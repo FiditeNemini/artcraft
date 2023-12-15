@@ -6,11 +6,18 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: IconDefinition;
   label?: string;
   textArea?: boolean;
+  className?: string;
 }
 
-export default function Input({ label, icon, textArea, ...rest }: InputProps) {
+export default function Input({
+  label,
+  icon,
+  textArea,
+  className,
+  ...rest
+}: InputProps) {
   return (
-    <div>
+    <div className={className}>
       {label && <label className="sub-title">{label}</label>}
 
       <div className={`form-group ${icon ? "input-icon" : ""}`}>

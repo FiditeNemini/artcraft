@@ -10,6 +10,8 @@ import {
   faFaceViewfinder,
   faCloudUpload,
   faWandMagicSparkles,
+  faHome,
+  faCompass,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/common/Button/Button";
@@ -231,7 +233,42 @@ export default function SideNav(props: SideNavProps) {
       className={`sidebar ${shouldShowSidebar ? "visible" : ""}`}
     >
       <ul className="sidebar-nav">
-        <li className="sidebar-heading">{t("speechTitle")}</li>
+        <li>
+          <NavLink
+            exact={true}
+            to="/"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon icon={faHome} className="sidebar-heading-icon" />
+            Home
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/pricing"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon icon={faStar} className="sidebar-heading-icon" />
+            {t("infoPricing")}
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/explore"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faCompass}
+              className="sidebar-heading-icon"
+            />
+            Explore
+          </NavLink>
+        </li>
+        <hr className="mb-3 mt-3" />
+        <li className="sidebar-heading">AI Tools</li>
         <li>
           <NavLink
             to="/tts"
@@ -271,8 +308,6 @@ export default function SideNav(props: SideNavProps) {
             {"Voice Designer"}
           </NavLink>
         </li>
-        <hr className="mb-3 mt-3" />
-        <li className="sidebar-heading">{t("videoTitle")}</li>
         <li>
           <NavLink
             to="/face-animator"
@@ -328,17 +363,6 @@ export default function SideNav(props: SideNavProps) {
               className="sidebar-heading-icon"
             />
             {t("communityGuide")}
-          </NavLink>
-        </li>
-        <hr className="mb-3 mt-3" />
-        <li>
-          <NavLink
-            to="/pricing"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon icon={faStar} className="sidebar-heading-icon" />
-            {t("infoPricing")}
           </NavLink>
         </li>
         <hr className="mb-3 mt-3" />

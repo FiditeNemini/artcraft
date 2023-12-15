@@ -1,4 +1,6 @@
-import { Button } from "components/common";
+import { faSearch } from "@fortawesome/pro-solid-svg-icons";
+import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
+import { Button, Input, Select } from "components/common";
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -12,14 +14,36 @@ export default function TopNav(props: TopNavProps) {
           <img
             src="/fakeyou/FakeYou-Logo.png"
             alt="FakeYou: Cartoon and Celebrity Text to Speech"
-            height="36"
-            className="mb-2"
+            height="34"
+            className="mb-1"
           />
         </Link>
-        <div className="sidebar-buttons d-flex gap-2 mt-4">
-          {/* {userOrLoginButton}
+
+        {/* Search Bar */}
+        <div className="search-bar-container d-flex justify-content-center">
+          <div className="d-flex">
+            <Input
+              placeholder="Search for a model weight..."
+              className="search-bar zi-3"
+            />
+            <Button
+              icon={faSearch}
+              onClick={() => {}}
+              variant="secondary"
+              className="search-bar-button"
+            />
+          </div>
+        </div>
+
+        <div className="d-flex align-items-center gap-3">
+          <div className="sidebar-buttons d-flex gap-2">
+            {/* {userOrLoginButton}
         {signupOrLogOutButton} */}
-          <Button label="Login" small={true} />
+            <Button label="Login" small={true} />
+          </div>
+          <div>
+            <Gravatar size={40} />
+          </div>
         </div>
       </div>
     </div>
