@@ -1,13 +1,7 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { TtsModel } from "@storyteller/components/src/api/tts/SearchTtsModels";
 import React from "react";
-import { Link } from "react-router-dom";
-import Button from "../Button";
-import {
-  faChartSimple,
-  faComment,
-  faHeart,
-} from "@fortawesome/pro-solid-svg-icons";
+import { Link, useHistory } from "react-router-dom";
+import Badge from "../Badge";
 
 interface SearchResultsDropdownProps {
   data: TtsModel[];
@@ -19,58 +13,56 @@ export default function SearchResultsDropdown({
   let likes = 1500;
   let uses = 25000;
   let comments = 25;
-  let model_type = "Tacotron2";
+  let modelCategory = "TTS";
+  let modelType = "Tacotron2";
+
+  const history = useHistory();
+
+  const handleResultClick = (item: TtsModel, event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+    history.push(`/weights/${item.model_token}`);
+  };
+
+  const handleInnerClick = (event: any) => {
+    event.stopPropagation();
+  };
 
   return (
-    <div className="row g-3">
-      {data.map(item => {
-        let modelPageLink = `/tts/${item.model_token}`;
+    <>
+      {data.length !== 0 && (
+        <div className="search-results-dropdown">
+          {data.map(item => {
+            // let modelPageLink = `/weight/${item.model_token}`;
 
-        return (
-          <div className="col-12 col-lg-6" key={item.model_token}>
-            <div className="model-search-results p-3">
-              <h5 className="fw-semibold mb-0">{item.title}</h5>
-              <p className="creator-name">
-                by{" "}
-                <Link
-                  className="fw-medium"
-                  to={`/profile/${item.creator_username}`}
-                >
-                  {item.creator_display_name}
-                </Link>
-              </p>
-              <div className="d-flex align-items-end">
-                <div className="flex-grow-1">
-                  <span
-                    className={`type-tag ${
-                      model_type === "Tacotron2" ? "tt2" : "tt2" // TODO
-                    }`}
-                  >
-                    TT2
-                  </span>
-                  <div className="d-flex gap-3 model-details fw-medium mt-3">
-                    <div>
-                      <FontAwesomeIcon icon={faHeart} className="me-2" />
-                      {likes && likes}
-                    </div>
-                    <div>
-                      <FontAwesomeIcon icon={faChartSimple} className="me-2" />
-                      {uses && uses}
-                    </div>
-                    <div>
-                      <FontAwesomeIcon icon={faComment} className="me-2" />
-                      {comments && comments}
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <Button label="Use Voice" small={true} to={modelPageLink} />
+            return (
+              <div
+                className="search-results-dropdown-item p-3"
+                key={item.model_token}
+                onClick={event => handleResultClick(item, event)}
+              >
+                <h6 className="fw-semibold mb-1">{item.title}</h6>
+                <div className="d-flex gap-2 align-items-center">
+                  <p className="fs-7">
+                    by{" "}
+                    <Link
+                      className="fw-medium"
+                      to={`/profile/${item.creator_username}`}
+                      onClick={handleInnerClick}
+                    >
+                      {item.creator_display_name}
+                    </Link>
+                  </p>
+                  <Badge label={"TTS"} color={"ultramarine"} small={true} />
                 </div>
               </div>
-            </div>
+            );
+          })}
+          <div className="search-results-dropdown-item view-more p-3">
+            View more results
           </div>
-        );
-      })}
-    </div>
+        </div>
+      )}
+    </>
   );
 }

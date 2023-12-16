@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import Input from "../Input";
 import Button from "../Button";
 import { faSearch } from "@fortawesome/pro-solid-svg-icons";
 import {
@@ -8,12 +7,14 @@ import {
 } from "@storyteller/components/src/api/tts/SearchTtsModels";
 import SearchResultsDropdown from "./SearchResultsDropdown";
 import SearchField from "./SearchField";
+import "./SearchBar.scss";
 
 interface SearchBarProps {}
 
 export default function SearchBar(props: SearchBarProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [foundTtsModels, setFoundTtsModels] = useState<TtsModel[]>([]);
+  const [isFocused, setIsFocused] = useState<boolean>(false);
 
   const maybeSearch = useCallback(async (value: string) => {
     setSearchTerm(value);
@@ -41,11 +42,22 @@ export default function SearchBar(props: SearchBarProps) {
     doSearch(searchTerm);
   }, [doSearch, searchTerm]);
 
+  const onBlurHandler = () => {
+    setTimeout(() => {
+      setIsFocused(false);
+    }, 100);
+  };
+
   return (
     <div className="search-bar-container">
-      <div>
-        <SearchField value={searchTerm} onChange={maybeSearch} />
-        <SearchResultsDropdown data={foundTtsModels} />
+      <div className="search-bar-group">
+        <SearchField
+          value={searchTerm}
+          onChange={maybeSearch}
+          onFocus={() => setIsFocused(true)}
+          onBlur={onBlurHandler}
+        />
+        {isFocused && <SearchResultsDropdown data={foundTtsModels} />}
       </div>
 
       <Button

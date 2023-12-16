@@ -1,21 +1,28 @@
 import React from "react";
 import Input from "../Input";
-import { faSearch } from "@fortawesome/pro-solid-svg-icons";
 
 interface SearchFieldProps {
   value: string;
   onChange: (value: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
-export default function SearchField({ value, onChange }: SearchFieldProps) {
+export default function SearchField({
+  value,
+  onChange,
+  onFocus,
+  onBlur,
+}: SearchFieldProps) {
   return (
     <Input
-      icon={faSearch}
       type="text"
       value={value}
       onChange={e => onChange(e.target.value)}
-      placeholder="Search..."
-      className="search-bar"
+      placeholder="Search for a model weight"
+      className="search-field"
+      onFocus={onFocus}
+      onBlur={onBlur}
     />
   );
 }

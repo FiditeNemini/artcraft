@@ -18,6 +18,12 @@
   &.shadow {
     box-shadow: 0 0 12px rgba($bg, 0.4);
   }
+
+  &.badge-small {
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 0.3rem;
+  }
 }
 
 @each $color, $value in $badge-colors {
