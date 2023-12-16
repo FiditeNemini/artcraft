@@ -177,16 +177,15 @@ $topbar-height: 66px;
 }
 
 .search-bar-container {
-  flex-grow: 1;
   display: flex;
   justify-content: center;
 }
 
 .search-bar {
-  width: 500px;
-
+  width: 580px;
   .form-control {
-    padding: 7px 0.75rem !important;
+    padding-top: 7.25px !important;
+    padding-bottom: 7.25px !important;
     border-radius: 0.5rem 0 0 0.5rem !important;
 
     &::placeholder {

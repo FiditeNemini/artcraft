@@ -1,0 +1,59 @@
+import React, { useCallback, useEffect, useState } from "react";
+import Input from "../Input";
+import Button from "../Button";
+import { faSearch } from "@fortawesome/pro-solid-svg-icons";
+import {
+  SearchTtsModels,
+  TtsModel,
+} from "@storyteller/components/src/api/tts/SearchTtsModels";
+import SearchResultsDropdown from "./SearchResultsDropdown";
+import SearchField from "./SearchField";
+
+interface SearchBarProps {}
+
+export default function SearchBar(props: SearchBarProps) {
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [foundTtsModels, setFoundTtsModels] = useState<TtsModel[]>([]);
+
+  const maybeSearch = useCallback(async (value: string) => {
+    setSearchTerm(value);
+  }, []);
+
+  const doSearch = useCallback(
+    async (value: string) => {
+      let request = {
+        search_term: value,
+      };
+
+      let response = await SearchTtsModels(request);
+
+      if (response.success) {
+        let models = [...response.models];
+        setFoundTtsModels(models);
+      } else {
+        setFoundTtsModels([]);
+      }
+    },
+    [setFoundTtsModels]
+  );
+
+  useEffect(() => {
+    doSearch(searchTerm);
+  }, [doSearch, searchTerm]);
+
+  return (
+    <div className="search-bar-container">
+      <div>
+        <SearchField value={searchTerm} onChange={maybeSearch} />
+        <SearchResultsDropdown data={foundTtsModels} />
+      </div>
+
+      <Button
+        icon={faSearch}
+        onClick={() => {}}
+        variant="secondary"
+        className="search-bar-button"
+      />
+    </div>
+  );
+}

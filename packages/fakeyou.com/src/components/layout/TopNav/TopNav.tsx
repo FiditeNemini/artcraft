@@ -1,6 +1,6 @@
-import { faSearch } from "@fortawesome/pro-solid-svg-icons";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-import { Button, Input, Select } from "components/common";
+import { Button } from "components/common";
+import SearchBar from "components/common/SearchBar";
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -20,20 +20,7 @@ export default function TopNav(props: TopNavProps) {
         </Link>
 
         {/* Search Bar */}
-        <div className="search-bar-container d-flex justify-content-center">
-          <div className="d-flex">
-            <Input
-              placeholder="Search for a model weight..."
-              className="search-bar zi-3"
-            />
-            <Button
-              icon={faSearch}
-              onClick={() => {}}
-              variant="secondary"
-              className="search-bar-button"
-            />
-          </div>
-        </div>
+        <SearchBar />
 
         <div className="d-flex align-items-center gap-3">
           <div className="sidebar-buttons d-flex gap-2">

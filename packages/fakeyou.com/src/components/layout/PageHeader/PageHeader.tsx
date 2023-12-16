@@ -94,7 +94,7 @@ export default function PageHeader({
 
   if (!panel) {
     return (
-      <div className="py-3">
+      <div className="py-4">
         <Panel clear={true}>
           {(back || showBackButton) && (
             <div className="d-flex my-2 my-lg-3">
