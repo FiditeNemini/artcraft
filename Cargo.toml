@@ -10,10 +10,10 @@ members = [
   "crates/_types/tokens",
 
   # CLI tools for operations, etc.
-  "crates/cli/database_backup",
-  "crates/cli/database_cleanup",
-  "crates/cli/dev_database_seed",
-  "crates/cli/dev_upload_media_file",
+  "crates/cli/database-backup",
+  "crates/cli/database-cleanup",
+  "crates/cli/dev-database-seed",
+  "crates/cli/dev-upload-media-file",
   "crates/cli/elasticsearch-cli",
   "crates/cli/kubectl-pod-cleanup",
   "crates/cli/lru-delete-models",

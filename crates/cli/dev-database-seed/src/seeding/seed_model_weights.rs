@@ -1,12 +1,10 @@
 use std::path::Path;
 
-use log::{ info, warn };
-use sqlx::{ MySql, Pool };
+use log::{info, warn};
+use rand::Rng;
+use sqlx::{MySql, Pool};
 
-use buckets::{ public::{ media_files::bucket_file_path::MediaFileBucketPath, self, weight_files::bucket_file_path::WeightFileBucketPath }, private };
-
-
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use enums::{
     by_table::model_weights::{weights_category::WeightsCategory, weights_types::WeightsType},
     common::visibility::Visibility,
