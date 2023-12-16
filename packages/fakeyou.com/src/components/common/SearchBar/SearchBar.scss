@@ -3,11 +3,12 @@
 .search-bar-container {
   display: flex;
   justify-content: center;
+  width: 580px;
 }
 
 .search-bar-group {
   position: relative;
-  width: 580px;
+  width: 100%;
 }
 
 .search-field {
@@ -66,5 +67,17 @@
   &:hover {
     border-color: lighten($secondary, 10%) !important;
     background-color: lighten($secondary, 10%) !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .search-bar-container {
+    width: 100%;
+  }
+
+  .search-field {
+    .form-control {
+      border-radius: 0.5rem !important;
+    }
   }
 }

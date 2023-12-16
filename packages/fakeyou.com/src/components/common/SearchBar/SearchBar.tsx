@@ -43,6 +43,7 @@ export default function SearchBar(props: SearchBarProps) {
   }, [doSearch, searchTerm]);
 
   const onBlurHandler = () => {
+    // Search field blur/Unfocusing hack: needs a little bit of delay for the result click event to register
     setTimeout(() => {
       setIsFocused(false);
     }, 100);
@@ -64,7 +65,7 @@ export default function SearchBar(props: SearchBarProps) {
         icon={faSearch}
         onClick={() => {}}
         variant="secondary"
-        className="search-bar-button"
+        className="search-bar-button d-none d-lg-flex"
       />
     </div>
   );

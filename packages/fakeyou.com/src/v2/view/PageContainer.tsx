@@ -212,7 +212,7 @@ class PageContainer extends React.Component<
       <div id="wrapper" className="no-padding">
         <div id="overlay"></div>
 
-        <TopNav />
+        <TopNav sessionWrapper={this.props.sessionWrapper} />
         <SideNav
           sessionWrapper={this.props.sessionWrapper}
           logoutHandler={this.logout}

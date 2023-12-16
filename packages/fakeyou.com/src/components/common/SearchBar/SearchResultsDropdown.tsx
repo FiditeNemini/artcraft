@@ -10,12 +10,6 @@ interface SearchResultsDropdownProps {
 export default function SearchResultsDropdown({
   data,
 }: SearchResultsDropdownProps) {
-  let likes = 1500;
-  let uses = 25000;
-  let comments = 25;
-  let modelCategory = "TTS";
-  let modelType = "Tacotron2";
-
   const history = useHistory();
 
   const handleResultClick = (item: TtsModel, event: React.MouseEvent) => {
