@@ -17,6 +17,7 @@ members = [
   "crates/cli/elasticsearch-cli",
   "crates/cli/kubectl-pod-cleanup",
   "crates/cli/lru-delete-models",
+  "crates/cli/migration-tool",
   "crates/cli/scrape_test",
 
   # Shared libraries
