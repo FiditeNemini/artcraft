@@ -54,7 +54,7 @@
     display: flex;
     justify-content: center;
     color: $primary;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
   }
 }
@@ -67,6 +67,17 @@
   &:hover {
     border-color: lighten($secondary, 10%) !important;
     background-color: lighten($secondary, 10%) !important;
+  }
+}
+
+.no-results {
+  text-align: center;
+  color: rgba($white, 0.5);
+  font-size: 15px;
+
+  &:hover {
+    background-color: $panel-inner !important;
+    cursor: default !important;
   }
 }
 

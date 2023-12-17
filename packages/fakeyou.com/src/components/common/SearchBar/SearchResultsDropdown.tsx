@@ -5,10 +5,14 @@ import Badge from "../Badge";
 
 interface SearchResultsDropdownProps {
   data: TtsModel[];
+  isNoResults?: boolean;
+  isLoading?: boolean;
 }
 
 export default function SearchResultsDropdown({
   data,
+  isNoResults,
+  isLoading,
 }: SearchResultsDropdownProps) {
   const history = useHistory();
 
@@ -54,6 +58,33 @@ export default function SearchResultsDropdown({
           })}
           <div className="search-results-dropdown-item view-more p-3">
             View more results
+          </div>
+        </div>
+      )}
+      {data.length === 0 && !isLoading && isNoResults && (
+        <div className="search-results-dropdown">
+          <div
+            className="search-results-dropdown-item p-3 no-results"
+            onClick={handleInnerClick}
+          >
+            No results found
+          </div>
+        </div>
+      )}
+      {isLoading && isNoResults && (
+        <div className="search-results-dropdown">
+          <div
+            className="search-results-dropdown-item p-3"
+            onClick={handleInnerClick}
+          >
+            <div className="text-center">
+              <div
+                className="spinner-border spinner-border-md opacity-50"
+                role="status"
+              >
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            </div>
           </div>
         </div>
       )}

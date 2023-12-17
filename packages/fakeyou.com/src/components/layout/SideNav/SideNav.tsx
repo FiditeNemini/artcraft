@@ -438,6 +438,7 @@ export default function SideNav({
               </span>
             </div>
           </div>
+
           <div className="px-4 d-flex d-lg-none gap-2 mt-3">
             {userOrLoginButton}
             {signupOrLogOutButton}

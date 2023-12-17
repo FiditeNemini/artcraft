@@ -24,6 +24,7 @@ export default function SearchBar({
 }: SearchBarProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [foundTtsModels, setFoundTtsModels] = useState<TtsModel[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const maybeSearch = useCallback(async (value: string) => {
     setSearchTerm(value);
@@ -35,6 +36,8 @@ export default function SearchBar({
         search_term: value,
       };
 
+      setIsLoading(true);
+
       let response = await SearchTtsModels(request);
 
       if (response.success) {
@@ -43,6 +46,8 @@ export default function SearchBar({
       } else {
         setFoundTtsModels([]);
       }
+
+      setIsLoading(false);
     },
     [setFoundTtsModels]
   );
@@ -61,7 +66,13 @@ export default function SearchBar({
           onBlur={onBlur}
           autoFocus={autoFocus}
         />
-        {isFocused && <SearchResultsDropdown data={foundTtsModels} />}
+        {isFocused && (
+          <SearchResultsDropdown
+            data={foundTtsModels}
+            isNoResults={foundTtsModels.length === 0 && searchTerm !== ""}
+            isLoading={isLoading}
+          />
+        )}
       </div>
 
       <Button
