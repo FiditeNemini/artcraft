@@ -4,5 +4,6 @@ pub mod get_weight;
 pub mod list_weights_by_tokens;
 pub mod list_weights_by_user;
 pub mod list_weights_query_builder;
+pub mod migration;
 pub mod tests;
 pub mod update_weight;

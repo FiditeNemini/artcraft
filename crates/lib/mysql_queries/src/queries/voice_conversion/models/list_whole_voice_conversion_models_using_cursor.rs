@@ -14,6 +14,7 @@ use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
 
 use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 
+/// This is meant to be the entire table
 #[derive(Debug)]
 pub struct WholeVoiceConversionModelRecord {
   pub id: i64,

@@ -1,6 +1,7 @@
 use std::thread;
 use std::time::Duration;
 use errors::AnyhowResult;
+use mysql_queries::queries::model_weights::migration::upsert_model_weight_from_voice_conversion_model::upsert_model_weight_from_voice_conversion_model;
 use mysql_queries::queries::voice_conversion::models::list_whole_voice_conversion_models_using_cursor::list_whole_voice_conversion_models_using_cursor;
 use crate::deps::Deps;
 
@@ -20,7 +21,8 @@ pub async fn migrate_voice_conversion_to_weights(deps: &Deps) -> AnyhowResult<()
     }
 
     for result in results.iter() {
-      println!("result: {:?}", result);
+      println!("result: {:?}\n\n", result);
+      upsert_model_weight_from_voice_conversion_model(result, &deps.mysql_development).await?;
     }
 
     if let Some(last_id) = results.last().map(|result| result.id) {
