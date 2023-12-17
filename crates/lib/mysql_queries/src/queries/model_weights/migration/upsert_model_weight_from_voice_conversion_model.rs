@@ -56,9 +56,10 @@ pub async fn upsert_model_weights_record(
   // maybe_last_update_user_token - seems like bad design
   // TODO(bt): OBVIOUSLY COPY THE BUCKET FILES !
   // TODO(bt): file checksum
-  // TODO(bt): rename maybe_private_bucket_extension to maybe_private_bucket_suffix.
+  // TODO(bt): rename maybe_private_bucket_extension to maybe_private_bucket_suffix (!!!)
   // TODO(bt): do we need model_weights.ip_address_last_update without audit logs?
   // TODO(bt): rename creator_ip_address to ip_address_creation (and add ip_address_last_update)
+  // TODO(bt): Check model_weights column integer types - signed vs unsigned
   let query = sqlx::query!(
         r#"
 INSERT INTO model_weights
@@ -74,12 +75,14 @@ SET
   description_rendered_html = ?,
   creator_user_token = ?,
   creator_ip_address = ?,
+
   creator_set_visibility = ?,
   maybe_last_update_user_token = NULL,
   original_download_url = ?,
   original_filename = ?,
   file_size_bytes = ?,
-  file_checksum_sha2 = NULL,
+  file_checksum_sha2 = "TODO",
+
   private_bucket_hash = "TODO",
   maybe_private_bucket_prefix = "TODO",
   maybe_private_bucket_extension = "TODO",
@@ -88,6 +91,7 @@ SET
   cached_user_ratings_negative_count = 0,
   maybe_cached_user_ratings_ratio = 0.0,
   cached_user_ratings_last_updated_at = NOW(),
+
   maybe_migration_old_model_token = ?,
   version = ?,
   created_at = ?,
@@ -111,7 +115,7 @@ ON DUPLICATE KEY UPDATE
   original_download_url = ?,
   original_filename = ?,
   file_size_bytes = ?,
-  file_checksum_sha2 = NULL,
+  file_checksum_sha2 = "TODO",
   private_bucket_hash = "TODO",
   maybe_private_bucket_prefix = "TODO",
   maybe_private_bucket_extension = "TODO",
@@ -126,7 +130,6 @@ ON DUPLICATE KEY UPDATE
   updated_at = ?,
   user_deleted_at = ?,
   mod_deleted_at = ?
-
         "#,
     // Insert
     model_weight_token,
@@ -137,10 +140,11 @@ ON DUPLICATE KEY UPDATE
     record.description_rendered_html,
     record.creator_user_token,
     record.ip_address_creation,
-    record.creator_set_visibility,
+    record.creator_set_visibility.to_str(),
     record.original_download_url,
     record.original_filename,
     record.file_size_bytes,
+
     record.token.as_str(),
     record.version,
     record.created_at,
@@ -156,7 +160,7 @@ ON DUPLICATE KEY UPDATE
     record.description_rendered_html,
     record.creator_user_token,
     record.ip_address_creation,
-    record.creator_set_visibility,
+    record.creator_set_visibility.to_str(),
     record.original_download_url,
     record.original_filename,
     record.file_size_bytes,
