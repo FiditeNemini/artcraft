@@ -1,21 +1,30 @@
 import {
   faBars,
   faSearch,
+  faSignOutAlt,
   faUser,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { WebUrl } from "common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { Logout } from "@storyteller/components/src/api/session/Logout";
 
 interface TopNavProps {
   sessionWrapper: SessionWrapper;
+  logoutHandler: () => void;
+  querySessionCallback: () => void;
+  querySessionSubscriptionsCallback: () => void;
 }
 
-export default function TopNav({ sessionWrapper }: TopNavProps) {
+export default function TopNav({
+  sessionWrapper,
+  querySessionCallback,
+  querySessionSubscriptionsCallback,
+}: TopNavProps) {
   let history = useHistory();
   const [isMobileSearchBarVisible, setIsMobileSearchBarVisible] =
     useState(false);
@@ -38,6 +47,7 @@ export default function TopNav({ sessionWrapper }: TopNavProps) {
 
   const handleSearchButtonClick = () => {
     setIsMobileSearchBarVisible(true);
+    setMenuButtonIcon(faBars);
     if (window.innerWidth < 1200) {
       if (wrapper) {
         wrapper.classList.remove("toggled");
@@ -60,11 +70,92 @@ export default function TopNav({ sessionWrapper }: TopNavProps) {
     }, 100);
   };
 
-  let signupOrProfileButton = (
+  useEffect(() => {
+    const handleMenuToggle = (event: any) => {
+      setMenuButtonIcon(event.detail.isOpen ? faXmark : faBars);
+    };
+
+    window.addEventListener("menuToggle", handleMenuToggle);
+
+    return () => {
+      window.removeEventListener("menuToggle", handleMenuToggle);
+    };
+  }, []);
+
+  const logoutHandler = async () => {
+    await Logout();
+    querySessionCallback();
+    querySessionSubscriptionsCallback();
+    // PosthogClient.reset();
+    // Analytics.accountLogout();
+    history.push("/");
+  };
+
+  const loggedIn = sessionWrapper.isLoggedIn();
+
+  let userOrLoginButton = (
     <>
-      <Button label="Sign Up" small onClick={() => history.push("/signup")} />
+      <Button
+        label="Login"
+        small
+        variant="secondary"
+        onClick={() => {
+          history.push("/login");
+        }}
+      />
     </>
   );
+
+  let signupOrLogOutButton = (
+    <>
+      <Button
+        label="Sign Up"
+        small
+        onClick={() => {
+          history.push("/signup");
+        }}
+      />
+    </>
+  );
+
+  if (loggedIn) {
+    let displayName = sessionWrapper.getDisplayName();
+    // let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
+    // let gravatar = <span />;
+
+    if (displayName === undefined) {
+      displayName = "My Account";
+    }
+
+    let url = WebUrl.userProfilePage(displayName);
+    userOrLoginButton = (
+      <>
+        <Button
+          icon={faUser}
+          label="My Profile"
+          small
+          variant="secondary"
+          onClick={() => {
+            history.push(url);
+          }}
+        />
+      </>
+    );
+
+    signupOrLogOutButton = (
+      <>
+        <Button
+          icon={faSignOutAlt}
+          label="Logout"
+          small
+          variant="danger"
+          onClick={async () => {
+            await logoutHandler();
+          }}
+        />
+      </>
+    );
+  }
 
   if (sessionWrapper.isLoggedIn()) {
     let displayName = sessionWrapper.getDisplayName();
@@ -72,7 +163,7 @@ export default function TopNav({ sessionWrapper }: TopNavProps) {
       displayName = "My Account";
     }
     let url = WebUrl.userProfilePage(displayName);
-    signupOrProfileButton = (
+    userOrLoginButton = (
       <Button
         icon={faUser}
         label="My Profile"
@@ -117,7 +208,10 @@ export default function TopNav({ sessionWrapper }: TopNavProps) {
 
         <div className="topbar-nav-right">
           <div className="d-flex align-items-center gap-2">
-            {signupOrProfileButton}
+            <div className="d-none d-lg-flex gap-2">
+              {userOrLoginButton}
+              {signupOrLogOutButton}
+            </div>
             <Button
               icon={faSearch}
               variant="secondary"
