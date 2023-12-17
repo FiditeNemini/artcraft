@@ -6,6 +6,7 @@ interface SearchFieldProps {
   onChange: (value: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
+  autoFocus?: boolean;
 }
 
 export default function SearchField({
@@ -13,6 +14,7 @@ export default function SearchField({
   onChange,
   onFocus,
   onBlur,
+  autoFocus = false,
 }: SearchFieldProps) {
   return (
     <Input
@@ -23,6 +25,7 @@ export default function SearchField({
       className="search-field"
       onFocus={onFocus}
       onBlur={onBlur}
+      autoFocus={autoFocus}
     />
   );
 }

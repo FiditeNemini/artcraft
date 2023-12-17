@@ -206,6 +206,21 @@ $topbar-height: 66px;
     transform: translate(-50%, -50%);
     width: 100%;
     padding: 0 1rem;
+
+    .close-search-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 0 1.8rem;
+      color: $white;
+      height: 100%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 4;
+      background: none;
+      border: none;
+      padding: 0;
+    }
   }
 }
 

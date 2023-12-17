@@ -9,12 +9,21 @@ import SearchResultsDropdown from "./SearchResultsDropdown";
 import SearchField from "./SearchField";
 import "./SearchBar.scss";
 
-interface SearchBarProps {}
+interface SearchBarProps {
+  autoFocus?: boolean;
+  onBlur?: () => void;
+  onFocus?: () => void;
+  isFocused?: boolean;
+}
 
-export default function SearchBar(props: SearchBarProps) {
+export default function SearchBar({
+  autoFocus,
+  onBlur,
+  onFocus,
+  isFocused,
+}: SearchBarProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [foundTtsModels, setFoundTtsModels] = useState<TtsModel[]>([]);
-  const [isFocused, setIsFocused] = useState<boolean>(false);
 
   const maybeSearch = useCallback(async (value: string) => {
     setSearchTerm(value);
@@ -42,21 +51,15 @@ export default function SearchBar(props: SearchBarProps) {
     doSearch(searchTerm);
   }, [doSearch, searchTerm]);
 
-  const onBlurHandler = () => {
-    // Search field blur/Unfocusing hack: needs a little bit of delay for the result click event to register
-    setTimeout(() => {
-      setIsFocused(false);
-    }, 100);
-  };
-
   return (
     <div className="search-bar-container">
-      <div className="search-bar-group">
+      <div className="search-field-group">
         <SearchField
           value={searchTerm}
           onChange={maybeSearch}
-          onFocus={() => setIsFocused(true)}
-          onBlur={onBlurHandler}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          autoFocus={autoFocus}
         />
         {isFocused && <SearchResultsDropdown data={foundTtsModels} />}
       </div>

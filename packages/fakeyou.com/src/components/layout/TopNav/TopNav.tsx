@@ -1,7 +1,12 @@
-import { faBars, faSearch, faUser } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faBars,
+  faSearch,
+  faUser,
+  faXmark,
+} from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
-import React from "react";
+import React, { useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { WebUrl } from "common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
@@ -12,18 +17,48 @@ interface TopNavProps {
 
 export default function TopNav({ sessionWrapper }: TopNavProps) {
   let history = useHistory();
+  const [isMobileSearchBarVisible, setIsMobileSearchBarVisible] =
+    useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const wrapper = document.getElementById("wrapper");
+  const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
 
   const handleMenuButtonClick = () => {
-    const wrapper = document.getElementById("wrapper");
-
     if (window.innerWidth < 1200) {
       if (wrapper) {
         wrapper.classList.toggle("toggled");
+        if (menuButtonIcon === faBars) {
+          setMenuButtonIcon(faXmark);
+        } else {
+          setMenuButtonIcon(faBars);
+        }
       }
     }
   };
 
-  const handleSearchButtonClick = () => {};
+  const handleSearchButtonClick = () => {
+    setIsMobileSearchBarVisible(true);
+    if (window.innerWidth < 1200) {
+      if (wrapper) {
+        wrapper.classList.remove("toggled");
+      }
+    }
+  };
+
+  const onFocusHandler = () => {
+    setIsFocused(true);
+  };
+
+  const onBlurHandler = () => {
+    // Search field blur/Unfocusing hack: needs a little bit of delay for the result click event to register
+    setTimeout(() => {
+      setIsFocused(false);
+
+      if (isMobileSearchBarVisible) {
+        setIsMobileSearchBarVisible(false);
+      }
+    }, 100);
+  };
 
   let signupOrProfileButton = (
     <>
@@ -72,7 +107,11 @@ export default function TopNav({ sessionWrapper }: TopNavProps) {
         <div className="topbar-nav-center">
           {/* Search Bar */}
           <div className="d-none d-lg-block">
-            <SearchBar />
+            <SearchBar
+              onFocus={onFocusHandler}
+              onBlur={onBlurHandler}
+              isFocused={isFocused}
+            />
           </div>
         </div>
 
@@ -88,7 +127,7 @@ export default function TopNav({ sessionWrapper }: TopNavProps) {
               className="d-lg-none"
             />
             <Button
-              icon={faBars}
+              icon={menuButtonIcon}
               variant="secondary"
               small={true}
               square={true}
@@ -100,11 +139,26 @@ export default function TopNav({ sessionWrapper }: TopNavProps) {
       </div>
 
       {/* Mobile Searchbar */}
-      <div className="topbar-mobile-search-bar-container d-block d-lg-none">
-        <div className="topbar-mobile-search-bar">
-          <SearchBar />
+      {isMobileSearchBarVisible && (
+        <div className="topbar-mobile-search-bar-container">
+          <div className="topbar-mobile-search-bar">
+            <SearchBar
+              onFocus={onFocusHandler}
+              onBlur={onBlurHandler}
+              isFocused={isFocused}
+              autoFocus={true}
+            />
+
+            <Button
+              icon={faXmark}
+              className="close-search-button"
+              onClick={() => {
+                setIsMobileSearchBarVisible(false);
+              }}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
