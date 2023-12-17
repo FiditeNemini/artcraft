@@ -17,8 +17,7 @@ use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mysql_queries::queries::model_weights::create_weight::{
     create_weight,
-    CreateModelWeightsArgs
-    ,
+    CreateModelWeightsArgs,
 };
 use storyteller_root::get_seed_tool_data_root;
 use tokens::tokens::model_weights::ModelWeightToken;
