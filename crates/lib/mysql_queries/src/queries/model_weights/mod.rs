@@ -2,6 +2,7 @@ pub mod create;
 pub mod create_weight;
 pub mod delete_weights;
 pub mod get_weight;
+pub mod inference;
 pub mod list_weights_by_tokens;
 pub mod list_weights_by_user;
 pub mod list_weights_query_builder;
