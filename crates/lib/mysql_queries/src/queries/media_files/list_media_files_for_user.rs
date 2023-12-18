@@ -73,9 +73,6 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
 
   let row_count_query = count_query_builder.build_query_scalar::<i64>();
   let row_count_result = row_count_query.fetch_one(args.mysql_pool).await?;
-  /// Figure out limit start and end based on page size and indexes as requested
-  let limit_start = args.page_size * args.page_index;
-  let limit_end = limit_start + args.page_size;
 
   /// Now fetch the actual results with all the fields
   let result_fields = select_result_fields();
@@ -83,8 +80,8 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
     args.maybe_filter_media_type,
     args.username,
     true,
-    limit_start,
-    limit_end,
+    args.page_index,
+    args.page_size,
     args.cursor_is_reversed,
     args.view_as,
     result_fields.as_str(),
@@ -157,8 +154,8 @@ fn query_builder<'a>(
   maybe_filter_media_type: Option<MediaFileType>,
   username: &'a str,
   enforce_limits: bool,
-  limit_start: usize,
-  limit_end: usize,
+  page_index: usize,
+  page_size: usize,
   cursor_is_reversed: bool,
   view_as: ViewAs,
   select_fields: &'a str,
@@ -208,11 +205,8 @@ WHERE m.user_deleted_at IS NULL
   }
 
   if enforce_limits {
-    if cursor_is_reversed {
-      query_builder.push(format!(" LIMIT {limit_start}, {limit_end} "));
-    } else {
-      query_builder.push(format!(" LIMIT {limit_end}, {limit_start} "));
-    }
+    let offset = page_index * page_size;
+    query_builder.push(format!(" LIMIT {page_size} OFFSET {offset} "));
   }
 
   query_builder
