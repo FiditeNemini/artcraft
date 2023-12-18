@@ -7,6 +7,7 @@ interface SearchFieldProps {
   onFocus?: () => void;
   onBlur?: () => void;
   autoFocus?: boolean;
+  onKeyPress?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 export default function SearchField({
@@ -14,6 +15,7 @@ export default function SearchField({
   onChange,
   onFocus,
   onBlur,
+  onKeyPress,
   autoFocus = false,
 }: SearchFieldProps) {
   return (
@@ -26,6 +28,7 @@ export default function SearchField({
       onFocus={onFocus}
       onBlur={onBlur}
       autoFocus={autoFocus}
+      onKeyPress={onKeyPress}
     />
   );
 }

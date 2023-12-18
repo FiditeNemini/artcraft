@@ -81,6 +81,13 @@
   }
 }
 
+.loading-results {
+  &:hover {
+    background-color: $panel-inner !important;
+    cursor: default !important;
+  }
+}
+
 @media (max-width: 992px) {
   .search-bar-container {
     width: 100%;

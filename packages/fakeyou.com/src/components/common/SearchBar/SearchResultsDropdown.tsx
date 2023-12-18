@@ -7,23 +7,32 @@ interface SearchResultsDropdownProps {
   data: TtsModel[];
   isNoResults?: boolean;
   isLoading?: boolean;
+  searchTerm?: string;
 }
 
 export default function SearchResultsDropdown({
   data,
   isNoResults,
   isLoading,
+  searchTerm,
 }: SearchResultsDropdownProps) {
   const history = useHistory();
 
   const handleResultClick = (item: TtsModel, event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();
-    history.push(`/weights/${item.model_token}`);
+    history.push(`/weight/${item.model_token}`);
   };
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
+  };
+
+  const handleUrlPush = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (searchTerm) {
+      history.push(`/search/weights?query=${encodeURIComponent(searchTerm)}`);
+    }
   };
 
   return (
@@ -56,30 +65,27 @@ export default function SearchResultsDropdown({
               </div>
             );
           })}
-          <div className="search-results-dropdown-item view-more p-3">
+          <div
+            className="search-results-dropdown-item view-more p-3"
+            onClick={handleUrlPush}
+          >
             View more results
           </div>
         </div>
       )}
       {data.length === 0 && !isLoading && isNoResults && (
         <div className="search-results-dropdown">
-          <div
-            className="search-results-dropdown-item p-3 no-results"
-            onClick={handleInnerClick}
-          >
+          <div className="search-results-dropdown-item p-3 no-results">
             No results found
           </div>
         </div>
       )}
       {isLoading && isNoResults && (
         <div className="search-results-dropdown">
-          <div
-            className="search-results-dropdown-item p-3"
-            onClick={handleInnerClick}
-          >
+          <div className="search-results-dropdown-item p-3 loading-results">
             <div className="text-center">
               <div
-                className="spinner-border spinner-border-md opacity-50"
+                className="spinner-border spinner-border-md opacity-75"
                 role="status"
               >
                 <span className="visually-hidden">Loading...</span>

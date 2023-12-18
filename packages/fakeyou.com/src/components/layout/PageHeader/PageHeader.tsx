@@ -15,7 +15,8 @@ interface PageHeaderProps {
   back?: BackConfig;
   titleIcon?: IconDefinition;
   title: string | React.ReactNode;
-  subText: string | React.ReactNode;
+  titleH2?: boolean;
+  subText?: string | React.ReactNode;
   full?: boolean;
   showButton?: boolean;
   extension?: React.ReactNode;
@@ -42,6 +43,7 @@ export default function PageHeader({
   back,
   titleIcon,
   title,
+  titleH2 = false,
   subText,
   full,
   showButton,
@@ -111,10 +113,15 @@ export default function PageHeader({
               } justify-content-center gap-4 py-2`}
             >
               <div>
-                <h1 className="fw-bold">
-                  {/* {icon} */}
-                  {title}
-                </h1>
+                {titleH2 ? (
+                  <h2 className="fw-bold">{title}</h2>
+                ) : (
+                  <h1 className="fw-bold">
+                    {/* {icon} */}
+                    {title}
+                  </h1>
+                )}
+
                 <p className={typeof subText === "string" ? "opacity-75" : ""}>
                   {subText}
                 </p>
