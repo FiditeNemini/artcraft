@@ -238,7 +238,7 @@ export default function SideNav({
         small
         variant="secondary"
         onClick={() => history.push(url)}
-        className="d-none d-lg-block"
+        className="d-block d-lg-none"
       />
     );
   }
