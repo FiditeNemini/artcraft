@@ -17,11 +17,7 @@ export interface GetDatasetResponse {
   updated_at: Date;
 }
 
-export const GetDataset = MakeRequest<
-  string,
-  GetDatasetRequest,
-  GetDatasetResponse
->({
+export const GetDataset = MakeRequest<string, GetDatasetRequest, GetDatasetResponse, {}>({
   method: "GET",
   routingFunction: (datasetToken: string) =>
     `/v1/voice_designer/dataset/${datasetToken}`,

@@ -9,11 +9,7 @@ export interface DeleteDatasetResponse {
   success: boolean;
 }
 
-export const DeleteDataset = MakeRequest<
-  string,
-  DeleteDatasetRequest,
-  DeleteDatasetResponse
->({
+export const DeleteDataset = MakeRequest<string, DeleteDatasetRequest,DeleteDatasetResponse,{}>({
   method: "DELETE",
   routingFunction: (voiceToken: string) =>
     `/v1/voice_designer/dataset/${voiceToken}/delete`,

@@ -49,8 +49,6 @@ import MediaTab from "./tabs/MediaTab";
 import WeightsTab from "./tabs/WeightsTab";
 import BookmarksTab from "./tabs/BookmarksTab";
 
-import useProfileRequests from '../useProfileRequests';
-
 interface Props {
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -76,8 +74,6 @@ function NewProfilePage(this: any, props: Props) {
       }
     }
   }, []);
-
-  useProfileRequests({ requestMedia: true });
 
   useEffect(() => {
     getUser(username);

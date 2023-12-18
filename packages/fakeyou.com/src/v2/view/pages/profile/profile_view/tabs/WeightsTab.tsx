@@ -60,6 +60,12 @@ export default function WeightsTab() {
     { value: "SDXL", label: "SD XL" },
   ];
 
+  const paginationProps = {
+    onPageChange: handlePageClick,
+    pageCount: 0, // replace with proper fecth value
+    currentPage: 0 // replace with proper fecth value
+  };
+
   const handleFilterChange = (option: any) => {
     const selectedOption = option as { value: string; label: string };
     setSelectedFilter(selectedOption.value);
@@ -106,12 +112,7 @@ export default function WeightsTab() {
             />
           )}
         </div>
-        <Pagination
-          itemsPerPage={itemsPerPage}
-          totalItems={data.length}
-          onPageChange={handlePageClick}
-          currentPage={currentPage}
-        />
+        <Pagination { ...paginationProps }/>
       </div>
       {isLoading ? (
         <div className="row gx-3 gy-3">
@@ -149,12 +150,7 @@ export default function WeightsTab() {
       )}
 
       <div className="d-flex justify-content-end mt-4">
-        <Pagination
-          itemsPerPage={itemsPerPage}
-          totalItems={data.length}
-          onPageChange={handlePageClick}
-          currentPage={currentPage}
-        />
+        <Pagination { ...paginationProps }/>
       </div>
     </>
   );

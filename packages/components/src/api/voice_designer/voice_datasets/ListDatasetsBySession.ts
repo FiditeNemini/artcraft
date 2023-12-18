@@ -1,9 +1,9 @@
 import MakeRequest from "../../MakeRequest";
 import { UserDetailsLight } from "../../_common/UserDetailsLight";
 
-export interface ListVoicesBySessionRequest {}
+export interface ListDatasetsBySessionRequest {}
 
-export interface ListVoicesBySessionResponse {
+export interface ListDatasetsBySessionResponse {
     voice_token: string,
     title: string,
     
@@ -17,7 +17,7 @@ export interface ListVoicesBySessionResponse {
     updated_at: Date,
 }
 
-export const ListVoicesBySession = MakeRequest<string, ListVoicesBySessionRequest, ListVoicesBySessionResponse>({
+export const ListDatasetsBySession = MakeRequest<string, ListDatasetsBySessionRequest, ListDatasetsBySessionResponse, {}>({
     method: "GET", 
     routingFunction: () => `/v1/voice_designer/dataset/session/list`,
 });

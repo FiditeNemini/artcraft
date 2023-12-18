@@ -10,7 +10,7 @@ export interface CreateVoiceResponse {
   inference_job_token: string,
 }
 
-export const CreateVoice = MakeRequest<string, CreateVoiceRequest, CreateVoiceResponse>({
+export const CreateVoice = MakeRequest<string, CreateVoiceRequest, CreateVoiceResponse,{}>({
     method: "POST", 
     routingFunction: () => "/v1/voice_designer/voice/create",
 });

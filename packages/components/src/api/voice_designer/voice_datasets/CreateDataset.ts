@@ -11,7 +11,7 @@ export interface CreateDatasetResponse {
   token: string,
 }
 
-export const CreateDataset = MakeRequest<string, CreateDatasetRequest, CreateDatasetResponse>({
+export const CreateDataset = MakeRequest<string, CreateDatasetRequest, CreateDatasetResponse,{}>({
     method: "POST", 
     routingFunction: () => "/v1/voice_designer/dataset/create",
 });

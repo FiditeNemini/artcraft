@@ -11,7 +11,7 @@ export interface EnqueueTtsResponse {
   inference_job_token: string,
 }
 
-export const EnqueueTts = MakeRequest<string, EnqueueTtsRequest, EnqueueTtsResponse>({
+export const EnqueueTts = MakeRequest<string, EnqueueTtsRequest, EnqueueTtsResponse,{}>({
     method: "POST", 
     routingFunction: () => "/v1/voice_designer/inference/enqueue_tts",
 });

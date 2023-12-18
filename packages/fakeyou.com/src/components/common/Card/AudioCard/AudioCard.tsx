@@ -16,6 +16,8 @@ interface AudioCardProps {
 export default function AudioCard({ data, type }: AudioCardProps) {
   const history = useHistory();
 
+  // console.log("🐙",data);
+
   const handleCardClick = () => {
     if (type === "media") {
       history.push(`/media/${data.token}`);
@@ -62,7 +64,7 @@ export default function AudioCard({ data, type }: AudioCardProps) {
           </div>
 
           <div className="mt-3" onClick={handleInnerClick}>
-            <LikeButton onToggle={handleLike} likeCount={data.likes} />
+            <LikeButton onToggle={handleLike} likeCount={data.like || 0 } />
           </div>
         </>
       )}

@@ -22,7 +22,7 @@ export interface ListVoicesByUserResponse {
     voices: Voice[],
 }
 
-export const ListVoicesByUser = MakeRequest<string, ListVoicesByUserRequest, ListVoicesByUserResponse>({
+export const ListVoicesByUser = MakeRequest<string, ListVoicesByUserRequest, ListVoicesByUserResponse, {}>({
     method: "GET", 
     routingFunction: (userName:  string) => `/v1/voice_designer/voice/user/${ userName }/list`,
 });

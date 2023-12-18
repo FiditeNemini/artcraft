@@ -14,9 +14,6 @@ interface RouteSetup<UrlRouteArgs> {
     routingFunction: UrlRoutingFunction<UrlRouteArgs>;
 } 
   
-//const formatUrl = (endpoint = "") =>
-//  `${useSsl ? "https" : "http"}://${host + endpoint}`;
-  
 const METHOD_OMITS_BODY: { [key: string]: boolean } = {
   DELETE: false,
   GET: true,
@@ -26,11 +23,10 @@ const METHOD_OMITS_BODY: { [key: string]: boolean } = {
   PUT: false,
 };
 
-const MakeRequest = <UrlRouteArgs, Request, Response>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request) => Promise<Response> => {
-    return async function(urlRouteArgs: UrlRouteArgs, request: Request) : Promise<Response> {
-        const endpoint = routeSetup.routingFunction(urlRouteArgs);
+const MakeRequest = <UrlRouteArgs, Request, Response, UrlParams>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request, urlParams?: UrlParams) => Promise<Response> => {
+    return async function(urlRouteArgs: UrlRouteArgs, request: Request, urlParams?: any) : Promise<Response> {
+        const endpoint = `${ routeSetup.routingFunction(urlRouteArgs) }${ urlParams ? "?" + new URLSearchParams(urlParams) : "" }`;
         const method = routeSetup.method;
-
         const methodOmitsBody = METHOD_OMITS_BODY[method] || false;
 
         return fetch(formatUrl(endpoint), {

@@ -8,19 +8,13 @@ import ReactPaginate from "react-paginate";
 import "./Pagination.scss";
 
 interface PaginationComponentProps {
-  currentPage: number;
-  itemsPerPage: number;
-  totalItems: number;
-  onPageChange: (selectedItem: { selected: number }) => void;
+  currentPage: number,
+  onPageChange: (selectedItem: { selected: number }) => void,
+  pageCount: number
 }
 
-export default function Pagination({
-  itemsPerPage,
-  totalItems,
-  onPageChange,
-  currentPage,
-}: PaginationComponentProps) {
-  const pageCount = Math.ceil(totalItems / itemsPerPage);
+export default function Pagination({ currentPage, onPageChange, pageCount }: PaginationComponentProps) {
+  // const pageCount = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <ReactPaginate

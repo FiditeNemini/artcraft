@@ -1,33 +1,32 @@
 import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-import mockMediaData from "./mockMediaData";
+// import mockMediaData from "./mockMediaData";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
 import Select from "components/common/Select";
-import {
-  faArrowDownWideShort,
-  faFilter,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";
 
+import useProfileRequests from "../../useProfileRequests";
+
 export default function MediaTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [data] = useState(mockMediaData);
   const [isLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 10;
+
+  const { mediaList, mediaPage, mediaPageChange, mediaPageCount } = useProfileRequests({ requestMedia: true });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    setCurrentPage(selectedItem.selected);
+    mediaPageChange(selectedItem.selected + 1);
   };
 
-  const currentItems = data.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
+  const paginationProps = {
+    onPageChange: handlePageClick,
+    pageCount: mediaPageCount - 1,
+    currentPage: mediaPage - 1
+  };
 
   const filterOptions = [
     { value: "all", label: "All Media" },
@@ -59,12 +58,7 @@ export default function MediaTab() {
             isSearchable={false}
           />
         </div>
-        <Pagination
-          itemsPerPage={itemsPerPage}
-          totalItems={data.length}
-          onPageChange={handlePageClick}
-          currentPage={currentPage}
-        />
+        <Pagination { ...paginationProps }/>
       </div>
       <AudioPlayerProvider>
         {isLoading ? (
@@ -78,20 +72,20 @@ export default function MediaTab() {
             gridRef={gridContainerRef}
             onLayoutComplete={() => console.log("Layout complete!")}
           >
-            {currentItems.map((data, index) => {
+            {mediaList.map((data, index) => {
               let card;
               switch (data.media_type) {
                 case "audio":
-                  card = <AudioCard key={index} data={data} type="media" />;
+                  card = <AudioCard data={data} type="media" />;
                   break;
                 case "image":
-                  card = <ImageCard key={index} data={data} type="media" />;
+                  card = <ImageCard data={data} type="media" />;
                   break;
                 case "video":
-                  card = <VideoCard key={index} data={data} type="media" />;
+                  card = <VideoCard data={data} type="media" />;
                   break;
                 default:
-                  card = <div key={index}>Unsupported media type</div>;
+                  card = <div>Unsupported media type</div>;
               }
               return (
                 <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
@@ -104,12 +98,7 @@ export default function MediaTab() {
       </AudioPlayerProvider>
 
       <div className="d-flex justify-content-end mt-4">
-        <Pagination
-          itemsPerPage={itemsPerPage}
-          totalItems={data.length}
-          onPageChange={handlePageClick}
-          currentPage={currentPage}
-        />
+        <Pagination { ...paginationProps }/>
       </div>
     </>
   );
