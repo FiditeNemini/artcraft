@@ -1906,6 +1906,7 @@ dependencies = [
  "subprocess",
  "subprocess_common",
  "tempdir",
+ "tokens",
  "tokio",
  "zip",
 ]
