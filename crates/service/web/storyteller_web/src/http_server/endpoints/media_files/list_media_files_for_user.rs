@@ -7,6 +7,7 @@ use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::{info, warn};
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use utoipa::{IntoParams, path, ToSchema};
 
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
@@ -16,18 +17,17 @@ use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_files::list_media_files_for_user::{list_media_files_for_user, ListMediaFileForUserArgs, ViewAs};
 use tokens::tokens::media_files::MediaFileToken;
 
-use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
-#[derive(Deserialize)]
-pub struct PathInfo {
+#[derive(Deserialize, ToSchema)]
+pub struct ListMediaFilesForUserPathInfo {
   username: String,
 }
 
-#[derive(Deserialize)]
-pub struct QueryParams {
+#[derive(Deserialize, ToSchema, IntoParams)]
+pub struct ListMediaFilesForUserQueryParams {
   pub sort_ascending: Option<bool>,
   pub page_size: Option<usize>,
   pub page_index: Option<usize>,
@@ -36,15 +36,15 @@ pub struct QueryParams {
   pub filter_media_type: Option<MediaFileType>,
 }
 
-#[derive(Serialize)]
-pub struct SuccessResponse {
+#[derive(Serialize, ToSchema)]
+pub struct ListMediaFilesForUserSuccessResponse {
   pub success: bool,
-  pub results: Vec<MediaFileListItem>,
+  pub results: Vec<MediaFileForUserListItem>,
   pub pagination: PaginationPage,
 }
 
-#[derive(Serialize)]
-pub struct MediaFileListItem {
+#[derive(Serialize, ToSchema)]
+pub struct MediaFileForUserListItem {
   pub token: MediaFileToken,
 
   pub origin_category: MediaFileOriginCategory,
@@ -63,39 +63,50 @@ pub struct MediaFileListItem {
   pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug)]
-pub enum ErrorResponse {
+#[derive(Debug, ToSchema)]
+pub enum ListMediaFilesForUserError {
   ServerError,
 }
 
-impl ResponseError for ErrorResponse {
+impl ResponseError for ListMediaFilesForUserError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      ErrorResponse::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      ListMediaFilesForUserError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      ErrorResponse::ServerError => "server error".to_string(),
+      ListMediaFilesForUserError::ServerError => "server error".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
   }
 }
 
-impl std::fmt::Display for ErrorResponse {
+impl std::fmt::Display for ListMediaFilesForUserError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
+#[utoipa::path(
+  get,
+  path = "/v1/media_files/list/user/{username}",
+  params(
+     ListMediaFilesForUserQueryParams,
+  ),
+  responses(
+    (status = 200, description = "List Featured Media Files", body = ListMediaFilesForUserSuccessResponse),
+    (status = 500, description = "Server error", body = ListMediaFilesForUserError),
+  ),
+)]
 pub async fn list_media_files_for_user_handler(
   http_request: HttpRequest,
-  path: Path<PathInfo>,
-  query: Query<QueryParams>,
+  path: Path<ListMediaFilesForUserPathInfo>,
+  query: Query<ListMediaFilesForUserQueryParams>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, ErrorResponse>
+) -> Result<HttpResponse, ListMediaFilesForUserError>
 {
   let maybe_user_session = server_state
       .session_checker
@@ -103,7 +114,7 @@ pub async fn list_media_files_for_user_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        ErrorResponse::ServerError
+        ListMediaFilesForUserError::ServerError
       })?;
 
   let mut is_author = false;
@@ -150,13 +161,13 @@ pub async fn list_media_files_for_user_handler(
     Ok(results) => results,
     Err(e) => {
       warn!("Query error: {:?}", e);
-      return Err(ErrorResponse::ServerError);
+      return Err(ListMediaFilesForUserError::ServerError);
     }
   };
 
 
   let results = results_page.records.into_iter()
-      .map(|record| MediaFileListItem {
+      .map(|record| MediaFileForUserListItem {
         token: record.token,
         origin_category: record.origin_category,
         origin_product_category: record.origin_product_category,
@@ -175,7 +186,7 @@ pub async fn list_media_files_for_user_handler(
       })
       .collect::<Vec<_>>();
 
-  let response = SuccessResponse {
+  let response = ListMediaFilesForUserSuccessResponse {
     success: true,
     results,
     pagination: PaginationPage{
@@ -185,7 +196,7 @@ pub async fn list_media_files_for_user_handler(
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| ErrorResponse::ServerError)?;
+      .map_err(|e| ListMediaFilesForUserError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

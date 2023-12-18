@@ -7,6 +7,7 @@ use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::{info, warn};
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use utoipa::{IntoParams, path, ToSchema};
 
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
@@ -22,8 +23,8 @@ use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
-#[derive(Deserialize)]
-pub struct QueryParams {
+#[derive(Deserialize, ToSchema, IntoParams)]
+pub struct ListMediaFilesQueryParams {
   pub sort_ascending: Option<bool>,
   pub per_page: Option<usize>,
   pub cursor: Option<String>,
@@ -31,14 +32,14 @@ pub struct QueryParams {
   pub filter_media_type: Option<MediaFileType>,
 }
 
-#[derive(Serialize)]
-pub struct SuccessResponse {
+#[derive(Serialize, ToSchema)]
+pub struct ListMediaFilesSuccessResponse {
   pub success: bool,
   pub results: Vec<MediaFileListItem>,
   pub pagination: PaginationCursors,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct MediaFileListItem {
   pub token: MediaFileToken,
 
@@ -61,38 +62,49 @@ pub struct MediaFileListItem {
   pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug)]
-pub enum ErrorResponse {
+#[derive(Debug, ToSchema)]
+pub enum ListMediaFilesError {
   ServerError,
 }
 
-impl ResponseError for ErrorResponse {
+impl ResponseError for ListMediaFilesError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      ErrorResponse::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      ListMediaFilesError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      ErrorResponse::ServerError => "server error".to_string(),
+      ListMediaFilesError::ServerError => "server error".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
   }
 }
 
-impl std::fmt::Display for ErrorResponse {
+impl std::fmt::Display for ListMediaFilesError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
+#[utoipa::path(
+  get,
+  path = "/v1/media_files/list",
+  params(
+  ListMediaFilesQueryParams,
+  ),
+  responses(
+    (status = 200, description = "List Featured Media Files", body = ListMediaFilesSuccessResponse),
+    (status = 500, description = "Server error", body = ListMediaFilesError),
+  ),
+)]
 pub async fn list_media_files_handler(
-  http_request: HttpRequest,
-  query: Query<QueryParams>,
-  server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, ErrorResponse>
+    http_request: HttpRequest,
+    query: Query<ListMediaFilesQueryParams>,
+    server_state: web::Data<Arc<ServerState>>
+) -> Result<HttpResponse, ListMediaFilesError>
 {
   let maybe_user_session = server_state
       .session_checker
@@ -100,7 +112,7 @@ pub async fn list_media_files_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        ErrorResponse::ServerError
+        ListMediaFilesError::ServerError
       })?;
 
   let mut is_mod = false;
@@ -122,7 +134,7 @@ pub async fn list_media_files_handler(
     let cursor = server_state.sort_key_crypto.decrypt_id(cursor)
         .map_err(|e| {
           warn!("crypto error: {:?}", e);
-          ErrorResponse::ServerError
+          ListMediaFilesError::ServerError
         })?;
     Some(cursor as usize)
   } else {
@@ -149,7 +161,7 @@ pub async fn list_media_files_handler(
     Ok(results) => results,
     Err(e) => {
       warn!("Query error: {:?}", e);
-      return Err(ErrorResponse::ServerError);
+      return Err(ListMediaFilesError::ServerError);
     }
   };
 
@@ -157,7 +169,7 @@ pub async fn list_media_files_handler(
     let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
         .map_err(|e| {
           warn!("crypto error: {:?}", e);
-          ErrorResponse::ServerError
+          ListMediaFilesError::ServerError
         })?;
     Some(cursor)
   } else {
@@ -168,7 +180,7 @@ pub async fn list_media_files_handler(
     let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
         .map_err(|e| {
           warn!("crypto error: {:?}", e);
-          ErrorResponse::ServerError
+          ListMediaFilesError::ServerError
         })?;
     Some(cursor)
   } else {
@@ -205,7 +217,7 @@ pub async fn list_media_files_handler(
       })
       .collect::<Vec<_>>();
 
-  let response = SuccessResponse {
+  let response = ListMediaFilesSuccessResponse {
     success: true,
     results,
     pagination: PaginationCursors {
@@ -216,7 +228,7 @@ pub async fn list_media_files_handler(
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| ErrorResponse::ServerError)?;
+      .map_err(|e| ListMediaFilesError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

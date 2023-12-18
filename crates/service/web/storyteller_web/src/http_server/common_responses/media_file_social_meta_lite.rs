@@ -1,8 +1,9 @@
+use utoipa::ToSchema;
 use tokens::tokens::media_files::MediaFileToken;
 
 
 /// Fields useful for enriching media file listings
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, ToSchema)]
 pub struct MediaFileSocialMetaLight {
     pub favorites_count: u64,
     pub comments_count: u64,

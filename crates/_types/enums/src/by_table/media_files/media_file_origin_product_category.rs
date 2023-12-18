@@ -4,6 +4,7 @@ use std::collections::BTreeSet;
 use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
+use utoipa::ToSchema;
 
 /// Used in the `media_files` table in `VARCHAR(16)` field `origin_product_category`.
 ///
@@ -14,7 +15,7 @@ use strum::EnumIter;
 ///
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, ToSchema)]
 pub enum MediaFileOriginProductCategory {
   /// Media files created by (or uploaded for) the Face Animator product.
   /// The underlying model could be SadTalker, Wav2Lip, or some future model
