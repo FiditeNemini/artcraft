@@ -110,7 +110,7 @@ export default function PageHeader({
             <div
               className={`d-flex flex-column ${
                 imageUrl ? "col-lg-7" : "col-12"
-              } justify-content-center gap-4 py-2`}
+              } justify-content-center gap-4`}
             >
               <div>
                 {titleH2 ? (
@@ -148,7 +148,7 @@ export default function PageHeader({
               )}
             </div>
           </div>
-          {extension && <div>{extension}</div>}
+          {extension && <div className="mt-2">{extension}</div>}
         </Panel>
       </div>
     );
