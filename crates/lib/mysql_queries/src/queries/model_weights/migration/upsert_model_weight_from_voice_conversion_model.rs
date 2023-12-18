@@ -1,13 +1,13 @@
 use anyhow::anyhow;
 use sqlx::{Acquire, MySql, MySqlPool, Transaction};
+
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
-
 use errors::AnyhowResult;
 use tokens::tokens::model_weights::ModelWeightToken;
 
-use crate::queries::voice_conversion::models::list_whole_voice_conversion_models_using_cursor::WholeVoiceConversionModelRecord;
+use crate::queries::voice_conversion::migration::list_whole_voice_conversion_models_using_cursor::WholeVoiceConversionModelRecord;
 
 /// Migrate `voice_conversion_models` records to `model_weights` + `model_weights_extension_voice_conversion_details` records.
 /// This is designed to be idempotent and re-runnable. Any time we re-run the query, we should get the same result.

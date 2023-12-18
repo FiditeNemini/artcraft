@@ -210,15 +210,3 @@ pub async fn process_rvc_v2_model<'a, 'b>(
     entity_type: Some(VoiceConversionModelType::RvcV2.to_string()), // NB: This may be different from `GenericDownloadType` in the future!
   })
 }
-
-//#[cfg(test)]
-//mod tests {
-//  use crockford_deprecated::crockford_entropy_lower;
-//
-//  #[test]
-//  fn temp() {
-//    // need to make some hashes really quick
-//    let e = crockford_entropy_lower(64);
-//    assert_eq!(e, "");
-//  }
-//}
