@@ -49,6 +49,7 @@ members = [
   "crates/lib/idempotency",
   "crates/lib/jobs_common",
   "crates/lib/logging",
+  "crates/lib/migration",
   "crates/lib/mysql_queries",
   "crates/lib/password",
   "crates/lib/redis_common",

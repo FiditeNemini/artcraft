@@ -14,6 +14,7 @@ use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
+use migration::voice_conversion::query_vc_model_for_migration::VcModel;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -25,7 +26,6 @@ use tokens::tokens::users::UserToken;
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::{Device, InferenceArgs};
-use crate::job::job_types::vc::vc_model::VcModel;
 use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 

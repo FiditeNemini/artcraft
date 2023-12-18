@@ -1,8 +1,10 @@
 use std::thread;
 use std::time::Duration;
+
 use errors::AnyhowResult;
 use mysql_queries::queries::model_weights::migration::upsert_model_weight_from_voice_conversion_model::upsert_model_weight_from_voice_conversion_model;
-use mysql_queries::queries::voice_conversion::models::list_whole_voice_conversion_models_using_cursor::list_whole_voice_conversion_models_using_cursor;
+use mysql_queries::queries::voice_conversion::migration::list_whole_voice_conversion_models_using_cursor::list_whole_voice_conversion_models_using_cursor;
+
 use crate::deps::Deps;
 
 const PAGE_SIZE: u64 = 10;

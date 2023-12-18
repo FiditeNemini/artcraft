@@ -1,15 +1,20 @@
 use std::path::PathBuf;
 
+use sqlx::MySqlPool;
+
 use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
+use errors::AnyhowResult;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
-use mysql_queries::queries::model_weights::inference::get_model_weight_for_voice_conversion_inference::ModelWeightForVoiceConversionInference;
-use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
+use mysql_queries::queries::model_weights::inference::get_model_weight_for_voice_conversion_inference::{get_model_weight_for_voice_conversion_inference, ModelWeightForVoiceConversionInference};
+use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::{get_voice_conversion_model_for_inference, VoiceConversionModelForInference};
+use tokens::tokens::model_weights::ModelWeightToken;
 
 /// Union over the legacy table and the new table to support an easier migration.
 /// This enum can hold a record of either type and present a unified accessor interface.
+#[derive(Clone)]
 pub enum VcModel {
   /// Old type from the `voice_conversion_models` table, on the way out
   LegacyVoiceConversion(VoiceConversionModelForInference),
@@ -28,6 +33,13 @@ pub enum VcModelType {
 }
 
 impl VcModel {
+  pub fn get_model_token(&self) -> &str {
+    match self {
+      VcModel::LegacyVoiceConversion(ref model) => model.token.as_str(),
+      VcModel::ModelWeight(ref model) => model.token.as_str(),
+    }
+  }
+
   pub fn get_model_type(&self) -> VcModelType {
     match self {
       VcModel::LegacyVoiceConversion(ref model) => match model.model_type {
@@ -152,6 +164,27 @@ impl VcModel {
   }
 }
 
+pub async fn query_vc_model_for_migration(model_token: &str, mysql_pool: &MySqlPool) -> AnyhowResult<Option<VcModel>> {
+  // NB: This is temporary migration code as we switch from the `voice_conversion_models` table to the `model_weights` table.
+  if model_token.starts_with(ModelWeightToken::token_prefix()) {
+    let model_weights_token = ModelWeightToken::new_from_str(model_token);
+
+    let maybe_model = get_model_weight_for_voice_conversion_inference(
+      &mysql_pool, &model_weights_token).await?;
+
+    Ok(maybe_model
+        .map(|model| VcModel::ModelWeight(model)))
+
+  } else {
+    let maybe_vc_model = get_voice_conversion_model_for_inference(
+      &mysql_pool, model_token).await?;
+
+    Ok(maybe_vc_model
+        .map(|model| VcModel::LegacyVoiceConversion(model)))
+  }
+}
+
+
 #[cfg(test)]
 mod tests {
 
@@ -164,7 +197,7 @@ mod tests {
     use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
     use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
 
-    use crate::job::job_types::vc::vc_model::{VcModel, VcModelType};
+    use crate::voice_conversion::query_vc_model_for_migration::{VcModel, VcModelType};
 
     fn default_model() -> VoiceConversionModelForInference {
       // NB: We could implement/derive the default trait, but this works just as well for now.
@@ -179,6 +212,27 @@ mod tests {
         user_deleted_at: None,
         mod_deleted_at: None,
       }
+    }
+
+    #[test]
+    fn get_model_token() {
+      let model = default_model();
+      assert_eq!(VcModel::LegacyVoiceConversion(model).get_model_token(), "vcm_entropy");
+    }
+
+    #[test]
+    fn get_model_type() {
+      let mut model = default_model();
+      model.model_type = VoiceConversionModelType::RvcV2;
+      assert_eq!(VcModel::LegacyVoiceConversion(model).get_model_type(), VcModelType::RvcV2);
+
+      let mut model = default_model();
+      model.model_type = VoiceConversionModelType::SoftVc;
+      assert_eq!(VcModel::LegacyVoiceConversion(model).get_model_type(), VcModelType::SoftVc);
+
+      let mut model = default_model();
+      model.model_type = VoiceConversionModelType::SoVitsSvc;
+      assert_eq!(VcModel::LegacyVoiceConversion(model).get_model_type(), VcModelType::SoVitsSvc);
     }
 
     #[test]
@@ -220,21 +274,6 @@ mod tests {
       let path = VcModel::LegacyVoiceConversion(model).get_index_file_cloud_bucket_path(&BucketPathUnifier::default_paths());
       assert_eq!(path, Some(PathBuf::from("/user_uploaded_rvc_v2_models/h/a/s/hash.index")));
     }
-
-    #[test]
-    fn get_model_type() {
-      let mut model = default_model();
-      model.model_type = VoiceConversionModelType::RvcV2;
-      assert_eq!(VcModel::LegacyVoiceConversion(model).get_model_type(), VcModelType::RvcV2);
-
-      let mut model = default_model();
-      model.model_type = VoiceConversionModelType::SoftVc;
-      assert_eq!(VcModel::LegacyVoiceConversion(model).get_model_type(), VcModelType::SoftVc);
-
-      let mut model = default_model();
-      model.model_type = VoiceConversionModelType::SoVitsSvc;
-      assert_eq!(VcModel::LegacyVoiceConversion(model).get_model_type(), VcModelType::SoVitsSvc);
-    }
   }
 
   mod new_model_weights {
@@ -246,7 +285,7 @@ mod tests {
     use mysql_queries::queries::model_weights::inference::get_model_weight_for_voice_conversion_inference::ModelWeightForVoiceConversionInference;
     use tokens::tokens::model_weights::ModelWeightToken;
 
-    use crate::job::job_types::vc::vc_model::{VcModel, VcModelType};
+    use crate::voice_conversion::query_vc_model_for_migration::{VcModel, VcModelType};
 
     fn default_model() -> ModelWeightForVoiceConversionInference {
       // NB: We could implement/derive the default trait, but this works just as well for now.
@@ -263,6 +302,27 @@ mod tests {
         user_deleted_at: None,
         mod_deleted_at: None,
       }
+    }
+
+    #[test]
+    fn get_model_token() {
+      let model = default_model();
+      assert_eq!(VcModel::ModelWeight(model).get_model_token(), "weight_entropy");
+    }
+
+    #[test]
+    fn get_model_type() {
+      let mut model = default_model();
+      model.weights_type = WeightsType::RvcV2;
+      assert_eq!(VcModel::ModelWeight(model).get_model_type(), VcModelType::RvcV2);
+
+      let mut model = default_model();
+      model.weights_type = WeightsType::StableDiffusion15;
+      assert_eq!(VcModel::ModelWeight(model).get_model_type(), VcModelType::Invalid);
+
+      let mut model = default_model();
+      model.weights_type = WeightsType::SoVitsSvc;
+      assert_eq!(VcModel::ModelWeight(model).get_model_type(), VcModelType::SoVitsSvc);
     }
 
     #[test]
@@ -303,21 +363,6 @@ mod tests {
       model.has_index_file = true;
       let path = VcModel::ModelWeight(model).get_index_file_cloud_bucket_path(&BucketPathUnifier::default_paths());
       assert_eq!(path, Some(PathBuf::from("/weights/h/a/s/hash/hash.rvc_index")));
-    }
-
-    #[test]
-    fn get_model_type() {
-      let mut model = default_model();
-      model.weights_type = WeightsType::RvcV2;
-      assert_eq!(VcModel::ModelWeight(model).get_model_type(), VcModelType::RvcV2);
-
-      let mut model = default_model();
-      model.weights_type = WeightsType::StableDiffusion15;
-      assert_eq!(VcModel::ModelWeight(model).get_model_type(), VcModelType::Invalid);
-
-      let mut model = default_model();
-      model.weights_type = WeightsType::SoVitsSvc;
-      assert_eq!(VcModel::ModelWeight(model).get_model_type(), VcModelType::SoVitsSvc);
     }
   }
 }

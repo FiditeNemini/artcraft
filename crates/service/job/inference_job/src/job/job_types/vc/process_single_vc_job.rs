@@ -1,25 +1,16 @@
-use std::time::Duration;
-
 use anyhow::anyhow;
 use log::{error, info};
-use sqlx::MySqlPool;
-use enums::by_table::model_weights::weights_types::WeightsType;
 
-use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
-use errors::AnyhowResult;
+use migration::voice_conversion::query_vc_model_for_migration::{query_vc_model_for_migration, VcModelType};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
-use mysql_queries::queries::model_weights::inference::get_model_weight_for_voice_conversion_inference::{get_model_weight_for_voice_conversion_inference, ModelWeightForVoiceConversionInference};
-use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::{get_voice_conversion_model_for_inference, VoiceConversionModelForInference};
 use tokens::tokens::media_uploads::MediaUploadToken;
-use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::vc::{rvc_v2, so_vits_svc};
 use crate::job::job_types::vc::rvc_v2::process_job::RvcV2ProcessJobArgs;
 use crate::job::job_types::vc::so_vits_svc::process_job::SoVitsSvcProcessJobArgs;
-use crate::job::job_types::vc::vc_model::{VcModel, VcModelType};
 use crate::job_dependencies::JobDependencies;
 
 pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -28,7 +19,14 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
     None => return Err(ProcessSingleJobError::InvalidJob(anyhow!("No model token for job: {:?}", job.inference_job_token))),
   };
 
-  let maybe_model = query_model(model_token, &job_dependencies.db.mysql_pool).await?;
+  // TODO: Interrogate a db result cache + filesystem model file cache
+
+  let maybe_model = query_vc_model_for_migration(model_token, &job_dependencies.db.mysql_pool)
+      .await
+      .map_err(|err| {
+        error!("error querying vc model {model_token} : {:?}", err);
+        return ProcessSingleJobError::Other(anyhow!("error querying vc model {model_token} : {:?}", err))
+      })?;
 
   let model = match maybe_model {
     None => return Err(ProcessSingleJobError::Other(anyhow!("model weights not found: {:?}", model_token))),
@@ -106,28 +104,3 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
 }
 
 
-async fn query_model(model_token: &str, mysql_pool: &MySqlPool) -> Result<Option<VcModel>, ProcessSingleJobError> {
-  // TODO: Interrogate a db result cache + filesystem model file cache
-
-  // NB: This is temporary migration code as we switch from the `voice_conversion_models` table to the `model_weights` table.
-  if model_token.starts_with(ModelWeightToken::token_prefix()) {
-    let model_weights_token = ModelWeightToken::new_from_str(model_token);
-
-    let maybe_model = get_model_weight_for_voice_conversion_inference(
-      &mysql_pool, &model_weights_token)
-        .await
-        .map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
-
-    Ok(maybe_model
-        .map(|model| VcModel::ModelWeight(model)))
-
-  } else {
-    let maybe_vc_model = get_voice_conversion_model_for_inference(
-      &mysql_pool, model_token)
-        .await
-        .map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
-
-    Ok(maybe_vc_model
-        .map(|model| VcModel::LegacyVoiceConversion(model)))
-  }
-}
