@@ -16,6 +16,7 @@ use mysql_queries::queries::media_files::list_media_files_for_user::{list_media_
 use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
+use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -27,7 +28,8 @@ pub struct PathInfo {
 #[derive(Deserialize)]
 pub struct QueryParams {
   pub sort_ascending: Option<bool>,
-  pub limit: Option<usize>,
+  pub page_size: Option<usize>,
+  pub page_index: Option<usize>,
   pub cursor: Option<String>,
   pub cursor_is_reversed: Option<bool>,
   pub filter_media_type: Option<MediaFileType>,
@@ -37,7 +39,7 @@ pub struct QueryParams {
 pub struct SuccessResponse {
   pub success: bool,
   pub results: Vec<MediaFileListItem>,
-  pub pagination: PaginationCursors,
+  pub pagination: PaginationPage,
 }
 
 #[derive(Serialize)]
@@ -115,21 +117,13 @@ pub async fn list_media_files_for_user_handler(
   };
 
   // TODO(bt,2023-12-04): Enforce real maximums and defaults
-  let limit = query.limit.unwrap_or(25);
+  let limit = query.page_size.unwrap_or(25);
 
   let sort_ascending = query.sort_ascending.unwrap_or(false);
   let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
 
-  let cursor = if let Some(cursor) = query.cursor.as_deref() {
-    let cursor = server_state.sort_key_crypto.decrypt_id(cursor)
-        .map_err(|e| {
-          warn!("crypto error: {:?}", e);
-          ErrorResponse::ServerError
-        })?;
-    Some(cursor as usize)
-  } else {
-    None
-  };
+  let page_size = query.page_size.unwrap_or_else(|| 25);
+  let page_index = query.page_index.unwrap_or_else(|| 0);
 
   let view_as = if is_author {
     ViewAs::Author
@@ -139,11 +133,12 @@ pub async fn list_media_files_for_user_handler(
     ViewAs::AnotherUser
   };
 
+
   let query_results = list_media_files_for_user(ListMediaFileForUserArgs {
     username: &path.username,
-    limit,
     maybe_filter_media_type: query.filter_media_type,
-    maybe_offset: cursor,
+    page_size,
+    page_index,
     cursor_is_reversed,
     view_as,
     mysql_pool: &server_state.mysql_pool,
@@ -158,27 +153,6 @@ pub async fn list_media_files_for_user_handler(
     }
   };
 
-  let cursor_next = if let Some(id) = results_page.last_id {
-    let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
-        .map_err(|e| {
-          warn!("crypto error: {:?}", e);
-          ErrorResponse::ServerError
-        })?;
-    Some(cursor)
-  } else {
-    None
-  };
-
-  let cursor_previous = if let Some(id) = results_page.first_id {
-    let cursor = server_state.sort_key_crypto.encrypt_id(id as u64)
-        .map_err(|e| {
-          warn!("crypto error: {:?}", e);
-          ErrorResponse::ServerError
-        })?;
-    Some(cursor)
-  } else {
-    None
-  };
 
   let results = results_page.records.into_iter()
       .map(|record| MediaFileListItem {
@@ -200,10 +174,9 @@ pub async fn list_media_files_for_user_handler(
   let response = SuccessResponse {
     success: true,
     results,
-    pagination: PaginationCursors {
-      maybe_next: cursor_next,
-      maybe_previous: cursor_previous,
-      cursor_is_reversed,
+    pagination: PaginationPage{
+      current: results_page.current_page,
+      total_page_count: results_page.total_page_count,
     }
   };
 
