@@ -213,7 +213,7 @@ async fn seed_file_to_bucket(
         .map(|extension| extension.to_str())
         .flatten();
     // we should just have this be file bucket path and then we can use a file descriptor to turn it into a specific type of path
-    let bucket_location = WeightFileBucketPath::generate_new(
+    let bucket_location: WeightFileBucketPath = WeightFileBucketPath::generate_new(
         maybe_bucket_prefix,
         maybe_bucket_extension
     );

@@ -4,3 +4,4 @@ pub mod public_path;
 pub mod voice_conversion_results;
 pub mod weight_uploads;
 pub mod weight_files;
+pub mod files;
