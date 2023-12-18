@@ -25,7 +25,6 @@ use crate::job::job_types::videofilter::rerender_a_video::download_video_file::d
 use crate::job::job_types::videofilter::rerender_a_video::rerender_inference_command::InferenceArgs;
 use crate::job::job_types::videofilter::rerender_a_video::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
-use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
 /// The maximum that either width or height can be
 const MAX_DIMENSION : u32 = 1500;
@@ -276,7 +275,7 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
 
     let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
-    info!("Audio destination bucket path: {:?}", &result_bucket_object_pathbuf);
+    info!("Video destination bucket path: {:?}", &result_bucket_object_pathbuf);
 
     info!("Uploading media ...");
 

@@ -27,7 +27,7 @@ pub async fn download_model_file(
 ) -> Result<ModelFile, ProcessSingleJobError> {
 
     let bucket_object_path;
-
+    let model_filename;
     match model_record {
         Some(model_record) => {
             let model_bucket_path =
@@ -36,18 +36,18 @@ pub async fn download_model_file(
                     model_record.maybe_private_bucket_prefix.as_deref(),
                     model_record.maybe_private_bucket_extension.as_deref(),
                 );
+            model_filename = model_record.private_bucket_hash.clone() + ".".to_owned() + model_record.maybe_private_bucket_extension.as_deref().unwrap_or("bin");
             bucket_object_path = model_bucket_path.to_full_object_pathbuf();
         }
         None => {
             return Err(ProcessSingleJobError::from_anyhow_error(
                 anyhow!("could not find model file")))
         }
-    }
-
-    let downloaded_filesystem_path = work_temp_dir.path().join("video.mp4");
+    };
+    let downloaded_filesystem_path = work_temp_dir.path().join(model_filename);
 
     maybe_download_file_from_bucket(MaybeDownloadArgs {
-        name_or_description_of_file: "video file",
+        name_or_description_of_file: "model file",
         final_filesystem_file_path: &downloaded_filesystem_path,
         bucket_object_path: &bucket_object_path,
         bucket_client: public_bucket_client,
