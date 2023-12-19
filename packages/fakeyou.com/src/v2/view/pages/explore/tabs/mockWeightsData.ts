@@ -62,7 +62,7 @@ let mockWeightsData = [
   {
     token: "token4",
     weight_name: "Desert",
-    media_type: "video",
+    media_type: "image",
     public_bucket_path: "/images/dummy-video.jpg",
     likes: 150,
     isLiked: true,
