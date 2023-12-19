@@ -151,11 +151,8 @@ impl VcModel {
         if !model.has_index_file {
           return None;
         }
-        let path = WeightFileBucketPath::from_object_hash(
-          &model.public_bucket_hash,
-          model.maybe_public_bucket_prefix.as_deref(),
-          Some(".rvc_index"));
-
+        // NB: Technically, we should read prefix/extension from DB. We keep index file extensions by convention, however.
+        let path = WeightFileBucketPath::rvc_index_file_from_object_hash(&model.public_bucket_hash);
         Some(PathBuf::from(path.get_full_object_path_str()))
       }
     }
