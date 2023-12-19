@@ -12,7 +12,7 @@ use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct VoiceConversionModelRecordForList {
   pub token: VoiceConversionModelToken,
   pub model_type: VoiceConversionModelType,
