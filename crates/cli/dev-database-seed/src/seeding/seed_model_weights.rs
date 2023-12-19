@@ -1,5 +1,5 @@
-use std::path::Path;
-
+use std::{path::Path, string};
+use errors::{anyhow, AnyhowResult};
 use log::{info, warn};
 use rand::Rng;
 use sqlx::{MySql, Pool};
@@ -9,7 +9,6 @@ use enums::{
     by_table::model_weights::{weights_category::WeightsCategory, weights_types::WeightsType},
     common::visibility::Visibility,
 };
-use errors::AnyhowResult;
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;
@@ -94,9 +93,9 @@ pub async fn seed_weights_files(
         let original_download_url = "https://example.com/model.safetensors";
         let thumbnail_token = format!("{}", n);
 
-        let public_bucket_hash: String = weights_file_token.to_string();
-        let public_bucket_prefix = weights_type.to_str();
-        let public_bucket_extension = weights_category.to_str();
+        // let public_bucket_hash: String = weights_file_token.to_string();
+        // let public_bucket_prefix = weights_type.to_string();
+        // let public_bucket_extension = weights_category.to_string();
 
         let cached_user_ratings_total_count = n.clone();
         let cached_user_ratings_positive_count = n.clone();
@@ -111,7 +110,7 @@ pub async fn seed_weights_files(
         let file_size_bytes = file_size(weight_file_path.clone())?;
         let sha256_checksum = sha256_hash_file(weight_file_path.clone())?;
         
-        let result = seed_model(
+        let bucket_details = seed_model(
             &mysql_pool,
             &model_weight_token,
             &user_token,
@@ -119,6 +118,11 @@ pub async fn seed_weights_files(
             &weight_file_path,
             maybe_bucket_clients
         ).await;
+        let bucket_details_data = bucket_details.unwrap();
+
+        let bucket_hash = bucket_details_data.bucket_hash;
+        let maybe_bucket_prefix = bucket_details_data.maybe_bucket_prefix.as_deref().unwrap();
+        let maybe_bucket_extension = bucket_details_data.maybe_bucket_extension.as_deref().unwrap();
 
         let create_model_weights_args = CreateModelWeightsArgs {
             token: &model_weight_token,
@@ -136,9 +140,9 @@ pub async fn seed_weights_files(
             original_filename: Some(original_filename.to_string()),
             file_size_bytes: file_size_bytes as i32, // Assuming the file size is 0
             file_checksum_sha2: sha256_checksum.to_string(), // Assuming the file checksum is an empty string
-            private_bucket_hash: public_bucket_hash,
-            maybe_private_bucket_prefix: Some(public_bucket_prefix.to_string()),
-            maybe_private_bucket_extension: Some(public_bucket_extension.to_string()),
+            private_bucket_hash: bucket_hash,
+            maybe_private_bucket_prefix: Some(maybe_bucket_prefix.to_string()),
+            maybe_private_bucket_extension: Some(maybe_bucket_extension.to_string()),
             cached_user_ratings_total_count,
             cached_user_ratings_positive_count,
             cached_user_ratings_negative_count,
@@ -149,24 +153,15 @@ pub async fn seed_weights_files(
 
         create_weight(create_model_weights_args).await?;
 
-        match result {
-            Ok(_) => info!("Seeded {:?}", weight_file_path),
-            Err(err) =>
-                warn!(
-                    r#"
-              Could not seed media file {} , {:?} : {:?}
-              (No worries: if there's a duplicate key error, we probably already
-              seeded the media file on a previous invocation!)
-            "#,
-                    model_weight_token,
-                    subdirectory_path,
-                    err
-                ),
-        }
+       
+        info!("Seeded {:?}", weight_file_path)
+        
     }
 
     Ok(())
 }
+
+#[derive(Clone)]
 struct BucketDetails {
     bucket_hash: String,
     maybe_bucket_prefix: Option<String>,
@@ -180,30 +175,26 @@ async fn seed_model(
     weight_type: WeightsType,
     weight_file_path: &Path,
     maybe_bucket_clients: Option<&BucketClients>
-) -> AnyhowResult<()> {
+) -> AnyhowResult<BucketDetails> {
     info!("Seeding Media file {:?} ...", weight_file_path);
     // mutable variables
-    let mut bucket_hash = "NOT_UPLOADED_BY_SEED_TOOL".to_string();
-    let mut maybe_bucket_prefix = "";
-    let mut maybe_bucket_extension = "";
-
     if let Some(bucket_clients) = maybe_bucket_clients {
-        let bucket_details = seed_file_to_bucket(weight_file_path, bucket_clients).await?;
-        bucket_hash = bucket_details.bucket_hash;
-        maybe_bucket_prefix = bucket_details.maybe_bucket_prefix.as_deref().unwrap();
-        maybe_bucket_extension = bucket_details.maybe_bucket_extension.as_deref().unwrap();
+        let bucket_details = seed_file_to_bucket(weight_file_path, bucket_clients,weight_type).await?;
+        return Ok(bucket_details);
     }
-   
-    Ok(())
+    Err(anyhow!("No bucket clients provided!"))
+
 }
 
 async fn seed_file_to_bucket(
     weight_file_path: &Path,
-    bucket_clients: &BucketClients
+    bucket_clients: &BucketClients,
+    weight_type: WeightsType,
 ) -> AnyhowResult<BucketDetails> {
     info!("Uploading weights file {:?} ...", weight_file_path);
 
-    let maybe_bucket_prefix = Some("fakeyou_");
+    let maybe_bucket_prefix = Some(format!("{}_",weight_type.to_str()));
+    let maybe_bucket_prefix = maybe_bucket_prefix.as_deref();
 
     let maybe_bucket_extension = weight_file_path
         .extension()
