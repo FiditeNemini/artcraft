@@ -20,6 +20,7 @@ use mysql_queries::payloads::generic_inference_args::videofilter_payload::{Reren
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
@@ -38,8 +39,13 @@ const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 pub struct EnqueueRerenderAnimationRequest {
     uuid_idempotency_token: String,
 
+    prompt: Option<String>,  // prompt for the new video
+    a_prompt: Option<String>,  // prompt describing the old video
+    n_prompt: Option<String>,  // negative prompt
     video_source: Option<MediaFileToken>,
-    sd_model: String,
+    sd_model_token: Option<ModelWeightToken>,
+    lora_model_token: Option<ModelWeightToken>,
+    seed: Option<i32>,
     creator_set_visibility: Option<Visibility>,
 }
 
@@ -158,13 +164,15 @@ pub async fn enqueue_rerender_animation_handler(
 
     // TODO(bt): CHECK DATABASE FOR TOKENS!
 
-    let video_source: VideofilterVideoSource = {
-        if let Some(ref token) = request.video_source {
-            VideofilterVideoSource::media_file_token(token.as_str())
-        } else {
-            return Err(EnqueueRerenderAnimationError::BadInput("video source not fully specified".to_string()));
-        }
-    };
+    let video_source: VideofilterVideoSource = request.video_source
+        .as_ref()
+        .map(|token| VideofilterVideoSource::media_file_token(token.as_str()))
+        .ok_or_else(|| EnqueueRerenderAnimationError::BadInput("video source not fully specified".to_string()))?;
+
+    let sd_model_token: ModelWeightToken = request.sd_model_token
+        .as_ref()
+        .map(|token| ModelWeightToken::new_from_str(token.as_str()))
+        .ok_or_else(|| EnqueueRerenderAnimationError::BadInput("sd model not fully specified".to_string()))?;
 
     let ip_address = get_request_ip(&http_request);
 
@@ -178,14 +186,19 @@ pub async fn enqueue_rerender_animation_handler(
 
     let inference_args = RerenderArgs {
         maybe_video_source: Some(video_source),
-        maybe_sd_model: Some(request.sd_model.clone()),
+        maybe_sd_model_token: Some(sd_model_token),
+        maybe_lora_model_token: request.lora_model_token.clone(),
+        maybe_prompt: request.prompt.clone(),
+        maybe_a_prompt: request.a_prompt.clone(),
+        maybe_n_prompt: request.n_prompt.clone(),
+        maybe_seed: request.seed.clone(),
     };
 
     info!("Creating rerender animation job record...");
 
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
-        inference_category: InferenceCategory::RerenderAVideo,
+        inference_category: InferenceCategory::VideoFilter,
         maybe_model_type: Some(InferenceModelType::RerenderAVideo), // NB: Model is static during inference
         maybe_model_token: None, // NB: Model is static during inference
         maybe_input_source_token: None, // TODO: Introduce a second foreign key ?
@@ -193,7 +206,7 @@ pub async fn enqueue_rerender_animation_handler(
         maybe_raw_inference_text: None, // No text
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {
-            inference_category: Some(InferenceCategoryAbbreviated::RerenderAVideo),
+            inference_category: Some(InferenceCategoryAbbreviated::VideoFilter),
             args: Some(PolymorphicInferenceArgs::Rr(inference_args)),
         }),
         maybe_creator_user_token: maybe_user_token.as_ref(),

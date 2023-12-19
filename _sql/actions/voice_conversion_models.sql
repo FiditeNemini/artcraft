@@ -13,6 +13,9 @@ where token IN (
     'vcm_502wkt2pca3y'
 );
 
+-- Re-home Nessu's models
+update voice_conversion_models set creator_user_token = "user_7z1h6sykg4r62" where creator_user_token = "U:C00NRSW1AE8T4" limit 5;
+
 -- Remove broken models
 update voice_conversion_models
 set

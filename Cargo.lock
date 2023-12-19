@@ -3481,6 +3481,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "migration-tool"
+version = "0.0.1"
+dependencies = [
+ "buckets",
+ "clap",
+ "config",
+ "easyenv",
+ "enums",
+ "errors",
+ "log",
+ "my-workspace-hack",
+ "mysql_queries",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "storyteller_root",
+ "strum",
+ "tokens",
+ "tokio",
+]
+
+[[package]]
 name = "mime"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"

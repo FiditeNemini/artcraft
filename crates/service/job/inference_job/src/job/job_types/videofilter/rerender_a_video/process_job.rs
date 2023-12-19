@@ -16,9 +16,11 @@ use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Rr;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::insert_media_file_from_rerender::{insert_media_file_from_rerender, InsertArgs};
+use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::videofilter::rerender_a_video::download_model_file::download_model_file;
 use crate::job::job_types::videofilter::rerender_a_video::download_video_file::download_video_file;
 use crate::job::job_types::videofilter::rerender_a_video::rerender_inference_command::InferenceArgs;
 use crate::job::job_types::videofilter::rerender_a_video::validate_job::validate_job;
@@ -122,22 +124,69 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
         _ => return Err(ProcessSingleJobError::Other(anyhow!("Rerender args not found"))),
     };
 
-    let sd_model = rr_args.maybe_sd_model.as_ref().ok_or(ProcessSingleJobError::Other(anyhow!("SD model not found")))?;
+
+    // =================== LOAD MODELS AND LORAS ==================== //
+
+    let sd_model_token = rr_args.maybe_sd_model_token.as_ref().ok_or(ProcessSingleJobError::Other(anyhow!("SD model not found")))?;
+
+    let retrieved_sd_record =  get_weight_by_token(
+        sd_model_token,
+        false,
+        &deps.db.mysql_pool
+    ).await?;
+
+    let model_path = download_model_file(
+        &retrieved_sd_record,
+        &args.job_dependencies.buckets.public_bucket_client,
+        &mut job_progress_reporter,
+        job,
+        &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
+        &work_temp_dir).await?;
+
+    info!("Downloaded model file: {:?}", model_path.filesystem_path);
+    let sd_model = model_path.filesystem_path.to_str().unwrap().to_string();
+
+    let lora_path = match rr_args.maybe_lora_model_token.clone() {
+        Some(lora_model_token) => {
+            let retrieved_lora_record = get_weight_by_token(
+                &lora_model_token,
+                false,
+                &deps.db.mysql_pool
+            ).await?;
+
+            let lora_path = download_model_file(
+                &retrieved_lora_record,
+                &args.job_dependencies.buckets.public_bucket_client,
+                &mut job_progress_reporter,
+                job,
+                &args.job_dependencies.fs.scoped_temp_dir_creator_for_work,
+                &work_temp_dir).await?;
+
+            info!("Downloaded lora file: {:?}", lora_path.filesystem_path);
+
+            Some(lora_path.filesystem_path)
+        }
+        None => None
+    };
+    let sd_lora = match lora_path {
+        Some(lora_path) => Some(lora_path.to_str().unwrap().to_string()),
+        None => None
+    };
 
     // ============== CREATE AND WRITE CONFIG TO DISK  ============== //
 
     // create seed if not exists
-    // let seed = rr_args.seed.unwrap_or_else(|| rand::random::<i64>());
-    let seed = rand::random::<i32>();
+    let seed = rr_args.maybe_seed.unwrap_or_else(|| rand::random::<i32>());
 
     let config = RerenderConfig {
         input: Some(usable_video_path.to_str().unwrap().to_string()),
         output: Some(output_video_fs_path.to_str().unwrap().to_string()),
         work_dir: Some(work_temp_dir.path().to_str().unwrap().to_string()),
         sd_model: Some(sd_model.to_string()),
-        prompt: Some("1girl, anime style, red hair".to_string()),
-        a_prompt: Some("1girl, 3d, realistic, read hair".to_string()),
-        n_prompt: Some("Bad quality, low quality, photo, artifacts, watermark, signature, faceless".to_string()),
+        lora_path: sd_lora,
+        prompt: rr_args.maybe_prompt.clone(),
+        a_prompt: rr_args.maybe_a_prompt.clone(),
+        n_prompt: rr_args.maybe_n_prompt.clone(),
         seed: Some(seed as i64),
         ..RerenderConfig::new()
     };
@@ -170,14 +219,6 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
 
         if let Ok(contents) = read_to_string(&stderr_output_file) {
             warn!("Captured stderr output: {}", contents);
-
-            // match categorize_error(&contents)  {
-            //     Some(ProcessSingleJobError::FaceDetectionFailure) => {
-            //         warn!("Face not detected in source image");
-            //         error = ProcessSingleJobError::FaceDetectionFailure;
-            //     }
-            //     _ => {}
-            // }
         }
 
         safe_delete_temp_file(&video_path.filesystem_path);
@@ -234,7 +275,7 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
 
     let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
-    info!("Audio destination bucket path: {:?}", &result_bucket_object_pathbuf);
+    info!("Video destination bucket path: {:?}", &result_bucket_object_pathbuf);
 
     info!("Uploading media ...");
 
