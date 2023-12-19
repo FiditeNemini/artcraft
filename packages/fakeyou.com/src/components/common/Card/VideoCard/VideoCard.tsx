@@ -72,6 +72,7 @@ export default function VideoCard({ data, type, showCreator }: VideoCardProps) {
                         backgroundIndex={
                           data.maybe_creator_user.default_avatar.color_index
                         }
+                        username={data.maybe_creator_user.username}
                       />
                     </div>
                   )}

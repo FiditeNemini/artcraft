@@ -76,6 +76,7 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
                       backgroundIndex={
                         data.maybe_creator_user.default_avatar.color_index
                       }
+                      username={data.maybe_creator_user.username}
                     />
                   </div>
                 )}
@@ -139,6 +140,7 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
                       backgroundIndex={
                         data.maybe_creator_user.default_avatar.color_index
                       }
+                      username={data.maybe_creator_user.username}
                     />
                   </div>
                 )}

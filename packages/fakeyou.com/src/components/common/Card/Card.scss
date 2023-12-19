@@ -84,8 +84,9 @@
   }
 
   .cover-img {
-    height: 90px;
-    width: 90px;
+    height: 110px;
+    width: 110px;
+    min-width: 110px;
     overflow: hidden;
     border-radius: 0.5rem;
     border: 2px solid rgba($white, 0.3);
@@ -94,6 +95,15 @@
     img {
       width: 100%;
       object-fit: cover;
+      pointer-events: none;
     }
+  }
+
+  h6 {
+    //2 lines of text then ellipsis
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }

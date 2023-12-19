@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 interface CreatorNameProps {
   displayName: string;
+  username: string;
   gravatarHash: string;
   avatarIndex: number;
   backgroundIndex: number;
@@ -19,10 +20,14 @@ export default function CreatorName({
   gravatarHash,
   avatarIndex,
   backgroundIndex,
+  username,
   className,
 }: CreatorNameProps) {
   return (
-    <div className={`d-flex gap-2 align-items-center ${className}`}>
+    <div
+      className={`d-flex gap-2 align-items-center ${className}`}
+      onClick={handleInnerClick}
+    >
       <Gravatar
         size={22}
         email_hash={gravatarHash}
@@ -30,9 +35,8 @@ export default function CreatorName({
         backgroundIndex={backgroundIndex}
       />
       <Link
-        to={`/`}
+        to={`/profile/${username}`}
         className="fw-medium fs-7 text-white opacity-75 text-truncate"
-        onClick={handleInnerClick}
       >
         {displayName}
       </Link>

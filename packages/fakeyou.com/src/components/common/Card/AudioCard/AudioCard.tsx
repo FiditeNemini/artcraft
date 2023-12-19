@@ -62,7 +62,7 @@ export default function AudioCard({
               </div>
             </div>
 
-            <h6 className="fw-semibold text-white mb-1 mt-3 text-truncate">
+            <h6 className="fw-semibold text-white mb-1 mt-3">
               {data.weight_name}
             </h6>
             <p className="fs-7 opacity-75">{timeAgo}</p>
@@ -89,6 +89,7 @@ export default function AudioCard({
                   backgroundIndex={
                     data.maybe_creator_user.default_avatar.color_index
                   }
+                  username={data.maybe_creator_user.username}
                 />
               </div>
             )}
@@ -157,6 +158,7 @@ export default function AudioCard({
                     backgroundIndex={
                       data.maybe_creator_user.default_avatar.color_index
                     }
+                    username={data.maybe_creator_user.username}
                   />
                 </div>
               )}

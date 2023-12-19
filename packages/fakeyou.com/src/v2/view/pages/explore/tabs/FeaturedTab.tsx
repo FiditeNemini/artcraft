@@ -48,7 +48,10 @@ export default function FeaturedTab() {
                 />
               );
               return (
-                <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
+                <div
+                  key={index}
+                  className="col-12 col-lg-6 col-xxl-4 grid-item"
+                >
                   {card}
                 </div>
               );

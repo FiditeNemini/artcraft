@@ -116,6 +116,7 @@ export default function WeightsTab() {
                     data={data}
                     type="weights"
                     showCreator={true}
+                    showCover={true}
                   />
                 );
                 break;

@@ -1,7 +1,8 @@
 let mockWeightsData = [
   {
     token: "token1",
-    weight_name: "Queen Elizabeth",
+    weight_name:
+      "Queen Elizabeth Queen Elizabeth Queen Elizabeth Queen Elizabeth",
     media_type: "audio",
     public_bucket_path:
       "/media/s/p/x/d/2/spxd2xr7nt7zdezyhp61h00kxatr18pf/fakeyou_rvc_spxd2xr7nt7zdezyhp61h00kxatr18pf.wav",
