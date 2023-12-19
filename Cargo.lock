@@ -912,6 +912,9 @@ version = "0.0.1"
 dependencies = [
  "crockford",
  "errors",
+ "filesys",
+ "hashing",
+ "mimetypes",
  "my-workspace-hack",
 ]
 

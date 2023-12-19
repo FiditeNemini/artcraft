@@ -16,7 +16,7 @@ use mimetypes::mimetype_for_file::get_mimetype_for_file;
 // use cloud_storage::bucket_client::BucketClient;
 struct WebFileManager {
     // bucket_client: BucketClients,
-    file_descriptor: dyn FileDescriptor
+    file_descriptor: Box<dyn FileDescriptor>
 }
 
 impl WebFileManager {
@@ -30,14 +30,14 @@ impl WebFileManager {
 
 
     // also include bucket details here
-    pub fn download_file(&self, system_file_path:String) {
+    pub fn download_file(&self, system_file_path:String) -> Result<(),AnyhowError> {
 
     }
     // return error or success with meta data.
     pub fn upload_file(&self, system_file_path:String) -> Result<FileMetaData,AnyhowError> {
        
         let file_descriptor = self.file_descriptor.clone();
-        let bucket_client = self.bucket_client.clone();
+        // let bucket_client = self.bucket_client.clone();
         if file_descriptor.is_public() {
            
         }

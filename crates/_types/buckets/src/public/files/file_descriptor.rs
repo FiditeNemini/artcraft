@@ -39,7 +39,7 @@ pub struct FileBucketDirectory<'a> {
   remote_cloud_base_directory: &'a str,
   full_remote_cloud_file_path: &'a str,
   file_name: &'a str,
-  file_descriptor: dyn FileDescriptor
+  file_descriptor: Box<dyn FileDescriptor>
 }
 
 impl FileBucketDirectory<'_> {
@@ -47,7 +47,7 @@ impl FileBucketDirectory<'_> {
     Self::from_object_hash(file_descriptor)
   }
 
-  fn from_object_hash(file_descriptor: dyn FileDescriptor) -> Self {
+  fn from_object_hash(file_descriptor: impl FileDescriptor) -> Self {
     let cloud_path_entropy = crockford_entropy_lower(32);
     let file_name_entropy  = crockford_entropy_lower(32);
 
@@ -69,7 +69,7 @@ impl FileBucketDirectory<'_> {
       remote_cloud_base_directory: remote_cloud_base_directory.as_ref(),
       full_remote_cloud_file_path: full_remote_cloud_file_path.as_ref(),
       file_name:file_name.as_ref(),
-      file_descriptor:file_descriptor
+      file_descriptor:Box::new(file_descriptor)
     }
   }
   
@@ -97,9 +97,9 @@ impl FileBucketDirectory<'_> {
       &self.file_name
   }
 
-  pub fn get_file_descriptor(&self) -> &dyn FileDescriptor {
-      &self.file_descriptor
-  }
+  // pub fn get_file_descriptor(&self) -> &dyn FileDescriptor {
+  //     &self.file_descriptor
+  // }
 
 }
 
