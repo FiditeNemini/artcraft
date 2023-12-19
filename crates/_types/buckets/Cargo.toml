@@ -18,6 +18,13 @@ path = "src/lib.rs"
 crockford = { path = "../../lib/crockford" }
 errors = { path = "../../lib/errors" }
 
+# probably need to have it's own module.
+filesys = { path = "../../lib/files/filesys" }
+hashing = { path = "../../lib/files/hashing" }
+mimetypes = { path = "../../lib/files/mimetypes" }
+
+
+
 # Workspace hack (faster compile times)
 my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
 

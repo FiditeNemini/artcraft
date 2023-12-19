@@ -1,55 +1,136 @@
 // Describes the file and how it will be saved to GCBucket
-#[derive(Clone)]
-pub struct FileDescriptorBucketDirectory {
-  object_hash: String,
-  directory: String,
-}
-
 // where the file should be stored based off the descriptor 
-const WEIGHT_FILE_DIRECTORY: &str = "/weights";
+
+use std::path::PathBuf;
+
+use crockford::crockford_entropy_lower;
+
+use crate::util::hashed_directory_path_long_string;
+
+// DEFAULT IMPLEMENTATION
+const REMOTE_FILE_DIRECTORY: &str = "/implement_google_cloud_storage_bucket_name";
+// File Descriptor Steers the Bucket Directory
 pub trait FileDescriptor {
+    // By default a file belongs in the public bucket will help us figureout which bucket to use.
+    fn remote_directory_path(&self) -> &str {
+        return REMOTE_FILE_DIRECTORY;
+    }
     // this will be the type of file
-    // e.g .safetensors .bin .jpg
-    fn get_suffix(&self)->String {
-       return ".bin".to_string();
+    // e.g requires! a period .safetensors .bin .jpg
+    fn get_suffix(&self)->&str {
+       return "implement".to_string().as_ref();
     }
     // This will be the prefix of the media type or the weights type.
     // name of the weights or the name of the media type
-    // vall-e_prompt, loRA, sd15, sdxl
-    fn get_prefix(&self)->String {
-        return "fake_u".to_string();
+    // vall-e_prompt, loRA, sd15, sdxl when implmenting add to the end
+    fn get_prefix(&self)->&str {
+        return "implement".to_string().as_ref();
     }
-    // This will be the token generated from the database record.
-    fn set_hash(&mut self, hash: String);
+
+    // This will be ensure that the right bucket is picked
+    fn is_public(&self) -> bool {
+      true
+    }
 }
 
-// TODO FIX
-// #[cfg(test)]
-// mod tests {
-//   use crate::public::weight_files::bucket_directory::WeightFileBucketDirectory;
+pub struct FileBucketDirectory<'a> {
+  file_object_hash: &'a str,
+  cloud_directory_hash: &'a str, 
+  remote_cloud_base_directory: &'a str,
+  full_remote_cloud_file_path: &'a str,
+  file_name: &'a str,
+  file_descriptor: dyn FileDescriptor
+}
 
-//   #[test]
-//   pub fn generate_new_entropy() {
-//     let directory = WeightFileBucketDirectory::generate_new();
-//     assert_eq!(directory.get_object_hash().len(), 32);
-//   }
+impl FileBucketDirectory<'_> {
+  pub fn generate_new(file_descriptor: impl FileDescriptor) -> Self {
+    Self::from_object_hash(file_descriptor)
+  }
 
-//   #[test]
-//   pub fn get_directory_path_str() {
-//     let directory = WeightFileBucketDirectory::from_object_hash("abcdefghijk");
-//     assert_eq!(directory.get_directory_path_str(), "/weights/a/b/c/d/e/abcdefghijk");
-//   }
+  fn from_object_hash(file_descriptor: dyn FileDescriptor) -> Self {
+    let cloud_path_entropy = crockford_entropy_lower(32);
+    let file_name_entropy  = crockford_entropy_lower(32);
 
-//   #[test]
-//   pub fn get_directory_path_str_short_name() {
-//     let directory = WeightFileBucketDirectory::from_object_hash("foo");
-//     assert_eq!(directory.get_directory_path_str(), "/weights/f/o/foo");
-//   }
+    // gets you wiki /a/b/c/d folder structure
+    let middle = hashed_directory_path_long_string::hashed_directory_path_long_string(cloud_path_entropy.as_ref());
 
-//   #[test]
-//   pub fn get_object_hash() {
-//     let hash = "abcdefghijk";
-//     let directory = WeightFileBucketDirectory::from_object_hash(hash);
-//     assert_eq!(directory.get_object_hash(), hash);
-//   }
-// }
+    // gets you cloud bucket path e.g weights/a/b/c/d/clould_path_entropy
+    let remote_cloud_base_directory = format!("{}/{}{}", file_descriptor.remote_directory_path().as_ref(), middle, cloud_path_entropy.as_ref());
+
+    // gets you name of the file with suffix and prefix and entropy in the centre
+    let file_name = format!("{}_{}.{}", file_descriptor.get_prefix(), file_name_entropy.as_ref(), file_descriptor.get_suffix());
+    // note: no longer optional because it's easy to know what it would be in the db explicit is better than implcit.
+    
+    // This is the full path you upload to.
+    let full_remote_cloud_file_path = format!("{}/{}", remote_cloud_base_directory , file_name);
+    Self {
+      file_object_hash: file_name_entropy.as_ref(),
+      cloud_directory_hash: cloud_path_entropy.as_ref(),
+      remote_cloud_base_directory: remote_cloud_base_directory.as_ref(),
+      full_remote_cloud_file_path: full_remote_cloud_file_path.as_ref(),
+      file_name:file_name.as_ref(),
+      file_descriptor:file_descriptor
+    }
+  }
+  
+  pub fn get_file_object_hash(&self) -> &str {
+      &self.file_object_hash
+  }
+
+  pub fn get_cloud_directory_hash(&self) -> &str {
+      &self.cloud_directory_hash
+  }
+
+  pub fn get_remote_cloud_base_directory(&self) -> &str {
+      &self.remote_cloud_base_directory
+  }
+
+  pub fn get_full_remote_cloud_file_path(&self) -> &str {
+      &self.full_remote_cloud_file_path
+  }
+
+  pub fn to_full_remote_cloud_file_path_pathbuf(&self) -> PathBuf {
+    PathBuf::from(&self.full_remote_cloud_file_path)
+  }
+
+  pub fn get_file_name(&self) -> &str {
+      &self.file_name
+  }
+
+  pub fn get_file_descriptor(&self) -> &dyn FileDescriptor {
+      &self.file_descriptor
+  }
+
+}
+
+#[cfg(test)]
+mod tests {
+
+  #[test]
+  pub fn test() {
+
+  }
+  // pub fn generate_new_entropy() {
+  //   let directory = FileDescriptorBucketDirectory::generate_new();
+  //   assert_eq!(directory.get_object_hash().len(), 32);
+  // }
+
+  // #[test]
+  // pub fn get_directory_path_str() {
+  //   let directory = FileDescriptorBucketDirectory::from_object_hash("abcdefghijk");
+  //   assert_eq!(directory.get_directory_path_str(), format!("/{}/a/b/c/d/e/abcdefghijk",REMOTE_FILE_DIRECTORY));
+  // }
+
+  // #[test]
+  // pub fn get_directory_path_str_short_name() {
+  //   let directory = FileDescriptorBucketDirectory::from_object_hash("foo");
+  //   assert_eq!(directory.get_directory_path_str(), format!("/{}/f/o/foo",REMOTE_FILE_DIRECTORY));
+  // }
+
+  // #[test]
+  // pub fn get_object_hash() {
+  //   let hash = "abcdefghijk";
+  //   let directory = FileDescriptorBucketDirectory::from_object_hash(hash);
+  //   assert_eq!(directory.get_object_hash(), hash);
+  // }
+}
