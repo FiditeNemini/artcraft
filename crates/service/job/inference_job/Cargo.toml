@@ -31,6 +31,7 @@ images = { path = "../../../lib/files/images" }
 jobs_common = { path = "../../../lib/jobs_common" }
 media = { path = "../../../lib/files/media" }
 memory_caching = { path = "../../../lib/caching/memory_caching" }
+migration = { path = "../../../lib/migration" }
 mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 redis_common = { path = "../../../lib/redis_common" }

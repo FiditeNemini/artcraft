@@ -1,6 +1,6 @@
-use std::{path::Path, string};
-use errors::{anyhow, AnyhowResult};
-use log::{info, warn};
+use std::path::Path;
+
+use log::info;
 use rand::Rng;
 use sqlx::{MySql, Pool};
 
@@ -9,6 +9,7 @@ use enums::{
     by_table::model_weights::{weights_category::WeightsCategory, weights_types::WeightsType},
     common::visibility::Visibility,
 };
+use errors::{anyhow, AnyhowResult};
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;

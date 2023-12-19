@@ -358,6 +358,7 @@ async fn main() -> AnyhowResult<()> {
 
     // Temporary flags
     enable_enqueue_generic_tts_job: easyenv::get_env_bool_or_default("FF_ENABLE_ENQUEUE_GENERIC_TTS_JOB", false),
+    switch_voice_conversion_to_model_weights: easyenv::get_env_bool_or_default("FF_SWITCH_VOICE_CONVERSION_TO_MODEL_WEIGHTS", false),
   };
 
   let third_party_url_redirector = ThirdPartyUrlRedirector::new(server_environment);

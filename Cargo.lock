@@ -1880,6 +1880,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "bootstrap",
+ "buckets",
  "chrono",
  "cloud_storage",
  "concurrency",
@@ -1897,6 +1898,7 @@ dependencies = [
  "hyper",
  "jobs_common",
  "log",
+ "migration",
  "mimetypes",
  "my-workspace-hack",
  "mysql_queries",
@@ -1909,6 +1911,7 @@ dependencies = [
  "subprocess",
  "subprocess_common",
  "tempdir",
+ "tokens",
  "tokio",
  "zip",
 ]
@@ -2976,6 +2979,7 @@ dependencies = [
  "log",
  "media",
  "memory_caching",
+ "migration",
  "mime",
  "mimetypes",
  "my-workspace-hack",
@@ -3484,15 +3488,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "migration"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "buckets",
+ "chrono",
+ "cloud_storage",
+ "enums",
+ "errors",
+ "jobs_common",
+ "my-workspace-hack",
+ "mysql_queries",
+ "once_cell",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "serial_test",
+ "sqlx",
+ "tokens",
+ "tokio",
+ "toml 0.5.11",
+]
+
+[[package]]
 name = "migration-tool"
 version = "0.0.1"
 dependencies = [
  "buckets",
  "clap",
+ "cloud_storage",
  "config",
  "easyenv",
  "enums",
  "errors",
+ "hashing",
  "log",
  "my-workspace-hack",
  "mysql_queries",
@@ -3502,6 +3532,7 @@ dependencies = [
  "sqlx",
  "storyteller_root",
  "strum",
+ "tempdir",
  "tokens",
  "tokio",
 ]
@@ -5903,6 +5934,7 @@ dependencies = [
  "md-5 0.9.1",
  "media",
  "memory_caching",
+ "migration",
  "mimetypes",
  "my-workspace-hack",
  "mysql_queries",
