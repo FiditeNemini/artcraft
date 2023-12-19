@@ -3513,6 +3513,7 @@ version = "0.0.1"
 dependencies = [
  "buckets",
  "clap",
+ "cloud_storage",
  "config",
  "easyenv",
  "enums",
