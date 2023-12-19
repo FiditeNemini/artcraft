@@ -51,7 +51,7 @@ pub struct ListMediaFileForUserArgs<'a> {
   pub maybe_filter_media_type: Option<MediaFileType>,
   pub page_size: usize,
   pub page_index: usize,
-  pub cursor_is_reversed: bool,
+  pub sort_ascending: bool,
   pub view_as: ViewAs,
   pub mysql_pool: &'a MySqlPool,
 }
@@ -66,7 +66,7 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
     false,
     0,
     0,
-    args.cursor_is_reversed,
+    args.sort_ascending,
     args.view_as,
     count_fields.as_str(),
   );
@@ -82,7 +82,7 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
     true,
     args.page_index,
     args.page_size,
-    args.cursor_is_reversed,
+    args.sort_ascending,
     args.view_as,
     result_fields.as_str(),
   );
@@ -112,7 +112,7 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
 
   Ok(MediaFileListPage {
     records: results,
-    sort_ascending: !args.cursor_is_reversed,
+    sort_ascending: args.sort_ascending,
     current_page: args.page_index,
     total_page_count: number_of_pages,
   })
@@ -156,7 +156,7 @@ fn query_builder<'a>(
   enforce_limits: bool,
   page_index: usize,
   page_size: usize,
-  cursor_is_reversed: bool,
+  sort_ascending: bool,
   view_as: ViewAs,
   select_fields: &'a str,
 ) -> QueryBuilder<'a, MySql> {
@@ -198,10 +198,10 @@ WHERE m.user_deleted_at IS NULL
     }
   }
 
-  if cursor_is_reversed {
-    query_builder.push(" ORDER BY m.id ASC ");
+  if sort_ascending {
+    query_builder.push(" ORDER BY m.created_at ASC ");
   } else {
-    query_builder.push(" ORDER BY m.id DESC ");
+    query_builder.push(" ORDER BY m.created_at DESC ");
   }
 
   if enforce_limits {

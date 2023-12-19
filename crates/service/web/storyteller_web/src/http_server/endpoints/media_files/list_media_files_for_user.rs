@@ -31,8 +31,6 @@ pub struct ListMediaFilesForUserQueryParams {
   pub sort_ascending: Option<bool>,
   pub page_size: Option<usize>,
   pub page_index: Option<usize>,
-  pub cursor: Option<String>,
-  pub cursor_is_reversed: Option<bool>,
   pub filter_media_type: Option<MediaFileType>,
 }
 
@@ -132,7 +130,6 @@ pub async fn list_media_files_for_user_handler(
   let limit = query.page_size.unwrap_or(25);
 
   let sort_ascending = query.sort_ascending.unwrap_or(false);
-  let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
 
   let page_size = query.page_size.unwrap_or_else(|| 25);
   let page_index = query.page_index.unwrap_or_else(|| 0);
@@ -151,7 +148,7 @@ pub async fn list_media_files_for_user_handler(
     maybe_filter_media_type: query.filter_media_type,
     page_size,
     page_index,
-    cursor_is_reversed,
+    sort_ascending,
     view_as,
     mysql_pool: &server_state.mysql_pool,
   }).await;
