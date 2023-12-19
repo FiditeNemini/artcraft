@@ -36,7 +36,9 @@ pub async fn download_model_file(
                     model_record.maybe_private_bucket_prefix.as_deref(),
                     model_record.maybe_private_bucket_extension.as_deref(),
                 );
-            model_filename = model_record.private_bucket_hash.clone() + ".".to_owned() + model_record.maybe_private_bucket_extension.as_deref().unwrap_or("bin");
+            let base_name = &model_record.private_bucket_hash;
+            let extension = model_record.maybe_private_bucket_extension.as_deref().unwrap_or("bin");
+            model_filename = format!("{base_name}.{extension}");
             bucket_object_path = model_bucket_path.to_full_object_pathbuf();
         }
         None => {
