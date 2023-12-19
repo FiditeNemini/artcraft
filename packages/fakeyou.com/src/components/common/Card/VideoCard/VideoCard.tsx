@@ -99,15 +99,15 @@ export default function VideoCard({ data, type, showCreator }: VideoCardProps) {
             <div className="d-flex align-items-center">
               <div className="d-flex flex-grow-1">
                 <Badge label="Video" color="purple" overlay={true} />
-                <Button
-                  icon={faArrowRight}
-                  iconFlip={true}
-                  variant="link"
-                  label="Use"
-                  onClick={handleCardClick}
-                  className="fs-7"
-                />
               </div>
+              <Button
+                icon={faArrowRight}
+                iconFlip={true}
+                variant="link"
+                label="Use"
+                onClick={handleCardClick}
+                className="fs-7"
+              />
             </div>
             <FontAwesomeIcon icon={faPlayCircle} className="card-video-play" />
             <div className="card-img-overlay-text">
