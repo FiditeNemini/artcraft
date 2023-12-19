@@ -12,6 +12,28 @@ use mysql_queries::queries::model_weights::inference::get_model_weight_for_voice
 use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::{get_voice_conversion_model_for_inference, VoiceConversionModelForInference};
 use tokens::tokens::model_weights::ModelWeightToken;
 
+/// Query model info
+/// Depending on the token prefix, this does either a modern or legacy lookup.
+pub async fn query_vc_model_for_migration(model_token: &str, mysql_pool: &MySqlPool) -> AnyhowResult<Option<VcModel>> {
+  // NB: This is temporary migration code as we switch from the `voice_conversion_models` table to the `model_weights` table.
+  if model_token.starts_with(ModelWeightToken::token_prefix()) {
+    let model_weights_token = ModelWeightToken::new_from_str(model_token);
+
+    let maybe_model = get_model_weight_for_voice_conversion_inference(
+      &mysql_pool, &model_weights_token).await?;
+
+    Ok(maybe_model
+        .map(|model| VcModel::ModelWeight(model)))
+
+  } else {
+    let maybe_vc_model = get_voice_conversion_model_for_inference(
+      &mysql_pool, model_token).await?;
+
+    Ok(maybe_vc_model
+        .map(|model| VcModel::LegacyVoiceConversion(model)))
+  }
+}
+
 /// Union over the legacy table and the new table to support an easier migration.
 /// This enum can hold a record of either type and present a unified accessor interface.
 #[derive(Clone)]
@@ -161,26 +183,6 @@ impl VcModel {
     };
     let filename = format!("{token}.index");
     cache_dir.voice_conversion_model_path(&filename)
-  }
-}
-
-pub async fn query_vc_model_for_migration(model_token: &str, mysql_pool: &MySqlPool) -> AnyhowResult<Option<VcModel>> {
-  // NB: This is temporary migration code as we switch from the `voice_conversion_models` table to the `model_weights` table.
-  if model_token.starts_with(ModelWeightToken::token_prefix()) {
-    let model_weights_token = ModelWeightToken::new_from_str(model_token);
-
-    let maybe_model = get_model_weight_for_voice_conversion_inference(
-      &mysql_pool, &model_weights_token).await?;
-
-    Ok(maybe_model
-        .map(|model| VcModel::ModelWeight(model)))
-
-  } else {
-    let maybe_vc_model = get_voice_conversion_model_for_inference(
-      &mysql_pool, model_token).await?;
-
-    Ok(maybe_vc_model
-        .map(|model| VcModel::LegacyVoiceConversion(model)))
   }
 }
 

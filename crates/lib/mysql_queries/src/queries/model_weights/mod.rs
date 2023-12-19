@@ -9,3 +9,4 @@ pub mod list_weights_query_builder;
 pub mod migration;
 pub mod tests;
 pub mod update_weight;
+pub mod model_weight_info_lite;
