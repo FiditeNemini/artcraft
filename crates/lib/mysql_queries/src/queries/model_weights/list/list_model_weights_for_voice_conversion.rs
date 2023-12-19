@@ -51,10 +51,10 @@ pub async fn list_model_weights_for_voice_conversion(
         ModelWeightForVoiceConversion {
           token: model.token,
           weight_type: model.weight_type,
-          creator_user_token: model.creator_user_token.unwrap_or(UserToken::new_from_str("TODO")),
-          creator_username: model.creator_username.unwrap_or("TODO".to_string()),
-          creator_display_name: model.creator_display_name.unwrap_or("TODO".to_string()),
-          creator_gravatar_hash: model.creator_gravatar_hash.unwrap_or("TODO".to_string()),
+          creator_user_token: model.creator_user_token,
+          creator_username: model.creator_username,
+          creator_display_name: model.creator_display_name,
+          creator_gravatar_hash: model.creator_gravatar_hash,
           title: model.title,
           ietf_language_tag: model.ietf_language_tag.unwrap_or("en".to_string()),
           ietf_primary_language_subtag: model.ietf_primary_language_subtag.unwrap_or("en".to_string()),
@@ -89,7 +89,7 @@ SELECT
 FROM model_weights as w
 LEFT OUTER JOIN model_weights_extension_voice_conversion_details as w_extension
     ON w_extension.model_weights_token = w.token
-LEFT OUTER JOIN users
+JOIN users
     ON users.token = w.creator_user_token
 WHERE
     w.weights_type IN ("rvc_v2", "so_vits_svc")
@@ -120,10 +120,10 @@ struct RawModelWeightForVoiceConversion {
   pub ietf_language_tag: Option<String>,
   pub ietf_primary_language_subtag: Option<String>,
 
-  pub creator_user_token: Option<UserToken>,
-  pub creator_username: Option<String>,
-  pub creator_display_name: Option<String>,
-  pub creator_gravatar_hash: Option<String>,
+  pub creator_user_token: UserToken,
+  pub creator_username: String,
+  pub creator_display_name: String,
+  pub creator_gravatar_hash: String,
 
   pub creator_set_visibility: Visibility,
 
