@@ -25,7 +25,7 @@ pub async fn process_single_vc_job(job_dependencies: &JobDependencies, job: &Ava
       .await
       .map_err(|err| {
         error!("error querying vc model {model_token} : {:?}", err);
-        return ProcessSingleJobError::Other(anyhow!("error querying vc model {model_token} : {:?}", err))
+        ProcessSingleJobError::Other(anyhow!("error querying vc model {model_token} : {:?}", err))
       })?;
 
   let model = match maybe_model {

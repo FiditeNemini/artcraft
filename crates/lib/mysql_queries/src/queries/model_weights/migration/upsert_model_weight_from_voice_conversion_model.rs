@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use sqlx::{Acquire, MySql, MySqlPool, Transaction};
+use sqlx::{MySql, MySqlPool, Transaction};
 
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;

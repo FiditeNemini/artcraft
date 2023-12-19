@@ -5,12 +5,10 @@ use log::{info, warn};
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
-use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use filesys::file_exists::file_exists;
 use migration::voice_conversion::query_vc_model_for_migration::{query_vc_model_for_migration, VcModel, VcModelType};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::{get_tts_model_for_inference_improved, TtsModelForInferenceError, TtsModelForInferenceRecord};
-use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::{get_voice_conversion_model_for_inference, VoiceConversionModelForInference};
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job_dependencies::JobDependencies;

@@ -1,18 +1,13 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
-use log::warn;
-use sqlx::{MySql, MySqlPool};
+use sqlx::MySql;
 use sqlx::pool::PoolConnection;
-use enums::by_table::model_weights::weights_types::WeightsType;
 
-use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
+use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
-use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
-
-use crate::helpers::boolean_converters::i8_to_bool;
 
 #[derive(Serialize, Clone)]
 pub struct ModelWeightForVoiceConversion {
