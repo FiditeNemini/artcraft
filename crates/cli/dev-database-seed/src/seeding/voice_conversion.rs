@@ -44,6 +44,7 @@ async fn create_rvc_model(
 
   insert_voice_conversion_model_from_download_job(InsertVoiceConversionModelArgs {
     model_type: VoiceConversionModelType::RvcV2,
+    maybe_new_weights_token: None,
     title,
     original_download_url: "https://example.com",
     original_filename: "unknown.zip",

@@ -164,6 +164,7 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
   let (_id, voice_conversion_model_token) = insert_voice_conversion_model_from_download_job(InsertVoiceConversionModelArgs {
     model_type: VoiceConversionModelType::RvcV2,
+    maybe_new_weights_token: Some(&model_weights_token),
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,

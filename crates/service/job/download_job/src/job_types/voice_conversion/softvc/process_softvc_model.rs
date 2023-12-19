@@ -100,6 +100,7 @@ pub async fn process_softvc_model<'a, 'b>(
 
   let (_id, model_token) = insert_voice_conversion_model_from_download_job(InsertVoiceConversionModelArgs {
     model_type: VoiceConversionModelType::SoftVc,
+    maybe_new_weights_token: None,
     title: &job.title,
     original_download_url: &job.download_url,
     original_filename: &download_filename,

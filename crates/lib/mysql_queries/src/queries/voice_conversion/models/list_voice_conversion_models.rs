@@ -29,11 +29,6 @@ pub struct VoiceConversionModelRecordForList {
 
   pub is_front_page_featured: bool,
 
-  // TODO(bt, 2023-04-18): Need columns for ratings
-  //pub user_ratings_positive_count: u32,
-  //pub user_ratings_negative_count: u32,
-  //pub user_ratings_total_count: u32, // NB: Does not include "neutral" ratings.
-
   pub creator_set_visibility: Visibility,
 
   pub created_at: DateTime<Utc>,
@@ -182,11 +177,6 @@ struct RawVoiceConversionModelRecord {
   pub creator_gravatar_hash: String,
 
   pub is_front_page_featured: i8, // bool
-
-  // TODO(bt, 2023-04-18): Need columns for ratings
-  //pub user_ratings_positive_count: u32,
-  //pub user_ratings_negative_count: u32,
-  //pub user_ratings_total_count: u32, // NB: Does not include "neutral" ratings.
 
   pub creator_set_visibility: Visibility,
 
