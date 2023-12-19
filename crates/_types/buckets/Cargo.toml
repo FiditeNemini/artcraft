@@ -22,8 +22,9 @@ errors = { path = "../../lib/errors" }
 filesys = { path = "../../lib/files/filesys" }
 hashing = { path = "../../lib/files/hashing" }
 mimetypes = { path = "../../lib/files/mimetypes" }
-
-
+# have to add this to it's own module.....
+# buckets = { path = "../../_types/buckets" }
+# cloud_storage = { path = "../../lib/api_clients/cloud_storage" }
 
 # Workspace hack (faster compile times)
 my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }

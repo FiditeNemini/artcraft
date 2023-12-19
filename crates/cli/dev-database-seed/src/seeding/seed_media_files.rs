@@ -106,7 +106,7 @@ async fn seed_model(
   let mut bucket_hash = "NOT_UPLOADED_BY_SEED_TOOL".to_string();
   let mut maybe_bucket_prefix = None;
   let mut maybe_bucket_extension = None;
-
+  
   if media_file_exists(mysql_pool, media_file_token).await? {
     info!("Media file already seeded: {:?}", media_file_token);
     return Ok(())

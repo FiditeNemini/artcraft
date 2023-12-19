@@ -2,9 +2,7 @@
 // where the file should be stored based off the descriptor 
 
 use std::path::PathBuf;
-
 use crockford::crockford_entropy_lower;
-
 use crate::util::hashed_directory_path_long_string;
 
 // DEFAULT IMPLEMENTATION
@@ -22,7 +20,7 @@ pub trait FileDescriptor {
     }
     // This will be the prefix of the media type or the weights type.
     // name of the weights or the name of the media type
-    // vall-e_prompt, loRA, sd15, sdxl when implmenting add to the end
+    // vall-e_prompt, loRA, sd15, sdxl when implmenting add to the end 
     fn get_prefix(&self)->String {
         return "implement".to_string();
     }
@@ -97,8 +95,8 @@ impl FileBucketDirectory {
       &self.file_name
   }
 
-  // pub fn get_file_descriptor(&self) -> &dyn FileDescriptor {
-  //     &self.file_descriptor
+  // pub fn get_file_descriptor(&self) -> Box<dyn FileDescriptor> {
+  //   self.file_descriptor
   // }
 
 }
@@ -107,13 +105,12 @@ impl FileBucketDirectory {
 mod tests {
 
   #[test]
-  pub fn test() {
+  pub fn test() {}
 
+  pub fn generate_new_entropy() {
+    let directory = FileDescriptorBucketDirectory::generate_new();
+    assert_eq!(directory.get_object_hash().len(), 32);
   }
-  // pub fn generate_new_entropy() {
-  //   let directory = FileDescriptorBucketDirectory::generate_new();
-  //   assert_eq!(directory.get_object_hash().len(), 32);
-  // }
 
   // #[test]
   // pub fn get_directory_path_str() {

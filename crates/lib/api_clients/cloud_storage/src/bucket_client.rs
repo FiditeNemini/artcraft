@@ -14,7 +14,7 @@ use tokio::io::AsyncReadExt;
 #[derive(Clone)]
 pub struct BucketClient {
   bucket: Bucket,
-
+  
   /// If set, put all files under this root path.
   optional_bucket_root: Option<String>,
 }
