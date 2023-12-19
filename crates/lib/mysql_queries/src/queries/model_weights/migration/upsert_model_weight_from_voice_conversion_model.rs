@@ -1,5 +1,6 @@
 use anyhow::anyhow;
 use sqlx::{MySql, MySqlPool, Transaction};
+use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
@@ -16,13 +17,14 @@ use crate::queries::voice_conversion::migration::list_whole_voice_conversion_mod
 pub async fn upsert_model_weight_from_voice_conversion_model(
   record: &WholeVoiceConversionModelRecord,
   mysql_pool: &MySqlPool,
+  bucket_path: &WeightFileBucketPath,
 ) -> AnyhowResult<()> {
-  //let mut connection = mysql_pool.acquire().await?;
+
   let mut transaction = mysql_pool.begin().await?;
 
   let model_weight_token = create_or_generate_token(record);
 
-  upsert_model_weights_record(record, &model_weight_token, &mut transaction).await?;
+  upsert_model_weights_record(record, &model_weight_token, bucket_path, &mut transaction).await?;
   upsert_model_weights_extension_record(record, &model_weight_token, &mut transaction).await?;
 
   // TODO: Don't update source record with new token *unless* we're backfilling the same database.
@@ -43,7 +45,8 @@ pub fn create_or_generate_token(record: &WholeVoiceConversionModelRecord) -> Mod
 pub async fn upsert_model_weights_record(
   record: &WholeVoiceConversionModelRecord,
   model_weight_token: &ModelWeightToken,
-  mut transaction: &mut Transaction<'_, MySql>
+  bucket_path: &WeightFileBucketPath,
+  mut transaction: &mut Transaction<'_, MySql>,
 ) -> AnyhowResult<()> {
 
   let weights_type = match record.model_type {
@@ -85,9 +88,9 @@ SET
   file_size_bytes = ?,
   file_checksum_sha2 = "TODO",
 
-  private_bucket_hash = "TODO",
-  maybe_private_bucket_prefix = "TODO",
-  maybe_private_bucket_extension = "TODO",
+  private_bucket_hash = ?,
+  maybe_private_bucket_prefix = ?,
+  maybe_private_bucket_extension = ?,
   cached_user_ratings_total_count = 0,
   cached_user_ratings_positive_count = 0,
   cached_user_ratings_negative_count = 0,
@@ -118,9 +121,9 @@ ON DUPLICATE KEY UPDATE
   original_filename = ?,
   file_size_bytes = ?,
   file_checksum_sha2 = "TODO",
-  private_bucket_hash = "TODO",
-  maybe_private_bucket_prefix = "TODO",
-  maybe_private_bucket_extension = "TODO",
+  private_bucket_hash = ?,
+  maybe_private_bucket_prefix = ?,
+  maybe_private_bucket_extension = ?,
   cached_user_ratings_total_count = 0,
   cached_user_ratings_positive_count = 0,
   cached_user_ratings_negative_count = 0,
@@ -147,6 +150,10 @@ ON DUPLICATE KEY UPDATE
     record.original_filename,
     record.file_size_bytes,
 
+    bucket_path.get_object_hash(),
+    bucket_path.get_optional_prefix(),
+    bucket_path.get_optional_extension(),
+
     record.token.as_str(),
     record.version,
     record.created_at,
@@ -166,6 +173,11 @@ ON DUPLICATE KEY UPDATE
     record.original_download_url,
     record.original_filename,
     record.file_size_bytes,
+
+    bucket_path.get_object_hash(),
+    bucket_path.get_optional_prefix(),
+    bucket_path.get_optional_extension(),
+
     record.token.as_str(),
     record.version,
     record.created_at,
