@@ -6,28 +6,54 @@ use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
-use errors::AnyhowResult;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
-use mysql_queries::queries::model_weights::inference::get_model_weight_for_voice_conversion_inference::{get_model_weight_for_voice_conversion_inference, ModelWeightForVoiceConversionInference};
-use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::{get_voice_conversion_model_for_inference, VoiceConversionModelForInference};
+use mysql_queries::queries::model_weights::inference::get_model_weight_for_voice_conversion_inference::{get_model_weight_for_voice_conversion_inference, ModelWeightError, ModelWeightForVoiceConversionInference};
+use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::{get_voice_conversion_model_for_inference, VoiceConversionModelForInference, VoiceConversionModelForInferenceError};
 use tokens::tokens::model_weights::ModelWeightToken;
+
+#[derive(Clone, Debug)]
+pub enum VcModelError {
+  ModelDeleted,
+  DatabaseError { reason: String },
+}
+
+impl std::fmt::Display for VcModelError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    match self {
+      VcModelError::ModelDeleted => write!(f, "ModelDeleted"),
+      VcModelError::DatabaseError { reason} =>
+        write!(f, "Database error: {:?}", reason),
+    }
+  }
+}
+
+impl std::error::Error for VcModelError {}
 
 /// Query model info
 /// Depending on the token prefix, this does either a modern or legacy lookup.
-pub async fn query_vc_model_for_migration(model_token: &str, mysql_pool: &MySqlPool) -> AnyhowResult<Option<VcModel>> {
+pub async fn query_vc_model_for_migration(model_token: &str, mysql_pool: &MySqlPool) -> Result<Option<VcModel>, VcModelError> {
   // NB: This is temporary migration code as we switch from the `voice_conversion_models` table to the `model_weights` table.
   if model_token.starts_with(ModelWeightToken::token_prefix()) {
     let model_weights_token = ModelWeightToken::new_from_str(model_token);
 
     let maybe_model = get_model_weight_for_voice_conversion_inference(
-      &mysql_pool, &model_weights_token).await?;
+      &mysql_pool, &model_weights_token).await.map_err(|err|
+      match err {
+        ModelWeightError::ModelDeleted =>  VcModelError::ModelDeleted,
+        ModelWeightError::DatabaseError { reason } => VcModelError::DatabaseError { reason },
+      }
+    )?;
 
     Ok(maybe_model
         .map(|model| VcModel::ModelWeight(model)))
 
   } else {
     let maybe_vc_model = get_voice_conversion_model_for_inference(
-      &mysql_pool, model_token).await?;
+      &mysql_pool, model_token).await.map_err(|err|
+      match err {
+        VoiceConversionModelForInferenceError::ModelDeleted =>  VcModelError::ModelDeleted,
+        VoiceConversionModelForInferenceError::DatabaseError { reason } => VcModelError::DatabaseError { reason },
+      })?;
 
     Ok(maybe_vc_model
         .map(|model| VcModel::LegacyVoiceConversion(model)))
