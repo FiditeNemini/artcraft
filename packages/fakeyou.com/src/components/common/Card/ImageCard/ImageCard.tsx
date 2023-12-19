@@ -4,15 +4,18 @@ import Card from "../Card";
 import useTimeAgo from "hooks/useTimeAgo";
 import Badge from "components/common/Badge";
 import LikeButton from "components/common/LikeButton";
-import Button from "components/common/Button";
 import FavoriteButton from "components/common/FavoriteButton";
+import CreatorName from "../CreatorName";
+import Button from "components/common/Button";
+import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 
 interface ImageCardProps {
   data: any;
   type: "media" | "weights";
+  showCreator?: boolean;
 }
 
-export default function ImageCard({ data, type }: ImageCardProps) {
+export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
   const history = useHistory();
 
   const handleCardClick = () => {
@@ -55,12 +58,31 @@ export default function ImageCard({ data, type }: ImageCardProps) {
               <div>
                 <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
               </div>
-              <div onClick={handleInnerClick} className="mt-2">
-                <LikeButton
-                  onToggle={handleLike}
-                  likeCount={data.likes}
-                  overlay={true}
-                />
+
+              <hr className="my-2" />
+
+              <div
+                className="d-flex align-items-center gap-2"
+                onClick={handleInnerClick}
+              >
+                {showCreator && (
+                  <div className="flex-grow-1">
+                    <CreatorName
+                      displayName={data.maybe_creator_user.display_name}
+                      gravatarHash={data.maybe_creator_user.gravatar_hash}
+                      avatarIndex={
+                        data.maybe_creator_user.default_avatar.image_index
+                      }
+                      backgroundIndex={
+                        data.maybe_creator_user.default_avatar.color_index
+                      }
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <LikeButton onToggle={handleLike} likeCount={data.likes} />
+                </div>
               </div>
             </div>
           </div>
@@ -76,18 +98,18 @@ export default function ImageCard({ data, type }: ImageCardProps) {
           />
           <div className="card-img-overlay">
             <div className="card-img-gradient" />
-
             <div className="d-flex align-items-center">
               <div className="d-flex flex-grow-1">
                 <Badge label="LORA" color="pink" overlay={true} />
               </div>
-              <div onClick={handleInnerClick}>
-                <FavoriteButton
-                  onToggle={handleLike}
-                  favoriteCount={data.likes}
-                  overlay={true}
-                />
-              </div>
+              <Button
+                icon={faArrowRight}
+                iconFlip={true}
+                variant="link"
+                label="Use"
+                onClick={handleCardClick}
+                className="fs-7"
+              />
             </div>
 
             <div className="card-img-overlay-text">
@@ -96,11 +118,38 @@ export default function ImageCard({ data, type }: ImageCardProps) {
                   <h6 className="fw-semibold text-white mb-1">
                     {data.weight_name}
                   </h6>
-                  <p className="fs-7 opacity-75">{timeAgo}</p>
+                  <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
                 </div>
-                <div onClick={handleInnerClick}>
-                  <Button label="Use" small={true} />
+              </div>
+
+              <hr className="my-2" />
+
+              <div
+                className="d-flex align-items-center gap-2"
+                onClick={handleInnerClick}
+              >
+                {showCreator && (
+                  <div className="flex-grow-1">
+                    <CreatorName
+                      displayName={data.maybe_creator_user.display_name}
+                      gravatarHash={data.maybe_creator_user.gravatar_hash}
+                      avatarIndex={
+                        data.maybe_creator_user.default_avatar.image_index
+                      }
+                      backgroundIndex={
+                        data.maybe_creator_user.default_avatar.color_index
+                      }
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <LikeButton onToggle={handleLike} likeCount={data.likes} />
                 </div>
+                <FavoriteButton
+                  onToggle={handleLike}
+                  favoriteCount={data.likes}
+                />
               </div>
             </div>
           </div>

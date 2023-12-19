@@ -95,10 +95,24 @@ export default function MediaTab() {
                 let card;
                 switch (data.media_type) {
                   case "audio":
-                    card = <AudioCard key={index} data={data} type="media" />;
+                    card = (
+                      <AudioCard
+                        key={index}
+                        data={data}
+                        type="media"
+                        showCreator={true}
+                      />
+                    );
                     break;
                   case "image":
-                    card = <ImageCard key={index} data={data} type="media" />;
+                    card = (
+                      <ImageCard
+                        key={index}
+                        data={data}
+                        type="media"
+                        showCreator={true}
+                      />
+                    );
                     break;
                   case "video":
                     card = <VideoCard key={index} data={data} type="media" />;

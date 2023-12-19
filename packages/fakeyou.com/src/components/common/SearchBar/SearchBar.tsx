@@ -79,7 +79,9 @@ export default function SearchBar({
   }, [searchTerm, history, location.pathname, doSearch, isOnSearchPage]);
 
   const handleSearchButtonClick = useCallback(() => {
-    history.push(`/search/weights?query=${encodeURIComponent(searchTerm)}`);
+    if (searchTerm !== "") {
+      history.push(`/search/weights?query=${encodeURIComponent(searchTerm)}`);
+    }
   }, [searchTerm, history]);
 
   const handleKeyPress = useCallback(
