@@ -1,31 +1,33 @@
 import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-// import mockMediaData from "./mockMediaData";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
-import Select from "components/common/Select";
+import { TempSelect } from "components/common";
 import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";
 
-import useProfileRequests from "../../useProfileRequests";
+import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import { useListContent } from "hooks";
 
 export default function MediaTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [isLoading] = useState(false);
 
-  const { mediaList, mediaPage, mediaPageChange, mediaPageCount } = useProfileRequests({ requestMedia: true });
+  const [list, listSet] = useState<MediaFile[]>([]);
+  const media = useListContent({ fetcher: GetMediaByUser, list, listSet, pagePreset: 1, requestList: true });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    mediaPageChange(selectedItem.selected + 1);
+    media.pageChange(selectedItem.selected + 1);
   };
 
   const paginationProps = {
     onPageChange: handlePageClick,
-    pageCount: mediaPageCount - 1,
-    currentPage: mediaPage - 1
+    pageCount: media.pageCount - 1,
+    currentPage: media.page - 1
   };
 
   const filterOptions = [
@@ -45,18 +47,20 @@ export default function MediaTab() {
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
         <div className="d-flex gap-2 flex-grow-1">
-          <Select
-            icon={faArrowDownWideShort}
-            options={sortOptions}
-            defaultValue={sortOptions[0]}
-            isSearchable={false}
-          />
-          <Select
-            icon={faFilter}
-            options={filterOptions}
-            defaultValue={filterOptions[0]}
-            isSearchable={false}
-          />
+          <TempSelect {...{
+            icon: faArrowDownWideShort,
+            options: sortOptions,
+            name: "sort",
+            onChange: media.onChange,
+            value: media.sort
+          }}/>
+          <TempSelect {...{
+            icon: faFilter,
+            options: filterOptions,
+            name: "filter",
+            onChange: media.onChange,
+            value: media.filter
+          }}/>
         </div>
         <Pagination { ...paginationProps }/>
       </div>
@@ -72,7 +76,7 @@ export default function MediaTab() {
             gridRef={gridContainerRef}
             onLayoutComplete={() => console.log("Layout complete!")}
           >
-            {mediaList.map((data, index) => {
+            {media.list.map((data: MediaFile, index: number) => {
               let card;
               switch (data.media_type) {
                 case "audio":
