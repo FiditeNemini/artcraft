@@ -33,7 +33,7 @@ pub struct RetrivedModelWeight {
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
     pub private_bucket_hash: String,
-    pub maybe_private_bucket_prefix: Option<String>,
+    pub maybe_private_bucket_prefix: Option<String>, // TODO crossproduct rename these to public thx ^-^
     pub maybe_private_bucket_extension: Option<String>,
     pub cached_user_ratings_negative_count: u32,
     pub cached_user_ratings_positive_count: u32,

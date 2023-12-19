@@ -1,3 +1,5 @@
+use tokens::tokens::model_weights::ModelWeightToken;
+
 /// Video sources can be one of several:
 ///  - F: media_files (todo)
 ///  - U: media_uploads (legacy)
@@ -32,5 +34,25 @@ pub struct RerenderArgs {
 
     #[serde(rename = "sd")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_sd_model: Option<String>,
+    pub maybe_sd_model_token: Option<ModelWeightToken>,
+
+    #[serde(rename = "lora")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_lora_model_token: Option<ModelWeightToken>,
+
+    #[serde(rename = "p")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_prompt: Option<String>,
+
+    #[serde(rename = "ap")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_a_prompt: Option<String>,
+
+    #[serde(rename = "np")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_n_prompt: Option<String>,
+
+    #[serde(rename = "se")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_seed: Option<i32>,
 }

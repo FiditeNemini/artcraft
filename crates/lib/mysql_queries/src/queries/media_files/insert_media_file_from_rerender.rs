@@ -55,7 +55,7 @@ pub async fn insert_media_file_from_rerender(
 
         let next_rerender_id = transactional_increment_generic_synthetic_id(
             &user_token,
-            IdCategory::RerenderResult,
+            IdCategory::VideoFilterResult,
             &mut transaction
         ).await?;
 
@@ -67,7 +67,7 @@ pub async fn insert_media_file_from_rerender(
     let creator_set_visibility = args.job.creator_set_visibility.clone();
 
     const ORIGIN_CATEGORY : MediaFileOriginCategory = MediaFileOriginCategory::Inference;
-    const ORIGIN_PRODUCT_CATEGORY : MediaFileOriginProductCategory = MediaFileOriginProductCategory::Rerender;
+    const ORIGIN_PRODUCT_CATEGORY : MediaFileOriginProductCategory = MediaFileOriginProductCategory::VideoFilter;
     const ORIGIN_MODEL_TYPE : MediaFileOriginModelType = MediaFileOriginModelType::Rerender;
     const MEDIA_TYPE : MediaFileType = MediaFileType::Video;
 
