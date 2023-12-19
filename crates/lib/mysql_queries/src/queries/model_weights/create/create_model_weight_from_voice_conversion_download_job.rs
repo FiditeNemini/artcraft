@@ -135,5 +135,7 @@ SET
     Err(err) => return Err(anyhow!("Mysql error: {:?}", err)),
   };
 
+  transaction.commit().await?;
+
   Ok((model_weights_record_id, weights_token))
 }
