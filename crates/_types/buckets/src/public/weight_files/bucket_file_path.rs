@@ -25,6 +25,31 @@ impl PublicPath for WeightFileBucketPath {}
 
 impl WeightFileBucketPath {
 
+  // TODO(bt,2023-12-19): This is temporary standardization. Clean this up.
+  pub fn generate_for_svc_model() -> Self {
+    Self::generate_new(Some("svc_"), Some(".pt"))
+  }
+
+  // TODO(bt,2023-12-19): This is temporary standardization. Clean this up.
+  pub fn generate_for_rvc_model() -> Self {
+    Self::generate_new(Some("rvc_"), Some(".pt"))
+  }
+
+  // TODO(bt,2023-12-19): This is temporary standardization. Clean this up.
+  pub fn svc_model_file_from_object_hash(hash: &str) -> Self {
+    Self::from_object_hash(hash, Some("svc_"), Some(".pt"))
+  }
+
+  // TODO(bt,2023-12-19): This is temporary standardization. Clean this up.
+  pub fn rvc_model_file_from_object_hash(hash: &str) -> Self {
+    Self::from_object_hash(hash, Some("rvc_"), Some(".pt"))
+  }
+
+  // TODO(bt,2023-12-19): This is temporary standardization. Clean this up.
+  pub fn rvc_index_file_from_object_hash(hash: &str) -> Self {
+    Self::from_object_hash(hash, Some("rvc_"), Some(".index"))
+  }
+
   pub fn generate_new(optional_prefix: Option<&str>, optional_extension: Option<&str>) -> Self {
     let entropy = crockford_entropy_lower(32);
     Self::from_object_hash(&entropy, optional_prefix, optional_extension)
@@ -71,6 +96,14 @@ impl WeightFileBucketPath {
   pub fn get_basename(&self) -> &str {
     &self.filename
   }
+
+  pub fn get_optional_prefix(&self) -> Option<&str> {
+    self.optional_prefix.as_deref()
+  }
+
+  pub fn get_optional_extension(&self) -> Option<&str> {
+    self.optional_extension.as_deref()
+  }
 }
 
 #[cfg(test)]
@@ -94,6 +127,49 @@ mod tests {
       let file = WeightFileBucketPath::from_object_hash("abcdefghijk", Some("pre_"), Some(".mp4"));
       assert_eq!(file.get_full_object_path_str(), "/weights/a/b/c/d/e/abcdefghijk/pre_abcdefghijk.mp4");
       assert_eq!(file.get_basename(), "pre_abcdefghijk.mp4");
+    }
+
+    #[test]
+    pub fn generate_for_rvc_model() {
+      let file = WeightFileBucketPath::generate_for_rvc_model();
+      assert_eq!(file.get_object_hash().len(), 32);
+      assert_eq!(file.get_directory().get_object_hash().len(), 32);
+      assert_eq!(file.get_optional_prefix(), Some("rvc_"));
+      assert_eq!(file.get_optional_extension(), Some(".pt"));
+      assert!(file.get_basename().starts_with("rvc_"));
+      assert!(file.get_basename().ends_with(".pt"));
+    }
+
+    #[test]
+    pub fn generate_for_svc_model() {
+      let file = WeightFileBucketPath::generate_for_svc_model();
+      assert_eq!(file.get_object_hash().len(), 32);
+      assert_eq!(file.get_directory().get_object_hash().len(), 32);
+      assert_eq!(file.get_optional_prefix(), Some("svc_"));
+      assert_eq!(file.get_optional_extension(), Some(".pt"));
+      assert!(file.get_basename().starts_with("svc_"));
+      assert!(file.get_basename().ends_with(".pt"));
+    }
+
+    #[test]
+    pub fn svc_model_file_from_object_hash() {
+      let file = WeightFileBucketPath::svc_model_file_from_object_hash("hashed");
+      assert_eq!(file.get_full_object_path_str(), "/weights/h/a/s/h/e/hashed/svc_hashed.pt");
+      assert_eq!(file.get_basename(), "svc_hashed.pt");
+    }
+
+    #[test]
+    pub fn rvc_model_file_from_object_hash() {
+      let file = WeightFileBucketPath::rvc_model_file_from_object_hash("hashed");
+      assert_eq!(file.get_full_object_path_str(), "/weights/h/a/s/h/e/hashed/rvc_hashed.pt");
+      assert_eq!(file.get_basename(), "rvc_hashed.pt");
+    }
+
+    #[test]
+    pub fn rvc_index_file_from_object_hash() {
+      let file = WeightFileBucketPath::rvc_index_file_from_object_hash("hashed");
+      assert_eq!(file.get_full_object_path_str(), "/weights/h/a/s/h/e/hashed/rvc_hashed.index");
+      assert_eq!(file.get_basename(), "rvc_hashed.index");
     }
   }
 

@@ -1877,6 +1877,7 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "bootstrap",
+ "buckets",
  "chrono",
  "cloud_storage",
  "concurrency",
@@ -3513,10 +3514,12 @@ version = "0.0.1"
 dependencies = [
  "buckets",
  "clap",
+ "cloud_storage",
  "config",
  "easyenv",
  "enums",
  "errors",
+ "hashing",
  "log",
  "my-workspace-hack",
  "mysql_queries",
@@ -3526,6 +3529,7 @@ dependencies = [
  "sqlx",
  "storyteller_root",
  "strum",
+ "tempdir",
  "tokens",
  "tokio",
 ]
