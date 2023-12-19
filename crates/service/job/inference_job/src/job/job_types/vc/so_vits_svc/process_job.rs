@@ -14,12 +14,12 @@ use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
+use migration::voice_conversion::query_vc_model_for_migration::VcModel;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::insert_media_file_from_voice_conversion::{insert_media_file_from_voice_conversion, InsertMediaFileArgs, VoiceConversionModelType};
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::MediaUploadRecordForInference;
-use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::users::UserToken;
 
@@ -35,7 +35,7 @@ const BUCKET_FILE_EXTENSION : &str = ".wav";
 pub struct SoVitsSvcProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
   pub job: &'a AvailableInferenceJob,
-  pub vc_model: &'a VoiceConversionModelForInference,
+  pub vc_model: &'a VcModel,
   pub media_upload_token: &'a MediaUploadToken,
   pub media_upload: &'a MediaUploadRecordForInference,
 }
@@ -67,7 +67,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   // ==================== CONFIRM OR DOWNLOAD SO-VITS-SVC SYNTHESIZER MODEL ==================== //
 
   let so_vits_svc_fs_path = {
-    let so_vits_svc_fs_path = args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_path(vc_model.token.as_str());
+    let so_vits_svc_fs_path = vc_model.get_model_persistent_filesystem_path(&args.job_dependencies.fs.semi_persistent_cache);
 
     create_dir_all_if_missing(args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_directory())
         .map_err(|e| {
@@ -75,7 +75,7 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
           ProcessSingleJobError::from_io_error(e)
         })?;
 
-    let so_vits_svc_model_object_path  = args.job_dependencies.buckets.bucket_path_unifier.so_vits_svc_model_path(&vc_model.private_bucket_hash);
+    let so_vits_svc_model_object_path = vc_model.get_model_cloud_bucket_path(&args.job_dependencies.buckets.bucket_path_unifier);
 
     maybe_download_file_from_bucket(MaybeDownloadArgs {
       name_or_description_of_file: "so-vits-svc model",

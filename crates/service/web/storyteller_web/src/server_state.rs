@@ -254,8 +254,15 @@ pub struct StaticFeatureFlags {
   /// This should be a number over 100.
   pub troll_ban_user_percent: u8,
 
+  // TODO(2023-03-20): Remove temporary flag when done.
+  //  NB(bt,2023-12-18): This is rolled out (=="TRUE")
   /// TEMPORARY: Control enqueuing TTS jobs to the generic job worker.
   pub enable_enqueue_generic_tts_job: bool,
+
+  // TODO(2023-12-18): Remove temporary flag when done.
+  /// TEMPORARY: Move voice control model listing over to `model_weights` from `voice_conversion_models`
+  /// This will control all downstream enqueuing, jobs, etc.
+  pub switch_voice_conversion_to_model_weights: bool,
 }
 
 /// Instead of top level service denial, these are bans against entities that instead return

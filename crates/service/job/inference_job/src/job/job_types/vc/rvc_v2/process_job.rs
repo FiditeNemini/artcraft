@@ -15,12 +15,12 @@ use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use media::decode_basic_audio_info::decode_basic_audio_file_info;
+use migration::voice_conversion::query_vc_model_for_migration::VcModel;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::insert_media_file_from_voice_conversion::{insert_media_file_from_voice_conversion, InsertMediaFileArgs, VoiceConversionModelType};
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::MediaUploadRecordForInference;
-use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInference;
 use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::users::UserToken;
 
@@ -36,7 +36,7 @@ const BUCKET_FILE_EXTENSION : &str = ".wav";
 pub struct RvcV2ProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
   pub job: &'a AvailableInferenceJob,
-  pub vc_model: &'a VoiceConversionModelForInference,
+  pub vc_model: &'a VcModel,
   pub media_upload_token: &'a MediaUploadToken,
   pub media_upload: &'a MediaUploadRecordForInference,
 }
@@ -77,8 +77,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
   info!("Download RVC model (if not present)...");
 
   let rvc_v2_model_fs_path = {
-    let filename = format!("{}.pt", vc_model.token.as_str());
-    let fs_path = args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_path(&filename);
+    let fs_path = vc_model.get_model_persistent_filesystem_path(&args.job_dependencies.fs.semi_persistent_cache);
 
     create_dir_all_if_missing(args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_directory())
         .map_err(|e| {
@@ -86,7 +85,7 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
           ProcessSingleJobError::from_io_error(e)
         })?;
 
-    let model_object_path = args.job_dependencies.buckets.bucket_path_unifier.rvc_v2_model_path(&vc_model.private_bucket_hash);
+    let model_object_path = vc_model.get_model_cloud_bucket_path(&args.job_dependencies.buckets.bucket_path_unifier);
 
     maybe_download_file_from_bucket(MaybeDownloadArgs {
       name_or_description_of_file: "rvc (v2) model",
@@ -129,12 +128,11 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
   // Index files are optional
   let mut maybe_rvc_v2_model_index_fs_path: Option<PathBuf> = None;
 
-  if vc_model.has_index_file {
+  if vc_model.has_index_file() {
     info!("Download RVC index (if not present)...");
 
     maybe_rvc_v2_model_index_fs_path = {
-      let filename = format!("{}.index", vc_model.token.as_str());
-      let fs_path = args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_path(&filename);
+      let fs_path = vc_model.get_index_file_persistent_filesystem_path(&args.job_dependencies.fs.semi_persistent_cache);
 
       create_dir_all_if_missing(args.job_dependencies.fs.semi_persistent_cache.voice_conversion_model_directory())
           .map_err(|e| {
@@ -142,7 +140,8 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
             ProcessSingleJobError::from_io_error(e)
           })?;
 
-      let model_index_object_path = args.job_dependencies.buckets.bucket_path_unifier.rvc_v2_model_index_path(&vc_model.private_bucket_hash);
+      let model_index_object_path = vc_model.get_index_file_cloud_bucket_path(&args.job_dependencies.buckets.bucket_path_unifier)
+          .ok_or_else(|| ProcessSingleJobError::from_anyhow_error(anyhow!("Index file path couldn't be determined.")))?;
 
       maybe_download_file_from_bucket(MaybeDownloadArgs {
         name_or_description_of_file: "rvc (v2) model index",
