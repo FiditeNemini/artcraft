@@ -17,14 +17,14 @@ pub trait FileDescriptor {
     }
     // this will be the type of file
     // e.g requires! a period .safetensors .bin .jpg
-    fn get_suffix(&self)->&str {
-       return "implement".to_string().as_ref();
+    fn get_suffix(&self)->String {
+       return "implement".to_string();
     }
     // This will be the prefix of the media type or the weights type.
     // name of the weights or the name of the media type
     // vall-e_prompt, loRA, sd15, sdxl when implmenting add to the end
-    fn get_prefix(&self)->&str {
-        return "implement".to_string().as_ref();
+    fn get_prefix(&self)->String {
+        return "implement".to_string();
     }
 
     // This will be ensure that the right bucket is picked
@@ -33,21 +33,21 @@ pub trait FileDescriptor {
     }
 }
 
-pub struct FileBucketDirectory<'a> {
-  file_object_hash: &'a str,
-  cloud_directory_hash: &'a str, 
-  remote_cloud_base_directory: &'a str,
-  full_remote_cloud_file_path: &'a str,
-  file_name: &'a str,
+pub struct FileBucketDirectory {
+  file_object_hash: String,
+  cloud_directory_hash: String, 
+  remote_cloud_base_directory: String,
+  full_remote_cloud_file_path: String,
+  file_name: String,
   file_descriptor: Box<dyn FileDescriptor>
 }
 
-impl FileBucketDirectory<'_> {
-  pub fn generate_new(file_descriptor: impl FileDescriptor) -> Self {
+impl FileBucketDirectory {
+  pub fn generate_new(file_descriptor: Box<dyn FileDescriptor>) -> Self {
     Self::from_object_hash(file_descriptor)
   }
 
-  fn from_object_hash(file_descriptor: impl FileDescriptor) -> Self {
+  fn from_object_hash(file_descriptor: Box<dyn FileDescriptor>) -> Self {
     let cloud_path_entropy = crockford_entropy_lower(32);
     let file_name_entropy  = crockford_entropy_lower(32);
 
@@ -55,21 +55,21 @@ impl FileBucketDirectory<'_> {
     let middle = hashed_directory_path_long_string::hashed_directory_path_long_string(cloud_path_entropy.as_ref());
 
     // gets you cloud bucket path e.g weights/a/b/c/d/clould_path_entropy
-    let remote_cloud_base_directory = format!("{}/{}{}", file_descriptor.remote_directory_path().as_ref(), middle, cloud_path_entropy.as_ref());
+    let remote_cloud_base_directory = format!("{}/{}{}", file_descriptor.remote_directory_path(), middle, cloud_path_entropy);
 
     // gets you name of the file with suffix and prefix and entropy in the centre
-    let file_name = format!("{}_{}.{}", file_descriptor.get_prefix(), file_name_entropy.as_ref(), file_descriptor.get_suffix());
+    let file_name = format!("{}_{}.{}", file_descriptor.get_prefix(), file_name_entropy, file_descriptor.get_suffix());
     // note: no longer optional because it's easy to know what it would be in the db explicit is better than implcit.
     
     // This is the full path you upload to.
     let full_remote_cloud_file_path = format!("{}/{}", remote_cloud_base_directory , file_name);
     Self {
-      file_object_hash: file_name_entropy.as_ref(),
-      cloud_directory_hash: cloud_path_entropy.as_ref(),
-      remote_cloud_base_directory: remote_cloud_base_directory.as_ref(),
-      full_remote_cloud_file_path: full_remote_cloud_file_path.as_ref(),
-      file_name:file_name.as_ref(),
-      file_descriptor:Box::new(file_descriptor)
+      file_object_hash: file_name_entropy,
+      cloud_directory_hash: cloud_path_entropy,
+      remote_cloud_base_directory: remote_cloud_base_directory,
+      full_remote_cloud_file_path: full_remote_cloud_file_path,
+      file_name:file_name,
+      file_descriptor:file_descriptor
     }
   }
   

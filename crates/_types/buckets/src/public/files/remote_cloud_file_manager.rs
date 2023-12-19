@@ -21,7 +21,7 @@ struct WebFileManager {
 
 impl WebFileManager {
     // bucket_client:BucketClients
-    fn new(file_descriptor: dyn FileDescriptor) -> WebFileManager {
+    fn new(file_descriptor: Box<dyn FileDescriptor>) -> WebFileManager {
         WebFileManager {
             // bucket_client: bucket_client,
             file_descriptor: file_descriptor
@@ -30,18 +30,19 @@ impl WebFileManager {
 
 
     // also include bucket details here
-    pub fn download_file(&self, system_file_path:String) -> Result<(),AnyhowError> {
+    // pub fn download_file(&self, system_file_path:String) -> Result<(),AnyhowError> {
 
-    }
+    // }
     // return error or success with meta data.
     pub fn upload_file(&self, system_file_path:String) -> Result<FileMetaData,AnyhowError> {
        
-        let file_descriptor = self.file_descriptor.clone();
+       
         // let bucket_client = self.bucket_client.clone();
-        if file_descriptor.is_public() {
+        if self.file_descriptor.is_public() {
            
         }
-        Ok(Self::get_file_meta_data(system_file_path.clone()))
+        let result = Self::get_file_meta_data(system_file_path.clone())?;
+        Ok(result)
     }
 
     // Retrieve the metadata from the file
@@ -49,14 +50,15 @@ impl WebFileManager {
         let file_size_bytes = file_size(system_file_path.clone())?;
         let sha256_checksum = sha256_hash_file(system_file_path.clone())?;
 
+        let bytes = file_read_bytes(system_file_path)?;
         let mimetype = get_mimetype_for_bytes(&bytes).unwrap_or("application/octet-stream");
       
 
-        FileMetaData {
+        Ok(FileMetaData {
             file_size_bytes: file_size_bytes,
             sha256_checksum: sha256_checksum,
             mimetype: mimetype.to_string()
-        };
+        })
     }
 }
 
@@ -66,9 +68,6 @@ impl WebFileManager {
 
 // should be able to take prefix suffix and entrpy to generate a file descriptor    
 
-// should return this once properly uploaded.
-// let file_size_bytes = file_size(weight_file_path.clone())?;
-// let sha256_checksum = sha256_hash_file(weight_file_path.clone())?;
 
 #[cfg(test)]
 mod tests {
