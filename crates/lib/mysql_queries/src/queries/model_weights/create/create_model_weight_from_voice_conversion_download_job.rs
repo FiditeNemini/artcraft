@@ -21,6 +21,7 @@ pub struct CreateModelWeightArgs<'a> {
   pub original_download_url: &'a str,
   pub original_filename: &'a str,
   pub file_size_bytes: u64,
+  pub file_checksum_sha2: &'a str,
 
   pub creator_user_token: &'a UserToken,
   pub creator_ip_address: &'a str,
@@ -72,7 +73,7 @@ SET
   original_download_url = ?,
   original_filename = ?,
   file_size_bytes = ?,
-  file_checksum_sha2 = "TODO",
+  file_checksum_sha2 = ?,
 
   creator_user_token = ?,
   creator_ip_address = ?,
@@ -98,6 +99,7 @@ SET
       args.original_download_url,
       args.original_filename,
       args.file_size_bytes,
+      args.file_checksum_sha2,
 
       args.creator_user_token,
       args.creator_ip_address,

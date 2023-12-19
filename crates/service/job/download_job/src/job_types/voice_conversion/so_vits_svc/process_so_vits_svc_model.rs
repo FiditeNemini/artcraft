@@ -3,9 +3,9 @@ use std::path::PathBuf;
 use anyhow::anyhow;
 use log::{error, info, warn};
 use tempdir::TempDir;
+
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
-
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
@@ -67,6 +67,7 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
   check_file_exists(&output_wav_path)?;
 
   let file_size_bytes = file_size(&original_model_file_path)?;
+  let file_checksum = sha256_hash_file(&original_model_file_path)?;
 
   // ==================== UPLOAD ORIGINAL MODEL FILE ==================== //
 
@@ -134,6 +135,7 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
     original_download_url: &job.download_url,
     original_filename: &download_filename,
     file_size_bytes,
+    file_checksum_sha2: &file_checksum,
     creator_user_token: &job.creator_user_token,
     creator_ip_address: &job.creator_ip_address,
     creator_set_visibility: Visibility::Public, // TODO: All models default to public at start

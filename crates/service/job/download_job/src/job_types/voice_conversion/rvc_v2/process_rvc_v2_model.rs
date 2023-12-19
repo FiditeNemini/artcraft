@@ -15,6 +15,7 @@ use filesys::file_size::file_size;
 use filesys::safe_delete_possible_temp_file::safe_delete_possible_temp_file;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use jobs_common::redis_job_status_logger::RedisJobStatusLogger;
 use mysql_queries::queries::generic_download::job::list_available_generic_download_jobs::AvailableDownloadJob;
 use mysql_queries::queries::model_weights::create::create_model_weight_from_voice_conversion_download_job::{create_model_weight_from_voice_conversion_download_job, CreateModelWeightArgs};
@@ -103,6 +104,7 @@ pub async fn process_rvc_v2_model<'a, 'b>(
   check_file_exists(&output_wav_path)?;
 
   let file_size_bytes = file_size(&original_model_file_path)?;
+  let file_checksum = sha256_hash_file(&original_model_file_path)?;
 
   // ==================== UPLOAD ORIGINAL MODEL FILE ==================== //
 
@@ -189,6 +191,7 @@ pub async fn process_rvc_v2_model<'a, 'b>(
     original_download_url: &job.download_url,
     original_filename: &download_filename,
     file_size_bytes,
+    file_checksum_sha2: &file_checksum,
     creator_user_token: &job.creator_user_token,
     creator_ip_address: &job.creator_ip_address,
     creator_set_visibility: Visibility::Public, // TODO: All models default to public at start
