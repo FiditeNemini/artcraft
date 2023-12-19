@@ -24,8 +24,8 @@ pub async fn migrate_voice_conversion_to_weights(deps: &Deps) -> AnyhowResult<()
 
     for result in results.iter() {
       println!("result: {:?}\n\n", result);
-      let bucket_path = copy_cloud_files(result, &deps).await?;
-      upsert_model_weight_from_voice_conversion_model(result, &deps.mysql_development, &bucket_path).await?;
+      let copied_data = copy_cloud_files(result, &deps).await?;
+      upsert_model_weight_from_voice_conversion_model(result, &deps.mysql_development, &copied_data).await?;
     }
 
     if let Some(last_id) = results.last().map(|result| result.id) {

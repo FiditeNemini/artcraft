@@ -3518,6 +3518,7 @@ dependencies = [
  "easyenv",
  "enums",
  "errors",
+ "hashing",
  "log",
  "my-workspace-hack",
  "mysql_queries",

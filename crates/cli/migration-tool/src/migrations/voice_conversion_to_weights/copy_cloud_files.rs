@@ -4,21 +4,23 @@ use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use errors::{anyhow, AnyhowResult};
+use hashing::sha256::sha256_hash_file::sha256_hash_file;
+use mysql_queries::queries::model_weights::migration::upsert_model_weight_from_voice_conversion_model::CopiedFileData;
 use mysql_queries::queries::voice_conversion::migration::list_whole_voice_conversion_models_using_cursor::WholeVoiceConversionModelRecord;
 
 use crate::deps::Deps;
 
-pub async fn copy_cloud_files(model: &WholeVoiceConversionModelRecord, deps: &Deps) -> AnyhowResult<WeightFileBucketPath> {
-  let bucket_path = copy_model(model, deps).await?;
+pub async fn copy_cloud_files(model: &WholeVoiceConversionModelRecord, deps: &Deps) -> AnyhowResult<CopiedFileData> {
+  let copied_file_data = copy_model(model, deps).await?;
 
   if model.has_index_file {
-    copy_index_file(model, deps, &bucket_path).await?;
+    copy_index_file(model, deps, &copied_file_data.bucket_path).await?;
   }
 
-  Ok(bucket_path)
+  Ok(copied_file_data)
 }
 
-async fn copy_model(model: &WholeVoiceConversionModelRecord, deps: &Deps) -> AnyhowResult<WeightFileBucketPath> {
+async fn copy_model(model: &WholeVoiceConversionModelRecord, deps: &Deps) -> AnyhowResult<CopiedFileData> {
   let bucket_path_unifier = BucketPathUnifier::default_paths();
 
   let old_model_bucket_path = match model.model_type {
@@ -33,6 +35,8 @@ async fn copy_model(model: &WholeVoiceConversionModelRecord, deps: &Deps) -> Any
 
   deps.bucket_production_private.download_file_to_disk(&old_model_bucket_path, &model_temp_fs_path).await?;
 
+  let file_checksum = sha256_hash_file(&model_temp_fs_path)?;
+
   let new_model_bucket_path = WeightFileBucketPath::generate_new(Some("model_"), Some(".bin"));
 
   deps.bucket_development_public.upload_filename_with_content_type(
@@ -40,10 +44,13 @@ async fn copy_model(model: &WholeVoiceConversionModelRecord, deps: &Deps) -> Any
     &model_temp_fs_path,
     "application/octet-stream").await?;
 
-  Ok(new_model_bucket_path)
+  Ok(CopiedFileData {
+    bucket_path: new_model_bucket_path,
+    file_sha_hash: file_checksum,
+  })
 }
 
-async fn copy_index_file(model: &WholeVoiceConversionModelRecord, deps: &Deps, bucket_path: &WeightFileBucketPath) -> AnyhowResult<WeightFileBucketPath> {
+async fn copy_index_file(model: &WholeVoiceConversionModelRecord, deps: &Deps, bucket_path: &WeightFileBucketPath) -> AnyhowResult<()> {
   let bucket_path_unifier = BucketPathUnifier::default_paths();
 
   let old_model_index_bucket_path = bucket_path_unifier.rvc_v2_model_index_path(&model.private_bucket_hash);
@@ -65,5 +72,5 @@ async fn copy_index_file(model: &WholeVoiceConversionModelRecord, deps: &Deps, b
     &model_temp_fs_path,
     "application/octet-stream").await?;
 
-  Ok(new_model_bucket_path)
+  Ok(()) // NB: We don't care about the path of the index file.
 }

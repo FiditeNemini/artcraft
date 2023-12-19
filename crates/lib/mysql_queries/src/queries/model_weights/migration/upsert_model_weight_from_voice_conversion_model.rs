@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use sqlx::{MySql, MySqlPool, Transaction};
-use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 
+use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
@@ -10,6 +10,11 @@ use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::queries::voice_conversion::migration::list_whole_voice_conversion_models_using_cursor::WholeVoiceConversionModelRecord;
 
+pub struct CopiedFileData {
+  pub bucket_path: WeightFileBucketPath,
+  pub file_sha_hash: String,
+}
+
 /// Migrate `voice_conversion_models` records to `model_weights` + `model_weights_extension_voice_conversion_details` records.
 /// This is designed to be idempotent and re-runnable. Any time we re-run the query, we should get the same result.
 /// This will enable us to perfect the query and get the write flows online and switched over.
@@ -17,14 +22,14 @@ use crate::queries::voice_conversion::migration::list_whole_voice_conversion_mod
 pub async fn upsert_model_weight_from_voice_conversion_model(
   record: &WholeVoiceConversionModelRecord,
   mysql_pool: &MySqlPool,
-  bucket_path: &WeightFileBucketPath,
+  copied_data: &CopiedFileData,
 ) -> AnyhowResult<()> {
 
   let mut transaction = mysql_pool.begin().await?;
 
   let model_weight_token = create_or_generate_token(record);
 
-  upsert_model_weights_record(record, &model_weight_token, bucket_path, &mut transaction).await?;
+  upsert_model_weights_record(record, &model_weight_token, copied_data, &mut transaction).await?;
   upsert_model_weights_extension_record(record, &model_weight_token, &mut transaction).await?;
 
   // TODO: Don't update source record with new token *unless* we're backfilling the same database.
@@ -45,7 +50,7 @@ pub fn create_or_generate_token(record: &WholeVoiceConversionModelRecord) -> Mod
 pub async fn upsert_model_weights_record(
   record: &WholeVoiceConversionModelRecord,
   model_weight_token: &ModelWeightToken,
-  bucket_path: &WeightFileBucketPath,
+  copied_data: &CopiedFileData,
   mut transaction: &mut Transaction<'_, MySql>,
 ) -> AnyhowResult<()> {
 
@@ -86,7 +91,7 @@ SET
   original_download_url = ?,
   original_filename = ?,
   file_size_bytes = ?,
-  file_checksum_sha2 = "TODO",
+  file_checksum_sha2 = ?,
 
   private_bucket_hash = ?,
   maybe_private_bucket_prefix = ?,
@@ -120,7 +125,7 @@ ON DUPLICATE KEY UPDATE
   original_download_url = ?,
   original_filename = ?,
   file_size_bytes = ?,
-  file_checksum_sha2 = "TODO",
+  file_checksum_sha2 = ?,
   private_bucket_hash = ?,
   maybe_private_bucket_prefix = ?,
   maybe_private_bucket_extension = ?,
@@ -150,9 +155,10 @@ ON DUPLICATE KEY UPDATE
     record.original_filename,
     record.file_size_bytes,
 
-    bucket_path.get_object_hash(),
-    bucket_path.get_optional_prefix(),
-    bucket_path.get_optional_extension(),
+    copied_data.file_sha_hash,
+    copied_data.bucket_path.get_object_hash(),
+    copied_data.bucket_path.get_optional_prefix(),
+    copied_data.bucket_path.get_optional_extension(),
 
     record.token.as_str(),
     record.version,
@@ -174,9 +180,10 @@ ON DUPLICATE KEY UPDATE
     record.original_filename,
     record.file_size_bytes,
 
-    bucket_path.get_object_hash(),
-    bucket_path.get_optional_prefix(),
-    bucket_path.get_optional_extension(),
+    copied_data.file_sha_hash,
+    copied_data.bucket_path.get_object_hash(),
+    copied_data.bucket_path.get_optional_prefix(),
+    copied_data.bucket_path.get_optional_extension(),
 
     record.token.as_str(),
     record.version,
