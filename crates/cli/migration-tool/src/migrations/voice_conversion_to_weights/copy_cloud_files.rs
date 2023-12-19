@@ -2,7 +2,8 @@ use tempdir::TempDir;
 
 use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
-use errors::AnyhowResult;
+use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
+use errors::{anyhow, AnyhowResult};
 use mysql_queries::queries::voice_conversion::migration::list_whole_voice_conversion_models_using_cursor::WholeVoiceConversionModelRecord;
 
 use crate::deps::Deps;
@@ -20,7 +21,11 @@ pub async fn copy_cloud_files(model: &WholeVoiceConversionModelRecord, deps: &De
 async fn copy_model(model: &WholeVoiceConversionModelRecord, deps: &Deps) -> AnyhowResult<WeightFileBucketPath> {
   let bucket_path_unifier = BucketPathUnifier::default_paths();
 
-  let old_model_bucket_path = bucket_path_unifier.rvc_v2_model_path(&model.private_bucket_hash);
+  let old_model_bucket_path = match model.model_type {
+    VoiceConversionModelType::RvcV2 => bucket_path_unifier.rvc_v2_model_path(&model.private_bucket_hash),
+    VoiceConversionModelType::SoVitsSvc => bucket_path_unifier.so_vits_svc_model_path(&model.private_bucket_hash),
+    VoiceConversionModelType::SoftVc => return Err(anyhow!("we never built softvc models")),
+  };
 
   // TODO(bt,2023-12-19): Probably faster to stream between buckets, but whatever.
   let temp_dir = TempDir::new("model_transfer")?;
