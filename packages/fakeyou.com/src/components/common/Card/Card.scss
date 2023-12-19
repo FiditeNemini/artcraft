@@ -82,4 +82,18 @@
       color: rgba($white, 0.8);
     }
   }
+
+  .cover-img {
+    height: 90px;
+    width: 90px;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    border: 2px solid rgba($white, 0.3);
+    margin-right: 12px;
+
+    img {
+      width: 100%;
+      object-fit: cover;
+    }
+  }
 }

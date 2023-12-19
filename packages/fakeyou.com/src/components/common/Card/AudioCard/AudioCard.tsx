@@ -14,9 +14,15 @@ interface AudioCardProps {
   data: any;
   type: "media" | "weights";
   showCreator?: boolean;
+  showCover?: boolean;
 }
 
-export default function AudioCard({ data, type, showCreator }: AudioCardProps) {
+export default function AudioCard({
+  data,
+  type,
+  showCreator,
+  showCover,
+}: AudioCardProps) {
   const history = useHistory();
 
   // console.log("🐙",data, data.public_bucket_path);
@@ -56,7 +62,7 @@ export default function AudioCard({ data, type, showCreator }: AudioCardProps) {
               </div>
             </div>
 
-            <h6 className="fw-semibold text-white mb-1 mt-4 text-truncate">
+            <h6 className="fw-semibold text-white mb-1 mt-3 text-truncate">
               {data.weight_name}
             </h6>
             <p className="fs-7 opacity-75">{timeAgo}</p>
@@ -97,26 +103,40 @@ export default function AudioCard({ data, type, showCreator }: AudioCardProps) {
       {type === "weights" && (
         <>
           <div>
-            <div className="d-flex align-items-center">
-              <div className="d-flex flex-grow-1">
-                <Badge label="RVC" color="orange" />
-              </div>
-              <Button
-                icon={faArrowRight}
-                iconFlip={true}
-                variant="link"
-                label="Use"
-                onClick={handleCardClick}
-                className="fs-7"
-              />
-            </div>
+            <div className="d-flex">
+              {showCover && (
+                <div className="cover-img">
+                  <img
+                    src="/images/dummy-image-2.jpg"
+                    alt="Cover"
+                    width={100}
+                  />
+                </div>
+              )}
 
-            <div className="d-flex align-items-center mt-3">
               <div className="flex-grow-1">
-                <h6 className="fw-semibold text-white mb-1">
-                  {data.weight_name}
-                </h6>
-                <p className="fs-7 opacity-75">{timeAgo}</p>
+                <div className="d-flex align-items-center">
+                  <div className="d-flex flex-grow-1">
+                    <Badge label="RVC" color="orange" />
+                  </div>
+                  <Button
+                    icon={faArrowRight}
+                    iconFlip={true}
+                    variant="link"
+                    label="Use"
+                    onClick={handleCardClick}
+                    className="fs-7"
+                  />
+                </div>
+
+                <div className="d-flex align-items-center mt-3">
+                  <div className="flex-grow-1">
+                    <h6 className="fw-semibold text-white mb-1">
+                      {data.weight_name}
+                    </h6>
+                    <p className="fs-7 opacity-75">{timeAgo}</p>
+                  </div>
+                </div>
               </div>
             </div>
 

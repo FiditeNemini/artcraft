@@ -38,7 +38,15 @@ export default function FeaturedTab() {
             onLayoutComplete={() => console.log("Layout complete!")}
           >
             {data.map((data, index) => {
-              let card = <AudioCard key={index} data={data} type="weights" />;
+              let card = (
+                <AudioCard
+                  key={index}
+                  data={data}
+                  type="weights"
+                  showCreator={true}
+                  showCover={true}
+                />
+              );
               return (
                 <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
                   {card}
