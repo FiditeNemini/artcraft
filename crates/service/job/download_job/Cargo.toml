@@ -16,6 +16,7 @@ path = "src/main.rs"
 
 # Internal
 bootstrap = { path = "../../../lib/bootstrap" }
+buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 concurrency = { path = "../../../lib/concurrency" }
 config = { path = "../../../lib/deprecated/config" }

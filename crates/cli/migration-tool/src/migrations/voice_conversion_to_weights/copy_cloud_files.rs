@@ -37,7 +37,11 @@ async fn copy_model(model: &WholeVoiceConversionModelRecord, deps: &Deps) -> Any
 
   let file_checksum = sha256_hash_file(&model_temp_fs_path)?;
 
-  let new_model_bucket_path = WeightFileBucketPath::generate_new(Some("model_"), Some(".bin"));
+  let new_model_bucket_path = match model.model_type {
+    VoiceConversionModelType::RvcV2 => WeightFileBucketPath::generate_for_rvc_model(),
+    VoiceConversionModelType::SoVitsSvc => WeightFileBucketPath::generate_for_svc_model(),
+    VoiceConversionModelType::SoftVc => return Err(anyhow!("we never built softvc models")),
+  };
 
   deps.bucket_development_public.upload_filename_with_content_type(
     &new_model_bucket_path.get_full_object_path_str(),
@@ -61,11 +65,8 @@ async fn copy_index_file(model: &WholeVoiceConversionModelRecord, deps: &Deps, b
 
   deps.bucket_production_private.download_file_to_disk(&old_model_index_bucket_path, &model_temp_fs_path).await?;
 
-  let new_model_bucket_path = WeightFileBucketPath::from_object_hash(
-    bucket_path.get_object_hash(),
-    Some("model_"),
-    Some(".index")
-  );
+  let new_model_bucket_path =
+      WeightFileBucketPath::rvc_index_file_from_object_hash(bucket_path.get_object_hash());
 
   deps.bucket_development_public.upload_filename_with_content_type(
     &new_model_bucket_path.get_full_object_path_str(),

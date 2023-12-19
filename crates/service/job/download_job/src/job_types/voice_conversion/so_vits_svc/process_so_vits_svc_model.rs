@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use anyhow::anyhow;
 use log::{error, info, warn};
 use tempdir::TempDir;
+use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
@@ -83,7 +84,7 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
 
   redis_logger.log_status("uploading so-vits-svc TTS model")?;
 
-  if let Err(err) = job_state.bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
+  if let Err(err) = job_state.private_bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
     error!("Problem uploading original model: {:?}", err);
     safe_delete_temp_file(&original_model_file_path);
     safe_delete_temp_file(&output_wav_path);
@@ -91,7 +92,17 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
     return Err(err);
   }
 
-  // TODO(bt, 2023-12-18): Upload model weights files !!
+  info!("Uploading to NEW model weights bucket...");
+
+  let new_model_bucket_path = WeightFileBucketPath::generate_for_svc_model();
+
+  if let Err(err) = job_state.public_bucket_client.upload_filename(new_model_bucket_path.get_full_object_path_str(), &original_model_file_path).await {
+    error!("Problem uploading original model to NEW bucket: {:?}", err);
+    safe_delete_temp_file(&original_model_file_path);
+    safe_delete_temp_file(&output_wav_path);
+    safe_delete_temp_directory(&temp_dir);
+    return Err(err);
+  }
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
@@ -140,9 +151,9 @@ pub async fn process_so_vits_svc_model<'a, 'b>(
     creator_ip_address: &job.creator_ip_address,
     creator_set_visibility: Visibility::Public, // TODO: All models default to public at start
     has_index_file: false, // SVC do not have index files.
-    public_bucket_hash: "TODO".to_string(), // TODO: This needs to be finished.
-    maybe_public_bucket_prefix: None,
-    maybe_public_bucket_extension: None,
+    public_bucket_hash: new_model_bucket_path.get_object_hash().to_string(),
+    maybe_public_bucket_prefix: new_model_bucket_path.get_optional_prefix().map(|p| p.to_string()),
+    maybe_public_bucket_extension: new_model_bucket_path.get_optional_extension().map(|p| p.to_string()),
     mysql_pool: &job_state.mysql_pool,
   }).await?;
 

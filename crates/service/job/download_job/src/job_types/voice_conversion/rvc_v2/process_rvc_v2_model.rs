@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use anyhow::anyhow;
 use log::{error, info, warn};
 use tempdir::TempDir;
+use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 
 use crockford::crockford_entropy_lower;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
@@ -42,7 +43,7 @@ pub async fn process_rvc_v2_model<'a, 'b>(
   // ==================== DOWNLOAD HUBERT ==================== //
 
   job_state.pretrained_models.rvc_v2_hubert.download_if_not_on_filesystem(
-    &job_state.bucket_client,
+    &job_state.private_bucket_client,
     temp_dir,
   ).await?;
 
@@ -120,10 +121,22 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
   redis_logger.log_status("uploading rvc (v2) TTS model")?;
 
-  if let Err(err) = job_state.bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
+  if let Err(err) = job_state.private_bucket_client.upload_filename(&model_bucket_path, &original_model_file_path).await {
     error!("Problem uploading model file: {:?}", err);
     safe_delete_temp_file(&original_model_file_path);
     safe_delete_possible_temp_file(maybe_original_model_index_file_path.as_deref());
+    safe_delete_temp_file(&output_wav_path);
+    safe_delete_temp_directory(&temp_dir);
+    return Err(err);
+  }
+
+  info!("Uploading to NEW model weights bucket...");
+
+  let new_model_bucket_path = WeightFileBucketPath::generate_for_rvc_model();
+
+  if let Err(err) = job_state.public_bucket_client.upload_filename(new_model_bucket_path.get_full_object_path_str(), &original_model_file_path).await {
+    error!("Problem uploading original model to NEW bucket: {:?}", err);
+    safe_delete_temp_file(&original_model_file_path);
     safe_delete_temp_file(&output_wav_path);
     safe_delete_temp_directory(&temp_dir);
     return Err(err);
@@ -136,7 +149,7 @@ pub async fn process_rvc_v2_model<'a, 'b>(
 
     info!("Destination bucket path (index): {:?}", &model_index_bucket_path);
 
-    if let Err(err) = job_state.bucket_client.upload_filename(&model_index_bucket_path, &original_index_file_path).await {
+    if let Err(err) = job_state.private_bucket_client.upload_filename(&model_index_bucket_path, &original_index_file_path).await {
       error!("Problem uploading index file: {:?}", err);
       safe_delete_temp_file(&original_model_file_path);
       safe_delete_temp_file(&original_index_file_path);
@@ -144,9 +157,21 @@ pub async fn process_rvc_v2_model<'a, 'b>(
       safe_delete_temp_directory(&temp_dir);
       return Err(err);
     }
-  }
 
-  // TODO(bt, 2023-12-18): Upload model weights files !!
+    info!("Uploading to NEW model weights (index) bucket...");
+
+    let new_index_bucket_path
+        = WeightFileBucketPath::rvc_index_file_from_object_hash(new_model_bucket_path.get_object_hash());
+
+    if let Err(err) = job_state.public_bucket_client.upload_filename(new_index_bucket_path.get_full_object_path_str(), &original_index_file_path).await {
+      error!("Problem uploading original model to NEW bucket: {:?}", err);
+      safe_delete_temp_file(&original_model_file_path);
+      safe_delete_temp_file(&original_index_file_path);
+      safe_delete_temp_file(&output_wav_path);
+      safe_delete_temp_directory(&temp_dir);
+      return Err(err);
+    }
+  }
 
   // ==================== DELETE DOWNLOADED FILE ==================== //
 
@@ -196,9 +221,9 @@ pub async fn process_rvc_v2_model<'a, 'b>(
     creator_ip_address: &job.creator_ip_address,
     creator_set_visibility: Visibility::Public, // TODO: All models default to public at start
     has_index_file: maybe_original_model_index_file_path.is_some(),
-    public_bucket_hash: "TODO".to_string(), // TODO: This needs to be finished.
-    maybe_public_bucket_prefix: None,
-    maybe_public_bucket_extension: None,
+    public_bucket_hash: new_model_bucket_path.get_object_hash().to_string(),
+    maybe_public_bucket_prefix: new_model_bucket_path.get_optional_prefix().map(|s| s.to_string()),
+    maybe_public_bucket_extension: new_model_bucket_path.get_optional_extension().map(|s| s.to_string()),
     mysql_pool: &job_state.mysql_pool,
   }).await?;
 
