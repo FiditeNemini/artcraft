@@ -14,7 +14,6 @@ use futures::TryStreamExt;
 use log::{error, info, warn};
 use r2d2_redis::redis::Commands;
 
-use buckets::util::hash_to_bucket_path_string::hash_to_bucket_path_string;
 use container_common::token::random_uuid::generate_random_uuid;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
@@ -252,13 +251,15 @@ pub async fn enqueue_infer_w2l_with_uploads(
 
   let audio_upload_bucket_hash = upload_uuid.clone();
 
-  let audio_upload_bucket_path = hash_to_bucket_path_string(
-    &upload_uuid,
-    Some(&server_state.audio_uploads_bucket_root)
-  ).map_err(|e| {
-    warn!("Hash bucket path error: {:?}", e);
-    InferW2lWithUploadError::ServerError
-  })?;
+  //let audio_upload_bucket_path = hash_to_bucket_path_string(
+  //  &upload_uuid,
+  //  Some(&server_state.audio_uploads_bucket_root)
+  //).map_err(|e| {
+  //  warn!("Hash bucket path error: {:?}", e);
+  //  InferW2lWithUploadError::ServerError
+  //})?;
+
+  let audio_upload_bucket_path = "THIS_IS_BROKEN_BECAUSE_W2L_IS_DEAD";
 
   info!("Uploading audio to bucket...");
   server_state.private_bucket_client.upload_file_with_content_type(
