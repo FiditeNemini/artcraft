@@ -361,7 +361,7 @@ mod tests {
       model.weights_type = WeightsType::RvcV2;
       model.has_index_file = true;
       let path = VcModel::ModelWeight(model).get_index_file_cloud_bucket_path(&BucketPathUnifier::default_paths());
-      assert_eq!(path, Some(PathBuf::from("/weights/h/a/s/hash/hash.rvc_index")));
+      assert_eq!(path, Some(PathBuf::from("/weights/h/a/s/hash/rvc_hash.index")));
     }
   }
 }
