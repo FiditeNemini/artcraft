@@ -63,7 +63,7 @@ impl RemoteCloudFileClient {
         let file_bucket_directory = FileBucketDirectory::from_existing_bucket_details(remote_cloud_bucket_details);
         let full_remote_cloud_file_path = file_bucket_directory.get_full_remote_cloud_file_path();
         let bucket_client = self.get_bucket_with_visbility(file_descriptor.is_public()).await?;
-        bucket_client.download_file_to_disk(full_remote_cloud_file_path, to_system_file_path);
+        bucket_client.download_file_to_disk(full_remote_cloud_file_path, to_system_file_path).await?;
         Ok(())
     }
 
@@ -110,19 +110,20 @@ impl RemoteCloudFileClient {
         info!("Reading media file: {:?}", from_system_file_path);
         // get meta data 
         let bytes = file_read_bytes(from_system_file_path)?;
-        let mimetype = get_mimetype_for_bytes(&bytes).unwrap_or("application/octet-stream");
+      
+        let result = Self::get_file_meta_data(from_system_file_path)?;
 
         let directory = FileBucketDirectory::generate_new(
             file_descriptor
         );
         
-        bucket_client.upload_file_with_content_type(
+        bucket_client.upload_file_with_content_type_process(
             &directory.get_remote_cloud_base_directory(),
             bytes.as_ref(),
-            mimetype
+            result.mimetype.as_ref()
         ).await?;
 
-        let result = Self::get_file_meta_data(from_system_file_path)?;
+        
         Ok(result)
     }
 
