@@ -912,9 +912,6 @@ version = "0.0.1"
 dependencies = [
  "crockford",
  "errors",
- "filesys",
- "hashing",
- "mimetypes",
  "my-workspace-hack",
 ]
 
@@ -1128,7 +1125,13 @@ version = "0.0.1"
 dependencies = [
  "anyhow",
  "buckets",
+ "crockford",
+ "easyenv",
+ "errors",
+ "filesys",
+ "hashing",
  "log",
+ "mimetypes",
  "my-workspace-hack",
  "rust-s3",
  "tokio",
