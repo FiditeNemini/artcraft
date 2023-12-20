@@ -1,6 +1,6 @@
 use std::path::Path;
 use std::time::Duration;
-
+use errors::AnyhowResult;
 use anyhow::anyhow;
 use anyhow::bail;
 use log::info;
@@ -10,7 +10,7 @@ use s3::creds::Credentials;
 use s3::region::Region;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
-
+ use std::error::Error;
 #[derive(Clone)]
 pub struct BucketClient {
   bucket: Bucket,
@@ -31,7 +31,7 @@ impl std::fmt::Display for BucketClientError {
         }
     }
 }
-impl std::error::Error for BucketClientError {}
+impl Error for BucketClientError {}
 
 
 impl BucketClient {
@@ -102,7 +102,7 @@ impl BucketClient {
     Ok(())
   }
 
-  pub async fn upload_file_with_content_type_process(&self, object_name: &str, bytes: &[u8], content_type: &str) -> anyhow::AnyhowResult<()> {
+  pub async fn upload_file_with_content_type_process(&self, object_name: &str, bytes: &[u8], content_type: &str) -> AnyhowResult<()> {
     info!("Filename for bucket: {}", object_name);
     let object_name = self.get_rooted_object_name(object_name);
     info!("Rooted filename for bucket: {}", object_name);
@@ -113,7 +113,7 @@ impl BucketClient {
     if code != 200 {
       let body = String::from_utf8_lossy(body_bytes);
       warn!("upload body: {}", body);
-      BucketClientError::ErrorWithCodeAndMessage { code, message: body.to_string() };
+      return Err(anyhow!("upload failed: {}", code));
     } else {
       info!("upload success: {}", code);
       Ok(())
