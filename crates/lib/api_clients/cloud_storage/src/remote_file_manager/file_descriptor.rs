@@ -35,28 +35,4 @@ mod tests {
 
   #[test]
   pub fn test() {}
-
-  pub fn generate_new_entropy() {
-    // let directory = FileDescriptorBucketDirectory::generate_new();
-    // assert_eq!(directory.get_object_hash().len(), 32);
-  }
-
-  // #[test]
-  // pub fn get_directory_path_str() {
-  //   let directory = FileDescriptorBucketDirectory::from_object_hash("abcdefghijk");
-  //   assert_eq!(directory.get_directory_path_str(), format!("/{}/a/b/c/d/e/abcdefghijk",REMOTE_FILE_DIRECTORY));
-  // }
-
-  // #[test]
-  // pub fn get_directory_path_str_short_name() {
-  //   let directory = FileDescriptorBucketDirectory::from_object_hash("foo");
-  //   assert_eq!(directory.get_directory_path_str(), format!("/{}/f/o/foo",REMOTE_FILE_DIRECTORY));
-  // }
-
-  // #[test]
-  // pub fn get_object_hash() {
-  //   let hash = "abcdefghijk";
-  //   let directory = FileDescriptorBucketDirectory::from_object_hash(hash);
-  //   assert_eq!(directory.get_object_hash(), hash);
-  // }
 }
