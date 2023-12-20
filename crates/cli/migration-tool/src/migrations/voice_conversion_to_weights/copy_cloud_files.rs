@@ -4,6 +4,8 @@ use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
 use errors::{anyhow, AnyhowResult};
+use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mysql_queries::queries::model_weights::migration::upsert_model_weight_from_voice_conversion_model::CopiedFileData;
 use mysql_queries::queries::voice_conversion::migration::list_whole_voice_conversion_models_using_cursor::WholeVoiceConversionModelRecord;
@@ -43,10 +45,13 @@ async fn copy_model(model: &WholeVoiceConversionModelRecord, deps: &Deps) -> Any
     VoiceConversionModelType::SoftVc => return Err(anyhow!("we never built softvc models")),
   };
 
-  deps.bucket_development_public.upload_filename_with_content_type(
+  deps.bucket_production_public.upload_filename_with_content_type(
     &new_model_bucket_path.get_full_object_path_str(),
     &model_temp_fs_path,
     "application/octet-stream").await?;
+
+  safe_delete_temp_file(&model_temp_fs_path);
+  safe_delete_temp_directory(&temp_dir);
 
   Ok(CopiedFileData {
     bucket_path: new_model_bucket_path,
@@ -68,10 +73,13 @@ async fn copy_index_file(model: &WholeVoiceConversionModelRecord, deps: &Deps, b
   let new_model_bucket_path =
       WeightFileBucketPath::rvc_index_file_from_object_hash(bucket_path.get_object_hash());
 
-  deps.bucket_development_public.upload_filename_with_content_type(
+  deps.bucket_production_public.upload_filename_with_content_type(
     &new_model_bucket_path.get_full_object_path_str(),
     &model_temp_fs_path,
     "application/octet-stream").await?;
+
+  safe_delete_temp_file(&model_temp_fs_path);
+  safe_delete_temp_directory(&temp_dir);
 
   Ok(()) // NB: We don't care about the path of the index file.
 }

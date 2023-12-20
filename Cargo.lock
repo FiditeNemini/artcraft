@@ -3519,6 +3519,7 @@ dependencies = [
  "easyenv",
  "enums",
  "errors",
+ "filesys",
  "hashing",
  "log",
  "my-workspace-hack",
