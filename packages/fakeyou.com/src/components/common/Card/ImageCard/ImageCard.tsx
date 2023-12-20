@@ -19,7 +19,7 @@ export default function ImageCard({ data, type }: ImageCardProps) {
     if (type === "media") {
       history.push(`/media/${data.token}`);
     } else if (type === "weights") {
-      history.push(`/weights/${data.token}`);
+      history.push(`/weight/${data.token}`);
     }
   };
 

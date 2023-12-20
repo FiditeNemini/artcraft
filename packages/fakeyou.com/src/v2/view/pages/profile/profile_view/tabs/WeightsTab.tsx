@@ -1,6 +1,8 @@
-import React, { useRef, useState } from "react";
+// @ts-nocheck
+import React, { useRef, useState, useEffect } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import mockWeightsData from "./mockWeightsData";
+import { ApiConfig } from "@storyteller/components";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
@@ -12,13 +14,90 @@ import {
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";
 
+interface IWeighttModelData {
+  token: string;
+  weight_name: string;
+  public_bucket_path: string;
+  likes: Number;
+  isLiked: boolean;
+  created_at: string;
+}
+
 export default function WeightsTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [data] = useState(mockWeightsData);
+  const [data, setData] = useState(mockWeightsData);
   const [isLoading] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 10;
+
+  useEffect(() => {
+    const api = new ApiConfig();
+    const endpointUrl = api.getWeights("?page_size=1000&page_index=0");
+    let weightsData = [];
+
+    fetch(endpointUrl, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(res => {
+        if (!res.success) {
+          return;
+        }
+        console.log(res);
+        res.weights?.forEach((l: any) => {
+          weightsData.push({
+            token: l?.weight_token,
+            weight_name: l?.title,
+            media_type: "image",
+            public_bucket_path: "/images/dummy-image.jpg",
+            likes: l?.likes,
+            isLiked: l?.bookmarks,
+            created_at: l?.created_at,
+          });
+        });
+        setData(weightsData);
+      })
+      .catch(e => {});
+  }, []);
+
+  const updateRequest = (params: any) => {
+    const api = new ApiConfig();
+    const endpointUrl = api.getWeights("?page_size=1000&page_index=0" + params);
+    let weightsData = [];
+
+    fetch(endpointUrl, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(res => {
+        if (!res.success) {
+          return;
+        }
+        console.log(res);
+        res.weights?.forEach((l: any) => {
+          weightsData.push({
+            token: l?.weight_token,
+            weight_name: l?.title,
+            media_type: "image",
+            public_bucket_path: "/images/dummy-image.jpg",
+            likes: l?.likes,
+            isLiked: l?.bookmarks,
+            created_at: l?.created_at,
+          });
+        });
+        setData(weightsData);
+      })
+      .catch(e => {});
+  };
 
   const handlePageClick = (selectedItem: { selected: number }) => {
     setCurrentPage(selectedItem.selected);
@@ -63,6 +142,98 @@ export default function WeightsTab() {
   const handleFilterChange = (option: any) => {
     const selectedOption = option as { value: string; label: string };
     setSelectedFilter(selectedOption.value);
+
+    switch (selectedOption.value) {
+      case "all":
+        updateRequest("");
+        break;
+      case "tts":
+        updateRequest("&weights_category=text_to_speech");
+        break;
+      case "vc":
+        updateRequest("&weights_category=voice_conversion");
+        break;
+      case "sd":
+        updateRequest("&weights_category=image_generation");
+        break;
+      default:
+        updateRequest("");
+    }
+  };
+
+  const handleOrderChange = (option: any) => {
+    const selectedOption = option as { value: string; label: string };
+
+    switch (selectedOption.value) {
+      case "oldest":
+        updateRequest("&sort_ascending=true");
+        break;
+      case "newest":
+        updateRequest("&sort_ascending=false");
+        break;
+      case "mostliked":
+        updateRequest("&sort_ascending=false");
+        break;
+      default:
+        updateRequest("&sort_ascending=false");
+    }
+  };
+
+  const handleTtsChange = (option: any) => {
+    const selectedOption = option as { value: string; label: string };
+
+    switch (selectedOption.value) {
+      case "all":
+        updateRequest("&weights_category=text_to_speech");
+        break;
+      case "tt2":
+        updateRequest("&weights_type=hifigan_tt2");
+        break;
+      default:
+        updateRequest("&weights_category=text_to_speec");
+    }
+  };
+
+  const handleVcChange = (option: any) => {
+    const selectedOption = option as { value: string; label: string };
+
+    switch (selectedOption.value) {
+      case "all":
+        updateRequest("&weights_category=voice_conversion");
+        break;
+      case "rvc":
+        updateRequest("&weights_type=rvc_v2");
+        break;
+      case "svc":
+        console.log(selectedOption.value);
+        updateRequest("&weights_type=so_vits_svc");
+        break;
+      default:
+        updateRequest("&weights_category=voice_conversion");
+    }
+  };
+
+  const handleSdChange = (option: any) => {
+    const selectedOption = option as { value: string; label: string };
+
+    switch (selectedOption.value) {
+      case "all":
+        updateRequest("&weights_category=image_generation");
+        break;
+      case "lora":
+        updateRequest("&weights_type=loRA");
+        break;
+      case "SD15":
+        console.log(selectedOption.value);
+        updateRequest("&weights_type=sd_1.5");
+        break;
+      case "SDXL":
+        console.log(selectedOption.value);
+        updateRequest("&weights_type=sdxl");
+        break;
+      default:
+        updateRequest("&weights_category=image_generation");
+    }
   };
 
   return (
@@ -74,6 +245,7 @@ export default function WeightsTab() {
             options={sortOptions}
             defaultValue={sortOptions[0]}
             isSearchable={false}
+            onChange={handleOrderChange}
           />
 
           <Select
@@ -89,6 +261,7 @@ export default function WeightsTab() {
               options={modelTtsOptions}
               defaultValue={modelTtsOptions[0]}
               isSearchable={false}
+              onChange={handleTtsChange}
             />
           )}
           {selectedFilter === "sd" && (
@@ -96,6 +269,7 @@ export default function WeightsTab() {
               options={modelSdOptions}
               defaultValue={modelSdOptions[0]}
               isSearchable={false}
+              onChange={handleSdChange}
             />
           )}
           {selectedFilter === "vc" && (
@@ -103,6 +277,7 @@ export default function WeightsTab() {
               options={modelVcOptions}
               defaultValue={modelVcOptions[0]}
               isSearchable={false}
+              onChange={handleVcChange}
             />
           )}
         </div>
