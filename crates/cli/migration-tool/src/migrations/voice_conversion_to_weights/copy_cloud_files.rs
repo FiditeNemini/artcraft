@@ -43,7 +43,7 @@ async fn copy_model(model: &WholeVoiceConversionModelRecord, deps: &Deps) -> Any
     VoiceConversionModelType::SoftVc => return Err(anyhow!("we never built softvc models")),
   };
 
-  deps.bucket_development_public.upload_filename_with_content_type(
+  deps.bucket_production_public.upload_filename_with_content_type(
     &new_model_bucket_path.get_full_object_path_str(),
     &model_temp_fs_path,
     "application/octet-stream").await?;
@@ -68,7 +68,7 @@ async fn copy_index_file(model: &WholeVoiceConversionModelRecord, deps: &Deps, b
   let new_model_bucket_path =
       WeightFileBucketPath::rvc_index_file_from_object_hash(bucket_path.get_object_hash());
 
-  deps.bucket_development_public.upload_filename_with_content_type(
+  deps.bucket_production_public.upload_filename_with_content_type(
     &new_model_bucket_path.get_full_object_path_str(),
     &model_temp_fs_path,
     "application/octet-stream").await?;
