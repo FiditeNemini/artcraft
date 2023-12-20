@@ -61,7 +61,10 @@ async fn copy_model_record_and_bucket_files(record: &WholeVoiceConversionModelRe
     }
   }
 
-  upsert_model_weight_from_voice_conversion_model(record, &deps.mysql_production, maybe_copied_data.as_ref()).await?;
+  if let Some(copied_data) = &maybe_copied_data {
+    info!("Upserting records...");
+    upsert_model_weight_from_voice_conversion_model(record, &deps.mysql_production, copied_data).await?;
+  }
 
   Ok(())
 }

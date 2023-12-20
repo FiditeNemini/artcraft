@@ -22,14 +22,14 @@ pub struct CopiedFileData {
 pub async fn upsert_model_weight_from_voice_conversion_model(
   record: &WholeVoiceConversionModelRecord,
   mysql_pool: &MySqlPool,
-  maybe_copied_data: Option<&CopiedFileData>,
+  copied_data: &CopiedFileData,
 ) -> AnyhowResult<()> {
 
   let mut transaction = mysql_pool.begin().await?;
 
   let model_weight_token = create_or_generate_token(record);
 
-  upsert_model_weights_record(record, &model_weight_token, maybe_copied_data, &mut transaction).await?;
+  upsert_model_weights_record(record, &model_weight_token, copied_data, &mut transaction).await?;
   upsert_model_weights_extension_record(record, &model_weight_token, &mut transaction).await?;
 
   update_original_record(record, &model_weight_token, &mut transaction).await?;
@@ -49,7 +49,7 @@ pub fn create_or_generate_token(record: &WholeVoiceConversionModelRecord) -> Mod
 pub async fn upsert_model_weights_record(
   record: &WholeVoiceConversionModelRecord,
   model_weight_token: &ModelWeightToken,
-  maybe_copied_data: Option<&CopiedFileData>,
+  copied_data: &CopiedFileData,
   mut transaction: &mut Transaction<'_, MySql>,
 ) -> AnyhowResult<()> {
 
@@ -226,6 +226,18 @@ pub async fn update_original_record(
   model_weight_token: &ModelWeightToken,
   transaction: &mut Transaction<'_, MySql>
 ) -> AnyhowResult<()> {
+  let query = sqlx::query!(
+        r#"
+UPDATE voice_conversion_models
+SET
+  maybe_migration_new_model_weights_token = ?
+WHERE token = ?
+        "#,
+      model_weight_token,
+      record.token,
+    );
+
+  let _r = query.execute(&mut **transaction).await?;
 
   Ok(())
 }
