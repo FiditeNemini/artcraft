@@ -22,7 +22,7 @@ export interface Weight {
 //   media_file?: MediaFile,
 // }
 
-// export const GetMedia = MakeRequest<string, GetMediaRequest, GetMediaResponse>({
+// export const GetMedia = MakeRequest<string, GetMediaRequest, GetMediaResponse, {}>({
 //   method: "GET",
 //   routingFunction: (mediaFileToken: string) => `/v1/media_files/file/${mediaFileToken}`,
 // });

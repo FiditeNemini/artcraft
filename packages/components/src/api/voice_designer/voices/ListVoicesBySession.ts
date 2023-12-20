@@ -17,7 +17,7 @@ export interface ListVoicesBySessionResponse {
     updated_at: Date,
 }
 
-export const ListVoicesBySession = MakeRequest<string, ListVoicesBySessionRequest, ListVoicesBySessionResponse>({
+export const ListVoicesBySession = MakeRequest<string, ListVoicesBySessionRequest, ListVoicesBySessionResponse, {}>({
     method: "GET", 
     routingFunction: () => `/v1/voice_designer/voice/session/list`,
 });

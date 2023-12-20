@@ -7,7 +7,7 @@ export interface ListSamplesForDatasetResponse {
     success: true
 }
 
-export const ListSamplesForDataset = MakeRequest<string, ListSamplesForDatasetRequest, ListSamplesForDatasetResponse>({
+export const ListSamplesForDataset = MakeRequest<string, ListSamplesForDatasetRequest, ListSamplesForDatasetResponse,{}>({
     method: "GET", 
     routingFunction: (datasetToken:  string) => `/v1/voice_designer/sample/dataset/${ datasetToken }/list`,
 });

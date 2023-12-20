@@ -17,7 +17,7 @@ export interface GetVoiceResponse {
   updated_at: Date;
 }
 
-export const GetVoice = MakeRequest<string, GetVoiceRequest, GetVoiceResponse>({
+export const GetVoice = MakeRequest<string, GetVoiceRequest, GetVoiceResponse, {}>({
   method: "GET",
   routingFunction: (voiceToken: string) =>
     `/v1/voice_designer/voice/${voiceToken}`,
