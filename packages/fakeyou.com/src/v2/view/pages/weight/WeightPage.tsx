@@ -34,6 +34,7 @@ import TtsInferencePanel from "./inference_panels/TtsInferencePanel";
 import Modal from "components/common/Modal";
 import SocialButton from "components/common/SocialButton";
 import Input from "components/common/Input";
+import { ApiConfig } from "@storyteller/components";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -93,18 +94,66 @@ export default function WeightPage({
     // Simulate an API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    if (dummyData) {
-      setWeight(dummyData);
-      setIsLoading(false);
-    } else {
-      setError(true);
-      setIsLoading(false);
-    }
+    // if (dummyData) {
+    //   setWeight(dummyData);
+    //   setIsLoading(false);
+    // } else {
+    //   setError(true);
+    //   setIsLoading(false);
+    // }
   }, []);
 
   useEffect(() => {
     getWeight(weight_token);
   }, [weight_token, getWeight]);
+
+  useEffect(() => {
+    const api = new ApiConfig();
+    const endpointUrl = api.getWeight("1");
+
+    fetch(endpointUrl, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      credentials: "include",
+    })
+      .then(res => res.json())
+      .then(res => {
+        if (!res.success) {
+          return;
+        }
+        console.log(res);
+        const dummyData = {
+          weight_token: res?.weight_token,
+          title: res?.title,
+          created_at: new Date(),
+          updated_at: new Date(),
+          weight_type: WeightType.HIFIGAN_TT2,
+          weight_category: WeightCategory.TTS,
+          maybe_creator_user: {
+            user_token: "test",
+            username: "",
+            display_name: "",
+            gravatar_hash: "test",
+            default_avatar: {
+              image_index: 0,
+              color_index: 0,
+            },
+          },
+          creator_set_visibility: "Public",
+          description_markdown: res?.description_markdown,
+        };
+        if (dummyData) {
+          setWeight(dummyData);
+          setIsLoading(false);
+        } else {
+          setError(true);
+          setIsLoading(false);
+        }
+      })
+      .catch(e => {});
+  }, []);
 
   function renderWeightComponent(weight: Weight) {
     switch (weight.weight_category) {
@@ -420,7 +469,7 @@ export default function WeightPage({
               <h4 className="fw-semibold mb-3">Comments</h4>
               <CommentComponent
                 entityType="user"
-                entityToken={weight.weight_token}
+                entityToken={"1"}
                 sessionWrapper={sessionWrapper}
               />
             </div>

@@ -26,7 +26,7 @@ function PasswordResetEmailPage(props: Props) {
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [isSent, setIsSent] = useState(false);
 
-  if (!user) { history.push("/"); }
+  if (user) { history.push("/"); }
 
   const handleChange = (
     ev: React.FormEvent<HTMLInputElement>

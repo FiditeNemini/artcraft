@@ -433,6 +433,16 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/media_files/file/${mediaFileToken}`;
   }
 
+  // =============== Weights Files ===============
+
+  getWeights(params: string): string {
+    return `${this.getApiOrigin()}/v1/weights/list${params}`;
+  }
+
+  getWeight(params: string): string {
+    return `${this.getApiOrigin()}/v1/weights/weight/${params}`;
+  }
+
   // =============== File Uploads ===============
 
   uploadAudio(): string {
