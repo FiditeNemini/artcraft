@@ -2,7 +2,7 @@ import Panel from "components/common/Panel";
 import Container from "components/common/Container";
 import PageHeader from "components/layout/PageHeader";
 import React, { useState } from "react";
-import { Button } from "components/common";
+import { Button, Input, TempInput } from "components/common";
 import { faUpload } from "@fortawesome/pro-solid-svg-icons";
 
 interface DevUploadProps {}
@@ -31,18 +31,20 @@ export default function DevUpload(props: DevUploadProps) {
 
       <Panel padding={true}>
         <div className="d-flex flex-column gap-5">
+          <Input label="File Name" />
           <input
             className="form-control form-control-lg"
             id="formFile"
             type="file"
             onChange={handleFileChange}
           />
-          <Button
-            full={true}
-            icon={faUpload}
-            label="Upload File"
-            onClick={handleUpload}
-          />
+          <div className="d-flex gap-3 justify-content-end">
+            <Button
+              icon={faUpload}
+              label="Upload Media"
+              onClick={handleUpload}
+            />
+          </div>
         </div>
       </Panel>
     </Container>
