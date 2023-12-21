@@ -22,14 +22,14 @@ easyenv = { path = "../../../lib/easyenv" }
 filesys = { path = "../../../lib/files/filesys" }
 hashing = { path = "../../../lib/files/hashing" }
 mimetypes = { path = "../../../lib/files/mimetypes" }
-
+storyteller_root = { path = "../../../lib/storyteller_root" }
 # Workspace hack (faster compile times)
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
 anyhow = "1.0.75"
 log = "0.4.14"
-
+env_logger = "0.10.1"
 # The "never-encode-slash" feature seems to have been removed:
 # https://github.com/durch/rust-s3/pull/254
 rust-s3 = { version = "0.33.0" }

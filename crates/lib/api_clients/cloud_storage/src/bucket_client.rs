@@ -121,7 +121,7 @@ impl BucketClient {
     }
   }
 
-  #[deprecated = "Use upload_file instead above it returns an error we can surface and act on."]
+  #[deprecated = "Use upload_file instead above it returns an error we can surface and act on. upload_file_with_content_type_process"]
   pub async fn upload_file_with_content_type(&self, object_name: &str, bytes: &[u8], content_type: &str) -> anyhow::Result<()> {
     info!("Filename for bucket: {}", object_name);
 
