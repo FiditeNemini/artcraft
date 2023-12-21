@@ -6,6 +6,7 @@ use actix_web::http::StatusCode;
 use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::{info, warn};
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
@@ -46,9 +47,9 @@ pub struct MediaFileListItem {
   pub maybe_origin_model_token: Option<String>,
 
   pub media_type: MediaFileType,
-  pub public_bucket_directory_hash: String,
-  pub maybe_public_bucket_prefix: Option<String>,
-  pub maybe_public_bucket_extension: Option<String>,
+
+  /// URL to the media file.
+  pub public_bucket_path: String,
 
   pub maybe_creator: Option<UserDetailsLight>,
 
@@ -180,9 +181,12 @@ pub async fn list_media_files_handler(
         maybe_origin_model_type: record.maybe_origin_model_type,
         maybe_origin_model_token: record.maybe_origin_model_token,
         media_type: record.media_type,
-        public_bucket_directory_hash: record.public_bucket_directory_hash,
-        maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
-        maybe_public_bucket_extension: record.maybe_public_bucket_extension,
+        public_bucket_path: MediaFileBucketPath::from_object_hash(
+          &record.public_bucket_directory_hash,
+          record.maybe_public_bucket_prefix.as_deref(),
+          record.maybe_public_bucket_extension.as_deref())
+            .get_full_object_path_str()
+            .to_string(),
         maybe_creator: UserDetailsLight::from_optional_db_fields_owned(
           record.maybe_creator_user_token,
           record.maybe_creator_username,
