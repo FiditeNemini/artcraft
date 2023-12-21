@@ -10,6 +10,7 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::warn;
+use utoipa::ToSchema;
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use mysql_queries::queries::user_bookmarks::create_user_bookmark::{create_user_bookmark, CreateUserBookmarkArgs};
@@ -28,19 +29,19 @@ use tokens::tokens::zs_voices::ZsVoiceToken;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct CreateUserBookmarkRequest {
   entity_token: String,
   entity_type: UserBookmarkEntityType,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct CreateUserBookmarkSuccessResponse {
   pub success: bool,
   pub user_bookmark_token: UserBookmarkToken,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum CreateUserBookmarkError {
   BadInput(String),
   NotAuthorized,
@@ -74,6 +75,15 @@ impl fmt::Display for CreateUserBookmarkError {
   }
 }
 
+#[utoipa::path(
+post,
+path = "/v1/user_bookmarks/create",
+request_body = CreateUserBookmarkRequest,
+responses(
+(status = 200, body = CreateUserBookmarkSuccessResponse),
+(status = 400, body = CreateUserBookmarkError),
+)
+)]
 pub async fn create_user_bookmark_handler(
   http_request: HttpRequest,
   request: web::Json<CreateUserBookmarkRequest>,

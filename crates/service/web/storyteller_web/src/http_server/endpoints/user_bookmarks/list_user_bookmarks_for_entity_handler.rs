@@ -12,6 +12,7 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::warn;
+use utoipa::ToSchema;
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use mysql_queries::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
@@ -23,20 +24,20 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
 /// For the URL PathInfo
-#[derive(Deserialize)]
-pub struct ListUserBookmarkPathInfo {
+#[derive(Deserialize, ToSchema)]
+pub struct ListUserBookmarksForEntityPathInfo {
   entity_type: UserBookmarkEntityType,
   entity_token: String,
 }
 
-#[derive(Serialize)]
-pub struct ListUserBookmarksSuccessResponse {
+#[derive(Serialize, ToSchema)]
+pub struct ListUserBookmarksForEntitySuccessResponse {
   pub success: bool,
-  pub user_bookmarks: Vec<UserBookmark>,
+  pub user_bookmarks: Vec<UserBookmarkForEntityListItem>,
 }
 
-#[derive(Serialize)]
-pub struct UserBookmark {
+#[derive(Serialize, ToSchema)]
+pub struct UserBookmarkForEntityListItem {
   pub token: UserBookmarkToken,
 
   pub user: UserDetailsLight,
@@ -45,21 +46,21 @@ pub struct UserBookmark {
   pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug)]
-pub enum ListUserBookmarksError {
+#[derive(Debug, ToSchema)]
+pub enum ListUserBookmarksForEntityError {
   ServerError,
 }
 
-impl ResponseError for ListUserBookmarksError {
+impl ResponseError for ListUserBookmarksForEntityError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      ListUserBookmarksError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+      ListUserBookmarksForEntityError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      ListUserBookmarksError::ServerError => "server error".to_string(),
+      ListUserBookmarksForEntityError::ServerError => "server error".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -67,17 +68,30 @@ impl ResponseError for ListUserBookmarksError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for ListUserBookmarksError {
+impl fmt::Display for ListUserBookmarksForEntityError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
+
+#[utoipa::path(
+  get,
+  path = "/v1/user_bookmarks/list/{entity_type}/{entity_token}",
+  params(
+    ("entity_type", description="The type of entity to list bookmarks for"),
+    ("entity_token", description="The token of the entity to list bookmarks for"),
+  ),
+  responses(
+  (status = 200, body = ListUserBookmarksForEntitySuccessResponse),
+  (status = 500, body = ListUserBookmarksForEntityError),
+  ),
+)]
 pub async fn list_user_bookmarks_for_entity_handler(
   _http_request: HttpRequest,
-  path: Path<ListUserBookmarkPathInfo>,
+  path: Path<ListUserBookmarksForEntityPathInfo>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, ListUserBookmarksError>
+) -> Result<HttpResponse, ListUserBookmarksForEntityError>
 {
   let entity_token = UserBookmarkEntityToken::from_entity_type_and_token(
     path.entity_type, &path.entity_token);
@@ -91,14 +105,14 @@ pub async fn list_user_bookmarks_for_entity_handler(
     Ok(results) => results,
     Err(e) => {
       warn!("Query error: {:?}", e);
-      return Err(ListUserBookmarksError::ServerError);
+      return Err(ListUserBookmarksForEntityError::ServerError);
     }
   };
 
-  let response = ListUserBookmarksSuccessResponse {
+  let response = ListUserBookmarksForEntitySuccessResponse {
     success: true,
     user_bookmarks: user_bookmarks.into_iter()
-        .map(|user_bookmark| UserBookmark {
+        .map(|user_bookmark| UserBookmarkForEntityListItem {
           token: user_bookmark.token,
           user: UserDetailsLight {
             user_token: user_bookmark.user_token.clone(),
@@ -114,7 +128,7 @@ pub async fn list_user_bookmarks_for_entity_handler(
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|_e| ListUserBookmarksError::ServerError)?;
+      .map_err(|_e| ListUserBookmarksForEntityError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

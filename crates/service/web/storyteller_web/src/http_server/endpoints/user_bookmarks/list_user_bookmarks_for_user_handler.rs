@@ -12,6 +12,7 @@ use actix_web::http::StatusCode;
 use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
+use utoipa::{IntoParams, ToSchema};
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use mysql_queries::queries::user_bookmarks::list_user_bookmarks::{list_user_bookmarks, list_user_user_bookmarks_by_entity_type};
@@ -20,34 +21,34 @@ use tokens::tokens::user_bookmarks::UserBookmarkToken;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct ListUserBookmarksPathInfo {
   username: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema, IntoParams)]
 pub struct ListUserBookmarksQueryData {
   maybe_scoped_entity_type: Option<UserBookmarkEntityType>,
 }
 
-#[derive(Serialize)]
-pub struct ListUserBookmarksSuccessResponse {
+#[derive(Serialize, ToSchema)]
+pub struct ListUserBookmarksForUserSuccessResponse {
   pub success: bool,
-  pub user_bookmarks: Vec<UserBookmark>,
+  pub user_bookmarks: Vec<UserBookmarkListItem>,
 }
 
-#[derive(Serialize)]
-pub struct UserBookmark {
+#[derive(Serialize, ToSchema)]
+pub struct UserBookmarkListItem {
   pub token: UserBookmarkToken,
 
-  pub details: UserBookmarkDetails,
+  pub details: UserBookmarkDetailsForUserList,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Serialize)]
-pub struct UserBookmarkDetails {
+#[derive(Serialize, ToSchema)]
+pub struct UserBookmarkDetailsForUserList {
   // TODO: This needs titles or some other summary metadata.
   pub entity_type: UserBookmarkEntityType,
   pub entity_token: String,
@@ -59,21 +60,21 @@ pub struct UserBookmarkDetails {
   pub maybe_thumbnail_url: Option<String>,
 }
 
-#[derive(Debug)]
-pub enum ListUserBookmarksError {
+#[derive(Debug, ToSchema)]
+pub enum ListUserBookmarksForUserError {
   ServerError,
 }
 
-impl ResponseError for ListUserBookmarksError {
+impl ResponseError for ListUserBookmarksForUserError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      ListUserBookmarksError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
+      ListUserBookmarksForUserError::ServerError=> StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      ListUserBookmarksError::ServerError => "server error".to_string(),
+      ListUserBookmarksForUserError::ServerError => "server error".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -81,18 +82,30 @@ impl ResponseError for ListUserBookmarksError {
 }
 
 // NB: Not using derive_more::Display since Clion doesn't understand it.
-impl fmt::Display for ListUserBookmarksError {
+impl fmt::Display for ListUserBookmarksForUserError {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     write!(f, "{:?}", self)
   }
 }
 
+#[utoipa::path(
+  get,
+  path = "/v1/user_bookmarks/list/user/{username}",
+  params(
+  ("username", description = "The username of the user whose bookmarks to list."),
+    ListUserBookmarksQueryData
+  ),
+responses(
+  (status = 200, description = "List User Bookmarks", body = ListUserBookmarksForUserSuccessResponse),
+  (status = 500, description = "Server error", body = ListUserBookmarksForUserError),
+),
+)]
 pub async fn list_user_bookmarks_for_user_handler(
   _http_request: HttpRequest,
   path: Path<ListUserBookmarksPathInfo>,
   query: Query<ListUserBookmarksQueryData>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, ListUserBookmarksError>
+) -> Result<HttpResponse, ListUserBookmarksForUserError>
 {
 
   let query_results = match query.maybe_scoped_entity_type {
@@ -106,16 +119,16 @@ pub async fn list_user_bookmarks_for_user_handler(
     Ok(results) => results,
     Err(e) => {
       warn!("Query error: {:?}", e);
-      return Err(ListUserBookmarksError::ServerError);
+      return Err(ListUserBookmarksForUserError::ServerError);
     }
   };
 
-  let response = ListUserBookmarksSuccessResponse {
+  let response = ListUserBookmarksForUserSuccessResponse {
     success: true,
     user_bookmarks: user_bookmarks.into_iter()
-        .map(|user_bookmark| UserBookmark {
+        .map(|user_bookmark| UserBookmarkListItem {
           token: user_bookmark.token,
-          details: UserBookmarkDetails {
+          details: UserBookmarkDetailsForUserList {
             entity_type: user_bookmark.entity_type,
             entity_token: user_bookmark.entity_token,
             maybe_summary_text: user_bookmark.maybe_entity_descriptive_text,
@@ -130,7 +143,7 @@ pub async fn list_user_bookmarks_for_user_handler(
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|_e| ListUserBookmarksError::ServerError)?;
+      .map_err(|_e| ListUserBookmarksForUserError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")
