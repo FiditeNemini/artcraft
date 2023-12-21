@@ -6,9 +6,10 @@ use log::{info, warn};
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use filesys::file_exists::file_exists;
-use migration::voice_conversion::query_vc_model_for_migration::{query_vc_model_for_migration, VcModel, VcModelType};
+use migration::voice_conversion::query_vc_model_for_migration::{query_vc_model_for_migration, VcModel, VcModelError, VcModelType};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::{get_tts_model_for_inference_improved, TtsModelForInferenceError, TtsModelForInferenceRecord};
+use mysql_queries::queries::voice_conversion::inference::get_voice_conversion_model_for_inference::VoiceConversionModelForInferenceError;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job_dependencies::JobDependencies;
@@ -163,7 +164,11 @@ async fn get_model_record_from_cacheable_query(job_dependencies: &JobDependencie
           let maybe_vc_model = query_vc_model_for_migration(token,
             &job_dependencies.db.mysql_pool)
               .await
-              .map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
+              .map_err(|err|
+                  match err {
+                    VcModelError::ModelDeleted => ProcessSingleJobError::ModelDeleted,
+                    _ => ProcessSingleJobError::Other(anyhow!("database error: {:?}", err))
+                  })?;
 
           match maybe_vc_model {
             None => MaybeInferenceModel::None,
