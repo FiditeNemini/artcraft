@@ -15,8 +15,8 @@ export interface ListW2lInferenceResultsForUserArgs {
 }
 
 export interface GetUserRatingArgs {
-  entity_type: string,
-  entity_token: string,
+  entity_type: string;
+  entity_token: string;
 }
 
 enum Domain {
@@ -75,7 +75,7 @@ class ApiConfig {
         apiHost = "api.dev.fakeyou.com:12345";
         useSsl = false;
         break;
-      default: 
+      default:
         if (document.location.host.includes("localhost")) {
           // NB: `localhost` seems to have problems with cookies.
           useSsl = document.location.protocol === "https:";
@@ -451,6 +451,10 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/media_uploads/upload`;
   }
 
+  uploadMediaFile(): string {
+    return `${this.getApiOrigin()}/v1/media_files/upload`;
+  }
+
   // =============== Voice Conversion ===============
 
   listVoiceConversionModels(): string {
@@ -490,7 +494,9 @@ class ApiConfig {
   // =============== User Ratings ===============
 
   getUserRating(args: GetUserRatingArgs): string {
-    return `${this.getApiOrigin()}/v1/user_rating/view/${args.entity_type}/${args.entity_token}`;
+    return `${this.getApiOrigin()}/v1/user_rating/view/${args.entity_type}/${
+      args.entity_token
+    }`;
   }
 
   setUserRating(): string {

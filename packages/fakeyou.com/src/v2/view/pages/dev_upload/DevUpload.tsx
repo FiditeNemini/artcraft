@@ -2,24 +2,64 @@ import Panel from "components/common/Panel";
 import Container from "components/common/Container";
 import PageHeader from "components/layout/PageHeader";
 import React, { useState } from "react";
-import { Button, Input, TempInput } from "components/common";
+import { Button, Input } from "components/common";
 import { faUpload } from "@fortawesome/pro-solid-svg-icons";
+import {
+  UploadMediaFile,
+  UploadMediaFileRequest,
+} from "@storyteller/components/src/api/media_files/UploadMediaFile";
+import { v4 as uuidv4 } from "uuid";
 
 interface DevUploadProps {}
 
 export default function DevUpload(props: DevUploadProps) {
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (event: any) => {
     setSelectedFile(event.target.files[0]);
   };
 
-  const handleUpload = () => {
+  const makeRequest = async (): Promise<UploadMediaFileRequest | null> => {
+    if (!selectedFile) {
+      return null;
+    }
+
+    const fileReader = new FileReader();
+    fileReader.readAsArrayBuffer(selectedFile);
+
+    return new Promise(resolve => {
+      fileReader.onload = () => {
+        const result = fileReader.result;
+        if (result instanceof ArrayBuffer) {
+          resolve({
+            uuid_idempotency_token: uuidv4(),
+            file_name: selectedFile.name,
+            file_bytes: result,
+            media_source: "file",
+          });
+        }
+      };
+    });
+  };
+
+  const handleUpload = async () => {
     if (!selectedFile) {
       alert("Please select a file to upload");
       return;
     }
-    console.log("Uploading", selectedFile);
+
+    const request = await makeRequest();
+    if (request) {
+      UploadMediaFile(request)
+        .then(res => {
+          if (res) {
+            console.log(res);
+          }
+        })
+        .catch(error => {
+          console.error("Upload failed:", error);
+        });
+    }
   };
 
   return (
