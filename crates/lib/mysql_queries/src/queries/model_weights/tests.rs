@@ -26,7 +26,7 @@ mod tests {
         undelete_weights_as_user,
     };
     use crate::queries::model_weights::get_weight::get_weight_by_token;
-    use crate::queries::model_weights::list::list_weights_by_user::list_weights_by_creator_username;
+    use crate::queries::model_weights::list::list_weights_by_user::{list_weights_by_creator_username, ListWeightsForUserArgs};
     use crate::queries::model_weights::list::list_weights_query_builder::ListWeightsQueryBuilder;
     use crate::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 
@@ -290,11 +290,14 @@ mod tests {
             &creator_username
         ).await?;
 
-        let weights_by_username = list_weights_by_creator_username(
-            &pool,
-            &creator_username,
-            can_see_deleted
-        ).await?;
+        let weights_by_username = list_weights_by_creator_username(ListWeightsForUserArgs {
+            creator_username: &creator_username,
+            page_size: 0,
+            page_index: 0,
+            sort_ascending: false,
+            can_see_deleted,
+            mysql_pool: &pool,
+        }).await?;
         for weight in weights_by_username.iter() {
             // print weight
             println!("weight: {:?}", weight.creator_username);
