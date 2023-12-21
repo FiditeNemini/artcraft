@@ -4,14 +4,16 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Path;
+use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
-use utoipa::ToSchema;
+use utoipa::{IntoParams, ToSchema};
+use enums::by_table::media_files::media_file_type::MediaFileType;
 
 use enums::common::visibility::Visibility;
-use mysql_queries::queries::model_weights::list_weights_by_user::list_weights_by_creator_username;
+use mysql_queries::queries::model_weights::list_weights_by_user::{list_weights_by_creator_username, ListWeightsForUserArgs};
 use tokens::tokens::model_weights::ModelWeightToken;
+use crate::http_server::common_responses::pagination_page::PaginationPage;
 
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
@@ -45,9 +47,16 @@ pub struct Weight {
 #[derive(Serialize,ToSchema)]
 pub struct ListWeightsByUserSuccessResponse {
   pub success: bool,
-  pub weights: Vec<Weight>,
+  pub results: Vec<Weight>,
+  pub pagination: PaginationPage,
 }
 
+#[derive(Deserialize, ToSchema, IntoParams)]
+pub struct ListWeightsForUserQueryParams {
+  pub sort_ascending: Option<bool>,
+  pub page_size: Option<usize>,
+  pub page_index: Option<usize>,
+}
 #[derive(Deserialize,ToSchema)]
 pub struct ListWeightsByUserPathInfo {
   username: String,
@@ -84,11 +93,13 @@ impl ResponseError for ListWeightsByUserError {
   ),
   params(
       ("path" = ListWeightsByUserPathInfo, description = "Payload for Request"),
+      ListWeightsForUserQueryParams
   )
 )]
 pub async fn list_weights_by_user_handler(
   http_request: HttpRequest,
   path: Path<ListWeightsByUserPathInfo>,
+  query: Query<ListWeightsForUserQueryParams>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListWeightsByUserError> {
 
@@ -112,25 +123,34 @@ pub async fn list_weights_by_user_handler(
   let username = path.username.as_ref();
   let creator_user_token = user_session.user_token.clone();
   let is_mod = user_session.can_ban_users;
+  let limit = query.page_size.unwrap_or(25);
+  let sort_ascending = query.sort_ascending.unwrap_or(false);
+  let page_size = query.page_size.unwrap_or_else(|| 25);
+  let page_index = query.page_index.unwrap_or_else(|| 0);
 
   let query_results = list_weights_by_creator_username(
-    &server_state.mysql_pool,
-    &username,
-    is_mod,
+    ListWeightsForUserArgs{
+        creator_username: username,
+        page_size,
+        page_index,
+        can_see_deleted: is_mod,
+        sort_ascending,
+        mysql_pool: &server_state.mysql_pool,
+    }
   ).await.map_err(|e| {
     warn!("Error querying for weights: {:?}", e);
     ListWeightsByUserError::ServerError
   });
 
-  let weights = match query_results {
-    Ok(weights) => weights,
+  let results_page = match query_results {
+    Ok(results) => results,
     Err(e) => {
       warn!("Error querying for weights: {:?}", e);
       return Err(ListWeightsByUserError::ServerError);
     }
   };
 
-  let weights:Vec<Weight> = weights.into_iter().map(|weight| {
+  let weights:Vec<Weight> = results_page.records.into_iter().map(|weight| {
     Weight {
       weight_token: weight.token,
       title: weight.title,
@@ -172,7 +192,11 @@ pub async fn list_weights_by_user_handler(
 
   let response: ListWeightsByUserSuccessResponse = ListWeightsByUserSuccessResponse {
     success: true,
-    weights: final_weights,
+    results: final_weights,
+    pagination: PaginationPage {
+      current: results_page.current_page,
+      total_page_count: results_page.total_page_count,
+    },
   };
 
   
