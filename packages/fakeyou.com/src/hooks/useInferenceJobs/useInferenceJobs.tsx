@@ -1,22 +1,12 @@
 import { useContext } from 'react';
+import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { InferenceJobsContext } from 'context';
 
-
-interface Props {
-  inferenceJobsByCategory?: any;
-  type: number;
-}
-
-export default function useInferenceJobs({ inferenceJobsByCategory, type }: Props) {
-  const { byCategory, processStatus } = useContext(InferenceJobsContext);
-  const jbs = byCategory.get(FrontendInferenceJobType.FaceAnimation) || [];
-
+export default function useInferenceJobs(jobType: FrontendInferenceJobType) {
+  const { byCategory } = useContext(InferenceJobsContext);
   return {
-    inferenceJobs: jbs.map((job,i) => ({
-      ...job!,
-      statusIndex: processStatus(job!)
-    })),
-    processStatus
+    inferenceJobs: (byCategory?.get(jobType) || []),
+    jobStatusDescription: (jobState: JobState) => Object.keys(JobState).filter(key => isNaN(Number(key)))[jobState]
   };
 };

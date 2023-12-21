@@ -1,4 +1,6 @@
+import { Button } from "components/common";
 import React from "react";
+import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 
 interface StepperControlsProps {
   onBack: () => void;
@@ -7,6 +9,7 @@ interface StepperControlsProps {
   createDisabled: boolean;
   steps: string[];
   currentStep: number;
+  continueDisabled?: boolean;
 }
 
 const StepperControls: React.FC<StepperControlsProps> = ({
@@ -15,28 +18,42 @@ const StepperControls: React.FC<StepperControlsProps> = ({
   steps,
   currentStep,
   onCreate,
-  createDisabled
+  createDisabled,
+  continueDisabled,
 }) => {
   return (
-    <div className="p-3 pb-4 px-lg-4 pt-0 d-flex gap-3">
-      {currentStep === 1 && (
-        <button className="btn btn-secondary w-100" onClick={onBack}>
-          Back
-        </button>
-      )}
+    <>
+      <hr className="mt-0 mb-4" />
 
-      {currentStep === 0 && (
-        <button className="btn btn-primary w-100" onClick={onNext}>
-          Continue
-        </button>
-      )}
+      <div className="p-3 pb-4 px-lg-4 pt-0 d-flex gap-3 justify-content-end">
+        {currentStep === 1 && (
+          <Button label="Back" variant="secondary" onClick={onBack} />
+        )}
 
-      {currentStep === 1 && (
-        <button disabled={ createDisabled } className="btn btn-primary w-100" onClick={onCreate}>
-          Create Voice
-        </button>
-      )}
-    </div>
+        {currentStep === 0 && (
+          <>
+            <Button label="Cancel" variant="secondary" to="/voice-designer" />
+            <Button
+              label="Continue"
+              onClick={onNext}
+              disabled={continueDisabled}
+              iconFlip={true}
+              icon={faChevronRight}
+            />
+          </>
+        )}
+
+        {currentStep === 1 && (
+          <Button
+            label="Create Voice"
+            onClick={onCreate}
+            disabled={createDisabled}
+            iconFlip={true}
+            icon={faChevronRight}
+          />
+        )}
+      </div>
+    </>
   );
 };
 

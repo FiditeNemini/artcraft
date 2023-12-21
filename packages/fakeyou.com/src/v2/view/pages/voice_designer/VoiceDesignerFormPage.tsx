@@ -7,7 +7,7 @@ import {
   faWaveform,
 } from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import Panel from "components/common/Panel";
+import { Panel } from "components/common";
 import { Stepper } from "./components/Stepper";
 import { StepperControls } from "./components/StepperControls";
 import { UploadSamples } from "./components/steps/UploadSamples";
@@ -15,30 +15,36 @@ import { VoiceDetails } from "./components/steps/VoiceDetails";
 import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
 import { useHistory } from "react-router-dom";
-
 import { v4 as uuidv4 } from "uuid";
-
 import { useFile } from "hooks";
-
 import useVoiceRequests from "./useVoiceRequests";
-import useUploadedFiles from "hooks/useUploadedFiles";
-
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { useSession } from "hooks";
 
 interface RouteParams {
   dataset_token?: string;
 }
 
-function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueueInferenceJob: any, sessionWrapper: SessionWrapper }) {
+function VoiceDesignerFormPage({
+  enqueueInferenceJob,
+  sessionWrapper,
+}: {
+  enqueueInferenceJob: any;
+  sessionWrapper: SessionWrapper;
+}) {
   const history = useHistory();
-  const { datasets, inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests({});
+  const { datasets, inputCtrl, languages, visibilityOptions, voices } =
+    useVoiceRequests({});
   const [language, languageSet] = useState("en");
   const [visibility, visibilitySet] = useState("hidden");
   const [title, titleSet] = useState("");
-  const [fetched,fetchedSet] = useState(false);
-  const deleteEverything = useUploadedFiles((state: any) => state.deleteEverything);
-  const audioProps = useFile({}); // contains upload inout state and controls, see docs
+  const [fetched, fetchedSet] = useState(false);
+  const [deleting, deletingSet] = useState([]); // samples currently being uploaded
+  const [inProgress, inProgressSet] = useState([]); // samples currently being uploaded
+  const [samples, samplesSet] = useState([]); // fetched/uploaded samples
+  const audioProps = useFile({});
+  const { user, sessionFetched } = useSession();
 
   const datasetInputs = [
     {
@@ -67,28 +73,32 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
   ];
 
   const { dataset_token } = useParams<RouteParams>();
-  const [isNewCreation] = useState(!dataset_token);
-  const isEditMode = Boolean(dataset_token) && !isNewCreation;
+  const existingVoice = !!dataset_token;
 
-  usePrefixedDocumentTitle(isEditMode ? "Edit Dataset" : "Create New Voice");
+  usePrefixedDocumentTitle(existingVoice ? "Edit Dataset" : "Create New Voice");
 
   const initialStep = history.location.pathname.includes("/upload") ? 1 : 0;
   const [currentStep, setCurrentStep] = useState(initialStep);
-  const [audioSamplesReady, setAudioSamplesReady] = useState(false);
-
-  const steps = isEditMode
+  const steps = existingVoice
     ? ["Edit Details", "Edit Samples"]
     : ["Voice Details", "Upload Samples"];
+  const uploadProps = {
+    audioProps,
+    datasetToken: dataset_token,
+    deleting,
+    deletingSet,
+    inProgress,
+    inProgressSet,
+    samples,
+    samplesSet,
+  };
 
-  const key = !isNewCreation && (dataset_token || uuidv4());
   const displayStep = (step: any) => {
     switch (step) {
       case 0:
         return <VoiceDetails {...{ datasetInputs }} />;
       case 1:
-        return (
-          <UploadSamples key={key as any} {...{ audioProps, datasetToken: dataset_token, setAudioSamplesReady }} />
-        );
+        return <UploadSamples {...uploadProps} />;
       default:
         return null;
     }
@@ -106,31 +116,33 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
 
   const handleNext = () => {
     if (currentStep === 0) {
-      if (isNewCreation) {
+      if (!existingVoice) {
         // It's a new creation and on the first step
 
-        datasets.create("",{
-          title,
-          creator_set_visibility: visibility,
-          idempotency_token: uuidv4(),
-        }).then((res: any) => {
-          if (res && res.success && res.token) {
-            deleteEverything();
-            history.push(`/voice-designer/dataset/${ res.token }/upload`);
-          } 
-        });
-
+        datasets
+          .create("", {
+            title,
+            creator_set_visibility: visibility,
+            idempotency_token: uuidv4(),
+          })
+          .then((res: any) => {
+            if (res && res.success && res.token) {
+              history.push(`/voice-designer/dataset/${res.token}/upload`);
+            }
+          });
       } else if (dataset_token) {
         // It's edit mode and on the first step
-        datasets.edit(dataset_token,{
-          title,
-          creator_set_visibility: visibility,
-          ietf_language_tag: language
-        }).then((res: any) => {
-          if (res && res.success && res.token) {
-            history.push(`/voice-designer/dataset/${dataset_token}/upload`);
-          } 
-        });
+        datasets
+          .edit(dataset_token, {
+            title,
+            creator_set_visibility: visibility,
+            ietf_language_tag: language,
+          })
+          .then((res: any) => {
+            if (res && res.success && res.token) {
+              history.push(`/voice-designer/dataset/${dataset_token}/upload`);
+            }
+          });
       }
       setCurrentStep(currentStep + 1);
     } else if (currentStep < steps.length - 1) {
@@ -145,7 +157,6 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
         voice_dataset_token: dataset_token || "",
       })
       .then((res: any) => {
-        deleteEverything();
         if (res && res.success) {
           enqueueInferenceJob(
             res.inference_job_token,
@@ -160,26 +171,25 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
   useEffect(() => {
     if (!fetched && dataset_token) {
       fetchedSet(true);
-      datasets.get(dataset_token,{})
-      .then((res) => {
+      datasets.get(dataset_token, {}).then(res => {
         languageSet(res.ietf_language_tag);
         titleSet(res.title);
         visibilitySet(res.creator_set_visibility);
       });
     }
-  },[dataset_token,datasets,fetched]);
+  }, [dataset_token, datasets, fetched]);
 
-  if (!sessionWrapper.isLoggedIn()) {
+  if (sessionFetched && !user) {
     history.push("/voice-designer");
   }
 
   return (
     <Container type="panel">
       <PageHeader
-        title={isEditMode ? "Edit Dataset" : "Create New Voice"}
-        titleIcon={isEditMode ? faPencil : faWaveform}
+        title={existingVoice ? "Edit Dataset" : "Create New Voice"}
+        titleIcon={existingVoice ? faPencil : faWaveform}
         subText={
-          isEditMode
+          existingVoice
             ? "Edit your dataset by uploading more samples to create a new voice"
             : "Add voice details and upload audio samples to clone your voice!"
         }
@@ -187,26 +197,30 @@ function VoiceDesignerFormPage({ enqueueInferenceJob, sessionWrapper }: { enqueu
         showBackButton={true}
         backbuttonLabel="Back to Voice Designer"
         backbuttonTo={
-          isEditMode ? "/voice-designer/datasets" : "/voice-designer/voices"
+          existingVoice ? "/voice-designer/datasets" : "/voice-designer/voices"
         }
       />
+      {sessionFetched && user && (
+        <Panel>
+          <div className="p-3 px-lg-4 bg-stepper">
+            <Stepper steps={steps} currentStep={currentStep} />
+          </div>
 
-      <Panel>
-        <div className="p-3 px-lg-4 bg-stepper">
-          <Stepper steps={steps} currentStep={currentStep} />
-        </div>
+          <div className="p-3 py-4 p-md-4">{displayStep(currentStep)}</div>
 
-        <div className="p-3 py-4 p-md-4">{displayStep(currentStep)}</div>
-
-        <StepperControls
-          steps={steps}
-          currentStep={currentStep}
-          onBack={handleBack}
-          onNext={handleNext}
-          onCreate={handleCreateVoice}
-          createDisabled={!audioSamplesReady}
-        />
-      </Panel>
+          <StepperControls
+            steps={steps}
+            currentStep={currentStep}
+            onBack={handleBack}
+            onNext={handleNext}
+            onCreate={handleCreateVoice}
+            createDisabled={
+              !!deleting.length || !!inProgress.length || !samples.length
+            } // deleting, uploading, or no samples = disabled
+            continueDisabled={title.length === 0}
+          />
+        </Panel>
+      )}
     </Container>
   );
 }

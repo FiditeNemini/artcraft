@@ -39,16 +39,24 @@ function AccordionItem({
   ) as AccordionContextType;
   const isOpen = openItems.includes(title);
 
-  const [contentHeight, setContentHeight] = useState<number | undefined>(
-    isOpen ? undefined : 0
+  const [contentHeight, setContentHeight] = useState<number>(
+    defaultOpen ? 0 : 0
   );
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Update content height whenever the accordion item is opened or closed
     if (contentRef.current) {
       setContentHeight(isOpen ? contentRef.current.scrollHeight : 0);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    // Adjust height when the content changes, only if the item is open
+    if (isOpen && contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight);
+    }
+  }, [children, isOpen]);
 
   const heightProps = useSpring({
     height: isOpen ? `${contentHeight}px` : "0px",
@@ -89,23 +97,21 @@ function AccordionItem({
 }
 
 function Accordion({ children }: AccordionProps) {
-  const [openItems, setOpenItems] = useState<string[]>([]);
+  // Extract titles of items that should be initially open
+  const defaultOpenTitles = React.Children.toArray(children)
+    .filter((child: any) => child.props.defaultOpen)
+    .map((child: any) => child.props.title);
+
+  // Initialize openItems with the titles of items that should be open
+  const [openItems, setOpenItems] = useState<string[]>(defaultOpenTitles);
 
   const toggleItem = (title: string) => {
     if (openItems.includes(title)) {
-      setOpenItems(openItems.filter((item) => item !== title));
+      setOpenItems(openItems.filter(item => item !== title));
     } else {
       setOpenItems([...openItems, title]);
     }
   };
-
-  // Initialize openItems based on defaultOpen props of AccordionItem children
-  useEffect(() => {
-    const defaultOpenItems = React.Children.toArray(children)
-      .filter((child: any) => child.props.defaultOpen)
-      .map((child: any) => child.props.title);
-    setOpenItems(defaultOpenItems);
-  }, [children]);
 
   return (
     <AccordionContext.Provider value={{ openItems, toggleItem }}>

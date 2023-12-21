@@ -1,0 +1,52 @@
+{
+  "FaceAnimation": {
+    "ATTEMPT_FAILED": "Face Animation Atempt Failed",
+    "COMPLETE_FAILURE": "Face Animation Failed.",
+    "COMPLETE_SUCCESS": "Face Animation Complete",
+    "DEAD": "Face Animation Dead",
+    "PENDING": "Pending Face Animation",
+    "STARTED": "Face Animation In Progress",
+    "UNKNOWN": "Animation Status Unknown",
+    "heading": "Face Animator Jobs"
+  },
+  "VoiceDesignerCreateVoice": {
+    "ATTEMPT_FAILED": "Face Animation Atempt Failed",
+    "COMPLETE_FAILURE": "Face Animation Failed.",
+    "COMPLETE_SUCCESS": "Face Animation Complete",
+    "DEAD": "Voice Designer Dead",
+    "PENDING": "Voice Designer Pending",
+    "STARTED": "Voice Designer In Progress",
+    "UNKNOWN": "Voice Designer Status Unknown",
+    "heading": "Voice Designer Jobs"
+  },
+  "core": {
+    "heading": "Latest Jobs"
+  },
+  "face_animator": {
+    "ATTEMPT_FAILED": "Face Animation Atempt Failed",
+    "COMPLETE_FAILURE": "Face Animation Failed.",
+    "COMPLETE_SUCCESS": "Face Animation Complete",
+    "PENDING": "Pending Face Animation",
+    "STARTED": "Face Animation In Progress",
+    "UNKNOWN": "Animation Status Uknown",
+    "heading": "Face Animator Jobs"
+  },
+  "subtitles": {
+    "ATTEMPT_FAILED": "Atempt {{attemptCount}} failed, trying again.",
+    "COMPLETE_FAILURE": "Please try again",
+    "COMPLETE_SUCCESS": "View result",
+    "DEAD": "Please try again",
+    "PENDING": "Adding to queue",
+    "STARTED": "Please wait",
+    "UNKNOWN": "Please wait or try again"
+  },
+  "voice_designer": {
+    "ATTEMPT_FAILED": "Face Animation Atempt Failed",
+    "COMPLETE_FAILURE": "Face Animation Failed.",
+    "COMPLETE_SUCCESS": "Face Animation Complete",
+    "PENDING": "Voice Designer Pending",
+    "STARTED": "Voice Designer In Progress",
+    "UNKNOWN": "Voice Designer Status Uknown",
+    "heading": "Voice Designer Jobs"
+  }
+}

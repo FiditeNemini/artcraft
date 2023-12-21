@@ -1,3 +1,4 @@
+import AudioBlobPreview from "./AudioBlobPreview";
 import AudioInput from "./AudioInput";
 import BasicVideo from "./BasicVideo";
 import Button from "./Button";
@@ -16,10 +17,12 @@ import SegmentButtons from "./SegmentButtons";
 import Select from "./Select";
 import Slider from "./Slider";
 import Spinner from "./Spinner";
+import TempAudioPlayer from "./TempAudioPlayer";
 import TempInput from "./TempInput";
 import TempSelect from "./TempSelect";
 
 export {
+  AudioBlobPreview,
   AudioInput,
   BasicVideo,
   Button,
@@ -38,6 +41,7 @@ export {
   Select,
   Slider,
   Spinner,
+  TempAudioPlayer,
   TempInput,
   TempSelect
 };

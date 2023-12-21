@@ -6,9 +6,8 @@ import { LoginPage } from "./pages/login/LoginPage";
 import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
-import { LipsyncEditor } from "./pages/lipsync";
+import FaceAnimator from "./pages/face_animator";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
-import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { SignupPage } from "./pages/signup/SignupPage";
@@ -97,6 +96,10 @@ import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVo
 import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
 import DevUpload from "./pages/dev-upload/DevUpload";
+import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
+import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
+import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
+import WeightPage from "./pages/weight/WeightPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -306,6 +309,16 @@ class PageContainer extends React.Component<
               />
             </Route>
 
+            {/* New Profile Page */}
+            <Route path="/dev-profile/:username">
+              <NewProfilePage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+              />
+            </Route>
+
             <Route path="/signup">
               <SignupPage
                 querySessionCallback={() => {}}
@@ -343,6 +356,24 @@ class PageContainer extends React.Component<
 
             <Route path="/media/:token">
               <MediaPage sessionWrapper={this.props.sessionWrapper} />
+            </Route>
+
+            {/* <Route path="/weight/:weight_token/edit">
+              <WeightEditPage />
+            </Route> */}
+
+            <Route path="/weight/:weight_token">
+              <WeightPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
+                inferenceJobs={this.props.inferenceJobs}
+                enqueueInferenceJob={this.props.enqueueInferenceJob}
+                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+                ttsInferenceJobs={this.props.ttsInferenceJobs}
+                enqueueTtsJob={this.props.enqueueTtsJob}
+              />
             </Route>
 
             <Route path="/dev-tts">
@@ -520,6 +551,12 @@ class PageContainer extends React.Component<
               />
             </Route>
 
+            <Route path="/moderation/job_control">
+              <ModerationJobControlPage
+                sessionWrapper={this.props.sessionWrapper}
+              />
+            </Route>
+
             <Route path="/moderation/tts_category/list">
               <ModerationTtsCategoryListPage
                 sessionWrapper={this.props.sessionWrapper}
@@ -607,8 +644,8 @@ class PageContainer extends React.Component<
               <AboutPage />
             </Route>
 
-            <Route path="/face-animator">
-              <LipsyncEditor
+            <Route path="/face-animator/:mediaToken?">
+              <FaceAnimator
                 {...{
                   enqueueInferenceJob: this.props.enqueueInferenceJob,
                   sessionSubscriptionsWrapper:
@@ -707,6 +744,7 @@ class PageContainer extends React.Component<
                   inferenceJobsByCategory: this.props.inferenceJobsByCategory,
                 }}
               />
+              <VoiceDesignerMainPage />
             </Route>
 
             <Route path="/generate-speech">

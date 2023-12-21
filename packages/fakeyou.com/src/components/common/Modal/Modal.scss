@@ -1,0 +1,45 @@
+@import "scss/colours.scss";
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(darken($panel, 8%), 0.7) !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  z-index: 1050;
+  display: block;
+}
+
+.modal-width-auto {
+  max-width: fit-content;
+  margin: auto;
+}
+
+.modal-content {
+  flex: 0 1 auto;
+  min-width: 0;
+  background-color: $panel;
+  border-color: lighten($panel, 8%) !important;
+  border: 1px solid;
+  border-radius: 0.5rem;
+  box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
+  -webkit-box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
+  -moz-box-shadow: 0px 9px 33px 1px rgba(19, 19, 27, 0.8);
+}
+
+.modal-header {
+  border-bottom: 1px solid lighten($panel, 8%);
+}
+
+.modal-header .btn-close {
+  filter: brightness(0) invert(1);
+}
+
+.modal-footer {
+  border-top: 1px solid lighten($panel, 8%);
+}

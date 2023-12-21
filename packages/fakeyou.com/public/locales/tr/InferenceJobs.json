@@ -1,0 +1,52 @@
+{
+  "FaceAnimation": {
+    "ATTEMPT_FAILED": "Yüz Animasyonu Denemesi Başarısız",
+    "COMPLETE_FAILURE": "Yüz Animasyonu Başarısız.",
+    "COMPLETE_SUCCESS": "Yüz Animasyonu Tamamlandı",
+    "DEAD": "Yüz Animasyonu Öldü",
+    "PENDING": "Bekleyen Yüz Animasyonu",
+    "STARTED": "Yüz Animasyonu Devam Ediyor",
+    "UNKNOWN": "Animasyon Durumu Bilinmiyor",
+    "heading": "Yüz Animatörü İş İlanları"
+  },
+  "VoiceDesignerCreateVoice": {
+    "ATTEMPT_FAILED": "Yüz Animasyonu Denemesi Başarısız",
+    "COMPLETE_FAILURE": "Yüz Animasyonu Başarısız.",
+    "COMPLETE_SUCCESS": "Yüz Animasyonu Tamamlandı",
+    "DEAD": "Ses Tasarımcısı Öldü",
+    "PENDING": "Ses Tasarımcısı Beklemede",
+    "STARTED": "Ses Tasarımcısı Devam Ediyor",
+    "UNKNOWN": "Ses Tasarımcısı Durumu Bilinmiyor",
+    "heading": "Ses Tasarımcısı İş İlanları"
+  },
+  "core": {
+    "heading": "En Son İşler"
+  },
+  "face_animator": {
+    "ATTEMPT_FAILED": "Yüz Animasyonu Denemesi Başarısız",
+    "COMPLETE_FAILURE": "Yüz Animasyonu Başarısız.",
+    "COMPLETE_SUCCESS": "Yüz Animasyonu Tamamlandı",
+    "PENDING": "Bekleyen Yüz Animasyonu",
+    "STARTED": "Yüz Animasyonu Devam Ediyor",
+    "UNKNOWN": "Animasyon Durumu Bilinmiyor",
+    "heading": "Yüz Animatörü İş İlanları"
+  },
+  "subtitles": {
+    "ATTEMPT_FAILED": "deneme {{attemptCount}} başarısız oldu, tekrar denedi.",
+    "COMPLETE_FAILURE": "Lütfen tekrar deneyin",
+    "COMPLETE_SUCCESS": "Sonucu göster",
+    "DEAD": "Lütfen tekrar deneyin",
+    "PENDING": "Kuyruğa ekleniyor",
+    "STARTED": "Lütfen bekleyin",
+    "UNKNOWN": "Lütfen bekleyin veya tekrar deneyin"
+  },
+  "voice_designer": {
+    "ATTEMPT_FAILED": "Yüz Animasyonu Denemesi Başarısız",
+    "COMPLETE_FAILURE": "Yüz Animasyonu Başarısız.",
+    "COMPLETE_SUCCESS": "Yüz Animasyonu Tamamlandı",
+    "PENDING": "Ses Tasarımcısı Beklemede",
+    "STARTED": "Ses Tasarımcısı Devam Ediyor",
+    "UNKNOWN": "Ses Tasarımcısı Durumu Bilinmiyor",
+    "heading": "Ses Tasarımcısı İş İlanları"
+  }
+}

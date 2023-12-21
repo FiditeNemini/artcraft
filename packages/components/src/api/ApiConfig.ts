@@ -70,6 +70,7 @@ class ApiConfig {
         break;
       case "dev.fakeyou.com:7000":
       case "dev.fakeyou.com:7001":
+      case "dev.fakeyou.com:7002":
         // NB: for dev machines without nginx proxies
         apiHost = "api.dev.fakeyou.com:12345";
         useSsl = false;
@@ -388,6 +389,10 @@ class ApiConfig {
 
   killTtsInferenceJobs(): string {
     return `${this.getApiOrigin()}/moderation/jobs/kill_tts_inference_jobs`;
+  }
+
+  killJobs(): string {
+    return `${this.getApiOrigin()}/moderation/jobs/kill_generic`;
   }
 
   getW2lInferenceStats(): string {

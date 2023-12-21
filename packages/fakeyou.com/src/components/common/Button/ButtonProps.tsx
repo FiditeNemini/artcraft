@@ -5,7 +5,8 @@ export default interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElem
   label?: string | null;
   icon?: IconDefinition;
   small?: boolean;
-  variant?: "primary" | "secondary" | "danger" | "link";
+  variant?: string;
+  // variant?: "primary" | "secondary" | "danger" | "link"; // this behaves weirdly
   to?: string;
   href?: string;
   target?: "_blank" | "_self";

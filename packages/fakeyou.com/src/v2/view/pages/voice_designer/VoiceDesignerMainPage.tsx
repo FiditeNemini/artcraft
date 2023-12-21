@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
-import {
-  faPenToSquare,
-  faPlus,
-  faRightToBracket,
-  faStar,
-  faWaveform,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faPenToSquare, faPlus, faRightToBracket, faStar, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { useLocalize } from "hooks";
 import Panel from "components/common/Panel";
@@ -15,48 +9,38 @@ import Container from "components/common/Container";
 import { NavLink } from "react-router-dom";
 import ListItems from "./components/NewList";
 import Modal from "components/common/Modal";
+import { Button } from "components/common";
 import useVoiceRequests from "./useVoiceRequests";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import { useSession } from "hooks";
 
-import {
-  FrontendInferenceJobType,
-  // InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { Button } from "components/common";
+// interface Props {}
 
-interface Props {
-  sessionWrapper: SessionWrapper;
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  inferenceJobsByCategory: any;
-}
-
-function VoiceDesignerMainPage(props: Props) {
+function VoiceDesignerMainPage() {
   usePrefixedDocumentTitle("AI Voice Designer");
   const { pathname } = useLocation();
   const { t } = useLocalize("FaceAnimator");
-  const { datasets, voices, isFetching } = useVoiceRequests({
+  const { datasets, voices, isLoading } = useVoiceRequests({
     requestDatasets: true,
     requestVoices: true,
   });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const view = ["/voice-designer/datasets", "/voice-designer/voices"].indexOf(
-    pathname
-  );
+  const view = ["/voice-designer/datasets", "/voice-designer/voices"].indexOf(pathname);
   const [deleteItem, setDeleteItem] = useState("");
   const [deleteType, setDeleteType] = useState("");
   const [deleteText, setDeleteText] = useState({
     title: "",
     text: "",
   });
-
   const history = useHistory();
+  const { user } = useSession();
 
   if (pathname === "/voice-designer" || pathname === "/voice-designer/") {
     return <Redirect to="/voice-designer/voices" />;
   }
-
   const openDeleteModal = (token: string, type: string) => {
     setDeleteItem(token);
     setDeleteType(type);
@@ -87,6 +71,12 @@ function VoiceDesignerMainPage(props: Props) {
     history.push(`/voice-designer/voice/${token}`);
   };
 
+  const DataBadge = () => <span className="dataset-badge mb-0">Dataset</span>;
+  const VoiceBadge = () => (
+    <FontAwesomeIcon icon={faMicrophone} className="me-2 me-lg-3" />
+  );
+
+  // these need to be abstracted to use over again -V
   const voiceClick =
     (todo: any, type: string) =>
     ({ target }: { target: any }) => {
@@ -106,7 +96,7 @@ function VoiceDesignerMainPage(props: Props) {
   const actionDataSets = datasets.list.map((dataset, i) => {
     return {
       ...dataset,
-      badge: "dataset",
+      badge: DataBadge,
       buttons: [
         {
           label: "Edit",
@@ -128,7 +118,7 @@ function VoiceDesignerMainPage(props: Props) {
   const actionVoices = voices.list.map((voice, i) => {
     return {
       ...voice,
-      badge: "voice",
+      badge: VoiceBadge,
       buttons: [
         {
           label: "Edit",
@@ -153,14 +143,12 @@ function VoiceDesignerMainPage(props: Props) {
     };
   });
 
-  const statusTxt = (status: number, config: any) =>
-    [
-      "Voice pending...",
-      "Voice in progress",
-      "Voice failed",
-      "Voice dead",
-      "Voice created successfully",
-    ][status];
+  const failures = (fail = "") => {
+    switch (fail) {
+      // case "face_not_detected": return "Face not detected, try another picture"; // voice designer can have failure states too!
+      default: return "Uknown failure";
+    }
+  };
 
   const createVoiceButton = {
     label: `Create new voice`,
@@ -180,130 +168,121 @@ function VoiceDesignerMainPage(props: Props) {
     to: "/pricing",
   };
 
-  const isLoggedIn = props.sessionWrapper.isLoggedIn();
-  let pageHeader = <></>;
-  if (!isLoggedIn) {
-    pageHeader = (
-      <PageHeader
-        button={signUpButton}
-        secondaryButton={pricingButton}
-        title="Voice Designer"
-        titleIcon={faWaveform}
-        subText="Create your own AI voice by providing audio files of the voice you want to clone."
-        panel={false}
-        imageUrl="/images/header/voice-designer.png"
+  const dataPlaceholder = () => (
+    <div className="d-flex flex-column list-items p-5 align-items-center">
+      <h5 className="fw-semibold mb-3">You haven't created any voices.</h5>
+      <Button
+        icon={faPlus} // 1
+        label="Create New Voice" // 2
+        small={true}
+        to="/voice-designer/create" // 3
       />
-    );
-  } else {
-    pageHeader = (
-      <PageHeader
-        button={createVoiceButton}
-        title="Voice Designer"
-        titleIcon={faWaveform}
-        subText="Create your own AI voice by providing audio files of the voice you want to clone."
-        panel={false}
-        imageUrl="/images/header/voice-designer.png"
+    </div>
+  );
+
+  const LogggedInView = () => (
+    <>
+      <InferenceJobsList
+        {...{
+          failures,
+          jobType: FrontendInferenceJobType.VoiceDesignerCreateVoice,
+          t
+        }}
       />
-    );
-  }
+      <Panel mb={true}>
+        <nav>
+          <ul className="nav nav-tabs">
+            <div className="d-flex flex-grow-1">
+              <li className="nav-item">
+                <NavLink
+                  to="/voice-designer/voices"
+                  className="nav-link fs-6 px-3 px-lg-4"
+                  activeClassName="active"
+                >
+                  My Voices
+                </NavLink>
+              </li>
+              <li className="nav-item">
+                <NavLink
+                  to="/voice-designer/datasets"
+                  className="nav-link fs-6"
+                  activeClassName="active"
+                >
+                  My Datasets
+                </NavLink>
+              </li>
+            </div>
+          </ul>
+        </nav>
 
-  let body = <></>;
-
-  if (!isLoggedIn) {
-    body = (
-      <Panel padding={true}>
-        <div className="d-flex flex-column align-items-center py-3 my-3 py-md-4 my-md-4 gap-4">
-          <div className="text-center">
-            <h4 className="fw-bold">Please log in to access voice creation.</h4>
-
-            <p className="text-center opacity-75">
-              If you don't have an account yet, sign up now to unlock this
-              feature!
-            </p>
-          </div>
-
-          <div className="d-flex gap-3 align-items-center">
-            <Button
-              label="Sign Up"
-              variant="primary"
-              icon={faPenToSquare}
-              to="/signup"
-            />
-            <Button
-              label="Login"
-              variant="secondary"
-              icon={faRightToBracket}
-              to="/login"
-            />
-          </div>
+        <div className="p-3 p-lg-4">
+          <ListItems
+            {...{
+              data: view ? actionVoices : actionDataSets,
+              dataPlaceholder,
+              isLoading,
+            }}
+          />
         </div>
       </Panel>
-    );
-  } else {
-    body = (
-      <>
-        <InferenceJobsList
-          {...{
-            t,
-            inferenceJobs: props.inferenceJobsByCategory.get(
-              FrontendInferenceJobType.VoiceDesignerCreateVoice
-            ),
-            statusTxt,
-          }}
-        />
-        <Panel mb={true}>
-          <nav>
-            <ul className="nav nav-tabs">
-              <div className="d-flex flex-grow-1">
-                <li className="nav-item">
-                  <NavLink
-                    to="/voice-designer/voices"
-                    className="nav-link fs-6 px-3 px-lg-4"
-                    activeClassName="active"
-                  >
-                    My Voices
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink
-                    to="/voice-designer/datasets"
-                    className="nav-link fs-6"
-                    activeClassName="active"
-                  >
-                    My Datasets
-                  </NavLink>
-                </li>
-              </div>
-            </ul>
-          </nav>
+    </>
+  );
 
-          <div className="p-3 p-lg-4">
-            <ListItems
-              {...{ data: view ? actionVoices : actionDataSets }}
-              isLoading={isFetching}
-            />
-          </div>
-        </Panel>
-      </>
-    );
-  }
+  const LoggedOutView = () => (
+    <Panel padding={true}>
+      <div className="d-flex flex-column align-items-center py-3 my-3 py-md-4 my-md-4 gap-4">
+        <div className="text-center">
+          <h4 className="fw-bold">Please log in to access voice creation.</h4>
+
+          <p className="text-center opacity-75">
+            If you don't have an account yet, sign up now to unlock this
+            feature!
+          </p>
+        </div>
+
+        <div className="d-flex gap-3 align-items-center">
+          <Button
+            label="Sign Up"
+            variant="primary"
+            icon={faPenToSquare}
+            to="/signup"
+          />
+          <Button
+            label="Login"
+            variant="secondary"
+            icon={faRightToBracket}
+            to="/login"
+          />
+        </div>
+      </div>
+    </Panel>
+  );
 
   return (
     <>
       <Container type="panel">
-        {pageHeader}
-
-        {body}
+        <PageHeader
+          {...{
+            button: user ? createVoiceButton : signUpButton,
+            ...(!user ? { secondaryButton: pricingButton } : {}),
+            title: "Voice Designer",
+            titleIcon: faWaveform,
+            subText:
+              "Create your own AI voice by providing audio files of the voice you want to clone.",
+            panel: false,
+            imageUrl: "/images/header/voice-designer.png",
+          }}
+        />
+        {user ? <LogggedInView /> : <LoggedOutView />}
+        {/* Delete Modal */}
+        <Modal
+          show={isDeleteModalOpen}
+          handleClose={closeDeleteModal}
+          title={deleteText.title}
+          content={<p>{deleteText.text}</p>}
+          onConfirm={handleDelete}
+        />
       </Container>
-
-      {/* Delete Modal */}
-      <Modal
-        show={isDeleteModalOpen}
-        handleClose={closeDeleteModal}
-        title={deleteText.title}
-        content={<p>{deleteText.text}</p>}
-        onConfirm={handleDelete}
-      />
     </>
   );
 }
