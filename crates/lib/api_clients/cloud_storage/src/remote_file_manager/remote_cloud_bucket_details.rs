@@ -30,8 +30,17 @@ impl RemoteCloudBucketDetails {
     pub fn file_descriptor_from_bucket_details(&self) -> Box<dyn FileDescriptor> {
         match self.prefix.as_str() {
             "loRA" => Box::new(weights_descriptor::WeightsLoRADescriptor {}),
-            "SD15" => Box::new(weights_descriptor::WeightsSD15Descriptor {}),
-            "SDXL" => Box::new(weights_descriptor::WeightsSDXLDescriptor {}),
+            "sd15" => Box::new(weights_descriptor::WeightsSD15Descriptor {}),
+            "sdxl" => Box::new(weights_descriptor::WeightsSDXLDescriptor {}),
+            "valle_prompt" => Box::new(weights_descriptor::WeightsVallePromptDescriptor {}),
+            "rvc" => {
+                match self.suffix.as_str() {
+                    "safetensors" => Box::new(weights_descriptor::WeightsRVCDescriptor {}),
+                    "index" => Box::new(weights_descriptor::WeightsRVCIndexDescriptor {}),
+                    _ => panic!("Unknown suffix: {}",self.suffix)
+                }
+            },
+            "svc" => Box::new(weights_descriptor::WeightsSVCDescriptor {}),
             _ => panic!("Unknown prefix: {}", self.prefix)
         }
     }
