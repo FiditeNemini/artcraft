@@ -1,25 +1,23 @@
 use std::fmt;
 use std::sync::Arc;
+
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::warn;
+use utoipa::ToSchema;
+
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::model_weights::weights_category::WeightsCategory;
+use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
-use tokens::tokens::users::UserToken;
+use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
+use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
-
-use tokens::tokens::model_weights::ModelWeightToken;
-use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
-
-use enums::by_table::model_weights::weights_types::WeightsType;
-use enums::by_table::model_weights::weights_category::WeightsCategory;
-
-use utoipa::ToSchema;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 #[derive(Serialize, Clone, ToSchema)]
 pub struct GetWeightResponse {
@@ -31,6 +29,8 @@ pub struct GetWeightResponse {
     maybe_thumbnail_token: Option<String>,
     description_markdown: String,
     description_rendered_html: String,
+
+    creator: UserDetailsLight,
     creator_set_visibility: Visibility,
 
     file_size_bytes: i32,
@@ -154,6 +154,13 @@ pub async fn get_weight_handler(
                 .to_string()
         });
 
+    let creator = UserDetailsLight::from_db_fields(
+        &weight.creator_user_token,
+        &weight.creator_username,
+        &weight.creator_display_name,
+        &weight.creator_gravatar_hash,
+    );
+
     let response = GetWeightResponse {
         success: true,
         weight_token: weight.token,
@@ -164,6 +171,7 @@ pub async fn get_weight_handler(
         description_markdown: weight.description_markdown,
         description_rendered_html: weight.description_rendered_html,
         maybe_avatar_public_bucket_path: maybe_avatar,
+        creator,
         creator_set_visibility: weight.creator_set_visibility,
         file_size_bytes: weight.file_size_bytes,
         file_checksum_sha2: weight.file_checksum_sha2,
