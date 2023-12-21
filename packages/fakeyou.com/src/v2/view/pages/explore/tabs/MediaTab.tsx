@@ -105,13 +105,34 @@ export default function MediaTab() {
                 let card;
                 switch (data.media_type) {
                   case "audio":
-                    card = <AudioCard data={data} type="media" />;
+                    card = (
+                      <AudioCard
+                        key={index}
+                        data={data}
+                        type="media"
+                        showCreator={true}
+                      />
+                    );
                     break;
                   case "image":
-                    card = <ImageCard data={data} type="media" />;
+                    card = (
+                      <ImageCard
+                        key={index}
+                        data={data}
+                        type="media"
+                        showCreator={true}
+                      />
+                    );
                     break;
                   case "video":
-                    card = <VideoCard data={data} type="media" />;
+                    card = (
+                      <VideoCard
+                        key={index}
+                        data={data}
+                        type="media"
+                        showCreator={true}
+                      />
+                    );
                     break;
                   default:
                     card = <div>Unsupported media type</div>;
