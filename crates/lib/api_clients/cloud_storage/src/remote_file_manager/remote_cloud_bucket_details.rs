@@ -4,9 +4,9 @@ use super::file_descriptor::FileDescriptor;
 use crate::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsSDXLDescriptor, self};
 
 pub struct RemoteCloudBucketDetails {
-    object_hash: String,
-    prefix: String,
-    suffix: String,
+    pub object_hash: String,
+    pub prefix: String,
+    pub suffix: String,
 }
 
 impl RemoteCloudBucketDetails {

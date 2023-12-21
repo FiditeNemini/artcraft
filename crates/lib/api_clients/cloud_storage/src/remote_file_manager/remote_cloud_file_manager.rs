@@ -4,35 +4,28 @@ use crate::remote_file_manager::file_directory::FileBucketDirectory;
 use crate::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 
 use super::bucket_orchestration;
-use super::file_descriptor::{FileDescriptor, self};
+use super::file_descriptor::{FileDescriptor};
 use super::file_meta_data::FileMetaData;
 
-use std::time::Duration;
-use buckets::public::{public_path, self};
 use errors:: AnyhowResult;
 
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
-use filesys::path_to_string::path_to_string;
+
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
-use mimetypes::mimetype_for_file::{get_mimetype_for_file, self};
 
 
-use log::info;
-use storyteller_root::get_seed_tool_data_root;
-use std::path::Path;
 
-use bucket_orchestration::BucketOrchestration;
-use crate::remote_file_manager::bucket_orchestration::{BucketOrchestrationDownload, BucketOrchestrationUpload};
+use crate::remote_file_manager::bucket_orchestration::{BucketOrchestrationCore};
 
 struct RemoteCloudFileClient {
-    bucket_orchestration_client: BucketOrchestration
+    bucket_orchestration_client: Box<dyn BucketOrchestrationCore>
 }
 
 impl RemoteCloudFileClient {
-    pub fn new(bucket_orchestration_client: BucketOrchestration) -> Self {
+    pub fn new(bucket_orchestration_client: Box<dyn BucketOrchestrationCore>) -> Self {
         Self {
             bucket_orchestration_client: bucket_orchestration_client
         }
@@ -43,7 +36,6 @@ impl RemoteCloudFileClient {
         let file_bucket_directory = FileBucketDirectory::from_existing_bucket_details(remote_cloud_bucket_details);
         let full_remote_cloud_file_path = file_bucket_directory.get_full_remote_cloud_file_path().to_string();
         let is_public = file_descriptor.is_public().clone();
-
 
         self.bucket_orchestration_client.download_file_to_disk(full_remote_cloud_file_path, to_system_file_path, is_public).await?;
         Ok(())
@@ -94,7 +86,41 @@ impl RemoteCloudFileClient {
 #[cfg(test)]
 mod tests {
     use env_logger;
+    use errors::AnyhowResult;
+    use crate::remote_file_manager::bucket_orchestration::BucketOrchestrationCore;
     use crate::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsSDXLDescriptor};
+    use super::bucket_orchestration;
+
+
+    struct BucketOrchestrationMock {
+
+    }
+    #[async-trait]
+    impl BucketOrchestrationCore for BucketOrchestrationMock {
+        async fn download_file_to_disk(
+            &self,
+            object_path: String,
+            filesystem_path: String,
+            is_public: bool,
+        ) -> AnyhowResult<()>{
+            println!("Download File to Disk");
+            println!("{}",object_path);
+            println!("{}",filesystem_path);
+            println!("{}",is_public);
+            Ok(())
+        }
+        async fn upload_file_with_content_type_process(&self, object_name: &str,
+                                                       bytes: &[u8],
+                                                       content_type: &str,
+                                                       is_public: bool) -> AnyhowResult<()> {
+            println!("Upload File to Disk");
+            println!("{}",object_name);
+            println!("{}",content_type);
+            println!("{}",is_public);
+            Ok(())
+        }
+    }
+
     #[tokio::test]
 
     async fn remote_file_manager_descriptor_test() {
@@ -105,41 +131,70 @@ mod tests {
         assert_eq!(file_descriptor.get_prefix(), "loRA");
         assert_eq!(file_descriptor.get_suffix(), "safetensors");
         assert_eq!(file_descriptor.is_public(), false);
+
     }
     #[tokio::test]
     async fn remote_file_manager_download_existing_file() {
         use super::*;
 
-        //std::env::set_var(TEST_STORYTELLER_ROOT, "/testing/storyteller/root");
+        env_logger::init();
 
-        // assert_eq!(get_storyteller_root(), PathBuf::from("/testing/storyteller/root"));
-        // std::env::remove_var(TEST_STORYTELLER_ROOT);
-        // let access_key = easyenv::get_env_string_required("ACCESS_KEY")?;
-        // let secret_key = easyenv::get_env_string_required("SECRET_KEY")?;
-        // let region_name = easyenv::get_env_string_required("REGION_NAME")?;
-        // let public_bucket_name = easyenv::get_env_string_required("PUBLIC_BUCKET_NAME")?;
-        // let private_bucket_name = easyenv::get_env_string_required("PRIVATE_BUCKET_NAME")?;
+        let file_path:&str= "./file_path_here";
+
+        // let seed_tool_data_root = get_seed_tool_data_root();
+        // let file_path = seed_tool_data_root.join(file_path);
+        let file_path = file_path.to_str().unwrap();
+        let remote_cloud_file_manager = RemoteCloudFileClient {
+            bucket_orchestration_client: Box::new(BucketOrchestrationCore {})
+        };
+
+        println!("begin upload from file_path: {:?}", file_path);
+        let details = RemoteCloudBucketDetails {
+            object_hash: String::from("123"),
+            prefix: String::from("loRA"),
+            suffix: String::from("safetensors")
+        };
+        let result = remote_cloud_file_manager.download_file(details,file_path).await;
+        
+        match result {
+            Ok(file_meta_data) => {
+                println!("file_meta_data: {:?}", file_meta_data);
+            },
+            Err(e) => {
+                println!("error: {:?}", e);
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn remote_file_manager_upload_existing_file() {
+        use super::*;
 
         env_logger::init();
 
-        // let weight_path:&str= "models/imagegen/loRA/nijiMecha.safetensors";
+        let weight_path:&str= "models/imagegen/loRA/nijiMecha.safetensors";
 
         // let seed_tool_data_root = get_seed_tool_data_root();
         // let weight_path = seed_tool_data_root.join(weight_path);
-        // let weight_path = weight_path.to_str().unwrap();
+        let weight_path = weight_path.to_str().unwrap();
+        let remote_cloud_file_manager = RemoteCloudFileClient {
+            bucket_orchestration_client: Box::new(BucketOrchestrationCore {})
+        };
 
-        // println!("begin upload from weight_path: {:?}", weight_path);
-        // let result = remote_cloud_file_manager.upload_file(Box::new(WeightsLoRADescriptor {}),weight_path).await;
-        
-        // match result {
-        //     Ok(file_meta_data) => {
-        //         println!("file_meta_data: {:?}", file_meta_data);
-        //     },
-        //     Err(e) => {
-        //         println!("error: {:?}", e);
-        //     }
-        // }
-  
+        println!("begin upload from weight_path: {:?}", weight_path);
+
+        let result = remote_cloud_file_manager.upload_file(Box::new(WeightsLoRADescriptor {}),weight_path).await;
+
+        match result {
+            Ok(file_meta_data) => {
+                println!("file_meta_data: {:?}", file_meta_data);
+            },
+            Err(e) => {
+                println!("error: {:?}", e);
+            }
+        }
     }
+
+
 
 }
