@@ -3,8 +3,8 @@ mod tests {
     use anyhow::Ok;
     use rand::Rng;
     use serial_test::serial;
-    use sqlx::MySqlPool;
     use sqlx::mysql::MySqlPoolOptions;
+    use sqlx::MySqlPool;
     use tokio;
 
     use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
@@ -26,8 +26,8 @@ mod tests {
         undelete_weights_as_user,
     };
     use crate::queries::model_weights::get_weight::get_weight_by_token;
-    use crate::queries::model_weights::list_weights_by_user::list_weights_by_creator_username;
-    use crate::queries::model_weights::list_weights_query_builder::ListWeightsQueryBuilder;
+    use crate::queries::model_weights::list::list_weights_by_user::list_weights_by_creator_username;
+    use crate::queries::model_weights::list::list_weights_query_builder::ListWeightsQueryBuilder;
     use crate::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 
     async fn setup() -> sqlx::Pool<sqlx::MySql> {

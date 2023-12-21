@@ -12,7 +12,7 @@ use enums::by_table::model_weights::{
   weights_category::WeightsCategory,
   weights_types::WeightsType,
 };
-use mysql_queries::queries::model_weights::list_weights_by_tokens::list_weights_by_tokens;
+use mysql_queries::queries::model_weights::list::list_weights_by_tokens::list_weights_by_tokens;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;

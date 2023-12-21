@@ -2,20 +2,18 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use chrono::{ DateTime, Utc };
-
+use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
 
 use config::shared_constants::DEFAULT_MYSQL_QUERY_RESULT_PAGE_SIZE;
+use enums::by_table::model_weights::{
+    weights_category::WeightsCategory,
+    weights_types::WeightsType,
+};
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::tokens::users::UserToken;
 use tokens::tokens::model_weights::ModelWeightToken;
-
-use enums::by_table::model_weights::{
-    weights_types::WeightsType,
-    weights_category::WeightsCategory,
-};
+use tokens::tokens::users::UserToken;
 
 #[derive(Serialize)]
 pub struct WeightsPage {
@@ -466,11 +464,12 @@ struct RawWeightJoinUser {
 
 #[cfg(test)]
 mod tests {
-    use crate::queries::model_weights::list_weights_query_builder::ListWeightsQueryBuilder;
     use enums::by_table::model_weights::{
-        weights_types::WeightsType,
         weights_category::WeightsCategory,
+        weights_types::WeightsType,
     };
+
+    use crate::queries::model_weights::list::list_weights_query_builder::ListWeightsQueryBuilder;
 
     #[test]
     fn predicates_without_scoping() {

@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use sqlx::{Acquire, FromRow, MySql, MySqlConnection, MySqlPool, QueryBuilder, Row};
+use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
 
 use enums::by_table::model_weights::{
@@ -11,7 +11,6 @@ use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
-
 
 pub struct WeightsForUserListPage {
   pub records: Vec<WeightsJoinUserRecord>,

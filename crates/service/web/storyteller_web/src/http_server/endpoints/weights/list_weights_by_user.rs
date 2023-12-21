@@ -8,13 +8,12 @@ use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
-use enums::by_table::media_files::media_file_type::MediaFileType;
 
 use enums::common::visibility::Visibility;
-use mysql_queries::queries::model_weights::list_weights_by_user::{list_weights_by_creator_username, ListWeightsForUserArgs};
+use mysql_queries::queries::model_weights::list::list_weights_by_user::{list_weights_by_creator_username, ListWeightsForUserArgs};
 use tokens::tokens::model_weights::ModelWeightToken;
-use crate::http_server::common_responses::pagination_page::PaginationPage;
 
+use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
