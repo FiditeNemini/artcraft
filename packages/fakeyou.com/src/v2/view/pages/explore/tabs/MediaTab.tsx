@@ -1,39 +1,40 @@
-import React, { useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-import mockMediaData from "./mockMediaData";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
-import Select from "components/common/Select";
+import { TempSelect } from "components/common";
 import {
   faArrowDownWideShort,
   faFilter,
 } from "@fortawesome/pro-solid-svg-icons";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
+import { ListMediaFiles } from "@storyteller/components/src/api/media_files/ListMediaFiles";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import { useListContent } from "hooks";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function MediaTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [data, setData] = useState(mockMediaData);
   const [isLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
 
-  const fetchMoreData = () => {
-    // Simulate a delay (like fetching API)
-    setTimeout(() => {
-      const moreData = data.concat(
-        // Here, create more dummy data
-        mockMediaData.map(item => ({ ...item, id: item.token + data.length }))
-      );
+  const [list, listSet] = useState<MediaFile[]>([]);
+  const media = useListContent({
+    fetcher: ListMediaFiles,
+    list,
+    listSet,
+    pagePreset: 1,
+    requestList: true,
+    isInfiniteScroll: true,
+  });
 
-      setData(moreData);
-
-      if (moreData.length >= mockMediaData.length * 2) {
-        setHasMore(false);
-      }
-    }, 1500);
-  };
+  // Fetch more data for infinite scroll
+  const fetchMoreData = useCallback(() => {
+    if (media.page < media.pageCount) {
+      media.pageChange(media.page + 1);
+    }
+  }, [media]);
 
   const filterOptions = [
     { value: "all", label: "All Media" },
@@ -52,17 +53,23 @@ export default function MediaTab() {
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
         <div className="d-flex gap-2 flex-grow-1">
-          <Select
-            icon={faArrowDownWideShort}
-            options={sortOptions}
-            defaultValue={sortOptions[0]}
-            isSearchable={false}
+          <TempSelect
+            {...{
+              icon: faArrowDownWideShort,
+              options: sortOptions,
+              name: "sort",
+              onChange: media.onChange,
+              value: media.sort,
+            }}
           />
-          <Select
-            icon={faFilter}
-            options={filterOptions}
-            defaultValue={filterOptions[0]}
-            isSearchable={false}
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: filterOptions,
+              name: "filter",
+              onChange: media.onChange,
+              value: media.filter,
+            }}
           />
         </div>
       </div>
@@ -75,8 +82,9 @@ export default function MediaTab() {
           </div>
         ) : (
           <InfiniteScroll
+            dataLength={list.length}
             next={fetchMoreData}
-            hasMore={hasMore}
+            hasMore={media.page < media.pageCount}
             loader={
               <div className="mt-4 d-flex justify-content-center">
                 <div className="spinner-border text-light" role="status">
@@ -84,41 +92,29 @@ export default function MediaTab() {
                 </div>
               </div>
             }
-            dataLength={data.length}
+            endMessage={
+              <p className="text-center mt-4 opacity-75">No more results.</p>
+            }
             className="overflow-hidden"
           >
             <MasonryGrid
               gridRef={gridContainerRef}
               onLayoutComplete={() => console.log("Layout complete!")}
             >
-              {data.map((data, index) => {
+              {media.list.map((data: MediaFile, index: number) => {
                 let card;
                 switch (data.media_type) {
                   case "audio":
-                    card = (
-                      <AudioCard
-                        key={index}
-                        data={data}
-                        type="media"
-                        showCreator={true}
-                      />
-                    );
+                    card = <AudioCard data={data} type="media" />;
                     break;
                   case "image":
-                    card = (
-                      <ImageCard
-                        key={index}
-                        data={data}
-                        type="media"
-                        showCreator={true}
-                      />
-                    );
+                    card = <ImageCard data={data} type="media" />;
                     break;
                   case "video":
-                    card = <VideoCard key={index} data={data} type="media" />;
+                    card = <VideoCard data={data} type="media" />;
                     break;
                   default:
-                    card = <div key={index}>Unsupported media type</div>;
+                    card = <div>Unsupported media type</div>;
                 }
                 return (
                   <div
