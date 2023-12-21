@@ -125,7 +125,7 @@ impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsR
 
 pub struct WeightsRVCIndexDescriptor {}
 
-impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsRVCDescriptor {
+impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsRVCIndexDescriptor {
     fn remote_directory_path(&self) -> &str {
         return REMOTE_FILE_DIRECTORY;
     }

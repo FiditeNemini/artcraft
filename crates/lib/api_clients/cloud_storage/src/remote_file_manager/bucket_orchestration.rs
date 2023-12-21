@@ -1,9 +1,11 @@
-use errors::AnyhowResult;
-use crate::bucket_client::BucketClient;
-use tokio::time::Duration;
 use log::info;
-use crate::remote_file_manager_mock::bucket_orchestration_mock;
+use tokio::time::Duration;
+
 use async_trait::async_trait;
+use errors::AnyhowResult;
+
+use crate::bucket_client::BucketClient;
+
 #[async_trait]
 pub trait BucketOrchestrationDownload {
      async fn download_file_to_disk(
@@ -16,13 +18,11 @@ pub trait BucketOrchestrationDownload {
 
 #[async_trait]
 pub trait BucketOrchestrationUpload {
-      async fn upload_file_with_content_type_process(&self,object_name: &str,
+     async fn upload_file_with_content_type_process(&self,object_name: &str,
                                                        bytes: &[u8],
                                                        content_type: &str,
                                                        is_public:bool) -> AnyhowResult<()>;
 }
-
-
 
 pub struct BucketOrchestration {
     access_key: String,
@@ -32,9 +32,10 @@ pub struct BucketOrchestration {
     private_bucket_name: String,
 }
 
+#[async_trait]
 impl BucketOrchestrationDownload for BucketOrchestration {
-    #[async_trait]
-    async fn download_file_to_disk(
+
+     async fn download_file_to_disk(
         &self,
         object_path: String,
         filesystem_path: String,
@@ -42,13 +43,13 @@ impl BucketOrchestrationDownload for BucketOrchestration {
     ) -> AnyhowResult<()> {
         let bucket_client = self.get_bucket_with_visbility(is_public).await?;
         bucket_client.download_file_to_disk(object_path, filesystem_path).await
-
     }
 }
 
-impl BucketOrchestrationUpload for BucketOrchestration {
-    #[async_trait]
-     async fn upload_file_with_content_type_process(&self,object_name: &str,
+#[async_trait]
+ impl BucketOrchestrationUpload for BucketOrchestration {
+
+       async fn upload_file_with_content_type_process(&self,object_name: &str,
                                                        bytes: &[u8],
                                                        content_type: &str,
                                                        is_public:bool) -> AnyhowResult<()> {

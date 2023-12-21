@@ -25,6 +25,8 @@ use storyteller_root::get_seed_tool_data_root;
 use std::path::Path;
 
 use bucket_orchestration::BucketOrchestration;
+use crate::remote_file_manager::bucket_orchestration::{BucketOrchestrationDownload, BucketOrchestrationUpload};
+
 struct RemoteCloudFileClient {
     bucket_orchestration_client: BucketOrchestration
 }
@@ -41,6 +43,7 @@ impl RemoteCloudFileClient {
         let file_bucket_directory = FileBucketDirectory::from_existing_bucket_details(remote_cloud_bucket_details);
         let full_remote_cloud_file_path = file_bucket_directory.get_full_remote_cloud_file_path().to_string();
         let is_public = file_descriptor.is_public().clone();
+
 
         self.bucket_orchestration_client.download_file_to_disk(full_remote_cloud_file_path, to_system_file_path, is_public).await?;
         Ok(())

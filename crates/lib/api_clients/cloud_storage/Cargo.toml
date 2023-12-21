@@ -30,8 +30,7 @@ my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 anyhow = "1.0.75"
 log = "0.4.14"
 env_logger = "0.10.1"
-async-trait = "0.1.58"
-
+async-trait = "0.1.75"
 # The "never-encode-slash" feature seems to have been removed:
 # https://github.com/durch/rust-s3/pull/254
 rust-s3 = { version = "0.33.0" }
@@ -39,3 +38,4 @@ rust-s3 = { version = "0.33.0" }
 # Runtime
 # NB: We switched to Tokio from `async-std` for broader ecosystem support.
 tokio = { version = "1.34.0", features = ["macros"] }
+
