@@ -11,6 +11,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use log::warn;
+use utoipa::ToSchema;
 
 use mysql_queries::queries::user_bookmarks::delete_user_bookmark::delete_user_bookmark;
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
@@ -20,18 +21,18 @@ use crate::http_server::web_utils::response_success_helpers::simple_json_success
 use crate::server_state::ServerState;
 
 /// For the URL PathInfo
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct DeleteUserBookmarkPathInfo {
   user_bookmark_token: UserBookmarkToken,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct DeleteUserBookmarkRequest {
   /// NB: this is only to disambiguate when a user is both a mod and an author.
   as_mod: Option<bool>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum DeleteUserBookmarkError {
   BadInput(String),
   NotAuthorized,
@@ -68,6 +69,20 @@ impl fmt::Display for DeleteUserBookmarkError {
   }
 }
 
+#[utoipa::path(
+  delete,
+  path = "/v1/user_bookmarks/delete/{user_bookmark_token}",
+  params(
+  ("user_bookmark_token", description = "UserBookmarkToken"),
+  ),
+  responses(
+    (status = 200, description = "Delete User Bookmark", body = SimpleGenericJsonSuccess),
+    (status = 400, description = "Bad input", body = DeleteUserBookmarkError),
+    (status = 401, description = "Not authorized", body = DeleteUserBookmarkError),
+    (status = 404, description = "Not found", body = DeleteUserBookmarkError),
+    (status = 500, description = "Server error", body = DeleteUserBookmarkError),
+  ),
+)]
 pub async fn delete_user_bookmark_handler(
   http_request: HttpRequest,
   path: Path<DeleteUserBookmarkPathInfo>,
