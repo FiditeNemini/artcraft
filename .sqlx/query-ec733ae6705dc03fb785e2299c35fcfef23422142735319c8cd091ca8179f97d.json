@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n            SELECT              \n                mw.token as `token: tokens::tokens::model_weights::ModelWeightToken`,\n                mw.title,\n                mw.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,\n                mw.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,\n                mw.maybe_thumbnail_token,\n                mw.description_markdown,\n                mw.description_rendered_html,\n                users.token as `creator_user_token: tokens::tokens::users::UserToken`,\n                users.username as creator_username,\n                users.display_name as creator_display_name,\n                users.email_gravatar_hash as creator_email_gravatar_hash,\n                mw.creator_ip_address,\n                mw.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n                mw.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,\n                mw.original_download_url,\n                mw.original_filename,\n                mw.file_size_bytes,\n                mw.file_checksum_sha2,\n                mw.private_bucket_hash,\n                mw.maybe_private_bucket_prefix,\n                mw.maybe_private_bucket_extension,\n                mw.cached_user_ratings_negative_count,\n                mw.cached_user_ratings_positive_count,\n                mw.cached_user_ratings_total_count,\n                mw.maybe_cached_user_ratings_ratio,\n                mw.cached_user_ratings_last_updated_at,\n                mw.version,\n                mw.created_at,\n                mw.updated_at,\n                mw.user_deleted_at,\n                mw.mod_deleted_at\n            FROM model_weights as mw\n            JOIN users\n                ON users.token = mw.creator_user_token\n            WHERE\n                users.username = ?\n            ",
+  "query": "\n            SELECT              \n                mw.token as `token: tokens::tokens::model_weights::ModelWeightToken`,\n                mw.title,\n                mw.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,\n                mw.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,\n                mw.maybe_thumbnail_token,\n                mw.description_markdown,\n                mw.description_rendered_html,\n                users.token as `creator_user_token: tokens::tokens::users::UserToken`,\n                users.username as creator_username,\n                users.display_name as creator_display_name,\n                users.email_gravatar_hash as creator_email_gravatar_hash,\n                mw.creator_ip_address,\n                mw.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n                mw.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,\n                mw.original_download_url,\n                mw.original_filename,\n                mw.file_size_bytes,\n                mw.file_checksum_sha2,\n                mw.public_bucket_hash,\n                mw.maybe_public_bucket_prefix,\n                mw.maybe_public_bucket_extension,\n                mw.cached_user_ratings_negative_count,\n                mw.cached_user_ratings_positive_count,\n                mw.cached_user_ratings_total_count,\n                mw.maybe_cached_user_ratings_ratio,\n                mw.cached_user_ratings_last_updated_at,\n                mw.version,\n                mw.created_at,\n                mw.updated_at,\n                mw.user_deleted_at,\n                mw.mod_deleted_at\n            FROM model_weights as mw\n            JOIN users\n                ON users.token = mw.creator_user_token\n            WHERE\n                users.username = ?\n            ",
   "describe": {
     "columns": [
       {
@@ -185,7 +185,7 @@
       },
       {
         "ordinal": 18,
-        "name": "private_bucket_hash",
+        "name": "public_bucket_hash",
         "type_info": {
           "type": "VarString",
           "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
@@ -195,7 +195,7 @@
       },
       {
         "ordinal": 19,
-        "name": "maybe_private_bucket_prefix",
+        "name": "maybe_public_bucket_prefix",
         "type_info": {
           "type": "VarString",
           "flags": "BINARY",
@@ -205,7 +205,7 @@
       },
       {
         "ordinal": 20,
-        "name": "maybe_private_bucket_extension",
+        "name": "maybe_public_bucket_extension",
         "type_info": {
           "type": "VarString",
           "flags": "BINARY",
@@ -351,5 +351,5 @@
       true
     ]
   },
-  "hash": "3d586592422727dcc928574966bdf5081ac69fdbb856fffcbd68187fd99c4642"
+  "hash": "ec733ae6705dc03fb785e2299c35fcfef23422142735319c8cd091ca8179f97d"
 }

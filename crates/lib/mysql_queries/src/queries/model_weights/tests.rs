@@ -76,9 +76,9 @@ mod tests {
             original_filename: Some("filename1.txt".to_string()),
             file_size_bytes: 1024,
             file_checksum_sha2: "checksum1".to_string(),
-            private_bucket_hash: "bucket_hash1".to_string(),
-            maybe_private_bucket_prefix: Some("_fake".to_string()),
-            maybe_private_bucket_extension: Some("rvc".to_string()),
+            public_bucket_hash: "bucket_hash1".to_string(),
+            maybe_public_bucket_prefix: Some("_fake".to_string()),
+            maybe_public_bucket_extension: Some("rvc".to_string()),
             cached_user_ratings_total_count: 10,
             cached_user_ratings_positive_count: 9,
             cached_user_ratings_negative_count: 1,
@@ -112,9 +112,9 @@ mod tests {
         assert_eq!(result.original_filename, Some("filename1.txt".to_string()));
         assert_eq!(result.file_size_bytes, 1024);
         assert_eq!(result.file_checksum_sha2, "checksum1".to_string());
-        assert_eq!(result.private_bucket_hash, "bucket_hash1".to_string());
-        assert_eq!(result.maybe_private_bucket_prefix, Some("_fake".to_string()));
-        assert_eq!(result.maybe_private_bucket_extension, Some("rvc".to_string()));
+        assert_eq!(result.public_bucket_hash, "bucket_hash1".to_string());
+        assert_eq!(result.maybe_public_bucket_prefix, Some("_fake".to_string()));
+        assert_eq!(result.maybe_public_bucket_extension, Some("rvc".to_string()));
         assert_eq!(result.cached_user_ratings_total_count, 10);
         assert_eq!(result.cached_user_ratings_positive_count, 9);
         assert_eq!(result.cached_user_ratings_negative_count, 1);
@@ -151,9 +151,9 @@ mod tests {
             original_filename: Some("filename1.txt".to_string()),
             file_size_bytes: 1024,
             file_checksum_sha2: "checksum1".to_string(),
-            private_bucket_hash: "bucket_hash1".to_string(),
-            maybe_private_bucket_prefix: Some("_fake".to_string()),
-            maybe_private_bucket_extension: Some("rvc".to_string()),
+            public_bucket_hash: "bucket_hash1".to_string(),
+            maybe_public_bucket_prefix: Some("_fake".to_string()),
+            maybe_public_bucket_extension: Some("rvc".to_string()),
             cached_user_ratings_total_count: 10,
             cached_user_ratings_positive_count: 9,
             cached_user_ratings_negative_count: 1,
@@ -228,9 +228,9 @@ mod tests {
             original_filename: Some("filename1.txt".to_string()),
             file_size_bytes: 1024,
             file_checksum_sha2: "checksum1".to_string(),
-            private_bucket_hash: "bucket_hash1".to_string(),
-            maybe_private_bucket_prefix: Some("_fake".to_string()),
-            maybe_private_bucket_extension: Some("rvc".to_string()),
+            public_bucket_hash: "bucket_hash1".to_string(),
+            maybe_public_bucket_prefix: Some("_fake".to_string()),
+            maybe_public_bucket_extension: Some("rvc".to_string()),
             cached_user_ratings_total_count: 10,
             cached_user_ratings_positive_count: 9,
             cached_user_ratings_negative_count: 1,
@@ -340,9 +340,9 @@ mod tests {
                 original_filename: Some(format!("filename {}.txt", i)),
                 file_size_bytes: 1024,
                 file_checksum_sha2: format!("checksum{}", i),
-                private_bucket_hash: format!("bucket_hash{}", i),
-                maybe_private_bucket_prefix: Some("_fake".to_string()),
-                maybe_private_bucket_extension: Some("rvc".to_string()),
+                public_bucket_hash: format!("bucket_hash{}", i),
+                maybe_public_bucket_prefix: Some("_fake".to_string()),
+                maybe_public_bucket_extension: Some("rvc".to_string()),
                 cached_user_ratings_total_count: 10,
                 cached_user_ratings_positive_count: 9,
                 cached_user_ratings_negative_count: 1,
@@ -583,9 +583,9 @@ mod tests {
                 original_filename: Some(format!("filename {}.txt", i)),
                 file_size_bytes: 1024,
                 file_checksum_sha2: format!("checksum{}", i),
-                private_bucket_hash: format!("bucket_hash{}", i),
-                maybe_private_bucket_prefix: Some("_fake".to_string()),
-                maybe_private_bucket_extension: Some("rvc".to_string()),
+                public_bucket_hash: format!("bucket_hash{}", i),
+                maybe_public_bucket_prefix: Some("_fake".to_string()),
+                maybe_public_bucket_extension: Some("rvc".to_string()),
                 cached_user_ratings_total_count: 10,
                 cached_user_ratings_positive_count: 9,
                 cached_user_ratings_negative_count: 1,

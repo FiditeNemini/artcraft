@@ -80,8 +80,8 @@ async fn lookup_bucket_details_from_record(model_weight_token: &ModelWeightToken
   };
 
   let bucket_path = match model_weight_record.weights_type {
-    WeightsType::RvcV2 => WeightFileBucketPath::rvc_model_file_from_object_hash(&model_weight_record.private_bucket_hash),
-    WeightsType::SoVitsSvc => WeightFileBucketPath::svc_model_file_from_object_hash(&model_weight_record.private_bucket_hash),
+    WeightsType::RvcV2 => WeightFileBucketPath::rvc_model_file_from_object_hash(&model_weight_record.public_bucket_hash),
+    WeightsType::SoVitsSvc => WeightFileBucketPath::svc_model_file_from_object_hash(&model_weight_record.public_bucket_hash),
     _ => return Ok(None), // NB: Stable Diffusion, etc. aren't valid for migration
   };
 

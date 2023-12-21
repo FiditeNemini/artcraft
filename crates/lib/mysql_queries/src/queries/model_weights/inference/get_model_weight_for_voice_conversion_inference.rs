@@ -65,9 +65,9 @@ SELECT
     w.title,
     vc.has_index_file,
 
-    w.private_bucket_hash,
-    w.maybe_private_bucket_prefix,
-    w.maybe_private_bucket_extension,
+    w.public_bucket_hash,
+    w.maybe_public_bucket_prefix,
+    w.maybe_public_bucket_extension,
 
     w.created_at,
     w.updated_at,
@@ -111,9 +111,9 @@ WHERE w.token = ?
     weights_type: model.weights_type,
     title: model.title,
     has_index_file: i8_to_bool(model.has_index_file),
-    public_bucket_hash: model.private_bucket_hash,
-    maybe_public_bucket_prefix: model.maybe_private_bucket_prefix,
-    maybe_public_bucket_extension: model.maybe_private_bucket_extension,
+    public_bucket_hash: model.public_bucket_hash,
+    maybe_public_bucket_prefix: model.maybe_public_bucket_prefix,
+    maybe_public_bucket_extension: model.maybe_public_bucket_extension,
     created_at: model.created_at,
     updated_at: model.updated_at,
     mod_deleted_at: model.mod_deleted_at,
@@ -129,9 +129,9 @@ struct InternalRecord {
 
   has_index_file: i8,
 
-  private_bucket_hash: String,
-  maybe_private_bucket_prefix: Option<String>,
-  maybe_private_bucket_extension: Option<String>,
+  public_bucket_hash: String,
+  maybe_public_bucket_prefix: Option<String>,
+  maybe_public_bucket_extension: Option<String>,
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,

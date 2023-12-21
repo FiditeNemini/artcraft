@@ -1,18 +1,16 @@
-use container_common::anyhow_result::AnyhowResult;
-
-use sqlx::{ MySqlPool, MySql };
-use sqlx::pool::PoolConnection;
 use anyhow::anyhow;
-use log::{ error };
+use chrono::{DateTime, Utc};
+use log::error;
+use sqlx::{MySql, MySqlPool};
+use sqlx::pool::PoolConnection;
 
-use enums::by_table::model_weights::weights_types::WeightsType;
+use container_common::anyhow_result::AnyhowResult;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
-
+use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
-use tokens::tokens::{ users::UserToken, model_weights::ModelWeightToken };
-use chrono::{ DateTime, Utc };
+use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
 
-// Notes ensure that Enums have sqlx::Type 
+// Notes ensure that Enums have sqlx::Type
 //  'weights_type: enums::by_table::model_weights::weights_types::WeightsType' use this to map
 // Retrieved Model Weight can be constrained to the fields that are needed
 
@@ -32,9 +30,9 @@ pub struct RetrivedModelWeight {
     pub original_filename: Option<String>,
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
-    pub private_bucket_hash: String,
-    pub maybe_private_bucket_prefix: Option<String>, // TODO crossproduct rename these to public thx ^-^
-    pub maybe_private_bucket_extension: Option<String>,
+    pub public_bucket_hash: String,
+    pub maybe_public_bucket_prefix: Option<String>,
+    pub maybe_public_bucket_extension: Option<String>,
     pub cached_user_ratings_negative_count: u32,
     pub cached_user_ratings_positive_count: u32,
     pub cached_user_ratings_total_count: u32,
@@ -97,9 +95,9 @@ pub async fn get_weights_by_token_with_connection(
             original_filename: record.original_filename,
             file_size_bytes: record.file_size_bytes,
             file_checksum_sha2: record.file_checksum_sha2,
-            private_bucket_hash: record.private_bucket_hash,
-            maybe_private_bucket_prefix: record.maybe_private_bucket_prefix,
-            maybe_private_bucket_extension: record.maybe_private_bucket_extension,
+            public_bucket_hash: record.public_bucket_hash,
+            maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
+            maybe_public_bucket_extension: record.maybe_public_bucket_extension,
             cached_user_ratings_negative_count: record.cached_user_ratings_negative_count,
             cached_user_ratings_positive_count: record.cached_user_ratings_positive_count,
             cached_user_ratings_total_count: record.cached_user_ratings_total_count,
@@ -138,9 +136,9 @@ async fn select_include_deleted(
         wt.original_filename,
         wt.file_size_bytes,
         wt.file_checksum_sha2,
-        wt.private_bucket_hash,
-        wt.maybe_private_bucket_prefix,
-        wt.maybe_private_bucket_extension,
+        wt.public_bucket_hash,
+        wt.maybe_public_bucket_prefix,
+        wt.maybe_public_bucket_extension,
         wt.cached_user_ratings_negative_count,
         wt.cached_user_ratings_positive_count,
         wt.cached_user_ratings_total_count,
@@ -186,9 +184,9 @@ async fn select_without_deleted(
         wt.original_filename,
         wt.file_size_bytes,
         wt.file_checksum_sha2,
-        wt.private_bucket_hash,
-        wt.maybe_private_bucket_prefix,
-        wt.maybe_private_bucket_extension,
+        wt.public_bucket_hash,
+        wt.maybe_public_bucket_prefix,
+        wt.maybe_public_bucket_extension,
         wt.cached_user_ratings_negative_count,
         wt.cached_user_ratings_positive_count,
         wt.cached_user_ratings_total_count,
@@ -228,9 +226,9 @@ pub struct RawWeight {
     pub original_filename: Option<String>,
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
-    pub private_bucket_hash: String,
-    pub maybe_private_bucket_prefix: Option<String>,
-    pub maybe_private_bucket_extension: Option<String>,
+    pub public_bucket_hash: String,
+    pub maybe_public_bucket_prefix: Option<String>,
+    pub maybe_public_bucket_extension: Option<String>,
     pub cached_user_ratings_negative_count: u32,
     pub cached_user_ratings_positive_count: u32,
     pub cached_user_ratings_total_count: u32,
