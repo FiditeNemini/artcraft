@@ -2,6 +2,7 @@ pub mod delete_media_file;
 pub mod get_media_file;
 pub mod insert_media_file_from_cli_tool;
 pub mod insert_media_file_from_face_animation;
+pub mod insert_media_file_from_file_upload;
 pub mod insert_media_file_from_rerender;
 pub mod insert_media_file_from_tacotron2;
 pub mod insert_media_file_from_voice_conversion;

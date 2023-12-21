@@ -49,6 +49,10 @@ pub enum IdCategory {
 
   #[serde(rename = "model_weights")]
   ModelWeights,
+
+  /// Files that are uploaded with no general product area they belong to. (Eg. local dev testing)
+  #[serde(rename = "file_upload")]
+  FileUpload,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -68,6 +72,7 @@ impl IdCategory {
       Self::ZeroShotTtsResult => "zs_tts_result",
       Self::VideoFilterResult => "video_filter",
       Self::ModelWeights => "model_weights",
+      Self::FileUpload => "file_upload",
     }
   }
 
@@ -82,6 +87,7 @@ impl IdCategory {
       "zs_tts_result" => Ok(Self::ZeroShotTtsResult),
       "video_filter" => Ok(Self::VideoFilterResult),
       "model_weights" => Ok(Self::ModelWeights),
+      "file_upload" => Ok(Self::FileUpload),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -99,6 +105,7 @@ impl IdCategory {
       Self::ZeroShotVoiceDataset,
       Self::ZeroShotVoiceEmbedding,
       Self::ModelWeights,
+      Self::FileUpload,
     ])
   }
 }
@@ -121,7 +128,8 @@ mod tests {
     assert_serialization(IdCategory::ZeroShotVoiceDataset, "zs_dataset");
     assert_serialization(IdCategory::ZeroShotVoiceEmbedding, "zs_voice");
     assert_serialization(IdCategory::ZeroShotTtsResult, "zs_tts_result");
-    assert_serialization(IdCategory::ModelWeights, "model_weights")
+    assert_serialization(IdCategory::ModelWeights, "model_weights");
+    assert_serialization(IdCategory::FileUpload, "file_upload");
   }
 
     #[test]
@@ -135,6 +143,7 @@ mod tests {
       assert_eq!(IdCategory::ZeroShotVoiceEmbedding.to_str(), "zs_voice");
       assert_eq!(IdCategory::ZeroShotTtsResult.to_str(), "zs_tts_result");
       assert_eq!(IdCategory::ModelWeights.to_str(), "model_weights");
+      assert_eq!(IdCategory::FileUpload.to_str(), "file_upload");
     }
 
     #[test]
@@ -148,13 +157,14 @@ mod tests {
       assert_eq!(IdCategory::from_str("zs_voice").unwrap(), IdCategory::ZeroShotVoiceEmbedding);
       assert_eq!(IdCategory::from_str("zs_tts_result").unwrap(), IdCategory::ZeroShotTtsResult);
       assert_eq!(IdCategory::from_str("model_weights").unwrap(), IdCategory::ModelWeights);
+      assert_eq!(IdCategory::from_str("file_upload").unwrap(), IdCategory::FileUpload);
     }
 
     #[test]
     fn all_variants() {
       // Static check
       let mut variants = IdCategory::all_variants();
-      assert_eq!(variants.len(), 9);
+      assert_eq!(variants.len(), 10);
       assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
       assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimationResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::VideoFilterResult));
@@ -164,6 +174,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotVoiceDataset));
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotVoiceEmbedding));
       assert_eq!(variants.pop_first(), Some(IdCategory::ModelWeights));
+      assert_eq!(variants.pop_first(), Some(IdCategory::FileUpload));
       assert_eq!(variants.pop_first(), None);
 
       // Generated check
