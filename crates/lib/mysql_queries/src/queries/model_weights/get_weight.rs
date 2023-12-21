@@ -22,9 +22,15 @@ pub struct RetrivedModelWeight {
     pub maybe_thumbnail_token: Option<String>,
     pub description_markdown: String,
     pub description_rendered_html: String,
+
     pub creator_user_token: UserToken,
+    pub creator_username: String,
+    pub creator_display_name: String,
+    pub creator_gravatar_hash: String,
+
     pub creator_ip_address: String,
     pub creator_set_visibility: Visibility,
+
     pub maybe_last_update_user_token: Option<UserToken>,
     pub original_download_url: Option<String>,
     pub original_filename: Option<String>,
@@ -93,6 +99,9 @@ pub async fn get_weights_by_token_with_connection(
             description_markdown: record.description_markdown,
             description_rendered_html: record.description_rendered_html,
             creator_user_token: record.creator_user_token,
+            creator_username: record.creator_username,
+            creator_display_name: record.creator_display_name,
+            creator_gravatar_hash: record.creator_gravatar_hash,
             creator_ip_address: record.creator_ip_address,
             creator_set_visibility: record.creator_set_visibility,
             maybe_last_update_user_token: record.maybe_last_update_user_token,
@@ -136,7 +145,12 @@ async fn select_include_deleted(
         wt.maybe_thumbnail_token,
         wt.description_markdown,
         wt.description_rendered_html,
+
         wt.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,
+        users.username as creator_username,
+        users.display_name as creator_display_name,
+        users.email_gravatar_hash AS creator_gravatar_hash,
+
         wt.creator_ip_address,
         wt.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
         wt.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,
@@ -163,6 +177,8 @@ async fn select_include_deleted(
         wt.user_deleted_at,
         wt.mod_deleted_at
         FROM model_weights as wt
+        JOIN users
+            ON users.token = wt.creator_user_token
         LEFT OUTER JOIN media_files as avatar
             ON avatar.token = wt.maybe_avatar_media_file_token
         WHERE
@@ -191,9 +207,14 @@ async fn select_without_deleted(
         wt.maybe_thumbnail_token,
         wt.description_markdown,
         wt.description_rendered_html,
-        wt.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,
         wt.creator_ip_address,
         wt.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+
+        wt.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,
+        users.username as creator_username,
+        users.display_name as creator_display_name,
+        users.email_gravatar_hash AS creator_gravatar_hash,
+
         wt.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,
         wt.original_download_url,
         wt.original_filename,
@@ -218,6 +239,8 @@ async fn select_without_deleted(
         wt.user_deleted_at,
         wt.mod_deleted_at
         FROM model_weights as wt
+        JOIN users
+            ON users.token = wt.creator_user_token
         LEFT OUTER JOIN media_files as avatar
             ON avatar.token = wt.maybe_avatar_media_file_token
         WHERE
@@ -240,7 +263,12 @@ pub struct RawWeight {
     pub maybe_thumbnail_token: Option<String>,
     pub description_markdown: String,
     pub description_rendered_html: String,
+
     pub creator_user_token: UserToken,
+    pub creator_username: String,
+    pub creator_display_name: String,
+    pub creator_gravatar_hash: String,
+
     pub creator_ip_address: String,
     pub creator_set_visibility: Visibility,
     pub maybe_last_update_user_token: Option<UserToken>,
