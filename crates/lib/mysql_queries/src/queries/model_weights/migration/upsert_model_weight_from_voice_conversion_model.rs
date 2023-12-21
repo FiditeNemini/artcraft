@@ -63,9 +63,8 @@ pub async fn upsert_model_weights_record(
 
   // NB: Not setting a few fields (for now)
   // maybe_last_update_user_token - seems like bad design
-  // TODO(bt): OBVIOUSLY COPY THE BUCKET FILES !
   // TODO(bt): file checksum
-  // TODO(bt): rename maybe_private_bucket_extension to maybe_private_bucket_suffix (!!!)
+  // TODO(bt): rename maybe_public_bucket_extension to maybe_public_bucket_suffix (!!!)
   // TODO(bt): do we need model_weights.ip_address_last_update without audit logs?
   // TODO(bt): rename creator_ip_address to ip_address_creation (and add ip_address_last_update)
   // TODO(bt): Check model_weights column integer types - signed vs unsigned
@@ -92,9 +91,9 @@ SET
   file_size_bytes = ?,
   file_checksum_sha2 = ?,
 
-  private_bucket_hash = ?,
-  maybe_private_bucket_prefix = ?,
-  maybe_private_bucket_extension = ?,
+  public_bucket_hash = ?,
+  maybe_public_bucket_prefix = ?,
+  maybe_public_bucket_extension = ?,
   cached_user_ratings_total_count = 0,
   cached_user_ratings_positive_count = 0,
   cached_user_ratings_negative_count = 0,
@@ -125,9 +124,9 @@ ON DUPLICATE KEY UPDATE
   original_filename = ?,
   file_size_bytes = ?,
   file_checksum_sha2 = ?,
-  private_bucket_hash = ?,
-  maybe_private_bucket_prefix = ?,
-  maybe_private_bucket_extension = ?,
+  public_bucket_hash = ?,
+  maybe_public_bucket_prefix = ?,
+  maybe_public_bucket_extension = ?,
   cached_user_ratings_total_count = 0,
   cached_user_ratings_positive_count = 0,
   cached_user_ratings_negative_count = 0,

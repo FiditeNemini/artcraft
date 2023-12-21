@@ -113,22 +113,22 @@ CREATE TABLE model_weights (
   -- The hash for the bucket directory that contains the original upload
   -- as well as any associated other files.
   -- The bucket filename for the primary file (not including the directory path) is given by:
-  -- `[{maybe_private_bucket_prefix}]{private_bucket_hash}[{maybe_private_bucket_extension}]`
-  private_bucket_hash  VARCHAR(32) NOT NULL,
+  -- `[{maybe_public_bucket_prefix}]{public_bucket_hash}[{maybe_public_bucket_extension}]`
+  public_bucket_hash  VARCHAR(32) NOT NULL,
 
   -- An optional prefix on the bucket filename.
   -- If present, this will be prepended to the beginning of the bucket filename to access the file.
   -- The bucket filename for the primary file (not including the directory path) is given by:
-  -- `[{maybe_private_bucket_prefix}]{private_directory_hash}[{maybe_private_bucket_extension}]`
-  maybe_private_bucket_prefix VARCHAR(16) DEFAULT NULL,
+  -- `[{maybe_public_bucket_prefix}]{public_bucket_hash}[{maybe_public_bucket_extension}]`
+  maybe_public_bucket_prefix VARCHAR(16) DEFAULT NULL,
 
   -- An optional appended extension on the bucket filename.
   -- If present, this will be appended to the end of the bucket filename to access the file.
   -- To allow for flexibility, this extension typically will contain a leading period if
   -- the file needs it (eg ".mp4" rather than "mp4")!
   -- The bucket filename for the primary file (not including the directory path) is given by:
-  -- `[{maybe_private_bucket_prefix}]{private_directory_hash}[{maybe_private_bucket_extension}]`
-  maybe_private_bucket_extension VARCHAR(16) DEFAULT NULL,
+  -- `[{maybe_public_bucket_prefix}]{public_bucket_hash}[{maybe_public_bucket_extension}]`
+  maybe_public_bucket_extension VARCHAR(16) DEFAULT NULL,
 
 
   -- ========== MODERATION DETAILS ==========

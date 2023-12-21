@@ -32,12 +32,12 @@ pub async fn download_model_file(
         Some(model_record) => {
             let model_bucket_path =
                 MediaFileBucketPath::from_object_hash(
-                    &model_record.private_bucket_hash,
-                    model_record.maybe_private_bucket_prefix.as_deref(),
-                    model_record.maybe_private_bucket_extension.as_deref(),
+                    &model_record.public_bucket_hash,
+                    model_record.maybe_public_bucket_prefix.as_deref(),
+                    model_record.maybe_public_bucket_extension.as_deref(),
                 );
-            let base_name = &model_record.private_bucket_hash;
-            let extension = model_record.maybe_private_bucket_extension.as_deref().unwrap_or("bin");
+            let base_name = &model_record.public_bucket_hash;
+            let extension = model_record.maybe_public_bucket_extension.as_deref().unwrap_or("bin");
             model_filename = format!("{base_name}.{extension}");
             bucket_object_path = model_bucket_path.to_full_object_pathbuf();
         }

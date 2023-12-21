@@ -141,9 +141,9 @@ pub async fn seed_weights_files(
             original_filename: Some(original_filename.to_string()),
             file_size_bytes: file_size_bytes as i32, // Assuming the file size is 0
             file_checksum_sha2: sha256_checksum.to_string(), // Assuming the file checksum is an empty string
-            private_bucket_hash: bucket_hash,
-            maybe_private_bucket_prefix: Some(maybe_bucket_prefix.to_string()),
-            maybe_private_bucket_extension: Some(maybe_bucket_extension.to_string()),
+            public_bucket_hash: bucket_hash,
+            maybe_public_bucket_prefix: Some(maybe_bucket_prefix.to_string()),
+            maybe_public_bucket_extension: Some(maybe_bucket_extension.to_string()),
             cached_user_ratings_total_count,
             cached_user_ratings_positive_count,
             cached_user_ratings_negative_count,

@@ -3,16 +3,14 @@ use chrono::{DateTime, Utc};
 use log::warn;
 use sqlx::{MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
-use enums::by_table::tts_models::tts_model_type::TtsModelType;
 
-use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
+use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::tts_models::TtsModelToken;
 use tokens::tokens::users::UserToken;
 use tokens::tokens::vocoder_models::VocoderModelToken;
-use tokens::tokens::voice_conversion_models::VoiceConversionModelToken;
 
 use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_optional_bool};
 

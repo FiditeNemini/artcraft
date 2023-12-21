@@ -79,9 +79,9 @@ SET
   creator_ip_address = ?,
   creator_set_visibility = ?,
 
-  private_bucket_hash = ?,
-  maybe_private_bucket_prefix = ?,
-  maybe_private_bucket_extension = ?,
+  public_bucket_hash = ?,
+  maybe_public_bucket_prefix = ?,
+  maybe_public_bucket_extension = ?,
 
   cached_user_ratings_total_count = 0,
   cached_user_ratings_positive_count = 0,

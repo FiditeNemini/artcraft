@@ -55,10 +55,9 @@ pub struct WeightJoinUser {
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
 
-    pub private_bucket_hash: String,
-
-    pub maybe_private_bucket_prefix: Option<String>,
-    pub maybe_private_bucket_extension: Option<String>,
+    pub public_bucket_hash: String,
+    pub maybe_public_bucket_prefix: Option<String>,
+    pub maybe_public_bucket_extension: Option<String>,
 
     pub cached_user_ratings_total_count: u32,
     pub cached_user_ratings_positive_count: u32,
@@ -234,9 +233,9 @@ impl ListWeightsQueryBuilder {
                     original_filename: record.original_filename,
                     file_size_bytes: record.file_size_bytes,
                     file_checksum_sha2: record.file_checksum_sha2,
-                    private_bucket_hash: record.private_bucket_hash,
-                    maybe_private_bucket_prefix: record.maybe_private_bucket_prefix,
-                    maybe_private_bucket_extension: record.maybe_private_bucket_extension,
+                    public_bucket_hash: record.public_bucket_hash,
+                    maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
+                    maybe_public_bucket_extension: record.maybe_public_bucket_extension,
                     cached_user_ratings_total_count: record.cached_user_ratings_total_count,
                     cached_user_ratings_positive_count: record.cached_user_ratings_positive_count,
                     cached_user_ratings_negative_count: record.cached_user_ratings_negative_count,
@@ -282,9 +281,9 @@ impl ListWeightsQueryBuilder {
             model_weights.original_filename,
             model_weights.file_size_bytes,
             model_weights.file_checksum_sha2,
-            model_weights.private_bucket_hash,
-            model_weights.maybe_private_bucket_prefix,
-            model_weights.maybe_private_bucket_extension,
+            model_weights.public_bucket_hash,
+            model_weights.maybe_public_bucket_prefix,
+            model_weights.maybe_public_bucket_extension,
             model_weights.cached_user_ratings_total_count,
             model_weights.cached_user_ratings_positive_count,
             model_weights.cached_user_ratings_negative_count,
@@ -442,10 +441,9 @@ struct RawWeightJoinUser {
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
 
-    pub private_bucket_hash: String,
-
-    pub maybe_private_bucket_prefix: Option<String>,
-    pub maybe_private_bucket_extension: Option<String>,
+    pub public_bucket_hash: String,
+    pub maybe_public_bucket_prefix: Option<String>,
+    pub maybe_public_bucket_extension: Option<String>,
 
     pub cached_user_ratings_total_count: u32,
     pub cached_user_ratings_positive_count: u32,

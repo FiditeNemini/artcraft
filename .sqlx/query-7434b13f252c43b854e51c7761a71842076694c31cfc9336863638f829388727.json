@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n        wt.token as `token: tokens::tokens::model_weights::ModelWeightToken`,\n        wt.title,\n        wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,\n        wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,\n        wt.maybe_thumbnail_token,\n        wt.description_markdown,\n        wt.description_rendered_html,\n        wt.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,\n        wt.creator_ip_address,\n        wt.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n        wt.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,\n        wt.original_download_url,\n        wt.original_filename,\n        wt.file_size_bytes,\n        wt.file_checksum_sha2,\n        wt.private_bucket_hash,\n        wt.maybe_private_bucket_prefix,\n        wt.maybe_private_bucket_extension,\n        wt.cached_user_ratings_negative_count,\n        wt.cached_user_ratings_positive_count,\n        wt.cached_user_ratings_total_count,\n        wt.maybe_cached_user_ratings_ratio,\n        wt.cached_user_ratings_last_updated_at,\n        wt.version,\n        wt.created_at,\n        wt.updated_at,\n        wt.user_deleted_at,\n        wt.mod_deleted_at\n        FROM model_weights as wt\n        WHERE\n            wt.token = ?\n            AND wt.user_deleted_at IS NULL\n            AND wt.mod_deleted_at IS NULL\n        ",
+  "query": "\n        SELECT\n        wt.token as `token: tokens::tokens::model_weights::ModelWeightToken`,\n        wt.title,\n        wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,\n        wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,\n        wt.maybe_thumbnail_token,\n        wt.description_markdown,\n        wt.description_rendered_html,\n        wt.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,\n        wt.creator_ip_address,\n        wt.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n        wt.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,\n        wt.original_download_url,\n        wt.original_filename,\n        wt.file_size_bytes,\n        wt.file_checksum_sha2,\n        wt.public_bucket_hash,\n        wt.maybe_public_bucket_prefix,\n        wt.maybe_public_bucket_extension,\n        wt.cached_user_ratings_negative_count,\n        wt.cached_user_ratings_positive_count,\n        wt.cached_user_ratings_total_count,\n        wt.maybe_cached_user_ratings_ratio,\n        wt.cached_user_ratings_last_updated_at,\n        wt.version,\n        wt.created_at,\n        wt.updated_at,\n        wt.user_deleted_at,\n        wt.mod_deleted_at\n        FROM model_weights as wt\n        WHERE\n            wt.token = ?\n            AND wt.user_deleted_at IS NULL\n            AND wt.mod_deleted_at IS NULL\n        ",
   "describe": {
     "columns": [
       {
@@ -155,7 +155,7 @@
       },
       {
         "ordinal": 15,
-        "name": "private_bucket_hash",
+        "name": "public_bucket_hash",
         "type_info": {
           "type": "VarString",
           "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
@@ -165,7 +165,7 @@
       },
       {
         "ordinal": 16,
-        "name": "maybe_private_bucket_prefix",
+        "name": "maybe_public_bucket_prefix",
         "type_info": {
           "type": "VarString",
           "flags": "BINARY",
@@ -175,7 +175,7 @@
       },
       {
         "ordinal": 17,
-        "name": "maybe_private_bucket_extension",
+        "name": "maybe_public_bucket_extension",
         "type_info": {
           "type": "VarString",
           "flags": "BINARY",
@@ -318,5 +318,5 @@
       true
     ]
   },
-  "hash": "f0b5767d52c389660d1859e628c746f6f33a9e1c25f21f66aeeb0784df768c8e"
+  "hash": "7434b13f252c43b854e51c7761a71842076694c31cfc9336863638f829388727"
 }
