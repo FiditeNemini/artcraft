@@ -1,0 +1,1 @@
+pub mod set_model_weight_avatar;

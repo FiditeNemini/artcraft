@@ -1,6 +1,7 @@
 pub mod create;
 pub mod create_weight;
 pub mod delete_weights;
+pub mod edit;
 pub mod get_weight;
 pub mod inference;
 pub mod list;

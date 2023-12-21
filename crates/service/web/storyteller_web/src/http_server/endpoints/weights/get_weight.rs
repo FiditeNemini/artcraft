@@ -19,6 +19,7 @@ use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 
 use utoipa::ToSchema;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 #[derive(Serialize, Clone, ToSchema)]
 pub struct GetWeightResponse {
@@ -34,7 +35,10 @@ pub struct GetWeightResponse {
 
     file_size_bytes: i32,
     file_checksum_sha2: String,
-    
+
+    /// If an avatar is set, this is the path to the asset.
+    maybe_avatar_public_bucket_path: Option<String>,
+
     cached_user_ratings_negative_count: u32,
     cached_user_ratings_positive_count: u32,
     cached_user_ratings_total_count: u32,
@@ -137,8 +141,18 @@ pub async fn get_weight_handler(
     if is_private && creator_user_token.as_str() != &user_session.user_token {
         warn!("user is not allowed to view this weight: {}", user_session.user_token);
         return Err(GetWeightError::NotAuthorized);
-    } 
+    }
 
+    let maybe_avatar = weight.maybe_avatar_public_bucket_hash
+        .as_deref()
+        .map(|hash| {
+            MediaFileBucketPath::from_object_hash(
+                hash,
+                weight.maybe_public_bucket_prefix.as_deref(),
+                weight.maybe_public_bucket_extension.as_deref())
+                .get_full_object_path_str()
+                .to_string()
+        });
 
     let response = GetWeightResponse {
         success: true,
@@ -149,6 +163,7 @@ pub async fn get_weight_handler(
         maybe_thumbnail_token: weight.maybe_thumbnail_token,
         description_markdown: weight.description_markdown,
         description_rendered_html: weight.description_rendered_html,
+        maybe_avatar_public_bucket_path: maybe_avatar,
         creator_set_visibility: weight.creator_set_visibility,
         file_size_bytes: weight.file_size_bytes,
         file_checksum_sha2: weight.file_checksum_sha2,
