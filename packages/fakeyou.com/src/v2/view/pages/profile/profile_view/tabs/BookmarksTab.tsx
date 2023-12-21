@@ -4,30 +4,30 @@ import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
 import SkeletonCard from "components/common/Card/SkeletonCard";
-import mockWeightsData from "./mockWeightsData";
 import Select from "components/common/Select";
-import {
-  faArrowDownWideShort,
-  faFilter,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
 import Pagination from "components/common/Pagination";
+
+import { useListContent } from "hooks";
+import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
 
 export default function BookmarksTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [data] = useState(mockWeightsData);
   const [isLoading] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 10;
+
+  const [list, listSet] = useState<any[]>([]);
+  const bookmarks = useListContent({ fetcher: GetBookmarksByUser, list, listSet, pagePreset: 1, requestList: true });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    setCurrentPage(selectedItem.selected);
+    bookmarks.pageChange(selectedItem.selected + 1);
   };
 
-  const currentItems = data.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
+  const paginationProps = {
+    onPageChange: handlePageClick,
+    pageCount: bookmarks.pageCount - 1,
+    currentPage: bookmarks.page - 1
+  };
 
   const filterOptions = [
     { value: "all", label: "All Weights" },
@@ -60,11 +60,11 @@ export default function BookmarksTab() {
     { value: "SDXL", label: "SD XL" },
   ];
 
-  const paginationProps = {
-    onPageChange: handlePageClick,
-    pageCount: 0, // replace with proper fecth value
-    currentPage: 0 // replace with proper fecth value
-  };
+  // const paginationProps = {
+  //   onPageChange: handlePageClick,
+  //   pageCount: 0, // replace with proper fecth value
+  //   currentPage: 0 // replace with proper fecth value
+  // };
 
   const handleFilterChange = (option: any) => {
     const selectedOption = option as { value: string; label: string };
@@ -125,7 +125,7 @@ export default function BookmarksTab() {
           gridRef={gridContainerRef}
           onLayoutComplete={() => console.log("Layout complete!")}
         >
-          {currentItems.map((data, index) => {
+          {bookmarks.list.map((data: any, index: number) => {
             let card;
             switch (data.media_type) {
               case "audio":

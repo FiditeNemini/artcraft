@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSession } from "hooks";
 
 interface Props {
+  addQueries?: any;
   fetcher: any;
   list: any;
   listSet: any;
@@ -9,7 +10,7 @@ interface Props {
   requestList?: boolean;
 }
 
-export default function useListContent({ fetcher, list, listSet, pagePreset = 0, requestList = false }: Props) {
+export default function useListContent({ addQueries, fetcher, list, listSet, pagePreset = 0, requestList = false }: Props) {
   const { user } = useSession();
   const [filter, filterSet] = useState("all");
   const [page, pageSet] = useState(pagePreset);
@@ -34,6 +35,7 @@ export default function useListContent({ fetcher, list, listSet, pagePreset = 0,
         statusSet(2);
         fetcher(user.username, {}, {
           page_index: page,
+          ...addQueries, // eventually we should provide a way to type this ... or not. It works
           ...filter !== "all" ? { filter_media_type: filter } : {},
           ...sort !== "newest" ? { sort_ascending: true } : {},
         }).then((res: any) => {
@@ -46,7 +48,7 @@ export default function useListContent({ fetcher, list, listSet, pagePreset = 0,
         });
       }
     }
-  }, [fetcher, filter, listSet, page, user, sort, status]);
+  }, [addQueries, fetcher, filter, listSet, page, user, sort, status]);
 
   return {
     filter,

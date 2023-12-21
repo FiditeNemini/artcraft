@@ -16,7 +16,7 @@ interface AudioCardProps {
 export default function AudioCard({ data, type }: AudioCardProps) {
   const history = useHistory();
 
-  // console.log("🐙",data);
+  // console.log("🐙",data, data.public_bucket_path);
 
   const handleCardClick = () => {
     if (type === "media") {
