@@ -4,8 +4,8 @@ use std::time::Instant;
 use anyhow::{anyhow, Error};
 use log::{error, info, warn};
 use serde::{Deserialize, Serialize};
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use filesys::check_file_exists::check_file_exists;
 use filesys::file_size::file_size;

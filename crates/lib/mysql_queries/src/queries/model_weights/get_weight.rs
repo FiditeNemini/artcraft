@@ -33,6 +33,11 @@ pub struct RetrivedModelWeight {
     pub public_bucket_hash: String,
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
+
+    pub maybe_avatar_public_bucket_hash: Option<String>,
+    pub maybe_avatar_public_bucket_prefix: Option<String>,
+    pub maybe_avatar_public_bucket_extension: Option<String>,
+
     pub cached_user_ratings_negative_count: u32,
     pub cached_user_ratings_positive_count: u32,
     pub cached_user_ratings_total_count: u32,
@@ -98,6 +103,9 @@ pub async fn get_weights_by_token_with_connection(
             public_bucket_hash: record.public_bucket_hash,
             maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
             maybe_public_bucket_extension: record.maybe_public_bucket_extension,
+            maybe_avatar_public_bucket_hash: record.maybe_avatar_public_bucket_hash,
+            maybe_avatar_public_bucket_prefix: record.maybe_avatar_public_bucket_prefix,
+            maybe_avatar_public_bucket_extension: record.maybe_avatar_public_bucket_extension,
             cached_user_ratings_negative_count: record.cached_user_ratings_negative_count,
             cached_user_ratings_positive_count: record.cached_user_ratings_positive_count,
             cached_user_ratings_total_count: record.cached_user_ratings_total_count,
@@ -139,6 +147,11 @@ async fn select_include_deleted(
         wt.public_bucket_hash,
         wt.maybe_public_bucket_prefix,
         wt.maybe_public_bucket_extension,
+
+        avatar.public_bucket_directory_hash as maybe_avatar_public_bucket_hash,
+        avatar.maybe_public_bucket_prefix as maybe_avatar_public_bucket_prefix,
+        avatar.maybe_public_bucket_extension as maybe_avatar_public_bucket_extension,
+
         wt.cached_user_ratings_negative_count,
         wt.cached_user_ratings_positive_count,
         wt.cached_user_ratings_total_count,
@@ -150,6 +163,8 @@ async fn select_include_deleted(
         wt.user_deleted_at,
         wt.mod_deleted_at
         FROM model_weights as wt
+        LEFT OUTER JOIN media_files as avatar
+            ON avatar.token = wt.maybe_avatar_media_file_token
         WHERE
             wt.token = ?
             "#,
@@ -187,6 +202,11 @@ async fn select_without_deleted(
         wt.public_bucket_hash,
         wt.maybe_public_bucket_prefix,
         wt.maybe_public_bucket_extension,
+
+        avatar.public_bucket_directory_hash as maybe_avatar_public_bucket_hash,
+        avatar.maybe_public_bucket_prefix as maybe_avatar_public_bucket_prefix,
+        avatar.maybe_public_bucket_extension as maybe_avatar_public_bucket_extension,
+
         wt.cached_user_ratings_negative_count,
         wt.cached_user_ratings_positive_count,
         wt.cached_user_ratings_total_count,
@@ -198,6 +218,8 @@ async fn select_without_deleted(
         wt.user_deleted_at,
         wt.mod_deleted_at
         FROM model_weights as wt
+        LEFT OUTER JOIN media_files as avatar
+            ON avatar.token = wt.maybe_avatar_media_file_token
         WHERE
             wt.token = ?
             AND wt.user_deleted_at IS NULL
@@ -229,6 +251,11 @@ pub struct RawWeight {
     pub public_bucket_hash: String,
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
+
+    pub maybe_avatar_public_bucket_hash: Option<String>,
+    pub maybe_avatar_public_bucket_prefix: Option<String>,
+    pub maybe_avatar_public_bucket_extension: Option<String>,
+
     pub cached_user_ratings_negative_count: u32,
     pub cached_user_ratings_positive_count: u32,
     pub cached_user_ratings_total_count: u32,
