@@ -27,6 +27,7 @@ export default function MasonryGrid({
       masonryInstance = new Masonry(gridRef.current, {
         itemSelector: ".grid-item",
         percentPosition: true,
+        transitionDuration: 0,
       });
 
       //Needs this or images will overflow masonry card. It checks if image is loaded then after it is loaded, it resizes the card.

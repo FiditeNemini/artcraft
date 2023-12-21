@@ -15,7 +15,8 @@ interface PageHeaderProps {
   back?: BackConfig;
   titleIcon?: IconDefinition;
   title: string | React.ReactNode;
-  subText: string | React.ReactNode;
+  titleH2?: boolean;
+  subText?: string | React.ReactNode;
   full?: boolean;
   showButton?: boolean;
   extension?: React.ReactNode;
@@ -42,6 +43,7 @@ export default function PageHeader({
   back,
   titleIcon,
   title,
+  titleH2 = false,
   subText,
   full,
   showButton,
@@ -94,7 +96,7 @@ export default function PageHeader({
 
   if (!panel) {
     return (
-      <div className="py-3">
+      <div className="py-4">
         <Panel clear={true}>
           {(back || showBackButton) && (
             <div className="d-flex my-2 my-lg-3">
@@ -108,13 +110,18 @@ export default function PageHeader({
             <div
               className={`d-flex flex-column ${
                 imageUrl ? "col-lg-7" : "col-12"
-              } justify-content-center gap-4 py-2`}
+              } justify-content-center gap-4`}
             >
               <div>
-                <h1 className="fw-bold">
-                  {/* {icon} */}
-                  {title}
-                </h1>
+                {titleH2 ? (
+                  <h2 className="fw-bold">{title}</h2>
+                ) : (
+                  <h1 className="fw-bold">
+                    {/* {icon} */}
+                    {title}
+                  </h1>
+                )}
+
                 <p className={typeof subText === "string" ? "opacity-75" : ""}>
                   {subText}
                 </p>
@@ -141,7 +148,7 @@ export default function PageHeader({
               )}
             </div>
           </div>
-          {extension && <div>{extension}</div>}
+          {extension && <div className="mt-2">{extension}</div>}
         </Panel>
       </div>
     );

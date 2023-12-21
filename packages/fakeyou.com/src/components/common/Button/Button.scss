@@ -108,6 +108,18 @@
   }
 }
 
+.card .button-link {
+  padding: 4px 8px;
+  font-size: 13px !important;
+  color: $white !important;
+  background-color: $primary;
+  border-radius: 0.5rem;
+
+  &:hover {
+    background-color: lighten($primary, 5%);
+  }
+}
+
 /* Disabled styles */
 .btn-primary:disabled,
 .btn-secondary:disabled,

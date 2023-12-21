@@ -1,33 +1,21 @@
 import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
+import mockWeightsData from "./mockWeightsData";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
-import SkeletonCard from "components/common/Card/SkeletonCard";
 import Select from "components/common/Select";
-import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
-import Pagination from "components/common/Pagination";
+import {
+  faArrowDownWideShort,
+  faFilter,
+} from "@fortawesome/pro-solid-svg-icons";
+import SkeletonCard from "components/common/Card/SkeletonCard";
 
-import { useListContent } from "hooks";
-import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
-
-export default function BookmarksTab() {
+export default function WeightsTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
+  const [data] = useState(mockWeightsData);
   const [isLoading] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("all");
-
-  const [list, listSet] = useState<any[]>([]);
-  const bookmarks = useListContent({ fetcher: GetBookmarksByUser, list, listSet, pagePreset: 1, requestList: true });
-
-  const handlePageClick = (selectedItem: { selected: number }) => {
-    bookmarks.pageChange(selectedItem.selected + 1);
-  };
-
-  const paginationProps = {
-    onPageChange: handlePageClick,
-    pageCount: bookmarks.pageCount - 1,
-    currentPage: bookmarks.page - 1
-  };
 
   const filterOptions = [
     { value: "all", label: "All Weights" },
@@ -59,12 +47,6 @@ export default function BookmarksTab() {
     { value: "SD15", label: "SD 1.5" },
     { value: "SDXL", label: "SD XL" },
   ];
-
-  // const paginationProps = {
-  //   onPageChange: handlePageClick,
-  //   pageCount: 0, // replace with proper fecth value
-  //   currentPage: 0 // replace with proper fecth value
-  // };
 
   const handleFilterChange = (option: any) => {
     const selectedOption = option as { value: string; label: string };
@@ -112,7 +94,6 @@ export default function BookmarksTab() {
             />
           )}
         </div>
-        <Pagination { ...paginationProps }/>
       </div>
       {isLoading ? (
         <div className="row gx-3 gy-3">
@@ -125,14 +106,29 @@ export default function BookmarksTab() {
           gridRef={gridContainerRef}
           onLayoutComplete={() => console.log("Layout complete!")}
         >
-          {bookmarks.list.map((data: any, index: number) => {
+          {data.map((data, index) => {
             let card;
             switch (data.media_type) {
               case "audio":
-                card = <AudioCard key={index} data={data} type="weights" />;
+                card = (
+                  <AudioCard
+                    key={index}
+                    data={data}
+                    type="weights"
+                    showCreator={true}
+                    showCover={true}
+                  />
+                );
                 break;
               case "image":
-                card = <ImageCard key={index} data={data} type="weights" />;
+                card = (
+                  <ImageCard
+                    key={index}
+                    data={data}
+                    type="weights"
+                    showCreator={true}
+                  />
+                );
                 break;
               case "video":
                 card = <VideoCard key={index} data={data} type="weights" />;
@@ -148,10 +144,6 @@ export default function BookmarksTab() {
           })}
         </MasonryGrid>
       )}
-
-      <div className="d-flex justify-content-end mt-4">
-        <Pagination { ...paginationProps }/>
-      </div>
     </>
   );
 }

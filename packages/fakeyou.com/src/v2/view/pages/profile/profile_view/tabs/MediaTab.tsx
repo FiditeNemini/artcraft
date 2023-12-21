@@ -18,7 +18,14 @@ export default function MediaTab() {
   const [isLoading] = useState(false);
 
   const [list, listSet] = useState<MediaFile[]>([]);
-  const media = useListContent({ fetcher: GetMediaByUser, list, listSet, pagePreset: 1, requestList: true });
+  const media = useListContent({
+    // addQueries: { abc: "anything" }, an example
+    fetcher: GetMediaByUser,
+    list,
+    listSet,
+    pagePreset: 1,
+    requestList: true
+  });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
     media.pageChange(selectedItem.selected + 1);

@@ -84,9 +84,9 @@ import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
+import TopNav from "components/layout/TopNav/TopNav";
 import SideNav from "components/layout/SideNav/SideNav";
 import MobileMenu from "components/layout/MobileMenu/MobileMenu";
-import { TopNav } from "./nav/TopNav";
 import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
 import MediaPage from "./pages/media/MediaPage";
 import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
@@ -99,6 +99,9 @@ import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
 import WeightPage from "./pages/weight/WeightPage";
+import ExplorePage from "./pages/explore/ExplorePage";
+import SearchPage from "./search/SearchPage";
+import { SearchProvider } from "context/SearchContext";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -207,651 +210,671 @@ class PageContainer extends React.Component<
   logout = () => {};
 
   public render() {
-    const { location } = this.props;
-
-    const shouldRenderNavs = location.pathname === "/";
-
     return (
-      <div id="wrapper" className="no-padding">
-        <div id="overlay"></div>
-        <SideNav
-          sessionWrapper={this.props.sessionWrapper}
-          logoutHandler={this.logout}
-          querySessionCallback={this.props.querySessionAction}
-          querySessionSubscriptionsCallback={
-            this.props.querySessionSubscriptionsAction
-          }
-        />
+      <SearchProvider>
+        <div id="wrapper" className="no-padding">
+          <div id="overlay"></div>
 
-        {shouldRenderNavs && (
           <TopNav
-            logoutHandler={this.logout}
             sessionWrapper={this.props.sessionWrapper}
+            logoutHandler={this.logout}
             querySessionCallback={this.props.querySessionAction}
             querySessionSubscriptionsCallback={
               this.props.querySessionSubscriptionsAction
             }
           />
-        )}
+          <SideNav
+            sessionWrapper={this.props.sessionWrapper}
+            logoutHandler={this.logout}
+            querySessionCallback={this.props.querySessionAction}
+            querySessionSubscriptionsCallback={
+              this.props.querySessionSubscriptionsAction
+            }
+          />
 
-        <div id="page-content-wrapper">
-          <MobileMenu sessionWrapper={this.props.sessionWrapper} />
-          <Switch>
-            <Route path="/firehose">
-              <FirehoseEventListPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+          <div id="page-content-wrapper">
+            <MobileMenu sessionWrapper={this.props.sessionWrapper} />
+            <Switch>
+              <Route path="/firehose">
+                <FirehoseEventListPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/news">
-              <NewsPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
+              <Route path="/news">
+                <NewsPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-            <Route path="/channels">
-              <ChannelsPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
+              <Route path="/channels">
+                <ChannelsPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-            <Route path="/leaderboard">
-              <LeaderboardPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/leaderboard">
+                <LeaderboardPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            <Route path="/login">
-              <LoginPage
-                sessionWrapper={this.props.sessionWrapper}
-                querySessionAction={this.props.querySessionAction}
-                querySessionSubscriptionsAction={
-                  this.props.querySessionSubscriptionsAction
-                }
-              />
-            </Route>
+              <Route path="/login">
+                <LoginPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  querySessionAction={this.props.querySessionAction}
+                  querySessionSubscriptionsAction={
+                    this.props.querySessionSubscriptionsAction
+                  }
+                />
+              </Route>
 
-            <Route path="/password-reset/verify">
-              <PasswordResetVerificationPage
-                sessionWrapper={this.props.sessionWrapper}
-                querySessionAction={this.props.querySessionAction}
-                querySessionSubscriptionsAction={
-                  this.props.querySessionSubscriptionsAction
-                }
-              />
-            </Route>
+              <Route path="/password-reset/verify">
+                <PasswordResetVerificationPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  querySessionAction={this.props.querySessionAction}
+                  querySessionSubscriptionsAction={
+                    this.props.querySessionSubscriptionsAction
+                  }
+                />
+              </Route>
 
-            <Route path="/password-reset">
-              <PasswordResetEmailPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/password-reset">
+                <PasswordResetEmailPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/profile/:username/edit">
-              <ProfileEditFc sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/profile/:username/edit">
+                <ProfileEditFc sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            <Route path="/profile/:username/ban">
-              <ProfileBanFc sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/profile/:username/ban">
+                <ProfileBanFc sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            <Route path="/profile/:username">
-              <ProfilePage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
+              <Route path="/profile/:username">
+                <ProfilePage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-            {/* New Profile Page */}
-            <Route path="/dev-profile/:username">
-              <NewProfilePage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
+              {/* New Profile Page */}
+              <Route path="/dev-profile/:username">
+                <NewProfilePage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-            <Route path="/signup">
-              <SignupPage
-                querySessionCallback={() => {}}
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/signup">
+                <SignupPage
+                  querySessionCallback={() => {}}
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/pricing" exact={true}>
-              <PricingPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
+              <Route path="/pricing" exact={true}>
+                <PricingPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
 
-            <Route path="/checkout_success" exact={true}>
-              <CheckoutSuccessPage
-                querySessionCallback={() => {}}
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
-            <Route path="/checkout_cancel" exact={true}>
-              <CheckoutCancelPage
-                querySessionCallback={() => {}}
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
-            <Route path="/portal_success" exact={true}>
-              <PortalSuccessPage
-                querySessionCallback={() => {}}
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/checkout_success" exact={true}>
+                <CheckoutSuccessPage
+                  querySessionCallback={() => {}}
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
+              <Route path="/checkout_cancel" exact={true}>
+                <CheckoutCancelPage
+                  querySessionCallback={() => {}}
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
+              <Route path="/portal_success" exact={true}>
+                <PortalSuccessPage
+                  querySessionCallback={() => {}}
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/media/:token">
-              <MediaPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/media/:token">
+                <MediaPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            {/* <Route path="/weight/:weight_token/edit">
+              <Route path="/explore">
+                <ExplorePage />
+              </Route>
+
+              {/* <Route path="/weight/:weight_token/edit">
               <WeightEditPage />
             </Route> */}
 
-            <Route path="/weight/:weight_token">
-              <WeightPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                inferenceJobs={this.props.inferenceJobs}
-                enqueueInferenceJob={this.props.enqueueInferenceJob}
-                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-                ttsInferenceJobs={this.props.ttsInferenceJobs}
-                enqueueTtsJob={this.props.enqueueTtsJob}
-              />
-            </Route>
+              <Route path="/weight/:weight_token">
+                <WeightPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                  inferenceJobs={this.props.inferenceJobs}
+                  enqueueInferenceJob={this.props.enqueueInferenceJob}
+                  inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+                  ttsInferenceJobs={this.props.ttsInferenceJobs}
+                  enqueueTtsJob={this.props.enqueueTtsJob}
+                />
+              </Route>
 
-            <Route path="/dev-tts">
-              <TtsModelSearchPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/search/weights">
+                <SearchPage />
+              </Route>
 
-            <Route path="/tts/result/:token/edit">
-              <TtsResultEditPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/dev-tts">
+                <TtsModelSearchPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/tts/result/:token/delete">
-              <TtsResultDeletePage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/tts/result/:token/edit">
+                <TtsResultEditPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            <Route path="/tts/result/:token">
-              <TtsResultViewPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/tts/result/:token/delete">
+                <TtsResultDeletePage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/tts/:token/edit">
-              <TtsModelEditPage
-                sessionWrapper={this.props.sessionWrapper}
-                enqueueTtsJob={this.props.enqueueTtsJob}
-                ttsInferenceJobs={this.props.ttsInferenceJobs}
-              />
-            </Route>
+              <Route path="/tts/result/:token">
+                <TtsResultViewPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            <Route path="/tts/:token/delete">
-              <TtsModelDeletePage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/tts/:token/edit">
+                <TtsModelEditPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  enqueueTtsJob={this.props.enqueueTtsJob}
+                  ttsInferenceJobs={this.props.ttsInferenceJobs}
+                />
+              </Route>
 
-            <Route path="/tts/:token/categories">
-              <TtsEditCategoriesPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/tts/:token/delete">
+                <TtsModelDeletePage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/tts/:token">
-              <TtsModelViewPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                enqueueTtsJob={this.props.enqueueTtsJob}
-                inferenceJobs={this.props.inferenceJobs}
-                ttsInferenceJobs={this.props.ttsInferenceJobs}
-                textBuffer={this.props.textBuffer}
-                setTextBuffer={this.props.setTextBuffer}
-                clearTextBuffer={this.props.clearTextBuffer}
-              />
-            </Route>
+              <Route path="/tts/:token/categories">
+                <TtsEditCategoriesPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/w2l/result/:token/edit">
-              <W2lResultEditPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/tts/:token">
+                <TtsModelViewPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                  enqueueTtsJob={this.props.enqueueTtsJob}
+                  inferenceJobs={this.props.inferenceJobs}
+                  ttsInferenceJobs={this.props.ttsInferenceJobs}
+                  textBuffer={this.props.textBuffer}
+                  setTextBuffer={this.props.setTextBuffer}
+                  clearTextBuffer={this.props.clearTextBuffer}
+                />
+              </Route>
 
-            <Route path="/w2l/result/:token/delete">
-              <W2lResultDeletePage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/w2l/result/:token/edit">
+                <W2lResultEditPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            <Route path="/w2l/result/:token">
-              <W2lResultViewPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/w2l/result/:token/delete">
+                <W2lResultDeletePage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/w2l/:templateToken/edit">
-              <W2lTemplateEditPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/w2l/result/:token">
+                <W2lResultViewPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            <Route path="/w2l/:templateToken/approval">
-              <W2lTemplateApprovePage
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/w2l/:templateToken/edit">
+                <W2lTemplateEditPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/w2l/:templateToken/delete">
-              <W2lTemplateDeletePage
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/w2l/:templateToken/approval">
+                <W2lTemplateApprovePage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/w2l/:templateSlug">
-              <W2lTemplateViewPage
-                sessionWrapper={this.props.sessionWrapper}
-                enqueueW2lJob={this.props.enqueueW2lJob}
-                w2lInferenceJobs={this.props.w2lInferenceJobs}
-              />
-            </Route>
+              <Route path="/w2l/:templateToken/delete">
+                <W2lTemplateDeletePage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/video">
-              <W2lTemplateListPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/w2l/:templateSlug">
+                <W2lTemplateViewPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  enqueueW2lJob={this.props.enqueueW2lJob}
+                  w2lInferenceJobs={this.props.w2lInferenceJobs}
+                />
+              </Route>
 
-            <Route path="/upload/w2l_photo">
-              <UploadW2lPhotoPage
-                sessionWrapper={this.props.sessionWrapper}
-                w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
-                enqueueW2lTemplateUploadJob={
-                  this.props.enqueueW2lTemplateUploadJob
-                }
-              />
-            </Route>
+              <Route path="/video">
+                <W2lTemplateListPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/upload/w2l_video">
-              <UploadW2lVideoPage
-                sessionWrapper={this.props.sessionWrapper}
-                w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
-                enqueueW2lTemplateUploadJob={
-                  this.props.enqueueW2lTemplateUploadJob
-                }
-              />
-            </Route>
+              <Route path="/upload/w2l_photo">
+                <UploadW2lPhotoPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
+                  enqueueW2lTemplateUploadJob={
+                    this.props.enqueueW2lTemplateUploadJob
+                  }
+                />
+              </Route>
 
-            <Route path="/upload/tts">
-              <UploadTtsModelPage
-                sessionWrapper={this.props.sessionWrapper}
-                ttsModelUploadJobs={this.props.ttsModelUploadJobs}
-                enqueueTtsModelUploadJob={this.props.enqueueTtsModelUploadJob}
-              />
-            </Route>
+              <Route path="/upload/w2l_video">
+                <UploadW2lVideoPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
+                  enqueueW2lTemplateUploadJob={
+                    this.props.enqueueW2lTemplateUploadJob
+                  }
+                />
+              </Route>
 
-            <Route path="/upload/voice_conversion">
-              <UploadVoiceConversionModel
-                sessionWrapper={this.props.sessionWrapper}
-                voiceConversionModelUploadJobs={
-                  this.props.voiceConversionModelUploadJobs
-                }
-                enqueueVoiceConversionModelUploadJob={
-                  this.props.enqueueVoiceConversionModelUploadJob
-                }
-              />
-            </Route>
+              <Route path="/upload/tts">
+                <UploadTtsModelPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  ttsModelUploadJobs={this.props.ttsModelUploadJobs}
+                  enqueueTtsModelUploadJob={this.props.enqueueTtsModelUploadJob}
+                />
+              </Route>
 
-            <Route path="/upload/vocoder" exact={true}>
-              <UploadVocoderPage
-                sessionWrapper={this.props.sessionWrapper}
-                vocoderUploadJobs={this.props.vocoderUploadJobs}
-                enqueueVocoderUploadJob={this.props.enqueueVocoderUploadJob}
-              />
-            </Route>
+              <Route path="/upload/voice_conversion">
+                <UploadVoiceConversionModel
+                  sessionWrapper={this.props.sessionWrapper}
+                  voiceConversionModelUploadJobs={
+                    this.props.voiceConversionModelUploadJobs
+                  }
+                  enqueueVoiceConversionModelUploadJob={
+                    this.props.enqueueVoiceConversionModelUploadJob
+                  }
+                />
+              </Route>
 
-            <Route path="/contribute">
-              <ContributeIndexPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/upload/vocoder" exact={true}>
+                <UploadVocoderPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  vocoderUploadJobs={this.props.vocoderUploadJobs}
+                  enqueueVocoderUploadJob={this.props.enqueueVocoderUploadJob}
+                />
+              </Route>
 
-            <Route path="/category/create">
-              <CreateCategoryPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/contribute">
+                <ContributeIndexPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/moderation/user/list">
-              <ModerationUserListFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/category/create">
+                <CreateCategoryPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/moderation/ip_bans/:ipAddress">
-              <ModerationViewIpBanFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/moderation/user/list">
+                <ModerationUserListFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/moderation/ip_bans">
-              <ModerationIpBanListFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/moderation/ip_bans/:ipAddress">
+                <ModerationViewIpBanFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/moderation/voice_stats">
-              <ModerationVoiceStatsFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/moderation/ip_bans">
+                <ModerationIpBanListFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/moderation/job_stats">
-              <ModerationJobStatsFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/moderation/voice_stats">
+                <ModerationVoiceStatsFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/moderation/job_control">
-              <ModerationJobControlPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/moderation/job_stats">
+                <ModerationJobStatsFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/moderation/tts_category/list">
-              <ModerationTtsCategoryListPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/moderation/job_control">
+                <ModerationJobControlPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/moderation/tts_category/edit/:token">
-              <ModerationTtsCategoryEditPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/moderation/tts_category/list">
+                <ModerationTtsCategoryListPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/moderation/category/delete/:token">
-              <ModerationCategoryDeletePage
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/moderation/tts_category/edit/:token">
+                <ModerationTtsCategoryEditPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/moderation/approve/w2l_templates">
-              <ModerationPendingW2lTemplatesFc
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/moderation/category/delete/:token">
+                <ModerationCategoryDeletePage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/moderation">
-              <ModerationFc sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/moderation/approve/w2l_templates">
+                <ModerationPendingW2lTemplatesFc
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route exact={true} path="/clone">
-              <VoiceCloneRequestPage />
-            </Route>
+              <Route path="/moderation">
+                <ModerationFc sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            <Route path="/patrons">
-              <PatronPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route exact={true} path="/clone">
+                <VoiceCloneRequestPage />
+              </Route>
 
-            <Route path="/product-usage">
-              <ProductUsageInfoPage
-                sessionWrapper={this.props.sessionWrapper}
-              />
-            </Route>
+              <Route path="/patrons">
+                <PatronPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            <Route path="/voice-conversion/:token/delete">
-              <VcModelDeletePage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/product-usage">
+                <ProductUsageInfoPage
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
 
-            <Route path="/voice-conversion/:token/edit">
-              <VcModelEditPage sessionWrapper={this.props.sessionWrapper} />
-            </Route>
+              <Route path="/voice-conversion/:token/delete">
+                <VcModelDeletePage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            <Route path="/voice-conversion/:token">
-              <VcModelViewPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-                setMaybeSelectedInferenceJob={
-                  this.props.maybeSelectedVoiceConversionModel
-                }
-              />
-            </Route>
+              <Route path="/voice-conversion/:token/edit">
+                <VcModelEditPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
-            <Route path="/voice-conversion">
-              <VcModelListPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                voiceConversionModels={this.props.voiceConversionModels}
-                setVoiceConversionModels={this.props.setVoiceConversionModels}
-                maybeSelectedVoiceConversionModel={
-                  this.props.maybeSelectedVoiceConversionModel
-                }
-                setMaybeSelectedVoiceConversionModel={
-                  this.props.setMaybeSelectedVoiceConversionModel
-                }
-                enqueueInferenceJob={this.props.enqueueInferenceJob}
-                inferenceJobs={this.props.inferenceJobs}
-                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-              />
-            </Route>
+              <Route path="/voice-conversion/:token">
+                <VcModelViewPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                  inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+                  setMaybeSelectedInferenceJob={
+                    this.props.maybeSelectedVoiceConversionModel
+                  }
+                />
+              </Route>
 
-            <Route path="/about">
-              <AboutPage />
-            </Route>
+              <Route path="/voice-conversion">
+                <VcModelListPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                  voiceConversionModels={this.props.voiceConversionModels}
+                  setVoiceConversionModels={this.props.setVoiceConversionModels}
+                  maybeSelectedVoiceConversionModel={
+                    this.props.maybeSelectedVoiceConversionModel
+                  }
+                  setMaybeSelectedVoiceConversionModel={
+                    this.props.setMaybeSelectedVoiceConversionModel
+                  }
+                  enqueueInferenceJob={this.props.enqueueInferenceJob}
+                  inferenceJobs={this.props.inferenceJobs}
+                  inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+                />
+              </Route>
 
-            <Route path="/face-animator/:mediaToken?">
-              <FaceAnimator
-                {...{
-                  enqueueInferenceJob: this.props.enqueueInferenceJob,
-                  sessionSubscriptionsWrapper:
-                    this.props.sessionSubscriptionsWrapper,
-                  inferenceJobs: this.props.inferenceJobs,
-                  inferenceJobsByCategory: this.props.inferenceJobsByCategory,
-                }}
-              />
-            </Route>
+              <Route path="/about">
+                <AboutPage />
+              </Route>
 
-            <Route path="/commissions">
-              <CommunityCommissionsPage />
-            </Route>
+              <Route path="/face-animator/:mediaToken?">
+                <FaceAnimator
+                  {...{
+                    enqueueInferenceJob: this.props.enqueueInferenceJob,
+                    sessionSubscriptionsWrapper:
+                      this.props.sessionSubscriptionsWrapper,
+                    inferenceJobs: this.props.inferenceJobs,
+                    inferenceJobsByCategory: this.props.inferenceJobsByCategory,
+                  }}
+                />
+              </Route>
 
-            <Route path="/terms">
-              <TermsPage />
-            </Route>
+              <Route path="/commissions">
+                <CommunityCommissionsPage />
+              </Route>
 
-            <Route path="/privacy">
-              <PrivacyPage />
-            </Route>
+              <Route path="/terms">
+                <TermsPage />
+              </Route>
 
-            <Route path="/guide">
-              <GuidePage />
-            </Route>
+              <Route path="/privacy">
+                <PrivacyPage />
+              </Route>
 
-            <Route path="/old">
-              <VocodesPage />
-            </Route>
+              <Route path="/guide">
+                <GuidePage />
+              </Route>
 
-            {/* Route for initial voice creation */}
-            <Route exact path="/voice-designer/create">
-              <VoiceDesignerFormPage
-                {...{
-                  enqueueInferenceJob: this.props.enqueueInferenceJob,
-                  sessionWrapper: this.props.sessionWrapper,
-                  sessionSubscriptionsWrapper:
-                    this.props.sessionSubscriptionsWrapper,
-                }}
-              />
-            </Route>
+              <Route path="/old">
+                <VocodesPage />
+              </Route>
 
-            {/* Route for editing the dataset details */}
-            <Route exact path="/voice-designer/dataset/:dataset_token/edit">
-              <VoiceDesignerFormPage
-                {...{
-                  enqueueInferenceJob: this.props.enqueueInferenceJob,
-                  sessionWrapper: this.props.sessionWrapper,
-                  sessionSubscriptionsWrapper:
-                    this.props.sessionSubscriptionsWrapper,
-                }}
-              />
-            </Route>
+              {/* Route for initial voice creation */}
+              <Route exact path="/voice-designer/create">
+                <VoiceDesignerFormPage
+                  {...{
+                    enqueueInferenceJob: this.props.enqueueInferenceJob,
+                    sessionWrapper: this.props.sessionWrapper,
+                    sessionSubscriptionsWrapper:
+                      this.props.sessionSubscriptionsWrapper,
+                  }}
+                />
+              </Route>
 
-            {/* Route for handling dataset token for uploading samples */}
-            <Route exact path="/voice-designer/dataset/:dataset_token/upload">
-              <VoiceDesignerFormPage
-                {...{
-                  enqueueInferenceJob: this.props.enqueueInferenceJob,
-                  sessionWrapper: this.props.sessionWrapper,
-                  sessionSubscriptionsWrapper:
-                    this.props.sessionSubscriptionsWrapper,
-                }}
-              />
-            </Route>
+              {/* Route for editing the dataset details */}
+              <Route exact path="/voice-designer/dataset/:dataset_token/edit">
+                <VoiceDesignerFormPage
+                  {...{
+                    enqueueInferenceJob: this.props.enqueueInferenceJob,
+                    sessionWrapper: this.props.sessionWrapper,
+                    sessionSubscriptionsWrapper:
+                      this.props.sessionSubscriptionsWrapper,
+                  }}
+                />
+              </Route>
 
-            <Route path="/voice-designer/voice/:voice_token/edit">
-              <VoiceDesignerVoiceEditPage />
-            </Route>
+              {/* Route for handling dataset token for uploading samples */}
+              <Route exact path="/voice-designer/dataset/:dataset_token/upload">
+                <VoiceDesignerFormPage
+                  {...{
+                    enqueueInferenceJob: this.props.enqueueInferenceJob,
+                    sessionWrapper: this.props.sessionWrapper,
+                    sessionSubscriptionsWrapper:
+                      this.props.sessionSubscriptionsWrapper,
+                  }}
+                />
+              </Route>
 
-            <Route path="/voice-designer/voice/:voice_token">
-              <VoiceDesignerUseVoicePage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                inferenceJobs={this.props.inferenceJobs}
-                enqueueInferenceJob={this.props.enqueueInferenceJob}
-                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-                ttsInferenceJobs={this.props.ttsInferenceJobs}
-              />
-            </Route>
+              <Route path="/voice-designer/voice/:voice_token/edit">
+                <VoiceDesignerVoiceEditPage />
+              </Route>
 
-            <Route path="/voice-designer">
-              <VoiceDesignerMainPage />
-            </Route>
+              <Route path="/voice-designer/voice/:voice_token">
+                <VoiceDesignerUseVoicePage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                  inferenceJobs={this.props.inferenceJobs}
+                  enqueueInferenceJob={this.props.enqueueInferenceJob}
+                  inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+                  ttsInferenceJobs={this.props.ttsInferenceJobs}
+                />
+              </Route>
 
-            <Route path="/generate-speech">
-              <GenerateSpeechPage />
-            </Route>
+              <Route path="/voice-designer">
+                <VoiceDesignerMainPage />
+              </Route>
 
-            <Route path="/character/donald-trump">
-              <TrumpTtsPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                enqueueTtsJob={this.props.enqueueTtsJob}
-                inferenceJobs={this.props.inferenceJobs}
-                ttsInferenceJobs={this.props.ttsInferenceJobs}
-                ttsModelUploadJobs={this.props.ttsModelUploadJobs}
-                w2lInferenceJobs={this.props.w2lInferenceJobs}
-                w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
-                textBuffer={this.props.textBuffer}
-                setTextBuffer={this.props.setTextBuffer}
-                clearTextBuffer={this.props.clearTextBuffer}
-                ttsModels={this.props.ttsModels}
-                setTtsModels={this.props.setTtsModels}
-                allTtsCategories={this.props.allTtsCategories}
-                setAllTtsCategories={this.props.setAllTtsCategories}
-                allTtsCategoriesByTokenMap={
-                  this.props.allTtsCategoriesByTokenMap
-                }
-                computedTtsCategoryAssignments={
-                  this.props.computedTtsCategoryAssignments
-                }
-                setComputedTtsCategoryAssignments={
-                  this.props.setComputedTtsCategoryAssignments
-                }
-                allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
-                ttsModelsByCategoryToken={this.props.ttsModelsByCategoryToken}
-                dropdownCategories={this.props.dropdownCategories}
-                setDropdownCategories={this.props.setDropdownCategories}
-                selectedCategories={this.props.selectedCategories}
-                setSelectedCategories={this.props.setSelectedCategories}
-                maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
-                setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
-                selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
-                setSelectedTtsLanguageScope={
-                  this.props.setSelectedTtsLanguageScope
-                }
-              />
-            </Route>
+              <Route path="/generate-speech">
+                <GenerateSpeechPage />
+              </Route>
 
-            <Route path="/tts" exact={true}>
-              <TtsModelListPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-                isShowingVocodesNotice={this.props.isShowingVocodesNotice}
-                clearVocodesNotice={this.props.clearVocodesNotice}
-                isShowingLanguageNotice={this.props.isShowingLangaugeNotice}
-                clearLanguageNotice={this.props.clearLanguageNotice}
-                displayLanguage={this.props.displayLanguage}
-                isShowingTwitchTtsNotice={this.props.isShowingTwitchTtsNotice}
-                clearTwitchTtsNotice={this.props.clearTwitchTtsNotice}
-                isShowingPleaseFollowNotice={
-                  this.props.isShowingPleaseFollowNotice
-                }
-                clearPleaseFollowNotice={this.props.clearPleaseFollowNotice}
-                isShowingBootstrapLanguageNotice={
-                  this.props.isShowingBootstrapLanguageNotice
-                }
-                clearBootstrapLanguageNotice={
-                  this.props.clearBootstrapLanguageNotice
-                }
-                enqueueInferenceJob={this.props.enqueueInferenceJob}
-                inferenceJobs={this.props.inferenceJobs}
-                inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-                enqueueTtsJob={this.props.enqueueTtsJob}
-                ttsInferenceJobs={this.props.ttsInferenceJobs}
-                ttsModelUploadJobs={this.props.ttsModelUploadJobs}
-                w2lInferenceJobs={this.props.w2lInferenceJobs}
-                w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
-                textBuffer={this.props.textBuffer}
-                setTextBuffer={this.props.setTextBuffer}
-                clearTextBuffer={this.props.clearTextBuffer}
-                ttsModels={this.props.ttsModels}
-                setTtsModels={this.props.setTtsModels}
-                allTtsCategories={this.props.allTtsCategories}
-                setAllTtsCategories={this.props.setAllTtsCategories}
-                allTtsCategoriesByTokenMap={
-                  this.props.allTtsCategoriesByTokenMap
-                }
-                computedTtsCategoryAssignments={
-                  this.props.computedTtsCategoryAssignments
-                }
-                setComputedTtsCategoryAssignments={
-                  this.props.setComputedTtsCategoryAssignments
-                }
-                allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
-                ttsModelsByCategoryToken={this.props.ttsModelsByCategoryToken}
-                dropdownCategories={this.props.dropdownCategories}
-                setDropdownCategories={this.props.setDropdownCategories}
-                selectedCategories={this.props.selectedCategories}
-                setSelectedCategories={this.props.setSelectedCategories}
-                maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
-                setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
-                selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
-                setSelectedTtsLanguageScope={
-                  this.props.setSelectedTtsLanguageScope
-                }
-              />
-            </Route>
+              <Route path="/character/donald-trump">
+                <TrumpTtsPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                  enqueueTtsJob={this.props.enqueueTtsJob}
+                  inferenceJobs={this.props.inferenceJobs}
+                  ttsInferenceJobs={this.props.ttsInferenceJobs}
+                  ttsModelUploadJobs={this.props.ttsModelUploadJobs}
+                  w2lInferenceJobs={this.props.w2lInferenceJobs}
+                  w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
+                  textBuffer={this.props.textBuffer}
+                  setTextBuffer={this.props.setTextBuffer}
+                  clearTextBuffer={this.props.clearTextBuffer}
+                  ttsModels={this.props.ttsModels}
+                  setTtsModels={this.props.setTtsModels}
+                  allTtsCategories={this.props.allTtsCategories}
+                  setAllTtsCategories={this.props.setAllTtsCategories}
+                  allTtsCategoriesByTokenMap={
+                    this.props.allTtsCategoriesByTokenMap
+                  }
+                  computedTtsCategoryAssignments={
+                    this.props.computedTtsCategoryAssignments
+                  }
+                  setComputedTtsCategoryAssignments={
+                    this.props.setComputedTtsCategoryAssignments
+                  }
+                  allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
+                  ttsModelsByCategoryToken={this.props.ttsModelsByCategoryToken}
+                  dropdownCategories={this.props.dropdownCategories}
+                  setDropdownCategories={this.props.setDropdownCategories}
+                  selectedCategories={this.props.selectedCategories}
+                  setSelectedCategories={this.props.setSelectedCategories}
+                  maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
+                  setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
+                  selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
+                  setSelectedTtsLanguageScope={
+                    this.props.setSelectedTtsLanguageScope
+                  }
+                />
+              </Route>
 
-            <Route path="/" exact={true}>
-              <LandingPage
-                sessionWrapper={this.props.sessionWrapper}
-                sessionSubscriptionsWrapper={
-                  this.props.sessionSubscriptionsWrapper
-                }
-              />
-            </Route>
-          </Switch>
+              <Route path="/tts" exact={true}>
+                <TtsModelListPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                  isShowingVocodesNotice={this.props.isShowingVocodesNotice}
+                  clearVocodesNotice={this.props.clearVocodesNotice}
+                  isShowingLanguageNotice={this.props.isShowingLangaugeNotice}
+                  clearLanguageNotice={this.props.clearLanguageNotice}
+                  displayLanguage={this.props.displayLanguage}
+                  isShowingTwitchTtsNotice={this.props.isShowingTwitchTtsNotice}
+                  clearTwitchTtsNotice={this.props.clearTwitchTtsNotice}
+                  isShowingPleaseFollowNotice={
+                    this.props.isShowingPleaseFollowNotice
+                  }
+                  clearPleaseFollowNotice={this.props.clearPleaseFollowNotice}
+                  isShowingBootstrapLanguageNotice={
+                    this.props.isShowingBootstrapLanguageNotice
+                  }
+                  clearBootstrapLanguageNotice={
+                    this.props.clearBootstrapLanguageNotice
+                  }
+                  enqueueInferenceJob={this.props.enqueueInferenceJob}
+                  inferenceJobs={this.props.inferenceJobs}
+                  inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+                  enqueueTtsJob={this.props.enqueueTtsJob}
+                  ttsInferenceJobs={this.props.ttsInferenceJobs}
+                  ttsModelUploadJobs={this.props.ttsModelUploadJobs}
+                  w2lInferenceJobs={this.props.w2lInferenceJobs}
+                  w2lTemplateUploadJobs={this.props.w2lTemplateUploadJobs}
+                  textBuffer={this.props.textBuffer}
+                  setTextBuffer={this.props.setTextBuffer}
+                  clearTextBuffer={this.props.clearTextBuffer}
+                  ttsModels={this.props.ttsModels}
+                  setTtsModels={this.props.setTtsModels}
+                  allTtsCategories={this.props.allTtsCategories}
+                  setAllTtsCategories={this.props.setAllTtsCategories}
+                  allTtsCategoriesByTokenMap={
+                    this.props.allTtsCategoriesByTokenMap
+                  }
+                  computedTtsCategoryAssignments={
+                    this.props.computedTtsCategoryAssignments
+                  }
+                  setComputedTtsCategoryAssignments={
+                    this.props.setComputedTtsCategoryAssignments
+                  }
+                  allTtsModelsByTokenMap={this.props.allTtsModelsByTokenMap}
+                  ttsModelsByCategoryToken={this.props.ttsModelsByCategoryToken}
+                  dropdownCategories={this.props.dropdownCategories}
+                  setDropdownCategories={this.props.setDropdownCategories}
+                  selectedCategories={this.props.selectedCategories}
+                  setSelectedCategories={this.props.setSelectedCategories}
+                  maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
+                  setMaybeSelectedTtsModel={this.props.setMaybeSelectedTtsModel}
+                  selectedTtsLanguageScope={this.props.selectedTtsLanguageScope}
+                  setSelectedTtsLanguageScope={
+                    this.props.setSelectedTtsLanguageScope
+                  }
+                />
+              </Route>
+
+              <Route path="/" exact={true}>
+                <LandingPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
+            </Switch>
+          </div>
         </div>
-      </div>
+      </SearchProvider>
     );
   }
 }

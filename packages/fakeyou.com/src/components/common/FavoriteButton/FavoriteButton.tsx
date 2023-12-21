@@ -5,12 +5,12 @@ import { faBookmark as faBookmarkOutline } from "@fortawesome/pro-regular-svg-ic
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "./FavoriteButton.scss";
-import useShortenNumber from "hooks/useShortenNumber";
+// import useShortenNumber from "hooks/useShortenNumber";
 
 interface FavoriteButtonProps {
   initialToggled?: boolean;
   onToggle: (toggled: boolean) => Promise<void>;
-  favoriteCount: number;
+  favoriteCount?: number;
   overlay?: boolean;
   large?: boolean;
 }
@@ -41,7 +41,7 @@ export default function FavoriteButton({
   const buttonShadow = overlay ? "shadow" : "";
   const iconClass = isToggled ? "icon-toggled" : "icon-default";
   const toolTip = isToggled ? "Unbookmark" : "Bookmark";
-  let favoriteCountShort = useShortenNumber(favoriteCount);
+  // let favoriteCountShort = useShortenNumber(favoriteCount || 0);
 
   return (
     <div className="d-flex gap-2" onClick={handleClick}>
@@ -52,6 +52,7 @@ export default function FavoriteButton({
         trigger="mouseenter"
         delay={[500, 0]}
         offset={[0, 12]}
+        placement="bottom"
       >
         <button
           onClick={handleClick}
@@ -62,9 +63,7 @@ export default function FavoriteButton({
             icon={isToggled ? faBookmark : faBookmarkOutline}
             className={`${iconClass} me-2`}
           />
-          {favoriteCount && (
-            <p className="favorite-number">{favoriteCountShort}</p>
-          )}
+          <p className="favorite-text">{isToggled ? "Saved" : "Save"}</p>
         </button>
       </Tippy>
     </div>
