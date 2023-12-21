@@ -68,15 +68,15 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
                 {showCreator && (
                   <div className="flex-grow-1">
                     <CreatorName
-                      displayName={data.maybe_creator_user.display_name}
-                      gravatarHash={data.maybe_creator_user.gravatar_hash}
+                      displayName={data.maybe_creator.display_name}
+                      gravatarHash={data.maybe_creator.gravatar_hash}
                       avatarIndex={
-                        data.maybe_creator_user.default_avatar.image_index
+                        data.maybe_creator.default_avatar.image_index
                       }
                       backgroundIndex={
-                        data.maybe_creator_user.default_avatar.color_index
+                        data.maybe_creator.default_avatar.color_index
                       }
-                      username={data.maybe_creator_user.username}
+                      username={data.maybe_creator.username}
                     />
                   </div>
                 )}

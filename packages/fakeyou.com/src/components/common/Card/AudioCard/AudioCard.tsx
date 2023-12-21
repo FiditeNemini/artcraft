@@ -81,15 +81,13 @@ export default function AudioCard({
             {showCreator && (
               <div className="flex-grow-1">
                 <CreatorName
-                  displayName={data.maybe_creator_user.display_name}
-                  gravatarHash={data.maybe_creator_user.gravatar_hash}
-                  avatarIndex={
-                    data.maybe_creator_user.default_avatar.image_index
-                  }
+                  displayName={data.maybe_creator.display_name}
+                  gravatarHash={data.maybe_creator.gravatar_hash}
+                  avatarIndex={data.maybe_creator.default_avatar.image_index}
                   backgroundIndex={
-                    data.maybe_creator_user.default_avatar.color_index
+                    data.maybe_creator.default_avatar.color_index
                   }
-                  username={data.maybe_creator_user.username}
+                  username={data.maybe_creator.username}
                 />
               </div>
             )}
