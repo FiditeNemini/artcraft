@@ -57,7 +57,6 @@ pub struct ListMediaFileForUserArgs<'a> {
 }
 
 pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> AnyhowResult<MediaFileListPage> {
-
   /// Let's figure out how many results we could have returned total
   let count_fields = select_total_count_field();
   let mut count_query_builder = query_builder(
