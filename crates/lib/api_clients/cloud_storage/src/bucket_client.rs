@@ -11,6 +11,7 @@ use s3::region::Region;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
  use std::error::Error;
+ 
 #[derive(Clone)]
 pub struct BucketClient {
   bucket: Bucket,
@@ -225,7 +226,7 @@ impl BucketClient {
     &self,
     object_path: P,
     filesystem_path: Q,
-  ) -> anyhow::Result<()> {
+  ) -> AnyhowResult<()> {
     let object_path_str = object_path.as_ref()
       .to_str()
       .map(|s| s.to_string())

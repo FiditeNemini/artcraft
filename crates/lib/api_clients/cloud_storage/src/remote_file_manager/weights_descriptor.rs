@@ -2,7 +2,6 @@ use super::file_descriptor::FileDescriptor;
 
 pub struct WeightsLoRADescriptor {}
 
-
 const REMOTE_FILE_DIRECTORY: &str = "/weights";
 
 impl FileDescriptor for WeightsLoRADescriptor {

@@ -1,8 +1,5 @@
 // Describes the file and how it will be saved to GCBucket
 // where the file should be stored based off the descriptor 
-use std::path::PathBuf;
-use crockford::crockford_entropy_lower;
-use buckets::util::hashed_directory_path_long_string;
 
 // DEFAULT IMPLEMENTATION
 const REMOTE_FILE_DIRECTORY: &str = "/implement_google_cloud_storage_bucket_name";

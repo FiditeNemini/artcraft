@@ -3,7 +3,8 @@ use std::path::PathBuf;
 use crockford::crockford_entropy_lower;
 use buckets::util::hashed_directory_path_long_string;
 use crate::remote_file_manager::file_descriptor::FileDescriptor;
-use crate::remote_file_manager::remote_cloud_file_manager::RemoteCloudBucketDetails;
+use crate::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
+
 pub struct FileBucketDirectory {
     file_object_hash: String, 
     remote_cloud_base_directory: String,
@@ -74,7 +75,6 @@ pub struct FileBucketDirectory {
     pub fn to_full_remote_cloud_file_path_pathbuf(&self) -> PathBuf {
       PathBuf::from(&self.full_remote_cloud_file_path)
     }
-  
     pub fn get_file_name(&self) -> &str {
         &self.file_name
     }

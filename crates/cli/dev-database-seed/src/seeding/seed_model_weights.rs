@@ -25,7 +25,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::bucket_clients::BucketClients;
 use crate::seeding::users::HANASHI_USER_TOKEN;
-
+use std::result::Result::Ok;
 pub async fn seed_weights_files(
     mysql_pool: &Pool<MySql>,
     maybe_bucket_clients: Option<&BucketClients>
