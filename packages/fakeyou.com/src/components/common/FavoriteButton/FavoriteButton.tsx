@@ -13,7 +13,6 @@ interface FavoriteButtonProps {
   favoriteCount?: number;
   overlay?: boolean;
   large?: boolean;
-  isFavorited?: boolean;
 }
 
 export default function FavoriteButton({
@@ -22,7 +21,6 @@ export default function FavoriteButton({
   favoriteCount,
   overlay,
   large,
-  isFavorited,
 }: FavoriteButtonProps) {
   const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +52,7 @@ export default function FavoriteButton({
         trigger="mouseenter"
         delay={[500, 0]}
         offset={[0, 12]}
+        placement="bottom"
       >
         <button
           onClick={handleClick}
@@ -64,7 +63,7 @@ export default function FavoriteButton({
             icon={isToggled ? faBookmark : faBookmarkOutline}
             className={`${iconClass} me-2`}
           />
-          <p className="favorite-text">{isFavorited ? "Saved" : "Save"}</p>
+          <p className="favorite-text">{isToggled ? "Saved" : "Save"}</p>
         </button>
       </Tippy>
     </div>
