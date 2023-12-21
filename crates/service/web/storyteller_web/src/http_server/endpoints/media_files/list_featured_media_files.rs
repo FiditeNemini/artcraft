@@ -7,20 +7,11 @@ use chrono::{DateTime, Utc};
 use log::{debug, error, warn};
 use r2d2_redis::redis::Commands;
 use utoipa::ToSchema;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
-use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
-use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
-use enums::by_table::media_files::media_file_type::MediaFileType;
 
-use enums::by_table::model_weights::{
-  weights_category::WeightsCategory,
-  weights_types::WeightsType,
-};
-use mysql_queries::queries::media_files::list_media_files_by_tokens::list_media_files_by_tokens;
-use mysql_queries::queries::model_weights::list_weights_by_tokens::list_weights_by_tokens;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_type::MediaFileType;
+use mysql_queries::queries::media_files::list::list_media_files_by_tokens::list_media_files_by_tokens;
 use tokens::tokens::media_files::MediaFileToken;
-use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;

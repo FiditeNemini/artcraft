@@ -7,14 +7,14 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::warn;
+use utoipa::ToSchema;
 
 use enums::common::visibility::Visibility;
-use mysql_queries::queries::model_weights::list_weights_by_user::{list_weights_by_creator_username, WeightsJoinUserRecord};
+use mysql_queries::queries::model_weights::list_weights_by_user::list_weights_by_creator_username;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
-use utoipa::ToSchema;
 
 #[derive(Serialize, Clone,ToSchema)]
 pub struct Weight {
@@ -159,7 +159,7 @@ pub async fn list_weights_by_user_handler(
   let final_weights:Vec<Weight>;
 
   // if it's not the user ... then only show public weights else show private and public
-  if (creator_user_token != user_session.user_token) {
+  if creator_user_token != user_session.user_token {
     final_weights = weights.into_iter().filter(|weight| {
       weight.creator_set_visibility == Visibility::Public
     }).collect();

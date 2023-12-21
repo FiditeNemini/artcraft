@@ -12,7 +12,7 @@ use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
 use http_server_common::request::get_request_ip::get_request_ip;
 use media::decode_basic_audio_info::decode_basic_audio_bytes_info;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
-use mysql_queries::queries::media_files::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
+use mysql_queries::queries::media_files::create::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
 use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::endpoints::media_files::upload::drain_multipart_request::{drain_multipart_request, MediaFileUploadSource};
