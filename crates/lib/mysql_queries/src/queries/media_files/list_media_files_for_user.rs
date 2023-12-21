@@ -51,7 +51,7 @@ pub struct ListMediaFileForUserArgs<'a> {
   pub maybe_filter_media_type: Option<MediaFileType>,
   pub page_size: usize,
   pub page_index: usize,
-  pub cursor_is_reversed: bool,
+  pub sort_ascending: bool,
   pub view_as: ViewAs,
   pub mysql_pool: &'a MySqlPool,
 }
@@ -66,16 +66,13 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
     false,
     0,
     0,
-    args.cursor_is_reversed,
+    args.sort_ascending,
     args.view_as,
     count_fields.as_str(),
   );
 
   let row_count_query = count_query_builder.build_query_scalar::<i64>();
   let row_count_result = row_count_query.fetch_one(args.mysql_pool).await?;
-  /// Figure out limit start and end based on page size and indexes as requested
-  let limit_start = args.page_size * args.page_index;
-  let limit_end = limit_start + args.page_size;
 
   /// Now fetch the actual results with all the fields
   let result_fields = select_result_fields();
@@ -83,9 +80,9 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
     args.maybe_filter_media_type,
     args.username,
     true,
-    limit_start,
-    limit_end,
-    args.cursor_is_reversed,
+    args.page_index,
+    args.page_size,
+    args.sort_ascending,
     args.view_as,
     result_fields.as_str(),
   );
@@ -115,7 +112,7 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
 
   Ok(MediaFileListPage {
     records: results,
-    sort_ascending: !args.cursor_is_reversed,
+    sort_ascending: args.sort_ascending,
     current_page: args.page_index,
     total_page_count: number_of_pages,
   })
@@ -157,9 +154,9 @@ fn query_builder<'a>(
   maybe_filter_media_type: Option<MediaFileType>,
   username: &'a str,
   enforce_limits: bool,
-  limit_start: usize,
-  limit_end: usize,
-  cursor_is_reversed: bool,
+  page_index: usize,
+  page_size: usize,
+  sort_ascending: bool,
   view_as: ViewAs,
   select_fields: &'a str,
 ) -> QueryBuilder<'a, MySql> {
@@ -201,18 +198,15 @@ WHERE m.user_deleted_at IS NULL
     }
   }
 
-  if cursor_is_reversed {
-    query_builder.push(" ORDER BY m.id ASC ");
+  if sort_ascending {
+    query_builder.push(" ORDER BY m.created_at ASC ");
   } else {
-    query_builder.push(" ORDER BY m.id DESC ");
+    query_builder.push(" ORDER BY m.created_at DESC ");
   }
 
   if enforce_limits {
-    if cursor_is_reversed {
-      query_builder.push(format!(" LIMIT {limit_start}, {limit_end} "));
-    } else {
-      query_builder.push(format!(" LIMIT {limit_end}, {limit_start} "));
-    }
+    let offset = page_index * page_size;
+    query_builder.push(format!(" LIMIT {page_size} OFFSET {offset} "));
   }
 
   query_builder
