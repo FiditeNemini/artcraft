@@ -6,6 +6,7 @@ use actix_web::http::StatusCode;
 use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::{info, warn};
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
@@ -52,9 +53,9 @@ pub struct MediaFileListItem {
   pub maybe_origin_model_token: Option<String>,
 
   pub media_type: MediaFileType,
-  pub public_bucket_directory_hash: String,
-  pub maybe_public_bucket_prefix: Option<String>,
-  pub maybe_public_bucket_extension: Option<String>,
+
+  /// URL to the media file.
+  pub public_bucket_path: String,
 
   pub creator_set_visibility: Visibility,
 
@@ -162,9 +163,12 @@ pub async fn list_media_files_for_user_handler(
         maybe_origin_model_type: record.maybe_origin_model_type,
         maybe_origin_model_token: record.maybe_origin_model_token,
         media_type: record.media_type,
-        public_bucket_directory_hash: record.public_bucket_directory_hash,
-        maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
-        maybe_public_bucket_extension: record.maybe_public_bucket_extension,
+        public_bucket_path: MediaFileBucketPath::from_object_hash(
+          &record.public_bucket_directory_hash,
+          record.maybe_public_bucket_prefix.as_deref(),
+          record.maybe_public_bucket_extension.as_deref())
+            .get_full_object_path_str()
+            .to_string(),
         creator_set_visibility: record.creator_set_visibility,
         created_at: record.created_at,
         updated_at: record.updated_at,
