@@ -124,31 +124,38 @@ pub async fn set_model_weight_avatar_handler(
 
   let mut maybe_set_media_file_token = None;
 
-  if let Some(media_file_token) = &request.avatar_media_file_token {
-    let media_file_lookup_result = get_media_file(
-      &media_file_token,
-      false,
-      &server_state.mysql_pool,
-    ).await;
+  let delete_avatar = request.avatar_media_file_token
+      .as_ref()
+      .map(|token| token.as_str().trim().is_empty())
+      .unwrap_or(true);
 
-    let media_file = match media_file_lookup_result {
-      Ok(Some(model_weight)) => model_weight,
-      Ok(None) => {
-        warn!("Media file not found: {:?}", media_file_token);
-        return Err(SetModelWeightAvatarError::NotFound);
-      },
-      Err(err) => {
-        warn!("Error looking up model_weights : {:?}", err);
-        return Err(SetModelWeightAvatarError::ServerError);
+  if !delete_avatar {
+    if let Some(media_file_token) = &request.avatar_media_file_token {
+      let media_file_lookup_result = get_media_file(
+        &media_file_token,
+        false,
+        &server_state.mysql_pool,
+      ).await;
+
+      let media_file = match media_file_lookup_result {
+        Ok(Some(model_weight)) => model_weight,
+        Ok(None) => {
+          warn!("Media file not found: {:?}", media_file_token);
+          return Err(SetModelWeightAvatarError::NotFound);
+        },
+        Err(err) => {
+          warn!("Error looking up model_weights : {:?}", err);
+          return Err(SetModelWeightAvatarError::ServerError);
+        }
+      };
+
+      if media_file.creator_set_visibility != Visibility::Public
+          || media_file.media_type != MediaFileType::Image {
+        return Err(SetModelWeightAvatarError::BadInput("Invalid media file token.".to_string()));
       }
-    };
 
-    if media_file.creator_set_visibility != Visibility::Public
-        || media_file.media_type != MediaFileType::Image {
-      return Err(SetModelWeightAvatarError::BadInput("Invalid media file token.".to_string()));
+      maybe_set_media_file_token = Some(media_file.token);
     }
-
-    maybe_set_media_file_token = Some(media_file.token);
   }
 
   // TODO(bt,2023-12-21): DB needs a column, or we need an ip audit log
@@ -157,7 +164,7 @@ pub async fn set_model_weight_avatar_handler(
   let query_result = set_model_weight_avatar(UpdateArgs {
     model_weight_token: &path.token,
     maybe_avatar_media_file_token: maybe_set_media_file_token.as_ref(),
-    mysql_pool: &server_state.mysql_pool
+    mysql_pool: &server_state.mysql_pool,
   }).await;
 
   match query_result {
