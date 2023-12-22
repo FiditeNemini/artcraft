@@ -13,10 +13,7 @@ use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
 
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
-
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
-
-
 
 use crate::remote_file_manager::bucket_orchestration::{BucketOrchestrationCore};
 
@@ -55,7 +52,7 @@ impl RemoteCloudFileClient {
             file_descriptor
         );
 
-        println!("Uploading media file to bucket path: {:?}",directory.get_remote_cloud_base_directory());
+        println!("Uploading media file to bucket path: {:?}",directory.get_full_remote_cloud_file_path());
 
         self.bucket_orchestration_client.upload_file_with_content_type_process(
             &directory.get_remote_cloud_base_directory(),
@@ -85,17 +82,15 @@ impl RemoteCloudFileClient {
 
 #[cfg(test)]
 mod tests {
+    use async_trait::async_trait;
     use env_logger;
     use errors::AnyhowResult;
     use crate::remote_file_manager::bucket_orchestration::BucketOrchestrationCore;
     use crate::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsSDXLDescriptor};
-    use super::bucket_orchestration;
 
+    struct BucketOrchestrationMock {}
 
-    struct BucketOrchestrationMock {
-
-    }
-    #[async-trait]
+    #[async_trait]
     impl BucketOrchestrationCore for BucketOrchestrationMock {
         async fn download_file_to_disk(
             &self,
@@ -107,16 +102,26 @@ mod tests {
             println!("{}",object_path);
             println!("{}",filesystem_path);
             println!("{}",is_public);
+            println!("Download Done Downloading");
+
+            assert_eq!(String::from("/weights/1/2/123/loRA_123.safetensors"),object_path);
+            assert_eq!(String::from("./file_path_here"),filesystem_path);
+            assert_eq!(is_public,true);
             Ok(())
         }
+
         async fn upload_file_with_content_type_process(&self, object_name: &str,
                                                        bytes: &[u8],
                                                        content_type: &str,
                                                        is_public: bool) -> AnyhowResult<()> {
             println!("Upload File to Disk");
             println!("{}",object_name);
-            println!("{}",content_type);
+            assert_eq!(object_name,String::from("/weights/2/y/q/m/2/2yqm2f1bamh88seyd690h9v24apgezhr/loRA_2yqm2f1bamh88seyd690h9v24apgezhr.safetensors"));
+            println!("ContentType:{}",content_type);
             println!("{}",is_public);
+            assert_eq!(is_public,true);
+
+            println!("Is Done Uploading");
             Ok(())
         }
     }
@@ -130,7 +135,7 @@ mod tests {
         
         assert_eq!(file_descriptor.get_prefix(), "loRA");
         assert_eq!(file_descriptor.get_suffix(), "safetensors");
-        assert_eq!(file_descriptor.is_public(), false);
+        assert_eq!(file_descriptor.is_public(), true);
 
     }
     #[tokio::test]
@@ -141,11 +146,8 @@ mod tests {
 
         let file_path:&str= "./file_path_here";
 
-        // let seed_tool_data_root = get_seed_tool_data_root();
-        // let file_path = seed_tool_data_root.join(file_path);
-        let file_path = file_path.to_str().unwrap();
         let remote_cloud_file_manager = RemoteCloudFileClient {
-            bucket_orchestration_client: Box::new(BucketOrchestrationCore {})
+            bucket_orchestration_client: Box::new(BucketOrchestrationMock {})
         };
 
         println!("begin upload from file_path: {:?}", file_path);
@@ -154,7 +156,7 @@ mod tests {
             prefix: String::from("loRA"),
             suffix: String::from("safetensors")
         };
-        let result = remote_cloud_file_manager.download_file(details,file_path).await;
+        let result = remote_cloud_file_manager.download_file(details,file_path.to_string()).await;
         
         match result {
             Ok(file_meta_data) => {
@@ -171,14 +173,11 @@ mod tests {
         use super::*;
 
         env_logger::init();
+        // Replace with a test file.
+        let weight_path:&str= "/home/tensor/code/storyteller/storyteller-rust/crates/lib/api_clients/cloud_storage/src/remote_file_manager/remote_cloud_file_manager.rs";
 
-        let weight_path:&str= "models/imagegen/loRA/nijiMecha.safetensors";
-
-        // let seed_tool_data_root = get_seed_tool_data_root();
-        // let weight_path = seed_tool_data_root.join(weight_path);
-        let weight_path = weight_path.to_str().unwrap();
         let remote_cloud_file_manager = RemoteCloudFileClient {
-            bucket_orchestration_client: Box::new(BucketOrchestrationCore {})
+            bucket_orchestration_client: Box::new(BucketOrchestrationMock {})
         };
 
         println!("begin upload from weight_path: {:?}", weight_path);
@@ -194,7 +193,4 @@ mod tests {
             }
         }
     }
-
-
-
 }

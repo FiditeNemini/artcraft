@@ -48,7 +48,7 @@ pub struct FileBucketDirectory {
       // gets you name of the file with suffix and prefix and entropy in the centre
       let file_name = format!("{}_{}.{}", file_descriptor.get_prefix(), entropy, file_descriptor.get_suffix());
       // note: no longer optional because it's easy to know what it would be in the db explicit is better than implcit.
-    
+
       // This is the full path you upload to.
       let full_remote_cloud_file_path = format!("{}/{}", remote_cloud_base_directory , file_name);
       Self {

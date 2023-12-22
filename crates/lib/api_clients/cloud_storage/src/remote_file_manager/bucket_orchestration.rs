@@ -5,6 +5,7 @@ use async_trait::async_trait;
 use errors::AnyhowResult;
 
 use crate::bucket_client::BucketClient;
+use crate::remote_file_manager::file_meta_data::FileMetaData;
 
 #[async_trait]
 pub trait BucketOrchestrationCore {
@@ -19,6 +20,7 @@ pub trait BucketOrchestrationCore {
                                                    bytes: &[u8],
                                                    content_type: &str,
                                                    is_public: bool) -> AnyhowResult<()>;
+
 }
 
 
