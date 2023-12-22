@@ -35,6 +35,7 @@ import Modal from "components/common/Modal";
 import SocialButton from "components/common/SocialButton";
 import Input from "components/common/Input";
 import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
+import { CreateBookmark } from "@storyteller/components/src/api/bookmarks/CreateBookmark";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -310,10 +311,14 @@ export default function WeightPage({
     );
   }
 
-  const handleBookmark = async (data: any) => {
-    console.log(
-      `The item is now ${data.isLiked ? "Bookmarked" : "Not Bookmarked"}.`
-    );
+  const handleBookmark = (toggled: boolean) => {
+    return CreateBookmark("",{
+      entity_token: weight_token,
+      entity_type: "model_weight"
+    })
+    .then((res: any) => {
+      console.log("🔖",res);
+    });
   };
 
   const subtitleDivider = <span className="opacity-25 fs-5 fw-light">|</span>;
