@@ -1,6 +1,5 @@
 import MakeRequest from "../MakeRequest";
 import { MediaFile } from "./GetMedia";
-// import { MediaFileType } from "../_common/enums/MediaFileType";
 import { LazyPagination } from "../_common/SharedFetchTypes";
 
 export interface ListMediaFilesRequest {}

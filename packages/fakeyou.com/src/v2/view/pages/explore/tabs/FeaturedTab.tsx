@@ -6,7 +6,6 @@ import SkeletonCard from "components/common/Card/SkeletonCard";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
-import ImageCard from "components/common/Card/ImageCard";
 
 export default function FeaturedTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -59,7 +58,7 @@ export default function FeaturedTab() {
           </MasonryGrid>
         )}
       </div>
-      <div>
+      {/* <div>
         <div className="d-flex align-items-center mb-3">
           <h3 className="fw-semibold mb-0 flex-grow-1">
             Featured Image Weights
@@ -98,7 +97,7 @@ export default function FeaturedTab() {
             })}
           </MasonryGrid>
         )}
-      </div>
+      </div> */}
     </div>
   );
 }

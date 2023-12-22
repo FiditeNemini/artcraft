@@ -25,13 +25,11 @@ export default function AudioCard({
 }: AudioCardProps) {
   const history = useHistory();
 
-  // console.log("🐙",data, data.public_bucket_path);
-
   const handleCardClick = () => {
     if (type === "media") {
       history.push(`/media/${data.token}`);
     } else if (type === "weights") {
-      history.push(`/weight/${data.token}`);
+      history.push(`/weight/${data.weight_token}`);
     }
   };
 
@@ -81,13 +79,15 @@ export default function AudioCard({
             {showCreator && (
               <div className="flex-grow-1">
                 <CreatorName
-                  displayName={data.maybe_creator.display_name}
-                  gravatarHash={data.maybe_creator.gravatar_hash}
-                  avatarIndex={data.maybe_creator.default_avatar.image_index}
-                  backgroundIndex={
-                    data.maybe_creator.default_avatar.color_index
+                  displayName={data.maybe_creator?.display_name || "Anonymous"}
+                  gravatarHash={data.maybe_creator?.gravatar_hash || null}
+                  avatarIndex={
+                    data.maybe_creator?.default_avatar.image_index || 0
                   }
-                  username={data.maybe_creator.username}
+                  backgroundIndex={
+                    data.maybe_creator?.default_avatar.color_index || 0
+                  }
+                  username={data.maybe_creator?.username || "anonymous"}
                 />
               </div>
             )}
@@ -126,9 +126,7 @@ export default function AudioCard({
 
               <div className="d-flex align-items-center mt-3">
                 <div className="flex-grow-1">
-                  <h6 className="fw-semibold text-white mb-1">
-                    {data.weight_name}
-                  </h6>
+                  <h6 className="fw-semibold text-white mb-1">{data.title}</h6>
                   <p className="fs-7 opacity-75">{timeAgo}</p>
                 </div>
               </div>
@@ -144,15 +142,13 @@ export default function AudioCard({
             {showCreator && (
               <div className="flex-grow-1">
                 <CreatorName
-                  displayName={data.maybe_creator_user.display_name}
-                  gravatarHash={data.maybe_creator_user.gravatar_hash}
-                  avatarIndex={
-                    data.maybe_creator_user.default_avatar.image_index
-                  }
+                  displayName={data.creator?.display_name || "Anonymous"}
+                  gravatarHash={data.creator?.gravatar_hash || null}
+                  avatarIndex={data.creator?.default_avatar.image_index || 0}
                   backgroundIndex={
-                    data.maybe_creator_user.default_avatar.color_index
+                    data.creator?.default_avatar.color_index || 0
                   }
-                  username={data.maybe_creator_user.username}
+                  username={data.creator?.username || "anonymous"}
                 />
               </div>
             )}

@@ -1,28 +1,42 @@
-// import MakeRequest from "../MakeRequest";
+import MakeRequest from "../MakeRequest";
 import { UserDetailsLight } from "../_common/UserDetailsLight";
 import { WeightCategory } from "../_common/enums/WeightCategory";
 import { WeightType } from "../_common/enums/WeightType";
 
 export interface Weight {
   weight_token: string;
-  weight_type: WeightType;
-  weight_category: WeightCategory;
-  maybe_creator_user: UserDetailsLight | null;
+  weights_type: WeightType;
+  weights_category: WeightCategory;
+  title: string;
+  public_bucket_path: string;
   creator_set_visibility: string;
   created_at: Date;
   updated_at: Date;
-  title: string;
+  creator: UserDetailsLight;
   description_markdown: string;
+  description_rendered_html: string;
+  file_checksum_sha2: string;
+  file_size_bytes: number;
+  maybe_cached_user_ratings_ratio: number | null;
+  maybe_cover_image_public_bucket_path: string | null;
+  version: number;
 }
 
-// export interface GetMediaRequest {}
+export interface GetWeightRequest {
+  weight_token: "string";
+}
 
-// export interface GetMediaResponse {
-//   success: boolean,
-//   media_file?: MediaFile,
-// }
+export interface GetWeightResponse {
+  success: boolean;
+  media_file?: Weight;
+}
 
-// export const GetMedia = MakeRequest<string, GetMediaRequest, GetMediaResponse, {}>({
-//   method: "GET",
-//   routingFunction: (mediaFileToken: string) => `/v1/media_files/file/${mediaFileToken}`,
-// });
+export const GetWeight = MakeRequest<
+  string,
+  GetWeightRequest,
+  GetWeightResponse,
+  {}
+>({
+  method: "GET",
+  routingFunction: (weightToken: string) => `/v1/weights/weight/${weightToken}`,
+});
