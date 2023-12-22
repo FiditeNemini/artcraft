@@ -1,7 +1,3 @@
-// NB: Incrementally getting rid of build warnings...
-#![forbid(unused_imports)]
-#![forbid(unused_mut)]
-#![forbid(unused_variables)]
 
 use std::fmt;
 use std::sync::Arc;
@@ -14,7 +10,7 @@ use chrono::{DateTime, Utc};
 use log::warn;
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
-use mysql_queries::queries::user_bookmarks::list_user_bookmarks::{list_user_bookmarks, list_user_user_bookmarks_by_entity_type};
+use mysql_queries::queries::user_bookmarks::list_user_bookmarks::{ list_user_bookmarks_by_maybe_entity_type};
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -100,36 +96,17 @@ pub async fn list_user_bookmarks_for_session_handler(
       })?
       .ok_or(ListUserBookmarksError::NotAuthorizedError)?;
 
-  let query_results = match query.maybe_scoped_entity_type {
-    None => list_user_bookmarks(&user_session.username, &server_state.mysql_pool).await,
-    Some(entity_type) =>
-      list_user_user_bookmarks_by_entity_type(&user_session.username, entity_type, &server_state.mysql_pool)
-          .await,
-  };
+  // let query_results = match query.maybe_scoped_entity_type {
+  //   None => list_user_bookmarks(&user_session.username, &server_state.mysql_pool).await,
+  //   Some(entity_type) =>
+  //     list_user_user_bookmarks_by_entity_type(&user_session.username, entity_type, &server_state.mysql_pool)
+  //         .await,
+  // };
 
-  let user_bookmarks = match query_results {
-    Ok(results) => results,
-    Err(e) => {
-      warn!("Query error: {:?}", e);
-      return Err(ListUserBookmarksError::ServerError);
-    }
-  };
 
   let response = ListUserBookmarksSuccessResponse {
     success: true,
-    user_bookmarks: user_bookmarks.into_iter()
-        .map(|user_bookmark| UserBookmark {
-          token: user_bookmark.token,
-          details: UserBookmarkDetails {
-            entity_type: user_bookmark.entity_type,
-            entity_token: user_bookmark.entity_token,
-            maybe_summary_text: None,
-            maybe_thumbnail_url: None,
-          },
-          created_at: user_bookmark.created_at,
-          updated_at: user_bookmark.updated_at,
-        })
-        .collect(),
+    user_bookmarks: Vec::new()
   };
 
   let body = serde_json::to_string(&response)
