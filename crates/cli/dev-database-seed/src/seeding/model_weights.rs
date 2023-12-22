@@ -111,8 +111,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
         let mut description_rendered_html;
         let mut original_filename;
         let mut original_download_url;
-        let mut thumbnail_token;
-        
+
         let mut private_bucket_hash:String = "".to_string();
         let mut private_bucket_prefix;
         let mut private_bucket_extension;
@@ -140,9 +139,6 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 original_filename = format!("gura_gwar{}.safetensors", i);
                 original_download_url = format!("www.google.ca");
 
-                // NOTE TO SELF this will be a join for later on for now they can use this.
-                thumbnail_token = "";
-                
                 // private_bucket_hash = format!("bucket_hash{}", i);
                 private_bucket_prefix = format!("_fake");
                 private_bucket_extension = format!("rvcV2");
@@ -171,9 +167,6 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 original_filename = format!("filename{}.txt", i);
                 original_download_url = format!("https://civitai.com/api/download/models/149193?type=Model&format=SafeTensor&size=pruned&fp=fp16");
 
-                // NOTE TO SELF this will be a join for later on for now they can use this.
-                thumbnail_token = "";
-                
                 // private_bucket_hash = format!("bucket_hash{}", i);
                 private_bucket_prefix = format!("_fake");
                 private_bucket_extension = format!("tt2");
@@ -197,9 +190,6 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 original_filename = format!("filename{}.txt", i);
                 original_download_url = format!("https://civitai.com/api/download/models/149193?type=Model&format=SafeTensor&size=pruned&fp=fp16");
 
-                // NOTE TO SELF this will be a join for later on for now they can use this.
-                thumbnail_token = ""; //sd1_5_image_token;
-                 
                 // private_bucket_hash = format!("bucket_hash{}", i);
                 private_bucket_prefix = format!("_fake");
                 private_bucket_extension = format!("sd15");
@@ -245,9 +235,6 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 original_filename = format!("filename{}.txt", i);
                 original_download_url = format!("https://civitai.com/api/download/models/149193?type=Model&format=SafeTensor&size=pruned&fp=fp16");
   
-                // NOTE TO SELF this will be a join for later on for now they can use this.
-                thumbnail_token = "";
-
                 cached_user_ratings_total_count = i;
                 cached_user_ratings_positive_count = i;
                 cached_user_ratings_negative_count = i;
@@ -273,9 +260,6 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 original_filename = format!("filename{}.txt", i);
                 original_download_url = format!("https://civitai.com/api/download/models/149193?type=Model&format=SafeTensor&size=pruned&fp=fp16");
 
-                // NOTE TO SELF this will be a join for later on for now they can use this.
-                thumbnail_token = ""; // lora_image_token;
-                
                 // private_bucket_hash = format!("bucket_hash{}", i);
                 private_bucket_prefix = format!("_fake");
                 private_bucket_extension = format!("loRA");
@@ -303,9 +287,6 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 original_filename = format!("gura_gwar{}.safetensors", i);
                 original_download_url = format!("www.google.ca");
 
-                // NOTE TO SELF this will be a join for later on for now they can use this.
-                thumbnail_token = "";
-                
                 // private_bucket_hash = format!("bucket_hash{}", i);
                 private_bucket_prefix = format!("_fake");
                 private_bucket_extension = format!("rvcV2");
@@ -324,7 +305,6 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 weights_type: weights_types, // replace with actual WeightsType
                 weights_category, // replace with actual WeightsCategory
                 title,
-                maybe_thumbnail_token: Some(thumbnail_token.to_string()),
                 description_markdown: description,
                 description_rendered_html: description_rendered_html.to_string(),
                 creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -370,7 +350,6 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 1".to_string()),
             description_markdown: "Description 1".to_string(),
             description_rendered_html: "<p>Description 1</p>".to_string(),
             creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -396,7 +375,6 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::HifiganTacotron2, // replace with actual WeightsType
             weights_category: WeightsCategory::TextToSpeech, // replace with actual WeightsCategory
             title: "Title 2".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 2".to_string()),
             description_markdown: "Description 2".to_string(),
             description_rendered_html: "<p>Description 2</p>".to_string(),
             creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -422,7 +400,6 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::StableDiffusion15, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 3".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 3".to_string()),
             description_markdown: "Description 3".to_string(),
             description_rendered_html: "<p>Description 3</p>".to_string(),
             creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -448,7 +425,6 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 4".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 4".to_string()),
             description_markdown: "Description 4".to_string(),
             description_rendered_html: "<p>Description 4</p>".to_string(),
             creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -474,7 +450,6 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 5".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 4".to_string()),
             description_markdown: "Description 4".to_string(),
             description_rendered_html: "<p>Description 4</p>".to_string(),
             creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -526,7 +501,6 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToke
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 1".to_string()),
             description_markdown: "Description 1".to_string(),
             description_rendered_html: "<p>Description 1</p>".to_string(),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
@@ -552,7 +526,6 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToke
             weights_type: WeightsType::HifiganTacotron2, // replace with actual WeightsType
             weights_category: WeightsCategory::TextToSpeech, // replace with actual WeightsCategory
             title: "Title 2".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 2".to_string()),
             description_markdown: "Description 2".to_string(),
             description_rendered_html: "<p>Description 2</p>".to_string(),
             creator_user_token: Some(&creator_token2), // replace with actual UserToken
@@ -578,7 +551,6 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToke
             weights_type: WeightsType::StableDiffusion15, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 3".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 3".to_string()),
             description_markdown: "Description 3".to_string(),
             description_rendered_html: "<p>Description 3</p>".to_string(),
             creator_user_token: Some(&creator_token3), // replace with actual UserToken
@@ -604,7 +576,6 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToke
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 4".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 4".to_string()),
             description_markdown: "Description 4".to_string(),
             description_rendered_html: "<p>Description 4</p>".to_string(),
             creator_user_token: Some(&creator_token4), // replace with actual UserToken
@@ -630,7 +601,6 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToke
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 5".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 5".to_string()),
             description_markdown: "Description 5".to_string(),
             description_rendered_html: "<p>Description 5</p>".to_string(),
             creator_user_token: Some(&creator_token5), // replace with actual UserToken
