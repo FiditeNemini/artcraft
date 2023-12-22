@@ -20,6 +20,8 @@ use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo,
 use crate::http_server::endpoints::media_files::list_featured_media_files::*;
 use crate::http_server::endpoints::media_files::list_media_files::*;
 use crate::http_server::endpoints::media_files::list_media_files_for_user::*;
+use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
+use crate::http_server::endpoints::media_files::upload_media_file::*;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::*;
 use crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::*;
 use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_entity_handler::*;
@@ -34,21 +36,25 @@ use crate::http_server::endpoints::weights::update_weight::*;
 use crate::http_server::web_utils::response_success_helpers::*;
 
 #[derive(OpenApi)]
-#[openapi(paths(crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
-    crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler,
-    crate::http_server::endpoints::weights::delete_weight::delete_weight_handler,
-    crate::http_server::endpoints::weights::update_weight::update_weight_handler,
-    crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler,
-    crate::http_server::endpoints::weights::get_weight::get_weight_handler,
-    crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler,
+#[openapi(
+  paths(
     crate::http_server::endpoints::media_files::list_featured_media_files::list_featured_media_files_handler,
     crate::http_server::endpoints::media_files::list_media_files::list_media_files_handler,
     crate::http_server::endpoints::media_files::list_media_files_for_user::list_media_files_for_user_handler,
+    crate::http_server::endpoints::media_files::upload_media_file::upload_media_file_handler,
     crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler,
     crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::delete_user_bookmark_handler,
-    crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_handler::list_user_bookmarks_for_user_handler,
     crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_entity_handler::list_user_bookmarks_for_entity_handler,
-    ),components(schemas(
+    crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_handler::list_user_bookmarks_for_user_handler,
+    crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
+    crate::http_server::endpoints::weights::delete_weight::delete_weight_handler,
+    crate::http_server::endpoints::weights::get_weight::get_weight_handler,
+    crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler,
+    crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler,
+    crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler,
+    crate::http_server::endpoints::weights::update_weight::update_weight_handler,
+  ),
+  components(schemas(
     // Tokens
     UserToken,Visibility,
     // 
@@ -61,6 +67,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     UpdateWeightRequest,UpdateWeightRequest,UpdateWeightPathInfo,UpdateWeightRequest,UpdateWeightError,
     SetModelWeightCoverImageRequest,SetModelWeightCoverImageResponse,SetModelWeightCoverImagePathInfo,SetModelWeightCoverImageError,
     DeleteWeightPathInfo,DeleteWeightRequest,DeleteWeightError,DeleteWeightRequest,DeleteWeightError,
+    UploadMediaSuccessResponse,MediaFileUploadError,
     ListWeightError,ModelWeightForList,ListWeightError,
     ListAvailableWeightsQuery,ListAvailableWeightsSuccessResponse,ModelWeightForList,
     ListWeightsByUserError,ListWeightsByUserSuccessResponse,ListWeightsByUserPathInfo,Weight,
@@ -78,5 +85,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     DeleteUserBookmarkPathInfo,DeleteUserBookmarkError,DeleteUserBookmarkRequest,
     ListUserBookmarksPathInfo,ListUserBookmarksForUserError,ListUserBookmarksForUserSuccessResponse,UserBookmarkListItem,
     ListUserBookmarksForEntityPathInfo,ListUserBookmarksForEntityError,ListUserBookmarksForEntitySuccessResponse,UserBookmarkForEntityListItem,
-    )))]
+  ))
+)]
 pub struct ApiDoc;
