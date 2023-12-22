@@ -2,65 +2,38 @@ import Panel from "components/common/Panel";
 import Container from "components/common/Container";
 import PageHeader from "components/layout/PageHeader";
 import React, { useState } from "react";
-import { Button, Input } from "components/common";
+import { Button } from "components/common";
 import { faUpload } from "@fortawesome/pro-solid-svg-icons";
-import {
-  UploadMediaFile,
-  UploadMediaFileRequest,
-} from "@storyteller/components/src/api/media_files/UploadMediaFile";
+import { UploadMedia, UploadMediaResponse } from "@storyteller/components/src/api/media_files/UploadMedia";
 import { v4 as uuidv4 } from "uuid";
+import { Link } from 'react-router-dom';
 
 interface DevUploadProps {}
 
 export default function DevUpload(props: DevUploadProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [file, fileSet] = useState<File | null>(null);
+  const [tokens,tokensSet] = useState<string[]>([]);
 
   const handleFileChange = (event: any) => {
-    setSelectedFile(event.target.files[0]);
+    fileSet(event.target.files[0]);
   };
 
-  const makeRequest = async (): Promise<UploadMediaFileRequest | null> => {
-    if (!selectedFile) {
-      return null;
-    }
 
-    const fileReader = new FileReader();
-    fileReader.readAsArrayBuffer(selectedFile);
-
-    return new Promise(resolve => {
-      fileReader.onload = () => {
-        const result = fileReader.result;
-        if (result instanceof ArrayBuffer) {
-          resolve({
-            uuid_idempotency_token: uuidv4(),
-            file_name: selectedFile.name,
-            file_bytes: result,
-            media_source: "file",
-          });
-        }
-      };
+  const handleUpload = () => {
+    if (file) UploadMedia({
+      uuid_idempotency_token: uuidv4(),
+      file,
+      source: "file",
+    }) // if there an audio file it uploads here
+    .then((res: UploadMediaResponse) => {
+      if ("media_file_token" in res) {
+        console.log("📁 upload response:", res);
+        tokensSet([res.media_file_token, ...tokens]);
+        fileSet(null);
+      }
     });
-  };
-
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      alert("Please select a file to upload");
-      return;
-    }
-
-    const request = await makeRequest();
-    if (request) {
-      UploadMediaFile(request)
-        .then(res => {
-          if (res) {
-            console.log(res);
-          }
-        })
-        .catch(error => {
-          console.error("Upload failed:", error);
-        });
-    }
-  };
+    else console.log("🥺 no file");
+  }
 
   return (
     <Container type="padded" className="pt-4 pt-lg-5">
@@ -71,7 +44,6 @@ export default function DevUpload(props: DevUploadProps) {
 
       <Panel padding={true}>
         <div className="d-flex flex-column gap-5">
-          <Input label="File Name" />
           <input
             className="form-control form-control-lg"
             id="formFile"
@@ -80,11 +52,17 @@ export default function DevUpload(props: DevUploadProps) {
           />
           <div className="d-flex gap-3 justify-content-end">
             <Button
+              disabled={!file}
               icon={faUpload}
               label="Upload Media"
               onClick={handleUpload}
             />
           </div>
+          <h2>Your uploads</h2>
+          {
+            tokens.map((token: string, key: number) => 
+              <Link {...{ key, to: `/media/${ token }` }}>{ token }</Link>)
+          }
         </div>
       </Panel>
     </Container>
