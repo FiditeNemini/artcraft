@@ -14,6 +14,7 @@ import { ListWeights } from "@storyteller/components/src/api/weights/ListWeights
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import { useLazyLists } from "hooks";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 
 export default function MediaTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -28,8 +29,8 @@ export default function MediaTab() {
   });
 
   const filterOptions = [
-    { value: "all", label: "All Media" },
-    { value: "images", label: "Images" },
+    { value: "all", label: "All Weights" },
+    { value: "images", label: "Image Generation" },
     { value: "audio", label: "Audio" },
     { value: "video", label: "Video" },
   ];
@@ -94,8 +95,8 @@ export default function MediaTab() {
             >
               {weights.list.map((data: any, index: number) => {
                 let card;
-                switch (data.media_type) {
-                  case "audio":
+                switch (data.weights_category) {
+                  case WeightCategory.TTS:
                     card = (
                       <AudioCard
                         key={index}
@@ -105,7 +106,27 @@ export default function MediaTab() {
                       />
                     );
                     break;
-                  case "image":
+                  case WeightCategory.VC:
+                    card = (
+                      <AudioCard
+                        key={index}
+                        data={data}
+                        type="weights"
+                        showCreator={true}
+                      />
+                    );
+                    break;
+                  case WeightCategory.ZS:
+                    card = (
+                      <AudioCard
+                        key={index}
+                        data={data}
+                        type="weights"
+                        showCreator={true}
+                      />
+                    );
+                    break;
+                  case WeightCategory.SD:
                     card = (
                       <ImageCard
                         key={index}
@@ -115,18 +136,8 @@ export default function MediaTab() {
                       />
                     );
                     break;
-                  case "video":
-                    card = (
-                      <VideoCard
-                        key={index}
-                        data={data}
-                        type="weights"
-                        showCreator={true}
-                      />
-                    );
-                    break;
                   default:
-                    card = <div>Unsupported media type</div>;
+                    card = <div>Unsupported weight type</div>;
                 }
                 return (
                   <div
