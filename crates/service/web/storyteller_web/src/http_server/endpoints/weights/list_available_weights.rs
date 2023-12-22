@@ -7,6 +7,7 @@ use chrono::{DateTime, Utc};
 use log::{info, warn};
 use rand::Rng;
 use utoipa::ToSchema;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 use enums::by_table::model_weights::{
     weights_category::WeightsCategory,
@@ -16,6 +17,7 @@ use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::list::list_weights_query_builder::ListWeightsQueryBuilder;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::server_state::ServerState;
 
@@ -48,12 +50,14 @@ pub struct ModelWeightForList {
 
     pub title: String,
 
-    pub maybe_thumbnail_token: Option<String>,
-
     pub description_markdown: String,
     pub description_rendered_html: String,
 
-    pub creator_user_token: UserToken,
+    /// Avatars are small descriptive images that can be set for any model.
+    /// If an avatar is set, this is the path to the asset.
+    pub maybe_avatar_public_bucket_path: Option<String>,
+
+    pub creator: UserDetailsLight,
     pub creator_set_visibility: Visibility,
 
     pub file_size_bytes: i32,
@@ -63,8 +67,6 @@ pub struct ModelWeightForList {
     pub cached_user_ratings_positive_count: u32,
     pub cached_user_ratings_negative_count: u32,
     pub maybe_cached_user_ratings_ratio: Option<f32>,
-
-    pub version: i32,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -222,39 +224,56 @@ pub async fn list_available_weights_handler(
     let response = ListAvailableWeightsSuccessResponse {
         success: true,
         weights: weights_page.weights.into_iter()
-            .map(|weights| ModelWeightForList {
-                weight_token: weights.token,
-                title: weights.title,
-                weights_type: weights.weights_type,
-                weights_category: weights.weights_category,
+            .map(|weight| {
 
-                maybe_thumbnail_token:weights.maybe_thumbnail_token,
-                description_markdown: weights.description_markdown,
-                description_rendered_html: weights.description_rendered_html,
+                let maybe_avatar = weight.maybe_avatar_public_bucket_hash
+                    .as_deref()
+                    .map(|hash| {
+                        MediaFileBucketPath::from_object_hash(
+                            hash,
+                            weight.maybe_avatar_public_bucket_prefix.as_deref(),
+                            weight.maybe_avatar_public_bucket_extension.as_deref())
+                            .get_full_object_path_str()
+                            .to_string()
+                    });
 
-                creator_user_token: weights.creator_user_token,
-                creator_set_visibility: weights.creator_set_visibility,
+                ModelWeightForList {
+                    weight_token: weight.token,
+                    title: weight.title,
+                    weights_type: weight.weights_type,
+                    weights_category: weight.weights_category,
 
-                file_size_bytes:weights.file_size_bytes,
-                file_checksum_sha2: weights.file_checksum_sha2,
+                    description_markdown: weight.description_markdown,
+                    description_rendered_html: weight.description_rendered_html,
+                    maybe_avatar_public_bucket_path: maybe_avatar,
 
-                cached_user_ratings_total_count: weights.cached_user_ratings_total_count,
-                cached_user_ratings_positive_count: weights.cached_user_ratings_positive_count,
-                cached_user_ratings_negative_count: weights.cached_user_ratings_negative_count,
-                maybe_cached_user_ratings_ratio: weights.maybe_cached_user_ratings_ratio,
+                    creator: UserDetailsLight::from_db_fields(
+                        &weight.creator_user_token,
+                        &weight.creator_username,
+                        &weight.creator_display_name,
+                        &weight.creator_email_gravatar_hash
+                    ),
+                    creator_set_visibility: weight.creator_set_visibility,
 
-                version: weights.version,
+                    file_size_bytes: weight.file_size_bytes,
+                    file_checksum_sha2: weight.file_checksum_sha2,
 
-                created_at: weights.created_at,
-                updated_at: weights.updated_at,
+                    cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
+                    cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
+                    cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
+                    maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
 
-                creator_username: weights.creator_username,
-                creator_display_name: weights.creator_display_name,
-                creator_email_gravatar_hash: weights.creator_email_gravatar_hash,
+                    created_at: weight.created_at,
+                    updated_at: weight.updated_at,
 
-                // TODO: FIX THIS when we align again.
-                bookmarks: random_bool,
-                likes: rng.gen_range(0..1000),
+                    creator_username: weight.creator_username,
+                    creator_display_name: weight.creator_display_name,
+                    creator_email_gravatar_hash: weight.creator_email_gravatar_hash,
+
+                    // TODO: FIX THIS when we align again.
+                    bookmarks: random_bool,
+                    likes: rng.gen_range(0..1000),
+                }
             }).collect::<Vec<_>>(),
         cursor_next,
         cursor_previous,

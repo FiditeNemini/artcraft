@@ -7,6 +7,7 @@ use chrono::{DateTime, Utc};
 use log::{debug, error, warn};
 use r2d2_redis::redis::Commands;
 use utoipa::ToSchema;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 use enums::by_table::model_weights::{
   weights_category::WeightsCategory,
@@ -33,9 +34,11 @@ pub struct ModelWeightForList {
 
   pub title: String,
 
-  pub maybe_thumbnail_token: Option<String>,
-
   pub creator: UserDetailsLight,
+
+  /// Avatars are small descriptive images that can be set for any model.
+  /// If an avatar is set, this is the path to the asset.
+  pub maybe_avatar_public_bucket_path: Option<String>,
 
   pub cached_user_ratings_total_count: u32,
   pub cached_user_ratings_positive_count: u32,
@@ -125,24 +128,38 @@ pub async fn list_featured_weights_handler(
   let response = ListFeaturedWeightsSuccessResponse {
     success: true,
     weights: weights.into_iter()
-        .map(|w| ModelWeightForList {
-          weight_token: w.token,
-          title: w.title,
-          weights_type: w.weights_type,
-          weights_category: w.weights_category,
-          maybe_thumbnail_token: w.maybe_thumbnail_token,
-          creator: UserDetailsLight::from_db_fields(
-            &w.creator_user_token,
-            &w.creator_username,
-            &w.creator_display_name,
-            &w.creator_email_gravatar_hash
-          ),
-          cached_user_ratings_total_count: w.cached_user_ratings_total_count,
-          cached_user_ratings_positive_count: w.cached_user_ratings_positive_count,
-          cached_user_ratings_negative_count: w.cached_user_ratings_negative_count,
-          maybe_cached_user_ratings_ratio: w.maybe_cached_user_ratings_ratio,
-          created_at: w.created_at,
-          updated_at: w.updated_at,
+        .map(|w| {
+
+          let maybe_avatar = w.maybe_avatar_public_bucket_hash
+              .as_deref()
+              .map(|hash| {
+                MediaFileBucketPath::from_object_hash(
+                  hash,
+                  w.maybe_avatar_public_bucket_prefix.as_deref(),
+                  w.maybe_avatar_public_bucket_extension.as_deref())
+                    .get_full_object_path_str()
+                    .to_string()
+              });
+
+          ModelWeightForList {
+            weight_token: w.token,
+            title: w.title,
+            weights_type: w.weights_type,
+            weights_category: w.weights_category,
+            maybe_avatar_public_bucket_path: maybe_avatar,
+            creator: UserDetailsLight::from_db_fields(
+              &w.creator_user_token,
+              &w.creator_username,
+              &w.creator_display_name,
+              &w.creator_email_gravatar_hash
+            ),
+            cached_user_ratings_total_count: w.cached_user_ratings_total_count,
+            cached_user_ratings_positive_count: w.cached_user_ratings_positive_count,
+            cached_user_ratings_negative_count: w.cached_user_ratings_negative_count,
+            maybe_cached_user_ratings_ratio: w.maybe_cached_user_ratings_ratio,
+            created_at: w.created_at,
+            updated_at: w.updated_at,
+          }
         }).collect::<Vec<_>>(),
   };
 

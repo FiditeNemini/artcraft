@@ -36,6 +36,7 @@ pub struct GetWeightResponse {
     file_size_bytes: i32,
     file_checksum_sha2: String,
 
+    /// Avatars are small descriptive images that can be set for any model.
     /// If an avatar is set, this is the path to the asset.
     maybe_avatar_public_bucket_path: Option<String>,
 
@@ -148,8 +149,8 @@ pub async fn get_weight_handler(
         .map(|hash| {
             MediaFileBucketPath::from_object_hash(
                 hash,
-                weight.maybe_public_bucket_prefix.as_deref(),
-                weight.maybe_public_bucket_extension.as_deref())
+                weight.maybe_avatar_public_bucket_prefix.as_deref(),
+                weight.maybe_avatar_public_bucket_extension.as_deref())
                 .get_full_object_path_str()
                 .to_string()
         });

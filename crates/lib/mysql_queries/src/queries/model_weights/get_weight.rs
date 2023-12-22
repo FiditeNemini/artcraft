@@ -158,6 +158,7 @@ async fn select_include_deleted(
         wt.original_filename,
         wt.file_size_bytes,
         wt.file_checksum_sha2,
+
         wt.public_bucket_hash,
         wt.maybe_public_bucket_prefix,
         wt.maybe_public_bucket_extension,

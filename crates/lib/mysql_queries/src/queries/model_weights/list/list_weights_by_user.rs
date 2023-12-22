@@ -51,6 +51,10 @@ pub struct WeightsJoinUserRecord {
     pub public_bucket_hash: String,
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
+  
+    pub maybe_avatar_public_bucket_hash: Option<String>,
+    pub maybe_avatar_public_bucket_prefix: Option<String>,
+    pub maybe_avatar_public_bucket_extension: Option<String>,
     
     pub cached_user_ratings_total_count: u32,
     pub cached_user_ratings_positive_count: u32,
@@ -134,38 +138,44 @@ fn select_total_count_field() -> String {
 
 fn select_result_fields() -> String {
     r#"
-                mw.token,
-                mw.title,
-                mw.weights_type,
-                mw.weights_category,
-                mw.maybe_thumbnail_token,
-                mw.description_markdown,
-                mw.description_rendered_html,
-                u.token as creator_user_token,
-                u.username as creator_username,
-                u.display_name as creator_display_name,
-                u.email_gravatar_hash as creator_email_gravatar_hash,
-                mw.creator_ip_address,
-                mw.creator_set_visibility,
-                mw.maybe_last_update_user_token,
-                mw.original_download_url,
-                mw.original_filename,
-                mw.file_size_bytes,
-                mw.file_checksum_sha2,
-                mw.public_bucket_hash,
-                mw.maybe_public_bucket_prefix,
-                mw.maybe_public_bucket_extension,
-                mw.cached_user_ratings_negative_count,
-                mw.cached_user_ratings_positive_count,
-                mw.cached_user_ratings_total_count,
-                mw.maybe_cached_user_ratings_ratio,
-                mw.cached_user_ratings_last_updated_at,
-                mw.version,
-                mw.created_at,
-                mw.updated_at,
-                mw.user_deleted_at,
-                mw.mod_deleted_at
-                "#.to_string()
+        mw.token,
+        mw.title,
+        mw.weights_type,
+        mw.weights_category,
+        mw.maybe_thumbnail_token,
+        mw.description_markdown,
+        mw.description_rendered_html,
+        u.token as creator_user_token,
+        u.username as creator_username,
+        u.display_name as creator_display_name,
+        u.email_gravatar_hash as creator_email_gravatar_hash,
+        mw.creator_ip_address,
+        mw.creator_set_visibility,
+        mw.maybe_last_update_user_token,
+        mw.original_download_url,
+        mw.original_filename,
+        mw.file_size_bytes,
+        mw.file_checksum_sha2,
+
+        mw.public_bucket_hash,
+        mw.maybe_public_bucket_prefix,
+        mw.maybe_public_bucket_extension,
+
+        avatar.public_bucket_directory_hash as maybe_avatar_public_bucket_hash,
+        avatar.maybe_public_bucket_prefix as maybe_avatar_public_bucket_prefix,
+        avatar.maybe_public_bucket_extension as maybe_avatar_public_bucket_extension,
+
+        mw.cached_user_ratings_negative_count,
+        mw.cached_user_ratings_positive_count,
+        mw.cached_user_ratings_total_count,
+        mw.maybe_cached_user_ratings_ratio,
+        mw.cached_user_ratings_last_updated_at,
+        mw.version,
+        mw.created_at,
+        mw.updated_at,
+        mw.user_deleted_at,
+        mw.mod_deleted_at
+    "#.to_string()
 }
 
 fn query_builder<'a>(
@@ -186,6 +196,8 @@ SELECT
 FROM model_weights as mw
 JOIN users as u
     ON u.token = mw.creator_user_token
+LEFT OUTER JOIN media_files as avatar
+    ON avatar.token = mw.maybe_avatar_media_file_token
     "#
         ));
 
@@ -215,44 +227,48 @@ JOIN users as u
 async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRecord> {
     let weights: Vec<WeightsJoinUserRecord> = dataset
         .into_iter()
-        .map(|dataset: RawWeightJoinUser| {
+        .map(|weight: RawWeightJoinUser| {
             WeightsJoinUserRecord {
-                token: dataset.token,
-                title: dataset.title,
-                weights_type: dataset.weights_type,
-                weights_category: dataset.weights_category,
-                maybe_thumbnail_token: dataset.maybe_thumbnail_token,
-                description_markdown: dataset.description_markdown,
-                description_rendered_html: dataset.description_rendered_html,
+                token: weight.token,
+                title: weight.title,
+                weights_type: weight.weights_type,
+                weights_category: weight.weights_category,
+                maybe_thumbnail_token: weight.maybe_thumbnail_token,
+                description_markdown: weight.description_markdown,
+                description_rendered_html: weight.description_rendered_html,
 
-                creator_user_token: dataset.creator_user_token,
-                creator_ip_address: dataset.creator_ip_address,
-                creator_set_visibility: dataset.creator_set_visibility,
+                creator_user_token: weight.creator_user_token,
+                creator_ip_address: weight.creator_ip_address,
+                creator_set_visibility: weight.creator_set_visibility,
 
-                maybe_last_update_user_token: dataset.maybe_last_update_user_token,
-                original_download_url: dataset.original_download_url,
-                original_filename: dataset.original_filename,
-                file_size_bytes: dataset.file_size_bytes,
-                file_checksum_sha2: dataset.file_checksum_sha2,
-                public_bucket_hash: dataset.public_bucket_hash,
-                maybe_public_bucket_prefix: dataset.maybe_public_bucket_prefix,
-                maybe_public_bucket_extension: dataset.maybe_public_bucket_extension,
+                maybe_last_update_user_token: weight.maybe_last_update_user_token,
+                original_download_url: weight.original_download_url,
+                original_filename: weight.original_filename,
+                file_size_bytes: weight.file_size_bytes,
+                file_checksum_sha2: weight.file_checksum_sha2,
+                public_bucket_hash: weight.public_bucket_hash,
+                maybe_public_bucket_prefix: weight.maybe_public_bucket_prefix,
+                maybe_public_bucket_extension: weight.maybe_public_bucket_extension,
 
-                cached_user_ratings_negative_count: dataset.cached_user_ratings_negative_count,
-                cached_user_ratings_positive_count: dataset.cached_user_ratings_positive_count,
-                cached_user_ratings_total_count: dataset.cached_user_ratings_total_count,
+                maybe_avatar_public_bucket_hash: weight.maybe_avatar_public_bucket_hash,
+                maybe_avatar_public_bucket_prefix: weight.maybe_avatar_public_bucket_prefix,
+                maybe_avatar_public_bucket_extension: weight.maybe_avatar_public_bucket_extension,
 
-                maybe_cached_user_ratings_ratio: dataset.maybe_cached_user_ratings_ratio,
-                cached_user_ratings_last_updated_at: dataset.cached_user_ratings_last_updated_at,
-                version: dataset.version,
-                created_at: dataset.created_at,
-                updated_at: dataset.updated_at,
-                user_deleted_at: dataset.user_deleted_at,
-                mod_deleted_at: dataset.mod_deleted_at,
+                cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
+                cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
+                cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
 
-                creator_username:dataset.creator_username,
-                creator_display_name:dataset.creator_display_name,
-                creator_email_gravatar_hash:dataset.creator_email_gravatar_hash
+                maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
+                cached_user_ratings_last_updated_at: weight.cached_user_ratings_last_updated_at,
+                version: weight.version,
+                created_at: weight.created_at,
+                updated_at: weight.updated_at,
+                user_deleted_at: weight.user_deleted_at,
+                mod_deleted_at: weight.mod_deleted_at,
+
+                creator_username: weight.creator_username,
+                creator_display_name: weight.creator_display_name,
+                creator_email_gravatar_hash: weight.creator_email_gravatar_hash,
             }
         }).collect();
 
@@ -288,7 +304,11 @@ async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRe
     pub public_bucket_hash: String,
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
-    
+
+    pub maybe_avatar_public_bucket_hash: Option<String>,
+    pub maybe_avatar_public_bucket_prefix: Option<String>,
+    pub maybe_avatar_public_bucket_extension: Option<String>,
+
     pub cached_user_ratings_total_count: u32,
     pub cached_user_ratings_positive_count: u32,
     pub cached_user_ratings_negative_count: u32,
@@ -309,7 +329,7 @@ async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRe
 }
 
 impl FromRow<'_, MySqlRow> for RawWeightJoinUser {
-    fn from_row(row: &MySqlRow) -> std::result::Result<Self, sqlx::Error> {
+    fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
         Ok(Self {
             token: row.try_get("token")?,
             weights_type: row.try_get("weights_type")?,
@@ -329,6 +349,9 @@ impl FromRow<'_, MySqlRow> for RawWeightJoinUser {
             public_bucket_hash: row.try_get("public_bucket_hash")?,
             maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
             maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
+            maybe_avatar_public_bucket_hash: row.try_get("maybe_avatar_public_bucket_hash")?,
+            maybe_avatar_public_bucket_prefix: row.try_get("maybe_avatar_public_bucket_prefix")?,
+            maybe_avatar_public_bucket_extension: row.try_get("maybe_avatar_public_bucket_extension")?,
             cached_user_ratings_total_count: row.try_get("cached_user_ratings_total_count")?,
             cached_user_ratings_positive_count: row.try_get("cached_user_ratings_positive_count")?,
             cached_user_ratings_negative_count: row.try_get("cached_user_ratings_negative_count")?,
