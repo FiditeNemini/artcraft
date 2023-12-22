@@ -1,4 +1,4 @@
-import { ApiConfig } from "../ApiConfig";
+import MakeRequest from "../MakeRequest";
 import { UserDetailsLight } from "../_common/UserDetailsLight";
 import { WeightCategory } from "../_common/enums/WeightCategory";
 import { WeightType } from "../_common/enums/WeightType";
@@ -21,36 +21,15 @@ export interface Weight {
   maybe_cover_image_public_bucket_path: string | null;
   version: number;
 }
+
+export interface GetWeightRequest {}
+
 export interface GetWeightResponse {
   success: boolean;
-  weight?: Weight;
+  media_file?: Weight;
 }
 
-export async function GetWeight(
-  weightToken: string
-): Promise<GetWeightResponse> {
-  const endpoint = new ApiConfig().getWeight(weightToken);
-
-  return await fetch(endpoint, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-    },
-    credentials: "include",
-  })
-    .then(res => res.json())
-    .then(res => {
-      const response: GetWeightResponse = res;
-
-      if (response && response.success && response.weight) {
-        response.weight.created_at = new Date(response.weight.created_at);
-        response.weight.updated_at = new Date(response.weight.updated_at);
-        return response;
-      } else {
-        return { success: false };
-      }
-    })
-    .catch(e => {
-      return { success: false };
-    });
-}
+export const GetWeight = MakeRequest<string,GetWeightRequest,GetWeightResponse,{}>({
+  method: "GET",
+  routingFunction: (weightToken: string) => `/v1/weights/weight/${weightToken}`,
+});

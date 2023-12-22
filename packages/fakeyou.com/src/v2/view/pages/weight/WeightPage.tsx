@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
@@ -62,25 +62,24 @@ export default function WeightPage({
   const [weight, setWeight] = useState<Weight | undefined | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-  const timeUpdated = useTimeAgo(weight?.updated_at.toISOString() || "");
+  const timeUpdated = useTimeAgo(weight?.updated_at?.toISOString() || "");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const getWeight = useCallback(async (mediaFileToken: string) => {
-    let result = await GetWeight(mediaFileToken);
-    if (result.weight) {
-      setWeight(result.weight);
-      setIsLoading(false);
-    } else {
-      setError(true);
-      setIsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    getWeight(weight_token);
-  }, [weight_token, getWeight]);
+    if (weight_token && !weight && isLoading) {
+      GetWeight(weight_token,{})
+      .then((res: any) => {
+        console.log("🏋️",res);
+        setIsLoading(false);
+        setWeight(res);
+      })
+      .catch((err) => {
+        setError(err);
+      });
+    }
+  },[isLoading, weight, weight_token]);
 
   function renderWeightComponent(weight: Weight) {
     switch (weight.weights_category) {
@@ -245,8 +244,8 @@ export default function WeightPage({
       property: "Visibility",
       value: weight.creator_set_visibility.toString(),
     },
-    { property: "Created at", value: weight.created_at.toString() },
-    { property: "Updated at", value: weight.updated_at.toString() },
+    { property: "Created at", value: weight.created_at?.toString() || "" },
+    { property: "Updated at", value: weight.updated_at?.toString() || "" },
   ];
 
   const imageDetails = [
@@ -256,8 +255,8 @@ export default function WeightPage({
       property: "Visibility",
       value: weight.creator_set_visibility.toString(),
     },
-    { property: "Created at", value: weight.created_at.toString() },
-    { property: "Updated at", value: weight.updated_at.toString() },
+    { property: "Created at", value: weight.created_at?.toString() || "" },
+    { property: "Updated at", value: weight.updated_at?.toString() || "" },
 
     //more to add for image/stable diffusion details
   ];
