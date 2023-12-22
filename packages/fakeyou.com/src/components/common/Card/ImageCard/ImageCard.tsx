@@ -8,6 +8,7 @@ import FavoriteButton from "components/common/FavoriteButton";
 import CreatorName from "../CreatorName";
 import Button from "components/common/Button";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
+import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 
 interface ImageCardProps {
   data: any;
@@ -22,7 +23,7 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
     if (type === "media") {
       history.push(`/media/${data.token}`);
     } else if (type === "weights") {
-      history.push(`/weight/${data.token}`);
+      history.push(`/weight/${data.weight_token}`);
     }
   };
 
@@ -35,6 +36,9 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
   const handleLike = async (data: any) => {
     console.log(`The item is now ${data.isLiked ? "liked" : "not liked"}.`);
   };
+
+  const { label: weightBadgeLabel, color: weightBadgeColor } =
+    useWeightTypeInfo(data.weights_type);
 
   return (
     <Card padding={false} onClick={handleCardClick}>
@@ -71,12 +75,12 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
                       displayName={
                         data.maybe_creator?.display_name || "Anonymous"
                       }
-                      gravatarHash={data.maybe_creator?.gravatar_hash || ""}
+                      gravatarHash={data.maybe_creator?.gravatar_hash || null}
                       avatarIndex={
-                        data.maybe_creator?.default_avatar.image_index || ""
+                        data.maybe_creator?.default_avatar.image_index || 0
                       }
                       backgroundIndex={
-                        data.maybe_creator?.default_avatar.color_index || ""
+                        data.maybe_creator?.default_avatar.color_index || 0
                       }
                       username={data.maybe_creator?.username || "anonymous"}
                     />
@@ -95,15 +99,22 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
       {type === "weights" && (
         <>
           <img
-            src={data.public_bucket_path}
-            alt={data.weight_name}
+            src={
+              data.maybe_cover_image_public_bucket_path ||
+              "/images/avatars/default-pfp.png"
+            }
+            alt={data.title}
             className="card-img"
           />
           <div className="card-img-overlay">
             <div className="card-img-gradient" />
             <div className="d-flex align-items-center">
               <div className="d-flex flex-grow-1">
-                <Badge label="LORA" color="pink" overlay={true} />
+                <Badge
+                  label={weightBadgeLabel}
+                  color={weightBadgeColor}
+                  overlay={true}
+                />
               </div>
               <Button
                 icon={faArrowRight}
@@ -133,12 +144,12 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
                   <div className="flex-grow-1">
                     <CreatorName
                       displayName={data.creator?.display_name || "Anonymous"}
-                      gravatarHash={data.creator?.gravatar_hash || ""}
+                      gravatarHash={data.creator?.gravatar_hash || null}
                       avatarIndex={
-                        data.creator?.default_avatar.image_index || ""
+                        data.creator?.default_avatar.image_index || 0
                       }
                       backgroundIndex={
-                        data.creator?.default_avatar.color_index || ""
+                        data.creator?.default_avatar.color_index || 0
                       }
                       username={data.creator?.username || "anonymous"}
                     />
@@ -148,10 +159,7 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
                 <div>
                   <LikeButton onToggle={handleLike} likeCount={data.likes} />
                 </div>
-                <FavoriteButton
-                  onToggle={handleLike}
-                  favoriteCount={data.likes}
-                />
+                <FavoriteButton onToggle={handleLike} />
               </div>
             </div>
           </div>

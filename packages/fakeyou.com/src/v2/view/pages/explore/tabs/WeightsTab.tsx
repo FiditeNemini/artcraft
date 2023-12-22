@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
-import VideoCard from "components/common/Card/VideoCard";
+// import VideoCard from "components/common/Card/VideoCard";
 import { TempSelect } from "components/common";
 import {
   faArrowDownWideShort,

@@ -1,6 +1,6 @@
-import Masonry from "masonry-layout"; //Refer to: https://github.com/desandro/masonry
-import imagesLoaded from "imagesloaded"; //Refer to: https://github.com/desandro/imagesloaded
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
+import Masonry from "masonry-layout";
+import imagesLoaded from "imagesloaded";
 
 interface MasonryGridProps {
   children: React.ReactNode;
@@ -13,37 +13,76 @@ export default function MasonryGrid({
   onLayoutComplete,
   gridRef,
 }: MasonryGridProps) {
+  const masonryInstance = useRef<Masonry | null>(null);
+
   useEffect(() => {
-    let masonryInstance: Masonry | null = null;
-
-    const updateLayout = () => {
-      //Needs this type guard to check that it is not undefined.
-      if (masonryInstance && typeof masonryInstance.layout === "function") {
-        masonryInstance.layout();
-      }
-    };
-
     if (gridRef.current) {
-      masonryInstance = new Masonry(gridRef.current, {
+      masonryInstance.current = new Masonry(gridRef.current, {
         itemSelector: ".grid-item",
         percentPosition: true,
         transitionDuration: 0,
       });
-
-      //Needs this or images will overflow masonry card. It checks if image is loaded then after it is loaded, it resizes the card.
-      imagesLoaded(gridRef.current, function () {
-        updateLayout();
-        onLayoutComplete?.();
-      });
     }
 
-    //Clean up
     return () => {
-      if (masonryInstance && typeof masonryInstance.destroy === "function") {
-        masonryInstance.destroy();
+      if (
+        masonryInstance.current &&
+        typeof masonryInstance.current.destroy === "function"
+      ) {
+        masonryInstance.current.destroy();
       }
     };
+  }, [gridRef]);
+
+  useEffect(() => {
+    const currentGrid = gridRef.current;
+    const currentMasonryInstance = masonryInstance.current;
+
+    if (currentGrid && currentMasonryInstance) {
+      imagesLoaded(currentGrid, function () {
+        if (typeof currentMasonryInstance.layout === "function") {
+          currentMasonryInstance.layout();
+          onLayoutComplete?.();
+        }
+      });
+    }
   }, [gridRef, onLayoutComplete]);
+
+  useEffect(() => {
+    const currentGrid = gridRef.current;
+    const currentMasonryInstance = masonryInstance.current;
+
+    if (currentGrid && currentMasonryInstance) {
+      // Observer to detect when new grid items are added
+      const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+          if (mutation.addedNodes.length) {
+            // Append new items to the Masonry layout
+            const newItems = Array.from(mutation.addedNodes).filter(
+              node =>
+                node instanceof HTMLElement &&
+                node.classList.contains("grid-item")
+            );
+            if (newItems.length) {
+              if (typeof currentMasonryInstance.appended === "function") {
+                currentMasonryInstance.appended(newItems);
+              }
+            }
+          }
+        });
+      });
+
+      // Observe the grid for new items
+      observer.observe(currentGrid, {
+        childList: true,
+      });
+
+      // Clean up observer on unmount
+      return () => {
+        observer.disconnect();
+      };
+    }
+  }, [gridRef]);
 
   return (
     <div

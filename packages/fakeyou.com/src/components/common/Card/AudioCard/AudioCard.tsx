@@ -25,13 +25,11 @@ export default function AudioCard({
 }: AudioCardProps) {
   const history = useHistory();
 
-  // console.log("🐙",data, data.public_bucket_path);
-
   const handleCardClick = () => {
     if (type === "media") {
       history.push(`/media/${data.token}`);
     } else if (type === "weights") {
-      history.push(`/weight/${data.token}`);
+      history.push(`/weight/${data.weight_token}`);
     }
   };
 
@@ -82,12 +80,12 @@ export default function AudioCard({
               <div className="flex-grow-1">
                 <CreatorName
                   displayName={data.maybe_creator?.display_name || "Anonymous"}
-                  gravatarHash={data.maybe_creator?.gravatar_hash || ""}
+                  gravatarHash={data.maybe_creator?.gravatar_hash || null}
                   avatarIndex={
-                    data.maybe_creator?.default_avatar.image_index || ""
+                    data.maybe_creator?.default_avatar.image_index || 0
                   }
                   backgroundIndex={
-                    data.maybe_creator?.default_avatar.color_index || ""
+                    data.maybe_creator?.default_avatar.color_index || 0
                   }
                   username={data.maybe_creator?.username || "anonymous"}
                 />
@@ -145,10 +143,10 @@ export default function AudioCard({
               <div className="flex-grow-1">
                 <CreatorName
                   displayName={data.creator?.display_name || "Anonymous"}
-                  gravatarHash={data.creator?.gravatar_hash || ""}
-                  avatarIndex={data.creator?.default_avatar.image_index || ""}
+                  gravatarHash={data.creator?.gravatar_hash || null}
+                  avatarIndex={data.creator?.default_avatar.image_index || 0}
                   backgroundIndex={
-                    data.creator?.default_avatar.color_index || ""
+                    data.creator?.default_avatar.color_index || 0
                   }
                   username={data.creator?.username || "anonymous"}
                 />
