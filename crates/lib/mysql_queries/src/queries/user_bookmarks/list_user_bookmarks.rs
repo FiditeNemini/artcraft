@@ -1,97 +1,49 @@
 use anyhow::anyhow;
 use log::warn;
-use sqlx::MySqlPool;
+use sqlx::{MySql, MySqlPool, QueryBuilder};
+use enums::by_table::media_files::media_file_type::MediaFileType;
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
+use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
+use crate::queries::media_files::list::list_media_files_for_user::{MediaFileListItem, MediaFileListPage, ViewAs};
 
 use crate::queries::user_bookmarks::list_user_bookmarks_result::RawUserBookmarkRecord;
 use crate::queries::user_bookmarks::list_user_bookmarks_result::UserBookmark;
 
-pub async fn list_user_bookmarks(
-  username: &str,
-  mysql_pool: &MySqlPool
-) -> AnyhowResult<Vec<UserBookmark>> {
 
-  /// TODO(bt,2023-11-21): Maybe this query can use a switch
-  ///  See: https://stackoverflow.com/questions/2761574/mysql-use-case-else-value-as-join-parameter
-  let maybe_results= sqlx::query_as!(
-      RawUserBookmarkRecord,
-        r#"
-SELECT
-    f.token as `token: tokens::tokens::user_bookmarks::UserBookmarkToken`,
-    f.entity_type as `entity_type: enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType`,
-    f.entity_token,
-    f.user_token as `user_token: tokens::tokens::users::UserToken`,
-    u.username,
-    u.display_name as user_display_name,
-    u.email_gravatar_hash as user_gravatar_hash,
-    f.created_at,
-    f.updated_at,
-    f.deleted_at,
+pub struct UserBookmarkListPage {
+  pub results: Vec<UserBookmark>,
 
-    media_files.media_type as `maybe_media_file_type: enums::by_table::media_files::media_file_type::MediaFileType`,
-    media_files.origin_product_category as `maybe_media_file_origin_category: enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory`,
+  pub sort_ascending: bool,
 
-    model_weights.title as maybe_descriptive_text_model_weight_title,
-    tts_models.title as maybe_descriptive_text_tts_model_title,
-    tts_results.raw_inference_text as maybe_descriptive_text_tts_result_inference_text,
-    users.display_name as maybe_descriptive_text_user_display_name,
-    voice_conversion_models.title as maybe_descriptive_text_voice_conversion_model_title,
-    zs_voices.title as maybe_descriptive_text_zs_voice_title
-
-FROM
-    user_bookmarks AS f
-JOIN users AS u
-    ON f.user_token = u.token
-
-LEFT OUTER JOIN model_weights ON model_weights.token = f.entity_token
-LEFT OUTER JOIN media_files ON media_files.token = f.entity_token
-LEFT OUTER JOIN tts_models ON tts_models.token = f.entity_token
-LEFT OUTER JOIN tts_results ON tts_results.token = f.entity_token
-LEFT OUTER JOIN users ON users.token = f.entity_token
-LEFT OUTER JOIN voice_conversion_models ON voice_conversion_models.token = f.entity_token
-LEFT OUTER JOIN zs_voices ON zs_voices.token = f.entity_token
-
-WHERE
-    u.username = ?
-    AND f.deleted_at IS NULL
-ORDER BY f.id DESC
-LIMIT 50
-        "#,
-      username
-    )
-      .fetch_all(mysql_pool)
-      .await;
-
-  match maybe_results {
-    Err(err) => match err {
-      sqlx::Error::RowNotFound => Ok(Vec::new()),
-      _ => {
-        warn!("list user_bookmarks db error: {:?}", err);
-        Err(anyhow!("error with query: {:?}", err))
-      }
-    },
-    Ok(results) => Ok(results.into_iter()
-        .map(|user_bookmark| user_bookmark.into_public_type())
-        .collect()),
-  }
+  pub current_page: usize,
+  pub total_page_count: usize,
 }
 
-pub async fn list_user_user_bookmarks_by_entity_type(
-    username: &str,
-    entity_type: UserBookmarkEntityType,
-    mysql_pool: &MySqlPool
-) -> AnyhowResult<Vec<UserBookmark>> {
+pub struct ListUserBookmarksForUserArgs<'a> {
+    pub username: &'a str,
+    pub maybe_filter_entity_type: Option<UserBookmarkEntityType>,
+    pub page_size: usize,
+    pub page_index: usize,
+    pub sort_ascending: bool,
+    pub mysql_pool: &'a MySqlPool,
+}
 
-  let maybe_results= sqlx::query_as!(
-      RawUserBookmarkRecord,
-        r#"
-SELECT
-    f.token as `token: tokens::tokens::user_bookmarks::UserBookmarkToken`,
-    f.entity_type as `entity_type: enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType`,
+fn select_total_count_field() -> String {
+    r#"
+    COUNT(f.id) AS total_count
+  "#
+        .to_string()
+}
+
+fn select_result_fields() -> String {
+    r#"
+    f.token,
+    f.entity_type,
     f.entity_token,
-    f.user_token as `user_token: tokens::tokens::users::UserToken`,
+    f.user_token,
     u.username,
     u.display_name as user_display_name,
     u.email_gravatar_hash as user_gravatar_hash,
@@ -99,8 +51,8 @@ SELECT
     f.updated_at,
     f.deleted_at,
 
-    media_files.media_type as `maybe_media_file_type: enums::by_table::media_files::media_file_type::MediaFileType`,
-    media_files.origin_product_category as `maybe_media_file_origin_category: enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory`,
+    media_files.media_type as maybe_media_file_type,
+    media_files.origin_product_category as maybe_media_file_origin_category,
 
     model_weights.title as maybe_descriptive_text_model_weight_title,
     tts_models.title as maybe_descriptive_text_tts_model_title,
@@ -108,7 +60,25 @@ SELECT
     users.display_name as maybe_descriptive_text_user_display_name,
     voice_conversion_models.title as maybe_descriptive_text_voice_conversion_model_title,
     zs_voices.title as maybe_descriptive_text_zs_voice_title
+    "#.to_string()
+}
 
+fn query_builder<'a>(
+    maybe_filter_entity_type: Option<UserBookmarkEntityType>,
+    maybe_username: Option<&'a str>,
+    enforce_limits: bool,
+    page_index: usize,
+    page_size: usize,
+    sort_ascending: bool,
+    select_fields: &'a str,
+) -> QueryBuilder<'a, MySql> {
+
+    let mut first_predicate_added = false;
+    // NB: Query cannot be statically checked by sqlx
+    let mut query_builder: QueryBuilder<MySql> = QueryBuilder::new(
+        format!(r#"
+SELECT
+     {select_fields}
 FROM
     user_bookmarks AS f
 JOIN users AS u
@@ -121,30 +91,91 @@ LEFT OUTER JOIN tts_results ON tts_results.token = f.entity_token
 LEFT OUTER JOIN users ON users.token = f.entity_token
 LEFT OUTER JOIN voice_conversion_models ON voice_conversion_models.token = f.entity_token
 LEFT OUTER JOIN zs_voices ON zs_voices.token = f.entity_token
+    "#
+        ));
 
-WHERE
-    u.username = ?
-    AND f.entity_type = ?
-    AND f.deleted_at IS NULL
-ORDER BY f.id DESC
-LIMIT 50
-        "#,
-      username,
-      entity_type
-    )
-      .fetch_all(mysql_pool)
-      .await;
+    if let Some(username) = maybe_username {
+        if !first_predicate_added {
+            query_builder.push(" WHERE ");
+            first_predicate_added = true;
+        } else {
+            query_builder.push(" AND ");
+        }
+        query_builder.push(" u.username = ");
+        query_builder.push_bind(username);
+    }
 
-  match maybe_results {
-    Err(err) => match err {
-      sqlx::Error::RowNotFound => Ok(Vec::new()),
-      _ => {
-        warn!("list user_bookmarks db error: {:?}", err);
-        Err(anyhow!("error with query: {:?}", err))
-      }
-    },
-    Ok(results) => Ok(results.into_iter()
-        .map(|user_bookmark| user_bookmark.into_public_type())
-        .collect()),
-  }
+    if let Some(entity_type) = maybe_filter_entity_type {
+        if !first_predicate_added {
+            query_builder.push(" WHERE ");
+            first_predicate_added = true;
+        } else {
+            query_builder.push(" AND ");
+        }
+        query_builder.push(" f.entity_type = ");
+        query_builder.push_bind(entity_type.to_str());
+    }
+
+    query_builder.push(" AND f.deleted_at IS NULL ");
+
+    if sort_ascending {
+        query_builder.push(" ORDER BY f.created_at ASC ");
+    } else {
+        query_builder.push(" ORDER BY f.created_at DESC ");
+    }
+
+    if enforce_limits {
+        let offset = page_index * page_size;
+        query_builder.push(format!(" LIMIT {page_size} OFFSET {offset} "));
+    }
+
+    query_builder
+}
+
+pub async fn list_user_bookmarks_by_maybe_entity_type(
+    args: ListUserBookmarksForUserArgs<'_>
+) -> AnyhowResult<UserBookmarkListPage> {
+
+    let count_fields = select_total_count_field();
+    let mut count_query_builder = query_builder(
+        args.maybe_filter_entity_type,
+        Some(args.username),
+        false,
+        0,
+        0,
+        args.sort_ascending,
+        count_fields.as_str(),
+    );
+
+    let row_count_query = count_query_builder.build_query_scalar::<i64>();
+    let row_count_result = row_count_query.fetch_one(args.mysql_pool).await?;
+
+    /// Now fetch the actual results with all the fields
+    let result_fields = select_result_fields();
+    let mut query = query_builder(
+        args.maybe_filter_entity_type,
+        Some(args.username),
+        true,
+        args.page_index,
+        args.page_size,
+        args.sort_ascending,
+        result_fields.as_str(),
+    );
+
+    let query = query.build_query_as::<RawUserBookmarkRecord>();
+    let results = query.fetch_all(args.mysql_pool).await?;
+
+    let number_of_pages = (row_count_result / args.page_size as i64) as usize;
+    let results = results.into_iter()
+        .map(|record| {
+            record.into_public_type()
+        })
+        .collect::<Vec<_>>();
+
+    Ok(UserBookmarkListPage {
+        results,
+        sort_ascending: args.sort_ascending,
+        current_page: args.page_index,
+        total_page_count: number_of_pages,
+    })
 }

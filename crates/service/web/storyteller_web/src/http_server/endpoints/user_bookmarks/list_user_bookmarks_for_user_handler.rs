@@ -15,9 +15,9 @@ use log::warn;
 use utoipa::{IntoParams, ToSchema};
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
-use mysql_queries::queries::user_bookmarks::list_user_bookmarks::{list_user_bookmarks, list_user_user_bookmarks_by_entity_type};
+use mysql_queries::queries::user_bookmarks::list_user_bookmarks::{list_user_bookmarks_by_maybe_entity_type, ListUserBookmarksForUserArgs};
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
-
+use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -28,13 +28,17 @@ pub struct ListUserBookmarksPathInfo {
 
 #[derive(Deserialize, ToSchema, IntoParams)]
 pub struct ListUserBookmarksQueryData {
+  sort_ascending: Option<bool>,
+  page_size: Option<usize>,
+  page_index: Option<usize>,
   maybe_scoped_entity_type: Option<UserBookmarkEntityType>,
 }
 
 #[derive(Serialize, ToSchema)]
 pub struct ListUserBookmarksForUserSuccessResponse {
   pub success: bool,
-  pub user_bookmarks: Vec<UserBookmarkListItem>,
+  pub results: Vec<UserBookmarkListItem>,
+  pub pagination: PaginationPage,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -101,21 +105,37 @@ responses(
 ),
 )]
 pub async fn list_user_bookmarks_for_user_handler(
-  _http_request: HttpRequest,
+  http_request: HttpRequest,
   path: Path<ListUserBookmarksPathInfo>,
   query: Query<ListUserBookmarksQueryData>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListUserBookmarksForUserError>
 {
+  let _maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        ListUserBookmarksForUserError::ServerError
+      })?;
 
-  let query_results = match query.maybe_scoped_entity_type {
-    None => list_user_bookmarks(&path.username, &server_state.mysql_pool).await,
-    Some(entity_type) =>
-      list_user_user_bookmarks_by_entity_type(&path.username, entity_type, &server_state.mysql_pool)
-          .await,
-  };
 
-  let user_bookmarks = match query_results {
+  let sort_ascending = query.sort_ascending.unwrap_or(false);
+  let page_size = query.page_size.unwrap_or_else(|| 25);
+  let page_index = query.page_index.unwrap_or_else(|| 0);
+
+  let query_results =
+      list_user_bookmarks_by_maybe_entity_type(ListUserBookmarksForUserArgs{
+        username: path.username.as_ref(),
+        maybe_filter_entity_type: query.maybe_scoped_entity_type.clone(),
+        sort_ascending,
+        page_size,
+        page_index,
+        mysql_pool: &server_state.mysql_pool,
+      }).await;
+
+  let results_page = match query_results {
     Ok(results) => results,
     Err(e) => {
       warn!("Query error: {:?}", e);
@@ -125,7 +145,7 @@ pub async fn list_user_bookmarks_for_user_handler(
 
   let response = ListUserBookmarksForUserSuccessResponse {
     success: true,
-    user_bookmarks: user_bookmarks.into_iter()
+    results: results_page.results.into_iter()
         .map(|user_bookmark| UserBookmarkListItem {
           token: user_bookmark.token,
           details: UserBookmarkDetailsForUserList {
@@ -140,6 +160,10 @@ pub async fn list_user_bookmarks_for_user_handler(
           updated_at: user_bookmark.updated_at,
         })
         .collect(),
+    pagination: PaginationPage{
+      current: results_page.current_page,
+      total_page_count: results_page.total_page_count,
+    }
   };
 
   let body = serde_json::to_string(&response)

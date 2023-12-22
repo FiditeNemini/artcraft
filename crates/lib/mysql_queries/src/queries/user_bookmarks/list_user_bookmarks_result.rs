@@ -1,10 +1,14 @@
 use chrono::{DateTime, Utc};
+use sqlx::{FromRow, Row};
+use sqlx::mysql::MySqlRow;
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::traits::mysql_from_row::MySqlFromRow;
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 use tokens::tokens::users::UserToken;
+use crate::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
 
 pub struct UserBookmark {
   pub token: UserBookmarkToken,
@@ -84,4 +88,29 @@ impl RawUserBookmarkRecord {
       maybe_deleted_at: self.deleted_at,
     }
   }
+}
+
+impl FromRow<'_, MySqlRow> for RawUserBookmarkRecord {
+    fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
+        Ok(Self {
+        token: UserBookmarkToken::new(row.try_get("token")?),
+        entity_type: UserBookmarkEntityType::try_from_mysql_row(row, "entity_type")?,
+        entity_token: row.try_get("entity_token")?,
+        user_token: row.try_get("user_token")?,
+        username: row.try_get("username")?,
+        user_display_name: row.try_get("user_display_name")?,
+        user_gravatar_hash: row.try_get("user_gravatar_hash")?,
+        created_at: row.try_get("created_at")?,
+        updated_at: row.try_get("updated_at")?,
+        deleted_at: row.try_get("deleted_at")?,
+        maybe_media_file_type: MediaFileType::try_from_mysql_row_nullable(row,"maybe_media_file_type")?,
+        maybe_media_file_origin_category: MediaFileOriginCategory::try_from_mysql_row_nullable(row,"maybe_media_file_origin_category")?,
+        maybe_descriptive_text_model_weight_title: row.try_get("maybe_descriptive_text_model_weight_title")?,
+        maybe_descriptive_text_tts_model_title: row.try_get("maybe_descriptive_text_tts_model_title")?,
+        maybe_descriptive_text_tts_result_inference_text: row.try_get("maybe_descriptive_text_tts_result_inference_text")?,
+        maybe_descriptive_text_user_display_name: row.try_get("maybe_descriptive_text_user_display_name")?,
+        maybe_descriptive_text_voice_conversion_model_title: row.try_get("maybe_descriptive_text_voice_conversion_model_title")?,
+        maybe_descriptive_text_zs_voice_title: row.try_get("maybe_descriptive_text_zs_voice_title")?,
+        })
+    }
 }

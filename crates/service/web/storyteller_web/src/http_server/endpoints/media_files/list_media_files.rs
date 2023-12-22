@@ -152,6 +152,7 @@ pub async fn list_media_files_handler(
     maybe_filter_media_type: query.filter_media_type,
     maybe_offset: cursor,
     cursor_is_reversed,
+    sort_ascending,
     view_as,
     mysql_pool: &server_state.mysql_pool,
   }).await;

@@ -127,7 +127,6 @@ pub async fn list_media_files_for_user_handler(
   };
 
   // TODO(bt,2023-12-04): Enforce real maximums and defaults
-  let limit = query.page_size.unwrap_or(25);
   let sort_ascending = query.sort_ascending.unwrap_or(false);
   let page_size = query.page_size.unwrap_or_else(|| 25);
   let page_index = query.page_index.unwrap_or_else(|| 0);

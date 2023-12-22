@@ -6,7 +6,6 @@ use actix_web::http::StatusCode;
 use chrono::{DateTime, Utc};
 use log::{info, warn};
 use rand::Rng;
-use utoipa::ToSchema;
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 use enums::by_table::model_weights::{
@@ -21,24 +20,28 @@ use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::server_state::ServerState;
 
+
+
+use utoipa::ToSchema;
+use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
+
+
 #[derive(Deserialize,ToSchema)]
 pub struct ListAvailableWeightsQuery {
     pub sort_ascending: Option<bool>,
-    pub page_size: u16,
-    pub page_index : u16,
+    pub per_page: Option<u16>,
     pub username: Option<String>,
     pub weights_type: Option<String>,
     pub weights_category: Option<String>,
+    pub cursor_is_reversed: Option<bool>,
+    pub cursor: Option<String>,
 }
 
 #[derive(Serialize,ToSchema)]
 pub struct ListAvailableWeightsSuccessResponse {
     pub success: bool,
-    pub weights: Vec<ModelWeightForList>,
-    pub page_size: u16,
-    pub page_index : u16,
-    pub cursor_next: Option<String>,
-    pub cursor_previous: Option<String>,
+    pub results: Vec<ModelWeightForList>,
+    pub pagination: PaginationCursors,
 }
 
 #[derive(Serialize,ToSchema)]
@@ -138,9 +141,21 @@ pub async fn list_available_weights_handler(
         }
     };
 
-    let limit = query.page_size;
+    let limit = query.per_page.unwrap_or(25);
 
     let sort_ascending = query.sort_ascending.unwrap_or(false);
+    let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
+
+    let cursor = if let Some(cursor) = query.cursor.as_deref() {
+        let cursor = server_state.sort_key_crypto.decrypt_id(cursor)
+            .map_err(|e| {
+                warn!("crypto error: {:?}", e);
+                ListWeightError::ServerError
+            })?;
+        Some(cursor)
+    } else {
+        None
+    };
 
     let include_user_hidden = is_mod;
 
@@ -175,6 +190,7 @@ pub async fn list_available_weights_handler(
 
     let mut query_builder = ListWeightsQueryBuilder::new()
         .sort_ascending(sort_ascending)
+        .cursor_is_reversed(cursor_is_reversed)
         .weights_category(weights_category)
         .weights_type(weights_type)
         .scope_creator_username(None)
@@ -182,7 +198,7 @@ pub async fn list_available_weights_handler(
         .include_user_deleted_results(is_mod)
         .include_mod_deleted_results(is_mod)
         .limit(limit)
-        .offset(Some((query.page_index as u64) * (query.page_size as u64)));
+        .offset(cursor);
 
     let query_results = query_builder.perform_query_for_page(&server_state.mysql_pool).await;
 
@@ -223,7 +239,7 @@ pub async fn list_available_weights_handler(
     // generate parse a response
     let response = ListAvailableWeightsSuccessResponse {
         success: true,
-        weights: weights_page.weights.into_iter()
+        results: weights_page.weights.into_iter()
             .map(|weight| {
 
                 let maybe_cover_image = weight.maybe_cover_image_public_bucket_hash
@@ -275,10 +291,11 @@ pub async fn list_available_weights_handler(
                     likes: rng.gen_range(0..1000),
                 }
             }).collect::<Vec<_>>(),
-        cursor_next,
-        cursor_previous,
-        page_index: query.page_index,
-        page_size: query.page_size
+        pagination: PaginationCursors {
+            maybe_next: cursor_next,
+            maybe_previous: cursor_previous,
+            cursor_is_reversed,
+        },
     };
 
     let body = serde_json::to_string(&response)

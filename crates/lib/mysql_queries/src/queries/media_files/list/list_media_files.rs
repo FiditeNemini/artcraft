@@ -62,6 +62,7 @@ pub struct ListMediaFilesArgs<'a> {
   pub maybe_filter_media_type: Option<MediaFileType>,
   pub maybe_offset: Option<usize>,
   pub cursor_is_reversed: bool,
+  pub sort_ascending: bool,
   pub view_as: ViewAs,
   pub mysql_pool: &'a MySqlPool,
 }
@@ -73,6 +74,7 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
     args.limit,
     args.maybe_offset,
     args.cursor_is_reversed,
+    args.sort_ascending,
     args.view_as,
   );
 
@@ -124,9 +126,11 @@ fn query_builder<'a>(
   limit: usize,
   maybe_offset: Option<usize>,
   cursor_is_reversed: bool,
+  sort_ascending: bool,
   view_as: ViewAs,
 ) -> QueryBuilder<'a, MySql> {
 
+  let mut sort_ascending = sort_ascending;
   // NB: Query cannot be statically checked by sqlx
   let mut query_builder: QueryBuilder<MySql> = QueryBuilder::new(
     r#"
@@ -192,17 +196,29 @@ WHERE
   }
 
   if let Some(offset) = maybe_offset {
-    if cursor_is_reversed {
-      query_builder.push(format!(" AND m.id < {offset} "));
+    if sort_ascending {
+      if cursor_is_reversed {
+        // NB: We're searching backwards.
+        query_builder.push(" AND m.id < ");
+        sort_ascending = !sort_ascending;
+      } else {
+        query_builder.push(" AND m.id > ");
+      }
     } else {
-      query_builder.push(format!(" AND m.id > {offset} "));
+      if cursor_is_reversed {
+        // NB: We're searching backwards.
+        query_builder.push(" AND m.id > ");
+        sort_ascending = !sort_ascending;
+      } else {
+        query_builder.push(" AND m.id < ");
+      }
     }
+    query_builder.push_bind(offset as i64);
   }
-
 
   query_builder.push(" GROUP BY m.id");
 
-  if cursor_is_reversed {
+  if sort_ascending {
     query_builder.push(" ORDER BY m.id ASC ");
   } else {
     query_builder.push(" ORDER BY m.id DESC ");
