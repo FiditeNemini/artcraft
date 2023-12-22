@@ -26,7 +26,6 @@ pub struct GetWeightResponse {
     title: String,
     weights_type: WeightsType,
     weights_category: WeightsCategory,
-    maybe_thumbnail_token: Option<String>,
     description_markdown: String,
     description_rendered_html: String,
 
@@ -36,9 +35,9 @@ pub struct GetWeightResponse {
     file_size_bytes: i32,
     file_checksum_sha2: String,
 
-    /// Avatars are small descriptive images that can be set for any model.
-    /// If an avatar is set, this is the path to the asset.
-    maybe_avatar_public_bucket_path: Option<String>,
+    /// Cover images are small descriptive images that can be set for any model.
+    /// If a cover image is set, this is the path to the asset.
+    maybe_cover_image_public_bucket_path: Option<String>,
 
     cached_user_ratings_negative_count: u32,
     cached_user_ratings_positive_count: u32,
@@ -144,13 +143,13 @@ pub async fn get_weight_handler(
         return Err(GetWeightError::NotAuthorized);
     }
 
-    let maybe_avatar = weight.maybe_avatar_public_bucket_hash
+    let maybe_cover_image = weight.maybe_cover_image_public_bucket_hash
         .as_deref()
         .map(|hash| {
             MediaFileBucketPath::from_object_hash(
                 hash,
-                weight.maybe_avatar_public_bucket_prefix.as_deref(),
-                weight.maybe_avatar_public_bucket_extension.as_deref())
+                weight.maybe_cover_image_public_bucket_prefix.as_deref(),
+                weight.maybe_cover_image_public_bucket_extension.as_deref())
                 .get_full_object_path_str()
                 .to_string()
         });
@@ -168,10 +167,9 @@ pub async fn get_weight_handler(
         title: weight.title,
         weights_type: weight.weights_type,
         weights_category: weight.weights_category,
-        maybe_thumbnail_token: weight.maybe_thumbnail_token,
         description_markdown: weight.description_markdown,
         description_rendered_html: weight.description_rendered_html,
-        maybe_avatar_public_bucket_path: maybe_avatar,
+        maybe_cover_image_public_bucket_path: maybe_cover_image,
         creator,
         creator_set_visibility: weight.creator_set_visibility,
         file_size_bytes: weight.file_size_bytes,

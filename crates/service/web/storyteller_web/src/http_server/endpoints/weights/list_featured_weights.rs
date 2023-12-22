@@ -36,9 +36,9 @@ pub struct ModelWeightForList {
 
   pub creator: UserDetailsLight,
 
-  /// Avatars are small descriptive images that can be set for any model.
-  /// If an avatar is set, this is the path to the asset.
-  pub maybe_avatar_public_bucket_path: Option<String>,
+  /// Cover images are small descriptive images that can be set for any model.
+  /// If a cover image is set, this is the path to the asset.
+  pub maybe_cover_image_public_bucket_path: Option<String>,
 
   pub cached_user_ratings_total_count: u32,
   pub cached_user_ratings_positive_count: u32,
@@ -130,13 +130,13 @@ pub async fn list_featured_weights_handler(
     weights: weights.into_iter()
         .map(|w| {
 
-          let maybe_avatar = w.maybe_avatar_public_bucket_hash
+          let maybe_cover_image = w.maybe_cover_image_public_bucket_hash
               .as_deref()
               .map(|hash| {
                 MediaFileBucketPath::from_object_hash(
                   hash,
-                  w.maybe_avatar_public_bucket_prefix.as_deref(),
-                  w.maybe_avatar_public_bucket_extension.as_deref())
+                  w.maybe_cover_image_public_bucket_prefix.as_deref(),
+                  w.maybe_cover_image_public_bucket_extension.as_deref())
                     .get_full_object_path_str()
                     .to_string()
               });
@@ -146,7 +146,7 @@ pub async fn list_featured_weights_handler(
             title: w.title,
             weights_type: w.weights_type,
             weights_category: w.weights_category,
-            maybe_avatar_public_bucket_path: maybe_avatar,
+            maybe_cover_image_public_bucket_path: maybe_cover_image,
             creator: UserDetailsLight::from_db_fields(
               &w.creator_user_token,
               &w.creator_username,

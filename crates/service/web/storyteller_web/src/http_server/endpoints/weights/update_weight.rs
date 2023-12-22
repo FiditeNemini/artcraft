@@ -20,7 +20,6 @@ use utoipa::ToSchema;
 #[derive(Deserialize, ToSchema)]
 pub struct UpdateWeightRequest {
     pub title: Option<String>,
-    pub thumbnail_token: Option<String>,
     pub description_markdown: Option<String>,
     pub description_rendered_html: Option<String>,
     pub weight_type: Option<String>,
@@ -143,7 +142,6 @@ pub async fn update_weight_handler(
         weight_token: &ModelWeightToken::new(path.weight_token.clone()),
         mysql_pool: &server_state.mysql_pool,
         title: request.title.as_deref(),
-        maybe_thumbnail_token: request.thumbnail_token.as_deref(),
         description_markdown: request.description_markdown.as_deref(),
         description_rendered_html: request.description_rendered_html.as_deref(),
         creator_set_visibility: request.visibility.as_ref(),

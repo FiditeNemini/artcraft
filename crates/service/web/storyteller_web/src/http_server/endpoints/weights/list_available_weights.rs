@@ -53,9 +53,9 @@ pub struct ModelWeightForList {
     pub description_markdown: String,
     pub description_rendered_html: String,
 
-    /// Avatars are small descriptive images that can be set for any model.
-    /// If an avatar is set, this is the path to the asset.
-    pub maybe_avatar_public_bucket_path: Option<String>,
+    /// Cover images are small descriptive images that can be set for any model.
+    /// If a cover image is set, this is the path to the asset.
+    pub maybe_cover_image_public_bucket_path: Option<String>,
 
     pub creator: UserDetailsLight,
     pub creator_set_visibility: Visibility,
@@ -226,13 +226,13 @@ pub async fn list_available_weights_handler(
         weights: weights_page.weights.into_iter()
             .map(|weight| {
 
-                let maybe_avatar = weight.maybe_avatar_public_bucket_hash
+                let maybe_cover_image = weight.maybe_cover_image_public_bucket_hash
                     .as_deref()
                     .map(|hash| {
                         MediaFileBucketPath::from_object_hash(
                             hash,
-                            weight.maybe_avatar_public_bucket_prefix.as_deref(),
-                            weight.maybe_avatar_public_bucket_extension.as_deref())
+                            weight.maybe_cover_image_public_bucket_prefix.as_deref(),
+                            weight.maybe_cover_image_public_bucket_extension.as_deref())
                             .get_full_object_path_str()
                             .to_string()
                     });
@@ -245,7 +245,7 @@ pub async fn list_available_weights_handler(
 
                     description_markdown: weight.description_markdown,
                     description_rendered_html: weight.description_rendered_html,
-                    maybe_avatar_public_bucket_path: maybe_avatar,
+                    maybe_cover_image_public_bucket_path: maybe_cover_image,
 
                     creator: UserDetailsLight::from_db_fields(
                         &weight.creator_user_token,

@@ -65,7 +65,6 @@ mod tests {
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 1".to_string()),
             description_markdown: "Description 1".to_string(),
             description_rendered_html: "<p>Description 1</p>".to_string(),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
@@ -98,7 +97,6 @@ mod tests {
         assert_eq!(result.title, "Title 1".to_string());
         assert_eq!(result.weights_type, WeightsType::RvcV2);
         assert_eq!(result.weights_category, WeightsCategory::VoiceConversion);
-        assert_eq!(result.maybe_thumbnail_token, Some("Thumbnail 1".to_string()));
         assert_eq!(result.description_markdown, "Description 1".to_string());
         assert_eq!(result.description_rendered_html, "<p>Description 1</p>".to_string());
         assert_eq!(result.creator_user_token, creator_token1);
@@ -140,7 +138,6 @@ mod tests {
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 1".to_string()),
             description_markdown: "Description 1".to_string(),
             description_rendered_html: "<p>Description 1</p>".to_string(),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
@@ -217,7 +214,6 @@ mod tests {
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
-            maybe_thumbnail_token: Some("Thumbnail 1".to_string()),
             description_markdown: "Description 1".to_string(),
             description_rendered_html: "<p>Description 1</p>".to_string(),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
@@ -332,7 +328,6 @@ mod tests {
                 weights_type: weights_type, // replace with actual WeightsType
                 weights_category: weights_category, // replace with actual WeightsCategory
                 title: format!("Title {}", i),
-                maybe_thumbnail_token: Some(format!("Thumbnail {}", i)),
                 description_markdown: format!("Description {}", i),
                 description_rendered_html: format!("<p>Description {}</p>", i),
                 creator_user_token: Some(&creator_token), // replace with actual UserToken
@@ -575,7 +570,6 @@ mod tests {
                 weights_type: weights_type, // replace with actual WeightsType
                 weights_category: weights_category, // replace with actual WeightsCategory
                 title: format!("Title {}", i),
-                maybe_thumbnail_token: Some(format!("Thumbnail {}", i)),
                 description_markdown: format!("Description {}", i),
                 description_rendered_html: format!("<p>Description {}</p>", i),
                 creator_user_token: Some(&creator_token), // replace with actual UserToken

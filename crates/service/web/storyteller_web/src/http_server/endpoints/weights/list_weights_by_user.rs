@@ -32,9 +32,9 @@ pub struct Weight {
   file_size_bytes: i32,
   file_checksum_sha2: String,
 
-  /// Avatars are small descriptive images that can be set for any model.
-  /// If an avatar is set, this is the path to the asset.
-  maybe_avatar_public_bucket_path: Option<String>,
+  /// Cover images are small descriptive images that can be set for any model.
+  /// If a cover image is set, this is the path to the asset.
+  maybe_cover_image_public_bucket_path: Option<String>,
 
   cached_user_ratings_total_count: u32,
   cached_user_ratings_positive_count: u32,
@@ -156,13 +156,13 @@ pub async fn list_weights_by_user_handler(
 
   let weights:Vec<Weight> = results_page.records.into_iter().map(|weight| {
 
-    let maybe_avatar = weight.maybe_avatar_public_bucket_hash
+    let maybe_cover_image = weight.maybe_cover_image_public_bucket_hash
         .as_deref()
         .map(|hash| {
           MediaFileBucketPath::from_object_hash(
             hash,
-            weight.maybe_avatar_public_bucket_prefix.as_deref(),
-            weight.maybe_avatar_public_bucket_extension.as_deref())
+            weight.maybe_cover_image_public_bucket_prefix.as_deref(),
+            weight.maybe_cover_image_public_bucket_extension.as_deref())
               .get_full_object_path_str()
               .to_string()
         });
@@ -176,7 +176,7 @@ pub async fn list_weights_by_user_handler(
         &weight.creator_display_name,
         &weight.creator_email_gravatar_hash,
       ),
-      maybe_avatar_public_bucket_path: maybe_avatar,
+      maybe_cover_image_public_bucket_path: maybe_cover_image,
       description_markdown: weight.description_markdown,
       description_rendered_html: weight.description_rendered_html,
       file_size_bytes: weight.file_size_bytes,

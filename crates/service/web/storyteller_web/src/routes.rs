@@ -160,7 +160,7 @@ use crate::http_server::endpoints::weights::get_weight::get_weight_handler;
 use crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler;
 use crate::http_server::endpoints::weights::list_featured_weights::list_featured_weights_handler;
 use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler;
-use crate::http_server::endpoints::weights::set_model_weight_avatar::set_model_weight_avatar_handler;
+use crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler;
 use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
 
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
@@ -1278,8 +1278,8 @@ fn add_weights_routes<T, B>(app: App<T>) -> App<T>
                 .route(web::post().to(update_weight_handler))
                 .route(web::delete().to(delete_weight_handler))
             )
-            .service(web::resource("/weight/{token}/avatar")
-                .route(web::post().to(set_model_weight_avatar_handler))
+            .service(web::resource("/weight/{token}/cover_image")
+                .route(web::post().to(set_model_weight_cover_image_handler))
             )
             .route("/by_user/{username}", web::get().to(list_weights_by_user_handler))
             .route("/list", web::get().to(list_available_weights_handler))

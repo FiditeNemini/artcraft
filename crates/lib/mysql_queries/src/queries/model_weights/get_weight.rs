@@ -19,7 +19,6 @@ pub struct RetrivedModelWeight {
     pub title: String,
     pub weights_type: WeightsType,
     pub weights_category: WeightsCategory,
-    pub maybe_thumbnail_token: Option<String>,
     pub description_markdown: String,
     pub description_rendered_html: String,
 
@@ -40,9 +39,9 @@ pub struct RetrivedModelWeight {
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
 
-    pub maybe_avatar_public_bucket_hash: Option<String>,
-    pub maybe_avatar_public_bucket_prefix: Option<String>,
-    pub maybe_avatar_public_bucket_extension: Option<String>,
+    pub maybe_cover_image_public_bucket_hash: Option<String>,
+    pub maybe_cover_image_public_bucket_prefix: Option<String>,
+    pub maybe_cover_image_public_bucket_extension: Option<String>,
 
     pub cached_user_ratings_negative_count: u32,
     pub cached_user_ratings_positive_count: u32,
@@ -95,7 +94,6 @@ pub async fn get_weights_by_token_with_connection(
             title: record.title,
             weights_type: record.weights_type,
             weights_category: record.weights_category,
-            maybe_thumbnail_token: record.maybe_thumbnail_token,
             description_markdown: record.description_markdown,
             description_rendered_html: record.description_rendered_html,
             creator_user_token: record.creator_user_token,
@@ -112,9 +110,9 @@ pub async fn get_weights_by_token_with_connection(
             public_bucket_hash: record.public_bucket_hash,
             maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
             maybe_public_bucket_extension: record.maybe_public_bucket_extension,
-            maybe_avatar_public_bucket_hash: record.maybe_avatar_public_bucket_hash,
-            maybe_avatar_public_bucket_prefix: record.maybe_avatar_public_bucket_prefix,
-            maybe_avatar_public_bucket_extension: record.maybe_avatar_public_bucket_extension,
+            maybe_cover_image_public_bucket_hash: record.maybe_cover_image_public_bucket_hash,
+            maybe_cover_image_public_bucket_prefix: record.maybe_cover_image_public_bucket_prefix,
+            maybe_cover_image_public_bucket_extension: record.maybe_cover_image_public_bucket_extension,
             cached_user_ratings_negative_count: record.cached_user_ratings_negative_count,
             cached_user_ratings_positive_count: record.cached_user_ratings_positive_count,
             cached_user_ratings_total_count: record.cached_user_ratings_total_count,
@@ -142,7 +140,6 @@ async fn select_include_deleted(
         wt.title,
         wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
         wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
-        wt.maybe_thumbnail_token,
         wt.description_markdown,
         wt.description_rendered_html,
 
@@ -163,9 +160,9 @@ async fn select_include_deleted(
         wt.maybe_public_bucket_prefix,
         wt.maybe_public_bucket_extension,
 
-        avatar.public_bucket_directory_hash as maybe_avatar_public_bucket_hash,
-        avatar.maybe_public_bucket_prefix as maybe_avatar_public_bucket_prefix,
-        avatar.maybe_public_bucket_extension as maybe_avatar_public_bucket_extension,
+        cover_image.public_bucket_directory_hash as maybe_cover_image_public_bucket_hash,
+        cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,
+        cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,
 
         wt.cached_user_ratings_negative_count,
         wt.cached_user_ratings_positive_count,
@@ -180,8 +177,8 @@ async fn select_include_deleted(
         FROM model_weights as wt
         JOIN users
             ON users.token = wt.creator_user_token
-        LEFT OUTER JOIN media_files as avatar
-            ON avatar.token = wt.maybe_avatar_media_file_token
+        LEFT OUTER JOIN media_files as cover_image
+            ON cover_image.token = wt.maybe_cover_image_media_file_token
         WHERE
             wt.token = ?
             "#,
@@ -205,7 +202,6 @@ async fn select_without_deleted(
         wt.title,
         wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
         wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
-        wt.maybe_thumbnail_token,
         wt.description_markdown,
         wt.description_rendered_html,
         wt.creator_ip_address,
@@ -225,9 +221,9 @@ async fn select_without_deleted(
         wt.maybe_public_bucket_prefix,
         wt.maybe_public_bucket_extension,
 
-        avatar.public_bucket_directory_hash as maybe_avatar_public_bucket_hash,
-        avatar.maybe_public_bucket_prefix as maybe_avatar_public_bucket_prefix,
-        avatar.maybe_public_bucket_extension as maybe_avatar_public_bucket_extension,
+        cover_image.public_bucket_directory_hash as maybe_cover_image_public_bucket_hash,
+        cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,
+        cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,
 
         wt.cached_user_ratings_negative_count,
         wt.cached_user_ratings_positive_count,
@@ -242,8 +238,8 @@ async fn select_without_deleted(
         FROM model_weights as wt
         JOIN users
             ON users.token = wt.creator_user_token
-        LEFT OUTER JOIN media_files as avatar
-            ON avatar.token = wt.maybe_avatar_media_file_token
+        LEFT OUTER JOIN media_files as cover_image
+            ON cover_image.token = wt.maybe_cover_image_media_file_token
         WHERE
             wt.token = ?
             AND wt.user_deleted_at IS NULL
@@ -261,7 +257,6 @@ pub struct RawWeight {
     pub title: String,
     pub weights_type: WeightsType,
     pub weights_category: WeightsCategory,
-    pub maybe_thumbnail_token: Option<String>,
     pub description_markdown: String,
     pub description_rendered_html: String,
 
@@ -281,9 +276,9 @@ pub struct RawWeight {
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
 
-    pub maybe_avatar_public_bucket_hash: Option<String>,
-    pub maybe_avatar_public_bucket_prefix: Option<String>,
-    pub maybe_avatar_public_bucket_extension: Option<String>,
+    pub maybe_cover_image_public_bucket_hash: Option<String>,
+    pub maybe_cover_image_public_bucket_prefix: Option<String>,
+    pub maybe_cover_image_public_bucket_extension: Option<String>,
 
     pub cached_user_ratings_negative_count: u32,
     pub cached_user_ratings_positive_count: u32,

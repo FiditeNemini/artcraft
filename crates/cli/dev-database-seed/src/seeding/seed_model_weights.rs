@@ -92,7 +92,6 @@ pub async fn seed_weights_files(
         let description_rendered_html = "This is a description rendered html";
         let original_filename = "model.safetensors";
         let original_download_url = "https://example.com/model.safetensors";
-        let thumbnail_token = format!("{}", n);
 
         // let public_bucket_hash: String = weights_file_token.to_string();
         // let public_bucket_prefix = weights_type.to_string();
@@ -130,7 +129,6 @@ pub async fn seed_weights_files(
             weights_type, // Assuming weights_type is defined elsewhere
             weights_category, // Assuming weights_category is defined elsewhere
             title: title.to_string(),
-            maybe_thumbnail_token: Some(thumbnail_token),
             description_markdown: description.to_string(),
             description_rendered_html: description_rendered_html.to_string(),
             creator_user_token: Some(&user_token),

@@ -63,9 +63,7 @@ SET
   weights_category = ?,
   title = ?,
 
-  maybe_thumbnail_token = NULL,
-  maybe_avatar_media_file_token = NULL,
-  maybe_cover_media_file_token = NULL,
+  maybe_cover_image_media_file_token = NULL,
   description_markdown = NULL,
   description_rendered_html = NULL,
 

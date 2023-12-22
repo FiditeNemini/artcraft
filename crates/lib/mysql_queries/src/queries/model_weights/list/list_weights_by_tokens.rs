@@ -20,8 +20,6 @@ pub struct WeightsByTokensRecord {
 
   pub title: String,
 
-  pub maybe_thumbnail_token: Option<String>,
-
   pub creator_user_token: UserToken,
   pub creator_username: String,
   pub creator_display_name: String,
@@ -31,9 +29,9 @@ pub struct WeightsByTokensRecord {
   pub maybe_public_bucket_prefix: Option<String>,
   pub maybe_public_bucket_extension: Option<String>,
 
-  pub maybe_avatar_public_bucket_hash: Option<String>,
-  pub maybe_avatar_public_bucket_prefix: Option<String>,
-  pub maybe_avatar_public_bucket_extension: Option<String>,
+  pub maybe_cover_image_public_bucket_hash: Option<String>,
+  pub maybe_cover_image_public_bucket_prefix: Option<String>,
+  pub maybe_cover_image_public_bucket_extension: Option<String>,
 
   pub cached_user_ratings_total_count: u32,
   pub cached_user_ratings_positive_count: u32,
@@ -75,7 +73,6 @@ async fn get_raw_weights_by_tokens(
           mw.title,
           mw.weights_type,
           mw.weights_category,
-          mw.maybe_thumbnail_token,
           users.token as creator_user_token,
           users.username as creator_username,
           users.display_name as creator_display_name,
@@ -83,9 +80,9 @@ async fn get_raw_weights_by_tokens(
           mw.public_bucket_hash,
           mw.maybe_public_bucket_prefix,
           mw.maybe_public_bucket_extension,
-          avatar.public_bucket_directory_hash as maybe_avatar_public_bucket_hash,
-          avatar.maybe_public_bucket_prefix as maybe_avatar_public_bucket_prefix,
-          avatar.maybe_public_bucket_extension as maybe_avatar_public_bucket_extension,
+          cover_image.public_bucket_directory_hash as maybe_cover_image_public_bucket_hash,
+          cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,
+          cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,
           mw.cached_user_ratings_negative_count,
           mw.cached_user_ratings_positive_count,
           mw.cached_user_ratings_total_count,
@@ -98,8 +95,8 @@ async fn get_raw_weights_by_tokens(
       FROM model_weights as mw
       JOIN users
           ON users.token = mw.creator_user_token
-      LEFT OUTER JOIN media_files as avatar
-          ON avatar.token = mw.maybe_avatar_media_file_token
+      LEFT OUTER JOIN media_files as cover_image
+          ON cover_image.token = mw.maybe_cover_image_media_file_token
       WHERE
           mw.creator_set_visibility = "public"
           AND mw.token IN (
@@ -113,7 +110,6 @@ async fn get_raw_weights_by_tokens(
           mw.title,
           mw.weights_type,
           mw.weights_category,
-          mw.maybe_thumbnail_token,
           users.token as creator_user_token,
           users.username as creator_username,
           users.display_name as creator_display_name,
@@ -121,9 +117,9 @@ async fn get_raw_weights_by_tokens(
           mw.public_bucket_hash,
           mw.maybe_public_bucket_prefix,
           mw.maybe_public_bucket_extension,
-          avatar.public_bucket_directory_hash as maybe_avatar_public_bucket_hash,
-          avatar.maybe_public_bucket_prefix as maybe_avatar_public_bucket_prefix,
-          avatar.maybe_public_bucket_extension as maybe_avatar_public_bucket_extension,
+          cover_image.public_bucket_directory_hash as maybe_cover_image_public_bucket_hash,
+          cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,
+          cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,
           mw.cached_user_ratings_negative_count,
           mw.cached_user_ratings_positive_count,
           mw.cached_user_ratings_total_count,
@@ -136,8 +132,8 @@ async fn get_raw_weights_by_tokens(
       FROM model_weights as mw
       JOIN users
           ON users.token = mw.creator_user_token
-      LEFT OUTER JOIN media_files as avatar
-          ON avatar.token = mw.maybe_avatar_media_file_token
+      LEFT OUTER JOIN media_files as cover_image
+          ON cover_image.token = mw.maybe_cover_image_media_file_token
       WHERE
           mw.creator_set_visibility = "public"
           AND mw.user_deleted_at IS NULL
@@ -177,7 +173,6 @@ fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsByTokensRecord> 
           title: weight.title,
           weights_type: weight.weights_type,
           weights_category: weight.weights_category,
-          maybe_thumbnail_token: weight.maybe_thumbnail_token,
 
           creator_user_token: weight.creator_user_token,
           creator_username: weight.creator_username,
@@ -188,9 +183,9 @@ fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsByTokensRecord> 
           maybe_public_bucket_prefix: weight.maybe_public_bucket_prefix,
           maybe_public_bucket_extension: weight.maybe_public_bucket_extension,
 
-          maybe_avatar_public_bucket_hash: weight.maybe_avatar_public_bucket_hash,
-          maybe_avatar_public_bucket_prefix: weight.maybe_avatar_public_bucket_prefix,
-          maybe_avatar_public_bucket_extension: weight.maybe_avatar_public_bucket_extension,
+          maybe_cover_image_public_bucket_hash: weight.maybe_cover_image_public_bucket_hash,
+          maybe_cover_image_public_bucket_prefix: weight.maybe_cover_image_public_bucket_prefix,
+          maybe_cover_image_public_bucket_extension: weight.maybe_cover_image_public_bucket_extension,
 
           cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
           cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
@@ -218,8 +213,6 @@ fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsByTokensRecord> 
     
     pub title: String,
     
-    pub maybe_thumbnail_token: Option<String>,
-
     pub creator_user_token: UserToken,
     pub creator_username: String,
     pub creator_display_name: String,
@@ -229,9 +222,9 @@ fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsByTokensRecord> 
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
 
-    pub maybe_avatar_public_bucket_hash: Option<String>,
-    pub maybe_avatar_public_bucket_prefix: Option<String>,
-    pub maybe_avatar_public_bucket_extension: Option<String>,
+    pub maybe_cover_image_public_bucket_hash: Option<String>,
+    pub maybe_cover_image_public_bucket_prefix: Option<String>,
+    pub maybe_cover_image_public_bucket_extension: Option<String>,
 
     pub cached_user_ratings_total_count: u32,
     pub cached_user_ratings_positive_count: u32,
@@ -264,7 +257,6 @@ impl FromRow<'_, MySqlRow> for RawWeightJoinUser {
       weights_type: WeightsType::try_from_mysql_row(row, "weights_type")?,
       weights_category: WeightsCategory::try_from_mysql_row(row, "weights_category")?,
       title: row.try_get("title")?,
-      maybe_thumbnail_token: row.try_get("maybe_thumbnail_token")?,
       creator_user_token: UserToken::new_from_str(row.try_get("creator_user_token")?),
       creator_username: row.try_get("creator_username")?,
       creator_display_name: row.try_get("creator_display_name")?,
@@ -272,9 +264,9 @@ impl FromRow<'_, MySqlRow> for RawWeightJoinUser {
       public_bucket_hash: row.try_get("public_bucket_hash")?,
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
       maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
-      maybe_avatar_public_bucket_hash: row.try_get("maybe_avatar_public_bucket_hash")?,
-      maybe_avatar_public_bucket_prefix: row.try_get("maybe_avatar_public_bucket_prefix")?,
-      maybe_avatar_public_bucket_extension: row.try_get("maybe_avatar_public_bucket_extension")?,
+      maybe_cover_image_public_bucket_hash: row.try_get("maybe_cover_image_public_bucket_hash")?,
+      maybe_cover_image_public_bucket_prefix: row.try_get("maybe_cover_image_public_bucket_prefix")?,
+      maybe_cover_image_public_bucket_extension: row.try_get("maybe_cover_image_public_bucket_extension")?,
       cached_user_ratings_total_count: row.try_get("cached_user_ratings_total_count")?,
       cached_user_ratings_positive_count: row.try_get("cached_user_ratings_positive_count")?,
       cached_user_ratings_negative_count: row.try_get("cached_user_ratings_negative_count")?,
