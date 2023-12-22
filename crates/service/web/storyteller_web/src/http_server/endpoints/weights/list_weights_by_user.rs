@@ -8,6 +8,7 @@ use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::list::list_weights_by_user::{list_weights_by_creator_username, ListWeightsForUserArgs};
@@ -25,16 +26,20 @@ pub struct Weight {
   creator: UserDetailsLight,
   creator_set_visibility: Visibility,
 
-  maybe_thumbnail_token: Option<String>,
-    
   description_markdown: String,
   description_rendered_html: String,
   
   file_size_bytes: i32,
   file_checksum_sha2: String,
+
+  /// Avatars are small descriptive images that can be set for any model.
+  /// If an avatar is set, this is the path to the asset.
+  maybe_avatar_public_bucket_path: Option<String>,
+
   cached_user_ratings_total_count: u32,
   cached_user_ratings_positive_count: u32,
   cached_user_ratings_negative_count: u32,
+
   maybe_cached_user_ratings_ratio: Option<f32>,
   cached_user_ratings_last_updated_at: DateTime<Utc>,
 
@@ -150,6 +155,18 @@ pub async fn list_weights_by_user_handler(
   };
 
   let weights:Vec<Weight> = results_page.records.into_iter().map(|weight| {
+
+    let maybe_avatar = weight.maybe_avatar_public_bucket_hash
+        .as_deref()
+        .map(|hash| {
+          MediaFileBucketPath::from_object_hash(
+            hash,
+            weight.maybe_avatar_public_bucket_prefix.as_deref(),
+            weight.maybe_avatar_public_bucket_extension.as_deref())
+              .get_full_object_path_str()
+              .to_string()
+        });
+
     Weight {
       weight_token: weight.token,
       title: weight.title,
@@ -159,7 +176,7 @@ pub async fn list_weights_by_user_handler(
         &weight.creator_display_name,
         &weight.creator_email_gravatar_hash,
       ),
-      maybe_thumbnail_token: weight.maybe_thumbnail_token,
+      maybe_avatar_public_bucket_path: maybe_avatar,
       description_markdown: weight.description_markdown,
       description_rendered_html: weight.description_rendered_html,
       file_size_bytes: weight.file_size_bytes,
