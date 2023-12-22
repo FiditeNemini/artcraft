@@ -12,6 +12,7 @@ use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
 use http_server_common::request::get_request_ip::get_request_ip;
 use media::decode_basic_audio_info::decode_basic_audio_bytes_info;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
+use mimetypes::mimetype_to_extension::mimetype_to_extension;
 use mysql_queries::queries::media_files::create::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
 use tokens::tokens::media_files::MediaFileToken;
 
@@ -278,31 +279,12 @@ pub async fn process_upload_media_file(
     },
   };
 
-  // TODO(bt,2023-12-20): Reasonable extensions.
-  let extension = match mime_type {
-    // Audio
-    "audio/aac" /* .aac */ => Some(".aac"),
-    "audio/m4a" /* .m4a */ => Some(".m4a"),
-    "audio/mpeg" /* .mp3 */ => Some(".mp3"),
-    "audio/ogg" /* .ogg */ => Some(".ogg"),
-    "audio/opus" /* .opus */ => Some(".opus"),
-    "audio/x-flac" /* .flac */ => Some(".flac"),
-    "audio/x-wav" /* .wav */ => Some(".wav"),
-    // Image
-    "image/gif" /* .gif */ => Some(".gif"),
-    "image/jpeg" /* .jpg */ => Some(".jpg"),
-    "image/png" /* .png */ => Some(".png"),
-    "image/webp" /* .webp */ => Some(".webp"),
-    // Video
-    "video/mp4" /* .mp4 */ => Some(".mp4"),
-    "video/quicktime" /* .mov */ => Some(".mov"),
-    "video/webm" /* .webm */ => Some(".webm"),
-    _ => None,
-  };
+  let extension = mimetype_to_extension(mime_type)
+      .map(|extension| format!(".{extension}"));
 
   const PREFIX : Option<&str> = Some("upload_");
 
-  let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, extension);
+  let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, extension.as_deref());
 
   info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
 
@@ -329,7 +311,7 @@ pub async fn process_upload_media_file(
     sha256_checksum: &hash,
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
-    maybe_public_bucket_extension: extension,
+    maybe_public_bucket_extension: extension.as_deref(),
     pool: &server_state.mysql_pool,
   })
       .await

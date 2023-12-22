@@ -18,7 +18,7 @@ path = "src/lib.rs"
 my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
-infer = "0.11" # Mimetype detection
+infer = "0.15.0" # Mimetype detection
 
 
 [dev-dependencies]
