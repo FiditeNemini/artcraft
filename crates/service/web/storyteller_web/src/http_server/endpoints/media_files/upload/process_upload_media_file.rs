@@ -194,6 +194,7 @@ pub async fn process_upload_media_file(
       "audio/x-flac" /* .flac */ => Some(MediaFileType::Audio),
       "audio/x-wav" /* .wav */ => Some(MediaFileType::Audio),
       // Image
+      "image/gif" /* .gif */ => Some(MediaFileType::Image),
       "image/jpeg" /* .jpg */ => Some(MediaFileType::Image),
       "image/png" /* .png */ => Some(MediaFileType::Image),
       "image/webp" /* .webp */ => Some(MediaFileType::Image),
@@ -288,6 +289,7 @@ pub async fn process_upload_media_file(
     "audio/x-flac" /* .flac */ => Some(".flac"),
     "audio/x-wav" /* .wav */ => Some(".wav"),
     // Image
+    "image/gif" /* .gif */ => Some(".gif"),
     "image/jpeg" /* .jpg */ => Some(".jpg"),
     "image/png" /* .png */ => Some(".png"),
     "image/webp" /* .webp */ => Some(".webp"),

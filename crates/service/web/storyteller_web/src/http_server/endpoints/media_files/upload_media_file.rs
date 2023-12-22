@@ -33,6 +33,11 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
     "video/mp4",
     "video/webm",
     //"video/quicktime",
+    // Image
+    "image/gif",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
   ])
 });
 
