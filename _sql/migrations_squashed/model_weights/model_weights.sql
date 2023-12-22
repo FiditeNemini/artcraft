@@ -39,17 +39,9 @@ CREATE TABLE model_weights (
   -- The "name" of the model, which might be complicated.
   title VARCHAR(255) NOT NULL,
 
-  -- TODO(bt, 2023-12-14): Delete the `maybe_thumbnail_token` column later.
-  --   We're using other columns instead.
-  maybe_thumbnail_token VARCHAR(32) DEFAULT NULL,
-
-  -- The "avatar" image is a media file of type image that serves as a
-  -- small avatar or profile picture icon.
-  maybe_avatar_media_file_token VARCHAR(32) DEFAULT NULL,
-
-  -- The "cover" image is a media file of type image that covers the
-  -- top of the page.
-  maybe_cover_media_file_token VARCHAR(32) DEFAULT NULL,
+  -- The "cover" image is a media file of type image that severs as a small
+  -- example of the model. Like album art or a user profile picture / avatar.
+  maybe_cover_image_media_file_token VARCHAR(32) DEFAULT NULL,
 
   -- The description of the model in markdown.
   description_markdown TEXT NOT NULL,
@@ -194,7 +186,6 @@ CREATE TABLE model_weights (
   KEY index_weights_category (weights_category),
   KEY fk_creator_user_token (creator_user_token),
   KEY index_creator_set_visibility (creator_set_visibility),
-  KEY fk_maybe_avatar_media_file_token (maybe_avatar_media_file_token),
-  KEY fk_maybe_cover_media_file_token (maybe_cover_media_file_token)
+  KEY fk_maybe_cover_media_file_token (maybe_cover_image_media_file_token)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
