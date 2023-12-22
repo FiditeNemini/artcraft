@@ -25,7 +25,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::bucket_clients::BucketClients;
 use crate::seeding::users::HANASHI_USER_TOKEN;
-
+use std::result::Result::Ok;
 pub async fn seed_weights_files(
     mysql_pool: &Pool<MySql>,
     maybe_bucket_clients: Option<&BucketClients>
@@ -202,7 +202,7 @@ async fn seed_file_to_bucket(
         .map(|extension| extension.to_str())
         .flatten();
     // we should just have this be file bucket path and then we can use a file descriptor to turn it into a specific type of path
-    let bucket_location = WeightFileBucketPath::generate_new(
+    let bucket_location: WeightFileBucketPath = WeightFileBucketPath::generate_new(
         maybe_bucket_prefix,
         maybe_bucket_extension
     );

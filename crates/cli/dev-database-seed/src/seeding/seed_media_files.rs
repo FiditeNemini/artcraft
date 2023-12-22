@@ -5,8 +5,10 @@ use sqlx::{MySql, Pool};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;
@@ -106,7 +108,7 @@ async fn seed_model(
   let mut bucket_hash = "NOT_UPLOADED_BY_SEED_TOOL".to_string();
   let mut maybe_bucket_prefix = None;
   let mut maybe_bucket_extension = None;
-
+  
   if media_file_exists(mysql_pool, media_file_token).await? {
     info!("Media file already seeded: {:?}", media_file_token);
     return Ok(())
@@ -181,16 +183,16 @@ async fn seed_file_to_bucket(
       .extension()
       .map(|extension| extension.to_str())
       .flatten();
-
+  // get the new bucket path ...
   let bucket_location = MediaFileBucketPath::generate_new(maybe_bucket_prefix, maybe_bucket_extension);
-
+  
   let bucket_path = path_to_string(bucket_location.to_full_object_pathbuf());
 
   info!("Reading media file: {:?}", media_file_path);
-
+  // get meta data 
   let bytes = file_read_bytes(media_file_path)?;
   let mimetype = get_mimetype_for_bytes(&bytes).unwrap_or("application/octet-stream");
-
+  
   info!("Uploading media file to bucket path: {:?}", bucket_path);
 
   let _r = bucket_clients.public.upload_file_with_content_type(
