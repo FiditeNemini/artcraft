@@ -1,21 +1,22 @@
 use std::fmt;
 use std::sync::Arc;
 
-use actix_web::{ HttpRequest, HttpResponse, web };
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use log::{ error, warn };
+use log::warn;
+use utoipa::ToSchema;
 
 use enums::common::visibility::Visibility;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use mysql_queries::queries::model_weights::edit::update_weight::{update_weights, UpdateWeightArgs};
 use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
-use mysql_queries::queries::model_weights::edit::update_weight::{ update_weights, UpdateWeightArgs };
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::server_state::ServerState;
-use utoipa::ToSchema;
+
 /// TODO will eventually be polymorphic
 #[derive(Deserialize, ToSchema)]
 pub struct UpdateWeightRequest {
