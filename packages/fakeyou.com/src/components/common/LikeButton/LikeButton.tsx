@@ -18,7 +18,7 @@ interface LikeButtonProps {
 export default function LikeButton({
   initialToggled = false,
   onToggle,
-  likeCount,
+  likeCount = 0, // useShortenNumber freaks out if likeCount = NaN, give it a default value until it loads
   overlay,
   large,
 }: LikeButtonProps) {

@@ -68,15 +68,11 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
                 {showCreator && (
                   <div className="flex-grow-1">
                     <CreatorName
-                      displayName={data.maybe_creator.display_name}
-                      gravatarHash={data.maybe_creator.gravatar_hash}
-                      avatarIndex={
-                        data.maybe_creator.default_avatar.image_index
-                      }
-                      backgroundIndex={
-                        data.maybe_creator.default_avatar.color_index
-                      }
-                      username={data.maybe_creator.username}
+                      displayName={data.maybe_creator?.display_name || "" } // these empty strings are fallbacks to prevent errors
+                      gravatarHash={data.maybe_creator?.gravatar_hash || "" } // since maybe_creator does not exist until loaded
+                      avatarIndex={data.maybe_creator?.default_avatar.image_index || "" } // consider wrapping everything that uses
+                      backgroundIndex={data.maybe_creator?.default_avatar.color_index || "" } // !!maybe_creator condition
+                      username={data.maybe_creator?.username || "" } // which only displays when that value is defined
                     />
                   </div>
                 )}
@@ -132,15 +128,15 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
                 {showCreator && (
                   <div className="flex-grow-1">
                     <CreatorName
-                      displayName={data.maybe_creator_user.display_name}
-                      gravatarHash={data.maybe_creator_user.gravatar_hash}
+                      displayName={data.maybe_creator?.display_name || "" }
+                      gravatarHash={data.maybe_creator?.gravatar_hash}
                       avatarIndex={
-                        data.maybe_creator_user.default_avatar.image_index
+                        data.maybe_creator?.default_avatar.image_index
                       }
                       backgroundIndex={
-                        data.maybe_creator_user.default_avatar.color_index
+                        data.maybe_creator?.default_avatar.color_index
                       }
-                      username={data.maybe_creator_user.username}
+                      username={data.maybe_creator?.username}
                     />
                   </div>
                 )}

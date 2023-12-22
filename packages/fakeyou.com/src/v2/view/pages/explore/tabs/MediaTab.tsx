@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
@@ -12,7 +12,7 @@ import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContex
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { ListMediaFiles } from "@storyteller/components/src/api/media_files/ListMediaFiles";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
-import { useListContent } from "hooks";
+import { useLazyLists } from "hooks";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function MediaTab() {
@@ -20,21 +20,20 @@ export default function MediaTab() {
   const [isLoading] = useState(false);
 
   const [list, listSet] = useState<MediaFile[]>([]);
-  const media = useListContent({
+  const media = useLazyLists({
     fetcher: ListMediaFiles,
     list,
     listSet,
-    pagePreset: 1,
     requestList: true,
-    isInfiniteScroll: true,
+    // isInfiniteScroll: true,
   });
 
   // Fetch more data for infinite scroll
-  const fetchMoreData = useCallback(() => {
-    if (media.page < media.pageCount) {
-      media.pageChange(media.page + 1);
-    }
-  }, [media]);
+  // const fetchMoreData = useCallback(() => {
+  //   if (media.page < media.pageCount) {
+  //     media.pageChange(media.page + 1);
+  //   }
+  // }, [media]);
 
   const filterOptions = [
     { value: "all", label: "All Media" },
@@ -82,9 +81,9 @@ export default function MediaTab() {
           </div>
         ) : (
           <InfiniteScroll
-            dataLength={list.length}
-            next={fetchMoreData}
-            hasMore={media.page < media.pageCount}
+            dataLength={media.list.length}
+            next={media.getMore}
+            hasMore={!media.list.length || !!media.next}
             loader={
               <div className="mt-4 d-flex justify-content-center">
                 <div className="spinner-border text-light" role="status">
@@ -101,7 +100,7 @@ export default function MediaTab() {
               gridRef={gridContainerRef}
               onLayoutComplete={() => console.log("Layout complete!")}
             >
-              {media.list.map((data: MediaFile, index: number) => {
+              {media.list.map((data: any, index: number) => {
                 let card;
                 switch (data.media_type) {
                   case "audio":
