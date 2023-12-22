@@ -35,7 +35,7 @@ import Modal from "components/common/Modal";
 import SocialButton from "components/common/SocialButton";
 import Input from "components/common/Input";
 import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
-import { CreateBookmark } from "@storyteller/components/src/api/bookmarks/CreateBookmark";
+import { useBookmarks } from "hooks";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -67,6 +67,8 @@ export default function WeightPage({
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const bookmarks = useBookmarks();
 
   useEffect(() => {
     if (weight_token && !weight && isLoading) {
@@ -311,15 +313,9 @@ export default function WeightPage({
     );
   }
 
-  const handleBookmark = (toggled: boolean) => {
-    return CreateBookmark("",{
-      entity_token: weight_token,
-      entity_type: "model_weight"
-    })
-    .then((res: any) => {
-      console.log("🔖",res);
-    });
-  };
+  // const handleBookmark = () => {
+  //   return bookmarks.toggle(); // this function checks if the bookmark exists, truthy = deleted, falsy = created
+  // };
 
   const subtitleDivider = <span className="opacity-25 fs-5 fw-light">|</span>;
 
@@ -369,16 +365,20 @@ export default function WeightPage({
                 <p>{weightCategory}</p>
                 {subtitleDivider}
                 <div className="d-flex align-items-center gap-2">
-                  <LikeButton
-                    likeCount={1200}
-                    onToggle={handleBookmark}
-                    large={true}
-                  />
-                  <FavoriteButton
-                    favoriteCount={100}
-                    onToggle={handleBookmark}
-                    large={true}
-                  />
+                  <LikeButton {...{
+                    entityToken: weight_token,
+                    entityType: "model_weight",
+                    likeCount: 1200,
+                    onToggle: bookmarks.toggle,
+                    large: true
+                  }}/>
+                  <FavoriteButton {...{
+                    entityToken: weight_token,
+                    entityType: "model_weight",
+                    favoriteCount: 100,
+                    onToggle: bookmarks.toggle,
+                    large: true
+                  }}/>
                 </div>
               </div>
             </div>

@@ -8,14 +8,18 @@ import "./LikeButton.scss";
 import useShortenNumber from "hooks/useShortenNumber";
 
 interface LikeButtonProps {
+  entityToken?: string;
+  entityType?: string;
   initialToggled?: boolean;
-  onToggle: (toggled: boolean) => Promise<void>;
+  onToggle: (entityToken: string, entityType: string) => Promise<boolean>;
   likeCount: number;
   overlay?: boolean;
   large?: boolean;
 }
 
 export default function LikeButton({
+  entityToken = "",
+  entityType = "",
   initialToggled = false,
   onToggle,
   likeCount = 0, // useShortenNumber freaks out if likeCount = NaN, give it a default value until it loads
@@ -27,14 +31,19 @@ export default function LikeButton({
 
   const handleClick = async () => {
     setIsLoading(true);
-    try {
-      await onToggle(!isToggled);
-      setIsToggled(!isToggled);
-    } catch (error) {
-      console.error("Error calling API", error);
-    } finally {
+    onToggle(entityToken, entityType)
+    .then((isToggled: boolean) => {
+      setIsToggled(isToggled);
       setIsLoading(false);
-    }
+    });
+    // try {
+    //   await onToggle(!isToggled);
+    //   setIsToggled(!isToggled);
+    // } catch (error) {
+    //   console.error("Error calling API", error);
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const buttonClass = isToggled ? "like-button toggled" : "like-button";
@@ -55,7 +64,7 @@ export default function LikeButton({
         placement="bottom"
       >
         <button
-          onClick={handleClick}
+          // onClick={handleClick} // unnecessary, parent has onClick, runs twice 
           disabled={isLoading}
           className={`${buttonClass} ${buttonShadow} ${large ? "large" : ""}`}
         >

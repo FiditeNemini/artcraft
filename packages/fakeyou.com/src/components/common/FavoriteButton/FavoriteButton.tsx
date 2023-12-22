@@ -8,14 +8,18 @@ import "./FavoriteButton.scss";
 // import useShortenNumber from "hooks/useShortenNumber";
 
 interface FavoriteButtonProps {
+  entityToken?: string;
+  entityType?: string;
   initialToggled?: boolean;
-  onToggle: (toggled: boolean) => Promise<void>;
+  onToggle: (entityToken: string, entityType: string) => Promise<boolean>;
   favoriteCount?: number;
   overlay?: boolean;
   large?: boolean;
 }
 
 export default function FavoriteButton({
+  entityToken = "",
+  entityType = "",
   initialToggled = false,
   onToggle,
   favoriteCount,
@@ -27,14 +31,19 @@ export default function FavoriteButton({
 
   const handleClick = async () => {
     setIsLoading(true);
-    try {
-      await onToggle(!isToggled);
-      setIsToggled(!isToggled);
-    } catch (error) {
-      console.error("Error calling API", error);
-    } finally {
+    onToggle(entityToken, entityType)
+    .then((isToggled: boolean) => {
+      setIsToggled(isToggled);
       setIsLoading(false);
-    }
+    });
+    // try {
+    //   await onToggle(!isToggled);
+    //   setIsToggled(!isToggled);
+    // } catch (error) {
+    //   console.error("Error calling API", error);
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const buttonClass = isToggled ? "favorite-button toggled" : "favorite-button";
@@ -55,7 +64,7 @@ export default function FavoriteButton({
         placement="bottom"
       >
         <button
-          onClick={handleClick}
+          // onClick={handleClick} // unnecessary, parent has onClick, runs twice 
           disabled={isLoading}
           className={`${buttonClass} ${buttonShadow} ${large ? "large" : ""}`}
         >

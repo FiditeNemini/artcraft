@@ -17,7 +17,7 @@ export default function BookmarksTab() {
   const [selectedFilter, setSelectedFilter] = useState("all");
 
   const [list, listSet] = useState<any[]>([]);
-  const bookmarks = useListContent({ fetcher: GetBookmarksByUser, list, listSet, pagePreset: 1, requestList: true });
+  const bookmarks = useListContent({ debug: "bookmarks tab", fetcher: GetBookmarksByUser, list, listSet, requestList: true });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
     bookmarks.pageChange(selectedItem.selected + 1);

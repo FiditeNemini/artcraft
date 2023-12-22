@@ -33,8 +33,9 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
 
   const timeAgo = useTimeAgo(data.created_at);
 
-  const handleLike = async (data: any) => {
+  const handleLike = async () => {
     console.log(`The item is now ${data.isLiked ? "liked" : "not liked"}.`);
+    return true; // temporary will be replaced with like function
   };
 
   const { label: weightBadgeLabel, color: weightBadgeColor } =

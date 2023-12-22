@@ -28,8 +28,9 @@ export default function VideoCard({ data, type, showCreator }: VideoCardProps) {
 
   const timeAgo = useTimeAgo(data.created_at);
 
-  const handleLike = async (data: any) => {
+  const handleLike = async () => {
     console.log(`The item is now ${data.isLiked ? "liked" : "not liked"}.`);
+    return true; // temporary, replace with like function
   };
 
   return (
