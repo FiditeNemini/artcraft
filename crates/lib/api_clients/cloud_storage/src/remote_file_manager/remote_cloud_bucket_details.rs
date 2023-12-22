@@ -1,7 +1,6 @@
-
+use crate::remote_file_manager::weights_descriptor::{self};
 
 use super::file_descriptor::FileDescriptor;
-use crate::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsSDXLDescriptor, self};
 
 pub struct RemoteCloudBucketDetails {
     pub object_hash: String,
@@ -12,9 +11,9 @@ pub struct RemoteCloudBucketDetails {
 impl RemoteCloudBucketDetails {
     pub fn new(object_hash: String, prefix: String, suffix: String) -> Self {
         Self {
-            object_hash: object_hash,
-            prefix: prefix,
-            suffix: suffix
+            object_hash,
+            prefix,
+            suffix
         }
     }
     pub fn get_object_hash(&self) -> &str {
@@ -49,7 +48,6 @@ impl RemoteCloudBucketDetails {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     #[test]
     pub fn test() {
 

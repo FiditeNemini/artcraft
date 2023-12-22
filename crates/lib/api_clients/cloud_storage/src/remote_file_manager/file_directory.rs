@@ -32,10 +32,10 @@ pub struct FileBucketDirectory {
       let full_remote_cloud_file_path = format!("{}/{}", remote_cloud_base_directory , file_name);
       Self {
         file_object_hash: entropy.to_string(),
-        remote_cloud_base_directory: remote_cloud_base_directory,
-        full_remote_cloud_file_path: full_remote_cloud_file_path,
-        file_name:file_name,
-        file_descriptor:file_descriptor
+        remote_cloud_base_directory,
+        full_remote_cloud_file_path,
+        file_name,
+        file_descriptor
       }
     }
     
@@ -53,10 +53,10 @@ pub struct FileBucketDirectory {
       let full_remote_cloud_file_path = format!("{}/{}", remote_cloud_base_directory , file_name);
       Self {
         file_object_hash: entropy,
-        remote_cloud_base_directory: remote_cloud_base_directory,
-        full_remote_cloud_file_path: full_remote_cloud_file_path,
-        file_name:file_name,
-        file_descriptor:file_descriptor
+        remote_cloud_base_directory,
+        full_remote_cloud_file_path,
+        file_name,
+        file_descriptor
       }
     }
     

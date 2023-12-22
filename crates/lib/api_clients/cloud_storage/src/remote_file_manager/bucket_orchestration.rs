@@ -5,7 +5,6 @@ use async_trait::async_trait;
 use errors::AnyhowResult;
 
 use crate::bucket_client::BucketClient;
-use crate::remote_file_manager::file_meta_data::FileMetaData;
 
 #[async_trait]
 pub trait BucketOrchestrationCore {
@@ -85,11 +84,11 @@ impl BucketOrchestration {
         public_bucket_name: String,
         private_bucket_name: String) -> Self {
         Self {
-            access_key: access_key,
-            secret_key: secret_key,
-            region_name: region_name,
-            public_bucket_name: public_bucket_name,
-            private_bucket_name: private_bucket_name,
+            access_key,
+            secret_key,
+            region_name,
+            public_bucket_name,
+            private_bucket_name,
         }
     }
 

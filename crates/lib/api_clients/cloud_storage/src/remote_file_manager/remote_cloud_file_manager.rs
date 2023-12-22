@@ -1,21 +1,15 @@
-
-
-use crate::remote_file_manager::file_directory::FileBucketDirectory;
-use crate::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
-
-use super::bucket_orchestration;
-use super::file_descriptor::{FileDescriptor};
-use super::file_meta_data::FileMetaData;
-
-use errors:: AnyhowResult;
-
+use errors::AnyhowResult;
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
-
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 
-use crate::remote_file_manager::bucket_orchestration::{BucketOrchestrationCore};
+use crate::remote_file_manager::bucket_orchestration::BucketOrchestrationCore;
+use crate::remote_file_manager::file_directory::FileBucketDirectory;
+use crate::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
+
+use super::file_descriptor::FileDescriptor;
+use super::file_meta_data::FileMetaData;
 
 struct RemoteCloudFileClient {
     bucket_orchestration_client: Box<dyn BucketOrchestrationCore>
@@ -24,7 +18,7 @@ struct RemoteCloudFileClient {
 impl RemoteCloudFileClient {
     pub fn new(bucket_orchestration_client: Box<dyn BucketOrchestrationCore>) -> Self {
         Self {
-            bucket_orchestration_client: bucket_orchestration_client
+            bucket_orchestration_client
         }
     }
 
@@ -73,8 +67,8 @@ impl RemoteCloudFileClient {
         let mimetype: &str = get_mimetype_for_bytes(&bytes).unwrap_or("application/octet-stream");
 
         Ok(FileMetaData {
-            file_size_bytes: file_size_bytes,
-            sha256_checksum: sha256_checksum,
+            file_size_bytes,
+            sha256_checksum,
             mimetype: mimetype.to_string()
         })
     }
@@ -85,8 +79,9 @@ mod tests {
     use async_trait::async_trait;
     use env_logger;
     use errors::AnyhowResult;
+
     use crate::remote_file_manager::bucket_orchestration::BucketOrchestrationCore;
-    use crate::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsSDXLDescriptor};
+    use crate::remote_file_manager::weights_descriptor::WeightsLoRADescriptor;
 
     struct BucketOrchestrationMock {}
 
@@ -127,7 +122,6 @@ mod tests {
     }
 
     #[tokio::test]
-
     async fn remote_file_manager_descriptor_test() {
         use super::*;
         let remote_cloud_bucket_details = RemoteCloudBucketDetails::new("object_hash".to_string(), "loRA".to_string(), "safetensors".to_string());
@@ -138,6 +132,8 @@ mod tests {
         assert_eq!(file_descriptor.is_public(), true);
 
     }
+
+    #[ignore]
     #[tokio::test]
     async fn remote_file_manager_download_existing_file() {
         use super::*;

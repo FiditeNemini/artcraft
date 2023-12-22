@@ -114,7 +114,7 @@ impl BucketClient {
     if code != 200 {
       let body = String::from_utf8_lossy(body_bytes);
       warn!("upload body: {}", body);
-      return Err(anyhow!("upload failed: {}", code));
+      Err(anyhow!("upload failed: {}", code))
     } else {
       info!("upload success: {}", code);
       Ok(())
