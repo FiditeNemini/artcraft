@@ -1,5 +1,4 @@
 pub mod create;
-pub mod create_weight;
 pub mod delete_weights;
 pub mod edit;
 pub mod get_weight;
@@ -8,4 +7,3 @@ pub mod list;
 pub mod migration;
 pub mod model_weight_info_lite;
 pub mod tests;
-pub mod update_weight;

@@ -17,8 +17,8 @@ mod tests {
     use enums::common::visibility::Visibility;
     use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
 
-    use crate::queries::model_weights::create_weight::create_weight;
-    use crate::queries::model_weights::create_weight::CreateModelWeightsArgs;
+    use crate::queries::model_weights::create::create_weight::create_weight;
+    use crate::queries::model_weights::create::create_weight::CreateModelWeightsArgs;
     use crate::queries::model_weights::delete_weights::{
         delete_weights_as_mod,
         delete_weights_as_user,
@@ -298,11 +298,11 @@ mod tests {
             can_see_deleted,
             mysql_pool: &pool,
         }).await?;
-        for weight in weights_by_username.iter() {
+        for weight in weights_by_username.records.iter() {
             // print weight
             println!("weight: {:?}", weight.creator_username);
         }
-        assert_eq!(weights_by_username.len(), 5);
+        assert_eq!(weights_by_username.records.len(), 5);
 
         Ok(())
     }

@@ -15,7 +15,7 @@ use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
-use mysql_queries::queries::model_weights::create_weight::{
+use mysql_queries::queries::model_weights::create::create_weight::{
     create_weight,
     CreateModelWeightsArgs,
 };
