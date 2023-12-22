@@ -36,8 +36,6 @@ pub struct WeightJoinUser {
 
     pub title: String,
 
-    pub maybe_thumbnail_token: Option<String>,
-
     pub description_markdown: String,
     pub description_rendered_html: String,
 
@@ -57,9 +55,9 @@ pub struct WeightJoinUser {
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
 
-    pub maybe_avatar_public_bucket_hash: Option<String>,
-    pub maybe_avatar_public_bucket_prefix: Option<String>,
-    pub maybe_avatar_public_bucket_extension: Option<String>,
+    pub maybe_cover_image_public_bucket_hash: Option<String>,
+    pub maybe_cover_image_public_bucket_prefix: Option<String>,
+    pub maybe_cover_image_public_bucket_extension: Option<String>,
 
     pub cached_user_ratings_total_count: u32,
     pub cached_user_ratings_positive_count: u32,
@@ -220,7 +218,6 @@ impl ListWeightsQueryBuilder {
                         record.weights_category.as_str()
                     ).unwrap(),
                     title: record.title,
-                    maybe_thumbnail_token: record.maybe_thumbnail_token,
                     description_markdown: record.description_markdown,
                     description_rendered_html: record.description_rendered_html,
                     creator_user_token: UserToken::new_from_str(&record.creator_user_token),
@@ -238,9 +235,9 @@ impl ListWeightsQueryBuilder {
                     public_bucket_hash: record.public_bucket_hash,
                     maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
                     maybe_public_bucket_extension: record.maybe_public_bucket_extension,
-                    maybe_avatar_public_bucket_hash: record.maybe_avatar_public_bucket_hash,
-                    maybe_avatar_public_bucket_prefix: record.maybe_avatar_public_bucket_prefix,
-                    maybe_avatar_public_bucket_extension: record.maybe_avatar_public_bucket_extension,
+                    maybe_cover_image_public_bucket_hash: record.maybe_cover_image_public_bucket_hash,
+                    maybe_cover_image_public_bucket_prefix: record.maybe_cover_image_public_bucket_prefix,
+                    maybe_cover_image_public_bucket_extension: record.maybe_cover_image_public_bucket_extension,
                     cached_user_ratings_total_count: record.cached_user_ratings_total_count,
                     cached_user_ratings_positive_count: record.cached_user_ratings_positive_count,
                     cached_user_ratings_negative_count: record.cached_user_ratings_negative_count,
@@ -275,7 +272,6 @@ impl ListWeightsQueryBuilder {
             model_weights.weights_type,
             model_weights.weights_category,
             model_weights.title,
-            model_weights.maybe_thumbnail_token,
             model_weights.description_markdown,
             model_weights.description_rendered_html,
             model_weights.creator_user_token,
@@ -289,9 +285,9 @@ impl ListWeightsQueryBuilder {
             model_weights.public_bucket_hash,
             model_weights.maybe_public_bucket_prefix,
             model_weights.maybe_public_bucket_extension,
-            avatar.public_bucket_directory_hash as maybe_avatar_public_bucket_hash,
-            avatar.maybe_public_bucket_prefix as maybe_avatar_public_bucket_prefix,
-            avatar.maybe_public_bucket_extension as maybe_avatar_public_bucket_extension,
+            cover_image.public_bucket_directory_hash as maybe_cover_image_public_bucket_hash,
+            cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,
+            cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,
             model_weights.cached_user_ratings_total_count,
             model_weights.cached_user_ratings_positive_count,
             model_weights.cached_user_ratings_negative_count,
@@ -308,8 +304,8 @@ impl ListWeightsQueryBuilder {
         FROM model_weights 
         JOIN users
             ON users.token = model_weights.creator_user_token
-        LEFT OUTER JOIN media_files as avatar
-            ON avatar.token = model_weights.maybe_avatar_media_file_token
+        LEFT OUTER JOIN media_files as cover_image
+            ON cover_image.token = model_weights.maybe_cover_image_media_file_token
         "#.to_string();
 
         query.push_str(&self.build_predicates());
@@ -434,8 +430,6 @@ struct RawWeightJoinUser {
 
     pub title: String,
 
-    pub maybe_thumbnail_token: Option<String>,
-
     pub description_markdown: String,
     pub description_rendered_html: String,
 
@@ -455,9 +449,9 @@ struct RawWeightJoinUser {
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
 
-    pub maybe_avatar_public_bucket_hash: Option<String>,
-    pub maybe_avatar_public_bucket_prefix: Option<String>,
-    pub maybe_avatar_public_bucket_extension: Option<String>,
+    pub maybe_cover_image_public_bucket_hash: Option<String>,
+    pub maybe_cover_image_public_bucket_prefix: Option<String>,
+    pub maybe_cover_image_public_bucket_extension: Option<String>,
 
     pub cached_user_ratings_total_count: u32,
     pub cached_user_ratings_positive_count: u32,

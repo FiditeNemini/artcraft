@@ -13,7 +13,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
-use mysql_queries::queries::model_weights::edit::set_model_weight_avatar::{set_model_weight_avatar, UpdateArgs};
+use mysql_queries::queries::model_weights::edit::set_model_weight_cover_image::{set_model_weight_cover_image, UpdateArgs};
 use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -70,7 +70,7 @@ impl fmt::Display for SetModelWeightAvatarError {
 
 // =============== Handler ===============
 
-pub async fn set_model_weight_avatar_handler(
+pub async fn set_model_weight_cover_image_handler(
   http_request: HttpRequest,
   path: Path<SetModelWeightAvatarPathInfo>,
   request: web::Json<SetModelWeightAvatarRequest>,
@@ -161,9 +161,9 @@ pub async fn set_model_weight_avatar_handler(
   // TODO(bt,2023-12-21): DB needs a column, or we need an ip audit log
   let _ip_address = get_request_ip(&http_request);
 
-  let query_result = set_model_weight_avatar(UpdateArgs {
+  let query_result = set_model_weight_cover_image(UpdateArgs {
     model_weight_token: &path.token,
-    maybe_avatar_media_file_token: maybe_set_media_file_token.as_ref(),
+    maybe_cover_image_media_file_token: maybe_set_media_file_token.as_ref(),
     mysql_pool: &server_state.mysql_pool,
   }).await;
 

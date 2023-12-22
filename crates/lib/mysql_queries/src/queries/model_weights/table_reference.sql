@@ -4,7 +4,6 @@ CREATE TABLE model_weights (
   weights_type VARCHAR(32) NOT NULL,
   weights_category VARCHAR(32) NOT NULL,
   title VARCHAR(255) NOT NULL,
-  maybe_thumbnail_token VARCHAR(32) DEFAULT NULL,
   description_markdown TEXT NOT NULL,
   description_rendered_html TEXT NOT NULL,
   creator_user_token VARCHAR(32) NOT NULL,
