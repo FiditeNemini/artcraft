@@ -34,7 +34,7 @@ import TtsInferencePanel from "./inference_panels/TtsInferencePanel";
 import Modal from "components/common/Modal";
 import SocialButton from "components/common/SocialButton";
 import Input from "components/common/Input";
-import { ApiConfig } from "@storyteller/components";
+import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -67,96 +67,23 @@ export default function WeightPage({
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const getWeight = useCallback(async (weightToken: string) => {
-    // Dummy data
-    const dummyData = {
-      weight_token: "TM:xke15gz3v8pv",
-      title: "Harry Potter (Daniel Radcliffe)",
-      created_at: new Date(),
-      updated_at: new Date(),
-      weight_type: WeightType.HIFIGAN_TT2,
-      weight_category: WeightCategory.TTS,
-      maybe_creator_user: {
-        user_token: "test",
-        username: "",
-        display_name: "",
-        gravatar_hash: "test",
-        default_avatar: {
-          image_index: 0,
-          color_index: 0,
-        },
-      },
-      creator_set_visibility: "Public",
-      description_markdown:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    };
-
-    // Simulate an API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // if (dummyData) {
-    //   setWeight(dummyData);
-    //   setIsLoading(false);
-    // } else {
-    //   setError(true);
-    //   setIsLoading(false);
-    // }
+  const getWeight = useCallback(async (mediaFileToken: string) => {
+    let result = await GetWeight(mediaFileToken);
+    if (result.weight) {
+      setWeight(result.weight);
+      setIsLoading(false);
+    } else {
+      setError(true);
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     getWeight(weight_token);
   }, [weight_token, getWeight]);
 
-  useEffect(() => {
-    const api = new ApiConfig();
-    const endpointUrl = api.getWeight("1");
-
-    fetch(endpointUrl, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(res => {
-        if (!res.success) {
-          return;
-        }
-        console.log(res);
-        const dummyData = {
-          weight_token: res?.weight_token,
-          title: res?.title,
-          created_at: new Date(),
-          updated_at: new Date(),
-          weight_type: WeightType.HIFIGAN_TT2,
-          weight_category: WeightCategory.TTS,
-          maybe_creator_user: {
-            user_token: "test",
-            username: "",
-            display_name: "",
-            gravatar_hash: "test",
-            default_avatar: {
-              image_index: 0,
-              color_index: 0,
-            },
-          },
-          creator_set_visibility: "Public",
-          description_markdown: res?.description_markdown,
-        };
-        if (dummyData) {
-          setWeight(dummyData);
-          setIsLoading(false);
-        } else {
-          setError(true);
-          setIsLoading(false);
-        }
-      })
-      .catch(e => {});
-  }, []);
-
   function renderWeightComponent(weight: Weight) {
-    switch (weight.weight_category) {
+    switch (weight.weights_category) {
       case WeightCategory.TTS:
         return (
           <TtsInferencePanel
@@ -293,7 +220,7 @@ export default function WeightPage({
     },
   };
 
-  let { weightType, weightTagColor } = weightTypeMap[weight.weight_type] || {
+  let { weightType, weightTagColor } = weightTypeMap[weight.weights_type] || {
     weightType: "",
     weightTagColor: "",
   };
@@ -307,7 +234,7 @@ export default function WeightPage({
       [WeightCategory.VOCODER]: { weightCategory: "Vocoder" },
     };
 
-  let { weightCategory } = weightCategoryMap[weight.weight_category] || {
+  let { weightCategory } = weightCategoryMap[weight.weights_category] || {
     weightCategory: "",
   };
 
@@ -337,7 +264,7 @@ export default function WeightPage({
 
   let weightDetails = undefined;
 
-  switch (weight.weight_category) {
+  switch (weight.weights_category) {
     case WeightCategory.TTS:
       weightDetails = <DataTable data={voiceDetails} />;
       break;
@@ -509,21 +436,21 @@ export default function WeightPage({
                 <div className="d-flex gap-2 p-3">
                   <Gravatar
                     size={48}
-                    username={weight.maybe_creator_user?.display_name}
+                    username={weight.creator?.display_name}
                     avatarIndex={
-                      weight.maybe_creator_user?.default_avatar.image_index || 0
+                      weight.creator?.default_avatar.image_index || 0
                     }
                     backgroundIndex={
-                      weight.maybe_creator_user?.default_avatar.color_index || 0
+                      weight.creator?.default_avatar.color_index || 0
                     }
                   />
                   <div className="d-flex flex-column">
-                    {weight.maybe_creator_user?.display_name ? (
+                    {weight.creator?.display_name ? (
                       <Link
                         className="fw-medium"
-                        to={`/profile/${weight.maybe_creator_user?.display_name}`}
+                        to={`/profile/${weight.creator?.display_name}`}
                       >
-                        {weight.maybe_creator_user?.display_name}
+                        {weight.creator?.display_name}
                       </Link>
                     ) : (
                       <p className="fw-medium text-white">Anonymous</p>
@@ -543,7 +470,7 @@ export default function WeightPage({
               </Accordion>
 
               {sessionWrapper.canEditTtsModelByUserToken(
-                weight.maybe_creator_user?.user_token
+                weight.creator?.user_token
               ) && (
                 <div className="d-flex gap-2">
                   <Button
