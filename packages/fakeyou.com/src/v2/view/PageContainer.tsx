@@ -95,6 +95,7 @@ import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesigner
 import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVoicePage";
 import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
+import DevUpload from "./pages/dev_upload/DevUpload";
 import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
@@ -673,6 +674,10 @@ class PageContainer extends React.Component<
 
             <Route path="/old">
               <VocodesPage />
+            </Route>
+
+            <Route path="/dev-upload">
+              <DevUpload />
             </Route>
 
             {/* Route for initial voice creation */}
