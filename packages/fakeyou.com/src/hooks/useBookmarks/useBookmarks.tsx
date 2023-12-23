@@ -8,7 +8,7 @@ import { useSession } from "hooks";
 export default function useBookmarks() {
   const [baseList, baseListSet] = useState<any[]>([]);
   const { user } = useSession();
-  const bookmarks = useListContent({ fetcher: GetBookmarksByUser, debug: "useBookmarks", list: baseList, listSet: baseListSet, requestList: true, urlParam: user.username });
+  const bookmarks = useListContent({ fetcher: GetBookmarksByUser, debug: "useBookmarks", list: baseList, listSet: baseListSet, requestList: true, urlParam: user?.username || "" });
   const list = bookmarks.list.reduce((obj: any, current: any) => {
     return { ...obj, [current.details.entity_token]: current.token }
   },{});
