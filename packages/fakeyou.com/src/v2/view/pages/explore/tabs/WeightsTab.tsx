@@ -103,6 +103,7 @@ export default function MediaTab() {
                         data={data}
                         type="weights"
                         showCreator={true}
+                        showCover={true}
                       />
                     );
                     break;
@@ -113,6 +114,7 @@ export default function MediaTab() {
                         data={data}
                         type="weights"
                         showCreator={true}
+                        showCover={true}
                       />
                     );
                     break;
@@ -123,6 +125,7 @@ export default function MediaTab() {
                         data={data}
                         type="weights"
                         showCreator={true}
+                        showCover={true}
                       />
                     );
                     break;
@@ -135,6 +138,9 @@ export default function MediaTab() {
                         showCreator={true}
                       />
                     );
+                    break;
+                  case WeightCategory.VOCODER:
+                    card = <></>;
                     break;
                   default:
                     card = <div>Unsupported weight type</div>;
