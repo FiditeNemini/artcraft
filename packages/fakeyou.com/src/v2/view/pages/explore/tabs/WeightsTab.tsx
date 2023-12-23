@@ -30,16 +30,34 @@ export default function WeightsTab() {
 
   const filterOptions = [
     { value: "all", label: "All Weights" },
-    { value: "images", label: "Image Generation" },
-    { value: "audio", label: "Audio" },
-    { value: "video", label: "Video" },
+    { value: "tts", label: "Text to Speech" },
+    { value: "vc", label: "Voice to Voice" },
+    { value: "sd", label: "Image Generation" },
   ];
 
   const sortOptions = [
     { value: "newest", label: "Newest" },
     { value: "oldest", label: "Oldest" },
-    { value: "mostliked", label: "Most Liked" },
+    { value: "mostliked", label: "Most Bookmarked" },
   ];
+
+  // const modelTtsOptions = [
+  //   { value: "all", label: "All Types" },
+  //   { value: "tt2", label: "Tacotron 2" },
+  // ];
+
+  // const modelVcOptions = [
+  //   { value: "all", label: "All Types" },
+  //   { value: "rvc", label: "RVCv2" },
+  //   { value: "svc", label: "SoVitsSvc" },
+  // ];
+
+  // const modelSdOptions = [
+  //   { value: "all", label: "All Types" },
+  //   { value: "lora", label: "LoRA" },
+  //   { value: "SD15", label: "SD 1.5" },
+  //   { value: "SDXL", label: "SD XL" },
+  // ];
 
   return (
     <>
@@ -63,6 +81,27 @@ export default function WeightsTab() {
               value: weights.filter,
             }}
           />
+          {/* {selectedFilter === "tts" && (
+            <TempSelect
+              options={modelTtsOptions}
+              defaultValue={modelTtsOptions[0]}
+              isSearchable={false}
+            />
+          )}
+          {selectedFilter === "sd" && (
+            <Select
+              options={modelSdOptions}
+              defaultValue={modelSdOptions[0]}
+              isSearchable={false}
+            />
+          )}
+          {selectedFilter === "vc" && (
+            <Select
+              options={modelVcOptions}
+              defaultValue={modelVcOptions[0]}
+              isSearchable={false}
+            />
+          )} */}
         </div>
       </div>
       <AudioPlayerProvider>
