@@ -36,6 +36,7 @@ import SocialButton from "components/common/SocialButton";
 import Input from "components/common/Input";
 import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
 import { useBookmarks } from "hooks";
+import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -70,19 +71,28 @@ export default function WeightPage({
 
   const bookmarks = useBookmarks();
 
+  const weightTypeInfo = useWeightTypeInfo(
+    weight?.weights_type || WeightType.NONE
+  );
+  const {
+    label: weightType,
+    color: weightTagColor,
+    fullLabel: weightTypeFull,
+  } = weightTypeInfo;
+
   useEffect(() => {
     if (weight_token && !weight && isLoading) {
-      GetWeight(weight_token,{})
-      .then((res: any) => {
-        console.log("🏋️",res);
-        setIsLoading(false);
-        setWeight(res);
-      })
-      .catch((err) => {
-        setError(err);
-      });
+      GetWeight(weight_token, {})
+        .then((res: any) => {
+          console.log("🏋️", res);
+          setIsLoading(false);
+          setWeight(res);
+        })
+        .catch(err => {
+          setError(err);
+        });
     }
-  },[isLoading, weight, weight_token]);
+  }, [isLoading, weight, weight_token]);
 
   function renderWeightComponent(weight: Weight) {
     switch (weight.weights_category) {
@@ -190,43 +200,6 @@ export default function WeightPage({
       </Container>
     );
 
-  const weightTypeMap: Record<
-    WeightType,
-    { weightType: string; weightTagColor: string }
-  > = {
-    [WeightType.TT2]: {
-      weightType: "Tacotron 2",
-      weightTagColor: "ultramarine",
-    },
-    [WeightType.HIFIGAN_TT2]: {
-      weightType: "HiFi-GAN Tacotron 2",
-      weightTagColor: "blue",
-    },
-    [WeightType.VALL_E]: { weightType: "VALL-E", weightTagColor: "purple" },
-    [WeightType.LORA]: { weightType: "LoRA", weightTagColor: "pink" },
-    [WeightType.RVCv2]: {
-      weightType: "RVCv2",
-      weightTagColor: "orange",
-    },
-    [WeightType.SD_15]: {
-      weightType: "Stable Diffusion 1.5",
-      weightTagColor: "lime",
-    },
-    [WeightType.SDXL]: {
-      weightType: "Stable Diffusion XL",
-      weightTagColor: "green",
-    },
-    [WeightType.SVC]: {
-      weightType: "SVC",
-      weightTagColor: "aqua",
-    },
-  };
-
-  let { weightType, weightTagColor } = weightTypeMap[weight.weights_type] || {
-    weightType: "",
-    weightTagColor: "",
-  };
-
   const weightCategoryMap: Record<WeightCategory, { weightCategory: string }> =
     {
       [WeightCategory.TTS]: { weightCategory: "Text to Speech" },
@@ -237,11 +210,11 @@ export default function WeightPage({
     };
 
   let { weightCategory } = weightCategoryMap[weight.weights_category] || {
-    weightCategory: "",
+    weightCategory: "none",
   };
 
   const voiceDetails = [
-    { property: "Type", value: weightType },
+    { property: "Type", value: weightTypeFull || WeightType.NONE },
     { property: "Category", value: weightCategory },
     {
       property: "Visibility",
@@ -252,7 +225,7 @@ export default function WeightPage({
   ];
 
   const imageDetails = [
-    { property: "Type", value: weightType },
+    { property: "Type", value: weightTypeFull || WeightType.NONE },
     { property: "Category", value: weightCategory },
     {
       property: "Visibility",
@@ -365,20 +338,23 @@ export default function WeightPage({
                 <p>{weightCategory}</p>
                 {subtitleDivider}
                 <div className="d-flex align-items-center gap-2">
-                  <LikeButton {...{
-                    entityToken: weight_token,
-                    entityType: "model_weight",
-                    likeCount: 1200,
-                    onToggle: bookmarks.toggle,
-                    large: true
-                  }}/>
-                  <FavoriteButton {...{
-                    entityToken: weight_token,
-                    entityType: "model_weight",
-                    favoriteCount: 100,
-                    onToggle: bookmarks.toggle,
-                    large: true
-                  }}/>
+                  <LikeButton
+                    {...{
+                      entityToken: weight_token,
+                      entityType: "model_weight",
+                      likeCount: 1200,
+                      onToggle: bookmarks.toggle,
+                      large: true,
+                    }}
+                  />
+                  <FavoriteButton
+                    {...{
+                      entityToken: weight_token,
+                      entityType: "model_weight",
+                      onToggle: bookmarks.toggle,
+                      large: true,
+                    }}
+                  />
                 </div>
               </div>
             </div>
