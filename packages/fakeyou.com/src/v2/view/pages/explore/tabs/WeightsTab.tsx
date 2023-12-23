@@ -16,7 +16,7 @@ import { useLazyLists } from "hooks";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 
-export default function MediaTab() {
+export default function WeightsTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [isLoading] = useState(false);
 

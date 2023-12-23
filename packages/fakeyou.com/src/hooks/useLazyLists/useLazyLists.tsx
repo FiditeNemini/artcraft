@@ -8,9 +8,15 @@ interface Props {
   requestList?: boolean;
 }
 
-export default function useLazyLists({ addQueries, fetcher, list, listSet, requestList = false } : Props) {
+export default function useLazyLists({
+  addQueries,
+  fetcher,
+  list = [],
+  listSet,
+  requestList = false,
+}: Props) {
   const [filter, filterSet] = useState("all");
-  const [next,nextSet] = useState("");
+  const [next, nextSet] = useState("");
   const [previous, previousSet] = useState(""); // I am not used for anything yet :)
   const [sort, sortSet] = useState("newest");
   const [status, statusSet] = useState(requestList ? 1 : 0);
@@ -33,26 +39,30 @@ export default function useLazyLists({ addQueries, fetcher, list, listSet, reque
   useEffect(() => {
     if (status === 1) {
       statusSet(2);
-      fetcher("",{},
+      fetcher(
+        "",
+        {},
         {
-          ...next ? { cursor: next } : {},
+          ...(next ? { cursor: next } : {}),
           ...addQueries, // eventually we should provide a way to type this ... or not. It works
-          ...filter !== "all" ? { filter_media_type: filter } : {},
-          ...sort !== "newest" ? { sort_ascending: true } : {},
+          ...(filter !== "all" ? { filter_media_type: filter } : {}),
+          ...(sort !== "newest" ? { sort_ascending: true } : {}),
         }
       ).then((res: any) => {
         statusSet(3);
         console.log("🎆", res);
         if (res.results && res.pagination) {
           listSet((prevObj: any) => {
-            let keyExists = listKeys.find((key) => key.split("#")[1] === res.pagination.maybe_next);
+            let keyExists = listKeys.find(
+              key => key.split("#")[1] === res.pagination.maybe_next
+            );
             if (!next && !totalKeys) {
               return { [0 + "#initial"]: res.results }; // save as object so we can track what has been loaded
             } else if (!keyExists) {
               return {
                 ...prevObj,
-                [`${totalKeys}#${ next }`]: res.results
-              }
+                [`${totalKeys}#${next}`]: res.results,
+              };
             }
           });
           nextSet(res.pagination.maybe_next || "");
@@ -60,7 +70,18 @@ export default function useLazyLists({ addQueries, fetcher, list, listSet, reque
         }
       });
     }
-  }, [ addQueries, fetcher, filter, list, listKeys, listSet, next, sort, status, totalKeys ]);
+  }, [
+    addQueries,
+    fetcher,
+    filter,
+    list,
+    listKeys,
+    listSet,
+    next,
+    sort,
+    status,
+    totalKeys,
+  ]);
 
   return {
     filter,
@@ -75,6 +96,6 @@ export default function useLazyLists({ addQueries, fetcher, list, listSet, reque
     sortSet,
     status,
     statusSet,
-    totalKeys
+    totalKeys,
   };
 }
