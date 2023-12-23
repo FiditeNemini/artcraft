@@ -2,13 +2,16 @@ import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
-import VideoCard from "components/common/Card/VideoCard";
-import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faArrowDownWideShort,
+  faFilter,
+} from "@fortawesome/pro-solid-svg-icons";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";
 import { useListContent } from "hooks";
 import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
 import { TempSelect } from "components/common";
+import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 
 // interface IWeighttModelData {
 //   token: string;
@@ -22,9 +25,9 @@ import { TempSelect } from "components/common";
 export default function WeightsTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [isLoading] = useState(false);
-  const [sd,sdSet] = useState("all");
-  const [tts,ttsSet] = useState("all");
-  const [vc,vcSet] = useState("all");
+  const [sd, sdSet] = useState("all");
+  const [tts, ttsSet] = useState("all");
+  const [vc, vcSet] = useState("all");
 
   const addSetters = { sdSet, ttsSet, vcSet };
 
@@ -36,7 +39,7 @@ export default function WeightsTab({ username }: { username: string }) {
     list,
     listSet,
     requestList: true,
-    urlParam: username
+    urlParam: username,
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -77,53 +80,63 @@ export default function WeightsTab({ username }: { username: string }) {
   const paginationProps = {
     onPageChange: handlePageClick,
     pageCount: weights.pageCount,
-    currentPage: weights.page
+    currentPage: weights.page,
   };
 
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
         <div className="d-flex gap-2 flex-grow-1">
-          <TempSelect {...{
-            icon: faArrowDownWideShort,
-            options: sortOptions,
-            name: "sort",
-            onChange: weights.onChange,
-            value: weights.sort
-          }}/>
-          <TempSelect {...{
-            icon: faFilter,
-            options: filterOptions,
-            name: "filter",
-            onChange: weights.onChange,
-            value: weights.filter
-          }}/>
-          {weights.filter === "tts" && (
-            <TempSelect {...{
-              options: modelTtsOptions,
-              name: "tts",
+          <TempSelect
+            {...{
+              icon: faArrowDownWideShort,
+              options: sortOptions,
+              name: "sort",
               onChange: weights.onChange,
-              value: tts
-            }}/>
+              value: weights.sort,
+            }}
+          />
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: filterOptions,
+              name: "filter",
+              onChange: weights.onChange,
+              value: weights.filter,
+            }}
+          />
+          {weights.filter === "tts" && (
+            <TempSelect
+              {...{
+                options: modelTtsOptions,
+                name: "tts",
+                onChange: weights.onChange,
+                value: tts,
+              }}
+            />
           )}
           {weights.filter === "sd" && (
-            <TempSelect {...{
-              options: modelSdOptions,
-              name: "sd",
-              onChange: weights.onChange,
-              value: sd
-            }}/>
+            <TempSelect
+              {...{
+                options: modelSdOptions,
+                name: "sd",
+                onChange: weights.onChange,
+                value: sd,
+              }}
+            />
           )}
           {weights.filter === "vc" && (
-            <TempSelect {...{
-              options: modelVcOptions,
-              name: "vc",
-              onChange: weights.onChange,
-              value: vc
-            }}/>
+            <TempSelect
+              {...{
+                options: modelVcOptions,
+                name: "vc",
+                onChange: weights.onChange,
+                value: vc,
+              }}
+            />
           )}
         </div>
-        <Pagination { ...paginationProps }/>
+        <Pagination {...paginationProps} />
       </div>
       {isLoading ? (
         <div className="row gx-3 gy-3">
@@ -138,18 +151,55 @@ export default function WeightsTab({ username }: { username: string }) {
         >
           {weights.list.map((data: any, index: number) => {
             let card;
-            switch (data.media_type) {
-              case "audio":
-                card = <AudioCard key={index} data={data} type="weights" />;
+            switch (data.weights_category) {
+              case WeightCategory.TTS:
+                card = (
+                  <AudioCard
+                    key={index}
+                    data={data}
+                    type="weights"
+                    showCreator={true}
+                    showCover={true}
+                  />
+                );
                 break;
-              case "image":
-                card = <ImageCard key={index} data={data} type="weights" />;
+              case WeightCategory.VC:
+                card = (
+                  <AudioCard
+                    key={index}
+                    data={data}
+                    type="weights"
+                    showCreator={true}
+                    showCover={true}
+                  />
+                );
                 break;
-              case "video":
-                card = <VideoCard key={index} data={data} type="weights" />;
+              case WeightCategory.ZS:
+                card = (
+                  <AudioCard
+                    key={index}
+                    data={data}
+                    type="weights"
+                    showCreator={true}
+                    showCover={true}
+                  />
+                );
+                break;
+              case WeightCategory.SD:
+                card = (
+                  <ImageCard
+                    key={index}
+                    data={data}
+                    type="weights"
+                    showCreator={true}
+                  />
+                );
+                break;
+              case WeightCategory.VOCODER:
+                card = <></>;
                 break;
               default:
-                card = <div key={index}>Unsupported media type</div>;
+                card = <div>Unsupported weight type</div>;
             }
             return (
               <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
@@ -161,7 +211,7 @@ export default function WeightsTab({ username }: { username: string }) {
       )}
 
       <div className="d-flex justify-content-end mt-4">
-        <Pagination { ...paginationProps }/>
+        <Pagination {...paginationProps} />
       </div>
     </>
   );
