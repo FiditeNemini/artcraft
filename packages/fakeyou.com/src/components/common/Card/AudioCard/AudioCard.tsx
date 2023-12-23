@@ -9,6 +9,7 @@ import FavoriteButton from "components/common/FavoriteButton";
 import CreatorName from "../CreatorName";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import Button from "components/common/Button";
+import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 
 interface AudioCardProps {
   data: any;
@@ -49,6 +50,9 @@ export default function AudioCard({
     console.log(`The item is now ${data.isLiked ? "liked" : "not liked"}.`);
     return true; // temporary, replace with like function
   };
+
+  const { label: weightBadgeLabel, color: weightBadgeColor } =
+    useWeightTypeInfo(data.weights_type);
 
   return (
     <Card padding={true} onClick={handleCardClick}>
@@ -113,7 +117,7 @@ export default function AudioCard({
             <div className="flex-grow-1">
               <div className="d-flex align-items-center">
                 <div className="d-flex flex-grow-1">
-                  <Badge label="RVC" color="orange" />
+                  <Badge label={weightBadgeLabel} color={weightBadgeColor} />
                 </div>
                 <Button
                   icon={faArrowRight}

@@ -26,10 +26,15 @@ export interface GetWeightRequest {}
 
 export interface GetWeightResponse {
   success: boolean;
-  media_file?: Weight;
+  weight?: Weight;
 }
 
-export const GetWeight = MakeRequest<string,GetWeightRequest,GetWeightResponse,{}>({
+export const GetWeight = MakeRequest<
+  string,
+  GetWeightRequest,
+  GetWeightResponse,
+  {}
+>({
   method: "GET",
   routingFunction: (weightToken: string) => `/v1/weights/weight/${weightToken}`,
 });

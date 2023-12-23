@@ -26,8 +26,8 @@ export default function FeaturedTab() {
       <div>
         <div className="d-flex align-items-center mb-3">
           <h3 className="fw-semibold mb-0 flex-grow-1">Featured Media</h3>
-          <Link to="/explore/weights">
-            View all
+          <Link to="/explore/media">
+            View media
             <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
           </Link>
         </div>
