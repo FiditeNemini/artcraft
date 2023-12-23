@@ -22,7 +22,7 @@ use crate::server_state::ServerState;
 pub struct Weight {
   weight_token: ModelWeightToken,
   title: String,
-  
+  weights_category: String,
   creator: UserDetailsLight,
   creator_set_visibility: Visibility,
 
@@ -170,6 +170,7 @@ pub async fn list_weights_by_user_handler(
     Weight {
       weight_token: weight.token,
       title: weight.title,
+      weights_category: weight.weights_category.to_string(),
       creator: UserDetailsLight::from_db_fields(
         &weight.creator_user_token,
         &weight.creator_username,

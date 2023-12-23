@@ -48,6 +48,7 @@ pub struct GetWeightResponse {
     
     version: i32,
     created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
 }
 
 #[derive(Deserialize,ToSchema)]
@@ -180,7 +181,8 @@ pub async fn get_weight_handler(
         maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
         cached_user_ratings_last_updated_at: weight.cached_user_ratings_last_updated_at,
         version: weight.version,
-        created_at: weight.created_at
+        created_at: weight.created_at,
+        updated_at: weight.updated_at
     };
 
     let body = serde_json::to_string(&response)
