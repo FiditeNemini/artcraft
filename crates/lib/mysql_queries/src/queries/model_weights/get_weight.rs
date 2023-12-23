@@ -14,7 +14,7 @@ use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
 //  'weights_type: enums::by_table::model_weights::weights_types::WeightsType' use this to map
 // Retrieved Model Weight can be constrained to the fields that are needed
 
-pub struct RetrivedModelWeight {
+pub struct RetrievedModelWeight {
     pub token: ModelWeightToken,
     pub title: String,
     pub weights_type: WeightsType,
@@ -60,7 +60,7 @@ pub async fn get_weight_by_token(
     weight_token: &ModelWeightToken,
     can_see_deleted: bool,
     mysql_pool: &MySqlPool
-) -> AnyhowResult<Option<RetrivedModelWeight>> {
+) -> AnyhowResult<Option<RetrievedModelWeight>> {
     let mut connection = mysql_pool.acquire().await?;
     get_weights_by_token_with_connection(weight_token, can_see_deleted, &mut connection).await
 }
@@ -69,7 +69,7 @@ pub async fn get_weights_by_token_with_connection(
     weight_token: &ModelWeightToken,
     can_see_deleted: bool,
     mysql_connection: &mut PoolConnection<MySql>
-) -> AnyhowResult<Option<RetrivedModelWeight>> {
+) -> AnyhowResult<Option<RetrievedModelWeight>> {
     let maybe_result = if can_see_deleted {
         select_include_deleted(weight_token, mysql_connection).await
     } else {
@@ -90,7 +90,7 @@ pub async fn get_weights_by_token_with_connection(
     // unwrap the result
 
     Ok(
-        Some(RetrivedModelWeight {
+        Some(RetrievedModelWeight {
             token: record.token,
             title: record.title,
             weights_type: record.weights_type,
