@@ -63,6 +63,11 @@ export default function useLazyLists({
                 ...prevObj,
                 [`${totalKeys}#${next}`]: res.results,
               };
+            } else {
+              // Key exists, just update the existing data
+              const updatedObj = { ...prevObj };
+              updatedObj[keyExists] = res.results;
+              return updatedObj;
             }
           });
           nextSet(res.pagination.maybe_next || "");
