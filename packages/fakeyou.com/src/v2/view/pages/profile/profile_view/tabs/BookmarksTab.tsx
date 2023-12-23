@@ -11,13 +11,13 @@ import Pagination from "components/common/Pagination";
 import { useListContent } from "hooks";
 import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
 
-export default function BookmarksTab() {
+export default function BookmarksTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [isLoading] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("all");
 
   const [list, listSet] = useState<any[]>([]);
-  const bookmarks = useListContent({ debug: "bookmarks tab", fetcher: GetBookmarksByUser, list, listSet, requestList: true });
+  const bookmarks = useListContent({ debug: "bookmarks tab", fetcher: GetBookmarksByUser, list, listSet, requestList: true, urlParam: username });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
     bookmarks.pageChange(selectedItem.selected + 1);
@@ -59,12 +59,6 @@ export default function BookmarksTab() {
     { value: "SD15", label: "SD 1.5" },
     { value: "SDXL", label: "SD XL" },
   ];
-
-  // const paginationProps = {
-  //   onPageChange: handlePageClick,
-  //   pageCount: 0, // replace with proper fecth value
-  //   currentPage: 0 // replace with proper fecth value
-  // };
 
   const handleFilterChange = (option: any) => {
     const selectedOption = option as { value: string; label: string };

@@ -13,7 +13,7 @@ import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetM
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { useListContent } from "hooks";
 
-export default function MediaTab() {
+export default function MediaTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [isLoading] = useState(false);
 
@@ -24,7 +24,8 @@ export default function MediaTab() {
     list,
     listSet,
     pagePreset: 1,
-    requestList: true
+    requestList: true,
+    urlParam: username
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {

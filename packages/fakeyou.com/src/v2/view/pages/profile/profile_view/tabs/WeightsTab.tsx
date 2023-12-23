@@ -1,112 +1,47 @@
-// @ts-nocheck
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-import mockWeightsData from "./mockWeightsData";
-import { ApiConfig } from "@storyteller/components";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
-import Select from "components/common/Select";
-import {
-  faArrowDownWideShort,
-  faFilter,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";
+import { useListContent } from "hooks";
+import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
+import { TempSelect } from "components/common";
 
-interface IWeighttModelData {
-  token: string;
-  weight_name: string;
-  public_bucket_path: string;
-  likes: Number;
-  isLiked: boolean;
-  created_at: string;
-}
+// interface IWeighttModelData {
+//   token: string;
+//   weight_name: string;
+//   public_bucket_path: string;
+//   likes: Number;
+//   isLiked: boolean;
+//   created_at: string;
+// }
 
-export default function WeightsTab() {
+export default function WeightsTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [data, setData] = useState(mockWeightsData);
   const [isLoading] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 10;
+  const [sd,sdSet] = useState("all");
+  const [tts,ttsSet] = useState("all");
+  const [vc,vcSet] = useState("all");
 
-  useEffect(() => {
-    const api = new ApiConfig();
-    const endpointUrl = api.getWeights("?page_size=1000&page_index=0");
-    let weightsData = [];
+  const addSetters = { sdSet, ttsSet, vcSet };
 
-    fetch(endpointUrl, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(res => {
-        if (!res.success) {
-          return;
-        }
-        console.log(res);
-        res.weights?.forEach((l: any) => {
-          weightsData.push({
-            token: l?.weight_token,
-            weight_name: l?.title,
-            media_type: "image",
-            public_bucket_path: "/images/dummy-image.jpg",
-            likes: l?.likes,
-            isLiked: l?.bookmarks,
-            created_at: l?.created_at,
-          });
-        });
-        setData(weightsData);
-      })
-      .catch(e => {});
-  }, []);
-
-  const updateRequest = (params: any) => {
-    const api = new ApiConfig();
-    const endpointUrl = api.getWeights("?page_size=1000&page_index=0" + params);
-    let weightsData = [];
-
-    fetch(endpointUrl, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-      credentials: "include",
-    })
-      .then(res => res.json())
-      .then(res => {
-        if (!res.success) {
-          return;
-        }
-        console.log(res);
-        res.weights?.forEach((l: any) => {
-          weightsData.push({
-            token: l?.weight_token,
-            weight_name: l?.title,
-            media_type: "image",
-            public_bucket_path: "/images/dummy-image.jpg",
-            likes: l?.likes,
-            isLiked: l?.bookmarks,
-            created_at: l?.created_at,
-          });
-        });
-        setData(weightsData);
-      })
-      .catch(e => {});
-  };
+  const [list, listSet] = useState<any[]>([]);
+  const weights = useListContent({
+    addSetters,
+    debug: "Weights tab",
+    fetcher: GetWeightsByUser,
+    list,
+    listSet,
+    requestList: true,
+    urlParam: username
+  });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    setCurrentPage(selectedItem.selected);
+    weights.pageChange(selectedItem.selected + 1);
   };
-
-  const currentItems = data.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
 
   const filterOptions = [
     { value: "all", label: "All Weights" },
@@ -141,150 +76,51 @@ export default function WeightsTab() {
 
   const paginationProps = {
     onPageChange: handlePageClick,
-    pageCount: 0, // replace with proper fecth value
-    currentPage: 0 // replace with proper fecth value
-  };
-
-  const handleFilterChange = (option: any) => {
-    const selectedOption = option as { value: string; label: string };
-    setSelectedFilter(selectedOption.value);
-
-    switch (selectedOption.value) {
-      case "all":
-        updateRequest("");
-        break;
-      case "tts":
-        updateRequest("&weights_category=text_to_speech");
-        break;
-      case "vc":
-        updateRequest("&weights_category=voice_conversion");
-        break;
-      case "sd":
-        updateRequest("&weights_category=image_generation");
-        break;
-      default:
-        updateRequest("");
-    }
-  };
-
-  const handleOrderChange = (option: any) => {
-    const selectedOption = option as { value: string; label: string };
-
-    switch (selectedOption.value) {
-      case "oldest":
-        updateRequest("&sort_ascending=true");
-        break;
-      case "newest":
-        updateRequest("&sort_ascending=false");
-        break;
-      case "mostliked":
-        updateRequest("&sort_ascending=false");
-        break;
-      default:
-        updateRequest("&sort_ascending=false");
-    }
-  };
-
-  const handleTtsChange = (option: any) => {
-    const selectedOption = option as { value: string; label: string };
-
-    switch (selectedOption.value) {
-      case "all":
-        updateRequest("&weights_category=text_to_speech");
-        break;
-      case "tt2":
-        updateRequest("&weights_type=hifigan_tt2");
-        break;
-      default:
-        updateRequest("&weights_category=text_to_speec");
-    }
-  };
-
-  const handleVcChange = (option: any) => {
-    const selectedOption = option as { value: string; label: string };
-
-    switch (selectedOption.value) {
-      case "all":
-        updateRequest("&weights_category=voice_conversion");
-        break;
-      case "rvc":
-        updateRequest("&weights_type=rvc_v2");
-        break;
-      case "svc":
-        console.log(selectedOption.value);
-        updateRequest("&weights_type=so_vits_svc");
-        break;
-      default:
-        updateRequest("&weights_category=voice_conversion");
-    }
-  };
-
-  const handleSdChange = (option: any) => {
-    const selectedOption = option as { value: string; label: string };
-
-    switch (selectedOption.value) {
-      case "all":
-        updateRequest("&weights_category=image_generation");
-        break;
-      case "lora":
-        updateRequest("&weights_type=loRA");
-        break;
-      case "SD15":
-        console.log(selectedOption.value);
-        updateRequest("&weights_type=sd_1.5");
-        break;
-      case "SDXL":
-        console.log(selectedOption.value);
-        updateRequest("&weights_type=sdxl");
-        break;
-      default:
-        updateRequest("&weights_category=image_generation");
-    }
+    pageCount: weights.pageCount,
+    currentPage: weights.page
   };
 
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
         <div className="d-flex gap-2 flex-grow-1">
-          <Select
-            icon={faArrowDownWideShort}
-            options={sortOptions}
-            defaultValue={sortOptions[0]}
-            isSearchable={false}
-            onChange={handleOrderChange}
-          />
-
-          <Select
-            icon={faFilter}
-            options={filterOptions}
-            defaultValue={filterOptions[0]}
-            isSearchable={false}
-            onChange={handleFilterChange}
-          />
-
-          {selectedFilter === "tts" && (
-            <Select
-              options={modelTtsOptions}
-              defaultValue={modelTtsOptions[0]}
-              isSearchable={false}
-              onChange={handleTtsChange}
-            />
+          <TempSelect {...{
+            icon: faArrowDownWideShort,
+            options: sortOptions,
+            name: "sort",
+            onChange: weights.onChange,
+            value: weights.sort
+          }}/>
+          <TempSelect {...{
+            icon: faFilter,
+            options: filterOptions,
+            name: "filter",
+            onChange: weights.onChange,
+            value: weights.filter
+          }}/>
+          {weights.filter === "tts" && (
+            <TempSelect {...{
+              options: modelTtsOptions,
+              name: "tts",
+              onChange: weights.onChange,
+              value: tts
+            }}/>
           )}
-          {selectedFilter === "sd" && (
-            <Select
-              options={modelSdOptions}
-              defaultValue={modelSdOptions[0]}
-              isSearchable={false}
-              onChange={handleSdChange}
-            />
+          {weights.filter === "sd" && (
+            <TempSelect {...{
+              options: modelSdOptions,
+              name: "sd",
+              onChange: weights.onChange,
+              value: sd
+            }}/>
           )}
-          {selectedFilter === "vc" && (
-            <Select
-              options={modelVcOptions}
-              defaultValue={modelVcOptions[0]}
-              isSearchable={false}
-              onChange={handleVcChange}
-            />
+          {weights.filter === "vc" && (
+            <TempSelect {...{
+              options: modelVcOptions,
+              name: "vc",
+              onChange: weights.onChange,
+              value: vc
+            }}/>
           )}
         </div>
         <Pagination { ...paginationProps }/>
@@ -300,7 +136,7 @@ export default function WeightsTab() {
           gridRef={gridContainerRef}
           onLayoutComplete={() => console.log("Layout complete!")}
         >
-          {currentItems.map((data, index) => {
+          {weights.list.map((data: any, index: number) => {
             let card;
             switch (data.media_type) {
               case "audio":

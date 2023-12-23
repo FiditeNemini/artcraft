@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
-import { useSession } from "hooks";
 
 interface Props {
   addQueries?: any;
+  addSetters?: any;
   debug?: string,
   fetcher: any;
   list: any;
   listSet: any;
   pagePreset?: number;
   requestList?: boolean;
+  urlParam: string;
 }
 
-export default function useListContent({ addQueries, debug = "", fetcher, list, listSet, pagePreset = 0, requestList = false }: Props) {
-  const { user } = useSession();
+export default function useListContent({ addQueries, addSetters, debug = "", fetcher, list, listSet, pagePreset = 0, requestList = false, urlParam = "" }: Props) {
   const [filter, filterSet] = useState("all");
   const [page, pageSet] = useState(pagePreset);
   const [pageCount, pageCountSet] = useState(0);
@@ -24,19 +24,23 @@ export default function useListContent({ addQueries, debug = "", fetcher, list, 
     statusSet(1);
   };
 
-  const onChange = ({ target }: { target: { name: string; value: any } }) => {
-    const todo: { [key: string]: (x: any) => void } = { filterSet, sortSet };
-    todo[target.name + "Set"](target.value);
-    pageSet(1); // Reset to first page on filter/sort change
+  const reFetch = () => {
+    pageSet(pagePreset); // Reset to first page on filter/sort change
     listSet([]); // Reset list on filter/sort change
     statusSet(1);
+  }
+
+  const onChange = ({ target }: { target: { name: string; value: any } }) => {
+    const todo: { [key: string]: (x: any) => void } = { ...addSetters, filterSet, sortSet };
+    todo[target.name + "Set"](target.value);
+    reFetch();
   };
 
   useEffect(() => {
-    if (user && user.username) {
+    if (urlParam) {
       if (status === 1) {
         statusSet(2);
-        fetcher(user.username, {},
+        fetcher(urlParam, {},
           {
             page_index: page,
             ...addQueries, // eventually we should provide a way to type this ... or not. It works
@@ -53,7 +57,7 @@ export default function useListContent({ addQueries, debug = "", fetcher, list, 
         });
       }
     }
-  }, [ addQueries, debug, fetcher, filter, listSet, page, user, sort, status ]);
+  }, [ addQueries, debug, fetcher, filter, listSet, page, sort, status, urlParam ]);
 
   return {
     filter,
@@ -65,6 +69,7 @@ export default function useListContent({ addQueries, debug = "", fetcher, list, 
     pageSet,
     pageCount,
     pageCountSet,
+    reFetch,
     sort,
     sortSet,
     status,
