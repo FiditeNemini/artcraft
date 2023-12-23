@@ -12,16 +12,17 @@ import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContex
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { ListWeights } from "@storyteller/components/src/api/weights/ListWeights";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
-import { useLazyLists } from "hooks";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
+// import { useLazyLists } from "hooks";
+import useLazyListsv2 from "hooks/useLazyLists/useLazyListsv2";
 
 export default function WeightsTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [isLoading] = useState(false);
 
   const [list, listSet] = useState<Weight[]>([]);
-  const weights = useLazyLists({
+  const weights = useLazyListsv2({
     fetcher: ListWeights,
     list,
     listSet,
@@ -63,7 +64,7 @@ export default function WeightsTab() {
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
         <div className="d-flex gap-2 flex-grow-1">
-          <TempSelect
+          {/* <TempSelect
             {...{
               icon: faArrowDownWideShort,
               options: sortOptions,
@@ -80,7 +81,7 @@ export default function WeightsTab() {
               onChange: weights.onChange,
               value: weights.filter,
             }}
-          />
+          /> */}
           {/* {selectedFilter === "tts" && (
             <TempSelect
               options={modelTtsOptions}
@@ -115,7 +116,7 @@ export default function WeightsTab() {
           <InfiniteScroll
             dataLength={weights.list.length}
             next={weights.getMore}
-            hasMore={!weights.list.length || !!weights.next}
+            hasMore={!weights.isEnd}
             loader={
               <div className="mt-4 d-flex justify-content-center">
                 <div className="spinner-border text-light" role="status">
