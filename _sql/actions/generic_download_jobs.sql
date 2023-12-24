@@ -15,7 +15,7 @@ select
 from generic_download_jobs
 where status IN ('started', 'attempt_failed', 'complete_failure', 'dead')
 and download_type NOT IN ('vits', 'hifigan')
-and created_at > NOW() - INTERVAL 15 DAY;
+and created_at > NOW() - INTERVAL 30 DAY;
 
 
 -- 2) Then restart them
@@ -32,7 +32,7 @@ where token IN (
         from generic_download_jobs
         where status IN ('started', 'attempt_failed', 'complete_failure', 'dead')
         and download_type NOT IN ('vits', 'hifigan')
-        and created_at > NOW() - INTERVAL 15 DAY
+        and created_at > NOW() - INTERVAL 30 DAY
     ) as x
 );
 

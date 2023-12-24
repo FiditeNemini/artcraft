@@ -73,7 +73,7 @@ impl GoogleDriveDownloadCommand {
 
     info!("Downloading {} to: {}", download_url, temp_filename);
 
-    let mut command = format!("{} --url {} --output_filename {}",
+    let mut command = format!("{} --url \"{}\" --output_filename {}",
                           &self.download_script,
                           download_url,
                           &temp_filename);
