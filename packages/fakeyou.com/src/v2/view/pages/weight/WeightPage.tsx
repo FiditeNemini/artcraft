@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
@@ -15,7 +15,6 @@ import {
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-// import useTimeAgo from "hooks/useTimeAgo";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { WeightType } from "@storyteller/components/src/api/_common/enums/WeightType";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
@@ -34,8 +33,7 @@ import TtsInferencePanel from "./inference_panels/TtsInferencePanel";
 import Modal from "components/common/Modal";
 import SocialButton from "components/common/SocialButton";
 import Input from "components/common/Input";
-import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
-import { useBookmarks } from "hooks";
+import { useBookmarks, useWeightFetch } from "hooks";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
@@ -66,9 +64,7 @@ export default function WeightPage({
   inferenceJobsByCategory,
 }: WeightProps) {
   const { weight_token } = useParams<{ weight_token: string }>();
-  const [weight, setWeight] = useState<Weight | undefined | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
+  const { data: weight, fetchError, isLoading, status } = useWeightFetch({ token: weight_token });
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
   const dateUpdated = moment(weight?.updated_at || "").format("LLL");
   const dateCreated = moment(weight?.updated_at || "").format("LLL");
@@ -80,6 +76,8 @@ export default function WeightPage({
 
   const bucketConfig = new BucketConfig();
 
+  console.log("😎",status, isLoading);
+
   const weightTypeInfo = useWeightTypeInfo(
     weight?.weights_type || WeightType.NONE
   );
@@ -89,19 +87,6 @@ export default function WeightPage({
     fullLabel: weightTypeFull,
   } = weightTypeInfo;
 
-  useEffect(() => {
-    if (weight_token && !weight && isLoading) {
-      GetWeight(weight_token, {})
-        .then((res: any) => {
-          console.log("🏋️", res);
-          setIsLoading(false);
-          setWeight(res);
-        })
-        .catch(err => {
-          setError(err);
-        });
-    }
-  }, [isLoading, weight, weight_token]);
 
   function renderWeightComponent(weight: Weight) {
     switch (weight.weights_category) {
@@ -208,7 +193,7 @@ export default function WeightPage({
     );
 
   //Error state
-  if (error || !weight)
+  if (fetchError || !weight)
     return (
       <Container type="panel">
         <PageHeader

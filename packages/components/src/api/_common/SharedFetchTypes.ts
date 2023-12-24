@@ -8,3 +8,11 @@ export interface LazyPagination {
   maybe_next: string,
   maybe_previous: string
 }
+
+export enum FetchStatus {
+  paused,
+  ready,
+  in_progress,
+  success,
+  error
+}

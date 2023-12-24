@@ -11,6 +11,7 @@ import useLocalize from './useLocalize';
 import useMedia from './useMedia';
 import useSession from './useSession';
 import useVideo from './useVideo';
+import useWeightFetch from './useWeightFetch';
 
 export {
   useBookmarks,
@@ -25,5 +26,6 @@ export {
   useLocalize,
   useMedia,
   useSession,
-  useVideo
+  useVideo,
+  useWeightFetch
 };
