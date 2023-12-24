@@ -305,8 +305,8 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 weights_type: weights_types, // replace with actual WeightsType
                 weights_category, // replace with actual WeightsCategory
                 title,
-                description_markdown: description,
-                description_rendered_html: description_rendered_html.to_string(),
+                maybe_description_markdown: Some(description),
+                maybe_description_rendered_html: Some(description_rendered_html.to_string()),
                 creator_user_token: Some(&user_token), // replace with actual UserToken
                 creator_ip_address: "192.168.1.1",
                 creator_set_visibility: Visibility::Public,
@@ -350,8 +350,8 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
-            description_markdown: "Description 1".to_string(),
-            description_rendered_html: "<p>Description 1</p>".to_string(),
+            maybe_description_markdown: Some("Description 1".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 1</p>".to_string()),
             creator_user_token: Some(&user_token), // replace with actual UserToken
             creator_ip_address: "192.168.1.1",
             creator_set_visibility: Visibility::Public,
@@ -375,8 +375,8 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::HifiganTacotron2, // replace with actual WeightsType
             weights_category: WeightsCategory::TextToSpeech, // replace with actual WeightsCategory
             title: "Title 2".to_string(),
-            description_markdown: "Description 2".to_string(),
-            description_rendered_html: "<p>Description 2</p>".to_string(),
+            maybe_description_markdown: Some("Description 2".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 2</p>".to_string()),
             creator_user_token: Some(&user_token), // replace with actual UserToken
             creator_ip_address: "292.268.2.2",
             creator_set_visibility: Visibility::Public,
@@ -400,8 +400,8 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::StableDiffusion15, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 3".to_string(),
-            description_markdown: "Description 3".to_string(),
-            description_rendered_html: "<p>Description 3</p>".to_string(),
+            maybe_description_markdown: Some("Description 3".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 3</p>".to_string()),
             creator_user_token: Some(&user_token), // replace with actual UserToken
             creator_ip_address: "392.368.3.3",
             creator_set_visibility: Visibility::Public,
@@ -425,8 +425,8 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 4".to_string(),
-            description_markdown: "Description 4".to_string(),
-            description_rendered_html: "<p>Description 4</p>".to_string(),
+            maybe_description_markdown: Some("Description 4".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 4</p>".to_string()),
             creator_user_token: Some(&user_token), // replace with actual UserToken
             creator_ip_address: "192.168.1.1",
             creator_set_visibility: Visibility::Public,
@@ -450,8 +450,8 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 5".to_string(),
-            description_markdown: "Description 4".to_string(),
-            description_rendered_html: "<p>Description 4</p>".to_string(),
+            maybe_description_markdown: Some("Description 4".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 4</p>".to_string()),
             creator_user_token: Some(&user_token), // replace with actual UserToken
             creator_ip_address: "192.168.1.1",
             creator_set_visibility: Visibility::Public,
@@ -501,8 +501,8 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToke
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
-            description_markdown: "Description 1".to_string(),
-            description_rendered_html: "<p>Description 1</p>".to_string(),
+            maybe_description_markdown: Some("Description 1".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 1</p>".to_string()),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
             creator_ip_address: "192.168.1.1",
             creator_set_visibility: Visibility::Public,
@@ -526,8 +526,8 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToke
             weights_type: WeightsType::HifiganTacotron2, // replace with actual WeightsType
             weights_category: WeightsCategory::TextToSpeech, // replace with actual WeightsCategory
             title: "Title 2".to_string(),
-            description_markdown: "Description 2".to_string(),
-            description_rendered_html: "<p>Description 2</p>".to_string(),
+            maybe_description_markdown: Some("Description 2".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 2</p>".to_string()),
             creator_user_token: Some(&creator_token2), // replace with actual UserToken
             creator_ip_address: "292.268.2.2",
             creator_set_visibility: Visibility::Public,
@@ -551,8 +551,8 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToke
             weights_type: WeightsType::StableDiffusion15, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 3".to_string(),
-            description_markdown: "Description 3".to_string(),
-            description_rendered_html: "<p>Description 3</p>".to_string(),
+            maybe_description_markdown: Some("Description 3".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 3</p>".to_string()),
             creator_user_token: Some(&creator_token3), // replace with actual UserToken
             creator_ip_address: "392.368.3.3",
             creator_set_visibility: Visibility::Public,
@@ -576,8 +576,8 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToke
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 4".to_string(),
-            description_markdown: "Description 4".to_string(),
-            description_rendered_html: "<p>Description 4</p>".to_string(),
+            maybe_description_markdown: Some("Description 4".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 4</p>".to_string()),
             creator_user_token: Some(&creator_token4), // replace with actual UserToken
             creator_ip_address: "192.168.1.1",
             creator_set_visibility: Visibility::Public,
@@ -601,8 +601,8 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToke
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 5".to_string(),
-            description_markdown: "Description 5".to_string(),
-            description_rendered_html: "<p>Description 5</p>".to_string(),
+            maybe_description_markdown: Some("Description 5".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 5</p>".to_string()),
             creator_user_token: Some(&creator_token5), // replace with actual UserToken
             creator_ip_address: "192.168.1.1",
             creator_set_visibility: Visibility::Public,

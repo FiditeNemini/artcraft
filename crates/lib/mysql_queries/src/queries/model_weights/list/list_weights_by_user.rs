@@ -30,9 +30,11 @@ pub struct WeightsJoinUserRecord {
     pub weights_category: WeightsCategory,
     
     pub title: String,
-    
-    pub description_markdown: String,
-    pub description_rendered_html: String,
+
+    // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
+    //  Hopefully we don't break the frontend by omitting these.
+    //pub maybe_description_markdown: String,
+    //pub maybe_description_rendered_html: String,
     
     pub creator_user_token: UserToken,
     pub creator_ip_address: String,
@@ -140,8 +142,6 @@ fn select_result_fields() -> String {
         mw.title,
         mw.weights_type,
         mw.weights_category,
-        mw.description_markdown,
-        mw.description_rendered_html,
         u.token as creator_user_token,
         u.username as creator_username,
         u.display_name as creator_display_name,
@@ -230,8 +230,8 @@ async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRe
                 title: weight.title,
                 weights_type: weight.weights_type,
                 weights_category: weight.weights_category,
-                description_markdown: weight.description_markdown,
-                description_rendered_html: weight.description_rendered_html,
+                //maybe_description_markdown: weight.maybe_description_markdown,
+                //maybe_description_rendered_html: weight.maybe_description_rendered_html,
 
                 creator_user_token: weight.creator_user_token,
                 creator_ip_address: weight.creator_ip_address,
@@ -279,9 +279,11 @@ async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRe
     pub weights_category: WeightsCategory,
     
     pub title: String,
-    
-    pub description_markdown: String,
-    pub description_rendered_html: String,
+
+    // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
+    //  Hopefully we don't break the frontend by omitting these.
+    //pub description_markdown: String,
+    //pub description_rendered_html: String,
     
     pub creator_user_token: UserToken,
     pub creator_ip_address: String,
@@ -329,8 +331,10 @@ impl FromRow<'_, MySqlRow> for RawWeightJoinUser {
             weights_type: row.try_get("weights_type")?,
             weights_category: row.try_get("weights_category")?,
             title: row.try_get("title")?,
-            description_markdown: row.try_get("description_markdown")?,
-            description_rendered_html: row.try_get("description_rendered_html")?,
+            // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
+            //  Hopefully we don't break the frontend by omitting these.
+            //maybe_description_markdown: row.try_get("maybe_description_markdown")?,
+            //maybe_description_rendered_html: row.try_get("maybe_description_rendered_html")?,
             creator_user_token: row.try_get("creator_user_token")?,
             creator_ip_address: row.try_get("creator_ip_address")?,
             creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,

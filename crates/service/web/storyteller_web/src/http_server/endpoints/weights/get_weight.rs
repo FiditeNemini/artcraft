@@ -26,7 +26,11 @@ pub struct GetWeightResponse {
     title: String,
     weights_type: WeightsType,
     weights_category: WeightsCategory,
+
+    // TODO(bt,2023-12-24): Migrated the column. We should return nullables, but I don't want to break the frontend
     description_markdown: String,
+
+    // TODO(bt,2023-12-24): Migrated the column. We should return nullables, but I don't want to break the frontend
     description_rendered_html: String,
 
     creator: UserDetailsLight,
@@ -168,8 +172,9 @@ pub async fn get_weight_handler(
         title: weight.title,
         weights_type: weight.weights_type,
         weights_category: weight.weights_category,
-        description_markdown: weight.description_markdown,
-        description_rendered_html: weight.description_rendered_html,
+        // TODO(bt,2023-12-24): Migrated the column. We should return nullable fields, but I don't want to break the frontend
+        description_markdown: weight.maybe_description_markdown.unwrap_or_else(|| "".to_string()),
+        description_rendered_html: weight.maybe_description_rendered_html.unwrap_or_else(|| "".to_string()),
         maybe_cover_image_public_bucket_path: maybe_cover_image,
         creator,
         creator_set_visibility: weight.creator_set_visibility,

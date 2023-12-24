@@ -4,8 +4,8 @@ CREATE TABLE model_weights (
   weights_type VARCHAR(32) NOT NULL,
   weights_category VARCHAR(32) NOT NULL,
   title VARCHAR(255) NOT NULL,
-  description_markdown TEXT NOT NULL,
-  description_rendered_html TEXT NOT NULL,
+  maybe_description_markdown TEXT DEFAULT NULL,
+  maybe_description_rendered_html TEXT DEFAULT NULL,
   creator_user_token VARCHAR(32) NOT NULL,
   creator_ip_address VARCHAR(40) NOT NULL,
   creator_set_visibility ENUM(

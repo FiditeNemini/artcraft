@@ -36,8 +36,8 @@ pub struct WeightJoinUser {
 
     pub title: String,
 
-    pub description_markdown: String,
-    pub description_rendered_html: String,
+    pub maybe_description_markdown: Option<String>,
+    pub maybe_description_rendered_html: Option<String>,
 
     pub creator_user_token: UserToken,
     pub creator_ip_address: String,
@@ -218,8 +218,8 @@ impl ListWeightsQueryBuilder {
                         record.weights_category.as_str()
                     ).unwrap(),
                     title: record.title,
-                    description_markdown: record.description_markdown,
-                    description_rendered_html: record.description_rendered_html,
+                    maybe_description_markdown: record.maybe_description_markdown,
+                    maybe_description_rendered_html: record.maybe_description_rendered_html,
                     creator_user_token: UserToken::new_from_str(&record.creator_user_token),
                     creator_ip_address: record.creator_ip_address,
                     creator_set_visibility: Visibility::from_str(
@@ -272,8 +272,8 @@ impl ListWeightsQueryBuilder {
             model_weights.weights_type,
             model_weights.weights_category,
             model_weights.title,
-            model_weights.description_markdown,
-            model_weights.description_rendered_html,
+            model_weights.maybe_description_markdown,
+            model_weights.maybe_description_rendered_html,
             model_weights.creator_user_token,
             model_weights.creator_ip_address,
             model_weights.creator_set_visibility,
@@ -430,8 +430,8 @@ struct RawWeightJoinUser {
 
     pub title: String,
 
-    pub description_markdown: String,
-    pub description_rendered_html: String,
+    pub maybe_description_markdown: Option<String>,
+    pub maybe_description_rendered_html: Option<String>,
 
     pub creator_user_token: String,
     pub creator_ip_address: String,

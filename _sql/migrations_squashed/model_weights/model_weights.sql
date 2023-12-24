@@ -44,10 +44,14 @@ CREATE TABLE model_weights (
   maybe_cover_image_media_file_token VARCHAR(32) DEFAULT NULL,
 
   -- The description of the model in markdown.
-  description_markdown TEXT NOT NULL,
+  -- This is optional, since not all weights are of the same caliber (eg. zero shot models
+  -- don't deserve a description).
+  maybe_description_markdown TEXT DEFAULT NULL,
 
   -- Generated HTML (not user-editable).
-  description_rendered_html TEXT NOT NULL,
+  -- This is optional, since not all weights are of the same caliber (eg. zero shot
+  -- models don't deserve a description).
+  maybe_description_rendered_html TEXT DEFAULT NULL,
 
 
   -- ========== CREATOR DETAILS ==========
