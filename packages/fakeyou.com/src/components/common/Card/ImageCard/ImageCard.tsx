@@ -9,6 +9,7 @@ import CreatorName from "../CreatorName";
 import Button from "components/common/Button";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface ImageCardProps {
   data: any;
@@ -41,12 +42,14 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
   const { label: weightBadgeLabel, color: weightBadgeColor } =
     useWeightTypeInfo(data.weights_type);
 
+  const imageLink = new BucketConfig().getGcsUrl(data.public_bucket_path);
+
   return (
     <Card padding={false} onClick={handleCardClick}>
       {type === "media" && (
         <>
           <img
-            src={data.public_bucket_path}
+            src={imageLink}
             alt={data.weight_name}
             className="card-img"
           />

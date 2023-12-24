@@ -8,6 +8,7 @@ import Badge from "components/common/Badge";
 import LikeButton from "components/common/LikeButton";
 import Button from "components/common/Button";
 import CreatorName from "../CreatorName";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface VideoCardProps {
   data: any;
@@ -33,12 +34,14 @@ export default function VideoCard({ data, type, showCreator }: VideoCardProps) {
     return true; // temporary, replace with like function
   };
 
+  const videoLink = new BucketConfig().getGcsUrl(data.public_bucket_path);
+
   return (
     <Card padding={false} onClick={handleCardClick}>
       {type === "media" && (
         <>
           <img
-            src={data.public_bucket_path}
+            src={videoLink}
             alt={data.weight_name}
             className="card-video"
           />
