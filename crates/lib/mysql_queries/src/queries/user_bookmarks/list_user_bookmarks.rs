@@ -1,17 +1,10 @@
-use anyhow::anyhow;
-use log::warn;
 use sqlx::{MySql, MySqlPool, QueryBuilder};
-use enums::by_table::media_files::media_file_type::MediaFileType;
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
-use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
-use tokens::tokens::user_bookmarks::UserBookmarkToken;
-use crate::queries::media_files::list::list_media_files_for_user::{MediaFileListItem, MediaFileListPage, ViewAs};
 
 use crate::queries::user_bookmarks::list_user_bookmarks_result::RawUserBookmarkRecord;
 use crate::queries::user_bookmarks::list_user_bookmarks_result::UserBookmark;
-
 
 pub struct UserBookmarkListPage {
   pub results: Vec<UserBookmark>,

@@ -2,13 +2,12 @@ use chrono::{DateTime, Utc};
 use sqlx::{FromRow, Row};
 use sqlx::mysql::MySqlRow;
 
-use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 use tokens::tokens::users::UserToken;
-use crate::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
 
 pub struct UserBookmark {
   pub token: UserBookmarkToken,
