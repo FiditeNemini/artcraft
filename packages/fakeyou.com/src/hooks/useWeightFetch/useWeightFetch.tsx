@@ -9,6 +9,9 @@ interface Props {
 export default function useWeightFetch({ token }: Props) {
   const [data, setData] = useState<Weight | undefined | null>(null);
   const [status, statusSet] = useState(FetchStatus.ready);
+  const [title, titleSet] = useState("");
+  const [visiblity, visiblitySet] = useState("public");
+  const [descriptionMD, descriptionMDSet] = useState();
   const isLoading = status === FetchStatus.ready || status === FetchStatus.in_progress;
   const fetchError = status === FetchStatus.error;
   
@@ -17,9 +20,13 @@ export default function useWeightFetch({ token }: Props) {
       statusSet(FetchStatus.in_progress);
       GetWeight(token, {})
         .then((res: any) => {
+          let { creator_set_visibility, description_markdown, title: resTitle, ...response } = res;
           console.log("🏋️", res, status);
           statusSet(FetchStatus.success);
-          setData(res);
+          titleSet(resTitle);
+          descriptionMDSet(description_markdown);
+          visiblitySet(creator_set_visibility);
+          setData(response);
         })
         .catch(err => {
           statusSet(FetchStatus.error);
@@ -27,5 +34,5 @@ export default function useWeightFetch({ token }: Props) {
     }
   }, [status, token, data]);
 
-  return { data, fetchError, isLoading, status };
+  return { data, fetchError, isLoading, descriptionMD, status, title, visiblity };
 };

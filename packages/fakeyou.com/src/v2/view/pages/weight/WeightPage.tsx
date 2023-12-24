@@ -64,7 +64,7 @@ export default function WeightPage({
   inferenceJobsByCategory,
 }: WeightProps) {
   const { weight_token } = useParams<{ weight_token: string }>();
-  const { data: weight, fetchError, isLoading, status } = useWeightFetch({ token: weight_token });
+  const { data: weight, descriptionMD, fetchError, isLoading, title } = useWeightFetch({ token: weight_token });
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
   const dateUpdated = moment(weight?.updated_at || "").format("LLL");
   const dateCreated = moment(weight?.updated_at || "").format("LLL");
@@ -75,8 +75,6 @@ export default function WeightPage({
   const bookmarks = useBookmarks();
 
   const bucketConfig = new BucketConfig();
-
-  console.log("😎",status, isLoading);
 
   const weightTypeInfo = useWeightTypeInfo(
     weight?.weights_type || WeightType.NONE
@@ -312,7 +310,7 @@ export default function WeightPage({
 
   const shareUrl = `https://fakeyou.com/weight/${weight.weight_token}`;
   const shareText = `Use FakeYou to generate speech as ${
-    weight.title || "your favorite characters"
+    title || "your favorite characters"
   }!`;
 
   const handleCopyLink = () => {
@@ -359,7 +357,7 @@ export default function WeightPage({
             )}
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
-                <h1 className="fw-bold mb-2">{weight.title}</h1>
+                <h1 className="fw-bold mb-2">{title}</h1>
               </div>
               <div className="d-flex gap-3 flex-wrap align-items-center">
                 <div className="d-flex gap-2 align-items-center flex-wrap">
@@ -398,10 +396,10 @@ export default function WeightPage({
           <div className="col-12 col-xl-8 d-flex flex-column gap-3">
             <div className="media-wrapper">{renderWeightComponent(weight)}</div>
 
-            {weight.description_markdown !== "" && (
+            { descriptionMD !== "" && (
               <Panel padding={true}>
                 <h4 className="fw-semibold mb-3">Description</h4>
-                <p>{weight.description_markdown}</p>
+                <p>{ descriptionMD }</p>
               </Panel>
             )}
 
@@ -576,7 +574,7 @@ export default function WeightPage({
         show={isDeleteModalOpen}
         handleClose={closeDeleteModal}
         title="Delete Weight"
-        content={`Are you sure you want to delete "${weight.title}"? This action cannot be undone.`}
+        content={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
         onConfirm={handleDelete}
       />
     </div>
