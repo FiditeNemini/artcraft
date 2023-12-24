@@ -18,7 +18,7 @@ export default function useLazyLists({
   const [filter, filterSet] = useState("all");
   const [next, nextSet] = useState("");
   const [previous, previousSet] = useState(""); // I am not used for anything yet :)
-  const [sort, sortSet] = useState("newest");
+  const [sort, sortSet] = useState(false);
   const [status, statusSet] = useState(requestList ? 1 : 0);
   const listKeys = Object.keys(list);
   const totalKeys = listKeys.length;
@@ -46,7 +46,7 @@ export default function useLazyLists({
           ...(next ? { cursor: next } : {}),
           ...addQueries, // eventually we should provide a way to type this ... or not. It works
           ...(filter !== "all" ? { filter_media_type: filter } : {}),
-          ...(sort !== "newest" ? { sort_ascending: true } : {}),
+          ...(sort ? { sort_ascending: true } : {}),
         }
       ).then((res: any) => {
         statusSet(3);

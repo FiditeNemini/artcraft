@@ -36,9 +36,9 @@ export default function WeightsTab() {
   ];
 
   const sortOptions = [
-    { value: "newest", label: "Newest" },
-    { value: "oldest", label: "Oldest" },
-    { value: "mostliked", label: "Most Bookmarked" },
+    { value: false, label: "Newest" },
+    { value: true, label: "Oldest" },
+    // { value: "mostliked", label: "Most Bookmarked" },
   ];
 
   // const modelTtsOptions = [
