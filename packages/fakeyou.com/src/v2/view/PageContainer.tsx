@@ -103,6 +103,7 @@ import WeightPage from "./pages/weight/WeightPage";
 import ExplorePage from "./pages/explore/ExplorePage";
 import SearchPage from "./search/SearchPage";
 import { SearchProvider } from "context/SearchContext";
+import WeightEditPage from "./pages/weight/WeightEditPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -360,9 +361,9 @@ class PageContainer extends React.Component<
                 <ExplorePage />
               </Route>
 
-              {/* <Route path="/weight/:weight_token/edit">
-              <WeightEditPage />
-            </Route> */}
+              <Route path="/weight/:weight_token/edit">
+                <WeightEditPage sessionWrapper={this.props.sessionWrapper} />
+              </Route>
 
               <Route path="/weight/:weight_token">
                 <WeightPage
@@ -698,21 +699,21 @@ class PageContainer extends React.Component<
                 <VocodesPage />
               </Route>
 
-            <Route path="/dev-upload">
-              <DevUpload />
-            </Route>
+              <Route path="/dev-upload">
+                <DevUpload />
+              </Route>
 
-            {/* Route for initial voice creation */}
-            <Route exact path="/voice-designer/create">
-              <VoiceDesignerFormPage
-                {...{
-                  enqueueInferenceJob: this.props.enqueueInferenceJob,
-                  sessionWrapper: this.props.sessionWrapper,
-                  sessionSubscriptionsWrapper:
-                    this.props.sessionSubscriptionsWrapper,
-                }}
-              />
-            </Route>
+              {/* Route for initial voice creation */}
+              <Route exact path="/voice-designer/create">
+                <VoiceDesignerFormPage
+                  {...{
+                    enqueueInferenceJob: this.props.enqueueInferenceJob,
+                    sessionWrapper: this.props.sessionWrapper,
+                    sessionSubscriptionsWrapper:
+                      this.props.sessionSubscriptionsWrapper,
+                  }}
+                />
+              </Route>
 
               {/* Route for editing the dataset details */}
               <Route exact path="/voice-designer/dataset/:dataset_token/edit">

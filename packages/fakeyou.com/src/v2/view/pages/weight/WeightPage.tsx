@@ -37,8 +37,8 @@ import Input from "components/common/Input";
 import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
 import { useBookmarks } from "hooks";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
-
 import moment from "moment";
+import WeightCoverImage from "components/common/WeightCoverImage";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -206,7 +206,7 @@ export default function WeightPage({
     {
       [WeightCategory.TTS]: { weightCategory: "Text to Speech" },
       [WeightCategory.VC]: { weightCategory: "Voice to Voice" },
-      [WeightCategory.SD]: { weightCategory: "Stable Diffusion" },
+      [WeightCategory.SD]: { weightCategory: "Image Generation" },
       [WeightCategory.ZS]: { weightCategory: "Voice Designer" },
       [WeightCategory.VOCODER]: { weightCategory: "Vocoder" },
     };
@@ -302,16 +302,20 @@ export default function WeightPage({
     setIsShareModalOpen(false);
   };
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareUrl);
-    setButtonLabel("Copied!");
-    setTimeout(() => setButtonLabel("Copy"), 1000);
-  };
-
   const shareUrl = `https://fakeyou.com/weight/${weight.weight_token}`;
   const shareText = `Use FakeYou to generate speech as ${
     weight.title || "your favorite characters"
   }!`;
+
+  const handleCopyLink = () => {
+    console.log("copying link");
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
+    }
+    setButtonLabel("Copied!");
+    setTimeout(() => setButtonLabel("Copy"), 1000);
+    console.log(shareUrl);
+  };
 
   const openDeleteModal = () => {
     setIsDeleteModalOpen(true);
@@ -321,47 +325,56 @@ export default function WeightPage({
     setIsDeleteModalOpen(false);
   };
 
+  const handleDelete = () => {
+    // if (deleteType === "voice") {
+    //   voices.delete(deleteItem);
+    //   voices.refresh();
+    // } else if (deleteType === "dataset") datasets.delete(deleteItem);
+    // datasets.refresh();
+  };
+
   return (
     <div>
       <Container type="panel" className="mb-5">
-        <PageHeader
-          title={
-            <div className="d-flex gap-2 align-items-center flex-wrap">
-              <span className="mb-1">{weight.title}</span>
-            </div>
-          }
-          subText={
-            <div className="d-flex gap-3 flex-wrap align-items-center">
+        <Panel clear={true} className="py-4">
+          <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
+            <WeightCoverImage src="/images/avatars/default-pfp.png" />
+            <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
-                <div>
-                  <Badge label={weightType} color={weightTagColor} />
-                </div>
-                {subtitleDivider}
-                <p>{weightCategory}</p>
-                {subtitleDivider}
-                <div className="d-flex align-items-center gap-2">
-                  <LikeButton
-                    {...{
-                      entityToken: weight_token,
-                      entityType: "model_weight",
-                      likeCount: 1200,
-                      onToggle: bookmarks.toggle,
-                      large: true,
-                    }}
-                  />
-                  <FavoriteButton
-                    {...{
-                      entityToken: weight_token,
-                      entityType: "model_weight",
-                      onToggle: bookmarks.toggle,
-                      large: true,
-                    }}
-                  />
+                <h1 className="fw-bold mb-2">{weight.title}</h1>
+              </div>
+              <div className="d-flex gap-3 flex-wrap align-items-center">
+                <div className="d-flex gap-2 align-items-center flex-wrap">
+                  <div>
+                    <Badge label={weightType} color={weightTagColor} />
+                  </div>
+                  {subtitleDivider}
+                  <p>{weightCategory}</p>
+                  {subtitleDivider}
+                  <div className="d-flex align-items-center gap-2">
+                    <LikeButton
+                      {...{
+                        entityToken: weight_token,
+                        entityType: "model_weight",
+                        likeCount: 1200,
+                        onToggle: bookmarks.toggle,
+                        large: true,
+                      }}
+                    />
+                    <FavoriteButton
+                      {...{
+                        entityToken: weight_token,
+                        entityType: "model_weight",
+                        onToggle: bookmarks.toggle,
+                        large: true,
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          }
-        />
+          </div>
+        </Panel>
 
         <div className="row g-4">
           <div className="col-12 col-xl-8 d-flex flex-column gap-3">
@@ -544,7 +557,8 @@ export default function WeightPage({
         show={isDeleteModalOpen}
         handleClose={closeDeleteModal}
         title="Delete Weight"
-        content="Are you sure you want to delete this weight? This action cannot be undone."
+        content={`Are you sure you want to delete "${weight.title}"? This action cannot be undone.`}
+        onConfirm={handleDelete}
       />
     </div>
   );
