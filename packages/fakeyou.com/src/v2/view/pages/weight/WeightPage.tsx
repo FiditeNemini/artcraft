@@ -40,6 +40,8 @@ import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import SdInferencePanel from "./inference_panels/SdInferencePanel";
+import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -73,6 +75,8 @@ export default function WeightPage({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const bookmarks = useBookmarks();
+
+  const bucketConfig = new BucketConfig();
 
   const weightTypeInfo = useWeightTypeInfo(
     weight?.weights_type || WeightType.NONE
@@ -134,12 +138,19 @@ export default function WeightPage({
           />
         );
       case WeightCategory.SD:
+        let sdCoverImage = "/images/avatars/default-pfp.png";
+        if (weight.maybe_cover_image_public_bucket_path !== null) {
+          sdCoverImage = bucketConfig.getCdnUrl(
+            weight.maybe_cover_image_public_bucket_path,
+            100,
+            100
+          );
+        }
+
         return (
           <div className="d-flex flex-column gap-3">
-            <Panel padding={true}>
-              Stable Diffusion preview/cover image(s)
-            </Panel>
-            <Panel padding={true}>Generation inference panel here</Panel>
+            <SdCoverImagePanel src={sdCoverImage} />
+            <SdInferencePanel />
           </div>
         );
       default:
@@ -343,7 +354,6 @@ export default function WeightPage({
     // datasets.refresh();
   };
 
-  const bucketConfig = new BucketConfig();
   let audioWeightCoverImage = "/images/avatars/default-pfp.png";
   if (weight.maybe_cover_image_public_bucket_path !== null) {
     audioWeightCoverImage = bucketConfig.getCdnUrl(
@@ -358,7 +368,8 @@ export default function WeightPage({
       <Container type="panel" className="mb-5">
         <Panel clear={true} className="py-4">
           <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
-            {weight.weights_category === WeightCategory.VC && (
+            {(weight.weights_category === WeightCategory.VC ||
+              weight.weights_category === WeightCategory.TTS) && (
               <WeightCoverImage src={audioWeightCoverImage} />
             )}
             <div>

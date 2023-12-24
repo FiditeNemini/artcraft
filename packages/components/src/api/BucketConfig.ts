@@ -25,7 +25,7 @@ class BucketConfig {
   getCdnUrl(
     bucketRelativePath: string,
     width?: number,
-    height?: number
+    quality?: number
   ): string {
     const basePath = this.isLocalDev
       ? "https://dev-cdn.fakeyou.com"
@@ -34,13 +34,13 @@ class BucketConfig {
       ? bucketRelativePath
       : "/" + bucketRelativePath;
     let resizeParams = "";
-    if (width || height) {
+    if (width || quality) {
       resizeParams = "cdn-cgi/image/";
       if (width) {
         resizeParams += `width=${width},`;
       }
-      if (height) {
-        resizeParams += `height=${height},`;
+      if (quality) {
+        resizeParams += `quality=${quality},`;
       }
       resizeParams = resizeParams.slice(0, -1);
     }
