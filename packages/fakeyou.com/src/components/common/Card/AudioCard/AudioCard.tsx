@@ -10,7 +10,7 @@ import CreatorName from "../CreatorName";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import Button from "components/common/Button";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
-
+import WeightCoverImage from "components/common/WeightCoverImage";
 interface AudioCardProps {
   data: any;
   type: "media" | "weights";
@@ -108,10 +108,7 @@ export default function AudioCard({
         <>
           <div className="d-flex">
             {showCover && (
-              <div className="cover-img">
-                {/* replace source image with api data */}
-                <img src="/images/dummy-image-2.jpg" alt="Cover" width={100} />
-              </div>
+              <WeightCoverImage src="/images/avatars/default-pfp.png" />
             )}
 
             <div className="flex-grow-1">
