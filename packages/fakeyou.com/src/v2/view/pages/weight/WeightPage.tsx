@@ -302,16 +302,20 @@ export default function WeightPage({
     setIsShareModalOpen(false);
   };
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareUrl);
-    setButtonLabel("Copied!");
-    setTimeout(() => setButtonLabel("Copy"), 1000);
-  };
-
   const shareUrl = `https://fakeyou.com/weight/${weight.weight_token}`;
   const shareText = `Use FakeYou to generate speech as ${
     weight.title || "your favorite characters"
   }!`;
+
+  const handleCopyLink = () => {
+    console.log("copying link");
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
+    }
+    setButtonLabel("Copied!");
+    setTimeout(() => setButtonLabel("Copy"), 1000);
+    console.log(shareUrl);
+  };
 
   const openDeleteModal = () => {
     setIsDeleteModalOpen(true);
@@ -319,6 +323,14 @@ export default function WeightPage({
 
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
+  };
+
+  const handleDelete = () => {
+    // if (deleteType === "voice") {
+    //   voices.delete(deleteItem);
+    //   voices.refresh();
+    // } else if (deleteType === "dataset") datasets.delete(deleteItem);
+    // datasets.refresh();
   };
 
   return (
@@ -545,7 +557,8 @@ export default function WeightPage({
         show={isDeleteModalOpen}
         handleClose={closeDeleteModal}
         title="Delete Weight"
-        content="Are you sure you want to delete this weight? This action cannot be undone."
+        content={`Are you sure you want to delete "${weight.title}"? This action cannot be undone.`}
+        onConfirm={handleDelete}
       />
     </div>
   );
