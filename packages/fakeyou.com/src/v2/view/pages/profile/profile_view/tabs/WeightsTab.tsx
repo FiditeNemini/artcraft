@@ -43,7 +43,7 @@ export default function WeightsTab({ username }: { username: string }) {
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    weights.pageChange(selectedItem.selected + 1);
+    weights.pageChange(selectedItem.selected);
   };
 
   const filterOptions = [

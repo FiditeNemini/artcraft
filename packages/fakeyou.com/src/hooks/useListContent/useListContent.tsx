@@ -20,7 +20,7 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
   const [status, statusSet] = useState(requestList ? 1 : 0);
 
   const pageChange = (page: number) => {
-    pageSet(pagePreset);
+    pageSet(page);
     statusSet(1);
   };
 

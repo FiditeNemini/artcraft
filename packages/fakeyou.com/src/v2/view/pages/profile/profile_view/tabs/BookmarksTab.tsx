@@ -20,7 +20,7 @@ export default function BookmarksTab({ username }: { username: string }) {
   const bookmarks = useListContent({ debug: "bookmarks tab", fetcher: GetBookmarksByUser, list, listSet, requestList: true, urlParam: username });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    bookmarks.pageChange(selectedItem.selected + 1);
+    bookmarks.pageChange(selectedItem.selected);
   };
 
   const paginationProps = {
@@ -120,6 +120,7 @@ export default function BookmarksTab({ username }: { username: string }) {
           onLayoutComplete={() => console.log("Layout complete!")}
         >
           {bookmarks.list.map((data: any, index: number) => {
+            console.log("🧣", data);
             let card;
             switch (data.media_type) {
               case "audio":
