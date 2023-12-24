@@ -27,8 +27,10 @@ pub struct Weight {
   creator: UserDetailsLight,
   creator_set_visibility: Visibility,
 
-  description_markdown: String,
-  description_rendered_html: String,
+  // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
+  //  Hopefully we don't break the frontend by omitting these.
+  //description_markdown: String,
+  //description_rendered_html: String,
   
   file_size_bytes: i32,
   file_checksum_sha2: String,
@@ -180,8 +182,8 @@ pub async fn list_weights_by_user_handler(
         &weight.creator_email_gravatar_hash,
       ),
       maybe_cover_image_public_bucket_path: maybe_cover_image,
-      description_markdown: weight.description_markdown,
-      description_rendered_html: weight.description_rendered_html,
+      //description_markdown: weight.maybe_description_markdown,
+      //description_rendered_html: weight.maybe_description_rendered_html,
       file_size_bytes: weight.file_size_bytes,
       file_checksum_sha2: weight.file_checksum_sha2,
       cached_user_ratings_total_count: weight.cached_user_ratings_total_count,

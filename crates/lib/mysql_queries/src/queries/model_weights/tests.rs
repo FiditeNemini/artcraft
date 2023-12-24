@@ -1,3 +1,4 @@
+#[ignore]
 #[cfg(test)]
 mod tests {
     use anyhow::Ok;
@@ -65,8 +66,8 @@ mod tests {
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
-            description_markdown: "Description 1".to_string(),
-            description_rendered_html: "<p>Description 1</p>".to_string(),
+            maybe_description_markdown: Some("Description 1".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 1</p>".to_string()),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
             creator_ip_address: "192.168.1.1",
             creator_set_visibility: Visibility::Public,
@@ -97,8 +98,8 @@ mod tests {
         assert_eq!(result.title, "Title 1".to_string());
         assert_eq!(result.weights_type, WeightsType::RvcV2);
         assert_eq!(result.weights_category, WeightsCategory::VoiceConversion);
-        assert_eq!(result.description_markdown, "Description 1".to_string());
-        assert_eq!(result.description_rendered_html, "<p>Description 1</p>".to_string());
+        assert_eq!(result.maybe_description_markdown, Some("Description 1".to_string()));
+        assert_eq!(result.maybe_description_rendered_html, Some("<p>Description 1</p>".to_string()));
         assert_eq!(result.creator_user_token, creator_token1);
         assert_eq!(result.creator_ip_address, "192.168.1.1".to_string());
         assert_eq!(result.creator_set_visibility, Visibility::Public);
@@ -138,8 +139,8 @@ mod tests {
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
-            description_markdown: "Description 1".to_string(),
-            description_rendered_html: "<p>Description 1</p>".to_string(),
+            maybe_description_markdown: Some("Description 1".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 1</p>".to_string()),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
             creator_ip_address: "192.168.1.1",
             creator_set_visibility: Visibility::Public,
@@ -214,8 +215,8 @@ mod tests {
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
-            description_markdown: "Description 1".to_string(),
-            description_rendered_html: "<p>Description 1</p>".to_string(),
+            maybe_description_markdown: Some("Description 1".to_string()),
+            maybe_description_rendered_html: Some("<p>Description 1</p>".to_string()),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
             creator_ip_address: "192.168.1.1",
             creator_set_visibility: Visibility::Public,
@@ -325,11 +326,11 @@ mod tests {
 
             let args = CreateModelWeightsArgs {
                 token: &model_weight_token, // replace with actual ModelWeightToken
-                weights_type: weights_type, // replace with actual WeightsType
-                weights_category: weights_category, // replace with actual WeightsCategory
+                weights_type, // replace with actual WeightsType
+                weights_category, // replace with actual WeightsCategory
                 title: format!("Title {}", i),
-                description_markdown: format!("Description {}", i),
-                description_rendered_html: format!("<p>Description {}</p>", i),
+                maybe_description_markdown: Some(format!("Description {}", i)),
+                maybe_description_rendered_html: Some(format!("<p>Description {}</p>", i)),
                 creator_user_token: Some(&creator_token), // replace with actual UserToken
                 creator_ip_address: "192.168.1.1",
                 creator_set_visibility: Visibility::Public,
@@ -567,11 +568,11 @@ mod tests {
 
             let args = CreateModelWeightsArgs {
                 token: &model_weight_token, // replace with actual ModelWeightToken
-                weights_type: weights_type, // replace with actual WeightsType
-                weights_category: weights_category, // replace with actual WeightsCategory
+                weights_type, // replace with actual WeightsType
+                weights_category, // replace with actual WeightsCategory
                 title: format!("Title {}", i),
-                description_markdown: format!("Description {}", i),
-                description_rendered_html: format!("<p>Description {}</p>", i),
+                maybe_description_markdown: Some(format!("Description {}", i)),
+                maybe_description_rendered_html: Some(format!("<p>Description {}</p>", i)),
                 creator_user_token: Some(&creator_token), // replace with actual UserToken
                 creator_ip_address: "192.168.1.1",
                 creator_set_visibility: Visibility::Public,

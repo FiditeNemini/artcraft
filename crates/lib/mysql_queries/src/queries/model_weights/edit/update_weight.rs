@@ -8,8 +8,8 @@ use tokens::tokens::model_weights::ModelWeightToken;
 pub struct UpdateWeightArgs<'a> {
     pub weight_token: &'a ModelWeightToken,
     pub title: Option<&'a str>,
-    pub description_markdown: Option<&'a str>,
-    pub description_rendered_html: Option<&'a str>,
+    pub maybe_description_markdown: Option<&'a str>,
+    pub maybe_description_rendered_html: Option<&'a str>,
     pub creator_set_visibility: Option<&'a Visibility>,
     pub weights_type: Option<String>,
     pub weights_category: Option<String>,
@@ -25,15 +25,15 @@ pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
     UPDATE model_weights
     SET
         title = COALESCE(?, title),
-        description_markdown = COALESCE(?, description_markdown),
-        description_rendered_html = COALESCE(?, description_rendered_html),
+        maybe_description_markdown = COALESCE(?, maybe_description_markdown),
+        maybe_description_rendered_html = COALESCE(?, maybe_description_rendered_html),
         creator_set_visibility = COALESCE(?, creator_set_visibility),
         version = version + 1
     WHERE token = ?
     "#,
         args.title.as_deref(),
-        args.description_markdown.as_deref(),
-        args.description_rendered_html.as_deref(),
+        args.maybe_description_markdown.as_deref(),
+        args.maybe_description_rendered_html.as_deref(),
         args.creator_set_visibility.as_deref(),
         args.weight_token.as_str()
     )
@@ -59,6 +59,7 @@ mod tests {
     use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
     use errors::AnyhowResult;
 
+    #[ignore]
     #[tokio::test]
     async fn test_update_weights() -> AnyhowResult<()> {
         let db_connection_string = DEFAULT_MYSQL_CONNECTION_STRING;

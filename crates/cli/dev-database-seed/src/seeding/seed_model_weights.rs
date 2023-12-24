@@ -129,8 +129,8 @@ pub async fn seed_weights_files(
             weights_type, // Assuming weights_type is defined elsewhere
             weights_category, // Assuming weights_category is defined elsewhere
             title: title.to_string(),
-            description_markdown: description.to_string(),
-            description_rendered_html: description_rendered_html.to_string(),
+            maybe_description_markdown: Some(description.to_string()),
+            maybe_description_rendered_html: Some(description_rendered_html.to_string()),
             creator_user_token: Some(&user_token),
             creator_ip_address: "127.0.0.1", // Assuming the IP address is localhost
             creator_set_visibility: Visibility::Public, // Assuming the visibility is public

@@ -53,8 +53,10 @@ pub struct ModelWeightForList {
 
     pub title: String,
 
-    pub description_markdown: String,
-    pub description_rendered_html: String,
+    // TODO(bt,2023-12-24): These aren't really appropriate for a list endpoint.
+    //  Hopefully we don't break the frontend by omitting these.
+    //pub description_markdown: String,
+    //pub description_rendered_html: String,
 
     /// Cover images are small descriptive images that can be set for any model.
     /// If a cover image is set, this is the path to the asset.
@@ -259,8 +261,6 @@ pub async fn list_available_weights_handler(
                     weights_type: weight.weights_type,
                     weights_category: weight.weights_category,
 
-                    description_markdown: weight.description_markdown,
-                    description_rendered_html: weight.description_rendered_html,
                     maybe_cover_image_public_bucket_path: maybe_cover_image,
 
                     creator: UserDetailsLight::from_db_fields(

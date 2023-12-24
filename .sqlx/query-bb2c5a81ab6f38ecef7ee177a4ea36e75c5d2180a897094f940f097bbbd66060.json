@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\n        SELECT\n        wt.token as `token: tokens::tokens::model_weights::ModelWeightToken`,\n        wt.title,\n        wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,\n        wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,\n        wt.description_markdown,\n        wt.description_rendered_html,\n\n        wt.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,\n        users.username as creator_username,\n        users.display_name as creator_display_name,\n        users.email_gravatar_hash AS creator_gravatar_hash,\n\n        wt.creator_ip_address,\n        wt.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n        wt.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,\n        wt.original_download_url,\n        wt.original_filename,\n        wt.file_size_bytes,\n        wt.file_checksum_sha2,\n\n        wt.public_bucket_hash,\n        wt.maybe_public_bucket_prefix,\n        wt.maybe_public_bucket_extension,\n\n        cover_image.public_bucket_directory_hash as maybe_cover_image_public_bucket_hash,\n        cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,\n        cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,\n\n        wt.cached_user_ratings_negative_count,\n        wt.cached_user_ratings_positive_count,\n        wt.cached_user_ratings_total_count,\n        wt.maybe_cached_user_ratings_ratio,\n        wt.cached_user_ratings_last_updated_at,\n        wt.version,\n        wt.created_at,\n        wt.updated_at,\n        wt.user_deleted_at,\n        wt.mod_deleted_at\n        FROM model_weights as wt\n        JOIN users\n            ON users.token = wt.creator_user_token\n        LEFT OUTER JOIN media_files as cover_image\n            ON cover_image.token = wt.maybe_cover_image_media_file_token\n        WHERE\n            wt.token = ?\n            ",
+  "query": "\n        SELECT\n        wt.token as `token: tokens::tokens::model_weights::ModelWeightToken`,\n        wt.title,\n        wt.weights_type as `weights_type: enums::by_table::model_weights::weights_types::WeightsType`,\n        wt.weights_category as `weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,\n        wt.maybe_description_markdown,\n        wt.maybe_description_rendered_html,\n        wt.creator_ip_address,\n        wt.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n\n        wt.creator_user_token as `creator_user_token: tokens::tokens::users::UserToken`,\n        users.username as creator_username,\n        users.display_name as creator_display_name,\n        users.email_gravatar_hash AS creator_gravatar_hash,\n\n        wt.maybe_last_update_user_token as `maybe_last_update_user_token: tokens::tokens::users::UserToken`,\n        wt.original_download_url,\n        wt.original_filename,\n        wt.file_size_bytes,\n        wt.file_checksum_sha2,\n        wt.public_bucket_hash,\n        wt.maybe_public_bucket_prefix,\n        wt.maybe_public_bucket_extension,\n\n        cover_image.public_bucket_directory_hash as maybe_cover_image_public_bucket_hash,\n        cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,\n        cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,\n\n        wt.cached_user_ratings_negative_count,\n        wt.cached_user_ratings_positive_count,\n        wt.cached_user_ratings_total_count,\n        wt.maybe_cached_user_ratings_ratio,\n        wt.cached_user_ratings_last_updated_at,\n        wt.version,\n        wt.created_at,\n        wt.updated_at,\n        wt.user_deleted_at,\n        wt.mod_deleted_at\n        FROM model_weights as wt\n        JOIN users\n            ON users.token = wt.creator_user_token\n        LEFT OUTER JOIN media_files as cover_image\n            ON cover_image.token = wt.maybe_cover_image_media_file_token\n        WHERE\n            wt.token = ?\n            AND wt.user_deleted_at IS NULL\n            AND wt.mod_deleted_at IS NULL\n        ",
   "describe": {
     "columns": [
       {
@@ -45,66 +45,26 @@
       },
       {
         "ordinal": 4,
-        "name": "description_markdown",
+        "name": "maybe_description_markdown",
         "type_info": {
           "type": "Blob",
-          "flags": "NOT_NULL | BLOB | BINARY | NO_DEFAULT_VALUE",
+          "flags": "BLOB | BINARY",
           "char_set": 224,
           "max_size": 262140
         }
       },
       {
         "ordinal": 5,
-        "name": "description_rendered_html",
+        "name": "maybe_description_rendered_html",
         "type_info": {
           "type": "Blob",
-          "flags": "NOT_NULL | BLOB | BINARY | NO_DEFAULT_VALUE",
+          "flags": "BLOB | BINARY",
           "char_set": 224,
           "max_size": 262140
         }
       },
       {
         "ordinal": 6,
-        "name": "creator_user_token: tokens::tokens::users::UserToken",
-        "type_info": {
-          "type": "VarString",
-          "flags": "NOT_NULL | MULTIPLE_KEY | BINARY | NO_DEFAULT_VALUE",
-          "char_set": 224,
-          "max_size": 128
-        }
-      },
-      {
-        "ordinal": 7,
-        "name": "creator_username",
-        "type_info": {
-          "type": "VarString",
-          "flags": "NOT_NULL | UNIQUE_KEY | BINARY | NO_DEFAULT_VALUE",
-          "char_set": 224,
-          "max_size": 80
-        }
-      },
-      {
-        "ordinal": 8,
-        "name": "creator_display_name",
-        "type_info": {
-          "type": "VarString",
-          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
-          "char_set": 224,
-          "max_size": 80
-        }
-      },
-      {
-        "ordinal": 9,
-        "name": "creator_gravatar_hash",
-        "type_info": {
-          "type": "String",
-          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
-          "char_set": 224,
-          "max_size": 128
-        }
-      },
-      {
-        "ordinal": 10,
         "name": "creator_ip_address",
         "type_info": {
           "type": "VarString",
@@ -114,13 +74,53 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 7,
         "name": "creator_set_visibility: enums::common::visibility::Visibility",
         "type_info": {
           "type": "String",
           "flags": "NOT_NULL | MULTIPLE_KEY | BINARY | ENUM",
           "char_set": 224,
           "max_size": 28
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "creator_user_token: tokens::tokens::users::UserToken",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | MULTIPLE_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 128
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "creator_username",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 80
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "creator_display_name",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 80
+        }
+      },
+      {
+        "ordinal": 11,
+        "name": "creator_gravatar_hash",
+        "type_info": {
+          "type": "String",
+          "flags": "NOT_NULL | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 128
         }
       },
       {
@@ -342,8 +342,8 @@
       false,
       false,
       false,
-      false,
-      false,
+      true,
+      true,
       false,
       false,
       false,
@@ -373,5 +373,5 @@
       true
     ]
   },
-  "hash": "c26943bde6d2364f0f1594dfbf4fa40c8f94706f1cc413aea6bf213df5d533d5"
+  "hash": "bb2c5a81ab6f38ecef7ee177a4ea36e75c5d2180a897094f940f097bbbd66060"
 }
