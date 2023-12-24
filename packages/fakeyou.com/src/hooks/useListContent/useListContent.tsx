@@ -16,7 +16,7 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
   const [filter, filterSet] = useState("all");
   const [page, pageSet] = useState(pagePreset);
   const [pageCount, pageCountSet] = useState(0);
-  const [sort, sortSet] = useState("newest");
+  const [sort, sortSet] = useState(false);
   const [status, statusSet] = useState(requestList ? 1 : 0);
 
   const pageChange = (page: number) => {
@@ -45,7 +45,7 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
             page_index: page,
             ...addQueries, // eventually we should provide a way to type this ... or not. It works
             ...(filter !== "all" ? { filter_media_type: filter } : {}),
-            ...(sort !== "newest" ? { sort_ascending: true } : {}),
+            ...(sort ? { sort_ascending: true } : {}),
           }
         ).then((res: any) => {
           if (debug) console.log(`🪲 useListContent success debug at: ${ debug }`, res);
