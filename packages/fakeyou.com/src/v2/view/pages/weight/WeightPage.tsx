@@ -70,6 +70,8 @@ export default function WeightPage({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
+  const dateUpdated = moment(weight?.updated_at || "").format("LLL");
+  const dateCreated = moment(weight?.updated_at || "").format("LLL");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -241,7 +243,7 @@ export default function WeightPage({
     { property: "Category", value: weightCategory },
     {
       property: "Visibility",
-      value: weight.creator_set_visibility.toString(),
+      value: weight.creator_set_visibility?.toString() || "",
     },
     { property: "Created at", value: weight.created_at?.toString() || "" },
     { property: "Updated at", value: weight.updated_at?.toString() || "" },
@@ -252,10 +254,10 @@ export default function WeightPage({
     { property: "Category", value: weightCategory },
     {
       property: "Visibility",
-      value: weight.creator_set_visibility.toString(),
+      value: weight.creator_set_visibility?.toString() || "",
     },
-    { property: "Created at", value: weight.created_at?.toString() || "" },
-    { property: "Updated at", value: weight.updated_at?.toString() || "" },
+    { property: "Created at", value: dateCreated || "" },
+    { property: "Updated at", value: dateUpdated || "" },
 
     //more to add for image/stable diffusion details
   ];
@@ -464,7 +466,8 @@ export default function WeightPage({
                 <div className="d-flex gap-2 p-3">
                   <Gravatar
                     size={48}
-                    username={weight.creator?.display_name}
+                    username={weight.creator?.username || ""}
+                    email_hash={weight.creator?.gravatar_hash || ""}
                     avatarIndex={
                       weight.creator?.default_avatar.image_index || 0
                     }

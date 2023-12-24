@@ -1,7 +1,7 @@
 import React from "react";
 import "./WeightCoverImage.scss";
 
-interface AudioWeightCoverImageProps {
+interface WeightCoverImageProps {
   src: string;
   alt?: string;
   height?: number;
@@ -13,7 +13,7 @@ export default function WeightCoverImage({
   alt,
   height = 100,
   width = 100,
-}: AudioWeightCoverImageProps) {
+}: WeightCoverImageProps) {
   const containerStyle = {
     height: `${height}px`,
     width: `${width}px`,
