@@ -8,8 +8,8 @@ select
     id,
     token,
     download_type,
-    title,
-    download_url,
+    SUBSTRING(title, 1, 35) as title,
+    SUBSTRING(download_url, 1, 100) as title,
     status,
     attempt_count
 from generic_download_jobs

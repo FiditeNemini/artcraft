@@ -46,9 +46,10 @@ pub fn extract_rvc_files(download_file: &Path, temp_dir: &TempDir) -> AnyhowResu
     return Ok(DownloadedRvcFile::ModelFileOnly { model_file: download_file.to_path_buf() });
   }
 
-  if archive.len() > 3 {
-    // There's something suspicious if the model files has more than 3 entries.
+  if archive.len() > 7 {
+    // There's something suspicious if the model files has more than 7 entries.
     // It should have the .pth file, a .index file, and _maybe_ a .txt file for credits.
+    // Mac users sometimes have a bogus __MACOSX directory, which may double the file count.
     warn!("File has wrong number of entries to be a valid model: {}", archive.len());
     return Ok(DownloadedRvcFile::InvalidModel);
   }
@@ -61,6 +62,11 @@ pub fn extract_rvc_files(download_file: &Path, temp_dir: &TempDir) -> AnyhowResu
   for i in 0..archive.len() {
     let mut file = archive.by_index(i)?;
     let filename = file.name().to_lowercase();
+
+    if filename.starts_with("__macosx/") {
+      // Mac users sometimes have a bogus __MACOSX directory, which may double the file count.
+      continue;
+    }
 
     let temp_file_path;
 
@@ -101,5 +107,39 @@ pub fn extract_rvc_files(download_file: &Path, temp_dir: &TempDir) -> AnyhowResu
     Ok(DownloadedRvcFile::ModelFileOnly {
       model_file: path_to_model,
     })
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use std::str::FromStr;
+
+  use anyhow::bail;
+  use tempdir::TempDir;
+
+  use errors::AnyhowResult;
+  use storyteller_root::get_seed_tool_data_root;
+
+  use crate::job_types::voice_conversion::rvc_v2::extract_rvc_files::{DownloadedRvcFile, extract_rvc_files};
+
+  #[test]
+  #[ignore]
+  fn test_rvc_with_macos_directory() -> AnyhowResult<()> {
+    let root = get_seed_tool_data_root();
+    let broken_model = root.join("models/rvc/sakura-hkt48.zip");
+    let tempdir = TempDir::new("test").expect("tempdir creation failed");
+
+    let extracted = extract_rvc_files(&broken_model, &tempdir).unwrap();
+
+    match extracted {
+      DownloadedRvcFile::InvalidModel => bail!("should not be broken"),
+      DownloadedRvcFile::ModelFileOnly { .. } => bail!("should not be model file only"),
+      DownloadedRvcFile::ModelAndIndexFile { model_file, index_file } => {
+        assert!(model_file.ends_with("model.pth"));
+        assert!(index_file.ends_with("model.index"));
+      }
+    }
+
+    Ok(())
   }
 }

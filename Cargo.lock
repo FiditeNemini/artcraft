@@ -1914,6 +1914,7 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "sqlx",
+ "storyteller_root",
  "subprocess",
  "subprocess_common",
  "tempdir",
