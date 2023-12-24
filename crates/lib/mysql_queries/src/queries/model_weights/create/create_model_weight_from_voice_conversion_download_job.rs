@@ -64,8 +64,8 @@ SET
   title = ?,
 
   maybe_cover_image_media_file_token = NULL,
-  description_markdown = NULL,
-  description_rendered_html = NULL,
+  description_markdown = "",
+  description_rendered_html = "",
 
   maybe_last_update_user_token = NULL,
   original_download_url = ?,
