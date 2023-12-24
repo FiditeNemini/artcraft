@@ -39,6 +39,9 @@ import { useBookmarks } from "hooks";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import SdInferencePanel from "./inference_panels/SdInferencePanel";
+import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -72,6 +75,8 @@ export default function WeightPage({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const bookmarks = useBookmarks();
+
+  const bucketConfig = new BucketConfig();
 
   const weightTypeInfo = useWeightTypeInfo(
     weight?.weights_type || WeightType.NONE
@@ -131,6 +136,22 @@ export default function WeightPage({
             ttsInferenceJobs={ttsInferenceJobs}
             voiceToken={weight.weight_token}
           />
+        );
+      case WeightCategory.SD:
+        let sdCoverImage = "/images/avatars/default-pfp.png";
+        if (weight.maybe_cover_image_public_bucket_path !== null) {
+          sdCoverImage = bucketConfig.getCdnUrl(
+            weight.maybe_cover_image_public_bucket_path,
+            100,
+            100
+          );
+        }
+
+        return (
+          <div className="d-flex flex-column gap-3">
+            <SdCoverImagePanel src={sdCoverImage} />
+            <SdInferencePanel />
+          </div>
         );
       default:
         return null;
@@ -333,12 +354,24 @@ export default function WeightPage({
     // datasets.refresh();
   };
 
+  let audioWeightCoverImage = "/images/avatars/default-pfp.png";
+  if (weight.maybe_cover_image_public_bucket_path !== null) {
+    audioWeightCoverImage = bucketConfig.getCdnUrl(
+      weight.maybe_cover_image_public_bucket_path,
+      100,
+      100
+    );
+  }
+
   return (
     <div>
       <Container type="panel" className="mb-5">
         <Panel clear={true} className="py-4">
           <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
-            <WeightCoverImage src="/images/avatars/default-pfp.png" />
+            {(weight.weights_category === WeightCategory.VC ||
+              weight.weights_category === WeightCategory.TTS) && (
+              <WeightCoverImage src={audioWeightCoverImage} />
+            )}
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
                 <h1 className="fw-bold mb-2">{weight.title}</h1>
