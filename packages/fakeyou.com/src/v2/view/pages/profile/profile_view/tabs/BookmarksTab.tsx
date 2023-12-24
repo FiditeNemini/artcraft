@@ -25,8 +25,8 @@ export default function BookmarksTab({ username }: { username: string }) {
 
   const paginationProps = {
     onPageChange: handlePageClick,
-    pageCount: bookmarks.pageCount - 1,
-    currentPage: bookmarks.page - 1
+    pageCount: bookmarks.pageCount,
+    currentPage: bookmarks.page
   };
 
   const filterOptions = [

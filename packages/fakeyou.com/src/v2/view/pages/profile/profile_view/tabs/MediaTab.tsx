@@ -23,19 +23,19 @@ export default function MediaTab({ username }: { username: string }) {
     fetcher: GetMediaByUser,
     list,
     listSet,
-    pagePreset: 1,
+    // pagePreset: 1,
     requestList: true,
     urlParam: username
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    media.pageChange(selectedItem.selected + 1);
+    media.pageChange(selectedItem.selected);
   };
 
   const paginationProps = {
     onPageChange: handlePageClick,
-    pageCount: media.pageCount - 1,
-    currentPage: media.page - 1
+    pageCount: media.pageCount,
+    currentPage: media.page
   };
 
   const filterOptions = [
