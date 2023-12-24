@@ -21,6 +21,8 @@ import {
   // faCirclePlay,
   // faShare,
   faSquareQuote,
+  faShare,
+  faLink,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -30,6 +32,9 @@ import { MediaFileType } from "@storyteller/components/src/api/_common/enums/Med
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
+import SocialButton from "components/common/SocialButton";
+import Modal from "components/common/Modal";
+import { Input } from "components/common";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -44,6 +49,8 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const [error, setError] = useState<boolean>(false);
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [buttonLabel, setButtonLabel] = useState("Copy");
 
   const getMediaFile = useCallback(async (mediaFileToken: string) => {
     let result = await GetMediaFile(mediaFileToken);
@@ -107,6 +114,9 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   }
 
   let audioLink = new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path);
+
+  const shareUrl = `https://fakeyou.com/media/${mediaFile?.token || ""}`;
+  const shareText = "Check out this media on FakeYou.com!";
 
   if (isLoading)
     return (
@@ -260,6 +270,22 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     );
   }
 
+  const openShareModal = () => {
+    setIsShareModalOpen(true);
+  };
+
+  const closeShareModal = () => {
+    setIsShareModalOpen(false);
+  };
+
+  const handleCopyLink = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
+    }
+    setButtonLabel("Copied!");
+    setTimeout(() => setButtonLabel("Copy"), 1000);
+  };
+
   return (
     <div>
       <Container type="panel" className="pt-4 pt-lg-5">
@@ -288,25 +314,24 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                   href={audioLink}
                   download={audioLink}
                 />
-                {/* Share and Create Buttons */}
-                {/* 
+
                 <div className="d-flex gap-2">
-                  <Button
+                  {/* <Button
                     square={true}
                     variant="secondary"
                     // icon={faCirclePlay}
                     onClick={() => {}}
                     tooltip="Create"
-                  />
-                 }
+                  /> */}
+
                   <Button
+                    icon={faShare}
                     square={true}
                     variant="secondary"
-                    // icon={faShare}
-                    onClick={() => {}}
                     tooltip="Share"
-                  /> 
-                </div> */}
+                    onClick={openShareModal}
+                  />
+                </div>
               </div>
 
               {mediaFile.media_type === MediaFileType.Audio ? (
@@ -356,7 +381,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
               <Panel className="rounded">
                 <div className="d-flex flex-column gap-2 p-3">
-                  <h6 className="fw-medium mb-0">Weight Used:</h6>
+                  <h6 className="fw-medium mb-0">Weight Used</h6>
                   <hr className="my-1" />
                   <div className="d-flex align-items-center">
                     <WeightCoverImage
@@ -366,7 +391,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                     />
                     <div className="d-flex flex-column">
                       <Link to="/">
-                        <h6 className="mb-0">Weight Name</h6>
+                        <h6 className="mb-1">Weight Name</h6>
                       </Link>
                       <p className="fs-7">by hanashi</p>
                     </div>
@@ -398,6 +423,58 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
           </Panel>
         </Container>
       </div>
+
+      {/* Share Modal */}
+      <Modal
+        show={isShareModalOpen}
+        handleClose={closeShareModal}
+        title="Share"
+        autoWidth={true}
+        showButtons={false}
+        content={
+          <div className="d-flex flex-column gap-4">
+            <div className="d-flex gap-3">
+              <SocialButton
+                social="x"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="whatsapp"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="facebook"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="reddit"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="email"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+            </div>
+            <div className="d-flex gap-2">
+              <div className="flex-grow-1">
+                <Input type="text" value={shareUrl} readOnly />
+              </div>
+
+              <Button
+                icon={faLink}
+                label={buttonLabel}
+                onClick={handleCopyLink}
+                variant="primary"
+              />
+            </div>
+          </div>
+        }
+      />
     </div>
   );
 }

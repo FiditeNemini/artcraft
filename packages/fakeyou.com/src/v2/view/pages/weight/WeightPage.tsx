@@ -331,13 +331,11 @@ export default function WeightPage({
   }!`;
 
   const handleCopyLink = () => {
-    console.log("copying link");
     if (navigator.clipboard) {
       navigator.clipboard.writeText(shareUrl);
     }
     setButtonLabel("Copied!");
     setTimeout(() => setButtonLabel("Copy"), 1000);
-    console.log(shareUrl);
   };
 
   const openDeleteModal = () => {
