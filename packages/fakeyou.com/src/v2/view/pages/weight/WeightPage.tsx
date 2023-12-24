@@ -39,6 +39,7 @@ import { useBookmarks } from "hooks";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -131,6 +132,15 @@ export default function WeightPage({
             ttsInferenceJobs={ttsInferenceJobs}
             voiceToken={weight.weight_token}
           />
+        );
+      case WeightCategory.SD:
+        return (
+          <div className="d-flex flex-column gap-3">
+            <Panel padding={true}>
+              Stable Diffusion preview/cover image(s)
+            </Panel>
+            <Panel padding={true}>Generation inference panel here</Panel>
+          </div>
         );
       default:
         return null;
@@ -333,12 +343,24 @@ export default function WeightPage({
     // datasets.refresh();
   };
 
+  const bucketConfig = new BucketConfig();
+  let audioWeightCoverImage = "/images/avatars/default-pfp.png";
+  if (weight.maybe_cover_image_public_bucket_path !== null) {
+    audioWeightCoverImage = bucketConfig.getCdnUrl(
+      weight.maybe_cover_image_public_bucket_path,
+      100,
+      100
+    );
+  }
+
   return (
     <div>
       <Container type="panel" className="mb-5">
         <Panel clear={true} className="py-4">
           <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
-            <WeightCoverImage src="/images/avatars/default-pfp.png" />
+            {weight.weights_category === WeightCategory.VC && (
+              <WeightCoverImage src={audioWeightCoverImage} />
+            )}
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
                 <h1 className="fw-bold mb-2">{weight.title}</h1>
