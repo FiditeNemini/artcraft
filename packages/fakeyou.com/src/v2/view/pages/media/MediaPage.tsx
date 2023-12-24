@@ -21,14 +21,20 @@ import {
   // faCirclePlay,
   // faShare,
   faSquareQuote,
+  faShare,
+  faLink,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-import useTimeAgo from "hooks/useTimeAgo";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { MediaFileType } from "@storyteller/components/src/api/_common/enums/MediaFileType";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import moment from "moment";
+import WeightCoverImage from "components/common/WeightCoverImage";
+import SocialButton from "components/common/SocialButton";
+import Modal from "components/common/Modal";
+import { Input } from "components/common";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -36,11 +42,15 @@ interface MediaPageProps {
 
 export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const { token } = useParams<{ token: string }>();
-  const [mediaFile, setMediaFile] = useState<MediaFile | undefined | null>(null);
+  const [mediaFile, setMediaFile] = useState<MediaFile | undefined | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-
-  const timeCreated = useTimeAgo(mediaFile?.created_at.toISOString() || "");
+  const timeCreated = moment(mediaFile?.created_at || "").fromNow();
+  const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [buttonLabel, setButtonLabel] = useState("Copy");
 
   const getMediaFile = useCallback(async (mediaFileToken: string) => {
     let result = await GetMediaFile(mediaFileToken);
@@ -104,6 +114,9 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   }
 
   let audioLink = new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path);
+
+  const shareUrl = `https://fakeyou.com/media/${mediaFile?.token || ""}`;
+  const shareText = "Check out this media on FakeYou.com!";
 
   if (isLoading)
     return (
@@ -171,7 +184,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
   const audioDetails = [
     { property: "Type", value: mediaFile.media_type },
-    { property: "Created at", value: mediaFile.created_at.toString() },
+    { property: "Created at", value: dateCreated || "" },
     {
       property: "Visibility",
       value: mediaFile.creator_set_visibility.toString(),
@@ -196,7 +209,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
   const videoDetails = [
     { property: "Type", value: mediaFile.media_type },
-    { property: "Created at", value: mediaFile.created_at.toString() },
+    { property: "Created at", value: dateCreated || "" },
     {
       property: "Visibility",
       value: mediaFile.creator_set_visibility.toString(),
@@ -205,7 +218,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
   const imageDetails = [
     { property: "Type", value: mediaFile.media_type },
-    { property: "Created at", value: mediaFile.created_at.toString() },
+    { property: "Created at", value: dateCreated || "" },
     {
       property: "Visibility",
       value: mediaFile.creator_set_visibility.toString(),
@@ -257,6 +270,22 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     );
   }
 
+  const openShareModal = () => {
+    setIsShareModalOpen(true);
+  };
+
+  const closeShareModal = () => {
+    setIsShareModalOpen(false);
+  };
+
+  const handleCopyLink = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
+    }
+    setButtonLabel("Copied!");
+    setTimeout(() => setButtonLabel("Copy"), 1000);
+  };
+
   return (
     <div>
       <Container type="panel" className="pt-4 pt-lg-5">
@@ -266,7 +295,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               {renderMediaComponent(mediaFile)}
             </div>
 
-            <div className="panel p-3 py-4 p-md-4 mt-4 d-none d-xl-block">
+            <div className="panel p-3 py-4 p-md-4 mt-3 d-none d-xl-block">
               <h4 className="fw-semibold mb-3">Comments</h4>
               <CommentComponent
                 entityType="user"
@@ -276,29 +305,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
             </div>
           </div>
           <div className="col-12 col-xl-4">
-            <div className="panel panel-clear d-flex flex-column gap-4">
-              <div className="d-flex gap-2">
-                <Gravatar
-                  size={48}
-                  username={mediaFile.maybe_creator_user?.display_name}
-                  avatarIndex={
-                    mediaFile.maybe_creator_user?.default_avatar.image_index
-                  }
-                  backgroundIndex={
-                    mediaFile.maybe_creator_user?.default_avatar.color_index
-                  }
-                />
-                <div className="d-flex flex-column">
-                  <Link
-                    className="fw-medium"
-                    to={`/profile/${mediaFile.maybe_creator_user?.display_name}`}
-                  >
-                    {mediaFile.maybe_creator_user?.display_name}
-                  </Link>
-                  {timeCreated}
-                </div>
-              </div>
-
+            <div className="panel panel-clear d-flex flex-column gap-3">
               <div className="d-flex gap-2 flex-wrap">
                 <Button
                   icon={faArrowDownToLine}
@@ -307,34 +314,91 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                   href={audioLink}
                   download={audioLink}
                 />
-                {/* Share and Create Buttons */}
-                 {/* 
+
                 <div className="d-flex gap-2">
-                  <Button
+                  {/* <Button
                     square={true}
                     variant="secondary"
                     // icon={faCirclePlay}
                     onClick={() => {}}
                     tooltip="Create"
-                  />
-                 }
+                  /> */}
+
                   <Button
+                    icon={faShare}
                     square={true}
                     variant="secondary"
-                    // icon={faShare}
-                    onClick={() => {}}
                     tooltip="Share"
-                  /> 
-                </div> */}
+                    onClick={openShareModal}
+                  />
+                </div>
               </div>
-              {  mediaFile.media_type === MediaFileType.Audio ? 
-                <Button {...{ 
-                  icon: faFaceViewfinder,
-                  label: "Use audio in Face Animator",
-                  to: `/face-animator/${ mediaFile.token }`,
-                  variant: "secondary"
-                }}/> : null
-              }
+
+              {mediaFile.media_type === MediaFileType.Audio ? (
+                <Button
+                  {...{
+                    icon: faFaceViewfinder,
+                    label: "Use audio in Face Animator",
+                    to: `/face-animator/${mediaFile.token}`,
+                    variant: "secondary",
+                  }}
+                />
+              ) : null}
+
+              <Panel className="rounded">
+                <div className="d-flex gap-2 p-3">
+                  <Gravatar
+                    size={48}
+                    username={mediaFile.maybe_creator_user?.username || ""}
+                    email_hash={
+                      mediaFile.maybe_creator_user?.gravatar_hash || ""
+                    }
+                    avatarIndex={
+                      mediaFile.maybe_creator_user?.default_avatar
+                        .image_index || 0
+                    }
+                    backgroundIndex={
+                      mediaFile.maybe_creator_user?.default_avatar
+                        .color_index || 0
+                    }
+                  />
+                  <div className="d-flex flex-column">
+                    {mediaFile.maybe_creator_user?.display_name ? (
+                      <Link
+                        className="fw-medium"
+                        to={`/profile/${mediaFile.maybe_creator_user?.display_name}`}
+                      >
+                        {mediaFile.maybe_creator_user?.display_name}
+                      </Link>
+                    ) : (
+                      <p className="fw-medium text-white">Anonymous</p>
+                    )}
+
+                    <p className="fs-7">Created: {timeCreated}</p>
+                  </div>
+                </div>
+              </Panel>
+
+              <Panel className="rounded">
+                <div className="d-flex flex-column gap-2 p-3">
+                  <h6 className="fw-medium mb-0">Weight Used</h6>
+                  <hr className="my-1" />
+                  <div className="d-flex align-items-center">
+                    <WeightCoverImage
+                      src="/images/dummy-image.jpg"
+                      height={60}
+                      width={60}
+                    />
+                    <div className="d-flex flex-column">
+                      <Link to="/">
+                        <h6 className="mb-1">Weight Name</h6>
+                      </Link>
+                      <p className="fs-7">by hanashi</p>
+                    </div>
+                  </div>
+                </div>
+              </Panel>
+
               <Accordion>
                 <Accordion.Item title="Media Details" defaultOpen={true}>
                   {mediaDetails}
@@ -347,7 +411,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         </div>
       </Container>
 
-      <div className="d-xl-none my-4">
+      <div className="d-xl-none my-3">
         <Container type="panel">
           <Panel padding={true}>
             <h4 className="fw-semibold mb-3">Comments</h4>
@@ -359,6 +423,58 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
           </Panel>
         </Container>
       </div>
+
+      {/* Share Modal */}
+      <Modal
+        show={isShareModalOpen}
+        handleClose={closeShareModal}
+        title="Share"
+        autoWidth={true}
+        showButtons={false}
+        content={
+          <div className="d-flex flex-column gap-4">
+            <div className="d-flex gap-3">
+              <SocialButton
+                social="x"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="whatsapp"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="facebook"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="reddit"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+              <SocialButton
+                social="email"
+                shareUrl={shareUrl}
+                shareText={shareText}
+              />
+            </div>
+            <div className="d-flex gap-2">
+              <div className="flex-grow-1">
+                <Input type="text" value={shareUrl} readOnly />
+              </div>
+
+              <Button
+                icon={faLink}
+                label={buttonLabel}
+                onClick={handleCopyLink}
+                variant="primary"
+              />
+            </div>
+          </div>
+        }
+      />
     </div>
   );
 }

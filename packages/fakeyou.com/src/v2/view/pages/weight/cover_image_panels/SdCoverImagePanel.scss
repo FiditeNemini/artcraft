@@ -1,0 +1,16 @@
+.sd-cover-img-container {
+  height: 600px;
+  overflow: hidden;
+
+  img {
+    border-radius: 0.5rem;
+    max-height: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 992px) {
+  .sd-cover-img-container {
+    height: 100%;
+  }
+}
