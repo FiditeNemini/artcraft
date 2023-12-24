@@ -5,12 +5,21 @@ declare -r entropy=$(xxd -l16 -ps /dev/urandom)
 #declare -r CHROME_DIR="${HOME}/.chromeDevTemp"
 declare -r chrome_dir="/tmp/chrome/${entropy}"
 
+# See flags available and documentation:
+# https://chromium.googlesource.com/chromium/src/+/HEAD/chrome/common/chrome_switches.cc
+# https://github.com/GoogleChrome/chrome-launcher/blob/main/docs/chrome-flags-for-tools.md
+# https://peter.sh/experiments/chromium-command-line-switches/
+
 # NB: Creating the directory first seems to block process start.
 # Perhaps this is the wrong chmod ownership flags.
 #mkdir -p $CHROME_DIR
 
+    #--auto-open-devtools-for-tabs="true" \
+    #--devtools-flags="" \
+
 launch_linux() {
   chromium \
+    --allow-running-insecure-content \
     --disable-site-isolation-trials \
     --disable-web-security \
     --ignore-certificate-errors \
