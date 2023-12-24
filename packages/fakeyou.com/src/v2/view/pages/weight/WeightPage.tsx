@@ -15,7 +15,7 @@ import {
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-import useTimeAgo from "hooks/useTimeAgo";
+// import useTimeAgo from "hooks/useTimeAgo";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { WeightType } from "@storyteller/components/src/api/_common/enums/WeightType";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
@@ -37,6 +37,8 @@ import Input from "components/common/Input";
 import { GetWeight } from "@storyteller/components/src/api/weights/GetWeight";
 import { useBookmarks } from "hooks";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
+
+import moment from "moment";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -64,7 +66,7 @@ export default function WeightPage({
   const [weight, setWeight] = useState<Weight | undefined | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<boolean>(false);
-  const timeUpdated = useTimeAgo(weight?.updated_at?.toISOString() || "");
+  const timeUpdated = moment(weight?.updated_at || "").fromNow();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
