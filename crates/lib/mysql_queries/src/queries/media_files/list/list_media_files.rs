@@ -180,7 +180,7 @@ WHERE
     // FIXME: Binding shouldn't require to_str().
     //  Otherwise, it's calling the Display trait on the raw type which is resulting in an
     //  incorrect binding and runtime error.
-    query_builder.push(" AND m.media_file_type = ");
+    query_builder.push(" AND m.media_type = ");
     query_builder.push_bind(media_type.to_str());
   }
 
