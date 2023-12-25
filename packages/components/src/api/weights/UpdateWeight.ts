@@ -1,0 +1,19 @@
+import MakeRequest from "../MakeRequest";
+
+export interface UpdateWeightRequest {
+  description_markdown: string,
+  description_rendered_html: string,
+  title: string,
+  visibility: string,
+  weight_category: string,
+  weight_type: string
+}
+
+export interface UpdateWeightResponse {
+  success: boolean
+}
+
+export const UpdateWeight = MakeRequest<string, UpdateWeightRequest, UpdateWeightResponse,{}>({
+  method: "POST",
+  routingFunction: (weight_token: string) => `/v1/weights/weight/${ weight_token }`,
+});

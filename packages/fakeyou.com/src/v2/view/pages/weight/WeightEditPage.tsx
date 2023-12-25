@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   faCircleExclamation,
   faEye,
-  faLanguage,
+  // faLanguage,
   faWaveform,
 } from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
@@ -13,9 +13,10 @@ import Container from "components/common/Container";
 import TempInput from "components/common/TempInput";
 import { Button, TempSelect } from "components/common";
 // import useVoiceRequests from "./useVoiceRequests";
-import { useHistory } from "react-router-dom";
+// import { useHistory } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import TextArea from "components/common/TextArea";
+import { useWeightFetch } from "hooks";
 
 interface WeightEditPageProps {
   sessionWrapper: SessionWrapper;
@@ -24,17 +25,22 @@ interface WeightEditPageProps {
 export default function WeightEditPage({
   sessionWrapper,
 }: WeightEditPageProps) {
-  const [language, languageSet] = useState("en");
-  const [visibility, visibilitySet] = useState("hidden");
-  const [title, titleSet] = useState("");
-  const [fetched, fetchedSet] = useState(false);
-  const history = useHistory();
+  // const [language, languageSet] = useState("en");
+  // const [fetched, fetchedSet] = useState(false);
+  // const history = useHistory();
   const { weight_token } = useParams<{ weight_token: string }>();
   const [weightCreatorToken, setWeightCreatorToken] = useState("");
 
-  // const { inputCtrl, languages, visibilityOptions, voices } = useVoiceRequests(
-  //   {}
-  // );
+  const { 
+    // data: weight, 
+    descriptionMD,
+    // fetchError,
+    // isLoading,
+    onChange,
+    title,
+    update,
+    visibility
+  } = useWeightFetch({ token: weight_token });
 
   usePrefixedDocumentTitle("Edit Voice");
 
@@ -51,16 +57,10 @@ export default function WeightEditPage({
   //         }
   //       });
 
-  //   useEffect(() => {
-  //     if (!fetched && weight_token) {
-  //       fetchedSet(true);
-  //       voices.get(weight_token, {}).then(res => {
-  //         languageSet(res.ietf_language_tag);
-  //         titleSet(res.title);
-  //         visibilitySet(res.creator_set_visibility);
-  //       });
-  //     }
-  //   }, [fetched, weight_token, voices]);
+  const visibilityOptions = [
+    { label: "Public", value: "public" },
+    { label: "Private", value: "private" }
+  ];
 
   if (
     !sessionWrapper.canEditTtsModelByUserToken(weightCreatorToken) === false ||
@@ -112,8 +112,9 @@ export default function WeightEditPage({
                 <TempInput
                   {...{
                     label: "Title",
+                    name: "title",
+                    onChange,
                     placeholder: "Title",
-                    // onChange: inputCtrl(titleSet),
                     value: title,
                   }}
                 />
@@ -122,38 +123,39 @@ export default function WeightEditPage({
                 <TextArea
                   {...{
                     label: "Description",
+                    name: "descriptionMD",
+                    onChange,
                     placeholder: "Description",
-                    // onChange: inputCtrl(titleSet),
-                    value: title,
+                    value: descriptionMD,
                   }}
                 />
               </div>
             </div>
           </div>
-
-          <div className="mt-lg-2">
-            <TempSelect
-              options={[]}
-              {...{
-                icon: faLanguage,
-                label: "Language",
-                // placeholder: "Voice name",
-                // onChange: inputCtrl(languageSet),
-                // options: languages,
-                value: language,
-              }}
-            />
-          </div>
-
+{
+          // <div className="mt-lg-2">
+          //   <TempSelect
+          //     options={[]}
+          //     {...{
+          //       icon: faLanguage,
+          //       label: "Language",
+          //       // placeholder: "Voice name",
+          //       // onChange: inputCtrl(languageSet),
+          //       // options: languages,
+          //       value: language,
+          //     }}
+          //   />
+          // </div>
+}
           <div>
             <TempSelect
-              options={[]}
               {...{
                 icon: faEye,
                 label: "Visibility",
+                name: "visibility",
+                options: visibilityOptions,
+                onChange,
                 placeholder: "Voice name",
-                // onChange: inputCtrl(visibilitySet),
-                // options: visibilityOptions,
                 value: visibility,
               }}
             />
@@ -172,7 +174,7 @@ export default function WeightEditPage({
             <Button
               {...{
                 label: "Save Changes",
-                // onClick
+                onClick: update
               }}
             />
           </div>

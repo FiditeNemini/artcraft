@@ -1,12 +1,8 @@
 import MakeRequest from "../MakeRequest";
 
 export interface DeleteWeightRequest {
-  description_markdown: string,
-  description_rendered_html: string,
-  title: string,
-  visibility: string,
-  weight_category: string,
-  weight_type: string
+  as_mod: boolean,
+  set_delete: boolean
 }
 
 export interface DeleteWeightResponse {
@@ -14,6 +10,6 @@ export interface DeleteWeightResponse {
 }
 
 export const DeleteWeight = MakeRequest<string, DeleteWeightRequest, DeleteWeightResponse,{}>({
-  method: "POST",
+  method: "DELETE",
   routingFunction: (weight_token: string) => `/v1/weights/weight/${ weight_token }`,
 });
