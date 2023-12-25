@@ -28,7 +28,7 @@ export default function WeightsTab({ username }: { username: string }) {
   const [sd, sdSet] = useState("all");
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
-
+  const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const addSetters = { sdSet, ttsSet, vcSet };
 
   const [list, listSet] = useState<any[]>([]);
@@ -83,6 +83,20 @@ export default function WeightsTab({ username }: { username: string }) {
     currentPage: weights.page,
   };
 
+  const resetMasonryGrid = () => {
+    setShowMasonryGrid(false);
+    setTimeout(() => setShowMasonryGrid(true), 10);
+  };
+
+  const handleSortOrFilterChange = (event: any) => {
+    if (weights.onChange) {
+      weights.onChange(event);
+    }
+
+    // Reset Masonry Grid
+    resetMasonryGrid();
+  };
+
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
@@ -92,7 +106,7 @@ export default function WeightsTab({ username }: { username: string }) {
               icon: faArrowDownWideShort,
               options: sortOptions,
               name: "sort",
-              onChange: weights.onChange,
+              onChange: handleSortOrFilterChange,
               value: weights.sort,
             }}
           />
@@ -101,7 +115,7 @@ export default function WeightsTab({ username }: { username: string }) {
               icon: faFilter,
               options: filterOptions,
               name: "filter",
-              onChange: weights.onChange,
+              onChange: handleSortOrFilterChange,
               value: weights.filter,
             }}
           />
@@ -110,7 +124,7 @@ export default function WeightsTab({ username }: { username: string }) {
               {...{
                 options: modelTtsOptions,
                 name: "tts",
-                onChange: weights.onChange,
+                onChange: handleSortOrFilterChange,
                 value: tts,
               }}
             />
@@ -120,7 +134,7 @@ export default function WeightsTab({ username }: { username: string }) {
               {...{
                 options: modelSdOptions,
                 name: "sd",
-                onChange: weights.onChange,
+                onChange: handleSortOrFilterChange,
                 value: sd,
               }}
             />
@@ -130,7 +144,7 @@ export default function WeightsTab({ username }: { username: string }) {
               {...{
                 options: modelVcOptions,
                 name: "vc",
-                onChange: weights.onChange,
+                onChange: handleSortOrFilterChange,
                 value: vc,
               }}
             />
@@ -145,69 +159,76 @@ export default function WeightsTab({ username }: { username: string }) {
           ))}
         </div>
       ) : (
-        <MasonryGrid
-          gridRef={gridContainerRef}
-          onLayoutComplete={() => console.log("Layout complete!")}
-        >
-          {weights.list.map((data: any, index: number) => {
-            let card;
-            switch (data.weights_category) {
-              case WeightCategory.TTS:
-                card = (
-                  <AudioCard
+        <>
+          {showMasonryGrid && (
+            <MasonryGrid
+              gridRef={gridContainerRef}
+              onLayoutComplete={() => console.log("Layout complete!")}
+            >
+              {weights.list.map((data: any, index: number) => {
+                let card;
+                switch (data.weights_category) {
+                  case WeightCategory.TTS:
+                    card = (
+                      <AudioCard
+                        key={index}
+                        data={data}
+                        type="weights"
+                        showCreator={true}
+                        showCover={true}
+                      />
+                    );
+                    break;
+                  case WeightCategory.VC:
+                    card = (
+                      <AudioCard
+                        key={index}
+                        data={data}
+                        type="weights"
+                        showCreator={true}
+                        showCover={true}
+                      />
+                    );
+                    break;
+                  case WeightCategory.ZS:
+                    card = (
+                      <AudioCard
+                        key={index}
+                        data={data}
+                        type="weights"
+                        showCreator={true}
+                        showCover={true}
+                      />
+                    );
+                    break;
+                  case WeightCategory.SD:
+                    card = (
+                      <ImageCard
+                        key={index}
+                        data={data}
+                        type="weights"
+                        showCreator={true}
+                      />
+                    );
+                    break;
+                  case WeightCategory.VOCODER:
+                    card = <></>;
+                    break;
+                  default:
+                    card = <div>Unsupported weight type</div>;
+                }
+                return (
+                  <div
                     key={index}
-                    data={data}
-                    type="weights"
-                    showCreator={true}
-                    showCover={true}
-                  />
+                    className="col-12 col-sm-6 col-xl-4 grid-item"
+                  >
+                    {card}
+                  </div>
                 );
-                break;
-              case WeightCategory.VC:
-                card = (
-                  <AudioCard
-                    key={index}
-                    data={data}
-                    type="weights"
-                    showCreator={true}
-                    showCover={true}
-                  />
-                );
-                break;
-              case WeightCategory.ZS:
-                card = (
-                  <AudioCard
-                    key={index}
-                    data={data}
-                    type="weights"
-                    showCreator={true}
-                    showCover={true}
-                  />
-                );
-                break;
-              case WeightCategory.SD:
-                card = (
-                  <ImageCard
-                    key={index}
-                    data={data}
-                    type="weights"
-                    showCreator={true}
-                  />
-                );
-                break;
-              case WeightCategory.VOCODER:
-                card = <></>;
-                break;
-              default:
-                card = <div>Unsupported weight type</div>;
-            }
-            return (
-              <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
-                {card}
-              </div>
-            );
-          })}
-        </MasonryGrid>
+              })}
+            </MasonryGrid>
+          )}
+        </>
       )}
 
       <div className="d-flex justify-content-end mt-4">

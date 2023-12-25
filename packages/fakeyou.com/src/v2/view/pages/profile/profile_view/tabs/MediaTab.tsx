@@ -4,7 +4,10 @@ import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
 import { TempSelect } from "components/common";
-import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faArrowDownWideShort,
+  faFilter,
+} from "@fortawesome/pro-solid-svg-icons";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";
@@ -16,6 +19,7 @@ import { useListContent } from "hooks";
 export default function MediaTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [isLoading] = useState(false);
+  const [showMasonryGrid, setShowMasonryGrid] = useState(true);
 
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useListContent({
@@ -25,7 +29,7 @@ export default function MediaTab({ username }: { username: string }) {
     listSet,
     // pagePreset: 1,
     requestList: true,
-    urlParam: username
+    urlParam: username,
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -35,7 +39,21 @@ export default function MediaTab({ username }: { username: string }) {
   const paginationProps = {
     onPageChange: handlePageClick,
     pageCount: media.pageCount,
-    currentPage: media.page
+    currentPage: media.page,
+  };
+
+  const resetMasonryGrid = () => {
+    setShowMasonryGrid(false);
+    setTimeout(() => setShowMasonryGrid(true), 10);
+  };
+
+  const handleSortOrFilterChange = (event: any) => {
+    if (media.onChange) {
+      media.onChange(event);
+    }
+
+    // Reset Masonry Grid
+    resetMasonryGrid();
   };
 
   const filterOptions = [
@@ -55,22 +73,26 @@ export default function MediaTab({ username }: { username: string }) {
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
         <div className="d-flex gap-2 flex-grow-1">
-          <TempSelect {...{
-            icon: faArrowDownWideShort,
-            options: sortOptions,
-            name: "sort",
-            onChange: media.onChange,
-            value: media.sort
-          }}/>
-          <TempSelect {...{
-            icon: faFilter,
-            options: filterOptions,
-            name: "filter",
-            onChange: media.onChange,
-            value: media.filter
-          }}/>
+          <TempSelect
+            {...{
+              icon: faArrowDownWideShort,
+              options: sortOptions,
+              name: "sort",
+              onChange: handleSortOrFilterChange,
+              value: media.sort,
+            }}
+          />
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: filterOptions,
+              name: "filter",
+              onChange: handleSortOrFilterChange,
+              value: media.filter,
+            }}
+          />
         </div>
-        <Pagination { ...paginationProps }/>
+        <Pagination {...paginationProps} />
       </div>
       <AudioPlayerProvider>
         {isLoading ? (
@@ -80,37 +102,44 @@ export default function MediaTab({ username }: { username: string }) {
             ))}
           </div>
         ) : (
-          <MasonryGrid
-            gridRef={gridContainerRef}
-            onLayoutComplete={() => console.log("Layout complete!")}
-          >
-            {media.list.map((data: MediaFile, index: number) => {
-              let card;
-              switch (data.media_type) {
-                case "audio":
-                  card = <AudioCard data={data} type="media" />;
-                  break;
-                case "image":
-                  card = <ImageCard data={data} type="media" />;
-                  break;
-                case "video":
-                  card = <VideoCard data={data} type="media" />;
-                  break;
-                default:
-                  card = <div>Unsupported media type</div>;
-              }
-              return (
-                <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
-                  {card}
-                </div>
-              );
-            })}
-          </MasonryGrid>
+          <>
+            {showMasonryGrid && (
+              <MasonryGrid
+                gridRef={gridContainerRef}
+                onLayoutComplete={() => console.log("Layout complete!")}
+              >
+                {media.list.map((data: MediaFile, index: number) => {
+                  let card;
+                  switch (data.media_type) {
+                    case "audio":
+                      card = <AudioCard data={data} type="media" />;
+                      break;
+                    case "image":
+                      card = <ImageCard data={data} type="media" />;
+                      break;
+                    case "video":
+                      card = <VideoCard data={data} type="media" />;
+                      break;
+                    default:
+                      card = <div>Unsupported media type</div>;
+                  }
+                  return (
+                    <div
+                      key={index}
+                      className="col-12 col-sm-6 col-xl-4 grid-item"
+                    >
+                      {card}
+                    </div>
+                  );
+                })}
+              </MasonryGrid>
+            )}
+          </>
         )}
       </AudioPlayerProvider>
 
       <div className="d-flex justify-content-end mt-4">
-        <Pagination { ...paginationProps }/>
+        <Pagination {...paginationProps} />
       </div>
     </>
   );
