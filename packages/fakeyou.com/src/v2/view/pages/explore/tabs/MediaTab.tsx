@@ -26,6 +26,7 @@ export default function MediaTab() {
     list,
     listSet,
     requestList: true,
+    addQueries: { per_page: 12 },
   });
 
   const resetMasonryGrid = () => {
