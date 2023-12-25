@@ -27,6 +27,7 @@ export default function WeightsTab() {
     list,
     listSet,
     requestList: true,
+    addQueries: { per_page: 12 },
   });
 
   const resetMasonryGrid = () => {

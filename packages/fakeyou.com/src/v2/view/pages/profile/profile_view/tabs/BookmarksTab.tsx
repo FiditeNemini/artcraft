@@ -27,6 +27,7 @@ export default function BookmarksTab({ username }: { username: string }) {
     listSet,
     requestList: true,
     urlParam: username,
+    addQueries: { per_page: 12 },
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {

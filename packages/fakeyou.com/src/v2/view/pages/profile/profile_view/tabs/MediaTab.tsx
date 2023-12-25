@@ -30,6 +30,7 @@ export default function MediaTab({ username }: { username: string }) {
     // pagePreset: 1,
     requestList: true,
     urlParam: username,
+    addQueries: { per_page: 12 },
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {

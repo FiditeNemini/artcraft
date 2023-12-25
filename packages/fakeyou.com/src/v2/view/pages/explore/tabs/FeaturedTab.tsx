@@ -19,6 +19,7 @@ export default function FeaturedTab() {
     list,
     listSet,
     requestList: true,
+    addQueries: { per_page: 12 },
   });
 
   return (

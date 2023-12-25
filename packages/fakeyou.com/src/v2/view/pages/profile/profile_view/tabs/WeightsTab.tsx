@@ -81,6 +81,7 @@ export default function WeightsTab({ username }: { username: string }) {
     onPageChange: handlePageClick,
     pageCount: weights.pageCount,
     currentPage: weights.page,
+    addQueries: { per_page: 12 },
   };
 
   const resetMasonryGrid = () => {
