@@ -19,6 +19,7 @@ import { useLazyLists } from "hooks";
 export default function WeightsTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [isLoading] = useState(false);
+  const [showMasonryGrid, setShowMasonryGrid] = useState(true);
 
   const [list, listSet] = useState<Weight[]>([]);
   const weights = useLazyLists({
@@ -27,6 +28,20 @@ export default function WeightsTab() {
     listSet,
     requestList: true,
   });
+
+  const resetMasonryGrid = () => {
+    setShowMasonryGrid(false);
+    setTimeout(() => setShowMasonryGrid(true), 10);
+  };
+
+  const handleSortOrFilterChange = (event: any) => {
+    if (weights.onChange) {
+      weights.onChange(event);
+    }
+
+    // Reset Masonry Grid
+    resetMasonryGrid();
+  };
 
   const filterOptions = [
     { value: "all", label: "All Weights" },
@@ -68,7 +83,7 @@ export default function WeightsTab() {
               icon: faArrowDownWideShort,
               options: sortOptions,
               name: "sort",
-              onChange: weights.onChange,
+              onChange: handleSortOrFilterChange,
               value: weights.sort,
             }}
           />
@@ -77,7 +92,7 @@ export default function WeightsTab() {
               icon: faFilter,
               options: filterOptions,
               name: "filter",
-              onChange: weights.onChange,
+              onChange: handleSortOrFilterChange,
               value: weights.filter,
             }}
           />
@@ -128,72 +143,74 @@ export default function WeightsTab() {
             }
             className="overflow-hidden"
           >
-            <MasonryGrid
-              gridRef={gridContainerRef}
-              onLayoutComplete={() => console.log("Layout complete!")}
-            >
-              {weights.list.map((data: any, index: number) => {
-                let card;
-                switch (data.weights_category) {
-                  case WeightCategory.TTS:
-                    card = (
-                      <AudioCard
-                        key={index}
-                        data={data}
-                        type="weights"
-                        showCreator={true}
-                        showCover={true}
-                      />
-                    );
-                    break;
-                  case WeightCategory.VC:
-                    card = (
-                      <AudioCard
-                        key={index}
-                        data={data}
-                        type="weights"
-                        showCreator={true}
-                        showCover={true}
-                      />
-                    );
-                    break;
-                  case WeightCategory.ZS:
-                    card = (
-                      <AudioCard
-                        key={index}
-                        data={data}
-                        type="weights"
-                        showCreator={true}
-                        showCover={true}
-                      />
-                    );
-                    break;
-                  case WeightCategory.SD:
-                    card = (
-                      <ImageCard
-                        key={index}
-                        data={data}
-                        type="weights"
-                        showCreator={true}
-                      />
-                    );
-                    break;
-                  case WeightCategory.VOCODER:
-                    card = <></>;
-                    break;
-                  default:
-                    card = <div>Unsupported weight type</div>;
-                }
-                return (
-                  <div
-                    key={index}
-                    className="col-12 col-sm-6 col-xl-4 grid-item"
-                  >
-                    {card}
-                  </div>
-                );
-              })}
-            </MasonryGrid>
+            {showMasonryGrid && (
+              <MasonryGrid
+                gridRef={gridContainerRef}
+                onLayoutComplete={() => console.log("Layout complete!")}
+              >
+                {weights.list.map((data: any, index: number) => {
+                  let card;
+                  switch (data.weights_category) {
+                    case WeightCategory.TTS:
+                      card = (
+                        <AudioCard
+                          key={index}
+                          data={data}
+                          type="weights"
+                          showCreator={true}
+                          showCover={true}
+                        />
+                      );
+                      break;
+                    case WeightCategory.VC:
+                      card = (
+                        <AudioCard
+                          key={index}
+                          data={data}
+                          type="weights"
+                          showCreator={true}
+                          showCover={true}
+                        />
+                      );
+                      break;
+                    case WeightCategory.ZS:
+                      card = (
+                        <AudioCard
+                          key={index}
+                          data={data}
+                          type="weights"
+                          showCreator={true}
+                          showCover={true}
+                        />
+                      );
+                      break;
+                    case WeightCategory.SD:
+                      card = (
+                        <ImageCard
+                          key={index}
+                          data={data}
+                          type="weights"
+                          showCreator={true}
+                        />
+                      );
+                      break;
+                    case WeightCategory.VOCODER:
+                      card = <></>;
+                      break;
+                    default:
+                      card = <div>Unsupported weight type</div>;
+                  }
+                  return (
+                    <div
+                      key={index}
+                      className="col-12 col-sm-6 col-xl-4 grid-item"
+                    >
+                      {card}
+                    </div>
+                  );
+                })}
+              </MasonryGrid>
+            )}
           </InfiniteScroll>
         )}
       </AudioPlayerProvider>

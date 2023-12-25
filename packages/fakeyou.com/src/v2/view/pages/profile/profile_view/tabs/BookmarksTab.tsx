@@ -5,7 +5,10 @@ import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import Select from "components/common/Select";
-import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faArrowDownWideShort,
+  faFilter,
+} from "@fortawesome/pro-solid-svg-icons";
 import Pagination from "components/common/Pagination";
 
 import { useListContent } from "hooks";
@@ -15,9 +18,16 @@ export default function BookmarksTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [isLoading] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("all");
-
+  // const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<any[]>([]);
-  const bookmarks = useListContent({ debug: "bookmarks tab", fetcher: GetBookmarksByUser, list, listSet, requestList: true, urlParam: username });
+  const bookmarks = useListContent({
+    debug: "bookmarks tab",
+    fetcher: GetBookmarksByUser,
+    list,
+    listSet,
+    requestList: true,
+    urlParam: username,
+  });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
     bookmarks.pageChange(selectedItem.selected);
@@ -26,8 +36,22 @@ export default function BookmarksTab({ username }: { username: string }) {
   const paginationProps = {
     onPageChange: handlePageClick,
     pageCount: bookmarks.pageCount,
-    currentPage: bookmarks.page
+    currentPage: bookmarks.page,
   };
+
+  // const resetMasonryGrid = () => {
+  //   setShowMasonryGrid(false);
+  //   setTimeout(() => setShowMasonryGrid(true), 10);
+  // };
+
+  // const handleSortOrFilterChange = (event: any) => {
+  //   if (weights.onChange) {
+  //     weights.onChange(event);
+  //   }
+
+  //   // Reset Masonry Grid
+  //   resetMasonryGrid();
+  // };
 
   const filterOptions = [
     { value: "all", label: "All Weights" },
@@ -106,7 +130,7 @@ export default function BookmarksTab({ username }: { username: string }) {
             />
           )}
         </div>
-        <Pagination { ...paginationProps }/>
+        <Pagination {...paginationProps} />
       </div>
       {isLoading ? (
         <div className="row gx-3 gy-3">
@@ -145,7 +169,7 @@ export default function BookmarksTab({ username }: { username: string }) {
       )}
 
       <div className="d-flex justify-content-end mt-4">
-        <Pagination { ...paginationProps }/>
+        <Pagination {...paginationProps} />
       </div>
     </>
   );
