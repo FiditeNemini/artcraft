@@ -29,7 +29,7 @@ export default function LikeButton({
   const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleClick = async (event: any) => {
+  const handleClick = async (event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     setIsLoading(true);
@@ -54,7 +54,7 @@ export default function LikeButton({
   let likeCountShort = useShortenNumber(likeCount);
 
   return (
-    <div className="d-flex gap-2" onClick={handleClick}>
+    <div className="d-flex gap-2">
       <Tippy
         theme="fakeyou"
         content={toolTip}
@@ -65,7 +65,7 @@ export default function LikeButton({
         placement="bottom"
       >
         <button
-          // onClick={handleClick} // unnecessary, parent has onClick, runs twice
+          onClick={handleClick}
           disabled={isLoading}
           className={`${buttonClass} ${buttonShadow} ${large ? "large" : ""}`}
         >

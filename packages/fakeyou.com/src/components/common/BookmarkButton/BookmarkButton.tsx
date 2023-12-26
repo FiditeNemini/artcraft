@@ -29,7 +29,9 @@ export default function BookmarkButton({
   const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleClick = async () => {
+  const handleClick = async (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
     setIsLoading(true);
     onToggle(entityToken, entityType).then((isToggled: boolean) => {
       setIsToggled(isToggled);
@@ -52,7 +54,7 @@ export default function BookmarkButton({
   // let favoriteCountShort = useShortenNumber(favoriteCount || 0);
 
   return (
-    <div className="d-flex gap-2" onClick={handleClick}>
+    <div className="d-flex gap-2">
       <Tippy
         theme="fakeyou"
         content={toolTip}
@@ -63,7 +65,7 @@ export default function BookmarkButton({
         placement="bottom"
       >
         <button
-          // onClick={handleClick} // unnecessary, parent has onClick, runs twice
+          onClick={handleClick}
           disabled={isLoading}
           className={`${buttonClass} ${buttonShadow} ${large ? "large" : ""}`}
         >
