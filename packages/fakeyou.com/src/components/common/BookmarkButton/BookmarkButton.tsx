@@ -4,10 +4,10 @@ import { faBookmark } from "@fortawesome/pro-solid-svg-icons";
 import { faBookmark as faBookmarkOutline } from "@fortawesome/pro-regular-svg-icons";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import "./FavoriteButton.scss";
+import "./BookmarkButton.scss";
 // import useShortenNumber from "hooks/useShortenNumber";
 
-interface FavoriteButtonProps {
+interface BookmarkButtonProps {
   entityToken?: string;
   entityType?: string;
   initialToggled?: boolean;
@@ -17,7 +17,7 @@ interface FavoriteButtonProps {
   large?: boolean;
 }
 
-export default function FavoriteButton({
+export default function BookmarkButton({
   entityToken = "",
   entityType = "",
   initialToggled = false,
@@ -25,14 +25,13 @@ export default function FavoriteButton({
   favoriteCount,
   overlay,
   large,
-}: FavoriteButtonProps) {
+}: BookmarkButtonProps) {
   const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async () => {
     setIsLoading(true);
-    onToggle(entityToken, entityType)
-    .then((isToggled: boolean) => {
+    onToggle(entityToken, entityType).then((isToggled: boolean) => {
       setIsToggled(isToggled);
       setIsLoading(false);
     });
@@ -64,7 +63,7 @@ export default function FavoriteButton({
         placement="bottom"
       >
         <button
-          // onClick={handleClick} // unnecessary, parent has onClick, runs twice 
+          // onClick={handleClick} // unnecessary, parent has onClick, runs twice
           disabled={isLoading}
           className={`${buttonClass} ${buttonShadow} ${large ? "large" : ""}`}
         >

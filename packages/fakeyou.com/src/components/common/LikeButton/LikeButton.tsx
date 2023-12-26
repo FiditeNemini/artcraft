@@ -29,10 +29,11 @@ export default function LikeButton({
   const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleClick = async () => {
+  const handleClick = async (event: any) => {
+    event.preventDefault();
+    event.stopPropagation();
     setIsLoading(true);
-    onToggle(entityToken, entityType)
-    .then((isToggled: boolean) => {
+    onToggle(entityToken, entityType).then((isToggled: boolean) => {
       setIsToggled(isToggled);
       setIsLoading(false);
     });
@@ -64,7 +65,7 @@ export default function LikeButton({
         placement="bottom"
       >
         <button
-          // onClick={handleClick} // unnecessary, parent has onClick, runs twice 
+          // onClick={handleClick} // unnecessary, parent has onClick, runs twice
           disabled={isLoading}
           className={`${buttonClass} ${buttonShadow} ${large ? "large" : ""}`}
         >

@@ -25,7 +25,7 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import Badge from "components/common/Badge";
-import FavoriteButton from "components/common/FavoriteButton";
+import BookmarkButton from "components/common/BookmarkButton";
 import LikeButton from "components/common/LikeButton";
 import VdInferencePanel from "./inference_panels/VdInferencePanel";
 import VcInferencePanel from "./inference_panels/VcInferencePanel";
@@ -380,7 +380,7 @@ export default function WeightPage({
                         large: true,
                       }}
                     />
-                    <FavoriteButton
+                    <BookmarkButton
                       {...{
                         entityToken: weight_token,
                         entityType: "model_weight",
