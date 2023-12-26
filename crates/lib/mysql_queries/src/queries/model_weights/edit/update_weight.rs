@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use sqlx::MySqlPool;
+use sqlx::{MySql, MySqlPool, QueryBuilder};
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
@@ -17,34 +17,63 @@ pub struct UpdateWeightArgs<'a> {
 }
 
 pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
-    let transaction = args.mysql_pool.begin().await?;
+    if args.title.is_none()
+        && args.maybe_description_markdown.is_none()
+        && args.maybe_description_rendered_html.is_none()
+        && args.creator_set_visibility.is_none()
+        && args.weights_type.is_none()
+        && args.weights_category.is_none(){
+        return Err(anyhow!("No fields to update"));
+    }
 
-
-    let query_result = sqlx::query!(
+    let mut query_builder: QueryBuilder<MySql> = QueryBuilder::new(
         r#"
-    UPDATE model_weights
-    SET
-        title = COALESCE(?, title),
-        maybe_description_markdown = COALESCE(?, maybe_description_markdown),
-        maybe_description_rendered_html = COALESCE(?, maybe_description_rendered_html),
-        creator_set_visibility = COALESCE(?, creator_set_visibility),
-        version = version + 1
-    WHERE token = ?
-    "#,
-        args.title.as_deref(),
-        args.maybe_description_markdown.as_deref(),
-        args.maybe_description_rendered_html.as_deref(),
-        args.creator_set_visibility.as_deref(),
-        args.weight_token.as_str()
-    )
-    .execute(args.mysql_pool).await;
+UPDATE model_weights
+SET
+    "#
+    );
 
+    let mut separated = query_builder.separated(", ");
+
+    if let Some(title) = args.title {
+        separated.push("title = ");
+        separated.push_bind_unseparated(title);
+    }
+    if let Some(maybe_description_markdown) = args.maybe_description_markdown {
+        separated.push("maybe_description_markdown = ");
+        separated.push_bind_unseparated(maybe_description_markdown);
+    }
+    if let Some(maybe_description_rendered_html) = args.maybe_description_rendered_html {
+        separated.push("maybe_description_rendered_html = ");
+        separated.push_bind_unseparated(maybe_description_rendered_html);
+    }
+    if let Some(creator_set_visibility) = args.creator_set_visibility {
+        separated.push("creator_set_visibility = ");
+        separated.push_bind_unseparated(creator_set_visibility.to_str());
+    }
+    if let Some(weights_type) = args.weights_type {
+        separated.push("weights_type = ");
+        separated.push_bind_unseparated(weights_type);
+    }
+    if let Some(weights_category) = args.weights_category {
+        separated.push("weights_category = ");
+        separated.push_bind_unseparated(weights_category);
+    }
+
+    separated.push("version = version + 1");
+
+    separated.push_unseparated(" WHERE token = ");
+    separated.push_bind_unseparated(args.weight_token.as_str());
+    separated.push_unseparated(" LIMIT 1");
+
+    let transaction = args.mysql_pool.begin().await?;
+    let query_result = query_builder.build().execute(args.mysql_pool).await;
     transaction.commit().await?;
 
     match query_result {
         Ok(_) => Ok(()),
         Err(err) => { 
-            Err(anyhow!("weights update error: {:?}", err)) 
+            Err(anyhow!("weights update error: {:?}", err))
         }
     }
 }
