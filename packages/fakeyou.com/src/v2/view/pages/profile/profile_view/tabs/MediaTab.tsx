@@ -14,9 +14,10 @@ import Pagination from "components/common/Pagination";
 
 import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
-import { useListContent } from "hooks";
+import { useBookmarks, useListContent } from "hooks";
 
 export default function MediaTab({ username }: { username: string }) {
+  const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
 
@@ -117,13 +118,25 @@ export default function MediaTab({ username }: { username: string }) {
                       let card;
                       switch (data.media_type) {
                         case "audio":
-                          card = <AudioCard data={data} type="media" />;
+                          card = <AudioCard {...{
+                            bookmarks,
+                            data,
+                            type: "media"
+                          }} />;
                           break;
                         case "image":
-                          card = <ImageCard data={data} type="media" />;
+                          card = <ImageCard {...{
+                            bookmarks,
+                            data,
+                            type: "media"
+                          }} />;
                           break;
                         case "video":
-                          card = <VideoCard data={data} type="media" />;
+                          card = <VideoCard {...{
+                            bookmarks,
+                            data,
+                            type: "media"
+                          }} />;
                           break;
                         default:
                           card = <div>Unsupported media type</div>;

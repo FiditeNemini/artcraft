@@ -12,10 +12,11 @@ import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContex
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { ListMediaFiles } from "@storyteller/components/src/api/media_files/ListMediaFiles";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
-import { useLazyLists } from "hooks";
+import { useBookmarks, useLazyLists } from "hooks";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function MediaTab() {
+  const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
 
@@ -119,32 +120,32 @@ export default function MediaTab() {
                       switch (data.media_type) {
                         case "audio":
                           card = (
-                            <AudioCard
-                              key={index}
-                              data={data}
-                              type="media"
-                              showCreator={true}
-                            />
+                            <AudioCard {...{
+                              bookmarks,
+                              data,
+                              type: "media",
+                              showCreator: true
+                            }} />
                           );
                           break;
                         case "image":
                           card = (
-                            <ImageCard
-                              key={index}
-                              data={data}
-                              type="media"
-                              showCreator={true}
-                            />
+                            <ImageCard {...{
+                              bookmarks,
+                              data,
+                              type: "media",
+                              showCreator: true
+                            }} />
                           );
                           break;
                         case "video":
                           card = (
-                            <VideoCard
-                              key={index}
-                              data={data}
-                              type="media"
-                              showCreator={true}
-                            />
+                            <VideoCard {...{
+                              bookmarks,
+                              data,
+                              type: "media",
+                              showCreator: true
+                            }}/>
                           );
                           break;
                         default:

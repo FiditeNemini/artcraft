@@ -6,11 +6,12 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
-import { useLazyLists } from "hooks";
+import { useBookmarks, useLazyLists } from "hooks";
 import { ListFeaturedMediaFiles } from "@storyteller/components/src/api/media_files/ListFeaturedMediaFiles";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 
 export default function FeaturedTab() {
+  const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [list, listSet] = useState<MediaFile[]>([]);
 
@@ -52,13 +53,13 @@ export default function FeaturedTab() {
               >
                 {media.list.map((data, index) => {
                   let card = (
-                    <AudioCard
-                      key={index}
-                      data={data}
-                      type="media"
-                      showCreator={true}
-                      showCover={true}
-                    />
+                    <AudioCard {...{
+                      bookmarks,
+                      data,
+                      type: "media",
+                      showCreator: true,
+                      showCover: true
+                    }} />
                   );
                   return (
                     <div

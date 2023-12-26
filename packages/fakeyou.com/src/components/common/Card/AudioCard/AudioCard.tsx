@@ -12,6 +12,7 @@ import Button from "components/common/Button";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
 interface AudioCardProps {
+  bookmarks: any,
   data: any;
   type: "media" | "weights";
   showCreator?: boolean;
@@ -19,11 +20,13 @@ interface AudioCardProps {
 }
 
 export default function AudioCard({
+  bookmarks,
   data,
   type,
   showCreator,
   showCover,
 }: AudioCardProps) {
+  console.log("😎",);
   const linkUrl =
     type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}`;
 
@@ -148,10 +151,12 @@ export default function AudioCard({
               <div>
                 <LikeButton onToggle={handleLike} likeCount={data.likes} />
               </div>
-              <BookmarkButton
-                onToggle={handleLike}
-                favoriteCount={data.likes}
-              />
+              <BookmarkButton {...{
+                entityToken: data.weight_token,
+                entityType: "model_weight",
+                onToggle: bookmarks.toggle,
+                large: true,
+              }} />
             </div>
           </>
         )}

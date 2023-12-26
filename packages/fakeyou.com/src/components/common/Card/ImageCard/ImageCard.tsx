@@ -21,6 +21,8 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
   const linkUrl =
     type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}`;
 
+    console.log("🎲",data);
+
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
   };

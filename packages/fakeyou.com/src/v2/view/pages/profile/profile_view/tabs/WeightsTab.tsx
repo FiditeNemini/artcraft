@@ -7,7 +7,7 @@ import {
   faFilter,
 } from "@fortawesome/pro-solid-svg-icons";
 import Pagination from "components/common/Pagination";
-import { useListContent } from "hooks";
+import { useBookmarks, useListContent } from "hooks";
 import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
 import { TempSelect } from "components/common";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
@@ -29,6 +29,7 @@ export default function WeightsTab({ username }: { username: string }) {
   const [vc, vcSet] = useState("all");
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const addSetters = { sdSet, ttsSet, vcSet };
+  const bookmarks = useBookmarks();
 
   const [list, listSet] = useState<any[]>([]);
   const weights = useListContent({
@@ -177,45 +178,45 @@ export default function WeightsTab({ username }: { username: string }) {
                     switch (data.weights_category) {
                       case WeightCategory.TTS:
                         card = (
-                          <AudioCard
-                            key={index}
-                            data={data}
-                            type="weights"
-                            showCreator={true}
-                            showCover={true}
-                          />
+                          <AudioCard {...{
+                            bookmarks,
+                            data,
+                            type: "weights",
+                            showCreator: true,
+                            showCover: true
+                          }} />
                         );
                         break;
                       case WeightCategory.VC:
                         card = (
-                          <AudioCard
-                            key={index}
-                            data={data}
-                            type="weights"
-                            showCreator={true}
-                            showCover={true}
-                          />
+                          <AudioCard {...{
+                            bookmarks,
+                            data,
+                            type: "weights",
+                            showCreator: true,
+                            showCover: true
+                          }} />
                         );
                         break;
                       case WeightCategory.ZS:
                         card = (
-                          <AudioCard
-                            key={index}
-                            data={data}
-                            type="weights"
-                            showCreator={true}
-                            showCover={true}
-                          />
+                          <AudioCard {...{
+                            bookmarks,
+                            data,
+                            type: "weights",
+                            showCreator: true,
+                            showCover: true
+                          }} />
                         );
                         break;
                       case WeightCategory.SD:
                         card = (
-                          <ImageCard
-                            key={index}
-                            data={data}
-                            type="weights"
-                            showCreator={true}
-                          />
+                          <ImageCard {...{
+                            bookmarks,
+                            data,
+                            type: "weights",
+                            showCreator: true
+                          }} />
                         );
                         break;
                       case WeightCategory.VOCODER:

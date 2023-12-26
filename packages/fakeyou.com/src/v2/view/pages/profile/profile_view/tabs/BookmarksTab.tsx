@@ -11,14 +11,15 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import Pagination from "components/common/Pagination";
 
-import { useListContent } from "hooks";
+import { useBookmarks, useListContent } from "hooks";
 import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
 
 export default function BookmarksTab({ username }: { username: string }) {
+  const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [list, listSet] = useState<any[]>([]);
-  const bookmarks = useListContent({
+  const { isLoading, list: dataList, page, pageChange, pageCount, status } = useListContent({
     debug: "bookmarks tab",
     fetcher: GetBookmarksByUser,
     list,
@@ -29,13 +30,13 @@ export default function BookmarksTab({ username }: { username: string }) {
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    bookmarks.pageChange(selectedItem.selected);
+    pageChange(selectedItem.selected);
   };
 
   const paginationProps = {
     onPageChange: handlePageClick,
-    pageCount: bookmarks.pageCount,
-    currentPage: bookmarks.page,
+    pageCount,
+    currentPage: page,
   };
 
   const filterOptions = [
@@ -117,7 +118,7 @@ export default function BookmarksTab({ username }: { username: string }) {
         </div>
         <Pagination {...paginationProps} />
       </div>
-      { bookmarks.isLoading ? (
+      { isLoading ? (
         <div className="row gx-3 gy-3">
           {Array.from({ length: 12 }).map((_, index) => (
             <SkeletonCard key={index} />
@@ -125,7 +126,7 @@ export default function BookmarksTab({ username }: { username: string }) {
         </div>
       ) : (
         <>
-          {bookmarks.list.length === 0 && bookmarks.status === 3 ? (
+          { dataList.length === 0 && status === 3 ? (
             <div className="text-center mt-4 opacity-75">
               No bookmarked weights yet.
             </div>
@@ -134,21 +135,32 @@ export default function BookmarksTab({ username }: { username: string }) {
               gridRef={gridContainerRef}
               onLayoutComplete={() => console.log("Layout complete!")}
             >
-              {bookmarks.list.map((data: any, index: number) => {
-                console.log("🧣", data);
+              { dataList.map((data: any, index: number) => {
                 let card;
                 switch (data.media_type) {
                   case "audio":
-                    card = <AudioCard key={index} data={data} type="weights" />;
+                    card = <AudioCard {...{
+                            bookmarks,
+                            data,
+                            type: "weights"
+                          }} />;
                     break;
                   case "image":
-                    card = <ImageCard key={index} data={data} type="weights" />;
+                    card = <ImageCard {...{
+                              bookmarks,
+                              data,
+                              type: "weights"
+                            }} />;
                     break;
                   case "video":
-                    card = <VideoCard key={index} data={data} type="weights" />;
+                    card = <VideoCard {...{
+                              bookmarks,
+                              data,
+                              type: "weights"
+                            }} />;
                     break;
                   default:
-                    card = <div key={index}>Unsupported media type</div>;
+                    card = <div>Unsupported media type</div>;
                 }
                 return (
                   <div
