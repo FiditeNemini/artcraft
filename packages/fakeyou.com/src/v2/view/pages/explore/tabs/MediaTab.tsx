@@ -9,7 +9,7 @@ import {
   faFilter,
 } from "@fortawesome/pro-solid-svg-icons";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
-import SkeletonCard from "components/common/Card/SkeletonCard";
+
 import { ListMediaFiles } from "@storyteller/components/src/api/media_files/ListMediaFiles";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { useLazyLists } from "hooks";
@@ -85,10 +85,10 @@ export default function MediaTab() {
           next={media.getMore}
           hasMore={!media.list.length || !!media.next}
           loader={
-            <div className="row gx-3 gy-3 mt-1">
-              {Array.from({ length: 12 }).map((_, index) => (
-                <SkeletonCard key={index} />
-              ))}
+            <div className="mt-4 d-flex justify-content-center">
+              <div className="spinner-border text-light" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
             </div>
           }
           endMessage={

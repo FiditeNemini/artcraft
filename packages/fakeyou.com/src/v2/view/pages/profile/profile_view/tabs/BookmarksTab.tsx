@@ -3,7 +3,7 @@ import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
-import SkeletonCard from "components/common/Card/SkeletonCard";
+
 import Select from "components/common/Select";
 import {
   faArrowDownWideShort,
@@ -142,10 +142,10 @@ export default function BookmarksTab({ username }: { username: string }) {
         <Pagination {...paginationProps} />
       </div>
       {isLoading ? (
-        <div className="row gx-3 gy-3">
-          {Array.from({ length: 12 }).map((_, index) => (
-            <SkeletonCard key={index} />
-          ))}
+        <div className="mt-4 d-flex justify-content-center">
+          <div className="spinner-border text-light" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
         </div>
       ) : (
         <>

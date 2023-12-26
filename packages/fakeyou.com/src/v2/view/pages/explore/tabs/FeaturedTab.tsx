@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
-import SkeletonCard from "components/common/Card/SkeletonCard";
+
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
@@ -42,10 +42,10 @@ export default function FeaturedTab() {
         </div>
 
         {isLoading ? (
-          <div className="row gx-3 gy-3 mt-1">
-            {Array.from({ length: 12 }).map((_, index) => (
-              <SkeletonCard key={index} />
-            ))}
+          <div className="mt-4 d-flex justify-content-center">
+            <div className="spinner-border text-light" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
           </div>
         ) : (
           <>

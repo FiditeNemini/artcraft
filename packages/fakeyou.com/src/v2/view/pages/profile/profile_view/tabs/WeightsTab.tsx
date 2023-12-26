@@ -11,7 +11,6 @@ import { useListContent } from "hooks";
 import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
 import { TempSelect } from "components/common";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
-import SkeletonCard from "components/common/Card/SkeletonCard";
 
 // interface IWeighttModelData {
 //   token: string;
@@ -163,10 +162,10 @@ export default function WeightsTab({ username }: { username: string }) {
         <Pagination {...paginationProps} />
       </div>
       {isLoading ? (
-        <div className="row gx-3 gy-3">
-          {Array.from({ length: 12 }).map((_, index) => (
-            <SkeletonCard key={index} />
-          ))}
+        <div className="mt-4 d-flex justify-content-center">
+          <div className="spinner-border text-light" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
         </div>
       ) : (
         <>
