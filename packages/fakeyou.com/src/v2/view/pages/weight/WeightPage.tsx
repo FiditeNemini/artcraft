@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
@@ -64,7 +64,13 @@ export default function WeightPage({
   inferenceJobsByCategory,
 }: WeightProps) {
   const { weight_token } = useParams<{ weight_token: string }>();
-  const { data: weight, descriptionMD, fetchError, isLoading, title } = useWeightFetch({ token: weight_token });
+  const {
+    data: weight,
+    descriptionMD,
+    fetchError,
+    isLoading,
+    title,
+  } = useWeightFetch({ token: weight_token });
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
   const dateUpdated = moment(weight?.updated_at || "").format("LLL");
   const dateCreated = moment(weight?.updated_at || "").format("LLL");
@@ -84,7 +90,6 @@ export default function WeightPage({
     color: weightTagColor,
     fullLabel: weightTypeFull,
   } = weightTypeInfo;
-
 
   function renderWeightComponent(weight: Weight) {
     switch (weight.weights_category) {
@@ -125,10 +130,8 @@ export default function WeightPage({
       case WeightCategory.SD:
         let sdCoverImage = "/images/avatars/default-pfp.png";
         if (weight.maybe_cover_image_public_bucket_path !== null) {
-          sdCoverImage = bucketConfig.getCdnUrl(
-            weight.maybe_cover_image_public_bucket_path,
-            100,
-            100
+          sdCoverImage = bucketConfig.getGcsUrl(
+            weight.maybe_cover_image_public_bucket_path
           );
         }
 
@@ -396,10 +399,10 @@ export default function WeightPage({
           <div className="col-12 col-xl-8 d-flex flex-column gap-3">
             <div className="media-wrapper">{renderWeightComponent(weight)}</div>
 
-            { descriptionMD !== "" && (
+            {descriptionMD !== "" && (
               <Panel padding={true}>
                 <h4 className="fw-semibold mb-3">Description</h4>
-                <p>{ descriptionMD }</p>
+                <p>{descriptionMD}</p>
               </Panel>
             )}
 
