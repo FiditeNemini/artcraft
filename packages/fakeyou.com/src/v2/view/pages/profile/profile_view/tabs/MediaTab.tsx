@@ -20,13 +20,17 @@ export default function MediaTab({ username }: { username: string }) {
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
-
   const [list, listSet] = useState<MediaFile[]>([]);
+  const resetMasonryGrid = () => {
+    setShowMasonryGrid(false);
+    setTimeout(() => setShowMasonryGrid(true), 10);
+  };
   const media = useListContent({
     // addQueries: { abc: "anything" }, an example
     fetcher: GetMediaByUser,
     list,
     listSet,
+    onInputChange: () => resetMasonryGrid(),
     requestList: true,
     urlParam: username,
     addQueries: { per_page: 24 },
@@ -42,20 +46,6 @@ export default function MediaTab({ username }: { username: string }) {
     currentPage: media.page,
   };
 
-  const resetMasonryGrid = () => {
-    setShowMasonryGrid(false);
-    setTimeout(() => setShowMasonryGrid(true), 10);
-  };
-
-  const handleSortOrFilterChange = (event: any) => {
-    if (media.onChange) {
-      media.onChange(event);
-    }
-
-    // Reset Masonry Grid
-    resetMasonryGrid();
-  };
-
   const filterOptions = [
     { value: "all", label: "All Media" },
     { value: "image", label: "Images" },
@@ -69,6 +59,15 @@ export default function MediaTab({ username }: { username: string }) {
     // { value: "mostliked", label: "Most Liked" },
   ];
 
+  const Card = ({ props, type }: { props: any, type: string }) => {
+    switch (type) {
+      case "audio": return <AudioCard { ...props } />;
+      case "image": return <ImageCard { ...props } />;
+      case "video": return <VideoCard { ...props } />;
+      default: return <div>Unsupported media type</div>;
+    }
+  };
+
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
@@ -78,7 +77,7 @@ export default function MediaTab({ username }: { username: string }) {
               icon: faArrowDownWideShort,
               options: sortOptions,
               name: "sort",
-              onChange: handleSortOrFilterChange,
+              onChange: media.onChange,
               value: media.sort,
             }}
           />
@@ -87,7 +86,7 @@ export default function MediaTab({ username }: { username: string }) {
               icon: faFilter,
               options: filterOptions,
               name: "filter",
-              onChange: handleSortOrFilterChange,
+              onChange: media.onChange,
               value: media.filter,
             }}
           />
@@ -114,41 +113,11 @@ export default function MediaTab({ username }: { username: string }) {
                     gridRef={gridContainerRef}
                     onLayoutComplete={() => console.log("Layout complete!")}
                   >
-                    {media.list.map((data: MediaFile, index: number) => {
-                      let card;
-                      switch (data.media_type) {
-                        case "audio":
-                          card = <AudioCard {...{
-                            bookmarks,
-                            data,
-                            type: "media"
-                          }} />;
-                          break;
-                        case "image":
-                          card = <ImageCard {...{
-                            bookmarks,
-                            data,
-                            type: "media"
-                          }} />;
-                          break;
-                        case "video":
-                          card = <VideoCard {...{
-                            bookmarks,
-                            data,
-                            type: "media"
-                          }} />;
-                          break;
-                        default:
-                          card = <div>Unsupported media type</div>;
-                      }
-                      return (
-                        <div
-                          key={index}
-                          className="col-12 col-sm-6 col-xl-4 grid-item"
-                        >
-                          {card}
-                        </div>
-                      );
+                    {media.list.map((data: MediaFile, key: number) => {
+                      let props = { bookmarks, data, type: "media" };
+                      return <div {...{ className: "col-12 col-sm-6 col-xl-4 grid-item", key }} >
+                        <Card {...{ type: data.media_type, props }}/>
+                      </div>;
                     })}
                   </MasonryGrid>
                 )}

@@ -28,16 +28,19 @@ export default function WeightsTab({ username }: { username: string }) {
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
-  const addSetters = { sdSet, ttsSet, vcSet };
   const bookmarks = useBookmarks();
-
   const [list, listSet] = useState<any[]>([]);
+  const resetMasonryGrid = () => {
+    setShowMasonryGrid(false);
+    setTimeout(() => setShowMasonryGrid(true), 10);
+  };
   const weights = useListContent({
-    addSetters,
+    addSetters: { sdSet, ttsSet, vcSet },
     debug: "Weights tab",
     fetcher: GetWeightsByUser,
     list,
     listSet,
+    onInputChange: () => resetMasonryGrid(),
     requestList: true,
     urlParam: username,
     addQueries: { per_page: 24 },
@@ -85,18 +88,14 @@ export default function WeightsTab({ username }: { username: string }) {
     addQueries: { per_page: 24 },
   };
 
-  const resetMasonryGrid = () => {
-    setShowMasonryGrid(false);
-    setTimeout(() => setShowMasonryGrid(true), 10);
-  };
-
-  const handleSortOrFilterChange = (event: any) => {
-    if (weights.onChange) {
-      weights.onChange(event);
+  const Card = ({ props, type }: { props: any, type: string }) => {
+    switch (type) {
+      case WeightCategory.TTS:
+      case WeightCategory.VC:
+      case WeightCategory.ZS: return <AudioCard { ...props } />;
+      case WeightCategory.SD: return <ImageCard { ...{ ...props, showCover: true }  } />;
+      default: return <div>Unsupported media type</div>;
     }
-
-    // Reset Masonry Grid
-    resetMasonryGrid();
   };
 
   return (
@@ -108,7 +107,7 @@ export default function WeightsTab({ username }: { username: string }) {
               icon: faArrowDownWideShort,
               options: sortOptions,
               name: "sort",
-              onChange: handleSortOrFilterChange,
+              onChange: weights.onChange,
               value: weights.sort,
             }}
           />
@@ -117,7 +116,7 @@ export default function WeightsTab({ username }: { username: string }) {
               icon: faFilter,
               options: filterOptions,
               name: "filter",
-              onChange: handleSortOrFilterChange,
+              onChange: weights.onChange,
               value: weights.filter,
             }}
           />
@@ -126,7 +125,7 @@ export default function WeightsTab({ username }: { username: string }) {
               {...{
                 options: modelTtsOptions,
                 name: "tts",
-                onChange: handleSortOrFilterChange,
+                onChange: weights.onChange,
                 value: tts,
               }}
             />
@@ -136,7 +135,7 @@ export default function WeightsTab({ username }: { username: string }) {
               {...{
                 options: modelSdOptions,
                 name: "sd",
-                onChange: handleSortOrFilterChange,
+                onChange: weights.onChange,
                 value: sd,
               }}
             />
@@ -146,7 +145,7 @@ export default function WeightsTab({ username }: { username: string }) {
               {...{
                 options: modelVcOptions,
                 name: "vc",
-                onChange: handleSortOrFilterChange,
+                onChange: weights.onChange,
                 value: vc,
               }}
             />
@@ -173,67 +172,13 @@ export default function WeightsTab({ username }: { username: string }) {
                   gridRef={gridContainerRef}
                   onLayoutComplete={() => console.log("Layout complete!")}
                 >
-                  {weights.list.map((data: any, index: number) => {
-                    let card;
-                    switch (data.weights_category) {
-                      case WeightCategory.TTS:
-                        card = (
-                          <AudioCard {...{
-                            bookmarks,
-                            data,
-                            type: "weights",
-                            showCreator: true,
-                            showCover: true
-                          }} />
-                        );
-                        break;
-                      case WeightCategory.VC:
-                        card = (
-                          <AudioCard {...{
-                            bookmarks,
-                            data,
-                            type: "weights",
-                            showCreator: true,
-                            showCover: true
-                          }} />
-                        );
-                        break;
-                      case WeightCategory.ZS:
-                        card = (
-                          <AudioCard {...{
-                            bookmarks,
-                            data,
-                            type: "weights",
-                            showCreator: true,
-                            showCover: true
-                          }} />
-                        );
-                        break;
-                      case WeightCategory.SD:
-                        card = (
-                          <ImageCard {...{
-                            bookmarks,
-                            data,
-                            type: "weights",
-                            showCreator: true
-                          }} />
-                        );
-                        break;
-                      case WeightCategory.VOCODER:
-                        card = <></>;
-                        break;
-                      default:
-                        card = <div>Unsupported weight type</div>;
-                    }
-                    return (
-                      <div
-                        key={index}
-                        className="col-12 col-sm-6 col-xl-4 grid-item"
-                      >
-                        {card}
-                      </div>
-                    );
-                  })}
+                  { weights.list.map((data: any, key: number) => {
+                    let props = { bookmarks, data, showCreator: true, type: "weights" };
+
+                    return <div {...{ className: "col-12 col-sm-6 col-xl-4 grid-item", key }} >
+                      <Card {...{ type: data.weights_category, props }}/>
+                    </div>;
+                  }) }
                 </MasonryGrid>
               )}
             </>

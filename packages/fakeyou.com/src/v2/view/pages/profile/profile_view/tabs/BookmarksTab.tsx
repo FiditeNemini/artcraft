@@ -4,7 +4,7 @@ import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
 import SkeletonCard from "components/common/Card/SkeletonCard";
-import Select from "components/common/Select";
+import { TempSelect } from "components/common";
 import {
   faArrowDownWideShort,
   faFilter,
@@ -17,16 +17,19 @@ import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/Ge
 export default function BookmarksTab({ username }: { username: string }) {
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [selectedFilter, setSelectedFilter] = useState("all");
+  const [sd, sdSet] = useState("all");
+  const [tts, ttsSet] = useState("all");
+  const [vc, vcSet] = useState("all");
   const [list, listSet] = useState<any[]>([]);
-  const { isLoading, list: dataList, page, pageChange, pageCount, status } = useListContent({
+  const { filter, isLoading, list: dataList, onChange, page, pageChange, pageCount, sort, status } = useListContent({
+    addQueries: { per_page: 24 },
+    addSetters: { sdSet, ttsSet, vcSet },
     debug: "bookmarks tab",
     fetcher: GetBookmarksByUser,
     list,
     listSet,
     requestList: true,
     urlParam: username,
-    addQueries: { per_page: 24 },
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -70,49 +73,65 @@ export default function BookmarksTab({ username }: { username: string }) {
     { value: "SDXL", label: "SD XL" },
   ];
 
-  const handleFilterChange = (option: any) => {
-    const selectedOption = option as { value: string; label: string };
-    setSelectedFilter(selectedOption.value);
+  const Card = ({ props, type }: { props: any, type: string }) => {
+    switch (type) {
+      case "audio": return <AudioCard { ...props } />;
+      case "image": return <ImageCard { ...props } />;
+      case "video": return <VideoCard { ...props } />;
+      default: return <div>Unsupported media type</div>;
+    }
   };
 
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
         <div className="d-flex gap-2 flex-grow-1">
-          <Select
-            icon={faArrowDownWideShort}
-            options={sortOptions}
-            defaultValue={sortOptions[0]}
-            isSearchable={false}
+          <TempSelect
+            {...{
+              icon: faArrowDownWideShort,
+              options: sortOptions,
+              name: "sort",
+              onChange,
+              value: sort,
+            }}
           />
-
-          <Select
-            icon={faFilter}
-            options={filterOptions}
-            defaultValue={filterOptions[0]}
-            isSearchable={false}
-            onChange={handleFilterChange}
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: filterOptions,
+              name: "filter",
+              onChange,
+              value: filter,
+            }}
           />
-
-          {selectedFilter === "tts" && (
-            <Select
-              options={modelTtsOptions}
-              defaultValue={modelTtsOptions[0]}
-              isSearchable={false}
+          { filter === "tts" && (
+            <TempSelect
+              {...{
+                options: modelTtsOptions,
+                name: "tts",
+                onChange,
+                value: tts,
+              }}
             />
           )}
-          {selectedFilter === "sd" && (
-            <Select
-              options={modelSdOptions}
-              defaultValue={modelSdOptions[0]}
-              isSearchable={false}
+          { filter === "sd" && (
+            <TempSelect
+              {...{
+                options: modelSdOptions,
+                name: "sd",
+                onChange,
+                value: sd,
+              }}
             />
           )}
-          {selectedFilter === "vc" && (
-            <Select
-              options={modelVcOptions}
-              defaultValue={modelVcOptions[0]}
-              isSearchable={false}
+          { filter === "vc" && (
+            <TempSelect
+              {...{
+                options: modelVcOptions,
+                name: "vc",
+                onChange,
+                value: vc,
+              }}
             />
           )}
         </div>
@@ -135,41 +154,12 @@ export default function BookmarksTab({ username }: { username: string }) {
               gridRef={gridContainerRef}
               onLayoutComplete={() => console.log("Layout complete!")}
             >
-              { dataList.map((data: any, index: number) => {
-                let card;
-                switch (data.media_type) {
-                  case "audio":
-                    card = <AudioCard {...{
-                            bookmarks,
-                            data,
-                            type: "weights"
-                          }} />;
-                    break;
-                  case "image":
-                    card = <ImageCard {...{
-                              bookmarks,
-                              data,
-                              type: "weights"
-                            }} />;
-                    break;
-                  case "video":
-                    card = <VideoCard {...{
-                              bookmarks,
-                              data,
-                              type: "weights"
-                            }} />;
-                    break;
-                  default:
-                    card = <div>Unsupported media type</div>;
-                }
-                return (
-                  <div
-                    key={index}
-                    className="col-12 col-sm-6 col-xl-4 grid-item"
-                  >
-                    {card}
-                  </div>
-                );
+              { dataList.map((data: any, key: number) => {
+                let props = { bookmarks, data, type: "weights" };
+
+                return <div {...{ className: "col-12 col-sm-6 col-xl-4 grid-item", key }} >
+                  <Card {...{ type: data.media_type, props }}/>
+                </div>;
               })}
             </MasonryGrid>
           )}

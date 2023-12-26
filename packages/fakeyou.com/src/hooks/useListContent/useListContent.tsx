@@ -8,12 +8,13 @@ interface Props {
   fetcher: any;
   list: any;
   listSet: any;
+  onInputChange?: (x?: any) => any;
   pagePreset?: number;
   requestList?: boolean;
   urlParam: string;
 }
 
-export default function useListContent({ addQueries, addSetters, debug = "", fetcher, list, listSet, pagePreset = 0, requestList = false, urlParam = "" }: Props) {
+export default function useListContent({ addQueries, addSetters, debug = "", fetcher, list, listSet, onInputChange = () => {}, pagePreset = 0, requestList = false, urlParam = "" }: Props) {
   const [filter, filterSet] = useState("all");
   const [page, pageSet] = useState(pagePreset);
   const [pageCount, pageCountSet] = useState(0);
@@ -36,6 +37,7 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
     const todo: { [key: string]: (x: any) => void } = { ...addSetters, filterSet, sortSet };
     todo[target.name + "Set"](target.value);
+    onInputChange({ target });
     reFetch();
   };
 

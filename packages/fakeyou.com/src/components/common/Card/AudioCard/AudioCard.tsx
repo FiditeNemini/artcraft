@@ -26,7 +26,6 @@ export default function AudioCard({
   showCreator,
   showCover,
 }: AudioCardProps) {
-  console.log("😎",);
   const linkUrl =
     type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}`;
 
