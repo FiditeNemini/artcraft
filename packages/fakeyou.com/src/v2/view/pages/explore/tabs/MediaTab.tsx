@@ -51,9 +51,9 @@ export default function MediaTab() {
   ];
 
   const sortOptions = [
-    { value: "newest", label: "Newest" },
-    { value: "oldest", label: "Oldest" },
-    { value: "mostliked", label: "Most Liked" },
+    { value: false, label: "Newest" },
+    { value: true, label: "Oldest" },
+    // { value: "mostliked", label: "Most Liked" },
   ];
 
   return (
