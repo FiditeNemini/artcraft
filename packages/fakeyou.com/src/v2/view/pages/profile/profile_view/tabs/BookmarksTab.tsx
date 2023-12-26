@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
@@ -16,9 +16,7 @@ import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/Ge
 
 export default function BookmarksTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("all");
-  // const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<any[]>([]);
   const bookmarks = useListContent({
     debug: "bookmarks tab",
@@ -39,20 +37,6 @@ export default function BookmarksTab({ username }: { username: string }) {
     pageCount: bookmarks.pageCount,
     currentPage: bookmarks.page,
   };
-
-  // const resetMasonryGrid = () => {
-  //   setShowMasonryGrid(false);
-  //   setTimeout(() => setShowMasonryGrid(true), 10);
-  // };
-
-  // const handleSortOrFilterChange = (event: any) => {
-  //   if (weights.onChange) {
-  //     weights.onChange(event);
-  //   }
-
-  //   // Reset Masonry Grid
-  //   resetMasonryGrid();
-  // };
 
   const filterOptions = [
     { value: "all", label: "All Weights" },
@@ -89,14 +73,6 @@ export default function BookmarksTab({ username }: { username: string }) {
     const selectedOption = option as { value: string; label: string };
     setSelectedFilter(selectedOption.value);
   };
-
-  useEffect(() => {
-    if (bookmarks.status === 1) {
-      setIsLoading(true);
-    } else if (bookmarks.status === 3) {
-      setIsLoading(false);
-    }
-  }, [bookmarks.status]);
 
   return (
     <>
@@ -141,7 +117,7 @@ export default function BookmarksTab({ username }: { username: string }) {
         </div>
         <Pagination {...paginationProps} />
       </div>
-      {isLoading ? (
+      { bookmarks.isLoading ? (
         <div className="row gx-3 gy-3">
           {Array.from({ length: 12 }).map((_, index) => (
             <SkeletonCard key={index} />

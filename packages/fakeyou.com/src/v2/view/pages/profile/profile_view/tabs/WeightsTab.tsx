@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
@@ -24,7 +24,6 @@ import SkeletonCard from "components/common/Card/SkeletonCard";
 
 export default function WeightsTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [sd, sdSet] = useState("all");
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
@@ -99,14 +98,6 @@ export default function WeightsTab({ username }: { username: string }) {
     resetMasonryGrid();
   };
 
-  useEffect(() => {
-    if (weights.status === 1) {
-      setIsLoading(true);
-    } else if (weights.status === 3) {
-      setIsLoading(false);
-    }
-  }, [weights.status]);
-
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
@@ -162,7 +153,7 @@ export default function WeightsTab({ username }: { username: string }) {
         </div>
         <Pagination {...paginationProps} />
       </div>
-      {isLoading ? (
+      { weights.isLoading ? (
         <div className="row gx-3 gy-3">
           {Array.from({ length: 12 }).map((_, index) => (
             <SkeletonCard key={index} />

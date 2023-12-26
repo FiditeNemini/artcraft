@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 
 interface Props {
   addQueries?: any;
@@ -17,17 +18,19 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
   const [page, pageSet] = useState(pagePreset);
   const [pageCount, pageCountSet] = useState(0);
   const [sort, sortSet] = useState(false);
-  const [status, statusSet] = useState(requestList ? 1 : 0);
+  const [status, statusSet] = useState(requestList ? FetchStatus.ready : FetchStatus.paused);
+  const isLoading = status === FetchStatus.ready || status === FetchStatus.in_progress;
+  const fetchError = status === FetchStatus.error;
 
   const pageChange = (page: number) => {
     pageSet(page);
-    statusSet(1);
+    statusSet(FetchStatus.ready);
   };
 
   const reFetch = () => {
     pageSet(pagePreset); // Reset to first page on filter/sort change
     listSet([]); // Reset list on filter/sort change
-    statusSet(1);
+    statusSet(FetchStatus.ready);
   }
 
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
@@ -39,7 +42,7 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
   useEffect(() => {
     if (urlParam) {
       if (status === 1) {
-        statusSet(2);
+        statusSet(FetchStatus.success);
         fetcher(urlParam, {},
           {
             page_index: page,
@@ -49,7 +52,7 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
           }
         ).then((res: any) => {
           if (debug) console.log(`🪲 useListContent success debug at: ${ debug }`, res);
-          statusSet(3);
+          statusSet(FetchStatus.error);
           if (res.results && res.pagination) {
             pageCountSet(res.pagination.total_page_count);
             listSet(res.results);
@@ -60,9 +63,11 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
   }, [ addQueries, debug, fetcher, filter, listSet, page, sort, status, urlParam ]);
 
   return {
+    fetchError,
     filter,
     filterSet,
     list,
+    isLoading,
     onChange,
     page,
     pageChange,

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
@@ -18,7 +18,6 @@ import { useListContent } from "hooks";
 
 export default function MediaTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
 
   const [list, listSet] = useState<MediaFile[]>([]);
@@ -27,7 +26,6 @@ export default function MediaTab({ username }: { username: string }) {
     fetcher: GetMediaByUser,
     list,
     listSet,
-    // pagePreset: 1,
     requestList: true,
     urlParam: username,
     addQueries: { per_page: 24 },
@@ -56,14 +54,6 @@ export default function MediaTab({ username }: { username: string }) {
     // Reset Masonry Grid
     resetMasonryGrid();
   };
-
-  useEffect(() => {
-    if (media.status === 1) {
-      setIsLoading(true);
-    } else if (media.status === 3) {
-      setIsLoading(false);
-    }
-  }, [media.status]);
 
   const filterOptions = [
     { value: "all", label: "All Media" },
@@ -104,7 +94,7 @@ export default function MediaTab({ username }: { username: string }) {
         <Pagination {...paginationProps} />
       </div>
       <AudioPlayerProvider>
-        {isLoading ? (
+        { media.isLoading ? (
           <div className="row gx-3 gy-3">
             {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />
