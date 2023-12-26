@@ -18,7 +18,6 @@ import { useLazyLists } from "hooks";
 
 export default function WeightsTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [isLoading] = useState(false);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
 
   const [list, listSet] = useState<Weight[]>([]);
@@ -121,99 +120,99 @@ export default function WeightsTab() {
         </div>
       </div>
       <AudioPlayerProvider>
-        {isLoading ? (
-          <div className="row gx-3 gy-3">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <SkeletonCard key={index} />
-            ))}
-          </div>
-        ) : (
-          <InfiniteScroll
-            dataLength={weights.list.length}
-            next={weights.getMore}
-            hasMore={!weights.list.length || !!weights.next}
-            loader={
-              <div className="mt-4 d-flex justify-content-center">
-                <div className="spinner-border text-light" role="status">
-                  <span className="visually-hidden">Loading...</span>
+        <InfiniteScroll
+          dataLength={weights.list.length}
+          next={weights.getMore}
+          hasMore={!weights.list.length || !!weights.next}
+          loader={
+            <div className="row gx-3 gy-3 mt-1">
+              {Array.from({ length: 12 }).map((_, index) => (
+                <SkeletonCard key={index} />
+              ))}
+            </div>
+          }
+          endMessage={
+            <p className="text-center mt-4 opacity-75">No more results.</p>
+          }
+          className="overflow-hidden"
+        >
+          {showMasonryGrid && (
+            <>
+              {weights.list.length === 0 && weights.status === 3 ? (
+                <div className="text-center mt-4 opacity-75">
+                  No weight created yet.
                 </div>
-              </div>
-            }
-            endMessage={
-              <p className="text-center mt-4 opacity-75">No more results.</p>
-            }
-            className="overflow-hidden"
-          >
-            {showMasonryGrid && (
-              <MasonryGrid
-                gridRef={gridContainerRef}
-                onLayoutComplete={() => console.log("Layout complete!")}
-              >
-                {weights.list.map((data: any, index: number) => {
-                  let card;
-                  switch (data.weights_category) {
-                    case WeightCategory.TTS:
-                      card = (
-                        <AudioCard
-                          key={index}
-                          data={data}
-                          type="weights"
-                          showCreator={true}
-                          showCover={true}
-                        />
-                      );
-                      break;
-                    case WeightCategory.VC:
-                      card = (
-                        <AudioCard
-                          key={index}
-                          data={data}
-                          type="weights"
-                          showCreator={true}
-                          showCover={true}
-                        />
-                      );
-                      break;
-                    case WeightCategory.ZS:
-                      card = (
-                        <AudioCard
-                          key={index}
-                          data={data}
-                          type="weights"
-                          showCreator={true}
-                          showCover={true}
-                        />
-                      );
-                      break;
-                    case WeightCategory.SD:
-                      card = (
-                        <ImageCard
-                          key={index}
-                          data={data}
-                          type="weights"
-                          showCreator={true}
-                        />
-                      );
-                      break;
-                    case WeightCategory.VOCODER:
-                      card = <></>;
-                      break;
-                    default:
-                      card = <div>Unsupported weight type</div>;
-                  }
-                  return (
-                    <div
-                      key={index}
-                      className="col-12 col-sm-6 col-xl-4 grid-item"
-                    >
-                      {card}
-                    </div>
-                  );
-                })}
-              </MasonryGrid>
-            )}
-          </InfiniteScroll>
-        )}
+              ) : (
+                <MasonryGrid
+                  gridRef={gridContainerRef}
+                  onLayoutComplete={() => console.log("Layout complete!")}
+                >
+                  {weights.list.map((data: any, index: number) => {
+                    let card;
+                    switch (data.weights_category) {
+                      case WeightCategory.TTS:
+                        card = (
+                          <AudioCard
+                            key={index}
+                            data={data}
+                            type="weights"
+                            showCreator={true}
+                            showCover={true}
+                          />
+                        );
+                        break;
+                      case WeightCategory.VC:
+                        card = (
+                          <AudioCard
+                            key={index}
+                            data={data}
+                            type="weights"
+                            showCreator={true}
+                            showCover={true}
+                          />
+                        );
+                        break;
+                      case WeightCategory.ZS:
+                        card = (
+                          <AudioCard
+                            key={index}
+                            data={data}
+                            type="weights"
+                            showCreator={true}
+                            showCover={true}
+                          />
+                        );
+                        break;
+                      case WeightCategory.SD:
+                        card = (
+                          <ImageCard
+                            key={index}
+                            data={data}
+                            type="weights"
+                            showCreator={true}
+                          />
+                        );
+                        break;
+                      case WeightCategory.VOCODER:
+                        card = <></>;
+                        break;
+                      default:
+                        card = <div>Unsupported weight type</div>;
+                    }
+                    return (
+                      <div
+                        key={index}
+                        className="col-12 col-sm-6 col-xl-4 grid-item"
+                      >
+                        {card}
+                      </div>
+                    );
+                  })}
+                </MasonryGrid>
+              )}
+            </>
+          )}
+        </InfiniteScroll>
       </AudioPlayerProvider>
     </>
   );

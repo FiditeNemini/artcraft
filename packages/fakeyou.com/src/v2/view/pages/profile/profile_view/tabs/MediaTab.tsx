@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
@@ -18,7 +18,7 @@ import { useListContent } from "hooks";
 
 export default function MediaTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
 
   const [list, listSet] = useState<MediaFile[]>([]);
@@ -30,7 +30,7 @@ export default function MediaTab({ username }: { username: string }) {
     // pagePreset: 1,
     requestList: true,
     urlParam: username,
-    addQueries: { per_page: 12 },
+    addQueries: { per_page: 24 },
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -56,6 +56,14 @@ export default function MediaTab({ username }: { username: string }) {
     // Reset Masonry Grid
     resetMasonryGrid();
   };
+
+  useEffect(() => {
+    if (media.status === 1) {
+      setIsLoading(true);
+    } else if (media.status === 3) {
+      setIsLoading(false);
+    }
+  }, [media.status]);
 
   const filterOptions = [
     { value: "all", label: "All Media" },
@@ -98,42 +106,50 @@ export default function MediaTab({ username }: { username: string }) {
       <AudioPlayerProvider>
         {isLoading ? (
           <div className="row gx-3 gy-3">
-            {Array.from({ length: 6 }).map((_, index) => (
+            {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />
             ))}
           </div>
         ) : (
           <>
             {showMasonryGrid && (
-              <MasonryGrid
-                gridRef={gridContainerRef}
-                onLayoutComplete={() => console.log("Layout complete!")}
-              >
-                {media.list.map((data: MediaFile, index: number) => {
-                  let card;
-                  switch (data.media_type) {
-                    case "audio":
-                      card = <AudioCard data={data} type="media" />;
-                      break;
-                    case "image":
-                      card = <ImageCard data={data} type="media" />;
-                      break;
-                    case "video":
-                      card = <VideoCard data={data} type="media" />;
-                      break;
-                    default:
-                      card = <div>Unsupported media type</div>;
-                  }
-                  return (
-                    <div
-                      key={index}
-                      className="col-12 col-sm-6 col-xl-4 grid-item"
-                    >
-                      {card}
-                    </div>
-                  );
-                })}
-              </MasonryGrid>
+              <>
+                {media.list.length === 0 && media.status === 3 ? (
+                  <div className="text-center mt-4 opacity-75">
+                    No media created yet.
+                  </div>
+                ) : (
+                  <MasonryGrid
+                    gridRef={gridContainerRef}
+                    onLayoutComplete={() => console.log("Layout complete!")}
+                  >
+                    {media.list.map((data: MediaFile, index: number) => {
+                      let card;
+                      switch (data.media_type) {
+                        case "audio":
+                          card = <AudioCard data={data} type="media" />;
+                          break;
+                        case "image":
+                          card = <ImageCard data={data} type="media" />;
+                          break;
+                        case "video":
+                          card = <VideoCard data={data} type="media" />;
+                          break;
+                        default:
+                          card = <div>Unsupported media type</div>;
+                      }
+                      return (
+                        <div
+                          key={index}
+                          className="col-12 col-sm-6 col-xl-4 grid-item"
+                        >
+                          {card}
+                        </div>
+                      );
+                    })}
+                  </MasonryGrid>
+                )}
+              </>
             )}
           </>
         )}

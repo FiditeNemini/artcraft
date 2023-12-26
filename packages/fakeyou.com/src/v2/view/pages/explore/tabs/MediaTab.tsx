@@ -17,7 +17,6 @@ import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function MediaTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [isLoading] = useState(false);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
 
   const [list, listSet] = useState<MediaFile[]>([]);
@@ -81,83 +80,83 @@ export default function MediaTab() {
         </div>
       </div>
       <AudioPlayerProvider>
-        {isLoading ? (
-          <div className="row gx-3 gy-3">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <SkeletonCard key={index} />
-            ))}
-          </div>
-        ) : (
-          <InfiniteScroll
-            dataLength={media.list.length}
-            next={media.getMore}
-            hasMore={!media.list.length || !!media.next}
-            loader={
-              <div className="mt-4 d-flex justify-content-center">
-                <div className="spinner-border text-light" role="status">
-                  <span className="visually-hidden">Loading...</span>
+        <InfiniteScroll
+          dataLength={media.list.length}
+          next={media.getMore}
+          hasMore={!media.list.length || !!media.next}
+          loader={
+            <div className="row gx-3 gy-3 mt-1">
+              {Array.from({ length: 12 }).map((_, index) => (
+                <SkeletonCard key={index} />
+              ))}
+            </div>
+          }
+          endMessage={
+            <p className="text-center mt-4 opacity-75">No more results.</p>
+          }
+          className="overflow-hidden"
+        >
+          {showMasonryGrid && (
+            <>
+              {media.list.length === 0 && media.status === 3 ? (
+                <div className="text-center mt-4 opacity-75">
+                  No media created yet.
                 </div>
-              </div>
-            }
-            endMessage={
-              <p className="text-center mt-4 opacity-75">No more results.</p>
-            }
-            className="overflow-hidden"
-          >
-            {showMasonryGrid && (
-              <MasonryGrid
-                gridRef={gridContainerRef}
-                onLayoutComplete={() => console.log("Layout complete!")}
-              >
-                {media.list.map((data: any, index: number) => {
-                  let card;
-                  switch (data.media_type) {
-                    case "audio":
-                      card = (
-                        <AudioCard
-                          key={index}
-                          data={data}
-                          type="media"
-                          showCreator={true}
-                        />
-                      );
-                      break;
-                    case "image":
-                      card = (
-                        <ImageCard
-                          key={index}
-                          data={data}
-                          type="media"
-                          showCreator={true}
-                        />
-                      );
-                      break;
-                    case "video":
-                      card = (
-                        <VideoCard
-                          key={index}
-                          data={data}
-                          type="media"
-                          showCreator={true}
-                        />
-                      );
-                      break;
-                    default:
-                      card = <div>Unsupported media type</div>;
-                  }
-                  return (
-                    <div
-                      key={index}
-                      className="col-12 col-sm-6 col-xl-4 grid-item"
-                    >
-                      {card}
-                    </div>
-                  );
-                })}
-              </MasonryGrid>
-            )}
-          </InfiniteScroll>
-        )}
+              ) : (
+                <MasonryGrid
+                  gridRef={gridContainerRef}
+                  onLayoutComplete={() => console.log("Layout complete!")}
+                >
+                  {media.list.map((data: any, index: number) => {
+                    let card;
+                    switch (data.media_type) {
+                      case "audio":
+                        card = (
+                          <AudioCard
+                            key={index}
+                            data={data}
+                            type="media"
+                            showCreator={true}
+                          />
+                        );
+                        break;
+                      case "image":
+                        card = (
+                          <ImageCard
+                            key={index}
+                            data={data}
+                            type="media"
+                            showCreator={true}
+                          />
+                        );
+                        break;
+                      case "video":
+                        card = (
+                          <VideoCard
+                            key={index}
+                            data={data}
+                            type="media"
+                            showCreator={true}
+                          />
+                        );
+                        break;
+                      default:
+                        card = <div>Unsupported media type</div>;
+                    }
+                    return (
+                      <div
+                        key={index}
+                        className="col-12 col-sm-6 col-xl-4 grid-item"
+                      >
+                        {card}
+                      </div>
+                    );
+                  })}
+                </MasonryGrid>
+              )}
+            </>
+          )}
+        </InfiniteScroll>
       </AudioPlayerProvider>
     </>
   );

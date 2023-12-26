@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
@@ -6,12 +6,12 @@ import {
   faArrowDownWideShort,
   faFilter,
 } from "@fortawesome/pro-solid-svg-icons";
-import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";
 import { useListContent } from "hooks";
 import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
 import { TempSelect } from "components/common";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
+import SkeletonCard from "components/common/Card/SkeletonCard";
 
 // interface IWeighttModelData {
 //   token: string;
@@ -24,7 +24,7 @@ import { WeightCategory } from "@storyteller/components/src/api/_common/enums/We
 
 export default function WeightsTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [sd, sdSet] = useState("all");
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
@@ -40,6 +40,7 @@ export default function WeightsTab({ username }: { username: string }) {
     listSet,
     requestList: true,
     urlParam: username,
+    addQueries: { per_page: 24 },
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -81,7 +82,7 @@ export default function WeightsTab({ username }: { username: string }) {
     onPageChange: handlePageClick,
     pageCount: weights.pageCount,
     currentPage: weights.page,
-    addQueries: { per_page: 12 },
+    addQueries: { per_page: 24 },
   };
 
   const resetMasonryGrid = () => {
@@ -97,6 +98,14 @@ export default function WeightsTab({ username }: { username: string }) {
     // Reset Masonry Grid
     resetMasonryGrid();
   };
+
+  useEffect(() => {
+    if (weights.status === 1) {
+      setIsLoading(true);
+    } else if (weights.status === 3) {
+      setIsLoading(false);
+    }
+  }, [weights.status]);
 
   return (
     <>
@@ -155,79 +164,87 @@ export default function WeightsTab({ username }: { username: string }) {
       </div>
       {isLoading ? (
         <div className="row gx-3 gy-3">
-          {Array.from({ length: 6 }).map((_, index) => (
+          {Array.from({ length: 12 }).map((_, index) => (
             <SkeletonCard key={index} />
           ))}
         </div>
       ) : (
         <>
           {showMasonryGrid && (
-            <MasonryGrid
-              gridRef={gridContainerRef}
-              onLayoutComplete={() => console.log("Layout complete!")}
-            >
-              {weights.list.map((data: any, index: number) => {
-                let card;
-                switch (data.weights_category) {
-                  case WeightCategory.TTS:
-                    card = (
-                      <AudioCard
+            <>
+              {weights.list.length === 0 && weights.status === 3 ? (
+                <div className="text-center mt-4 opacity-75">
+                  No weight created yet.
+                </div>
+              ) : (
+                <MasonryGrid
+                  gridRef={gridContainerRef}
+                  onLayoutComplete={() => console.log("Layout complete!")}
+                >
+                  {weights.list.map((data: any, index: number) => {
+                    let card;
+                    switch (data.weights_category) {
+                      case WeightCategory.TTS:
+                        card = (
+                          <AudioCard
+                            key={index}
+                            data={data}
+                            type="weights"
+                            showCreator={true}
+                            showCover={true}
+                          />
+                        );
+                        break;
+                      case WeightCategory.VC:
+                        card = (
+                          <AudioCard
+                            key={index}
+                            data={data}
+                            type="weights"
+                            showCreator={true}
+                            showCover={true}
+                          />
+                        );
+                        break;
+                      case WeightCategory.ZS:
+                        card = (
+                          <AudioCard
+                            key={index}
+                            data={data}
+                            type="weights"
+                            showCreator={true}
+                            showCover={true}
+                          />
+                        );
+                        break;
+                      case WeightCategory.SD:
+                        card = (
+                          <ImageCard
+                            key={index}
+                            data={data}
+                            type="weights"
+                            showCreator={true}
+                          />
+                        );
+                        break;
+                      case WeightCategory.VOCODER:
+                        card = <></>;
+                        break;
+                      default:
+                        card = <div>Unsupported weight type</div>;
+                    }
+                    return (
+                      <div
                         key={index}
-                        data={data}
-                        type="weights"
-                        showCreator={true}
-                        showCover={true}
-                      />
+                        className="col-12 col-sm-6 col-xl-4 grid-item"
+                      >
+                        {card}
+                      </div>
                     );
-                    break;
-                  case WeightCategory.VC:
-                    card = (
-                      <AudioCard
-                        key={index}
-                        data={data}
-                        type="weights"
-                        showCreator={true}
-                        showCover={true}
-                      />
-                    );
-                    break;
-                  case WeightCategory.ZS:
-                    card = (
-                      <AudioCard
-                        key={index}
-                        data={data}
-                        type="weights"
-                        showCreator={true}
-                        showCover={true}
-                      />
-                    );
-                    break;
-                  case WeightCategory.SD:
-                    card = (
-                      <ImageCard
-                        key={index}
-                        data={data}
-                        type="weights"
-                        showCreator={true}
-                      />
-                    );
-                    break;
-                  case WeightCategory.VOCODER:
-                    card = <></>;
-                    break;
-                  default:
-                    card = <div>Unsupported weight type</div>;
-                }
-                return (
-                  <div
-                    key={index}
-                    className="col-12 col-sm-6 col-xl-4 grid-item"
-                  >
-                    {card}
-                  </div>
-                );
-              })}
-            </MasonryGrid>
+                  })}
+                </MasonryGrid>
+              )}
+            </>
           )}
         </>
       )}

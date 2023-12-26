@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
@@ -16,7 +16,7 @@ import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/Ge
 
 export default function BookmarksTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("all");
   // const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<any[]>([]);
@@ -27,7 +27,7 @@ export default function BookmarksTab({ username }: { username: string }) {
     listSet,
     requestList: true,
     urlParam: username,
-    addQueries: { per_page: 12 },
+    addQueries: { per_page: 24 },
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -90,6 +90,14 @@ export default function BookmarksTab({ username }: { username: string }) {
     setSelectedFilter(selectedOption.value);
   };
 
+  useEffect(() => {
+    if (bookmarks.status === 1) {
+      setIsLoading(true);
+    } else if (bookmarks.status === 3) {
+      setIsLoading(false);
+    }
+  }, [bookmarks.status]);
+
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
@@ -135,38 +143,49 @@ export default function BookmarksTab({ username }: { username: string }) {
       </div>
       {isLoading ? (
         <div className="row gx-3 gy-3">
-          {Array.from({ length: 6 }).map((_, index) => (
+          {Array.from({ length: 12 }).map((_, index) => (
             <SkeletonCard key={index} />
           ))}
         </div>
       ) : (
-        <MasonryGrid
-          gridRef={gridContainerRef}
-          onLayoutComplete={() => console.log("Layout complete!")}
-        >
-          {bookmarks.list.map((data: any, index: number) => {
-            console.log("🧣", data);
-            let card;
-            switch (data.media_type) {
-              case "audio":
-                card = <AudioCard key={index} data={data} type="weights" />;
-                break;
-              case "image":
-                card = <ImageCard key={index} data={data} type="weights" />;
-                break;
-              case "video":
-                card = <VideoCard key={index} data={data} type="weights" />;
-                break;
-              default:
-                card = <div key={index}>Unsupported media type</div>;
-            }
-            return (
-              <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
-                {card}
-              </div>
-            );
-          })}
-        </MasonryGrid>
+        <>
+          {bookmarks.list.length === 0 && bookmarks.status === 3 ? (
+            <div className="text-center mt-4 opacity-75">
+              No bookmarked weights yet.
+            </div>
+          ) : (
+            <MasonryGrid
+              gridRef={gridContainerRef}
+              onLayoutComplete={() => console.log("Layout complete!")}
+            >
+              {bookmarks.list.map((data: any, index: number) => {
+                console.log("🧣", data);
+                let card;
+                switch (data.media_type) {
+                  case "audio":
+                    card = <AudioCard key={index} data={data} type="weights" />;
+                    break;
+                  case "image":
+                    card = <ImageCard key={index} data={data} type="weights" />;
+                    break;
+                  case "video":
+                    card = <VideoCard key={index} data={data} type="weights" />;
+                    break;
+                  default:
+                    card = <div key={index}>Unsupported media type</div>;
+                }
+                return (
+                  <div
+                    key={index}
+                    className="col-12 col-sm-6 col-xl-4 grid-item"
+                  >
+                    {card}
+                  </div>
+                );
+              })}
+            </MasonryGrid>
+          )}
+        </>
       )}
 
       <div className="d-flex justify-content-end mt-4">
