@@ -9,7 +9,7 @@ import {
   faFilter,
 } from "@fortawesome/pro-solid-svg-icons";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
-
+import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";
 
 import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
@@ -105,10 +105,10 @@ export default function MediaTab({ username }: { username: string }) {
       </div>
       <AudioPlayerProvider>
         {isLoading ? (
-          <div className="mt-4 d-flex justify-content-center">
-            <div className="spinner-border text-light" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
+          <div className="row gx-3 gy-3">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
           </div>
         ) : (
           <>

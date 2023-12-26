@@ -8,6 +8,7 @@ import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { useLazyLists } from "hooks";
 import { ListFeaturedMediaFiles } from "@storyteller/components/src/api/media_files/ListFeaturedMediaFiles";
+import SkeletonCard from "components/common/Card/SkeletonCard";
 
 export default function FeaturedTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -42,10 +43,10 @@ export default function FeaturedTab() {
         </div>
 
         {isLoading ? (
-          <div className="mt-4 d-flex justify-content-center">
-            <div className="spinner-border text-light" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </div>
+          <div className="row gx-3 gy-3">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
           </div>
         ) : (
           <>
