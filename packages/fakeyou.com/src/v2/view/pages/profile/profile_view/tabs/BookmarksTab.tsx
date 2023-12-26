@@ -17,10 +17,15 @@ import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/Ge
 export default function BookmarksTab({ username }: { username: string }) {
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
+  const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [sd, sdSet] = useState("all");
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
   const [list, listSet] = useState<any[]>([]);
+  const resetMasonryGrid = () => {
+    setShowMasonryGrid(false);
+    setTimeout(() => setShowMasonryGrid(true), 10);
+  };
   const { filter, isLoading, list: dataList, onChange, page, pageChange, pageCount, sort, status } = useListContent({
     addQueries: { per_page: 24 },
     addSetters: { sdSet, ttsSet, vcSet },
@@ -28,6 +33,7 @@ export default function BookmarksTab({ username }: { username: string }) {
     fetcher: GetBookmarksByUser,
     list,
     listSet,
+    onInputChange: () => resetMasonryGrid(),
     requestList: true,
     urlParam: username,
   });
@@ -143,7 +149,7 @@ export default function BookmarksTab({ username }: { username: string }) {
             <SkeletonCard key={index} />
           ))}
         </div>
-      ) : (
+      ) : ( showMasonryGrid &&
         <>
           { dataList.length === 0 && status === 3 ? (
             <div className="text-center mt-4 opacity-75">
