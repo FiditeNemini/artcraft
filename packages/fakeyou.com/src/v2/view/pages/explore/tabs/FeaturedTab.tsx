@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 
@@ -12,7 +12,6 @@ import SkeletonCard from "components/common/Card/SkeletonCard";
 
 export default function FeaturedTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [list, listSet] = useState<MediaFile[]>([]);
 
   const media = useLazyLists({
@@ -22,14 +21,6 @@ export default function FeaturedTab() {
     requestList: true,
     addQueries: { per_page: 12 },
   });
-
-  useEffect(() => {
-    if (media.status === 1) {
-      setIsLoading(true);
-    } else if (media.status === 3) {
-      setIsLoading(false);
-    }
-  }, [media.status]);
 
   return (
     <div className="d-flex flex-column gap-4">
@@ -42,7 +33,7 @@ export default function FeaturedTab() {
           </Link>
         </div>
 
-        {isLoading ? (
+        { media.isLoading ? (
           <div className="row gx-3 gy-3">
             {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />

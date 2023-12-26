@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
@@ -18,7 +18,6 @@ import InfiniteScroll from "react-infinite-scroll-component";
 export default function MediaTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
 
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useLazyLists({
@@ -56,12 +55,6 @@ export default function MediaTab() {
     // { value: "mostliked", label: "Most Liked" },
   ];
 
-  useEffect(() => {
-    if (media.status === 3) {
-      setIsLoading(false);
-    }
-  }, [media.status]);
-
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
@@ -87,7 +80,7 @@ export default function MediaTab() {
         </div>
       </div>
       <AudioPlayerProvider>
-        {isLoading ? (
+        { media.isLoading ? (
           <div className="row gx-3 gy-3">
             {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />

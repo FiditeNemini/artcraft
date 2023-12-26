@@ -41,7 +41,7 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
 
   useEffect(() => {
     if (urlParam) {
-      if (status === 1) {
+      if (status === FetchStatus.ready) {
         statusSet(FetchStatus.success);
         fetcher(urlParam, {},
           {

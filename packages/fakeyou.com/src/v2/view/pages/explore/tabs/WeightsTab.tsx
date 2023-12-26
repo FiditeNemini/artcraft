@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
@@ -19,8 +19,6 @@ import { useLazyLists } from "hooks";
 export default function WeightsTab() {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-
   const [list, listSet] = useState<Weight[]>([]);
   const weights = useLazyLists({
     fetcher: ListWeights,
@@ -75,12 +73,6 @@ export default function WeightsTab() {
   //   { value: "SDXL", label: "SD XL" },
   // ];
 
-  useEffect(() => {
-    if (weights.status === 3) {
-      setIsLoading(false);
-    }
-  }, [weights.status]);
-
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
@@ -127,7 +119,7 @@ export default function WeightsTab() {
         </div>
       </div>
       <AudioPlayerProvider>
-        {isLoading ? (
+        { weights.isLoading ? (
           <div className="row gx-3 gy-3">
             {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 
 interface Props {
   addQueries?: any;
@@ -19,9 +20,11 @@ export default function useLazyLists({
   const [next, nextSet] = useState("");
   const [previous, previousSet] = useState(""); // I am not used for anything yet :)
   const [sort, sortSet] = useState(false);
-  const [status, statusSet] = useState(requestList ? 1 : 0);
+  const [status, statusSet] = useState(requestList ? FetchStatus.ready : FetchStatus.paused);
   const listKeys = Object.keys(list);
   const totalKeys = listKeys.length;
+  const isLoading = status === FetchStatus.ready || status === FetchStatus.in_progress;
+  const fetchError = status === FetchStatus.error;
 
   const getMore = () => {
     if (next) statusSet(1);
@@ -33,12 +36,12 @@ export default function useLazyLists({
     listSet([]); // Reset list on filter/sort change
     nextSet("");
     previousSet("");
-    statusSet(1);
+    statusSet(FetchStatus.ready);
   };
 
   useEffect(() => {
-    if (status === 1) {
-      statusSet(2);
+    if (status === FetchStatus.ready) {
+      statusSet(FetchStatus.in_progress);
       fetcher(
         "",
         {},
@@ -49,7 +52,7 @@ export default function useLazyLists({
           ...(sort ? { sort_ascending: true } : {}),
         }
       ).then((res: any) => {
-        statusSet(3);
+        statusSet(FetchStatus.ready);
         console.log("🎆", res);
         if (res.results && res.pagination) {
           listSet((prevObj: any) => {
@@ -89,9 +92,11 @@ export default function useLazyLists({
   ]);
 
   return {
+    fetchError,
     filter,
     filterSet,
     getMore,
+    isLoading,
     list: Object.values(list).flat(), // format as an array, eventually the input list will live within this hook. Eventually
     listKeys,
     next,
