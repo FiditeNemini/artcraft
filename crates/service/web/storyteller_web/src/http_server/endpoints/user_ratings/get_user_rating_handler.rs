@@ -3,6 +3,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use actix_web::http::StatusCode;
 use log::{error, info};
+use utoipa::ToSchema;
 
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
@@ -19,7 +20,7 @@ use crate::server_state::ServerState;
 // =============== Request ===============
 
 /// For the URL PathInfo
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct GetUserRatingPath {
   /// The type of the entity being rated.
   pub entity_type: UserRatingEntityType,
@@ -30,7 +31,7 @@ pub struct GetUserRatingPath {
 
 // =============== Success Response ===============
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct GetUserRatingResponse {
   pub success: bool,
 
@@ -41,7 +42,7 @@ pub struct GetUserRatingResponse {
 
 // =============== Error Response ===============
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub enum GetUserRatingError {
   BadInput(String),
   NotAuthorized,
@@ -71,6 +72,21 @@ impl std::fmt::Display for GetUserRatingError {
 
 // =============== Handler ===============
 
+
+#[utoipa::path(
+get,
+path = "/v1/user_rating/view/{entity_type}/{entity_token}",
+params(
+("entity_type", description = "The type of the entity being rated."),
+("entity_token", description = "Entity token"),
+),
+responses(
+(status = 200, description = "List User Bookmarks", body = GetUserRatingResponse),
+(status = 400, description = "Bad input", body = GetUserRatingError),
+(status = 401, description = "Not authorized", body = GetUserRatingError),
+(status = 500, description = "Server error", body = GetUserRatingError),
+),
+)]
 pub async fn get_user_rating_handler(
   http_request: HttpRequest,
   path: web::Path<GetUserRatingPath>,
