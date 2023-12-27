@@ -4,7 +4,7 @@ import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetch
 interface Props {
   addQueries?: any;
   addSetters?: any;
-  debug?: string,
+  debug?: string;
   fetcher: any;
   list: any;
   listSet: any;
@@ -17,13 +17,28 @@ interface Props {
 
 const n = () => {};
 
-export default function useListContent({ addQueries, addSetters, debug = "", fetcher, list, listSet, onInputChange = n, onSuccess = n, pagePreset = 0, requestList = false, urlParam = "" }: Props) {
+export default function useListContent({
+  addQueries,
+  addSetters,
+  debug = "",
+  fetcher,
+  list,
+  listSet,
+  onInputChange = n,
+  onSuccess = n,
+  pagePreset = 0,
+  requestList = false,
+  urlParam = "",
+}: Props) {
   const [filter, filterSet] = useState("all");
   const [page, pageSet] = useState(pagePreset);
   const [pageCount, pageCountSet] = useState(0);
   const [sort, sortSet] = useState(false);
-  const [status, statusSet] = useState(requestList ? FetchStatus.ready : FetchStatus.paused);
-  const isLoading = status === FetchStatus.ready || status === FetchStatus.in_progress;
+  const [status, statusSet] = useState(
+    requestList ? FetchStatus.ready : FetchStatus.paused
+  );
+  const isLoading =
+    status === FetchStatus.ready || status === FetchStatus.in_progress;
   const fetchError = status === FetchStatus.error;
 
   const pageChange = (page: number) => {
@@ -35,10 +50,14 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
     pageSet(pagePreset); // Reset to first page on filter/sort change
     listSet([]); // Reset list on filter/sort change
     statusSet(FetchStatus.ready);
-  }
+  };
 
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
-    const todo: { [key: string]: (x: any) => void } = { ...addSetters, filterSet, sortSet };
+    const todo: { [key: string]: (x: any) => void } = {
+      ...addSetters,
+      filterSet,
+      sortSet,
+    };
     todo[target.name + "Set"](target.value);
     onInputChange({ target });
     reFetch();
@@ -47,8 +66,10 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
   useEffect(() => {
     if (urlParam) {
       if (status === FetchStatus.ready) {
-        statusSet(FetchStatus.success);
-        fetcher(urlParam, {},
+        statusSet(FetchStatus.in_progress);
+        fetcher(
+          urlParam,
+          {},
           {
             page_index: page,
             ...addQueries, // eventually we should provide a way to type this ... or not. It works
@@ -56,8 +77,9 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
             ...(sort ? { sort_ascending: true } : {}),
           }
         ).then((res: any) => {
-          if (debug) console.log(`🪲 useListContent success debug at: ${ debug }`, res);
-          statusSet(FetchStatus.error);
+          if (debug)
+            console.log(`🪲 useListContent success debug at: ${debug}`, res);
+          statusSet(FetchStatus.success);
           onSuccess(res);
           if (res.results && res.pagination) {
             pageCountSet(res.pagination.total_page_count);
@@ -66,7 +88,18 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
         });
       }
     }
-  }, [ addQueries, debug, fetcher, filter, listSet, onSuccess, page, sort, status, urlParam ]);
+  }, [
+    addQueries,
+    debug,
+    fetcher,
+    filter,
+    listSet,
+    onSuccess,
+    page,
+    sort,
+    status,
+    urlParam,
+  ]);
 
   return {
     fetchError,
