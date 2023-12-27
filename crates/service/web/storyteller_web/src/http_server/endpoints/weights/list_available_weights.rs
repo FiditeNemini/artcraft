@@ -29,7 +29,7 @@ use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 #[derive(Deserialize,ToSchema)]
 pub struct ListAvailableWeightsQuery {
     pub sort_ascending: Option<bool>,
-    pub per_page: Option<u16>,
+    pub page_size: Option<u16>,
     pub username: Option<String>,
     pub weights_type: Option<String>,
     pub weights_category: Option<String>,
@@ -143,7 +143,7 @@ pub async fn list_available_weights_handler(
         }
     };
 
-    let limit = query.per_page.unwrap_or(25);
+    let limit = query.page_size.unwrap_or(25);
 
     let sort_ascending = query.sort_ascending.unwrap_or(false);
     let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);
