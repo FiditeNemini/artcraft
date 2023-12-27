@@ -75,7 +75,7 @@ impl std::fmt::Display for SetUserRatingError {
 
 #[utoipa::path(
   post,
-  path = "/v1/user_ratings/rate",
+  path = "/v1/user_rating/rate",
   request_body = SetUserRatingRequest,
   responses(
       (status = 200, description = "Set user rating", body = SetUserRatingResponse),

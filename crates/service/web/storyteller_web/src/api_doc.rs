@@ -6,6 +6,8 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::{weights_category::WeightsCategory, weights_types::WeightsType};
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
+use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
+use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use enums::common::visibility::Visibility;
 use tokens::tokens::generic_inference_jobs::*;
 use tokens::tokens::media_files::*;
@@ -89,8 +91,8 @@ use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
     DeleteUserBookmarkPathInfo,DeleteUserBookmarkError,DeleteUserBookmarkRequest,
     ListUserBookmarksPathInfo,ListUserBookmarksForUserError,ListUserBookmarksForUserSuccessResponse,UserBookmarkListItem,
     ListUserBookmarksForEntityPathInfo,ListUserBookmarksForEntityError,ListUserBookmarksForEntitySuccessResponse,UserBookmarkForEntityListItem,
-    GetUserRatingPathInfo,GetUserRatingError,GetUserRatingSuccessResponse,UserRating,
-    SetUserRatingError,SetUserRatingRequest,SetUserRatingSuccessResponse,
+    GetUserRatingError,GetUserRatingResponse,UserRatingValue,UserRatingEntityType,
+    SetUserRatingError,SetUserRatingRequest,SetUserRatingResponse,
   ))
 )]
 pub struct ApiDoc;
