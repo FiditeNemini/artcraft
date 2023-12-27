@@ -26,7 +26,7 @@ use crate::server_state::ServerState;
 #[derive(Deserialize, ToSchema, IntoParams)]
 pub struct ListMediaFilesQueryParams {
   pub sort_ascending: Option<bool>,
-  pub per_page: Option<usize>,
+  pub page_size: Option<usize>,
   pub cursor: Option<String>,
   pub cursor_is_reversed: Option<bool>,
   pub filter_media_type: Option<MediaFileType>,
@@ -125,7 +125,7 @@ pub async fn list_media_files_handler(
   };
 
   // TODO(bt,2023-12-04): Enforce real maximums and defaults
-  let limit = query.per_page.unwrap_or(25);
+  let limit = query.page_size.unwrap_or(25);
 
   let sort_ascending = query.sort_ascending.unwrap_or(false);
   let cursor_is_reversed = query.cursor_is_reversed.unwrap_or(false);

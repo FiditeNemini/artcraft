@@ -162,12 +162,14 @@ impl ListWeightsQueryBuilder {
         mysql_pool: &MySqlPool
     ) -> AnyhowResult<Vec<RawWeightJoinUser>> {
         let query = self.build_query_string();
-        //println!("HERE! query: {}", query);
-        //panic!("query: {:?}", query);
 
         let mut query = sqlx::query_as::<_, RawWeightJoinUser>(&query);
 
         // NB: The following bindings must match the order of the query builder !!
+
+        if let Some(offset) = self.offset {
+            query = query.bind(offset);
+        }
 
         if let Some(username) = self.scope_creator_username.as_deref() {
             query = query.bind(username);
@@ -183,9 +185,6 @@ impl ListWeightsQueryBuilder {
 
         query = query.bind(self.limit);
 
-        if let Some(offset) = self.offset {
-            query = query.bind(offset);
-        }
 
         let mut results = query.fetch_all(mysql_pool).await?;
 
@@ -331,18 +330,18 @@ impl ListWeightsQueryBuilder {
             if sort_ascending {
                 if self.cursor_is_reversed {
                     // NB: We're searching backwards.
-                    query.push_str(" model_weights.id");
+                    query.push_str(" model_weights.id < ? ");
                     sort_ascending = !sort_ascending;
                 } else {
-                    query.push_str(" model_weights.id");
+                    query.push_str(" model_weights.id > ? ");
                 }
             } else {
                 if self.cursor_is_reversed {
                     // NB: We're searching backwards.
-                    query.push_str(" model_weights.id");
+                    query.push_str(" model_weights.id > ? ");
                     sort_ascending = !sort_ascending;
                 } else {
-                    query.push_str(" model_weights.id");
+                    query.push_str(" model_weights.id < ? ");
                 }
             }
         }
@@ -409,10 +408,6 @@ impl ListWeightsQueryBuilder {
 
         if self.limit > 0 {
             query.push_str(" LIMIT ?");
-        }
-
-        if let Some(_) = self.offset {
-            query.push_str(" OFFSET ?");
         }
 
         query

@@ -14,6 +14,8 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::model_weights::edit::update_weight::{update_weights, UpdateWeightArgs};
 use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
 use tokens::tokens::model_weights::ModelWeightToken;
+use user_input_common::check_for_slurs::contains_slurs;
+use user_input_common::markdown_to_html::markdown_to_html;
 
 use crate::server_state::ServerState;
 
@@ -22,6 +24,8 @@ use crate::server_state::ServerState;
 pub struct UpdateWeightRequest {
     pub title: Option<String>,
     pub description_markdown: Option<String>,
+    // KS: We should probably remove this
+    // Users have to update markdown, not html directly
     pub description_rendered_html: Option<String>,
     pub weight_type: Option<String>,
     pub weight_category: Option<String>,
@@ -139,12 +143,34 @@ pub async fn update_weight_handler(
         return Err(UpdateWeightError::NotAuthorized);
     }
 
+    let mut weight_title = None;
+    let mut description_markdown = None;
+    let mut description_rendered_html = None;
+
+
+    if let Some(title) = &request.title {
+        if (contains_slurs(title)) {
+            return Err(UpdateWeightError::BadInput("Title contains slurs".to_string()));
+        }
+        weight_title = Some(title.trim().to_string());
+    }
+
+    if let Some(markdown) = &request.description_markdown {
+        if (contains_slurs(markdown)) {
+            return Err(UpdateWeightError::BadInput("Description contains slurs".to_string()));
+        }
+        let markdown = markdown.trim().to_string();
+        let html = markdown_to_html(&markdown);
+        description_markdown = Some(markdown);
+        description_rendered_html = Some(html);
+    }
+
     let query_result = update_weights(UpdateWeightArgs {
         weight_token: &ModelWeightToken::new(path.weight_token.clone()),
         mysql_pool: &server_state.mysql_pool,
-        title: request.title.as_deref(),
-        maybe_description_markdown: request.description_markdown.as_deref(),
-        maybe_description_rendered_html: request.description_rendered_html.as_deref(),
+        title: weight_title.as_deref(),
+        maybe_description_markdown: description_markdown.as_deref(),
+        maybe_description_rendered_html: description_rendered_html.as_deref(),
         creator_set_visibility: request.visibility.as_ref(),
         weights_type: request.weight_type.as_deref().map(|s| s.to_string()),
         weights_category: request.weight_category.as_deref().map(|s| s.to_string()),
