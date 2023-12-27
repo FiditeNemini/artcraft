@@ -6,6 +6,7 @@ use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCat
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
@@ -39,12 +40,6 @@ pub struct MediaFileListItem {
   pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Clone, Copy)]
-pub enum ViewAs {
-  Author,
-  Moderator,
-  AnotherUser,
-}
 
 pub struct ListMediaFileForUserArgs<'a> {
   pub username: &'a str,
@@ -168,13 +163,10 @@ SELECT
 FROM media_files AS m
 LEFT OUTER JOIN users AS u
     ON m.maybe_creator_user_token = u.token
-
-WHERE m.user_deleted_at IS NULL
-  AND m.mod_deleted_at IS NULL
     "#
   ));
 
-  query_builder.push(" AND u.username = ");
+  query_builder.push(" WHERE u.username = ");
   query_builder.push_bind(username);
 
   if let Some(media_type) = maybe_filter_media_type {
@@ -186,9 +178,12 @@ WHERE m.user_deleted_at IS NULL
   }
 
   match view_as {
-    ViewAs::Author => {}
+    ViewAs::Author => {
+      query_builder.push(" AND m.user_deleted_at IS NULL AND m.mod_deleted_at IS NULL ");
+    }
     ViewAs::Moderator => {}
     ViewAs::AnotherUser => {
+      query_builder.push(" AND m.user_deleted_at IS NULL AND m.mod_deleted_at IS NULL ");
       // FIXME: Binding shouldn't require to_str().
       //  Otherwise, it's calling the Display trait on the raw type which is resulting in an
       //  incorrect binding and runtime error.

@@ -6,6 +6,7 @@ use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCat
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
@@ -49,12 +50,6 @@ pub struct MediaFileListItem {
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Clone, Copy)]
-pub enum ViewAs {
-  Moderator,
-  NonModerator,
 }
 
 pub struct ListMediaFilesArgs<'a> {
@@ -170,23 +165,35 @@ LEFT OUTER JOIN favorites as f
     ON f.entity_type = 'media_file' AND f.entity_token = m.token
 LEFT OUTER JOIN comments as c
     ON c.entity_type = 'media_file' AND c.entity_token  = c.token
-WHERE
-    m.user_deleted_at IS NULL
-    AND m.mod_deleted_at IS NULL
     "#
   );
 
+  let mut first_predicate_added = false;
+
   if let Some(media_type) = maybe_filter_media_type {
+    if !first_predicate_added {
+      query_builder.push(" WHERE ");
+      first_predicate_added = true;
+    } else {
+      query_builder.push(" AND ");
+    }
     // FIXME: Binding shouldn't require to_str().
     //  Otherwise, it's calling the Display trait on the raw type which is resulting in an
     //  incorrect binding and runtime error.
-    query_builder.push(" AND m.media_type = ");
+    query_builder.push(" m.media_type = ");
     query_builder.push_bind(media_type.to_str());
   }
 
   match view_as {
     ViewAs::Moderator => {}
-    ViewAs::NonModerator=> {
+    ViewAs::Author | ViewAs::AnotherUser => {
+      if !first_predicate_added {
+        query_builder.push(" WHERE ");
+        first_predicate_added = true;
+      } else {
+        query_builder.push(" AND ");
+      }
+      query_builder.push(" m.user_deleted_at IS NULL AND m.mod_deleted_at IS NULL ");
       // FIXME: Binding shouldn't require to_str().
       //  Otherwise, it's calling the Display trait on the raw type which is resulting in an
       //  incorrect binding and runtime error.
@@ -196,6 +203,13 @@ WHERE
   }
 
   if let Some(offset) = maybe_offset {
+    if !first_predicate_added {
+      query_builder.push(" WHERE ");
+      first_predicate_added = true;
+    } else {
+      query_builder.push(" AND ");
+    }
+
     if sort_ascending {
       if cursor_is_reversed {
         // NB: We're searching backwards.

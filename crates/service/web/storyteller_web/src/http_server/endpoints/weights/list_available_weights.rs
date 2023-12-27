@@ -132,14 +132,10 @@ pub async fn list_available_weights_handler(
         })?;
 
     let mut is_mod = false;
-    let user_session = match maybe_user_session {
+    match maybe_user_session {
+        None => {},
         Some(session) => {
             is_mod = session.can_ban_users;
-            session
-        }
-        None => {
-            info!("not logged in");
-            return Err(ListWeightError::NotAuthorized);
         }
     };
 

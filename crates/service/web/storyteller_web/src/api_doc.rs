@@ -6,6 +6,8 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::{weights_category::WeightsCategory, weights_types::WeightsType};
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
+use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
+use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use enums::common::visibility::Visibility;
 use tokens::tokens::generic_inference_jobs::*;
 use tokens::tokens::media_files::*;
@@ -34,6 +36,8 @@ use crate::http_server::endpoints::weights::list_weights_by_user::*;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::*;
 use crate::http_server::endpoints::weights::update_weight::*;
 use crate::http_server::web_utils::response_success_helpers::*;
+use crate::http_server::endpoints::user_ratings::get_user_rating_handler::*;
+use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
 
 #[derive(OpenApi)]
 #[openapi(
@@ -53,6 +57,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler,
     crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler,
     crate::http_server::endpoints::weights::update_weight::update_weight_handler,
+    crate::http_server::endpoints::user_ratings::get_user_rating_handler::get_user_rating_handler,
+    crate::http_server::endpoints::user_ratings::set_user_rating_handler::set_user_rating_handler,
   ),
   components(schemas(
     // Tokens
@@ -85,6 +91,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     DeleteUserBookmarkPathInfo,DeleteUserBookmarkError,DeleteUserBookmarkRequest,
     ListUserBookmarksPathInfo,ListUserBookmarksForUserError,ListUserBookmarksForUserSuccessResponse,UserBookmarkListItem,
     ListUserBookmarksForEntityPathInfo,ListUserBookmarksForEntityError,ListUserBookmarksForEntitySuccessResponse,UserBookmarkForEntityListItem,
+    GetUserRatingError,GetUserRatingResponse,UserRatingValue,UserRatingEntityType,
+    SetUserRatingError,SetUserRatingRequest,SetUserRatingResponse,
   ))
 )]
 pub struct ApiDoc;

@@ -3,6 +3,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use actix_web::http::StatusCode;
 use log::{error, info, warn};
+use utoipa::ToSchema;
 
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
@@ -22,7 +23,7 @@ use crate::server_state::ServerState;
 
 // =============== Request ===============
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct SetUserRatingRequest {
   /// The type of the entity being rated.
   pub entity_type: UserRatingEntityType,
@@ -35,14 +36,14 @@ pub struct SetUserRatingRequest {
 
 // =============== Success Response ===============
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct SetUserRatingResponse {
   pub success: bool,
 }
 
 // =============== Error Response ===============
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub enum SetUserRatingError {
   BadInput(String),
   NotAuthorized,
@@ -72,6 +73,17 @@ impl std::fmt::Display for SetUserRatingError {
 
 // =============== Handler ===============
 
+#[utoipa::path(
+  post,
+  path = "/v1/user_rating/rate",
+  request_body = SetUserRatingRequest,
+  responses(
+      (status = 200, description = "Set user rating", body = SetUserRatingResponse),
+      (status = 400, description = "Bad input", body = SetUserRatingError),
+      (status = 401, description = "Not authorized", body = SetUserRatingError),
+      (status = 500, description = "Server error", body = SetUserRatingError),
+  ),
+)]
 pub async fn set_user_rating_handler(
   http_request: HttpRequest,
   request: web::Json<SetUserRatingRequest>,

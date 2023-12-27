@@ -9,6 +9,7 @@ use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::common::view_as::ViewAs;
 
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::list::list_weights_by_user::{list_weights_by_creator_username, ListWeightsForUserArgs};
@@ -119,17 +120,27 @@ pub async fn list_weights_by_user_handler(
         ListWeightsByUserError::ServerError
       })?;
 
-  let user_session = match maybe_user_session {
-    Some(session) => session,
-    None => {
-      warn!("not logged in");
-      return Err(ListWeightsByUserError::NotAuthorized);
-    }
+  let mut is_author = false;
+  let mut is_mod = false;
+
+  match maybe_user_session {
+    None => {},
+    Some(session) => {
+      is_author = session.username == path.username;
+      is_mod = session.can_ban_users;
+
+    },
+  };
+
+  let view_as = if is_author {
+    ViewAs::Author
+  } else if is_mod {
+    ViewAs::Moderator
+  } else {
+    ViewAs::AnotherUser
   };
 
   let username = path.username.as_ref();
-  let creator_user_token = user_session.user_token.clone();
-  let is_mod = user_session.can_ban_users;
   let limit = query.page_size.unwrap_or(25);
   let sort_ascending = query.sort_ascending.unwrap_or(false);
   let page_size = query.page_size.unwrap_or_else(|| 25);
@@ -140,8 +151,8 @@ pub async fn list_weights_by_user_handler(
         creator_username: username,
         page_size,
         page_index,
-        can_see_deleted: is_mod,
         sort_ascending,
+        view_as,
         mysql_pool: &server_state.mysql_pool,
     }
   ).await.map_err(|e| {
@@ -197,23 +208,10 @@ pub async fn list_weights_by_user_handler(
     }
   }).collect();
 
-  let final_weights:Vec<Weight>;
-
-  // if it's not the user ... then only show public weights else show private and public
-  if creator_user_token != user_session.user_token {
-    final_weights = weights.into_iter().filter(|weight| {
-      weight.creator_set_visibility == Visibility::Public
-    }).collect();
- 
-  }  
-  else {
-    final_weights = weights;
-  }
-
 
   let response: ListWeightsByUserSuccessResponse = ListWeightsByUserSuccessResponse {
     success: true,
-    results: final_weights,
+    results: weights,
     pagination: PaginationPage {
       current: results_page.current_page,
       total_page_count: results_page.total_page_count,
