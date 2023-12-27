@@ -34,7 +34,7 @@ export default function MediaTab({ username }: { username: string }) {
     onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
     urlParam: username,
-    addQueries: { per_page: 24 },
+    addQueries: { page_size: 24 },
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -60,12 +60,16 @@ export default function MediaTab({ username }: { username: string }) {
     // { value: "mostliked", label: "Most Liked" },
   ];
 
-  const Card = ({ props, type }: { props: any, type: string }) => {
+  const Card = ({ props, type }: { props: any; type: string }) => {
     switch (type) {
-      case "audio": return <AudioCard { ...props } />;
-      case "image": return <ImageCard { ...props } />;
-      case "video": return <VideoCard { ...props } />;
-      default: return <div>Unsupported media type</div>;
+      case "audio":
+        return <AudioCard {...props} />;
+      case "image":
+        return <ImageCard {...props} />;
+      case "video":
+        return <VideoCard {...props} />;
+      default:
+        return <div>Unsupported media type</div>;
     }
   };
 
@@ -95,7 +99,7 @@ export default function MediaTab({ username }: { username: string }) {
         <Pagination {...paginationProps} />
       </div>
       <AudioPlayerProvider>
-        { media.isLoading ? (
+        {media.isLoading ? (
           <div className="row gx-3 gy-3">
             {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />
@@ -116,9 +120,16 @@ export default function MediaTab({ username }: { username: string }) {
                   >
                     {media.list.map((data: MediaFile, key: number) => {
                       let props = { bookmarks, data, type: "media" };
-                      return <div {...{ className: "col-12 col-sm-6 col-xl-4 grid-item", key }} >
-                        <Card {...{ type: data.media_type, props }}/>
-                      </div>;
+                      return (
+                        <div
+                          {...{
+                            className: "col-12 col-sm-6 col-xl-4 grid-item",
+                            key,
+                          }}
+                        >
+                          <Card {...{ type: data.media_type, props }} />
+                        </div>
+                      );
                     })}
                   </MasonryGrid>
                 )}

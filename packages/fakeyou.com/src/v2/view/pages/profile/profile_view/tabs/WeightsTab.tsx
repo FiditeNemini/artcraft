@@ -38,7 +38,7 @@ export default function WeightsTab({ username }: { username: string }) {
     onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
     urlParam: username,
-    addQueries: { per_page: 24 },
+    addQueries: { page_size: 24 },
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -80,7 +80,7 @@ export default function WeightsTab({ username }: { username: string }) {
     onPageChange: handlePageClick,
     pageCount: weights.pageCount,
     currentPage: weights.page,
-    addQueries: { per_page: 24 },
+    addQueries: { page_size: 24 },
   };
 
   return (
@@ -138,7 +138,7 @@ export default function WeightsTab({ username }: { username: string }) {
         </div>
         <Pagination {...paginationProps} />
       </div>
-      { weights.isLoading ? (
+      {weights.isLoading ? (
         <div className="row gx-3 gy-3">
           {Array.from({ length: 12 }).map((_, index) => (
             <SkeletonCard key={index} />
@@ -157,13 +157,27 @@ export default function WeightsTab({ username }: { username: string }) {
                   gridRef={gridContainerRef}
                   onLayoutComplete={() => console.log("Layout complete!")}
                 >
-                  { weights.list.map((data: any, key: number) => {
-                    let props = { bookmarks, data, showCreator: true, type: "weights" };
+                  {weights.list.map((data: any, key: number) => {
+                    let props = {
+                      bookmarks,
+                      data,
+                      showCreator: true,
+                      type: "weights",
+                    };
 
-                    return <div {...{ className: "col-12 col-sm-6 col-xl-4 grid-item", key }} >
-                      <WeightsCards {...{ type: data.weights_category, props }}/>
-                    </div>;
-                  }) }
+                    return (
+                      <div
+                        {...{
+                          className: "col-12 col-sm-6 col-xl-4 grid-item",
+                          key,
+                        }}
+                      >
+                        <WeightsCards
+                          {...{ type: data.weights_category, props }}
+                        />
+                      </div>
+                    );
+                  })}
                 </MasonryGrid>
               )}
             </>

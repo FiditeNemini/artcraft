@@ -23,7 +23,7 @@ export default function FeaturedTab() {
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
-    addQueries: { per_page: 12 },
+    addQueries: { page_size: 12 },
   });
 
   return (
@@ -37,45 +37,49 @@ export default function FeaturedTab() {
           </Link>
         </div>
 
-        { media.isLoading && !media.list.length ? (
+        {media.isLoading && !media.list.length ? (
           <div className="row gx-3 gy-3">
             {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />
             ))}
           </div>
         ) : (
-          showMasonryGrid && <>
-            {media.list.length === 0 && media.status === 3 ? (
-              <div className="text-center mt-4 opacity-75">
-                No featured media.
-              </div>
-            ) : (
-              <MasonryGrid
-                gridRef={gridContainerRef}
-                onLayoutComplete={() => console.log("Layout complete!")}
-              >
-                {media.list.map((data, index) => {
-                  let card = (
-                    <AudioCard {...{
-                      bookmarks,
-                      data,
-                      type: "media",
-                      showCreator: true,
-                      showCover: true
-                    }} />
-                  );
-                  return (
-                    <div
-                      key={index}
-                      className="col-12 col-lg-6 col-xxl-4 grid-item"
-                    >
-                      {card}
-                    </div>
-                  );
-                })}
-              </MasonryGrid>
-            )}
-          </>
+          showMasonryGrid && (
+            <>
+              {media.list.length === 0 && media.status === 3 ? (
+                <div className="text-center mt-4 opacity-75">
+                  No featured media.
+                </div>
+              ) : (
+                <MasonryGrid
+                  gridRef={gridContainerRef}
+                  onLayoutComplete={() => console.log("Layout complete!")}
+                >
+                  {media.list.map((data, index) => {
+                    let card = (
+                      <AudioCard
+                        {...{
+                          bookmarks,
+                          data,
+                          type: "media",
+                          showCreator: true,
+                          showCover: true,
+                        }}
+                      />
+                    );
+                    return (
+                      <div
+                        key={index}
+                        className="col-12 col-lg-6 col-xxl-4 grid-item"
+                      >
+                        {card}
+                      </div>
+                    );
+                  })}
+                </MasonryGrid>
+              )}
+            </>
+          )
         )}
       </div>
       {/* <div>

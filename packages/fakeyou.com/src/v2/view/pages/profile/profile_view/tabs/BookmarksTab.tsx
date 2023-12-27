@@ -26,8 +26,18 @@ export default function BookmarksTab({ username }: { username: string }) {
   //   setShowMasonryGrid(false);
   //   setTimeout(() => setShowMasonryGrid(true), 10);
   // };
-  const { filter, isLoading, list: dataList, onChange, page, pageChange, pageCount, sort, status } = useListContent({
-    addQueries: { per_page: 24 },
+  const {
+    filter,
+    isLoading,
+    list: dataList,
+    onChange,
+    page,
+    pageChange,
+    pageCount,
+    sort,
+    status,
+  } = useListContent({
+    addQueries: { page_size: 24 },
     addSetters: { sdSet, ttsSet, vcSet },
     debug: "bookmarks tab",
     fetcher: GetBookmarksByUser,
@@ -80,12 +90,16 @@ export default function BookmarksTab({ username }: { username: string }) {
     { value: "SDXL", label: "SD XL" },
   ];
 
-  const Card = ({ props, type }: { props: any, type: string }) => {
+  const Card = ({ props, type }: { props: any; type: string }) => {
     switch (type) {
-      case "audio": return <AudioCard { ...props } />;
-      case "image": return <ImageCard { ...props } />;
-      case "video": return <VideoCard { ...props } />;
-      default: return <div>Unsupported media type</div>;
+      case "audio":
+        return <AudioCard {...props} />;
+      case "image":
+        return <ImageCard {...props} />;
+      case "video":
+        return <VideoCard {...props} />;
+      default:
+        return <div>Unsupported media type</div>;
     }
   };
 
@@ -111,7 +125,7 @@ export default function BookmarksTab({ username }: { username: string }) {
               value: filter,
             }}
           />
-          { filter === "tts" && (
+          {filter === "tts" && (
             <TempSelect
               {...{
                 options: modelTtsOptions,
@@ -121,7 +135,7 @@ export default function BookmarksTab({ username }: { username: string }) {
               }}
             />
           )}
-          { filter === "sd" && (
+          {filter === "sd" && (
             <TempSelect
               {...{
                 options: modelSdOptions,
@@ -131,7 +145,7 @@ export default function BookmarksTab({ username }: { username: string }) {
               }}
             />
           )}
-          { filter === "vc" && (
+          {filter === "vc" && (
             <TempSelect
               {...{
                 options: modelVcOptions,
@@ -144,33 +158,42 @@ export default function BookmarksTab({ username }: { username: string }) {
         </div>
         <Pagination {...paginationProps} />
       </div>
-      { isLoading ? (
+      {isLoading ? (
         <div className="row gx-3 gy-3">
           {Array.from({ length: 12 }).map((_, index) => (
             <SkeletonCard key={index} />
           ))}
         </div>
-      ) : ( showMasonryGrid &&
-        <>
-          { dataList.length === 0 && status === 3 ? (
-            <div className="text-center mt-4 opacity-75">
-              No bookmarked weights yet.
-            </div>
-          ) : (
-            <MasonryGrid
-              gridRef={gridContainerRef}
-              onLayoutComplete={() => console.log("Layout complete!")}
-            >
-              { dataList.map((data: any, key: number) => {
-                let props = { bookmarks, data, type: "weights" };
+      ) : (
+        showMasonryGrid && (
+          <>
+            {dataList.length === 0 && status === 3 ? (
+              <div className="text-center mt-4 opacity-75">
+                No bookmarked weights yet.
+              </div>
+            ) : (
+              <MasonryGrid
+                gridRef={gridContainerRef}
+                onLayoutComplete={() => console.log("Layout complete!")}
+              >
+                {dataList.map((data: any, key: number) => {
+                  let props = { bookmarks, data, type: "weights" };
 
-                return <div {...{ className: "col-12 col-sm-6 col-xl-4 grid-item", key }} >
-                  <Card {...{ type: data.media_type, props }}/>
-                </div>;
-              })}
-            </MasonryGrid>
-          )}
-        </>
+                  return (
+                    <div
+                      {...{
+                        className: "col-12 col-sm-6 col-xl-4 grid-item",
+                        key,
+                      }}
+                    >
+                      <Card {...{ type: data.media_type, props }} />
+                    </div>
+                  );
+                })}
+              </MasonryGrid>
+            )}
+          </>
+        )
       )}
 
       <div className="d-flex justify-content-end mt-4">

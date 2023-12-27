@@ -28,7 +28,7 @@ export default function MediaTab() {
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
-    addQueries: { per_page: 12 },
+    addQueries: { page_size: 12 },
   });
 
   const filterOptions = [
@@ -69,7 +69,7 @@ export default function MediaTab() {
         </div>
       </div>
       <AudioPlayerProvider>
-        { media.isLoading && !media.list.length ? (
+        {media.isLoading && !media.list.length ? (
           <div className="row gx-3 gy-3">
             {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />
@@ -108,32 +108,38 @@ export default function MediaTab() {
                       switch (data.media_type) {
                         case "audio":
                           card = (
-                            <AudioCard {...{
-                              bookmarks,
-                              data,
-                              type: "media",
-                              showCreator: true
-                            }} />
+                            <AudioCard
+                              {...{
+                                bookmarks,
+                                data,
+                                type: "media",
+                                showCreator: true,
+                              }}
+                            />
                           );
                           break;
                         case "image":
                           card = (
-                            <ImageCard {...{
-                              bookmarks,
-                              data,
-                              type: "media",
-                              showCreator: true
-                            }} />
+                            <ImageCard
+                              {...{
+                                bookmarks,
+                                data,
+                                type: "media",
+                                showCreator: true,
+                              }}
+                            />
                           );
                           break;
                         case "video":
                           card = (
-                            <VideoCard {...{
-                              bookmarks,
-                              data,
-                              type: "media",
-                              showCreator: true
-                            }}/>
+                            <VideoCard
+                              {...{
+                                bookmarks,
+                                data,
+                                type: "media",
+                                showCreator: true,
+                              }}
+                            />
                           );
                           break;
                         default:
