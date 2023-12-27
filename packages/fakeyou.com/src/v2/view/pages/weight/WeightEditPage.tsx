@@ -102,7 +102,7 @@ export default function WeightEditPage({
       />
 
       <>
-        {!isLoading ? (
+        {isLoading ? (
           <Panel padding={true}>
             <div className="d-flex flex-column gap-3">
               <Skeleton type="short" />
