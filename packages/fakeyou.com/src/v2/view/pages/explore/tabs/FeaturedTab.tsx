@@ -37,7 +37,7 @@ export default function FeaturedTab() {
           </Link>
         </div>
 
-        { media.isLoading ? (
+        { media.isLoading && !media.list.length ? (
           <div className="row gx-3 gy-3">
             {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />

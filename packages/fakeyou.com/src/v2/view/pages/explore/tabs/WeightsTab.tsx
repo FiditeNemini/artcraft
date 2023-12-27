@@ -106,7 +106,7 @@ export default function WeightsTab() {
         </div>
       </div>
       <AudioPlayerProvider>
-        { weights.isLoading ? (
+        { weights.isLoading && !weights.list.length  ? (
           <div className="row gx-3 gy-3">
             {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />

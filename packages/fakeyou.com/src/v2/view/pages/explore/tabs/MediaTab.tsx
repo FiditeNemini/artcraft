@@ -21,7 +21,7 @@ export default function MediaTab() {
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useLazyLists({
-    debug: "aaaa",
+    debug: "explore media tab",
     fetcher: ListMediaFiles,
     list,
     listSet,
@@ -69,7 +69,7 @@ export default function MediaTab() {
         </div>
       </div>
       <AudioPlayerProvider>
-        { media.isLoading ? (
+        { media.isLoading && !media.list.length ? (
           <div className="row gx-3 gy-3">
             {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />
