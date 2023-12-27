@@ -17,6 +17,8 @@ import { Button, TempSelect } from "components/common";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import TextArea from "components/common/TextArea";
 import { useWeightFetch } from "hooks";
+import SplitPanel from "components/common/SplitPanel";
+import Skeleton from "components/common/Skeleton";
 
 interface WeightEditPageProps {
   sessionWrapper: SessionWrapper;
@@ -31,15 +33,15 @@ export default function WeightEditPage({
   const { weight_token } = useParams<{ weight_token: string }>();
   const [weightCreatorToken, setWeightCreatorToken] = useState("");
 
-  const { 
-    // data: weight, 
+  const {
+    // data: weight,
     descriptionMD,
     // fetchError,
-    // isLoading,
+    isLoading,
     onChange,
     title,
     update,
-    visibility
+    visibility,
   } = useWeightFetch({ token: weight_token });
 
   usePrefixedDocumentTitle("Edit Voice");
@@ -59,7 +61,7 @@ export default function WeightEditPage({
 
   const visibilityOptions = [
     { label: "Public", value: "public" },
-    { label: "Private", value: "private" }
+    { label: "Private", value: "private" },
   ];
 
   if (
@@ -99,87 +101,103 @@ export default function WeightEditPage({
         backbuttonTo={`/weight/${weight_token}`}
       />
 
-      <Panel className="mb-5">
-        <div className="d-flex flex-column gap-3 p-3 py-4 p-md-4">
-          <div className="d-flex flex-column flex-lg-row gap-4">
-            {/* Replace this with an image component component */}
-            <div className="bg-secondary rounded p-3">
-              cover image select component here
+      <>
+        {!isLoading ? (
+          <Panel padding={true}>
+            <div className="d-flex flex-column gap-3">
+              <Skeleton type="short" />
+              <Skeleton height="40px" />
+              <Skeleton type="short" />
+              <Skeleton height="40px" />
+              <div className="d-flex justify-content-end mt-3 gap-2">
+                <Skeleton height="40px" width="120px" />
+                <Skeleton height="40px" width="120px" />
+              </div>
             </div>
+          </Panel>
+        ) : (
+          <SplitPanel dividerFooter={true}>
+            <SplitPanel.Body padding={true}>
+              <div className="d-flex flex-column flex-lg-row gap-4">
+                {/* Replace this with an image component component */}
+                <div className="bg-secondary rounded p-3">
+                  cover image select component here
+                </div>
 
-            <div className="w-100 d-flex flex-column gap-3">
-              <div>
-                <TempInput
+                <div className="w-100 d-flex flex-column gap-3">
+                  <div>
+                    <TempInput
+                      {...{
+                        label: "Title",
+                        name: "title",
+                        onChange,
+                        placeholder: "Title",
+                        value: title,
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <TextArea
+                      {...{
+                        label: "Description",
+                        name: "descriptionMD",
+                        onChange,
+                        placeholder: "Description",
+                        value: descriptionMD,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+              {
+                // <div className="mt-lg-2">
+                //   <TempSelect
+                //     options={[]}
+                //     {...{
+                //       icon: faLanguage,
+                //       label: "Language",
+                //       // placeholder: "Voice name",
+                //       // onChange: inputCtrl(languageSet),
+                //       // options: languages,
+                //       value: language,
+                //     }}
+                //   />
+                // </div>
+              }
+              <div className="mt-3">
+                <TempSelect
                   {...{
-                    label: "Title",
-                    name: "title",
+                    icon: faEye,
+                    label: "Visibility",
+                    name: "visibility",
+                    options: visibilityOptions,
                     onChange,
-                    placeholder: "Title",
-                    value: title,
+                    placeholder: "Voice name",
+                    value: visibility,
                   }}
                 />
               </div>
-              <div>
-                <TextArea
+            </SplitPanel.Body>
+            <SplitPanel.Footer padding={true}>
+              <div className="d-flex gap-2 justify-content-end">
+                <Button
                   {...{
-                    label: "Description",
-                    name: "descriptionMD",
-                    onChange,
-                    placeholder: "Description",
-                    value: descriptionMD,
+                    label: "Cancel",
+                    to: `/weight/${weight_token}`,
+                    variant: "secondary",
+                  }}
+                />
+                <Button
+                  {...{
+                    label: "Save Changes",
+                    onClick: update,
                   }}
                 />
               </div>
-            </div>
-          </div>
-{
-          // <div className="mt-lg-2">
-          //   <TempSelect
-          //     options={[]}
-          //     {...{
-          //       icon: faLanguage,
-          //       label: "Language",
-          //       // placeholder: "Voice name",
-          //       // onChange: inputCtrl(languageSet),
-          //       // options: languages,
-          //       value: language,
-          //     }}
-          //   />
-          // </div>
-}
-          <div>
-            <TempSelect
-              {...{
-                icon: faEye,
-                label: "Visibility",
-                name: "visibility",
-                options: visibilityOptions,
-                onChange,
-                placeholder: "Voice name",
-                value: visibility,
-              }}
-            />
-          </div>
-        </div>
-        <hr className="mt-0 mb-4" />
-        <div className="p-3 pb-4 px-lg-4 pt-0">
-          <div className="d-flex gap-2 justify-content-end">
-            <Button
-              {...{
-                label: "Cancel",
-                to: `/weight/${weight_token}`,
-                variant: "secondary",
-              }}
-            />
-            <Button
-              {...{
-                label: "Save Changes",
-                onClick: update
-              }}
-            />
-          </div>
-        </div>
-      </Panel>
+            </SplitPanel.Footer>
+          </SplitPanel>
+        )}
+      </>
     </Container>
   );
 }
