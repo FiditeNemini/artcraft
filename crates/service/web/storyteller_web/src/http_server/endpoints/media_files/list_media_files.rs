@@ -13,8 +13,9 @@ use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCat
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
-use mysql_queries::queries::media_files::list::list_media_files::{list_media_files, ListMediaFilesArgs, ViewAs};
+use mysql_queries::queries::media_files::list::list_media_files::{list_media_files, ListMediaFilesArgs};
 use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
@@ -144,7 +145,7 @@ pub async fn list_media_files_handler(
   let view_as = if is_mod {
     ViewAs::Moderator
   } else {
-    ViewAs::NonModerator
+    ViewAs::AnotherUser
   };
 
   let query_results = list_media_files(ListMediaFilesArgs {

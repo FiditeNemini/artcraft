@@ -6,6 +6,7 @@ use enums::by_table::model_weights::{
   weights_category::WeightsCategory,
   weights_types::WeightsType,
 };
+use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
@@ -20,7 +21,6 @@ pub struct WeightsForUserListPage {
   pub current_page: usize,
   pub total_page_count: usize,
 }
-
 
 #[derive(Serialize)]
 pub struct WeightsJoinUserRecord {
@@ -80,7 +80,7 @@ pub struct ListWeightsForUserArgs<'a> {
   pub page_size: usize,
   pub page_index: usize,
   pub sort_ascending: bool,
-  pub can_see_deleted: bool,
+  pub view_as: ViewAs,
   pub mysql_pool: &'a MySqlPool,
 }
 
@@ -93,7 +93,7 @@ pub async fn list_weights_by_creator_username(args: ListWeightsForUserArgs<'_>) 
         0,
         args.sort_ascending,
         count_fields.as_str(),
-        args.can_see_deleted,
+        args.view_as,
     );
 
     let row_count_query = count_query_builder.build_query_scalar::<i64>();
@@ -108,7 +108,7 @@ pub async fn list_weights_by_creator_username(args: ListWeightsForUserArgs<'_>) 
         args.page_size,
         args.sort_ascending,
         result_fields.as_str(),
-        args.can_see_deleted,
+        args.view_as,
     );
 
     let query = query.build_query_as::<RawWeightJoinUser>();
@@ -116,10 +116,7 @@ pub async fn list_weights_by_creator_username(args: ListWeightsForUserArgs<'_>) 
 
     let number_of_pages = (row_count_result / args.page_size as i64) as usize;
 
-
-
     let weights_records: Vec<WeightsJoinUserRecord> = map_to_weights(results).await;
-
 
     Ok(WeightsForUserListPage {
         records: weights_records,
@@ -182,7 +179,7 @@ fn query_builder<'a>(
     page_size: usize,
     sort_ascending: bool,
     select_fields: &'a str,
-    can_see_deleted: bool,
+    view_as: ViewAs,
 ) -> QueryBuilder<'a, MySql> {
 
     // NB: Query cannot be statically checked by sqlx
@@ -198,13 +195,20 @@ LEFT OUTER JOIN media_files as cover_image
     "#
         ));
 
-    if !can_see_deleted {
-       query_builder.push(" WHERE mw.user_deleted_at IS NULL AND mw.mod_deleted_at IS NULL ");
-    }
-
-    query_builder.push(" AND u.username = ");
+    query_builder.push(" WHERE u.username = ");
     query_builder.push_bind(username);
 
+    match view_as {
+        ViewAs::Author => {
+            query_builder.push(" AND mw.user_deleted_at IS NULL AND mw.mod_deleted_at IS NULL ");
+        }
+        ViewAs::Moderator => {}
+        ViewAs::AnotherUser => {
+            query_builder.push(" AND mw.user_deleted_at IS NULL AND mw.mod_deleted_at IS NULL ");
+            query_builder.push(" AND mw.creator_set_visibility = ");
+            query_builder.push_bind(Visibility::Public.to_str());
+        }
+    }
 
     if sort_ascending {
         query_builder.push(" ORDER BY mw.created_at ASC ");

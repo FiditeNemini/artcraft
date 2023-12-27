@@ -6,6 +6,7 @@ use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCat
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
@@ -49,12 +50,6 @@ pub struct MediaFileListItem {
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Clone, Copy)]
-pub enum ViewAs {
-  Moderator,
-  NonModerator,
 }
 
 pub struct ListMediaFilesArgs<'a> {
@@ -171,8 +166,6 @@ LEFT OUTER JOIN favorites as f
 LEFT OUTER JOIN comments as c
     ON c.entity_type = 'media_file' AND c.entity_token  = c.token
 WHERE
-    m.user_deleted_at IS NULL
-    AND m.mod_deleted_at IS NULL
     "#
   );
 
@@ -186,7 +179,7 @@ WHERE
 
   match view_as {
     ViewAs::Moderator => {}
-    ViewAs::NonModerator=> {
+    ViewAs::Author | ViewAs::AnotherUser => {
       // FIXME: Binding shouldn't require to_str().
       //  Otherwise, it's calling the Display trait on the raw type which is resulting in an
       //  incorrect binding and runtime error.
