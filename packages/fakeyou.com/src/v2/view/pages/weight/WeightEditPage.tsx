@@ -31,7 +31,7 @@ export default function WeightEditPage({
   // const [fetched, fetchedSet] = useState(false);
   // const history = useHistory();
   const { weight_token } = useParams<{ weight_token: string }>();
-  const [weightCreatorToken, setWeightCreatorToken] = useState("");
+  const [weightCreatorToken] = useState("");
 
   const {
     // data: weight,
