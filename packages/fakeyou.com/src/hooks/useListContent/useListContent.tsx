@@ -9,12 +9,15 @@ interface Props {
   list: any;
   listSet: any;
   onInputChange?: (x?: any) => any;
+  onSuccess?: (x?: any) => any;
   pagePreset?: number;
   requestList?: boolean;
   urlParam: string;
 }
 
-export default function useListContent({ addQueries, addSetters, debug = "", fetcher, list, listSet, onInputChange = () => {}, pagePreset = 0, requestList = false, urlParam = "" }: Props) {
+const n = () => {};
+
+export default function useListContent({ addQueries, addSetters, debug = "", fetcher, list, listSet, onInputChange = n, onSuccess = n, pagePreset = 0, requestList = false, urlParam = "" }: Props) {
   const [filter, filterSet] = useState("all");
   const [page, pageSet] = useState(pagePreset);
   const [pageCount, pageCountSet] = useState(0);
@@ -55,6 +58,7 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
         ).then((res: any) => {
           if (debug) console.log(`🪲 useListContent success debug at: ${ debug }`, res);
           statusSet(FetchStatus.error);
+          onSuccess(res);
           if (res.results && res.pagination) {
             pageCountSet(res.pagination.total_page_count);
             listSet(res.results);
@@ -62,7 +66,7 @@ export default function useListContent({ addQueries, addSetters, debug = "", fet
         });
       }
     }
-  }, [ addQueries, debug, fetcher, filter, listSet, page, sort, status, urlParam ]);
+  }, [ addQueries, debug, fetcher, filter, listSet, onSuccess, page, sort, status, urlParam ]);
 
   return {
     fetchError,

@@ -21,16 +21,17 @@ export default function MediaTab({ username }: { username: string }) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<MediaFile[]>([]);
-  const resetMasonryGrid = () => {
-    setShowMasonryGrid(false);
-    setTimeout(() => setShowMasonryGrid(true), 10);
-  };
+  // const resetMasonryGrid = () => {
+  //   setShowMasonryGrid(false);
+  //   setTimeout(() => setShowMasonryGrid(true), 10);
+  // };
   const media = useListContent({
     // addQueries: { abc: "anything" }, an example
     fetcher: GetMediaByUser,
     list,
     listSet,
-    onInputChange: () => resetMasonryGrid(),
+    onInputChange: () => setShowMasonryGrid(false),
+    onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
     urlParam: username,
     addQueries: { per_page: 24 },

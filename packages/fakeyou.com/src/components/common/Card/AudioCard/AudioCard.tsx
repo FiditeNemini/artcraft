@@ -11,6 +11,7 @@ import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import Button from "components/common/Button";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
+
 interface AudioCardProps {
   bookmarks: any,
   data: any;

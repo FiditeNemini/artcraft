@@ -14,11 +14,14 @@ export default function FeaturedTab() {
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [list, listSet] = useState<MediaFile[]>([]);
+  const [showMasonryGrid, setShowMasonryGrid] = useState(true);
 
   const media = useLazyLists({
     fetcher: ListFeaturedMediaFiles,
     list,
     listSet,
+    onInputChange: () => setShowMasonryGrid(false),
+    onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
     addQueries: { per_page: 12 },
   });
@@ -41,7 +44,7 @@ export default function FeaturedTab() {
             ))}
           </div>
         ) : (
-          <>
+          showMasonryGrid && <>
             {media.list.length === 0 && media.status === 3 ? (
               <div className="text-center mt-4 opacity-75">
                 No featured media.

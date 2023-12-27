@@ -3,19 +3,18 @@ import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetch
 
 interface Props {
   addQueries?: any;
+  debug?: string,
   fetcher: any;
   list: any;
   listSet: any;
+  onInputChange?: (x?: any) => any;
+  onSuccess?: (x?: any) => any;
   requestList?: boolean;
 }
 
-export default function useLazyLists({
-  addQueries,
-  fetcher,
-  list = [],
-  listSet,
-  requestList = false,
-}: Props) {
+const n = () => {};
+
+export default function useLazyLists({ addQueries, debug = "", fetcher, list = [], listSet, onInputChange = n, onSuccess = n, requestList = false }: Props) {
   const [filter, filterSet] = useState("all");
   const [next, nextSet] = useState("");
   const [previous, previousSet] = useState(""); // I am not used for anything yet :)
@@ -33,6 +32,7 @@ export default function useLazyLists({
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
     const todo: { [key: string]: (x: any) => void } = { filterSet, sortSet };
     todo[target.name + "Set"](target.value);
+    onInputChange({ target });
     listSet([]); // Reset list on filter/sort change
     nextSet("");
     previousSet("");
@@ -52,13 +52,12 @@ export default function useLazyLists({
           ...(sort ? { sort_ascending: true } : {}),
         }
       ).then((res: any) => {
-        statusSet(FetchStatus.ready);
-        console.log("🎆", res);
+        if (debug) console.log(`🐞 useLazyLists success debug at: ${ debug }`, res);
+        statusSet(FetchStatus.success);
+        onSuccess(res);
         if (res.results && res.pagination) {
           listSet((prevObj: any) => {
-            let keyExists = listKeys.find(
-              key => key.split("#")[1] === res.pagination.maybe_next
-            );
+            let keyExists = listKeys.find(key => key.split("#")[1] === res.pagination.maybe_next);
             if (!next && !totalKeys) {
               return { [0 + "#initial"]: res.results }; // save as object so we can track what has been loaded
             } else if (!keyExists) {
@@ -78,18 +77,7 @@ export default function useLazyLists({
         }
       });
     }
-  }, [
-    addQueries,
-    fetcher,
-    filter,
-    list,
-    listKeys,
-    listSet,
-    next,
-    sort,
-    status,
-    totalKeys,
-  ]);
+  }, [ addQueries, debug, fetcher, filter, listKeys, listSet, next, onSuccess, sort, status, totalKeys ]);
 
   return {
     fetchError,

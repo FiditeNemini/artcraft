@@ -22,10 +22,10 @@ export default function BookmarksTab({ username }: { username: string }) {
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
   const [list, listSet] = useState<any[]>([]);
-  const resetMasonryGrid = () => {
-    setShowMasonryGrid(false);
-    setTimeout(() => setShowMasonryGrid(true), 10);
-  };
+  // const resetMasonryGrid = () => {
+  //   setShowMasonryGrid(false);
+  //   setTimeout(() => setShowMasonryGrid(true), 10);
+  // };
   const { filter, isLoading, list: dataList, onChange, page, pageChange, pageCount, sort, status } = useListContent({
     addQueries: { per_page: 24 },
     addSetters: { sdSet, ttsSet, vcSet },
@@ -33,7 +33,8 @@ export default function BookmarksTab({ username }: { username: string }) {
     fetcher: GetBookmarksByUser,
     list,
     listSet,
-    onInputChange: () => resetMasonryGrid(),
+    onInputChange: () => setShowMasonryGrid(false),
+    onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
     urlParam: username,
   });

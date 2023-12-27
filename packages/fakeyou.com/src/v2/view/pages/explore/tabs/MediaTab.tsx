@@ -19,29 +19,17 @@ export default function MediaTab() {
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
-
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useLazyLists({
+    debug: "aaaa",
     fetcher: ListMediaFiles,
     list,
     listSet,
+    onInputChange: () => setShowMasonryGrid(false),
+    onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
     addQueries: { per_page: 12 },
   });
-
-  const resetMasonryGrid = () => {
-    setShowMasonryGrid(false);
-    setTimeout(() => setShowMasonryGrid(true), 10);
-  };
-
-  const handleSortOrFilterChange = (event: any) => {
-    if (media.onChange) {
-      media.onChange(event);
-    }
-
-    // Reset Masonry Grid
-    resetMasonryGrid();
-  };
 
   const filterOptions = [
     { value: "all", label: "All Media" },
@@ -65,7 +53,7 @@ export default function MediaTab() {
               icon: faArrowDownWideShort,
               options: sortOptions,
               name: "sort",
-              onChange: handleSortOrFilterChange,
+              onChange: media.onChange,
               value: media.sort,
             }}
           />
@@ -74,7 +62,7 @@ export default function MediaTab() {
               icon: faFilter,
               options: filterOptions,
               name: "filter",
-              onChange: handleSortOrFilterChange,
+              onChange: media.onChange,
               value: media.filter,
             }}
           />

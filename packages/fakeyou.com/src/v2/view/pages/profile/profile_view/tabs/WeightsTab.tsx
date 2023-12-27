@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-import AudioCard from "components/common/Card/AudioCard";
-import ImageCard from "components/common/Card/ImageCard";
+import WeightsCards from "components/common/Card/WeightsCards";
 import {
   faArrowDownWideShort,
   faFilter,
@@ -10,7 +9,6 @@ import Pagination from "components/common/Pagination";
 import { useBookmarks, useListContent } from "hooks";
 import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
 import { TempSelect } from "components/common";
-import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 
 // interface IWeighttModelData {
@@ -30,17 +28,14 @@ export default function WeightsTab({ username }: { username: string }) {
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const bookmarks = useBookmarks();
   const [list, listSet] = useState<any[]>([]);
-  const resetMasonryGrid = () => {
-    setShowMasonryGrid(false);
-    setTimeout(() => setShowMasonryGrid(true), 10);
-  };
   const weights = useListContent({
     addSetters: { sdSet, ttsSet, vcSet },
     debug: "Weights tab",
     fetcher: GetWeightsByUser,
     list,
     listSet,
-    onInputChange: () => resetMasonryGrid(),
+    onInputChange: () => setShowMasonryGrid(false),
+    onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
     urlParam: username,
     addQueries: { per_page: 24 },
@@ -86,16 +81,6 @@ export default function WeightsTab({ username }: { username: string }) {
     pageCount: weights.pageCount,
     currentPage: weights.page,
     addQueries: { per_page: 24 },
-  };
-
-  const Card = ({ props, type }: { props: any, type: string }) => {
-    switch (type) {
-      case WeightCategory.TTS:
-      case WeightCategory.VC:
-      case WeightCategory.ZS: return <AudioCard { ...props } />;
-      case WeightCategory.SD: return <ImageCard { ...{ ...props, showCover: true }  } />;
-      default: return <div>Unsupported media type</div>;
-    }
   };
 
   return (
@@ -176,7 +161,7 @@ export default function WeightsTab({ username }: { username: string }) {
                     let props = { bookmarks, data, showCreator: true, type: "weights" };
 
                     return <div {...{ className: "col-12 col-sm-6 col-xl-4 grid-item", key }} >
-                      <Card {...{ type: data.weights_category, props }}/>
+                      <WeightsCards {...{ type: data.weights_category, props }}/>
                     </div>;
                   }) }
                 </MasonryGrid>

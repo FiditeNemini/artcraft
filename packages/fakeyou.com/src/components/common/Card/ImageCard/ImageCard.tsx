@@ -12,16 +12,15 @@ import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface ImageCardProps {
+  bookmarks: any,
   data: any;
   type: "media" | "weights";
   showCreator?: boolean;
 }
 
-export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
+export default function ImageCard({ bookmarks, data, type, showCreator }: ImageCardProps) {
   const linkUrl =
     type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}`;
-
-    console.log("🎲",data);
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
@@ -157,7 +156,11 @@ export default function ImageCard({ data, type, showCreator }: ImageCardProps) {
                   <div>
                     <LikeButton onToggle={handleLike} likeCount={data.likes} />
                   </div>
-                  <BookmarkButton onToggle={handleLike} />
+                  <BookmarkButton {...{
+                    entityToken: data.weight_token,
+                    entityType: "model_weight",
+                    onToggle: bookmarks.toggle,
+                  }}/>
                 </div>
               </div>
             </div>
