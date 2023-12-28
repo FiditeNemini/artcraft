@@ -1,5 +1,8 @@
 use sqlx::{MySql, MySqlPool, QueryBuilder};
 
+use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::by_table::model_weights::weights_category::WeightsCategory;
+use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use errors::AnyhowResult;
 
@@ -18,6 +21,9 @@ pub struct UserBookmarkListPage {
 pub struct ListUserBookmarksForUserArgs<'a> {
     pub username: &'a str,
     pub maybe_filter_entity_type: Option<UserBookmarkEntityType>,
+    pub maybe_filter_weight_type: Option<WeightsType>,
+    pub maybe_filter_weight_category: Option<WeightsCategory>,
+    pub maybe_filter_media_file_type: Option<MediaFileType>,
     pub page_size: usize,
     pub page_index: usize,
     pub sort_ascending: bool,
@@ -31,7 +37,7 @@ fn select_total_count_field() -> String {
         .to_string()
 }
 
-fn select_result_fields() -> String {
+fn select_result_fields() -> &'static str {
     r#"
     f.token,
     f.entity_type,
@@ -53,11 +59,14 @@ fn select_result_fields() -> String {
     users.display_name as maybe_descriptive_text_user_display_name,
     voice_conversion_models.title as maybe_descriptive_text_voice_conversion_model_title,
     zs_voices.title as maybe_descriptive_text_zs_voice_title
-    "#.to_string()
+    "#
 }
 
 fn query_builder<'a>(
     maybe_filter_entity_type: Option<UserBookmarkEntityType>,
+    maybe_filter_weight_type: Option<WeightsType>,
+    maybe_filter_weight_category: Option<WeightsCategory>,
+    maybe_filter_media_file_type: Option<MediaFileType>,
     maybe_username: Option<&'a str>,
     enforce_limits: bool,
     page_index: usize,
@@ -109,6 +118,39 @@ LEFT OUTER JOIN zs_voices ON zs_voices.token = f.entity_token
         query_builder.push_bind(entity_type.to_str());
     }
 
+    if let Some(weights_type) = maybe_filter_weight_type {
+        if !first_predicate_added {
+            query_builder.push(" WHERE ");
+            first_predicate_added = true;
+        } else {
+            query_builder.push(" AND ");
+        }
+        query_builder.push(" model_weights.weights_type = ");
+        query_builder.push_bind(weights_type.to_str());
+    }
+
+    if let Some(weights_category) = maybe_filter_weight_category {
+        if !first_predicate_added {
+            query_builder.push(" WHERE ");
+            first_predicate_added = true;
+        } else {
+            query_builder.push(" AND ");
+        }
+        query_builder.push(" model_weights.weights_category = ");
+        query_builder.push_bind(weights_category.to_str());
+    }
+
+    if let Some(media_file_type) = maybe_filter_media_file_type {
+        if !first_predicate_added {
+            query_builder.push(" WHERE ");
+            first_predicate_added = true;
+        } else {
+            query_builder.push(" AND ");
+        }
+        query_builder.push(" media_files.media_type = ");
+        query_builder.push_bind(media_file_type.to_str());
+    }
+
     query_builder.push(" AND f.deleted_at IS NULL ");
 
     if sort_ascending {
@@ -132,6 +174,9 @@ pub async fn list_user_bookmarks_by_maybe_entity_type(
     let count_fields = select_total_count_field();
     let mut count_query_builder = query_builder(
         args.maybe_filter_entity_type,
+        args.maybe_filter_weight_type,
+        args.maybe_filter_weight_category,
+        args.maybe_filter_media_file_type,
         Some(args.username),
         false,
         0,
@@ -147,12 +192,15 @@ pub async fn list_user_bookmarks_by_maybe_entity_type(
     let result_fields = select_result_fields();
     let mut query = query_builder(
         args.maybe_filter_entity_type,
+        args.maybe_filter_weight_type,
+        args.maybe_filter_weight_category,
+        args.maybe_filter_media_file_type,
         Some(args.username),
         true,
         args.page_index,
         args.page_size,
         args.sort_ascending,
-        result_fields.as_str(),
+        result_fields,
     );
 
     let query = query.build_query_as::<RawUserBookmarkRecord>();
