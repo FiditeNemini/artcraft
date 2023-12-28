@@ -23,6 +23,10 @@ pub enum Environment {
 pub enum Action {
   ReindexTts,
   SearchTts,
+  /// Reindex model_weights into ElasticSearch
+  ReindexModelWeights,
+  /// Search the model weights
+  SearchModelWeights,
 }
 
 #[derive(Parser, Debug)]
