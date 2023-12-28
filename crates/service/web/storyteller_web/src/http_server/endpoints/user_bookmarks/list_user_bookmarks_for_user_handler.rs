@@ -82,6 +82,16 @@ pub struct UserBookmarkDetailsForUserList {
 
   // TODO: Populate this for images, video, etc.
   pub maybe_thumbnail_url: Option<String>,
+
+  /// This is only populated if the item is a model weight.
+  pub maybe_weights_data: Option<WeightsData>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct WeightsData {
+  pub title: String,
+  pub weights_type: WeightsType,
+  pub weights_category: WeightsCategory,
 }
 
 #[derive(Debug, ToSchema)]
@@ -164,6 +174,15 @@ pub async fn list_user_bookmarks_for_user_handler(
           details: UserBookmarkDetailsForUserList {
             entity_type: user_bookmark.entity_type,
             entity_token: user_bookmark.entity_token,
+            maybe_weights_data: match user_bookmark.entity_type {
+              UserBookmarkEntityType::ModelWeight => Some(WeightsData {
+                // TODO(bt,2023-12-28): Proper default, optional, or "unknown" values would be better.
+                title: user_bookmark.maybe_entity_descriptive_text.clone().unwrap_or("weight".to_string()),
+                weights_type: user_bookmark.maybe_model_weight_type.unwrap_or(WeightsType::Tacotron2),
+                weights_category: user_bookmark.maybe_model_weight_category.unwrap_or(WeightsCategory::TextToSpeech),
+              }),
+              _ => None,
+            },
             maybe_summary_text: user_bookmark.maybe_entity_descriptive_text,
             // TODO(bt,2023-11-21): Thumbnails need proper support. We should build them as a
             //  first-class system before handling the backfill here.

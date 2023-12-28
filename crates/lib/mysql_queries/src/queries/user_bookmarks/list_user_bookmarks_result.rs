@@ -4,6 +4,8 @@ use sqlx::mysql::MySqlRow;
 
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::by_table::model_weights::weights_category::WeightsCategory;
+use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
@@ -18,6 +20,12 @@ pub struct UserBookmark {
   /// Something descriptive about the bookmarked entity.
   /// This might be TTS text, a username, etc. It depends on the entity type.
   pub maybe_entity_descriptive_text: Option<String>,
+
+  /// Only set if the bookmark is of a model_weights record.
+  pub maybe_model_weight_type: Option<WeightsType>,
+
+  /// Only set if the bookmark is of a model_weights record.
+  pub maybe_model_weight_category: Option<WeightsCategory>,
 
   pub user_token: UserToken,
   pub username: String,
@@ -46,6 +54,9 @@ pub struct RawUserBookmarkRecord {
 
   pub (crate) maybe_media_file_type: Option<MediaFileType>,
   pub (crate) maybe_media_file_origin_category: Option<MediaFileOriginCategory>,
+
+  pub (crate) maybe_model_weight_type: Option<WeightsType>,
+  pub (crate) maybe_model_weight_category: Option<WeightsCategory>,
 
   pub (crate) maybe_descriptive_text_model_weight_title: Option<String>,
   pub (crate) maybe_descriptive_text_tts_model_title: Option<String>,
@@ -78,6 +89,8 @@ impl RawUserBookmarkRecord {
         UserBookmarkEntityType::VoiceConversionModel => self.maybe_descriptive_text_voice_conversion_model_title,
         UserBookmarkEntityType::ZsVoice => self.maybe_descriptive_text_zs_voice_title,
       },
+      maybe_model_weight_type: self.maybe_model_weight_type,
+      maybe_model_weight_category: self.maybe_model_weight_category,
       user_token: self.user_token,
       username: self.username,
       user_display_name: self.user_display_name,
@@ -104,6 +117,8 @@ impl FromRow<'_, MySqlRow> for RawUserBookmarkRecord {
         deleted_at: row.try_get("deleted_at")?,
         maybe_media_file_type: MediaFileType::try_from_mysql_row_nullable(row,"maybe_media_file_type")?,
         maybe_media_file_origin_category: MediaFileOriginCategory::try_from_mysql_row_nullable(row,"maybe_media_file_origin_category")?,
+        maybe_model_weight_type: WeightsType::try_from_mysql_row_nullable(row, "maybe_model_weight_type")?,
+        maybe_model_weight_category: WeightsCategory::try_from_mysql_row_nullable(row, "maybe_model_weight_category")?,
         maybe_descriptive_text_model_weight_title: row.try_get("maybe_descriptive_text_model_weight_title")?,
         maybe_descriptive_text_tts_model_title: row.try_get("maybe_descriptive_text_tts_model_title")?,
         maybe_descriptive_text_tts_result_inference_text: row.try_get("maybe_descriptive_text_tts_result_inference_text")?,
