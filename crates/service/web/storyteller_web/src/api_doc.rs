@@ -28,6 +28,8 @@ use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler:
 use crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::*;
 use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_entity_handler::*;
 use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_handler::*;
+use crate::http_server::endpoints::user_ratings::get_user_rating_handler::*;
+use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
 use crate::http_server::endpoints::weights::delete_weight::*;
 use crate::http_server::endpoints::weights::get_weight::*;
@@ -36,8 +38,6 @@ use crate::http_server::endpoints::weights::list_weights_by_user::*;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::*;
 use crate::http_server::endpoints::weights::update_weight::*;
 use crate::http_server::web_utils::response_success_helpers::*;
-use crate::http_server::endpoints::user_ratings::get_user_rating_handler::*;
-use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
 
 #[derive(OpenApi)]
 #[openapi(
@@ -50,6 +50,8 @@ use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
     crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::delete_user_bookmark_handler,
     crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_entity_handler::list_user_bookmarks_for_entity_handler,
     crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_handler::list_user_bookmarks_for_user_handler,
+    crate::http_server::endpoints::user_ratings::get_user_rating_handler::get_user_rating_handler,
+    crate::http_server::endpoints::user_ratings::set_user_rating_handler::set_user_rating_handler,
     crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
     crate::http_server::endpoints::weights::delete_weight::delete_weight_handler,
     crate::http_server::endpoints::weights::get_weight::get_weight_handler,
@@ -57,17 +59,18 @@ use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
     crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler,
     crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler,
     crate::http_server::endpoints::weights::update_weight::update_weight_handler,
-    crate::http_server::endpoints::user_ratings::get_user_rating_handler::get_user_rating_handler,
-    crate::http_server::endpoints::user_ratings::set_user_rating_handler::set_user_rating_handler,
   ),
   components(schemas(
     // Tokens
-    UserToken,Visibility,
-    // 
-    SimpleGenericJsonSuccess,
+    UserToken,
+    // Common
+    SimpleGenericJsonSuccess,Visibility,
+    PaginationCursors,PaginationPage,
     // Inference
     EnqueueTTSRequest,EnqueueTTSRequestSuccessResponse,EnqueueTTSRequestError,InferenceJobToken,
-    //Model Weights                   
+    // Media Files
+    WeightsData,
+    // Model Weights
     ModelWeightToken,WeightsCategory,WeightsType,
     GetWeightPathInfo,GetWeightResponse,GetWeightError,
     UpdateWeightRequest,UpdateWeightRequest,UpdateWeightPathInfo,UpdateWeightRequest,UpdateWeightError,
@@ -78,8 +81,6 @@ use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
     ListAvailableWeightsQuery,ListAvailableWeightsSuccessResponse,ModelWeightForList,
     ListWeightsByUserError,ListWeightsByUserSuccessResponse,ListWeightsByUserPathInfo,Weight,
     UserDetailsLight,DefaultAvatarInfo,
-    PaginationCursors,
-    PaginationPage,
     MediaFileOriginModelType,MediaFileOriginProductCategory,MediaFileOriginCategory,
     ListFeaturedMediaFilesSuccessResponse,MediaFile,MediaFileToken,MediaFileType, ListFeaturedMediaFilesError,
     ListMediaFilesSuccessResponse, ListMediaFilesError, MediaFileListItem, ListMediaFilesQueryParams,
