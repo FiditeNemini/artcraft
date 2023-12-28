@@ -53,6 +53,9 @@ fn select_result_fields() -> &'static str {
     media_files.media_type as maybe_media_file_type,
     media_files.origin_product_category as maybe_media_file_origin_category,
 
+    model_weights.weights_type as maybe_model_weight_type,
+    model_weights.weights_category as maybe_model_weight_category,
+
     model_weights.title as maybe_descriptive_text_model_weight_title,
     tts_models.title as maybe_descriptive_text_tts_model_title,
     tts_results.raw_inference_text as maybe_descriptive_text_tts_result_inference_text,
