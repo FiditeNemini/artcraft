@@ -13,6 +13,9 @@ use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
+use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::by_table::model_weights::weights_category::WeightsCategory;
+use enums::by_table::model_weights::weights_types::WeightsType;
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use mysql_queries::queries::user_bookmarks::list_user_bookmarks::{list_user_bookmarks_by_maybe_entity_type, ListUserBookmarksForUserArgs};
@@ -31,7 +34,24 @@ pub struct ListUserBookmarksQueryData {
   sort_ascending: Option<bool>,
   page_size: Option<usize>,
   page_index: Option<usize>,
+
+  // TODO(bt,2023-12-28): Should these scope clauses be in an enum / one_of so that callers can only apply one type of
+  //  scope at a time? They're kind of meaningless when used in conjunction.
+
+  /// Scope to a particular type of entity (there are lots). Note that some types are deprecated
+  /// and will no longer be valid soon: TtsModel, TtsResult, W2lTemplate, W2lResult,
+  /// VoiceConversionModel. See `maybe_scoped_weight_type`, `maybe_scoped_weight_category`,
+  /// and `maybe_scoped_media_file_type` instead.
   maybe_scoped_entity_type: Option<UserBookmarkEntityType>,
+
+  /// If set, we implicitly scope bookmarks to model weights (UserBookmarkEntityType::ModelWeight)
+  maybe_scoped_weight_type: Option<WeightsType>,
+
+  /// If set, we implicitly scope bookmarks to model weights (UserBookmarkEntityType::ModelWeight)
+  maybe_scoped_weight_category: Option<WeightsCategory>,
+
+  /// If set, we implicitly scope bookmarks to media files (UserBookmarkEntityType::MediaFile)
+  maybe_scoped_media_file_type: Option<MediaFileType>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -105,22 +125,12 @@ responses(
 ),
 )]
 pub async fn list_user_bookmarks_for_user_handler(
-  http_request: HttpRequest,
+  _http_request: HttpRequest,
   path: Path<ListUserBookmarksPathInfo>,
   query: Query<ListUserBookmarksQueryData>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListUserBookmarksForUserError>
 {
-  let _maybe_user_session = server_state
-      .session_checker
-      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
-      .await
-      .map_err(|e| {
-        warn!("Session checker error: {:?}", e);
-        ListUserBookmarksForUserError::ServerError
-      })?;
-
-
   let sort_ascending = query.sort_ascending.unwrap_or(false);
   let page_size = query.page_size.unwrap_or_else(|| 25);
   let page_index = query.page_index.unwrap_or_else(|| 0);
@@ -128,7 +138,10 @@ pub async fn list_user_bookmarks_for_user_handler(
   let query_results =
       list_user_bookmarks_by_maybe_entity_type(ListUserBookmarksForUserArgs{
         username: path.username.as_ref(),
-        maybe_filter_entity_type: query.maybe_scoped_entity_type.clone(),
+        maybe_filter_entity_type: query.maybe_scoped_entity_type,
+        maybe_filter_weight_type: query.maybe_scoped_weight_type,
+        maybe_filter_weight_category: query.maybe_scoped_weight_category,
+        maybe_filter_media_file_type: query.maybe_scoped_media_file_type,
         sort_ascending,
         page_size,
         page_index,
