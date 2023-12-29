@@ -13,6 +13,7 @@ use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
@@ -92,6 +93,10 @@ pub struct WeightsData {
   pub title: String,
   pub weights_type: WeightsType,
   pub weights_category: WeightsCategory,
+
+  /// Cover images are small descriptive images that can be set for any model.
+  /// If a cover image is set, this is the path to the asset.
+  pub maybe_cover_image_public_bucket_path: Option<String>,
 }
 
 #[derive(Debug, ToSchema)]
@@ -169,27 +174,41 @@ pub async fn list_user_bookmarks_for_user_handler(
   let response = ListUserBookmarksForUserSuccessResponse {
     success: true,
     results: results_page.results.into_iter()
-        .map(|user_bookmark| UserBookmarkListItem {
-          token: user_bookmark.token,
-          details: UserBookmarkDetailsForUserList {
-            entity_type: user_bookmark.entity_type,
-            entity_token: user_bookmark.entity_token,
-            maybe_weights_data: match user_bookmark.entity_type {
-              UserBookmarkEntityType::ModelWeight => Some(WeightsData {
-                // TODO(bt,2023-12-28): Proper default, optional, or "unknown" values would be better.
-                title: user_bookmark.maybe_entity_descriptive_text.clone().unwrap_or_else(|| "weight".to_string()),
-                weights_type: user_bookmark.maybe_model_weight_type.unwrap_or(WeightsType::Tacotron2),
-                weights_category: user_bookmark.maybe_model_weight_category.unwrap_or(WeightsCategory::TextToSpeech),
-              }),
-              _ => None,
+        .map(|user_bookmark| {
+          let maybe_cover_image = user_bookmark.maybe_model_weight_cover_image_public_bucket_hash
+              .as_deref()
+              .map(|hash| {
+                MediaFileBucketPath::from_object_hash(
+                  hash,
+                  user_bookmark.maybe_model_weight_cover_image_public_bucket_prefix.as_deref(),
+                  user_bookmark.maybe_model_weight_cover_image_public_bucket_extension.as_deref())
+                    .get_full_object_path_str()
+                    .to_string()
+              });
+
+          UserBookmarkListItem {
+            token: user_bookmark.token,
+            details: UserBookmarkDetailsForUserList {
+              entity_type: user_bookmark.entity_type,
+              entity_token: user_bookmark.entity_token,
+              maybe_weights_data: match user_bookmark.entity_type {
+                UserBookmarkEntityType::ModelWeight => Some(WeightsData {
+                  // TODO(bt,2023-12-28): Proper default, optional, or "unknown" values would be better.
+                  title: user_bookmark.maybe_entity_descriptive_text.clone().unwrap_or_else(|| "weight".to_string()),
+                  weights_type: user_bookmark.maybe_model_weight_type.unwrap_or(WeightsType::Tacotron2),
+                  weights_category: user_bookmark.maybe_model_weight_category.unwrap_or(WeightsCategory::TextToSpeech),
+                  maybe_cover_image_public_bucket_path: maybe_cover_image,
+                }),
+                _ => None,
+              },
+              maybe_summary_text: user_bookmark.maybe_entity_descriptive_text,
+              // TODO(bt,2023-11-21): Thumbnails need proper support. We should build them as a
+              //  first-class system before handling the backfill here.
+              maybe_thumbnail_url: None,
             },
-            maybe_summary_text: user_bookmark.maybe_entity_descriptive_text,
-            // TODO(bt,2023-11-21): Thumbnails need proper support. We should build them as a
-            //  first-class system before handling the backfill here.
-            maybe_thumbnail_url: None,
-          },
-          created_at: user_bookmark.created_at,
-          updated_at: user_bookmark.updated_at,
+            created_at: user_bookmark.created_at,
+            updated_at: user_bookmark.updated_at,
+          }
         })
         .collect(),
     pagination: PaginationPage{

@@ -55,6 +55,9 @@ fn select_result_fields() -> &'static str {
 
     model_weights.weights_type as maybe_model_weight_type,
     model_weights.weights_category as maybe_model_weight_category,
+    media_file_cover_images.public_bucket_directory_hash as maybe_model_weight_cover_image_public_bucket_hash,
+    media_file_cover_images.maybe_public_bucket_prefix as maybe_model_weight_cover_image_public_bucket_prefix,
+    media_file_cover_images.maybe_public_bucket_extension as maybe_model_weight_cover_image_public_bucket_extension,
 
     model_weights.title as maybe_descriptive_text_model_weight_title,
     tts_models.title as maybe_descriptive_text_tts_model_title,
@@ -90,12 +93,16 @@ JOIN users AS u
     ON f.user_token = u.token
 
 LEFT OUTER JOIN model_weights ON model_weights.token = f.entity_token
+LEFT OUTER JOIN media_files AS media_file_cover_images
+    ON model_weights.maybe_cover_image_media_file_token = media_file_cover_images.token
+
 LEFT OUTER JOIN media_files ON media_files.token = f.entity_token
 LEFT OUTER JOIN tts_models ON tts_models.token = f.entity_token
 LEFT OUTER JOIN tts_results ON tts_results.token = f.entity_token
 LEFT OUTER JOIN users ON users.token = f.entity_token
 LEFT OUTER JOIN voice_conversion_models ON voice_conversion_models.token = f.entity_token
 LEFT OUTER JOIN zs_voices ON zs_voices.token = f.entity_token
+
     "#
         ));
 
