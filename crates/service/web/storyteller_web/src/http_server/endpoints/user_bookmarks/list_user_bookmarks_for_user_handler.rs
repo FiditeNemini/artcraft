@@ -89,7 +89,7 @@ pub struct UserBookmarkDetailsForUserList {
   pub maybe_media_file_data: Option<MediaFileData>,
 
   /// This is only populated if the item is a model weight.
-  pub maybe_weights_data: Option<WeightsData>,
+  pub maybe_weight_data: Option<WeightsData>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -103,8 +103,8 @@ pub struct MediaFileData {
 #[derive(Serialize, ToSchema)]
 pub struct WeightsData {
   pub title: String,
-  pub weights_type: WeightsType,
-  pub weights_category: WeightsCategory,
+  pub weight_type: WeightsType,
+  pub weight_category: WeightsCategory,
 
   /// Cover images are small descriptive images that can be set for any model.
   /// If a cover image is set, this is the path to the asset.
@@ -221,12 +221,12 @@ pub async fn list_user_bookmarks_for_user_handler(
                   public_bucket_path: path,
                 }),
               },
-              maybe_weights_data: match user_bookmark.entity_type {
+              maybe_weight_data: match user_bookmark.entity_type {
                 UserBookmarkEntityType::ModelWeight => Some(WeightsData {
                   // TODO(bt,2023-12-28): Proper default, optional, or "unknown" values would be better.
                   title: user_bookmark.maybe_entity_descriptive_text.clone().unwrap_or_else(|| "weight".to_string()),
-                  weights_type: user_bookmark.maybe_model_weight_type.unwrap_or(WeightsType::Tacotron2),
-                  weights_category: user_bookmark.maybe_model_weight_category.unwrap_or(WeightsCategory::TextToSpeech),
+                  weight_type: user_bookmark.maybe_model_weight_type.unwrap_or(WeightsType::Tacotron2),
+                  weight_category: user_bookmark.maybe_model_weight_category.unwrap_or(WeightsCategory::TextToSpeech),
                   maybe_cover_image_public_bucket_path: maybe_model_weight_cover_image,
                 }),
                 _ => None,

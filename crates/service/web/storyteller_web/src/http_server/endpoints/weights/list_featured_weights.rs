@@ -29,8 +29,8 @@ pub struct ListFeaturedWeightsSuccessResponse {
 pub struct ModelWeightForList {
   pub weight_token: ModelWeightToken,
 
-  pub weights_type: WeightsType,
-  pub weights_category: WeightsCategory,
+  pub weight_type: WeightsType,
+  pub weight_category: WeightsCategory,
 
   pub title: String,
 
@@ -144,8 +144,8 @@ pub async fn list_featured_weights_handler(
           ModelWeightForList {
             weight_token: w.token,
             title: w.title,
-            weights_type: w.weights_type,
-            weights_category: w.weights_category,
+            weight_type: w.weights_type,
+            weight_category: w.weights_category,
             maybe_cover_image_public_bucket_path: maybe_cover_image,
             creator: UserDetailsLight::from_db_fields(
               &w.creator_user_token,
