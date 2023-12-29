@@ -27,6 +27,16 @@ pub struct UserBookmark {
   /// Only set if the bookmark is of a model_weights record.
   pub maybe_model_weight_category: Option<WeightsCategory>,
 
+  /// Only set if the bookmark is of a media_files record *AND* the model has a cover image.
+  pub maybe_model_weight_cover_image_public_bucket_hash: Option<String>,
+
+  /// Only set if the bookmark is of a media_files record *AND* the model has a cover image.
+
+  pub maybe_model_weight_cover_image_public_bucket_prefix: Option<String>,
+
+  /// Only set if the bookmark is of a media_files record *AND* the model has a cover image.
+  pub maybe_model_weight_cover_image_public_bucket_extension: Option<String>,
+
   pub user_token: UserToken,
   pub username: String,
   pub user_display_name: String,
@@ -57,6 +67,10 @@ pub struct RawUserBookmarkRecord {
 
   pub (crate) maybe_model_weight_type: Option<WeightsType>,
   pub (crate) maybe_model_weight_category: Option<WeightsCategory>,
+
+  pub (crate) maybe_model_weight_cover_image_public_bucket_hash: Option<String>,
+  pub (crate) maybe_model_weight_cover_image_public_bucket_prefix: Option<String>,
+  pub (crate) maybe_model_weight_cover_image_public_bucket_extension: Option<String>,
 
   pub (crate) maybe_descriptive_text_model_weight_title: Option<String>,
   pub (crate) maybe_descriptive_text_tts_model_title: Option<String>,
@@ -91,6 +105,9 @@ impl RawUserBookmarkRecord {
       },
       maybe_model_weight_type: self.maybe_model_weight_type,
       maybe_model_weight_category: self.maybe_model_weight_category,
+      maybe_model_weight_cover_image_public_bucket_hash: self.maybe_model_weight_cover_image_public_bucket_hash,
+      maybe_model_weight_cover_image_public_bucket_prefix: self.maybe_model_weight_cover_image_public_bucket_prefix,
+      maybe_model_weight_cover_image_public_bucket_extension: self.maybe_model_weight_cover_image_public_bucket_extension,
       user_token: self.user_token,
       username: self.username,
       user_display_name: self.user_display_name,
@@ -119,6 +136,9 @@ impl FromRow<'_, MySqlRow> for RawUserBookmarkRecord {
         maybe_media_file_origin_category: MediaFileOriginCategory::try_from_mysql_row_nullable(row,"maybe_media_file_origin_category")?,
         maybe_model_weight_type: WeightsType::try_from_mysql_row_nullable(row, "maybe_model_weight_type")?,
         maybe_model_weight_category: WeightsCategory::try_from_mysql_row_nullable(row, "maybe_model_weight_category")?,
+        maybe_model_weight_cover_image_public_bucket_hash: row.try_get("maybe_model_weight_cover_image_public_bucket_hash")?,
+        maybe_model_weight_cover_image_public_bucket_prefix: row.try_get("maybe_model_weight_cover_image_public_bucket_prefix")?,
+        maybe_model_weight_cover_image_public_bucket_extension: row.try_get("maybe_model_weight_cover_image_public_bucket_extension")?,
         maybe_descriptive_text_model_weight_title: row.try_get("maybe_descriptive_text_model_weight_title")?,
         maybe_descriptive_text_tts_model_title: row.try_get("maybe_descriptive_text_tts_model_title")?,
         maybe_descriptive_text_tts_result_inference_text: row.try_get("maybe_descriptive_text_tts_result_inference_text")?,
