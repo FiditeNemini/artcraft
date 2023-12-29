@@ -13,14 +13,15 @@ use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
+
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
-
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use mysql_queries::queries::user_bookmarks::list_user_bookmarks::{list_user_bookmarks_by_maybe_entity_type, ListUserBookmarksForUserArgs};
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
+
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -84,8 +85,19 @@ pub struct UserBookmarkDetailsForUserList {
   // TODO: Populate this for images, video, etc.
   pub maybe_thumbnail_url: Option<String>,
 
+  /// This is only populated if the item is a media file.
+  pub maybe_media_file_data: Option<MediaFileData>,
+
   /// This is only populated if the item is a model weight.
   pub maybe_weights_data: Option<WeightsData>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct MediaFileData {
+  pub media_type: MediaFileType,
+
+  /// URL to the media file.
+  pub public_bucket_path: String,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -134,10 +146,10 @@ impl fmt::Display for ListUserBookmarksForUserError {
   ("username", description = "The username of the user whose bookmarks to list."),
     ListUserBookmarksQueryData
   ),
-responses(
-  (status = 200, description = "List User Bookmarks", body = ListUserBookmarksForUserSuccessResponse),
-  (status = 500, description = "Server error", body = ListUserBookmarksForUserError),
-),
+  responses(
+    (status = 200, description = "List User Bookmarks", body = ListUserBookmarksForUserSuccessResponse),
+    (status = 500, description = "Server error", body = ListUserBookmarksForUserError),
+  ),
 )]
 pub async fn list_user_bookmarks_for_user_handler(
   _http_request: HttpRequest,
@@ -175,7 +187,17 @@ pub async fn list_user_bookmarks_for_user_handler(
     success: true,
     results: results_page.results.into_iter()
         .map(|user_bookmark| {
-          let maybe_cover_image = user_bookmark.maybe_model_weight_cover_image_public_bucket_hash
+          let maybe_media_file_path = user_bookmark.maybe_media_file_public_bucket_hash
+              .as_deref()
+              .map(|hash| {
+                MediaFileBucketPath::from_object_hash(
+                  hash,
+                  user_bookmark.maybe_media_file_public_bucket_prefix.as_deref(),
+                  user_bookmark.maybe_media_file_public_bucket_extension.as_deref())
+                    .get_full_object_path_str()
+                    .to_string()
+              });
+          let maybe_model_weight_cover_image = user_bookmark.maybe_model_weight_cover_image_public_bucket_hash
               .as_deref()
               .map(|hash| {
                 MediaFileBucketPath::from_object_hash(
@@ -191,13 +213,21 @@ pub async fn list_user_bookmarks_for_user_handler(
             details: UserBookmarkDetailsForUserList {
               entity_type: user_bookmark.entity_type,
               entity_token: user_bookmark.entity_token,
+              maybe_media_file_data: match maybe_media_file_path {
+                None => None,
+                Some(path) => Some(MediaFileData {
+                  // TODO(bt,2023-12-28): Proper default, optional, or "unknown" values would be better.
+                  media_type: user_bookmark.maybe_media_file_type.unwrap_or(MediaFileType::Image),
+                  public_bucket_path: path,
+                }),
+              },
               maybe_weights_data: match user_bookmark.entity_type {
                 UserBookmarkEntityType::ModelWeight => Some(WeightsData {
                   // TODO(bt,2023-12-28): Proper default, optional, or "unknown" values would be better.
                   title: user_bookmark.maybe_entity_descriptive_text.clone().unwrap_or_else(|| "weight".to_string()),
                   weights_type: user_bookmark.maybe_model_weight_type.unwrap_or(WeightsType::Tacotron2),
                   weights_category: user_bookmark.maybe_model_weight_category.unwrap_or(WeightsCategory::TextToSpeech),
-                  maybe_cover_image_public_bucket_path: maybe_cover_image,
+                  maybe_cover_image_public_bucket_path: maybe_model_weight_cover_image,
                 }),
                 _ => None,
               },

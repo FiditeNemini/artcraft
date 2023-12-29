@@ -17,6 +17,11 @@ pub struct UserBookmark {
   pub entity_type: UserBookmarkEntityType,
   pub entity_token: String,
 
+  pub maybe_media_file_type: Option<MediaFileType>,
+  pub maybe_media_file_public_bucket_hash: Option<String>,
+  pub maybe_media_file_public_bucket_prefix: Option<String>,
+  pub maybe_media_file_public_bucket_extension: Option<String>,
+
   /// Something descriptive about the bookmarked entity.
   /// This might be TTS text, a username, etc. It depends on the entity type.
   pub maybe_entity_descriptive_text: Option<String>,
@@ -64,6 +69,9 @@ pub struct RawUserBookmarkRecord {
 
   pub (crate) maybe_media_file_type: Option<MediaFileType>,
   pub (crate) maybe_media_file_origin_category: Option<MediaFileOriginCategory>,
+  pub (crate) maybe_media_file_public_bucket_hash: Option<String>,
+  pub (crate) maybe_media_file_public_bucket_prefix: Option<String>,
+  pub (crate) maybe_media_file_public_bucket_extension: Option<String>,
 
   pub (crate) maybe_model_weight_type: Option<WeightsType>,
   pub (crate) maybe_model_weight_category: Option<WeightsCategory>,
@@ -86,6 +94,10 @@ impl RawUserBookmarkRecord {
       token: self.token,
       entity_type: self.entity_type,
       entity_token: self.entity_token,
+      maybe_media_file_type: self.maybe_media_file_type,
+      maybe_media_file_public_bucket_hash: self.maybe_media_file_public_bucket_hash,
+      maybe_media_file_public_bucket_prefix: self.maybe_media_file_public_bucket_prefix,
+      maybe_media_file_public_bucket_extension: self.maybe_media_file_public_bucket_extension,
       maybe_entity_descriptive_text: match self.entity_type {
         UserBookmarkEntityType::User => self.maybe_descriptive_text_user_display_name,
         UserBookmarkEntityType::ModelWeight => self.maybe_descriptive_text_model_weight_title,
@@ -134,6 +146,9 @@ impl FromRow<'_, MySqlRow> for RawUserBookmarkRecord {
         deleted_at: row.try_get("deleted_at")?,
         maybe_media_file_type: MediaFileType::try_from_mysql_row_nullable(row,"maybe_media_file_type")?,
         maybe_media_file_origin_category: MediaFileOriginCategory::try_from_mysql_row_nullable(row,"maybe_media_file_origin_category")?,
+        maybe_media_file_public_bucket_hash: row.try_get("maybe_media_file_public_bucket_hash")?,
+        maybe_media_file_public_bucket_prefix: row.try_get("maybe_media_file_public_bucket_prefix")?,
+        maybe_media_file_public_bucket_extension: row.try_get("maybe_media_file_public_bucket_extension")?,
         maybe_model_weight_type: WeightsType::try_from_mysql_row_nullable(row, "maybe_model_weight_type")?,
         maybe_model_weight_category: WeightsCategory::try_from_mysql_row_nullable(row, "maybe_model_weight_category")?,
         maybe_model_weight_cover_image_public_bucket_hash: row.try_get("maybe_model_weight_cover_image_public_bucket_hash")?,
