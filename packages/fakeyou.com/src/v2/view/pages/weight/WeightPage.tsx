@@ -67,9 +67,18 @@ export default function WeightPage({
   const { weight_token } = useParams<{ weight_token: string }>();
   const origin = search ? new URLSearchParams(search).get("origin") : "";
   const history = useHistory();
-  const { data: weight, descriptionMD, fetchError, isLoading, title, remove } = useWeightFetch({
-    onRemove: () => { history.push(origin || ""); },
-    token: weight_token
+  const {
+    data: weight,
+    descriptionMD,
+    fetchError,
+    isLoading,
+    title,
+    remove,
+  } = useWeightFetch({
+    onRemove: () => {
+      history.push(origin || "");
+    },
+    token: weight_token,
   });
 
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
@@ -230,7 +239,7 @@ export default function WeightPage({
     { property: "Category", value: weightCategory },
     {
       property: "Visibility",
-      value: weight.creator_set_visibility?.toString() || "",
+      value: weight.creator_set_visibility,
     },
     { property: "Created at", value: weight.created_at?.toString() || "" },
     { property: "Updated at", value: weight.updated_at?.toString() || "" },
@@ -241,7 +250,7 @@ export default function WeightPage({
     { property: "Category", value: weightCategory },
     {
       property: "Visibility",
-      value: weight.creator_set_visibility?.toString() || "",
+      value: weight.creator_set_visibility,
     },
     { property: "Created at", value: dateCreated || "" },
     { property: "Updated at", value: dateUpdated || "" },
