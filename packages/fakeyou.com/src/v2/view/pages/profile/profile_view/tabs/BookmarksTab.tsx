@@ -187,6 +187,7 @@ export default function BookmarksTab({ username }: { username: string }) {
                           props,
                         }}
                       />
+                      <MediaCards {...{ type: data.media_type, props }} />
                     </div>
                   );
                 })}
