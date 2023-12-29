@@ -297,6 +297,17 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
   const subtitleDivider = <span className="opacity-25 fs-5 fw-light">|</span>;
 
+  const bucketConfig = new BucketConfig();
+
+  let weightUsedCoverImage = "/images/avatars/default-pfp.png";
+  if (mediaFile.maybe_model_weight_info !== null) {
+    weightUsedCoverImage = bucketConfig.getCdnUrl(
+      mediaFile.maybe_model_weight_info.maybe_cover_image_public_bucket_path,
+      60,
+      100
+    );
+  }
+
   return (
     <div>
       <Container type="panel" className="mb-5">
@@ -447,7 +458,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                     <hr className="my-1" />
                     <div className="d-flex align-items-center">
                       <WeightCoverImage
-                        src="/images/dummy-image.jpg"
+                        src={weightUsedCoverImage}
                         height={60}
                         width={60}
                       />

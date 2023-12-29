@@ -9,16 +9,17 @@ export interface MediaFile {
   token: string;
   media_type: MediaFileType;
   public_bucket_path: string;
-  maybe_creator_user?: UserDetailsLight | null;
+  maybe_creator_user: UserDetailsLight | null;
   creator_set_visibility: string;
   created_at: Date;
   updated_at: Date;
-  maybe_model_weight_info?: {
+  maybe_model_weight_info: {
     title: string;
     weight_token: string;
     weight_category: WeightCategory;
     weight_type: WeightType;
     maybe_weight_creator: UserDetailsLight;
+    maybe_cover_image_public_bucket_path: string;
   };
 }
 
