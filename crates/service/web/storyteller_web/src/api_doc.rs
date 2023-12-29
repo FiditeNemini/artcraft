@@ -64,6 +64,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
   ),
   components(schemas(
     // Tokens
+    MediaFileToken,
+    ModelWeightToken,
     UserToken,
     // Common
     SimpleGenericJsonSuccess,Visibility,
@@ -74,7 +76,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     WeightsData,
     GetMediaFilePathInfo,GetMediaFileError,GetMediaFileSuccessResponse,GetMediaFileModelInfo,MediaFileInfo,
     // Model Weights
-    ModelWeightToken,WeightsCategory,WeightsType,
+    WeightsCategory,WeightsType,
     GetWeightPathInfo,GetWeightResponse,GetWeightError,
     UpdateWeightRequest,UpdateWeightRequest,UpdateWeightPathInfo,UpdateWeightRequest,UpdateWeightError,
     SetModelWeightCoverImageRequest,SetModelWeightCoverImageResponse,SetModelWeightCoverImagePathInfo,SetModelWeightCoverImageError,
@@ -85,7 +87,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListWeightsByUserError,ListWeightsByUserSuccessResponse,ListWeightsByUserPathInfo,Weight,
     UserDetailsLight,DefaultAvatarInfo,
     MediaFileOriginModelType,MediaFileOriginProductCategory,MediaFileOriginCategory,
-    ListFeaturedMediaFilesSuccessResponse,MediaFile,MediaFileToken,MediaFileType, ListFeaturedMediaFilesError,
+    ListFeaturedMediaFilesSuccessResponse,MediaFile,MediaFileType, ListFeaturedMediaFilesError,
     ListMediaFilesSuccessResponse, ListMediaFilesError, MediaFileListItem, ListMediaFilesQueryParams,
     MediaFileSocialMetaLight,
     ListMediaFilesForUserSuccessResponse,ListMediaFilesForUserQueryParams,ListMediaFilesForUserError,ListMediaFilesForUserPathInfo,
