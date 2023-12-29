@@ -47,9 +47,8 @@ export default function ImageCard({
       data.weights_type || data.details?.maybe_weights_data?.weights_type
     );
 
-  const imageLink = new BucketConfig().getGcsUrl(data.public_bucket_path);
-
   console.log("🌇", origin);
+
   const bucketConfig = new BucketConfig();
   let coverImage = "/images/avatars/default-pfp.png";
 
