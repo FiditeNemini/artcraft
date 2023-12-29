@@ -33,7 +33,7 @@ export default function AudioCard({
   const linkUrl =
     type === "media"
       ? `/media/${data.token}`
-      : `/weight/${data.weight_token}${
+      : `/weight/${data.weight_token || data.details.entity_token}${
           origin ? "?origin=" + origin + "&ehhh=mehh" : ""
         }`;
 

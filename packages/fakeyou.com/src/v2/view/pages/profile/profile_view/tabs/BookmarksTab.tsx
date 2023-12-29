@@ -165,7 +165,15 @@ export default function BookmarksTab({ username }: { username: string }) {
                 onLayoutComplete={() => console.log("Layout complete!")}
               >
                 {dataList.map((data: any, key: number) => {
-                  let props = {
+                  let weightProps = {
+                    bookmarks,
+                    data,
+                    origin,
+                    type: "weights",
+                    showCreator: true,
+                  };
+
+                  let mediaProps = {
                     bookmarks,
                     data,
                     origin,
@@ -184,10 +192,12 @@ export default function BookmarksTab({ username }: { username: string }) {
                         {...{
                           type: data.details.maybe_weights_data
                             .weights_category,
-                          props,
+                          props: weightProps,
                         }}
                       />
-                      <MediaCards {...{ type: data.media_type, props }} />
+                      <MediaCards
+                        {...{ type: data.media_type, props: mediaProps }}
+                      />
                     </div>
                   );
                 })}

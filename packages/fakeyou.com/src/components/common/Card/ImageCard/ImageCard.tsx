@@ -29,7 +29,9 @@ export default function ImageCard({
   const linkUrl =
     type === "media"
       ? `/media/${data.token}`
-      : `/weight/${data.weight_token || data.details.entity_token}`;
+      : `/weight/${data.weight_token || data.details.entity_token}${
+          origin ? "?origin=" + origin + "&ehhh=mehh" : ""
+        }`;
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
