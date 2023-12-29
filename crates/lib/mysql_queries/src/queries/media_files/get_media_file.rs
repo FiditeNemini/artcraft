@@ -39,6 +39,15 @@ pub struct MediaFile {
   pub maybe_model_weights_type: Option<WeightsType>,
   pub maybe_model_weights_category: Option<WeightsCategory>,
 
+  pub maybe_model_cover_image_public_bucket_hash: Option<String>,
+  pub maybe_model_cover_image_public_bucket_prefix: Option<String>,
+  pub maybe_model_cover_image_public_bucket_extension: Option<String>,
+
+  pub maybe_model_weight_creator_user_token: Option<UserToken>,
+  pub maybe_model_weight_creator_username: Option<String>,
+  pub maybe_model_weight_creator_display_name: Option<String>,
+  pub maybe_model_weight_creator_gravatar_hash: Option<String>,
+
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
   pub maybe_public_bucket_extension: Option<String>,
@@ -80,6 +89,15 @@ pub struct MediaFileRaw {
   pub maybe_model_weights_title: Option<String>,
   pub maybe_model_weights_type: Option<WeightsType>,
   pub maybe_model_weights_category: Option<WeightsCategory>,
+
+  pub maybe_model_cover_image_public_bucket_hash: Option<String>,
+  pub maybe_model_cover_image_public_bucket_prefix: Option<String>,
+  pub maybe_model_cover_image_public_bucket_extension: Option<String>,
+
+  pub maybe_model_weight_creator_user_token: Option<UserToken>,
+  pub maybe_model_weight_creator_username: Option<String>,
+  pub maybe_model_weight_creator_display_name: Option<String>,
+  pub maybe_model_weight_creator_gravatar_hash: Option<String>,
 
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
@@ -126,6 +144,13 @@ pub async fn get_media_file(
     maybe_model_weights_title: record.maybe_model_weights_title,
     maybe_model_weights_type: record.maybe_model_weights_type,
     maybe_model_weights_category: record.maybe_model_weights_category,
+    maybe_model_cover_image_public_bucket_hash: record.maybe_model_cover_image_public_bucket_hash,
+    maybe_model_cover_image_public_bucket_prefix: record.maybe_model_cover_image_public_bucket_prefix,
+    maybe_model_cover_image_public_bucket_extension: record.maybe_model_cover_image_public_bucket_extension,
+    maybe_model_weight_creator_user_token: record.maybe_model_weight_creator_user_token,
+    maybe_model_weight_creator_username: record.maybe_model_weight_creator_username,
+    maybe_model_weight_creator_display_name: record.maybe_model_weight_creator_display_name,
+    maybe_model_weight_creator_gravatar_hash: record.maybe_model_weight_creator_gravatar_hash,
     public_bucket_directory_hash: record.public_bucket_directory_hash,
     maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
     maybe_public_bucket_extension: record.maybe_public_bucket_extension,
@@ -158,6 +183,15 @@ SELECT
     model_weights.weights_type as `maybe_model_weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
     model_weights.weights_category as `maybe_model_weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
 
+    cover_image.public_bucket_directory_hash as maybe_model_cover_image_public_bucket_hash,
+    cover_image.maybe_public_bucket_prefix as maybe_model_cover_image_public_bucket_prefix,
+    cover_image.maybe_public_bucket_extension as maybe_model_cover_image_public_bucket_extension,
+
+    model_weight_creator.token as `maybe_model_weight_creator_user_token: tokens::tokens::users::UserToken`,
+    model_weight_creator.username as maybe_model_weight_creator_username,
+    model_weight_creator.display_name as maybe_model_weight_creator_display_name,
+    model_weight_creator.email_gravatar_hash as maybe_model_weight_creator_gravatar_hash,
+
     m.public_bucket_directory_hash,
     m.maybe_public_bucket_prefix,
     m.maybe_public_bucket_extension,
@@ -170,6 +204,10 @@ LEFT OUTER JOIN users
     ON m.maybe_creator_user_token = users.token
 LEFT OUTER JOIN model_weights
     ON m.maybe_origin_model_token = model_weights.token
+LEFT OUTER JOIN media_files as cover_image
+    ON cover_image.token = model_weights.maybe_cover_image_media_file_token
+LEFT OUTER JOIN users as model_weight_creator
+    ON model_weight_creator.token = model_weights.creator_user_token
 WHERE
     m.token = ?
         "#,
@@ -203,6 +241,15 @@ SELECT
     model_weights.weights_type as `maybe_model_weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
     model_weights.weights_category as `maybe_model_weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
 
+    cover_image.public_bucket_directory_hash as maybe_model_cover_image_public_bucket_hash,
+    cover_image.maybe_public_bucket_prefix as maybe_model_cover_image_public_bucket_prefix,
+    cover_image.maybe_public_bucket_extension as maybe_model_cover_image_public_bucket_extension,
+
+    model_weight_creator.token as `maybe_model_weight_creator_user_token: tokens::tokens::users::UserToken`,
+    model_weight_creator.username as maybe_model_weight_creator_username,
+    model_weight_creator.display_name as maybe_model_weight_creator_display_name,
+    model_weight_creator.email_gravatar_hash as maybe_model_weight_creator_gravatar_hash,
+
     m.public_bucket_directory_hash,
     m.maybe_public_bucket_prefix,
     m.maybe_public_bucket_extension,
@@ -215,6 +262,10 @@ LEFT OUTER JOIN users
     ON m.maybe_creator_user_token = users.token
 LEFT OUTER JOIN model_weights
     ON m.maybe_origin_model_token = model_weights.token
+LEFT OUTER JOIN media_files as cover_image
+    ON cover_image.token = model_weights.maybe_cover_image_media_file_token
+LEFT OUTER JOIN users as model_weight_creator
+    ON model_weight_creator.token = model_weights.creator_user_token
 WHERE
     m.token = ?
     AND m.user_deleted_at IS NULL

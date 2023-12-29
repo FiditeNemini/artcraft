@@ -64,18 +64,33 @@ use crate::http_server::web_utils::response_success_helpers::*;
   ),
   components(schemas(
     // Tokens
+    InferenceJobToken,
     MediaFileToken,
     ModelWeightToken,
+    UserBookmarkToken,
     UserToken,
-    // Common
-    SimpleGenericJsonSuccess,Visibility,
-    PaginationCursors,PaginationPage,
+
+    // Enums
+    MediaFileOriginCategory,
+    MediaFileOriginModelType,
+    MediaFileOriginProductCategory,
+    MediaFileType,
+    WeightsCategory,
+    WeightsType,
+
+    // Common response structs
+    DefaultAvatarInfo,
+    PaginationCursors,
+    PaginationPage,
+    SimpleGenericJsonSuccess,
+    UserDetailsLight,
+    Visibility,
+
     // Inference
-    EnqueueTTSRequest,EnqueueTTSRequestSuccessResponse,EnqueueTTSRequestError,InferenceJobToken,
+    EnqueueTTSRequest,EnqueueTTSRequestSuccessResponse,EnqueueTTSRequestError,
     // Media Files
     GetMediaFilePathInfo,GetMediaFileError,GetMediaFileSuccessResponse,GetMediaFileModelInfo,MediaFileInfo,
     // Model Weights
-    WeightsCategory,WeightsType,
     GetWeightPathInfo,GetWeightResponse,GetWeightError,
     UpdateWeightRequest,UpdateWeightRequest,UpdateWeightPathInfo,UpdateWeightRequest,UpdateWeightError,
     SetModelWeightCoverImageRequest,SetModelWeightCoverImageResponse,SetModelWeightCoverImagePathInfo,SetModelWeightCoverImageError,
@@ -84,15 +99,13 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListWeightError,ModelWeightForList,ListWeightError,
     ListAvailableWeightsQuery,ListAvailableWeightsSuccessResponse,ModelWeightForList,
     ListWeightsByUserError,ListWeightsByUserSuccessResponse,ListWeightsByUserPathInfo,Weight,
-    UserDetailsLight,DefaultAvatarInfo,
     WeightsData,MediaFileData,
-    MediaFileOriginModelType,MediaFileOriginProductCategory,MediaFileOriginCategory,
-    ListFeaturedMediaFilesSuccessResponse,MediaFile,MediaFileType, ListFeaturedMediaFilesError,
+    ListFeaturedMediaFilesSuccessResponse,MediaFile, ListFeaturedMediaFilesError,
     ListMediaFilesSuccessResponse, ListMediaFilesError, MediaFileListItem, ListMediaFilesQueryParams,
     MediaFileSocialMetaLight,
     ListMediaFilesForUserSuccessResponse,ListMediaFilesForUserQueryParams,ListMediaFilesForUserError,ListMediaFilesForUserPathInfo,
     MediaFileForUserListItem, MediaFileForUserListItem,
-    UserBookmarkToken,UserBookmarkDetailsForUserList,UserBookmarkEntityType,
+    UserBookmarkDetailsForUserList,UserBookmarkEntityType,
     CreateUserBookmarkRequest,CreateUserBookmarkError,CreateUserBookmarkSuccessResponse,
     DeleteUserBookmarkPathInfo,DeleteUserBookmarkError,DeleteUserBookmarkRequest,
     ListUserBookmarksPathInfo,ListUserBookmarksForUserError,ListUserBookmarksForUserSuccessResponse,UserBookmarkListItem,
