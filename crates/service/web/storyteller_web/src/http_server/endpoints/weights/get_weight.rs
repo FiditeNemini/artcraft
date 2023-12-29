@@ -55,12 +55,12 @@ pub struct GetWeightResponse {
     updated_at: DateTime<Utc>,
 }
 
-#[derive(Deserialize,ToSchema)]
+#[derive(Deserialize, ToSchema)]
 pub struct GetWeightPathInfo {
-    weight_token: String,
+    weight_token: ModelWeightToken,
 }
 
-#[derive(Debug,ToSchema)]
+#[derive(Debug, ToSchema)]
 pub enum GetWeightError {
     NotAuthorized,
     NotFound,
@@ -100,7 +100,6 @@ pub async fn get_weight_handler(
     path: Path<GetWeightPathInfo>,
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, GetWeightError> {
-
     let maybe_user_session = server_state
         .session_checker
         .maybe_get_user_session(&http_request, &server_state.mysql_pool)
@@ -110,20 +109,13 @@ pub async fn get_weight_handler(
             GetWeightError::ServerError
         })?;
 
-    let user_session = match maybe_user_session {
-        Some(session) => session,
-        None => {
-            warn!("not logged in");
-            return Err(GetWeightError::NotAuthorized);
-        }
-    };
-
-    let weight_token = ModelWeightToken::new_from_str(&path.weight_token);
-    let creator_user_token = user_session.user_token.clone();
-    let is_mod = user_session.can_ban_users;
+    let is_mod = maybe_user_session
+        .as_ref()
+        .map(|session| session.can_ban_users)
+        .unwrap_or(false);
 
     let weight_lookup_result = get_weight_by_token(
-        &weight_token,
+        &path.weight_token,
         is_mod,
         &server_state.mysql_pool,
     ).await;
@@ -131,7 +123,7 @@ pub async fn get_weight_handler(
     let weight = match weight_lookup_result {
         Ok(Some(weight)) => weight,
         Ok(None) => {
-            warn!("Weight not found: {:?}", weight_token);
+            warn!("Weight not found: {:?}", &path.weight_token);
             return Err(GetWeightError::NotFound);
         },
         Err(err) => {
@@ -143,9 +135,21 @@ pub async fn get_weight_handler(
     // if the weight is private, only the creator can view it
     let is_private = weight.creator_set_visibility == Visibility::Private;
 
-    if is_private && creator_user_token.as_str() != &user_session.user_token {
-        warn!("user is not allowed to view this weight: {}", user_session.user_token);
-        return Err(GetWeightError::NotAuthorized);
+    if is_private {
+        let user_session = match maybe_user_session {
+            Some(session) => session,
+            None => {
+                warn!("not logged in");
+                return Err(GetWeightError::NotAuthorized);
+            }
+        };
+
+        let session_user_token = user_session.user_token.clone();
+
+        if !is_mod && session_user_token.as_str() != &user_session.user_token {
+            warn!("user is not allowed to view this weight: {}", user_session.user_token);
+            return Err(GetWeightError::NotAuthorized);
+        }
     }
 
     let maybe_cover_image = weight.maybe_cover_image_public_bucket_hash
