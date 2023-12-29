@@ -33,7 +33,7 @@ export default function MediaTab() {
 
   const filterOptions = [
     { value: "all", label: "All Media" },
-    { value: "images", label: "Images" },
+    { value: "image", label: "Images" },
     { value: "audio", label: "Audio" },
     { value: "video", label: "Video" },
   ];
