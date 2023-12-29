@@ -48,8 +48,8 @@ pub struct ListAvailableWeightsSuccessResponse {
 pub struct ModelWeightForList {
     pub weight_token: ModelWeightToken,
 
-    pub weights_type: WeightsType,
-    pub weights_category: WeightsCategory,
+    pub weight_type: WeightsType,
+    pub weight_category: WeightsCategory,
 
     pub title: String,
 
@@ -254,8 +254,8 @@ pub async fn list_available_weights_handler(
                 ModelWeightForList {
                     weight_token: weight.token,
                     title: weight.title,
-                    weights_type: weight.weights_type,
-                    weights_category: weight.weights_category,
+                    weight_type: weight.weights_type,
+                    weight_category: weight.weights_category,
 
                     maybe_cover_image_public_bucket_path: maybe_cover_image,
 
