@@ -14,11 +14,12 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 interface ImageCardProps {
   bookmarks: any,
   data: any;
+  origin?: string;
   type: "media" | "weights";
   showCreator?: boolean;
 }
 
-export default function ImageCard({ bookmarks, data, type, showCreator }: ImageCardProps) {
+export default function ImageCard({ bookmarks, data, origin = "", type, showCreator }: ImageCardProps) {
   const linkUrl =
     type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}`;
 
@@ -38,8 +39,10 @@ export default function ImageCard({ bookmarks, data, type, showCreator }: ImageC
 
   const imageLink = new BucketConfig().getGcsUrl(data.public_bucket_path);
 
+  console.log("🌇", origin);
+
   return (
-    <Link to={linkUrl}>
+    <Link {...{ to: linkUrl, state: { origin }, onClick: () => console.log("🌠 IMG CARD") }}>
       <Card padding={false} canHover={true}>
         {type === "media" && (
           <>

@@ -12,11 +12,12 @@ import { Link } from "react-router-dom";
 
 interface VideoCardProps {
   data: any;
+  origin?: string;
   type: "media" | "weights";
   showCreator?: boolean;
 }
 
-export default function VideoCard({ data, type, showCreator }: VideoCardProps) {
+export default function VideoCard({ data, origin = "", type, showCreator }: VideoCardProps) {
   const linkUrl =
     type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}`;
 
@@ -34,7 +35,7 @@ export default function VideoCard({ data, type, showCreator }: VideoCardProps) {
   const videoLink = new BucketConfig().getGcsUrl(data.public_bucket_path);
 
   return (
-    <Link to={linkUrl}>
+    <Link {...{ to: linkUrl, state: { origin }, onClick: () => console.log("🌠 VIDEO CARD") }}>
       <Card padding={false} canHover={true}>
         {type === "media" && (
           <>

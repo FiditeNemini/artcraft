@@ -13,8 +13,9 @@ import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
 
 interface AudioCardProps {
-  bookmarks: any,
+  bookmarks: any;
   data: any;
+  origin?: string;
   type: "media" | "weights";
   showCreator?: boolean;
   showCover?: boolean;
@@ -23,12 +24,13 @@ interface AudioCardProps {
 export default function AudioCard({
   bookmarks,
   data,
+  origin = "",
   type,
   showCreator,
   showCover,
 }: AudioCardProps) {
   const linkUrl =
-    type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}`;
+    type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}${origin ? "?origin=" + origin + "&ehhh=mehh" : "" }`;
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
@@ -45,7 +47,7 @@ export default function AudioCard({
     useWeightTypeInfo(data.weights_type);
 
   return (
-    <Link to={linkUrl}>
+    <Link {...{ to: linkUrl, state: { origin }, onClick: () => console.log("🌠 AUDIO CARD") }}>
       <Card padding={true} canHover={true}>
         {type === "media" && (
           <>

@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import WeightsCards from "components/common/Card/WeightsCards";
 import {
@@ -21,6 +22,7 @@ import SkeletonCard from "components/common/Card/SkeletonCard";
 // }
 
 export default function WeightsTab({ username }: { username: string }) {
+  const { pathname: origin } = useLocation();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [sd, sdSet] = useState("all");
   const [tts, ttsSet] = useState("all");
@@ -40,6 +42,8 @@ export default function WeightsTab({ username }: { username: string }) {
     urlParam: username,
     addQueries: { page_size: 24 },
   });
+
+  console.log("💎",origin);
 
   const handlePageClick = (selectedItem: { selected: number }) => {
     weights.pageChange(selectedItem.selected);
@@ -161,6 +165,7 @@ export default function WeightsTab({ username }: { username: string }) {
                     let props = {
                       bookmarks,
                       data,
+                      origin,
                       showCreator: true,
                       type: "weights",
                     };
