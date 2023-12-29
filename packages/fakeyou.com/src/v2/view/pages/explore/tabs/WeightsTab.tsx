@@ -117,11 +117,14 @@ export default function WeightsTab() {
             next={weights.getMore}
             hasMore={!weights.list.length || !!weights.next}
             loader={
-              <div className="mt-4 d-flex justify-content-center">
-                <div className="spinner-border text-light" role="status">
-                  <span className="visually-hidden">Loading...</span>
+              weights.list.length !== 0 &&
+              weights.isLoading && (
+                <div className="mt-4 d-flex justify-content-center">
+                  <div className="spinner-border text-light" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
                 </div>
-              </div>
+              )
             }
             endMessage={
               <p className="text-center mt-4 opacity-75">No more results.</p>
