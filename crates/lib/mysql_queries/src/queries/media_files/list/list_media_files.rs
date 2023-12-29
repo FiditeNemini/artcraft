@@ -213,24 +213,24 @@ LEFT OUTER JOIN comments as c
     if sort_ascending {
       if cursor_is_reversed {
         // NB: We're searching backwards.
-        query_builder.push(" AND m.id < ");
+        query_builder.push(" m.id < ");
         sort_ascending = !sort_ascending;
       } else {
-        query_builder.push(" AND m.id > ");
+        query_builder.push(" m.id > ");
       }
     } else {
       if cursor_is_reversed {
         // NB: We're searching backwards.
-        query_builder.push(" AND m.id > ");
+        query_builder.push(" m.id > ");
         sort_ascending = !sort_ascending;
       } else {
-        query_builder.push(" AND m.id < ");
+        query_builder.push(" m.id < ");
       }
     }
     query_builder.push_bind(offset as i64);
   }
 
-  query_builder.push(" GROUP BY m.id");
+  query_builder.push(" GROUP BY m.id ");
 
   if sort_ascending {
     query_builder.push(" ORDER BY m.id ASC ");

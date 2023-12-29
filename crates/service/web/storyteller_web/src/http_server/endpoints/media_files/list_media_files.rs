@@ -93,9 +93,7 @@ impl std::fmt::Display for ListMediaFilesError {
 #[utoipa::path(
   get,
   path = "/v1/media_files/list",
-  params(
-  ListMediaFilesQueryParams,
-  ),
+  params(ListMediaFilesQueryParams),
   responses(
     (status = 200, description = "List Featured Media Files", body = ListMediaFilesSuccessResponse),
     (status = 500, description = "Server error", body = ListMediaFilesError),
