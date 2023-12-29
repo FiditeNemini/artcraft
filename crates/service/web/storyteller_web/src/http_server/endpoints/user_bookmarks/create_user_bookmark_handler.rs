@@ -76,13 +76,13 @@ impl fmt::Display for CreateUserBookmarkError {
 }
 
 #[utoipa::path(
-post,
-path = "/v1/user_bookmarks/create",
-request_body = CreateUserBookmarkRequest,
-responses(
-(status = 200, body = CreateUserBookmarkSuccessResponse),
-(status = 400, body = CreateUserBookmarkError),
-)
+  post,
+  path = "/v1/user_bookmarks/create",
+  request_body = CreateUserBookmarkRequest,
+  responses(
+    (status = 200, body = CreateUserBookmarkSuccessResponse),
+    (status = 400, body = CreateUserBookmarkError),
+  )
 )]
 pub async fn create_user_bookmark_handler(
   http_request: HttpRequest,
