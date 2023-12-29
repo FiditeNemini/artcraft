@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-import MediaCards from "components/common/Card/MediaCards";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { TempSelect } from "components/common";
 import {
@@ -173,13 +172,13 @@ export default function BookmarksTab({ username }: { username: string }) {
                     showCreator: true,
                   };
 
-                  let mediaProps = {
-                    bookmarks,
-                    data,
-                    origin,
-                    type: "weights",
-                    showCreator: true,
-                  };
+                  // let mediaProps = {
+                  //   bookmarks,
+                  //   data,
+                  //   origin,
+                  //   type: "media",
+                  //   showCreator: true,
+                  // };
 
                   return (
                     <div
@@ -195,9 +194,9 @@ export default function BookmarksTab({ username }: { username: string }) {
                           props: weightProps,
                         }}
                       />
-                      <MediaCards
+                      {/* <MediaCards
                         {...{ type: data.media_type, props: mediaProps }}
-                      />
+                      /> */}
                     </div>
                   );
                 })}
