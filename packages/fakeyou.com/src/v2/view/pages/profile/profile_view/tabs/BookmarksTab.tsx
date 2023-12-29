@@ -1,5 +1,7 @@
 import React, { useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
+import MediaCards from "components/common/Card/MediaCards";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { TempSelect } from "components/common";
 import {
@@ -13,6 +15,7 @@ import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/Ge
 import WeightsCards from "components/common/Card/WeightsCards";
 
 export default function BookmarksTab({ username }: { username: string }) {
+  const { pathname: origin } = useLocation();
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
@@ -165,6 +168,7 @@ export default function BookmarksTab({ username }: { username: string }) {
                   let props = {
                     bookmarks,
                     data,
+                    origin,
                     type: "weights",
                     showCreator: true,
                   };

@@ -14,6 +14,7 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 interface ImageCardProps {
   bookmarks: any;
   data: any;
+  origin?: string;
   type: "media" | "weights";
   showCreator?: boolean;
 }
@@ -21,6 +22,7 @@ interface ImageCardProps {
 export default function ImageCard({
   bookmarks,
   data,
+  origin = "",
   type,
   showCreator,
 }: ImageCardProps) {
@@ -45,6 +47,9 @@ export default function ImageCard({
       data.weights_type || data.details?.maybe_weights_data?.weights_type
     );
 
+  const imageLink = new BucketConfig().getGcsUrl(data.public_bucket_path);
+
+  console.log("🌇", origin);
   const bucketConfig = new BucketConfig();
   let coverImage = "/images/avatars/default-pfp.png";
 
@@ -70,7 +75,13 @@ export default function ImageCard({
   }
 
   return (
-    <Link to={linkUrl}>
+    <Link
+      {...{
+        to: linkUrl,
+        state: { origin },
+        onClick: () => console.log("🌠 IMG CARD"),
+      }}
+    >
       <Card padding={false} canHover={true}>
         {type === "media" && (
           <>

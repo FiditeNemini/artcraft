@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useHistory, useParams, useLocation } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import Container from "components/common/Container";
@@ -63,14 +63,15 @@ export default function WeightPage({
   enqueueTtsJob,
   inferenceJobsByCategory,
 }: WeightProps) {
+  const { search } = useLocation();
   const { weight_token } = useParams<{ weight_token: string }>();
-  const {
-    data: weight,
-    descriptionMD,
-    fetchError,
-    isLoading,
-    title,
-  } = useWeightFetch({ token: weight_token });
+  const origin = search ? new URLSearchParams(search).get("origin") : "";
+  const history = useHistory();
+  const { data: weight, descriptionMD, fetchError, isLoading, title, remove } = useWeightFetch({
+    onRemove: () => { history.push(origin || ""); },
+    token: weight_token
+  });
+
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
   const dateUpdated = moment(weight?.updated_at || "").format("LLL");
   const dateCreated = moment(weight?.updated_at || "").format("LLL");
@@ -332,14 +333,6 @@ export default function WeightPage({
     setIsDeleteModalOpen(false);
   };
 
-  const handleDelete = () => {
-    // if (deleteType === "voice") {
-    //   voices.delete(deleteItem);
-    //   voices.refresh();
-    // } else if (deleteType === "dataset") datasets.delete(deleteItem);
-    // datasets.refresh();
-  };
-
   let audioWeightCoverImage = "/images/avatars/default-pfp.png";
   if (weight.maybe_cover_image_public_bucket_path !== null) {
     audioWeightCoverImage = bucketConfig.getCdnUrl(
@@ -578,7 +571,7 @@ export default function WeightPage({
         handleClose={closeDeleteModal}
         title="Delete Weight"
         content={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
-        onConfirm={handleDelete}
+        onConfirm={remove}
       />
     </div>
   );

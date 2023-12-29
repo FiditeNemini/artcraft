@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import { GetWeight, Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import { UpdateWeight } from "@storyteller/components/src/api/weights/UpdateWeight";
+import { DeleteWeight } from "@storyteller/components/src/api/weights/DeleteWeight";
 
 interface Props {
+  onRemove?: (x: any) => void;
   token: string;
 }
 
-export default function useWeightFetch({ token }: Props) {
+export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
   const [data, setData] = useState<Weight | undefined | null>(null);
   const [status, statusSet] = useState(FetchStatus.ready);
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
@@ -16,6 +19,7 @@ export default function useWeightFetch({ token }: Props) {
   const [descriptionMD, descriptionMDSet] = useState("");
   const isLoading = status === FetchStatus.ready || status === FetchStatus.in_progress;
   const fetchError = status === FetchStatus.error;
+  const history = useHistory();
 
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
     const todo: { [key: string]: (x: any) => void } = { descriptionMDSet, titleSet, visibilitySet };
@@ -35,9 +39,23 @@ export default function useWeightFetch({ token }: Props) {
     .then((res: any) => {
       console.log("📝",res);
       writeStatusSet(FetchStatus.success);
+      history.replace(`/weight/${ token }`);
     })
     .catch(err => {
       writeStatusSet(FetchStatus.error);
+    });
+  };
+
+  const remove = () => {
+    writeStatusSet(FetchStatus.in_progress);
+    DeleteWeight(token,{
+      as_mod: true,
+      set_delete: true
+    })
+    .then((res: any) => {
+      writeStatusSet(FetchStatus.success);
+      console.log("✂️",res);
+      onRemove(res);
     });
   };
   
@@ -60,5 +78,5 @@ export default function useWeightFetch({ token }: Props) {
     }
   }, [status, token, data]);
 
-  return { data, fetchError, isLoading, descriptionMD, onChange, status, title, update, visibility, writeStatus };
+  return { data, fetchError, isLoading, descriptionMD, onChange, remove, status, title, update, visibility, writeStatus };
 };

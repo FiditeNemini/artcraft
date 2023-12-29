@@ -16,6 +16,7 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 interface AudioCardProps {
   bookmarks: any;
   data: any;
+  origin?: string;
   type: "media" | "weights";
   showCreator?: boolean;
   showCover?: boolean;
@@ -24,6 +25,7 @@ interface AudioCardProps {
 export default function AudioCard({
   bookmarks,
   data,
+  origin = "",
   type,
   showCreator,
   showCover,
@@ -31,7 +33,9 @@ export default function AudioCard({
   const linkUrl =
     type === "media"
       ? `/media/${data.token}`
-      : `/weight/${data.weight_token || data.details.entity_token}`;
+      : `/weight/${data.weight_token}${
+          origin ? "?origin=" + origin + "&ehhh=mehh" : ""
+        }`;
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
@@ -74,7 +78,13 @@ export default function AudioCard({
   }
 
   return (
-    <Link to={linkUrl}>
+    <Link
+      {...{
+        to: linkUrl,
+        state: { origin },
+        onClick: () => console.log("🌠 AUDIO CARD"),
+      }}
+    >
       <Card padding={true} canHover={true}>
         {type === "media" && (
           <>
