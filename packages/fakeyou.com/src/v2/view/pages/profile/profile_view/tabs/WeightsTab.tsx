@@ -43,7 +43,7 @@ export default function WeightsTab({ username }: { username: string }) {
     addQueries: { page_size: 24 },
   });
 
-  console.log("💎",origin);
+  console.log("💎", origin);
 
   const handlePageClick = (selectedItem: { selected: number }) => {
     weights.pageChange(selectedItem.selected);
@@ -178,7 +178,7 @@ export default function WeightsTab({ username }: { username: string }) {
                         }}
                       >
                         <WeightsCards
-                          {...{ type: data.weights_category, props }}
+                          {...{ type: data.weight_category, props }}
                         />
                       </div>
                     );

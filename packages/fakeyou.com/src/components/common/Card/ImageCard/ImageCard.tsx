@@ -46,7 +46,7 @@ export default function ImageCard({
 
   const { label: weightBadgeLabel, color: weightBadgeColor } =
     useWeightTypeInfo(
-      data.weights_type || data.details?.maybe_weights_data?.weights_type
+      data.weight_type || data.details?.maybe_weights_data?.weight_type
     );
 
   console.log("🌇", origin);

@@ -41,8 +41,8 @@ export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
       description_rendered_html: data?.description_rendered_html || "",
       title,
       visibility,
-      weight_category: data?.weights_category || "",
-      weight_type: data?.weights_type || "",
+      weight_category: data?.weight_category || "",
+      weight_type: data?.weight_type || "",
     })
       .then((res: any) => {
         writeStatusSet(FetchStatus.success);

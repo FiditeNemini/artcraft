@@ -5,8 +5,8 @@ import { WeightType } from "../_common/enums/WeightType";
 
 export interface Weight {
   weight_token: string;
-  weights_type: WeightType;
-  weights_category: WeightCategory;
+  weight_type: WeightType;
+  weight_category: WeightCategory;
   title: string;
   public_bucket_path: string;
   creator_set_visibility: string;

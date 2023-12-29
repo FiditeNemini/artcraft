@@ -158,7 +158,7 @@ export default function WeightsTab() {
                           }}
                         >
                           <WeightsCards
-                            {...{ type: data.weights_category, props }}
+                            {...{ type: data.weight_category, props }}
                           />
                         </div>
                       );
