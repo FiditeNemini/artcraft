@@ -173,13 +173,13 @@ export default function BookmarksTab({ username }: { username: string }) {
                     showCreator: true,
                   };
 
-                  let mediaProps = {
-                    bookmarks,
-                    data,
-                    origin,
-                    type: "weights",
-                    showCreator: true,
-                  };
+                  // let mediaProps = {
+                  //   bookmarks,
+                  //   data,
+                  //   origin,
+                  //   type: "media",
+                  //   showCreator: true,
+                  // };
 
                   return (
                     <div
@@ -195,9 +195,9 @@ export default function BookmarksTab({ username }: { username: string }) {
                           props: weightProps,
                         }}
                       />
-                      <MediaCards
+                      {/* <MediaCards
                         {...{ type: data.media_type, props: mediaProps }}
-                      />
+                      /> */}
                     </div>
                   );
                 })}
