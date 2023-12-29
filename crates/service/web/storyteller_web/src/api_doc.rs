@@ -73,7 +73,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     // Inference
     EnqueueTTSRequest,EnqueueTTSRequestSuccessResponse,EnqueueTTSRequestError,InferenceJobToken,
     // Media Files
-    WeightsData,
     GetMediaFilePathInfo,GetMediaFileError,GetMediaFileSuccessResponse,GetMediaFileModelInfo,MediaFileInfo,
     // Model Weights
     WeightsCategory,WeightsType,
@@ -86,6 +85,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListAvailableWeightsQuery,ListAvailableWeightsSuccessResponse,ModelWeightForList,
     ListWeightsByUserError,ListWeightsByUserSuccessResponse,ListWeightsByUserPathInfo,Weight,
     UserDetailsLight,DefaultAvatarInfo,
+    WeightsData,MediaFileData,
     MediaFileOriginModelType,MediaFileOriginProductCategory,MediaFileOriginCategory,
     ListFeaturedMediaFilesSuccessResponse,MediaFile,MediaFileType, ListFeaturedMediaFilesError,
     ListMediaFilesSuccessResponse, ListMediaFilesError, MediaFileListItem, ListMediaFilesQueryParams,
