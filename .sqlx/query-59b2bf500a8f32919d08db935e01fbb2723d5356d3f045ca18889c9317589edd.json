@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\nSELECT\n    m.token as `token: tokens::tokens::media_files::MediaFileToken`,\n\n    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,\n\n    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n\n    m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n\n    m.public_bucket_directory_hash,\n    m.maybe_public_bucket_prefix,\n    m.maybe_public_bucket_extension,\n\n    m.created_at,\n    m.updated_at\n\nFROM media_files AS m\nLEFT OUTER JOIN users\n    ON m.maybe_creator_user_token = users.token\nWHERE\n    m.token = ?\n    AND m.user_deleted_at IS NULL\n    AND m.mod_deleted_at IS NULL\n        ",
+  "query": "\nSELECT\n    m.token as `token: tokens::tokens::media_files::MediaFileToken`,\n\n    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,\n\n    users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    users.username as maybe_creator_username,\n    users.display_name as maybe_creator_display_name,\n    users.email_gravatar_hash as maybe_creator_gravatar_hash,\n\n    m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n\n    model_weights.token as `maybe_model_weights_token: tokens::tokens::model_weights::ModelWeightToken`,\n    model_weights.title as maybe_model_weights_title,\n    model_weights.weights_type as `maybe_model_weights_type: enums::by_table::model_weights::weights_types::WeightsType`,\n    model_weights.weights_category as `maybe_model_weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,\n\n    m.public_bucket_directory_hash,\n    m.maybe_public_bucket_prefix,\n    m.maybe_public_bucket_extension,\n\n    m.created_at,\n    m.updated_at\n\nFROM media_files AS m\nLEFT OUTER JOIN users\n    ON m.maybe_creator_user_token = users.token\nLEFT OUTER JOIN model_weights\n    ON m.maybe_origin_model_token = model_weights.token\nWHERE\n    m.token = ?\n    AND m.user_deleted_at IS NULL\n    AND m.mod_deleted_at IS NULL\n        ",
   "describe": {
     "columns": [
       {
@@ -75,6 +75,46 @@
       },
       {
         "ordinal": 7,
+        "name": "maybe_model_weights_token: tokens::tokens::model_weights::ModelWeightToken",
+        "type_info": {
+          "type": "VarString",
+          "flags": "UNIQUE_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 128
+        }
+      },
+      {
+        "ordinal": 8,
+        "name": "maybe_model_weights_title",
+        "type_info": {
+          "type": "VarString",
+          "flags": "BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 1020
+        }
+      },
+      {
+        "ordinal": 9,
+        "name": "maybe_model_weights_type: enums::by_table::model_weights::weights_types::WeightsType",
+        "type_info": {
+          "type": "VarString",
+          "flags": "MULTIPLE_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 128
+        }
+      },
+      {
+        "ordinal": 10,
+        "name": "maybe_model_weights_category: enums::by_table::model_weights::weights_category::WeightsCategory",
+        "type_info": {
+          "type": "VarString",
+          "flags": "MULTIPLE_KEY | BINARY | NO_DEFAULT_VALUE",
+          "char_set": 224,
+          "max_size": 128
+        }
+      },
+      {
+        "ordinal": 11,
         "name": "public_bucket_directory_hash",
         "type_info": {
           "type": "VarString",
@@ -84,7 +124,7 @@
         }
       },
       {
-        "ordinal": 8,
+        "ordinal": 12,
         "name": "maybe_public_bucket_prefix",
         "type_info": {
           "type": "VarString",
@@ -94,7 +134,7 @@
         }
       },
       {
-        "ordinal": 9,
+        "ordinal": 13,
         "name": "maybe_public_bucket_extension",
         "type_info": {
           "type": "VarString",
@@ -104,7 +144,7 @@
         }
       },
       {
-        "ordinal": 10,
+        "ordinal": 14,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -114,7 +154,7 @@
         }
       },
       {
-        "ordinal": 11,
+        "ordinal": 15,
         "name": "updated_at",
         "type_info": {
           "type": "Timestamp",
@@ -135,6 +175,10 @@
       true,
       true,
       false,
+      true,
+      true,
+      true,
+      true,
       false,
       true,
       true,
@@ -142,5 +186,5 @@
       false
     ]
   },
-  "hash": "afdbb01a3efc9bcf283d0c8888995673b9f50588788a44f004d3ae4f330092ef"
+  "hash": "59b2bf500a8f32919d08db935e01fbb2723d5356d3f045ca18889c9317589edd"
 }
