@@ -19,6 +19,7 @@ use crate::http_server::common_responses::media_file_social_meta_lite::MediaFile
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
+use crate::http_server::endpoints::media_files::get_media_file::*;
 use crate::http_server::endpoints::media_files::list_featured_media_files::*;
 use crate::http_server::endpoints::media_files::list_media_files::*;
 use crate::http_server::endpoints::media_files::list_media_files_for_user::*;
@@ -42,6 +43,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
 #[derive(OpenApi)]
 #[openapi(
   paths(
+    crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler,
     crate::http_server::endpoints::media_files::list_featured_media_files::list_featured_media_files_handler,
     crate::http_server::endpoints::media_files::list_media_files::list_media_files_handler,
     crate::http_server::endpoints::media_files::list_media_files_for_user::list_media_files_for_user_handler,
@@ -70,6 +72,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     EnqueueTTSRequest,EnqueueTTSRequestSuccessResponse,EnqueueTTSRequestError,InferenceJobToken,
     // Media Files
     WeightsData,
+    GetMediaFilePathInfo,GetMediaFileError,GetMediaFileSuccessResponse,GetMediaFileModelInfo,MediaFileInfo,
     // Model Weights
     ModelWeightToken,WeightsCategory,WeightsType,
     GetWeightPathInfo,GetWeightResponse,GetWeightError,

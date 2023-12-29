@@ -142,8 +142,8 @@ pub async fn list_user_bookmarks_for_user_handler(
 ) -> Result<HttpResponse, ListUserBookmarksForUserError>
 {
   let sort_ascending = query.sort_ascending.unwrap_or(false);
-  let page_size = query.page_size.unwrap_or_else(|| 25);
-  let page_index = query.page_index.unwrap_or_else(|| 0);
+  let page_size = query.page_size.unwrap_or(25);
+  let page_index = query.page_index.unwrap_or(0);
 
   let query_results =
       list_user_bookmarks_by_maybe_entity_type(ListUserBookmarksForUserArgs{
@@ -177,7 +177,7 @@ pub async fn list_user_bookmarks_for_user_handler(
             maybe_weights_data: match user_bookmark.entity_type {
               UserBookmarkEntityType::ModelWeight => Some(WeightsData {
                 // TODO(bt,2023-12-28): Proper default, optional, or "unknown" values would be better.
-                title: user_bookmark.maybe_entity_descriptive_text.clone().unwrap_or("weight".to_string()),
+                title: user_bookmark.maybe_entity_descriptive_text.clone().unwrap_or_else(|| "weight".to_string()),
                 weights_type: user_bookmark.maybe_model_weight_type.unwrap_or(WeightsType::Tacotron2),
                 weights_category: user_bookmark.maybe_model_weight_category.unwrap_or(WeightsCategory::TextToSpeech),
               }),

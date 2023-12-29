@@ -8,9 +8,12 @@ use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
 
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::by_table::model_weights::weights_category::WeightsCategory;
+use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 #[derive(Serialize, Debug)]
@@ -30,6 +33,11 @@ pub struct MediaFile {
   pub maybe_creator_gravatar_hash: Option<String>,
 
   pub creator_set_visibility: Visibility,
+
+  pub maybe_model_weights_token: Option<ModelWeightToken>,
+  pub maybe_model_weights_title: Option<String>,
+  pub maybe_model_weights_type: Option<WeightsType>,
+  pub maybe_model_weights_category: Option<WeightsCategory>,
 
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
@@ -67,6 +75,11 @@ pub struct MediaFileRaw {
   pub maybe_creator_gravatar_hash: Option<String>,
 
   pub creator_set_visibility: Visibility,
+
+  pub maybe_model_weights_token: Option<ModelWeightToken>,
+  pub maybe_model_weights_title: Option<String>,
+  pub maybe_model_weights_type: Option<WeightsType>,
+  pub maybe_model_weights_category: Option<WeightsCategory>,
 
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
@@ -109,6 +122,10 @@ pub async fn get_media_file(
     maybe_creator_display_name: record.maybe_creator_display_name,
     maybe_creator_gravatar_hash: record.maybe_creator_gravatar_hash,
     creator_set_visibility: record.creator_set_visibility,
+    maybe_model_weights_token: record.maybe_model_weights_token,
+    maybe_model_weights_title: record.maybe_model_weights_title,
+    maybe_model_weights_type: record.maybe_model_weights_type,
+    maybe_model_weights_category: record.maybe_model_weights_category,
     public_bucket_directory_hash: record.public_bucket_directory_hash,
     maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
     maybe_public_bucket_extension: record.maybe_public_bucket_extension,
@@ -136,6 +153,11 @@ SELECT
 
     m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
+    model_weights.token as `maybe_model_weights_token: tokens::tokens::model_weights::ModelWeightToken`,
+    model_weights.title as maybe_model_weights_title,
+    model_weights.weights_type as `maybe_model_weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
+    model_weights.weights_category as `maybe_model_weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
+
     m.public_bucket_directory_hash,
     m.maybe_public_bucket_prefix,
     m.maybe_public_bucket_extension,
@@ -146,6 +168,8 @@ SELECT
 FROM media_files AS m
 LEFT OUTER JOIN users
     ON m.maybe_creator_user_token = users.token
+LEFT OUTER JOIN model_weights
+    ON m.maybe_origin_model_token = model_weights.token
 WHERE
     m.token = ?
         "#,
@@ -174,6 +198,11 @@ SELECT
 
     m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
+    model_weights.token as `maybe_model_weights_token: tokens::tokens::model_weights::ModelWeightToken`,
+    model_weights.title as maybe_model_weights_title,
+    model_weights.weights_type as `maybe_model_weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
+    model_weights.weights_category as `maybe_model_weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
+
     m.public_bucket_directory_hash,
     m.maybe_public_bucket_prefix,
     m.maybe_public_bucket_extension,
@@ -184,6 +213,8 @@ SELECT
 FROM media_files AS m
 LEFT OUTER JOIN users
     ON m.maybe_creator_user_token = users.token
+LEFT OUTER JOIN model_weights
+    ON m.maybe_origin_model_token = model_weights.token
 WHERE
     m.token = ?
     AND m.user_deleted_at IS NULL
