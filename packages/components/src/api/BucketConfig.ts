@@ -30,7 +30,7 @@ class BucketConfig {
     const basePath = this.isLocalDev
       ? "https://dev-cdn.fakeyou.com"
       : "https://cdn.fakeyou.com";
-    let path = bucketRelativePath.startsWith("/")
+    let path = bucketRelativePath?.startsWith("/")
       ? bucketRelativePath
       : "/" + bucketRelativePath;
     let resizeParams = "";

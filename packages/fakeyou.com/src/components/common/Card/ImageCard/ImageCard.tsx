@@ -12,15 +12,22 @@ import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface ImageCardProps {
-  bookmarks: any,
+  bookmarks: any;
   data: any;
   type: "media" | "weights";
   showCreator?: boolean;
 }
 
-export default function ImageCard({ bookmarks, data, type, showCreator }: ImageCardProps) {
+export default function ImageCard({
+  bookmarks,
+  data,
+  type,
+  showCreator,
+}: ImageCardProps) {
   const linkUrl =
-    type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}`;
+    type === "media"
+      ? `/media/${data.token}`
+      : `/weight/${data.weight_token || data.details.entity_token}`;
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
@@ -34,16 +41,40 @@ export default function ImageCard({ bookmarks, data, type, showCreator }: ImageC
   };
 
   const { label: weightBadgeLabel, color: weightBadgeColor } =
-    useWeightTypeInfo(data.weights_type);
+    useWeightTypeInfo(
+      data.weights_type || data.details?.maybe_weights_data?.weights_type
+    );
 
-  const imageLink = new BucketConfig().getGcsUrl(data.public_bucket_path);
+  const bucketConfig = new BucketConfig();
+  let coverImage = "/images/avatars/default-pfp.png";
+
+  if (type === "media") {
+    coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 400, 100);
+  } else if (type === "weights") {
+    if (data.maybe_cover_image_public_bucket_path) {
+      coverImage = bucketConfig.getCdnUrl(
+        data.maybe_cover_image_public_bucket_path,
+        400,
+        100
+      );
+    }
+    if (
+      data.details?.maybe_weights_data?.maybe_cover_image_public_bucket_path
+    ) {
+      coverImage = bucketConfig.getCdnUrl(
+        data.details?.maybe_weights_data?.maybe_cover_image_public_bucket_path,
+        400,
+        100
+      );
+    }
+  }
 
   return (
     <Link to={linkUrl}>
       <Card padding={false} canHover={true}>
         {type === "media" && (
           <>
-            <img src={imageLink} alt={data.weight_name} className="card-img" />
+            <img src={coverImage} alt={data.weight_name} className="card-img" />
             <div className="card-img-overlay">
               <div className="card-img-gradient" />
 
@@ -93,14 +124,7 @@ export default function ImageCard({ bookmarks, data, type, showCreator }: ImageC
 
         {type === "weights" && (
           <>
-            <img
-              src={
-                data.maybe_cover_image_public_bucket_path ||
-                "/images/avatars/default-pfp.png"
-              }
-              alt={data.title}
-              className="card-img"
-            />
+            <img src={coverImage} alt={data.title} className="card-img" />
             <div className="card-img-overlay">
               <div className="card-img-gradient" />
               <div className="d-flex align-items-center">
@@ -125,7 +149,7 @@ export default function ImageCard({ bookmarks, data, type, showCreator }: ImageC
                 <div className="d-flex align-items-center mt-3">
                   <div className="flex-grow-1">
                     <h6 className="fw-semibold text-white mb-1">
-                      {data.title}
+                      {data.title || data.details?.maybe_weights_data?.title}
                     </h6>
                     <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
                   </div>
@@ -156,11 +180,13 @@ export default function ImageCard({ bookmarks, data, type, showCreator }: ImageC
                   <div>
                     <LikeButton onToggle={handleLike} likeCount={data.likes} />
                   </div>
-                  <BookmarkButton {...{
-                    entityToken: data.weight_token,
-                    entityType: "model_weight",
-                    onToggle: bookmarks.toggle,
-                  }}/>
+                  <BookmarkButton
+                    {...{
+                      entityToken: data.weight_token,
+                      entityType: "model_weight",
+                      onToggle: bookmarks.toggle,
+                    }}
+                  />
                 </div>
               </div>
             </div>

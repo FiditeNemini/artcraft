@@ -1,8 +1,5 @@
 import React, { useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-import AudioCard from "components/common/Card/AudioCard";
-import ImageCard from "components/common/Card/ImageCard";
-import VideoCard from "components/common/Card/VideoCard";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { TempSelect } from "components/common";
 import {
@@ -13,6 +10,7 @@ import Pagination from "components/common/Pagination";
 
 import { useBookmarks, useListContent } from "hooks";
 import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
+import WeightsCards from "components/common/Card/WeightsCards";
 
 export default function BookmarksTab({ username }: { username: string }) {
   const bookmarks = useBookmarks();
@@ -90,19 +88,6 @@ export default function BookmarksTab({ username }: { username: string }) {
     { value: "SDXL", label: "SD XL" },
   ];
 
-  const Card = ({ props, type }: { props: any; type: string }) => {
-    switch (type) {
-      case "audio":
-        return <AudioCard {...props} />;
-      case "image":
-        return <ImageCard {...props} />;
-      case "video":
-        return <VideoCard {...props} />;
-      default:
-        return <div>Unsupported media type</div>;
-    }
-  };
-
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
@@ -177,7 +162,12 @@ export default function BookmarksTab({ username }: { username: string }) {
                 onLayoutComplete={() => console.log("Layout complete!")}
               >
                 {dataList.map((data: any, key: number) => {
-                  let props = { bookmarks, data, type: "weights" };
+                  let props = {
+                    bookmarks,
+                    data,
+                    type: "weights",
+                    showCreator: true,
+                  };
 
                   return (
                     <div
@@ -186,7 +176,13 @@ export default function BookmarksTab({ username }: { username: string }) {
                         key,
                       }}
                     >
-                      <Card {...{ type: data.media_type, props }} />
+                      <WeightsCards
+                        {...{
+                          type: data.details.maybe_weights_data
+                            .weights_category,
+                          props,
+                        }}
+                      />
                     </div>
                   );
                 })}
