@@ -9,17 +9,10 @@ interface MediaImageComponentProps {
 export default function MediaImageComponent({
   mediaFile,
 }: MediaImageComponentProps) {
-  const imagePath = new BucketConfig().getGcsUrl(
-    mediaFile.public_bucket_path
-  );
+  const imagePath = new BucketConfig().getGcsUrl(mediaFile.public_bucket_path);
   return (
     <div>
-      <img
-        src={imagePath}
-        alt="test"
-        width="400"
-        height="300"
-      />
+      <img src={imagePath} alt="test" />
     </div>
   );
 }

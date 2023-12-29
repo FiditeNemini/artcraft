@@ -50,7 +50,7 @@ export default function AudioCard({
 
   const { label: weightBadgeLabel, color: weightBadgeColor } =
     useWeightTypeInfo(
-      data.weight_type || data.details?.maybe_weights_data?.weight_type
+      data.weight_type || data.details?.maybe_weight_data?.weight_type
     );
 
   const bucketConfig = new BucketConfig();
@@ -66,11 +66,9 @@ export default function AudioCard({
         100
       );
     }
-    if (
-      data.details?.maybe_weights_data?.maybe_cover_image_public_bucket_path
-    ) {
+    if (data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path) {
       coverImage = bucketConfig.getCdnUrl(
-        data.details?.maybe_weights_data?.maybe_cover_image_public_bucket_path,
+        data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path,
         100,
         100
       );
@@ -157,7 +155,7 @@ export default function AudioCard({
                 <div className="d-flex align-items-center mt-3">
                   <div className="flex-grow-1">
                     <h6 className="fw-semibold text-white mb-1">
-                      {data.title || data.details.maybe_weights_data.title}
+                      {data.title || data.details.maybe_weight_data.title}
                     </h6>
                     <p className="fs-7 opacity-75">{timeAgo}</p>
                   </div>

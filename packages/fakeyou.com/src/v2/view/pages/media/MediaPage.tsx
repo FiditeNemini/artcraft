@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import MediaAudioComponent from "./MediaAudioComponent";
 import MediaVideoComponent from "./MediaVideoComponent";
-import MediaImageComponent from "./MediaImageComponent";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import {
   GetMediaFile,
@@ -37,6 +36,7 @@ import LikeButton from "components/common/LikeButton";
 import Badge from "components/common/Badge";
 import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
 import { useBookmarks } from "hooks";
+import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -111,7 +111,18 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         );
 
       case MediaFileType.Image:
-        return <MediaImageComponent mediaFile={mediaFile} />;
+        let sdMediaImage = "/images/avatars/default-pfp.png";
+        if (
+          mediaFile.maybe_model_weight_info &&
+          mediaFile.maybe_model_weight_info
+            .maybe_cover_image_public_bucket_path !== null
+        ) {
+          sdMediaImage = bucketConfig.getGcsUrl(
+            mediaFile.maybe_model_weight_info
+              .maybe_cover_image_public_bucket_path
+          );
+        }
+        return <SdCoverImagePanel src={sdMediaImage} />;
       default:
         return <div>Unsupported media type</div>;
     }

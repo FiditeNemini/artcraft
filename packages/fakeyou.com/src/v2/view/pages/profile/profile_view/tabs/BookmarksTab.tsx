@@ -189,7 +189,7 @@ export default function BookmarksTab({ username }: { username: string }) {
                     >
                       <WeightsCards
                         {...{
-                          type: data.details.maybe_weights_data.weight_category,
+                          type: data.details.maybe_weight_data.weight_category,
                           props: weightProps,
                         }}
                       />
