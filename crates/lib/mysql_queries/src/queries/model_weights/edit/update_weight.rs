@@ -3,17 +3,22 @@ use sqlx::{MySql, MySqlPool, QueryBuilder};
 
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 pub struct UpdateWeightArgs<'a> {
     pub weight_token: &'a ModelWeightToken,
     pub title: Option<&'a str>,
+    pub cover_image: Option<CoverImageOption<'a>>,
     pub maybe_description_markdown: Option<&'a str>,
     pub maybe_description_rendered_html: Option<&'a str>,
     pub creator_set_visibility: Option<&'a Visibility>,
-    pub weights_type: Option<String>,
-    pub weights_category: Option<String>,
     pub mysql_pool: &'a MySqlPool,
+}
+
+pub enum CoverImageOption<'a> {
+    ClearCoverImage,
+    SetCoverImage(&'a MediaFileToken),
 }
 
 pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
@@ -21,8 +26,8 @@ pub async fn update_weights(args: UpdateWeightArgs<'_>) -> AnyhowResult<()> {
         && args.maybe_description_markdown.is_none()
         && args.maybe_description_rendered_html.is_none()
         && args.creator_set_visibility.is_none()
-        && args.weights_type.is_none()
-        && args.weights_category.is_none(){
+        && args.cover_image.is_none()
+    {
         return Err(anyhow!("No fields to update"));
     }
 
@@ -51,13 +56,16 @@ SET
         separated.push("creator_set_visibility = ");
         separated.push_bind_unseparated(creator_set_visibility.to_str());
     }
-    if let Some(weights_type) = args.weights_type {
-        separated.push("weights_type = ");
-        separated.push_bind_unseparated(weights_type);
-    }
-    if let Some(weights_category) = args.weights_category {
-        separated.push("weights_category = ");
-        separated.push_bind_unseparated(weights_category);
+    if let Some(cover_image_option) = args.cover_image {
+        match cover_image_option {
+            CoverImageOption::ClearCoverImage => {
+                separated.push(" maybe_cover_image_media_file_token = NULL ");
+            }
+            CoverImageOption::SetCoverImage(media_file_token) => {
+                separated.push("maybe_cover_image_media_file_token = ");
+                separated.push_bind_unseparated(media_file_token.as_str());
+            }
+        }
     }
 
     separated.push("version = version + 1");

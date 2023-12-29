@@ -7,28 +7,32 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use log::warn;
 use utoipa::ToSchema;
+use enums::by_table::media_files::media_file_type::MediaFileType;
 
 use enums::common::visibility::Visibility;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::model_weights::edit::update_weight::{update_weights, UpdateWeightArgs};
+use mysql_queries::queries::media_files::get_media_file::get_media_file;
+use mysql_queries::queries::model_weights::edit::update_weight::{CoverImageOption, update_weights, UpdateWeightArgs};
 use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
 
 use crate::server_state::ServerState;
 
-/// TODO will eventually be polymorphic
+// TODO will eventually be polymorphic
+/// **IMPORTANT**: This endpoint handles sparse (by-field) updates rather than wholesale updates.
+/// That is, if a field is absent, we do not update it (as opposed to clearing it).
 #[derive(Deserialize, ToSchema)]
 pub struct UpdateWeightRequest {
     pub title: Option<String>,
     pub description_markdown: Option<String>,
-    // KS: We should probably remove this
-    // Users have to update markdown, not html directly
-    pub description_rendered_html: Option<String>,
-    pub weight_type: Option<String>,
-    pub weight_category: Option<String>,
+
+    /// The media file token of the *image* media file.
+    /// Set to *empty string* to clear the cover image.
+    pub cover_image_media_file_token: Option<MediaFileToken>,
     pub visibility: Option<Visibility>,
 }
 
@@ -144,15 +148,38 @@ pub async fn update_weight_handler(
     }
 
     let mut weight_title = None;
+    let mut cover_image = None;
     let mut description_markdown = None;
     let mut description_rendered_html = None;
-
 
     if let Some(title) = &request.title {
         if (contains_slurs(title)) {
             return Err(UpdateWeightError::BadInput("Title contains slurs".to_string()));
         }
         weight_title = Some(title.trim().to_string());
+    }
+
+    if let Some(media_file_token) = &request.cover_image_media_file_token {
+        if media_file_token.as_str().trim().is_empty() {
+            cover_image = Some(CoverImageOption::ClearCoverImage);
+        } else {
+            let maybe_media_file = get_media_file(
+                media_file_token,
+                false, // NB: Even mods shouldn't set deleted media files.
+                &server_state.mysql_pool
+            ).await.map_err(|err| {
+                warn!("Error looking up media file: {:?}", err);
+                UpdateWeightError::ServerError
+            })?;
+
+            let maybe_media_file_type = maybe_media_file.map(|media_file| media_file.media_type);
+
+            match maybe_media_file_type {
+                Some(MediaFileType::Image) => cover_image = Some(CoverImageOption::SetCoverImage(media_file_token)),
+                None => return Err(UpdateWeightError::BadInput("Media file does not exist".to_string())),
+                _ => return Err(UpdateWeightError::BadInput("Media file is the wrong type".to_string())),
+            }
+        }
     }
 
     if let Some(markdown) = &request.description_markdown {
@@ -169,11 +196,10 @@ pub async fn update_weight_handler(
         weight_token: &ModelWeightToken::new(path.weight_token.clone()),
         mysql_pool: &server_state.mysql_pool,
         title: weight_title.as_deref(),
+        cover_image,
         maybe_description_markdown: description_markdown.as_deref(),
         maybe_description_rendered_html: description_rendered_html.as_deref(),
         creator_set_visibility: request.visibility.as_ref(),
-        weights_type: request.weight_type.as_deref().map(|s| s.to_string()),
-        weights_category: request.weight_category.as_deref().map(|s| s.to_string()),
     }).await;
 
     match query_result {
