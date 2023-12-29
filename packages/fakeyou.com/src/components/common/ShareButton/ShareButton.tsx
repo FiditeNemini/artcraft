@@ -26,7 +26,7 @@ export default function ShareButton(props: ShareButtonProps) {
     <div className="d-flex">
       <Tippy
         content={tippyContent}
-        hideOnClick={false}
+        hideOnClick={true}
         placement="bottom"
         theme="fakeyou"
         arrow={false}

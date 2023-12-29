@@ -18,8 +18,6 @@ import {
   faCircleExclamation,
   faFaceViewfinder,
   faArrowDownToLine,
-  // faCirclePlay,
-  // faShare,
   faSquareQuote,
   faShare,
   faLink,
@@ -35,6 +33,10 @@ import WeightCoverImage from "components/common/WeightCoverImage";
 import SocialButton from "components/common/SocialButton";
 import Modal from "components/common/Modal";
 import { Input } from "components/common";
+import LikeButton from "components/common/LikeButton";
+import Badge from "components/common/Badge";
+import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
+import { useBookmarks } from "hooks";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -66,6 +68,8 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   useEffect(() => {
     getMediaFile(token);
   }, [token, getMediaFile]);
+
+  const bookmarks = useBookmarks();
 
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
@@ -112,6 +116,11 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         return <div>Unsupported media type</div>;
     }
   }
+
+  const weightTypeInfo = useMediaFileTypeInfo(
+    mediaFile?.media_type || MediaFileType.None
+  );
+  const { label: mediaType, color: mediaTagColor } = weightTypeInfo;
 
   let audioLink = new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path);
 
@@ -286,9 +295,61 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     setTimeout(() => setButtonLabel("Copy"), 1000);
   };
 
+  const subtitleDivider = <span className="opacity-25 fs-5 fw-light">|</span>;
+
   return (
     <div>
-      <Container type="panel" className="pt-4 pt-lg-5">
+      <Container type="panel" className="mb-5">
+        <Panel clear={true} className="py-4">
+          <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
+            <div>
+              <div className="d-flex gap-2 align-items-center flex-wrap">
+                <h1 className="fw-bold mb-2">
+                  {mediaFile.maybe_model_weight_info?.title ||
+                    `Media ${mediaType}`}
+                </h1>
+              </div>
+              <div className="d-flex gap-3 flex-wrap align-items-center">
+                <div className="d-flex gap-2 align-items-center flex-wrap">
+                  <div>
+                    <Badge label={mediaType} color={mediaTagColor} />
+                  </div>
+                  {subtitleDivider}
+
+                  {mediaFile.maybe_model_weight_info && (
+                    <>
+                      <p>
+                        {mediaFile.maybe_model_weight_info?.weight_category}
+                      </p>
+                      {subtitleDivider}
+                    </>
+                  )}
+
+                  <div className="d-flex align-items-center gap-2">
+                    <LikeButton
+                      {...{
+                        entityToken: token,
+                        entityType: "media_file",
+                        likeCount: 1200,
+                        onToggle: bookmarks.toggle,
+                        large: true,
+                      }}
+                    />
+                    {/* <BookmarkButton
+                        {...{
+                          entityToken: weight_token,
+                          entityType: "model_weight",
+                          onToggle: bookmarks.toggle,
+                          large: true,
+                        }}
+                      /> */}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Panel>
+
         <div className="row g-4">
           <div className="col-12 col-xl-8">
             <div className="media-wrapper">
@@ -374,30 +435,46 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                       <p className="fw-medium text-white">Anonymous</p>
                     )}
 
-                    <p className="fs-7">Created: {timeCreated}</p>
+                    <p className="fs-7">Created {timeCreated}</p>
                   </div>
                 </div>
               </Panel>
 
-              <Panel className="rounded">
-                <div className="d-flex flex-column gap-2 p-3">
-                  <h6 className="fw-medium mb-0">Weight Used</h6>
-                  <hr className="my-1" />
-                  <div className="d-flex align-items-center">
-                    <WeightCoverImage
-                      src="/images/dummy-image.jpg"
-                      height={60}
-                      width={60}
-                    />
-                    <div className="d-flex flex-column">
-                      <Link to="/">
-                        <h6 className="mb-1">Weight Name</h6>
-                      </Link>
-                      <p className="fs-7">by hanashi</p>
+              {mediaFile.maybe_model_weight_info && (
+                <Panel className="rounded">
+                  <div className="d-flex flex-column gap-2 p-3">
+                    <h6 className="fw-medium mb-0">Weight Used</h6>
+                    <hr className="my-1" />
+                    <div className="d-flex align-items-center">
+                      <WeightCoverImage
+                        src="/images/dummy-image.jpg"
+                        height={60}
+                        width={60}
+                      />
+                      <div className="d-flex flex-column">
+                        <Link
+                          to={`/weight/${mediaFile.maybe_model_weight_info.weight_token}`}
+                        >
+                          <h6 className="mb-1">
+                            {mediaFile.maybe_model_weight_info.title}
+                          </h6>
+                        </Link>
+                        <p className="fs-7">
+                          by{" "}
+                          <Link
+                            to={`/profile/${mediaFile.maybe_model_weight_info.maybe_weight_creator.username}`}
+                          >
+                            {
+                              mediaFile.maybe_model_weight_info
+                                .maybe_weight_creator.display_name
+                            }
+                          </Link>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Panel>
+                </Panel>
+              )}
 
               <Accordion>
                 <Accordion.Item title="Media Details" defaultOpen={true}>
