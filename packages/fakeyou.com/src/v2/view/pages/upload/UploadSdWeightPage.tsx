@@ -83,16 +83,26 @@ export default function UploadSdWeightPage({
           <SplitPanel dividerFooter={true}>
             <SplitPanel.Body padding={true}>
               <div className="row gx-4 gy-3">
-                <div className="col-12 col-lg-4">
+                <div className="col-12 col-lg-5">
                   <label className="sub-title required">Cover Image</label>
                 </div>
-                <div className="col-12 col-lg-8 d-flex flex-column gap-3 order-first order-lg-last">
+                <div className="col-12 col-lg-7 d-flex flex-column gap-3 order-first order-lg-last">
                   <div>
                     <TempInput
                       {...{
                         label: "Title",
                         name: "title",
                         placeholder: "Title",
+                        required: true,
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <TempInput
+                      {...{
+                        label: "Download URL, eg. Google Drive link",
+                        name: "Url",
+                        placeholder: "Download URL",
                         required: true,
                       }}
                     />
