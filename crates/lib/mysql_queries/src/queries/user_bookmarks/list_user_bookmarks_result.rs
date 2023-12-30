@@ -22,6 +22,11 @@ pub struct UserBookmark {
   pub maybe_media_file_public_bucket_prefix: Option<String>,
   pub maybe_media_file_public_bucket_extension: Option<String>,
 
+  pub maybe_media_file_creator_user_token: Option<UserToken>,
+  pub maybe_media_file_creator_username: Option<String>,
+  pub maybe_media_file_creator_display_name: Option<String>,
+  pub maybe_media_file_creator_gravatar_hash: Option<String>,
+
   /// Something descriptive about the bookmarked entity.
   /// This might be TTS text, a username, etc. It depends on the entity type.
   pub maybe_entity_descriptive_text: Option<String>,
@@ -42,6 +47,12 @@ pub struct UserBookmark {
   /// Only set if the bookmark is of a media_files record *AND* the model has a cover image.
   pub maybe_model_weight_cover_image_public_bucket_extension: Option<String>,
 
+  pub maybe_model_weight_creator_user_token: Option<UserToken>,
+  pub maybe_model_weight_creator_username: Option<String>,
+  pub maybe_model_weight_creator_display_name: Option<String>,
+  pub maybe_model_weight_creator_gravatar_hash: Option<String>,
+
+  // TODO(bt,2023-12-30): I don't think these user fields are necessary.
   pub user_token: UserToken,
   pub username: String,
   pub user_display_name: String,
@@ -58,6 +69,7 @@ pub struct RawUserBookmarkRecord {
   pub (crate) entity_type: UserBookmarkEntityType,
   pub (crate) entity_token: String,
 
+  // TODO(bt,2023-12-30): I don't think these user fields are necessary.
   pub (crate) user_token: UserToken,
   pub (crate) username: String,
   pub (crate) user_display_name: String,
@@ -73,12 +85,22 @@ pub struct RawUserBookmarkRecord {
   pub (crate) maybe_media_file_public_bucket_prefix: Option<String>,
   pub (crate) maybe_media_file_public_bucket_extension: Option<String>,
 
+  pub (crate) maybe_media_file_creator_user_token: Option<UserToken>,
+  pub (crate) maybe_media_file_creator_username: Option<String>,
+  pub (crate) maybe_media_file_creator_display_name: Option<String>,
+  pub (crate) maybe_media_file_creator_gravatar_hash: Option<String>,
+
   pub (crate) maybe_model_weight_type: Option<WeightsType>,
   pub (crate) maybe_model_weight_category: Option<WeightsCategory>,
 
   pub (crate) maybe_model_weight_cover_image_public_bucket_hash: Option<String>,
   pub (crate) maybe_model_weight_cover_image_public_bucket_prefix: Option<String>,
   pub (crate) maybe_model_weight_cover_image_public_bucket_extension: Option<String>,
+
+  pub (crate) maybe_model_weight_creator_user_token: Option<UserToken>,
+  pub (crate) maybe_model_weight_creator_username: Option<String>,
+  pub (crate) maybe_model_weight_creator_display_name: Option<String>,
+  pub (crate) maybe_model_weight_creator_gravatar_hash: Option<String>,
 
   pub (crate) maybe_descriptive_text_model_weight_title: Option<String>,
   pub (crate) maybe_descriptive_text_tts_model_title: Option<String>,
@@ -98,6 +120,10 @@ impl RawUserBookmarkRecord {
       maybe_media_file_public_bucket_hash: self.maybe_media_file_public_bucket_hash,
       maybe_media_file_public_bucket_prefix: self.maybe_media_file_public_bucket_prefix,
       maybe_media_file_public_bucket_extension: self.maybe_media_file_public_bucket_extension,
+      maybe_media_file_creator_user_token: self.maybe_media_file_creator_user_token,
+      maybe_media_file_creator_username: self.maybe_media_file_creator_username,
+      maybe_media_file_creator_display_name: self.maybe_media_file_creator_display_name,
+      maybe_media_file_creator_gravatar_hash: self.maybe_media_file_creator_gravatar_hash,
       maybe_entity_descriptive_text: match self.entity_type {
         UserBookmarkEntityType::User => self.maybe_descriptive_text_user_display_name,
         UserBookmarkEntityType::ModelWeight => self.maybe_descriptive_text_model_weight_title,
@@ -120,6 +146,10 @@ impl RawUserBookmarkRecord {
       maybe_model_weight_cover_image_public_bucket_hash: self.maybe_model_weight_cover_image_public_bucket_hash,
       maybe_model_weight_cover_image_public_bucket_prefix: self.maybe_model_weight_cover_image_public_bucket_prefix,
       maybe_model_weight_cover_image_public_bucket_extension: self.maybe_model_weight_cover_image_public_bucket_extension,
+      maybe_model_weight_creator_user_token: self.maybe_model_weight_creator_user_token,
+      maybe_model_weight_creator_username: self.maybe_model_weight_creator_username,
+      maybe_model_weight_creator_display_name: self.maybe_model_weight_creator_display_name,
+      maybe_model_weight_creator_gravatar_hash: self.maybe_model_weight_creator_gravatar_hash,
       user_token: self.user_token,
       username: self.username,
       user_display_name: self.user_display_name,
@@ -149,11 +179,19 @@ impl FromRow<'_, MySqlRow> for RawUserBookmarkRecord {
         maybe_media_file_public_bucket_hash: row.try_get("maybe_media_file_public_bucket_hash")?,
         maybe_media_file_public_bucket_prefix: row.try_get("maybe_media_file_public_bucket_prefix")?,
         maybe_media_file_public_bucket_extension: row.try_get("maybe_media_file_public_bucket_extension")?,
+        maybe_media_file_creator_user_token: row.try_get("maybe_media_file_creator_user_token")?,
+        maybe_media_file_creator_username: row.try_get("maybe_media_file_creator_username")?,
+        maybe_media_file_creator_display_name: row.try_get("maybe_media_file_creator_display_name")?,
+        maybe_media_file_creator_gravatar_hash: row.try_get("maybe_media_file_creator_gravatar_hash")?,
         maybe_model_weight_type: WeightsType::try_from_mysql_row_nullable(row, "maybe_model_weight_type")?,
         maybe_model_weight_category: WeightsCategory::try_from_mysql_row_nullable(row, "maybe_model_weight_category")?,
         maybe_model_weight_cover_image_public_bucket_hash: row.try_get("maybe_model_weight_cover_image_public_bucket_hash")?,
         maybe_model_weight_cover_image_public_bucket_prefix: row.try_get("maybe_model_weight_cover_image_public_bucket_prefix")?,
         maybe_model_weight_cover_image_public_bucket_extension: row.try_get("maybe_model_weight_cover_image_public_bucket_extension")?,
+        maybe_model_weight_creator_user_token: row.try_get("maybe_model_weight_creator_user_token")?,
+        maybe_model_weight_creator_username: row.try_get("maybe_model_weight_creator_username")?,
+        maybe_model_weight_creator_display_name: row.try_get("maybe_model_weight_creator_display_name")?,
+        maybe_model_weight_creator_gravatar_hash: row.try_get("maybe_model_weight_creator_gravatar_hash")?,
         maybe_descriptive_text_model_weight_title: row.try_get("maybe_descriptive_text_model_weight_title")?,
         maybe_descriptive_text_tts_model_title: row.try_get("maybe_descriptive_text_tts_model_title")?,
         maybe_descriptive_text_tts_result_inference_text: row.try_get("maybe_descriptive_text_tts_result_inference_text")?,

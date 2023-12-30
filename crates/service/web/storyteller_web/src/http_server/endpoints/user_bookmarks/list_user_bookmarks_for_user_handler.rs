@@ -23,6 +23,7 @@ use mysql_queries::queries::user_bookmarks::list_user_bookmarks::{list_user_book
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
 use crate::http_server::common_responses::pagination_page::PaginationPage;
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -98,6 +99,9 @@ pub struct MediaFileData {
 
   /// URL to the media file.
   pub public_bucket_path: String,
+
+  /// Creator of the media file
+  pub maybe_creator: Option<UserDetailsLight>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -109,6 +113,11 @@ pub struct WeightsData {
   /// Cover images are small descriptive images that can be set for any model.
   /// If a cover image is set, this is the path to the asset.
   pub maybe_cover_image_public_bucket_path: Option<String>,
+
+  /// Creator of the weight
+  /// NB: Technically this should not be optional, but since the join is
+  /// incredibly telescopic, we may as well make it optional for now.
+  pub maybe_creator: Option<UserDetailsLight>,
 }
 
 #[derive(Debug, ToSchema)]
@@ -197,6 +206,7 @@ pub async fn list_user_bookmarks_for_user_handler(
                     .get_full_object_path_str()
                     .to_string()
               });
+
           let maybe_model_weight_cover_image = user_bookmark.maybe_model_weight_cover_image_public_bucket_hash
               .as_deref()
               .map(|hash| {
@@ -207,6 +217,20 @@ pub async fn list_user_bookmarks_for_user_handler(
                     .get_full_object_path_str()
                     .to_string()
               });
+
+          let maybe_media_file_creator = UserDetailsLight::from_optional_db_fields(
+            user_bookmark.maybe_media_file_creator_user_token.as_ref(),
+            user_bookmark.maybe_media_file_creator_username.as_deref(),
+            user_bookmark.maybe_media_file_creator_display_name.as_deref(),
+            user_bookmark.maybe_media_file_creator_gravatar_hash.as_deref(),
+          );
+
+          let maybe_model_weight_creator = UserDetailsLight::from_optional_db_fields(
+            user_bookmark.maybe_model_weight_creator_user_token.as_ref(),
+            user_bookmark.maybe_model_weight_creator_username.as_deref(),
+            user_bookmark.maybe_model_weight_creator_display_name.as_deref(),
+            user_bookmark.maybe_model_weight_creator_gravatar_hash.as_deref(),
+          );
 
           UserBookmarkListItem {
             token: user_bookmark.token,
@@ -219,6 +243,7 @@ pub async fn list_user_bookmarks_for_user_handler(
                   // TODO(bt,2023-12-28): Proper default, optional, or "unknown" values would be better.
                   media_type: user_bookmark.maybe_media_file_type.unwrap_or(MediaFileType::Image),
                   public_bucket_path: path,
+                  maybe_creator: maybe_media_file_creator,
                 }),
               },
               maybe_weight_data: match user_bookmark.entity_type {
@@ -228,6 +253,7 @@ pub async fn list_user_bookmarks_for_user_handler(
                   weight_type: user_bookmark.maybe_model_weight_type.unwrap_or(WeightsType::Tacotron2),
                   weight_category: user_bookmark.maybe_model_weight_category.unwrap_or(WeightsCategory::TextToSpeech),
                   maybe_cover_image_public_bucket_path: maybe_model_weight_cover_image,
+                  maybe_creator: maybe_model_weight_creator,
                 }),
                 _ => None,
               },
