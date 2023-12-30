@@ -67,9 +67,18 @@ export default function WeightPage({
   const { weight_token } = useParams<{ weight_token: string }>();
   const origin = search ? new URLSearchParams(search).get("origin") : "";
   const history = useHistory();
-  const { data: weight, descriptionMD, fetchError, isLoading, title, remove } = useWeightFetch({
-    onRemove: () => { history.push(origin || ""); },
-    token: weight_token
+  const {
+    data: weight,
+    descriptionMD,
+    fetchError,
+    isLoading,
+    title,
+    remove,
+  } = useWeightFetch({
+    onRemove: () => {
+      history.push(origin || "");
+    },
+    token: weight_token,
   });
 
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
@@ -84,7 +93,7 @@ export default function WeightPage({
   const bucketConfig = new BucketConfig();
 
   const weightTypeInfo = useWeightTypeInfo(
-    weight?.weights_type || WeightType.NONE
+    weight?.weight_type || WeightType.NONE
   );
   const {
     label: weightType,
@@ -93,7 +102,7 @@ export default function WeightPage({
   } = weightTypeInfo;
 
   function renderWeightComponent(weight: Weight) {
-    switch (weight.weights_category) {
+    switch (weight.weight_category) {
       case WeightCategory.TTS:
         return (
           <TtsInferencePanel
@@ -221,7 +230,7 @@ export default function WeightPage({
       [WeightCategory.VOCODER]: { weightCategory: "Vocoder" },
     };
 
-  let { weightCategory } = weightCategoryMap[weight.weights_category] || {
+  let { weightCategory } = weightCategoryMap[weight.weight_category] || {
     weightCategory: "none",
   };
 
@@ -230,7 +239,7 @@ export default function WeightPage({
     { property: "Category", value: weightCategory },
     {
       property: "Visibility",
-      value: weight.creator_set_visibility?.toString() || "",
+      value: weight.creator_set_visibility,
     },
     { property: "Created at", value: weight.created_at?.toString() || "" },
     { property: "Updated at", value: weight.updated_at?.toString() || "" },
@@ -241,7 +250,7 @@ export default function WeightPage({
     { property: "Category", value: weightCategory },
     {
       property: "Visibility",
-      value: weight.creator_set_visibility?.toString() || "",
+      value: weight.creator_set_visibility,
     },
     { property: "Created at", value: dateCreated || "" },
     { property: "Updated at", value: dateUpdated || "" },
@@ -251,7 +260,7 @@ export default function WeightPage({
 
   let weightDetails = undefined;
 
-  switch (weight.weights_category) {
+  switch (weight.weight_category) {
     case WeightCategory.TTS:
       weightDetails = <DataTable data={voiceDetails} />;
       break;
@@ -347,8 +356,8 @@ export default function WeightPage({
       <Container type="panel" className="mb-5">
         <Panel clear={true} className="py-4">
           <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
-            {(weight.weights_category === WeightCategory.VC ||
-              weight.weights_category === WeightCategory.TTS) && (
+            {(weight.weight_category === WeightCategory.VC ||
+              weight.weight_category === WeightCategory.TTS) && (
               <WeightCoverImage src={audioWeightCoverImage} />
             )}
             <div>

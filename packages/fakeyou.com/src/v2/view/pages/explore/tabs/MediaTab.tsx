@@ -33,7 +33,7 @@ export default function MediaTab() {
 
   const filterOptions = [
     { value: "all", label: "All Media" },
-    { value: "images", label: "Images" },
+    { value: "image", label: "Images" },
     { value: "audio", label: "Audio" },
     { value: "video", label: "Video" },
   ];
@@ -81,11 +81,14 @@ export default function MediaTab() {
             next={media.getMore}
             hasMore={!media.list.length || !!media.next}
             loader={
-              <div className="mt-4 d-flex justify-content-center">
-                <div className="spinner-border text-light" role="status">
-                  <span className="visually-hidden">Loading...</span>
+              media.list.length !== 0 &&
+              media.isLoading && (
+                <div className="mt-4 d-flex justify-content-center">
+                  <div className="spinner-border text-light" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
                 </div>
-              </div>
+              )
             }
             endMessage={
               <p className="text-center mt-4 opacity-75">No more results.</p>

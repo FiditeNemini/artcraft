@@ -11,6 +11,7 @@ import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import Button from "components/common/Button";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface AudioCardProps {
   bookmarks: any;
@@ -30,7 +31,11 @@ export default function AudioCard({
   showCover,
 }: AudioCardProps) {
   const linkUrl =
-    type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}${origin ? "?origin=" + origin + "&ehhh=mehh" : "" }`;
+    type === "media"
+      ? `/media/${data.token}`
+      : `/weight/${data.weight_token || data.details.entity_token}${
+          origin ? "?origin=" + origin + "&ehhh=mehh" : ""
+        }`;
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
@@ -44,10 +49,40 @@ export default function AudioCard({
   };
 
   const { label: weightBadgeLabel, color: weightBadgeColor } =
-    useWeightTypeInfo(data.weights_type);
+    useWeightTypeInfo(
+      data.weight_type || data.details?.maybe_weight_data?.weight_type
+    );
+
+  const bucketConfig = new BucketConfig();
+  let coverImage = "/images/avatars/default-pfp.png";
+
+  if (type === "media") {
+    coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 400, 100);
+  } else if (type === "weights") {
+    if (data.maybe_cover_image_public_bucket_path) {
+      coverImage = bucketConfig.getCdnUrl(
+        data.maybe_cover_image_public_bucket_path,
+        100,
+        100
+      );
+    }
+    if (data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path) {
+      coverImage = bucketConfig.getCdnUrl(
+        data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path,
+        100,
+        100
+      );
+    }
+  }
 
   return (
-    <Link {...{ to: linkUrl, state: { origin }, onClick: () => console.log("🌠 AUDIO CARD") }}>
+    <Link
+      {...{
+        to: linkUrl,
+        state: { origin },
+        onClick: () => console.log("🌠 AUDIO CARD"),
+      }}
+    >
       <Card padding={true} canHover={true}>
         {type === "media" && (
           <>
@@ -100,9 +135,7 @@ export default function AudioCard({
         {type === "weights" && (
           <>
             <div className="d-flex">
-              {showCover && (
-                <WeightCoverImage src="/images/avatars/default-pfp.png" />
-              )}
+              {showCover && <WeightCoverImage src={coverImage} />}
 
               <div className="flex-grow-1">
                 <div className="d-flex align-items-center">
@@ -122,7 +155,7 @@ export default function AudioCard({
                 <div className="d-flex align-items-center mt-3">
                   <div className="flex-grow-1">
                     <h6 className="fw-semibold text-white mb-1">
-                      {data.title}
+                      {data.title || data.details.maybe_weight_data.title}
                     </h6>
                     <p className="fs-7 opacity-75">{timeAgo}</p>
                   </div>
@@ -153,12 +186,13 @@ export default function AudioCard({
               <div>
                 <LikeButton onToggle={handleLike} likeCount={data.likes} />
               </div>
-              <BookmarkButton {...{
-                entityToken: data.weight_token,
-                entityType: "model_weight",
-                onToggle: bookmarks.toggle,
-                large: true,
-              }} />
+              <BookmarkButton
+                {...{
+                  entityToken: data.weight_token,
+                  entityType: "model_weight",
+                  onToggle: bookmarks.toggle,
+                }}
+              />
             </div>
           </>
         )}

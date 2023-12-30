@@ -9,6 +9,8 @@ import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia"
 import { useBookmarks, useLazyLists } from "hooks";
 import { ListFeaturedMediaFiles } from "@storyteller/components/src/api/media_files/ListFeaturedMediaFiles";
 import SkeletonCard from "components/common/Card/SkeletonCard";
+import ImageCard from "components/common/Card/ImageCard";
+import VideoCard from "components/common/Card/VideoCard";
 
 export default function FeaturedTab() {
   const bookmarks = useBookmarks();
@@ -23,7 +25,7 @@ export default function FeaturedTab() {
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
-    addQueries: { page_size: 12 },
+    debug: "featured media",
   });
 
   return (
@@ -55,22 +57,52 @@ export default function FeaturedTab() {
                   gridRef={gridContainerRef}
                   onLayoutComplete={() => console.log("Layout complete!")}
                 >
-                  {media.list.map((data, index) => {
-                    let card = (
-                      <AudioCard
-                        {...{
-                          bookmarks,
-                          data,
-                          type: "media",
-                          showCreator: true,
-                          showCover: true,
-                        }}
-                      />
-                    );
+                  {media.list.map((data: any, index: number) => {
+                    let card;
+                    switch (data.media_type) {
+                      case "audio":
+                        card = (
+                          <AudioCard
+                            {...{
+                              bookmarks,
+                              data,
+                              type: "media",
+                              showCreator: true,
+                            }}
+                          />
+                        );
+                        break;
+                      case "image":
+                        card = (
+                          <ImageCard
+                            {...{
+                              bookmarks,
+                              data,
+                              type: "media",
+                              showCreator: true,
+                            }}
+                          />
+                        );
+                        break;
+                      case "video":
+                        card = (
+                          <VideoCard
+                            {...{
+                              bookmarks,
+                              data,
+                              type: "media",
+                              showCreator: true,
+                            }}
+                          />
+                        );
+                        break;
+                      default:
+                        card = <div>Unsupported media type</div>;
+                    }
                     return (
                       <div
                         key={index}
-                        className="col-12 col-lg-6 col-xxl-4 grid-item"
+                        className="col-12 col-sm-6 col-xl-4 grid-item"
                       >
                         {card}
                       </div>

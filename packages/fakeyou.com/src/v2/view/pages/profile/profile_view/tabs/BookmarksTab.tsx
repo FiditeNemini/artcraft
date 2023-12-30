@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-import MediaCards from "components/common/Card/MediaCards";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { TempSelect } from "components/common";
 import {
@@ -12,6 +11,7 @@ import Pagination from "components/common/Pagination";
 
 import { useBookmarks, useListContent } from "hooks";
 import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
+import WeightsCards from "components/common/Card/WeightsCards";
 
 export default function BookmarksTab({ username }: { username: string }) {
   const { pathname: origin } = useLocation();
@@ -164,7 +164,21 @@ export default function BookmarksTab({ username }: { username: string }) {
                 onLayoutComplete={() => console.log("Layout complete!")}
               >
                 {dataList.map((data: any, key: number) => {
-                  let props = { bookmarks, data, origin, type: "weights" };
+                  let weightProps = {
+                    bookmarks,
+                    data,
+                    origin,
+                    type: "weights",
+                    showCreator: true,
+                  };
+
+                  // let mediaProps = {
+                  //   bookmarks,
+                  //   data,
+                  //   origin,
+                  //   type: "media",
+                  //   showCreator: true,
+                  // };
 
                   return (
                     <div
@@ -173,7 +187,15 @@ export default function BookmarksTab({ username }: { username: string }) {
                         key,
                       }}
                     >
-                      <MediaCards {...{ type: data.media_type, props }} />
+                      <WeightsCards
+                        {...{
+                          type: data.details.maybe_weight_data.weight_category,
+                          props: weightProps,
+                        }}
+                      />
+                      {/* <MediaCards
+                        {...{ type: data.media_type, props: mediaProps }}
+                      /> */}
                     </div>
                   );
                 })}

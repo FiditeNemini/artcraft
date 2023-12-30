@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
-import { GetWeight, Weight } from "@storyteller/components/src/api/weights/GetWeight";
+import {
+  GetWeight,
+  Weight,
+} from "@storyteller/components/src/api/weights/GetWeight";
 import { UpdateWeight } from "@storyteller/components/src/api/weights/UpdateWeight";
 import { DeleteWeight } from "@storyteller/components/src/api/weights/DeleteWeight";
 import { UploadMedia, UploadMediaResponse } from "@storyteller/components/src/api/media_files/UploadMedia";
@@ -28,7 +31,11 @@ export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
   const history = useHistory();
 
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
-    const todo: { [key: string]: (x: any) => void } = { descriptionMDSet, titleSet, visibilitySet };
+    const todo: { [key: string]: (x: any) => void } = {
+      descriptionMDSet,
+      titleSet,
+      visibilitySet,
+    };
     todo[target.name + "Set"](target.value);
   };
 
@@ -40,35 +47,30 @@ export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
       description_rendered_html: data?.description_rendered_html || "",
       title,
       visibility,
-      weight_category: data?.weights_category || "",
-      weight_type: data?.weights_type || ""
+      weight_category: data?.weight_category || "",
+      weight_type: data?.weight_type || "",
     })
-    .then((res: any) => {
-      console.log("📝",res);
-      writeStatusSet(FetchStatus.success);
-      history.replace(`/weight/${ token }`);
-    })
-    .catch(err => {
-      writeStatusSet(FetchStatus.error);
-    });
+      .then((res: any) => {
+        writeStatusSet(FetchStatus.success);
+        history.replace(`/weight/${token}`);
+      })
+      .catch(err => {
+        writeStatusSet(FetchStatus.error);
+      });
   };
 
   const remove = () => {
     writeStatusSet(FetchStatus.in_progress);
-    DeleteWeight(token,{
+    DeleteWeight(token, {
       as_mod: true,
-      set_delete: true
-    })
-    .then((res: any) => {
+      set_delete: true,
+    }).then((res: any) => {
       writeStatusSet(FetchStatus.success);
-      console.log("✂️",res);
       onRemove(res);
     });
   };
 
   const uploadCoverImg = (e: any) => {
-    console.log("🧲",!!imageProps.file, imgUploadStatus);
-    // e.stopPropigation();
     if (imageProps.file && imgUploadStatus < 2) {
       imgUploadStatusSet(FetchStatus.in_progress);
       UploadMedia({
@@ -89,18 +91,21 @@ export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
     if (token && !data && status === FetchStatus.ready) {
       statusSet(FetchStatus.in_progress);
       GetWeight(token, {})
-      .then((res: any) => {
-        let { creator_set_visibility, description_markdown, title: resTitle, ...response } = res;
-        console.log("🏋️", res, status);
-        statusSet(FetchStatus.success);
-        titleSet(resTitle);
-        descriptionMDSet(description_markdown);
-        visibilitySet(creator_set_visibility);
-        setData(response);
-      })
-      .catch(err => {
-        statusSet(FetchStatus.error);
-      });
+        .then((res: any) => {
+          let {
+            creator_set_visibility,
+            description_markdown,
+            title: resTitle,
+          } = res;
+          statusSet(FetchStatus.success);
+          titleSet(resTitle);
+          descriptionMDSet(description_markdown);
+          visibilitySet(creator_set_visibility);
+          setData(res);
+        })
+        .catch(err => {
+          statusSet(FetchStatus.error);
+        });
     }
   }, [status, token, data]);
 
