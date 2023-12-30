@@ -1,0 +1,88 @@
+@import "scss/_breakpoint.scss";
+@import "scss/breakpoints.scss";
+@import "scss/colours.scss";
+
+.weight-editor {
+    display: flex;
+
+    @include breakpoint($under992) {
+      flex-direction: column-reverse;
+    }
+    // background-color: red;
+
+  & > * {
+    flex-shrink: 0;
+    // margin-right: 1rem;
+    @include breakpoint($over992) {
+      width: 50%;
+      max-width: 50%;
+    }
+
+    @include breakpoint($under992) {
+      width: 100%;
+    }
+  }
+
+  textarea {
+    height: 10rem;
+    resize: none;
+  }
+
+  > :first-child {
+    // background-color: purple;
+  }
+
+  > :last-child {
+    // background-color: green;
+    padding-left: 2rem;
+  }
+
+
+  .fy-cover-img-input {
+    // background-color: red;
+    position: relative;
+    height: 0;
+    padding-bottom: 100%;
+
+    .fy-cover-control {
+      position: absolute;
+    }
+
+    .upload-control-btn {
+      background-color: rgba($secondary, .8);
+      backdrop-filter: blur(2px);
+      border: none;
+      margin: auto auto 1rem auto;
+    }
+  }
+
+  .weight-initial-cover-img {
+    background-size: cover;
+    background-position: center;
+    border-radius: .5rem;
+    position: absolute;
+    // display: flex;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    // padding-bottom: 100%;
+
+    div {
+      // background-color: red;
+      display: flex;
+      height: 100%;
+      width: 100%;
+      position: absolute;
+    }
+  }
+
+  .form-group {
+    margin-bottom: .75rem;
+  }
+
+  .upload-control-indicator {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+}

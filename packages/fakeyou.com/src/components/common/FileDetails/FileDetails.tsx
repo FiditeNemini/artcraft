@@ -1,16 +1,18 @@
 import React from 'react';
+import { a, useSpring } from '@react-spring/web';
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/pro-solid-svg-icons";
 import "./FileDetails.scss";
 
 interface Props {
   clear?: (file?: any) => void;
+  disabled?: boolean;
   file?: any;
   hideClearDetails?: boolean;
   icon?: any;
 }
 
-export default function FileDetails({ clear = () => {}, file, hideClearDetails, icon }: Props) {
+export default function FileDetails({ clear = () => {}, disabled, file, hideClearDetails, icon }: Props) {
   const fileSize =
     file && file.size >= 1024 * 1024
       ? (file.size / 1024 / 1024).toFixed(2) + " MB"
@@ -18,7 +20,12 @@ export default function FileDetails({ clear = () => {}, file, hideClearDetails, 
       ? `${Math.floor(file.size / 1024)} KB`
       : null;
 
-  return <div {...{ className: "fy-uploader-layout upload-details" }}>
+  const style = useSpring({
+    config: { mass: 1, tension: 120, friction: 14 },
+    opacity: disabled ? 0 : 1
+  });
+
+  return <a.div {...{ className: "fy-uploader-layout upload-details", style }}>
     { icon && <Icon {...{ className: "fy-uploader-layout-icon", icon }}/> }
     <div>
       <div {...{ className: "filename" }}>
@@ -32,5 +39,5 @@ export default function FileDetails({ clear = () => {}, file, hideClearDetails, 
     { !hideClearDetails && <button {...{ className: "upload-details-clear btn btn-destructive align-items-center justify-content-center", onClick: e => { e.preventDefault(); clear() } }}>
           <Icon {...{ icon: faTrash }}/>
     </button> }
-  </div>;
+  </a.div>;
 };

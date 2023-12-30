@@ -1,6 +1,7 @@
 import MakeRequest from "../MakeRequest";
 
 export interface UpdateWeightRequest {
+  cover_image_media_file_token: string;
   description_markdown: string,
   description_rendered_html: string,
   title: string,

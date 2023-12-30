@@ -4,6 +4,9 @@ import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetch
 import { GetWeight, Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import { UpdateWeight } from "@storyteller/components/src/api/weights/UpdateWeight";
 import { DeleteWeight } from "@storyteller/components/src/api/weights/DeleteWeight";
+import { UploadMedia, UploadMediaResponse } from "@storyteller/components/src/api/media_files/UploadMedia";
+import { v4 as uuidv4 } from "uuid";
+import { useFile } from "hooks";
 
 interface Props {
   onRemove?: (x: any) => void;
@@ -17,6 +20,9 @@ export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
   const [title, titleSet] = useState("");
   const [visibility, visibilitySet] = useState("public");
   const [descriptionMD, descriptionMDSet] = useState("");
+  const [imgMediaFile, imgMediaFileSet] = useState("");
+  const [imgUploadStatus, imgUploadStatusSet] = useState(FetchStatus.ready);
+  const imageProps = useFile({});
   const isLoading = status === FetchStatus.ready || status === FetchStatus.in_progress;
   const fetchError = status === FetchStatus.error;
   const history = useHistory();
@@ -29,6 +35,7 @@ export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
   const update = () => {
     writeStatusSet(FetchStatus.in_progress);
     UpdateWeight(token,{
+      cover_image_media_file_token: imgMediaFile,
       description_markdown: descriptionMD,
       description_rendered_html: data?.description_rendered_html || "",
       title,
@@ -58,6 +65,25 @@ export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
       onRemove(res);
     });
   };
+
+  const uploadCoverImg = (e: any) => {
+    console.log("🧲",!!imageProps.file, imgUploadStatus);
+    // e.stopPropigation();
+    if (imageProps.file && imgUploadStatus < 2) {
+      imgUploadStatusSet(FetchStatus.in_progress);
+      UploadMedia({
+        uuid_idempotency_token: uuidv4(),
+        file: imageProps.file,
+        source: "file",
+      }) // if there an audio file it uploads here
+      .then((res: UploadMediaResponse) => {
+        if ("media_file_token" in res) {
+          imgUploadStatusSet(FetchStatus.success);
+          imgMediaFileSet(res.media_file_token);
+        }
+      });
+    }
+  };
   
   useEffect(() => {
     if (token && !data && status === FetchStatus.ready) {
@@ -78,5 +104,5 @@ export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
     }
   }, [status, token, data]);
 
-  return { data, fetchError, isLoading, descriptionMD, onChange, remove, status, title, update, visibility, writeStatus };
+  return { data, fetchError, imgMediaFile, imgMediaFileSet, imageProps, imgUploadStatus, isLoading, descriptionMD, onChange, remove, status, title, update, uploadCoverImg, visibility, writeStatus };
 };

@@ -1,28 +1,41 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  faCircleExclamation,
-  faEye,
-  // faLanguage,
-  faWaveform,
-} from "@fortawesome/pro-solid-svg-icons";
+import { a, useTransition } from "@react-spring/web";
+import { faCircleExclamation, faEye, faImage, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
-import Container from "components/common/Container";
-import TempInput from "components/common/TempInput";
-import { Button, TempSelect } from "components/common";
-// import useVoiceRequests from "./useVoiceRequests";
-// import { useHistory } from "react-router-dom";
+import { Button, Container, Panel, Skeleton, SplitPanel,
+  ImageInput, TempInput, TempSelect, TempTextArea } from "components/common";
+import { WorkIndicator } from "components/svg";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import TextArea from "components/common/TextArea";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import { useWeightFetch } from "hooks";
-import SplitPanel from "components/common/SplitPanel";
-import Skeleton from "components/common/Skeleton";
+import "./WeightEditPage.scss";
 
 interface WeightEditPageProps {
   sessionWrapper: SessionWrapper;
 }
+
+// UploadControl will eventually live elsewhere
+const UploadControl = ({ onClick, status }:{ onClick: (x: any) => any, status: FetchStatus }) => {
+  const failure = status === FetchStatus.error;
+  const success = status === FetchStatus.success;
+
+  return status === FetchStatus.ready ? <Button {...{
+      className: "upload-control-btn",
+      label: "Upload image",
+      onClick,
+      variant: "secondary"
+    }}/> : <div {...{ className: "upload-control-indicator" }}>
+      <WorkIndicator {...{
+        failure,
+        stage: success ? 2 : 1,
+        success
+      }}/>
+      <span>{ success ? "Cover image uploaded" : "Uploading ..." }</span>
+    </div>;
+};
 
 export default function WeightEditPage({
   sessionWrapper,
@@ -34,30 +47,32 @@ export default function WeightEditPage({
   const [weightCreatorToken] = useState("");
 
   const {
-    // data: weight,
+    data: weight,
     descriptionMD,
     // fetchError,
+    // imgMediaFile,
+    imageProps,
+    imgUploadStatus,
     isLoading,
     onChange,
     title,
+    uploadCoverImg,
     update,
     visibility,
   } = useWeightFetch({ token: weight_token });
 
-  usePrefixedDocumentTitle("Edit Voice");
+  const src = new BucketConfig().getGcsUrl(weight?.maybe_cover_image_public_bucket_path || "");
 
-  //   const onClick = () =>
-  //     voices
-  //       .update(weight_token, {
-  //         title,
-  //         creator_set_visibility: visibility,
-  //         ietf_language_tag: language,
-  //       })
-  //       .then((res: any) => {
-  //         if (res && res.success) {
-  //           history.push("/voice-designer");
-  //         }
-  //       });
+  const [editingImg,editingImgSet] = useState(0);
+
+  const transitions = useTransition(editingImg, {
+    config: { tension: 120,  friction: 15 },
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
+  });
+
+  usePrefixedDocumentTitle("Edit Voice");
 
   const visibilityOptions = [
     { label: "Public", value: "public" },
@@ -118,55 +133,44 @@ export default function WeightEditPage({
         ) : (
           <SplitPanel dividerFooter={true}>
             <SplitPanel.Body padding={true}>
-              <div className="d-flex flex-column flex-lg-row gap-4">
-                {/* Replace this with an image component component */}
-                <div className="bg-secondary rounded p-3">
-                  cover image select component here
+              <div {...{ className: "weight-editor w-100 d-flex" }}>
+                <div {...{ className: "weight-editor-column" }}>
+                  <div {...{ className: "fy-cover-img-input" }}> { weight?.maybe_cover_image_public_bucket_path &&
+                     transitions((style, i) => !i ? <a.div {...{
+                        className: "weight-initial-cover-img",
+                        style: { ...style, backgroundImage: `url(${src})`
+                      } }}>
+                        <div>
+                          <Button {...{
+                            className: "upload-control-btn",
+                            label: "Change cover image",
+                            onClick: () => editingImgSet(1),
+                            variant: "secondary"
+                          }}/>
+                        </div>
+                      </a.div> :
+                      <a.div {...{ style }}>
+                        <ImageInput {...{
+                          ...imageProps,
+                          disabled: imgUploadStatus > 1,
+                          placeholderIcon: faImage
+                        }}>
+                          <div {...{ className: "fy-cover-control" }}>
+                            <UploadControl {...{ onClick: uploadCoverImg, status: imgUploadStatus }}/>
+                          </div>
+                        </ImageInput>
+                      </a.div> )
+                  } </div>
                 </div>
-
-                <div className="w-100 d-flex flex-column gap-3">
-                  <div>
-                    <TempInput
-                      {...{
-                        label: "Title",
-                        name: "title",
-                        onChange,
-                        placeholder: "Title",
-                        value: title,
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <TextArea
-                      {...{
-                        label: "Description",
-                        name: "descriptionMD",
-                        onChange,
-                        placeholder: "Description",
-                        value: descriptionMD,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-              {
-                // <div className="mt-lg-2">
-                //   <TempSelect
-                //     options={[]}
-                //     {...{
-                //       icon: faLanguage,
-                //       label: "Language",
-                //       // placeholder: "Voice name",
-                //       // onChange: inputCtrl(languageSet),
-                //       // options: languages,
-                //       value: language,
-                //     }}
-                //   />
-                // </div>
-              }
-              <div className="mt-3">
-                <TempSelect
-                  {...{
+                <div {...{ className: "weight-editor-column" }}>
+                  <TempInput {...{
+                      label: "Title",
+                      name: "title",
+                      onChange,
+                      placeholder: "Title",
+                      value: title,
+                    }} />
+                  <TempSelect {...{
                     icon: faEye,
                     label: "Visibility",
                     name: "visibility",
@@ -174,8 +178,15 @@ export default function WeightEditPage({
                     onChange,
                     placeholder: "Voice name",
                     value: visibility,
-                  }}
-                />
+                  }} />
+                  <TempTextArea {...{
+                    label: "Description",
+                    name: "descriptionMD",
+                    onChange,
+                    placeholder: "Description",
+                    value: descriptionMD,
+                  }} />
+                </div>
               </div>
             </SplitPanel.Body>
             <SplitPanel.Footer padding={true}>

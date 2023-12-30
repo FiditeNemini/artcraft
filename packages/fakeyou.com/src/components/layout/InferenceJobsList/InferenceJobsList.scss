@@ -1,72 +1,37 @@
 @import "scss/colours.scss";
 
 a.face-animator-job {
-	&:hover {
-		background-color: $panel-inner;
-	}
+  &:hover {
+    background-color: $panel-inner;
+  }
 }
 
 .face-animator-job {
-	border-radius: .5rem;
+  border-radius: .5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  margin-top: .5rem;
+  padding: .5rem;
+
+  .job-details {
     display: flex;
+    align-items: center;
     flex-wrap: wrap;
-    align-items: stretch;
-    margin-top: .5rem;
-    padding: .5rem;
+    // height: 100%;
+    width: min-content;
 
-	svg {
-		// background-color: rgba(#ccc, .05);
-		margin-right: .5rem;
-		height: 2.25rem;
-		width: 2.25rem;
-		fill: none;
+  }
 
-		circle, line, polyline {
+  .work-indicator { margin-right: .5rem; }
 
-			stroke-width: 4px;
-			stroke-linecap: round;
-			stroke: #fff;
-		}
-
-		polyline {
-			transform: translate(2px,2px);
-		}
-	}
-
-	@keyframes ckw {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
-}
-	.work-indicator-circle-track {
-		stroke: rgba(#fff, .15);
-		stroke-width: 4px;
-	}
-	.work-indicator-circle-marker {
-		transform-origin: 18px 18px;
-		animation: ckw 1.5s linear infinite;
-		// strokeDashoffset: 4;
-		// stroke: #fff;
-	}
-
-	.job-details {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      // height: 100%;
-      width: min-content;
-
-    }
-
-	h6 { 
-		color: #fff;
-		line-height: 1rem;
-		height: 1rem;
-		margin-bottom: 0;
-		white-space: nowrap
-	}
-	span { font-weight: lighter; line-height: 1rem; }
+  h6 { 
+    color: #fff;
+    line-height: 1rem;
+    height: 1rem;
+    margin-bottom: 0;
+    white-space: nowrap
+  }
+  
+  span { font-weight: lighter; line-height: 1rem; }
 }

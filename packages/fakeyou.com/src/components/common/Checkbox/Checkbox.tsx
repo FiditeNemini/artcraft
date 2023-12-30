@@ -1,6 +1,6 @@
 import React from 'react';
 import { a, useSpring } from "@react-spring/web";
-import { Check } from "components/common";
+import { Check } from "components/svg";
 import { useHover, useId } from "hooks";
 import makeClass from "resources/makeClass";
 import "./Checkbox.scss";
