@@ -104,6 +104,7 @@ import ExplorePage from "./pages/explore/ExplorePage";
 import SearchPage from "./search/SearchPage";
 import { SearchProvider } from "context/SearchContext";
 import WeightEditPage from "./pages/weight/WeightEditPage";
+import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -349,6 +350,12 @@ class PageContainer extends React.Component<
               <Route path="/portal_success" exact={true}>
                 <PortalSuccessPage
                   querySessionCallback={() => {}}
+                  sessionWrapper={this.props.sessionWrapper}
+                />
+              </Route>
+
+              <Route path="/upload/sd">
+                <UploadSdWeightPage
                   sessionWrapper={this.props.sessionWrapper}
                 />
               </Route>

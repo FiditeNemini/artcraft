@@ -105,6 +105,13 @@ styles with important tags:
     box-shadow: none !important;
   }
 
+  label {
+    &.required:after {
+      content: " *";
+      color: $primary;
+    }
+  }
+
   thead,
   tbody {
     border-color: rgba($white, 0.2) !important;

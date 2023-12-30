@@ -1,11 +1,25 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { a, useTransition } from "@react-spring/web";
-import { faCircleExclamation, faEye, faImage, faWaveform } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faCircleExclamation,
+  faEye,
+  faImage,
+  faWaveform,
+} from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import PageHeader from "components/layout/PageHeader";
-import { Button, Container, Panel, Skeleton, SplitPanel,
-  ImageInput, TempInput, TempSelect, TempTextArea } from "components/common";
+import {
+  Button,
+  Container,
+  Panel,
+  Skeleton,
+  SplitPanel,
+  ImageInput,
+  TempInput,
+  TempSelect,
+  TempTextArea,
+} from "components/common";
 import { WorkIndicator } from "components/svg";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
@@ -18,23 +32,37 @@ interface WeightEditPageProps {
 }
 
 // UploadControl will eventually live elsewhere
-const UploadControl = ({ onClick, status }:{ onClick: (x: any) => any, status: FetchStatus }) => {
+const UploadControl = ({
+  onClick,
+  status,
+}: {
+  onClick: (x: any) => any;
+  status: FetchStatus;
+}) => {
   const failure = status === FetchStatus.error;
   const success = status === FetchStatus.success;
 
-  return status === FetchStatus.ready ? <Button {...{
-      className: "upload-control-btn",
-      label: "Upload image",
-      onClick,
-      variant: "secondary"
-    }}/> : <div {...{ className: "upload-control-indicator" }}>
-      <WorkIndicator {...{
-        failure,
-        stage: success ? 2 : 1,
-        success
-      }}/>
-      <span>{ success ? "Cover image uploaded" : "Uploading ..." }</span>
-    </div>;
+  return status === FetchStatus.ready ? (
+    <Button
+      {...{
+        className: "upload-control-btn",
+        label: "Upload image",
+        onClick,
+        variant: "secondary",
+      }}
+    />
+  ) : (
+    <div {...{ className: "upload-control-indicator" }}>
+      <WorkIndicator
+        {...{
+          failure,
+          stage: success ? 2 : 1,
+          success,
+        }}
+      />
+      <span>{success ? "Cover image uploaded" : "Uploading ..."}</span>
+    </div>
+  );
 };
 
 export default function WeightEditPage({
@@ -61,12 +89,14 @@ export default function WeightEditPage({
     visibility,
   } = useWeightFetch({ token: weight_token });
 
-  const src = new BucketConfig().getGcsUrl(weight?.maybe_cover_image_public_bucket_path || "");
+  const src = new BucketConfig().getGcsUrl(
+    weight?.maybe_cover_image_public_bucket_path || ""
+  );
 
-  const [editingImg,editingImgSet] = useState(0);
+  const [editingImg, editingImgSet] = useState(0);
 
   const transitions = useTransition(editingImg, {
-    config: { tension: 120,  friction: 15 },
+    config: { tension: 120, friction: 15 },
     from: { opacity: 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
@@ -105,7 +135,7 @@ export default function WeightEditPage({
   }
 
   return (
-    <Container type="panel">
+    <Container type="panel" className="mb-5">
       <PageHeader
         title="Edit Weight"
         titleIcon={faWaveform}
@@ -135,57 +165,84 @@ export default function WeightEditPage({
             <SplitPanel.Body padding={true}>
               <div {...{ className: "weight-editor w-100 d-flex" }}>
                 <div {...{ className: "weight-editor-column" }}>
-                  <div {...{ className: "fy-cover-img-input" }}> { weight?.maybe_cover_image_public_bucket_path &&
-                     transitions((style, i) => !i ? <a.div {...{
-                        className: "weight-initial-cover-img",
-                        style: { ...style, backgroundImage: `url(${src})`
-                      } }}>
-                        <div>
-                          <Button {...{
-                            className: "upload-control-btn",
-                            label: "Change cover image",
-                            onClick: () => editingImgSet(1),
-                            variant: "secondary"
-                          }}/>
-                        </div>
-                      </a.div> :
-                      <a.div {...{ style }}>
-                        <ImageInput {...{
-                          ...imageProps,
-                          disabled: imgUploadStatus > 1,
-                          placeholderIcon: faImage
-                        }}>
-                          <div {...{ className: "fy-cover-control" }}>
-                            <UploadControl {...{ onClick: uploadCoverImg, status: imgUploadStatus }}/>
-                          </div>
-                        </ImageInput>
-                      </a.div> )
-                  } </div>
+                  <div {...{ className: "fy-cover-img-input" }}>
+                    {" "}
+                    {weight?.maybe_cover_image_public_bucket_path &&
+                      transitions((style, i) =>
+                        !i ? (
+                          <a.div
+                            {...{
+                              className: "weight-initial-cover-img",
+                              style: {
+                                ...style,
+                                backgroundImage: `url(${src})`,
+                              },
+                            }}
+                          >
+                            <div>
+                              <Button
+                                {...{
+                                  className: "upload-control-btn",
+                                  label: "Change cover image",
+                                  onClick: () => editingImgSet(1),
+                                  variant: "secondary",
+                                }}
+                              />
+                            </div>
+                          </a.div>
+                        ) : (
+                          <a.div {...{ style }}>
+                            <ImageInput
+                              {...{
+                                ...imageProps,
+                                disabled: imgUploadStatus > 1,
+                                placeholderIcon: faImage,
+                              }}
+                            >
+                              <div {...{ className: "fy-cover-control" }}>
+                                <UploadControl
+                                  {...{
+                                    onClick: uploadCoverImg,
+                                    status: imgUploadStatus,
+                                  }}
+                                />
+                              </div>
+                            </ImageInput>
+                          </a.div>
+                        )
+                      )}{" "}
+                  </div>
                 </div>
                 <div {...{ className: "weight-editor-column" }}>
-                  <TempInput {...{
+                  <TempInput
+                    {...{
                       label: "Title",
                       name: "title",
                       onChange,
                       placeholder: "Title",
                       value: title,
-                    }} />
-                  <TempSelect {...{
-                    icon: faEye,
-                    label: "Visibility",
-                    name: "visibility",
-                    options: visibilityOptions,
-                    onChange,
-                    placeholder: "Voice name",
-                    value: visibility,
-                  }} />
-                  <TempTextArea {...{
-                    label: "Description",
-                    name: "descriptionMD",
-                    onChange,
-                    placeholder: "Description",
-                    value: descriptionMD,
-                  }} />
+                    }}
+                  />
+                  <TempSelect
+                    {...{
+                      icon: faEye,
+                      label: "Visibility",
+                      name: "visibility",
+                      options: visibilityOptions,
+                      onChange,
+                      placeholder: "Voice name",
+                      value: visibility,
+                    }}
+                  />
+                  <TempTextArea
+                    {...{
+                      label: "Description",
+                      name: "descriptionMD",
+                      onChange,
+                      placeholder: "Description",
+                      value: descriptionMD,
+                    }}
+                  />
                 </div>
               </div>
             </SplitPanel.Body>

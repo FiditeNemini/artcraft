@@ -55,7 +55,7 @@ export default function ImageCard({
   let coverImage = "/images/avatars/default-pfp.png";
 
   if (type === "media") {
-    coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 400, 100);
+    coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 600, 100);
   } else if (type === "weights") {
     if (data.maybe_cover_image_public_bucket_path) {
       coverImage = bucketConfig.getCdnUrl(
