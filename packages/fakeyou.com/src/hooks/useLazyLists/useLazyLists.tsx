@@ -5,6 +5,7 @@ interface Props {
   addQueries?: any;
   debug?: string,
   fetcher: any;
+  filterKey?: string;
   list: any;
   listSet: any;
   onInputChange?: (x?: any) => any;
@@ -14,7 +15,7 @@ interface Props {
 
 const n = () => {};
 
-export default function useLazyLists({ addQueries, debug = "", fetcher, list = [], listSet, onInputChange = n, onSuccess = n, requestList = false }: Props) {
+export default function useLazyLists({ addQueries, debug = "", fetcher, filterKey = "filter_media_type", list = [], listSet, onInputChange = n, onSuccess = n, requestList = false }: Props) {
   const [filter, filterSet] = useState("all");
   const [next, nextSet] = useState("");
   const [previous, previousSet] = useState(""); // I am not used for anything yet :)
@@ -48,7 +49,7 @@ export default function useLazyLists({ addQueries, debug = "", fetcher, list = [
         {
           ...(next ? { cursor: next } : {}),
           ...addQueries, // eventually we should provide a way to type this ... or not. It works
-          ...(filter !== "all" ? { filter_media_type: filter } : {}),
+          ...(filter !== "all" ? { [filterKey]: filter } : {}),
           ...(sort ? { sort_ascending: true } : {}),
         }
       ).then((res: any) => {
@@ -77,7 +78,7 @@ export default function useLazyLists({ addQueries, debug = "", fetcher, list = [
         }
       });
     }
-  }, [ addQueries, debug, fetcher, filter, listKeys, listSet, next, onSuccess, sort, status, totalKeys ]);
+  }, [ addQueries, debug, fetcher, filter, filterKey, listKeys, listSet, next, onSuccess, sort, status, totalKeys ]);
 
   return {
     fetchError,

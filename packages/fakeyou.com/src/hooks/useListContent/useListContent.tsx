@@ -6,6 +6,7 @@ interface Props {
   addSetters?: any;
   debug?: string;
   fetcher: any;
+  filterKey?: string;
   list: any;
   listSet: any;
   onInputChange?: (x?: any) => any;
@@ -22,6 +23,7 @@ export default function useListContent({
   addSetters,
   debug = "",
   fetcher,
+  filterKey = "filter_media_type",
   list,
   listSet,
   onInputChange = n,
@@ -73,7 +75,7 @@ export default function useListContent({
           {
             page_index: page,
             ...addQueries, // eventually we should provide a way to type this ... or not. It works
-            ...(filter !== "all" ? { filter_media_type: filter } : {}),
+            ...(filter !== "all" ? { [filterKey]: filter } : {}),
             ...(sort ? { sort_ascending: true } : {}),
           }
         ).then((res: any) => {
@@ -93,6 +95,7 @@ export default function useListContent({
     debug,
     fetcher,
     filter,
+    filterKey,
     listSet,
     onSuccess,
     page,

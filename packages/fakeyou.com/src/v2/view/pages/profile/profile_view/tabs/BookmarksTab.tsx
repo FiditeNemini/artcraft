@@ -21,6 +21,7 @@ export default function BookmarksTab({ username }: { username: string }) {
   const [sd, sdSet] = useState("all");
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
+  const [weightCategory, weightCategorySet] = useState("all");
   const [list, listSet] = useState<any[]>([]);
   // const resetMasonryGrid = () => {
   //   setShowMasonryGrid(false);
@@ -37,10 +38,14 @@ export default function BookmarksTab({ username }: { username: string }) {
     sort,
     status,
   } = useListContent({
-    addQueries: { page_size: 24 },
-    addSetters: { sdSet, ttsSet, vcSet },
+    addQueries: {
+      page_size: 24,
+      ...(weightCategory !== "all" ? { maybe_scoped_weight_category: weightCategory } : {}),
+    },
+    addSetters: { sdSet, ttsSet, vcSet, weightCategorySet },
     debug: "bookmarks tab",
     fetcher: GetBookmarksByUser,
+    filterKey: "maybe_scoped_weight_type",
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
@@ -59,11 +64,30 @@ export default function BookmarksTab({ username }: { username: string }) {
     currentPage: page,
   };
 
-  const filterOptions = [
-    { value: "all", label: "All Weights" },
-    { value: "tts", label: "Text to Speech" },
-    { value: "vc", label: "Voice to Voice" },
-    { value: "sd", label: "Image Generation" },
+  // const filterOptions = [
+  //   { value: "all", label: "All Weights" },
+  //   { value: "tts", label: "Text to Speech" },
+  //   { value: "vc", label: "Voice to Voice" },
+  //   { value: "sd", label: "Image Generation" },
+  // ];
+
+  const filterOptions = [ // these probably need beter labels
+    { value: "all", label: "All weight types" },
+    { value: "hifigan_tt2", label: "hifigan_tt2" },
+    { value: "sd_1.5", label: "sd_1.5" },
+    { value: "sdxl", label: "sdxl" },
+    { value: "so_vits_svc", label: "so_vits_svc" },
+    { value: "tt2", label: "tt2" },
+    { value: "loRA", label: "loRA" },
+    { value: "vall_e", label: "vall_e" }
+  ];
+
+  const weightCategoryOpts = [
+    { value: "all", label: "All weight categories" },
+    { value: "image_generation", label: "Image generation" },
+    { value: "text_to_speech", label: "Text to speech" },
+    { value: "vocoder", label: "Vocoder" },
+    { value: "voice_conversion", label: "Voice conversion" }
   ];
 
   const sortOptions = [
@@ -110,6 +134,15 @@ export default function BookmarksTab({ username }: { username: string }) {
               name: "filter",
               onChange,
               value: filter,
+            }}
+          />
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: weightCategoryOpts,
+              name: "weightCategory",
+              onChange,
+              value: weightCategory,
             }}
           />
           {filter === "tts" && (

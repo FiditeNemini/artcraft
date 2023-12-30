@@ -20,6 +20,7 @@ export default function WeightsTab() {
   const [list, listSet] = useState<Weight[]>([]);
   const weights = useLazyLists({
     fetcher: ListWeights,
+    filterKey: "weights_category",
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
