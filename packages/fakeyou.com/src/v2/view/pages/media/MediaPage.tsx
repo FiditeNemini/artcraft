@@ -112,15 +112,8 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
       case MediaFileType.Image:
         let sdMediaImage = "/images/avatars/default-pfp.png";
-        if (
-          mediaFile.maybe_model_weight_info &&
-          mediaFile.maybe_model_weight_info
-            .maybe_cover_image_public_bucket_path !== null
-        ) {
-          sdMediaImage = bucketConfig.getGcsUrl(
-            mediaFile.maybe_model_weight_info
-              .maybe_cover_image_public_bucket_path
-          );
+        if (mediaFile.public_bucket_path) {
+          sdMediaImage = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         }
         return <SdCoverImagePanel src={sdMediaImage} />;
       default:
