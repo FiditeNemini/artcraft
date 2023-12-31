@@ -1,9 +1,8 @@
 import React from "react";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import { Button } from "components/common";
-import Input from "components/common/Input";
 // import useVoiceDetailsStore from "hooks/useVoiceDetailsStore/";
-import Select from "components/common/TempSelect";
+import { TempInput, TempSelect } from "components/common";
 
 export const SearchFieldClass = {
   control: (state: any) =>
@@ -27,8 +26,9 @@ function VoiceDetails({ datasetInputs }: { datasetInputs: any }) {
     <div>
       {datasetInputs.map(
         ({ type = "", options = [], ...props }, key: number) => {
-          if (type === "text") return <Input {...{ ...props, key }} />;
-          else return <Select {...{ ...props, classNames, key, options }} />;
+          if (type === "text") return <TempInput {...{ ...props, key }} />;
+          else
+            return <TempSelect {...{ ...props, classNames, key, options }} />;
         }
       )}
     </div>
