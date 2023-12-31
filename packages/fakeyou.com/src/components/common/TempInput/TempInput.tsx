@@ -24,7 +24,7 @@ export default function TempInput({
           {label}
         </label>
       )}
-      <div className={`${icon ? "input-icon" : ""}`}>
+      <div className={`fy-input ${icon ? "input-icon" : ""}`}>
         {icon && (
           <FontAwesomeIcon icon={icon} className="form-control-feedback" />
         )}
