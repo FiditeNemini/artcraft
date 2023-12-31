@@ -24,11 +24,13 @@ function VoiceDetails({ datasetInputs }: { datasetInputs: any }) {
   const classNames = SearchFieldClass;
 
   return (
-    <div className="d-flex flex-column gap-4">
-      { datasetInputs.map(({ type = "", options = [], ...props }, key: number) => {
-        if (type === "text") return <Input {...{ ...props, key }} />;
-        else return <Select {...{ ...props, classNames, key, options } }/>;
-      }) }
+    <div>
+      {datasetInputs.map(
+        ({ type = "", options = [], ...props }, key: number) => {
+          if (type === "text") return <Input {...{ ...props, key }} />;
+          else return <Select {...{ ...props, classNames, key, options }} />;
+        }
+      )}
     </div>
   );
 }
