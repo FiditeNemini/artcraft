@@ -21,7 +21,9 @@ export default function TempTextArea({
           {label}
         </label>
       )}
-      <textarea className="fy-textarea form-control" {...rest} />
+      <div className="fy-textarea">
+        <textarea className="form-control" {...rest} />
+      </div>
     </>
   );
 }

@@ -1,11 +1,8 @@
 .fy-select {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 
-  :only-child {
-    margin-bottom: 0;
-  }
-
-  :last-child {
+  &:only-child,
+  &:last-child {
     margin-bottom: 0;
   }
 }
