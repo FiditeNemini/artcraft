@@ -19,7 +19,7 @@ use crate::server_state::ServerState;
 #[derive(Serialize, ToSchema)]
 pub struct ListFeaturedMediaFilesSuccessResponse {
   pub success: bool,
-  pub media_files: Vec<MediaFile>,
+  pub results: Vec<MediaFile>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -123,7 +123,7 @@ pub async fn list_featured_media_files_handler(
 
   let response = ListFeaturedMediaFilesSuccessResponse {
     success: true,
-    media_files: media_files.into_iter()
+    results: media_files.into_iter()
         .map(|m| {
           let public_bucket_path = MediaFileBucketPath::from_object_hash(
             &m.public_bucket_directory_hash,
