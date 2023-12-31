@@ -25,7 +25,6 @@ export default function FeaturedTab() {
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
-    debug: "featured media",
   });
 
   return (
