@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { useLocation } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import MediaCards from "components/common/Card/MediaCards";
 import { TempSelect } from "components/common";
@@ -22,7 +22,9 @@ export default function MediaTab({ username }: { username: string }) {
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
-  const [mediaType, mediaTypeSet] = useState(urlQueries.get("filter_media_type") || "all");
+  const [mediaType, mediaTypeSet] = useState(
+    urlQueries.get("filter_media_type") || "all"
+  );
   const [list, listSet] = useState<MediaFile[]>([]);
   // const resetMasonryGrid = () => {
   //   setShowMasonryGrid(false);
@@ -40,7 +42,7 @@ export default function MediaTab({ username }: { username: string }) {
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
-    urlParam: username
+    urlParam: username,
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -69,7 +71,7 @@ export default function MediaTab({ username }: { username: string }) {
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
-        <div className="d-flex gap-2 flex-grow-1">
+        <div className="d-flex flex-grow-1">
           <TempSelect
             {...{
               icon: faArrowDownWideShort,

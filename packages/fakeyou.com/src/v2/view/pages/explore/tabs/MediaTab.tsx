@@ -47,7 +47,7 @@ export default function MediaTab() {
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
-        <div className="d-flex gap-2 flex-grow-1">
+        <div className="d-flex flex-grow-1">
           <TempSelect
             {...{
               icon: faArrowDownWideShort,

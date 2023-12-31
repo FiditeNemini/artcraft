@@ -27,7 +27,9 @@ export default function WeightsTab({ username }: { username: string }) {
   // const { maybe_scoped_weight_type, ...yadda } = useParams<{ maybe_scoped_weight_type: string }>();
   const urlQueries = new URLSearchParams(search);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [weightType, weightTypeSet] = useState(urlQueries.get("maybe_scoped_weight_type") || "all");
+  const [weightType, weightTypeSet] = useState(
+    urlQueries.get("maybe_scoped_weight_type") || "all"
+  );
   const [sd, sdSet] = useState("all");
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
@@ -37,7 +39,7 @@ export default function WeightsTab({ username }: { username: string }) {
   const weights = useListContent({
     addQueries: {
       ...prepFilter(weightType, "maybe_scoped_weight_type"),
-      page_size: 24
+      page_size: 24,
     },
     addSetters: { weightTypeSet, sdSet, ttsSet, vcSet },
     debug: "Weights tab",
@@ -47,7 +49,7 @@ export default function WeightsTab({ username }: { username: string }) {
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
-    urlParam: username
+    urlParam: username,
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -95,7 +97,7 @@ export default function WeightsTab({ username }: { username: string }) {
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
-        <div className="d-flex gap-2 flex-grow-1">
+        <div className="d-flex flex-grow-1">
           <TempSelect
             {...{
               icon: faArrowDownWideShort,
@@ -114,7 +116,7 @@ export default function WeightsTab({ username }: { username: string }) {
               value: weightType,
             }}
           />
-          { weightType === "tts" && (
+          {weightType === "tts" && (
             <TempSelect
               {...{
                 options: modelTtsOptions,
@@ -124,7 +126,7 @@ export default function WeightsTab({ username }: { username: string }) {
               }}
             />
           )}
-          { weightType === "sd" && (
+          {weightType === "sd" && (
             <TempSelect
               {...{
                 options: modelSdOptions,
@@ -134,7 +136,7 @@ export default function WeightsTab({ username }: { username: string }) {
               }}
             />
           )}
-          { weightType === "vc" && (
+          {weightType === "vc" && (
             <TempSelect
               {...{
                 options: modelVcOptions,

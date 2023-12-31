@@ -36,7 +36,7 @@ export default function Select({
     options.find((option: any) => option.value === value)?.label || "";
   const onChange = ({ value }: any) =>
     inChange({ target: { value, name, type: "select" } });
-  const className = `fy-select ${icon ? " input-icon" : ""}${
+  const className = `${icon ? " input-icon" : ""}${
     small ? " select-small" : ""
   }`;
   const classNames = {
@@ -53,7 +53,8 @@ export default function Select({
   };
 
   return (
-    <>
+    // Changed fragment to div here just so that it can be laid out with bootstrap easily using d-flex, flex-column and responsive gaps which requires grouping.
+    <div className="fy-select">
       {label && (
         <label className={`sub-title ${required ? "required" : ""}`}>
           {label}
@@ -77,6 +78,6 @@ export default function Select({
           />
         </div>
       </div>
-    </>
+    </div>
   );
 }

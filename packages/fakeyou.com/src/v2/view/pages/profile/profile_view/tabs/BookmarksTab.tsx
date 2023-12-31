@@ -20,11 +20,15 @@ export default function BookmarksTab({ username }: { username: string }) {
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
-  const [weightType, weightTypeSet] = useState(urlQueries.get("maybe_scoped_weight_type") || "all");
+  const [weightType, weightTypeSet] = useState(
+    urlQueries.get("maybe_scoped_weight_type") || "all"
+  );
   const [sd, sdSet] = useState("all");
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
-  const [weightCategory, weightCategorySet] = useState(urlQueries.get("maybe_scoped_weight_category") || "all");
+  const [weightCategory, weightCategorySet] = useState(
+    urlQueries.get("maybe_scoped_weight_category") || "all"
+  );
   const [list, listSet] = useState<any[]>([]);
   // const resetMasonryGrid = () => {
   //   setShowMasonryGrid(false);
@@ -74,7 +78,8 @@ export default function BookmarksTab({ username }: { username: string }) {
   //   { value: "sd", label: "Image Generation" },
   // ];
 
-  const filterOptions = [ // these probably need beter labels
+  const filterOptions = [
+    // these probably need beter labels
     { value: "all", label: "All weight types" },
     { value: "hifigan_tt2", label: "hifigan_tt2" },
     { value: "sd_1.5", label: "sd_1.5" },
@@ -82,7 +87,7 @@ export default function BookmarksTab({ username }: { username: string }) {
     { value: "so_vits_svc", label: "so_vits_svc" },
     { value: "tt2", label: "tt2" },
     { value: "loRA", label: "loRA" },
-    { value: "vall_e", label: "vall_e" }
+    { value: "vall_e", label: "vall_e" },
   ];
 
   const weightCategoryOpts = [
@@ -90,7 +95,7 @@ export default function BookmarksTab({ username }: { username: string }) {
     { value: "image_generation", label: "Image generation" },
     { value: "text_to_speech", label: "Text to speech" },
     { value: "vocoder", label: "Vocoder" },
-    { value: "voice_conversion", label: "Voice conversion" }
+    { value: "voice_conversion", label: "Voice conversion" },
   ];
 
   const sortOptions = [
@@ -120,7 +125,7 @@ export default function BookmarksTab({ username }: { username: string }) {
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
-        <div className="d-flex gap-2 flex-grow-1">
+        <div className="d-flex flex-grow-1">
           <TempSelect
             {...{
               icon: faArrowDownWideShort,
@@ -148,7 +153,7 @@ export default function BookmarksTab({ username }: { username: string }) {
               value: weightCategory,
             }}
           />
-          { weightType === "tts" && (
+          {weightType === "tts" && (
             <TempSelect
               {...{
                 options: modelTtsOptions,
@@ -158,7 +163,7 @@ export default function BookmarksTab({ username }: { username: string }) {
               }}
             />
           )}
-          { weightType === "sd" && (
+          {weightType === "sd" && (
             <TempSelect
               {...{
                 options: modelSdOptions,
@@ -168,7 +173,7 @@ export default function BookmarksTab({ username }: { username: string }) {
               }}
             />
           )}
-          { weightType === "vc" && (
+          {weightType === "vc" && (
             <TempSelect
               {...{
                 options: modelVcOptions,

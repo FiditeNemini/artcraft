@@ -18,7 +18,8 @@ export default function TempInput({
   ...rest
 }: InputProps) {
   return (
-    <>
+    // Changed fragment to div here just so that it can be laid out with bootstrap easily using d-flex, flex-column and responsive gaps which requires grouping.
+    <div className="fy-input">
       {label && (
         <label className={`sub-title ${required ? "required" : ""}`}>
           {label}
@@ -30,6 +31,6 @@ export default function TempInput({
         )}
         <input className="form-control" {...rest} />
       </div>
-    </>
+    </div>
   );
 }
