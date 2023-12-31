@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use log::warn;
-use sqlx::{MySql, MySqlPool};
+use sqlx::{Error, MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
 
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
@@ -80,13 +80,13 @@ pub async fn list_whole_voice_conversion_models_using_cursor(
   let models : Vec<RawRecord> = match maybe_models {
     Ok(models) => models,
     Err(err) => {
-      match err {
-        RowNotFound => {
-          return Ok(Vec::new());
+      return match err {
+        Error::RowNotFound => {
+          Ok(Vec::new())
         },
         _ => {
           warn!("vc model list query error: {:?}", err);
-          return Err(anyhow!("vc model list query error"));
+          Err(anyhow!("vc model list query error"))
         }
       }
     }
@@ -134,7 +134,7 @@ async fn list_whole_voice_conversion_models(
   mysql_connection: &mut PoolConnection<MySql>,
   page_size: u64,
   cursor: u64,
-) -> AnyhowResult<Vec<RawRecord>> {
+) -> Result<Vec<RawRecord>, Error> {
   Ok(sqlx::query_as!(
       RawRecord,
         r#"

@@ -241,7 +241,7 @@ LEFT OUTER JOIN users
 
     let mut query = "".to_string();
 
-    if let Some(offset) = self.offset {
+    if let Some(_offset) = self.offset {
       if !first_predicate_added {
         query.push_str(" WHERE");
         first_predicate_added = true;

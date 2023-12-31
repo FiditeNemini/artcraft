@@ -25,7 +25,7 @@ pub fn run_http_server(args: CreateServerArgs) -> AnyhowResult<Server>
   // HTTP server args
   let bind_address = easyenv::get_env_string_or_default("HTTP_BIND_ADDRESS", DEFAULT_BIND_ADDRESS);
   let num_workers = easyenv::get_env_num("HTTP_NUM_WORKERS", DEFAULT_NUM_WORKERS)?;
-  let hostname = args.container_environment.hostname.clone();
+  let _hostname = args.container_environment.hostname.clone();
 
   let server_state = HttpServerSharedState {
     job_stats: args.job_stats.clone(),

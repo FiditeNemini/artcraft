@@ -113,14 +113,14 @@ pub async fn process_create_voice(
 
   info!("Dataset length info: {}", dataset.len());
 
-  let temp_extension = String::from(".bin");
-  let temp_prefix:String;
-
-  if !deps.job.info.container.is_on_prem {
-    temp_prefix = String::from("sample_"); // this is for seed in local dev to download the samples
-  } else {
-    temp_prefix = String::from(BUCKET_FILE_PREFIX_CREATE);
-  }
+//  let temp_extension = String::from(".bin");
+//  let temp_prefix: String;
+//
+//  if !deps.job.info.container.is_on_prem {
+//    temp_prefix = String::from("sample_"); // this is for seed in local dev to download the samples
+//  } else {
+//    temp_prefix = String::from(BUCKET_FILE_PREFIX_CREATE);
+//  }
 
   let mut downloaded_dataset: Vec<PathBuf> = Vec::new();
 

@@ -81,7 +81,7 @@ async fn create_document_from_record(elasticsearch: &Elasticsearch, record: &Tts
 }
 
 // NB: Adapted from elasticsearch crate examples source
-async fn create_tts_model_index(client: &Elasticsearch, delete: bool) -> AnyhowResult<()> {
+async fn create_tts_model_index(client: &Elasticsearch, _delete: bool) -> AnyhowResult<()> {
 
   info!("Creating TTS model index...");
 

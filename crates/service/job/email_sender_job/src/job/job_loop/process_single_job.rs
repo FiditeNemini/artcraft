@@ -17,7 +17,7 @@ pub async fn process_single_job(
   job_dependencies: &JobDependencies,
   job: &AvailableEmailSenderJob,
 ) -> Result<ProcessSingleJobSuccessCase, ProcessSingleJobError> {
-  let mut force_execution = false;
+  //let mut force_execution = false;
 
   // Some jobs have "routing tags". These ensure that jobs only execute on certain hosts.
   // This is typically for debugging or development.
@@ -27,7 +27,7 @@ pub async fn process_single_job(
 
     if hostname.starts_with(&routing_tag) {
       info!("Job has routing tag ({}) for execution on this host ({})", routing_tag, hostname);
-      force_execution = true;
+      //force_execution = true;
     } else {
       info!("Job routing tag ({}) doesn't match hostname ({}); skipping...", routing_tag, hostname);
       return Ok(ProcessSingleJobSuccessCase::JobSkippedForRoutingTagMismatch);

@@ -84,8 +84,8 @@ async fn main() -> AnyhowResult<()> {
   info!("Hostname: {}", &container_environment.hostname);
 
   // NB: These are non-standard env vars we're injecting ourselves.
-  let k8s_node_name = easyenv::get_env_string_optional("K8S_NODE_NAME");
-  let k8s_pod_name = easyenv::get_env_string_optional("K8S_POD_NAME");
+  let _k8s_node_name = easyenv::get_env_string_optional("K8S_NODE_NAME");
+  let _k8s_pod_name = easyenv::get_env_string_optional("K8S_POD_NAME");
 
   // Bucket stuff (shared)
   let access_key = easyenv::get_env_string_required(ENV_ACCESS_KEY)?;
