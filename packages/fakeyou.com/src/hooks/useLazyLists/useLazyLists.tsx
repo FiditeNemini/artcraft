@@ -3,7 +3,7 @@ import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetch
 
 interface Props {
   addQueries?: any;
-  debug?: string;
+  debug?: string,
   fetcher: any;
   filterKey?: string;
   list: any;
@@ -15,28 +15,15 @@ interface Props {
 
 const n = () => {};
 
-export default function useLazyLists({
-  addQueries,
-  debug = "",
-  fetcher,
-  filterKey = "filter_media_type",
-  list = [],
-  listSet,
-  onInputChange = n,
-  onSuccess = n,
-  requestList = false,
-}: Props) {
+export default function useLazyLists({ addQueries, debug = "", fetcher, filterKey = "filter_media_type", list = [], listSet, onInputChange = n, onSuccess = n, requestList = false }: Props) {
   const [filter, filterSet] = useState("all");
   const [next, nextSet] = useState("");
   const [previous, previousSet] = useState(""); // I am not used for anything yet :)
   const [sort, sortSet] = useState(false);
-  const [status, statusSet] = useState(
-    requestList ? FetchStatus.ready : FetchStatus.paused
-  );
+  const [status, statusSet] = useState(requestList ? FetchStatus.ready : FetchStatus.paused);
   const listKeys = Object.keys(list);
   const totalKeys = listKeys.length;
-  const isLoading =
-    status === FetchStatus.ready || status === FetchStatus.in_progress;
+  const isLoading = status === FetchStatus.ready || status === FetchStatus.in_progress;
   const fetchError = status === FetchStatus.error;
 
   const getMore = () => {
@@ -66,15 +53,12 @@ export default function useLazyLists({
           ...(sort ? { sort_ascending: true } : {}),
         }
       ).then((res: any) => {
-        if (debug)
-          console.log(`🐞 useLazyLists success debug at: ${debug}`, res);
+        if (debug) console.log(`🐞 useLazyLists success debug at: ${ debug }`, res);
         statusSet(FetchStatus.success);
         onSuccess(res);
         if (res.results && res.pagination) {
           listSet((prevObj: any) => {
-            let keyExists = listKeys.find(
-              key => key.split("#")[1] === res.pagination.maybe_next
-            );
+            let keyExists = listKeys.find(key => key.split("#")[1] === res.pagination.maybe_next);
             if (!next && !totalKeys) {
               return { [0 + "#initial"]: res.results }; // save as object so we can track what has been loaded
             } else if (!keyExists) {
@@ -91,25 +75,10 @@ export default function useLazyLists({
           });
           nextSet(res.pagination.maybe_next || "");
           previousSet(res.pagination.maybe_next);
-        } else if (res.media_files) {
-          listSet(res.media_files || []);
         }
       });
     }
-  }, [
-    addQueries,
-    debug,
-    fetcher,
-    filter,
-    filterKey,
-    listKeys,
-    listSet,
-    next,
-    onSuccess,
-    sort,
-    status,
-    totalKeys,
-  ]);
+  }, [ addQueries, debug, fetcher, filter, filterKey, listKeys, listSet, next, onSuccess, sort, status, totalKeys ]);
 
   return {
     fetchError,
