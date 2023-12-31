@@ -9,7 +9,6 @@ interface Props {
 }
 
 export default function WeightsCards({ props, type }: Props) {
-  console.log("🧿",props);
   switch (type) {
     case WeightCategory.TTS:
     case WeightCategory.VC:

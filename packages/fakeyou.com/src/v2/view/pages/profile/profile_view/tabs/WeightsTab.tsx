@@ -11,6 +11,7 @@ import { useBookmarks, useListContent } from "hooks";
 import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
 import { TempSelect } from "components/common";
 import SkeletonCard from "components/common/Card/SkeletonCard";
+import prepFilter from "resources/prepFilter";
 
 // interface IWeighttModelData {
 //   token: string;
@@ -22,8 +23,11 @@ import SkeletonCard from "components/common/Card/SkeletonCard";
 // }
 
 export default function WeightsTab({ username }: { username: string }) {
-  const { pathname: origin } = useLocation();
+  const { pathname: origin, search } = useLocation();
+  // const { maybe_scoped_weight_type, ...yadda } = useParams<{ maybe_scoped_weight_type: string }>();
+  const urlQueries = new URLSearchParams(search);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
+  const [weightType, weightTypeSet] = useState(urlQueries.get("maybe_scoped_weight_type") || "all");
   const [sd, sdSet] = useState("all");
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
@@ -31,7 +35,11 @@ export default function WeightsTab({ username }: { username: string }) {
   const bookmarks = useBookmarks();
   const [list, listSet] = useState<any[]>([]);
   const weights = useListContent({
-    addSetters: { sdSet, ttsSet, vcSet },
+    addQueries: {
+      ...prepFilter(weightType, "maybe_scoped_weight_type"),
+      page_size: 24
+    },
+    addSetters: { weightTypeSet, sdSet, ttsSet, vcSet },
     debug: "Weights tab",
     fetcher: GetWeightsByUser,
     list,
@@ -39,11 +47,8 @@ export default function WeightsTab({ username }: { username: string }) {
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
-    urlParam: username,
-    addQueries: { page_size: 24 },
+    urlParam: username
   });
-
-  console.log("💎", origin);
 
   const handlePageClick = (selectedItem: { selected: number }) => {
     weights.pageChange(selectedItem.selected);
@@ -104,12 +109,12 @@ export default function WeightsTab({ username }: { username: string }) {
             {...{
               icon: faFilter,
               options: filterOptions,
-              name: "filter",
+              name: "weightType",
               onChange: weights.onChange,
-              value: weights.filter,
+              value: weightType,
             }}
           />
-          {weights.filter === "tts" && (
+          { weightType === "tts" && (
             <TempSelect
               {...{
                 options: modelTtsOptions,
@@ -119,7 +124,7 @@ export default function WeightsTab({ username }: { username: string }) {
               }}
             />
           )}
-          {weights.filter === "sd" && (
+          { weightType === "sd" && (
             <TempSelect
               {...{
                 options: modelSdOptions,
@@ -129,7 +134,7 @@ export default function WeightsTab({ username }: { username: string }) {
               }}
             />
           )}
-          {weights.filter === "vc" && (
+          { weightType === "vc" && (
             <TempSelect
               {...{
                 options: modelVcOptions,

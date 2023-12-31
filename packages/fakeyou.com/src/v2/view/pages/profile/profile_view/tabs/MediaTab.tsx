@@ -14,27 +14,33 @@ import Pagination from "components/common/Pagination";
 import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { useBookmarks, useListContent } from "hooks";
+import prepFilter from "resources/prepFilter";
 
 export default function MediaTab({ username }: { username: string }) {
-  const { pathname: origin } = useLocation();
+  const { pathname: origin, search } = useLocation();
+  const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
+  const [mediaType, mediaTypeSet] = useState(urlQueries.get("filter_media_type") || "all");
   const [list, listSet] = useState<MediaFile[]>([]);
   // const resetMasonryGrid = () => {
   //   setShowMasonryGrid(false);
   //   setTimeout(() => setShowMasonryGrid(true), 10);
   // };
   const media = useListContent({
-    // addQueries: { abc: "anything" }, an example
+    addQueries: {
+      page_size: 24,
+      ...prepFilter(mediaType, "filter_media_type"),
+    },
+    addSetters: { mediaTypeSet },
     fetcher: GetMediaByUser,
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: () => setShowMasonryGrid(true),
     requestList: true,
-    urlParam: username,
-    addQueries: { page_size: 24 },
+    urlParam: username
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -77,9 +83,9 @@ export default function MediaTab({ username }: { username: string }) {
             {...{
               icon: faFilter,
               options: filterOptions,
-              name: "filter",
+              name: "mediaType",
               onChange: media.onChange,
-              value: media.filter,
+              value: mediaType,
             }}
           />
         </div>
