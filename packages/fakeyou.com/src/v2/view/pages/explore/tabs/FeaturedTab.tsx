@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 
@@ -6,8 +6,9 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
-import { useBookmarks, useLazyLists } from "hooks";
+import { useBookmarks } from "hooks";
 import { ListFeaturedMediaFiles } from "@storyteller/components/src/api/media_files/ListFeaturedMediaFiles";
+import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
@@ -16,17 +17,22 @@ export default function FeaturedTab() {
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [list, listSet] = useState<MediaFile[]>([]);
-  const [showMasonryGrid, setShowMasonryGrid] = useState(true);
+  // const [showMasonryGrid, setShowMasonryGrid] = useState(true);
+  const [status, statusSet] = useState(FetchStatus.ready);
+  const isLoading = status === FetchStatus.ready || status === FetchStatus.in_progress;
 
-  const media = useLazyLists({
-    fetcher: ListFeaturedMediaFiles,
-    list,
-    listSet,
-    onInputChange: () => setShowMasonryGrid(false),
-    onSuccess: () => setShowMasonryGrid(true),
-    requestList: true,
-    debug: "featured media",
-  });
+  useEffect(() => {
+    if (status === FetchStatus.ready) {
+      statusSet(FetchStatus.in_progress);
+      ListFeaturedMediaFiles("",{}).then((res: any) => {
+        console.log("🏮",res);
+        statusSet(FetchStatus.success);
+        if (res.results) {
+          listSet(res.results);
+        }
+      });
+    }
+  },[status]);
 
   return (
     <div className="d-flex flex-column gap-4">
@@ -39,16 +45,14 @@ export default function FeaturedTab() {
           </Link>
         </div>
 
-        {media.isLoading && !media.list.length ? (
+        { isLoading && !list.length ? (
           <div className="row gx-3 gy-3">
             {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />
             ))}
           </div>
-        ) : (
-          showMasonryGrid && (
-            <>
-              {media.list.length === 0 && media.status === 3 ? (
+        ) : ( <>
+              { list.length === 0 && status === 3 ? (
                 <div className="text-center mt-4 opacity-75">
                   No featured media.
                 </div>
@@ -57,7 +61,7 @@ export default function FeaturedTab() {
                   gridRef={gridContainerRef}
                   onLayoutComplete={() => console.log("Layout complete!")}
                 >
-                  {media.list.map((data: any, index: number) => {
+                  { list.map((data: any, index: number) => {
                     let card;
                     switch (data.media_type) {
                       case "audio":
@@ -111,7 +115,6 @@ export default function FeaturedTab() {
                 </MasonryGrid>
               )}
             </>
-          )
         )}
       </div>
       {/* <div>
