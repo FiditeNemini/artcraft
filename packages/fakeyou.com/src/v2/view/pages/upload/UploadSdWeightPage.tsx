@@ -86,47 +86,41 @@ export default function UploadSdWeightPage({
                 <div className="col-12 col-lg-5">
                   <label className="sub-title required">Cover Image</label>
                 </div>
-                <div className="col-12 col-lg-7 d-flex flex-column gap-3 order-first order-lg-last">
-                  <div>
-                    <TempInput
-                      {...{
-                        label: "Title",
-                        name: "title",
-                        placeholder: "Title",
-                        required: true,
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <TempInput
-                      {...{
-                        label: "Download URL, eg. Google Drive link",
-                        name: "Url",
-                        placeholder: "Download URL",
-                        required: true,
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <TempSelect
-                      {...{
-                        icon: faEye,
-                        label: "Visibility",
-                        name: "visibility",
-                        options: visibilityOptions,
-                        placeholder: "Voice name",
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <TempTextArea
-                      {...{
-                        label: "Description",
-                        name: "descriptionMD",
-                        placeholder: "Description",
-                      }}
-                    />
-                  </div>
+                <div className="col-12 col-lg-7 order-first order-lg-last">
+                  <TempInput
+                    {...{
+                      label: "Title",
+                      name: "title",
+                      placeholder: "Title",
+                      required: true,
+                    }}
+                  />
+
+                  <TempInput
+                    {...{
+                      label: "Download URL, eg. Google Drive link",
+                      name: "Url",
+                      placeholder: "Download URL",
+                      required: true,
+                    }}
+                  />
+
+                  <TempSelect
+                    {...{
+                      icon: faEye,
+                      label: "Visibility",
+                      name: "visibility",
+                      options: visibilityOptions,
+                      placeholder: "Voice name",
+                    }}
+                  />
+                  <TempTextArea
+                    {...{
+                      label: "Description",
+                      name: "descriptionMD",
+                      placeholder: "Description",
+                    }}
+                  />
                 </div>
               </div>
             </SplitPanel.Body>

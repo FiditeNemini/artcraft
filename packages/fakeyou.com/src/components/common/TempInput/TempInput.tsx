@@ -1,6 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import "./Input.scss";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: IconDefinition;
@@ -23,7 +24,7 @@ export default function TempInput({
           {label}
         </label>
       )}
-      <div className={`form-group ${icon ? "input-icon" : ""}`}>
+      <div className={`${icon ? "input-icon" : ""}`}>
         {icon && (
           <FontAwesomeIcon icon={icon} className="form-control-feedback" />
         )}
