@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import "../Select/Select.scss";
 import ReactSelect, { Props as ReactSelectProps } from "react-select";
+import "./Select.scss";
 
 export interface Option {
   value: string | number | boolean;
@@ -35,7 +36,7 @@ export default function Select({
     options.find((option: any) => option.value === value)?.label || "";
   const onChange = ({ value }: any) =>
     inChange({ target: { value, name, type: "select" } });
-  const className = `form-group${icon ? " input-icon" : ""}${
+  const className = `fy-select ${icon ? " input-icon" : ""}${
     small ? " select-small" : ""
   }`;
   const classNames = {

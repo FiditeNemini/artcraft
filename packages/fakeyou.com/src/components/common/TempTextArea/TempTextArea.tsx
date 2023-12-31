@@ -1,4 +1,5 @@
 import React from "react";
+import "./TextArea.scss";
 
 interface TextAreaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -20,9 +21,7 @@ export default function TempTextArea({
           {label}
         </label>
       )}
-      <div className="form-group">
-        <textarea className="form-control" {...rest} />
-      </div>
+      <textarea className="fy-textarea form-control" {...rest} />
     </>
   );
 }

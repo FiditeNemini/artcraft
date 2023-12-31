@@ -1,0 +1,13 @@
+.fy-input {
+  input {
+    margin-bottom: 1rem;
+
+    :only-child {
+      margin-bottom: 0;
+    }
+
+    :last-child {
+      margin-bottom: 0;
+    }
+  }
+}

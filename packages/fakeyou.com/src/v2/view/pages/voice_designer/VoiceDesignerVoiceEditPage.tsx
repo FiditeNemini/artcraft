@@ -67,43 +67,37 @@ function VoiceDesignerVoiceEditPage() {
       />
 
       <Panel>
-        <div className="d-flex flex-column gap-4 p-3 py-4 p-md-4">
-          <div>
-            <TempInput
-              {...{
-                label: "Title",
-                placeholder: "Voice name",
-                onChange: inputCtrl(titleSet),
-                value: title,
-              }}
-            />
-          </div>
+        <div className="p-3 py-4 p-md-4">
+          <TempInput
+            {...{
+              label: "Title",
+              placeholder: "Voice name",
+              onChange: inputCtrl(titleSet),
+              value: title,
+            }}
+          />
 
-          <div>
-            <TempSelect
-              {...{
-                icon: faLanguage,
-                label: "Language",
-                // placeholder: "Voice name",
-                onChange: inputCtrl(languageSet),
-                options: languages,
-                value: language,
-              }}
-            />
-          </div>
+          <TempSelect
+            {...{
+              icon: faLanguage,
+              label: "Language",
+              // placeholder: "Voice name",
+              onChange: inputCtrl(languageSet),
+              options: languages,
+              value: language,
+            }}
+          />
 
-          <div>
-            <TempSelect
-              {...{
-                icon: faEye,
-                label: "Visibility",
-                // placeholder: "Voice name",
-                onChange: inputCtrl(visibilitySet),
-                options: visibilityOptions,
-                value: visibility,
-              }}
-            />
-          </div>
+          <TempSelect
+            {...{
+              icon: faEye,
+              label: "Visibility",
+              // placeholder: "Voice name",
+              onChange: inputCtrl(visibilitySet),
+              options: visibilityOptions,
+              value: visibility,
+            }}
+          />
         </div>
         <hr className="mt-0 mb-4" />
         <div className="p-3 pb-4 px-lg-4 pt-0">
