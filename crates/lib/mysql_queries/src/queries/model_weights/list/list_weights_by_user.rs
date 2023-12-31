@@ -81,6 +81,8 @@ pub struct ListWeightsForUserArgs<'a> {
   pub page_index: usize,
   pub sort_ascending: bool,
   pub view_as: ViewAs,
+  pub maybe_scoped_weight_type: Option<WeightsType>,
+  pub maybe_scoped_weight_category: Option<WeightsCategory>,
   pub mysql_pool: &'a MySqlPool,
 }
 
@@ -94,6 +96,8 @@ pub async fn list_weights_by_creator_username(args: ListWeightsForUserArgs<'_>) 
         args.sort_ascending,
         count_fields.as_str(),
         args.view_as,
+        args.maybe_scoped_weight_type,
+        args.maybe_scoped_weight_category,
     );
 
     let row_count_query = count_query_builder.build_query_scalar::<i64>();
@@ -109,6 +113,8 @@ pub async fn list_weights_by_creator_username(args: ListWeightsForUserArgs<'_>) 
         args.sort_ascending,
         result_fields.as_str(),
         args.view_as,
+        args.maybe_scoped_weight_type,
+        args.maybe_scoped_weight_category,
     );
 
     let query = query.build_query_as::<RawWeightJoinUser>();
@@ -180,6 +186,8 @@ fn query_builder<'a>(
     sort_ascending: bool,
     select_fields: &'a str,
     view_as: ViewAs,
+    maybe_scoped_weight_type: Option<WeightsType>,
+    maybe_scoped_weight_category: Option<WeightsCategory>,
 ) -> QueryBuilder<'a, MySql> {
 
     // NB: Query cannot be statically checked by sqlx
@@ -208,6 +216,16 @@ LEFT OUTER JOIN media_files as cover_image
             query_builder.push(" AND mw.creator_set_visibility = ");
             query_builder.push_bind(Visibility::Public.to_str());
         }
+    }
+
+    if let Some(weight_type) = maybe_scoped_weight_type {
+      query_builder.push(" AND mw.weights_type = ");
+      query_builder.push_bind(weight_type.to_str());
+    }
+
+    if let Some(weight_category) = maybe_scoped_weight_category {
+      query_builder.push(" AND mw.weights_category = ");
+      query_builder.push_bind(weight_category.to_str());
     }
 
     if sort_ascending {

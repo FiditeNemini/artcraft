@@ -8,9 +8,11 @@ use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-use enums::common::view_as::ViewAs;
 
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::model_weights::weights_category::WeightsCategory;
+use enums::by_table::model_weights::weights_types::WeightsType;
+use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::list::list_weights_by_user::{list_weights_by_creator_username, ListWeightsForUserArgs};
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -64,7 +66,17 @@ pub struct ListWeightsForUserQueryParams {
   pub sort_ascending: Option<bool>,
   pub page_size: Option<usize>,
   pub page_index: Option<usize>,
+
+  /// Optional. Scope to only the exact weight type.
+  /// Shouldn't be used with weight category scoping
+  pub maybe_scoped_weight_type: Option<WeightsType>,
+
+  /// Optional. Scope to only the exact weight category, which may include
+  /// multiple types of model (eg voice_conversion includes RVC, SVC, etc.)
+  /// Shouldn't be used with weight type scoping
+  pub maybe_scoped_weight_category: Option<WeightsCategory>,
 }
+
 #[derive(Deserialize,ToSchema)]
 pub struct ListWeightsByUserPathInfo {
   username: String,
@@ -153,6 +165,8 @@ pub async fn list_weights_by_user_handler(
         page_index,
         sort_ascending,
         view_as,
+        maybe_scoped_weight_category: query.maybe_scoped_weight_category,
+        maybe_scoped_weight_type: query.maybe_scoped_weight_type,
         mysql_pool: &server_state.mysql_pool,
     }
   ).await.map_err(|e| {
@@ -193,8 +207,6 @@ pub async fn list_weights_by_user_handler(
         &weight.creator_email_gravatar_hash,
       ),
       maybe_cover_image_public_bucket_path: maybe_cover_image,
-      //description_markdown: weight.maybe_description_markdown,
-      //description_rendered_html: weight.maybe_description_rendered_html,
       file_size_bytes: weight.file_size_bytes,
       file_checksum_sha2: weight.file_checksum_sha2,
       cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
