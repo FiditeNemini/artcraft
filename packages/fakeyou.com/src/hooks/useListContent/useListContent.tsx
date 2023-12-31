@@ -31,8 +31,9 @@ export default function useListContent({
   requestList = false,
   urlParam = "",
 }: Props) {
-  const { pathname, search } = useLocation();
-  const urlQueries = new URLSearchParams(search);
+  const { pathname, search: locSearch } = useLocation();
+  const history = useHistory();
+  const urlQueries = new URLSearchParams(locSearch);
   const [page, pageSet] = useState(parseInt(urlQueries.get("page_index") || "") || pagePreset);
   const [pageCount, pageCountSet] = useState(0);
   const [sort, sortSet] = useState(urlQueries.get("sort_ascending") === "true");
@@ -42,7 +43,6 @@ export default function useListContent({
   const isLoading =
     status === FetchStatus.ready || status === FetchStatus.in_progress;
   const fetchError = status === FetchStatus.error;
-  const history = useHistory();
 
   const pageChange = (page: number) => {
     pageSet(page);

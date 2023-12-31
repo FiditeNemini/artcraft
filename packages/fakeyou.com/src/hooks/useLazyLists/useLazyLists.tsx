@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
+import { useHistory, useLocation } from "react-router-dom";
 
 interface Props {
   addQueries?: any;
+  addSetters?: any;
   debug?: string,
   fetcher: any;
-  filterKey?: string;
   list: any;
   listSet: any;
   onInputChange?: (x?: any) => any;
@@ -15,11 +16,13 @@ interface Props {
 
 const n = () => {};
 
-export default function useLazyLists({ addQueries, debug = "", fetcher, filterKey = "filter_media_type", list = [], listSet, onInputChange = n, onSuccess = n, requestList = false }: Props) {
-  const [filter, filterSet] = useState("all");
-  const [next, nextSet] = useState("");
+export default function useLazyLists({ addQueries, addSetters, debug = "", fetcher, list = [], listSet, onInputChange = n, onSuccess = n, requestList = false }: Props) {
+  const { pathname, search: locSearch } = useLocation();
+  const history = useHistory();
+  const urlQueries = new URLSearchParams(locSearch);
+  const [next, nextSet] = useState(urlQueries.get("cursor") || "");
   const [previous, previousSet] = useState(""); // I am not used for anything yet :)
-  const [sort, sortSet] = useState(false);
+  const [sort, sortSet] = useState(urlQueries.get("sort_ascending") === "true");
   const [status, statusSet] = useState(requestList ? FetchStatus.ready : FetchStatus.paused);
   const listKeys = Object.keys(list);
   const totalKeys = listKeys.length;
@@ -31,7 +34,7 @@ export default function useLazyLists({ addQueries, debug = "", fetcher, filterKe
   };
 
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
-    const todo: { [key: string]: (x: any) => void } = { filterSet, sortSet };
+    const todo: { [key: string]: (x: any) => void } = { ...addSetters, sortSet };
     todo[target.name + "Set"](target.value);
     onInputChange({ target });
     listSet([]); // Reset list on filter/sort change
@@ -41,18 +44,18 @@ export default function useLazyLists({ addQueries, debug = "", fetcher, filterKe
   };
 
   useEffect(() => {
+    const queries = {
+      ...(next ? { cursor: next } : {}),
+      ...addQueries, // eventually we should provide a way to type this ... or not. It works
+      ...(sort ? { sort_ascending: true } : {}),
+    };
+
     if (status === FetchStatus.ready) {
+      let search = new URLSearchParams(queries).toString();
       statusSet(FetchStatus.in_progress);
-      fetcher(
-        "",
-        {},
-        {
-          ...(next ? { cursor: next } : {}),
-          ...addQueries, // eventually we should provide a way to type this ... or not. It works
-          ...(filter !== "all" ? { [filterKey]: filter } : {}),
-          ...(sort ? { sort_ascending: true } : {}),
-        }
-      ).then((res: any) => {
+      history.replace({ pathname, search });
+
+      fetcher( "",{},queries).then((res: any) => {
         if (debug) console.log(`🐞 useLazyLists success debug at: ${ debug }`, res);
         statusSet(FetchStatus.success);
         onSuccess(res);
@@ -78,12 +81,10 @@ export default function useLazyLists({ addQueries, debug = "", fetcher, filterKe
         }
       });
     }
-  }, [ addQueries, debug, fetcher, filter, filterKey, listKeys, listSet, next, onSuccess, sort, status, totalKeys ]);
+  }, [ addQueries, debug, fetcher, history, listKeys, listSet, next, onSuccess, pathname, sort, status, totalKeys ]);
 
   return {
     fetchError,
-    filter,
-    filterSet,
     getMore,
     isLoading,
     list: Object.values(list).flat(), // format as an array, eventually the input list will live within this hook. Eventually

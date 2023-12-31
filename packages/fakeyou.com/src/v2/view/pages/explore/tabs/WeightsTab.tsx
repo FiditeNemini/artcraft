@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import WeightsCards from "components/common/Card/WeightsCards";
 import { TempSelect } from "components/common";
@@ -12,21 +13,28 @@ import { ListWeights } from "@storyteller/components/src/api/weights/ListWeights
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useBookmarks, useLazyLists } from "hooks";
+import prepFilter from "resources/prepFilter";
 
 export default function WeightsTab() {
+  const { search } = useLocation();
+  const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
+  const [weightType, weightTypeSet] = useState(urlQueries.get("maybe_scoped_weight_type") || "all");
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<Weight[]>([]);
   const weights = useLazyLists({
+    addQueries: {
+      page_size: 24,
+      ...prepFilter(weightType, "maybe_scoped_weight_type")
+    },
+    addSetters: { weightTypeSet },
     fetcher: ListWeights,
-    filterKey: "weights_category",
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: () => setShowMasonryGrid(true),
-    requestList: true,
-    addQueries: { page_size: 12 },
+    requestList: true
   });
 
   const filterOptions = [
@@ -77,9 +85,9 @@ export default function WeightsTab() {
             {...{
               icon: faFilter,
               options: filterOptions,
-              name: "filter",
+              name: "weightType",
               onChange: weights.onChange,
-              value: weights.filter,
+              value: weightType,
             }}
           />
           {/* {selectedFilter === "tts" && (

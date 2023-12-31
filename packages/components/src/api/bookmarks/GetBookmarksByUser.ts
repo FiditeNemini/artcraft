@@ -10,7 +10,8 @@ export interface UserBookmarksListResponse {
 }
 
 export interface UserBookmarksListQueries {
-  page_index: number;
+  page_index?: number;
+  page_size: number;
 }
 
 export const GetBookmarksByUser = MakeRequest<

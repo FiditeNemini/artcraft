@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
@@ -14,21 +15,29 @@ import { ListMediaFiles } from "@storyteller/components/src/api/media_files/List
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { useBookmarks, useLazyLists } from "hooks";
 import InfiniteScroll from "react-infinite-scroll-component";
+import prepFilter from "resources/prepFilter";
 
 export default function MediaTab() {
+  const { search } = useLocation();
+  const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
+  const [weightType, weightTypeSet] = useState(urlQueries.get("maybe_scoped_weight_type") || "all");
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useLazyLists({
+    addQueries: {
+      page_size: 24,
+      ...prepFilter(weightType, "maybe_scoped_weight_type")
+    },
+    addSetters: { weightTypeSet },
     debug: "explore media tab",
     fetcher: ListMediaFiles,
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: () => setShowMasonryGrid(true),
-    requestList: true,
-    addQueries: { page_size: 12 },
+    requestList: true
   });
 
   const filterOptions = [
@@ -61,9 +70,9 @@ export default function MediaTab() {
             {...{
               icon: faFilter,
               options: filterOptions,
-              name: "filter",
+              name: "weightType",
               onChange: media.onChange,
-              value: media.filter,
+              value: weightType,
             }}
           />
         </div>
