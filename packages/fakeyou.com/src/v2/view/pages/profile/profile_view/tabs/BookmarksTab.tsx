@@ -12,23 +12,26 @@ import Pagination from "components/common/Pagination";
 import { useBookmarks, useListContent } from "hooks";
 import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
 import WeightsCards from "components/common/Card/WeightsCards";
+import prepFilter from "resources/prepFilter";
 
 export default function BookmarksTab({ username }: { username: string }) {
-  const { pathname: origin } = useLocation();
+  const { pathname: origin, search } = useLocation();
+  const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
+  const [weightType, weightTypeSet] = useState(urlQueries.get("maybe_scoped_weight_type") || "all");
   const [sd, sdSet] = useState("all");
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
-  const [weightCategory, weightCategorySet] = useState("all");
+  const [weightCategory, weightCategorySet] = useState(urlQueries.get("maybe_scoped_weight_category") || "all");
   const [list, listSet] = useState<any[]>([]);
   // const resetMasonryGrid = () => {
   //   setShowMasonryGrid(false);
   //   setTimeout(() => setShowMasonryGrid(true), 10);
   // };
   const {
-    filter,
+    // filter,
     isLoading,
     list: dataList,
     onChange,
@@ -40,12 +43,12 @@ export default function BookmarksTab({ username }: { username: string }) {
   } = useListContent({
     addQueries: {
       page_size: 24,
-      ...(weightCategory !== "all" ? { maybe_scoped_weight_category: weightCategory } : {}),
+      ...prepFilter(weightType, "maybe_scoped_weight_type"),
+      ...prepFilter(weightCategory, "maybe_scoped_weight_category"),
     },
-    addSetters: { sdSet, ttsSet, vcSet, weightCategorySet },
+    addSetters: { sdSet, ttsSet, vcSet, weightCategorySet, weightTypeSet },
     debug: "bookmarks tab",
     fetcher: GetBookmarksByUser,
-    filterKey: "maybe_scoped_weight_type",
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
@@ -131,9 +134,9 @@ export default function BookmarksTab({ username }: { username: string }) {
             {...{
               icon: faFilter,
               options: filterOptions,
-              name: "filter",
+              name: "weightType",
               onChange,
-              value: filter,
+              value: weightType,
             }}
           />
           <TempSelect
@@ -145,7 +148,7 @@ export default function BookmarksTab({ username }: { username: string }) {
               value: weightCategory,
             }}
           />
-          {filter === "tts" && (
+          { weightType === "tts" && (
             <TempSelect
               {...{
                 options: modelTtsOptions,
@@ -155,7 +158,7 @@ export default function BookmarksTab({ username }: { username: string }) {
               }}
             />
           )}
-          {filter === "sd" && (
+          { weightType === "sd" && (
             <TempSelect
               {...{
                 options: modelSdOptions,
@@ -165,7 +168,7 @@ export default function BookmarksTab({ username }: { username: string }) {
               }}
             />
           )}
-          {filter === "vc" && (
+          { weightType === "vc" && (
             <TempSelect
               {...{
                 options: modelVcOptions,

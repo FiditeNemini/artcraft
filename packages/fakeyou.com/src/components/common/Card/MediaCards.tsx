@@ -9,7 +9,6 @@ interface Props {
 }
 
 export default function MediaCards({ props, type }: Props) {
-  console.log("🔋",props);
   switch (type) {
     case "audio":
       return <AudioCard {...props} />;
