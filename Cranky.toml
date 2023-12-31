@@ -40,6 +40,7 @@ deny = [
   "clippy::redundant_static_lifetimes", # Lint: feels more modern to elide static lifetimes
 
   # Rust
+	"unused_parens", # Unused parens are ugly
   "unused_imports", # These are easy to automatically cull
 
   # Possible:

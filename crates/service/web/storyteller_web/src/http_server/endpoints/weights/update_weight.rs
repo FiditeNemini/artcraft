@@ -153,7 +153,7 @@ pub async fn update_weight_handler(
     let mut description_rendered_html = None;
 
     if let Some(title) = &request.title {
-        if (contains_slurs(title)) {
+        if contains_slurs(title) {
             return Err(UpdateWeightError::BadInput("Title contains slurs".to_string()));
         }
         weight_title = Some(title.trim().to_string());
@@ -183,7 +183,7 @@ pub async fn update_weight_handler(
     }
 
     if let Some(markdown) = &request.description_markdown {
-        if (contains_slurs(markdown)) {
+        if contains_slurs(markdown) {
             return Err(UpdateWeightError::BadInput("Description contains slurs".to_string()));
         }
         let markdown = markdown.trim().to_string();
