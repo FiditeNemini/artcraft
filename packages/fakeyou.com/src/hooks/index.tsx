@@ -9,6 +9,7 @@ import useLazyLists from './useLazyLists';
 import useListContent from './useListContent';
 import useLocalize from './useLocalize';
 import useMedia from './useMedia';
+import useRatings from './useRatings';
 import useSession from './useSession';
 import useVideo from './useVideo';
 import useWeightFetch from './useWeightFetch';
@@ -25,6 +26,7 @@ export {
   useListContent,
   useLocalize,
   useMedia,
+  useRatings,
   useSession,
   useVideo,
   useWeightFetch
