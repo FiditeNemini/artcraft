@@ -125,7 +125,7 @@ export default function BookmarksTab({ username }: { username: string }) {
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
-        <div className="d-flex flex-grow-1">
+        <div className="d-flex flex-grow-1 flex-wrap gap-2">
           <TempSelect
             {...{
               icon: faArrowDownWideShort,

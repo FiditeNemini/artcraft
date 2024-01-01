@@ -22,13 +22,15 @@ export default function MediaTab() {
   const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [weightType, weightTypeSet] = useState(urlQueries.get("maybe_scoped_weight_type") || "all");
+  const [weightType, weightTypeSet] = useState(
+    urlQueries.get("maybe_scoped_weight_type") || "all"
+  );
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useLazyLists({
     addQueries: {
       page_size: 24,
-      ...prepFilter(weightType, "maybe_scoped_weight_type")
+      ...prepFilter(weightType, "maybe_scoped_weight_type"),
     },
     addSetters: { weightTypeSet },
     debug: "explore media tab",
@@ -37,7 +39,7 @@ export default function MediaTab() {
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: () => setShowMasonryGrid(true),
-    requestList: true
+    requestList: true,
   });
 
   const filterOptions = [
@@ -56,7 +58,7 @@ export default function MediaTab() {
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
-        <div className="d-flex flex-grow-1">
+        <div className="d-flex flex-grow-1 flex-wrap gap-2">
           <TempSelect
             {...{
               icon: faArrowDownWideShort,
