@@ -193,6 +193,7 @@ export default function ImageCard({
                       entityToken: data.weight_token,
                       entityType: "model_weight",
                       onToggle: bookmarks.toggle,
+                      initialToggled: bookmarks.list[data.weight_token]
                     }}
                   />
                 </div>

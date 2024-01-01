@@ -20,9 +20,8 @@ export default function WeightsTab() {
   const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [weightType, weightTypeSet] = useState(
-    urlQueries.get("maybe_scoped_weight_type") || "all"
-  );
+  const [weightType, weightTypeSet] = useState(urlQueries.get("maybe_scoped_weight_type") || "all");
+  const [weightCategory, weightCategorySet] = useState(urlQueries.get("maybe_scoped_weight_category") || "all");
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<Weight[]>([]);
   const weights = useLazyLists({
@@ -30,7 +29,7 @@ export default function WeightsTab() {
       page_size: 24,
       ...prepFilter(weightType, "maybe_scoped_weight_type"),
     },
-    addSetters: { weightTypeSet },
+    addSetters: { weightCategorySet, weightTypeSet },
     fetcher: ListWeights,
     list,
     listSet,
@@ -39,11 +38,30 @@ export default function WeightsTab() {
     requestList: true,
   });
 
-  const filterOptions = [
-    { value: "all", label: "All Weights" },
-    { value: "tts", label: "Text to Speech" },
-    { value: "vc", label: "Voice to Voice" },
-    { value: "sd", label: "Image Generation" },
+  // const filterOptions = [
+  //   { value: "all", label: "All Weights" },
+  //   { value: "tts", label: "Text to Speech" },
+  //   { value: "vc", label: "Voice to Voice" },
+  //   { value: "sd", label: "Image Generation" },
+  // ];
+
+  const weightTypeOpts = [ // these probably need beter labels
+    { value: "all", label: "All weight types" },
+    { value: "hifigan_tt2", label: "hifigan_tt2" },
+    { value: "sd_1.5", label: "sd_1.5" },
+    { value: "sdxl", label: "sdxl" },
+    { value: "so_vits_svc", label: "so_vits_svc" },
+    { value: "tt2", label: "tt2" },
+    { value: "loRA", label: "loRA" },
+    { value: "vall_e", label: "vall_e" },
+  ];
+
+  const weightCategoryOpts = [
+    { value: "all", label: "All weight categories" },
+    { value: "image_generation", label: "Image generation" },
+    { value: "text_to_speech", label: "Text to speech" },
+    { value: "vocoder", label: "Vocoder" },
+    { value: "voice_conversion", label: "Voice conversion" },
   ];
 
   const sortOptions = [
@@ -83,15 +101,20 @@ export default function WeightsTab() {
               value: weights.sort,
             }}
           />
-          <TempSelect
-            {...{
-              icon: faFilter,
-              options: filterOptions,
-              name: "weightType",
-              onChange: weights.onChange,
-              value: weightType,
-            }}
-          />
+          <TempSelect {...{
+            icon: faFilter,
+            options: weightCategoryOpts,
+            name: "weightCategory",
+            onChange: weights.onChange,
+            value: weightCategory,
+          }} />
+          <TempSelect {...{
+            icon: faFilter,
+            options: weightTypeOpts,
+            name: "weightType",
+            onChange: weights.onChange,
+            value: weightType,
+          }} />
           {/* {selectedFilter === "tts" && (
             <TempSelect
               options={modelTtsOptions}

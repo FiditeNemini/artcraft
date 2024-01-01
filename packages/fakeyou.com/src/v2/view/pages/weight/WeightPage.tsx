@@ -388,6 +388,7 @@ export default function WeightPage({
                         entityType: "model_weight",
                         onToggle: bookmarks.toggle,
                         large: true,
+                        initialToggled: bookmarks.list[weight_token]
                       }}
                     />
                   </div>
