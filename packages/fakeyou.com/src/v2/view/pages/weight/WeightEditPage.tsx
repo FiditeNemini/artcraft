@@ -163,8 +163,9 @@ export default function WeightEditPage({
         ) : (
           <SplitPanel dividerFooter={true}>
             <SplitPanel.Body padding={true}>
-              <div {...{ className: "weight-editor w-100 d-flex" }}>
-                <div {...{ className: "weight-editor-column" }}>
+              <div {...{ className: "weight-editor row gy-3 gx-4" }}>
+                <div {...{ className: "col-12 col-lg-5" }}>
+                  <label className="sub-title">Cover Image</label>
                   <div {...{ className: "fy-cover-img-input" }}>
                     {" "}
                     {weight?.maybe_cover_image_public_bucket_path &&
@@ -213,7 +214,7 @@ export default function WeightEditPage({
                       )}{" "}
                   </div>
                 </div>
-                <div {...{ className: "weight-editor-column" }}>
+                <div {...{ className: "col-lg-7 order-first  order-lg-last" }}>
                   <TempInput
                     {...{
                       label: "Title",
