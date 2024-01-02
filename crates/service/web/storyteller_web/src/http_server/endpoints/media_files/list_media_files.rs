@@ -46,6 +46,7 @@ pub struct MediaFileListItem {
 
   pub origin_category: MediaFileOriginCategory,
   pub origin_product_category: MediaFileOriginProductCategory,
+
   pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
   pub maybe_origin_model_token: Option<String>,
 

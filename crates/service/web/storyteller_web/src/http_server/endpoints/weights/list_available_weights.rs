@@ -4,10 +4,11 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use chrono::{DateTime, Utc};
-use log::{info, warn};
+use log::warn;
 use rand::Rng;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use utoipa::ToSchema;
 
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::model_weights::{
     weights_category::WeightsCategory,
     weights_types::WeightsType,
@@ -15,24 +16,18 @@ use enums::by_table::model_weights::{
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::list::list_weights_query_builder::ListWeightsQueryBuilder;
 use tokens::tokens::model_weights::ModelWeightToken;
-use tokens::tokens::users::UserToken;
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 
-use crate::server_state::ServerState;
-
-
-
-use utoipa::ToSchema;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
-
+use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
+use crate::server_state::ServerState;
 
 #[derive(Deserialize,ToSchema)]
 pub struct ListAvailableWeightsQuery {
     pub sort_ascending: Option<bool>,
     pub page_size: Option<u16>,
     pub username: Option<String>,
-    pub weights_type: Option<String>,
-    pub weights_category: Option<String>,
+    pub weight_type: Option<WeightsType>,
+    pub weight_category: Option<WeightsCategory>,
     pub cursor_is_reversed: Option<bool>,
     pub cursor: Option<String>,
 }
@@ -157,40 +152,11 @@ pub async fn list_available_weights_handler(
 
     let include_user_hidden = is_mod;
 
-    let mut weights_category: Option<WeightsCategory> = None;
-    let mut weights_type: Option<WeightsType> = None;
-
-    if let Some(weights_category_string) = query.weights_category.as_ref() {
-        let result = WeightsCategory::from_str(&weights_category_string);
-        match result {
-            Ok(category) => { 
-                weights_category = Some(category) 
-            },
-            Err(e) => {
-                warn!("invalid weights_category: {:?}", e);
-                weights_category = None
-            }
-        }
-    }
-
-    if let Some(weights_type_string) = query.weights_type.as_ref() {
-        let result = WeightsType::from_str(&weights_type_string);
-        match result {
-            Ok(wtype) => { 
-                weights_type = Some(wtype) 
-            },
-            Err(e) => {
-                warn!("invalid weights_type: {:?}", e);
-                weights_type = None
-            }
-        }
-    }
-
     let mut query_builder = ListWeightsQueryBuilder::new()
         .sort_ascending(sort_ascending)
         .cursor_is_reversed(cursor_is_reversed)
-        .weights_category(weights_category)
-        .weights_type(weights_type)
+        .weights_category(query.weight_category)
+        .weights_type(query.weight_type)
         .scope_creator_username(None)
         .include_user_hidden(include_user_hidden)
         .include_user_deleted_results(is_mod)
