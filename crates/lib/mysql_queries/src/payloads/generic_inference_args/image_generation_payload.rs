@@ -59,6 +59,9 @@ pub struct SDArgs {
     #[serde(rename = "lu")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_lora_upload_path: Option<String>
+
+    #[serde(rename = "t")]
+    pub inference_type: Option<String>
 }
 
 

@@ -6,7 +6,6 @@ use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
 use crate::payloads::generic_inference_args::videofilter_payload::RerenderArgs;
 use crate::payloads::generic_inference_args::image_generation_payload::SDArgs;
 
-use tokens::tokens::{model_weights::ModelWeightToken, media_files::MediaFileToken};
 /// Used to encode extra state for the `generic_inference_jobs` table.
 /// This should act somewhat like a serialized protobuf stored inside a record.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -223,10 +222,7 @@ use crate::payloads::generic_inference_args::generic_inference_args::{Fundamenta
     };
 
     let json = serde_json::ser::to_string(&args).unwrap();
-
     assert_eq!(json, r#"{"cat":"ig","args":{"Ig":{"vs":"video_media_token","is":"image_media_token","sd":"sd_model_token","lm":"lora_model_token","p":"prompt","ap":"a_prompt","np":"n_prompt","se":1,"mu":"upload_path","lu":"lora_upload_path"}}}"#.to_string());
-
-
   }
 
   #[test]

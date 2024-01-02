@@ -8,9 +8,12 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use elasticsearch::http::request;
 use log::warn;
 use serde::Deserialize;
 use serde::Serialize;
+use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::model_weights::ModelWeightToken;
 use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
@@ -23,16 +26,19 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
     PolymorphicInferenceArgs,
 };
 
-use mysql_queries::payloads::generic_inference_args::tts_payload::TTSArgs;
+use mysql_queries::payloads::generic_inference_args::image_generation_payload::SDArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
     insert_generic_inference_job,
     InsertGenericInferenceArgs,
 };
 
+
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
+use crate::http_server::endpoints::media_files::drain_multipart_request::MediaSource;
+use crate::http_server::endpoints::weights::list_weights_by_user::Weight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -44,12 +50,30 @@ const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
 /// This is useful for catching the live logs or intercepting the job.
 const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 
+#[derive(Deserialize,ToSchema)]
+pub enum TypeOfInference {
+    #[serde(rename = "lora")]
+    UploadLoRA,
+    #[serde(rename = "checkpoint")]
+    CheckPoint,
+    #[serde(rename = "standard_inference")]
+    StandardInference,
+}
 
 #[derive(Deserialize,ToSchema)]
 pub struct EnqueueImageGenRequest {
     uuid_idempotency_token: String,
-    text: String,
-    voice_token: String,
+    type_of_inference: TypeOfInference, // upload loRA / check point / standard inference
+    maybe_video_source: Option<String>,
+    maybe_image_source: Option<String>,
+    maybe_sd_model_token: Option<String>,
+    maybe_lora_model_token: Option<String>,
+    maybe_prompt: Option<String>,
+    maybe_a_prompt: Option<String>,
+    maybe_n_prompt: Option<String>,
+    maybe_seed: Option<String>,
+    maybe_upload_path: Option<String>,
+    maybe_lora_upload_path: Option<String>,
 }
 
 #[derive(Serialize,ToSchema)]
@@ -119,7 +143,7 @@ pub async fn enqueue_image_generation_request(
 ) -> Result<HttpResponse, EnqueueImageGenRequestError> {
 
     let mut maybe_user_token: Option<UserToken> = None;
-
+    let mut visbility =  enums::common::visibility::Visibility::Public;
     let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {
         warn!("MySql pool error: {:?}", err);
         EnqueueImageGenRequestError::ServerError
@@ -133,7 +157,8 @@ pub async fn enqueue_image_generation_request(
             warn!("Session checker error: {:?}", e);
             EnqueueImageGenRequestError::ServerError
         })?;
-
+    
+    
     if let Some(user_session) = maybe_user_session.as_ref() {
         maybe_user_token = Some(UserToken::new_from_str(&user_session.user_token));
     }
@@ -177,36 +202,80 @@ pub async fn enqueue_image_generation_request(
     // Get up IP address
     let ip_address = get_request_ip(&http_request);
 
-    // package as larger component args should always have an embedding token ..
-    let inference_args = TTSArgs {
-        voice_token: Some(request.voice_token.clone()),
-        dataset_token: None,
+    // Check the inference args to make sure everything is all there for upload loRA / model or standard inference
+
+    // ==================== INFERENCE ARGS ==================== //
+
+    if request.type_of_inference == EnqueueImageGenType::Inference {
+        if request.maybe_sd_model_token.is_none() {
+            return Err(EnqueueImageGenRequestError::BadInput("No sd model token provided".to_string()));
+        }
+
+        if request.maybe_prompt.is_none() {
+            return Err(EnqueueImageGenRequestError::BadInput("No prompt provided".to_string()));
+        }
+
+    } else if request.type_of_inference == EnqueueImageGenRequest::UploadLoRA {
+        if request.maybe_lora_upload_path.is_none() {
+            return Err(EnqueueImageGenRequestError::BadInput("No lora upload path provided".to_string()));
+        }
+    } else if request.type_of_inference == EnqueueImageGenRequest::CheckPoint {
+        if request.maybe_upload_path.is_none() {
+            return Err(EnqueueImageGenRequestError::BadInput("No upload path provided".to_string()));
+        }
+    }
+
+    let video_token = MediaFileToken(request.maybe_video_source.clone().unwrap_or_default());
+    let image_source_token = MediaFileToken(request.maybe_image_source.clone().unwrap_or_default());
+    let sd_weight_token = ModelWeightToken(request.maybe_sd_model_token.clone().unwrap_or_default());
+    let lora_token = ModelWeightToken(request.maybe_lora_model_token.clone().unwrap_or_default());
+
+    let a_prompt = request.maybe_a_prompt.clone().unwrap_or_default();
+    let n_prompt = request.maybe_n_prompt.clone().unwrap_or_default();
+
+    // we can only do 1 upload type at a time.
+    // if we are uploading a model.
+    let upload_path = request.maybe_upload_path.clone().unwrap_or_default();
+    // if we are uploading a lora model.
+    let lora_upload_path = request.maybe_lora_upload_path.clone().unwrap_or_default();
+
+    let inference_args = SDArgs {
+        maybe_video_source: Some(video_token),
+        maybe_image_source: Some(image_source_token),
+        maybe_sd_model_token: Some(sd_weight_token),
+        maybe_lora_model_token: Some(lora_token),
+        maybe_prompt: Some(request.maybe_prompt.clone().unwrap_or_default()),
+        maybe_a_prompt: Some(a_prompt),
+        maybe_n_prompt: Some(n_prompt),
+        maybe_seed: Some(request.maybe_seed.clone().unwrap_or_default()),
+        maybe_upload_path: Some(upload_path),
+        maybe_lora_upload_path: Some(lora_upload_path),
+        inference_type: Some(request.type_of_inference.clone()),
     };
 
     // create the inference args here
-    // enqueue a zero shot tts request here...
     let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
 
     // create the job record here!
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
-        inference_category: InferenceCategory::TextToSpeech,
-        maybe_model_type: Some(InferenceModelType::VallEX), // NB: Model is static during inference
+        inference_category: InferenceCategory::ImageGeneration,
+        maybe_model_type: Some(InferenceModelType::StableDiffusion), // NB: Model is static during inference
         maybe_model_token: None, // NB: Model is static during inference
         maybe_input_source_token: None,
         maybe_input_source_token_type: None,
         maybe_raw_inference_text: Some(&request.text),
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {
-            inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
-            args: Some(PolymorphicInferenceArgs::Tts(inference_args)),
+            inference_category: Some(InferenceCategoryAbbreviated::ImageGeneration),
+            args: Some(PolymorphicInferenceArgs::Ig(inference_args)),
         }),
         maybe_creator_user_token: maybe_user_token.as_ref(),
         maybe_avt_token: maybe_avt_token.as_ref(),
         creator_ip_address: &ip_address,
-        creator_set_visibility: enums::common::visibility::Visibility::Public,
+        creator_set_visibility: visbility,
         priority_level,
-        requires_keepalive: true, // do we need this? I think so
+        requires_keepalive: true, 
         is_debug_request,
         maybe_routing_tag: maybe_routing_tag.as_deref(),
         mysql_pool: &server_state.mysql_pool,
