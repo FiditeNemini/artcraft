@@ -224,7 +224,7 @@ use crate::payloads::generic_inference_args::generic_inference_args::{Fundamenta
 
     let json = serde_json::ser::to_string(&args).unwrap();
 
-    assert_eq!(json, r#"{"cat":"ig","args":{"Ig":{"v":"video_media_token","i":"image_media_token","s":"sd_model_token","l":"lora_model_token","p":"prompt","a":"a_prompt","n":"n_prompt","e":1,"u":"upload_path","o":"lora_upload_path"}}}"#.to_string());
+    assert_eq!(json, r#"{"cat":"ig","args":{"Ig":{"vs":"video_media_token","is":"image_media_token","sd":"sd_model_token","lm":"lora_model_token","p":"prompt","ap":"a_prompt","np":"n_prompt","se":1,"mu":"upload_path","lu":"lora_upload_path"}}}"#.to_string());
 
 
   }

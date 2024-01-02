@@ -32,7 +32,7 @@ pub struct SDArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_sd_model_token: Option<ModelWeightToken>,
 
-    #[serde(rename = "lora")]
+    #[serde(rename = "lm")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_lora_model_token: Option<ModelWeightToken>,
 
@@ -52,11 +52,11 @@ pub struct SDArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_seed: Option<i32>,
   
-    #[serde(rename = "mup")]
+    #[serde(rename = "mu")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_upload_path: Option<String>,
     
-    #[serde(rename = "lup")]
+    #[serde(rename = "lu")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_lora_upload_path: Option<String>
 }
