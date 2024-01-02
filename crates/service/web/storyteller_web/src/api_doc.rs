@@ -80,6 +80,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
 
     // Common response structs
     DefaultAvatarInfo,
+    MediaFileSocialMetaLight,
     PaginationCursors,
     PaginationPage,
     SimpleGenericJsonSuccess,
@@ -102,7 +103,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     WeightsData,MediaFileData,
     ListFeaturedMediaFilesSuccessResponse,MediaFile, ListFeaturedMediaFilesError,
     ListMediaFilesSuccessResponse, ListMediaFilesError, MediaFileListItem, ListMediaFilesQueryParams,
-    MediaFileSocialMetaLight,
     ListMediaFilesForUserSuccessResponse,ListMediaFilesForUserQueryParams,ListMediaFilesForUserError,ListMediaFilesForUserPathInfo,
     MediaFileForUserListItem, MediaFileForUserListItem,
     UserBookmarkDetailsForUserList,UserBookmarkEntityType,
