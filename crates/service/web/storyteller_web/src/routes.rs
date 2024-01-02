@@ -162,7 +162,7 @@ use crate::http_server::endpoints::weights::list_featured_weights::list_featured
 use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler;
 use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
-
+use crate::http_server::endpoints::image_gen::enqueue_image_generation::
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
       B: MessageBody,
@@ -1255,6 +1255,31 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
                       .route("/enqueue_vc", web::post().to(enqueue_vc_request))
               )
       )
+}
+
+
+fn add_image_gen_routes<T,B> (app:App<T>)-> App<T>
+    where
+        B: MessageBody,
+        T: ServiceFactory<
+            ServiceRequest,
+            Config = (),
+            Response = ServiceResponse<B>,
+            Error = Error,
+            InitError = (),
+        >,
+{
+    app.service(
+        web::scope("/v1/image_gen")
+            .service(
+                web::scope("/model")
+                    .route("/upload", web::post().to(upload_zs_sample_handler))
+            )
+            .service(
+                web::scope("/inference")
+                    .route("/enqueue_image_gen", web::post().to(enqueue_tts_request))
+            )
+    )
 }
 
 // ==================== Weights ROUTES ====================

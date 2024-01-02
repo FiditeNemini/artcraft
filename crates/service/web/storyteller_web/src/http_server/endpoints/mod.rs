@@ -27,3 +27,4 @@ pub mod voice_designer;
 pub mod w2l;
 pub mod user_bookmarks;
 pub mod weights;
+pub mod image_gen;

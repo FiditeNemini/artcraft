@@ -4,6 +4,7 @@ use errors::AnyhowResult;
 use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
 use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
 use crate::payloads::generic_inference_args::videofilter_payload::{RerenderArgs};
+use crate::payloads::generic_inference_args::image_generation_payload::{SDArgs};
 
 
 /// Used to encode extra state for the `generic_inference_jobs` table.
@@ -40,6 +41,10 @@ pub enum InferenceCategoryAbbreviated {
   #[serde(rename = "vf")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(alias = "video_filter")]
   VideoFilter,
+
+  #[serde(rename = "ig")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(alias = "image_generation")]
+  ImageGeneration
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]
@@ -113,6 +118,7 @@ impl InferenceCategoryAbbreviated {
       InferenceCategory::TextToSpeech => Self::TextToSpeech,
       InferenceCategory::VoiceConversion => Self::VoiceConversion,
       InferenceCategory::VideoFilter => Self::VideoFilter,
+      InferenceCategory::ImageGeneration => Self::ImageGeneration,
     }
   }
 
@@ -122,6 +128,7 @@ impl InferenceCategoryAbbreviated {
       Self::TextToSpeech => InferenceCategory::TextToSpeech,
       Self::VoiceConversion => InferenceCategory::VoiceConversion,
       Self::VideoFilter => InferenceCategory::VideoFilter,
+      Self::ImageGeneration =>InferenceCategory::ImageGeneration
     }
   }
 }
