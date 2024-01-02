@@ -74,7 +74,7 @@ pub async fn seed_weights_files(
 
     for (
         user_token,
-        weights_file_token,
+        _weights_file_token,
         weights_type,
         weights_category,
         model_name,
@@ -168,9 +168,9 @@ struct BucketDetails {
 }
 
 async fn seed_model(
-    mysql_pool: &Pool<MySql>,
-    model_weight_token: &ModelWeightToken,
-    user_token: &UserToken,
+    _mysql_pool: &Pool<MySql>,
+    _model_weight_token: &ModelWeightToken,
+    _user_token: &UserToken,
     weight_type: WeightsType,
     weight_file_path: &Path,
     maybe_bucket_clients: Option<&BucketClients>

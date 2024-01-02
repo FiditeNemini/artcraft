@@ -81,7 +81,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
 *Thank you for your continued support and feedback!*
 "#;
 
-    let sd1_5_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/be706282-2978-42a0-aaa2-73881aad94e9/width=1024/00049-2287632957-1girl,face,curly%20hair,red%20hair,white%20background,.jpeg";
+    let _sd1_5_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/be706282-2978-42a0-aaa2-73881aad94e9/width=1024/00049-2287632957-1girl,face,curly%20hair,red%20hair,white%20background,.jpeg";
 
     // create a loop that loops from 1 to 100
     for i in 1..=100 {
@@ -112,7 +112,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
         let mut original_filename;
         let mut original_download_url;
 
-        let mut private_bucket_hash:String = "".to_string();
+        let mut _private_bucket_hash:String = "".to_string();
         let mut private_bucket_prefix;
         let mut private_bucket_extension;
 
@@ -220,7 +220,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
 
                 Have fun! 😊
                 "#;
-                let sdxl_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/be706282-2978-42a0-aaa2-73881aad94e9/width=1024/00049-2287632957-1girl,face,curly%20hair,red%20hair,white%20background,.jpeg";
+                let _sdxl_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/be706282-2978-42a0-aaa2-73881aad94e9/width=1024/00049-2287632957-1girl,face,curly%20hair,red%20hair,white%20background,.jpeg";
 
                 model_weight_token = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
                 title = format!("SDXL_Niji_Special Edition: {}", i);
@@ -249,7 +249,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 - LoRA Gawr Gura
                 "#;
 
-                let lora_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/123645df-dee2-4239-863a-76a150b09c32/width=1024/00000-2171948503.jpeg";
+                let _lora_image_token = "https://image.civitai.com/xG1nkqKTMzGDvpLrqFT7WA/123645df-dee2-4239-863a-76a150b09c32/width=1024/00000-2171948503.jpeg";
                 model_weight_token = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
                 title = format!("Gawr Gura LoRA: {}", i);
                 
@@ -479,7 +479,7 @@ pub async fn seed_weights_for_user_token(
 }
 
 
-pub async fn original_seed_weights(mysql_pool: &Pool<MySql>,user_token: UserToken) -> AnyhowResult<()> {
+pub async fn original_seed_weights(mysql_pool: &Pool<MySql>, _user_token: UserToken) -> AnyhowResult<()> {
     let model_weight_token1 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
     let creator_token1 = UserToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
 

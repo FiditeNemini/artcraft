@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use log::{info, warn};
-use sqlx::{MySql, MySqlPool};
+use sqlx::{Error, MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
@@ -75,13 +75,13 @@ pub async fn list_tts_models_with_connection(
   let models : Vec<InternalRawTtsModelRecordForList> = match maybe_models {
     Ok(models) => models,
     Err(err) => {
-      match err {
-        RowNotFound => {
-          return Ok(Vec::new());
+      return match err {
+        Error::RowNotFound => {
+          Ok(Vec::new())
         },
         _ => {
           warn!("tts model list query error: {:?}", err);
-          return Err(anyhow!("tts model list query error"));
+          Err(anyhow!("tts model list query error"))
         }
       }
     }
@@ -117,7 +117,7 @@ pub async fn list_tts_models_with_connection(
 async fn list_tts_models_for_all_creators(
   mysql_connection: &mut PoolConnection<MySql>,
   allow_mod_disabled: bool
-) -> AnyhowResult<Vec<InternalRawTtsModelRecordForList>> {
+) -> Result<Vec<InternalRawTtsModelRecordForList>, Error> {
   // TODO: There has to be a better way.
   //  Sqlx doesn't like anything except string literals.
   let maybe_models = if !allow_mod_disabled {
@@ -198,7 +198,7 @@ async fn list_tts_models_creator_scoped(
   mysql_connection: &mut PoolConnection<MySql>,
   scope_creator_username: &str,
   allow_mod_disabled: bool
-) -> AnyhowResult<Vec<InternalRawTtsModelRecordForList>> {
+) -> Result<Vec<InternalRawTtsModelRecordForList>, Error> {
   // TODO: There has to be a better way.
   //  Sqlx doesn't like anything except string literals.
   let maybe_models = if !allow_mod_disabled {

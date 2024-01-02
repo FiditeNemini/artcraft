@@ -47,11 +47,11 @@ pub async fn main() -> AnyhowResult<()> {
     maybe_bucket_clients = Some(get_bucket_clients()?);
   }
 
-  let mut maybe_elasticsearch = None;
-
-  if args.seed_elasticsearch {
-    maybe_elasticsearch = Some(get_elasticsearch_client());
-  }
+//  let mut maybe_elasticsearch = None;
+//
+//  if args.seed_elasticsearch {
+//    maybe_elasticsearch = Some(get_elasticsearch_client());
+//  }
 
   seed_user_accounts(&pool).await?;
   seed_media_files(&pool, maybe_bucket_clients.as_ref()).await?;

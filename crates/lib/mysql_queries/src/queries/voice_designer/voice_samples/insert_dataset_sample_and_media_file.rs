@@ -53,7 +53,7 @@ const ORIGIN_PRODUCT : MediaFileOriginProductCategory = MediaFileOriginProductCa
 
 pub async fn insert_dataset_sample_and_media_file(args: InsertDatasetSampleAndMediaFileArgs<'_>) -> AnyhowResult<(ZsVoiceDatasetSampleToken, MediaFileToken, u64)> {
 
-  let maybe_creator_synthetic_id : Option<u64> = None;
+  let _maybe_creator_synthetic_id : Option<u64> = None;
 
   let mut transaction = args.mysql_pool.begin().await?;
 

@@ -60,7 +60,7 @@ pub fn parse_model_types(comma_separated_types: &str) -> AnyhowResult<BTreeSet<I
 
   for t in scoped_types.into_iter() {
     let model_type = InferenceModelType::from_str(&t)
-        .map_err(|err| anyhow!(
+        .map_err(|_err| anyhow!(
           "Invalid model type: {:?}; should include only items from: {:?}",
           t,
           InferenceModelType::all_variants()))?;

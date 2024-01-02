@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use log::warn;
-use sqlx::{MySql, MySqlPool};
+use sqlx::{Error, MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
 
 use enums::by_table::media_files::media_file_type::MediaFileType;
@@ -10,8 +10,6 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voice_dataset_samples::ZsVoiceDatasetSampleToken;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
-
-
 
 pub struct DatasetSampleRecordForList {
     pub sample_token: ZsVoiceDatasetSampleToken,
@@ -62,13 +60,13 @@ pub async fn list_samples_by_dataset_token_with_connection(
     let records = match maybe_samples {
         Ok(records) => records,
         Err(err) => {
-            match err {
-                RowNotFound => {
-                    return Ok(Vec::new());
+            return match err {
+                Error::RowNotFound => {
+                    Ok(Vec::new())
                 },
                 _ => {
                     warn!("dataset sample list query error: {:?}", err);
-                    return Err(anyhow!("Error fetching dataset samples by dataset token: {:?}", err));
+                    Err(anyhow!("Error fetching dataset samples by dataset token: {:?}", err))
                 }
             }
         }
@@ -96,7 +94,7 @@ async fn list_samples_by_dataset_token(
     mysql_connection: &mut PoolConnection<MySql>,
     dataset_token: &ZsVoiceDatasetToken,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<InternalRawDatasetSampleRecordForList>> {
+) -> Result<Vec<InternalRawDatasetSampleRecordForList>, Error> {
     let maybe_samples = if !can_see_deleted {
         sqlx::query_as!(
             InternalRawDatasetSampleRecordForList,

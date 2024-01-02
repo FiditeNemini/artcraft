@@ -15,6 +15,7 @@ mod tests {
         weights_category::WeightsCategory,
         weights_types::WeightsType,
     };
+    use enums::common::view_as::ViewAs;
     use enums::common::visibility::Visibility;
     use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
 
@@ -278,7 +279,7 @@ mod tests {
         let pool = setup().await;
 
         let creator_username = "hanashi".to_string();
-        let can_see_deleted = true;
+        let view_as = ViewAs::Moderator;
 
         seed_weights_with_category_and_type(
             WeightsType::LoRA,
@@ -292,7 +293,7 @@ mod tests {
             page_size: 0,
             page_index: 0,
             sort_ascending: false,
-            can_see_deleted,
+            view_as,
             mysql_pool: &pool,
         }).await?;
         for weight in weights_by_username.records.iter() {

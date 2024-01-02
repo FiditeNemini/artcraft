@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use log::warn;
-use sqlx::{MySql, MySqlPool};
+use sqlx::{Error, MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
 
 use enums::by_table::voice_conversion_models::voice_conversion_model_type::VoiceConversionModelType;
@@ -64,13 +64,13 @@ pub async fn list_voice_conversion_models_with_connection(
   let models : Vec<RawVoiceConversionModelRecord> = match maybe_models {
     Ok(models) => models,
     Err(err) => {
-      match err {
-        RowNotFound => {
-          return Ok(Vec::new());
+      return match err {
+        Error::RowNotFound => {
+          Ok(Vec::new())
         },
         _ => {
           warn!("vc model list query error: {:?}", err);
-          return Err(anyhow!("vc model list query error"));
+          Err(anyhow!("vc model list query error"))
         }
       }
     }
@@ -99,7 +99,7 @@ pub async fn list_voice_conversion_models_with_connection(
 
 async fn list_voice_conversion_models_for_all_creators(
   mysql_connection: &mut PoolConnection<MySql>,
-) -> AnyhowResult<Vec<RawVoiceConversionModelRecord>> {
+) -> Result<Vec<RawVoiceConversionModelRecord>, Error> {
   Ok(sqlx::query_as!(
       RawVoiceConversionModelRecord,
         r#"
@@ -131,7 +131,7 @@ WHERE
 async fn list_voice_conversion_models_creator_scoped(
   mysql_connection: &mut PoolConnection<MySql>,
   scope_creator_username: &str,
-) -> AnyhowResult<Vec<RawVoiceConversionModelRecord>> {
+) -> Result<Vec<RawVoiceConversionModelRecord>, Error> {
   Ok(sqlx::query_as!(
       RawVoiceConversionModelRecord,
         r#"

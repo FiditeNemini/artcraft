@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use log::{info, warn};
-use sqlx::{MySql, MySqlPool};
+use sqlx::{Error, MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
@@ -50,13 +50,13 @@ pub async fn list_zs_voices_by_username_with_connection(
     let voices : Vec<InternalRawVoiceRecordForList> = match maybe_voices {
         Ok(voices) => voices,
         Err(err) => {
-            match err {
-                RowNotFound => {
-                    return Ok(Vec::new());
+            return match err {
+                Error::RowNotFound => {
+                    Ok(Vec::new())
                 },
                 _ => {
                     warn!("voice list query error: {:?}", err);
-                    return Err(anyhow!("voice list query error"));
+                    Err(anyhow!("voice list query error"))
                 }
             }
         }
@@ -89,7 +89,7 @@ async fn list_voices_by_creator_username(
     mysql_connection: &mut PoolConnection<MySql>,
     creator_username: &str,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<InternalRawVoiceRecordForList>> {
+) -> Result<Vec<InternalRawVoiceRecordForList>, Error> {
     // TODO: There has to be a better way.
     //  Sqlx doesn't like anything except string literals.
     let maybe_voices = if !can_see_deleted {

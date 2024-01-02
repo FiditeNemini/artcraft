@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use log::{info, warn};
-use sqlx::MySqlPool;
+use sqlx::{Error, MySqlPool};
 
 use errors::AnyhowResult;
 
@@ -69,13 +69,13 @@ pub async fn list_w2l_templates(
     Err(err) => {
       warn!("Error: {:?}", err);
 
-      match err {
-        RowNotFound => {
-          return Ok(Vec::new());
+      return match err {
+        Error::RowNotFound => {
+          Ok(Vec::new())
         },
         _ => {
           warn!("w2l template list query error: {:?}", err);
-          return Err(anyhow!("w2l template list query error"));
+          Err(anyhow!("w2l template list query error"))
         }
       }
     }
@@ -106,7 +106,7 @@ pub async fn list_w2l_templates(
 async fn list_w2l_templates_for_all_creators(
   mysql_pool: &MySqlPool,
   require_mod_approved: bool
-) -> AnyhowResult<Vec<RawW2lTemplateRecordForList>> {
+) -> Result<Vec<RawW2lTemplateRecordForList>, Error> {
   // TODO: There has to be a better way.
   //  Sqlx doesn't like anything except string literals.
   let maybe_templates = if require_mod_approved {
@@ -177,7 +177,7 @@ async fn list_w2l_templates_creator_scoped(
   mysql_pool: &MySqlPool,
   scope_creator_username: &str,
   require_mod_approved: bool
-) -> AnyhowResult<Vec<RawW2lTemplateRecordForList>> {
+) -> Result<Vec<RawW2lTemplateRecordForList>, Error> {
   // TODO: There has to be a better way.
   //  Sqlx doesn't like anything except string literals.
   let maybe_templates = if require_mod_approved {

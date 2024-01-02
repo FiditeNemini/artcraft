@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use log::{info, warn};
-use sqlx::{MySql, MySqlPool};
+use sqlx::{Error, MySql, MySqlPool};
 use sqlx::pool::PoolConnection;
 
 use enums::common::visibility::Visibility;
@@ -51,13 +51,13 @@ pub async fn list_datasets_by_username_with_connection(
     let datasets : Vec<InternalRawDatasetRecordForList> = match datasets {
         Ok(datasets) => datasets,
         Err(err) => {
-            match err {
-                RowNotFound => {
-                    return Ok(Vec::new());
+            return match err {
+                Error::RowNotFound => {
+                    Ok(Vec::new())
                 },
                 _ => {
                     warn!("dataset list query error: {:?}", err);
-                    return Err(anyhow!("dataset list query error"));
+                    Err(anyhow!("dataset list query error"))
                 }
             }
         }
@@ -90,7 +90,7 @@ async fn list_datasets_by_creator_username(
     mysql_connection: &mut PoolConnection<MySql>,
     creator_username: &str,
     can_see_deleted: bool,
-) -> AnyhowResult<Vec<InternalRawDatasetRecordForList>> {
+) -> Result<Vec<InternalRawDatasetRecordForList>, Error> {
     // TODO: There has to be a better way.
     //  Sqlx doesn't like anything except string literals.
     let maybe_datasets = if !can_see_deleted {

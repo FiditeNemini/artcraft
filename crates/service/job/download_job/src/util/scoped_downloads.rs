@@ -60,7 +60,7 @@ pub fn parse_download_types(comma_separated_types: &str) -> AnyhowResult<BTreeSe
 
   for t in scoped_types.into_iter() {
     let model_type = GenericDownloadType::from_str(&t)
-        .map_err(|err| anyhow!(
+        .map_err(|_err| anyhow!(
           "Invalid model type: {:?}; should include only items from: {:?}",
           t,
           GenericDownloadType::all_variants()))?;

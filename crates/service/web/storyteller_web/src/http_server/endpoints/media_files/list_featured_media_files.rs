@@ -9,6 +9,9 @@ use r2d2_redis::redis::Commands;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
+use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
+use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use mysql_queries::queries::media_files::list::list_media_files_by_tokens::list_media_files_by_tokens;
 use tokens::tokens::media_files::MediaFileToken;
@@ -19,7 +22,7 @@ use crate::server_state::ServerState;
 #[derive(Serialize, ToSchema)]
 pub struct ListFeaturedMediaFilesSuccessResponse {
   pub success: bool,
-  pub media_files: Vec<MediaFile>,
+  pub results: Vec<MediaFile>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -33,11 +36,10 @@ pub struct MediaFile {
   /// URL to the media file
   pub public_bucket_path: String,
 
-  // TODO: Provenance data - hide some of the models we use, especially zero shot.
-  //pub origin_category: MediaFileOriginCategory,
-  //pub origin_product_category: MediaFileOriginProductCategory,
-  //pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
-  //pub maybe_origin_model_token: Option<String>,
+  pub origin_category: MediaFileOriginCategory,
+  pub origin_product_category: MediaFileOriginProductCategory,
+  pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
+  pub maybe_origin_model_token: Option<String>,
 
   pub maybe_creator: Option<UserDetailsLight>,
 
@@ -123,7 +125,7 @@ pub async fn list_featured_media_files_handler(
 
   let response = ListFeaturedMediaFilesSuccessResponse {
     success: true,
-    media_files: media_files.into_iter()
+    results: media_files.into_iter()
         .map(|m| {
           let public_bucket_path = MediaFileBucketPath::from_object_hash(
             &m.public_bucket_directory_hash,
@@ -136,10 +138,10 @@ pub async fn list_featured_media_files_handler(
             token: m.token,
             media_type: m.media_type,
             public_bucket_path,
-            //origin_category: m.origin_category,
-            //origin_product_category: m.origin_product_category,
-            //maybe_origin_model_type: m.maybe_origin_model_type,
-            //maybe_origin_model_token: m.maybe_origin_model_token,
+            origin_category: m.origin_category,
+            origin_product_category: m.origin_product_category,
+            maybe_origin_model_type: m.maybe_origin_model_type,
+            maybe_origin_model_token: m.maybe_origin_model_token,
             maybe_creator: UserDetailsLight::from_optional_db_fields_owned(
               m.maybe_creator_user_token,
               m.maybe_creator_username,

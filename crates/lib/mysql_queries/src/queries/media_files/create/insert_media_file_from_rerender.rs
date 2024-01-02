@@ -63,9 +63,6 @@ pub async fn insert_media_file_from_rerender(
         maybe_creator_category_synthetic_id = Some(next_rerender_id);
     }
 
-    let creator_ip_address = args.job.creator_ip_address.as_str();
-    let creator_set_visibility = args.job.creator_set_visibility.clone();
-
     const ORIGIN_CATEGORY : MediaFileOriginCategory = MediaFileOriginCategory::Inference;
     const ORIGIN_PRODUCT_CATEGORY : MediaFileOriginProductCategory = MediaFileOriginProductCategory::VideoFilter;
     const ORIGIN_MODEL_TYPE : MediaFileOriginModelType = MediaFileOriginModelType::Rerender;

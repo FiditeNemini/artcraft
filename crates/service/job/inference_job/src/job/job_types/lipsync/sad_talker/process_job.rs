@@ -180,7 +180,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
   // TODO: Limit output length for non-premium (???)
 
-  let maybe_args = job.maybe_inference_args
+  let _maybe_args = job.maybe_inference_args
       .as_ref()
       .map(|args| args.args.as_ref())
       .flatten();

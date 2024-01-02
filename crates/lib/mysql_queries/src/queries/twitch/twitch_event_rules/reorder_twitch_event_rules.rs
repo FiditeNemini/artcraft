@@ -72,7 +72,7 @@ pub async fn reorder_twitch_event_rules(
       .join("\n");
 
   let query_inner_ip_addresses = rule_token_to_order_map.iter()
-      .map(|(token, position)|  {
+      .map(|(token, _position)|  {
         format!("when token = '{}' then '{}'", token.as_str(), ip_address_update)
       })
       .collect::<Vec<String>>()

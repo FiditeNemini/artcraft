@@ -22,7 +22,7 @@ use crate::server_state::ServerState;
 #[derive(Serialize, ToSchema)]
 pub struct ListFeaturedWeightsSuccessResponse {
   pub success: bool,
-  pub weights: Vec<ModelWeightForList>,
+  pub results: Vec<ModelWeightForList>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -127,7 +127,7 @@ pub async fn list_featured_weights_handler(
 
   let response = ListFeaturedWeightsSuccessResponse {
     success: true,
-    weights: weights.into_iter()
+    results: weights.into_iter()
         .map(|w| {
 
           let maybe_cover_image = w.maybe_cover_image_public_bucket_hash
