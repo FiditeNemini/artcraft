@@ -1,4 +1,4 @@
-use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::{model_weights::ModelWeightToken, media_files::MediaFileToken};
 
 /// Video sources can be one of several:
 ///  - F: media_files (todo)
@@ -22,7 +22,11 @@ pub enum SDSource {
 pub struct SDArgs {
     #[serde(rename = "vs")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_video_source: Option<VideofilterVideoSource>,
+    pub maybe_video_source: Option<MediaFileToken>,
+
+    #[serde(rename = "is")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_image_source: Option<MediaFileToken>, 
 
     #[serde(rename = "sd")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -47,8 +51,14 @@ pub struct SDArgs {
     #[serde(rename = "se")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_seed: Option<i32>,
-
-    #[serde(rename = "upload_path")]
+  
+    #[serde(rename = "mup")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_upload_path: Option<String>
+    pub maybe_upload_path: Option<String>,
+    
+    #[serde(rename = "lup")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_lora_upload_path: Option<String>
 }
+
+
