@@ -17,6 +17,7 @@ use crate::job::job_types::lipsync::process_single_lipsync_job::process_single_l
 use crate::job::job_types::tts::process_single_tts_job::process_single_tts_job;
 use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
 use crate::job::job_types::videofilter::process_single_vf_job::process_single_vf_job;
+use crate::job::job_types::imagegen::process_single_ig_job::process_single_ig_job;
 use crate::job_dependencies::JobDependencies;
 
 pub async fn process_single_job(
@@ -185,6 +186,9 @@ async fn do_process_single_job(
     }
     InferenceCategory::VideoFilter => {
       process_single_vf_job(job_dependencies, job).await?
+    }
+    InferenceCategory::ImageGeneration => {
+      process_single_ig_job(job_dependencies, job).await?
     }
   };
 

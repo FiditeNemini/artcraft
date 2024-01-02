@@ -76,6 +76,8 @@ pub async fn do_process_single_job(job_state: &JobState, job: &AvailableDownload
     return Err(anyhow!("Bad download URL: `{}`", &job.download_url));
   }
 
+  // TODO USE THIS DOWNLOADER
+
   let download_filename = match job_state.sidecar_configs.google_drive_downloader.download_file(&job.download_url, &temp_dir).await {
     Ok(filename) => filename,
     Err(e) => {
