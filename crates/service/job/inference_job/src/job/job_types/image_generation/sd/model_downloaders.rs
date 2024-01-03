@@ -8,10 +8,10 @@ crate::impl_model_downloader!(
     "/tmp/downloads/sadtalker/parsing_parsenet.pth"
   );
 
-pub struct SDDownloaders {
+pub struct StableDiffusionDownloaders {
     sd_vae_encoder: SDVAEEncoder
 }
-impl SDDownloaders {
+impl StableDiffusionDownloaders {
   pub fn build_all_from_env() -> Self {
     Self {
       sd_vae_encoder: SDVAEEncoder::from_env(),

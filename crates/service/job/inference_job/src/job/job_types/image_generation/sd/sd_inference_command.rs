@@ -131,7 +131,7 @@ impl StableDiffusionInferenceCommand {
     let maybe_default_config_path = easyenv::get_env_pathbuf_optional(
       "STABLE_DIFFUSION_INFERENCE_MAYBE_DEFAULT_CONFIG_PATH");
 
-    let maybe_execution_timeout =
+    let maybe_execution_timeout: Option<Duration> =
         easyenv::get_env_duration_seconds_optional("STABLE_DIFFUSION_TIMEOUT_SECONDS");
 
     let maybe_docker_options = easyenv::get_env_string_optional(
@@ -226,10 +226,10 @@ impl StableDiffusionInferenceCommand {
     //   command.push_str(" --still ");
     // }
 
-    if let Some(dir) = self.alternate_checkpoint_dir.as_ref() {
-      command.push_str(" --checkpoint_dir ");
-      command.push_str(&path_to_string(dir));
-    }
+    // if let Some(dir) = self.alternate_checkpoint_dir.as_ref() {
+    //   command.push_str(" --checkpoint_dir ");
+    //   command.push_str(&path_to_string(dir));
+    // }
 
     // ===== End Python Args =====
 

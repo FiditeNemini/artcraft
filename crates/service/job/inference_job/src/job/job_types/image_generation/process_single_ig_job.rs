@@ -4,7 +4,7 @@ use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::image_generation::sd::process_job::process_job;
 use crate::job_dependencies::JobDependencies;
-use crate::job::job_types::image_generation::sd::process_job::SDProcessArgs;
+use crate::job::job_types::image_generation::sd::process_job::StableDiffusionProcessArgs;
 use errors::anyhow;
 
 pub async fn process_single_ig_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -26,7 +26,7 @@ pub async fn process_single_ig_job(job_dependencies: &JobDependencies, job: &Ava
 }
 
 pub async fn dispatch_sd_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
-    let args = SDProcessArgs {
+    let args = StableDiffusionProcessArgs {
         job_dependencies,
         job,
     };

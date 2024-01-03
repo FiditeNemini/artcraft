@@ -11,7 +11,7 @@ use crate::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDe
 use super::file_descriptor::FileDescriptor;
 use super::file_meta_data::FileMetaData;
 
-struct RemoteCloudFileClient {
+pub struct RemoteCloudFileClient {
     bucket_orchestration_client: Box<dyn BucketOrchestrationCore>
 }
 

@@ -101,7 +101,6 @@ pub enum PolymorphicInferenceArgs {
   Ig(StableDiffusionArgs)
 }
 
-
 impl GenericInferenceArgs {
 
   pub fn from_json(json: &str) -> AnyhowResult<Self> {
@@ -137,9 +136,7 @@ impl InferenceCategoryAbbreviated {
 
 #[cfg(test)]
 mod tests {
-  use enums::by_table::generic_inference_jobs::inference_category;
-
-use crate::payloads::generic_inference_args::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
+  use crate::payloads::generic_inference_args::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
   use crate::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
   use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
   use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
@@ -204,7 +201,8 @@ use crate::payloads::generic_inference_args::generic_inference_args::{Fundamenta
     let seed = 1;
     let upload_path = "upload_path".to_string();
     let lora_upload_path = "lora_upload_path".to_string();
-    
+    let checkpoint = "checkpoint".to_string();
+
     let args = GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::ImageGeneration),
       args: Some(PolymorphicInferenceArgs::Ig(StableDiffusionArgs {
@@ -217,7 +215,8 @@ use crate::payloads::generic_inference_args::generic_inference_args::{Fundamenta
         maybe_n_prompt: Some(n_prompt),
         maybe_seed: Some(seed),
         maybe_upload_path: Some(upload_path),
-        maybe_lora_upload_path: Some(lora_upload_path)
+        maybe_lora_upload_path: Some(lora_upload_path),
+        inference_type: Some(checkpoint)
       })),
     };
 
