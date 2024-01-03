@@ -37,16 +37,14 @@ export default function WeightEditPage({
   const [weightCreatorToken] = useState("");
 
   const {
+    coverImg,
     data: weight,
     descriptionMD,
     // fetchError,
     // imgMediaFile,
-    imageProps,
-    imgUploadStatus,
     isLoading,
     onChange,
     title,
-    uploadCoverImg,
     update,
     visibility,
     writeStatus
@@ -119,14 +117,12 @@ export default function WeightEditPage({
               <div {...{ className: "weight-editor row gy-3 gx-4" }}>
                 <div {...{ className: "col-12 col-lg-5" }}>
                   <label className="sub-title">Cover Image</label>
-                  <div {...{ className: "fy-cover-img-input" }}>
-                    <CoverImageInput {...{
-                      currentPath,
-                      onClick: uploadCoverImg,
-                      status: imgUploadStatus,
-                      ...imageProps
-                    }} />
-                  </div>
+                  <CoverImageInput {...{
+                    currentPath,
+                    onClick: coverImg.upload,
+                    status: coverImg.status,
+                    ...coverImg.fileProps
+                  }} />
                 </div>
                 <div {...{ className: "col-lg-7 order-first  order-lg-last" }}>
                   <TempInput

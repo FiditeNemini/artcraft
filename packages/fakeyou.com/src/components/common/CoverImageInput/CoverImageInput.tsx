@@ -40,23 +40,25 @@ export default function CoverImageInput({ currentPath, onClick, status, ...rest 
   const [editingImg, editingImgSet] = useState(0);
   const transitions = useTransition(editingImg, basicTransition({}));
 
-  return transitions((style, i) => !currentPath || i ? <a.div {...{ style }}>
-    <ImageInput {...{ ...rest, disabled: status > 1, placeholderIcon: faImage }} >
-      <div {...{ className: "fy-cover-control" }}>
-        <UploadControl {...{ onClick, status }} />
+  return <div {...{ className: "fy-cover-img-input" }}>
+    { transitions((style, i) => !currentPath || i ? <a.div {...{ style }}>
+      <ImageInput {...{ ...rest, disabled: status > 1, placeholderIcon: faImage }} >
+        <div {...{ className: "fy-cover-control" }}>
+          <UploadControl {...{ onClick, status }} />
+        </div>
+      </ImageInput>
+    </a.div> : <a.div {...{
+      className: "weight-initial-cover-img",
+      style: { ...style, backgroundImage: `url(${ currentPath })` } 
+    }}>
+      <div>
+        <Button {...{
+          className: "upload-control-btn",
+          label: "Change cover image",
+          onClick: () => editingImgSet(1),
+          variant: "secondary"
+        }} />
       </div>
-    </ImageInput>
-  </a.div> : <a.div {...{
-    className: "weight-initial-cover-img",
-    style: { ...style, backgroundImage: `url(${ currentPath })` } 
-  }}>
-    <div>
-      <Button {...{
-        className: "upload-control-btn",
-        label: "Change cover image",
-        onClick: () => editingImgSet(1),
-        variant: "secondary"
-      }} />
-    </div>
-  </a.div>);
+    </a.div> )}
+  </div>;
 };

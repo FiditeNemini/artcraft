@@ -1,4 +1,5 @@
 import useBookmarks from './useBookmarks';
+import useCoverImgUpload from './useCoverImgUpload';
 import useFile from './useFile';
 import useHover from './useHover';
 import useId from './useId';
@@ -10,12 +11,14 @@ import useListContent from './useListContent';
 import useLocalize from './useLocalize';
 import useMedia from './useMedia';
 import useRatings from './useRatings';
+import useSdUpload from './useSdUpload';
 import useSession from './useSession';
 import useVideo from './useVideo';
 import useWeightFetch from './useWeightFetch';
 
 export {
   useBookmarks,
+  useCoverImgUpload,
   useFile,
   useHover,
   useId,
@@ -27,6 +30,7 @@ export {
   useLocalize,
   useMedia,
   useRatings,
+  useSdUpload,
   useSession,
   useVideo,
   useWeightFetch

@@ -9,6 +9,7 @@ import PageHeader from "components/layout/PageHeader";
 import {
   Button,
   Container,
+  CoverImageInput,
   Panel,
   Skeleton,
   SplitPanel,
@@ -17,6 +18,7 @@ import {
   TempTextArea,
 } from "components/common";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { useSdUpload } from "hooks";
 
 interface UploadSdWeightPageProps {
   sessionWrapper: SessionWrapper;
@@ -33,6 +35,8 @@ export default function UploadSdWeightPage({
     { label: "Public", value: "public" },
     { label: "Private", value: "private" },
   ];
+
+  const { coverImg, descriptionMD, onChange, title, upload, uploadPath, visibility } = useSdUpload();
 
   if (!sessionWrapper.isLoggedIn() && !isLoading) {
     return (
@@ -85,13 +89,21 @@ export default function UploadSdWeightPage({
               <div className="row gx-4 gy-3">
                 <div className="col-12 col-lg-5">
                   <label className="sub-title required">Cover Image</label>
+                  <CoverImageInput {...{
+                    currentPath: "",
+                    onClick: coverImg.upload,
+                    status: coverImg.status,
+                    ...coverImg.fileProps
+                  }} />
                 </div>
                 <div className="col-12 col-lg-7 order-first order-lg-last">
                   <TempInput
                     {...{
                       label: "Title",
                       name: "title",
+                      onChange,
                       placeholder: "Title",
+                      value: title,
                       required: true,
                     }}
                   />
@@ -99,8 +111,10 @@ export default function UploadSdWeightPage({
                   <TempInput
                     {...{
                       label: "Download URL, eg. Google Drive link",
-                      name: "Url",
+                      name: "uploadPath",
+                      onChange,
                       placeholder: "Download URL",
+                      value: uploadPath,
                       required: true,
                     }}
                   />
@@ -110,15 +124,19 @@ export default function UploadSdWeightPage({
                       icon: faEye,
                       label: "Visibility",
                       name: "visibility",
+                      onChange,
                       options: visibilityOptions,
                       placeholder: "Voice name",
+                      value: visibility,
                     }}
                   />
                   <TempTextArea
                     {...{
                       label: "Description",
                       name: "descriptionMD",
+                      onChange,
                       placeholder: "Description",
+                      value: descriptionMD,
                     }}
                   />
                 </div>
@@ -129,6 +147,7 @@ export default function UploadSdWeightPage({
                 <Button
                   {...{
                     label: "Upload Weight",
+                    onClick: upload
                   }}
                 />
               </div>
