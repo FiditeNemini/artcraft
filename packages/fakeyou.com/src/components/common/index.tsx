@@ -4,6 +4,7 @@ import BasicVideo from "./BasicVideo";
 import Button from "./Button";
 import Checkbox from "./Checkbox";
 import Container from "./Container";
+import CoverImageInput from "./CoverImageInput";
 import FileActions from "./FileActions";
 import FileDetails from "./FileDetails";
 import FileWrapper from "./FileWrapper";
@@ -23,6 +24,7 @@ import TempAudioPlayer from "./TempAudioPlayer";
 import TempInput from "./TempInput";
 import TempSelect from "./TempSelect";
 import TempTextArea from "./TempTextArea";
+import TintSpinner from "./TintSpinner";
 
 export {
   AudioBlobPreview,
@@ -31,6 +33,7 @@ export {
   Button,
   Checkbox,
   Container,
+  CoverImageInput,
   FileActions,
   FileDetails,
   FileWrapper,
@@ -49,5 +52,6 @@ export {
   TempAudioPlayer,
   TempInput,
   TempSelect,
-  TempTextArea
+  TempTextArea,
+  TintSpinner
 };

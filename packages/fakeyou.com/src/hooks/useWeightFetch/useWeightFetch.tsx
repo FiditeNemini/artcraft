@@ -42,7 +42,7 @@ export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
   const update = () => {
     writeStatusSet(FetchStatus.in_progress);
     UpdateWeight(token,{
-      cover_image_media_file_token: imgMediaFile,
+      ...imgMediaFile ? { cover_image_media_file_token: imgMediaFile } : {},
       description_markdown: descriptionMD,
       description_rendered_html: data?.description_rendered_html || "",
       title,
