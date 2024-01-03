@@ -8,7 +8,6 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use elasticsearch::http::request;
 use log::warn;
 use serde::Deserialize;
 use serde::Serialize;
@@ -37,11 +36,10 @@ use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
-use crate::http_server::endpoints::media_files::drain_multipart_request::MediaSource;
-use crate::http_server::endpoints::weights::list_weights_by_user::Weight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
+use std::fmt::{Display, Formatter};
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.
 const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
@@ -50,14 +48,23 @@ const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
 /// This is useful for catching the live logs or intercepting the job.
 const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 
-#[derive(Deserialize,ToSchema)]
+#[derive(Debug,Deserialize, Clone, Copy, Eq, PartialEq)]
 pub enum TypeOfInference {
     #[serde(rename = "lora")]
     UploadLoRA,
     #[serde(rename = "checkpoint")]
     CheckPoint,
-    #[serde(rename = "standard_inference")]
-    StandardInference,
+    #[serde(rename = "inference")]
+    Inference,
+}
+impl Display for TypeOfInference {
+    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
+        match self {
+            TypeOfInference::UploadLoRA => write!(f, "lora"),
+            TypeOfInference::CheckPoint => write!(f, "checkpoint"),
+            TypeOfInference::Inference => write!(f, "inference"),
+        }
+    }
 }
 
 #[derive(Deserialize,ToSchema)]
@@ -71,7 +78,7 @@ pub struct EnqueueImageGenRequest {
     maybe_prompt: Option<String>,
     maybe_a_prompt: Option<String>,
     maybe_n_prompt: Option<String>,
-    maybe_seed: Option<String>,
+    maybe_seed: Option<i64>,
     maybe_upload_path: Option<String>,
     maybe_lora_upload_path: Option<String>,
 }
@@ -143,7 +150,7 @@ pub async fn enqueue_image_generation_request(
 ) -> Result<HttpResponse, EnqueueImageGenRequestError> {
 
     let mut maybe_user_token: Option<UserToken> = None;
-    let mut visbility =  enums::common::visibility::Visibility::Public;
+    let  visbility =  enums::common::visibility::Visibility::Public;
     let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {
         warn!("MySql pool error: {:?}", err);
         EnqueueImageGenRequestError::ServerError
@@ -206,7 +213,7 @@ pub async fn enqueue_image_generation_request(
 
     // ==================== INFERENCE ARGS ==================== //
 
-    if request.type_of_inference == EnqueueImageGenType::Inference {
+    if request.type_of_inference == TypeOfInference::Inference {
         if request.maybe_sd_model_token.is_none() {
             return Err(EnqueueImageGenRequestError::BadInput("No sd model token provided".to_string()));
         }
@@ -215,11 +222,11 @@ pub async fn enqueue_image_generation_request(
             return Err(EnqueueImageGenRequestError::BadInput("No prompt provided".to_string()));
         }
 
-    } else if request.type_of_inference == EnqueueImageGenRequest::UploadLoRA {
+    } else if request.type_of_inference == TypeOfInference::UploadLoRA {
         if request.maybe_lora_upload_path.is_none() {
             return Err(EnqueueImageGenRequestError::BadInput("No lora upload path provided".to_string()));
         }
-    } else if request.type_of_inference == EnqueueImageGenRequest::CheckPoint {
+    } else if request.type_of_inference == TypeOfInference::CheckPoint {
         if request.maybe_upload_path.is_none() {
             return Err(EnqueueImageGenRequestError::BadInput("No upload path provided".to_string()));
         }
@@ -239,6 +246,12 @@ pub async fn enqueue_image_generation_request(
     // if we are uploading a lora model.
     let lora_upload_path = request.maybe_lora_upload_path.clone().unwrap_or_default();
 
+    let mut seed = -1;
+
+    if let Some(s) = request.maybe_seed {
+        seed = s;
+    }
+
     let inference_args = SDArgs {
         maybe_video_source: Some(video_token),
         maybe_image_source: Some(image_source_token),
@@ -247,10 +260,10 @@ pub async fn enqueue_image_generation_request(
         maybe_prompt: Some(request.maybe_prompt.clone().unwrap_or_default()),
         maybe_a_prompt: Some(a_prompt),
         maybe_n_prompt: Some(n_prompt),
-        maybe_seed: Some(request.maybe_seed.clone().unwrap_or_default()),
+        maybe_seed: Some(seed),
         maybe_upload_path: Some(upload_path),
         maybe_lora_upload_path: Some(lora_upload_path),
-        inference_type: Some(request.type_of_inference.clone()),
+        inference_type: Some(request.type_of_inference.to_string()),
     };
 
     // create the inference args here
@@ -264,7 +277,7 @@ pub async fn enqueue_image_generation_request(
         maybe_model_token: None, // NB: Model is static during inference
         maybe_input_source_token: None,
         maybe_input_source_token_type: None,
-        maybe_raw_inference_text: Some(&request.text),
+        maybe_raw_inference_text: None,
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {
             inference_category: Some(InferenceCategoryAbbreviated::ImageGeneration),

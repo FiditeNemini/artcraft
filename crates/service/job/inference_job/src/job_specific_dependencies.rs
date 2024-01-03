@@ -9,7 +9,7 @@ use crate::job::job_types::tts::vits::vits_dependencies::VitsDependencies;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_dependencies::RvcV2Dependencies;
 use crate::job::job_types::vc::so_vits_svc::svc_dependencies::SvcDependencies;
 use crate::job::job_types::videofilter::rerender_a_video::rerender_dependencies::RerenderDependencies;
-use crate::job::job_types::imagegen::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
+use crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
 
 use crate::util::scoped_execution::ScopedExecution;
 
@@ -71,7 +71,7 @@ impl JobSpecificDependencies {
       maybe_rerender_dependencies = Some(RerenderDependencies::setup()?);
     }
     
-    if scoped_execution.can_run_job(job_model_type::StableDiffusion) {
+    if scoped_execution.can_run_job(InferenceModelType::StableDiffusion) {
       print_with_space("Setting Stable Diffusion dependencies...");
       maybe_stable_diffusion_dependencies = Some(StableDiffusionDependencies::setup()?);
     }
