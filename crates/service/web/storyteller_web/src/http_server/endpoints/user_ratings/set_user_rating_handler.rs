@@ -10,6 +10,7 @@ use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
+use mysql_queries::queries::users::user_ratings::get_total_user_rating_count_for_entity::get_total_user_rating_count_for_entity;
 use mysql_queries::queries::users::user_ratings::update_tts_model_ratings::update_tts_model_ratings;
 use mysql_queries::queries::users::user_ratings::upsert_user_rating::{Args, upsert_user_rating};
 use tokens::tokens::media_files::MediaFileToken;
@@ -39,6 +40,10 @@ pub struct SetUserRatingRequest {
 #[derive(Serialize, ToSchema)]
 pub struct SetUserRatingResponse {
   pub success: bool,
+
+  /// This is the new positive rating count (across all users) for the entity in question.
+  /// This does not include negative ratings.
+  pub new_positive_rating_count_for_entity: usize,
 }
 
 // =============== Error Response ===============
@@ -179,8 +184,16 @@ pub async fn set_user_rating_handler(
     }
   }
 
+  let count = get_total_user_rating_count_for_entity(&entity, &mut mysql_connection)
+      .await
+      .map_err(|err| {
+        error!("Error getting total user rating count for entity: {:?}", err);
+        SetUserRatingError::ServerError
+      })?;
+
   let response = SetUserRatingResponse {
     success: true,
+    new_positive_rating_count_for_entity: count.positive_count,
   };
 
   let body = serde_json::to_string(&response)
