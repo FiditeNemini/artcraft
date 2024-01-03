@@ -2,6 +2,7 @@ import React from "react";
 import { a, useTransition } from "@react-spring/web";
 import { basicTransition } from "resources";
 import { Spinner } from "components/common";
+import "./TintSpinner.scss";
 
 interface Props {
   busy?: boolean;
