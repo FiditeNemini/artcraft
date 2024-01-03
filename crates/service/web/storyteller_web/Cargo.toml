@@ -134,6 +134,7 @@ actix-rt = "2.9.0"
 actix-service = "2.0.2"
 actix-utils = "3.0.1"
 actix-web = "4.4.0"
+actix-web-lab = "0.20.1"
 jwt = "0.13.0"
 
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime

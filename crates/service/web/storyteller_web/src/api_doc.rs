@@ -29,6 +29,7 @@ use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler:
 use crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::*;
 use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_entity_handler::*;
 use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_handler::*;
+use crate::http_server::endpoints::user_ratings::batch_get_user_rating_handler::*;
 use crate::http_server::endpoints::user_ratings::get_user_rating_handler::*;
 use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
@@ -52,6 +53,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::delete_user_bookmark_handler,
     crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_entity_handler::list_user_bookmarks_for_entity_handler,
     crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_handler::list_user_bookmarks_for_user_handler,
+    crate::http_server::endpoints::user_ratings::batch_get_user_rating_handler::batch_get_user_rating_handler,
     crate::http_server::endpoints::user_ratings::get_user_rating_handler::get_user_rating_handler,
     crate::http_server::endpoints::user_ratings::set_user_rating_handler::set_user_rating_handler,
     crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
@@ -101,6 +103,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListAvailableWeightsQuery,ListAvailableWeightsSuccessResponse,ModelWeightForList,
     ListWeightsByUserError,ListWeightsByUserSuccessResponse,ListWeightsByUserPathInfo,Weight,
     WeightsData,MediaFileData,
+    BatchGetUserRatingQueryParams,BatchGetUserRatingResponse,BatchGetUserRatingError,RatingRow,
     ListFeaturedMediaFilesSuccessResponse,MediaFile, ListFeaturedMediaFilesError,
     ListMediaFilesSuccessResponse, ListMediaFilesError, MediaFileListItem, ListMediaFilesQueryParams,
     ListMediaFilesForUserSuccessResponse,ListMediaFilesForUserQueryParams,ListMediaFilesForUserError,ListMediaFilesForUserPathInfo,
