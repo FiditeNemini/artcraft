@@ -17,6 +17,8 @@ use tokens::tokens::tts_models::TtsModelToken;
 
 use crate::server_state::ServerState;
 
+const MAX_BATCH_SIZE : usize = 200;
+
 // =============== Request ===============
 
 #[derive(Deserialize, ToSchema, IntoParams)]
@@ -119,10 +121,17 @@ pub async fn batch_get_user_rating_handler(
         BatchGetUserRatingError::ServerError
       })?;
 
+  // NB: Force move of tokens from the Query<T>.
+  // The auto-magical Query<T> will ordinarily try to force a Copy, which isn't on HashSet.
+  let mut tokens = query.0.tokens;
+
+  // Don't allow bad actors to flood our DB.
+  tokens.shrink_to(MAX_BATCH_SIZE);
+
   let user_session = match maybe_user_session {
     Some(session) => session,
     None => {
-      let ratings = fill_in_missed_ratings(&query.tokens, Vec::new());
+      let ratings = fill_in_missed_ratings(&tokens, Vec::new());
 
       // NB: Just return "neutral" for everything.
       return Ok(HttpResponse::Ok()
@@ -136,7 +145,7 @@ pub async fn batch_get_user_rating_handler(
 
   batch_get_user_ratings(
     &user_session.user_token_typed,
-    &query.tokens,
+    &tokens,
     &mut mysql_connection
   ).await
       .map_err(|e| {
@@ -148,7 +157,7 @@ pub async fn batch_get_user_rating_handler(
             .content_type("application/json")
             .json(BatchGetUserRatingResponse {
               success: true,
-              ratings: fill_in_missed_ratings(&query.tokens, ratings),
+              ratings: fill_in_missed_ratings(&tokens, ratings),
             })
       })
 }
