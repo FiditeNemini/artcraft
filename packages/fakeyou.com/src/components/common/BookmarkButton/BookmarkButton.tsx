@@ -26,15 +26,16 @@ export default function BookmarkButton({
   overlay,
   large,
 }: BookmarkButtonProps) {
-  const [isToggled, setIsToggled] = useState(initialToggled);
+  const isToggled = initialToggled; // toggled value managed externally via usebookmarks, this may change
+  // const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async (event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    setIsLoading(true);
+    // setIsLoading(true);
     onToggle(entityToken, entityType).then((isToggled: boolean) => {
-      setIsToggled(isToggled);
+      // setIsToggled(isToggled);
       setIsLoading(false);
     });
     // try {
