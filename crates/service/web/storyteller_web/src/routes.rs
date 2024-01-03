@@ -113,6 +113,7 @@ use crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler:
 use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_entity_handler::list_user_bookmarks_for_entity_handler;
 use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_session_handler::list_user_bookmarks_for_session_handler;
 use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_handler::list_user_bookmarks_for_user_handler;
+use crate::http_server::endpoints::user_ratings::batch_get_user_rating_handler::batch_get_user_rating_handler;
 use crate::http_server::endpoints::user_ratings::get_user_rating_handler::get_user_rating_handler;
 use crate::http_server::endpoints::user_ratings::set_user_rating_handler::set_user_rating_handler;
 use crate::http_server::endpoints::vocoders::get_vocoder::get_vocoder_handler;
@@ -1111,6 +1112,10 @@ fn add_user_rating_routes<T, B> (app: App<T>) -> App<T>
       >,
 {
   app.service(web::scope("/v1/user_rating")
+      .service(web::resource("/batch")
+          .route(web::get().to(batch_get_user_rating_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
       .service(web::resource("/rate")
           .route(web::post().to(set_user_rating_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
