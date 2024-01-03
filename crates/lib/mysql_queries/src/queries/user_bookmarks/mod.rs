@@ -1,3 +1,4 @@
+pub mod batch_get_user_bookmarks;
 pub mod create_user_bookmark;
 pub mod delete_user_bookmark;
 pub mod get_total_bookmark_count_for_entity;
