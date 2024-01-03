@@ -1,25 +1,26 @@
 use std::collections::HashSet;
+
 use anyhow::anyhow;
 use log::error;
 use sqlx::{MySql, QueryBuilder};
 use sqlx::pool::PoolConnection;
 
-use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
-use enums::by_table::user_ratings::rating_value::UserRatingValue;
+use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use errors::AnyhowResult;
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
 use tokens::tokens::users::UserToken;
 
-pub struct BatchUserRating {
+pub struct BatchUserBookmark {
+  pub token: UserBookmarkToken,
   pub entity_token: String,
-  pub entity_type: UserRatingEntityType,
-  pub rating_value: UserRatingValue,
+  pub entity_type: UserBookmarkEntityType,
 }
 
-pub async fn batch_get_user_ratings(
+pub async fn batch_get_user_bookmarks(
   user_token: &UserToken,
   tokens: &HashSet<String>,
   mysql_connection: &mut PoolConnection<MySql>,
-) -> AnyhowResult<Vec<BatchUserRating>>
+) -> AnyhowResult<Vec<BatchUserBookmark>>
 {
   if tokens.len() == 0 {
     return Ok(Vec::new());
@@ -28,11 +29,11 @@ pub async fn batch_get_user_ratings(
   let mut query_builder: QueryBuilder<MySql> = QueryBuilder::new(
     r#"
 SELECT
+    token,
     entity_type,
-    entity_token,
-    rating_value
+    entity_token
 
-FROM user_ratings
+FROM user_bookmarks
 
 WHERE user_token =
   "#);
@@ -57,14 +58,12 @@ WHERE user_token =
   match maybe_results {
     Ok(records) => Ok(records
         .into_iter()
-        .map(|record| BatchUserRating {
+        .map(|record| BatchUserBookmark {
+          token: UserBookmarkToken::new_from_str(&record.token),
           // NB: Fail open; W2lTemplates are dead, so this is a good sentinel value
-          entity_type: UserRatingEntityType::from_str(&record.entity_type)
-              .unwrap_or(UserRatingEntityType::W2lTemplate),
+          entity_type: UserBookmarkEntityType::from_str(&record.entity_type)
+              .unwrap_or(UserBookmarkEntityType::W2lTemplate),
           entity_token: record.entity_token,
-          // NB: Fail open; "neutral" is a good default on failure.
-          rating_value: UserRatingValue::from_str(&record.rating_value)
-              .unwrap_or(UserRatingValue::Neutral),
         }).collect::<Vec<_>>()),
     Err(err) => match err {
       sqlx::Error::RowNotFound => Ok(Vec::new()),
@@ -78,7 +77,7 @@ WHERE user_token =
 
 #[derive(sqlx::FromRow)]
 struct RawRating {
+  token: String,
   entity_token: String,
   entity_type: String,
-  rating_value: String,
 }
