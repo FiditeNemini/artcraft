@@ -4,7 +4,7 @@ use errors::AnyhowResult;
 use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
 use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
 use crate::payloads::generic_inference_args::videofilter_payload::RerenderArgs;
-use crate::payloads::generic_inference_args::image_generation_payload::SDArgs;
+use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
 
 /// Used to encode extra state for the `generic_inference_jobs` table.
 /// This should act somewhat like a serialized protobuf stored inside a record.
@@ -98,7 +98,7 @@ pub enum PolymorphicInferenceArgs {
   Rr(RerenderArgs),
 
   /// Image generation. (Short name to save space when serializing.)
-  Ig(SDArgs)
+  Ig(StableDiffusionArgs)
 }
 
 
@@ -142,7 +142,7 @@ mod tests {
 use crate::payloads::generic_inference_args::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
   use crate::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
   use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
-  use crate::payloads::generic_inference_args::image_generation_payload::SDArgs;
+  use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
   use tokens::tokens::{model_weights::ModelWeightToken, media_files::MediaFileToken};
 
   #[test]
@@ -207,7 +207,7 @@ use crate::payloads::generic_inference_args::generic_inference_args::{Fundamenta
     
     let args = GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::ImageGeneration),
-      args: Some(PolymorphicInferenceArgs::Ig(SDArgs {
+      args: Some(PolymorphicInferenceArgs::Ig(StableDiffusionArgs {
         maybe_video_source: Some(video_media_token),
         maybe_image_source: Some(image_media_token),
         maybe_sd_model_token: Some(sd_model_token),

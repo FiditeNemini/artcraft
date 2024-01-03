@@ -25,7 +25,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
     PolymorphicInferenceArgs,
 };
 
-use mysql_queries::payloads::generic_inference_args::image_generation_payload::SDArgs;
+use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
     insert_generic_inference_job,
     InsertGenericInferenceArgs,
@@ -71,7 +71,6 @@ impl Display for TypeOfInference {
 pub struct EnqueueImageGenRequest {
     uuid_idempotency_token: String,
     type_of_inference: TypeOfInference, // upload loRA / check point / standard inference
-    maybe_video_source: Option<String>,
     maybe_image_source: Option<String>,
     maybe_sd_model_token: Option<String>,
     maybe_lora_model_token: Option<String>,
@@ -81,6 +80,7 @@ pub struct EnqueueImageGenRequest {
     maybe_seed: Option<i64>,
     maybe_upload_path: Option<String>,
     maybe_lora_upload_path: Option<String>,
+    maybe_cfg_scale: Option<f32>
 }
 
 #[derive(Serialize,ToSchema)]
@@ -252,7 +252,7 @@ pub async fn enqueue_image_generation_request(
         seed = s;
     }
 
-    let inference_args = SDArgs {
+    let inference_args = StableDiffusionArgs {
         maybe_video_source: Some(video_token),
         maybe_image_source: Some(image_source_token),
         maybe_sd_model_token: Some(sd_weight_token),

@@ -6,7 +6,7 @@ use tokens::tokens::{model_weights::ModelWeightToken, media_files::MediaFileToke
 
 /// For image to image we probably want images
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
-pub enum SDSource {
+pub enum StableDiffusionSource {
     // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
     /// Media File Token (media_files table)
     /// Serde cannot yet rename enum variants.
@@ -19,7 +19,7 @@ pub enum SDSource {
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
-pub struct SDArgs {
+pub struct StableDiffusionArgs {
     #[serde(rename = "vs")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_video_source: Option<MediaFileToken>,
@@ -61,7 +61,7 @@ pub struct SDArgs {
     pub maybe_lora_upload_path: Option<String>,
 
     #[serde(rename = "t")]
-    pub inference_type: Option<String>
+    pub inference_type: String,
 }
 
 
