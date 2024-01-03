@@ -14,6 +14,7 @@ use utoipa::ToSchema;
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use mysql_queries::queries::user_bookmarks::create_user_bookmark::{create_user_bookmark, CreateUserBookmarkArgs};
+use mysql_queries::queries::user_bookmarks::get_total_bookmark_count_for_entity::get_total_bookmark_count_for_entity;
 use mysql_queries::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -39,6 +40,9 @@ pub struct CreateUserBookmarkRequest {
 pub struct CreateUserBookmarkSuccessResponse {
   pub success: bool,
   pub user_bookmark_token: UserBookmarkToken,
+
+  /// This is the new bookmark count (across all users) for the entity in question.
+  pub new_bookmark_count_for_entity: usize,
 }
 
 #[derive(Debug, ToSchema)]
@@ -155,9 +159,17 @@ pub async fn create_user_bookmark_handler(
     }
   };
 
+  let count = get_total_bookmark_count_for_entity(&entity_token, &mut mysql_connection)
+      .await
+      .map_err(|err| {
+        warn!("error getting updated bookmark count: {:?}", err);
+        CreateUserBookmarkError::ServerError
+      })?;
+
   let response = CreateUserBookmarkSuccessResponse {
     success: true,
     user_bookmark_token,
+    new_bookmark_count_for_entity: count.total_count,
   };
 
   let body = serde_json::to_string(&response)
