@@ -97,10 +97,10 @@ pub async fn seed_weights_files(
         // let public_bucket_prefix = weights_type.to_string();
         // let public_bucket_extension = weights_category.to_string();
 
-        let cached_user_ratings_total_count = n.clone();
-        let cached_user_ratings_positive_count = n.clone();
-        let cached_user_ratings_negative_count = n.clone();
-        let cached_user_ratings_ratio = 100.0 as f32;
+        //let cached_user_ratings_total_count = n.clone();
+        //let cached_user_ratings_positive_count = n.clone();
+        //let cached_user_ratings_negative_count = n.clone();
+        //let cached_user_ratings_ratio = 100.0 as f32;
         let version = 1;
 
         // get the abs path of the weights file to upload.
@@ -142,10 +142,10 @@ pub async fn seed_weights_files(
             public_bucket_hash: bucket_hash,
             maybe_public_bucket_prefix: Some(maybe_bucket_prefix.to_string()),
             maybe_public_bucket_extension: Some(maybe_bucket_extension.to_string()),
-            cached_user_ratings_total_count,
-            cached_user_ratings_positive_count,
-            cached_user_ratings_negative_count,
-            maybe_cached_user_ratings_ratio: Some(cached_user_ratings_ratio),
+            //cached_user_ratings_total_count,
+            //cached_user_ratings_positive_count,
+            //cached_user_ratings_negative_count,
+            //maybe_cached_user_ratings_ratio: Some(cached_user_ratings_ratio),
             version,
             mysql_pool: &mysql_pool, // Assuming mysql_pool is defined elsewhere
         };
