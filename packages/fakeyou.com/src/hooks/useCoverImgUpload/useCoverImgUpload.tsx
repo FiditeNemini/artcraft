@@ -17,7 +17,7 @@ export default function useCoverImgUpload() {
         uuid_idempotency_token: uuidv4(),
         file: fileProps.file,
         source: "file",
-      }) // if there an audio file it uploads here
+      })
       .then((res: UploadMediaResponse) => {
         if ("media_file_token" in res) {
           statusSet(FetchStatus.success);

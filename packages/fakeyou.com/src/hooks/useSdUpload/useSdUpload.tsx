@@ -4,10 +4,6 @@ import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetch
 import { useCoverImgUpload } from "hooks";
 import { v4 as uuidv4 } from "uuid";
 
-// interface Props {
-//   value?: any;
-// }
-
 // this hook is mostly for organizational purposes while I work -V
 
 export default function useSdUpload() {
