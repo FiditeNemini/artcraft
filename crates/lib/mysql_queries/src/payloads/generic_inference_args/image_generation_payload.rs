@@ -20,9 +20,6 @@ pub enum StableDiffusionSource {
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
 pub struct StableDiffusionArgs {
-    #[serde(rename = "is")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_image_source: Option<MediaFileToken>, 
 
     #[serde(rename = "sd")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,6 +28,18 @@ pub struct StableDiffusionArgs {
     #[serde(rename = "lm")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_lora_model_token: Option<ModelWeightToken>,
+
+    #[serde(rename = "w")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_width: Option<i32>,
+
+    #[serde(rename = "h")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_height: Option<i32>,
+
+    #[serde(rename = "s")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_sampler: Option<i32>,
 
     #[serde(rename = "p")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,13 +60,27 @@ pub struct StableDiffusionArgs {
     #[serde(rename = "mu")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_upload_path: Option<String>,
+
+    #[serde(rename = "cf")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_cfg_scale: Option<i32>,
     
     #[serde(rename = "lu")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_lora_upload_path: Option<String>,
 
+    #[serde(rename = "sa")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_number_of_samples: Option<i64>,
+
+    #[serde(rename = "bz")]
+    pub maybe_batch_size: Option<i32>,
+
+    #[serde(rename = "bc")]
+    pub maybe_batch_count: Option<i32>,
+
     #[serde(rename = "t")]
-    pub inference_type: String,
+    pub type_of_inference: String,
 }
 
 

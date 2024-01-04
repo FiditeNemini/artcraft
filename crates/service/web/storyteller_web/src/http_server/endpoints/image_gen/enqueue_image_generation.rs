@@ -67,6 +67,7 @@ impl Display for TypeOfInference {
     }
 }
 
+
 #[derive(Deserialize,ToSchema)]
 pub struct EnqueueImageGenRequest {
     uuid_idempotency_token: String,
@@ -78,9 +79,15 @@ pub struct EnqueueImageGenRequest {
     maybe_a_prompt: Option<String>,
     maybe_n_prompt: Option<String>,
     maybe_seed: Option<i64>,
+    maybe_width: Option<i32>,
+    maybe_height: Option<i32>,
+    maybe_sampler: Option<String>,
     maybe_upload_path: Option<String>,
     maybe_lora_upload_path: Option<String>,
-    maybe_cfg_scale: Option<f32>
+    maybe_cfg_scale: Option<i32>,
+    maybe_number_of_samples: Option<i64>,
+    maybe_batch_size: Option<i32>,
+    maybe_batch_count: Option<i32>,
 }
 
 #[derive(Serialize,ToSchema)]
@@ -236,6 +243,7 @@ pub async fn enqueue_image_generation_request(
     let image_source_token = MediaFileToken(request.maybe_image_source.clone().unwrap_or_default());
     let sd_weight_token = ModelWeightToken(request.maybe_sd_model_token.clone().unwrap_or_default());
     let lora_token = ModelWeightToken(request.maybe_lora_model_token.clone().unwrap_or_default());
+    
 
     let a_prompt = request.maybe_a_prompt.clone().unwrap_or_default();
     let n_prompt = request.maybe_n_prompt.clone().unwrap_or_default();
