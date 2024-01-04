@@ -20,10 +20,6 @@ pub enum StableDiffusionSource {
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
 pub struct StableDiffusionArgs {
-    #[serde(rename = "vs")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_video_source: Option<MediaFileToken>,
-
     #[serde(rename = "is")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_image_source: Option<MediaFileToken>, 

@@ -232,7 +232,7 @@ pub async fn enqueue_image_generation_request(
         }
     }
 
-    let video_token = MediaFileToken(request.maybe_video_source.clone().unwrap_or_default());
+    
     let image_source_token = MediaFileToken(request.maybe_image_source.clone().unwrap_or_default());
     let sd_weight_token = ModelWeightToken(request.maybe_sd_model_token.clone().unwrap_or_default());
     let lora_token = ModelWeightToken(request.maybe_lora_model_token.clone().unwrap_or_default());
@@ -252,8 +252,9 @@ pub async fn enqueue_image_generation_request(
         seed = s;
     }
 
+    let inference_type = request.type_of_inference.to_string().clone();
+
     let inference_args = StableDiffusionArgs {
-        maybe_video_source: Some(video_token),
         maybe_image_source: Some(image_source_token),
         maybe_sd_model_token: Some(sd_weight_token),
         maybe_lora_model_token: Some(lora_token),
@@ -263,7 +264,7 @@ pub async fn enqueue_image_generation_request(
         maybe_seed: Some(seed),
         maybe_upload_path: Some(upload_path),
         maybe_lora_upload_path: Some(lora_upload_path),
-        inference_type: Some(request.type_of_inference.to_string()),
+        inference_type: inference_type,
     };
 
     // create the inference args here

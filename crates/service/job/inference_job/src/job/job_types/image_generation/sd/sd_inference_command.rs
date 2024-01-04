@@ -66,23 +66,27 @@ pub enum ExecutableOrCommand {
   Command(String),
 }
 
-pub struct InferenceArgs<'s, P: AsRef<Path>> {
+pub struct InferenceArgs<P: AsRef<Path>> {
   /// --source_image: path to the input image (or video)
-  pub input_image: P,
-
+  pub input_image: P, // Not availbile rn
   /// --result_dir: path to directory work is performed
   pub work_dir: P,
-
   /// --result_file: path to final file output
   pub output_file: P,
-
   pub stderr_output_file: P,
-
-  /// --enhancer: "gfpgan"
-  pub maybe_enhancer: Option<&'s str>,
-
-  /// --preprocess: "crop", etc.
-  pub maybe_preprocess: Option<&'s str>,
+  pub prompt: P,
+  pub negative_prompt:P,
+  pub number_of_samples:i32,
+  pub samplers:String,
+  pub width:i32,
+  pub height:i32,
+  pub cfg_scale:i32, 
+  pub seed:i32, 
+  pub lora_path:P, 
+  pub check_point:P, 
+  pub vae:P,
+  pub batch_size:i32, 
+  pub batch_count:i32,
 }
 
 impl StableDiffusionInferenceCommand {
@@ -198,44 +202,56 @@ impl StableDiffusionInferenceCommand {
     }
 
     // ===== Begin Python Args =====
-
-    // command.push_str(" --driven_audio ");
-    // command.push_str(&path_to_string(args.input_audio));
-
-    // command.push_str(" --source_image ");
-    // command.push_str(&path_to_string(args.input_image));
-
-    // command.push_str(" --result_dir ");
-    // command.push_str(&path_to_string(args.work_dir));
-
-    // command.push_str(" --result_file ");
-    // command.push_str(&path_to_string(args.output_file));
-
-    // if let Some(preprocess) = args.maybe_preprocess.as_deref() {
-    //   command.push_str(" --preprocess ");
-    //   command.push_str(preprocess);
-    //   command.push_str(" ");
-    // }
-    // if let Some(enhancer) = args.maybe_enhancer.as_deref() {
-    //   command.push_str(" --enhancer ");
-    //   command.push_str(enhancer);
-    //   command.push_str(" ");
-    // }
-
-    // if args.make_still {
-    //   command.push_str(" --still ");
-    // }
-
-    // if let Some(dir) = self.alternate_checkpoint_dir.as_ref() {
-    //   command.push_str(" --checkpoint_dir ");
-    //   command.push_str(&path_to_string(dir));
-    // }
-
-    // ===== End Python Args =====
-
-    if let Some(docker_options) = self.maybe_docker_options.as_ref() {
-      command = docker_options.to_command_string(&command);
-    }
+    command.push_str("--prompt ");
+    command.push_str(&args.prompt.as_ref().to_string_lossy());
+    
+    command.push_str(" --result_dir ");
+    command.push_str(&args.work_dir.as_ref().to_string_lossy());
+    
+    command.push_str(" --result_file ");
+    command.push_str(&args.output_file.as_ref().to_string_lossy());
+    
+    command.push_str(" --stderr_output_file ");
+    command.push_str(&args.stderr_output_file.as_ref().to_string_lossy());
+    
+    command.push_str(" --prompt ");
+    command.push_str(&args.prompt.as_ref().to_string_lossy());
+    
+    command.push_str(" --negative_prompt ");
+    command.push_str(&args.negative_prompt.as_ref().to_string_lossy());
+    
+    command.push_str(" --number_of_samples ");
+    command.push_str(&args.number_of_samples.to_string());
+    
+    command.push_str(" --samplers ");
+    command.push_str(&args.samplers);
+    
+    command.push_str(" --width ");
+    command.push_str(&args.width.to_string());
+    
+    command.push_str(" --height ");
+    command.push_str(&args.height.to_string());
+    
+    command.push_str(" --cfg_scale ");
+    command.push_str(&args.cfg_scale.to_string());
+    
+    command.push_str(" --seed ");
+    command.push_str(&args.seed.to_string());
+    
+    command.push_str(" --lora_path ");
+    command.push_str(&args.lora_path.as_ref().to_string_lossy());
+    
+    command.push_str(" --check_point ");
+    command.push_str(&args.check_point.as_ref().to_string_lossy());
+    
+    command.push_str(" --vae ");
+    command.push_str(&args.vae.as_ref().to_string_lossy());
+    
+    command.push_str(" --batch_size ");
+    command.push_str(&args.batch_size.to_string());
+    
+    command.push_str(" --batch_count ");
+    command.push_str(&args.batch_count.to_string());
 
     info!("Command: {:?}", command);
 
