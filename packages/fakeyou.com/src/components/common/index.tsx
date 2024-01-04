@@ -11,6 +11,7 @@ import FileWrapper from "./FileWrapper";
 import FileLabel from "./FileLabel";
 import ImageInput from "./ImageInput";
 import Input from "./Input";
+import Label from "./Label";
 import NumberSlider from "./NumberSlider";
 import Panel from "./Panel";
 import Radio from "./Radio";
@@ -40,6 +41,7 @@ export {
   FileLabel,
   ImageInput,
   Input,
+  Label,
   NumberSlider,
   Panel,
   Radio,

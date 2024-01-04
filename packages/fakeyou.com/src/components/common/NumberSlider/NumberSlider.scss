@@ -1,0 +1,40 @@
+.fy-number-slider {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: .75rem;
+
+  .fy-number-slider-range {
+    flex-grow: 1;
+  }
+
+  .fy-number-slider-value {
+    text-align: center;
+    width: fit-content;
+    padding: 6px;
+    border-radius: 8px;
+    background-color: #2f2f42;
+    border-width: 1px;
+    border-color: rgba(#fff, 0.12);
+    color: rgba(#fff, 0.85);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .fy-number-slider-track {
+    height: .5rem;
+    width: 100%;
+    margin: 0 0 0 .6875rem; // margin half width of thumb, so that thumb does not overlap margins at minimum position
+    background-color: #4f4f66;
+    border-radius: .25rem;
+  }
+
+  .fy-number-slider-thumb {
+    height: 1.375rem;
+    width: 1.375rem;
+    background-color: #e66462;
+    border-radius: 50%;
+    box-shadow: 0px 0px 10px rgba(#000, 0.15);
+    &:hover { background-color: #fff }
+  }
+}
