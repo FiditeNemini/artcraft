@@ -4,13 +4,13 @@ use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloud
 use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
-use crate::job::job_loop::job_success_result::JobSuccessResult;
+use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job_dependencies::JobDependencies;
 use anyhow::anyhow;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
-use cloud_storage::remote_file_manager::bucket_orchestration::BucketOrchestration;
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType::UploadModel;
 use crate::job::job_types::image_generation::sd::validate_inputs::validate_inputs;
 
 pub struct StableDiffusionProcessArgs<'a> {
@@ -18,22 +18,10 @@ pub struct StableDiffusionProcessArgs<'a> {
     pub job: &'a AvailableInferenceJob,
 }
 
-async fn get_remote_cloud_file_client() -> RemoteCloudFileClient {
-    let bucket_orchestration = match BucketOrchestration::new_bucket_client_from_existing_env() {
-        Ok(client) => client,
-        Err(e) => {
-            panic!("Error creating bucket orchestration client: {:?}", e);
-        }
-    };
-    RemoteCloudFileClient::new(Box::new(bucket_orchestration))
-}
-
-// fill out sd diffusion dependencies
-// get specific weight 
-// download weight / lora
 // run inference
 // upload inference result
-// upload model checkpoint or loRA 
+// upload model checkpoint or loRA
+
 // create record in db
     // if stable_diffusion_args.inference_type == "checkpoint" {
     //     // run inference with checkpoint and upload
@@ -47,6 +35,10 @@ async fn get_remote_cloud_file_client() -> RemoteCloudFileClient {
     // run inference
     // insert record into the db with the inference job token complete.
 
+
+pub async fn download_from_google_link() {
+
+}
 pub async fn sd_args_from_job(args: &StableDiffusionProcessArgs<'_>) -> Result<StableDiffusionArgs, ProcessSingleJobError> {
     let inference_args = args.job.maybe_inference_args
     .as_ref()
@@ -82,6 +74,7 @@ pub async fn process_job(args: StableDiffusionProcessArgs<'_>) -> Result<JobSucc
     //==================== TEMP DIR ==================== //
     let work_temp_dir = format!("temp_stable_diffusion_inference_{}", job.id.0);
 
+
     //NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
     let work_temp_dir = args.job_dependencies
         .fs
@@ -89,10 +82,31 @@ pub async fn process_job(args: StableDiffusionProcessArgs<'_>) -> Result<JobSucc
         .new_tempdir(&work_temp_dir)
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
+    let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint").to_str();
+    let sd_checkpoint_path = match sd_checkpoint_path {
+        Some(value) => {
+            value
+        },
+        None => {
+
+        }
+    };
+
+    let lora_path = work_temp_dir.path().join("lora").to_str();
+    let lora_path = match lora_path {
+        Some(value) => {
+            value
+        },
+        None => {
+        }
+    };
+
+    // Unpack loRA and Checkpoint
     // run inference by downloading from google drive.
     let lora_token = sd_args.maybe_lora_model_token;
-
     let weight_token = sd_args.maybe_sd_model_token;
+
+
     let retrieved_sd_record = match weight_token {
         Some(token) => {
             let retrieved_sd_record = get_weight_by_token(
@@ -130,21 +144,32 @@ pub async fn process_job(args: StableDiffusionProcessArgs<'_>) -> Result<JobSucc
         retrieved_sd_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
     );
 
-    let remote_cloud_file_client = get_remote_cloud_file_client().await;
-    remote_cloud_file_client.download_file(remote_cloud_bucket_details, to_system_file_path);
+    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
+    remote_cloud_file_client.download_file(details, sd_checkpoint_path.to_string()).await?;
 
     match retrieved_loRA_record {
         Some(record) => {
-            
-            let lora_details = RemoteCloudBucketDetails::new(
-                record.public_bucket_hash.clone(),
-                record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
-                record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
-            );
-            remote_cloud_file_client.download_file(lora_details, work_temp_dir.to_string());
+            match record {
+                Some(model_weight_record) => {
+                    let lora_details = RemoteCloudBucketDetails::new(
+                        model_weight_record.public_bucket_hash.clone(),
+                        model_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
+                        model_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
+                    );
+                    remote_cloud_file_client.download_file(lora_details, lora_path.to_string()).await?;
+                },
+                None => {}
+            }
         },
         None => {}
     }
+
+    // insert model record in create model record
+
+    // let maybe_result_entity = ResultEntity {
+    //     entity_type: InferenceResultType::UploadModel,
+    //     entity_token:
+    // };
 
     Ok(JobSuccessResult {
          maybe_result_entity: None,

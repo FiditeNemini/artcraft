@@ -29,6 +29,9 @@ pub enum InferenceResultType {
 
   #[serde(rename = "zs_voice_embedding")]
   ZeroShotVoiceEmbedding,
+
+  #[serde(renane = "upload_model")]
+  UploadModel
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!

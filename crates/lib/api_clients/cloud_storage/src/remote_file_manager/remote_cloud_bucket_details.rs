@@ -1,7 +1,7 @@
 use crate::remote_file_manager::weights_descriptor::{self};
-
 use super::file_descriptor::FileDescriptor;
 
+#[derive(Debug, Clone)]
 pub struct RemoteCloudBucketDetails {
     pub object_hash: String,
     pub prefix: String,
