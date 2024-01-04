@@ -140,26 +140,6 @@ CREATE TABLE model_weights (
   -- is_locked_from_user_modification BOOLEAN NOT NULL DEFAULT FALSE,
 
 
-  -- ========== RATING AND RANKING ==========
-
-  -- User ratings are cached on the model, but are *not* a source of truth.
-  -- Total count only includes "positive" and "negative" votes, not neutral ones.
-  cached_user_ratings_total_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
-
-  -- Total positive
-  cached_user_ratings_positive_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
-
-  -- Total negative
-  cached_user_ratings_negative_count INT(10) UNSIGNED NOT NULL DEFAULT 0,
-
-  -- User ratings are cached on the model, but are *not* a source of truth.
-  -- Total count only includes "positive" and "negative" votes, not neutral ones.
-  maybe_cached_user_ratings_ratio FLOAT,
-
-  -- When the cached ratings were last calculated and updated.
-  cached_user_ratings_last_updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-
   -- ========== MIGRATION DETAILS ==========
 
   -- If migrated from another table, this is the token of the original model.
