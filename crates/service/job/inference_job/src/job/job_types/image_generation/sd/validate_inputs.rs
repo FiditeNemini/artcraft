@@ -26,11 +26,11 @@ pub async fn validate_inputs(args: StableDiffusionProcessArgs<'_>) -> Result<(),
     };
 
     let stable_diffusion_args: StableDiffusionArgs = StableDiffusionArgs::from(sd_args.clone());
-    if stable_diffusion_args.inference_type == "checkpoint" {
+    if stable_diffusion_args.type_of_inference == "checkpoint" {
         
-    } else if stable_diffusion_args.inference_type == "lora" {
+    } else if stable_diffusion_args.type_of_inference == "lora" {
 
-    } else if stable_diffusion_args.inference_type == "inference" {
+    } else if stable_diffusion_args.type_of_inference == "inference" {
         
     } else {
         return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("wrong inference type for job!")));

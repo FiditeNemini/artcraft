@@ -1,18 +1,31 @@
 
 use std::time::Duration;
+use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job_dependencies::JobDependencies;
 use anyhow::anyhow;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
+use cloud_storage::remote_file_manager::bucket_orchestration::BucketOrchestration;
 use crate::job::job_types::image_generation::sd::validate_inputs::validate_inputs;
 
 pub struct StableDiffusionProcessArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
     pub job: &'a AvailableInferenceJob,
+}
+
+async fn get_remote_cloud_file_client() -> RemoteCloudFileClient {
+    let bucket_orchestration = match BucketOrchestration::new_bucket_client_from_existing_env() {
+        Ok(client) => client,
+        Err(e) => {
+            panic!("Error creating bucket orchestration client: {:?}", e);
+        }
+    };
+    RemoteCloudFileClient::new(Box::new(bucket_orchestration))
 }
 
 // fill out sd diffusion dependencies
@@ -66,7 +79,6 @@ pub async fn process_job(args: StableDiffusionProcessArgs<'_>) -> Result<JobSucc
         .job_progress_reporter
         .new_generic_inference(job.inference_job_token.as_str())
         .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
-
     //==================== TEMP DIR ==================== //
     let work_temp_dir = format!("temp_stable_diffusion_inference_{}", job.id.0);
 
@@ -77,7 +89,62 @@ pub async fn process_job(args: StableDiffusionProcessArgs<'_>) -> Result<JobSucc
         .new_tempdir(&work_temp_dir)
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
+    // run inference by downloading from google drive.
+    let lora_token = sd_args.maybe_lora_model_token;
 
+    let weight_token = sd_args.maybe_sd_model_token;
+    let retrieved_sd_record = match weight_token {
+        Some(token) => {
+            let retrieved_sd_record = get_weight_by_token(
+                &token,
+                false,
+                &deps.db.mysql_pool
+            ).await?;
+            match retrieved_sd_record {
+                Some(record) => record,
+                None => {
+                    return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no record of model!")))
+                }
+            }
+        },
+        None => {
+            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no sd model token for job!")))
+        }
+    }; 
+    // ignore if no lora token
+    let retrieved_loRA_record = match lora_token {
+        Some(token) => {
+            let retrieved_loRA_record = get_weight_by_token(
+                &token,
+                false,
+                &deps.db.mysql_pool
+            ).await?;
+            Some(retrieved_loRA_record)
+        },
+        None => None
+    };
+
+    let details = RemoteCloudBucketDetails::new(
+        retrieved_sd_record.public_bucket_hash.clone(),
+        retrieved_sd_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
+        retrieved_sd_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
+    );
+
+    let remote_cloud_file_client = get_remote_cloud_file_client().await;
+    remote_cloud_file_client.download_file(remote_cloud_bucket_details, to_system_file_path);
+
+    match retrieved_loRA_record {
+        Some(record) => {
+            
+            let lora_details = RemoteCloudBucketDetails::new(
+                record.public_bucket_hash.clone(),
+                record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
+                record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
+            );
+            remote_cloud_file_client.download_file(lora_details, work_temp_dir.to_string());
+        },
+        None => {}
+    }
 
     Ok(JobSuccessResult {
          maybe_result_entity: None,
