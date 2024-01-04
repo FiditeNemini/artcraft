@@ -40,10 +40,10 @@ pub struct ModelWeightForList {
   /// If a cover image is set, this is the path to the asset.
   pub maybe_cover_image_public_bucket_path: Option<String>,
 
-  pub cached_user_ratings_total_count: u32,
-  pub cached_user_ratings_positive_count: u32,
-  pub cached_user_ratings_negative_count: u32,
-  pub maybe_cached_user_ratings_ratio: Option<f32>,
+  //pub cached_user_ratings_total_count: u32,
+  //pub cached_user_ratings_positive_count: u32,
+  //pub cached_user_ratings_negative_count: u32,
+  //pub maybe_cached_user_ratings_ratio: Option<f32>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -153,10 +153,10 @@ pub async fn list_featured_weights_handler(
               &w.creator_display_name,
               &w.creator_email_gravatar_hash
             ),
-            cached_user_ratings_total_count: w.cached_user_ratings_total_count,
-            cached_user_ratings_positive_count: w.cached_user_ratings_positive_count,
-            cached_user_ratings_negative_count: w.cached_user_ratings_negative_count,
-            maybe_cached_user_ratings_ratio: w.maybe_cached_user_ratings_ratio,
+            //cached_user_ratings_total_count: w.cached_user_ratings_total_count,
+            //cached_user_ratings_positive_count: w.cached_user_ratings_positive_count,
+            //cached_user_ratings_negative_count: w.cached_user_ratings_negative_count,
+            //maybe_cached_user_ratings_ratio: w.maybe_cached_user_ratings_ratio,
             created_at: w.created_at,
             updated_at: w.updated_at,
           }

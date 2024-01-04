@@ -43,12 +43,11 @@ pub struct GetWeightResponse {
     /// If a cover image is set, this is the path to the asset.
     maybe_cover_image_public_bucket_path: Option<String>,
 
-    cached_user_ratings_negative_count: u32,
-    cached_user_ratings_positive_count: u32,
-    cached_user_ratings_total_count: u32,
-
-    maybe_cached_user_ratings_ratio: Option<f32>,
-    cached_user_ratings_last_updated_at: DateTime<Utc>,
+    //cached_user_ratings_negative_count: u32,
+    //cached_user_ratings_positive_count: u32,
+    //cached_user_ratings_total_count: u32,
+    //maybe_cached_user_ratings_ratio: Option<f32>,
+    //cached_user_ratings_last_updated_at: DateTime<Utc>,
     
     version: i32,
     created_at: DateTime<Utc>,
@@ -184,11 +183,11 @@ pub async fn get_weight_handler(
         creator_set_visibility: weight.creator_set_visibility,
         file_size_bytes: weight.file_size_bytes,
         file_checksum_sha2: weight.file_checksum_sha2,
-        cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
-        cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
-        cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
-        maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
-        cached_user_ratings_last_updated_at: weight.cached_user_ratings_last_updated_at,
+        //cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
+        //cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
+        //cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
+        //maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
+        //cached_user_ratings_last_updated_at: weight.cached_user_ratings_last_updated_at,
         version: weight.version,
         created_at: weight.created_at,
         updated_at: weight.updated_at

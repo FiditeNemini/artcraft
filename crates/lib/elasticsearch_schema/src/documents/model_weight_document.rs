@@ -34,11 +34,11 @@ pub struct ModelWeightDocument {
   //pub description_markdown_html: String,
 
   // TODO(bt,2023-12-22): Populate these fields
-  pub cached_user_ratings_total_count: u32,
-  pub cached_user_ratings_positive_count: u32,
-  pub cached_user_ratings_negative_count: u32,
-  pub cached_user_ratings_ratio: f32,
-  pub cached_user_ratings_last_updated_at: DateTime<Utc>,
+  //pub cached_user_ratings_total_count: u32,
+  //pub cached_user_ratings_positive_count: u32,
+  //pub cached_user_ratings_negative_count: u32,
+  //pub cached_user_ratings_ratio: f32,
+  //pub cached_user_ratings_last_updated_at: DateTime<Utc>,
 
   pub creator_user_token: UserToken,
   pub creator_username: String,

@@ -116,10 +116,10 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
         let mut private_bucket_prefix;
         let mut private_bucket_extension;
 
-        let mut cached_user_ratings_total_count;
-        let mut cached_user_ratings_positive_count;
-        let mut cached_user_ratings_negative_count;
-        let mut cached_user_ratings_ratio;
+        //let mut cached_user_ratings_total_count;
+        //let mut cached_user_ratings_positive_count;
+        //let mut cached_user_ratings_negative_count;
+        //let mut cached_user_ratings_ratio;
         let mut version;
 
         match i {
@@ -142,10 +142,10 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 // private_bucket_hash = format!("bucket_hash{}", i);
                 private_bucket_prefix = format!("_fake");
                 private_bucket_extension = format!("rvcV2");
-                cached_user_ratings_total_count = i;
-                cached_user_ratings_positive_count = i;
-                cached_user_ratings_negative_count = i;
-                cached_user_ratings_ratio = i as u32 / 100;
+                //cached_user_ratings_total_count = i;
+                //cached_user_ratings_positive_count = i;
+                //cached_user_ratings_negative_count = i;
+                //cached_user_ratings_ratio = i as u32 / 100;
                 version = i as i32;
                 println!("Seeding RVCv2 model {}", i);
             },
@@ -171,10 +171,10 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 private_bucket_prefix = format!("_fake");
                 private_bucket_extension = format!("tt2");
 
-                cached_user_ratings_total_count = i;
-                cached_user_ratings_positive_count = i;
-                cached_user_ratings_negative_count = i;
-                cached_user_ratings_ratio = i as u32 / 100;
+                //cached_user_ratings_total_count = i;
+                //cached_user_ratings_positive_count = i;
+                //cached_user_ratings_negative_count = i;
+                //cached_user_ratings_ratio = i as u32 / 100;
                 version = i as i32;
                 println!("Seeding TT2 model {}", i);
             },
@@ -194,10 +194,10 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 private_bucket_prefix = format!("_fake");
                 private_bucket_extension = format!("sd15");
 
-                cached_user_ratings_total_count = i;
-                cached_user_ratings_positive_count = i;
-                cached_user_ratings_negative_count = i;
-                cached_user_ratings_ratio = i as u32 / 100;
+                //cached_user_ratings_total_count = i;
+                //cached_user_ratings_positive_count = i;
+                //cached_user_ratings_negative_count = i;
+                //cached_user_ratings_ratio = i as u32 / 100;
                 version = i as i32;
                 println!("Seeding SD15 model {}", i);
             },
@@ -235,10 +235,10 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 original_filename = format!("filename{}.txt", i);
                 original_download_url = format!("https://civitai.com/api/download/models/149193?type=Model&format=SafeTensor&size=pruned&fp=fp16");
   
-                cached_user_ratings_total_count = i;
-                cached_user_ratings_positive_count = i;
-                cached_user_ratings_negative_count = i;
-                cached_user_ratings_ratio = i as u32 / 100;
+                //cached_user_ratings_total_count = i;
+                //cached_user_ratings_positive_count = i;
+                //cached_user_ratings_negative_count = i;
+                //cached_user_ratings_ratio = i as u32 / 100;
                 version = i as i32;
                 println!("Seeding SDXL model {}", i);
             },
@@ -264,10 +264,10 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 private_bucket_prefix = format!("_fake");
                 private_bucket_extension = format!("loRA");
 
-                cached_user_ratings_total_count = i;
-                cached_user_ratings_positive_count = i;
-                cached_user_ratings_negative_count = i;
-                cached_user_ratings_ratio = i as u32 / 100;
+                //cached_user_ratings_total_count = i;
+                //cached_user_ratings_positive_count = i;
+                //cached_user_ratings_negative_count = i;
+                //cached_user_ratings_ratio = i as u32 / 100;
                 version = i as i32;
                 println!("Seeding LoRA model {}", i);
             },
@@ -290,10 +290,10 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 // private_bucket_hash = format!("bucket_hash{}", i);
                 private_bucket_prefix = format!("_fake");
                 private_bucket_extension = format!("rvcV2");
-                cached_user_ratings_total_count = i;
-                cached_user_ratings_positive_count = i;
-                cached_user_ratings_negative_count = i;
-                cached_user_ratings_ratio = i as u32 / 100;
+                //cached_user_ratings_total_count = i;
+                //cached_user_ratings_positive_count = i;
+                //cached_user_ratings_negative_count = i;
+                //cached_user_ratings_ratio = i as u32 / 100;
                 version = i as i32;
 
                 println!("Out of range");
@@ -318,10 +318,10 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 public_bucket_hash: "bucket_hash1".to_string(),
                 maybe_public_bucket_prefix: Some(private_bucket_prefix),
                 maybe_public_bucket_extension: Some(private_bucket_extension),
-                cached_user_ratings_total_count,
-                cached_user_ratings_positive_count,
-                cached_user_ratings_negative_count,
-                maybe_cached_user_ratings_ratio: Some(cached_user_ratings_ratio as f32),
+                //cached_user_ratings_total_count,
+                //cached_user_ratings_positive_count,
+                //cached_user_ratings_negative_count,
+                //maybe_cached_user_ratings_ratio: Some(cached_user_ratings_ratio as f32),
                 version,
                 mysql_pool: &mysql_pool, // replace with actual MySqlPool
             };
@@ -363,10 +363,10 @@ pub async fn seed_weights_for_user_token(
             public_bucket_hash: "bucket_hash1".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("rvc".to_string()),
-            cached_user_ratings_total_count: 10,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 1,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 10,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 1,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 1,
             mysql_pool: &mysql_pool, // replace with actual MySqlPool
         },
@@ -388,10 +388,10 @@ pub async fn seed_weights_for_user_token(
             public_bucket_hash: "bucket_hash2".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("tt2".to_string()),
-            cached_user_ratings_total_count: 20,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 2,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 20,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 2,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 2,
             mysql_pool: &mysql_pool, // replace with actual MySqlPool
         },
@@ -413,10 +413,10 @@ pub async fn seed_weights_for_user_token(
             public_bucket_hash: "bucket_hash3".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("safetensors".to_string()),
-            cached_user_ratings_total_count: 10,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 1,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 10,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 1,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 1,
             mysql_pool: &mysql_pool, // replace with actual MySqlPool
         },
@@ -438,10 +438,10 @@ pub async fn seed_weights_for_user_token(
             public_bucket_hash: "bucket_hash4".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("LoRA".to_string()),
-            cached_user_ratings_total_count: 10,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 1,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 10,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 1,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 2,
             mysql_pool: &mysql_pool, // replace with actual MySqlPool
         },
@@ -463,10 +463,10 @@ pub async fn seed_weights_for_user_token(
             public_bucket_hash: "bucket_hash4".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("LoRA".to_string()),
-            cached_user_ratings_total_count: 10,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 1,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 10,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 1,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 2,
             mysql_pool: &mysql_pool, // replace with actual MySqlPool
         }
@@ -514,10 +514,10 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>, _user_token: UserTo
             public_bucket_hash: "bucket_hash1".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("rvc".to_string()),
-            cached_user_ratings_total_count: 10,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 1,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 10,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 1,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 1,
             mysql_pool: &mysql_pool, // replace with actual MySqlPool
         },
@@ -539,10 +539,10 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>, _user_token: UserTo
             public_bucket_hash: "bucket_hash2".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("tt2".to_string()),
-            cached_user_ratings_total_count: 20,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 2,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 20,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 2,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 2,
             mysql_pool: &mysql_pool, // replace with actual MySqlPool
         },
@@ -564,10 +564,10 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>, _user_token: UserTo
             public_bucket_hash: "bucket_hash3".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("safetensors".to_string()),
-            cached_user_ratings_total_count: 10,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 1,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 10,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 1,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 1,
             mysql_pool: &mysql_pool, // replace with actual MySqlPool
         },
@@ -589,10 +589,10 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>, _user_token: UserTo
             public_bucket_hash: "bucket_hash4".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("LoRA".to_string()),
-            cached_user_ratings_total_count: 10,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 1,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 10,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 1,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 2,
             mysql_pool: &mysql_pool, // replace with actual MySqlPool
         },
@@ -614,10 +614,10 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>, _user_token: UserTo
             public_bucket_hash: "bucket_hash5".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("LoRA".to_string()),
-            cached_user_ratings_total_count: 10,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 1,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 10,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 1,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 2,
             mysql_pool: &mysql_pool, // replace with actual MySqlPool
         }

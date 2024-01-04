@@ -63,10 +63,10 @@ pub struct ModelWeightForList {
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
 
-    pub cached_user_ratings_total_count: u32,
-    pub cached_user_ratings_positive_count: u32,
-    pub cached_user_ratings_negative_count: u32,
-    pub maybe_cached_user_ratings_ratio: Option<f32>,
+    //pub cached_user_ratings_total_count: u32,
+    //pub cached_user_ratings_positive_count: u32,
+    //pub cached_user_ratings_negative_count: u32,
+    //pub maybe_cached_user_ratings_ratio: Option<f32>,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -236,10 +236,10 @@ pub async fn list_available_weights_handler(
                     file_size_bytes: weight.file_size_bytes,
                     file_checksum_sha2: weight.file_checksum_sha2,
 
-                    cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
-                    cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
-                    cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
-                    maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
+                    //cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
+                    //cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
+                    //cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
+                    //maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
 
                     created_at: weight.created_at,
                     updated_at: weight.updated_at,
