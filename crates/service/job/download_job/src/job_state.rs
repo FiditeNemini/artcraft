@@ -70,7 +70,7 @@ pub struct PretrainedModels {
 
 /// Configurations and interfaces to code deployed as sidecars or container mounts.
 pub struct SidecarConfigs {
-  pub google_drive_downloader: GoogleDriveDownloadCommand,
+  pub(crate) google_drive_downloader: GoogleDriveDownloadCommand,
   pub rvc_v2_model_check_command: RvcV2ModelCheckCommand,
   pub softvc_model_check_command: SoftVcModelCheckCommand,
   pub so_vits_svc_model_check_command: SoVitsSvcModelCheckCommand,

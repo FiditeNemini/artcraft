@@ -64,6 +64,7 @@ pub async fn process_job(args: StableDiffusionProcessArgs<'_>) -> Result<JobSucc
     let job = args.job;
     let deps = args.job_dependencies;
 
+
     let sd_args = sd_args_from_job(&args).await?;
     
     let mut job_progress_reporter = args.job_dependencies
