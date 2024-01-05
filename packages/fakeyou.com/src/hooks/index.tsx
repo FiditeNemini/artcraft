@@ -1,4 +1,5 @@
 import useBookmarks from './useBookmarks';
+import useChanger from './useChanger';
 import useCoverImgUpload from './useCoverImgUpload';
 import useFile from './useFile';
 import useHover from './useHover';
@@ -18,6 +19,7 @@ import useWeightFetch from './useWeightFetch';
 
 export {
   useBookmarks,
+  useChanger,
   useCoverImgUpload,
   useFile,
   useHover,

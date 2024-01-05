@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, NumberSlider, Panel, SegmentButtons, TempSelect, TempTextArea } from "components/common";
+import { useChanger } from 'hooks';
 import { onChanger } from 'resources';
 
 interface SdInferencePanelProps {}
@@ -15,6 +16,8 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
   const [batchSize, batchSizeSet] = useState(1);
   const [batchCount, batchCountSet] = useState(1);
   const onChange = onChanger({ batchCountSet, batchSizeSet, cfgScaleSet, checkPointSet, heightSet, loRAPathSet, samplerSet, seedSet, widthSet });
+
+
 
   const samplerOpts = [
     { label: "DPM++", value: "DPM++" },
@@ -47,11 +50,16 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
   ];
 
   // console.log("🚨",Math.pow(2,32));
+
+  const { setProps } = useChanger({
+    prompt: useState("")
+  });
+
   return <Panel padding={true}>
     <TempTextArea {...{
       label: "Prompt",
-      name: "prompt",
-      placeholder: "Enter a prompt"
+      placeholder: "Enter a prompt",
+      ...setProps("prompt")
     }}/>
     <TempTextArea {...{
       label: "Negative prompt",
