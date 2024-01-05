@@ -1,9 +1,7 @@
 import React, { useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-import AudioCard from "components/common/Card/AudioCard";
-import ImageCard from "components/common/Card/ImageCard";
-import VideoCard from "components/common/Card/VideoCard";
+import MediaCards from "components/common/Card/MediaCards";
 import { TempSelect } from "components/common";
 import {
   faArrowDownWideShort,
@@ -13,7 +11,7 @@ import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContex
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { ListMediaFiles } from "@storyteller/components/src/api/media_files/ListMediaFiles";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
-import { useBookmarks, useLazyLists } from "hooks";
+import { useBookmarks, useLazyLists, useRatings } from "hooks";
 import InfiniteScroll from "react-infinite-scroll-component";
 import prepFilter from "resources/prepFilter";
 
@@ -21,6 +19,7 @@ export default function MediaTab() {
   const { search } = useLocation();
   const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
+  const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [weightType, weightTypeSet] = useState(
     urlQueries.get("maybe_scoped_weight_type") || "all"
@@ -116,58 +115,16 @@ export default function MediaTab() {
                   <MasonryGrid
                     gridRef={gridContainerRef}
                     onLayoutComplete={() => console.log("Layout complete!")}
-                  >
-                    {media.list.map((data: any, index: number) => {
-                      let card;
-                      switch (data.media_type) {
-                        case "audio":
-                          card = (
-                            <AudioCard
-                              {...{
-                                bookmarks,
-                                data,
-                                type: "media",
-                                showCreator: true,
-                              }}
-                            />
-                          );
-                          break;
-                        case "image":
-                          card = (
-                            <ImageCard
-                              {...{
-                                bookmarks,
-                                data,
-                                type: "media",
-                                showCreator: true,
-                              }}
-                            />
-                          );
-                          break;
-                        case "video":
-                          card = (
-                            <VideoCard
-                              {...{
-                                bookmarks,
-                                data,
-                                type: "media",
-                                showCreator: true,
-                              }}
-                            />
-                          );
-                          break;
-                        default:
-                          card = <div>Unsupported media type</div>;
-                      }
-                      return (
-                        <div
-                          key={index}
-                          className="col-12 col-sm-6 col-xl-4 grid-item"
-                        >
-                          {card}
-                        </div>
-                      );
-                    })}
+                  > { media.list.map((data: any, key: number) => {
+                    let props = { bookmarks, data, origin, ratings, type: "media" };
+
+                    return <div {...{
+                      className: "col-12 col-sm-6 col-xl-4 grid-item",
+                      key
+                    }}>
+                      <MediaCards {...{ type: data.media_type, props }} />
+                    </div>;
+                  }) }
                   </MasonryGrid>
                 )}
               </>

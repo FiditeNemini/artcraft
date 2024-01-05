@@ -9,7 +9,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import Pagination from "components/common/Pagination";
 
-import { useBookmarks, useListContent } from "hooks";
+import { useBookmarks, useListContent, useRatings } from "hooks";
 import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
 import WeightsCards from "components/common/Card/WeightsCards";
 import prepFilter from "resources/prepFilter";
@@ -18,6 +18,7 @@ export default function BookmarksTab({ username }: { username: string }) {
   const { pathname: origin, search } = useLocation();
   const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
+  const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [weightType, weightTypeSet] = useState(
@@ -205,13 +206,7 @@ export default function BookmarksTab({ username }: { username: string }) {
                 onLayoutComplete={() => console.log("Layout complete!")}
               >
                 {dataList.map((data: any, key: number) => {
-                  let weightProps = {
-                    bookmarks,
-                    data,
-                    origin,
-                    type: "weights",
-                    showCreator: true,
-                  };
+                  let weightProps = { bookmarks, data, origin, ratings, showCreator: true, type: "weights" };
 
                   // let mediaProps = {
                   //   bookmarks,

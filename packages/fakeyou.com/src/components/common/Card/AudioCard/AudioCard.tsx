@@ -17,18 +17,20 @@ interface AudioCardProps {
   bookmarks: any;
   data: any;
   origin?: string;
-  type: "media" | "weights";
+  ratings: any;
   showCreator?: boolean;
   showCover?: boolean;
+  type: "media" | "weights";
 }
 
 export default function AudioCard({
   bookmarks,
   data,
   origin = "",
-  type,
+  ratings,
   showCreator,
   showCover,
+  type,
 }: AudioCardProps) {
   const linkUrl =
     type === "media"
@@ -42,11 +44,6 @@ export default function AudioCard({
   };
 
   const timeAgo = useTimeAgo(data.created_at);
-
-  const handleLike = async () => {
-    console.log(`The item is now ${data.isLiked ? "liked" : "not liked"}.`);
-    return true; // temporary, replace with like function
-  };
 
   const { label: weightBadgeLabel, color: weightBadgeColor } =
     useWeightTypeInfo(
@@ -126,7 +123,12 @@ export default function AudioCard({
               )}
 
               <div>
-                <LikeButton onToggle={handleLike} likeCount={data.like || 0} />
+                <LikeButton {...{
+                  entityToken: data.token,
+                  entityType: "media_file",
+                  likeCount: data.likes,
+                  onToggle: ratings.toggle
+                }} />
               </div>
             </div>
           </>
@@ -184,7 +186,12 @@ export default function AudioCard({
               )}
 
               <div>
-                <LikeButton onToggle={handleLike} likeCount={data.likes} />
+                <LikeButton {...{
+                  entityToken: data.weight_token,
+                  entityType: "model_weight",
+                  likeCount: data.likes,
+                  onToggle: ratings.toggle
+                }} />
               </div>
               <BookmarkButton
                 {...{

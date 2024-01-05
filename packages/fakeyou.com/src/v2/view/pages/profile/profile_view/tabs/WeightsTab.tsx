@@ -7,7 +7,7 @@ import {
   faFilter,
 } from "@fortawesome/pro-solid-svg-icons";
 import Pagination from "components/common/Pagination";
-import { useBookmarks, useListContent } from "hooks";
+import { useBookmarks, useListContent, useRatings } from "hooks";
 import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
 import { TempSelect } from "components/common";
 import SkeletonCard from "components/common/Card/SkeletonCard";
@@ -34,6 +34,7 @@ export default function WeightsTab({ username }: { username: string }) {
   const [vc, vcSet] = useState("all");
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const bookmarks = useBookmarks();
+  const ratings = useRatings();
   const [list, listSet] = useState<any[]>([]);
   const weights = useListContent({
     addQueries: {
@@ -193,13 +194,7 @@ export default function WeightsTab({ username }: { username: string }) {
                   onLayoutComplete={() => console.log("Layout complete!")}
                 >
                   {weights.list.map((data: any, key: number) => {
-                    let props = {
-                      bookmarks,
-                      data,
-                      origin,
-                      showCreator: true,
-                      type: "weights",
-                    };
+                    let props = { bookmarks, data, origin, ratings, showCreator: true, type: "weights" };
 
                     return (
                       <div

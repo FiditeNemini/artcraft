@@ -13,11 +13,12 @@ import { Link } from "react-router-dom";
 interface VideoCardProps {
   data: any;
   origin?: string;
-  type: "media" | "weights";
+  ratings: any;
   showCreator?: boolean;
+  type: "media" | "weights";
 }
 
-export default function VideoCard({ data, origin = "", type, showCreator }: VideoCardProps) {
+export default function VideoCard({ data, origin = "", ratings, showCreator, type }: VideoCardProps) {
   const linkUrl =
     type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}`;
 
@@ -26,11 +27,6 @@ export default function VideoCard({ data, origin = "", type, showCreator }: Vide
   };
 
   const timeAgo = useTimeAgo(data.created_at);
-
-  const handleLike = async () => {
-    console.log(`The item is now ${data.isLiked ? "liked" : "not liked"}.`);
-    return true; // temporary, replace with like function
-  };
 
   const videoLink = new BucketConfig().getGcsUrl(data.public_bucket_path);
 
@@ -86,10 +82,12 @@ export default function VideoCard({ data, origin = "", type, showCreator }: Vide
                     )}
 
                     <div>
-                      <LikeButton
-                        onToggle={handleLike}
-                        likeCount={data.likes}
-                      />
+                      <LikeButton {...{
+                        entityToken: data.token,
+                        entityType: "media_file",
+                        likeCount: data.likes,
+                        onToggle: ratings.toggle
+                      }} />
                     </div>
                   </div>
                 </div>
@@ -132,11 +130,13 @@ export default function VideoCard({ data, origin = "", type, showCreator }: Vide
                   </h6>
                   <p className="fs-7 opacity-75">{timeAgo}</p>
                   <div className="mt-2" onClick={handleInnerClick}>
-                    <LikeButton
-                      onToggle={handleLike}
-                      likeCount={data.likes}
-                      overlay={true}
-                    />
+                    <LikeButton {...{
+                      entityToken: data.weight_token,
+                      entityType: "model_weight",
+                      likeCount: data.likes,
+                      onToggle: ratings.toggle,
+                      overlay: true
+                    }} />
                   </div>
                 </div>
               </div>

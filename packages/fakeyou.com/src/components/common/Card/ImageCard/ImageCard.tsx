@@ -15,16 +15,18 @@ interface ImageCardProps {
   bookmarks: any;
   data: any;
   origin?: string;
-  type: "media" | "weights";
+  ratings: any;
   showCreator?: boolean;
+  type: "media" | "weights";
 }
 
 export default function ImageCard({
   bookmarks,
   data,
   origin = "",
-  type,
   showCreator,
+  ratings,
+  type
 }: ImageCardProps) {
   const linkUrl =
     type === "media"
@@ -38,11 +40,6 @@ export default function ImageCard({
   };
 
   const timeAgo = useTimeAgo(data.created_at);
-
-  const handleLike = async () => {
-    console.log(`The item is now ${data.isLiked ? "liked" : "not liked"}.`);
-    return true; // temporary will be replaced with like function
-  };
 
   const { label: weightBadgeLabel, color: weightBadgeColor } =
     useWeightTypeInfo(
@@ -122,7 +119,12 @@ export default function ImageCard({
                   )}
 
                   <div>
-                    <LikeButton onToggle={handleLike} likeCount={data.likes} />
+                    <LikeButton {...{
+                      entityToken: data.token,
+                      entityType: "media_file",
+                      likeCount: data.likes,
+                      onToggle: ratings.toggle
+                    }} />
                   </div>
                 </div>
               </div>
@@ -186,7 +188,12 @@ export default function ImageCard({
                   )}
 
                   <div>
-                    <LikeButton onToggle={handleLike} likeCount={data.likes} />
+                    <LikeButton {...{
+                      entityToken: data.weight_token,
+                      entityType: "model_weight",
+                      likeCount: data.likes,
+                      onToggle: ratings.toggle
+                    }} />
                   </div>
                   <BookmarkButton
                     {...{

@@ -13,34 +13,35 @@ import Pagination from "components/common/Pagination";
 
 import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
-import { useBookmarks, useListContent } from "hooks";
+import { useBookmarks, useListContent, useRatings } from "hooks";
 import prepFilter from "resources/prepFilter";
 
 export default function MediaTab({ username }: { username: string }) {
   const { pathname: origin, search } = useLocation();
   const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
+  const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [mediaType, mediaTypeSet] = useState(
     urlQueries.get("filter_media_type") || "all"
   );
   const [list, listSet] = useState<MediaFile[]>([]);
-  // const resetMasonryGrid = () => {
-  //   setShowMasonryGrid(false);
-  //   setTimeout(() => setShowMasonryGrid(true), 10);
-  // };
   const media = useListContent({
     addQueries: {
       page_size: 24,
       ...prepFilter(mediaType, "filter_media_type"),
     },
     addSetters: { mediaTypeSet },
+    debug: "profile media",
     fetcher: GetMediaByUser,
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
-    onSuccess: () => setShowMasonryGrid(true),
+    onSuccess: (res) => {
+      ratings.gather(res);
+      setShowMasonryGrid(true);
+    },
     requestList: true,
     urlParam: username,
   });
@@ -114,7 +115,7 @@ export default function MediaTab({ username }: { username: string }) {
                     onLayoutComplete={() => console.log("Layout complete!")}
                   >
                     {media.list.map((data: MediaFile, key: number) => {
-                      let props = { bookmarks, data, origin, type: "media" };
+                      let props = { bookmarks, data, origin, ratings, type: "media" };
                       return (
                         <div
                           {...{
