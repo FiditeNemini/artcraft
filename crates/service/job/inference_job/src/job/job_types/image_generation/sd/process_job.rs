@@ -174,14 +174,14 @@ pub async fn process_job(
 
 #[cfg(test)]
 mod tests {
-    use anyhow::anyhow;
-    use std::path::PathBuf;
-    use cloud_storage::remote_file_manager::{
-        remote_cloud_file_manager::{RemoteCloudFileClient, self},
-        remote_cloud_bucket_details::RemoteCloudBucketDetails,
-    };
-    use errors::{AnyhowError, AnyhowResult};
-    #[tokio::test]
+use anyhow::anyhow;
+use std::path::PathBuf;
+use cloud_storage::remote_file_manager::{
+remote_cloud_file_manager::{RemoteCloudFileClient, self},
+remote_cloud_bucket_details::RemoteCloudBucketDetails,
+};
+use errors::{AnyhowError, AnyhowResult};
+#[tokio::test]
     async fn test_seed_weights_files() -> AnyhowResult<()> {
         let seed_path = PathBuf::from("/storyteller/root/custom-seed-tool-data");
         let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;

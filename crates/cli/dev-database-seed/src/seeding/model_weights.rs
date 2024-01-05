@@ -1,8 +1,11 @@
+use std::path::PathBuf;
 use std::vec;
 
 use log::info;
 use sqlx::{MySql, Pool};
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
+use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
+
 use cloud_storage::remote_file_manager::weights_descriptor;
 use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor};
 use easyenv::from_filename;
@@ -20,6 +23,42 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 use crate::seeding::users::HANASHI_USERNAME;
+
+pub async fn test_seed_weights_files() -> AnyhowResult<()> {
+
+    let seed_path = PathBuf::from("/storyteller/root/custom-seed-tool-data");
+    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;
+    let remote_cloud_file_client = match remote_cloud_file_client {
+        Ok(res) => {
+            res
+        }
+        Err(_) => {
+            return Err(anyhow!("failed to get remote cloud file client"));
+        }
+    };
+
+    let mut path_dl1 = seed_path.clone();
+    path_dl1.push("downloads/loRA");
+    let mut path_dl2 = seed_path.clone();
+    path_dl2.push("downloads/checkpoint");
+
+    let bucket_details1 = RemoteCloudBucketDetails {
+        object_hash: String::from("apa0ej6es8d3ss2gwtf1cghge35qn9tn"),
+        prefix: String::from("sd15"),
+        suffix: String::from("safetensors"),
+    };
+
+    let bucket_details2 = RemoteCloudBucketDetails {
+        object_hash: String::from("27kz11et18fargyyxbj66ntfn621k9d3"),
+        prefix: String::from("loRA"),
+        suffix: String::from("safetensors"),
+    };
+
+    remote_cloud_file_client.download_file(bucket_details1, String::from("./checkpoint")).await?;
+    remote_cloud_file_client.download_file(bucket_details2, String::from("./loRA")).await?;
+
+    Ok(())
+}
 
 pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserToken) -> AnyhowResult<()> {
     let sd1_5_markdown_description = r#"
@@ -932,6 +971,8 @@ pub async fn seed_weights(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
     //original_seed_weights(mysql_pool,user_token).await?;
     //seed_weights_for_user_token(mysql_pool, user_token).await?;
     //seed_weights_for_paging(mysql_pool,user_token).await?;
-    seed_weights_for_testing_inference(mysql_pool,user_token).await?;
+    //seed_weights_for_testing_inference(mysql_pool,user_token).await?;
+    println!("TESTING DOWLOAD");
+    test_seed_weights_files().await?;
     Ok(())
 }
