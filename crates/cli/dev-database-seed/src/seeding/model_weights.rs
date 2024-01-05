@@ -551,15 +551,14 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
     let sd_15_weights_descriptor = Box::new(WeightsSD15Descriptor {});
     let lora_descriptor = Box::new(WeightsLoRADescriptor{});
 
-
-    let path_object_SD = get_seed_tool_data_root().await?;
+    let mut path_object_SD = get_seed_tool_data_root();
     path_object_SD.push("models/imagegen/sd15/majicmixFantasy_v30Vae.safetensors");
 
-    let path_object_loRA = get_seed_tool_data_root().await?;
-    path_object_loRA.push("model/imagegen/loRA/xiawolei-v100-000019.safetensors");
+    let mut path_object_loRA = get_seed_tool_data_root();
+    path_object_loRA.push("models/imagegen/loRA/xiawolei-v100-000019.safetensors");
 
-    let metadata1 = remote_cloud_file_client.upload_file(sd_15_weights_descriptor,path_object_SD.string()).await?;
-    let metadata2 = remote_cloud_file_client.upload_file(lora_descriptor,path_object_loRA.string()).await?;
+    let metadata1 = remote_cloud_file_client.upload_file(sd_15_weights_descriptor,path_object_SD.as_path().to_str().unwrap()).await?;
+    let metadata2 = remote_cloud_file_client.upload_file(lora_descriptor,path_object_loRA.as_path().to_str().unwrap()).await?;
 
     let weights1 = CreateModelWeightsArgs {
         token: &model_weight_token1, // replace with actual ModelWeightToken
@@ -576,9 +575,9 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
         original_filename: Some("majicmixFantasy_v30Vae.safetensors".to_string()),
         file_size_bytes: metadata1.file_size_bytes as i32,
         file_checksum_sha2: metadata1.sha256_checksum.to_string(),
-        public_bucket_hash: metadata1.bucket_details.unwrap().object_hash,
-        maybe_public_bucket_prefix: Some(metadata1.bucket_details.unwrap().prefix),
-        maybe_public_bucket_extension: Some(metadata1.bucket_details.unwrap().suffix),
+        public_bucket_hash: metadata1.bucket_details.clone().unwrap().object_hash,
+        maybe_public_bucket_prefix: Some(metadata1.bucket_details.clone().unwrap().prefix),
+        maybe_public_bucket_extension: Some(metadata1.bucket_details.clone().unwrap().suffix),
         cached_user_ratings_total_count: 10,
         cached_user_ratings_positive_count: 9,
         cached_user_ratings_negative_count: 1,
@@ -602,9 +601,9 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
     original_filename: Some("xiawolei-v100-000019.safetensors".to_string()),
     file_size_bytes: metadata2.file_size_bytes as i32,
     file_checksum_sha2: metadata2.sha256_checksum.to_string(),
-    public_bucket_hash: metadata2.bucket_details.unwrap().object_hash,
-    maybe_public_bucket_prefix: Some(metadata2.bucket_details.unwrap().prefix),
-    maybe_public_bucket_extension: Some(metadata2.bucket_details.unwrap().suffix),
+    public_bucket_hash: metadata2.bucket_details.clone().unwrap().object_hash.clone(),
+    maybe_public_bucket_prefix: Some(metadata2.bucket_details.clone().unwrap().prefix),
+    maybe_public_bucket_extension: Some(metadata2.bucket_details.clone().unwrap().suffix),
     cached_user_ratings_total_count: 20,
     cached_user_ratings_positive_count: 9,
     cached_user_ratings_negative_count: 2,
@@ -614,7 +613,6 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
     };
 
     create_weight(weights1).await?;
-
     create_weight(weights2).await?;
 
 
@@ -933,7 +931,7 @@ pub async fn seed_weights(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
 
     //original_seed_weights(mysql_pool,user_token).await?;
     //seed_weights_for_user_token(mysql_pool, user_token).await?;
-    seed_weights_for_paging(mysql_pool,user_token).await?;
-
+    //seed_weights_for_paging(mysql_pool,user_token).await?;
+    seed_weights_for_testing_inference(mysql_pool,user_token).await?;
     Ok(())
 }
