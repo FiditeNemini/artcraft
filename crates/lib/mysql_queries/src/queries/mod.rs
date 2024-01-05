@@ -3,6 +3,7 @@ pub mod audit_logs;
 pub mod billing;
 pub mod comments;
 pub mod email_sender_jobs;
+pub mod entity_stats;
 pub mod generic_download;
 pub mod generic_inference;
 pub mod generic_synthetic_ids;
@@ -11,18 +12,18 @@ pub mod ip_bans;
 pub mod media_files;
 pub mod media_uploads;
 pub mod model_categories;
+pub mod model_weights;
 pub mod public_event_feed;
 pub mod stats;
 pub mod trending_model_analytics;
 pub mod tts;
 pub mod twitch;
-pub mod users;
 pub mod user_bookmarks;
+pub mod users;
 pub mod vocoder;
 pub mod voice_clone_requests;
 pub mod voice_conversion;
 pub mod voice_designer;
 pub mod w2l;
-pub mod model_weights;
 
 
