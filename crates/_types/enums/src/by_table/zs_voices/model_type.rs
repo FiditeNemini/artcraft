@@ -16,6 +16,8 @@ pub enum ZsVoiceModelType {
   /// TTS-type zero shot models
   #[serde(rename = "vall-e-x")]
   VallEX,
+  #[serde(rename = "styletts2")]
+  StyleTTS2,
 }
 
 // TODO(bt, 2023-01-17): This desperately needs MySQL integration tests!
@@ -27,12 +29,14 @@ impl ZsVoiceModelType {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::VallEX=> "vall-e-x",
+      Self::StyleTTS2 => "styletts2",
     }
   }
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
       "vall-e-x" => Ok(Self::VallEX),
+      "styletts2" => Ok(Self::StyleTTS2),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -42,6 +46,7 @@ impl ZsVoiceModelType {
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
       Self::VallEX,
+      Self::StyleTTS2,
     ])
   }
 }
@@ -66,11 +71,13 @@ mod tests {
     #[test]
     fn to_str() {
       assert_eq!(ZsVoiceModelType::VallEX.to_str(), "vall-e-x");
+      assert_eq!(ZsVoiceModelType::StyleTTS2.to_str(), "styletts2");
     }
 
     #[test]
     fn from_str() {
       assert_eq!(ZsVoiceModelType::from_str("vall-e-x").unwrap(), ZsVoiceModelType::VallEX);
+      assert_eq!(ZsVoiceModelType::from_str("styletts2").unwrap(), ZsVoiceModelType::StyleTTS2);
       assert!(ZsVoiceModelType::from_str("foo").is_err());
     }
   }
@@ -81,8 +88,9 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = ZsVoiceModelType::all_variants();
-      assert_eq!(variants.len(), 1);
+      assert_eq!(variants.len(), 2);
       assert_eq!(variants.pop_first(), Some(ZsVoiceModelType::VallEX));
+      assert_eq!(variants.pop_first(), Some(ZsVoiceModelType::StyleTTS2));
       assert_eq!(variants.pop_first(), None);
     }
   }

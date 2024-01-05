@@ -35,6 +35,8 @@ pub enum InferenceModelType {
   RerenderAVideo,
   #[serde(rename = "mocap_net")]
   MocapNet,
+  #[serde(rename = "styletts2")]
+  StyleTTS2,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -53,6 +55,7 @@ impl InferenceModelType {
       Self::VallEX => "vall_e_x",
       Self::RerenderAVideo => "rerender_a_video",
       Self::MocapNet => "mocap_net",
+      Self::StyleTTS2 => "styletts2",
     }
   }
 
@@ -66,6 +69,7 @@ impl InferenceModelType {
       "vall_e_x" => Ok(Self::VallEX),
       "rerender_a_video" => Ok(Self::RerenderAVideo),
       "mocap_net" => Ok(Self::MocapNet),
+      "styletts2" => Ok(Self::StyleTTS2),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -82,6 +86,7 @@ impl InferenceModelType {
       InferenceModelType::VallEX,
       InferenceModelType::RerenderAVideo,
       InferenceModelType::MocapNet,
+      InferenceModelType::StyleTTS2,
     ])
   }
 }
@@ -101,6 +106,7 @@ mod tests {
     assert_serialization(InferenceModelType::VallEX, "vall_e_x");
     assert_serialization(InferenceModelType::RerenderAVideo, "rerender_a_video");
     assert_serialization(InferenceModelType::MocapNet, "mocap_net");
+    assert_serialization(InferenceModelType::StyleTTS2, "styletts2");
   }
 
   #[test]
@@ -113,6 +119,7 @@ mod tests {
     assert_eq!(InferenceModelType::VallEX.to_str(), "vall_e_x");
     assert_eq!(InferenceModelType::RerenderAVideo.to_str(), "rerender_a_video");
     assert_eq!(InferenceModelType::MocapNet.to_str(), "mocap_net");
+    assert_eq!(InferenceModelType::StyleTTS2.to_str(), "styletts2");
   }
 
   #[test]
@@ -125,6 +132,7 @@ mod tests {
     assert_eq!(InferenceModelType::from_str("vall_e_x").unwrap(), InferenceModelType::VallEX);
     assert_eq!(InferenceModelType::from_str("rerender_a_video").unwrap(), InferenceModelType::RerenderAVideo);
     assert_eq!(InferenceModelType::from_str("mocap_net").unwrap(), InferenceModelType::MocapNet);
+    assert_eq!(InferenceModelType::from_str("styletts2").unwrap(), InferenceModelType::StyleTTS2);
   }
 
   #[test]
@@ -140,6 +148,7 @@ mod tests {
     assert_eq!(variants.pop_first(), Some(InferenceModelType::VallEX));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::RerenderAVideo));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::MocapNet));
+    assert_eq!(variants.pop_first(), Some(InferenceModelType::StyleTTS2));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check
