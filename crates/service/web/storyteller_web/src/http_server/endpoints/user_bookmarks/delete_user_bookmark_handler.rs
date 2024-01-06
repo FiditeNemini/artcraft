@@ -142,21 +142,27 @@ pub async fn delete_user_bookmark_handler(
     &mut *transaction,
   ).await;
 
-  let maybe_stats_entity_token =
-      StatsEntityToken::from_bookmark_entity_type_and_token(
-        user_bookmark.entity_type, &user_bookmark.entity_token);
+  // Decrement only if we're deleting for the first time
+  let decrement_bookmark_count = user_bookmark.maybe_deleted_at.is_none();
 
-  if let Some(stats_entity_token) = maybe_stats_entity_token {
-    upsert_entity_stats_on_bookmark_event(UpsertEntityStatsArgs {
-      stats_entity_token: &stats_entity_token,
-      action: BookmarkAction::Delete,
-      mysql_executor: &mut *transaction,
-      phantom: Default::default(),
+  if decrement_bookmark_count {
+    // NB: Not all bookmarkable things have stats (eg. deprecated record types don't have stats).
+    let maybe_stats_entity_token =
+        StatsEntityToken::from_bookmark_entity_type_and_token(
+          user_bookmark.entity_type, &user_bookmark.entity_token);
 
-    }).await.map_err(|err| {
-      error!("error recording stats: {:?}", err);
-      DeleteUserBookmarkError::ServerError
-    })?;
+    if let Some(stats_entity_token) = maybe_stats_entity_token {
+      upsert_entity_stats_on_bookmark_event(UpsertEntityStatsArgs {
+        stats_entity_token: &stats_entity_token,
+        action: BookmarkAction::Delete,
+        mysql_executor: &mut *transaction,
+        phantom: Default::default(),
+
+      }).await.map_err(|err| {
+        error!("error recording stats: {:?}", err);
+        DeleteUserBookmarkError::ServerError
+      })?;
+    }
   }
 
   transaction.commit().await
