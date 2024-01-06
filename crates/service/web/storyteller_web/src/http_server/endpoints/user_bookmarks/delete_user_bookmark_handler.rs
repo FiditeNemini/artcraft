@@ -10,10 +10,14 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use log::warn;
+use log::{error, info, warn};
+use sqlx::Acquire;
 use utoipa::ToSchema;
 
+use mysql_queries::queries::entity_stats::stats_entity_token::StatsEntityToken;
+use mysql_queries::queries::entity_stats::upsert_entity_stats_on_bookmark_event::{BookmarkAction, upsert_entity_stats_on_bookmark_event, UpsertEntityStatsArgs};
 use mysql_queries::queries::user_bookmarks::delete_user_bookmark::delete_user_bookmark;
+use mysql_queries::queries::user_bookmarks::get_user_bookmark_transactional_locking::{BookmarkIdentifier, get_user_bookmark_transactional_locking};
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -113,13 +117,55 @@ pub async fn delete_user_bookmark_handler(
     }
   };
 
-  let query_result = delete_user_bookmark(
+  let mut transaction = mysql_connection.begin().await
+      .map_err(|err| {
+        error!("error creating transaction: {:?}", err);
+        DeleteUserBookmarkError::ServerError
+      })?;
+
+  let user_bookmark = get_user_bookmark_transactional_locking(
+    BookmarkIdentifier::BookmarkToken(&path.user_bookmark_token),
+    &mut *transaction
+  ).await
+      .map_err(|err| {
+        error!("error getting user bookmark: {:?}", err);
+        DeleteUserBookmarkError::ServerError
+      })?
+      .ok_or_else(|| {
+        info!("bookmark not found");
+        DeleteUserBookmarkError::NotFound
+      })?;
+
+  let delete_result = delete_user_bookmark(
     &path.user_bookmark_token,
     &user_session.user_token_typed,
-    &mut *mysql_connection
+    &mut *transaction,
   ).await;
 
-  match query_result {
+  let maybe_stats_entity_token =
+      StatsEntityToken::from_bookmark_entity_type_and_token(
+        user_bookmark.entity_type, &user_bookmark.entity_token);
+
+  if let Some(stats_entity_token) = maybe_stats_entity_token {
+    upsert_entity_stats_on_bookmark_event(UpsertEntityStatsArgs {
+      stats_entity_token: &stats_entity_token,
+      action: BookmarkAction::Delete,
+      mysql_executor: &mut *transaction,
+      phantom: Default::default(),
+
+    }).await.map_err(|err| {
+      error!("error recording stats: {:?}", err);
+      DeleteUserBookmarkError::ServerError
+    })?;
+  }
+
+  transaction.commit().await
+      .map_err(|err| {
+        error!("error committing transaction: {:?}", err);
+        DeleteUserBookmarkError::ServerError
+      })?;
+
+  match delete_result {
     Ok(_) => {},
     Err(err) => {
       warn!("Update tts mod approval status DB error: {:?}", err);

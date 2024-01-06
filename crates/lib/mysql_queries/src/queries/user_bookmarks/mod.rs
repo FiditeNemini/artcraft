@@ -3,6 +3,7 @@ pub mod create_user_bookmark;
 pub mod delete_user_bookmark;
 pub mod get_total_bookmark_count_for_entity;
 pub mod get_user_bookmark;
+pub mod get_user_bookmark_transactional_locking;
 pub mod list_user_bookmarks;
 pub mod list_user_bookmarks_for_entity;
 pub mod list_user_bookmarks_result;
