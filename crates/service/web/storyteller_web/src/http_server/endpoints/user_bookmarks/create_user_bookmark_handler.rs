@@ -178,7 +178,13 @@ pub async fn create_user_bookmark_handler(
     }
   };
 
-  if maybe_existing_user_bookmark.is_none() {
+  // Increment only if we're creating or undeleting a bookmark
+  let increment_bookmark_count =
+      maybe_existing_user_bookmark.is_none() ||
+          maybe_existing_user_bookmark.map(|bookmark| bookmark.maybe_deleted_at.is_some())
+              .unwrap_or(false);
+
+  if increment_bookmark_count {
     // NB: Not all bookmarkable things have stats (eg. deprecated record types don't have stats).
     let maybe_stats_entity_token =
         StatsEntityToken::from_bookmark_entity_type_and_token(request.entity_type, &request.entity_token);
