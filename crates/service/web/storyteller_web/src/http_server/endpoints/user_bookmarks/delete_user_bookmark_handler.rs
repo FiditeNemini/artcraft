@@ -142,7 +142,7 @@ pub async fn delete_user_bookmark_handler(
     &mut *transaction,
   ).await;
 
-  // Decrement only if we're deleting for the first time
+  // Decrement only if we're deleting a non-deleted bookmark
   let decrement_bookmark_count = user_bookmark.maybe_deleted_at.is_none();
 
   if decrement_bookmark_count {
