@@ -23,7 +23,7 @@ pub struct CreateUserBookmarkArgs<'e, 'c, E>
   pub phantom: PhantomData<&'c E>,
 }
 
-pub async fn create_user_bookmark<'e, 'c : 'e, E>(
+pub async fn upsert_user_bookmark<'e, 'c : 'e, E>(
     args: CreateUserBookmarkArgs<'e, 'c, E>,
 )
     -> AnyhowResult<UserBookmarkToken>

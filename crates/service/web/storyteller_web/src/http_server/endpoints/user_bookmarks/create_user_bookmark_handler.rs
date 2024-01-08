@@ -16,7 +16,7 @@ use utoipa::ToSchema;
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use mysql_queries::queries::entity_stats::stats_entity_token::StatsEntityToken;
 use mysql_queries::queries::entity_stats::upsert_entity_stats_on_bookmark_event::{BookmarkAction, upsert_entity_stats_on_bookmark_event, UpsertEntityStatsArgs};
-use mysql_queries::queries::user_bookmarks::create_user_bookmark::{create_user_bookmark, CreateUserBookmarkArgs};
+use mysql_queries::queries::user_bookmarks::upsert_user_bookmark::{upsert_user_bookmark, CreateUserBookmarkArgs};
 use mysql_queries::queries::user_bookmarks::get_total_bookmark_count_for_entity::get_total_bookmark_count_for_entity;
 use mysql_queries::queries::user_bookmarks::get_user_bookmark_transactional_locking::{BookmarkIdentifier, get_user_bookmark_transactional_locking};
 use mysql_queries::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
@@ -163,17 +163,17 @@ pub async fn create_user_bookmark_handler(
         CreateUserBookmarkError::ServerError
       })?;
 
-  let create_result = create_user_bookmark(CreateUserBookmarkArgs {
+  let upsert_result = upsert_user_bookmark(CreateUserBookmarkArgs {
     entity_token: &entity_token,
     user_token: &user_session.user_token_typed,
     mysql_executor: &mut *transaction,
     phantom: Default::default(),
   }).await;
 
-  let user_bookmark_token = match create_result {
+  let user_bookmark_token = match upsert_result {
     Ok(token) => token,
     Err(err) => {
-      warn!("error inserting user_bookmark: {:?}", err);
+      warn!("error upserting user_bookmark: {:?}", err);
       return Err(CreateUserBookmarkError::ServerError);
     }
   };
