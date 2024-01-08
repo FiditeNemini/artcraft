@@ -1,5 +1,6 @@
 use enums::by_table::entity_stats::stats_entity_type::StatsEntityType;
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
+use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use tokens::tokens::comments::CommentToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -17,6 +18,15 @@ impl StatsEntityToken {
     match entity_type {
       UserBookmarkEntityType::MediaFile => Some(Self::MediaFile(MediaFileToken::new_from_str(token))),
       UserBookmarkEntityType::ModelWeight => Some(Self::ModelWeight(ModelWeightToken::new_from_str(token))),
+      _ => None,
+    }
+  }
+
+  /// Rating entity types aren't 1:1, and they're not a superset (yet) either.
+  pub fn from_rating_entity_type_and_token(entity_type: UserRatingEntityType, token: &str) -> Option<Self> {
+    match entity_type {
+      UserRatingEntityType::MediaFile => Some(Self::MediaFile(MediaFileToken::new_from_str(token))),
+      UserRatingEntityType::ModelWeight => Some(Self::ModelWeight(ModelWeightToken::new_from_str(token))),
       _ => None,
     }
   }
