@@ -210,6 +210,7 @@ pub async fn create_user_bookmark_handler(
       })?;
 
   // TODO(bt,2024-01-04): The methods of stats collection here differs.
+  //  Update this to return directly from the stats table instead of doing a COUNT(*).
 
   let count = get_total_bookmark_count_for_entity(&entity_token, &mut mysql_connection)
       .await

@@ -1,5 +1,6 @@
-use sqlx::MySql;
-use sqlx::pool::PoolConnection;
+use std::marker::PhantomData;
+
+use sqlx::{Executor, MySql};
 
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use errors::AnyhowResult;
@@ -7,15 +8,25 @@ use tokens::tokens::users::UserToken;
 
 use crate::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
 
-pub struct Args<'a> {
-  pub user_token: &'a UserToken,
-  pub user_rating_entity: &'a UserRatingEntity,
+pub struct Args<'e, 'c, E>
+  where E: 'e + Executor<'c, Database = MySql>
+{
+  pub user_token: &'e UserToken,
+  pub user_rating_entity: &'e UserRatingEntity,
   pub user_rating_value: UserRatingValue,
-  pub ip_address: &'a str,
-  pub mysql_connection: &'a mut PoolConnection<MySql>,
+  pub ip_address: &'e str,
+  pub mysql_executor: E,
+
+  // TODO: Not sure if this works to tell the compiler we need the lifetime annotation.
+  //  See: https://doc.rust-lang.org/std/marker/struct.PhantomData.html#unused-lifetime-parameters
+  pub phantom: PhantomData<&'c E>,
 }
 
-pub async fn upsert_user_rating(args: Args<'_>) -> AnyhowResult<()> {
+pub async fn upsert_user_rating<'e, 'c : 'e, E>(
+  args: Args<'e, 'c, E>,
+) -> AnyhowResult<()>
+  where E: 'e + Executor<'c, Database = MySql>
+{
   let entity_type = args.user_rating_entity.get_entity_type();
   let entity_token = args.user_rating_entity.get_entity_token_str();
 
@@ -45,6 +56,7 @@ ON DUPLICATE KEY UPDATE
       args.ip_address
     );
 
-  let _r = query.execute(&mut **args.mysql_connection).await?;
+  let _r = query.execute(args.mysql_executor).await?;
+
   Ok(())
 }
