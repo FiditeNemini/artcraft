@@ -86,7 +86,7 @@ export default function VideoCard({ data, origin = "", ratings, showCreator, typ
                         entityToken: data.token,
                         entityType: "media_file",
                         likeCount: data.likes,
-                        onToggle: ratings.toggle
+                        onToggle: ratings?.toggle
                       }} />
                     </div>
                   </div>
@@ -134,7 +134,7 @@ export default function VideoCard({ data, origin = "", ratings, showCreator, typ
                       entityToken: data.weight_token,
                       entityType: "model_weight",
                       likeCount: data.likes,
-                      onToggle: ratings.toggle,
+                      onToggle: ratings?.toggle,
                       overlay: true
                     }} />
                   </div>

@@ -1,6 +1,6 @@
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import React from "react";
-import { Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 interface CreatorNameProps {
   displayName: string;
@@ -23,6 +23,7 @@ export default function CreatorName({
   username,
   className,
 }: CreatorNameProps) {
+  const history = useHistory();
   return (
     <div
       className={`d-flex gap-2 align-items-center ${className}`}
@@ -34,12 +35,12 @@ export default function CreatorName({
         avatarIndex={avatarIndex}
         backgroundIndex={backgroundIndex}
       />
-      <Link
-        to={`/profile/${username}`}
-        className="fw-medium fs-7 text-white opacity-75 text-truncate"
-      >
+      <div {...{
+        className: "fw-medium fs-7 text-white opacity-75 text-truncate",
+        onClick: () => history.push(`/profile/${username}`) // programatically link to avoid "<a> cannot appear as a descendant of <a>" errors
+      }} >
         {displayName}
-      </Link>
+      </div>
     </div>
   );
 }

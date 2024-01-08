@@ -23,9 +23,14 @@ const METHOD_OMITS_BODY: { [key: string]: boolean } = {
   PUT: false,
 };
 
-const MakeRequest = <UrlRouteArgs, Request, Response, UrlParams>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request, urlParams?: UrlParams) => Promise<Response> => {
-    return async function(urlRouteArgs: UrlRouteArgs, request: Request, urlParams?: any) : Promise<Response> {
-        const endpoint = `${ routeSetup.routingFunction(urlRouteArgs) }${ urlParams ? "?" + new URLSearchParams(urlParams) : "" }`;
+const MakeRequest = <UrlRouteArgs, Request, Response, UrlParams>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request, queries?: UrlParams) => Promise<Response> => {
+    return async function(urlRouteArgs: UrlRouteArgs, request: Request, queries?: any) : Promise<Response> {
+        const prepedQueries = queries ? Object.keys(queries).reduce((obj,key) => {
+            let current = queries[key]
+            return { [key]: Array.isArray(current) ? current.join("&tokens=") : current };
+        },{}) : null;
+        console.log("❓",prepedQueries);
+        const endpoint = `${ routeSetup.routingFunction(urlRouteArgs) }${ prepedQueries ? "?" + new URLSearchParams(prepedQueries) : "" }`;
         const method = routeSetup.method;
         const methodOmitsBody = METHOD_OMITS_BODY[method] || false;
 

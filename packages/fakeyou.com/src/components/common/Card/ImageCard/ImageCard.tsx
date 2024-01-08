@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import Card from "../Card";
 import useTimeAgo from "hooks/useTimeAgo";
 import Badge from "components/common/Badge";
@@ -28,6 +28,7 @@ export default function ImageCard({
   ratings,
   type
 }: ImageCardProps) {
+  const history = useHistory();
   const linkUrl =
     type === "media"
       ? `/media/${data.token}`
@@ -145,14 +146,15 @@ export default function ImageCard({
                     overlay={true}
                   />
                 </div>
-                <Button
-                  icon={faArrowRight}
-                  iconFlip={true}
-                  variant="link"
-                  label="Use"
-                  to={linkUrl}
-                  className="fs-7"
-                />
+                <Button {...{
+                  className: "fs-7",
+                  icon: faArrowRight,
+                  label: "Use",
+                  onClick: () => {
+                    history.push(linkUrl); // programatically link to avoid "<a> cannot appear as a descendant of <a>" errors
+                  },
+                  variant: "link",
+                }} />
               </div>
 
               <div className="card-img-overlay-text">
@@ -192,14 +194,14 @@ export default function ImageCard({
                       entityToken: data.weight_token,
                       entityType: "model_weight",
                       likeCount: data.likes,
-                      onToggle: ratings.toggle
+                      onToggle: ratings?.toggle
                     }} />
                   </div>
                   <BookmarkButton
                     {...{
                       entityToken: data.weight_token,
                       entityType: "model_weight",
-                      onToggle: bookmarks.toggle,
+                      onToggle: bookmarks?.toggle,
                       initialToggled: bookmarks.list[data.weight_token]
                     }}
                   />
