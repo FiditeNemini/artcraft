@@ -105,6 +105,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListAvailableWeightsQuery,ListAvailableWeightsSuccessResponse,ModelWeightForList,
     ListWeightsByUserError,ListWeightsByUserSuccessResponse,ListWeightsByUserPathInfo,Weight,
     WeightsData,MediaFileData,
+    BookmarkListStats,
     BatchGetUserRatingQueryParams,BatchGetUserRatingResponse,BatchGetUserRatingError,RatingRow,
     BatchGetUserBookmarksQueryParams,BatchGetUserBookmarksResponse,BatchGetUserBookmarksError,BookmarkRow,
     ListFeaturedMediaFilesSuccessResponse,MediaFile, ListFeaturedMediaFilesError,

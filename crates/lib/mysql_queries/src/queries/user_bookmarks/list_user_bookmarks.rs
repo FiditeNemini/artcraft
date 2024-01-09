@@ -50,6 +50,10 @@ fn select_result_fields() -> &'static str {
     f.updated_at,
     f.deleted_at,
 
+    entity_stats.ratings_positive_count as maybe_ratings_positive_count,
+    entity_stats.ratings_negative_count as maybe_ratings_negative_count,
+    entity_stats.bookmark_count as maybe_bookmark_count,
+
     media_files.media_type as maybe_media_file_type,
     media_files.origin_product_category as maybe_media_file_origin_category,
     media_files.public_bucket_directory_hash as maybe_media_file_public_bucket_hash,
@@ -102,6 +106,10 @@ FROM
     user_bookmarks AS f
 JOIN users AS u
     ON f.user_token = u.token
+
+LEFT OUTER JOIN entity_stats
+    ON entity_stats.entity_type = f.entity_type
+    AND entity_stats.entity_token = f.entity_token
 
 LEFT OUTER JOIN model_weights ON model_weights.token = f.entity_token
 LEFT OUTER JOIN media_files AS media_file_cover_images

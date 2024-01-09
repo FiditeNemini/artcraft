@@ -91,6 +91,8 @@ pub struct UserBookmarkDetailsForUserList {
 
   /// This is only populated if the item is a model weight.
   pub maybe_weight_data: Option<WeightsData>,
+
+  pub stats: BookmarkListStats,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -118,6 +120,14 @@ pub struct WeightsData {
   /// NB: Technically this should not be optional, but since the join is
   /// incredibly telescopic, we may as well make it optional for now.
   pub maybe_creator: Option<UserDetailsLight>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct BookmarkListStats {
+  /// Number of positive ratings (or "likes") for this item
+  pub positive_rating_count: u32,
+  /// Number of bookmarks for this item
+  pub bookmark_count: u32,
 }
 
 #[derive(Debug, ToSchema)]
@@ -261,6 +271,11 @@ pub async fn list_user_bookmarks_for_user_handler(
               // TODO(bt,2023-11-21): Thumbnails need proper support. We should build them as a
               //  first-class system before handling the backfill here.
               maybe_thumbnail_url: None,
+
+              stats: BookmarkListStats {
+                positive_rating_count: user_bookmark.maybe_ratings_positive_count.unwrap_or(0),
+                bookmark_count: user_bookmark.maybe_bookmark_count.unwrap_or(0),
+              },
             },
             created_at: user_bookmark.created_at,
             updated_at: user_bookmark.updated_at,

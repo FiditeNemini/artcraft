@@ -58,6 +58,10 @@ pub struct UserBookmark {
   pub user_display_name: String,
   pub user_gravatar_hash: String,
 
+  pub maybe_ratings_positive_count: Option<u32>,
+  pub maybe_ratings_negative_count: Option<u32>,
+  pub maybe_bookmark_count: Option<u32>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
   pub maybe_deleted_at: Option<DateTime<Utc>>,
@@ -78,6 +82,10 @@ pub struct RawUserBookmarkRecord {
   pub (crate) created_at: DateTime<Utc>,
   pub (crate) updated_at: DateTime<Utc>,
   pub (crate) deleted_at: Option<DateTime<Utc>>,
+
+  pub (crate) maybe_ratings_positive_count: Option<u32>,
+  pub (crate) maybe_ratings_negative_count: Option<u32>,
+  pub (crate) maybe_bookmark_count: Option<u32>,
 
   pub (crate) maybe_media_file_type: Option<MediaFileType>,
   pub (crate) maybe_media_file_origin_category: Option<MediaFileOriginCategory>,
@@ -154,6 +162,9 @@ impl RawUserBookmarkRecord {
       username: self.username,
       user_display_name: self.user_display_name,
       user_gravatar_hash: self.user_gravatar_hash,
+      maybe_ratings_positive_count: self.maybe_ratings_positive_count,
+      maybe_ratings_negative_count: self.maybe_ratings_negative_count,
+      maybe_bookmark_count: self.maybe_bookmark_count,
       created_at: self.created_at,
       updated_at: self.updated_at,
       maybe_deleted_at: self.deleted_at,
@@ -174,7 +185,10 @@ impl FromRow<'_, MySqlRow> for RawUserBookmarkRecord {
         created_at: row.try_get("created_at")?,
         updated_at: row.try_get("updated_at")?,
         deleted_at: row.try_get("deleted_at")?,
-        maybe_media_file_type: MediaFileType::try_from_mysql_row_nullable(row,"maybe_media_file_type")?,
+        maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
+        maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,
+        maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,
+        maybe_media_file_type: MediaFileType::try_from_mysql_row_nullable(row, "maybe_media_file_type")?,
         maybe_media_file_origin_category: MediaFileOriginCategory::try_from_mysql_row_nullable(row,"maybe_media_file_origin_category")?,
         maybe_media_file_public_bucket_hash: row.try_get("maybe_media_file_public_bucket_hash")?,
         maybe_media_file_public_bucket_prefix: row.try_get("maybe_media_file_public_bucket_prefix")?,
