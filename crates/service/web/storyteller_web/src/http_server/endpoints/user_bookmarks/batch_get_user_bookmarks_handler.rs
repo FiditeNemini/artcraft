@@ -13,6 +13,7 @@ use mysql_queries::queries::user_bookmarks::batch_get_user_bookmarks::{batch_get
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::tts_models::TtsModelToken;
+use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
 use crate::server_state::ServerState;
 
@@ -51,6 +52,8 @@ pub struct BookmarkRow {
   pub entity_type: UserBookmarkEntityType,
   /// Whether the entity is bookmarked or not
   pub is_bookmarked: bool,
+  /// If the object is bookmarked, this is the bookmark token (used to delete the bookmark).
+  pub maybe_bookmark_token: Option<UserBookmarkToken>,
 }
 
 // =============== Error Response ===============
@@ -166,6 +169,7 @@ fn fill_in_missed_bookmarks(request_tokens: &HashSet<String>, db_response: Vec<B
 
   for record in db_response.into_iter() {
     outputs.insert(record.entity_token.clone(), BookmarkRow {
+      maybe_bookmark_token: Some(record.token),
       entity_token: record.entity_token,
       entity_type: record.entity_type,
       is_bookmarked: true,
@@ -189,6 +193,7 @@ fn fill_in_missed_bookmarks(request_tokens: &HashSet<String>, db_response: Vec<B
           }
         },
         is_bookmarked: false,
+        maybe_bookmark_token: None,
       });
     }
   }
