@@ -18,6 +18,7 @@ use tokens::tokens::users::*;
 use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::endpoints::media_files::get_media_file::*;
 use crate::http_server::endpoints::media_files::list_featured_media_files::*;
@@ -87,6 +88,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileSocialMetaLight,
     PaginationCursors,
     PaginationPage,
+    SimpleEntityStats,
     SimpleGenericJsonSuccess,
     UserDetailsLight,
     Visibility,
@@ -105,7 +107,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListAvailableWeightsQuery,ListAvailableWeightsSuccessResponse,ModelWeightForList,
     ListWeightsByUserError,ListWeightsByUserSuccessResponse,ListWeightsByUserPathInfo,Weight,
     WeightsData,MediaFileData,
-    BookmarkListStats,
     BatchGetUserRatingQueryParams,BatchGetUserRatingResponse,BatchGetUserRatingError,RatingRow,
     BatchGetUserBookmarksQueryParams,BatchGetUserBookmarksResponse,BatchGetUserBookmarksError,BookmarkRow,
     ListFeaturedMediaFilesSuccessResponse,MediaFile, ListFeaturedMediaFilesError,

@@ -23,6 +23,7 @@ use mysql_queries::queries::user_bookmarks::list_user_bookmarks::{list_user_book
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
 use crate::http_server::common_responses::pagination_page::PaginationPage;
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -92,7 +93,7 @@ pub struct UserBookmarkDetailsForUserList {
   /// This is only populated if the item is a model weight.
   pub maybe_weight_data: Option<WeightsData>,
 
-  pub stats: BookmarkListStats,
+  pub stats: SimpleEntityStats,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -120,14 +121,6 @@ pub struct WeightsData {
   /// NB: Technically this should not be optional, but since the join is
   /// incredibly telescopic, we may as well make it optional for now.
   pub maybe_creator: Option<UserDetailsLight>,
-}
-
-#[derive(Serialize, ToSchema)]
-pub struct BookmarkListStats {
-  /// Number of positive ratings (or "likes") for this item
-  pub positive_rating_count: u32,
-  /// Number of bookmarks for this item
-  pub bookmark_count: u32,
 }
 
 #[derive(Debug, ToSchema)]
@@ -272,7 +265,7 @@ pub async fn list_user_bookmarks_for_user_handler(
               //  first-class system before handling the backfill here.
               maybe_thumbnail_url: None,
 
-              stats: BookmarkListStats {
+              stats: SimpleEntityStats {
                 positive_rating_count: user_bookmark.maybe_ratings_positive_count.unwrap_or(0),
                 bookmark_count: user_bookmark.maybe_bookmark_count.unwrap_or(0),
               },
