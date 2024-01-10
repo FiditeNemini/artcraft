@@ -25,12 +25,11 @@ const METHOD_OMITS_BODY: { [key: string]: boolean } = {
 
 const MakeRequest = <UrlRouteArgs, Request, Response, UrlParams>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request, queries?: UrlParams) => Promise<Response> => {
     return async function(urlRouteArgs: UrlRouteArgs, request: Request, queries?: any) : Promise<Response> {
-        const prepedQueries = queries ? Object.keys(queries).reduce((obj,key) => {
-            let current = queries[key]
-            return { [key]: Array.isArray(current) ? current.join("&tokens=") : current };
-        },{}) : null;
-        console.log("❓",prepedQueries);
-        const endpoint = `${ routeSetup.routingFunction(urlRouteArgs) }${ prepedQueries ? "?" + new URLSearchParams(prepedQueries) : "" }`;
+        const newQueries = queries ? Object.keys(queries).map((key, i) => {
+            return `${ i ? "&" : "" }${ key }=${ Array.isArray(queries[key]) ? queries[key].join(`&${ key }=`) : queries[key] }`
+        }).join("") : null;
+
+        const endpoint = `${ routeSetup.routingFunction(urlRouteArgs) }${ newQueries ? "?" + newQueries : "" }`;
         const method = routeSetup.method;
         const methodOmitsBody = METHOD_OMITS_BODY[method] || false;
 

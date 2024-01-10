@@ -195,10 +195,11 @@ export default function AudioCard({
               </div>
               <BookmarkButton
                 {...{
+                  busy: bookmarks.busyList[data.weight_token],
                   entityToken: data.weight_token,
                   entityType: "model_weight",
                   onToggle: bookmarks?.toggle,
-                  initialToggled: bookmarks.list[data.weight_token]
+                  initialToggled: bookmarks?.list[data.weight_token]?.is
                 }}
               />
             </div>

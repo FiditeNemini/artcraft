@@ -39,7 +39,7 @@ export default function MediaTab({ username }: { username: string }) {
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: (res) => {
-      ratings.gather(res);
+      bookmarks.gather({ res });
       setShowMasonryGrid(true);
     },
     requestList: true,

@@ -2,12 +2,15 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark } from "@fortawesome/pro-solid-svg-icons";
 import { faBookmark as faBookmarkOutline } from "@fortawesome/pro-regular-svg-icons";
+import { a, useTransition } from "@react-spring/web";
+import { basicTransition } from "resources";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "./BookmarkButton.scss";
 // import useShortenNumber from "hooks/useShortenNumber";
 
 interface BookmarkButtonProps {
+  busy?: boolean;
   entityToken?: string;
   entityType?: string;
   initialToggled?: boolean;
@@ -18,6 +21,7 @@ interface BookmarkButtonProps {
 }
 
 export default function BookmarkButton({
+  busy,
   entityToken = "",
   entityType = "",
   initialToggled = false,
@@ -29,6 +33,7 @@ export default function BookmarkButton({
   const isToggled = initialToggled; // toggled value managed externally via usebookmarks, this may change
   // const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
+  const [animating,animatingSet] = useState(false);
 
   const handleClick = async (event: React.MouseEvent) => {
     event.preventDefault();
@@ -54,6 +59,15 @@ export default function BookmarkButton({
   const toolTip = isToggled ? "Unbookmark" : "Bookmark";
   // let favoriteCountShort = useShortenNumber(favoriteCount || 0);
 
+  const index = busy ? 0 : isToggled ? 1 : 2;
+
+  const transitions = useTransition(index, basicTransition({
+    onRest: () => animatingSet(false),
+    onStart: () => {
+      animatingSet(true)
+    }
+  }));
+
   return (
     <div className="d-flex gap-2">
       <Tippy
@@ -74,7 +88,28 @@ export default function BookmarkButton({
             icon={isToggled ? faBookmark : faBookmarkOutline}
             className={`${iconClass} me-2`}
           />
-          <p className="favorite-text">{isToggled ? "Saved" : "Save"}</p>
+          <div className="favorite-text">
+            <div {...{ className: "favorite-text-wrapper" }}>
+            {
+              transitions((style, i, state) => {
+                let isLeaving = state.phase === "leave";
+                const content = (txt = "") =>
+                  <a.div {...{ style: {
+                    ...style,
+                    position: isLeaving && animating ? "absolute" : "relative" 
+                  } }}>{ 
+                     txt ? txt : <svg {...{ className: "fy-workdots" }}>
+                      <circle cx="2" cy="8" r="2" />
+                      <circle cx="8" cy="8" r="2" />
+                      <circle cx="14" cy="8" r="2" />
+                    </svg>
+                  }</a.div>;
+                return [ content(""), content("Saved"), content("Save")
+                ][i];
+              })
+            }
+              </div>
+          </div>
         </button>
       </Tippy>
     </div>

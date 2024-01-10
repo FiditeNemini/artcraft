@@ -30,11 +30,15 @@ export default function WeightsTab() {
       ...prepFilter(weightType, "maybe_scoped_weight_type"),
     },
     addSetters: { weightCategorySet, weightTypeSet },
+    debug: "explore weights tab",
     fetcher: ListWeights,
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
-    onSuccess: () => setShowMasonryGrid(true),
+    onSuccess: (res) => {
+      bookmarks.gather({ res, expand: true }); // expand rather than replace for lazy loading 
+      setShowMasonryGrid(true);
+    },
     requestList: true,
   });
 
