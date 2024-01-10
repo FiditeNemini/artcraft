@@ -19,6 +19,7 @@ use mysql_queries::queries::media_files::list::list_media_files_for_user::{list_
 use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::common_responses::pagination_page::PaginationPage;
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -57,6 +58,9 @@ pub struct MediaFileForUserListItem {
   pub public_bucket_path: String,
 
   pub creator_set_visibility: Visibility,
+
+  /// Statistics about the media file
+  pub stats: SimpleEntityStats,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -176,6 +180,10 @@ pub async fn list_media_files_for_user_handler(
             .get_full_object_path_str()
             .to_string(),
         creator_set_visibility: record.creator_set_visibility,
+        stats: SimpleEntityStats {
+          positive_rating_count: record.maybe_ratings_positive_count.unwrap_or(0),
+          bookmark_count: record.maybe_bookmark_count.unwrap_or(0),
+        },
         created_at: record.created_at,
         updated_at: record.updated_at,
       })
