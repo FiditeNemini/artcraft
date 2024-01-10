@@ -37,8 +37,8 @@ export default function MediaTab() {
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
-    onSuccess: (res) => {
-      bookmarks.gather({ res, expand: true }); // expand rather than replace for lazy loading 
+    onSuccess: res => {
+      bookmarks.gather({ res, expand: true }); // expand rather than replace for lazy loading
       setShowMasonryGrid(true);
     },
     requestList: true,
@@ -118,16 +118,29 @@ export default function MediaTab() {
                   <MasonryGrid
                     gridRef={gridContainerRef}
                     onLayoutComplete={() => console.log("Layout complete!")}
-                  > { media.list.map((data: any, key: number) => {
-                    let props = { bookmarks, data, origin, ratings, type: "media" };
+                  >
+                    {" "}
+                    {media.list.map((data: any, key: number) => {
+                      let props = {
+                        bookmarks,
+                        data,
+                        origin,
+                        ratings,
+                        type: "media",
+                        showCreator: true,
+                      };
 
-                    return <div {...{
-                      className: "col-12 col-sm-6 col-xl-4 grid-item",
-                      key
-                    }}>
-                      <MediaCards {...{ type: data.media_type, props }} />
-                    </div>;
-                  }) }
+                      return (
+                        <div
+                          {...{
+                            className: "col-12 col-sm-6 col-xl-4 grid-item",
+                            key,
+                          }}
+                        >
+                          <MediaCards {...{ type: data.media_type, props }} />
+                        </div>
+                      );
+                    })}
                   </MasonryGrid>
                 )}
               </>
