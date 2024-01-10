@@ -59,23 +59,20 @@ pub struct WeightJoinUser {
     pub maybe_cover_image_public_bucket_prefix: Option<String>,
     pub maybe_cover_image_public_bucket_extension: Option<String>,
 
-    //pub cached_user_ratings_total_count: u32,
-    //pub cached_user_ratings_positive_count: u32,
-    //pub cached_user_ratings_negative_count: u32,
-    //pub maybe_cached_user_ratings_ratio: Option<f32>,
-    //pub cached_user_ratings_last_updated_at: DateTime<Utc>,
+    pub creator_username: String,
+    pub creator_display_name: String,
+    pub creator_email_gravatar_hash: String,
+
+    pub maybe_ratings_positive_count: Option<u32>,
+    pub maybe_ratings_negative_count: Option<u32>,
+    pub maybe_bookmark_count: Option<u32>,
 
     pub version: i32,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-
     pub user_deleted_at: Option<DateTime<Utc>>,
     pub mod_deleted_at: Option<DateTime<Utc>>,
-
-    pub creator_username: String,
-    pub creator_display_name: String,
-    pub creator_email_gravatar_hash: String,
 }
 
 pub struct ListWeightsQueryBuilder {
@@ -237,19 +234,17 @@ impl ListWeightsQueryBuilder {
                     maybe_cover_image_public_bucket_hash: record.maybe_cover_image_public_bucket_hash,
                     maybe_cover_image_public_bucket_prefix: record.maybe_cover_image_public_bucket_prefix,
                     maybe_cover_image_public_bucket_extension: record.maybe_cover_image_public_bucket_extension,
-                    //cached_user_ratings_total_count: record.cached_user_ratings_total_count,
-                    //cached_user_ratings_positive_count: record.cached_user_ratings_positive_count,
-                    //cached_user_ratings_negative_count: record.cached_user_ratings_negative_count,
-                    //maybe_cached_user_ratings_ratio: record.maybe_cached_user_ratings_ratio,
-                    //cached_user_ratings_last_updated_at: record.cached_user_ratings_last_updated_at,
+                    creator_username: record.creator_username,
+                    creator_display_name: record.creator_display_name,
+                    creator_email_gravatar_hash: record.creator_email_gravatar_hash,
+                    maybe_ratings_positive_count: record.maybe_ratings_positive_count,
+                    maybe_ratings_negative_count: record.maybe_ratings_negative_count,
+                    maybe_bookmark_count: record.maybe_bookmark_count,
                     version: record.version,
                     created_at: record.created_at,
                     updated_at: record.updated_at,
                     user_deleted_at: record.user_deleted_at,
                     mod_deleted_at: record.mod_deleted_at,
-                    creator_username: record.creator_username,
-                    creator_display_name: record.creator_display_name,
-                    creator_email_gravatar_hash: record.creator_email_gravatar_hash,
                 }
             })
             .collect::<Vec<WeightJoinUser>>();
@@ -294,12 +289,18 @@ impl ListWeightsQueryBuilder {
             model_weights.mod_deleted_at,
             users.username AS creator_username,
             users.display_name AS creator_display_name,
-            users.email_gravatar_hash AS creator_email_gravatar_hash
-        FROM model_weights 
+            users.email_gravatar_hash AS creator_email_gravatar_hash,
+            entity_stats.ratings_positive_count as maybe_ratings_positive_count,
+            entity_stats.ratings_negative_count as maybe_ratings_negative_count,
+            entity_stats.bookmark_count as maybe_bookmark_count
+        FROM model_weights
         JOIN users
             ON users.token = model_weights.creator_user_token
         LEFT OUTER JOIN media_files as cover_image
             ON cover_image.token = model_weights.maybe_cover_image_media_file_token
+        LEFT OUTER JOIN entity_stats
+            ON entity_stats.entity_type = "model_weight"
+            AND entity_stats.entity_token = model_weights.token
         "#.to_string();
 
         query.push_str(&self.build_predicates());
@@ -443,11 +444,13 @@ struct RawWeightJoinUser {
     pub maybe_cover_image_public_bucket_prefix: Option<String>,
     pub maybe_cover_image_public_bucket_extension: Option<String>,
 
-    //pub cached_user_ratings_total_count: u32,
-    //pub cached_user_ratings_positive_count: u32,
-    //pub cached_user_ratings_negative_count: u32,
-    //pub maybe_cached_user_ratings_ratio: Option<f32>,
-    //pub cached_user_ratings_last_updated_at: DateTime<Utc>,
+    pub creator_username: String,
+    pub creator_display_name: String,
+    pub creator_email_gravatar_hash: String,
+
+    pub maybe_ratings_positive_count: Option<u32>,
+    pub maybe_ratings_negative_count: Option<u32>,
+    pub maybe_bookmark_count: Option<u32>,
 
     pub version: i32,
 
@@ -456,10 +459,6 @@ struct RawWeightJoinUser {
 
     pub user_deleted_at: Option<DateTime<Utc>>,
     pub mod_deleted_at: Option<DateTime<Utc>>,
-
-    pub creator_username: String,
-    pub creator_display_name: String,
-    pub creator_email_gravatar_hash: String,
 }
 
 #[cfg(test)]

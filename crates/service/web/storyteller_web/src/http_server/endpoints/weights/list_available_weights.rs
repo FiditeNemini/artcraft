@@ -18,6 +18,7 @@ use mysql_queries::queries::model_weights::list::list_weights_query_builder::Lis
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
@@ -63,22 +64,15 @@ pub struct ModelWeightForList {
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
 
-    //pub cached_user_ratings_total_count: u32,
-    //pub cached_user_ratings_positive_count: u32,
-    //pub cached_user_ratings_negative_count: u32,
-    //pub maybe_cached_user_ratings_ratio: Option<f32>,
-
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-
     pub creator_username: String,
     pub creator_display_name: String,
     pub creator_email_gravatar_hash: String,
 
-    // additional fields to be added when tables are around
-    pub likes: u32,
-    pub bookmarks: bool,
+    /// Statistics about the weights
+    pub stats: SimpleEntityStats,
 
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Debug,ToSchema)]
@@ -236,21 +230,17 @@ pub async fn list_available_weights_handler(
                     file_size_bytes: weight.file_size_bytes,
                     file_checksum_sha2: weight.file_checksum_sha2,
 
-                    //cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
-                    //cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
-                    //cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
-                    //maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
-
-                    created_at: weight.created_at,
-                    updated_at: weight.updated_at,
-
                     creator_username: weight.creator_username,
                     creator_display_name: weight.creator_display_name,
                     creator_email_gravatar_hash: weight.creator_email_gravatar_hash,
 
-                    // TODO: FIX THIS when we align again.
-                    bookmarks: random_bool,
-                    likes: rng.gen_range(0..1000),
+                    stats: SimpleEntityStats {
+                        positive_rating_count: weight.maybe_ratings_positive_count.unwrap_or(0),
+                        bookmark_count: weight.maybe_bookmark_count.unwrap_or(0),
+                    },
+
+                    created_at: weight.created_at,
+                    updated_at: weight.updated_at,
                 }
             }).collect::<Vec<_>>(),
         pagination: PaginationCursors {
