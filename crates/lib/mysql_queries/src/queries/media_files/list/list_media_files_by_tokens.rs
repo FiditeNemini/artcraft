@@ -31,6 +31,10 @@ pub struct MediaFilesByTokensRecord {
   pub maybe_creator_display_name: Option<String>,
   pub maybe_creator_email_gravatar_hash: Option<String>,
 
+  pub maybe_ratings_positive_count: Option<u32>,
+  pub maybe_ratings_negative_count: Option<u32>,
+  pub maybe_bookmark_count: Option<u32>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -76,12 +80,19 @@ async fn get_raw_media_files_by_tokens(
           m.maybe_public_bucket_prefix,
           m.maybe_public_bucket_extension,
 
+          entity_stats.ratings_positive_count as maybe_ratings_positive_count,
+          entity_stats.ratings_negative_count as maybe_ratings_negative_count,
+          entity_stats.bookmark_count as maybe_bookmark_count,
+
           m.created_at,
           m.updated_at
 
       FROM media_files as m
       LEFT OUTER JOIN users
           ON users.token = m.maybe_creator_user_token
+      LEFT OUTER JOIN entity_stats
+          ON entity_stats.entity_type = "media_file"
+          AND entity_stats.entity_token = m.token
       WHERE
           m.creator_set_visibility = "public"
           AND m.token IN (
@@ -108,12 +119,19 @@ async fn get_raw_media_files_by_tokens(
           m.maybe_public_bucket_prefix,
           m.maybe_public_bucket_extension,
 
+          entity_stats.ratings_positive_count as maybe_ratings_positive_count,
+          entity_stats.ratings_negative_count as maybe_ratings_negative_count,
+          entity_stats.bookmark_count as maybe_bookmark_count,
+
           m.created_at,
           m.updated_at
 
       FROM media_files as m
       LEFT OUTER JOIN users
           ON users.token = m.maybe_creator_user_token
+      LEFT OUTER JOIN entity_stats
+          ON entity_stats.entity_type = "media_file"
+          AND entity_stats.entity_token = m.token
       WHERE
           m.creator_set_visibility = "public"
           AND m.user_deleted_at IS NULL
@@ -161,7 +179,12 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
           maybe_creator_display_name: media_file.maybe_creator_display_name,
           maybe_creator_email_gravatar_hash: media_file.maybe_creator_email_gravatar_hash,
 
+          maybe_ratings_positive_count: media_file.maybe_ratings_positive_count,
+          maybe_ratings_negative_count: media_file.maybe_ratings_negative_count,
+          maybe_bookmark_count: media_file.maybe_bookmark_count,
+
           media_type: media_file.media_type,
+
           public_bucket_directory_hash: media_file.public_bucket_directory_hash,
           maybe_public_bucket_prefix: media_file.maybe_public_bucket_prefix,
           maybe_public_bucket_extension: media_file.maybe_public_bucket_extension,
@@ -193,6 +216,10 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
     pub public_bucket_directory_hash: String,
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
+
+    pub maybe_ratings_positive_count: Option<u32>,
+    pub maybe_ratings_negative_count: Option<u32>,
+    pub maybe_bookmark_count: Option<u32>,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -227,6 +254,9 @@ impl FromRow<'_, MySqlRow> for RawMediaFileJoinUser {
       public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
       maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
+      maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
+      maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,
+      maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,
       created_at: row.try_get("created_at")?,
       updated_at: row.try_get("updated_at")?,
     })

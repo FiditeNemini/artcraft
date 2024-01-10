@@ -20,6 +20,7 @@ use tokens::tokens::media_files::MediaFileToken;
 
 use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -57,6 +58,9 @@ pub struct MediaFileListItem {
 
   pub maybe_creator: Option<UserDetailsLight>,
   pub maybe_social_meta: Option<MediaFileSocialMetaLight>,
+
+  /// Statistics about the media file
+  pub stats: SimpleEntityStats,
 
   pub creator_set_visibility: Visibility,
 
@@ -212,6 +216,10 @@ pub async fn list_media_files_handler(
             record.favorite_count,
             record.comment_count,
         )),
+        stats: SimpleEntityStats {
+          positive_rating_count: record.maybe_ratings_positive_count.unwrap_or(0),
+          bookmark_count: record.maybe_bookmark_count.unwrap_or(0),
+        },
         creator_set_visibility: record.creator_set_visibility,
         created_at: record.created_at,
         updated_at: record.updated_at,

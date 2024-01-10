@@ -45,8 +45,15 @@ pub struct MediaFileListItem {
 
   pub creator_set_visibility: Visibility,
 
+  #[deprecated(note = "more expensive to query")]
   pub comment_count: u64,
+
+  #[deprecated(note = "more expensive to query")]
   pub favorite_count: u64,
+
+  pub maybe_ratings_positive_count: Option<u32>,
+  pub maybe_ratings_negative_count: Option<u32>,
+  pub maybe_bookmark_count: Option<u32>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -102,6 +109,9 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
           creator_set_visibility: record.creator_set_visibility,
           comment_count: record.comment_count as u64,
           favorite_count: record.favorite_count as u64,
+          maybe_ratings_positive_count: record.maybe_ratings_positive_count,
+          maybe_ratings_negative_count: record.maybe_ratings_negative_count,
+          maybe_bookmark_count: record.maybe_bookmark_count,
           created_at: record.created_at,
           updated_at: record.updated_at,
         }
@@ -150,6 +160,11 @@ SELECT
   u.display_name as maybe_creator_display_name,
   u.email_gravatar_hash as maybe_creator_gravatar_hash,
 
+
+  entity_stats.ratings_positive_count as maybe_ratings_positive_count,
+  entity_stats.ratings_negative_count as maybe_ratings_negative_count,
+  entity_stats.bookmark_count as maybe_bookmark_count,
+
   m.creator_set_visibility,
   m.created_at,
   m.updated_at,
@@ -165,6 +180,9 @@ LEFT OUTER JOIN favorites as f
     ON f.entity_type = 'media_file' AND f.entity_token = m.token
 LEFT OUTER JOIN comments as c
     ON c.entity_type = 'media_file' AND c.entity_token  = c.token
+LEFT OUTER JOIN entity_stats
+    ON entity_stats.entity_type = "media_file"
+    AND entity_stats.entity_token = m.token
     "#
   );
 
@@ -267,6 +285,10 @@ struct MediaFileListItemInternal {
   comment_count: i64,
   favorite_count: i64,
 
+  maybe_ratings_positive_count: Option<u32>,
+  maybe_ratings_negative_count: Option<u32>,
+  maybe_bookmark_count: Option<u32>,
+
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
 }
@@ -308,6 +330,9 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       updated_at: row.try_get("updated_at")?,
       comment_count: row.try_get("comment_count")?,
       favorite_count: row.try_get("favorite_count")?,
+      maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
+      maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,
+      maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,
     })
   }
 }

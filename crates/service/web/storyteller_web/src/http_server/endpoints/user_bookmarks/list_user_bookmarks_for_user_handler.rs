@@ -93,6 +93,7 @@ pub struct UserBookmarkDetailsForUserList {
   /// This is only populated if the item is a model weight.
   pub maybe_weight_data: Option<WeightsData>,
 
+  /// Statistics about the bookmarked item
   pub stats: SimpleEntityStats,
 }
 
