@@ -29,7 +29,6 @@ const BUCKET_FILE_EXTENSION: &str = ".bvh";
 pub struct MocapNetProcessJobArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
     pub job: &'a AvailableInferenceJob,
-    // pub media_file: MediaFile,
 }
 
 pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -127,6 +126,11 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
         .inference_command
         .execute_inference(InferenceArgs {
             video_file: &usable_video_path,
+            maybe_ik1: &mc_args.maybe_ik1,
+            maybe_ik2: &mc_args.maybe_ik2,
+            maybe_ik3: &mc_args.maybe_ik3,
+            maybe_smoothing1: &mc_args.maybe_smoothing1,
+            maybe_smoothing2: &mc_args.maybe_smoothing2,
             stderr_output_file: &stderr_output_file,
         });
 

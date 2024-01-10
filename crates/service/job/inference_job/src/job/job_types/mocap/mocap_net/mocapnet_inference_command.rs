@@ -60,6 +60,11 @@ pub enum ExecutableOrCommand {
 
 pub struct InferenceArgs<'s, P: AsRef<Path>> {
     pub video_file: &'s P,
+    pub maybe_ik1: &'s Option<f32>,
+    pub maybe_ik2: &'s Option<i32>,
+    pub maybe_ik3: &'s Option<i32>,
+    pub maybe_smoothing1: &'s Option<f32>,
+    pub maybe_smoothing2: &'s Option<f32>,
     pub stderr_output_file: &'s Path,
 }
 
@@ -149,9 +154,14 @@ impl MocapnetInferenceCommand {
 
         command.push_str(" -m mediapipeHolisticWebcamMocapNET ");
 
-        // get video path
         let video_path = args.video_file.as_ref();
         command.push_str(&format!(" --from {}", path_to_string(video_path)));
+        if let Some(ik1) = args.maybe_ik1 {
+            command.push_str(&format!(" --ik {} {} {}", ik1, args.maybe_ik2.unwrap(), args.maybe_ik3.unwrap()));
+        }
+        if let Some(smooth1) = args.maybe_smoothing1 {
+            command.push_str(&format!(" --smooth {} {}", smooth1, args.maybe_smoothing2.unwrap()));
+        }
         command.push_str(" --all --save --headless 2");
 
         // ===== End Python Args =====

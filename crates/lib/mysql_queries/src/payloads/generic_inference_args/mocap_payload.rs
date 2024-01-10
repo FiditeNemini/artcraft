@@ -24,9 +24,29 @@ impl MocapVideoSource {
     }
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct MocapArgs {
     #[serde(rename = "vs")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_video_source: Option<MocapVideoSource>,
+
+    #[serde(rename = "i1")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_ik1: Option<f32>,
+
+    #[serde(rename = "i2")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_ik2: Option<i32>,
+
+    #[serde(rename = "i3")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_ik3: Option<i32>,
+
+    #[serde(rename = "s1")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_smoothing1: Option<f32>,
+
+    #[serde(rename = "s2")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_smoothing2: Option<f32>,
 }

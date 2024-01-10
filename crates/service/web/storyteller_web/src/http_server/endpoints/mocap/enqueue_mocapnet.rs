@@ -174,6 +174,11 @@ pub async fn enqueue_mocapnet_handler(
 
     let inference_args = MocapArgs {
         maybe_video_source: Some(video_source),
+        maybe_ik1: Some(0.001f32),
+        maybe_ik2: Some(99i32),
+        maybe_ik3: Some(99i32),
+        maybe_smoothing1: Some(60f32),
+        maybe_smoothing2: Some(10f32),
     };
 
     info!("Creating mocapnet job record...");
