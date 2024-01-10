@@ -53,6 +53,9 @@ pub struct BookmarkRow {
   /// Whether the entity is bookmarked or not
   pub is_bookmarked: bool,
   /// If the object is bookmarked, this is the bookmark token (used to delete the bookmark).
+  /// Since we soft-delete bookmarks, we go to the extra step of clearing out this field if
+  /// the bookmark is soft deleted, even though it still has a record with token on the
+  /// backend.
   pub maybe_bookmark_token: Option<UserBookmarkToken>,
 }
 
@@ -168,11 +171,14 @@ fn fill_in_missed_bookmarks(request_tokens: &HashSet<String>, db_response: Vec<B
   let mut outputs = HashMap::with_capacity(request_tokens.len());
 
   for record in db_response.into_iter() {
+    let is_bookmarked = record.maybe_deleted_at.is_none();
+
     outputs.insert(record.entity_token.clone(), BookmarkRow {
-      maybe_bookmark_token: Some(record.token),
+      // NB: We clear out the token if it's deleted for the sake of the frontend.
+      maybe_bookmark_token: if is_bookmarked { Some(record.token) } else { None },
       entity_token: record.entity_token,
       entity_type: record.entity_type,
-      is_bookmarked: record.maybe_deleted_at.is_none(),
+      is_bookmarked,
     });
   }
 
