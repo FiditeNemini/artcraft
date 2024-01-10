@@ -97,7 +97,6 @@ import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmai
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
 import DevUpload from "./pages/dev_upload/DevUpload";
 import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
-import { ProfilePage } from "./pages/profile/profile_view/ProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
 import WeightPage from "./pages/weight/WeightPage";
 import ExplorePage from "./pages/explore/ExplorePage";
@@ -300,17 +299,8 @@ class PageContainer extends React.Component<
                 <ProfileBanFc sessionWrapper={this.props.sessionWrapper} />
               </Route>
 
-              <Route path="/profile/:username">
-                <ProfilePage
-                  sessionWrapper={this.props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                />
-              </Route>
-
               {/* New Profile Page */}
-              <Route path="/dev-profile/:username">
+              <Route path="/profile/:username">
                 <NewProfilePage
                   sessionWrapper={this.props.sessionWrapper}
                   sessionSubscriptionsWrapper={
