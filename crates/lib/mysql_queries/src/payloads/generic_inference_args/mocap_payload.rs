@@ -30,23 +30,31 @@ pub struct MocapArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_video_source: Option<MocapVideoSource>,
 
-    #[serde(rename = "i1")]
+    #[serde(rename = "ik1")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_ik1: Option<f32>,
 
-    #[serde(rename = "i2")]
+    #[serde(rename = "ik2")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_ik2: Option<i32>,
 
-    #[serde(rename = "i3")]
+    #[serde(rename = "ik3")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_ik3: Option<i32>,
 
-    #[serde(rename = "s1")]
+    #[serde(rename = "sm1")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_smoothing1: Option<f32>,
 
-    #[serde(rename = "s2")]
+    #[serde(rename = "sm2")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_smoothing2: Option<f32>,
+
+    #[serde(rename = "si1")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_size1: Option<i32>,
+
+    #[serde(rename = "si2")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_size2: Option<i32>,
 }

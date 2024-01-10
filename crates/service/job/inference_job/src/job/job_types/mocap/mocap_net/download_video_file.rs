@@ -23,6 +23,7 @@ pub struct VideoFile {
     pub filesystem_path: PathBuf,
 }
 
+// TODO: Replace with remote cloud client
 pub async fn download_video_file(
     video_source: &MocapVideoSource,
     public_bucket_client: &BucketClient,

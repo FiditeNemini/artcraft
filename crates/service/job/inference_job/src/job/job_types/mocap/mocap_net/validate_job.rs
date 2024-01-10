@@ -13,6 +13,8 @@ pub struct JobArgs<'a> {
     pub maybe_ik3: Option<&'a i32>,
     pub maybe_smoothing1: Option<&'a f32>,
     pub maybe_smoothing2: Option<&'a f32>,
+    pub maybe_size1: Option<&'a i32>,
+    pub maybe_size2: Option<&'a i32>,
 }
 
 pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
@@ -64,5 +66,7 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
         maybe_ik3: inference_args.maybe_ik3.as_ref(),
         maybe_smoothing1: inference_args.maybe_smoothing1.as_ref(),
         maybe_smoothing2: inference_args.maybe_smoothing2.as_ref(),
+        maybe_size1: inference_args.maybe_size1.as_ref(),
+        maybe_size2: inference_args.maybe_size2.as_ref(),
     })
 }

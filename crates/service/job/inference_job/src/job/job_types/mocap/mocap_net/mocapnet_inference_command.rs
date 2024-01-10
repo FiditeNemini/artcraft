@@ -65,6 +65,8 @@ pub struct InferenceArgs<'s, P: AsRef<Path>> {
     pub maybe_ik3: &'s Option<i32>,
     pub maybe_smoothing1: &'s Option<f32>,
     pub maybe_smoothing2: &'s Option<f32>,
+    pub maybe_size1: &'s Option<i32>,
+    pub maybe_size2: &'s Option<i32>,
     pub stderr_output_file: &'s Path,
 }
 
@@ -161,6 +163,9 @@ impl MocapnetInferenceCommand {
         }
         if let Some(smooth1) = args.maybe_smoothing1 {
             command.push_str(&format!(" --smooth {} {}", smooth1, args.maybe_smoothing2.unwrap()));
+        }
+        if let Some(size1) = args.maybe_size1 {
+            command.push_str(&format!(" --size {} {}", size1, args.maybe_size2.unwrap()));
         }
         command.push_str(" --all --save --headless 2");
 

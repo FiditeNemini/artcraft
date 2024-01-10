@@ -179,6 +179,8 @@ pub async fn enqueue_mocapnet_handler(
         maybe_ik3: Some(99i32),
         maybe_smoothing1: Some(60f32),
         maybe_smoothing2: Some(10f32),
+        maybe_size1: Some(1920i32),
+        maybe_size2: Some(1080i32),
     };
 
     info!("Creating mocapnet job record...");

@@ -131,6 +131,8 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
             maybe_ik3: &mc_args.maybe_ik3,
             maybe_smoothing1: &mc_args.maybe_smoothing1,
             maybe_smoothing2: &mc_args.maybe_smoothing2,
+            maybe_size1: &mc_args.maybe_size1,
+            maybe_size2: &mc_args.maybe_size2,
             stderr_output_file: &stderr_output_file,
         });
 
