@@ -15,7 +15,7 @@ use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Mc;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_mocapnet::{insert_media_file_from_mocapnet, InsertArgs};
-use crate::job::job_types::mocap::mocap_net::mocapnet_inference_command::InferenceArgs;
+use crate::job::job_types::mocap::mocap_net::mocapnet_inference_command::{InferenceArgs, MocapnetInferenceCommand};
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -95,11 +95,12 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
     job_progress_reporter.log_status("running inference")
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-    let output_video_fs_path = work_temp_dir.path().join("blend.mp4");
+    let output_bvh_path = model_dependencies.inference_command.mocapnet_root_code_directory.clone()
+        .join("out.bvh");
 
     info!("Running MocapNET inference...");
 
-    info!("Expected output video filename: {:?}", &output_video_fs_path);
+    info!("Expected output bvh filename: {:?}", &output_bvh_path);
 
     // TODO: Limit output length for non-premium (???)
 
@@ -143,7 +144,7 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
         }
 
         safe_delete_temp_file(&video_path.filesystem_path);
-        safe_delete_temp_file(&output_video_fs_path);
+        safe_delete_temp_file(&output_bvh_path);
         safe_delete_temp_file(&stderr_output_file);
         safe_delete_temp_directory(&work_temp_dir);
 
@@ -152,13 +153,13 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
 
     // ==================== CHECK NON-WATERMARKED RESULT ==================== //
 
-    info!("Checking that output file exists: {:?} ...", output_video_fs_path);
+    info!("Checking that output file exists: {:?} ...", output_bvh_path);
 
-    check_file_exists(&output_video_fs_path).map_err(|e| ProcessSingleJobError::Other(e))?;
+    check_file_exists(&output_bvh_path).map_err(|e| ProcessSingleJobError::Other(e))?;
 
     // ==================== OPTIONAL WATERMARK ==================== //
 
-    let finished_file = output_video_fs_path.clone();
+    let finished_file = output_bvh_path.clone();
 
     // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
@@ -172,10 +173,7 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
 
     info!("Interrogating result mimetype ...");
 
-    let mimetype = get_mimetype_for_file(&finished_file)
-        .map_err(|err| ProcessSingleJobError::from_io_error(err))?
-        .map(|mime| mime.to_string())
-        .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
+    let mimetype = "application/octet-stream";
 
     info!("Calculating sha256...");
 
@@ -209,7 +207,7 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
     // ==================== DELETE TEMP FILES ==================== //
 
     safe_delete_temp_file(&video_path.filesystem_path);
-    safe_delete_temp_file(&output_video_fs_path);
+    safe_delete_temp_file(&output_bvh_path);
     safe_delete_temp_file(&stderr_output_file);
     safe_delete_temp_directory(&work_temp_dir);
 

@@ -55,6 +55,7 @@ impl InferenceCategory {
       "text_to_speech" => Ok(Self::TextToSpeech),
       "voice_conversion" => Ok(Self::VoiceConversion),
       "video_filter" => Ok(Self::VideoFilter),
+      "mocap" => Ok(Self::Mocap),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -67,6 +68,7 @@ impl InferenceCategory {
       Self::TextToSpeech,
       Self::VoiceConversion,
       Self::VideoFilter,
+      Self::Mocap,
     ])
   }
 }

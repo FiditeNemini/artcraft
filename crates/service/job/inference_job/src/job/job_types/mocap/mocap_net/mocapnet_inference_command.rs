@@ -33,7 +33,7 @@ static IGNORED_ENVIRONMENT_VARS : Lazy<HashSet<String>> = Lazy::new(|| {
 #[derive(Clone)]
 pub struct MocapnetInferenceCommand {
     /// Where the code lives
-    mocapnet_root_code_directory: PathBuf,
+    pub(crate) mocapnet_root_code_directory: PathBuf,
 
     /// A single executable script or a much larger bash command.
     executable_or_command: ExecutableOrCommand,
@@ -152,8 +152,7 @@ impl MocapnetInferenceCommand {
         // get video path
         let video_path = args.video_file.as_ref();
         command.push_str(&format!(" --from {}", path_to_string(video_path)));
-
-        command.push_str(" --all --save ");
+        command.push_str(" --all --save --headless 2");
 
         // ===== End Python Args =====
 

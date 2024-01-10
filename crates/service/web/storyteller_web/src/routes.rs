@@ -229,7 +229,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
 
   // ==================== Mocap ========================
   let mut app = RouteBuilder::from_app(app)
-      .add_get("/v1/mocap/mocapnet/create", enqueue_mocapnet_handler)
+      .add_post("/v1/mocap/mocapnet/create", enqueue_mocapnet_handler)
       .into_app();
 
   // ==================== "Generic" Inference ====================

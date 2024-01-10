@@ -188,7 +188,7 @@ pub async fn enqueue_mocapnet_handler(
         maybe_raw_inference_text: None, // No text
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {
-            inference_category: Some(InferenceCategoryAbbreviated::VideoFilter),
+            inference_category: Some(InferenceCategoryAbbreviated::Mocap),
             args: Some(PolymorphicInferenceArgs::Mc(inference_args)),
         }),
         maybe_creator_user_token: maybe_user_token.as_ref(),
@@ -196,7 +196,7 @@ pub async fn enqueue_mocapnet_handler(
         creator_ip_address: &ip_address,
         creator_set_visibility: set_visibility,
         priority_level,
-        requires_keepalive: plan.rerender_requires_frontent_keepalive(),
+        requires_keepalive: plan.mocapnet_requires_frontend_keepalive(),
         is_debug_request,
         maybe_routing_tag: maybe_routing_tag.as_deref(),
         mysql_pool: &server_state.mysql_pool,
