@@ -18,6 +18,7 @@ use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -66,6 +67,9 @@ pub struct MediaFileInfo {
   /// the token as a media file and improperly assume it can be used with the rest of
   /// the media file APIs.
   pub is_emulated_media_file: bool,
+
+  /// Statistics about the media file
+  pub stats: SimpleEntityStats,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -272,6 +276,10 @@ async fn modern_media_file_lookup(
       ),
       creator_set_visibility: result.creator_set_visibility,
       is_emulated_media_file: false,
+      stats: SimpleEntityStats {
+        positive_rating_count: result.maybe_ratings_positive_count.unwrap_or(0),
+        bookmark_count: result.maybe_bookmark_count.unwrap_or(0),
+      },
       created_at: result.created_at,
       updated_at: result.updated_at,
     },
@@ -342,6 +350,10 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       ),
       creator_set_visibility: result.creator_set_visibility,
       is_emulated_media_file: true,
+      stats: SimpleEntityStats {
+        positive_rating_count: 0,
+        bookmark_count: 0,
+      },
       created_at: result.created_at,
       updated_at: result.updated_at,
     },
