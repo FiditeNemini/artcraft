@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 use anyhow::anyhow;
+use chrono::{DateTime, Utc};
 use log::error;
 use sqlx::{MySql, QueryBuilder};
 use sqlx::pool::PoolConnection;
@@ -14,6 +15,7 @@ pub struct BatchUserBookmark {
   pub token: UserBookmarkToken,
   pub entity_token: String,
   pub entity_type: UserBookmarkEntityType,
+  pub maybe_deleted_at: Option<DateTime<Utc>>,
 }
 
 pub async fn batch_get_user_bookmarks(
@@ -31,7 +33,8 @@ pub async fn batch_get_user_bookmarks(
 SELECT
     token,
     entity_type,
-    entity_token
+    entity_token,
+    deleted_at as maybe_deleted_at
 
 FROM user_bookmarks
 
@@ -64,6 +67,7 @@ WHERE user_token =
           entity_type: UserBookmarkEntityType::from_str(&record.entity_type)
               .unwrap_or(UserBookmarkEntityType::W2lTemplate),
           entity_token: record.entity_token,
+          maybe_deleted_at: record.maybe_deleted_at,
         }).collect::<Vec<_>>()),
     Err(err) => match err {
       sqlx::Error::RowNotFound => Ok(Vec::new()),
@@ -80,4 +84,5 @@ struct RawRating {
   token: String,
   entity_token: String,
   entity_type: String,
+  maybe_deleted_at: Option<DateTime<Utc>>,
 }

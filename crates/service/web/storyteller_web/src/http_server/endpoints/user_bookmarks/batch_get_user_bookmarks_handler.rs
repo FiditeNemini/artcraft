@@ -172,7 +172,7 @@ fn fill_in_missed_bookmarks(request_tokens: &HashSet<String>, db_response: Vec<B
       maybe_bookmark_token: Some(record.token),
       entity_token: record.entity_token,
       entity_type: record.entity_type,
-      is_bookmarked: true,
+      is_bookmarked: record.maybe_deleted_at.is_none(),
     });
   }
 
