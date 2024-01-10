@@ -18,7 +18,6 @@ use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_files::list::list_media_files::{list_media_files, ListMediaFilesArgs};
 use tokens::tokens::media_files::MediaFileToken;
 
-use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
@@ -57,7 +56,6 @@ pub struct MediaFileListItem {
   pub public_bucket_path: String,
 
   pub maybe_creator: Option<UserDetailsLight>,
-  pub maybe_social_meta: Option<MediaFileSocialMetaLight>,
 
   /// Statistics about the media file
   pub stats: SimpleEntityStats,
@@ -212,10 +210,6 @@ pub async fn list_media_files_handler(
           record.maybe_creator_display_name,
           record.maybe_creator_gravatar_hash,
         ),
-        maybe_social_meta: Option::from(MediaFileSocialMetaLight::from_db_fields(
-            record.favorite_count,
-            record.comment_count,
-        )),
         stats: SimpleEntityStats {
           positive_rating_count: record.maybe_ratings_positive_count.unwrap_or(0),
           bookmark_count: record.maybe_bookmark_count.unwrap_or(0),
