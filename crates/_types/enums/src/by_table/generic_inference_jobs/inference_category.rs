@@ -28,6 +28,9 @@ pub enum InferenceCategory {
 
   #[serde(rename = "video_filter")]
   VideoFilter,
+
+  #[serde(rename = "mocap")]
+  Mocap,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -42,6 +45,7 @@ impl InferenceCategory {
       Self::TextToSpeech => "text_to_speech",
       Self::VoiceConversion => "voice_conversion",
       Self::VideoFilter => "video_filter",
+      Self::Mocap => "mocap",
     }
   }
 
@@ -51,6 +55,7 @@ impl InferenceCategory {
       "text_to_speech" => Ok(Self::TextToSpeech),
       "voice_conversion" => Ok(Self::VoiceConversion),
       "video_filter" => Ok(Self::VideoFilter),
+      "mocap" => Ok(Self::Mocap),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -63,6 +68,7 @@ impl InferenceCategory {
       Self::TextToSpeech,
       Self::VoiceConversion,
       Self::VideoFilter,
+      Self::Mocap,
     ])
   }
 }
@@ -78,6 +84,7 @@ mod tests {
     assert_serialization(InferenceCategory::TextToSpeech, "text_to_speech");
     assert_serialization(InferenceCategory::VoiceConversion, "voice_conversion");
     assert_serialization(InferenceCategory::VideoFilter, "video_filter");
+    assert_serialization(InferenceCategory::Mocap, "mocap")
   }
 
   #[test]
@@ -86,6 +93,7 @@ mod tests {
     assert_eq!(InferenceCategory::TextToSpeech.to_str(), "text_to_speech");
     assert_eq!(InferenceCategory::VoiceConversion.to_str(), "voice_conversion");
     assert_eq!(InferenceCategory::VideoFilter.to_str(), "video_filter");
+    assert_eq!(InferenceCategory::Mocap.to_str(), "mocap");
   }
 
   #[test]
@@ -94,17 +102,19 @@ mod tests {
     assert_eq!(InferenceCategory::from_str("text_to_speech").unwrap(), InferenceCategory::TextToSpeech);
     assert_eq!(InferenceCategory::from_str("voice_conversion").unwrap(), InferenceCategory::VoiceConversion);
     assert_eq!(InferenceCategory::from_str("video_filter").unwrap(), InferenceCategory::VideoFilter);
+    assert_eq!(InferenceCategory::from_str("mocap").unwrap(), InferenceCategory::Mocap);
   }
 
   #[test]
   fn all_variants() {
     // Static check
     let mut variants = InferenceCategory::all_variants();
-    assert_eq!(variants.len(), 4);
+    assert_eq!(variants.len(), 5);
     assert_eq!(variants.pop_first(), Some(InferenceCategory::LipsyncAnimation));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::TextToSpeech));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::VoiceConversion));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::VideoFilter));
+    assert_eq!(variants.pop_first(), Some(InferenceCategory::Mocap));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check

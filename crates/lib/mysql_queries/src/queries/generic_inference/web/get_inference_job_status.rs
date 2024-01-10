@@ -179,6 +179,7 @@ fn raw_record_to_public_result(record: RawGenericInferenceJobStatus) -> GenericI
     InferenceCategory::TextToSpeech => record.maybe_tts_model_title.as_deref(),
     InferenceCategory::VoiceConversion => record.maybe_voice_conversion_model_title.as_deref(),
     InferenceCategory::VideoFilter => Some("Video Filter"),
+    InferenceCategory::Mocap => Some("Mocap"),
   };
 
   // NB: A bit of a hack. We store TTS results with a full path.
@@ -188,6 +189,7 @@ fn raw_record_to_public_result(record: RawGenericInferenceJobStatus) -> GenericI
     InferenceCategory::TextToSpeech => (false, record.maybe_tts_public_bucket_path.as_deref()),
     InferenceCategory::VoiceConversion => (true, record.maybe_voice_conversion_public_bucket_hash.as_deref()),
     InferenceCategory::VideoFilter => (true, record.maybe_media_file_public_bucket_directory_hash.as_deref()),
+    InferenceCategory::Mocap => (true, record.maybe_media_file_public_bucket_directory_hash.as_deref()),
   };
 
   // NB: We've moved voice conversion out of their own table and into media_files
