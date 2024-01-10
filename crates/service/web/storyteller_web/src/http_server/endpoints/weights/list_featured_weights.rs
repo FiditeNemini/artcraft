@@ -7,8 +7,8 @@ use chrono::{DateTime, Utc};
 use log::{debug, error, warn};
 use r2d2_redis::redis::Commands;
 use utoipa::ToSchema;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::model_weights::{
   weights_category::WeightsCategory,
   weights_types::WeightsType,
@@ -16,6 +16,7 @@ use enums::by_table::model_weights::{
 use mysql_queries::queries::model_weights::list::list_weights_by_tokens::list_weights_by_tokens;
 use tokens::tokens::model_weights::ModelWeightToken;
 
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
@@ -40,10 +41,8 @@ pub struct ModelWeightForList {
   /// If a cover image is set, this is the path to the asset.
   pub maybe_cover_image_public_bucket_path: Option<String>,
 
-  //pub cached_user_ratings_total_count: u32,
-  //pub cached_user_ratings_positive_count: u32,
-  //pub cached_user_ratings_negative_count: u32,
-  //pub maybe_cached_user_ratings_ratio: Option<f32>,
+  /// Statistics about the weights
+  pub stats: SimpleEntityStats,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -153,10 +152,10 @@ pub async fn list_featured_weights_handler(
               &w.creator_display_name,
               &w.creator_email_gravatar_hash
             ),
-            //cached_user_ratings_total_count: w.cached_user_ratings_total_count,
-            //cached_user_ratings_positive_count: w.cached_user_ratings_positive_count,
-            //cached_user_ratings_negative_count: w.cached_user_ratings_negative_count,
-            //maybe_cached_user_ratings_ratio: w.maybe_cached_user_ratings_ratio,
+            stats: SimpleEntityStats {
+              positive_rating_count: w.maybe_ratings_positive_count.unwrap_or(0),
+              bookmark_count: w.maybe_bookmark_count.unwrap_or(0),
+            },
             created_at: w.created_at,
             updated_at: w.updated_at,
           }
