@@ -2,6 +2,7 @@ use enums::by_table::generic_inference_jobs::inference_category::InferenceCatego
 use errors::AnyhowResult;
 
 use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
+use crate::payloads::generic_inference_args::mocap_payload::MocapArgs;
 use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
 use crate::payloads::generic_inference_args::videofilter_payload::{RerenderArgs};
 
@@ -40,6 +41,10 @@ pub enum InferenceCategoryAbbreviated {
   #[serde(rename = "vf")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(alias = "video_filter")]
   VideoFilter,
+
+  #[serde(rename = "mc")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(alias = "mocap")]
+  Mocap,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]
@@ -91,7 +96,10 @@ pub enum PolymorphicInferenceArgs {
   },
 
   /// Rerender a video. (Short name to save space when serializing.)
-  Rr(RerenderArgs)
+  Rr(RerenderArgs),
+
+  // Mocap (Short name to save space when serializing.)
+  Mc(MocapArgs)
 }
 
 
@@ -113,6 +121,7 @@ impl InferenceCategoryAbbreviated {
       InferenceCategory::TextToSpeech => Self::TextToSpeech,
       InferenceCategory::VoiceConversion => Self::VoiceConversion,
       InferenceCategory::VideoFilter => Self::VideoFilter,
+      InferenceCategory::Mocap => Self::Mocap,
     }
   }
 
@@ -122,6 +131,7 @@ impl InferenceCategoryAbbreviated {
       Self::TextToSpeech => InferenceCategory::TextToSpeech,
       Self::VoiceConversion => InferenceCategory::VoiceConversion,
       Self::VideoFilter => InferenceCategory::VideoFilter,
+      Self::Mocap => InferenceCategory::Mocap,
     }
   }
 }

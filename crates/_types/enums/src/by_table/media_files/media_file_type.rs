@@ -21,6 +21,9 @@ pub enum MediaFileType {
 
   /// Video files: mp4, etc.
   Video,
+
+  /// Mocap files: BVH, etc.
+  Mocap,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -35,6 +38,7 @@ impl MediaFileType {
       Self::Audio => "audio",
       Self::Image => "image",
       Self::Video => "video",
+      Self::Mocap => "mocap",
     }
   }
 
@@ -43,6 +47,7 @@ impl MediaFileType {
       "audio" => Ok(Self::Audio),
       "image" => Ok(Self::Image),
       "video" => Ok(Self::Video),
+      "mocap" => Ok(Self::Mocap),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -54,6 +59,7 @@ impl MediaFileType {
       Self::Audio,
       Self::Image,
       Self::Video,
+      Self::Mocap,
     ])
   }
 }
@@ -71,6 +77,7 @@ mod tests {
       assert_serialization(MediaFileType::Audio, "audio");
       assert_serialization(MediaFileType::Image, "image");
       assert_serialization(MediaFileType::Video, "video");
+      assert_serialization(MediaFileType::Mocap, "mocap");
     }
   }
 
@@ -82,6 +89,7 @@ mod tests {
       assert_eq!(MediaFileType::Audio.to_str(), "audio");
       assert_eq!(MediaFileType::Image.to_str(), "image");
       assert_eq!(MediaFileType::Video.to_str(), "video");
+      assert_eq!(MediaFileType::Mocap.to_str(), "mocap");
     }
 
     #[test]
@@ -89,6 +97,7 @@ mod tests {
       assert_eq!(MediaFileType::from_str("audio").unwrap(), MediaFileType::Audio);
       assert_eq!(MediaFileType::from_str("image").unwrap(), MediaFileType::Image);
       assert_eq!(MediaFileType::from_str("video").unwrap(), MediaFileType::Video);
+      assert_eq!(MediaFileType::from_str("mocap").unwrap(), MediaFileType::Mocap);
       assert!(MediaFileType::from_str("foo").is_err());
     }
   }
@@ -99,10 +108,11 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileType::all_variants();
-      assert_eq!(variants.len(), 3);
+      assert_eq!(variants.len(), 4);
       assert_eq!(variants.pop_first(), Some(MediaFileType::Audio));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Image));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Video));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Mocap));
       assert_eq!(variants.pop_first(), None);
     }
   }

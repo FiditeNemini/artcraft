@@ -1,17 +1,18 @@
+use anyhow::anyhow;
 use errors::AnyhowResult;
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 
-use crate::remote_file_manager::bucket_orchestration::BucketOrchestrationCore;
+use crate::remote_file_manager::bucket_orchestration::{BucketOrchestration, BucketOrchestrationCore};
 use crate::remote_file_manager::file_directory::FileBucketDirectory;
 use crate::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 
 use super::file_descriptor::FileDescriptor;
 use super::file_meta_data::FileMetaData;
 
-struct RemoteCloudFileClient {
+pub struct RemoteCloudFileClient {
     bucket_orchestration_client: Box<dyn BucketOrchestrationCore>
 }
 
@@ -20,6 +21,19 @@ impl RemoteCloudFileClient {
         Self {
             bucket_orchestration_client
         }
+    }
+
+    pub async fn get_remote_cloud_file_client() -> AnyhowResult<Self> {
+        let bucket_orchestration = match BucketOrchestration::new_bucket_client_from_existing_env() {
+            Ok(client) => client,
+            Err(e) => {
+                return Err(anyhow!("Error creating bucket orchestration client: {:?}", e));
+            }
+        };
+
+        Ok(Self {
+            bucket_orchestration_client: Box::new(bucket_orchestration)
+        })
     }
 
     pub async fn download_file(&self, remote_cloud_bucket_details:RemoteCloudBucketDetails, to_system_file_path:String) -> AnyhowResult<()> {
