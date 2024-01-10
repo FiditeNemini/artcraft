@@ -16,6 +16,7 @@ use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
 use tokens::tokens::model_weights::ModelWeightToken;
 
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
@@ -43,12 +44,9 @@ pub struct GetWeightResponse {
     /// If a cover image is set, this is the path to the asset.
     maybe_cover_image_public_bucket_path: Option<String>,
 
-    //cached_user_ratings_negative_count: u32,
-    //cached_user_ratings_positive_count: u32,
-    //cached_user_ratings_total_count: u32,
-    //maybe_cached_user_ratings_ratio: Option<f32>,
-    //cached_user_ratings_last_updated_at: DateTime<Utc>,
-    
+    /// Statistics about the weights
+    stats: SimpleEntityStats,
+
     version: i32,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
@@ -183,11 +181,10 @@ pub async fn get_weight_handler(
         creator_set_visibility: weight.creator_set_visibility,
         file_size_bytes: weight.file_size_bytes,
         file_checksum_sha2: weight.file_checksum_sha2,
-        //cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
-        //cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
-        //cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
-        //maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
-        //cached_user_ratings_last_updated_at: weight.cached_user_ratings_last_updated_at,
+        stats: SimpleEntityStats {
+            positive_rating_count: weight.maybe_ratings_positive_count.unwrap_or(0),
+            bookmark_count: weight.maybe_bookmark_count.unwrap_or(0),
+        },
         version: weight.version,
         created_at: weight.created_at,
         updated_at: weight.updated_at

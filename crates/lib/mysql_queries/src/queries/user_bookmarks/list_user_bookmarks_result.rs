@@ -53,6 +53,8 @@ pub struct UserBookmark {
   pub maybe_model_weight_creator_gravatar_hash: Option<String>,
 
   // TODO(bt,2023-12-30): I don't think these user fields are necessary.
+  //  We already know the user we're querying on behalf of, so presumably we
+  //  already have their info (ie. profile page use).
   pub user_token: UserToken,
   pub username: String,
   pub user_display_name: String,
@@ -74,6 +76,8 @@ pub struct RawUserBookmarkRecord {
   pub (crate) entity_token: String,
 
   // TODO(bt,2023-12-30): I don't think these user fields are necessary.
+  //  We already know the user we're querying on behalf of, so presumably we
+  //  already have their info (ie. profile page use).
   pub (crate) user_token: UserToken,
   pub (crate) username: String,
   pub (crate) user_display_name: String,
