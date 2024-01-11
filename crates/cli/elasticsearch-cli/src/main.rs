@@ -45,7 +45,15 @@ pub async fn main() -> AnyhowResult<()> {
     }
     Action::SearchTts => {
       info!("Searching TTS...");
-      search_tts_models(&elasticsearch, "zel", Some("en")).await;
+      let _results = search_tts_models(&elasticsearch, "zel", Some("en")).await?;
+    }
+    Action::ReindexModelWeights => {
+      info!("Reindexing model weights...");
+
+    }
+    Action::SearchModelWeights => {
+      info!("Searching model weights...");
+      // TODO(bt,2024-01-10): Implement.
     }
   }
 
