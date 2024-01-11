@@ -125,8 +125,6 @@ export default function AudioCard({
 
               <div>
 
-                />
-
                 <LikeButton {...{
                   likeCount: data.likes,
                   ...ratings.makeProps({
