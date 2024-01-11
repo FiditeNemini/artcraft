@@ -1292,10 +1292,8 @@ fn add_weights_routes<T, B>(app: App<T>) -> App<T>
                 .route(web::post().to(update_weight_handler))
                 .route(web::delete().to(delete_weight_handler))
             )
-            .service(
-              web::resource("/search")
-                  .route(web::post().to(search_model_weights_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
+            .service(web::resource("/search")
+                .route(web::post().to(search_model_weights_handler))
             )
             .service(web::resource("/weight/{token}/cover_image")
                 .route(web::post().to(set_model_weight_cover_image_handler))
