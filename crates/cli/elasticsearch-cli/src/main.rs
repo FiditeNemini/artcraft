@@ -16,6 +16,7 @@ use elasticsearch_schema::searches::search_tts_models::search_tts_models;
 use errors::AnyhowResult;
 
 use crate::cli_args::{Action, Environment, parse_cli_args};
+use crate::plans::create_all_model_weight_documents::create_all_model_weight_documents;
 use crate::plans::create_all_tts_documents::create_all_tts_documents;
 
 pub mod cli_args;
@@ -49,7 +50,7 @@ pub async fn main() -> AnyhowResult<()> {
     }
     Action::ReindexModelWeights => {
       info!("Reindexing model weights...");
-
+      create_all_model_weight_documents(&mysql, &elasticsearch).await?;
     }
     Action::SearchModelWeights => {
       info!("Searching model weights...");

@@ -71,13 +71,13 @@ pub async fn list_model_weights_for_elastic_search_backfill_using_cursor(
   let models : Vec<RawRecord> = match maybe_models {
     Ok(models) => models,
     Err(err) => {
-      match err {
+      return match err {
         RowNotFound => {
-          return Ok(Vec::new());
+          Ok(Vec::new())
         },
         _ => {
           warn!("vc model list query error: {:?}", err);
-          return Err(anyhow!("vc model list query error"));
+          Err(anyhow!("vc model list query error"))
         }
       }
     }

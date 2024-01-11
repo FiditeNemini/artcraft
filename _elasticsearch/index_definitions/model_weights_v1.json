@@ -1,0 +1,38 @@
+{
+  "settings" : {
+    "index.number_of_shards" : 3,
+    "index.number_of_replicas" : 2
+  },
+  "mappings" : {
+    "properties" : {
+      "token" : { "type" : "keyword" },
+
+      "creator_set_visibility" : { "type" : "keyword" },
+
+      "weights_type" : { "type" : "keyword" },
+      "weights_category" : { "type" : "keyword" },
+
+      "title" : { "type" : "search_as_you_type" },
+
+      "maybe_cover_image_media_file_token" : { "type" : "keyword" },
+      "maybe_cover_image_public_bucket_hash" : { "type" : "keyword" },
+      "maybe_cover_image_public_bucket_prefix" : { "type" : "keyword" },
+      "maybe_cover_image_public_bucket_extension" : { "type" : "keyword" },
+
+      "creator_user_token" : { "type" : "keyword" },
+      "creator_username" : { "type" : "keyword" },
+      "creator_display_name" : { "type" : "keyword" },
+      "creator_gravatar_hash" : { "type" : "keyword" },
+
+      "ratings_positive_count" : { "type" : "keyword" },
+      "ratings_negative_count" : { "type" : "keyword" },
+      "bookmark_count" : { "type" : "keyword" },
+
+      "maybe_ietf_language_tag" : { "type" : "keyword" },
+      "maybe_ietf_primary_language_subtag" : { "type" : "keyword" },
+
+      "created_at" : { "type" : "date" },
+      "updated_at" : { "type" : "date" }
+    }
+  }
+}

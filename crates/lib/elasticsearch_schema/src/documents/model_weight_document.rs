@@ -33,7 +33,9 @@ pub struct ModelWeightDocument {
   // *** NB: Never put the bucket path to the model in Elasticsearch ! ***
 
   pub maybe_cover_image_media_file_token: Option<MediaFileToken>,
-  pub maybe_cover_image_media_bucket_path: Option<String>,
+  pub maybe_cover_image_public_bucket_hash: Option<String>,
+  pub maybe_cover_image_public_bucket_prefix: Option<String>,
+  pub maybe_cover_image_public_bucket_extension: Option<String>,
 
   //pub description_markdown: String,
   //pub description_markdown_html: String,
@@ -44,8 +46,8 @@ pub struct ModelWeightDocument {
   pub creator_gravatar_hash: String,
 
   // Statistics
-  pub positive_rating_count: u32,
-  pub negative_rating_count: u32,
+  pub ratings_positive_count: u32,
+  pub ratings_negative_count: u32,
   pub bookmark_count: u32,
 
   // Fields only used for TTS models and voice conversion models.
@@ -54,6 +56,8 @@ pub struct ModelWeightDocument {
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
+  pub user_deleted_at: Option<DateTime<Utc>>,
+  pub mod_deleted_at: Option<DateTime<Utc>>,
 }
 
 impl Document for ModelWeightDocument {
