@@ -86,10 +86,10 @@ function NewProfilePage(this: any, props: Props) {
   usePrefixedDocumentTitle(documentTitle);
 
   if (
-    pathname === `/dev-profile/${username}` ||
-    pathname === `/dev-profile/${username}/`
+    pathname === `/profile/${username}` ||
+    pathname === `/profile/${username}/`
   ) {
-    return <Redirect to={`/dev-profile/${username}/media`} />;
+    return <Redirect to={`/profile/${username}/media`} />;
   }
 
   if (notFoundState) {
@@ -355,23 +355,23 @@ function NewProfilePage(this: any, props: Props) {
 
   const tabs = [
     {
-      to: `/dev-profile/${username}/media`,
+      to: `/profile/${username}/media`,
       label: "Media",
-      content: <MediaTab />,
+      content: <MediaTab {...{ username }} />,
       icon: faPhotoFilmMusic,
       padding: true,
     },
     {
-      to: `/dev-profile/${username}/weights`,
+      to: `/profile/${username}/weights`,
       label: "Weights",
-      content: <WeightsTab />,
+      content: <WeightsTab {...{ username }} />,
       icon: faLayerGroup,
       padding: true,
     },
     {
-      to: `/dev-profile/${username}/bookmarks`,
+      to: `/profile/${username}/bookmarks`,
       label: "Bookmarks",
-      content: <BookmarksTab />,
+      content: <BookmarksTab {...{ username }} />,
       icon: faBookmark,
       padding: true,
     },

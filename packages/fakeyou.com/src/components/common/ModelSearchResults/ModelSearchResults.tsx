@@ -8,10 +8,10 @@ import {
   faComment,
   faHeart,
 } from "@fortawesome/pro-solid-svg-icons";
-import { TtsModel } from "@storyteller/components/src/api/tts/SearchTtsModels";
+import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 
 interface Props {
-  data: TtsModel[];
+  data: Weight[];
 }
 
 function shortenNumber(num: number): string {
@@ -26,21 +26,24 @@ export default function ModelSearchResults(props: Props) {
   let likes = 1500;
   let uses = 25000;
   let comments = 25;
-  let model_type  = "Tacotron2";
+  let model_type = "Tacotron2";
 
   return (
     <div className="row g-3">
-      {props.data.map((item) => {
-        let modelPageLink = `/tts/${item.model_token}`;
+      {props.data.map(item => {
+        let modelPageLink = `/weight/${item.weight_token}`;
 
         return (
-          <div className="col-12 col-lg-6" key={item.model_token}>
+          <div className="col-12 col-lg-6" key={item.weight_token}>
             <div className="model-search-results p-3">
               <h5 className="fw-semibold mb-0">{item.title}</h5>
               <p className="creator-name">
                 by{" "}
-                <Link className="fw-medium" to={`/profile/${item.creator_username}`}>
-                  {item.creator_display_name}
+                <Link
+                  className="fw-medium"
+                  to={`/profile/${item.creator.username}`}
+                >
+                  {item.creator.display_name}
                 </Link>
               </p>
               <div className="d-flex align-items-end">

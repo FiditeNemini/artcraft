@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+import { TintSpinner } from "components/common";
 
 // Header, Body, and Footer Interfaces and Components
 interface HeaderProps {
@@ -30,6 +31,7 @@ const Footer: React.FC<FooterProps> = ({ children, padding }) => {
 
 // Panel Interface
 interface PanelProps {
+  busy?: boolean;
   children: ReactNode;
   dividerHeader?: boolean;
   dividerFooter?: boolean;
@@ -42,7 +44,7 @@ const SplitPanel: React.FC<PanelProps> & {
   Header: typeof Header;
   Body: typeof Body;
   Footer: typeof Footer;
-} = ({ children, dividerHeader, dividerFooter, clear, className }) => {
+} = ({ busy, children, dividerHeader, dividerFooter, clear, className }) => {
   let header: ReactNode, body: ReactNode, footer: ReactNode;
 
   const panelClassName = `${clear ? "panel-clear" : "panel"} ${
@@ -72,6 +74,7 @@ const SplitPanel: React.FC<PanelProps> & {
       {body}
       {dividerFooter && <hr className="m-0" />}
       {footer}
+      { <TintSpinner {...{ busy }} /> }
     </div>
   );
 };

@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useHistory, useParams, useLocation } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import Container from "components/common/Container";
@@ -15,7 +15,6 @@ import {
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
-import useTimeAgo from "hooks/useTimeAgo";
 import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 import { WeightType } from "@storyteller/components/src/api/_common/enums/WeightType";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
@@ -26,7 +25,7 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import Badge from "components/common/Badge";
-import FavoriteButton from "components/common/FavoriteButton";
+import BookmarkButton from "components/common/BookmarkButton";
 import LikeButton from "components/common/LikeButton";
 import VdInferencePanel from "./inference_panels/VdInferencePanel";
 import VcInferencePanel from "./inference_panels/VcInferencePanel";
@@ -34,6 +33,13 @@ import TtsInferencePanel from "./inference_panels/TtsInferencePanel";
 import Modal from "components/common/Modal";
 import SocialButton from "components/common/SocialButton";
 import Input from "components/common/Input";
+import { useBookmarks, useWeightFetch, useRatings } from "hooks";
+import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
+import moment from "moment";
+import WeightCoverImage from "components/common/WeightCoverImage";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import SdInferencePanel from "./inference_panels/SdInferencePanel";
+import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
 
 interface WeightProps {
   sessionWrapper: SessionWrapper;
@@ -57,54 +63,47 @@ export default function WeightPage({
   enqueueTtsJob,
   inferenceJobsByCategory,
 }: WeightProps) {
+  const { search } = useLocation();
   const { weight_token } = useParams<{ weight_token: string }>();
-  const [weight, setWeight] = useState<Weight | undefined | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
-  const timeUpdated = useTimeAgo(weight?.updated_at.toISOString() || "");
+  const origin = search ? new URLSearchParams(search).get("origin") : "";
+  const history = useHistory();
+  const bookmarks = useBookmarks();
+  const ratings = useRatings();
+  const {
+    data: weight,
+    descriptionMD,
+    fetchError,
+    isLoading,
+    title,
+    remove,
+  } = useWeightFetch({
+    onRemove: () => {
+      history.push(origin || "");
+    },
+    onSuccess: (res: any) => {
+      bookmarks.gather({ res, key: "weight_token" }); // expand rather than replace for lazy loading 
+      ratings.gather({ res, key: "weight_token" });
+    },
+    token: weight_token,
+  });
+
+  const timeUpdated = moment(weight?.updated_at || "").fromNow();
+  const dateUpdated = moment(weight?.updated_at || "").format("LLL");
+  const dateCreated = moment(weight?.updated_at || "").format("LLL");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const getWeight = useCallback(async (weightToken: string) => {
-    // Dummy data
-    const dummyData = {
-      weight_token: "TM:xke15gz3v8pv",
-      title: "Harry Potter (Daniel Radcliffe)",
-      created_at: new Date(),
-      updated_at: new Date(),
-      weight_type: WeightType.HIFIGAN_TT2,
-      weight_category: WeightCategory.TTS,
-      maybe_creator_user: {
-        user_token: "test",
-        username: "",
-        display_name: "",
-        gravatar_hash: "test",
-        default_avatar: {
-          image_index: 0,
-          color_index: 0,
-        },
-      },
-      creator_set_visibility: "Public",
-      description_markdown:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    };
+  const bucketConfig = new BucketConfig();
 
-    // Simulate an API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    if (dummyData) {
-      setWeight(dummyData);
-      setIsLoading(false);
-    } else {
-      setError(true);
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    getWeight(weight_token);
-  }, [weight_token, getWeight]);
+  const weightTypeInfo = useWeightTypeInfo(
+    weight?.weight_type || WeightType.NONE
+  );
+  const {
+    label: weightType,
+    color: weightTagColor,
+    fullLabel: weightTypeFull,
+  } = weightTypeInfo;
 
   function renderWeightComponent(weight: Weight) {
     switch (weight.weight_category) {
@@ -141,6 +140,20 @@ export default function WeightPage({
             ttsInferenceJobs={ttsInferenceJobs}
             voiceToken={weight.weight_token}
           />
+        );
+      case WeightCategory.SD:
+        let sdCoverImage = "/images/avatars/default-pfp.png";
+        if (weight.maybe_cover_image_public_bucket_path !== null) {
+          sdCoverImage = bucketConfig.getGcsUrl(
+            weight.maybe_cover_image_public_bucket_path
+          );
+        }
+
+        return (
+          <div className="d-flex flex-column gap-3">
+            <SdCoverImagePanel src={sdCoverImage} />
+            <SdInferencePanel />
+          </div>
         );
       default:
         return null;
@@ -195,7 +208,7 @@ export default function WeightPage({
     );
 
   //Error state
-  if (error || !weight)
+  if (fetchError || !weight)
     return (
       <Container type="panel">
         <PageHeader
@@ -212,76 +225,39 @@ export default function WeightPage({
       </Container>
     );
 
-  const weightTypeMap: Record<
-    WeightType,
-    { weightType: string; weightTagColor: string }
-  > = {
-    [WeightType.TT2]: {
-      weightType: "Tacotron 2",
-      weightTagColor: "ultramarine",
-    },
-    [WeightType.HIFIGAN_TT2]: {
-      weightType: "HiFi-GAN Tacotron 2",
-      weightTagColor: "blue",
-    },
-    [WeightType.VALL_E]: { weightType: "VALL-E", weightTagColor: "purple" },
-    [WeightType.LORA]: { weightType: "LoRA", weightTagColor: "pink" },
-    [WeightType.RVCv2]: {
-      weightType: "RVCv2",
-      weightTagColor: "orange",
-    },
-    [WeightType.SD_15]: {
-      weightType: "Stable Diffusion 1.5",
-      weightTagColor: "lime",
-    },
-    [WeightType.SDXL]: {
-      weightType: "Stable Diffusion XL",
-      weightTagColor: "green",
-    },
-    [WeightType.SVC]: {
-      weightType: "SVC",
-      weightTagColor: "aqua",
-    },
-  };
-
-  let { weightType, weightTagColor } = weightTypeMap[weight.weight_type] || {
-    weightType: "",
-    weightTagColor: "",
-  };
-
   const weightCategoryMap: Record<WeightCategory, { weightCategory: string }> =
     {
       [WeightCategory.TTS]: { weightCategory: "Text to Speech" },
       [WeightCategory.VC]: { weightCategory: "Voice to Voice" },
-      [WeightCategory.SD]: { weightCategory: "Stable Diffusion" },
+      [WeightCategory.SD]: { weightCategory: "Image Generation" },
       [WeightCategory.ZS]: { weightCategory: "Voice Designer" },
       [WeightCategory.VOCODER]: { weightCategory: "Vocoder" },
     };
 
   let { weightCategory } = weightCategoryMap[weight.weight_category] || {
-    weightCategory: "",
+    weightCategory: "none",
   };
 
   const voiceDetails = [
-    { property: "Type", value: weightType },
+    { property: "Type", value: weightTypeFull || WeightType.NONE },
     { property: "Category", value: weightCategory },
     {
       property: "Visibility",
-      value: weight.creator_set_visibility.toString(),
+      value: weight.creator_set_visibility,
     },
-    { property: "Created at", value: weight.created_at.toString() },
-    { property: "Updated at", value: weight.updated_at.toString() },
+    { property: "Created at", value: weight.created_at?.toString() || "" },
+    { property: "Updated at", value: weight.updated_at?.toString() || "" },
   ];
 
   const imageDetails = [
-    { property: "Type", value: weightType },
+    { property: "Type", value: weightTypeFull || WeightType.NONE },
     { property: "Category", value: weightCategory },
     {
       property: "Visibility",
-      value: weight.creator_set_visibility.toString(),
+      value: weight.creator_set_visibility,
     },
-    { property: "Created at", value: weight.created_at.toString() },
-    { property: "Updated at", value: weight.updated_at.toString() },
+    { property: "Created at", value: dateCreated || "" },
+    { property: "Updated at", value: dateUpdated || "" },
 
     //more to add for image/stable diffusion details
   ];
@@ -335,11 +311,10 @@ export default function WeightPage({
     );
   }
 
-  const handleBookmark = async (data: any) => {
-    console.log(
-      `The item is now ${data.isLiked ? "Bookmarked" : "Not Bookmarked"}.`
-    );
-  };
+
+  // const handleBookmark = () => {
+  //   return bookmarks.toggle(); // this function checks if the bookmark exists, truthy = deleted, falsy = created
+  // };
 
   const subtitleDivider = <span className="opacity-25 fs-5 fw-light">|</span>;
 
@@ -351,16 +326,18 @@ export default function WeightPage({
     setIsShareModalOpen(false);
   };
 
+  const shareUrl = `https://fakeyou.com/weight/${weight.weight_token}`;
+  const shareText = `Use FakeYou to generate speech as ${
+    title || "your favorite characters"
+  }!`;
+
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareUrl);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
+    }
     setButtonLabel("Copied!");
     setTimeout(() => setButtonLabel("Copy"), 1000);
   };
-
-  const shareUrl = `https://fakeyou.com/weight/${weight.weight_token}`;
-  const shareText = `Use FakeYou to generate speech as ${
-    weight.title || "your favorite characters"
-  }!`;
 
   const openDeleteModal = () => {
     setIsDeleteModalOpen(true);
@@ -370,49 +347,70 @@ export default function WeightPage({
     setIsDeleteModalOpen(false);
   };
 
+  let audioWeightCoverImage = "/images/avatars/default-pfp.png";
+  if (weight.maybe_cover_image_public_bucket_path !== null) {
+    audioWeightCoverImage = bucketConfig.getCdnUrl(
+      weight.maybe_cover_image_public_bucket_path,
+      100,
+      100
+    );
+  }
+
   return (
     <div>
       <Container type="panel" className="mb-5">
-        <PageHeader
-          title={
-            <div className="d-flex gap-2 align-items-center flex-wrap">
-              <span className="mb-1">{weight.title}</span>
-            </div>
-          }
-          subText={
-            <div className="d-flex gap-3 flex-wrap align-items-center">
+        <Panel clear={true} className="py-4">
+          <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
+            {(weight.weight_category === WeightCategory.VC ||
+              weight.weight_category === WeightCategory.TTS) && (
+              <WeightCoverImage src={audioWeightCoverImage} />
+            )}
+            <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
-                <div>
-                  <Badge label={weightType} color={weightTagColor} />
-                </div>
-                {subtitleDivider}
-                <p>{weightCategory}</p>
-                {subtitleDivider}
-                <div className="d-flex align-items-center gap-2">
-                  <LikeButton
-                    likeCount={1200}
-                    onToggle={handleBookmark}
-                    large={true}
-                  />
-                  <FavoriteButton
-                    favoriteCount={100}
-                    onToggle={handleBookmark}
-                    large={true}
-                  />
+                <h1 className="fw-bold mb-2">{title}</h1>
+              </div>
+              <div className="d-flex gap-3 flex-wrap align-items-center">
+                <div className="d-flex gap-2 align-items-center flex-wrap">
+                  <div>
+                    <Badge label={weightType} color={weightTagColor} />
+                  </div>
+                  {subtitleDivider}
+                  <p>{weightCategory}</p>
+                  {subtitleDivider}
+                  <div className="d-flex align-items-center gap-2">
+                    <LikeButton
+                      {...{
+                        ...ratings.makeProps({
+                          entityToken: weight_token,
+                          entityType: "model_weight"
+                        }),
+                        large: true,
+                      }}
+                    />
+                    <BookmarkButton
+                      {...{
+                        ...bookmarks.makeProps({
+                          entityToken: weight_token,
+                          entityType: "model_weight"
+                        }),
+                        large: true
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
-          }
-        />
+          </div>
+        </Panel>
 
         <div className="row g-4">
           <div className="col-12 col-xl-8 d-flex flex-column gap-3">
             <div className="media-wrapper">{renderWeightComponent(weight)}</div>
 
-            {weight.description_markdown !== "" && (
+            {descriptionMD !== "" && (
               <Panel padding={true}>
                 <h4 className="fw-semibold mb-3">Description</h4>
-                <p>{weight.description_markdown}</p>
+                <p>{descriptionMD}</p>
               </Panel>
             )}
 
@@ -420,7 +418,7 @@ export default function WeightPage({
               <h4 className="fw-semibold mb-3">Comments</h4>
               <CommentComponent
                 entityType="user"
-                entityToken={weight.weight_token}
+                entityToken={"1"}
                 sessionWrapper={sessionWrapper}
               />
             </div>
@@ -460,21 +458,22 @@ export default function WeightPage({
                 <div className="d-flex gap-2 p-3">
                   <Gravatar
                     size={48}
-                    username={weight.maybe_creator_user?.display_name}
+                    username={weight.creator?.username || ""}
+                    email_hash={weight.creator?.gravatar_hash || ""}
                     avatarIndex={
-                      weight.maybe_creator_user?.default_avatar.image_index || 0
+                      weight.creator?.default_avatar.image_index || 0
                     }
                     backgroundIndex={
-                      weight.maybe_creator_user?.default_avatar.color_index || 0
+                      weight.creator?.default_avatar.color_index || 0
                     }
                   />
                   <div className="d-flex flex-column">
-                    {weight.maybe_creator_user?.display_name ? (
+                    {weight.creator?.display_name ? (
                       <Link
                         className="fw-medium"
-                        to={`/profile/${weight.maybe_creator_user?.display_name}`}
+                        to={`/profile/${weight.creator?.display_name}`}
                       >
-                        {weight.maybe_creator_user?.display_name}
+                        {weight.creator?.display_name}
                       </Link>
                     ) : (
                       <p className="fw-medium text-white">Anonymous</p>
@@ -494,7 +493,7 @@ export default function WeightPage({
               </Accordion>
 
               {sessionWrapper.canEditTtsModelByUserToken(
-                weight.maybe_creator_user?.user_token
+                weight.creator?.user_token
               ) && (
                 <div className="d-flex gap-2">
                   <Button
@@ -586,7 +585,8 @@ export default function WeightPage({
         show={isDeleteModalOpen}
         handleClose={closeDeleteModal}
         title="Delete Weight"
-        content="Are you sure you want to delete this weight? This action cannot be undone."
+        content={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
+        onConfirm={remove}
       />
     </div>
   );

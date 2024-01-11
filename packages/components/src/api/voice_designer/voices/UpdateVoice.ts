@@ -10,7 +10,7 @@ export interface UpdateVoiceResponse {
     success: boolean,
 }
 
-export const UpdateVoice = MakeRequest<string, UpdateVoiceRequest, UpdateVoiceResponse>({
+export const UpdateVoice = MakeRequest<string, UpdateVoiceRequest, UpdateVoiceResponse, {}>({
     method: "POST", 
     routingFunction: (voiceToken:  string) => `/v1/voice_designer/voice/${ voiceToken }/update`,
 });

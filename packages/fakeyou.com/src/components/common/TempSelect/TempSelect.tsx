@@ -3,9 +3,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import "../Select/Select.scss";
 import ReactSelect, { Props as ReactSelectProps } from "react-select";
+import "./Select.scss";
 
 export interface Option {
-  value: string | number;
+  value: string | number | boolean;
   label: string;
 }
 
@@ -16,6 +17,7 @@ export interface SelectProps extends ReactSelectProps {
   small?: boolean;
   options: Option[];
   onChange?: (value: any) => void;
+  required?: boolean;
 }
 
 export default function Select({
@@ -27,13 +29,16 @@ export default function Select({
   rounded,
   small,
   value,
+  required,
   ...rest
 }: SelectProps) {
   const valueLabel =
     options.find((option: any) => option.value === value)?.label || "";
   const onChange = ({ value }: any) =>
     inChange({ target: { value, name, type: "select" } });
-
+  const className = `${icon ? " input-icon" : ""}${
+    small ? " select-small" : ""
+  }`;
   const classNames = {
     control: ({ isFocused }: { isFocused: boolean }) =>
       `select${icon ? " with-icon" : ""}${rounded ? " rounded-full" : ""}${
@@ -48,13 +53,14 @@ export default function Select({
   };
 
   return (
-    <div>
-      {label && <label className="sub-title">{label}</label>}
-      <div
-        className={`form-group${icon ? " input-icon" : ""}${
-          small ? " select-small" : ""
-        }`}
-      >
+    // Changed fragment to div here just so that it can be laid out with bootstrap easily using d-flex, flex-column and responsive gaps which requires grouping.
+    <div className="fy-select">
+      {label && (
+        <label className={`sub-title ${required ? "required" : ""}`}>
+          {label}
+        </label>
+      )}
+      <div {...{ className }}>
         {icon && (
           <FontAwesomeIcon icon={icon} className="form-control-feedback" />
         )}

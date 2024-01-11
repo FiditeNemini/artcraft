@@ -73,7 +73,9 @@ export default function AudioPlayer({ src, id }: AudioPlayerProps) {
     }
   }, [isPlayerOnScreen, isPlaying]);
 
-  const togglePlayPause = () => {
+  const togglePlayPause = (event: any) => {
+    event.preventDefault();
+    event.stopPropagation();
     if (waveSurferRef.current) {
       if (!isPlaying) {
         setCurrentPlayingId(id);

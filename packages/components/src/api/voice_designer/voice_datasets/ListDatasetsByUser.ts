@@ -22,7 +22,7 @@ export interface ListDatasetsByUserResponse {
     datasets: Dataset[],
 }
 
-export const ListDatasetsByUser = MakeRequest<string, ListDatasetsByUserRequest, ListDatasetsByUserResponse>({
+export const ListDatasetsByUser = MakeRequest<string, ListDatasetsByUserRequest, ListDatasetsByUserResponse, {}>({
     method: "GET", 
     routingFunction: (userName:  string) => `/v1/voice_designer/dataset/user/${ userName }/list`,
 });

@@ -87,17 +87,14 @@ function Tabs({ tabs }: TabsProps) {
         ))}
       </ul>
       <TabContent padding={activeTabProps?.padding}>
-        {tabs.map(tab => (
-          <a.div
-            key={tab.to}
-            style={fade}
-            className={`tab-pane fade ${
-              activeTab === tab.to ? "show active" : ""
-            }`}
-          >
-            {tab.content}
-          </a.div>
-        ))}
+        <a.div
+          style={fade}
+          className={`tab-pane fade ${
+            activeTab === activeTabProps?.to ? "show active" : ""
+          }`}
+        >
+          {activeTabProps?.content}
+        </a.div>
       </TabContent>
     </nav>
   );

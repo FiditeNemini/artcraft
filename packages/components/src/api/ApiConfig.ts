@@ -132,6 +132,10 @@ class ApiConfig {
     return `${this.getApiOrigin()}/tts/search`;
   }
 
+  searchWeights(): string {
+    return `${this.getApiOrigin()}/v1/weights/search`;
+  }
+
   getPendingTtsJobCount(): string {
     return `${this.getApiOrigin()}/tts/queue_length`;
   }
@@ -431,6 +435,16 @@ class ApiConfig {
 
   getMediaFile(mediaFileToken: string): string {
     return `${this.getApiOrigin()}/v1/media_files/file/${mediaFileToken}`;
+  }
+
+  // =============== Weights Files ===============
+
+  getWeights(params: string): string {
+    return `${this.getApiOrigin()}/v1/weights/list${params}`;
+  }
+
+  getWeight(params: string): string {
+    return `${this.getApiOrigin()}/v1/weights/weight/${params}`;
   }
 
   // =============== File Uploads ===============

@@ -14,9 +14,6 @@ interface RouteSetup<UrlRouteArgs> {
     routingFunction: UrlRoutingFunction<UrlRouteArgs>;
 } 
   
-//const formatUrl = (endpoint = "") =>
-//  `${useSsl ? "https" : "http"}://${host + endpoint}`;
-  
 const METHOD_OMITS_BODY: { [key: string]: boolean } = {
   DELETE: false,
   GET: true,
@@ -26,11 +23,14 @@ const METHOD_OMITS_BODY: { [key: string]: boolean } = {
   PUT: false,
 };
 
-const MakeRequest = <UrlRouteArgs, Request, Response>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request) => Promise<Response> => {
-    return async function(urlRouteArgs: UrlRouteArgs, request: Request) : Promise<Response> {
-        const endpoint = routeSetup.routingFunction(urlRouteArgs);
-        const method = routeSetup.method;
+const MakeRequest = <UrlRouteArgs, Request, Response, UrlParams>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request, queries?: UrlParams) => Promise<Response> => {
+    return async function(urlRouteArgs: UrlRouteArgs, request: Request, queries?: any) : Promise<Response> {
+        const newQueries = queries ? Object.keys(queries).map((key, i) => {
+            return `${ i ? "&" : "" }${ key }=${ Array.isArray(queries[key]) ? queries[key].join(`&${ key }=`) : queries[key] }`
+        }).join("") : null;
 
+        const endpoint = `${ routeSetup.routingFunction(urlRouteArgs) }${ newQueries ? "?" + newQueries : "" }`;
+        const method = routeSetup.method;
         const methodOmitsBody = METHOD_OMITS_BODY[method] || false;
 
         return fetch(formatUrl(endpoint), {

@@ -82,4 +82,12 @@
       color: rgba($white, 0.8);
     }
   }
+
+  h6 {
+    //2 lines of text then ellipsis
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }

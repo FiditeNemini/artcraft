@@ -5,27 +5,28 @@ import {
   faTrophy,
   faWaveformLines,
   faStar,
-  faUser,
-  faSignOutAlt,
   faFaceViewfinder,
   faCloudUpload,
   faWandMagicSparkles,
-  faCameraMovie,
+  faHome,
+  faCompass,
+  faUser,
+  faSignOutAlt,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Button from "components/common/Button/Button";
 import React, { useEffect, useState } from "react";
-import { Link, NavLink, useHistory, useRouteMatch } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import {
   GetQueueStats,
   GetQueueStatsIsOk,
   GetQueueStatsSuccessResponse,
 } from "@storyteller/components/src/api/stats/queues/GetQueueStats";
-import { WebUrl } from "common/WebUrl";
-import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
 import { useLocalize } from "hooks";
+import { Logout } from "@storyteller/components/src/api/session/Logout";
+import { Button } from "components/common";
+import { WebUrl } from "common/WebUrl";
 
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
@@ -36,19 +37,28 @@ interface SideNavProps {
   querySessionSubscriptionsCallback: () => void;
 }
 
-export default function SideNav(props: SideNavProps) {
+export default function SideNav({
+  sessionWrapper,
+  querySessionCallback,
+  querySessionSubscriptionsCallback,
+}: SideNavProps) {
   const { t } = useLocalize("SideNav");
-  let history = useHistory();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const fakeYouFrontendEnv = FakeYouFrontendEnvironment.getInstance();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isDevelopmentEnv = fakeYouFrontendEnv.isDevelopment();
-  const handleNavLinkClick = () => {
-    const wrapper = document.getElementById("wrapper");
+  const wrapper = document.getElementById("wrapper");
+  const isMenuOpen = wrapper?.classList.contains("toggled");
 
+  let history = useHistory();
+  const handleNavLinkClick = () => {
     if (window.innerWidth < 992) {
       if (wrapper) {
         wrapper.classList.toggle("toggled");
+        // Dispatch the event here after toggling the class (Links with the TopNav menu icon change)
+        window.dispatchEvent(
+          new CustomEvent("menuToggle", { detail: { isOpen: isMenuOpen } })
+        );
       }
     }
   };
@@ -74,11 +84,6 @@ export default function SideNav(props: SideNavProps) {
     };
   }, []);
 
-  const matchHome = useRouteMatch({
-    path: "/",
-    exact: true,
-  });
-
   useEffect(() => {
     // Update window width on resize
     const handleResize = () => {
@@ -93,19 +98,17 @@ export default function SideNav(props: SideNavProps) {
     };
   }, []);
 
-  const shouldShowSidebar = windowWidth >= 992 && matchHome;
+  const shouldShowSidebar = windowWidth >= 992;
 
   useEffect(() => {
-    const wrapper = document.getElementById("wrapper");
+    const contentWrapper = document.getElementById("page-content-wrapper");
 
     if (windowWidth >= 992) {
-      if (matchHome) {
-        wrapper?.classList.add("no-padding");
-      } else {
-        wrapper?.classList.remove("no-padding");
-      }
+      contentWrapper?.classList.remove("no-padding");
+    } else {
+      contentWrapper?.classList.add("no-padding");
     }
-  }, [matchHome, windowWidth]);
+  }, [windowWidth]);
 
   const [queueStats, setQueueStats] = useState<GetQueueStatsSuccessResponse>({
     success: true,
@@ -149,24 +152,23 @@ export default function SideNav(props: SideNavProps) {
 
   const logoutHandler = async () => {
     await Logout();
-    props.querySessionCallback();
-    props.querySessionSubscriptionsCallback();
+    querySessionCallback();
+    querySessionSubscriptionsCallback();
     // PosthogClient.reset();
     // Analytics.accountLogout();
     history.push("/");
   };
 
-  const loggedIn = props.sessionWrapper.isLoggedIn();
+  const loggedIn = sessionWrapper.isLoggedIn();
 
   let userOrLoginButton = (
     <>
       <Button
-        label={t("loginButton")}
+        label="Login"
         small
         variant="secondary"
         onClick={() => {
           history.push("/login");
-          handleNavLinkClick();
         }}
       />
     </>
@@ -175,18 +177,17 @@ export default function SideNav(props: SideNavProps) {
   let signupOrLogOutButton = (
     <>
       <Button
-        label={t("signUpButton")}
+        label="Sign Up"
         small
         onClick={() => {
           history.push("/signup");
-          handleNavLinkClick();
         }}
       />
     </>
   );
 
   if (loggedIn) {
-    let displayName = props.sessionWrapper.getDisplayName();
+    let displayName = sessionWrapper.getDisplayName();
     // let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
     // let gravatar = <span />;
 
@@ -199,12 +200,11 @@ export default function SideNav(props: SideNavProps) {
       <>
         <Button
           icon={faUser}
-          label={t("profileButton")}
+          label="My Profile"
           small
           variant="secondary"
           onClick={() => {
             history.push(url);
-            handleNavLinkClick();
           }}
         />
       </>
@@ -214,15 +214,32 @@ export default function SideNav(props: SideNavProps) {
       <>
         <Button
           icon={faSignOutAlt}
-          label={t("logOutButton")}
+          label="Logout"
           small
           variant="danger"
           onClick={async () => {
             await logoutHandler();
-            handleNavLinkClick();
           }}
         />
       </>
+    );
+  }
+
+  if (sessionWrapper.isLoggedIn()) {
+    let displayName = sessionWrapper.getDisplayName();
+    if (displayName === undefined) {
+      displayName = "My Account";
+    }
+    let url = WebUrl.userProfilePage(displayName);
+    userOrLoginButton = (
+      <Button
+        icon={faUser}
+        label="My Profile"
+        small
+        variant="secondary"
+        onClick={() => history.push(url)}
+        className="d-block d-lg-none"
+      />
     );
   }
 
@@ -234,183 +251,200 @@ export default function SideNav(props: SideNavProps) {
     queueStats.inference.by_queue.pending_tacotron2_jobs;
 
   return (
-    <div
-      id="sidebar-wrapper"
-      className={`sidebar ${shouldShowSidebar ? "" : "visible"}`}
-    >
-      <ul className="sidebar-nav">
-        <div className="sidebar-brand">
-          <Link to="/" onClick={handleNavLinkClick}>
-            <img
-              src="/fakeyou/FakeYou-Logo.png"
-              alt="FakeYou: Cartoon and Celebrity Text to Speech"
-              height="36"
-            />
-          </Link>
+    <>
+      <div
+        id="sidebar-wrapper"
+        className={`sidebar ${shouldShowSidebar ? "visible" : ""}`}
+      >
+        <div>
+          <ul className="sidebar-nav">
+            <li>
+              <NavLink
+                exact={true}
+                to="/"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faHome}
+                  className="sidebar-heading-icon"
+                />
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/pricing"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faStar}
+                  className="sidebar-heading-icon"
+                />
+                {t("infoPricing")}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/explore"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faCompass}
+                  className="sidebar-heading-icon"
+                />
+                Explore
+              </NavLink>
+            </li>
+            <hr className="mb-3 mt-3" />
+            <li className="sidebar-heading">AI Tools</li>
+            <li>
+              <NavLink
+                to="/tts"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faMessageDots}
+                  className="sidebar-heading-icon"
+                />
+                {t("speechTts")}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/voice-conversion"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faWaveformLines}
+                  className="sidebar-heading-icon"
+                />
+                {t("speechVc")}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/voice-designer"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faWandMagicSparkles}
+                  className="sidebar-heading-icon"
+                />
+                {"Voice Designer"}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/face-animator"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faFaceViewfinder}
+                  className="sidebar-heading-icon"
+                />
+                {t("videoFaceAnimator")}
+              </NavLink>
+            </li>
+
+            <hr className="mb-3 mt-3" />
+            <li className="sidebar-heading">{t("communityTitle")}</li>
+            <li>
+              <NavLink
+                to="/contribute"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faCloudUpload}
+                  className="sidebar-heading-icon"
+                />
+                {t("communityUploadModels")}
+              </NavLink>
+            </li>
+            <li>
+              <a
+                href="https://discord.gg/fakeyou"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <FontAwesomeIcon
+                  icon={faDiscord}
+                  className="sidebar-heading-icon"
+                />
+                {t("communityDiscord")}
+              </a>
+              <NavLink
+                to="/leaderboard"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faTrophy}
+                  className="sidebar-heading-icon"
+                />
+                {t("communityLeaderboard")}
+              </NavLink>
+              <NavLink
+                to="/guide"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faBookOpen}
+                  className="sidebar-heading-icon"
+                />
+                {t("communityGuide")}
+              </NavLink>
+            </li>
+          </ul>
         </div>
-        <div className="sidebar-buttons d-flex gap-2 mt-4">
-          {userOrLoginButton}
-          {signupOrLogOutButton}
+
+        <div className="mobile-fixed-bottom">
+          <div className="sidebar-heading">Jobs Queue</div>
+          <div className="ps-4">
+            <div>
+              {t("queueTts")}:{" "}
+              <span className="text-red">{ttsQueuedCount}</span>
+            </div>
+            <div>
+              {t("queueRvc")}:{" "}
+              <span className="text-red">
+                {queueStats.inference.by_queue.pending_rvc_jobs}
+              </span>
+            </div>
+            <div>
+              {t("queueSvc")}:{" "}
+              <span className="text-red">
+                {queueStats.inference.by_queue.pending_svc_jobs}
+              </span>
+            </div>
+            <div>
+              {t("queueFaceAnimator")}:{" "}
+              <span className="text-red">
+                {queueStats.inference.by_queue.pending_face_animation_jobs}
+              </span>
+            </div>
+            <div>
+              Voice Designer:{" "}
+              <span className="text-red">
+                {queueStats.inference.by_queue.pending_voice_designer}
+              </span>
+            </div>
+          </div>
+
+          <div className="px-4 d-flex d-lg-none gap-2 mt-3">
+            {userOrLoginButton}
+            {signupOrLogOutButton}
+          </div>
         </div>
-        <hr className="my-4" />
-
-        <li className="sidebar-heading">{t("speechTitle")}</li>
-        <li>
-          <NavLink
-            to="/tts"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon
-              icon={faMessageDots}
-              className="sidebar-heading-icon"
-            />
-            {t("speechTts")}
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/voice-conversion"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon
-              icon={faWaveformLines}
-              className="sidebar-heading-icon"
-            />
-            {t("speechVc")}
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/voice-designer"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon
-              icon={faWandMagicSparkles}
-              className="sidebar-heading-icon"
-            />
-            {"Voice Designer"}
-          </NavLink>
-        </li>
-        <hr className="mb-4 mt-3" />
-        <li className="sidebar-heading">{t("videoTitle")}</li>
-        <li>
-          <NavLink
-            to="/face-animator"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon
-              icon={faFaceViewfinder}
-              className="sidebar-heading-icon"
-            />
-            {t("videoFaceAnimator")}
-          </NavLink>
-        </li>
-
-        <li>
-          <NavLink
-            to="/storyteller-studio"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon
-              icon={faCameraMovie}
-              className="sidebar-heading-icon"
-            />
-            Storyteller Studio
-            {/* {t("videoStorytellerStudio")} */}
-          </NavLink>
-        </li>
-
-        <hr className="mb-4 mt-3" />
-        <li className="sidebar-heading">{t("communityTitle")}</li>
-        <li>
-          <NavLink
-            to="/contribute"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon
-              icon={faCloudUpload}
-              className="sidebar-heading-icon"
-            />
-            {t("communityUploadModels")}
-          </NavLink>
-        </li>
-        <li>
-          <a href="https://discord.gg/fakeyou" target="_blank" rel="noreferrer">
-            <FontAwesomeIcon
-              icon={faDiscord}
-              className="sidebar-heading-icon"
-            />
-            {t("communityDiscord")}
-          </a>
-          <NavLink
-            to="/leaderboard"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon icon={faTrophy} className="sidebar-heading-icon" />
-            {t("communityLeaderboard")}
-          </NavLink>
-          <NavLink
-            to="/guide"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon
-              icon={faBookOpen}
-              className="sidebar-heading-icon"
-            />
-            {t("communityGuide")}
-          </NavLink>
-        </li>
-        <hr className="mb-3 mt-3" />
-        <li>
-          <NavLink
-            to="/pricing"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon icon={faStar} className="sidebar-heading-icon" />
-            {t("infoPricing")}
-          </NavLink>
-        </li>
-        <hr className="mb-4 mt-3" />
-        <li className="sidebar-heading">{t("queueTitle")}</li>
-        <li className="ps-4 fs-7 mb-5">
-          <div>
-            {t("queueTts")}: <span className="text-red">{ttsQueuedCount}</span>
-          </div>
-          <div>
-            {t("queueRvc")}:{" "}
-            <span className="text-red">
-              {queueStats.inference.by_queue.pending_rvc_jobs}
-            </span>
-          </div>
-          <div>
-            {t("queueSvc")}:{" "}
-            <span className="text-red">
-              {queueStats.inference.by_queue.pending_svc_jobs}
-            </span>
-          </div>
-          <div>
-            {t("queueFaceAnimator")}:{" "}
-            <span className="text-red">
-              {queueStats.inference.by_queue.pending_face_animation_jobs}
-            </span>
-          </div>
-          <div>
-            Voice Designer:{" "}
-            <span className="text-red">
-              {queueStats.inference.by_queue.pending_voice_designer}
-            </span>
-          </div>
-        </li>
-      </ul>
-    </div>
+      </div>
+    </>
   );
 }

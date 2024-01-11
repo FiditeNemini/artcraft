@@ -21,9 +21,9 @@ export default function SkeletonCard(props: SkeletonCardProps) {
           <h6 className="fw-semibold text-white mb-1 mt-3">
             <Skeleton type="medium" />
           </h6>
-          <p className="fs-7 opacity-75">
+          <div className="fs-7 opacity-75">
             <Skeleton type="short" />
-          </p>
+          </div>
         </div>
 
         <div>

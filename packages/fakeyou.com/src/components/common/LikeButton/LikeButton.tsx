@@ -2,39 +2,53 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/pro-solid-svg-icons";
 import { faHeart as faHeartOutline } from "@fortawesome/pro-regular-svg-icons";
+import { WorkDots } from "components/svg";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "./LikeButton.scss";
 import useShortenNumber from "hooks/useShortenNumber";
 
 interface LikeButtonProps {
-  initialToggled?: boolean;
-  onToggle: (toggled: boolean) => Promise<void>;
+  busy?: boolean;
+  entityToken?: string;
+  entityType?: string;
   likeCount: number;
+  isToggled: boolean;
   overlay?: boolean;
   large?: boolean;
+  toggle: (entityToken: string, entityType: string) => any
 }
 
 export default function LikeButton({
-  initialToggled = false,
-  onToggle,
-  likeCount,
+  busy,
+  entityToken = "",
+  entityType = "",
+  likeCount = 0, // useShortenNumber freaks out if likeCount = NaN, give it a default value until it loads
+  isToggled,
   overlay,
   large,
+  toggle
 }: LikeButtonProps) {
-  const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleClick = async () => {
-    setIsLoading(true);
-    try {
-      await onToggle(!isToggled);
-      setIsToggled(!isToggled);
-    } catch (error) {
-      console.error("Error calling API", error);
-    } finally {
+  // console.log("😎",busy);
+
+  const handleClick = async (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    // setIsLoading(true);
+    toggle(entityToken, entityType).then((isToggled: boolean) => {
+      // setIsToggled(isToggled);
       setIsLoading(false);
-    }
+    });
+    // try {
+    //   await onToggle(!isToggled);
+    //   setIsToggled(!isToggled);
+    // } catch (error) {
+    //   console.error("Error calling API", error);
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const buttonClass = isToggled ? "like-button toggled" : "like-button";
@@ -44,7 +58,7 @@ export default function LikeButton({
   let likeCountShort = useShortenNumber(likeCount);
 
   return (
-    <div className="d-flex gap-2" onClick={handleClick}>
+    <div className="d-flex gap-2">
       <Tippy
         theme="fakeyou"
         content={toolTip}
@@ -63,7 +77,9 @@ export default function LikeButton({
             icon={isToggled ? faHeart : faHeartOutline}
             className={`${iconClass} me-2`}
           />
-          {likeCount && <p className="like-number">{likeCountShort}</p>}
+            <div className="like-number">
+              <WorkDots {...{ labels: [likeCountShort], index: busy ? 0 : 1 }}/>
+            </div>
         </button>
       </Tippy>
     </div>

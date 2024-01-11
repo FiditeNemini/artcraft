@@ -5,13 +5,19 @@ interface CardProps {
   padding?: boolean;
   children?: React.ReactNode;
   onClick?: () => void;
+  canHover?: boolean;
 }
 
-export default function Card({ padding, children, onClick }: CardProps) {
+export default function Card({
+  padding,
+  children,
+  onClick,
+  canHover,
+}: CardProps) {
   return (
     <div
       className={`card ${padding ? "p-3" : ""} ${
-        onClick ? "card-clickable" : ""
+        onClick || canHover ? "card-clickable" : ""
       }`}
       onClick={onClick}
     >

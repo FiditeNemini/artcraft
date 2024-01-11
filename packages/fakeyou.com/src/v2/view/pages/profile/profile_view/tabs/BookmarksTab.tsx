@@ -1,45 +1,111 @@
 import React, { useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-import AudioCard from "components/common/Card/AudioCard";
-import ImageCard from "components/common/Card/ImageCard";
-import VideoCard from "components/common/Card/VideoCard";
 import SkeletonCard from "components/common/Card/SkeletonCard";
-import mockWeightsData from "./mockWeightsData";
-import Select from "components/common/Select";
+import { TempSelect } from "components/common";
 import {
   faArrowDownWideShort,
   faFilter,
 } from "@fortawesome/pro-solid-svg-icons";
 import Pagination from "components/common/Pagination";
 
-export default function BookmarksTab() {
+import { useBookmarks, useListContent, useRatings } from "hooks";
+import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
+import WeightsCards from "components/common/Card/WeightsCards";
+import prepFilter from "resources/prepFilter";
+
+export default function BookmarksTab({ username }: { username: string }) {
+  const { pathname: origin, search } = useLocation();
+  const urlQueries = new URLSearchParams(search);
+  const bookmarks = useBookmarks();
+  const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [data] = useState(mockWeightsData);
-  const [isLoading] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState("all");
-  const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 10;
+  const [showMasonryGrid, setShowMasonryGrid] = useState(true);
+  const [weightType, weightTypeSet] = useState(
+    urlQueries.get("maybe_scoped_weight_type") || "all"
+  );
+  const [sd, sdSet] = useState("all");
+  const [tts, ttsSet] = useState("all");
+  const [vc, vcSet] = useState("all");
+  const [weightCategory, weightCategorySet] = useState(
+    urlQueries.get("maybe_scoped_weight_category") || "all"
+  );
+  const [list, listSet] = useState<any[]>([]);
+  // const resetMasonryGrid = () => {
+  //   setShowMasonryGrid(false);
+  //   setTimeout(() => setShowMasonryGrid(true), 10);
+  // };
+  const {
+    // filter,
+    isLoading,
+    list: dataList,
+    onChange,
+    page,
+    pageChange,
+    pageCount,
+    sort,
+    status,
+  } = useListContent({
+    addQueries: {
+      page_size: 24,
+      ...prepFilter(weightType, "maybe_scoped_weight_type"),
+      ...prepFilter(weightCategory, "maybe_scoped_weight_category"),
+    },
+    addSetters: { sdSet, ttsSet, vcSet, weightCategorySet, weightTypeSet },
+    debug: "bookmarks tab",
+    fetcher: GetBookmarksByUser,
+    list,
+    listSet,
+    onInputChange: () => setShowMasonryGrid(false),
+    onSuccess: (res) => {
+      bookmarks.gather({ res, key: "weight_token" });
+      setShowMasonryGrid(true);
+    },
+    requestList: true,
+    urlParam: username,
+  });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    setCurrentPage(selectedItem.selected);
+    pageChange(selectedItem.selected);
   };
 
-  const currentItems = data.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
+  const paginationProps = {
+    onPageChange: handlePageClick,
+    pageCount,
+    currentPage: page,
+  };
+
+  // const filterOptions = [
+  //   { value: "all", label: "All Weights" },
+  //   { value: "tts", label: "Text to Speech" },
+  //   { value: "vc", label: "Voice to Voice" },
+  //   { value: "sd", label: "Image Generation" },
+  // ];
 
   const filterOptions = [
-    { value: "all", label: "All Weights" },
-    { value: "tts", label: "Text to Speech" },
-    { value: "vc", label: "Voice to Voice" },
-    { value: "sd", label: "Image Generation" },
+    // these probably need beter labels
+    { value: "all", label: "All weight types" },
+    { value: "hifigan_tt2", label: "hifigan_tt2" },
+    { value: "sd_1.5", label: "sd_1.5" },
+    { value: "sdxl", label: "sdxl" },
+    { value: "so_vits_svc", label: "so_vits_svc" },
+    { value: "tt2", label: "tt2" },
+    { value: "loRA", label: "loRA" },
+    { value: "vall_e", label: "vall_e" },
+  ];
+
+  const weightCategoryOpts = [
+    { value: "all", label: "All weight categories" },
+    { value: "image_generation", label: "Image generation" },
+    { value: "text_to_speech", label: "Text to speech" },
+    { value: "vocoder", label: "Vocoder" },
+    { value: "voice_conversion", label: "Voice conversion" },
   ];
 
   const sortOptions = [
-    { value: "newest", label: "Newest" },
-    { value: "oldest", label: "Oldest" },
-    { value: "mostliked", label: "Most Bookmarked" },
+    { value: false, label: "Newest" },
+    { value: true, label: "Oldest" },
+    // { value: "mostliked", label: "Most Liked" },
   ];
 
   const modelTtsOptions = [
@@ -60,101 +126,126 @@ export default function BookmarksTab() {
     { value: "SDXL", label: "SD XL" },
   ];
 
-  const handleFilterChange = (option: any) => {
-    const selectedOption = option as { value: string; label: string };
-    setSelectedFilter(selectedOption.value);
-  };
-
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
-        <div className="d-flex gap-2 flex-grow-1">
-          <Select
-            icon={faArrowDownWideShort}
-            options={sortOptions}
-            defaultValue={sortOptions[0]}
-            isSearchable={false}
+        <div className="d-flex flex-grow-1 flex-wrap gap-2">
+          <TempSelect
+            {...{
+              icon: faArrowDownWideShort,
+              options: sortOptions,
+              name: "sort",
+              onChange,
+              value: sort,
+            }}
           />
-
-          <Select
-            icon={faFilter}
-            options={filterOptions}
-            defaultValue={filterOptions[0]}
-            isSearchable={false}
-            onChange={handleFilterChange}
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: filterOptions,
+              name: "weightType",
+              onChange,
+              value: weightType,
+            }}
           />
-
-          {selectedFilter === "tts" && (
-            <Select
-              options={modelTtsOptions}
-              defaultValue={modelTtsOptions[0]}
-              isSearchable={false}
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: weightCategoryOpts,
+              name: "weightCategory",
+              onChange,
+              value: weightCategory,
+            }}
+          />
+          {weightType === "tts" && (
+            <TempSelect
+              {...{
+                options: modelTtsOptions,
+                name: "tts",
+                onChange,
+                value: tts,
+              }}
             />
           )}
-          {selectedFilter === "sd" && (
-            <Select
-              options={modelSdOptions}
-              defaultValue={modelSdOptions[0]}
-              isSearchable={false}
+          {weightType === "sd" && (
+            <TempSelect
+              {...{
+                options: modelSdOptions,
+                name: "sd",
+                onChange,
+                value: sd,
+              }}
             />
           )}
-          {selectedFilter === "vc" && (
-            <Select
-              options={modelVcOptions}
-              defaultValue={modelVcOptions[0]}
-              isSearchable={false}
+          {weightType === "vc" && (
+            <TempSelect
+              {...{
+                options: modelVcOptions,
+                name: "vc",
+                onChange,
+                value: vc,
+              }}
             />
           )}
         </div>
-        <Pagination
-          itemsPerPage={itemsPerPage}
-          totalItems={data.length}
-          onPageChange={handlePageClick}
-          currentPage={currentPage}
-        />
+        <Pagination {...paginationProps} />
       </div>
       {isLoading ? (
         <div className="row gx-3 gy-3">
-          {Array.from({ length: 6 }).map((_, index) => (
+          {Array.from({ length: 12 }).map((_, index) => (
             <SkeletonCard key={index} />
           ))}
         </div>
       ) : (
-        <MasonryGrid
-          gridRef={gridContainerRef}
-          onLayoutComplete={() => console.log("Layout complete!")}
-        >
-          {currentItems.map((data, index) => {
-            let card;
-            switch (data.media_type) {
-              case "audio":
-                card = <AudioCard key={index} data={data} type="weights" />;
-                break;
-              case "image":
-                card = <ImageCard key={index} data={data} type="weights" />;
-                break;
-              case "video":
-                card = <VideoCard key={index} data={data} type="weights" />;
-                break;
-              default:
-                card = <div key={index}>Unsupported media type</div>;
-            }
-            return (
-              <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
-                {card}
+        showMasonryGrid && (
+          <>
+            {dataList.length === 0 && status === 3 ? (
+              <div className="text-center mt-4 opacity-75">
+                No bookmarked weights yet.
               </div>
-            );
-          })}
-        </MasonryGrid>
+            ) : (
+              <MasonryGrid
+                gridRef={gridContainerRef}
+                onLayoutComplete={() => console.log("Layout complete!")}
+              >
+                {dataList.map((data: any, key: number) => {
+                  let weightProps = { bookmarks, data, origin, ratings, showCreator: true, type: "weights" };
+
+                  // let mediaProps = {
+                  //   bookmarks,
+                  //   data,
+                  //   origin,
+                  //   type: "media",
+                  //   showCreator: true,
+                  // };
+
+                  return (
+                    <div
+                      {...{
+                        className: "col-12 col-sm-6 col-xl-4 grid-item",
+                        key,
+                      }}
+                    >
+                      <WeightsCards
+                        {...{
+                          type: data.details.maybe_weight_data.weight_category,
+                          props: weightProps,
+                        }}
+                      />
+                      {/* <MediaCards
+                        {...{ type: data.media_type, props: mediaProps }}
+                      /> */}
+                    </div>
+                  );
+                })}
+              </MasonryGrid>
+            )}
+          </>
+        )
       )}
 
       <div className="d-flex justify-content-end mt-4">
-        <Pagination
-          itemsPerPage={itemsPerPage}
-          totalItems={data.length}
-          onPageChange={handlePageClick}
-          currentPage={currentPage}
-        />
+        <Pagination {...paginationProps} />
       </div>
     </>
   );

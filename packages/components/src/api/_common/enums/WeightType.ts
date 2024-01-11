@@ -7,4 +7,5 @@ export enum WeightType {
   SVC = "so_vits_svc",
   LORA = "loRA",
   VALL_E = "vall_e",
+  NONE = "none",
 }

@@ -1,101 +1,217 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Card from "../Card";
 import AudioPlayer from "components/common/AudioPlayer";
 import useTimeAgo from "hooks/useTimeAgo";
 import Badge from "components/common/Badge";
 import LikeButton from "components/common/LikeButton";
-import FavoriteButton from "components/common/FavoriteButton";
+import BookmarkButton from "components/common/BookmarkButton";
+import CreatorName from "../CreatorName";
+import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import Button from "components/common/Button";
+import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
+import WeightCoverImage from "components/common/WeightCoverImage";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface AudioCardProps {
+  bookmarks: any;
   data: any;
+  origin?: string;
+  ratings: any;
+  showCreator?: boolean;
+  showCover?: boolean;
   type: "media" | "weights";
 }
 
-export default function AudioCard({ data, type }: AudioCardProps) {
-  const history = useHistory();
-
-  const handleCardClick = () => {
-    if (type === "media") {
-      history.push(`/media/${data.token}`);
-    } else if (type === "weights") {
-      history.push(`/weights/${data.token}`);
-    }
-  };
+export default function AudioCard({
+  bookmarks,
+  data,
+  origin = "",
+  ratings,
+  showCreator,
+  showCover,
+  type,
+}: AudioCardProps) {
+  const linkUrl =
+    type === "media"
+      ? `/media/${data.token}`
+      : `/weight/${data.weight_token || data.details.entity_token}${
+          origin ? "?origin=" + origin : ""
+        }`;
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
   };
 
-  const handleUseModel = () => {
-    if (type === "weights") {
-      history.push(`/weights/${data.token}`);
-    }
-  };
-
   const timeAgo = useTimeAgo(data.created_at);
 
-  const handleLike = async (data: any) => {
-    console.log(`The item is now ${data.isLiked ? "liked" : "not liked"}.`);
-  };
+  const { label: weightBadgeLabel, color: weightBadgeColor } =
+    useWeightTypeInfo(
+      data.weight_type || data.details?.maybe_weight_data?.weight_type
+    );
+
+  const bucketConfig = new BucketConfig();
+  let coverImage = "/images/avatars/default-pfp.png";
+
+  if (type === "media") {
+    coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 400, 100);
+  } else if (type === "weights") {
+    if (data.maybe_cover_image_public_bucket_path) {
+      coverImage = bucketConfig.getCdnUrl(
+        data.maybe_cover_image_public_bucket_path,
+        100,
+        100
+      );
+    }
+    if (data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path) {
+      coverImage = bucketConfig.getCdnUrl(
+        data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path,
+        100,
+        100
+      );
+    }
+  }
+
+  // console.log("💎",ratings?.list[data.weight_token]);
 
   return (
-    <Card padding={true} onClick={handleCardClick}>
-      {type === "media" && (
-        <>
-          <div className="mb-3">
-            <div className="d-flex align-items-center">
-              <div className="d-flex flex-grow-1">
-                <Badge label="Audio" color="teal" />
+    <Link
+      {...{
+        to: linkUrl,
+        state: { origin },
+      }}
+    >
+      <Card padding={true} canHover={true}>
+        {type === "media" && (
+          <>
+            <div className="mb-3">
+              <div className="d-flex align-items-center">
+                <div className="d-flex flex-grow-1 align-items-center gap-2">
+                  <Badge label="Audio" color="teal" />
+                </div>
               </div>
+
+              <h6 className="fw-semibold text-white mb-1 mt-3">
+                {data.weight_name}
+              </h6>
+              <p className="fs-7 opacity-75">{timeAgo}</p>
             </div>
 
-            <h6 className="fw-semibold text-white mb-1 mt-3">
-              {data.weight_name}
-            </h6>
-            <p className="fs-7 opacity-75">{timeAgo}</p>
-          </div>
-
-          <div onClick={handleInnerClick}>
             <AudioPlayer src={data.public_bucket_path} id={data.token} />
-          </div>
 
-          <div className="mt-3" onClick={handleInnerClick}>
-            <LikeButton onToggle={handleLike} likeCount={data.likes} />
-          </div>
-        </>
-      )}
+            <hr className="my-3" />
 
-      {type === "weights" && (
-        <>
-          <div>
-            <div className="d-flex align-items-center">
-              <div className="d-flex flex-grow-1">
-                <Badge label="RVC" color="orange" />
-              </div>
-              <div onClick={handleInnerClick}>
-                <FavoriteButton
-                  onToggle={handleLike}
-                  favoriteCount={data.likes}
-                />
+            <div
+              className="d-flex align-items-center gap-2"
+              onClick={handleInnerClick}
+            >
+              {showCreator && (
+                <div className="flex-grow-1">
+                  <CreatorName
+                    displayName={
+                      data.maybe_creator?.display_name || "Anonymous"
+                    }
+                    gravatarHash={data.maybe_creator?.gravatar_hash || null}
+                    avatarIndex={
+                      data.maybe_creator?.default_avatar.image_index || 0
+                    }
+                    backgroundIndex={
+                      data.maybe_creator?.default_avatar.color_index || 0
+                    }
+                    username={data.maybe_creator?.username || "anonymous"}
+                  />
+                </div>
+              )}
+
+              <div>
+
+                <LikeButton {...{
+                  likeCount: data.likes,
+                  ...ratings.makeProps({
+                    entityToken: data.token,
+                    entityType: "media_file"
+                  })
+                }} />
+
               </div>
             </div>
+          </>
+        )}
 
-            <div className="d-flex align-items-center mt-3">
+        {type === "weights" && (
+          <>
+            <div className="d-flex">
+              {showCover && (
+                <WeightCoverImage src={coverImage} height={110} width={110} />
+              )}
+
               <div className="flex-grow-1">
-                <h6 className="fw-semibold text-white mb-1">
-                  {data.weight_name}
-                </h6>
-                <p className="fs-7 opacity-75">{timeAgo}</p>
-              </div>
-              <div onClick={handleInnerClick}>
-                <Button label="Use" small={true} onClick={handleUseModel} />
+                <div className="d-flex align-items-center">
+                  <div className="d-flex flex-grow-1">
+                    <Badge label={weightBadgeLabel} color={weightBadgeColor} />
+                  </div>
+                  <Button
+                    icon={faArrowRight}
+                    iconFlip={true}
+                    variant="link"
+                    label="Use"
+                    className="fs-7"
+                    to={linkUrl}
+                  />
+                </div>
+
+                <div className="d-flex align-items-center mt-3">
+                  <div className="flex-grow-1">
+                    <h6 className="fw-semibold text-white mb-1">
+                      {data.title || data.details.maybe_weight_data.title}
+                    </h6>
+                    <p className="fs-7 opacity-75">{timeAgo}</p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </>
-      )}
-    </Card>
+
+            <hr className="my-3" />
+
+            <div
+              className="d-flex align-items-center gap-2"
+              onClick={handleInnerClick}
+            >
+              {showCreator && (
+                <div className="flex-grow-1">
+                  <CreatorName
+                    displayName={data.creator?.display_name || "Anonymous"}
+                    gravatarHash={data.creator?.gravatar_hash || null}
+                    avatarIndex={data.creator?.default_avatar.image_index || 0}
+                    backgroundIndex={
+                      data.creator?.default_avatar.color_index || 0
+                    }
+                    username={data.creator?.username || "anonymous"}
+                  />
+                </div>
+              )}
+
+              <div>
+                <LikeButton {...{
+                  likeCount: ratings?.list[data.weight_token]?.positive_rating_count || 0,
+                  ...ratings.makeProps({
+                    entityToken: data.weight_token,
+                    entityType: "model_weight"
+                  })
+                }} />
+              </div>
+              <BookmarkButton
+                {...{
+                  ...bookmarks.makeProps({
+                    entityToken: data.weight_token,
+                    entityType: "model_weight"
+                  })
+                }}
+              />
+            </div>
+          </>
+        )}
+      </Card>
+    </Link>
   );
 }

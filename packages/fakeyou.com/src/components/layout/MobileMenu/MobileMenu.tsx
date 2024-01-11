@@ -27,7 +27,11 @@ export default function MobileMenu(props: MobileMenuProps) {
 
   let signupOrProfileButton = (
     <>
-      <Button label="Sign Up" small onClick={() => history.push("/signup")} />
+      <Button
+        label="Sign Up"
+        small={true}
+        onClick={() => history.push("/signup")}
+      />
     </>
   );
 

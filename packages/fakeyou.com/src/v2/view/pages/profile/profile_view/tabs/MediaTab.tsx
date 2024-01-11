@@ -1,10 +1,8 @@
 import React, { useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-import mockMediaData from "./mockMediaData";
-import AudioCard from "components/common/Card/AudioCard";
-import ImageCard from "components/common/Card/ImageCard";
-import VideoCard from "components/common/Card/VideoCard";
-import Select from "components/common/Select";
+import MediaCards from "components/common/Card/MediaCards";
+import { TempSelect } from "components/common";
 import {
   faArrowDownWideShort,
   faFilter,
@@ -13,103 +11,133 @@ import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContex
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";
 
-export default function MediaTab() {
+import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import { useListContent, useRatings } from "hooks";
+import prepFilter from "resources/prepFilter";
+
+export default function MediaTab({ username }: { username: string }) {
+  const { pathname: origin, search } = useLocation();
+  const urlQueries = new URLSearchParams(search);
+  // const bookmarks = useBookmarks();
+  const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [data] = useState(mockMediaData);
-  const [isLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 10;
+  const [showMasonryGrid, setShowMasonryGrid] = useState(true);
+  const [mediaType, mediaTypeSet] = useState(
+    urlQueries.get("filter_media_type") || "all"
+  );
+  const [list, listSet] = useState<MediaFile[]>([]);
+  const media = useListContent({
+    addQueries: {
+      page_size: 24,
+      ...prepFilter(mediaType, "filter_media_type"),
+    },
+    addSetters: { mediaTypeSet },
+    debug: "profile media",
+    fetcher: GetMediaByUser,
+    list,
+    listSet,
+    onInputChange: () => setShowMasonryGrid(false),
+    onSuccess: (res) => {
+      // bookmarks.gather({ res, key: "token" });
+      ratings.gather({ res, key: "token" });
+      setShowMasonryGrid(true);
+    },
+    requestList: true,
+    urlParam: username,
+  });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    setCurrentPage(selectedItem.selected);
+    media.pageChange(selectedItem.selected);
   };
 
-  const currentItems = data.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
+  const paginationProps = {
+    onPageChange: handlePageClick,
+    pageCount: media.pageCount,
+    currentPage: media.page,
+  };
 
   const filterOptions = [
     { value: "all", label: "All Media" },
-    { value: "images", label: "Images" },
+    { value: "image", label: "Images" },
     { value: "audio", label: "Audio" },
     { value: "video", label: "Video" },
   ];
 
   const sortOptions = [
-    { value: "newest", label: "Newest" },
-    { value: "oldest", label: "Oldest" },
-    { value: "mostliked", label: "Most Liked" },
+    { value: false, label: "Newest" },
+    { value: true, label: "Oldest" },
+    // { value: "mostliked", label: "Most Liked" },
   ];
 
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
-        <div className="d-flex gap-2 flex-grow-1">
-          <Select
-            icon={faArrowDownWideShort}
-            options={sortOptions}
-            defaultValue={sortOptions[0]}
-            isSearchable={false}
+        <div className="d-flex flex-grow-1 flex-wrap gap-2">
+          <TempSelect
+            {...{
+              icon: faArrowDownWideShort,
+              options: sortOptions,
+              name: "sort",
+              onChange: media.onChange,
+              value: media.sort,
+            }}
           />
-          <Select
-            icon={faFilter}
-            options={filterOptions}
-            defaultValue={filterOptions[0]}
-            isSearchable={false}
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: filterOptions,
+              name: "mediaType",
+              onChange: media.onChange,
+              value: mediaType,
+            }}
           />
         </div>
-        <Pagination
-          itemsPerPage={itemsPerPage}
-          totalItems={data.length}
-          onPageChange={handlePageClick}
-          currentPage={currentPage}
-        />
+        <Pagination {...paginationProps} />
       </div>
       <AudioPlayerProvider>
-        {isLoading ? (
+        {media.isLoading ? (
           <div className="row gx-3 gy-3">
-            {Array.from({ length: 6 }).map((_, index) => (
+            {Array.from({ length: 12 }).map((_, index) => (
               <SkeletonCard key={index} />
             ))}
           </div>
         ) : (
-          <MasonryGrid
-            gridRef={gridContainerRef}
-            onLayoutComplete={() => console.log("Layout complete!")}
-          >
-            {currentItems.map((data, index) => {
-              let card;
-              switch (data.media_type) {
-                case "audio":
-                  card = <AudioCard key={index} data={data} type="media" />;
-                  break;
-                case "image":
-                  card = <ImageCard key={index} data={data} type="media" />;
-                  break;
-                case "video":
-                  card = <VideoCard key={index} data={data} type="media" />;
-                  break;
-                default:
-                  card = <div key={index}>Unsupported media type</div>;
-              }
-              return (
-                <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
-                  {card}
-                </div>
-              );
-            })}
-          </MasonryGrid>
+          <>
+            {showMasonryGrid && (
+              <>
+                {media.list.length === 0 && media.status === 3 ? (
+                  <div className="text-center mt-4 opacity-75">
+                    No media created yet.
+                  </div>
+                ) : (
+                  <MasonryGrid
+                    gridRef={gridContainerRef}
+                    onLayoutComplete={() => console.log("Layout complete!")}
+                  >
+                    {media.list.map((data: MediaFile, key: number) => {
+                      let props = { data, origin, ratings, type: "media" };
+                      return (
+                        <div
+                          {...{
+                            className: "col-12 col-sm-6 col-xl-4 grid-item",
+                            key,
+                          }}
+                        >
+                          <MediaCards {...{ type: data.media_type, props }} />
+                        </div>
+                      );
+                    })}
+                  </MasonryGrid>
+                )}
+              </>
+            )}
+          </>
         )}
       </AudioPlayerProvider>
 
       <div className="d-flex justify-content-end mt-4">
-        <Pagination
-          itemsPerPage={itemsPerPage}
-          totalItems={data.length}
-          onPageChange={handlePageClick}
-          currentPage={currentPage}
-        />
+        <Pagination {...paginationProps} />
       </div>
     </>
   );
