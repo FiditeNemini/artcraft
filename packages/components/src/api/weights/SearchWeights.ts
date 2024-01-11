@@ -7,7 +7,7 @@ export interface SearchWeightsRequest {
 
 export interface SearchWeightsResponse {
   success: boolean;
-  models: Weight[];
+  weights: Weight[];
 }
 
 export enum SearchWeightsError {

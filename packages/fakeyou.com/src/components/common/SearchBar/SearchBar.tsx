@@ -26,7 +26,7 @@ export default function SearchBar({
   let location = useLocation();
 
   const { searchTerm, setSearchTerm } = useSearch();
-  const [foundTtsModels, setFoundTtsModels] = useState<Weight[]>([]);
+  const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const isOnSearchPage = location.pathname.startsWith("/search");
 
@@ -48,15 +48,15 @@ export default function SearchBar({
       let response = await SearchWeights(request);
 
       if (response.success) {
-        let models = [...response.models];
-        setFoundTtsModels(models);
+        let weights = [...response.weights];
+        setFoundWeights(weights);
       } else {
-        setFoundTtsModels([]);
+        setFoundWeights([]);
       }
 
       setIsLoading(false);
     },
-    [setFoundTtsModels]
+    [setFoundWeights]
   );
 
   useEffect(() => {
@@ -104,8 +104,8 @@ export default function SearchBar({
         />
         {isFocused && !isOnSearchPage && (
           <SearchResultsDropdown
-            data={foundTtsModels}
-            isNoResults={foundTtsModels.length === 0 && searchTerm !== ""}
+            data={foundWeights}
+            isNoResults={foundWeights.length === 0 && searchTerm !== ""}
             isLoading={isLoading}
             searchTerm={searchTerm}
           />

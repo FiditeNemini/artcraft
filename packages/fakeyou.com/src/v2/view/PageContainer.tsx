@@ -87,7 +87,6 @@ import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
 import TopNav from "components/layout/TopNav/TopNav";
 import SideNav from "components/layout/SideNav/SideNav";
 import MobileMenu from "components/layout/MobileMenu/MobileMenu";
-import TtsModelSearchPage from "./pages/tts/tts_model_search/TtsModelSearchPage";
 import MediaPage from "./pages/media/MediaPage";
 import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
 import { VoiceDesignerMainPage } from "./pages/voice_designer/VoiceDesignerMainPage";
@@ -378,12 +377,6 @@ class PageContainer extends React.Component<
 
               <Route path="/search/weights">
                 <SearchPage />
-              </Route>
-
-              <Route path="/dev-tts">
-                <TtsModelSearchPage
-                  sessionWrapper={this.props.sessionWrapper}
-                />
               </Route>
 
               <Route path="/tts/result/:token/edit">
