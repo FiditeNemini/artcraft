@@ -13,7 +13,6 @@ use users_component::endpoints::get_profile_handler::get_profile_handler;
 
 use crate::http_server::endpoints::animation::enqueue_face_animation::enqueue_face_animation_handler;
 use crate::http_server::endpoints::animation::enqueue_rerender_animation::enqueue_rerender_animation_handler;
-use crate::http_server::endpoints::mocap::enqueue_mocapnet::enqueue_mocapnet_handler;
 use crate::http_server::endpoints::api_tokens::create_api_token::create_api_token_handler;
 use crate::http_server::endpoints::api_tokens::delete_api_token::delete_api_token_handler;
 use crate::http_server::endpoints::api_tokens::edit_api_token::edit_api_token_handler;
@@ -55,6 +54,7 @@ use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_ha
 use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha_easy_handler;
 use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
 use crate::http_server::endpoints::misc::root_index::get_root_index;
+use crate::http_server::endpoints::mocap::enqueue_mocapnet::enqueue_mocapnet_handler;
 use crate::http_server::endpoints::moderation::approval::pending_w2l_templates::get_pending_w2l_templates_handler;
 use crate::http_server::endpoints::moderation::categories::delete_category::delete_category_handler;
 use crate::http_server::endpoints::moderation::categories::edit_category::edit_category_handler;
@@ -163,6 +163,7 @@ use crate::http_server::endpoints::weights::get_weight::get_weight_handler;
 use crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler;
 use crate::http_server::endpoints::weights::list_featured_weights::list_featured_weights_handler;
 use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler;
+use crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler;
 use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
 
@@ -1290,6 +1291,11 @@ fn add_weights_routes<T, B>(app: App<T>) -> App<T>
                 .route(web::get().to(get_weight_handler))
                 .route(web::post().to(update_weight_handler))
                 .route(web::delete().to(delete_weight_handler))
+            )
+            .service(
+              web::resource("/search")
+                  .route(web::post().to(search_model_weights_handler))
+                  .route(web::head().to(|| HttpResponse::Ok()))
             )
             .service(web::resource("/weight/{token}/cover_image")
                 .route(web::post().to(set_model_weight_cover_image_handler))
