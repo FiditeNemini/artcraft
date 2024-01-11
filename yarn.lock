@@ -4591,6 +4591,7 @@ __metadata:
     moment: ^2.29.4
     prettier: ^3.1.0
     pretty-quick: ^3.1.3
+    react-range-slider-input: ^3.0.7
     universal-cookie: ^6.1.1
     yarn: ^1.22.19
   languageName: unknown
@@ -8587,6 +8588,13 @@ __metadata:
   version: 3.20.3
   resolution: "core-js@npm:3.20.3"
   checksum: 2106cdfb1330abf9e27d577666fc0421feafe8c39bb5af90a63af16e9706c767a7e3a82edc21ce3ed6b9d806f3200d1cf6cc3d0597a8c0af12dbec287c781d65
+  languageName: node
+  linkType: hard
+
+"core-js@npm:^3.22.4":
+  version: 3.35.0
+  resolution: "core-js@npm:3.35.0"
+  checksum: 25c224aca3df012b98f08f13ccbd8171ef5852acd33fd5e58e106d27f5f0c97de2fdbc520f0b4364d26253caf2deb3e5d265310f57d2a66ae6cc922850e649f0
   languageName: node
   linkType: hard
 
@@ -17875,6 +17883,16 @@ __metadata:
     react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
     react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
   checksum: 74c28dfa77abb9bedde0f83b919e4f3f8694e66f5c90228bd5f72c05b128dedf06cbc3bd30461aa29c5a2139539977cc7628fa7b31ebdbfb536d8a666e8fd494
+  languageName: node
+  linkType: hard
+
+"react-range-slider-input@npm:^3.0.7":
+  version: 3.0.7
+  resolution: "react-range-slider-input@npm:3.0.7"
+  dependencies:
+    clsx: ^1.1.1
+    core-js: ^3.22.4
+  checksum: e304c950e1bd9a3140ae14519522221614d7000a30b8dea112e856fd267264305210cb6d6ffa73179a52f770e852b011d8534127dab44684307e673272cfecf7
   languageName: node
   linkType: hard
 
