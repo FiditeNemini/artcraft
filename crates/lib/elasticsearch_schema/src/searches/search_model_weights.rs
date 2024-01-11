@@ -1,9 +1,10 @@
 use elasticsearch::{Elasticsearch, SearchParts};
+use log::error;
 use serde_json::{json, Value};
 
 use errors::AnyhowResult;
 
-use crate::documents::model_weight_document::ModelWeightDocument;
+use crate::documents::model_weight_document::{MODEL_WEIGHT_INDEX, ModelWeightDocument};
 
 pub async fn search_model_weights(
   client: &Elasticsearch,
@@ -17,7 +18,7 @@ pub async fn search_model_weights(
   };
 
   let search_response = client
-      .search(SearchParts::None)
+      .search(SearchParts::Index(&[MODEL_WEIGHT_INDEX]))
       .body(search_json)
       .allow_no_indices(true)
       .send()
@@ -43,7 +44,11 @@ pub async fn search_model_weights(
         let maybe_object = hit.get_mut("_source")
             .map(|source| source.take());
         if let Some(value) = maybe_object {
-          let document = serde_json::from_value::<ModelWeightDocument>(value)?;
+          let document = serde_json::from_value::<ModelWeightDocument>(value)
+              .map_err(|err| {
+                error!("Error: {:?}", &err);
+                err
+              })?;
           documents.push(document);
         }
       }
