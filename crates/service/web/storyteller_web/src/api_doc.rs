@@ -39,6 +39,7 @@ use crate::http_server::endpoints::weights::delete_weight::*;
 use crate::http_server::endpoints::weights::get_weight::*;
 use crate::http_server::endpoints::weights::list_available_weights::*;
 use crate::http_server::endpoints::weights::list_weights_by_user::*;
+use crate::http_server::endpoints::weights::search_model_weights_handler::*;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::*;
 use crate::http_server::endpoints::weights::update_weight::*;
 use crate::http_server::web_utils::response_success_helpers::*;
@@ -65,6 +66,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler,
     crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler,
     crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler,
+    crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler,
     crate::http_server::endpoints::weights::update_weight::update_weight_handler,
   ),
   components(schemas(
@@ -107,6 +109,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListAvailableWeightsQuery,ListAvailableWeightsSuccessResponse,ModelWeightForList,
     ListWeightsByUserError,ListWeightsByUserSuccessResponse,ListWeightsByUserPathInfo,Weight,
     WeightsData,MediaFileData,
+    SearchModelWeightsRequest,SearchModelWeightsSuccessResponse,ModelWeightSearchResult,SearchModelWeightsError,
     BatchGetUserRatingQueryParams,BatchGetUserRatingResponse,BatchGetUserRatingError,RatingRow,
     BatchGetUserBookmarksQueryParams,BatchGetUserBookmarksResponse,BatchGetUserBookmarksError,BookmarkRow,
     ListFeaturedMediaFilesSuccessResponse,MediaFile, ListFeaturedMediaFilesError,

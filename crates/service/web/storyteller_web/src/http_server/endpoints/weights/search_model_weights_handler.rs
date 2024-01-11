@@ -12,6 +12,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use chrono::{DateTime, Utc};
 use log::error;
+use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use elasticsearch_schema::searches::search_model_weights::search_model_weights;
@@ -25,12 +26,12 @@ use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct SearchModelWeightsRequest {
   pub search_term: String,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, ToSchema)]
 pub struct ModelWeightSearchResult {
   pub token: ModelWeightToken,
 
@@ -54,13 +55,13 @@ pub struct ModelWeightSearchResult {
   pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct SearchModelWeightsSuccessResponse {
   pub success: bool,
   pub weights: Vec<ModelWeightSearchResult>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum SearchModelWeightsError {
   ServerError,
 }
@@ -88,6 +89,17 @@ impl fmt::Display for SearchModelWeightsError {
   }
 }
 
+#[utoipa::path(
+  post,
+  path = "/v1/weights/search",
+  responses(
+    (status = 200, description = "Successful search", body = SearchModelWeightsSuccessResponse),
+    (status = 500, description = "Server error", body = SearchModelWeightsError),
+  ),
+  params(
+    ("request" = SearchModelWeightsRequest, description = "Payload for Request"),
+  )
+)]
 pub async fn search_model_weights_handler(
   _http_request: HttpRequest,
   request: web::Json<SearchModelWeightsRequest>,
