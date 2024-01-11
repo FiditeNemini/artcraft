@@ -17,6 +17,7 @@ export default function WeightCoverImage({
   const containerStyle = {
     height: `${height}px`,
     width: `${width}px`,
+    minWidth: `${width}px`,
   };
 
   return (

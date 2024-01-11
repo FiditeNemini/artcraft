@@ -1,10 +1,10 @@
-import { TtsModel } from "@storyteller/components/src/api/tts/SearchTtsModels";
+import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import Badge from "../Badge";
 
 interface SearchResultsDropdownProps {
-  data: TtsModel[];
+  data: Weight[];
   isNoResults?: boolean;
   isLoading?: boolean;
   searchTerm?: string;
@@ -18,10 +18,10 @@ export default function SearchResultsDropdown({
 }: SearchResultsDropdownProps) {
   const history = useHistory();
 
-  const handleResultClick = (item: TtsModel, event: React.MouseEvent) => {
+  const handleResultClick = (item: Weight, event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();
-    history.push(`/weight/${item.model_token}`);
+    history.push(`/weight/${item.weight_token}`);
   };
 
   const handleInnerClick = (event: any) => {
@@ -40,12 +40,12 @@ export default function SearchResultsDropdown({
       {data.length !== 0 && (
         <div className="search-results-dropdown">
           {data.map(item => {
-            // let modelPageLink = `/weight/${item.model_token}`;
+            // let modelPageLink = `/weight/${item.weight_token}`;
 
             return (
               <div
                 className="search-results-dropdown-item p-3"
-                key={item.model_token}
+                key={item.weight_token}
                 onClick={event => handleResultClick(item, event)}
               >
                 <h6 className="fw-semibold mb-1">{item.title}</h6>
@@ -54,10 +54,10 @@ export default function SearchResultsDropdown({
                     by{" "}
                     <Link
                       className="fw-medium"
-                      to={`/profile/${item.creator_username}`}
+                      to={`/profile/${item.creator.username}`}
                       onClick={handleInnerClick}
                     >
-                      {item.creator_display_name}
+                      {item.creator.display_name}
                     </Link>
                   </p>
                   <Badge label={"TTS"} color={"ultramarine"} small={true} />

@@ -22,7 +22,7 @@ const weightTypeInfo: WeightTypeInfo = {
     color: "purple",
     fullLabel: "Stable Diffusion XL",
   },
-  [WeightType.SVC]: { label: "SVC", color: "cyan", fullLabel: "SVC" },
+  [WeightType.SVC]: { label: "SVC", color: "turquoise", fullLabel: "SVC" },
   [WeightType.LORA]: { label: "LoRA", color: "pink", fullLabel: "LoRA" },
   [WeightType.VALL_E]: {
     label: "VALL-E",
