@@ -4,6 +4,7 @@ import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetch
 interface Props {
   checker: any,
   fetcher: any,
+  modLibrary?: any,
   onPass?: any,
   onFail?: any,
   resultsKey: string
@@ -23,6 +24,7 @@ interface Gather {
 export default function useBatchContent({
   checker,
   fetcher,
+  modLibrary = (current: any, res: any, entity_token: string ) => current,
   onPass,
   onFail,
   resultsKey }: Props) {
@@ -30,17 +32,21 @@ export default function useBatchContent({
   const [busyList, busyListSet] = useState<Library>({});
   const [status, statusSet] = useState(FetchStatus.ready);
 
-  const gather = ({ expand, key, modLibrary = (x: any, res: any, entity_token: string ) => x, res }: Gather) => {
-    let tokens = res.results.map((item: any) => item[key]);
-    // console.log("🪙",res.results, tokens);
+  const gather = ({ expand, key, res }: Gather) => {
+    let tokens = res.results ? res.results.map((item: any) => item[key]) : [res[key]];
+    // console.log("🪙",fetcher);
     busyListSet(tokens.reduce((obj = {},token = "") => ({ ...obj, [token]: true }),{})); // add current batch to busy list
     fetcher("",{},{ tokens }).then((batchRes: any) => {
-      // console.log("😡",batchRes,resultsKey);
-      if (batchRes.success && batchRes[resultsKey]) {
+
+    console.log("🪙", batchRes.success && !!batchRes[resultsKey]);
+      if (batchRes.success && !!batchRes[resultsKey]) {
+
         let newBatch = batchRes[resultsKey].reduce((obj = {}, { entity_token = "", ...current }) => ({
           ...obj,
           [entity_token]: { ...modLibrary(current, res, entity_token) }
         }),{});
+
+      console.log("😡", newBatch);
         busyListSet({}); // this should be a for each key in tokens delete from busyList, but this is fine for now
         listSet((list: any) => expand ? { ...list, ...newBatch } : newBatch);
       }

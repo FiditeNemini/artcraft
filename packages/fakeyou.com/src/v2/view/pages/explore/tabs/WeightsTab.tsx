@@ -38,18 +38,7 @@ export default function WeightsTab() {
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: (res) => {
       bookmarks.gather({ res, expand: true, key: "weight_token" }); // expand rather than replace for lazy loading 
-      ratings.gather({ 
-        res,
-        expand: true,
-        key: "weight_token",
-        modLibrary: (current: any, res: any, entity_token: string) => {
-          let { positive_rating_count } = res.results.find((item: any, i: number) => 
-            item.weight_token === entity_token
-          ).stats;
-
-          return { ...current, positive_rating_count };
-        }
-      });
+      ratings.gather({ res, expand: true, key: "weight_token" });
       setShowMasonryGrid(true);
     },
     requestList: true,

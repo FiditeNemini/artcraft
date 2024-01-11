@@ -33,7 +33,7 @@ import TtsInferencePanel from "./inference_panels/TtsInferencePanel";
 import Modal from "components/common/Modal";
 import SocialButton from "components/common/SocialButton";
 import Input from "components/common/Input";
-import { useBookmarks, useWeightFetch } from "hooks";
+import { useBookmarks, useWeightFetch, useRatings } from "hooks";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
@@ -67,6 +67,8 @@ export default function WeightPage({
   const { weight_token } = useParams<{ weight_token: string }>();
   const origin = search ? new URLSearchParams(search).get("origin") : "";
   const history = useHistory();
+  const bookmarks = useBookmarks();
+  const ratings = useRatings();
   const {
     data: weight,
     descriptionMD,
@@ -78,6 +80,10 @@ export default function WeightPage({
     onRemove: () => {
       history.push(origin || "");
     },
+    onSuccess: (res: any) => {
+      bookmarks.gather({ res, key: "weight_token" }); // expand rather than replace for lazy loading 
+      ratings.gather({ res, key: "weight_token" });
+    },
     token: weight_token,
   });
 
@@ -87,8 +93,6 @@ export default function WeightPage({
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const bookmarks = useBookmarks();
 
   const bucketConfig = new BucketConfig();
 
@@ -307,6 +311,7 @@ export default function WeightPage({
     );
   }
 
+
   // const handleBookmark = () => {
   //   return bookmarks.toggle(); // this function checks if the bookmark exists, truthy = deleted, falsy = created
   // };
@@ -375,20 +380,23 @@ export default function WeightPage({
                   <div className="d-flex align-items-center gap-2">
                     <LikeButton
                       {...{
+                        busy: ratings.busyList[weight_token],
                         entityToken: weight_token,
                         entityType: "model_weight",
-                        likeCount: 1200,
-                        onToggle: bookmarks.toggle,
+                        likeCount: ratings?.list[weight_token]?.positive_rating_count || 0,
+                        initialToggled: (ratings?.list[weight_token]?.rating_value || "") === "positive",
+                        onToggle: ratings?.toggle,
                         large: true,
                       }}
                     />
                     <BookmarkButton
                       {...{
+                        busy: bookmarks.busyList[weight_token],
                         entityToken: weight_token,
                         entityType: "model_weight",
-                        onToggle: bookmarks.toggle,
-                        large: true,
-                        initialToggled: bookmarks.list[weight_token]
+                        onToggle: bookmarks?.toggle,
+                        initialToggled: bookmarks?.list[weight_token]?.maybe_bookmark_token,
+                        large: true
                       }}
                     />
                   </div>

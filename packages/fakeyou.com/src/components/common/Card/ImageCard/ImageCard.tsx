@@ -33,7 +33,7 @@ export default function ImageCard({
     type === "media"
       ? `/media/${data.token}`
       : `/weight/${data.weight_token || data.details.entity_token}${
-          origin ? "?origin=" + origin + "&ehhh=mehh" : ""
+          origin ? "?origin=" + origin : ""
         }`;
 
   const handleInnerClick = (event: any) => {

@@ -7,11 +7,14 @@ import { DeleteWeight } from "@storyteller/components/src/api/weights/DeleteWeig
 import { useCoverImgUpload } from "hooks";
 
 interface Props {
-  onRemove?: (x: any) => void;
-  token: string;
+  onSuccess?: (res: Weight) => any,
+  onRemove?: (x: any) => void,
+  token: string
 }
 
-export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
+const n = (x?: any) => {};
+
+export default function useWeightFetch({ onRemove = n, onSuccess = n, token }: Props) {
   const [data, setData] = useState<Weight | undefined | null>(null);
   const [status, statusSet] = useState(FetchStatus.ready);
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
@@ -77,13 +80,14 @@ export default function useWeightFetch({ onRemove = () => {}, token }: Props) {
           titleSet(resTitle);
           descriptionMDSet(description_markdown);
           visibilitySet(creator_set_visibility);
+          onSuccess(res);
           setData(res);
         })
         .catch(err => {
           statusSet(FetchStatus.error);
         });
     }
-  }, [status, token, data]);
+  }, [status, onSuccess, token, data]);
 
   return { coverImg, data, fetchError, isLoading, descriptionMD, onChange, remove, status, title, update, visibility, writeStatus };
 };

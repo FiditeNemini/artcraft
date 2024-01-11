@@ -46,7 +46,7 @@ export default function useRatings() {
     resultsKey: "ratings"
   });
 
-  console.log("🔮",list);
+  // console.log("🔮",list);
 
   return { busyList, gather, list, status, toggleStatus, toggleStatusSet, toggle };
 };
