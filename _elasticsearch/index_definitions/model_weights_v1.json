@@ -21,18 +21,20 @@
 
       "creator_user_token" : { "type" : "keyword" },
       "creator_username" : { "type" : "keyword" },
-      "creator_display_name" : { "type" : "keyword" },
-      "creator_gravatar_hash" : { "type" : "keyword" },
+      "creator_display_name" : { "type" : "text" },
+      "creator_gravatar_hash" : { "type" : "text" },
 
-      "ratings_positive_count" : { "type" : "keyword" },
-      "ratings_negative_count" : { "type" : "keyword" },
-      "bookmark_count" : { "type" : "keyword" },
+      "ratings_positive_count" : { "type" : "unsigned_long" },
+      "ratings_negative_count" : { "type" : "unsigned_long" },
+      "bookmark_count" : { "type" : "unsigned_long" },
 
       "maybe_ietf_language_tag" : { "type" : "keyword" },
       "maybe_ietf_primary_language_subtag" : { "type" : "keyword" },
 
       "created_at" : { "type" : "date" },
-      "updated_at" : { "type" : "date" }
+      "updated_at" : { "type" : "date" },
+      "user_deleted_at" : { "type" : "date" },
+      "mod_deleted_at" : { "type" : "date" }
     }
   }
 }

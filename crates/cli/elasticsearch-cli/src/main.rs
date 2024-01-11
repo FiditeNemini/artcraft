@@ -12,6 +12,7 @@ use sqlx::{MySql, Pool};
 use sqlx::mysql::MySqlPoolOptions;
 
 use config::shared_constants::DEFAULT_RUST_LOG;
+use elasticsearch_schema::searches::search_model_weights::search_model_weights;
 use elasticsearch_schema::searches::search_tts_models::search_tts_models;
 use errors::AnyhowResult;
 
@@ -54,7 +55,10 @@ pub async fn main() -> AnyhowResult<()> {
     }
     Action::SearchModelWeights => {
       info!("Searching model weights...");
-      // TODO(bt,2024-01-10): Implement.
+      let results = search_model_weights(&elasticsearch, "zel", Some("en")).await?;
+      for result in results {
+        println!("Result: {:?}", result);
+      }
     }
   }
 
