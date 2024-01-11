@@ -78,7 +78,7 @@ export default function AudioCard({
     <Link
       {...{
         to: linkUrl,
-        state: { origin }
+        state: { origin },
       }}
     >
       <Card padding={true} canHover={true}>
@@ -124,14 +124,17 @@ export default function AudioCard({
               )}
 
               <div>
-                <LikeButton {...{
-                  busy: ratings.busyList[data.token],
-                  entityToken: data.token,
-                  entityType: "media_file",
-                  likeCount: data.likes,
-                  initialToggled: ratings?.list[data.token]?.rating_value === "positive",
-                  onToggle: ratings.toggle
-                }} />
+                <LikeButton
+                  {...{
+                    busy: ratings.busyList[data.token],
+                    entityToken: data.token,
+                    entityType: "media_file",
+                    likeCount: data.likes,
+                    initialToggled:
+                      ratings?.list[data.token]?.rating_value === "positive",
+                    onToggle: ratings.toggle,
+                  }}
+                />
               </div>
             </div>
           </>
@@ -140,7 +143,9 @@ export default function AudioCard({
         {type === "weights" && (
           <>
             <div className="d-flex">
-              {showCover && <WeightCoverImage src={coverImage} />}
+              {showCover && (
+                <WeightCoverImage src={coverImage} height={110} width={110} />
+              )}
 
               <div className="flex-grow-1">
                 <div className="d-flex align-items-center">
@@ -189,13 +194,17 @@ export default function AudioCard({
               )}
 
               <div>
-                <LikeButton {...{
-                  busy: ratings.busyList[data.weight_token],
-                  entityToken: data.weight_token,
-                  entityType: "model_weight",
-                  likeCount: ratings?.list[data.weight_token]?.positive_rating_count || 0,
-                  onToggle: ratings?.toggle
-                }} />
+                <LikeButton
+                  {...{
+                    busy: ratings.busyList[data.weight_token],
+                    entityToken: data.weight_token,
+                    entityType: "model_weight",
+                    likeCount:
+                      ratings?.list[data.weight_token]?.positive_rating_count ||
+                      0,
+                    onToggle: ratings?.toggle,
+                  }}
+                />
               </div>
               <BookmarkButton
                 {...{
@@ -203,7 +212,8 @@ export default function AudioCard({
                   entityToken: data.weight_token,
                   entityType: "model_weight",
                   onToggle: bookmarks?.toggle,
-                  initialToggled: bookmarks?.list[data.weight_token]?.maybe_bookmark_token
+                  initialToggled:
+                    bookmarks?.list[data.weight_token]?.maybe_bookmark_token,
                 }}
               />
             </div>
