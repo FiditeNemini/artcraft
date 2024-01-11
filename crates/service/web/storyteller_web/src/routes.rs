@@ -198,10 +198,12 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_user_rating_routes(app); /* /v1/user_rating/... */
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
+  app = add_weights_routes(app); /* /v1/weights/... */
 
-  if server_environment == ServerEnvironment::Development {
-     app = add_weights_routes(app); /* /v1/stubs/... */
-  }
+  //if server_environment == ServerEnvironment::Development {
+  //   // ...
+  //}
+
   // ==================== Comments ====================
 
   let mut app = RouteBuilder::from_app(app)
@@ -1294,6 +1296,7 @@ fn add_weights_routes<T, B>(app: App<T>) -> App<T>
             )
             .service(web::resource("/search")
                 .route(web::post().to(search_model_weights_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
             )
             .service(web::resource("/weight/{token}/cover_image")
                 .route(web::post().to(set_model_weight_cover_image_handler))
