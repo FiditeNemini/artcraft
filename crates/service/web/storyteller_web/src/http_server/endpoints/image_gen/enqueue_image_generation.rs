@@ -11,7 +11,7 @@ use actix_web::http::StatusCode;
 use log::warn;
 use serde::Deserialize;
 use serde::Serialize;
-use tokens::tokens::media_files::MediaFileToken;
+
 use tokens::tokens::model_weights::ModelWeightToken;
 use utoipa::ToSchema;
 
@@ -68,6 +68,39 @@ impl Display for TypeOfInference {
 }
 
 
+pub fn is_valid_string(input: &str) -> bool {
+    let valid_strings = [
+        "DPM++ 2M Karras",
+        "DPM++ SDE Karras",
+        "DPM++ 2M SDE Exponential",
+        "DPM++ 2M SDE Karras",
+        "Euler a",
+        "Euler",
+        "LMS",
+        "Heun",
+        "DPM2",
+        "DPM2 a",
+        "DPM++ 2S a",
+        "DPM++ 2M",
+        "DPM++ SDE",
+        "DPM++ 2M SDE",
+        "DPM++ 2M SDE Heun",
+        "DPM++ 2M SDE Heun Karras",
+        "DPM++ 2M SDE Heun Exponential",
+        "DPM++ 3M SDE",
+        "DPM++ 3M SDE Karras",
+        "DPM++ 3M SDE Exponential",
+        "DPM fast",
+        "DPM adaptive",
+        "LMS Karras",
+        "DPM2 Karras",
+        "DPM2 a Karras",
+        "DPM++ 2S a Karras"
+    ];
+    valid_strings.contains(&input)
+}
+
+
 #[derive(Deserialize,ToSchema)]
 pub struct EnqueueImageGenRequest {
     uuid_idempotency_token: String,
@@ -85,7 +118,7 @@ pub struct EnqueueImageGenRequest {
     maybe_upload_path: Option<String>,
     maybe_lora_upload_path: Option<String>,
     maybe_cfg_scale: Option<i32>,
-    maybe_number_of_samples: Option<i64>,
+    maybe_number_of_samples: Option<i32>,
     maybe_batch_size: Option<i32>,
     maybe_batch_count: Option<i32>,
 }
@@ -239,8 +272,48 @@ pub async fn enqueue_image_generation_request(
         }
     }
 
-    
-    let image_source_token = MediaFileToken(request.maybe_image_source.clone().unwrap_or_default());
+    let width = request.maybe_width.unwrap_or(512);
+    let height = request.maybe_height.unwrap_or(512);
+
+    let width = match width {
+        0..=512 => 512,
+        513..=768 => 768,
+        769..=1024 => 1024,
+        _ => 1024,
+    };
+
+    let height = match height {
+        0..=512 => 512,
+        513..=768 => 768,
+        769..=1024 => 1024,
+        _ => 1024,
+    };
+
+    let cfg_scale = match request.maybe_cfg_scale {
+        Some(val) => if val > 32 { 32 } else { val },
+        None => 7
+    };
+
+    let number_of_samples = match request.maybe_number_of_samples {
+        Some(val) => if val < 0 { 20 } else if val > 128 { 128 } else { val },
+        None => 20,
+    };
+
+    let batch_size = match request.maybe_batch_size {
+        Some(val) => if val > 4 { 4 } else { val },
+        None => 1,
+    };
+
+    let batch_count = match request.maybe_batch_count {
+        Some(val) => if val > 2 { 2 } else { val },
+        None => 1,
+    };
+
+    let sampler = match request.maybe_sampler.clone() {
+        Some(val) => if is_valid_string(&val) { val.clone() } else { String::from("Euler a") },
+        None =>String::from( "Euler a"),
+    };
+
     let sd_weight_token = ModelWeightToken(request.maybe_sd_model_token.clone().unwrap_or_default());
     let lora_token = ModelWeightToken(request.maybe_lora_model_token.clone().unwrap_or_default());
     
@@ -260,10 +333,11 @@ pub async fn enqueue_image_generation_request(
         seed = s;
     }
 
-    let inference_type = request.type_of_inference.to_string().clone();
+    let type_of_inference = request.type_of_inference.to_string().clone();
+
+
 
     let inference_args = StableDiffusionArgs {
-        maybe_image_source: Some(image_source_token),
         maybe_sd_model_token: Some(sd_weight_token),
         maybe_lora_model_token: Some(lora_token),
         maybe_prompt: Some(request.maybe_prompt.clone().unwrap_or_default()),
@@ -272,7 +346,14 @@ pub async fn enqueue_image_generation_request(
         maybe_seed: Some(seed),
         maybe_upload_path: Some(upload_path),
         maybe_lora_upload_path: Some(lora_upload_path),
-        inference_type: inference_type,
+        type_of_inference: type_of_inference,
+        maybe_cfg_scale: Some(cfg_scale),
+        maybe_number_of_samples: Some(number_of_samples),
+        maybe_batch_count: Some(batch_count),
+        maybe_batch_size: Some(batch_size),
+        maybe_width: Some(width),
+        maybe_height: Some(height),
+        maybe_sampler: Some(sampler)
     };
 
     // create the inference args here

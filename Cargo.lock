@@ -2977,6 +2977,7 @@ dependencies = [
  "enums",
  "errors",
  "filesys",
+ "google_drive_common",
  "hashing",
  "hostname",
  "hyper",
