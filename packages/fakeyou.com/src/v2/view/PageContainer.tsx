@@ -670,6 +670,15 @@ class PageContainer extends React.Component<
                 />
               </Route>
 
+              <Route path="/storyteller-studio">
+                <StorytellerStudioListPage
+                  sessionWrapper={this.props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    this.props.sessionSubscriptionsWrapper
+                  }
+                />
+              </Route>
+
               <Route path="/commissions">
                 <CommunityCommissionsPage />
               </Route>

@@ -18,7 +18,7 @@ function StorytellerStudioListPage(props: Props) {
         sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
       />
 
-      <div className="container">
+      <div className="container mb-5">
         <Iframe
           url="https://engine.fakeyou.com?mode=studio"
           width="100%"
