@@ -60,6 +60,7 @@
     "react-dom": "^16.13.1",
     "react-drag-drop-files": "^2.3.9",
     "react-i18next": "^11.15.4",
+    "react-iframe": "^1.8.5",
     "react-infinite-scroll-component": "^6.1.0",
     "react-paginate": "^8.2.0",
     "react-range": "^1.8.14",

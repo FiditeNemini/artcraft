@@ -84,6 +84,7 @@ import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
+import { StorytellerStudioListPage } from "./pages/storyteller_studio/vc_model_list/StorytellerStudioListPage";
 import SideNav from "components/layout/SideNav/SideNav";
 import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import { TopNav } from "./nav/TopNav";
@@ -653,6 +654,15 @@ class PageContainer extends React.Component<
                   inferenceJobs: this.props.inferenceJobs,
                   inferenceJobsByCategory: this.props.inferenceJobsByCategory,
                 }}
+              />
+            </Route>
+
+            <Route path="/storyteller-studio">
+              <StorytellerStudioListPage
+                sessionWrapper={this.props.sessionWrapper}
+                sessionSubscriptionsWrapper={
+                  this.props.sessionSubscriptionsWrapper
+                }
               />
             </Route>
 

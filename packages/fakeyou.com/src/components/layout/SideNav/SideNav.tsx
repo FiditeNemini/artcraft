@@ -10,6 +10,7 @@ import {
   faFaceViewfinder,
   faCloudUpload,
   faWandMagicSparkles,
+  faCameraMovie,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/common/Button/Button";
@@ -39,9 +40,9 @@ export default function SideNav(props: SideNavProps) {
   const { t } = useLocalize("SideNav");
   let history = useHistory();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const fakeYouFrontendEnv =  FakeYouFrontendEnvironment.getInstance();
+  const fakeYouFrontendEnv = FakeYouFrontendEnvironment.getInstance();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const isDevelopmentEnv = fakeYouFrontendEnv.isDevelopment()
+  const isDevelopmentEnv = fakeYouFrontendEnv.isDevelopment();
   const handleNavLinkClick = () => {
     const wrapper = document.getElementById("wrapper");
 
@@ -228,7 +229,9 @@ export default function SideNav(props: SideNavProps) {
   // NB(bt,2023-11-28): These are representative of tacotron2 jobs handled by two queueing systems:
   // The legacy queue (tts-inference-job) and the modern queue (inference-job). We'll add both totals
   // while we migrate off of the legacy system, then eventually kill the legacy statistic.
-  const ttsQueuedCount = queueStats.legacy_tts.pending_job_count + queueStats.inference.by_queue.pending_tacotron2_jobs;
+  const ttsQueuedCount =
+    queueStats.legacy_tts.pending_job_count +
+    queueStats.inference.by_queue.pending_tacotron2_jobs;
 
   return (
     <div
@@ -307,6 +310,21 @@ export default function SideNav(props: SideNavProps) {
           </NavLink>
         </li>
 
+        <li>
+          <NavLink
+            to="/storyteller-studio"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faCameraMovie}
+              className="sidebar-heading-icon"
+            />
+            Storyteller Studio
+            {/* {t("videoStorytellerStudio")} */}
+          </NavLink>
+        </li>
+
         <hr className="mb-4 mt-3" />
         <li className="sidebar-heading">{t("communityTitle")}</li>
         <li>
@@ -365,10 +383,7 @@ export default function SideNav(props: SideNavProps) {
         <li className="sidebar-heading">{t("queueTitle")}</li>
         <li className="ps-4 fs-7 mb-5">
           <div>
-            {t("queueTts")}:{" "}
-            <span className="text-red">
-              {ttsQueuedCount}
-            </span>
+            {t("queueTts")}: <span className="text-red">{ttsQueuedCount}</span>
           </div>
           <div>
             {t("queueRvc")}:{" "}
