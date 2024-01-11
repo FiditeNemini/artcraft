@@ -33,7 +33,7 @@ pub struct SearchModelWeightsRequest {
 
 #[derive(Serialize, Clone, ToSchema)]
 pub struct ModelWeightSearchResult {
-  pub token: ModelWeightToken,
+  pub weight_token: ModelWeightToken,
 
   pub weights_type: WeightsType,
   pub weights_category: WeightsCategory,
@@ -129,7 +129,7 @@ pub async fn search_model_weights_handler(
             });
 
         ModelWeightSearchResult {
-          token: result.token,
+          weight_token: result.token,
           weights_type: result.weights_type,
           weights_category: result.weights_category,
           title: result.title,
@@ -161,10 +161,10 @@ pub async fn search_model_weights_handler(
   let mut new_results = Vec::with_capacity(results.len());
 
   for result in results.into_iter() {
-    if added_tokens.contains(&result.token) {
+    if added_tokens.contains(&result.weight_token) {
       continue;
     }
-    added_tokens.insert(result.token.clone());
+    added_tokens.insert(result.weight_token.clone());
     new_results.push(result);
   }
 
