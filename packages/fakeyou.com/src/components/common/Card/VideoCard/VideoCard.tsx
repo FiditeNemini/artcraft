@@ -83,11 +83,10 @@ export default function VideoCard({ data, origin = "", ratings, showCreator, typ
 
                     <div>
                       <LikeButton {...{
-                        busy: ratings.busyList[data.token],
-                        entityToken: data.token,
-                        entityType: "media_file",
-                        likeCount: data.likes,
-                        onToggle: ratings?.toggle
+                        ...ratings.makeProps({
+                          entityToken: data.token,
+                          entityType: "media_file",
+                        })
                       }} />
                     </div>
                   </div>
@@ -132,12 +131,11 @@ export default function VideoCard({ data, origin = "", ratings, showCreator, typ
                   <p className="fs-7 opacity-75">{timeAgo}</p>
                   <div className="mt-2" onClick={handleInnerClick}>
                     <LikeButton {...{
-                      busy: ratings.busyList[data.weight_token],
-                      entityToken: data.weight_token,
-                      entityType: "model_weight",
-                      likeCount: data.likes,
-                      onToggle: ratings?.toggle,
-                      overlay: true
+                      overlay: true,
+                      ...ratings.makeProps({
+                        entityToken: data.weight_token,
+                        entityType: "model_weight",
+                      })
                     }} />
                   </div>
                 </div>

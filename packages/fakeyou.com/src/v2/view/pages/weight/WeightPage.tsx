@@ -380,22 +380,19 @@ export default function WeightPage({
                   <div className="d-flex align-items-center gap-2">
                     <LikeButton
                       {...{
-                        busy: ratings.busyList[weight_token],
-                        entityToken: weight_token,
-                        entityType: "model_weight",
-                        likeCount: ratings?.list[weight_token]?.positive_rating_count || 0,
-                        initialToggled: (ratings?.list[weight_token]?.rating_value || "") === "positive",
-                        onToggle: ratings?.toggle,
+                        ...ratings.makeProps({
+                          entityToken: weight_token,
+                          entityType: "model_weight"
+                        }),
                         large: true,
                       }}
                     />
                     <BookmarkButton
                       {...{
-                        busy: bookmarks.busyList[weight_token],
-                        entityToken: weight_token,
-                        entityType: "model_weight",
-                        onToggle: bookmarks?.toggle,
-                        initialToggled: bookmarks?.list[weight_token]?.maybe_bookmark_token,
+                        ...bookmarks.makeProps({
+                          entityToken: weight_token,
+                          entityType: "model_weight"
+                        }),
                         large: true
                       }}
                     />

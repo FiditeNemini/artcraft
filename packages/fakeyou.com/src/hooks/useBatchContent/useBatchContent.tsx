@@ -7,7 +7,8 @@ interface Props {
   modLibrary?: any,
   onPass?: any,
   onFail?: any,
-  resultsKey: string
+  resultsKey: string,
+  toggleCheck: (x: any) => any
 }
 
 interface Library {
@@ -27,8 +28,10 @@ export default function useBatchContent({
   modLibrary = (current: any, res: any, entity_token: string ) => current,
   onPass,
   onFail,
-  resultsKey }: Props) {
-  const [list, listSet] = useState<Library>({});
+  resultsKey,
+  toggleCheck
+}: Props) {
+  const [library, librarySet] = useState<Library>({});
   const [busyList, busyListSet] = useState<Library>({});
   const [status, statusSet] = useState(FetchStatus.ready);
 
@@ -38,7 +41,7 @@ export default function useBatchContent({
     busyListSet(tokens.reduce((obj = {},token = "") => ({ ...obj, [token]: true }),{})); // add current batch to busy list
     fetcher("",{},{ tokens }).then((batchRes: any) => {
 
-    console.log("🪙", batchRes.success && !!batchRes[resultsKey]);
+    console.log("🪙", res);
       if (batchRes.success && !!batchRes[resultsKey]) {
 
         let newBatch = batchRes[resultsKey].reduce((obj = {}, { entity_token = "", ...current }) => ({
@@ -48,7 +51,7 @@ export default function useBatchContent({
 
       console.log("😡", newBatch);
         busyListSet({}); // this should be a for each key in tokens delete from busyList, but this is fine for now
-        listSet((list: any) => expand ? { ...list, ...newBatch } : newBatch);
+        librarySet((library: any) => expand ? { ...library, ...newBatch } : newBatch);
       }
     })
   };
@@ -63,32 +66,43 @@ export default function useBatchContent({
   });
 
   const toggle = (entity_token: string, entity_type: string) => {
-    let inLibrary = list[entity_token];
+    let inLibrary = library[entity_token];
     statusSet(FetchStatus.in_progress);
     busyAdd(entity_token);
 
     console.log(`⏳ toggling entity ${ entity_token }, in library?: ${ !!inLibrary }`);
 
     if (inLibrary && checker(inLibrary)) {
-      return onPass.fetch(entity_token, entity_type, list)
+      return onPass.fetch(entity_token, entity_type, library)
       .then((res: any) => {
         console.log("⭕️",res);
         busyRemove(entity_token);
-        listSet(onPass.modLibrary(res, entity_token, entity_type, list));
+        librarySet(onPass.modLibrary(res, entity_token, entity_type, library));
         statusSet(FetchStatus.ready);
         return false;
       });
     } else {
-      return onFail.fetch(entity_token, entity_type, list)
+      return onFail.fetch(entity_token, entity_type, library)
       .then((res: any) => {
         console.log("❌",res);
         busyRemove(entity_token);
-        listSet(onFail.modLibrary(res, entity_token, entity_type, list));
+        librarySet(onFail.modLibrary(res, entity_token, entity_type, library));
         statusSet(FetchStatus.ready);
         return true;
       });
     }
   };
+
+  const toggled = ( entity_token = "" ) => toggleCheck(library[entity_token]);
+
+  const makeProps = ({ entityToken, entityType }: { entityToken: string, entityType: string }) => ({
+    busy: busyList[entityToken],
+    entityToken,
+    entityType,
+    isToggled: toggled(entityToken),
+    toggle
+  });
+
 
   return {
     busyAdd,
@@ -96,10 +110,12 @@ export default function useBatchContent({
     busyList,
     busyListSet,
     gather,
-    list,
-    listSet,
+    library,
+    librarySet,
+    makeProps,
     status,
     statusSet,
-    toggle
+    toggle,
+    toggled
   };
 };

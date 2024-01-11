@@ -12,32 +12,30 @@ interface BookmarkButtonProps {
   busy?: boolean;
   entityToken?: string;
   entityType?: string;
-  initialToggled?: boolean;
-  onToggle: (entityToken: string, entityType: string) => Promise<boolean>;
   favoriteCount?: number;
-  overlay?: boolean;
+  isToggled: boolean;
   large?: boolean;
+  overlay?: boolean;
+  toggle: (entityToken: string, entityType: string) => any
 }
 
 export default function BookmarkButton({
   busy,
   entityToken = "",
   entityType = "",
-  initialToggled = false,
-  onToggle,
   favoriteCount,
-  overlay,
+  isToggled,
   large,
+  overlay,
+  toggle,
 }: BookmarkButtonProps) {
-  const isToggled = initialToggled; // toggled value managed externally via usebookmarks, this may change
-  // const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = async (event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
     // setIsLoading(true);
-    onToggle(entityToken, entityType).then((isToggled: boolean) => {
+    toggle(entityToken, entityType).then((isToggled: boolean) => {
       // setIsToggled(isToggled);
       setIsLoading(false);
     });

@@ -35,7 +35,7 @@ import { Input } from "components/common";
 import LikeButton from "components/common/LikeButton";
 import Badge from "components/common/Badge";
 import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
-import { useBookmarks } from "hooks";
+import { useRatings } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 
 interface MediaPageProps {
@@ -69,7 +69,8 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     getMediaFile(token);
   }, [token, getMediaFile]);
 
-  const bookmarks = useBookmarks();
+  // const bookmarks = useBookmarks();
+  const ratings = useRatings();
 
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
@@ -343,11 +344,11 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                   <div className="d-flex align-items-center gap-2">
                     <LikeButton
                       {...{
-                        entityToken: token,
-                        entityType: "media_file",
-                        likeCount: 1200,
-                        onToggle: bookmarks.toggle,
                         large: true,
+                        ...ratings.makeProps({
+                          entityToken: token,
+                          entityType: "media_file"
+                        }),
                       }}
                     />
                     {/* <BookmarkButton

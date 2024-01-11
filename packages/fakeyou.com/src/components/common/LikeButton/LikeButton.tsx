@@ -12,25 +12,23 @@ interface LikeButtonProps {
   busy?: boolean;
   entityToken?: string;
   entityType?: string;
-  initialToggled?: boolean;
-  onToggle: (entityToken: string, entityType: string) => Promise<boolean>;
   likeCount: number;
+  isToggled: boolean;
   overlay?: boolean;
   large?: boolean;
+  toggle: (entityToken: string, entityType: string) => any
 }
 
 export default function LikeButton({
   busy,
   entityToken = "",
   entityType = "",
-  initialToggled = false,
-  onToggle,
   likeCount = 0, // useShortenNumber freaks out if likeCount = NaN, give it a default value until it loads
+  isToggled,
   overlay,
   large,
+  toggle
 }: LikeButtonProps) {
-  const isToggled = initialToggled; // toggled value managed externally via useRatings, this may change
-  // const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
 
   // console.log("😎",busy);
@@ -39,7 +37,7 @@ export default function LikeButton({
     event.preventDefault();
     event.stopPropagation();
     // setIsLoading(true);
-    onToggle(entityToken, entityType).then((isToggled: boolean) => {
+    toggle(entityToken, entityType).then((isToggled: boolean) => {
       // setIsToggled(isToggled);
       setIsLoading(false);
     });

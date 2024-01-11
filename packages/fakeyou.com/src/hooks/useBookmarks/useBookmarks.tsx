@@ -22,7 +22,7 @@ export default function useBookmarks() {
     }
   };
 
-  const { busyList, gather, list, status, toggle } = useBatchContent({
+  return useBatchContent({
     checker: ({ maybe_bookmark_token }: any) => !!maybe_bookmark_token,
     fetcher: GetBookmarks,
     modLibrary: (current: any, res: any, entity_token: string) => {
@@ -49,14 +49,7 @@ export default function useBookmarks() {
       }),
       modLibrary: toggleList(true)
     },
-    resultsKey: "bookmarks"
+    resultsKey: "bookmarks",
+    toggleCheck: (entity: any) => !!entity?.maybe_bookmark_token
   });
-
-  return {
-    busyList,
-    gather,
-    list,
-    status,
-    toggle
-  };
 };
