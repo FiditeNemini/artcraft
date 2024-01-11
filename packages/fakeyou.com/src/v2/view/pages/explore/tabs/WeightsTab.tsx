@@ -12,13 +12,14 @@ import SkeletonCard from "components/common/Card/SkeletonCard";
 import { ListWeights } from "@storyteller/components/src/api/weights/ListWeights";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useBookmarks, useLazyLists } from "hooks";
+import { useBookmarks, useLazyLists, useRatings } from "hooks";
 import prepFilter from "resources/prepFilter";
 
 export default function WeightsTab() {
   const { search } = useLocation();
   const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
+  const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [weightType, weightTypeSet] = useState(urlQueries.get("maybe_scoped_weight_type") || "all");
   const [weightCategory, weightCategorySet] = useState(urlQueries.get("maybe_scoped_weight_category") || "all");
@@ -36,7 +37,17 @@ export default function WeightsTab() {
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: (res) => {
-      bookmarks.gather({ res, expand: true }); // expand rather than replace for lazy loading 
+      bookmarks.gather({ res, expand: true, key: "weight_token" }); // expand rather than replace for lazy loading 
+      ratings.gather({ 
+        res,
+        expand: true,
+        key: "weight_token",
+        modLibrary: (current: any, res: any, entity_token: string) => {
+          // let item = res.results.find((item: any, i: number) => item.weight_token === entity_token);
+          // console.log("🍋", item);
+          return current;
+        }
+      });
       setShowMasonryGrid(true);
     },
     requestList: true,
@@ -184,6 +195,7 @@ export default function WeightsTab() {
                       let props = {
                         bookmarks,
                         data,
+                        ratings,
                         showCreator: true,
                         type: "weights",
                       };

@@ -191,6 +191,7 @@ export default function ImageCard({
 
                   <div>
                     <LikeButton {...{
+                      busy: ratings.busyList[data.weight_token],
                       entityToken: data.weight_token,
                       entityType: "model_weight",
                       likeCount: data.likes,

@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/pro-solid-svg-icons";
 import { faHeart as faHeartOutline } from "@fortawesome/pro-regular-svg-icons";
+import { WorkDots } from "components/svg";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "./LikeButton.scss";
 import useShortenNumber from "hooks/useShortenNumber";
 
 interface LikeButtonProps {
+  busy?: boolean;
   entityToken?: string;
   entityType?: string;
   initialToggled?: boolean;
@@ -18,6 +20,7 @@ interface LikeButtonProps {
 }
 
 export default function LikeButton({
+  busy,
   entityToken = "",
   entityType = "",
   initialToggled = false,
@@ -29,6 +32,8 @@ export default function LikeButton({
   const isToggled = initialToggled; // toggled value managed externally via useRatings, this may change
   // const [isToggled, setIsToggled] = useState(initialToggled);
   const [isLoading, setIsLoading] = useState(false);
+
+  // console.log("😎",busy);
 
   const handleClick = async (event: React.MouseEvent) => {
     event.preventDefault();
@@ -74,7 +79,9 @@ export default function LikeButton({
             icon={isToggled ? faHeart : faHeartOutline}
             className={`${iconClass} me-2`}
           />
-          {likeCount && <p className="like-number">{likeCountShort}</p>}
+            <div className="like-number">
+              <WorkDots {...{ labels: [likeCountShort], index: busy ? 0 : 1 }}/>
+            </div>
         </button>
       </Tippy>
     </div>

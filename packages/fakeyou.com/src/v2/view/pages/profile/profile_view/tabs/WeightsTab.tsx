@@ -49,7 +49,8 @@ export default function WeightsTab({ username }: { username: string }) {
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: (res) => {
-      bookmarks.gather({ res });
+      bookmarks.gather({ res, key: "weight_token" });
+      // ratings.gather(res);
       setShowMasonryGrid(true);
     },
     requestList: true,

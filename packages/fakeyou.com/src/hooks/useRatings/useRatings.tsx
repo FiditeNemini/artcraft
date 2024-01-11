@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
-import { GetRatings, GetRatingsResponse } from "@storyteller/components/src/api/user_ratings/GetRatings";
-import { SetRating, SetRatingResponse } from "@storyteller/components/src/api/user_ratings/SetRating";
+import { GetRatings } from "@storyteller/components/src/api/user_ratings/GetRatings";
+import { SetRating } from "@storyteller/components/src/api/user_ratings/SetRating";
+import { useBatchContent } from "hooks";
 
 // interface Props {
 //   value?: any
@@ -9,38 +10,34 @@ import { SetRating, SetRatingResponse } from "@storyteller/components/src/api/us
 
 export default function useRatings() {
   // const [library, librarySet] = useState({});
-  const [baseList, baseListSet] = useState<any[]>([]);
+  // const [baseList, baseListSet] = useState<any[]>([]);
   const [toggleStatus, toggleStatusSet] = useState(FetchStatus.ready);
 
-  const library = baseList.reduce((obj: any, current: any) => {
-    return { ...obj, [current.entity_token]: current.token }
-  },{});
+  const fetch = (entity_token: string, entity_type: string, lib: any) => {
+    // console.log("🔔",lib[entity_token].rating_value);
+    return SetRating("",{
+      entity_token,
+      entity_type,
+      rating_value: lib[entity_token].rating_value === "neutral" ? "positive" : "neutral"
+    });
+  };
 
-  const gather = (res: any) => {
-    let tokens = res.results.map((item: any) => item.token);
-    console.log("💧", tokens);
-    GetRatings("",{},{ tokens }).then((res: GetRatingsResponse) => {
-      if (res.success && res.ratings) {
-        console.log("🪙",res);
-        baseListSet(res.ratings);
+  const { busyList, gather, list, status, toggle } = useBatchContent({
+    fetcher: GetRatings,
+    checker: () => true,
+    onPass: {
+      fetch,
+      modLibrary: (res: any, entity_token: string, entity_type: string, lib: any) => {
+        return {
+          ...lib,
+          [entity_token]: { entity_type, rating_value: lib[entity_token].rating_value === "neutral" ? "positive" : "neutral" }
+        };
       }
-    });
-  };
+    },
+    resultsKey: "ratings"
+  });
 
-  const toggle = (token: string, entityType: string) => {
-    let inLibrary = library[token];
+  // console.log("🔮",list);
 
-    toggleStatusSet(FetchStatus.in_progress);
-    console.log("⏳ toggling bookmark ...",{ token, entityType });
-    SetRating("",{
-      entity_token: token,
-      entity_type: entityType,
-      rating_value: !inLibrary || inLibrary.rating_value === "neutral" ? "positive" : "neutral"
-    }).then(( res: SetRatingResponse ) => {
-      toggleStatusSet(FetchStatus.ready);
-      console.log("👍 like toggled",res);
-    });
-  };
-
-  return { gather, toggleStatus, toggleStatusSet, toggle };
+  return { busyList, gather, list, status, toggleStatus, toggleStatusSet, toggle };
 };

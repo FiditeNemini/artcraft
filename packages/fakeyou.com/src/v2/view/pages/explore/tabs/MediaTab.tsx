@@ -38,7 +38,7 @@ export default function MediaTab() {
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: (res) => {
-      bookmarks.gather({ res, expand: true }); // expand rather than replace for lazy loading 
+      bookmarks.gather({ res, expand: true, key: "token" }); // expand rather than replace for lazy loading 
       setShowMasonryGrid(true);
     },
     requestList: true,

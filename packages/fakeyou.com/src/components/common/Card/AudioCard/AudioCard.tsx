@@ -76,8 +76,7 @@ export default function AudioCard({
     <Link
       {...{
         to: linkUrl,
-        state: { origin },
-        onClick: () => console.log("🌠 AUDIO CARD"),
+        state: { origin }
       }}
     >
       <Card padding={true} canHover={true}>
@@ -124,9 +123,11 @@ export default function AudioCard({
 
               <div>
                 <LikeButton {...{
+                  busy: ratings.busyList[data.token],
                   entityToken: data.token,
                   entityType: "media_file",
                   likeCount: data.likes,
+                  initialToggled: ratings?.list[data.token]?.rating_value === "positive",
                   onToggle: ratings.toggle
                 }} />
               </div>
@@ -187,6 +188,7 @@ export default function AudioCard({
 
               <div>
                 <LikeButton {...{
+                  busy: ratings.busyList[data.weight_token],
                   entityToken: data.weight_token,
                   entityType: "model_weight",
                   likeCount: data.likes,

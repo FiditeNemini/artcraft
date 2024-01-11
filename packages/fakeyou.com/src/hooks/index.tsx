@@ -1,3 +1,4 @@
+import useBatchContent from './useBatchContent';
 import useBookmarks from './useBookmarks';
 import useChanger from './useChanger';
 import useCoverImgUpload from './useCoverImgUpload';
@@ -18,6 +19,7 @@ import useVideo from './useVideo';
 import useWeightFetch from './useWeightFetch';
 
 export {
+  useBatchContent,
   useBookmarks,
   useChanger,
   useCoverImgUpload,

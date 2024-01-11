@@ -58,7 +58,7 @@ export default function BookmarksTab({ username }: { username: string }) {
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: (res) => {
-      bookmarks.gather({ res });
+      bookmarks.gather({ res, key: "weight_token" });
       setShowMasonryGrid(true);
     },
     requestList: true,
