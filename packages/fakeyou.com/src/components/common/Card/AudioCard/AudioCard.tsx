@@ -124,17 +124,17 @@ export default function AudioCard({
               )}
 
               <div>
-                <LikeButton
-                  {...{
-                    busy: ratings.busyList[data.token],
-                    entityToken: data.token,
-                    entityType: "media_file",
-                    likeCount: data.likes,
-                    initialToggled:
-                      ratings?.list[data.token]?.rating_value === "positive",
-                    onToggle: ratings.toggle,
-                  }}
+
                 />
+
+                <LikeButton {...{
+                  likeCount: data.likes,
+                  ...ratings.makeProps({
+                    entityToken: data.token,
+                    entityType: "media_file"
+                  })
+                }} />
+
               </div>
             </div>
           </>
@@ -194,26 +194,20 @@ export default function AudioCard({
               )}
 
               <div>
-                <LikeButton
-                  {...{
-                    busy: ratings.busyList[data.weight_token],
+                <LikeButton {...{
+                  likeCount: ratings?.list[data.weight_token]?.positive_rating_count || 0,
+                  ...ratings.makeProps({
                     entityToken: data.weight_token,
-                    entityType: "model_weight",
-                    likeCount:
-                      ratings?.list[data.weight_token]?.positive_rating_count ||
-                      0,
-                    onToggle: ratings?.toggle,
-                  }}
-                />
+                    entityType: "model_weight"
+                  })
+                }} />
               </div>
               <BookmarkButton
                 {...{
-                  busy: bookmarks.busyList[data.weight_token],
-                  entityToken: data.weight_token,
-                  entityType: "model_weight",
-                  onToggle: bookmarks?.toggle,
-                  initialToggled:
-                    bookmarks?.list[data.weight_token]?.maybe_bookmark_token,
+                  ...bookmarks.makeProps({
+                    entityToken: data.weight_token,
+                    entityType: "model_weight"
+                  })
                 }}
               />
             </div>
