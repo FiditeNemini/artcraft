@@ -194,7 +194,8 @@ export default function ImageCard({
                       busy: ratings.busyList[data.weight_token],
                       entityToken: data.weight_token,
                       entityType: "model_weight",
-                      likeCount: data.likes,
+                      likeCount: ratings?.list[data.weight_token]?.positive_rating_count || 0,
+                      initialToggled: (ratings?.list[data.weight_token]?.rating_value || "") === "positive",
                       onToggle: ratings?.toggle
                     }} />
                   </div>
@@ -204,7 +205,7 @@ export default function ImageCard({
                       entityToken: data.weight_token,
                       entityType: "model_weight",
                       onToggle: bookmarks?.toggle,
-                      initialToggled: bookmarks?.list[data.weight_token]?.is_bookmarked
+                      initialToggled: bookmarks?.list[data.weight_token]?.maybe_bookmark_token
                     }}
                   />
                 </div>

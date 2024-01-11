@@ -28,16 +28,25 @@ export default function useRatings() {
     onPass: {
       fetch,
       modLibrary: (res: any, entity_token: string, entity_type: string, lib: any) => {
-        return {
+        
+        let jam = {
           ...lib,
-          [entity_token]: { entity_type, rating_value: lib[entity_token].rating_value === "neutral" ? "positive" : "neutral" }
+          [entity_token]: {
+            entity_type,
+            rating_value: lib[entity_token].rating_value === "neutral" ? "positive" : "neutral",
+            positive_rating_count: res.new_positive_rating_count_for_entity
+          }
         };
+
+        console.log("💯",res, jam);
+
+          return jam;
       }
     },
     resultsKey: "ratings"
   });
 
-  // console.log("🔮",list);
+  console.log("🔮",list);
 
   return { busyList, gather, list, status, toggleStatus, toggleStatusSet, toggle };
 };

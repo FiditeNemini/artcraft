@@ -72,6 +72,8 @@ export default function AudioCard({
     }
   }
 
+  // console.log("💎",ratings?.list[data.weight_token]);
+
   return (
     <Link
       {...{
@@ -191,7 +193,7 @@ export default function AudioCard({
                   busy: ratings.busyList[data.weight_token],
                   entityToken: data.weight_token,
                   entityType: "model_weight",
-                  likeCount: data.likes,
+                  likeCount: ratings?.list[data.weight_token]?.positive_rating_count || 0,
                   onToggle: ratings?.toggle
                 }} />
               </div>
@@ -201,7 +203,7 @@ export default function AudioCard({
                   entityToken: data.weight_token,
                   entityType: "model_weight",
                   onToggle: bookmarks?.toggle,
-                  initialToggled: bookmarks?.list[data.weight_token]?.is
+                  initialToggled: bookmarks?.list[data.weight_token]?.maybe_bookmark_token
                 }}
               />
             </div>

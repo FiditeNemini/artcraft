@@ -43,9 +43,11 @@ export default function WeightsTab() {
         expand: true,
         key: "weight_token",
         modLibrary: (current: any, res: any, entity_token: string) => {
-          // let item = res.results.find((item: any, i: number) => item.weight_token === entity_token);
-          // console.log("🍋", item);
-          return current;
+          let { positive_rating_count } = res.results.find((item: any, i: number) => 
+            item.weight_token === entity_token
+          ).stats;
+
+          return { ...current, positive_rating_count };
         }
       });
       setShowMasonryGrid(true);
