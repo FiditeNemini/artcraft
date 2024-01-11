@@ -195,10 +195,11 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_user_rating_routes(app); /* /v1/user_rating/... */
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
-
-  if server_environment == ServerEnvironment::Development {
-     app = add_weights_routes(app); /* /v1/stubs/... */
-  }
+    app = add_image_gen_routes(app);
+    app = add_weights_routes(app);
+  // if server_environment == ServerEnvironment::Development {
+  //
+  // }
   // ==================== Comments ====================
 
   let mut app = RouteBuilder::from_app(app)
@@ -216,6 +217,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
       .add_get("/v1/user_bookmarks/list/user/{username}", list_user_bookmarks_for_user_handler)
       .add_get("/v1/user_bookmarks/list/entity/{entity_type}/{entity_token}", list_user_bookmarks_for_entity_handler)
       .into_app();
+
 
   // ==================== Animations ====================
 

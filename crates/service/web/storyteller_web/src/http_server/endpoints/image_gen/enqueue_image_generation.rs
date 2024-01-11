@@ -119,7 +119,6 @@ pub struct EnqueueImageGenRequest {
     maybe_lora_upload_path: Option<String>,
     maybe_cfg_scale: Option<i32>,
     maybe_number_of_samples: Option<i32>,
-    maybe_batch_size: Option<i32>,
     maybe_batch_count: Option<i32>,
 }
 
@@ -189,6 +188,7 @@ pub async fn enqueue_image_generation_request(
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, EnqueueImageGenRequestError> {
 
+    // TODO: Brandon need to figure out premium vs not premium
     let mut maybe_user_token: Option<UserToken> = None;
     let  visbility =  enums::common::visibility::Visibility::Public;
     let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {
@@ -234,6 +234,8 @@ pub async fn enqueue_image_generation_request(
             return Err(EnqueueImageGenRequestError::NotAuthorized);
         }
     }
+
+    // DETECT premium user and queue
 
     // ==================== RATE LIMIT ==================== //
 
@@ -299,13 +301,9 @@ pub async fn enqueue_image_generation_request(
         None => 20,
     };
 
-    let batch_size = match request.maybe_batch_size {
-        Some(val) => if val > 4 { 4 } else { val },
-        None => 1,
-    };
 
     let batch_count = match request.maybe_batch_count {
-        Some(val) => if val > 2 { 2 } else { val },
+        Some(val) => if val > 4 { 4 } else { val },
         None => 1,
     };
 
@@ -336,7 +334,6 @@ pub async fn enqueue_image_generation_request(
     let type_of_inference = request.type_of_inference.to_string().clone();
 
 
-
     let inference_args = StableDiffusionArgs {
         maybe_sd_model_token: Some(sd_weight_token),
         maybe_lora_model_token: Some(lora_token),
@@ -350,7 +347,6 @@ pub async fn enqueue_image_generation_request(
         maybe_cfg_scale: Some(cfg_scale),
         maybe_number_of_samples: Some(number_of_samples),
         maybe_batch_count: Some(batch_count),
-        maybe_batch_size: Some(batch_size),
         maybe_width: Some(width),
         maybe_height: Some(height),
         maybe_sampler: Some(sampler)

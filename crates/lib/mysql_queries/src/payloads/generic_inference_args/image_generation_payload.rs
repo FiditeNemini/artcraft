@@ -73,9 +73,6 @@ pub struct StableDiffusionArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_number_of_samples: Option<i32>,
 
-    #[serde(rename = "bz")]
-    pub maybe_batch_size: Option<i32>,
-
     #[serde(rename = "bc")]
     pub maybe_batch_count: Option<i32>,
 
