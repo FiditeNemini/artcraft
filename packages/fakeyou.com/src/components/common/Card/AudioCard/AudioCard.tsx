@@ -189,7 +189,6 @@ export default function AudioCard({
 
               <div>
                 <LikeButton {...{
-                  likeCount: ratings?.list[data.weight_token]?.positive_rating_count || 0,
                   ...ratings.makeProps({
                     entityToken: data.weight_token,
                     entityType: "model_weight"

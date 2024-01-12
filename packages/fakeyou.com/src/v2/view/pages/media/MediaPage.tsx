@@ -53,7 +53,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
-
+  const ratings = useRatings();
   const getMediaFile = useCallback(async (mediaFileToken: string) => {
     let result = await GetMediaFile(mediaFileToken);
     if (result.media_file) {
@@ -70,7 +70,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   }, [token, getMediaFile]);
 
   // const bookmarks = useBookmarks();
-  const ratings = useRatings();
 
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
