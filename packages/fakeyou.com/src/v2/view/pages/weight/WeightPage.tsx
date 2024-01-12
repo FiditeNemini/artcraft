@@ -240,8 +240,8 @@ export default function WeightPage({
       property: "Visibility",
       value: weight.creator_set_visibility,
     },
-    { property: "Created at", value: weight.created_at?.toString() || "" },
-    { property: "Updated at", value: weight.updated_at?.toString() || "" },
+    { property: "Created at", value: dateCreated || "" },
+    { property: "Updated at", value: dateCreated || "" },
   ];
 
   const imageDetails = [
