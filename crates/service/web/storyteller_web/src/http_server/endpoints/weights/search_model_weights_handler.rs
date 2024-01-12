@@ -36,8 +36,8 @@ pub struct SearchModelWeightsRequest {
 pub struct ModelWeightSearchResult {
   pub weight_token: ModelWeightToken,
 
-  pub weights_type: WeightsType,
-  pub weights_category: WeightsCategory,
+  pub weight_type: WeightsType,
+  pub weight_category: WeightsCategory,
 
   pub creator_set_visibility: Visibility,
 
@@ -142,8 +142,8 @@ pub async fn search_model_weights_handler(
 
         ModelWeightSearchResult {
           weight_token: result.token,
-          weights_type: result.weights_type,
-          weights_category: result.weights_category,
+          weight_type: result.weights_type,
+          weight_category: result.weights_category,
           title: result.title,
           creator: UserDetailsLight::from_db_fields(
             &result.creator_user_token,
