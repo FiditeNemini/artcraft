@@ -69,8 +69,13 @@ pub struct ModelWeightForList {
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
 
+    #[deprecated(note="switch to UserDetailsLight")]
     pub creator_username: String,
+
+    #[deprecated(note="switch to UserDetailsLight")]
     pub creator_display_name: String,
+
+    #[deprecated(note="switch to UserDetailsLight")]
     pub creator_email_gravatar_hash: String,
 
     /// Statistics about the weights
