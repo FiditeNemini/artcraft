@@ -356,7 +356,7 @@ export default function SideNav({
 
             <li>
               <NavLink
-                to="/storyteller-studio"
+                to="/studio"
                 activeClassName="active-link"
                 onClick={handleNavLinkClick}
               >
