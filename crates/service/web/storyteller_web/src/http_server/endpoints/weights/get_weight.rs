@@ -15,6 +15,7 @@ use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
 use tokens::tokens::model_weights::ModelWeightToken;
+use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
@@ -40,8 +41,12 @@ pub struct GetWeightResponse {
     file_size_bytes: i32,
     file_checksum_sha2: String,
 
+    /// Information about the cover image.
+    pub cover_image: CoverImageDetails,
+
     /// Cover images are small descriptive images that can be set for any model.
     /// If a cover image is set, this is the path to the asset.
+    #[deprecated(note="switch to CoverImageDetails")]
     maybe_cover_image_public_bucket_path: Option<String>,
 
     /// Statistics about the weights
@@ -149,6 +154,13 @@ pub async fn get_weight_handler(
         }
     }
 
+    let cover_image_details = CoverImageDetails::from_optional_db_fields(
+        &weight.token,
+        weight.maybe_cover_image_public_bucket_hash.as_deref(),
+        weight.maybe_cover_image_public_bucket_prefix.as_deref(),
+        weight.maybe_cover_image_public_bucket_extension.as_deref(),
+    );
+
     let maybe_cover_image = weight.maybe_cover_image_public_bucket_hash
         .as_deref()
         .map(|hash| {
@@ -176,6 +188,7 @@ pub async fn get_weight_handler(
         // TODO(bt,2023-12-24): Migrated the column. We should return nullable fields, but I don't want to break the frontend
         description_markdown: weight.maybe_description_markdown.unwrap_or_else(|| "".to_string()),
         description_rendered_html: weight.maybe_description_rendered_html.unwrap_or_else(|| "".to_string()),
+        cover_image: cover_image_details,
         maybe_cover_image_public_bucket_path: maybe_cover_image,
         creator,
         creator_set_visibility: weight.creator_set_visibility,

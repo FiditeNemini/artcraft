@@ -20,6 +20,7 @@ use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use tokens::tokens::model_weights::ModelWeightToken;
+use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
@@ -44,6 +45,10 @@ pub struct ModelWeightSearchResult {
 
   pub creator: UserDetailsLight,
 
+  /// Information about the cover image.
+  pub cover_image: CoverImageDetails,
+
+  #[deprecated(note="switch to CoverImageDetails")]
   pub maybe_cover_image_public_bucket_path: Option<String>,
 
   pub stats: SimpleEntityStats,
@@ -117,6 +122,13 @@ pub async fn search_model_weights_handler(
 
   let results = results.into_iter()
       .map(|result| {
+        let cover_image_details = CoverImageDetails::from_optional_db_fields(
+          &result.token,
+          result.maybe_cover_image_public_bucket_hash.as_deref(),
+          result.maybe_cover_image_public_bucket_prefix.as_deref(),
+          result.maybe_cover_image_public_bucket_extension.as_deref(),
+        );
+
         let maybe_cover_image = result.maybe_cover_image_public_bucket_hash
             .as_deref()
             .map(|hash| {
@@ -139,6 +151,7 @@ pub async fn search_model_weights_handler(
             &result.creator_display_name,
             &result.creator_gravatar_hash,
           ),
+          cover_image: cover_image_details,
           maybe_cover_image_public_bucket_path: maybe_cover_image,
           stats: SimpleEntityStats {
             positive_rating_count: result.ratings_positive_count,
