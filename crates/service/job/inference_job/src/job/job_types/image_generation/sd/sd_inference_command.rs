@@ -68,7 +68,6 @@ pub enum ExecutableOrCommand {
 
 pub struct InferenceArgs<P: AsRef<Path>> {
   /// --source_image: path to the input image (or video)
-  pub input_image: P, // Not availbile rn
   /// --result_dir: path to directory work is performed
   pub work_dir: P,
   /// --result_file: path to final file output
@@ -305,21 +304,3 @@ impl StableDiffusionInferenceCommand {
     }
   }
 }
-
-
-
-
-
-// pub struct StableDiffusionInferenceCommand {
-//     pub command: String,
-//     pub args: Vec<String>
-// }
-
-// impl StableDiffusionInferenceCommand {
-//     pub from_env() -> Self {
-//         Self {
-//             command: "python".to_string(),
-//             args: vec![],
-//         }
-//     }
-// }

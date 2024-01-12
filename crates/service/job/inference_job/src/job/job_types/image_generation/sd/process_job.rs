@@ -8,8 +8,11 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job_dependencies::JobDependencies;
 use anyhow::anyhow;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
+
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType::UploadModel;
+use crate::job::job_types::image_generation::sd::sd_inference_command::InferenceArgs;
+use crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
 use crate::job::job_types::image_generation::sd::validate_inputs::validate_inputs;
 
 pub struct StableDiffusionProcessArgs<'a> {
@@ -21,16 +24,6 @@ pub struct StableDiffusionProcessArgs<'a> {
 // upload inference result
 // upload model checkpoint or loRA
 
-// create record in db
-// if stable_diffusion_args.inference_type == "checkpoint" {
-//     // run inference with checkpoint and upload
-// } else if stable_diffusion_args.inference_type == "lora" {
-//     // run inference with the  lora + random checkpoint
-// } else if stable_diffusion_args.inference_type == "inference" {
-//     // run inference with or without lora
-// } else {
-//     return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("wrong inference type for job!")));
-// }
 // run inference
 // insert record into the db with the inference job token complete.
 
@@ -63,32 +56,33 @@ pub async fn sd_args_from_job(
     Ok(stable_diffusion_args)
 }
 
+// store the prompt and cluster them today.
 
 pub async fn process_job_selection (args: StableDiffusionProcessArgs<'_>
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
     let job = args.job;
     let sd_args = sd_args_from_job(&args).await?;
     if sd_args.type_of_inference == "inference" {
-        process_job_inference(args).await
+        process_job_inference(&args).await
     }
     else if sd_args.type_of_inference == "lora" {
-        process_job_lora(args).await
+        process_job_lora(&args).await
     }
     else if sd_args.type_of_inference == "checkpoint"{
-        process_job_inference(args).await
+        process_job_inference(&args).await
     }
     else {
         Err(ProcessSingleJobError::Other(anyhow!("inference type doesn't exist!")))
     }
 }
 
-pub async fn process_job_checkpoint(args: StableDiffusionProcessArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
+pub async fn process_job_checkpoint(args: &StableDiffusionProcessArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
     Ok(JobSuccessResult {
         maybe_result_entity: None,
         inference_duration: Duration::from_secs(0),
     })
 }
-pub async fn process_job_lora(args: StableDiffusionProcessArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
+pub async fn process_job_lora(args: &StableDiffusionProcessArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
     Ok(JobSuccessResult {
         maybe_result_entity: None,
         inference_duration: Duration::from_secs(0),
@@ -96,67 +90,82 @@ pub async fn process_job_lora(args: StableDiffusionProcessArgs<'_>) -> Result<Jo
 }
 
 pub async fn process_job_inference(
-    args: StableDiffusionProcessArgs<'_>
+    args: &StableDiffusionProcessArgs<'_>
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
     let job = args.job;
     let deps = args.job_dependencies;
 
-    // let sd_args = sd_args_from_job(&args).await?;
+    let sd_args = sd_args_from_job(&args).await?;
 
-    // let mut job_progress_reporter = args.job_dependencies.clients.job_progress_reporter
-    //     .new_generic_inference(job.inference_job_token.as_str())
-    //     .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
-    // //==================== TEMP DIR ==================== //
-    // let work_temp_dir = format!("temp_stable_diffusion_inference_{}", job.id.0);
+    let sd_deps = match &args.job_dependencies.job.job_specific_dependencies.maybe_stable_diffusion_dependencies {
+        None => {
+            return Err(ProcessSingleJobError::Other(anyhow!("Missing Job Specific Dependencies")));
+        }
+        Some(val) => {
+            val
+        }
+    };
 
-    // //NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
-    // let work_temp_dir = args.job_dependencies.fs.scoped_temp_dir_creator_for_work
-    //     .new_tempdir(&work_temp_dir)
-    //     .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
+    let mut job_progress_reporter = args.job_dependencies.clients.job_progress_reporter
+        .new_generic_inference(job.inference_job_token.as_str())
+        .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
+    //==================== TEMP DIR ==================== //
 
-    // let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint");
-    // let lora_path = work_temp_dir.path().join("lora");
+    let work_temp_dir = format!("temp_stable_diffusion_inference_{}", job.id.0);
+
+    // thread::sleep(seconds) to check the directory
+
+    //NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
+    let work_temp_dir = args.job_dependencies.fs.scoped_temp_dir_creator_for_work
+        .new_tempdir(&work_temp_dir)
+        .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
+
+    let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint");
+    let lora_path = work_temp_dir.path().join("lora");
+
+
 
     // // Unpack loRA and Checkpoint
     // // run inference by downloading from google drive.
-    // let lora_token = sd_args.maybe_lora_model_token;
-    // let weight_token = sd_args.maybe_sd_model_token;
+    let lora_token = sd_args.maybe_lora_model_token;
+    let weight_token = sd_args.maybe_sd_model_token;
 
-    // let retrieved_sd_record = match weight_token {
-    //     Some(token) => {
-    //         let retrieved_sd_record = get_weight_by_token(
-    //             &token,
-    //             false,
-    //             &deps.db.mysql_pool
-    //         ).await?;
-    //         match retrieved_sd_record {
-    //             Some(record) => record,
-    //             None => {
-    //                 return Err(
-    //                     ProcessSingleJobError::from_anyhow_error(anyhow!("no record of model!"))
-    //                 );
-    //             }
-    //         }
-    //     }
-    //     None => {
-    //         return Err(
-    //             ProcessSingleJobError::from_anyhow_error(anyhow!("no sd model token for job!"))
-    //         );
-    //     }
-    // };
 
-    // // ignore if no lora token
-    // let retrieved_loRA_record = match lora_token {
-    //     Some(token) => {
-    //         let retrieved_loRA_record = get_weight_by_token(
-    //             &token,
-    //             false,
-    //             &deps.db.mysql_pool
-    //         ).await?;
-    //         Some(retrieved_loRA_record)
-    //     }
-    //     None => None,
-    // };
+    let retrieved_sd_record = match weight_token {
+        Some(token) => {
+            let retrieved_sd_record = get_weight_by_token(
+                &token,
+                false,
+                &deps.db.mysql_pool
+            ).await?;
+            match retrieved_sd_record {
+                Some(record) => record,
+                None => {
+                    return Err(
+                        ProcessSingleJobError::from_anyhow_error(anyhow!("no record of model!"))
+                    );
+                }
+            }
+        }
+        None => {
+            return Err(
+                ProcessSingleJobError::from_anyhow_error(anyhow!("no sd model token for job!"))
+            );
+        }
+    };
+
+    // ignore if no lora token
+    let retrieved_loRA_record = match lora_token {
+        Some(token) => {
+            let retrieved_loRA_record = get_weight_by_token(
+                &token,
+                false,
+                &deps.db.mysql_pool
+            ).await?;
+            Some(retrieved_loRA_record)
+        }
+        None => None,
+    };
 
     // let details = RemoteCloudBucketDetails::new(
     //     retrieved_sd_record.public_bucket_hash.clone(),
@@ -197,6 +206,26 @@ pub async fn process_job_inference(
     //     entity_type: InferenceResultType::UploadModel,
     //     entity_token:
     // };
+
+
+    sd_deps.inference_command.execute_inference(InferenceArgs {
+        work_dir: (),
+        output_file: (),
+        stderr_output_file: (),
+        prompt: (),
+        negative_prompt: (),
+        number_of_samples: 0,
+        samplers: "".to_string(),
+        width: 0,
+        height: 0,
+        cfg_scale: 0,
+        seed: 0,
+        lora_path: (),
+        checkpoint_path: (),
+        vae: (),
+        batch_count: 0,
+    });
+
 
     Ok(JobSuccessResult {
         maybe_result_entity: None,
