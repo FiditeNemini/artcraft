@@ -9,6 +9,7 @@ import { useLocation } from "react-router-dom";
 import debounce from "lodash.debounce";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import WeightsCards from "components/common/Card/WeightsCards";
+import { useBookmarks, useRatings } from "hooks";
 
 // const allTags = [
 //   "English",
@@ -21,6 +22,8 @@ import WeightsCards from "components/common/Card/WeightsCards";
 
 export default function SearchPage() {
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
+  const bookmarks = useBookmarks();
+  const ratings = useRatings();
 
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -123,6 +126,8 @@ export default function SearchPage() {
           {foundWeights.map((data: any, key: number) => {
             let props = {
               data,
+              bookmarks,
+              ratings,
               showCreator: true,
               type: "weights",
             };
