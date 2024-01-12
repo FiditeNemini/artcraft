@@ -12,6 +12,7 @@ import {
   faCompass,
   faUser,
   faSignOutAlt,
+  faCameraMovie,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
@@ -350,6 +351,21 @@ export default function SideNav({
                   className="sidebar-heading-icon"
                 />
                 {t("videoFaceAnimator")}
+              </NavLink>
+            </li>
+
+            <li>
+              <NavLink
+                to="/storyteller-studio"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faCameraMovie}
+                  className="sidebar-heading-icon"
+                />
+                Storyteller Studio
+                {/* {t("videoStorytellerStudio")} */}
               </NavLink>
             </li>
 

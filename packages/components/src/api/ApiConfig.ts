@@ -132,6 +132,10 @@ class ApiConfig {
     return `${this.getApiOrigin()}/tts/search`;
   }
 
+  searchWeights(): string {
+    return `${this.getApiOrigin()}/v1/weights/search`;
+  }
+
   getPendingTtsJobCount(): string {
     return `${this.getApiOrigin()}/tts/queue_length`;
   }

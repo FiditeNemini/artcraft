@@ -78,7 +78,7 @@ export default function AudioCard({
     <Link
       {...{
         to: linkUrl,
-        state: { origin }
+        state: { origin },
       }}
     >
       <Card padding={true} canHover={true}>
@@ -124,6 +124,7 @@ export default function AudioCard({
               )}
 
               <div>
+
                 <LikeButton {...{
                   likeCount: data.likes,
                   ...ratings.makeProps({
@@ -131,6 +132,7 @@ export default function AudioCard({
                     entityType: "media_file"
                   })
                 }} />
+
               </div>
             </div>
           </>
@@ -139,7 +141,9 @@ export default function AudioCard({
         {type === "weights" && (
           <>
             <div className="d-flex">
-              {showCover && <WeightCoverImage src={coverImage} />}
+              {showCover && (
+                <WeightCoverImage src={coverImage} height={110} width={110} />
+              )}
 
               <div className="flex-grow-1">
                 <div className="d-flex align-items-center">

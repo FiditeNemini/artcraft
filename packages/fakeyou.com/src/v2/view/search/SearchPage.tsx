@@ -6,10 +6,8 @@ import Panel from "components/common/Panel";
 import ModelSearchResults from "components/common/ModelSearchResults";
 import ModelTags from "components/common/ModelTags";
 import Select from "components/common/Select";
-import {
-  SearchTtsModels,
-  TtsModel,
-} from "@storyteller/components/src/api/tts/SearchTtsModels";
+import { SearchWeights } from "@storyteller/components/src/api/weights/SearchWeights";
+import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import { useLocation } from "react-router-dom";
 
 const allTags = [
@@ -22,7 +20,7 @@ const allTags = [
 ];
 
 export default function SearchPage() {
-  const [foundTtsModels, setFoundTtsModels] = useState<TtsModel[]>([]);
+  const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
 
   const useQuery = () => {
     return new URLSearchParams(useLocation().search);
@@ -34,16 +32,16 @@ export default function SearchPage() {
         search_term: value,
       };
 
-      let response = await SearchTtsModels(request);
+      let response = await SearchWeights(request);
 
       if (response.success) {
-        let models = [...response.models];
-        setFoundTtsModels(models);
+        let weights = [...response.weights];
+        setFoundWeights(weights);
       } else {
-        setFoundTtsModels([]);
+        setFoundWeights([]);
       }
     },
-    [setFoundTtsModels]
+    [setFoundWeights]
   );
 
   const query = useQuery();
@@ -83,7 +81,7 @@ export default function SearchPage() {
   return (
     <Container type="panel" className="mb-5">
       <PageHeader
-        title={`${foundTtsModels.length || "0"} results for "${urlSearchTerm}"`}
+        title={`${foundWeights.length || "0"} results for "${urlSearchTerm}"`}
         titleH2={true}
         extension={tags}
         panel={false}
@@ -104,7 +102,7 @@ export default function SearchPage() {
         </div>
 
         {/*<ModelSearchResults data={filteredData} />*/}
-        <ModelSearchResults data={foundTtsModels} />
+        <ModelSearchResults data={foundWeights} />
       </Panel>
     </Container>
   );
