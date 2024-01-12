@@ -41,7 +41,7 @@ pub struct Weight {
   file_checksum_sha2: String,
 
   /// Information about the cover image.
-  pub cover_image: CoverImageDetails,
+  cover_image: CoverImageDetails,
 
   /// Cover images are small descriptive images that can be set for any model.
   /// If a cover image is set, this is the path to the asset.
