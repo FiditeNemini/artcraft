@@ -15,8 +15,10 @@ select
     token,
     title,
     download_url,
-    status
+    status,
+    assigned_worker
 from generic_download_jobs
 where download_type = 'rvc_v2'
-and status IN ('started', 'attempt_failed')
-and created_at > (CURDATE() - INTERVAL 2 DAY);
+and status IN ('started', 'attempt_failed', 'dead')
+and created_at > (CURDATE() - INTERVAL 12 HOUR)
+order by updated_at desc;
