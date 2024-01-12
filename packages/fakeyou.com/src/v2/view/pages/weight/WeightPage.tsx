@@ -404,7 +404,7 @@ export default function WeightPage({
               <h4 className="fw-semibold mb-3">Comments</h4>
               <CommentComponent
                 entityType="user"
-                entityToken={"1"}
+                entityToken={weight.weight_token}
                 sessionWrapper={sessionWrapper}
               />
             </div>

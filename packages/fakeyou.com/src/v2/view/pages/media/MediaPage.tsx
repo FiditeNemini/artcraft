@@ -32,6 +32,7 @@ import Badge from "components/common/Badge";
 import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
 import { useMedia, useRatings } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
+import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -43,11 +44,9 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const { media: mediaFile, status } = useMedia({
     mediaToken: token,
     onSuccess: (res: any) => {
-      console.log("🚺", res);
       ratings.gather({ res, key: "token" });
     },
   });
-  console.log("😎", ratings.library);
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
@@ -177,8 +176,25 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       </Container>
     );
 
+  const weightCategoryMap: Record<WeightCategory, { weightCategory: string }> =
+    {
+      [WeightCategory.TTS]: { weightCategory: "Text to Speech" },
+      [WeightCategory.VC]: { weightCategory: "Voice to Voice" },
+      [WeightCategory.SD]: { weightCategory: "Image Generation" },
+      [WeightCategory.ZS]: { weightCategory: "Voice Designer" },
+      [WeightCategory.VOCODER]: { weightCategory: "Vocoder" },
+    };
+
+  let weightCategory = "none";
+  if (mediaFile?.maybe_model_weight_info) {
+    const categoryInfo =
+      weightCategoryMap[mediaFile.maybe_model_weight_info.weight_category];
+    weightCategory = categoryInfo ? categoryInfo.weightCategory : "none";
+  }
+
   const audioDetails = [
     { property: "Type", value: mediaFile?.media_type || "" },
+    { property: "Category", value: weightCategory || "" },
     { property: "Created at", value: dateCreated || "" },
     {
       property: "Visibility",
@@ -312,9 +328,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
                   {mediaFile?.maybe_model_weight_info && (
                     <>
-                      <p>
-                        {mediaFile?.maybe_model_weight_info?.weight_category}
-                      </p>
+                      <p>{weightCategory}</p>
                       {subtitleDivider}
                     </>
                   )}
