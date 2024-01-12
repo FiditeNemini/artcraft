@@ -1,2 +1,2 @@
+pub mod cover_images;
 pub mod user_avatars;
-mod cover_images;
