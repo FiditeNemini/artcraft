@@ -1,11 +1,7 @@
 use crate::util::model_downloader::ModelDownloader;
 
 pub struct StyleTTS2Downloaders {
-    pub styletts2: StyleTTS2ModelMapping,
-    pub whisper_lg: WhisperLargeModelMapping,
-    pub whisper_md: WhisperMediumModelMapping,
-    pub vocos_encodec_24khz: VocosEncodecModelMapping,
-    pub vocos_config: VocosEncodecConfigMapping
+    // pub styletts2: StyleTTS2ModelMapping,
 }
 
 crate::impl_model_downloader!(
@@ -54,18 +50,15 @@ crate::impl_model_downloader!(
 );
 
 impl StyleTTS2Downloaders {
+    // TODO(KS): All checkpoints are in the container, so we don't need to download them here.
+    // Maybe they should be here instead
     pub fn build_all_from_env() -> Self {
         Self {
-            styletts2: StyleTTS2ModelMapping::from_env(),
-            whisper_lg: WhisperLargeModelMapping::from_env(),
-            whisper_md: WhisperMediumModelMapping::from_env(),
-            vocos_encodec_24khz: VocosEncodecModelMapping::from_env(),
-            vocos_config: VocosEncodecConfigMapping::from_env(),
         }
     }
 
     pub fn all_downloaders(&self) -> Vec<&dyn ModelDownloader> {
-        vec![&self.styletts2, &self.whisper_lg, &self.whisper_md, &self.vocos_encodec_24khz, &self.vocos_config]
+        vec![]
     }
 }
 

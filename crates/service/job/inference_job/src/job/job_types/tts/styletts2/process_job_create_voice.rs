@@ -113,20 +113,10 @@ pub async fn process_create_voice(
 
   info!("Dataset length info: {}", dataset.len());
 
-//  let temp_extension = String::from(".bin");
-//  let temp_prefix: String;
-//
-//  if !deps.job.info.container.is_on_prem {
-//    temp_prefix = String::from("sample_"); // this is for seed in local dev to download the samples
-//  } else {
-//    temp_prefix = String::from(BUCKET_FILE_PREFIX_CREATE);
-//  }
-
   let mut downloaded_dataset: Vec<PathBuf> = Vec::new();
 
   for (index, record) in dataset.iter().enumerate() {
     //https://storage.googleapis.com/dev-vocodes-public/media/5/3/3/w/8/533w8zs0fy11nv7gkcna7p7vt03h8nda/dev_zs_533w8zs0fy11nv7gkcna7p7vt03h8nda.bin <-- where the file actually is
-
     let prefix: Option<&str> = record.maybe_public_bucket_prefix.as_ref().map(|s| s.as_str());
     let extension: Option<&str> = record.maybe_public_bucket_extension.as_ref().map(|s| s.as_str());
 
@@ -166,9 +156,16 @@ pub async fn process_create_voice(
 
     info!("FilePath to clone voice: {}", file_path.to_string_lossy());
     downloaded_dataset.push(file_path.clone());
+
+
+    // TODO(KS): This is a hack to get only the first file to download
+    // Ideally we could have improved logic to pick the "best" media file from a dataset
+    if (index > 0) {
+        break;
+    }
   }
 
-  info!("Dataset Length {}", downloaded_dataset.len());
+  info!("Dataset Length downloaded: {}", downloaded_dataset.len());
 
   // STEP 4 Download the models
   info!("Download models (if not present)...");
@@ -193,9 +190,7 @@ pub async fn process_create_voice(
   info!("Files to process: {:?}", audio_files);
 
   // Name of the output file
-  // NB: don't use the extension... for the inference since the container will add the extension.
-  let output_file_name = PathBuf::from("temp");
-
+  let output_embedding_path = work_temp_dir.path().join("style.npz");
   let stderr_output_file = work_temp_dir.path().join("zero_shot_create_voice_err.txt");
 
   let inference_start_time = Instant::now();
@@ -204,9 +199,8 @@ pub async fn process_create_voice(
   let command_exit_status =
       model_dependencies.create_embedding_command.execute_inference(
         job::job_types::tts::styletts2::styletts2_inference_command::CreateVoiceInferenceArgs {
-          output_embedding_path: &workdir,
-          output_embedding_name: &output_file_name,
-          audio_files,
+          output_embedding_path: &output_embedding_path,
+          audio_file: audio_files,
           stderr_output_file: &stderr_output_file,
         }
       );
@@ -220,15 +214,6 @@ pub async fn process_create_voice(
 
     if let Ok(contents) = read_to_string(&stderr_output_file) {
       warn!("Captured stderr output: {}", contents);
-
-      // Re-categorize error?
-      //match categorize_error(&contents)  {
-      //    Some(ProcessSingleJobError::FaceDetectionFailure) => {
-      //        warn!("Face not detected in source image");
-      //        error = ProcessSingleJobError::FaceDetectionFailure;
-      //    }
-      //    _ => {}
-      //}
     }
 
     //thread::sleep(Duration::from_secs(300));
@@ -246,13 +231,7 @@ pub async fn process_create_voice(
 
   info!("Inference success!");
 
-  //info!("Success; waiting...");
-  //thread::sleep(Duration::from_secs(300));
-
-
-  // STEP 4. Download dataset each audio file
   info!("Uploading Media ...");
-
   let embedding_bucket_location = ZeroShotVoiceEmbeddingBucketPath::generate_new(
     ModelCategory::Tts,
     ModelType::StyleTTS2,
@@ -264,7 +243,7 @@ pub async fn process_create_voice(
   // Get Finished File
   let mut finished_file = work_temp_dir.path().to_path_buf();
 
-  let output_bucket_file_name = String::from("temp.npz"); // use extension for bucket upload.
+  let output_bucket_file_name = String::from("style.npz"); // use extension for bucket upload.
   finished_file.push(&output_bucket_file_name);
 
   info!("Upload File Path: {:?}", finished_file);

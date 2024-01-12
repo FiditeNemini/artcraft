@@ -39,17 +39,15 @@ static IGNORED_ENVIRONMENT_VARS: Lazy<HashSet<String>> = Lazy::new(|| {
 // so we have all the files downloaded for the inputs.
 pub struct InferenceArgs<P: AsRef<Path>> {
     /// --driven_audio: path to the input audio
-    pub input_embedding_path: P, // name of the embedding.npz in the work dir
-    pub input_embedding_name: String,
-    pub input_text: String, // name of the text
-    pub output_file_name: String, // output file name in the output folder
+    pub input_embedding_file_path: P, // name of the embedding.npz in the work dir
+    pub input_text_file_path: P, // name of the text
+    pub output_file_name: P, // output file name in the output folder
     pub stderr_output_file: P,
 }
 
 pub struct CreateVoiceInferenceArgs<P: AsRef<Path>> {
   pub output_embedding_path: P,
-  pub output_embedding_name: P,
-  pub audio_files: String,
+  pub audio_file: String,
   pub stderr_output_file: P,
 }
 
@@ -195,46 +193,19 @@ impl StyleTTS2InferenceCommand {
 
         // ===== Begin Python Args =====
 
-        command.push_str(" --text ");
-        command.push_str(&format!("\"{}\"", &args.input_text));
+        command.push_str(" --input ");
+        command.push_str(&path_to_string(args.input_text_file_path));
 
-        command.push_str(" --prompt-name ");
-        command.push_str(&path_to_string(args.input_embedding_name));
+        command.push_str(" --input-style-npz ");
+        command.push_str(&path_to_string(args.input_embedding_file_path));
 
-        command.push_str(" --prompt-path ");
-        command.push_str(&path_to_string(&args.input_embedding_path));
 
-        command.push_str(" --audio-name ");
+        command.push_str(" --output ");
         command.push_str(&path_to_string(args.output_file_name));
 
-        command.push_str(" --audio-path ");
-        command.push_str(&path_to_string(&args.input_embedding_path));
-
-        command.push_str(" --mode ");
-        command.push_str(&path_to_string("0"));
-        // TODO improve and use a better model for premium users
-        command.push_str(" --whisper-model ");
-        command.push_str(&path_to_string(Path::new("medium")));
-
-        command.push_str(" --whisper-folder-path ");
-        command.push_str(
-            &path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/whisper/"))
-        );
-
-        command.push_str(" --vocos-folder-path ");
-        command.push_str(
-            &path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/vocos-encodec/"))
-        );
-
-        command.push_str(" --StyleTTS2-path ");
-        command.push_str(
-            &path_to_string(
-                Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/StyleTTS2-checkpoint.pt")
-            )
-        );
-
-        command.push_str(" --tmp-work-dir ");
-        command.push_str(&path_to_string(Path::new("/tmp/downloads/zero_shot_tts/")));
+        //TODO(KS): Make this a parameter
+        command.push_str(" --vcsteps ");
+        command.push_str(format!("{}", 20).as_str());
 
         // ===== End Python Args =====
 
@@ -446,40 +417,11 @@ impl StyleTTS2CreateEmbeddingCommand {
 
         // ===== Begin Python Args =====
         
-        command.push_str(" --prompt-name ");
-        command.push_str(&path_to_string(args.output_embedding_name));
-
-        command.push_str(" --prompt-path ");
+        command.push_str(" --output-style-npz ");
         command.push_str(&path_to_string(&args.output_embedding_path));
         
-        command.push_str(" --audio-wav-files ");
-        command.push_str(&args.audio_files); 
-
-        command.push_str(" --mode ");
-        command.push_str(&path_to_string("1"));
-        // TODO improve and use a better model for premium users
-        command.push_str(" --whisper-model ");
-        command.push_str(&path_to_string(Path::new("medium")));
-
-        command.push_str(" --whisper-folder-path ");
-        command.push_str(
-            &path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/whisper/"))
-        );
-
-        command.push_str(" --vocos-folder-path ");
-        command.push_str(
-            &path_to_string(Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/vocos-encodec/"))
-        );
-
-        command.push_str(" --StyleTTS2-path ");
-        command.push_str(
-            &path_to_string(
-                Path::new("/tmp/downloads/zero_shot_tts/vall-e-x_1.0/StyleTTS2-checkpoint.pt")
-            )
-        );
-
-        command.push_str(" --tmp-work-dir ");
-        command.push_str(&path_to_string(Path::new("/tmp/downloads/zero_shot_tts/")));
+        command.push_str(" --voice ");
+        command.push_str(&args.audio_file);
 
         // ===== End Python Args =====
 
