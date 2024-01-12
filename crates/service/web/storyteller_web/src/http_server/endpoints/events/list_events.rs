@@ -5,14 +5,14 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use chrono::{DateTime, Utc};
 use derive_more::Display;
-use log::{error, log};
+use log::error;
 
 use mysql_queries::queries::public_event_feed::list_public_event_feed_items::list_public_event_feed_items;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use crate::util::placeholder_images::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::util::placeholder_images::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 #[derive(Serialize)]
 pub struct EventRecord {

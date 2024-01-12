@@ -100,7 +100,6 @@ pub mod routes;
 pub mod server_state;
 pub mod subscriptions;
 pub mod threads;
-pub mod user_avatars;
 pub mod util;
 pub mod validations;
 

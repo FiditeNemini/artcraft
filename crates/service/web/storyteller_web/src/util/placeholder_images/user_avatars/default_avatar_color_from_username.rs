@@ -33,7 +33,7 @@ mod tests {
 
   use rand::distributions::{Alphanumeric, DistString};
 
-  use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+  use crate::util::placeholder_images::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 
   #[test]
   fn test_stability() {
