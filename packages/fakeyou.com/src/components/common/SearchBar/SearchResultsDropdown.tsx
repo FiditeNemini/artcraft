@@ -2,6 +2,7 @@ import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import Badge from "../Badge";
+import useWeightTypeInfo from "hooks/useWeightTypeInfo";
 
 interface SearchResultsDropdownProps {
   data: Weight[];
@@ -39,8 +40,10 @@ export default function SearchResultsDropdown({
     <>
       {data.length !== 0 && (
         <div className="search-results-dropdown">
-          {data.map(item => {
-            // let modelPageLink = `/weight/${item.weight_token}`;
+          {data.slice(0, 6).map((item: any) => {
+            const { label: weightBadgeLabel, color: weightBadgeColor } =
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useWeightTypeInfo(item.weight_type);
 
             return (
               <div
@@ -60,7 +63,11 @@ export default function SearchResultsDropdown({
                       {item.creator.display_name}
                     </Link>
                   </p>
-                  <Badge label={"TTS"} color={"ultramarine"} small={true} />
+                  <Badge
+                    label={weightBadgeLabel}
+                    color={weightBadgeColor}
+                    small={true}
+                  />
                 </div>
               </div>
             );
