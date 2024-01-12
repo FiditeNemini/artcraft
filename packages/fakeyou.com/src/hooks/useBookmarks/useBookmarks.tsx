@@ -17,7 +17,7 @@ export default function useBookmarks() {
       [entity_token]: { 
         entity_type,
         is_bookmarked: toBookmark,
-        maybe_bookmark_token: toBookmark ? res.maybe_bookmark_token : null
+        maybe_bookmark_token: toBookmark ? res.user_bookmark_token : null
       }
     }
   };

@@ -4436,6 +4436,7 @@ __metadata:
     "@types/infinite-scroll": ^4.0.3
     "@types/jest": ^24.9.1
     "@types/js-cookie": ^3.0.1
+    "@types/lodash.debounce": ^4.0.9
     "@types/masonry-layout": ^4.2.7
     "@types/node": ^12.12.47
     "@types/react": ^16.9.36
@@ -4587,7 +4588,6 @@ __metadata:
   resolution: "@storyteller/root@workspace:."
   dependencies:
     "@react-spring/types": ^9.7.3
-    "@types/lodash.debounce": ^4.0.9
     craco: ^0.0.3
     cross-env: ^7.0.3
     husky: ^8.0.3
