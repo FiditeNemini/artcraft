@@ -1,4 +1,5 @@
-#![forbid(private_in_public)]
+#![forbid(private_bounds)]
+#![forbid(private_interfaces)]
 #![forbid(unused_must_use)]
 //#![forbid(warnings)]
 

@@ -1,6 +1,7 @@
 #![forbid(dead_code)]
 #![forbid(non_snake_case)]
-#![forbid(private_in_public)]
+#![forbid(private_bounds)]
+#![forbid(private_interfaces)]
 #![forbid(unused_imports)]
 #![forbid(unused_must_use)] // Important
 #![forbid(unused_mut)]

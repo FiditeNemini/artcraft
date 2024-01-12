@@ -20,6 +20,7 @@ pub enum MediaFileOriginModelType {
   RvcV2,
 
   /// SadTalker -- v1, we may add another enum value for future versions
+  #[serde(rename = "sad_talker")]
   SadTalker,
 
   /// so-vits-svc voice conversion models
