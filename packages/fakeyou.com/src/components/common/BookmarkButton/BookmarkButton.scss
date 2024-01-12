@@ -12,16 +12,12 @@
   font-size: 14px !important;
   cursor: pointer;
   outline: inherit;
-  font-size: 16px;
-  transition: 0.2s all;
+  transition: 0.2s;
   padding: 3px 8px;
-  flex-wrap: none;
-  overflow: hidden;
-  width: fit-content;
-  height: 1.75rem;
+  min-width: 52px;
+  max-height: 27px;
   border-radius: 0.5rem;
-  // white-space: nowrap;
-  position: relative;
+  overflow: hidden;
 
   &.shadow {
     box-shadow: 0 0 12px rgba($bg, 0.4) !important;
@@ -57,6 +53,7 @@
 
   &.large {
     padding: 6px 10px;
+    max-height: 33px;
   }
 }
 
@@ -90,7 +87,8 @@
   // height: max-content;
 
   .favorite-text-wrapper {
-   position: relative;
+    position: relative;
+    display: flex;
   }
 
   span {
@@ -104,10 +102,18 @@
 }
 
 @keyframes workdots {
-  0% { opacity: .33 }
-  33% { opacity: .66 }
-  66% { opacity: .66 }
-  100% { opacity: .33 }
+  0% {
+    opacity: 0.33;
+  }
+  33% {
+    opacity: 0.66;
+  }
+  66% {
+    opacity: 0.66;
+  }
+  100% {
+    opacity: 0.33;
+  }
 }
 
 .fy-workdots {
@@ -116,17 +122,17 @@
   fill: #fff;
 
   circle {
-    animation: .66s infinite workdots;
+    animation: 0.66s infinite workdots;
     animation-timing-function: ease-in-out;
   }
   :nth-child(1) {
     animation-delay: 0;
   }
-    :nth-child(2) {
-    animation-delay: .22s;
+  :nth-child(2) {
+    animation-delay: 0.22s;
   }
-    :nth-child(3) {
-    animation-delay: .44s;
+  :nth-child(3) {
+    animation-delay: 0.44s;
   }
 }
 
