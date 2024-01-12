@@ -36,7 +36,7 @@ pub enum MediaFileOriginModelType {
   #[serde(rename = "rerender")]
   Rerender,
 
-  #[serde(rename = "mocapnet")]
+  #[serde(rename = "mocap_net")]
   MocapNet,
 }
 
@@ -55,7 +55,7 @@ impl MediaFileOriginModelType {
       Self::Tacotron2 => "tacotron2",
       Self::VallEX => "vall_e_x",
       Self::Rerender => "rerender",
-      Self::MocapNet => "mocapnet",
+      Self::MocapNet => "mocap_net",
     }
   }
 
@@ -67,7 +67,7 @@ impl MediaFileOriginModelType {
       "tacotron2" => Ok(Self::Tacotron2),
       "vall_e_x" => Ok(Self::VallEX),
       "rerender" => Ok(Self::Rerender),
-      "mocapnet" => Ok(Self::MocapNet),
+      "mocap_net" => Ok(Self::MocapNet),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -108,7 +108,7 @@ mod tests {
       assert_eq!(MediaFileOriginModelType::Tacotron2.to_str(), "tacotron2");
       assert_eq!(MediaFileOriginModelType::VallEX.to_str(), "vall_e_x");
       assert_eq!(MediaFileOriginModelType::Rerender.to_str(), "rerender");
-      assert_eq!(MediaFileOriginModelType::MocapNet.to_str(), "mocapnet");
+      assert_eq!(MediaFileOriginModelType::MocapNet.to_str(), "mocap_net");
   }
 
     #[test]
@@ -119,7 +119,7 @@ mod tests {
       assert_eq!(MediaFileOriginModelType::from_str("tacotron2").unwrap(), MediaFileOriginModelType::Tacotron2);
       assert_eq!(MediaFileOriginModelType::from_str("vall_e_x").unwrap(), MediaFileOriginModelType::VallEX);
       assert_eq!(MediaFileOriginModelType::from_str("rerender").unwrap(), MediaFileOriginModelType::Rerender);
-      assert_eq!(MediaFileOriginModelType::from_str("mocapnet").unwrap(), MediaFileOriginModelType::MocapNet);
+      assert_eq!(MediaFileOriginModelType::from_str("mocap_net").unwrap(), MediaFileOriginModelType::MocapNet);
       assert!(MediaFileOriginModelType::from_str("foo").is_err());
     }
 
