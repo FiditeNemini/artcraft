@@ -79,9 +79,7 @@ export default function BookmarkButton({
           />
           <div className="favorite-text">
             <div {...{ className: "favorite-text-wrapper" }}>
-              <WorkDots
-                {...{ labels: ["Saved", "Save"], index: busy ? 0 : 1 }}
-              />
+              <WorkDots {...{ labels: ["Saved", "Save"], index }} />
             </div>
           </div>
         </button>
