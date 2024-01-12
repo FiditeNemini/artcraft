@@ -362,19 +362,23 @@ class PageContainer extends React.Component<
                 <WeightEditPage sessionWrapper={this.props.sessionWrapper} />
               </Route>
 
-              <Route path="/weight/:weight_token">
-                <WeightPage
-                  sessionWrapper={this.props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                  inferenceJobs={this.props.inferenceJobs}
-                  enqueueInferenceJob={this.props.enqueueInferenceJob}
-                  inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-                  ttsInferenceJobs={this.props.ttsInferenceJobs}
-                  enqueueTtsJob={this.props.enqueueTtsJob}
-                />
-              </Route>
+              <Route
+                path="/weight/:weight_token"
+                render={props => (
+                  <WeightPage
+                    key={props.match.params.weight_token}
+                    sessionWrapper={this.props.sessionWrapper}
+                    sessionSubscriptionsWrapper={
+                      this.props.sessionSubscriptionsWrapper
+                    }
+                    inferenceJobs={this.props.inferenceJobs}
+                    enqueueInferenceJob={this.props.enqueueInferenceJob}
+                    inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+                    ttsInferenceJobs={this.props.ttsInferenceJobs}
+                    enqueueTtsJob={this.props.enqueueTtsJob}
+                  />
+                )}
+              />
 
               <Route path="/search/weights">
                 <SearchPage />

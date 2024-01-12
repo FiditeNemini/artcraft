@@ -19,12 +19,6 @@ export default function SearchResultsDropdown({
 }: SearchResultsDropdownProps) {
   const history = useHistory();
 
-  const handleResultClick = (item: Weight, event: React.MouseEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
-    history.push(`/weight/${item.weight_token}`);
-  };
-
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
   };
@@ -46,30 +40,28 @@ export default function SearchResultsDropdown({
               useWeightTypeInfo(item.weight_type);
 
             return (
-              <div
-                className="search-results-dropdown-item p-3"
-                key={item.weight_token}
-                onClick={event => handleResultClick(item, event)}
-              >
-                <h6 className="fw-semibold mb-1">{item.title}</h6>
-                <div className="d-flex gap-2 align-items-center">
-                  <p className="fs-7">
-                    by{" "}
-                    <Link
-                      className="fw-medium"
-                      to={`/profile/${item.creator.username}`}
-                      onClick={handleInnerClick}
-                    >
-                      {item.creator.display_name}
-                    </Link>
-                  </p>
-                  <Badge
-                    label={weightBadgeLabel}
-                    color={weightBadgeColor}
-                    small={true}
-                  />
+              <Link to={`/weight/${item.weight_token}`} key={item.weight_token}>
+                <div className="search-results-dropdown-item p-3">
+                  <h6 className="fw-semibold mb-1 text-white">{item.title}</h6>
+                  <div className="d-flex gap-2 align-items-center">
+                    <p className="fs-7">
+                      by{" "}
+                      <Link
+                        className="fw-medium"
+                        to={`/profile/${item.creator.username}`}
+                        onClick={handleInnerClick}
+                      >
+                        {item.creator.display_name}
+                      </Link>
+                    </p>
+                    <Badge
+                      label={weightBadgeLabel}
+                      color={weightBadgeColor}
+                      small={true}
+                    />
+                  </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
           <div
