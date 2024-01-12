@@ -1,7 +1,7 @@
 use std::fs::read_to_string;
 use std::time::Instant;
 
-use anyhow::{anyhow};
+use anyhow::anyhow;
 use log::{error, info, warn};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
@@ -11,15 +11,14 @@ use filesys::file_size::file_size;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
-use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Mc;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_mocapnet::{insert_media_file_from_mocapnet, InsertArgs};
-use crate::job::job_types::mocap::mocap_net::mocapnet_inference_command::{InferenceArgs, MocapnetInferenceCommand};
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::mocap::mocap_net::download_video_file::download_video_file;
+use crate::job::job_types::mocap::mocap_net::mocapnet_inference_command::InferenceArgs;
 use crate::job::job_types::mocap::mocap_net::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
 

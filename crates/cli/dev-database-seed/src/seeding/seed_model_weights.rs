@@ -83,7 +83,7 @@ pub async fn seed_weights_files(
         let user_token = UserToken::new_from_str(user_token);
         // prepare the inputs for a model
         let mut rng = rand::thread_rng();
-        let n: u32 = rng.gen();
+        let _n: u32 = rng.gen();
 
         let model_weight_token = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
 

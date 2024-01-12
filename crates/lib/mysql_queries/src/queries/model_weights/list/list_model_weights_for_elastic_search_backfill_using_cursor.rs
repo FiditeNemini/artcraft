@@ -70,16 +70,10 @@ pub async fn list_model_weights_for_elastic_search_backfill_using_cursor(
 
   let models : Vec<RawRecord> = match maybe_models {
     Ok(models) => models,
+    Err(sqlx::error::Error::RowNotFound) => return Ok(Vec::new()),
     Err(err) => {
-      return match err {
-        RowNotFound => {
-          Ok(Vec::new())
-        },
-        _ => {
-          warn!("vc model list query error: {:?}", err);
-          Err(anyhow!("vc model list query error"))
-        }
-      }
+      warn!("vc model list query error: {:?}", err);
+      return Err(anyhow!("vc model list query error"));
     }
   };
 
@@ -120,7 +114,7 @@ async fn list_model_weights(
   mysql_connection: &mut PoolConnection<MySql>,
   page_size: u64,
   cursor: u64,
-) -> AnyhowResult<Vec<RawRecord>> {
+) -> Result<Vec<RawRecord>, sqlx::Error> {
   Ok(sqlx::query_as!(
       RawRecord,
         r#"

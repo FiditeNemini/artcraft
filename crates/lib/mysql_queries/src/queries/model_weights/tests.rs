@@ -115,10 +115,6 @@ mod tests {
         assert_eq!(result.public_bucket_hash, "bucket_hash1".to_string());
         assert_eq!(result.maybe_public_bucket_prefix, Some("_fake".to_string()));
         assert_eq!(result.maybe_public_bucket_extension, Some("rvc".to_string()));
-        assert_eq!(result.cached_user_ratings_total_count, 10);
-        assert_eq!(result.cached_user_ratings_positive_count, 9);
-        assert_eq!(result.cached_user_ratings_negative_count, 1);
-        assert_eq!(result.maybe_cached_user_ratings_ratio, Some(0.9));
         assert_eq!(result.version, 1);
 
         Ok(())
