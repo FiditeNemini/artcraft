@@ -15,7 +15,6 @@ import {
   faFaceViewfinder,
   faArrowDownToLine,
   faSquareQuote,
-  faShare,
   faLink,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
@@ -27,7 +26,6 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import SocialButton from "components/common/SocialButton";
-import Modal from "components/common/Modal";
 import { Input } from "components/common";
 import LikeButton from "components/common/LikeButton";
 import Badge from "components/common/Badge";
@@ -52,7 +50,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   console.log("😎", ratings.library);
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
 
   function renderMediaComponent(mediaFile: MediaFile) {
@@ -268,14 +265,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     );
   }
 
-  const openShareModal = () => {
-    setIsShareModalOpen(true);
-  };
-
-  const closeShareModal = () => {
-    setIsShareModalOpen(false);
-  };
-
   const handleCopyLink = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(shareUrl);
@@ -373,43 +362,41 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
           <div className="col-12 col-xl-4">
             <div className="panel panel-clear d-flex flex-column gap-3">
               <div className="d-flex gap-2 flex-wrap">
-                <Button
-                  icon={faArrowDownToLine}
-                  label="Download"
-                  className="flex-grow-1"
-                  href={audioLink}
-                  download={audioLink}
-                />
-
-                <div className="d-flex gap-2">
-                  {/* <Button
-                    square={true}
-                    variant="secondary"
-                    // icon={faCirclePlay}
-                    onClick={() => {}}
-                    tooltip="Create"
-                  /> */}
-
+                {mediaFile?.media_type === MediaFileType.Audio ? (
                   <Button
-                    icon={faShare}
-                    square={true}
-                    variant="secondary"
-                    tooltip="Share"
-                    onClick={openShareModal}
+                    {...{
+                      icon: faFaceViewfinder,
+                      label: "Use audio in Face Animator",
+                      to: `/face-animator/${mediaFile.token}`,
+                      variant: "primary",
+                      className: "flex-grow-1",
+                    }}
                   />
-                </div>
-              </div>
+                ) : null}
 
-              {mediaFile?.media_type === MediaFileType.Audio ? (
-                <Button
-                  {...{
-                    icon: faFaceViewfinder,
-                    label: "Use audio in Face Animator",
-                    to: `/face-animator/${mediaFile.token}`,
-                    variant: "secondary",
-                  }}
-                />
-              ) : null}
+                {mediaFile?.media_type !== MediaFileType.Audio && (
+                  <Button
+                    icon={faArrowDownToLine}
+                    label="Download"
+                    className="flex-grow-1"
+                    href={audioLink}
+                    download={audioLink}
+                    variant="secondary"
+                  />
+                )}
+                {mediaFile?.media_type === MediaFileType.Audio && (
+                  <div className="d-flex gap-2">
+                    <Button
+                      icon={faArrowDownToLine}
+                      square={true}
+                      variant="secondary"
+                      href={audioLink}
+                      download={audioLink}
+                      tooltip="Download"
+                    />
+                  </div>
+                )}
+              </div>
 
               <Panel className="rounded">
                 <div className="d-flex gap-2 p-3">
@@ -448,8 +435,11 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               {mediaFile?.maybe_model_weight_info && (
                 <Panel className="rounded">
                   <div className="d-flex flex-column gap-2 p-3">
-                    <h6 className="fw-medium mb-0">Weight Used</h6>
-                    <hr className="my-1" />
+                    <div>
+                      <h6 className="fw-medium mb-0">Weight Used</h6>
+                      <hr className="mt-3 mb-2" />
+                    </div>
+
                     <div className="d-flex align-items-center">
                       <WeightCoverImage
                         src={weightUsedCoverImage}
@@ -460,7 +450,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                         <Link
                           to={`/weight/${mediaFile?.maybe_model_weight_info.weight_token}`}
                         >
-                          <h6 className="mb-1">
+                          <h6 className="mb-1 two-line-ellipsis">
                             {mediaFile?.maybe_model_weight_info.title}
                           </h6>
                         </Link>
@@ -495,6 +485,55 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
                 {modMediaDetails}
               </Accordion>
+
+              <Panel className="p-3 rounded">
+                <div className="d-flex flex-column gap-3">
+                  <div>
+                    <h6 className="fw-medium mb-0">Share Media</h6>
+                    <hr className="mt-3 mb-0" />
+                  </div>
+
+                  <div className="d-flex justify-content-between flex-wrap">
+                    <SocialButton
+                      social="x"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="whatsapp"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="facebook"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="reddit"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="email"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                  </div>
+                  <div className="d-flex gap-2">
+                    <div className="flex-grow-1">
+                      <Input type="text" value={shareUrl} readOnly />
+                    </div>
+
+                    <Button
+                      icon={faLink}
+                      label={buttonLabel}
+                      onClick={handleCopyLink}
+                      variant="primary"
+                    />
+                  </div>
+                </div>
+              </Panel>
             </div>
           </div>
         </div>
@@ -512,58 +551,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
           </Panel>
         </Container>
       </div>
-
-      {/* Share Modal */}
-      <Modal
-        show={isShareModalOpen}
-        handleClose={closeShareModal}
-        title="Share"
-        autoWidth={true}
-        showButtons={false}
-        content={
-          <div className="d-flex flex-column gap-4">
-            <div className="d-flex gap-3">
-              <SocialButton
-                social="x"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="whatsapp"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="facebook"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="reddit"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="email"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-            </div>
-            <div className="d-flex gap-2">
-              <div className="flex-grow-1">
-                <Input type="text" value={shareUrl} readOnly />
-              </div>
-
-              <Button
-                icon={faLink}
-                label={buttonLabel}
-                onClick={handleCopyLink}
-                variant="primary"
-              />
-            </div>
-          </div>
-        }
-      />
     </div>
   );
 }
