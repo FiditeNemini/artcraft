@@ -68,7 +68,7 @@ function SessionVoiceConversionResultsList(props: Props) {
 
   // ============================= GENERIC INFERENCE =============================
 
-  props.inferenceJobs.forEach((job) => {
+  props.inferenceJobs.forEach(job => {
     if (!job.maybeResultToken) {
       let cssStyle = "alert alert-secondary mb-0";
       let stateDescription = "Pending...";
@@ -160,7 +160,7 @@ function SessionVoiceConversionResultsList(props: Props) {
                   className="fw-semibold"
                 >
                   <FontAwesomeIcon icon={faLink} className="me-2" />
-                  {t("resultsAudioDownload")}
+                  Download and Share
                 </Link>
               </div>
             </div>
