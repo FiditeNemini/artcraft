@@ -31,7 +31,7 @@ import "./FaceAnimator.scss";
 
 export default function FaceAnimator({ enqueueInferenceJob,  sessionSubscriptionsWrapper,  inferenceJobs,  inferenceJobsByCategory, ...rest }: FaceAnimatorCore) {
   const { mediaToken } = useParams<{ mediaToken: string }>();
-  const [presetAudio] = useMedia({ mediaToken });
+  const { media: presetAudio } = useMedia({ mediaToken });
   const { t } = useLocalize("FaceAnimator");
   usePrefixedDocumentTitle("AI Face Animator");
 

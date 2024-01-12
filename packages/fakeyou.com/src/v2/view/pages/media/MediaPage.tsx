@@ -1,12 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import MediaAudioComponent from "./MediaAudioComponent";
 import MediaVideoComponent from "./MediaVideoComponent";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import {
-  GetMediaFile,
-  MediaFile,
-} from "@storyteller/components/src/api/media_files/GetMediaFile";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
 import Container from "components/common/Container";
 import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
@@ -35,7 +32,7 @@ import { Input } from "components/common";
 import LikeButton from "components/common/LikeButton";
 import Badge from "components/common/Badge";
 import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
-import { useRatings } from "hooks";
+import { useMedia, useRatings } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 
 interface MediaPageProps {
@@ -44,32 +41,19 @@ interface MediaPageProps {
 
 export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const { token } = useParams<{ token: string }>();
-  const [mediaFile, setMediaFile] = useState<MediaFile | undefined | null>(
-    null
-  );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
+  const ratings = useRatings();
+  const { media: mediaFile, status } = useMedia({
+    mediaToken: token,
+    onSuccess: (res: any) => {
+      console.log("🚺",res);
+      ratings.gather({ res, key: "token" });
+    }
+  });
+  console.log("😎",ratings.library);
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
-  const ratings = useRatings();
-  const getMediaFile = useCallback(async (mediaFileToken: string) => {
-    let result = await GetMediaFile(mediaFileToken);
-    if (result.media_file) {
-      setMediaFile(result.media_file);
-      setIsLoading(false);
-    } else {
-      setError(true);
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    getMediaFile(token);
-  }, [token, getMediaFile]);
-
-  // const bookmarks = useBookmarks();
 
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
@@ -131,7 +115,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const shareUrl = `https://fakeyou.com/media/${mediaFile?.token || ""}`;
   const shareText = "Check out this media on FakeYou.com!";
 
-  if (isLoading)
+  if (status < 3)
     return (
       <>
         <Container type="padded" className="pt-4 pt-lg-5">
@@ -179,7 +163,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       </>
     );
 
-  if (error || !mediaFile)
+  if (status === 4) // = error, will replace with type 
     return (
       <Container type="panel">
         <PageHeader
@@ -196,11 +180,11 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     );
 
   const audioDetails = [
-    { property: "Type", value: mediaFile.media_type },
+    { property: "Type", value: mediaFile?.media_type || "" },
     { property: "Created at", value: dateCreated || "" },
     {
       property: "Visibility",
-      value: mediaFile.creator_set_visibility.toString(),
+      value: mediaFile?.creator_set_visibility.toString() || "",
     },
     /*{
       value: mediaFile.model_used,
@@ -221,37 +205,38 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   ];
 
   const videoDetails = [
-    { property: "Type", value: mediaFile.media_type },
+    { property: "Type", value: mediaFile?.media_type || "" },
     { property: "Created at", value: dateCreated || "" },
     {
       property: "Visibility",
-      value: mediaFile.creator_set_visibility.toString(),
+      value: mediaFile?.creator_set_visibility.toString() || "",
     },
   ];
 
   const imageDetails = [
-    { property: "Type", value: mediaFile.media_type },
+    { property: "Type", value: mediaFile?.media_type || "" },
     { property: "Created at", value: dateCreated || "" },
     {
       property: "Visibility",
-      value: mediaFile.creator_set_visibility.toString(),
+      value: mediaFile?.creator_set_visibility.toString() || "",
     },
   ];
 
-  let mediaDetails = undefined;
+  let mediaDetails;
 
-  switch (mediaFile.media_type) {
-    case MediaFileType.Audio:
-      mediaDetails = <DataTable data={audioDetails} />;
+  switch (mediaFile?.media_type) {
+    case MediaFileType.Audio: 
+      mediaDetails = audioDetails;
       break;
-    case MediaFileType.Video:
-      mediaDetails = <DataTable data={videoDetails} />;
+    case MediaFileType.Video: 
+      mediaDetails = videoDetails;
       break;
-    case MediaFileType.Image:
-      mediaDetails = <DataTable data={imageDetails} />;
+    case MediaFileType.Image: 
+      mediaDetails = imageDetails;
       break;
     default:
   }
+
 
   let modMediaDetails = undefined;
 
@@ -304,9 +289,9 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const bucketConfig = new BucketConfig();
 
   let weightUsedCoverImage = "/images/avatars/default-pfp.png";
-  if (mediaFile.maybe_model_weight_info !== null) {
+  if (mediaFile?.maybe_model_weight_info !== null) {
     weightUsedCoverImage = bucketConfig.getCdnUrl(
-      mediaFile.maybe_model_weight_info.maybe_cover_image_public_bucket_path,
+      mediaFile?.maybe_model_weight_info?.maybe_cover_image_public_bucket_path || "",
       60,
       100
     );
@@ -320,7 +305,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
                 <h1 className="fw-bold mb-2">
-                  {mediaFile.maybe_model_weight_info?.title ||
+                  {mediaFile?.maybe_model_weight_info?.title ||
                     `Media ${mediaType}`}
                 </h1>
               </div>
@@ -331,10 +316,10 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                   </div>
                   {subtitleDivider}
 
-                  {mediaFile.maybe_model_weight_info && (
+                  {mediaFile?.maybe_model_weight_info && (
                     <>
                       <p>
-                        {mediaFile.maybe_model_weight_info?.weight_category}
+                        {mediaFile?.maybe_model_weight_info?.weight_category}
                       </p>
                       {subtitleDivider}
                     </>
@@ -368,14 +353,14 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         <div className="row g-4">
           <div className="col-12 col-xl-8">
             <div className="media-wrapper">
-              {renderMediaComponent(mediaFile)}
+              { mediaFile && renderMediaComponent(mediaFile) }
             </div>
 
             <div className="panel p-3 py-4 p-md-4 mt-3 d-none d-xl-block">
               <h4 className="fw-semibold mb-3">Comments</h4>
               <CommentComponent
                 entityType="user"
-                entityToken={mediaFile.token}
+                entityToken={mediaFile?.token || "" }
                 sessionWrapper={sessionWrapper}
               />
             </div>
@@ -410,7 +395,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                 </div>
               </div>
 
-              {mediaFile.media_type === MediaFileType.Audio ? (
+              {mediaFile?.media_type === MediaFileType.Audio ? (
                 <Button
                   {...{
                     icon: faFaceViewfinder,
@@ -425,26 +410,26 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                 <div className="d-flex gap-2 p-3">
                   <Gravatar
                     size={48}
-                    username={mediaFile.maybe_creator_user?.username || ""}
+                    username={mediaFile?.maybe_creator_user?.username || ""}
                     email_hash={
-                      mediaFile.maybe_creator_user?.gravatar_hash || ""
+                      mediaFile?.maybe_creator_user?.gravatar_hash || ""
                     }
                     avatarIndex={
-                      mediaFile.maybe_creator_user?.default_avatar
+                      mediaFile?.maybe_creator_user?.default_avatar
                         .image_index || 0
                     }
                     backgroundIndex={
-                      mediaFile.maybe_creator_user?.default_avatar
+                      mediaFile?.maybe_creator_user?.default_avatar
                         .color_index || 0
                     }
                   />
                   <div className="d-flex flex-column">
-                    {mediaFile.maybe_creator_user?.display_name ? (
+                    {mediaFile?.maybe_creator_user?.display_name ? (
                       <Link
                         className="fw-medium"
-                        to={`/profile/${mediaFile.maybe_creator_user?.display_name}`}
+                        to={`/profile/${mediaFile?.maybe_creator_user?.display_name}`}
                       >
-                        {mediaFile.maybe_creator_user?.display_name}
+                        {mediaFile?.maybe_creator_user?.display_name}
                       </Link>
                     ) : (
                       <p className="fw-medium text-white">Anonymous</p>
@@ -455,7 +440,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                 </div>
               </Panel>
 
-              {mediaFile.maybe_model_weight_info && (
+              {mediaFile?.maybe_model_weight_info && (
                 <Panel className="rounded">
                   <div className="d-flex flex-column gap-2 p-3">
                     <h6 className="fw-medium mb-0">Weight Used</h6>
@@ -468,19 +453,19 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                       />
                       <div className="d-flex flex-column">
                         <Link
-                          to={`/weight/${mediaFile.maybe_model_weight_info.weight_token}`}
+                          to={`/weight/${mediaFile?.maybe_model_weight_info.weight_token}`}
                         >
                           <h6 className="mb-1">
-                            {mediaFile.maybe_model_weight_info.title}
+                            {mediaFile?.maybe_model_weight_info.title}
                           </h6>
                         </Link>
                         <p className="fs-7">
                           by{" "}
                           <Link
-                            to={`/profile/${mediaFile.maybe_model_weight_info.maybe_weight_creator.username}`}
+                            to={`/profile/${mediaFile?.maybe_model_weight_info.maybe_weight_creator.username}`}
                           >
                             {
-                              mediaFile.maybe_model_weight_info
+                              mediaFile?.maybe_model_weight_info
                                 .maybe_weight_creator.display_name
                             }
                           </Link>
@@ -493,7 +478,9 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
               <Accordion>
                 <Accordion.Item title="Media Details" defaultOpen={true}>
-                  {mediaDetails}
+                  { !!mediaDetails && <DataTable {...{
+                    data: mediaDetails
+                  }} /> }
                 </Accordion.Item>
 
                 {modMediaDetails}
@@ -509,7 +496,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
             <h4 className="fw-semibold mb-3">Comments</h4>
             <CommentComponent
               entityType="user"
-              entityToken={mediaFile.token}
+              entityToken={mediaFile?.token || "" }
               sessionWrapper={sessionWrapper}
             />
           </Panel>

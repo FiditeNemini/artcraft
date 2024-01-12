@@ -2,13 +2,8 @@ import { GetRatings } from "@storyteller/components/src/api/user_ratings/GetRati
 import { SetRating } from "@storyteller/components/src/api/user_ratings/SetRating";
 import { useBatchContent } from "hooks";
 
-// interface Props {
-//   value?: any
-// }
-
 export default function useRatings() {
   const fetch = (entity_token: string, entity_type: string, lib: any) => {
-    // console.log("🔔",lib[entity_token].rating_value);
     return SetRating("",{
       entity_token,
       entity_type,
@@ -20,9 +15,9 @@ export default function useRatings() {
     fetcher: GetRatings,
     checker: () => true,
     modLibrary: (current: any, res: any, entity_token: string) => {
-      let { positive_rating_count } = res.results.find((item: any, i: number) => 
+      let { positive_rating_count } = res.results ? res.results.find((item: any, i: number) => 
         item.weight_token === entity_token
-      ).stats;
+      ).stats : res.stats;
 
       return { ...current, positive_rating_count };
     },

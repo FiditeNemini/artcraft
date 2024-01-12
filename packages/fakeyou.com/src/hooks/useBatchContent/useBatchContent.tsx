@@ -41,13 +41,17 @@ export default function useBatchContent({
     busyListSet(tokens.reduce((obj = {},token = "") => ({ ...obj, [token]: true }),{})); // add current batch to busy list
     fetcher("",{},{ tokens }).then((batchRes: any) => {
 
-    console.log("🪙", res);
+    console.log("🪙", res, modLibrary);
       if (batchRes.success && !!batchRes[resultsKey]) {
-
-        let newBatch = batchRes[resultsKey].reduce((obj = {}, { entity_token = "", ...current }) => ({
-          ...obj,
-          [entity_token]: { ...modLibrary(current, res, entity_token) }
-        }),{});
+console.log("🥏",batchRes[resultsKey]);
+        let newBatch = batchRes[resultsKey].reduce((obj = {}, { entity_token = "", ...current }) => {
+          console.log("🧲",current, res, entity_token, obj);
+          let newCurrent = {
+            ...obj,
+            [entity_token]: { ...modLibrary(current, res, entity_token) }
+          };
+          return newCurrent;
+        },{});
 
       console.log("😡", newBatch);
         busyListSet({}); // this should be a for each key in tokens delete from busyList, but this is fine for now

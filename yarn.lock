@@ -4469,6 +4469,7 @@ __metadata:
     react-dom: ^16.13.1
     react-drag-drop-files: ^2.3.9
     react-i18next: ^11.15.4
+    react-iframe: ^1.8.5
     react-infinite-scroll-component: ^6.1.0
     react-paginate: ^8.2.0
     react-range: ^1.8.14
@@ -17824,6 +17825,17 @@ __metadata:
     react-native:
       optional: true
   checksum: 1fa984c55ee252a7e5815deaf60a488aa8ef8508791c02c275290c6119a326be9491668e7a9a8e87e44a7dfef75b3c226e6e26ac79fe268576f9d4695860aed4
+  languageName: node
+  linkType: hard
+
+"react-iframe@npm:^1.8.5":
+  version: 1.8.5
+  resolution: "react-iframe@npm:1.8.5"
+  dependencies:
+    object-assign: ^4.1.1
+  peerDependencies:
+    react: ">=16.x.x"
+  checksum: b2bb08039329035d44d6d85613337e200b7fe6d854dd45a54c34fc53ff4118874f23e17c7dbbb4825cd3d4b874ae4436edcabc819308e1aea4fdc3730ea50df0
   languageName: node
   linkType: hard
 

@@ -22,19 +22,9 @@ export default function useBookmarks() {
     }
   };
 
-  return useBatchContent({
+  const bookmarks = useBatchContent({
     checker: ({ maybe_bookmark_token }: any) => !!maybe_bookmark_token,
     fetcher: GetBookmarks,
-    modLibrary: (current: any, res: any, entity_token: string) => {
-      // let thing = res.results ? res.results.find((item: any, i: number) => 
-      //   item.weight_token === entity_token
-      // )
-      let { positive_rating_count } = res.results ? res.results.find((item: any, i: number) => 
-        item.weight_token === entity_token
-      ).stats : res.stats;
-
-      return { ...current, positive_rating_count };
-    },
     onPass: {
       fetch: (entity_token: string, entity_type: string, lib: any) => {
         let bookmarkToken = lib[entity_token].maybe_bookmark_token;
@@ -52,4 +42,6 @@ export default function useBookmarks() {
     resultsKey: "bookmarks",
     toggleCheck: (entity: any) => !!entity?.maybe_bookmark_token
   });
+
+  return bookmarks;
 };

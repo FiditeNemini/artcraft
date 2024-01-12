@@ -126,7 +126,6 @@ export default function AudioCard({
               <div>
 
                 <LikeButton {...{
-                  likeCount: data.likes,
                   ...ratings.makeProps({
                     entityToken: data.token,
                     entityType: "media_file"
