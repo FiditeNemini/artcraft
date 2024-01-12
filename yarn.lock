@@ -4459,6 +4459,7 @@ __metadata:
     imagesloaded: ^5.0.0
     infinite-scroll: ^4.0.1
     js-cookie: ^3.0.1
+    lodash.debounce: ^4.0.8
     masonry-layout: ^4.2.2
     posthog-js: ^1.73.1
     pretty-num: ^0.5.2
@@ -4469,6 +4470,7 @@ __metadata:
     react-dom: ^16.13.1
     react-drag-drop-files: ^2.3.9
     react-i18next: ^11.15.4
+    react-iframe: ^1.8.5
     react-infinite-scroll-component: ^6.1.0
     react-paginate: ^8.2.0
     react-range: ^1.8.14
@@ -4585,6 +4587,7 @@ __metadata:
   resolution: "@storyteller/root@workspace:."
   dependencies:
     "@react-spring/types": ^9.7.3
+    "@types/lodash.debounce": ^4.0.9
     craco: ^0.0.3
     cross-env: ^7.0.3
     husky: ^8.0.3
@@ -5372,6 +5375,22 @@ __metadata:
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
   checksum: e60b153664572116dfea673c5bda7778dbff150498f44f998e34b5886d8afc47f16799280e4b6e241c0472aef1bc36add771c569c68fc5125fc2ae519a3eb9ac
+  languageName: node
+  linkType: hard
+
+"@types/lodash.debounce@npm:^4.0.9":
+  version: 4.0.9
+  resolution: "@types/lodash.debounce@npm:4.0.9"
+  dependencies:
+    "@types/lodash": "*"
+  checksum: 8183a152e01928e3b97ca773f6ae6038b8695e76493ba8bf6b743ec143948a62294fbc9d49fa4a78b52265b3ba4892ef57534e0c13d04aa0f111671b5a944feb
+  languageName: node
+  linkType: hard
+
+"@types/lodash@npm:*":
+  version: 4.14.202
+  resolution: "@types/lodash@npm:4.14.202"
+  checksum: a91acf3564a568c6f199912f3eb2c76c99c5a0d7e219394294213b3f2d54f672619f0fde4da22b29dc5d4c31457cd799acc2e5cb6bd90f9af04a1578483b6ff7
   languageName: node
   linkType: hard
 
@@ -17824,6 +17843,17 @@ __metadata:
     react-native:
       optional: true
   checksum: 1fa984c55ee252a7e5815deaf60a488aa8ef8508791c02c275290c6119a326be9491668e7a9a8e87e44a7dfef75b3c226e6e26ac79fe268576f9d4695860aed4
+  languageName: node
+  linkType: hard
+
+"react-iframe@npm:^1.8.5":
+  version: 1.8.5
+  resolution: "react-iframe@npm:1.8.5"
+  dependencies:
+    object-assign: ^4.1.1
+  peerDependencies:
+    react: ">=16.x.x"
+  checksum: b2bb08039329035d44d6d85613337e200b7fe6d854dd45a54c34fc53ff4118874f23e17c7dbbb4825cd3d4b874ae4436edcabc819308e1aea4fdc3730ea50df0
   languageName: node
   linkType: hard
 

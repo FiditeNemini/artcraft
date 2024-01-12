@@ -73,13 +73,7 @@ export default function SearchResultsDropdown({
           </div>
         </div>
       )}
-      {data.length === 0 && !isLoading && isNoResults && (
-        <div className="search-results-dropdown">
-          <div className="search-results-dropdown-item p-3 no-results">
-            No results found
-          </div>
-        </div>
-      )}
+
       {isLoading && isNoResults && (
         <div className="search-results-dropdown">
           <div className="search-results-dropdown-item p-3 loading-results">
@@ -91,6 +85,14 @@ export default function SearchResultsDropdown({
                 <span className="visually-hidden">Loading...</span>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {data.length === 0 && !isLoading && isNoResults && (
+        <div className="search-results-dropdown">
+          <div className="search-results-dropdown-item p-3 no-results">
+            No results found
           </div>
         </div>
       )}

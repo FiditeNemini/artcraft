@@ -8,6 +8,7 @@ import SearchField from "./SearchField";
 import "./SearchBar.scss";
 import { useHistory, useLocation } from "react-router-dom";
 import { useSearch } from "context/SearchContext";
+import debounce from "lodash.debounce";
 
 interface SearchBarProps {
   autoFocus?: boolean;
@@ -27,7 +28,7 @@ export default function SearchBar({
 
   const { searchTerm, setSearchTerm } = useSearch();
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const isOnSearchPage = location.pathname.startsWith("/search");
 
   const maybeSearch = useCallback(
@@ -59,6 +60,14 @@ export default function SearchBar({
     [setFoundWeights]
   );
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedDoSearch = useCallback(
+    debounce(searchTerm => {
+      doSearch(searchTerm);
+    }, 250),
+    [doSearch]
+  );
+
   useEffect(() => {
     if (isOnSearchPage) {
       const query = new URLSearchParams(location.search).get("query");
@@ -72,9 +81,21 @@ export default function SearchBar({
     if (isOnSearchPage) {
       history.push(`/search/weights?query=${encodeURIComponent(searchTerm)}`);
     } else {
-      doSearch(searchTerm);
+      debouncedDoSearch(searchTerm);
     }
-  }, [searchTerm, history, location.pathname, doSearch, isOnSearchPage]);
+  }, [
+    searchTerm,
+    history,
+    location.pathname,
+    isOnSearchPage,
+    debouncedDoSearch,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      debouncedDoSearch.cancel();
+    };
+  }, [debouncedDoSearch]);
 
   const handleSearchButtonClick = useCallback(() => {
     if (searchTerm !== "") {

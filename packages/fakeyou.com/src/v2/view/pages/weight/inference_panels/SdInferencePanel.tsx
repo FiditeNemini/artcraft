@@ -23,15 +23,14 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
   const [sampler, samplerSet] = useState("DPM++ 2M Karras");
   const [aspectRatio, aspectRatioSet] = useState("square");
   const [cfgScale, cfgScaleSet] = useState(7);
+  const [samples, samplesSet] = useState(8);
   const [loRAPath, loRAPathSet] = useState(1);
   // const [checkPoint, checkPointSet] = useState(1);
-  const [batchSize, batchSizeSet] = useState(1);
   const [batchCount, batchCountSet] = useState(1);
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const onChange = onChanger({
     batchCountSet,
-    batchSizeSet,
     cfgScaleSet,
     // checkPointSet,
     loRAPathSet,
@@ -40,6 +39,7 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     aspectRatioSet,
     setPrompt,
     setNegativePrompt,
+    samplesSet,
   });
 
   const samplerOpts = [
@@ -96,16 +96,15 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     { label: "Another thing", value: 3 },
   ];
 
-  const batchSizeOpts = [
+  const batchCountOpts = [
     { label: "1", value: 1 },
     { label: "2", value: 2 },
     { label: "3", value: 3 },
     { label: "4", value: 4 },
-  ];
-
-  const batchCountOpts = [
-    { label: "1", value: 1 },
-    { label: "2", value: 2 },
+    { label: "5", value: 5 },
+    { label: "6", value: 6 },
+    { label: "7", value: 7 },
+    { label: "8", value: 8 },
   ];
 
   const handlePromptChange = (
@@ -189,6 +188,18 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
                 value: cfgScale,
               }}
             />
+
+            <NumberSlider
+              {...{
+                min: 8,
+                max: 64,
+                name: "samples",
+                label: "Samples",
+                onChange,
+                thumbTip: "Samples",
+                value: samples,
+              }}
+            />
             <TempSelect
               {...{
                 label: "loRA path",
@@ -208,18 +219,10 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
                 value: checkPoint,
               }}
             /> */}
+
             <SegmentButtons
               {...{
-                label: "Batch size",
-                name: "batchSize",
-                onChange,
-                options: batchSizeOpts,
-                value: batchSize,
-              }}
-            />
-            <SegmentButtons
-              {...{
-                label: "Batch count",
+                label: "Number of Generations",
                 name: "batchCount",
                 onChange,
                 options: batchCountOpts,
