@@ -2,7 +2,7 @@ use enums::by_table::generic_inference_jobs::inference_model_type::InferenceMode
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::image_generation::sd::process_job::process_job;
+use crate::job::job_types::image_generation::sd::process_job::process_job_selection;
 use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::image_generation::sd::process_job::StableDiffusionProcessArgs;
 use errors::anyhow;
@@ -30,5 +30,5 @@ pub async fn dispatch_sd_job(job_dependencies: &JobDependencies, job: &Available
         job_dependencies,
         job,
     };
-    process_job(args).await
+    process_job_selection(args).await
 }

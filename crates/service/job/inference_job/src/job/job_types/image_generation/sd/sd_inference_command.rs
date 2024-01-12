@@ -83,9 +83,8 @@ pub struct InferenceArgs<P: AsRef<Path>> {
   pub cfg_scale:i32, 
   pub seed:i32, 
   pub lora_path:P, 
-  pub check_point:P, 
+  pub checkpoint_path:P,
   pub vae:P,
-  pub batch_size:i32, 
   pub batch_count:i32,
 }
 
@@ -117,16 +116,12 @@ impl StableDiffusionInferenceCommand {
     let maybe_inference_command = easyenv::get_env_string_optional(
       "STABLE_DIFFUSION_INFERENCE_COMMAND");
 
-    // Optional, eg. `./infer.py`. Typically we'll use the command form instead.
-    let maybe_inference_executable = easyenv::get_env_pathbuf_optional(
-      "STABLE_DIFFUSION_INFERENCE_EXECUTABLE");
 
     let executable_or_command = match maybe_inference_command {
       Some(command) => ExecutableOrCommand::Command(command),
-      None => match maybe_inference_executable {
-        Some(executable) => ExecutableOrCommand::Executable(executable),
-        None => return Err(anyhow!("neither command nor executable passed")),
-      },
+      None => {
+        return Err(anyhow!("neither command nor executable passed"));
+      }
     };
 
     let maybe_virtual_env_activation_command = easyenv::get_env_string_optional(
@@ -204,19 +199,16 @@ impl StableDiffusionInferenceCommand {
     // ===== Begin Python Args =====
     command.push_str("--prompt ");
     command.push_str(&args.prompt.as_ref().to_string_lossy());
-    
+
     command.push_str(" --result_dir ");
     command.push_str(&args.work_dir.as_ref().to_string_lossy());
-    
+
     command.push_str(" --result_file ");
     command.push_str(&args.output_file.as_ref().to_string_lossy());
     
     command.push_str(" --stderr_output_file ");
     command.push_str(&args.stderr_output_file.as_ref().to_string_lossy());
-    
-    command.push_str(" --prompt ");
-    command.push_str(&args.prompt.as_ref().to_string_lossy());
-    
+
     command.push_str(" --negative_prompt ");
     command.push_str(&args.negative_prompt.as_ref().to_string_lossy());
     
@@ -242,13 +234,10 @@ impl StableDiffusionInferenceCommand {
     command.push_str(&args.lora_path.as_ref().to_string_lossy());
     
     command.push_str(" --check_point ");
-    command.push_str(&args.check_point.as_ref().to_string_lossy());
+    command.push_str(&args.checkpoint_path.as_ref().to_string_lossy());
     
     command.push_str(" --vae ");
     command.push_str(&args.vae.as_ref().to_string_lossy());
-    
-    command.push_str(" --batch_size ");
-    command.push_str(&args.batch_size.to_string());
     
     command.push_str(" --batch_count ");
     command.push_str(&args.batch_count.to_string());

@@ -202,21 +202,24 @@ mod tests {
     let upload_path = "upload_path".to_string();
     let lora_upload_path = "lora_upload_path".to_string();
     let checkpoint = "checkpoint".to_string();
-
+    let type_of_inference = "type_of_inference".to_string();
     let args = GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::ImageGeneration),
       args: Some(PolymorphicInferenceArgs::Ig(StableDiffusionArgs {
-        maybe_video_source: Some(video_media_token),
-        maybe_image_source: Some(image_media_token),
         maybe_sd_model_token: Some(sd_model_token),
         maybe_lora_model_token: Some(lora_model_token),
+        maybe_height: Some(512),
+        maybe_width: Some(512),
+        maybe_cfg_scale: Some(7),
         maybe_prompt: Some(prompt),
-        maybe_a_prompt: Some(a_prompt),
         maybe_n_prompt: Some(n_prompt),
+        maybe_batch_count: Some(1),
+        maybe_batch_size: Some(1),
+        maybe_number_of_samples: Some(25),
         maybe_seed: Some(seed),
         maybe_upload_path: Some(upload_path),
         maybe_lora_upload_path: Some(lora_upload_path),
-        inference_type: Some(checkpoint)
+        type_of_inference: type_of_inference
       })),
     };
 

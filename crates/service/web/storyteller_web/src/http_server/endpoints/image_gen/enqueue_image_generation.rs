@@ -109,7 +109,6 @@ pub struct EnqueueImageGenRequest {
     maybe_sd_model_token: Option<String>,
     maybe_lora_model_token: Option<String>,
     maybe_prompt: Option<String>,
-    maybe_a_prompt: Option<String>,
     maybe_n_prompt: Option<String>,
     maybe_seed: Option<i64>,
     maybe_width: Option<i32>,
@@ -189,8 +188,10 @@ pub async fn enqueue_image_generation_request(
 ) -> Result<HttpResponse, EnqueueImageGenRequestError> {
 
     // TODO: Brandon need to figure out premium vs not premium
+
     let mut maybe_user_token: Option<UserToken> = None;
     let  visbility =  enums::common::visibility::Visibility::Public;
+
     let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {
         warn!("MySql pool error: {:?}", err);
         EnqueueImageGenRequestError::ServerError
@@ -316,7 +317,6 @@ pub async fn enqueue_image_generation_request(
     let lora_token = ModelWeightToken(request.maybe_lora_model_token.clone().unwrap_or_default());
     
 
-    let a_prompt = request.maybe_a_prompt.clone().unwrap_or_default();
     let n_prompt = request.maybe_n_prompt.clone().unwrap_or_default();
 
     // we can only do 1 upload type at a time.
@@ -333,12 +333,10 @@ pub async fn enqueue_image_generation_request(
 
     let type_of_inference = request.type_of_inference.to_string().clone();
 
-
     let inference_args = StableDiffusionArgs {
         maybe_sd_model_token: Some(sd_weight_token),
         maybe_lora_model_token: Some(lora_token),
         maybe_prompt: Some(request.maybe_prompt.clone().unwrap_or_default()),
-        maybe_a_prompt: Some(a_prompt),
         maybe_n_prompt: Some(n_prompt),
         maybe_seed: Some(seed),
         maybe_upload_path: Some(upload_path),

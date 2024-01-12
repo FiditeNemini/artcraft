@@ -45,10 +45,6 @@ pub struct StableDiffusionArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_prompt: Option<String>,
 
-    #[serde(rename = "ap")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_a_prompt: Option<String>,
-
     #[serde(rename = "np")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_n_prompt: Option<String>,

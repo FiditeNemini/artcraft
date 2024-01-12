@@ -63,7 +63,39 @@ pub async fn sd_args_from_job(
     Ok(stable_diffusion_args)
 }
 
-pub async fn process_job(
+
+pub async fn process_job_selection (args: StableDiffusionProcessArgs<'_>
+) -> Result<JobSuccessResult, ProcessSingleJobError> {
+    let job = args.job;
+    let sd_args = sd_args_from_job(&args).await?;
+    if sd_args.type_of_inference == "inference" {
+        process_job_inference(args).await
+    }
+    else if sd_args.type_of_inference == "lora" {
+        process_job_lora(args).await
+    }
+    else if sd_args.type_of_inference == "checkpoint"{
+        process_job_inference(args).await
+    }
+    else {
+        Err(ProcessSingleJobError::Other(anyhow!("inference type doesn't exist!")))
+    }
+}
+
+pub async fn process_job_checkpoint(args: StableDiffusionProcessArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
+    Ok(JobSuccessResult {
+        maybe_result_entity: None,
+        inference_duration: Duration::from_secs(0),
+    })
+}
+pub async fn process_job_lora(args: StableDiffusionProcessArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
+    Ok(JobSuccessResult {
+        maybe_result_entity: None,
+        inference_duration: Duration::from_secs(0),
+    })
+}
+
+pub async fn process_job_inference(
     args: StableDiffusionProcessArgs<'_>
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
     let job = args.job;
