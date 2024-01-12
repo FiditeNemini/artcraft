@@ -241,7 +241,7 @@ export default function WeightPage({
       value: weight.creator_set_visibility,
     },
     { property: "Created at", value: dateCreated || "" },
-    { property: "Updated at", value: dateCreated || "" },
+    { property: "Updated at", value: dateUpdated || "" },
   ];
 
   const imageDetails = [
