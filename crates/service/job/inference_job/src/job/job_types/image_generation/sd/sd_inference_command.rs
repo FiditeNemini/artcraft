@@ -73,8 +73,8 @@ pub struct InferenceArgs<P: AsRef<Path>> {
   /// --result_file: path to final file output
   pub output_file: P,
   pub stderr_output_file: P,
-  pub prompt: P,
-  pub negative_prompt:P,
+  pub prompt: String,
+  pub negative_prompt:String,
   pub number_of_samples:i32,
   pub samplers:String,
   pub width:i32,

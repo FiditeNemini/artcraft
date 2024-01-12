@@ -11,6 +11,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::Pol
 
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType::UploadModel;
+use tokens::tokens::model_weights::ModelWeightToken;
 use crate::job::job_types::image_generation::sd::sd_inference_command::InferenceArgs;
 use crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
 use crate::job::job_types::image_generation::sd::validate_inputs::validate_inputs;
@@ -77,6 +78,14 @@ pub async fn process_job_selection (args: StableDiffusionProcessArgs<'_>
 }
 
 pub async fn process_job_checkpoint(args: &StableDiffusionProcessArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
+
+    // insert model record in create model record
+
+    // let maybe_result_entity = ResultEntity {
+    //     entity_type: InferenceResultType::UploadModel,
+    //     entity_token:
+    // };
+
     Ok(JobSuccessResult {
         maybe_result_entity: None,
         inference_duration: Duration::from_secs(0),
@@ -96,7 +105,6 @@ pub async fn process_job_inference(
     let deps = args.job_dependencies;
 
     let sd_args = sd_args_from_job(&args).await?;
-
     let sd_deps = match &args.job_dependencies.job.job_specific_dependencies.maybe_stable_diffusion_dependencies {
         None => {
             return Err(ProcessSingleJobError::Other(anyhow!("Missing Job Specific Dependencies")));
@@ -122,8 +130,14 @@ pub async fn process_job_inference(
 
     let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint");
     let lora_path = work_temp_dir.path().join("lora");
+    let vae_path = work_temp_dir.path().join("vae");
+    let output_path = work_temp_dir.path().join("output");
 
-
+    println!("Pathes to download to");
+    println!("sd_checkpoint_path:{}",sd_checkpoint_path.to_string());
+    println!("lora_path:{}",lora_path.to_string());
+    println!("vae_path:{}",vae_path.to_string());
+    println!("output_path:{}",output_path.to_string());
 
     // // Unpack loRA and Checkpoint
     // // run inference by downloading from google drive.
@@ -167,64 +181,106 @@ pub async fn process_job_inference(
         None => None,
     };
 
-    // let details = RemoteCloudBucketDetails::new(
-    //     retrieved_sd_record.public_bucket_hash.clone(),
-    //     retrieved_sd_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
-    //     retrieved_sd_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
-    // );
+    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
 
-    // let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
-    // remote_cloud_file_client.download_file(details, sd_checkpoint_path.to_string()).await?;
+    // Details for SD checkpoint
+    let details = RemoteCloudBucketDetails::new(
+        retrieved_sd_record.public_bucket_hash.clone(),
+        retrieved_sd_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
+        retrieved_sd_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
+    );
+    remote_cloud_file_client.download_file(details, sd_checkpoint_path.to_string()).await?;
 
-    // match retrieved_loRA_record {
-    //     Some(record) => {
-    //         match record {
-    //             Some(model_weight_record) => {
-    //                 let lora_details = RemoteCloudBucketDetails::new(
-    //                     model_weight_record.public_bucket_hash.clone(),
-    //                     model_weight_record.maybe_public_bucket_prefix
-    //                         .clone()
-    //                         .unwrap_or_else(|| "".to_string()),
-    //                     model_weight_record.maybe_public_bucket_extension
-    //                         .clone()
-    //                         .unwrap_or_else(|| "".to_string())
-    //                 );
-    //                 remote_cloud_file_client.download_file(
-    //                     lora_details,
-    //                     lora_path.to_str
-    //                 ).await?;
-    //             }
-    //             None => {}
-    //         }
-    //     }
-    //     None => {}
-    // }
+    match retrieved_loRA_record {
+        Some(record) => {
+            match record {
+                Some(model_weight_record) => {
 
-    // insert model record in create model record
+                    let lora_details = RemoteCloudBucketDetails::new(
+                        model_weight_record.public_bucket_hash.clone(),
+                        model_weight_record.maybe_public_bucket_prefix
+                            .clone()
+                            .unwrap_or_else(|| "".to_string()),
+                        model_weight_record.maybe_public_bucket_extension
+                            .clone()
+                            .unwrap_or_else(|| "".to_string())
+                    );
+                    remote_cloud_file_client.download_file(
+                        lora_details,
+                        lora_path.to_string()
+                    ).await?;
 
-    // let maybe_result_entity = ResultEntity {
-    //     entity_type: InferenceResultType::UploadModel,
-    //     entity_token:
-    // };
+                }
+                None => {}
+            }
+        }
+        None => {}
+    }
 
 
+
+    // VAE token for now
+    let vae_token = String::from("weight_rb0959wfzjhk3d1k93hr3s0qw");
+    let model_weight_vae = ModelWeightToken(vae_token);
+
+    let vae_weight_record =  get_weight_by_token(
+        &model_weight_vae,
+        false,
+        &deps.db.mysql_pool
+    ).await?;
+
+    let vae_weight_record = match vae_weight_record {
+        Some(val) => {
+            val
+        },
+        None => {
+            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no VAE? thats a problem.")))
+        }
+    };
+
+
+    let vae_details = RemoteCloudBucketDetails::new(
+        vae_weight_record.public_bucket_hash.clone(),
+        vae_weight_record.maybe_public_bucket_prefix
+            .clone()
+            .unwrap_or_else(|| "".to_string()),
+        vae_weight_record.maybe_public_bucket_extension
+            .clone()
+            .unwrap_or_else(|| "".to_string())
+    );
+
+    remote_cloud_file_client.download_file(
+        vae_details,
+        vae_path.to_string()
+    ).await?;
+
+    let prompt = match sd_args.maybe_prompt {
+        Some(val) => {
+            val
+        }
+        None => Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No Prompt provided!")))
+    };
+
+    // #TODO allow for batch and saving later. output files
     sd_deps.inference_command.execute_inference(InferenceArgs {
-        work_dir: (),
-        output_file: (),
-        stderr_output_file: (),
-        prompt: (),
-        negative_prompt: (),
+        work_dir: work_temp_dir,
+        output_file: output_path,
+        stderr_output_file:,
+        prompt:  prompt,
+        negative_prompt:sd_args.maybe_n_prompt.unwrap_or_default(),
         number_of_samples: 0,
         samplers: "".to_string(),
-        width: 0,
-        height: 0,
-        cfg_scale: 0,
-        seed: 0,
-        lora_path: (),
-        checkpoint_path: (),
-        vae: (),
-        batch_count: 0,
+        width: sd_args.maybe_width.unwrap_or(512),
+        height: sd_args.maybe_height.unwrap_or(512),
+        cfg_scale: sd_args.maybe_cfg_scale.unwrap_or(7),
+        seed: sd_args.maybe_seed.unwrap_or(1),
+        lora_path: lora_path.clone().as_path(),
+        checkpoint_path: sd_checkpoint_path.clone(),
+        vae: vae_path.as_path(),
+        batch_count: sd_args.maybe_batch_count.unwrap_or(1),
     });
+
+    // upload media and create a record.
 
 
     Ok(JobSuccessResult {

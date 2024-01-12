@@ -17,6 +17,7 @@ use enums::by_table::model_weights::{
 use enums::common::visibility::Visibility;
 use errors::{anyhow, AnyhowResult};
 use mysql_queries::queries::model_weights::create::create_weight::{create_weight, CreateModelWeightsArgs};
+use mysql_queries::queries::users::user::create_account::create_account;
 use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 use storyteller_root::get_seed_tool_data_root;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -376,6 +377,8 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
 }
 
 pub async fn seed_weights_for_testing_inference(mysql_pool: &Pool<MySql>, user_token: UserToken) -> AnyhowResult<()>{
+
+
     let miyhoyo_description = r#"一个面向米哈游角色的模型合集~A collection for MIHOYO Characters~
 对应人物tag记录在版本信息里，可在右侧“About this version”选项中查看。The corresponding character prompts are recorded in the version information and can be viewed in the About this version option on the right.
 打开目录寻找最爱~（附带链接，点击直达）~Open the catalog, find your favorites~ (with links, click to go directly):
@@ -580,24 +583,35 @@ majicMIX fantasy v2 =
 Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
 "#;
 
+
+    let sd_vae_description = r"This is an earlier version of a stable VAE. Compared to other VAEs, it has a higher level of stability. I am not the creator, but I could not find this VAE on the website, so I am sharing it here.
+这是较早时候的稳定VAE，与其他VAE相比具有较高的稳定性，不容易坏图。我不是作者，但是站里没找着所以搬运。#";
+
+
     info!("Seeding weights for inference...");
     ModelWeightToken::reset_rng_for_testing_and_dev_seeding_never_use_in_production_seriously(54321);
     let model_weight_token1 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
     let model_weight_token2 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let model_weight_token3 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+
 
     let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
 
     let sd_15_weights_descriptor = Box::new(WeightsSD15Descriptor {});
     let lora_descriptor = Box::new(WeightsLoRADescriptor{});
-
+    let sd_vae_15_weights_descriptor = Box::new(WeightsSD15Descriptor {});
     let mut path_object_SD = get_seed_tool_data_root();
     path_object_SD.push("models/imagegen/sd15/majicmixFantasy_v30Vae.safetensors");
 
     let mut path_object_loRA = get_seed_tool_data_root();
     path_object_loRA.push("models/imagegen/loRA/xiawolei-v100-000019.safetensors");
 
+    let mut path_to_VAE = get_seed_tool_data_root();
+    path_to_VAE.push("models/imagegen/vae/zVae_v20.safetensors");
+
     let metadata1 = remote_cloud_file_client.upload_file(sd_15_weights_descriptor,path_object_SD.as_path().to_str().unwrap()).await?;
     let metadata2 = remote_cloud_file_client.upload_file(lora_descriptor,path_object_loRA.as_path().to_str().unwrap()).await?;
+    let metadata3 = remote_cloud_file_client.upload_file(sd_vae_15_weights_descriptor,path_to_VAE.as_path().to_str().unwrap()).await?;
 
     let weights1 = CreateModelWeightsArgs {
         token: &model_weight_token1, // replace with actual ModelWeightToken
@@ -626,34 +640,60 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
     };
 
     let weights2  = CreateModelWeightsArgs {
-    token: &model_weight_token2, // replace with actual ModelWeightToken
-    weights_type: WeightsType::LoRA, // replace with actual WeightsType
-    weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
-    title: "MIHOYO Collection 米家全家桶 (Honkai Impact 3rd | Honkai Star Rail | Genshin Impact | Zenless Zone Zero)".to_string(),
-    maybe_description_markdown: Some(miyhoyo_description.to_string()),
-    maybe_description_rendered_html: Some(miyhoyo_description.to_string()),
-    creator_user_token: Some(&user_token), // replace with actual UserToken
-    creator_ip_address: "292.268.2.2",
-    creator_set_visibility: Visibility::Public,
-    maybe_last_update_user_token: Some("<p> Honkai <p>".to_string()),
-    original_download_url: Some("https://civitai.com/models/95243/mihoyo-collection-honkai-impact-3rd-or-honkai-star-rail-or-genshin-impact-or-zenless-zone-zero".to_string()),
-    original_filename: Some("xiawolei-v100-000019.safetensors".to_string()),
-    file_size_bytes: metadata2.file_size_bytes as i32,
-    file_checksum_sha2: metadata2.sha256_checksum.to_string(),
-    public_bucket_hash: metadata2.bucket_details.clone().unwrap().object_hash.clone(),
-    maybe_public_bucket_prefix: Some(metadata2.bucket_details.clone().unwrap().prefix),
-    maybe_public_bucket_extension: Some(metadata2.bucket_details.clone().unwrap().suffix),
-    cached_user_ratings_total_count: 20,
-    cached_user_ratings_positive_count: 9,
-    cached_user_ratings_negative_count: 2,
-    maybe_cached_user_ratings_ratio: Some(0.9),
-    version: 2,
-    mysql_pool: &mysql_pool, // replace with actual MySqlPool
+        token: &model_weight_token2, // replace with actual ModelWeightToken
+        weights_type: WeightsType::LoRA, // replace with actual WeightsType
+        weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
+        title: "MIHOYO Collection 米家全家桶 (Honkai Impact 3rd | Honkai Star Rail | Genshin Impact | Zenless Zone Zero)".to_string(),
+        maybe_description_markdown: Some(miyhoyo_description.to_string()),
+        maybe_description_rendered_html: Some(miyhoyo_description.to_string()),
+        creator_user_token: Some(&user_token), // replace with actual UserToken
+        creator_ip_address: "292.268.2.2",
+        creator_set_visibility: Visibility::Public,
+        maybe_last_update_user_token: Some("<p> Honkai <p>".to_string()),
+        original_download_url: Some("https://civitai.com/models/95243/mihoyo-collection-honkai-impact-3rd-or-honkai-star-rail-or-genshin-impact-or-zenless-zone-zero".to_string()),
+        original_filename: Some("xiawolei-v100-000019.safetensors".to_string()),
+        file_size_bytes: metadata2.file_size_bytes as i32,
+        file_checksum_sha2: metadata2.sha256_checksum.to_string(),
+        public_bucket_hash: metadata2.bucket_details.clone().unwrap().object_hash.clone(),
+        maybe_public_bucket_prefix: Some(metadata2.bucket_details.clone().unwrap().prefix),
+        maybe_public_bucket_extension: Some(metadata2.bucket_details.clone().unwrap().suffix),
+        cached_user_ratings_total_count: 20,
+        cached_user_ratings_positive_count: 9,
+        cached_user_ratings_negative_count: 2,
+        maybe_cached_user_ratings_ratio: Some(0.9),
+        version: 2,
+        mysql_pool: &mysql_pool, // replace with actual MySqlPool
+    };
+
+    let weights3 = CreateModelWeightsArgs {
+        token: &model_weight_token3, // replace with actual ModelWeightToken
+        weights_type: WeightsType::StableDiffusion15, // replace with actual WeightsType
+        weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
+        title: "z-vae".to_string(),
+        maybe_description_markdown: Some(sd_vae_description.to_string()),
+        maybe_description_rendered_html: Some("<p>Description</p>".to_string()),
+        creator_user_token: Some(&user_token), // replace with actual UserToken
+        creator_ip_address: "192.168.1.1",
+        creator_set_visibility: Visibility::Public,
+        maybe_last_update_user_token: Some("Last Update User Token".to_string()),
+        original_download_url: Some("https://civitai.com/models/97653/z-vae".to_string()),
+        original_filename: Some("zVae_v20.safetensors".to_string()),
+        file_size_bytes: metadata3.file_size_bytes as i32,
+        file_checksum_sha2: metadata3.sha256_checksum.to_string(),
+        public_bucket_hash: metadata3.bucket_details.clone().unwrap().object_hash,
+        maybe_public_bucket_prefix: Some(metadata3.bucket_details.clone().unwrap().prefix),
+        maybe_public_bucket_extension: Some(metadata3.bucket_details.clone().unwrap().suffix),
+        cached_user_ratings_total_count: 10,
+        cached_user_ratings_positive_count: 9,
+        cached_user_ratings_negative_count: 1,
+        maybe_cached_user_ratings_ratio: Some(0.9),
+        version: 1,
+        mysql_pool: &mysql_pool, // replace with actual MySqlPool
     };
 
     create_weight(weights1).await?;
     create_weight(weights2).await?;
-
+    create_weight(weights3).await?;
 
     Ok(())
 }
