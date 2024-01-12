@@ -45,11 +45,11 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const { media: mediaFile, status } = useMedia({
     mediaToken: token,
     onSuccess: (res: any) => {
-      console.log("🚺",res);
+      console.log("🚺", res);
       ratings.gather({ res, key: "token" });
-    }
+    },
   });
-  console.log("😎",ratings.library);
+  console.log("😎", ratings.library);
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -163,7 +163,8 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       </>
     );
 
-  if (status === 4) // = error, will replace with type 
+  if (status === 4)
+    // = error, will replace with type
     return (
       <Container type="panel">
         <PageHeader
@@ -225,18 +226,17 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   let mediaDetails;
 
   switch (mediaFile?.media_type) {
-    case MediaFileType.Audio: 
+    case MediaFileType.Audio:
       mediaDetails = audioDetails;
       break;
-    case MediaFileType.Video: 
+    case MediaFileType.Video:
       mediaDetails = videoDetails;
       break;
-    case MediaFileType.Image: 
+    case MediaFileType.Image:
       mediaDetails = imageDetails;
       break;
     default:
   }
-
 
   let modMediaDetails = undefined;
 
@@ -289,9 +289,14 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const bucketConfig = new BucketConfig();
 
   let weightUsedCoverImage = "/images/avatars/default-pfp.png";
-  if (mediaFile?.maybe_model_weight_info !== null) {
+  if (
+    mediaFile?.maybe_model_weight_info !== null &&
+    mediaFile?.maybe_model_weight_info?.maybe_cover_image_public_bucket_path !==
+      null
+  ) {
     weightUsedCoverImage = bucketConfig.getCdnUrl(
-      mediaFile?.maybe_model_weight_info?.maybe_cover_image_public_bucket_path || "",
+      mediaFile?.maybe_model_weight_info
+        ?.maybe_cover_image_public_bucket_path || "",
       60,
       100
     );
@@ -331,7 +336,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                         large: true,
                         ...ratings.makeProps({
                           entityToken: token,
-                          entityType: "media_file"
+                          entityType: "media_file",
                         }),
                       }}
                     />
@@ -353,14 +358,14 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         <div className="row g-4">
           <div className="col-12 col-xl-8">
             <div className="media-wrapper">
-              { mediaFile && renderMediaComponent(mediaFile) }
+              {mediaFile && renderMediaComponent(mediaFile)}
             </div>
 
             <div className="panel p-3 py-4 p-md-4 mt-3 d-none d-xl-block">
               <h4 className="fw-semibold mb-3">Comments</h4>
               <CommentComponent
                 entityType="user"
-                entityToken={mediaFile?.token || "" }
+                entityToken={mediaFile?.token || ""}
                 sessionWrapper={sessionWrapper}
               />
             </div>
@@ -463,6 +468,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                           by{" "}
                           <Link
                             to={`/profile/${mediaFile?.maybe_model_weight_info.maybe_weight_creator.username}`}
+                            className="fw-medium text-white"
                           >
                             {
                               mediaFile?.maybe_model_weight_info
@@ -478,9 +484,13 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
               <Accordion>
                 <Accordion.Item title="Media Details" defaultOpen={true}>
-                  { !!mediaDetails && <DataTable {...{
-                    data: mediaDetails
-                  }} /> }
+                  {!!mediaDetails && (
+                    <DataTable
+                      {...{
+                        data: mediaDetails,
+                      }}
+                    />
+                  )}
                 </Accordion.Item>
 
                 {modMediaDetails}
@@ -496,7 +506,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
             <h4 className="fw-semibold mb-3">Comments</h4>
             <CommentComponent
               entityType="user"
-              entityToken={mediaFile?.token || "" }
+              entityToken={mediaFile?.token || ""}
               sessionWrapper={sessionWrapper}
             />
           </Panel>
