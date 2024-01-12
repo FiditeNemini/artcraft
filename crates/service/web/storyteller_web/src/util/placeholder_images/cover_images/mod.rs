@@ -1,0 +1,1 @@
+pub mod default_cover_image_from_token;
