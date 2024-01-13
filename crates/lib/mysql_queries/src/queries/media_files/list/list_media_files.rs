@@ -33,6 +33,7 @@ pub struct MediaFileListItem {
 
   pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
   pub maybe_origin_model_token: Option<String>,
+
   // NB: The title won't be populated for `tts_models` records or non-`model_weights` records.
   pub maybe_origin_model_title: Option<String>,
 
