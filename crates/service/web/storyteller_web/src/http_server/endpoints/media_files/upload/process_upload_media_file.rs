@@ -144,7 +144,7 @@ pub async fn process_upload_media_file(
 
   info!("Upload maybe filesize: {:?}", maybe_file_size_bytes);
 
-  let maybe_mimetype = upload_media_request.file_bytes
+  let mut maybe_mimetype = upload_media_request.file_bytes
       .as_ref()
       .map(|bytes| get_mimetype_for_bytes(bytes.as_ref()))
       .flatten();
@@ -253,6 +253,16 @@ pub async fn process_upload_media_file(
 
       maybe_duration_millis = basic_info.duration_millis;
       maybe_codec_name = basic_info.codec_name;
+    }
+  }
+
+  if media_file_type.is_none() && maybe_mimetype.is_none() {
+    // https://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html
+    const BVH_HEADER : &[u8] = "HIERARCHY".as_bytes();
+
+    if bytes.starts_with(BVH_HEADER) {
+      media_file_type = Some(MediaFileType::Mocap);
+      maybe_mimetype = Some("application/octet-stream");
     }
   }
 
