@@ -13,6 +13,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::Pol
 
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType::UploadModel;
+use filesys::path_to_string::path_to_string;
 use tokens::tokens::model_weights::ModelWeightToken;
 use crate::job::job_types::image_generation::sd::sd_inference_command::InferenceArgs;
 use crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
@@ -133,11 +134,11 @@ pub async fn process_job_inference(
     let vae_path = work_temp_dir.path().join("vae");
     let output_path = work_temp_dir.path().join("output");
 
-    println!("Pathes to download to:");
-    println!("sd_checkpoint_path:{}",sd_checkpoint_path.to_string());
-    println!("lora_path:{}",lora_path.to_string());
-    println!("vae_path:{}",vae_path.to_string());
-    println!("output_path:{}",output_path.to_string());
+    println!("Paths to download to:");
+    println!("sd_checkpoint_path:{}",sd_checkpoint_path.display());
+    println!("lora_path:{}",lora_path.display());
+    println!("vae_path:{}",vae_path.display());
+    println!("output_path:{}",output_path.display());
 
     // // Unpack loRA and Checkpoint
     // // run inference by downloading from google drive.
@@ -189,7 +190,7 @@ pub async fn process_job_inference(
         retrieved_sd_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
         retrieved_sd_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
     );
-    remote_cloud_file_client.download_file(details, sd_checkpoint_path.to_string()).await?;
+    remote_cloud_file_client.download_file(details, path_to_string(sd_checkpoint_path.clone())).await?;
 
     match retrieved_loRA_record {
         Some(record) => {
@@ -207,7 +208,7 @@ pub async fn process_job_inference(
                     );
                     remote_cloud_file_client.download_file(
                         lora_details,
-                        lora_path.to_string()
+                        path_to_string(lora_path.clone())
                     ).await?;
 
                 }
@@ -249,17 +250,17 @@ pub async fn process_job_inference(
 
     remote_cloud_file_client.download_file(
         vae_details,
-        vae_path.to_string()
+        path_to_string(vae_path.clone())
     ).await?;
 
     let prompt = match sd_args.maybe_prompt {
         Some(val) => {
             val
         }
-        None => Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No Prompt provided!")))
+        None => return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No Prompt provided!")))
     };
 
-    let stderr_output_file = work_temp_dir.path().join("zero_shot_create_voice_err.txt");
+    let stderr_output_file = work_temp_dir.path().join("sd_err.txt");
 
     let number_of_samples = match sd_args.maybe_number_of_samples {
         Some(val) => {
@@ -278,12 +279,12 @@ pub async fn process_job_inference(
         prompt: prompt,
         negative_prompt:sd_args.maybe_n_prompt.unwrap_or_default(),
         number_of_samples: number_of_samples,
-        samplers: "".to_string(),
+        samplers: sd_args.maybe_sampler.unwrap_or(String::from("Euler a")),
         width: sd_args.maybe_width.unwrap_or(512),
         height: sd_args.maybe_height.unwrap_or(512),
         cfg_scale: sd_args.maybe_cfg_scale.unwrap_or(7),
         seed: sd_args.maybe_seed.unwrap_or(1),
-        lora_path: Some(lora_path),
+        lora_path: lora_path.clone(),
         checkpoint_path: sd_checkpoint_path.clone(),
         vae: vae_path.clone(),
         batch_count: sd_args.maybe_batch_count.unwrap_or(1),

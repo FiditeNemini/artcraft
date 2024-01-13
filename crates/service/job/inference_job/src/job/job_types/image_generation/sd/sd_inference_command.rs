@@ -81,7 +81,7 @@ pub struct InferenceArgs {
   pub height:i32,
   pub cfg_scale:i32, 
   pub seed:i64,
-  pub lora_path:Option<PathBuf>,
+  pub lora_path:PathBuf,
   pub checkpoint_path:PathBuf,
   pub vae:PathBuf,
   pub batch_count:i32,
@@ -197,49 +197,49 @@ impl StableDiffusionInferenceCommand {
 
     // ===== Begin Python Args =====
     command.push_str("--prompt ");
-    command.push_str(&args.prompt.as_ref().to_string_lossy());
+    command.push_str(&path_to_string(args.prompt));
 
     command.push_str(" --result_dir ");
-    command.push_str(&args.work_dir.as_ref().to_string_lossy());
+    command.push_str(&path_to_string(args.work_dir));
 
     command.push_str(" --result_file ");
-    command.push_str(&args.output_file.as_ref().to_string_lossy());
+    command.push_str(&path_to_string(args.output_file));
     
     command.push_str(" --stderr_output_file ");
-    command.push_str(&args.stderr_output_file.as_ref().to_string_lossy());
+    command.push_str(&path_to_string(args.stderr_output_file.clone()));
 
     command.push_str(" --negative_prompt ");
-    command.push_str(&args.negative_prompt.as_ref().to_string_lossy());
+    command.push_str(&path_to_string(args.negative_prompt));
     
     command.push_str(" --number_of_samples ");
-    command.push_str(&args.number_of_samples.to_string());
+    command.push_str(args.number_of_samples.to_string().as_str());
     
     command.push_str(" --samplers ");
-    command.push_str(&args.samplers);
+    command.push_str(&path_to_string(args.samplers));
     
     command.push_str(" --width ");
-    command.push_str(&args.width.to_string());
+    command.push_str(args.width.to_string().as_str());
     
     command.push_str(" --height ");
-    command.push_str(&args.height.to_string());
+    command.push_str(args.height.to_string().as_str());
     
     command.push_str(" --cfg_scale ");
-    command.push_str(&args.cfg_scale.to_string());
+    command.push_str(args.cfg_scale.to_string().as_str());
     
     command.push_str(" --seed ");
-    command.push_str(&args.seed.to_string());
+    command.push_str(args.seed.to_string().as_str());
     
     command.push_str(" --lora_path ");
-    command.push_str(&args.lora_path.as_ref().to_string_lossy());
+    command.push_str(&path_to_string(args.lora_path));
     
     command.push_str(" --check_point ");
-    command.push_str(&args.checkpoint_path.as_ref().to_string_lossy());
+    command.push_str(&path_to_string(args.checkpoint_path));
     
     command.push_str(" --vae ");
-    command.push_str(&args.vae.as_ref().to_string_lossy());
+    command.push_str(&path_to_string(args.vae));
     
     command.push_str(" --batch_count ");
-    command.push_str(&args.batch_count.to_string());
+    command.push_str(args.batch_count.to_string().as_str());
 
     info!("Command: {:?}", command);
 
@@ -265,7 +265,7 @@ impl StableDiffusionInferenceCommand {
 
     let mut config = PopenConfig::default();
 
-    info!("stderr will be written to file: {:?}", args.stderr_output_file.as_ref());
+    info!("stderr will be written to file: {}", path_to_string(args.stderr_output_file.clone()));
 
     let stderr_file = File::create(&args.stderr_output_file)?;
     config.stderr = Redirection::File(stderr_file);
