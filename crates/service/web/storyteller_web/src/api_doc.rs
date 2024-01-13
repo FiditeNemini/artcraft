@@ -16,6 +16,7 @@ use tokens::tokens::user_bookmarks::*;
 use tokens::tokens::users::*;
 
 use crate::http_server::common_responses::cover_image_details::*;
+use crate::http_server::common_responses::media_file_origin_details::*;
 use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
@@ -90,6 +91,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     CoverImageDetails,
     DefaultAvatarInfo,
     DefaultCoverInfo,
+    MediaFileModelDetails,
+    MediaFileOriginDetails,
     MediaFileSocialMetaLight,
     PaginationCursors,
     PaginationPage,

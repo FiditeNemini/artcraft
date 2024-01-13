@@ -26,7 +26,7 @@ CREATE TABLE media_files (
   --   * 'device_api' for direct user uploads recorded using Browser/Device APIs.
   origin_category VARCHAR(16) NOT NULL,
 
-  -- TODO: Remove default value once records backfilled and queries updated.
+  -- TODO(bt,2024-01-12): Rename to origin_product.
   -- Product area where the media file originated.
   -- This is not the *model* that created the thing, this is the *product*.
   -- (The underlying models can change over time.)
@@ -37,8 +37,13 @@ CREATE TABLE media_files (
   -- "Voice Designer" dataset samples in a video generation flow.)
   --
   -- Possible values:
+  --   * 'unknown' for legacy records without an associated product
   --   * 'face_animator' for uploads and outputs
-  --   * 'unknown' for legacy records without an associated product (TODO: This should be temporary)
+  --   * 'tts' for text to speech outputs
+  --   * 'voice_conversion' for uploads or outputs (RVC or SVC)
+  --   * 'zs_voice' for uploads or outputs for zero shot voice products
+  --   * 'video_filter' filters on videos
+  --   * 'mocap' for files uploaded or processed by motion capture
   origin_product_category VARCHAR(16) NOT NULL DEFAULT "unknown",
 
   -- For inference that can be tied back to a model, the type of model.
