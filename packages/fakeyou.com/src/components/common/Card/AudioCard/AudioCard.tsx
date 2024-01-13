@@ -51,28 +51,26 @@ export default function AudioCard({
     );
 
   const bucketConfig = new BucketConfig();
-  let coverImage = "/images/avatars/default-pfp.png";
+  let coverImage = undefined;
 
   if (type === "media") {
     coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 400, 100);
   } else if (type === "weights") {
-    if (data.maybe_cover_image_public_bucket_path) {
+    if (data.cover_image.maybe_cover_image_public_bucket_path) {
       coverImage = bucketConfig.getCdnUrl(
-        data.maybe_cover_image_public_bucket_path,
-        100,
+        data.cover_image.maybe_cover_image_public_bucket_path,
+        110,
         100
       );
     }
     if (data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path) {
       coverImage = bucketConfig.getCdnUrl(
         data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path,
-        100,
+        110,
         100
       );
     }
   }
-
-  // console.log("💎",ratings?.list[data.weight_token]);
 
   return (
     <Link
@@ -124,14 +122,14 @@ export default function AudioCard({
               )}
 
               <div>
-
-                <LikeButton {...{
-                  ...ratings.makeProps({
-                    entityToken: data.token,
-                    entityType: "media_file"
-                  })
-                }} />
-
+                <LikeButton
+                  {...{
+                    ...ratings.makeProps({
+                      entityToken: data.token,
+                      entityType: "media_file",
+                    }),
+                  }}
+                />
               </div>
             </div>
           </>
@@ -141,7 +139,12 @@ export default function AudioCard({
           <>
             <div className="d-flex">
               {showCover && (
-                <WeightCoverImage src={coverImage} height={110} width={110} />
+                <WeightCoverImage
+                  src={coverImage}
+                  height={110}
+                  width={110}
+                  coverIndex={data.cover_image.default_cover.image_index}
+                />
               )}
 
               <div className="flex-grow-1">
@@ -191,19 +194,21 @@ export default function AudioCard({
               )}
 
               <div>
-                <LikeButton {...{
-                  ...ratings.makeProps({
-                    entityToken: data.weight_token,
-                    entityType: "model_weight"
-                  })
-                }} />
+                <LikeButton
+                  {...{
+                    ...ratings.makeProps({
+                      entityToken: data.weight_token,
+                      entityType: "model_weight",
+                    }),
+                  }}
+                />
               </div>
               <BookmarkButton
                 {...{
                   ...bookmarks.makeProps({
                     entityToken: data.weight_token,
-                    entityType: "model_weight"
-                  })
+                    entityType: "model_weight",
+                  }),
                 }}
               />
             </div>

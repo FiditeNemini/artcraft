@@ -18,7 +18,12 @@ export interface Weight {
   file_checksum_sha2: string;
   file_size_bytes: number;
   maybe_cached_user_ratings_ratio: number | null;
-  maybe_cover_image_public_bucket_path: string | null;
+  cover_image: {
+    maybe_cover_image_public_bucket_path: string | null;
+    default_cover: {
+      image_index: number;
+    };
+  };
   version: number;
 }
 

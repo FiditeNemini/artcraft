@@ -26,7 +26,7 @@ export default function ImageCard({
   origin = "",
   showCreator,
   ratings,
-  type
+  type,
 }: ImageCardProps) {
   const history = useHistory();
   const linkUrl =
@@ -48,22 +48,24 @@ export default function ImageCard({
     );
 
   const bucketConfig = new BucketConfig();
-  let coverImage = "/images/avatars/default-pfp.png";
+  let coverImage = `/images/default-covers/${
+    data.cover_image.default_cover.image_index || 0
+  }.webp`;
 
   if (type === "media") {
     coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 600, 100);
   } else if (type === "weights") {
-    if (data.maybe_cover_image_public_bucket_path) {
+    if (data.cover_image.maybe_cover_image_public_bucket_path) {
       coverImage = bucketConfig.getCdnUrl(
-        data.maybe_cover_image_public_bucket_path,
-        400,
+        data.cover_image.maybe_cover_image_public_bucket_path,
+        600,
         100
       );
     }
     if (data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path) {
       coverImage = bucketConfig.getCdnUrl(
         data.details?.maybe_weight_data?.maybe_cover_image_public_bucket_path,
-        400,
+        600,
         100
       );
     }
@@ -74,7 +76,6 @@ export default function ImageCard({
       {...{
         to: linkUrl,
         state: { origin },
-        onClick: () => console.log("🌠 IMG CARD"),
       }}
     >
       <Card padding={false} canHover={true}>
@@ -120,12 +121,14 @@ export default function ImageCard({
                   )}
 
                   <div>
-                    <LikeButton {...{
-                      ...ratings.makeProps({
-                        entityToken: data.token,
-                        entityType: "media_file",
-                      })
-                    }} />
+                    <LikeButton
+                      {...{
+                        ...ratings.makeProps({
+                          entityToken: data.token,
+                          entityType: "media_file",
+                        }),
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -146,15 +149,17 @@ export default function ImageCard({
                     overlay={true}
                   />
                 </div>
-                <Button {...{
-                  className: "fs-7",
-                  icon: faArrowRight,
-                  label: "Use",
-                  onClick: () => {
-                    history.push(linkUrl); // programatically link to avoid "<a> cannot appear as a descendant of <a>" errors
-                  },
-                  variant: "link",
-                }} />
+                <Button
+                  {...{
+                    className: "fs-7",
+                    icon: faArrowRight,
+                    label: "Use",
+                    onClick: () => {
+                      history.push(linkUrl); // programatically link to avoid "<a> cannot appear as a descendant of <a>" errors
+                    },
+                    variant: "link",
+                  }}
+                />
               </div>
 
               <div className="card-img-overlay-text">
@@ -190,19 +195,21 @@ export default function ImageCard({
                   )}
 
                   <div>
-                    <LikeButton {...{
-                      ...ratings.makeProps({
-                        entityToken: data.weight_token,
-                        entityType: "model_weight"
-                      })
-                    }} />
+                    <LikeButton
+                      {...{
+                        ...ratings.makeProps({
+                          entityToken: data.weight_token,
+                          entityType: "model_weight",
+                        }),
+                      }}
+                    />
                   </div>
                   <BookmarkButton
                     {...{
                       ...bookmarks.makeProps({
                         entityToken: data.weight_token,
                         entityType: "model_weight",
-                      })
+                      }),
                     }}
                   />
                 </div>

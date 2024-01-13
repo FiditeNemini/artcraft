@@ -138,9 +138,9 @@ export default function WeightPage({
         );
       case WeightCategory.SD:
         let sdCoverImage = "/images/avatars/default-pfp.png";
-        if (weight.maybe_cover_image_public_bucket_path !== null) {
+        if (weight.cover_image.maybe_cover_image_public_bucket_path !== null) {
           sdCoverImage = bucketConfig.getGcsUrl(
-            weight.maybe_cover_image_public_bucket_path
+            weight.cover_image.maybe_cover_image_public_bucket_path
           );
         }
 
@@ -333,10 +333,10 @@ export default function WeightPage({
     setIsDeleteModalOpen(false);
   };
 
-  let audioWeightCoverImage = "/images/avatars/default-pfp.png";
-  if (weight.maybe_cover_image_public_bucket_path !== null) {
+  let audioWeightCoverImage = undefined;
+  if (weight.cover_image.maybe_cover_image_public_bucket_path !== null) {
     audioWeightCoverImage = bucketConfig.getCdnUrl(
-      weight.maybe_cover_image_public_bucket_path,
+      weight.cover_image.maybe_cover_image_public_bucket_path,
       100,
       100
     );
@@ -349,7 +349,10 @@ export default function WeightPage({
           <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
             {(weight.weight_category === WeightCategory.VC ||
               weight.weight_category === WeightCategory.TTS) && (
-              <WeightCoverImage src={audioWeightCoverImage} />
+              <WeightCoverImage
+                src={audioWeightCoverImage}
+                coverIndex={weight.cover_image.default_cover.image_index}
+              />
             )}
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
