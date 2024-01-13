@@ -289,8 +289,12 @@ pub async fn process_upload_media_file(
     },
   };
 
-  let extension = mimetype_to_extension(mime_type)
+  let mut extension = mimetype_to_extension(mime_type)
       .map(|extension| format!(".{extension}"));
+
+  if extension.is_none() && media_file_type == MediaFileType::Mocap {
+    extension = Some(".bvh".to_string());
+  }
 
   const PREFIX : Option<&str> = Some("upload_");
 
