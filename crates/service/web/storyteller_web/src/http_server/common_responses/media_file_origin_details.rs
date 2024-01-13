@@ -36,7 +36,7 @@ pub enum MediaFileModelDetails {
     model_type: MediaFileOriginModelType,
     /// The model token
     token: ModelWeightToken,
-    /// The model title
+    /// The model title (typically only populated for `model_weights` models, not legacy tables such as `tts_models`.)
     title: String,
   },
 }
