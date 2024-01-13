@@ -47,10 +47,11 @@ export default function WeightEditPage({
     title,
     update,
     visibility,
-    writeStatus
+    writeStatus,
   } = useWeightFetch({ token: weight_token });
 
-  const basePath = weight?.maybe_cover_image_public_bucket_path || "";
+  const basePath =
+    weight?.cover_image.maybe_cover_image_public_bucket_path || "";
   const currentPath = basePath ? new BucketConfig().getGcsUrl(basePath) : "";
 
   usePrefixedDocumentTitle("Edit Voice");
@@ -117,12 +118,14 @@ export default function WeightEditPage({
               <div {...{ className: "weight-editor row gy-3 gx-4" }}>
                 <div {...{ className: "col-12 col-lg-5" }}>
                   <label className="sub-title">Cover Image</label>
-                  <CoverImageInput {...{
-                    currentPath,
-                    onClick: coverImg.upload,
-                    status: coverImg.status,
-                    ...coverImg.fileProps
-                  }} />
+                  <CoverImageInput
+                    {...{
+                      currentPath,
+                      onClick: coverImg.upload,
+                      status: coverImg.status,
+                      ...coverImg.fileProps,
+                    }}
+                  />
                 </div>
                 <div {...{ className: "col-lg-7 order-first  order-lg-last" }}>
                   <TempInput
