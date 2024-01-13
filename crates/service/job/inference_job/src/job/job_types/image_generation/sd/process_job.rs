@@ -1,3 +1,5 @@
+use std::ops::Deref;
+use std::path::PathBuf;
 use std::time::Duration;
 use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
@@ -21,9 +23,6 @@ pub struct StableDiffusionProcessArgs<'a> {
     pub job: &'a AvailableInferenceJob,
 }
 
-// run inference
-// upload inference result
-// upload model checkpoint or loRA
 
 // run inference
 // insert record into the db with the inference job token complete.
@@ -128,12 +127,13 @@ pub async fn process_job_inference(
         .new_tempdir(&work_temp_dir)
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
+
     let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint");
     let lora_path = work_temp_dir.path().join("lora");
     let vae_path = work_temp_dir.path().join("vae");
     let output_path = work_temp_dir.path().join("output");
 
-    println!("Pathes to download to");
+    println!("Pathes to download to:");
     println!("sd_checkpoint_path:{}",sd_checkpoint_path.to_string());
     println!("lora_path:{}",lora_path.to_string());
     println!("vae_path:{}",vae_path.to_string());
@@ -217,8 +217,6 @@ pub async fn process_job_inference(
         None => {}
     }
 
-
-
     // VAE token for now
     let vae_token = String::from("weight_rb0959wfzjhk3d1k93hr3s0qw");
     let model_weight_vae = ModelWeightToken(vae_token);
@@ -261,27 +259,37 @@ pub async fn process_job_inference(
         None => Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No Prompt provided!")))
     };
 
+    let stderr_output_file = work_temp_dir.path().join("zero_shot_create_voice_err.txt");
+
+    let number_of_samples = match sd_args.maybe_number_of_samples {
+        Some(val) => {
+            val
+        },
+        None => {
+            20
+        }
+    };
+
     // #TODO allow for batch and saving later. output files
     sd_deps.inference_command.execute_inference(InferenceArgs {
-        work_dir: work_temp_dir,
+        work_dir: work_temp_dir.path().to_path_buf(),
         output_file: output_path,
-        stderr_output_file:,
-        prompt:  prompt,
+        stderr_output_file: stderr_output_file,
+        prompt: prompt,
         negative_prompt:sd_args.maybe_n_prompt.unwrap_or_default(),
-        number_of_samples: 0,
+        number_of_samples: number_of_samples,
         samplers: "".to_string(),
         width: sd_args.maybe_width.unwrap_or(512),
         height: sd_args.maybe_height.unwrap_or(512),
         cfg_scale: sd_args.maybe_cfg_scale.unwrap_or(7),
         seed: sd_args.maybe_seed.unwrap_or(1),
-        lora_path: lora_path.clone().as_path(),
+        lora_path: Some(lora_path),
         checkpoint_path: sd_checkpoint_path.clone(),
-        vae: vae_path.as_path(),
+        vae: vae_path.clone(),
         batch_count: sd_args.maybe_batch_count.unwrap_or(1),
     });
 
     // upload media and create a record.
-
 
     Ok(JobSuccessResult {
         maybe_result_entity: None,

@@ -66,13 +66,13 @@ pub enum ExecutableOrCommand {
   Command(String),
 }
 
-pub struct InferenceArgs<P: AsRef<Path>> {
+pub struct InferenceArgs {
   /// --source_image: path to the input image (or video)
   /// --result_dir: path to directory work is performed
-  pub work_dir: P,
+  pub work_dir: PathBuf,
   /// --result_file: path to final file output
-  pub output_file: P,
-  pub stderr_output_file: P,
+  pub output_file: PathBuf,
+  pub stderr_output_file: PathBuf,
   pub prompt: String,
   pub negative_prompt:String,
   pub number_of_samples:i32,
@@ -80,10 +80,10 @@ pub struct InferenceArgs<P: AsRef<Path>> {
   pub width:i32,
   pub height:i32,
   pub cfg_scale:i32, 
-  pub seed:i32, 
-  pub lora_path:P, 
-  pub checkpoint_path:P,
-  pub vae:P,
+  pub seed:i64,
+  pub lora_path:Option<PathBuf>,
+  pub checkpoint_path:PathBuf,
+  pub vae:PathBuf,
   pub batch_count:i32,
 }
 
@@ -158,9 +158,9 @@ impl StableDiffusionInferenceCommand {
     })
   }
 
-  pub fn execute_inference<P: AsRef<Path>>(
+  pub fn execute_inference(
     &self,
-    args: InferenceArgs<P>,
+    args: InferenceArgs,
   ) -> CommandExitStatus {
     match self.do_execute_inference(args) {
       Ok(exit_status) => exit_status,
@@ -168,9 +168,9 @@ impl StableDiffusionInferenceCommand {
     }
   }
 
-  fn do_execute_inference<P: AsRef<Path>>(
+  fn do_execute_inference(
     &self,
-    args: InferenceArgs<P>,
+    args: InferenceArgs,
   ) -> AnyhowResult<CommandExitStatus> {
 
     let mut command = String::new();
