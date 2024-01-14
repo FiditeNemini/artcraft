@@ -196,26 +196,25 @@ impl StableDiffusionInferenceCommand {
     }
 
     // ===== Begin Python Args =====
-    command.push_str("--prompt ");
-    command.push_str(&path_to_string(args.prompt));
+    command.push_str(format!("--prompt \"{}\"",&path_to_string(args.prompt)).as_ref());
 
-    command.push_str(" --result_dir ");
+    command.push_str(" --output-dir ");
     command.push_str(&path_to_string(args.work_dir));
 
-    command.push_str(" --result_file ");
+    command.push_str(" --output-name ");
     command.push_str(&path_to_string(args.output_file));
     
-    command.push_str(" --stderr_output_file ");
-    command.push_str(&path_to_string(args.stderr_output_file.clone()));
+    // command.push_str(" --stderr-output-file ");
+    // command.push_str(&path_to_string(args.stderr_output_file.clone()));
 
-    command.push_str(" --negative_prompt ");
-    command.push_str(&path_to_string(args.negative_prompt));
+    command.push_str(format!(" --negative-prompt \"{}\"",&path_to_string(args.negative_prompt)).as_ref());
+    //command.push_str(&path_to_string(args.negative_prompt));
     
-    command.push_str(" --number_of_samples ");
+    command.push_str(" --number-of-samples ");
     command.push_str(args.number_of_samples.to_string().as_str());
     
-    command.push_str(" --samplers ");
-    command.push_str(&path_to_string(args.samplers));
+    command.push_str(format!(" --samplers \"{}\"",&path_to_string(args.samplers)).as_ref());
+    //command.push_str(&path_to_string(args.samplers));
     
     command.push_str(" --width ");
     command.push_str(args.width.to_string().as_str());
@@ -223,23 +222,27 @@ impl StableDiffusionInferenceCommand {
     command.push_str(" --height ");
     command.push_str(args.height.to_string().as_str());
     
-    command.push_str(" --cfg_scale ");
+    command.push_str(" --cfg-scale ");
     command.push_str(args.cfg_scale.to_string().as_str());
     
     command.push_str(" --seed ");
     command.push_str(args.seed.to_string().as_str());
     
-    command.push_str(" --lora_path ");
+    command.push_str(" --loRA-path ");
     command.push_str(&path_to_string(args.lora_path));
     
-    command.push_str(" --check_point ");
+    command.push_str(" --check-point ");
     command.push_str(&path_to_string(args.checkpoint_path));
     
     command.push_str(" --vae ");
     command.push_str(&path_to_string(args.vae));
     
-    command.push_str(" --batch_count ");
+    command.push_str(" --batch-count ");
     command.push_str(args.batch_count.to_string().as_str());
+    
+    command.push_str(" --batch-size ");
+    command.push_str(1.to_string().as_str());
+
 
     info!("Command: {:?}", command);
 

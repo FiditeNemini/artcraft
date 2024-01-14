@@ -188,7 +188,7 @@ async fn get_model_record_from_cacheable_query(job_dependencies: &JobDependencie
       }
     }
     _ => {
-      warn!("Job does not have a category or a model token: {:?} - category: {:?}, token: {:?}",
+      warn!("Only applies to older job workflows. Job does not have a category or a model token: {:?} - category: {:?}, token: {:?}",
         job.id, job.inference_category, job.maybe_model_token);
 
       MaybeInferenceModel::None

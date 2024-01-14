@@ -1,5 +1,7 @@
 use std::ops::Deref;
 use std::path::PathBuf;
+use std::thread;
+use std::thread::Thread;
 use std::time::Duration;
 use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
@@ -290,6 +292,9 @@ pub async fn process_job_inference(
         batch_count: sd_args.maybe_batch_count.unwrap_or(1),
     });
 
+    // hack to check the directory before clean up.
+    let thirtyMinutes = 1800;
+    thread::sleep(Duration::from_secs(thirtyMinutes));
     // upload media and create a record.
 
     Ok(JobSuccessResult {
