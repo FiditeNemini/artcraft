@@ -50,6 +50,7 @@
 
 # Test paths
 /dev-tts*   /index.html   200
+/dev-upload*   /index.html   200
 /tts-dev*   /index.html   200
 
 # Old paths
