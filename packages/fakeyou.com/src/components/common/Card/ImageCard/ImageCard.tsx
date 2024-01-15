@@ -48,13 +48,14 @@ export default function ImageCard({
     );
 
   const bucketConfig = new BucketConfig();
-  let coverImage = `/images/default-covers/${
-    data.cover_image.default_cover.image_index || 0
-  }.webp`;
+  let coverImage = undefined;
 
   if (type === "media") {
     coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 600, 100);
   } else if (type === "weights") {
+    coverImage = `/images/default-covers/${
+      data.cover_image.default_cover.image_index || 0
+    }.webp`;
     if (data.cover_image.maybe_cover_image_public_bucket_path) {
       coverImage = bucketConfig.getCdnUrl(
         data.cover_image.maybe_cover_image_public_bucket_path,
