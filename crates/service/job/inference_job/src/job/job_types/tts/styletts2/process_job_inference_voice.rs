@@ -11,6 +11,7 @@ use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use cloud_storage::bucket_path_unifier::BucketPathUnifier;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use filesys::file_size::file_size;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mysql_queries::queries::media_files::create::insert_media_file_from_zero_shot_tts::insert_media_file_from_zero_shot;
@@ -135,7 +136,7 @@ pub async fn process_inference_voice(
   let command_exit_status =
       model_dependencies.inference_command.execute_inference(
         InferenceArgs {
-          input_embedding_file_path: &workdir,
+          input_embedding_file_path: &downloaded_weights_path,
           input_text_file_path: &text_input_fs_path, // text
           output_file_name: &output_file_name, // output file name in the output folder
           stderr_output_file: &stderr_output_file,
@@ -208,6 +209,7 @@ pub async fn process_inference_voice(
   let (media_file_token, id) = insert_media_file_from_zero_shot(InsertArgs {
     pool: &args.job_dependencies.db.mysql_pool,
     job: &job,
+    origin_model_type: MediaFileOriginModelType::StyleTTS2,
     maybe_mime_type: Some(&MIME_TYPE),
     file_size_bytes,
     sha256_checksum: &file_checksum,

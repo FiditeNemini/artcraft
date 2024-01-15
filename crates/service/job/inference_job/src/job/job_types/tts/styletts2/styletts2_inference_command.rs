@@ -423,6 +423,12 @@ impl StyleTTS2CreateEmbeddingCommand {
         command.push_str(" --voice ");
         command.push_str(&args.audio_file);
 
+        command.push_str(" --vcsteps ");
+        command.push_str(format!("{}", 20).as_str());
+
+        command.push_str(" --input ");
+        command.push_str("/dev/null");
+
         // ===== End Python Args =====
 
         if let Some(docker_options) = self.maybe_docker_options.as_ref() {
