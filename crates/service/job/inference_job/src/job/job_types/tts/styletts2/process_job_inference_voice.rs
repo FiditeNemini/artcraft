@@ -17,12 +17,13 @@ use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mysql_queries::queries::media_files::create::insert_media_file_from_zero_shot_tts::insert_media_file_from_zero_shot;
 use mysql_queries::queries::media_files::create::insert_media_file_from_zero_shot_tts::InsertArgs;
 use mysql_queries::queries::voice_designer::voices::get_voice::{get_voice_by_token, ZsVoice};
+use tts_common::clean_symbols::clean_symbols;
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::job_success_result::ResultEntity;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::tts::vall_e_x::process_job::VALLEXProcessJobArgs;
-use crate::job::job_types::tts::vall_e_x::vall_e_x_inference_command::InferenceArgs;
+use crate::job::job_types::tts::styletts2::process_job::StyleTTS2ProcessJobArgs;
+use crate::job::job_types::tts::styletts2::styletts2_inference_command::InferenceArgs;
 
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";
 const BUCKET_FILE_EXTENSION: &str = ".wav";
@@ -30,7 +31,7 @@ const MIME_TYPE: &str = "audio/wav";
 
 
 pub async fn process_inference_voice(
-  args: VALLEXProcessJobArgs<'_>,
+  args: StyleTTS2ProcessJobArgs<'_>,
   voice_token: String
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
   let deps = args.job_dependencies;
@@ -40,9 +41,9 @@ pub async fn process_inference_voice(
   let model_dependencies = deps
       .job
       .job_specific_dependencies
-      .maybe_vall_e_x_dependencies
+      .maybe_styletts2_dependencies
       .as_ref()
-      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing VALL-E-X dependencies".to_string())))?;
+      .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("missing StyleTTS2 dependencies".to_string())))?;
 
   // get some globals
   let mut job_progress_reporter = deps
@@ -53,7 +54,9 @@ pub async fn process_inference_voice(
 
   // get job args
   let text = match job.maybe_raw_inference_text.clone() {
-    Some(value) => { value }
+    Some(value) => {
+      clean_symbols(value.as_str())
+    }
     None => {
       return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Text for Inference")));
     }
@@ -91,17 +94,6 @@ pub async fn process_inference_voice(
     }
   }
 
-  // Might not need this for inference.
-  // let creator_user_token:UserToken;
-  // match &job.maybe_creator_user_token {
-  //     Some(token) => {
-  //         creator_user_token = UserToken::new_from_str(token);
-  //     },
-  //     None => {
-  //         return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")));
-  //     }
-  // }
-
   // run inference
   let work_temp_dir = format!("/tmp/temp_zeroshot_inference_{}", job.id.0);
 
@@ -111,7 +103,7 @@ pub async fn process_inference_voice(
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
   let workdir = work_temp_dir.path().to_path_buf();
-  let filename = "weights.npz".to_string();
+  let filename = "style.npz".to_string();
 
   let mut downloaded_weights_path = work_temp_dir.path().to_path_buf();
   downloaded_weights_path.push(&filename);
@@ -130,20 +122,23 @@ pub async fn process_inference_voice(
       .log_status("running inference")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
+  let text_input_fs_path = work_temp_dir.path().join("inference_input.txt");
+
+  std::fs::write(&text_input_fs_path, &text)
+      .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
+
   let inference_start_time = Instant::now();
 
-  let output_file_name = String::from("output.wav");
-
+  let output_file_name = work_temp_dir.path().join("output.wav");
   let stderr_output_file = work_temp_dir.path().join("zero_shot_inference.txt");
 
   // Run Inference
   let command_exit_status =
       model_dependencies.inference_command.execute_inference(
         InferenceArgs {
-          input_embedding_path: &workdir,
-          input_embedding_name: filename,
-          input_text: String::from(text), // text
-          output_file_name: output_file_name.clone(), // output file name in the output folder
+          input_embedding_file_path: &downloaded_weights_path,
+          input_text_file_path: &text_input_fs_path, // text
+          output_file_name: &output_file_name, // output file name in the output folder
           stderr_output_file: &stderr_output_file,
         }
       );
@@ -157,18 +152,7 @@ pub async fn process_inference_voice(
 
     if let Ok(contents) = read_to_string(&stderr_output_file) {
       warn!("Captured stderr output: {}", contents);
-
-      // Re-categorize error?
-      //match categorize_error(&contents)  {
-      //    Some(ProcessSingleJobError::FaceDetectionFailure) => {
-      //        warn!("Face not detected in source image");
-      //        error = ProcessSingleJobError::FaceDetectionFailure;
-      //    }
-      //    _ => {}
-      //}
     }
-
-    //thread::sleep(Duration::from_secs(300));
 
     // Clean up temp files
     //safe_delete_temp_file(&audio_path.filesystem_path);
@@ -225,7 +209,7 @@ pub async fn process_inference_voice(
   let (media_file_token, id) = insert_media_file_from_zero_shot(InsertArgs {
     pool: &args.job_dependencies.db.mysql_pool,
     job: &job,
-    origin_model_type: MediaFileOriginModelType::VallEX,
+    origin_model_type: MediaFileOriginModelType::StyleTTS2,
     maybe_mime_type: Some(&MIME_TYPE),
     file_size_bytes,
     sha256_checksum: &file_checksum,
@@ -294,7 +278,7 @@ pub async fn download_voice_embedding(
   let embedding_bucket_location = ZeroShotVoiceEmbeddingBucketPath::from_object_hash(
     &voice.bucket_hash,
     ModelCategory::Tts,
-    ModelType::VallEx,
+    ModelType::StyleTTS2,
     voice.model_version
   );
 
