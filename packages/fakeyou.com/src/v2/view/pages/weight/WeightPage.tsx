@@ -535,7 +535,7 @@ export default function WeightPage({
         title="Share"
         autoWidth={true}
         showButtons={false}
-        content={
+        content={() =>
           <div className="d-flex flex-column gap-4">
             <div className="d-flex gap-3">
               <SocialButton
@@ -585,7 +585,7 @@ export default function WeightPage({
         show={isDeleteModalOpen}
         handleClose={closeDeleteModal}
         title="Delete Weight"
-        content={`Are you sure you want to delete "${title}"? This action cannot be undone.`}
+        content={() => <>{ `Are you sure you want to delete "${title}"? This action cannot be undone.` }</>}
         onConfirm={remove}
       />
     </div>

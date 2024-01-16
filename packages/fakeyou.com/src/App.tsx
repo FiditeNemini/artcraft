@@ -840,7 +840,8 @@ class App extends React.Component<Props, State> {
                 }}
               >
                 <SessionProvider
-                  {...{ 
+                  {...{
+                    querySession: this.querySession,
                     sessionWrapper: this.state.sessionWrapper,
                     sessionFetched: this.state.sessionFetched
                   }}

@@ -45,11 +45,11 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const { media: mediaFile, status } = useMedia({
     mediaToken: token,
     onSuccess: (res: any) => {
-      console.log("🚺",res);
+      // console.log("🚺",res);
       ratings.gather({ res, key: "token" });
     }
   });
-  console.log("😎",ratings.library);
+  // console.log("😎",ratings.library);
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
@@ -510,7 +510,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         title="Share"
         autoWidth={true}
         showButtons={false}
-        content={
+        content={() =>
           <div className="d-flex flex-column gap-4">
             <div className="d-flex gap-3">
               <SocialButton

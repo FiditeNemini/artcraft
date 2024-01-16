@@ -8,32 +8,34 @@ import "./Modal.scss";
 interface ModalProps {
   show: boolean;
   handleClose: () => void;
+  noHeader?: boolean;
   onCancel?: (e: React.MouseEvent<HTMLElement>) => any;
   onConfirm?: (e: React.MouseEvent<HTMLElement>) => any;
-  title: string;
-  content: React.ReactNode;
+  title?: string;
+  content: React.ElementType;
   icon?: IconDefinition;
   autoWidth?: boolean;
   showButtons?: boolean;
 }
 
 const Modal: React.FC<ModalProps> = ({
-  show,
+  autoWidth,
+  content: Content,
   handleClose,
+  noHeader,
   onCancel: cancelEvent,
   onConfirm: confirmEvent,
-  title,
-  content,
   icon,
-  autoWidth,
+  show,
   showButtons = true,
+  title,
 }) => {
   const fadeIn = useSpring({
     opacity: show ? 1 : 0,
     config: { duration: 80, easing: t => t },
-    onRest: () => {
-      if (!show) handleClose();
-    },
+    // onRest: () => {
+    //   if (!show) handleClose();
+    // },
   });
 
   useEffect(() => {
@@ -76,19 +78,22 @@ const Modal: React.FC<ModalProps> = ({
           }`}
         >
           <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">
-                {icon && <FontAwesomeIcon icon={icon} className="me-3" />}
-                {title}
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={handleClose}
-                aria-label="Close"
-              ></button>
+            { !noHeader && <header className="modal-header">
+                <h5 className="modal-title">
+                  {icon && <FontAwesomeIcon icon={icon} className="me-3" />}
+                  { title || "" }
+                </h5>
+                <button 
+                  type="button"
+                  className="btn-close"
+                  onClick={handleClose}
+                  aria-label="Close"
+                />
+              </header>
+            }
+            <div className="modal-body">
+              { Content && <Content {...{ handleClose }} /> }
             </div>
-            <div className="modal-body">{content}</div>
             {showButtons && (
               <div className="modal-footer">
                 <Button variant="secondary" label="Cancel" onClick={onCancel} />

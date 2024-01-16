@@ -1,10 +1,12 @@
 import React from "react";
+import { Label } from "components/common";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import "./Input.scss";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: IconDefinition;
+  invalidReason?: string;
   label?: string;
   textArea?: boolean;
   required?: boolean;
@@ -13,6 +15,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export default function TempInput({
   label,
   icon,
+  invalidReason,
   textArea,
   required,
   ...rest
@@ -20,11 +23,7 @@ export default function TempInput({
   return (
     // Changed fragment to div here just so that it can be laid out with bootstrap easily using d-flex, flex-column and responsive gaps which requires grouping.
     <div className="fy-input">
-      {label && (
-        <label className={`sub-title ${required ? "required" : ""}`}>
-          {label}
-        </label>
-      )}
+      <Label {...{ invalidReason, label, required }}/>
       <div className={`fy-input ${icon ? "input-icon" : ""}`}>
         {icon && (
           <FontAwesomeIcon icon={icon} className="form-control-feedback" />

@@ -279,7 +279,7 @@ function VoiceDesignerMainPage() {
           show={isDeleteModalOpen}
           handleClose={closeDeleteModal}
           title={deleteText.title}
-          content={<p>{deleteText.text}</p>}
+          content={() => <p>{deleteText.text}</p>}
           onConfirm={handleDelete}
         />
       </Container>

@@ -16,6 +16,9 @@ export default function useMedia({ mediaToken = "", onSuccess = (res:MediaFile) 
           onSuccess(res.media_file);
           mediaSet(res.media_file);
         }
+      })
+      .catch((err) => {
+        statusSet(FetchStatus.error);
       });
     }
 

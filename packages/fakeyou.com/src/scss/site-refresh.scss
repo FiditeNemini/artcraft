@@ -890,6 +890,7 @@ styles with important tags:
   }
 
   .modal-content {
+    overflow: hidden;
     background-color: $panel;
     border-color: lighten($panel, 8%) !important;
     border: 1px solid;

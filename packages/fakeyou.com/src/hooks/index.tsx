@@ -11,6 +11,7 @@ import useInterval from './useInterval';
 import useLazyLists from './useLazyLists';
 import useListContent from './useListContent';
 import useLocalize from './useLocalize';
+import useLoginModal from "./useLoginModal";
 import useMedia from './useMedia';
 import useRatings from './useRatings';
 import useSdUpload from './useSdUpload';
@@ -32,6 +33,7 @@ export {
   useLazyLists,
   useListContent,
   useLocalize,
+  useLoginModal,
   useMedia,
   useRatings,
   useSdUpload,
