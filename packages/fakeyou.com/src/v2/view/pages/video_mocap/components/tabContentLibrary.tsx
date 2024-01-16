@@ -6,14 +6,21 @@ export default function TabContentLibrary(props: {
   const { t } = props
   return(
     <div
-      className="tab-content fade"
+      className="tab-pane fade"
       id="vmcLibrary"
     >
-      <div className="d-flex flex-column gap-4 h-100">
-        <div className="d-flex flex-column gap-3">
-          <p>{t("input.filenamePlaceholder")}</p>
-          <p>{t("button.select")}</p>
-          <p>{t("button.generate")}</p>
+      <div className="row">
+        <div className="col-12">
+          <div className="d-flex py-3">
+            <div className="flex-grow-1">
+              <input className="form-control w-100" placeholder={t("input.filenamePlaceholder")} />
+            </div>
+            <button className="btn btn-primary m-1">{t("button.select")}</button>
+          </div>
+
+          <div className="d-flex justify-content-end">
+              <button className="btn btn-primary m-1" disabled>{t("button.generate")}</button>
+          </div>
         </div>
       </div>
     </div>

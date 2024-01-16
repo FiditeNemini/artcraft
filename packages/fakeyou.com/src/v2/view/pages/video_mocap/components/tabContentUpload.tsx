@@ -7,7 +7,7 @@ export default function TabContentUpload(props:{
   const { t } = props
   return(
     <div
-      className="tab-content fade show active"
+      className="tab-pane fade show active"
       id="vmcUpload"
     >
         <div className="row">
