@@ -1,25 +1,29 @@
 import React from "react";
+import VideoInput from "v2/view/pages/video_mocap/components/uploadFieldVideo";
 
-interface Props{
+export default function TabContentUpload(props:{
   t: Function
-}
-
-export default function TabContentUpload(props:Props){
+}){
   const { t } = props
-
   return(
     <div
-      className="tab-pane fade show active"
+      className="tab-content fade show active"
       id="vmcUpload"
     >
-      <div className="d-flex flex-column gap-4 h-100">
-          <div className="d-flex flex-column gap-3">
-            <p>{t("input.dropzoneDescription")}</p>
-            <p>{t("button.upload")}</p>
-            <p>{t("button.generate")}</p>
+        <div className="row">
+          <div className="col-12">
+            <VideoInput t={t}/>
           </div>
         </div>
 
+        <div className="row">
+          <div className="col-12">
+            <div className="d-flex justify-content-end">
+              <button className="btn btn-primary m-1">{t("button.upload")}</button>
+              <button className="btn btn-primary m-1" disabled>{t("button.generate")}</button>
+            </div>
+          </div>
+        </div>
     </div>
   )
 }

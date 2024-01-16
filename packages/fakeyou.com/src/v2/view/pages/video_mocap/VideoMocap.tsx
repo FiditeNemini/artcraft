@@ -3,6 +3,7 @@ import { useLocalize } from "hooks";
 
 import TabContentUpload from "./components/tabContentUpload";
 import TabContentLibrary from "./components/tabContentLibrary";
+import { BasicVideo } from "components/common";
 
 export default function VideoMotionCapture(){
   const { t } = useLocalize("VideoMotionCapture");
@@ -21,7 +22,7 @@ export default function VideoMotionCapture(){
         <div className="row g-5 mt-1">
 
           {/*Video Chooser Tabs*/}
-          <div className="col-12 col-lg-6 d-flex flex-column gap-4">
+          <div className="col-12 col-md-6">
             <ul className="nav nav-tabs nav-vc" id="vmcTab">
               <li className="nav-item w-100">
                 <button
@@ -48,8 +49,13 @@ export default function VideoMotionCapture(){
               <TabContentUpload t={t}/>
               <TabContentLibrary t={t}/>
             </div>
-          </div> {/*Chooser Tabs*/}
-
+          </div>
+          {/*ENDS Video Chooser Tabs*/}
+          
+          <div className="col-12 col-md-6">
+            <BasicVideo />
+          </div>
+          
         </div>{/*2nd row*/}
 
       </div>{/*panel*/}

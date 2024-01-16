@@ -317,7 +317,7 @@ export default function SideNav(props: SideNavProps) {
               icon={faPersonRays}
               className="sidebar-heading-icon"
             />
-            {t("mocapNetGenerator")}
+            {t("videoMotionCapture")}
           </NavLink>
         </li>
 
