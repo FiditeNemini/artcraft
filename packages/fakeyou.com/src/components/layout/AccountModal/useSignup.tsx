@@ -145,27 +145,29 @@ interface Props {
   statusSet: (x: FetchStatus) => void,
 }
 
-export default function useLogin({ onSuccess, status, statusSet }: Props) {
+export default function useSignup({ onSuccess, status, statusSet }: Props) {
   const { querySession } = useSession();
   const { allAreValid, setProps, state, update } = useChanger({
-    errorStrings: {
-      email: emailErrors,
-      password: passwordErrors,
-      passwordConfirm: passwordConfirmErrors,
-      username: usernameErrors,
+    email: {
+      errorText: emailErrors,
+      validator: emailValidator,
+      value: ""
     },
-    state: {
-      email: "",
-      password: "",
-      passwordConfirm: "",
-      username: ""
+    password: {
+      errorText: passwordErrors,
+      validator: passwordValidator,
+      value: ""
     },
-    validators: {
-      email: emailValidator,
-      password: passwordValidator,
-      passwordConfirm: passwordConfirmValidator,
-      username: usernameValidator
-    }
+    passwordConfirm: {
+      errorText: passwordConfirmErrors,
+      validator: passwordConfirmValidator,
+      value: ""
+    },
+    username: {
+      errorText: usernameErrors,
+      validator: usernameValidator,
+      value: ""
+    },
   });
 
   const signup = () => {

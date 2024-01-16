@@ -48,12 +48,19 @@
 		transition: opacity .25s ease-in-out;
 	}
 
+	.error-message {
+		color: $primary;
+		margin-bottom: 1rem;
+		text-align: center;
+	}
+
 
 }
 
 .modal-spinner {
 	height: 300px;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 }

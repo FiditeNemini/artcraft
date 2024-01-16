@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { a, useTransition } from "@react-spring/web";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import { Spinner } from "components/common";
+import useLogin from "./useLogin";
 import useSignup from "./useSignup";
 import LoginView from "./LoginView";
 import SignupView from "./SignupView";
@@ -22,13 +23,26 @@ const AniMod = ({ animating, isLeaving, render: Render, style, ...rest }: AniPro
     <Render {...{ ...rest, animating }} />
   </a.div>;
 
-const Loader = () => <div {...{ className: `fy-modal-page modal-spinner` }}><Spinner /></div>;
+const Loader = ({ viewLogin }: { viewLogin: boolean }) => <div {...{ className: `fy-modal-page modal-spinner` }}>
+  <h3> {
+    viewLogin ? "Logging you in" : "Creating your account"
+  } </h3>
+  <Spinner />
+</div>;
 
 export default function LoginModal({ handleClose }: { handleClose: any }) {
   const [status,statusSet] = useState(FetchStatus.paused);
   const [viewLogin,viewLoginSet] = useState(false);
   const [animating,animatingSet] = useState(false);
-  const { setProps, signup } = useSignup({
+  const { errorType, setProps: loginProps, login } = useLogin({
+    onSuccess: () => {
+      Analytics.accountLoginSuccess();
+      handleClose(); 
+    },
+    status,
+    statusSet
+  });
+  const { setProps: signupProps, signup } = useSignup({
     onSuccess: () => {
       Analytics.accountSignupAttempt();
       handleClose(); 
@@ -54,13 +68,13 @@ export default function LoginModal({ handleClose }: { handleClose: any }) {
     {
       transitions((style: any, i: number, state: any) => {
         let isLeaving = state.phase === "leave";
+        let sharedProps = { animating, handleClose, isLeaving, style, viewLogin, viewLoginSet };
 
         switch(i) {
-          case 0: return <AniMod {...{ animating, handleClose, isLeaving, render: SignupView, setProps, signup, style, viewLoginSet }}/>;
-          case 1: return <AniMod {...{ animating, handleClose, isLeaving, render: LoginView, setProps, signup, style, viewLoginSet }}/>;
-          case 2: return <AniMod {...{ animating, handleClose, isLeaving, render: Loader, setProps, signup, style, viewLoginSet }}/>;
+          case 0: return <AniMod {...{ render: SignupView, signupProps, signup, ...sharedProps }}/>;
+          case 1: return <AniMod {...{ errorType, login, loginProps, render: LoginView, ...sharedProps }}/>;
+          case 2: return <AniMod {...{ render: Loader, ...sharedProps }}/>;
         }
-
       
       })
     }

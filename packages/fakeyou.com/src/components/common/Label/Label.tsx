@@ -12,7 +12,7 @@ export default function Label({ invalidReason, label, required }: Props) {
     { label ? <label {...{ className: `{required ? " required" : ""}` }}>
       { label }
     </label> : null }
-    { invalidReason ? <span {...{ className: "form-text red is-danger" }}>
+    { invalidReason ? <span {...{ className: "label-error form-text red is-danger" }}>
       { invalidReason }
     </span> : null }
   </div>;

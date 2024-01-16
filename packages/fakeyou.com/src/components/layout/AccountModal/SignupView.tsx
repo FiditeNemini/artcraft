@@ -5,12 +5,12 @@ import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
 interface Props {
   animating: boolean,
   handleClose: (x:any) => any,
-  setProps: (x:any) => any,
+  signupProps: (x:any) => any,
   signup: (x:any) => any,
   viewLoginSet: (x:any) => void
 }
 
-export default function LoginView({ animating, handleClose, setProps, signup, viewLoginSet }: Props) {
+export default function LoginView({ animating, handleClose, signupProps, signup, viewLoginSet }: Props) {
   return <div {...{ className: `fy-modal-page${ animating ? " animating-modal-page" : ""}` }}>
     <header>
       <div {...{ className: "login-modal-title-row" }}>
@@ -22,10 +22,10 @@ export default function LoginView({ animating, handleClose, setProps, signup, vi
         <span {...{ className: "login-modal-login-link", onClick: () => { if (!animating) viewLoginSet(true); } }}>Or login instead</span>
       </div>
     </header>
-    <TempInput {...{ icon: faUser, label: "Username", placeholder: "Username", ...setProps("username") }}/>
-    <TempInput {...{ icon: faEnvelope, label: "Email", placeholder: "Email", ...setProps("email") }}/>
-    <TempInput {...{ icon: faKey, label: "Password", placeholder: "Enter a new password", type: "password", ...setProps("password") }}/>
-    <TempInput {...{ icon: faKey, label: "Confirm password", placeholder: "Confirm password", type: "password", ...setProps("passwordConfirm") }}/>
-    <button {...{ className: "btn btn-primary w-100 mt-4", onClick: signup }}>Sign up</button>
+    <TempInput {...{ icon: faUser, label: "Username", placeholder: "Username", ...signupProps("username") }}/>
+    <TempInput {...{ icon: faEnvelope, label: "Email", placeholder: "Email", ...signupProps("email") }}/>
+    <TempInput {...{ icon: faKey, label: "Password", placeholder: "Enter a new password", type: "password", ...signupProps("password") }}/>
+    <TempInput {...{ icon: faKey, label: "Confirm password", placeholder: "Confirm password", type: "password", ...signupProps("passwordConfirm") }}/>
+    <button {...{ className: "btn btn-primary w-100 mt-4", disabled: animating, onClick: signup }}>Sign up</button>
   </div>;
 };

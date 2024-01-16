@@ -1,143 +1,7 @@
+import { useState } from "react";
 import { useChanger, useSession } from "hooks";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
-import { CreateAccount, CreateAccountResponse } from "@storyteller/components/src/api/account/CreateAccount";
-import { InputValidation, ValidatorCallbacks } from "common/InputValidation";
-
-
-enum EmailReasons {
-  EmailTaken = "emailTaken",
-  Invalid = "invalid",
-  TooShort = "tooShort",
-  BadInput = "badInput"
-}
-
-enum PasswordReasons {
-  TooShort = "tooShort"
-}
-
-enum PasswordConfirmReasons {
-  PasswordMismatch = "passwordMismatch",
-  TooShort = "tooShort"
-}
-
-enum UsernameReasons {
-  ContainsSlurs = "containsSlurs",
-  InvalidCharacters = "invalidCharacters",
-  IsReserved = "isReserved",
-  IsTaken = "isTaken",
-  TooLong = "tooLong",
-  TooShort = "tooShort"
-}
-
-const emailErrors = {
-  emailTaken: "Email is taken",
-  invalid: "Email is invalid",
-  tooShort: "Email is too short",
-  badInput: "Bad email input, try another"
-};
-
-const passwordErrors = {
-  tooShort: "Password is too short",
-};
-
-const passwordConfirmErrors = {
-  passwordMismatch: "Passwords do not match",
-  tooShort: "Password is too short"
-};
-
-const usernameErrors = {
-  containsSlurs: "Username contains slurs",
-  invalidCharacters: "Username has invalid characters",
-  isReserved: "Username is reserved",
-  isTaken: "Username is taken",
-  tooLong: "Username is too long",
-  tooShort: "Username is too short"
-};
-
-const emailValidator = ({ inputValue }: ValidatorCallbacks) => {
-  let reason = "";
-  let validation = InputValidation.Neutral;
-  
-    if (inputValue.length > 1) {
-      if (inputValue.length < 3) {
-        validation = InputValidation.Invalid;
-        reason = EmailReasons.TooShort;
-      } else if (!inputValue.includes("@")) {
-        validation = InputValidation.Invalid;
-        reason = EmailReasons.Invalid;
-      } else {
-        validation = InputValidation.Valid;
-      }
-    }
-
-  return { value: inputValue, reason, validation };
-};
-
-const passwordConfirmValidator = ({ inputValue, state }: ValidatorCallbacks) => {
-  const password = state.password;
-  let validation = InputValidation.Neutral;
-  let reason = "";
-
-    if (inputValue.length > 1) {
-      if (inputValue !== password.value) {
-        validation = InputValidation.Invalid;
-        reason = PasswordConfirmReasons.PasswordMismatch;
-      } else {
-        validation = InputValidation.Valid;
-        reason = "";
-      }
-    }
-
-  return { value: inputValue, reason, validation };
-};
-
-const passwordValidator = ({ inputValue, state }: ValidatorCallbacks) => {
-  const passwordConfirm = state.passwordConfirm;
-  let validation = InputValidation.Neutral;
-  let reason = "";
-  let confirmValidation = InputValidation.Neutral;
-  let confirmReason = "";
-
-  if (inputValue.length > 1) {
-    if (inputValue.length < 6) {
-      validation = InputValidation.Invalid;
-      reason = PasswordReasons.TooShort;
-    } else {
-      validation = InputValidation.Valid;
-    }
-
-    if (inputValue !== passwordConfirm.value) {
-      confirmValidation = InputValidation.Invalid;
-      confirmReason = PasswordConfirmReasons.PasswordMismatch
-    } else {
-      confirmValidation = InputValidation.Valid;
-      confirmReason = "";
-    }
-  }
-
-  const additional = { passwordConfirm: { ...passwordConfirm, reason: confirmReason, validation: confirmValidation } }
-
-  return { additional, value: inputValue, reason, validation };
-};
-
-const usernameValidator = ({ inputValue }: ValidatorCallbacks) => {
-  let reason = "";
-  let validation = InputValidation.Neutral;
-  
-  if (inputValue.length > 1) {
-    if (inputValue.length < 3) {
-      validation = InputValidation.Invalid;
-      reason = UsernameReasons.TooShort
-    } else if (inputValue.length > 15) {
-      validation = InputValidation.Invalid;
-      reason = UsernameReasons.TooLong
-    } else {
-      validation = InputValidation.Valid;
-    }
-  }
-
-  return { value: inputValue, reason, validation };
-};
+import { CreateSession, CreateSessionResponse } from "@storyteller/components/src/api/account/CreateSession";
 
 interface Props {
   onSuccess?: (x?:any) => any,
@@ -146,71 +10,34 @@ interface Props {
 }
 
 export default function useLogin({ onSuccess, status, statusSet }: Props) {
-  const { querySession } = useSession();
+  const [errorType,errorTypeSet] = useState("");
+  const { querySession, querySubscriptions } = useSession();
   const { allAreValid, setProps, state, update } = useChanger({
-    errorStrings: {
-      email: emailErrors,
-      password: passwordErrors,
-      passwordConfirm: passwordConfirmErrors,
-      username: usernameErrors,
-    },
-    state: {
-      email: "",
-      password: "",
-      passwordConfirm: "",
-      username: ""
-    },
-    validators: {
-      email: emailValidator,
-      password: passwordValidator,
-      passwordConfirm: passwordConfirmValidator,
-      username: usernameValidator
-    }
+    password: { value: "" },
+    usernameOrEmail: { value: "" }
   });
 
-  const signup = () => {
+  const login = () => {
     console.log("🐊",);
+    errorTypeSet("");
     statusSet(FetchStatus.in_progress);
     // if (allAreValid()) {
-      CreateAccount("",{
-        username: state.username.value,
-        email_address: state.email.value,
+      CreateSession("",{
+        username_or_email: state.usernameOrEmail.value,
         password: state.password.value,
-        password_confirmation: state.passwordConfirm.value,
-      }).then((res: CreateAccountResponse) => {
+      }).then((res: CreateSessionResponse) => {
         console.log("🦋",res);
-        // let updates = {}
-        if (res && res.error_fields && res.error_type) {
-        	statusSet(FetchStatus.error);
-          if (res.error_fields.email_address) {
-            console.log("🍟",res.error_type);
-            switch (res.error_type) {
-              case "BadInput": return update({ name: "email", reason: EmailReasons.BadInput, validation: InputValidation.Invalid });
-              case "EmailTaken": return update({ name: "email", reason: EmailReasons.EmailTaken, validation: InputValidation.Invalid });
-            }
-            return;
-          } else if (res.error_fields.password) {
-            switch (res.error_type) {
-              case "TooShort": update({ name: "password", reason: PasswordReasons.TooShort, validation: InputValidation.Invalid });
-            } 
-          } else if (res.error_fields?.username) {
-            let updateUsername = (reason: UsernameReasons) => update({ reason, name: "username", validation: InputValidation.Invalid });
-            switch (res.error_fields.username) {
-              case "invalid username characters": return updateUsername(UsernameReasons.InvalidCharacters);
-              case "username is too long": return updateUsername(UsernameReasons.TooLong);
-              case "username is taken": return updateUsername(UsernameReasons.IsTaken);
-              case "username is reserved": return updateUsername(UsernameReasons.IsReserved);
-              case "username contains slurs": return updateUsername(UsernameReasons.ContainsSlurs);
-            } 
-          }
+        if (!res.success && res.error_type) {
+          statusSet(FetchStatus.error);
+          errorTypeSet(res.error_type);
         } else if (res.success) {
           statusSet(FetchStatus.success);
           querySession();
+          querySubscriptions();
           if (onSuccess) onSuccess(res);
         } 
       });
-    // }
-  };
+    };
 
-  return { allAreValid, setProps, signup, state, update };
+  return { allAreValid, errorType, errorTypeSet, login, setProps, state, update };
 };

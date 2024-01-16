@@ -842,6 +842,7 @@ class App extends React.Component<Props, State> {
                 <SessionProvider
                   {...{
                     querySession: this.querySession,
+                    querySubscriptions: this.querySessionSubscriptions,
                     sessionWrapper: this.state.sessionWrapper,
                     sessionFetched: this.state.sessionFetched
                   }}

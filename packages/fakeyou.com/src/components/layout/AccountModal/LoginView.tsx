@@ -1,16 +1,27 @@
 import React from 'react';
 import { TempInput } from "components/common";
-import { faUser, faEnvelope, faKey } from "@fortawesome/free-solid-svg-icons";
+import { faUser, faKey } from "@fortawesome/free-solid-svg-icons";
+
+enum ErrorTypes {
+  InvalidCredentials = "abc",
+  ServerError = "abc"
+}
 
 interface Props {
   animating: boolean,
+  errorType?: string,
   handleClose: (x:any) => any,
-  setProps: (x:any) => any,
-  signup: (x:any) => any,
+  login: (x:any) => any,
+  loginProps: (x:any) => any,
   viewLoginSet: (x:any) => void
 }
 
-export default function LoginView({ animating, handleClose, setProps, signup, viewLoginSet }: Props) {
+export default function LoginView({ animating, errorType = "", handleClose, login, loginProps, viewLoginSet }: Props) {
+  const errorStrings = [
+    "Could not login, check credentials and try again.",
+    "A sever error occured. Try again."
+  ];
+
   return <div {...{ className: `fy-modal-page${ animating ? " animating-modal-page" : ""}` }}>
     <header>
       <div {...{ className: "login-modal-title-row" }}>
@@ -25,8 +36,9 @@ export default function LoginView({ animating, handleClose, setProps, signup, vi
         }}>Signup instead</span>
       </div>
     </header>
-    <TempInput {...{ icon: faUser, label: "Username or email", placeholder: "Username", ...setProps("username") }}/>
-    <TempInput {...{ icon: faKey, label: "Password", placeholder: "Enter your password", type: "password", ...setProps("password") }}/>
-    <button {...{ className: "btn btn-primary w-100 mt-4", onClick: signup }}>Login</button>
+    { errorType ? <p  {...{ className: "error-message" }}>{ errorStrings[Object.keys(ErrorTypes).indexOf(errorType)] }</p> : null }
+    <TempInput {...{ icon: faUser, label: "Username or email", placeholder: "Username", ...loginProps("username") }}/>
+    <TempInput {...{ icon: faKey, label: "Password", placeholder: "Enter your password", type: "password", ...loginProps("password") }}/>
+    <button {...{ className: "btn btn-primary w-100 mt-4", disabled: animating, onClick: login }}>Login</button>
   </div>;
 };
