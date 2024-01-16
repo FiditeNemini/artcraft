@@ -309,7 +309,7 @@ export default function SideNav(props: SideNavProps) {
         </li>
         <li>
           <NavLink
-            to="/gen-mocapnet"
+            to="/mocapnet-gen"
             activeClassName="active-link"
             onClick={handleNavLinkClick}
           >
@@ -317,7 +317,7 @@ export default function SideNav(props: SideNavProps) {
               icon={faPersonRays}
               className="sidebar-heading-icon"
             />
-            {t("genMocapNet")}
+            {t("mocapNetGenerator")}
           </NavLink>
         </li>
 

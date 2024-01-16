@@ -7,6 +7,7 @@
   "infoPricing": "Tarifs",
   "logOutButton": "Se déconnecter",
   "loginButton": "Se connecter",
+  "mocapNetGenerator": "Générateur MocapNet",
   "profileButton": "Profil",
   "queueFaceAnimator": "Animations en file d'attente",
   "queueRvc": "RVC en file d'attente",
