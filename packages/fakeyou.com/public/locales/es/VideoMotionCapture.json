@@ -1,0 +1,19 @@
+{
+  "button": {
+    "generate": "Generar",
+    "select": "Seleccionar",
+    "upload": "Subir vídeo"
+  },
+  "headings": {
+    "subtitle": "Seleccione un video y genere un video de captura de movimiento para animaciones para usar con Storyteller Studio.",
+    "title": "Captura de movimiento de vídeo"
+  },
+  "input": {
+    "dropzoneDescription": "Sube un vídeo o déjalo aquí...",
+    "filenamePlaceholder": "Elige entre los medios"
+  },
+  "tabTitle": {
+    "library": "Elige entre los medios",
+    "upload": "Subir"
+  }
+}

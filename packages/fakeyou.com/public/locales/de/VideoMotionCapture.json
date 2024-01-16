@@ -1,0 +1,19 @@
+{
+  "button": {
+    "generate": "Generieren",
+    "select": "Wählen",
+    "upload": "Video hochladen"
+  },
+  "headings": {
+    "subtitle": "Wählen Sie ein Video aus und generieren Sie ein Motion-Capture-Video für Animationen zur Verwendung mit Storyteller Studio.",
+    "title": "Video-Bewegungserfassung"
+  },
+  "input": {
+    "dropzoneDescription": "Laden Sie ein Video hoch oder legen Sie es hier ab...",
+    "filenamePlaceholder": "Wählen Sie aus Medien"
+  },
+  "tabTitle": {
+    "library": "Wählen Sie aus Medien",
+    "upload": "Hochladen"
+  }
+}

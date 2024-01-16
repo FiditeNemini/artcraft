@@ -1,0 +1,19 @@
+{
+  "button": {
+    "generate": "产生",
+    "select": "选择",
+    "upload": "上传视频"
+  },
+  "headings": {
+    "subtitle": "选择一个视频并生成动画的动作捕捉视频以与 Storyteller Studio 一起使用。",
+    "title": "视频动作捕捉"
+  },
+  "input": {
+    "dropzoneDescription": "上传视频或将其拖放到此处...",
+    "filenamePlaceholder": "从媒体中选择"
+  },
+  "tabTitle": {
+    "library": "从媒体中选择",
+    "upload": "上传"
+  }
+}

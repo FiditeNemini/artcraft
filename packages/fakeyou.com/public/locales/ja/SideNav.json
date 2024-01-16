@@ -19,6 +19,7 @@
   "speechTts": "テキスト読み上げ",
   "speechVc": "声から声へ",
   "videoFaceAnimator": "フェイスアニメーター",
+  "videoMotionCapture": "ビデオモーションキャプチャ",
   "videoTitle": "ビデオ生成",
   "videoW2l": "ビデオリップシンク"
 }

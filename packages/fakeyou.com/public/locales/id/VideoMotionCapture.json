@@ -1,0 +1,19 @@
+{
+  "button": {
+    "generate": "Menghasilkan",
+    "select": "Pilih",
+    "upload": "Mengunggah video"
+  },
+  "headings": {
+    "subtitle": "Pilih video dan buat video tangkapan gerak untuk animasi yang akan digunakan dengan Storyteller Studio.",
+    "title": "Pengambilan Gerakan Video"
+  },
+  "input": {
+    "dropzoneDescription": "Unggah video atau letakkan di sini...",
+    "filenamePlaceholder": "Pilih dari media"
+  },
+  "tabTitle": {
+    "library": "Pilih dari media",
+    "upload": "Mengunggah"
+  }
+}

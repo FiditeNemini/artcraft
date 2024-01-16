@@ -309,7 +309,7 @@ export default function SideNav(props: SideNavProps) {
         </li>
         <li>
           <NavLink
-            to="/mocapnet-gen"
+            to="/video-mocap"
             activeClassName="active-link"
             onClick={handleNavLinkClick}
           >

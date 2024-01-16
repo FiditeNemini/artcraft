@@ -1,0 +1,19 @@
+{
+  "button": {
+    "generate": "生成する",
+    "select": "選択する",
+    "upload": "ビデオをアップロードする"
+  },
+  "headings": {
+    "subtitle": "ビデオを選択し、Storyteller Studio で使用するアニメーション用のモーション キャプチャ ビデオを生成します。",
+    "title": "ビデオモーションキャプチャ"
+  },
+  "input": {
+    "dropzoneDescription": "ビデオをアップロードするか、ここにドロップしてください...",
+    "filenamePlaceholder": "メディアから選ぶ"
+  },
+  "tabTitle": {
+    "library": "メディアから選ぶ",
+    "upload": "アップロード"
+  }
+}
