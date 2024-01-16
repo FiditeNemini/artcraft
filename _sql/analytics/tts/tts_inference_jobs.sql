@@ -2,6 +2,20 @@
 -- noinspection SqlNoDataSourceInspectionForFile
 -- noinspection SqlResolveForFile
 
+
+-- Find jobs that are broken for a given user
+select id, last_assigned_worker, internal_debugging_failure_reason,created_at
+from tts_inference_jobs
+where maybe_creator_user_token IN (
+    select token
+    from users
+    where username IN ('knifecat ', 'rewritten_code', 'johnloberger')
+)
+  and attempt_count > 1
+  and status IN ('complete_failure', 'dead', 'attempt_failed')
+and created_at > ( CURDATE() - INTERVAL 5 DAY );
+
+
 -- Total pending jobs
 select count(*)
 from tts_inference_jobs
