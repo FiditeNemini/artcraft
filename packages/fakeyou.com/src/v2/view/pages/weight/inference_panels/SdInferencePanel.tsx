@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Button,
+  Input,
   NumberSlider,
   Panel,
   SegmentButtons,
@@ -19,7 +20,8 @@ import {
 interface SdInferencePanelProps {}
 
 export default function SdInferencePanel(props: SdInferencePanelProps) {
-  const [seed, seedSet] = useState(5);
+  const [seed, seedSet] = useState("random");
+  const [seedNumber, seedNumberSet] = useState("");
   const [sampler, samplerSet] = useState("DPM++ 2M Karras");
   const [aspectRatio, aspectRatioSet] = useState("square");
   const [cfgScale, cfgScaleSet] = useState(7);
@@ -35,7 +37,6 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     // checkPointSet,
     loRAPathSet,
     samplerSet,
-    seedSet,
     aspectRatioSet,
     setPrompt,
     setNegativePrompt,
@@ -107,6 +108,11 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     { label: "8", value: 8 },
   ];
 
+  const seedOpts = [
+    { label: "Random", value: "random" },
+    { label: "Custom", value: "custom" },
+  ];
+
   const handlePromptChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -117,6 +123,28 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     setNegativePrompt(event.target.value);
+  };
+
+  const generateRandomSeed = () => Math.floor(Math.random() * Math.pow(2, 32));
+
+  const handleSeedChange = (option: any) => {
+    const { value } = option.target;
+    const randomSeed = generateRandomSeed();
+    if (value === "custom") {
+      if (seedNumber === "") {
+        seedNumberSet(randomSeed.toString());
+      }
+      seedSet(value);
+    } else {
+      seedNumberSet(randomSeed.toString());
+      seedSet(value);
+      seedNumberSet("");
+    }
+  };
+
+  const handleSeedNumberChange = (event: any) => {
+    seedNumberSet(event.target.value);
+    seedSet("custom");
   };
 
   return (
@@ -156,17 +184,26 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
       <Accordion>
         <Accordion.Item title="Advanced">
           <div className="p-3 d-flex flex-column gap-3">
-            <NumberSlider
-              {...{
-                min: 5,
-                max: 128,
-                name: "seed",
-                label: "Seed value",
-                onChange,
-                thumbTip: "Seed value",
-                value: seed,
-              }}
-            />
+            <div>
+              <label className="sub-title">Seed</label>
+              <div className="d-flex gap-2">
+                <SegmentButtons
+                  {...{
+                    name: "seed",
+                    onChange: handleSeedChange,
+                    options: seedOpts,
+                    value: seed,
+                  }}
+                />
+                <Input
+                  placeholder="Random"
+                  value={seedNumber}
+                  onChange={handleSeedNumberChange}
+                  type="number"
+                />
+              </div>
+            </div>
+
             <TempSelect
               {...{
                 label: "Sampler",
