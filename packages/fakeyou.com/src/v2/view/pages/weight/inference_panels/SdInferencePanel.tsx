@@ -138,13 +138,18 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     } else {
       seedNumberSet(randomSeed.toString());
       seedSet(value);
-      seedNumberSet("");
     }
   };
 
   const handleSeedNumberChange = (event: any) => {
     seedNumberSet(event.target.value);
     seedSet("custom");
+  };
+
+  const handleBlur = () => {
+    if (seedNumber === "") {
+      seedSet("random");
+    }
   };
 
   return (
@@ -200,6 +205,7 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
                   value={seedNumber}
                   onChange={handleSeedNumberChange}
                   type="number"
+                  onBlur={handleBlur}
                 />
               </div>
             </div>
