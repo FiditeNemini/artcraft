@@ -102,7 +102,7 @@ import WeightPage from "./pages/weight/WeightPage";
 import ExplorePage from "./pages/explore/ExplorePage";
 import SearchPage from "./search/SearchPage";
 import { SearchProvider } from "context/SearchContext";
-import { LoginModalProvider } from "components/providers";
+import { AccountModalProvider } from "components/providers";
 import WeightEditPage from "./pages/weight/WeightEditPage";
 import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
 
@@ -214,7 +214,7 @@ class PageContainer extends React.Component<
 
   public render() {
     return (
-      <LoginModalProvider>
+      <AccountModalProvider>
       <SearchProvider>
         <div id="wrapper" className="no-padding">
           <div id="overlay"></div>
@@ -883,7 +883,7 @@ class PageContainer extends React.Component<
           </div>
         </div>
       </SearchProvider>
-      </LoginModalProvider>
+      </AccountModalProvider>
     );
   }
 }

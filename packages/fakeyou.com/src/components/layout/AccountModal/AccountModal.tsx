@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import { a, config, useTransition } from "@react-spring/web";
+import { a, useTransition } from "@react-spring/web";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import { Spinner } from "components/common";
-import useLogin from "./useLogin";
+import useSignup from "./useSignup";
 import LoginView from "./LoginView";
 import SignupView from "./SignupView";
-import { basicTransition } from "resources";
 import { Analytics } from "common/Analytics";
-import "./LoginModal.scss";
+import "./AccountModal.scss";
 
 interface AniProps {
   animating: boolean,
@@ -29,7 +28,7 @@ export default function LoginModal({ handleClose }: { handleClose: any }) {
   const [status,statusSet] = useState(FetchStatus.paused);
   const [viewLogin,viewLoginSet] = useState(false);
   const [animating,animatingSet] = useState(false);
-  const { allAreValid, setProps, signup, state } = useLogin({
+  const { setProps, signup } = useSignup({
     onSuccess: () => {
       Analytics.accountSignupAttempt();
       handleClose(); 

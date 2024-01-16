@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { LoginModalContext } from 'context';
+import { AccountModalContext } from 'context';
 import { Modal } from "components/common";
-import LoginModal from "components/layout/LoginModal";
+import AccountModal from "components/layout/AccountModal";
 
 interface Props {
   children?: any;
 }
 
 
-export default function LoginModalProvider({ children }: Props) {
+export default function AccountModalProvider({ children }: Props) {
 	const [show, showSet] = useState(false);
 	const open = () => showSet(true);
 	const close = () => { showSet(false); console.log("🍏",);};
 
-    return <LoginModalContext.Provider {...{ value: { show, close, open } }}>
+    return <AccountModalContext.Provider {...{ value: { show, close, open } }}>
       {children}
       {
       	<Modal {...{
@@ -22,9 +22,9 @@ export default function LoginModalProvider({ children }: Props) {
       		noHeader: true,
       		show,
       		showButtons: false,
-      		content: LoginModal
+      		content: AccountModal
       		// title: "You need to login",
       	}}/>
       }
-    </LoginModalContext.Provider>;
+    </AccountModalContext.Provider>;
 };
