@@ -100,7 +100,7 @@ import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
 import WeightPage from "./pages/weight/WeightPage";
 import ExplorePage from "./pages/explore/ExplorePage";
-import SearchPage from "./search/SearchPage";
+import SearchPage from "./pages/search/SearchPage";
 import { SearchProvider } from "context/SearchContext";
 import WeightEditPage from "./pages/weight/WeightEditPage";
 import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";

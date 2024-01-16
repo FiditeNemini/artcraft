@@ -91,8 +91,6 @@ export default function SearchPage() {
   //   { value: "this month", label: "This Month" },
   // ];
 
-  console.log("FOUNDWEIGHTS", foundWeights);
-
   return (
     <Container type="panel" className="mb-5">
       <PageHeader

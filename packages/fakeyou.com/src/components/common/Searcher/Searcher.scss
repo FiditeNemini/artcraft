@@ -1,0 +1,8 @@
+@import "scss/colours.scss";
+
+.searcher-container {
+  &.in-modal {
+    overflow: hidden;
+    max-height: 50vh;
+  }
+}

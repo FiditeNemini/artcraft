@@ -15,6 +15,8 @@ interface ModalProps {
   icon?: IconDefinition;
   autoWidth?: boolean;
   showButtons?: boolean;
+  padding?: boolean;
+  large?: boolean;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -27,6 +29,8 @@ const Modal: React.FC<ModalProps> = ({
   icon,
   autoWidth,
   showButtons = true,
+  padding = true,
+  large = false,
 }) => {
   const fadeIn = useSpring({
     opacity: show ? 1 : 0,
@@ -72,8 +76,8 @@ const Modal: React.FC<ModalProps> = ({
       <div className="modal" role="dialog">
         <div
           className={`modal-dialog modal-dialog-centered ${
-            autoWidth && "modal-width-auto"
-          }`}
+            large ? "modal-width-large" : ""
+          } ${autoWidth ? "modal-width-auto" : ""}`.trim()}
         >
           <div className="modal-content">
             <div className="modal-header">
@@ -88,7 +92,7 @@ const Modal: React.FC<ModalProps> = ({
                 aria-label="Close"
               ></button>
             </div>
-            <div className="modal-body">{content}</div>
+            <div className={`modal-body ${padding && "p-3"}`}>{content}</div>
             {showButtons && (
               <div className="modal-footer">
                 <Button variant="secondary" label="Cancel" onClick={onCancel} />

@@ -15,9 +15,17 @@
   display: block;
 }
 
+.modal-body {
+  padding: 0;
+}
+
 .modal-width-auto {
   max-width: fit-content;
   margin: auto;
+}
+
+.modal-width-large {
+  max-width: 1200px;
 }
 
 .modal-content {

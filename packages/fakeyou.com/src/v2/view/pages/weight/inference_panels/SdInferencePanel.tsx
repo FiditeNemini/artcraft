@@ -16,6 +16,9 @@ import {
   faRectanglePortrait,
   faSquare,
 } from "@fortawesome/pro-solid-svg-icons";
+import Modal from "components/common/Modal";
+import NonRouteTabs from "components/common/Tabs/NonRouteTabs";
+import Searcher from "components/common/Searcher";
 
 interface SdInferencePanelProps {}
 
@@ -26,7 +29,7 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
   const [aspectRatio, aspectRatioSet] = useState("square");
   const [cfgScale, cfgScaleSet] = useState(7);
   const [samples, samplesSet] = useState(8);
-  const [loRAPath, loRAPathSet] = useState(1);
+  // const [loraPath, loraPathSet] = useState(1);
   // const [checkPoint, checkPointSet] = useState(1);
   const [batchCount, batchCountSet] = useState(1);
   const [prompt, setPrompt] = useState("");
@@ -35,13 +38,13 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     batchCountSet,
     cfgScaleSet,
     // checkPointSet,
-    loRAPathSet,
     samplerSet,
     aspectRatioSet,
     setPrompt,
     setNegativePrompt,
     samplesSet,
   });
+  const [isLoraModalOpen, isLoraModalOpenSet] = useState(false);
 
   const samplerOpts = [
     { label: "DPM++ 2M Karras", value: "DPM++ 2M Karras" },
@@ -89,12 +92,6 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
       icon: faRectanglePortrait,
       subLabel: "512x768",
     },
-  ];
-
-  const tempDeleteMeOpts = [
-    { label: "Something", value: 1 },
-    { label: "Something else", value: 2 },
-    { label: "Another thing", value: 3 },
   ];
 
   const batchCountOpts = [
@@ -165,6 +162,23 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
       internalSeed.current = generateRandomSeed();
     }
   };
+
+  const openLoraModal = () => {
+    isLoraModalOpenSet(true);
+  };
+
+  const closeLoraModal = () => {
+    isLoraModalOpenSet(false);
+  };
+
+  const loraSearchTabs = [
+    {
+      label: "All LoRA Weights",
+      content: <Searcher type="modal" />,
+      padding: true,
+    },
+    { label: "Bookmarked", content: <Searcher type="modal" />, padding: true },
+  ];
 
   return (
     <Panel padding={true}>
@@ -257,15 +271,19 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
                 value: samples,
               }}
             />
-            <TempSelect
-              {...{
-                label: "loRA path",
-                name: "loraPath",
-                onChange,
-                options: tempDeleteMeOpts,
-                value: loRAPath,
-              }}
-            />
+
+            <div>
+              <label className="sub-title">LoRA Weight</label>
+              <div className="d-flex gap-2">
+                <Input
+                  disabled={true}
+                  className="w-100"
+                  placeholder="None selected"
+                />
+                <Button label="Select" onClick={openLoraModal} />
+              </div>
+            </div>
+
             {/* Checkpoint Use weight token */}
             {/* <TempSelect
               {...{
@@ -305,6 +323,17 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
           }}
         />
       </div>
+
+      {/* Additional LoRA Weight Modal */}
+      <Modal
+        show={isLoraModalOpen}
+        handleClose={closeLoraModal}
+        title="Select a LoRA Weight"
+        content={<NonRouteTabs tabs={loraSearchTabs} />}
+        showButtons={false}
+        padding={false}
+        large={true}
+      />
     </Panel>
   );
 }

@@ -37,8 +37,8 @@ export default function MediaTab() {
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
-    onSuccess: (res) => {
-      bookmarks.gather({ res, expand: true, key: "token" }); // expand rather than replace for lazy loading 
+    onSuccess: res => {
+      bookmarks.gather({ res, expand: true, key: "token" }); // expand rather than replace for lazy loading
       setShowMasonryGrid(true);
     },
     requestList: true,
@@ -119,7 +119,6 @@ export default function MediaTab() {
                     gridRef={gridContainerRef}
                     onLayoutComplete={() => console.log("Layout complete!")}
                   >
-                    {" "}
                     {media.list.map((data: any, key: number) => {
                       let props = {
                         bookmarks,
