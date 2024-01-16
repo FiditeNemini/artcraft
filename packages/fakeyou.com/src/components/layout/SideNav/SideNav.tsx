@@ -10,6 +10,7 @@ import {
   faFaceViewfinder,
   faCloudUpload,
   faWandMagicSparkles,
+  faPersonRays
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Button from "components/common/Button/Button";
@@ -304,6 +305,19 @@ export default function SideNav(props: SideNavProps) {
               className="sidebar-heading-icon"
             />
             {t("videoFaceAnimator")}
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/gen-mocapnet"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faPersonRays}
+              className="sidebar-heading-icon"
+            />
+            {t("genMocapNet")}
           </NavLink>
         </li>
 

@@ -7,6 +7,7 @@ import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
 import FaceAnimator from "./pages/face_animator";
+import GenerateMocapNet from "./pages/generate_mocapnet";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -653,6 +654,12 @@ class PageContainer extends React.Component<
                   inferenceJobs: this.props.inferenceJobs,
                   inferenceJobsByCategory: this.props.inferenceJobsByCategory,
                 }}
+              />
+            </Route>
+
+            <Route path="/gen-mocapnet/:mediaToken?">
+              <GenerateMocapNet
+
               />
             </Route>
 
