@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Button,
   Input,
@@ -126,29 +126,43 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
   };
 
   const generateRandomSeed = () => Math.floor(Math.random() * Math.pow(2, 32));
+  const internalSeed = useRef(generateRandomSeed()); // useRef to hold the internal seed
 
   const handleSeedChange = (option: any) => {
     const { value } = option.target;
-    const randomSeed = generateRandomSeed();
+
     if (value === "custom") {
       if (seedNumber === "") {
+        const randomSeed = generateRandomSeed();
+        internalSeed.current = randomSeed;
         seedNumberSet(randomSeed.toString());
       }
       seedSet(value);
     } else {
-      seedNumberSet(randomSeed.toString());
       seedSet(value);
+      seedNumberSet("");
+      internalSeed.current = generateRandomSeed(); // Generate a new random seed when switching back to "Random"
     }
   };
 
   const handleSeedNumberChange = (event: any) => {
-    seedNumberSet(event.target.value);
+    const customSeed = event.target.value;
+    seedNumberSet(customSeed);
+    internalSeed.current =
+      customSeed !== "" ? parseInt(customSeed, 10) : generateRandomSeed();
     seedSet("custom");
   };
 
   const handleBlur = () => {
     if (seedNumber === "") {
       seedSet("random");
+    }
+  };
+
+  const handleGenerateImage = () => {
+    //makse sure seed is random if random is selected
+    if (seed === "random") {
+      internalSeed.current = generateRandomSeed();
     }
   };
 
@@ -287,6 +301,7 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
           {...{
             label: "Generate Image",
             disabled: prompt === "",
+            onClick: handleGenerateImage,
           }}
         />
       </div>
