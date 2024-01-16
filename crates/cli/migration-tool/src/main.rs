@@ -5,16 +5,16 @@
 
 
 use std::time::Duration;
+
 use log::info;
 use sqlx::{MySql, Pool};
 use sqlx::mysql::MySqlPoolOptions;
-use cloud_storage::bucket_client::BucketClient;
 
+use cloud_storage::bucket_client::BucketClient;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use errors::AnyhowResult;
 
 use crate::deps::Deps;
-use crate::migrations::voice_conversion_to_weights::migrate::migrate_voice_conversion_to_weights;
 
 pub mod deps;
 pub mod migrations;
@@ -40,7 +40,7 @@ pub async fn main() -> AnyhowResult<()> {
     bucket_production_private: get_bucket_client("PRODUCTION_PRIVATE")?,
   };
 
-  migrate_voice_conversion_to_weights(&deps).await?;
+  //migrate_voice_conversion_to_weights(&deps).await?;
 
   Ok(())
 }

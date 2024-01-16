@@ -25,6 +25,11 @@ impl PublicPath for WeightFileBucketPath {}
 
 impl WeightFileBucketPath {
 
+  // TODO(bt,2024-01-14): This is temporary standardization. Clean this up.
+  pub fn generate_for_tt2_model() -> Self {
+    Self::generate_new(Some("tt2_"), Some(".pt"))
+  }
+
   // TODO(bt,2023-12-19): This is temporary standardization. Clean this up.
   pub fn generate_for_svc_model() -> Self {
     Self::generate_new(Some("svc_"), Some(".pt"))
@@ -33,6 +38,11 @@ impl WeightFileBucketPath {
   // TODO(bt,2023-12-19): This is temporary standardization. Clean this up.
   pub fn generate_for_rvc_model() -> Self {
     Self::generate_new(Some("rvc_"), Some(".pt"))
+  }
+
+  // TODO(bt,2024-01-15): This is temporary standardization. Clean this up.
+  pub fn tt2_model_file_from_object_hash(hash: &str) -> Self {
+    Self::from_object_hash(hash, Some("tt2_"), Some(".pt"))
   }
 
   // TODO(bt,2023-12-19): This is temporary standardization. Clean this up.
