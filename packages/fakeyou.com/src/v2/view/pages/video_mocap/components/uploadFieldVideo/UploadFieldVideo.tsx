@@ -36,8 +36,7 @@ export default function UploadFieldVideo({
   const onLoad = () => loadedSet(1);
   const style = useSpring({
     config: { mass: 1, tension: 120, friction: 14 },
-    onRest,
-    opacity: loaded ? 1 : 0
+    onRest
   });
   
   const fileTypes = ["MP4"];
@@ -46,10 +45,10 @@ export default function UploadFieldVideo({
     <div className="fy-image-uploader d-flex">
       { file ?
         <>
-          <a.img 
-            alt="file preview"
-            className="h-100 w-100 object-fit-cover"
+          <video
+            controls
             src={blob}
+            className="mh-100 mw-100 object-fit-cover"
             {...{onLoad, style}}
           />
           <FileDetails {...{ clear, file, hideClearDetails, icon: faFileVideo }}/>
