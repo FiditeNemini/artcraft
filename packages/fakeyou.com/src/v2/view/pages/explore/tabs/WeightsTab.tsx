@@ -29,6 +29,7 @@ export default function WeightsTab() {
     addQueries: {
       page_size: 24,
       ...prepFilter(weightType, "weight_type"),
+      ...prepFilter(weightCategory, "weight_category"),
     },
     addSetters: { weightCategorySet, weightTypeSet },
     debug: "explore weights tab",
@@ -59,7 +60,7 @@ export default function WeightsTab() {
     { value: "so_vits_svc", label: "so_vits_svc" },
     { value: "tt2", label: "tt2" },
     { value: "loRA", label: "loRA" },
-    { value: "vall_e", label: "vall_e" },
+    //{ value: "vall_e", label: "vall_e" }, // NB(brandon,2024-01-17): Not supported
   ];
 
   const weightCategoryOpts = [
