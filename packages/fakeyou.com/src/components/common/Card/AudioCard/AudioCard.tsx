@@ -90,7 +90,9 @@ export default function AudioCard({
               </div>
 
               <h6 className="fw-semibold text-white mb-1 mt-3">
-                {data.weight_name}
+                {data.origin.maybe_model
+                  ? data.origin.maybe_model.title
+                  : "Media Audio"}
               </h6>
               <p className="fs-7 opacity-75">{timeAgo}</p>
             </div>
