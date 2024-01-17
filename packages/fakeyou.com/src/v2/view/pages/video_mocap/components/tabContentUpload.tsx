@@ -1,10 +1,17 @@
-import React from "react";
+import React, {useState} from "react";
+
+import { useFile } from "hooks";
+
 import VideoInput from "v2/view/pages/video_mocap/components/uploadFieldVideo";
 
 export default function TabContentUpload(props:{
   t: Function
 }){
   const { t } = props
+  const videoProps = useFile({})
+  const [videoReady, videoReadySet] = useState<boolean>(false);
+
+  // contains upload inout state and controls, see docs
   return(
     <div
       className="tab-pane fade show active py-4"
@@ -12,7 +19,9 @@ export default function TabContentUpload(props:{
     >
         <div className="row">
           <div className="col-12">
-            <VideoInput t={t}/>
+            <VideoInput {...{ ...t, ...videoProps,
+              onRest: () => videoReadySet(videoProps.file ? true : false),
+            }}/>
           </div>
         </div>
 

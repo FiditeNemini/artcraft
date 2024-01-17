@@ -1,36 +1,29 @@
 @import "scss/colours.scss";
 @import "scss/_breakpoint.scss";
 
+//TODO: PUSH TO TOP
+.fill-secondary {
+	fill: $secondary;
+}
 
-.image-upload-frame {
+//TODO: PUSH TO TOP, given in BS5
+.object-fit-cover{
+	object-fit: cover;
+}
+
+.video-upload-frame {
 	// aspect-ratio: 4/3;
 	@include breakpoint(min-width 992px) {
 		aspect-ratio: 1/1;
 	}
 }
+.image-upload-label, .upload-details {
+	background-color: rgba($panel, .85);
+}
 
-.fy-image-uploader {
-	border-radius: .5rem .5rem 0 0;
-
-	.image-upload-label, .upload-details {
-		background-color: rgba($panel, .85);
-	}
-
-	.upload-details {
-		top: 0;
-		width: 100%;
-		padding: 1rem;
-		border-radius: 0;
-	}
-
-	.file-preview {
-		height: 100%;
-		width: 100%;
-		border-radius: .5rem;
-		object-fit: cover;
-	}
-	
-	.image-placeholder {
-		fill: $secondary;
-	}
+.upload-details {
+	top: 0;
+	width: 100%;
+	padding: 1rem;
+	border-radius: 0;
 }

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { a, useSpring } from '@react-spring/web';
 import { FileDetails, FileWrapper, FileLabel } from "components/common";
-import { faImagePortrait } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFileVideo, faVideo } from "@fortawesome/pro-solid-svg-icons";
 import "./style.scss";
 
 interface Props {
@@ -41,20 +42,23 @@ export default function UploadFieldVideo({
   
   const fileTypes = ["MP4"];
 
-  return <FileWrapper {...{ fileTypes, panelClass: "image-upload-frame", ...inputProps, ...rest }}>
+  return <FileWrapper {...{ fileTypes, panelClass: "video-upload-frame", ...inputProps, ...rest }}>
     <div className="fy-image-uploader d-flex">
-      <div className="image-upload-label">
-        { !file && <FileLabel {...{ fileTypes }} /> }
-      </div>
       { file ?
         <>
-          <a.img {...{ alt: "file preview", className: "file-preview", onLoad, src: blob, style }} />
-          <FileDetails {...{ clear, file, hideClearDetails, icon: faImagePortrait }}/>
+          <a.img 
+            alt="file preview"
+            className="h-100 w-100 object-fit-cover"
+            src={blob}
+            {...{onLoad, style}}
+          />
+          <FileDetails {...{ clear, file, hideClearDetails, icon: faFileVideo }}/>
         </> :
         <>
-          <svg className="image-placeholder" height="400" viewBox="0 0 300 300" width="400">
-            <path d="m152.42 226c41.8 0 69.49-43.57 73.21-90.87 3.78-47.97-26.06-87.13-75.69-87.13-49.64 0-79.28 39.15-75.69 87.13 3.72 49.79 36.37 90.87 78.17 90.87zm-29.19-50.93c1.62-1.51 4.15-1.42 5.65.2 4.1 4.41 15.31 6.97 21.88 6.97s17.77-2.56 21.88-6.97c1.5-1.62 4.04-1.71 5.65-.2 1.62 1.5 1.92 3.95.2 5.65-6.31 6.27-18.31 9.52-27.74 9.52s-22.16-3.54-27.74-9.52c-1.49-1.61-1.4-4.14.22-5.65zm115.25 112.93h-176.62c-37.67 0-38.24-17.41-27.56-26.36 21.49-18.01 57.18-23.64 114.81-23.64 60.01 0 96.24 4.84 117.41 24.06 10.09 9.16 7.67 25.94-28.04 25.94z"/>
-          </svg>
+          <div className="image-upload-label">
+            <FileLabel {...{ fileTypes }} />
+          </div>
+          <svg className="fill-secondary" xmlns="http://www.w3.org/2000/svg" height="160" width="200" viewBox="0 0 576 512"><path d="M0 128C0 92.7 28.7 64 64 64H320c35.3 0 64 28.7 64 64V384c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V128zM559.1 99.8c10.4 5.6 16.9 16.4 16.9 28.2V384c0 11.8-6.5 22.6-16.9 28.2s-23 5-32.9-1.6l-96-64L416 337.1V320 192 174.9l14.2-9.5 96-64c9.8-6.5 22.4-7.2 32.9-1.6z"/></svg>
         </>
       }
     </div>
