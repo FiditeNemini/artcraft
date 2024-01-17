@@ -74,6 +74,13 @@ pub struct StableDiffusionArgs {
 
     #[serde(rename = "t")]
     pub type_of_inference: String,
+
+    // loRA / checkpoint description
+    #[serde(rename = "de")]
+    pub description: Option<String>,
+    // loRA / checkpoint name and description
+    #[serde(rename = "na")]
+    pub name: Option<String>
 }
 
 
