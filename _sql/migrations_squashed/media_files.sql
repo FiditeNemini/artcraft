@@ -58,6 +58,11 @@ CREATE TABLE media_files (
   -- The original filename of the media (if uploaded by a user)
   maybe_origin_filename VARCHAR(255) DEFAULT NULL,
 
+  -- Whether this media file was generated as part of a batch
+  -- If so, we can look up the batch in a separate query/call to the `batch_generations` table.
+  -- We won't hold the batch token in this table since it'll be very sparsely populated.
+  is_batch_generated BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- ========== METADATA ==========
 
   -- We can store text transcripts, etc. in other tables and refer back via foreign key.
