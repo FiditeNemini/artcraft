@@ -2,6 +2,7 @@ import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import Badge from "../Badge";
+import useWeightTypeInfo from "hooks/useWeightTypeInfo";
 
 interface SearchResultsDropdownProps {
   data: Weight[];
@@ -18,12 +19,6 @@ export default function SearchResultsDropdown({
 }: SearchResultsDropdownProps) {
   const history = useHistory();
 
-  const handleResultClick = (item: Weight, event: React.MouseEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
-    history.push(`/weight/${item.weight_token}`);
-  };
-
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
   };
@@ -39,30 +34,34 @@ export default function SearchResultsDropdown({
     <>
       {data.length !== 0 && (
         <div className="search-results-dropdown">
-          {data.map(item => {
-            // let modelPageLink = `/weight/${item.weight_token}`;
+          {data.slice(0, 6).map((item: any) => {
+            const { label: weightBadgeLabel, color: weightBadgeColor } =
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useWeightTypeInfo(item.weight_type);
 
             return (
-              <div
-                className="search-results-dropdown-item p-3"
-                key={item.weight_token}
-                onClick={event => handleResultClick(item, event)}
-              >
-                <h6 className="fw-semibold mb-1">{item.title}</h6>
-                <div className="d-flex gap-2 align-items-center">
-                  <p className="fs-7">
-                    by{" "}
-                    <Link
-                      className="fw-medium"
-                      to={`/profile/${item.creator.username}`}
-                      onClick={handleInnerClick}
-                    >
-                      {item.creator.display_name}
-                    </Link>
-                  </p>
-                  <Badge label={"TTS"} color={"ultramarine"} small={true} />
+              <Link to={`/weight/${item.weight_token}`} key={item.weight_token}>
+                <div className="search-results-dropdown-item p-3">
+                  <h6 className="fw-semibold mb-1 text-white">{item.title}</h6>
+                  <div className="d-flex gap-2 align-items-center">
+                    <p className="fs-7">
+                      by{" "}
+                      <Link
+                        className="fw-medium"
+                        to={`/profile/${item.creator.username}`}
+                        onClick={handleInnerClick}
+                      >
+                        {item.creator.display_name}
+                      </Link>
+                    </p>
+                    <Badge
+                      label={weightBadgeLabel}
+                      color={weightBadgeColor}
+                      small={true}
+                    />
+                  </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
           <div

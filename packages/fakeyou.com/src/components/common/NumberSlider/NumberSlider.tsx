@@ -70,6 +70,7 @@ export default function NumberSlider({
             onChange: inChange,
             type: "number",
             value,
+            step: step,
           }}
         />
         <div {...{ className: "fy-number-slider-range" }}>
@@ -80,7 +81,7 @@ export default function NumberSlider({
               onChange,
               renderThumb: thumb(thumbTip),
               renderTrack,
-              step,
+              step: step,
               thumbTip,
               values: [value],
             }}

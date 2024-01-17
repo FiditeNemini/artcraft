@@ -100,7 +100,7 @@ import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
 import WeightPage from "./pages/weight/WeightPage";
 import ExplorePage from "./pages/explore/ExplorePage";
-import SearchPage from "./search/SearchPage";
+import SearchPage from "./pages/search/SearchPage";
 import { SearchProvider } from "context/SearchContext";
 import WeightEditPage from "./pages/weight/WeightEditPage";
 import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
@@ -362,19 +362,23 @@ class PageContainer extends React.Component<
                 <WeightEditPage sessionWrapper={this.props.sessionWrapper} />
               </Route>
 
-              <Route path="/weight/:weight_token">
-                <WeightPage
-                  sessionWrapper={this.props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    this.props.sessionSubscriptionsWrapper
-                  }
-                  inferenceJobs={this.props.inferenceJobs}
-                  enqueueInferenceJob={this.props.enqueueInferenceJob}
-                  inferenceJobsByCategory={this.props.inferenceJobsByCategory}
-                  ttsInferenceJobs={this.props.ttsInferenceJobs}
-                  enqueueTtsJob={this.props.enqueueTtsJob}
-                />
-              </Route>
+              <Route
+                path="/weight/:weight_token"
+                render={props => (
+                  <WeightPage
+                    key={props.match.params.weight_token}
+                    sessionWrapper={this.props.sessionWrapper}
+                    sessionSubscriptionsWrapper={
+                      this.props.sessionSubscriptionsWrapper
+                    }
+                    inferenceJobs={this.props.inferenceJobs}
+                    enqueueInferenceJob={this.props.enqueueInferenceJob}
+                    inferenceJobsByCategory={this.props.inferenceJobsByCategory}
+                    ttsInferenceJobs={this.props.ttsInferenceJobs}
+                    enqueueTtsJob={this.props.enqueueTtsJob}
+                  />
+                )}
+              />
 
               <Route path="/search/weights">
                 <SearchPage />
@@ -670,7 +674,7 @@ class PageContainer extends React.Component<
                 />
               </Route>
 
-              <Route path="/storyteller-studio">
+              <Route path="/studio">
                 <StorytellerStudioListPage
                   sessionWrapper={this.props.sessionWrapper}
                   sessionSubscriptionsWrapper={

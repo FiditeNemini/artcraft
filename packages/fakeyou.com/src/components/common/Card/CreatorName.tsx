@@ -1,6 +1,6 @@
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 interface CreatorNameProps {
   displayName: string;
@@ -11,10 +11,6 @@ interface CreatorNameProps {
   className?: string;
 }
 
-const handleInnerClick = (event: any) => {
-  event.stopPropagation();
-};
-
 export default function CreatorName({
   displayName,
   gravatarHash,
@@ -23,11 +19,15 @@ export default function CreatorName({
   username,
   className,
 }: CreatorNameProps) {
-  const history = useHistory();
+  const handleInnerClick = (event: any) => {
+    event.stopPropagation();
+  };
+
   return (
-    <div
+    <Link
       className={`d-flex gap-2 align-items-center ${className}`}
       onClick={handleInnerClick}
+      to={`/profile/${username}`}
     >
       <Gravatar
         size={22}
@@ -35,12 +35,13 @@ export default function CreatorName({
         avatarIndex={avatarIndex}
         backgroundIndex={backgroundIndex}
       />
-      <div {...{
-        className: "fw-medium fs-7 text-white opacity-75 text-truncate",
-        onClick: () => history.push(`/profile/${username}`) // programatically link to avoid "<a> cannot appear as a descendant of <a>" errors
-      }} >
+      <div
+        {...{
+          className: "fw-medium fs-7 text-white opacity-75 text-truncate",
+        }}
+      >
         {displayName}
       </div>
-    </div>
+    </Link>
   );
 }

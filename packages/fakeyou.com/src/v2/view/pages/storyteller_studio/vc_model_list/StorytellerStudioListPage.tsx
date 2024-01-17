@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import Iframe from "react-iframe";
 
@@ -43,17 +43,18 @@ function StorytellerStudioListPage(props: Props) {
   );
 }
 
-const LoadingIcon: React.FC = () => {
-  return (
-    <>
-      <span
-        className="spinner-border spinner-border-sm ms-3"
-        role="status"
-        aria-hidden="true"
-      ></span>
-      <span className="visually-hidden">Loading...</span>
-    </>
-  );
-};
+// NB(bt,2024-01-12): Commenting out so netlify builds don't yell at us
+//const LoadingIcon: React.FC = () => {
+//  return (
+//    <>
+//      <span
+//        className="spinner-border spinner-border-sm ms-3"
+//        role="status"
+//        aria-hidden="true"
+//      ></span>
+//      <span className="visually-hidden">Loading...</span>
+//    </>
+//  );
+//};
 
 export { StorytellerStudioListPage };
