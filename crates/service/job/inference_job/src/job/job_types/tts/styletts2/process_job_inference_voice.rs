@@ -102,7 +102,7 @@ pub async fn process_inference_voice(
       .new_tempdir(&work_temp_dir)
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
-  let workdir = work_temp_dir.path().to_path_buf();
+  let _workdir = work_temp_dir.path().to_path_buf();
   let filename = "style.npz".to_string();
 
   let mut downloaded_weights_path = work_temp_dir.path().to_path_buf();

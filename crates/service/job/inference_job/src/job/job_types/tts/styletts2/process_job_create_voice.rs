@@ -160,7 +160,7 @@ pub async fn process_create_voice(
 
     // TODO(KS): This is a hack to get only the first file to download
     // Ideally we could have improved logic to pick the "best" media file from a dataset
-    if (index >= 0) {
+    if downloaded_dataset.len() >= 1 {
         break;
     }
   }
