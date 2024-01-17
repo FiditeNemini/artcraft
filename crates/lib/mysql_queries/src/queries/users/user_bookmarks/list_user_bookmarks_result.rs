@@ -70,56 +70,56 @@ pub struct UserBookmark {
 }
 
 pub struct RawUserBookmarkRecord {
-  pub (crate) token: UserBookmarkToken,
+  pub(crate) token: UserBookmarkToken,
 
-  pub (crate) entity_type: UserBookmarkEntityType,
-  pub (crate) entity_token: String,
+  pub(crate) entity_type: UserBookmarkEntityType,
+  pub(crate) entity_token: String,
 
   // TODO(bt,2023-12-30): I don't think these user fields are necessary.
   //  We already know the user we're querying on behalf of, so presumably we
   //  already have their info (ie. profile page use).
-  pub (crate) user_token: UserToken,
-  pub (crate) username: String,
-  pub (crate) user_display_name: String,
-  pub (crate) user_gravatar_hash: String,
+  pub(crate) user_token: UserToken,
+  pub(crate) username: String,
+  pub(crate) user_display_name: String,
+  pub(crate) user_gravatar_hash: String,
 
-  pub (crate) created_at: DateTime<Utc>,
-  pub (crate) updated_at: DateTime<Utc>,
-  pub (crate) deleted_at: Option<DateTime<Utc>>,
+  pub(crate) created_at: DateTime<Utc>,
+  pub(crate) updated_at: DateTime<Utc>,
+  pub(crate) deleted_at: Option<DateTime<Utc>>,
 
-  pub (crate) maybe_ratings_positive_count: Option<u32>,
-  pub (crate) maybe_ratings_negative_count: Option<u32>,
-  pub (crate) maybe_bookmark_count: Option<u32>,
+  pub(crate) maybe_ratings_positive_count: Option<u32>,
+  pub(crate) maybe_ratings_negative_count: Option<u32>,
+  pub(crate) maybe_bookmark_count: Option<u32>,
 
-  pub (crate) maybe_media_file_type: Option<MediaFileType>,
-  pub (crate) maybe_media_file_origin_category: Option<MediaFileOriginCategory>,
-  pub (crate) maybe_media_file_public_bucket_hash: Option<String>,
-  pub (crate) maybe_media_file_public_bucket_prefix: Option<String>,
-  pub (crate) maybe_media_file_public_bucket_extension: Option<String>,
+  pub(crate) maybe_media_file_type: Option<MediaFileType>,
+  pub(crate) maybe_media_file_origin_category: Option<MediaFileOriginCategory>,
+  pub(crate) maybe_media_file_public_bucket_hash: Option<String>,
+  pub(crate) maybe_media_file_public_bucket_prefix: Option<String>,
+  pub(crate) maybe_media_file_public_bucket_extension: Option<String>,
 
-  pub (crate) maybe_media_file_creator_user_token: Option<UserToken>,
-  pub (crate) maybe_media_file_creator_username: Option<String>,
-  pub (crate) maybe_media_file_creator_display_name: Option<String>,
-  pub (crate) maybe_media_file_creator_gravatar_hash: Option<String>,
+  pub(crate) maybe_media_file_creator_user_token: Option<UserToken>,
+  pub(crate) maybe_media_file_creator_username: Option<String>,
+  pub(crate) maybe_media_file_creator_display_name: Option<String>,
+  pub(crate) maybe_media_file_creator_gravatar_hash: Option<String>,
 
-  pub (crate) maybe_model_weight_type: Option<WeightsType>,
-  pub (crate) maybe_model_weight_category: Option<WeightsCategory>,
+  pub(crate) maybe_model_weight_type: Option<WeightsType>,
+  pub(crate) maybe_model_weight_category: Option<WeightsCategory>,
 
-  pub (crate) maybe_model_weight_cover_image_public_bucket_hash: Option<String>,
-  pub (crate) maybe_model_weight_cover_image_public_bucket_prefix: Option<String>,
-  pub (crate) maybe_model_weight_cover_image_public_bucket_extension: Option<String>,
+  pub(crate) maybe_model_weight_cover_image_public_bucket_hash: Option<String>,
+  pub(crate) maybe_model_weight_cover_image_public_bucket_prefix: Option<String>,
+  pub(crate) maybe_model_weight_cover_image_public_bucket_extension: Option<String>,
 
-  pub (crate) maybe_model_weight_creator_user_token: Option<UserToken>,
-  pub (crate) maybe_model_weight_creator_username: Option<String>,
-  pub (crate) maybe_model_weight_creator_display_name: Option<String>,
-  pub (crate) maybe_model_weight_creator_gravatar_hash: Option<String>,
+  pub(crate) maybe_model_weight_creator_user_token: Option<UserToken>,
+  pub(crate) maybe_model_weight_creator_username: Option<String>,
+  pub(crate) maybe_model_weight_creator_display_name: Option<String>,
+  pub(crate) maybe_model_weight_creator_gravatar_hash: Option<String>,
 
-  pub (crate) maybe_descriptive_text_model_weight_title: Option<String>,
-  pub (crate) maybe_descriptive_text_tts_model_title: Option<String>,
-  pub (crate) maybe_descriptive_text_tts_result_inference_text: Option<String>,
-  pub (crate) maybe_descriptive_text_user_display_name: Option<String>,
-  pub (crate) maybe_descriptive_text_voice_conversion_model_title: Option<String>,
-  pub (crate) maybe_descriptive_text_zs_voice_title: Option<String>,
+  pub(crate) maybe_descriptive_text_model_weight_title: Option<String>,
+  pub(crate) maybe_descriptive_text_tts_model_title: Option<String>,
+  pub(crate) maybe_descriptive_text_tts_result_inference_text: Option<String>,
+  pub(crate) maybe_descriptive_text_user_display_name: Option<String>,
+  pub(crate) maybe_descriptive_text_voice_conversion_model_title: Option<String>,
+  pub(crate) maybe_descriptive_text_zs_voice_title: Option<String>,
 }
 
 impl RawUserBookmarkRecord {

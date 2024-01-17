@@ -15,8 +15,8 @@ use log::warn;
 use utoipa::ToSchema;
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
-use mysql_queries::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
-use mysql_queries::queries::user_bookmarks::list_user_bookmarks_for_entity::list_user_bookmarks_for_entity;
+use mysql_queries::queries::users::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
+use mysql_queries::queries::users::user_bookmarks::list_user_bookmarks_for_entity::list_user_bookmarks_for_entity;
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
 use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};

@@ -16,8 +16,8 @@ use utoipa::ToSchema;
 
 use mysql_queries::queries::entity_stats::stats_entity_token::StatsEntityToken;
 use mysql_queries::queries::entity_stats::upsert_entity_stats_on_bookmark_event::{BookmarkAction, upsert_entity_stats_on_bookmark_event, UpsertEntityStatsArgs};
-use mysql_queries::queries::user_bookmarks::delete_user_bookmark::delete_user_bookmark;
-use mysql_queries::queries::user_bookmarks::get_user_bookmark_transactional_locking::{BookmarkIdentifier, get_user_bookmark_transactional_locking};
+use mysql_queries::queries::users::user_bookmarks::delete_user_bookmark::delete_user_bookmark;
+use mysql_queries::queries::users::user_bookmarks::get_user_bookmark_transactional_locking::{BookmarkIdentifier, get_user_bookmark_transactional_locking};
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;

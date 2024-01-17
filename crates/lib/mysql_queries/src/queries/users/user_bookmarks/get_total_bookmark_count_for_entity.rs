@@ -1,11 +1,11 @@
 use anyhow::anyhow;
 use log::warn;
-use sqlx::{MySql};
+use sqlx::MySql;
 use sqlx::pool::PoolConnection;
 
 use errors::AnyhowResult;
 
-use crate::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
+use crate::queries::users::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
 
 pub struct BookmarkCount {
   pub total_count: usize,

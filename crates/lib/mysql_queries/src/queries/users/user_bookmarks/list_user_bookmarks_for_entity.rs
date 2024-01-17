@@ -7,7 +7,7 @@ use errors::AnyhowResult;
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 use tokens::tokens::users::UserToken;
 
-use crate::queries::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
+use crate::queries::users::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
 
 pub struct UserBookmark {
   pub token: UserBookmarkToken,

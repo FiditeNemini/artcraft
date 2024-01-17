@@ -9,7 +9,7 @@ use utoipa::{IntoParams, ToSchema};
 
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::user_bookmarks::batch_get_user_bookmarks::{batch_get_user_bookmarks, BatchUserBookmark};
+use mysql_queries::queries::users::user_bookmarks::batch_get_user_bookmarks::{batch_get_user_bookmarks, BatchUserBookmark};
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::tts_models::TtsModelToken;

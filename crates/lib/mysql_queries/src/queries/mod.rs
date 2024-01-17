@@ -18,7 +18,6 @@ pub mod stats;
 pub mod trending_model_analytics;
 pub mod tts;
 pub mod twitch;
-pub mod user_bookmarks;
 pub mod users;
 pub mod vocoder;
 pub mod voice_clone_requests;
