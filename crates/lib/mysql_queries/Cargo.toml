@@ -16,6 +16,7 @@ path = "src/lib.rs"
 
 # Internal
 buckets = { path = "../../_types/buckets" }
+composite_identifiers = { path = "../../_types/composite_identifiers" }
 config = { path = "../deprecated/config" }
 container_common = { path = "../deprecated/container_common" }
 enums = { path = "../../_types/enums" }
