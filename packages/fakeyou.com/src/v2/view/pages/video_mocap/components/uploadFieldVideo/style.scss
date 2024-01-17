@@ -10,20 +10,11 @@
 .object-fit-cover{
 	object-fit: cover;
 }
-
-.video-upload-frame {
-	// aspect-ratio: 4/3;
-	@include breakpoint(min-width 992px) {
-		aspect-ratio: 1/1;
-	}
+.ratio-1x1 {
+	aspect-ratio: 1/1;
 }
-.image-upload-label, .upload-details {
-	background-color: rgba($panel, .85);
-}
+//-end--//
 
 .upload-details {
-	top: 0;
-	width: 100%;
-	padding: 1rem;
-	border-radius: 0;
+	background-color: rgba($panel, .85);
 }

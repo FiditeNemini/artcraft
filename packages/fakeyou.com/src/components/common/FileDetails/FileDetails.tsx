@@ -8,9 +8,16 @@ interface Props {
   file?: any;
   hideClearDetails?: boolean;
   icon?: any;
+  className?: string
 }
 
-export default function FileDetails({ clear = () => {}, file, hideClearDetails, icon }: Props) {
+export default function FileDetails({
+  clear = () => {}, 
+  file,
+  hideClearDetails,
+  icon,
+  className
+}: Props) {
   const fileSize =
     file && file.size >= 1024 * 1024
       ? (file.size / 1024 / 1024).toFixed(2) + " MB"
@@ -18,7 +25,7 @@ export default function FileDetails({ clear = () => {}, file, hideClearDetails, 
       ? `${Math.floor(file.size / 1024)} KB`
       : null;
 
-  return <div {...{ className: "fy-uploader-layout upload-details" }}>
+  return <div className={"fy-uploader-layout upload-details " + className} >
     { icon && <Icon {...{ className: "fy-uploader-layout-icon", icon }}/> }
     <div>
       <div {...{ className: "filename" }}>
