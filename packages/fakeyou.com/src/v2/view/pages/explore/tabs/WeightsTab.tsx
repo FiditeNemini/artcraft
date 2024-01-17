@@ -28,7 +28,7 @@ export default function WeightsTab() {
   const weights = useLazyLists({
     addQueries: {
       page_size: 24,
-      ...prepFilter(weightType, "maybe_scoped_weight_type"),
+      ...prepFilter(weightType, "weight_type"),
     },
     addSetters: { weightCategorySet, weightTypeSet },
     debug: "explore weights tab",
