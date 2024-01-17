@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Button,
+  Input,
   NumberSlider,
   Panel,
   SegmentButtons,
@@ -15,16 +16,20 @@ import {
   faRectanglePortrait,
   faSquare,
 } from "@fortawesome/pro-solid-svg-icons";
+import Modal from "components/common/Modal";
+import NonRouteTabs from "components/common/Tabs/NonRouteTabs";
+import Searcher from "components/common/Searcher";
 
 interface SdInferencePanelProps {}
 
 export default function SdInferencePanel(props: SdInferencePanelProps) {
-  const [seed, seedSet] = useState(5);
+  const [seed, seedSet] = useState("random");
+  const [seedNumber, seedNumberSet] = useState("");
   const [sampler, samplerSet] = useState("DPM++ 2M Karras");
   const [aspectRatio, aspectRatioSet] = useState("square");
   const [cfgScale, cfgScaleSet] = useState(7);
   const [samples, samplesSet] = useState(8);
-  const [loRAPath, loRAPathSet] = useState(1);
+  // const [loraPath, loraPathSet] = useState(1);
   // const [checkPoint, checkPointSet] = useState(1);
   const [batchCount, batchCountSet] = useState(1);
   const [prompt, setPrompt] = useState("");
@@ -33,14 +38,13 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     batchCountSet,
     cfgScaleSet,
     // checkPointSet,
-    loRAPathSet,
     samplerSet,
-    seedSet,
     aspectRatioSet,
     setPrompt,
     setNegativePrompt,
     samplesSet,
   });
+  const [isLoraModalOpen, isLoraModalOpenSet] = useState(false);
 
   const samplerOpts = [
     { label: "DPM++ 2M Karras", value: "DPM++ 2M Karras" },
@@ -90,12 +94,6 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     },
   ];
 
-  const tempDeleteMeOpts = [
-    { label: "Something", value: 1 },
-    { label: "Something else", value: 2 },
-    { label: "Another thing", value: 3 },
-  ];
-
   const batchCountOpts = [
     { label: "1", value: 1 },
     { label: "2", value: 2 },
@@ -105,6 +103,11 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     { label: "6", value: 6 },
     { label: "7", value: 7 },
     { label: "8", value: 8 },
+  ];
+
+  const seedOpts = [
+    { label: "Random", value: "random" },
+    { label: "Custom", value: "custom" },
   ];
 
   const handlePromptChange = (
@@ -118,6 +121,64 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
   ) => {
     setNegativePrompt(event.target.value);
   };
+
+  const generateRandomSeed = () => Math.floor(Math.random() * Math.pow(2, 32));
+  const internalSeed = useRef(generateRandomSeed()); // useRef to hold the internal seed
+
+  const handleSeedChange = (option: any) => {
+    const { value } = option.target;
+
+    if (value === "custom") {
+      if (seedNumber === "") {
+        const randomSeed = generateRandomSeed();
+        internalSeed.current = randomSeed;
+        seedNumberSet(randomSeed.toString());
+      }
+      seedSet(value);
+    } else {
+      seedSet(value);
+      seedNumberSet("");
+      internalSeed.current = generateRandomSeed(); // Generate a new random seed when switching back to "Random"
+    }
+  };
+
+  const handleSeedNumberChange = (event: any) => {
+    const customSeed = event.target.value;
+    seedNumberSet(customSeed);
+    internalSeed.current =
+      customSeed !== "" ? parseInt(customSeed, 10) : generateRandomSeed();
+    seedSet("custom");
+  };
+
+  const handleBlur = () => {
+    if (seedNumber === "") {
+      seedSet("random");
+    }
+  };
+
+  const handleGenerateImage = () => {
+    //makse sure seed is random if random is selected
+    if (seed === "random") {
+      internalSeed.current = generateRandomSeed();
+    }
+  };
+
+  const openLoraModal = () => {
+    isLoraModalOpenSet(true);
+  };
+
+  const closeLoraModal = () => {
+    isLoraModalOpenSet(false);
+  };
+
+  const loraSearchTabs = [
+    {
+      label: "All LoRA Weights",
+      content: <Searcher type="modal" />,
+      padding: true,
+    },
+    { label: "Bookmarked", content: <Searcher type="modal" />, padding: true },
+  ];
 
   return (
     <Panel padding={true}>
@@ -156,17 +217,27 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
       <Accordion>
         <Accordion.Item title="Advanced">
           <div className="p-3 d-flex flex-column gap-3">
-            <NumberSlider
-              {...{
-                min: 5,
-                max: 128,
-                name: "seed",
-                label: "Seed value",
-                onChange,
-                thumbTip: "Seed value",
-                value: seed,
-              }}
-            />
+            <div>
+              <label className="sub-title">Seed</label>
+              <div className="d-flex gap-2">
+                <SegmentButtons
+                  {...{
+                    name: "seed",
+                    onChange: handleSeedChange,
+                    options: seedOpts,
+                    value: seed,
+                  }}
+                />
+                <Input
+                  placeholder="Random"
+                  value={seedNumber}
+                  onChange={handleSeedNumberChange}
+                  type="number"
+                  onBlur={handleBlur}
+                />
+              </div>
+            </div>
+
             <TempSelect
               {...{
                 label: "Sampler",
@@ -186,6 +257,7 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
                 onChange,
                 thumbTip: "CFG Scale",
                 value: cfgScale,
+                step: 0.5,
               }}
             />
 
@@ -200,15 +272,19 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
                 value: samples,
               }}
             />
-            <TempSelect
-              {...{
-                label: "loRA path",
-                name: "loraPath",
-                onChange,
-                options: tempDeleteMeOpts,
-                value: loRAPath,
-              }}
-            />
+
+            <div>
+              <label className="sub-title">LoRA Weight</label>
+              <div className="d-flex gap-2">
+                <Input
+                  disabled={true}
+                  className="w-100"
+                  placeholder="None selected"
+                />
+                <Button label="Select" onClick={openLoraModal} />
+              </div>
+            </div>
+
             {/* Checkpoint Use weight token */}
             {/* <TempSelect
               {...{
@@ -244,9 +320,22 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
           {...{
             label: "Generate Image",
             disabled: prompt === "",
+            onClick: handleGenerateImage,
           }}
         />
       </div>
+
+      {/* Additional LoRA Weight Modal */}
+      <Modal
+        show={isLoraModalOpen}
+        handleClose={closeLoraModal}
+        title="Select a LoRA Weight"
+        content={() => <NonRouteTabs tabs={loraSearchTabs} />}
+        showButtons={false}
+        padding={false}
+        large={true}
+        position="top"
+      />
     </Panel>
   );
 }

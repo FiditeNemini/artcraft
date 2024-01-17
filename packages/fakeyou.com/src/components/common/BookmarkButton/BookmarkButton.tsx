@@ -16,7 +16,7 @@ interface BookmarkButtonProps {
   isToggled: boolean;
   large?: boolean;
   overlay?: boolean;
-  toggle: (entityToken: string, entityType: string) => any
+  toggle: (entityToken: string, entityType: string) => any;
 }
 
 export default function BookmarkButton({
@@ -57,7 +57,6 @@ export default function BookmarkButton({
 
   const index = busy ? 0 : isToggled ? 1 : 2;
 
-
   return (
     <div className="d-flex gap-2">
       <Tippy
@@ -80,8 +79,8 @@ export default function BookmarkButton({
           />
           <div className="favorite-text">
             <div {...{ className: "favorite-text-wrapper" }}>
-              <WorkDots {...{ labels: ["Saved","Save"], index }}/>
-              </div>
+              <WorkDots {...{ labels: ["Saved", "Save"], index }} />
+            </div>
           </div>
         </button>
       </Tippy>

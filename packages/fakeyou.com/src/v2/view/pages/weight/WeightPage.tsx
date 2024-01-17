@@ -7,11 +7,7 @@ import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Skeleton from "components/common/Skeleton";
 import Button from "components/common/Button";
-import {
-  faCircleExclamation,
-  faLink,
-  faShare,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faCircleExclamation, faLink } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
@@ -81,7 +77,7 @@ export default function WeightPage({
       history.push(origin || "");
     },
     onSuccess: (res: any) => {
-      bookmarks.gather({ res, key: "weight_token" }); // expand rather than replace for lazy loading 
+      bookmarks.gather({ res, key: "weight_token" }); // expand rather than replace for lazy loading
       ratings.gather({ res, key: "weight_token" });
     },
     token: weight_token,
@@ -90,7 +86,6 @@ export default function WeightPage({
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
   const dateUpdated = moment(weight?.updated_at || "").format("LLL");
   const dateCreated = moment(weight?.updated_at || "").format("LLL");
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -143,9 +138,9 @@ export default function WeightPage({
         );
       case WeightCategory.SD:
         let sdCoverImage = "/images/avatars/default-pfp.png";
-        if (weight.maybe_cover_image_public_bucket_path !== null) {
+        if (weight?.cover_image?.maybe_cover_image_public_bucket_path !== null) {
           sdCoverImage = bucketConfig.getGcsUrl(
-            weight.maybe_cover_image_public_bucket_path
+            weight?.cover_image?.maybe_cover_image_public_bucket_path || ""
           );
         }
 
@@ -245,8 +240,8 @@ export default function WeightPage({
       property: "Visibility",
       value: weight.creator_set_visibility,
     },
-    { property: "Created at", value: weight.created_at?.toString() || "" },
-    { property: "Updated at", value: weight.updated_at?.toString() || "" },
+    { property: "Created at", value: dateCreated || "" },
+    { property: "Updated at", value: dateUpdated || "" },
   ];
 
   const imageDetails = [
@@ -311,20 +306,11 @@ export default function WeightPage({
     );
   }
 
-
   // const handleBookmark = () => {
   //   return bookmarks.toggle(); // this function checks if the bookmark exists, truthy = deleted, falsy = created
   // };
 
   const subtitleDivider = <span className="opacity-25 fs-5 fw-light">|</span>;
-
-  const openShareModal = () => {
-    setIsShareModalOpen(true);
-  };
-
-  const closeShareModal = () => {
-    setIsShareModalOpen(false);
-  };
 
   const shareUrl = `https://fakeyou.com/weight/${weight.weight_token}`;
   const shareText = `Use FakeYou to generate speech as ${
@@ -347,10 +333,10 @@ export default function WeightPage({
     setIsDeleteModalOpen(false);
   };
 
-  let audioWeightCoverImage = "/images/avatars/default-pfp.png";
-  if (weight.maybe_cover_image_public_bucket_path !== null) {
+  let audioWeightCoverImage = undefined;
+  if (weight?.cover_image?.maybe_cover_image_public_bucket_path !== null) {
     audioWeightCoverImage = bucketConfig.getCdnUrl(
-      weight.maybe_cover_image_public_bucket_path,
+      weight?.cover_image?.maybe_cover_image_public_bucket_path || "",
       100,
       100
     );
@@ -363,7 +349,10 @@ export default function WeightPage({
           <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
             {(weight.weight_category === WeightCategory.VC ||
               weight.weight_category === WeightCategory.TTS) && (
-              <WeightCoverImage src={audioWeightCoverImage} />
+              <WeightCoverImage
+                src={audioWeightCoverImage}
+                coverIndex={weight.cover_image.default_cover.image_index}
+              />
             )}
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
@@ -382,7 +371,7 @@ export default function WeightPage({
                       {...{
                         ...ratings.makeProps({
                           entityToken: weight_token,
-                          entityType: "model_weight"
+                          entityType: "model_weight",
                         }),
                         large: true,
                       }}
@@ -391,9 +380,9 @@ export default function WeightPage({
                       {...{
                         ...bookmarks.makeProps({
                           entityToken: weight_token,
-                          entityType: "model_weight"
+                          entityType: "model_weight",
                         }),
-                        large: true
+                        large: true,
                       }}
                     />
                   </div>
@@ -418,14 +407,14 @@ export default function WeightPage({
               <h4 className="fw-semibold mb-3">Comments</h4>
               <CommentComponent
                 entityType="user"
-                entityToken={"1"}
+                entityToken={weight.weight_token}
                 sessionWrapper={sessionWrapper}
               />
             </div>
           </div>
           <div className="col-12 col-xl-4">
             <div className="panel panel-clear d-flex flex-column gap-3">
-              <div className="d-flex gap-2 flex-wrap">
+              {/* <div className="d-flex gap-2 flex-wrap">
                 <Button
                   variant="secondary"
                   icon={faShare}
@@ -433,9 +422,8 @@ export default function WeightPage({
                   className="flex-grow-1"
                   onClick={openShareModal}
                 />
-                {/* Share and Create Buttons */}
 
-                {/* <div className="d-flex gap-2">
+                <div className="d-flex gap-2">
                   <Button
                     square={true}
                     variant="secondary"
@@ -451,8 +439,8 @@ export default function WeightPage({
                     onClick={() => {}}
                     tooltip="Share"
                   />
-                </div> */}
-              </div>
+                </div>
+              </div> */}
 
               <Panel className="rounded">
                 <div className="d-flex gap-2 p-3">
@@ -492,6 +480,55 @@ export default function WeightPage({
                 {modMediaDetails}
               </Accordion>
 
+              <Panel className="p-3 rounded">
+                <div className="d-flex flex-column gap-3">
+                  <div>
+                    <h6 className="fw-medium mb-0">Share Weight</h6>
+                    <hr className="mt-3 mb-0" />
+                  </div>
+
+                  <div className="d-flex justify-content-between flex-wrap">
+                    <SocialButton
+                      social="x"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="whatsapp"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="facebook"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="reddit"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="email"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                  </div>
+                  <div className="d-flex gap-2">
+                    <div className="flex-grow-1">
+                      <Input type="text" value={shareUrl} readOnly />
+                    </div>
+
+                    <Button
+                      icon={faLink}
+                      label={buttonLabel}
+                      onClick={handleCopyLink}
+                      variant="primary"
+                    />
+                  </div>
+                </div>
+              </Panel>
+
               {sessionWrapper.canEditTtsModelByUserToken(
                 weight.creator?.user_token
               ) && (
@@ -527,60 +564,6 @@ export default function WeightPage({
           </Panel>
         </Container>
       </div>
-
-      {/* Share Modal */}
-      <Modal
-        show={isShareModalOpen}
-        handleClose={closeShareModal}
-        title="Share"
-        autoWidth={true}
-        showButtons={false}
-        content={() =>
-          <div className="d-flex flex-column gap-4">
-            <div className="d-flex gap-3">
-              <SocialButton
-                social="x"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="whatsapp"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="facebook"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="reddit"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="email"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-            </div>
-            <div className="d-flex gap-2">
-              <div className="flex-grow-1">
-                <Input type="text" value={shareUrl} readOnly />
-              </div>
-
-              <Button
-                icon={faLink}
-                label={buttonLabel}
-                onClick={handleCopyLink}
-                variant="primary"
-              />
-            </div>
-          </div>
-        }
-      />
-
-      {/* Delete Modal */}
       <Modal
         show={isDeleteModalOpen}
         handleClose={closeDeleteModal}

@@ -119,7 +119,7 @@ export default function RecordComponent(props: Props) {
           </div>
         </button>
       ) : (
-        <button className="btn btn-secondary" onClick={handleStartRecording}>
+        <button className="btn btn-primary" onClick={handleStartRecording}>
           <FontAwesomeIcon icon={faMicrophone} className="me-2" />
           {t("recordButtonStart")}
         </button>

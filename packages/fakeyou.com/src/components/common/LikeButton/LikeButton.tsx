@@ -16,7 +16,7 @@ interface LikeButtonProps {
   isToggled: boolean;
   overlay?: boolean;
   large?: boolean;
-  toggle: (entityToken: string, entityType: string) => any
+  toggle: (entityToken: string, entityType: string) => any;
 }
 
 export default function LikeButton({
@@ -27,7 +27,7 @@ export default function LikeButton({
   isToggled,
   overlay,
   large,
-  toggle
+  toggle,
 }: LikeButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -77,9 +77,13 @@ export default function LikeButton({
             icon={isToggled ? faHeart : faHeartOutline}
             className={`${iconClass} me-2`}
           />
-            <div className="like-number">
-              <WorkDots {...{ labels: [likeCountShort], index: busy ? 0 : 1 }}/>
+          <div className="like-number">
+            <div className="like-number-wrapper">
+              <WorkDots
+                {...{ labels: [likeCountShort], index: busy ? 0 : 1 }}
+              />
             </div>
+          </div>
         </button>
       </Tippy>
     </div>

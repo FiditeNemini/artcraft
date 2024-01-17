@@ -12,11 +12,12 @@
   font-size: 14px !important;
   cursor: pointer;
   outline: inherit;
-  font-size: 16px;
   transition: 0.2s;
   padding: 3px 8px;
   min-width: 52px;
+  max-height: 27px;
   border-radius: 0.5rem;
+  overflow: hidden !important;
 
   &.shadow {
     box-shadow: 0 0 12px rgba($bg, 0.4) !important;
@@ -49,6 +50,7 @@
 
   &.large {
     padding: 6px 10px;
+    max-height: 33px;
   }
 }
 
@@ -73,6 +75,11 @@
   font-weight: 400 !important;
   opacity: 0.9;
   transition: 0.2s;
+}
+
+.like-number-wrapper {
+  position: relative;
+  display: flex;
 }
 
 @keyframes pulse {

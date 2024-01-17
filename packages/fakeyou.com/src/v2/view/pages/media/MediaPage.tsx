@@ -15,7 +15,6 @@ import {
   faFaceViewfinder,
   faArrowDownToLine,
   faSquareQuote,
-  faShare,
   faLink,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
@@ -27,13 +26,13 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import SocialButton from "components/common/SocialButton";
-import Modal from "components/common/Modal";
 import { Input } from "components/common";
 import LikeButton from "components/common/LikeButton";
 import Badge from "components/common/Badge";
 import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
 import { useMedia, useRatings } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
+import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -45,14 +44,12 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const { media: mediaFile, status } = useMedia({
     mediaToken: token,
     onSuccess: (res: any) => {
-      // console.log("🚺",res);
       ratings.gather({ res, key: "token" });
-    }
+    },
   });
-  // console.log("😎",ratings.library);
+
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
-  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [buttonLabel, setButtonLabel] = useState("Copy");
 
   function renderMediaComponent(mediaFile: MediaFile) {
@@ -163,7 +160,8 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       </>
     );
 
-  if (status === 4) // = error, will replace with type 
+  if (status === 4)
+    // = error, will replace with type
     return (
       <Container type="panel">
         <PageHeader
@@ -179,8 +177,25 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
       </Container>
     );
 
+  const weightCategoryMap: Record<WeightCategory, { weightCategory: string }> =
+    {
+      [WeightCategory.TTS]: { weightCategory: "Text to Speech" },
+      [WeightCategory.VC]: { weightCategory: "Voice to Voice" },
+      [WeightCategory.SD]: { weightCategory: "Image Generation" },
+      [WeightCategory.ZS]: { weightCategory: "Voice Designer" },
+      [WeightCategory.VOCODER]: { weightCategory: "Vocoder" },
+    };
+
+  let weightCategory = "none";
+  if (mediaFile?.maybe_model_weight_info) {
+    const categoryInfo =
+      weightCategoryMap[mediaFile.maybe_model_weight_info.weight_category];
+    weightCategory = categoryInfo ? categoryInfo.weightCategory : "none";
+  }
+
   const audioDetails = [
     { property: "Type", value: mediaFile?.media_type || "" },
+    { property: "Category", value: weightCategory || "" },
     { property: "Created at", value: dateCreated || "" },
     {
       property: "Visibility",
@@ -225,18 +240,17 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   let mediaDetails;
 
   switch (mediaFile?.media_type) {
-    case MediaFileType.Audio: 
+    case MediaFileType.Audio:
       mediaDetails = audioDetails;
       break;
-    case MediaFileType.Video: 
+    case MediaFileType.Video:
       mediaDetails = videoDetails;
       break;
-    case MediaFileType.Image: 
+    case MediaFileType.Image:
       mediaDetails = imageDetails;
       break;
     default:
   }
-
 
   let modMediaDetails = undefined;
 
@@ -268,14 +282,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     );
   }
 
-  const openShareModal = () => {
-    setIsShareModalOpen(true);
-  };
-
-  const closeShareModal = () => {
-    setIsShareModalOpen(false);
-  };
-
   const handleCopyLink = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(shareUrl);
@@ -289,9 +295,14 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
   const bucketConfig = new BucketConfig();
 
   let weightUsedCoverImage = "/images/avatars/default-pfp.png";
-  if (mediaFile?.maybe_model_weight_info !== null) {
+  if (
+    mediaFile?.maybe_model_weight_info !== null &&
+    mediaFile?.maybe_model_weight_info?.maybe_cover_image_public_bucket_path !==
+      null
+  ) {
     weightUsedCoverImage = bucketConfig.getCdnUrl(
-      mediaFile?.maybe_model_weight_info?.maybe_cover_image_public_bucket_path || "",
+      mediaFile?.maybe_model_weight_info
+        ?.maybe_cover_image_public_bucket_path || "",
       60,
       100
     );
@@ -318,9 +329,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
                   {mediaFile?.maybe_model_weight_info && (
                     <>
-                      <p>
-                        {mediaFile?.maybe_model_weight_info?.weight_category}
-                      </p>
+                      <p>{weightCategory}</p>
                       {subtitleDivider}
                     </>
                   )}
@@ -331,7 +340,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                         large: true,
                         ...ratings.makeProps({
                           entityToken: token,
-                          entityType: "media_file"
+                          entityType: "media_file",
                         }),
                       }}
                     />
@@ -353,14 +362,14 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         <div className="row g-4">
           <div className="col-12 col-xl-8">
             <div className="media-wrapper">
-              { mediaFile && renderMediaComponent(mediaFile) }
+              {mediaFile && renderMediaComponent(mediaFile)}
             </div>
 
             <div className="panel p-3 py-4 p-md-4 mt-3 d-none d-xl-block">
               <h4 className="fw-semibold mb-3">Comments</h4>
               <CommentComponent
                 entityType="user"
-                entityToken={mediaFile?.token || "" }
+                entityToken={mediaFile?.token || ""}
                 sessionWrapper={sessionWrapper}
               />
             </div>
@@ -368,43 +377,41 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
           <div className="col-12 col-xl-4">
             <div className="panel panel-clear d-flex flex-column gap-3">
               <div className="d-flex gap-2 flex-wrap">
-                <Button
-                  icon={faArrowDownToLine}
-                  label="Download"
-                  className="flex-grow-1"
-                  href={audioLink}
-                  download={audioLink}
-                />
-
-                <div className="d-flex gap-2">
-                  {/* <Button
-                    square={true}
-                    variant="secondary"
-                    // icon={faCirclePlay}
-                    onClick={() => {}}
-                    tooltip="Create"
-                  /> */}
-
+                {mediaFile?.media_type === MediaFileType.Audio ? (
                   <Button
-                    icon={faShare}
-                    square={true}
-                    variant="secondary"
-                    tooltip="Share"
-                    onClick={openShareModal}
+                    {...{
+                      icon: faFaceViewfinder,
+                      label: "Use audio in Face Animator",
+                      to: `/face-animator/${mediaFile.token}`,
+                      variant: "primary",
+                      className: "flex-grow-1",
+                    }}
                   />
-                </div>
-              </div>
+                ) : null}
 
-              {mediaFile?.media_type === MediaFileType.Audio ? (
-                <Button
-                  {...{
-                    icon: faFaceViewfinder,
-                    label: "Use audio in Face Animator",
-                    to: `/face-animator/${mediaFile.token}`,
-                    variant: "secondary",
-                  }}
-                />
-              ) : null}
+                {mediaFile?.media_type !== MediaFileType.Audio && (
+                  <Button
+                    icon={faArrowDownToLine}
+                    label="Download"
+                    className="flex-grow-1"
+                    href={audioLink}
+                    download={audioLink}
+                    variant="secondary"
+                  />
+                )}
+                {mediaFile?.media_type === MediaFileType.Audio && (
+                  <div className="d-flex gap-2">
+                    <Button
+                      icon={faArrowDownToLine}
+                      square={true}
+                      variant="secondary"
+                      href={audioLink}
+                      download={audioLink}
+                      tooltip="Download"
+                    />
+                  </div>
+                )}
+              </div>
 
               <Panel className="rounded">
                 <div className="d-flex gap-2 p-3">
@@ -443,8 +450,11 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               {mediaFile?.maybe_model_weight_info && (
                 <Panel className="rounded">
                   <div className="d-flex flex-column gap-2 p-3">
-                    <h6 className="fw-medium mb-0">Weight Used</h6>
-                    <hr className="my-1" />
+                    <div>
+                      <h6 className="fw-medium mb-0">Weight Used</h6>
+                      <hr className="mt-3 mb-2" />
+                    </div>
+
                     <div className="d-flex align-items-center">
                       <WeightCoverImage
                         src={weightUsedCoverImage}
@@ -455,7 +465,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                         <Link
                           to={`/weight/${mediaFile?.maybe_model_weight_info.weight_token}`}
                         >
-                          <h6 className="mb-1">
+                          <h6 className="mb-1 two-line-ellipsis">
                             {mediaFile?.maybe_model_weight_info.title}
                           </h6>
                         </Link>
@@ -463,6 +473,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
                           by{" "}
                           <Link
                             to={`/profile/${mediaFile?.maybe_model_weight_info.maybe_weight_creator.username}`}
+                            className="fw-medium text-white"
                           >
                             {
                               mediaFile?.maybe_model_weight_info
@@ -478,13 +489,66 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
 
               <Accordion>
                 <Accordion.Item title="Media Details" defaultOpen={true}>
-                  { !!mediaDetails && <DataTable {...{
-                    data: mediaDetails
-                  }} /> }
+                  {!!mediaDetails && (
+                    <DataTable
+                      {...{
+                        data: mediaDetails,
+                      }}
+                    />
+                  )}
                 </Accordion.Item>
 
                 {modMediaDetails}
               </Accordion>
+
+              <Panel className="p-3 rounded">
+                <div className="d-flex flex-column gap-3">
+                  <div>
+                    <h6 className="fw-medium mb-0">Share Media</h6>
+                    <hr className="mt-3 mb-0" />
+                  </div>
+
+                  <div className="d-flex justify-content-between flex-wrap">
+                    <SocialButton
+                      social="x"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="whatsapp"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="facebook"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="reddit"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                    <SocialButton
+                      social="email"
+                      shareUrl={shareUrl}
+                      shareText={shareText}
+                    />
+                  </div>
+                  <div className="d-flex gap-2">
+                    <div className="flex-grow-1">
+                      <Input type="text" value={shareUrl} readOnly />
+                    </div>
+
+                    <Button
+                      icon={faLink}
+                      label={buttonLabel}
+                      onClick={handleCopyLink}
+                      variant="primary"
+                    />
+                  </div>
+                </div>
+              </Panel>
             </div>
           </div>
         </div>
@@ -496,64 +560,12 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
             <h4 className="fw-semibold mb-3">Comments</h4>
             <CommentComponent
               entityType="user"
-              entityToken={mediaFile?.token || "" }
+              entityToken={mediaFile?.token || ""}
               sessionWrapper={sessionWrapper}
             />
           </Panel>
         </Container>
-      </div>
-
-      {/* Share Modal */}
-      <Modal
-        show={isShareModalOpen}
-        handleClose={closeShareModal}
-        title="Share"
-        autoWidth={true}
-        showButtons={false}
-        content={() =>
-          <div className="d-flex flex-column gap-4">
-            <div className="d-flex gap-3">
-              <SocialButton
-                social="x"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="whatsapp"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="facebook"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="reddit"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-              <SocialButton
-                social="email"
-                shareUrl={shareUrl}
-                shareText={shareText}
-              />
-            </div>
-            <div className="d-flex gap-2">
-              <div className="flex-grow-1">
-                <Input type="text" value={shareUrl} readOnly />
-              </div>
-
-              <Button
-                icon={faLink}
-                label={buttonLabel}
-                onClick={handleCopyLink}
-                variant="primary"
-              />
-            </div>
-          </div>
-        }
-      />
+      </div>  
     </div>
   );
 }

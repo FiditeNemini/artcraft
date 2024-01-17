@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
-import { useLoginModal, useSession } from "hooks";
+import { useLoginModal } from "hooks";
 
 interface Props {
   checker: any,
@@ -32,7 +32,7 @@ export default function useBatchContent({
   resultsKey,
   toggleCheck
 }: Props) {
-  const { user } = useSession();
+  // const { user } = useSession();
   const login = useLoginModal();
   const [library, librarySet] = useState<Library>({});
   const [busyList, busyListSet] = useState<Library>({});
