@@ -11,22 +11,27 @@ pub struct BatchEntry {
   pub entity: BatchGenerationEntity,
 }
 
-pub struct InsertBatchArgs<'a> {
-  pub entries: Vec<BatchEntry>,
-  pub transaction: &'a mut Transaction<'a, MySql>,
+pub struct InsertBatchArgs<'a, 'b> {
+  pub entries: Vec<BatchGenerationEntity>,
+  pub transaction: &'a mut Transaction<'b, MySql>,
 }
 
-/// NB: Caller is responsible for rolling back the transaction if this fails.
-pub async fn insert_batch_generation_records(args: InsertBatchArgs<'_>) -> AnyhowResult<()> {
+/// Insert a list of entities into a "batch" together for grouping; returns the new batch token identifier to return
+/// to the HTTP caller.
+///
+/// NB: Calling code is responsible for rolling back the transaction if this fails.
+pub async fn insert_batch_generation_records<'a, 'b>(args: InsertBatchArgs<'a, 'b>) -> AnyhowResult<BatchGenerationToken> {
+  let batch_token = BatchGenerationToken::generate();
+
   let mut query_builder = QueryBuilder::new(r#"
     INSERT INTO batch_generations (token, entity_type, entity_token) VALUES
   "#);
 
   for (i, entry) in args.entries.iter().enumerate() {
-    let (entity_type, entity_token) = entry.entity.get_composite_keys();
+    let (entity_type, entity_token) = entry.get_composite_keys();
 
     query_builder.push("(");
-    query_builder.push_bind(&entry.batch_token);
+    query_builder.push_bind(&batch_token);
     query_builder.push(",");
 
     query_builder.push_bind(entity_type);
@@ -45,10 +50,49 @@ pub async fn insert_batch_generation_records(args: InsertBatchArgs<'_>) -> Anyho
   let query_result  = query.execute(&mut **args.transaction).await;
 
   match query_result {
-    Ok(_) => Ok(()),
+    Ok(_) => Ok(batch_token),
     Err(err) => {
       error!("Error with batch generation query: {:?}", &err);
       Err(anyhow!("model category creation error: {:?}", &err))
     },
+  }
+}
+
+#[ignore]
+#[cfg(test)]
+mod tests {
+
+  use sqlx::mysql::MySqlPoolOptions;
+  use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
+  use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
+  use tokens::tokens::media_files::MediaFileToken;
+  use crate::queries::batch_generations::insert_batch_generation_records::{insert_batch_generation_records, InsertBatchArgs};
+
+  async fn setup() -> sqlx::Pool<sqlx::MySql> {
+    MySqlPoolOptions::new()
+        .max_connections(3)
+        .connect(&DEFAULT_MYSQL_CONNECTION_STRING).await
+        .unwrap()
+  }
+
+  #[ignore]
+  #[tokio::test]
+  async fn test() {
+    let pool = setup().await;
+
+    let mut transaction = pool.begin().await.unwrap();
+
+    let entries = vec![
+      BatchGenerationEntity::MediaFile(MediaFileToken::new_from_str("media_foo")),
+      BatchGenerationEntity::MediaFile(MediaFileToken::new_from_str("media_bar")),
+      BatchGenerationEntity::MediaFile(MediaFileToken::new_from_str("media_baz")),
+    ];
+
+    let r = insert_batch_generation_records(InsertBatchArgs {
+      entries,
+      transaction: &mut transaction,
+    }).await;
+
+    transaction.commit().await.unwrap();
   }
 }
