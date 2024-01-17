@@ -62,7 +62,7 @@ import HttpBackend from "i18next-http-backend";
 
 import {
   InferenceJobs,
-  Session as SessionProvider,
+  SessionProvider,
 } from "components/providers";
 
 // NB: We're transitioning over to this instance of i18n-next that loads translations over HTTP from Json Files.

@@ -1,5 +1,5 @@
 import AccountModalProvider from "./AccountModalProvider";
 import InferenceJobs from "./InferenceJobs";
-import Session from "./Session";
+import SessionProvider from "./SessionProvider";
 
-export { AccountModalProvider, InferenceJobs, Session };
+export { AccountModalProvider, InferenceJobs, SessionProvider };

@@ -1,12 +1,6 @@
 import { useState } from "react";
 import { InputValidation, InputStateLibrary, ValidatorCallbacks } from "common/InputValidation";
 
-// interface Props {
-//   errorStrings: { [key:string]: { [error:string]: string } },
-//   state: { [key:string]: any },
-//   validators: { [key: string]: (value:any) => any }
-// }
-
 interface InputInput {
   errorText?: { [key: string]: string },
   validator?: (value: ValidatorCallbacks) => ValidatorOutput,
@@ -49,7 +43,6 @@ export default function useChanger(input: Props) {
     const config = input[name];
     const current = state[name];
     if (config && current) {
-      console.log("🍇",config.errorText,current);
       return {
         name,
         value: current.value,
