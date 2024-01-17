@@ -37,7 +37,7 @@ export default function LoginView({ animating, errorType = "", handleClose, logi
       </div>
     </header>
     { errorType ? <p  {...{ className: "error-message" }}>{ errorStrings[Object.keys(ErrorTypes).indexOf(errorType)] }</p> : null }
-    <TempInput {...{ icon: faUser, label: "Username or email", placeholder: "Username", ...loginProps("username") }}/>
+    <TempInput {...{ icon: faUser, label: "Username or email", placeholder: "Username", ...loginProps("usernameOrEmail") }}/>
     <TempInput {...{ icon: faKey, label: "Password", placeholder: "Enter your password", type: "password", ...loginProps("password") }}/>
     <button {...{ className: "btn btn-primary w-100 mt-4", disabled: animating, onClick: login }}>Login</button>
   </div>;

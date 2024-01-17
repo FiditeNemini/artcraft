@@ -35,9 +35,6 @@ const Modal: React.FC<ModalProps> = ({
   const fadeIn = useSpring({
     opacity: show ? 1 : 0,
     config: { duration: 80, easing: t => t },
-    // onRest: () => {
-    //   if (!show) handleClose();
-    // },
   });
 
   useEffect(() => {

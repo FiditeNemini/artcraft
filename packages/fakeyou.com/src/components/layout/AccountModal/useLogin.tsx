@@ -18,7 +18,6 @@ export default function useLogin({ onSuccess, status, statusSet }: Props) {
   });
 
   const login = () => {
-    console.log("🐊",);
     errorTypeSet("");
     statusSet(FetchStatus.in_progress);
     // if (allAreValid()) {
@@ -26,7 +25,6 @@ export default function useLogin({ onSuccess, status, statusSet }: Props) {
         username_or_email: state.usernameOrEmail.value,
         password: state.password.value,
       }).then((res: CreateSessionResponse) => {
-        console.log("🦋",res);
         if (!res.success && res.error_type) {
           statusSet(FetchStatus.error);
           errorTypeSet(res.error_type);

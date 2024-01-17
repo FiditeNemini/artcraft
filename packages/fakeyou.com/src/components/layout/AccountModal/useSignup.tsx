@@ -171,47 +171,41 @@ export default function useSignup({ onSuccess, status, statusSet }: Props) {
   });
 
   const signup = () => {
-    console.log("🐊",);
     statusSet(FetchStatus.in_progress);
-    // if (allAreValid()) {
-      CreateAccount("",{
-        username: state.username.value,
-        email_address: state.email.value,
-        password: state.password.value,
-        password_confirmation: state.passwordConfirm.value,
-      }).then((res: CreateAccountResponse) => {
-        console.log("🦋",res);
-        // let updates = {}
-        if (res && res.error_fields && res.error_type) {
-        	statusSet(FetchStatus.error);
-          if (res.error_fields.email_address) {
-            console.log("🍟",res.error_type);
-            switch (res.error_type) {
-              case "BadInput": return update({ name: "email", reason: EmailReasons.BadInput, validation: InputValidation.Invalid });
-              case "EmailTaken": return update({ name: "email", reason: EmailReasons.EmailTaken, validation: InputValidation.Invalid });
-            }
-            return;
-          } else if (res.error_fields.password) {
-            switch (res.error_type) {
-              case "TooShort": update({ name: "password", reason: PasswordReasons.TooShort, validation: InputValidation.Invalid });
-            } 
-          } else if (res.error_fields?.username) {
-            let updateUsername = (reason: UsernameReasons) => update({ reason, name: "username", validation: InputValidation.Invalid });
-            switch (res.error_fields.username) {
-              case "invalid username characters": return updateUsername(UsernameReasons.InvalidCharacters);
-              case "username is too long": return updateUsername(UsernameReasons.TooLong);
-              case "username is taken": return updateUsername(UsernameReasons.IsTaken);
-              case "username is reserved": return updateUsername(UsernameReasons.IsReserved);
-              case "username contains slurs": return updateUsername(UsernameReasons.ContainsSlurs);
-            } 
+    CreateAccount("",{
+      username: state.username.value,
+      email_address: state.email.value,
+      password: state.password.value,
+      password_confirmation: state.passwordConfirm.value,
+    }).then((res: CreateAccountResponse) => {
+      if (res && res.error_fields && res.error_type) {
+      	statusSet(FetchStatus.error);
+        if (res.error_fields.email_address) {
+          switch (res.error_type) {
+            case "BadInput": return update({ name: "email", reason: EmailReasons.BadInput, validation: InputValidation.Invalid });
+            case "EmailTaken": return update({ name: "email", reason: EmailReasons.EmailTaken, validation: InputValidation.Invalid });
           }
-        } else if (res.success) {
-          statusSet(FetchStatus.success);
-          querySession();
-          if (onSuccess) onSuccess(res);
-        } 
-      });
-    // }
+          return;
+        } else if (res.error_fields.password) {
+          switch (res.error_type) {
+            case "TooShort": update({ name: "password", reason: PasswordReasons.TooShort, validation: InputValidation.Invalid });
+          } 
+        } else if (res.error_fields?.username) {
+          let updateUsername = (reason: UsernameReasons) => update({ reason, name: "username", validation: InputValidation.Invalid });
+          switch (res.error_fields.username) {
+            case "invalid username characters": return updateUsername(UsernameReasons.InvalidCharacters);
+            case "username is too long": return updateUsername(UsernameReasons.TooLong);
+            case "username is taken": return updateUsername(UsernameReasons.IsTaken);
+            case "username is reserved": return updateUsername(UsernameReasons.IsReserved);
+            case "username contains slurs": return updateUsername(UsernameReasons.ContainsSlurs);
+          } 
+        }
+      } else if (res.success) {
+        statusSet(FetchStatus.success);
+        querySession();
+        if (onSuccess) onSuccess(res);
+      } 
+    });
   };
 
   return { allAreValid, setProps, signup, state, update };
