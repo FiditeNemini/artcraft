@@ -257,6 +257,7 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
                 onChange,
                 thumbTip: "CFG Scale",
                 value: cfgScale,
+                step: 0.5,
               }}
             />
 
@@ -333,6 +334,7 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
         showButtons={false}
         padding={false}
         large={true}
+        position="top"
       />
     </Panel>
   );

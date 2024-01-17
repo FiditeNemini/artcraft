@@ -17,6 +17,7 @@ interface ModalProps {
   showButtons?: boolean;
   padding?: boolean;
   large?: boolean;
+  position?: "center" | "top";
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -31,6 +32,7 @@ const Modal: React.FC<ModalProps> = ({
   showButtons = true,
   padding = true,
   large = false,
+  position = "center",
 }) => {
   const fadeIn = useSpring({
     opacity: show ? 1 : 0,
@@ -75,9 +77,11 @@ const Modal: React.FC<ModalProps> = ({
     <a.div style={fadeIn} className="modal-backdrop">
       <div className="modal" role="dialog">
         <div
-          className={`modal-dialog modal-dialog-centered ${
-            large ? "modal-width-large" : ""
-          } ${autoWidth ? "modal-width-auto" : ""}`.trim()}
+          className={`modal-dialog ${
+            position === "center" ? "modal-dialog-centered" : ""
+          } ${large ? "modal-xl" : ""} ${
+            autoWidth ? "modal-width-auto" : ""
+          }`.trim()}
         >
           <div className="modal-content">
             <div className="modal-header">
