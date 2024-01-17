@@ -58,6 +58,7 @@ export default function WeightsTab() {
     { value: "sd_1.5", label: "sd_1.5" },
     { value: "sdxl", label: "sdxl" },
     { value: "so_vits_svc", label: "so_vits_svc" },
+    { value: "rvc_v2", label: "rvc_v2" },
     { value: "tt2", label: "tt2" },
     { value: "loRA", label: "loRA" },
     //{ value: "vall_e", label: "vall_e" }, // NB(brandon,2024-01-17): Not supported
