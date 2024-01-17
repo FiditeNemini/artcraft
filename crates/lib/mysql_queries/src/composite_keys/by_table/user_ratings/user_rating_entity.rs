@@ -39,4 +39,13 @@ impl UserRatingEntity {
       UserRatingEntity::W2lTemplate(token) => token.as_str(),
     }
   }
+
+  pub fn get_composite_keys(&self) -> (UserRatingEntityType, &str) {
+    match self {
+      UserRatingEntity::MediaFile(token) => (UserRatingEntityType::MediaFile, token.as_str()),
+      UserRatingEntity::ModelWeight(token) => (UserRatingEntityType::ModelWeight, token.as_str()),
+      UserRatingEntity::TtsModel(token) => (UserRatingEntityType::TtsModel, token.as_str()),
+      UserRatingEntity::W2lTemplate(token) => (UserRatingEntityType::W2lTemplate, token.as_str()),
+    }
+  }
 }

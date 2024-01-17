@@ -18,8 +18,9 @@ use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_files::list::list_media_files::{list_media_files, ListMediaFilesArgs};
 use tokens::tokens::media_files::MediaFileToken;
 
-use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
+use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -44,19 +45,30 @@ pub struct ListMediaFilesSuccessResponse {
 pub struct MediaFileListItem {
   pub token: MediaFileToken,
 
+  pub media_type: MediaFileType,
+
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
   pub origin_category: MediaFileOriginCategory,
+
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
   pub origin_product_category: MediaFileOriginProductCategory,
 
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
   pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
+
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
   pub maybe_origin_model_token: Option<String>,
 
-  pub media_type: MediaFileType,
+  /// Details where the media file came from.
+  pub origin: MediaFileOriginDetails,
 
   /// URL to the media file.
   pub public_bucket_path: String,
 
   pub maybe_creator: Option<UserDetailsLight>,
-  pub maybe_social_meta: Option<MediaFileSocialMetaLight>,
+
+  /// Statistics about the media file
+  pub stats: SimpleEntityStats,
 
   pub creator_set_visibility: Visibility,
 
@@ -191,11 +203,17 @@ pub async fn list_media_files_handler(
   let results = results_page.records.into_iter()
       .map(|record| MediaFileListItem {
         token: record.token.clone(),
+        media_type: record.media_type,
+        origin: MediaFileOriginDetails::from_db_fields_str(
+          record.origin_category,
+          record.origin_product_category,
+          record.maybe_origin_model_type,
+          record.maybe_origin_model_token.as_deref(),
+          record.maybe_origin_model_title.as_deref()),
         origin_category: record.origin_category,
         origin_product_category: record.origin_product_category,
         maybe_origin_model_type: record.maybe_origin_model_type,
         maybe_origin_model_token: record.maybe_origin_model_token,
-        media_type: record.media_type,
         public_bucket_path: MediaFileBucketPath::from_object_hash(
           &record.public_bucket_directory_hash,
           record.maybe_public_bucket_prefix.as_deref(),
@@ -208,10 +226,10 @@ pub async fn list_media_files_handler(
           record.maybe_creator_display_name,
           record.maybe_creator_gravatar_hash,
         ),
-        maybe_social_meta: Option::from(MediaFileSocialMetaLight::from_db_fields(
-            record.favorite_count,
-            record.comment_count,
-        )),
+        stats: SimpleEntityStats {
+          positive_rating_count: record.maybe_ratings_positive_count.unwrap_or(0),
+          bookmark_count: record.maybe_bookmark_count.unwrap_or(0),
+        },
         creator_set_visibility: record.creator_set_visibility,
         created_at: record.created_at,
         updated_at: record.updated_at,

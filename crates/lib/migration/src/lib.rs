@@ -4,7 +4,8 @@
 //!
 
 // Never allow these
-#![forbid(private_in_public)]
+#![forbid(private_bounds)]
+#![forbid(private_interfaces)]
 #![forbid(unused_must_use)] // NB: It's unsafe to not close/check some things
 
 // Okay to toggle
@@ -17,4 +18,5 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+pub mod text_to_speech;
 pub mod voice_conversion;

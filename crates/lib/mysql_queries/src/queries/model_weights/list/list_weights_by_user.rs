@@ -55,13 +55,11 @@ pub struct WeightsJoinUserRecord {
     pub maybe_cover_image_public_bucket_hash: Option<String>,
     pub maybe_cover_image_public_bucket_prefix: Option<String>,
     pub maybe_cover_image_public_bucket_extension: Option<String>,
-    
-    pub cached_user_ratings_total_count: u32,
-    pub cached_user_ratings_positive_count: u32,
-    pub cached_user_ratings_negative_count: u32,
-    pub maybe_cached_user_ratings_ratio: Option<f32>,
-    pub cached_user_ratings_last_updated_at: DateTime<Utc>,
-    
+
+    pub maybe_ratings_positive_count: Option<u32>,
+    pub maybe_ratings_negative_count: Option<u32>,
+    pub maybe_bookmark_count: Option<u32>,
+
     pub version: i32,
     
     pub created_at: DateTime<Utc>,
@@ -165,11 +163,10 @@ fn select_result_fields() -> String {
         cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,
         cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,
 
-        mw.cached_user_ratings_negative_count,
-        mw.cached_user_ratings_positive_count,
-        mw.cached_user_ratings_total_count,
-        mw.maybe_cached_user_ratings_ratio,
-        mw.cached_user_ratings_last_updated_at,
+        entity_stats.ratings_positive_count as maybe_ratings_positive_count,
+        entity_stats.ratings_negative_count as maybe_ratings_negative_count,
+        entity_stats.bookmark_count as maybe_bookmark_count,
+
         mw.version,
         mw.created_at,
         mw.updated_at,
@@ -200,6 +197,9 @@ JOIN users as u
     ON u.token = mw.creator_user_token
 LEFT OUTER JOIN media_files as cover_image
     ON cover_image.token = mw.maybe_cover_image_media_file_token
+LEFT OUTER JOIN entity_stats
+    ON entity_stats.entity_type = "model_weights"
+    AND entity_stats.entity_token = mw.token
     "#
         ));
 
@@ -272,12 +272,10 @@ async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRe
                 maybe_cover_image_public_bucket_prefix: weight.maybe_cover_image_public_bucket_prefix,
                 maybe_cover_image_public_bucket_extension: weight.maybe_cover_image_public_bucket_extension,
 
-                cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
-                cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
-                cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
+                maybe_ratings_positive_count: weight.maybe_ratings_positive_count,
+                maybe_ratings_negative_count: weight.maybe_ratings_negative_count,
+                maybe_bookmark_count: weight.maybe_bookmark_count,
 
-                maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
-                cached_user_ratings_last_updated_at: weight.cached_user_ratings_last_updated_at,
                 version: weight.version,
                 created_at: weight.created_at,
                 updated_at: weight.updated_at,
@@ -327,12 +325,10 @@ async fn map_to_weights(dataset:Vec<RawWeightJoinUser>) -> Vec<WeightsJoinUserRe
     pub maybe_cover_image_public_bucket_prefix: Option<String>,
     pub maybe_cover_image_public_bucket_extension: Option<String>,
 
-    pub cached_user_ratings_total_count: u32,
-    pub cached_user_ratings_positive_count: u32,
-    pub cached_user_ratings_negative_count: u32,
-    pub maybe_cached_user_ratings_ratio: Option<f32>,
-    pub cached_user_ratings_last_updated_at: DateTime<Utc>,
-    
+    pub maybe_ratings_positive_count: Option<u32>,
+    pub maybe_ratings_negative_count: Option<u32>,
+    pub maybe_bookmark_count: Option<u32>,
+
     pub version: i32,
     
     pub created_at: DateTime<Utc>,
@@ -371,11 +367,9 @@ impl FromRow<'_, MySqlRow> for RawWeightJoinUser {
             maybe_cover_image_public_bucket_hash: row.try_get("maybe_cover_image_public_bucket_hash")?,
             maybe_cover_image_public_bucket_prefix: row.try_get("maybe_cover_image_public_bucket_prefix")?,
             maybe_cover_image_public_bucket_extension: row.try_get("maybe_cover_image_public_bucket_extension")?,
-            cached_user_ratings_total_count: row.try_get("cached_user_ratings_total_count")?,
-            cached_user_ratings_positive_count: row.try_get("cached_user_ratings_positive_count")?,
-            cached_user_ratings_negative_count: row.try_get("cached_user_ratings_negative_count")?,
-            maybe_cached_user_ratings_ratio: row.try_get("maybe_cached_user_ratings_ratio")?,
-            cached_user_ratings_last_updated_at: row.try_get("cached_user_ratings_last_updated_at")?,
+            maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
+            maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,
+            maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,
             version: row.try_get("version")?,
             created_at: row.try_get("created_at")?,
             updated_at: row.try_get("updated_at")?,

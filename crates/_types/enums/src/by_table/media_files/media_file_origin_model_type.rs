@@ -20,6 +20,7 @@ pub enum MediaFileOriginModelType {
   RvcV2,
 
   /// SadTalker -- v1, we may add another enum value for future versions
+  #[serde(rename = "sad_talker")]
   SadTalker,
 
   /// so-vits-svc voice conversion models
@@ -34,6 +35,12 @@ pub enum MediaFileOriginModelType {
 
   #[serde(rename = "rerender")]
   Rerender,
+
+  #[serde(rename = "mocap_net")]
+  MocapNet,
+
+  #[serde(rename = "styletts2")]
+  StyleTTS2,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -51,6 +58,8 @@ impl MediaFileOriginModelType {
       Self::Tacotron2 => "tacotron2",
       Self::VallEX => "vall_e_x",
       Self::Rerender => "rerender",
+      Self::MocapNet => "mocap_net",
+      Self::StyleTTS2 => "styletts2",
     }
   }
 
@@ -62,6 +71,8 @@ impl MediaFileOriginModelType {
       "tacotron2" => Ok(Self::Tacotron2),
       "vall_e_x" => Ok(Self::VallEX),
       "rerender" => Ok(Self::Rerender),
+      "mocap_net" => Ok(Self::MocapNet),
+      "styletts2" => Ok(Self::StyleTTS2),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -76,6 +87,8 @@ impl MediaFileOriginModelType {
       Self::Tacotron2,
       Self::VallEX,
       Self::Rerender,
+      Self::MocapNet,
+      Self::StyleTTS2,
     ])
   }
 }
@@ -101,6 +114,8 @@ mod tests {
       assert_eq!(MediaFileOriginModelType::Tacotron2.to_str(), "tacotron2");
       assert_eq!(MediaFileOriginModelType::VallEX.to_str(), "vall_e_x");
       assert_eq!(MediaFileOriginModelType::Rerender.to_str(), "rerender");
+      assert_eq!(MediaFileOriginModelType::MocapNet.to_str(), "mocap_net");
+      assert_eq!(MediaFileOriginModelType::StyleTTS2.to_str(), "styletts2");
   }
 
     #[test]
@@ -111,19 +126,23 @@ mod tests {
       assert_eq!(MediaFileOriginModelType::from_str("tacotron2").unwrap(), MediaFileOriginModelType::Tacotron2);
       assert_eq!(MediaFileOriginModelType::from_str("vall_e_x").unwrap(), MediaFileOriginModelType::VallEX);
       assert_eq!(MediaFileOriginModelType::from_str("rerender").unwrap(), MediaFileOriginModelType::Rerender);
+      assert_eq!(MediaFileOriginModelType::from_str("mocap_net").unwrap(), MediaFileOriginModelType::MocapNet);
+      assert_eq!(MediaFileOriginModelType::from_str("styletts2").unwrap(), MediaFileOriginModelType::StyleTTS2);
       assert!(MediaFileOriginModelType::from_str("foo").is_err());
     }
 
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginModelType::all_variants();
-      assert_eq!(variants.len(), 6);
+      assert_eq!(variants.len(), 8);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::RvcV2));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SadTalker));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SoVitsSvc));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::Tacotron2));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::VallEX));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::Rerender));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::MocapNet));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::StyleTTS2));
       assert_eq!(variants.pop_first(), None);
     }
   }

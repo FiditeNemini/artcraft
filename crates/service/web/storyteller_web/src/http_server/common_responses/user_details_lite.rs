@@ -2,8 +2,8 @@ use utoipa::ToSchema;
 
 use tokens::tokens::users::UserToken;
 
-use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use crate::util::placeholder_images::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::util::placeholder_images::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 /// Everything we need to refer to a user on the public web interface.
 #[derive(Clone, Serialize, ToSchema)]

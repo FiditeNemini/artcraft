@@ -18,6 +18,7 @@ pub struct InsertArgs<'a> {
   pub pool: &'a MySqlPool,
   pub job: &'a AvailableInferenceJob,
 
+  pub origin_model_type: MediaFileOriginModelType,
   pub maybe_mime_type: Option<&'a str>,
   pub file_size_bytes: u64,
   pub sha256_checksum: &'a str,
@@ -69,7 +70,6 @@ pub async fn insert_media_file_from_zero_shot(
     // Since fill this out apart of the funtion this seems like the only thing to change.
     const ORIGIN_CATEGORY : MediaFileOriginCategory = MediaFileOriginCategory::Inference;
     const ORIGIN_PRODUCT_CATEGORY : MediaFileOriginProductCategory = MediaFileOriginProductCategory::ZeroShotVoice;
-    const ORIGIN_MODEL_TYPE : MediaFileOriginModelType = MediaFileOriginModelType::VallEX;
     const MEDIA_TYPE : MediaFileType = MediaFileType::Audio;
 
     let record_id = {
@@ -111,8 +111,8 @@ pub async fn insert_media_file_from_zero_shot(
     
           ORIGIN_CATEGORY.to_str(),
           ORIGIN_PRODUCT_CATEGORY.to_str(),
-          ORIGIN_MODEL_TYPE.to_str(),
-    
+          args.origin_model_type.to_str(),
+
           MEDIA_TYPE.to_str(),
           args.maybe_mime_type,
           args.file_size_bytes,

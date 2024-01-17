@@ -23,8 +23,8 @@ use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
 
 use crate::server_state::ServerState;
-use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use crate::util::placeholder_images::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::util::placeholder_images::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 // =============== Request ===============
 

@@ -2,6 +2,7 @@ use enums::by_table::generic_inference_jobs::inference_category::InferenceCatego
 use errors::AnyhowResult;
 
 use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
+use crate::payloads::generic_inference_args::mocap_payload::MocapArgs;
 use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
 use crate::payloads::generic_inference_args::videofilter_payload::RerenderArgs;
 use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
@@ -43,7 +44,11 @@ pub enum InferenceCategoryAbbreviated {
 
   #[serde(rename = "ig")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(alias = "image_generation")]
-  ImageGeneration
+  ImageGeneration,
+
+  #[serde(rename = "mc")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(alias = "mocap")]
+  Mocap,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]
@@ -98,7 +103,10 @@ pub enum PolymorphicInferenceArgs {
   Rr(RerenderArgs),
 
   /// Image generation. (Short name to save space when serializing.)
-  Ig(StableDiffusionArgs)
+  Ig(StableDiffusionArgs),
+
+  // Mocap (Short name to save space when serializing.)
+  Mc(MocapArgs)
 }
 
 impl GenericInferenceArgs {
@@ -120,6 +128,7 @@ impl InferenceCategoryAbbreviated {
       InferenceCategory::VoiceConversion => Self::VoiceConversion,
       InferenceCategory::VideoFilter => Self::VideoFilter,
       InferenceCategory::ImageGeneration => Self::ImageGeneration,
+      InferenceCategory::Mocap => Self::Mocap,
     }
   }
 
@@ -130,6 +139,7 @@ impl InferenceCategoryAbbreviated {
       Self::VoiceConversion => InferenceCategory::VoiceConversion,
       Self::VideoFilter => InferenceCategory::VideoFilter,
       Self::ImageGeneration =>InferenceCategory::ImageGeneration
+      Self::Mocap => InferenceCategory::Mocap,
     }
   }
 }
@@ -208,18 +218,20 @@ mod tests {
       args: Some(PolymorphicInferenceArgs::Ig(StableDiffusionArgs {
         maybe_sd_model_token: Some(sd_model_token),
         maybe_lora_model_token: Some(lora_model_token),
+        maybe_sampler: Some("sampler".as_ref()),
         maybe_height: Some(512),
         maybe_width: Some(512),
         maybe_cfg_scale: Some(7),
         maybe_prompt: Some(prompt),
         maybe_n_prompt: Some(n_prompt),
         maybe_batch_count: Some(1),
-        maybe_batch_size: Some(1),
         maybe_number_of_samples: Some(25),
         maybe_seed: Some(seed),
         maybe_upload_path: Some(upload_path),
         maybe_lora_upload_path: Some(lora_upload_path),
-        type_of_inference: type_of_inference
+        type_of_inference: type_of_inference,
+        description: Some("Option".as_ref()),
+        title: Some("Model Name".as_ref())
       })),
     };
 

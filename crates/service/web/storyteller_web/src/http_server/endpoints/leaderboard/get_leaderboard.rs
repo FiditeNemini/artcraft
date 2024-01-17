@@ -20,8 +20,8 @@ use tokens::tokens::users::UserToken;
 use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
-use crate::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use crate::util::placeholder_images::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::util::placeholder_images::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 #[derive(Serialize)]
 pub struct LeaderboardResponse {

@@ -74,18 +74,18 @@ impl std::fmt::Display for GetUserRatingError {
 
 
 #[utoipa::path(
-get,
-path = "/v1/user_rating/view/{entity_type}/{entity_token}",
-params(
-("entity_type", description = "The type of the entity being rated."),
-("entity_token", description = "Entity token"),
-),
-responses(
-(status = 200, description = "List User Bookmarks", body = GetUserRatingResponse),
-(status = 400, description = "Bad input", body = GetUserRatingError),
-(status = 401, description = "Not authorized", body = GetUserRatingError),
-(status = 500, description = "Server error", body = GetUserRatingError),
-),
+  get,
+  path = "/v1/user_rating/view/{entity_type}/{entity_token}",
+  params(
+    ("entity_type", description = "The type of the entity being rated."),
+    ("entity_token", description = "Entity token"),
+  ),
+  responses(
+    (status = 200, description = "List User Bookmarks", body = GetUserRatingResponse),
+    (status = 400, description = "Bad input", body = GetUserRatingError),
+    (status = 401, description = "Not authorized", body = GetUserRatingError),
+    (status = 500, description = "Server error", body = GetUserRatingError),
+  ),
 )]
 pub async fn get_user_rating_handler(
   http_request: HttpRequest,

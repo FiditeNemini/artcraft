@@ -12,7 +12,7 @@ use crate::helpers::boolean_converters::i8_to_bool;
 // FIXME: This is the old style of query scoping and shouldn't be copied.
 
 // TODO/FIXME : This struct is returned publicly in some endpoints!
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct TtsModelRecordForList {
   pub model_token: String,
   pub tts_model_type: String,

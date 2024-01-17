@@ -54,6 +54,7 @@ use crate::http_server::endpoints::misc::detect_locale_handler::detect_locale_ha
 use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha_easy_handler;
 use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
 use crate::http_server::endpoints::misc::root_index::get_root_index;
+use crate::http_server::endpoints::mocap::enqueue_mocapnet::enqueue_mocapnet_handler;
 use crate::http_server::endpoints::moderation::approval::pending_w2l_templates::get_pending_w2l_templates_handler;
 use crate::http_server::endpoints::moderation::categories::delete_category::delete_category_handler;
 use crate::http_server::endpoints::moderation::categories::edit_category::edit_category_handler;
@@ -108,11 +109,13 @@ use crate::http_server::endpoints::twitch::oauth::check_oauth_status::check_oaut
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_json::oauth_begin_enroll_json;
 use crate::http_server::endpoints::twitch::oauth::oauth_begin_redirect::oauth_begin_enroll_redirect;
 use crate::http_server::endpoints::twitch::oauth::oauth_end::oauth_end_enroll_from_redirect;
+use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler;
 use crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::delete_user_bookmark_handler;
 use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_entity_handler::list_user_bookmarks_for_entity_handler;
 use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_session_handler::list_user_bookmarks_for_session_handler;
 use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_handler::list_user_bookmarks_for_user_handler;
+use crate::http_server::endpoints::user_ratings::batch_get_user_rating_handler::batch_get_user_rating_handler;
 use crate::http_server::endpoints::user_ratings::get_user_rating_handler::get_user_rating_handler;
 use crate::http_server::endpoints::user_ratings::set_user_rating_handler::set_user_rating_handler;
 use crate::http_server::endpoints::vocoders::get_vocoder::get_vocoder_handler;
@@ -160,6 +163,7 @@ use crate::http_server::endpoints::weights::get_weight::get_weight_handler;
 use crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler;
 use crate::http_server::endpoints::weights::list_featured_weights::list_featured_weights_handler;
 use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler;
+use crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler;
 use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
 use crate::http_server::endpoints::image_gen::enqueue_image_generation::enqueue_image_generation_request;
@@ -211,6 +215,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   // ==================== User Bookmarks ====================
 
   let mut app = RouteBuilder::from_app(app)
+      .add_get("/v1/user_bookmarks/batch", batch_get_user_bookmarks_handler)
       .add_post("/v1/user_bookmarks/create", create_user_bookmark_handler)
       .add_post("/v1/user_bookmarks/delete/{user_bookmark_token}", delete_user_bookmark_handler)
       .add_get("/v1/user_bookmarks/list/session", list_user_bookmarks_for_session_handler)
@@ -224,6 +229,11 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   let mut app = RouteBuilder::from_app(app)
       .add_post("/v1/animation/face_animation/create", enqueue_face_animation_handler)
       .add_post("/v1/animation/rerender/create", enqueue_rerender_animation_handler)
+      .into_app();
+
+  // ==================== Mocap ========================
+  let mut app = RouteBuilder::from_app(app)
+      .add_post("/v1/mocap/mocapnet/create", enqueue_mocapnet_handler)
       .into_app();
 
   // ==================== "Generic" Inference ====================
@@ -1114,6 +1124,10 @@ fn add_user_rating_routes<T, B> (app: App<T>) -> App<T>
       >,
 {
   app.service(web::scope("/v1/user_rating")
+      .service(web::resource("/batch")
+          .route(web::get().to(batch_get_user_rating_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
       .service(web::resource("/rate")
           .route(web::post().to(set_user_rating_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
@@ -1306,6 +1320,10 @@ fn add_weights_routes<T, B>(app: App<T>) -> App<T>
                 .route(web::get().to(get_weight_handler))
                 .route(web::post().to(update_weight_handler))
                 .route(web::delete().to(delete_weight_handler))
+            )
+            .service(web::resource("/search")
+                .route(web::post().to(search_model_weights_handler))
+                .route(web::head().to(|| HttpResponse::Ok()))
             )
             .service(web::resource("/weight/{token}/cover_image")
                 .route(web::post().to(set_model_weight_cover_image_handler))

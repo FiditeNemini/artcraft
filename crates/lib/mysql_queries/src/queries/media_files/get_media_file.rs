@@ -52,6 +52,10 @@ pub struct MediaFile {
   pub maybe_public_bucket_prefix: Option<String>,
   pub maybe_public_bucket_extension: Option<String>,
 
+  pub maybe_ratings_positive_count: Option<u32>,
+  pub maybe_ratings_negative_count: Option<u32>,
+  pub maybe_bookmark_count: Option<u32>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 
@@ -106,6 +110,10 @@ pub struct MediaFileRaw {
   //pub model_is_mod_approved: bool, // converted
   //pub maybe_mod_user_token: Option<String>,
 
+  pub maybe_ratings_positive_count: Option<u32>,
+  pub maybe_ratings_negative_count: Option<u32>,
+  pub maybe_bookmark_count: Option<u32>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -154,6 +162,9 @@ pub async fn get_media_file(
     public_bucket_directory_hash: record.public_bucket_directory_hash,
     maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
     maybe_public_bucket_extension: record.maybe_public_bucket_extension,
+    maybe_ratings_positive_count: record.maybe_ratings_positive_count,
+    maybe_ratings_negative_count: record.maybe_ratings_negative_count,
+    maybe_bookmark_count: record.maybe_bookmark_count,
     created_at: record.created_at,
     updated_at: record.updated_at,
   }))
@@ -196,6 +207,10 @@ SELECT
     m.maybe_public_bucket_prefix,
     m.maybe_public_bucket_extension,
 
+    entity_stats.ratings_positive_count as maybe_ratings_positive_count,
+    entity_stats.ratings_negative_count as maybe_ratings_negative_count,
+    entity_stats.bookmark_count as maybe_bookmark_count,
+
     m.created_at,
     m.updated_at
 
@@ -208,6 +223,9 @@ LEFT OUTER JOIN media_files as cover_image
     ON cover_image.token = model_weights.maybe_cover_image_media_file_token
 LEFT OUTER JOIN users as model_weight_creator
     ON model_weight_creator.token = model_weights.creator_user_token
+LEFT OUTER JOIN entity_stats
+    ON entity_stats.entity_type = "media_file"
+    AND entity_stats.entity_token = m.token
 WHERE
     m.token = ?
         "#,
@@ -254,6 +272,10 @@ SELECT
     m.maybe_public_bucket_prefix,
     m.maybe_public_bucket_extension,
 
+    entity_stats.ratings_positive_count as maybe_ratings_positive_count,
+    entity_stats.ratings_negative_count as maybe_ratings_negative_count,
+    entity_stats.bookmark_count as maybe_bookmark_count,
+
     m.created_at,
     m.updated_at
 
@@ -266,6 +288,9 @@ LEFT OUTER JOIN media_files as cover_image
     ON cover_image.token = model_weights.maybe_cover_image_media_file_token
 LEFT OUTER JOIN users as model_weight_creator
     ON model_weight_creator.token = model_weights.creator_user_token
+LEFT OUTER JOIN entity_stats
+    ON entity_stats.entity_type = "media_file"
+    AND entity_stats.entity_token = m.token
 WHERE
     m.token = ?
     AND m.user_deleted_at IS NULL

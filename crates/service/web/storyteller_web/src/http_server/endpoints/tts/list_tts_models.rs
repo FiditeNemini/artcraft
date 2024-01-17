@@ -16,10 +16,11 @@ use log::{error, info, warn};
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
 
+use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use migration::text_to_speech::list_tts_models_for_migration::list_tts_models_for_migration;
 use mysql_queries::queries::tts::tts_category_assignments::fetch_and_build_tts_model_category_map::fetch_and_build_tts_model_category_map_with_connection;
-use mysql_queries::queries::tts::tts_models::list_tts_models::list_tts_models_with_connection;
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -133,7 +134,7 @@ pub async fn list_tts_models_handler(
           })?;
 
       // TODO: Fail open in case the DB is down. Pull from expired cache if query fails.
-      let models = get_all_models(&mut mysql_connection)
+      let models = get_all_models(&mut mysql_connection, server_state.flags.switch_tts_to_model_weights)
           .await
           .map_err(|e| {
             error!("Error querying database: {:?}", e);
@@ -212,47 +213,44 @@ pub fn render_response_payload(response: ListTtsModelsSuccessResponse) -> Result
   Ok(body)
 }
 
-async fn get_all_models(mysql_connection: &mut PoolConnection<MySql>) -> AnyhowResult<Vec<TtsModelRecordForResponse>> {
-  let mut models = list_tts_models_with_connection(
-    mysql_connection,
-    None,
-    false
-  ).await?;
+async fn get_all_models(mysql_connection: &mut PoolConnection<MySql>, use_weights_table: bool) -> AnyhowResult<Vec<TtsModelRecordForResponse>> {
+  let mut models = list_tts_models_for_migration(mysql_connection, use_weights_table).await?;
+
+  // Make the list nice for human readers.
+  models.sort_by(|a, b|
+      natural_lexical_cmp(&a.title(), &b.title()));
 
   let model_categories_map
       = fetch_and_build_tts_model_category_map_with_connection(mysql_connection).await?;
 
-  // Make the list nice for human readers.
-  models.sort_by(|a, b|
-      natural_lexical_cmp(&a.title, &b.title));
-
   let models_for_response = models.into_iter()
       .map(|model| {
-        let model_token = model.model_token.clone();
+        // NB: All the cloning is just for the migration of tts_models --> model_weights
+        let model_token = model.token().to_string();
         TtsModelRecordForResponse {
-          model_token: model.model_token,
-          tts_model_type: model.tts_model_type,
-          creator_user_token: model.creator_user_token,
-          creator_username: model.creator_username,
-          creator_display_name: model.creator_display_name,
-          creator_gravatar_hash: model.creator_gravatar_hash,
-          title: model.title,
-          ietf_language_tag: model.ietf_language_tag,
-          ietf_primary_language_subtag: model.ietf_primary_language_subtag,
-          is_front_page_featured: model.is_front_page_featured,
-          is_twitch_featured: model.is_twitch_featured,
-          maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
-          creator_set_visibility: model.creator_set_visibility,
+          model_token: model.token().to_string(),
+          tts_model_type: TtsModelType::Tacotron2.to_string(), // NB(bt): We only ever supported the TT2 value
+          creator_user_token: model.creator_user_token().to_string(),
+          creator_username: model.creator_username().to_string(),
+          creator_display_name: model.creator_display_name().to_string(),
+          creator_gravatar_hash: model.creator_gravatar_hash().to_string(),
+          title: model.title().to_string(),
+          ietf_language_tag: model.ietf_language_tag().to_string(),
+          ietf_primary_language_subtag: model.ietf_primary_language_subtag().to_string(),
+          is_front_page_featured: model.is_front_page_featured(),
+          is_twitch_featured: false, // NB: This is no longer used.
+          maybe_suggested_unique_bot_command: None, // NB: This is no longer used.
+          creator_set_visibility: model.creator_set_visibility(),
           user_ratings: UserRatingsStats {
-            positive_count: model.user_ratings_positive_count,
-            negative_count: model.user_ratings_negative_count,
-            total_count: model.user_ratings_total_count,
+            positive_count: model.user_ratings_positive_count(),
+            negative_count: model.user_ratings_negative_count(),
+            total_count: model.user_ratings_total_count(),
           },
           category_tokens: model_categories_map.model_to_category_tokens.get(&model_token)
               .map(|hash| hash.clone())
               .unwrap_or(HashSet::new()),
-          created_at: model.created_at,
-          updated_at: model.updated_at,
+          created_at: model.created_at().clone(),
+          updated_at: model.updated_at().clone(),
         }
       })
       .collect::<Vec<TtsModelRecordForResponse>>();

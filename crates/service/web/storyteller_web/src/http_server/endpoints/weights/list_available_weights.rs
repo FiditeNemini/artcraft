@@ -16,8 +16,10 @@ use enums::by_table::model_weights::{
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::list::list_weights_query_builder::ListWeightsQueryBuilder;
 use tokens::tokens::model_weights::ModelWeightToken;
+use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
 
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
@@ -55,7 +57,11 @@ pub struct ModelWeightForList {
 
     /// Cover images are small descriptive images that can be set for any model.
     /// If a cover image is set, this is the path to the asset.
+    #[deprecated(note="switch to CoverImageDetails")]
     pub maybe_cover_image_public_bucket_path: Option<String>,
+
+    /// Information about the cover image.
+    pub cover_image: CoverImageDetails,
 
     pub creator: UserDetailsLight,
     pub creator_set_visibility: Visibility,
@@ -63,22 +69,20 @@ pub struct ModelWeightForList {
     pub file_size_bytes: i32,
     pub file_checksum_sha2: String,
 
-    pub cached_user_ratings_total_count: u32,
-    pub cached_user_ratings_positive_count: u32,
-    pub cached_user_ratings_negative_count: u32,
-    pub maybe_cached_user_ratings_ratio: Option<f32>,
+    #[deprecated(note="switch to UserDetailsLight")]
+    pub creator_username: String,
+
+    #[deprecated(note="switch to UserDetailsLight")]
+    pub creator_display_name: String,
+
+    #[deprecated(note="switch to UserDetailsLight")]
+    pub creator_email_gravatar_hash: String,
+
+    /// Statistics about the weights
+    pub stats: SimpleEntityStats,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-
-    pub creator_username: String,
-    pub creator_display_name: String,
-    pub creator_email_gravatar_hash: String,
-
-    // additional fields to be added when tables are around
-    pub likes: u32,
-    pub bookmarks: bool,
-
 }
 
 #[derive(Debug,ToSchema)]
@@ -205,6 +209,12 @@ pub async fn list_available_weights_handler(
         success: true,
         results: weights_page.weights.into_iter()
             .map(|weight| {
+                let cover_image_details = CoverImageDetails::from_optional_db_fields(
+                    &weight.token,
+                    weight.maybe_cover_image_public_bucket_hash.as_deref(),
+                    weight.maybe_cover_image_public_bucket_prefix.as_deref(),
+                    weight.maybe_cover_image_public_bucket_extension.as_deref(),
+                );
 
                 let maybe_cover_image = weight.maybe_cover_image_public_bucket_hash
                     .as_deref()
@@ -224,6 +234,7 @@ pub async fn list_available_weights_handler(
                     weight_category: weight.weights_category,
 
                     maybe_cover_image_public_bucket_path: maybe_cover_image,
+                    cover_image: cover_image_details,
 
                     creator: UserDetailsLight::from_db_fields(
                         &weight.creator_user_token,
@@ -236,21 +247,17 @@ pub async fn list_available_weights_handler(
                     file_size_bytes: weight.file_size_bytes,
                     file_checksum_sha2: weight.file_checksum_sha2,
 
-                    cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
-                    cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
-                    cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
-                    maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
-
-                    created_at: weight.created_at,
-                    updated_at: weight.updated_at,
-
                     creator_username: weight.creator_username,
                     creator_display_name: weight.creator_display_name,
                     creator_email_gravatar_hash: weight.creator_email_gravatar_hash,
 
-                    // TODO: FIX THIS when we align again.
-                    bookmarks: random_bool,
-                    likes: rng.gen_range(0..1000),
+                    stats: SimpleEntityStats {
+                        positive_rating_count: weight.maybe_ratings_positive_count.unwrap_or(0),
+                        bookmark_count: weight.maybe_bookmark_count.unwrap_or(0),
+                    },
+
+                    created_at: weight.created_at,
+                    updated_at: weight.updated_at,
                 }
             }).collect::<Vec<_>>(),
         pagination: PaginationCursors {

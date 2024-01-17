@@ -30,8 +30,12 @@ pub struct MediaFileListItem {
 
   pub origin_category: MediaFileOriginCategory,
   pub origin_product_category: MediaFileOriginProductCategory,
+
   pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
   pub maybe_origin_model_token: Option<String>,
+
+  // NB: The title won't be populated for `tts_models` records or non-`model_weights` records.
+  pub maybe_origin_model_title: Option<String>,
 
   pub media_type: MediaFileType,
   pub public_bucket_directory_hash: String,
@@ -45,8 +49,15 @@ pub struct MediaFileListItem {
 
   pub creator_set_visibility: Visibility,
 
+  #[deprecated(note = "more expensive to query")]
   pub comment_count: u64,
+
+  #[deprecated(note = "more expensive to query")]
   pub favorite_count: u64,
+
+  pub maybe_ratings_positive_count: Option<u32>,
+  pub maybe_ratings_negative_count: Option<u32>,
+  pub maybe_bookmark_count: Option<u32>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -91,6 +102,7 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
           origin_product_category: record.origin_product_category,
           maybe_origin_model_type: record.maybe_origin_model_type,
           maybe_origin_model_token: record.maybe_origin_model_token,
+          maybe_origin_model_title: record.maybe_origin_model_title,
           media_type: record.media_type,
           public_bucket_directory_hash: record.public_bucket_directory_hash,
           maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
@@ -102,6 +114,9 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
           creator_set_visibility: record.creator_set_visibility,
           comment_count: record.comment_count as u64,
           favorite_count: record.favorite_count as u64,
+          maybe_ratings_positive_count: record.maybe_ratings_positive_count,
+          maybe_ratings_negative_count: record.maybe_ratings_negative_count,
+          maybe_bookmark_count: record.maybe_bookmark_count,
           created_at: record.created_at,
           updated_at: record.updated_at,
         }
@@ -133,13 +148,15 @@ SELECT
   m.id,
   m.token,
 
+  m.media_type,
+
   m.origin_category,
   m.origin_product_category,
 
   m.maybe_origin_model_type,
   m.maybe_origin_model_token,
 
-  m.media_type,
+  w.title as maybe_origin_model_title,
 
   m.public_bucket_directory_hash,
   m.maybe_public_bucket_prefix,
@@ -149,6 +166,11 @@ SELECT
   u.username as maybe_creator_username,
   u.display_name as maybe_creator_display_name,
   u.email_gravatar_hash as maybe_creator_gravatar_hash,
+
+
+  entity_stats.ratings_positive_count as maybe_ratings_positive_count,
+  entity_stats.ratings_negative_count as maybe_ratings_negative_count,
+  entity_stats.bookmark_count as maybe_bookmark_count,
 
   m.creator_set_visibility,
   m.created_at,
@@ -161,10 +183,15 @@ FROM media_files AS m
 
 LEFT OUTER JOIN users AS u
     ON m.maybe_creator_user_token = u.token
+LEFT OUTER JOIN model_weights as w
+     ON m.maybe_origin_model_token = w.token
 LEFT OUTER JOIN favorites as f
     ON f.entity_type = 'media_file' AND f.entity_token = m.token
 LEFT OUTER JOIN comments as c
     ON c.entity_type = 'media_file' AND c.entity_token  = c.token
+LEFT OUTER JOIN entity_stats
+    ON entity_stats.entity_type = "media_file"
+    AND entity_stats.entity_token = m.token
     "#
   );
 
@@ -251,6 +278,7 @@ struct MediaFileListItemInternal {
   origin_product_category: MediaFileOriginProductCategory,
   maybe_origin_model_type: Option<MediaFileOriginModelType>,
   maybe_origin_model_token: Option<String>,
+  maybe_origin_model_title: Option<String>,
 
   media_type: MediaFileType,
   public_bucket_directory_hash: String,
@@ -266,6 +294,10 @@ struct MediaFileListItemInternal {
 
   comment_count: i64,
   favorite_count: i64,
+
+  maybe_ratings_positive_count: Option<u32>,
+  maybe_ratings_negative_count: Option<u32>,
+  maybe_bookmark_count: Option<u32>,
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
@@ -295,6 +327,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       origin_product_category: MediaFileOriginProductCategory::try_from_mysql_row(row, "origin_product_category")?,
       maybe_origin_model_type: MediaFileOriginModelType::try_from_mysql_row_nullable(row, "maybe_origin_model_type")?,
       maybe_origin_model_token: row.try_get("maybe_origin_model_token")?,
+      maybe_origin_model_title: row.try_get("maybe_origin_model_title")?,
       media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
       public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
@@ -308,6 +341,9 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       updated_at: row.try_get("updated_at")?,
       comment_count: row.try_get("comment_count")?,
       favorite_count: row.try_get("favorite_count")?,
+      maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
+      maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,
+      maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,
     })
   }
 }

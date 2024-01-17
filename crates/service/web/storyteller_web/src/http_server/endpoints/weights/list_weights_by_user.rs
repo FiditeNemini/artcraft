@@ -16,12 +16,14 @@ use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::list::list_weights_by_user::{list_weights_by_creator_username, ListWeightsForUserArgs};
 use tokens::tokens::model_weights::ModelWeightToken;
+use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
 
 use crate::http_server::common_responses::pagination_page::PaginationPage;
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
-#[derive(Serialize, Clone,ToSchema)]
+#[derive(Serialize, Clone, ToSchema)]
 pub struct Weight {
   weight_token: ModelWeightToken,
   title: String,
@@ -38,16 +40,16 @@ pub struct Weight {
   file_size_bytes: i32,
   file_checksum_sha2: String,
 
+  /// Information about the cover image.
+  cover_image: CoverImageDetails,
+
   /// Cover images are small descriptive images that can be set for any model.
   /// If a cover image is set, this is the path to the asset.
+  #[deprecated(note="switch to CoverImageDetails")]
   maybe_cover_image_public_bucket_path: Option<String>,
 
-  cached_user_ratings_total_count: u32,
-  cached_user_ratings_positive_count: u32,
-  cached_user_ratings_negative_count: u32,
-
-  maybe_cached_user_ratings_ratio: Option<f32>,
-  cached_user_ratings_last_updated_at: DateTime<Utc>,
+  /// Statistics about the weights
+  stats: SimpleEntityStats,
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
@@ -182,7 +184,14 @@ pub async fn list_weights_by_user_handler(
     }
   };
 
-  let weights:Vec<Weight> = results_page.records.into_iter().map(|weight| {
+  let weights: Vec<Weight> = results_page.records.into_iter().map(|weight| {
+
+    let cover_image_details = CoverImageDetails::from_optional_db_fields(
+      &weight.token,
+      weight.maybe_cover_image_public_bucket_hash.as_deref(),
+      weight.maybe_cover_image_public_bucket_prefix.as_deref(),
+      weight.maybe_cover_image_public_bucket_extension.as_deref(),
+    );
 
     let maybe_cover_image = weight.maybe_cover_image_public_bucket_hash
         .as_deref()
@@ -206,20 +215,19 @@ pub async fn list_weights_by_user_handler(
         &weight.creator_display_name,
         &weight.creator_email_gravatar_hash,
       ),
+      cover_image: cover_image_details,
       maybe_cover_image_public_bucket_path: maybe_cover_image,
       file_size_bytes: weight.file_size_bytes,
       file_checksum_sha2: weight.file_checksum_sha2,
-      cached_user_ratings_total_count: weight.cached_user_ratings_total_count,
-      cached_user_ratings_positive_count: weight.cached_user_ratings_positive_count,
-      cached_user_ratings_negative_count: weight.cached_user_ratings_negative_count,
-      maybe_cached_user_ratings_ratio: weight.maybe_cached_user_ratings_ratio,
-      cached_user_ratings_last_updated_at: weight.cached_user_ratings_last_updated_at,
       creator_set_visibility: weight.creator_set_visibility,
+      stats: SimpleEntityStats {
+        positive_rating_count: weight.maybe_ratings_positive_count.unwrap_or(0),
+        bookmark_count: weight.maybe_bookmark_count.unwrap_or(0),
+      },
       created_at: weight.created_at,
       updated_at: weight.updated_at,
     }
   }).collect();
-
 
   let response: ListWeightsByUserSuccessResponse = ListWeightsByUserSuccessResponse {
     success: true,

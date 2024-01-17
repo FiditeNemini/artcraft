@@ -5,8 +5,7 @@ use filesys::file_size::file_size;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 
-use crate::remote_file_manager::bucket_orchestration::BucketOrchestrationCore;
-use crate::remote_file_manager::bucket_orchestration::BucketOrchestration;
+use crate::remote_file_manager::bucket_orchestration::{BucketOrchestration, BucketOrchestrationCore};
 use crate::remote_file_manager::file_directory::FileBucketDirectory;
 use crate::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 

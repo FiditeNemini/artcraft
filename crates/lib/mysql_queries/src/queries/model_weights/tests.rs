@@ -80,10 +80,10 @@ mod tests {
             public_bucket_hash: "bucket_hash1".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("rvc".to_string()),
-            cached_user_ratings_total_count: 10,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 1,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 10,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 1,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 1,
             mysql_pool: &pool, // replace with actual MySqlPool
         };
@@ -115,10 +115,6 @@ mod tests {
         assert_eq!(result.public_bucket_hash, "bucket_hash1".to_string());
         assert_eq!(result.maybe_public_bucket_prefix, Some("_fake".to_string()));
         assert_eq!(result.maybe_public_bucket_extension, Some("rvc".to_string()));
-        assert_eq!(result.cached_user_ratings_total_count, 10);
-        assert_eq!(result.cached_user_ratings_positive_count, 9);
-        assert_eq!(result.cached_user_ratings_negative_count, 1);
-        assert_eq!(result.maybe_cached_user_ratings_ratio, Some(0.9));
         assert_eq!(result.version, 1);
 
         Ok(())
@@ -153,10 +149,10 @@ mod tests {
             public_bucket_hash: "bucket_hash1".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("rvc".to_string()),
-            cached_user_ratings_total_count: 10,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 1,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 10,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 1,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 1,
             mysql_pool: &pool, // replace with actual MySqlPool
         };
@@ -229,10 +225,10 @@ mod tests {
             public_bucket_hash: "bucket_hash1".to_string(),
             maybe_public_bucket_prefix: Some("_fake".to_string()),
             maybe_public_bucket_extension: Some("rvc".to_string()),
-            cached_user_ratings_total_count: 10,
-            cached_user_ratings_positive_count: 9,
-            cached_user_ratings_negative_count: 1,
-            maybe_cached_user_ratings_ratio: Some(0.9),
+            //cached_user_ratings_total_count: 10,
+            //cached_user_ratings_positive_count: 9,
+            //cached_user_ratings_negative_count: 1,
+            //maybe_cached_user_ratings_ratio: Some(0.9),
             version: 1,
             mysql_pool: &pool, // replace with actual MySqlPool
         };
@@ -294,6 +290,8 @@ mod tests {
             page_index: 0,
             sort_ascending: false,
             view_as,
+            maybe_scoped_weight_type: None,
+            maybe_scoped_weight_category: None,
             mysql_pool: &pool,
             maybe_scoped_weight_type: None,
             maybe_scoped_weight_category: None,
@@ -345,10 +343,10 @@ mod tests {
                 public_bucket_hash: format!("bucket_hash{}", i),
                 maybe_public_bucket_prefix: Some("_fake".to_string()),
                 maybe_public_bucket_extension: Some("rvc".to_string()),
-                cached_user_ratings_total_count: 10,
-                cached_user_ratings_positive_count: 9,
-                cached_user_ratings_negative_count: 1,
-                maybe_cached_user_ratings_ratio: Some(0.9),
+                //cached_user_ratings_total_count: 10,
+                //cached_user_ratings_positive_count: 9,
+                //cached_user_ratings_negative_count: 1,
+                //maybe_cached_user_ratings_ratio: Some(0.9),
                 version: 1,
                 mysql_pool: &pool, // replace with actual MySqlPool
             };
@@ -587,10 +585,10 @@ mod tests {
                 public_bucket_hash: format!("bucket_hash{}", i),
                 maybe_public_bucket_prefix: Some("_fake".to_string()),
                 maybe_public_bucket_extension: Some("rvc".to_string()),
-                cached_user_ratings_total_count: 10,
-                cached_user_ratings_positive_count: 9,
-                cached_user_ratings_negative_count: 1,
-                maybe_cached_user_ratings_ratio: Some(0.9),
+                //cached_user_ratings_total_count: 10,
+                //cached_user_ratings_positive_count: 9,
+                //cached_user_ratings_negative_count: 1,
+                //maybe_cached_user_ratings_ratio: Some(0.9),
                 version: 1,
                 mysql_pool: &pool, // replace with actual MySqlPool
             };

@@ -25,6 +25,10 @@ pub enum IdCategory {
   #[serde(rename = "video_filter")]
   VideoFilterResult,
 
+  // Results from mocap
+  #[serde(rename = "mocap")]
+  MocapResult,
+
   /// Results from tacotron2
   /// Applies for RVC and SVC
   #[serde(rename = "tts_result")]
@@ -73,6 +77,7 @@ impl IdCategory {
       Self::VideoFilterResult => "video_filter",
       Self::ModelWeights => "model_weights",
       Self::FileUpload => "file_upload",
+      Self::MocapResult => "mocap",
     }
   }
 
@@ -88,6 +93,7 @@ impl IdCategory {
       "video_filter" => Ok(Self::VideoFilterResult),
       "model_weights" => Ok(Self::ModelWeights),
       "file_upload" => Ok(Self::FileUpload),
+      "mocap" => Ok(Self::MocapResult),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -106,6 +112,7 @@ impl IdCategory {
       Self::ZeroShotVoiceEmbedding,
       Self::ModelWeights,
       Self::FileUpload,
+      Self::MocapResult,
     ])
   }
 }
@@ -130,6 +137,7 @@ mod tests {
     assert_serialization(IdCategory::ZeroShotTtsResult, "zs_tts_result");
     assert_serialization(IdCategory::ModelWeights, "model_weights");
     assert_serialization(IdCategory::FileUpload, "file_upload");
+    assert_serialization(IdCategory::MocapResult, "mocap");
   }
 
     #[test]
@@ -144,6 +152,7 @@ mod tests {
       assert_eq!(IdCategory::ZeroShotTtsResult.to_str(), "zs_tts_result");
       assert_eq!(IdCategory::ModelWeights.to_str(), "model_weights");
       assert_eq!(IdCategory::FileUpload.to_str(), "file_upload");
+      assert_eq!(IdCategory::MocapResult.to_str(), "mocap");
     }
 
     #[test]
@@ -158,16 +167,18 @@ mod tests {
       assert_eq!(IdCategory::from_str("zs_tts_result").unwrap(), IdCategory::ZeroShotTtsResult);
       assert_eq!(IdCategory::from_str("model_weights").unwrap(), IdCategory::ModelWeights);
       assert_eq!(IdCategory::from_str("file_upload").unwrap(), IdCategory::FileUpload);
+      assert_eq!(IdCategory::from_str("mocap").unwrap(), IdCategory::MocapResult);
     }
 
     #[test]
     fn all_variants() {
       // Static check
       let mut variants = IdCategory::all_variants();
-      assert_eq!(variants.len(), 10);
+      assert_eq!(variants.len(), 11);
       assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
       assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimationResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::VideoFilterResult));
+      assert_eq!(variants.pop_first(), Some(IdCategory::MocapResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::TtsResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::VoiceConversionResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotTtsResult));

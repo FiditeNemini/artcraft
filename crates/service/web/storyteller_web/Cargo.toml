@@ -24,6 +24,7 @@ actix_helpers = { path = "../../../lib/actix_helpers" }
 bootstrap = { path = "../../../lib/bootstrap" }
 buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
+composite_identifiers = { path = "../../../_types/composite_identifiers" }
 config = { path = "../../../lib/deprecated/config" }
 container_common = { path = "../../../lib/deprecated/container_common" }
 cookies = { path = "../../../lib/cookies" }
@@ -134,6 +135,7 @@ actix-rt = "2.9.0"
 actix-service = "2.0.2"
 actix-utils = "3.0.1"
 actix-web = "4.4.0"
+actix-web-lab = "0.20.1"
 jwt = "0.13.0"
 
 # NB: Hyper is just for HTTP client use in jobs. I'd use Actix client, but I need tokio runtime

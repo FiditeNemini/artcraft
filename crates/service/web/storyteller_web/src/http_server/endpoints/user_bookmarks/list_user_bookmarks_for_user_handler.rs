@@ -19,10 +19,11 @@ use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
-use mysql_queries::queries::user_bookmarks::list_user_bookmarks::{list_user_bookmarks_by_maybe_entity_type, ListUserBookmarksForUserArgs};
+use mysql_queries::queries::users::user_bookmarks::list_user_bookmarks::{list_user_bookmarks_by_maybe_entity_type, ListUserBookmarksForUserArgs};
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
 
 use crate::http_server::common_responses::pagination_page::PaginationPage;
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -91,6 +92,9 @@ pub struct UserBookmarkDetailsForUserList {
 
   /// This is only populated if the item is a model weight.
   pub maybe_weight_data: Option<WeightsData>,
+
+  /// Statistics about the bookmarked item
+  pub stats: SimpleEntityStats,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -261,6 +265,11 @@ pub async fn list_user_bookmarks_for_user_handler(
               // TODO(bt,2023-11-21): Thumbnails need proper support. We should build them as a
               //  first-class system before handling the backfill here.
               maybe_thumbnail_url: None,
+
+              stats: SimpleEntityStats {
+                positive_rating_count: user_bookmark.maybe_ratings_positive_count.unwrap_or(0),
+                bookmark_count: user_bookmark.maybe_bookmark_count.unwrap_or(0),
+              },
             },
             created_at: user_bookmark.created_at,
             updated_at: user_bookmark.updated_at,

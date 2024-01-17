@@ -7,15 +7,17 @@ use chrono::{DateTime, Utc};
 use log::{debug, error, warn};
 use r2d2_redis::redis::Commands;
 use utoipa::ToSchema;
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::model_weights::{
   weights_category::WeightsCategory,
   weights_types::WeightsType,
 };
 use mysql_queries::queries::model_weights::list::list_weights_by_tokens::list_weights_by_tokens;
 use tokens::tokens::model_weights::ModelWeightToken;
+use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
 
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
@@ -36,14 +38,16 @@ pub struct ModelWeightForList {
 
   pub creator: UserDetailsLight,
 
+  /// Information about the cover image.
+  pub cover_image: CoverImageDetails,
+
   /// Cover images are small descriptive images that can be set for any model.
   /// If a cover image is set, this is the path to the asset.
+  #[deprecated(note="switch to CoverImageDetails")]
   pub maybe_cover_image_public_bucket_path: Option<String>,
 
-  pub cached_user_ratings_total_count: u32,
-  pub cached_user_ratings_positive_count: u32,
-  pub cached_user_ratings_negative_count: u32,
-  pub maybe_cached_user_ratings_ratio: Option<f32>,
+  /// Statistics about the weights
+  pub stats: SimpleEntityStats,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -129,6 +133,12 @@ pub async fn list_featured_weights_handler(
     success: true,
     results: weights.into_iter()
         .map(|w| {
+          let cover_image_details = CoverImageDetails::from_optional_db_fields(
+            &w.token,
+            w.maybe_cover_image_public_bucket_hash.as_deref(),
+            w.maybe_cover_image_public_bucket_prefix.as_deref(),
+            w.maybe_cover_image_public_bucket_extension.as_deref(),
+          );
 
           let maybe_cover_image = w.maybe_cover_image_public_bucket_hash
               .as_deref()
@@ -146,6 +156,7 @@ pub async fn list_featured_weights_handler(
             title: w.title,
             weight_type: w.weights_type,
             weight_category: w.weights_category,
+            cover_image: cover_image_details,
             maybe_cover_image_public_bucket_path: maybe_cover_image,
             creator: UserDetailsLight::from_db_fields(
               &w.creator_user_token,
@@ -153,10 +164,10 @@ pub async fn list_featured_weights_handler(
               &w.creator_display_name,
               &w.creator_email_gravatar_hash
             ),
-            cached_user_ratings_total_count: w.cached_user_ratings_total_count,
-            cached_user_ratings_positive_count: w.cached_user_ratings_positive_count,
-            cached_user_ratings_negative_count: w.cached_user_ratings_negative_count,
-            maybe_cached_user_ratings_ratio: w.maybe_cached_user_ratings_ratio,
+            stats: SimpleEntityStats {
+              positive_rating_count: w.maybe_ratings_positive_count.unwrap_or(0),
+              bookmark_count: w.maybe_bookmark_count.unwrap_or(0),
+            },
             created_at: w.created_at,
             updated_at: w.updated_at,
           }

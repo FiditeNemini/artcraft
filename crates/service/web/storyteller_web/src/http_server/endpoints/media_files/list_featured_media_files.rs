@@ -15,7 +15,9 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use mysql_queries::queries::media_files::list::list_media_files_by_tokens::list_media_files_by_tokens;
 use tokens::tokens::media_files::MediaFileToken;
+use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
@@ -36,12 +38,25 @@ pub struct MediaFile {
   /// URL to the media file
   pub public_bucket_path: String,
 
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
   pub origin_category: MediaFileOriginCategory,
+
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
   pub origin_product_category: MediaFileOriginProductCategory,
+
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
   pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
+
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
   pub maybe_origin_model_token: Option<String>,
 
+  /// Details where the media file came from.
+  pub origin: MediaFileOriginDetails,
+
   pub maybe_creator: Option<UserDetailsLight>,
+
+  /// Statistics about the media file
+  pub stats: SimpleEntityStats,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -138,6 +153,12 @@ pub async fn list_featured_media_files_handler(
             token: m.token,
             media_type: m.media_type,
             public_bucket_path,
+            origin: MediaFileOriginDetails::from_db_fields_str(
+              m.origin_category,
+              m.origin_product_category,
+              m.maybe_origin_model_type,
+              m.maybe_origin_model_token.as_deref(),
+              m.maybe_origin_model_title.as_deref()),
             origin_category: m.origin_category,
             origin_product_category: m.origin_product_category,
             maybe_origin_model_type: m.maybe_origin_model_type,
@@ -148,6 +169,10 @@ pub async fn list_featured_media_files_handler(
               m.maybe_creator_display_name,
               m.maybe_creator_email_gravatar_hash
             ),
+            stats: SimpleEntityStats {
+              positive_rating_count: m.maybe_ratings_positive_count.unwrap_or(0),
+              bookmark_count: m.maybe_bookmark_count.unwrap_or(0),
+            },
             created_at: m.created_at,
             updated_at: m.updated_at,
           }

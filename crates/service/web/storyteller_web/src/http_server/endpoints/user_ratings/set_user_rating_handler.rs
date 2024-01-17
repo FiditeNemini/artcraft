@@ -3,6 +3,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use actix_web::http::StatusCode;
 use log::{error, info, warn};
+use sqlx::Acquire;
 use utoipa::ToSchema;
 
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
@@ -10,6 +11,10 @@ use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::composite_keys::by_table::user_ratings::user_rating_entity::UserRatingEntity;
+use mysql_queries::queries::entity_stats::stats_entity_token::StatsEntityToken;
+use mysql_queries::queries::entity_stats::upsert_entity_stats_on_ratings_event::{RatingsAction, upsert_entity_stats_on_ratings_event, UpsertEntityStatsArgs};
+use mysql_queries::queries::users::user_ratings::get_total_user_rating_count_for_entity::get_total_user_rating_count_for_entity;
+use mysql_queries::queries::users::user_ratings::get_user_rating_transactional_locking::get_user_rating_transactional_locking;
 use mysql_queries::queries::users::user_ratings::update_tts_model_ratings::update_tts_model_ratings;
 use mysql_queries::queries::users::user_ratings::upsert_user_rating::{Args, upsert_user_rating};
 use tokens::tokens::media_files::MediaFileToken;
@@ -39,6 +44,10 @@ pub struct SetUserRatingRequest {
 #[derive(Serialize, ToSchema)]
 pub struct SetUserRatingResponse {
   pub success: bool,
+
+  /// This is the new positive rating count (across all users) for the entity in question.
+  /// This does not include negative ratings.
+  pub new_positive_rating_count_for_entity: usize,
 }
 
 // =============== Error Response ===============
@@ -151,12 +160,29 @@ pub async fn set_user_rating_handler(
       return Err(SetUserRatingError::BadInput("type not yet supported".to_string())),
   };
 
+  let mut transaction = mysql_connection.begin().await
+      .map_err(|err| {
+        error!("error creating transaction: {:?}", err);
+        SetUserRatingError::ServerError
+      })?;
+
+  let maybe_existing_user_rating = get_user_rating_transactional_locking(
+    &user_session.user_token_typed,
+    &entity,
+    &mut *transaction,
+  ).await
+      .map_err(|err| {
+        error!("error getting user rating: {:?}", err);
+        SetUserRatingError::ServerError
+      })?;
+
   let _r = upsert_user_rating(Args {
     user_token: &user_session.user_token_typed,
     user_rating_entity: &entity,
     user_rating_value: request.rating_value,
     ip_address: &ip_address,
-    mysql_connection: &mut mysql_connection
+    mysql_executor: &mut *transaction,
+    phantom: Default::default(),
   })
       .await
       .map_err(|err| {
@@ -164,6 +190,51 @@ pub async fn set_user_rating_handler(
         SetUserRatingError::ServerError
       })?;
 
+  let existing_rating_value = maybe_existing_user_rating
+      .map(|rating| rating.rating_value)
+      .unwrap_or(UserRatingValue::Neutral);
+
+  let mut maybe_rating_action =
+      match (existing_rating_value, request.rating_value) {
+        (UserRatingValue::Neutral, UserRatingValue::Neutral) => None,
+        (UserRatingValue::Neutral, UserRatingValue::Positive) => Some(RatingsAction::NeutralToPositive),
+        (UserRatingValue::Neutral, UserRatingValue::Negative) => Some(RatingsAction::NeutralToNegative),
+        (UserRatingValue::Positive, UserRatingValue::Neutral) => Some(RatingsAction::PositiveToNeutral),
+        (UserRatingValue::Positive, UserRatingValue::Positive) => None,
+        (UserRatingValue::Positive, UserRatingValue::Negative) => Some(RatingsAction::PositiveToNegative),
+        (UserRatingValue::Negative, UserRatingValue::Neutral) => Some(RatingsAction::NegativeToNeutral),
+        (UserRatingValue::Negative, UserRatingValue::Positive) => Some(RatingsAction::NeutralToPositive),
+        (UserRatingValue::Negative, UserRatingValue::Negative) => None,
+      };
+
+  if let Some(rating_action) = maybe_rating_action {
+
+    // NB: Not all rateable things have stats (eg. deprecated record types don't have stats).
+    let maybe_stats_entity_token =
+        StatsEntityToken::from_rating_entity_type_and_token(request.entity_type, &request.entity_token);
+
+    if let Some(stats_entity_token) = maybe_stats_entity_token {
+      upsert_entity_stats_on_ratings_event(UpsertEntityStatsArgs {
+        stats_entity_token: &stats_entity_token,
+        action: rating_action,
+        mysql_executor: &mut *transaction,
+        phantom: Default::default(),
+      })
+          .await
+          .map_err(|err| {
+            error!("Error upserting entity stats: {:?}", err);
+            SetUserRatingError::ServerError
+          })?;
+    }
+  }
+
+  transaction.commit().await
+      .map_err(|err| {
+        error!("error committing transaction: {:?}", err);
+        SetUserRatingError::ServerError
+      })?;
+
+  // NB: Legacy
   match request.entity_type {
     UserRatingEntityType::TtsModel => {
       let token = TtsModelToken::new_from_str(&request.entity_token);
@@ -179,8 +250,19 @@ pub async fn set_user_rating_handler(
     }
   }
 
+  // TODO(bt,2024-01-04): The methods of stats collection here differs.
+  //  Update this to return directly from the stats table instead of doing a COUNT(*).
+
+  let count = get_total_user_rating_count_for_entity(&entity, &mut mysql_connection)
+      .await
+      .map_err(|err| {
+        error!("Error getting total user rating count for entity: {:?}", err);
+        SetUserRatingError::ServerError
+      })?;
+
   let response = SetUserRatingResponse {
     success: true,
+    new_positive_rating_count_for_entity: count.positive_count,
   };
 
   let body = serde_json::to_string(&response)

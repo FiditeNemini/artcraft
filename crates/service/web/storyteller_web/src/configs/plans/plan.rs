@@ -52,6 +52,9 @@ pub struct Plan {
     // ========== Features for Videofilters ==========
     rerender_requires_frontend_keepalive: bool,
 
+    // ========== Features for Mocap ==========
+    mocapnet_requires_frontend_keepalive: bool,
+
     // ========== Features for TTS ==========
 
     tts_base_priority_level: u8,
@@ -95,6 +98,7 @@ impl Plan {
             is_synthetic_plan: builder.is_synthetic_plan,
             lipsync_requires_frontend_keepalive: builder.lipsync_requires_frontend_keepalive,
             rerender_requires_frontend_keepalive: builder.rerender_requires_frontend_keepalive,
+            mocapnet_requires_frontend_keepalive: builder.mocapnet_requires_frontend_keepalive,
             can_remove_visual_watermarks: builder.can_remove_visual_watermarks,
             tts_base_priority_level: builder.tts_base_priority_level,
             tts_max_duration: builder.tts_max_duration,
@@ -152,6 +156,10 @@ impl Plan {
 
     pub fn rerender_requires_frontent_keepalive(&self) -> bool {
         self.rerender_requires_frontend_keepalive
+    }
+
+    pub fn mocapnet_requires_frontend_keepalive(&self) -> bool {
+        self.mocapnet_requires_frontend_keepalive
     }
 
     pub fn can_remove_visual_watermarks(&self) -> bool {
@@ -232,6 +240,7 @@ pub struct PlanBuilder {
 
     w2l_max_duration: Duration,
     w2l_can_turn_off_watermark: bool,
+    mocapnet_requires_frontend_keepalive: bool,
 }
 
 impl PlanBuilder {
@@ -252,6 +261,9 @@ impl PlanBuilder {
 
             // Videofilters
             rerender_requires_frontend_keepalive: true,
+
+            // Mocapnet
+            mocapnet_requires_frontend_keepalive: true,
 
             // TTS
             tts_base_priority_level : TTS_DEFAULT_PRIORITY_LEVEL,
@@ -275,7 +287,7 @@ impl PlanBuilder {
 
             // W2L
             w2l_max_duration: Duration::seconds(W2L_DEFAULT_TIME_LIMIT_SECONDS),
-            w2l_can_turn_off_watermark: false
+            w2l_can_turn_off_watermark: false,
         }
     }
 

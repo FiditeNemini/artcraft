@@ -28,7 +28,7 @@ CREATE TABLE model_weights_extension_tts_details (
   -- live in the `storyteller-ml` repository.
   -- Older models and brand new models will have this field set to null, and we'll infer which value to
   -- lazily backfill based on the creation date and language setting.
-  -- tts_text_pipeline_type VARCHAR(64) DEFAULT NULL,
+  text_pipeline_type VARCHAR(64) DEFAULT NULL,
 
   -- If true, multiply the mel outputs before being vocoded by a globally default constant.
   use_default_mel_multiply_factor BOOLEAN NOT NULL DEFAULT FALSE,

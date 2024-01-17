@@ -3,7 +3,7 @@ use serde_json::{json, Value};
 
 use errors::AnyhowResult;
 
-use crate::documents::tts_model_document::TtsModelDocument;
+use crate::documents::tts_model_document::{TTS_MODEL_INDEX, TtsModelDocument};
 
 pub async fn search_tts_models(
   client: &Elasticsearch,
@@ -17,7 +17,7 @@ pub async fn search_tts_models(
   };
 
   let search_response = client
-      .search(SearchParts::None)
+      .search(SearchParts::Index(&[TTS_MODEL_INDEX]))
       .body(search_json)
       .allow_no_indices(true)
       .send()

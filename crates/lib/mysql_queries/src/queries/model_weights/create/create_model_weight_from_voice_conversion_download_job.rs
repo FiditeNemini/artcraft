@@ -81,12 +81,6 @@ SET
   maybe_public_bucket_prefix = ?,
   maybe_public_bucket_extension = ?,
 
-  cached_user_ratings_total_count = 0,
-  cached_user_ratings_positive_count = 0,
-  cached_user_ratings_negative_count = 0,
-  maybe_cached_user_ratings_ratio = 0.0,
-  cached_user_ratings_last_updated_at = NOW(),
-
   maybe_migration_old_model_token = ?
         "#,
       &weights_token,

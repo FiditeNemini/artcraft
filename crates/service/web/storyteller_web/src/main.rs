@@ -1,5 +1,6 @@
 // Never allow these
-#![forbid(private_in_public)]
+#![forbid(private_bounds)]
+#![forbid(private_interfaces)]
 #![forbid(unused_must_use)] // NB: It's unsafe to not close/check some things
 
 // Okay to toggle
@@ -99,7 +100,6 @@ pub mod routes;
 pub mod server_state;
 pub mod subscriptions;
 pub mod threads;
-pub mod user_avatars;
 pub mod util;
 pub mod validations;
 
@@ -359,6 +359,7 @@ async fn main() -> AnyhowResult<()> {
     // Temporary flags
     enable_enqueue_generic_tts_job: easyenv::get_env_bool_or_default("FF_ENABLE_ENQUEUE_GENERIC_TTS_JOB", false),
     switch_voice_conversion_to_model_weights: easyenv::get_env_bool_or_default("FF_SWITCH_VOICE_CONVERSION_TO_MODEL_WEIGHTS", false),
+    switch_tts_to_model_weights: easyenv::get_env_bool_or_default("FF_SWITCH_TTS_TO_MODEL_WEIGHTS", false),
   };
 
   let third_party_url_redirector = ThirdPartyUrlRedirector::new(server_environment);

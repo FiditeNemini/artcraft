@@ -43,11 +43,10 @@ pub struct RetrievedModelWeight {
     pub maybe_cover_image_public_bucket_prefix: Option<String>,
     pub maybe_cover_image_public_bucket_extension: Option<String>,
 
-    pub cached_user_ratings_negative_count: u32,
-    pub cached_user_ratings_positive_count: u32,
-    pub cached_user_ratings_total_count: u32,
-    pub maybe_cached_user_ratings_ratio: Option<f32>,
-    pub cached_user_ratings_last_updated_at: DateTime<Utc>,
+    pub maybe_ratings_positive_count: Option<u32>,
+    pub maybe_ratings_negative_count: Option<u32>,
+    pub maybe_bookmark_count: Option<u32>,
+
     pub version: i32,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -113,11 +112,9 @@ pub async fn get_weights_by_token_with_connection(
             maybe_cover_image_public_bucket_hash: record.maybe_cover_image_public_bucket_hash,
             maybe_cover_image_public_bucket_prefix: record.maybe_cover_image_public_bucket_prefix,
             maybe_cover_image_public_bucket_extension: record.maybe_cover_image_public_bucket_extension,
-            cached_user_ratings_negative_count: record.cached_user_ratings_negative_count,
-            cached_user_ratings_positive_count: record.cached_user_ratings_positive_count,
-            cached_user_ratings_total_count: record.cached_user_ratings_total_count,
-            maybe_cached_user_ratings_ratio: record.maybe_cached_user_ratings_ratio,
-            cached_user_ratings_last_updated_at: record.cached_user_ratings_last_updated_at,
+            maybe_ratings_positive_count: record.maybe_ratings_positive_count,
+            maybe_ratings_negative_count: record.maybe_ratings_negative_count,
+            maybe_bookmark_count: record.maybe_bookmark_count,
             version: record.version,
             created_at: record.created_at,
             updated_at: record.updated_at,
@@ -164,11 +161,10 @@ async fn select_include_deleted(
         cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,
         cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,
 
-        wt.cached_user_ratings_negative_count,
-        wt.cached_user_ratings_positive_count,
-        wt.cached_user_ratings_total_count,
-        wt.maybe_cached_user_ratings_ratio,
-        wt.cached_user_ratings_last_updated_at,
+        entity_stats.ratings_positive_count as maybe_ratings_positive_count,
+        entity_stats.ratings_negative_count as maybe_ratings_negative_count,
+        entity_stats.bookmark_count as maybe_bookmark_count,
+
         wt.version,
         wt.created_at,
         wt.updated_at,
@@ -179,6 +175,9 @@ async fn select_include_deleted(
             ON users.token = wt.creator_user_token
         LEFT OUTER JOIN media_files as cover_image
             ON cover_image.token = wt.maybe_cover_image_media_file_token
+        LEFT OUTER JOIN entity_stats
+            ON entity_stats.entity_type = "model_weight"
+            AND entity_stats.entity_token = wt.token
         WHERE
             wt.token = ?
             "#,
@@ -225,11 +224,10 @@ async fn select_without_deleted(
         cover_image.maybe_public_bucket_prefix as maybe_cover_image_public_bucket_prefix,
         cover_image.maybe_public_bucket_extension as maybe_cover_image_public_bucket_extension,
 
-        wt.cached_user_ratings_negative_count,
-        wt.cached_user_ratings_positive_count,
-        wt.cached_user_ratings_total_count,
-        wt.maybe_cached_user_ratings_ratio,
-        wt.cached_user_ratings_last_updated_at,
+        entity_stats.ratings_positive_count as maybe_ratings_positive_count,
+        entity_stats.ratings_negative_count as maybe_ratings_negative_count,
+        entity_stats.bookmark_count as maybe_bookmark_count,
+
         wt.version,
         wt.created_at,
         wt.updated_at,
@@ -240,6 +238,9 @@ async fn select_without_deleted(
             ON users.token = wt.creator_user_token
         LEFT OUTER JOIN media_files as cover_image
             ON cover_image.token = wt.maybe_cover_image_media_file_token
+        LEFT OUTER JOIN entity_stats
+            ON entity_stats.entity_type = "model_weight"
+            AND entity_stats.entity_token = wt.token
         WHERE
             wt.token = ?
             AND wt.user_deleted_at IS NULL
@@ -280,11 +281,10 @@ pub struct RawWeight {
     pub maybe_cover_image_public_bucket_prefix: Option<String>,
     pub maybe_cover_image_public_bucket_extension: Option<String>,
 
-    pub cached_user_ratings_negative_count: u32,
-    pub cached_user_ratings_positive_count: u32,
-    pub cached_user_ratings_total_count: u32,
-    pub maybe_cached_user_ratings_ratio: Option<f32>,
-    pub cached_user_ratings_last_updated_at: DateTime<Utc>,
+    pub maybe_ratings_positive_count: Option<u32>,
+    pub maybe_ratings_negative_count: Option<u32>,
+    pub maybe_bookmark_count: Option<u32>,
+
     pub version: i32,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,

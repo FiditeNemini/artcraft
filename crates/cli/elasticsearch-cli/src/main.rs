@@ -12,10 +12,12 @@ use sqlx::{MySql, Pool};
 use sqlx::mysql::MySqlPoolOptions;
 
 use config::shared_constants::DEFAULT_RUST_LOG;
+use elasticsearch_schema::searches::search_model_weights::search_model_weights;
 use elasticsearch_schema::searches::search_tts_models::search_tts_models;
 use errors::AnyhowResult;
 
 use crate::cli_args::{Action, Environment, parse_cli_args};
+use crate::plans::create_all_model_weight_documents::create_all_model_weight_documents;
 use crate::plans::create_all_tts_documents::create_all_tts_documents;
 
 pub mod cli_args;
@@ -45,7 +47,18 @@ pub async fn main() -> AnyhowResult<()> {
     }
     Action::SearchTts => {
       info!("Searching TTS...");
-      search_tts_models(&elasticsearch, "zel", Some("en")).await;
+      let _results = search_tts_models(&elasticsearch, "zel", Some("en")).await?;
+    }
+    Action::ReindexModelWeights => {
+      info!("Reindexing model weights...");
+      create_all_model_weight_documents(&mysql, &elasticsearch).await?;
+    }
+    Action::SearchModelWeights => {
+      info!("Searching model weights...");
+      let results = search_model_weights(&elasticsearch, "zel", Some("en")).await?;
+      for result in results {
+        println!("Result: {:?}", result);
+      }
     }
   }
 

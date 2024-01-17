@@ -26,12 +26,14 @@ impl ModelCategory {
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum ModelType {
   VallEx,
+  StyleTTS2,
 }
 
 impl ModelType {
   pub fn to_str(&self) -> &'static str {
     match self {
       ModelType::VallEx => "vallex",
+      ModelType::StyleTTS2 => "styletts2",
     }
   }
 }
