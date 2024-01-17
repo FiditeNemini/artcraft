@@ -73,31 +73,32 @@ export default function useBatchContent({
   });
 
   const toggle = (entity_token: string, entity_type: string) => {
-    login.open();
-    let inLibrary = library[entity_token];
-    statusSet(FetchStatus.in_progress);
-    busyAdd(entity_token);
+    if (login.sessionCheck()) {
+      let inLibrary = library[entity_token];
+      statusSet(FetchStatus.in_progress);
+      busyAdd(entity_token);
 
-    console.log(`⏳ toggling entity ${ entity_token }, in library?: ${ !!inLibrary }`);
+      console.log(`⏳ toggling entity ${ entity_token }, in library?: ${ !!inLibrary }`);
 
-    if (inLibrary && checker(inLibrary)) {
-      return onPass.fetch(entity_token, entity_type, library)
-      .then((res: any) => {
-        console.log("⭕️",res);
-        busyRemove(entity_token);
-        librarySet(onPass.modLibrary(res, entity_token, entity_type, library));
-        statusSet(FetchStatus.ready);
-        return false;
-      });
-    } else {
-      return onFail.fetch(entity_token, entity_type, library)
-      .then((res: any) => {
-        console.log("❌",res);
-        busyRemove(entity_token);
-        librarySet(onFail.modLibrary(res, entity_token, entity_type, library));
-        statusSet(FetchStatus.ready);
-        return true;
-      });
+      if (inLibrary && checker(inLibrary)) {
+        return onPass.fetch(entity_token, entity_type, library)
+        .then((res: any) => {
+          console.log("⭕️",res);
+          busyRemove(entity_token);
+          librarySet(onPass.modLibrary(res, entity_token, entity_type, library));
+          statusSet(FetchStatus.ready);
+          return false;
+        });
+      } else {
+        return onFail.fetch(entity_token, entity_type, library)
+        .then((res: any) => {
+          console.log("❌",res);
+          busyRemove(entity_token);
+          librarySet(onFail.modLibrary(res, entity_token, entity_type, library));
+          statusSet(FetchStatus.ready);
+          return true;
+        });
+      }
     }
   };
 

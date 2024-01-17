@@ -7,10 +7,10 @@ interface Props {
   handleClose: (x:any) => any,
   signupProps: (x:any) => any,
   signup: (x:any) => any,
-  viewLoginSet: (x:any) => void
+  viewSwitch: () => void
 }
 
-export default function LoginView({ animating, handleClose, signupProps, signup, viewLoginSet }: Props) {
+export default function LoginView({ animating, handleClose, signupProps, signup, viewSwitch }: Props) {
   return <div {...{ className: `fy-modal-page${ animating ? " animating-modal-page" : ""}` }}>
     <header>
       <div {...{ className: "login-modal-title-row" }}>
@@ -19,7 +19,7 @@ export default function LoginView({ animating, handleClose, signupProps, signup,
       </div>
       <div {...{ className: "login-modal-subtitle-row" }}>
         <span {...{ className: "login-modal-subtitle" }}>Create a new account</span>
-        <span {...{ className: "login-modal-login-link", onClick: () => { if (!animating) viewLoginSet(true); } }}>Or login instead</span>
+        <span {...{ className: "login-modal-login-link", onClick: () => { if (!animating) viewSwitch(); } }}>Or login instead</span>
       </div>
     </header>
     <TempInput {...{ icon: faUser, label: "Username", placeholder: "Username", ...signupProps("username") }}/>

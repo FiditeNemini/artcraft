@@ -6,13 +6,14 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import "./Modal.scss";
 
 interface ModalProps {
+  content: React.ElementType;
+  contentProps?: any;
   show: boolean;
   handleClose: () => void;
   noHeader?: boolean;
   onCancel?: (e: React.MouseEvent<HTMLElement>) => any;
   onConfirm?: (e: React.MouseEvent<HTMLElement>) => any;
   title?: string;
-  content: React.ElementType;
   icon?: IconDefinition;
   autoWidth?: boolean;
   showButtons?: boolean;
@@ -21,6 +22,7 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({
   autoWidth,
   content: Content,
+  contentProps,
   handleClose,
   noHeader,
   onCancel: cancelEvent,
@@ -92,7 +94,7 @@ const Modal: React.FC<ModalProps> = ({
               </header>
             }
             <div className="modal-body">
-              { Content && <Content {...{ handleClose }} /> }
+              { Content && <Content {...{ ...contentProps, handleClose }} /> }
             </div>
             {showButtons && (
               <div className="modal-footer">

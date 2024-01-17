@@ -6,6 +6,7 @@ import useLogin from "./useLogin";
 import useSignup from "./useSignup";
 import LoginView from "./LoginView";
 import SignupView from "./SignupView";
+import { ModalView } from "context/AccountModalContext";
 import { Analytics } from "common/Analytics";
 import "./AccountModal.scss";
 
@@ -30,9 +31,10 @@ const Loader = ({ viewLogin }: { viewLogin: boolean }) => <div {...{ className: 
   <Spinner />
 </div>;
 
-export default function LoginModal({ handleClose }: { handleClose: any }) {
+export default function LoginModal({ handleClose, view, viewSwitch }: { handleClose: any, view: ModalView, viewSwitch: () => void }) {
+  const viewLogin = view === ModalView.Login;
   const [status,statusSet] = useState(FetchStatus.paused);
-  const [viewLogin,viewLoginSet] = useState(false);
+  // const [viewLogin,viewLoginSet] = useState(false);
   const [animating,animatingSet] = useState(false);
   const { errorType, setProps: loginProps, login } = useLogin({
     onSuccess: () => {
@@ -68,7 +70,7 @@ export default function LoginModal({ handleClose }: { handleClose: any }) {
     {
       transitions((style: any, i: number, state: any) => {
         let isLeaving = state.phase === "leave";
-        let sharedProps = { animating, handleClose, isLeaving, style, viewLogin, viewLoginSet };
+        let sharedProps = { animating, handleClose, isLeaving, style, viewLogin, viewSwitch };
 
         switch(i) {
           case 0: return <AniMod {...{ render: SignupView, signupProps, signup, ...sharedProps }}/>;

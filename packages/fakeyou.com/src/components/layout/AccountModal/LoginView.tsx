@@ -13,10 +13,10 @@ interface Props {
   handleClose: (x:any) => any,
   login: (x:any) => any,
   loginProps: (x:any) => any,
-  viewLoginSet: (x:any) => void
+  viewSwitch: () => void
 }
 
-export default function LoginView({ animating, errorType = "", handleClose, login, loginProps, viewLoginSet }: Props) {
+export default function LoginView({ animating, errorType = "", handleClose, login, loginProps, viewSwitch }: Props) {
   const errorStrings = [
     "Could not login, check credentials and try again.",
     "A sever error occured. Try again."
@@ -32,7 +32,7 @@ export default function LoginView({ animating, errorType = "", handleClose, logi
         <span {...{ className: "login-modal-subtitle" }}>Log into your account</span>
         <span {...{
           className: `login-modal-login-link`,
-          onClick: () => { if (!animating) viewLoginSet(false); } 
+          onClick: () => { if (!animating) viewSwitch(); } 
         }}>Signup instead</span>
       </div>
     </header>

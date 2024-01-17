@@ -1,9 +1,16 @@
 import { createContext } from 'react';
 
-interface AccountModalContext { show: boolean, close: () => void, open: () => void }
+export enum ModalView {
+  Closed,
+  Signup,
+  Login
+}
+
+interface AccountModalContext { close: () => void, open: () => void, sessionCheck: () => boolean, view: ModalView,  }
 
 export default createContext<AccountModalContext>({
-	show: false,
 	close: () => {},
-	open: () => {}
+	open: () => {},
+	sessionCheck: () => false,
+	view: ModalView.Closed,
 });
