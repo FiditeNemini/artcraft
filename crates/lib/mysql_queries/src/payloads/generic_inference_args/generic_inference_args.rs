@@ -138,7 +138,7 @@ impl InferenceCategoryAbbreviated {
       Self::TextToSpeech => InferenceCategory::TextToSpeech,
       Self::VoiceConversion => InferenceCategory::VoiceConversion,
       Self::VideoFilter => InferenceCategory::VideoFilter,
-      Self::ImageGeneration =>InferenceCategory::ImageGeneration
+      Self::ImageGeneration =>InferenceCategory::ImageGeneration,
       Self::Mocap => InferenceCategory::Mocap,
     }
   }

@@ -1,4 +1,4 @@
-#![forbid(unused_imports)]
+// #![forbid(unused_imports)]
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
@@ -119,6 +119,8 @@ pub struct EnqueueImageGenRequest {
     maybe_cfg_scale: Option<i32>,
     maybe_number_of_samples: Option<i32>,
     maybe_batch_count: Option<i32>,
+    name: String,
+    description: String,
 }
 
 #[derive(Serialize,ToSchema)]
@@ -332,7 +334,8 @@ pub async fn enqueue_image_generation_request(
     }
 
     let type_of_inference = request.type_of_inference.to_string().clone();
-
+    let description = request.description.to_string().clone();
+    let name = request.name.to_string().clone();
     let inference_args = StableDiffusionArgs {
         maybe_sd_model_token: Some(sd_weight_token),
         maybe_lora_model_token: Some(lora_token),
@@ -347,7 +350,9 @@ pub async fn enqueue_image_generation_request(
         maybe_batch_count: Some(batch_count),
         maybe_width: Some(width),
         maybe_height: Some(height),
-        maybe_sampler: Some(sampler)
+        maybe_sampler: Some(sampler),
+        description: Some(description),
+        name: Some(name),
     };
 
     // create the inference args here

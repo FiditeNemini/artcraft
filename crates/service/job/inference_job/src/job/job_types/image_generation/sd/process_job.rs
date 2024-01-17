@@ -434,10 +434,6 @@ pub async fn process_job_inference(
             public_bucket_hash: "".to_string(),
             maybe_public_bucket_prefix: None,
             maybe_public_bucket_extension: None,
-            cached_user_ratings_total_count: 0,
-            cached_user_ratings_positive_count: 0,
-            cached_user_ratings_negative_count: 0,
-            maybe_cached_user_ratings_ratio: None,
             version: 0,
             mysql_pool,
         }).await?;

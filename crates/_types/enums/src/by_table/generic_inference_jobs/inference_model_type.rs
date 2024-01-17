@@ -56,7 +56,7 @@ impl InferenceModelType {
       Self::Vits => "vits",
       Self::VallEX => "vall_e_x",
       Self::RerenderAVideo => "rerender_a_video",
-      Self::StableDiffusion => "stable_diffusion"
+      Self::StableDiffusion => "stable_diffusion",
       Self::MocapNet => "mocap_net",
       Self::StyleTTS2 => "styletts2",
     }

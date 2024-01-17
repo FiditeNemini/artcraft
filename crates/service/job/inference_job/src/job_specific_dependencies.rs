@@ -100,7 +100,7 @@ impl JobSpecificDependencies {
       maybe_vall_e_x_dependencies,
       maybe_vits_dependencies,
       maybe_rerender_dependencies,
-      maybe_stable_diffusion_dependencies
+      maybe_stable_diffusion_dependencies,
       maybe_mocapnet_dependencies,
       maybe_styletts2_dependencies,
     })
