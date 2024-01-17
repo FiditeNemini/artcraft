@@ -21,17 +21,18 @@ export default function MediaTab() {
   const bookmarks = useBookmarks();
   const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [weightType, weightTypeSet] = useState(
-    urlQueries.get("maybe_scoped_weight_type") || "all"
+  const [mediaType, mediaTypeSet] = useState(
+    urlQueries.get("filter_media_type") || "all"
   );
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useLazyLists({
     addQueries: {
       page_size: 24,
-      ...prepFilter(weightType, "maybe_scoped_weight_type"),
+      //...prepFilter(weightType, "maybe_scoped_weight_type"),
+      ...prepFilter(mediaType, "filter_media_type"),
     },
-    addSetters: { weightTypeSet },
+    addSetters: { mediaTypeSet },
     debug: "explore media tab",
     fetcher: ListMediaFiles,
     list,
@@ -74,9 +75,9 @@ export default function MediaTab() {
             {...{
               icon: faFilter,
               options: filterOptions,
-              name: "weightType",
+              name: "mediaType",
               onChange: media.onChange,
-              value: weightType,
+              value: mediaType,
             }}
           />
         </div>
