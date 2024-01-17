@@ -7,7 +7,7 @@ export default function TabContentUpload(props:{
   const { t } = props
   return(
     <div
-      className="tab-pane fade show active"
+      className="tab-pane fade show active py-4"
       id="vmcUpload"
     >
         <div className="row">
@@ -16,11 +16,11 @@ export default function TabContentUpload(props:{
           </div>
         </div>
 
-        <div className="row">
+        <div className="row py-3">
           <div className="col-12">
-            <div className="d-flex justify-content-end">
-              <button className="btn btn-primary m-1">{t("button.upload")}</button>
-              <button className="btn btn-primary m-1" disabled>{t("button.generate")}</button>
+            <div className="d-flex justify-content-end gap-3">
+              <button className="btn btn-primary">{t("button.upload")}</button>
+              <button className="btn btn-primary" disabled>{t("button.generate")}</button>
             </div>
           </div>
         </div>

@@ -23,10 +23,10 @@ export default function VideoMotionCapture(){
 
           {/*Video Chooser Tabs*/}
           <div className="col-12 col-md-6">
-            <ul className="nav nav-tabs nav-vc" id="vmcTab">
-              <li className="nav-item w-100">
+            <ul className="nav nav-tabs" id="vmcTab">
+              <li className="nav-item">
                 <button
-                  className="nav-link active w-100"
+                  className="nav-link active"
                   id="vmcUploadTab"
                   data-bs-toggle="tab"
                   data-bs-target="#vmcUpload"
@@ -34,9 +34,9 @@ export default function VideoMotionCapture(){
                   {t("tabTitle.upload")}
                 </button>
               </li>
-              <li className="nav-item w-100">
+              <li className="nav-item">
                 <button
-                  className="nav-link w-100"
+                  className="nav-link"
                   id="vmcLibraryTab"
                   data-bs-toggle="tab"
                   data-bs-target="#vmcLibrary"
@@ -55,7 +55,7 @@ export default function VideoMotionCapture(){
           <div className="col-12 col-md-6">
             <BasicVideo />
           </div>
-          
+
         </div>{/*2nd row*/}
 
       </div>{/*panel*/}
