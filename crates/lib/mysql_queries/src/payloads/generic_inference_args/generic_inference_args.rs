@@ -237,7 +237,7 @@ mod tests {
     };
 
     let json = serde_json::ser::to_string(&args).unwrap();
-    assert_eq!(json, r#"{"cat":"ig","args":{"Ig":{"vs":"video_media_token","is":"image_media_token","sd":"sd_model_token","lm":"lora_model_token","p":"prompt","ap":"a_prompt","np":"n_prompt","se":1,"mu":"upload_path","lu":"lora_upload_path"}}}"#.to_string());
+    assert_eq!(json, r#"{"cat":"ig","args":{"Ig":{"sd":"sd_model_token","lm":"lora_model_token","w":512,"h":512,"s":"sampler","p":"prompt","np":"n_prompt","se":1,"mu":"upload_path","cf":7,"lu":"lora_upload_path","sa":25,"bc":1,"t":"type_of_inference","de":"Option","na":"Model Name"}}}"#.to_string());
   }
 
   #[test]

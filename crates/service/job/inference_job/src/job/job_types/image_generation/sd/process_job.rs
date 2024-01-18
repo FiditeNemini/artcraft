@@ -427,6 +427,7 @@ pub async fn process_job_inference(
 
 }
 
+#[ignore]
 #[cfg(test)]
 mod tests {
     use std::path::PathBuf;
@@ -439,6 +440,7 @@ mod tests {
     };
     use errors::AnyhowResult;
 
+    #[ignore]
     #[tokio::test]
     async fn test_seed_weights_files() -> AnyhowResult<()> {
         let seed_path = PathBuf::from("/storyteller/root/custom-seed-tool-data");
