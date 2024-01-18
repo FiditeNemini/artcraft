@@ -110,7 +110,7 @@ mod tests {
   fn all_variants() {
     // Static check
     let mut variants = InferenceResultType::all_variants();
-    assert_eq!(variants.len(), 4);
+    assert_eq!(variants.len(), 5);
     assert_eq!(variants.pop_first(), Some(InferenceResultType::MediaFile));
     assert_eq!(variants.pop_first(), Some(InferenceResultType::TextToSpeech));
     assert_eq!(variants.pop_first(), Some(InferenceResultType::VoiceConversion));

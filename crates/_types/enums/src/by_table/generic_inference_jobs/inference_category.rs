@@ -31,6 +31,7 @@ pub enum InferenceCategory {
 
   #[serde(rename = "image_generation")]
   ImageGeneration,
+
   #[serde(rename = "mocap")]
   Mocap,
 }
@@ -117,7 +118,7 @@ mod tests {
   fn all_variants() {
     // Static check
     let mut variants = InferenceCategory::all_variants();
-    assert_eq!(variants.len(), 5);
+    assert_eq!(variants.len(), 6);
     assert_eq!(variants.pop_first(), Some(InferenceCategory::LipsyncAnimation));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::TextToSpeech));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::VoiceConversion));
