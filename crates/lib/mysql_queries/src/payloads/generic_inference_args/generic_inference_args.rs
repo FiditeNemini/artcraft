@@ -1,11 +1,11 @@
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use errors::AnyhowResult;
 
+use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
 use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
 use crate::payloads::generic_inference_args::mocap_payload::MocapArgs;
 use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
 use crate::payloads::generic_inference_args::videofilter_payload::RerenderArgs;
-use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
 
 /// Used to encode extra state for the `generic_inference_jobs` table.
 /// This should act somewhat like a serialized protobuf stored inside a record.
@@ -146,11 +146,12 @@ impl InferenceCategoryAbbreviated {
 
 #[cfg(test)]
 mod tests {
+  use tokens::tokens::{media_files::MediaFileToken, model_weights::ModelWeightToken};
+
   use crate::payloads::generic_inference_args::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
+  use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
   use crate::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
   use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
-  use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
-  use tokens::tokens::{model_weights::ModelWeightToken, media_files::MediaFileToken};
 
   #[test]
   fn typical_lipsync_animation_args_serialize() {
@@ -218,7 +219,7 @@ mod tests {
       args: Some(PolymorphicInferenceArgs::Ig(StableDiffusionArgs {
         maybe_sd_model_token: Some(sd_model_token),
         maybe_lora_model_token: Some(lora_model_token),
-        maybe_sampler: Some("sampler".as_ref()),
+        maybe_sampler: Some("sampler".to_string()),
         maybe_height: Some(512),
         maybe_width: Some(512),
         maybe_cfg_scale: Some(7),
@@ -229,9 +230,9 @@ mod tests {
         maybe_seed: Some(seed),
         maybe_upload_path: Some(upload_path),
         maybe_lora_upload_path: Some(lora_upload_path),
-        type_of_inference: type_of_inference,
-        description: Some("Option".as_ref()),
-        title: Some("Model Name".as_ref())
+        type_of_inference,
+        description: Some("Option".to_string()),
+        name: Some("Model Name".to_string())
       })),
     };
 

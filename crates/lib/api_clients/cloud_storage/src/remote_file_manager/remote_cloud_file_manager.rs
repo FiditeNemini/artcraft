@@ -68,8 +68,8 @@ impl RemoteCloudFileClient {
         
         result.bucket_details = Some(RemoteCloudBucketDetails {
             object_hash: directory.get_file_object_hash().to_string(),
-            suffix:suffix,
-            prefix:prefix,
+            suffix,
+            prefix,
         });
 
         println!("Uploading media file to bucket path: {:?}",directory.get_full_remote_cloud_file_path());

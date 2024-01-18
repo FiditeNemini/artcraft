@@ -6090,6 +6090,7 @@ dependencies = [
  "sha2 0.9.9",
  "speculoos",
  "sqlx",
+ "strum",
  "symphonia",
  "time 0.3.30",
  "tokens",

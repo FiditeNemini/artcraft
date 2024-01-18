@@ -1,46 +1,30 @@
-use std::env::temp_dir;
-use std::ops::Deref;
-use std::path::PathBuf;
 use std::thread;
-use std::thread::Thread;
 use std::time::{Duration, Instant};
-use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
-use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
-use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
-use crate::job::job_loop::job_success_result::{ JobSuccessResult, ResultEntity };
-use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job_dependencies::JobDependencies;
+
 use anyhow::anyhow;
 use log::info;
-use sqlx::MySqlPool;
-use cloud_storage::remote_file_manager::media_descriptor::MediaImagePngDescriptor;
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 
+use cloud_storage::remote_file_manager::media_descriptor::MediaImagePngDescriptor;
+use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
-use cloud_storage::remote_file_manager::weights_descriptor::WeightsLoRADescriptor;
-use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType::UploadModel;
-use enums::by_table::generic_synthetic_ids::id_category::IdCategory::MediaFile;
 use enums::by_table::media_files::media_file_type::MediaFileType;
-use enums::by_table::media_uploads::media_upload_source::MediaUploadSource;
-use enums::by_table::media_uploads::media_upload_type::MediaUploadType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
-use enums::common::visibility::Visibility;
 use filesys::path_to_string::path_to_string;
-use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
-use mysql_queries::payloads::media_upload_modification_details::MediaUploadModificationDetails;
+use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
+use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
-use mysql_queries::queries::media_uploads::insert_media_upload::{Args, insert_media_upload};
-use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
+use mysql_queries::queries::model_weights::create::create_weight::{create_weight, CreateModelWeightsArgs};
+use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
-use crate::job::job_types::image_generation::sd::sd_inference_command::InferenceArgs;
-use crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
-use crate::job::job_types::image_generation::sd::validate_inputs::validate_inputs;
 
-use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
-use mysql_queries::queries::model_weights::create::create_weight::{create_weight, CreateModelWeightsArgs};
+use crate::job::job_loop::job_success_result::JobSuccessResult;
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::image_generation::sd::sd_inference_command::InferenceArgs;
+use crate::job_dependencies::JobDependencies;
 
 pub struct StableDiffusionProcessArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
@@ -82,7 +66,6 @@ pub async fn sd_args_from_job(
 
 pub async fn process_job_selection (args: StableDiffusionProcessArgs<'_>
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
-    let job = args.job;
     let sd_args = sd_args_from_job(&args).await?;
     if sd_args.type_of_inference == "inference" {
         process_job_inference(&args).await
@@ -98,7 +81,7 @@ pub async fn process_job_selection (args: StableDiffusionProcessArgs<'_>
     }
 }
 
-pub async fn process_job_checkpoint(args: &StableDiffusionProcessArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
+pub async fn process_job_checkpoint(_args: &StableDiffusionProcessArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
     // insert model record in create model record
 
@@ -111,7 +94,7 @@ pub async fn process_job_checkpoint(args: &StableDiffusionProcessArgs<'_>) -> Re
         inference_duration: Duration::from_secs(0),
     })
 }
-pub async fn process_job_lora(args: &StableDiffusionProcessArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
+pub async fn process_job_lora(_args: &StableDiffusionProcessArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
     Ok(JobSuccessResult {
         maybe_result_entity: None,
         inference_duration: Duration::from_secs(0),
@@ -147,9 +130,10 @@ pub async fn process_job_inference(
     }
 
 
-    let mut job_progress_reporter = args.job_dependencies.clients.job_progress_reporter
+    let _job_progress_reporter = args.job_dependencies.clients.job_progress_reporter
         .new_generic_inference(job.inference_job_token.as_str())
         .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
+
     //==================== TEMP DIR ==================== //
 
     let work_temp_dir = format!("temp_stable_diffusion_inference_{}", job.id.0);
@@ -192,9 +176,10 @@ pub async fn process_job_inference(
             }
         }
 
-        if download_url.len() <= 0 {
+        if download_url.len() == 0 {
             return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Download URL Missing")));
         }
+
         let file_name = "download.safetensors";
         let download_script = easyenv::get_env_string_or_default(
             "DOWNLOAD_SCRIPT",
@@ -202,9 +187,10 @@ pub async fn process_job_inference(
         let google_drive_downloader =
             GoogleDriveDownloadCommand::new_production(&download_script);
         info!("Downloading {}",download_url);
-        let download_filename = match google_drive_downloader.download_file_with_file_name(&download_url, &work_temp_dir,file_name).await {
+
+        let _download_filename = match google_drive_downloader.download_file_with_file_name(&download_url, &work_temp_dir,file_name).await {
             Ok(filename) => filename,
-            Err(e) => {
+            Err(_e) => {
                 return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Download")));
             }
         };
@@ -300,9 +286,7 @@ pub async fn process_job_inference(
     ).await?;
 
     let vae_weight_record = match vae_weight_record {
-        Some(val) => {
-            val
-        },
+        Some(val) => val,
         None => {
             return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no VAE? thats a problem.")))
         }
@@ -325,31 +309,26 @@ pub async fn process_job_inference(
     ).await?;
 
     let prompt = match sd_args.maybe_prompt {
-        Some(val) => {
-            val
-        }
+        Some(val) => val,
         None => return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No Prompt provided!")))
     };
 
     let stderr_output_file = work_temp_dir.path().join("sd_err.txt");
 
     let number_of_samples = match sd_args.maybe_number_of_samples {
-        Some(val) => {
-            val
-        },
-        None => {
-            20
-        }
+        Some(val) => val,
+        None => 20,
     };
+
     let inference_start_time = Instant::now();
 
     sd_deps.inference_command.execute_inference(InferenceArgs {
         work_dir: work_temp_dir.path().to_path_buf(),
         output_file: output_path.clone(),
-        stderr_output_file: stderr_output_file,
-        prompt: prompt,
+        stderr_output_file,
+        prompt,
         negative_prompt:sd_args.maybe_n_prompt.unwrap_or_default(),
-        number_of_samples: number_of_samples,
+        number_of_samples,
         samplers: sd_args.maybe_sampler.unwrap_or(String::from("Euler a")),
         width: sd_args.maybe_width.unwrap_or(512),
         height: sd_args.maybe_height.unwrap_or(512),
@@ -387,7 +366,7 @@ pub async fn process_job_inference(
                 pool: mysql_pool,
                 maybe_creator_user_token: Some(&creator_user_token),
                 maybe_creator_anonymous_visitor_token: None,
-                creator_ip_address: creator_ip_address,
+                creator_ip_address,
                 creator_set_visibility: Default::default(),
                 upload_type: UploadType::Filesystem,
                 media_file_type: MediaFileType::Image,
@@ -424,7 +403,7 @@ pub async fn process_job_inference(
             maybe_description_markdown: None,
             maybe_description_rendered_html: None,
             creator_user_token: Some(&creator_user_token),
-            creator_ip_address: creator_ip_address,
+            creator_ip_address,
             creator_set_visibility: Default::default(),
             maybe_last_update_user_token: None,
             original_download_url: None,
@@ -450,14 +429,17 @@ pub async fn process_job_inference(
 
 #[cfg(test)]
 mod tests {
-use anyhow::anyhow;
-use std::path::PathBuf;
-use cloud_storage::remote_file_manager::{
-remote_cloud_file_manager::{RemoteCloudFileClient, self},
-remote_cloud_bucket_details::RemoteCloudBucketDetails,
-};
-use errors::{AnyhowError, AnyhowResult};
-#[tokio::test]
+    use std::path::PathBuf;
+
+    use anyhow::anyhow;
+
+    use cloud_storage::remote_file_manager::{
+        remote_cloud_bucket_details::RemoteCloudBucketDetails,
+        remote_cloud_file_manager::RemoteCloudFileClient,
+    };
+    use errors::AnyhowResult;
+
+    #[tokio::test]
     async fn test_seed_weights_files() -> AnyhowResult<()> {
         let seed_path = PathBuf::from("/storyteller/root/custom-seed-tool-data");
         let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;

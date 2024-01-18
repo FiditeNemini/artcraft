@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use log::error;
-use sqlx::{Executor, MySql, QueryBuilder, Transaction};
+use sqlx::{MySql, QueryBuilder, Transaction};
 
 use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
 use errors::AnyhowResult;
@@ -61,11 +61,12 @@ pub async fn insert_batch_generation_records<'a, 'b>(args: InsertBatchArgs<'a, '
 #[ignore]
 #[cfg(test)]
 mod tests {
-
   use sqlx::mysql::MySqlPoolOptions;
+
   use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
   use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
   use tokens::tokens::media_files::MediaFileToken;
+
   use crate::queries::batch_generations::insert_batch_generation_records::{insert_batch_generation_records, InsertBatchArgs};
 
   async fn setup() -> sqlx::Pool<sqlx::MySql> {

@@ -2,6 +2,7 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::fmt::{Display, Formatter};
 use std::fmt::Debug;
 use std::sync::Arc;
 
@@ -11,8 +12,6 @@ use actix_web::http::StatusCode;
 use log::warn;
 use serde::Deserialize;
 use serde::Serialize;
-
-use tokens::tokens::model_weights::ModelWeightToken;
 use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
@@ -24,22 +23,19 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
     InferenceCategoryAbbreviated,
     PolymorphicInferenceArgs,
 };
-
 use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
     insert_generic_inference_job,
     InsertGenericInferenceArgs,
 };
-
-
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
-use std::fmt::{Display, Formatter};
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.
 const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
@@ -344,7 +340,7 @@ pub async fn enqueue_image_generation_request(
         maybe_seed: Some(seed),
         maybe_upload_path: Some(upload_path),
         maybe_lora_upload_path: Some(lora_upload_path),
-        type_of_inference: type_of_inference,
+        type_of_inference,
         maybe_cfg_scale: Some(cfg_scale),
         maybe_number_of_samples: Some(number_of_samples),
         maybe_batch_count: Some(batch_count),

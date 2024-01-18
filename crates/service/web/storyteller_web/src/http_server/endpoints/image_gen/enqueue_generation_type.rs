@@ -8,7 +8,7 @@ use utoipa::ToSchema;
 
 
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, ToSchema)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Debug, Deserialize, Serialize, ToSchema)]
 pub enum EnqueueImageGenType {
     #[serde(rename = "upload_lora")]
     UploadLoRA,

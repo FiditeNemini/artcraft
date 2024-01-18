@@ -67,7 +67,6 @@ impl GoogleDriveDownloadCommand {
         .unwrap_or("/tmp")
         .to_string();
 
-    let temp_filename = random_crockford_token(10);
     let temp_filename = format!("{}/{}", temp_dir_path, file_name);
 
     info!("Downloading {} to: {}", download_url, temp_filename);

@@ -7,10 +7,8 @@ use errors::AnyhowResult;
 
 use crate::bucket_clients::get_bucket_clients;
 use crate::cli_args::parse_cli_args;
-use crate::seeding::model_weights::seed_weights; // V1
+use crate::seeding::model_weights::seed_weights;
 use crate::seeding::seed_media_files::seed_media_files;
-use crate::seeding::seed_model_weights::seed_weights_files; // V2 v3 will come later on when everything is more conslidated and clear.
-use crate::seeding::model_weights::test_seed_weights_files;
 use crate::seeding::tts_tacotron2::seed_tts_tacotron2;
 use crate::seeding::users::seed_user_accounts;
 use crate::seeding::voice_conversion::seed_voice_conversion;

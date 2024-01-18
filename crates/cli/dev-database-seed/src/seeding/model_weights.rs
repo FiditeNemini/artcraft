@@ -3,13 +3,10 @@ use std::vec;
 
 use log::info;
 use sqlx::{MySql, Pool};
-use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
+
 use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
-
-use cloud_storage::remote_file_manager::weights_descriptor;
+use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor};
-use easyenv::from_filename;
-
 use enums::by_table::model_weights::{
     weights_category::WeightsCategory,
     weights_types::WeightsType,
@@ -17,7 +14,6 @@ use enums::by_table::model_weights::{
 use enums::common::visibility::Visibility;
 use errors::{anyhow, AnyhowResult};
 use mysql_queries::queries::model_weights::create::create_weight::{create_weight, CreateModelWeightsArgs};
-use mysql_queries::queries::users::user::create_account::create_account;
 use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 use storyteller_root::get_seed_tool_data_root;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -631,10 +627,6 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
         public_bucket_hash: metadata1.bucket_details.clone().unwrap().object_hash,
         maybe_public_bucket_prefix: Some(metadata1.bucket_details.clone().unwrap().prefix),
         maybe_public_bucket_extension: Some(metadata1.bucket_details.clone().unwrap().suffix),
-        cached_user_ratings_total_count: 10,
-        cached_user_ratings_positive_count: 9,
-        cached_user_ratings_negative_count: 1,
-        maybe_cached_user_ratings_ratio: Some(0.9),
         version: 1,
         mysql_pool: &mysql_pool, // replace with actual MySqlPool
     };
@@ -657,10 +649,6 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
         public_bucket_hash: metadata2.bucket_details.clone().unwrap().object_hash.clone(),
         maybe_public_bucket_prefix: Some(metadata2.bucket_details.clone().unwrap().prefix),
         maybe_public_bucket_extension: Some(metadata2.bucket_details.clone().unwrap().suffix),
-        cached_user_ratings_total_count: 20,
-        cached_user_ratings_positive_count: 9,
-        cached_user_ratings_negative_count: 2,
-        maybe_cached_user_ratings_ratio: Some(0.9),
         version: 2,
         mysql_pool: &mysql_pool, // replace with actual MySqlPool
     };
@@ -683,10 +671,6 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
         public_bucket_hash: metadata3.bucket_details.clone().unwrap().object_hash,
         maybe_public_bucket_prefix: Some(metadata3.bucket_details.clone().unwrap().prefix),
         maybe_public_bucket_extension: Some(metadata3.bucket_details.clone().unwrap().suffix),
-        cached_user_ratings_total_count: 10,
-        cached_user_ratings_positive_count: 9,
-        cached_user_ratings_negative_count: 1,
-        maybe_cached_user_ratings_ratio: Some(0.9),
         version: 1,
         mysql_pool: &mysql_pool, // replace with actual MySqlPool
     };

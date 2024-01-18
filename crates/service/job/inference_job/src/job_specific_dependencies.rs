@@ -1,8 +1,9 @@
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use errors::AnyhowResult;
-use sqlx::pool::maybe;
 
+use crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_dependencies::SadTalkerDependencies;
+use crate::job::job_types::mocap::mocap_net::mocapnet_dependencies::MocapNetDependencies;
 use crate::job::job_types::tts::styletts2::styletts2_dependencies::StyleTTS2Dependencies;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_dependencies::Tacotron2Dependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_dependencies::VallExDependencies;
@@ -10,9 +11,6 @@ use crate::job::job_types::tts::vits::vits_dependencies::VitsDependencies;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_dependencies::RvcV2Dependencies;
 use crate::job::job_types::vc::so_vits_svc::svc_dependencies::SvcDependencies;
 use crate::job::job_types::videofilter::rerender_a_video::rerender_dependencies::RerenderDependencies;
-use crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
-
-use crate::job::job_types::mocap::mocap_net::mocapnet_dependencies::MocapNetDependencies;
 use crate::util::scoped_execution::ScopedExecution;
 
 pub struct JobSpecificDependencies {
