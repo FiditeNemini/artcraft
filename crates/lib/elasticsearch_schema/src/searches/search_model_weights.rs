@@ -1,6 +1,7 @@
 use elasticsearch::{Elasticsearch, SearchParts};
 use log::error;
 use serde_json::{json, Value};
+use enums::by_table::model_weights::weights_types::WeightsType;
 
 use errors::AnyhowResult;
 
@@ -10,11 +11,13 @@ pub async fn search_model_weights(
   client: &Elasticsearch,
   search_term: &str,
   maybe_language_subtag: Option<&str>,
+  maybe_weights_type: Option<WeightsType>,
 ) -> AnyhowResult<Vec<ModelWeightDocument>> {
 
-  let search_json = match maybe_language_subtag {
-    None => query_model_weights(search_term),
-    Some(language) => query_model_weights_with_required_language(search_term, language)
+  let search_json = match (maybe_language_subtag, maybe_weights_type) {
+    (Some(language), None) => query_model_weights_with_required_language(search_term, language),
+    (None, Some(weights_type)) => query_model_weights_with_model_weights_type(search_term, weights_type),
+    _ => query_model_weights(search_term),
   };
 
   let search_response = client
@@ -44,11 +47,7 @@ pub async fn search_model_weights(
         let maybe_object = hit.get_mut("_source")
             .map(|source| source.take());
         if let Some(value) = maybe_object {
-          let document = serde_json::from_value::<ModelWeightDocument>(value)
-              .map_err(|err| {
-                error!("Error: {:?}", &err);
-                err
-              })?;
+          let document = serde_json::from_value::<ModelWeightDocument>(value)?;
           documents.push(document);
         }
       }
@@ -112,6 +111,56 @@ fn query_model_weights_with_required_language(search_term: &str, language_tag: &
           {
             "match": {
               "maybe_ietf_primary_language_subtag": language_tag
+            }
+          },
+          {
+            "bool": {
+              "should": [
+                {
+                  "fuzzy": {
+                    "title": {
+                      "value": search_term,
+                      "fuzziness": 2
+                    }
+                  }
+                },
+                {
+                  "match": {
+                    "title": {
+                      "query": search_term,
+                      "boost": 1
+                    }
+                  }
+                },
+                {
+                  "multi_match": {
+                    "query": search_term,
+                    "type": "bool_prefix",
+                    "fields": [
+                      "title",
+                      "title._2gram",
+                      "title._3gram"
+                    ],
+                    "boost": 50
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  })
+}
+
+fn query_model_weights_with_model_weights_type(search_term: &str, weight_type: WeightsType) -> Value {
+  json!({
+    "query": {
+      "bool": {
+        "must": [
+          {
+            "match": {
+              "weights_type": weight_type.to_string(),
             }
           },
           {
