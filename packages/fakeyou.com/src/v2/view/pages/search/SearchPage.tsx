@@ -24,6 +24,8 @@ import Select from "components/common/Select";
 
 export default function SearchPage() {
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
+  const [weightType, setWeightType] = useState<string>("all");
+
   const bookmarks = useBookmarks();
   const ratings = useRatings();
 
@@ -35,9 +37,13 @@ export default function SearchPage() {
 
   const doSearch = useCallback(
     async (value: string) => {
-      let request = {
+      let request : any = {
         search_term: value,
       };
+
+      if (weightType !== "all") {
+        request["weight_type"] = weightType;
+      }
 
       let response = await SearchWeights(request);
 
@@ -48,7 +54,7 @@ export default function SearchPage() {
         setFoundWeights([]);
       }
     },
-    [setFoundWeights]
+    [setFoundWeights, weightType]
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,6 +118,8 @@ export default function SearchPage() {
     { value: "loRA", label: "LoRA" },
   ];
 
+  const weightTypeValue = weightTypeOpts.find((el) => el.value === weightType) || weightTypeOpts[0];
+
   return (
     <Container type="panel" className="mb-5">
       <PageHeader
@@ -144,6 +152,10 @@ export default function SearchPage() {
               options: weightTypeOpts,
               name: "weightType",
               defaultValue: weightTypeOpts[0],
+              value: weightTypeValue,
+              onChange: (args) => {
+                setWeightType(args.value)
+              },
             }}
           />
         </div>
