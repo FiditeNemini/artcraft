@@ -56,7 +56,7 @@ export default function AudioCard({
   if (type === "media") {
     coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 400, 100);
   } else if (type === "weights") {
-    if (data.cover_image.maybe_cover_image_public_bucket_path) {
+    if (data?.cover_image?.maybe_cover_image_public_bucket_path) {
       coverImage = bucketConfig.getCdnUrl(
         data.cover_image.maybe_cover_image_public_bucket_path,
         110,
@@ -145,7 +145,7 @@ export default function AudioCard({
                   src={coverImage}
                   height={110}
                   width={110}
-                  coverIndex={data.cover_image.default_cover.image_index}
+                  coverIndex={data?.cover_image?.default_cover?.image_index}
                 />
               )}
 
