@@ -1,8 +1,9 @@
 import React, {useState} from "react";
 import { v4 as uuidv4 } from "uuid";
-import { UploadVideo } from '@storyteller/components/src/api/upload/UploadVideo'
 
+import { UploadVideo } from '@storyteller/components/src/api/upload/UploadVideo'
 import { useFile } from "hooks";
+
 import VideoInput from "v2/view/pages/video_mocap/components/VideoInput";
 
 export default function TabContentUpload(props:{
