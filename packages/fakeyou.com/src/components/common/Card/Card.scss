@@ -18,6 +18,20 @@
     background-color: #57577d;
   }
 
+  .card-mocap {
+    width: 100%;
+    transition: 0.4s ease;
+    object-fit: cover;
+    object-position: center;
+    min-height: 300px;
+    max-height: 500px;
+    background-color: #57577d;
+
+    > path {
+      fill: lighten(#57577d, 15%);
+    }
+  }
+
   .card-video {
     width: 100%;
     transition: 0.4s ease;

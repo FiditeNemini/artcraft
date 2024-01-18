@@ -1,6 +1,7 @@
 import React from "react";
 import AudioCard from "./AudioCard";
 import ImageCard from "./ImageCard";
+import MocapCard from "./MocapCard";
 import VideoCard from "./VideoCard";
 
 interface Props {
@@ -14,6 +15,8 @@ export default function MediaCards({ props, type }: Props) {
       return <AudioCard {...props} />;
     case "image":
       return <ImageCard {...props} />;
+    case "mocap":
+      return <MocapCard {...props} />;
     case "video":
       return <VideoCard {...props} />;
     default:
