@@ -12,6 +12,17 @@
     "dropzoneDescription": "อัปโหลดวิดีโอหรือวางที่นี่...",
     "filenamePlaceholder": "เลือกจากสื่อ"
   },
+  "message": {
+    "unknownError": "ข้อผิดพลาดที่ไม่รู้จัก"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "อัปโหลดวิดีโอแล้ว",
+      "fileUploading": "การอัปโหลดวิดีโอ",
+      "mocapNetRequestSucceed": "คำขอจับภาพเคลื่อนไหวสำเร็จ",
+      "mocapNetRequesting": "การขอจับภาพเคลื่อนไหว"
+    }
+  },
   "tabTitle": {
     "library": "เลือกจากสื่อ",
     "upload": "อัพโหลด"

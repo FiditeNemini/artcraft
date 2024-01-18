@@ -12,6 +12,17 @@
     "dropzoneDescription": "একটি ভিডিও আপলোড করুন বা এখানে ড্রপ করুন...",
     "filenamePlaceholder": "মিডিয়া থেকে বেছে নিন"
   },
+  "message": {
+    "unknownError": "অজানা ত্রুটি"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "ভিডিও আপলোড করা হয়েছে",
+      "fileUploading": "ভিডিও আপলোড হচ্ছে",
+      "mocapNetRequestSucceed": "মোশন ক্যাপচার অনুরোধ সফল",
+      "mocapNetRequesting": "মোশন ক্যাপচারের অনুরোধ করা হচ্ছে"
+    }
+  },
   "tabTitle": {
     "library": "মিডিয়া থেকে বেছে নিন",
     "upload": "আপলোড করুন"

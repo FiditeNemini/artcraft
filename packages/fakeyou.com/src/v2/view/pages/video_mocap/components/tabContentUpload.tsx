@@ -16,9 +16,9 @@ export default function TabContentUpload(props:{
   const { t, pageStateCallback } = props
   const videoProps = useFile({})
   enum tabStates {
-    NO_FILE, FILE_STAGED, FILE_UPLOADING, FILE_UPLOADED
+    NO_FILE, FILE_STAGED, FILE_UPLOADING, FILE_UPLOADED, MOCAPNET
   }
-  const { NO_FILE, FILE_STAGED, FILE_UPLOADING, FILE_UPLOADED } = tabStates;
+  const { NO_FILE, FILE_STAGED, FILE_UPLOADING, FILE_UPLOADED, MOCAPNET } = tabStates;
   const [tabState, setTabState] = useState<number>(NO_FILE);
   const [token, setToken] = useState<string>("");
 
@@ -105,12 +105,22 @@ export default function TabContentUpload(props:{
           </div>
       </div>
     )
+  } else if (tabState === MOCAPNET){
+    return(
+      <div className="tab-pane fade show active py-4" id="vmcUpload">
+          <div className="row">
+            <div className="col-12">
+              <h2>{t("tab.message.mocapNetRequesting")}</h2>
+            </div>
+          </div>
+      </div>
+    )
   }else {
     return(
       <div className="tab-pane fade show active py-4" id="vmcUpload">
         <div className="row">
             <div className="col-12">
-              <h1>{t("tab.message.error")}</h1>
+              <h1>{t("message.UnknownError")}</h1>
             </div>
         </div>
       </div>

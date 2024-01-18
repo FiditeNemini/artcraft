@@ -12,6 +12,17 @@
     "dropzoneDescription": "Téléchargez une vidéo ou déposez-la ici...",
     "filenamePlaceholder": "Choisissez parmi les médias"
   },
+  "message": {
+    "unknownError": "Erreur inconnue"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "Vidéo téléchargée",
+      "fileUploading": "Téléchargement de vidéo",
+      "mocapNetRequestSucceed": "La demande de capture de mouvement a réussi",
+      "mocapNetRequesting": "Demander une capture de mouvement"
+    }
+  },
   "tabTitle": {
     "library": "Choisissez parmi les médias",
     "upload": "Télécharger"

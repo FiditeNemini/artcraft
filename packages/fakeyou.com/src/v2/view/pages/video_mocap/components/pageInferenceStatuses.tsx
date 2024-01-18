@@ -19,7 +19,7 @@ export function PageInferenceStatuses (props:{
   ) => void,
   pageStateCallback: (data:{tokenType:string, token:string | undefined}) => void
 }){
-  const { enqueueInferenceJob } = props;
+  const { t, pageState, enqueueInferenceJob } = props;
   useEffect(()=>{
     console.log("ENQUEUE INFERENCE JOB>>")
     enqueueInferenceJob(
@@ -38,10 +38,15 @@ export function PageInferenceStatuses (props:{
   };
 
   return(
-    <InferenceJobsList {...{
-      failures,
-      onSelect: () => Analytics.voiceConversionClickDownload(),
-      jobType: FrontendInferenceJobType.VideoMotionCapture,
-    }}/>
+    <>
+      <h2>{t("tab.message.mocapNetRequestSucceed")}</h2>
+      <h4>Job Token: {pageState.jobToken}</h4>
+      
+      <InferenceJobsList {...{
+        failures,
+        onSelect: () => Analytics.voiceConversionClickDownload(),
+        jobType: FrontendInferenceJobType.VideoMotionCapture,
+      }}/>
+    </>
   )
 }

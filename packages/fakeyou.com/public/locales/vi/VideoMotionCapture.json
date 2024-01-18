@@ -12,6 +12,17 @@
     "dropzoneDescription": "Tải video lên hoặc thả video vào đây...",
     "filenamePlaceholder": "Chọn từ phương tiện truyền thông"
   },
+  "message": {
+    "unknownError": "Lỗi không rõ"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "Video đã tải lên",
+      "fileUploading": "Tải lên video",
+      "mocapNetRequestSucceed": "Yêu cầu chụp chuyển động thành công",
+      "mocapNetRequesting": "Yêu cầu chụp chuyển động"
+    }
+  },
   "tabTitle": {
     "library": "Chọn từ phương tiện truyền thông",
     "upload": "Tải lên"

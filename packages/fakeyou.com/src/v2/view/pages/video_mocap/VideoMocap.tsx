@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import { useLocalize } from "hooks";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -32,7 +32,7 @@ export default function VideoMotionCapture(props: {
   const handlePageState = (
     {tokenType, token }:{tokenType:string, token:string | undefined}
   ) => {
-    if(token && tokenType == "jobToken"){
+    if(token && tokenType === "jobToken"){
       setPageState({
         ...pageState,
         index: SHOW_JOB_STATUS,
