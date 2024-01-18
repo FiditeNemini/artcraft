@@ -28,8 +28,8 @@ export function UploadVideoIsError(response: UploadVideoResponse): response is U
 export async function UploadVideo(request: UploadVideoRequest) : Promise<UploadVideoResponse> 
 {
   //TODO: Upload Video Endpoint doesn't exist yet
-  const endpoint = new ApiConfig().uploadMedia();
   //const endpoint = new ApiConfig().uploadVideo();
+  const endpoint = new ApiConfig().uploadMedia();
   
   const formData = new FormData();
 

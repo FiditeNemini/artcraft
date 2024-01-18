@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function FileDetails({
-  clear = () => {}, 
+  clear,
   file,
   hideClearDetails,
   icon,
@@ -25,19 +25,40 @@ export default function FileDetails({
       ? `${Math.floor(file.size / 1024)} KB`
       : null;
 
-  return <div className={"fy-uploader-layout upload-details " + className} >
-    { icon && <Icon {...{ className: "fy-uploader-layout-icon", icon }}/> }
-    <div>
-      <div {...{ className: "filename" }}>
-        { file.name.slice(0, file.name.lastIndexOf(".")) }
+  return (
+    <div className={`
+      fy-uploader-layout
+      upload-details
+      position-relative
+      w-100
+      ${className}`
+      } >
+      { icon && <Icon {...{ className: "fy-uploader-layout-icon", icon }}/> }
+      <div>
+        <div {...{ className: "filename" }}>
+          { file.name.slice(0, file.name.lastIndexOf(".")) }
+        </div>
+        <span className="opacity-50">
+          {`${ file.name.split(".").pop().toUpperCase() } file size: ${ fileSize }`}
+        </span>
+        <u className="fw-medium opacity-100 ms-1">Change file</u>
       </div>
-      <span className="opacity-50">
-        {`${ file.name.split(".").pop().toUpperCase() } file size: ${ fileSize }`}
-      </span>
-      <u className="fw-medium opacity-100 ms-1">Change file</u>
+      { !hideClearDetails && 
+        <button 
+          className="
+            upload-details-clear
+            btn btn-destructive
+            align-items-center
+            justify-content-center
+          "
+          onClick={e=>{
+            e.preventDefault();
+            if (clear) clear();
+          }}
+        >
+            <Icon icon= {faTrash }/>
+        </button> 
+      }
     </div>
-    { !hideClearDetails && <button {...{ className: "upload-details-clear btn btn-destructive align-items-center justify-content-center", onClick: e => { e.preventDefault(); clear() } }}>
-          <Icon {...{ icon: faTrash }}/>
-    </button> }
-  </div>;
+  );
 };

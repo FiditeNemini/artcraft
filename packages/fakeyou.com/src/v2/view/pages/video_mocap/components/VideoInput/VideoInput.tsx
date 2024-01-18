@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSpring } from '@react-spring/web';
 import { FileDetails, FileWrapper, FileLabel } from "components/common";
 import { faFileVideo } from "@fortawesome/pro-solid-svg-icons";
@@ -12,7 +12,7 @@ interface Props {
   hideActions?: boolean,
   hideClearDetails?: boolean,
   inputProps?: any,
-  onRest?: () => void,
+  onStateChange?: () => void,
   success?: boolean,
   submit?: () => void,
   working?: boolean,
@@ -27,17 +27,21 @@ export default function UploadFieldVideo({
   hideActions,
   hideClearDetails,
   inputProps,
-  onRest = ()=>{},
+  onStateChange = ()=>{},
   success = false,
   submit = ()=>{},
   working = false,
   t,
   ...rest }: Props)
 {
+  useEffect(()=>{
+    //only fire for file unload
+    //on file load is fired in video elements
+    if (!file) onStateChange();
+  }, [file])
 
   const style = useSpring({
-    config: { mass: 1, tension: 120, friction: 14 },
-    onRest
+    config: { mass: 1, tension: 120, friction: 14 }
   });
   
   const fileTypes = ["MP4"];
@@ -57,7 +61,8 @@ export default function UploadFieldVideo({
             controls
             src={blob}
             className="mh-100 mw-100 object-fit-cover"
-            {...{onLoadStart:onRest, style}}
+            onLoadStart={onStateChange}
+            {...{style}}
           />
           
         </> :
