@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import Container from "components/common/Container";
 import PageHeader from "components/layout/PageHeader";
 import Panel from "components/common/Panel";
-import ModelTags from "components/common/ModelTags";
+// import ModelTags from "components/common/ModelTags";
 import { SearchWeights } from "@storyteller/components/src/api/weights/SearchWeights";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import { useLocation } from "react-router-dom";
@@ -10,17 +10,17 @@ import debounce from "lodash.debounce";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import WeightsCards from "components/common/Card/WeightsCards";
 import { useBookmarks, useRatings } from "hooks";
-import { faClock } from "@fortawesome/pro-solid-svg-icons";
-import TempSelect from "components/common/TempSelect";
+import { faFilter, faLanguage, faTag } from "@fortawesome/pro-solid-svg-icons";
+import Select from "components/common/Select";
 
-const allTags = [
-  "English",
-  "Spanish",
-  "Portuguese",
-  "High-pitched",
-  "Low-pitched",
-  "Character",
-];
+// const allTags = [
+//   "English",
+//   "Spanish",
+//   "Portuguese",
+//   "High-pitched",
+//   "Low-pitched",
+//   "Character",
+// ];
 
 export default function SearchPage() {
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
@@ -68,29 +68,48 @@ export default function SearchPage() {
     }
   }, [urlSearchTerm, debouncedDoSearch]);
 
-  let selectedTags: any = [];
-  let handleSelectTag = () => {};
+  // let selectedTags: any = [];
+  // let handleSelectTag = () => {};
 
-  const tags = (
-    <div className="d-flex flex-column gap-3">
-      <ModelTags
-        tags={allTags}
-        selectedTags={selectedTags}
-        onSelectTag={handleSelectTag}
-      />
-    </div>
-  );
+  // const tags = (
+  //   <div className="d-flex flex-column gap-3">
+  //     <ModelTags
+  //       tags={allTags}
+  //       selectedTags={selectedTags}
+  //       onSelectTag={handleSelectTag}
+  //     />
+  //   </div>
+  // );
 
-  const sortOptions = [
-    { value: "most liked", label: "Most Liked" },
-    { value: "most used", label: "Most Used" },
-    { value: "moset recent", label: "Most Recent" },
+  // const sortOptions = [
+  //   { value: "most liked", label: "Most Liked" },
+  //   { value: "most used", label: "Most Used" },
+  //   { value: "moset recent", label: "Most Recent" },
+  // ];
+  const languageOpts = [
+    { value: "all", label: "All Languages" },
+    { value: "english", label: "Egnlish" },
+    { value: "spanish", label: "Spanish" },
+    { value: "portuguese", label: "Portuguese" },
   ];
-  const sortTimeOptions = [
-    { value: "all time", label: "All Time" },
-    { value: "today", label: "Today" },
-    { value: "this week", label: "This Week" },
-    { value: "this month", label: "This Month" },
+
+  const weightCategoryOpts = [
+    { value: "all", label: "All Categories" },
+    { value: "image_generation", label: "Image generation" },
+    { value: "text_to_speech", label: "Text to speech" },
+    { value: "vocoder", label: "Vocoder" },
+    { value: "voice_conversion", label: "Voice conversion" },
+  ];
+
+  const weightTypeOpts = [
+    { value: "all", label: "All Types" },
+    { value: "hifigan_tt2", label: "HiFiGAN TT2" },
+    { value: "sd_1.5", label: "SD 1.5" },
+    { value: "sdxl", label: "SDXL" },
+    { value: "so_vits_svc", label: "SVC" },
+    { value: "rvc_v2", label: "RVC v2" },
+    { value: "tt2", label: "TT2" },
+    { value: "loRA", label: "LoRA" },
   ];
 
   return (
@@ -98,13 +117,35 @@ export default function SearchPage() {
       <PageHeader
         title={`${foundWeights.length || "0"} results for "${urlSearchTerm}"`}
         titleH2={true}
-        extension={tags}
+        // extension={tags}
         panel={false}
       />
       <Panel padding={true}>
         <div className="d-flex gap-2 mb-4">
-          <TempSelect small={true} options={sortOptions} />
-          <TempSelect small={true} icon={faClock} options={sortTimeOptions} />
+          <Select
+            {...{
+              icon: faLanguage,
+              options: languageOpts,
+              name: "languages",
+              defaultValue: languageOpts[0],
+            }}
+          />
+          <Select
+            {...{
+              icon: faTag,
+              options: weightCategoryOpts,
+              name: "weightCategory",
+              defaultValue: weightCategoryOpts[0],
+            }}
+          />
+          <Select
+            {...{
+              icon: faFilter,
+              options: weightTypeOpts,
+              name: "weightType",
+              defaultValue: weightTypeOpts[0],
+            }}
+          />
         </div>
 
         <MasonryGrid
