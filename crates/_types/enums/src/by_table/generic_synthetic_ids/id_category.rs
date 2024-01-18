@@ -29,6 +29,10 @@ pub enum IdCategory {
   #[serde(rename = "mocap")]
   MocapResult,
 
+  // Results from workflows
+  #[serde(rename = "workflow")]
+  WorkflowResult,
+
   /// Results from tacotron2
   /// Applies for RVC and SVC
   #[serde(rename = "tts_result")]
@@ -78,6 +82,7 @@ impl IdCategory {
       Self::ModelWeights => "model_weights",
       Self::FileUpload => "file_upload",
       Self::MocapResult => "mocap",
+      Self::WorkflowResult => "workflow",
     }
   }
 
@@ -94,6 +99,7 @@ impl IdCategory {
       "model_weights" => Ok(Self::ModelWeights),
       "file_upload" => Ok(Self::FileUpload),
       "mocap" => Ok(Self::MocapResult),
+      "workflow" => Ok(Self::WorkflowResult),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -113,6 +119,7 @@ impl IdCategory {
       Self::ModelWeights,
       Self::FileUpload,
       Self::MocapResult,
+      Self::WorkflowResult,
     ])
   }
 }
@@ -138,6 +145,7 @@ mod tests {
     assert_serialization(IdCategory::ModelWeights, "model_weights");
     assert_serialization(IdCategory::FileUpload, "file_upload");
     assert_serialization(IdCategory::MocapResult, "mocap");
+    assert_serialization(IdCategory::WorkflowResult, "workflow");
   }
 
     #[test]
@@ -153,6 +161,7 @@ mod tests {
       assert_eq!(IdCategory::ModelWeights.to_str(), "model_weights");
       assert_eq!(IdCategory::FileUpload.to_str(), "file_upload");
       assert_eq!(IdCategory::MocapResult.to_str(), "mocap");
+      assert_eq!(IdCategory::WorkflowResult.to_str(), "workflow");
     }
 
     #[test]
@@ -168,13 +177,14 @@ mod tests {
       assert_eq!(IdCategory::from_str("model_weights").unwrap(), IdCategory::ModelWeights);
       assert_eq!(IdCategory::from_str("file_upload").unwrap(), IdCategory::FileUpload);
       assert_eq!(IdCategory::from_str("mocap").unwrap(), IdCategory::MocapResult);
+      assert_eq!(IdCategory::from_str("workflow").unwrap(), IdCategory::WorkflowResult);
     }
 
     #[test]
     fn all_variants() {
       // Static check
       let mut variants = IdCategory::all_variants();
-      assert_eq!(variants.len(), 11);
+      assert_eq!(variants.len(), 12);
       assert_eq!(variants.pop_first(), Some(IdCategory::MediaFile));
       assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimationResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::VideoFilterResult));
@@ -186,6 +196,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotVoiceEmbedding));
       assert_eq!(variants.pop_first(), Some(IdCategory::ModelWeights));
       assert_eq!(variants.pop_first(), Some(IdCategory::FileUpload));
+      assert_eq!(variants.pop_first(), Some(IdCategory::WorkflowResult));
       assert_eq!(variants.pop_first(), None);
 
       // Generated check

@@ -31,6 +31,9 @@ pub enum InferenceCategory {
 
   #[serde(rename = "mocap")]
   Mocap,
+
+  #[serde(rename = "workflow")]
+  Workflow,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -46,6 +49,7 @@ impl InferenceCategory {
       Self::VoiceConversion => "voice_conversion",
       Self::VideoFilter => "video_filter",
       Self::Mocap => "mocap",
+      Self::Workflow => "workflow",
     }
   }
 
@@ -69,6 +73,7 @@ impl InferenceCategory {
       Self::VoiceConversion,
       Self::VideoFilter,
       Self::Mocap,
+      Self::Workflow,
     ])
   }
 }
@@ -84,7 +89,8 @@ mod tests {
     assert_serialization(InferenceCategory::TextToSpeech, "text_to_speech");
     assert_serialization(InferenceCategory::VoiceConversion, "voice_conversion");
     assert_serialization(InferenceCategory::VideoFilter, "video_filter");
-    assert_serialization(InferenceCategory::Mocap, "mocap")
+    assert_serialization(InferenceCategory::Mocap, "mocap");
+    assert_serialization(InferenceCategory::Workflow, "workflow")
   }
 
   #[test]
@@ -94,6 +100,7 @@ mod tests {
     assert_eq!(InferenceCategory::VoiceConversion.to_str(), "voice_conversion");
     assert_eq!(InferenceCategory::VideoFilter.to_str(), "video_filter");
     assert_eq!(InferenceCategory::Mocap.to_str(), "mocap");
+    assert_eq!(InferenceCategory::Workflow.to_str(), "workflow");
   }
 
   #[test]
@@ -103,18 +110,20 @@ mod tests {
     assert_eq!(InferenceCategory::from_str("voice_conversion").unwrap(), InferenceCategory::VoiceConversion);
     assert_eq!(InferenceCategory::from_str("video_filter").unwrap(), InferenceCategory::VideoFilter);
     assert_eq!(InferenceCategory::from_str("mocap").unwrap(), InferenceCategory::Mocap);
+    assert_eq!(InferenceCategory::from_str("workflow").unwrap(), InferenceCategory::Workflow);
   }
 
   #[test]
   fn all_variants() {
     // Static check
     let mut variants = InferenceCategory::all_variants();
-    assert_eq!(variants.len(), 5);
+    assert_eq!(variants.len(), 6);
     assert_eq!(variants.pop_first(), Some(InferenceCategory::LipsyncAnimation));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::TextToSpeech));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::VoiceConversion));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::VideoFilter));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::Mocap));
+    assert_eq!(variants.pop_first(), Some(InferenceCategory::Workflow));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check

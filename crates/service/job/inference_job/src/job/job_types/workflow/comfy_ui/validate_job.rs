@@ -1,0 +1,69 @@
+use std::collections::HashMap;
+use anyhow::anyhow;
+
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::{InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
+use mysql_queries::payloads::generic_inference_args::workflow_payload::{WorkflowArgs, FileSource, Dependency};
+use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+
+pub struct JobArgs<'a> {
+    pub dependencies: &'a HashMap<String, Dependency>,
+    pub workflow_source: &'a FileSource,
+}
+
+pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
+    let inference_args = job.maybe_inference_args
+        .as_ref()
+        .map(|args| args.args.as_ref())
+        .flatten();
+
+    let inference_category = job.maybe_inference_args
+        .as_ref()
+        .map(|args| args.inference_category)
+        .flatten();
+
+    match inference_category {
+        Some(InferenceCategoryAbbreviated::Workflow) => {}, // Valid
+        Some(category) => {
+            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("wrong inference category for job: {:?}", category)));
+        },
+        None => {
+            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no inference category for job!")));
+        }
+    };
+
+    let inference_args = match inference_args {
+        Some(args) => args,
+        None => {
+            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no inference args for job!")));
+        }
+    };
+
+    let inference_args = match inference_args {
+        PolymorphicInferenceArgs::Wf(inference_args) => inference_args,
+        _ => {
+            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("wrong inner args for job!")));
+        }
+    };
+
+    let dependencies = match &inference_args.maybe_dependencies {
+        Some(args) => args,
+        None => {
+            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No dependency map provided!")));
+        }
+    };
+
+    let workflow_source = match &inference_args.maybe_workflow_source {
+        Some(args) => args,
+        None => {
+            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No workflow source provided!")));
+        }
+    };
+
+
+    Ok(JobArgs {
+        dependencies,
+        workflow_source
+    })
+}

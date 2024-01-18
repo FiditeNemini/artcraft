@@ -9,6 +9,7 @@ use crate::job::job_types::vc::rvc_v2::rvc_v2_dependencies::RvcV2Dependencies;
 use crate::job::job_types::vc::so_vits_svc::svc_dependencies::SvcDependencies;
 use crate::job::job_types::videofilter::rerender_a_video::rerender_dependencies::RerenderDependencies;
 use crate::job::job_types::mocap::mocap_net::mocapnet_dependencies::MocapNetDependencies;
+use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
 use crate::util::scoped_execution::ScopedExecution;
 
 pub struct JobSpecificDependencies {
@@ -20,6 +21,7 @@ pub struct JobSpecificDependencies {
   pub maybe_vits_dependencies: Option<VitsDependencies>,
   pub maybe_rerender_dependencies: Option<RerenderDependencies>,
   pub maybe_mocapnet_dependencies: Option<MocapNetDependencies>,
+  pub maybe_comfy_ui_dependencies: Option<ComfyDependencies>,
 }
 
 impl JobSpecificDependencies {
@@ -33,6 +35,7 @@ impl JobSpecificDependencies {
     let mut maybe_vits_dependencies = None;
     let mut maybe_rerender_dependencies = None;
     let mut maybe_mocapnet_dependencies = None;
+    let mut maybe_comfy_ui_dependencies = None;
 
     if scoped_execution.can_run_job(InferenceModelType::RvcV2) {
       print_with_space("Setting RVCv2 dependencies...");
@@ -74,6 +77,11 @@ impl JobSpecificDependencies {
       maybe_mocapnet_dependencies = Some(MocapNetDependencies::setup()?);
     }
 
+    if scoped_execution.can_run_job(InferenceModelType::ComfyUi) {
+      print_with_space("Setting ComfyUI dependencies...");
+      maybe_comfy_ui_dependencies = Some(ComfyDependencies::setup()?);
+    }
+
     Ok(JobSpecificDependencies {
       maybe_rvc_v2_dependencies,
       maybe_sad_talker_dependencies,
@@ -82,7 +90,8 @@ impl JobSpecificDependencies {
       maybe_vall_e_x_dependencies,
       maybe_vits_dependencies,
       maybe_rerender_dependencies,
-      maybe_mocapnet_dependencies
+      maybe_mocapnet_dependencies,
+      maybe_comfy_ui_dependencies,
     })
   }
 }

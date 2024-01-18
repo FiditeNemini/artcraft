@@ -35,6 +35,8 @@ pub enum InferenceModelType {
   RerenderAVideo,
   #[serde(rename = "mocap_net")]
   MocapNet,
+  #[serde(rename = "comfy_ui")]
+  ComfyUi,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -53,6 +55,7 @@ impl InferenceModelType {
       Self::VallEX => "vall_e_x",
       Self::RerenderAVideo => "rerender_a_video",
       Self::MocapNet => "mocap_net",
+      Self::ComfyUi => "comfy_ui",
     }
   }
 
@@ -66,6 +69,7 @@ impl InferenceModelType {
       "vall_e_x" => Ok(Self::VallEX),
       "rerender_a_video" => Ok(Self::RerenderAVideo),
       "mocap_net" => Ok(Self::MocapNet),
+      "comfy_ui" => Ok(Self::ComfyUi),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -101,6 +105,7 @@ mod tests {
     assert_serialization(InferenceModelType::VallEX, "vall_e_x");
     assert_serialization(InferenceModelType::RerenderAVideo, "rerender_a_video");
     assert_serialization(InferenceModelType::MocapNet, "mocap_net");
+    assert_serialization(InferenceModelType::ComfyUi, "comfy_ui");
   }
 
   #[test]
@@ -113,6 +118,7 @@ mod tests {
     assert_eq!(InferenceModelType::VallEX.to_str(), "vall_e_x");
     assert_eq!(InferenceModelType::RerenderAVideo.to_str(), "rerender_a_video");
     assert_eq!(InferenceModelType::MocapNet.to_str(), "mocap_net");
+    assert_eq!(InferenceModelType::ComfyUi.to_str(), "comfy_ui");
   }
 
   #[test]
@@ -125,13 +131,14 @@ mod tests {
     assert_eq!(InferenceModelType::from_str("vall_e_x").unwrap(), InferenceModelType::VallEX);
     assert_eq!(InferenceModelType::from_str("rerender_a_video").unwrap(), InferenceModelType::RerenderAVideo);
     assert_eq!(InferenceModelType::from_str("mocap_net").unwrap(), InferenceModelType::MocapNet);
+    assert_eq!(InferenceModelType::from_str("comfy_ui").unwrap(), InferenceModelType::ComfyUi);
   }
 
   #[test]
   fn all_variants() {
     // Static check
     let mut variants = InferenceModelType::all_variants();
-    assert_eq!(variants.len(), 8);
+    assert_eq!(variants.len(), 9);
     assert_eq!(variants.pop_first(), Some(InferenceModelType::RvcV2));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::SadTalker));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::SoVitsSvc));
@@ -140,6 +147,7 @@ mod tests {
     assert_eq!(variants.pop_first(), Some(InferenceModelType::VallEX));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::RerenderAVideo));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::MocapNet));
+    assert_eq!(variants.pop_first(), Some(InferenceModelType::ComfyUi));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check

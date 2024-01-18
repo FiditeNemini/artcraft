@@ -28,3 +28,4 @@ pub mod w2l;
 pub mod user_bookmarks;
 pub mod weights;
 pub(crate) mod mocap;
+pub(crate) mod workflows;
