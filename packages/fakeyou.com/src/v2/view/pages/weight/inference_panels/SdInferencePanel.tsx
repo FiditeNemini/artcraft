@@ -24,7 +24,6 @@ import {
   EnqueueImageGenIsSuccess,
   EnqueueImageGenIsError,
 } from "@storyteller/components/src/api/image_generation/EnqueueImageGen";
-import { TypeOfInference } from "@storyteller/components/src/api/_common/enums/TypeOfInference";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
 interface SdInferencePanelProps {
