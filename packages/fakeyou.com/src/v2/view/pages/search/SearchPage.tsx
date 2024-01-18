@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import Container from "components/common/Container";
 import PageHeader from "components/layout/PageHeader";
 import Panel from "components/common/Panel";
-// import ModelTags from "components/common/ModelTags";
+import ModelTags from "components/common/ModelTags";
 import { SearchWeights } from "@storyteller/components/src/api/weights/SearchWeights";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import { useLocation } from "react-router-dom";
@@ -10,15 +10,17 @@ import debounce from "lodash.debounce";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import WeightsCards from "components/common/Card/WeightsCards";
 import { useBookmarks, useRatings } from "hooks";
+import { faClock } from "@fortawesome/pro-solid-svg-icons";
+import TempSelect from "components/common/TempSelect";
 
-// const allTags = [
-//   "English",
-//   "Spanish",
-//   "Portuguese",
-//   "High-pitched",
-//   "Low-pitched",
-//   "Character",
-// ];
+const allTags = [
+  "English",
+  "Spanish",
+  "Portuguese",
+  "High-pitched",
+  "Low-pitched",
+  "Character",
+];
 
 export default function SearchPage() {
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
@@ -66,56 +68,44 @@ export default function SearchPage() {
     }
   }, [urlSearchTerm, debouncedDoSearch]);
 
-  // let selectedTags: any = [];
-  // let handleSelectTag = () => {};
+  let selectedTags: any = [];
+  let handleSelectTag = () => {};
 
-  // const tags = (
-  //   <div className="d-flex flex-column gap-3">
-  //     <ModelTags
-  //       tags={allTags}
-  //       selectedTags={selectedTags}
-  //       onSelectTag={handleSelectTag}
-  //     />
-  //   </div>
-  // );
+  const tags = (
+    <div className="d-flex flex-column gap-3">
+      <ModelTags
+        tags={allTags}
+        selectedTags={selectedTags}
+        onSelectTag={handleSelectTag}
+      />
+    </div>
+  );
 
-  // const sortOptions = [
-  //   { value: "most liked", label: "Most Liked" },
-  //   { value: "most used", label: "Most Used" },
-  //   { value: "moset recent", label: "Most Recent" },
-  // ];
-  // const sortTimeOptions = [
-  //   { value: "all time", label: "All Time" },
-  //   { value: "today", label: "Today" },
-  //   { value: "this week", label: "This Week" },
-  //   { value: "this month", label: "This Month" },
-  // ];
+  const sortOptions = [
+    { value: "most liked", label: "Most Liked" },
+    { value: "most used", label: "Most Used" },
+    { value: "moset recent", label: "Most Recent" },
+  ];
+  const sortTimeOptions = [
+    { value: "all time", label: "All Time" },
+    { value: "today", label: "Today" },
+    { value: "this week", label: "This Week" },
+    { value: "this month", label: "This Month" },
+  ];
 
   return (
     <Container type="panel" className="mb-5">
       <PageHeader
         title={`${foundWeights.length || "0"} results for "${urlSearchTerm}"`}
         titleH2={true}
-        // extension={tags}
+        extension={tags}
         panel={false}
       />
       <Panel padding={true}>
-        {/* <div className="d-flex gap-2 mb-4">
-          <Select
-            small={true}
-            options={sortOptions}
-            defaultValue={sortOptions[0]}
-          />
-          <Select
-            small={true}
-            icon={faClock}
-            options={sortTimeOptions}
-            defaultValue={sortTimeOptions[0]}
-          />
-        </div> */}
-
-        {/*<ModelSearchResults data={filteredData} />*/}
-        {/* <ModelSearchResults data={foundWeights} /> */}
+        <div className="d-flex gap-2 mb-4">
+          <TempSelect small={true} options={sortOptions} />
+          <TempSelect small={true} icon={faClock} options={sortTimeOptions} />
+        </div>
 
         <MasonryGrid
           gridRef={gridContainerRef}
