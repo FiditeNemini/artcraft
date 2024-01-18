@@ -485,6 +485,12 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/animation/face_animation/create`;
   }
 
+  // =============== Image Generation ===============
+
+  enqueueImageGeneration(): string {
+    return `${this.getApiOrigin()}/v1/image_gen/inference/enqueue_image_gen`;
+  }
+
   // =============== Generic Model Downloads ===============
 
   enqueueRemoteDownloadJob(): string {

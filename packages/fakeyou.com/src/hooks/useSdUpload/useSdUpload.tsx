@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import { UploadModel } from "@storyteller/components/src/api/image_generation/UploadModel";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import { useCoverImgUpload } from "hooks";
@@ -7,8 +7,8 @@ import { v4 as uuidv4 } from "uuid";
 // this hook is mostly for organizational purposes while I work -V
 
 export default function useSdUpload() {
-	const [title, titleSet] = useState("");
-  const [uploadPath,uploadPathSet] = useState("");
+  const [title, titleSet] = useState("");
+  const [uploadPath, uploadPathSet] = useState("");
   const [visibility, visibilitySet] = useState("public");
   const [descriptionMD, descriptionMDSet] = useState("");
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
@@ -19,30 +19,41 @@ export default function useSdUpload() {
       descriptionMDSet,
       uploadPathSet,
       titleSet,
-      visibilitySet
+      visibilitySet,
     };
     todo[target.name + "Set"](target.value);
   };
 
   const upload = () => {
     writeStatusSet(FetchStatus.in_progress);
-  	UploadModel("",{
-      ...coverImg.token ? { cover_image_media_file_token: coverImg.token } : {},
+    UploadModel("", {
+      ...(coverImg.token
+        ? { cover_image_media_file_token: coverImg.token }
+        : {}),
       description: descriptionMD,
       uuid_idempotency_token: uuidv4(),
       type_of_inference: "inference",
       maybe_upload_path: uploadPath,
       title,
-      visibility
+      visibility,
     })
-    .then((res: any) => {
-      writeStatusSet(FetchStatus.success);
-      console.log("🌠",res);
-      // history.replace(`/weight/${token}`);
-    })
-    .catch(err => {
-      writeStatusSet(FetchStatus.error);
-    });
-  }
-  return { coverImg, descriptionMD, onChange, title, upload, uploadPath, visibility, writeStatus };
-};
+      .then((res: any) => {
+        writeStatusSet(FetchStatus.success);
+        console.log("🌠", res);
+        // history.replace(`/weight/${token}`);
+      })
+      .catch(err => {
+        writeStatusSet(FetchStatus.error);
+      });
+  };
+  return {
+    coverImg,
+    descriptionMD,
+    onChange,
+    title,
+    upload,
+    uploadPath,
+    visibility,
+    writeStatus,
+  };
+}
