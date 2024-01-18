@@ -1,8 +1,7 @@
 use elasticsearch::{Elasticsearch, SearchParts};
-use log::error;
 use serde_json::{json, Value};
-use enums::by_table::model_weights::weights_types::WeightsType;
 
+use enums::by_table::model_weights::weights_types::WeightsType;
 use errors::AnyhowResult;
 
 use crate::documents::model_weight_document::{MODEL_WEIGHT_INDEX, ModelWeightDocument};
@@ -201,4 +200,68 @@ fn query_model_weights_with_model_weights_type(search_term: &str, weight_type: W
       }
     }
   })
+}
+
+#[cfg(test)]
+mod tests {
+  use regex::Regex;
+  use crate::searches::search_model_weights::query_model_weights;
+
+  #[test]
+  fn default_search_only_keyword() {
+    let json = query_model_weights("FOO_BAR_BAZ");
+    let json = serde_json::to_string(&json).unwrap();
+
+    // NB: Keys in emitted JSON are sorted.
+    let expected_json = r#"
+      {
+        "query": {
+          "bool": {
+            "must": [
+              {
+                "bool": {
+                  "should": [
+                    {
+                      "fuzzy": {
+                        "title": {
+                          "fuzziness": 2,
+                          "value": "FOO_BAR_BAZ"
+                        }
+                      }
+                    },
+                    {
+                      "match": {
+                        "title": {
+                          "boost": 1,
+                          "query": "FOO_BAR_BAZ"
+                        }
+                      }
+                    },
+                    {
+                      "multi_match": {
+                        "boost": 50,
+                        "fields": [
+                          "title",
+                          "title._2gram",
+                          "title._3gram"
+                        ],
+                        "query": "FOO_BAR_BAZ",
+                        "type": "bool_prefix"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    "#;
+
+    let regex = Regex::new("\\s+").expect("regex should parse");
+
+    let expected_json = regex.replace_all(&expected_json, "");
+
+    assert_eq!(&json, &expected_json);
+  }
 }
