@@ -1,13 +1,46 @@
-import React from "react";
-import { useLocalize } from "hooks";
+import React, { useState, useEffect } from "react";
 
-import TabContentUpload from "./components/tabContentUpload";
-import TabContentLibrary from "./components/tabContentLibrary";
+import { useLocalize } from "hooks";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
+import { FrontendInferenceJobType,  InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+
+import { PageVideoProvision } from "./components/pageVideoProvision";
+import { PageInferenceStatuses } from "./components/pageInferenceStatuses";
 import { BasicVideo } from "components/common";
 
-export default function VideoMotionCapture(){
+export default function VideoMotionCapture(props: {
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper,
+  enqueueInferenceJob: (
+    jobToken: string,
+    frontendInferenceJobType: FrontendInferenceJobType
+  ) => void,
+  inferenceJobs: Array<InferenceJob>,
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>,
+}){
+
+  const { enqueueInferenceJob } = props;
   const { t } = useLocalize("VideoMotionCapture");
+  enum pageStates { VIDEO_PROVISION, SHOW_JOB_STATUS }
+  const { VIDEO_PROVISION, SHOW_JOB_STATUS} = pageStates;
+  const [pageState, setPageState] = useState<{
+    index:number,
+    inputMediaToken: string,
+    jobToken: string,
+    resultMediaToken: string
+  }>({ index: VIDEO_PROVISION, inputMediaToken: "", jobToken: "", resultMediaToken: ""});
   
+  const handlePageState = (
+    {tokenType, token }:{tokenType:string, token:string | undefined}
+  ) => {
+    if(token && tokenType == "jobToken"){
+      setPageState({
+        ...pageState,
+        index: SHOW_JOB_STATUS,
+        jobToken: token
+      })
+    }
+  }
+
   return (
     <div className="container-panel py-4">
       <div className="panel p-4">
@@ -21,34 +54,25 @@ export default function VideoMotionCapture(){
         
         <div className="row g-5 mt-1">
 
-          {/*Video Chooser Tabs*/}
+          {/*Video Provision Tabs & Job Statuses*/}
           <div className="col-12 col-md-6">
-            <ul className="nav nav-tabs" id="vmcTab">
-              <li className="nav-item">
-                <button
-                  className="nav-link active"
-                  id="vmcUploadTab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#vmcUpload"
-                >
-                  {t("tabTitle.upload")}
-                </button>
-              </li>
-              <li className="nav-item">
-                <button
-                  className="nav-link"
-                  id="vmcLibraryTab"
-                  data-bs-toggle="tab"
-                  data-bs-target="#vmcLibrary"
-                >
-                  {t("tabTitle.library")}
-                </button>
-              </li>
-            </ul>
-            <div className="tab-content" id="vmcTabContent">
-              <TabContentUpload t={t}/>
-              <TabContentLibrary t={t}/>
-            </div>
+            { pageState.index === VIDEO_PROVISION && 
+              <PageVideoProvision
+                t={t}
+                pageStateCallback={handlePageState}
+              />
+            }
+            { pageState.index === SHOW_JOB_STATUS && 
+              <PageInferenceStatuses
+                {...{
+                  t,
+                  enqueueInferenceJob,
+                  pageStates,
+                  pageState,
+                  pageStateCallback: handlePageState
+                }}
+              />
+            }
           </div>
           {/*ENDS Video Chooser Tabs*/}
           

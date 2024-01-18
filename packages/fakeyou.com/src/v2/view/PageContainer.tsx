@@ -659,7 +659,13 @@ class PageContainer extends React.Component<
 
             <Route path="/video-mocap/:mediaToken?">
               <VideoMocap
-
+                {...{
+                  enqueueInferenceJob: this.props.enqueueInferenceJob,
+                  sessionSubscriptionsWrapper:
+                    this.props.sessionSubscriptionsWrapper,
+                  inferenceJobs: this.props.inferenceJobs,
+                  inferenceJobsByCategory: this.props.inferenceJobsByCategory,
+                }}
               />
             </Route>
 

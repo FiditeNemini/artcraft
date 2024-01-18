@@ -471,6 +471,11 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/animation/face_animation/create`;
   }
 
+  // =============== Motion Capture / mocap ===============
+  enqueueVideoMotionCapture(): string{
+    return `${this.getApiOrigin()}/v1/mocap/mocapnet/create`
+  }
+
   // =============== Generic Model Downloads ===============
 
   enqueueRemoteDownloadJob(): string {
