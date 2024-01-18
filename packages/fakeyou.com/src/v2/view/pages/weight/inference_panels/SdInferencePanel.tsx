@@ -128,6 +128,26 @@ export default function SdInferencePanel({
     { label: "Custom", value: "custom" },
   ];
 
+  let imageWidth: number;
+  let imageHeight: number;
+
+  switch (aspectRatio) {
+    case "square":
+      imageWidth = 512;
+      imageHeight = 512;
+      break;
+    case "landscape":
+      imageWidth = 768;
+      imageHeight = 512;
+      break;
+    case "portrait":
+      imageWidth = 512;
+      imageHeight = 768;
+      break;
+    default:
+      throw new Error("Invalid aspect ratio");
+  }
+
   const handlePromptChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -215,8 +235,8 @@ export default function SdInferencePanel({
       maybe_prompt: prompt,
       maybe_n_prompt: negativePrompt,
       maybe_seed: internalSeed.current,
-      maybe_width: 512,
-      maybe_height: 512,
+      maybe_width: imageWidth,
+      maybe_height: imageHeight,
       maybe_sampler: sampler,
       maybe_cfg_scale: cfgScale,
       maybe_number_of_samples: samples,
