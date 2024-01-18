@@ -263,6 +263,11 @@ pub struct StaticFeatureFlags {
   /// TEMPORARY: Move voice control model listing over to `model_weights` from `voice_conversion_models`
   /// This will control all downstream enqueuing, jobs, etc.
   pub switch_voice_conversion_to_model_weights: bool,
+
+  // TODO(2024-01-13): Remove temporary flag when done.
+  /// TEMPORARY: Move voice control model listing over to `model_weights` from `tts_models`
+  /// This will control all downstream enqueuing, jobs, etc.
+  pub switch_tts_to_model_weights: bool,
 }
 
 /// Instead of top level service denial, these are bans against entities that instead return

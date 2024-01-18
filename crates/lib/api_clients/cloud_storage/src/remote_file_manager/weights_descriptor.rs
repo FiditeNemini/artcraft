@@ -3,7 +3,6 @@ use super::file_descriptor::FileDescriptor;
 pub struct WeightsLoRADescriptor;
 
 const REMOTE_FILE_DIRECTORY: &str = "/weights";
-
 impl FileDescriptor for WeightsLoRADescriptor {
     fn remote_directory_path(&self) -> &str {
         REMOTE_FILE_DIRECTORY
@@ -25,6 +24,7 @@ impl FileDescriptor for WeightsLoRADescriptor {
       true
     }
 }
+
 
 pub struct WeightsSD15Descriptor;
 
@@ -166,6 +166,26 @@ impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsV
     }
 
     // This will be ensure that the right bucket is picked
+    fn is_public(&self) -> bool {
+        true
+    }
+}
+
+pub struct WeightsWorkflowDescriptor;
+
+impl FileDescriptor for WeightsWorkflowDescriptor {
+    fn remote_directory_path(&self) -> &str {
+        REMOTE_FILE_DIRECTORY
+    }
+
+    fn get_suffix(&self) -> String {
+        "json".to_string()
+    }
+
+    fn get_prefix(&self) -> String {
+        "workflow".to_string()
+    }
+
     fn is_public(&self) -> bool {
         true
     }

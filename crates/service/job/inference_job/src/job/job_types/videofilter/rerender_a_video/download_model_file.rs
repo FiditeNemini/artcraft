@@ -16,7 +16,7 @@ use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 pub struct ModelFile {
     pub filesystem_path: PathBuf,
 }
-
+// TODO replace this with remote cloud file manager.
 pub async fn download_model_file(
     model_record: &Option<RetrievedModelWeight>,
     public_bucket_client: &BucketClient,

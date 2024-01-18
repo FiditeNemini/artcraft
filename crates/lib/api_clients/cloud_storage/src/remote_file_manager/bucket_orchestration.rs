@@ -19,7 +19,6 @@ pub trait BucketOrchestrationCore {
                                                    bytes: &[u8],
                                                    content_type: &str,
                                                    is_public: bool) -> AnyhowResult<()>;
-
 }
 
 

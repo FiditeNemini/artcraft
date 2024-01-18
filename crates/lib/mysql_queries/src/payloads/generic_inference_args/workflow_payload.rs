@@ -1,30 +1,16 @@
 use std::collections::HashMap;
 use tokens::tokens::model_weights::ModelWeightToken;
 
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
-pub enum FileSource {
-    F(String),
-    U(String),
-}
-
-impl FileSource {
-    pub fn media_file_token(token: &str) -> Self {
-        FileSource::F(token.to_string())
-    }
-    pub fn media_upload_token(token: &str) -> Self {
-        FileSource::U(token.to_string())
-    }
-}
-
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
-enum NewValue {
+pub enum NewValue {
     String(String),
     Float(f32),
     Int(i32),
+    Bool(bool),
 }
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct WorkflowArgs {
     #[serde(rename = "sd")]
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -77,6 +77,7 @@ impl VcModelLite {
         WeightsType::HifiganTacotron2 => None, // NB: Not used directly in inference. Included by other models.
         WeightsType::LoRA => None, // NB: not used directly in inference. Included in other models.
         WeightsType::VallE => None, // TODO(bt,2023-12-18): Does this mean speaker weights?
+        WeightsType::ComfyUi => None, // NB: not used directly in inference. Included in other models.
       }
     }
   }
@@ -97,6 +98,7 @@ impl VcModelLite {
         WeightsType::HifiganTacotron2 => None, // NB: Not used directly in inference. Included by other models.
         WeightsType::LoRA => None, // NB: not used directly in inference. Included in other models.
         WeightsType::VallE => None, // TODO(bt,2023-12-18): Does this mean speaker weights?
+        WeightsType::ComfyUi => None, // NB: not used directly in inference. Included in other models.
       }
     }
   }

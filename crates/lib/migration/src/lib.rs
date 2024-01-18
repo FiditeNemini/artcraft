@@ -18,4 +18,5 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+pub mod text_to_speech;
 pub mod voice_conversion;

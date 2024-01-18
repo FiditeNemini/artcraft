@@ -1,5 +1,6 @@
 pub mod api_tokens;
 pub mod audit_logs;
+pub mod batch_generations;
 pub mod billing;
 pub mod comments;
 pub mod email_sender_jobs;
@@ -18,12 +19,9 @@ pub mod stats;
 pub mod trending_model_analytics;
 pub mod tts;
 pub mod twitch;
-pub mod user_bookmarks;
 pub mod users;
 pub mod vocoder;
 pub mod voice_clone_requests;
 pub mod voice_conversion;
 pub mod voice_designer;
 pub mod w2l;
-
-

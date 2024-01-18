@@ -318,8 +318,11 @@ fn record_to_payload(
             }
           }
         }
+        InferenceCategory::ImageGeneration => { 
+          "".to_string()
+        }
       };
-
+     
       ResultDetailsResponse {
         entity_type: result_details.entity_type,
         entity_token: result_details.entity_token,

@@ -8,7 +8,8 @@ use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improve
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::tts::{tacotron2_v2_early_fakeyou, vits};
+use crate::job::job_types::tts::{styletts2, tacotron2_v2_early_fakeyou, vits};
+use crate::job::job_types::tts::styletts2::process_job::StyleTTS2ProcessJobArgs;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::process_job::ProcessJobArgs;
 use crate::job::job_types::tts::vall_e_x::process_job::VALLEXProcessJobArgs;
 use crate::job::job_types::tts::vits::process_job::VitsProcessJobArgs;
@@ -24,7 +25,7 @@ pub async fn process_single_tts_job(
   // TODO: Move common checks for slurs, etc. here.
 
   match job.maybe_model_type {
-    Some(InferenceModelType::VallEX) => {
+    Some(InferenceModelType::VallEX) | Some(InferenceModelType::StyleTTS2) => {
       // Zero-shot TTS does not need a fine-tuned model token.
       dispatch_zero_shot_model(
         job_dependencies,
@@ -60,6 +61,12 @@ async fn dispatch_zero_shot_model(
   match job.maybe_model_type {
     Some(InferenceModelType::VallEX) => {
       vall_e_x::process_job::process_job(VALLEXProcessJobArgs {
+        job_dependencies,
+        job,
+      }).await
+    }
+    Some(InferenceModelType::StyleTTS2) => {
+      styletts2::process_job::process_job(StyleTTS2ProcessJobArgs {
         job_dependencies,
         job,
       }).await

@@ -35,7 +35,6 @@ const BUCKET_FILE_EXTENSION: &str = ".mp4";
 pub struct RerenderProcessJobArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
     pub job: &'a AvailableInferenceJob,
-    // pub media_file: MediaFile,
 }
 
 pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {

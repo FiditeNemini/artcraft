@@ -6,8 +6,8 @@ use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use errors::AnyhowResult;
 
-use crate::queries::user_bookmarks::list_user_bookmarks_result::RawUserBookmarkRecord;
-use crate::queries::user_bookmarks::list_user_bookmarks_result::UserBookmark;
+use crate::queries::users::user_bookmarks::list_user_bookmarks_result::RawUserBookmarkRecord;
+use crate::queries::users::user_bookmarks::list_user_bookmarks_result::UserBookmark;
 
 pub struct UserBookmarkListPage {
   pub results: Vec<UserBookmark>,

@@ -41,6 +41,9 @@ pub enum MediaFileOriginModelType {
 
   #[serde(rename = "comfy_ui")]
   ComfyUi,
+
+  #[serde(rename = "styletts2")]
+  StyleTTS2,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -60,6 +63,7 @@ impl MediaFileOriginModelType {
       Self::Rerender => "rerender",
       Self::MocapNet => "mocap_net",
       Self::ComfyUi => "comfy_ui",
+      Self::StyleTTS2 => "styletts2",
     }
   }
 
@@ -73,6 +77,7 @@ impl MediaFileOriginModelType {
       "rerender" => Ok(Self::Rerender),
       "mocap_net" => Ok(Self::MocapNet),
       "comfy_ui" => Ok(Self::ComfyUi),
+      "styletts2" => Ok(Self::StyleTTS2),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -89,6 +94,7 @@ impl MediaFileOriginModelType {
       Self::Rerender,
       Self::MocapNet,
       Self::ComfyUi,
+      Self::StyleTTS2,
     ])
   }
 }
@@ -116,6 +122,7 @@ mod tests {
       assert_eq!(MediaFileOriginModelType::Rerender.to_str(), "rerender");
       assert_eq!(MediaFileOriginModelType::MocapNet.to_str(), "mocap_net");
       assert_eq!(MediaFileOriginModelType::ComfyUi.to_str(), "comfy_ui");
+      assert_eq!(MediaFileOriginModelType::StyleTTS2.to_str(), "styletts2");
   }
 
     #[test]
@@ -128,13 +135,14 @@ mod tests {
       assert_eq!(MediaFileOriginModelType::from_str("rerender").unwrap(), MediaFileOriginModelType::Rerender);
       assert_eq!(MediaFileOriginModelType::from_str("mocap_net").unwrap(), MediaFileOriginModelType::MocapNet);
       assert_eq!(MediaFileOriginModelType::from_str("comfy_ui").unwrap(), MediaFileOriginModelType::ComfyUi);
+      assert_eq!(MediaFileOriginModelType::from_str("styletts2").unwrap(), MediaFileOriginModelType::StyleTTS2);
       assert!(MediaFileOriginModelType::from_str("foo").is_err());
     }
 
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginModelType::all_variants();
-      assert_eq!(variants.len(), 8);
+      assert_eq!(variants.len(), 10);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::RvcV2));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SadTalker));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SoVitsSvc));
@@ -143,6 +151,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::Rerender));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::MocapNet));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::ComfyUi));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::StyleTTS2));
       assert_eq!(variants.pop_first(), None);
     }
   }

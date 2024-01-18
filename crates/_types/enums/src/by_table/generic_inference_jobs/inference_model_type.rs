@@ -33,10 +33,14 @@ pub enum InferenceModelType {
   VallEX,
   #[serde(rename = "rerender_a_video")]
   RerenderAVideo,
+  #[serde(rename = "stable_diffusion")]
+  StableDiffusion,
   #[serde(rename = "mocap_net")]
   MocapNet,
   #[serde(rename = "comfy_ui")]
   ComfyUi,
+  #[serde(rename = "styletts2")]
+  StyleTTS2,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -54,7 +58,9 @@ impl InferenceModelType {
       Self::Vits => "vits",
       Self::VallEX => "vall_e_x",
       Self::RerenderAVideo => "rerender_a_video",
+      Self::StableDiffusion => "stable_diffusion",
       Self::MocapNet => "mocap_net",
+      Self::StyleTTS2 => "styletts2",
       Self::ComfyUi => "comfy_ui",
     }
   }
@@ -68,7 +74,9 @@ impl InferenceModelType {
       "vits" => Ok(Self::Vits),
       "vall_e_x" => Ok(Self::VallEX),
       "rerender_a_video" => Ok(Self::RerenderAVideo),
+      "stable_diffusion" => Ok(Self::StableDiffusion),
       "mocap_net" => Ok(Self::MocapNet),
+      "styletts2" => Ok(Self::StyleTTS2),
       "comfy_ui" => Ok(Self::ComfyUi),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -85,7 +93,9 @@ impl InferenceModelType {
       InferenceModelType::Vits,
       InferenceModelType::VallEX,
       InferenceModelType::RerenderAVideo,
+      InferenceModelType::StableDiffusion,
       InferenceModelType::MocapNet,
+      InferenceModelType::StyleTTS2,
     ])
   }
 }
@@ -104,8 +114,10 @@ mod tests {
     assert_serialization(InferenceModelType::Vits, "vits");
     assert_serialization(InferenceModelType::VallEX, "vall_e_x");
     assert_serialization(InferenceModelType::RerenderAVideo, "rerender_a_video");
+    assert_serialization(InferenceModelType::StableDiffusion, "stable_diffusion");
     assert_serialization(InferenceModelType::MocapNet, "mocap_net");
     assert_serialization(InferenceModelType::ComfyUi, "comfy_ui");
+    assert_serialization(InferenceModelType::StyleTTS2, "styletts2");
   }
 
   #[test]
@@ -117,7 +129,9 @@ mod tests {
     assert_eq!(InferenceModelType::Vits.to_str(), "vits");
     assert_eq!(InferenceModelType::VallEX.to_str(), "vall_e_x");
     assert_eq!(InferenceModelType::RerenderAVideo.to_str(), "rerender_a_video");
+    assert_eq!(InferenceModelType::StableDiffusion.to_str(), "stable_diffusion");
     assert_eq!(InferenceModelType::MocapNet.to_str(), "mocap_net");
+    assert_eq!(InferenceModelType::StyleTTS2.to_str(), "styletts2");
     assert_eq!(InferenceModelType::ComfyUi.to_str(), "comfy_ui");
   }
 
@@ -130,7 +144,9 @@ mod tests {
     assert_eq!(InferenceModelType::from_str("vits").unwrap(), InferenceModelType::Vits);
     assert_eq!(InferenceModelType::from_str("vall_e_x").unwrap(), InferenceModelType::VallEX);
     assert_eq!(InferenceModelType::from_str("rerender_a_video").unwrap(), InferenceModelType::RerenderAVideo);
+    assert_eq!(InferenceModelType::from_str("stable_diffusion").unwrap(), InferenceModelType::StableDiffusion);
     assert_eq!(InferenceModelType::from_str("mocap_net").unwrap(), InferenceModelType::MocapNet);
+    assert_eq!(InferenceModelType::from_str("styletts2").unwrap(), InferenceModelType::StyleTTS2);
     assert_eq!(InferenceModelType::from_str("comfy_ui").unwrap(), InferenceModelType::ComfyUi);
   }
 
@@ -138,7 +154,7 @@ mod tests {
   fn all_variants() {
     // Static check
     let mut variants = InferenceModelType::all_variants();
-    assert_eq!(variants.len(), 9);
+    assert_eq!(variants.len(), 10);
     assert_eq!(variants.pop_first(), Some(InferenceModelType::RvcV2));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::SadTalker));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::SoVitsSvc));
@@ -146,7 +162,9 @@ mod tests {
     assert_eq!(variants.pop_first(), Some(InferenceModelType::Vits));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::VallEX));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::RerenderAVideo));
+    assert_eq!(variants.pop_first(), Some(InferenceModelType::StableDiffusion));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::MocapNet));
+    assert_eq!(variants.pop_first(), Some(InferenceModelType::StyleTTS2));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::ComfyUi));
     assert_eq!(variants.pop_first(), None);
 

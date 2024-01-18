@@ -10,15 +10,13 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::{info, warn};
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-use mysql_queries::payloads::generic_inference_args::workflow_payload::{WorkflowArgs};
+use mysql_queries::payloads::generic_inference_args::workflow_payload::{NewValue, WorkflowArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -44,6 +42,7 @@ pub struct EnqueueComfyRequest {
     maybe_lora_model: Option<ModelWeightToken>,
     maybe_prompt: Option<String>,
     maybe_negative_prompt: Option<String>,
+    maybe_json_modifications: Option<HashMap<String, NewValue>>,
     maybe_workflow_config: Option<ModelWeightToken>,
 
     creator_set_visibility: Option<Visibility>,
@@ -179,6 +178,7 @@ pub async fn enqueue_comfy_ui_handler(
         maybe_lora_model: request.maybe_lora_model.clone(),
         maybe_prompt: request.maybe_prompt.clone(),
         maybe_negative_prompt: request.maybe_negative_prompt.clone(),
+        maybe_json_modifications: request.maybe_json_modifications.clone(),
         maybe_workflow_config: request.maybe_workflow_config.clone(),
     };
 

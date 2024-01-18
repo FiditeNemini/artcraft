@@ -1,14 +1,16 @@
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use errors::AnyhowResult;
 
+use crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_dependencies::SadTalkerDependencies;
+use crate::job::job_types::mocap::mocap_net::mocapnet_dependencies::MocapNetDependencies;
+use crate::job::job_types::tts::styletts2::styletts2_dependencies::StyleTTS2Dependencies;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_dependencies::Tacotron2Dependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_dependencies::VallExDependencies;
 use crate::job::job_types::tts::vits::vits_dependencies::VitsDependencies;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_dependencies::RvcV2Dependencies;
 use crate::job::job_types::vc::so_vits_svc::svc_dependencies::SvcDependencies;
 use crate::job::job_types::videofilter::rerender_a_video::rerender_dependencies::RerenderDependencies;
-use crate::job::job_types::mocap::mocap_net::mocapnet_dependencies::MocapNetDependencies;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
 use crate::util::scoped_execution::ScopedExecution;
 
@@ -20,7 +22,9 @@ pub struct JobSpecificDependencies {
   pub maybe_vall_e_x_dependencies: Option<VallExDependencies>,
   pub maybe_vits_dependencies: Option<VitsDependencies>,
   pub maybe_rerender_dependencies: Option<RerenderDependencies>,
+  pub maybe_stable_diffusion_dependencies: Option<StableDiffusionDependencies>,
   pub maybe_mocapnet_dependencies: Option<MocapNetDependencies>,
+  pub maybe_styletts2_dependencies: Option<StyleTTS2Dependencies>,
   pub maybe_comfy_ui_dependencies: Option<ComfyDependencies>,
 }
 
@@ -34,7 +38,9 @@ impl JobSpecificDependencies {
     let mut maybe_vall_e_x_dependencies = None;
     let mut maybe_vits_dependencies = None;
     let mut maybe_rerender_dependencies = None;
+    let mut maybe_stable_diffusion_dependencies = None;
     let mut maybe_mocapnet_dependencies = None;
+    let mut maybe_styletts2_dependencies = None;
     let mut maybe_comfy_ui_dependencies = None;
 
     if scoped_execution.can_run_job(InferenceModelType::RvcV2) {
@@ -62,6 +68,11 @@ impl JobSpecificDependencies {
       maybe_vall_e_x_dependencies = Some(VallExDependencies::setup()?);
     }
 
+    if scoped_execution.can_run_job(InferenceModelType::StyleTTS2) {
+      print_with_space("Setting StyleTTS2 dependencies...");
+      maybe_styletts2_dependencies = Some(StyleTTS2Dependencies::setup()?);
+    }
+
     if scoped_execution.can_run_job(InferenceModelType::Vits) {
       print_with_space("Setting Vits dependencies...");
       maybe_vits_dependencies = Some(VitsDependencies::setup()?);
@@ -70,6 +81,11 @@ impl JobSpecificDependencies {
     if scoped_execution.can_run_job(InferenceModelType::RerenderAVideo) {
       print_with_space("Setting Rerender dependencies...");
       maybe_rerender_dependencies = Some(RerenderDependencies::setup()?);
+    }
+
+    if scoped_execution.can_run_job(InferenceModelType::StableDiffusion) {
+      print_with_space("Setting Stable Diffusion dependencies...");
+      maybe_stable_diffusion_dependencies = Some(StableDiffusionDependencies::setup()?);
     }
 
     if scoped_execution.can_run_job(InferenceModelType::MocapNet) {
@@ -90,7 +106,9 @@ impl JobSpecificDependencies {
       maybe_vall_e_x_dependencies,
       maybe_vits_dependencies,
       maybe_rerender_dependencies,
+      maybe_stable_diffusion_dependencies,
       maybe_mocapnet_dependencies,
+      maybe_styletts2_dependencies,
       maybe_comfy_ui_dependencies,
     })
   }

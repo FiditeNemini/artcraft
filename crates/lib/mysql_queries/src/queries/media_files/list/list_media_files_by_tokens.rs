@@ -19,8 +19,12 @@ pub struct MediaFilesByTokensRecord {
 
   pub origin_category: MediaFileOriginCategory,
   pub origin_product_category: MediaFileOriginProductCategory,
+
   pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
   pub maybe_origin_model_token: Option<String>,
+
+  // NB: The title won't be populated for `tts_models` records or non-`model_weights` records.
+  pub maybe_origin_model_title: Option<String>,
 
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
@@ -68,8 +72,11 @@ async fn get_raw_media_files_by_tokens(
 
           m.origin_category,
           m.origin_product_category,
+
           m.maybe_origin_model_type,
           m.maybe_origin_model_token,
+
+          w.title as maybe_origin_model_title,
 
           users.token as maybe_creator_user_token,
           users.username as maybe_creator_username,
@@ -90,6 +97,8 @@ async fn get_raw_media_files_by_tokens(
       FROM media_files as m
       LEFT OUTER JOIN users
           ON users.token = m.maybe_creator_user_token
+      LEFT OUTER JOIN model_weights as w
+           ON m.maybe_origin_model_token = w.token
       LEFT OUTER JOIN entity_stats
           ON entity_stats.entity_type = "media_file"
           AND entity_stats.entity_token = m.token
@@ -107,8 +116,11 @@ async fn get_raw_media_files_by_tokens(
 
           m.origin_category,
           m.origin_product_category,
+
           m.maybe_origin_model_type,
           m.maybe_origin_model_token,
+
+          w.title as maybe_origin_model_title,
 
           users.token as maybe_creator_user_token,
           users.username as maybe_creator_username,
@@ -129,6 +141,8 @@ async fn get_raw_media_files_by_tokens(
       FROM media_files as m
       LEFT OUTER JOIN users
           ON users.token = m.maybe_creator_user_token
+      LEFT OUTER JOIN model_weights as w
+           ON m.maybe_origin_model_token = w.token
       LEFT OUTER JOIN entity_stats
           ON entity_stats.entity_type = "media_file"
           AND entity_stats.entity_token = m.token
@@ -173,6 +187,7 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
           origin_product_category: media_file.origin_product_category,
           maybe_origin_model_type: media_file.maybe_origin_model_type,
           maybe_origin_model_token: media_file.maybe_origin_model_token,
+          maybe_origin_model_title: media_file.maybe_origin_model_title,
 
           maybe_creator_user_token: media_file.maybe_creator_user_token,
           maybe_creator_username: media_file.maybe_creator_username,
@@ -205,8 +220,11 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
 
     pub origin_category: MediaFileOriginCategory,
     pub origin_product_category: MediaFileOriginProductCategory,
+
     pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
     pub maybe_origin_model_token: Option<String>,
+
+    pub maybe_origin_model_title: Option<String>,
 
     pub maybe_creator_user_token: Option<UserToken>,
     pub maybe_creator_username: Option<String>,
@@ -246,6 +264,7 @@ impl FromRow<'_, MySqlRow> for RawMediaFileJoinUser {
       origin_product_category: MediaFileOriginProductCategory::try_from_mysql_row(row, "origin_product_category")?,
       maybe_origin_model_type: MediaFileOriginModelType::try_from_mysql_row_nullable(row, "maybe_origin_model_type")?,
       maybe_origin_model_token: row.try_get("maybe_origin_model_token")?,
+      maybe_origin_model_title: row.try_get("maybe_origin_model_title")?,
       maybe_creator_user_token: row.try_get::<Option<String>, _>("maybe_creator_user_token")?
           .and_then(|token| Some(UserToken::new_from_str(&token))),
       maybe_creator_username: row.try_get("maybe_creator_username")?,

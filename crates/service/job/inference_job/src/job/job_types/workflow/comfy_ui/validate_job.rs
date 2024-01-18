@@ -2,14 +2,15 @@ use std::collections::HashMap;
 use anyhow::anyhow;
 
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
-use mysql_queries::payloads::generic_inference_args::workflow_payload::{WorkflowArgs, FileSource, Dependency};
+use mysql_queries::payloads::generic_inference_args::workflow_payload::{NewValue};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 pub struct JobArgs<'a> {
-    pub dependencies: &'a HashMap<String, Dependency>,
-    pub workflow_source: &'a FileSource,
+    pub workflow_source: &'a ModelWeightToken,
+    pub maybe_json_modifications: &'a Option<HashMap<String, NewValue>>,
 }
 
 pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
@@ -47,14 +48,7 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
         }
     };
 
-    let dependencies = match &inference_args.maybe_dependencies {
-        Some(args) => args,
-        None => {
-            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No dependency map provided!")));
-        }
-    };
-
-    let workflow_source = match &inference_args.maybe_workflow_source {
+    let workflow_source = match &inference_args.maybe_workflow_config {
         Some(args) => args,
         None => {
             return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No workflow source provided!")));
@@ -63,7 +57,7 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
 
 
     Ok(JobArgs {
-        dependencies,
-        workflow_source
+        workflow_source,
+        maybe_json_modifications: &inference_args.maybe_json_modifications,
     })
 }

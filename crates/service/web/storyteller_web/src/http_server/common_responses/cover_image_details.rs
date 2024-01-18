@@ -3,6 +3,7 @@ use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use tokens::tokens::users::UserToken;
+use crate::util::placeholder_images::cover_images::default_cover_image_color_from_token::default_cover_image_color_from_token;
 use crate::util::placeholder_images::cover_images::default_cover_image_from_token::default_cover_image_from_token;
 
 use crate::util::placeholder_images::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
@@ -25,6 +26,8 @@ pub struct CoverImageDetails {
 pub struct DefaultCoverInfo {
   /// Which image to show.
   pub image_index: u8,
+  /// Which color to use.
+  pub color_index: u8,
 }
 
 impl CoverImageDetails {
@@ -60,6 +63,7 @@ impl DefaultCoverInfo {
   pub fn from_token(model_weight_token: &ModelWeightToken) -> Self {
     Self {
       image_index: default_cover_image_from_token(model_weight_token),
+      color_index: default_cover_image_color_from_token(model_weight_token),
     }
   }
 }

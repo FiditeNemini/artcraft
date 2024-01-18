@@ -3,9 +3,7 @@ use std::hash::{Hash, Hasher};
 
 use tokens::tokens::model_weights::ModelWeightToken;
 
-// TODO(bt,2024-01-11): How many cover images are there?
-
-/// There are currently 25 avatars numbered 0 to 24 (0-indexed).
+/// There are currently 25 cover images numbered 0 to 24 (0-indexed).
 /// The original dataset was numbered 1 - 25, but I renamed 25 to 0.
 const NUMBER_OF_COVER_IMAGES: u64 = 25;
 

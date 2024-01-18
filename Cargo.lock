@@ -1260,6 +1260,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "composite_identifiers"
+version = "0.0.1"
+dependencies = [
+ "enums",
+ "my-workspace-hack",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sqlx",
+ "sqlx-core",
+ "sqlx-mysql",
+ "strum",
+ "tokens",
+ "toml 0.5.11",
+ "utoipa",
+]
+
+[[package]]
 name = "concurrency"
 version = "0.0.1"
 dependencies = [
@@ -3052,6 +3070,7 @@ dependencies = [
  "chrono",
  "cloud_storage",
  "collections",
+ "composite_identifiers",
  "concurrency",
  "config",
  "dotenv",
@@ -3059,6 +3078,7 @@ dependencies = [
  "enums",
  "errors",
  "filesys",
+ "google_drive_common",
  "hashing",
  "hostname",
  "hyper",
@@ -3857,6 +3877,7 @@ dependencies = [
  "anyhow",
  "buckets",
  "chrono",
+ "composite_identifiers",
  "config",
  "container_common",
  "dotenv",
@@ -6006,6 +6027,7 @@ dependencies = [
  "buckets",
  "chrono",
  "cloud_storage",
+ "composite_identifiers",
  "config",
  "container_common",
  "cookies",
@@ -6068,6 +6090,7 @@ dependencies = [
  "sha2 0.9.9",
  "speculoos",
  "sqlx",
+ "strum",
  "symphonia",
  "time 0.3.30",
  "tokens",

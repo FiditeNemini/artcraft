@@ -30,8 +30,12 @@ pub struct MediaFileListItem {
 
   pub origin_category: MediaFileOriginCategory,
   pub origin_product_category: MediaFileOriginProductCategory,
+
   pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
   pub maybe_origin_model_token: Option<String>,
+
+  // NB: The title won't be populated for `tts_models` records or non-`model_weights` records.
+  pub maybe_origin_model_title: Option<String>,
 
   pub media_type: MediaFileType,
   pub public_bucket_directory_hash: String,
@@ -98,6 +102,7 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
           origin_product_category: record.origin_product_category,
           maybe_origin_model_type: record.maybe_origin_model_type,
           maybe_origin_model_token: record.maybe_origin_model_token,
+          maybe_origin_model_title: record.maybe_origin_model_title,
           media_type: record.media_type,
           public_bucket_directory_hash: record.public_bucket_directory_hash,
           maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
@@ -143,13 +148,15 @@ SELECT
   m.id,
   m.token,
 
+  m.media_type,
+
   m.origin_category,
   m.origin_product_category,
 
   m.maybe_origin_model_type,
   m.maybe_origin_model_token,
 
-  m.media_type,
+  w.title as maybe_origin_model_title,
 
   m.public_bucket_directory_hash,
   m.maybe_public_bucket_prefix,
@@ -176,6 +183,8 @@ FROM media_files AS m
 
 LEFT OUTER JOIN users AS u
     ON m.maybe_creator_user_token = u.token
+LEFT OUTER JOIN model_weights as w
+     ON m.maybe_origin_model_token = w.token
 LEFT OUTER JOIN favorites as f
     ON f.entity_type = 'media_file' AND f.entity_token = m.token
 LEFT OUTER JOIN comments as c
@@ -269,6 +278,7 @@ struct MediaFileListItemInternal {
   origin_product_category: MediaFileOriginProductCategory,
   maybe_origin_model_type: Option<MediaFileOriginModelType>,
   maybe_origin_model_token: Option<String>,
+  maybe_origin_model_title: Option<String>,
 
   media_type: MediaFileType,
   public_bucket_directory_hash: String,
@@ -317,6 +327,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       origin_product_category: MediaFileOriginProductCategory::try_from_mysql_row(row, "origin_product_category")?,
       maybe_origin_model_type: MediaFileOriginModelType::try_from_mysql_row_nullable(row, "maybe_origin_model_type")?,
       maybe_origin_model_token: row.try_get("maybe_origin_model_token")?,
+      maybe_origin_model_title: row.try_get("maybe_origin_model_title")?,
       media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
       public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,

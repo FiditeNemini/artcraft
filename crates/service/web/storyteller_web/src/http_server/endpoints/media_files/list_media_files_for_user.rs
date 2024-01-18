@@ -17,6 +17,7 @@ use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_files::list::list_media_files_for_user::{list_media_files_for_user, ListMediaFileForUserArgs};
 use tokens::tokens::media_files::MediaFileToken;
+use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
@@ -47,12 +48,22 @@ pub struct ListMediaFilesForUserSuccessResponse {
 pub struct MediaFileForUserListItem {
   pub token: MediaFileToken,
 
-  pub origin_category: MediaFileOriginCategory,
-  pub origin_product_category: MediaFileOriginProductCategory,
-  pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
-  pub maybe_origin_model_token: Option<String>,
-
   pub media_type: MediaFileType,
+
+  /// Details where the media file came from.
+  pub origin: MediaFileOriginDetails,
+
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
+  pub origin_category: MediaFileOriginCategory,
+
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
+  pub origin_product_category: MediaFileOriginProductCategory,
+
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
+  pub maybe_origin_model_type: Option<MediaFileOriginModelType>,
+
+  #[deprecated(note="Use MediaFileOriginDetails instead")]
+  pub maybe_origin_model_token: Option<String>,
 
   /// URL to the media file.
   pub public_bucket_path: String,
@@ -168,11 +179,17 @@ pub async fn list_media_files_for_user_handler(
   let results = results_page.records.into_iter()
       .map(|record| MediaFileForUserListItem {
         token: record.token,
+        media_type: record.media_type,
+        origin: MediaFileOriginDetails::from_db_fields_str(
+          record.origin_category,
+          record.origin_product_category,
+          record.maybe_origin_model_type,
+          record.maybe_origin_model_token.as_deref(),
+          record.maybe_origin_model_title.as_deref()),
         origin_category: record.origin_category,
         origin_product_category: record.origin_product_category,
         maybe_origin_model_type: record.maybe_origin_model_type,
         maybe_origin_model_token: record.maybe_origin_model_token,
-        media_type: record.media_type,
         public_bucket_path: MediaFileBucketPath::from_object_hash(
           &record.public_bucket_directory_hash,
           record.maybe_public_bucket_prefix.as_deref(),

@@ -72,6 +72,7 @@ pub struct VallEXInferenceCommand {
     pub alternate_checkpoint_dir: Option<PathBuf>,
 }
 
+
 impl VallEXInferenceCommand {
     pub fn new<P: AsRef<Path>>(
         root_code_directory: P,
