@@ -166,6 +166,7 @@ use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_b
 use crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler;
 use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
+use crate::http_server::endpoints::image_gen::enqueue_image_generation::enqueue_image_generation_request;
 
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
@@ -198,12 +199,11 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_user_rating_routes(app); /* /v1/user_rating/... */
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
-  app = add_weights_routes(app); /* /v1/weights/... */
-
-  //if server_environment == ServerEnvironment::Development {
-  //   // ...
-  //}
-
+    app = add_image_gen_routes(app);
+    app = add_weights_routes(app);
+  // if server_environment == ServerEnvironment::Development {
+  //
+  // }
   // ==================== Comments ====================
 
   let mut app = RouteBuilder::from_app(app)
@@ -222,6 +222,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
       .add_get("/v1/user_bookmarks/list/user/{username}", list_user_bookmarks_for_user_handler)
       .add_get("/v1/user_bookmarks/list/entity/{entity_type}/{entity_token}", list_user_bookmarks_for_entity_handler)
       .into_app();
+
 
   // ==================== Animations ====================
 
@@ -1271,6 +1272,32 @@ fn add_voice_designer_routes<T,B> (app:App<T>)-> App<T>
                       .route("/enqueue_vc", web::post().to(enqueue_vc_request))
               )
       )
+}
+
+
+fn add_image_gen_routes<T,B> (app:App<T>)-> App<T>
+    where
+        B: MessageBody,
+        T: ServiceFactory<
+            ServiceRequest,
+            Config = (),
+            Response = ServiceResponse<B>,
+            Error = Error,
+            InitError = (),
+        >,
+{
+  // 
+    app.service(
+        web::scope("/v1/image_gen")
+            .service(
+                web::scope("/model")
+                    .route("/upload", web::post().to(enqueue_image_generation_request))
+            )
+            .service(
+                web::scope("/inference")
+                    .route("/enqueue_image_gen", web::post().to(enqueue_image_generation_request))
+            )
+    )
 }
 
 // ==================== Weights ROUTES ====================

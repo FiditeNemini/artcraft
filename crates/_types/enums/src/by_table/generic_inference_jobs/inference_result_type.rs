@@ -29,6 +29,9 @@ pub enum InferenceResultType {
 
   #[serde(rename = "zs_voice_embedding")]
   ZeroShotVoiceEmbedding,
+
+  #[serde(rename = "upload_model")]
+  UploadModel
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -43,6 +46,7 @@ impl InferenceResultType {
       Self::TextToSpeech => "text_to_speech",
       Self::VoiceConversion => "voice_conversion",
       Self::ZeroShotVoiceEmbedding => "zs_voice_embedding",
+      Self::UploadModel => "upload_model",
     }
   }
 
@@ -52,6 +56,7 @@ impl InferenceResultType {
       "text_to_speech" => Ok(Self::TextToSpeech),
       "voice_conversion" => Ok(Self::VoiceConversion),
       "zs_voice_embedding" => Ok(Self::ZeroShotVoiceEmbedding),
+      "upload_model" => Ok(Self::UploadModel),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -64,6 +69,7 @@ impl InferenceResultType {
       InferenceResultType::TextToSpeech,
       InferenceResultType::VoiceConversion,
       InferenceResultType::ZeroShotVoiceEmbedding,
+      InferenceResultType::UploadModel,
     ])
   }
 }
@@ -79,6 +85,7 @@ mod tests {
     assert_serialization(InferenceResultType::TextToSpeech, "text_to_speech");
     assert_serialization(InferenceResultType::VoiceConversion, "voice_conversion");
     assert_serialization(InferenceResultType::ZeroShotVoiceEmbedding, "zs_voice_embedding");
+    assert_serialization(InferenceResultType::UploadModel, "upload_model");
   }
 
   #[test]
@@ -87,6 +94,7 @@ mod tests {
     assert_eq!(InferenceResultType::TextToSpeech.to_str(), "text_to_speech");
     assert_eq!(InferenceResultType::VoiceConversion.to_str(), "voice_conversion");
     assert_eq!(InferenceResultType::ZeroShotVoiceEmbedding.to_str(), "zs_voice_embedding");
+    assert_eq!(InferenceResultType::UploadModel.to_str(), "upload_model");
   }
 
   #[test]
@@ -95,6 +103,7 @@ mod tests {
     assert_eq!(InferenceResultType::from_str("text_to_speech").unwrap(), InferenceResultType::TextToSpeech);
     assert_eq!(InferenceResultType::from_str("voice_conversion").unwrap(), InferenceResultType::VoiceConversion);
     assert_eq!(InferenceResultType::from_str("zs_voice_embedding").unwrap(), InferenceResultType::ZeroShotVoiceEmbedding);
+    assert_eq!(InferenceResultType::from_str("upload_model").unwrap(), InferenceResultType::UploadModel);
   }
 
   #[test]
@@ -106,6 +115,7 @@ mod tests {
     assert_eq!(variants.pop_first(), Some(InferenceResultType::TextToSpeech));
     assert_eq!(variants.pop_first(), Some(InferenceResultType::VoiceConversion));
     assert_eq!(variants.pop_first(), Some(InferenceResultType::ZeroShotVoiceEmbedding));
+    assert_eq!(variants.pop_first(), Some(InferenceResultType::UploadModel));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check

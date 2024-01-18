@@ -4,8 +4,8 @@ use errors::AnyhowResult;
 use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
 use crate::payloads::generic_inference_args::mocap_payload::MocapArgs;
 use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
-use crate::payloads::generic_inference_args::videofilter_payload::{RerenderArgs};
-
+use crate::payloads::generic_inference_args::videofilter_payload::RerenderArgs;
+use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
 
 /// Used to encode extra state for the `generic_inference_jobs` table.
 /// This should act somewhat like a serialized protobuf stored inside a record.
@@ -41,6 +41,10 @@ pub enum InferenceCategoryAbbreviated {
   #[serde(rename = "vf")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(alias = "video_filter")]
   VideoFilter,
+
+  #[serde(rename = "ig")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(alias = "image_generation")]
+  ImageGeneration,
 
   #[serde(rename = "mc")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(alias = "mocap")]
@@ -98,10 +102,12 @@ pub enum PolymorphicInferenceArgs {
   /// Rerender a video. (Short name to save space when serializing.)
   Rr(RerenderArgs),
 
+  /// Image generation. (Short name to save space when serializing.)
+  Ig(StableDiffusionArgs),
+
   // Mocap (Short name to save space when serializing.)
   Mc(MocapArgs)
 }
-
 
 impl GenericInferenceArgs {
 
@@ -121,6 +127,7 @@ impl InferenceCategoryAbbreviated {
       InferenceCategory::TextToSpeech => Self::TextToSpeech,
       InferenceCategory::VoiceConversion => Self::VoiceConversion,
       InferenceCategory::VideoFilter => Self::VideoFilter,
+      InferenceCategory::ImageGeneration => Self::ImageGeneration,
       InferenceCategory::Mocap => Self::Mocap,
     }
   }
@@ -131,6 +138,7 @@ impl InferenceCategoryAbbreviated {
       Self::TextToSpeech => InferenceCategory::TextToSpeech,
       Self::VoiceConversion => InferenceCategory::VoiceConversion,
       Self::VideoFilter => InferenceCategory::VideoFilter,
+      Self::ImageGeneration =>InferenceCategory::ImageGeneration,
       Self::Mocap => InferenceCategory::Mocap,
     }
   }
@@ -141,6 +149,8 @@ mod tests {
   use crate::payloads::generic_inference_args::generic_inference_args::{FundamentalFrequencyMethodForJob, GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
   use crate::payloads::generic_inference_args::lipsync_payload::{LipsyncAnimationAudioSource, LipsyncAnimationImageSource, LipsyncArgs};
   use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
+  use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
+  use tokens::tokens::{model_weights::ModelWeightToken, media_files::MediaFileToken};
 
   #[test]
   fn typical_lipsync_animation_args_serialize() {
@@ -185,6 +195,48 @@ mod tests {
 
     // NB: Make sure we don't overflow the DB field capacity (TEXT column).
     assert!(json.len() < 1000);
+  }
+
+  #[test]
+  fn typical_image_gen_args_serialize() {
+
+    let video_media_token = MediaFileToken("video_media_token".to_string());
+    let image_media_token = MediaFileToken("image_media_token".to_string());
+    let sd_model_token = ModelWeightToken("sd_model_token".to_string());
+    let lora_model_token = ModelWeightToken("lora_model_token".to_string());
+
+    let prompt = "prompt".to_string();
+    let a_prompt = "a_prompt".to_string();
+    let n_prompt = "n_prompt".to_string();
+    let seed = 1;
+    let upload_path = "upload_path".to_string();
+    let lora_upload_path = "lora_upload_path".to_string();
+    let checkpoint = "checkpoint".to_string();
+    let type_of_inference = "type_of_inference".to_string();
+    let args = GenericInferenceArgs {
+      inference_category: Some(InferenceCategoryAbbreviated::ImageGeneration),
+      args: Some(PolymorphicInferenceArgs::Ig(StableDiffusionArgs {
+        maybe_sd_model_token: Some(sd_model_token),
+        maybe_lora_model_token: Some(lora_model_token),
+        maybe_sampler: Some("sampler".as_ref()),
+        maybe_height: Some(512),
+        maybe_width: Some(512),
+        maybe_cfg_scale: Some(7),
+        maybe_prompt: Some(prompt),
+        maybe_n_prompt: Some(n_prompt),
+        maybe_batch_count: Some(1),
+        maybe_number_of_samples: Some(25),
+        maybe_seed: Some(seed),
+        maybe_upload_path: Some(upload_path),
+        maybe_lora_upload_path: Some(lora_upload_path),
+        type_of_inference: type_of_inference,
+        description: Some("Option".as_ref()),
+        title: Some("Model Name".as_ref())
+      })),
+    };
+
+    let json = serde_json::ser::to_string(&args).unwrap();
+    assert_eq!(json, r#"{"cat":"ig","args":{"Ig":{"vs":"video_media_token","is":"image_media_token","sd":"sd_model_token","lm":"lora_model_token","p":"prompt","ap":"a_prompt","np":"n_prompt","se":1,"mu":"upload_path","lu":"lora_upload_path"}}}"#.to_string());
   }
 
   #[test]

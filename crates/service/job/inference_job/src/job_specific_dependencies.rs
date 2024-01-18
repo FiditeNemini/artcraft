@@ -1,5 +1,6 @@
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use errors::AnyhowResult;
+use sqlx::pool::maybe;
 
 use crate::job::job_types::lipsync::sad_talker::sad_talker_dependencies::SadTalkerDependencies;
 use crate::job::job_types::tts::styletts2::styletts2_dependencies::StyleTTS2Dependencies;
@@ -9,6 +10,8 @@ use crate::job::job_types::tts::vits::vits_dependencies::VitsDependencies;
 use crate::job::job_types::vc::rvc_v2::rvc_v2_dependencies::RvcV2Dependencies;
 use crate::job::job_types::vc::so_vits_svc::svc_dependencies::SvcDependencies;
 use crate::job::job_types::videofilter::rerender_a_video::rerender_dependencies::RerenderDependencies;
+use crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
+
 use crate::job::job_types::mocap::mocap_net::mocapnet_dependencies::MocapNetDependencies;
 use crate::util::scoped_execution::ScopedExecution;
 
@@ -20,6 +23,7 @@ pub struct JobSpecificDependencies {
   pub maybe_vall_e_x_dependencies: Option<VallExDependencies>,
   pub maybe_vits_dependencies: Option<VitsDependencies>,
   pub maybe_rerender_dependencies: Option<RerenderDependencies>,
+  pub maybe_stable_diffusion_dependencies: Option<StableDiffusionDependencies>,
   pub maybe_mocapnet_dependencies: Option<MocapNetDependencies>,
   pub maybe_styletts2_dependencies: Option<StyleTTS2Dependencies>,
 }
@@ -34,6 +38,7 @@ impl JobSpecificDependencies {
     let mut maybe_vall_e_x_dependencies = None;
     let mut maybe_vits_dependencies = None;
     let mut maybe_rerender_dependencies = None;
+    let mut maybe_stable_diffusion_dependencies = None;
     let mut maybe_mocapnet_dependencies = None;
     let mut maybe_styletts2_dependencies = None;
 
@@ -76,6 +81,11 @@ impl JobSpecificDependencies {
       print_with_space("Setting Rerender dependencies...");
       maybe_rerender_dependencies = Some(RerenderDependencies::setup()?);
     }
+    
+    if scoped_execution.can_run_job(InferenceModelType::StableDiffusion) {
+      print_with_space("Setting Stable Diffusion dependencies...");
+      maybe_stable_diffusion_dependencies = Some(StableDiffusionDependencies::setup()?);
+    }
 
     if scoped_execution.can_run_job(InferenceModelType::MocapNet) {
       print_with_space("Setting MocapNet dependencies...");
@@ -90,6 +100,7 @@ impl JobSpecificDependencies {
       maybe_vall_e_x_dependencies,
       maybe_vits_dependencies,
       maybe_rerender_dependencies,
+      maybe_stable_diffusion_dependencies,
       maybe_mocapnet_dependencies,
       maybe_styletts2_dependencies,
     })

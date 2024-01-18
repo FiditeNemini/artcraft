@@ -22,7 +22,7 @@ use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 pub struct VideoFile {
     pub filesystem_path: PathBuf,
 }
-
+// TODO replace this with remote cloud file manager.
 pub async fn download_video_file(
     video_source: &VideofilterVideoSource,
     public_bucket_client: &BucketClient,
@@ -63,23 +63,23 @@ pub async fn download_video_file(
                 }
             }
         }
-        VideofilterVideoSource::U(media_upload_token) => {
-            let media_upload_token = MediaUploadToken::new_from_str(media_upload_token);
-            let media_upload_result = get_media_upload_for_inference(
-                &media_upload_token,
-                mysql_pool
-            ).await;
+                                                                VideofilterVideoSource::U(media_upload_token) => {
+                                                                    let media_upload_token = MediaUploadToken::new_from_str(media_upload_token);
+                                                                    let media_upload_result = get_media_upload_for_inference(
+                                                                        &media_upload_token,
+                                                                        mysql_pool
+                                                                    ).await;
 
-            let media_upload_result = match media_upload_result {
-                Ok(Some(result)) => result,
-                Ok(None) => {
-                    warn!("could not find media upload: {:?}", media_upload_token);
-                    return Err(ProcessSingleJobError::from_anyhow_error(
-                        anyhow!("could not find media upload: {:?}", media_upload_token)))
-                }
-                Err(e) => {
-                    error!("could not query media upload: {:?}", e);
-                    return Err(ProcessSingleJobError::from_anyhow_error(e))
+                                                                    let media_upload_result = match media_upload_result {
+                                                                        Ok(Some(result)) => result,
+                                                                        Ok(None) => {
+                                                                            warn!("could not find media upload: {:?}", media_upload_token);
+                                                                            return Err(ProcessSingleJobError::from_anyhow_error(
+                                                                                anyhow!("could not find media upload: {:?}", media_upload_token)))
+                                                                        }
+                                                                        Err(e) => {
+                                                                            error!("could not query media upload: {:?}", e);
+                                                                            return Err(ProcessSingleJobError::from_anyhow_error(e))
                 }
             };
 

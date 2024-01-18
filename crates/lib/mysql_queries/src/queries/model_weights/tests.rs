@@ -293,6 +293,8 @@ mod tests {
             maybe_scoped_weight_type: None,
             maybe_scoped_weight_category: None,
             mysql_pool: &pool,
+            maybe_scoped_weight_type: None,
+            maybe_scoped_weight_category: None,
         }).await?;
         for weight in weights_by_username.records.iter() {
             // print weight
