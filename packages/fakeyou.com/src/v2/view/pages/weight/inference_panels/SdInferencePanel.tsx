@@ -47,17 +47,16 @@ export default function SdInferencePanel({
   const [aspectRatio, aspectRatioSet] = useState("square");
   const [cfgScale, cfgScaleSet] = useState(7);
   const [samples, samplesSet] = useState(8);
-  // const [loraPath, loraPathSet] = useState(1);
-  // const [checkPoint, checkPointSet] = useState(1);
+  const [loraToken, loraTokenSet] = useState("");
   const [batchCount, batchCountSet] = useState(1);
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const onChange = onChanger({
     batchCountSet,
     cfgScaleSet,
-    // checkPointSet,
     samplerSet,
     aspectRatioSet,
+    loraTokenSet,
     setPrompt,
     setNegativePrompt,
     samplesSet,
@@ -211,7 +210,7 @@ export default function SdInferencePanel({
       uuid_idempotency_token: uuidv4(),
       type_of_inference: TypeOfInference.Standard,
       maybe_sd_model_token: sd_model_token,
-      maybe_lora_model_token: "",
+      maybe_lora_model_token: loraToken,
       maybe_prompt: prompt,
       maybe_n_prompt: negativePrompt,
       maybe_seed: internalSeed.current,
@@ -222,6 +221,8 @@ export default function SdInferencePanel({
       maybe_number_of_samples: samples,
       maybe_batch_count: batchCount,
     };
+
+    console.log("request", request);
 
     const response = await EnqueueImageGen(request);
 
