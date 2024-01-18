@@ -10,6 +10,8 @@ import debounce from "lodash.debounce";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import WeightsCards from "components/common/Card/WeightsCards";
 import { useBookmarks, useRatings } from "hooks";
+import { faFilter, faLanguage, faTag } from "@fortawesome/pro-solid-svg-icons";
+import Select from "components/common/Select";
 
 // const allTags = [
 //   "English",
@@ -22,6 +24,8 @@ import { useBookmarks, useRatings } from "hooks";
 
 export default function SearchPage() {
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
+  const [weightType, setWeightType] = useState<string>("all");
+
   const bookmarks = useBookmarks();
   const ratings = useRatings();
 
@@ -33,9 +37,13 @@ export default function SearchPage() {
 
   const doSearch = useCallback(
     async (value: string) => {
-      let request = {
+      let request: any = {
         search_term: value,
       };
+
+      if (weightType !== "all") {
+        request["weight_type"] = weightType;
+      }
 
       let response = await SearchWeights(request);
 
@@ -46,7 +54,7 @@ export default function SearchPage() {
         setFoundWeights([]);
       }
     },
-    [setFoundWeights]
+    [setFoundWeights, weightType]
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,12 +92,34 @@ export default function SearchPage() {
   //   { value: "most used", label: "Most Used" },
   //   { value: "moset recent", label: "Most Recent" },
   // ];
-  // const sortTimeOptions = [
-  //   { value: "all time", label: "All Time" },
-  //   { value: "today", label: "Today" },
-  //   { value: "this week", label: "This Week" },
-  //   { value: "this month", label: "This Month" },
-  // ];
+  const languageOpts = [
+    { value: "all", label: "All Languages" },
+    { value: "english", label: "English" },
+    { value: "spanish", label: "Spanish" },
+    { value: "portuguese", label: "Portuguese" },
+  ];
+
+  const weightCategoryOpts = [
+    { value: "all", label: "All Categories" },
+    { value: "image_generation", label: "Image generation" },
+    { value: "text_to_speech", label: "Text to speech" },
+    { value: "vocoder", label: "Vocoder" },
+    { value: "voice_conversion", label: "Voice conversion" },
+  ];
+
+  const weightTypeOpts = [
+    { value: "all", label: "All Types" },
+    { value: "hifigan_tt2", label: "HiFiGAN TT2" },
+    { value: "sd_1.5", label: "SD 1.5" },
+    { value: "sdxl", label: "SDXL" },
+    { value: "so_vits_svc", label: "SVC" },
+    { value: "rvc_v2", label: "RVC v2" },
+    { value: "tt2", label: "TT2" },
+    { value: "loRA", label: "LoRA" },
+  ];
+
+  const weightTypeValue =
+    weightTypeOpts.find(el => el.value === weightType) || weightTypeOpts[0];
 
   return (
     <Container type="panel" className="mb-5">
@@ -100,22 +130,36 @@ export default function SearchPage() {
         panel={false}
       />
       <Panel padding={true}>
-        {/* <div className="d-flex gap-2 mb-4">
+        <div className="d-flex gap-2 mb-4">
           <Select
-            small={true}
-            options={sortOptions}
-            defaultValue={sortOptions[0]}
+            {...{
+              icon: faLanguage,
+              options: languageOpts,
+              name: "languages",
+              defaultValue: languageOpts[0],
+            }}
           />
           <Select
-            small={true}
-            icon={faClock}
-            options={sortTimeOptions}
-            defaultValue={sortTimeOptions[0]}
+            {...{
+              icon: faTag,
+              options: weightCategoryOpts,
+              name: "weightCategory",
+              defaultValue: weightCategoryOpts[0],
+            }}
           />
-        </div> */}
-
-        {/*<ModelSearchResults data={filteredData} />*/}
-        {/* <ModelSearchResults data={foundWeights} /> */}
+          <Select
+            {...{
+              icon: faFilter,
+              options: weightTypeOpts,
+              name: "weightType",
+              defaultValue: weightTypeOpts[0],
+              value: weightTypeValue,
+              onChange: args => {
+                setWeightType(args.value);
+              },
+            }}
+          />
+        </div>
 
         <MasonryGrid
           gridRef={gridContainerRef}

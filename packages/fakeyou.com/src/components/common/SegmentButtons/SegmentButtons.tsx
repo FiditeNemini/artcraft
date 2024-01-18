@@ -26,7 +26,7 @@ export default function SegmentButtons({
   // const onClick = ({ target }: any) => onChange();
   return (
     <div>
-      <Label {...{ label }} />
+      {label && <Label {...{ label }} />}
       <ul {...{ className: "fy-segment-buttons mb-0" }}>
         {options.map(
           (

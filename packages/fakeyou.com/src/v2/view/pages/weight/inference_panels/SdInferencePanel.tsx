@@ -8,7 +8,6 @@ import {
   TempSelect,
   TempTextArea,
 } from "components/common";
-// import { useChanger } from "hooks";
 import { onChanger } from "resources";
 import Accordion from "components/common/Accordion";
 import {
@@ -19,27 +18,43 @@ import {
 import Modal from "components/common/Modal";
 import NonRouteTabs from "components/common/Tabs/NonRouteTabs";
 import Searcher from "components/common/Searcher";
+import { v4 as uuidv4 } from "uuid";
+import {
+  EnqueueImageGen,
+  EnqueueImageGenIsSuccess,
+  EnqueueImageGenIsError,
+} from "@storyteller/components/src/api/image_generation/EnqueueImageGen";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
-interface SdInferencePanelProps {}
+interface SdInferencePanelProps {
+  sd_model_token: string;
+  enqueueInferenceJob: (
+    jobToken: string,
+    frontendInferenceJobType: FrontendInferenceJobType
+  ) => void;
+}
 
-export default function SdInferencePanel(props: SdInferencePanelProps) {
+export default function SdInferencePanel({
+  enqueueInferenceJob,
+  sd_model_token,
+}: SdInferencePanelProps) {
+  const [isEnqueuing, setIsEnqueuing] = useState(false);
   const [seed, seedSet] = useState("random");
   const [seedNumber, seedNumberSet] = useState("");
   const [sampler, samplerSet] = useState("DPM++ 2M Karras");
   const [aspectRatio, aspectRatioSet] = useState("square");
   const [cfgScale, cfgScaleSet] = useState(7);
   const [samples, samplesSet] = useState(8);
-  // const [loraPath, loraPathSet] = useState(1);
-  // const [checkPoint, checkPointSet] = useState(1);
+  const [loraToken, loraTokenSet] = useState("");
   const [batchCount, batchCountSet] = useState(1);
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const onChange = onChanger({
     batchCountSet,
     cfgScaleSet,
-    // checkPointSet,
     samplerSet,
     aspectRatioSet,
+    loraTokenSet,
     setPrompt,
     setNegativePrompt,
     samplesSet,
@@ -110,6 +125,26 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     { label: "Custom", value: "custom" },
   ];
 
+  let imageWidth: number;
+  let imageHeight: number;
+
+  switch (aspectRatio) {
+    case "square":
+      imageWidth = 512;
+      imageHeight = 512;
+      break;
+    case "landscape":
+      imageWidth = 768;
+      imageHeight = 512;
+      break;
+    case "portrait":
+      imageWidth = 512;
+      imageHeight = 768;
+      break;
+    default:
+      throw new Error("Invalid aspect ratio");
+  }
+
   const handlePromptChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -156,13 +191,6 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     }
   };
 
-  const handleGenerateImage = () => {
-    //makse sure seed is random if random is selected
-    if (seed === "random") {
-      internalSeed.current = generateRandomSeed();
-    }
-  };
-
   const openLoraModal = () => {
     isLoraModalOpenSet(true);
   };
@@ -179,6 +207,58 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
     },
     { label: "Bookmarked", content: <Searcher type="modal" />, padding: true },
   ];
+
+  const handleEnqueueImageGen = async (
+    ev: React.FormEvent<HTMLButtonElement>
+  ) => {
+    ev.preventDefault();
+
+    if (!prompt) {
+      return false;
+    }
+
+    setIsEnqueuing(true);
+
+    //make sure seed is random on generation if random is selected
+    if (seed === "random") {
+      internalSeed.current = generateRandomSeed();
+    }
+
+    const request = {
+      uuid_idempotency_token: uuidv4(),
+      maybe_sd_model_token: sd_model_token,
+      maybe_lora_model_token: loraToken,
+      maybe_prompt: prompt,
+      maybe_n_prompt: negativePrompt,
+      maybe_seed: internalSeed.current,
+      maybe_width: imageWidth,
+      maybe_height: imageHeight,
+      maybe_sampler: sampler,
+      maybe_cfg_scale: cfgScale,
+      maybe_number_of_samples: samples,
+      maybe_batch_count: batchCount,
+    };
+
+    console.log("request", request);
+
+    const response = await EnqueueImageGen(request);
+
+    if (EnqueueImageGenIsSuccess(response)) {
+      console.log("enqueuing...");
+
+      if (response.inference_job_token) {
+        enqueueInferenceJob(
+          response.inference_job_token,
+          FrontendInferenceJobType.ImageGeneration
+        );
+      }
+    } else if (EnqueueImageGenIsError(response)) {
+      console.log("error");
+    }
+    setIsEnqueuing(false);
+
+    return false;
+  };
 
   return (
     <Panel padding={true}>
@@ -219,7 +299,7 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
           <div className="p-3 d-flex flex-column gap-3">
             <div>
               <label className="sub-title">Seed</label>
-              <div className="d-flex gap-2">
+              <div className="d-flex gap-2 align-items-center">
                 <SegmentButtons
                   {...{
                     name: "seed",
@@ -320,7 +400,8 @@ export default function SdInferencePanel(props: SdInferencePanelProps) {
           {...{
             label: "Generate Image",
             disabled: prompt === "",
-            onClick: handleGenerateImage,
+            onClick: handleEnqueueImageGen,
+            isLoading: isEnqueuing,
           }}
         />
       </div>

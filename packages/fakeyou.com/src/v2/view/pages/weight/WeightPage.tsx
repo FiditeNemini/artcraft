@@ -138,7 +138,9 @@ export default function WeightPage({
         );
       case WeightCategory.SD:
         let sdCoverImage = "/images/avatars/default-pfp.png";
-        if (weight?.cover_image?.maybe_cover_image_public_bucket_path !== null) {
+        if (
+          weight?.cover_image?.maybe_cover_image_public_bucket_path !== null
+        ) {
           sdCoverImage = bucketConfig.getGcsUrl(
             weight?.cover_image?.maybe_cover_image_public_bucket_path || ""
           );
@@ -147,7 +149,10 @@ export default function WeightPage({
         return (
           <div className="d-flex flex-column gap-3">
             <SdCoverImagePanel src={sdCoverImage} />
-            <SdInferencePanel />
+            <SdInferencePanel
+              sd_model_token={weight.weight_token}
+              enqueueInferenceJob={enqueueInferenceJob}
+            />
           </div>
         );
       default:
@@ -568,7 +573,9 @@ export default function WeightPage({
         show={isDeleteModalOpen}
         handleClose={closeDeleteModal}
         title="Delete Weight"
-        content={() => <>{ `Are you sure you want to delete "${title}"? This action cannot be undone.` }</>}
+        content={() => (
+          <>{`Are you sure you want to delete "${title}"? This action cannot be undone.`}</>
+        )}
         onConfirm={remove}
       />
     </div>
