@@ -40,7 +40,6 @@ export default function SdInferencePanel({
   sd_model_token,
 }: SdInferencePanelProps) {
   const [isEnqueuing, setIsEnqueuing] = useState(false);
-  const [inferenceType, inferenceTypeSet] = useState(TypeOfInference.Inference);
   const [seed, seedSet] = useState("random");
   const [seedNumber, seedNumberSet] = useState("");
   const [sampler, samplerSet] = useState("DPM++ 2M Karras");
@@ -60,7 +59,6 @@ export default function SdInferencePanel({
     setPrompt,
     setNegativePrompt,
     samplesSet,
-    inferenceTypeSet,
   });
   const [isLoraModalOpen, isLoraModalOpenSet] = useState(false);
 
@@ -229,7 +227,6 @@ export default function SdInferencePanel({
 
     const request = {
       uuid_idempotency_token: uuidv4(),
-      type_of_inference: inferenceType,
       maybe_sd_model_token: sd_model_token,
       maybe_lora_model_token: loraToken,
       maybe_prompt: prompt,

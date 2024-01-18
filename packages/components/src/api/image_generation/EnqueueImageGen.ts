@@ -1,9 +1,7 @@
 import { ApiConfig } from "../ApiConfig";
-import { TypeOfInference } from "../_common/enums/TypeOfInference";
 
 export interface EnqueueImageGenRequest {
   uuid_idempotency_token: string;
-  type_of_inference: TypeOfInference;
   maybe_sd_model_token: string;
   maybe_lora_model_token: string;
   maybe_prompt: string;
