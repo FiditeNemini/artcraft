@@ -37,7 +37,7 @@ export default function SearchPage() {
 
   const doSearch = useCallback(
     async (value: string) => {
-      let request : any = {
+      let request: any = {
         search_term: value,
       };
 
@@ -94,7 +94,7 @@ export default function SearchPage() {
   // ];
   const languageOpts = [
     { value: "all", label: "All Languages" },
-    { value: "english", label: "Egnlish" },
+    { value: "english", label: "English" },
     { value: "spanish", label: "Spanish" },
     { value: "portuguese", label: "Portuguese" },
   ];
@@ -118,7 +118,8 @@ export default function SearchPage() {
     { value: "loRA", label: "LoRA" },
   ];
 
-  const weightTypeValue = weightTypeOpts.find((el) => el.value === weightType) || weightTypeOpts[0];
+  const weightTypeValue =
+    weightTypeOpts.find(el => el.value === weightType) || weightTypeOpts[0];
 
   return (
     <Container type="panel" className="mb-5">
@@ -153,8 +154,8 @@ export default function SearchPage() {
               name: "weightType",
               defaultValue: weightTypeOpts[0],
               value: weightTypeValue,
-              onChange: (args) => {
-                setWeightType(args.value)
+              onChange: args => {
+                setWeightType(args.value);
               },
             }}
           />
