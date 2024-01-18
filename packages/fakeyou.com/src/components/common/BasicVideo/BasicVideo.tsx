@@ -9,9 +9,16 @@ import "./BasicVideo.scss"
 interface Props {
   className?: string;
   src?: string;
+  title?: string;
+  description?: string;
 }
 
-export default function BasicVideo({ className, src }: Props) {
+export default function BasicVideo({
+  className,
+  src,
+  title,
+  description
+}: Props) {
   const [tint,tintSet] = useState(true);
   const [{ playCtrl },vidProps] = useVideo({ onEnded: () => tintSet(true) });
   const style = useSpring({
@@ -28,7 +35,8 @@ export default function BasicVideo({ className, src }: Props) {
       <source {...{ src, type: "video/mp4" }} />
     </video>
     <a.div {...{ className: "video-overlay", onClick, style }}>
-      <h6>Face Animator Sample</h6>
+      {title && <h6>{title}</h6>}
+      {description && <p>{description}</p>}
       <FontAwesomeIcon {...{ icon: faPlay }} />
     </a.div>
   </div>;

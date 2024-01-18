@@ -1,7 +1,7 @@
 import React from "react";
 import { useSpring } from '@react-spring/web';
 import { FileDetails, FileWrapper, FileLabel } from "components/common";
-import { faFileVideo, faVideo } from "@fortawesome/pro-solid-svg-icons";
+import { faFileVideo } from "@fortawesome/pro-solid-svg-icons";
 import "./style.scss";
 
 interface Props {
@@ -16,6 +16,7 @@ interface Props {
   success?: boolean,
   submit?: () => void,
   working?: boolean,
+  t: Function,
   [x:string]: any,
 }
 
@@ -30,6 +31,7 @@ export default function UploadFieldVideo({
   success = false,
   submit = ()=>{},
   working = false,
+  t,
   ...rest }: Props)
 {
 

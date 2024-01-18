@@ -53,7 +53,10 @@ export default function VideoMotionCapture(){
           {/*ENDS Video Chooser Tabs*/}
           
           <div className="col-12 col-md-6">
-            <BasicVideo />
+            <BasicVideo
+              title="Video -> Mocap Sample"
+              src="/videos/face-animator-instruction-en.mp4"
+            />
           </div>
 
         </div>{/*2nd row*/}
