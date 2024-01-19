@@ -28,30 +28,13 @@ export default function FileDetails({ className, clear = () => {}, disabled, fil
 
   return <a.div {...{ className: `fy-uploader-layout upload-details${ className ? " " + className : "" }`, style }}>
     { icon && <Icon {...{ className: "fy-uploader-layout-icon", icon }}/> }
-    <div>
+    <div className="pb-0">
       <div {...{ className: "filename" }}>
         { file.name.slice(0, file.name.lastIndexOf(".")) }
-
-        <span className="opacity-50">
-          {`${ file.name.split(".").pop().toUpperCase() } file size: ${ fileSize }`}
-        </span>
       </div>
-      { !hideClearDetails && 
-        <button 
-          className="
-            upload-details-clear
-            btn btn-destructive
-            align-items-center
-            justify-content-center
-          "
-          onClick={e=>{
-            e.preventDefault();
-            if (clear) clear();
-          }}
-        >
-            <Icon icon= {faTrash }/>
-        </button> 
-      }
+        <p className="opacity-50">
+          {`${ file.name.split(".").pop().toUpperCase() } file size: ${ fileSize }`}
+        </p>
     </div>
     { !hideClearDetails && <button {...{ className: "upload-details-clear btn btn-destructive align-items-center justify-content-center", onClick: e => { e.preventDefault(); clear() } }}>
           <Icon {...{ icon: faTrash }}/>
