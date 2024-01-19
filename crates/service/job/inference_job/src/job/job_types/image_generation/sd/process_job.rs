@@ -129,7 +129,6 @@ pub async fn process_job_inference(
         }
     }
 
-
     let _job_progress_reporter = args.job_dependencies.clients.job_progress_reporter
         .new_generic_inference(job.inference_job_token.as_str())
         .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
