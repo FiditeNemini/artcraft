@@ -300,7 +300,6 @@ export default function SideNav({
                 Explore
               </NavLink>
             </li>
-            
             <hr className="mb-3 mt-3" />
             <li className="sidebar-heading">{t("speechTitle")}</li>
             <li>
@@ -368,6 +367,21 @@ export default function SideNav({
                   className="sidebar-heading-icon"
                 />
                 {t("videoMotionCapture")}
+              </NavLink>
+            </li>
+
+            <li>
+             <NavLink
+                 to="/studio"
+                 activeClassName="active-link"
+                 onClick={handleNavLinkClick}
+               >
+                 <FontAwesomeIcon
+                   icon={faCameraMovie}
+                   className="sidebar-heading-icon"
+                 />
+                Storyteller Studio
+                {/* {t("videoStorytellerStudio")} */}
               </NavLink>
             </li>
 
