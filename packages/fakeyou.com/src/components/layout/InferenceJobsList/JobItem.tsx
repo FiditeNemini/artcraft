@@ -104,6 +104,7 @@ export default function JobItem({ failures, maybeFailureCategory, maybeResultTok
       <a.h6 {...{  style: headingBounce }}>
         { t(`${jobType}.${jobStatus}`) }
       </a.h6>
+      <a.p>Token: {jobToken}</a.p>
       <a.span {...{ style: subtitleBounce }}>{ isComplete ? subtitle + " >" : subtitle }</a.span>
     </div>
   </OuterItem>;

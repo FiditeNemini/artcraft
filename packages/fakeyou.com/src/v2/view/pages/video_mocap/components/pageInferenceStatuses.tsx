@@ -24,7 +24,7 @@ export function PageInferenceStatuses (props:{
     console.log("ENQUEUE INFERENCE JOB>>")
     enqueueInferenceJob(
       props.pageState.jobToken,
-      FrontendInferenceJobType.VideoMotionCapture
+      FrontendInferenceJobType.FaceAnimation
     );
   }, [])
 
@@ -45,7 +45,7 @@ export function PageInferenceStatuses (props:{
       <InferenceJobsList {...{
         failures,
         onSelect: () => Analytics.voiceConversionClickDownload(),
-        jobType: FrontendInferenceJobType.VideoMotionCapture,
+        jobType: FrontendInferenceJobType.FaceAnimation,
       }}/>
     </>
   )
