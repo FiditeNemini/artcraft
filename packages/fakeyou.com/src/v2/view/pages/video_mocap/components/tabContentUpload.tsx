@@ -53,6 +53,7 @@ export default function TabContentUpload(props:{
           token: res.inference_job_token
         })
       });
+    setTabState(MOCAPNET)
   }
   // contains upload inout state and controls, see docs
   if (tabState === NO_FILE || tabState === FILE_STAGED){
