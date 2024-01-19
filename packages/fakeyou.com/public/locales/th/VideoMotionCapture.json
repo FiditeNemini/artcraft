@@ -1,0 +1,19 @@
+{
+  "button": {
+    "generate": "สร้าง",
+    "select": "เลือก",
+    "upload": "อัปโหลดวิดีโอ"
+  },
+  "headings": {
+    "subtitle": "เลือกวิดีโอและสร้างวิดีโอจับภาพเคลื่อนไหวสำหรับภาพเคลื่อนไหวเพื่อใช้กับ Storyteller Studio",
+    "title": "จับภาพวิดีโอเคลื่อนไหว"
+  },
+  "input": {
+    "dropzoneDescription": "อัปโหลดวิดีโอหรือวางที่นี่...",
+    "filenamePlaceholder": "เลือกจากสื่อ"
+  },
+  "tabTitle": {
+    "library": "เลือกจากสื่อ",
+    "upload": "อัพโหลด"
+  }
+}

@@ -18,6 +18,7 @@
   "speechTts": "텍스트 음성 변환",
   "speechVc": "음성 대 음성",
   "videoFaceAnimator": "얼굴 애니메이터",
+  "videoMotionCapture": "비디오 모션 캡처",
   "videoTitle": "비디오 생성",
   "videoW2l": "비디오 립싱크"
 }

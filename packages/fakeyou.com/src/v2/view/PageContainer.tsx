@@ -7,6 +7,7 @@ import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
 import FaceAnimator from "./pages/face_animator";
+import VideoMocap from "./pages/video_mocap";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -767,6 +768,18 @@ class PageContainer extends React.Component<
               <Route path="/generate-speech">
                 <GenerateSpeechPage />
               </Route>
+
+              <Route path="/video-mocap/:mediaToken?">
+               <VideoMocap
+                 {...{
+                   enqueueInferenceJob: this.props.enqueueInferenceJob,
+                   sessionSubscriptionsWrapper:
+                     this.props.sessionSubscriptionsWrapper,
+                   inferenceJobs: this.props.inferenceJobs,
+                   inferenceJobsByCategory: this.props.inferenceJobsByCategory,
+                 }}
+               />
+             </Route>
 
               <Route path="/character/donald-trump">
                 <TrumpTtsPage

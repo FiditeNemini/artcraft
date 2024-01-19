@@ -208,8 +208,11 @@ export default function FaceAnimator({ enqueueInferenceJob,  sessionSubscription
       onSelect: () => Analytics.voiceConversionClickDownload(),
       jobType: FrontendInferenceJobType.FaceAnimation,
     }}/>
-    <div {...{ className: "face-animator-mobile-sample" }}>
-      <BasicVideo {...{ src: "/videos/face-animator-instruction-en.mp4" }} />
+    <div className="face-animator-mobile-sample">
+      <BasicVideo
+        title="Face Animator Sample"
+        src="/videos/face-animator-instruction-en.mp4"
+      />
     </div>
   </div>;
 }

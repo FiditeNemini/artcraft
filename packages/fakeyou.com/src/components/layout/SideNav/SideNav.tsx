@@ -13,6 +13,7 @@ import {
   faUser,
   faSignOutAlt,
   faCameraMovie,
+  faPersonRays
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
@@ -353,7 +354,6 @@ export default function SideNav({
                 {t("videoFaceAnimator")}
               </NavLink>
             </li>
-
             <li>
               <NavLink
                 to="/studio"
@@ -368,6 +368,74 @@ export default function SideNav({
                 {/* {t("videoStorytellerStudio")} */}
               </NavLink>
             </li>
+        <li className="sidebar-heading">{t("speechTitle")}</li>
+        <li>
+          <NavLink
+            to="/tts"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faMessageDots}
+              className="sidebar-heading-icon"
+            />
+            {t("speechTts")}
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/voice-conversion"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faWaveformLines}
+              className="sidebar-heading-icon"
+            />
+            {t("speechVc")}
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/voice-designer"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faWandMagicSparkles}
+              className="sidebar-heading-icon"
+            />
+            {"Voice Designer"}
+          </NavLink>
+        </li>
+        <hr className="mb-4 mt-3" />
+        <li className="sidebar-heading">{t("videoTitle")}</li>
+        <li>
+          <NavLink
+            to="/face-animator"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faFaceViewfinder}
+              className="sidebar-heading-icon"
+            />
+            {t("videoFaceAnimator")}
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/video-mocap"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faPersonRays}
+              className="sidebar-heading-icon"
+            />
+            {t("videoMotionCapture")}
+          </NavLink>
+        </li>
 
             <hr className="mb-3 mt-3" />
             <li className="sidebar-heading">{t("communityTitle")}</li>

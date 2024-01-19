@@ -18,6 +18,7 @@
   "speechTts": "Text to Speech",
   "speechVc": "Voice to Voice",
   "videoFaceAnimator": "Face Animator",
+  "videoMotionCapture": "Video Motion Capture",
   "videoTitle": "Video Generation",
   "videoW2l": "Video Lip Sync"
 }

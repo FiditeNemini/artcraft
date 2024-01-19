@@ -18,6 +18,7 @@
   "speechTts": "Text zu Sprache",
   "speechVc": "Stimme zu Stimme",
   "videoFaceAnimator": "Gesichtsanimator",
+  "videoMotionCapture": "Video-Bewegungserfassung",
   "videoTitle": "Videogenerierung",
   "videoW2l": "Video-Lippensynchronisation"
 }

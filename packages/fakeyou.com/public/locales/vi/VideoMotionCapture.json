@@ -1,0 +1,19 @@
+{
+  "button": {
+    "generate": "Phát ra",
+    "select": "Lựa chọn",
+    "upload": "Tải video lên"
+  },
+  "headings": {
+    "subtitle": "Chọn một video và tạo video ghi lại chuyển động cho hoạt ảnh để sử dụng với Storyteller Studio.",
+    "title": "Quay video chuyển động"
+  },
+  "input": {
+    "dropzoneDescription": "Tải video lên hoặc thả video vào đây...",
+    "filenamePlaceholder": "Chọn từ phương tiện truyền thông"
+  },
+  "tabTitle": {
+    "library": "Chọn từ phương tiện truyền thông",
+    "upload": "Tải lên"
+  }
+}

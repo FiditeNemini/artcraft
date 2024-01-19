@@ -1,0 +1,19 @@
+{
+  "button": {
+    "generate": "creare",
+    "select": "Selezionare",
+    "upload": "Carica video"
+  },
+  "headings": {
+    "subtitle": "Seleziona un video e genera video motion capture per le animazioni da utilizzare con Storyteller Studio.",
+    "title": "Acquisizione del movimento video"
+  },
+  "input": {
+    "dropzoneDescription": "Carica un video o rilascialo qui...",
+    "filenamePlaceholder": "Scegli tra i media"
+  },
+  "tabTitle": {
+    "library": "Scegli tra i media",
+    "upload": "Caricamento"
+  }
+}

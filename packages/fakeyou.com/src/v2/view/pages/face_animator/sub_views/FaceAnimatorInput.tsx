@@ -36,7 +36,11 @@ export default function FaceAnimatorInput({ audioProps, imageProps, frameDimensi
           hideActions: true,
         }}/>
       </AudioInput> }
-      <BasicVideo {...{ className: "face-animator-wide-sample", src: "/videos/face-animator-instruction-en.mp4" }}/>
+      <BasicVideo
+        className="face-animator-wide-sample"
+        title="Face Animator Sample"
+        src="/videos/face-animator-instruction-en.mp4"
+      />
     </div>
     <div {...{ className: "animation-configure-panel panel" }}>
       <fieldset {...{ className: "input-block" }}>

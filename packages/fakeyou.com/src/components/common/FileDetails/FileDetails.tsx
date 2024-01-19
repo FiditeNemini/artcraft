@@ -10,9 +10,10 @@ interface Props {
   file?: any;
   hideClearDetails?: boolean;
   icon?: any;
+  className?: string
 }
 
-export default function FileDetails({ clear = () => {}, disabled, file, hideClearDetails, icon }: Props) {
+export default function FileDetails({ className, clear = () => {}, disabled, file, hideClearDetails, icon }: Props) {
   const fileSize =
     file && file.size >= 1024 * 1024
       ? (file.size / 1024 / 1024).toFixed(2) + " MB"
@@ -25,16 +26,32 @@ export default function FileDetails({ clear = () => {}, disabled, file, hideClea
     opacity: disabled ? 0 : 1
   });
 
-  return <a.div {...{ className: "fy-uploader-layout upload-details", style }}>
+  return <a.div {...{ className: `fy-uploader-layout upload-details${ className ? " " + className : "" }`, style }}>
     { icon && <Icon {...{ className: "fy-uploader-layout-icon", icon }}/> }
     <div>
       <div {...{ className: "filename" }}>
         { file.name.slice(0, file.name.lastIndexOf(".")) }
+
+        <span className="opacity-50">
+          {`${ file.name.split(".").pop().toUpperCase() } file size: ${ fileSize }`}
+        </span>
       </div>
-      <span className="opacity-50">
-        {`${ file.name.split(".").pop().toUpperCase() } file size: ${ fileSize }`}
-      </span>
-      <u className="fw-medium opacity-100 ms-1">Change file</u>
+      { !hideClearDetails && 
+        <button 
+          className="
+            upload-details-clear
+            btn btn-destructive
+            align-items-center
+            justify-content-center
+          "
+          onClick={e=>{
+            e.preventDefault();
+            if (clear) clear();
+          }}
+        >
+            <Icon icon= {faTrash }/>
+        </button> 
+      }
     </div>
     { !hideClearDetails && <button {...{ className: "upload-details-clear btn btn-destructive align-items-center justify-content-center", onClick: e => { e.preventDefault(); clear() } }}>
           <Icon {...{ icon: faTrash }}/>
