@@ -99,8 +99,9 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
         }
         return <SdCoverImagePanel src={sdMediaImage} />;
       case MediaFileType.Mocap:
+        const bvhUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         return <Iframe {...{
-          url: "https://engine.fakeyou.com?mode=studio",
+          url: `https://engine.fakeyou.com?mode=viewer&bvh=${bvhUrl}`,
           className: "fy-studio-frame",
         }}  />;
       default:
