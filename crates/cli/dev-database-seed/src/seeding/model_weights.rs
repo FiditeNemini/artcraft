@@ -1058,12 +1058,12 @@ pub async fn seed_weights(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
         Some(token) => token,
     };
 
-    //original_seed_weights(mysql_pool,user_token).await?;
-    //seed_weights_for_user_token(mysql_pool, user_token).await?;
-    //seed_weights_for_paging(mysql_pool,user_token).await?;
-    // seed_weights_for_testing_inference(mysql_pool,user_token).await?;
-    //println!("TESTING DOWLOAD");
-    //test_seed_weights_files().await?;
-    seed_workflows_for_testing_inference(mysql_pool,user_token).await?;
+    // original_seed_weights(mysql_pool,user_token).await?;
+    // seed_weights_for_user_token(mysql_pool, user_token).await?;
+    // seed_weights_for_paging(mysql_pool,user_token).await?;
+    seed_weights_for_testing_inference(mysql_pool,user_token.clone()).await?;
+    println!("TESTING DOWLOAD");
+    test_seed_weights_files().await?;
+    seed_workflows_for_testing_inference(mysql_pool,user_token.clone()).await?;
     Ok(())
 }
