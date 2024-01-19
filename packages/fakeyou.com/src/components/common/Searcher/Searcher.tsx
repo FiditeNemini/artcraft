@@ -4,19 +4,20 @@ import { faSearch } from "@fortawesome/pro-solid-svg-icons";
 import MasonryGrid from "../MasonryGrid/MasonryGrid";
 import "./Searcher.scss";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
-import { useBookmarks, useRatings } from "hooks";
+import { useLazyLists } from "hooks";
 import { SearchWeights } from "@storyteller/components/src/api/weights/SearchWeights";
 import debounce from "lodash.debounce";
 import WeightsCards from "../Card/WeightsCards";
 import LoadingSpinner from "../LoadingSpinner";
 import useSearcherStore from "hooks/useSearcherStore";
-
+import prepFilter from "resources/prepFilter";
+import { ListWeights } from "@storyteller/components/src/api/weights/ListWeights";
+import InfiniteScroll from "react-infinite-scroll-component";
 interface SearcherProps {
   type?: "page" | "modal";
   dataType?: "media" | "weights";
   weightType?: string;
   onResultSelect?: () => void;
-  weightTypeFilter?: any;
   searcherKey: string;
 }
 
@@ -25,7 +26,6 @@ export default function Searcher({
   dataType = "weights",
   weightType = "all",
   onResultSelect,
-  weightTypeFilter,
   searcherKey,
 }: SearcherProps) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -33,8 +33,9 @@ export default function Searcher({
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchCompleted, setSearchCompleted] = useState(0);
-  const bookmarks = useBookmarks();
-  const ratings = useRatings();
+  // const bookmarks = useBookmarks();
+  // const ratings = useRatings();
+  const [list, listSet] = useState<Weight[]>([]);
 
   useEffect(() => {
     if (searchTerm[searcherKey]) {
@@ -59,7 +60,7 @@ export default function Searcher({
       setIsSearching(true);
 
       if (weightType !== "all") {
-        request[weightTypeFilter] = weightType;
+        request["weight_type"] = weightType;
       }
 
       let response = await SearchWeights(request);
@@ -74,7 +75,7 @@ export default function Searcher({
 
       setIsSearching(false);
     },
-    [setFoundWeights, weightType, setSearchCompleted, weightTypeFilter]
+    [setFoundWeights, weightType, setSearchCompleted]
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,6 +85,19 @@ export default function Searcher({
     }, 250),
     [doSearch]
   );
+
+  const weights = useLazyLists({
+    addQueries: {
+      page_size: 9,
+      ...prepFilter(weightType, "weight_type"),
+    },
+    debug: "Weights List",
+    fetcher: ListWeights,
+    list,
+    listSet,
+    requestList: true,
+    disableUrlQueries: true,
+  });
 
   return (
     <div>
@@ -98,36 +112,102 @@ export default function Searcher({
         className={`searcher-container ${
           type === "modal" ? "in-modal" : ""
         }`.trim()}
+        id={searcherKey}
       >
         {/* Result Cards */}
-        {isSearching ? (
-          <LoadingSpinner />
-        ) : (
-          <MasonryGrid key={searchCompleted} gridRef={gridContainerRef}>
-            {dataType === "weights" &&
-              foundWeights.map((data: any, key: number) => {
-                let props = {
-                  data,
-                  bookmarks,
-                  ratings,
-                  showCreator: true,
-                  type: "weights",
-                  inSearcher: true,
-                  onResultSelect,
-                };
 
-                return (
-                  <div
-                    {...{
-                      className: "col-12 col-sm-6 col-xl-4 grid-item",
-                      key,
-                    }}
-                  >
-                    <WeightsCards {...{ type: data.weight_category, props }} />
+        {searchTerm[searcherKey] && !isSearching ? (
+          <>
+            {isSearching ? (
+              <LoadingSpinner />
+            ) : (
+              <MasonryGrid key={searchCompleted} gridRef={gridContainerRef}>
+                {dataType === "weights" &&
+                  foundWeights.map((data: any, key: number) => {
+                    let props = {
+                      data,
+                      showCreator: true,
+                      type: "weights",
+                      inSearcher: true,
+                      onResultSelect,
+                    };
+
+                    return (
+                      <div
+                        {...{
+                          className: "col-12 col-sm-6 col-xl-4 grid-item",
+                          key,
+                        }}
+                      >
+                        <WeightsCards
+                          {...{ type: data.weight_category, props }}
+                        />
+                      </div>
+                    );
+                  })}
+              </MasonryGrid>
+            )}
+          </>
+        ) : (
+          <>
+            <InfiniteScroll
+              dataLength={weights.list.length}
+              next={weights.getMore}
+              hasMore={!weights.list.length || !!weights.next}
+              loader={
+                weights.list.length !== 0 &&
+                weights.isLoading && (
+                  <div className="mt-4 d-flex justify-content-center">
+                    <div className="spinner-border text-light" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
                   </div>
-                );
-              })}
-          </MasonryGrid>
+                )
+              }
+              endMessage={
+                <p className="text-center mt-4 opacity-75">No more results.</p>
+              }
+              className="overflow-hidden"
+              scrollableTarget={searcherKey}
+              scrollThreshold={0.95}
+            >
+              <>
+                {weights.list.length === 0 && weights.status === 3 ? (
+                  <div className="text-center mt-4 opacity-75">
+                    No weight created yet.
+                  </div>
+                ) : (
+                  <MasonryGrid
+                    gridRef={gridContainerRef}
+                    onLayoutComplete={() => console.log("Layout complete!")}
+                  >
+                    {weights.list.map((data: any, key: number) => {
+                      let props = {
+                        data,
+                        showCreator: true,
+                        type: "weights",
+                        inSearcher: true,
+                        onResultSelect,
+                      };
+
+                      return (
+                        <div
+                          {...{
+                            className: "col-12 col-sm-6 col-xl-4 grid-item",
+                            key,
+                          }}
+                        >
+                          <WeightsCards
+                            {...{ type: data.weight_category, props }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </MasonryGrid>
+                )}
+              </>
+            </InfiniteScroll>
+          </>
         )}
       </div>
     </div>

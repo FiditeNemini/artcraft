@@ -40,7 +40,7 @@ const SelectSearcher = memo(({ label, tabs }: SelectSearcherProps) => {
         type="modal"
         onResultSelect={closeModal}
         searcherKey={tab.searcherKey}
-        weightTypeFilter={tab.weightTypeFilter}
+        weightType={tab.weightTypeFilter}
       />
     ),
     padding: true,

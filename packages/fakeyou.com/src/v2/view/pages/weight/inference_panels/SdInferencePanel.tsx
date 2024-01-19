@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, memo } from "react";
 import {
   Button,
   Input,
@@ -33,7 +33,7 @@ interface SdInferencePanelProps {
   ) => void;
 }
 
-export default function SdInferencePanel({
+function SdInferencePanel({
   enqueueInferenceJob,
   sd_model_token,
 }: SdInferencePanelProps) {
@@ -339,12 +339,12 @@ export default function SdInferencePanel({
                 {
                   label: "All LoRA Weights",
                   searcherKey: "allLoraWeights",
-                  weightTypeFilter: "lora",
+                  weightTypeFilter: "rvc_v2",
                 },
                 {
                   label: "Bookmarked",
                   searcherKey: "bookmarkedLoraWeights",
-                  weightTypeFilter: "lora",
+                  weightTypeFilter: "rvc_v2",
                 },
               ]}
             />
@@ -392,3 +392,5 @@ export default function SdInferencePanel({
     </Panel>
   );
 }
+
+export default memo(SdInferencePanel);
