@@ -38,7 +38,7 @@ export default function UploadFieldVideo({
     //only fire for file unload
     //on file load is fired in video elements
     if (!file) onStateChange();
-  }, [file])
+  }, [file, onStateChange])
 
   const style = useSpring({
     config: { mass: 1, tension: 120, friction: 14 }
