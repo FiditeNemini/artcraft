@@ -110,13 +110,15 @@ pub async fn list_available_voices_handler(
 
     let include_user_hidden = is_mod;
 
+    // NB(bt,2024-01-18): Showing mods deleted files is actually kind of annoying!
+    const CAN_SEE_DELETED : bool = false;
 
     let mut query_builder = ListVoicesQueryBuilder::new()
         .sort_ascending(sort_ascending)
         .scope_creator_username(None)
         .include_user_hidden(include_user_hidden)
-        .include_user_deleted_results(is_mod)
-        .include_mod_deleted_results(is_mod)
+        .include_user_deleted_results(CAN_SEE_DELETED)
+        .include_mod_deleted_results(CAN_SEE_DELETED)
         .limit(limit)
         .cursor_is_reversed(cursor_is_reversed)
         .offset(cursor);
