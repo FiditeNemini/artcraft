@@ -116,13 +116,20 @@ export default function WeightPage({
         );
       case WeightCategory.VC:
         return (
-          <VcInferencePanel
-            sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-            enqueueInferenceJob={enqueueInferenceJob}
-            inferenceJobs={inferenceJobs}
-            inferenceJobsByCategory={inferenceJobsByCategory}
-            voiceToken={weight.weight_token}
-          />
+          <>
+            <VcInferencePanel
+              sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+              enqueueInferenceJob={enqueueInferenceJob}
+              inferenceJobs={inferenceJobs}
+              inferenceJobsByCategory={inferenceJobsByCategory}
+              voiceToken={weight.weight_token}
+            />
+
+            <SdInferencePanel
+              sd_model_token={weight.weight_token}
+              enqueueInferenceJob={enqueueInferenceJob}
+            />
+          </>
         );
 
       case WeightCategory.ZS:

@@ -431,7 +431,7 @@ styles with important tags:
   .form-select {
     border-width: 1px;
     border-color: $white;
-    padding: 11px 0.75rem;
+    padding: 10.25px 0.75rem;
 
     &:focus {
       border-color: $primary;
@@ -1719,7 +1719,7 @@ textarea {
 }
 
 .fy-studio-frame {
-  border-radius: .5rem;
+  border-radius: 0.5rem;
   width: 100%;
   height: 500px;
 }

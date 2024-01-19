@@ -10,7 +10,6 @@ import {
 } from "@storyteller/components/src/api/media_files/UploadMedia";
 import { v4 as uuidv4 } from "uuid";
 import { Link } from "react-router-dom";
-import SelectSearcher from "components/common/SelectSearcher/SelectSearcher";
 
 interface DevUploadProps {}
 
@@ -68,10 +67,6 @@ export default function DevUpload(props: DevUploadProps) {
           ))}
         </div>
       </Panel>
-
-      <div className="mt-5">
-        <SelectSearcher label="Additional LoRA Weight" />
-      </div>
     </Container>
   );
 }

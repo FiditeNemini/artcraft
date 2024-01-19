@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Input from "../Input";
 import { faSearch } from "@fortawesome/pro-solid-svg-icons";
 import MasonryGrid from "../MasonryGrid/MasonryGrid";
@@ -9,6 +9,7 @@ import { SearchWeights } from "@storyteller/components/src/api/weights/SearchWei
 import debounce from "lodash.debounce";
 import WeightsCards from "../Card/WeightsCards";
 import LoadingSpinner from "../LoadingSpinner";
+import useSearcherStore from "hooks/useSearcherStore";
 
 interface SearcherProps {
   type?: "page" | "modal";
@@ -16,6 +17,7 @@ interface SearcherProps {
   weightType?: string;
   onResultSelect?: () => void;
   weightTypeFilter?: any;
+  searcherKey: string;
 }
 
 export default function Searcher({
@@ -24,18 +26,27 @@ export default function Searcher({
   weightType = "all",
   onResultSelect,
   weightTypeFilter,
+  searcherKey,
 }: SearcherProps) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const { searchTerm, setSearchTerm } = useSearcherStore();
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchCompleted, setSearchCompleted] = useState(0);
   const bookmarks = useBookmarks();
   const ratings = useRatings();
 
+  useEffect(() => {
+    if (searchTerm[searcherKey]) {
+      setSearchTerm(searcherKey, searchTerm[searcherKey]);
+    }
+    doSearch(searchTerm[searcherKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleInputChange = (e: any) => {
     const newValue = e.target.value;
-    setSearchTerm(newValue);
+    setSearchTerm(searcherKey, newValue);
     debouncedDoSearch(newValue);
   };
 
@@ -79,7 +90,7 @@ export default function Searcher({
       <Input
         icon={faSearch}
         placeholder="Search..."
-        value={searchTerm}
+        value={searchTerm[searcherKey]}
         onChange={handleInputChange}
         className="mb-3"
       />
@@ -92,11 +103,7 @@ export default function Searcher({
         {isSearching ? (
           <LoadingSpinner />
         ) : (
-          <MasonryGrid
-            key={searchCompleted}
-            gridRef={gridContainerRef}
-            onLayoutComplete={() => console.log("Layout complete!")}
-          >
+          <MasonryGrid key={searchCompleted} gridRef={gridContainerRef}>
             {dataType === "weights" &&
               foundWeights.map((data: any, key: number) => {
                 let props = {
