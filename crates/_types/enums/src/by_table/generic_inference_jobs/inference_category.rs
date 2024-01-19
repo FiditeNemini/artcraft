@@ -34,6 +34,9 @@ pub enum InferenceCategory {
 
   #[serde(rename = "mocap")]
   Mocap,
+
+  #[serde(rename = "workflow")]
+  Workflow,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -50,6 +53,7 @@ impl InferenceCategory {
       Self::VideoFilter => "video_filter",
       Self::ImageGeneration => "image_generation",
       Self::Mocap => "mocap",
+      Self::Workflow => "workflow",
     }
   }
 
@@ -61,6 +65,7 @@ impl InferenceCategory {
       "video_filter" => Ok(Self::VideoFilter),
       "image_generation" => Ok(Self::ImageGeneration),
       "mocap" => Ok(Self::Mocap),
+      "workflow" => Ok(Self::Workflow),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -75,6 +80,7 @@ impl InferenceCategory {
       Self::VideoFilter,
       Self::ImageGeneration,
       Self::Mocap,
+      Self::Workflow,
     ])
   }
 }
@@ -91,7 +97,8 @@ mod tests {
     assert_serialization(InferenceCategory::VoiceConversion, "voice_conversion");
     assert_serialization(InferenceCategory::VideoFilter, "video_filter");
     assert_serialization(InferenceCategory::ImageGeneration, "image_generation");
-    assert_serialization(InferenceCategory::Mocap, "mocap")
+    assert_serialization(InferenceCategory::Mocap, "mocap");
+    assert_serialization(InferenceCategory::Workflow, "workflow")
   }
 
   #[test]
@@ -102,6 +109,7 @@ mod tests {
     assert_eq!(InferenceCategory::VideoFilter.to_str(), "video_filter");
     assert_eq!(InferenceCategory::ImageGeneration.to_str(), "image_generation");
     assert_eq!(InferenceCategory::Mocap.to_str(), "mocap");
+    assert_eq!(InferenceCategory::Workflow.to_str(), "workflow");
   }
 
   #[test]
@@ -110,8 +118,9 @@ mod tests {
     assert_eq!(InferenceCategory::from_str("text_to_speech").unwrap(), InferenceCategory::TextToSpeech);
     assert_eq!(InferenceCategory::from_str("voice_conversion").unwrap(), InferenceCategory::VoiceConversion);
     assert_eq!(InferenceCategory::from_str("video_filter").unwrap(), InferenceCategory::VideoFilter);
-    assert_eq!(InferenceCategory::from_str("image_generation").unwrap(), InferenceCategory::ImageGeneration); 
+    assert_eq!(InferenceCategory::from_str("image_generation").unwrap(), InferenceCategory::ImageGeneration);
     assert_eq!(InferenceCategory::from_str("mocap").unwrap(), InferenceCategory::Mocap);
+    assert_eq!(InferenceCategory::from_str("workflow").unwrap(), InferenceCategory::Workflow);
   }
 
   #[test]
@@ -125,6 +134,7 @@ mod tests {
     assert_eq!(variants.pop_first(), Some(InferenceCategory::VideoFilter));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::ImageGeneration));
     assert_eq!(variants.pop_first(), Some(InferenceCategory::Mocap));
+    assert_eq!(variants.pop_first(), Some(InferenceCategory::Workflow));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check

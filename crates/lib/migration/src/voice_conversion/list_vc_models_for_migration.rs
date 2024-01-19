@@ -67,6 +67,7 @@ impl VcModelForList {
         WeightsType::Tacotron2 => None,
         WeightsType::LoRA => None,
         WeightsType::VallE => None,
+        WeightsType::ComfyUi => None,
       },
     }
   }

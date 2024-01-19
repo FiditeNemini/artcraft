@@ -25,6 +25,8 @@ pub enum WeightsType {
     LoRA,
     #[serde(rename = "vall_e")]
     VallE,
+    #[serde(rename = "comfy_ui")]
+    ComfyUi,
 }
 
 
@@ -39,6 +41,7 @@ impl WeightsType {
             Self::Tacotron2 => "tt2",
             Self::LoRA => "loRA",
             Self::VallE => "vall_e",
+            Self::ComfyUi => "comfy_ui",
         }
     }
 
@@ -52,6 +55,7 @@ impl WeightsType {
             "tt2" => Ok(Self::Tacotron2),
             "loRA" => Ok(Self::LoRA),
             "vall_e" => Ok(Self::VallE),
+            "comfy_ui" => Ok(Self::ComfyUi),
             _ => Err(format!("invalid value: {:?}", value)),
         }
     }
@@ -65,7 +69,8 @@ impl WeightsType {
             Self::SoVitsSvc,
             Self::Tacotron2,
             Self::LoRA,
-            Self::VallE
+            Self::VallE,
+            Self::ComfyUi,
         ])
     }
 }
@@ -88,6 +93,7 @@ mod tests {
         assert_eq!(WeightsType::Tacotron2.to_str(), "tt2");
         assert_eq!(WeightsType::LoRA.to_str(), "loRA");
         assert_eq!(WeightsType::VallE.to_str(), "vall_e");
+        assert_eq!(WeightsType::ComfyUi.to_str(), "comfy_ui");
     }
 
     #[test]
@@ -100,13 +106,14 @@ mod tests {
         assert_eq!(WeightsType::from_str("tt2").unwrap(), WeightsType::Tacotron2);
         assert_eq!(WeightsType::from_str("loRA").unwrap(), WeightsType::LoRA);
         assert_eq!(WeightsType::from_str("vall_e").unwrap(), WeightsType::VallE);
+        assert_eq!(WeightsType::from_str("comfy_ui").unwrap(), WeightsType::ComfyUi);
         assert!(WeightsType::from_str("invalid").is_err());
     }
 
     #[test]
     fn test_all_variants() {
         let variants = WeightsType::all_variants();
-        assert_eq!(variants.len(), 8);
+        assert_eq!(variants.len(), 9);
         assert!(variants.contains(&WeightsType::HifiganTacotron2));
         assert!(variants.contains(&WeightsType::RvcV2));
         assert!(variants.contains(&WeightsType::StableDiffusion15));
@@ -115,5 +122,6 @@ mod tests {
         assert!(variants.contains(&WeightsType::Tacotron2));
         assert!(variants.contains(&WeightsType::LoRA));
         assert!(variants.contains(&WeightsType::VallE));
+        assert!(variants.contains(&WeightsType::ComfyUi));
     }
 }

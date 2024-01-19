@@ -6,6 +6,7 @@ use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
 use crate::payloads::generic_inference_args::mocap_payload::MocapArgs;
 use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
 use crate::payloads::generic_inference_args::videofilter_payload::RerenderArgs;
+use crate::payloads::generic_inference_args::workflow_payload::WorkflowArgs;
 
 /// Used to encode extra state for the `generic_inference_jobs` table.
 /// This should act somewhat like a serialized protobuf stored inside a record.
@@ -49,6 +50,10 @@ pub enum InferenceCategoryAbbreviated {
   #[serde(rename = "mc")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
   #[serde(alias = "mocap")]
   Mocap,
+
+  #[serde(rename = "wf")] // NB: DO NOT CHANGE. It could break live jobs. Renamed to be fewer bytes.
+  #[serde(alias = "workflow")]
+  Workflow,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]
@@ -106,7 +111,10 @@ pub enum PolymorphicInferenceArgs {
   Ig(StableDiffusionArgs),
 
   // Mocap (Short name to save space when serializing.)
-  Mc(MocapArgs)
+  Mc(MocapArgs),
+
+  // ComfyUI (Short name to save space when serializing.)
+  Cu(WorkflowArgs)
 }
 
 impl GenericInferenceArgs {
@@ -129,6 +137,7 @@ impl InferenceCategoryAbbreviated {
       InferenceCategory::VideoFilter => Self::VideoFilter,
       InferenceCategory::ImageGeneration => Self::ImageGeneration,
       InferenceCategory::Mocap => Self::Mocap,
+      InferenceCategory::Workflow => Self::Workflow,
     }
   }
 
@@ -140,6 +149,7 @@ impl InferenceCategoryAbbreviated {
       Self::VideoFilter => InferenceCategory::VideoFilter,
       Self::ImageGeneration =>InferenceCategory::ImageGeneration,
       Self::Mocap => InferenceCategory::Mocap,
+      Self::Workflow => InferenceCategory::Workflow,
     }
   }
 }

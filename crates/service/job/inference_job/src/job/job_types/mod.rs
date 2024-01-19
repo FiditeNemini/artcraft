@@ -4,4 +4,4 @@ pub mod vc;
 pub(crate) mod videofilter;
 pub mod image_generation;
 pub(crate) mod mocap;
- 
+pub(crate) mod workflow;

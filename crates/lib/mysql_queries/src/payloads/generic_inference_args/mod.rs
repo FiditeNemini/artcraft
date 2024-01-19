@@ -4,3 +4,4 @@ pub mod tts_payload;
 pub mod videofilter_payload;
 pub mod image_generation_payload;
 pub mod mocap_payload;
+pub mod workflow_payload;

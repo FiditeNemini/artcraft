@@ -40,6 +40,7 @@ impl RemoteCloudBucketDetails {
                 }
             },
             "svc" => Box::new(weights_descriptor::WeightsSVCDescriptor {}),
+            "workflow" => Box::new(weights_descriptor::WeightsWorkflowDescriptor {}),
             _ => panic!("Unknown prefix: {}", self.prefix)
         }
     }
