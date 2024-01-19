@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import Container from "components/common/Container";
 import PageHeader from "components/layout/PageHeader";
 import Panel from "components/common/Panel";
-// import ModelTags from "components/common/ModelTags";
 import { SearchWeights } from "@storyteller/components/src/api/weights/SearchWeights";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import { useLocation } from "react-router-dom";
@@ -25,6 +24,7 @@ import Select from "components/common/Select";
 export default function SearchPage() {
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
   const [weightType, setWeightType] = useState<string>("all");
+  const [searchCompleted, setSearchCompleted] = useState(0);
 
   const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -50,6 +50,7 @@ export default function SearchPage() {
       if (response.success) {
         let weights = [...response.weights];
         setFoundWeights(weights);
+        setSearchCompleted(prev => prev + 1);
       } else {
         setFoundWeights([]);
       }
@@ -130,7 +131,7 @@ export default function SearchPage() {
         panel={false}
       />
       <Panel padding={true}>
-        <div className="d-flex gap-2 mb-4">
+        <div className="d-flex gap-2 mb-3">
           <Select
             {...{
               icon: faLanguage,
@@ -156,12 +157,14 @@ export default function SearchPage() {
               value: weightTypeValue,
               onChange: args => {
                 setWeightType(args.value);
+                console.log(args.value);
               },
             }}
           />
         </div>
 
         <MasonryGrid
+          key={searchCompleted}
           gridRef={gridContainerRef}
           onLayoutComplete={() => console.log("Layout complete!")}
         >

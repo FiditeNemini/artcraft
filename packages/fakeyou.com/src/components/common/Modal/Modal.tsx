@@ -20,6 +20,7 @@ interface ModalProps {
   padding?: boolean;
   large?: boolean;
   position?: "center" | "top";
+  mobileFullscreen?: boolean;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -37,6 +38,7 @@ const Modal: React.FC<ModalProps> = ({
   padding = true,
   large = false,
   position = "center",
+  mobileFullscreen = false,
 }) => {
   const fadeIn = useSpring({
     opacity: show ? 1 : 0,
@@ -80,26 +82,27 @@ const Modal: React.FC<ModalProps> = ({
         <div
           className={`modal-dialog ${
             position === "center" ? "modal-dialog-centered" : ""
-          } ${large ? "modal-xl" : ""} ${
-            autoWidth ? "modal-width-auto" : ""
+          } ${large ? "modal-xl" : ""} ${autoWidth ? "modal-width-auto" : ""} ${
+            mobileFullscreen ? "modal-dialog-mobile-fullscreen" : ""
           }`.trim()}
         >
-          <div className="modal-content">
-            { !noHeader && <header className="modal-header">
+          <div className={`modal-content`.trim()}>
+            {!noHeader && (
+              <header className="modal-header">
                 <h5 className="modal-title">
                   {icon && <FontAwesomeIcon icon={icon} className="me-3" />}
-                  { title || "" }
+                  {title || ""}
                 </h5>
-                <button 
+                <button
                   type="button"
                   className="btn-close"
                   onClick={handleClose}
                   aria-label="Close"
                 />
               </header>
-            }
-            <div {...{ className: `modal-body ${padding ? "p-3" : ""}`}}>
-              { Content && <Content {...{ handleClose }} /> }
+            )}
+            <div {...{ className: `modal-body ${padding ? "p-3" : ""}` }}>
+              {Content && <Content {...{ handleClose }} />}
             </div>
             {showButtons && (
               <div className="modal-footer">

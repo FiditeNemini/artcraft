@@ -2,7 +2,16 @@
 
 .searcher-container {
   &.in-modal {
-    overflow: hidden;
-    max-height: 50vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 65vh;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .searcher-container {
+    &.in-modal {
+      max-height: 70vh;
+    }
   }
 }

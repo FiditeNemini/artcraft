@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import Card from "../Card";
 import AudioPlayer from "components/common/AudioPlayer";
 import useTimeAgo from "hooks/useTimeAgo";
@@ -12,15 +12,18 @@ import Button from "components/common/Button";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import useToken from "hooks/useToken";
 
 interface AudioCardProps {
-  bookmarks: any;
+  bookmarks?: any;
   data: any;
   origin?: string;
-  ratings: any;
+  ratings?: any;
   showCreator?: boolean;
   showCover?: boolean;
   type: "media" | "weights";
+  inSearcher?: boolean;
+  onResultSelect?: () => void;
 }
 
 export default function AudioCard({
@@ -31,7 +34,11 @@ export default function AudioCard({
   showCreator,
   showCover,
   type,
+  inSearcher = false,
+  onResultSelect,
 }: AudioCardProps) {
+  const { setToken, setWeightTitle } = useToken();
+  const history = useHistory();
   const linkUrl =
     type === "media"
       ? `/media/${data.token}`
@@ -41,6 +48,12 @@ export default function AudioCard({
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
+  };
+
+  const handleSearcherResultSelect = () => {
+    setToken(data.weight_token);
+    setWeightTitle && setWeightTitle(data.title);
+    onResultSelect && onResultSelect();
   };
 
   const timeAgo = useTimeAgo(data.created_at);
@@ -72,57 +85,50 @@ export default function AudioCard({
     }
   }
 
-  return (
-    <Link
-      {...{
-        to: linkUrl,
-        state: { origin },
-      }}
-    >
-      <Card padding={true} canHover={true}>
-        {type === "media" && (
-          <>
-            <div className="mb-3">
-              <div className="d-flex align-items-center">
-                <div className="d-flex flex-grow-1 align-items-center gap-2">
-                  <Badge label="Audio" color="teal" />
-                </div>
+  const card = (
+    <Card padding={true} canHover={true} onClick={handleSearcherResultSelect}>
+      {type === "media" && (
+        <>
+          <div className="mb-3">
+            <div className="d-flex align-items-center">
+              <div className="d-flex flex-grow-1 align-items-center gap-2">
+                <Badge label="Audio" color="teal" />
               </div>
-
-              <h6 className="fw-semibold text-white mb-1 mt-3">
-                {data.origin.maybe_model
-                  ? data.origin.maybe_model.title
-                  : "Media Audio"}
-              </h6>
-              <p className="fs-7 opacity-75">{timeAgo}</p>
             </div>
 
-            <AudioPlayer src={data.public_bucket_path} id={data.token} />
+            <h6 className="fw-semibold text-white mb-1 mt-3">
+              {data.origin.maybe_model
+                ? data.origin.maybe_model.title
+                : "Media Audio"}
+            </h6>
+            <p className="fs-7 opacity-75">{timeAgo}</p>
+          </div>
 
-            <hr className="my-3" />
+          <AudioPlayer src={data.public_bucket_path} id={data.token} />
 
-            <div
-              className="d-flex align-items-center gap-2"
-              onClick={handleInnerClick}
-            >
-              {showCreator && (
-                <div className="flex-grow-1">
-                  <CreatorName
-                    displayName={
-                      data.maybe_creator?.display_name || "Anonymous"
-                    }
-                    gravatarHash={data.maybe_creator?.gravatar_hash || null}
-                    avatarIndex={
-                      data.maybe_creator?.default_avatar.image_index || 0
-                    }
-                    backgroundIndex={
-                      data.maybe_creator?.default_avatar.color_index || 0
-                    }
-                    username={data.maybe_creator?.username || "anonymous"}
-                  />
-                </div>
-              )}
+          <hr className="my-3" />
 
+          <div
+            className="d-flex align-items-center gap-2"
+            onClick={handleInnerClick}
+          >
+            {showCreator && (
+              <div className="flex-grow-1">
+                <CreatorName
+                  displayName={data.maybe_creator?.display_name || "Anonymous"}
+                  gravatarHash={data.maybe_creator?.gravatar_hash || null}
+                  avatarIndex={
+                    data.maybe_creator?.default_avatar.image_index || 0
+                  }
+                  backgroundIndex={
+                    data.maybe_creator?.default_avatar.color_index || 0
+                  }
+                  username={data.maybe_creator?.username || "anonymous"}
+                />
+              </div>
+            )}
+
+            {ratings && (
               <div>
                 <LikeButton
                   {...{
@@ -133,68 +139,83 @@ export default function AudioCard({
                   }}
                 />
               </div>
-            </div>
-          </>
-        )}
+            )}
+          </div>
+        </>
+      )}
 
-        {type === "weights" && (
-          <>
-            <div className="d-flex">
-              {showCover && (
-                <WeightCoverImage
-                  src={coverImage}
-                  height={110}
-                  width={110}
-                  coverIndex={data?.cover_image?.default_cover?.image_index}
-                />
-              )}
+      {type === "weights" && (
+        <>
+          <div className="d-flex">
+            {showCover && (
+              <WeightCoverImage
+                src={coverImage}
+                height={110}
+                width={110}
+                coverIndex={data?.cover_image?.default_cover?.image_index}
+              />
+            )}
 
-              <div className="flex-grow-1">
-                <div className="d-flex align-items-center">
-                  <div className="d-flex flex-grow-1">
-                    <Badge label={weightBadgeLabel} color={weightBadgeColor} />
-                  </div>
+            <div className="flex-grow-1">
+              <div className="d-flex align-items-center">
+                <div className="d-flex flex-grow-1">
+                  <Badge label={weightBadgeLabel} color={weightBadgeColor} />
+                </div>
+                {inSearcher ? (
+                  <Button
+                    icon={faArrowRight}
+                    iconFlip={true}
+                    variant="link"
+                    label="Select"
+                    className="fs-7"
+                    onClick={handleSearcherResultSelect}
+                  />
+                ) : (
                   <Button
                     icon={faArrowRight}
                     iconFlip={true}
                     variant="link"
                     label="Use"
                     className="fs-7"
-                    to={linkUrl}
+                    onClick={() => {
+                      history.push(linkUrl);
+                    }}
                   />
-                </div>
+                )}
+              </div>
 
-                <div className="d-flex align-items-center mt-3">
-                  <div className="flex-grow-1">
-                    <h6 className="fw-semibold text-white mb-1">
-                      {data.title || data.details.maybe_weight_data.title}
-                    </h6>
-                    <p className="fs-7 opacity-75">{timeAgo}</p>
-                  </div>
+              <div className="d-flex align-items-center mt-3">
+                <div className="flex-grow-1">
+                  <h6 className="fw-semibold text-white mb-1">
+                    {data.title || data.details.maybe_weight_data.title}
+                  </h6>
+                  <p className="fs-7 opacity-75">{timeAgo}</p>
                 </div>
               </div>
             </div>
+          </div>
 
-            <hr className="my-3" />
+          <hr className="my-3" />
 
-            <div
-              className="d-flex align-items-center gap-2"
-              onClick={handleInnerClick}
-            >
-              {showCreator && (
-                <div className="flex-grow-1">
-                  <CreatorName
-                    displayName={data.creator?.display_name || "Anonymous"}
-                    gravatarHash={data.creator?.gravatar_hash || null}
-                    avatarIndex={data.creator?.default_avatar.image_index || 0}
-                    backgroundIndex={
-                      data.creator?.default_avatar.color_index || 0
-                    }
-                    username={data.creator?.username || "anonymous"}
-                  />
-                </div>
-              )}
+          <div
+            className="d-flex align-items-center gap-2"
+            onClick={handleInnerClick}
+          >
+            {showCreator && (
+              <div className="flex-grow-1">
+                <CreatorName
+                  displayName={data.creator?.display_name || "Anonymous"}
+                  gravatarHash={data.creator?.gravatar_hash || null}
+                  avatarIndex={data.creator?.default_avatar.image_index || 0}
+                  backgroundIndex={
+                    data.creator?.default_avatar.color_index || 0
+                  }
+                  username={data.creator?.username || "anonymous"}
+                />
+              </div>
+            )}
 
+            {ratings && (
               <div>
                 <LikeButton
                   {...{
@@ -205,6 +226,9 @@ export default function AudioCard({
                   }}
                 />
               </div>
+            )}
+
+            {bookmarks && (
               <BookmarkButton
                 {...{
                   ...bookmarks.makeProps({
@@ -213,10 +237,27 @@ export default function AudioCard({
                   }),
                 }}
               />
-            </div>
-          </>
-        )}
-      </Card>
-    </Link>
+            )}
+          </div>
+        </>
+      )}
+    </Card>
+  );
+
+  return (
+    <>
+      {inSearcher ? (
+        <>{card}</>
+      ) : (
+        <Link
+          {...{
+            to: linkUrl,
+            state: { origin },
+          }}
+        >
+          {card}
+        </Link>
+      )}
+    </>
   );
 }

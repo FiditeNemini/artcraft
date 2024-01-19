@@ -4,36 +4,40 @@ import PageHeader from "components/layout/PageHeader";
 import React, { useState } from "react";
 import { Button } from "components/common";
 import { faUpload } from "@fortawesome/pro-solid-svg-icons";
-import { UploadMedia, UploadMediaResponse } from "@storyteller/components/src/api/media_files/UploadMedia";
+import {
+  UploadMedia,
+  UploadMediaResponse,
+} from "@storyteller/components/src/api/media_files/UploadMedia";
 import { v4 as uuidv4 } from "uuid";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import SelectSearcher from "components/common/SelectSearcher/SelectSearcher";
 
 interface DevUploadProps {}
 
 export default function DevUpload(props: DevUploadProps) {
   const [file, fileSet] = useState<File | null>(null);
-  const [tokens,tokensSet] = useState<string[]>([]);
+  const [tokens, tokensSet] = useState<string[]>([]);
 
   const handleFileChange = (event: any) => {
     fileSet(event.target.files[0]);
   };
 
-
   const handleUpload = () => {
-    if (file) UploadMedia({
-      uuid_idempotency_token: uuidv4(),
-      file,
-      source: "file",
-    }) // if there an audio file it uploads here
-    .then((res: UploadMediaResponse) => {
-      if ("media_file_token" in res) {
-        console.log("📁 upload response:", res);
-        tokensSet([res.media_file_token, ...tokens]);
-        fileSet(null);
-      }
-    });
+    if (file)
+      UploadMedia({
+        uuid_idempotency_token: uuidv4(),
+        file,
+        source: "file",
+      }) // if there an audio file it uploads here
+        .then((res: UploadMediaResponse) => {
+          if ("media_file_token" in res) {
+            console.log("📁 upload response:", res);
+            tokensSet([res.media_file_token, ...tokens]);
+            fileSet(null);
+          }
+        });
     else console.log("🥺 no file");
-  }
+  };
 
   return (
     <Container type="padded" className="pt-4 pt-lg-5">
@@ -59,12 +63,15 @@ export default function DevUpload(props: DevUploadProps) {
             />
           </div>
           <h2>Your uploads</h2>
-          {
-            tokens.map((token: string, key: number) => 
-              <Link {...{ key, to: `/media/${ token }` }}>{ token }</Link>)
-          }
+          {tokens.map((token: string, key: number) => (
+            <Link {...{ key, to: `/media/${token}` }}>{token}</Link>
+          ))}
         </div>
       </Panel>
+
+      <div className="mt-5">
+        <SelectSearcher label="Additional LoRA Weight" />
+      </div>
     </Container>
   );
 }
