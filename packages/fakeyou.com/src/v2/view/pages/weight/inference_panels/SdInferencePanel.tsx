@@ -15,9 +15,6 @@ import {
   faRectanglePortrait,
   faSquare,
 } from "@fortawesome/pro-solid-svg-icons";
-import Modal from "components/common/Modal";
-import NonRouteTabs from "components/common/Tabs/NonRouteTabs";
-import Searcher from "components/common/Searcher";
 import { v4 as uuidv4 } from "uuid";
 import {
   EnqueueImageGen,
@@ -25,6 +22,8 @@ import {
   EnqueueImageGenIsError,
 } from "@storyteller/components/src/api/image_generation/EnqueueImageGen";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import useToken from "hooks/useToken";
+import SelectSearcher from "components/common/SelectSearcher/SelectSearcher";
 
 interface SdInferencePanelProps {
   sd_model_token: string;
@@ -38,6 +37,7 @@ export default function SdInferencePanel({
   enqueueInferenceJob,
   sd_model_token,
 }: SdInferencePanelProps) {
+  const { token: loraToken } = useToken();
   const [isEnqueuing, setIsEnqueuing] = useState(false);
   const [seed, seedSet] = useState("random");
   const [seedNumber, seedNumberSet] = useState("");
@@ -45,7 +45,6 @@ export default function SdInferencePanel({
   const [aspectRatio, aspectRatioSet] = useState("square");
   const [cfgScale, cfgScaleSet] = useState(7);
   const [samples, samplesSet] = useState(8);
-  const [loraToken, loraTokenSet] = useState("");
   const [batchCount, batchCountSet] = useState(1);
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
@@ -54,12 +53,10 @@ export default function SdInferencePanel({
     cfgScaleSet,
     samplerSet,
     aspectRatioSet,
-    loraTokenSet,
     setPrompt,
     setNegativePrompt,
     samplesSet,
   });
-  const [isLoraModalOpen, isLoraModalOpenSet] = useState(false);
 
   const samplerOpts = [
     { label: "DPM++ 2M Karras", value: "DPM++ 2M Karras" },
@@ -190,23 +187,6 @@ export default function SdInferencePanel({
       seedSet("random");
     }
   };
-
-  const openLoraModal = () => {
-    isLoraModalOpenSet(true);
-  };
-
-  const closeLoraModal = () => {
-    isLoraModalOpenSet(false);
-  };
-
-  const loraSearchTabs = [
-    {
-      label: "All LoRA Weights",
-      content: <Searcher type="modal" />,
-      padding: true,
-    },
-    { label: "Bookmarked", content: <Searcher type="modal" />, padding: true },
-  ];
 
   const handleEnqueueImageGen = async (
     ev: React.FormEvent<HTMLButtonElement>
@@ -353,17 +333,7 @@ export default function SdInferencePanel({
               }}
             />
 
-            <div>
-              <label className="sub-title">LoRA Weight</label>
-              <div className="d-flex gap-2">
-                <Input
-                  disabled={true}
-                  className="w-100"
-                  placeholder="None selected"
-                />
-                <Button label="Select" onClick={openLoraModal} />
-              </div>
-            </div>
+            <SelectSearcher label="Additional LoRA Weight" />
 
             {/* Checkpoint Use weight token */}
             {/* <TempSelect
@@ -405,18 +375,6 @@ export default function SdInferencePanel({
           }}
         />
       </div>
-
-      {/* Additional LoRA Weight Modal */}
-      <Modal
-        show={isLoraModalOpen}
-        handleClose={closeLoraModal}
-        title="Select a LoRA Weight"
-        content={() => <NonRouteTabs tabs={loraSearchTabs} />}
-        showButtons={false}
-        padding={false}
-        large={true}
-        position="top"
-      />
     </Panel>
   );
 }

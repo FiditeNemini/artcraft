@@ -18,6 +18,7 @@ interface ImageCardProps {
   ratings: any;
   showCreator?: boolean;
   type: "media" | "weights";
+  inSearcher?: boolean;
 }
 
 export default function ImageCard({
@@ -27,6 +28,7 @@ export default function ImageCard({
   showCreator,
   ratings,
   type,
+  inSearcher = false,
 }: ImageCardProps) {
   const history = useHistory();
   const linkUrl =
@@ -38,6 +40,14 @@ export default function ImageCard({
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
+  };
+
+  const handleSearcherSelect = () => {
+    if (inSearcher) {
+      console.log("Searcher weight selected", data.weight_token);
+    } else {
+      return;
+    }
   };
 
   const timeAgo = useTimeAgo(data.created_at);
@@ -72,153 +82,173 @@ export default function ImageCard({
     }
   }
 
-  return (
-    <Link
-      {...{
-        to: linkUrl,
-        state: { origin },
-      }}
-    >
-      <Card padding={false} canHover={true}>
-        {type === "media" && (
-          <>
-            <img src={coverImage} alt={data.weight_name} className="card-img" />
-            <div className="card-img-overlay">
-              <div className="card-img-gradient" />
+  const card = (
+    <Card padding={false} canHover={true}>
+      {type === "media" && (
+        <>
+          <img src={coverImage} alt={data.weight_name} className="card-img" />
+          <div className="card-img-overlay">
+            <div className="card-img-gradient" />
 
-              <div className="d-flex align-items-center">
-                <div className="d-flex flex-grow-1">
-                  <Badge label="Image" color="ultramarine" overlay={true} />
-                </div>
-              </div>
-
-              <div className="card-img-overlay-text">
-                <div>
-                  <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
-                </div>
-
-                <hr className="my-2" />
-
-                <div
-                  className="d-flex align-items-center gap-2"
-                  onClick={handleInnerClick}
-                >
-                  {showCreator && (
-                    <div className="flex-grow-1">
-                      <CreatorName
-                        displayName={
-                          data.maybe_creator?.display_name || "Anonymous"
-                        }
-                        gravatarHash={data.maybe_creator?.gravatar_hash || null}
-                        avatarIndex={
-                          data.maybe_creator?.default_avatar.image_index || 0
-                        }
-                        backgroundIndex={
-                          data.maybe_creator?.default_avatar.color_index || 0
-                        }
-                        username={data.maybe_creator?.username || "anonymous"}
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <LikeButton
-                      {...{
-                        ...ratings.makeProps({
-                          entityToken: data.token,
-                          entityType: "media_file",
-                        }),
-                      }}
-                    />
-                  </div>
-                </div>
+            <div className="d-flex align-items-center">
+              <div className="d-flex flex-grow-1">
+                <Badge label="Image" color="ultramarine" overlay={true} />
               </div>
             </div>
-          </>
-        )}
 
-        {type === "weights" && (
-          <>
-            <img src={coverImage} alt={data.title} className="card-img" />
-            <div className="card-img-overlay">
-              <div className="card-img-gradient" />
-              <div className="d-flex align-items-center">
-                <div className="d-flex flex-grow-1">
-                  <Badge
-                    label={weightBadgeLabel}
-                    color={weightBadgeColor}
-                    overlay={true}
-                  />
-                </div>
-                <Button
-                  {...{
-                    className: "fs-7",
-                    icon: faArrowRight,
-                    label: "Use",
-                    onClick: () => {
-                      history.push(linkUrl); // programatically link to avoid "<a> cannot appear as a descendant of <a>" errors
-                    },
-                    variant: "link",
-                  }}
-                />
+            <div className="card-img-overlay-text">
+              <div>
+                <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
               </div>
 
-              <div className="card-img-overlay-text">
-                <div className="d-flex align-items-center mt-3">
+              <hr className="my-2" />
+
+              <div
+                className="d-flex align-items-center gap-2"
+                onClick={handleInnerClick}
+              >
+                {showCreator && (
                   <div className="flex-grow-1">
-                    <h6 className="fw-semibold text-white mb-1">
-                      {data.title || data.details?.maybe_weight_data?.title}
-                    </h6>
-                    <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
-                  </div>
-                </div>
-
-                <hr className="my-2" />
-
-                <div
-                  className="d-flex align-items-center gap-2"
-                  onClick={handleInnerClick}
-                >
-                  {showCreator && (
-                    <div className="flex-grow-1">
-                      <CreatorName
-                        displayName={data.creator?.display_name || "Anonymous"}
-                        gravatarHash={data.creator?.gravatar_hash || null}
-                        avatarIndex={
-                          data.creator?.default_avatar.image_index || 0
-                        }
-                        backgroundIndex={
-                          data.creator?.default_avatar.color_index || 0
-                        }
-                        username={data.creator?.username || "anonymous"}
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <LikeButton
-                      {...{
-                        ...ratings.makeProps({
-                          entityToken: data.weight_token,
-                          entityType: "model_weight",
-                        }),
-                      }}
+                    <CreatorName
+                      displayName={
+                        data.maybe_creator?.display_name || "Anonymous"
+                      }
+                      gravatarHash={data.maybe_creator?.gravatar_hash || null}
+                      avatarIndex={
+                        data.maybe_creator?.default_avatar.image_index || 0
+                      }
+                      backgroundIndex={
+                        data.maybe_creator?.default_avatar.color_index || 0
+                      }
+                      username={data.maybe_creator?.username || "anonymous"}
                     />
                   </div>
-                  <BookmarkButton
+                )}
+
+                <div>
+                  <LikeButton
                     {...{
-                      ...bookmarks.makeProps({
-                        entityToken: data.weight_token,
-                        entityType: "model_weight",
+                      ...ratings.makeProps({
+                        entityToken: data.token,
+                        entityType: "media_file",
                       }),
                     }}
                   />
                 </div>
               </div>
             </div>
-          </>
-        )}
-      </Card>
-    </Link>
+          </div>
+        </>
+      )}
+
+      {type === "weights" && (
+        <>
+          <img src={coverImage} alt={data.title} className="card-img" />
+          <div className="card-img-overlay">
+            <div className="card-img-gradient" />
+            <div className="d-flex align-items-center">
+              <div className="d-flex flex-grow-1">
+                <Badge
+                  label={weightBadgeLabel}
+                  color={weightBadgeColor}
+                  overlay={true}
+                />
+              </div>
+              {inSearcher ? (
+                <Button
+                  icon={faArrowRight}
+                  iconFlip={true}
+                  variant="link"
+                  label="Select"
+                  className="fs-7"
+                  onClick={handleSearcherSelect}
+                />
+              ) : (
+                <Button
+                  icon={faArrowRight}
+                  iconFlip={true}
+                  variant="link"
+                  label="Use"
+                  className="fs-7"
+                  onClick={() => {
+                    history.push(linkUrl);
+                  }}
+                />
+              )}
+            </div>
+
+            <div className="card-img-overlay-text">
+              <div className="d-flex align-items-center mt-3">
+                <div className="flex-grow-1">
+                  <h6 className="fw-semibold text-white mb-1">
+                    {data.title || data.details?.maybe_weight_data?.title}
+                  </h6>
+                  <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
+                </div>
+              </div>
+
+              <hr className="my-2" />
+
+              <div
+                className="d-flex align-items-center gap-2"
+                onClick={handleInnerClick}
+              >
+                {showCreator && (
+                  <div className="flex-grow-1">
+                    <CreatorName
+                      displayName={data.creator?.display_name || "Anonymous"}
+                      gravatarHash={data.creator?.gravatar_hash || null}
+                      avatarIndex={
+                        data.creator?.default_avatar.image_index || 0
+                      }
+                      backgroundIndex={
+                        data.creator?.default_avatar.color_index || 0
+                      }
+                      username={data.creator?.username || "anonymous"}
+                    />
+                  </div>
+                )}
+
+                <div>
+                  <LikeButton
+                    {...{
+                      ...ratings.makeProps({
+                        entityToken: data.weight_token,
+                        entityType: "model_weight",
+                      }),
+                    }}
+                  />
+                </div>
+                <BookmarkButton
+                  {...{
+                    ...bookmarks.makeProps({
+                      entityToken: data.weight_token,
+                      entityType: "model_weight",
+                    }),
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </Card>
+  );
+
+  return (
+    <>
+      {inSearcher ? (
+        <>{card}</>
+      ) : (
+        <Link
+          {...{
+            to: linkUrl,
+            state: { origin },
+          }}
+        >
+          {card}
+        </Link>
+      )}
+    </>
   );
 }
