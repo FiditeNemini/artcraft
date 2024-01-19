@@ -217,6 +217,20 @@ pub async fn enqueue_image_generation_request(
         }
     }
 
+    if mode == "lora" {
+        match request.maybe_lora_upload_path {
+            Some(_) => {}
+            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Lora Upload Path".to_string()))
+        }
+    }
+
+    if mode == "model" {
+        match request.maybe_sd_model_token {
+            Some(_) => {}
+            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Model Upload Path".to_string()))
+        }
+    }
+
     // TODO: Brandon need to figure out premium vs not premium
 
     let mut maybe_user_token: Option<UserToken> = None;
