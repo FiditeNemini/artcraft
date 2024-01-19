@@ -4,39 +4,44 @@ import { useBatchContent } from "hooks";
 
 export default function useRatings() {
   const fetch = (entity_token: string, entity_type: string, lib: any) => {
-    return SetRating("",{
+    const newRating = {
       entity_token,
       entity_type,
-      rating_value: lib[entity_token].rating_value === "neutral" ? "positive" : "neutral"
-    });
+      rating_value: lib[entity_token]?.rating_value !== "positive" ? "positive" : "neutral"
+    }
+    // console.log("😎",lib[entity_token], newRating);
+    return SetRating("", newRating);
+  };
+
+  const modLibrary = (res: any, entity_token: string, entity_type: string, lib: any) => {
+    return {
+      ...lib,
+      [entity_token]: {
+        entity_type,
+        rating_value: lib[entity_token].rating_value === "neutral" ? "positive" : "neutral",
+        positive_rating_count: res.new_positive_rating_count_for_entity
+      }
+    };
   };
 
   const ratings = useBatchContent({
     fetcher: GetRatings,
     checker: () => true,
-    modLibrary: (current: any, res: any, entity_token: string) => {
+    modLibrary: (current: any, res: any, entity_token: string, tokenType: string) => {
+      // console.log("🪼", tokenType, res );
       let { positive_rating_count } = res.results ? res.results.find((item: any, i: number) => 
-        item.weight_token === entity_token
+        item[tokenType] === entity_token
       ).stats : res.stats;
 
       return { ...current, positive_rating_count };
     },
-    onPass: {
-      fetch,
-      modLibrary: (res: any, entity_token: string, entity_type: string, lib: any) => {
-        return {
-          ...lib,
-          [entity_token]: {
-            entity_type,
-            rating_value: lib[entity_token].rating_value === "neutral" ? "positive" : "neutral",
-            positive_rating_count: res.new_positive_rating_count_for_entity
-          }
-        };
-      }
-    },
+    onFail: { fetch, modLibrary },
+    onPass: { fetch, modLibrary },
     resultsKey: "ratings",
     toggleCheck: (entity: any) => (entity?.rating_value || "") === "positive"
   });
+
+  // console.log("🍎",ratings.busyList);
 
   return {
     ...ratings,

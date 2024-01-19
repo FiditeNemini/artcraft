@@ -28,7 +28,7 @@ export default function useBatchContent({
   fetcher,
   modLibrary = (current: any, res: any, entity_token: string ) => current,
   onPass,
-  onFail,
+  onFail = { fetch: () => new Promise(() => {}) },
   resultsKey,
   toggleCheck
 }: Props) {
@@ -36,26 +36,31 @@ export default function useBatchContent({
   const [library, librarySet] = useState<Library>({});
   const [busyList, busyListSet] = useState<Library>({});
   const [status, statusSet] = useState(FetchStatus.ready);
+  const [tokenType,tokenTypeSet] = useState("");
 
   const gather = ({ expand, key, res }: Gather) => {
     let tokens = res.results ? res.results.map((item: any) => item[key]) : [res[key]];
+    let abc = tokens.reduce((obj = {},token = "") => ({ ...obj, [token]: true }),{})
     // console.log("🪙",fetcher);
-    busyListSet(tokens.reduce((obj = {},token = "") => ({ ...obj, [token]: true }),{})); // add current batch to busy list
+    tokenTypeSet(key)
+    busyListSet(abc); // add current batch to busy list
     fetcher("",{},{ tokens }).then((batchRes: any) => {
 
-    // console.log("🪙", res, modLibrary);
+    // console.log("🦄",resultsKey,  res, modLibrary);
       if (batchRes.success && !!batchRes[resultsKey]) {
-        // console.log("🥏",batchRes[resultsKey]);
+        // console.log("🥏",resultsKey);
         let newBatch = batchRes[resultsKey].reduce((obj = {}, { entity_token = "", ...current }) => {
-          // console.log("🧲",current, res, entity_token, obj);
+          // console.log("🧲", resultsKey, {current, res, entity_token, obj});
           let newCurrent = {
             ...obj,
-            [entity_token]: { ...modLibrary(current, res, entity_token) }
+            [entity_token]: { ...modLibrary(current, res, entity_token, key) }
           };
+
+
+          // console.log("😡", resultsKey, newCurrent);
           return newCurrent;
         },{});
-
-      // console.log("😡", newBatch);
+        // console.log("🐸",busyList);
         busyListSet({}); // this should be a for each key in tokens delete from busyList, but this is fine for now
         librarySet((library: any) => expand ? { ...library, ...newBatch } : newBatch);
       }
@@ -80,6 +85,7 @@ export default function useBatchContent({
       console.log(`⏳ toggling entity ${ entity_token }, in library?: ${ !!inLibrary }`);
 
       if (inLibrary && checker(inLibrary)) {
+        // console.log("⭕️");
         return onPass.fetch(entity_token, entity_type, library)
         .then((res: any) => {
           console.log("⭕️",res);
@@ -89,6 +95,7 @@ export default function useBatchContent({
           return false;
         });
       } else {
+        // console.log("❌");
         return onFail.fetch(entity_token, entity_type, library)
         .then((res: any) => {
           console.log("❌",res);
@@ -123,6 +130,7 @@ export default function useBatchContent({
     makeProps,
     status,
     statusSet,
+    tokenType,
     toggle,
     toggled
   };
