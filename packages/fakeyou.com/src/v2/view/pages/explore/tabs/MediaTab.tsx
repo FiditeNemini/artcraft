@@ -50,6 +50,7 @@ export default function MediaTab() {
     { value: "image", label: "Images" },
     { value: "audio", label: "Audio" },
     { value: "video", label: "Video" },
+    { value: "mocap", label: "Motion Capture" },
   ];
 
   const sortOptions = [
