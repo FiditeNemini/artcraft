@@ -26,7 +26,7 @@ export function PageInferenceStatuses (props:{
       props.pageState.jobToken,
       FrontendInferenceJobType.FaceAnimation
     );
-  }, [])
+  }, [props.pageState.jobToken, enqueueInferenceJob])
 
   const failures = (fail = "") => {
     switch (fail) {
