@@ -2149,6 +2149,7 @@ dependencies = [
  "errors",
  "log",
  "my-workspace-hack",
+ "regex",
  "serde",
  "serde_json",
  "tokens",

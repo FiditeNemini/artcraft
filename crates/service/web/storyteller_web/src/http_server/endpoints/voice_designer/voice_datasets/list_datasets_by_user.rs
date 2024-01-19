@@ -89,12 +89,16 @@ pub async fn list_datasets_by_user_handler(
 
   let username = path.username.as_ref();
   let creator_user_token = user_session.user_token.clone();
-  let is_mod = user_session.can_ban_users;
+  let _is_mod = user_session.can_ban_users;
+
+  // NB(bt,2024-01-18): Showing mods deleted files is actually kind of annoying!
+  // We should focus on visibility-related controls instead.
+  const CAN_SEE_DELETED : bool = false;
 
   let query_results = list_datasets_by_username(
     &server_state.mysql_pool,
     &username,
-    is_mod,
+    CAN_SEE_DELETED,
   ).await.map_err(|e| {
     warn!("Error querying for datasets: {:?}", e);
     ListDatasetsByUserError::ServerError

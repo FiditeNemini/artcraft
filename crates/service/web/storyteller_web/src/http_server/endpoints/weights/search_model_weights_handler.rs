@@ -30,6 +30,9 @@ use crate::server_state::ServerState;
 #[derive(Deserialize, ToSchema)]
 pub struct SearchModelWeightsRequest {
   pub search_term: String,
+  pub weight_type: Option<WeightsType>,
+  pub weight_category: Option<WeightsCategory>,
+  pub ietf_language_subtag: Option<String>,
 }
 
 #[derive(Serialize, Clone, ToSchema)]
@@ -113,7 +116,9 @@ pub async fn search_model_weights_handler(
   let results = search_model_weights(
     &server_state.elasticsearch,
     &request.search_term,
-    None)
+    request.ietf_language_subtag.as_deref(),
+    request.weight_type,
+    request.weight_category)
       .await
       .map_err(|err| {
         error!("Searching error: {:?}", err);

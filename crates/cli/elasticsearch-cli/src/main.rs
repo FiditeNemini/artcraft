@@ -14,6 +14,7 @@ use sqlx::mysql::MySqlPoolOptions;
 use config::shared_constants::DEFAULT_RUST_LOG;
 use elasticsearch_schema::searches::search_model_weights::search_model_weights;
 use elasticsearch_schema::searches::search_tts_models::search_tts_models;
+use enums::by_table::model_weights::weights_types::WeightsType;
 use errors::AnyhowResult;
 
 use crate::cli_args::{Action, Environment, parse_cli_args};
@@ -55,9 +56,10 @@ pub async fn main() -> AnyhowResult<()> {
     }
     Action::SearchModelWeights => {
       info!("Searching model weights...");
-      let results = search_model_weights(&elasticsearch, "zel", Some("en")).await?;
+      //let results = search_model_weights(&elasticsearch, "zel", Some("en"), Some(WeightsType::SoVitsSvc)).await?;
+      let results = search_model_weights(&elasticsearch, "zel", None, Some(WeightsType::RvcV2), None).await?;
       for result in results {
-        println!("Result: {:?}", result);
+        println!("Result: {:#?}", result);
       }
     }
   }

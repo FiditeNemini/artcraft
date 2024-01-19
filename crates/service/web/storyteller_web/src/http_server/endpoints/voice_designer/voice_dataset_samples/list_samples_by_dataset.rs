@@ -86,11 +86,15 @@ pub async fn list_samples_by_dataset_handler(
   };
 
   let dataset_token = ZsVoiceDatasetToken(path.dataset_token.clone());
-  let is_mod = user_session.can_ban_users;
+  let _is_mod = user_session.can_ban_users;
+
+  // NB(bt,2024-01-18): Showing mods deleted files is actually kind of annoying!
+  // We should focus on visibility-related controls instead.
+  const CAN_SEE_DELETED : bool = false;
 
   let query_results = list_dataset_samples_for_dataset_token(
     &dataset_token,
-    is_mod,
+    CAN_SEE_DELETED,
     &server_state.mysql_pool
   ).await.map_err(|e| {
     warn!("list_samples error: {:?}", e);
