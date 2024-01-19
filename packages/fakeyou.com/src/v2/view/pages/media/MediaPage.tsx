@@ -33,6 +33,7 @@ import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
 import { useMedia, useRatings } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
+import Iframe from "react-iframe";
 
 interface MediaPageProps {
   sessionWrapper: SessionWrapper;
@@ -97,6 +98,11 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
           sdMediaImage = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         }
         return <SdCoverImagePanel src={sdMediaImage} />;
+      case MediaFileType.Mocap:
+        return <Iframe {...{
+          url: "https://engine.fakeyou.com?mode=studio",
+          className: "fy-studio-frame",
+        }}  />;
       default:
         return <div>Unsupported media type</div>;
     }

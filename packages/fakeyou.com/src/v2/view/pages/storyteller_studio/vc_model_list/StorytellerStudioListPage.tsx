@@ -22,7 +22,7 @@ function StorytellerStudioListPage(props: Props) {
         <Iframe
           url="https://engine.fakeyou.com?mode=studio"
           width="100%"
-          height="900px"
+          height="300px"
           id=""
           className=""
           display="block"

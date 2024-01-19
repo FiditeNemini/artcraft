@@ -17,6 +17,10 @@ const mediaFileTypeInfo: MediaFileTypeInfo = {
     label: "Video",
     color: "purple",
   },
+  [MediaFileType.Mocap]: {
+    label: "Mocap",
+    color: "pink",
+  },
   [MediaFileType.None]: {
     label: "None",
     color: "gray",
