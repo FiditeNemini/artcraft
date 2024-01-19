@@ -20,14 +20,6 @@ pub struct WorkflowArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_lora_model: Option<ModelWeightToken>,
 
-    #[serde(rename = "prompt")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_prompt: Option<String>,
-
-    #[serde(rename = "negative_prompt")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_negative_prompt: Option<String>,
-
     #[serde(rename = "workflow_config")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_workflow_config: Option<ModelWeightToken>,

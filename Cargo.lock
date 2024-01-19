@@ -3084,6 +3084,7 @@ dependencies = [
  "hyper",
  "images",
  "jobs_common",
+ "jsonpath_lib",
  "lfu",
  "log",
  "media",
@@ -3223,6 +3224,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "54c0c35952f67de54bb584e9fd912b3023117cbafc0a77d8f3dee1fb5f572fe8"
 dependencies = [
  "wasm-bindgen",
+]
+
+[[package]]
+name = "jsonpath_lib"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eaa63191d68230cccb81c5aa23abd53ed64d83337cacbb25a7b8c7979523774f"
+dependencies = [
+ "log",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -5401,6 +5413,7 @@ version = "1.0.108"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d1c7e3eac408d115102c4c24ad393e0821bb3a5df4d506a80f85f7a742a526b"
 dependencies = [
+ "indexmap",
  "itoa 1.0.9",
  "ryu",
  "serde",

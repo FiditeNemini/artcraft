@@ -176,8 +176,6 @@ pub async fn enqueue_comfy_ui_handler(
     let inference_args = WorkflowArgs {
         maybe_sd_model: request.maybe_sd_model.clone(),
         maybe_lora_model: request.maybe_lora_model.clone(),
-        maybe_prompt: request.maybe_prompt.clone(),
-        maybe_negative_prompt: request.maybe_negative_prompt.clone(),
         maybe_json_modifications: request.maybe_json_modifications.clone(),
         maybe_workflow_config: request.maybe_workflow_config.clone(),
     };
@@ -195,7 +193,7 @@ pub async fn enqueue_comfy_ui_handler(
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {
             inference_category: Some(InferenceCategoryAbbreviated::Workflow),
-            args: Some(PolymorphicInferenceArgs::Wf(inference_args)),
+            args: Some(PolymorphicInferenceArgs::Cu(inference_args)),
         }),
         maybe_creator_user_token: maybe_user_token.as_ref(),
         maybe_avt_token: maybe_avt_token.as_ref(),

@@ -31,12 +31,10 @@ pub struct InsertArgs<'a> {
     pub is_on_prem: bool,
     pub worker_hostname: &'a str,
     pub worker_cluster: &'a str,
+    pub media_file_type: MediaFileType,
 }
 
-pub async fn insert_media_file_from_comfy_ui(
-    args: InsertArgs<'_>,
-    media_file_type: MediaFileType,
-) -> AnyhowResult<(MediaFileToken, u64)>
+pub async fn insert_media_file_from_comfy_ui(args: InsertArgs<'_>) -> AnyhowResult<(MediaFileToken, u64)>
 {
     let result_token = MediaFileToken::generate();
 
@@ -109,7 +107,7 @@ SET
       ORIGIN_PRODUCT_CATEGORY.to_str(),
       ORIGIN_MODEL_TYPE.to_str(),
 
-      media_file_type.to_str(),
+      args.media_file_type.to_str(),
       args.maybe_mime_type,
       args.file_size_bytes,
 

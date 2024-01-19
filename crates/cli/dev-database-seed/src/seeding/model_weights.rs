@@ -684,14 +684,22 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
 }
 
 pub async fn seed_workflows_for_testing_inference(mysql_pool: &Pool<MySql>, user_token: UserToken) -> AnyhowResult<()>{
-    let model_weight_token4 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let model_weight_token1 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let model_weight_token2 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+
     let mut path_to_comfy = get_seed_tool_data_root();
-    path_to_comfy.push("models/workflows/comfyui/test-workflow.json");
+    path_to_comfy.push("models/workflows/comfyui/workflow_api.json");
     let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
     let comfy_weights_descriptor = Box::new(WeightsWorkflowDescriptor {});
-    let metadata4 = remote_cloud_file_client.upload_file(comfy_weights_descriptor,path_to_comfy.as_path().to_str().unwrap()).await?;
-    let weights4 = CreateModelWeightsArgs {
-        token: &model_weight_token4, // replace with actual ModelWeightToken
+    let metadata1 = remote_cloud_file_client.upload_file(comfy_weights_descriptor, path_to_comfy.as_path().to_str().unwrap()).await?;
+
+    let mut path_to_comfy2 = get_seed_tool_data_root();
+    path_to_comfy2.push("models/workflows/comfyui/majicmixRealistic_v7.safetensors");
+    let comfy_weights_descriptor2 = Box::new(WeightsSD15Descriptor {});
+    let metadata2 = remote_cloud_file_client.upload_file(comfy_weights_descriptor2, path_to_comfy2.as_path().to_str().unwrap()).await?;
+
+    let weights1 = CreateModelWeightsArgs {
+        token: &model_weight_token1, // replace with actual ModelWeightToken
         weights_type: WeightsType::ComfyUi, // replace with actual WeightsType
         weights_category: WeightsCategory::WorkflowConfig, // replace with actual WeightsCategory
         title: "comfy-test-workflow".to_string(),
@@ -703,15 +711,38 @@ pub async fn seed_workflows_for_testing_inference(mysql_pool: &Pool<MySql>, user
         maybe_last_update_user_token: Some("Last Update User Token".to_string()),
         original_download_url: Some("https://github.com/comfyanonymous/ComfyUI".to_string()),
         original_filename: Some("test-workflow.json".to_string()),
-        file_size_bytes: metadata4.file_size_bytes as i32,
-        file_checksum_sha2: metadata4.sha256_checksum.to_string(),
-        public_bucket_hash: metadata4.bucket_details.clone().unwrap().object_hash,
-        maybe_public_bucket_prefix: Some(metadata4.bucket_details.clone().unwrap().prefix),
-        maybe_public_bucket_extension: Some(metadata4.bucket_details.clone().unwrap().suffix),
+        file_size_bytes: metadata1.file_size_bytes as i32,
+        file_checksum_sha2: metadata1.sha256_checksum.to_string(),
+        public_bucket_hash: metadata1.bucket_details.clone().unwrap().object_hash,
+        maybe_public_bucket_prefix: Some(metadata1.bucket_details.clone().unwrap().prefix),
+        maybe_public_bucket_extension: Some(metadata1.bucket_details.clone().unwrap().suffix),
         version: 1,
         mysql_pool: &mysql_pool, // replace with actual MySqlPool
     };
-    create_weight(weights4).await?;
+    let weights2 = CreateModelWeightsArgs {
+        token: &model_weight_token2, // replace with actual ModelWeightToken
+        weights_type: WeightsType::ComfyUi, // replace with actual WeightsType
+        weights_category: WeightsCategory::WorkflowConfig, // replace with actual WeightsCategory
+        title: "v1-5-pruned-emaonly".to_string(),
+        maybe_description_markdown: Some("Test model for ComfyUI".to_string()),
+        maybe_description_rendered_html: Some("<p>Description</p>".to_string()),
+        creator_user_token: Some(&user_token), // replace with actual UserToken
+        creator_ip_address: "192.168.1.1",
+        creator_set_visibility: Visibility::Public,
+        maybe_last_update_user_token: Some("Last Update User Token".to_string()),
+        original_download_url: Some("https://huggingface.co/runwayml/stable-diffusion-v1-5".to_string()),
+        original_filename: Some("v1-5-pruned-emaonly.ckpt".to_string()),
+        file_size_bytes: metadata2.file_size_bytes as i32,
+        file_checksum_sha2: metadata2.sha256_checksum.to_string(),
+        public_bucket_hash: metadata2.bucket_details.clone().unwrap().object_hash,
+        maybe_public_bucket_prefix: Some(metadata2.bucket_details.clone().unwrap().prefix),
+        maybe_public_bucket_extension: Some(metadata2.bucket_details.clone().unwrap().suffix),
+        version: 1,
+        mysql_pool: &mysql_pool, // replace with actual MySqlPool
+    };
+
+    create_weight(weights1).await?;
+    create_weight(weights2).await?;
 
     Ok(())
 }

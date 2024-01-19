@@ -96,6 +96,7 @@ impl InferenceModelType {
       InferenceModelType::StableDiffusion,
       InferenceModelType::MocapNet,
       InferenceModelType::StyleTTS2,
+      InferenceModelType::ComfyUi,
     ])
   }
 }
@@ -154,7 +155,7 @@ mod tests {
   fn all_variants() {
     // Static check
     let mut variants = InferenceModelType::all_variants();
-    assert_eq!(variants.len(), 10);
+    assert_eq!(variants.len(), 11);
     assert_eq!(variants.pop_first(), Some(InferenceModelType::RvcV2));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::SadTalker));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::SoVitsSvc));

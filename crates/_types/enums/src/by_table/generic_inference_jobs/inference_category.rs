@@ -65,6 +65,7 @@ impl InferenceCategory {
       "video_filter" => Ok(Self::VideoFilter),
       "image_generation" => Ok(Self::ImageGeneration),
       "mocap" => Ok(Self::Mocap),
+      "workflow" => Ok(Self::Workflow),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }

@@ -113,8 +113,8 @@ pub enum PolymorphicInferenceArgs {
   // Mocap (Short name to save space when serializing.)
   Mc(MocapArgs),
 
-  // Workflow (Short name to save space when serializing.)
-  Wf(WorkflowArgs)
+  // ComfyUI (Short name to save space when serializing.)
+  Cu(WorkflowArgs)
 }
 
 impl GenericInferenceArgs {

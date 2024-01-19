@@ -34,7 +34,7 @@ static IGNORED_ENVIRONMENT_VARS : Lazy<HashSet<String>> = Lazy::new(|| {
 #[derive(Clone)]
 pub struct ComfyInferenceCommand {
     /// Where the code lives
-    comfy_root_code_directory: PathBuf,
+    pub(crate) comfy_root_code_directory: PathBuf,
 
     /// A single executable script or a much larger bash command.
     executable_or_command: ExecutableOrCommand,

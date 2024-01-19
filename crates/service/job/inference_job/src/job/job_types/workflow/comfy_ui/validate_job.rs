@@ -11,6 +11,9 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 pub struct JobArgs<'a> {
     pub workflow_source: &'a ModelWeightToken,
     pub maybe_json_modifications: &'a Option<HashMap<String, NewValue>>,
+    pub maybe_sd_model: &'a Option<ModelWeightToken>,
+    pub maybe_lora_model: &'a Option<ModelWeightToken>,
+
 }
 
 pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
@@ -42,7 +45,7 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
     };
 
     let inference_args = match inference_args {
-        PolymorphicInferenceArgs::Wf(inference_args) => inference_args,
+        PolymorphicInferenceArgs::Cu(inference_args) => inference_args,
         _ => {
             return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("wrong inner args for job!")));
         }
@@ -58,6 +61,8 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
 
     Ok(JobArgs {
         workflow_source,
+        maybe_sd_model: &inference_args.maybe_sd_model,
+        maybe_lora_model: &inference_args.maybe_lora_model,
         maybe_json_modifications: &inference_args.maybe_json_modifications,
     })
 }
