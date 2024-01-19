@@ -57,7 +57,7 @@ pub async fn main() -> AnyhowResult<()> {
     Action::SearchModelWeights => {
       info!("Searching model weights...");
       //let results = search_model_weights(&elasticsearch, "zel", Some("en"), Some(WeightsType::SoVitsSvc)).await?;
-      let results = search_model_weights(&elasticsearch, "zel", None, Some(WeightsType::RvcV2)).await?;
+      let results = search_model_weights(&elasticsearch, "zel", None, Some(WeightsType::RvcV2), None).await?;
       for result in results {
         println!("Result: {:#?}", result);
       }

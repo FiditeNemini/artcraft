@@ -117,7 +117,8 @@ pub async fn search_model_weights_handler(
     &server_state.elasticsearch,
     &request.search_term,
     request.ietf_language_subtag.as_deref(),
-    request.weight_type)
+    request.weight_type,
+    request.weight_category)
       .await
       .map_err(|err| {
         error!("Searching error: {:?}", err);

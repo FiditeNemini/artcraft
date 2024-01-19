@@ -1,6 +1,7 @@
 use elasticsearch::{Elasticsearch, SearchParts};
 use serde_json::{json, Value};
 
+use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use errors::{anyhow, AnyhowResult};
 
@@ -10,6 +11,7 @@ pub struct SearchModelWeightsQuery<'a> {
   pub search_term: &'a str,
   pub maybe_language_subtag: Option<&'a str>,
   pub maybe_weights_type: Option<WeightsType>,
+  pub maybe_weights_category: Option<WeightsCategory>,
 }
 
 impl <'a>SearchModelWeightsQuery<'a> {
@@ -87,6 +89,16 @@ impl <'a>SearchModelWeightsQuery<'a> {
       ));
     }
 
+    if let Some(weights_category) = &self.maybe_weights_category {
+      must_clause.push(json!(
+        {
+          "match": {
+            "weights_category": weights_category.to_string(),
+          }
+        }
+      ));
+    }
+
     Ok(search_json)
   }
 }
@@ -96,12 +108,14 @@ pub async fn search_model_weights(
   search_term: &str,
   maybe_language_subtag: Option<&str>,
   maybe_weights_type: Option<WeightsType>,
+  maybe_weights_category: Option<WeightsCategory>,
 ) -> AnyhowResult<Vec<ModelWeightDocument>> {
 
   let query = SearchModelWeightsQuery {
     search_term,
     maybe_language_subtag,
     maybe_weights_type,
+    maybe_weights_category,
   };
 
   let search_json = query.query()?;
@@ -144,203 +158,15 @@ pub async fn search_model_weights(
   Ok(documents)
 }
 
-fn query_model_weights(search_term: &str) -> Value {
-  json!({
-    "query": {
-      "bool": {
-        "must": [
-          {
-            "bool": {
-              "should": [
-                {
-                  "fuzzy": {
-                    "title": {
-                      "value": search_term,
-                      "fuzziness": 2
-                    }
-                  }
-                },
-                {
-                  "match": {
-                    "title": {
-                      "query": search_term,
-                      "boost": 1
-                    }
-                  }
-                },
-                {
-                  "multi_match": {
-                    "query": search_term,
-                    "type": "bool_prefix",
-                    "fields": [
-                      "title",
-                      "title._2gram",
-                      "title._3gram"
-                    ],
-                    "boost": 50
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    }
-  })
-}
-
-fn base_search(search_term: &str) -> Value {
-  json!({
-    "query": {
-      "bool": {
-        "must": [
-          {
-            "bool": {
-              "should": [
-                {
-                  "fuzzy": {
-                    "title": {
-                      "value": search_term,
-                      "fuzziness": 2
-                    }
-                  }
-                },
-                {
-                  "match": {
-                    "title": {
-                      "query": search_term,
-                      "boost": 1
-                    }
-                  }
-                },
-                {
-                  "multi_match": {
-                    "query": search_term,
-                    "type": "bool_prefix",
-                    "fields": [
-                      "title",
-                      "title._2gram",
-                      "title._3gram"
-                    ],
-                    "boost": 50
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    }
-  })
-}
-
-
-fn query_model_weights_with_required_language(search_term: &str, language_tag: &str) -> Value {
-  json!({
-    "query": {
-      "bool": {
-        "must": [
-          {
-            "match": {
-              "maybe_ietf_primary_language_subtag": language_tag
-            }
-          },
-          {
-            "bool": {
-              "should": [
-                {
-                  "fuzzy": {
-                    "title": {
-                      "value": search_term,
-                      "fuzziness": 2
-                    }
-                  }
-                },
-                {
-                  "match": {
-                    "title": {
-                      "query": search_term,
-                      "boost": 1
-                    }
-                  }
-                },
-                {
-                  "multi_match": {
-                    "query": search_term,
-                    "type": "bool_prefix",
-                    "fields": [
-                      "title",
-                      "title._2gram",
-                      "title._3gram"
-                    ],
-                    "boost": 50
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    }
-  })
-}
-
-fn query_model_weights_with_model_weights_type(search_term: &str, weight_type: WeightsType) -> Value {
-  json!({
-    "query": {
-      "bool": {
-        "must": [
-          {
-            "match": {
-              "weights_type": weight_type.to_string(),
-            }
-          },
-          {
-            "bool": {
-              "should": [
-                {
-                  "fuzzy": {
-                    "title": {
-                      "value": search_term,
-                      "fuzziness": 2
-                    }
-                  }
-                },
-                {
-                  "match": {
-                    "title": {
-                      "query": search_term,
-                      "boost": 1
-                    }
-                  }
-                },
-                {
-                  "multi_match": {
-                    "query": search_term,
-                    "type": "bool_prefix",
-                    "fields": [
-                      "title",
-                      "title._2gram",
-                      "title._3gram"
-                    ],
-                    "boost": 50
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    }
-  })
-}
-
 #[cfg(test)]
 mod tests {
   use regex::Regex;
+
+  use enums::by_table::model_weights::weights_category::WeightsCategory;
   use enums::by_table::model_weights::weights_types::WeightsType;
   use errors::AnyhowResult;
-  use crate::searches::search_model_weights::{query_model_weights, SearchModelWeightsQuery};
+
+  use crate::searches::search_model_weights::SearchModelWeightsQuery;
 
   fn query_to_json_string(query: SearchModelWeightsQuery<'_>) -> AnyhowResult<String> {
     let json = query.query()?;
@@ -360,6 +186,7 @@ mod tests {
       search_term: "FOO_BAR_BAZ",
       maybe_language_subtag: None,
       maybe_weights_type: None,
+      maybe_weights_category: None,
     };
 
     let json = query_to_json_string(query).unwrap();
@@ -421,6 +248,7 @@ mod tests {
       search_term: "FOO_BAR_BAZ",
       maybe_language_subtag: Some("en"),
       maybe_weights_type: Some(WeightsType::SoVitsSvc),
+      maybe_weights_category: Some(WeightsCategory::Vocoder),
     };
 
     let json = query_to_json_string(query).unwrap();
@@ -473,6 +301,11 @@ mod tests {
               {
                 "match": {
                   "weights_type": "so_vits_svc"
+                }
+              },
+              {
+                "match": {
+                  "weights_category": "vocoder"
                 }
               }
             ]
