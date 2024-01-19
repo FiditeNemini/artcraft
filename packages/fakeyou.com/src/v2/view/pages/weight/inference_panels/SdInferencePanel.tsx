@@ -333,7 +333,21 @@ export default function SdInferencePanel({
               }}
             />
 
-            <SelectSearcher label="Additional LoRA Weight" />
+            <SelectSearcher
+              label="Additional LoRA Weight"
+              tabs={[
+                {
+                  label: "All LoRA Weights",
+                  searcherKey: "allLoraWeights",
+                  weightTypeFilter: "lora",
+                },
+                {
+                  label: "Bookmarked",
+                  searcherKey: "bookmarkedLoraWeights",
+                  weightTypeFilter: "lora",
+                },
+              ]}
+            />
 
             {/* Checkpoint Use weight token */}
             {/* <TempSelect

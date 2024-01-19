@@ -7,100 +7,86 @@ import Button from "../Button";
 import useToken from "hooks/useToken";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
-interface SelectSearcherProps {
-  label?: string;
+interface TabConfig {
+  label: string;
+  searcherKey: string;
   weightTypeFilter?: string;
 }
+interface SelectSearcherProps {
+  label?: string;
+  tabs: TabConfig[];
+}
 
-const SelectSearcher = memo(
-  ({ label, weightTypeFilter }: SelectSearcherProps) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const { weightTitle, setWeightTitle } = useToken();
+const SelectSearcher = memo(({ label, tabs }: SelectSearcherProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { weightTitle, setWeightTitle } = useToken();
 
-    const openModal = () => {
-      setIsModalOpen(true);
-    };
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
 
-    const closeModal = () => {
-      setIsModalOpen(false);
-    };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
-    const handleRemove = () => {
-      setWeightTitle && setWeightTitle("");
-    };
+  const handleRemove = () => {
+    setWeightTitle && setWeightTitle("");
+  };
 
-    const searchTabs = [
-      {
-        label: "All LoRA Weights",
-        content: (
-          <Searcher
-            type="modal"
-            onResultSelect={closeModal}
-            weightTypeFilter={weightTypeFilter}
-            searcherKey="allLoraWeights"
+  const searchTabs = tabs.map(tab => ({
+    label: tab.label,
+    content: (
+      <Searcher
+        type="modal"
+        onResultSelect={closeModal}
+        searcherKey={tab.searcherKey}
+        weightTypeFilter={tab.weightTypeFilter}
+      />
+    ),
+    padding: true,
+  }));
+
+  return (
+    <>
+      <div>
+        {label && <label className="sub-title">{label}</label>}
+
+        <div className="d-flex gap-2">
+          <Input
+            disabled={true}
+            className="w-100"
+            placeholder="None selected"
+            value={weightTitle ? weightTitle : ""}
           />
-        ),
-        padding: true,
-      },
-      {
-        label: "Bookmarked",
-        content: (
-          <>
-            <Searcher
-              type="modal"
-              onResultSelect={closeModal}
-              searcherKey="bookmarkedLoraWeights"
-            />
-            <h2 className="text-center py-4">
-              NEEDS USER BOOKMARK ELASTIC SEARCH HERE
-            </h2>
-          </>
-        ),
-        padding: true,
-      },
-    ];
-    return (
-      <>
-        <div>
-          {label && <label className="sub-title">{label}</label>}
-
-          <div className="d-flex gap-2">
-            <Input
-              disabled={true}
-              className="w-100"
-              placeholder="None selected"
-              value={weightTitle ? weightTitle : ""}
-            />
+          <Button
+            label={weightTitle ? "Change" : "Select"}
+            onClick={openModal}
+          />
+          {weightTitle && (
             <Button
-              label={weightTitle ? "Change" : "Select"}
-              onClick={openModal}
+              square={true}
+              variant="danger"
+              icon={faTrash}
+              onClick={handleRemove}
+              tooltip="Remove"
             />
-            {weightTitle && (
-              <Button
-                square={true}
-                variant="danger"
-                icon={faTrash}
-                onClick={handleRemove}
-                tooltip="Remove"
-              />
-            )}
-          </div>
+          )}
         </div>
+      </div>
 
-        <Modal
-          show={isModalOpen}
-          handleClose={closeModal}
-          title="Select a LoRA Weight"
-          content={() => <NonRouteTabs tabs={searchTabs} />}
-          showButtons={false}
-          padding={false}
-          large={true}
-          position="top"
-          mobileFullscreen={true}
-        />
-      </>
-    );
-  }
-);
+      <Modal
+        show={isModalOpen}
+        handleClose={closeModal}
+        title="Select a LoRA Weight"
+        content={() => <NonRouteTabs tabs={searchTabs} />}
+        showButtons={false}
+        padding={false}
+        large={true}
+        position="top"
+        mobileFullscreen={true}
+      />
+    </>
+  );
+});
 
 export default SelectSearcher;
