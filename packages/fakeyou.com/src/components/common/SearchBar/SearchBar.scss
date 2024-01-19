@@ -37,7 +37,7 @@
 
   .search-results-dropdown-item {
     background-color: $panel-inner;
-    border-bottom: 1px solid lighten($panel-inner, 6%);
+    border-bottom: 1px solid lighten($panel-inner, 6%) !important;
     transition: 0.05s;
 
     &:hover {
