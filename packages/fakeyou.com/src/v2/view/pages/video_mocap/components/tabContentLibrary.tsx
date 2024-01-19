@@ -1,7 +1,8 @@
 import React from "react";
 
 export default function TabContentLibrary(props: {
-  t: Function
+  t: Function,
+  pageStateCallback: Function
 }){
   const { t } = props
   return(

@@ -12,6 +12,17 @@
     "dropzoneDescription": "Загрузите видео или оставьте его здесь...",
     "filenamePlaceholder": "Выбирайте из медиа"
   },
+  "message": {
+    "unknownError": "Неизвестная ошибка"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "Видео загружено",
+      "fileUploading": "Загрузка видео",
+      "mocapNetRequestSucceed": "Запрос на захват движения выполнен успешно",
+      "mocapNetRequesting": "Запрос захвата движения"
+    }
+  },
   "tabTitle": {
     "library": "Выбирайте из медиа",
     "upload": "Загрузить"

@@ -12,6 +12,17 @@
     "dropzoneDescription": "ビデオをアップロードするか、ここにドロップしてください...",
     "filenamePlaceholder": "メディアから選ぶ"
   },
+  "message": {
+    "unknownError": "不明なエラー"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "アップロードされたビデオ",
+      "fileUploading": "ビデオのアップロード",
+      "mocapNetRequestSucceed": "モーション キャプチャ リクエストが成功しました",
+      "mocapNetRequesting": "モーションキャプチャのリクエスト"
+    }
+  },
   "tabTitle": {
     "library": "メディアから選ぶ",
     "upload": "アップロード"

@@ -12,6 +12,17 @@
     "dropzoneDescription": "Laden Sie ein Video hoch oder legen Sie es hier ab...",
     "filenamePlaceholder": "Wählen Sie aus Medien"
   },
+  "message": {
+    "unknownError": "Unbekannter Fehler"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "Video hochgeladen",
+      "fileUploading": "Hochladen von Videos",
+      "mocapNetRequestSucceed": "Motion Capture-Anfrage erfolgreich",
+      "mocapNetRequesting": "Motion Capture wird angefordert"
+    }
+  },
   "tabTitle": {
     "library": "Wählen Sie aus Medien",
     "upload": "Hochladen"

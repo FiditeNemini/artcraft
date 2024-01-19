@@ -12,6 +12,17 @@
     "dropzoneDescription": "上传视频或将其拖放到此处...",
     "filenamePlaceholder": "从媒体中选择"
   },
+  "message": {
+    "unknownError": "未知错误"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "视频已上传",
+      "fileUploading": "视频上传",
+      "mocapNetRequestSucceed": "动作捕捉请求成功",
+      "mocapNetRequesting": "请求动作捕捉"
+    }
+  },
   "tabTitle": {
     "library": "从媒体中选择",
     "upload": "上传"

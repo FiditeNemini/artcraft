@@ -12,6 +12,17 @@
     "dropzoneDescription": "Bir video yükleyin veya buraya bırakın...",
     "filenamePlaceholder": "Medya arasından seçim yapın"
   },
+  "message": {
+    "unknownError": "Bilinmeyen hata"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "Video Yüklendi",
+      "fileUploading": "Video Yükleme",
+      "mocapNetRequestSucceed": "Hareket Yakalama İsteği Başarılı",
+      "mocapNetRequesting": "Hareket Yakalama Talebi"
+    }
+  },
   "tabTitle": {
     "library": "Medya arasından seçim yapın",
     "upload": "Yüklemek"

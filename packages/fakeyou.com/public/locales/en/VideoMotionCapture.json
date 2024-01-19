@@ -12,6 +12,17 @@
     "dropzoneDescription": "Upload a video or drop it here...",
     "filenamePlaceholder": "Choose from media"
   },
+  "message": {
+    "unknownError": "Unknown Error"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "Video Uploaded",
+      "fileUploading": "Video Uploading",
+      "mocapNetRequestSucceed": "Motion Capture Request Succeed",
+      "mocapNetRequesting": "Requesting Motion Capture"
+    }
+  },
   "tabTitle": {
     "library": "Choose from media",
     "upload": "Upload"

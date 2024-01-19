@@ -12,6 +12,17 @@
     "dropzoneDescription": "동영상을 업로드하거나 여기에 드롭하세요.",
     "filenamePlaceholder": "미디어에서 선택"
   },
+  "message": {
+    "unknownError": "알수없는 오류"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "동영상 업로드됨",
+      "fileUploading": "비디오 업로드",
+      "mocapNetRequestSucceed": "모션 캡처 요청 성공",
+      "mocapNetRequesting": "모션 캡처 요청"
+    }
+  },
   "tabTitle": {
     "library": "미디어에서 선택",
     "upload": "업로드"

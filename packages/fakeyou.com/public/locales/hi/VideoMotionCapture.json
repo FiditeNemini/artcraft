@@ -12,6 +12,17 @@
     "dropzoneDescription": "एक वीडियो अपलोड करें या इसे यहां छोड़ें...",
     "filenamePlaceholder": "मीडिया से चुनें"
   },
+  "message": {
+    "unknownError": "अज्ञात त्रुटि"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "वीडियो अपलोड किया गया",
+      "fileUploading": "वीडियो अपलोडिंग",
+      "mocapNetRequestSucceed": "मोशन कैप्चर अनुरोध सफल",
+      "mocapNetRequesting": "मोशन कैप्चर का अनुरोध"
+    }
+  },
   "tabTitle": {
     "library": "मीडिया से चुनें",
     "upload": "डालना"

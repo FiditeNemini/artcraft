@@ -1,21 +1,26 @@
-import React, {useState} from "react";
+import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { UploadVideo } from '@storyteller/components/src/api/upload/UploadVideo'
+import {
+  EnqueueVideoMotionCapture
+} from "@storyteller/components/src/api/video_mocap";
 import { useFile } from "hooks";
 
 import VideoInput from "v2/view/pages/video_mocap/components/VideoInput";
 
 export default function TabContentUpload(props:{
   t: Function
+  pageStateCallback: (data:{tokenType:string, token:string | undefined}) => void
 }){
-  const { t } = props
+  const { t, pageStateCallback } = props
   const videoProps = useFile({})
-  const NO_FILE = 0
-  const FILE_STAGED = 1
-  const FILE_UPLOADING = 2
-  const FILE_UPLOADED = 3
-  const [videoState, setVideoState] = useState<number>(NO_FILE);
+  enum tabStates {
+    NO_FILE, FILE_STAGED, FILE_UPLOADING, FILE_UPLOADED, MOCAPNET
+  }
+  const { NO_FILE, FILE_STAGED, FILE_UPLOADING, FILE_UPLOADED, MOCAPNET } = tabStates;
+  const [tabState, setTabState] = useState<number>(NO_FILE);
+  const [token, setToken] = useState<string>("");
 
   const makeRequest = () => ({
     uuid_idempotency_token: uuidv4(),
@@ -25,39 +30,101 @@ export default function TabContentUpload(props:{
   });
 
   const handleUploadVideo = ()=>{
-    setVideoState(FILE_UPLOADING)
+    setTabState(FILE_UPLOADING)
     UploadVideo(makeRequest()).then((res=>{
-      console.log("RESPONSE >>>")
-      console.log(res)
-      setVideoState(FILE_UPLOADED)
+      if(res.success && "upload_token" in res){
+        setToken(res.upload_token)
+      }
     }));
   }
-  // contains upload inout state and controls, see docs
-  return(
-    <div
-      className="tab-pane fade show active py-4"
-      id="vmcUpload"
-    >
-        <div className="row">
-          <div className="col-12">
-            <VideoInput {...{t, ...videoProps,
-              onStateChange: () => setVideoState(videoProps.file ? FILE_STAGED : NO_FILE),
-            }}/>
-          </div>
-        </div>
+  useEffect(()=>{
+    if (token!=="") setTabState(FILE_UPLOADED)
+  }, [token])
 
-        <div className="row py-3">
-          <div className="col-12">
-            <div className="d-flex justify-content-end gap-3">
-              <button
-                className="btn btn-primary"
-                disabled={videoState!==FILE_STAGED}
-                onClick={handleUploadVideo}
-              >{t("button.upload")}</button>
-              <button className="btn btn-primary" disabled={videoState!==FILE_UPLOADED}>{t("button.generate")}</button>
+  const handleEnqueueMocapNet = ()=>{
+    const request = {
+      video_source: token,
+      uuid_idempotency_token: uuidv4()
+    }
+    EnqueueVideoMotionCapture(request)
+      .then(res=>{
+        pageStateCallback({
+          tokenType: "jobToken",
+          token: res.inference_job_token
+        })
+      });
+    setTabState(MOCAPNET)
+  }
+  // contains upload inout state and controls, see docs
+  if (tabState === NO_FILE || tabState === FILE_STAGED){
+    return(
+      <div className="tab-pane fade show active py-4" id="vmcUpload">
+          <div className="row">
+            <div className="col-12">
+              <VideoInput {...{t, ...videoProps,
+                onStateChange: () => setTabState(videoProps.file ? FILE_STAGED : NO_FILE),
+              }}/>
             </div>
           </div>
+  
+          <div className="row py-3">
+            <div className="col-12">
+              <div className="d-flex justify-content-end gap-3">
+                <button
+                  className="btn btn-primary"
+                  disabled={tabState!==FILE_STAGED}
+                  onClick={handleUploadVideo}
+                >{t("button.upload")}</button>
+              </div>
+            </div>
+          </div>
+      </div>
+    )
+  } else if (tabState === FILE_UPLOADING){
+    return(
+      <div className="tab-pane fade show active py-4" id="vmcUpload">
+          <div className="row">
+            <div className="col-12">
+              <h2>{t("tab.message.fileUploading")}</h2>
+            </div>
+          </div>
+      </div>
+    )
+  }else if (tabState === FILE_UPLOADED){
+    return(
+      <div className="tab-pane fade show active py-4" id="vmcUpload">
+          <div className="row">
+            <div className="col-12">
+              <h2>{t("tab.message.fileUploaded")}</h2>
+            </div>
+            <div className="col-12">
+              <button
+                className="btn btn-primary" 
+                onClick={handleEnqueueMocapNet}
+              >{t("button.generate")}</button>
+            </div>
+          </div>
+      </div>
+    )
+  } else if (tabState === MOCAPNET){
+    return(
+      <div className="tab-pane fade show active py-4" id="vmcUpload">
+          <div className="row">
+            <div className="col-12">
+              <h2>{t("tab.message.mocapNetRequesting")}</h2>
+            </div>
+          </div>
+      </div>
+    )
+  }else {
+    return(
+      <div className="tab-pane fade show active py-4" id="vmcUpload">
+        <div className="row">
+            <div className="col-12">
+              <h1>{t("message.UnknownError")}</h1>
+            </div>
         </div>
-    </div>
-  )
+      </div>
+    )
+  }
 }

@@ -12,6 +12,17 @@
     "dropzoneDescription": "Carica un video o rilascialo qui...",
     "filenamePlaceholder": "Scegli tra i media"
   },
+  "message": {
+    "unknownError": "Errore sconosciuto"
+  },
+  "tab": {
+    "message": {
+      "fileUploaded": "Video caricato",
+      "fileUploading": "Caricamento video",
+      "mocapNetRequestSucceed": "La richiesta di acquisizione del movimento è riuscita",
+      "mocapNetRequesting": "Richiesta di Motion Capture"
+    }
+  },
   "tabTitle": {
     "library": "Scegli tra i media",
     "upload": "Caricamento"
