@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import { UploadVideo } from '@storyteller/components/src/api/upload/UploadVideo'
+import { UploadMedia } from '@storyteller/components/src/api/media_files/UploadMedia'
 import {
   EnqueueVideoMotionCapture
 } from "@storyteller/components/src/api/video_mocap";
@@ -31,15 +31,15 @@ export default function TabContentUpload(props:{
 
   const handleUploadVideo = ()=>{
     setTabState(FILE_UPLOADING)
-    UploadVideo(makeRequest()).then((res=>{
-      if(res.success && "upload_token" in res){
-        setToken(res.upload_token)
+    UploadMedia(makeRequest()).then((res=>{
+      if(res.success && "media_file_token" in res){
+        setToken(res.media_file_token)
       }
     }));
   }
   useEffect(()=>{
     if (token!=="") setTabState(FILE_UPLOADED)
-  }, [token])
+  }, [token, FILE_UPLOADED])
 
   const handleEnqueueMocapNet = ()=>{
     const request = {
