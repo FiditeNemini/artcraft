@@ -141,10 +141,9 @@ pub async fn process_job_inference(
     // thread::sleep(seconds) to check the directory
 
     //NB: TempDir exists until it goes out of scope, at which point it should delete from filesystem.
-    let mut work_temp_dir = args.job_dependencies.fs.scoped_temp_dir_creator_for_work
+    let work_temp_dir = args.job_dependencies.fs.scoped_temp_dir_creator_for_work
         .new_tempdir(&work_temp_dir)
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
-
 
     let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint.safetensors");
     let lora_path = work_temp_dir.path().join("lora.safetensors");

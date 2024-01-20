@@ -146,22 +146,22 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
             _ => WeightsType::LoRA
         };
 
-        let mut model_weight_token;
-        let mut title;
-        let mut description;
-        let mut description_rendered_html;
-        let mut original_filename;
-        let mut original_download_url;
+        let model_weight_token;
+        let title;
+        let description;
+        let description_rendered_html;
+        let original_filename;
+        let original_download_url;
 
-        let mut _private_bucket_hash:String = "".to_string();
-        let mut private_bucket_prefix;
-        let mut private_bucket_extension;
+        let _private_bucket_hash = "".to_string();
+        let private_bucket_prefix;
+        let private_bucket_extension;
 
         //let mut cached_user_ratings_total_count;
         //let mut cached_user_ratings_positive_count;
         //let mut cached_user_ratings_negative_count;
         //let mut cached_user_ratings_ratio;
-        let mut version;
+        let version;
 
         match i {
             1..=20 => {

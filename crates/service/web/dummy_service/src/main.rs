@@ -37,7 +37,7 @@ async fn main() -> AnyhowResult<()> {
   //  I'm too tired to figure out the generic types though.
   if env_args.enable_gzip {
     HttpServer::new(move || {
-      let mut app = App::new()
+      let app = App::new()
           .wrap(Logger::new(&log_format))
           .wrap(DefaultHeaders::new()
               .header("X-Backend-Hostname", &server_hostname))
@@ -55,7 +55,7 @@ async fn main() -> AnyhowResult<()> {
         .await?;
   } else {
     HttpServer::new(move || {
-      let mut app = App::new()
+      let app = App::new()
           .wrap(Logger::new(&log_format))
           .wrap(DefaultHeaders::new()
               .header("X-Backend-Hostname", &server_hostname));

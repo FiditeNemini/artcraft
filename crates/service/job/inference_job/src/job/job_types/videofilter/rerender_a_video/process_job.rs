@@ -87,7 +87,7 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
 
     // ==================== TRANSCODE MEDIA (IF NECESSARY) ==================== //
 
-    let mut usable_video_path = video_path.filesystem_path.clone();
+    let usable_video_path = video_path.filesystem_path.clone();
 
     //TODO: re encode with ffmpeg
 

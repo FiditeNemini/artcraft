@@ -86,8 +86,8 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
     Some(FaceEnhancer::R) => Some("RestoreFormer".to_string()),
   };
 
-  let mut width = inference_args.maybe_resize_width;
-  let mut height = inference_args.maybe_resize_height;
+  let width = inference_args.maybe_resize_width;
+  let height = inference_args.maybe_resize_height;
 
   Ok(JobArgs {
     audio_source,
