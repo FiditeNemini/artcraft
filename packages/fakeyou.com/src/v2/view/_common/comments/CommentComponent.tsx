@@ -39,7 +39,7 @@ function CommentComponent(props: Props) {
   }, [loadComments]);
 
   return (
-    <div className="d-flex flex-column gap-4">
+    <div className="d-flex flex-column gap-3">
       <CreateCommentForm
         entityType={props.entityType}
         entityToken={props.entityToken}

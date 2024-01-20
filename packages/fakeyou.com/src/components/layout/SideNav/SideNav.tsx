@@ -13,7 +13,7 @@ import {
   faUser,
   faSignOutAlt,
   faCameraMovie,
-  faPersonRays
+  faPersonRays,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
@@ -371,15 +371,15 @@ export default function SideNav({
             </li>
 
             <li>
-             <NavLink
-                 to="/studio"
-                 activeClassName="active-link"
-                 onClick={handleNavLinkClick}
-               >
-                 <FontAwesomeIcon
-                   icon={faCameraMovie}
-                   className="sidebar-heading-icon"
-                 />
+              <NavLink
+                to="/studio"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faCameraMovie}
+                  className="sidebar-heading-icon"
+                />
                 Storyteller Studio
                 {/* {t("videoStorytellerStudio")} */}
               </NavLink>
@@ -439,39 +439,41 @@ export default function SideNav({
         </div>
 
         <div className="mobile-fixed-bottom">
-          <div className="sidebar-heading">Jobs Queue</div>
-          <div className="ps-4">
-            <div>
-              {t("queueTts")}:{" "}
-              <span className="text-red">{ttsQueuedCount}</span>
-            </div>
-            <div>
-              {t("queueRvc")}:{" "}
-              <span className="text-red">
-                {queueStats.inference.by_queue.pending_rvc_jobs}
-              </span>
-            </div>
-            <div>
-              {t("queueSvc")}:{" "}
-              <span className="text-red">
-                {queueStats.inference.by_queue.pending_svc_jobs}
-              </span>
-            </div>
-            <div>
-              {t("queueFaceAnimator")}:{" "}
-              <span className="text-red">
-                {queueStats.inference.by_queue.pending_face_animation_jobs}
-              </span>
-            </div>
-            <div>
-              Voice Designer:{" "}
-              <span className="text-red">
-                {queueStats.inference.by_queue.pending_voice_designer}
-              </span>
+          <div className="d-none d-lg-block">
+            <div className="sidebar-heading">Jobs Queue</div>
+            <div className="ps-4 mb-3">
+              <div>
+                {t("queueTts")}:{" "}
+                <span className="text-red">{ttsQueuedCount}</span>
+              </div>
+              <div>
+                {t("queueRvc")}:{" "}
+                <span className="text-red">
+                  {queueStats.inference.by_queue.pending_rvc_jobs}
+                </span>
+              </div>
+              <div>
+                {t("queueSvc")}:{" "}
+                <span className="text-red">
+                  {queueStats.inference.by_queue.pending_svc_jobs}
+                </span>
+              </div>
+              <div>
+                {t("queueFaceAnimator")}:{" "}
+                <span className="text-red">
+                  {queueStats.inference.by_queue.pending_face_animation_jobs}
+                </span>
+              </div>
+              <div>
+                Voice Designer:{" "}
+                <span className="text-red">
+                  {queueStats.inference.by_queue.pending_voice_designer}
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="px-4 d-flex d-lg-none gap-2 mt-3">
+          <div className="px-4 d-flex d-lg-none gap-2 mb-5">
             {userOrLoginButton}
             {signupOrLogOutButton}
           </div>
