@@ -13,12 +13,18 @@ import { Link } from "react-router-dom";
 interface VideoCardProps {
   data: any;
   origin?: string;
-  ratings: any;
+  ratings?: any;
   showCreator?: boolean;
   type: "media" | "weights";
 }
 
-export default function VideoCard({ data, origin = "", ratings, showCreator, type }: VideoCardProps) {
+export default function VideoCard({
+  data,
+  origin = "",
+  ratings,
+  showCreator,
+  type,
+}: VideoCardProps) {
   const linkUrl =
     type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}`;
 
@@ -28,15 +34,32 @@ export default function VideoCard({ data, origin = "", ratings, showCreator, typ
 
   const timeAgo = useTimeAgo(data.created_at);
 
-  const videoLink = new BucketConfig().getGcsUrl(data.public_bucket_path);
+  const bucketConfig = new BucketConfig();
+  //video doesnt have random cover image endpoint or thumbnails yet
+  let coverImage = `/images/default-covers/${
+    data?.cover_image?.default_cover.image_index || 0
+  }.webp`;
+
+  if (data?.cover_image?.maybe_cover_image_public_bucket_path) {
+    coverImage = bucketConfig.getCdnUrl(
+      data.cover_image.maybe_cover_image_public_bucket_path,
+      600,
+      100
+    );
+  }
 
   return (
-    <Link {...{ to: linkUrl, state: { origin }, onClick: () => console.log("🌠 VIDEO CARD") }}>
+    <Link
+      {...{
+        to: linkUrl,
+        state: { origin },
+      }}
+    >
       <Card padding={false} canHover={true}>
         {type === "media" && (
           <>
             <img
-              src={videoLink}
+              src={coverImage}
               alt={data.weight_name}
               className="card-video"
             />
@@ -82,12 +105,14 @@ export default function VideoCard({ data, origin = "", ratings, showCreator, typ
                     )}
 
                     <div>
-                      <LikeButton {...{
-                        ...ratings.makeProps({
-                          entityToken: data.token,
-                          entityType: "media_file",
-                        })
-                      }} />
+                      <LikeButton
+                        {...{
+                          ...ratings.makeProps({
+                            entityToken: data.token,
+                            entityType: "media_file",
+                          }),
+                        }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -130,13 +155,15 @@ export default function VideoCard({ data, origin = "", ratings, showCreator, typ
                   </h6>
                   <p className="fs-7 opacity-75">{timeAgo}</p>
                   <div className="mt-2" onClick={handleInnerClick}>
-                    <LikeButton {...{
-                      overlay: true,
-                      ...ratings.makeProps({
-                        entityToken: data.weight_token,
-                        entityType: "model_weight",
-                      })
-                    }} />
+                    <LikeButton
+                      {...{
+                        overlay: true,
+                        ...ratings.makeProps({
+                          entityToken: data.weight_token,
+                          entityType: "model_weight",
+                        }),
+                      }}
+                    />
                   </div>
                 </div>
               </div>
