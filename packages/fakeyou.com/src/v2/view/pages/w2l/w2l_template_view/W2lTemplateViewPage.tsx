@@ -550,7 +550,6 @@ function W2lTemplateViewPage(props: Props) {
             <CommentComponent
               entityType="user"
               entityToken={w2lTemplate.template_token}
-              sessionWrapper={props.sessionWrapper}
             />
           </div>
         </div>

@@ -27,11 +27,14 @@ export default function useRatings() {
   const ratings = useBatchContent({
     fetcher: GetRatings,
     checker: () => true,
+    debug: "useRatings",
     modLibrary: (current: any, res: any, entity_token: string, tokenType: string) => {
-      // console.log("🪼", tokenType, res );
+      console.log("🪼", tokenType, res );
       let { positive_rating_count } = res.results ? res.results.find((item: any, i: number) => 
         item[tokenType] === entity_token
       ).stats : res.stats;
+
+      console.log("🐽",positive_rating_count);
 
       return { ...current, positive_rating_count };
     },

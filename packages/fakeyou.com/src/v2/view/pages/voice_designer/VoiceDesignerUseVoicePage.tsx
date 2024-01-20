@@ -312,7 +312,6 @@ export default function VoiceDesignerUseVoicePage(
         <CommentComponent
           entityType="user"
           entityToken={voice_token}
-          sessionWrapper={props.sessionWrapper}
         />
       </Panel>
     </Container>

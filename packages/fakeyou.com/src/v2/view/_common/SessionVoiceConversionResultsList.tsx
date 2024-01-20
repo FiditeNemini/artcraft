@@ -31,6 +31,7 @@ interface Props {
 const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
 function SessionVoiceConversionResultsList(props: Props) {
+  console.log("😎",props.sessionSubscriptionsWrapper);
   const { t } = useLocalize("SessionVoiceConversionResultsList");
   const [pendingTtsJobs, setPendingTtsJobs] =
     useState<GetPendingTtsJobCountSuccessResponse>({

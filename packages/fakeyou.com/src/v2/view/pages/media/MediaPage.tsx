@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import MediaAudioComponent from "./MediaAudioComponent";
 import MediaVideoComponent from "./MediaVideoComponent";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
 import Container from "components/common/Container";
 import Panel from "components/common/Panel";
@@ -30,16 +29,14 @@ import { Input } from "components/common";
 import LikeButton from "components/common/LikeButton";
 import Badge from "components/common/Badge";
 import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
-import { useMedia, useRatings } from "hooks";
+import { useMedia, useRatings, useSession } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import Iframe from "react-iframe";
 
-interface MediaPageProps {
-  sessionWrapper: SessionWrapper;
-}
 
-export default function MediaPage({ sessionWrapper }: MediaPageProps) {
+export default function MediaPage() {
+  const { user } = useSession();
   const { token } = useParams<{ token: string }>();
   const ratings = useRatings();
   const { media: mediaFile, status } = useMedia({
@@ -281,7 +278,7 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
     },
   ];
 
-  if (sessionWrapper.canBanUsers()) {
+  if (user.canBanUsers) {
     modMediaDetails = (
       <Accordion.Item title="Moderator Details" defaultOpen={false}>
         <DataTable data={modDetails} />
@@ -377,7 +374,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
               <CommentComponent
                 entityType="user"
                 entityToken={mediaFile?.token || ""}
-                sessionWrapper={sessionWrapper}
               />
             </div>
           </div>
@@ -568,7 +564,6 @@ export default function MediaPage({ sessionWrapper }: MediaPageProps) {
             <CommentComponent
               entityType="user"
               entityToken={mediaFile?.token || ""}
-              sessionWrapper={sessionWrapper}
             />
           </Panel>
         </Container>

@@ -13,16 +13,19 @@ interface ModalProps {
 }
 
 interface SessionContextType {
+  canEditTtsModel: (token:string) => boolean,
   check: () => boolean,
   loggedIn: boolean,
   modal: ModalProps,
   querySession?: any,
   querySubscriptions?: any,
   sessionFetched: boolean,
-  user?: any
+  user?: any,
+  userTokenMatch: (token:string) => boolean
 }
 
 export default createContext<SessionContextType>({
+  canEditTtsModel: () => false,
   check: () => false,
   loggedIn: false,
   sessionFetched: false,
@@ -30,5 +33,6 @@ export default createContext<SessionContextType>({
     close: () => {},
     open: () => {},
     view: ModalView.Closed,
-  }
+  },
+  userTokenMatch: () => false
 });

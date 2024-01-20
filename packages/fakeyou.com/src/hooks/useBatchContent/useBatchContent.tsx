@@ -4,6 +4,7 @@ import { useSession } from "hooks";
 
 interface Props {
   checker: any,
+  debug?: string,
   fetcher: any,
   modLibrary?: any,
   onPass?: any,
@@ -25,6 +26,7 @@ interface Gather {
 
 export default function useBatchContent({
   checker,
+  debug,
   fetcher,
   modLibrary = (current: any, res: any, entity_token: string ) => current,
   onPass,
@@ -38,10 +40,12 @@ export default function useBatchContent({
   const [status, statusSet] = useState(FetchStatus.ready);
   const [tokenType,tokenTypeSet] = useState("");
 
+  const dlog = (...dbg: any) => debug ? console.log(...dbg) : {};
+
   const gather = ({ expand, key, res }: Gather) => {
     let tokens = res.results ? res.results.map((item: any) => item[key]) : [res[key]];
     let abc = tokens.reduce((obj = {},token = "") => ({ ...obj, [token]: true }),{})
-    // console.log("🪙",fetcher);
+    dlog("🪙",fetcher);
     tokenTypeSet(key)
     busyListSet(abc); // add current batch to busy list
     fetcher("",{},{ tokens }).then((batchRes: any) => {
