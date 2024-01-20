@@ -46,6 +46,9 @@ pub enum MediaFileOriginProductCategory {
   // Mocap
   #[serde(rename = "mocap")]
   Mocap,
+
+  #[serde(rename = "image_gen")]
+  ImageGeneration
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -64,6 +67,7 @@ impl MediaFileOriginProductCategory {
       Self::ZeroShotVoice => "zs_voice",
       Self::VideoFilter => "video_filter",
       Self::Mocap => "mocap",
+      Self::ImageGeneration => "image_gen"
     }
   }
 
@@ -76,6 +80,7 @@ impl MediaFileOriginProductCategory {
       "zs_voice" => Ok(Self::ZeroShotVoice),
       "video_filter" => Ok(Self::VideoFilter),
       "mocap" => Ok(Self::Mocap),
+      "image_gen" => Ok(Self::ImageGeneration),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -91,6 +96,7 @@ impl MediaFileOriginProductCategory {
       Self::VoiceConversion,
       Self::ZeroShotVoice,
       Self::Mocap,
+      Self::ImageGeneration 
     ])
   }
 }
@@ -111,7 +117,8 @@ mod tests {
       assert_serialization(MediaFileOriginProductCategory::VoiceConversion, "voice_conversion");
       assert_serialization(MediaFileOriginProductCategory::ZeroShotVoice, "zs_voice");
       assert_serialization(MediaFileOriginProductCategory::VideoFilter, "video_filter");
-      assert_serialization(MediaFileOriginProductCategory::Mocap, "mocap")
+      assert_serialization(MediaFileOriginProductCategory::Mocap, "mocap");
+      assert_serialization(MediaFileOriginProductCategory::Mocap, "image_gen")
     }
 
     #[test]
@@ -123,6 +130,7 @@ mod tests {
       assert_eq!(MediaFileOriginProductCategory::ZeroShotVoice.to_str(), "zs_voice");
       assert_eq!(MediaFileOriginProductCategory::VideoFilter.to_str(), "video_filter");
       assert_eq!(MediaFileOriginProductCategory::Mocap.to_str(), "mocap");
+      assert_eq!(MediaFileOriginProductCategory::ImageGeneration.to_str(), "image_gen");
     }
 
     #[test]
@@ -134,6 +142,7 @@ mod tests {
       assert_eq!(MediaFileOriginProductCategory::from_str("zs_voice").unwrap(), MediaFileOriginProductCategory::ZeroShotVoice);
       assert_eq!(MediaFileOriginProductCategory::from_str("video_filter").unwrap(), MediaFileOriginProductCategory::VideoFilter);
       assert_eq!(MediaFileOriginProductCategory::from_str("mocap").unwrap(), MediaFileOriginProductCategory::Mocap);
+      assert_eq!(MediaFileOriginProductCategory::from_str("image_gen").unwrap(),MediaFileOriginProductCategory::ImageGeneration);
     }
 
     #[test]
@@ -147,6 +156,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::ZeroShotVoice));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::VideoFilter));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::Mocap));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginProductCategory::ImageGeneration));
       assert_eq!(variants.pop_first(), None);
     }
   }

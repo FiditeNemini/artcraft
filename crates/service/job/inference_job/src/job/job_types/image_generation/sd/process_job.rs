@@ -4,6 +4,9 @@ use std::time::{ Duration, Instant };
 use anyhow::anyhow;
 use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
+use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
+use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use log::info;
 
 use cloud_storage::remote_file_manager::media_descriptor::MediaImagePngDescriptor;
@@ -24,6 +27,8 @@ use mysql_queries::queries::media_files::create::insert_media_file_from_file_upl
     InsertMediaFileFromUploadArgs,
     UploadType,
 };
+use mysql_queries::queries::media_files::create::insert_media_file_generic;
+use mysql_queries::queries::model_categories::create_category;
 use mysql_queries::queries::model_weights::create::create_weight::{
     create_weight,
     CreateModelWeightsArgs,
@@ -235,6 +240,7 @@ pub async fn process_inference(
 pub async fn process_job_inference(
     args: &StableDiffusionProcessArgs<'_>
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
+
     let job = args.job;
     let deps = args.job_dependencies;
     let mysql_pool = &deps.db.mysql_pool;
@@ -444,9 +450,9 @@ pub async fn process_job_inference(
 
     let mut entries = vec![];
 
-
     for i in 0..sd_args.maybe_batch_count.unwrap_or(1) {
         let path = output_path.clone();
+        
         let file_path = format!("{}_{}.png", path_to_string(path), i);
         println!("Upload File Path:{}", file_path);
         let metadata = remote_cloud_file_client.upload_file(
@@ -462,31 +468,47 @@ pub async fn process_job_inference(
                 );
             }
         };
-
-        // TODO: Generic Insert with batch id.
-        // insert media file generic should run here.
-        let media_file_token = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
-            pool: mysql_pool,
-            maybe_creator_user_token: Some(&creator_user_token),
-            maybe_creator_anonymous_visitor_token: anon_user_token.as_ref(),
-            creator_ip_address,
-            creator_set_visibility: Default::default(),
-            upload_type: UploadType::Filesystem,
-            media_file_type: MediaFileType::Image,
-            maybe_mime_type: Some(metadata.mimetype.as_ref()),
-            file_size_bytes: metadata.file_size_bytes,
-            duration_millis: inference_duration.as_secs() * 1000,
-            sha256_checksum: metadata.sha256_checksum.as_str(),
-            public_bucket_directory_hash: bucket_details.object_hash.as_str(),
+       
+        let media_file_token = insert_media_file_generic(InsertArgs {
+            pool:mysql_pool,
+            job:job,
+            // metadata
+            maybe_mime_type:Some(metadata.mimetype.as_ref()),
+            file_size_bytes:metadata.file_size_bytes,
+            sha256_checksum:metadata.sha256_checksum.as_str(),
+            upload_type:UploadType::Filesystem,
+            duration_millis:inference_duration.as_secs() * 1000,
+            
+            public_bucket_directory_hash:bucket_details.object_hash.as_str(),
             maybe_public_bucket_prefix: Some(bucket_details.prefix.as_str()),
             maybe_public_bucket_extension: Some(bucket_details.suffix.as_str()),
-        }).await?;
-
         
+            // origin and type, need a second weight token for the loRA might be a generic way todo this.
+            maybe_origin_filename: file_path,
+            maybe_origin_model_token: weight_token,
+            media_file_origin_category: MediaFileOriginCategory::Upload,
+            media_file_origin_product: MediaFileOriginProductCategory::ImageGeneration,
+            media_file_model_type: MediaFileOriginModelType::StableDiffusion15,
+        
+            // creator info 
+            maybe_creator_file_synthetic_id_category: MediaFileOriginCategory::Inference,
+            maybe_creator_category_synthetic_id:MediaFileOriginCategory::Upload,
+
+            maybe_creator_user_token: Some(&creator_user_token),
+            maybe_creator_anonymous_visitor_token: anon_user_token.as_ref(),
+
+            creator_ip_address:creator_ip_address,
+            creator_set_visibility: Default::default(),
+        
+            media_type: MediaFileType::Image,
+            is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
+            worker_hostname: &args.job_dependencies.job.info.container.hostname,
+            worker_cluster: &args.job_dependencies.job.info.container.cluster_name,
+        });
+
         let batch_generation_entity: BatchGenerationEntity = BatchGenerationEntity::MediaFile(media_file_token.0);
         entries.push(batch_generation_entity);
     }
-
  
     let mut transaction = mysql_pool.begin().await.unwrap();
     let batch_token_result = insert_batch_generation_records(InsertBatchArgs {

@@ -38,7 +38,7 @@ impl RemoteCloudFileClient {
         }
     }
 
-    
+    // Where the to_system_file_path is  let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint.safetensors"); path and file name and extension
     pub async fn download_file(&self, remote_cloud_bucket_details:RemoteCloudBucketDetails, to_system_file_path:String) -> AnyhowResult<()> {
         let file_descriptor = remote_cloud_bucket_details.file_descriptor_from_bucket_details();
         let file_bucket_directory = FileBucketDirectory::from_existing_bucket_details(remote_cloud_bucket_details);
