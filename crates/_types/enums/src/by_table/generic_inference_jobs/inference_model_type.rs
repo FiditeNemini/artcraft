@@ -165,8 +165,8 @@ mod tests {
     assert_eq!(variants.pop_first(), Some(InferenceModelType::RerenderAVideo));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::StableDiffusion));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::MocapNet));
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::StyleTTS2));
     assert_eq!(variants.pop_first(), Some(InferenceModelType::ComfyUi));
+    assert_eq!(variants.pop_first(), Some(InferenceModelType::StyleTTS2));
     assert_eq!(variants.pop_first(), None);
 
     // Generated check

@@ -1,7 +1,6 @@
 use std::path::PathBuf;
 
 use anyhow::anyhow;
-use tempdir::TempDir;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;

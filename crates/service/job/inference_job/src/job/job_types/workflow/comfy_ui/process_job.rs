@@ -2,11 +2,9 @@ use std::fs::read_to_string;
 use std::path::PathBuf;
 use std::time::Instant;
 
-use anyhow::{anyhow};
+use anyhow::anyhow;
 use log::{error, info, warn};
-use jsonpath_lib::replace_with;
 use serde::de::Error;
-
 use serde_json::Value;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
@@ -19,8 +17,9 @@ use filesys::file_size::file_size;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
+use jsonpath_lib::replace_with;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::{Cu};
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
 use mysql_queries::payloads::generic_inference_args::workflow_payload::NewValue;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
@@ -29,10 +28,8 @@ use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
-use crate::job::job_types::workflow::comfy_ui::download_model_file::download_model_file;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
-
 
 const BUCKET_FILE_PREFIX: &str = "fakeyou_";
 
