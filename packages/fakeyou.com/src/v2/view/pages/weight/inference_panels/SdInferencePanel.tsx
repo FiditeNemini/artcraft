@@ -339,12 +339,12 @@ function SdInferencePanel({
                 {
                   label: "All LoRA Weights",
                   searcherKey: "allLoraWeights",
-                  weightTypeFilter: "rvc_v2",
+                  weightTypeFilter: "lora",
                 },
                 {
                   label: "Bookmarked",
                   searcherKey: "bookmarkedLoraWeights",
-                  weightTypeFilter: "rvc_v2",
+                  weightTypeFilter: "lora",
                 },
               ]}
             />
