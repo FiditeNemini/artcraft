@@ -16,15 +16,14 @@ use rand::seq::SliceRandom;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
-use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
+use migration::text_to_speech::get_tts_model_for_inference_migration::TtsModelForInferenceMigration;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
-use mysql_queries::queries::tts::tts_models::get_tts_model::TtsModelRecord;
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::tts_inference_jobs::TtsInferenceJobToken;
 use tokens::tokens::users::UserToken;
@@ -36,7 +35,7 @@ use crate::configs::app_startup::username_set::UsernameSet;
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::configs::plans::plan::Plan;
 use crate::http_server::endpoints::investor_demo::demo_cookie::request_has_demo_cookie;
-use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::get_model_with_caching::get_model_with_caching;
+use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::get_tts_model_with_caching::get_tts_model_with_caching;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
@@ -286,10 +285,11 @@ pub async fn enqueue_infer_tts_handler(
 
   // ==================== CHECK TTS MODEL EXISTENCE / SETTINGS==================== //
 
-  let tts_model_lookup_result = get_model_with_caching(
+  let tts_model_lookup_result = get_tts_model_with_caching(
     &request.tts_model_token,
     &server_state.redis_ttl_cache,
-    &mut mysql_connection
+    &mut mysql_connection,
+    server_state.flags.switch_tts_to_model_weights,
   ).await;
 
   let tts_model = match tts_model_lookup_result {
@@ -377,18 +377,12 @@ pub async fn enqueue_infer_tts_handler(
 
   // ==================== ENQUEUE APPROPRIATE TTS TYPE ==================== //
 
-  let use_new_job_system = match tts_model.tts_model_type {
-    TtsModelType::Vits => true, // VITS is only on the new system.
-    TtsModelType::Tacotron2 => use_new_job_system_for_request || server_state.flags.enable_enqueue_generic_tts_job,
-  };
+  let use_new_job_system = use_new_job_system_for_request || server_state.flags.enable_enqueue_generic_tts_job;
 
   let job_token;
   let job_token_type;
 
-  let model_type = match tts_model.tts_model_type {
-    TtsModelType::Tacotron2 => InferenceModelType::Tacotron2,
-    TtsModelType::Vits => InferenceModelType::Vits,
-  };
+  let model_type = InferenceModelType::Tacotron2;
 
   let max_duration_seconds = plan.tts_max_duration_seconds();
 
@@ -559,10 +553,10 @@ pub fn validate_inference_text(text: &str, plan: &Plan) -> Result<(), String> {
 /// This is designed to fail closed (read: actually open!) rather than hit resources.
 async fn check_if_authorized_to_use_model(
   maybe_user_session: Option<&UserSessionExtended>,
-  tts_model: &TtsModelRecord,
+  tts_model: &TtsModelForInferenceMigration,
 ) -> bool {
 
-  match tts_model.creator_set_visibility {
+  match tts_model.creator_set_visibility() {
     Visibility::Public => return true,
     Visibility::Hidden => return true,
     Visibility::Private => {} // Fall through
@@ -570,7 +564,7 @@ async fn check_if_authorized_to_use_model(
 
   let is_authorized = maybe_user_session
       .map(|session| {
-        (session.user_token.as_str() == tts_model.creator_user_token.as_str()) // is_author
+        (session.user_token.as_str() == tts_model.creator_user_token()) // is_author
             || (session.role.can_ban_users) // is_mod
             || (session.user_token.as_str() == USER_FAKEYOU_USER_TOKEN) // is allowed user #1
             || (session.user_token.as_str() == USER_NEWS_STORY_USER_TOKEN) // is allowed user #2

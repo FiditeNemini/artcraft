@@ -9,6 +9,10 @@ impl RedisCacheKeys {
     format!("get_tts_model:{}", model_token)
   }
 
+  pub fn get_tts_model_for_inference_migration_endpoint(model_token: &str) -> String {
+    format!("get_tts_inf:{}", model_token)
+  }
+
   pub fn get_unified_queue_stats_endpoint() -> &'static str {
     "q_stats_2" // NB: Schema changed, hence _2
   }

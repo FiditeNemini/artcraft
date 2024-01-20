@@ -27,7 +27,7 @@ mod tests {
         undelete_weights_as_mod,
         undelete_weights_as_user,
     };
-    use crate::queries::model_weights::get_weight::get_weight_by_token;
+    use crate::queries::model_weights::get::get_weight::get_weight_by_token;
     use crate::queries::model_weights::list::list_weights_by_user::{list_weights_by_creator_username, ListWeightsForUserArgs};
     use crate::queries::model_weights::list::list_weights_query_builder::ListWeightsQueryBuilder;
     use crate::queries::users::user::get_user_token_by_username::get_user_token_by_username;

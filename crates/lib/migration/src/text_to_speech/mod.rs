@@ -1,1 +1,2 @@
 pub mod list_tts_models_for_migration;
+pub mod get_tts_model_for_inference_migration;

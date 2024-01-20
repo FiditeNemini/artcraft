@@ -5,29 +5,21 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use log::{error, log, warn};
-use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction::Delete;
+use log::warn;
+use utoipa::ToSchema;
 
-use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::model_weights::delete_weights::{
-  delete_weights_as_user,
   delete_weights_as_mod,
-  undelete_weights_as_user,
-  undelete_weights_as_mod
+  delete_weights_as_user,
+  undelete_weights_as_user
 };
-use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
-
+use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 use crate::util::delete_role_disambiguation::{delete_role_disambiguation, DeleteRole};
-
-use enums::common::visibility::Visibility;
-use tokens::tokens::users::UserToken;
-
-use utoipa::ToSchema;
 
 #[derive(Deserialize,ToSchema)]
 pub struct DeleteWeightPathInfo {
