@@ -222,7 +222,6 @@ impl TtsModelInfoMigration {
     }
   }
 
-
   pub fn text_preprocessing_algorithm(&self) -> &str {
     match self {
       Self::LegacyTts(ref model) => &model.text_preprocessing_algorithm,
