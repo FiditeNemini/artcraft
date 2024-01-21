@@ -6,7 +6,7 @@ use log::{info, warn};
 use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use errors::AnyhowResult;
-use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
+use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use mysql_queries::queries::model_weights::migration::upsert_model_weight_from_tts_model::{CopiedTtsFileData, upsert_model_weight_from_tts_model};
 use mysql_queries::queries::tts::tts_models::migration::list_whole_tts_models_using_cursor::{list_whole_tts_models_using_cursor, WholeTtsModelRecord};
 use tokens::tokens::model_weights::ModelWeightToken;
