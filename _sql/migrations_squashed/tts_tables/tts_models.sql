@@ -43,6 +43,7 @@ CREATE TABLE tts_models (
   has_self_contained_pitch_model BOOLEAN NOT NULL DEFAULT FALSE,
 
   -- NB(2022-07-05): THIS IS NOW MEANINGLESS AND SUPERSEDED BY `TEXT_PIPELINE_TYPE`.
+  -- NB(2024-01-20): All 8720 records in the database are "basic".
   -- NB: DO NOT CHANGE ORDER; APPEND ONLY!
   -- How text should be handled.
   text_preprocessing_algorithm ENUM(
