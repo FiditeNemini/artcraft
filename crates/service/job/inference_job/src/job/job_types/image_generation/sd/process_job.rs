@@ -1,9 +1,11 @@
+use std::convert::TryInto;
 use std::thread;
 use std::time::{ Duration, Instant };
 
 use anyhow::anyhow;
 use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -27,7 +29,12 @@ use mysql_queries::queries::media_files::create::insert_media_file_from_file_upl
     InsertMediaFileFromUploadArgs,
     UploadType,
 };
-use mysql_queries::queries::media_files::create::insert_media_file_generic;
+
+
+use mysql_queries::queries::media_files::create::insert_media_file_generic::insert_media_file_generic;
+use mysql_queries::queries::media_files::create::insert_media_file_generic::InsertArgs;
+
+
 use mysql_queries::queries::model_categories::create_category;
 use mysql_queries::queries::model_weights::create::create_weight::{
     create_weight,
@@ -306,10 +313,10 @@ pub async fn process_job_inference(
     // // Unpack loRA and Checkpoint
     // // run inference by downloading from google drive.
     let lora_token = sd_args.maybe_lora_model_token;
-    let weight_token = sd_args.maybe_sd_model_token;
+    let weight_token = sd_args.maybe_sd_model_token.clone();
 
     let retrieved_sd_record = match weight_token {
-        Some(token) => {
+        Some(ref token) => {
             let retrieved_sd_record = get_weight_by_token(
                 &token,
                 false,
@@ -454,7 +461,9 @@ pub async fn process_job_inference(
         let path = output_path.clone();
         
         let file_path = format!("{}_{}.png", path_to_string(path), i);
+
         println!("Upload File Path:{}", file_path);
+
         let metadata = remote_cloud_file_client.upload_file(
             Box::new(MediaImagePngDescriptor {}),
             file_path.as_ref()
@@ -469,43 +478,41 @@ pub async fn process_job_inference(
             }
         };
        
+        // extra_file_modification_info: todo!(), // JSON ENCODED STRUCT
         let media_file_token = insert_media_file_generic(InsertArgs {
             pool:mysql_pool,
             job:job,
-            // metadata
-            maybe_mime_type:Some(metadata.mimetype.as_ref()),
-            file_size_bytes:metadata.file_size_bytes,
-            sha256_checksum:metadata.sha256_checksum.as_str(),
-            upload_type:UploadType::Filesystem,
-            duration_millis:inference_duration.as_secs() * 1000,
-            
-            public_bucket_directory_hash:bucket_details.object_hash.as_str(),
+            media_type: MediaFileType::Image,
+            origin_category:MediaFileOriginCategory::Upload,
+            origin_product_category: MediaFileOriginProductCategory::ImageGeneration,
+            maybe_origin_model_type: Some(MediaFileOriginModelType::StableDiffusion15),
+            maybe_origin_model_token: weight_token,
+            maybe_origin_filename: Some(file_path),
+            is_batch_generated: true,
+            maybe_mime_type: Some(metadata.mimetype.as_ref()),
+            file_size_bytes: metadata.file_size_bytes,
+            maybe_duration_millis: Some(inference_duration.as_millis() as u64),
+            maybe_audio_encoding: None,
+            maybe_video_encoding: None,
+            maybe_frame_width: Some(sd_args.maybe_width.unwrap_or(512) as u32),
+            maybe_frame_height: Some(sd_args.maybe_height.unwrap_or(512) as u32),
+            checksum_sha2: metadata.sha256_checksum.as_str(),
+            public_bucket_directory_hash: bucket_details.object_hash.as_str(),
             maybe_public_bucket_prefix: Some(bucket_details.prefix.as_str()),
             maybe_public_bucket_extension: Some(bucket_details.suffix.as_str()),
-        
-            // origin and type, need a second weight token for the loRA might be a generic way todo this.
-            maybe_origin_filename: file_path,
-            maybe_origin_model_token: weight_token,
-            media_file_origin_category: MediaFileOriginCategory::Upload,
-            media_file_origin_product: MediaFileOriginProductCategory::ImageGeneration,
-            media_file_model_type: MediaFileOriginModelType::StableDiffusion15,
-        
-            // creator info 
-            maybe_creator_file_synthetic_id_category: MediaFileOriginCategory::Inference,
-            maybe_creator_category_synthetic_id:MediaFileOriginCategory::Upload,
-
+            extra_file_modification_info: todo!(),
             maybe_creator_user_token: Some(&creator_user_token),
-            maybe_creator_anonymous_visitor_token: anon_user_token.as_ref(),
-
-            creator_ip_address:creator_ip_address,
-            creator_set_visibility: Default::default(),
+            maybe_creator_anonymous_visitor_token:anon_user_token.as_ref(),
+            creator_ip_address: creator_ip_address,
+            creator_set_visibility: args.job.creator_set_visibility,
+            maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
+            maybe_creator_category_synthetic_id_category: IdCategory::ModelWeights,
+            maybe_mod_user_token: None,
+            is_generated_on_prem: args.job_dependencies.job.info.container.is_on_prem,
+            generated_by_worker:  Some(&args.job_dependencies.job.info.container.hostname),
+            generated_by_cluster: Some(&args.job_dependencies.job.info.container.cluster_name)
+        }).await?;
         
-            media_type: MediaFileType::Image,
-            is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
-            worker_hostname: &args.job_dependencies.job.info.container.hostname,
-            worker_cluster: &args.job_dependencies.job.info.container.cluster_name,
-        });
-
         let batch_generation_entity: BatchGenerationEntity = BatchGenerationEntity::MediaFile(media_file_token.0);
         entries.push(batch_generation_entity);
     }
