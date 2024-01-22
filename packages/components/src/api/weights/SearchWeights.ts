@@ -3,6 +3,9 @@ import { Weight } from "./GetWeight";
 
 export interface SearchWeightsRequest {
   search_term: string;
+  weight_type?: string;
+  weight_category?: string;
+  ietf_language_tag?: string;
 }
 
 export interface SearchWeightsResponse {

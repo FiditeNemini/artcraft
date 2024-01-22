@@ -4,22 +4,20 @@ import PageHeader from "components/layout/PageHeader";
 import Panel from "components/common/Panel";
 import { SearchWeights } from "@storyteller/components/src/api/weights/SearchWeights";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
-import { useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import debounce from "lodash.debounce";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import WeightsCards from "components/common/Card/WeightsCards";
 import { useBookmarks, useRatings } from "hooks";
-import { faFilter, faLanguage, faTag } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faFilter,
+  faLanguage,
+  faTag,
+  faXmark,
+} from "@fortawesome/pro-solid-svg-icons";
 import Select from "components/common/Select";
-
-// const allTags = [
-//   "English",
-//   "Spanish",
-//   "Portuguese",
-//   "High-pitched",
-//   "Low-pitched",
-//   "Character",
-// ];
+import { AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP } from "_i18n/AvailableLanguageMap";
+import { Button } from "components/common";
 
 export default function SearchPage() {
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
@@ -29,9 +27,12 @@ export default function SearchPage() {
   const [weightTypeOpts, setWeightTypeOpts] = useState([
     { value: "all", label: "All Types" },
   ]);
+  const [language, setLanguage] = useState<string>("all");
 
   const bookmarks = useBookmarks();
   const ratings = useRatings();
+  const history = useHistory();
+  const location = useLocation();
 
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -39,19 +40,27 @@ export default function SearchPage() {
     return new URLSearchParams(useLocation().search);
   };
 
+  const query = useQuery();
+  const urlSearchTerm = query.get("query") || "";
+  const urlWeightType = query.get("type") || "all";
+  const urlWeightCategory = query.get("category") || "all";
+  const urlLanguage = query.get("language") || "all";
+
   const doSearch = useCallback(
-    async (value: string) => {
-      let request: any = {
-        search_term: value,
+    async (
+      searchTerm,
+      weightTypeFilter,
+      weightCategoryFilter,
+      languageFilter
+    ) => {
+      let request = {
+        search_term: searchTerm,
+        weight_type: weightTypeFilter !== "all" ? weightTypeFilter : undefined,
+        weight_category:
+          weightCategoryFilter !== "all" ? weightCategoryFilter : undefined,
+        ietf_language_subtag:
+          languageFilter !== "all" ? languageFilter : undefined,
       };
-
-      if (weightType !== "all") {
-        request["weight_type"] = weightType;
-      }
-
-      if (weightCategory !== "all") {
-        request["weight_category"] = weightCategory;
-      }
 
       let response = await SearchWeights(request);
 
@@ -63,31 +72,68 @@ export default function SearchPage() {
         setFoundWeights([]);
       }
     },
-    [setFoundWeights, weightType, weightCategory]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [setFoundWeights, weightType, weightCategory, language]
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedDoSearch = useCallback(
-    debounce(searchTerm => {
-      doSearch(searchTerm);
-    }, 250),
+    debounce(
+      (searchTerm, weightTypeFilter, weightCategoryFilter, languageFilter) => {
+        doSearch(
+          searchTerm,
+          weightTypeFilter,
+          weightCategoryFilter,
+          languageFilter
+        );
+      },
+      250
+    ),
     [doSearch]
   );
 
-  const query = useQuery();
-  const urlSearchTerm = query.get("query") || "";
-
   useEffect(() => {
     if (urlSearchTerm) {
-      debouncedDoSearch(urlSearchTerm);
+      debouncedDoSearch(
+        urlSearchTerm,
+        urlWeightType,
+        urlWeightCategory,
+        urlLanguage
+      );
     }
-  }, [urlSearchTerm, debouncedDoSearch]);
+  }, [
+    urlSearchTerm,
+    urlWeightType,
+    urlWeightCategory,
+    urlLanguage,
+    debouncedDoSearch,
+  ]);
 
-  const languageOpts = [
-    { value: "all", label: "All Languages" },
-    { value: "english", label: "English" },
-    { value: "spanish", label: "Spanish" },
-    { value: "portuguese", label: "Portuguese" },
+  let languageOpts = Object.entries(AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP).map(
+    ([languageCode, language]) => {
+      let label = `${language.languageName}`;
+
+      if (language.languageNameLocalized !== undefined) {
+        label = `${language.languageNameLocalized} / ${label}`;
+      }
+
+      if (language.flags.length > 0) {
+        label += ` ${language.flags.join(" ")}`;
+      }
+
+      return {
+        value: languageCode,
+        label: label,
+      };
+    }
+  );
+
+  languageOpts = [
+    {
+      label: `All Languages`,
+      value: "all",
+    },
+    ...languageOpts,
   ];
 
   const weightCategoryOpts = [
@@ -149,6 +195,63 @@ export default function SearchPage() {
     weightCategoryOpts.find(el => el.value === weightCategory) ||
     weightCategoryOpts[0];
 
+  const languageValue =
+    languageOpts.find(el => el.value === language) || languageOpts[0];
+
+  // update URL query parameters
+  const updateQueryParams = (params: any) => {
+    const searchParams = new URLSearchParams(location.search);
+    Object.keys(params).forEach(key => {
+      if (params[key] === "all") {
+        searchParams.delete(key);
+      } else {
+        searchParams.set(key, params[key]);
+      }
+    });
+    history.push({
+      pathname: location.pathname,
+      search: searchParams.toString(),
+    });
+  };
+
+  // Set initial filter states from URL query parameters
+  useEffect(() => {
+    setWeightType(query.get("type") || "all");
+    setWeightCategory(query.get("category") || "all");
+    setLanguage(query.get("language") || "all");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Update URL when filters change
+  useEffect(() => {
+    updateQueryParams({
+      query: urlSearchTerm,
+      type: weightType,
+      category: weightCategory,
+      language: language,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weightType, weightCategory, language, urlSearchTerm]);
+
+  const isFilterApplied =
+    weightType !== "all" || weightCategory !== "all" || language !== "all";
+
+  const handleClearFilters = () => {
+    setWeightType("all");
+    setWeightCategory("all");
+    setLanguage("all");
+
+    const updatedSearchParams = new URLSearchParams();
+    if (urlSearchTerm !== "") updatedSearchParams.set("query", urlSearchTerm);
+
+    history.push({
+      pathname: location.pathname,
+      search: updatedSearchParams.toString(),
+    });
+
+    doSearch(urlSearchTerm, "all", "all", "all");
+  };
+
   return (
     <Container type="panel" className="mb-5">
       <PageHeader
@@ -164,7 +267,11 @@ export default function SearchPage() {
               icon: faLanguage,
               options: languageOpts,
               name: "languages",
+              value: languageValue,
               defaultValue: languageOpts[0],
+              onChange: args => {
+                setLanguage(args.value);
+              },
             }}
           />
           <Select
@@ -191,6 +298,15 @@ export default function SearchPage() {
               },
             }}
           />
+          {isFilterApplied && (
+            <Button
+              variant="link"
+              icon={faXmark}
+              label="Reset Filters"
+              className="ms-2"
+              onClick={handleClearFilters}
+            />
+          )}
         </div>
 
         <MasonryGrid
