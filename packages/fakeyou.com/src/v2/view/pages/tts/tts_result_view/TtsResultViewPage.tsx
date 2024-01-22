@@ -550,7 +550,6 @@ function TtsResultViewPage(props: Props) {
             <CommentComponent
               entityType="user"
               entityToken={ttsInferenceResult.tts_result_token}
-              sessionWrapper={props.sessionWrapper}
             />
           </div>
         </div>

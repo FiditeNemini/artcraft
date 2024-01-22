@@ -1,22 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import Searcher from "../Searcher";
 import Modal from "../Modal";
 import NonRouteTabs from "../Tabs/NonRouteTabs";
 import Input from "../Input";
 import Button from "../Button";
 import useToken from "hooks/useToken";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
-interface SelectSearcherProps {
-  label?: string;
+interface TabConfig {
+  label: string;
+  searcherKey: string;
   weightTypeFilter?: string;
 }
+interface SelectSearcherProps {
+  label?: string;
+  tabs: TabConfig[];
+}
 
-export default function SelectSearcher({
-  label,
-  weightTypeFilter,
-}: SelectSearcherProps) {
+const SelectSearcher = memo(({ label, tabs }: SelectSearcherProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { weightTitle } = useToken();
+  const { weightTitle, setWeightTitle } = useToken();
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -26,24 +29,23 @@ export default function SelectSearcher({
     setIsModalOpen(false);
   };
 
-  const searchTabs = [
-    {
-      label: "All LoRA Weights",
-      content: (
-        <Searcher
-          type="modal"
-          onResultSelect={closeModal}
-          weightTypeFilter={weightTypeFilter}
-        />
-      ),
-      padding: true,
-    },
-    {
-      label: "Bookmarked",
-      content: <Searcher type="modal" onResultSelect={closeModal} />,
-      padding: true,
-    },
-  ];
+  const handleRemove = () => {
+    setWeightTitle && setWeightTitle("");
+  };
+
+  const searchTabs = tabs.map(tab => ({
+    label: tab.label,
+    content: (
+      <Searcher
+        type="modal"
+        onResultSelect={closeModal}
+        searcherKey={tab.searcherKey}
+        weightType={tab.weightTypeFilter}
+      />
+    ),
+    padding: true,
+  }));
+
   return (
     <>
       <div>
@@ -56,7 +58,19 @@ export default function SelectSearcher({
             placeholder="None selected"
             value={weightTitle ? weightTitle : ""}
           />
-          <Button label="Select" onClick={openModal} />
+          <Button
+            label={weightTitle ? "Change" : "Select"}
+            onClick={openModal}
+          />
+          {weightTitle && (
+            <Button
+              square={true}
+              variant="danger"
+              icon={faTrash}
+              onClick={handleRemove}
+              tooltip="Remove"
+            />
+          )}
         </div>
       </div>
 
@@ -73,4 +87,6 @@ export default function SelectSearcher({
       />
     </>
   );
-}
+});
+
+export default SelectSearcher;

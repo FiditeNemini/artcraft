@@ -359,7 +359,6 @@ function W2lResultViewPage(props: Props) {
             <CommentComponent
               entityType="user"
               entityToken={w2lInferenceResult.w2l_result_token}
-              sessionWrapper={props.sessionWrapper}
             />
           </div>
         </div>

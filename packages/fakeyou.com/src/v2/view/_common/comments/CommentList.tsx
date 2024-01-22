@@ -1,18 +1,17 @@
 import React from "react";
 import { formatDistance } from "date-fns";
 import { Comment } from "@storyteller/components/src/api/comments/ListComments";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SafeDeleteCommentButton } from "./SafeDeleteCommentButton";
 
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
+import { useSession } from "hooks";
 
 interface Props {
   entityType: string;
   entityToken: string;
   comments: Comment[];
   loadComments: () => void;
-  sessionWrapper: SessionWrapper;
 }
 
 /**
@@ -22,6 +21,7 @@ interface Props {
  * See the documentation on the parent <CommentComponent />
  */
 function CommentList(props: Props) {
+  const { user, userTokenMatch } = useSession();
   // NB: It's more convenient to show recent data first {.reverse()}
   var reversedComments = props.comments.slice();
 
@@ -39,8 +39,8 @@ function CommentList(props: Props) {
     // comments - the person that owns the thing the comment is attached to.
     // We want profile / model / result owner to be able to clear harassing
     // comments themselves. This isn't ready yet, though.
-    const isAuthor = props.sessionWrapper.userTokenMatches(comment.user_token);
-    const isModerator = props.sessionWrapper.canBanUsers();
+    const isAuthor = userTokenMatch(comment.user_token);
+    const isModerator = user.canBanUsers;
     const canDelete = isAuthor || isModerator;
 
     let maybeDeleteButton = <></>;

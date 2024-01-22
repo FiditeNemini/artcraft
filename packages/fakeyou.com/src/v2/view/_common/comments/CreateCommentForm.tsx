@@ -4,14 +4,13 @@ import {
   CreateCommentIsOk,
 } from "@storyteller/components/src/api/comments/CreateComment";
 import { v4 as uuidv4 } from "uuid";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
+import { useSession } from "hooks";
 
 interface Props {
   entityType: string;
   entityToken: string;
   loadComments: () => void;
-  sessionWrapper: SessionWrapper;
 }
 
 /**
@@ -21,6 +20,7 @@ interface Props {
  * See the documentation on the parent <CommentComponent />
  */
 function CreateCommentForm(props: Props) {
+  const { user } = useSession();
   const { entityType, entityToken, loadComments } = props;
 
   const [commentMarkdown, setCommentMarkdown] = useState<string>("");
@@ -89,7 +89,7 @@ function CreateCommentForm(props: Props) {
     setButtonVisible(false);
   };
 
-  let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
+  let gravatarHash = user?.email_gravatar_hash;
   let gravatar = <span />;
   if (gravatarHash !== undefined) {
     gravatar = <Gravatar email_hash={gravatarHash} size={40} />;
@@ -123,7 +123,7 @@ function CreateCommentForm(props: Props) {
       {commentMarkdown}
     </textarea>
   );
-  if (props.sessionWrapper.isLoggedIn()) {
+  if (user) {
     createCommentComponent = (
       <form onSubmit={handleFormSubmit}>
         <div className="d-flex flex-column gap-3">

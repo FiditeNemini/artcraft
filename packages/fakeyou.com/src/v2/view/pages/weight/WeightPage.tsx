@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useHistory, useParams, useLocation } from "react-router-dom";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import Container from "components/common/Container";
 import Panel from "components/common/Panel";
@@ -29,7 +28,7 @@ import TtsInferencePanel from "./inference_panels/TtsInferencePanel";
 import Modal from "components/common/Modal";
 import SocialButton from "components/common/SocialButton";
 import Input from "components/common/Input";
-import { useBookmarks, useWeightFetch, useRatings } from "hooks";
+import { useBookmarks, useWeightFetch, useRatings, useSession } from "hooks";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
@@ -38,7 +37,6 @@ import SdInferencePanel from "./inference_panels/SdInferencePanel";
 import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
 
 interface WeightProps {
-  sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   inferenceJobs: Array<InferenceJob>;
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -51,7 +49,6 @@ interface WeightProps {
 }
 
 export default function WeightPage({
-  sessionWrapper,
   sessionSubscriptionsWrapper,
   inferenceJobs,
   ttsInferenceJobs,
@@ -59,6 +56,7 @@ export default function WeightPage({
   enqueueTtsJob,
   inferenceJobsByCategory,
 }: WeightProps) {
+  const { canEditTtsModel, user } = useSession();
   const { search } = useLocation();
   const { weight_token } = useParams<{ weight_token: string }>();
   const origin = search ? new URLSearchParams(search).get("origin") : "";
@@ -303,7 +301,7 @@ export default function WeightPage({
     },
   ];
 
-  if (sessionWrapper.canBanUsers()) {
+  if (user?.canBanUsers) {
     modMediaDetails = (
       <Accordion.Item title="Moderator Details" defaultOpen={false}>
         <DataTable data={modDetails} />
@@ -413,7 +411,6 @@ export default function WeightPage({
               <CommentComponent
                 entityType="user"
                 entityToken={weight.weight_token}
-                sessionWrapper={sessionWrapper}
               />
             </div>
           </div>
@@ -534,9 +531,7 @@ export default function WeightPage({
                 </div>
               </Panel>
 
-              {sessionWrapper.canEditTtsModelByUserToken(
-                weight.creator?.user_token
-              ) && (
+              {canEditTtsModel(weight.creator?.user_token) && (
                 <div className="d-flex gap-2">
                   <Button
                     full={true}
@@ -564,7 +559,6 @@ export default function WeightPage({
             <CommentComponent
               entityType="user"
               entityToken={weight.weight_token}
-              sessionWrapper={sessionWrapper}
             />
           </Panel>
         </Container>

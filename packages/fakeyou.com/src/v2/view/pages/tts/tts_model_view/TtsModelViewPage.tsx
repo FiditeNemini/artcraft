@@ -848,7 +848,6 @@ function TtsModelViewPage(props: Props) {
             <CommentComponent
               entityType="user"
               entityToken={ttsModel.model_token}
-              sessionWrapper={props.sessionWrapper}
             />
           </div>
         </div>

@@ -177,7 +177,6 @@ export default function VcModelViewPage(props: VcModelViewPageProps) {
         <CommentComponent
           entityType="user"
           entityToken="test"
-          sessionWrapper={props.sessionWrapper}
         />
       </Panel>
     </Container>

@@ -23,25 +23,44 @@ export default function CreatorName({
     event.stopPropagation();
   };
 
+  const gravatar = (
+    <Gravatar
+      size={22}
+      email_hash={gravatarHash}
+      avatarIndex={avatarIndex || 0}
+      backgroundIndex={backgroundIndex || 0}
+    />
+  );
+
   return (
-    <Link
-      className={`d-flex gap-2 align-items-center ${className}`}
-      onClick={handleInnerClick}
-      to={`/profile/${username}`}
-    >
-      <Gravatar
-        size={22}
-        email_hash={gravatarHash}
-        avatarIndex={avatarIndex}
-        backgroundIndex={backgroundIndex}
-      />
-      <div
-        {...{
-          className: "fw-medium fs-7 text-white opacity-75 text-truncate",
-        }}
-      >
-        {displayName}
-      </div>
-    </Link>
+    <>
+      {displayName === "Anonymous" ? (
+        <div className="d-flex gap-2 align-items-center">
+          {gravatar}
+          <div
+            {...{
+              className: "fw-medium fs-7 text-white opacity-75 text-truncate",
+            }}
+          >
+            {displayName}
+          </div>
+        </div>
+      ) : (
+        <Link
+          className={`d-flex gap-2 align-items-center ${className}`}
+          onClick={handleInnerClick}
+          to={`/profile/${username}`}
+        >
+          {gravatar}
+          <div
+            {...{
+              className: "fw-medium fs-7 text-white opacity-75 text-truncate",
+            }}
+          >
+            {displayName}
+          </div>
+        </Link>
+      )}
+    </>
   );
 }

@@ -352,7 +352,7 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/media/:token">
-                <MediaPage sessionWrapper={this.props.sessionWrapper} />
+                <MediaPage />
               </Route>
 
               <Route path="/explore">
@@ -368,7 +368,6 @@ class PageContainer extends React.Component<
                 render={props => (
                   <WeightPage
                     key={props.match.params.weight_token}
-                    sessionWrapper={this.props.sessionWrapper}
                     sessionSubscriptionsWrapper={
                       this.props.sessionSubscriptionsWrapper
                     }
@@ -770,16 +769,16 @@ class PageContainer extends React.Component<
               </Route>
 
               <Route path="/video-mocap/:mediaToken?">
-               <VideoMocap
-                 {...{
-                   enqueueInferenceJob: this.props.enqueueInferenceJob,
-                   sessionSubscriptionsWrapper:
-                     this.props.sessionSubscriptionsWrapper,
-                   inferenceJobs: this.props.inferenceJobs,
-                   inferenceJobsByCategory: this.props.inferenceJobsByCategory,
-                 }}
-               />
-             </Route>
+                <VideoMocap
+                  {...{
+                    enqueueInferenceJob: this.props.enqueueInferenceJob,
+                    sessionSubscriptionsWrapper:
+                      this.props.sessionSubscriptionsWrapper,
+                    inferenceJobs: this.props.inferenceJobs,
+                    inferenceJobsByCategory: this.props.inferenceJobsByCategory,
+                  }}
+                />
+              </Route>
 
               <Route path="/character/donald-trump">
                 <TrumpTtsPage

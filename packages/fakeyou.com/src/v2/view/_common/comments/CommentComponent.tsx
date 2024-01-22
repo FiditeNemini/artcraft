@@ -6,13 +6,11 @@ import {
   ListCommentsIsOk,
 } from "@storyteller/components/src/api/comments/ListComments";
 import { CreateCommentForm } from "./CreateCommentForm";
-import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { CommentList } from "./CommentList";
 
 interface Props {
   entityType: string;
   entityToken: string;
-  sessionWrapper: SessionWrapper;
 }
 
 /**
@@ -41,19 +39,17 @@ function CommentComponent(props: Props) {
   }, [loadComments]);
 
   return (
-    <div className="d-flex flex-column gap-4">
+    <div className="d-flex flex-column gap-3">
       <CreateCommentForm
         entityType={props.entityType}
         entityToken={props.entityToken}
         loadComments={loadComments}
-        sessionWrapper={props.sessionWrapper}
       />
       <CommentList
         entityType={props.entityType}
         entityToken={props.entityToken}
         loadComments={loadComments}
         comments={comments}
-        sessionWrapper={props.sessionWrapper}
       />
     </div>
   );

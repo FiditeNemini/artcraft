@@ -39,7 +39,7 @@ export default function MediaTab() {
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: res => {
-      bookmarks.gather({ res, expand: true, key: "token" }); // expand rather than replace for lazy loading
+      ratings.gather({ res, expand: true, key: "token" }); // expand rather than replace for lazy loading
       setShowMasonryGrid(true);
     },
     requestList: true,
@@ -50,6 +50,7 @@ export default function MediaTab() {
     { value: "image", label: "Images" },
     { value: "audio", label: "Audio" },
     { value: "video", label: "Video" },
+    { value: "mocap", label: "Motion Capture" },
   ];
 
   const sortOptions = [

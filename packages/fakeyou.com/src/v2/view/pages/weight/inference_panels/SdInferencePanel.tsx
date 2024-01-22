@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, memo } from "react";
 import {
   Button,
   Input,
@@ -33,7 +33,7 @@ interface SdInferencePanelProps {
   ) => void;
 }
 
-export default function SdInferencePanel({
+function SdInferencePanel({
   enqueueInferenceJob,
   sd_model_token,
 }: SdInferencePanelProps) {
@@ -333,7 +333,21 @@ export default function SdInferencePanel({
               }}
             />
 
-            <SelectSearcher label="Additional LoRA Weight" />
+            <SelectSearcher
+              label="Additional LoRA Weight"
+              tabs={[
+                {
+                  label: "All LoRA Weights",
+                  searcherKey: "allLoraWeights",
+                  weightTypeFilter: "lora",
+                },
+                {
+                  label: "Bookmarked",
+                  searcherKey: "bookmarkedLoraWeights",
+                  weightTypeFilter: "lora",
+                },
+              ]}
+            />
 
             {/* Checkpoint Use weight token */}
             {/* <TempSelect
@@ -378,3 +392,5 @@ export default function SdInferencePanel({
     </Panel>
   );
 }
+
+export default memo(SdInferencePanel);
