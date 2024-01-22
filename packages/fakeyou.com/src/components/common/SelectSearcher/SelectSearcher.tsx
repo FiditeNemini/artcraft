@@ -9,8 +9,9 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 interface TabConfig {
   label: string;
-  searcherKey: string;
+  searcherKey?: string;
   weightTypeFilter?: string;
+  mediaTypeFilter?: string; // NOT DONE
 }
 interface SelectSearcherProps {
   label?: string;
@@ -35,14 +36,14 @@ const SelectSearcher = memo(({ label, tabs }: SelectSearcherProps) => {
 
   const searchTabs = tabs.map(tab => ({
     label: tab.label,
-    content: (
+    content: tab.searcherKey ? (
       <Searcher
         type="modal"
         onResultSelect={closeModal}
         searcherKey={tab.searcherKey}
         weightType={tab.weightTypeFilter}
       />
-    ),
+    ) : null,
     padding: true,
   }));
 
