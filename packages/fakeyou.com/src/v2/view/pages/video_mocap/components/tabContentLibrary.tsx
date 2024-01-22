@@ -8,7 +8,8 @@ export default function TabContentLibrary(props: {
   return (
     <div>
       <SelectSearcher
-        label="Select a Video Media"
+        modalTitle="Select a Video"
+        label="Select a Video"
         tabs={[
           {
             label: "All Videos",
