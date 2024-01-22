@@ -1,13 +1,12 @@
 use std::path::PathBuf;
 
 use anyhow::anyhow;
-use tempdir::TempDir;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::model_weights::get_weight::RetrievedModelWeight;
+use mysql_queries::queries::model_weights::get::get_weight::RetrievedModelWeight;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};

@@ -7,14 +7,14 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use log::warn;
 use utoipa::ToSchema;
-use enums::by_table::media_files::media_file_type::MediaFileType;
 
+use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::edit::update_weight::{CoverImageOption, update_weights, UpdateWeightArgs};
-use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
+use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use user_input_common::check_for_slurs::contains_slurs;

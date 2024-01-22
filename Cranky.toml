@@ -43,8 +43,7 @@ deny = [
   "unused_imports", # These are easy to automatically cull
   "unused_parens", # Unused parens are ugly
   "unused_variables", # Don't leave cruft
-
-  #"unused_mut", # Be strict about mutability (TODO)
+  "unused_mut", # Be strict about mutability
 
   # Possible:
   # "clippy::ptr_arg",

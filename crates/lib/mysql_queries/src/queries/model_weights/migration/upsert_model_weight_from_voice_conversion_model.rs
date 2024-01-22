@@ -50,7 +50,7 @@ pub async fn upsert_model_weights_record(
   record: &WholeVoiceConversionModelRecord,
   model_weight_token: &ModelWeightToken,
   copied_data: &CopiedFileData,
-  mut transaction: &mut Transaction<'_, MySql>,
+  transaction: &mut Transaction<'_, MySql>,
 ) -> AnyhowResult<()> {
 
   let weights_type = match record.model_type {

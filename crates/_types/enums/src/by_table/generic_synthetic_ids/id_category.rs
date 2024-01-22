@@ -189,6 +189,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(IdCategory::LipsyncAnimationResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::VideoFilterResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::MocapResult));
+      assert_eq!(variants.pop_first(), Some(IdCategory::WorkflowResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::TtsResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::VoiceConversionResult));
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotTtsResult));
@@ -196,7 +197,6 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(IdCategory::ZeroShotVoiceEmbedding));
       assert_eq!(variants.pop_first(), Some(IdCategory::ModelWeights));
       assert_eq!(variants.pop_first(), Some(IdCategory::FileUpload));
-      assert_eq!(variants.pop_first(), Some(IdCategory::WorkflowResult));
       assert_eq!(variants.pop_first(), None);
 
       // Generated check

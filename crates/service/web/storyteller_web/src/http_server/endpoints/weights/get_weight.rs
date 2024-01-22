@@ -13,10 +13,10 @@ use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
-use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
+use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::model_weights::ModelWeightToken;
-use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
 
+use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;

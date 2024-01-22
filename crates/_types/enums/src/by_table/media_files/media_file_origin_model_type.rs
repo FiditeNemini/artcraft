@@ -142,7 +142,7 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginModelType::all_variants();
-      assert_eq!(variants.len(), 10);
+      assert_eq!(variants.len(), 9);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::RvcV2));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SadTalker));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SoVitsSvc));

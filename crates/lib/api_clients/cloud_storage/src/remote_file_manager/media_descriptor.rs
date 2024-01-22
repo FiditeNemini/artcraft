@@ -1,5 +1,4 @@
 use crate::remote_file_manager::file_descriptor::FileDescriptor;
-
 // TODO ASK BRANDON WHAT path should this be?
 const MEDIA_FILE_DIRECTORY: &str = "/media";
 
@@ -27,12 +26,11 @@ impl FileDescriptor for MediaVideoMp4Descriptor {
     fn remote_directory_path(&self) -> &str {
         MEDIA_FILE_DIRECTORY
     }
-
-    fn get_suffix(&self) -> String {
+    fn get_suffix(&self)->String {
         "mp4".to_string()
     }
 
-    fn get_prefix(&self) -> String {
+    fn get_prefix(&self)->String {
         "video".to_string()
     }
 
