@@ -686,6 +686,7 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
 pub async fn seed_workflows_for_testing_inference(mysql_pool: &Pool<MySql>, user_token: UserToken) -> AnyhowResult<()>{
     let model_weight_token1 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
     let model_weight_token2 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let model_weight_token3 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
 
     let mut path_to_comfy = get_seed_tool_data_root();
     path_to_comfy.push("models/workflows/comfyui/workflow_api.json");
@@ -1061,9 +1062,9 @@ pub async fn seed_weights(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
     // original_seed_weights(mysql_pool,user_token).await?;
     // seed_weights_for_user_token(mysql_pool, user_token).await?;
     // seed_weights_for_paging(mysql_pool,user_token).await?;
-    seed_weights_for_testing_inference(mysql_pool,user_token.clone()).await?;
-    println!("TESTING DOWLOAD");
-    test_seed_weights_files().await?;
-    seed_workflows_for_testing_inference(mysql_pool,user_token.clone()).await?;
+    // seed_weights_for_testing_inference(mysql_pool,user_token.clone()).await?;
+    // println!("TESTING DOWLOAD");
+    // test_seed_weights_files().await?;
+    // seed_workflows_for_testing_inference(mysql_pool,user_token.clone()).await?;
     Ok(())
 }

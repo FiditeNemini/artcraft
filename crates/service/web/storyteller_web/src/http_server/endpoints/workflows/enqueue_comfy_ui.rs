@@ -19,6 +19,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{Ge
 use mysql_queries::payloads::generic_inference_args::workflow_payload::{NewValue, WorkflowArgs};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
@@ -44,6 +45,8 @@ pub struct EnqueueComfyRequest {
     maybe_negative_prompt: Option<String>,
     maybe_json_modifications: Option<HashMap<String, NewValue>>,
     maybe_workflow_config: Option<ModelWeightToken>,
+    maybe_input_file: Option<MediaFileToken>,
+    maybe_output_path: Option<String>,
 
     creator_set_visibility: Option<Visibility>,
 }
@@ -178,6 +181,8 @@ pub async fn enqueue_comfy_ui_handler(
         maybe_lora_model: request.maybe_lora_model.clone(),
         maybe_json_modifications: request.maybe_json_modifications.clone(),
         maybe_workflow_config: request.maybe_workflow_config.clone(),
+        maybe_input_file: request.maybe_input_file.clone(),
+        maybe_output_path: request.maybe_output_path.clone(),
     };
 
     info!("Creating ComfyUI job record...");
