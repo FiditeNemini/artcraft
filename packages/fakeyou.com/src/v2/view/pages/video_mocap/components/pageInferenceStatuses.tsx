@@ -24,7 +24,7 @@ export function PageInferenceStatuses (props:{
     console.log("ENQUEUE INFERENCE JOB>>")
     enqueueInferenceJob(
       props.pageState.jobToken,
-      FrontendInferenceJobType.FaceAnimation
+      FrontendInferenceJobType.VideoMotionCapture
     );
   }, [props.pageState.jobToken, enqueueInferenceJob])
 
@@ -33,7 +33,7 @@ export function PageInferenceStatuses (props:{
       case "sample case": 
         return "Sample Case, this should not have been shown";
       default:
-        return "Uknown failure";
+        return "Unknown failure";
     }
   };
 
@@ -45,7 +45,7 @@ export function PageInferenceStatuses (props:{
       <InferenceJobsList {...{
         failures,
         onSelect: () => Analytics.voiceConversionClickDownload(),
-        jobType: FrontendInferenceJobType.FaceAnimation,
+        jobType: FrontendInferenceJobType.VideoMotionCapture,
       }}/>
     </>
   )

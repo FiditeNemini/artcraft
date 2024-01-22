@@ -5,7 +5,7 @@ import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadM
 import { EnqueueVideoMotionCapture } from "@storyteller/components/src/api/video_mocap";
 import { useFile } from "hooks";
 
-import VideoInput from "v2/view/pages/video_mocap/components/VideoInput";
+import VideoInput from "components/common/VideoInput";
 
 export default function TabContentUpload(props: {
   t: Function;

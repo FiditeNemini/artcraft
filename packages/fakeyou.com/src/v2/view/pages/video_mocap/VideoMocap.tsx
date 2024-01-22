@@ -1,18 +1,18 @@
 import React, { useState } from "react";
+import { Redirect, useLocation } from "react-router-dom";
 
-import { useLocalize } from "hooks";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-
-// import { PageVideoProvision } from "./components/pageVideoProvision";
 import { PageInferenceStatuses } from "./components/pageInferenceStatuses";
+
 import { BasicVideo, Container, Panel } from "components/common";
 import PageHeader from "components/layout/PageHeader";
 import Tabs from "components/common/Tabs";
-import { Redirect, useLocation } from "react-router-dom";
+import { useLocalize } from "hooks";
+
 import TabContentUpload from "./components/tabContentUpload";
 import TabContentLibrary from "./components/tabContentLibrary";
 

@@ -206,6 +206,7 @@ function initInferenceJobsByCategoryMap(): Map<
     []
   );
   inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceDesignerTts, []);
+  inferenceJobsByCategory.set(FrontendInferenceJobType.VideoMotionCapture, []);
   return inferenceJobsByCategory;
 }
 
@@ -485,10 +486,8 @@ class App extends React.Component<Props, State> {
     frontendJobType: FrontendInferenceJobType
   ) => {
     const newJob = new InferenceJob(jobToken, frontendJobType);
-    let inferenceJobs = this.state.inferenceJobs.concat([newJob]);
-
     this.setState({
-      inferenceJobs: inferenceJobs,
+      inferenceJobs: [...this.state.inferenceJobs, newJob],
     });
   };
 
