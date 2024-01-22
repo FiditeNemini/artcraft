@@ -24,7 +24,11 @@ import Select from "components/common/Select";
 export default function SearchPage() {
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
   const [weightType, setWeightType] = useState<string>("all");
+  const [weightCategory, setWeightCategory] = useState<string>("all");
   const [searchCompleted, setSearchCompleted] = useState(0);
+  const [weightTypeOpts, setWeightTypeOpts] = useState([
+    { value: "all", label: "All Types" },
+  ]);
 
   const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -45,6 +49,10 @@ export default function SearchPage() {
         request["weight_type"] = weightType;
       }
 
+      if (weightCategory !== "all") {
+        request["weight_category"] = weightCategory;
+      }
+
       let response = await SearchWeights(request);
 
       if (response.success) {
@@ -55,7 +63,7 @@ export default function SearchPage() {
         setFoundWeights([]);
       }
     },
-    [setFoundWeights, weightType]
+    [setFoundWeights, weightType, weightCategory]
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,24 +83,6 @@ export default function SearchPage() {
     }
   }, [urlSearchTerm, debouncedDoSearch]);
 
-  // let selectedTags: any = [];
-  // let handleSelectTag = () => {};
-
-  // const tags = (
-  //   <div className="d-flex flex-column gap-3">
-  //     <ModelTags
-  //       tags={allTags}
-  //       selectedTags={selectedTags}
-  //       onSelectTag={handleSelectTag}
-  //     />
-  //   </div>
-  // );
-
-  // const sortOptions = [
-  //   { value: "most liked", label: "Most Liked" },
-  //   { value: "most used", label: "Most Used" },
-  //   { value: "moset recent", label: "Most Recent" },
-  // ];
   const languageOpts = [
     { value: "all", label: "All Languages" },
     { value: "english", label: "English" },
@@ -102,25 +92,62 @@ export default function SearchPage() {
 
   const weightCategoryOpts = [
     { value: "all", label: "All Categories" },
-    { value: "image_generation", label: "Image generation" },
-    { value: "text_to_speech", label: "Text to speech" },
+    { value: "image_generation", label: "Image Generation" },
+    { value: "text_to_speech", label: "Text to Speech" },
     { value: "vocoder", label: "Vocoder" },
-    { value: "voice_conversion", label: "Voice conversion" },
+    { value: "voice_conversion", label: "Voice Conversion" },
   ];
 
-  const weightTypeOpts = [
-    { value: "all", label: "All Types" },
-    { value: "hifigan_tt2", label: "HiFiGAN TT2" },
-    { value: "sd_1.5", label: "SD 1.5" },
-    { value: "sdxl", label: "SDXL" },
-    { value: "so_vits_svc", label: "SVC" },
-    { value: "rvc_v2", label: "RVC v2" },
-    { value: "tt2", label: "TT2" },
-    { value: "loRA", label: "LoRA" },
-  ];
+  const updateWeightTypeOpts = useCallback(category => {
+    switch (category) {
+      case "image_generation":
+        setWeightTypeOpts([
+          { value: "all", label: "All Types" },
+          { value: "sd_1.5", label: "SD 1.5" },
+          { value: "sdxl", label: "SDXL" },
+          { value: "loRA", label: "LoRA" },
+        ]);
+        break;
+      case "text_to_speech":
+        setWeightTypeOpts([
+          { value: "all", label: "All Types" },
+          { value: "tt2", label: "TT2" },
+          { value: "hifigan_tt2", label: "HiFiGAN TT2" },
+        ]);
+        break;
+      case "voice_conversion":
+        setWeightTypeOpts([
+          { value: "all", label: "All Types" },
+          { value: "so_vits_svc", label: "SVC" },
+          { value: "rvc_v2", label: "RVC v2" },
+        ]);
+        break;
+      default:
+        setWeightTypeOpts([
+          { value: "all", label: "All Types" },
+          { value: "hifigan_tt2", label: "HiFiGAN TT2" },
+          { value: "sd_1.5", label: "SD 1.5" },
+          { value: "sdxl", label: "SDXL" },
+          { value: "so_vits_svc", label: "SVC" },
+          { value: "rvc_v2", label: "RVC v2" },
+          { value: "tt2", label: "TT2" },
+          { value: "loRA", label: "LoRA" },
+        ]);
+    }
+  }, []);
+
+  // Update weight type options when weight category changes
+  useEffect(() => {
+    updateWeightTypeOpts(weightCategory);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weightCategory]);
 
   const weightTypeValue =
     weightTypeOpts.find(el => el.value === weightType) || weightTypeOpts[0];
+
+  const weightCategoryValue =
+    weightCategoryOpts.find(el => el.value === weightCategory) ||
+    weightCategoryOpts[0];
 
   return (
     <Container type="panel" className="mb-5">
@@ -145,7 +172,11 @@ export default function SearchPage() {
               icon: faTag,
               options: weightCategoryOpts,
               name: "weightCategory",
+              value: weightCategoryValue,
               defaultValue: weightCategoryOpts[0],
+              onChange: args => {
+                setWeightCategory(args.value);
+              },
             }}
           />
           <Select
@@ -157,7 +188,6 @@ export default function SearchPage() {
               value: weightTypeValue,
               onChange: args => {
                 setWeightType(args.value);
-                console.log(args.value);
               },
             }}
           />
