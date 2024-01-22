@@ -1,3 +1,4 @@
+use crate::remote_file_manager::media_descriptor;
 use crate::remote_file_manager::weights_descriptor::{self};
 use super::file_descriptor::FileDescriptor;
 
@@ -28,6 +29,7 @@ impl RemoteCloudBucketDetails {
 
     pub fn file_descriptor_from_bucket_details(&self) -> Box<dyn FileDescriptor> {
         match self.prefix.as_str() {
+            // Weights
             "loRA" => Box::new(weights_descriptor::WeightsLoRADescriptor {}),
             "sd15" => Box::new(weights_descriptor::WeightsSD15Descriptor {}),
             "sdxl" => Box::new(weights_descriptor::WeightsSDXLDescriptor {}),
@@ -41,6 +43,19 @@ impl RemoteCloudBucketDetails {
             },
             "svc" => Box::new(weights_descriptor::WeightsSVCDescriptor {}),
             "workflow" => Box::new(weights_descriptor::WeightsWorkflowDescriptor {}),
+            // Media
+            "image" => {
+                match self.suffix.as_str() {
+                    "png" => Box::new(media_descriptor::MediaImagePngDescriptor {}),
+                    _ => panic!("Unknown suffix: {}",self.suffix)
+                }
+            },
+            "video" => {
+                match self.suffix.as_str() {
+                    "mp4" => Box::new(media_descriptor::MediaVideoMp4Descriptor {}),
+                    _ => panic!("Unknown suffix: {}",self.suffix)
+                }
+            },
             _ => panic!("Unknown prefix: {}", self.prefix)
         }
     }
