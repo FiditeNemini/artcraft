@@ -5,13 +5,15 @@ import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadM
 import { EnqueueVideoMotionCapture } from "@storyteller/components/src/api/video_mocap";
 import { useFile } from "hooks";
 
+import { Spinner } from "components/common";
 import VideoInput from "components/common/VideoInput";
 
 export default function TabContentUpload(props: {
   t: Function;
   pageStateCallback: (data: {
-    tokenType: string;
-    token: string | undefined;
+    nextState: number;
+    tokenType?: string;
+    token?: string | undefined;
   }) => void;
 }) {
   const { t, pageStateCallback } = props;
@@ -43,6 +45,11 @@ export default function TabContentUpload(props: {
       }
     });
   };
+  useEffect(()=>{
+    if(tabState === FILE_UPLOADING){
+      pageStateCallback({nextState:1});
+    }
+  }, [tabState])
   useEffect(() => {
     if (token !== "") setTabState(FILE_UPLOADED);
   }, [token, FILE_UPLOADED]);
@@ -54,6 +61,7 @@ export default function TabContentUpload(props: {
     };
     EnqueueVideoMotionCapture(request).then(res => {
       pageStateCallback({
+        nextState: 2,
         tokenType: "jobToken",
         token: res.inference_job_token,
       });
@@ -98,6 +106,7 @@ export default function TabContentUpload(props: {
         <div className="row">
           <div className="col-12">
             <h2>{t("tab.message.fileUploading")}</h2>
+            <Spinner />
           </div>
         </div>
       </div>
@@ -123,6 +132,7 @@ export default function TabContentUpload(props: {
         <div className="row">
           <div className="col-12">
             <h2>{t("tab.message.mocapNetRequesting")}</h2>
+            <Spinner />
           </div>
         </div>
       </div>

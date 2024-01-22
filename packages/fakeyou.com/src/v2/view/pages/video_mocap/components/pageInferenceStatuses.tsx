@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
 import { Analytics } from "common/Analytics";
 import InferenceJobsList from "components/layout/InferenceJobsList";
@@ -7,26 +7,9 @@ import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/Infer
 export function PageInferenceStatuses (props:{
   t: Function,
   pageStates: Object,
-  pageState: {
-    index:number,
-    inputMediaToken: string,
-    jobToken: string,
-    resultMediaToken: string
-  },
-  enqueueInferenceJob: (
-    jobToken: string,
-    frontendInferenceJobType: FrontendInferenceJobType
-  ) => void,
-  pageStateCallback: (data:{tokenType:string, token:string | undefined}) => void
+  pageStateCallback: (data:{nextState:number, token?:string}) => void
 }){
-  const { t, pageState, enqueueInferenceJob } = props;
-  useEffect(()=>{
-    console.log("ENQUEUE INFERENCE JOB>>")
-    enqueueInferenceJob(
-      props.pageState.jobToken,
-      FrontendInferenceJobType.VideoMotionCapture
-    );
-  }, [props.pageState.jobToken, enqueueInferenceJob])
+  const { t } = props;
 
   const failures = (fail = "") => {
     switch (fail) {
@@ -38,15 +21,14 @@ export function PageInferenceStatuses (props:{
   };
 
   return(
-    <>
+    <div className="p3">
       <h2>{t("tab.message.mocapNetRequestSucceed")}</h2>
-      <h4>Job Token: {pageState.jobToken}</h4>
       
       <InferenceJobsList {...{
         failures,
         onSelect: () => Analytics.voiceConversionClickDownload(),
         jobType: FrontendInferenceJobType.VideoMotionCapture,
       }}/>
-    </>
+    </div>
   )
 }

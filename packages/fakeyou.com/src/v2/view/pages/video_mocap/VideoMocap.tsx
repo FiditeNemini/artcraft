@@ -28,35 +28,29 @@ export default function VideoMotionCapture(props: {
   const { enqueueInferenceJob } = props;
   const { t } = useLocalize("VideoMotionCapture");
   enum pageStates {
-    VIDEO_PROVISION,
+    START,
+    VIDEO_PROVISIONING,
     SHOW_JOB_STATUS,
   }
-  const { VIDEO_PROVISION, SHOW_JOB_STATUS } = pageStates;
-  const [pageState, setPageState] = useState<{
-    index: number;
-    inputMediaToken: string;
-    jobToken: string;
-    resultMediaToken: string;
-  }>({
-    index: VIDEO_PROVISION,
-    inputMediaToken: "",
-    jobToken: "",
-    resultMediaToken: "",
-  });
+  const { START, VIDEO_PROVISIONING, SHOW_JOB_STATUS } = pageStates;
+  const [pageState, setPageState] = useState<number>(START);
 
   const handlePageState = ({
-    tokenType,
+    nextState,
     token,
   }: {
-    tokenType: string;
-    token: string | undefined;
+    nextState: number;
+    token?: string;
   }) => {
-    if (token && tokenType === "jobToken") {
-      setPageState({
-        ...pageState,
-        index: SHOW_JOB_STATUS,
-        jobToken: token,
-      });
+    if(nextState===VIDEO_PROVISIONING){
+      setPageState(VIDEO_PROVISIONING)
+    }
+    else if (nextState===SHOW_JOB_STATUS && token) {
+      enqueueInferenceJob(
+        token,
+        FrontendInferenceJobType.VideoMotionCapture
+      );
+      setPageState(SHOW_JOB_STATUS);
     }
   };
 
@@ -91,14 +85,14 @@ export default function VideoMotionCapture(props: {
         <div className="row g-0">
           {/*Video Provision Tabs & Job Statuses*/}
           <div className="col-12 col-md-6">
-            {pageState.index === VIDEO_PROVISION && <Tabs tabs={tabs} />}
-            {pageState.index === SHOW_JOB_STATUS && (
+            {pageState !== SHOW_JOB_STATUS && 
+              <Tabs tabs={tabs} disabled={pageState === VIDEO_PROVISIONING}/>
+            }
+            {pageState === SHOW_JOB_STATUS && (
               <PageInferenceStatuses
                 {...{
                   t,
-                  enqueueInferenceJob,
                   pageStates,
-                  pageState,
                   pageStateCallback: handlePageState,
                 }}
               />
