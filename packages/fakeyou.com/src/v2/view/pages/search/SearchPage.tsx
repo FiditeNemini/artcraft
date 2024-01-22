@@ -261,7 +261,7 @@ export default function SearchPage() {
         panel={false}
       />
       <Panel padding={true}>
-        <div className="d-flex gap-2 mb-3">
+        <div className="d-flex gap-2 mb-3 flex-wrap">
           <Select
             {...{
               icon: faLanguage,
