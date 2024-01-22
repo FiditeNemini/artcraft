@@ -54,22 +54,6 @@ export default function FileDetails({
               .toUpperCase()} file size: ${fileSize}`}
           </span>
         </div>
-        {/* {!hideClearDetails && (
-          <button
-            className="
-            upload-details-clear
-            btn btn-destructive
-            align-items-center
-            justify-content-center
-          "
-            onClick={e => {
-              e.preventDefault();
-              if (clear) clear();
-            }}
-          >
-            <Icon icon={faTrash} />
-          </button>
-        )} */}
       </div>
       {!hideClearDetails && (
         <button
