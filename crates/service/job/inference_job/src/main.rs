@@ -22,7 +22,10 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use log::{info, warn};
-use opentelemetry::metrics;
+use opentelemetry::{KeyValue};
+use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_sdk::metrics::reader::{DefaultAggregationSelector, DefaultTemporalitySelector};
+use opentelemetry_sdk::Resource;
 use r2d2_redis::r2d2;
 use r2d2_redis::RedisConnectionManager;
 use sqlx::mysql::MySqlPoolOptions;
@@ -75,10 +78,24 @@ const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &str = "TTS_INFERENCE_SIDECAR_HOSTNAME
 
 const OTEL_METER_NAME: &str = "inference-job";
 
+// TODO@madhukar93: labels for model etc
+fn init_otel_metrics_pipeline() {
+ opentelemetry_otlp::new_pipeline()
+     .metrics(opentelemetry_sdk::runtime::Tokio)
+     .with_exporter(opentelemetry_otlp::new_exporter().tonic().with_endpoint("adot-collector.adot-collector-kubeprometheus"))
+     .with_resource(Resource::new(vec![KeyValue::new("service.name", "inference-job")]))
+     .with_period(Duration::from_secs(3))
+     .with_timeout(Duration::from_secs(10))
+     .with_aggregation_selector(DefaultAggregationSelector::new())
+     .with_temporality_selector(DefaultTemporalitySelector::new())
+     .build().unwrap();
+}
+
 //#[tokio::main]
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {
 
+  init_otel_metrics_pipeline();
   let container_environment = bootstrap(BootstrapArgs {
     app_name: "inference-job",
     default_logging_override: Some(DEFAULT_RUST_LOG),
