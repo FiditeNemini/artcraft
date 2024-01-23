@@ -119,16 +119,12 @@ pub async fn process_job_inference(
         }
     };
 
-    let creator_user_token:UserToken;
-    match &job.maybe_creator_user_token {
-        Some(token) => {
-            creator_user_token = UserToken::new_from_str(token);
-        },
+    let creator_user_token = match &job.maybe_creator_user_token {
+        Some(token) => UserToken::new_from_str(token),
         None => {
             return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")));
         }
-    }
-
+    };
 
     let _job_progress_reporter = args.job_dependencies.clients.job_progress_reporter
         .new_generic_inference(job.inference_job_token.as_str())

@@ -54,12 +54,6 @@ pub struct ModelWeightForLegacyTtsInference {
     // Joined custom vocoder fields
     pub maybe_custom_vocoder: Option<CustomVocoderFields>,
 
-    //// Joined custom vocoder fields
-    //pub maybe_custom_vocoder_token: Option<String>,
-    //pub maybe_custom_vocoder_type: Option<VocoderType>,
-    //pub maybe_custom_vocoder_title: Option<String>,
-    //pub maybe_custom_vocoder_private_bucket_hash: Option<String>,
-
     pub use_default_mel_multiply_factor: bool,
     pub maybe_custom_mel_multiply_factor: Option<f64>,
 
@@ -78,9 +72,9 @@ pub async fn get_weight_for_legacy_tts_inference(
         .await
         .map_err(|err| {
             error!("Error acquiring db connection from pool: {:?}", err);
-            return TtsModelForInferenceError::DatabaseError {
+            TtsModelForInferenceError::DatabaseError {
                 reason: format!("Mysql connection error: {:?}", err)
-            };
+            }
         })?;
 
     get_weight_for_legacy_tts_inference_with_connection(weight_token, &mut connection).await
@@ -140,10 +134,6 @@ pub async fn get_weight_for_legacy_tts_inference_with_connection(
         maybe_ietf_primary_language_subtag: record.maybe_ietf_primary_language_subtag,
         maybe_default_pretrained_vocoder: record.maybe_default_pretrained_vocoder,
         maybe_text_pipeline_type: record.maybe_text_pipeline_type,
-        //maybe_custom_vocoder_token: record.maybe_custom_vocoder_token,
-        //maybe_custom_vocoder_type: record.maybe_custom_vocoder_type,
-        //maybe_custom_vocoder_title: record.maybe_custom_vocoder_title,
-        //maybe_custom_vocoder_private_bucket_hash: record.maybe_custom_vocoder_private_bucket_hash,
         maybe_custom_vocoder: match record.maybe_custom_vocoder_token {
             // NB: We're relying on a single field's presence to infer that the others vocoder fields
             // are also there. If for some reason they aren't, fail open.
