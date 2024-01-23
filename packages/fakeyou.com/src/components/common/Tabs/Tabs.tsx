@@ -4,7 +4,6 @@ import { useSpring, a } from "@react-spring/web";
 import "./Tabs.scss";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import makeClass from "resources/makeClass";
 
 interface TabProps {
   to: string;
