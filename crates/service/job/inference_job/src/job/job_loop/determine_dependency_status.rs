@@ -6,6 +6,7 @@ use log::{info, warn};
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use filesys::file_exists::file_exists;
+use migration::text_to_speech::get_tts_model_for_run_inference_migration::{get_tts_model_for_run_inference_migration, TtsModelForRunInferenceMigration};
 use migration::voice_conversion::query_vc_model_for_migration::{query_vc_model_for_migration, VcModel, VcModelError, VcModelType};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::{get_tts_model_for_inference_improved, TtsModelForInferenceError, TtsModelForInferenceRecord};
@@ -27,7 +28,7 @@ pub struct DependencyStatus {
 
 pub enum MaybeInferenceModel {
   None,
-  TtsModel(TtsModelForInferenceRecord),
+  TtsModel(TtsModelForRunInferenceMigration),
   VcModel(VcModel)
 }
 
@@ -64,13 +65,13 @@ fn get_model_token_and_path(job_dependencies: &JobDependencies, maybe_model: &Ma
   // TODO(bt,2023-05-01): Also check other paths (user-supplied vocoders, etc.)
   let maybe_filesystem_path = match maybe_model {
     MaybeInferenceModel::TtsModel(ref model) => {
-      match model.tts_model_type {
+      match model.tts_model_type() {
         TtsModelType::Tacotron2 => {
-          maybe_model_token = Some(model.model_token.to_string());
+          maybe_model_token = Some(model.token().to_string());
           Some(job_dependencies
               .fs
               .semi_persistent_cache
-              .tts_synthesizer_model_path(model.model_token.as_str()))
+              .tts_synthesizer_model_path(model.token()))
         }
         TtsModelType::Vits => {
           None
@@ -123,8 +124,8 @@ async fn get_model_record_from_cacheable_query(job_dependencies: &JobDependencie
       match maybe_model {
         Some(model) => MaybeInferenceModel::TtsModel(model),
         None => {
-          let maybe_tts_model = get_tts_model_for_inference_improved(
-            &job_dependencies.db.mysql_pool, token)
+          let maybe_tts_model = get_tts_model_for_run_inference_migration(
+            token, &job_dependencies.db.mysql_pool)
               .await
               .map_err(|err| match err {
                 TtsModelForInferenceError::ModelDeleted => ProcessSingleJobError::ModelDeleted,

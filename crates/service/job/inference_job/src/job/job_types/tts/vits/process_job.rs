@@ -13,9 +13,9 @@ use filesys::check_file_exists::check_file_exists;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
+use migration::text_to_speech::get_tts_model_for_run_inference_migration::TtsModelForRunInferenceMigration;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
 use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_result, JobType};
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
@@ -32,7 +32,7 @@ const TEST_REQUEST_TEXT: &str = "This is a test request.";
 pub struct VitsProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
   pub job: &'a AvailableInferenceJob,
-  pub tts_model: &'a TtsModelForInferenceRecord,
+  pub tts_model: &'a TtsModelForRunInferenceMigration,
   pub raw_inference_text: &'a str,
 }
 
@@ -63,12 +63,12 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
   // ==================== CONFIRM OR DOWNLOAD VITS SYNTHESIZER MODEL ==================== //
 
   let vits_traced_synthesizer_fs_path = {
-    let vits_traced_synthesizer_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_synthesizer_model_path(tts_model.model_token.as_str());
+    let vits_traced_synthesizer_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_synthesizer_model_path(tts_model.token());
 
     // NB: We're using traced models, not the original model files.
     // We generate these at time of upload from the original model files.
     // In the future we may need to "repair" broken models.
-    let vits_traced_synthesizer_object_path  = args.job_dependencies.buckets.bucket_path_unifier.tts_traced_synthesizer_path(&tts_model.private_bucket_hash);
+    let vits_traced_synthesizer_object_path  = tts_model.vits_traced_synthesizer_object_path(&args.job_dependencies.buckets.bucket_path_unifier);
 
     maybe_download_file_from_bucket(MaybeDownloadArgs {
       name_or_description_of_file: "vits traced tts model",
@@ -233,7 +233,7 @@ pub async fn process_job(args: VitsProcessJobArgs<'_>) -> Result<JobSuccessResul
 
   args.job_dependencies.clients.firehose_publisher.tts_inference_finished(
     job.maybe_creator_user_token.as_deref(),
-    tts_model.model_token.as_str(),
+    tts_model.token(),
     &inference_result_token)
       .await
       .map_err(|e| {
