@@ -15,7 +15,7 @@ pub async fn get_tts_model_for_enqueue_inference_migration(
   mysql_connection: &mut PoolConnection<MySql>,
   can_see_deleted: bool,
   use_weights_table: bool,
-) -> AnyhowResult<Option<TtsModelForEnqueueInferenceMigration>> {
+) -> AnyhowResult<Option<TtsModelForEnqueueInferenceMigrationWrapper>> {
   // NB: This is temporary migration code as we switch from the `tts_models` table to the `model_weights` table.
   if use_weights_table {
     let token = ModelWeightToken::new_from_str(token);
@@ -26,7 +26,7 @@ pub async fn get_tts_model_for_enqueue_inference_migration(
       mysql_connection
     ).await?;
 
-    Ok(maybe_model.map(|model| TtsModelForEnqueueInferenceMigration::ModelWeight(model)))
+    Ok(maybe_model.map(|model| TtsModelForEnqueueInferenceMigrationWrapper::ModelWeight(model)))
 
   } else {
 
@@ -36,21 +36,21 @@ pub async fn get_tts_model_for_enqueue_inference_migration(
       mysql_connection
     ).await?;
 
-    Ok(maybe_model.map(|model| TtsModelForEnqueueInferenceMigration::LegacyTts(model)))
+    Ok(maybe_model.map(|model| TtsModelForEnqueueInferenceMigrationWrapper::LegacyTts(model)))
   }
 }
 
 /// Union over the legacy table and the new table to support an easier migration.
 /// This enum can hold a record of either type and present a unified accessor interface.
 #[derive(Clone, Serialize, Deserialize)]
-pub enum TtsModelForEnqueueInferenceMigration {
+pub enum TtsModelForEnqueueInferenceMigrationWrapper {
   /// Old type from the `tts_models` table, on the way out
   LegacyTts(TtsModelRecord),
   /// New type, replacing the `tts_models` table.
   ModelWeight(ModelWeightForLegacyTtsEnqueue),
 }
 
-impl TtsModelForEnqueueInferenceMigration {
+impl TtsModelForEnqueueInferenceMigrationWrapper {
   pub fn token(&self) -> &str {
     match self {
       Self::LegacyTts(ref model) => model.model_token.as_str(),

@@ -13,7 +13,7 @@ use filesys::check_file_exists::check_file_exists;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_string::sha256_hash_string;
-use migration::text_to_speech::get_tts_model_for_run_inference_migration::TtsModelForRunInferenceMigration;
+use migration::text_to_speech::get_tts_model_for_run_inference_migration::TtsModelForRunInferenceMigrationWrapper;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::tts::tts_results::insert_tts_result::{insert_tts_result, JobType};
@@ -32,7 +32,7 @@ const TEST_REQUEST_TEXT: &str = "This is a test request.";
 pub struct VitsProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
   pub job: &'a AvailableInferenceJob,
-  pub tts_model: &'a TtsModelForRunInferenceMigration,
+  pub tts_model: &'a TtsModelForRunInferenceMigrationWrapper,
   pub raw_inference_text: &'a str,
 }
 

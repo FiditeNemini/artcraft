@@ -20,7 +20,7 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_api_token::get_request_api_token;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
-use migration::text_to_speech::get_tts_model_for_enqueue_inference_migration::TtsModelForEnqueueInferenceMigration;
+use migration::text_to_speech::get_tts_model_for_enqueue_inference_migration::TtsModelForEnqueueInferenceMigrationWrapper;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
@@ -553,7 +553,7 @@ pub fn validate_inference_text(text: &str, plan: &Plan) -> Result<(), String> {
 /// This is designed to fail closed (read: actually open!) rather than hit resources.
 async fn check_if_authorized_to_use_model(
   maybe_user_session: Option<&UserSessionExtended>,
-  tts_model: &TtsModelForEnqueueInferenceMigration,
+  tts_model: &TtsModelForEnqueueInferenceMigrationWrapper,
 ) -> bool {
 
   match tts_model.creator_set_visibility() {

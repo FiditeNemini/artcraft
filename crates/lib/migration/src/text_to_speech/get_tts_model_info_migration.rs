@@ -18,7 +18,7 @@ pub async fn get_tts_model_info_migration(
   mysql_connection: &mut PoolConnection<MySql>,
   can_see_deleted: bool,
   use_weights_table: bool,
-) -> AnyhowResult<Option<TtsModelInfoMigration>> {
+) -> AnyhowResult<Option<TtsModelInfoMigrationWrapper>> {
   // NB: This is temporary migration code as we switch from the `tts_models` table to the `model_weights` table.
   if use_weights_table {
     let token = ModelWeightToken::new_from_str(token);
@@ -29,7 +29,7 @@ pub async fn get_tts_model_info_migration(
       mysql_connection
     ).await?;
 
-    Ok(maybe_model.map(|model| TtsModelInfoMigration::ModelWeight(model)))
+    Ok(maybe_model.map(|model| TtsModelInfoMigrationWrapper::ModelWeight(model)))
 
   } else {
     let maybe_model = get_tts_model_by_token_using_connection(
@@ -38,21 +38,21 @@ pub async fn get_tts_model_info_migration(
       mysql_connection
     ).await?;
 
-    Ok(maybe_model.map(|model| TtsModelInfoMigration::LegacyTts(model)))
+    Ok(maybe_model.map(|model| TtsModelInfoMigrationWrapper::LegacyTts(model)))
   }
 }
 
 /// Union over the legacy table and the new table to support an easier migration.
 /// This enum can hold a record of either type and present a unified accessor interface.
 #[derive(Clone, Serialize, Deserialize)]
-pub enum TtsModelInfoMigration {
+pub enum TtsModelInfoMigrationWrapper {
   /// Old type from the `tts_models` table, on the way out
   LegacyTts(TtsModelRecord),
   /// New type, replacing the `tts_models` table.
   ModelWeight(ModelWeightForLegacyTtsInfo),
 }
 
-impl TtsModelInfoMigration {
+impl TtsModelInfoMigrationWrapper {
   pub fn token(&self) -> &str {
     match self {
       Self::LegacyTts(ref model) => model.model_token.as_str(),

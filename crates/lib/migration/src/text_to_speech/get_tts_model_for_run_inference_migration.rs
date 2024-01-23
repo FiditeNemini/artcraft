@@ -16,7 +16,7 @@ use tokens::tokens::users::UserToken;
 pub async fn get_tts_model_for_run_inference_migration(
   tts_model_token: &str,
   mysql_pool: &MySqlPool,
-) -> Result<Option<TtsModelForRunInferenceMigration>, TtsModelForInferenceError> {
+) -> Result<Option<TtsModelForRunInferenceMigrationWrapper>, TtsModelForInferenceError> {
   // NB: This is temporary migration code as we switch from the `tts_models` table to the `model_weights` table.
   if tts_model_token.starts_with(ModelWeightToken::token_prefix()) {
     let token = ModelWeightToken::new_from_str(tts_model_token);
@@ -26,7 +26,7 @@ pub async fn get_tts_model_for_run_inference_migration(
       mysql_pool
     ).await?;
 
-    Ok(maybe_model.map(|model| TtsModelForRunInferenceMigration::ModelWeight(model)))
+    Ok(maybe_model.map(|model| TtsModelForRunInferenceMigrationWrapper::ModelWeight(model)))
   } else {
 
     let maybe_model = get_tts_model_for_inference_improved(
@@ -34,7 +34,7 @@ pub async fn get_tts_model_for_run_inference_migration(
       &tts_model_token,
     ).await?;
 
-    Ok(maybe_model.map(|model| TtsModelForRunInferenceMigration::LegacyTts(model)))
+    Ok(maybe_model.map(|model| TtsModelForRunInferenceMigrationWrapper::LegacyTts(model)))
   }
 }
 
@@ -42,14 +42,14 @@ pub async fn get_tts_model_for_run_inference_migration(
 /// Union over the legacy table and the new table to support an easier migration.
 /// This enum can hold a record of either type and present a unified accessor interface.
 #[derive(Clone)]
-pub enum TtsModelForRunInferenceMigration {
+pub enum TtsModelForRunInferenceMigrationWrapper {
   /// Old type from the `tts_models` table, on the way out
   LegacyTts(TtsModelForInferenceRecord),
   /// New type, replacing the `tts_models` table.
   ModelWeight(ModelWeightForLegacyTtsInference),
 }
 
-impl TtsModelForRunInferenceMigration {
+impl TtsModelForRunInferenceMigrationWrapper {
   pub fn token(&self) -> &str {
     match self {
       Self::LegacyTts(ref model) => model.model_token.as_str(),

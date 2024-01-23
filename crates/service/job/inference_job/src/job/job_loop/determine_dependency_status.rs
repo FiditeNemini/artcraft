@@ -6,7 +6,7 @@ use log::{info, warn};
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use filesys::file_exists::file_exists;
-use migration::text_to_speech::get_tts_model_for_run_inference_migration::{get_tts_model_for_run_inference_migration, TtsModelForRunInferenceMigration};
+use migration::text_to_speech::get_tts_model_for_run_inference_migration::{get_tts_model_for_run_inference_migration, TtsModelForRunInferenceMigrationWrapper};
 use migration::voice_conversion::query_vc_model_for_migration::{query_vc_model_for_migration, VcModel, VcModelError, VcModelType};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::{get_tts_model_for_inference_improved, TtsModelForInferenceError, TtsModelForInferenceRecord};
@@ -28,7 +28,7 @@ pub struct DependencyStatus {
 
 pub enum MaybeInferenceModel {
   None,
-  TtsModel(TtsModelForRunInferenceMigration),
+  TtsModel(TtsModelForRunInferenceMigrationWrapper),
   VcModel(VcModel)
 }
 
