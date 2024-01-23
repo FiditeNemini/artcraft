@@ -11,10 +11,12 @@ interface TabProps {
   content?: React.ReactNode;
   icon?: IconDefinition;
   padding?: boolean;
+  disabled?:boolean;
 }
 
 interface TabsProps {
   tabs: TabProps[];
+  disabled?: boolean;
 }
 
 interface TabContentProps {
@@ -22,12 +24,12 @@ interface TabContentProps {
   padding?: boolean;
 }
 
-function Tab({ to, label, icon, onClick }: TabProps & { onClick: () => void }) {
+function Tab({ to, label, icon, onClick, disabled }: TabProps & { onClick: () => void }) {
   return (
     <li className="nav-item">
       <NavLink
         to={to}
-        className="nav-link fs-6 px-3 px-lg-4"
+        className={"nav-link fs-6 px-3 px-lg-4" + (disabled?" disabled":"")}
         activeClassName="active"
         onClick={onClick}
       >
@@ -43,7 +45,7 @@ function TabContent({ children, padding }: TabContentProps) {
   return <div className={`tab-content ${paddingClasses}`}>{children}</div>;
 }
 
-function Tabs({ tabs }: TabsProps) {
+function Tabs({ tabs, disabled }: TabsProps) {
   const location = useLocation();
   const currentPath = location.pathname;
   const initialTab = tabs.find(tab => tab.to === currentPath) || tabs[0];
@@ -83,6 +85,7 @@ function Tabs({ tabs }: TabsProps) {
             label={tab.label}
             onClick={() => handleTabClick(tab.to)}
             icon={tab.icon}
+            disabled={disabled || tab.disabled}
           />
         ))}
       </ul>

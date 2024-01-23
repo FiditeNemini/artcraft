@@ -18,19 +18,26 @@ export default function InferenceJobsList({ failures, jobType, onSelect }: JobsL
   // let height = 0;
   // const transitions = useTransition(inferenceJobs,{ not right now });
 
-  return inferenceJobs.length ? <div {...{ className: "face-animator-jobs panel" }}>
-    <h5>{ t("core.heading") }</h5>
-    { 
-      inferenceJobs.map((job: InferenceJob, key: number) =>
-        <JobItem {...{
-          failures,
-          jobStatusDescription,
-          jobType,
-          key,
-          onSelect,
-          t,
-          // refSet: (ref: any) => console.log(ref),
-          ...job }} />).reverse()
-    }
-  </div> : null;
+  if (inferenceJobs.length){
+    return(
+      <div className="face-animator-jobs panel">
+        <h5>{ t("core.heading") }</h5>
+        { 
+          inferenceJobs.map((job: InferenceJob, key: number) =>
+            <JobItem {...{
+              failures,
+              jobStatusDescription,
+              jobType,
+              key,
+              onSelect,
+              t,
+              ...job }} />).reverse()
+        }
+      </div>
+    )
+  }
+  else{
+    return null;
+  }
+
 };
