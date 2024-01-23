@@ -15,13 +15,18 @@ use cloud_storage::remote_file_manager::media_descriptor::MediaImagePngDescripto
 use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
+
 use filesys::path_to_string::path_to_string;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
-use mysql_queries::queries::batch_generations::insert_batch_generation_records::{InsertBatchArgs, self};
+use mysql_queries::queries::batch_generations::insert_batch_generation_records::{
+    InsertBatchArgs,
+    self,
+};
 use mysql_queries::queries::batch_generations::insert_batch_generation_records::insert_batch_generation_records;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_file_upload::{
@@ -30,10 +35,8 @@ use mysql_queries::queries::media_files::create::insert_media_file_from_file_upl
     UploadType,
 };
 
-
 use mysql_queries::queries::media_files::create::insert_media_file_generic::insert_media_file_generic;
 use mysql_queries::queries::media_files::create::insert_media_file_generic::InsertArgs;
-
 
 use mysql_queries::queries::model_categories::create_category;
 use mysql_queries::queries::model_weights::create::create_weight::{
@@ -51,6 +54,20 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::image_generation::sd::sd_inference_command::InferenceArgs;
 use crate::job_dependencies::JobDependencies;
 
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
+pub struct InferenceValues {
+    pub prompt: String,
+    pub cfg_scale: u32,
+    pub negative_prompt: Option<String>,
+    pub lora_model_weight_token: Option<String>,
+    pub lora_name: Option<String>,
+    pub sampler: String,
+    pub width: u32,
+    pub height: u32,
+    pub seed: i64,
+    pub number_of_samples:u32,
+}
+
 pub struct StableDiffusionProcessArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
     pub job: &'a AvailableInferenceJob,
@@ -63,7 +80,11 @@ pub async fn sd_args_from_job(
 ) -> Result<StableDiffusionArgs, ProcessSingleJobError> {
     let inference_args = args.job.maybe_inference_args
         .as_ref()
-        .map(|args: &mysql_queries::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs| args.args.as_ref())
+        .map(
+            |
+                args: &mysql_queries::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs
+            | args.args.as_ref()
+        )
         .flatten();
     let polymorphic_args = match inference_args {
         Some(args) => args,
@@ -111,21 +132,6 @@ pub async fn process_job_model(
         inference_duration: Duration::from_secs(0),
     })
 }
-
-// let pool = setup().await;
-
-// let mut transaction = pool.begin().await.unwrap();
-
-// let entries = vec![
-//   BatchGenerationEntity::MediaFile(MediaFileToken::new_from_str("media_foo")),
-//   BatchGenerationEntity::MediaFile(MediaFileToken::new_from_str("media_bar")),
-//   BatchGenerationEntity::MediaFile(MediaFileToken::new_from_str("media_baz")),
-// ];
-
-// let r = insert_batch_generation_records(InsertBatchArgs {
-//   entries,
-//   transaction: &mut transaction,
-// }).await;
 
 pub async fn process_job_lora(
     args: &StableDiffusionProcessArgs<'_>
@@ -247,7 +253,6 @@ pub async fn process_inference(
 pub async fn process_job_inference(
     args: &StableDiffusionProcessArgs<'_>
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
-
     let job = args.job;
     let deps = args.job_dependencies;
     let mysql_pool = &deps.db.mysql_pool;
@@ -341,11 +346,14 @@ pub async fn process_job_inference(
     // ignore if no lora token
     let retrieved_loRA_record = match lora_token {
         Some(token) => {
+
             let retrieved_loRA_record = get_weight_by_token(
                 &token,
                 false,
                 &deps.db.mysql_pool
             ).await?;
+            
+            
             Some(retrieved_loRA_record)
         }
         None => None,
@@ -359,11 +367,14 @@ pub async fn process_job_inference(
         retrieved_sd_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
         retrieved_sd_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
     );
-    
+
     remote_cloud_file_client.download_file(
         details,
         path_to_string(sd_checkpoint_path.clone())
     ).await?;
+
+    let mut lora_name=String::from("");
+    let mut lora_token=String::from("");
 
     match retrieved_loRA_record {
         Some(record) => {
@@ -378,6 +389,9 @@ pub async fn process_job_inference(
                             .clone()
                             .unwrap_or_else(|| "".to_string())
                     );
+
+                    lora_name = model_weight_record.title;
+                    lora_token = model_weight_record.token.to_string();
                     remote_cloud_file_client.download_file(
                         lora_details,
                         path_to_string(lora_path.clone())
@@ -436,10 +450,10 @@ pub async fn process_job_inference(
         work_dir: work_temp_dir.path().to_path_buf(),
         output_file: output_path.clone(),
         stderr_output_file,
-        prompt,
-        negative_prompt: sd_args.maybe_n_prompt.unwrap_or_default(),
+        prompt: prompt.clone(),
+        negative_prompt: sd_args.maybe_n_prompt.clone().unwrap_or_default(),
         number_of_samples,
-        samplers: sd_args.maybe_sampler.unwrap_or(String::from("Euler a")),
+        samplers: sd_args.maybe_sampler.clone().unwrap_or(String::from("Euler a")),
         width: sd_args.maybe_width.unwrap_or(512),
         height: sd_args.maybe_height.unwrap_or(512),
         cfg_scale: sd_args.maybe_cfg_scale.unwrap_or(7),
@@ -459,7 +473,7 @@ pub async fn process_job_inference(
 
     for i in 0..sd_args.maybe_batch_count.unwrap_or(1) {
         let path = output_path.clone();
-        
+
         let file_path = format!("{}_{}.png", path_to_string(path), i);
 
         println!("Upload File Path:{}", file_path);
@@ -477,13 +491,26 @@ pub async fn process_job_inference(
                 );
             }
         };
-       
+        
+        let inputs = InferenceValues {
+            prompt: prompt.clone(),
+            cfg_scale: sd_args.maybe_cfg_scale.unwrap_or(7),
+            negative_prompt: sd_args.maybe_n_prompt,
+            lora_model_weight_token: Some(lora_token),
+            lora_name:Some(lora_name),
+            sampler: sd_args.maybe_sampler.unwrap_or(String::from("Euler a")),
+            width: sd_args.maybe_width.unwrap_or(512),
+            height: sd_args.maybe_height.unwrap_or(512),
+            seed: sd_args.maybe_seed.unwrap_or(1),
+            number_of_samples: number_of_samples,
+        };
+
         // extra_file_modification_info: todo!(), // JSON ENCODED STRUCT
         let media_file_token = insert_media_file_generic(InsertArgs {
-            pool:mysql_pool,
-            job:job,
+            pool: mysql_pool,
+            job: job,
             media_type: MediaFileType::Image,
-            origin_category:MediaFileOriginCategory::Upload,
+            origin_category: MediaFileOriginCategory::Upload,
             origin_product_category: MediaFileOriginProductCategory::ImageGeneration,
             maybe_origin_model_type: Some(MediaFileOriginModelType::StableDiffusion15),
             maybe_origin_model_token: weight_token,
@@ -502,51 +529,52 @@ pub async fn process_job_inference(
             maybe_public_bucket_extension: Some(bucket_details.suffix.as_str()),
             extra_file_modification_info: todo!(),
             maybe_creator_user_token: Some(&creator_user_token),
-            maybe_creator_anonymous_visitor_token:anon_user_token.as_ref(),
+            maybe_creator_anonymous_visitor_token: anon_user_token.as_ref(),
             creator_ip_address: creator_ip_address,
             creator_set_visibility: args.job.creator_set_visibility,
             maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
             maybe_creator_category_synthetic_id_category: IdCategory::ModelWeights,
             maybe_mod_user_token: None,
             is_generated_on_prem: args.job_dependencies.job.info.container.is_on_prem,
-            generated_by_worker:  Some(&args.job_dependencies.job.info.container.hostname),
-            generated_by_cluster: Some(&args.job_dependencies.job.info.container.cluster_name)
+            generated_by_worker: Some(&args.job_dependencies.job.info.container.hostname),
+            generated_by_cluster: Some(&args.job_dependencies.job.info.container.cluster_name),
         }).await?;
-        
-        let batch_generation_entity: BatchGenerationEntity = BatchGenerationEntity::MediaFile(media_file_token.0);
+
+        let batch_generation_entity: BatchGenerationEntity = BatchGenerationEntity::MediaFile(
+            media_file_token.0
+        );
         entries.push(batch_generation_entity);
     }
- 
+
     let mut transaction = mysql_pool.begin().await.unwrap();
+
     let batch_token_result = insert_batch_generation_records(InsertBatchArgs {
-      entries,
-      transaction: &mut transaction,
+        entries,
+        transaction: &mut transaction,
     }).await;
+
+  
+    let batch_token = match batch_token_result {
+        Ok(v) => { v.to_string() }
+        Err(err) => {
+            return Err(
+                ProcessSingleJobError::from_anyhow_error(anyhow!("No batch token? something has failed."))
+            );
+        }
+    };
 
     // hack to check the directory before clean up.
     let thirtyMinutes = 1800;
     thread::sleep(Duration::from_secs(thirtyMinutes));
     // upload media and create a record.
 
-    let batch_token = match batch_token_result {
-        Ok(v) => {
-            v.to_string()
-        },
-        Err(err) => {
-            return Err(
-                ProcessSingleJobError::from_anyhow_error(anyhow!("no VAE? thats a problem."))
-            );
-        }
-    };
-
     Ok(JobSuccessResult { // TODO: batch token needs to go here
         maybe_result_entity: Some(ResultEntity {
             entity_type: InferenceResultType::MediaFile,
             entity_token: batch_token,
         }),
-        inference_duration:inference_duration,
+        inference_duration: inference_duration,
     })
-
 }
 
 #[ignore]
@@ -562,6 +590,11 @@ mod tests {
     };
     use errors::AnyhowResult;
 
+    #[ignore]
+    #[tokio::test]
+    async fn test_json_extra_info() -> AnyhowResult<()> {
+
+    }
     #[ignore]
     #[tokio::test]
     async fn test_seed_weights_files() -> AnyhowResult<()> {

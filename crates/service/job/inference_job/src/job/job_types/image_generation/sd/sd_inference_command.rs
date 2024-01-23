@@ -75,16 +75,16 @@ pub struct InferenceArgs {
   pub stderr_output_file: PathBuf,
   pub prompt: String,
   pub negative_prompt:String,
-  pub number_of_samples:i32,
+  pub number_of_samples:u32,
   pub samplers:String,
-  pub width:i32,
-  pub height:i32,
-  pub cfg_scale:i32, 
+  pub width:u32,
+  pub height:u32,
+  pub cfg_scale:u32, 
   pub seed:i64,
   pub lora_path:PathBuf,
   pub checkpoint_path:PathBuf,
   pub vae:PathBuf,
-  pub batch_count:i32,
+  pub batch_count:u32,
 }
 
 impl StableDiffusionInferenceCommand {

@@ -104,14 +104,14 @@ pub struct EnqueueImageGenRequest {
     maybe_prompt: Option<String>,
     maybe_n_prompt: Option<String>,
     maybe_seed: Option<i64>,
-    maybe_width: Option<i32>,
-    maybe_height: Option<i32>,
+    maybe_width: Option<u32>,
+    maybe_height: Option<u32>,
     maybe_sampler: Option<String>,
     maybe_upload_path: Option<String>,
     maybe_lora_upload_path: Option<String>,
-    maybe_cfg_scale: Option<i32>,
-    maybe_number_of_samples: Option<i32>,
-    maybe_batch_count: Option<i32>,
+    maybe_cfg_scale: Option<u32>,
+    maybe_number_of_samples: Option<u32>,
+    maybe_batch_count: Option<u32>,
     maybe_name: Option<String>,
     maybe_description: Option<String>,
 }
@@ -183,6 +183,8 @@ pub async fn enqueue_image_generation_request(
     request: web::Json<EnqueueImageGenRequest>,
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, EnqueueImageGenRequestError> {
+
+    // TODO:I know ill fix this later
     let path = http_request.path();
     let segments: Vec<&str> = path.split('/').collect();
     let last_segment = segments.last().unwrap_or(&"");
@@ -270,6 +272,9 @@ pub async fn enqueue_image_generation_request(
     let maybe_routing_tag = get_request_header_optional(&http_request, ROUTING_TAG_HEADER_NAME).map(
         |routing_tag| routing_tag.trim().to_string()
     );
+
+
+
 
     // ==================== BANNED USERS ==================== //
 
