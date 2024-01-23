@@ -1,10 +1,13 @@
-import SelectSearcher from "components/common/SelectSearcher/SelectSearcher";
 import React from "react";
+
+import SelectSearcher from "components/common/SelectSearcher/SelectSearcher";
+import { Action, State } from "../videoMocapReducer";
 
 export default function TabContentLibrary(props: {
   t: Function;
-  pageStateCallback: Function;
-}) {
+  pageState: State;
+  dispatchPageState: (action: Action) => void;
+}){
   return (
     <div>
       <SelectSearcher

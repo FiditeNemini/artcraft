@@ -4,7 +4,7 @@ import { Analytics } from "common/Analytics";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
-export default function VideoMotionCaptureJobList(){
+export default function VideoMocapJobList(){
   const failures = (fail = "") => {
     switch (fail) {
       case "sample case": 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useReducer, useEffect } from "react";
 import { Redirect, useLocation } from "react-router-dom";
 
 import {
@@ -13,7 +13,9 @@ import { useLocalize } from "hooks";
 
 import TabContentUpload from "./components/tabContentUpload";
 import TabContentLibrary from "./components/tabContentLibrary";
-import VideoMotionCaptureJobList from "./components/videoMotionCaptureJobList";
+import PageVideoMocapProgress from "./components/pageVideoMocapProgress";
+import VideoMocapJobList from "./components/videoMocapJobList";
+import {states, reducer} from './videoMocapReducer';
 
 export default function VideoMotionCapture(props: {
   enqueueInferenceJob: (
@@ -25,33 +27,22 @@ export default function VideoMotionCapture(props: {
 }) {
   const { enqueueInferenceJob } = props;
   const { t } = useLocalize("VideoMotionCapture");
-  enum pageStates {
-    START,
-    VIDEO_PROVISIONING,
-    SHOW_JOB_STATUS,
-  }
-  const { START, VIDEO_PROVISIONING, SHOW_JOB_STATUS } = pageStates;
-  const [pageState, setPageState] = useState<number>(START);
+  const { NO_FILE, FILE_UPLOADING, MOCAPNET_ENQUEUED } = states;
+  const [pageState, dispatchPageState] = useReducer(reducer, {status: NO_FILE});
 
-  const handlePageState = ({
-    nextState,
-    token,
-  }: {
-    nextState: number;
-    token?: string;
-  }) => {
-    if(nextState===VIDEO_PROVISIONING){
-      setPageState(VIDEO_PROVISIONING)
-    }
-    else if (nextState===SHOW_JOB_STATUS && token) {
+  useEffect(()=>{
+    if (pageState.status === states.MOCAPNET_ENQUEUED && pageState.inferenceJobToken){
       enqueueInferenceJob(
-        token,
+        pageState.inferenceJobToken,
         FrontendInferenceJobType.VideoMotionCapture
       );
-      setPageState(SHOW_JOB_STATUS);
+      dispatchPageState({
+        type: 'enqueueMocapNetSuccess', 
+        payload:{inferenceJobToken: undefined}
+      });
     }
-  };
-
+      
+  }, [pageState])
   const { pathname } = useLocation();
 
   if (pathname === `/video-mocap` || pathname === `/video-mocap/`) {
@@ -61,13 +52,13 @@ export default function VideoMotionCapture(props: {
   const tabs = [
     {
       label: t("tabTitle.upload"),
-      content: <TabContentUpload t={t} pageStateCallback={handlePageState} />,
+      content: <TabContentUpload {...{t, pageState, dispatchPageState}} />,
       to: "/video-mocap/upload",
       padding: true,
     },
     {
       label: t("tabTitle.library"),
-      content: <TabContentLibrary t={t} pageStateCallback={handlePageState} />,
+      content: <TabContentLibrary {...{t, pageState, dispatchPageState}} />,
       to: "/video-mocap/select-media",
       padding: true,
     },
@@ -81,13 +72,11 @@ export default function VideoMotionCapture(props: {
       />
       <Panel>
         <div className="row g-0">
-          { pageState !== SHOW_JOB_STATUS &&
+          { pageState.status < FILE_UPLOADING && <>
               <div className="col-12 col-md-6">
-                <Tabs tabs={tabs} disabled={pageState === VIDEO_PROVISIONING}/>
+                <Tabs tabs={tabs}/>
               </div>
-          }
-          { pageState === START &&
-            <div className="col-12 col-md-6">
+              <div className="col-12 col-md-6">
               <Panel padding={true} clear={true}>
                 <BasicVideo
                   title="Video -> Mocap Sample"
@@ -95,8 +84,13 @@ export default function VideoMotionCapture(props: {
                 />
               </Panel>
             </div>
+          </>}
+          { pageState.status >= FILE_UPLOADING && pageState.status < MOCAPNET_ENQUEUED &&
+            <div className="col-12" >
+              <PageVideoMocapProgress {...{t, pageState, dispatchPageState}} />
+            </div>
           }
-          { pageState === SHOW_JOB_STATUS &&
+          { pageState.status === MOCAPNET_ENQUEUED &&
             <div className="col-12" >
               <h2 className="p-3 m-0">{t("tab.message.mocapNetRequestSucceed")}</h2>
             </div>
@@ -105,7 +99,7 @@ export default function VideoMotionCapture(props: {
         {/*2nd row*/}
       </Panel>
       {/*panel*/}
-      <VideoMotionCaptureJobList />
+      <VideoMocapJobList />
     </Container>
   );
 }
