@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 use std::thread;
 use std::time::{ Duration, Instant };
-
+use serde_json;
 use anyhow::anyhow;
 use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
@@ -471,6 +471,29 @@ pub async fn process_job_inference(
 
     let mut entries = vec![];
 
+    let inputs = InferenceValues {
+        prompt: prompt.clone(),
+        cfg_scale: sd_args.maybe_cfg_scale.unwrap_or(7),
+        negative_prompt: sd_args.maybe_n_prompt,
+        lora_model_weight_token: Some(lora_token),
+        lora_name:Some(lora_name),
+        sampler: sd_args.maybe_sampler.unwrap_or(String::from("Euler a")),
+        width: sd_args.maybe_width.unwrap_or(512),
+        height: sd_args.maybe_height.unwrap_or(512),
+        seed: sd_args.maybe_seed.unwrap_or(1),
+        number_of_samples: number_of_samples,
+    };
+
+    let inputs = match serde_json::to_string(&inputs) {
+        Ok(result) => result,
+        Err(err) => {
+            return Err(
+                ProcessSingleJobError::from_anyhow_error(anyhow!("couldn't serialize metadata."))
+            );
+        }
+    };
+
+
     for i in 0..sd_args.maybe_batch_count.unwrap_or(1) {
         let path = output_path.clone();
 
@@ -492,19 +515,6 @@ pub async fn process_job_inference(
             }
         };
         
-        let inputs = InferenceValues {
-            prompt: prompt.clone(),
-            cfg_scale: sd_args.maybe_cfg_scale.unwrap_or(7),
-            negative_prompt: sd_args.maybe_n_prompt,
-            lora_model_weight_token: Some(lora_token),
-            lora_name:Some(lora_name),
-            sampler: sd_args.maybe_sampler.unwrap_or(String::from("Euler a")),
-            width: sd_args.maybe_width.unwrap_or(512),
-            height: sd_args.maybe_height.unwrap_or(512),
-            seed: sd_args.maybe_seed.unwrap_or(1),
-            number_of_samples: number_of_samples,
-        };
-
         // extra_file_modification_info: todo!(), // JSON ENCODED STRUCT
         let media_file_token = insert_media_file_generic(InsertArgs {
             pool: mysql_pool,
@@ -513,7 +523,7 @@ pub async fn process_job_inference(
             origin_category: MediaFileOriginCategory::Upload,
             origin_product_category: MediaFileOriginProductCategory::ImageGeneration,
             maybe_origin_model_type: Some(MediaFileOriginModelType::StableDiffusion15),
-            maybe_origin_model_token: weight_token,
+            maybe_origin_model_token: weight_token.clone(),
             maybe_origin_filename: Some(file_path),
             is_batch_generated: true,
             maybe_mime_type: Some(metadata.mimetype.as_ref()),
@@ -527,8 +537,8 @@ pub async fn process_job_inference(
             public_bucket_directory_hash: bucket_details.object_hash.as_str(),
             maybe_public_bucket_prefix: Some(bucket_details.prefix.as_str()),
             maybe_public_bucket_extension: Some(bucket_details.suffix.as_str()),
-            extra_file_modification_info: todo!(),
-            maybe_creator_user_token: Some(&creator_user_token),
+            extra_file_modification_info:Some(&inputs),
+            maybe_creator_user_token: Some(&creator_user_token) ,
             maybe_creator_anonymous_visitor_token: anon_user_token.as_ref(),
             creator_ip_address: creator_ip_address,
             creator_set_visibility: args.job.creator_set_visibility,
