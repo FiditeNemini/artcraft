@@ -72,6 +72,7 @@ pub struct InferenceArgs {
   pub work_dir: PathBuf,
   /// --result_file: path to final file output
   pub output_file: PathBuf,
+  pub stdout_output_file: PathBuf,
   pub stderr_output_file: PathBuf,
   pub prompt: String,
   pub negative_prompt:String,
@@ -228,8 +229,11 @@ impl StableDiffusionInferenceCommand {
     command.push_str(" --seed ");
     command.push_str(args.seed.to_string().as_str());
     
-    command.push_str(" --loRA-path ");
-    command.push_str(&path_to_string(args.lora_path));
+    // TODO ensure lora path is not empty ...
+    if args.lora_path.as_os_str().is_empty() == false {
+      command.push_str(" --loRA-path ");
+      command.push_str(&path_to_string(args.lora_path));
+    }
     
     command.push_str(" --check-point ");
     command.push_str(&path_to_string(args.checkpoint_path));
@@ -271,7 +275,9 @@ impl StableDiffusionInferenceCommand {
     info!("stderr will be written to file: {}", path_to_string(args.stderr_output_file.clone()));
 
     let stderr_file = File::create(&args.stderr_output_file)?;
+    let stdout_file = File::create(&args.stdout_output_file)?;
     config.stderr = Redirection::File(stderr_file);
+    config.stdout = Redirection::File(stdout_file);
 
     if !env_vars.is_empty() {
       config.env = Some(env_vars);

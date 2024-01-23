@@ -1,7 +1,7 @@
 // #![forbid(unused_imports)]
 #![forbid(unused_mut)]
 // #![forbid(unused_variables)]
-
+use log::info;
 use std::fmt::{ Display, Formatter };
 use std::fmt::Debug;
 use std::sync::Arc;
@@ -251,9 +251,21 @@ pub async fn enqueue_image_generation_request(
             warn!("Session checker error: {:?}", e);
             EnqueueImageGenRequestError::ServerError
         })?;
+    
 
     if let Some(user_session) = maybe_user_session.as_ref() {
+
         maybe_user_token = Some(UserToken::new_from_str(&user_session.user_token));
+        match maybe_user_token {
+            Some(ref val) => {    
+                println!("User Token: {}",val.clone().to_string());
+            },
+            None => {
+                println!("User Token check? Failed to find!");
+            }
+        }
+    } else {
+        println!("Session isn't there");
     }
 
     // Plan should handle "first anonymous use" and "investor" cases.
@@ -404,7 +416,7 @@ pub async fn enqueue_image_generation_request(
         creator_ip_address: &ip_address,
         creator_set_visibility: visbility,
         priority_level,
-        requires_keepalive: true,
+        requires_keepalive: false, //reverse ...  TODO fix this. we set it base on account is premium or not ... 
         is_debug_request,
         maybe_routing_tag: maybe_routing_tag.as_deref(),
         mysql_pool: &server_state.mysql_pool,
@@ -460,6 +472,14 @@ pub async fn enqueue_image_generation_request(
 // {
 //     "uuid_idempotency_token": "13",
 //     "maybe_upload_path": "https://drive.google.com/file/d/1WRgR2pn0Ky8ls5_9Zq6tQlHTBvyWeach/view?usp=sharing",
+//     "maybe_name":"some_name",
+//     "maybe_description":"some_description"
+// }
+
+
+// {
+//     "uuid_idempotency_token": "123",
+//     "maybe_lora_upload_path": "https://drive.google.com/file/d/1WRgR2pn0Ky8ls5_9Zq6tQlHTBvyWeach/view?usp=sharing",
 //     "maybe_name":"some_name",
 //     "maybe_description":"some_description"
 // }

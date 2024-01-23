@@ -1,5 +1,5 @@
 use std::convert::TryInto;
-use std::thread;
+use std::{ fs, thread };
 use std::time::{ Duration, Instant };
 use serde_json;
 use anyhow::anyhow;
@@ -65,7 +65,7 @@ pub struct InferenceValues {
     pub width: u32,
     pub height: u32,
     pub seed: i64,
-    pub number_of_samples:u32,
+    pub number_of_samples: u32,
 }
 
 pub struct StableDiffusionProcessArgs<'a> {
@@ -303,7 +303,7 @@ pub async fn process_job_inference(
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
     let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint.safetensors");
-    let lora_path = work_temp_dir.path().join("lora.safetensors");
+    let mut lora_path = work_temp_dir.path().join("lora.safetensors");
     let vae_path = work_temp_dir.path().join("vae.safetensors");
     let output_path = work_temp_dir.path().join("output");
 
@@ -342,18 +342,16 @@ pub async fn process_job_inference(
             );
         }
     };
-
+    // origin file name needs to be just the file name  /tmp/downloads_long_lived/temp_stable_diffusion_inference_32.8qJJljxWWZeD/output_0.png
     // ignore if no lora token
     let retrieved_loRA_record = match lora_token {
         Some(token) => {
-
             let retrieved_loRA_record = get_weight_by_token(
                 &token,
                 false,
                 &deps.db.mysql_pool
             ).await?;
-            
-            
+
             Some(retrieved_loRA_record)
         }
         None => None,
@@ -373,8 +371,8 @@ pub async fn process_job_inference(
         path_to_string(sd_checkpoint_path.clone())
     ).await?;
 
-    let mut lora_name=String::from("");
-    let mut lora_token=String::from("");
+    let mut lora_name = String::from("");
+    let mut lora_token = String::from("");
 
     match retrieved_loRA_record {
         Some(record) => {
@@ -397,10 +395,14 @@ pub async fn process_job_inference(
                         path_to_string(lora_path.clone())
                     ).await?;
                 }
-                None => {}
+                None => {
+                    lora_path.clear();
+                }
             }
         }
-        None => {}
+        None => {
+            lora_path.clear();
+        }
     }
 
     // VAE token for now
@@ -438,6 +440,7 @@ pub async fn process_job_inference(
     };
 
     let stderr_output_file = work_temp_dir.path().join("sd_err.txt");
+    let stdout_output_file = work_temp_dir.path().join("sd_out.txt");
 
     let number_of_samples = match sd_args.maybe_number_of_samples {
         Some(val) => val,
@@ -450,6 +453,7 @@ pub async fn process_job_inference(
         work_dir: work_temp_dir.path().to_path_buf(),
         output_file: output_path.clone(),
         stderr_output_file,
+        stdout_output_file,
         prompt: prompt.clone(),
         negative_prompt: sd_args.maybe_n_prompt.clone().unwrap_or_default(),
         number_of_samples,
@@ -464,6 +468,11 @@ pub async fn process_job_inference(
         batch_count: sd_args.maybe_batch_count.unwrap_or(1),
     });
 
+      // hack to check the directory before clean up.
+      let thirtyMinutes = 1800;
+      thread::sleep(Duration::from_secs(thirtyMinutes));
+      // upload media and create a record.
+
     let inference_duration = Instant::now().duration_since(inference_start_time);
     let creator_ip_address = &job.creator_ip_address;
     // run a for loop for output images output_0 in the folder then use upload media.
@@ -476,7 +485,7 @@ pub async fn process_job_inference(
         cfg_scale: sd_args.maybe_cfg_scale.unwrap_or(7),
         negative_prompt: sd_args.maybe_n_prompt,
         lora_model_weight_token: Some(lora_token),
-        lora_name:Some(lora_name),
+        lora_name: Some(lora_name),
         sampler: sd_args.maybe_sampler.unwrap_or(String::from("Euler a")),
         width: sd_args.maybe_width.unwrap_or(512),
         height: sd_args.maybe_height.unwrap_or(512),
@@ -493,6 +502,13 @@ pub async fn process_job_inference(
         }
     };
 
+    // pathes
+    // let paths = fs::read_dir(work_temp_dir.path().join("output")).unwrap();
+    // for path in paths {
+    //     println!("Name: {}", path.unwrap().path().display());
+    // }
+
+  
 
     for i in 0..sd_args.maybe_batch_count.unwrap_or(1) {
         let path = output_path.clone();
@@ -514,7 +530,7 @@ pub async fn process_job_inference(
                 );
             }
         };
-        
+
         // extra_file_modification_info: todo!(), // JSON ENCODED STRUCT
         let media_file_token = insert_media_file_generic(InsertArgs {
             pool: mysql_pool,
@@ -537,8 +553,8 @@ pub async fn process_job_inference(
             public_bucket_directory_hash: bucket_details.object_hash.as_str(),
             maybe_public_bucket_prefix: Some(bucket_details.prefix.as_str()),
             maybe_public_bucket_extension: Some(bucket_details.suffix.as_str()),
-            extra_file_modification_info:Some(&inputs),
-            maybe_creator_user_token: Some(&creator_user_token) ,
+            extra_file_modification_info: Some(&inputs),
+            maybe_creator_user_token: Some(&creator_user_token),
             maybe_creator_anonymous_visitor_token: anon_user_token.as_ref(),
             creator_ip_address: creator_ip_address,
             creator_set_visibility: args.job.creator_set_visibility,
@@ -563,20 +579,16 @@ pub async fn process_job_inference(
         transaction: &mut transaction,
     }).await;
 
-  
     let batch_token = match batch_token_result {
         Ok(v) => { v.to_string() }
         Err(err) => {
             return Err(
-                ProcessSingleJobError::from_anyhow_error(anyhow!("No batch token? something has failed."))
+                ProcessSingleJobError::from_anyhow_error(
+                    anyhow!("No batch token? something has failed.")
+                )
             );
         }
     };
-
-    // hack to check the directory before clean up.
-    let thirtyMinutes = 1800;
-    thread::sleep(Duration::from_secs(thirtyMinutes));
-    // upload media and create a record.
 
     Ok(JobSuccessResult { // TODO: batch token needs to go here
         maybe_result_entity: Some(ResultEntity {
@@ -602,9 +614,7 @@ mod tests {
 
     #[ignore]
     #[tokio::test]
-    async fn test_json_extra_info() -> AnyhowResult<()> {
-
-    }
+    async fn test_json_extra_info() -> AnyhowResult<()> {}
     #[ignore]
     #[tokio::test]
     async fn test_seed_weights_files() -> AnyhowResult<()> {

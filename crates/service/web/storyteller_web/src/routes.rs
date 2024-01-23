@@ -1295,8 +1295,8 @@ fn add_image_gen_routes<T,B> (app:App<T>)-> App<T>
                     .route("/model", web::post().to(enqueue_image_generation_request))
             )
             .service(
-                web::scope("/inference")
-                    .route("/enqueue_image_gen", web::post().to(enqueue_image_generation_request))
+                web::scope("/enqueue")
+                    .route("/inference", web::post().to(enqueue_image_generation_request))
             )
     )
 }

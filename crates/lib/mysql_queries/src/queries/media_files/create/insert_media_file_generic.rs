@@ -147,8 +147,8 @@ pub async fn insert_media_file_generic(
 
         args.origin_category.to_str(),
         args.origin_product_category.to_str(),
-        args.maybe_origin_model_type,
-        args.maybe_origin_model_token,
+        args.maybe_origin_model_type.map(|e| e.to_str()),
+        args.maybe_origin_model_token.map(|e| e.to_string()),
         args.maybe_origin_filename,
 
         args.is_batch_generated,
@@ -167,11 +167,11 @@ pub async fn insert_media_file_generic(
         args.maybe_public_bucket_extension,
         args.extra_file_modification_info,
 
-        args.maybe_creator_user_token,
-        args.maybe_creator_anonymous_visitor_token,
+        args.maybe_creator_user_token.map(|e| e.to_string()),
+        args.maybe_creator_anonymous_visitor_token.map(|e| e.to_string()),
 
         args.creator_ip_address,
-        args.creator_set_visibility,
+        args.creator_set_visibility.to_str(),
 
         maybe_creator_file_synthetic_id,
         maybe_creator_category_synthetic_id,
