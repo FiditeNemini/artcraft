@@ -289,7 +289,6 @@ pub async fn enqueue_infer_tts_handler(
     &request.tts_model_token,
     &server_state.redis_ttl_cache,
     &mut mysql_connection,
-    server_state.flags.switch_tts_to_model_weights,
   ).await;
 
   let tts_model = match tts_model_lookup_result {
