@@ -32,5 +32,10 @@
       background-color: transparent;
       border-bottom: 4px solid $primary !important;
     }
+
+    &.disabled{
+      color: rgba($white, 0.5) !important;
+      pointer-events: none;
+    }
   }
 }

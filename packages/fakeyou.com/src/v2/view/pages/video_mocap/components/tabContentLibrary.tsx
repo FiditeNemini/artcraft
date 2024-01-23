@@ -1,10 +1,12 @@
 import SelectModal from "components/common/SelectModal/SelectModal";
 import React from "react";
+import { Action, State } from "../videoMocapReducer";
 
 export default function TabContentLibrary(props: {
   t: Function;
-  pageStateCallback: Function;
-}) {
+  pageState: State;
+  dispatchPageState: (action: Action) => void;
+}){
   return (
     <div>
       <SelectModal
