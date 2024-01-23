@@ -122,9 +122,6 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
 
 async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<AvailableInferenceJob>) -> AnyhowResult<()> {
   let job_count = jobs.len();
-  let meter = otel::meter(OTEL_METER_NAME);
-  // TODO: total_duration as histogram for min/max/avg/percentiles
-  let job_duration_metric = meter.i64_observable_gauge("job_duration").with_unit(Unit::new("ms")).init();
 
   for (i, job) in jobs.into_iter().enumerate() {
     let start_time = Instant::now();
@@ -155,14 +152,22 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
       }
     }
     let job_duration = Instant::now().duration_since(start_time);;
-    job_duration_metric.observe(job_duration.as_millis() as i64,
+
+    // is there a less verbose way to do this?
+    let model_type_str = match job.maybe_model_type {
+      Some(model_type) => model_type.to_string(),
+      None => "unknown".to_string(),
+    };
+
+    job_dependencies.instruments.job_duration.record(job_duration.as_millis() as u64,
       &[
-        // TODO: need job_ prefix?
-        OtelAttribute::new("job_id", format!("{:?}", job.id)),
+        OtelAttribute::new("job_user_is_premium", job.is_from_premium_user),
+        OtelAttribute::new("job_model", model_type_str),
+        OtelAttribute::new("job_status", job.status.to_str()),
         OtelAttribute::new("job_inference_category", job.inference_category.to_str()),
         OtelAttribute::new("job_inference_token", job.inference_job_token.as_str().to_owned()),
       ]
-    )
+    );
   }
 
   Ok(())
