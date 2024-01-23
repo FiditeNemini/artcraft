@@ -23,7 +23,7 @@ import {
 } from "@storyteller/components/src/api/image_generation/EnqueueImageGen";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import useToken from "hooks/useToken";
-import SelectSearcher from "components/common/SelectSearcher/SelectSearcher";
+import SelectModal from "components/common/SelectModal/SelectModal";
 
 interface SdInferencePanelProps {
   sd_model_token: string;
@@ -333,7 +333,7 @@ function SdInferencePanel({
               }}
             />
 
-            <SelectSearcher
+            <SelectModal
               label="Additional LoRA Weight"
               tabs={[
                 {

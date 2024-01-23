@@ -13,14 +13,14 @@ interface TabConfig {
   weightTypeFilter?: string;
   mediaTypeFilter?: string; // NOT DONE
 }
-interface SelectSearcherProps {
+interface SelectModalProps {
   label?: string;
   tabs: TabConfig[];
   modalTitle?: string;
 }
 
-const SelectSearcher = memo(
-  ({ label, tabs, modalTitle = "Select" }: SelectSearcherProps) => {
+const SelectModal = memo(
+  ({ label, tabs, modalTitle = "Select" }: SelectModalProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { weightTitle, setWeightTitle } = useToken();
 
@@ -93,4 +93,4 @@ const SelectSearcher = memo(
   }
 );
 
-export default SelectSearcher;
+export default SelectModal;

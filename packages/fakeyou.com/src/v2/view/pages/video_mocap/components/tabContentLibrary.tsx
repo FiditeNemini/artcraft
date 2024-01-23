@@ -1,4 +1,4 @@
-import SelectSearcher from "components/common/SelectSearcher/SelectSearcher";
+import SelectModal from "components/common/SelectModal/SelectModal";
 import React from "react";
 
 export default function TabContentLibrary(props: {
@@ -7,7 +7,7 @@ export default function TabContentLibrary(props: {
 }) {
   return (
     <div>
-      <SelectSearcher
+      <SelectModal
         modalTitle="Select a Video"
         label="Select a Video"
         tabs={[
