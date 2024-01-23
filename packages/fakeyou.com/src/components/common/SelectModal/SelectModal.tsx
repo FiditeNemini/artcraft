@@ -1,4 +1,4 @@
-import React, { useState, memo } from "react";
+import React, { useState, memo, useEffect } from "react";
 import Searcher from "../Searcher";
 import Modal from "../Modal";
 import NonRouteTabs from "../Tabs/NonRouteTabs";
@@ -6,12 +6,17 @@ import Input from "../Input";
 import Button from "../Button";
 import useToken from "hooks/useToken";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import SelectMediaList from "./SelectMediaList";
+import SelectWeightsList from "./SelectWeightsList";
+import { set } from "date-fns";
 
 interface TabConfig {
   label: string;
-  searcherKey?: string;
+  tabKey: string;
+  type?: "media" | "weights";
   weightTypeFilter?: string;
-  mediaTypeFilter?: string; // NOT DONE
+  mediaTypeFilter?: string;
+  searcher?: boolean;
 }
 interface SelectModalProps {
   label?: string;
@@ -22,7 +27,34 @@ interface SelectModalProps {
 const SelectModal = memo(
   ({ label, tabs, modalTitle = "Select" }: SelectModalProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { weightTitle, setWeightTitle } = useToken();
+    const { token, setToken, weightTitle, setWeightTitle } = useToken();
+    const [activeTab, setActiveTab] = useState(tabs[0].tabKey);
+    const [mediaType, setMediaType] = useState(
+      tabs[0].mediaTypeFilter || "all"
+    );
+    const [weightType, setWeightType] = useState(
+      tabs[0].weightTypeFilter || "all"
+    );
+
+    // Update mediaType when activeTab changes
+    useEffect(() => {
+      const currentTab = tabs.find(tab => tab.tabKey === activeTab);
+      setMediaType(currentTab?.mediaTypeFilter || "all");
+      setWeightType(currentTab?.mediaTypeFilter || "all");
+    }, [activeTab, tabs]);
+
+    // const allWeights = useLazyLists({
+    //   addQueries: {
+    //     page_size: 9,
+    //     ...prepFilter(weightType, "filter_media_type"),
+    //   },
+    //   debug: "Media List",
+    //   fetcher: ListWeights,
+    //   list: weightList,
+    //   listSet: setWeightList,
+    //   requestList: true,
+    //   disableUrlQueries: true,
+    // });
 
     const openModal = () => {
       setIsModalOpen(true);
@@ -34,19 +66,32 @@ const SelectModal = memo(
 
     const handleRemove = () => {
       setWeightTitle && setWeightTitle("");
+      setToken("");
     };
 
     const searchTabs = tabs.map(tab => ({
       label: tab.label,
-      content: tab.searcherKey ? (
+      content: tab.searcher ? (
         <Searcher
           type="modal"
           onResultSelect={closeModal}
-          searcherKey={tab.searcherKey}
+          searcherKey={tab.tabKey}
           weightType={tab.weightTypeFilter}
         />
-      ) : null,
+      ) : (
+        <>
+          {tab.type === "media" && (
+            <SelectMediaList
+              mediaType={mediaType}
+              listKey={tab.tabKey}
+              onResultSelect={closeModal}
+            />
+          )}
+          {tab.type === "weights" && <SelectWeightsList />}
+        </>
+      ),
       padding: true,
+      onClick: () => setActiveTab(tab.tabKey),
     }));
 
     return (
@@ -59,13 +104,13 @@ const SelectModal = memo(
               disabled={true}
               className="w-100"
               placeholder="None selected"
-              value={weightTitle ? weightTitle : ""}
+              value={weightTitle ? weightTitle : token || ""}
             />
             <Button
               label={weightTitle ? "Change" : "Select"}
               onClick={openModal}
             />
-            {weightTitle && (
+            {token && (
               <Button
                 square={true}
                 variant="danger"

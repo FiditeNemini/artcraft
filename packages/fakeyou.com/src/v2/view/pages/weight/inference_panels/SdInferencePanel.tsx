@@ -338,13 +338,15 @@ function SdInferencePanel({
               tabs={[
                 {
                   label: "All LoRA Weights",
-                  searcherKey: "allLoraWeights",
+                  tabKey: "allLoraWeights",
                   weightTypeFilter: "lora",
+                  searcher: true,
                 },
                 {
                   label: "Bookmarked",
-                  searcherKey: "bookmarkedLoraWeights",
+                  tabKey: "bookmarkedLoraWeights",
                   weightTypeFilter: "lora",
+                  searcher: false,
                 },
               ]}
             />

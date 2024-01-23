@@ -13,13 +13,10 @@ export default function TabContentLibrary(props: {
         tabs={[
           {
             label: "All Videos",
-            searcherKey: "allVideos",
-            mediaTypeFilter: "",
-          },
-          {
-            label: "Bookmarked",
-            searcherKey: "bookmarkedVideos",
-            mediaTypeFilter: "",
+            tabKey: "allVideos",
+            mediaTypeFilter: "video",
+            searcher: false,
+            type: "media",
           },
         ]}
       />
