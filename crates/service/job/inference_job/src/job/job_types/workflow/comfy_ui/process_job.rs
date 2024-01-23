@@ -23,6 +23,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::Pol
 use mysql_queries::payloads::generic_inference_args::workflow_payload::NewValue;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
+use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
@@ -30,8 +31,6 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
-
-const BUCKET_FILE_PREFIX: &str = "fakeyou_";
 
 pub struct ComfyProcessJobArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
@@ -94,7 +93,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 sd_model,
                 false,
                 &deps.db.mysql_pool
-            ).await?.unwrap();
+            ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("SD model not found")))?;
 
             let bucket_details = RemoteCloudBucketDetails {
                 object_hash: retrieved_sd_record.public_bucket_hash,
@@ -106,6 +105,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             remote_cloud_file_client.download_file(bucket_details, sd_path.clone()).await?;
             maybe_sd_path = Some(sd_path.parse().unwrap());
             info!("Downloaded SD model to {:?}", sd_path);
+            maybe_sd_path = Some(sd_path.parse().unwrap());
         }
         None => {}
     }
@@ -118,7 +118,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 lora_model,
                 false,
                 &deps.db.mysql_pool
-            ).await?.unwrap();
+            ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Lora model not found")))?;
             let bucket_details = RemoteCloudBucketDetails {
                 object_hash: retrieved_lora_record.public_bucket_hash,
                 prefix: retrieved_lora_record.maybe_public_bucket_prefix.unwrap(),
@@ -130,6 +130,31 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             remote_cloud_file_client.download_file(bucket_details, lora_path.clone()).await?;
             maybe_lora_path = Some(lora_path.parse().unwrap());
             info!("Downloaded Lora model to {:?}", lora_path);
+            maybe_lora_path = Some(lora_path.parse().unwrap());
+        }
+        None => {}
+    }
+    // Download Input file if specified
+    let mut maybe_input_path: Option<PathBuf> = None;
+    match job_args.maybe_input_file {
+        Some(input_file) => {
+            let input_dir = root_comfy_path.join("input");
+            let retrieved_input_record =  get_media_file(
+                input_file,
+                false,
+                &deps.db.mysql_pool
+            ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Input file not found")))?;
+            let bucket_details = RemoteCloudBucketDetails {
+                object_hash: retrieved_input_record.public_bucket_directory_hash,
+                prefix: retrieved_input_record.maybe_public_bucket_prefix.unwrap(),
+                suffix: retrieved_input_record.maybe_public_bucket_extension.clone().unwrap(),
+            };
+            // Download to "input.EXTENSION"
+            let input_filename = format!("input.{}", retrieved_input_record.maybe_public_bucket_extension.unwrap());
+            let input_path = input_dir.join(input_filename).to_str().unwrap().to_string();
+            remote_cloud_file_client.download_file(bucket_details, input_path.clone()).await?;
+            info!("Downloaded input file to {:?}", input_path);
+            maybe_input_path = Some(input_path.parse().unwrap());
         }
         None => {}
     }
@@ -222,49 +247,46 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         if let Some(lora_path) = maybe_lora_path {
             safe_delete_temp_file(&lora_path);
         }
+        if let Some(input_path) = maybe_input_path {
+            safe_delete_temp_file(&input_path);
+        }
 
         return Err(error);
     }
 
     // ==================== GET OUTPUT FILE ======================== //
-
-    // take the latest file in the output directory
-    let output_dir = root_comfy_path.join("output");
-    let mut entries: Vec<PathBuf> = std::fs::read_dir(output_dir).unwrap()
-        .map(|res| res.map(|e| e.path()))
-        .collect::<Result<Vec<_>, std::io::Error>>()
-        .unwrap();
-
-    entries.sort_by_key(|path| std::fs::metadata(path).unwrap().modified().unwrap());
-
+    let mut output_file = root_comfy_path.join("output");
+    output_file = output_file.join(job_args.output_path);
 
     // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
-
-    // check if entries is empty
-    if entries.is_empty() {
-        return Err(ProcessSingleJobError::Other(anyhow!("No output files found")));
-    }
-    let finished_file = entries.last().unwrap();
-    info!("Checking that file exists: {:?} ...", finished_file);
-    check_file_exists(&finished_file).map_err(|e| ProcessSingleJobError::Other(e))?;
+    info!("Checking that file exists: {:?} ...", output_file);
+    check_file_exists(&output_file).map_err(|e| ProcessSingleJobError::Other(e))?;
 
     info!("Interrogating result file size ...");
 
-    let file_size_bytes = file_size(&finished_file)
+    let file_size_bytes = file_size(&output_file)
         .map_err(|err| ProcessSingleJobError::Other(err))?;
 
     info!("Interrogating result mimetype ...");
 
-    let mimetype = get_mimetype_for_file(&finished_file)
+    let mimetype = get_mimetype_for_file(&output_file)
         .map_err(|err| ProcessSingleJobError::from_io_error(err))?
         .map(|mime| mime.to_string())
         .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
 
     // create ext from mimetype
     let ext = match mimetype.as_str() {
-        "video/mp4" => ".mp4",
-        "image/png" => ".png",
-        "image/jpeg" => ".jpg",
+        "video/mp4" => "mp4",
+        "image/png" => "png",
+        "image/jpeg" => "jpg",
+        _ => return Err(ProcessSingleJobError::Other(anyhow!("Mimetype not supported: {}", mimetype))),
+    };
+
+    // create prefix from mimetype
+    let prefix = match mimetype.as_str() {
+        "video/mp4" => "video",
+        "image/png" => "image",
+        "image/jpeg" => "image",
         _ => return Err(ProcessSingleJobError::Other(anyhow!("Mimetype not supported: {}", mimetype))),
     };
 
@@ -278,7 +300,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Calculating sha256...");
 
-    let file_checksum = sha256_hash_file(&finished_file)
+    let file_checksum = sha256_hash_file(&output_file)
         .map_err(|err| {
             ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
         })?;
@@ -289,7 +311,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
     let result_bucket_location = MediaFileBucketPath::generate_new(
-        Some(BUCKET_FILE_PREFIX),
+        Some(prefix),
         Some(ext));
 
     let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
@@ -300,7 +322,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
         &result_bucket_object_pathbuf,
-        &finished_file,
+        &output_file,
         &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .await
         .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -308,6 +330,16 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     // ==================== DELETE TEMP FILES ==================== //
 
     safe_delete_temp_file(&stderr_output_file);
+    safe_delete_temp_file(&workflow_path);
+    if let Some(sd_path) = maybe_sd_path {
+        safe_delete_temp_file(&sd_path);
+    }
+    if let Some(lora_path) = maybe_lora_path {
+        safe_delete_temp_file(&lora_path);
+    }
+    if let Some(input_path) = maybe_input_path {
+        safe_delete_temp_file(&input_path);
+    }
 
     // delete all files in output directory
     let output_dir = root_comfy_path.join("output");
@@ -333,7 +365,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         file_size_bytes,
         sha256_checksum: &file_checksum,
         public_bucket_directory_hash: result_bucket_location.get_object_hash(),
-        maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
+        maybe_public_bucket_prefix: Some(prefix),
         maybe_public_bucket_extension: Some(ext),
         is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
         worker_hostname: &args.job_dependencies.job.info.container.hostname,
