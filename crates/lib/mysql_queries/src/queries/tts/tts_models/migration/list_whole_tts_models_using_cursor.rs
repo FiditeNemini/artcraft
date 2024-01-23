@@ -29,9 +29,11 @@ pub struct WholeTtsModelRecord {
 
   pub text_preprocessing_algorithm: Option<String>,
 
+  // Weird mel multiplication hack
   pub use_default_mel_multiply_factor: bool,
-  pub maybe_custom_mel_multiply_factor: Option<f64>,
+  pub maybe_custom_mel_multiply_factor: Option<f64>, // 10
 
+  // Vocoder
   pub maybe_default_pretrained_vocoder: Option<String>,
   pub maybe_custom_vocoder_token: Option<VocoderModelToken>,
 
@@ -44,7 +46,7 @@ pub struct WholeTtsModelRecord {
 
   pub voice_name: Option<String>,
   pub actor_name: Option<String>,
-  pub characteristic: Option<String>,
+  pub characteristic: Option<String>, // 20
   pub version_string: Option<String>,
 
   pub is_front_page_featured: bool,
@@ -59,7 +61,7 @@ pub struct WholeTtsModelRecord {
   pub creator_user_token: UserToken,
 
   pub creator_ip_address_creation: String,
-  pub creator_ip_address_last_update: String,
+  pub creator_ip_address_last_update: String, // 30
 
   pub creator_set_visibility: Visibility,
 
@@ -74,7 +76,7 @@ pub struct WholeTtsModelRecord {
 
   pub is_public_listing_approved: Option<bool>,
   pub is_locked_from_user_modification: bool,
-  pub is_locked_from_use: bool,
+  pub is_locked_from_use: bool, // 40
 
   pub maybe_mod_comments: Option<String>,
   pub maybe_mod_user_token: Option<UserToken>,
@@ -87,7 +89,7 @@ pub struct WholeTtsModelRecord {
   pub updated_at: DateTime<Utc>,
 
   pub user_deleted_at: Option<DateTime<Utc>>,
-  pub mod_deleted_at: Option<DateTime<Utc>>,
+  pub mod_deleted_at: Option<DateTime<Utc>>, // 48 fields total
 }
 
 pub async fn list_whole_tts_models_using_cursor(
