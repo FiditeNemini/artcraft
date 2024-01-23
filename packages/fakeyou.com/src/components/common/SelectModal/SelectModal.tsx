@@ -8,7 +8,6 @@ import useToken from "hooks/useToken";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import SelectMediaList from "./SelectMediaList";
 import SelectWeightsList from "./SelectWeightsList";
-import { set } from "date-fns";
 
 interface TabConfig {
   label: string;
@@ -43,19 +42,6 @@ const SelectModal = memo(
       setWeightType(currentTab?.mediaTypeFilter || "all");
     }, [activeTab, tabs]);
 
-    // const allWeights = useLazyLists({
-    //   addQueries: {
-    //     page_size: 9,
-    //     ...prepFilter(weightType, "filter_media_type"),
-    //   },
-    //   debug: "Media List",
-    //   fetcher: ListWeights,
-    //   list: weightList,
-    //   listSet: setWeightList,
-    //   requestList: true,
-    //   disableUrlQueries: true,
-    // });
-
     const openModal = () => {
       setIsModalOpen(true);
     };
@@ -87,7 +73,13 @@ const SelectModal = memo(
               onResultSelect={closeModal}
             />
           )}
-          {tab.type === "weights" && <SelectWeightsList />}
+          {tab.type === "weights" && (
+            <SelectWeightsList
+              weightType={weightType}
+              listKey={tab.tabKey}
+              onResultSelect={closeModal}
+            />
+          )}
         </>
       ),
       padding: true,
@@ -106,10 +98,7 @@ const SelectModal = memo(
               placeholder="None selected"
               value={weightTitle ? weightTitle : token || ""}
             />
-            <Button
-              label={weightTitle ? "Change" : "Select"}
-              onClick={openModal}
-            />
+            <Button label={token ? "Change" : "Select"} onClick={openModal} />
             {token && (
               <Button
                 square={true}

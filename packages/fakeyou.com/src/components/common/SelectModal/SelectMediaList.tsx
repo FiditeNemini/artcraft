@@ -26,7 +26,7 @@ export default function SelectMediaList({
       page_size: 9,
       ...prepFilter(mediaType, "filter_media_type"),
     },
-    debug: "User Media List",
+    debug: "Media List",
     fetcher: ListMediaFiles,
     list,
     listSet,

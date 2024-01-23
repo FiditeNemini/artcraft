@@ -6,7 +6,7 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 
-import { BasicVideo, Container, Panel } from "components/common";
+import { BasicVideo, Button, Container, Panel } from "components/common";
 import PageHeader from "components/layout/PageHeader";
 import Tabs from "components/common/Tabs";
 import { useLocalize } from "hooks";
@@ -15,7 +15,12 @@ import TabContentUpload from "./components/tabContentUpload";
 import TabContentLibrary from "./components/tabContentLibrary";
 import PageVideoMocapProgress from "./components/pageVideoMocapProgress";
 import VideoMocapJobList from "./components/videoMocapJobList";
-import {states, reducer} from './videoMocapReducer';
+import { states, reducer } from "./videoMocapReducer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowRotateLeft,
+  faPersonCircleCheck,
+} from "@fortawesome/pro-solid-svg-icons";
 
 export default function VideoMotionCapture(props: {
   enqueueInferenceJob: (
@@ -28,21 +33,25 @@ export default function VideoMotionCapture(props: {
   const { enqueueInferenceJob } = props;
   const { t } = useLocalize("VideoMotionCapture");
   const { NO_FILE, FILE_UPLOADING, MOCAPNET_ENQUEUED } = states;
-  const [pageState, dispatchPageState] = useReducer(reducer, {status: NO_FILE});
+  const [pageState, dispatchPageState] = useReducer(reducer, {
+    status: NO_FILE,
+  });
 
-  useEffect(()=>{
-    if (pageState.status === states.MOCAPNET_ENQUEUED && pageState.inferenceJobToken){
+  useEffect(() => {
+    if (
+      pageState.status === states.MOCAPNET_ENQUEUED &&
+      pageState.inferenceJobToken
+    ) {
       enqueueInferenceJob(
         pageState.inferenceJobToken,
         FrontendInferenceJobType.VideoMotionCapture
       );
       dispatchPageState({
-        type: 'enqueueMocapNetSuccess', 
-        payload:{inferenceJobToken: undefined}
+        type: "enqueueMocapNetSuccess",
+        payload: { inferenceJobToken: undefined },
       });
     }
-      
-  }, [pageState, enqueueInferenceJob])
+  }, [pageState, enqueueInferenceJob]);
   const { pathname } = useLocation();
 
   if (pathname === `/video-mocap` || pathname === `/video-mocap/`) {
@@ -52,13 +61,13 @@ export default function VideoMotionCapture(props: {
   const tabs = [
     {
       label: t("tabTitle.upload"),
-      content: <TabContentUpload {...{t, pageState, dispatchPageState}} />,
+      content: <TabContentUpload {...{ t, pageState, dispatchPageState }} />,
       to: "/video-mocap/upload",
       padding: true,
     },
     {
       label: t("tabTitle.library"),
-      content: <TabContentLibrary {...{t, pageState, dispatchPageState}} />,
+      content: <TabContentLibrary {...{ t, pageState, dispatchPageState }} />,
       to: "/video-mocap/select-media",
       padding: true,
     },
@@ -70,36 +79,56 @@ export default function VideoMotionCapture(props: {
         title={t("headings.title")}
         subText={t("headings.subtitle")}
       />
-      <Panel>
+
+      <VideoMocapJobList />
+
+      <Panel className="mt-3">
         <div className="row g-0">
-          { pageState.status < FILE_UPLOADING && <>
+          {pageState.status < FILE_UPLOADING && (
+            <>
               <div className="col-12 col-md-6">
-                <Tabs tabs={tabs}/>
+                <Tabs tabs={tabs} />
               </div>
               <div className="col-12 col-md-6">
-              <Panel padding={true} clear={true}>
-                <BasicVideo
-                  title="Video -> Mocap Sample"
-                  src="/videos/face-animator-instruction-en.mp4"
+                <Panel padding={true} clear={true}>
+                  <BasicVideo
+                    title="Video -> Mocap Sample"
+                    src="/videos/face-animator-instruction-en.mp4"
+                  />
+                </Panel>
+              </div>
+            </>
+          )}
+          {pageState.status >= FILE_UPLOADING &&
+            pageState.status < MOCAPNET_ENQUEUED && (
+              <PageVideoMocapProgress
+                {...{ t, pageState, dispatchPageState }}
+              />
+            )}
+          {pageState.status === MOCAPNET_ENQUEUED && (
+            <Panel padding={true}>
+              <div className="d-flex flex-column gap-3 text-center align-items-center">
+                <FontAwesomeIcon
+                  icon={faPersonCircleCheck}
+                  className="display-5 mb-2"
                 />
-              </Panel>
-            </div>
-          </>}
-          { pageState.status >= FILE_UPLOADING && pageState.status < MOCAPNET_ENQUEUED &&
-            <div className="col-12" >
-              <PageVideoMocapProgress {...{t, pageState, dispatchPageState}} />
-            </div>
-          }
-          { pageState.status === MOCAPNET_ENQUEUED &&
-            <div className="col-12" >
-              <h2 className="p-3 m-0">{t("tab.message.mocapNetRequestSucceed")}</h2>
-            </div>
-          }
+                <h2 className="fw-semibold">
+                  {t("tab.message.mocapNetRequestSucceed")}
+                </h2>
+                <div>
+                  <Button
+                    icon={faArrowRotateLeft}
+                    iconFlip={true}
+                    label="Generate Another"
+                    onClick={() => {}} //back to first state
+                    variant="primary"
+                  />
+                </div>
+              </div>
+            </Panel>
+          )}
         </div>
-        {/*2nd row*/}
       </Panel>
-      {/*panel*/}
-      <VideoMocapJobList />
     </Container>
   );
 }
