@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { Redirect, useLocation } from "react-router-dom";
 
-import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
-import { PageInferenceStatuses } from "./components/pageInferenceStatuses";
 
 import { BasicVideo, Container, Panel } from "components/common";
 import PageHeader from "components/layout/PageHeader";
@@ -15,9 +13,9 @@ import { useLocalize } from "hooks";
 
 import TabContentUpload from "./components/tabContentUpload";
 import TabContentLibrary from "./components/tabContentLibrary";
+import VideoMotionCaptureJobList from "./components/videoMotionCaptureJobList";
 
 export default function VideoMotionCapture(props: {
-  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   enqueueInferenceJob: (
     jobToken: string,
     frontendInferenceJobType: FrontendInferenceJobType
@@ -83,35 +81,31 @@ export default function VideoMotionCapture(props: {
       />
       <Panel>
         <div className="row g-0">
-          {/*Video Provision Tabs & Job Statuses*/}
-          <div className="col-12 col-md-6">
-            {pageState !== SHOW_JOB_STATUS && 
-              <Tabs tabs={tabs} disabled={pageState === VIDEO_PROVISIONING}/>
-            }
-            {pageState === SHOW_JOB_STATUS && (
-              <PageInferenceStatuses
-                {...{
-                  t,
-                  pageStates,
-                  pageStateCallback: handlePageState,
-                }}
-              />
-            )}
-          </div>
-          {/*ENDS Video Chooser Tabs*/}
-
-          <div className="col-12 col-md-6">
-            <Panel padding={true} clear={true}>
-              <BasicVideo
-                title="Video -> Mocap Sample"
-                src="/videos/face-animator-instruction-en.mp4"
-              />
-            </Panel>
-          </div>
+          { pageState !== SHOW_JOB_STATUS &&
+              <div className="col-12 col-md-6">
+                <Tabs tabs={tabs} disabled={pageState === VIDEO_PROVISIONING}/>
+              </div>
+          }
+          { pageState === START &&
+            <div className="col-12 col-md-6">
+              <Panel padding={true} clear={true}>
+                <BasicVideo
+                  title="Video -> Mocap Sample"
+                  src="/videos/face-animator-instruction-en.mp4"
+                />
+              </Panel>
+            </div>
+          }
+          { pageState === SHOW_JOB_STATUS &&
+            <div className="col-12" >
+              <h2 className="p-3 m-0">{t("tab.message.mocapNetRequestSucceed")}</h2>
+            </div>
+          }
         </div>
         {/*2nd row*/}
       </Panel>
       {/*panel*/}
+      <VideoMotionCaptureJobList />
     </Container>
   );
 }
