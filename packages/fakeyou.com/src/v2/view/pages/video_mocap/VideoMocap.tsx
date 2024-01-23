@@ -42,7 +42,7 @@ export default function VideoMotionCapture(props: {
       });
     }
       
-  }, [pageState])
+  }, [pageState, enqueueInferenceJob])
   const { pathname } = useLocation();
 
   if (pathname === `/video-mocap` || pathname === `/video-mocap/`) {

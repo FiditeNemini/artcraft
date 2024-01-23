@@ -37,7 +37,9 @@ export default function PageVideoMocapProgress ({t, pageState, dispatchPageState
     return (
         <div className="row p-4 g-4">
           <div className="col-12 d-flex justify-content-center">
-            <h2>{t("tab.message.fileUploading")}</h2>
+            <h2 className="flex-basis">{t("tab.message.fileUploading")}</h2>
+          </div>
+          <div className="col-12 d-flex justify-content-center">
             <Spinner />
           </div>
         </div>
