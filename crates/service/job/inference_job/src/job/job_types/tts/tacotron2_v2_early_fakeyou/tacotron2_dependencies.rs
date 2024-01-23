@@ -21,6 +21,7 @@ pub struct Tacotron2Dependencies {
   /// dependencies that are for the sidecar version of TT2
   pub sidecar: SidecarDeps,
 
+  /// Rollout flag for uploading results as `media_files` instead of `tts_results`.
   pub upload_as_media_file: bool,
 }
 
