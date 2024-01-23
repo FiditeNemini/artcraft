@@ -22,7 +22,7 @@ interface AudioCardProps {
   showCreator?: boolean;
   showCover?: boolean;
   type: "media" | "weights";
-  inSearcher?: boolean;
+  inSelectModal?: boolean;
   onResultSelect?: () => void;
 }
 
@@ -34,7 +34,7 @@ export default function AudioCard({
   showCreator,
   showCover,
   type,
-  inSearcher = false,
+  inSelectModal = false,
   onResultSelect,
 }: AudioCardProps) {
   const { setToken, setWeightTitle } = useToken();
@@ -50,10 +50,12 @@ export default function AudioCard({
     event.stopPropagation();
   };
 
-  const handleSearcherResultSelect = () => {
-    setToken(data.weight_token);
-    setWeightTitle && setWeightTitle(data.title);
-    onResultSelect && onResultSelect();
+  const handleSelectModalResultSelect = () => {
+    if (inSelectModal) {
+      setToken(data.weight_token);
+      setWeightTitle && setWeightTitle(data.title);
+      onResultSelect && onResultSelect();
+    }
   };
 
   const timeAgo = useTimeAgo(data.created_at);
@@ -86,7 +88,11 @@ export default function AudioCard({
   }
 
   const card = (
-    <Card padding={true} canHover={true} onClick={handleSearcherResultSelect}>
+    <Card
+      padding={true}
+      canHover={true}
+      onClick={handleSelectModalResultSelect}
+    >
       {type === "media" && (
         <>
           <div className="mb-3">
@@ -161,14 +167,14 @@ export default function AudioCard({
                 <div className="d-flex flex-grow-1">
                   <Badge label={weightBadgeLabel} color={weightBadgeColor} />
                 </div>
-                {inSearcher ? (
+                {inSelectModal ? (
                   <Button
                     icon={faArrowRight}
                     iconFlip={true}
                     variant="link"
                     label="Select"
                     className="fs-7"
-                    onClick={handleSearcherResultSelect}
+                    onClick={handleSelectModalResultSelect}
                   />
                 ) : (
                   <Button
@@ -246,7 +252,7 @@ export default function AudioCard({
 
   return (
     <>
-      {inSearcher ? (
+      {inSelectModal ? (
         <>{card}</>
       ) : (
         <Link

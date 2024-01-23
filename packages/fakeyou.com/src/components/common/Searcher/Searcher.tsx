@@ -128,7 +128,7 @@ export default function Searcher({
                       data,
                       showCreator: true,
                       type: "weights",
-                      inSearcher: true,
+                      inSelectModal: true,
                       onResultSelect,
                     };
 
@@ -186,7 +186,7 @@ export default function Searcher({
                         data,
                         showCreator: true,
                         type: "weights",
-                        inSearcher: true,
+                        inSelectModal: true,
                         onResultSelect,
                       };
 

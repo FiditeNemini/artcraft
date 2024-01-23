@@ -10,15 +10,17 @@ import Button from "components/common/Button";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import useToken from "hooks/useToken";
 
 interface ImageCardProps {
-  bookmarks: any;
+  bookmarks?: any;
   data: any;
   origin?: string;
-  ratings: any;
+  ratings?: any;
   showCreator?: boolean;
   type: "media" | "weights";
-  inSearcher?: boolean;
+  inSelectModal?: boolean;
+  onResultSelect?: () => void;
 }
 
 export default function ImageCard({
@@ -28,9 +30,11 @@ export default function ImageCard({
   showCreator,
   ratings,
   type,
-  inSearcher = false,
+  inSelectModal = false,
+  onResultSelect,
 }: ImageCardProps) {
   const history = useHistory();
+  const { setToken, setWeightTitle } = useToken();
   const linkUrl =
     type === "media"
       ? `/media/${data.token}`
@@ -42,11 +46,11 @@ export default function ImageCard({
     event.stopPropagation();
   };
 
-  const handleSearcherSelect = () => {
-    if (inSearcher) {
-      console.log("Searcher weight selected", data.weight_token);
-    } else {
-      return;
+  const handleSelectModalResultSelect = () => {
+    if (inSelectModal) {
+      setToken(data.weight_token);
+      setWeightTitle && setWeightTitle(data.title);
+      onResultSelect && onResultSelect();
     }
   };
 
@@ -83,7 +87,11 @@ export default function ImageCard({
   }
 
   const card = (
-    <Card padding={false} canHover={true}>
+    <Card
+      padding={false}
+      canHover={true}
+      onClick={handleSelectModalResultSelect}
+    >
       {type === "media" && (
         <>
           <img src={coverImage} alt={data.weight_name} className="card-img" />
@@ -94,6 +102,16 @@ export default function ImageCard({
               <div className="d-flex flex-grow-1">
                 <Badge label="Image" color="ultramarine" overlay={true} />
               </div>
+              {inSelectModal && (
+                <Button
+                  icon={faArrowRight}
+                  iconFlip={true}
+                  variant="link"
+                  label="Select"
+                  className="fs-7"
+                  onClick={handleSelectModalResultSelect}
+                />
+              )}
             </div>
 
             <div className="card-img-overlay-text">
@@ -125,16 +143,18 @@ export default function ImageCard({
                   </div>
                 )}
 
-                <div>
-                  <LikeButton
-                    {...{
-                      ...ratings.makeProps({
-                        entityToken: data.token,
-                        entityType: "media_file",
-                      }),
-                    }}
-                  />
-                </div>
+                {ratings && (
+                  <div>
+                    <LikeButton
+                      {...{
+                        ...ratings.makeProps({
+                          entityToken: data.token,
+                          entityType: "media_file",
+                        }),
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -154,14 +174,14 @@ export default function ImageCard({
                   overlay={true}
                 />
               </div>
-              {inSearcher ? (
+              {inSelectModal ? (
                 <Button
                   icon={faArrowRight}
                   iconFlip={true}
                   variant="link"
                   label="Select"
                   className="fs-7"
-                  onClick={handleSearcherSelect}
+                  onClick={handleSelectModalResultSelect}
                 />
               ) : (
                 <Button
@@ -209,24 +229,29 @@ export default function ImageCard({
                   </div>
                 )}
 
-                <div>
-                  <LikeButton
+                {ratings && (
+                  <div>
+                    <LikeButton
+                      {...{
+                        ...ratings.makeProps({
+                          entityToken: data.weight_token,
+                          entityType: "model_weight",
+                        }),
+                      }}
+                    />
+                  </div>
+                )}
+
+                {bookmarks && (
+                  <BookmarkButton
                     {...{
-                      ...ratings.makeProps({
+                      ...bookmarks.makeProps({
                         entityToken: data.weight_token,
                         entityType: "model_weight",
                       }),
                     }}
                   />
-                </div>
-                <BookmarkButton
-                  {...{
-                    ...bookmarks.makeProps({
-                      entityToken: data.weight_token,
-                      entityType: "model_weight",
-                    }),
-                  }}
-                />
+                )}
               </div>
             </div>
           </div>
@@ -237,7 +262,7 @@ export default function ImageCard({
 
   return (
     <>
-      {inSearcher ? (
+      {inSelectModal ? (
         <>{card}</>
       ) : (
         <Link

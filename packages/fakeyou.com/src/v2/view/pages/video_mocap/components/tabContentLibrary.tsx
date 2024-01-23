@@ -1,6 +1,5 @@
+import SelectModal from "components/common/SelectModal/SelectModal";
 import React from "react";
-
-import SelectSearcher from "components/common/SelectSearcher/SelectSearcher";
 import { Action, State } from "../videoMocapReducer";
 
 export default function TabContentLibrary(props: {
@@ -10,19 +9,16 @@ export default function TabContentLibrary(props: {
 }){
   return (
     <div>
-      <SelectSearcher
+      <SelectModal
         modalTitle="Select a Video"
         label="Select a Video"
         tabs={[
           {
             label: "All Videos",
-            searcherKey: "allVideos",
-            mediaTypeFilter: "",
-          },
-          {
-            label: "Bookmarked",
-            searcherKey: "bookmarkedVideos",
-            mediaTypeFilter: "",
+            tabKey: "allVideos",
+            mediaTypeFilter: "video",
+            searcher: false,
+            type: "media",
           },
         ]}
       />
