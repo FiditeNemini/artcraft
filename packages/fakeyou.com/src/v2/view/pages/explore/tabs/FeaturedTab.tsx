@@ -9,35 +9,53 @@ import { useBookmarks, useRatings } from "hooks";
 import { ListFeaturedMediaFiles } from "@storyteller/components/src/api/media_files/ListFeaturedMediaFiles";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import SkeletonCard from "components/common/Card/SkeletonCard";
+// import { SegmentButtons } from "components/common";
+import "./FeaturedTab.scss";
 
 export default function FeaturedTab() {
   const bookmarks = useBookmarks();
   const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [list, listSet] = useState<MediaFile[]>([]);
+  const [listType,
+  // listTypeSet
+  ] = useState("media");
   // const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [status, statusSet] = useState(FetchStatus.ready);
   const isLoading =
     status === FetchStatus.ready || status === FetchStatus.in_progress;
 
+  // const options = [{ label: "Media", value: "media" },{ label: "Weights", value: "weight" }];
+  // const onChange = ({ target }: any) => {
+  //   listTypeSet(target.value === "weight" ? target.value : "media");
+  //   // clear list
+  //   // statusSet(FetchStatus.ready)
+  // };
+
   useEffect(() => {
     if (status === FetchStatus.ready) {
       statusSet(FetchStatus.in_progress);
-      ListFeaturedMediaFiles("", {}).then((res: any) => {
-        console.log("🏮", res);
-        statusSet(FetchStatus.success);
-        if (res.results) {
-          listSet(res.results);
-        }
-      });
+      if (listType === "media") {
+        ListFeaturedMediaFiles("", {}).then((res: any) => {
+          console.log("🏮", res);
+          statusSet(FetchStatus.success);
+          if (res.results) {
+            listSet(res.results);
+          }
+        });
+      } 
+      // else if (listType === "weight") {}
     }
-  }, [status]);
+  }, [listType, status]);
 
   return (
     <div className="d-flex flex-column gap-4">
       <div>
-        <div className="d-flex align-items-center mb-3">
-          <h3 className="fw-semibold mb-0 flex-grow-1">Featured Media</h3>
+        <div className="fy-featured-header mb-3">
+          <h3 className="fw-semibold mb-0">Featured</h3>
+          {
+           // <SegmentButtons {...{ onChange, options, value: listType }}/> // switch between media/weights control
+          }
           <Link to="/explore/media">
             View media
             <FontAwesomeIcon icon={faChevronRight} className="ms-2" />
