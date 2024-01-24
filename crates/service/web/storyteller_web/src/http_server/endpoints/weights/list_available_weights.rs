@@ -163,8 +163,8 @@ pub async fn list_available_weights_handler(
         .weights_type(query.weight_type)
         .scope_creator_username(None)
         .include_user_hidden(include_user_hidden)
-        .include_user_deleted_results(is_mod)
-        .include_mod_deleted_results(is_mod)
+        .include_user_deleted_results(false) // NB: Mods don't want to see deleted models. We'll improve this later.
+        .include_mod_deleted_results(false) // NB: Mods don't want to see deleted models. We'll improve this later.
         .limit(limit)
         .offset(cursor);
 

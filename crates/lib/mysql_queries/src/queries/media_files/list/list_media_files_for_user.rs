@@ -202,10 +202,10 @@ LEFT OUTER JOIN entity_stats
   }
 
   match view_as {
-    ViewAs::Author => {
+    ViewAs::Author | ViewAs::Moderator => {
+      // NB(bt): Actually, mods don't want to see deleted files. We'll improve the moderator UI later.
       query_builder.push(" AND m.user_deleted_at IS NULL AND m.mod_deleted_at IS NULL ");
     }
-    ViewAs::Moderator => {}
     ViewAs::AnotherUser => {
       query_builder.push(" AND m.user_deleted_at IS NULL AND m.mod_deleted_at IS NULL ");
       // FIXME: Binding shouldn't require to_str().
