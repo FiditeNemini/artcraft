@@ -411,7 +411,7 @@ export default function WeightPage({
             <div className="panel p-3 py-4 p-md-4 d-none d-xl-block">
               <h4 className="fw-semibold mb-3">Comments</h4>
               <CommentComponent
-                entityType="user"
+                entityType="model_weight"
                 entityToken={weight.weight_token}
               />
             </div>
@@ -559,7 +559,7 @@ export default function WeightPage({
           <Panel padding={true}>
             <h4 className="fw-semibold mb-3">Comments</h4>
             <CommentComponent
-              entityType="user"
+              entityType="model_weight"
               entityToken={weight.weight_token}
             />
           </Panel>

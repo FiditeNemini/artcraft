@@ -29,7 +29,7 @@ function CommentList(props: Props) {
 
   let rows: Array<JSX.Element> = [];
 
-  reversedComments.forEach((comment) => {
+  reversedComments.forEach(comment => {
     const createTime = new Date(comment.created_at);
     const relativeCreateTime = formatDistance(createTime, now, {
       addSuffix: true,
@@ -40,7 +40,7 @@ function CommentList(props: Props) {
     // We want profile / model / result owner to be able to clear harassing
     // comments themselves. This isn't ready yet, though.
     const isAuthor = userTokenMatch(comment.user_token);
-    const isModerator = user.canBanUsers;
+    const isModerator = user?.canBanUsers;
     const canDelete = isAuthor || isModerator;
 
     let maybeDeleteButton = <></>;
@@ -62,9 +62,9 @@ function CommentList(props: Props) {
       <tr key={comment.token}>
         <td className="px-0">
           <div className="d-flex gap-3 py-3">
-            <Gravatar size={40} email_hash={comment.user_gravatar_hash} />
+            <Gravatar size={42} email_hash={comment.user_gravatar_hash} />
             <div>
-              <div className="d-flex gap-2 align-items-center">
+              <div className="d-flex gap-2 align-items-center flex-wrap">
                 <Link to={profileLink} className="fw-medium text-white">
                   {comment.user_display_name}
                 </Link>

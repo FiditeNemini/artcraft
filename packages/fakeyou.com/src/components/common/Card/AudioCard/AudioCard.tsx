@@ -206,13 +206,22 @@ export default function AudioCard({
             {showCreator && (
               <div className="flex-grow-1">
                 <CreatorName
-                  displayName={data.creator?.display_name || "Anonymous"}
+                  displayName={
+                    data.creator?.display_name ||
+                    data.details?.maybe_weight_data.maybe_creator
+                      .display_name ||
+                    "Anonymous"
+                  }
                   gravatarHash={data.creator?.gravatar_hash || null}
                   avatarIndex={data.creator?.default_avatar.image_index || 0}
                   backgroundIndex={
                     data.creator?.default_avatar.color_index || 0
                   }
-                  username={data.creator?.username || "anonymous"}
+                  username={
+                    data.creator?.username ||
+                    data.details?.maybe_weight_data.maybe_creator.username ||
+                    "anonymous"
+                  }
                 />
               </div>
             )}

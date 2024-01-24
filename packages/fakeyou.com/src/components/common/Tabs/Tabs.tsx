@@ -8,10 +8,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 interface TabProps {
   to: string;
   label: string;
+  numberCount?: number;
   content?: React.ReactNode;
   icon?: IconDefinition;
   padding?: boolean;
-  disabled?:boolean;
+  disabled?: boolean;
 }
 
 interface TabsProps {
@@ -24,17 +25,29 @@ interface TabContentProps {
   padding?: boolean;
 }
 
-function Tab({ to, label, icon, onClick, disabled }: TabProps & { onClick: () => void }) {
+function Tab({
+  to,
+  label,
+  numberCount,
+  icon,
+  onClick,
+  disabled,
+}: TabProps & { onClick: () => void }) {
   return (
     <li className="nav-item">
       <NavLink
         to={to}
-        className={"nav-link fs-6 px-3 px-lg-4" + (disabled?" disabled":"")}
+        className={"nav-link fs-6 px-3 px-lg-4" + (disabled ? " disabled" : "")}
         activeClassName="active"
         onClick={onClick}
       >
         {icon && <FontAwesomeIcon icon={icon} className="me-2" />}
-        {label}
+        <div className="d-flex gap-2">
+          {label}
+          {numberCount && (
+            <div className="number-count">{numberCount.toString() || "0"}</div>
+          )}
+        </div>
       </NavLink>
     </li>
   );
@@ -83,6 +96,7 @@ function Tabs({ tabs, disabled }: TabsProps) {
             key={tab.to}
             to={tab.to}
             label={tab.label}
+            numberCount={tab.numberCount}
             onClick={() => handleTabClick(tab.to)}
             icon={tab.icon}
             disabled={disabled || tab.disabled}
