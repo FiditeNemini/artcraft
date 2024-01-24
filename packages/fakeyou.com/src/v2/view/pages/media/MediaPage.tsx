@@ -278,7 +278,7 @@ export default function MediaPage() {
     },
   ];
 
-  if (user.canBanUsers) {
+  if (user?.canBanUsers) {
     modMediaDetails = (
       <Accordion.Item title="Moderator Details" defaultOpen={false}>
         <DataTable data={modDetails} />
