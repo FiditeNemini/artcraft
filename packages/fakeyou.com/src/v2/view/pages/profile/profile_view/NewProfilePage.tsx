@@ -37,6 +37,7 @@ import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocum
 import {
   faBookmark,
   faCalendarAlt,
+  faComment,
   faLayerGroup,
   faPhotoFilmMusic,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -48,6 +49,7 @@ import Tabs from "components/common/Tabs";
 import MediaTab from "./tabs/MediaTab";
 import WeightsTab from "./tabs/WeightsTab";
 import BookmarksTab from "./tabs/BookmarksTab";
+import { CommentComponent } from "v2/view/_common/comments/CommentComponent";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -373,6 +375,15 @@ function NewProfilePage(this: any, props: Props) {
       label: "Bookmarks",
       content: <BookmarksTab {...{ username }} />,
       icon: faBookmark,
+      padding: true,
+    },
+    {
+      to: `/profile/${username}/comments`,
+      label: "Comments",
+      content: (
+        <CommentComponent entityType="user" entityToken={userData.user_token} />
+      ),
+      icon: faComment,
       padding: true,
     },
   ];

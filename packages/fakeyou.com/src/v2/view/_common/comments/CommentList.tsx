@@ -29,7 +29,7 @@ function CommentList(props: Props) {
 
   let rows: Array<JSX.Element> = [];
 
-  reversedComments.forEach((comment) => {
+  reversedComments.forEach(comment => {
     const createTime = new Date(comment.created_at);
     const relativeCreateTime = formatDistance(createTime, now, {
       addSuffix: true,
@@ -62,7 +62,7 @@ function CommentList(props: Props) {
       <tr key={comment.token}>
         <td className="px-0">
           <div className="d-flex gap-3 py-3">
-            <Gravatar size={40} email_hash={comment.user_gravatar_hash} />
+            <Gravatar size={42} email_hash={comment.user_gravatar_hash} />
             <div>
               <div className="d-flex gap-2 align-items-center">
                 <Link to={profileLink} className="fw-medium text-white">
