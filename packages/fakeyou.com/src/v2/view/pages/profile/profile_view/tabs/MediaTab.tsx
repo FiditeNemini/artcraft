@@ -17,7 +17,7 @@ import { useListContent, useRatings } from "hooks";
 import prepFilter from "resources/prepFilter";
 
 export default function MediaTab({ username }: { username: string }) {
-  const { pathname: origin, search } = useLocation();
+  const { pathname: source, search } = useLocation();
   const urlQueries = new URLSearchParams(search);
   // const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -33,7 +33,7 @@ export default function MediaTab({ username }: { username: string }) {
       ...prepFilter(mediaType, "filter_media_type"),
     },
     addSetters: { mediaTypeSet },
-    debug: "profile media",
+    // debug: "profile media",
     fetcher: GetMediaByUser,
     list,
     listSet,
@@ -116,7 +116,7 @@ export default function MediaTab({ username }: { username: string }) {
                     onLayoutComplete={() => console.log("Layout complete!")}
                   >
                     {media.list.map((data: MediaFile, key: number) => {
-                      let props = { data, origin, ratings, type: "media" };
+                      let props = { data, source, ratings, type: "media" };
                       return (
                         <div
                           {...{

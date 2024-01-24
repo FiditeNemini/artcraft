@@ -7,31 +7,27 @@ import LikeButton from "components/common/LikeButton";
 import CreatorName from "../CreatorName";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
+import getCardUrl from "../getCardUrl";
 // import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface ImageCardProps {
   bookmarks: any;
   data: any;
-  origin?: string;
   ratings: any;
   showCreator?: boolean;
+  source?: string;
   type: "media" | "weights";
 }
 
 export default function ImageCard({
   bookmarks,
   data,
-  origin = "",
   showCreator,
+  source = "",
   ratings,
   type,
 }: ImageCardProps) {
-  const linkUrl =
-    type === "media"
-      ? `/media/${data.token}`
-      : `/weight/${data.weight_token || data.details.entity_token}${
-          origin ? "?origin=" + origin : ""
-        }`;
+  const linkUrl = getCardUrl(data,source,type);
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
@@ -44,8 +40,7 @@ export default function ImageCard({
   return (
     <Link
       {...{
-        to: linkUrl,
-        state: { origin },
+        to: linkUrl
       }}
     >
       <Card padding={false} canHover={true}>

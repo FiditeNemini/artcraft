@@ -10,12 +10,13 @@ import CreatorName from "../CreatorName";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { Link } from "react-router-dom";
 import useToken from "hooks/useToken";
+import getCardUrl from "../getCardUrl";
 
 interface VideoCardProps {
   data: any;
-  origin?: string;
   ratings?: any;
   showCreator?: boolean;
+  source?: string;
   type: "media" | "weights";
   inSelectModal?: boolean;
   onResultSelect?: () => void;
@@ -23,16 +24,15 @@ interface VideoCardProps {
 
 export default function VideoCard({
   data,
-  origin = "",
   ratings,
   showCreator,
+  source = "",
   type,
   inSelectModal = false,
   onResultSelect,
 }: VideoCardProps) {
   const { setToken, setWeightTitle } = useToken();
-  const linkUrl =
-    type === "media" ? `/media/${data.token}` : `/weight/${data.weight_token}`;
+  const linkUrl = getCardUrl(data,source,type);
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
@@ -197,7 +197,6 @@ export default function VideoCard({
         <Link
           {...{
             to: linkUrl,
-            state: { origin },
           }}
         >
           {card}

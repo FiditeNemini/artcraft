@@ -13,14 +13,15 @@ import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import useToken from "hooks/useToken";
+import getCardUrl from "../getCardUrl";
 
 interface AudioCardProps {
   bookmarks?: any;
   data: any;
-  origin?: string;
   ratings?: any;
   showCreator?: boolean;
   showCover?: boolean;
+  source?: string;
   type: "media" | "weights";
   inSelectModal?: boolean;
   onResultSelect?: () => void;
@@ -29,22 +30,17 @@ interface AudioCardProps {
 export default function AudioCard({
   bookmarks,
   data,
-  origin = "",
   ratings,
   showCreator,
   showCover,
+  source = "",
   type,
   inSelectModal = false,
   onResultSelect,
 }: AudioCardProps) {
   const { setToken, setWeightTitle } = useToken();
+  const linkUrl = getCardUrl(data,source,type);
   const history = useHistory();
-  const linkUrl =
-    type === "media"
-      ? `/media/${data.token}`
-      : `/weight/${data.weight_token || data.details.entity_token}${
-          origin ? "?origin=" + origin : ""
-        }`;
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
@@ -257,8 +253,7 @@ export default function AudioCard({
       ) : (
         <Link
           {...{
-            to: linkUrl,
-            state: { origin },
+            to: linkUrl
           }}
         >
           {card}

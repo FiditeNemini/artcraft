@@ -13,7 +13,6 @@ interface Props {
 }
 
 export default function SessionProvider({ children, querySession, querySubscriptions, sessionFetched, sessionWrapper }: Props) {
-  console.log("🥕",sessionWrapper);
   const sessionResponse = sessionWrapper?.sessionStateResponse || { logged_in: false };
   const { logged_in: loggedIn, user } = sessionResponse;
   const [view,viewSet] = useState(ModalView.Closed);

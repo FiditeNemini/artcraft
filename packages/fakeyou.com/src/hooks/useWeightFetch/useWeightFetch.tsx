@@ -55,10 +55,10 @@ export default function useWeightFetch({ onRemove = n, onSuccess = n, token }: P
       });
   };
 
-  const remove = () => {
+  const remove = (as_mod: boolean) => {
     writeStatusSet(FetchStatus.in_progress);
     DeleteWeight(token, {
-      as_mod: true,
+      as_mod,
       set_delete: true,
     }).then((res: any) => {
       writeStatusSet(FetchStatus.success);

@@ -16,7 +16,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import prepFilter from "resources/prepFilter";
 
 export default function MediaTab() {
-  const { search } = useLocation();
+  const { pathname: source, search } = useLocation();
   const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -33,7 +33,7 @@ export default function MediaTab() {
       ...prepFilter(mediaType, "filter_media_type"),
     },
     addSetters: { mediaTypeSet },
-    debug: "explore media tab",
+    // debug: "explore media tab",
     fetcher: ListMediaFiles,
     list,
     listSet,
@@ -125,7 +125,7 @@ export default function MediaTab() {
                       let props = {
                         bookmarks,
                         data,
-                        origin,
+                        source,
                         ratings,
                         type: "media",
                         showCreator: true,

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import MediaCards from "components/common/Card/MediaCards";
 import { Link } from "react-router-dom";
@@ -13,6 +14,7 @@ import SkeletonCard from "components/common/Card/SkeletonCard";
 import "./FeaturedTab.scss";
 
 export default function FeaturedTab() {
+  const { pathname: source } = useLocation();
   const bookmarks = useBookmarks();
   const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -83,10 +85,10 @@ export default function FeaturedTab() {
                   let props = {
                     bookmarks,
                     data,
-                    origin,
                     ratings,
-                    type: "media",
                     showCreator: true,
+                    source,
+                    type: "media",
                   };
 
                   return (

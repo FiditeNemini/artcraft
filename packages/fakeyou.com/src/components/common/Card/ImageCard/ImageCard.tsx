@@ -11,13 +11,14 @@ import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import useToken from "hooks/useToken";
+import getCardUrl from "../getCardUrl";
 
 interface ImageCardProps {
   bookmarks?: any;
   data: any;
-  origin?: string;
   ratings?: any;
   showCreator?: boolean;
+  source?: string;
   type: "media" | "weights";
   inSelectModal?: boolean;
   onResultSelect?: () => void;
@@ -26,8 +27,8 @@ interface ImageCardProps {
 export default function ImageCard({
   bookmarks,
   data,
-  origin = "",
   showCreator,
+  source = "",
   ratings,
   type,
   inSelectModal = false,
@@ -35,12 +36,7 @@ export default function ImageCard({
 }: ImageCardProps) {
   const history = useHistory();
   const { setToken, setWeightTitle } = useToken();
-  const linkUrl =
-    type === "media"
-      ? `/media/${data.token}`
-      : `/weight/${data.weight_token || data.details.entity_token}${
-          origin ? "?origin=" + origin : ""
-        }`;
+  const linkUrl = getCardUrl(data,source,type);
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
@@ -268,7 +264,6 @@ export default function ImageCard({
         <Link
           {...{
             to: linkUrl,
-            state: { origin },
           }}
         >
           {card}

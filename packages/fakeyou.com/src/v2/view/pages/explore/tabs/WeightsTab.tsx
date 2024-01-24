@@ -16,7 +16,7 @@ import { useBookmarks, useLazyLists, useRatings } from "hooks";
 import prepFilter from "resources/prepFilter";
 
 export default function WeightsTab() {
-  const { search } = useLocation();
+  const { pathname: source, search } = useLocation();
   const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -188,6 +188,7 @@ export default function WeightsTab() {
                       let props = {
                         bookmarks,
                         data,
+                        source,
                         ratings,
                         showCreator: true,
                         type: "weights",

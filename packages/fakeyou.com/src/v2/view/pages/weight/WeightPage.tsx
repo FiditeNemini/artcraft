@@ -59,7 +59,7 @@ export default function WeightPage({
   const { canEditTtsModel, user } = useSession();
   const { search } = useLocation();
   const { weight_token } = useParams<{ weight_token: string }>();
-  const origin = search ? new URLSearchParams(search).get("origin") : "";
+  const source = search ? new URLSearchParams(search).get("source") : "";
   const history = useHistory();
   const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -72,7 +72,7 @@ export default function WeightPage({
     remove,
   } = useWeightFetch({
     onRemove: () => {
-      history.push(origin || "");
+      history.push(source || "");
     },
     onSuccess: (res: any) => {
       bookmarks.gather({ res, key: "weight_token" }); // expand rather than replace for lazy loading
@@ -97,6 +97,8 @@ export default function WeightPage({
     color: weightTagColor,
     fullLabel: weightTypeFull,
   } = weightTypeInfo;
+
+  const deleteWeight = () => remove(!!user?.can_ban_users);
 
   function renderWeightComponent(weight: Weight) {
     switch (weight.weight_category) {
@@ -570,7 +572,7 @@ export default function WeightPage({
         content={() => (
           <>{`Are you sure you want to delete "${title}"? This action cannot be undone.`}</>
         )}
-        onConfirm={remove}
+        onConfirm={deleteWeight}
       />
     </div>
   );

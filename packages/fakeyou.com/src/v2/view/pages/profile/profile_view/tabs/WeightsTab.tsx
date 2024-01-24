@@ -23,7 +23,7 @@ import prepFilter from "resources/prepFilter";
 // }
 
 export default function WeightsTab({ username }: { username: string }) {
-  const { pathname: origin, search } = useLocation();
+  const { pathname: source, search } = useLocation();
   // const { maybe_scoped_weight_type, ...yadda } = useParams<{ maybe_scoped_weight_type: string }>();
   const urlQueries = new URLSearchParams(search);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -198,7 +198,7 @@ export default function WeightsTab({ username }: { username: string }) {
                   onLayoutComplete={() => console.log("Layout complete!")}
                 >
                   {weights.list.map((data: any, key: number) => {
-                    let props = { bookmarks, data, origin, ratings, showCreator: true, type: "weights" };
+                    let props = { bookmarks, data, ratings, showCreator: true, type: "weights", source };
 
                     return (
                       <div

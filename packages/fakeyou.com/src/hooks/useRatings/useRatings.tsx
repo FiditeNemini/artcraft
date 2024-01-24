@@ -9,7 +9,6 @@ export default function useRatings() {
       entity_type,
       rating_value: lib[entity_token]?.rating_value !== "positive" ? "positive" : "neutral"
     }
-    // console.log("😎",lib[entity_token], newRating);
     return SetRating("", newRating);
   };
 
@@ -27,14 +26,11 @@ export default function useRatings() {
   const ratings = useBatchContent({
     fetcher: GetRatings,
     checker: () => true,
-    debug: "useRatings",
+    // debug: "useRatings",
     modLibrary: (current: any, res: any, entity_token: string, tokenType: string) => {
-      console.log("🪼", tokenType, res );
       let { positive_rating_count } = res.results ? res.results.find((item: any, i: number) => 
         item[tokenType] === entity_token
       ).stats : res.stats;
-
-      console.log("🐽",positive_rating_count);
 
       return { ...current, positive_rating_count };
     },
@@ -43,8 +39,6 @@ export default function useRatings() {
     resultsKey: "ratings",
     toggleCheck: (entity: any) => (entity?.rating_value || "") === "positive"
   });
-
-  // console.log("🍎",ratings.busyList);
 
   return {
     ...ratings,

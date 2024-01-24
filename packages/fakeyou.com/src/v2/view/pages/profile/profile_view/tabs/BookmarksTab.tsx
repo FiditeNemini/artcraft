@@ -15,7 +15,7 @@ import WeightsCards from "components/common/Card/WeightsCards";
 import prepFilter from "resources/prepFilter";
 
 export default function BookmarksTab({ username }: { username: string }) {
-  const { pathname: origin, search } = useLocation();
+  const { pathname: source, search } = useLocation();
   const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -52,7 +52,7 @@ export default function BookmarksTab({ username }: { username: string }) {
       ...prepFilter(weightCategory, "maybe_scoped_weight_category"),
     },
     addSetters: { sdSet, ttsSet, vcSet, weightCategorySet, weightTypeSet },
-    debug: "bookmarks tab",
+    // debug: "bookmarks tab",
     fetcher: GetBookmarksByUser,
     list,
     listSet,
@@ -209,7 +209,7 @@ export default function BookmarksTab({ username }: { username: string }) {
                 onLayoutComplete={() => console.log("Layout complete!")}
               >
                 {dataList.map((data: any, key: number) => {
-                  let weightProps = { bookmarks, data, origin, ratings, showCreator: true, type: "weights" };
+                  let weightProps = { bookmarks, data, ratings, showCreator: true, source, type: "weights" };
 
                   // let mediaProps = {
                   //   bookmarks,
