@@ -34,7 +34,6 @@ import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import Iframe from "react-iframe";
 
-
 export default function MediaPage() {
   const { user } = useSession();
   const { token } = useParams<{ token: string }>();
@@ -97,10 +96,14 @@ export default function MediaPage() {
         return <SdCoverImagePanel src={sdMediaImage} />;
       case MediaFileType.Mocap:
         const bvhUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
-        return <Iframe {...{
-          url: `https://engine.fakeyou.com?mode=viewer&bvh=${bvhUrl}`,
-          className: "fy-studio-frame",
-        }}  />;
+        return (
+          <Iframe
+            {...{
+              url: `https://engine.fakeyou.com?mode=viewer&bvh=${bvhUrl}`,
+              className: "fy-studio-frame",
+            }}
+          />
+        );
       default:
         return <div>Unsupported media type</div>;
     }
@@ -372,7 +375,7 @@ export default function MediaPage() {
             <div className="panel p-3 py-4 p-md-4 mt-3 d-none d-xl-block">
               <h4 className="fw-semibold mb-3">Comments</h4>
               <CommentComponent
-                entityType="user"
+                entityType="media_file"
                 entityToken={mediaFile?.token || ""}
               />
             </div>
@@ -562,12 +565,12 @@ export default function MediaPage() {
           <Panel padding={true}>
             <h4 className="fw-semibold mb-3">Comments</h4>
             <CommentComponent
-              entityType="user"
+              entityType="media_file"
               entityToken={mediaFile?.token || ""}
             />
           </Panel>
         </Container>
-      </div>  
+      </div>
     </div>
   );
 }
