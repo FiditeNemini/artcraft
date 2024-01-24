@@ -5,15 +5,20 @@ export interface UserWeightListRequest {}
 
 export interface UserWeightListResponse {
   // pagination: Pagination,
-  success: boolean,
-  weights: any
+  success: boolean;
+  results: any;
 }
 
 export interface UserWeightListQueries {
-  page_index: number,
+  page_index: number;
 }
 
-export const GetWeightsByUser = MakeRequest<string, UserWeightListRequest, UserWeightListResponse, UserWeightListQueries>({
+export const GetWeightsByUser = MakeRequest<
+  string,
+  UserWeightListRequest,
+  UserWeightListResponse,
+  UserWeightListQueries
+>({
   method: "GET",
   routingFunction: (userToken: string) => `/v1/weights/by_user/${userToken}`,
 });
