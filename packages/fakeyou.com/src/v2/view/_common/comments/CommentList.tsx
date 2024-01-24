@@ -64,7 +64,7 @@ function CommentList(props: Props) {
           <div className="d-flex gap-3 py-3">
             <Gravatar size={42} email_hash={comment.user_gravatar_hash} />
             <div>
-              <div className="d-flex gap-2 align-items-center">
+              <div className="d-flex gap-2 align-items-center flex-wrap">
                 <Link to={profileLink} className="fw-medium text-white">
                   {comment.user_display_name}
                 </Link>
