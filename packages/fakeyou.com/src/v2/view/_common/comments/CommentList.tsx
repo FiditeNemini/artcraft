@@ -40,7 +40,7 @@ function CommentList(props: Props) {
     // We want profile / model / result owner to be able to clear harassing
     // comments themselves. This isn't ready yet, though.
     const isAuthor = userTokenMatch(comment.user_token);
-    const isModerator = user.canBanUsers;
+    const isModerator = user?.canBanUsers;
     const canDelete = isAuthor || isModerator;
 
     let maybeDeleteButton = <></>;
