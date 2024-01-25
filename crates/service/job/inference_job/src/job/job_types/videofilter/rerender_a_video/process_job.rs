@@ -16,7 +16,7 @@ use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Rr;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_rerender::{insert_media_file_from_rerender, InsertArgs};
-use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
+use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -87,7 +87,7 @@ pub async fn process_job(args: RerenderProcessJobArgs<'_>) -> Result<JobSuccessR
 
     // ==================== TRANSCODE MEDIA (IF NECESSARY) ==================== //
 
-    let mut usable_video_path = video_path.filesystem_path.clone();
+    let usable_video_path = video_path.filesystem_path.clone();
 
     //TODO: re encode with ffmpeg
 

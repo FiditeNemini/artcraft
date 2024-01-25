@@ -170,3 +170,23 @@ impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsV
         true
     }
 }
+
+pub struct WeightsWorkflowDescriptor;
+
+impl FileDescriptor for WeightsWorkflowDescriptor {
+    fn remote_directory_path(&self) -> &str {
+        REMOTE_FILE_DIRECTORY
+    }
+
+    fn get_suffix(&self) -> String {
+        "json".to_string()
+    }
+
+    fn get_prefix(&self) -> String {
+        "workflow".to_string()
+    }
+
+    fn is_public(&self) -> bool {
+        true
+    }
+}

@@ -55,6 +55,7 @@ use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha
 use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
 use crate::http_server::endpoints::misc::root_index::get_root_index;
 use crate::http_server::endpoints::mocap::enqueue_mocapnet::enqueue_mocapnet_handler;
+use crate::http_server::endpoints::workflows::enqueue_comfy_ui::enqueue_comfy_ui_handler;
 use crate::http_server::endpoints::moderation::approval::pending_w2l_templates::get_pending_w2l_templates_handler;
 use crate::http_server::endpoints::moderation::categories::delete_category::delete_category_handler;
 use crate::http_server::endpoints::moderation::categories::edit_category::edit_category_handler;
@@ -235,6 +236,11 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   let mut app = RouteBuilder::from_app(app)
       .add_post("/v1/mocap/mocapnet/create", enqueue_mocapnet_handler)
       .into_app();
+
+  // ==================== Workflows ====================
+    let mut app = RouteBuilder::from_app(app)
+        .add_post("/v1/workflow/comfy/create", enqueue_comfy_ui_handler)
+        .into_app();
 
   // ==================== "Generic" Inference ====================
 

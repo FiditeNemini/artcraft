@@ -16,8 +16,8 @@ use log::warn;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
 use enums::common::visibility::Visibility;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
+use migration::text_to_speech::get_tts_model_info_migration::get_tts_model_info_migration;
 use mysql_queries::column_types::vocoder_type::VocoderType;
-use mysql_queries::queries::tts::tts_models::get_tts_model::get_tts_model_by_token_using_connection;
 use redis_common::redis_cache_keys::RedisCacheKeys;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
@@ -204,13 +204,16 @@ pub async fn get_tts_model_handler(
 
   let model_token = path.token.clone();
 
+  let switch_to_weights_flag = server_state.flags.switch_tts_to_model_weights;
+
   let get_tts_model = move || {
     // NB: async closures are not yet stable in Rust, so we include an async block.
     async move {
-      get_tts_model_by_token_using_connection(
+      get_tts_model_info_migration(
         &model_token,
-        show_deleted_models,
         &mut mysql_connection,
+        show_deleted_models,
+        switch_to_weights_flag,
       ).await
     }
   };
@@ -221,14 +224,14 @@ pub async fn get_tts_model_handler(
       get_tts_model().await
     }
     Ok(mut redis_ttl_cache) => {
-      let cache_key = RedisCacheKeys::get_tts_model_endpoint(&path.token);
+      let cache_key = RedisCacheKeys::get_tts_model_for_info_migration_endpoint(&path.token);
       redis_ttl_cache.lazy_load_if_not_cached(&cache_key, move || {
         get_tts_model()
       }).await
     }
   };
 
-  let mut model = match model_query_result {
+  let model = match model_query_result {
     Err(e) => {
       warn!("query error: {:?}", e);
       return Err(GetTtsModelError::ServerError);
@@ -238,22 +241,24 @@ pub async fn get_tts_model_handler(
   };
 
   if let Some(user_session) = &maybe_user_session {
-    is_original_author = user_session.user_token == model.creator_user_token;
+    is_original_author = user_session.user_token == model.creator_user_token();
   }
 
-  if let Some(moderator_fields) = model.maybe_moderator_fields.as_ref() {
-    // NB: The moderator fields will always be present before removal
-    // We don't want non-mods seeing stuff made by banned users.
-    if moderator_fields.creator_is_banned && !is_moderator {
-      return Err(GetTtsModelError::NotFound);
-    }
-  }
+  // NB(bt, 2024-01-20): Removing to make porting easier.
+  //if let Some(moderator_fields) = model.maybe_moderator_fields.as_ref() {
+  //  // NB: The moderator fields will always be present before removal
+  //  // We don't want non-mods seeing stuff made by banned users.
+  //  if moderator_fields.creator_is_banned && !is_moderator {
+  //    return Err(GetTtsModelError::NotFound);
+  //  }
+  //}
 
-  if !is_moderator {
-    model.maybe_moderator_fields = None;
-  }
+  // NB(bt, 2024-01-20): Removing to make porting easier.
+  //if !is_moderator {
+  //  model.maybe_moderator_fields = None;
+  //}
 
-  let text_pipeline_type = model.text_pipeline_type
+  let text_pipeline_type = model.text_pipeline_type()
       .as_deref()
       .and_then(|pipeline_type| {
         // If there's an error deserializing, turn it to None instead of 500ing. The column is
@@ -273,64 +278,68 @@ pub async fn get_tts_model_handler(
 
   // TODO: Use language to infer as well.
   let text_pipeline_type_guess =
-      guess_text_pipeline_heuristic(Some(model.created_at.clone()));
+      guess_text_pipeline_heuristic(Some(model.created_at().clone()));
 
   // Map to public response type.
   let response = GetTtsModelSuccessResponse {
     success: true,
     model: TtsModelInfo {
-      model_token: model.model_token,
-      tts_model_type: model.tts_model_type,
+      model_token: model.token().to_string(),
+      tts_model_type: model.tts_model_type(),
       text_pipeline_type,
       text_pipeline_type_guess,
-      maybe_custom_vocoder: match model.maybe_custom_vocoder {
-        None => None,
-        Some(vocoder) => Some(CustomVocoderInfo {
-          vocoder_token: vocoder.vocoder_token,
-          vocoder_title: vocoder.vocoder_title,
-          creator_user_token: vocoder.creator_user_token,
-          creator_username: vocoder.creator_username,
-          creator_display_name: vocoder.creator_display_name,
-          creator_gravatar_hash: vocoder.creator_gravatar_hash,
-        })
-      },
-      maybe_default_pretrained_vocoder: model.maybe_default_pretrained_vocoder,
-      text_preprocessing_algorithm: model.text_preprocessing_algorithm,
-      creator_user_token: model.creator_user_token,
-      creator_username: model.creator_username.to_string(), // NB: Cloned because of ref use for avatar below
-      creator_display_name: model.creator_display_name,
-      creator_gravatar_hash: model.creator_gravatar_hash,
-      creator_default_avatar_index: default_avatar_from_username(&model.creator_username),
-      creator_default_avatar_color_index: default_avatar_color_from_username(&model.creator_username),
-      title: model.title,
-      description_markdown: model.description_markdown,
-      description_rendered_html: model.description_rendered_html,
-      ietf_language_tag: model.ietf_language_tag,
-      ietf_primary_language_subtag: model.ietf_primary_language_subtag,
-      is_front_page_featured: model.is_front_page_featured,
-      is_twitch_featured: model.is_twitch_featured,
-      maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command,
+      // NB(bt, 2024-01-20): We won't be needing these much longer.
+      maybe_custom_vocoder: None,
+      //maybe_custom_vocoder: match model.maybe_custom_vocoder {
+      //  None => None,
+      //  Some(vocoder) => Some(CustomVocoderInfo {
+      //    vocoder_token: vocoder.vocoder_token,
+      //    vocoder_title: vocoder.vocoder_title,
+      //    creator_user_token: vocoder.creator_user_token,
+      //    creator_username: vocoder.creator_username,
+      //    creator_display_name: vocoder.creator_display_name,
+      //    creator_gravatar_hash: vocoder.creator_gravatar_hash,
+      //  })
+      //},
+      maybe_default_pretrained_vocoder: model.maybe_default_pretrained_vocoder(),
+      text_preprocessing_algorithm: model.text_preprocessing_algorithm().to_string(),
+      creator_user_token: model.creator_user_token().to_string(),
+      creator_username: model.creator_username().to_string(), // NB: Cloned because of ref use for avatar below
+      creator_display_name: model.creator_display_name().to_string(),
+      creator_gravatar_hash: model.creator_gravatar_hash().to_string(),
+      creator_default_avatar_index: default_avatar_from_username(&model.creator_username().to_string()),
+      creator_default_avatar_color_index: default_avatar_color_from_username(&model.creator_username().to_string()),
+      title: model.title().to_string(),
+      description_markdown: model.description_markdown().to_string(),
+      description_rendered_html: model.description_rendered_html().to_string(),
+      ietf_language_tag: model.ietf_language_tag().to_string(),
+      ietf_primary_language_subtag: model.ietf_primary_language_subtag().to_string(),
+      is_front_page_featured: model.is_front_page_featured(),
+      is_twitch_featured: model.is_twitch_featured(),
+      maybe_suggested_unique_bot_command: model.maybe_suggested_unique_bot_command().map(|s| s.to_string()),
       user_ratings: UserRatingsStats {
-        positive_count: model.user_ratings_positive_count,
-        negative_count: model.user_ratings_negative_count,
-        total_count: model.user_ratings_total_count,
+        positive_count: model.user_ratings_positive_count(),
+        negative_count: model.user_ratings_negative_count(),
+        total_count: model.user_ratings_total_count(),
       },
-      creator_set_visibility: model.creator_set_visibility,
-      is_locked_from_use: model.is_locked_from_use,
-      is_locked_from_user_modification: model.is_locked_from_user_modification,
-      created_at: model.created_at,
-      updated_at: model.updated_at,
-      maybe_moderator_fields: model.maybe_moderator_fields.map(|mod_fields| {
-        TtsModelModeratorFieldInfo {
-          use_default_m_factor: mod_fields.use_default_mel_multiply_factor,
-          maybe_custom_m_factor: mod_fields.maybe_custom_mel_multiply_factor,
-          creator_is_banned: mod_fields.creator_is_banned,
-          creator_ip_address_creation: mod_fields.creator_ip_address_creation,
-          creator_ip_address_last_update: mod_fields.creator_ip_address_last_update,
-          user_deleted_at: mod_fields.user_deleted_at,
-          mod_deleted_at: mod_fields.mod_deleted_at,
-        }
-      })
+      creator_set_visibility: model.creator_set_visibility(),
+      is_locked_from_use: model.is_locked_from_use(),
+      is_locked_from_user_modification: model.is_locked_from_user_modification(),
+      created_at: model.created_at().clone(),
+      updated_at: model.updated_at().clone(),
+      maybe_moderator_fields: None,
+      // NB(bt, 2024-01-20): We won't be needing these much longer.
+      //maybe_moderator_fields: model.maybe_moderator_fields.map(|mod_fields| {
+      //  TtsModelModeratorFieldInfo {
+      //    use_default_m_factor: mod_fields.use_default_mel_multiply_factor,
+      //    maybe_custom_m_factor: mod_fields.maybe_custom_mel_multiply_factor,
+      //    creator_is_banned: mod_fields.creator_is_banned,
+      //    creator_ip_address_creation: mod_fields.creator_ip_address_creation,
+      //    creator_ip_address_last_update: mod_fields.creator_ip_address_last_update,
+      //    user_deleted_at: mod_fields.user_deleted_at,
+      //    mod_deleted_at: mod_fields.mod_deleted_at,
+      //  }
+      //})
     },
   };
 

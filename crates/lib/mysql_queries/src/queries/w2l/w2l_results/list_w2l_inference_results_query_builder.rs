@@ -154,7 +154,7 @@ impl ListW2lResultsQueryBuilder {
             maybe_creator_user_token: r.maybe_creator_user_token.clone(),
             maybe_creator_username: r.maybe_creator_username.clone(),
             maybe_creator_display_name: r.maybe_creator_display_name.clone(),
-            maybe_creator_result_id: r.maybe_creator_result_id.map(|v| v as u64).clone(),
+            maybe_creator_result_id: r.maybe_creator_result_id.map(|v| v as u64),
             file_size_bytes: if r.file_size_bytes > 0 { r.file_size_bytes as u32 } else { 0 },
             frame_width: if r.frame_width > 0 { r.frame_width as u32 } else { 0 },
             frame_height: if r.frame_height > 0 { r.frame_height as u32 } else { 0 },

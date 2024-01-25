@@ -11,9 +11,9 @@ use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use migration::text_to_speech::get_tts_model_for_run_inference_migration::TtsModelForRunInferenceMigrationWrapper;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
 use tts_common::clean_symbols::clean_symbols;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
@@ -36,7 +36,7 @@ const TEST_REQUEST_TEXT: &str = "This is a test request.";
 pub struct ProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
   pub job: &'a AvailableInferenceJob,
-  pub tts_model: &'a TtsModelForInferenceRecord,
+  pub tts_model: &'a TtsModelForRunInferenceMigrationWrapper,
   pub raw_inference_text: &'a str,
 }
 
@@ -111,7 +111,7 @@ async fn process_job_with_cleanup(
 
   // ==================== CONFIRM OR DOWNLOAD OPTIONAL CUSTOM VOCODER MODEL ==================== //
 
-  let custom_vocoder_fs_path = match &tts_model.maybe_custom_vocoder {
+  let custom_vocoder_fs_path = match tts_model.maybe_custom_vocoder() {
     None => None,
     Some(vocoder) => {
       let custom_vocoder_fs_path = args.job_dependencies.fs.semi_persistent_cache.custom_vocoder_model_path(&vocoder.vocoder_token);
@@ -136,14 +136,20 @@ async fn process_job_with_cleanup(
   // ==================== CONFIRM OR DOWNLOAD TTS SYNTHESIZER MODEL ==================== //
 
   let tts_synthesizer_fs_path = {
-    let tts_synthesizer_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_synthesizer_model_path(tts_model.model_token.as_str());
-    let tts_synthesizer_object_path  = args.job_dependencies.buckets.bucket_path_unifier.tts_synthesizer_path(&tts_model.private_bucket_hash);
+    let bucket_client = if tts_model.is_private_bucket() {
+      &args.job_dependencies.buckets.private_bucket_client
+    } else {
+      &args.job_dependencies.buckets.public_bucket_client
+    };
+
+    let tts_synthesizer_fs_path = args.job_dependencies.fs.semi_persistent_cache.tts_synthesizer_model_path(tts_model.token());
+    let tts_synthesizer_object_path  = tts_model.bucket_object_path(&args.job_dependencies.buckets.bucket_path_unifier);
 
     maybe_download_file_from_bucket(MaybeDownloadArgs {
       name_or_description_of_file: "synthesizer",
       final_filesystem_file_path: & tts_synthesizer_fs_path,
       bucket_object_path: &tts_synthesizer_object_path,
-      bucket_client: &args.job_dependencies.buckets.private_bucket_client,
+      bucket_client,
       job_progress_reporter: &mut job_progress_reporter,
       job_progress_update_description: "downloading synthesizer",
       job_id: job.id.0,
@@ -183,7 +189,7 @@ async fn process_job_with_cleanup(
   info!("Expected output metadata filename: {:?}", &output_metadata_fs_path);
 
   let mut pretrained_vocoder = VocoderType::HifiGanSuperResolution;
-  if let Some(default_vocoder) = tts_model.maybe_default_pretrained_vocoder.as_deref() {
+  if let Some(default_vocoder) = tts_model.maybe_default_pretrained_vocoder().as_deref() {
     pretrained_vocoder = VocoderType::from_str(default_vocoder)
         .map_err(|e| ProcessSingleJobError::Other(e))?;
   }
@@ -214,14 +220,14 @@ async fn process_job_with_cleanup(
       };
   };
 
-  let text_pipeline_type_or_guess = tts_model.text_pipeline_type
+  let text_pipeline_type_or_guess = tts_model.text_pipeline_type()
       .as_deref()
       // NB: If there's an error deserializing, turn it to None.
       .and_then(|pipeline_type| TextPipelineType::from_str(pipeline_type).ok())
-      .unwrap_or_else(|| guess_text_pipeline_heuristic(Some(tts_model.created_at)));
+      .unwrap_or_else(|| guess_text_pipeline_heuristic(Some(tts_model.created_at().clone())));
 
   info!("With text pipeline type `{:?} ` (or guess: {:?})",
-    &tts_model.text_pipeline_type,
+    &tts_model.text_pipeline_type(),
     &text_pipeline_type_or_guess);
 
   // NB: Tacotron operates on decoder steps. 1000 steps is the default and correlates to
@@ -232,9 +238,9 @@ async fn process_job_with_cleanup(
 
   let mut maybe_mel_multiply_factor = None;
 
-  if let Some(factor) = tts_model.maybe_custom_mel_multiply_factor {
+  if let Some(factor) = tts_model.maybe_custom_mel_multiply_factor() {
     maybe_mel_multiply_factor = Some(MelMultiplyFactor::CustomMultiplyFactor(factor));
-  } else if tts_model.use_default_mel_multiply_factor {
+  } else if tts_model.use_default_mel_multiply_factor() {
     maybe_mel_multiply_factor = Some(MelMultiplyFactor::DefaultMultiplyFactor);
   }
 
@@ -262,8 +268,8 @@ async fn process_job_with_cleanup(
       &output_spectrogram_fs_path,
       &output_metadata_fs_path,
       maybe_unload_model_path,
-      tts_model.use_default_mel_multiply_factor,
-      tts_model.maybe_custom_mel_multiply_factor,
+      tts_model.use_default_mel_multiply_factor(),
+      tts_model.maybe_custom_mel_multiply_factor(),
     ).await.map_err(|e| ProcessSingleJobError::Other(e))?;
   } else {
     info!("Shelling out for inference...");
@@ -322,7 +328,7 @@ async fn process_job_with_cleanup(
 
   args.job_dependencies.clients.firehose_publisher.tts_inference_finished(
     job.maybe_creator_user_token.as_deref(),
-    tts_model.model_token.as_str(),
+    tts_model.token(),
     &inference_result.entity_token)
       .await
       .map_err(|e| {

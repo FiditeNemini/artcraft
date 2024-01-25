@@ -64,10 +64,10 @@ pub async fn main() -> AnyhowResult<()> {
   let bytes = file_read_bytes(args.file_path)?;
   let mimetype = get_mimetype_for_bytes(&bytes);
 
-  let mut media_file_type;
-  let mut maybe_mime_type;
-  let mut maybe_public_bucket_prefix;
-  let mut maybe_public_bucket_extension;
+  let media_file_type;
+  let maybe_mime_type;
+  let maybe_public_bucket_prefix;
+  let maybe_public_bucket_extension;
 
   match mimetype {
     Some("audio/wav") |

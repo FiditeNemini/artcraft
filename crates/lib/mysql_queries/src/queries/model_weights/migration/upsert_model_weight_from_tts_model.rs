@@ -48,7 +48,7 @@ pub async fn upsert_model_weights_record(
   record: &WholeTtsModelRecord,
   model_weight_token: &ModelWeightToken,
   copied_data: &CopiedTtsFileData,
-  mut transaction: &mut Transaction<'_, MySql>,
+  transaction: &mut Transaction<'_, MySql>,
 ) -> AnyhowResult<()> {
 
   // NB: We never supported other TTS models in the tts_models table.

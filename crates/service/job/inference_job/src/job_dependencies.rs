@@ -18,10 +18,10 @@ use jobs_common::job_stats::JobStats;
 use jobs_common::semi_persistent_cache_dir::SemiPersistentCacheDir;
 use memory_caching::multi_item_ttl_cache::MultiItemTtlCache;
 use memory_caching::ttl_key_counter::TtlKeyCounter;
+use migration::text_to_speech::get_tts_model_for_run_inference_migration::TtsModelForRunInferenceMigrationWrapper;
 use migration::voice_conversion::query_vc_model_for_migration::VcModel;
 use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmentArg;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
-use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::TtsModelForInferenceRecord;
 
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::scoped_execution::ScopedExecution;
@@ -163,7 +163,7 @@ pub struct FileSystemDetails {
 
 // TODO: Move into the appropriate job-specific dependencies object.
 pub struct JobCaches {
-  pub tts_model_record_cache: MultiItemTtlCache<String, TtsModelForInferenceRecord>,
+  pub tts_model_record_cache: MultiItemTtlCache<String, TtsModelForRunInferenceMigrationWrapper>,
   pub vc_model_record_cache: MultiItemTtlCache<String, VcModel>,
 
   /// Skip processing models if they're not on the filesystem.

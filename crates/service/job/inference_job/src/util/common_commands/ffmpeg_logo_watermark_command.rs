@@ -166,7 +166,7 @@ impl FfmpegLogoWatermarkCommand {
       &command
     ];
 
-    let mut config = PopenConfig::default();
+    let config = PopenConfig::default();
 
     let mut p = Popen::create(&command_parts, config)?;
 

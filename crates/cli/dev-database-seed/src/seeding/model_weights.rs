@@ -6,7 +6,7 @@ use sqlx::{MySql, Pool};
 
 use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
-use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor};
+use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsWorkflowDescriptor};
 use enums::by_table::model_weights::{
     weights_category::WeightsCategory,
     weights_types::WeightsType,
@@ -146,22 +146,22 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
             _ => WeightsType::LoRA
         };
 
-        let mut model_weight_token;
-        let mut title;
-        let mut description;
-        let mut description_rendered_html;
-        let mut original_filename;
-        let mut original_download_url;
+        let model_weight_token;
+        let title;
+        let description;
+        let description_rendered_html;
+        let original_filename;
+        let original_download_url;
 
-        let mut _private_bucket_hash:String = "".to_string();
-        let mut private_bucket_prefix;
-        let mut private_bucket_extension;
+        let _private_bucket_hash = "".to_string();
+        let private_bucket_prefix;
+        let private_bucket_extension;
 
         //let mut cached_user_ratings_total_count;
         //let mut cached_user_ratings_positive_count;
         //let mut cached_user_ratings_negative_count;
         //let mut cached_user_ratings_ratio;
-        let mut version;
+        let version;
 
         match i {
             1..=20 => {
@@ -596,6 +596,7 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
     let sd_15_weights_descriptor = Box::new(WeightsSD15Descriptor {});
     let lora_descriptor = Box::new(WeightsLoRADescriptor{});
     let sd_vae_15_weights_descriptor = Box::new(WeightsSD15Descriptor {});
+
     let mut path_object_SD = get_seed_tool_data_root();
     path_object_SD.push("models/imagegen/sd15/majicmixFantasy_v30Vae.safetensors");
 
@@ -681,6 +682,71 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
 
     Ok(())
 }
+
+pub async fn seed_workflows_for_testing_inference(mysql_pool: &Pool<MySql>, user_token: UserToken) -> AnyhowResult<()>{
+    let model_weight_token1 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    let model_weight_token2 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+
+    let mut path_to_comfy = get_seed_tool_data_root();
+    path_to_comfy.push("models/workflows/comfyui/workflow_api.json");
+    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
+    let comfy_weights_descriptor = Box::new(WeightsWorkflowDescriptor {});
+    let metadata1 = remote_cloud_file_client.upload_file(comfy_weights_descriptor, path_to_comfy.as_path().to_str().unwrap()).await?;
+
+    let mut path_to_comfy2 = get_seed_tool_data_root();
+    path_to_comfy2.push("models/workflows/comfyui/majicmixRealistic_v7.safetensors");
+    let comfy_weights_descriptor2 = Box::new(WeightsSD15Descriptor {});
+    let metadata2 = remote_cloud_file_client.upload_file(comfy_weights_descriptor2, path_to_comfy2.as_path().to_str().unwrap()).await?;
+
+    let weights1 = CreateModelWeightsArgs {
+        token: &model_weight_token1, // replace with actual ModelWeightToken
+        weights_type: WeightsType::ComfyUi, // replace with actual WeightsType
+        weights_category: WeightsCategory::WorkflowConfig, // replace with actual WeightsCategory
+        title: "comfy-test-workflow".to_string(),
+        maybe_description_markdown: Some("Test workflow for ComfyUI".to_string()),
+        maybe_description_rendered_html: Some("<p>Description</p>".to_string()),
+        creator_user_token: Some(&user_token), // replace with actual UserToken
+        creator_ip_address: "192.168.1.1",
+        creator_set_visibility: Visibility::Public,
+        maybe_last_update_user_token: Some("Last Update User Token".to_string()),
+        original_download_url: Some("https://github.com/comfyanonymous/ComfyUI".to_string()),
+        original_filename: Some("test-workflow.json".to_string()),
+        file_size_bytes: metadata1.file_size_bytes as i32,
+        file_checksum_sha2: metadata1.sha256_checksum.to_string(),
+        public_bucket_hash: metadata1.bucket_details.clone().unwrap().object_hash,
+        maybe_public_bucket_prefix: Some(metadata1.bucket_details.clone().unwrap().prefix),
+        maybe_public_bucket_extension: Some(metadata1.bucket_details.clone().unwrap().suffix),
+        version: 1,
+        mysql_pool: &mysql_pool, // replace with actual MySqlPool
+    };
+    let weights2 = CreateModelWeightsArgs {
+        token: &model_weight_token2, // replace with actual ModelWeightToken
+        weights_type: WeightsType::ComfyUi, // replace with actual WeightsType
+        weights_category: WeightsCategory::WorkflowConfig, // replace with actual WeightsCategory
+        title: "v1-5-pruned-emaonly".to_string(),
+        maybe_description_markdown: Some("Test model for ComfyUI".to_string()),
+        maybe_description_rendered_html: Some("<p>Description</p>".to_string()),
+        creator_user_token: Some(&user_token), // replace with actual UserToken
+        creator_ip_address: "192.168.1.1",
+        creator_set_visibility: Visibility::Public,
+        maybe_last_update_user_token: Some("Last Update User Token".to_string()),
+        original_download_url: Some("https://huggingface.co/runwayml/stable-diffusion-v1-5".to_string()),
+        original_filename: Some("v1-5-pruned-emaonly.ckpt".to_string()),
+        file_size_bytes: metadata2.file_size_bytes as i32,
+        file_checksum_sha2: metadata2.sha256_checksum.to_string(),
+        public_bucket_hash: metadata2.bucket_details.clone().unwrap().object_hash,
+        maybe_public_bucket_prefix: Some(metadata2.bucket_details.clone().unwrap().prefix),
+        maybe_public_bucket_extension: Some(metadata2.bucket_details.clone().unwrap().suffix),
+        version: 1,
+        mysql_pool: &mysql_pool, // replace with actual MySqlPool
+    };
+
+    create_weight(weights1).await?;
+    create_weight(weights2).await?;
+
+    Ok(())
+}
+
 pub async fn seed_weights_for_user_token(
     mysql_pool: &Pool<MySql>,
     user_token: UserToken
@@ -992,11 +1058,12 @@ pub async fn seed_weights(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
         Some(token) => token,
     };
 
-    //original_seed_weights(mysql_pool,user_token).await?;
-    //seed_weights_for_user_token(mysql_pool, user_token).await?;
-    //seed_weights_for_paging(mysql_pool,user_token).await?;
-    seed_weights_for_testing_inference(mysql_pool,user_token).await?;
-    //println!("TESTING DOWLOAD");
-    //test_seed_weights_files().await?;
+    // original_seed_weights(mysql_pool,user_token).await?;
+    // seed_weights_for_user_token(mysql_pool, user_token).await?;
+    // seed_weights_for_paging(mysql_pool,user_token).await?;
+    seed_weights_for_testing_inference(mysql_pool,user_token.clone()).await?;
+    println!("TESTING DOWLOAD");
+    test_seed_weights_files().await?;
+    seed_workflows_for_testing_inference(mysql_pool,user_token.clone()).await?;
     Ok(())
 }

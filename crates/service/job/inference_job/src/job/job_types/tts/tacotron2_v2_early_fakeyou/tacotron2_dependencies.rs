@@ -18,9 +18,10 @@ pub struct Tacotron2Dependencies {
   /// Common pretrained hifigan super resolution vocoder filename
   pub hifigan_superres_vocoder_model_filename: String,
 
-  /// Dependencies that are for the sidecar version of TT2
+  /// dependencies that are for the sidecar version of TT2
   pub sidecar: SidecarDeps,
 
+  /// Rollout flag for uploading results as `media_files` instead of `tts_results`.
   pub upload_as_media_file: bool,
 }
 

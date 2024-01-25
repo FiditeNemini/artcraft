@@ -212,8 +212,17 @@ LEFT OUTER JOIN entity_stats
   }
 
   match view_as {
-    ViewAs::Moderator => {}
-    ViewAs::Author | ViewAs::AnotherUser => {
+    ViewAs::Moderator | ViewAs::Author => {
+      if !first_predicate_added {
+        query_builder.push(" WHERE ");
+        first_predicate_added = true;
+      } else {
+        query_builder.push(" AND ");
+      }
+      // NB(bt): Actually, mods don't want to see deleted files. We'll improve the moderator UI later.
+      query_builder.push(" m.user_deleted_at IS NULL AND m.mod_deleted_at IS NULL ");
+    }
+    ViewAs::AnotherUser => {
       if !first_predicate_added {
         query_builder.push(" WHERE ");
         first_predicate_added = true;

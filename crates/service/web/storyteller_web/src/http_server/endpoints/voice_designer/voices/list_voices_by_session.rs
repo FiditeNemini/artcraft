@@ -76,12 +76,16 @@ pub async fn list_voices_by_session_handler(
       })?;
 
   let creator_user_token = user_session.user_token.clone();
-  let is_mod = user_session.can_ban_users;
+  let _is_mod = user_session.can_ban_users;
+
+  // NB(bt,2024-01-18): Showing mods deleted files is actually kind of annoying!
+  // We should focus on visibility-related controls instead.
+  const CAN_SEE_DELETED : bool = false;
 
   let query_results = list_zs_voices_by_username(
     &server_state.mysql_pool,
     &user_session.username,
-    is_mod,
+    CAN_SEE_DELETED,
   ).await.map_err(|e| {
     warn!("Error querying for voices: {:?}", e);
     ListVoicesByUserError::ServerError

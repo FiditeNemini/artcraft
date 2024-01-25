@@ -272,6 +272,14 @@ fn record_to_payload(
               .get_full_object_path_str()
               .to_string()
         }
+        InferenceCategory::Workflow => {
+          MediaFileBucketPath::from_object_hash(
+            &result_details.public_bucket_location_or_hash,
+            result_details.maybe_media_file_public_bucket_prefix.as_deref(),
+            result_details.maybe_media_file_public_bucket_extension.as_deref())
+              .get_full_object_path_str()
+              .to_string()
+        }
         InferenceCategory::TextToSpeech => {
           match result_details.entity_type.as_str() {
             "media_file" => {

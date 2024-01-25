@@ -162,6 +162,10 @@ impl Plan {
         self.mocapnet_requires_frontend_keepalive
     }
 
+    pub fn workflow_requires_frontend_keepalive(&self) -> bool {
+        self.mocapnet_requires_frontend_keepalive
+    }
+
     pub fn can_remove_visual_watermarks(&self) -> bool {
         self.can_remove_visual_watermarks
     }

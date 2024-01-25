@@ -106,6 +106,7 @@ impl VcModel {
         WeightsType::Tacotron2 => VcModelType::Invalid,
         WeightsType::LoRA => VcModelType::Invalid,
         WeightsType::VallE => VcModelType::Invalid,
+        WeightsType::ComfyUi => VcModelType::Invalid,
       }
     }
   }

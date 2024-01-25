@@ -19,6 +19,7 @@ use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
 use crate::job::job_types::videofilter::process_single_vf_job::process_single_vf_job;
 use crate::job::job_types::image_generation::process_single_ig_job::process_single_ig_job;
 use crate::job::job_types::mocap::process_single_mc_job::process_single_mc_job;
+use crate::job::job_types::workflow::process_single_wf_job::process_single_wf_job;
 use crate::job_dependencies::JobDependencies;
 
 pub async fn process_single_job(
@@ -193,6 +194,9 @@ async fn do_process_single_job(
     }
     InferenceCategory::Mocap => {
       process_single_mc_job(job_dependencies, job).await?
+    }
+    InferenceCategory::Workflow => {
+      process_single_wf_job(job_dependencies, job).await?
     }
   };
 

@@ -165,6 +165,7 @@ CREATE TABLE model_weights (
   -- INDICES --
   PRIMARY KEY (id),
   UNIQUE KEY (token),
+  UNIQUE KEY unique_index_maybe_migration_old_model_token (maybe_migration_old_model_token),
 
   KEY index_weights_type (weights_type),
   KEY index_weights_category (weights_category),

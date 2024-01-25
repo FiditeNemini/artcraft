@@ -17,6 +17,8 @@ pub enum WeightsCategory {
     Vocoder,
     #[serde(rename = "voice_conversion")]
     VoiceConversion,
+    #[serde(rename = "workflow_config")]
+    WorkflowConfig,
 }
 
 impl WeightsCategory {
@@ -26,6 +28,7 @@ impl WeightsCategory {
             Self::TextToSpeech => "text_to_speech",
             Self::Vocoder => "vocoder",
             Self::VoiceConversion => "voice_conversion",
+            Self::WorkflowConfig => "workflow_config",
         }
     }
 
@@ -35,6 +38,7 @@ impl WeightsCategory {
             "text_to_speech" => Ok(Self::TextToSpeech),
             "vocoder" => Ok(Self::Vocoder),
             "voice_conversion" => Ok(Self::VoiceConversion),
+            "workflow_config" => Ok(Self::WorkflowConfig),
             _ => Err(format!("invalid value: {:?}", value)),
         }
     }
@@ -45,6 +49,7 @@ impl WeightsCategory {
             Self::TextToSpeech,
             Self::Vocoder,
             Self::VoiceConversion,
+            Self::WorkflowConfig,
         ])
     }
 }
@@ -62,6 +67,7 @@ mod tests {
         assert_eq!(WeightsCategory::TextToSpeech.to_str(), "text_to_speech");
         assert_eq!(WeightsCategory::Vocoder.to_str(), "vocoder");
         assert_eq!(WeightsCategory::VoiceConversion.to_str(), "voice_conversion");
+        assert_eq!(WeightsCategory::WorkflowConfig.to_str(), "workflow_config");
     }
 
     #[test]
@@ -70,16 +76,18 @@ mod tests {
         assert_eq!(WeightsCategory::from_str("text_to_speech").unwrap(), WeightsCategory::TextToSpeech);
         assert_eq!(WeightsCategory::from_str("vocoder").unwrap(), WeightsCategory::Vocoder);
         assert_eq!(WeightsCategory::from_str("voice_conversion").unwrap(), WeightsCategory::VoiceConversion);
+        assert_eq!(WeightsCategory::from_str("workflow_config").unwrap(), WeightsCategory::WorkflowConfig);
         assert!(WeightsCategory::from_str("invalid").is_err());
     }
 
     #[test]
     fn test_all_variants() {
         let variants = WeightsCategory::all_variants();
-        assert_eq!(variants.len(), 4);
+        assert_eq!(variants.len(), 5);
         assert!(variants.contains(&WeightsCategory::ImageGeneration));
         assert!(variants.contains(&WeightsCategory::TextToSpeech));
         assert!(variants.contains(&WeightsCategory::Vocoder));
         assert!(variants.contains(&WeightsCategory::VoiceConversion));
+        assert!(variants.contains(&WeightsCategory::WorkflowConfig));
     }
 }

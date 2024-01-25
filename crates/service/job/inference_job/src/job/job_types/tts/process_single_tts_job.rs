@@ -3,8 +3,8 @@ use log::warn;
 
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::by_table::tts_models::tts_model_type::TtsModelType;
+use migration::text_to_speech::get_tts_model_for_run_inference_migration::get_tts_model_for_run_inference_migration;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::tts::tts_models::get_tts_model_for_inference_improved::get_tts_model_for_inference_improved;
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -88,9 +88,9 @@ async fn dispatch_fine_tuned_weights_model(
       .ok_or(ProcessSingleJobError::Other(anyhow!("no model token on job")))?;
 
   // TODO(bt,2023-10-09): Interrogate TTS model cache before querying database.
-  let maybe_tts_model = get_tts_model_for_inference_improved(
-    &job_dependencies.db.mysql_pool,
+  let maybe_tts_model = get_tts_model_for_run_inference_migration(
     tts_model_token,
+    &job_dependencies.db.mysql_pool,
   ).await.map_err(|err| ProcessSingleJobError::Other(anyhow!("database error: {:?}", err)))?;
 
   let tts_model = match maybe_tts_model {
@@ -100,7 +100,7 @@ async fn dispatch_fine_tuned_weights_model(
     Some(tts_model) => tts_model,
   };
 
-  match tts_model.tts_model_type {
+  match tts_model.tts_model_type() {
     TtsModelType::Vits => {
       vits::process_job::process_job(VitsProcessJobArgs {
         job_dependencies,

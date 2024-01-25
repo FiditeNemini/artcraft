@@ -6,7 +6,7 @@ use log::{info, warn};
 use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use errors::AnyhowResult;
-use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
+use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use mysql_queries::queries::model_weights::migration::upsert_model_weight_from_tts_model::{CopiedTtsFileData, upsert_model_weight_from_tts_model};
 use mysql_queries::queries::tts::tts_models::migration::list_whole_tts_models_using_cursor::{list_whole_tts_models_using_cursor, WholeTtsModelRecord};
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -21,6 +21,7 @@ const PAGE_SIZE: u64 = 10;
 pub async fn migrate_tts_to_weights(deps: &Deps) -> AnyhowResult<()> {
 
   let mut cursor = 0;
+  let mut counter = 0;
 
   loop {
     info!("Querying {PAGE_SIZE} models at cursor = {cursor}");
@@ -34,15 +35,16 @@ pub async fn migrate_tts_to_weights(deps: &Deps) -> AnyhowResult<()> {
     }
 
     for result in results.iter() {
-      println!("\n\nmigrating over result {:?} : {:?} ...", result.token, result);
+      println!("\n\nmigrating over (counter: {counter}, id: {}, token: {:?}) : {:?} ...", result.id, result.token, result);
       copy_model_record_and_bucket_files(result, &deps).await?;
+      counter += 1;
     }
 
     if let Some(last_id) = results.last().map(|result| result.id) {
       cursor = last_id as u64;
     }
 
-    thread::sleep(Duration::from_secs(2));
+    thread::sleep(Duration::from_millis(500));
   }
 
   Ok(())

@@ -132,9 +132,15 @@ impl fmt::Display for EditTtsModelError {
 pub async fn edit_tts_model_handler(
   http_request: HttpRequest,
   path: Path<EditTtsModelPathInfo>,
-  request: web::Json<EditTtsModelRequest>,
+  request: Json<EditTtsModelRequest>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, EditTtsModelError>
 {
+  // NB: Disable if we've migrated to model_weights
+  if server_state.flags.switch_tts_to_model_weights {
+    warn!("Migration to model_weights for tts. Cannot delete old model.");
+    return Err(EditTtsModelError::ServerError);
+  }
+
   let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)

@@ -76,6 +76,12 @@ pub async fn delete_tts_model_handler(
   request: web::Json<DeleteTtsModelRequest>,
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, DeleteTtsModelError> {
+  // NB: Disable if we've migrated to model_weights
+  if server_state.flags.switch_tts_to_model_weights {
+    warn!("Migration to model_weights for tts. Cannot delete old model.");
+    return Err(DeleteTtsModelError::ServerError);
+  }
+
   let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
