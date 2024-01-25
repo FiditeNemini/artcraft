@@ -519,7 +519,6 @@ pub async fn process_job_lora(
 
 
     let model_weight_token = &ModelWeightToken::generate();
-
     let model_weight_token_result = create_weight(CreateModelWeightsArgs {
         token: &model_weight_token,
         weights_type: WeightsType::LoRA,
