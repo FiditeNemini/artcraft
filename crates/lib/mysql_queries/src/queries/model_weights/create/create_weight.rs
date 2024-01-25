@@ -21,17 +21,17 @@ pub struct CreateModelWeightsArgs<'a> {
     pub maybe_last_update_user_token: Option<String>,
     pub original_download_url: Option<String>,
     pub original_filename: Option<String>,
-    pub file_size_bytes: i32,
+    pub file_size_bytes: u64,
     pub file_checksum_sha2: String,
     pub public_bucket_hash: String,
     pub maybe_public_bucket_prefix: Option<String>,
     pub maybe_public_bucket_extension: Option<String>,
-    pub version: i32,
+    pub version: u32,
     pub mysql_pool: &'a MySqlPool,
 }
 
 pub async fn create_weight(args: CreateModelWeightsArgs<'_>) -> AnyhowResult<ModelWeightToken> {
-    let model_weights_token = ModelWeightToken::generate();
+    
     let transaction = args.mysql_pool.begin().await?;
     let query_result = sqlx
         ::query!(
@@ -79,7 +79,7 @@ pub async fn create_weight(args: CreateModelWeightsArgs<'_>) -> AnyhowResult<Mod
         .execute(args.mysql_pool).await;
 
     match query_result {
-        Ok(_) => { Ok(model_weights_token) }
+        Ok(_) => { Ok(args.token.clone()) }
         Err(err) => {
             transaction.rollback().await?;
             warn!("Transaction failure: {:?}", err);

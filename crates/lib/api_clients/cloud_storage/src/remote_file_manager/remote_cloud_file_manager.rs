@@ -85,7 +85,7 @@ impl RemoteCloudFileClient {
     }
 
     // Retrieve the metadata from the file
-    fn get_file_meta_data(system_file_path:&str) -> AnyhowResult<FileMetaData> {
+    pub fn get_file_meta_data(system_file_path:&str) -> AnyhowResult<FileMetaData> {
         let file_size_bytes = file_size(system_file_path.clone())?;
         let sha256_checksum = sha256_hash_file(system_file_path.clone())?;
 

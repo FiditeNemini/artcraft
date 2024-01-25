@@ -286,8 +286,6 @@ pub async fn enqueue_image_generation_request(
     );
 
 
-
-
     // ==================== BANNED USERS ==================== //
 
     if let Some(ref user) = maybe_user_session {
@@ -443,6 +441,7 @@ pub async fn enqueue_image_generation_request(
     Ok(HttpResponse::Ok().content_type("application/json").body(body))
 }
 
+// with LoRA
 // http://127.0.0.1:12345/v1/image_gen/inference/enqueue_image_gen
 // {
 //     "uuid_idempotency_token": "12",
@@ -460,6 +459,22 @@ pub async fn enqueue_image_generation_request(
 //     "maybe_batch_count": 4,
 //   }
 
+// without LoRA
+// {
+//     "uuid_idempotency_token": "132141",
+//     "maybe_sd_model_token": "weight_dmmthavhawqc2hj7yqyemcbf8",
+//     "maybe_prompt": "raiden mei a very well drawn, anime girl, with pink and purple hair sitting down on a chair relaxed, highest quality, semi nude, masterpiece, painted",
+//     "maybe_a_prompt": "a anime girl, with pink and purple hair sitting down on a chair relaxed.",
+//     "maybe_n_prompt": "nsfw, black and white, low quality, pixelated",
+//     "maybe_seed": -1,
+//     "maybe_width": 512,
+//     "maybe_height": 512,
+//     "maybe_sampler": "DPM++ 2M SDE Heun",
+//     "maybe_cfg_scale": 8,
+//     "maybe_number_of_samples": 64,
+//     "maybe_batch_count": 4
+// }
+
 // http://127.0.0.1:12345/v1/image_gen/upload/lora
 // {
 //     "uuid_idempotency_token": "12",
@@ -475,7 +490,6 @@ pub async fn enqueue_image_generation_request(
 //     "maybe_name":"some_name",
 //     "maybe_description":"some_description"
 // }
-
 
 // {
 //     "uuid_idempotency_token": "123",

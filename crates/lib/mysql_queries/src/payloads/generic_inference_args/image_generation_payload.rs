@@ -82,7 +82,11 @@ pub struct StableDiffusionArgs {
     // loRA / checkpoint name and description
     #[serde(rename = "na")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_name: Option<String>
+    pub maybe_name: Option<String>,
+
+    #[serde(rename = "ve")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_version: Option<u32>
 }
 
 

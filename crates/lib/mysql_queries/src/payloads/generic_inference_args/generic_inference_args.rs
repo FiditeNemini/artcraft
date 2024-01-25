@@ -214,6 +214,8 @@ mod tests {
     let lora_upload_path = "lora_upload_path".to_string();
     let checkpoint = "checkpoint".to_string();
     let type_of_inference = "type_of_inference".to_string();
+    let version: u32 = 0;
+
     let args = GenericInferenceArgs {
       inference_category: Some(InferenceCategoryAbbreviated::ImageGeneration),
       args: Some(PolymorphicInferenceArgs::Ig(StableDiffusionArgs {
@@ -231,8 +233,9 @@ mod tests {
         maybe_upload_path: Some(upload_path),
         maybe_lora_upload_path: Some(lora_upload_path),
         type_of_inference,
-        description: Some("Option".to_string()),
-        name: Some("Model Name".to_string())
+        maybe_description: Some("Option".to_string()),
+        maybe_name: Some("Model Name".to_string()),
+        maybe_version: Some(version),
       })),
     };
 
