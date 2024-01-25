@@ -29,7 +29,7 @@ export default function InferenceJobsList({
 
   if (inferenceJobs.length) {
     return (
-      <Panel padding={true}>
+      <Panel {...{ className: "fy-inference-jobs-list", padding: true }}>
         <h5>{t("core.heading")}</h5>
         {inferenceJobs
           .map((job: InferenceJob, key: number) => (

@@ -173,7 +173,7 @@ export default function FaceAnimator({ enqueueInferenceJob,  sessionSubscription
     }
   };
 
-  return <div {...{ className: "container-panel pt-4" }}>
+  return <div {...{ className: "face-animator-container container-panel pt-4" }}>
     <div {...{ className: "panel face-animator-main" }}>
       <FaceAnimatorTitle {...headerProps} />
       {transitions((style, i) => {

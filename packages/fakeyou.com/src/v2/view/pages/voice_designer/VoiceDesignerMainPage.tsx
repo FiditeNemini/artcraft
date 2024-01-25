@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
 import { faPenToSquare, faPlus, faRightToBracket, faStar, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import InferenceJobsList from "components/layout/InferenceJobsList";
-import { useLocalize } from "hooks";
+import { useLocalize, useSession } from "hooks";
 import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Container from "components/common/Container";
@@ -15,7 +15,7 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import { useSession } from "hooks";
+import "./VoiceDesigner.scss";
 
 // interface Props {}
 
@@ -180,8 +180,7 @@ function VoiceDesignerMainPage() {
     </div>
   );
 
-  const LogggedInView = () => (
-    <>
+  const logggedInView = <>
       <InferenceJobsList
         {...{
           failures,
@@ -225,11 +224,9 @@ function VoiceDesignerMainPage() {
           />
         </div>
       </Panel>
-    </>
-  );
+    </>;
 
-  const LoggedOutView = () => (
-    <Panel padding={true}>
+  const loggedOutView = <Panel padding={true}>
       <div className="d-flex flex-column align-items-center py-3 my-3 py-md-4 my-md-4 gap-4">
         <div className="text-center">
           <h4 className="fw-bold">Please log in to access voice creation.</h4>
@@ -255,12 +252,11 @@ function VoiceDesignerMainPage() {
           />
         </div>
       </div>
-    </Panel>
-  );
+    </Panel>;
 
   return (
     <>
-      <Container type="panel">
+      <Container {...{ className: "voice-designer-page", type: "panel" }}>
         <PageHeader
           {...{
             button: user ? createVoiceButton : signUpButton,
@@ -273,7 +269,7 @@ function VoiceDesignerMainPage() {
             imageUrl: "/images/header/voice-designer.png",
           }}
         />
-        {user ? <LogggedInView /> : <LoggedOutView />}
+        {user ? logggedInView : loggedOutView}
         {/* Delete Modal */}
         <Modal
           show={isDeleteModalOpen}

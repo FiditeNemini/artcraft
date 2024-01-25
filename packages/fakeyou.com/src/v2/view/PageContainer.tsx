@@ -207,6 +207,7 @@ class PageContainer extends React.Component<
   constructor(props: Props & RouteComponentProps) {
     super(props);
 
+  console.log("💰",);
     this.state = {};
   }
 

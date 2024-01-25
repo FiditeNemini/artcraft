@@ -10,6 +10,10 @@
   }
 }
 
+.face-animator-container {
+  .fy-inference-jobs-list { margin-top: 1rem }
+}
+
 .face-animator-main {
   @include FApanel;
   position: relative;
