@@ -18,6 +18,9 @@ deny = [
   "clippy::borrow_as_ptr",
   "clippy::borrow_deref_ref",
 
+  # Clippy async
+  "clippy::await_holding_lock",
+
   # Clippy - performance
   "clippy::cmp_owned",
   "clippy::useless_vec",
@@ -48,6 +51,7 @@ deny = [
   # Possible:
   # "clippy::ptr_arg",
   # "clippy::too_many_lines" (note: this is configurable)
+  #  "clippy::clone_on_copy", # Don't use clone() on Copy types
 ]
 
 warn = [

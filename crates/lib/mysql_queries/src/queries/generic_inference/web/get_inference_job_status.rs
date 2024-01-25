@@ -221,7 +221,7 @@ fn raw_record_to_public_result(record: RawGenericInferenceJobStatus) -> GenericI
                   maybe_media_file_public_bucket_prefix: record.maybe_media_file_public_bucket_prefix.clone(),
                   maybe_media_file_public_bucket_extension: record.maybe_media_file_public_bucket_extension.clone(),
                   public_bucket_location_is_hash: bucket_path_is_hash,
-                  maybe_successfully_completed_at: record.maybe_successfully_completed_at.clone(),
+                  maybe_successfully_completed_at: record.maybe_successfully_completed_at,
                 }
               })
             })
