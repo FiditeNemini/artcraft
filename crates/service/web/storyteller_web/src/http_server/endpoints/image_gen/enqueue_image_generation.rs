@@ -114,6 +114,7 @@ pub struct EnqueueImageGenRequest {
     maybe_batch_count: Option<u32>,
     maybe_name: Option<String>,
     maybe_description: Option<String>,
+    maybe_version: Option<u32>
 }
 
 #[derive(Serialize, ToSchema)]
@@ -369,9 +370,14 @@ pub async fn enqueue_image_generation_request(
         seed = s;
     }
 
+    let mut version:u32 = 0;
     let type_of_inference = mode.to_string().clone();
     let description = request.maybe_description.clone();
     let name = request.maybe_name.clone();
+
+    if let Some(s) = request.maybe_version {
+        version = s;
+    }
 
     let inference_args = StableDiffusionArgs {
         maybe_sd_model_token: Some(sd_weight_token),
@@ -390,6 +396,7 @@ pub async fn enqueue_image_generation_request(
         maybe_sampler: Some(sampler),
         maybe_description: description,
         maybe_name: name,
+        maybe_version: version,
     };
 
     // create the inference args here
