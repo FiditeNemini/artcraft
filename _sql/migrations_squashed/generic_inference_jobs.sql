@@ -17,12 +17,18 @@ CREATE TABLE generic_inference_jobs (
 
   -- ========== INFERENCE DETAILS ==========
 
+  -- NB: Note that this is probably coming to mean "job type". It's grown to indicate the
+  -- exact type of job to run (though that's still also somewhat incorrectly spread over
+  -- maybe_model_type).
+  --
   -- Broad category of inference
   -- Examples (may not be up to date):
   --  * text_to_speech
   --  * voice_conversion
   inference_category VARCHAR(32) NOT NULL,
 
+  -- NB: Note that this is probably no longer useful (so long as we migrate away from it)
+  --
   -- Potential part of the composite foreign key to the primary model being used, if any.
   -- This will normally live in `maybe_inference_args`, but in this case, it's useful for
   -- running easy database analytical queries.

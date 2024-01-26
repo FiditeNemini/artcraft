@@ -38,9 +38,9 @@ pub enum InferenceCategory {
   #[serde(rename = "workflow")]
   Workflow,
 
-  /// Eg. A job that turns "FBX" animation files into "GLTF" animation files.
-  #[serde(rename = "format_conversion")]
-  FormatConversion,
+  /// A job that turns "FBX" game engine files into "GLTF" files (Bevy-compatible).
+  #[serde(rename = "convert_fbx_gltf")]
+  ConvertFbxToGltf,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -58,7 +58,7 @@ impl InferenceCategory {
       Self::ImageGeneration => "image_generation",
       Self::Mocap => "mocap",
       Self::Workflow => "workflow",
-      Self::FormatConversion => "format_conversion",
+      Self::ConvertFbxToGltf => "convert_fbx_gltf",
     }
   }
 
@@ -71,7 +71,7 @@ impl InferenceCategory {
       "image_generation" => Ok(Self::ImageGeneration),
       "mocap" => Ok(Self::Mocap),
       "workflow" => Ok(Self::Workflow),
-      "format_conversion" => Ok(Self::FormatConversion),
+      "convert_fbx_gltf" => Ok(Self::ConvertFbxToGltf),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -87,7 +87,7 @@ impl InferenceCategory {
       Self::ImageGeneration,
       Self::Mocap,
       Self::Workflow,
-      Self::FormatConversion,
+      Self::ConvertFbxToGltf,
     ])
   }
 }
@@ -109,7 +109,7 @@ mod tests {
       assert_serialization(InferenceCategory::ImageGeneration, "image_generation");
       assert_serialization(InferenceCategory::Mocap, "mocap");
       assert_serialization(InferenceCategory::Workflow, "workflow");
-      assert_serialization(InferenceCategory::FormatConversion, "format_conversion");
+      assert_serialization(InferenceCategory::ConvertFbxToGltf, "convert_fbx_gltf");
     }
 
     #[test]
@@ -121,7 +121,7 @@ mod tests {
       assert_eq!(InferenceCategory::ImageGeneration.to_str(), "image_generation");
       assert_eq!(InferenceCategory::Mocap.to_str(), "mocap");
       assert_eq!(InferenceCategory::Workflow.to_str(), "workflow");
-      assert_eq!(InferenceCategory::FormatConversion.to_str(), "format_conversion");
+      assert_eq!(InferenceCategory::ConvertFbxToGltf.to_str(), "convert_fbx_gltf");
     }
 
     #[test]
@@ -133,7 +133,7 @@ mod tests {
       assert_eq!(InferenceCategory::from_str("image_generation").unwrap(), InferenceCategory::ImageGeneration);
       assert_eq!(InferenceCategory::from_str("mocap").unwrap(), InferenceCategory::Mocap);
       assert_eq!(InferenceCategory::from_str("workflow").unwrap(), InferenceCategory::Workflow);
-      assert_eq!(InferenceCategory::from_str("format_conversion").unwrap(), InferenceCategory::FormatConversion);
+      assert_eq!(InferenceCategory::from_str("convert_fbx_gltf").unwrap(), InferenceCategory::ConvertFbxToGltf);
     }
 
     #[test]
@@ -148,7 +148,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(InferenceCategory::ImageGeneration));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::Mocap));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::Workflow));
-      assert_eq!(variants.pop_first(), Some(InferenceCategory::FormatConversion));
+      assert_eq!(variants.pop_first(), Some(InferenceCategory::ConvertFbxToGltf));
       assert_eq!(variants.pop_first(), None);
 
       // Generated check
@@ -172,6 +172,16 @@ mod tests {
         assert_eq!(variant, InferenceCategory::from_str(variant.to_str()).unwrap());
         assert_eq!(variant, InferenceCategory::from_str(&format!("{}", variant)).unwrap());
         assert_eq!(variant, InferenceCategory::from_str(&format!("{:?}", variant)).unwrap());
+      }
+    }
+
+    #[test]
+    fn serialized_length_ok_for_database() {
+      const MAX_LENGTH : usize = 32;
+      for variant in InferenceCategory::all_variants() {
+        let serialized = variant.to_str();
+        assert!(serialized.len() > 0, "variant {:?} is too short", variant);
+        assert!(serialized.len() <= MAX_LENGTH, "variant {:?} is too long", variant);
       }
     }
   }
