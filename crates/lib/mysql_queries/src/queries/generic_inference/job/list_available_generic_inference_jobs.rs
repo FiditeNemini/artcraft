@@ -150,90 +150,7 @@ pub async fn list_available_generic_inference_jobs(
 
 async fn list_sorted_by_id(args: ListAvailableGenericInferenceJobArgs<'_>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
   // NB: Can't be type checked because of WHERE IN clause with dynamic contents
-
-  // Also had to remove the following typing:
-  //id as `id: crate::queries::generic_inference::job::_keys::GenericInferenceJobId`,
-  //token AS `inference_job_token: tokens::jobs::inference::InferenceJobToken`,
-  //inference_type as `inference_type: enums::workers::generic_inference_type::GenericInferenceType`,
-  //creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
-  //status as `status: crate::column_types::job_status::JobStatus`,
-
-  let mut query = r#"
-SELECT
-  id,
-  token as inference_job_token,
-  uuid_idempotency_token,
-
-  inference_category,
-  maybe_model_type,
-  maybe_model_token,
-
-  maybe_input_source_token,
-  maybe_input_source_token_type,
-
-  maybe_inference_args,
-  maybe_raw_inference_text,
-
-  maybe_creator_user_token,
-  maybe_creator_anonymous_visitor_token,
-  creator_ip_address,
-  creator_set_visibility,
-
-  status,
-  attempt_count,
-
-  priority_level,
-  is_keepalive_required,
-
-  is_from_premium_user,
-  is_from_api_user,
-  is_for_twitch,
-
-  max_duration_seconds,
-
-  is_debug_request,
-  maybe_routing_tag,
-
-  created_at,
-  updated_at,
-  retry_at,
-  NOW() as database_clock
-
-FROM generic_inference_jobs
-
-WHERE
-  (
-    status IN ("pending", "attempt_failed")
-  )
-  AND
-  (
-    retry_at IS NULL
-    OR
-    retry_at < CURRENT_TIMESTAMP
-  )
-  AND
-  (
-    is_debug_request = ?
-  )
-"#.to_string();
-
-  if let Some(model_types) = args.maybe_scope_by_model_type {
-    query.push_str(&format!(r#"
-      AND
-      (
-        maybe_model_type IN ({})
-      )
-    "#, model_type_predicate(model_types)));
-  }
-
-  if let Some(inference_categories) = args.maybe_scope_by_job_category {
-    query.push_str(&format!(r#"
-      AND
-      (
-        inference_category IN ({})
-      )
-    "#, inference_category_predicate(&inference_categories)));
-  }
+  let mut query = core_query(&args);
 
   query.push_str(r#"
     ORDER BY id ASC
@@ -250,14 +167,24 @@ WHERE
 
 async fn list_sorted_by_priority(args: ListAvailableGenericInferenceJobArgs<'_>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
   // NB: Can't be type checked because of WHERE IN clause with dynamic contents
+  let mut query = core_query(&args);
 
-  // Also had to remove the following typing:
-  //id as `id: crate::queries::generic_inference::job::_keys::GenericInferenceJobId`,
-  //token AS `inference_job_token: tokens::jobs::inference::InferenceJobToken`,
-  //inference_category as `inference_category: enums::workers::generic_inference_type::GenericInferenceType`,
-  //creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
-  //status as `status: crate::column_types::job_status::JobStatus`,
+  query.push_str(r#"
+    ORDER BY priority_level DESC, id ASC
+    LIMIT ?
+  "#);
 
+  let query = sqlx::query_as::<_, AvailableInferenceJobRawInternal>(&query)
+      .bind(args.is_debug_worker)
+      .bind(args.num_records);
+
+  query.fetch_all(args.mysql_pool)
+      .await
+}
+
+// TODO(bt,2024-01-25): Make QueryBuilder
+fn core_query(args: &ListAvailableGenericInferenceJobArgs<'_>) -> String {
+  // NB: Can't be type checked because of WHERE IN clause with dynamic contents
   let mut query = r#"
 SELECT
   id,
@@ -317,7 +244,6 @@ WHERE
   )
 "#.to_string();
 
-
   if let Some(model_types) = args.maybe_scope_by_model_type {
     query.push_str(&format!(r#"
       AND
@@ -336,18 +262,9 @@ WHERE
     "#, inference_category_predicate(&inference_categories)));
   }
 
-  query.push_str(r#"
-  ORDER BY priority_level DESC, id ASC
-  LIMIT ?
-        "#);
-
-  let query = sqlx::query_as::<_, AvailableInferenceJobRawInternal>(&query)
-      .bind(args.is_debug_worker)
-      .bind(args.num_records);
-
-  query.fetch_all(args.mysql_pool)
-      .await
+  query
 }
+
 
 #[derive(Debug)]
 #[derive(sqlx::FromRow)]
