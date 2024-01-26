@@ -228,7 +228,7 @@ pub async fn enqueue_image_generation_request(
     }
 
     if mode == "model" {
-        match request.maybe_sd_model_token {
+        match request.maybe_upload_path {
             Some(_) => {}
             None => return Err(EnqueueImageGenRequestError::BadInput("Missing Model Upload Path".to_string()))
         }
@@ -396,7 +396,7 @@ pub async fn enqueue_image_generation_request(
         maybe_sampler: Some(sampler),
         maybe_description: description,
         maybe_name: name,
-        maybe_version: version,
+        maybe_version: Some(version),
     };
 
     // create the inference args here

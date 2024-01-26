@@ -47,7 +47,7 @@ use mysql_queries::queries::model_weights::create::create_weight::{
     create_weight,
     CreateModelWeightsArgs,
 };
-use mysql_queries::queries::model_weights::get_weight::get_weight_by_token;
+use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -118,11 +118,11 @@ pub async fn process_job_selection(
     let sd_args = sd_args_from_job(&args).await?;
 
     if sd_args.type_of_inference == "inference" {
-        process_job_inference(&args).await
+        return process_job_inference(&args).await
     } else if sd_args.type_of_inference == "lora" {
-        process_job_lora(&args).await
+        return process_job_lora(&args).await
     } else if sd_args.type_of_inference == "model" {
-        process_job_sd(&args).await
+        return process_job_sd(&args).await
     } else {
         Err(ProcessSingleJobError::Other(anyhow!("inference type doesn't exist!")))
     }
@@ -170,16 +170,13 @@ pub async fn process_job_sd(
     let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint.safetensors");
     let vae_path = work_temp_dir.path().join("vae.safetensors");
     let output_path = work_temp_dir.path().join("output");
-    let g_drive_path = work_temp_dir.path().join("gdrive");
 
     info!("Paths to download to:");
     info!("sd_checkpoint_path:{}", sd_checkpoint_path.display());
-  
     info!("vae_path:{}", vae_path.display());
     info!("output_path:{}", output_path.display());
-    info!("tmp_google_drive_path:{}", g_drive_path.display());
 
-    let download_url = match sd_args.maybe_lora_upload_path {
+    let download_url = match sd_args.maybe_upload_path {
         Some(val) => { val }
         None => { "".to_string() }
     };
@@ -271,10 +268,10 @@ pub async fn process_job_sd(
     // check if file exists if it does not error out....
     let path = output_path.clone();
     let file_path = format!("{}_{}.png", path_to_string(path), 0);
-    
+
     if file_exists(file_path.path()) == false {
         return Err(
-            ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Upload Not a LoRA."))
+            ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Upload Not a SD Model"))
         );
     }
 
@@ -282,7 +279,7 @@ pub async fn process_job_sd(
     // upload and create weights for loRA...
     let weights_sd_descriptor = Box::new(WeightsSD15Descriptor{});
     let metadata = remote_cloud_file_client.upload_file(weights_sd_descriptor,sd_checkpoint_path.to_str().unwrap_or_default()).await?;
-
+    // chekc the model hash for duplicated models.
     let bucket_details = match metadata.bucket_details {
         Some(metadata) => metadata, 
         None => {
@@ -353,10 +350,6 @@ pub async fn process_job_lora(
         }
     }
 
-    let anon_user_token: Option<&AnonymousVisitorTrackingToken>;
-    // The parameters will be updated on another screen perhaps?
-    // so right now it will fill with the availible  values.
-
 
     let work_temp_dir = format!("temp_stable_diffusion_inference_{}", job.id.0);
     let work_temp_dir = args.job_dependencies.fs.scoped_temp_dir_creator_for_work
@@ -367,14 +360,12 @@ pub async fn process_job_lora(
     let lora_path = work_temp_dir.path().join("lora.safetensors"); // input path into execution
     let vae_path = work_temp_dir.path().join("vae.safetensors");
     let output_path = work_temp_dir.path().join("output");
-    let g_drive_path = work_temp_dir.path().join("gdrive");
 
     info!("Paths to download to:");
     info!("sd_checkpoint_path:{}", sd_checkpoint_path.display());
     info!("lora_path:{}", lora_path.display());
     info!("vae_path:{}", vae_path.display());
     info!("output_path:{}", output_path.display());
-    info!("tmp_google_drive_path:{}", g_drive_path.display());
 
     let download_url = match sd_args.maybe_lora_upload_path {
         Some(val) => { val }
@@ -501,7 +492,7 @@ pub async fn process_job_lora(
     
     if file_exists(file_path.path()) == false {
         return Err(
-            ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Upload Not a LoRA."))
+            ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Upload Not a LoRA"))
         );
     }
 
@@ -516,7 +507,6 @@ pub async fn process_job_lora(
             return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to generate bucket details!")));
         }
     };
-
 
     let model_weight_token = &ModelWeightToken::generate();
     let model_weight_token_result = create_weight(CreateModelWeightsArgs {
@@ -551,18 +541,7 @@ pub async fn process_job_lora(
 
 }
 
-pub async fn process_inference(
-    _args: &StableDiffusionProcessArgs<'_>
-) -> Result<JobSuccessResult, ProcessSingleJobError> {
-    Ok(JobSuccessResult {
-        maybe_result_entity: None,
-        inference_duration: Duration::from_secs(0),
-    })
-}
-// loop in default args to check the model
-pub async fn process_job_inference_check_model() {
 
-}
 pub async fn process_job_inference(
     args: &StableDiffusionProcessArgs<'_>
 ) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -571,7 +550,7 @@ pub async fn process_job_inference(
     let mysql_pool = &deps.db.mysql_pool;
 
     let sd_args = sd_args_from_job(&args).await?;
-    let sd_deps = match
+    let sd_deps: &crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies = match
         &args.job_dependencies.job.job_specific_dependencies.maybe_stable_diffusion_dependencies
     {
         None => {
