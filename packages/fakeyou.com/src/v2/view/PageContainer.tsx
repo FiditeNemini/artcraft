@@ -105,6 +105,7 @@ import SearchPage from "./pages/search/SearchPage";
 import { SearchProvider } from "context/SearchContext";
 import WeightEditPage from "./pages/weight/WeightEditPage";
 import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
+import { FooterNav } from "./nav/FooterNav";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -207,7 +208,7 @@ class PageContainer extends React.Component<
   constructor(props: Props & RouteComponentProps) {
     super(props);
 
-  console.log("💰",);
+    console.log("💰");
     this.state = {};
   }
 
@@ -895,6 +896,7 @@ class PageContainer extends React.Component<
                 />
               </Route>
             </Switch>
+            <FooterNav sessionWrapper={this.props.sessionWrapper} />
           </div>
         </div>
       </SearchProvider>
