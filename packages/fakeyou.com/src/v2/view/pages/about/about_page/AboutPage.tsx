@@ -13,30 +13,39 @@ function AboutPage(props: Props) {
 
   const teamMembers = [
     {
+      name: "Justin",
+      role: "ML",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Adrian",
+      role: "ML",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
       name: "Scott",
       role: "Technical 3D Artist",
       imageSrc: "/images/team/scott.webp",
     },
     {
+      name: "Danny",
+      role: "3D Engine",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Brooks",
+      role: "3D Engine",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Andrei",
+      role: "3D Engine",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
       name: "Michael",
-      role: "ML / Backend",
+      role: "Backend / ML",
       imageSrc: "/images/team/michael.webp",
-    },
-
-    {
-      name: "Ishaan",
-      role: "Growth",
-      imageSrc: "/images/avatars/default-pfp.png",
-    },
-    {
-      name: "Salt",
-      role: "3D Engine",
-      imageSrc: "/images/avatars/default-pfp.png",
-    },
-    {
-      name: "Rewin",
-      role: "3D Engine",
-      imageSrc: "/images/avatars/default-pfp.png",
     },
     {
       name: "Kasisnu",
@@ -45,12 +54,7 @@ function AboutPage(props: Props) {
     },
     {
       name: "Madhukar",
-      role: "Backend",
-      imageSrc: "/images/avatars/default-pfp.png",
-    },
-    {
-      name: "Danny",
-      role: "3D Engine Frontend",
+      role: "Infra",
       imageSrc: "/images/avatars/default-pfp.png",
     },
     {
@@ -68,20 +72,24 @@ function AboutPage(props: Props) {
       role: "Frontend",
       imageSrc: "/images/team/bombay.webp",
     },
-
     {
-      name: "Brooks",
-      role: "Role",
+      name: "Ishaan",
+      role: "Growth",
       imageSrc: "/images/avatars/default-pfp.png",
     },
     {
-      name: "Yae",
-      role: "Role",
+      name: "Evgenii",
+      role: "Gen AI Artist",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Steven",
+      role: "Gen AI Artist",
       imageSrc: "/images/avatars/default-pfp.png",
     },
     {
       name: "Willis",
-      role: "ML / Generative Art",
+      role: "Gen AI Artist",
       imageSrc: "/images/avatars/default-pfp.png",
     },
     {
@@ -102,6 +110,20 @@ function AboutPage(props: Props) {
         title="About Us"
         subText="We're building FakeYou as just one component of a broad set of production and creative tooling."
       />
+      <Panel padding={true} mb={true}>
+        <h2 className="mb-3 fw-bold">Lorem Ipsum</h2>
+
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo consequat. Duis aute irure dolor in
+          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+          culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+      </Panel>
+
       <Panel padding={true} mb={true}>
         <h2 className="mb-3 fw-bold">Our Mission</h2>
 
