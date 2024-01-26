@@ -1,8 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { Container, Panel } from "components/common";
+import PageHeader from "components/layout/PageHeader";
 
 interface Props {}
 
@@ -10,300 +11,171 @@ function AboutPage(props: Props) {
   PosthogClient.recordPageview();
   usePrefixedDocumentTitle("About Us");
 
+  const teamMembers = [
+    {
+      name: "Scott",
+      role: "Technical 3D Artist",
+      imageSrc: "/images/team/scott.webp",
+    },
+    {
+      name: "Michael",
+      role: "ML / Backend",
+      imageSrc: "/images/team/michael.webp",
+    },
+
+    {
+      name: "Ishaan",
+      role: "Growth",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Salt",
+      role: "3D Engine",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Rewin",
+      role: "3D Engine",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Kasisnu",
+      role: "Backend",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Madhukar",
+      role: "Backend",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Danny",
+      role: "3D Engine Frontend",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Wil",
+      role: "Frontend",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Victor",
+      role: "Frontend",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Bombay",
+      role: "Frontend",
+      imageSrc: "/images/team/bombay.webp",
+    },
+
+    {
+      name: "Brooks",
+      role: "Role",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Yae",
+      role: "Role",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Willis",
+      role: "ML / Generative Art",
+      imageSrc: "/images/avatars/default-pfp.png",
+    },
+    {
+      name: "Jose",
+      role: "Data Team",
+      imageSrc: "/images/team/jose.webp",
+    },
+    {
+      name: "Rodrigo",
+      role: "Data Team",
+      imageSrc: "/images/team/rodrigo.webp",
+    },
+  ];
+
   return (
-    <div>
-      <div className="container mb-4">
-        <div className="row gx-3 flex-lg-row-reverse align-items-center">
-          <div className="col-lg-6">
-            <div className="d-flex justify-content-center">
-              <img
-                src="/mascot/kitsune_pose3.webp"
-                className="img-fluid"
-                width="516"
-                height="444"
-                alt="FakeYou Kitsune Mascot!"
-              />
-            </div>
+    <Container type="panel" className="mb-5">
+      <PageHeader
+        title="About Us"
+        subText="We're building FakeYou as just one component of a broad set of production and creative tooling."
+      />
+      <Panel padding={true} mb={true}>
+        <h2 className="mb-3 fw-bold">Our Mission</h2>
+
+        <p>
+          Our mission is to empower anyone to create full feature-length content
+          from home without institutional capital, large teams, huge amounts of
+          time, or deep reservoirs of highly specialized talent. We give
+          everyone their turn in the director’s seat and turn dreams into
+          physical form.
+        </p>
+      </Panel>
+
+      <Panel padding={true}>
+        <h2 className="mb-3 fw-bold">The Team</h2>
+
+        <div className="row g-4 g-md-5">
+          <div className="col-6 col-md-3 mb-0">
+            <img
+              src="/images/team/brandon.webp"
+              className="img-fluid img-team img-brandon rounded"
+              alt="Brandon Thomas"
+            />
           </div>
-          <div className="col-lg-6 px-md-2 ps-lg-5 ps-xl-2">
-            <div className="text-center text-lg-start">
-              <div>
-                <h1 className=" fw-bold lh-1 mb-4">A Glimpse of the Future</h1>
-              </div>
-              <div>
-                <p className="lead">
-                  We're building FakeYou as just one component of a broad set of
-                  production and creative tooling.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div className="container-panel pt-4 pb-5">
-        <div className="panel p-3 p-lg-4 load-hidden mt-5 mt-lg-0">
-          <h1 className="panel-title fw-bold">About FakeYou</h1>
-          <div className="py-6 d-flex flex-column gap-4">
-            <p>
-              Your brain was already capable of imagining things spoken in other
-              people's voices. This is a demonstration of how far computers have
-              caught up. One day computers will be able to bring all of the rich
-              and vivid imagery of your hopes and dreams to life. There's never
-              been a better time throughout all history to be a creative than
-              now.
-            </p>
-            <div>
-              <h2 className="mb-4">Technology disclosure</h2>
-              <p>
-                <em>
-                  We'll be happy to remove any of the voices featured here for
-                  any reason. See our <Link to="/terms">terms page</Link> for
-                  more info.
-                </em>
+          <div className="col-12 col-md-9 text-start d-flex flex-column justify-content-center">
+            <div className="p-3 px-0">
+              <p className="fw-semibold opacity-100 mb-0 fs-5">
+                Brandon Thomas
               </p>
-              <br />
-              <p>
-                &rdquo;Deep fakes&rdquo; are kind of like Photoshop when it
-                first came out. They're impressive, maybe a little bit scary,
-                but they're about to become the new norm. People will become
-                accustomed to the technology, and the results will be used
-                mostly for creative good, unlocking previously costly and
-                unattainable high production values for individual creators.
-                It's our belief that the next Hollywood will be <em>you</em>.
-              </p>
-              <br />
-              <p>
-                The technology to clone voices is already out in the open, and
-                the voices here are built by a community of contributors. We're
-                not the only website doing this, and plenty of people are
-                producing these same results on their own at home, independent
-                of our work. You can see thousands of examples on YouTube and
-                social media.
-              </p>
-              <br />
-              <p>
-                Even if the United States chooses to ban this technology,
-                institutions in China, Japan, Canada, and other countries all
-                over the world are rapidly conducting and publishing research on
-                this topic. People everywhere have access to this easy-to-use
-                technology. State actors probably have even more sophisiticated
-                versions available.
-              </p>
-              <br />
-              <p>
-                As an interesting point, most if not all of the voices produced
-                by this website are actually
-                <em> Linda Johnson</em> with a little bit layered on top.
-              </p>
-
-              <p>
+              <p className="team-role-text">Founder and CEO</p>
+              <hr className="my-3 w-25 opacity-25" />
+              <p className="fw-normal mt-3 mb-0">
+                Brandon worked 8 years as a distributed systems and AI/ML
+                engineer at Square. He’s spent the last decade making indie
+                films and being plugged into the Atlanta art scene. In college
+                he built a{" "}
                 <a
-                  href="https://github.com/NVIDIA/tacotron2"
+                  href="https://www.youtube.com/watch?v=x034jVB1avs"
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noreferrer"
+                  className="text-red"
                 >
-                  NVIDIA makes these tools publicly available for you to make
-                  your own voice models
-                </a>
-                . Check it out!
-              </p>
-            </div>
-
-            <div>
-              <h2 className="mb-4">Voice Acting & Musician Jobs</h2>
-              <p>
-                If you're a voice actor or musician, we're looking to hire
-                talented performers to help us build commercial-friendly AI
-                voices. (The user-submitted models on FakeYou are just a
-                technology demonstration and may not be used commercially.) We
-                want to empower small creators (game designers, musicians, and
-                more) to voice, sing, and speak emotion into their work. Please
-                reach out to <code>jobs@storyteller.io</code> if you'd like to
-                work with us. We can pay a flat fee and/or royalty. Please get
-                in touch to learn more!
-              </p>
-            </div>
-            <div>
-              <h2 className="mb-4">FakeYou was previously Vocodes</h2>
-              <p>
-                FakeYou.com was previously known as{" "}
-                <strong>https://vo.codes</strong>, but has been rebranded to
-                better reflect its purpose and direction. (Not many people know
-                what a <em>vocoder</em> is anyway, so it didn't make sense to
-                keep the name.)
-              </p>
-            </div>
-            <div>
-              <h2 className="mb-4">Thanks</h2>
-              <p>
-                Thanks to the following individuals (in no particular order) for
-                help with data gathering and annotation, Discord moderation, ML
-                advice, etc.
-              </p>
-              <br />
-              <p>
-                Vegito1089, Shin, Ashurath, MakaveliGH, Blutarch Mann, Yahia,
-                Tim Squid, Seuneramet, Matt, Seth, CookiePPP,{" "}
-                <a
-                  href="https://twitter.com/r9y9/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  @r9y9
-                </a>
-                , BFlat, Raisin.
-              </p>
-
-              <br />
-
-              <p>
-                The following papers, models, and resources were used:
-                <br />
-                <br />
-                <a
-                  href="https://github.com/NVIDIA/tacotron2"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Tacotron2
+                  laser projector
                 </a>{" "}
-                (BSD-3 license),{" "}
-                <a
-                  href="https://github.com/jaywalnut310/glow-tts"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  glow-tts
-                </a>{" "}
-                (MIT license), {/* MIT */}
-                <a
-                  href="https://github.com/seungwonpark/melgan"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  MelGAN
-                </a>{" "}
-                (BSD-3 license), {/* BSD3 */}
-                <a
-                  href="https://arxiv.org/pdf/2005.05106.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Multi-band MelGAN
-                </a>{" "}
-                (paper),{" "}
-                <a
-                  href="https://arxiv.org/abs/2010.05646"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  HiFi-GAN
-                </a>{" "}
-                (paper),{" "}
-                <a
-                  href="https://github.com/Rudrabha/Wav2Lip"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Wav2Lip
-                </a>{" "}
-                (MIT license), {/* Non-commercial */}
-                <a
-                  href="http://www.speech.cs.cmu.edu/cgi-bin/cmudict"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  CMUDict
-                </a>{" "}
-                (BSD-2 license),{" "}
-                <a
-                  href="https://keithito.com/LJ-Speech-Dataset/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  LJSpeech
-                </a>{" "}
-                (public domain),{" "}
-                <a
-                  href="https://datashare.is.ed.ac.uk/handle/10283/3443"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  VCTK
-                </a>{" "}
-                (CC BY 4.0).
+                and programmed it to play video games on the side of
+                skyscrapers. Today he’s working on disrupting Hollywood and the
+                music industry and transforming narrative storytelling into
+                something the likes of which we’ve never seen before.
               </p>
-              <br />
-              <p>
-                Videos are generated by the amazing Wav2Lip system{" "}
-                <a
-                  href="https://doi.org/10.1145/3394171.3413532"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  (paper)
-                </a>
-                , by Prajwal{" "}
-                <a
-                  href="https://twitter.com/prajwalkr14"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  (@prajwalkr14)
-                </a>
-                , K R and Mukhopadhyay, Rudrabha and Namboodiri, Vinay P. and
-                Jawahar, C.V.
-              </p>
-            </div>
-            <div>
-              <h2 className="mb-4">Contact</h2>
-              <p>
-                Reach out to "echelon" on{" "}
-                <a
-                  href="https://twitter.com/echelon"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Twitter
-                </a>
-                &nbsp;and Hacker News. Say hi.
-              </p>
-
-              <p>
-                The Storyteller Company (registered as Learning Machines, LLC)
-              </p>
-            </div>
-            <div>
-              <h2 className="mb-4">Built With</h2>
-              <div className="row gx-3 gx-lg-4">
-                <div className="col-4 col-md-3">
-                  <img
-                    className="rounded img-fluid"
-                    src="/logos/pytorch.png"
-                    alt="models are written in pytorch"
-                  />
-                </div>
-                <div className="col-4 col-md-3">
-                  <img
-                    className="rounded img-fluid"
-                    src="/logos/rust.png"
-                    alt="core server components are written in Rust"
-                  />
-                </div>
-                <div className="col-4 col-md-3">
-                  <img
-                    className="rounded img-fluid"
-                    src="/logos/kubernetes.png"
-                    alt="the cluster scales with k8s"
-                  />
-                </div>
-              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+
+        <div className="row g-3 gx-lg-5 gy-md-5 pt-3 pt-md-5">
+          {teamMembers.map((member, index) => (
+            <div className="col-6 col-md-3" key={index}>
+              <Panel className="overflow-hidden panel-inner rounded h-100">
+                <img
+                  src={member.imageSrc}
+                  className="img-fluid img-team"
+                  alt=""
+                />
+                <div className="p-3">
+                  <p className="fw-semibold opacity-100 mb-0 fs-5">
+                    {member.name}
+                  </p>
+                  <p className="fs-7">{member.role}</p>
+                </div>
+              </Panel>
+            </div>
+          ))}
+        </div>
+      </Panel>
+    </Container>
   );
 }
 
