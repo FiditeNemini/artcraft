@@ -13,6 +13,11 @@ function AboutPage(props: Props) {
 
   const teamMembers = [
     {
+      name: "Michael",
+      role: "ML / Backend",
+      imageSrc: "/images/team/michael.webp",
+    },
+    {
       name: "Justin",
       role: "ML",
       imageSrc: "/images/avatars/default-pfp.png",
@@ -41,11 +46,6 @@ function AboutPage(props: Props) {
       name: "Andrei",
       role: "3D Engine",
       imageSrc: "/images/avatars/default-pfp.png",
-    },
-    {
-      name: "Michael",
-      role: "Backend / ML",
-      imageSrc: "/images/team/michael.webp",
     },
     {
       name: "Kasisnu",
