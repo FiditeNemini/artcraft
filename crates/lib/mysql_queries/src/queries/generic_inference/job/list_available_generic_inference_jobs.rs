@@ -88,18 +88,10 @@ pub async fn list_available_generic_inference_jobs(
 )
   -> AnyhowResult<Vec<AvailableInferenceJob>>
 {
-  let model_types = args.maybe_scope_by_model_type
-      .map(|types| types.clone())
-      .unwrap_or(InferenceModelType::all_variants()); // NB: All model types
-
-  let inference_categories = args.maybe_scope_by_job_category
-        .map(|types| types.clone())
-        .unwrap_or(InferenceCategory::all_variants()); // NB: All categories
-
   let query = if args.sort_by_priority {
-    list_sorted_by_priority(args, model_types, inference_categories).await
+    list_sorted_by_priority(args).await
   } else {
-    list_sorted_by_id(args, model_types, inference_categories).await
+    list_sorted_by_id(args).await
   };
 
   let job_records = query?;
@@ -156,7 +148,7 @@ pub async fn list_available_generic_inference_jobs(
   Ok(job_records)
 }
 
-async fn list_sorted_by_id(args: ListAvailableGenericInferenceJobArgs<'_>, model_types: BTreeSet<InferenceModelType>, inference_categories: BTreeSet<InferenceCategory>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
+async fn list_sorted_by_id(args: ListAvailableGenericInferenceJobArgs<'_>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
   // NB: Can't be type checked because of WHERE IN clause with dynamic contents
 
   // Also had to remove the following typing:
@@ -207,24 +199,9 @@ SELECT
   retry_at,
   NOW() as database_clock
 
-FROM generic_inference_jobs"#.to_string();
+FROM generic_inference_jobs
 
-  query.push_str(&format!(r#"
-    WHERE
-    (
-      maybe_model_type IN ({})
-    )
-  "#, model_type_predicate(&model_types)));
-
-  query.push_str(&format!(r#"
-    and
-    (
-      inference_category IN ({})
-    )
-  "#, inference_category_predicate(&inference_categories)));
-
-  query.push_str(r#"
-  AND
+WHERE
   (
     status IN ("pending", "attempt_failed")
   )
@@ -238,9 +215,30 @@ FROM generic_inference_jobs"#.to_string();
   (
     is_debug_request = ?
   )
-  ORDER BY id ASC
-  LIMIT ?
-        "#);
+"#.to_string();
+
+  if let Some(model_types) = args.maybe_scope_by_model_type {
+    query.push_str(&format!(r#"
+      AND
+      (
+        maybe_model_type IN ({})
+      )
+    "#, model_type_predicate(model_types)));
+  }
+
+  if let Some(inference_categories) = args.maybe_scope_by_job_category {
+    query.push_str(&format!(r#"
+      AND
+      (
+        inference_category IN ({})
+      )
+    "#, inference_category_predicate(&inference_categories)));
+  }
+
+  query.push_str(r#"
+    ORDER BY id ASC
+    LIMIT ?
+  "#);
 
   let query = sqlx::query_as::<_, AvailableInferenceJobRawInternal>(&query)
       .bind(args.is_debug_worker)
@@ -250,7 +248,7 @@ FROM generic_inference_jobs"#.to_string();
       .await
 }
 
-async fn list_sorted_by_priority(args: ListAvailableGenericInferenceJobArgs<'_>, model_types: BTreeSet<InferenceModelType>, inference_categories: BTreeSet<InferenceCategory>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
+async fn list_sorted_by_priority(args: ListAvailableGenericInferenceJobArgs<'_>) -> Result<Vec<AvailableInferenceJobRawInternal>, sqlx::Error> {
   // NB: Can't be type checked because of WHERE IN clause with dynamic contents
 
   // Also had to remove the following typing:
@@ -301,24 +299,9 @@ SELECT
   retry_at,
   NOW() as database_clock
 
-FROM generic_inference_jobs"#.to_string();
+FROM generic_inference_jobs
 
-  query.push_str(&format!(r#"
-    WHERE
-    (
-      maybe_model_type IN ({})
-    )
-  "#, model_type_predicate(&model_types)));
-
-  query.push_str(&format!(r#"
-    and
-    (
-      inference_category IN ({})
-    )
-  "#, inference_category_predicate(&inference_categories)));
-
-  query.push_str(r#"
-  AND
+WHERE
   (
     status IN ("pending", "attempt_failed")
   )
@@ -332,6 +315,28 @@ FROM generic_inference_jobs"#.to_string();
   (
     is_debug_request = ?
   )
+"#.to_string();
+
+
+  if let Some(model_types) = args.maybe_scope_by_model_type {
+    query.push_str(&format!(r#"
+      AND
+      (
+        maybe_model_type IN ({})
+      )
+    "#, model_type_predicate(model_types)));
+  }
+
+  if let Some(inference_categories) = args.maybe_scope_by_job_category {
+    query.push_str(&format!(r#"
+      AND
+      (
+        inference_category IN ({})
+      )
+    "#, inference_category_predicate(&inference_categories)));
+  }
+
+  query.push_str(r#"
   ORDER BY priority_level DESC, id ASC
   LIMIT ?
         "#);
