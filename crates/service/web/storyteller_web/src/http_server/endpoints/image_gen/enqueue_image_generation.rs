@@ -1,12 +1,12 @@
 // #![forbid(unused_imports)]
 #![forbid(unused_mut)]
-#![forbid(unused_variables)]
-
-use std::fmt::{Display, Formatter};
+// #![forbid(unused_variables)]
+use log::info;
+use std::fmt::{ Display, Formatter };
 use std::fmt::Debug;
 use std::sync::Arc;
 
-use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::{ HttpRequest, HttpResponse, web };
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::warn;
@@ -44,25 +44,24 @@ const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
 /// This is useful for catching the live logs or intercepting the job.
 const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 
-#[derive(Debug,Deserialize, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Deserialize, Clone, Copy, Eq, PartialEq)]
 pub enum TypeOfInference {
     #[serde(rename = "lora")]
-    UploadLoRA,
-    #[serde(rename = "checkpoint")]
-    CheckPoint,
+    Lora,
+    #[serde(rename = "model")]
+    Model,
     #[serde(rename = "inference")]
-    Inference,
+    Inference
 }
 impl Display for TypeOfInference {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         match self {
-            TypeOfInference::UploadLoRA => write!(f, "lora"),
-            TypeOfInference::CheckPoint => write!(f, "checkpoint"),
+            TypeOfInference::Lora => write!(f, "lora"),
+            TypeOfInference::Model => write!(f, "model"),
             TypeOfInference::Inference => write!(f, "inference"),
         }
     }
 }
-
 
 pub fn is_valid_string(input: &str) -> bool {
     let valid_strings = [
@@ -91,41 +90,40 @@ pub fn is_valid_string(input: &str) -> bool {
         "LMS Karras",
         "DPM2 Karras",
         "DPM2 a Karras",
-        "DPM++ 2S a Karras"
+        "DPM++ 2S a Karras",
     ];
     valid_strings.contains(&input)
 }
 
-
-#[derive(Deserialize,ToSchema)]
+#[derive(Deserialize, ToSchema)]
 pub struct EnqueueImageGenRequest {
     uuid_idempotency_token: String,
-    type_of_inference: TypeOfInference, // upload loRA / check point / standard inference
     maybe_image_source: Option<String>,
     maybe_sd_model_token: Option<String>,
     maybe_lora_model_token: Option<String>,
     maybe_prompt: Option<String>,
     maybe_n_prompt: Option<String>,
     maybe_seed: Option<i64>,
-    maybe_width: Option<i32>,
-    maybe_height: Option<i32>,
+    maybe_width: Option<u32>,
+    maybe_height: Option<u32>,
     maybe_sampler: Option<String>,
     maybe_upload_path: Option<String>,
     maybe_lora_upload_path: Option<String>,
-    maybe_cfg_scale: Option<i32>,
-    maybe_number_of_samples: Option<i32>,
-    maybe_batch_count: Option<i32>,
-    name: String,
-    description: String,
+    maybe_cfg_scale: Option<u32>,
+    maybe_number_of_samples: Option<u32>,
+    maybe_batch_count: Option<u32>,
+    maybe_name: Option<String>,
+    maybe_description: Option<String>,
+    maybe_version: Option<u32>
 }
 
-#[derive(Serialize,ToSchema)]
+#[derive(Serialize, ToSchema)]
 pub struct EnqueueImageGenRequestSuccessResponse {
     pub success: bool,
     pub inference_job_token: InferenceJobToken,
 }
 
-#[derive(Debug,ToSchema)]
+#[derive(Debug, ToSchema)]
 pub enum EnqueueImageGenRequestError {
     BadInput(String),
     NotAuthorized,
@@ -166,18 +164,20 @@ impl std::fmt::Display for EnqueueImageGenRequestError {
 // insert generic inference job.rs
 // Need to convert it to generic inference job.
 #[utoipa::path(
-post,
-path = "/inference/enqueue_image_gen/",
-responses(
-(status = 200, description = "Enqueue TTS generically", body = EnqueueImageGenRequestSuccessResponse),
-(status = 400, description = "Bad input", body = EnqueueImageGenRequestError),
-(status = 401, description = "Not authorized", body = EnqueueImageGenRequestError),
-(status = 429, description = "Rate limited", body = EnqueueImageGenRequestError),
-(status = 500, description = "Server error", body = EnqueueImageGenRequestError)
-),
-params(
-("request" = EnqueueImageGenRequest, description = "Payload for TTS Request")
-)
+    post,
+    path = "/inference/enqueue_image_gen/",
+    responses(
+        (
+            status = 200,
+            description = "Enqueue TTS generically",
+            body = EnqueueImageGenRequestSuccessResponse,
+        ),
+        (status = 400, description = "Bad input", body = EnqueueImageGenRequestError),
+        (status = 401, description = "Not authorized", body = EnqueueImageGenRequestError),
+        (status = 429, description = "Rate limited", body = EnqueueImageGenRequestError),
+        (status = 500, description = "Server error", body = EnqueueImageGenRequestError)
+    ),
+    params(("request" = EnqueueImageGenRequest, description = "Payload for TTS Request"))
 )]
 pub async fn enqueue_image_generation_request(
     http_request: HttpRequest,
@@ -185,10 +185,59 @@ pub async fn enqueue_image_generation_request(
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, EnqueueImageGenRequestError> {
 
+    // TODO:I know ill fix this later
+    let path = http_request.path();
+    let segments: Vec<&str> = path.split('/').collect();
+    let last_segment = segments.last().unwrap_or(&"");
+    
+    println!("Last segment: {}", last_segment);
+
+    // use segment to determine what to do.
+    let mode; 
+    if last_segment.to_string() == "lora" {
+        mode = "lora";
+    } else if last_segment.to_string()  == "model" {
+        mode = "model";
+    } else {
+        mode = "inference";
+    }
+
+    // check and ensure we also pass description and the name
+    if mode == "lora" || mode == "model" {
+        match request.maybe_name {
+            Some(_) => {},
+            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Model / Lora Name".to_string()))
+        }
+
+        match request.maybe_description {
+            Some(_) => {}
+            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Model / Lora Description".to_string()))
+        }
+    } else {
+        match request.maybe_sd_model_token {
+            Some(_) => {}
+            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Model Token".to_string()))
+        }
+    }
+
+    if mode == "lora" {
+        match request.maybe_lora_upload_path {
+            Some(_) => {}
+            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Lora Upload Path".to_string()))
+        }
+    }
+
+    if mode == "model" {
+        match request.maybe_upload_path {
+            Some(_) => {}
+            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Model Upload Path".to_string()))
+        }
+    }
+
     // TODO: Brandon need to figure out premium vs not premium
 
     let mut maybe_user_token: Option<UserToken> = None;
-    let  visbility =  enums::common::visibility::Visibility::Public;
+    let visbility = enums::common::visibility::Visibility::Public;
 
     let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {
         warn!("MySql pool error: {:?}", err);
@@ -204,9 +253,20 @@ pub async fn enqueue_image_generation_request(
             EnqueueImageGenRequestError::ServerError
         })?;
     
-    
+
     if let Some(user_session) = maybe_user_session.as_ref() {
+
         maybe_user_token = Some(UserToken::new_from_str(&user_session.user_token));
+        match maybe_user_token {
+            Some(ref val) => {    
+                println!("User Token: {}",val.clone().to_string());
+            },
+            None => {
+                println!("User Token check? Failed to find!");
+            }
+        }
+    } else {
+        println!("Session isn't there");
     }
 
     // Plan should handle "first anonymous use" and "investor" cases.
@@ -225,6 +285,7 @@ pub async fn enqueue_image_generation_request(
     let maybe_routing_tag = get_request_header_optional(&http_request, ROUTING_TAG_HEADER_NAME).map(
         |routing_tag| routing_tag.trim().to_string()
     );
+
 
     // ==================== BANNED USERS ==================== //
 
@@ -254,25 +315,6 @@ pub async fn enqueue_image_generation_request(
 
     // ==================== INFERENCE ARGS ==================== //
 
-    if request.type_of_inference == TypeOfInference::Inference {
-        if request.maybe_sd_model_token.is_none() {
-            return Err(EnqueueImageGenRequestError::BadInput("No sd model token provided".to_string()));
-        }
-
-        if request.maybe_prompt.is_none() {
-            return Err(EnqueueImageGenRequestError::BadInput("No prompt provided".to_string()));
-        }
-
-    } else if request.type_of_inference == TypeOfInference::UploadLoRA {
-        if request.maybe_lora_upload_path.is_none() {
-            return Err(EnqueueImageGenRequestError::BadInput("No lora upload path provided".to_string()));
-        }
-    } else if request.type_of_inference == TypeOfInference::CheckPoint {
-        if request.maybe_upload_path.is_none() {
-            return Err(EnqueueImageGenRequestError::BadInput("No upload path provided".to_string()));
-        }
-    }
-
     let width = request.maybe_width.unwrap_or(512);
     let height = request.maybe_height.unwrap_or(512);
 
@@ -291,32 +333,31 @@ pub async fn enqueue_image_generation_request(
     };
 
     let cfg_scale = match request.maybe_cfg_scale {
-        Some(val) => if val > 32 { 32 } else { val },
-        None => 7
+        Some(val) => if val > 32 { 32 } else { val }
+        None => 7,
     };
 
     let number_of_samples = match request.maybe_number_of_samples {
-        Some(val) => if val < 0 { 20 } else if val > 128 { 128 } else { val },
+        Some(val) => if val < 0 { 20 } else if val > 128 { 128 } else { val }
         None => 20,
     };
 
-
     let batch_count = match request.maybe_batch_count {
-        Some(val) => if val > 4 { 4 } else { val },
+        Some(val) => if val > 4 { 4 } else { val }
         None => 1,
     };
 
     let sampler = match request.maybe_sampler.clone() {
-        Some(val) => if is_valid_string(&val) { val.clone() } else { String::from("Euler a") },
-        None =>String::from( "Euler a"),
+        Some(val) => if is_valid_string(&val) { val.clone() } else { String::from("Euler a") }
+        None => String::from("Euler a"),
     };
 
-    let sd_weight_token = ModelWeightToken(request.maybe_sd_model_token.clone().unwrap_or_default());
+    let sd_weight_token = ModelWeightToken(
+        request.maybe_sd_model_token.clone().unwrap_or_default()
+    );
     let lora_token = ModelWeightToken(request.maybe_lora_model_token.clone().unwrap_or_default());
-    
 
     let n_prompt = request.maybe_n_prompt.clone().unwrap_or_default();
-
     // we can only do 1 upload type at a time.
     // if we are uploading a model.
     let upload_path = request.maybe_upload_path.clone().unwrap_or_default();
@@ -329,9 +370,15 @@ pub async fn enqueue_image_generation_request(
         seed = s;
     }
 
-    let type_of_inference = request.type_of_inference.to_string().clone();
-    let description = request.description.to_string().clone();
-    let name = request.name.to_string().clone();
+    let mut version:u32 = 0;
+    let type_of_inference = mode.to_string().clone();
+    let description = request.maybe_description.clone();
+    let name = request.maybe_name.clone();
+
+    if let Some(s) = request.maybe_version {
+        version = s;
+    }
+
     let inference_args = StableDiffusionArgs {
         maybe_sd_model_token: Some(sd_weight_token),
         maybe_lora_model_token: Some(lora_token),
@@ -347,8 +394,9 @@ pub async fn enqueue_image_generation_request(
         maybe_width: Some(width),
         maybe_height: Some(height),
         maybe_sampler: Some(sampler),
-        description: Some(description),
-        name: Some(name),
+        maybe_description: description,
+        maybe_name: name,
+        maybe_version: Some(version),
     };
 
     // create the inference args here
@@ -373,7 +421,7 @@ pub async fn enqueue_image_generation_request(
         creator_ip_address: &ip_address,
         creator_set_visibility: visbility,
         priority_level,
-        requires_keepalive: true, 
+        requires_keepalive: false, //reverse ...  TODO fix this. we set it base on account is premium or not ... 
         is_debug_request,
         maybe_routing_tag: maybe_routing_tag.as_deref(),
         mysql_pool: &server_state.mysql_pool,
@@ -392,8 +440,67 @@ pub async fn enqueue_image_generation_request(
         inference_job_token: job_token,
     };
 
-    let body = serde_json::to_string(&response).map_err(|_e| EnqueueImageGenRequestError::ServerError)?;
+    let body = serde_json
+        ::to_string(&response)
+        .map_err(|_e| EnqueueImageGenRequestError::ServerError)?;
 
     // Error handling 101 rust result type returned like so.
     Ok(HttpResponse::Ok().content_type("application/json").body(body))
 }
+
+// with LoRA
+// http://127.0.0.1:12345/v1/image_gen/inference/enqueue_image_gen
+// {
+//     "uuid_idempotency_token": "12",
+//     "maybe_sd_model_token": "weight_dmmthavhawqc2hj7yqyemcbf8",
+//     "maybe_lora_model_token": "weight_t7gz78fjg27m0wtw6r33gafxs",
+//     "maybe_prompt": "raiden mei a very well drawn, anime girl, with pink and purple hair sitting down on a chair relaxed, highest quality, semi nude, masterpiece, painted",
+//     "maybe_a_prompt": "a anime girl, with pink and purple hair sitting down on a chair relaxed.",
+//     "maybe_n_prompt": "nsfw, black and white, low quality, pixelated",
+//     "maybe_seed": -1,
+//     "maybe_width": 1024,
+//     "maybe_height": 1024,
+//     "maybe_sampler": "DPM++ 2M SDE Heun",
+//     "maybe_cfg_scale": 7,
+//     "maybe_number_of_samples": 64,
+//     "maybe_batch_count": 4,
+//   }
+
+// without LoRA
+// {
+//     "uuid_idempotency_token": "132141",
+//     "maybe_sd_model_token": "weight_dmmthavhawqc2hj7yqyemcbf8",
+//     "maybe_prompt": "raiden mei a very well drawn, anime girl, with pink and purple hair sitting down on a chair relaxed, highest quality, semi nude, masterpiece, painted",
+//     "maybe_a_prompt": "a anime girl, with pink and purple hair sitting down on a chair relaxed.",
+//     "maybe_n_prompt": "nsfw, black and white, low quality, pixelated",
+//     "maybe_seed": -1,
+//     "maybe_width": 512,
+//     "maybe_height": 512,
+//     "maybe_sampler": "DPM++ 2M SDE Heun",
+//     "maybe_cfg_scale": 8,
+//     "maybe_number_of_samples": 64,
+//     "maybe_batch_count": 4
+// }
+
+// http://127.0.0.1:12345/v1/image_gen/upload/lora
+// {
+//     "uuid_idempotency_token": "12",
+//     "maybe_lora_upload_path": "https://drive.google.com/file/d/1WRgR2pn0Ky8ls5_9Zq6tQlHTBvyWeach/view?usp=sharing",
+//     "maybe_name":"some_name",
+//     "maybe_description":"some_description"
+// }
+
+// http://127.0.0.1:12345/v1/image_gen/upload/model
+// {
+//     "uuid_idempotency_token": "13",
+//     "maybe_upload_path": "https://drive.google.com/file/d/1WRgR2pn0Ky8ls5_9Zq6tQlHTBvyWeach/view?usp=sharing",
+//     "maybe_name":"some_name",
+//     "maybe_description":"some_description"
+// }
+
+// {
+//     "uuid_idempotency_token": "123",
+//     "maybe_lora_upload_path": "https://drive.google.com/file/d/1WRgR2pn0Ky8ls5_9Zq6tQlHTBvyWeach/view?usp=sharing",
+//     "maybe_name":"some_name",
+//     "maybe_description":"some_description"
+// }
