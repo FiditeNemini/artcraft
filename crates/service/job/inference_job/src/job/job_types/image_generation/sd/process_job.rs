@@ -210,7 +210,15 @@ pub async fn process_job_sd(
             return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Download")));
         }
     };
+
     let download_file_path = work_temp_dir.path().join(download_filename);
+
+    if file_exists(download_file_path.as_path()) == false {
+        return Err(
+            ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Download SD Model from Google"))
+        );
+    }
+
     info!("File Retrieved at {}", download_file_path.display());
 
     // download vae for model
@@ -408,6 +416,12 @@ pub async fn process_job_lora(
 
     let download_file_path = work_temp_dir.path().join(download_filename);
     info!("File Retrieved at {}", download_file_path.display());
+    if file_exists(download_file_path.as_path()) == false {
+        return Err(
+            ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Download loRA Model from Google Drive"))
+        );
+    }
+
 
     // download model + vae for lora
     // use lora with whatever checkpoint make it fixed id if it works submit it
