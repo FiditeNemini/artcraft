@@ -1,15 +1,13 @@
 use anyhow::anyhow;
-use enums::common::visibility::Visibility;
-use sqlx;
-use sqlx::MySqlPool;
-
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
-use enums::by_table::media_files::media_file_origin_category::{MediaFileOriginCategory, self};
+use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
-
+use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use sqlx;
+use sqlx::MySqlPool;
 use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -17,7 +15,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use crate::queries::generic_synthetic_ids::transactional_increment_generic_synthetic_id::transactional_increment_generic_synthetic_id;
-use crate::queries::media_files::create::insert_media_file_from_file_upload::UploadType;
+
 // thought about this it seems like this can be a bit more geneneric instead of having this we can ...
 pub struct InsertArgs<'a> {
     pub pool: &'a MySqlPool,

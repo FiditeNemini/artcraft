@@ -188,15 +188,16 @@ pub async fn enqueue_image_generation_request(
     // TODO:I know ill fix this later
     let path = http_request.path();
     let segments: Vec<&str> = path.split('/').collect();
-    let last_segment = segments.last().unwrap_or(&"");
+    let last_segment = segments.last().map(|s| *s).unwrap_or("");
     
     println!("Last segment: {}", last_segment);
 
     // use segment to determine what to do.
-    let mode; 
-    if last_segment.to_string() == "lora" {
+    let mode;
+
+    if last_segment == "lora" {
         mode = "lora";
-    } else if last_segment.to_string()  == "model" {
+    } else if last_segment  == "model" {
         mode = "model";
     } else {
         mode = "inference";
@@ -338,7 +339,7 @@ pub async fn enqueue_image_generation_request(
     };
 
     let number_of_samples = match request.maybe_number_of_samples {
-        Some(val) => if val < 0 { 20 } else if val > 128 { 128 } else { val }
+        Some(val) => if val > 128 { 128 } else { val }
         None => 20,
     };
 

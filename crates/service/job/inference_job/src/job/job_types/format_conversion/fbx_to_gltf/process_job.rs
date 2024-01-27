@@ -45,7 +45,7 @@ pub async fn process_job(args: FbxToGltfJobArgs<'_>) -> Result<JobSuccessResult,
 
   info!("Download media for conversion...");
 
-  let original_media_upload_fs_path = {
+  let _original_media_upload_fs_path = {
     let original_media_upload_fs_path = work_temp_dir.path().join("original.fbx");
 
     let media_upload_bucket_path =

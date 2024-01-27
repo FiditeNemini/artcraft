@@ -1,59 +1,44 @@
-use std::convert::TryInto;
 use std::path::PathBuf;
-use std::{ fs, thread };
-use std::time::{ Duration, Instant };
+use std::time::{Duration, Instant};
+
 use actix_web::dev::ResourcePath;
-use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor};
-use filesys::file_exists::file_exists;
-use serde_json;
 use anyhow::anyhow;
+use log::info;
+use serde_json;
+
+use cloud_storage::remote_file_manager::media_descriptor::MediaImagePngDescriptor;
+use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
+use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
+use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor};
 use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
-use log::info;
-
-use cloud_storage::remote_file_manager::media_descriptor::MediaImagePngDescriptor;
-use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
-use cloud_storage::remote_file_manager::remote_cloud_file_manager::{self, RemoteCloudFileClient};
 use enums::by_table::media_files::media_file_type::MediaFileType;
-
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
-
+use filesys::file_exists::file_exists;
 use filesys::path_to_string::path_to_string;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
-use mysql_queries::queries::batch_generations::insert_batch_generation_records::{
-    InsertBatchArgs,
-    self,
-};
 use mysql_queries::queries::batch_generations::insert_batch_generation_records::insert_batch_generation_records;
+use mysql_queries::queries::batch_generations::insert_batch_generation_records::InsertBatchArgs;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_files::create::insert_media_file_from_file_upload::{
-    insert_media_file_from_file_upload,
-    InsertMediaFileFromUploadArgs,
-    UploadType,
-};
-
 use mysql_queries::queries::media_files::create::insert_media_file_generic::insert_media_file_generic;
 use mysql_queries::queries::media_files::create::insert_media_file_generic::InsertArgs;
-
-use mysql_queries::queries::model_categories::create_category;
 use mysql_queries::queries::model_weights::create::create_weight::{
     create_weight,
     CreateModelWeightsArgs,
 };
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
-use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
-use crate::job::job_loop::job_success_result::{ JobSuccessResult, ResultEntity };
+use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::image_generation::sd::sd_inference_command::InferenceArgs;
 use crate::job_dependencies::JobDependencies;
@@ -118,11 +103,11 @@ pub async fn process_job_selection(
     let sd_args = sd_args_from_job(&args).await?;
 
     if sd_args.type_of_inference == "inference" {
-        return process_job_inference(&args).await
+        process_job_inference(&args).await
     } else if sd_args.type_of_inference == "lora" {
-        return process_job_lora(&args).await
+        process_job_lora(&args).await
     } else if sd_args.type_of_inference == "model" {
-        return process_job_sd(&args).await
+        process_job_sd(&args).await
     } else {
         Err(ProcessSingleJobError::Other(anyhow!("inference type doesn't exist!")))
     }
@@ -785,12 +770,12 @@ pub async fn process_job_inference(
         width: sd_args.maybe_width.unwrap_or(512),
         height: sd_args.maybe_height.unwrap_or(512),
         seed: sd_args.maybe_seed.unwrap_or(1),
-        number_of_samples: number_of_samples,
+        number_of_samples,
     };
 
     let inputs = match serde_json::to_string(&inputs) {
         Ok(result) => result,
-        Err(err) => {
+        Err(_err) => {
             return Err(
                 ProcessSingleJobError::from_anyhow_error(anyhow!("couldn't serialize metadata."))
             );
@@ -822,7 +807,7 @@ pub async fn process_job_inference(
         // extra_file_modification_info: todo!(), // JSON ENCODED STRUCT
         let media_file_token = insert_media_file_generic(InsertArgs {
             pool: mysql_pool,
-            job: job,
+            job,
             media_type: MediaFileType::Image,
             origin_category: MediaFileOriginCategory::Upload,
             origin_product_category: MediaFileOriginProductCategory::ImageGeneration,
@@ -844,7 +829,7 @@ pub async fn process_job_inference(
             extra_file_modification_info: Some(&inputs),
             maybe_creator_user_token: Some(&creator_user_token),
             maybe_creator_anonymous_visitor_token: anon_user_token.as_ref(),
-            creator_ip_address: creator_ip_address,
+            creator_ip_address,
             creator_set_visibility: args.job.creator_set_visibility,
             maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
             maybe_creator_category_synthetic_id_category: IdCategory::ModelWeights,
@@ -869,7 +854,7 @@ pub async fn process_job_inference(
 
     let batch_token = match batch_token_result {
         Ok(v) => { v.to_string() }
-        Err(err) => {
+        Err(_err) => {
             return Err(
                 ProcessSingleJobError::from_anyhow_error(
                     anyhow!("No batch token? something has failed.")
@@ -883,7 +868,7 @@ pub async fn process_job_inference(
             entity_type: InferenceResultType::MediaFile,
             entity_token: batch_token,
         }),
-        inference_duration: inference_duration,
+        inference_duration,
     })
 }
 
