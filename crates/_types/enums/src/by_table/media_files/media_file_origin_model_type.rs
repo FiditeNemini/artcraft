@@ -143,14 +143,14 @@ mod tests {
       assert_eq!(MediaFileOriginModelType::from_str("mocap_net").unwrap(), MediaFileOriginModelType::MocapNet);
       assert_eq!(MediaFileOriginModelType::from_str("comfy_ui").unwrap(), MediaFileOriginModelType::ComfyUi);
       assert_eq!(MediaFileOriginModelType::from_str("styletts2").unwrap(), MediaFileOriginModelType::StyleTTS2);
-      assert_eq!(MediaFileOriginModelType::from_str("stable_diffusion_1_5").unwrap(), MediaFileOriginModelType::StyleTTS2);
+      assert_eq!(MediaFileOriginModelType::from_str("stable_diffusion_1_5").unwrap(), MediaFileOriginModelType::StableDiffusion15);
       assert!(MediaFileOriginModelType::from_str("foo").is_err());
     }
 
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginModelType::all_variants();
-      assert_eq!(variants.len(), 9);
+      assert_eq!(variants.len(), 10);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::RvcV2));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SadTalker));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginModelType::SoVitsSvc));

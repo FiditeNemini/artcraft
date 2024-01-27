@@ -887,9 +887,6 @@ mod tests {
 
     #[ignore]
     #[tokio::test]
-    async fn test_json_extra_info() -> AnyhowResult<()> {}
-    #[ignore]
-    #[tokio::test]
     async fn test_seed_weights_files() -> AnyhowResult<()> {
         let seed_path = PathBuf::from("/storyteller/root/custom-seed-tool-data");
         let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;

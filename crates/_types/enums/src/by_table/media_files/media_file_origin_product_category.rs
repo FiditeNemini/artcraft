@@ -124,7 +124,7 @@ mod tests {
       assert_serialization(MediaFileOriginProductCategory::ZeroShotVoice, "zs_voice");
       assert_serialization(MediaFileOriginProductCategory::VideoFilter, "video_filter");
       assert_serialization(MediaFileOriginProductCategory::Mocap, "mocap");
-      assert_serialization(MediaFileOriginProductCategory::Mocap, "image_gen");
+      assert_serialization(MediaFileOriginProductCategory::ImageGeneration, "image_gen");
       assert_serialization(MediaFileOriginProductCategory::Workflow, "workflow");
     }
 
