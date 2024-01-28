@@ -15,7 +15,6 @@ pub enum FileOrCreate<'a> {
   // Future option(3): already open file handle
 }
 
-
 pub struct RunAsSubprocessArgs<'a> {
   /// The args for the process we're going to call
   pub args: Box<dyn CommandArgs>,
