@@ -17,7 +17,7 @@ pub enum FileOrCreate<'a> {
 
 pub struct RunAsSubprocessArgs<'a> {
   /// The args for the process we're going to call
-  pub args: Box<dyn CommandArgs>,
+  pub args: Box<&'a dyn CommandArgs>,
 
   /// If set, write stderr to this file.
   pub maybe_stderr_output_file: Option<FileOrCreate<'a>>,

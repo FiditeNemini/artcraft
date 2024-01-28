@@ -45,7 +45,14 @@ pub struct CommandRunner {
 impl CommandRunner {
 
   /// Run the command with the `subprocess` crate utilities
-  pub fn run_with_subprocess(&self, args: RunAsSubprocessArgs<'_>) -> AnyhowResult<CommandExitStatus> {
+  pub fn run_with_subprocess(&self, args: RunAsSubprocessArgs<'_>) -> CommandExitStatus {
+    self.do_run_with_subprocess(args)
+        .unwrap_or_else(|err| {
+          CommandExitStatus::FailureWithReason { reason: format!("error: {:?}", err) }
+        })
+  }
+
+  fn do_run_with_subprocess(&self, args: RunAsSubprocessArgs<'_>) -> AnyhowResult<CommandExitStatus> {
     let command = self.build_command_string(&args.args);
 
     info!("Command: {:?}", command);
@@ -132,7 +139,7 @@ impl CommandRunner {
     }
   }
 
-  fn build_command_string(&self, command_args: &Box<dyn CommandArgs>) -> String {
+  fn build_command_string(&self, command_args: &Box<&dyn CommandArgs>) -> String {
     let mut command = String::new();
 
     if let Some(execution_directory) = self.maybe_execution_directory.as_deref() {
