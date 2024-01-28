@@ -256,8 +256,6 @@ pub async fn process_upload_media_file(
     }
   }
 
-  let mut maybe_mocap_extension = None;
-
   if media_file_type.is_none() && maybe_mimetype.is_none() {
     // https://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html
     const BVH_HEADER : &[u8] = "HIERARCHY".as_bytes();
@@ -266,13 +264,11 @@ pub async fn process_upload_media_file(
     const FBX_HEADER : &[u8] = "Kaydara FBX Binary".as_bytes();
 
     if bytes.starts_with(BVH_HEADER) {
-      media_file_type = Some(MediaFileType::Mocap);
+      media_file_type = Some(MediaFileType::Bvh);
       maybe_mimetype = Some("application/octet-stream");
-      maybe_mocap_extension = Some(".bvh".to_string());
     } else if bytes.starts_with(FBX_HEADER) {
-      media_file_type = Some(MediaFileType::Mocap);
+      media_file_type = Some(MediaFileType::Fbx);
       maybe_mimetype = Some("application/octet-stream");
-      maybe_mocap_extension = Some(".fbx".to_string());
     }
   }
 
@@ -302,8 +298,14 @@ pub async fn process_upload_media_file(
   let mut extension = mimetype_to_extension(mime_type)
       .map(|extension| format!(".{extension}"));
 
-  if extension.is_none() && media_file_type == MediaFileType::Mocap {
-    extension = maybe_mocap_extension;
+  if extension.is_none() {
+    extension = match media_file_type {
+      MediaFileType::Mocap => Some(".bvh".to_string()),
+      MediaFileType::Bvh => Some(".bvh".to_string()),
+      MediaFileType::Fbx => Some(".fbx".to_string()),
+      MediaFileType::Gltf => Some(".gltf".to_string()),
+      _ => None,
+    };
   }
 
   const PREFIX : Option<&str> = Some("upload_");
