@@ -321,7 +321,7 @@ fn record_to_payload(
         InferenceCategory::ImageGeneration => { 
           "".to_string()
         }
-        InferenceCategory::ConvertFbxToGltf => {
+        InferenceCategory::FormatConversion => {
           "".to_string()
         }
       };

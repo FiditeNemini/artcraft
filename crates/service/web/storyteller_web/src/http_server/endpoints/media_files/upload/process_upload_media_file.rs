@@ -256,13 +256,23 @@ pub async fn process_upload_media_file(
     }
   }
 
+  let mut maybe_mocap_extension = None;
+
   if media_file_type.is_none() && maybe_mimetype.is_none() {
     // https://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html
     const BVH_HEADER : &[u8] = "HIERARCHY".as_bytes();
 
+    // https://code.blender.org/2013/08/fbx-binary-file-format-specification/
+    const FBX_HEADER : &[u8] = "Kaydara FBX Binary".as_bytes();
+
     if bytes.starts_with(BVH_HEADER) {
       media_file_type = Some(MediaFileType::Mocap);
       maybe_mimetype = Some("application/octet-stream");
+      maybe_mocap_extension = Some(".bvh".to_string());
+    } else if bytes.starts_with(FBX_HEADER) {
+      media_file_type = Some(MediaFileType::Mocap);
+      maybe_mimetype = Some("application/octet-stream");
+      maybe_mocap_extension = Some(".fbx".to_string());
     }
   }
 
@@ -293,7 +303,7 @@ pub async fn process_upload_media_file(
       .map(|extension| format!(".{extension}"));
 
   if extension.is_none() && media_file_type == MediaFileType::Mocap {
-    extension = Some(".bvh".to_string());
+    extension = maybe_mocap_extension;
   }
 
   const PREFIX : Option<&str> = Some("upload_");

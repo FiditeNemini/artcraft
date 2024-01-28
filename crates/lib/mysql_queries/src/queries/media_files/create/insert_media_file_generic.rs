@@ -8,6 +8,7 @@ use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use sqlx;
 use sqlx::MySqlPool;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -48,13 +49,6 @@ pub struct InsertArgs<'a> {
     pub maybe_public_bucket_prefix: Option<&'a str>,
     pub maybe_public_bucket_extension: Option<&'a str>,
     pub extra_file_modification_info: Option<&'a str>,  // Assuming TEXT type can be represented by &str
-
-    // Creator information
-    pub maybe_creator_user_token: Option<&'a UserToken>,
-    pub maybe_creator_anonymous_visitor_token: Option<&'a AnonymousVisitorTrackingToken>,
-
-    pub creator_ip_address: &'a str,
-    pub creator_set_visibility: Visibility,
 
     pub maybe_creator_file_synthetic_id_category: IdCategory,
     pub maybe_creator_category_synthetic_id_category: IdCategory,
@@ -165,11 +159,11 @@ pub async fn insert_media_file_generic(
         args.maybe_public_bucket_extension,
         args.extra_file_modification_info,
 
-        args.maybe_creator_user_token.map(|e| e.to_string()),
-        args.maybe_creator_anonymous_visitor_token.map(|e| e.to_string()),
+        args.job.maybe_creator_user_token.as_deref(),
+        args.job.maybe_creator_anonymous_visitor_token.as_deref(),
 
-        args.creator_ip_address,
-        args.creator_set_visibility.to_str(),
+        args.job.creator_ip_address,
+        args.job.creator_set_visibility.to_str(),
 
         maybe_creator_file_synthetic_id,
         maybe_creator_category_synthetic_id,
@@ -181,9 +175,7 @@ pub async fn insert_media_file_generic(
     ).execute(&mut *transaction).await;
 
     let record_id = match query_result {
-        Ok(res) => {
-            res.last_insert_id()
-        },
+        Ok(res) => res.last_insert_id(),
         Err(err) => {
             // TODO: handle better
             //transaction.rollback().await?;

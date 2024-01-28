@@ -325,23 +325,15 @@ pub async fn process_job_lora(
     let sd_deps = match
         &args.job_dependencies.job.job_specific_dependencies.maybe_stable_diffusion_dependencies
     {
-        None => {
-            return Err(ProcessSingleJobError::Other(anyhow!("Missing Job Specific Dependencies")));
-        }
-        Some(val) => { val }
+        Some(val) => val,
+        None => return Err(ProcessSingleJobError::Other(anyhow!("Missing Job Specific Dependencies"))),
     };
 
     let creator_ip_address = &job.creator_ip_address;
-    let creator_user_token: UserToken;
-
-    match &job.maybe_creator_user_token {
-        Some(token) => {
-            creator_user_token = UserToken::new_from_str(token);
-        }
-        None => {
-            return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")));
-        }
-    }
+    let creator_user_token = match job.maybe_creator_user_token.as_deref() {
+        Some(token) => UserToken::new_from_str(token),
+        None => return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token"))),
+    };
 
 
     let work_temp_dir = format!("temp_stable_diffusion_inference_{}", job.id.0);
@@ -760,15 +752,13 @@ pub async fn process_job_inference(
     });
 
 
-    
-
       // hack to check the directory before clean up.
     //   let thirtyMinutes = 1800;
     //   thread::sleep(Duration::from_secs(thirtyMinutes));
       // upload media and create a record.
 
     let inference_duration = Instant::now().duration_since(inference_start_time);
-    let creator_ip_address = &job.creator_ip_address;
+
     // run a for loop for output images output_0 in the folder then use upload media.
     // pngs
 
@@ -834,17 +824,13 @@ pub async fn process_job_inference(
             maybe_duration_millis: Some(inference_duration.as_millis() as u64),
             maybe_audio_encoding: None,
             maybe_video_encoding: None,
-            maybe_frame_width: Some(sd_args.maybe_width.unwrap_or(512) as u32),
-            maybe_frame_height: Some(sd_args.maybe_height.unwrap_or(512) as u32),
+            maybe_frame_width: Some(sd_args.maybe_width.unwrap_or(512)),
+            maybe_frame_height: Some(sd_args.maybe_height.unwrap_or(512)),
             checksum_sha2: metadata.sha256_checksum.as_str(),
             public_bucket_directory_hash: bucket_details.object_hash.as_str(),
             maybe_public_bucket_prefix: Some(bucket_details.prefix.as_str()),
             maybe_public_bucket_extension: Some(bucket_details.suffix.as_str()),
             extra_file_modification_info: Some(&inputs),
-            maybe_creator_user_token: Some(&creator_user_token),
-            maybe_creator_anonymous_visitor_token: anon_user_token.as_ref(),
-            creator_ip_address,
-            creator_set_visibility: args.job.creator_set_visibility,
             maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
             maybe_creator_category_synthetic_id_category: IdCategory::ModelWeights,
             maybe_mod_user_token: None,
