@@ -3632,7 +3632,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "serial_test",
+ "serial_test 2.0.0",
  "sqlx",
  "tokens",
  "tokio",
@@ -3905,7 +3905,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "serde_json",
- "serial_test",
+ "serial_test 2.0.0",
  "sqlx",
  "tokens",
  "tokio",
@@ -5526,7 +5526,21 @@ dependencies = [
  "lazy_static",
  "log",
  "parking_lot 0.12.1",
- "serial_test_derive",
+ "serial_test_derive 2.0.0",
+]
+
+[[package]]
+name = "serial_test"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "953ad9342b3aaca7cb43c45c097dd008d4907070394bd0751a0aa8817e5a018d"
+dependencies = [
+ "dashmap",
+ "futures 0.3.29",
+ "lazy_static",
+ "log",
+ "parking_lot 0.12.1",
+ "serial_test_derive 3.0.0",
 ]
 
 [[package]]
@@ -5534,6 +5548,17 @@ name = "serial_test_derive"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "91d129178576168c589c9ec973feedf7d3126c01ac2bf08795109aa35b69fb8f"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.39",
+]
+
+[[package]]
+name = "serial_test_derive"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b93fb4adc70021ac1b47f7d45e8cc4169baaa7ea58483bc5b721d19a26202212"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -6127,7 +6152,7 @@ name = "storyteller_root"
 version = "0.0.1"
 dependencies = [
  "my-workspace-hack",
- "serial_test",
+ "serial_test 2.0.0",
  "tempdir",
 ]
 
@@ -6214,6 +6239,7 @@ dependencies = [
  "filesys",
  "log",
  "my-workspace-hack",
+ "serial_test 3.0.0",
  "subprocess",
 ]
 

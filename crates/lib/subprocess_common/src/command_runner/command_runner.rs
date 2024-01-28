@@ -1,7 +1,7 @@
 use std::env;
 use std::ffi::OsString;
 use std::fs::File;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::time::Duration;
 
 use log::info;
@@ -11,11 +11,12 @@ use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
 
 use crate::command_exit_status::CommandExitStatus;
+use crate::command_runner::command_runner_args::{FileOrCreate, RunAsSubprocessArgs};
 use crate::docker_options::DockerOptions;
 use crate::executable_or_command::ExecutableOrShellCommand;
 
 #[derive(Clone)]
-pub struct CommandAdapter {
+pub struct CommandRunner {
   /// The script, executable, or command to run.
   pub executable_or_command: ExecutableOrShellCommand,
 
@@ -35,13 +36,8 @@ pub struct CommandAdapter {
   pub maybe_execution_timeout: Option<Duration>,
 }
 
-pub struct RunAsSubprocessArgs<'a> {
-  /// If set, write stderr to this file.
-  /// The file must not already exist and must not already be open.
-  pub maybe_stderr_output_file: Option<&'a Path>,
-}
 
-impl CommandAdapter {
+impl CommandRunner {
 
   /// Run the command with the `subprocess` crate utilities
   pub fn run_with_subprocess(&self, args: RunAsSubprocessArgs<'_>) -> AnyhowResult<CommandExitStatus> {
@@ -74,7 +70,9 @@ impl CommandAdapter {
       }
     }
 
-    // TODO: Command arguments
+    let command_arguments = args.args.to_command_string();
+    command.push_str(&command_arguments);
+    command.push_str(" ");
 
     if let Some(docker_options) = self.maybe_docker_options.as_ref() {
       command = docker_options.to_command_string(&command);
@@ -109,11 +107,24 @@ impl CommandAdapter {
       config.env = Some(env_vars);
     }
 
-    if let Some(stderr_output_file) = args.maybe_stderr_output_file {
-      info!("stderr will be written to file: {:?}", stderr_output_file);
+    match args.maybe_stderr_output_file {
+      Some(FileOrCreate::NewFileWithName(stderr_output_file)) => {
+        info!("stderr will be written to file: {:?}", stderr_output_file);
 
-      let stderr_file = File::create(stderr_output_file)?;
-      config.stderr = Redirection::File(stderr_file);
+        let stderr_file = File::create(stderr_output_file)?;
+        config.stderr = Redirection::File(stderr_file);
+      },
+      _ => {},
+    }
+
+    match args.maybe_stdout_output_file {
+      Some(FileOrCreate::NewFileWithName(stdout_output_file)) => {
+        info!("stdout will be written to file: {:?}", stdout_output_file);
+
+        let stdout_file = File::create(stdout_output_file)?;
+        config.stdout = Redirection::File(stdout_file);
+      },
+      _ => {},
     }
 
     let mut popen_handle = Popen::create(&command_parts, config)?;
@@ -131,24 +142,6 @@ impl CommandAdapter {
         popen_handle.wait_timeout(timeout.clone())?
       }
     };
-
-    //let mut popen = Popen::create(
-    //  &["echo", "hello"],
-    //  PopenConfig {
-    //    stdout: Redirection::Pipe,
-    //    ..Default::default()
-    //  }
-    //)?;
-
-    //let stdout = popen.stdout.take().unwrap();
-    //let mut stdout_reader = BufReader::new(stdout);
-
-    //let mut output = String::new();
-    //stdout_reader.read_to_string(&mut output)?;
-
-    //let status = popen.wait()?;
-    //println!("status: {:?}", status);
-    //println!("output: {:?}", output);
 
     match maybe_exit_status {
       None => {
