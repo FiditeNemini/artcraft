@@ -263,12 +263,20 @@ pub async fn process_upload_media_file(
     // https://code.blender.org/2013/08/fbx-binary-file-format-specification/
     const FBX_HEADER : &[u8] = "Kaydara FBX Binary".as_bytes();
 
+    // https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_002_BasicGltfStructure.md
+    // TODO(bt,2024-01-28): Fix this ASAP
+    const GLTF_CONTENTS_1 : &[u8] = "{".as_bytes();
+
     if bytes.starts_with(BVH_HEADER) {
       media_file_type = Some(MediaFileType::Bvh);
       maybe_mimetype = Some("application/octet-stream");
     } else if bytes.starts_with(FBX_HEADER) {
       media_file_type = Some(MediaFileType::Fbx);
       maybe_mimetype = Some("application/octet-stream");
+    } else if bytes.starts_with(GLTF_CONTENTS_1) {
+      // TODO(bt,2024-01-28): This is a horrible check!
+      media_file_type = Some(MediaFileType::Gltf);
+      maybe_mimetype = Some("application/json");
     }
   }
 
