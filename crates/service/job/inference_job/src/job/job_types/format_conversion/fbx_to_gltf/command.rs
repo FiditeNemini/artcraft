@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+/*
 use std::env;
 use std::ffi::OsString;
 use std::fs::File;
@@ -7,14 +7,12 @@ use std::time::Duration;
 
 use anyhow::anyhow;
 use log::info;
-use once_cell::sync::Lazy;
 use subprocess::{Popen, PopenConfig, Redirection};
 
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
+use subprocess_common::command_exit_status::CommandExitStatus;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
-
-use crate::job::job_loop::command_exit_status::CommandExitStatus;
 
 #[derive(Clone)]
 pub struct FbxToGltfCommand {
@@ -48,19 +46,19 @@ pub struct InferenceArgs<'s, P: AsRef<Path>> {
 impl FbxToGltfCommand {
 
   pub fn from_env() -> AnyhowResult<Self> {
-    let sad_talker_root_code_directory = easyenv::get_env_pathbuf_required(
-      "SAD_TALKER_INFERENCE_ROOT_DIRECTORY")?;
+    let root_code_directory = easyenv::get_env_pathbuf_optional(
+      "FBX2GLTF_ROOT_DIRECTORY")?;
 
-    let maybe_inference_command = easyenv::get_env_string_optional(
-      "SAD_TALKER_INFERENCE_COMMAND");
+    let maybe_command = easyenv::get_env_string_optional(
+      "FBX2GLTF_COMMAND");
 
     // Optional, eg. `./infer.py`. Typically we'll use the command form instead.
-    let maybe_inference_executable = easyenv::get_env_pathbuf_optional(
-      "SAD_TALKER_INFERENCE_EXECUTABLE");
+    let maybe_executable = easyenv::get_env_pathbuf_optional(
+      "FBX2GLTF_EXECUTABLE");
 
-    let executable_or_command = match maybe_inference_command {
+    let executable_or_command = match maybe_command {
       Some(command) => ExecutableOrCommand::Command(command),
-      None => match maybe_inference_executable {
+      None => match maybe_executable {
         Some(executable) => ExecutableOrCommand::Executable(executable),
         None => return Err(anyhow!("neither command nor executable passed")),
       },
@@ -206,3 +204,4 @@ impl FbxToGltfCommand {
     }
   }
 }
+*/
