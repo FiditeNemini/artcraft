@@ -12,9 +12,8 @@ use subprocess::{Popen, PopenConfig, Redirection};
 
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
+use subprocess_common::command_exit_status::CommandExitStatus;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
-
-use crate::job::job_loop::command_exit_status::CommandExitStatus;
 
 #[derive(Clone)]
 pub enum ExecutableOrCommand {

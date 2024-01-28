@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+/*
 use std::env;
 use std::ffi::OsString;
 use std::fs::File;
@@ -7,7 +7,6 @@ use std::time::Duration;
 
 use anyhow::anyhow;
 use log::info;
-use once_cell::sync::Lazy;
 use subprocess::{Popen, PopenConfig, Redirection};
 
 use errors::AnyhowResult;
@@ -15,45 +14,19 @@ use filesys::path_to_string::path_to_string;
 use subprocess_common::command_exit_status::CommandExitStatus;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
 
-// These environment vars are not copied over to the subprocess
-// TODO/FIXME(bt, 2023-05-28): This is horrific security!
-static IGNORED_ENVIRONMENT_VARS : Lazy<HashSet<String>> = Lazy::new(|| {
-  let env_var_names= [
-    "MYSQL_URL",
-    "ACCESS_KEY",
-    "SECRET_KEY",
-    "NEWRELIC_API_KEY",
-  ];
-
-  env_var_names.iter()
-      .map(|value| value.to_string())
-      .collect::<HashSet<String>>()
-});
-
 #[derive(Clone)]
-pub struct SadTalkerInferenceCommand {
+pub struct FbxToGltfCommand {
   /// Where the code lives
-  sad_talker_root_code_directory: PathBuf,
+  pub maybe_root_code_directory: Option<PathBuf>,
 
   /// A single executable script or a much larger bash command.
-  executable_or_command: ExecutableOrCommand,
-
-  /// eg. `source python/bin/activate`
-  maybe_virtual_env_activation_command: Option<String>,
-
-  /// Optional default config file to use
-  maybe_default_config_path: Option<PathBuf>,
+  pub executable_or_command: ExecutableOrCommand,
 
   /// If this is run under Docker (eg. in development), these are the options.
-  maybe_docker_options: Option<DockerOptions>,
+  pub maybe_docker_options: Option<DockerOptions>,
 
   /// If the execution should be ended after a certain point.
-  maybe_execution_timeout: Option<Duration>,
-
-  /// Inference arg.
-  /// --checkpoint_dir: optional location for checkpoints directory
-  pub alternate_checkpoint_dir: Option<PathBuf>,
-
+  pub maybe_execution_timeout: Option<Duration>,
 }
 
 #[derive(Clone)]
@@ -66,67 +39,26 @@ pub enum ExecutableOrCommand {
 }
 
 pub struct InferenceArgs<'s, P: AsRef<Path>> {
-  /// --driven_audio: path to the input audio
-  pub input_audio: P,
-
-  /// --source_image: path to the input image (or video)
-  pub input_image: P,
-
-  /// --result_dir: path to directory work is performed
-  pub work_dir: P,
-
-  /// --result_file: path to final file output
-  pub output_file: P,
-
-  pub stderr_output_file: P,
-
-  /// --still: less animation
-  pub make_still: bool,
-
-  /// --enhancer: "gfpgan"
-  pub maybe_enhancer: Option<&'s str>,
-
-  /// --preprocess: "crop", etc.
-  pub maybe_preprocess: Option<&'s str>,
-
-  // TODO: Other SadTalker args
+  pub input_fbx_file: P,
+  pub output_directory: P,
 }
 
-impl SadTalkerInferenceCommand {
-  pub fn new<P: AsRef<Path>>(
-    sad_talker_root_code_directory: P,
-    executable_or_command: ExecutableOrCommand,
-    maybe_virtual_env_activation_command: Option<&str>,
-    maybe_default_config_path: Option<P>,
-    maybe_docker_options: Option<DockerOptions>,
-    maybe_execution_timeout: Option<Duration>,
-    alternate_checkpoint_dir: Option<PathBuf>
-  ) -> Self {
-    Self {
-      sad_talker_root_code_directory: sad_talker_root_code_directory.as_ref().to_path_buf(),
-      executable_or_command,
-      maybe_virtual_env_activation_command: maybe_virtual_env_activation_command.map(|s| s.to_string()),
-      maybe_default_config_path: maybe_default_config_path.map(|p| p.as_ref().to_path_buf()),
-      maybe_docker_options,
-      maybe_execution_timeout,
-      alternate_checkpoint_dir,
-    }
-  }
+impl FbxToGltfCommand {
 
   pub fn from_env() -> AnyhowResult<Self> {
-    let sad_talker_root_code_directory = easyenv::get_env_pathbuf_required(
-      "SAD_TALKER_INFERENCE_ROOT_DIRECTORY")?;
+    let root_code_directory = easyenv::get_env_pathbuf_optional(
+      "FBX2GLTF_ROOT_DIRECTORY")?;
 
-    let maybe_inference_command = easyenv::get_env_string_optional(
-      "SAD_TALKER_INFERENCE_COMMAND");
+    let maybe_command = easyenv::get_env_string_optional(
+      "FBX2GLTF_COMMAND");
 
     // Optional, eg. `./infer.py`. Typically we'll use the command form instead.
-    let maybe_inference_executable = easyenv::get_env_pathbuf_optional(
-      "SAD_TALKER_INFERENCE_EXECUTABLE");
+    let maybe_executable = easyenv::get_env_pathbuf_optional(
+      "FBX2GLTF_EXECUTABLE");
 
-    let executable_or_command = match maybe_inference_command {
+    let executable_or_command = match maybe_command {
       Some(command) => ExecutableOrCommand::Command(command),
-      None => match maybe_inference_executable {
+      None => match maybe_executable {
         Some(executable) => ExecutableOrCommand::Executable(executable),
         None => return Err(anyhow!("neither command nor executable passed")),
       },
@@ -157,13 +89,9 @@ impl SadTalkerInferenceCommand {
       "SAD_TALKER_ALTERNATE_CHECKPOINT_PATH");
 
     Ok(Self {
-      sad_talker_root_code_directory,
       executable_or_command,
-      maybe_virtual_env_activation_command,
-      maybe_default_config_path,
       maybe_docker_options,
       maybe_execution_timeout,
-      alternate_checkpoint_dir,
     })
   }
 
@@ -183,13 +111,7 @@ impl SadTalkerInferenceCommand {
   ) -> AnyhowResult<CommandExitStatus> {
 
     let mut command = String::new();
-    command.push_str(&format!("cd {}", path_to_string(&self.sad_talker_root_code_directory)));
-
-    if let Some(venv_command) = self.maybe_virtual_env_activation_command.as_deref() {
-      command.push_str(" && ");
-      command.push_str(venv_command);
-      command.push_str(" ");
-    }
+    command.push_str(&format!("cd {}", path_to_string(&self.root_code_directory)));
 
     command.push_str(" && ");
 
@@ -206,37 +128,12 @@ impl SadTalkerInferenceCommand {
 
     // ===== Begin Python Args =====
 
-    command.push_str(" --driven_audio ");
-    command.push_str(&path_to_string(args.input_audio));
+    command.push_str(" -i ");
+    command.push_str(&path_to_string(args.input_fbx_file));
 
-    command.push_str(" --source_image ");
-    command.push_str(&path_to_string(args.input_image));
+    command.push_str(" -o ");
+    command.push_str(&path_to_string(args.output_directory));
 
-    command.push_str(" --result_dir ");
-    command.push_str(&path_to_string(args.work_dir));
-
-    command.push_str(" --result_file ");
-    command.push_str(&path_to_string(args.output_file));
-
-    if let Some(preprocess) = args.maybe_preprocess.as_deref() {
-      command.push_str(" --preprocess ");
-      command.push_str(preprocess);
-      command.push_str(" ");
-    }
-    if let Some(enhancer) = args.maybe_enhancer.as_deref() {
-      command.push_str(" --enhancer ");
-      command.push_str(enhancer);
-      command.push_str(" ");
-    }
-
-    if args.make_still {
-      command.push_str(" --still ");
-    }
-
-    if let Some(dir) = self.alternate_checkpoint_dir.as_ref() {
-      command.push_str(" --checkpoint_dir ");
-      command.push_str(&path_to_string(dir));
-    }
 
     // ===== End Python Args =====
 
@@ -307,3 +204,4 @@ impl SadTalkerInferenceCommand {
     }
   }
 }
+*/

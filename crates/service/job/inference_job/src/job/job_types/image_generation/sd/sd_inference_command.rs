@@ -1,4 +1,3 @@
-
 use std::collections::HashSet;
 use std::env;
 use std::ffi::OsString;
@@ -13,9 +12,8 @@ use subprocess::{Popen, PopenConfig, Redirection};
 
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
+use subprocess_common::command_exit_status::CommandExitStatus;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
-
-use crate::job::job_loop::command_exit_status::CommandExitStatus;
 
 // These environment vars are not copied over to the subprocess
 // TODO/FIXME(bt, 2023-05-28): This is horrific security!
