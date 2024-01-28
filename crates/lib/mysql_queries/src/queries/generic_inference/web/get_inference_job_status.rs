@@ -182,7 +182,7 @@ fn raw_record_to_public_result(record: RawGenericInferenceJobStatus) -> GenericI
     InferenceCategory::ImageGeneration => Some("Image Generation"),
     InferenceCategory::Mocap => Some("Mocap"),
     InferenceCategory::Workflow => Some("Workflow"),
-    InferenceCategory::ConvertFbxToGltf => Some("FBX to GLTF"),
+    InferenceCategory::FormatConversion => Some("format conversion"),
   };
 
   // NB: A bit of a hack. We store TTS results with a full path.
@@ -195,7 +195,7 @@ fn raw_record_to_public_result(record: RawGenericInferenceJobStatus) -> GenericI
     InferenceCategory::ImageGeneration => (true, record.maybe_media_file_public_bucket_directory_hash.as_deref()),
     InferenceCategory::Mocap => (true, record.maybe_media_file_public_bucket_directory_hash.as_deref()),
     InferenceCategory::Workflow => (true, record.maybe_media_file_public_bucket_directory_hash.as_deref()),
-    InferenceCategory::ConvertFbxToGltf => (true, record.maybe_media_file_public_bucket_directory_hash.as_deref()),
+    InferenceCategory::FormatConversion => (true, record.maybe_media_file_public_bucket_directory_hash.as_deref()),
   };
 
   // NB: We've moved voice conversion out of their own table and into media_files

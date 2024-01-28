@@ -17,9 +17,10 @@ CREATE TABLE generic_inference_jobs (
 
   -- ========== INFERENCE DETAILS ==========
 
-  -- NB: Note that this is probably coming to mean "job type". It's grown to indicate the
-  -- exact type of job to run (though that's still also somewhat incorrectly spread over
-  -- maybe_model_type).
+  -- NB: This is becoming a problematic field and is becoming conflated with `maybe_model_type`.
+  -- We're using this to handle job dispatching, but the latter is being used to load container
+  -- dependencies at startup (even if it isn't a real model type or a polymorphic foreign key).
+  -- This is pretty gross and horrible.
   --
   -- Broad category of inference
   -- Examples (may not be up to date):
@@ -27,7 +28,10 @@ CREATE TABLE generic_inference_jobs (
   --  * voice_conversion
   inference_category VARCHAR(32) NOT NULL,
 
-  -- NB: Note that this is probably no longer useful (so long as we migrate away from it)
+  -- NB: See notes on inference_category. This is becoming a problematic field. We're using
+  -- this to load the container spin-up arguments and dependencies, but the former is being
+  -- used to dispatch the job. `inference_category` is the one that should probably go away,
+  -- and this column should be renamed to `inference_job_type`.
   --
   -- Potential part of the composite foreign key to the primary model being used, if any.
   -- This will normally live in `maybe_inference_args`, but in this case, it's useful for

@@ -41,6 +41,9 @@ pub enum InferenceModelType {
   ComfyUi,
   #[serde(rename = "styletts2")]
   StyleTTS2,
+  /// A job that turns "FBX" game engine files into "GLTF" files (Bevy-compatible).
+  #[serde(rename = "convert_fbx_gltf")]
+  ConvertFbxToGltf,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -62,6 +65,7 @@ impl InferenceModelType {
       Self::MocapNet => "mocap_net",
       Self::StyleTTS2 => "styletts2",
       Self::ComfyUi => "comfy_ui",
+      Self::ConvertFbxToGltf => "convert_fbx_gltf",
     }
   }
 
@@ -78,25 +82,27 @@ impl InferenceModelType {
       "mocap_net" => Ok(Self::MocapNet),
       "styletts2" => Ok(Self::StyleTTS2),
       "comfy_ui" => Ok(Self::ComfyUi),
+      "convert_fbx_gltf" => Ok(Self::ConvertFbxToGltf),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
 
-  pub fn all_variants() -> BTreeSet<InferenceModelType> {
+  pub fn all_variants() -> BTreeSet<Self> {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
-      InferenceModelType::RvcV2,
-      InferenceModelType::SadTalker,
-      InferenceModelType::SoVitsSvc,
-      InferenceModelType::Tacotron2,
-      InferenceModelType::Vits,
-      InferenceModelType::VallEX,
-      InferenceModelType::RerenderAVideo,
-      InferenceModelType::StableDiffusion,
-      InferenceModelType::MocapNet,
-      InferenceModelType::StyleTTS2,
-      InferenceModelType::ComfyUi,
+      Self::RvcV2,
+      Self::SadTalker,
+      Self::SoVitsSvc,
+      Self::Tacotron2,
+      Self::Vits,
+      Self::VallEX,
+      Self::RerenderAVideo,
+      Self::StableDiffusion,
+      Self::MocapNet,
+      Self::StyleTTS2,
+      Self::ComfyUi,
+      Self::ConvertFbxToGltf,
     ])
   }
 }
@@ -122,6 +128,7 @@ mod tests {
       assert_serialization(InferenceModelType::MocapNet, "mocap_net");
       assert_serialization(InferenceModelType::ComfyUi, "comfy_ui");
       assert_serialization(InferenceModelType::StyleTTS2, "styletts2");
+      assert_serialization(InferenceModelType::ConvertFbxToGltf, "convert_fbx_gltf");
     }
 
     #[test]
@@ -137,6 +144,7 @@ mod tests {
       assert_eq!(InferenceModelType::MocapNet.to_str(), "mocap_net");
       assert_eq!(InferenceModelType::StyleTTS2.to_str(), "styletts2");
       assert_eq!(InferenceModelType::ComfyUi.to_str(), "comfy_ui");
+      assert_eq!(InferenceModelType::ConvertFbxToGltf.to_str(), "convert_fbx_gltf");
     }
 
     #[test]
@@ -152,13 +160,14 @@ mod tests {
       assert_eq!(InferenceModelType::from_str("mocap_net").unwrap(), InferenceModelType::MocapNet);
       assert_eq!(InferenceModelType::from_str("styletts2").unwrap(), InferenceModelType::StyleTTS2);
       assert_eq!(InferenceModelType::from_str("comfy_ui").unwrap(), InferenceModelType::ComfyUi);
+      assert_eq!(InferenceModelType::from_str("convert_fbx_gltf").unwrap(), InferenceModelType::ConvertFbxToGltf);
     }
 
     #[test]
     fn all_variants() {
       // Static check
       let mut variants = InferenceModelType::all_variants();
-      assert_eq!(variants.len(), 11);
+      assert_eq!(variants.len(), 12);
       assert_eq!(variants.pop_first(), Some(InferenceModelType::RvcV2));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::SadTalker));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::SoVitsSvc));
@@ -170,6 +179,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(InferenceModelType::MocapNet));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::ComfyUi));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::StyleTTS2));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::ConvertFbxToGltf));
       assert_eq!(variants.pop_first(), None);
 
       // Generated check
@@ -193,6 +203,16 @@ mod tests {
         assert_eq!(variant, InferenceModelType::from_str(variant.to_str()).unwrap());
         assert_eq!(variant, InferenceModelType::from_str(&format!("{}", variant)).unwrap());
         assert_eq!(variant, InferenceModelType::from_str(&format!("{:?}", variant)).unwrap());
+      }
+    }
+
+    #[test]
+    fn serialized_length_ok_for_database() {
+      const MAX_LENGTH : usize = 32;
+      for variant in InferenceModelType::all_variants() {
+        let serialized = variant.to_str();
+        assert!(serialized.len() > 0, "variant {:?} is too short", variant);
+        assert!(serialized.len() <= MAX_LENGTH, "variant {:?} is too long", variant);
       }
     }
   }

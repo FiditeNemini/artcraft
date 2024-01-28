@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use log::error;
 
+use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::get_media_file_for_inference::get_media_file_for_inference;
 use tokens::tokens::media_files::MediaFileToken;
@@ -11,14 +12,14 @@ use crate::job::job_types::format_conversion::fbx_to_gltf;
 use crate::job::job_types::format_conversion::fbx_to_gltf::process_job::FbxToGltfJobArgs;
 use crate::job_dependencies::JobDependencies;
 
-// NB: There will likely be lots of other format conversions for us to run, and there's probably lots of shared code between them.
-// This enum lets us reuse the shared portions in this function before dispatching to the special parts.
-#[derive(Debug, Copy, Clone)]
-pub enum FormatConversionType {
-  FbxToGltf,
-}
+// // NB: There will likely be lots of other format conversions for us to run, and there's probably lots of shared code between them.
+// // This enum lets us reuse the shared portions in this function before dispatching to the special parts.
+// #[derive(Debug, Copy, Clone)]
+// pub enum FormatConversionType {
+//   FbxToGltf,
+// }
 
-pub async fn process_single_format_conversion_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob, conversion_type: FormatConversionType) -> Result<JobSuccessResult, ProcessSingleJobError> {
+pub async fn process_single_format_conversion_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
   let maybe_media_file_token = job.maybe_input_source_token
       .as_deref()
@@ -44,14 +45,16 @@ pub async fn process_single_format_conversion_job(job_dependencies: &JobDependen
     }
   };
 
-  let job_success_result = match conversion_type {
-    FormatConversionType::FbxToGltf => {
+  let job_success_result = match job.maybe_model_type {
+    Some(InferenceModelType::ConvertFbxToGltf) => {
       fbx_to_gltf::process_job::process_job(FbxToGltfJobArgs {
         job_dependencies,
         job,
         media_file: &media_file,
       }).await?
-    }
+    },
+    Some(model_type) => return Err(ProcessSingleJobError::Other(anyhow!("wrong model type: {:?}", model_type))),
+    None => return Err(ProcessSingleJobError::Other(anyhow!("no model type in record"))),
   };
 
   Ok(job_success_result)

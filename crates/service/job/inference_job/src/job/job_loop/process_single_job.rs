@@ -13,7 +13,7 @@ use redis_common::redis_keys::RedisKeys;
 use crate::job::job_loop::determine_dependency_status::determine_dependency_status;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
-use crate::job::job_types::format_conversion::process_single_format_conversion_job::{FormatConversionType, process_single_format_conversion_job};
+use crate::job::job_types::format_conversion::process_single_format_conversion_job::process_single_format_conversion_job;
 use crate::job::job_types::image_generation::process_single_ig_job::process_single_ig_job;
 use crate::job::job_types::lipsync::process_single_lipsync_job::process_single_lipsync_job;
 use crate::job::job_types::mocap::process_single_mc_job::process_single_mc_job;
@@ -199,8 +199,8 @@ async fn do_process_single_job(
     InferenceCategory::Workflow => {
       process_single_wf_job(job_dependencies, job).await?
     }
-    InferenceCategory::ConvertFbxToGltf => {
-      process_single_format_conversion_job(job_dependencies, job, FormatConversionType::FbxToGltf).await?
+    InferenceCategory::FormatConversion => {
+      process_single_format_conversion_job(job_dependencies, job).await?
     }
   };
 
