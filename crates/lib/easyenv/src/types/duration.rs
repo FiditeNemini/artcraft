@@ -12,7 +12,7 @@ pub fn get_env_duration_seconds_required(env_name: &str) -> Result<Duration, Env
     .and_then(|maybe| match maybe {
       None => {
         warn!("Env var '{}' not supplied.", env_name);
-        Err(EnvError::RequiredNotPresent)
+        Err(EnvError::RequiredNotPresent { name: env_name.to_string() })
       },
       Some(val) => Ok(val),
     })

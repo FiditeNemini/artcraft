@@ -13,7 +13,10 @@ pub enum EnvError {
     reason: String
   },
   /// The required environment variable wasn't present.
-  RequiredNotPresent,
+  RequiredNotPresent {
+    /// The name of the missing environment variable.
+    name: String
+  },
 }
 
 impl Display for EnvError {
@@ -21,7 +24,19 @@ impl Display for EnvError {
     let reason = match self {
       EnvError::NotUnicode => "EnvError::NotUnicode",
       EnvError::ParseError { .. } => "EnvError::ParseError",
-      EnvError::RequiredNotPresent => "EnvError::RequiredNotPresent",
+      EnvError::RequiredNotPresent { name } =>
+        return write!(f, r#"
+          EnvError::RequiredNotPresent: the following environment variable was not present:
+
+              --->  {:?}
+
+          In development, setting it in the environment config files: .env, .env-secrets,
+              cargo/service/../{{app_name}}/config/{{app_name}}.development.env, etc.
+
+          If it looks like it might be a secret, ask for help in our company Discord.
+
+          In production, make sure these environment variables are set in Kubernetes.
+        "#, name),
     };
     write!(f, "{:?}", reason)
   }
