@@ -78,11 +78,12 @@ export default function VideoMotionCapture(props: {
       <PageHeader
         title={t("headings.title")}
         subText={t("headings.subtitle")}
+        imageUrl="/images/header/video-mocap.png"
       />
 
       <VideoMocapJobList />
 
-      <Panel className="mt-3">
+      <Panel>
         <div className="row g-0">
           {pageState.status < FILE_UPLOADING && (
             <>
