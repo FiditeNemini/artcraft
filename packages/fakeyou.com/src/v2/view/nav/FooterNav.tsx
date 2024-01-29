@@ -18,6 +18,7 @@ import {
   GetServerInfoSuccessResponse,
 } from "@storyteller/components/src/api/server/GetServerInfo";
 import { useLocalize } from "hooks";
+import { Container } from "components/common";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -77,152 +78,150 @@ function FooterNav(props: Props) {
   }
 
   return (
-    <div>
-      <footer id="footer">
-        <div className="container py-5">
-          <div className="row gx-5 gy-5">
-            <div className="col-12 col-lg-3 d-flex flex-column gap-4 align-items-center align-items-lg-start">
-              <Link to="/">
-                <img
-                  src="/fakeyou/FakeYou-Logo.png"
-                  alt="FakeYou: Cartoon and Celebrity Text to Speech"
-                  height="36"
-                />
-              </Link>
-              <div className="d-flex gap-3">
-                <a
-                  className="social-icon"
-                  href={ThirdPartyLinks.FAKEYOU_DISCORD}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Join our Discord Server"
-                >
-                  <FontAwesomeIcon icon={faDiscord} className="me-2" />
-                </a>
-                <a
-                  className="social-icon"
-                  href={ThirdPartyLinks.FAKEYOU_TWITTER_WITH_FOLLOW_INTENT}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Follow us on Twitter"
-                >
-                  <FontAwesomeIcon icon={faTwitter} className="me-2" />
-                </a>
-                <a
-                  className="social-icon"
-                  href={ThirdPartyLinks.FAKEYOU_TIKTOK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Follow us on Tiktok"
-                >
-                  <FontAwesomeIcon icon={faTiktok} className="me-2" />
-                </a>
-                <a
-                  className="social-icon"
-                  href={ThirdPartyLinks.FAKEYOU_TWITCH}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Subscribe to our Twitch Channel"
-                >
-                  <FontAwesomeIcon icon={faTwitch} className="me-2" />
-                </a>
-              </div>
-            </div>
-            <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
-              <p className="fw-bold">{t("productsTitle")}</p>
-              <li>
-                <Link to="/tts">{t("productTts")}</Link>
-              </li>
-
-              <li>
-                <Link to="/voice-conversion">{t("productVc")}</Link>
-              </li>
-
-              <li>
-                <Link to="/voice-designer">Voice Designer</Link>
-              </li>
-
-              <li>
-                <Link to="/face-animator">{t("productFaceAnimator")}</Link>
-              </li>
-
-              <li>
-                <Link to="/contribute">{t("productUploadModels")}</Link>
-              </li>
-            </div>
-            <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
-              <p className="fw-bold">{t("communityTitle")}</p>
-
-              <li>
-                <a
-                  href={ThirdPartyLinks.FAKEYOU_DISCORD}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {t("communityDiscord")}
-                </a>
-              </li>
-
-              <li>
-                <Link to="/leaderboard">{t("communityLeaderboard")}</Link>
-              </li>
-
-              <li>
-                <Link to="/guide">{t("communityGuide")}</Link>
-              </li>
-
-              <li>
-                <Link to={myDataLink}>{t("communityProfile")}</Link>
-              </li>
-            </div>
-            <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
-              <p className="fw-bold">{t("infoTitle")}</p>
-              <li>
-                <Link to={WebUrl.pricingPageWithReferer("footer")}>
-                  {t("infoPricing")}
-                </Link>
-              </li>
-              <li>
-                <Link to={WebUrl.aboutUsPage()}>{t("infoAbout")}</Link>
-              </li>
-
-              <li>
-                <Link to={WebUrl.termsPage()}>{t("infoTerms")}</Link>
-              </li>
-
-              <li>
-                <Link to={WebUrl.privacyPage()}>{t("infoPrivacyPolicy")}</Link>
-              </li>
-              <li>
-                <a href={WebUrl.developerDocs()}>{t("infoApiDocs")}</a>
-              </li>
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <hr />
-          </div>
-
-          <div className="d-flex flex-column flex-lg-row pt-2 align-items-center gap-0 gap-lg-4">
-            <span className="flex-grow-1">
-              © 2023 FakeYou by{" "}
-              <a href="https://storyteller.ai" target="_blank" rel="noreferrer">
-                Storyteller.ai
+    <footer id="footer">
+      <Container type="panel" className="py-5">
+        <div className="row g-5">
+          <div className="col-12 col-lg-3 d-flex flex-column gap-4 align-items-center align-items-lg-start">
+            <Link to="/">
+              <img
+                src="/fakeyou/FakeYou-Logo.png"
+                alt="FakeYou: Cartoon and Celebrity Text to Speech"
+                height="34"
+              />
+            </Link>
+            <div className="d-flex gap-3">
+              <a
+                className="social-icon"
+                href={ThirdPartyLinks.FAKEYOU_DISCORD}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Join our Discord Server"
+              >
+                <FontAwesomeIcon icon={faDiscord} className="me-2" />
               </a>
-            </span>
-            <div className="d-flex flex-column flex-lg-row align-items-center mt-4 mt-lg-0">
-              {moderationLink}
+              <a
+                className="social-icon"
+                href={ThirdPartyLinks.FAKEYOU_TWITTER_WITH_FOLLOW_INTENT}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Follow us on Twitter"
+              >
+                <FontAwesomeIcon icon={faTwitter} className="me-2" />
+              </a>
+              <a
+                className="social-icon"
+                href={ThirdPartyLinks.FAKEYOU_TIKTOK}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Follow us on Tiktok"
+              >
+                <FontAwesomeIcon icon={faTiktok} className="me-2" />
+              </a>
+              <a
+                className="social-icon"
+                href={ThirdPartyLinks.FAKEYOU_TWITCH}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Subscribe to our Twitch Channel"
+              >
+                <FontAwesomeIcon icon={faTwitch} className="me-2" />
+              </a>
             </div>
+          </div>
+          <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
+            <p className="fw-bold">{t("productsTitle")}</p>
+            <li>
+              <Link to="/tts">{t("productTts")}</Link>
+            </li>
 
-            {serverGitSha}
+            <li>
+              <Link to="/voice-conversion">{t("productVc")}</Link>
+            </li>
 
-            <div className="d-flex flex-column flex-lg-row align-items-center">
-              <GitSha prefix="FE: " />
-            </div>
+            <li>
+              <Link to="/voice-designer">Voice Designer</Link>
+            </li>
+
+            <li>
+              <Link to="/face-animator">{t("productFaceAnimator")}</Link>
+            </li>
+
+            <li>
+              <Link to="/contribute">{t("productUploadModels")}</Link>
+            </li>
+          </div>
+          <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
+            <p className="fw-bold">{t("communityTitle")}</p>
+
+            <li>
+              <a
+                href={ThirdPartyLinks.FAKEYOU_DISCORD}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("communityDiscord")}
+              </a>
+            </li>
+
+            <li>
+              <Link to="/leaderboard">{t("communityLeaderboard")}</Link>
+            </li>
+
+            <li>
+              <Link to="/guide">{t("communityGuide")}</Link>
+            </li>
+
+            <li>
+              <Link to={myDataLink}>{t("communityProfile")}</Link>
+            </li>
+          </div>
+          <div className="py-2 col-12 col-lg-3 d-flex flex-column gap-2 gap-lg-3 align-items-center align-items-lg-start">
+            <p className="fw-bold">{t("infoTitle")}</p>
+            <li>
+              <Link to={WebUrl.pricingPageWithReferer("footer")}>
+                {t("infoPricing")}
+              </Link>
+            </li>
+            <li>
+              <Link to={WebUrl.aboutUsPage()}>{t("infoAbout")}</Link>
+            </li>
+
+            <li>
+              <Link to={WebUrl.termsPage()}>{t("infoTerms")}</Link>
+            </li>
+
+            <li>
+              <Link to={WebUrl.privacyPage()}>{t("infoPrivacyPolicy")}</Link>
+            </li>
+            <li>
+              <a href={WebUrl.developerDocs()}>{t("infoApiDocs")}</a>
+            </li>
           </div>
         </div>
-      </footer>
-    </div>
+
+        <div className="pt-4">
+          <hr />
+        </div>
+
+        <div className="d-flex flex-column flex-lg-row pt-2 align-items-center gap-2 gap-xl-4 flex-wrap">
+          <span className="flex-grow-1">
+            © 2023 FakeYou by{" "}
+            <a href="https://storyteller.ai" target="_blank" rel="noreferrer">
+              Storyteller.ai
+            </a>
+          </span>
+          <div className="d-flex flex-column flex-lg-row align-items-center mt-4 mt-lg-0">
+            {moderationLink}
+          </div>
+
+          {serverGitSha}
+
+          <div className="d-flex flex-column flex-lg-row align-items-center">
+            <GitSha prefix="FE: " />
+          </div>
+        </div>
+      </Container>
+    </footer>
   );
 }
 

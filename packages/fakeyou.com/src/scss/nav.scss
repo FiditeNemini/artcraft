@@ -52,6 +52,10 @@ $topbar-height: 66px;
 }
 
 #page-content-wrapper {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   position: relative;
   padding-left: 260px;

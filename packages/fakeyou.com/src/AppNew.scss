@@ -38,12 +38,6 @@ $headings-font-family: "Fira Sans", sans-serif;
     overflow-wrap: anywhere;
   }
 
-  //old wrapper
-  // .mainwrap {
-  //   max-width: 800px;
-  //   margin: auto;
-  // }
-
   canvas#spectrogram {
     margin: 0.5em 0;
     transform: scaleY(-1);
@@ -58,37 +52,10 @@ $headings-font-family: "Fira Sans", sans-serif;
     box-shadow: none;
   }
 
-  /*p {
-    a:link, 
-    a:visited {
-      color: rgb(119, 165, 235);
-      font-weight: bold;
-    }
-    a:hover, 
-    a:active{
-      color: rgb(85, 133, 204);
-      font-weight: bold;
-    }
-  }*/
-
-  // p {
-  //   a:before {
-  //     content: " ";
-  //   }
-  // }
-
   #main {
     position: relative; // Footer attachment.
     min-height: 100vh;
     overflow: hidden;
-
-    &.low-spec {
-      .animation-wrapper {
-        display: none;
-        visibility: hidden;
-        content-visibility: hidden;
-      }
-    }
   }
 
   .social {
