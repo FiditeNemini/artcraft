@@ -9,7 +9,7 @@ import {
 import { BasicVideo, Button, Container, Panel } from "components/common";
 import PageHeader from "components/layout/PageHeader";
 import Tabs from "components/common/Tabs";
-import { useLocalize } from "hooks";
+import { useInferenceJobs, useLocalize } from "hooks";
 
 import TabContentUpload from "./components/tabContentUpload";
 import TabContentLibrary from "./components/tabContentLibrary";
@@ -36,6 +36,11 @@ export default function VideoMotionCapture(props: {
   const [pageState, dispatchPageState] = useReducer(reducer, {
     status: NO_FILE,
   });
+
+  const { inferenceJobs } = useInferenceJobs(
+    FrontendInferenceJobType.VideoMotionCapture
+  );
+  const hasMotionCaptureJobs = inferenceJobs && inferenceJobs.length > 0;
 
   useEffect(() => {
     if (
@@ -81,7 +86,11 @@ export default function VideoMotionCapture(props: {
         imageUrl="/images/header/video-mocap.png"
       />
 
-      <VideoMocapJobList />
+      {hasMotionCaptureJobs && (
+        <div className="mb-4">
+          <VideoMocapJobList />
+        </div>
+      )}
 
       <Panel>
         <div className="row g-0">
