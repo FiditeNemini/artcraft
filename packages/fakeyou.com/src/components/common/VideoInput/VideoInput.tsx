@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useSpring } from "@react-spring/web";
 import { FileDetails, FileWrapper, FileLabel } from "components/common";
 import { faFileVideo, faVideo } from "@fortawesome/pro-solid-svg-icons";
-import "./videoinput.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Props {

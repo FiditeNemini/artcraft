@@ -27,7 +27,7 @@ const mediaFileTypeInfo: MediaFileTypeInfo = {
   },
   [MediaFileType.FBX]: {
     label: "FBX",
-    color: "turquoise",
+    color: "lime",
   },
   [MediaFileType.None]: {
     label: "None",

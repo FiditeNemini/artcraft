@@ -141,10 +141,10 @@ export default function MediaPage() {
     }
   }
 
-  const weightTypeInfo = useMediaFileTypeInfo(
+  const mediaTypeInfo = useMediaFileTypeInfo(
     mediaFile?.media_type || MediaFileType.None
   );
-  const { label: mediaType, color: mediaTagColor } = weightTypeInfo;
+  const { label: mediaType, color: mediaTagColor } = mediaTypeInfo;
 
   let audioLink = new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path);
 
@@ -277,7 +277,10 @@ export default function MediaPage() {
   ];
 
   const bvhDetails = [
-    { property: "Type", value: mediaFile?.media_type || "" },
+    {
+      property: "Type",
+      value: mediaType || "",
+    },
     {
       property: "Visibility",
       value: mediaFile?.creator_set_visibility.toString() || "",
@@ -286,7 +289,10 @@ export default function MediaPage() {
   ];
 
   const gltfDetails = [
-    { property: "Type", value: mediaFile?.media_type || "" },
+    {
+      property: "Type",
+      value: mediaType || "",
+    },
     {
       property: "Visibility",
       value: mediaFile?.creator_set_visibility.toString() || "",
@@ -295,7 +301,10 @@ export default function MediaPage() {
   ];
 
   const fbxDetails = [
-    { property: "Type", value: mediaFile?.media_type || "" },
+    {
+      property: "Type",
+      value: mediaType || "",
+    },
     {
       property: "Visibility",
       value: mediaFile?.creator_set_visibility.toString() || "",

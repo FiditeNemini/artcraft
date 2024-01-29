@@ -106,6 +106,7 @@ import { SearchProvider } from "context/SearchContext";
 import WeightEditPage from "./pages/weight/WeightEditPage";
 import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
 import { FooterNav } from "./nav/FooterNav";
+import FbxToGltfPage from "./pages/fbx_to_gltf/FbxToGltfPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -674,6 +675,10 @@ class PageContainer extends React.Component<
                     inferenceJobsByCategory: this.props.inferenceJobsByCategory,
                   }}
                 />
+              </Route>
+
+              <Route path="/fbx-to-gltf/:mediaToken?">
+                <FbxToGltfPage />
               </Route>
 
               <Route path="/studio">

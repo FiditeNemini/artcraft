@@ -144,6 +144,7 @@ export default function PageHeader({
                   alt="Header"
                   className="img-fluid my-3"
                   height="235"
+                  loading="lazy"
                 />
               )}
             </div>
