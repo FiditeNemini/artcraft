@@ -83,7 +83,7 @@ export default function WeightPage({
 
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
   const dateUpdated = moment(weight?.updated_at || "").format("LLL");
-  const dateCreated = moment(weight?.updated_at || "").format("LLL");
+  const dateCreated = moment(weight?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
