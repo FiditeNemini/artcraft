@@ -84,7 +84,7 @@ fn init_otel_metrics_pipeline() -> Result<(), opentelemetry::metrics::MetricsErr
  let provider = opentelemetry_otlp::new_pipeline()
      .metrics(opentelemetry_sdk::runtime::Tokio)
      // TODO: 1. read host from env 2. Single pod of otel-collector is probably not good enough, run daemonset?
-     .with_exporter(opentelemetry_otlp::new_exporter().tonic().with_endpoint("adot-collector.adot-collector-kubeprometheus"))
+     .with_exporter(opentelemetry_otlp::new_exporter().tonic().with_endpoint("http://adot-collector.adot-collector-kubeprometheus:4317"))
      .with_resource(Resource::new(vec![KeyValue::new("service.name", "inference-job")]))
      .with_period(Duration::from_secs(3))
      .with_timeout(Duration::from_secs(10))
