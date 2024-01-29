@@ -703,7 +703,9 @@ class PageContainer extends React.Component<
                 </Route>
 
                 <Route path="/fbx-to-gltf/:mediaToken?">
-                  <FbxToGltfPage />
+                  <FbxToGltfPage
+                    enqueueInferenceJob={this.props.enqueueInferenceJob}
+                  />
                 </Route>
 
                 <Route path="/studio">
