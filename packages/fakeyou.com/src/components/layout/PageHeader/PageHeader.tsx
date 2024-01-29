@@ -142,7 +142,7 @@ export default function PageHeader({
                 <img
                   src={imageUrl}
                   alt="Header"
-                  className="img-fluid my-3"
+                  className="img-fluid"
                   height="235"
                   loading="lazy"
                 />
