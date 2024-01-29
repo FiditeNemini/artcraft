@@ -6,11 +6,11 @@ import Badge from "components/common/Badge";
 import LikeButton from "components/common/LikeButton";
 import CreatorName from "../CreatorName";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
+import { faCube } from "@fortawesome/pro-solid-svg-icons";
 import getCardUrl from "../getCardUrl";
-// import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
 
-interface ImageCardProps {
+interface FBXCardProps {
   bookmarks: any;
   data: any;
   ratings: any;
@@ -19,15 +19,15 @@ interface ImageCardProps {
   type: "media" | "weights";
 }
 
-export default function ImageCard({
+export default function FBXCard({
   bookmarks,
   data,
   showCreator,
   source = "",
   ratings,
   type,
-}: ImageCardProps) {
-  const linkUrl = getCardUrl(data,source,type);
+}: FBXCardProps) {
+  const linkUrl = getCardUrl(data, source, type);
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
@@ -35,22 +35,32 @@ export default function ImageCard({
 
   const timeAgo = useTimeAgo(data.created_at);
 
-  // const bucketConfig = new BucketConfig();
+  const { label: mediaBadgeLabel, color: mediaBadgeColor } =
+    useMediaFileTypeInfo(
+      data.media_type || data.details?.maybe_media_data?.media_type
+    );
 
   return (
     <Link
       {...{
-        to: linkUrl
+        to: linkUrl,
       }}
     >
       <Card padding={false} canHover={true}>
-        <FontAwesomeIcon {...{ className: "card-mocap", icon: faPersonWalking }}/>
+        <div className="card-img d-flex align-items-center justify-content-center">
+          <FontAwesomeIcon icon={faCube} className="card-img-icon" />
+        </div>
+
         <div className="card-img-overlay">
           <div className="card-img-gradient" />
 
           <div className="d-flex align-items-center">
             <div className="d-flex flex-grow-1">
-              <Badge label="Mocap" color="pink" overlay={true} />
+              <Badge
+                label={mediaBadgeLabel}
+                color={mediaBadgeColor}
+                overlay={true}
+              />
             </div>
           </div>
 
