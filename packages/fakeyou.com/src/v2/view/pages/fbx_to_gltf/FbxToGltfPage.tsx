@@ -1,14 +1,25 @@
 import { faArrowRightArrowLeft } from "@fortawesome/pro-solid-svg-icons";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { Button, Container, Panel } from "components/common";
 import FileInput from "components/common/FileInput";
 import PageHeader from "components/layout/PageHeader";
-import { useFile } from "hooks";
+import { useFile, useMedia } from "hooks";
 import React from "react";
+import { useParams } from "react-router-dom";
 
 interface FbxToGltfPageProps {}
 
 export default function FbxToGltfPage(props: FbxToGltfPageProps) {
+  const { mediaToken } = useParams<{ mediaToken: string }>();
+  const { media } = useMedia({ mediaToken });
   const fileProps = useFile({});
+
+  let fileBucketPath = new BucketConfig().getGcsUrl(media?.public_bucket_path);
+
+  if (mediaToken) {
+    //sets media file
+    fileProps.blob = fileBucketPath;
+  }
 
   return (
     <Container type="panel">

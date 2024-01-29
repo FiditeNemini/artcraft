@@ -129,7 +129,7 @@ export default function MediaPage() {
                 <Button
                   icon={faArrowRightArrowLeft}
                   label="Convert FBX to glTF"
-                  to="/fbx-to-gltf"
+                  to={`/fbx-to-gltf/${mediaFile.token}`}
                   variant="primary"
                 />
               </div>
