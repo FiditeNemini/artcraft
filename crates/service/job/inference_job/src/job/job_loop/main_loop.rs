@@ -165,7 +165,6 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
         OtelAttribute::new("job_model", model_type_str),
         OtelAttribute::new("job_status", job.status.to_str()),
         OtelAttribute::new("job_inference_category", job.inference_category.to_str()),
-        OtelAttribute::new("job_inference_token", job.inference_job_token.as_str().to_owned()),
       ]
     );
   }
