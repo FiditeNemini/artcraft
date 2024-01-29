@@ -107,6 +107,7 @@ import WeightEditPage from "./pages/weight/WeightEditPage";
 import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
 import { FooterNav } from "./nav/FooterNav";
 import FbxToGltfPage from "./pages/fbx_to_gltf/FbxToGltfPage";
+import UploadLoraWeightPage from "./pages/upload/UploadLoraWeightPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -349,12 +350,6 @@ class PageContainer extends React.Component<
                   />
                 </Route>
 
-                <Route path="/upload/sd">
-                  <UploadSdWeightPage
-                    sessionWrapper={this.props.sessionWrapper}
-                  />
-                </Route>
-
                 <Route path="/media/:token">
                   <MediaPage />
                 </Route>
@@ -540,6 +535,18 @@ class PageContainer extends React.Component<
                     sessionWrapper={this.props.sessionWrapper}
                     vocoderUploadJobs={this.props.vocoderUploadJobs}
                     enqueueVocoderUploadJob={this.props.enqueueVocoderUploadJob}
+                  />
+                </Route>
+
+                <Route path="/upload/sd">
+                  <UploadSdWeightPage
+                    sessionWrapper={this.props.sessionWrapper}
+                  />
+                </Route>
+
+                <Route path="/upload/lora">
+                  <UploadLoraWeightPage
+                    sessionWrapper={this.props.sessionWrapper}
                   />
                 </Route>
 

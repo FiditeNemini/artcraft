@@ -16,15 +16,15 @@ import {
   TempTextArea,
 } from "components/common";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { useSdUpload } from "hooks";
+import useLoraUpload from "hooks/useLoraUpload";
 
-interface UploadSdWeightPageProps {
+interface UploadLoraWeightPageProps {
   sessionWrapper: SessionWrapper;
 }
 
-export default function UploadSdWeightPage({
+export default function UploadLoraWeightPage({
   sessionWrapper,
-}: UploadSdWeightPageProps) {
+}: UploadLoraWeightPageProps) {
   usePrefixedDocumentTitle("Edit Voice");
 
   const visibilityOptions = [
@@ -40,7 +40,7 @@ export default function UploadSdWeightPage({
     upload,
     uploadPath,
     visibility,
-  } = useSdUpload();
+  } = useLoraUpload();
 
   if (!sessionWrapper.isLoggedIn()) {
     return (
@@ -67,9 +67,9 @@ export default function UploadSdWeightPage({
   return (
     <Container type="panel">
       <PageHeader
-        title="Upload Stable Diffusion Weight"
+        title="Upload LoRA Weight"
         titleIcon={faWaveform}
-        subText="Upload a Stable Diffusion image model weight. Once your weight is successfully uploaded, you'll be able to start using it and sharing it with others."
+        subText="Upload a LoRA model weight. Once your weight is successfully uploaded, you'll be able to start using it and sharing it with others."
         panel={false}
       />
 
