@@ -1,6 +1,4 @@
-#![forbid(unused_imports)]
 #![forbid(unused_mut)]
-#![forbid(unused_variables)]
 
 use std::fmt::Debug;
 use std::sync::Arc;
@@ -19,16 +17,15 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
-    GenericInferenceArgs,
-    InferenceCategoryAbbreviated,
-    PolymorphicInferenceArgs,
+  GenericInferenceArgs,
+  InferenceCategoryAbbreviated,
 };
-use mysql_queries::payloads::generic_inference_args::tts_payload::TTSArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
-    insert_generic_inference_job,
-    InsertGenericInferenceArgs,
+  insert_generic_inference_job,
+  InsertGenericInferenceArgs,
 };
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
@@ -43,85 +40,82 @@ const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
 /// This is useful for catching the live logs or intercepting the job.
 const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 
-
-#[derive(Deserialize,ToSchema)]
-pub struct EnqueueTTSRequest {
-    uuid_idempotency_token: String,
-    text: String,
-    voice_token: String,
+#[derive(Deserialize, ToSchema)]
+pub struct EnqueueFbxToGltfRequest {
+  // Entropy for idempotency
+  uuid_idempotency_token: String,
+  // The existing FBX media file token
+  media_file_token: MediaFileToken,
 }
 
-#[derive(Serialize,ToSchema)]
-pub struct EnqueueTTSRequestSuccessResponse {
-    pub success: bool,
-    pub inference_job_token: InferenceJobToken,
+#[derive(Serialize, ToSchema)]
+pub struct EnqueueFbxToGltfRequestSuccessResponse {
+  pub success: bool,
+  pub inference_job_token: InferenceJobToken,
 }
 
-#[derive(Debug,ToSchema)]
-pub enum EnqueueTTSRequestError {
-    BadInput(String),
-    NotAuthorized,
-    ServerError,
-    RateLimited,
+#[derive(Debug, ToSchema)]
+pub enum EnqueueFbxToGltfRequestError {
+  BadInput(String),
+  NotAuthorized,
+  ServerError,
+  RateLimited,
 }
 
-impl ResponseError for EnqueueTTSRequestError {
-    fn status_code(&self) -> StatusCode {
-        match *self {
-            EnqueueTTSRequestError::BadInput(_) => StatusCode::BAD_REQUEST,
-            EnqueueTTSRequestError::NotAuthorized => StatusCode::UNAUTHORIZED,
-            EnqueueTTSRequestError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
-            EnqueueTTSRequestError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
-        }
+impl ResponseError for EnqueueFbxToGltfRequestError {
+  fn status_code(&self) -> StatusCode {
+    match *self {
+      EnqueueFbxToGltfRequestError::BadInput(_) => StatusCode::BAD_REQUEST,
+      EnqueueFbxToGltfRequestError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      EnqueueFbxToGltfRequestError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      EnqueueFbxToGltfRequestError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
     }
+  }
 
-    fn error_response(&self) -> HttpResponse {
-        let error_reason = match self {
-            EnqueueTTSRequestError::BadInput(reason) => reason.to_string(),
-            EnqueueTTSRequestError::NotAuthorized => "unauthorized".to_string(),
-            EnqueueTTSRequestError::ServerError => "server error".to_string(),
-            EnqueueTTSRequestError::RateLimited => "rate limited".to_string(),
-        };
+  fn error_response(&self) -> HttpResponse {
+    let error_reason = match self {
+      EnqueueFbxToGltfRequestError::BadInput(reason) => reason.to_string(),
+      EnqueueFbxToGltfRequestError::NotAuthorized => "unauthorized".to_string(),
+      EnqueueFbxToGltfRequestError::ServerError => "server error".to_string(),
+      EnqueueFbxToGltfRequestError::RateLimited => "rate limited".to_string(),
+    };
 
-        to_simple_json_error(&error_reason, self.status_code())
-    }
+    to_simple_json_error(&error_reason, self.status_code())
+  }
 }
 
-impl std::fmt::Display for EnqueueTTSRequestError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
-    }
+impl std::fmt::Display for EnqueueFbxToGltfRequestError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{:?}", self)
+  }
 }
 
-// Implementation for enqueuing a TTS request
-// Reference enqueue_infer_tts_handler.rs for checks: rate limiting / user sessions
-// insert generic inference job.rs
-// Need to convert it to generic inference job.
 #[utoipa::path(
-    post,
-    path = "/inference/enqueue_tts/",
-    responses(
-        (status = 200, description = "Enqueue TTS generically", body = EnqueueTTSRequestSuccessResponse),
-        (status = 400, description = "Bad input", body = EnqueueTTSRequestError),
-        (status = 401, description = "Not authorized", body = EnqueueTTSRequestError),
-        (status = 429, description = "Rate limited", body = EnqueueTTSRequestError),
-        (status = 500, description = "Server error", body = EnqueueTTSRequestError)
+  post,
+  path = "/v1/conversion/enqueue_fbx_to_gltf",
+  responses(
+    (
+      status = 200,
+      description = "Enqueue FBX to GLTF",
+      body = EnqueueFbxToGltfRequestSuccessResponse,
     ),
-    params(
-        ("request" = EnqueueTTSRequest, description = "Payload for TTS Request")
-    )
+    (status = 400, description = "Bad input", body = EnqueueFbxToGltfRequestError),
+    (status = 401, description = "Not authorized", body = EnqueueFbxToGltfRequestError),
+    (status = 429, description = "Rate limited", body = EnqueueFbxToGltfRequestError),
+    (status = 500, description = "Server error", body = EnqueueFbxToGltfRequestError)
+  ),
+  params(("request" = EnqueueFbxToGltfRequest, description = "Payload for FBX to GLTF Request"))
 )]
-pub async fn enqueue_tts_request(
+pub async fn enqueue_fbx_to_gltf_handler(
     http_request: HttpRequest,
-    request: web::Json<EnqueueTTSRequest>,
+    request: web::Json<EnqueueFbxToGltfRequest>,
     server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, EnqueueTTSRequestError> {
-    
+) -> Result<HttpResponse, EnqueueFbxToGltfRequestError> {
     let mut maybe_user_token: Option<UserToken> = None;
 
     let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {
         warn!("MySql pool error: {:?}", err);
-        EnqueueTTSRequestError::ServerError
+        EnqueueFbxToGltfRequestError::ServerError
     })?;
 
     // ==================== USER SESSION ==================== //
@@ -130,7 +124,7 @@ pub async fn enqueue_tts_request(
         .maybe_get_user_session_extended_from_connection(&http_request, &mut mysql_connection).await
         .map_err(|e| {
             warn!("Session checker error: {:?}", e);
-            EnqueueTTSRequestError::ServerError
+            EnqueueFbxToGltfRequestError::ServerError
         })?;
 
     if let Some(user_session) = maybe_user_session.as_ref() {
@@ -158,7 +152,7 @@ pub async fn enqueue_tts_request(
 
     if let Some(ref user) = maybe_user_session {
         if user.role.is_banned {
-            return Err(EnqueueTTSRequestError::NotAuthorized);
+            return Err(EnqueueFbxToGltfRequestError::NotAuthorized);
         }
     }
 
@@ -170,42 +164,33 @@ pub async fn enqueue_tts_request(
     };
 
     if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-        return Err(EnqueueTTSRequestError::RateLimited);
+        return Err(EnqueueFbxToGltfRequestError::RateLimited);
     }
 
-    // Get up IP address
     let ip_address = get_request_ip(&http_request);
 
-    // package as larger component args should always have an embedding token ..
-    let inference_args = TTSArgs {
-        voice_token: Some(request.voice_token.clone()),
-        dataset_token: None,
-    };
+    let maybe_avt_token = server_state.avt_cookie_manager
+        .get_avt_token_from_request(&http_request);
 
-    // create the inference args here
-    // enqueue a zero shot tts request here...
-    let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
-
-    // create the job record here!
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
-        inference_category: InferenceCategory::TextToSpeech,
-        maybe_model_type: Some(InferenceModelType::StyleTTS2), // NB: Model is static during inference
-        maybe_model_token: None, // NB: Model is static during inference
-        maybe_input_source_token: None,
+        inference_category: InferenceCategory::ImageGeneration,
+        maybe_model_type: Some(InferenceModelType::ConvertFbxToGltf),
+        maybe_model_token: None,
+        maybe_input_source_token: Some(&request.media_file_token.as_str()),
         maybe_input_source_token_type: None,
-        maybe_raw_inference_text: Some(&request.text),
+        maybe_raw_inference_text: None,
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {
-            inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
-            args: Some(PolymorphicInferenceArgs::Tts(inference_args)),
+            inference_category: Some(InferenceCategoryAbbreviated::FormatConversion),
+            args: None, // NB: no format conversion args for now
         }),
         maybe_creator_user_token: maybe_user_token.as_ref(),
         maybe_avt_token: maybe_avt_token.as_ref(),
         creator_ip_address: &ip_address,
         creator_set_visibility: Visibility::Public,
         priority_level,
-        requires_keepalive: true, // do we need this? I think so
+        requires_keepalive: true,
         is_debug_request,
         maybe_routing_tag: maybe_routing_tag.as_deref(),
         mysql_pool: &server_state.mysql_pool,
@@ -215,17 +200,17 @@ pub async fn enqueue_tts_request(
         Ok((job_token, _id)) => job_token,
         Err(err) => {
             warn!("New generic inference job creation DB error: {:?}", err);
-            return Err(EnqueueTTSRequestError::ServerError);
+            return Err(EnqueueFbxToGltfRequestError::ServerError);
         }
     };
 
-    let response: EnqueueTTSRequestSuccessResponse = EnqueueTTSRequestSuccessResponse {
+    let response: EnqueueFbxToGltfRequestSuccessResponse = EnqueueFbxToGltfRequestSuccessResponse {
         success: true,
         inference_job_token: job_token,
     };
 
-    let body = serde_json::to_string(&response).map_err(|_e| EnqueueTTSRequestError::ServerError)?;
+    let body = serde_json::to_string(&response)
+        .map_err(|_e| EnqueueFbxToGltfRequestError::ServerError)?;
 
-    // Error handling 101 rust result type returned like so.
     Ok(HttpResponse::Ok().content_type("application/json").body(body))
 }

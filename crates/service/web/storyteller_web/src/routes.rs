@@ -26,11 +26,13 @@ use crate::http_server::endpoints::categories::tts::list_tts_model_assigned_cate
 use crate::http_server::endpoints::comments::create_comment_handler::create_comment_handler;
 use crate::http_server::endpoints::comments::delete_comment_handler::delete_comment_handler;
 use crate::http_server::endpoints::comments::list_comments_handler::list_comments_handler;
+use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::enqueue_fbx_to_gltf_handler;
 use crate::http_server::endpoints::download_job::enqueue_generic_download::enqueue_generic_download_handler;
 use crate::http_server::endpoints::download_job::get_generic_upload_job_status::get_generic_download_job_status_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_refresh_flag_handler::disable_design_refresh_flag_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
+use crate::http_server::endpoints::image_gen::enqueue_image_generation::enqueue_image_generation_request;
 use crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler;
 use crate::http_server::endpoints::inference_job::get_pending_inference_job_count::get_pending_inference_job_count_handler;
 use crate::http_server::endpoints::inference_job::kill_inference_jobs::kill_generic_inference_jobs_handler;
@@ -55,7 +57,6 @@ use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha
 use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
 use crate::http_server::endpoints::misc::root_index::get_root_index;
 use crate::http_server::endpoints::mocap::enqueue_mocapnet::enqueue_mocapnet_handler;
-use crate::http_server::endpoints::workflows::enqueue_comfy_ui::enqueue_comfy_ui_handler;
 use crate::http_server::endpoints::moderation::approval::pending_w2l_templates::get_pending_w2l_templates_handler;
 use crate::http_server::endpoints::moderation::categories::delete_category::delete_category_handler;
 use crate::http_server::endpoints::moderation::categories::edit_category::edit_category_handler;
@@ -167,7 +168,7 @@ use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_b
 use crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler;
 use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
-use crate::http_server::endpoints::image_gen::enqueue_image_generation::enqueue_image_generation_request;
+use crate::http_server::endpoints::workflows::enqueue_comfy_ui::enqueue_comfy_ui_handler;
 
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
@@ -248,6 +249,12 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
       .add_get("/v1/model_inference/job_status/{token}", get_inference_job_status_handler)
       .add_delete("/v1/model_inference/job/{token}", terminate_inference_job_handler, true)
       .add_get("/v1/model_inference/queue_length", get_pending_inference_job_count_handler)
+      .into_app();
+
+  // ==================== Format Conversion ====================
+
+  let mut app = RouteBuilder::from_app(app)
+      .add_post("/v1/conversion/enqueue_fbx_to_gltf", enqueue_fbx_to_gltf_handler)
       .into_app();
 
   // ==================== Stats ====================
