@@ -6,9 +6,8 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 
-import { BasicVideo, Button, Container, Panel } from "components/common";
+import { BasicVideo, Button, Container, Panel, Tabs } from "components/common";
 import PageHeader from "components/layout/PageHeader";
-import Tabs from "components/common/Tabs";
 import { useInferenceJobs, useLocalize } from "hooks";
 
 import TabContentUpload from "./components/tabContentUpload";
@@ -130,7 +129,9 @@ export default function VideoMotionCapture(props: {
                     icon={faArrowRotateLeft}
                     iconFlip={true}
                     label="Generate Another"
-                    onClick={() => {}} //back to first state
+                    onClick={() => {
+                      dispatchPageState({type:"restart"})
+                    }} //back to first state
                     variant="primary"
                   />
                 </div>

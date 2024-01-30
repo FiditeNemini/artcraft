@@ -1,34 +1,35 @@
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
 
 export enum states{
   NO_FILE,
   FILE_STAGED,
+  FILE_SELECTED,
   FILE_UPLOADING,
   FILE_UPLOADED,
-  FILE_SELECTED,
-  MOCAPNET_ENQUEUEING,
-  MOCAPNET_ENQUEUED,
+  FILE_LOADING,
+  FILE_LOADED,
 }
 
 export type State = {
   status: number;
   mediaFileToken?: string;
+  mediaFile?: MediaFile;
   inferenceJobToken?: string;
 }
 
 export type Action = 
-  | {type: 'restart'}
   | {type: 'stagedFile'}
   | {type: 'clearedFile'}
-  | {type: 'selectedFile', payload:{ mediaFileToken: string}}
+  | {type: 'selectedFile', payload: { mediaFileToken: string}}
   | {type: 'uploadFile'}
   | {type: 'uploadFileSuccess', payload:{ mediaFileToken: string}}
-  | {type: 'enqueueMocapNet'}
-  | {type: 'enqueueMocapNetSuccess', payload: {inferenceJobToken: string|undefined}}
+  | {type: 'loadFile'}
+  | {type: 'loadFileSuccess', payload:{mediaFile: MediaFile}}
+
 
 export function reducer (state: State, action: Action): State {
+  console.log(action);
   switch(action.type){
-    case 'restart':
-      return { status: states.NO_FILE }
     case 'stagedFile':
       return {...state, status: states.FILE_STAGED}
     case 'clearedFile':
@@ -47,14 +48,15 @@ export function reducer (state: State, action: Action): State {
         status: states.FILE_UPLOADED,
         mediaFileToken: action.payload.mediaFileToken
       }
-    case 'enqueueMocapNet':
-      return {...state, status:states.MOCAPNET_ENQUEUEING}
-    case 'enqueueMocapNetSuccess':
+    case 'loadFile':
+      return {...state, status: states.FILE_LOADING}
+    case 'loadFileSuccess':
+      console.log("LOAD FILE SUCCESS");
       return {
         ...state,
-        status: states.MOCAPNET_ENQUEUED,
-        inferenceJobToken: action.payload.inferenceJobToken
-      };
+        status: states.FILE_LOADED,
+        mediaFile: action.payload.mediaFile
+      }
     default:
       return {status: states.NO_FILE};
       

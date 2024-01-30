@@ -1,8 +1,7 @@
 import SelectModal from "components/common/SelectModal/SelectModal";
-import React, {useState} from "react";
-import { Action, State } from "../videoMocapReducer";
+import React from "react";
+import { states, Action, State } from "../storytellerFilterReducer";
 import { Button } from "components/common";
-
 export default function TabContentLibrary({
   t, pageState, dispatchPageState
 }: {
@@ -10,18 +9,16 @@ export default function TabContentLibrary({
   pageState: State;
   dispatchPageState: (action: Action) => void;
 }){
-  const [token, setToken] = useState<string|undefined>();
+
   const handleProceed = ()=>{
-    if(token)
-      dispatchPageState({
-        type: "selectedFile",
-        payload: {mediaFileToken: token}
-      });
+    dispatchPageState({type: "loadFile"})
   }
   const handleOnSelect = (token:string)=>{
-    setToken(token);
+    dispatchPageState({
+      type: "selectedFile",
+      payload: {mediaFileToken: token}
+    });
   };
-
   return (
     <div>
       <SelectModal
@@ -38,7 +35,7 @@ export default function TabContentLibrary({
           },
         ]}
       />
-      {token && 
+      {pageState.status === states.FILE_SELECTED && 
         <Button 
           label={t("button.proceed")}
           onClick={handleProceed}

@@ -21,12 +21,14 @@ interface SelectModalProps {
   label?: string;
   tabs: TabConfig[];
   modalTitle?: string;
+  onSelect?: (token: string)=>void;
 }
 
 const SelectModal = memo(
-  ({ label, tabs, modalTitle = "Select" }: SelectModalProps) => {
+  ({ label, tabs, modalTitle = "Select", onSelect }: SelectModalProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { token, setToken, weightTitle, setWeightTitle } = useToken();
+    const [selectedValue, setSelectedValue] = useState("");
     const [activeTab, setActiveTab] = useState(tabs[0].tabKey);
     const [mediaType, setMediaType] = useState(
       tabs[0].mediaTypeFilter || "all"
@@ -41,6 +43,16 @@ const SelectModal = memo(
       setMediaType(currentTab?.mediaTypeFilter || "all");
       setWeightType(currentTab?.mediaTypeFilter || "all");
     }, [activeTab, tabs]);
+
+    useEffect(()=>{
+      if(token && token !== selectedValue && onSelect){
+        setSelectedValue(token);
+        onSelect(token);
+      }else if(weightTitle && weightTitle !== selectedValue && onSelect){
+        setSelectedValue(weightTitle);
+        onSelect(weightTitle);
+      }
+    }, [token, weightTitle, selectedValue, onSelect]);
 
     const openModal = () => {
       setIsModalOpen(true);
