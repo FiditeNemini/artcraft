@@ -39,7 +39,10 @@
   },
   "dependencies": {
     "@react-spring/types": "^9.7.3",
+    "@typeform/embed-react": "^3.10.0",
+    "local-storage": "^2.0.0",
     "moment": "^2.29.4",
+    "react-typeform-embed": "^1.0.8",
     "universal-cookie": "^6.1.1",
     "yarn": "^1.22.19"
   },
