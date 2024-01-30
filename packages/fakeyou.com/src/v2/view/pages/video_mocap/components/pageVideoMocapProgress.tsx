@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { EnqueueVideoMotionCapture } from "@storyteller/components/src/api/video_mocap";
@@ -21,8 +21,8 @@ export default function PageVideoMocapProgress({
   pageState: State;
   dispatchPageState: (action: Action) => void;
 }) {
-  const { FILE_UPLOADING, FILE_UPLOADED, MOCAPNET_ENQUEUEING } = states;
-
+  const { FILE_UPLOADING, FILE_UPLOADED, FILE_SELECTED, MOCAPNET_ENQUEUEING } = states;
+  
   const handleEnqueueMocapNet = () => {
     if (pageState.mediaFileToken) {
       const request = {
@@ -42,6 +42,10 @@ export default function PageVideoMocapProgress({
       dispatchPageState({ type: "enqueueMocapNet" });
     }
   };
+
+  if (pageState.status === FILE_SELECTED){
+    handleEnqueueMocapNet();
+  }
 
   if (pageState.status === FILE_UPLOADING) {
     return (

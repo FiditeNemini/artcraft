@@ -21,7 +21,7 @@ export default function StorytellerFilter(props:{
 }){
   const debug=true;
   const { t } = useLocalize("StorytellerFilter");
-  const { NO_FILE, FILE_STAGED, FILE_UPLOADING, FILE_UPLOADED, FILE_LOADING, FILE_LOADED } = states;
+  const { NO_FILE, FILE_STAGED, FILE_UPLOADING, FILE_UPLOADED, FILE_SELECTED, FILE_LOADING, FILE_LOADED } = states;
   const [pageState, dispatchPageState] = useReducer(reducer, {
     status: NO_FILE,
   });
@@ -31,6 +31,7 @@ export default function StorytellerFilter(props:{
       case NO_FILE:
       case FILE_STAGED:
       case FILE_UPLOADING:
+      case FILE_SELECTED:
         return <PageVideoProvision {...{debug, t, pageState, dispatchPageState}}/>
       case FILE_UPLOADED:
       case FILE_LOADING:

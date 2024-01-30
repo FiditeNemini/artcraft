@@ -3,6 +3,7 @@ import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaF
 export enum states{
   NO_FILE,
   FILE_STAGED,
+  FILE_SELECTED,
   FILE_UPLOADING,
   FILE_UPLOADED,
   FILE_LOADING,
@@ -19,6 +20,7 @@ export type State = {
 export type Action = 
   | {type: 'stagedFile'}
   | {type: 'clearedFile'}
+  | {type: 'selectedFile', payload: { mediaFileToken: string}}
   | {type: 'uploadFile'}
   | {type: 'uploadFileSuccess', payload:{ mediaFileToken: string}}
   | {type: 'loadFile'}
@@ -32,6 +34,12 @@ export function reducer (state: State, action: Action): State {
       return {...state, status: states.FILE_STAGED}
     case 'clearedFile':
       return {...state, status: states.NO_FILE}
+    case 'selectedFile':
+      return {
+        ...state,
+        status: states.FILE_SELECTED,
+        mediaFileToken: action.payload.mediaFileToken
+      } 
     case 'uploadFile':
       return {...state,status: states.FILE_UPLOADING};
     case 'uploadFileSuccess':

@@ -129,7 +129,9 @@ export default function VideoMotionCapture(props: {
                     icon={faArrowRotateLeft}
                     iconFlip={true}
                     label="Generate Another"
-                    onClick={() => {}} //back to first state
+                    onClick={() => {
+                      dispatchPageState({type:"restart"})
+                    }} //back to first state
                     variant="primary"
                   />
                 </div>

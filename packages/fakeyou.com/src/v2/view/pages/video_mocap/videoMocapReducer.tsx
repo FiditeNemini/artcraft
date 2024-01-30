@@ -4,6 +4,7 @@ export enum states{
   FILE_STAGED,
   FILE_UPLOADING,
   FILE_UPLOADED,
+  FILE_SELECTED,
   MOCAPNET_ENQUEUEING,
   MOCAPNET_ENQUEUED,
 }
@@ -15,20 +16,29 @@ export type State = {
 }
 
 export type Action = 
-  | {type: 'uploadFile'}
+  | {type: 'restart'}
   | {type: 'stagedFile'}
   | {type: 'clearedFile'}
+  | {type: 'selectedFile', payload:{ mediaFileToken: string}}
+  | {type: 'uploadFile'}
   | {type: 'uploadFileSuccess', payload:{ mediaFileToken: string}}
   | {type: 'enqueueMocapNet'}
   | {type: 'enqueueMocapNetSuccess', payload: {inferenceJobToken: string|undefined}}
 
 export function reducer (state: State, action: Action): State {
-  console.log(action);
   switch(action.type){
+    case 'restart':
+      return { status: states.NO_FILE }
     case 'stagedFile':
       return {...state, status: states.FILE_STAGED}
     case 'clearedFile':
       return {...state, status: states.NO_FILE}
+    case 'selectedFile':
+      return {
+        ...state,
+        status: states.FILE_SELECTED,
+        mediaFileToken: action.payload.mediaFileToken
+      } 
     case 'uploadFile':
       return {...state,status: states.FILE_UPLOADING};
     case 'uploadFileSuccess':
