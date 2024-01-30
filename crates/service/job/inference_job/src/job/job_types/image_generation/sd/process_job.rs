@@ -550,22 +550,22 @@ pub async fn process_job_inference(
         Some(val) => { val }
     };
 
-    let creator_user_token: UserToken;
-    let anon_user_token: Option<AnonymousVisitorTrackingToken>;
+    let _creator_user_token: UserToken;
+    let _anon_user_token: Option<AnonymousVisitorTrackingToken>;
 
     match &job.maybe_creator_anonymous_visitor_token {
         Some(token) => {
             let anonymous_visitor_token = AnonymousVisitorTrackingToken::new_from_str(token);
-            anon_user_token = Some(anonymous_visitor_token);
+            _anon_user_token = Some(anonymous_visitor_token);
         }
         None => {
-            anon_user_token = None;
+            _anon_user_token = None;
         }
     }
 
     match &job.maybe_creator_user_token {
         Some(token) => {
-            creator_user_token = UserToken::new_from_str(token);
+            _creator_user_token = UserToken::new_from_str(token);
         }
         None => {
             return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")));

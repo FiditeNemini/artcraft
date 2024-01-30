@@ -208,7 +208,7 @@ mod tests {
       maybe_execution_timeout: None,
     };
 
-    let ptr : Box<dyn CommandArgs> = Box::new(BlenderArgs {});
+    let ptr : Box<&dyn CommandArgs> = Box::new(&BlenderArgs {});
     let result = runner.build_command_string(&ptr);
 
     assert_eq!(&result, r#"blender -a --foo --bar=baz --bin="blah blah""#);
@@ -225,7 +225,7 @@ mod tests {
       maybe_execution_timeout: None,
     };
 
-    let ptr : Box<dyn CommandArgs> = Box::new(BlenderArgs {});
+    let ptr : Box<&dyn CommandArgs> = Box::new(&BlenderArgs {});
     let result = runner.build_command_string(&ptr);
 
     assert_eq!(&result, r#"python3.6 inference.py -a --foo --bar=baz --bin="blah blah""#);
@@ -242,7 +242,7 @@ mod tests {
       maybe_execution_timeout: None,
     };
 
-    let ptr : Box<dyn CommandArgs> = Box::new(BlenderArgs {});
+    let ptr : Box<&dyn CommandArgs> = Box::new(&BlenderArgs {});
     let result = runner.build_command_string(&ptr);
 
     assert_eq!(&result, r#"cd /usr/local/bin && blender -a --foo --bar=baz --bin="blah blah""#);
@@ -259,7 +259,7 @@ mod tests {
       maybe_execution_timeout: None,
     };
 
-    let ptr : Box<dyn CommandArgs> = Box::new(BlenderArgs {});
+    let ptr : Box<&dyn CommandArgs> = Box::new(&BlenderArgs {});
     let result = runner.build_command_string(&ptr);
 
     assert_eq!(&result, r#"source venv/bin/activate && python3.6 inference.py -a --foo --bar=baz --bin="blah blah""#);
@@ -282,7 +282,7 @@ mod tests {
       maybe_execution_timeout: None,
     };
 
-    let ptr : Box<dyn CommandArgs> = Box::new(BlenderArgs {});
+    let ptr : Box<&dyn CommandArgs> = Box::new(&BlenderArgs {});
     let result = runner.build_command_string(&ptr);
 
     // TODO(bt, 2024-01-27): The quotes are broken. Fix this!!
