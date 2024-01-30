@@ -174,7 +174,7 @@ pub async fn enqueue_fbx_to_gltf_handler(
 
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
-        inference_category: InferenceCategory::ImageGeneration,
+        inference_category: InferenceCategory::FormatConversion,
         maybe_model_type: Some(InferenceModelType::ConvertFbxToGltf),
         maybe_model_token: None,
         maybe_input_source_token: Some(&request.media_file_token.as_str()),

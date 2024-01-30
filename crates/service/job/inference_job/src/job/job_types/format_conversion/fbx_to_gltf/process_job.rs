@@ -5,7 +5,6 @@ use anyhow::anyhow;
 use log::{error, info, warn};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
-use buckets::public::media_uploads::bucket_file_path::MediaUploadOriginalFilePath;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
@@ -70,18 +69,20 @@ pub async fn process_job(args: FbxToGltfJobArgs<'_>) -> Result<JobSuccessResult,
   info!("Download media for conversion...");
 
   let original_media_upload_fs_path = {
-    let original_media_upload_fs_path = work_temp_dir.path().join("original.fbx");
+    let original_media_file_fs_path = work_temp_dir.path().join("original.fbx");
 
-    let media_upload_bucket_path =
-        MediaUploadOriginalFilePath::from_object_hash(&media_file.public_bucket_directory_hash);
+    let media_file_bucket_path = MediaFileBucketPath::from_object_hash(
+          &media_file.public_bucket_directory_hash,
+          media_file.maybe_public_bucket_prefix.as_deref(),
+          media_file.maybe_public_bucket_extension.as_deref());
 
-    let bucket_object_path = media_upload_bucket_path.to_full_object_pathbuf();
+    let bucket_object_path = media_file_bucket_path.to_full_object_pathbuf();
 
     info!("Downloading media to bucket path: {:?}", &bucket_object_path);
 
     maybe_download_file_from_bucket(MaybeDownloadArgs {
       name_or_description_of_file: "media upload (original file)",
-      final_filesystem_file_path: &original_media_upload_fs_path,
+      final_filesystem_file_path: &original_media_file_fs_path,
       bucket_object_path: &bucket_object_path,
       bucket_client: &args.job_dependencies.buckets.public_bucket_client,
       job_progress_reporter: &mut job_progress_reporter,
@@ -91,7 +92,7 @@ pub async fn process_job(args: FbxToGltfJobArgs<'_>) -> Result<JobSuccessResult,
       maybe_existing_file_minimum_size_required: None,
     }).await?;
 
-    original_media_upload_fs_path
+    original_media_file_fs_path
   };
 
   // ==================== SETUP FOR CONVERSION ==================== //
@@ -211,7 +212,7 @@ pub async fn process_job(args: FbxToGltfJobArgs<'_>) -> Result<JobSuccessResult,
   let (inference_result_token, id) = insert_media_file_generic(InsertArgs {
     pool: &args.job_dependencies.db.mysql_pool,
     job: &job,
-    media_type: MediaFileType::Mocap,
+    media_type: MediaFileType::Gltf,
     origin_category: MediaFileOriginCategory::Processed,
     origin_product_category: MediaFileOriginProductCategory::Mocap,
     maybe_origin_model_type: None,
@@ -225,8 +226,8 @@ pub async fn process_job(args: FbxToGltfJobArgs<'_>) -> Result<JobSuccessResult,
     maybe_frame_width: None,
     maybe_frame_height: None,
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
-    maybe_public_bucket_prefix: None,
-    maybe_public_bucket_extension: Some(BUCKET_FILE_EXTENSION),
+    maybe_public_bucket_prefix: result_bucket_location.get_optional_prefix(),
+    maybe_public_bucket_extension: result_bucket_location.get_optional_extension(),
     extra_file_modification_info: None,
     maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
     maybe_creator_category_synthetic_id_category: IdCategory::MocapResult,

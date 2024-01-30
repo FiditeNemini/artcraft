@@ -12,6 +12,7 @@ const ORIGINAL_FILE_BASENAME : &str = "original_upload.bin";
 /// The original user upload file.
 /// It may have derivative files (down samples, crops, etc.) that live alongside it.
 #[derive(Clone)]
+#[deprecated(note = "Use media_files records and MediaFileBucketPath instead. media_uploads records are DEPRECATED.")]
 pub struct MediaUploadOriginalFilePath {
   directory: MediaUploadDirectory,
   full_object_path: String,
@@ -21,11 +22,13 @@ impl PublicPath for MediaUploadOriginalFilePath {}
 
 impl MediaUploadOriginalFilePath {
 
+  #[deprecated(note = "Use media_files records and MediaFileBucketPath instead. media_uploads records are DEPRECATED.")]
   pub fn generate_new() -> Self {
     let entropy = crockford_entropy_lower(32);
     Self::from_object_hash(&entropy)
   }
 
+  #[deprecated(note = "Use media_files records and MediaFileBucketPath instead. media_uploads records are DEPRECATED.")]
   pub fn from_object_hash(hash: &str) -> Self {
     // TODO: Path construction could be cleaner.
     let directory = MediaUploadDirectory::from_object_hash(hash);
@@ -36,22 +39,27 @@ impl MediaUploadOriginalFilePath {
     }
   }
 
+  #[deprecated(note = "Use media_files records and MediaFileBucketPath instead. media_uploads records are DEPRECATED.")]
   pub fn get_full_object_path_str(&self) -> &str {
     &self.full_object_path
   }
 
+  #[deprecated(note = "Use media_files records and MediaFileBucketPath instead. media_uploads records are DEPRECATED.")]
   pub fn to_full_object_pathbuf(&self) -> PathBuf {
     PathBuf::from(&self.full_object_path)
   }
 
+  #[deprecated(note = "Use media_files records and MediaFileBucketPath instead. media_uploads records are DEPRECATED.")]
   pub fn get_directory(&self) -> &MediaUploadDirectory {
     &self.directory
   }
 
+  #[deprecated(note = "Use media_files records and MediaFileBucketPath instead. media_uploads records are DEPRECATED.")]
   pub fn get_object_hash(&self) -> &str {
     &self.directory.get_object_hash()
   }
 
+  #[deprecated(note = "Use media_files records and MediaFileBucketPath instead. media_uploads records are DEPRECATED.")]
   pub fn get_basename() -> &'static str {
     ORIGINAL_FILE_BASENAME
   }

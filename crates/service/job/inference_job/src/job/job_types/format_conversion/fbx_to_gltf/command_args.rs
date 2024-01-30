@@ -15,10 +15,10 @@ impl CommandArgs for FbxToGltfCommandArgs<'_> {
     // Verbose flag
     command.push_str(" -v ");
 
-    command.push_str("-i ");
+    command.push_str(" -i ");
     command.push_str(&path_to_string(self.input_file));
 
-    command.push_str("-o ");
+    command.push_str(" -o ");
     command.push_str(&path_to_string(self.output_directory));
 
     command
