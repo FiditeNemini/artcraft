@@ -11,7 +11,7 @@ use enums::common::visibility::Visibility;
 use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct ModelWeightForLegacyTtsInference {
+pub struct ModelWeightForLegacyTtsEnqueue {
     pub token: ModelWeightToken,
     pub weights_type: WeightsType,
     pub weights_category: WeightsCategory,
@@ -27,7 +27,7 @@ pub async fn get_weight_for_legacy_tts_enqueue(
     weight_token: &ModelWeightToken,
     can_see_deleted: bool,
     mysql_pool: &MySqlPool
-) -> AnyhowResult<Option<ModelWeightForLegacyTtsInference>> {
+) -> AnyhowResult<Option<ModelWeightForLegacyTtsEnqueue>> {
     let mut connection = mysql_pool.acquire().await?;
     get_weight_for_legacy_tts_enqueue_with_connection(weight_token, can_see_deleted, &mut connection).await
 }
@@ -36,7 +36,7 @@ pub async fn get_weight_for_legacy_tts_enqueue_with_connection(
     weight_token: &ModelWeightToken,
     can_see_deleted: bool,
     mysql_connection: &mut PoolConnection<MySql>
-) -> AnyhowResult<Option<ModelWeightForLegacyTtsInference>> {
+) -> AnyhowResult<Option<ModelWeightForLegacyTtsEnqueue>> {
     let maybe_result = if can_see_deleted {
         select_include_deleted(weight_token, mysql_connection).await
     } else {
@@ -54,19 +54,15 @@ pub async fn get_weight_for_legacy_tts_enqueue_with_connection(
         }
     };
 
-    // unwrap the result
-
-    Ok(
-        Some(ModelWeightForLegacyTtsInference {
-            token: record.token,
-            weights_type: record.weights_type,
-            weights_category: record.weights_category,
-            creator_user_token: record.creator_user_token,
-            creator_set_visibility: record.creator_set_visibility,
-            user_deleted_at: record.user_deleted_at,
-            mod_deleted_at: record.mod_deleted_at,
-        })
-    )
+    Ok(Some(ModelWeightForLegacyTtsEnqueue {
+        token: record.token,
+        weights_type: record.weights_type,
+        weights_category: record.weights_category,
+        creator_user_token: record.creator_user_token,
+        creator_set_visibility: record.creator_set_visibility,
+        user_deleted_at: record.user_deleted_at,
+        mod_deleted_at: record.mod_deleted_at,
+    }))
 }
 
 async fn select_include_deleted(

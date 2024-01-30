@@ -3,7 +3,7 @@ use sqlx::MySql;
 use sqlx::pool::PoolConnection;
 
 use errors::AnyhowResult;
-use migration::text_to_speech::get_tts_model_for_inference_migration::{get_tts_model_for_inference_migration, TtsModelForInferenceMigration};
+use migration::text_to_speech::get_tts_model_for_enqueue_inference_migration::{get_tts_model_for_enqueue_inference_migration, TtsModelForEnqueueInferenceMigrationWrapper};
 use redis_caching::redis_ttl_cache::RedisTtlCache;
 use redis_common::redis_cache_keys::RedisCacheKeys;
 
@@ -14,14 +14,14 @@ pub async fn get_tts_model_with_caching(
   redis_ttl_cache: &RedisTtlCache,
   mysql_connection: &mut PoolConnection<MySql>,
   use_weights_table: bool,
-) -> AnyhowResult<Option<TtsModelForInferenceMigration>> {
+) -> AnyhowResult<Option<TtsModelForEnqueueInferenceMigrationWrapper>> {
   // NB: Copy due to move. Not a cloned ref due to clippy lint
   let model_token2 = model_token.to_string();
 
   let get_tts_model = move || {
     // NB: async closures are not yet stable in Rust, so we include an async block.
     async move {
-      get_tts_model_for_inference_migration(
+      get_tts_model_for_enqueue_inference_migration(
         &model_token2,
         mysql_connection,
         true,
