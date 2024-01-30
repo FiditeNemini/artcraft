@@ -1,6 +1,6 @@
 import React from "react";
 import { Widget } from "@typeform/embed-react";
-import ls, { get, set } from "local-storage";
+import { get, set } from "local-storage";
 
 export default function TypeformWidget() {
   return (

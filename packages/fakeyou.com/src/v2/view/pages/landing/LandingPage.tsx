@@ -15,8 +15,6 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import "./LandingPage.scss";
-import { Widget } from "@typeform/embed-react";
-import ls, { get, set } from "local-storage";
 import TypeformWidget from "components/common/TypeformWidget";
 // import VstSectionV1 from "./components/VstSectionV1";
 import VstSectionV2 from "./components/VstSectionV2";
