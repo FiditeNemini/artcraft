@@ -108,6 +108,7 @@ import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
 import { FooterNav } from "./nav/FooterNav";
 import FbxToGltfPage from "./pages/fbx_to_gltf/FbxToGltfPage";
 import UploadLoraWeightPage from "./pages/upload/UploadLoraWeightPage";
+import StorytellerFilterPage from "./pages/storyteller_filter/StorytellerFilter";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -807,6 +808,19 @@ class PageContainer extends React.Component<
 
                 <Route path="/video-mocap/:mediaToken?">
                   <VideoMocap
+                    {...{
+                      enqueueInferenceJob: this.props.enqueueInferenceJob,
+                      sessionSubscriptionsWrapper:
+                        this.props.sessionSubscriptionsWrapper,
+                      inferenceJobs: this.props.inferenceJobs,
+                      inferenceJobsByCategory:
+                        this.props.inferenceJobsByCategory,
+                    }}
+                  />
+                </Route>
+
+                <Route path="/storyteller-filter/:mediaToken?">
+                  <StorytellerFilterPage
                     {...{
                       enqueueInferenceJob: this.props.enqueueInferenceJob,
                       sessionSubscriptionsWrapper:

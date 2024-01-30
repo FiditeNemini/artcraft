@@ -22,6 +22,7 @@ import Skeleton from "./Skeleton";
 import Slider from "./Slider";
 import Spinner from "./Spinner";
 import SplitPanel from "./SplitPanel";
+import Tabs from "./Tabs";
 import TempAudioPlayer from "./TempAudioPlayer";
 import TempInput from "./TempInput";
 import TempSelect from "./TempSelect";
@@ -53,6 +54,7 @@ export {
   Slider,
   Spinner,
   SplitPanel,
+  Tabs,
   TempAudioPlayer,
   TempInput,
   TempSelect,
