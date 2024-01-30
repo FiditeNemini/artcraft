@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useSpring, a } from "@react-spring/web";
@@ -6,11 +6,13 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import "./Modal.scss";
 
 interface ModalProps {
-  content: React.ElementType;
+  className?: string;
+  content?: React.ElementType | null;
   contentProps?: any;
   show: boolean;
   handleClose: () => void;
   noHeader?: boolean;
+  omitBody?: boolean;
   onCancel?: (e: React.MouseEvent<HTMLElement>) => any;
   onConfirm?: (e: React.MouseEvent<HTMLElement>) => any;
   title?: string;
@@ -23,12 +25,18 @@ interface ModalProps {
   mobileFullscreen?: boolean;
 }
 
+const ModalBody = ({ children, omitBody, padding }: { children: any, omitBody?: boolean, padding?: boolean }) => omitBody ? children : <div {...{ className: `modal-body ${padding ? "p-3" : ""}` }}>
+  { children }
+</div>;
+
 const Modal: React.FC<ModalProps> = ({
   autoWidth,
+  className,
   content: Content,
   contentProps,
   handleClose,
   noHeader,
+  omitBody,
   onCancel: cancelEvent,
   onConfirm: confirmEvent,
   icon,
@@ -44,6 +52,9 @@ const Modal: React.FC<ModalProps> = ({
     opacity: show ? 1 : 0,
     config: { duration: 80, easing: t => t },
   });
+  const [loaded,loadedSet] = useState(false);
+
+  console.log("🩵",loaded);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -53,6 +64,10 @@ const Modal: React.FC<ModalProps> = ({
       }
     };
 
+    if (!loaded) {
+      loadedSet(true);
+    }
+
     if (show) {
       document.addEventListener("mousedown", handleClickOutside);
     }
@@ -60,7 +75,7 @@ const Modal: React.FC<ModalProps> = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [show, handleClose]);
+  }, [show, handleClose, loaded]);
 
   const onCancel = (e: React.MouseEvent<HTMLElement>) => {
     if (cancelEvent) cancelEvent(e);
@@ -78,7 +93,7 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <a.div style={fadeIn} className="modal-backdrop">
-      <div className="modal" role="dialog">
+      <div {...{ className: `modal${ className ? " " + className : "" }`, role: "dialog" }}>
         <div
           className={`modal-dialog ${
             position === "center" ? "modal-dialog-centered" : ""
@@ -101,9 +116,9 @@ const Modal: React.FC<ModalProps> = ({
                 />
               </header>
             )}
-            <div {...{ className: `modal-body ${padding ? "p-3" : ""}` }}>
-              {Content && <Content {...{ handleClose }} />}
-            </div>
+            <ModalBody {...{ omitBody, padding }}>
+              {Content && <Content {...{ ...contentProps, handleClose }} />}
+            </ModalBody>
             {showButtons && (
               <div className="modal-footer">
                 <Button variant="secondary" label="Cancel" onClick={onCancel} />

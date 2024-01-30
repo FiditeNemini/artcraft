@@ -1,0 +1,29 @@
+.fy-engine-compositor {
+  // margin: 1rem;
+  padding: 1rem;
+
+  .engine-compositor-container {
+    padding: 1rem;
+
+    header {
+      // background: blue;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    h2 { margin-bottom: 0; }
+  }
+  .compositor-content {
+    display: flex;
+    gap: 1rem;
+    // padding: 1rem;
+
+    > * {
+      width: 100%;
+      // background: red;
+     }
+  }
+}

@@ -6,10 +6,9 @@ interface Props {
   debug?: any;
   onChange?: (file: any) => void;
   onClear?: (x?: any) => void;
-  onSubmit?: (file: any) => Promise<boolean | undefined> | Promise<void>;
 }
 
-export default function useFile({ debug, onChange = n, onClear = n, onSubmit = n }: Props) {
+export default function useFile({ debug, onChange = n, onClear = n }: Props) {
   const [file, fileSet] = useState<any>(undefined);
   const [blob, blobSet] = useState<string>();
   const inputRef = useRef<HTMLInputElement>(null);

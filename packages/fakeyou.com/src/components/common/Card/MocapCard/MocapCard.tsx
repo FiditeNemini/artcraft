@@ -13,15 +13,17 @@ import getCardUrl from "../getCardUrl";
 interface ImageCardProps {
   bookmarks: any;
   data: any;
+  onClick?: (e:any) => any;
   ratings: any;
   showCreator?: boolean;
   source?: string;
   type: "media" | "weights";
 }
 
-export default function ImageCard({
+export default function MocapCard({
   bookmarks,
   data,
+  onClick: inClick,
   showCreator,
   source = "",
   ratings,
@@ -35,14 +37,12 @@ export default function ImageCard({
 
   const timeAgo = useTimeAgo(data.created_at);
 
+  const Wrapper = ({ children }: { children: any }) => inClick ? <div {...{ onClick: () => { inClick(data) } }}>{ children }</div> : <Link {...{ to: linkUrl  }}>{ children }</Link>;
+
   // const bucketConfig = new BucketConfig();
 
   return (
-    <Link
-      {...{
-        to: linkUrl
-      }}
-    >
+    <Wrapper>
       <Card padding={false} canHover={true}>
         <FontAwesomeIcon {...{ className: "card-mocap", icon: faPersonWalking }}/>
         <div className="card-img-overlay">
@@ -83,20 +83,11 @@ export default function ImageCard({
                 </div>
               )}
 
-              <div>
-                <LikeButton
-                  {...{
-                    ...ratings.makeProps({
-                      entityToken: data.token,
-                      entityType: "media_file",
-                    }),
-                  }}
-                />
-              </div>
+         
             </div>
           </div>
         </div>
       </Card>
-    </Link>
+    </Wrapper>
   );
 }

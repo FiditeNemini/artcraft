@@ -24,6 +24,7 @@ interface AudioCardProps {
   source?: string;
   type: "media" | "weights";
   inSelectModal?: boolean;
+  onClick?: (e:any) => any; 
   onResultSelect?: () => void;
 }
 
@@ -36,6 +37,7 @@ export default function AudioCard({
   source = "",
   type,
   inSelectModal = false,
+  onClick: inClick,
   onResultSelect,
 }: AudioCardProps) {
   const { setToken, setWeightTitle } = useToken();
@@ -83,11 +85,15 @@ export default function AudioCard({
     }
   }
 
+  const onClick = () => {
+    if (inClick) inClick(data);
+  };
+
   const card = (
     <Card
       padding={true}
       canHover={true}
-      onClick={handleSelectModalResultSelect}
+      onClick={onClick}
     >
       {type === "media" && (
         <>
@@ -163,14 +169,14 @@ export default function AudioCard({
                 <div className="d-flex flex-grow-1">
                   <Badge label={weightBadgeLabel} color={weightBadgeColor} />
                 </div>
-                {inSelectModal ? (
+                {inClick ? (
                   <Button
                     icon={faArrowRight}
                     iconFlip={true}
                     variant="link"
                     label="Select"
                     className="fs-7"
-                    onClick={handleSelectModalResultSelect}
+                    onClick={onClick}
                   />
                 ) : (
                   <Button
@@ -257,7 +263,7 @@ export default function AudioCard({
 
   return (
     <>
-      {inSelectModal ? (
+      {inClick ? (
         <>{card}</>
       ) : (
         <Link

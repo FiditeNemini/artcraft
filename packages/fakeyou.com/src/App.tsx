@@ -62,6 +62,7 @@ import HttpBackend from "i18next-http-backend";
 
 import {
   InferenceJobs,
+  ModalProvider,
   SessionProvider,
 } from "components/providers";
 
@@ -833,6 +834,7 @@ class App extends React.Component<Props, State> {
             */}
 
             <div className="migrationComponentWrapper">
+              <ModalProvider> 
               <InferenceJobs
                 {...{
                   byCategory: this.state.inferenceJobsByCategory,
@@ -955,6 +957,7 @@ class App extends React.Component<Props, State> {
                   </Switch>
                 </SessionProvider>
               </InferenceJobs>
+              </ModalProvider>
             </div>
           </div>
         </div>

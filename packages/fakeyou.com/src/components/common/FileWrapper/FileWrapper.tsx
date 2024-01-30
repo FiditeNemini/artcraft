@@ -7,12 +7,13 @@ interface Props {
   containerClass?: string;
   fileTypes?: string[];
   inputRef: any;
+  noStyle?: boolean;
   onChange: (file?: any) => void;
   panelClass?: string;
   [x:string]: any;
 };
 
-export default function FileWrapper({ children, containerClass, fileTypes = [], inputRef, onChange, panelClass, ...rest }: Props) {
+export default function FileWrapper({ children, containerClass, fileTypes = [], inputRef, noStyle, onChange, panelClass, ...rest }: Props) {
   const id = 'file-input-' + useId();
   const accept = fileTypes.map((type,i) => `.${ type.toLowerCase() }`).join(",");
 
@@ -32,9 +33,12 @@ export default function FileWrapper({ children, containerClass, fileTypes = [], 
     }
   };
 
-  return <div {...{ className: `fy-uploader${ containerClass ? " " + containerClass : "" }`, onDragLeave: onDragEvent(1), onDragOver: onDragEvent(0), onDrop }}>
+  const containerBaseClass = noStyle ? "-no-style" : "";
+  const panelBaseClass = noStyle ? "" : "panel panel-inner d-flex align-items-center";
+
+  return <div {...{ className: `fy-uploader${ containerBaseClass }${ containerClass ? " " + containerClass : "" }`, onDragLeave: onDragEvent(1), onDragOver: onDragEvent(0), onDrop }}>
     <input { ...{ accept, onChange: fileChange, type: "file", id, ref: inputRef, ...rest }} />
-    <label {...{ className: `panel panel-inner d-flex align-items-center${ panelClass ? " " + panelClass : "" }`, htmlFor: id }} >
+    <label {...{ className: `${ panelBaseClass }${ panelClass ? " " + panelClass : "" }`, htmlFor: id }} >
       { children }
     </label>
   </div>;

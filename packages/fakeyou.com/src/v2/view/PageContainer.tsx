@@ -97,6 +97,7 @@ import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVo
 import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
 import DevUpload from "./pages/dev_upload/DevUpload";
+import EngineCompositor from "./pages/EngineCompositor";
 import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
 import WeightPage from "./pages/weight/WeightPage";
@@ -207,7 +208,6 @@ class PageContainer extends React.Component<
   constructor(props: Props & RouteComponentProps) {
     super(props);
 
-  console.log("💰",);
     this.state = {};
   }
 
@@ -759,6 +759,10 @@ class PageContainer extends React.Component<
                   inferenceJobsByCategory={this.props.inferenceJobsByCategory}
                   ttsInferenceJobs={this.props.ttsInferenceJobs}
                 />
+              </Route>
+
+              <Route path="/engine-compositor">
+                <EngineCompositor />
               </Route>
 
               <Route path="/voice-designer">

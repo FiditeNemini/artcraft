@@ -14,6 +14,7 @@ interface Props {
   pagePreset?: number;
   requestList?: boolean;
   urlParam: string;
+  urlUpdate?: boolean;
 }
 
 const n = () => {};
@@ -30,6 +31,7 @@ export default function useListContent({
   pagePreset = 0,
   requestList = false,
   urlParam = "",
+  urlUpdate = true
 }: Props) {
   const { pathname, search: locSearch } = useLocation();
   const history = useHistory();
@@ -76,7 +78,7 @@ export default function useListContent({
       if (status === FetchStatus.ready) {
         let search = new URLSearchParams(queries).toString();
         statusSet(FetchStatus.in_progress);
-        history.replace({ pathname, search });
+        if (urlUpdate) history.replace({ pathname, search });
         fetcher(urlParam,{},queries).then((res: any) => {
           if (debug)
             console.log(`🪲 useListContent success debug at: ${debug}`, res);
@@ -101,6 +103,7 @@ export default function useListContent({
     sort,
     status,
     urlParam,
+    urlUpdate
   ]);
 
   return {

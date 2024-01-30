@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { SessionContext } from 'context';
+import { ModalContext } from 'context';
 
 export default function useInferenceJobs() {
-  return useContext(SessionContext);
+  return useContext(ModalContext);
 };
