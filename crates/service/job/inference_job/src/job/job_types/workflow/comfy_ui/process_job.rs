@@ -1,5 +1,5 @@
 use std::fs::read_to_string;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use anyhow::anyhow;
@@ -7,6 +7,7 @@ use jsonpath_lib::replace_with;
 use log::{error, info, warn};
 use serde::de::Error;
 use serde_json::Value;
+use walkdir::WalkDir;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
@@ -35,6 +36,16 @@ use crate::job_dependencies::JobDependencies;
 pub struct ComfyProcessJobArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
     pub job: &'a AvailableInferenceJob,
+}
+
+fn recursively_delete_files_in(path: &Path) -> std::io::Result<()> {
+    for entry in WalkDir::new(path) {
+        let entry = entry?;
+        if entry.path().is_file() {
+            safe_delete_temp_file(entry.path());
+        }
+    }
+    Ok(())
 }
 
 pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -69,6 +80,40 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .scoped_temp_dir_creator_for_work
         .new_tempdir(&work_temp_dir)
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
+
+    // ===================== DOWNLOAD REQUIRED MODELS IF NOT EXIST ===================== //
+
+    let all_models = &args.job_dependencies.job.job_specific_dependencies.maybe_comfy_ui_dependencies;
+    match all_models {
+        Some(models) => {
+            for model in &models.dependency_tokens.comfy {
+                let mut comfy_dir = model_dependencies.inference_command.comfy_root_code_directory.clone();
+                comfy_dir = comfy_dir.join(model.location.clone());
+                if !comfy_dir.exists() {
+                    let bucket_details = RemoteCloudBucketDetails {
+                        object_hash: model.hash.clone(),
+                        prefix: model.prefix.clone(),
+                        suffix: model.extension.clone(),
+                    };
+                    let comfy_path = comfy_dir.to_str().unwrap().to_string();
+                    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;
+                    let remote_cloud_file_client = match remote_cloud_file_client {
+                        Ok(res) => {
+                            res
+                        }
+                        Err(_) => {
+                            return Err(ProcessSingleJobError::from(anyhow!("failed to get remote cloud file client")));
+                        }
+                    };
+                    remote_cloud_file_client.download_file(bucket_details, comfy_path.clone()).await?;
+                    info!("Downloaded model to {:?}", comfy_path);
+                }
+            }
+        }
+        None => {
+            info!("No models specified to download")
+        }
+    }
 
 
     // ==================== QUERY AND DOWNLOAD FILES ==================== //
@@ -217,20 +262,35 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ==================== RUN INFERENCE SCRIPT ==================== //
     let stderr_output_file = work_temp_dir.path().join("stderr.txt");
+    let stdout_output_file = work_temp_dir.path().join("stdout.txt");
+
     let inference_start_time = Instant::now();
 
     let command_exit_status = model_dependencies
         .inference_command
         .execute_inference(InferenceArgs {
             stderr_output_file: &stderr_output_file,
+            stdout_output_file: &stdout_output_file,
         });
 
     let inference_duration = Instant::now().duration_since(inference_start_time);
 
     info!("Inference took duration to complete: {:?}", &inference_duration);
 
-    if !command_exit_status.is_success() {
+    // ==================== GET OUTPUT FILE ======================== //
+    let mut output_file = root_comfy_path.join("output");
+    output_file = output_file.join(job_args.output_path);
+
+    // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
+
+    // check stdout for success and check if file exists
+    let stdout_output = read_to_string(&stdout_output_file).unwrap();
+    // check for "Prompt executed" in stdout (comfyui only outputs this for success)
+    if !stdout_output.contains("Prompt executed") || check_file_exists(&output_file).is_err() {
         error!("Inference failed: {:?}", command_exit_status);
+
+        error!("Captured stdout output: {}", stdout_output);
+        error!("Captured stderr output: {}", read_to_string(&stderr_output_file).unwrap());
 
         let error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
 
@@ -239,6 +299,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
 
         safe_delete_temp_file(&stderr_output_file);
+        safe_delete_temp_file(&stdout_output_file);
         safe_delete_temp_directory(&work_temp_dir);
         safe_delete_temp_file(&workflow_path);
         if let Some(sd_path) = maybe_sd_path {
@@ -250,17 +311,11 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         if let Some(input_path) = maybe_input_path {
             safe_delete_temp_file(&input_path);
         }
+        let output_dir = root_comfy_path.join("output");
+        recursively_delete_files_in(&output_dir).unwrap();
 
         return Err(error);
     }
-
-    // ==================== GET OUTPUT FILE ======================== //
-    let mut output_file = root_comfy_path.join("output");
-    output_file = output_file.join(job_args.output_path);
-
-    // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
-    info!("Checking that file exists: {:?} ...", output_file);
-    check_file_exists(&output_file).map_err(|e| ProcessSingleJobError::Other(e))?;
 
     info!("Interrogating result file size ...");
 
@@ -330,6 +385,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     // ==================== DELETE TEMP FILES ==================== //
 
     safe_delete_temp_file(&stderr_output_file);
+    safe_delete_temp_file(&stdout_output_file);
     safe_delete_temp_file(&workflow_path);
     if let Some(sd_path) = maybe_sd_path {
         safe_delete_temp_file(&sd_path);
@@ -341,15 +397,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         safe_delete_temp_file(&input_path);
     }
 
-    // delete all files in output directory
     let output_dir = root_comfy_path.join("output");
-    let entries: Vec<PathBuf> = std::fs::read_dir(output_dir).unwrap()
-        .map(|res| res.map(|e| e.path()))
-        .collect::<Result<Vec<_>, std::io::Error>>()
-        .unwrap();
-    for entry in entries {
-        safe_delete_temp_file(&entry);
-    }
+    recursively_delete_files_in(&output_dir).unwrap();
 
     // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
     safe_delete_temp_directory(&work_temp_dir);

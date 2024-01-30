@@ -83,3 +83,4 @@ time = "0.3.30"
 mime = "0.3.17"
 rand = { version = "0.8.5", features = [] }
 jsonpath_lib = "0.3.0"
+walkdir = "2.4.0"

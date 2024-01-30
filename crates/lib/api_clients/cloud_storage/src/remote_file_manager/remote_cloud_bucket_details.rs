@@ -31,7 +31,12 @@ impl RemoteCloudBucketDetails {
         match self.prefix.as_str() {
             // Weights
             "loRA" => Box::new(weights_descriptor::WeightsLoRADescriptor {}),
-            "sd15" => Box::new(weights_descriptor::WeightsSD15Descriptor {}),
+            "sd15" =>
+                match self.suffix.as_str() {
+                    "safetensors" => Box::new(weights_descriptor::WeightsSD15Descriptor {}),
+                    "ckpt" => Box::new(weights_descriptor::WeightsSD15CkptDescriptor {}),
+                    _ => panic!("Unknown suffix: {}",self.suffix)
+                },
             "sdxl" => Box::new(weights_descriptor::WeightsSDXLDescriptor {}),
             "valle_prompt" => Box::new(weights_descriptor::WeightsVallePromptDescriptor {}),
             "rvc" => {

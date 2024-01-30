@@ -43,7 +43,7 @@ pub async fn seed_test_videos(mysql_pool: &Pool<MySql>, user_token: UserToken) -
 }
 
 pub async fn seed_media_seedtool(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
-    info!("Seeding weights...");
+    info!("Seeding media...");
 
     let user_token = match get_user_token_by_username(HANASHI_USERNAME, mysql_pool).await? {
         None => {
