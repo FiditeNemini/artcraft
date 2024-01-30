@@ -60,10 +60,7 @@ import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import HttpBackend from "i18next-http-backend";
 
-import {
-  InferenceJobs,
-  SessionProvider,
-} from "components/providers";
+import { InferenceJobs, SessionProvider } from "components/providers";
 
 // NB: We're transitioning over to this instance of i18n-next that loads translations over HTTP from Json Files.
 // The old i18n-next instance (see below) bakes in translations into the compiled javascript blob.
@@ -207,6 +204,7 @@ function initInferenceJobsByCategoryMap(): Map<
   );
   inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceDesignerTts, []);
   inferenceJobsByCategory.set(FrontendInferenceJobType.VideoMotionCapture, []);
+  inferenceJobsByCategory.set(FrontendInferenceJobType.ConvertFbxtoGltf, []);
   return inferenceJobsByCategory;
 }
 
@@ -404,11 +402,11 @@ class App extends React.Component<Props, State> {
         Accept: "application/json",
       },
     })
-      .then((_raw_response) => {
+      .then(_raw_response => {
         this.querySession();
         this.querySessionSubscriptions();
       })
-      .catch((e) => {
+      .catch(e => {
         /* Ignore. */
       });
   };
@@ -451,7 +449,7 @@ class App extends React.Component<Props, State> {
     if (GetModelInferenceJobStatusIsOk(lookupResult)) {
       let updatedJobs: Array<InferenceJob> = [];
 
-      this.state.inferenceJobs.forEach((existingJob) => {
+      this.state.inferenceJobs.forEach(existingJob => {
         if (
           existingJob.jobToken !== lookupResult.state!.job_token ||
           !jobStateCanChange(existingJob.jobState)
@@ -511,8 +509,8 @@ class App extends React.Component<Props, State> {
         Accept: "application/json",
       },
     })
-      .then((res) => res.json())
-      .then((response) => {
+      .then(res => res.json())
+      .then(response => {
         const jobResponse: TtsInferenceJobStateResponsePayload = response;
 
         if (jobResponse === undefined || jobResponse.state === undefined) {
@@ -521,7 +519,7 @@ class App extends React.Component<Props, State> {
 
         let updatedJobs: Array<TtsInferenceJob> = [];
 
-        this.state.ttsInferenceJobs.forEach((existingJob) => {
+        this.state.ttsInferenceJobs.forEach(existingJob => {
           if (
             existingJob.jobToken !== jobResponse.state!.job_token ||
             !jobStateCanChange(existingJob.jobState)
@@ -538,7 +536,7 @@ class App extends React.Component<Props, State> {
           ttsInferenceJobs: updatedJobs,
         });
       })
-      .catch((e) => {
+      .catch(e => {
         /* Ignore. */
       });
   };
@@ -563,8 +561,8 @@ class App extends React.Component<Props, State> {
         Accept: "application/json",
       },
     })
-      .then((res) => res.json())
-      .then((response) => {
+      .then(res => res.json())
+      .then(response => {
         const jobResponse: TtsModelUploadJobStateResponsePayload = response;
 
         if (jobResponse === undefined || jobResponse.state === undefined) {
@@ -572,7 +570,7 @@ class App extends React.Component<Props, State> {
         }
 
         let updatedJobs: Array<TtsModelUploadJob> = [];
-        this.state.ttsModelUploadJobs.forEach((existingJob) => {
+        this.state.ttsModelUploadJobs.forEach(existingJob => {
           if (
             existingJob.jobToken !== jobResponse.state!.job_token ||
             !jobStateCanChange(existingJob.jobState)
@@ -589,7 +587,7 @@ class App extends React.Component<Props, State> {
           ttsModelUploadJobs: updatedJobs,
         });
       })
-      .catch((e) => {
+      .catch(e => {
         /* Ignore. */
       });
   };
@@ -614,8 +612,8 @@ class App extends React.Component<Props, State> {
         Accept: "application/json",
       },
     })
-      .then((res) => res.json())
-      .then((response) => {
+      .then(res => res.json())
+      .then(response => {
         const jobResponse: W2lInferenceJobStateResponsePayload = response;
 
         if (jobResponse === undefined || jobResponse.state === undefined) {
@@ -623,7 +621,7 @@ class App extends React.Component<Props, State> {
         }
 
         let updatedJobs: Array<W2lInferenceJob> = [];
-        this.state.w2lInferenceJobs.forEach((existingJob) => {
+        this.state.w2lInferenceJobs.forEach(existingJob => {
           if (
             existingJob.jobToken !== jobResponse.state!.job_token ||
             !jobStateCanChange(existingJob.jobState)
@@ -640,7 +638,7 @@ class App extends React.Component<Props, State> {
           w2lInferenceJobs: updatedJobs,
         });
       })
-      .catch((e) => {
+      .catch(e => {
         /* Ignore. */
       });
   };
@@ -665,8 +663,8 @@ class App extends React.Component<Props, State> {
         Accept: "application/json",
       },
     })
-      .then((res) => res.json())
-      .then((response) => {
+      .then(res => res.json())
+      .then(response => {
         const jobResponse: W2lTemplateUploadJobStateResponsePayload = response;
 
         if (jobResponse === undefined || jobResponse.state === undefined) {
@@ -675,7 +673,7 @@ class App extends React.Component<Props, State> {
 
         let updatedJobs: Array<W2lTemplateUploadJob> = [];
 
-        this.state.w2lTemplateUploadJobs.forEach((existingJob) => {
+        this.state.w2lTemplateUploadJobs.forEach(existingJob => {
           if (
             existingJob.jobToken !== jobResponse.state!.job_token ||
             !jobStateCanChange(existingJob.jobState)
@@ -694,7 +692,7 @@ class App extends React.Component<Props, State> {
           w2lTemplateUploadJobs: updatedJobs,
         });
       })
-      .catch((e) => {
+      .catch(e => {
         /* Ignore. */
       });
   };
@@ -714,7 +712,7 @@ class App extends React.Component<Props, State> {
     if (GetRemoteDownloadJobStatusIsOk(lookupResult)) {
       let updatedJobs: Array<VocoderUploadJob> = [];
 
-      this.state.vocoderUploadJobs.forEach((existingJob) => {
+      this.state.vocoderUploadJobs.forEach(existingJob => {
         if (
           existingJob.jobToken !== lookupResult.state!.job_token ||
           !jobStateCanChange(existingJob.jobState)
@@ -748,7 +746,7 @@ class App extends React.Component<Props, State> {
     if (GetRemoteDownloadJobStatusIsOk(lookupResult)) {
       let updatedJobs: Array<VocoderUploadJob> = [];
 
-      this.state.voiceConversionModelUploadJobs.forEach((existingJob) => {
+      this.state.voiceConversionModelUploadJobs.forEach(existingJob => {
         if (
           existingJob.jobToken !== lookupResult.state!.job_token ||
           !jobStateCanChange(existingJob.jobState)
@@ -770,37 +768,37 @@ class App extends React.Component<Props, State> {
   };
 
   pollJobs = () => {
-    this.state.inferenceJobs.forEach((job) => {
+    this.state.inferenceJobs.forEach(job => {
       if (jobStateCanChange(job.jobState)) {
         this.checkInferenceJob(job.jobToken);
       }
     });
-    this.state.ttsInferenceJobs.forEach((job) => {
+    this.state.ttsInferenceJobs.forEach(job => {
       if (jobStateCanChange(job.jobState)) {
         this.checkTtsJob(job.jobToken);
       }
     });
-    this.state.w2lInferenceJobs.forEach((job) => {
+    this.state.w2lInferenceJobs.forEach(job => {
       if (jobStateCanChange(job.jobState)) {
         this.checkW2lJob(job.jobToken);
       }
     });
-    this.state.ttsModelUploadJobs.forEach((job) => {
+    this.state.ttsModelUploadJobs.forEach(job => {
       if (jobStateCanChange(job.jobState)) {
         this.checkTtsModelUploadJob(job.jobToken);
       }
     });
-    this.state.w2lTemplateUploadJobs.forEach((job) => {
+    this.state.w2lTemplateUploadJobs.forEach(job => {
       if (jobStateCanChange(job.jobState)) {
         this.checkW2lTemplateUploadJob(job.jobToken);
       }
     });
-    this.state.vocoderUploadJobs.forEach((job) => {
+    this.state.vocoderUploadJobs.forEach(job => {
       if (jobStateCanChange(job.jobState)) {
         this.checkVocoderUploadJob(job.jobToken);
       }
     });
-    this.state.voiceConversionModelUploadJobs.forEach((job) => {
+    this.state.voiceConversionModelUploadJobs.forEach(job => {
       if (jobStateCanChange(job.jobState)) {
         this.checkVoiceConversionModelUploadJob(job.jobToken);
       }
@@ -843,7 +841,7 @@ class App extends React.Component<Props, State> {
                     querySession: this.querySession,
                     querySubscriptions: this.querySessionSubscriptions,
                     sessionWrapper: this.state.sessionWrapper,
-                    sessionFetched: this.state.sessionFetched
+                    sessionFetched: this.state.sessionFetched,
                   }}
                 >
                   <Switch>

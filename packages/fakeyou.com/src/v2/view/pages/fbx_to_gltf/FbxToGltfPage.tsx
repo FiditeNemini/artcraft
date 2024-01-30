@@ -14,6 +14,11 @@ import { v4 as uuidv4 } from "uuid";
 import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadMedia";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import FbxToGltfJobList from "./components/FbxToGltfJobList";
+import {
+  EnqueueFbxToGltf,
+  EnqueueFbxToGltfIsSuccess,
+  EnqueueFbxToGltfIsError,
+} from "@storyteller/components/src/api/file_conversion/EnqueueFbxToGltf";
 
 interface FbxToGltfPageProps {
   enqueueInferenceJob: (
@@ -32,11 +37,15 @@ export default function FbxToGltfPage({
     mediaToken: mediaToken ?? undefined,
   });
   const fileProps = useFile({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isWorking, setIsWorking] = useState(false);
 
   const { inferenceJobs } = useInferenceJobs(
-    FrontendInferenceJobType.VideoMotionCapture
+    FrontendInferenceJobType.ConvertFbxtoGltf
   );
   const hasConversionJobs = inferenceJobs && inferenceJobs.length > 0;
+
+  console.log("inferenceJobs", inferenceJobs);
 
   useEffect(() => {
     // If there's a mediaToken, automatically prepare the file for conversion
@@ -50,14 +59,6 @@ export default function FbxToGltfPage({
     history.push("/fbx-to-gltf");
   };
 
-  async function EnqueueFbxToGltf(file: any) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        console.log("EnqueueFbxToGltf", file);
-      }, 1000);
-    });
-  }
-
   const makeFBXUploadRequest = () => ({
     uuid_idempotency_token: uuidv4(),
     file: fileProps.file,
@@ -69,57 +70,75 @@ export default function FbxToGltfPage({
     try {
       const res = await UploadMedia(makeFBXUploadRequest());
       if (res.success && res.media_file_token) {
-        return { upload_token: res.upload_token };
+        return { upload_token: res.media_file_token };
       }
-      // Handle failure scenario - perhaps throw an error or return a specific result
       console.error("Upload failed:", res);
       return null;
     } catch (error) {
       console.error("Error in upload:", error);
-      // Handle the error appropriately
       return null;
     }
   };
 
-  const EnqueueConvert = async (params: any) => {
-    let request: any = {
-      uuid_idempotency_token: uuidv4(),
-      file_source: undefined,
-      upload_token: params.upload_token,
-    };
-
-    const response = await EnqueueFbxToGltf(request);
-
-    console.log("Response: ", response);
-
-    // if (response.inference_job_token) {
-    //   enqueueInferenceJob(
-    //     response.inference_job_token,
-    //     FrontendInferenceJobType.ConvertFbxtoGltf
-    //   );
-    // }
-  };
-
-  const uploadAndConvert = async () => {
+  const submit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    setIsWorking(true);
     try {
-      const uploadResponse = await handleUploadFBX();
-      if (uploadResponse && uploadResponse.upload_token) {
-        await EnqueueConvert({
-          upload_token: uploadResponse.upload_token,
-        });
+      let uploadToken = mediaToken;
+
+      // If no media token, upload the file first
+      if (!mediaToken && fileProps.file) {
+        const uploadResponse = await handleUploadFBX();
+        if (uploadResponse && uploadResponse.upload_token) {
+          uploadToken = uploadResponse.upload_token;
+        } else {
+          console.error("Failed to upload file. Response:", uploadResponse);
+          throw new Error("File upload failed");
+        }
+      }
+
+      // Enqueue the conversion job
+      if (uploadToken) {
+        await EnqueueConvert({ upload_token: uploadToken });
+      } else {
+        console.error("No upload token available for conversion");
       }
     } catch (error) {
-      console.error("Error uploading file: ", error);
-      // Handle upload error
+      console.error("Error in submit process: ", error);
+    } finally {
+      setIsWorking(false);
+      setIsSubmitting(false);
     }
   };
 
-  const submit = async () => {
-    if (mediaToken && presetFile) {
-      EnqueueConvert({ upload_token: mediaToken });
-    } else if (fileProps.file) {
-      await uploadAndConvert();
-    } else {
+  const EnqueueConvert = async ({ upload_token }: any) => {
+    if (!upload_token) return false;
+
+    try {
+      let request = {
+        uuid_idempotency_token: uuidv4(),
+        file_source: undefined,
+        media_file_token: upload_token,
+      };
+
+      const response = await EnqueueFbxToGltf(request);
+
+      if (EnqueueFbxToGltfIsSuccess(response)) {
+        console.log("Enqueue successful");
+
+        if (response && response.inference_job_token) {
+          enqueueInferenceJob(
+            response.inference_job_token,
+            FrontendInferenceJobType.ConvertFbxtoGltf
+          );
+        }
+        return true;
+      } else if (EnqueueFbxToGltfIsError(response)) {
+        throw new Error("Enqueue failed");
+      }
+    } catch (error) {
+      console.error("Error in enqueueing conversion: ", error);
       return false;
     }
   };
@@ -179,7 +198,8 @@ export default function FbxToGltfPage({
               icon={faArrowRightArrowLeft}
               label="Convert to glTF"
               onClick={submit}
-              disabled={!fileProps.file}
+              disabled={!mediaToken && !fileProps.file}
+              isLoading={isWorking}
             />
           </div>
         </div>
