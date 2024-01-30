@@ -1,6 +1,6 @@
 import SelectModal from "components/common/SelectModal/SelectModal";
 import React, {useState} from "react";
-import { states, Action, State } from "../videoMocapReducer";
+import { Action, State } from "../videoMocapReducer";
 import { Button } from "components/common";
 
 export default function TabContentLibrary({
