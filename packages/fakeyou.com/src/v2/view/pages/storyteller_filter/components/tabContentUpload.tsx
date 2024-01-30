@@ -3,18 +3,19 @@ import { v4 as uuidv4 } from "uuid";
 
 import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadMedia";
 import { useFile } from "hooks";
-
-import VideoInput from "components/common/VideoInput";
+import { ErrorMessage, VideoInput, Spinner } from "components/common";
 import { states, Action, State } from "../storytellerFilterReducer";
 
-export default function TabContentUpload({t, pageState, dispatchPageState}: {
+export default function TabContentUpload({
+  debug=false, t, pageState, dispatchPageState
+}: {
+  debug?: boolean;
   t: Function;
   pageState: State;
   dispatchPageState: (action: Action) => void;
 }) {
   const videoProps = useFile({});
-  const {NO_FILE, FILE_STAGED} = states;
-
+  const {NO_FILE, FILE_STAGED, FILE_UPLOADING} = states;
 
   const makeVideoUploadRequest = () => ({
     uuid_idempotency_token: uuidv4(),
@@ -73,12 +74,17 @@ export default function TabContentUpload({t, pageState, dispatchPageState}: {
         </div>
       </>
     );
-  }
-  return (
+  }else if (pageState.status === FILE_UPLOADING){
+    return(
       <div className="row">
         <div className="col-12">
-          <h1>{t("message.UnknownError")}</h1>
+          <h1>{t("message.fileUploading")}</h1>
+        </div>
+        <div className="col-12">
+          <Spinner />
         </div>
       </div>
-  );
+    );
+  }
+  return <ErrorMessage />;
 }
