@@ -150,6 +150,7 @@ export default function WeightPage({
           <div className="d-flex flex-column gap-3">
             <SdCoverImagePanel src={sdCoverImage} />
             <SdInferencePanel
+              sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
               sd_model_token={weight.weight_token}
               enqueueInferenceJob={enqueueInferenceJob}
             />

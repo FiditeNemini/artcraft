@@ -3,7 +3,7 @@ import React from "react";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Container, Panel } from "components/common";
-import PageHeader from "components/layout/PageHeader";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 
 interface Props {}
 
@@ -106,9 +106,11 @@ function AboutPage(props: Props) {
 
   return (
     <Container type="panel" className="mb-5">
-      <PageHeader
+      <PageHeaderWithImage
         title="About Us"
         subText="We're building FakeYou as just one component of a broad set of production and creative tooling."
+        headerImage="/mascot/kitsune_pose3.webp"
+        yOffset="85%"
       />
       <Panel padding={true} mb={true}>
         <h2 className="mb-3 fw-bold">Lorem Ipsum</h2>

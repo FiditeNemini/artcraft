@@ -29,11 +29,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBarsStaggered,
   faDeleteLeft,
-  faVolumeHigh,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { TtsPageHero } from "./TrumpTtsPageHero";
 import { Analytics } from "../../../../../common/Analytics";
 import {
   GetComputedTtsCategoryAssignments,
@@ -47,6 +45,8 @@ import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocum
 import { SearchOmnibar } from "./search/SearchOmnibar";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
+import { faVolumeHigh } from "@fortawesome/pro-solid-svg-icons";
 
 const PAGE_MODEL_TOKENS = new Set<string>([
   "TM:pmd1wm3kf6az", // Development: "Fake Donald Trump #1"
@@ -164,7 +164,7 @@ function TrumpTtsPage(props: Props) {
         //    featuredModels[Math.floor(Math.random() * featuredModels.length)];
         //}
 
-        let trumpModels = models.filter((model) => {
+        let trumpModels = models.filter(model => {
           return PAGE_MODEL_TOKENS.has(model.model_token);
         });
 
@@ -195,20 +195,19 @@ function TrumpTtsPage(props: Props) {
         "SYNTHETIC_CATEGORY:TRENDING_MODELS";
 
       let maybeLatestCategory = categories.find(
-        (category) => category.category_token === LATEST_MODELS_CATEGORY_TOKEN
+        category => category.category_token === LATEST_MODELS_CATEGORY_TOKEN
       );
 
       let maybeTrendingCategory = categories.find(
-        (category) => category.category_token === TRENDING_MODELS_CATEGORY_TOKEN
+        category => category.category_token === TRENDING_MODELS_CATEGORY_TOKEN
       );
 
       let otherCategories = categories
         .filter(
-          (category) => category.category_token !== LATEST_MODELS_CATEGORY_TOKEN
+          category => category.category_token !== LATEST_MODELS_CATEGORY_TOKEN
         )
         .filter(
-          (category) =>
-            category.category_token !== TRENDING_MODELS_CATEGORY_TOKEN
+          category => category.category_token !== TRENDING_MODELS_CATEGORY_TOKEN
         );
 
       categories = [];
@@ -363,7 +362,7 @@ function TrumpTtsPage(props: Props) {
     );
   }
 
-  let trumpModels = props.ttsModels.filter((model) => {
+  let trumpModels = props.ttsModels.filter(model => {
     return PAGE_MODEL_TOKENS.has(model.model_token);
   });
 
@@ -380,9 +379,12 @@ function TrumpTtsPage(props: Props) {
 
   return (
     <div>
-      <TtsPageHero
-        sessionWrapper={props.sessionWrapper}
-        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+      <PageHeaderWithImage
+        headerImage="/mascot/trump.webp"
+        titleIcon={faVolumeHigh}
+        title="Donald Trump TTS"
+        subText="FakeYou has the very best Donald Trump AI voice on the internet. Use deep
+        fake Donald Trump to say your favorite memes."
       />
 
       <div className="container-panel pb-5 mb-4">

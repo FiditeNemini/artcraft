@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { faVolume } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import { PageHeaderWithImage } from "v2/view/_common/PageHeaderWithImage";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { Panel } from "v2/view/_common/Panel";
 import { motion } from "framer-motion";
 import { container } from "data/animation";
@@ -55,10 +53,8 @@ function GenerateSpeechPage() {
     <motion.div initial="hidden" animate="visible" variants={container}>
       <PageHeaderWithImage
         headerImage="/mascot/kitsune_pose2.webp"
-        titleIcon={<FontAwesomeIcon icon={faVolume} className="me-3" />}
         title={<>Generate Speech</>}
         subText={<>Generate text to speech with your favorites characters</>}
-        showButtons={false}
       />
 
       <Panel padding>

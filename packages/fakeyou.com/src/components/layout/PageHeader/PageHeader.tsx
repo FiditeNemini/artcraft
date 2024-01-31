@@ -67,7 +67,9 @@ export default function PageHeader({
   secondaryButtonOnClick,
 }: PageHeaderProps) {
   const icon = (
-    <>{titleIcon && <FontAwesomeIcon icon={titleIcon} className="me-3" />}</>
+    <>
+      {titleIcon && <FontAwesomeIcon icon={titleIcon} className="me-3 fs-2" />}
+    </>
   );
 
   const buttonProps = {
@@ -116,8 +118,8 @@ export default function PageHeader({
                 {titleH2 ? (
                   <h2 className="fw-bold">{title}</h2>
                 ) : (
-                  <h1 className="fw-bold">
-                    {/* {icon} */}
+                  <h1 className="fw-bold d-flex align-items-center">
+                    {icon}
                     {title}
                   </h1>
                 )}

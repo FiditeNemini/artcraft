@@ -1,24 +1,26 @@
 import SelectModal from "components/common/SelectModal/SelectModal";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Action, State } from "../videoMocapReducer";
 import { Button } from "components/common";
 
 export default function TabContentLibrary({
-  t, pageState, dispatchPageState
+  t,
+  pageState,
+  dispatchPageState,
 }: {
   t: Function;
   pageState: State;
   dispatchPageState: (action: Action) => void;
-}){
-  const [token, setToken] = useState<string|undefined>();
-  const handleProceed = ()=>{
-    if(token)
+}) {
+  const [token, setToken] = useState<string | undefined>();
+  const handleProceed = () => {
+    if (token)
       dispatchPageState({
         type: "selectedFile",
-        payload: {mediaFileToken: token}
+        payload: { mediaFileToken: token },
       });
-  }
-  const handleOnSelect = (token:string)=>{
+  };
+  const handleOnSelect = (token: string) => {
     setToken(token);
   };
 
@@ -38,12 +40,7 @@ export default function TabContentLibrary({
           },
         ]}
       />
-      {token && 
-        <Button 
-          label={t("button.proceed")}
-          onClick={handleProceed}
-        />
-      }
+      {token && <Button label={t("button.proceed")} onClick={handleProceed} />}
     </div>
   );
 }

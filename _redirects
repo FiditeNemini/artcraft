@@ -48,6 +48,7 @@
 /voice-designer*   /index.html   200
 /w2l*   /index.html   200
 /weight*   /index.html   200
+/text-to-image*   /index.html   200
 
 # Test paths
 /dev-tts*   /index.html   200
