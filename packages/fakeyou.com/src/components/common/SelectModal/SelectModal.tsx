@@ -12,7 +12,7 @@ import SelectWeightsList from "./SelectWeightsList";
 interface TabConfig {
   label: string;
   tabKey: string;
-  type?: "media" | "weights";
+  type: "media" | "weights";
   weightTypeFilter?: string;
   mediaTypeFilter?: string;
   searcher?: boolean;
@@ -21,11 +21,18 @@ interface SelectModalProps {
   label?: string;
   tabs: TabConfig[];
   modalTitle?: string;
-  onSelect?: (token: string)=>void;
+  onSelect?: (token: string) => void;
+  required?: boolean;
 }
 
 const SelectModal = memo(
-  ({ label, tabs, modalTitle = "Select", onSelect }: SelectModalProps) => {
+  ({
+    label,
+    tabs,
+    modalTitle = "Select",
+    onSelect,
+    required,
+  }: SelectModalProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { token, setToken, weightTitle, setWeightTitle } = useToken();
     const [selectedValue, setSelectedValue] = useState("");
@@ -41,18 +48,21 @@ const SelectModal = memo(
     useEffect(() => {
       const currentTab = tabs.find(tab => tab.tabKey === activeTab);
       setMediaType(currentTab?.mediaTypeFilter || "all");
-      setWeightType(currentTab?.mediaTypeFilter || "all");
+      setWeightType(currentTab?.weightTypeFilter || "all");
     }, [activeTab, tabs]);
 
-    useEffect(()=>{
-      if(token && token !== selectedValue && onSelect){
+    useEffect(() => {
+      if (token && token !== selectedValue && onSelect) {
         setSelectedValue(token);
         onSelect(token);
-      }else if(weightTitle && weightTitle !== selectedValue && onSelect){
+      } else if (weightTitle && weightTitle !== selectedValue && onSelect) {
         setSelectedValue(weightTitle);
         onSelect(weightTitle);
       }
-    }, [token, weightTitle, selectedValue, onSelect]);
+
+      console.log("token", token, "weightTitle", weightTitle);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token, weightTitle]);
 
     const openModal = () => {
       setIsModalOpen(true);
@@ -101,7 +111,11 @@ const SelectModal = memo(
     return (
       <>
         <div>
-          {label && <label className="sub-title">{label}</label>}
+          {label && (
+            <label className={`sub-title ${required && "required"}`.trim()}>
+              {label}
+            </label>
+          )}
 
           <div className="d-flex gap-2">
             <Input

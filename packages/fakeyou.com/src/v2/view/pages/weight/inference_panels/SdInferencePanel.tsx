@@ -2,6 +2,7 @@ import React, { useRef, useState, memo } from "react";
 import {
   Button,
   Input,
+  Label,
   NumberSlider,
   Panel,
   SegmentButtons,
@@ -28,19 +29,26 @@ import PremiumLock from "components/PremiumLock";
 
 interface SdInferencePanelProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  sd_model_token: string;
+  sd_model_token?: string;
   enqueueInferenceJob: (
     jobToken: string,
     frontendInferenceJobType: FrontendInferenceJobType
   ) => void;
+  isStandalone?: boolean;
 }
 
 function SdInferencePanel({
   enqueueInferenceJob,
   sd_model_token,
   sessionSubscriptionsWrapper,
+  isStandalone = false,
 }: SdInferencePanelProps) {
   const [loraToken, setLoraToken] = useState<string | null>(null);
+  const [weightToken, setWeightToken] = useState(sd_model_token);
+
+  const handleOnWeightSelect = (token: string) => {
+    setWeightToken(token);
+  };
 
   const handleOnSelect = (token: string) => {
     setLoraToken(token);
@@ -226,7 +234,7 @@ function SdInferencePanel({
   ) => {
     ev.preventDefault();
 
-    if (!prompt) {
+    if (!prompt || weightToken === undefined) {
       return false;
     }
 
@@ -243,7 +251,7 @@ function SdInferencePanel({
 
     const request = {
       uuid_idempotency_token: uuidv4(),
-      maybe_sd_model_token: sd_model_token,
+      maybe_sd_model_token: isStandalone ? weightToken : sd_model_token,
       maybe_lora_model_token: loraToken,
       maybe_prompt: prompt,
       maybe_n_prompt: negativePrompt,
@@ -282,6 +290,31 @@ function SdInferencePanel({
       <h4 className="fw-semibold mb-4">Generate an Image</h4>
 
       <div className="d-flex flex-column gap-3 mb-4">
+        {isStandalone && (
+          <SelectModal
+            required={true}
+            modalTitle="Select a Weight"
+            label="Select a Weight"
+            onSelect={handleOnWeightSelect}
+            tabs={[
+              {
+                label: "All Weights",
+                tabKey: "allWeights",
+                weightTypeFilter: "sdxl",
+                searcher: true,
+                type: "weights",
+              },
+              {
+                label: "Bookmarked",
+                tabKey: "bookmarkedWeights",
+                weightTypeFilter: "sdxl",
+                searcher: false,
+                type: "weights",
+              },
+            ]}
+          />
+        )}
+
         <TempTextArea
           {...{
             label: "Prompt",
@@ -293,7 +326,7 @@ function SdInferencePanel({
         />
         <TempTextArea
           {...{
-            label: "Negative prompt",
+            label: "Negative Prompt",
             name: "negativePrompt",
             placeholder: "Enter a negative prompt",
             onChange: handleNegativePromptChange,
@@ -377,43 +410,36 @@ function SdInferencePanel({
                 {
                   label: "All LoRA Weights",
                   tabKey: "allLoraWeights",
-                  weightTypeFilter: "lora",
+                  weightTypeFilter: "rvc_v2",
                   searcher: true,
+                  type: "weights",
                 },
                 {
                   label: "Bookmarked",
                   tabKey: "bookmarkedLoraWeights",
-                  weightTypeFilter: "lora",
+                  weightTypeFilter: "rvc_v2",
                   searcher: false,
+                  type: "weights",
                 },
               ]}
             />
 
-            {/* Checkpoint Use weight token */}
-            {/* <TempSelect
-              {...{
-                label: "Checkpoint",
-                name: "checkPoint",
-                onChange,
-                options: tempDeleteMeOpts,
-                value: checkPoint,
-              }}
-            /> */}
-
-            <PremiumLock
-              sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-              requiredPlan="pro"
-            >
-              <SegmentButtons
-                {...{
-                  label: "Number of Generations",
-                  name: "batchCount",
-                  onChange,
-                  options: batchCountOpts,
-                  value: batchCount,
-                }}
-              />
-            </PremiumLock>
+            <div>
+              <Label label="Number of Generations" />
+              <PremiumLock
+                sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+                requiredPlan="pro"
+              >
+                <SegmentButtons
+                  {...{
+                    name: "batchCount",
+                    onChange,
+                    options: batchCountOpts,
+                    value: batchCount,
+                  }}
+                />
+              </PremiumLock>
+            </div>
           </div>
         </Accordion.Item>
       </Accordion>
@@ -429,7 +455,7 @@ function SdInferencePanel({
         <Button
           {...{
             label: "Generate Image",
-            disabled: prompt === "",
+            disabled: prompt === "" || weightToken === undefined,
             onClick: handleEnqueueImageGen,
             isLoading: isEnqueuing,
           }}

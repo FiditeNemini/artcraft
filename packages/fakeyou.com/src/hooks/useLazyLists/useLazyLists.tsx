@@ -32,7 +32,8 @@ export default function useLazyLists({
   const { pathname, search: locSearch } = useLocation();
   const history = useHistory();
   const urlQueries = new URLSearchParams(locSearch);
-  const [next, nextSet] = useState(urlQueries.get("cursor") || "");
+  const urlCursor = urlQueries.get("cursor");
+  const [next, nextSet] = useState(urlCursor || "");
   const [previous, previousSet] = useState(""); // I am not used for anything yet :)
   const [sort, sortSet] = useState(urlQueries.get("sort_ascending") === "true");
   const [status, statusSet] = useState(
@@ -60,6 +61,13 @@ export default function useLazyLists({
     previousSet("");
     statusSet(FetchStatus.ready);
   };
+
+  const reset = () => {
+    listSet([]); // Reset list on filter/sort change
+    nextSet("");
+    previousSet("");
+    statusSet(FetchStatus.ready);
+  }
 
   useEffect(() => {
     const queries = {
@@ -98,7 +106,7 @@ export default function useLazyLists({
             }
           });
           nextSet(res.pagination.maybe_next || "");
-          previousSet(res.pagination.maybe_next);
+          previousSet(res.pagination.maybe_previous);
         }
       });
     }
@@ -127,10 +135,12 @@ export default function useLazyLists({
     next,
     onChange,
     previous,
+    reset,
     sort,
     sortSet,
     status,
     statusSet,
     totalKeys,
+    urlCursor
   };
 }

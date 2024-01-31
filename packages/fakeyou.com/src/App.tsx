@@ -204,6 +204,7 @@ function initInferenceJobsByCategoryMap(): Map<
   );
   inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceDesignerTts, []);
   inferenceJobsByCategory.set(FrontendInferenceJobType.VideoMotionCapture, []);
+  inferenceJobsByCategory.set(FrontendInferenceJobType.ImageGeneration, []);
   inferenceJobsByCategory.set(FrontendInferenceJobType.ConvertFbxtoGltf, []);
   return inferenceJobsByCategory;
 }
