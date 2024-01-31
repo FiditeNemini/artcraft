@@ -15,6 +15,10 @@ use strum::EnumIter;
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default)]
 #[serde(rename_all = "snake_case")]
 pub enum InferenceJobType {
+  /// Job that converts bevy to workflow files
+  #[serde(rename = "bevy_to_workflow")]
+  BevyToWorkflow,
+
   /// Jobs that run ComfyUI workflows
   ComfyUi,
 
@@ -64,6 +68,7 @@ impl_mysql_enum_coders!(InferenceJobType);
 impl InferenceJobType {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::BevyToWorkflow => "bevy_to_workflow",
       Self::ComfyUi => "comfy_ui",
       Self::ConvertFbxToGltf => "convert_fbx_gltf",
       Self::MocapNet => "mocap_net",
@@ -80,6 +85,7 @@ impl InferenceJobType {
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "bevy_to_workflow" => Ok(Self::BevyToWorkflow),
       "comfy_ui" => Ok(Self::ComfyUi),
       "convert_fbx_gltf" => Ok(Self::ConvertFbxToGltf),
       "mocap_net" => Ok(Self::MocapNet),
@@ -99,6 +105,7 @@ impl InferenceJobType {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      Self::BevyToWorkflow,
       Self::ComfyUi,
       Self::ConvertFbxToGltf,
       Self::MocapNet,
@@ -129,6 +136,7 @@ mod tests {
 
     #[test]
     fn test_serialization() {
+      assert_serialization(InferenceJobType::BevyToWorkflow, "bevy_to_workflow");
       assert_serialization(InferenceJobType::ComfyUi, "comfy_ui");
       assert_serialization(InferenceJobType::ConvertFbxToGltf, "convert_fbx_gltf");
       assert_serialization(InferenceJobType::MocapNet, "mocap_net");
@@ -144,6 +152,7 @@ mod tests {
 
     #[test]
     fn to_str() {
+      assert_eq!(InferenceJobType::BevyToWorkflow.to_str(), "bevy_to_workflow");
       assert_eq!(InferenceJobType::ComfyUi.to_str(), "comfy_ui");
       assert_eq!(InferenceJobType::ConvertFbxToGltf.to_str(), "convert_fbx_gltf");
       assert_eq!(InferenceJobType::MocapNet.to_str(), "mocap_net");
@@ -159,6 +168,7 @@ mod tests {
 
     #[test]
     fn from_str() {
+      assert_eq!(InferenceJobType::from_str("bevy_to_workflow").unwrap(), InferenceJobType::BevyToWorkflow);
       assert_eq!(InferenceJobType::from_str("comfy_ui").unwrap(), InferenceJobType::ComfyUi);
       assert_eq!(InferenceJobType::from_str("convert_fbx_gltf").unwrap(), InferenceJobType::ConvertFbxToGltf);
       assert_eq!(InferenceJobType::from_str("mocap_net").unwrap(), InferenceJobType::MocapNet);
@@ -176,7 +186,8 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = InferenceJobType::all_variants();
-      assert_eq!(variants.len(), 11);
+      assert_eq!(variants.len(), 12);
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::BevyToWorkflow));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::ComfyUi));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::ConvertFbxToGltf));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::MocapNet));

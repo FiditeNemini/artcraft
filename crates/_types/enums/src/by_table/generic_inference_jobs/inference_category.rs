@@ -40,6 +40,9 @@ pub enum InferenceCategory {
 
   #[serde(rename = "format_conversion")]
   FormatConversion,
+
+  #[serde(rename = "convert_bvh_to_workflow")]
+  ConvertBvhToWorkflow,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -58,6 +61,7 @@ impl InferenceCategory {
       Self::Mocap => "mocap",
       Self::Workflow => "workflow",
       Self::FormatConversion => "format_conversion",
+      Self::ConvertBvhToWorkflow => "convert_bvh_to_workflow",
     }
   }
 
@@ -71,6 +75,7 @@ impl InferenceCategory {
       "mocap" => Ok(Self::Mocap),
       "workflow" => Ok(Self::Workflow),
       "format_conversion" => Ok(Self::FormatConversion),
+      "convert_bvh_to_workflow" => Ok(Self::ConvertBvhToWorkflow),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -87,6 +92,7 @@ impl InferenceCategory {
       Self::Mocap,
       Self::Workflow,
       Self::FormatConversion,
+      Self::ConvertBvhToWorkflow,
     ])
   }
 }
@@ -109,6 +115,7 @@ mod tests {
       assert_serialization(InferenceCategory::Mocap, "mocap");
       assert_serialization(InferenceCategory::Workflow, "workflow");
       assert_serialization(InferenceCategory::FormatConversion, "format_conversion");
+      assert_serialization(InferenceCategory::ConvertBvhToWorkflow, "convert_bvh_to_workflow");
     }
 
     #[test]
@@ -121,6 +128,7 @@ mod tests {
       assert_eq!(InferenceCategory::Mocap.to_str(), "mocap");
       assert_eq!(InferenceCategory::Workflow.to_str(), "workflow");
       assert_eq!(InferenceCategory::FormatConversion.to_str(), "format_conversion");
+      assert_eq!(InferenceCategory::ConvertBvhToWorkflow.to_str(), "convert_bvh_to_workflow");
     }
 
     #[test]
@@ -133,6 +141,7 @@ mod tests {
       assert_eq!(InferenceCategory::from_str("mocap").unwrap(), InferenceCategory::Mocap);
       assert_eq!(InferenceCategory::from_str("workflow").unwrap(), InferenceCategory::Workflow);
       assert_eq!(InferenceCategory::from_str("format_conversion").unwrap(), InferenceCategory::FormatConversion);
+      assert_eq!(InferenceCategory::from_str("convert_bvh_to_workflow").unwrap(), InferenceCategory::ConvertBvhToWorkflow);
     }
 
     #[test]
@@ -148,6 +157,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(InferenceCategory::Mocap));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::Workflow));
       assert_eq!(variants.pop_first(), Some(InferenceCategory::FormatConversion));
+      assert_eq!(variants.pop_first(), Some(InferenceCategory::ConvertBvhToWorkflow));
       assert_eq!(variants.pop_first(), None);
 
       // Generated check

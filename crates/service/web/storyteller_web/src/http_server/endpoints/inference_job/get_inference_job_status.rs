@@ -324,6 +324,9 @@ fn record_to_payload(
         InferenceCategory::FormatConversion => {
           "".to_string()
         }
+        InferenceCategory::ConvertBvhToWorkflow => {
+          "".to_string()
+        }
       };
      
       ResultDetailsResponse {

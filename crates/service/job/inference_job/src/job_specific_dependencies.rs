@@ -1,5 +1,6 @@
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use errors::AnyhowResult;
+use crate::job::job_types::bevy_to_workflow::bvh_to_workflow::dependencies::BvhToWorkflowDependencies;
 
 use crate::job::job_types::format_conversion::fbx_to_gltf::dependencies::FbxToGltfDependencies;
 use crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
@@ -28,6 +29,7 @@ pub struct JobSpecificDependencies {
   pub maybe_styletts2_dependencies: Option<StyleTTS2Dependencies>,
   pub maybe_comfy_ui_dependencies: Option<ComfyDependencies>,
   pub maybe_convert_fbx_to_gltf_dependencies: Option<FbxToGltfDependencies>,
+  pub maybe_convert_bvh_to_workflow_dependencies: Option<BvhToWorkflowDependencies>,
 }
 
 impl JobSpecificDependencies {
@@ -45,6 +47,7 @@ impl JobSpecificDependencies {
     let mut maybe_styletts2_dependencies = None;
     let mut maybe_comfy_ui_dependencies = None;
     let mut maybe_convert_fbx_to_gltf_dependencies = None;
+    let mut maybe_convert_bvh_to_workflow_dependencies = None;
 
     if scoped_execution.can_run_job(InferenceModelType::RvcV2) {
       print_with_space("Setting RVCv2 dependencies...");
@@ -106,6 +109,11 @@ impl JobSpecificDependencies {
       maybe_convert_fbx_to_gltf_dependencies = Some(FbxToGltfDependencies::setup()?);
     }
 
+    if scoped_execution.can_run_job(InferenceModelType::BvhToWorkflow) {
+      print_with_space("Setting ConvertBvhToWorkflow dependencies...");
+      maybe_convert_bvh_to_workflow_dependencies = Some(BvhToWorkflowDependencies::setup()?);
+    }
+
     Ok(JobSpecificDependencies {
       maybe_rvc_v2_dependencies,
       maybe_sad_talker_dependencies,
@@ -119,6 +127,7 @@ impl JobSpecificDependencies {
       maybe_styletts2_dependencies,
       maybe_comfy_ui_dependencies,
       maybe_convert_fbx_to_gltf_dependencies,
+      maybe_convert_bvh_to_workflow_dependencies,
     })
   }
 }

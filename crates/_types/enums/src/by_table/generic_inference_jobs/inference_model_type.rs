@@ -44,6 +44,8 @@ pub enum InferenceModelType {
   /// A job that turns "FBX" game engine files into "GLTF" files (Bevy-compatible).
   #[serde(rename = "convert_fbx_gltf")]
   ConvertFbxToGltf,
+  #[serde(rename = "bvh_to_workflow")]
+  BvhToWorkflow
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -66,6 +68,7 @@ impl InferenceModelType {
       Self::StyleTTS2 => "styletts2",
       Self::ComfyUi => "comfy_ui",
       Self::ConvertFbxToGltf => "convert_fbx_gltf",
+      Self::BvhToWorkflow => "bvh_to_workflow",
     }
   }
 
@@ -83,6 +86,7 @@ impl InferenceModelType {
       "styletts2" => Ok(Self::StyleTTS2),
       "comfy_ui" => Ok(Self::ComfyUi),
       "convert_fbx_gltf" => Ok(Self::ConvertFbxToGltf),
+      "bvh_to_workflow" => Ok(Self::BvhToWorkflow),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -103,6 +107,7 @@ impl InferenceModelType {
       Self::StyleTTS2,
       Self::ComfyUi,
       Self::ConvertFbxToGltf,
+        Self::BvhToWorkflow,
     ])
   }
 }
@@ -129,6 +134,7 @@ mod tests {
       assert_serialization(InferenceModelType::ComfyUi, "comfy_ui");
       assert_serialization(InferenceModelType::StyleTTS2, "styletts2");
       assert_serialization(InferenceModelType::ConvertFbxToGltf, "convert_fbx_gltf");
+      assert_serialization(InferenceModelType::BvhToWorkflow, "bvh_to_workflow");
     }
 
     #[test]
@@ -145,6 +151,7 @@ mod tests {
       assert_eq!(InferenceModelType::StyleTTS2.to_str(), "styletts2");
       assert_eq!(InferenceModelType::ComfyUi.to_str(), "comfy_ui");
       assert_eq!(InferenceModelType::ConvertFbxToGltf.to_str(), "convert_fbx_gltf");
+      assert_eq!(InferenceModelType::BvhToWorkflow.to_str(), "bvh_to_workflow");
     }
 
     #[test]
@@ -161,6 +168,7 @@ mod tests {
       assert_eq!(InferenceModelType::from_str("styletts2").unwrap(), InferenceModelType::StyleTTS2);
       assert_eq!(InferenceModelType::from_str("comfy_ui").unwrap(), InferenceModelType::ComfyUi);
       assert_eq!(InferenceModelType::from_str("convert_fbx_gltf").unwrap(), InferenceModelType::ConvertFbxToGltf);
+      assert_eq!(InferenceModelType::from_str("bvh_to_workflow").unwrap(), InferenceModelType::BvhToWorkflow);
     }
 
     #[test]
@@ -180,6 +188,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(InferenceModelType::ComfyUi));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::StyleTTS2));
       assert_eq!(variants.pop_first(), Some(InferenceModelType::ConvertFbxToGltf));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::BvhToWorkflow));
       assert_eq!(variants.pop_first(), None);
 
       // Generated check
