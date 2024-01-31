@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import MediaCards from "components/common/Card/MediaCards";
-import { TempSelect } from "components/common";
+import { Button, TempSelect } from "components/common";
 import {
   faArrowDownWideShort,
   faFilter,
@@ -59,6 +59,8 @@ export default function MediaTab() {
     // { value: "mostliked", label: "Most Liked" },
   ];
 
+  console.log("💎",media.urlCursor);
+
   return (
     <>
       <div className="d-flex flex-wrap gap-3 mb-3">
@@ -82,6 +84,7 @@ export default function MediaTab() {
             }}
           />
         </div>
+        { media.urlCursor ? <Button {...{ label: "Back to top", onClick: () => media.reset() }}/> : null }
       </div>
       <AudioPlayerProvider>
         {media.isLoading && !media.list.length ? (

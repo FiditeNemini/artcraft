@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import WeightsCards from "components/common/Card/WeightsCards";
-import { TempSelect } from "components/common";
+import { Button, TempSelect } from "components/common";
 import {
   faArrowDownWideShort,
   faFilter,
@@ -145,6 +145,7 @@ export default function WeightsTab() {
             />
           )} */}
         </div>
+        { weights.urlCursor ? <Button {...{ label: "Back to top", onClick: () => weights.reset() }}/> : null }
       </div>
       <AudioPlayerProvider>
         {weights.isLoading && !weights.list.length ? (
