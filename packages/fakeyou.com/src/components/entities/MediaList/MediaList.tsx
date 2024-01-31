@@ -1,12 +1,39 @@
 import React, { useRef } from "react";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-import MediaCards from "components/common/Card/MediaCards";
+// import MediaCards from "components/common/Card/MediaCards";
+import AudioCard from "components/common/Card/AudioCard";
+import ImageCard from "components/common/Card/ImageCard";
+import MocapCard from "components/common/Card/MocapCard";
+import VideoCard from "components/common/Card/VideoCard";
+import { BvhCard } from "components/entities";
+
+interface MediaCardsProps {
+  props: any,
+  type: string
+}
 
 interface Props {
   list: MediaFile[],
   success?: boolean
 }
+
+const MediaCards = ({ props, type }: MediaCardsProps) => {
+  switch (type) {
+    case "audio":
+      return <AudioCard {...props} />;
+    case "image":
+      return <ImageCard {...props} />;
+    case "mocap":
+      return <MocapCard {...props} />;
+    case "video":
+      return <VideoCard {...props} />;
+    case "bvh":
+      return <BvhCard {...props}/>
+    default:
+      return <div>Unsupported media type</div>;
+  }
+};
 
 export default function MediaList({ list, success, ...rest }: Props) {
   const gridRef = useRef<HTMLDivElement | null>(null);

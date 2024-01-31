@@ -1,3 +1,4 @@
+import BvhCard from "./BvhCard";
 import MediaList from "./MediaList";
 
-export { MediaList };
+export { BvhCard, MediaList };
