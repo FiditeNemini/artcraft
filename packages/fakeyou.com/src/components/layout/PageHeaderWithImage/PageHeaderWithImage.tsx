@@ -21,7 +21,7 @@ function PageHeaderWithImage(props: Props) {
       <div className="row gx-3">
         <div className="col-12 col-md-7 py-3 py-lg-4">
           <div className="py-3">
-            <h1 className="fw-bold text-center text-md-start">
+            <h1 className="fw-bold text-center text-md-start d-flex align-items-center">
               {props.titleIcon && (
                 <FontAwesomeIcon icon={props.titleIcon} className="me-3 fs-2" />
               )}
@@ -48,4 +48,4 @@ function PageHeaderWithImage(props: Props) {
   );
 }
 
-export { PageHeaderWithImage };
+export default PageHeaderWithImage;

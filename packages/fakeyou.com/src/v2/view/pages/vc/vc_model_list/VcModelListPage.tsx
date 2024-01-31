@@ -34,7 +34,7 @@ import PitchShiftComponent from "./components/PitchShiftComponent";
 import PitchEstimateMethodComponent from "./components/PitchEstimateMethodComponent";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { useLocalize } from "hooks";
-import { PageHeaderWithImage } from "v2/view/_common/PageHeaderWithImage";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { Container, Panel } from "components/common";
 import { faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
 

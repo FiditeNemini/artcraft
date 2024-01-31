@@ -1,10 +1,10 @@
 import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import Iframe from "react-iframe";
-
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { PageHeaderWithImage } from "v2/view/_common/PageHeaderWithImage";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { Container, Panel } from "components/common";
+import { faCameraMovie } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -16,6 +16,7 @@ function StorytellerStudioListPage(props: Props) {
     <Container type="panel">
       <PageHeaderWithImage
         headerImage="mascot/may4th.webp"
+        titleIcon={faCameraMovie}
         title="Storyteller Studio"
         subText="Anyone can make films."
       />

@@ -45,7 +45,7 @@ import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocum
 import { SearchOmnibar } from "./search/SearchOmnibar";
 import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-import { PageHeaderWithImage } from "v2/view/_common/PageHeaderWithImage";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { faVolumeHigh } from "@fortawesome/pro-solid-svg-icons";
 
 const PAGE_MODEL_TOKENS = new Set<string>([

@@ -7,7 +7,6 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 
 import { BasicVideo, Button, Container, Panel, Tabs } from "components/common";
-import PageHeader from "components/layout/PageHeader";
 import { useInferenceJobs, useLocalize } from "hooks";
 
 import TabContentUpload from "./components/tabContentUpload";
@@ -19,7 +18,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRotateLeft,
   faPersonCircleCheck,
+  faPersonRays,
 } from "@fortawesome/pro-solid-svg-icons";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 
 export default function VideoMotionCapture(props: {
   enqueueInferenceJob: (
@@ -79,10 +80,12 @@ export default function VideoMotionCapture(props: {
 
   return (
     <Container type="panel" className="mb-5">
-      <PageHeader
+      <PageHeaderWithImage
         title={t("headings.title")}
         subText={t("headings.subtitle")}
-        imageUrl="/images/header/video-mocap.png"
+        headerImage="/mascot/video-mocap.webp"
+        yOffset="62%"
+        titleIcon={faPersonRays}
       />
 
       {hasMotionCaptureJobs && (
@@ -130,7 +133,7 @@ export default function VideoMotionCapture(props: {
                     iconFlip={true}
                     label="Generate Another"
                     onClick={() => {
-                      dispatchPageState({type:"restart"})
+                      dispatchPageState({ type: "restart" });
                     }} //back to first state
                     variant="primary"
                   />
