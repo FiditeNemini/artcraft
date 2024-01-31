@@ -35,6 +35,7 @@ import { useMedia, useRatings, useSession } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import Iframe from "react-iframe";
+import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
 
 export default function MediaPage() {
   const { user } = useSession();
@@ -91,11 +92,21 @@ export default function MediaPage() {
         );
 
       case MediaFileType.Image:
+        const one = false;
+        const multi = one ? false : true;
         let sdMediaImage = "/images/avatars/default-pfp.png";
         if (mediaFile.public_bucket_path) {
           sdMediaImage = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         }
-        return <SdCoverImagePanel src={sdMediaImage} />;
+        return (
+          <>
+            {!multi ? (
+              <SdCoverImagePanel src={sdMediaImage} />
+            ) : (
+              <SdBatchMediaPanel />
+            )}
+          </>
+        );
       case MediaFileType.BVH:
         const bvhUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         return (
