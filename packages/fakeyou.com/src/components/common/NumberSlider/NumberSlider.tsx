@@ -8,12 +8,16 @@ interface Props {
   label?: string;
   max?: number;
   min?: number;
-  name?: string;
-  onChange?: any;
   required?: boolean;
   step?: number;
   thumbTip?: string;
+  // name, value and setter for onChange has to be in this particular format
+  // name = state variable's name as a stringh
+  // value = the state variable's reference
+  // onChange = the statevariable's setter function's reference
+  name?: string;
   value?: number;
+  onChange?: any;
 }
 
 const renderTrack = ({ props: { style, ...props }, children }: any) => (
