@@ -109,6 +109,7 @@ import { FooterNav } from "./nav/FooterNav";
 import FbxToGltfPage from "./pages/fbx_to_gltf/FbxToGltfPage";
 import UploadLoraWeightPage from "./pages/upload/UploadLoraWeightPage";
 import StorytellerFilterPage from "./pages/storyteller_filter/StorytellerFilter";
+import ScrollToTop from "./_common/ScrollToTop";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -220,6 +221,7 @@ class PageContainer extends React.Component<
   public render() {
     return (
       <SearchProvider>
+        <ScrollToTop />
         <div id="wrapper" className="no-padding">
           <div id="overlay"></div>
 

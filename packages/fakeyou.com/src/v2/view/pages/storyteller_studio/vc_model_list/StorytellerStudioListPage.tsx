@@ -3,7 +3,8 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import Iframe from "react-iframe";
 
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { SsPageHero } from "./components/SsPageHero";
+import { PageHeaderWithImage } from "v2/view/_common/PageHeaderWithImage";
+import { Container, Panel } from "components/common";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -12,19 +13,20 @@ interface Props {
 
 function StorytellerStudioListPage(props: Props) {
   return (
-    <div>
-      <SsPageHero
-        sessionWrapper={props.sessionWrapper}
-        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+    <Container type="panel">
+      <PageHeaderWithImage
+        headerImage="mascot/may4th.webp"
+        title="Storyteller Studio"
+        subText="Anyone can make films."
       />
 
-      <div className="container mb-5">
+      <Panel className="overflow-hidden">
         <Iframe
           url="https://engine.fakeyou.com?mode=studio"
           width="100%"
           height="900px"
           id=""
-          className=""
+          className="rounded"
           display="block"
           position="relative"
         />
@@ -38,8 +40,8 @@ function StorytellerStudioListPage(props: Props) {
             See details <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
           </Link>
         </div> */}
-      </div>
-    </div>
+      </Panel>
+    </Container>
   );
 }
 

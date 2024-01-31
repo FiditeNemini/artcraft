@@ -1,46 +1,50 @@
+import { Panel } from "components/common";
 import React from "react";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Props {
   headerImage: string;
-  titleIcon?: JSX.Element;
-  title: JSX.Element;
-  subText: JSX.Element;
-  showButtons: boolean;
-  actionButtons?: JSX.Element;
+  titleIcon?: IconDefinition;
+  title: React.ReactNode;
+  subText: React.ReactNode;
+  yOffset?: string;
 }
 
 function PageHeaderWithImage(props: Props) {
+  const imageStyle = {
+    top: props.yOffset || "50%",
+  };
+
   return (
-    <div className="container-panel pt-3 pb-4 pt-lg-4">
-      <div className="panel">
-        <div className="row gx-3 flex-md-row-reverse">
-          <div className="col-12 col-md-5 hero-img-container d-none d-md-block">
+    <Panel clear={true}>
+      <div className="row gx-3">
+        <div className="col-12 col-md-7 py-3 py-lg-4">
+          <div className="py-3">
+            <h1 className="fw-bold text-center text-md-start">
+              {props.titleIcon && (
+                <FontAwesomeIcon icon={props.titleIcon} className="me-3 fs-2" />
+              )}
+              {props.title}
+            </h1>
+
+            <p className="text-center text-md-start opacity-75">
+              {props.subText}
+            </p>
+          </div>
+        </div>
+        <div className="col-12 col-md-5 d-none d-md-block">
+          <div className="hero-img-container">
             <img
               src={props.headerImage}
               className="hero-img"
               alt="Hero Header"
+              style={imageStyle}
             />
-          </div>
-          <div className="col-12 col-md-7">
-            <div className="p-3 py-4 p-md-4">
-              <h1 className="fw-bold text-center text-md-start">
-                {props.titleIcon}
-                {props.title}
-              </h1>
-
-              <p className="text-center text-md-start opacity-75 pt-1">
-                {props.subText}
-              </p>
-              {props.showButtons && (
-                <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-md-start mt-4 pt-2">
-                  {props.actionButtons}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Panel>
   );
 }
 

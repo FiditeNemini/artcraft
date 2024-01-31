@@ -22,10 +22,12 @@ import {
   EnqueueImageGenIsError,
 } from "@storyteller/components/src/api/image_generation/EnqueueImageGen";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import useToken from "hooks/useToken";
 import SelectModal from "components/common/SelectModal/SelectModal";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
+import PremiumLock from "components/PremiumLock";
 
 interface SdInferencePanelProps {
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   sd_model_token: string;
   enqueueInferenceJob: (
     jobToken: string,
@@ -36,27 +38,58 @@ interface SdInferencePanelProps {
 function SdInferencePanel({
   enqueueInferenceJob,
   sd_model_token,
+  sessionSubscriptionsWrapper,
 }: SdInferencePanelProps) {
-  const { token: loraToken } = useToken();
+  const [loraToken, setLoraToken] = useState<string | null>(null);
+
+  const handleOnSelect = (token: string) => {
+    setLoraToken(token);
+  };
+
   const [isEnqueuing, setIsEnqueuing] = useState(false);
-  const [seed, seedSet] = useState("random");
-  const [seedNumber, seedNumberSet] = useState("");
-  const [sampler, samplerSet] = useState("DPM++ 2M Karras");
-  const [aspectRatio, aspectRatioSet] = useState("square");
-  const [cfgScale, cfgScaleSet] = useState(7);
-  const [samples, samplesSet] = useState(8);
-  const [batchCount, batchCountSet] = useState(1);
+  const [seed, setSeed] = useState("random");
+  const [seedNumber, setSeedNumber] = useState("");
+  const [sampler, setSampler] = useState("DPM++ 2M Karras");
+  const [aspectRatio, setAspectRatio] = useState("square");
+  const [cfgScale, setCfgScale] = useState(7);
+  const [samples, setSamples] = useState(8);
+  const [batchCount, setBatchCount] = useState(1);
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const onChange = onChanger({
-    batchCountSet,
-    cfgScaleSet,
-    samplerSet,
-    aspectRatioSet,
+    setBatchCount,
+    setCfgScale,
+    setSampler,
+    setAspectRatio,
     setPrompt,
     setNegativePrompt,
-    samplesSet,
+    setSamples,
   });
+
+  const initialState = {
+    prompt: "",
+    negativePrompt: "",
+    aspectRatio: "square",
+    seed: "random",
+    seedNumber: "",
+    sampler: "DPM++ 2M Karras",
+    cfgScale: 7,
+    samples: 8,
+    batchCount: 1,
+    loraToken: null,
+  };
+
+  const resetToInitialState = () => {
+    setPrompt(initialState.prompt);
+    setNegativePrompt(initialState.negativePrompt);
+    setAspectRatio(initialState.aspectRatio);
+    setSeed(initialState.seed);
+    setSeedNumber(initialState.seedNumber);
+    setSampler(initialState.sampler);
+    setCfgScale(initialState.cfgScale);
+    setSamples(initialState.samples);
+    setBatchCount(initialState.batchCount);
+  };
 
   const samplerOpts = [
     { label: "DPM++ 2M Karras", value: "DPM++ 2M Karras" },
@@ -164,27 +197,27 @@ function SdInferencePanel({
       if (seedNumber === "") {
         const randomSeed = generateRandomSeed();
         internalSeed.current = randomSeed;
-        seedNumberSet(randomSeed.toString());
+        setSeedNumber(randomSeed.toString());
       }
-      seedSet(value);
+      setSeed(value);
     } else {
-      seedSet(value);
-      seedNumberSet("");
+      setSeed(value);
+      setSeedNumber("");
       internalSeed.current = generateRandomSeed(); // Generate a new random seed when switching back to "Random"
     }
   };
 
   const handleSeedNumberChange = (event: any) => {
     const customSeed = event.target.value;
-    seedNumberSet(customSeed);
+    setSeedNumber(customSeed);
     internalSeed.current =
       customSeed !== "" ? parseInt(customSeed, 10) : generateRandomSeed();
-    seedSet("custom");
+    setSeed("custom");
   };
 
   const handleBlur = () => {
     if (seedNumber === "") {
-      seedSet("random");
+      setSeed("random");
     }
   };
 
@@ -195,6 +228,10 @@ function SdInferencePanel({
 
     if (!prompt) {
       return false;
+    }
+
+    if (!sessionSubscriptionsWrapper.hasActiveProSubscription()) {
+      setBatchCount(1);
     }
 
     setIsEnqueuing(true);
@@ -335,6 +372,7 @@ function SdInferencePanel({
 
             <SelectModal
               label="Additional LoRA Weight"
+              onSelect={handleOnSelect}
               tabs={[
                 {
                   label: "All LoRA Weights",
@@ -362,15 +400,20 @@ function SdInferencePanel({
               }}
             /> */}
 
-            <SegmentButtons
-              {...{
-                label: "Number of Generations",
-                name: "batchCount",
-                onChange,
-                options: batchCountOpts,
-                value: batchCount,
-              }}
-            />
+            <PremiumLock
+              sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+              requiredPlan="pro"
+            >
+              <SegmentButtons
+                {...{
+                  label: "Number of Generations",
+                  name: "batchCount",
+                  onChange,
+                  options: batchCountOpts,
+                  value: batchCount,
+                }}
+              />
+            </PremiumLock>
           </div>
         </Accordion.Item>
       </Accordion>
@@ -380,6 +423,7 @@ function SdInferencePanel({
           {...{
             label: "Clear All",
             variant: "secondary",
+            onClick: resetToInitialState,
           }}
         />
         <Button

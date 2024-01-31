@@ -12,6 +12,7 @@ interface Props {
   options?: any;
   value?: string | number;
   icon?: IconDefinition | undefined;
+  disabled?: boolean;
 }
 
 export default function SegmentButtons({
@@ -22,11 +23,12 @@ export default function SegmentButtons({
   onChange,
   options = [],
   value: inValue = "",
+  disabled = false,
 }: Props) {
   // const onClick = ({ target }: any) => onChange();
   return (
     <div>
-      {label && <Label {...{ label }} />}
+      {label && <Label {...{ label, disabled: disabled }} />}
       <ul {...{ className: "fy-segment-buttons mb-0" }}>
         {options.map(
           (
@@ -35,7 +37,9 @@ export default function SegmentButtons({
           ) => (
             <li
               {...{
-                ...(value === inValue && { className: "fy-selected-segment" }),
+                className: `${value === inValue ? "fy-selected-segment" : ""} ${
+                  disabled ? "fy-disabled-segment" : ""
+                }`.trim(),
                 key,
                 onClick: ({ target }: any) =>
                   onChange({ target: { name, type: "option", value } }),
