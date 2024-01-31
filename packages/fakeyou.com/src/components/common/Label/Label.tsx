@@ -21,7 +21,9 @@ export default function Label({
       }}
     >
       {label ? (
-        <label {...{ className: `${required ? " required" : ""}`.trim() }}>
+        <label
+          {...{ className: `fw-medium ${required ? " required" : ""}`.trim() }}
+        >
           {label}
         </label>
       ) : null}

@@ -43,13 +43,13 @@ export default function PremiumLock({
       {hasAccess() ? (
         children
       ) : (
-        <Panel padding={true} className="fy-premium-lock rounded">
+        <Panel className="fy-premium-lock rounded px-3 py-4">
           {children}
           <div className="overlay">
-            <div className="d-flex flex-column align-items-center gap-2">
+            <div className="d-flex flex-column align-items-center gap-2 text-center">
               <FontAwesomeIcon icon={faLock} className="me-2 fs-5" />
               <div>
-                Feature requires{" "}
+                This feature requires a{" "}
                 <Link to="/pricing">{requiredPlan} subscription</Link>
               </div>
             </div>
