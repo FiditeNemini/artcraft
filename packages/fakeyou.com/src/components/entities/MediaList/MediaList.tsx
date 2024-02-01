@@ -5,7 +5,7 @@ import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
-import { BvhCard } from "components/entities";
+import { BvhCard, CardWrapper } from "components/entities";
 
 interface MediaCardsProps {
   props: any,
@@ -26,7 +26,7 @@ const MediaCards = ({ props, type }: MediaCardsProps) => {
     case "video":
       return <VideoCard {...props} />;
     case "bvh":
-      return <BvhCard {...props}/>
+      return <CardWrapper {...{ ...props, card: BvhCard }}/>
     default:
       return <div>Unsupported media type</div>;
   }

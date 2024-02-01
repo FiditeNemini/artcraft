@@ -3,17 +3,25 @@ import { Link } from "react-router-dom";
 import getCardUrl from "components/common/Card/getCardUrl";
 
 interface Props {
+  canHover?: boolean,
   card: any,
   data: any,
   onClick?: (e:any) => any,
+  padding?: boolean,
   source?: string,
   type: "media" | "weights"
 }
 
-export default function CardWrapper({ card: Card, data, onClick, source = "", type, ...rest }: Props) {
+export default function CardWrapper({ canHover, card: Card, data, onClick, padding, source = "", type, ...rest }: Props) {
   const linkUrl = getCardUrl(data,source,type);
   const cardProps = { data, source, type, ...rest }
-  return onClick ? <Card {...{ onClick, ...cardProps }}/> : <Link {...{ to: linkUrl }}>
-      <Card {...cardProps}/> 
-    </Link>;
+  const className = `card ${ padding ? "p-3" : "" }${ onClick || canHover ? " card-clickable" : ""  }`;
+
+  return onClick ?
+  <div {...{ className, onClick }}>
+    <Card { ...cardProps }/>
+  </div> : 
+  <Link {...{ className, to: linkUrl }}>
+    <Card {...cardProps}/> 
+  </Link>;
 };

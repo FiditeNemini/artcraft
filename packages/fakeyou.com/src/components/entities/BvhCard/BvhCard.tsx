@@ -15,13 +15,13 @@ export default function BvhCard({ data, showCreator }: Props) {
   const timeAgo = useTimeAgo(data.created_at);
   const handleInnerClick = (event: any) => event.stopPropagation();
   return <>
-    <Icon {...{ className: "card-mocap", icon: faPersonWalking }}/>
+    <Icon {...{ className: "card-img", icon: faPersonWalking }}/>
     <div className="card-img-overlay">
       <div className="card-img-gradient" />
 
       <div className="d-flex align-items-center">
         <div className="d-flex flex-grow-1">
-          <Badge label="Mocap" color="pink" overlay={true} />
+          <Badge label="BVH" color="pink" overlay={true} />
         </div>
       </div>
 

@@ -839,6 +839,7 @@ class App extends React.Component<Props, State> {
               <ModalProvider> 
               <InferenceJobs
                 {...{
+                  enqueue: this.enqueueInferenceJob,
                   byCategory: this.state.inferenceJobsByCategory,
                 }}
               >
