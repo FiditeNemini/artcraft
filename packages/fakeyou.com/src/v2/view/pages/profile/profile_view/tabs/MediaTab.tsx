@@ -47,8 +47,6 @@ export default function MediaTab({ username }: { username: string }) {
     urlParam: username,
   });
 
-  console.log("🐸",media.status);
-
   const handlePageClick = (selectedItem: { selected: number }) => {
     media.pageChange(selectedItem.selected);
   };
