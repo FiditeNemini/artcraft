@@ -10,14 +10,21 @@
 
 .fy-mocap-input {
   @include panel;
-  aspect-ratio: 1/1;
-  width: 100%;
+  height: 300px;
   border-radius: .5rem;
   overflow: hidden;
   position: relative;
   // background-color: $panel;
+}
 
+.fy-media-input-square {
+  aspect-ratio: 1/1;
 
+  .fy-media-picker-empty-controls {}
+}
+
+.fy-media-input-landscape {
+  height: 300px;
 }
 
 .fy-media-picker-empty, .fy-media-picker-full {

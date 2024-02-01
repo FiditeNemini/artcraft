@@ -18,6 +18,7 @@ interface Props {
   label?: string, 
   onChange?: any,
   type?: MediaFilterProp,
+  aspectRatio?: "square" | "landscape" | "portrait"
 }
 
 interface SlideProps {
@@ -91,7 +92,7 @@ const AniMod = ({ animating, className, isLeaving, render: Render, style, ...res
     <Render {...{ ...rest, animating }} />
   </a.div>;
 
-export default function MocapInput({ label, onChange, type }: Props) {
+export default function MocapInput({ aspectRatio = "square", label, onChange, type }: Props) {
   const { search } = useLocation();
   const presetToken = search ? new URLSearchParams(search).get("preset_token") : "";
   const [mediaToken,mediaTokenSet] = useState(presetToken || "");
@@ -134,7 +135,7 @@ export default function MocapInput({ label, onChange, type }: Props) {
 
   return <>
     <Label {...{ label }}/>
-    <div {...{ className: `fy-mocap-input panel-inner`, }}>
+    <div {...{ className: `fy-mocap-input panel-inner${ aspectRatio ? " fy-media-input-" + aspectRatio : "" }`, }}>
       { 
         // media ? <MocapInputFull {...{ media }}/> : <MediaPickerEmpty {...{ inputProps, media, onSelect, open, user }}/>
         transitions((style: any, i: number, state: any) => {

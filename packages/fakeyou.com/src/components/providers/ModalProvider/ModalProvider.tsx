@@ -13,7 +13,6 @@ interface ModalConfig {
 
 export default function ModalProvider({ children }: Props) {
   const [modalState,modalStateSet] = useState<ModalConfig | null>(null);
-  console.log("🔮",modalState);
   const open = (cfg: ModalConfig) => {
     console.log("🪬",cfg);
     modalStateSet(cfg);
