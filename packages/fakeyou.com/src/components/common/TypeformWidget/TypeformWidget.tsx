@@ -7,7 +7,8 @@ export default function TypeformWidget() {
     <div>
       {!get<boolean>("isSubmit") ? (
         <Widget
-          id="UfvpJUpF?utm_source=xxxxx"
+          //id="UfvpJUpF?utm_source=xxxxx&typeform-welcome=0"
+          id="UfvpJUpF"
           height={400}
           opacity={80}
           onSubmit={() => {
