@@ -54,8 +54,6 @@ const Modal: React.FC<ModalProps> = ({
   });
   const [loaded,loadedSet] = useState(false);
 
-  console.log("🩵",loaded);
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const modalContent = document.querySelector(".modal-content");
