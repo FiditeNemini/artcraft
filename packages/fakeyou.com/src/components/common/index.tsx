@@ -1,3 +1,4 @@
+import Accordion from "./Accordion";
 import AudioBlobPreview from "./AudioBlobPreview";
 import AudioInput from "./AudioInput";
 import BasicVideo from "./BasicVideo";
@@ -20,6 +21,7 @@ import Panel from "./Panel";
 import Radio from "./Radio";
 import SegmentButtons from "./SegmentButtons";
 import Select from "./Select";
+import SelectModal from "./SelectModal";
 import Skeleton from "./Skeleton";
 import Slider from "./Slider";
 import Spinner from "./Spinner";
@@ -35,6 +37,7 @@ import TintSpinner from "./TintSpinner";
 import VideoInput from "./VideoInput";
 
 export {
+  Accordion,
   AudioBlobPreview,
   AudioInput,
   BasicVideo,
@@ -57,6 +60,7 @@ export {
   Radio,
   SegmentButtons,
   Select,
+  SelectModal,
   Skeleton,
   Slider,
   Spinner,

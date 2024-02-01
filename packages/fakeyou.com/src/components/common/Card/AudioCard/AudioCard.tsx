@@ -12,7 +12,7 @@ import Button from "components/common/Button";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import useToken from "hooks/useToken";
+// import useToken from "hooks/useToken";
 import getCardUrl from "../getCardUrl";
 
 interface AudioCardProps {
@@ -24,7 +24,7 @@ interface AudioCardProps {
   source?: string;
   type: "media" | "weights";
   inSelectModal?: boolean;
-  onResultSelect?: () => void;
+  onResultSelect?: (data:{token: string, title:string}) => void;
 }
 
 export default function AudioCard({
@@ -38,7 +38,7 @@ export default function AudioCard({
   inSelectModal = false,
   onResultSelect,
 }: AudioCardProps) {
-  const { setToken, setWeightTitle } = useToken();
+  // const { setToken, setWeightTitle } = useToken();
   const linkUrl = getCardUrl(data,source,type);
   const history = useHistory();
 
@@ -47,10 +47,13 @@ export default function AudioCard({
   };
 
   const handleSelectModalResultSelect = () => {
-    if (inSelectModal) {
-      setToken(data.weight_token);
-      setWeightTitle && setWeightTitle(data.title);
-      onResultSelect && onResultSelect();
+    console.log(`inSelectModal : ${inSelectModal}`);
+    console.log(`onResultSelect : ${onResultSelect}`);
+    if (inSelectModal && onResultSelect) {
+      onResultSelect({
+        token: data.weight_token,
+        title: data.title
+      });
     }
   };
 

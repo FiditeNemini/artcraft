@@ -10,7 +10,7 @@ import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 interface SelectWeightsListProps {
   weightType: string;
   listKey: string;
-  onResultSelect?: () => void;
+  onResultSelect?: (data:{token:string, title:string}) => void;
 }
 
 export default function SelectWeightsList({

@@ -14,10 +14,10 @@ export default function TabContentLibrary({
   const handleProceed = ()=>{
     dispatchPageState({type: "loadFile"})
   }
-  const handleOnSelect = (token:string)=>{
+  const handleOnSelect = (data:{token:string, title:string})=>{
     dispatchPageState({
       type: "selectedFile",
-      payload: {mediaFileToken: token}
+      payload: {mediaFileToken: data.token}
     });
   };
   return (
