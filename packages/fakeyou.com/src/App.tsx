@@ -60,7 +60,11 @@ import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import HttpBackend from "i18next-http-backend";
 
-import { InferenceJobs, SessionProvider } from "components/providers";
+import {
+  InferenceJobs,
+  ModalProvider,
+  SessionProvider,
+} from "components/providers";
 
 // NB: We're transitioning over to this instance of i18n-next that loads translations over HTTP from Json Files.
 // The old i18n-next instance (see below) bakes in translations into the compiled javascript blob.
@@ -832,8 +836,10 @@ class App extends React.Component<Props, State> {
             */}
 
             <div className="migrationComponentWrapper">
+              <ModalProvider> 
               <InferenceJobs
                 {...{
+                  enqueue: this.enqueueInferenceJob,
                   byCategory: this.state.inferenceJobsByCategory,
                 }}
               >
@@ -954,6 +960,7 @@ class App extends React.Component<Props, State> {
                   </Switch>
                 </SessionProvider>
               </InferenceJobs>
+              </ModalProvider>
             </div>
           </div>
         </div>

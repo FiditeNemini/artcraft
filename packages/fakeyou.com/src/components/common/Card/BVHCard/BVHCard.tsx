@@ -13,6 +13,7 @@ import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
 interface BVHCardProps {
   bookmarks: any;
   data: any;
+  onClick?: (e:any) => any;
   ratings: any;
   showCreator?: boolean;
   source?: string;
@@ -22,6 +23,7 @@ interface BVHCardProps {
 export default function BVHCard({
   bookmarks,
   data,
+  onClick: inClick,
   showCreator,
   source = "",
   ratings,
@@ -40,12 +42,12 @@ export default function BVHCard({
       data.media_type || data.details?.maybe_media_data?.media_type
     );
 
+  const Wrapper = ({ children }: { children: any }) => inClick ? <div {...{ onClick: () => { inClick(data) } }}>{ children }</div> : <Link {...{ to: linkUrl  }}>{ children }</Link>;
+
+  // const bucketConfig = new BucketConfig();
+
   return (
-    <Link
-      {...{
-        to: linkUrl,
-      }}
-    >
+    <Wrapper>
       <Card padding={false} canHover={true}>
         <div className="card-img d-flex align-items-center justify-content-center">
           <FontAwesomeIcon icon={faPersonWalking} className="card-img-icon" />
@@ -92,21 +94,18 @@ export default function BVHCard({
                   />
                 </div>
               )}
-
-              <div>
-                <LikeButton
-                  {...{
-                    ...ratings.makeProps({
-                      entityToken: data.token,
-                      entityType: "media_file",
-                    }),
-                  }}
-                />
-              </div>
+              <LikeButton
+                {...{
+                  ...ratings.makeProps({
+                    entityToken: data.token,
+                    entityType: "media_file",
+                  }),
+                }}
+              />
             </div>
           </div>
         </div>
       </Card>
-    </Link>
+    </Wrapper>
   );
 }

@@ -12,7 +12,7 @@ import SkeletonCard from "components/common/Card/SkeletonCard";
 import { ListWeights } from "@storyteller/components/src/api/weights/ListWeights";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useBookmarks, useLazyLists, useRatings } from "hooks";
+import { useBookmarks, useLazyLists, useOnScreen, useRatings } from "hooks";
 import prepFilter from "resources/prepFilter";
 
 export default function WeightsTab() {
@@ -25,6 +25,8 @@ export default function WeightsTab() {
   const [weightCategory, weightCategorySet] = useState(urlQueries.get("maybe_scoped_weight_category") || "all");
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<Weight[]>([]);
+  const toTopBtnRef = useRef<HTMLDivElement | null>(null);
+  const onScreen = useOnScreen(toTopBtnRef,"0px");
   const weights = useLazyLists({
     addQueries: {
       page_size: 24,
@@ -145,8 +147,20 @@ export default function WeightsTab() {
             />
           )} */}
         </div>
-        { weights.urlCursor ? <Button {...{ label: "Back to top", onClick: () => weights.reset() }}/> : null }
+        { weights.urlCursor ? 
+          <Button {...{
+            className: `to-top-button`,
+            buttonRef: toTopBtnRef,
+            label: "Back to top",
+            onClick: () => weights.reset(),
+          }}/> : null }
       </div>
+      { weights.urlCursor && !onScreen ? 
+        <Button {...{
+          className: `to-top-button-off-screen`,
+          label: "Back to top",
+          onClick: () => weights.reset(),
+        }}/> : null }
       <AudioPlayerProvider>
         {weights.isLoading && !weights.list.length ? (
           <div className="row gx-3 gy-3">

@@ -14,6 +14,7 @@ import FileLabel from "./FileLabel";
 import ImageInput from "./ImageInput";
 import Input from "./Input";
 import Label from "./Label";
+import MocapInput from "./MocapInput";
 import Modal from "./Modal";
 import NumberSlider from "./NumberSlider";
 import NumberSliderV2 from "./NumberSliderV2";
@@ -53,6 +54,7 @@ export {
   ImageInput,
   Input,
   Label,
+  MocapInput,
   Modal,
   NumberSlider,
   NumberSliderV2,

@@ -7,7 +7,7 @@ export default function useMedia({ mediaToken = "", onSuccess = (res:MediaFile) 
   const [media,mediaSet] = useState<MediaFile | undefined>();
 
   useEffect(() => {
-    if (mediaToken && status === FetchStatus.ready) {
+    if (!media && mediaToken && status === FetchStatus.ready) {
       statusSet(FetchStatus.in_progress);
       GetMedia(mediaToken,{})
       .then((res) => {
@@ -22,6 +22,6 @@ export default function useMedia({ mediaToken = "", onSuccess = (res:MediaFile) 
       });
     }
 
-  },[mediaToken, onSuccess, status, statusSet]);
- return { media, status };
+  },[media, mediaToken, onSuccess, status, statusSet]);
+ return { media, mediaSet, status };
 };

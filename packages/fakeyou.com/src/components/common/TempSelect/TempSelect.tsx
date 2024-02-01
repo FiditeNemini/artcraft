@@ -1,9 +1,8 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import "../Select/Select.scss";
 import ReactSelect, { Props as ReactSelectProps } from "react-select";
-import "./Select.scss";
+import "./TempSelect.scss";
 
 export interface Option {
   value: string | number | boolean;
@@ -54,7 +53,7 @@ export default function Select({
 
   return (
     // Changed fragment to div here just so that it can be laid out with bootstrap easily using d-flex, flex-column and responsive gaps which requires grouping.
-    <div className="fy-select">
+    <div className="fy-temp-select">
       {label && (
         <label className={`sub-title ${required ? "required" : ""}`}>
           {label}

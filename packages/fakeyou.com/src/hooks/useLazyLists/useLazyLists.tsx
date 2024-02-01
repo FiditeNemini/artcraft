@@ -45,6 +45,9 @@ export default function useLazyLists({
     status === FetchStatus.ready || status === FetchStatus.in_progress;
   const fetchError = status === FetchStatus.error;
 
+  const [goingtToTop,goingtToTopSet] = useState(false);
+  const [y,ySet] = useState(0);
+
   const getMore = () => {
     if (next) statusSet(1);
   };
@@ -67,6 +70,8 @@ export default function useLazyLists({
     nextSet("");
     previousSet("");
     statusSet(FetchStatus.ready);
+    window.scrollTo(0,0);
+    goingtToTopSet(true);
   }
 
   useEffect(() => {
@@ -76,7 +81,15 @@ export default function useLazyLists({
       ...(sort ? { sort_ascending: true } : {}),
     };
 
-    if (status === FetchStatus.ready) {
+    const adjustY = () => ySet(window.pageYOffset);
+
+    if (goingtToTop) {
+      window.addEventListener('scroll', adjustY, { passive: true });
+      if (y === 0) setTimeout(() => goingtToTopSet(false),500);
+    }
+    else window.removeEventListener('scroll',adjustY);
+
+    if (status === FetchStatus.ready && !goingtToTop) {
       let search = new URLSearchParams(queries).toString();
       statusSet(FetchStatus.in_progress);
       !disableUrlQueries && history.replace({ pathname, search });
@@ -114,6 +127,7 @@ export default function useLazyLists({
     addQueries,
     debug,
     fetcher,
+    goingtToTop,
     history,
     listKeys,
     listSet,
@@ -124,6 +138,7 @@ export default function useLazyLists({
     status,
     totalKeys,
     disableUrlQueries,
+    y
   ]);
 
   return {

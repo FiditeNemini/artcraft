@@ -4,8 +4,9 @@ import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/Infer
 import { InferenceJobsContext } from 'context';
 
 export default function useInferenceJobs(jobType: FrontendInferenceJobType) {
-  const { byCategory } = useContext(InferenceJobsContext);
+  const { byCategory, enqueue } = useContext(InferenceJobsContext);
   return {
+    enqueue,
     inferenceJobs: (byCategory?.get(jobType) || []),
     jobStatusDescription: (jobState: JobState) => Object.keys(JobState).filter(key => isNaN(Number(key)))[jobState]
   };

@@ -1,6 +1,6 @@
 @import "scss/colours.scss";
 
-.fy-uploader {
+.fy-uploader, .fy-uploader-no-style {
   [type="file"] {
     border: 0;
     clip: rect(0, 0, 0, 0);
@@ -13,12 +13,6 @@
 
     + label {
       cursor: pointer;
-      border: dashed 2px rgba(255, 255, 255, 0.12) !important;
-      border-radius: 0.5rem;
-      transition: 0.1s all;
-      &:hover {
-        background-color: lighten($panel, 6%);
-      }
     }
   }
   .fy-uploader-layout {
@@ -29,6 +23,20 @@
     .fy-uploader-layout-icon {
       font-size: 2.625rem;
       margin-right: 1rem;
+    }
+  }
+}
+
+.fy-uploader {
+    [type="file"] {
+
+    + label {
+      border: dashed 2px rgba(255, 255, 255, 0.12) !important;
+      border-radius: 0.5rem;
+      transition: 0.1s all;
+      &:hover {
+        background-color: lighten($panel, 6%);
+      }
     }
   }
 }
