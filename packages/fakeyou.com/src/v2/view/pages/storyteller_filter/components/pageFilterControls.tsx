@@ -18,8 +18,6 @@ import {
 import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import UseStateViewer from "components/common/UseStateViewer";
-
 export default function PageFilterControls({
   debug=false, t, pageState, dispatchPageState
 }: {
@@ -64,7 +62,6 @@ export default function PageFilterControls({
         <>
           <Panel>
             <div className="row g-3 p-3">
-              {/* <h1>{t("message.fileUploaded")}</h1> */}
               {debug && <p>{`File Token: ${pageState.mediaFileToken}`}</p> }
               <div className="col-5">
                 <BasicVideo src={mediaLink} />
