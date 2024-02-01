@@ -4,9 +4,9 @@ import { get, set } from "local-storage";
 import './TypeformContainer.scss';
 
 export default function TypeformWidget() {
-  return (
-    <div className="typeformcontainer">
+  return <>
       {!get<boolean>("isSubmit") ? (
+      <div className="typeformcontainer">
         <Widget
           id="UfvpJUpF"
           style={{ width: '100%', height: '100%' }}
@@ -17,8 +17,8 @@ export default function TypeformWidget() {
           }}
           hideHeaders
           enableSandbox={false}
-        />
-      ) : null}
+        />  
     </div>
-  );
+      ) : null}
+  </>;
 }
