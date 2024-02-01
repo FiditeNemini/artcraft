@@ -3,9 +3,7 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use anyhow::anyhow;
-use jsonpath_lib::replace_with;
 use log::{error, info, warn};
-use reqwest::Url;
 use serde::de::Error;
 use serde_json::Value;
 use tokio::io::AsyncWriteExt;
@@ -84,6 +82,17 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
     // ===================== DOWNLOAD REQUIRED MODELS IF NOT EXIST ===================== //
+    let root_comfy_path = model_dependencies.inference_command.comfy_root_code_directory.clone();
+
+    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;
+    let remote_cloud_file_client = match remote_cloud_file_client {
+        Ok(res) => {
+            res
+        }
+        Err(_) => {
+            return Err(ProcessSingleJobError::from(anyhow!("failed to get remote cloud file client")));
+        }
+    };
 
     async fn download_file(file_url: String, dep_path: PathBuf) -> Result<(), anyhow::Error> {
         // Send a GET request to the file_url
@@ -130,19 +139,53 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
     }
 
+    // Download workflow to ComfyRunner
+    let workflow_dir = root_comfy_path.join("../ComfyLauncher");
+    let retrieved_workflow_record =  get_weight_by_token(
+        job_args.workflow_source,
+        false,
+        &deps.db.mysql_pool
+    ).await?.unwrap();
+
+    let bucket_details = RemoteCloudBucketDetails {
+        object_hash: retrieved_workflow_record.public_bucket_hash,
+        prefix: retrieved_workflow_record.maybe_public_bucket_prefix.unwrap(),
+        suffix: retrieved_workflow_record.maybe_public_bucket_extension.unwrap(),
+    };
+    let workflow_path = workflow_dir.join("prompt.json").to_str().unwrap().to_string();
+    remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
+
+    let maybe_args = job.maybe_inference_args
+        .as_ref()
+        .map(|args| args.args.as_ref())
+        .flatten();
+
+    let poly_args = match maybe_args {
+        None => return Err(ProcessSingleJobError::Other(anyhow!("ComfyUi args not found"))),
+        Some(args) => args,
+    };
+
+    let comfy_args = match poly_args {
+        Cu(args) => args,
+        _ => return Err(ProcessSingleJobError::Other(anyhow!("ComfyUi args not found"))),
+    };
+
+    // Apply modifications if they exist
+    if let Some(modifications) = comfy_args.maybe_json_modifications.clone() {
+        // Load prompt.json
+        let prompt_file = File::open(&workflow_path).unwrap();
+        let mut prompt_json: Value = serde_json::from_reader(prompt_file).unwrap();
+        // Modify json
+        for (path, new_value) in modifications {
+            prompt_json = replace_json_value(prompt_json, &path, new_value).map_err(|e| ProcessSingleJobError::Other(e))?;
+        }
+        // Save prompt.json
+        let prompt_file = File::create(&workflow_path).unwrap();
+        serde_json::to_writer(prompt_file, &prompt_json).unwrap();
+    }
+
 
     // ==================== QUERY AND DOWNLOAD FILES ==================== //
-    let root_comfy_path = model_dependencies.inference_command.comfy_root_code_directory.clone();
-
-    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;
-    let remote_cloud_file_client = match remote_cloud_file_client {
-        Ok(res) => {
-            res
-        }
-        Err(_) => {
-            return Err(ProcessSingleJobError::from(anyhow!("failed to get remote cloud file client")));
-        }
-    };
 
     // Download SD model if specified
     let mut maybe_sd_path: Option<PathBuf> = None;
@@ -217,53 +260,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             maybe_input_path = Some(input_path.parse().unwrap());
         }
         None => {}
-    }
-
-    // Download workflow to ComfyRunner
-    let workflow_dir = root_comfy_path.join("../ComfyLauncher");
-    let retrieved_workflow_record =  get_weight_by_token(
-        job_args.workflow_source,
-        false,
-        &deps.db.mysql_pool
-    ).await?.unwrap();
-
-    let bucket_details = RemoteCloudBucketDetails {
-        object_hash: retrieved_workflow_record.public_bucket_hash,
-        prefix: retrieved_workflow_record.maybe_public_bucket_prefix.unwrap(),
-        suffix: retrieved_workflow_record.maybe_public_bucket_extension.unwrap(),
-    };
-    let workflow_path = workflow_dir.join("prompt.json").to_str().unwrap().to_string();
-    remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
-
-    let maybe_args = job.maybe_inference_args
-        .as_ref()
-        .map(|args| args.args.as_ref())
-        .flatten();
-
-    let poly_args = match maybe_args {
-        None => return Err(ProcessSingleJobError::Other(anyhow!("ComfyUi args not found"))),
-        Some(args) => args,
-    };
-
-    let comfy_args = match poly_args {
-        Cu(args) => args,
-        _ => return Err(ProcessSingleJobError::Other(anyhow!("ComfyUi args not found"))),
-    };
-
-    // Apply modifications if they exist
-    if let Some(modifications) = comfy_args.maybe_json_modifications.clone() {
-        // Load prompt.json
-        let prompt_file = std::fs::File::open(&workflow_path).unwrap();
-        let mut prompt_json: Value = serde_json::from_reader(prompt_file).unwrap();
-        // Modify json
-        for (path, new_value) in modifications {
-            prompt_json = replace_json_value(prompt_json, &path, new_value).expect(
-                format!("Failed to replace json value at path {}", path).as_str()
-            );
-        }
-        // Save prompt.json
-        let prompt_file = std::fs::File::create(&workflow_path).unwrap();
-        serde_json::to_writer(prompt_file, &prompt_json).unwrap();
     }
 
     // ==================== SETUP FOR INFERENCE ==================== //
@@ -456,15 +452,29 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     })
 }
 
-fn replace_json_value(json: Value, path: &str, new_value: NewValue) -> Result<Value, serde_json::Error> {
-    replace_with(json, path, &mut |_| {
+fn replace_json_value(json: Value, path: &str, new_value: NewValue) -> anyhow::Result<Value> {
+    // First, attempt to read the value at the specified path
+    let results = jsonpath_lib::select(&json, path).map_err(|err| {
+        anyhow!("Invalid jsonpath '{}': {:?}", path, err)
+    })?;
+
+    // If the path does not exist or returns no results, return an error
+    if results.is_empty() {
+        return Err(anyhow!("Path '{}' does not exist in the provided JSON.", path));
+    }
+
+    // If the path exists, proceed with the replacement
+    // Assuming replace_with returns a Result, handle it appropriately
+    jsonpath_lib::replace_with(json, path, &mut |_| {
         match &new_value {
             NewValue::String(s) => Some(Value::String(s.clone())),
-            NewValue::Float(f) => Some(Value::Number(serde_json::Number::from_f64(*f as f64).unwrap())),
+            NewValue::Float(f) => serde_json::Number::from_f64(*f as f64)
+                .map(Value::Number) // Convert Option to Some(Value::Number) if Some, else None
+                .or_else(|| Some(Value::Null)), // If None, use Value::Null instead
             NewValue::Int(i) => Some(Value::Number(serde_json::Number::from(*i))),
             NewValue::Bool(b) => Some(Value::Bool(*b)),
         }
     }).map_err(|err| {
-        serde_json::Error::custom(format!("Failed to replace json value at path {}: {:?}", path, err))
+        anyhow!("Failed to replace json value at path '{}': {:?}", path, err)
     })
 }
