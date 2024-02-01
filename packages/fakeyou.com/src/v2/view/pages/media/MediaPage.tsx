@@ -15,6 +15,8 @@ import {
   faArrowDownToLine,
   faSquareQuote,
   faLink,
+  faFileCircleXmark,
+  faArrowRightArrowLeft,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -94,7 +96,7 @@ export default function MediaPage() {
           sdMediaImage = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         }
         return <SdCoverImagePanel src={sdMediaImage} />;
-      case MediaFileType.Mocap:
+      case MediaFileType.BVH:
         const bvhUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         return (
           <Iframe
@@ -104,15 +106,45 @@ export default function MediaPage() {
             }}
           />
         );
+      case MediaFileType.GLTF:
+        const gltfUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
+        return (
+          <Iframe
+            {...{
+              url: `https://engine.fakeyou.com?mode=viewer&gltf=${gltfUrl}`,
+              className: "fy-studio-frame",
+            }}
+          />
+        );
+      case MediaFileType.FBX:
+        return (
+          <Panel padding={true}>
+            <div className="d-flex flex-column p-4 gap-3 text-center align-items-center">
+              <FontAwesomeIcon
+                icon={faFileCircleXmark}
+                className="display-5 mb-2"
+              />
+              <h2 className="fw-semibold">FBX file not supported</h2>
+              <div className="d-flex gap-2">
+                <Button
+                  icon={faArrowRightArrowLeft}
+                  label="Convert FBX to glTF"
+                  to={`/fbx-to-gltf/${mediaFile.token}`}
+                  variant="primary"
+                />
+              </div>
+            </div>
+          </Panel>
+        );
       default:
         return <div>Unsupported media type</div>;
     }
   }
 
-  const weightTypeInfo = useMediaFileTypeInfo(
+  const mediaTypeInfo = useMediaFileTypeInfo(
     mediaFile?.media_type || MediaFileType.None
   );
-  const { label: mediaType, color: mediaTagColor } = weightTypeInfo;
+  const { label: mediaType, color: mediaTagColor } = mediaTypeInfo;
 
   let audioLink = new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path);
 
@@ -228,20 +260,56 @@ export default function MediaPage() {
 
   const videoDetails = [
     { property: "Type", value: mediaFile?.media_type || "" },
-    { property: "Created at", value: dateCreated || "" },
     {
       property: "Visibility",
       value: mediaFile?.creator_set_visibility.toString() || "",
     },
+    { property: "Created at", value: dateCreated || "" },
   ];
 
   const imageDetails = [
     { property: "Type", value: mediaFile?.media_type || "" },
-    { property: "Created at", value: dateCreated || "" },
     {
       property: "Visibility",
       value: mediaFile?.creator_set_visibility.toString() || "",
     },
+    { property: "Created at", value: dateCreated || "" },
+  ];
+
+  const bvhDetails = [
+    {
+      property: "Type",
+      value: mediaType || "",
+    },
+    {
+      property: "Visibility",
+      value: mediaFile?.creator_set_visibility.toString() || "",
+    },
+    { property: "Created at", value: dateCreated || "" },
+  ];
+
+  const gltfDetails = [
+    {
+      property: "Type",
+      value: mediaType || "",
+    },
+    {
+      property: "Visibility",
+      value: mediaFile?.creator_set_visibility.toString() || "",
+    },
+    { property: "Created at", value: dateCreated || "" },
+  ];
+
+  const fbxDetails = [
+    {
+      property: "Type",
+      value: mediaType || "",
+    },
+    {
+      property: "Visibility",
+      value: mediaFile?.creator_set_visibility.toString() || "",
+    },
+    { property: "Created at", value: dateCreated || "" },
   ];
 
   let mediaDetails;
@@ -255,6 +323,15 @@ export default function MediaPage() {
       break;
     case MediaFileType.Image:
       mediaDetails = imageDetails;
+      break;
+    case MediaFileType.BVH:
+      mediaDetails = bvhDetails;
+      break;
+    case MediaFileType.GLTF:
+      mediaDetails = gltfDetails;
+      break;
+    case MediaFileType.FBX:
+      mediaDetails = fbxDetails;
       break;
     default:
   }

@@ -2,6 +2,8 @@ export enum MediaFileType {
   Audio = "audio",
   Video = "video",
   Image = "image",
-  Mocap = "mocap",
+  BVH = "bvh",
+  GLTF = "gltf",
+  FBX = "fbx",
   None = "none",
 }

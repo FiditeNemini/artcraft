@@ -492,10 +492,14 @@ class ApiConfig {
   }
 
   // =============== Motion Capture / mocap ===============
-  enqueueVideoMotionCapture(): string{
-    return `${this.getApiOrigin()}/v1/mocap/mocapnet/create`
+  enqueueVideoMotionCapture(): string {
+    return `${this.getApiOrigin()}/v1/mocap/mocapnet/create`;
   }
 
+  // =============== Convert FBX to glTF ===============
+  enqueueFbxToGltf(): string {
+    return `${this.getApiOrigin()}/v1/conversion/enqueue_fbx_to_gltf`;
+  }
 
   // =============== Generic Model Downloads ===============
 

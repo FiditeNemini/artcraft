@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { Redirect, useHistory, useLocation } from "react-router-dom";
-import { faPenToSquare, faPlus, faRightToBracket, faStar, faWaveform } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faPenToSquare,
+  faPlus,
+  faRightToBracket,
+  faStar,
+  faWandMagicSparkles,
+  faMicrophone,
+} from "@fortawesome/pro-solid-svg-icons";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { useLocalize, useSession } from "hooks";
 import Panel from "components/common/Panel";
@@ -13,7 +20,6 @@ import { Button } from "components/common";
 import useVoiceRequests from "./useVoiceRequests";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMicrophone } from "@fortawesome/pro-solid-svg-icons";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import "./VoiceDesigner.scss";
 
@@ -28,7 +34,9 @@ function VoiceDesignerMainPage() {
     requestVoices: true,
   });
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const view = ["/voice-designer/datasets", "/voice-designer/voices"].indexOf(pathname);
+  const view = ["/voice-designer/datasets", "/voice-designer/voices"].indexOf(
+    pathname
+  );
   const [deleteItem, setDeleteItem] = useState("");
   const [deleteType, setDeleteType] = useState("");
   const [deleteText, setDeleteText] = useState({
@@ -146,7 +154,8 @@ function VoiceDesignerMainPage() {
   const failures = (fail = "") => {
     switch (fail) {
       // case "face_not_detected": return "Face not detected, try another picture"; // voice designer can have failure states too!
-      default: return "Uknown failure";
+      default:
+        return "Uknown failure";
     }
   };
 
@@ -180,12 +189,13 @@ function VoiceDesignerMainPage() {
     </div>
   );
 
-  const logggedInView = <>
+  const logggedInView = (
+    <>
       <InferenceJobsList
         {...{
           failures,
           jobType: FrontendInferenceJobType.VoiceDesignerCreateVoice,
-          t
+          t,
         }}
       />
       <Panel mb={true}>
@@ -224,9 +234,11 @@ function VoiceDesignerMainPage() {
           />
         </div>
       </Panel>
-    </>;
+    </>
+  );
 
-  const loggedOutView = <Panel padding={true}>
+  const loggedOutView = (
+    <Panel padding={true}>
       <div className="d-flex flex-column align-items-center py-3 my-3 py-md-4 my-md-4 gap-4">
         <div className="text-center">
           <h4 className="fw-bold">Please log in to access voice creation.</h4>
@@ -252,7 +264,8 @@ function VoiceDesignerMainPage() {
           />
         </div>
       </div>
-    </Panel>;
+    </Panel>
+  );
 
   return (
     <>
@@ -262,7 +275,7 @@ function VoiceDesignerMainPage() {
             button: user ? createVoiceButton : signUpButton,
             ...(!user ? { secondaryButton: pricingButton } : {}),
             title: "Voice Designer",
-            titleIcon: faWaveform,
+            titleIcon: faWandMagicSparkles,
             subText:
               "Create your own AI voice by providing audio files of the voice you want to clone.",
             panel: false,

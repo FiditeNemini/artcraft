@@ -46,7 +46,6 @@ import {
 // import { GenericNotice } from "./notices/GenericNotice";
 // import { DiscordLink2 } from "@storyteller/components/src/elements/DiscordLink2";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { TtsPageHero } from "./TtsPageHero";
 import { Analytics } from "../../../../../common/Analytics";
 import {
   GetComputedTtsCategoryAssignments,
@@ -67,6 +66,9 @@ import { RatingStats } from "../../../_common/ratings/RatingStats";
 import { SearchOmnibar } from "./search/SearchOmnibar";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { useLocalize } from "hooks";
+import { Container, Panel } from "components/common";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
+import { faMessageDots } from "@fortawesome/pro-solid-svg-icons";
 
 export interface EnqueueJobResponsePayload {
   success: boolean;
@@ -194,7 +196,7 @@ function TtsModelListPage(props: Props) {
       setTtsModels(models);
       if (!maybeSelectedTtsModel && models.length > 0) {
         let model = models[0];
-        const featuredModels = models.filter((m) => m.is_front_page_featured);
+        const featuredModels = models.filter(m => m.is_front_page_featured);
         if (featuredModels.length > 0) {
           // Random featured model
           model =
@@ -225,20 +227,19 @@ function TtsModelListPage(props: Props) {
         "SYNTHETIC_CATEGORY:TRENDING_MODELS";
 
       let maybeLatestCategory = categories.find(
-        (category) => category.category_token === LATEST_MODELS_CATEGORY_TOKEN
+        category => category.category_token === LATEST_MODELS_CATEGORY_TOKEN
       );
 
       let maybeTrendingCategory = categories.find(
-        (category) => category.category_token === TRENDING_MODELS_CATEGORY_TOKEN
+        category => category.category_token === TRENDING_MODELS_CATEGORY_TOKEN
       );
 
       let otherCategories = categories
         .filter(
-          (category) => category.category_token !== LATEST_MODELS_CATEGORY_TOKEN
+          category => category.category_token !== LATEST_MODELS_CATEGORY_TOKEN
         )
         .filter(
-          (category) =>
-            category.category_token !== TRENDING_MODELS_CATEGORY_TOKEN
+          category => category.category_token !== TRENDING_MODELS_CATEGORY_TOKEN
         );
 
       categories = [];
@@ -499,7 +500,7 @@ function TtsModelListPage(props: Props) {
   }
 
   return (
-    <div>
+    <Container type="panel">
       {/* {bootstrapLanguageNotice} */}
 
       {pleaseFollowNotice}
@@ -510,131 +511,127 @@ function TtsModelListPage(props: Props) {
 
       {twitchTtsNotice}
 
-      <TtsPageHero
-        sessionWrapper={props.sessionWrapper}
-        sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+      <PageHeaderWithImage
+        headerImage="/mascot/kitsune_pose2.webp"
+        titleIcon={faMessageDots}
+        title={t("heroTitle")}
+        subText={t("heroText")}
+        yOffset="65%"
       />
 
-      <div className="container-panel pb-5 mb-4">
-        <div className="panel p-3 py-4 p-md-4">
-          <i className="fas fa-volume-high"></i>
+      <Panel padding={true}>
+        <div className="d-flex gap-4">
+          <form
+            className="w-100 d-flex flex-column"
+            onSubmit={handleFormSubmit}
+          >
+            {/* Explore Rollout */}
 
-          <div className="d-flex gap-4">
-            <form
-              className="w-100 d-flex flex-column"
-              onSubmit={handleFormSubmit}
-            >
-              {/* Explore Rollout */}
+            <SearchOmnibar
+              allTtsCategories={props.allTtsCategories}
+              allTtsModels={props.ttsModels}
+              allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+              allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+              ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+              dropdownCategories={props.dropdownCategories}
+              setDropdownCategories={props.setDropdownCategories}
+              selectedCategories={props.selectedCategories}
+              setSelectedCategories={props.setSelectedCategories}
+              maybeSelectedTtsModel={props.maybeSelectedTtsModel}
+              setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+              selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+              setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
+            />
 
-              <SearchOmnibar
-                allTtsCategories={props.allTtsCategories}
-                allTtsModels={props.ttsModels}
-                allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
-                allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-                dropdownCategories={props.dropdownCategories}
-                setDropdownCategories={props.setDropdownCategories}
-                selectedCategories={props.selectedCategories}
-                setSelectedCategories={props.setSelectedCategories}
-                maybeSelectedTtsModel={props.maybeSelectedTtsModel}
-                setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-                setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
-              />
-
-              {/*
+            {/*
                 
                 
                 EXPLORE OMNIBAR GOES HERE TODO
                 
                 */}
 
-              {directViewLink}
+            {directViewLink}
 
-              <div className="row gx-5 gy-5">
-                <div className="col-12 col-lg-6 d-flex flex-column gap-3">
-                  <div className="d-flex flex-column gap-3 h-100">
-                    <div className="d-flex gap-2">
-                      <label className="sub-title pb-0">
-                        {t("ttsTextInputLabel")}
-                      </label>
-                      {/*<a href="/" className="ms-1">
+            <div className="row gx-5 gy-5">
+              <div className="col-12 col-lg-6 d-flex flex-column gap-3">
+                <div className="d-flex flex-column gap-3 h-100">
+                  <div className="d-flex gap-2">
+                    <label className="sub-title pb-0">
+                      {t("ttsTextInputLabel")}
+                    </label>
+                    {/*<a href="/" className="ms-1">
                           <FontAwesomeIcon icon={faShuffle} />
                         </a>*/}
-                    </div>
-                    <textarea
-                      onClick={() => {
-                        Analytics.ttsClickTextInputBox();
-                      }}
-                      onChange={handleChangeText}
-                      className="form-control text-message h-100"
-                      value={props.textBuffer}
-                      placeholder={t("ttsTextInputPlaceholder", {
-                        character:
-                          props.maybeSelectedTtsModel?.title || "character",
-                      })}
-                    ></textarea>
-                    {audioLimitAlert}
-                    <div className="d-flex gap-3">
-                      <button
-                        className={speakButtonClass}
-                        disabled={
-                          remainingCharactersButtonDisabled ||
-                          noTextInputButtonDisabled
-                        }
-                        onClick={handleLoading}
-                        type="submit"
-                      >
-                        <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
-                        {t("ttsButtonSpeak")}
-
-                        {loading && <LoadingIcon />}
-                      </button>
-                      <button
-                        className="btn btn-destructive w-100"
-                        onClick={handleClearClick}
-                        disabled={noTextInputButtonDisabled}
-                      >
-                        <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />
-                        {t("ttsButtonClear")}
-                      </button>
-                    </div>
                   </div>
-                </div>
-                <div className="col-12 col-lg-6">
-                  <div className="d-flex flex-column gap-3">
-                    <h4 className="text-center text-lg-start">
-                      <FontAwesomeIcon
-                        icon={faBarsStaggered}
-                        className="me-3"
-                      />
-                      {t("ttsResultsTitle")}
-                    </h4>
-                    <div className="d-flex flex-column gap-3 session-tts-section">
-                      <SessionTtsInferenceResultList
-                        inferenceJobs={
-                          props.inferenceJobsByCategory.get(
-                            FrontendInferenceJobType.TextToSpeech
-                          )!
-                        }
-                        ttsInferenceJobs={props.ttsInferenceJobs}
-                        sessionSubscriptionsWrapper={
-                          props.sessionSubscriptionsWrapper
-                        }
-                      />
-                    </div>
+                  <textarea
+                    onClick={() => {
+                      Analytics.ttsClickTextInputBox();
+                    }}
+                    onChange={handleChangeText}
+                    className="form-control text-message h-100"
+                    value={props.textBuffer}
+                    placeholder={t("ttsTextInputPlaceholder", {
+                      character:
+                        props.maybeSelectedTtsModel?.title || "character",
+                    })}
+                  ></textarea>
+                  {audioLimitAlert}
+                  <div className="d-flex gap-3">
+                    <button
+                      className={speakButtonClass}
+                      disabled={
+                        remainingCharactersButtonDisabled ||
+                        noTextInputButtonDisabled
+                      }
+                      onClick={handleLoading}
+                      type="submit"
+                    >
+                      <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
+                      {t("ttsButtonSpeak")}
+
+                      {loading && <LoadingIcon />}
+                    </button>
+                    <button
+                      className="btn btn-destructive w-100"
+                      onClick={handleClearClick}
+                      disabled={noTextInputButtonDisabled}
+                    >
+                      <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />
+                      {t("ttsButtonClear")}
+                    </button>
                   </div>
                 </div>
               </div>
-              {maybeError}
-            </form>
-          </div>
+              <div className="col-12 col-lg-6">
+                <div className="d-flex flex-column gap-3">
+                  <h4 className="text-center text-lg-start">
+                    <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
+                    {t("ttsResultsTitle")}
+                  </h4>
+                  <div className="d-flex flex-column gap-3 session-tts-section">
+                    <SessionTtsInferenceResultList
+                      inferenceJobs={
+                        props.inferenceJobsByCategory.get(
+                          FrontendInferenceJobType.TextToSpeech
+                        )!
+                      }
+                      ttsInferenceJobs={props.ttsInferenceJobs}
+                      sessionSubscriptionsWrapper={
+                        props.sessionSubscriptionsWrapper
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {maybeError}
+          </form>
         </div>
 
         {/* <div className="pt-5">
           <BackLink link="/" text="Back to main page" />
         </div> */}
-      </div>
+      </Panel>
 
       <SessionW2lInferenceResultList
         w2lInferenceJobs={props.w2lInferenceJobs}
@@ -647,7 +644,7 @@ function TtsModelListPage(props: Props) {
       <SessionTtsModelUploadResultList
         modelUploadJobs={props.ttsModelUploadJobs}
       />
-    </div>
+    </Container>
   );
 }
 

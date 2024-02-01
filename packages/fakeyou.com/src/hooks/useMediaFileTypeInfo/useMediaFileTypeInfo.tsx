@@ -17,9 +17,17 @@ const mediaFileTypeInfo: MediaFileTypeInfo = {
     label: "Video",
     color: "purple",
   },
-  [MediaFileType.Mocap]: {
-    label: "Mocap",
+  [MediaFileType.BVH]: {
+    label: "BVH",
     color: "pink",
+  },
+  [MediaFileType.GLTF]: {
+    label: "glTF",
+    color: "lime",
+  },
+  [MediaFileType.FBX]: {
+    label: "FBX",
+    color: "lime",
   },
   [MediaFileType.None]: {
     label: "None",

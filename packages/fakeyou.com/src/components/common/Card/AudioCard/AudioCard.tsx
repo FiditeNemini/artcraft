@@ -85,15 +85,15 @@ export default function AudioCard({
     }
   }
 
-  const onClick = () => {
-    if (inClick) inClick(data);
-  };
+  // const onClick = () => {
+  //   if (inClick) inClick(data);
+  // };
 
   const card = (
     <Card
       padding={true}
       canHover={true}
-      onClick={onClick}
+      onClick={handleSelectModalResultSelect}
     >
       {type === "media" && (
         <>
@@ -176,7 +176,7 @@ export default function AudioCard({
                     variant="link"
                     label="Select"
                     className="fs-7"
-                    onClick={onClick}
+                    onClick={handleSelectModalResultSelect}
                   />
                 ) : (
                   <Button

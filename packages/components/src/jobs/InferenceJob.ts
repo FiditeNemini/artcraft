@@ -9,7 +9,8 @@ export enum FrontendInferenceJobType {
   VoiceDesignerCreateVoice,
   VoiceDesignerTts,
   ImageGeneration,
-  VideoMotionCapture
+  VideoMotionCapture,
+  ConvertFbxtoGltf,
 }
 
 // NB: Many of these fields are optional despite the response payload containing them

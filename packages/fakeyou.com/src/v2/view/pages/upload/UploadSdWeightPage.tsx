@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   faCircleExclamation,
   faEye,
@@ -10,8 +10,6 @@ import {
   Button,
   Container,
   CoverImageInput,
-  Panel,
-  Skeleton,
   SplitPanel,
   TempInput,
   TempSelect,
@@ -27,8 +25,6 @@ interface UploadSdWeightPageProps {
 export default function UploadSdWeightPage({
   sessionWrapper,
 }: UploadSdWeightPageProps) {
-  const [isLoading] = useState(false);
-
   usePrefixedDocumentTitle("Edit Voice");
 
   const visibilityOptions = [
@@ -36,9 +32,17 @@ export default function UploadSdWeightPage({
     { label: "Private", value: "private" },
   ];
 
-  const { coverImg, descriptionMD, onChange, title, upload, uploadPath, visibility } = useSdUpload();
+  const {
+    coverImg,
+    descriptionMD,
+    onChange,
+    title,
+    upload,
+    uploadPath,
+    visibility,
+  } = useSdUpload();
 
-  if (!sessionWrapper.isLoggedIn() && !isLoading) {
+  if (!sessionWrapper.isLoggedIn()) {
     return (
       <Container type="panel">
         <PageHeader
@@ -65,96 +69,81 @@ export default function UploadSdWeightPage({
       <PageHeader
         title="Upload Stable Diffusion Weight"
         titleIcon={faWaveform}
-        subText="Upload a Stable Diffusion Image model weight. Once your weight is successfully uploaded, you'll be able to start using it and sharing it with others."
+        subText="Upload a Stable Diffusion image model weight. Once your weight is successfully uploaded, you'll be able to start using it and sharing it with others."
         panel={false}
       />
 
-      <>
-        {isLoading ? (
-          <Panel padding={true}>
-            <div className="d-flex flex-column gap-3">
-              <Skeleton type="short" />
-              <Skeleton height="40px" />
-              <Skeleton type="short" />
-              <Skeleton height="40px" />
-              <div className="d-flex justify-content-end mt-3 gap-2">
-                <Skeleton height="40px" width="120px" />
-                <Skeleton height="40px" width="120px" />
-              </div>
+      <SplitPanel dividerFooter={true}>
+        <SplitPanel.Body padding={true}>
+          <div className="row gx-4 gy-3">
+            <div className="col-12 col-lg-5">
+              <label className="sub-title required">Cover Image</label>
+              <CoverImageInput
+                {...{
+                  currentPath: "",
+                  onClick: coverImg.upload,
+                  status: coverImg.status,
+                  ...coverImg.fileProps,
+                }}
+              />
             </div>
-          </Panel>
-        ) : (
-          <SplitPanel dividerFooter={true}>
-            <SplitPanel.Body padding={true}>
-              <div className="row gx-4 gy-3">
-                <div className="col-12 col-lg-5">
-                  <label className="sub-title required">Cover Image</label>
-                  <CoverImageInput {...{
-                    currentPath: "",
-                    onClick: coverImg.upload,
-                    status: coverImg.status,
-                    ...coverImg.fileProps
-                  }} />
-                </div>
-                <div className="col-12 col-lg-7 order-first order-lg-last">
-                  <TempInput
-                    {...{
-                      label: "Title",
-                      name: "title",
-                      onChange,
-                      placeholder: "Title",
-                      value: title,
-                      required: true,
-                    }}
-                  />
+            <div className="col-12 col-lg-7 order-first order-lg-last">
+              <TempInput
+                {...{
+                  label: "Title",
+                  name: "title",
+                  onChange,
+                  placeholder: "Title",
+                  value: title,
+                  required: true,
+                }}
+              />
 
-                  <TempInput
-                    {...{
-                      label: "Download URL, eg. Google Drive link",
-                      name: "uploadPath",
-                      onChange,
-                      placeholder: "Download URL",
-                      value: uploadPath,
-                      required: true,
-                    }}
-                  />
+              <TempInput
+                {...{
+                  label: "Download URL, eg. Google Drive link",
+                  name: "uploadPath",
+                  onChange,
+                  placeholder: "Download URL",
+                  value: uploadPath,
+                  required: true,
+                }}
+              />
 
-                  <TempSelect
-                    {...{
-                      icon: faEye,
-                      label: "Visibility",
-                      name: "visibility",
-                      onChange,
-                      options: visibilityOptions,
-                      placeholder: "Voice name",
-                      value: visibility,
-                    }}
-                  />
-                  <TempTextArea
-                    {...{
-                      label: "Description",
-                      name: "descriptionMD",
-                      onChange,
-                      placeholder: "Description",
-                      value: descriptionMD,
-                    }}
-                  />
-                </div>
-              </div>
-            </SplitPanel.Body>
-            <SplitPanel.Footer padding={true}>
-              <div className="d-flex gap-2 justify-content-end">
-                <Button
-                  {...{
-                    label: "Upload Weight",
-                    onClick: upload
-                  }}
-                />
-              </div>
-            </SplitPanel.Footer>
-          </SplitPanel>
-        )}
-      </>
+              <TempSelect
+                {...{
+                  icon: faEye,
+                  label: "Visibility",
+                  name: "visibility",
+                  onChange,
+                  options: visibilityOptions,
+                  placeholder: "Voice name",
+                  value: visibility,
+                }}
+              />
+              <TempTextArea
+                {...{
+                  label: "Description",
+                  name: "descriptionMD",
+                  onChange,
+                  placeholder: "Description",
+                  value: descriptionMD,
+                }}
+              />
+            </div>
+          </div>
+        </SplitPanel.Body>
+        <SplitPanel.Footer padding={true}>
+          <div className="d-flex gap-2 justify-content-end">
+            <Button
+              {...{
+                label: "Upload Weight",
+                onClick: upload,
+              }}
+            />
+          </div>
+        </SplitPanel.Footer>
+      </SplitPanel>
     </Container>
   );
 }

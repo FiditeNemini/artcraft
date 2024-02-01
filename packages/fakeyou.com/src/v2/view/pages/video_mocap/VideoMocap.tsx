@@ -6,10 +6,8 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 
-import { BasicVideo, Button, Container, Panel } from "components/common";
-import PageHeader from "components/layout/PageHeader";
-import Tabs from "components/common/Tabs";
-import { useLocalize } from "hooks";
+import { BasicVideo, Button, Container, Panel, Tabs } from "components/common";
+import { useInferenceJobs, useLocalize } from "hooks";
 
 import TabContentUpload from "./components/tabContentUpload";
 import TabContentLibrary from "./components/tabContentLibrary";
@@ -20,7 +18,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRotateLeft,
   faPersonCircleCheck,
+  faPersonRays,
 } from "@fortawesome/pro-solid-svg-icons";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 
 export default function VideoMotionCapture(props: {
   enqueueInferenceJob: (
@@ -36,6 +36,11 @@ export default function VideoMotionCapture(props: {
   const [pageState, dispatchPageState] = useReducer(reducer, {
     status: NO_FILE,
   });
+
+  const { inferenceJobs } = useInferenceJobs(
+    FrontendInferenceJobType.VideoMotionCapture
+  );
+  const hasMotionCaptureJobs = inferenceJobs && inferenceJobs.length > 0;
 
   useEffect(() => {
     if (
@@ -75,14 +80,21 @@ export default function VideoMotionCapture(props: {
 
   return (
     <Container type="panel" className="mb-5">
-      <PageHeader
+      <PageHeaderWithImage
         title={t("headings.title")}
         subText={t("headings.subtitle")}
+        headerImage="/mascot/video-mocap.webp"
+        yOffset="62%"
+        titleIcon={faPersonRays}
       />
 
-      <VideoMocapJobList />
+      {hasMotionCaptureJobs && (
+        <div className="mb-4">
+          <VideoMocapJobList />
+        </div>
+      )}
 
-      <Panel className="mt-3">
+      <Panel>
         <div className="row g-0">
           {pageState.status < FILE_UPLOADING && (
             <>
@@ -120,7 +132,9 @@ export default function VideoMotionCapture(props: {
                     icon={faArrowRotateLeft}
                     iconFlip={true}
                     label="Generate Another"
-                    onClick={() => {}} //back to first state
+                    onClick={() => {
+                      dispatchPageState({ type: "restart" });
+                    }} //back to first state
                     variant="primary"
                   />
                 </div>

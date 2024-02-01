@@ -17,10 +17,12 @@ import { PageHeader } from "../../_common/PageHeader";
 import {
   faFileArrowUp,
   faHandHoldingHeart,
+  faImage,
+  faMicrophone,
 } from "@fortawesome/pro-solid-svg-icons";
-import { faMicrophoneStand } from "@fortawesome/pro-duotone-svg-icons";
 import { faWaveformLines } from "@fortawesome/pro-regular-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { Button } from "components/common";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -96,25 +98,39 @@ function ContributeIndexPage(props: Props) {
             </p>
             <div className="row gx-3 gy-3">
               <div className="col-12 col-md-6">
-                <Link
+                <Button
+                  icon={faMicrophone}
+                  label="Upload Voice to Voice Weight"
                   to="/upload/voice_conversion"
-                  className="btn btn-primary w-100"
-                >
-                  <FontAwesomeIcon icon={faMicrophoneStand} className="me-3" />
-                  Upload Voice to Voice Model
-                </Link>
+                />
               </div>
               <div className="col-12 col-md-6">
-                <Link to="/upload/tts" className="btn btn-primary w-100">
-                  <FontAwesomeIcon icon={faVolumeHigh} className="me-3" />
-                  {t("pages.contributeIndex.buttonUploadVoice")}
-                </Link>
+                <Button
+                  icon={faVolumeHigh}
+                  label={t("pages.contributeIndex.buttonUploadVoice")}
+                  to="/upload/tts"
+                />
               </div>
               <div className="col-12 col-md-6">
-                <Link to="/upload/vocoder" className="btn btn-primary w-100">
-                  <FontAwesomeIcon icon={faWaveformLines} className="me-3" />
-                  Upload Vocoder
-                </Link>
+                <Button
+                  icon={faWaveformLines}
+                  label="Upload Vocoder"
+                  to="/upload/vocoder"
+                />
+              </div>
+              <div className="col-12 col-md-6">
+                <Button
+                  icon={faImage}
+                  label="Upload Stable Diffusion Weight"
+                  to="/upload/sd"
+                />
+              </div>
+              <div className="col-12 col-md-6">
+                <Button
+                  icon={faImage}
+                  label="Upload LoRa Weight"
+                  to="/upload/lora"
+                />
               </div>
             </div>
           </div>

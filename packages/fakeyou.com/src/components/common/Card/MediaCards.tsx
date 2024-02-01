@@ -1,12 +1,14 @@
 import React from "react";
 import AudioCard from "./AudioCard";
 import ImageCard from "./ImageCard";
-import MocapCard from "./MocapCard";
 import VideoCard from "./VideoCard";
+import BVHCard from "./BVHCard";
+import GLTFCard from "./GLTFCard";
+import FBXCard from "./FBXCard";
 
 interface Props {
-  props: any,
-  type: string
+  props: any;
+  type: string;
 }
 
 export default function MediaCards({ props, type }: Props) {
@@ -15,11 +17,15 @@ export default function MediaCards({ props, type }: Props) {
       return <AudioCard {...props} />;
     case "image":
       return <ImageCard {...props} />;
-    case "mocap":
-      return <MocapCard {...props} />;
+    case "bvh":
+      return <BVHCard {...props} />;
+    case "gltf":
+      return <GLTFCard {...props} />;
+    case "fbx":
+      return <FBXCard {...props} />;
     case "video":
       return <VideoCard {...props} />;
     default:
       return <div>Unsupported media type</div>;
   }
-};
+}

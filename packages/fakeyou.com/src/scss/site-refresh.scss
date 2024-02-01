@@ -29,16 +29,15 @@ styles with important tags:
 }
 
 .fakeyou-refresh {
-
   //- BS5 classnames -//
-  .object-fit-cover{
+  .object-fit-cover {
     object-fit: cover;
   }
   .ratio-1x1 {
     aspect-ratio: 1/1;
   }
   //-end--//
-  
+
   ::-webkit-scrollbar-thumb {
     background-color: rgba($secondary, 1);
     border-radius: 0.5rem;
@@ -1129,11 +1128,11 @@ styles with important tags:
   .hero-img {
     pointer-events: none;
     position: absolute;
-    width: 90%;
-    margin: auto;
-    top: 22%;
-    right: 9%;
-    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 95%;
   }
 
   .hero-img-mobile {

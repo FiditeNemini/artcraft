@@ -13,6 +13,7 @@ import useListContent from './useListContent';
 import useLocalize from './useLocalize';
 import useMedia from './useMedia';
 import useModal from './useModal';
+import useOnScreen from "./useOnScreen";
 import useRatings from './useRatings';
 import useSdUpload from './useSdUpload';
 import useSession from './useSession';
@@ -35,6 +36,7 @@ export {
   useLocalize,
   useMedia,
   useModal,
+  useOnScreen,
   useRatings,
   useSdUpload,
   useSession,

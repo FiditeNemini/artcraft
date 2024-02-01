@@ -5,6 +5,7 @@ import Button from "./Button";
 import Checkbox from "./Checkbox";
 import Container from "./Container";
 import CoverImageInput from "./CoverImageInput";
+import ErrorMessage from "./ErrorMessage"
 import FileActions from "./FileActions";
 import FileDetails from "./FileDetails";
 import FileWrapper from "./FileWrapper";
@@ -23,11 +24,13 @@ import Skeleton from "./Skeleton";
 import Slider from "./Slider";
 import Spinner from "./Spinner";
 import SplitPanel from "./SplitPanel";
+import Tabs from "./Tabs";
 import TempAudioPlayer from "./TempAudioPlayer";
 import TempInput from "./TempInput";
 import TempSelect from "./TempSelect";
 import TempTextArea from "./TempTextArea";
 import TintSpinner from "./TintSpinner";
+import VideoInput from "./VideoInput";
 
 export {
   AudioBlobPreview,
@@ -37,6 +40,7 @@ export {
   Checkbox,
   Container,
   CoverImageInput,
+  ErrorMessage,
   FileActions,
   FileDetails,
   FileWrapper,
@@ -55,9 +59,11 @@ export {
   Slider,
   Spinner,
   SplitPanel,
+  Tabs,
   TempAudioPlayer,
   TempInput,
   TempSelect,
   TempTextArea,
-  TintSpinner
+  TintSpinner,
+  VideoInput
 };

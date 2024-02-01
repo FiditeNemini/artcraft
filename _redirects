@@ -12,6 +12,7 @@
 /contribute*   /index.html   200
 /explore*   /index.html   200
 /face-animator*   /index.html   200
+/fbx-to-gltf*   /index.html   200
 /firehose*   /index.html   200
 /guide*   /index.html   200
 /jobs*   /index.html   200
@@ -47,6 +48,7 @@
 /voice-designer*   /index.html   200
 /w2l*   /index.html   200
 /weight*   /index.html   200
+/text-to-image*   /index.html   200
 
 # Test paths
 /dev-tts*   /index.html   200

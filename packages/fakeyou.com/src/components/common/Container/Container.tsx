@@ -29,7 +29,8 @@ export default function PageContainer({
   }
 
   // Merge the classNames
-  const mergedClassNames = `${containerClass} ${className}`;
+  const mergedClassNames =
+    `${containerClass} ${className} min-height-100vh`.trim();
 
   return <div className={mergedClassNames}>{children}</div>;
 }

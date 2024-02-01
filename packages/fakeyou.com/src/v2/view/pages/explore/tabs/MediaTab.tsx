@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import MediaCards from "components/common/Card/MediaCards";
-import { TempSelect } from "components/common";
+import { Button, TempSelect } from "components/common";
 import {
   faArrowDownWideShort,
   faFilter,
@@ -11,7 +11,7 @@ import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContex
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { ListMediaFiles } from "@storyteller/components/src/api/media_files/ListMediaFiles";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
-import { useBookmarks, useLazyLists, useRatings } from "hooks";
+import { useBookmarks, useLazyLists, useOnScreen, useRatings } from "hooks";
 import InfiniteScroll from "react-infinite-scroll-component";
 import prepFilter from "resources/prepFilter";
 
@@ -20,6 +20,9 @@ export default function MediaTab() {
   const urlQueries = new URLSearchParams(search);
   const bookmarks = useBookmarks();
   const ratings = useRatings();
+  const toTopBtnRef = useRef<HTMLDivElement | null>(null);
+  const onScreen = useOnScreen(toTopBtnRef,"0px");
+
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [mediaType, mediaTypeSet] = useState(
     urlQueries.get("filter_media_type") || "all"
@@ -82,7 +85,20 @@ export default function MediaTab() {
             }}
           />
         </div>
+        { media.urlCursor ? 
+          <Button {...{
+            className: `to-top-button`,
+            buttonRef: toTopBtnRef,
+            label: "Back to top",
+            onClick: () => media.reset(),
+          }}/> : null }
       </div>
+      { media.urlCursor && !onScreen ? 
+        <Button {...{
+          className: `to-top-button-off-screen`,
+          label: "Back to top",
+          onClick: () => media.reset(),
+        }}/> : null }
       <AudioPlayerProvider>
         {media.isLoading && !media.list.length ? (
           <div className="row gx-3 gy-3">
@@ -91,6 +107,7 @@ export default function MediaTab() {
             ))}
           </div>
         ) : (
+
           <InfiniteScroll
             dataLength={media.list.length}
             next={media.getMore}

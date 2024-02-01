@@ -4,7 +4,6 @@ import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 // import MediaCards from "components/common/Card/MediaCards";
 import AudioCard from "components/common/Card/AudioCard";
 import ImageCard from "components/common/Card/ImageCard";
-import MocapCard from "components/common/Card/MocapCard";
 import VideoCard from "components/common/Card/VideoCard";
 import { BvhCard } from "components/entities";
 
@@ -24,8 +23,6 @@ const MediaCards = ({ props, type }: MediaCardsProps) => {
       return <AudioCard {...props} />;
     case "image":
       return <ImageCard {...props} />;
-    case "mocap":
-      return <MocapCard {...props} />;
     case "video":
       return <VideoCard {...props} />;
     case "bvh":

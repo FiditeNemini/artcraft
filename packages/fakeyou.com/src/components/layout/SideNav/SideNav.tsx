@@ -14,6 +14,7 @@ import {
   faSignOutAlt,
   faCameraMovie,
   faPersonRays,
+  faMessageImage,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
@@ -341,7 +342,7 @@ export default function SideNav({
                 {"Voice Designer"}
               </NavLink>
             </li>
-            <hr className="mb-4 mt-3" />
+            <hr className="mb-3 mt-3" />
             <li className="sidebar-heading">{t("videoTitle")}</li>
             <li>
               <NavLink
@@ -384,6 +385,22 @@ export default function SideNav({
                 {/* {t("videoStorytellerStudio")} */}
               </NavLink>
             </li>
+            <hr className="mb-3 mt-3" />
+            <li className="sidebar-heading">Image Generation</li>
+            <li>
+              <NavLink
+                to="/text-to-image"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faMessageImage}
+                  className="sidebar-heading-icon"
+                />
+                Text to Image
+                {/* {t("videoStorytellerStudio")} */}
+              </NavLink>
+            </li>
 
             <hr className="mb-3 mt-3" />
             <li className="sidebar-heading">{t("communityTitle")}</li>
@@ -400,7 +417,7 @@ export default function SideNav({
                 {t("communityUploadModels")}
               </NavLink>
             </li>
-            <li>
+            <li className="mb-3">
               <a
                 href="https://discord.gg/fakeyou"
                 target="_blank"

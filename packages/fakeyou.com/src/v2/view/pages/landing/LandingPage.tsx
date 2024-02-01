@@ -18,7 +18,6 @@ import {
   faSparkles,
 } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-import { FooterNav } from "v2/view/nav/FooterNav";
 import Alert from "components/common/Alert/Alert";
 // import { Analytics } from "../../../../../common/Analytics";
 
@@ -559,8 +558,6 @@ function LandingPage(props: Props) {
           />
         </div>
       </div>
-
-      <FooterNav sessionWrapper={props.sessionWrapper} />
     </div>
   );
 }

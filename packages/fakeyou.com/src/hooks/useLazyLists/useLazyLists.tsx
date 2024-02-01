@@ -32,7 +32,8 @@ export default function useLazyLists({
   const { pathname, search: locSearch } = useLocation();
   const history = useHistory();
   const urlQueries = new URLSearchParams(locSearch);
-  const [next, nextSet] = useState(urlQueries.get("cursor") || "");
+  const urlCursor = urlQueries.get("cursor");
+  const [next, nextSet] = useState(urlCursor || "");
   const [previous, previousSet] = useState(""); // I am not used for anything yet :)
   const [sort, sortSet] = useState(urlQueries.get("sort_ascending") === "true");
   const [status, statusSet] = useState(
@@ -43,6 +44,9 @@ export default function useLazyLists({
   const isLoading =
     status === FetchStatus.ready || status === FetchStatus.in_progress;
   const fetchError = status === FetchStatus.error;
+
+  const [goingtToTop,goingtToTopSet] = useState(false);
+  const [y,ySet] = useState(0);
 
   const getMore = () => {
     if (next) statusSet(1);
@@ -61,6 +65,15 @@ export default function useLazyLists({
     statusSet(FetchStatus.ready);
   };
 
+  const reset = () => {
+    listSet([]); // Reset list on filter/sort change
+    nextSet("");
+    previousSet("");
+    statusSet(FetchStatus.ready);
+    window.scrollTo(0,0);
+    goingtToTopSet(true);
+  }
+
   useEffect(() => {
     const queries = {
       ...(next ? { cursor: next } : {}),
@@ -68,7 +81,15 @@ export default function useLazyLists({
       ...(sort ? { sort_ascending: true } : {}),
     };
 
-    if (status === FetchStatus.ready) {
+    const adjustY = () => ySet(window.pageYOffset);
+
+    if (goingtToTop) {
+      window.addEventListener('scroll', adjustY, { passive: true });
+      if (y === 0) setTimeout(() => goingtToTopSet(false),500);
+    }
+    else window.removeEventListener('scroll',adjustY);
+
+    if (status === FetchStatus.ready && !goingtToTop) {
       let search = new URLSearchParams(queries).toString();
       statusSet(FetchStatus.in_progress);
       !disableUrlQueries && history.replace({ pathname, search });
@@ -98,7 +119,7 @@ export default function useLazyLists({
             }
           });
           nextSet(res.pagination.maybe_next || "");
-          previousSet(res.pagination.maybe_next);
+          previousSet(res.pagination.maybe_previous);
         }
       });
     }
@@ -106,6 +127,7 @@ export default function useLazyLists({
     addQueries,
     debug,
     fetcher,
+    goingtToTop,
     history,
     listKeys,
     listSet,
@@ -116,6 +138,7 @@ export default function useLazyLists({
     status,
     totalKeys,
     disableUrlQueries,
+    y
   ]);
 
   return {
@@ -127,10 +150,12 @@ export default function useLazyLists({
     next,
     onChange,
     previous,
+    reset,
     sort,
     sortSet,
     status,
     statusSet,
     totalKeys,
+    urlCursor
   };
 }
