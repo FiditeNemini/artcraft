@@ -14,9 +14,10 @@ pub async fn get_tts_model_for_enqueue_inference_migration(
   token: &str,
   mysql_connection: &mut PoolConnection<MySql>,
   can_see_deleted: bool,
-  use_weights_table: bool,
 ) -> AnyhowResult<Option<TtsModelForEnqueueInferenceMigrationWrapper>> {
   // NB: This is temporary migration code as we switch from the `tts_models` table to the `model_weights` table.
+  let use_weights_table = token.starts_with(ModelWeightToken::token_prefix());
+
   if use_weights_table {
     let token = ModelWeightToken::new_from_str(token);
 

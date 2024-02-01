@@ -137,7 +137,7 @@ pub async fn seed_weights_files(
             maybe_last_update_user_token: None, // Assuming there is no last update user token
             original_download_url: Some(original_download_url.to_string()),
             original_filename: Some(original_filename.to_string()),
-            file_size_bytes: file_size_bytes as i32, // Assuming the file size is 0
+            file_size_bytes, // Assuming the file size is 0
             file_checksum_sha2: sha256_checksum.to_string(), // Assuming the file checksum is an empty string
             public_bucket_hash: bucket_hash,
             maybe_public_bucket_prefix: Some(maybe_bucket_prefix.to_string()),

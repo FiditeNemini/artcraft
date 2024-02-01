@@ -32,7 +32,7 @@ pub fn get_env_string_required(env_name: &str) -> Result<String, EnvError> {
     Some(s) => Ok(s.to_string()),
     None => {
       warn!("Required env var '{}' not supplied.", env_name);
-      Err(EnvError::RequiredNotPresent)
+      Err(EnvError::RequiredNotPresent { name: env_name.to_string() })
     },
   }
 }

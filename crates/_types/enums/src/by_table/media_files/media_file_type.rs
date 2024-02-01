@@ -6,7 +6,7 @@ use strum::EnumCount;
 use strum::EnumIter;
 use utoipa::ToSchema;
 
-/// Used in the `media_files` table in a `VARCHAR` field.
+/// Used in the `media_files` table in a `VARCHAR(16)` field.
 ///
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
@@ -23,7 +23,19 @@ pub enum MediaFileType {
   Video,
 
   /// Mocap files: BVH, etc.
+  /// NB: In actuality, this is just the BVH file type.
+  /// NB: This is the old type to migrate from.
   Mocap,
+
+  /// BVH files (for Bevy)
+  /// NB: This is the new type to migrate to.
+  Bvh,
+
+  /// FBX files (for Bevy)
+  Fbx,
+
+  /// glTF files (for Bevy)
+  Gltf,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -39,6 +51,9 @@ impl MediaFileType {
       Self::Image => "image",
       Self::Video => "video",
       Self::Mocap => "mocap",
+      Self::Bvh => "bvh",
+      Self::Fbx => "fbx",
+      Self::Gltf => "gltf",
     }
   }
 
@@ -48,6 +63,9 @@ impl MediaFileType {
       "image" => Ok(Self::Image),
       "video" => Ok(Self::Video),
       "mocap" => Ok(Self::Mocap),
+      "bvh" => Ok(Self::Bvh),
+      "fbx" => Ok(Self::Fbx),
+      "gltf" => Ok(Self::Gltf),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -60,6 +78,9 @@ impl MediaFileType {
       Self::Image,
       Self::Video,
       Self::Mocap,
+      Self::Bvh,
+      Self::Fbx,
+      Self::Gltf,
     ])
   }
 }
@@ -78,6 +99,9 @@ mod tests {
       assert_serialization(MediaFileType::Image, "image");
       assert_serialization(MediaFileType::Video, "video");
       assert_serialization(MediaFileType::Mocap, "mocap");
+      assert_serialization(MediaFileType::Bvh, "bvh");
+      assert_serialization(MediaFileType::Fbx, "fbx");
+      assert_serialization(MediaFileType::Gltf, "gltf");
     }
   }
 
@@ -89,7 +113,9 @@ mod tests {
       assert_eq!(MediaFileType::Audio.to_str(), "audio");
       assert_eq!(MediaFileType::Image.to_str(), "image");
       assert_eq!(MediaFileType::Video.to_str(), "video");
-      assert_eq!(MediaFileType::Mocap.to_str(), "mocap");
+      assert_eq!(MediaFileType::Bvh.to_str(), "bvh");
+      assert_eq!(MediaFileType::Fbx.to_str(), "fbx");
+      assert_eq!(MediaFileType::Gltf.to_str(), "gltf");
     }
 
     #[test]
@@ -98,6 +124,9 @@ mod tests {
       assert_eq!(MediaFileType::from_str("image").unwrap(), MediaFileType::Image);
       assert_eq!(MediaFileType::from_str("video").unwrap(), MediaFileType::Video);
       assert_eq!(MediaFileType::from_str("mocap").unwrap(), MediaFileType::Mocap);
+      assert_eq!(MediaFileType::from_str("bvh").unwrap(), MediaFileType::Bvh);
+      assert_eq!(MediaFileType::from_str("fbx").unwrap(), MediaFileType::Fbx);
+      assert_eq!(MediaFileType::from_str("gltf").unwrap(), MediaFileType::Gltf);
       assert!(MediaFileType::from_str("foo").is_err());
     }
   }
@@ -108,11 +137,14 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileType::all_variants();
-      assert_eq!(variants.len(), 4);
+      assert_eq!(variants.len(), 7);
       assert_eq!(variants.pop_first(), Some(MediaFileType::Audio));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Image));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Video));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Mocap));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Bvh));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Fbx));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Gltf));
       assert_eq!(variants.pop_first(), None);
     }
   }
@@ -132,6 +164,16 @@ mod tests {
         assert_eq!(variant, MediaFileType::from_str(variant.to_str()).unwrap());
         assert_eq!(variant, MediaFileType::from_str(&format!("{}", variant)).unwrap());
         assert_eq!(variant, MediaFileType::from_str(&format!("{:?}", variant)).unwrap());
+      }
+    }
+
+    #[test]
+    fn serialized_length_ok_for_database() {
+      const MAX_LENGTH : usize = 16;
+      for variant in MediaFileType::all_variants() {
+        let serialized = variant.to_str();
+        assert!(serialized.len() > 0, "variant {:?} is too short", variant);
+        assert!(serialized.len() <= MAX_LENGTH, "variant {:?} is too long", variant);
       }
     }
   }

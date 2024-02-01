@@ -1,4 +1,3 @@
-
 use std::collections::HashSet;
 use std::env;
 use std::ffi::OsString;
@@ -13,9 +12,8 @@ use subprocess::{Popen, PopenConfig, Redirection};
 
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;
+use subprocess_common::command_exit_status::CommandExitStatus;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerGpu, DockerOptions};
-
-use crate::job::job_loop::command_exit_status::CommandExitStatus;
 
 // These environment vars are not copied over to the subprocess
 // TODO/FIXME(bt, 2023-05-28): This is horrific security!
@@ -72,19 +70,20 @@ pub struct InferenceArgs {
   pub work_dir: PathBuf,
   /// --result_file: path to final file output
   pub output_file: PathBuf,
+  pub stdout_output_file: PathBuf,
   pub stderr_output_file: PathBuf,
   pub prompt: String,
   pub negative_prompt:String,
-  pub number_of_samples:i32,
+  pub number_of_samples:u32,
   pub samplers:String,
-  pub width:i32,
-  pub height:i32,
-  pub cfg_scale:i32, 
+  pub width:u32,
+  pub height:u32,
+  pub cfg_scale:u32, 
   pub seed:i64,
   pub lora_path:PathBuf,
   pub checkpoint_path:PathBuf,
   pub vae:PathBuf,
-  pub batch_count:i32,
+  pub batch_count:u32,
 }
 
 impl StableDiffusionInferenceCommand {
@@ -228,8 +227,11 @@ impl StableDiffusionInferenceCommand {
     command.push_str(" --seed ");
     command.push_str(args.seed.to_string().as_str());
     
-    command.push_str(" --loRA-path ");
-    command.push_str(&path_to_string(args.lora_path));
+    // TODO ensure lora path is not empty ...
+    if args.lora_path.as_os_str().is_empty() == false {
+      command.push_str(" --loRA-path ");
+      command.push_str(&path_to_string(args.lora_path));
+    }
     
     command.push_str(" --check-point ");
     command.push_str(&path_to_string(args.checkpoint_path));
@@ -271,7 +273,9 @@ impl StableDiffusionInferenceCommand {
     info!("stderr will be written to file: {}", path_to_string(args.stderr_output_file.clone()));
 
     let stderr_file = File::create(&args.stderr_output_file)?;
+    let stdout_file = File::create(&args.stdout_output_file)?;
     config.stderr = Redirection::File(stderr_file);
+    config.stdout = Redirection::File(stdout_file);
 
     if !env_vars.is_empty() {
       config.env = Some(env_vars);

@@ -260,9 +260,23 @@ pub async fn process_upload_media_file(
     // https://research.cs.wisc.edu/graphics/Courses/cs-838-1999/Jeff/BVH.html
     const BVH_HEADER : &[u8] = "HIERARCHY".as_bytes();
 
+    // https://code.blender.org/2013/08/fbx-binary-file-format-specification/
+    const FBX_HEADER : &[u8] = "Kaydara FBX Binary".as_bytes();
+
+    // https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_002_BasicGltfStructure.md
+    // TODO(bt,2024-01-28): Fix this ASAP
+    const GLTF_CONTENTS_1 : &[u8] = "{".as_bytes();
+
     if bytes.starts_with(BVH_HEADER) {
-      media_file_type = Some(MediaFileType::Mocap);
+      media_file_type = Some(MediaFileType::Bvh);
       maybe_mimetype = Some("application/octet-stream");
+    } else if bytes.starts_with(FBX_HEADER) {
+      media_file_type = Some(MediaFileType::Fbx);
+      maybe_mimetype = Some("application/octet-stream");
+    } else if bytes.starts_with(GLTF_CONTENTS_1) {
+      // TODO(bt,2024-01-28): This is a horrible check!
+      media_file_type = Some(MediaFileType::Gltf);
+      maybe_mimetype = Some("application/json");
     }
   }
 
@@ -292,8 +306,14 @@ pub async fn process_upload_media_file(
   let mut extension = mimetype_to_extension(mime_type)
       .map(|extension| format!(".{extension}"));
 
-  if extension.is_none() && media_file_type == MediaFileType::Mocap {
-    extension = Some(".bvh".to_string());
+  if extension.is_none() {
+    extension = match media_file_type {
+      MediaFileType::Mocap => Some(".bvh".to_string()),
+      MediaFileType::Bvh => Some(".bvh".to_string()),
+      MediaFileType::Fbx => Some(".fbx".to_string()),
+      MediaFileType::Gltf => Some(".gltf".to_string()),
+      _ => None,
+    };
   }
 
   const PREFIX : Option<&str> = Some("upload_");

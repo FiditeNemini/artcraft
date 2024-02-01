@@ -73,6 +73,14 @@ impl MediaFileBucketPath {
   pub fn get_basename(&self) -> &str {
     &self.filename
   }
+
+  pub fn get_optional_prefix(&self) -> Option<&str> {
+    self.optional_prefix.as_deref()
+  }
+
+  pub fn get_optional_extension(&self) -> Option<&str> {
+    self.optional_extension.as_deref()
+  }
 }
 
 #[cfg(test)]

@@ -12,7 +12,7 @@ use strum::EnumIter;
 ///
 /// These types are present in the HTTP API and database columns as serialized here.
 ///
-/// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
+/// YOU CAN ADD NEW VALUES, BUT DO NOT CHANGE EXISTING VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum InferenceResultType {

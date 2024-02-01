@@ -207,10 +207,10 @@ LEFT OUTER JOIN entity_stats
     query_builder.push_bind(username);
 
     match view_as {
-        ViewAs::Author => {
+        ViewAs::Author | ViewAs::Moderator => {
+            // NB(bt): Actually, mods don't want to see deleted models. We'll improve the moderator UI later.
             query_builder.push(" AND mw.user_deleted_at IS NULL AND mw.mod_deleted_at IS NULL ");
         }
-        ViewAs::Moderator => {}
         ViewAs::AnotherUser => {
             query_builder.push(" AND mw.user_deleted_at IS NULL AND mw.mod_deleted_at IS NULL ");
             query_builder.push(" AND mw.creator_set_visibility = ");

@@ -18,7 +18,7 @@ use strum::EnumIter;
 /// Another benefit is that we'll surface all of the various types of failure and perhaps eventually
 /// come to handle some in a cross-cutting way.
 ///
-/// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
+/// YOU CAN ADD NEW VALUES, BUT DO NOT CHANGE EXISTING VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum FrontendFailureCategory {

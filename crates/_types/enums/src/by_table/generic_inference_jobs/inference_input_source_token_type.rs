@@ -7,7 +7,7 @@ use strum::EnumIter;
 
 /// Used in the `generic_inference_jobs` table in `VARCHAR(32)` field `maybe_input_source_token`.
 ///
-/// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
+/// YOU CAN ADD NEW VALUES, BUT DO NOT CHANGE EXISTING VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum InferenceInputSourceTokenType {

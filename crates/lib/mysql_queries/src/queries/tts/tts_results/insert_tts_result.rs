@@ -64,7 +64,7 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
       maybe_creator_user_token = tts_job.maybe_creator_user_token.clone();
       tts_model_token = tts_job.model_token.clone();
       creator_ip_address = tts_job.creator_ip_address.clone();
-      creator_set_visibility = tts_job.creator_set_visibility.clone();
+      creator_set_visibility = tts_job.creator_set_visibility;
     }
     JobType::GenericInferenceJob(generic_job) => {
       raw_inference_text = generic_job.maybe_raw_inference_text.as_deref()
@@ -75,7 +75,7 @@ pub async fn insert_tts_result<P: AsRef<Path>>(
           .unwrap_or("")
           .to_string();
       creator_ip_address = generic_job.creator_ip_address.clone();
-      creator_set_visibility = generic_job.creator_set_visibility.clone();
+      creator_set_visibility = generic_job.creator_set_visibility;
     }
   }
 

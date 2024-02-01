@@ -5,7 +5,8 @@
 
 use std::collections::BTreeMap;
 
-use actix_web::cookie::Cookie;
+use actix_web::cookie::{Cookie, SameSite};
+use actix_web::cookie::time::OffsetDateTime;
 use actix_web::HttpRequest;
 use anyhow::anyhow;
 use log::warn;
@@ -55,21 +56,27 @@ impl SessionCookieManager {
     let make_secure = !self.cookie_domain.to_lowercase().contains("jungle.horse")
       && !self.cookie_domain.to_lowercase().contains("localhost");
 
+    let same_site = if make_secure {
+      SameSite::None // NB: Allow usage from other domains
+    } else {
+      SameSite::Lax // NB: You can't set "SameSite=None" on non-secure cookies
+    };
+
     Ok(Cookie::build(SESSION_COOKIE_NAME, jwt_string)
       .secure(make_secure) // HTTPS-only
+      .same_site(same_site)
       .permanent()
       .path("/") // NB: Otherwise it'll be set to `/v1`
       //.domain(&self.cookie_domain)
       //.http_only(true) // Not exposed to Javascript
       //.expires(OffsetDateTime::now_utc() + time::Duration::days(365))
-      //.same_site(SameSite::Lax)
       .finish())
   }
 
   pub fn delete_cookie(&self) -> Cookie {
     let mut cookie = Cookie::build(SESSION_COOKIE_NAME, "DELETED")
       .path("/") // NB: Otherwise it'll be set to `/v1`
-      .expires(actix_web::cookie::time::OffsetDateTime::UNIX_EPOCH)
+      .expires(OffsetDateTime::UNIX_EPOCH)
       .finish();
     cookie.make_removal();
     cookie

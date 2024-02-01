@@ -321,6 +321,9 @@ fn record_to_payload(
         InferenceCategory::ImageGeneration => { 
           "".to_string()
         }
+        InferenceCategory::FormatConversion => {
+          "".to_string()
+        }
       };
      
       ResultDetailsResponse {

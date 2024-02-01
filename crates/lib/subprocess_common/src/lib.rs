@@ -13,4 +13,7 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+pub mod command_runner;
+pub mod command_exit_status;
 pub mod docker_options;
+pub mod executable_or_command;

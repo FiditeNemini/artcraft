@@ -31,11 +31,11 @@ pub struct StableDiffusionArgs {
 
     #[serde(rename = "w")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_width: Option<i32>,
+    pub maybe_width: Option<u32>,
 
     #[serde(rename = "h")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_height: Option<i32>,
+    pub maybe_height: Option<u32>,
 
     #[serde(rename = "s")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -59,7 +59,7 @@ pub struct StableDiffusionArgs {
 
     #[serde(rename = "cf")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_cfg_scale: Option<i32>,
+    pub maybe_cfg_scale: Option<u32>,
     
     #[serde(rename = "lu")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -67,10 +67,10 @@ pub struct StableDiffusionArgs {
 
     #[serde(rename = "sa")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_number_of_samples: Option<i32>,
+    pub maybe_number_of_samples: Option<u32>,
 
     #[serde(rename = "bc")]
-    pub maybe_batch_count: Option<i32>,
+    pub maybe_batch_count: Option<u32>,
 
     #[serde(rename = "t")]
     pub type_of_inference: String,
@@ -78,11 +78,15 @@ pub struct StableDiffusionArgs {
     // loRA / checkpoint description
     #[serde(rename = "de")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
+    pub maybe_description: Option<String>,
     // loRA / checkpoint name and description
     #[serde(rename = "na")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>
+    pub maybe_name: Option<String>,
+
+    #[serde(rename = "ve")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_version: Option<u32>
 }
 
 

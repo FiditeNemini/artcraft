@@ -13,7 +13,6 @@ pub async fn get_tts_model_with_caching(
   model_token: &str,
   redis_ttl_cache: &RedisTtlCache,
   mysql_connection: &mut PoolConnection<MySql>,
-  use_weights_table: bool,
 ) -> AnyhowResult<Option<TtsModelForEnqueueInferenceMigrationWrapper>> {
   // NB: Copy due to move. Not a cloned ref due to clippy lint
   let model_token2 = model_token.to_string();
@@ -25,7 +24,6 @@ pub async fn get_tts_model_with_caching(
         &model_token2,
         mysql_connection,
         true,
-        use_weights_table,
       ).await
     }
   };

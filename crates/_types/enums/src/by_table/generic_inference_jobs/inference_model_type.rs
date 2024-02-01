@@ -13,7 +13,7 @@ use strum::EnumIter;
 ///
 /// These types are present in the HTTP API and database columns as serialized here.
 ///
-/// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
+/// YOU CAN ADD NEW VALUES, BUT DO NOT CHANGE EXISTING VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum InferenceModelType {
@@ -41,6 +41,9 @@ pub enum InferenceModelType {
   ComfyUi,
   #[serde(rename = "styletts2")]
   StyleTTS2,
+  /// A job that turns "FBX" game engine files into "GLTF" files (Bevy-compatible).
+  #[serde(rename = "convert_fbx_gltf")]
+  ConvertFbxToGltf,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -62,6 +65,7 @@ impl InferenceModelType {
       Self::MocapNet => "mocap_net",
       Self::StyleTTS2 => "styletts2",
       Self::ComfyUi => "comfy_ui",
+      Self::ConvertFbxToGltf => "convert_fbx_gltf",
     }
   }
 
@@ -78,25 +82,27 @@ impl InferenceModelType {
       "mocap_net" => Ok(Self::MocapNet),
       "styletts2" => Ok(Self::StyleTTS2),
       "comfy_ui" => Ok(Self::ComfyUi),
+      "convert_fbx_gltf" => Ok(Self::ConvertFbxToGltf),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
 
-  pub fn all_variants() -> BTreeSet<InferenceModelType> {
+  pub fn all_variants() -> BTreeSet<Self> {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
-      InferenceModelType::RvcV2,
-      InferenceModelType::SadTalker,
-      InferenceModelType::SoVitsSvc,
-      InferenceModelType::Tacotron2,
-      InferenceModelType::Vits,
-      InferenceModelType::VallEX,
-      InferenceModelType::RerenderAVideo,
-      InferenceModelType::StableDiffusion,
-      InferenceModelType::MocapNet,
-      InferenceModelType::StyleTTS2,
-      InferenceModelType::ComfyUi,
+      Self::RvcV2,
+      Self::SadTalker,
+      Self::SoVitsSvc,
+      Self::Tacotron2,
+      Self::Vits,
+      Self::VallEX,
+      Self::RerenderAVideo,
+      Self::StableDiffusion,
+      Self::MocapNet,
+      Self::StyleTTS2,
+      Self::ComfyUi,
+      Self::ConvertFbxToGltf,
     ])
   }
 }
@@ -106,71 +112,108 @@ mod tests {
   use crate::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
   use crate::test_helpers::assert_serialization;
 
-  #[test]
-  fn test_serialization() {
-    assert_serialization(InferenceModelType::RvcV2, "rvc_v2");
-    assert_serialization(InferenceModelType::SadTalker, "sad_talker");
-    assert_serialization(InferenceModelType::SoVitsSvc, "so_vits_svc");
-    assert_serialization(InferenceModelType::Tacotron2, "tacotron2");
-    assert_serialization(InferenceModelType::Vits, "vits");
-    assert_serialization(InferenceModelType::VallEX, "vall_e_x");
-    assert_serialization(InferenceModelType::RerenderAVideo, "rerender_a_video");
-    assert_serialization(InferenceModelType::StableDiffusion, "stable_diffusion");
-    assert_serialization(InferenceModelType::MocapNet, "mocap_net");
-    assert_serialization(InferenceModelType::ComfyUi, "comfy_ui");
-    assert_serialization(InferenceModelType::StyleTTS2, "styletts2");
+  mod explicit_checks {
+    use super::*;
+
+    #[test]
+    fn test_serialization() {
+      assert_serialization(InferenceModelType::RvcV2, "rvc_v2");
+      assert_serialization(InferenceModelType::SadTalker, "sad_talker");
+      assert_serialization(InferenceModelType::SoVitsSvc, "so_vits_svc");
+      assert_serialization(InferenceModelType::Tacotron2, "tacotron2");
+      assert_serialization(InferenceModelType::Vits, "vits");
+      assert_serialization(InferenceModelType::VallEX, "vall_e_x");
+      assert_serialization(InferenceModelType::RerenderAVideo, "rerender_a_video");
+      assert_serialization(InferenceModelType::StableDiffusion, "stable_diffusion");
+      assert_serialization(InferenceModelType::MocapNet, "mocap_net");
+      assert_serialization(InferenceModelType::ComfyUi, "comfy_ui");
+      assert_serialization(InferenceModelType::StyleTTS2, "styletts2");
+      assert_serialization(InferenceModelType::ConvertFbxToGltf, "convert_fbx_gltf");
+    }
+
+    #[test]
+    fn to_str() {
+      assert_eq!(InferenceModelType::RvcV2.to_str(), "rvc_v2");
+      assert_eq!(InferenceModelType::SadTalker.to_str(), "sad_talker");
+      assert_eq!(InferenceModelType::SoVitsSvc.to_str(), "so_vits_svc");
+      assert_eq!(InferenceModelType::Tacotron2.to_str(), "tacotron2");
+      assert_eq!(InferenceModelType::Vits.to_str(), "vits");
+      assert_eq!(InferenceModelType::VallEX.to_str(), "vall_e_x");
+      assert_eq!(InferenceModelType::RerenderAVideo.to_str(), "rerender_a_video");
+      assert_eq!(InferenceModelType::StableDiffusion.to_str(), "stable_diffusion");
+      assert_eq!(InferenceModelType::MocapNet.to_str(), "mocap_net");
+      assert_eq!(InferenceModelType::StyleTTS2.to_str(), "styletts2");
+      assert_eq!(InferenceModelType::ComfyUi.to_str(), "comfy_ui");
+      assert_eq!(InferenceModelType::ConvertFbxToGltf.to_str(), "convert_fbx_gltf");
+    }
+
+    #[test]
+    fn from_str() {
+      assert_eq!(InferenceModelType::from_str("rvc_v2").unwrap(), InferenceModelType::RvcV2);
+      assert_eq!(InferenceModelType::from_str("sad_talker").unwrap(), InferenceModelType::SadTalker);
+      assert_eq!(InferenceModelType::from_str("so_vits_svc").unwrap(), InferenceModelType::SoVitsSvc);
+      assert_eq!(InferenceModelType::from_str("tacotron2").unwrap(), InferenceModelType::Tacotron2);
+      assert_eq!(InferenceModelType::from_str("vits").unwrap(), InferenceModelType::Vits);
+      assert_eq!(InferenceModelType::from_str("vall_e_x").unwrap(), InferenceModelType::VallEX);
+      assert_eq!(InferenceModelType::from_str("rerender_a_video").unwrap(), InferenceModelType::RerenderAVideo);
+      assert_eq!(InferenceModelType::from_str("stable_diffusion").unwrap(), InferenceModelType::StableDiffusion);
+      assert_eq!(InferenceModelType::from_str("mocap_net").unwrap(), InferenceModelType::MocapNet);
+      assert_eq!(InferenceModelType::from_str("styletts2").unwrap(), InferenceModelType::StyleTTS2);
+      assert_eq!(InferenceModelType::from_str("comfy_ui").unwrap(), InferenceModelType::ComfyUi);
+      assert_eq!(InferenceModelType::from_str("convert_fbx_gltf").unwrap(), InferenceModelType::ConvertFbxToGltf);
+    }
+
+    #[test]
+    fn all_variants() {
+      // Static check
+      let mut variants = InferenceModelType::all_variants();
+      assert_eq!(variants.len(), 12);
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::RvcV2));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::SadTalker));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::SoVitsSvc));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::Tacotron2));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::Vits));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::VallEX));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::RerenderAVideo));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::StableDiffusion));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::MocapNet));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::ComfyUi));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::StyleTTS2));
+      assert_eq!(variants.pop_first(), Some(InferenceModelType::ConvertFbxToGltf));
+      assert_eq!(variants.pop_first(), None);
+
+      // Generated check
+      use strum::IntoEnumIterator;
+      assert_eq!(InferenceModelType::all_variants().len(), InferenceModelType::iter().len());
+    }
   }
+  
+  mod mechanical_checks {
+    use super::*;
 
-  #[test]
-  fn to_str() {
-    assert_eq!(InferenceModelType::RvcV2.to_str(), "rvc_v2");
-    assert_eq!(InferenceModelType::SadTalker.to_str(), "sad_talker");
-    assert_eq!(InferenceModelType::SoVitsSvc.to_str(), "so_vits_svc");
-    assert_eq!(InferenceModelType::Tacotron2.to_str(), "tacotron2");
-    assert_eq!(InferenceModelType::Vits.to_str(), "vits");
-    assert_eq!(InferenceModelType::VallEX.to_str(), "vall_e_x");
-    assert_eq!(InferenceModelType::RerenderAVideo.to_str(), "rerender_a_video");
-    assert_eq!(InferenceModelType::StableDiffusion.to_str(), "stable_diffusion");
-    assert_eq!(InferenceModelType::MocapNet.to_str(), "mocap_net");
-    assert_eq!(InferenceModelType::StyleTTS2.to_str(), "styletts2");
-    assert_eq!(InferenceModelType::ComfyUi.to_str(), "comfy_ui");
-  }
+    #[test]
+    fn variant_length() {
+      use strum::IntoEnumIterator;
+      assert_eq!(InferenceModelType::all_variants().len(), InferenceModelType::iter().len());
+    }
 
-  #[test]
-  fn from_str() {
-    assert_eq!(InferenceModelType::from_str("rvc_v2").unwrap(), InferenceModelType::RvcV2);
-    assert_eq!(InferenceModelType::from_str("sad_talker").unwrap(), InferenceModelType::SadTalker);
-    assert_eq!(InferenceModelType::from_str("so_vits_svc").unwrap(), InferenceModelType::SoVitsSvc);
-    assert_eq!(InferenceModelType::from_str("tacotron2").unwrap(), InferenceModelType::Tacotron2);
-    assert_eq!(InferenceModelType::from_str("vits").unwrap(), InferenceModelType::Vits);
-    assert_eq!(InferenceModelType::from_str("vall_e_x").unwrap(), InferenceModelType::VallEX);
-    assert_eq!(InferenceModelType::from_str("rerender_a_video").unwrap(), InferenceModelType::RerenderAVideo);
-    assert_eq!(InferenceModelType::from_str("stable_diffusion").unwrap(), InferenceModelType::StableDiffusion);
-    assert_eq!(InferenceModelType::from_str("mocap_net").unwrap(), InferenceModelType::MocapNet);
-    assert_eq!(InferenceModelType::from_str("styletts2").unwrap(), InferenceModelType::StyleTTS2);
-    assert_eq!(InferenceModelType::from_str("comfy_ui").unwrap(), InferenceModelType::ComfyUi);
-  }
+    #[test]
+    fn round_trip() {
+      for variant in InferenceModelType::all_variants() {
+        assert_eq!(variant, InferenceModelType::from_str(variant.to_str()).unwrap());
+        assert_eq!(variant, InferenceModelType::from_str(&format!("{}", variant)).unwrap());
+        assert_eq!(variant, InferenceModelType::from_str(&format!("{:?}", variant)).unwrap());
+      }
+    }
 
-  #[test]
-  fn all_variants() {
-    // Static check
-    let mut variants = InferenceModelType::all_variants();
-    assert_eq!(variants.len(), 11);
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::RvcV2));
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::SadTalker));
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::SoVitsSvc));
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::Tacotron2));
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::Vits));
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::VallEX));
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::RerenderAVideo));
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::StableDiffusion));
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::MocapNet));
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::ComfyUi));
-    assert_eq!(variants.pop_first(), Some(InferenceModelType::StyleTTS2));
-    assert_eq!(variants.pop_first(), None);
-
-    // Generated check
-    use strum::IntoEnumIterator;
-    assert_eq!(InferenceModelType::all_variants().len(), InferenceModelType::iter().len());
+    #[test]
+    fn serialized_length_ok_for_database() {
+      const MAX_LENGTH : usize = 32;
+      for variant in InferenceModelType::all_variants() {
+        let serialized = variant.to_str();
+        assert!(serialized.len() > 0, "variant {:?} is too short", variant);
+        assert!(serialized.len() <= MAX_LENGTH, "variant {:?} is too long", variant);
+      }
+    }
   }
 }

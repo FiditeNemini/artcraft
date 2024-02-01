@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+
 use errors::AnyhowResult;
 use filesys::file_read_bytes::file_read_bytes;
 use filesys::file_size::file_size;
@@ -11,7 +12,6 @@ use crate::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDe
 
 use super::file_descriptor::FileDescriptor;
 use super::file_meta_data::FileMetaData;
-
 
 pub struct RemoteCloudFileClient {
     bucket_orchestration_client: Box<dyn BucketOrchestrationCore>
@@ -38,12 +38,12 @@ impl RemoteCloudFileClient {
         }
     }
 
-    
+    // Where the to_system_file_path is  let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint.safetensors"); path and file name and extension
     pub async fn download_file(&self, remote_cloud_bucket_details:RemoteCloudBucketDetails, to_system_file_path:String) -> AnyhowResult<()> {
         let file_descriptor = remote_cloud_bucket_details.file_descriptor_from_bucket_details();
         let file_bucket_directory = FileBucketDirectory::from_existing_bucket_details(remote_cloud_bucket_details);
         let full_remote_cloud_file_path = file_bucket_directory.get_full_remote_cloud_file_path().to_string();
-        let is_public = file_descriptor.is_public().clone();
+        let is_public = file_descriptor.is_public();
 
         self.bucket_orchestration_client.download_file_to_disk(full_remote_cloud_file_path, to_system_file_path, is_public).await?;
         Ok(())
@@ -85,7 +85,7 @@ impl RemoteCloudFileClient {
     }
 
     // Retrieve the metadata from the file
-    fn get_file_meta_data(system_file_path:&str) -> AnyhowResult<FileMetaData> {
+    pub fn get_file_meta_data(system_file_path:&str) -> AnyhowResult<FileMetaData> {
         let file_size_bytes = file_size(system_file_path.clone())?;
         let sha256_checksum = sha256_hash_file(system_file_path.clone())?;
 
@@ -105,6 +105,7 @@ impl RemoteCloudFileClient {
 mod tests {
     use async_trait::async_trait;
     use env_logger;
+
     use errors::AnyhowResult;
 
     use crate::remote_file_manager::bucket_orchestration::BucketOrchestrationCore;

@@ -21,6 +21,7 @@ const PAGE_SIZE: u64 = 10;
 pub async fn migrate_tts_to_weights(deps: &Deps) -> AnyhowResult<()> {
 
   let mut cursor = 0;
+  let mut counter = 0;
 
   loop {
     info!("Querying {PAGE_SIZE} models at cursor = {cursor}");
@@ -34,15 +35,16 @@ pub async fn migrate_tts_to_weights(deps: &Deps) -> AnyhowResult<()> {
     }
 
     for result in results.iter() {
-      println!("\n\nmigrating over result {:?} : {:?} ...", result.token, result);
+      println!("\n\nmigrating over (counter: {counter}, id: {}, token: {:?}) : {:?} ...", result.id, result.token, result);
       copy_model_record_and_bucket_files(result, &deps).await?;
+      counter += 1;
     }
 
     if let Some(last_id) = results.last().map(|result| result.id) {
       cursor = last_id as u64;
     }
 
-    thread::sleep(Duration::from_secs(2));
+    thread::sleep(Duration::from_millis(500));
   }
 
   Ok(())
