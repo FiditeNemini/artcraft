@@ -6,7 +6,7 @@ use sqlx::{MySql, Pool};
 
 use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
-use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsSD15CkptDescriptor};
+use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsSD15CkptDescriptor, WeightsWorkflowDescriptor};
 use enums::by_table::model_weights::{
     weights_category::WeightsCategory,
     weights_types::WeightsType,
@@ -363,7 +363,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 //cached_user_ratings_positive_count,
                 //cached_user_ratings_negative_count,
                 //maybe_cached_user_ratings_ratio: Some(cached_user_ratings_ratio as f32),
-                version,
+                version: version as u32,
                 mysql_pool: &mysql_pool, // replace with actual MySqlPool
             };
         
@@ -623,7 +623,7 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
         maybe_last_update_user_token: Some("Last Update User Token".to_string()),
         original_download_url: Some("https://civitai.com/models/41865/majicmix-fantasy".to_string()),
         original_filename: Some("majicmixFantasy_v30Vae.safetensors".to_string()),
-        file_size_bytes: metadata1.file_size_bytes as i32,
+        file_size_bytes: metadata1.file_size_bytes,
         file_checksum_sha2: metadata1.sha256_checksum.to_string(),
         public_bucket_hash: metadata1.bucket_details.clone().unwrap().object_hash,
         maybe_public_bucket_prefix: Some(metadata1.bucket_details.clone().unwrap().prefix),
@@ -645,7 +645,7 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
         maybe_last_update_user_token: Some("<p> Honkai <p>".to_string()),
         original_download_url: Some("https://civitai.com/models/95243/mihoyo-collection-honkai-impact-3rd-or-honkai-star-rail-or-genshin-impact-or-zenless-zone-zero".to_string()),
         original_filename: Some("xiawolei-v100-000019.safetensors".to_string()),
-        file_size_bytes: metadata2.file_size_bytes as i32,
+        file_size_bytes: metadata2.file_size_bytes,
         file_checksum_sha2: metadata2.sha256_checksum.to_string(),
         public_bucket_hash: metadata2.bucket_details.clone().unwrap().object_hash.clone(),
         maybe_public_bucket_prefix: Some(metadata2.bucket_details.clone().unwrap().prefix),
@@ -667,7 +667,7 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
         maybe_last_update_user_token: Some("Last Update User Token".to_string()),
         original_download_url: Some("https://civitai.com/models/97653/z-vae".to_string()),
         original_filename: Some("zVae_v20.safetensors".to_string()),
-        file_size_bytes: metadata3.file_size_bytes as i32,
+        file_size_bytes: metadata3.file_size_bytes,
         file_checksum_sha2: metadata3.sha256_checksum.to_string(),
         public_bucket_hash: metadata3.bucket_details.clone().unwrap().object_hash,
         maybe_public_bucket_prefix: Some(metadata3.bucket_details.clone().unwrap().prefix),
@@ -690,10 +690,10 @@ pub async fn seed_workflows_for_testing_inference(mysql_pool: &Pool<MySql>, user
     let model_weight_token4 = ModelWeightToken::new_from_str("weight_n8sz47gmfw2zx02snrbz88ns9");
 
     let mut path_to_comfy = get_seed_tool_data_root();
-    path_to_comfy.push("models/workflows/comfyui/workflow_api.json");
+    path_to_comfy.push("models/workflows/comfyui/yae_video_prod.json");
     let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
-    // let comfy_weights_descriptor = Box::new(WeightsWorkflowDescriptor {});
-    // let metadata1 = remote_cloud_file_client.upload_file(comfy_weights_descriptor, path_to_comfy.as_path().to_str().unwrap()).await?;
+    let comfy_weights_descriptor = Box::new(WeightsWorkflowDescriptor {});
+    let metadata1 = remote_cloud_file_client.upload_file(comfy_weights_descriptor, path_to_comfy.as_path().to_str().unwrap()).await?;
 
     // let mut path_to_comfy2 = get_seed_tool_data_root();
     // path_to_comfy2.push("models/workflows/comfyui/majicmixRealistic_v7.safetensors");
@@ -705,32 +705,32 @@ pub async fn seed_workflows_for_testing_inference(mysql_pool: &Pool<MySql>, user
     // let comfy_weights_descriptor3 = Box::new(WeightsWorkflowDescriptor {});
     // let metadata3 = remote_cloud_file_client.upload_file(comfy_weights_descriptor3, path_to_comfy3.as_path().to_str().unwrap()).await?;
 
-    let mut path_to_comfy4 = get_seed_tool_data_root();
+/*    let mut path_to_comfy4 = get_seed_tool_data_root();
     path_to_comfy4.push("models/workflows/comfyui/v3_sd15_mm.ckpt");
     let comfy_weights_descriptor4 = Box::new(WeightsSD15CkptDescriptor {});
-    let metadata4 = remote_cloud_file_client.upload_file(comfy_weights_descriptor4, path_to_comfy4.as_path().to_str().unwrap()).await?;
+    let metadata4 = remote_cloud_file_client.upload_file(comfy_weights_descriptor4, path_to_comfy4.as_path().to_str().unwrap()).await?;*/
 
-    // let weights1 = CreateModelWeightsArgs {
-    //     token: &model_weight_token1, // replace with actual ModelWeightToken
-    //     weights_type: WeightsType::ComfyUi, // replace with actual WeightsType
-    //     weights_category: WeightsCategory::WorkflowConfig, // replace with actual WeightsCategory
-    //     title: "comfy-test-workflow".to_string(),
-    //     maybe_description_markdown: Some("Test workflow for ComfyUI".to_string()),
-    //     maybe_description_rendered_html: Some("<p>Description</p>".to_string()),
-    //     creator_user_token: Some(&user_token), // replace with actual UserToken
-    //     creator_ip_address: "192.168.1.1",
-    //     creator_set_visibility: Visibility::Public,
-    //     maybe_last_update_user_token: Some("Last Update User Token".to_string()),
-    //     original_download_url: Some("https://github.com/comfyanonymous/ComfyUI".to_string()),
-    //     original_filename: Some("test-workflow.json".to_string()),
-    //     file_size_bytes: metadata1.file_size_bytes as i32,
-    //     file_checksum_sha2: metadata1.sha256_checksum.to_string(),
-    //     public_bucket_hash: metadata1.bucket_details.clone().unwrap().object_hash,
-    //     maybe_public_bucket_prefix: Some(metadata1.bucket_details.clone().unwrap().prefix),
-    //     maybe_public_bucket_extension: Some(metadata1.bucket_details.clone().unwrap().suffix),
-    //     version: 1,
-    //     mysql_pool: &mysql_pool, // replace with actual MySqlPool
-    // };
+    let weights1 = CreateModelWeightsArgs {
+        token: &model_weight_token1, // replace with actual ModelWeightToken
+        weights_type: WeightsType::ComfyUi, // replace with actual WeightsType
+        weights_category: WeightsCategory::WorkflowConfig, // replace with actual WeightsCategory
+        title: "yae-video-prod".to_string(),
+        maybe_description_markdown: Some("ComfyUI Workflow".to_string()),
+        maybe_description_rendered_html: Some("<p>Description</p>".to_string()),
+        creator_user_token: Some(&user_token), // replace with actual UserToken
+        creator_ip_address: "192.168.1.1",
+        creator_set_visibility: Visibility::Public,
+        maybe_last_update_user_token: Some("Last Update User Token".to_string()),
+        original_download_url: Some("https://github.com/comfyanonymous/ComfyUI".to_string()),
+        original_filename: Some("yae_video_prod.json".to_string()),
+        file_size_bytes: metadata1.file_size_bytes,
+        file_checksum_sha2: metadata1.sha256_checksum.to_string(),
+        public_bucket_hash: metadata1.bucket_details.clone().unwrap().object_hash,
+        maybe_public_bucket_prefix: Some(metadata1.bucket_details.clone().unwrap().prefix),
+        maybe_public_bucket_extension: Some(metadata1.bucket_details.clone().unwrap().suffix),
+        version: 1,
+        mysql_pool: &mysql_pool, // replace with actual MySqlPool
+    };
     // let weights2 = CreateModelWeightsArgs {
     //     token: &model_weight_token2, // replace with actual ModelWeightToken
     //     weights_type: WeightsType::ComfyUi, // replace with actual WeightsType
@@ -775,32 +775,32 @@ pub async fn seed_workflows_for_testing_inference(mysql_pool: &Pool<MySql>, user
     //     mysql_pool: &mysql_pool, // replace with actual MySqlPool
     // };
 
-    let weights4 = CreateModelWeightsArgs {
-        token: &model_weight_token4, // replace with actual ModelWeightToken
-        weights_type: WeightsType::ComfyUi, // replace with actual WeightsType
-        weights_category: WeightsCategory::WorkflowConfig, // replace with actual WeightsCategory
-        title: "v3_sd15_mm".to_string(),
-        maybe_description_markdown: Some("ComfyUI motion module".to_string()),
-        maybe_description_rendered_html: Some("<p>Description</p>".to_string()),
-        creator_user_token: Some(&user_token), // replace with actual UserToken
-        creator_ip_address: "192.168.1.1",
-        creator_set_visibility: Visibility::Public,
-        maybe_last_update_user_token: Some("Last Update User Token".to_string()),
-        original_download_url: Some("https://huggingface.co/guoyww/animatediff/blob/main/v3_sd15_mm.ckpt".to_string()),
-        original_filename: Some("v3_sd15_mm.ckpt".to_string()),
-        file_size_bytes: metadata4.file_size_bytes as i32,
-        file_checksum_sha2: metadata4.sha256_checksum.to_string(),
-        public_bucket_hash: metadata4.bucket_details.clone().unwrap().object_hash,
-        maybe_public_bucket_prefix: Some(metadata4.bucket_details.clone().unwrap().prefix),
-        maybe_public_bucket_extension: Some(metadata4.bucket_details.clone().unwrap().suffix),
-        version: 1,
-        mysql_pool: &mysql_pool, // replace with actual MySqlPool
-    };
+    // let weights4 = CreateModelWeightsArgs {
+    //     token: &model_weight_token4, // replace with actual ModelWeightToken
+    //     weights_type: WeightsType::ComfyUi, // replace with actual WeightsType
+    //     weights_category: WeightsCategory::WorkflowConfig, // replace with actual WeightsCategory
+    //     title: "v3_sd15_mm".to_string(),
+    //     maybe_description_markdown: Some("ComfyUI motion module".to_string()),
+    //     maybe_description_rendered_html: Some("<p>Description</p>".to_string()),
+    //     creator_user_token: Some(&user_token), // replace with actual UserToken
+    //     creator_ip_address: "192.168.1.1",
+    //     creator_set_visibility: Visibility::Public,
+    //     maybe_last_update_user_token: Some("Last Update User Token".to_string()),
+    //     original_download_url: Some("https://huggingface.co/guoyww/animatediff/blob/main/v3_sd15_mm.ckpt".to_string()),
+    //     original_filename: Some("v3_sd15_mm.ckpt".to_string()),
+    //     file_size_bytes: metadata4.file_size_bytes as i32,
+    //     file_checksum_sha2: metadata4.sha256_checksum.to_string(),
+    //     public_bucket_hash: metadata4.bucket_details.clone().unwrap().object_hash,
+    //     maybe_public_bucket_prefix: Some(metadata4.bucket_details.clone().unwrap().prefix),
+    //     maybe_public_bucket_extension: Some(metadata4.bucket_details.clone().unwrap().suffix),
+    //     version: 1,
+    //     mysql_pool: &mysql_pool, // replace with actual MySqlPool
+    // };
 
-    // create_weight(weights1).await?;
+    create_weight(weights1).await?;
     // create_weight(weights2).await?;
     // create_weight(weights3).await?;
-    create_weight(weights4).await?;
+    // create_weight(weights4).await?;
 
     Ok(())
 }

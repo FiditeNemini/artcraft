@@ -1,12 +1,14 @@
-use std::fs::read_to_string;
+use std::fs::{File, read_to_string};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use anyhow::anyhow;
 use jsonpath_lib::replace_with;
 use log::{error, info, warn};
+use reqwest::Url;
 use serde::de::Error;
 use serde_json::Value;
+use tokio::io::AsyncWriteExt;
 use walkdir::WalkDir;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
@@ -83,30 +85,43 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ===================== DOWNLOAD REQUIRED MODELS IF NOT EXIST ===================== //
 
+    async fn download_file(file_url: String, dep_path: PathBuf) -> Result<(), anyhow::Error> {
+        // Send a GET request to the file_url
+        let response = reqwest::get(&file_url).await?;
+
+        // Ensure the request was successful
+        if response.status().is_success() {
+            // Get the byte stream of the file
+            let bytes = response.bytes().await?;
+
+            // Ensure the parent directory exists
+            if let Some(parent) = dep_path.parent() {
+                // Skip errors (for example if the directory already exists)
+                let _ = tokio::fs::create_dir_all(&parent).await;
+            }
+
+            // Create or open the file at dep_path asynchronously
+            let mut file = tokio::fs::File::create(&dep_path).await?;
+
+            // Write the bytes to the file asynchronously
+            file.write_all(&bytes).await?;
+            println!("File downloaded successfully.");
+        } else {
+            println!("Failed to download the file.");
+        }
+
+        Ok(())
+    }
+
     let all_models = &args.job_dependencies.job.job_specific_dependencies.maybe_comfy_ui_dependencies;
     match all_models {
         Some(models) => {
             for model in &models.dependency_tokens.comfy {
-                let mut comfy_dir = model_dependencies.inference_command.comfy_root_code_directory.clone();
-                comfy_dir = comfy_dir.join(model.location.clone());
-                if !comfy_dir.exists() {
-                    let bucket_details = RemoteCloudBucketDetails {
-                        object_hash: model.hash.clone(),
-                        prefix: model.prefix.clone(),
-                        suffix: model.extension.clone(),
-                    };
-                    let comfy_path = comfy_dir.to_str().unwrap().to_string();
-                    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;
-                    let remote_cloud_file_client = match remote_cloud_file_client {
-                        Ok(res) => {
-                            res
-                        }
-                        Err(_) => {
-                            return Err(ProcessSingleJobError::from(anyhow!("failed to get remote cloud file client")));
-                        }
-                    };
-                    remote_cloud_file_client.download_file(bucket_details, comfy_path.clone()).await?;
-                    info!("Downloaded model to {:?}", comfy_path);
+                let mut dep_path = model_dependencies.inference_command.comfy_root_code_directory.clone();
+                dep_path = dep_path.join(model.location.clone());
+                if !dep_path.exists() {
+                    download_file(model.url.clone(), dep_path.clone()).await.map_err(|e| ProcessSingleJobError::Other(e))?;
+                    info!("Downloaded model to {:?}", dep_path);
                 }
             }
         }
@@ -145,7 +160,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 prefix: retrieved_sd_record.maybe_public_bucket_prefix.unwrap(),
                 suffix: retrieved_sd_record.maybe_public_bucket_extension.unwrap(),
             };
-            let sd_filename = retrieved_sd_record.original_filename.unwrap_or("sd_model.safetensors".to_string());
+            let sd_filename = "model.safetensors";
             let sd_path = sd_dir.join(sd_filename).to_str().unwrap().to_string();
             remote_cloud_file_client.download_file(bucket_details, sd_path.clone()).await?;
             maybe_sd_path = Some(sd_path.parse().unwrap());
@@ -170,7 +185,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 suffix: retrieved_lora_record.maybe_public_bucket_extension.unwrap(),
             };
 
-            let lora_filename = retrieved_lora_record.original_filename.unwrap_or("lora_model.safetensors".to_string());
+            let lora_filename = "lora.safetensors";
             let lora_path = lora_dir.join(lora_filename).to_str().unwrap().to_string();
             remote_cloud_file_client.download_file(bucket_details, lora_path.clone()).await?;
             maybe_lora_path = Some(lora_path.parse().unwrap());
