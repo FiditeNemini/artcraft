@@ -1,9 +1,8 @@
 import React from "react";
-import { Redirect, useLocation } from "react-router-dom";
 
 import { BasicVideo, Panel, Tabs } from "components/common";
 
-import { Action, State } from "../storytellerFilterReducer";
+import { State, Action } from "../storytellerFilterReducer";
 import TabContentUpload from "./tabContentUpload";
 import TabContentLibrary from "./tabContentLibrary";
 
@@ -15,6 +14,7 @@ export default function PageVideoProvision({
   pageState: State;
   dispatchPageState: (action: Action) => void;
 }) {
+
   const tabs = [
     {
       label: t("tabTitle.upload"),
@@ -33,12 +33,6 @@ export default function PageVideoProvision({
       padding: true,
     },
   ];
-
-  //pick default tab using pathname
-  const { pathname } = useLocation();
-  if (pathname === "/storyteller-filter" || pathname === "/storyteller-filter/") {
-    return <Redirect to={"/storyteller-filter/upload"} />;
-  }
 
   return(
     <Panel>

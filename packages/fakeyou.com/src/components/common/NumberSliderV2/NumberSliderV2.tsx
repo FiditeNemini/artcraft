@@ -57,19 +57,14 @@ export default function NumberSlider({
   const step = stepProps && stepProps <= max-min ? stepProps 
     : max-min >= 1 ? 1 : (max-min) / 10;
   const initialValue = initialValueProps && initialValueProps <= max && initialValueProps >= min ? initialValueProps
-  : max-min == step ? min : roundToStep((max+min)/2, step);
+  : max-min === step ? min : roundToStep((max+min)/2, step);
 
-  // const [value, setValue] = useState<number>(initialValue);
-  // const didMount = useRef(false);
   function handleInputOnChange(e: React.ChangeEvent<HTMLInputElement>){
-    // setValue(Number.parseInt(e.target.value));
     if(onChangeCallback)onChangeCallback(Number.parseInt(e.target.value))
   }
   function handleRangeOnChange(rangeValue: number[]){
     if(onChangeCallback)onChangeCallback(rangeValue[0])
-    // setValue(rangeValue[0])
   }
-
 
   return (
     <div>

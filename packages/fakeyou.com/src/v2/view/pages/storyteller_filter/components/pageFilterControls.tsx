@@ -1,4 +1,6 @@
 import React, {useState} from "react";
+import { useParams } from "react-router-dom";
+
 import { useMedia } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { states, Action, State } from "../storytellerFilterReducer";
@@ -22,11 +24,12 @@ export default function PageFilterControls({
   pageState: State;
   dispatchPageState: (action: Action) => void;
 }) {
+  const { mediaToken } = useParams<any>();
+
   useMedia({
-    mediaToken: pageState.mediaFileToken,
+    mediaToken: pageState.mediaFileToken || mediaToken,
     onSuccess: (res: any) => {
       // ratings.gather({ res, key: "token" });
-      console.log(res)
       dispatchPageState({
         type: 'loadFileSuccess',
         payload: {mediaFile: res}

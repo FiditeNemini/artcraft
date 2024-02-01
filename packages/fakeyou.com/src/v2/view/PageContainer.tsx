@@ -822,7 +822,7 @@ class PageContainer extends React.Component<
                   />
                 </Route>
 
-                <Route path="/storyteller-filter/:mediaToken?">
+                <Route path="/storyteller-filter">
                   <StorytellerFilterPage
                     {...{
                       enqueueInferenceJob: this.props.enqueueInferenceJob,

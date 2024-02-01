@@ -1,7 +1,9 @@
-import SelectModal from "components/common/SelectModal/SelectModal";
 import React from "react";
+import { NavLink } from "react-router-dom";
 import { states, Action, State } from "../storytellerFilterReducer";
 import { Button } from "components/common";
+import SelectModal from "components/common/SelectModal/SelectModal";
+
 export default function TabContentLibrary({
   t, pageState, dispatchPageState
 }: {
@@ -9,7 +11,6 @@ export default function TabContentLibrary({
   pageState: State;
   dispatchPageState: (action: Action) => void;
 }){
-
   const handleProceed = ()=>{
     dispatchPageState({type: "loadFile"})
   }
@@ -35,11 +36,13 @@ export default function TabContentLibrary({
           },
         ]}
       />
-      {pageState.status === states.FILE_SELECTED && 
-        <Button 
-          label={t("button.proceed")}
-          onClick={handleProceed}
-        />
+      {pageState.status === states.FILE_SELECTED &&
+        <NavLink to={`load/${pageState.mediaFileToken}`}>
+          <Button 
+            label={t("button.proceed")}
+            onClick={handleProceed}
+          />
+        </NavLink>
       }
     </div>
   );
