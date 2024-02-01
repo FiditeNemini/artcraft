@@ -1,24 +1,22 @@
 import React from "react";
 import { Widget } from "@typeform/embed-react";
 import { get, set } from "local-storage";
+import './TypeformContainer.scss';
 
 export default function TypeformWidget() {
   return (
-    <div>
+    <div className="typeformcontainer">
       {!get<boolean>("isSubmit") ? (
         <Widget
-          //id="UfvpJUpF?utm_source=xxxxx&typeform-welcome=0"
           id="UfvpJUpF"
-          height={400}
+          style={{ width: '100%', height: '100%' }}
           opacity={80}
           onSubmit={() => {
             set<boolean>("isSubmit", true);
             console.log("Form submitted!");
-            // window.location.reload();
           }}
           hideHeaders
-          // disableAutoFocus
-          enableSandbox
+          enableSandbox={false}
         />
       ) : null}
     </div>
