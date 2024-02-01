@@ -33,13 +33,12 @@ export default function AudioCard({
   ratings,
   showCreator,
   showCover,
-  source = "",
+  // source = "",
   type,
   inSelectModal = false,
   // onClick: inClick,
   onResultSelect,
 }: AudioCardProps) {
-  // const { setToken, setWeightTitle } = useToken();
   // const linkUrl = getCardUrl(data,source,type);
   // const history = useHistory();
 
@@ -48,8 +47,6 @@ export default function AudioCard({
   };
 
   const handleSelectModalResultSelect = () => {
-    console.log(`inSelectModal : ${inSelectModal}`);
-    console.log(`onResultSelect : ${onResultSelect}`);
     if (inSelectModal && onResultSelect) {
       onResultSelect({
         token: data.weight_token,

@@ -66,9 +66,6 @@ const SelectModal = memo(
     };
 
     const handleOnSelect = (data:{token:string, title:string}) => {
-      console.log("selct modal handleOnSelect")
-      console.log(data);
-      console.log(data.title);
       setSelectedValue({token: data.token, title: data.title || ""});
       if (onSelect) onSelect(data);
       closeModal();
@@ -79,7 +76,7 @@ const SelectModal = memo(
       content: tab.searcher ? (
         <Searcher
           type="modal"
-          onResultSelect={closeModal}
+          onResultSelect={handleOnSelect}
           searcherKey={tab.tabKey}
           weightType={tab.weightTypeFilter}
         />

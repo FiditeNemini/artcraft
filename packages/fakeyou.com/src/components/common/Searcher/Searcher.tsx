@@ -17,7 +17,7 @@ interface SearcherProps {
   type?: "page" | "modal";
   dataType?: "media" | "weights";
   weightType?: string;
-  onResultSelect?: () => void;
+  onResultSelect?: (data:{token:string, title:string}) => void;
   searcherKey: string;
 }
 

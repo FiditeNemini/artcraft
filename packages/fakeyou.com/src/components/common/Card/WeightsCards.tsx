@@ -13,7 +13,7 @@ export default function WeightsCards({ props, type }: Props) {
     case WeightCategory.TTS:
     case WeightCategory.VC:
     case WeightCategory.ZS:
-      return <AudioCard {...{ ...props, showCover: true }} />;
+      return <AudioCard { ...props} showCover />;
     case WeightCategory.SD:
       return <ImageCard {...props} />;
     default:

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
 
 import { useMedia } from "hooks";
@@ -17,6 +17,8 @@ import {
 
 import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import UseStateViewer from "components/common/UseStateViewer";
 
 export default function PageFilterControls({
   debug=false, t, pageState, dispatchPageState
@@ -47,6 +49,9 @@ export default function PageFilterControls({
     firstPass: 15,
     upScalePass: 15
   });
+  useEffect(()=>{
+    if(debug) console.log(filterState)
+  },[filterState, debug])
 
   const handleOnChange = (key: string, newValue:any,) => {
     setFilterState((curr)=>({...curr, [key]: newValue}));
@@ -79,7 +84,6 @@ export default function PageFilterControls({
                   modalTitle="Select a Stable Diffusion Weight"
                   label="Select a Stable Diffusion Weight"
                   onSelect={({token})=>{
-                    console.log(`calling from select modal result select ${token}`);
                     handleOnChange("sdModelToken", token);
                   }}
                   tabs={[
