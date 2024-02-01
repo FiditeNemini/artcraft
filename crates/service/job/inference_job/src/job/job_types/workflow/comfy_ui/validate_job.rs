@@ -4,16 +4,18 @@ use anyhow::anyhow;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::payloads::generic_inference_args::workflow_payload::{NewValue};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 pub struct JobArgs<'a> {
     pub workflow_source: &'a ModelWeightToken,
+    pub output_path: &'a String,
     pub maybe_json_modifications: &'a Option<HashMap<String, NewValue>>,
     pub maybe_sd_model: &'a Option<ModelWeightToken>,
     pub maybe_lora_model: &'a Option<ModelWeightToken>,
-
+    pub maybe_input_file: &'a Option<MediaFileToken>,
 }
 
 pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingleJobError> {
@@ -58,11 +60,20 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
         }
     };
 
+    let output_path = match &inference_args.maybe_output_path {
+        Some(args) => args,
+        None => {
+            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No output file provided!")));
+        }
+    };
+
 
     Ok(JobArgs {
         workflow_source,
+        output_path,
         maybe_sd_model: &inference_args.maybe_sd_model,
         maybe_lora_model: &inference_args.maybe_lora_model,
         maybe_json_modifications: &inference_args.maybe_json_modifications,
+        maybe_input_file: &inference_args.maybe_input_file,
     })
 }

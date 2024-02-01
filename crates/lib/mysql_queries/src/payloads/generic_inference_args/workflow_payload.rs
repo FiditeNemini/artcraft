@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
@@ -27,4 +28,12 @@ pub struct WorkflowArgs {
     #[serde(rename = "json_modifications")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_json_modifications: Option<HashMap<String, NewValue>>,
+
+    #[serde(rename = "in")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_input_file: Option<MediaFileToken>,
+
+    #[serde(rename = "out")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_output_path: Option<String>,
 }

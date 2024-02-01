@@ -50,6 +50,30 @@ impl FileDescriptor for WeightsSD15Descriptor {
     }
 }
 
+pub struct WeightsSD15CkptDescriptor;
+
+impl FileDescriptor for WeightsSD15CkptDescriptor {
+    fn remote_directory_path(&self) -> &str {
+        REMOTE_FILE_DIRECTORY
+    }
+    // this will be the type of file peroid is handled by the file formatter
+    // e.g safetensors bin jpg
+    fn get_suffix(&self)->String {
+       "ckpt".to_string()
+    }
+    // This will be the prefix of the media type or the weights type.
+    // name of the weights or the name of the media type
+    // vall-e_prompt, SD15, sd15, sdxl when implmenting add to the end
+    fn get_prefix(&self)->String {
+        "sd15".to_string()
+    }
+
+    // This will be ensure that the right bucket is picked
+    fn is_public(&self) -> bool {
+      true
+    }
+}
+
 
 pub struct WeightsSDXLDescriptor;
 

@@ -63,6 +63,7 @@ pub enum ExecutableOrCommand {
 
 pub struct InferenceArgs<'s> {
     pub stderr_output_file: &'s Path,
+    pub stdout_output_file: &'s Path,
 }
 
 impl ComfyInferenceCommand {
@@ -179,7 +180,9 @@ impl ComfyInferenceCommand {
         info!("stderr will be written to file: {:?}", args.stderr_output_file.as_os_str());
 
         let stderr_file = File::create(&args.stderr_output_file)?;
+        let stdout_file = File::create(&args.stdout_output_file)?;
         config.stderr = Redirection::File(stderr_file);
+        config.stdout = Redirection::File(stdout_file);
 
         if !env_vars.is_empty() {
             config.env = Some(env_vars);

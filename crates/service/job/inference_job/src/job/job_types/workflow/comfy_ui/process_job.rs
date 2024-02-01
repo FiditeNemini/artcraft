@@ -1,12 +1,13 @@
-use std::fs::read_to_string;
-use std::path::PathBuf;
+use std::fs::{File, read_to_string};
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use anyhow::anyhow;
-use jsonpath_lib::replace_with;
 use log::{error, info, warn};
 use serde::de::Error;
 use serde_json::Value;
+use tokio::io::AsyncWriteExt;
+use walkdir::WalkDir;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
@@ -23,6 +24,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::Pol
 use mysql_queries::payloads::generic_inference_args::workflow_payload::NewValue;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
+use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
@@ -31,11 +33,19 @@ use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::Infer
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
 
-const BUCKET_FILE_PREFIX: &str = "fakeyou_";
-
 pub struct ComfyProcessJobArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
     pub job: &'a AvailableInferenceJob,
+}
+
+fn recursively_delete_files_in(path: &Path) -> std::io::Result<()> {
+    for entry in WalkDir::new(path) {
+        let entry = entry?;
+        if entry.path().is_file() {
+            safe_delete_temp_file(entry.path());
+        }
+    }
+    Ok(())
 }
 
 pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -71,8 +81,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .new_tempdir(&work_temp_dir)
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
-
-    // ==================== QUERY AND DOWNLOAD FILES ==================== //
+    // ===================== DOWNLOAD REQUIRED MODELS IF NOT EXIST ===================== //
     let root_comfy_path = model_dependencies.inference_command.comfy_root_code_directory.clone();
 
     let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;
@@ -85,53 +94,49 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
     };
 
-    // Download SD model if specified
-    let mut maybe_sd_path: Option<PathBuf> = None;
-    match job_args.maybe_sd_model {
-        Some(sd_model) => {
-            let sd_dir = root_comfy_path.join("models").join("checkpoints");
-            let retrieved_sd_record =  get_weight_by_token(
-                sd_model,
-                false,
-                &deps.db.mysql_pool
-            ).await?.unwrap();
+    async fn download_file(file_url: String, dep_path: PathBuf) -> Result<(), anyhow::Error> {
+        // Send a GET request to the file_url
+        let response = reqwest::get(&file_url).await?;
 
-            let bucket_details = RemoteCloudBucketDetails {
-                object_hash: retrieved_sd_record.public_bucket_hash,
-                prefix: retrieved_sd_record.maybe_public_bucket_prefix.unwrap(),
-                suffix: retrieved_sd_record.maybe_public_bucket_extension.unwrap(),
-            };
-            let sd_filename = retrieved_sd_record.original_filename.unwrap_or("sd_model.safetensors".to_string());
-            let sd_path = sd_dir.join(sd_filename).to_str().unwrap().to_string();
-            remote_cloud_file_client.download_file(bucket_details, sd_path.clone()).await?;
-            maybe_sd_path = Some(sd_path.parse().unwrap());
-            info!("Downloaded SD model to {:?}", sd_path);
+        // Ensure the request was successful
+        if response.status().is_success() {
+            // Get the byte stream of the file
+            let bytes = response.bytes().await?;
+
+            // Ensure the parent directory exists
+            if let Some(parent) = dep_path.parent() {
+                // Skip errors (for example if the directory already exists)
+                let _ = tokio::fs::create_dir_all(&parent).await;
+            }
+
+            // Create or open the file at dep_path asynchronously
+            let mut file = tokio::fs::File::create(&dep_path).await?;
+
+            // Write the bytes to the file asynchronously
+            file.write_all(&bytes).await?;
+            println!("File downloaded successfully.");
+        } else {
+            println!("Failed to download the file.");
         }
-        None => {}
+
+        Ok(())
     }
-    // Download Lora model if specified
-    let mut maybe_lora_path: Option<PathBuf> = None;
-    match job_args.maybe_lora_model {
-        Some(lora_model) => {
-            let lora_dir = root_comfy_path.join("models").join("checkpoints");
-            let retrieved_lora_record =  get_weight_by_token(
-                lora_model,
-                false,
-                &deps.db.mysql_pool
-            ).await?.unwrap();
-            let bucket_details = RemoteCloudBucketDetails {
-                object_hash: retrieved_lora_record.public_bucket_hash,
-                prefix: retrieved_lora_record.maybe_public_bucket_prefix.unwrap(),
-                suffix: retrieved_lora_record.maybe_public_bucket_extension.unwrap(),
-            };
 
-            let lora_filename = retrieved_lora_record.original_filename.unwrap_or("lora_model.safetensors".to_string());
-            let lora_path = lora_dir.join(lora_filename).to_str().unwrap().to_string();
-            remote_cloud_file_client.download_file(bucket_details, lora_path.clone()).await?;
-            maybe_lora_path = Some(lora_path.parse().unwrap());
-            info!("Downloaded Lora model to {:?}", lora_path);
+    let all_models = &args.job_dependencies.job.job_specific_dependencies.maybe_comfy_ui_dependencies;
+    match all_models {
+        Some(models) => {
+            for model in &models.dependency_tokens.comfy {
+                let mut dep_path = model_dependencies.inference_command.comfy_root_code_directory.clone();
+                dep_path = dep_path.join(model.location.clone());
+                if !dep_path.exists() {
+                    download_file(model.url.clone(), dep_path.clone()).await.map_err(|e| ProcessSingleJobError::Other(e))?;
+                    info!("Downloaded model to {:?}", dep_path);
+                }
+            }
         }
-        None => {}
+        None => {
+            info!("No models specified to download")
+        }
     }
 
     // Download workflow to ComfyRunner
@@ -168,17 +173,93 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     // Apply modifications if they exist
     if let Some(modifications) = comfy_args.maybe_json_modifications.clone() {
         // Load prompt.json
-        let prompt_file = std::fs::File::open(&workflow_path).unwrap();
+        let prompt_file = File::open(&workflow_path).unwrap();
         let mut prompt_json: Value = serde_json::from_reader(prompt_file).unwrap();
         // Modify json
         for (path, new_value) in modifications {
-            prompt_json = replace_json_value(prompt_json, &path, new_value).expect(
-                format!("Failed to replace json value at path {}", path).as_str()
-            );
+            prompt_json = replace_json_value(prompt_json, &path, new_value).map_err(|e| ProcessSingleJobError::Other(e))?;
         }
         // Save prompt.json
-        let prompt_file = std::fs::File::create(&workflow_path).unwrap();
+        let prompt_file = File::create(&workflow_path).unwrap();
         serde_json::to_writer(prompt_file, &prompt_json).unwrap();
+    }
+
+
+    // ==================== QUERY AND DOWNLOAD FILES ==================== //
+
+    // Download SD model if specified
+    let mut maybe_sd_path: Option<PathBuf> = None;
+    match job_args.maybe_sd_model {
+        Some(sd_model) => {
+            let sd_dir = root_comfy_path.join("models").join("checkpoints");
+            let retrieved_sd_record =  get_weight_by_token(
+                sd_model,
+                false,
+                &deps.db.mysql_pool
+            ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("SD model not found")))?;
+
+            let bucket_details = RemoteCloudBucketDetails {
+                object_hash: retrieved_sd_record.public_bucket_hash,
+                prefix: retrieved_sd_record.maybe_public_bucket_prefix.unwrap(),
+                suffix: retrieved_sd_record.maybe_public_bucket_extension.unwrap(),
+            };
+            let sd_filename = "model.safetensors";
+            let sd_path = sd_dir.join(sd_filename).to_str().unwrap().to_string();
+            remote_cloud_file_client.download_file(bucket_details, sd_path.clone()).await?;
+            maybe_sd_path = Some(sd_path.parse().unwrap());
+            info!("Downloaded SD model to {:?}", sd_path);
+            maybe_sd_path = Some(sd_path.parse().unwrap());
+        }
+        None => {}
+    }
+    // Download Lora model if specified
+    let mut maybe_lora_path: Option<PathBuf> = None;
+    match job_args.maybe_lora_model {
+        Some(lora_model) => {
+            let lora_dir = root_comfy_path.join("models").join("checkpoints");
+            let retrieved_lora_record =  get_weight_by_token(
+                lora_model,
+                false,
+                &deps.db.mysql_pool
+            ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Lora model not found")))?;
+            let bucket_details = RemoteCloudBucketDetails {
+                object_hash: retrieved_lora_record.public_bucket_hash,
+                prefix: retrieved_lora_record.maybe_public_bucket_prefix.unwrap(),
+                suffix: retrieved_lora_record.maybe_public_bucket_extension.unwrap(),
+            };
+
+            let lora_filename = "lora.safetensors";
+            let lora_path = lora_dir.join(lora_filename).to_str().unwrap().to_string();
+            remote_cloud_file_client.download_file(bucket_details, lora_path.clone()).await?;
+            maybe_lora_path = Some(lora_path.parse().unwrap());
+            info!("Downloaded Lora model to {:?}", lora_path);
+            maybe_lora_path = Some(lora_path.parse().unwrap());
+        }
+        None => {}
+    }
+    // Download Input file if specified
+    let mut maybe_input_path: Option<PathBuf> = None;
+    match job_args.maybe_input_file {
+        Some(input_file) => {
+            let input_dir = root_comfy_path.join("input");
+            let retrieved_input_record =  get_media_file(
+                input_file,
+                false,
+                &deps.db.mysql_pool
+            ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Input file not found")))?;
+            let bucket_details = RemoteCloudBucketDetails {
+                object_hash: retrieved_input_record.public_bucket_directory_hash,
+                prefix: retrieved_input_record.maybe_public_bucket_prefix.unwrap(),
+                suffix: retrieved_input_record.maybe_public_bucket_extension.clone().unwrap(),
+            };
+            // Download to "input.EXTENSION"
+            let input_filename = format!("input.{}", retrieved_input_record.maybe_public_bucket_extension.unwrap());
+            let input_path = input_dir.join(input_filename).to_str().unwrap().to_string();
+            remote_cloud_file_client.download_file(bucket_details, input_path.clone()).await?;
+            info!("Downloaded input file to {:?}", input_path);
+            maybe_input_path = Some(input_path.parse().unwrap());
+        }
+        None => {}
     }
 
     // ==================== SETUP FOR INFERENCE ==================== //
@@ -192,20 +273,35 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ==================== RUN INFERENCE SCRIPT ==================== //
     let stderr_output_file = work_temp_dir.path().join("stderr.txt");
+    let stdout_output_file = work_temp_dir.path().join("stdout.txt");
+
     let inference_start_time = Instant::now();
 
     let command_exit_status = model_dependencies
         .inference_command
         .execute_inference(InferenceArgs {
             stderr_output_file: &stderr_output_file,
+            stdout_output_file: &stdout_output_file,
         });
 
     let inference_duration = Instant::now().duration_since(inference_start_time);
 
     info!("Inference took duration to complete: {:?}", &inference_duration);
 
-    if !command_exit_status.is_success() {
+    // ==================== GET OUTPUT FILE ======================== //
+    let mut output_file = root_comfy_path.join("output");
+    output_file = output_file.join(job_args.output_path);
+
+    // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
+
+    // check stdout for success and check if file exists
+    let stdout_output = read_to_string(&stdout_output_file).unwrap();
+    // check for "Prompt executed" in stdout (comfyui only outputs this for success)
+    if !stdout_output.contains("Prompt executed") || check_file_exists(&output_file).is_err() {
         error!("Inference failed: {:?}", command_exit_status);
+
+        error!("Captured stdout output: {}", stdout_output);
+        error!("Captured stderr output: {}", read_to_string(&stderr_output_file).unwrap());
 
         let error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
 
@@ -214,6 +310,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
 
         safe_delete_temp_file(&stderr_output_file);
+        safe_delete_temp_file(&stdout_output_file);
         safe_delete_temp_directory(&work_temp_dir);
         safe_delete_temp_file(&workflow_path);
         if let Some(sd_path) = maybe_sd_path {
@@ -222,49 +319,40 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         if let Some(lora_path) = maybe_lora_path {
             safe_delete_temp_file(&lora_path);
         }
+        if let Some(input_path) = maybe_input_path {
+            safe_delete_temp_file(&input_path);
+        }
+        let output_dir = root_comfy_path.join("output");
+        recursively_delete_files_in(&output_dir).unwrap();
 
         return Err(error);
     }
 
-    // ==================== GET OUTPUT FILE ======================== //
-
-    // take the latest file in the output directory
-    let output_dir = root_comfy_path.join("output");
-    let mut entries: Vec<PathBuf> = std::fs::read_dir(output_dir).unwrap()
-        .map(|res| res.map(|e| e.path()))
-        .collect::<Result<Vec<_>, std::io::Error>>()
-        .unwrap();
-
-    entries.sort_by_key(|path| std::fs::metadata(path).unwrap().modified().unwrap());
-
-
-    // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
-
-    // check if entries is empty
-    if entries.is_empty() {
-        return Err(ProcessSingleJobError::Other(anyhow!("No output files found")));
-    }
-    let finished_file = entries.last().unwrap();
-    info!("Checking that file exists: {:?} ...", finished_file);
-    check_file_exists(&finished_file).map_err(|e| ProcessSingleJobError::Other(e))?;
-
     info!("Interrogating result file size ...");
 
-    let file_size_bytes = file_size(&finished_file)
+    let file_size_bytes = file_size(&output_file)
         .map_err(|err| ProcessSingleJobError::Other(err))?;
 
     info!("Interrogating result mimetype ...");
 
-    let mimetype = get_mimetype_for_file(&finished_file)
+    let mimetype = get_mimetype_for_file(&output_file)
         .map_err(|err| ProcessSingleJobError::from_io_error(err))?
         .map(|mime| mime.to_string())
         .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
 
     // create ext from mimetype
     let ext = match mimetype.as_str() {
-        "video/mp4" => ".mp4",
-        "image/png" => ".png",
-        "image/jpeg" => ".jpg",
+        "video/mp4" => "mp4",
+        "image/png" => "png",
+        "image/jpeg" => "jpg",
+        _ => return Err(ProcessSingleJobError::Other(anyhow!("Mimetype not supported: {}", mimetype))),
+    };
+
+    // create prefix from mimetype
+    let prefix = match mimetype.as_str() {
+        "video/mp4" => "video",
+        "image/png" => "image",
+        "image/jpeg" => "image",
         _ => return Err(ProcessSingleJobError::Other(anyhow!("Mimetype not supported: {}", mimetype))),
     };
 
@@ -278,7 +366,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Calculating sha256...");
 
-    let file_checksum = sha256_hash_file(&finished_file)
+    let file_checksum = sha256_hash_file(&output_file)
         .map_err(|err| {
             ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
         })?;
@@ -289,7 +377,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
     let result_bucket_location = MediaFileBucketPath::generate_new(
-        Some(BUCKET_FILE_PREFIX),
+        Some(prefix),
         Some(ext));
 
     let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
@@ -300,7 +388,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
         &result_bucket_object_pathbuf,
-        &finished_file,
+        &output_file,
         &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .await
         .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -308,16 +396,20 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     // ==================== DELETE TEMP FILES ==================== //
 
     safe_delete_temp_file(&stderr_output_file);
-
-    // delete all files in output directory
-    let output_dir = root_comfy_path.join("output");
-    let entries: Vec<PathBuf> = std::fs::read_dir(output_dir).unwrap()
-        .map(|res| res.map(|e| e.path()))
-        .collect::<Result<Vec<_>, std::io::Error>>()
-        .unwrap();
-    for entry in entries {
-        safe_delete_temp_file(&entry);
+    safe_delete_temp_file(&stdout_output_file);
+    safe_delete_temp_file(&workflow_path);
+    if let Some(sd_path) = maybe_sd_path {
+        safe_delete_temp_file(&sd_path);
     }
+    if let Some(lora_path) = maybe_lora_path {
+        safe_delete_temp_file(&lora_path);
+    }
+    if let Some(input_path) = maybe_input_path {
+        safe_delete_temp_file(&input_path);
+    }
+
+    let output_dir = root_comfy_path.join("output");
+    recursively_delete_files_in(&output_dir).unwrap();
 
     // NB: We should be using a tempdir, but to make absolutely certain we don't overflow the disk...
     safe_delete_temp_directory(&work_temp_dir);
@@ -333,7 +425,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         file_size_bytes,
         sha256_checksum: &file_checksum,
         public_bucket_directory_hash: result_bucket_location.get_object_hash(),
-        maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
+        maybe_public_bucket_prefix: Some(prefix),
         maybe_public_bucket_extension: Some(ext),
         is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
         worker_hostname: &args.job_dependencies.job.info.container.hostname,
@@ -360,15 +452,29 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     })
 }
 
-fn replace_json_value(json: Value, path: &str, new_value: NewValue) -> Result<Value, serde_json::Error> {
-    replace_with(json, path, &mut |_| {
+fn replace_json_value(json: Value, path: &str, new_value: NewValue) -> anyhow::Result<Value> {
+    // First, attempt to read the value at the specified path
+    let results = jsonpath_lib::select(&json, path).map_err(|err| {
+        anyhow!("Invalid jsonpath '{}': {:?}", path, err)
+    })?;
+
+    // If the path does not exist or returns no results, return an error
+    if results.is_empty() {
+        return Err(anyhow!("Path '{}' does not exist in the provided JSON.", path));
+    }
+
+    // If the path exists, proceed with the replacement
+    // Assuming replace_with returns a Result, handle it appropriately
+    jsonpath_lib::replace_with(json, path, &mut |_| {
         match &new_value {
             NewValue::String(s) => Some(Value::String(s.clone())),
-            NewValue::Float(f) => Some(Value::Number(serde_json::Number::from_f64(*f as f64).unwrap())),
+            NewValue::Float(f) => serde_json::Number::from_f64(*f as f64)
+                .map(Value::Number) // Convert Option to Some(Value::Number) if Some, else None
+                .or_else(|| Some(Value::Null)), // If None, use Value::Null instead
             NewValue::Int(i) => Some(Value::Number(serde_json::Number::from(*i))),
             NewValue::Bool(b) => Some(Value::Bool(*b)),
         }
     }).map_err(|err| {
-        serde_json::Error::custom(format!("Failed to replace json value at path {}: {:?}", path, err))
+        anyhow!("Failed to replace json value at path '{}': {:?}", path, err)
     })
 }
