@@ -17,6 +17,11 @@ CREATE TABLE generic_inference_jobs (
 
   -- ========== INFERENCE DETAILS ==========
 
+  -- The new enum for the type of job, which will eventually replace `inference_category` and `maybe_model_type`.
+  -- This isn't fully supported yet in the inference-job, but we'll start populating it and adding logic around it.
+  -- We'll start this out as nullable, then migrate the old rows with a default column value.
+  job_type VARCHAR(32) DEFAULT NULL,
+
   -- NB: This is becoming a problematic field and is becoming conflated with `maybe_model_type`.
   -- We're using this to handle job dispatching, but the latter is being used to load container
   -- dependencies at startup (even if it isn't a real model type or a polymorphic foreign key).
@@ -249,6 +254,7 @@ CREATE TABLE generic_inference_jobs (
   PRIMARY KEY (id),
   UNIQUE KEY (token),
   UNIQUE KEY (uuid_idempotency_token),
+  KEY index_job_type (job_type),
   KEY index_inference_category (inference_category),
   KEY index_maybe_model_type_and_maybe_model_token (maybe_model_type, maybe_model_token),
   KEY index_maybe_model_type (maybe_model_type),
