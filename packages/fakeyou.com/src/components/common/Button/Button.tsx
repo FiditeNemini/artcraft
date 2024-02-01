@@ -7,6 +7,7 @@ import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 
 export default function Button({
+  buttonRef,
   label,
   icon,
   small,
@@ -81,7 +82,7 @@ export default function Button({
       {ButtonContent}
     </a>
   ) : (
-    <button type="button" {...commonProps} {...rest}>
+    <button {...{ ...commonProps, ...rest, type: "button", ref: buttonRef }}>
       {ButtonContent}
     </button>
   );
