@@ -190,7 +190,7 @@ pub async fn enqueue_tts_request(
     // create the job record here!
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
-        job_type: InferenceJobType::Unknown,
+        job_type: InferenceJobType::StyleTTS2,
         inference_category: InferenceCategory::TextToSpeech,
         maybe_model_type: Some(InferenceModelType::StyleTTS2), // NB: Model is static during inference
         maybe_model_token: None, // NB: Model is static during inference

@@ -398,7 +398,7 @@ pub async fn enqueue_infer_tts_handler(
 
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
       uuid_idempotency_token: &request.uuid_idempotency_token,
-      job_type: InferenceJobType::Unknown,
+      job_type: InferenceJobType::Tacotron2,
       inference_category: InferenceCategory::TextToSpeech,
       maybe_model_type: Some(model_type),
       maybe_model_token: Some(request.tts_model_token.as_str()),

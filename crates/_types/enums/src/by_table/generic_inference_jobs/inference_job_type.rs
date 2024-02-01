@@ -13,16 +13,45 @@ use strum::EnumIter;
 /// YOU CAN ADD NEW VALUES, BUT DO NOT CHANGE EXISTING VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default)]
+#[serde(rename_all = "snake_case")]
 pub enum InferenceJobType {
+  /// Jobs that run ComfyUI workflows
+  ComfyUi,
+
   /// A job that turns "FBX" game engine files into "GLTF" files (Bevy-compatible).
   #[serde(rename = "convert_fbx_gltf")]
   ConvertFbxToGltf,
 
-  #[serde(rename = "rerender_a_video")]
+  /// Process a video into BVH mocap animation data for game engines
+  MocapNet,
+
+  /// Re-render a video is a video style transfer algorithm. We developed code
+  /// around it, but chose to develop AnimateDiff / ComfyUI support instead.
   RerenderAVideo,
 
+  /// RVC is a voice conversion model. RVCv2 is the most popular such model currently.
+  #[serde(rename = "rvc_v2")]
+  RvcV2,
+
+  /// SadTalker does image-to-video lip-syncing when given an audio file and image.
+  SadTalker,
+
+  /// so-vits-svc voice conversion. This predates RVCv2.
+  SoVitsSvc,
+
+  /// Stable diffusion image generation
+  StableDiffusion,
+
+  /// StyleTTS2 is a zero shot multi-speaker TTS model.
+  /// This job type should handle both speaker vector encoding and inference.
+  #[serde(rename = "styletts2")]
+  StyleTTS2,
+
+  /// TT2 Text to speech
+  Tacotron2,
+
   /// A value we may use in the future for historical jobs
-  #[serde(rename = "unknown")]
+  /// (i.e. when we backfill the database column and make it non-nullable)
   #[default]
   Unknown,
 }
@@ -35,15 +64,32 @@ impl_mysql_enum_coders!(InferenceJobType);
 impl InferenceJobType {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::ComfyUi => "comfy_ui",
       Self::ConvertFbxToGltf => "convert_fbx_gltf",
+      Self::MocapNet => "mocap_net",
       Self::RerenderAVideo => "rerender_a_video",
+      Self::RvcV2 => "rvc_v2",
+      Self::SadTalker => "sad_talker",
+      Self::SoVitsSvc => "so_vits_svc",
+      Self::StableDiffusion => "stable_diffusion",
+      Self::StyleTTS2 => "styletts2",
+      Self::Tacotron2 => "tacotron2",
       Self::Unknown => "unknown",
     }
   }
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "comfy_ui" => Ok(Self::ComfyUi),
       "convert_fbx_gltf" => Ok(Self::ConvertFbxToGltf),
+      "mocap_net" => Ok(Self::MocapNet),
+      "rerender_a_video" => Ok(Self::RerenderAVideo),
+      "rvc_v2" => Ok(Self::RvcV2),
+      "sad_talker" => Ok(Self::SadTalker),
+      "so_vits_svc" => Ok(Self::SoVitsSvc),
+      "stable_diffusion" => Ok(Self::StableDiffusion),
+      "styletts2" => Ok(Self::StyleTTS2),
+      "tacotron2" => Ok(Self::Tacotron2),
       "unknown" => Ok(Self::Unknown),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -53,7 +99,16 @@ impl InferenceJobType {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      Self::ComfyUi,
       Self::ConvertFbxToGltf,
+      Self::MocapNet,
+      Self::RerenderAVideo,
+      Self::RvcV2,
+      Self::SadTalker,
+      Self::SoVitsSvc,
+      Self::StableDiffusion,
+      Self::StyleTTS2,
+      Self::Tacotron2,
       Self::Unknown,
     ])
   }
@@ -74,22 +129,46 @@ mod tests {
 
     #[test]
     fn test_serialization() {
+      assert_serialization(InferenceJobType::ComfyUi, "comfy_ui");
       assert_serialization(InferenceJobType::ConvertFbxToGltf, "convert_fbx_gltf");
+      assert_serialization(InferenceJobType::MocapNet, "mocap_net");
       assert_serialization(InferenceJobType::RerenderAVideo, "rerender_a_video");
+      assert_serialization(InferenceJobType::RvcV2, "rvc_v2");
+      assert_serialization(InferenceJobType::SadTalker, "sad_talker");
+      assert_serialization(InferenceJobType::SoVitsSvc, "so_vits_svc");
+      assert_serialization(InferenceJobType::StableDiffusion, "stable_diffusion");
+      assert_serialization(InferenceJobType::StyleTTS2, "styletts2");
+      assert_serialization(InferenceJobType::Tacotron2, "tacotron2");
       assert_serialization(InferenceJobType::Unknown, "unknown");
     }
 
     #[test]
     fn to_str() {
+      assert_eq!(InferenceJobType::ComfyUi.to_str(), "comfy_ui");
       assert_eq!(InferenceJobType::ConvertFbxToGltf.to_str(), "convert_fbx_gltf");
+      assert_eq!(InferenceJobType::MocapNet.to_str(), "mocap_net");
       assert_eq!(InferenceJobType::RerenderAVideo.to_str(), "rerender_a_video");
+      assert_eq!(InferenceJobType::RvcV2.to_str(), "rvc_v2");
+      assert_eq!(InferenceJobType::SadTalker.to_str(), "sad_talker");
+      assert_eq!(InferenceJobType::SoVitsSvc.to_str(), "so_vits_svc");
+      assert_eq!(InferenceJobType::StableDiffusion.to_str(), "stable_diffusion");
+      assert_eq!(InferenceJobType::StyleTTS2.to_str(), "styletts2");
+      assert_eq!(InferenceJobType::Tacotron2.to_str(), "tacotron2");
       assert_eq!(InferenceJobType::Unknown.to_str(), "unknown");
     }
 
     #[test]
     fn from_str() {
+      assert_eq!(InferenceJobType::from_str("comfy_ui").unwrap(), InferenceJobType::ComfyUi);
       assert_eq!(InferenceJobType::from_str("convert_fbx_gltf").unwrap(), InferenceJobType::ConvertFbxToGltf);
+      assert_eq!(InferenceJobType::from_str("mocap_net").unwrap(), InferenceJobType::MocapNet);
       assert_eq!(InferenceJobType::from_str("rerender_a_video").unwrap(), InferenceJobType::RerenderAVideo);
+      assert_eq!(InferenceJobType::from_str("rvc_v2").unwrap(), InferenceJobType::RvcV2);
+      assert_eq!(InferenceJobType::from_str("sad_talker").unwrap(), InferenceJobType::SadTalker);
+      assert_eq!(InferenceJobType::from_str("so_vits_svc").unwrap(), InferenceJobType::SoVitsSvc);
+      assert_eq!(InferenceJobType::from_str("stable_diffusion").unwrap(), InferenceJobType::StableDiffusion);
+      assert_eq!(InferenceJobType::from_str("styletts2").unwrap(), InferenceJobType::StyleTTS2);
+      assert_eq!(InferenceJobType::from_str("tacotron2").unwrap(), InferenceJobType::Tacotron2);
       assert_eq!(InferenceJobType::from_str("unknown").unwrap(), InferenceJobType::Unknown);
     }
 
@@ -97,9 +176,17 @@ mod tests {
     fn all_variants() {
       // Static check
       let mut variants = InferenceJobType::all_variants();
-      assert_eq!(variants.len(), 3);
+      assert_eq!(variants.len(), 11);
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::ComfyUi));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::ConvertFbxToGltf));
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::MocapNet));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::RerenderAVideo));
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::RvcV2));
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::SadTalker));
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::SoVitsSvc));
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::StableDiffusion));
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::StyleTTS2));
+      assert_eq!(variants.pop_first(), Some(InferenceJobType::Tacotron2));
       assert_eq!(variants.pop_first(), Some(InferenceJobType::Unknown));
       assert_eq!(variants.pop_first(), None);
 

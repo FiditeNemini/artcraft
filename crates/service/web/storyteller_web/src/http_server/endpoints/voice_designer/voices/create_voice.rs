@@ -177,7 +177,7 @@ pub async fn create_voice_handler(
     // create the job record here! explore the table insert the inference args in here as json! keep it short
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
-        job_type: InferenceJobType::Unknown,
+        job_type: InferenceJobType::StyleTTS2,
         inference_category: InferenceCategory::TextToSpeech,
         maybe_model_type: Some(InferenceModelType::StyleTTS2), // NB: Model is static during inference
         maybe_model_token: None, // NB: Model is static during inference

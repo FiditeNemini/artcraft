@@ -308,7 +308,7 @@ pub async fn enqueue_face_animation_handler(
 
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
-    job_type: InferenceJobType::Unknown,
+    job_type: InferenceJobType::SadTalker,
     inference_category: InferenceCategory::LipsyncAnimation,
     maybe_model_type: Some(InferenceModelType::SadTalker), // NB: Model is static during inference
     maybe_model_token: None, // NB: Model is static during inference

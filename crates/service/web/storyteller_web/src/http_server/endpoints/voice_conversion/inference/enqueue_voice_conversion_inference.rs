@@ -290,9 +290,19 @@ pub async fn enqueue_voice_conversion_inference_handler(
     });
   }
 
+  let job_type = match model_inference_info.job_model_type {
+    InferenceModelType::SoVitsSvc => InferenceJobType::SoVitsSvc,
+    InferenceModelType::RvcV2 => InferenceJobType::RvcV2,
+    _ => {
+      // In theory, this shouldn't catch anything.
+      error!("wrong model type for voice conversion: {:?}", model_inference_info.job_model_type);
+      return Err(EnqueueVoiceConversionInferenceError::ServerError)
+    }
+  };
+
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
-    job_type: InferenceJobType::Unknown,
+    job_type,
     inference_category: InferenceCategory::VoiceConversion,
     maybe_model_type: Some(model_inference_info.job_model_type),
     maybe_model_token: Some(&model_token),

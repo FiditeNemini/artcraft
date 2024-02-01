@@ -407,7 +407,7 @@ pub async fn enqueue_image_generation_request(
     // create the job record here!
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
-        job_type: InferenceJobType::Unknown,
+        job_type: InferenceJobType::StableDiffusion,
         inference_category: InferenceCategory::ImageGeneration,
         maybe_model_type: Some(InferenceModelType::StableDiffusion), // NB: Model is static during inference
         maybe_model_token: None, // NB: Model is static during inference
