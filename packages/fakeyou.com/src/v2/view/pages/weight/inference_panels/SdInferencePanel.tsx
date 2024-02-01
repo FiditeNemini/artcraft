@@ -47,7 +47,7 @@ function SdInferencePanel({
   const [weightToken, setWeightToken] = useState(sd_model_token);
 
   const handleOnWeightSelect = (data:{token:string,title:string}) => {
-    setLoraToken(data.token);
+    setWeightToken(data.token);
   };
   const handleOnSelect = (data:{token:string,title:string}) => {
     setLoraToken(data.token);
