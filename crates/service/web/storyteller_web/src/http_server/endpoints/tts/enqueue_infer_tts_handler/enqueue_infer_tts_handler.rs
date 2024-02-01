@@ -15,6 +15,7 @@ use rand::Rng;
 use rand::seq::SliceRandom;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_api_token::get_request_api_token;
@@ -397,6 +398,7 @@ pub async fn enqueue_infer_tts_handler(
 
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
       uuid_idempotency_token: &request.uuid_idempotency_token,
+      job_type: InferenceJobType::Unknown,
       inference_category: InferenceCategory::TextToSpeech,
       maybe_model_type: Some(model_type),
       maybe_model_token: Some(request.tts_model_token.as_str()),

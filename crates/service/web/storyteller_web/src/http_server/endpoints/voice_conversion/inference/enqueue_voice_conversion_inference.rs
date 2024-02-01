@@ -16,6 +16,7 @@ use sqlx::pool::PoolConnection;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
+use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
@@ -291,6 +292,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
 
   let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
     uuid_idempotency_token: &request.uuid_idempotency_token,
+    job_type: InferenceJobType::Unknown,
     inference_category: InferenceCategory::VoiceConversion,
     maybe_model_type: Some(model_inference_info.job_model_type),
     maybe_model_token: Some(&model_token),

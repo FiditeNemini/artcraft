@@ -3,6 +3,7 @@ use sqlx::MySqlPool;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
+use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
@@ -14,6 +15,11 @@ use crate::payloads::generic_inference_args::generic_inference_args::GenericInfe
 
 pub struct InsertGenericInferenceArgs<'a> {
   pub uuid_idempotency_token: &'a str,
+
+  // NB: This will eventually take the place of "inference category" and "maybe model type", since the latter two are
+  // used entirely inconsistently for job dispatching (especially "inference category"). This should always be 1:1 with
+  // a concrete job type.
+  pub job_type: InferenceJobType,
 
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<InferenceModelType>,
@@ -68,6 +74,8 @@ SET
   token = ?,
   uuid_idempotency_token = ?,
 
+  job_type = ?,
+
   inference_category = ?,
   maybe_model_type = ?,
   maybe_model_token = ?,
@@ -96,6 +104,8 @@ SET
         "#,
         job_token.as_str(),
         args.uuid_idempotency_token,
+
+        args.job_type.to_str(),
 
         args.inference_category.to_str(),
 

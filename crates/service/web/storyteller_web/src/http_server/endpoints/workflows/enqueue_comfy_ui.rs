@@ -11,6 +11,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::{info, warn};
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
@@ -189,6 +190,7 @@ pub async fn enqueue_comfy_ui_handler(
 
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
+        job_type: InferenceJobType::Unknown,
         inference_category: InferenceCategory::Workflow,
         maybe_model_type: Some(InferenceModelType::ComfyUi), // NB: Model is static during inference
         maybe_model_token: None, // NB: Model is static during inference
