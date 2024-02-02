@@ -17,6 +17,7 @@ import {
   faLink,
   faFileCircleXmark,
   faArrowRightArrowLeft,
+  faVideoPlus
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -411,7 +412,7 @@ export default function MediaPage() {
           <div className="col-12 col-xl-4">
             <div className="panel panel-clear d-flex flex-column gap-3">
               <div className="d-flex gap-2 flex-wrap">
-                {mediaFile?.media_type === MediaFileType.Audio ? (
+                { mediaFile?.media_type === MediaFileType.Audio ? (
                   <Button
                     {...{
                       icon: faFaceViewfinder,
@@ -421,7 +422,18 @@ export default function MediaPage() {
                       className: "flex-grow-1",
                     }}
                   />
-                ) : null}
+                ) : null }
+                { mediaFile?.media_type === MediaFileType.BVH ? (
+                  <Button
+                    {...{
+                      icon: faVideoPlus,
+                      label: "Use BVH in Engine Compositor",
+                      to: `/engine-compositor?preset_token=${mediaFile.token}`,
+                      variant: "primary",
+                      className: "flex-grow-1",
+                    }}
+                  />
+                ) : null }
 
                 {mediaFile?.media_type !== MediaFileType.Audio && (
                   <Button

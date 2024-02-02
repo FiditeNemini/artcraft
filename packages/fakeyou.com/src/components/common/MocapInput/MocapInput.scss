@@ -10,7 +10,6 @@
 
 .fy-mocap-input {
   @include panel;
-  height: 300px;
   border-radius: .5rem;
   overflow: hidden;
   position: relative;
@@ -19,12 +18,15 @@
 
 .fy-media-input-square {
   aspect-ratio: 1/1;
+  height: 300px;
 
   .fy-media-picker-empty-controls {}
 }
 
 .fy-media-input-landscape {
-  height: 300px;
+  width: 100%;
+  aspect-ratio: 4/3;
+  max-height: 66vh;
 }
 
 .fy-media-picker-empty, .fy-media-picker-full {
