@@ -1,17 +1,21 @@
 import React from "react";
 import useTimeAgo from "hooks/useTimeAgo";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import { MakeRatingsProps } from "hooks/useRatings";
 import { faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
+import LikeButton from "components/common/LikeButton";
 import CreatorName from "components/common/Card/CreatorName";
 import Badge from "components/common/Badge";
 
 interface Props {
   data: any,
+  makeRatingsProps?: MakeRatingsProps,
   showCreator?: boolean
 }
 
 
-export default function BvhCard({ data, showCreator }: Props) {
+export default function BvhCard({ data, makeRatingsProps, showCreator }: Props) {
   const timeAgo = useTimeAgo(data.created_at);
   const handleInnerClick = (event: any) => event.stopPropagation();
   return <>
@@ -54,16 +58,16 @@ export default function BvhCard({ data, showCreator }: Props) {
             </div>
           )}
           {
-            // <div>
-            //   <LikeButton
-            //     {...{
-            //       ...ratings.makeProps({
-            //         entityToken: data.token,
-            //         entityType: "media_file",
-            //       }),
-            //     }}
-            //   />
-            // </div>
+            makeRatingsProps ? <div>
+              <LikeButton
+                {...{
+                  ...makeRatingsProps({
+                    entityToken: data.token,
+                    entityType: "media_file",
+                  }),
+                }}
+              />
+            </div> : null
           }
         </div>
       </div>

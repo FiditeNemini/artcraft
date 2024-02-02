@@ -4,6 +4,7 @@ export enum MediaFileType {
   Image = "image",
   BVH = "bvh",
   GLTF = "gltf",
+  GLB = "glb",
   FBX = "fbx",
   None = "none",
 }

@@ -1,6 +1,12 @@
 import { GetRatings } from "@storyteller/components/src/api/user_ratings/GetRatings";
 import { SetRating } from "@storyteller/components/src/api/user_ratings/SetRating";
-import { useBatchContent } from "hooks";
+import useBatchContent, { BatchInputProps, MakePropsParams } from "hooks/useBatchContent";
+
+export interface RatingsProps extends BatchInputProps {
+  likeCount: 0
+}
+
+export type MakeRatingsProps = (x: MakePropsParams) => RatingsProps;
 
 export default function useRatings() {
   const fetch = (entity_token: string, entity_type: string, lib: any) => {
@@ -40,11 +46,13 @@ export default function useRatings() {
     toggleCheck: (entity: any) => (entity?.rating_value || "") === "positive"
   });
 
+  const makeProps: MakeRatingsProps = ({ entityToken, entityType }: MakePropsParams) => ({
+    ...ratings.makeProps({ entityToken, entityType }),
+    likeCount: ratings.library[entityToken]?.positive_rating_count || 0,
+  });
+
   return {
     ...ratings,
-    makeProps: ({ entityToken, entityType }: { entityToken: string, entityType: string }) => ({
-      ...ratings.makeProps({ entityToken, entityType }),
-      likeCount: ratings.library[entityToken]?.positive_rating_count || 0,
-    })
+    makeProps
   }
 };
