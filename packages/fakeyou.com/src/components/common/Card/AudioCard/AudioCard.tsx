@@ -1,5 +1,5 @@
 import React from "react";
-// import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import Card from "../Card";
 import AudioPlayer from "components/common/AudioPlayer";
 import useTimeAgo from "hooks/useTimeAgo";
@@ -12,6 +12,7 @@ import Button from "components/common/Button";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import getCardUrl from "../getCardUrl";
 // import getCardUrl from "../getCardUrl";
 
 interface AudioCardProps {
@@ -23,7 +24,7 @@ interface AudioCardProps {
   source?: string;
   type: "media" | "weights";
   inSelectModal?: boolean;
-  onResultSelect?: (data:{token: string, title:string}) => void;
+  onResultSelect?: (data: { token: string; title: string }) => void;
   // onClick?: (e:any) => any;
 }
 
@@ -33,14 +34,14 @@ export default function AudioCard({
   ratings,
   showCreator,
   showCover,
-  // source = "",
+  source = "",
   type,
   inSelectModal = false,
   // onClick: inClick,
   onResultSelect,
 }: AudioCardProps) {
-  // const linkUrl = getCardUrl(data,source,type);
-  // const history = useHistory();
+  const linkUrl = getCardUrl(data, source, type);
+  const history = useHistory();
 
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
@@ -50,7 +51,7 @@ export default function AudioCard({
     if (inSelectModal && onResultSelect) {
       onResultSelect({
         token: data.weight_token,
-        title: data.title
+        title: data.title,
       });
     }
   };
@@ -164,7 +165,7 @@ export default function AudioCard({
                 <div className="d-flex flex-grow-1">
                   <Badge label={weightBadgeLabel} color={weightBadgeColor} />
                 </div>
-                {/* {inClick ? (
+                {inSelectModal ? (
                   <Button
                     icon={faArrowRight}
                     iconFlip={true}
@@ -175,7 +176,7 @@ export default function AudioCard({
                       history.push(linkUrl);
                     }}
                   />
-                ) : ( */}
+                ) : (
                   <Button
                     icon={faArrowRight}
                     iconFlip={true}
@@ -184,7 +185,7 @@ export default function AudioCard({
                     className="fs-7"
                     onClick={handleSelectModalResultSelect}
                   />
-                {/* )} */}
+                )}
               </div>
 
               <div className="d-flex align-items-center mt-3">
@@ -257,18 +258,18 @@ export default function AudioCard({
   );
 
   return (
-    // <>
-    //   {inClick ? (
+    <>
+      {inSelectModal ? (
         <>{card}</>
-    //   ) : (
-    //     <Link
-    //       {...{
-    //         to: linkUrl
-    //       }}
-    //     >
-    //       {card}
-    //     </Link>
-    //   )}
-    // </>
+      ) : (
+        <Link
+          {...{
+            to: linkUrl,
+          }}
+        >
+          {card}
+        </Link>
+      )}
+    </>
   );
 }
