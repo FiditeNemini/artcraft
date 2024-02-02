@@ -11,6 +11,7 @@ import { faChevronDown } from "@fortawesome/pro-solid-svg-icons";
 import { animated, useSpring } from "@react-spring/web";
 
 interface AccordionProps {
+  className?: string;
   children: React.ReactNode;
 }
 
@@ -96,7 +97,7 @@ function AccordionItem({
   );
 }
 
-function Accordion({ children }: AccordionProps) {
+function Accordion({ children, className }: AccordionProps) {
   // Extract titles of items that should be initially open
   const defaultOpenTitles = React.Children.toArray(children)
     .filter((child: any) => child.props.defaultOpen)
@@ -115,7 +116,9 @@ function Accordion({ children }: AccordionProps) {
 
   return (
     <AccordionContext.Provider value={{ openItems, toggleItem }}>
-      <div className="d-flex flex-column gap-3">{children}</div>
+      <div className={`d-flex flex-column gap-3 ${className}`}>
+        {children}
+      </div>
     </AccordionContext.Provider>
   );
 }

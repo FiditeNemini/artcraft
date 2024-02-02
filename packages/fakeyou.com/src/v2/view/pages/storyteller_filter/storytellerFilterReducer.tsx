@@ -28,7 +28,7 @@ export type Action =
 
 
 export function reducer (state: State, action: Action): State {
-  console.log(action);
+
   switch(action.type){
     case 'stagedFile':
       return {...state, status: states.FILE_STAGED}

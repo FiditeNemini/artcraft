@@ -12,8 +12,8 @@ import Button from "components/common/Button";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import useToken from "hooks/useToken";
 import getCardUrl from "../getCardUrl";
+// import getCardUrl from "../getCardUrl";
 
 interface AudioCardProps {
   bookmarks?: any;
@@ -24,8 +24,8 @@ interface AudioCardProps {
   source?: string;
   type: "media" | "weights";
   inSelectModal?: boolean;
-  onClick?: (e:any) => any; 
-  onResultSelect?: () => void;
+  onResultSelect?: (data: { token: string; title: string }) => void;
+  // onClick?: (e:any) => any;
 }
 
 export default function AudioCard({
@@ -37,11 +37,10 @@ export default function AudioCard({
   source = "",
   type,
   inSelectModal = false,
-  onClick: inClick,
+  // onClick: inClick,
   onResultSelect,
 }: AudioCardProps) {
-  const { setToken, setWeightTitle } = useToken();
-  const linkUrl = getCardUrl(data,source,type);
+  const linkUrl = getCardUrl(data, source, type);
   const history = useHistory();
 
   const handleInnerClick = (event: any) => {
@@ -49,10 +48,11 @@ export default function AudioCard({
   };
 
   const handleSelectModalResultSelect = () => {
-    if (inSelectModal) {
-      setToken(data.weight_token);
-      setWeightTitle && setWeightTitle(data.title);
-      onResultSelect && onResultSelect();
+    if (inSelectModal && onResultSelect) {
+      onResultSelect({
+        token: data.weight_token,
+        title: data.title,
+      });
     }
   };
 
@@ -84,10 +84,6 @@ export default function AudioCard({
       );
     }
   }
-
-  // const onClick = () => {
-  //   if (inClick) inClick(data);
-  // };
 
   const card = (
     <Card
@@ -169,14 +165,16 @@ export default function AudioCard({
                 <div className="d-flex flex-grow-1">
                   <Badge label={weightBadgeLabel} color={weightBadgeColor} />
                 </div>
-                {inClick ? (
+                {inSelectModal ? (
                   <Button
                     icon={faArrowRight}
                     iconFlip={true}
                     variant="link"
                     label="Select"
                     className="fs-7"
-                    onClick={handleSelectModalResultSelect}
+                    onClick={() => {
+                      history.push(linkUrl);
+                    }}
                   />
                 ) : (
                   <Button
@@ -185,9 +183,7 @@ export default function AudioCard({
                     variant="link"
                     label="Use"
                     className="fs-7"
-                    onClick={() => {
-                      history.push(linkUrl);
-                    }}
+                    onClick={handleSelectModalResultSelect}
                   />
                 )}
               </div>
@@ -263,12 +259,12 @@ export default function AudioCard({
 
   return (
     <>
-      {inClick ? (
+      {inSelectModal ? (
         <>{card}</>
       ) : (
         <Link
           {...{
-            to: linkUrl
+            to: linkUrl,
           }}
         >
           {card}

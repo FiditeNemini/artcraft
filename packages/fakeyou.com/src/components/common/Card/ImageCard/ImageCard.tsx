@@ -10,7 +10,7 @@ import Button from "components/common/Button";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import useToken from "hooks/useToken";
+// import useToken from "hooks/useToken";
 import getCardUrl from "../getCardUrl";
 
 interface ImageCardProps {
@@ -21,7 +21,7 @@ interface ImageCardProps {
   source?: string;
   type: "media" | "weights";
   inSelectModal?: boolean;
-  onResultSelect?: () => void;
+  onResultSelect?: (data:{token: string, title:string}) => void;
 }
 
 export default function ImageCard({
@@ -35,18 +35,22 @@ export default function ImageCard({
   onResultSelect,
 }: ImageCardProps) {
   const history = useHistory();
-  const { setToken, setWeightTitle } = useToken();
+  // const { setToken, setWeightTitle } = useToken();
   const linkUrl = getCardUrl(data,source,type);
 
   const handleInnerClick = (event: any) => {
+    console.log("handleInnderClick")
     event.stopPropagation();
   };
 
   const handleSelectModalResultSelect = () => {
+    console.log("handleSelectModalResultSelect")
     if (inSelectModal) {
-      setToken(data.weight_token);
-      setWeightTitle && setWeightTitle(data.title);
-      onResultSelect && onResultSelect();
+      
+      onResultSelect && onResultSelect({
+        token: data.weight_token,
+        title: data.title
+      });
     }
   };
 

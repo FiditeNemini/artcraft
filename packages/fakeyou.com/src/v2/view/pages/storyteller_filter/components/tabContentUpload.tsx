@@ -1,4 +1,5 @@
 import React from "react";
+import { Redirect } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 
 import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadMedia";
@@ -15,7 +16,7 @@ export default function TabContentUpload({
   dispatchPageState: (action: Action) => void;
 }) {
   const videoProps = useFile({});
-  const {NO_FILE, FILE_STAGED, FILE_UPLOADING} = states;
+  const {NO_FILE, FILE_STAGED, FILE_UPLOADING, FILE_UPLOADED} = states;
 
   const makeVideoUploadRequest = () => ({
     uuid_idempotency_token: uuidv4(),
@@ -85,6 +86,10 @@ export default function TabContentUpload({
         </div>
       </div>
     );
+  }else if (pageState.status === FILE_UPLOADED){
+    return(
+      <Redirect to={`load/${pageState.mediaFileToken}`}/>
+    )
   }
   return <ErrorMessage />;
 }

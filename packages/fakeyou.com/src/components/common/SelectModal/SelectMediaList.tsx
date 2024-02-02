@@ -10,7 +10,7 @@ import { ListMediaFiles } from "@storyteller/components/src/api/media_files/List
 interface SelectMediaListProps {
   mediaType: string;
   listKey: string;
-  onResultSelect?: () => void;
+  onResultSelect?: (data:{token:string, title:string}) => void;
 }
 
 export default function SelectMediaList({
