@@ -25,7 +25,7 @@ const mediaFileTypeInfo: MediaFileTypeInfo = {
     label: "glTF",
     color: "lime",
   },
-  [MediaFileType.GLTF]: {
+  [MediaFileType.GLB]: {
     label: "GLB",
     color: "lime",
   },
