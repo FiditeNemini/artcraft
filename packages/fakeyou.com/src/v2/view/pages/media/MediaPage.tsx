@@ -106,6 +106,16 @@ export default function MediaPage() {
             }}
           />
         );
+      case MediaFileType.GLB:
+        const glbUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
+        return (
+          <Iframe
+            {...{
+              url: `https://engine.fakeyou.com?mode=viewer&gltf=${glbUrl}`,
+              className: "fy-studio-frame",
+            }}
+          />
+        );
       case MediaFileType.GLTF:
         const gltfUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         return (
@@ -258,49 +268,7 @@ export default function MediaPage() {
     },*/
   ];
 
-  const videoDetails = [
-    { property: "Type", value: mediaFile?.media_type || "" },
-    {
-      property: "Visibility",
-      value: mediaFile?.creator_set_visibility.toString() || "",
-    },
-    { property: "Created at", value: dateCreated || "" },
-  ];
-
-  const imageDetails = [
-    { property: "Type", value: mediaFile?.media_type || "" },
-    {
-      property: "Visibility",
-      value: mediaFile?.creator_set_visibility.toString() || "",
-    },
-    { property: "Created at", value: dateCreated || "" },
-  ];
-
-  const bvhDetails = [
-    {
-      property: "Type",
-      value: mediaType || "",
-    },
-    {
-      property: "Visibility",
-      value: mediaFile?.creator_set_visibility.toString() || "",
-    },
-    { property: "Created at", value: dateCreated || "" },
-  ];
-
-  const gltfDetails = [
-    {
-      property: "Type",
-      value: mediaType || "",
-    },
-    {
-      property: "Visibility",
-      value: mediaFile?.creator_set_visibility.toString() || "",
-    },
-    { property: "Created at", value: dateCreated || "" },
-  ];
-
-  const fbxDetails = [
+  const defaultDetails = [
     {
       property: "Type",
       value: mediaType || "",
@@ -318,22 +286,9 @@ export default function MediaPage() {
     case MediaFileType.Audio:
       mediaDetails = audioDetails;
       break;
-    case MediaFileType.Video:
-      mediaDetails = videoDetails;
-      break;
-    case MediaFileType.Image:
-      mediaDetails = imageDetails;
-      break;
-    case MediaFileType.BVH:
-      mediaDetails = bvhDetails;
-      break;
-    case MediaFileType.GLTF:
-      mediaDetails = gltfDetails;
-      break;
-    case MediaFileType.FBX:
-      mediaDetails = fbxDetails;
-      break;
     default:
+      mediaDetails = defaultDetails;
+      break
   }
 
   let modMediaDetails = undefined;

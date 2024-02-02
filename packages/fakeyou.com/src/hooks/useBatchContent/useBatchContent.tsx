@@ -24,6 +24,18 @@ interface Gather {
   res: any
 }
 
+type BatchToggle = (entity_token: string, entity_type: string) => boolean;
+
+export interface MakePropsParams { entityToken: string, entityType: string }
+
+export interface BatchInputProps {
+  busy: boolean,
+  entityToken: string,
+  entityType: string,
+  isToggled: boolean,
+  toggle: BatchToggle
+}
+
 export default function useBatchContent({
   checker,
   debug,
@@ -80,7 +92,7 @@ export default function useBatchContent({
     return newState;
   });
 
-  const toggle = (entity_token: string, entity_type: string) => {
+  const toggle: BatchToggle = (entity_token, entity_type) => {
     if (session.check()) {
       let inLibrary = library[entity_token];
       statusSet(FetchStatus.in_progress);
@@ -114,7 +126,7 @@ export default function useBatchContent({
 
   const toggled = ( entity_token = "" ) => toggleCheck(library[entity_token]);
 
-  const makeProps = ({ entityToken, entityType }: { entityToken: string, entityType: string }) => ({
+  const makeProps = ({ entityToken, entityType }: MakePropsParams) => ({
     busy: busyList[entityToken],
     entityToken,
     entityType,
