@@ -30,7 +30,6 @@ import SocialButton from "components/common/SocialButton";
 import { Input } from "components/common";
 import LikeButton from "components/common/LikeButton";
 import Badge from "components/common/Badge";
-import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
 import { useMedia, useRatings, useSession } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
@@ -151,10 +150,7 @@ export default function MediaPage() {
     }
   }
 
-  const mediaTypeInfo = useMediaFileTypeInfo(
-    mediaFile?.media_type || MediaFileType.None
-  );
-  const { label: mediaType, color: mediaTagColor } = mediaTypeInfo;
+  const mediaType = mediaFile?.media_type || ""; // THIS SHOULD BECOME A TRANSLATION STRING, THIS IS NOT DATA -V
 
   let audioLink = new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path);
 
@@ -362,7 +358,7 @@ export default function MediaPage() {
               <div className="d-flex gap-3 flex-wrap align-items-center">
                 <div className="d-flex gap-2 align-items-center flex-wrap">
                   <div>
-                    <Badge label={mediaType} color={mediaTagColor} />
+                    <Badge {...{ className: `fy-entity-type-${ mediaFile?.media_type || "" }`, label: mediaType, }}/>
                   </div>
                   {subtitleDivider}
 

@@ -3,7 +3,7 @@ import "./Badge.scss";
 
 interface BadgeProps {
   label: string;
-  color: string;
+  color?: string;
   overlay?: boolean;
   className?: string;
   small?: boolean;
@@ -11,7 +11,7 @@ interface BadgeProps {
 
 export default function Badge({
   label,
-  color,
+  color = "gray", // should default to a visible state
   overlay = false,
   className = "",
   small = false,

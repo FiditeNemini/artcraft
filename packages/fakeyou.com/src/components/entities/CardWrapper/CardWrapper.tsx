@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import getCardUrl from "components/common/Card/getCardUrl";
+import "./CardWrapper.scss";
 
 interface Props {
   canHover?: boolean,

@@ -100,7 +100,7 @@ export default function AudioCard({
           <div className="mb-3">
             <div className="d-flex align-items-center">
               <div className="d-flex flex-grow-1 align-items-center gap-2">
-                <Badge label="Audio" color="teal" />
+                <Badge {...{ className: "fy-entity-type-audio", label: "Audio" }} />
               </div>
             </div>
 

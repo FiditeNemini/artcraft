@@ -8,7 +8,6 @@ import CreatorName from "../CreatorName";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
 import getCardUrl from "../getCardUrl";
-import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
 
 interface BVHCardProps {
   bookmarks: any;
@@ -37,11 +36,6 @@ export default function BVHCard({
 
   const timeAgo = useTimeAgo(data.created_at);
 
-  const { label: mediaBadgeLabel, color: mediaBadgeColor } =
-    useMediaFileTypeInfo(
-      data.media_type || data.details?.maybe_media_data?.media_type
-    );
-
   const Wrapper = ({ children }: { children: any }) => inClick ? <div {...{ onClick: () => { inClick(data) } }}>{ children }</div> : <Link {...{ to: linkUrl  }}>{ children }</Link>;
 
   // const bucketConfig = new BucketConfig();
@@ -58,11 +52,7 @@ export default function BVHCard({
 
           <div className="d-flex align-items-center">
             <div className="d-flex flex-grow-1">
-              <Badge
-                label={mediaBadgeLabel}
-                color={mediaBadgeColor}
-                overlay={true}
-              />
+              <Badge  {...{ className: "fy-entity-type-bvh", label: "BVH", overlay: true }}/>
             </div>
           </div>
 
