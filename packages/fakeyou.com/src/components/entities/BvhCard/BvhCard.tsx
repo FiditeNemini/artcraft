@@ -1,6 +1,6 @@
 import React from "react";
 import useTimeAgo from "hooks/useTimeAgo";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+// import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { MakeRatingsProps } from "hooks/useRatings";
 import { faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";

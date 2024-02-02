@@ -1,3 +1,4 @@
+import Accordion from "./Accordion";
 import AudioBlobPreview from "./AudioBlobPreview";
 import AudioInput from "./AudioInput";
 import BasicVideo from "./BasicVideo";
@@ -16,10 +17,12 @@ import Label from "./Label";
 import MocapInput from "./MocapInput";
 import Modal from "./Modal";
 import NumberSlider from "./NumberSlider";
+import NumberSliderV2 from "./NumberSliderV2";
 import Panel from "./Panel";
 import Radio from "./Radio";
 import SegmentButtons from "./SegmentButtons";
 import Select from "./Select";
+import SelectModal from "./SelectModal";
 import Skeleton from "./Skeleton";
 import Slider from "./Slider";
 import Spinner from "./Spinner";
@@ -29,10 +32,13 @@ import TempAudioPlayer from "./TempAudioPlayer";
 import TempInput from "./TempInput";
 import TempSelect from "./TempSelect";
 import TempTextArea from "./TempTextArea";
+import TextArea from "./TextArea";
+import TextAreaV2 from "./TextAreaV2";
 import TintSpinner from "./TintSpinner";
 import VideoInput from "./VideoInput";
 
 export {
+  Accordion,
   AudioBlobPreview,
   AudioInput,
   BasicVideo,
@@ -51,10 +57,12 @@ export {
   MocapInput,
   Modal,
   NumberSlider,
+  NumberSliderV2,
   Panel,
   Radio,
   SegmentButtons,
   Select,
+  SelectModal,
   Skeleton,
   Slider,
   Spinner,
@@ -64,6 +72,8 @@ export {
   TempInput,
   TempSelect,
   TempTextArea,
+  TextArea,
+  TextAreaV2,
   TintSpinner,
   VideoInput
 };

@@ -20,8 +20,8 @@ export default function TabContentLibrary({
         payload: { mediaFileToken: token },
       });
   };
-  const handleOnSelect = (token: string) => {
-    setToken(token);
+  const handleOnSelect = (data:{token:string,title:string}) => {
+    setToken(data.token);
   };
 
   return (

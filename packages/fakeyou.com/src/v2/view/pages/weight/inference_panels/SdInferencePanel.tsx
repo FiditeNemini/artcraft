@@ -1,16 +1,17 @@
 import React, { useRef, useState, memo } from "react";
 import {
+  Accordion,
   Button,
   Input,
   Label,
   NumberSlider,
   Panel,
   SegmentButtons,
+  SelectModal,
   TempSelect,
   TempTextArea,
 } from "components/common";
 import { onChanger } from "resources";
-import Accordion from "components/common/Accordion";
 import {
   faRectangleLandscape,
   faRectanglePortrait,
@@ -23,7 +24,6 @@ import {
   EnqueueImageGenIsError,
 } from "@storyteller/components/src/api/image_generation/EnqueueImageGen";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import SelectModal from "components/common/SelectModal/SelectModal";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import PremiumLock from "components/PremiumLock";
 
@@ -46,12 +46,11 @@ function SdInferencePanel({
   const [loraToken, setLoraToken] = useState<string | null>(null);
   const [weightToken, setWeightToken] = useState(sd_model_token);
 
-  const handleOnWeightSelect = (token: string) => {
-    setWeightToken(token);
+  const handleOnWeightSelect = (data:{token:string,title:string}) => {
+    setWeightToken(data.token);
   };
-
-  const handleOnSelect = (token: string) => {
-    setLoraToken(token);
+  const handleOnSelect = (data:{token:string,title:string}) => {
+    setLoraToken(data.token);
   };
 
   const [isEnqueuing, setIsEnqueuing] = useState(false);

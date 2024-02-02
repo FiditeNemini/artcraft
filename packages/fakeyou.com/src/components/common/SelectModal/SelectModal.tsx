@@ -4,7 +4,6 @@ import Modal from "../Modal";
 import NonRouteTabs from "../Tabs/NonRouteTabs";
 import Input from "../Input";
 import Button from "../Button";
-import useToken from "hooks/useToken";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import SelectMediaList from "./SelectMediaList";
 import SelectWeightsList from "./SelectWeightsList";
@@ -21,7 +20,10 @@ interface SelectModalProps {
   label?: string;
   tabs: TabConfig[];
   modalTitle?: string;
-  onSelect?: (token: string) => void;
+  onSelect?: (data:{
+    token: string,
+    title: string,
+  }) => void;
   required?: boolean;
 }
 
@@ -34,8 +36,8 @@ const SelectModal = memo(
     required,
   }: SelectModalProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const { token, setToken, weightTitle, setWeightTitle } = useToken();
-    const [selectedValue, setSelectedValue] = useState("");
+    const initialValue = {token:"", title:""};
+    const [selectedValue, setSelectedValue] = useState(initialValue);
     const [activeTab, setActiveTab] = useState(tabs[0].tabKey);
     const [mediaType, setMediaType] = useState(
       tabs[0].mediaTypeFilter || "all"
@@ -51,19 +53,6 @@ const SelectModal = memo(
       setWeightType(currentTab?.weightTypeFilter || "all");
     }, [activeTab, tabs]);
 
-    useEffect(() => {
-      if (token && token !== selectedValue && onSelect) {
-        setSelectedValue(token);
-        onSelect(token);
-      } else if (weightTitle && weightTitle !== selectedValue && onSelect) {
-        setSelectedValue(weightTitle);
-        onSelect(weightTitle);
-      }
-
-      console.log("token", token, "weightTitle", weightTitle);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [token, weightTitle]);
-
     const openModal = () => {
       setIsModalOpen(true);
     };
@@ -73,16 +62,21 @@ const SelectModal = memo(
     };
 
     const handleRemove = () => {
-      setWeightTitle && setWeightTitle("");
-      setToken("");
+      setSelectedValue(initialValue);
     };
+
+    const handleOnSelect = (data:{token:string, title:string}) => {
+      setSelectedValue({token: data.token, title: data.title || ""});
+      if (onSelect) onSelect(data);
+      closeModal();
+    }
 
     const searchTabs = tabs.map(tab => ({
       label: tab.label,
       content: tab.searcher ? (
         <Searcher
           type="modal"
-          onResultSelect={closeModal}
+          onResultSelect={handleOnSelect}
           searcherKey={tab.tabKey}
           weightType={tab.weightTypeFilter}
         />
@@ -92,14 +86,14 @@ const SelectModal = memo(
             <SelectMediaList
               mediaType={mediaType}
               listKey={tab.tabKey}
-              onResultSelect={closeModal}
+              onResultSelect={handleOnSelect}
             />
           )}
           {tab.type === "weights" && (
             <SelectWeightsList
               weightType={weightType}
               listKey={tab.tabKey}
-              onResultSelect={closeModal}
+              onResultSelect={handleOnSelect}
             />
           )}
         </>
@@ -122,10 +116,12 @@ const SelectModal = memo(
               disabled={true}
               className="w-100"
               placeholder="None selected"
-              value={weightTitle ? weightTitle : token || ""}
+              value={selectedValue.title !=="" 
+                ? selectedValue.title 
+                : selectedValue.token || ""}
             />
-            <Button label={token ? "Change" : "Select"} onClick={openModal} />
-            {token && (
+            <Button label={selectedValue.token !== "" ? "Change" : "Select"} onClick={openModal} />
+            {selectedValue.token && (
               <Button
                 square={true}
                 variant="danger"

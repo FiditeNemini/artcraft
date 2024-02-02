@@ -15,6 +15,7 @@ import {
   faCameraMovie,
   faPersonRays,
   faMessageImage,
+  faPhotoFilm,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
@@ -368,6 +369,20 @@ export default function SideNav({
                   className="sidebar-heading-icon"
                 />
                 {t("videoMotionCapture")}
+              </NavLink>
+            </li>
+
+            <li>
+              <NavLink
+                to="/storyteller-filter"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faPhotoFilm}
+                  className="sidebar-heading-icon"
+                />
+                {t("storytellerFilter")}
               </NavLink>
             </li>
 
