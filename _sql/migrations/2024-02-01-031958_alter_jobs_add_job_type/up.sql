@@ -7,4 +7,4 @@ ALTER TABLE generic_inference_jobs
     AFTER uuid_idempotency_token;
 
 ALTER TABLE generic_inference_jobs
-    ADD UNIQUE INDEX index_job_type (job_type);
+    ADD INDEX index_job_type (job_type);
