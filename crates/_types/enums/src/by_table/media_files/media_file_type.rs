@@ -34,6 +34,9 @@ pub enum MediaFileType {
   /// FBX files (for Bevy)
   Fbx,
 
+  /// glTF binary files (for Bevy)
+  Glb,
+
   /// glTF files (for Bevy)
   Gltf,
 }
@@ -53,6 +56,7 @@ impl MediaFileType {
       Self::Mocap => "mocap",
       Self::Bvh => "bvh",
       Self::Fbx => "fbx",
+      Self::Glb => "glb",
       Self::Gltf => "gltf",
     }
   }
@@ -65,6 +69,7 @@ impl MediaFileType {
       "mocap" => Ok(Self::Mocap),
       "bvh" => Ok(Self::Bvh),
       "fbx" => Ok(Self::Fbx),
+      "glb" => Ok(Self::Glb),
       "gltf" => Ok(Self::Gltf),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -80,6 +85,7 @@ impl MediaFileType {
       Self::Mocap,
       Self::Bvh,
       Self::Fbx,
+      Self::Glb,
       Self::Gltf,
     ])
   }
@@ -101,6 +107,7 @@ mod tests {
       assert_serialization(MediaFileType::Mocap, "mocap");
       assert_serialization(MediaFileType::Bvh, "bvh");
       assert_serialization(MediaFileType::Fbx, "fbx");
+      assert_serialization(MediaFileType::Glb, "glb");
       assert_serialization(MediaFileType::Gltf, "gltf");
     }
   }
@@ -115,6 +122,7 @@ mod tests {
       assert_eq!(MediaFileType::Video.to_str(), "video");
       assert_eq!(MediaFileType::Bvh.to_str(), "bvh");
       assert_eq!(MediaFileType::Fbx.to_str(), "fbx");
+      assert_eq!(MediaFileType::Glb.to_str(), "glb");
       assert_eq!(MediaFileType::Gltf.to_str(), "gltf");
     }
 
@@ -126,6 +134,7 @@ mod tests {
       assert_eq!(MediaFileType::from_str("mocap").unwrap(), MediaFileType::Mocap);
       assert_eq!(MediaFileType::from_str("bvh").unwrap(), MediaFileType::Bvh);
       assert_eq!(MediaFileType::from_str("fbx").unwrap(), MediaFileType::Fbx);
+      assert_eq!(MediaFileType::from_str("glb").unwrap(), MediaFileType::Glb);
       assert_eq!(MediaFileType::from_str("gltf").unwrap(), MediaFileType::Gltf);
       assert!(MediaFileType::from_str("foo").is_err());
     }
@@ -137,13 +146,14 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileType::all_variants();
-      assert_eq!(variants.len(), 7);
+      assert_eq!(variants.len(), 8);
       assert_eq!(variants.pop_first(), Some(MediaFileType::Audio));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Image));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Video));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Mocap));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Bvh));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Fbx));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Glb));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Gltf));
       assert_eq!(variants.pop_first(), None);
     }

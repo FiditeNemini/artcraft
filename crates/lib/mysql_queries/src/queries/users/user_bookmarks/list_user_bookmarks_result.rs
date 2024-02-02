@@ -152,6 +152,7 @@ impl RawUserBookmarkRecord {
               MediaFileType::Mocap => Some("mocap file".to_string()),
               MediaFileType::Bvh => Some("3d file".to_string()),
               MediaFileType::Fbx => Some("3d file".to_string()),
+              MediaFileType::Glb => Some("3d file".to_string()),
               MediaFileType::Gltf => Some("3d file".to_string()),
             }),
         UserBookmarkEntityType::VoiceConversionModel => self.maybe_descriptive_text_voice_conversion_model_title,
