@@ -23,6 +23,7 @@ use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::*;
+use crate::http_server::endpoints::media_files::delete_media_file::*;
 use crate::http_server::endpoints::media_files::get_media_file::*;
 use crate::http_server::endpoints::media_files::list_featured_media_files::*;
 use crate::http_server::endpoints::media_files::list_media_files::*;
@@ -51,6 +52,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
 #[openapi(
   paths(
     crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::enqueue_fbx_to_gltf_handler,
+    crate::http_server::endpoints::media_files::delete_media_file::delete_media_file_handler,
     crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler,
     crate::http_server::endpoints::media_files::list_featured_media_files::list_featured_media_files_handler,
     crate::http_server::endpoints::media_files::list_media_files::list_media_files_handler,
@@ -107,6 +109,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     EnqueueTTSRequest,EnqueueTTSRequestSuccessResponse,EnqueueTTSRequestError,
     EnqueueFbxToGltfRequest,EnqueueFbxToGltfRequestSuccessResponse,EnqueueFbxToGltfRequestError,
     // Media Files
+    DeleteMediaFileRequest,DeleteMediaFilePathInfo,DeleteMediaFileError,
     GetMediaFilePathInfo,GetMediaFileError,GetMediaFileSuccessResponse,GetMediaFileModelInfo,MediaFileInfo,
     // Model Weights
     GetWeightPathInfo,GetWeightResponse,GetWeightError,

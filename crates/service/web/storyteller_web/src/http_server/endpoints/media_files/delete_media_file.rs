@@ -6,6 +6,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use log::warn;
+use utoipa::ToSchema;
 
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::media_files::delete_media_file::{delete_media_file_as_mod, delete_media_file_as_user, undelete_media_file_as_mod, undelete_media_file_as_user};
@@ -16,7 +17,7 @@ use crate::http_server::web_utils::response_success_helpers::simple_json_success
 use crate::server_state::ServerState;
 use crate::util::delete_role_disambiguation::{delete_role_disambiguation, DeleteRole};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct DeleteMediaFileRequest {
     set_delete: bool,
     /// NB: this is only to disambiguate when a user is both a mod and an author.
@@ -24,14 +25,14 @@ pub struct DeleteMediaFileRequest {
 }
 
 /// For the URL PathInfo
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct DeleteMediaFilePathInfo {
     token: MediaFileToken,
 }
 
 // =============== Error Response ===============
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub enum DeleteMediaFileError {
     BadInput(String),
     NotFound,
@@ -63,6 +64,20 @@ impl fmt::Display for DeleteMediaFileError {
 
 // =============== Handler ===============
 
+#[utoipa::path(
+    delete,
+    path = "/v1/media_files/file/{token}",
+    responses(
+        (status = 200, description = "Success Delete", body = SimpleGenericJsonSuccess),
+        (status = 400, description = "Bad input", body = DeleteMediaFileError),
+        (status = 401, description = "Not authorized", body = DeleteMediaFileError),
+        (status = 500, description = "Server error", body = DeleteMediaFileError),
+    ),
+    params(
+        ("request" = DeleteMediaFileRequest, description = "Payload for Request"),
+        ("path" = DeleteMediaFilePathInfo, description = "Path for Request")
+    )
+)]
 pub async fn delete_media_file_handler(
     http_request: HttpRequest,
     path: Path<DeleteMediaFilePathInfo>,
