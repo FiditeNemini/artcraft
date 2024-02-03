@@ -272,10 +272,11 @@ impl StableDiffusionInferenceCommand {
 
     info!("stderr will be written to file: {}", path_to_string(args.stderr_output_file.clone()));
 
+    //let stdout_file = File::create(args.stdout_output_file)?;
+    //config.stdout = Redirection::File(stdout_file);
+
     let stderr_file = File::create(args.stderr_output_file)?;
-    let stdout_file = File::create(args.stdout_output_file)?;
     config.stderr = Redirection::File(stderr_file);
-    config.stdout = Redirection::File(stdout_file);
 
     if !env_vars.is_empty() {
       config.env = Some(env_vars);
