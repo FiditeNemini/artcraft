@@ -38,6 +38,9 @@ pub struct ComfyInferenceCommand {
     /// A single executable script or a much larger bash command.
     executable_or_command: ExecutableOrCommand,
 
+    // Where to mount the filesystem
+    pub(crate) mounts_directory: PathBuf,
+
     /// Config file to use
     config_path: Option<PathBuf>,
 
@@ -105,10 +108,14 @@ impl ComfyInferenceCommand {
                 }
             });
 
+        let mounts_directory = easyenv::get_env_pathbuf_required(
+            "COMFY_MOUNTS_DIRECTORY")?;
+
         Ok(Self {
             comfy_root_code_directory,
             executable_or_command,
             config_path,
+            mounts_directory,
             maybe_virtual_env_activation_command,
             maybe_docker_options,
             maybe_execution_timeout,
