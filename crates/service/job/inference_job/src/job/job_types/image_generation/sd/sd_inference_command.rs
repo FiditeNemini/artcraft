@@ -64,14 +64,14 @@ pub enum ExecutableOrCommand {
   Command(String),
 }
 
-pub struct InferenceArgs {
+pub struct InferenceArgs<'a> {
   /// --source_image: path to the input image (or video)
   /// --result_dir: path to directory work is performed
   pub work_dir: PathBuf,
   /// --result_file: path to final file output
   pub output_file: PathBuf,
-  pub stdout_output_file: PathBuf,
-  pub stderr_output_file: PathBuf,
+  pub stdout_output_file: &'a PathBuf,
+  pub stderr_output_file: &'a PathBuf,
   pub prompt: String,
   pub negative_prompt:String,
   pub number_of_samples:u32,
@@ -272,8 +272,8 @@ impl StableDiffusionInferenceCommand {
 
     info!("stderr will be written to file: {}", path_to_string(args.stderr_output_file.clone()));
 
-    let stderr_file = File::create(&args.stderr_output_file)?;
-    let stdout_file = File::create(&args.stdout_output_file)?;
+    let stderr_file = File::create(args.stderr_output_file)?;
+    let stdout_file = File::create(args.stdout_output_file)?;
     config.stderr = Redirection::File(stderr_file);
     config.stdout = Redirection::File(stdout_file);
 

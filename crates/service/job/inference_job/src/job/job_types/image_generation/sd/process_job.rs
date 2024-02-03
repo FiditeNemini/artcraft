@@ -1,9 +1,10 @@
+use std::fs::read_to_string;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 
 use actix_web::dev::ResourcePath;
 use anyhow::anyhow;
-use log::{error, info};
+use log::{error, info, warn};
 use serde_json;
 
 use cloud_storage::remote_file_manager::media_descriptor::MediaImagePngDescriptor;
@@ -21,6 +22,8 @@ use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use filesys::file_exists::file_exists;
 use filesys::path_to_string::path_to_string;
+use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
+use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
@@ -253,11 +256,11 @@ pub async fn process_job_sd(
     let stdout_output_file = work_temp_dir.path().join("sd_out.txt");
 
     // run inference on loRA downloaded
-    sd_deps.inference_command.execute_inference(InferenceArgs {
+    let exit_status = sd_deps.inference_command.execute_inference(InferenceArgs {
         work_dir: work_temp_dir.path().to_path_buf(),
         output_file: output_path.clone(),
-        stderr_output_file,
-        stdout_output_file,
+        stderr_output_file: &stderr_output_file,
+        stdout_output_file: &stdout_output_file,
         prompt:String::from("This is a green sign that says go this is a test prompt to test the model."),
         negative_prompt: sd_args.maybe_n_prompt.clone().unwrap_or_default(),
         number_of_samples:20,
@@ -272,14 +275,38 @@ pub async fn process_job_sd(
         batch_count: sd_args.maybe_batch_count.unwrap_or(1),
     });
 
+    if !exit_status.is_success() {
+        error!("SD inference failed: {:?}", exit_status);
+
+        let error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", exit_status));
+
+        if let Ok(contents) = read_to_string(&stderr_output_file) {
+            warn!("Captured stderr output: {}", contents);
+
+            //match categorize_error(&contents)  {
+            //  Some(ProcessSingleJobError::FaceDetectionFailure) => {
+            //    warn!("Face not detected in source image");
+            //    error = ProcessSingleJobError::FaceDetectionFailure;
+            //  }
+            //  _ => {}
+            //}
+        }
+        return Err(error);
+    }
+
+
     // check if file exists if it does not error out....
     let path = output_path.clone();
     let file_path = format!("{}_{}.png", path_to_string(path), 0);
 
-    if file_exists(file_path.path()) == false {
-        return Err(
-            ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Upload Not a SD Model"))
-        );
+    if !file_exists(file_path.path()) {
+        error!("Output file did not exist: {:?}", file_path);
+
+        if let Ok(contents) = read_to_string(&stderr_output_file) {
+            error!("Captured stderr output: {}", contents);
+        }
+
+        return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Upload Not a SD Model")));
     }
 
     // If it worked and didn't fail! then we should save and create the weight.
@@ -485,11 +512,11 @@ pub async fn process_job_lora(
     let stdout_output_file = work_temp_dir.path().join("sd_out.txt");
 
     // run inference on loRA downloaded
-    sd_deps.inference_command.execute_inference(InferenceArgs {
+    let exit_status = sd_deps.inference_command.execute_inference(InferenceArgs {
         work_dir: work_temp_dir.path().to_path_buf(),
         output_file: output_path.clone(),
-        stderr_output_file,
-        stdout_output_file,
+        stderr_output_file: &stderr_output_file,
+        stdout_output_file: &stdout_output_file,
         prompt:String::from("This is a green sign that says go this is a test prompt to test the model."),
         negative_prompt: sd_args.maybe_n_prompt.clone().unwrap_or_default(),
         number_of_samples:20,
@@ -503,6 +530,25 @@ pub async fn process_job_lora(
         vae: vae_path.clone(),
         batch_count: sd_args.maybe_batch_count.unwrap_or(1),
     });
+
+    if !exit_status.is_success() {
+        error!("SD inference failed: {:?}", exit_status);
+
+        let error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", exit_status));
+
+        if let Ok(contents) = read_to_string(&stderr_output_file) {
+            warn!("Captured stderr output: {}", contents);
+
+            //match categorize_error(&contents)  {
+            //  Some(ProcessSingleJobError::FaceDetectionFailure) => {
+            //    warn!("Face not detected in source image");
+            //    error = ProcessSingleJobError::FaceDetectionFailure;
+            //  }
+            //  _ => {}
+            //}
+        }
+        return Err(error);
+    }
 
     // check if file exists if it does not error out....
     let path = output_path.clone();
@@ -769,11 +815,11 @@ pub async fn process_job_inference(
 
     let inference_start_time = Instant::now();
 
-    sd_deps.inference_command.execute_inference(InferenceArgs {
+    let exit_status = sd_deps.inference_command.execute_inference(InferenceArgs {
         work_dir: work_temp_dir.path().to_path_buf(),
         output_file: output_path.clone(),
-        stderr_output_file,
-        stdout_output_file,
+        stderr_output_file: &stderr_output_file,
+        stdout_output_file: &stdout_output_file,
         prompt: prompt.clone(),
         negative_prompt: sd_args.maybe_n_prompt.clone().unwrap_or_default(),
         number_of_samples,
@@ -788,8 +834,27 @@ pub async fn process_job_inference(
         batch_count: sd_args.maybe_batch_count.unwrap_or(1),
     });
 
+    if !exit_status.is_success() {
+        error!("SD inference failed: {:?}", exit_status);
 
-      // hack to check the directory before clean up.
+        let error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", exit_status));
+
+        if let Ok(contents) = read_to_string(&stderr_output_file) {
+            warn!("Captured stderr output: {}", contents);
+
+            //match categorize_error(&contents)  {
+            //  Some(ProcessSingleJobError::FaceDetectionFailure) => {
+            //    warn!("Face not detected in source image");
+            //    error = ProcessSingleJobError::FaceDetectionFailure;
+            //  }
+            //  _ => {}
+            //}
+        }
+        return Err(error);
+    }
+
+
+    // hack to check the directory before clean up.
     //   let thirtyMinutes = 1800;
     //   thread::sleep(Duration::from_secs(thirtyMinutes));
       // upload media and create a record.
