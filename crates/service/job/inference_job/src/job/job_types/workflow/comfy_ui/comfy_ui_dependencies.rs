@@ -36,12 +36,12 @@ impl RequiredModels {
                     url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/v3_sd15_adapter.ckpt".to_string(),
                 },
                 ComfyDependency {
-                    location: PathBuf::from("custom_nodes/ComfyUI-AnimateDiff-Evolved/models/v3_sd15_mm.ckpt"),
-                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/v3_sd15_mm.ckpt".to_string(),
+                    location: PathBuf::from("models/embeddings/badhandv4.pt"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/badhandv4.pt".to_string(),
                 },
                 ComfyDependency {
-                    location: PathBuf::from("custom_nodes/ComfyUI-AnimateDiff-Evolved/models/v3_sd15_mm.ckpt"),
-                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/v3_sd15_mm.ckpt".to_string(),
+                    location: PathBuf::from("models/embeddings/easynegative.safetensors"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/easynegative.safetensors".to_string(),
                 },
                 ComfyDependency {
                     location: PathBuf::from("models/controlnet/v3_sd15_sparsectrl_scribble.ckpt"),
@@ -90,6 +90,46 @@ impl RequiredModels {
                 ComfyDependency {
                     location: PathBuf::from("models/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors"),
                     url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/model.safetensors".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("custom_nodes/ComfyUI-AnimateDiff-Evolved/models/v3_sd15_mm.ckpt"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/v3_sd15_mm.ckpt".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("custom_nodes/comfyui_controlnet_aux/ckpts/hr16/DWPose-TorchScript-BatchSize5/dw-ll_ucoco_384_bs5.torchscript.pt"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/dw-ll_ucoco_384_bs5.torchscript.pt".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v/DWPose/yolox_l.onnx"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/yolox_l.onnx".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("custom_nodes/comfyui_controlnet_aux/ckpts/LiheYoung/Depth-Anything/checkpoints/depth_anything_vitl14.pth"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/depth_anything_vitl14.pth".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("custom_nodes/comfyui_controlnet_aux/ckpts/lllyasviel/Annotators/sk_model2.pth"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/sk_model2.pth".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("custom_nodes/comfyui_controlnet_aux/ckpts/lllyasviel/Annotators/sk_model.pth"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/sk_model.pth".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("custom_nodes/comfyui_controlnet_aux/ckpts/lllyasviel/Annotators/netG.pth"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/netG.pth".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("custom_nodes/comfyui_controlnet_aux/ckpts/lllyasviel/Annotators/ControlNetHED.pth"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/ControlNetHED.pth".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("custom_nodes/ComfyUI-Frame-Interpolation/ckpts/rife/rife47.pth"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/rife47.pth".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("input/example.png"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/example.png".to_string(),
                 },
             ],
         }

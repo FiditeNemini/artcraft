@@ -82,7 +82,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
     // ===================== DOWNLOAD REQUIRED MODELS IF NOT EXIST ===================== //
-    let root_comfy_path = model_dependencies.inference_command.comfy_root_code_directory.clone();
+    let root_comfy_path = model_dependencies.inference_command.mounts_directory.clone();
 
     let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;
     let remote_cloud_file_client = match remote_cloud_file_client {
@@ -126,7 +126,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     match all_models {
         Some(models) => {
             for model in &models.dependency_tokens.comfy {
-                let mut dep_path = model_dependencies.inference_command.comfy_root_code_directory.clone();
+                let mut dep_path = model_dependencies.inference_command.mounts_directory.clone();
                 dep_path = dep_path.join(model.location.clone());
                 if !dep_path.exists() {
                     download_file(model.url.clone(), dep_path.clone()).await.map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -140,7 +140,11 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     }
 
     // Download workflow to ComfyRunner
-    let workflow_dir = root_comfy_path.join("../ComfyLauncher");
+    let workflow_dir = root_comfy_path.join("prompt");
+    // make folder if not exist
+    if !workflow_dir.exists() {
+        std::fs::create_dir_all(&workflow_dir).unwrap();
+    }
     let retrieved_workflow_record =  get_weight_by_token(
         job_args.workflow_source,
         false,
@@ -192,6 +196,10 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     match job_args.maybe_sd_model {
         Some(sd_model) => {
             let sd_dir = root_comfy_path.join("models").join("checkpoints");
+            // make if not exist
+            if !sd_dir.exists() {
+                std::fs::create_dir_all(&sd_dir).unwrap();
+            }
             let retrieved_sd_record =  get_weight_by_token(
                 sd_model,
                 false,
@@ -216,7 +224,11 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     let mut maybe_lora_path: Option<PathBuf> = None;
     match job_args.maybe_lora_model {
         Some(lora_model) => {
-            let lora_dir = root_comfy_path.join("models").join("checkpoints");
+            let lora_dir = root_comfy_path.join("models").join("loras");
+            // make if not exist
+            if !lora_dir.exists() {
+                std::fs::create_dir_all(&lora_dir).unwrap();
+            }
             let retrieved_lora_record =  get_weight_by_token(
                 lora_model,
                 false,
@@ -242,6 +254,10 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     match job_args.maybe_input_file {
         Some(input_file) => {
             let input_dir = root_comfy_path.join("input");
+            // make if not exist
+            if !input_dir.exists() {
+                std::fs::create_dir_all(&input_dir).unwrap();
+            }
             let retrieved_input_record =  get_media_file(
                 input_file,
                 false,
@@ -260,6 +276,12 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             maybe_input_path = Some(input_path.parse().unwrap());
         }
         None => {}
+    }
+
+    // make outputs dir if not exist
+    let output_dir = root_comfy_path.join("output");
+    if !output_dir.exists() {
+        std::fs::create_dir_all(&output_dir).unwrap();
     }
 
     // ==================== SETUP FOR INFERENCE ==================== //
