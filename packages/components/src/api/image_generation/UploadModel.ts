@@ -18,5 +18,5 @@ export interface UploadModelResponse {
 
 export const UploadModel = MakeRequest<string, UploadModelRequest, UploadModelResponse,{}>({
     method: "POST", 
-    routingFunction: () => "/v1/image_gen/model/upload",
+    routingFunction: () => "/v1/image_gen/upload/model",
 });
