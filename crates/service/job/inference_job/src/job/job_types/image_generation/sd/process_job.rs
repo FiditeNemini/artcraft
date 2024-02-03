@@ -22,8 +22,6 @@ use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use filesys::file_exists::file_exists;
 use filesys::path_to_string::path_to_string;
-use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
-use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
 use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
@@ -384,14 +382,15 @@ pub async fn process_job_lora(
 
     let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint.safetensors");
     let lora_path = work_temp_dir.path().join("lora.safetensors"); // input path into execution
-    let vae_path = work_temp_dir.path().join("vae.safetensors");
+    //let vae_path = work_temp_dir.path().join("vae.safetensors");
+    let vae_path = work_temp_dir.path().join("vae.pt"); // TODO: Should this be `.safetensors` or `.pt`?
     let output_path = work_temp_dir.path().join("output");
 
     info!("Paths to download to:");
-    info!("sd_checkpoint_path:{}", sd_checkpoint_path.display());
-    info!("lora_path:{}", lora_path.display());
-    info!("vae_path:{}", vae_path.display());
-    info!("output_path:{}", output_path.display());
+    info!("sd_checkpoint_path: {:?}", sd_checkpoint_path);
+    info!("lora_path: {:?}", lora_path);
+    info!("vae_path: {:?}", vae_path);
+    info!("output_path: {:?}", output_path);
 
     let download_url = match sd_args.maybe_lora_upload_path {
         Some(val) => { val }
@@ -660,14 +659,15 @@ pub async fn process_job_inference(
 
     let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint.safetensors");
     let mut lora_path = work_temp_dir.path().join("lora.safetensors");
-    let vae_path = work_temp_dir.path().join("vae.safetensors");
+    //let vae_path = work_temp_dir.path().join("vae.safetensors");
+    let vae_path = work_temp_dir.path().join("vae.pt"); // TODO: Should this be `.safetensors` or `.pt`?
     let output_path = work_temp_dir.path().join("output");
 
     info!("Paths to download to:");
-    info!("sd_checkpoint_path:{}", sd_checkpoint_path.display());
-    info!("lora_path:{}", lora_path.display());
-    info!("vae_path:{}", vae_path.display());
-    info!("output_path:{}", output_path.display());
+    info!("sd_checkpoint_path: {:?}", sd_checkpoint_path);
+    info!("lora_path: {:?}", lora_path);
+    info!("vae_path: {:?}", vae_path);
+    info!("output_path: {:?}", output_path);
 
     // thread::sleep(seconds) to check the directory
 
