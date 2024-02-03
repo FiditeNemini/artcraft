@@ -3,7 +3,7 @@ use std::time::{Duration, Instant};
 
 use actix_web::dev::ResourcePath;
 use anyhow::anyhow;
-use log::info;
+use log::{error, info};
 use serde_json;
 
 use cloud_storage::remote_file_manager::media_descriptor::MediaImagePngDescriptor;
@@ -75,6 +75,7 @@ pub async fn sd_args_from_job(
             | args.args.as_ref()
         )
         .flatten();
+
     let polymorphic_args = match inference_args {
         Some(args) => args,
         None => {
@@ -92,6 +93,7 @@ pub async fn sd_args_from_job(
             );
         }
     };
+
     let stable_diffusion_args: StableDiffusionArgs = StableDiffusionArgs::from(sd_args.clone());
     Ok(stable_diffusion_args)
 }
@@ -208,32 +210,44 @@ pub async fn process_job_sd(
 
     // download vae for model
 
-    // use this vae doesn't matter though
-    // VAE token for now
-    let vae_token = String::from("weight_rb0959wfzjhk3d1k93hr3s0qw");
-    let model_weight_vae = ModelWeightToken(vae_token);
-    let vae_weight_record = get_weight_by_token(
-        &model_weight_vae,
-        false,
-        &deps.db.mysql_pool
-    ).await?;
-    let vae_weight_record = match vae_weight_record {
-        Some(val) => val,
-        None => {
-            return Err(
-                ProcessSingleJobError::from_anyhow_error(anyhow!("no VAE? thats a problem."))
-            );
-        }
-    };
+    args.job_dependencies
+        .buckets
+        .public_bucket_client
+        .download_file_to_disk(&sd_deps.vae_bucket_path, &vae_path)
+        .await
+        .map_err(|err| {
+            error!("could not download VAE: {:?}", err);
+            ProcessSingleJobError::from_anyhow_error(anyhow!("could not download VAE: {:?}", err))
+        })?;
 
-    let vae_details = RemoteCloudBucketDetails::new(
-        vae_weight_record.public_bucket_hash.clone(),
-        vae_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
-        vae_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
-    );
+//    // use this vae doesn't matter though
+//    // VAE token for now
+//    let vae_token = String::from("REPLACE_ME");
+//    let model_weight_vae = ModelWeightToken(vae_token);
+//    let vae_weight_record = get_weight_by_token(
+//        &model_weight_vae,
+//        false,
+//        &deps.db.mysql_pool
+//    ).await?;
+//    let vae_weight_record = match vae_weight_record {
+//        Some(val) => val,
+//        None => {
+//            return Err(
+//                ProcessSingleJobError::from_anyhow_error(anyhow!("no VAE? thats a problem."))
+//            );
+//        }
+//    };
+//
+//    let vae_details = RemoteCloudBucketDetails::new(
+//        vae_weight_record.public_bucket_hash.clone(),
+//        vae_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
+//        vae_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
+//    );
+//
+//    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
+//    remote_cloud_file_client.download_file(vae_details, path_to_string(vae_path.clone())).await?;
 
     let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
-    remote_cloud_file_client.download_file(vae_details, path_to_string(vae_path.clone())).await?;
 
     let stderr_output_file = work_temp_dir.path().join("sd_err.txt");
     let stdout_output_file = work_temp_dir.path().join("sd_out.txt");
@@ -427,32 +441,42 @@ pub async fn process_job_lora(
     remote_cloud_file_client.download_file(sd_weight_details, path_to_string(sd_checkpoint_path.clone())).await?;
 
 
-    // use this vae doesn't matter though
-    // VAE token for now
-    let vae_token = String::from("weight_rb0959wfzjhk3d1k93hr3s0qw");
-    let model_weight_vae = ModelWeightToken(vae_token);
-    let vae_weight_record = get_weight_by_token(
-        &model_weight_vae,
-        false,
-        &deps.db.mysql_pool
-    ).await?;
-    let vae_weight_record = match vae_weight_record {
-        Some(val) => val,
-        None => {
-            return Err(
-                ProcessSingleJobError::from_anyhow_error(anyhow!("no VAE? thats a problem."))
-            );
-        }
-    };
+    args.job_dependencies
+        .buckets
+        .public_bucket_client
+        .download_file_to_disk(&sd_deps.vae_bucket_path, &vae_path)
+        .await
+        .map_err(|err| {
+            error!("could not download VAE: {:?}", err);
+            ProcessSingleJobError::from_anyhow_error(anyhow!("could not download VAE: {:?}", err))
+        })?;
 
-    let vae_details = RemoteCloudBucketDetails::new(
-        vae_weight_record.public_bucket_hash.clone(),
-        vae_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
-        vae_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
-    );
-
-    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
-    remote_cloud_file_client.download_file(vae_details, path_to_string(vae_path.clone())).await?;
+//    // use this vae doesn't matter though
+//    // VAE token for now
+//    let vae_token = String::from("REPLACE_ME");
+//    let model_weight_vae = ModelWeightToken(vae_token);
+//    let vae_weight_record = get_weight_by_token(
+//        &model_weight_vae,
+//        false,
+//        &deps.db.mysql_pool
+//    ).await?;
+//    let vae_weight_record = match vae_weight_record {
+//        Some(val) => val,
+//        None => {
+//            return Err(
+//                ProcessSingleJobError::from_anyhow_error(anyhow!("no VAE? thats a problem."))
+//            );
+//        }
+//    };
+//
+//    let vae_details = RemoteCloudBucketDetails::new(
+//        vae_weight_record.public_bucket_hash.clone(),
+//        vae_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
+//        vae_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
+//    );
+//
+//    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
+//    remote_cloud_file_client.download_file(vae_details, path_to_string(vae_path.clone())).await?;
 
     let stderr_output_file = work_temp_dir.path().join("sd_err.txt");
     let stdout_output_file = work_temp_dir.path().join("sd_out.txt");
@@ -688,32 +712,42 @@ pub async fn process_job_inference(
         }
     }
 
-    // VAE token for now
-    let vae_token = String::from("weight_rb0959wfzjhk3d1k93hr3s0qw");
-    let model_weight_vae = ModelWeightToken(vae_token);
+    args.job_dependencies
+        .buckets
+        .public_bucket_client
+        .download_file_to_disk(&sd_deps.vae_bucket_path, &vae_path)
+        .await
+        .map_err(|err| {
+            error!("could not download VAE: {:?}", err);
+            ProcessSingleJobError::from_anyhow_error(anyhow!("could not download VAE: {:?}", err))
+        })?;
 
-    let vae_weight_record = get_weight_by_token(
-        &model_weight_vae,
-        false,
-        &deps.db.mysql_pool
-    ).await?;
-
-    let vae_weight_record = match vae_weight_record {
-        Some(val) => val,
-        None => {
-            return Err(
-                ProcessSingleJobError::from_anyhow_error(anyhow!("no VAE? thats a problem."))
-            );
-        }
-    };
-
-    let vae_details = RemoteCloudBucketDetails::new(
-        vae_weight_record.public_bucket_hash.clone(),
-        vae_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
-        vae_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
-    );
-
-    remote_cloud_file_client.download_file(vae_details, path_to_string(vae_path.clone())).await?;
+//    // VAE token for now
+//    let vae_token = String::from("REPLACE_ME");
+//    let model_weight_vae = ModelWeightToken(vae_token);
+//
+//    let vae_weight_record = get_weight_by_token(
+//        &model_weight_vae,
+//        false,
+//        &deps.db.mysql_pool
+//    ).await?;
+//
+//    let vae_weight_record = match vae_weight_record {
+//        Some(val) => val,
+//        None => {
+//            return Err(
+//                ProcessSingleJobError::from_anyhow_error(anyhow!("no VAE? thats a problem."))
+//            );
+//        }
+//    };
+//
+//    let vae_details = RemoteCloudBucketDetails::new(
+//        vae_weight_record.public_bucket_hash.clone(),
+//        vae_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
+//        vae_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
+//    );
+//
+//    remote_cloud_file_client.download_file(vae_details, path_to_string(vae_path.clone())).await?;
 
     let prompt = match sd_args.maybe_prompt {
         Some(val) => val,
