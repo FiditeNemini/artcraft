@@ -345,7 +345,7 @@ pub async fn enqueue_image_generation_request(
     };
 
     let batch_count = match request.maybe_batch_count {
-        Some(val) => if val > 4 { 4 } else { val }
+        Some(val) => if val > 6 { 6 } else { val }
         None => 1,
     };
 
