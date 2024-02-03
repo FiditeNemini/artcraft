@@ -57,12 +57,12 @@ export default function BookmarksTab({ username }: { username: string }) {
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
-    onSuccess: (res) => {
+    onSuccess: res => {
       bookmarks.gather({ res, key: "weight_token" });
       setShowMasonryGrid(true);
     },
     requestList: true,
-    urlParam: username,
+    urlParam: username.toLowerCase(),
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -209,7 +209,14 @@ export default function BookmarksTab({ username }: { username: string }) {
                 onLayoutComplete={() => console.log("Layout complete!")}
               >
                 {dataList.map((data: any, key: number) => {
-                  let weightProps = { bookmarks, data, ratings, showCreator: true, source, type: "weights" };
+                  let weightProps = {
+                    bookmarks,
+                    data,
+                    ratings,
+                    showCreator: true,
+                    source,
+                    type: "weights",
+                  };
 
                   // let mediaProps = {
                   //   bookmarks,

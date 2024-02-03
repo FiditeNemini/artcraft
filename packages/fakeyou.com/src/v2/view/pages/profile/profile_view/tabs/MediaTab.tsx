@@ -38,13 +38,13 @@ export default function MediaTab({ username }: { username: string }) {
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
-    onSuccess: (res) => {
+    onSuccess: res => {
       // bookmarks.gather({ res, key: "token" });
       ratings.gather({ res, key: "token" });
       setShowMasonryGrid(true);
     },
     requestList: true,
-    urlParam: username,
+    urlParam: username.toLowerCase(),
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
