@@ -488,7 +488,7 @@ class ApiConfig {
   // =============== Image Generation ===============
 
   enqueueImageGeneration(): string {
-    return `${this.getApiOrigin()}/v1/image_gen/inference/enqueue_image_gen`;
+    return `${this.getApiOrigin()}/v1/image_gen/enqueue/inference`;
   }
 
   // =============== Motion Capture / mocap ===============
