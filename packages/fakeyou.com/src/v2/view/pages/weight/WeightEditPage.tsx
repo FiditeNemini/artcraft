@@ -20,7 +20,7 @@ import {
 } from "components/common";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { useWeightFetch } from "hooks";
+import { useSession, useWeightFetch } from "hooks";
 import "./WeightEditPage.scss";
 
 interface WeightEditPageProps {
@@ -30,6 +30,7 @@ interface WeightEditPageProps {
 export default function WeightEditPage({
   sessionWrapper,
 }: WeightEditPageProps) {
+  const { user, canEditTtsModel } = useSession();
   // const [language, languageSet] = useState("en");
   // const [fetched, fetchedSet] = useState(false);
   // const history = useHistory();
@@ -62,7 +63,7 @@ export default function WeightEditPage({
 
   let weightToken = weight?.creator?.user_token;
 
-  if (!weightToken || !sessionWrapper.canEditTtsModelByUserToken(weightToken)) {
+  if (!weightToken || !canEditTtsModel(user?.user_token || "")) {
     return (
       <Container type="panel">
         <PageHeader

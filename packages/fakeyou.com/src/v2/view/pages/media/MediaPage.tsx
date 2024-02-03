@@ -36,7 +36,7 @@ import { WeightCategory } from "@storyteller/components/src/api/_common/enums/We
 import Iframe from "react-iframe";
 
 export default function MediaPage() {
-  const { user } = useSession();
+  const { canEditTtsModel, user } = useSession();
   const { token } = useParams<{ token: string }>();
   const ratings = useRatings();
   const { media: mediaFile, remove, status } = useMedia({
@@ -605,12 +605,12 @@ export default function MediaPage() {
                 </div>
               </Panel>
 
-              {user?.canBanUsers && (
+              {canEditTtsModel(user?.user_token || "") && (
                 <div className="d-flex gap-2">
                   <Button
                     full={true}
                     variant="danger"
-                    label="Delete Weight"
+                    label="Delete Media"
                     onClick={openDeleteModal}
                   />
                 </div>
