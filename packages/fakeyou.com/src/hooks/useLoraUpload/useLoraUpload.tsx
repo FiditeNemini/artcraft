@@ -30,11 +30,11 @@ export default function useLoraUpload() {
       ...(coverImg.token
         ? { cover_image_media_file_token: coverImg.token }
         : {}),
-      description: descriptionMD,
+      maybe_name: title,
+      maybe_description: descriptionMD,
       uuid_idempotency_token: uuidv4(),
       type_of_inference: "inference",
       maybe_upload_path: uploadPath,
-      title,
       visibility,
     })
       .then((res: any) => {

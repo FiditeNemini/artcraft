@@ -5,9 +5,9 @@ export interface UploadModelRequest {
   type_of_inference: String, // upload_lora / check_point / inference
   maybe_upload_path?: String,
   maybe_lora_upload_path?: String,
-  title: String,
+  maybe_name: String,
+  maybe_description: String,
   visibility: String,
-  description: String
 }
 
 export interface UploadModelResponse {
