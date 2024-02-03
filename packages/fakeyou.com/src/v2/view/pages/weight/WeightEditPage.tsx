@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import {
   faCircleExclamation,
@@ -34,7 +34,6 @@ export default function WeightEditPage({
   // const [fetched, fetchedSet] = useState(false);
   // const history = useHistory();
   const { weight_token } = useParams<{ weight_token: string }>();
-  const [weightCreatorToken] = useState("");
 
   const {
     coverImg,
@@ -61,10 +60,9 @@ export default function WeightEditPage({
     { label: "Private", value: "private" },
   ];
 
-  if (
-    !sessionWrapper.canEditTtsModelByUserToken(weightCreatorToken) === false ||
-    !weight_token
-  ) {
+  let weightToken = weight?.creator?.user_token;
+
+  if (!weightToken || !sessionWrapper.canEditTtsModelByUserToken(weightToken)) {
     return (
       <Container type="panel">
         <PageHeader
