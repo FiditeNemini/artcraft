@@ -44,6 +44,9 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::image_generation::sd::sd_inference_command::InferenceArgs;
 use crate::job_dependencies::JobDependencies;
 
+const SD_IMAGE_PREFIX : &str = "image_";
+const SD_IMAGE_SUFFIX : &str = ".png";
+
 #[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 pub struct InferenceValues {
     pub prompt: String,
@@ -910,6 +913,7 @@ pub async fn process_job_inference(
             }
         };
 
+
         // extra_file_modification_info: todo!(), // JSON ENCODED STRUCT
         let media_file_token = insert_media_file_generic(InsertArgs {
             pool: mysql_pool,
@@ -930,8 +934,10 @@ pub async fn process_job_inference(
             maybe_frame_height: Some(sd_args.maybe_height.unwrap_or(512)),
             checksum_sha2: metadata.sha256_checksum.as_str(),
             public_bucket_directory_hash: bucket_details.object_hash.as_str(),
-            maybe_public_bucket_prefix: Some(bucket_details.prefix.as_str()),
-            maybe_public_bucket_extension: Some(bucket_details.suffix.as_str()),
+            //maybe_public_bucket_prefix: Some(bucket_details.prefix.as_str()),
+            maybe_public_bucket_prefix: Some(SD_IMAGE_PREFIX),
+            //maybe_public_bucket_extension: Some(bucket_details.suffix.as_str()),
+            maybe_public_bucket_extension: Some(SD_IMAGE_SUFFIX),
             extra_file_modification_info: Some(&inputs),
             maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
             maybe_creator_category_synthetic_id_category: IdCategory::ModelWeights,
