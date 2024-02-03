@@ -416,7 +416,10 @@ pub async fn process_job_lora(
 
     // download model + vae for lora
     // use lora with whatever checkpoint make it fixed id if it works submit it
-    let weight_token_sd_model_token = ModelWeightToken(String::from("weight_dmmthavhawqc2hj7yqyemcbf8")); // any generic model.
+    let weight_token_sd_model_token = ModelWeightToken::new_from_str(&sd_deps.predefined_sd_weight_token);
+
+    info!("Using predefined SD weight token: {:?}", &weight_token_sd_model_token);
+
     let sd_weight_record = get_weight_by_token(
         &weight_token_sd_model_token,
         false,
