@@ -65,6 +65,14 @@ export class SessionWrapper {
     return this.canEditOtherUsersProfiles();
   }
 
+  public canEditMediaFileByUserToken(userToken: MaybeString) : boolean {
+    return this.canEditOtherUsersTtsModels() || this.userTokenMatches(userToken);
+  }
+
+  public canEditWeightByUserToken(userToken: MaybeString) : boolean {
+    return this.canEditOtherUsersTtsModels() || this.userTokenMatches(userToken);
+  }
+
   public canEditTtsModelByUserToken(userToken: MaybeString) : boolean {
     return this.canEditOtherUsersTtsModels() || this.userTokenMatches(userToken);
   }
