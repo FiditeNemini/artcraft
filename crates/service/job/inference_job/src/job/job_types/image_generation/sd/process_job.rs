@@ -158,13 +158,14 @@ pub async fn process_job_sd(
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
     let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint.safetensors");
-    let vae_path = work_temp_dir.path().join("vae.safetensors");
+    //let vae_path = work_temp_dir.path().join("vae.safetensors");
+    let vae_path = work_temp_dir.path().join("vae.pt"); // TODO: Should this be `.safetensors` or `.pt`?
     let output_path = work_temp_dir.path().join("output");
 
     info!("Paths to download to:");
-    info!("sd_checkpoint_path:{}", sd_checkpoint_path.display());
-    info!("vae_path:{}", vae_path.display());
-    info!("output_path:{}", output_path.display());
+    info!("sd_checkpoint_path: {:?}", sd_checkpoint_path);
+    info!("vae_path: {:?}", vae_path);
+    info!("output_path: {:?}", output_path);
 
     let download_url = match sd_args.maybe_upload_path {
         Some(val) => { val }
@@ -182,12 +183,12 @@ pub async fn process_job_sd(
         "DOWNLOAD_SCRIPT",
         "download_internet_file.py"
     );
-    // Download 
+
     let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script,
-        None,
-        None, 
-        None);
+        None, None, None);
+
     info!("Downloading {}", download_url);
+
     let download_filename = match
         google_drive_downloader.download_file_with_file_name(
             &download_url,
@@ -196,17 +197,13 @@ pub async fn process_job_sd(
         ).await
     {
         Ok(filename) => filename,
-        Err(_e) => {
-            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Download")));
-        }
+        Err(_e) => return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Download"))),
     };
 
     let download_file_path = work_temp_dir.path().join(download_filename);
 
     if file_exists(download_file_path.as_path()) == false {
-        return Err(
-            ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Download SD Model from Google"))
-        );
+        return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Download SD Model from Google")));
     }
 
     info!("File Retrieved at {}", download_file_path.display());
@@ -222,6 +219,8 @@ pub async fn process_job_sd(
             error!("could not download VAE: {:?}", err);
             ProcessSingleJobError::from_anyhow_error(anyhow!("could not download VAE: {:?}", err))
         })?;
+
+    info!("VAE downloaded to: {:?}", &vae_path);
 
 //    // use this vae doesn't matter though
 //    // VAE token for now
