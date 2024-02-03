@@ -96,7 +96,6 @@ import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesigner
 import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVoicePage";
 import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
-import DevUpload from "./pages/dev_upload/DevUpload";
 import EngineCompositor from "./pages/EngineCompositor";
 import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
@@ -112,6 +111,10 @@ import UploadLoraWeightPage from "./pages/upload/UploadLoraWeightPage";
 import StorytellerFilterPage from "./pages/storyteller_filter/StorytellerFilter";
 import ScrollToTop from "./_common/ScrollToTop";
 import TextToImagePage from "./pages/text_to_image/TextToImagePage";
+
+
+import DevUpload from "./pages/dev_upload/DevUpload";
+import DevMediaInput from "./pages/dev_upload/DevMediaInput";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -742,6 +745,10 @@ class PageContainer extends React.Component<
 
                 <Route path="/dev-upload">
                   <DevUpload />
+                </Route>
+
+                <Route path="/dev-media-input">
+                  <DevMediaInput />
                 </Route>
 
                 {/* Route for initial voice creation */}

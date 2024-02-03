@@ -7,6 +7,9 @@ import ImageCard from "components/common/Card/ImageCard";
 import VideoCard from "components/common/Card/VideoCard";
 import { BvhCard, CardWrapper } from "components/entities";
 
+import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome"; // for now
+import { faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
+
 interface MediaCardsProps {
   props: any,
   type: string
@@ -17,6 +20,8 @@ interface Props {
   success?: boolean
 }
 
+const MocapPreview = () => <Icon {...{ className: "card-img", icon: faPersonWalking }}/>;
+
 const MediaCards = ({ props, type }: MediaCardsProps) => {
   switch (type) {
     case "audio":
@@ -26,7 +31,7 @@ const MediaCards = ({ props, type }: MediaCardsProps) => {
     case "video":
       return <VideoCard {...props} />;
     case "bvh":
-      return <CardWrapper {...{ ...props, card: BvhCard }}/>
+      return <CardWrapper {...{ ...props, card: BvhCard, preview: MocapPreview }}/>
     default:
       return <div>Unsupported media type</div>;
   }

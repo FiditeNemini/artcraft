@@ -1,6 +1,7 @@
 import Accordion from "./Accordion";
 import AudioBlobPreview from "./AudioBlobPreview";
 import AudioInput from "./AudioInput";
+import Badge from "./Badge";
 import BasicVideo from "./BasicVideo";
 import Button from "./Button";
 import Checkbox from "./Checkbox";
@@ -41,6 +42,7 @@ export {
   Accordion,
   AudioBlobPreview,
   AudioInput,
+  Badge,
   BasicVideo,
   Button,
   Checkbox,

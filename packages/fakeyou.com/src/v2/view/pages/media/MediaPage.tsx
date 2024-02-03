@@ -28,9 +28,8 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import SocialButton from "components/common/SocialButton";
-import { Input } from "components/common";
+import { Badge, Input, Modal } from "components/common";
 import LikeButton from "components/common/LikeButton";
-import Badge from "components/common/Badge";
 import { useMedia, useRatings, useSession } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
@@ -40,7 +39,7 @@ export default function MediaPage() {
   const { user } = useSession();
   const { token } = useParams<{ token: string }>();
   const ratings = useRatings();
-  const { media: mediaFile, status } = useMedia({
+  const { media: mediaFile, remove, status } = useMedia({
     mediaToken: token,
     onSuccess: (res: any) => {
       ratings.gather({ res, key: "token" });
@@ -50,6 +49,16 @@ export default function MediaPage() {
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
+
+
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const closeDeleteModal = () => setIsDeleteModalOpen(false);
+
+  const openDeleteModal = () => setIsDeleteModalOpen(true);
+
+  const deleteMedia = () => remove(!!user?.can_ban_users);
 
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
@@ -595,6 +604,17 @@ export default function MediaPage() {
                   </div>
                 </div>
               </Panel>
+
+              {user?.canBanUsers && (
+                <div className="d-flex gap-2">
+                  <Button
+                    full={true}
+                    variant="danger"
+                    label="Delete Weight"
+                    onClick={openDeleteModal}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -611,6 +631,16 @@ export default function MediaPage() {
           </Panel>
         </Container>
       </div>
+      <Modal
+        show={isDeleteModalOpen}
+        handleClose={closeDeleteModal}
+        title="Delete Media"
+        content={() => (
+           <>{`Are you sure you want to delete this media file? This action cannot be undone.`}</> // replace w/ dynamic later -V
+          // <>{`Are you sure you want to delete "${title}"? This action cannot be undone.`}</>
+        )}
+        onConfirm={deleteMedia}
+      />
     </div>
   );
 }
