@@ -10,13 +10,13 @@ import {
   Checkbox,
   ErrorMessage,
   Input,
+  InputSeed,
   NumberSliderV2,
   Panel,
   SelectModal,
   Spinner,
   TextAreaV2
 } from "components/common";
-import InputSeed from "./inputSeed";
 import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
