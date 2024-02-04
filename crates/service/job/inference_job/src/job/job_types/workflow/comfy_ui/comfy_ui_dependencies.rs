@@ -6,6 +6,7 @@ use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::Comfy
 pub struct ComfyDependencies {
     pub inference_command: ComfyInferenceCommand,
     pub dependency_tokens: RequiredModels,
+    pub workflow_bucket_path: String,
 }
 
 impl ComfyDependencies {
@@ -13,6 +14,7 @@ impl ComfyDependencies {
         Ok(Self {
             inference_command: ComfyInferenceCommand::from_env()?,
             dependency_tokens: RequiredModels::init(),
+            workflow_bucket_path: easyenv::get_env_string_required("COMFY_WORKFLOW_BUCKET_PATH")?,
         })
     }
 }

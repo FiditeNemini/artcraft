@@ -29,6 +29,7 @@ use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
@@ -122,6 +123,11 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         Ok(())
     }
 
+    let comfy_deps = match args.job_dependencies.job.job_specific_dependencies.maybe_comfy_ui_dependencies {
+        Some(ref deps) => deps,
+        None => return Err(ProcessSingleJobError::from(anyhow!("no comfy deps"))),
+    };
+
     let all_models = &args.job_dependencies.job.job_specific_dependencies.maybe_comfy_ui_dependencies;
     match all_models {
         Some(models) => {
@@ -145,19 +151,31 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     if !workflow_dir.exists() {
         std::fs::create_dir_all(&workflow_dir).unwrap();
     }
-    let retrieved_workflow_record =  get_weight_by_token(
-        job_args.workflow_source,
-        false,
-        &deps.db.mysql_pool
-    ).await?.unwrap();
 
-    let bucket_details = RemoteCloudBucketDetails {
-        object_hash: retrieved_workflow_record.public_bucket_hash,
-        prefix: retrieved_workflow_record.maybe_public_bucket_prefix.unwrap(),
-        suffix: retrieved_workflow_record.maybe_public_bucket_extension.unwrap(),
-    };
     let workflow_path = workflow_dir.join("prompt.json").to_str().unwrap().to_string();
-    remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
+
+    //let retrieved_workflow_record =  get_weight_by_token(
+    //    job_args.workflow_source,
+    //    false,
+    //    &deps.db.mysql_pool
+    //).await?.unwrap();
+
+    //let bucket_details = RemoteCloudBucketDetails {
+    //    object_hash: retrieved_workflow_record.public_bucket_hash,
+    //    prefix: retrieved_workflow_record.maybe_public_bucket_prefix.unwrap(),
+    //    suffix: retrieved_workflow_record.maybe_public_bucket_extension.unwrap(),
+    //};
+    //remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
+
+    args.job_dependencies
+        .buckets
+        .public_bucket_client
+        .download_file_to_disk(&comfy_deps.workflow_bucket_path, &workflow_path)
+        .await
+        .map_err(|err| {
+            error!("could not download VAE: {:?}", err);
+            ProcessSingleJobError::from_anyhow_error(anyhow!("could not download VAE: {:?}", err))
+        })?;
 
     let maybe_args = job.maybe_inference_args
         .as_ref()
