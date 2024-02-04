@@ -24,7 +24,9 @@ export type Action =
   | {type: 'uploadFile'}
   | {type: 'uploadFileSuccess', payload:{ mediaFileToken: string}}
   | {type: 'loadFile'}
-  | {type: 'loadFileSuccess', payload:{mediaFile: MediaFile}}
+  | {type: 'loadFileSuccess', payload:{
+      mediaFileToken: string, mediaFile: MediaFile
+    }}
 
 
 export function reducer (state: State, action: Action): State {
@@ -55,7 +57,8 @@ export function reducer (state: State, action: Action): State {
       return {
         ...state,
         status: states.FILE_LOADED,
-        mediaFile: action.payload.mediaFile
+        mediaFile: action.payload.mediaFile,
+        mediaFileToken : action.payload.mediaFileToken,
       }
     default:
       return {status: states.NO_FILE};
