@@ -56,7 +56,7 @@ export default function NumberSlider({
 }: Props) {
   const step = stepProps && stepProps <= max-min ? stepProps 
     : max-min >= 1 ? 1 : (max-min) / 10;
-  const initialValue = initialValueProps && initialValueProps <= max && initialValueProps >= min ? initialValueProps
+  const initialValue = initialValueProps !== undefined && initialValueProps <= max && initialValueProps >= min ? initialValueProps
   : max-min === step ? min : roundToStep((max+min)/2, step);
 
   function handleInputOnChange(e: React.ChangeEvent<HTMLInputElement>){

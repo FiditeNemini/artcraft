@@ -7,7 +7,9 @@ import { states, Action, State } from "../storytellerFilterReducer";
 import {
   Accordion,
   BasicVideo,
+  Checkbox,
   ErrorMessage,
+  Input,
   NumberSliderV2,
   Panel,
   SelectModal,
@@ -27,26 +29,36 @@ export default function PageFilterControls({
   dispatchPageState: (action: Action) => void;
 }) {
   const { mediaToken } = useParams<any>();
-
   useMedia({
     mediaToken: pageState.mediaFileToken || mediaToken,
     onSuccess: (res: any) => {
       // ratings.gather({ res, key: "token" });
       dispatchPageState({
         type: 'loadFileSuccess',
-        payload: {mediaFile: res}
+        payload: {
+          mediaFile: res,
+          mediaFileToken: pageState.mediaFileToken || mediaToken
+        }
       })
     },
   });
 
   const [filterState, setFilterState] = useState({
+    seed: "",
     sdModelToken: "",
     loraModelToken: "",
     posPrompt: "",
     negPrompt: "",
-    firstPass: 15,
-    upScalePass: 15,
-    seed: "",
+    firstPass: 1,
+    upscalePass: 0.42,
+    motionScale:1,
+    upscaleMultiplier: 1.5,
+    useEmptyLatent: false,
+    useFaceDetailer: false,
+    denoiseFaceDetailer: 0.45,
+    useLCM: false,
+    lcmCFG: 2,
+    lcmSteps: 8
   });
   useEffect(()=>{
     if(debug) console.log(filterState)
@@ -77,7 +89,7 @@ export default function PageFilterControls({
             </div>
           </Panel>
           <Accordion className="mt-4">
-            <Accordion.Item title={t("heading1")}>
+            <Accordion.Item title={"Basics"} defaultOpen>
               <div className="row g-3 p-3">
                 <SelectModal 
                   modalTitle="Select a Stable Diffusion Weight"
@@ -102,6 +114,8 @@ export default function PageFilterControls({
                     },
                   ]}
                 />
+              </div>
+              <div className="row g-3 p-3">
                 <SelectModal
                   modalTitle="Select a LoRA Weight"
                   label="Additional LoRA Weight"
@@ -126,49 +140,289 @@ export default function PageFilterControls({
                     },
                   ]}
                 />
-                <TextAreaV2
-                  {...{
-                    label: "Prompt",
-                    placeholder: "Enter a prompt",
-                    onChange: (val:string)=>handleOnChange("posPrompt", val),
-                    value: filterState.posPrompt,
-                    required: false,
-                  }}
-                />
-                <TextAreaV2
-                  {...{
-                    label: "Negative Prompt",
-                    placeholder: "Enter Negative Prompt",
-                    onChange: (val:string)=>handleOnChange("negPrompt", val),
-                    value: filterState.negPrompt,
-                    required: false,
-                  }}
-                />
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <TextAreaV2
+                    {...{
+                      label: "Prompt",
+                      placeholder: "Enter a prompt",
+                      onChange: (val:string)=>handleOnChange("posPrompt", val),
+                      value: filterState.posPrompt,
+                      required: false,
+                    }}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <TextAreaV2
+                    {...{
+                      label: "Negative Prompt",
+                      placeholder: "Enter Negative Prompt",
+                      onChange: (val:string)=>handleOnChange("negPrompt", val),
+                      value: filterState.negPrompt,
+                      required: false,
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="row g-3 p-3">
                 <InputSeed label="Seed" onChange={
                   (val:string)=>handleOnChange("seed", val)
                 }/>
               </div>
+              
             </Accordion.Item>
-            <Accordion.Item title={t("headings2")}>
+            <Accordion.Item title="Advance" defaultOpen>
               <div className="row g-3 p-3">
-                <NumberSliderV2 {...{
-                    min: 1,
-                    max: 30,
-                    step: 0.5,
-                    initialValue: filterState.firstPass,
-                    label: " Denoise First Pass",
-                    thumbTip: "Denoise First Pass",
-                    onChange: (val)=>{handleOnChange("firstPass",val)}
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                      min: 0.1,
+                      max: 1,
+                      step: 0.01,
+                      initialValue: filterState.firstPass,
+                      label: " Denoise First Pass",
+                      thumbTip: "Denoise First Pass",
+                      onChange: (val)=>{handleOnChange("firstPass",val)}
+                    }}/>
+                </div>
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 0.1,
+                    max: 1,
+                    step: 0.01,
+                    initialValue: filterState.upscalePass,
+                    label: "Denoise Upscale Pass",
+                    thumbTip: "Denoise Upscale Pass",
+                    onChange: (val)=>{handleOnChange("upscalePass", val)}
                   }}/>
-                <NumberSliderV2 {...{
-                  min: 1,
-                  max: 30,
-                  initialValue: filterState.upScalePass,
-                  label: "Denoise Upscale Pass",
-                  thumbTip: "Denoise Upscale Pass",
-                  onChange: (val)=>{handleOnChange("upScalePass", val)}
-                }}/>
-                <br />
+                </div>
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 0.25,
+                    max: 2,
+                    step: 0.05,
+                    initialValue: filterState.motionScale,
+                    label: "Motion Scale",
+                    thumbTip: "Motion Scale",
+                    onChange: (val)=>{handleOnChange("motionScale", val)}
+                  }}/>
+                </div>
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 1.5,
+                    max: 2,
+                    step: 0.5,
+                    initialValue: filterState.upscaleMultiplier,
+                    label: "Upscale Multiplier",
+                    thumbTip: "Upscale Multiplier",
+                    onChange: (val)=>{handleOnChange("upscaleMultiplier", val)}
+                  }}/>
+                </div>
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <Checkbox 
+                    label="Use Empty Latent" 
+                    checked={filterState.useEmptyLatent}
+                    onChange={(e:{target:{ checked: boolean, name:string, type: string }})=>{handleOnChange("useEmptyLatent", e.target.checked)}}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <Checkbox 
+                    label="Use Face Detailer" 
+                    checked={filterState.useFaceDetailer}
+                    onChange={(e:{target:{ checked: boolean, name:string, type: string }})=>{handleOnChange("useFaceDetailer", e.target.checked)}}
+                  />
+                </div>
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+
+                </div>
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 0.1,
+                    max: 0.7,
+                    step: 0.01,
+                    initialValue: filterState.denoiseFaceDetailer,
+                    label: "Denoise Face Detailer",
+                    thumbTip: "Denoise Face Detailer",
+                    onChange: (val)=>{handleOnChange("denoiseFaceDetailer", val)}
+                  }}/>
+                </div>
+              </div>
+              <div className="row g-3 p-3">
+                <Checkbox 
+                  label="Use LCM" 
+                  checked={filterState.useLCM}
+                  onChange={(e:{target:{ checked: boolean, name:string, type: string }})=>{handleOnChange("useLCM", e.target.checked)}}
+                />
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 1,
+                    max: 10,
+                    step: 1,
+                    initialValue: filterState.lcmCFG,
+                    label: "LCM CFG",
+                    thumbTip: "LCM CFG",
+                    onChange: (val)=>{handleOnChange("lcmCFG", val)}
+                  }}/>
+                </div>
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 5,
+                    max: 15,
+                    step: 1,
+                    initialValue: filterState.lcmSteps,
+                    label: "LCM Steps",
+                    thumbTip: "LCM Steps",
+                    onChange: (val)=>{handleOnChange("lcmSteps", val)}
+                  }}/>
+                </div>
+              </div>
+            </Accordion.Item>
+            <Accordion.Item title="Control Nets" defaultOpen>
+              <div className="row g-3 p-3">
+                <Checkbox 
+                  label="Use Control Nets" 
+                  checked={false}
+                  onChange={(e:{target:{ checked: boolean, name:string, type: string }})=>{
+                    console.log(`Use Control Nets: ${e.target.checked}`)
+                  }}
+                />
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 0,
+                    max: 1,
+                    step: 0.1,
+                    initialValue: 0,
+                    label: "Canny",
+                    thumbTip: "Canny",
+                    onChange: (val)=>{console.log(`Canny: ${val}`)}
+                    }}/>
+                </div>
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 0,
+                    max: 1,
+                    step: 0.1,
+                    initialValue: 0,
+                    label: "Line Art Anime",
+                    thumbTip: "Line Art Anime",
+                    onChange: (val)=>{console.log(`Line Art Anime: ${val}`)}
+                    }}/>
+                </div>
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 0,
+                    max: 1,
+                    step: 0.1,
+                    initialValue: 0,
+                    label: "Depth",
+                    thumbTip: "Depth",
+                    onChange: (val)=>{console.log(`Depth: ${val}`)}
+                    }}/>
+                </div>
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 0,
+                    max: 1,
+                    step: 0.1,
+                    initialValue: 0,
+                    label: "OpenPose",
+                    thumbTip: "OpenPose",
+                    onChange: (val)=>{console.log(`OpenPose: ${val}`)}
+                    }}/>
+                </div>
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 0,
+                    max: 1,
+                    step: 0.1,
+                    initialValue: 0,
+                    label: "Media Pipe Face",
+                    thumbTip: "Media Pipe Face",
+                    onChange: (val)=>{console.log(`Media Pipe Face: ${val}`)}
+                    }}/>
+                </div>
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 0,
+                    max: 1,
+                    step: 0.1,
+                    initialValue: 0.7,
+                    label: "Sparse Scribble",
+                    thumbTip: "Sparse Scribble",
+                    onChange: (val)=>{console.log(`Sparse Scribble: ${val}`)}
+                    }}/>
+                </div>
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 0,
+                    max: 1,
+                    step: 0.1,
+                    initialValue: 0.5,
+                    label: "Video CN",
+                    thumbTip: "Video CN",
+                    onChange: (val)=>{console.log(`Video CN: ${val}`)}
+                    }}/>
+                </div>
+                <div className="col-md-6">
+                  <NumberSliderV2 {...{
+                    min: 0,
+                    max: 1,
+                    step: 0.1,
+                    initialValue: 0,
+                    label: "Tile CN",
+                    thumbTip: "Tile CN",
+                    onChange: (val)=>{console.log(`Tile CN: ${val}`)}
+                    }}/>
+                </div>
+              </div>
+            </Accordion.Item>
+            <Accordion.Item title="Video Settings">
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <Input label="Width" />
+                </div>
+                <div className="col-md-6">
+                  <Input label="Height" />
+                </div>
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <Input label="Frames Cap" />
+                </div>
+                <div className="col-md-6">
+                  <Input label="Skip Frames" />
+                </div>
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <Input label="Every n-th Frame" />
+                </div>
+                <div className="col-md-6">
+                  <Input label="Input FPS" />
+                </div>
+              </div>
+              <div className="row g-3 p-3">
+                <div className="col-md-6">
+                  <Input label="Interpolation Multiplier" />
+                </div>
+                <div className="col-md-6">
+                </div>
               </div>
             </Accordion.Item>
           </Accordion>
