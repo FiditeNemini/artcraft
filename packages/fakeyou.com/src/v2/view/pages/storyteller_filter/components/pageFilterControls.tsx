@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import { useParams } from "react-router-dom";
 
 import { useMedia } from "hooks";
@@ -14,7 +14,7 @@ import {
   Spinner,
   TextAreaV2
 } from "components/common";
-
+import InputSeed from "./inputSeed";
 import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -45,7 +45,8 @@ export default function PageFilterControls({
     posPrompt: "",
     negPrompt: "",
     firstPass: 15,
-    upScalePass: 15
+    upScalePass: 15,
+    seed: "",
   });
   useEffect(()=>{
     if(debug) console.log(filterState)
@@ -57,6 +58,7 @@ export default function PageFilterControls({
 
   if (pageState.mediaFile){
     const mediaLink = new BucketConfig().getGcsUrl(pageState.mediaFile.public_bucket_path);
+
     if (mediaLink)
       return(
         <>
@@ -142,6 +144,9 @@ export default function PageFilterControls({
                     required: false,
                   }}
                 />
+                <InputSeed label="Seed" onChange={
+                  (val:string)=>handleOnChange("seed", val)
+                }/>
               </div>
             </Accordion.Item>
             <Accordion.Item title={t("headings2")}>

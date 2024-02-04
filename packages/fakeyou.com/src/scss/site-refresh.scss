@@ -36,6 +36,20 @@ styles with important tags:
   .ratio-1x1 {
     aspect-ratio: 1/1;
   }
+  /* Chrome, Safari, Edge, Opera */
+  .numberInputNoArrows input::-webkit-outer-spin-button,
+  .numberInputNoArrows input::-webkit-inner-spin-button,
+  input.numberInputNoArrows::-webkit-outer-spin-button,
+  input.numberInputNoArrows::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  /* Firefox */
+  .numberInputNoArrows input[type=number],
+  input.numberInputNoArrows[type=number] {
+    -moz-appearance: textfield;
+  }
+  
   //-end--//
 
   ::-webkit-scrollbar-thumb {
