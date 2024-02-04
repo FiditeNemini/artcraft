@@ -133,7 +133,9 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             for model in &models.dependency_tokens.comfy {
                 let mut dep_path = model_dependencies.inference_command.mounts_directory.clone();
                 dep_path = dep_path.join(model.location.clone());
+                info!("Checking if path exists: {:?}", dep_path);
                 if !dep_path.exists() {
+                    warn!("Path does not exist: {:?}", dep_path);
                     download_file(model.url.clone(), dep_path.clone()).await.map_err(|e| ProcessSingleJobError::Other(e))?;
                     info!("Downloaded model to {:?}", dep_path);
                 }
