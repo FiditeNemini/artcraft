@@ -4,7 +4,6 @@ use std::time::Instant;
 
 use anyhow::anyhow;
 use log::{error, info, warn};
-use serde::de::Error;
 use serde_json::Value;
 use tokio::io::AsyncWriteExt;
 use walkdir::WalkDir;
@@ -16,6 +15,7 @@ use enums::by_table::generic_inference_jobs::inference_result_type::InferenceRes
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use filesys::check_file_exists::check_file_exists;
 use filesys::file_size::file_size;
+use filesys::path_to_string::path_to_string;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
@@ -29,7 +29,6 @@ use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_ui::comfy_ui_dependencies::ComfyDependencies;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
@@ -284,15 +283,25 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 false,
                 &deps.db.mysql_pool
             ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Input file not found")))?;
-            let bucket_details = RemoteCloudBucketDetails {
-                object_hash: retrieved_input_record.public_bucket_directory_hash,
-                prefix: retrieved_input_record.maybe_public_bucket_prefix.unwrap(),
-                suffix: retrieved_input_record.maybe_public_bucket_extension.clone().unwrap(),
-            };
-            // Download to "input.EXTENSION"
+
+            let media_file_bucket_path = MediaFileBucketPath::from_object_hash(
+                &retrieved_input_record.public_bucket_directory_hash,
+                retrieved_input_record.maybe_public_bucket_prefix.as_deref(),
+                retrieved_input_record.maybe_public_bucket_extension.as_deref());
+
             let input_filename = format!("input.{}", retrieved_input_record.maybe_public_bucket_extension.unwrap());
-            let input_path = input_dir.join(input_filename).to_str().unwrap().to_string();
-            remote_cloud_file_client.download_file(bucket_details, input_path.clone()).await?;
+            let input_path = path_to_string(input_dir.join(input_filename));
+
+            //let bucket_details = RemoteCloudBucketDetails {
+            //    object_hash: retrieved_input_record.public_bucket_directory_hash,
+            //    prefix: retrieved_input_record.maybe_public_bucket_prefix.unwrap(),
+            //    suffix: retrieved_input_record.maybe_public_bucket_extension.clone().unwrap(),
+            //};
+            //// Download to "input.EXTENSION"
+            //remote_cloud_file_client.download_file(bucket_details, input_path.clone()).await?;
+
+            remote_cloud_file_client.download_media_file(&media_file_bucket_path, input_path.clone()).await?;
+
             info!("Downloaded input file to {:?}", input_path);
             maybe_input_path = Some(input_path.parse().unwrap());
         }

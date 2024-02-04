@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 use errors::AnyhowResult;
 use filesys::file_read_bytes::file_read_bytes;
@@ -46,6 +47,14 @@ impl RemoteCloudFileClient {
         let is_public = file_descriptor.is_public();
 
         self.bucket_orchestration_client.download_file_to_disk(full_remote_cloud_file_path, to_system_file_path, is_public).await?;
+        Ok(())
+    }
+
+    pub async fn download_media_file(&self, media_file_path: &MediaFileBucketPath, to_system_file_path: String) -> AnyhowResult<()> {
+        const IS_PUBLIC: bool = true; // NB: Media files are always public
+        let full_remote_cloud_file_path = media_file_path.get_full_object_path_str().to_string();
+
+        self.bucket_orchestration_client.download_file_to_disk(full_remote_cloud_file_path, to_system_file_path, IS_PUBLIC).await?;
         Ok(())
     }
 
