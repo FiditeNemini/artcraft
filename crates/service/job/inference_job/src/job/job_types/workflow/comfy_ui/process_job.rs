@@ -167,14 +167,17 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     //};
     //remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
 
+    info!("Downloading workflow {:?}", &comfy_deps.workflow_bucket_path);
+    info!("Downloading workflow to {:?}", workflow_path);
+
     args.job_dependencies
         .buckets
         .public_bucket_client
         .download_file_to_disk(&comfy_deps.workflow_bucket_path, &workflow_path)
         .await
         .map_err(|err| {
-            error!("could not download VAE: {:?}", err);
-            ProcessSingleJobError::from_anyhow_error(anyhow!("could not download VAE: {:?}", err))
+            error!("could not download workflow: {:?}", err);
+            ProcessSingleJobError::from_anyhow_error(anyhow!("could not download workflow: {:?}", err))
         })?;
 
     let maybe_args = job.maybe_inference_args
