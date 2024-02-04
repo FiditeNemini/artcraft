@@ -324,16 +324,20 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     info!("Running ComfyUI inference...");
 
     // ==================== RUN INFERENCE SCRIPT ==================== //
+
     let stderr_output_file = work_temp_dir.path().join("stderr.txt");
     let stdout_output_file = work_temp_dir.path().join("stdout.txt");
 
     let inference_start_time = Instant::now();
+
+    let prompt_path = PathBuf::from(&workflow_path);
 
     let command_exit_status = model_dependencies
         .inference_command
         .execute_inference(InferenceArgs {
             stderr_output_file: &stderr_output_file,
             stdout_output_file: &stdout_output_file,
+            prompt_location: &prompt_path,
         });
 
     let inference_duration = Instant::now().duration_since(inference_start_time);

@@ -67,6 +67,7 @@ pub enum ExecutableOrCommand {
 pub struct InferenceArgs<'s> {
     pub stderr_output_file: &'s Path,
     pub stdout_output_file: &'s Path,
+    pub prompt_location: &'s Path,
 }
 
 impl ComfyInferenceCommand {
@@ -155,6 +156,10 @@ impl ComfyInferenceCommand {
                 command.push_str(" ");
             }
         }
+
+        command.push_str(" --prompt ");
+        command.push_str(&path_to_string(args.prompt_location));
+        command.push_str(" ");
 
         if let Some(docker_options) = self.maybe_docker_options.as_ref() {
             command = docker_options.to_command_string(&command);
