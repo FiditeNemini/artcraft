@@ -2293,6 +2293,50 @@ dependencies = [
 ]
 
 [[package]]
+name = "es-update-job"
+version = "0.0.1"
+dependencies = [
+ "actix_helpers",
+ "anyhow",
+ "bootstrap",
+ "chrono",
+ "concurrency",
+ "config",
+ "container_common",
+ "dotenv",
+ "easyenv",
+ "elasticsearch",
+ "elasticsearch_schema",
+ "enums",
+ "errors",
+ "filesys",
+ "hashing",
+ "hostname",
+ "jobs_common",
+ "log",
+ "media",
+ "memory_caching",
+ "mimetypes",
+ "my-workspace-hack",
+ "mysql_queries",
+ "once_cell",
+ "rand 0.8.5",
+ "redis_common",
+ "reusable_types",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "server_environment",
+ "sqlx",
+ "storyteller_root",
+ "subprocess",
+ "subprocess_common",
+ "testing",
+ "tokens",
+ "tokio",
+]
+
+[[package]]
 name = "etcetera"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

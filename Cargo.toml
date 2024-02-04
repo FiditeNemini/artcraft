@@ -73,6 +73,7 @@ members = [
   "crates/service/job/analytics_job",
   "crates/service/job/download_job",
   "crates/service/job/email_sender_job",
+  "crates/service/job/es-update-job",
   "crates/service/job/inference_job",
   "crates/service/job/tts_download_job",
   "crates/service/job/tts_inference_job",
