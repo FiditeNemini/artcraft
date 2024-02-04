@@ -289,7 +289,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 retrieved_input_record.maybe_public_bucket_prefix.as_deref(),
                 retrieved_input_record.maybe_public_bucket_extension.as_deref());
 
-            let input_filename = format!("input.{}", retrieved_input_record.maybe_public_bucket_extension.unwrap());
+            //let input_filename = format!("input.{}", retrieved_input_record.maybe_public_bucket_extension.unwrap());
+            let input_filename = "input.mp4".to_string();
             let input_path = path_to_string(input_dir.join(input_filename));
 
             //let bucket_details = RemoteCloudBucketDetails {
