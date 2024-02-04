@@ -1,25 +1,32 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, memo} from 'react';
 import {
   Input,
   SegmentButtons
 } from "components/common";
 
-export default function InputSeet({
+import generateRandomSeed from 'resources/generateRandomSeed';
+
+export default memo (function InputSeed({
   label,
+  initialValue : initialValueProps,
   onChange : onChangeCallback
 }:{
-  label:string
-  onChange: (newSeed: string)=>void
+  label:string;
+  initialValue?: string;
+  onChange: (newSeed: string)=>void;
 }){
-  function generateRandomSeed(){ 
-    return Math.floor(Math.random() * Math.pow(2, 32)).toString();
-  };
-
   const [inputType, setInputType] = useState<"random"|"custom">("random");
-  const [seedValue, setSeedValue] = useState<string>(generateRandomSeed());
+  const [seedValue, setSeedValue] = useState<string>(initialValueProps || "");
+  useEffect(()=>{
+    // console.log('should run only once when mount')
+    if (!initialValueProps && seedValue===""){
+      const newRandom = generateRandomSeed();
+      setSeedValue(newRandom);
+      onChangeCallback(newRandom);
+    }
+  },[initialValueProps, onChangeCallback, seedValue]);
 
   const handleInputTypeChange = (e:any) => {
-    console.log(typeof e);
     const newValue = e.target.value;
     if (newValue === "custom") {
       setInputType("custom");
@@ -30,8 +37,8 @@ export default function InputSeet({
       onChangeCallback(newRandom);
     }
   };
-  const handleSeedChange = (event: any) => {
-    const customSeed = event.target.value;
+  const handleSeedChange = (e: any) => {
+    const customSeed = e.target.value;
     setInputType("custom");
     setSeedValue(customSeed);
     onChangeCallback(customSeed);
@@ -64,4 +71,4 @@ export default function InputSeet({
       </div>
     </div>
   )
-}
+});

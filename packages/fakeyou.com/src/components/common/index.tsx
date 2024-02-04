@@ -14,6 +14,7 @@ import FileWrapper from "./FileWrapper";
 import FileLabel from "./FileLabel";
 import ImageInput from "./ImageInput";
 import Input from "./Input";
+import InputSeed from "./InputSeed";
 import Label from "./Label";
 import MocapInput from "./MocapInput";
 import Modal from "./Modal";
@@ -55,6 +56,7 @@ export {
   FileLabel,
   ImageInput,
   Input,
+  InputSeed,
   Label,
   MocapInput,
   Modal,
