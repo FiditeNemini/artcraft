@@ -61,6 +61,12 @@ impl RemoteCloudBucketDetails {
                     _ => panic!("Unknown suffix: {}",self.suffix)
                 }
             },
+            "upload" => {
+                match self.suffix.as_str() {
+                    "mp4" => Box::new(media_descriptor::UploadVideoMp4Descriptor {}),
+                    _ => panic!("Unknown suffix: {}",self.suffix)
+                }
+            },
             _ => panic!("Unknown prefix: {}", self.prefix)
         }
     }
