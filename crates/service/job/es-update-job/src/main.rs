@@ -56,6 +56,7 @@ async fn main() -> AnyhowResult<()> {
       between_job_batch_wait_millis: easyenv::get_env_num("BETWEEN_JOB_BATCH_WAIT_MILLIS", 500)?,
       between_query_wait_millis: easyenv::get_env_num("BETWEEN_QUERY_WAIT_MILLIS", 100)?,
       between_error_wait_millis: easyenv::get_env_num("BETWEEN_ERROR_WAIT_MILLIS", 10_000)?,
+      between_no_updates_wait_millis: easyenv::get_env_num("BETWEEN_NO_UPDATES_WAIT_MILLIS", 20_000)?,
     },
   };
 

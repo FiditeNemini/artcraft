@@ -21,4 +21,7 @@ pub struct SleepConfigs {
 
   // How long to wait between errors.
   pub between_error_wait_millis: u64,
+
+  // How long to wait between periods of NO-OPs / no updates.
+  pub between_no_updates_wait_millis: u64,
 }

@@ -46,11 +46,20 @@ pub async fn with_database_main_loop(updated_at_cursor: &mut DateTime<Utc>, job_
     let mut maybe_tokens =
         list_model_weight_tokens_updated_since(&mut *mysql_connection, &updated_at_cursor).await?;
 
+    if maybe_tokens.is_empty() {
+      info!("No records updated since {:?}", &updated_at_cursor);
+      std::thread::sleep(Duration::from_millis(job_state.sleep_config.between_no_updates_wait_millis));
+      continue;
+    }
+
     info!("Found {} updated records", maybe_tokens.len());
+
+    let mut last_observed_updated_at = updated_at_cursor.clone();
 
     while !maybe_tokens.is_empty() {
       // NB: This list might be very large if we query from (1) the epoch, or (2) there was a large series of updates
-      let drained_tokens = maybe_tokens.drain(0..50)
+      let last = 50.min(maybe_tokens.len());
+      let drained_tokens = maybe_tokens.drain(0..last)
           .into_iter()
           .map(|record| record.token)
           .collect::<Vec<_>>();
@@ -75,11 +84,18 @@ pub async fn with_database_main_loop(updated_at_cursor: &mut DateTime<Utc>, job_
 
         *updated_at_cursor = last_successful_update_at.max(*updated_at_cursor);
 
+        last_observed_updated_at = updated_at;
+
         std::thread::sleep(Duration::from_millis(job_state.sleep_config.between_es_writes_wait_millis));
       }
 
       std::thread::sleep(Duration::from_millis(job_state.sleep_config.between_job_batch_wait_millis));
     }
+
+    // NB: The last cursor math put us a second behind the current clock. Here we'll advance to the last record.
+    // NB: This technically could miss records if we're updating within the same second batch we read from, but that
+    // seems both unlikely and not worth solving at our present scale.
+    *updated_at_cursor = last_observed_updated_at.max(*updated_at_cursor);
 
     info!("Up to date at cursor = {:?}", &updated_at_cursor);
 

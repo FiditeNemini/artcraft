@@ -125,9 +125,9 @@ async fn list_model_weights<'e, 'c, E>(
         r#"
 SELECT
     w.id,
-    w.token
+    w.token,
 
-    w.creator_set_visibility
+    w.creator_set_visibility,
 
     w.weights_type,
     w.weights_category,
@@ -174,7 +174,7 @@ LEFT OUTER JOIN entity_stats
 LEFT OUTER JOIN media_files as cover_image
     ON cover_image.token = w.maybe_cover_image_media_file_token
 
-WHERE token IN (
+WHERE w.token IN (
         "#);
 
   // NB: Syntax will be wrong if list has zero length
