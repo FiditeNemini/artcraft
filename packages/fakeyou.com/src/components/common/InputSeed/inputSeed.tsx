@@ -1,4 +1,4 @@
-import React, {useState, useEffect, memo} from 'react';
+import React, {useState, useEffect, useCallback, memo} from 'react';
 import { useLocalize } from 'hooks';
 import {
   Input,
@@ -29,7 +29,7 @@ export default memo (function InputSeed({
     inputType: "random",
     seedValue: ""
   })
-  const setNewRandomSeed = (newType:"custom"|"random")=>{
+  const setNewRandomSeed = useCallback((newType:"custom"|"random")=>{
     const newRandom = generateRandomSeed();
     setState({
       firstLoad: true,
@@ -37,12 +37,12 @@ export default memo (function InputSeed({
       seedValue: newRandom
     });
     onChangeCallback(newRandom);
-  };
+  }, [onChangeCallback]);
   useEffect(()=>{
     if (!initialValueProps && !firstLoad){
       setNewRandomSeed("random");
     }
-  },[initialValueProps, setNewRandomSeed]);
+  },[initialValueProps, firstLoad, setNewRandomSeed]);
 
 
   const handleInputTypeChange = (e:any) => {
