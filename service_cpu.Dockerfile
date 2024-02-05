@@ -125,7 +125,13 @@ RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
   $HOME/.cargo/bin/cargo build \
   --release \
-  --bin email-sender-job
+  --bin email-sender-job \
+
+RUN SQLX_OFFLINE=true \
+  LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
+  $HOME/.cargo/bin/cargo build \
+  --release \
+  --bin es-update-job
 
 RUN SQLX_OFFLINE=true \
   LD_LIBRARY_PATH=/usr/lib:${LD_LIBRARY_PATH} \
@@ -171,6 +177,7 @@ COPY --from=builder /tmp/target/release/storyteller-web /
 COPY --from=builder /tmp/target/release/dummy-service /
 COPY --from=builder /tmp/target/release/analytics-job /
 COPY --from=builder /tmp/target/release/email-sender-job  /
+COPY --from=builder /tmp/target/release/es-update-job  /
 
 # Legacy apps:
 COPY --from=builder /tmp/target/release/tts-download-job /
