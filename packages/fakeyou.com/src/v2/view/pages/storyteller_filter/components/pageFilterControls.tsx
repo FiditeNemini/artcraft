@@ -1,11 +1,16 @@
-import React, {useState, useEffect} from "react";
-import { useParams } from "react-router-dom";
-
+import React, {useState} from "react";
+import { useParams, useHistory } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMedia } from "hooks";
+
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { EnqueueStorytellerFilter } from "@storyteller/components/src/api/storyteller_filter";
 import { states, Action, State } from "../storytellerFilterReducer";
 import {
   Accordion,
+  Button,
   BasicVideo,
   Checkbox,
   ErrorMessage,
@@ -15,13 +20,12 @@ import {
   Panel,
   SelectModal,
   Spinner,
-  TextAreaV2
+  TextArea
 } from "components/common";
-import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 
 export default function PageFilterControls({
-  debug=false, t, pageState, dispatchPageState
+  t, pageState, dispatchPageState
 }: {
   debug?: boolean;
   t: Function;
@@ -32,7 +36,6 @@ export default function PageFilterControls({
   useMedia({
     mediaToken: pageState.mediaFileToken || mediaToken,
     onSuccess: (res: any) => {
-      // ratings.gather({ res, key: "token" });
       dispatchPageState({
         type: 'loadFileSuccess',
         payload: {
@@ -44,6 +47,8 @@ export default function PageFilterControls({
   });
 
   const [filterState, setFilterState] = useState({
+    outputPath: "vid2vid/SparseUpscaleInterp_00001.mp4",
+    workflowConfig: "weight_q8sz47gmfw2zx02snrbz88ns9",
     seed: "",
     sdModelToken: "",
     loraModelToken: "",
@@ -58,14 +63,72 @@ export default function PageFilterControls({
     denoiseFaceDetailer: 0.45,
     useLCM: false,
     lcmCFG: 2,
-    lcmSteps: 8
+    lcmSteps: 8,
+    framesCap:16,
+    skipFrames:0,
+    nthFrames:2,
+    inputFps: 24,
+    interpolationMutiplier: 2,
+    cnTile: 0,
+    cnCanny: 0,
+    cnLinearAnime: 0,
+    cnLinearRealistic: 0,
+    cnDepth: 0,
+    cnOpenPose: 0,
+    cnPipeFace: 0,
+    cnSparse: 0.7,
   });
-  useEffect(()=>{
-    if(debug) console.log(filterState)
-  },[filterState, debug])
 
   const handleOnChange = (key: string, newValue:any,) => {
     setFilterState((curr)=>({...curr, [key]: newValue}));
+  }
+
+  const history = useHistory();
+  const handleGenerate = ()=>{
+    console.log("filterState:")
+    console.log(filterState)
+
+    const request = {
+      "uuid_idempotency_token": uuidv4(),
+      "maybe_sd_model": filterState.sdModelToken,
+      "maybe_workflow_config": filterState.workflowConfig,
+      "maybe_input_file": pageState.mediaFileToken || mediaToken,
+      "maybe_output_path": filterState.outputPath,
+      "maybe_json_modifications": {
+        "$.510.inputs.Text": filterState.posPrompt,
+        "$.8.inputs.text": filterState.negPrompt,
+        "$.173.inputs.seed": filterState.seed,
+        "$.401.inputs.Value": filterState.firstPass,
+        "$.918.inputs.Value": filterState.motionScale,
+        "$.137.inputs.Value": filterState.framesCap,
+        "$.186.inputs.Value": filterState.skipFrames,
+        "$.140.inputs.Value": filterState.nthFrames,
+        "$.154.inputs.Value": filterState.inputFps,
+        "$.445.inputs.number": filterState.interpolationMutiplier,
+        "$.947.inputs.Value": filterState.cnTile,
+        "$.800.inputs.Value": filterState.cnCanny,
+        "$.797.inputs.Value": filterState.cnLinearAnime,
+        "$.796.inputs.Value": filterState.cnLinearRealistic,
+        "$.772.inputs.Value": filterState.cnDepth,
+        "$.771.inputs.Value": filterState.cnOpenPose,
+        "$.527.inputs.Value": filterState.cnPipeFace,
+        "$.403.inputs.Value": filterState.cnSparse
+      },
+    }
+    EnqueueStorytellerFilter(request).then(res => {
+      if (res.success && res.inference_job_token) {
+        dispatchPageState({
+          type: 'enqueueFilterSuccess',
+          payload: {
+            inferenceJobToken: res.inference_job_token
+          }
+        })
+      }else{
+        console.log(res);
+      }
+    })
+    dispatchPageState({type: 'enqueueFilter'})
+    history.push("/storyteller-filter/jobs");
   }
 
   if (pageState.mediaFile){
@@ -76,7 +139,6 @@ export default function PageFilterControls({
         <>
           <Panel>
             <div className="row g-3 p-3">
-              {debug && <p>{`File Token: ${pageState.mediaFileToken}`}</p> }
               <div className="col-5">
                 <BasicVideo src={mediaLink} />
               </div>
@@ -143,22 +205,22 @@ export default function PageFilterControls({
               </div>
               <div className="row g-3 p-3">
                 <div className="col-md-6">
-                  <TextAreaV2
+                  <TextArea
                     {...{
                       label: "Prompt",
                       placeholder: "Enter a prompt",
-                      onChange: (val:string)=>handleOnChange("posPrompt", val),
+                      onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange("posPrompt", e.target.value),
                       value: filterState.posPrompt,
                       required: false,
                     }}
                   />
                 </div>
                 <div className="col-md-6">
-                  <TextAreaV2
+                  <TextArea
                     {...{
                       label: "Negative Prompt",
                       placeholder: "Enter Negative Prompt",
-                      onChange: (val:string)=>handleOnChange("negPrompt", val),
+                      onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange("negPrompt", e.target.value),
                       value: filterState.negPrompt,
                       required: false,
                     }}
@@ -176,9 +238,7 @@ export default function PageFilterControls({
               <div className="row g-3 p-3">
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                      min: 0.1,
-                      max: 1,
-                      step: 0.01,
+                      min: 0.1, max: 1, step: 0.01,
                       initialValue: filterState.firstPass,
                       label: " Denoise First Pass",
                       thumbTip: "Denoise First Pass",
@@ -187,9 +247,7 @@ export default function PageFilterControls({
                 </div>
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 0.1,
-                    max: 1,
-                    step: 0.01,
+                    min: 0.1, max: 1, step: 0.01,
                     initialValue: filterState.upscalePass,
                     label: "Denoise Upscale Pass",
                     thumbTip: "Denoise Upscale Pass",
@@ -200,9 +258,7 @@ export default function PageFilterControls({
               <div className="row g-3 p-3">
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 0.25,
-                    max: 2,
-                    step: 0.05,
+                    min: 0.25, max: 2, step: 0.05,
                     initialValue: filterState.motionScale,
                     label: "Motion Scale",
                     thumbTip: "Motion Scale",
@@ -211,9 +267,7 @@ export default function PageFilterControls({
                 </div>
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 1.5,
-                    max: 2,
-                    step: 0.5,
+                    min: 1.5, max: 2, step: 0.5,
                     initialValue: filterState.upscaleMultiplier,
                     label: "Upscale Multiplier",
                     thumbTip: "Upscale Multiplier",
@@ -243,9 +297,7 @@ export default function PageFilterControls({
                 </div>
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 0.1,
-                    max: 0.7,
-                    step: 0.01,
+                    min: 0.1, max: 0.7, step: 0.01,
                     initialValue: filterState.denoiseFaceDetailer,
                     label: "Denoise Face Detailer",
                     thumbTip: "Denoise Face Detailer",
@@ -263,9 +315,7 @@ export default function PageFilterControls({
               <div className="row g-3 p-3">
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 1,
-                    max: 10,
-                    step: 1,
+                    min: 1, max: 10, step: 1,
                     initialValue: filterState.lcmCFG,
                     label: "LCM CFG",
                     thumbTip: "LCM CFG",
@@ -274,9 +324,7 @@ export default function PageFilterControls({
                 </div>
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 5,
-                    max: 15,
-                    step: 1,
+                    min: 5, max: 15, step: 1,
                     initialValue: filterState.lcmSteps,
                     label: "LCM Steps",
                     thumbTip: "LCM Steps",
@@ -287,107 +335,82 @@ export default function PageFilterControls({
             </Accordion.Item>
             <Accordion.Item title="Control Nets" defaultOpen>
               <div className="row g-3 p-3">
-                <Checkbox 
-                  label="Use Control Nets" 
-                  checked={false}
-                  onChange={(e:{target:{ checked: boolean, name:string, type: string }})=>{
-                    console.log(`Use Control Nets: ${e.target.checked}`)
-                  }}
-                />
-              </div>
-              <div className="row g-3 p-3">
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 0,
-                    max: 1,
-                    step: 0.1,
-                    initialValue: 0,
+                    min: 0, max: 1, step: 0.1,
+                    initialValue: filterState.cnCanny,
                     label: "Canny",
                     thumbTip: "Canny",
-                    onChange: (val)=>{console.log(`Canny: ${val}`)}
+                    onChange: (val)=>{handleOnChange("cnCanny", val)}
                     }}/>
                 </div>
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 0,
-                    max: 1,
-                    step: 0.1,
-                    initialValue: 0,
+                    min: 0, max: 1, step: 0.1,
+                    initialValue: filterState.cnLinearAnime,
                     label: "Line Art Anime",
                     thumbTip: "Line Art Anime",
-                    onChange: (val)=>{console.log(`Line Art Anime: ${val}`)}
+                    onChange: (val)=>{handleOnChange("cnLinearAnime", val)}
                     }}/>
                 </div>
               </div>
               <div className="row g-3 p-3">
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 0,
-                    max: 1,
-                    step: 0.1,
-                    initialValue: 0,
+                    min: 0, max: 1, step: 0.1,
+                    initialValue: filterState.cnDepth,
                     label: "Depth",
                     thumbTip: "Depth",
-                    onChange: (val)=>{console.log(`Depth: ${val}`)}
+                    onChange: (val)=>{handleOnChange("cnDepth", val)}
                     }}/>
                 </div>
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 0,
-                    max: 1,
-                    step: 0.1,
-                    initialValue: 0,
+                    min: 0, max: 1, step: 0.1,
+                    initialValue: filterState.cnOpenPose,
                     label: "OpenPose",
                     thumbTip: "OpenPose",
-                    onChange: (val)=>{console.log(`OpenPose: ${val}`)}
+                    onChange: (val)=>{handleOnChange("cnOpenPose", val)}
                     }}/>
                 </div>
               </div>
               <div className="row g-3 p-3">
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 0,
-                    max: 1,
-                    step: 0.1,
-                    initialValue: 0,
+                    min: 0, max: 1, step: 0.1,
+                    initialValue: filterState.cnPipeFace,
                     label: "Media Pipe Face",
                     thumbTip: "Media Pipe Face",
-                    onChange: (val)=>{console.log(`Media Pipe Face: ${val}`)}
+                    onChange: (val)=>{handleOnChange("cnPipeFace", val)}
                     }}/>
                 </div>
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 0,
-                    max: 1,
-                    step: 0.1,
-                    initialValue: 0.7,
+                    min: 0, max: 1, step: 0.1,
+                    initialValue: filterState.cnSparse,
                     label: "Sparse Scribble",
                     thumbTip: "Sparse Scribble",
-                    onChange: (val)=>{console.log(`Sparse Scribble: ${val}`)}
+                    onChange: (val)=>{handleOnChange("cnSparse", val)}
                     }}/>
                 </div>
               </div>
               <div className="row g-3 p-3">
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 0,
-                    max: 1,
-                    step: 0.1,
-                    initialValue: 0.5,
-                    label: "Video CN",
+                    min: 0, max: 1, step: 0.1,
+                    initialValue: filterState.cnLinearRealistic,
+                    label: "Video CN (Linear Realistic)",
                     thumbTip: "Video CN",
-                    onChange: (val)=>{console.log(`Video CN: ${val}`)}
+                    onChange: (val)=>{handleOnChange("cnLinearRealistic", val)}
                     }}/>
                 </div>
                 <div className="col-md-6">
                   <NumberSliderV2 {...{
-                    min: 0,
-                    max: 1,
-                    step: 0.1,
-                    initialValue: 0,
+                    min: 0, max: 1, step: 0.1,
+                    initialValue: filterState.cnTile,
                     label: "Tile CN",
                     thumbTip: "Tile CN",
-                    onChange: (val)=>{console.log(`Tile CN: ${val}`)}
+                    onChange: (val)=>{handleOnChange("cnTile", val)}
                     }}/>
                 </div>
               </div>
@@ -414,7 +437,7 @@ export default function PageFilterControls({
                   <Input label="Every n-th Frame" />
                 </div>
                 <div className="col-md-6">
-                  <Input label="Input FPS" />
+                  <Input label="Input FPS" readOnly/>
                 </div>
               </div>
               <div className="row g-3 p-3">
@@ -426,12 +449,20 @@ export default function PageFilterControls({
               </div>
             </Accordion.Item>
           </Accordion>
+          <div className="row g-3 py-3">
+            <div className="col-12 d-flex justify-content-end">
+              <Button
+                label={t("Process Filter")}
+                onClick={handleGenerate}
+                variant="primary"
+              />
+            </div>
+          </div>
         </>
       );
   }else if (pageState.status <= states.FILE_LOADING){
     return (
       <Panel>
-        {debug && <p>{`File Token: ${pageState.mediaFileToken}`}</p> }
         <p>Loading Files</p>
         <Spinner />
       </Panel>

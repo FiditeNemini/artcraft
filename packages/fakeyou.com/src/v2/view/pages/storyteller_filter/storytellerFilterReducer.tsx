@@ -8,6 +8,8 @@ export enum states{
   FILE_UPLOADED,
   FILE_LOADING,
   FILE_LOADED,
+  FILTER_ENQUEUEING,
+  FILTER_ENQUEUED
 }
 
 export type State = {
@@ -27,6 +29,8 @@ export type Action =
   | {type: 'loadFileSuccess', payload:{
       mediaFileToken: string, mediaFile: MediaFile
     }}
+  | {type: 'enqueueFilter'}
+  | {type: 'enqueueFilterSuccess', payload: {inferenceJobToken: string|undefined}}
 
 
 export function reducer (state: State, action: Action): State {
@@ -59,6 +63,17 @@ export function reducer (state: State, action: Action): State {
         status: states.FILE_LOADED,
         mediaFile: action.payload.mediaFile,
         mediaFileToken : action.payload.mediaFileToken,
+      }
+    case 'enqueueFilter':
+      return {
+        ...state,
+        status: states.FILTER_ENQUEUEING
+      }
+    case 'enqueueFilterSuccess':
+      return {
+        ...state,
+        status: states.FILTER_ENQUEUED,
+        inferenceJobToken: action.payload.inferenceJobToken
       }
     default:
       return {status: states.NO_FILE};

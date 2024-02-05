@@ -2,6 +2,7 @@ import React from "react";
 import {Switch, Route, useRouteMatch, Redirect} from "react-router-dom";
 import PageFilterControls from "./components/pageFilterControls";
 import PageVideoProvision from "./components/pageVideoProvision";
+import PageJobList from "./components/pageJobList";
 import {State,Action} from "./storytellerFilterReducer";
 
 export default function SubRoutes ({
@@ -24,6 +25,9 @@ export default function SubRoutes ({
       </Route>
       <Route exact path={`${path}/select-media`}>
         <PageVideoProvision {...{debug, t, pageState, dispatchPageState}}/>
+      </Route>
+      <Route exact path={`${path}/jobs`}>
+        <PageJobList {...{debug, t, pageState, dispatchPageState}}/>
       </Route>
       <Route path={`${path}`}>
         <Redirect to={`${path}/upload`} />
