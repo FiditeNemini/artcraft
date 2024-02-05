@@ -16,12 +16,13 @@ use mysql_queries::queries::model_weights::list::list_model_weight_tokens_update
 use crate::job_state::JobState;
 
 pub async fn main_loop(job_state: JobState) {
-  let cursor = DateTime::UNIX_EPOCH;
+  // TODO(bt,2024-02-05): Write this cursor to Redis so job can resume without reindexing everything.
+  let mut cursor = DateTime::UNIX_EPOCH;
 
   loop {
     info!("Main loop; cursor @ {:?}", &cursor);
 
-    let result = with_database_main_loop(cursor, &job_state).await;
+    let result = with_database_main_loop(&mut cursor, &job_state).await;
 
     if let Err(err) = result {
       error!("Error in main loop: {:?}", err);
@@ -32,7 +33,9 @@ pub async fn main_loop(job_state: JobState) {
   }
 }
 
-pub async fn with_database_main_loop(mut updated_at_cursor: DateTime<Utc>, job_state: &JobState) -> AnyhowResult<()> {
+pub async fn with_database_main_loop(updated_at_cursor: &mut DateTime<Utc>, job_state: &JobState) -> AnyhowResult<()> {
+  info!("Acquiring MySQL connection...");
+
   let mut mysql_connection = job_state.mysql_pool.acquire().await?;
 
   let mut last_successful_update_at = updated_at_cursor.clone();
@@ -42,6 +45,8 @@ pub async fn with_database_main_loop(mut updated_at_cursor: DateTime<Utc>, job_s
 
     let mut maybe_tokens =
         list_model_weight_tokens_updated_since(&mut *mysql_connection, &updated_at_cursor).await?;
+
+    info!("Found {} updated records", maybe_tokens.len());
 
     while !maybe_tokens.is_empty() {
       // NB: This list might be very large if we query from (1) the epoch, or (2) there was a large series of updates
@@ -68,15 +73,17 @@ pub async fn with_database_main_loop(mut updated_at_cursor: DateTime<Utc>, job_s
           last_successful_update_at = cursor_at_least.max(last_successful_update_at);
         }
 
-        updated_at_cursor = last_successful_update_at.max(updated_at_cursor);
+        *updated_at_cursor = last_successful_update_at.max(*updated_at_cursor);
 
         std::thread::sleep(Duration::from_millis(job_state.sleep_config.between_es_writes_wait_millis));
       }
+
+      std::thread::sleep(Duration::from_millis(job_state.sleep_config.between_job_batch_wait_millis));
     }
 
     info!("Up to date at cursor = {:?}", &updated_at_cursor);
 
-    std::thread::sleep(Duration::from_millis(job_state.sleep_config.between_job_batch_wait_millis));
+    std::thread::sleep(Duration::from_millis(job_state.sleep_config.between_query_wait_millis));
   }
 }
 

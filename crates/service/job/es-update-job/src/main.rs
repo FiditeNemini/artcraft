@@ -52,8 +52,8 @@ async fn main() -> AnyhowResult<()> {
     mysql_pool,
     elasticsearch,
     sleep_config: SleepConfigs {
-      between_es_writes_wait_millis: easyenv::get_env_num("BETWEEN_JOB_WAIT_MILLIS", 100)?,
-      between_job_batch_wait_millis: easyenv::get_env_num("BETWEEN_JOB_BATCH_WAIT_MILLIS", 5000)?,
+      between_es_writes_wait_millis: easyenv::get_env_num("BETWEEN_WRITES_WAIT_MILLIS", 100)?,
+      between_job_batch_wait_millis: easyenv::get_env_num("BETWEEN_JOB_BATCH_WAIT_MILLIS", 500)?,
       between_query_wait_millis: easyenv::get_env_num("BETWEEN_QUERY_WAIT_MILLIS", 100)?,
       between_error_wait_millis: easyenv::get_env_num("BETWEEN_ERROR_WAIT_MILLIS", 10_000)?,
     },
