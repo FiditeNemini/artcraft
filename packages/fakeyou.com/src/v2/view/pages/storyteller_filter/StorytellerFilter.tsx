@@ -1,6 +1,6 @@
-import React, {useReducer } from 'react';
+import React, {useReducer, useEffect } from 'react';
 
-import { useLocalize } from "hooks";
+import { useInferenceJobs, useLocalize } from "hooks";
 import { FrontendInferenceJobType, InferenceJob } from '@storyteller/components/src/jobs/InferenceJob';
 
 import { Container } from "components/common";
@@ -23,6 +23,26 @@ export default function StorytellerFilter(props:{
   const [pageState, dispatchPageState] = useReducer(reducer, {
     status: NO_FILE,
   });
+
+  const { enqueueInferenceJob } = props;
+  useInferenceJobs(
+    FrontendInferenceJobType.StorytellerFilter
+  );
+  useEffect(() => {
+    if (
+      pageState.status === states.FILTER_ENQUEUED &&
+      pageState.inferenceJobToken
+    ) {
+      enqueueInferenceJob(
+        pageState.inferenceJobToken,
+        FrontendInferenceJobType.StorytellerFilter
+      );
+      dispatchPageState({
+        type: "enqueueFilterSuccess",
+        payload: { inferenceJobToken: undefined },
+      });
+    }
+  }, [pageState, enqueueInferenceJob]);
 
   return(
     <Container type="panel" className="mb-5">

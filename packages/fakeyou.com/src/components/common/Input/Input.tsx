@@ -5,14 +5,14 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: IconDefinition;
   label?: string;
-  textArea?: boolean;
+  // textArea?: boolean;
   className?: string;
 }
 
 export default function Input({
   label,
   icon,
-  textArea,
+  // textArea,
   className,
   ...rest
 }: InputProps) {

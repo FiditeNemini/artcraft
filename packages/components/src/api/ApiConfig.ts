@@ -496,6 +496,11 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/mocap/mocapnet/create`;
   }
 
+  // =============== Storyteller Filter ===============
+  enqueueStorytellerFilter(): string {
+    return `${this.getApiOrigin()}/v1/workflow/comfy/create`;
+  }
+
   // =============== Convert FBX to glTF ===============
   enqueueFbxToGltf(): string {
     return `${this.getApiOrigin()}/v1/conversion/enqueue_fbx_to_gltf`;
