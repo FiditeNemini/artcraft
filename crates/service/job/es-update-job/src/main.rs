@@ -1,0 +1,90 @@
+// Never allow these
+#![forbid(private_bounds)]
+#![forbid(private_interfaces)]
+#![forbid(unused_must_use)] // NB: It's unsafe to not close/check some things
+
+// Okay to toggle
+#![forbid(unreachable_patterns)]
+#![forbid(unused_imports)]
+#![forbid(unused_mut)]
+#![forbid(unused_variables)]
+
+// Always allow
+#![allow(dead_code)]
+#![allow(non_snake_case)]
+
+// Strict
+//#![forbid(warnings)]
+
+use elasticsearch::Elasticsearch;
+use elasticsearch::http::transport::Transport;
+use log::info;
+use sqlx::{MySql, Pool};
+use sqlx::mysql::MySqlPoolOptions;
+
+use bootstrap::bootstrap::{bootstrap, BootstrapArgs};
+use config::shared_constants::DEFAULT_MYSQL_CONNECTION_STRING;
+use config::shared_constants::DEFAULT_RUST_LOG;
+use errors::AnyhowResult;
+
+use crate::job_state::{JobState, SleepConfigs};
+use crate::main_loop::main_loop;
+
+pub mod job_state;
+pub mod main_loop;
+
+#[tokio::main]
+async fn main() -> AnyhowResult<()> {
+
+  let container_environment = bootstrap(BootstrapArgs {
+    app_name: "es-update-job",
+    default_logging_override: Some(DEFAULT_RUST_LOG),
+    config_search_directories: &[".", "./config", "crates/service/job/es-update-job/config"],
+  })?;
+
+  info!("Hostname: {}", &container_environment.hostname);
+
+  let mysql_pool = get_mysql_pool().await?;
+  let elasticsearch = get_elasticsearch_client()?;
+
+
+  let job_state = JobState {
+    mysql_pool,
+    elasticsearch,
+    sleep_config: SleepConfigs {
+      between_es_writes_wait_millis: easyenv::get_env_num("BETWEEN_WRITES_WAIT_MILLIS", 100)?,
+      between_job_batch_wait_millis: easyenv::get_env_num("BETWEEN_JOB_BATCH_WAIT_MILLIS", 500)?,
+      between_query_wait_millis: easyenv::get_env_num("BETWEEN_QUERY_WAIT_MILLIS", 100)?,
+      between_error_wait_millis: easyenv::get_env_num("BETWEEN_ERROR_WAIT_MILLIS", 10_000)?,
+      between_no_updates_wait_millis: easyenv::get_env_num("BETWEEN_NO_UPDATES_WAIT_MILLIS", 20_000)?,
+    },
+  };
+
+  let _r = main_loop(job_state).await;
+
+  Ok(())
+}
+
+async fn get_mysql_pool() -> AnyhowResult<Pool<MySql>> {
+  info!("Connecting to MySQL database...");
+
+  let db_connection_string =
+      easyenv::get_env_string_or_default(
+        "MYSQL_URL",
+        DEFAULT_MYSQL_CONNECTION_STRING);
+
+  let mysql_pool = MySqlPoolOptions::new()
+      .max_connections(5)
+      .connect(&db_connection_string)
+      .await?;
+
+  Ok(mysql_pool)
+}
+
+fn get_elasticsearch_client() -> AnyhowResult<Elasticsearch> {
+  info!("Connecting to Elasticsearch...");
+  let transport = Transport::single_node(&easyenv::get_env_string_required("ELASTICSEARCH_URL")?)?;
+
+  // TODO(bt,2023-10-26): Allow connecting to instances by URL instead of the default dev URL.
+  Ok(Elasticsearch::new(transport))
+}
