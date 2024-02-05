@@ -8,7 +8,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use log::{info, warn};
+use log::{error, info, warn};
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
@@ -19,6 +19,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
 use mysql_queries::payloads::generic_inference_args::mocap_payload::{MocapArgs, MocapVideoSource};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
+use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
@@ -26,6 +27,7 @@ use tokens::tokens::users::UserToken;
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.
@@ -154,6 +156,19 @@ pub async fn enqueue_mocapnet_handler(
         return Err(EnqueueMocapnetError::RateLimited);
     }
 
+    // ==================== HANDLE IDEMPOTENCY ==================== //
+
+    if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
+        return Err(EnqueueMocapnetError::BadInput(reason));
+    }
+
+    insert_idempotency_token(&request.uuid_idempotency_token, &mut *mysql_connection)
+        .await
+        .map_err(|err| {
+            error!("Error inserting idempotency token: {:?}", err);
+            EnqueueMocapnetError::BadInput("invalid idempotency token".to_string())
+        })?;
+
     // ==================== LOOK UP MODEL INFO ==================== //
 
     // TODO(bt): CHECK DATABASE FOR TOKENS!
@@ -208,7 +223,7 @@ pub async fn enqueue_mocapnet_handler(
         requires_keepalive: plan.mocapnet_requires_frontend_keepalive(),
         is_debug_request,
         maybe_routing_tag: maybe_routing_tag.as_deref(),
-        mysql_pool: &server_state.mysql_pool,
+        mysql_pool: &server_state.mysql_pool, // TODO(bt,2024-02-04): Reuse connection
     }).await;
 
     let job_token = match query_result {

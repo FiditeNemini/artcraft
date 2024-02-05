@@ -1,14 +1,15 @@
 // #![forbid(unused_imports)]
 #![forbid(unused_mut)]
-// #![forbid(unused_variables)]
-use log::info;
-use std::fmt::{ Display, Formatter };
+
+use std::fmt::{Display, Formatter};
 use std::fmt::Debug;
 use std::sync::Arc;
 
-use actix_web::{ HttpRequest, HttpResponse, web };
+use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+// #![forbid(unused_variables)]
+use log::error;
 use log::warn;
 use serde::Deserialize;
 use serde::Serialize;
@@ -29,6 +30,7 @@ use mysql_queries::queries::generic_inference::web::insert_generic_inference_job
     insert_generic_inference_job,
     InsertGenericInferenceArgs,
 };
+use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
@@ -36,6 +38,7 @@ use tokens::tokens::users::UserToken;
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.
@@ -314,6 +317,20 @@ pub async fn enqueue_image_generation_request(
     let ip_address = get_request_ip(&http_request);
 
     // Check the inference args to make sure everything is all there for upload loRA / model or standard inference
+
+
+    // ==================== HANDLE IDEMPOTENCY ==================== //
+
+    if let Err(reason) = validate_idempotency_token_format(&request.uuid_idempotency_token) {
+        return Err(EnqueueImageGenRequestError::BadInput(reason));
+    }
+
+    insert_idempotency_token(&request.uuid_idempotency_token, &mut *mysql_connection)
+        .await
+        .map_err(|err| {
+            error!("Error inserting idempotency token: {:?}", err);
+            EnqueueImageGenRequestError::BadInput("invalid idempotency token".to_string())
+        })?;
 
     // ==================== INFERENCE ARGS ==================== //
 
