@@ -172,6 +172,9 @@ CREATE TABLE model_weights (
   KEY index_weights_category (weights_category),
   KEY fk_creator_user_token (creator_user_token),
   KEY index_creator_set_visibility (creator_set_visibility),
-  KEY fk_maybe_cover_media_file_token (maybe_cover_image_media_file_token)
+  KEY fk_maybe_cover_media_file_token (maybe_cover_image_media_file_token),
+  KEY index_updated_at (updated_at),
+  KEY index_user_deleted_at (user_deleted_at),
+  KEY index_mod_deleted_at (user_deleted_at)
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
