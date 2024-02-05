@@ -10,8 +10,8 @@ pub struct JobState {
 
 /// Use sleep to not overload the database.
 pub struct SleepConfigs {
-  // How long to wait between individual "jobs".
-  pub between_job_wait_millis: u64,
+  // How long to wait between individual ES writes.
+  pub between_es_writes_wait_millis: u64,
 
   // How long to wait between individual job batches.
   pub between_job_batch_wait_millis: u64,
