@@ -9,6 +9,7 @@ pub mod generic_download;
 pub mod generic_inference;
 pub mod generic_synthetic_ids;
 pub mod health_check;
+pub mod idepotency_tokens;
 pub mod ip_bans;
 pub mod media_files;
 pub mod media_uploads;

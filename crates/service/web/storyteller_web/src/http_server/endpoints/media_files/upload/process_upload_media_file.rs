@@ -13,6 +13,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use media::decode_basic_audio_info::decode_basic_audio_bytes_info;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mimetypes::mimetype_to_extension::mimetype_to_extension;
+use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use mysql_queries::queries::media_files::create::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
 use tokens::tokens::media_files::MediaFileToken;
 
@@ -103,30 +104,20 @@ pub async fn process_upload_media_file(
   let uuid_idempotency_token = upload_media_request.uuid_idempotency_token
       .ok_or(MediaFileUploadError::BadInput("no uuid".to_string()))?;
 
-  // TODO(bt,2023-12-20): Generic table for this.
-  //let maybe_existing_upload =
-  //    get_media_upload_by_uuid_with_connection(&uuid_idempotency_token, &mut mysql_connection)
-  //        .await;
-
-  //match maybe_existing_upload {
-  //  Err(err) => {
-  //    error!("Error checking for previous upload: {:?}", err);
-  //    return Err(MediaFileUploadError::ServerError);
-  //  }
-  //  Ok(Some(upload)) => {
-  //    // File already uploaded and frontend didn't protect us.
-  //    return Ok(SuccessCase::MediaAlreadyUploaded {
-  //      existing_media_file_token: upload.token,
-  //    });
-  //  }
-  //  Ok(None) => {
-  //    // Proceed.
-  //  }
-  //}
+  // ==================== HANDLE IDEMPOTENCY ==================== //
 
   if let Err(reason) = validate_idempotency_token_format(&uuid_idempotency_token) {
     return Err(MediaFileUploadError::BadInput(reason));
   }
+
+  insert_idempotency_token(&uuid_idempotency_token, &mut *mysql_connection)
+      .await
+      .map_err(|err| {
+        error!("Error inserting idempotency token: {:?}", err);
+        MediaFileUploadError::BadInput("invalid idempotency token".to_string())
+      })?;
+
+  // ==================== PROCESS REQUEST ==================== //
 
   let creator_set_visibility = maybe_user_session
       .as_ref()
