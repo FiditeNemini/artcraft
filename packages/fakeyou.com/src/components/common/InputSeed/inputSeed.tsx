@@ -1,4 +1,5 @@
-import React, {useState, useEffect, memo} from 'react';
+import React, {useState, useEffect, useCallback, memo} from 'react';
+import { useLocalize } from 'hooks';
 import {
   Input,
   SegmentButtons
@@ -7,46 +8,67 @@ import {
 import generateRandomSeed from 'resources/generateRandomSeed';
 
 export default memo (function InputSeed({
+  t: tProps,
   label,
   initialValue : initialValueProps,
   onChange : onChangeCallback
 }:{
+  t?: Function
   label:string;
   initialValue?: string;
   onChange: (newSeed: string)=>void;
 }){
-  const [inputType, setInputType] = useState<"random"|"custom">("random");
-  const [seedValue, setSeedValue] = useState<string>(initialValueProps || "");
+  const {t:tHook} = useLocalize("SeedInput");
+  const t = tProps ? tProps : tHook;
+  const[{firstLoad, inputType, seedValue}, setState] = useState<{
+    firstLoad: boolean;
+    inputType: "random" | "custom";
+    seedValue: string;
+  }>({
+    firstLoad: false,
+    inputType: "random",
+    seedValue: ""
+  })
+  const setNewRandomSeed = useCallback((newType:"custom"|"random")=>{
+    const newRandom = generateRandomSeed();
+    setState({
+      firstLoad: true,
+      inputType: newType,
+      seedValue: newRandom
+    });
+    onChangeCallback(newRandom);
+  }, [onChangeCallback]);
   useEffect(()=>{
-    // console.log('should run only once when mount')
-    if (!initialValueProps && seedValue===""){
-      const newRandom = generateRandomSeed();
-      setSeedValue(newRandom);
-      onChangeCallback(newRandom);
+    if (!initialValueProps && !firstLoad){
+      setNewRandomSeed("random");
     }
-  },[initialValueProps, onChangeCallback, seedValue]);
+  },[initialValueProps, firstLoad, setNewRandomSeed]);
+
 
   const handleInputTypeChange = (e:any) => {
     const newValue = e.target.value;
     if (newValue === "custom") {
-      setInputType("custom");
+      setNewRandomSeed("custom");
     } else {
-      const newRandom = generateRandomSeed();
-      setInputType("random");
-      setSeedValue(newRandom);
-      onChangeCallback(newRandom);
+      setNewRandomSeed("random");
     }
   };
   const handleSeedChange = (e: any) => {
     const customSeed = e.target.value;
-    setInputType("custom");
-    setSeedValue(customSeed);
+    setState({
+      firstLoad: true,
+      inputType: "custom",
+      seedValue: customSeed
+    })
     onChangeCallback(customSeed);
   };
-
+  const handleOnBlur = () => {
+    if(inputType==="custom" && seedValue==="")
+      setNewRandomSeed(inputType);
+  }
   const seedOpts = [
-    { label: "Random", value: "random" },
-    { label: "Custom", value: "custom" },
+    { label: t("random"), value: "random" },
+    { label: t("custom"), value: "custom" },
   ];
 
   return(
@@ -55,7 +77,7 @@ export default memo (function InputSeed({
       <div className="d-flex gap-2 align-items-center">
         <SegmentButtons
           {...{
-            name: "seed",
+            name: t("seed"),
             onChange: handleInputTypeChange,
             options: seedOpts,
             value: inputType,
@@ -63,9 +85,10 @@ export default memo (function InputSeed({
         />
         <Input
           className="numberInputNoArrows"
-          placeholder="Random"
-          value={seedValue}
+          placeholder={t("randomPlaceholder")}
+          value={inputType === "custom" ? seedValue : ""}
           onChange={handleSeedChange}
+          onBlur={handleOnBlur}
           type="number"
         />
       </div>
