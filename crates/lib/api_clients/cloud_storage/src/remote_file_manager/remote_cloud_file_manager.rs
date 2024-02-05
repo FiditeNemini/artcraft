@@ -162,11 +162,11 @@ mod tests {
     #[tokio::test]
     async fn remote_file_manager_descriptor_test() {
         use super::*;
-        let remote_cloud_bucket_details = RemoteCloudBucketDetails::new("object_hash".to_string(), "loRA".to_string(), "safetensors".to_string());
+        let remote_cloud_bucket_details = RemoteCloudBucketDetails::new("object_hash".to_string(), "loRA_".to_string(), ".safetensors".to_string());
         let file_descriptor = remote_cloud_bucket_details.file_descriptor_from_bucket_details();
         
-        assert_eq!(file_descriptor.get_prefix(), "loRA");
-        assert_eq!(file_descriptor.get_suffix(), "safetensors");
+        assert_eq!(file_descriptor.get_prefix(), "loRA_");
+        assert_eq!(file_descriptor.get_suffix(), ".safetensors");
         assert_eq!(file_descriptor.is_public(), true);
 
     }
@@ -187,8 +187,8 @@ mod tests {
         println!("begin upload from file_path: {:?}", file_path);
         let details = RemoteCloudBucketDetails {
             object_hash: String::from("123"),
-            prefix: String::from("loRA"),
-            suffix: String::from("safetensors")
+            prefix: String::from("loRA_"),
+            suffix: String::from(".safetensors")
         };
         let result = remote_cloud_file_manager.download_file(details,file_path.to_string()).await;
         

@@ -10,11 +10,11 @@ impl FileDescriptor for MediaImagePngDescriptor {
         MEDIA_FILE_DIRECTORY
     }
     fn get_suffix(&self)->String {
-        "png".to_string()
+        ".png".to_string()
     }
 
     fn get_prefix(&self)->String {
-        "image".to_string()
+        "image_".to_string()
     }
 
     fn is_public(&self) -> bool {
@@ -28,11 +28,11 @@ impl FileDescriptor for MediaVideoMp4Descriptor {
         MEDIA_FILE_DIRECTORY
     }
     fn get_suffix(&self)->String {
-        "mp4".to_string()
+        ".mp4".to_string()
     }
 
     fn get_prefix(&self)->String {
-        "video".to_string()
+        "video_".to_string()
     }
 
     fn is_public(&self) -> bool {
@@ -46,11 +46,11 @@ impl FileDescriptor for UploadVideoMp4Descriptor {
         MEDIA_FILE_DIRECTORY
     }
     fn get_suffix(&self)->String {
-        "mp4".to_string()
+        ".mp4".to_string()
     }
 
     fn get_prefix(&self)->String {
-        "upload".to_string()
+        "upload_".to_string()
     }
 
     fn is_public(&self) -> bool {

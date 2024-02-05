@@ -10,13 +10,13 @@ impl FileDescriptor for WeightsLoRADescriptor {
     // this will be the type of file peroid is handled by the file formatter
     // e.g safetensors bin jpg
     fn get_suffix(&self)->String {
-       "safetensors".to_string()
+       ".safetensors".to_string()
     }
     // This will be the prefix of the media type or the weights type.
     // name of the weights or the name of the media type
     // vall-e_prompt, loRA, sd15, sdxl when implmenting add to the end 
     fn get_prefix(&self)->String {
-        "loRA".to_string()
+        "loRA_".to_string()
     }
 
     // This will be ensure that the right bucket is picked
@@ -35,13 +35,13 @@ impl FileDescriptor for WeightsSD15Descriptor {
     // this will be the type of file peroid is handled by the file formatter
     // e.g safetensors bin jpg
     fn get_suffix(&self)->String {
-       "safetensors".to_string()
+       ".safetensors".to_string()
     }
     // This will be the prefix of the media type or the weights type.
     // name of the weights or the name of the media type
     // vall-e_prompt, SD15, sd15, sdxl when implmenting add to the end 
     fn get_prefix(&self)->String {
-        "sd15".to_string()
+        "sd15_".to_string()
     }
 
     // This will be ensure that the right bucket is picked
@@ -59,13 +59,13 @@ impl FileDescriptor for WeightsSD15CkptDescriptor {
     // this will be the type of file peroid is handled by the file formatter
     // e.g safetensors bin jpg
     fn get_suffix(&self)->String {
-       "ckpt".to_string()
+       ".ckpt".to_string()
     }
     // This will be the prefix of the media type or the weights type.
     // name of the weights or the name of the media type
     // vall-e_prompt, SD15, sd15, sdxl when implmenting add to the end
     fn get_prefix(&self)->String {
-        "sd15".to_string()
+        "sd15_".to_string()
     }
 
     // This will be ensure that the right bucket is picked
@@ -84,13 +84,13 @@ impl FileDescriptor for WeightsSDXLDescriptor {
     // this will be the type of file peroid is handled by the file formatter
     // e.g safetensors bin jpg
     fn get_suffix(&self)->String {
-       "safetensors".to_string()
+       ".safetensors".to_string()
     }
     // This will be the prefix of the media type or the weights type.
     // name of the weights or the name of the media type
     // vall-e_prompt, SD15, sd15, sdxl when implmenting add to the end 
     fn get_prefix(&self)->String {
-        "sdxl".to_string()
+        "sdxl_".to_string()
     }
 
     // This will be ensure that the right bucket is picked
@@ -108,13 +108,13 @@ impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsS
     // this will be the type of file peroid is handled by the file formatter
     // e.g safetensors bin jpg
     fn get_suffix(&self)->String {
-        "safetensors".to_string()
+        ".safetensors".to_string()
     }
     // This will be the prefix of the media type or the weights type.
     // name of the weights or the name of the media type
     // vall-e_prompt, SD15, sd15, sdxl when implmenting add to the end
     fn get_prefix(&self)->String {
-        "svc".to_string()
+        "svc_".to_string()
     }
 
     // This will be ensure that the right bucket is picked
@@ -132,13 +132,13 @@ impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsR
     // this will be the type of file peroid is handled by the file formatter
     // e.g safetensors bin jpg
     fn get_suffix(&self)->String {
-        "pth".to_string()
+        ".pth".to_string()
     }
     // This will be the prefix of the media type or the weights type.
     // name of the weights or the name of the media type
     // vall-e_prompt, SD15, sd15, sdxl when implmenting add to the end
     fn get_prefix(&self)->String {
-        "rvc".to_string()
+        "rvc_".to_string()
     }
 
     // This will be ensure that the right bucket is picked
@@ -156,13 +156,13 @@ impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsR
     // this will be the type of file peroid is handled by the file formatter
     // e.g safetensors bin jpg
     fn get_suffix(&self)->String {
-        "index".to_string()
+        ".index".to_string()
     }
     // This will be the prefix of the media type or the weights type.
     // name of the weights or the name of the media type
     // vall-e_prompt, SD15, sd15, sdxl when implmenting add to the end
     fn get_prefix(&self)->String {
-        "rvc".to_string()
+        "rvc_".to_string()
     }
 
     // This will be ensure that the right bucket is picked
@@ -180,13 +180,13 @@ impl FileDescriptor for crate::remote_file_manager::weights_descriptor::WeightsV
     // this will be the type of file peroid is handled by the file formatter
     // e.g safetensors bin jpg
     fn get_suffix(&self)->String {
-        "safetensors".to_string()
+        ".safetensors".to_string()
     }
     // This will be the prefix of the media type or the weights type.
     // name of the weights or the name of the media type
     // vall-e_prompt, SD15, sd15, sdxl when implmenting add to the end
     fn get_prefix(&self)->String {
-        "valle_prompt".to_string()
+        "valle_prompt_".to_string()
     }
 
     // This will be ensure that the right bucket is picked
@@ -203,11 +203,11 @@ impl FileDescriptor for WeightsWorkflowDescriptor {
     }
 
     fn get_suffix(&self) -> String {
-        "json".to_string()
+        ".json".to_string()
     }
 
     fn get_prefix(&self) -> String {
-        "workflow".to_string()
+        "workflow_".to_string()
     }
 
     fn is_public(&self) -> bool {
