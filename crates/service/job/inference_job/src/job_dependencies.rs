@@ -4,7 +4,6 @@
 #![forbid(unused_variables)]
 
 use std::path::PathBuf;
-use  opentelemetry::metrics::Histogram;
 
 use r2d2_redis::r2d2;
 use r2d2_redis::RedisConnectionManager;
@@ -25,12 +24,10 @@ use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmen
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 
 use crate::job_specific_dependencies::JobSpecificDependencies;
+use crate::util::instrumentation::JobInstruments;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
-pub struct Instruments {
-  pub job_duration: Histogram<u64>
-}
 
 pub struct JobDependencies {
   /// Database dependencies.
@@ -49,7 +46,7 @@ pub struct JobDependencies {
   pub job: JobSystemDependencies,
 
   /// otel instruments
-  pub instruments: Instruments,
+  pub job_instruments: JobInstruments,
 }
 
 pub struct JobSystemDependencies {

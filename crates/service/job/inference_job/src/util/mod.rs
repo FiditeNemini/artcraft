@@ -2,6 +2,8 @@ pub mod common_commands;
 pub mod file_cache_dir;
 pub mod from_env;
 pub mod maybe_download_file_from_bucket;
+pub mod instrumentation;
+
 #[macro_use]
 pub mod model_downloader;
 pub mod scoped_execution;

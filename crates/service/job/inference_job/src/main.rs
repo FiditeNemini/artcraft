@@ -54,8 +54,9 @@ use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use crate::http_server::run_http_server::CreateServerArgs;
 use crate::http_server::run_http_server::launch_http_server;
 use crate::job::job_loop::main_loop::main_loop;
-use crate::job_dependencies::{BucketDependencies, ClientDependencies, DatabaseDependencies, FileSystemDetails, Instruments, JobCaches, JobDependencies, JobInstanceInfo, JobSystemControls, JobSystemDependencies};
+use crate::job_dependencies::{BucketDependencies, ClientDependencies, DatabaseDependencies, FileSystemDetails, JobCaches, JobDependencies, JobInstanceInfo, JobSystemControls, JobSystemDependencies};
 use crate::job_specific_dependencies::JobSpecificDependencies;
+use crate::util::instrumentation::JobInstruments;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
@@ -103,13 +104,7 @@ async fn main() -> AnyhowResult<()> {
     warn!("Failed to initialize OpenTelemetry metrics pipeline, continuing execution: {}", e);
   }
 
-  // TODO: use constants?
   let meter = opentelemetry::global::meter("inference-job");
-  let job_duration = meter.u64_histogram("inference_job_duration")
-      .with_unit(Unit::new("milliseconds"))
-      // job type could be a label, and this instrument could be common for all jobs
-      .with_description("inference job duration")
-      .init();
 
   let container_environment = bootstrap(BootstrapArgs {
     app_name: "inference-job",
@@ -312,9 +307,7 @@ async fn main() -> AnyhowResult<()> {
       },
       job_specific_dependencies,
     },
-    instruments: Instruments {
-      job_duration,
-    },
+    job_instruments: JobInstruments::new_from_meter(meter),
   };
 
   set_up_directories(&job_dependencies)?;

@@ -234,6 +234,8 @@ async fn do_process_single_job(
 
   info!("Saved model record: {} - {}", job.id.0, &job.inference_job_token);
 
+  job_dependencies.job_instruments.inference_command_execution_duration.record(inference_duration.as_millis() as u64, &[]);
+
   // TODO(bt, 2023-01-11): Need to publish that the job finished.
   //  Publish the *correct type* of event.
   //job_dependencies.firehose_publisher.publish_generic_download_finished(
