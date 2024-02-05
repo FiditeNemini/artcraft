@@ -58,7 +58,7 @@
         "name": "user_deleted_at",
         "type_info": {
           "type": "Timestamp",
-          "flags": "BINARY",
+          "flags": "MULTIPLE_KEY | BINARY",
           "char_set": 63,
           "max_size": 19
         }
@@ -68,7 +68,7 @@
         "name": "mod_deleted_at",
         "type_info": {
           "type": "Timestamp",
-          "flags": "BINARY",
+          "flags": "MULTIPLE_KEY | BINARY",
           "char_set": 63,
           "max_size": 19
         }
