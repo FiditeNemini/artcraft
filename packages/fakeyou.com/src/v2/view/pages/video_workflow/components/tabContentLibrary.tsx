@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { states, Action, State } from "../videoWorkflowReducer";
 import { Button } from "components/common";
-import SelectModal from "components/common/SelectModal/SelectModal";
+import SelectModal, { SelectModalData } from "components/common/SelectModal/SelectModal";
 
 export default function TabContentLibrary({
   t, pageState, dispatchPageState
@@ -14,12 +14,17 @@ export default function TabContentLibrary({
   const handleProceed = ()=>{
     dispatchPageState({type: "loadFile"})
   }
-  const handleOnSelect = (data:{token:string, title:string})=>{
-    dispatchPageState({
-      type: "selectedFile",
-      payload: {mediaFileToken: data.token}
-    });
+  const handleOnSelect = (data:SelectModalData)=>{
+    if (data.token !== ""){
+      dispatchPageState({
+        type: "selectedFile",
+        payload: {mediaFileToken: data.token}
+      });
+    }else{
+      dispatchPageState({type: "clearedFile"});
+    };
   };
+
   return (
     <div className="row g-3">
       <div className="col-12">
@@ -27,11 +32,12 @@ export default function TabContentLibrary({
         modalTitle="Select a Video"
         label="Select a Video"
         onSelect={handleOnSelect}
+        value={{token: pageState.mediaFileToken || "", title: ""}}
         tabs={[
           {
             label: "All Videos",
             tabKey: "allVideos",
-            mediaTypeFilter: "video",
+            typeFilter: "video",
             searcher: false,
             type: "media",
           },

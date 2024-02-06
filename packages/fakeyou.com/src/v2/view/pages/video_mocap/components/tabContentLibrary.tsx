@@ -34,7 +34,7 @@ export default function TabContentLibrary({
           {
             label: "All Videos",
             tabKey: "allVideos",
-            mediaTypeFilter: "video",
+            typeFilter: "video",
             searcher: false,
             type: "media",
           },
