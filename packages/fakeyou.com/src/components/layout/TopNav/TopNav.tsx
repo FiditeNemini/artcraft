@@ -12,6 +12,7 @@ import { Link, useHistory } from "react-router-dom";
 import { WebUrl } from "common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
+import { useDomainConfig } from "context/DomainConfigContext";
 
 interface TopNavProps {
   sessionWrapper: SessionWrapper;
@@ -25,6 +26,7 @@ export default function TopNav({
   querySessionCallback,
   querySessionSubscriptionsCallback,
 }: TopNavProps) {
+  const domain = useDomainConfig();
   let history = useHistory();
   const [isMobileSearchBarVisible, setIsMobileSearchBarVisible] =
     useState(false);
@@ -181,14 +183,14 @@ export default function TopNav({
         <div className="topbar-nav-left">
           <Link to="/">
             <img
-              src="/fakeyou/FakeYou-Logo.png"
-              alt="FakeYou: Cartoon and Celebrity Text to Speech"
+              src={domain.logo}
+              alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
               height="34"
               className="mb-2 d-none d-lg-block"
             />
             <img
               src="/fakeyou/FakeYou-Logo-Mobile.png"
-              alt="FakeYou: Cartoon and Celebrity Text to Speech"
+              alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
               height="36"
               className="mb-0 d-block d-lg-none"
             />
