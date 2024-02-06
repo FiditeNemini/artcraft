@@ -1,0 +1,17 @@
+{
+  "button": {
+    "proceed": "Tiến tới Kiểm soát quy trình công việc",
+    "process": "Quy trình đến quy trình làm việc",
+    "select": "Lựa chọn",
+    "upload": "Tải video lên"
+  },
+  "headings": {
+    "title": "Quy trình làm việc video"
+  },
+  "tabTitle": {
+    "library": "Chọn từ phương tiện truyền thông",
+    "original": "Nguyên bản",
+    "preview": "Xem trước",
+    "upload": "Tải lên"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "button": {
+    "proceed": "워크플로 제어로 진행",
+    "process": "워크플로 프로세스",
+    "select": "선택하다",
+    "upload": "비디오 업로드"
+  },
+  "headings": {
+    "title": "비디오 워크플로우"
+  },
+  "tabTitle": {
+    "library": "미디어에서 선택",
+    "original": "원래의",
+    "preview": "시사",
+    "upload": "업로드"
+  }
+}
