@@ -402,84 +402,85 @@ function LandingPage(props: Props) {
             </Panel>
           </Container>
 
-          <Container type="panel" className="py-5">
-            <Panel padding={true} className="overflow-hidden">
-              <div className="d-flex flex-column align-items-center rounded-0 mb-5 mt-5 pt-3">
-                <div className="d-flex flex-column align-items-center text-center cta-container">
-                  <h2 className="fw-bold">AI Audio Generation</h2>
-                  <p className="mw-300 opacity-75">{t("ctaText")}</p>
-                  <div className="d-flex d-lg-none align-items-center mt-3 cta-mobile">
+          <div className="panel rounded-0 py-5 my-5">
+            <Container type="panel" className="py-lg-5">
+              <Panel clear={true}>
+                <div className="d-flex flex-column align-items-center rounded-0 mt-lg-4 pt-lg-4">
+                  <div className="d-flex flex-column align-items-center text-center cta-container">
+                    <h2 className="fw-bold">AI Audio Generation</h2>
+                    <p className="mw-300 opacity-75">{t("ctaText")}</p>
+                    <div className="d-flex d-lg-none align-items-center mt-2 cta-mobile">
+                      <img
+                        src="/images/landing/hanashi-before.webp"
+                        alt="hanashi before"
+                        width={200}
+                        height={200}
+                      />
+                      <img
+                        src="/images/landing/chevrons-red.webp"
+                        alt="red chevrons"
+                        width={95}
+                        height={80}
+                      />
+                      <img
+                        src="/images/landing/hanashi-after.webp"
+                        alt="hanashi after"
+                        width={200}
+                        height={200}
+                      />
+                    </div>
                     <img
                       src="/images/landing/hanashi-before.webp"
                       alt="hanashi before"
-                      width={200}
-                      height={200}
+                      className="hanashi-before d-none d-lg-block"
+                      width={311}
+                      height={311}
+                    />
+                    <img
+                      src="/images/landing/chevrons-grey.webp"
+                      alt="grey chevrons"
+                      className="chevrons-grey d-none d-lg-block"
+                      width={127}
+                      height={108}
                     />
                     <img
                       src="/images/landing/chevrons-red.webp"
                       alt="red chevrons"
-                      width={95}
-                      height={80}
+                      className="chevrons-red d-none d-lg-block"
+                      width={127}
+                      height={108}
                     />
                     <img
                       src="/images/landing/hanashi-after.webp"
                       alt="hanashi after"
-                      width={200}
-                      height={200}
+                      className="hanashi-after d-none d-lg-block"
+                      width={311}
+                      height={311}
                     />
                   </div>
-                  <img
-                    src="/images/landing/hanashi-before.webp"
-                    alt="hanashi before"
-                    className="hanashi-before d-none d-lg-block"
-                    width={311}
-                    height={311}
-                  />
-                  <img
-                    src="/images/landing/chevrons-grey.webp"
-                    alt="grey chevrons"
-                    className="chevrons-grey d-none d-lg-block"
-                    width={127}
-                    height={108}
-                  />
-                  <img
-                    src="/images/landing/chevrons-red.webp"
-                    alt="red chevrons"
-                    className="chevrons-red d-none d-lg-block"
-                    width={127}
-                    height={108}
-                  />
-                  <img
-                    src="/images/landing/hanashi-after.webp"
-                    alt="hanashi after"
-                    className="hanashi-after d-none d-lg-block"
-                    width={311}
-                    height={311}
-                  />
                 </div>
-              </div>
-
-              <div className="row gy-4 mt-lg-3">
-                <div className="col-12 col-md-6">
-                  <Panel padding={true} className="panel-inner rounded">
-                    <h4 className="fw-semibold mb-3">Text to Speech</h4>
-                    <div className="d-flex flex-column gap-3">
-                      <Select />
-                      <Input placeholder="Type what you want your character to say" />
-                    </div>
-                  </Panel>
+                <div className="row gy-4 mt-lg-3">
+                  <div className="col-12 col-md-6">
+                    <Panel padding={true} className="panel-inner rounded h-100">
+                      <h4 className="fw-semibold mb-3">Text to Speech</h4>
+                      <div className="d-flex flex-column gap-3">
+                        <Select />
+                        <Input placeholder="Type what you want your character to say" />
+                      </div>
+                    </Panel>
+                  </div>
+                  <div className="col-12 col-md-6">
+                    <Panel padding={true} className="panel-inner rounded h-100">
+                      <h4 className="fw-semibold mb-3">Voice to Voice</h4>
+                      <div className="d-flex flex-column gap-3">
+                        <Select />
+                      </div>
+                    </Panel>
+                  </div>
                 </div>
-                <div className="col-12 col-md-6">
-                  <Panel padding={true} className="panel-inner rounded">
-                    <h4 className="fw-semibold mb-3">Voice to Voice</h4>
-                    <div className="d-flex flex-column gap-3">
-                      <Select />
-                    </div>
-                  </Panel>
-                </div>
-              </div>
-            </Panel>
-          </Container>
+              </Panel>
+            </Container>
+          </div>
 
           <Container type="panel" className="pt-5 my-5">
             <Panel padding={true}>
