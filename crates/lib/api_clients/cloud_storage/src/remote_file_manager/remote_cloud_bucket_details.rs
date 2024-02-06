@@ -27,43 +27,44 @@ impl RemoteCloudBucketDetails {
         &self.suffix
     }
 
+    // this is not really useful for downloads remove...
     pub fn file_descriptor_from_bucket_details(&self) -> Box<dyn FileDescriptor> {
         match self.prefix.as_str() {
             // Weights
-            "loRA" => Box::new(weights_descriptor::WeightsLoRADescriptor {}),
-            "sd15" =>
+            "loRA_" => Box::new(weights_descriptor::WeightsLoRADescriptor {}),
+            "sd15_" =>
                 match self.suffix.as_str() {
-                    "safetensors" => Box::new(weights_descriptor::WeightsSD15Descriptor {}),
-                    "ckpt" => Box::new(weights_descriptor::WeightsSD15CkptDescriptor {}),
+                    ".safetensors" => Box::new(weights_descriptor::WeightsSD15Descriptor {}),
+                    ".ckpt" => Box::new(weights_descriptor::WeightsSD15CkptDescriptor {}),
                     _ => panic!("Unknown suffix: {}",self.suffix)
                 },
-            "sdxl" => Box::new(weights_descriptor::WeightsSDXLDescriptor {}),
-            "valle_prompt" => Box::new(weights_descriptor::WeightsVallePromptDescriptor {}),
-            "rvc" => {
+            "sdxl_" => Box::new(weights_descriptor::WeightsSDXLDescriptor {}),
+            "valle_prompt_" => Box::new(weights_descriptor::WeightsVallePromptDescriptor {}),
+            "rvc_" => {
                 match self.suffix.as_str() {
-                    "safetensors" => Box::new(weights_descriptor::WeightsRVCDescriptor {}),
-                    "index" => Box::new(weights_descriptor::WeightsRVCIndexDescriptor {}),
+                    ".safetensors" => Box::new(weights_descriptor::WeightsRVCDescriptor {}),
+                    ".index" => Box::new(weights_descriptor::WeightsRVCIndexDescriptor {}),
                     _ => panic!("Unknown suffix: {}",self.suffix)
                 }
             },
-            "svc" => Box::new(weights_descriptor::WeightsSVCDescriptor {}),
-            "workflow" => Box::new(weights_descriptor::WeightsWorkflowDescriptor {}),
+            "svc_" => Box::new(weights_descriptor::WeightsSVCDescriptor {}),
+            "workflow_" => Box::new(weights_descriptor::WeightsWorkflowDescriptor {}),
             // Media
-            "image" => {
+            "image_" => {
                 match self.suffix.as_str() {
-                    "png" => Box::new(media_descriptor::MediaImagePngDescriptor {}),
+                    ".png" => Box::new(media_descriptor::MediaImagePngDescriptor {}),
                     _ => panic!("Unknown suffix: {}",self.suffix)
                 }
             },
-            "video" => {
+            "video_" => {
                 match self.suffix.as_str() {
-                    "mp4" => Box::new(media_descriptor::MediaVideoMp4Descriptor {}),
+                    ".mp4" => Box::new(media_descriptor::MediaVideoMp4Descriptor {}),
                     _ => panic!("Unknown suffix: {}",self.suffix)
                 }
             },
-            "upload" => {
+            "upload_" => {
                 match self.suffix.as_str() {
-                    "mp4" => Box::new(media_descriptor::UploadVideoMp4Descriptor {}),
+                    ".mp4" => Box::new(media_descriptor::UploadVideoMp4Descriptor {}),
                     _ => panic!("Unknown suffix: {}",self.suffix)
                 }
             },

@@ -8,7 +8,7 @@ use errors::AnyhowResult;
 use crate::bucket_clients::get_bucket_clients;
 use crate::cli_args::parse_cli_args;
 use crate::seeding::model_weights::seed_weights;
-
+use crate::seeding::users::seed_user_accounts;
 pub mod bucket_clients;
 
 pub mod cli_args;
@@ -47,11 +47,11 @@ pub async fn main() -> AnyhowResult<()> {
 //    maybe_elasticsearch = Some(get_elasticsearch_client());
 //  }
 
-  // seed_user_accounts(&pool).await?;
+  //seed_user_accounts(&pool).await?;
   // seed_media_files(&pool, maybe_bucket_clients.as_ref()).await?;
   //seed_zero_shot_tts(&pool, maybe_bucket_clients.as_ref()).await?;
   // seed_voice_conversion(&pool).await?;
-  seed_weights(&pool).await?;
+  //seed_weights(&pool).await?;
   // seed_media_seedtool(&pool).await?;
   // seed_tts_tacotron2(&pool, maybe_bucket_clients.as_ref()).await?;
   
