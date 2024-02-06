@@ -14,7 +14,7 @@ import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocument
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import Container from "components/common/Container";
 import Panel from "components/common/Panel";
-import PageHeader from "components/layout/PageHeader";
+import { useDomainConfig } from "context/DomainConfigContext";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -25,7 +25,7 @@ interface Props {
 function LoginPage(props: Props) {
   let history = useHistory();
   PosthogClient.recordPageview();
-
+  const domain = useDomainConfig();
   const [password, setPassword] = useState("");
   const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -90,12 +90,12 @@ function LoginPage(props: Props) {
   }
 
   return (
-    <Container type="panel" className="login-panel">
-      <PageHeader
-        title="Login"
-        subText="Log into your account."
-        panel={false}
-      />
+    <Container
+      type="panel"
+      className="login-panel d-flex flex-column align-items-center"
+    >
+      <h2 className="fw-bold mb-0 mt-5 mb-4">Login to {domain.title}</h2>
+
       <Panel padding={true}>
         {errorWarning}
 
@@ -132,10 +132,16 @@ function LoginPage(props: Props) {
                   onChange={handlePasswordChange}
                 />
               </div>
-              <p className="d-flex flex-column flex-lg-row gap-2">
-                <Link to="/password-reset" className="text-link form-text">
+              <p className="d-flex flex-lg-row gap-2">
+                <Link
+                  to="/password-reset"
+                  className="text-link form-text flex-grow-1"
+                >
                   Forgot your password?
                 </Link>
+                <span className="form-text text-link">
+                  Don't have an account? <Link to="/signup">Sign up</Link>
+                </span>
               </p>
             </div>
           </div>

@@ -1,26 +1,21 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { Link } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import { useLocalize, useModal } from "hooks";
+import { useLocalize } from "hooks";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faStar,
-  faArrowRight,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import { WebUrl } from "../../../../common/WebUrl";
 import {
+  faCompass,
   faFileArrowUp,
   faFlask,
-  faSearch,
   faSparkles,
 } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
-import Alert from "components/common/Alert/Alert";
-import { Button, Container, Panel } from "components/common";
+// import Alert from "components/common/Alert/Alert";
+import { Button, Container, Modal, Panel } from "components/common";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -32,66 +27,65 @@ function LandingPage(props: Props) {
   PosthogClient.recordPageview();
   const { t } = useLocalize("LandingPage");
   const isLoggedIn = props.sessionWrapper.isLoggedIn();
-  const isSubscribed = props.sessionSubscriptionsWrapper.hasPaidFeatures();
+  // const isSubscribed = props.sessionSubscriptionsWrapper.hasPaidFeatures();
   // const [isFocused, setIsFocused] = useState(false);
-  const { open, close } = useModal();
 
-  let signUpButton = <></>;
-  let viewPricingButton = <></>;
-  let upgradeButton = <></>;
-  let myProfileButton = <></>;
+  // let signUpButton = <></>;
+  // let viewPricingButton = <></>;
+  // let upgradeButton = <></>;
+  // let myProfileButton = <></>;
   let uploadModelSection = <></>;
 
-  if (!isLoggedIn) {
-    signUpButton = (
-      <>
-        <Link
-          to="/signup"
-          // onClick={() => {
-          //   Analytics.ttsClickHeroSignup();
-          // }}
-        >
-          <button type="button" className="btn btn-primary w-100">
-            {t("heroButtonSignUp")}
-            <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
-          </button>
-        </Link>
-      </>
-    );
-    viewPricingButton = (
-      <>
-        <Link
-          to={WebUrl.pricingPageWithReferer("tts_hero_new")}
-          // onClick={() => {
-          //   Analytics.ttsClickHeroViewPricing();
-          // }}
-        >
-          <button type="button" className="btn btn-secondary w-100">
-            <FontAwesomeIcon icon={faStar} className="me-2" />
-            {t("heroButtonPricing")}
-          </button>
-        </Link>
-      </>
-    );
-  }
+  // if (!isLoggedIn) {
+  //   signUpButton = (
+  //     <>
+  //       <Link
+  //         to="/signup"
+  //         // onClick={() => {
+  //         //   Analytics.ttsClickHeroSignup();
+  //         // }}
+  //       >
+  //         <button type="button" className="btn btn-primary w-100">
+  //           {t("heroButtonSignUp")}
+  //           <FontAwesomeIcon icon={faArrowRight} className="ms-2" />
+  //         </button>
+  //       </Link>
+  //     </>
+  //   );
+  //   viewPricingButton = (
+  //     <>
+  //       <Link
+  //         to={WebUrl.pricingPageWithReferer("tts_hero_new")}
+  //         // onClick={() => {
+  //         //   Analytics.ttsClickHeroViewPricing();
+  //         // }}
+  //       >
+  //         <button type="button" className="btn btn-secondary w-100">
+  //           <FontAwesomeIcon icon={faStar} className="me-2" />
+  //           {t("heroButtonPricing")}
+  //         </button>
+  //       </Link>
+  //     </>
+  //   );
+  // }
   if (isLoggedIn) {
-    let displayName = props.sessionWrapper.getDisplayName() as string; // NB: If logged in, should be string
-    let url = WebUrl.userProfilePage(displayName);
-    myProfileButton = (
-      <>
-        <Link
-          to={url}
-          // onClick={() => {
-          //   Analytics.ttsClickHeroViewProfile();
-          // }}
-        >
-          <button type="button" className="btn btn-secondary w-100">
-            <FontAwesomeIcon icon={faUser} className="me-2" />
-            {t("heroButtonProfile")}
-          </button>
-        </Link>
-      </>
-    );
+    // let displayName = props.sessionWrapper.getDisplayName() as string; // NB: If logged in, should be string
+    // let url = WebUrl.userProfilePage(displayName);
+    // myProfileButton = (
+    //   <>
+    //     <Link
+    //       to={url}
+    //       // onClick={() => {
+    //       //   Analytics.ttsClickHeroViewProfile();
+    //       // }}
+    //     >
+    //       <button type="button" className="btn btn-secondary w-100">
+    //         <FontAwesomeIcon icon={faUser} className="me-2" />
+    //         {t("heroButtonProfile")}
+    //       </button>
+    //     </Link>
+    //   </>
+    // );
 
     uploadModelSection = (
       <>
@@ -121,41 +115,41 @@ function LandingPage(props: Props) {
       </>
     );
 
-    if (!isSubscribed) {
-      upgradeButton = (
-        <>
-          <Link
-            to={WebUrl.pricingPageWithReferer("tts_hero_user")}
-            // onClick={() => {
-            //   Analytics.ttsClickHeroUpgradePlan();
-            // }}
-          >
-            <button type="button" className="btn btn-primary w-100">
-              <FontAwesomeIcon icon={faStar} className="me-2" />
-              {t("heroButtonUpgradePlan")}
-            </button>
-          </Link>
-        </>
-      );
-    }
+    // if (!isSubscribed) {
+    //   upgradeButton = (
+    //     <>
+    //       <Link
+    //         to={WebUrl.pricingPageWithReferer("tts_hero_user")}
+    //         // onClick={() => {
+    //         //   Analytics.ttsClickHeroUpgradePlan();
+    //         // }}
+    //       >
+    //         <button type="button" className="btn btn-primary w-100">
+    //           <FontAwesomeIcon icon={faStar} className="me-2" />
+    //           {t("heroButtonUpgradePlan")}
+    //         </button>
+    //       </Link>
+    //     </>
+    //   );
+    // }
   }
 
-  const randomHeroImage = useMemo(() => {
-    const images = [
-      // Main Images:
-      "mascot/kitsune_pose2.webp",
-      // "mascot/may4th.webp",
-      // "mascot/halloween_1.webp",
-      // "mascot/halloween_2.webp",
-      // "mascot/halloween_3.webp",
-      // "mascot/xmas_1.webp",
-      // "mascot/xmas_2.webp",
-      // "mascot/xmas_3.webp",
-      // "mascot/xmas_4.webp",
-    ];
+  // const randomHeroImage = useMemo(() => {
+  //   const images = [
+  //     // Main Images:
+  //     "mascot/kitsune_pose2.webp",
+  //     // "mascot/may4th.webp",
+  //     // "mascot/halloween_1.webp",
+  //     // "mascot/halloween_2.webp",
+  //     // "mascot/halloween_3.webp",
+  //     // "mascot/xmas_1.webp",
+  //     // "mascot/xmas_2.webp",
+  //     // "mascot/xmas_3.webp",
+  //     // "mascot/xmas_4.webp",
+  //   ];
 
-    return images[Math.floor(Math.random() * images.length)];
-  }, []);
+  //   return images[Math.floor(Math.random() * images.length)];
+  // }, []);
 
   // const onFocusHandler = () => {
   //   setIsFocused(true);
@@ -386,18 +380,21 @@ function LandingPage(props: Props) {
                     icon={faArrowRight}
                     iconFlip={true}
                     label="Sign Up"
-                    to="/tts"
+                    to="/signup"
                   />
                   <Button
-                    icon={faSearch}
-                    label="Search for a weight model..."
+                    icon={faCompass}
+                    label="Explore"
                     variant="secondary"
-                    className="opacity-75 ps-3 pe-5 d-none d-lg-flex"
+                    to="/explore"
                   />
                 </div>
               </div>
             </div>
           </Panel>
+
+          <div className="section"> </div>
+          <div className="section"> </div>
 
           <div className="d-flex flex-column section align-items-center rounded-0 mb-5">
             <div className="d-flex flex-column align-items-center text-center cta-container">
@@ -489,6 +486,14 @@ function LandingPage(props: Props) {
           </div>
         </Container>
       )}
+
+      <Modal
+        title="Login to FakeYou"
+        show={false}
+        handleClose={function (): void {
+          throw new Error("Function not implemented.");
+        }}
+      />
     </>
   );
 }
