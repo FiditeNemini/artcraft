@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { states, Action, State } from "../storytellerFilterReducer";
+import { states, Action, State } from "../videoWorkflowReducer";
 import { Button } from "components/common";
 import SelectModal from "components/common/SelectModal/SelectModal";
 
@@ -21,7 +21,8 @@ export default function TabContentLibrary({
     });
   };
   return (
-    <div>
+    <div className="row g-3">
+      <div className="col-12">
       <SelectModal
         modalTitle="Select a Video"
         label="Select a Video"
@@ -36,13 +37,16 @@ export default function TabContentLibrary({
           },
         ]}
       />
+      </div>
       {pageState.status === states.FILE_SELECTED &&
-        <NavLink to={`load/${pageState.mediaFileToken}`}>
-          <Button 
-            label={t("button.proceed")}
-            onClick={handleProceed}
-          />
-        </NavLink>
+        <div className="col-12 d-flex justify-content-center mt-5">
+          <NavLink to={`load/${pageState.mediaFileToken}`}>
+            <Button 
+              label={t("button.proceed")}
+              onClick={handleProceed}
+            />
+          </NavLink>
+        </div>
       }
     </div>
   );
