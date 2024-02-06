@@ -7,7 +7,7 @@ import { useMedia } from "hooks";
 
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { EnqueueStorytellerFilter } from "@storyteller/components/src/api/storyteller_filter";
-import { states, Action, State } from "../storytellerFilterReducer";
+import { states, Action, State } from "../videoWorkflowReducer";
 import {
   Accordion,
   Button,
