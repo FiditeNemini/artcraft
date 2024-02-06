@@ -402,7 +402,7 @@ function LandingPage(props: Props) {
             </Panel>
           </Container>
 
-          <Container type="panel" className="mt-5">
+          <Container type="panel" className="py-5">
             <Panel padding={true} className="overflow-hidden">
               <div className="d-flex flex-column align-items-center rounded-0 mb-5 mt-5 pt-3">
                 <div className="d-flex flex-column align-items-center text-center cta-container">
@@ -459,7 +459,7 @@ function LandingPage(props: Props) {
                 </div>
               </div>
 
-              <div className="row gy-3 mt-lg-3">
+              <div className="row gy-4 mt-lg-3">
                 <div className="col-12 col-md-6">
                   <Panel padding={true} className="panel-inner rounded">
                     <h4 className="fw-semibold mb-3">Text to Speech</h4>
@@ -481,9 +481,9 @@ function LandingPage(props: Props) {
             </Panel>
           </Container>
 
-          <div className="section">
-            <div className="text-center community-container">
-              <div className="panel px-4 py-5 d-flex flex-column align-items-center community-container rounded">
+          <Container type="panel" className="pt-5 my-5">
+            <Panel padding={true}>
+              <div className="d-flex flex-column align-items-center py-5">
                 <h2 className="fw-bold mb-2">{t("communityTitle")}</h2>
                 <p className="opacity-75">{t("communityText")}</p>
                 <div className="d-flex mt-4 gap-3">
@@ -512,8 +512,8 @@ function LandingPage(props: Props) {
                 alt="background dots"
                 className="dots-left-bottom me-3"
               />
-            </div>
-          </div>
+            </Panel>
+          </Container>
         </>
       )}
 
