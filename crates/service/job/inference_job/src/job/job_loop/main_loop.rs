@@ -9,12 +9,16 @@ use jobs_common::noop_logger::NoOpLogger;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::{AvailableInferenceJob, list_available_generic_inference_jobs, ListAvailableGenericInferenceJobArgs};
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_completely_failed::mark_generic_inference_job_completely_failed;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_failure::mark_generic_inference_job_failure;
+use opentelemetry::metrics::AsyncInstrument;
 
+use crate::OTEL_METER_NAME;
 use crate::job::job_loop::clear_full_filesystem::clear_full_filesystem;
 use crate::job::job_loop::process_single_job::process_single_job;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
 use crate::job_dependencies::JobDependencies;
+
+use opentelemetry::{global as otel, KeyValue as OtelAttribute, metrics::Unit};
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;
@@ -61,6 +65,7 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
     }).await;
 
     let batch_query_duration = Instant::now().duration_since(batch_query_start_time);
+    job_dependencies.job_instruments.batch_query_duration.record(batch_query_duration.as_millis() as u64, &[]);
 
     if batch_query_duration > SLOW_BATCH_QUERY_NOTICE_DURATION {
       warn!("Batch query took duration: {:?}", &batch_query_duration);
@@ -91,9 +96,15 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
       continue;
     }
 
+    job_dependencies.job_instruments.batch_size.record(jobs.len() as u64, &[]);
     info!("Queried {} jobs from database", jobs.len());
 
+    let batch_processing_start_time = Instant::now();
+
     let batch_result = process_job_batch(&job_dependencies, jobs).await;
+
+    let batch_processing_duration = Instant::now().duration_since(batch_processing_start_time);
+    job_dependencies.job_instruments.batch_processing_duration.record(batch_processing_duration.as_millis() as u64, &[]);
 
     match batch_result {
       Ok(_) => {},
@@ -118,8 +129,13 @@ pub async fn main_loop(job_dependencies: JobDependencies) {
 
 async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<AvailableInferenceJob>) -> AnyhowResult<()> {
   let job_count = jobs.len();
+
   for (i, job) in jobs.into_iter().enumerate() {
+    job_dependencies.job_instruments.total_job_count.add(1, &[]);
+
+    let start_time = Instant::now();
     let result = process_single_job(job_dependencies, &job).await;
+
 
     match result {
       Ok(success_case) => {
@@ -134,6 +150,7 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
 
         if increment_success_count {
           let stats = job_dependencies.job.info.job_stats.increment_success_count().ok();
+          job_dependencies.job_instruments.job_success_count.add(1, &[]);
           warn!("Success stats: {:?}", stats);
         }
       },
@@ -145,6 +162,21 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
         let _r = handle_error(&job_dependencies, &job, err).await?;
       }
     }
+    let job_duration = Instant::now().duration_since(start_time);;
+
+    let model_type_str = match job.maybe_model_type {
+      Some(model_type) => model_type.to_string(),
+      None => "unknown".to_string(),
+    };
+
+    job_dependencies.job_instruments.job_duration.record(job_duration.as_millis() as u64,
+      &[
+        OtelAttribute::new("job_user_is_premium", job.is_from_premium_user),
+        OtelAttribute::new("job_model", model_type_str),
+        OtelAttribute::new("job_status", job.status.to_str()),
+        OtelAttribute::new("job_inference_category", job.inference_category.to_str()),
+      ]
+    );
   }
 
   Ok(())
@@ -255,6 +287,10 @@ async fn handle_error(job_dependencies: &&JobDependencies, job: &AvailableInfere
     let stats = job_dependencies.job.info.job_stats.increment_failure_count().ok();
     warn!("Failure stats: {:?}", stats);
   }
+
+  job_dependencies.job_instruments.job_failure_count.add(1, &[
+    OtelAttribute::new("job_failure_internal_reason", internal_failure_reason.clone()),
+  ]);
 
   match job_failure_class {
     JobFailureClass::PermanentFailure => {

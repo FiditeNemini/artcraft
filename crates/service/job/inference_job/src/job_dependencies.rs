@@ -24,8 +24,10 @@ use mysql_queries::common_inputs::container_environment_arg::ContainerEnvironmen
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 
 use crate::job_specific_dependencies::JobSpecificDependencies;
+use crate::util::instrumentation::JobInstruments;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
+
 
 pub struct JobDependencies {
   /// Database dependencies.
@@ -42,6 +44,9 @@ pub struct JobDependencies {
 
   /// Job controls, stats, etc.
   pub job: JobSystemDependencies,
+
+  /// otel instruments
+  pub job_instruments: JobInstruments,
 }
 
 pub struct JobSystemDependencies {

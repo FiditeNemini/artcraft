@@ -22,6 +22,11 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use log::{info, warn};
+use opentelemetry::{KeyValue};
+use opentelemetry::metrics::Unit;
+use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_sdk::metrics::reader::{DefaultAggregationSelector, DefaultTemporalitySelector};
+use opentelemetry_sdk::Resource;
 use r2d2_redis::r2d2;
 use r2d2_redis::RedisConnectionManager;
 use sqlx::mysql::MySqlPoolOptions;
@@ -51,6 +56,7 @@ use crate::http_server::run_http_server::launch_http_server;
 use crate::job::job_loop::main_loop::main_loop;
 use crate::job_dependencies::{BucketDependencies, ClientDependencies, DatabaseDependencies, FileSystemDetails, JobCaches, JobDependencies, JobInstanceInfo, JobSystemControls, JobSystemDependencies};
 use crate::job_specific_dependencies::JobSpecificDependencies;
+use crate::util::instrumentation::JobInstruments;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
@@ -72,9 +78,33 @@ const ENV_PUBLIC_BUCKET_NAME : &str = "PUBLIC_BUCKET_NAME";
 // HTTP sidecar
 const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &str = "TTS_INFERENCE_SIDECAR_HOSTNAME";
 
+const OTEL_METER_NAME: &str = "inference-job";
+
+// TODO@madhukar93: labels for model etc
+fn init_otel_metrics_pipeline() -> Result<(), opentelemetry::metrics::MetricsError>  {
+ let provider = opentelemetry_otlp::new_pipeline()
+     .metrics(opentelemetry_sdk::runtime::Tokio)
+     // TODO: 1. read host from env 2. Single pod of otel-collector is probably not good enough, run daemonset?
+     .with_exporter(opentelemetry_otlp::new_exporter().tonic().with_endpoint("http://adot-collector.adot-collector-kubeprometheus:4317"))
+     .with_resource(Resource::new(vec![KeyValue::new("service.name", "inference-job")]))
+     .with_period(Duration::from_secs(3))
+     .with_timeout(Duration::from_secs(10))
+     .with_aggregation_selector(DefaultAggregationSelector::new())
+     .with_temporality_selector(DefaultTemporalitySelector::new())
+     .build()?;
+  opentelemetry::global::set_meter_provider(provider);
+  Ok(())
+}
+
 //#[tokio::main]
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {
+
+  if let Err(e) = init_otel_metrics_pipeline() {
+    warn!("Failed to initialize OpenTelemetry metrics pipeline, continuing execution: {}", e);
+  }
+
+  let meter = opentelemetry::global::meter("inference-job");
 
   let container_environment = bootstrap(BootstrapArgs {
     app_name: "inference-job",
@@ -277,6 +307,7 @@ async fn main() -> AnyhowResult<()> {
       },
       job_specific_dependencies,
     },
+    job_instruments: JobInstruments::new_from_meter(meter),
   };
 
   set_up_directories(&job_dependencies)?;
