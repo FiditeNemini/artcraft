@@ -34,7 +34,13 @@
       "created_at" : { "type" : "date" },
       "updated_at" : { "type" : "date" },
       "user_deleted_at" : { "type" : "date" },
-      "mod_deleted_at" : { "type" : "date" }
+      "mod_deleted_at" : { "type" : "date" },
+
+      "is_deleted" : {
+        "type": "boolean",
+        "index": true
+      }
+
     }
   }
 }

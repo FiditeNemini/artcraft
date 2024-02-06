@@ -53,6 +53,8 @@ pub async fn create_all_model_weight_documents(mysql: &Pool<MySql>, elasticsearc
 async fn create_document_from_record(elasticsearch: &Elasticsearch, record: ModelWeightForElasticsearchRecord) -> AnyhowResult<()> {
   info!("Create record for {:?} - {:?}", record.token, record.title);
 
+  let is_deleted = record.user_deleted_at.is_some() || record.mod_deleted_at.is_some();
+
   let document = ModelWeightDocument {
     token: record.token,
 
@@ -93,6 +95,8 @@ async fn create_document_from_record(elasticsearch: &Elasticsearch, record: Mode
     updated_at: record.updated_at,
     user_deleted_at: record.user_deleted_at,
     mod_deleted_at: record.mod_deleted_at,
+
+    is_deleted,
   };
 
   let op : BulkOperation<_> = BulkOperation::index(&document)

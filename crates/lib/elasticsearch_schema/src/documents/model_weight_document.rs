@@ -58,6 +58,9 @@ pub struct ModelWeightDocument {
   pub updated_at: DateTime<Utc>,
   pub user_deleted_at: Option<DateTime<Utc>>,
   pub mod_deleted_at: Option<DateTime<Utc>>,
+
+  /// Calculated as "either user or mod deleted"
+  pub is_deleted: bool,
 }
 
 impl Document for ModelWeightDocument {
