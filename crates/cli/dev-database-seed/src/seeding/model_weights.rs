@@ -41,14 +41,14 @@ pub async fn test_seed_weights_files() -> AnyhowResult<()> {
 
     let bucket_details1 = RemoteCloudBucketDetails {
         object_hash: String::from("apa0ej6es8d3ss2gwtf1cghge35qn9tn"),
-        prefix: String::from("sd15"),
-        suffix: String::from("safetensors"),
+        prefix: String::from("sd15_"),
+        suffix: String::from(".safetensors"),
     };
 
     let bucket_details2 = RemoteCloudBucketDetails {
         object_hash: String::from("27kz11et18fargyyxbj66ntfn621k9d3"),
-        prefix: String::from("loRA"),
-        suffix: String::from("safetensors"),
+        prefix: String::from("loRA_"),
+        suffix: String::from(".safetensors"),
     };
 
     remote_cloud_file_client.download_file(bucket_details1, String::from("./checkpoint")).await?;
@@ -331,10 +331,6 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 // private_bucket_hash = format!("bucket_hash{}", i);
                 private_bucket_prefix = format!("_fake");
                 private_bucket_extension = format!("rvcV2");
-                //cached_user_ratings_total_count = i;
-                //cached_user_ratings_positive_count = i;
-                //cached_user_ratings_negative_count = i;
-                //cached_user_ratings_ratio = i as u32 / 100;
                 version = i as i32;
 
                 println!("Out of range");
@@ -836,8 +832,8 @@ pub async fn seed_weights_for_user_token(
             file_size_bytes: 1024,
             file_checksum_sha2: "checksum1".to_string(),
             public_bucket_hash: "bucket_hash1".to_string(),
-            maybe_public_bucket_prefix: Some("_fake".to_string()),
-            maybe_public_bucket_extension: Some("rvc".to_string()),
+            maybe_public_bucket_prefix: Some("rvc_".to_string()),
+            maybe_public_bucket_extension: Some(".pt".to_string()),
             //cached_user_ratings_total_count: 10,
             //cached_user_ratings_positive_count: 9,
             //cached_user_ratings_negative_count: 1,
@@ -1119,9 +1115,9 @@ pub async fn seed_weights(mysql_pool: &Pool<MySql>) -> AnyhowResult<()> {
     // original_seed_weights(mysql_pool,user_token).await?;
     // seed_weights_for_user_token(mysql_pool, user_token).await?;
     // seed_weights_for_paging(mysql_pool,user_token).await?;
-    // seed_weights_for_testing_inference(mysql_pool,user_token.clone()).await?;
+    seed_weights_for_testing_inference(mysql_pool,user_token.clone()).await?;
     // println!("TESTING DOWLOAD");
-    // test_seed_weights_files().await?;
-    seed_workflows_for_testing_inference(mysql_pool,user_token.clone()).await?;
+    //test_seed_weights_files().await?;
+    // seed_workflows_for_testing_inference(mysql_pool,user_token.clone()).await?;
     Ok(())
 }
