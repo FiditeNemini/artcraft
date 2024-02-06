@@ -6,8 +6,8 @@ import { FrontendInferenceJobType, InferenceJob } from '@storyteller/components/
 import { Container } from "components/common";
 import PageHeader from "components/layout/PageHeader";
 
-import { states, reducer } from "./storytellerFilterReducer";
-import SubRoutes from "./storytellerFilterRoutes";
+import { states, reducer } from "./videoWorkflowReducer";
+import SubRoutes from "./videoWorkflowRoutes";
 
 export default function StorytellerFilter(props:{
   enqueueInferenceJob: (

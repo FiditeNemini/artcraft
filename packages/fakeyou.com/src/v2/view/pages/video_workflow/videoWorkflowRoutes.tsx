@@ -1,9 +1,9 @@
 import React from "react";
 import {Switch, Route, useRouteMatch, Redirect} from "react-router-dom";
-import PageFilterControls from "./components/pageFilterControls";
+import PageWorkflowControls from "./components/pageWorkflowControls";
 import PageVideoProvision from "./components/pageVideoProvision";
 import PageJobList from "./components/pageJobList";
-import {State,Action} from "./storytellerFilterReducer";
+import {State,Action} from "./videoWorkflowReducer";
 
 export default function SubRoutes ({
   debug, t, pageState, dispatchPageState
@@ -14,20 +14,23 @@ export default function SubRoutes ({
   dispatchPageState: (action: Action) => void
 }){
   const { path } = useRouteMatch();
+  const commonPageProps = {
+    debug, parentPath: path, t, pageState, dispatchPageState
+  };
 
   return(
     <Switch>
       <Route exact path={`${path}/load/:mediaToken`} >
-        <PageFilterControls {...{debug, t, pageState, dispatchPageState}}/>
+        <PageWorkflowControls {...commonPageProps}/>
       </Route>
       <Route exact path={`${path}/upload`}>
-        <PageVideoProvision {...{debug, t, pageState, dispatchPageState}}/>
+        <PageVideoProvision {...commonPageProps}/>
       </Route>
       <Route exact path={`${path}/select-media`}>
-        <PageVideoProvision {...{debug, t, pageState, dispatchPageState}}/>
+        <PageVideoProvision {...commonPageProps}/>
       </Route>
       <Route exact path={`${path}/jobs`}>
-        <PageJobList {...{debug, t, pageState, dispatchPageState}}/>
+        <PageJobList {...commonPageProps}/>
       </Route>
       <Route path={`${path}`}>
         <Redirect to={`${path}/upload`} />
