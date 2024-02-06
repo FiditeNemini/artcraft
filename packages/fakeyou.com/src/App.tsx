@@ -210,6 +210,7 @@ function initInferenceJobsByCategoryMap(): Map<
   inferenceJobsByCategory.set(FrontendInferenceJobType.VideoMotionCapture, []);
   inferenceJobsByCategory.set(FrontendInferenceJobType.ImageGeneration, []);
   inferenceJobsByCategory.set(FrontendInferenceJobType.ConvertFbxtoGltf, []);
+  inferenceJobsByCategory.set(FrontendInferenceJobType.StorytellerFilter, [])
   return inferenceJobsByCategory;
 }
 

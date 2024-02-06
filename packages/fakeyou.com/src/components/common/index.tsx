@@ -14,6 +14,7 @@ import FileWrapper from "./FileWrapper";
 import FileLabel from "./FileLabel";
 import ImageInput from "./ImageInput";
 import Input from "./Input";
+import InputSeed from "./InputSeed";
 import Label from "./Label";
 import LikeButton from "./LikeButton";
 import MocapInput from "./MocapInput";
@@ -56,6 +57,7 @@ export {
   FileLabel,
   ImageInput,
   Input,
+  InputSeed,
   Label,
   LikeButton,
   MocapInput,
