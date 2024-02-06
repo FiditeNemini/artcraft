@@ -15,7 +15,14 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 // import Alert from "components/common/Alert/Alert";
-import { Button, Container, Modal, Panel } from "components/common";
+import {
+  Button,
+  Container,
+  Input,
+  Modal,
+  Panel,
+  Select,
+} from "components/common";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -345,114 +352,137 @@ function LandingPage(props: Props) {
           </Panel>
         </Container>
       ) : (
-        <Container type="panel" className="mt-5">
-          <Panel clear={true} className="py-lg-5">
-            <div className="row g-5 g-lg-5 flex-row-reverse">
-              <div className="col-12 col-md-6">
-                <div className="position-relative">
-                  <div className="ratio ratio-16x9 video-container">
-                    <video
-                      autoPlay={true}
-                      playsInline={true}
-                      loop={true}
-                      muted={true}
-                    >
-                      <source src="/videos/tts-video.mp4" type="video/mp4" />
-                    </video>
+        <>
+          <Container type="panel" className="py-5">
+            <Panel clear={true} className="py-lg-5">
+              <div className="row g-5 g-lg-5 flex-row-reverse">
+                <div className="col-12 col-md-6">
+                  <div className="position-relative">
+                    <div className="ratio ratio-16x9 video-container">
+                      <video
+                        autoPlay={true}
+                        playsInline={true}
+                        loop={true}
+                        muted={true}
+                      >
+                        <source src="/videos/tts-video.mp4" type="video/mp4" />
+                      </video>
+                    </div>
+                    <img
+                      src="/images/landing/bg-dots.webp"
+                      alt="background dots"
+                      className="dots-right-bottom"
+                    />
+                  </div>
+                </div>
+                <div className="col-12 col-md-6 d-flex flex-column justify-content-center text-center text-lg-start gap-2">
+                  <h1 className="fw-bold display-5">
+                    Enabling Anyone to Create Quality Movies with AI
+                  </h1>
+                  <p className="opacity-75">
+                    We are combining generative AI and User Generated Content to
+                    radically democratize both audio and video production.
+                  </p>
+                  <div className="d-flex mt-3 mt-lg-4 gap-3 justify-content-center justify-content-lg-start">
+                    <Button
+                      icon={faArrowRight}
+                      iconFlip={true}
+                      label="Sign Up"
+                      to="/signup"
+                    />
+                    <Button
+                      icon={faCompass}
+                      label="Explore"
+                      variant="secondary"
+                      to="/explore"
+                    />
+                  </div>
+                </div>
+              </div>
+            </Panel>
+          </Container>
+
+          <Container type="panel" className="mt-5">
+            <Panel padding={true} className="overflow-hidden">
+              <div className="d-flex flex-column align-items-center rounded-0 mb-5 mt-5 pt-3">
+                <div className="d-flex flex-column align-items-center text-center cta-container">
+                  <h2 className="fw-bold">AI Audio Generation</h2>
+                  <p className="mw-300 opacity-75">{t("ctaText")}</p>
+                  <div className="d-flex d-lg-none align-items-center mt-3 cta-mobile">
+                    <img
+                      src="/images/landing/hanashi-before.webp"
+                      alt="hanashi before"
+                      width={200}
+                      height={200}
+                    />
+                    <img
+                      src="/images/landing/chevrons-red.webp"
+                      alt="red chevrons"
+                      width={95}
+                      height={80}
+                    />
+                    <img
+                      src="/images/landing/hanashi-after.webp"
+                      alt="hanashi after"
+                      width={200}
+                      height={200}
+                    />
                   </div>
                   <img
-                    src="/images/landing/bg-dots.webp"
-                    alt="background dots"
-                    className="dots-right-bottom"
+                    src="/images/landing/hanashi-before.webp"
+                    alt="hanashi before"
+                    className="hanashi-before d-none d-lg-block"
+                    width={311}
+                    height={311}
+                  />
+                  <img
+                    src="/images/landing/chevrons-grey.webp"
+                    alt="grey chevrons"
+                    className="chevrons-grey d-none d-lg-block"
+                    width={127}
+                    height={108}
+                  />
+                  <img
+                    src="/images/landing/chevrons-red.webp"
+                    alt="red chevrons"
+                    className="chevrons-red d-none d-lg-block"
+                    width={127}
+                    height={108}
+                  />
+                  <img
+                    src="/images/landing/hanashi-after.webp"
+                    alt="hanashi after"
+                    className="hanashi-after d-none d-lg-block"
+                    width={311}
+                    height={311}
                   />
                 </div>
               </div>
-              <div className="col-12 col-md-6 d-flex flex-column justify-content-center text-center text-lg-start gap-2">
-                <h1 className="fw-bold display-5">
-                  Enabling Anyone to Create Quality Movies with AI
-                </h1>
-                <p className="opacity-75">
-                  We are combining generative AI and User Generated Content to
-                  radically democratize both audio and video production.
-                </p>
-                <div className="d-flex mt-3 mt-lg-4 gap-3 justify-content-center justify-content-lg-start">
-                  <Button
-                    icon={faArrowRight}
-                    iconFlip={true}
-                    label="Sign Up"
-                    to="/signup"
-                  />
-                  <Button
-                    icon={faCompass}
-                    label="Explore"
-                    variant="secondary"
-                    to="/explore"
-                  />
+
+              <div className="row gy-3 mt-lg-3">
+                <div className="col-12 col-md-6">
+                  <Panel padding={true} className="panel-inner rounded">
+                    <h4 className="fw-semibold mb-3">Text to Speech</h4>
+                    <div className="d-flex flex-column gap-3">
+                      <Select />
+                      <Input placeholder="Type what you want your character to say" />
+                    </div>
+                  </Panel>
+                </div>
+                <div className="col-12 col-md-6">
+                  <Panel padding={true} className="panel-inner rounded">
+                    <h4 className="fw-semibold mb-3">Voice to Voice</h4>
+                    <div className="d-flex flex-column gap-3">
+                      <Select />
+                    </div>
+                  </Panel>
                 </div>
               </div>
-            </div>
-          </Panel>
+            </Panel>
+          </Container>
 
-          <div className="section"> </div>
-          <div className="section"> </div>
-
-          <div className="d-flex flex-column section align-items-center rounded-0 mb-5">
-            <div className="d-flex flex-column align-items-center text-center cta-container">
-              <div className="d-flex d-lg-none align-items-center mb-4 cta-mobile">
-                <img
-                  src="/images/landing/hanashi-before.webp"
-                  alt="hanashi before"
-                  width={200}
-                  height={200}
-                />
-                <img
-                  src="/images/landing/chevrons-red.webp"
-                  alt="red chevrons"
-                  width={95}
-                  height={80}
-                />
-                <img
-                  src="/images/landing/hanashi-after.webp"
-                  alt="hanashi after"
-                  width={200}
-                  height={200}
-                />
-              </div>
-              <h2 className="fw-bold">{t("ctaTitle")}</h2>
-              <p className="mw-300 opacity-75">{t("ctaText")}</p>
-              <img
-                src="/images/landing/hanashi-before.webp"
-                alt="hanashi before"
-                className="hanashi-before d-none d-lg-block"
-                width={311}
-                height={311}
-              />
-              <img
-                src="/images/landing/chevrons-grey.webp"
-                alt="grey chevrons"
-                className="chevrons-grey d-none d-lg-block"
-                width={127}
-                height={108}
-              />
-              <img
-                src="/images/landing/chevrons-red.webp"
-                alt="red chevrons"
-                className="chevrons-red d-none d-lg-block"
-                width={127}
-                height={108}
-              />
-              <img
-                src="/images/landing/hanashi-after.webp"
-                alt="hanashi after"
-                className="hanashi-after d-none d-lg-block"
-                width={311}
-                height={311}
-              />
-            </div>
-          </div>
-
-          <div className="py-4">
-            <div className="container text-center community-container">
+          <div className="section">
+            <div className="text-center community-container">
               <div className="panel px-4 py-5 d-flex flex-column align-items-center community-container rounded">
                 <h2 className="fw-bold mb-2">{t("communityTitle")}</h2>
                 <p className="opacity-75">{t("communityText")}</p>
@@ -484,7 +514,7 @@ function LandingPage(props: Props) {
               />
             </div>
           </div>
-        </Container>
+        </>
       )}
 
       <Modal

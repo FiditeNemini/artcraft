@@ -11,21 +11,21 @@ styles with important tags:
 //
 // Once the rollout is complete, this outer wrapper class can be removed.
 
-  @mixin panel {
-    background-color: $panel;
-    border-color: #ffffff12 !important;
-    border: 1px solid;
-    border-left: none;
-    border-right: none;
-    border-radius: 0px;
-    box-shadow:
-      0 0 0 1px rgba(0 0 0 / 16%),
-      0 70px 65px rgb(0 0 0 / 8%),
-      0 30px 30px rgb(0 0 0 / 7%),
-      0 15px 15px rgb(0 0 0 / 5%),
-      0 10px 8px rgb(0 0 0 / 3%),
-      0 4px 4px rgb(0 0 0 / 2%),
-      0 2px 2px rgb(0 0 0 / 1%) !important;
+@mixin panel {
+  background-color: $panel;
+  border-color: #ffffff12 !important;
+  border: 1px solid;
+  border-left: none;
+  border-right: none;
+  border-radius: 0px;
+  box-shadow:
+    0 0 0 1px rgba(0 0 0 / 16%),
+    0 70px 65px rgb(0 0 0 / 8%),
+    0 30px 30px rgb(0 0 0 / 7%),
+    0 15px 15px rgb(0 0 0 / 5%),
+    0 10px 8px rgb(0 0 0 / 3%),
+    0 4px 4px rgb(0 0 0 / 2%),
+    0 2px 2px rgb(0 0 0 / 1%) !important;
 }
 
 .fakeyou-refresh {
@@ -45,11 +45,11 @@ styles with important tags:
     margin: 0;
   }
   /* Firefox */
-  .numberInputNoArrows input[type=number],
-  input.numberInputNoArrows[type=number] {
+  .numberInputNoArrows input[type="number"],
+  input.numberInputNoArrows[type="number"] {
     -moz-appearance: textfield;
   }
-  
+
   //-end--//
 
   ::-webkit-scrollbar-thumb {
@@ -1373,15 +1373,15 @@ styles with important tags:
 
     .hanashi-before {
       position: absolute;
-      top: -35%;
-      left: -140%;
+      top: -80%;
+      left: -150%;
       pointer-events: none;
     }
 
     .hanashi-after {
       position: absolute;
-      top: -35%;
-      right: -140%;
+      top: -80%;
+      right: -150%;
       pointer-events: none;
     }
   }
@@ -1696,8 +1696,8 @@ textarea {
     }
 
     .section {
-      padding-top: 7rem;
-      padding-bottom: 7rem;
+      padding-top: 6rem;
+      padding-bottom: 6rem;
     }
   }
 }
