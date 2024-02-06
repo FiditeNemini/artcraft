@@ -45,7 +45,7 @@ const SelectModal = memo(
     const [weightType, setWeightType] = useState(
       tabs[0].weightTypeFilter || "all"
     );
-
+console.log("🔫", tabs, activeTab, weightType);
     // Update mediaType when activeTab changes
     useEffect(() => {
       const currentTab = tabs.find(tab => tab.tabKey === activeTab);

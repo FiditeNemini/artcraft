@@ -163,14 +163,14 @@ export default function PageFilterControls({
                     {
                       label: "All Weights",
                       tabKey: "allWeights",
-                      weightTypeFilter: "sdxl",
+                      weightTypeFilter: "sd_1.5",
                       searcher: true,
                       type: "weights",
                     },
                     {
                       label: "Bookmarked",
                       tabKey: "bookmarkedWeights",
-                      weightTypeFilter: "sdxl",
+                      weightTypeFilter: "sd_1.5",
                       searcher: false,
                       type: "weights",
                     },

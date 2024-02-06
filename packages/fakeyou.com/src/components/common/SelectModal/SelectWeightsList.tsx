@@ -81,7 +81,7 @@ export default function SelectWeightsList({
                       key,
                     }}
                   >
-                    <WeightsCards {...{ type: data.weights_type, props }} />
+                    <WeightsCards {...{ type: data.weight_category, props }} />
                   </div>
                 );
               })}
