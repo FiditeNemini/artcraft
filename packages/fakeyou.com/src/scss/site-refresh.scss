@@ -360,7 +360,7 @@ styles with important tags:
     }
 
     .panel-inner {
-      background-color: lighten($panel, 4%);
+      background-color: $panel-inner;
     }
 
     .panel-tts-results {
