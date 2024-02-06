@@ -22,6 +22,10 @@ CREATE TABLE users (
   -- The role assigned to the user confers permissions.
   user_role_slug VARCHAR(16) NOT NULL,
 
+  -- Rollout flag for Storyteller Studio
+  -- Default to false until rollout is 100%, then remove the column.
+  can_access_studio BOOLEAN NOT NULL DEFAULT false,
+
   -- ========== PREMIUM FEATURES ==========
 
   -- If the user has a Stripe subscription (or has had one), we link it to the user here.
@@ -171,6 +175,7 @@ CREATE TABLE users (
   UNIQUE KEY (username),
   UNIQUE KEY (email_address),
   KEY fk_user_role_slug (user_role_slug),
+  KEY index_can_access_studio (can_access_studio),
   KEY fk_maybe_avatar_media_file_token (maybe_avatar_media_file_token),
   KEY fk_maybe_cover_media_file_token (maybe_cover_media_file_token)
 
