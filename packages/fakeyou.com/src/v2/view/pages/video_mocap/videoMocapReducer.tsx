@@ -1,10 +1,11 @@
 
 export enum states{
   NO_FILE,
+  FILE_SELECTED,
+  FILE_SELECTED_PROCEED,
   FILE_STAGED,
   FILE_UPLOADING,
   FILE_UPLOADED,
-  FILE_SELECTED,
   MOCAPNET_ENQUEUEING,
   MOCAPNET_ENQUEUED,
 }
@@ -20,6 +21,7 @@ export type Action =
   | {type: 'stagedFile'}
   | {type: 'clearedFile'}
   | {type: 'selectedFile', payload:{ mediaFileToken: string}}
+  | {type: 'proceedSelectedFile'}
   | {type: 'uploadFile'}
   | {type: 'uploadFileSuccess', payload:{ mediaFileToken: string}}
   | {type: 'enqueueMocapNet'}
@@ -32,13 +34,19 @@ export function reducer (state: State, action: Action): State {
     case 'stagedFile':
       return {...state, status: states.FILE_STAGED}
     case 'clearedFile':
-      return {...state, status: states.NO_FILE}
+      return {
+        ...state,
+        status: states.NO_FILE,
+        mediaFileToken: undefined
+      }
     case 'selectedFile':
       return {
         ...state,
         status: states.FILE_SELECTED,
         mediaFileToken: action.payload.mediaFileToken
       } 
+    case 'proceedSelectedFile':
+      return {...state, status: states.FILE_SELECTED_PROCEED } 
     case 'uploadFile':
       return {...state,status: states.FILE_UPLOADING};
     case 'uploadFileSuccess':

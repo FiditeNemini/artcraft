@@ -28,21 +28,21 @@ export default function TabContentLibrary({
   return (
     <div className="row g-3">
       <div className="col-12">
-      <SelectModal
-        modalTitle="Select a Video"
-        label="Select a Video"
-        onSelect={handleOnSelect}
-        value={{token: pageState.mediaFileToken || "", title: ""}}
-        tabs={[
-          {
-            label: "All Videos",
-            tabKey: "allVideos",
-            typeFilter: "video",
-            searcher: false,
-            type: "media",
-          },
-        ]}
-      />
+        <SelectModal
+          modalTitle="Select a Video"
+          label="Select a Video"
+          onSelect={handleOnSelect}
+          value={{token: pageState.mediaFileToken || "", title: ""}}
+          tabs={[
+            {
+              label: "All Videos",
+              tabKey: "allVideos",
+              typeFilter: "video",
+              searcher: false,
+              type: "media",
+            },
+          ]}
+        />
       </div>
       {pageState.status === states.FILE_SELECTED &&
         <div className="col-12 d-flex justify-content-center mt-5">
