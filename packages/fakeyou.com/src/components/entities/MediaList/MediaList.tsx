@@ -2,13 +2,9 @@ import React, { useRef } from "react";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 // import MediaCards from "components/common/Card/MediaCards";
-import AudioCard from "components/common/Card/AudioCard";
-import ImageCard from "components/common/Card/ImageCard";
-import VideoCard from "components/common/Card/VideoCard";
-import { BvhCard, CardWrapper } from "components/entities";
-
-import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome"; // for now
-import { faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
+// import AudioCard from "components/common/Card/AudioCard";
+import { ImagePreview, MocapPreview, VideoPreview } from '../CardPreviews';
+import { AudioCard, OverlayCard, CardWrapper } from "components/entities";
 
 interface MediaCardsProps {
   props: any,
@@ -20,18 +16,16 @@ interface Props {
   success?: boolean
 }
 
-const MocapPreview = () => <Icon {...{ className: "card-img", icon: faPersonWalking }}/>;
-
 const MediaCards = ({ props, type }: MediaCardsProps) => {
   switch (type) {
     case "audio":
-      return <AudioCard {...props} />;
+      return <CardWrapper {...{ ...props, card: AudioCard, padding: true }}/>;
     case "image":
-      return <ImageCard {...props} />;
+      return <CardWrapper {...{ ...props, card: OverlayCard, preview: ImagePreview }}/>;
     case "video":
-      return <VideoCard {...props} />;
+      return <CardWrapper {...{ ...props, card: OverlayCard, preview: VideoPreview }}/>;
     case "bvh":
-      return <CardWrapper {...{ ...props, card: BvhCard, preview: MocapPreview }}/>
+      return <CardWrapper {...{ ...props, card: OverlayCard, preview: MocapPreview }}/>;
     default:
       return <div>Unsupported media type</div>;
   }
