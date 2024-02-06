@@ -12,6 +12,7 @@ import {
   faFileArrowUp,
   faFlask,
   faSparkles,
+  faTrashAlt,
 } from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 // import Alert from "components/common/Alert/Alert";
@@ -466,6 +467,18 @@ function LandingPage(props: Props) {
                       <div className="d-flex flex-column gap-3">
                         <Select />
                         <Input placeholder="Type what you want your character to say" />
+                        <div className="d-flex gap-2 justify-content-end">
+                          <Button
+                            label="Clear"
+                            icon={faTrashAlt}
+                            variant="danger"
+                          />
+                          <Button
+                            label="Generate"
+                            icon={faArrowRight}
+                            iconFlip={true}
+                          />
+                        </div>
                       </div>
                     </Panel>
                   </div>
@@ -474,6 +487,18 @@ function LandingPage(props: Props) {
                       <h4 className="fw-semibold mb-3">Voice to Voice</h4>
                       <div className="d-flex flex-column gap-3">
                         <Select />
+                        <div className="d-flex gap-2 justify-content-end">
+                          <Button
+                            label="Clear"
+                            icon={faTrashAlt}
+                            variant="danger"
+                          />
+                          <Button
+                            label="Generate"
+                            icon={faArrowRight}
+                            iconFlip={true}
+                          />
+                        </div>
                       </div>
                     </Panel>
                   </div>
