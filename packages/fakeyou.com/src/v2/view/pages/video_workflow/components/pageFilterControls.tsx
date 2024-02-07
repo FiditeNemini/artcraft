@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMedia } from "hooks";
 
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { EnqueueStorytellerFilter } from "@storyteller/components/src/api/storyteller_filter";
+import { EnqueueVideoWorkflow } from "@storyteller/components/src/api/video_workflow";
 import { states, Action, State } from "../videoWorkflowReducer";
 import {
   Accordion,
@@ -24,12 +24,13 @@ import {
 } from "components/common";
 
 
-export default function PageFilterControls({
-  t, pageState, dispatchPageState
+export default function PageWorkflowControls({
+  t, pageState, dispatchPageState, parentPath
 }: {
   debug?: boolean;
   t: Function;
   pageState: State;
+  parentPath: string;
   dispatchPageState: (action: Action) => void;
 }) {
   const { mediaToken } = useParams<any>();
@@ -115,7 +116,7 @@ export default function PageFilterControls({
         "$.403.inputs.Value": filterState.cnSparse
       },
     }
-    EnqueueStorytellerFilter(request).then(res => {
+    EnqueueVideoWorkflow(request).then(res => {
       if (res.success && res.inference_job_token) {
         dispatchPageState({
           type: 'enqueueFilterSuccess',
@@ -128,7 +129,7 @@ export default function PageFilterControls({
       }
     })
     dispatchPageState({type: 'enqueueFilter'})
-    history.push("/storyteller-filter/jobs");
+    history.push(`${parentPath}/jobs`);
   }
 
   if (pageState.mediaFile){
