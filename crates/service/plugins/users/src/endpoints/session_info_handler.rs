@@ -41,6 +41,9 @@ pub struct UserInfo {
   pub display_name: String,
   pub email_gravatar_hash: String,
 
+  // Feature / rollout flags:
+  pub can_access_studio: bool,
+
   // Premium plans:
   pub fakeyou_plan: FakeYouPlan,
   pub storyteller_stream_plan: StorytellerStreamPlan,
@@ -142,6 +145,9 @@ pub async fn session_info_handler(
           username: session_data.username.to_string(),
           display_name: session_data.display_name.to_string(),
           email_gravatar_hash: session_data.email_gravatar_hash.to_string(),
+
+          // Rollout / feature flags:
+          can_access_studio: session_data.can_access_studio,
 
           // Premium plans:
           fakeyou_plan: FakeYouPlan::Free,
