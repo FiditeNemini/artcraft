@@ -846,7 +846,7 @@ class PageContainer extends React.Component<
                   </Route>
 
                   <Route path="/storyteller-filter">
-                    <StorytellerFilterPage
+                    <VideoWorkflowPage
                       {...{
                         enqueueInferenceJob: this.props.enqueueInferenceJob,
                         sessionSubscriptionsWrapper:
