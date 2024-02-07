@@ -108,7 +108,7 @@ import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
 import { FooterNav } from "./nav/FooterNav";
 import FbxToGltfPage from "./pages/fbx_to_gltf/FbxToGltfPage";
 import UploadLoraWeightPage from "./pages/upload/UploadLoraWeightPage";
-import StorytellerFilterPage from "./pages/storyteller_filter/StorytellerFilter";
+import VideoWorkflowPage from "./pages/video_workflow";
 import ScrollToTop from "./_common/ScrollToTop";
 import TextToImagePage from "./pages/text_to_image/TextToImagePage";
 import DomainConfigProvider from "context/DomainConfigContext";
