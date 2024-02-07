@@ -824,6 +824,7 @@ class PageContainer extends React.Component<
                       inferenceJobs: this.props.inferenceJobs,
                       inferenceJobsByCategory:
                         this.props.inferenceJobsByCategory,
+                      sessionWrapper: this.props.sessionWrapper,
                     }}
                   />
                 </Route>
@@ -1331,6 +1332,7 @@ class PageContainer extends React.Component<
                       this.props.sessionSubscriptionsWrapper,
                     inferenceJobs: this.props.inferenceJobs,
                     inferenceJobsByCategory: this.props.inferenceJobsByCategory,
+                    sessionWrapper: this.props.sessionWrapper,
                   }}
                 />
               </Route>
