@@ -29,7 +29,7 @@ export default function StorytellerFilter(props:{
 
   const { enqueueInferenceJob } = props;
   useInferenceJobs(
-    FrontendInferenceJobType.StorytellerFilter
+    FrontendInferenceJobType.VideoWorkflow
   );
   useEffect(() => {
     if (
@@ -38,7 +38,7 @@ export default function StorytellerFilter(props:{
     ) {
       enqueueInferenceJob(
         pageState.inferenceJobToken,
-        FrontendInferenceJobType.StorytellerFilter
+        FrontendInferenceJobType.VideoWorkflow
       );
       dispatchPageState({
         type: "enqueueFilterSuccess",
