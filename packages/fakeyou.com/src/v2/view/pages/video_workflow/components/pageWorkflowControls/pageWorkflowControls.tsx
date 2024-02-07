@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useRef} from "react";
 import { useParams, useHistory } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
@@ -14,7 +14,6 @@ import {
   BasicVideo,
   Checkbox,
   ErrorMessage,
-  TempInput as Input,
   InputSeed,
   NumberSliderV2,
   Panel,
@@ -23,6 +22,8 @@ import {
   TextArea
 } from "components/common";
 
+import SectionControlNets, {ControlNetsInitialValues as CnIvs} from "./sectionControlNets";
+import SectionVideoSettings from "./sectionVideoSettings";
 
 export default function PageFilterControls({
   t, pageState, dispatchPageState, parentPath
@@ -34,6 +35,7 @@ export default function PageFilterControls({
   dispatchPageState: (action: Action) => void;
 }) {
   const { mediaToken } = useParams<any>();
+  const videoRef = useRef<HTMLVideoElement>(null);
   useMedia({
     mediaToken: pageState.mediaFileToken || mediaToken,
     onSuccess: (res: any) => {
@@ -43,7 +45,7 @@ export default function PageFilterControls({
           mediaFile: res,
           mediaFileToken: pageState.mediaFileToken || mediaToken
         }
-      })
+      });
     },
   });
 
@@ -70,14 +72,7 @@ export default function PageFilterControls({
     nthFrames:2,
     inputFps: 24,
     interpolationMutiplier: 2,
-    cnTile: 0,
-    cnCanny: 0,
-    cnLinearAnime: 0,
-    cnLinearRealistic: 0,
-    cnDepth: 0,
-    cnOpenPose: 0,
-    cnPipeFace: 0,
-    cnSparse: 0.7,
+    ...CnIvs
   });
 
   const handleOnChange = (key: string, newValue:any,) => {
@@ -141,7 +136,7 @@ export default function PageFilterControls({
           <Panel>
             <div className="row g-3 p-3">
               <div className="col-5">
-                <BasicVideo src={mediaLink} />
+                <BasicVideo src={mediaLink} ref={videoRef}/>
               </div>
               <div className="col-1 d-flex align-items-center justify-items-center">
                 <FontAwesomeIcon icon={faChevronRight} className="fa-6x"/>
@@ -335,119 +330,15 @@ export default function PageFilterControls({
               </div>
             </Accordion.Item>
             <Accordion.Item title="Control Nets" defaultOpen>
-              <div className="row g-3 p-3">
-                <div className="col-md-6">
-                  <NumberSliderV2 {...{
-                    min: 0, max: 1, step: 0.1,
-                    initialValue: filterState.cnCanny,
-                    label: "Canny",
-                    thumbTip: "Canny",
-                    onChange: (val)=>{handleOnChange("cnCanny", val)}
-                    }}/>
-                </div>
-                <div className="col-md-6">
-                  <NumberSliderV2 {...{
-                    min: 0, max: 1, step: 0.1,
-                    initialValue: filterState.cnLinearAnime,
-                    label: "Line Art Anime",
-                    thumbTip: "Line Art Anime",
-                    onChange: (val)=>{handleOnChange("cnLinearAnime", val)}
-                    }}/>
-                </div>
-              </div>
-              <div className="row g-3 p-3">
-                <div className="col-md-6">
-                  <NumberSliderV2 {...{
-                    min: 0, max: 1, step: 0.1,
-                    initialValue: filterState.cnDepth,
-                    label: "Depth",
-                    thumbTip: "Depth",
-                    onChange: (val)=>{handleOnChange("cnDepth", val)}
-                    }}/>
-                </div>
-                <div className="col-md-6">
-                  <NumberSliderV2 {...{
-                    min: 0, max: 1, step: 0.1,
-                    initialValue: filterState.cnOpenPose,
-                    label: "OpenPose",
-                    thumbTip: "OpenPose",
-                    onChange: (val)=>{handleOnChange("cnOpenPose", val)}
-                    }}/>
-                </div>
-              </div>
-              <div className="row g-3 p-3">
-                <div className="col-md-6">
-                  <NumberSliderV2 {...{
-                    min: 0, max: 1, step: 0.1,
-                    initialValue: filterState.cnPipeFace,
-                    label: "Media Pipe Face",
-                    thumbTip: "Media Pipe Face",
-                    onChange: (val)=>{handleOnChange("cnPipeFace", val)}
-                    }}/>
-                </div>
-                <div className="col-md-6">
-                  <NumberSliderV2 {...{
-                    min: 0, max: 1, step: 0.1,
-                    initialValue: filterState.cnSparse,
-                    label: "Sparse Scribble",
-                    thumbTip: "Sparse Scribble",
-                    onChange: (val)=>{handleOnChange("cnSparse", val)}
-                    }}/>
-                </div>
-              </div>
-              <div className="row g-3 p-3">
-                <div className="col-md-6">
-                  <NumberSliderV2 {...{
-                    min: 0, max: 1, step: 0.1,
-                    initialValue: filterState.cnLinearRealistic,
-                    label: "Video CN (Linear Realistic)",
-                    thumbTip: "Video CN",
-                    onChange: (val)=>{handleOnChange("cnLinearRealistic", val)}
-                    }}/>
-                </div>
-                <div className="col-md-6">
-                  <NumberSliderV2 {...{
-                    min: 0, max: 1, step: 0.1,
-                    initialValue: filterState.cnTile,
-                    label: "Tile CN",
-                    thumbTip: "Tile CN",
-                    onChange: (val)=>{handleOnChange("cnTile", val)}
-                    }}/>
-                </div>
-              </div>
+              <SectionControlNets
+                onChange={(key,val)=>handleOnChange(key,val)}
+              />
             </Accordion.Item>
             <Accordion.Item title="Video Settings">
-              <div className="row g-3 p-3">
-                <div className="col-md-6">
-                  <Input label="Width"/>
-                </div>
-                <div className="col-md-6">
-                  <Input label="Height" />
-                </div>
-              </div>
-              <div className="row g-3 p-3">
-                <div className="col-md-6">
-                  <Input label="Frames Cap" />
-                </div>
-                <div className="col-md-6">
-                  <Input label="Skip Frames" />
-                </div>
-              </div>
-              <div className="row g-3 p-3">
-                <div className="col-md-6">
-                  <Input label="Every n-th Frame" />
-                </div>
-                <div className="col-md-6">
-                  <Input label="Input FPS" readOnly/>
-                </div>
-              </div>
-              <div className="row g-3 p-3">
-                <div className="col-md-6">
-                  <Input label="Interpolation Multiplier" />
-                </div>
-                <div className="col-md-6">
-                </div>
-              </div>
+              <SectionVideoSettings
+                onChange={(key,val)=>handleOnChange(key,val)}
+                videoElement={videoRef?.current}
+              />
             </Accordion.Item>
           </Accordion>
           <div className="row g-3 py-3">
