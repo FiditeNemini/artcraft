@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Button, MocapInput } from "components/common";
+import { EntityInput } from "components/entities";
+import { Button } from "components/common";
 // import { useInferenceJobs } from "hooks";
 // import InferenceJobsList from "components/layout/InferenceJobsList";
 // import { EnqueueEngineCompositing } from "@storyteller/components/src/api/engine_compositor/EnqueueEngineCompositing";
@@ -28,7 +29,7 @@ export default function DevMediaInput({ value }: Props) {
         <h2>{ [526,187].map((num = 0) => String.fromCodePoint(128000 + num)) }</h2>
         <Button {...{ label: "Enqueue", variant: "primary" }}/>
       </header>
-       <MocapInput {...{ aspectRatio: "landscape", label: "Choose Media File", onChange, type: "all" }}/>
+       <EntityInput {...{ aspectRatio: "landscape", label: "Choose Media File", onChange, weightType: "sd_1.5" }}/>
        <div>
         { mediaToken }
        </div>

@@ -19,6 +19,7 @@ import {
   faUser,
   faWandMagicSparkles,
   faWaveformLines,
+  faTransporter
 } from "@fortawesome/pro-solid-svg-icons";
 
 import {
@@ -398,6 +399,20 @@ export default function SideNav({
                   className="sidebar-heading-icon"
                 />
                 Storyteller Studio
+                {/* {t("videoStorytellerStudio")} */}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/engine-compositor"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faTransporter}
+                  className="sidebar-heading-icon"
+                />
+                Engine Compositor
                 {/* {t("videoStorytellerStudio")} */}
               </NavLink>
             </li>
