@@ -7,9 +7,12 @@ import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session
 import { faMessageImage } from "@fortawesome/pro-solid-svg-icons";
 import TextToImageJobsList from "./components/TextToImageJobsList";
 import { useInferenceJobs } from "hooks";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 interface TextToImagePageProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
+  sessionWrapper: SessionWrapper;
   enqueueInferenceJob: (
     jobToken: string,
     frontendInferenceJobType: FrontendInferenceJobType
@@ -17,6 +20,7 @@ interface TextToImagePageProps {
 }
 
 export default function TextToImagePage({
+  sessionWrapper,
   sessionSubscriptionsWrapper,
   enqueueInferenceJob,
 }: TextToImagePageProps) {
@@ -24,6 +28,10 @@ export default function TextToImagePage({
     FrontendInferenceJobType.ImageGeneration
   );
   const hasImageGenJobs = inferenceJobs && inferenceJobs.length > 0;
+
+  if (!sessionWrapper.canAccessStudio()) {
+    return <StudioNotAvailable />
+  }
 
   return (
     <Container type="panel">

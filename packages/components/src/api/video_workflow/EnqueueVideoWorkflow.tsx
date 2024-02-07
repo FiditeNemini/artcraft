@@ -1,6 +1,6 @@
 import { ApiConfig } from "@storyteller/components";
 
-export interface EnqueueStorytellerFilterRequest {
+export interface EnqueueVideoWorkflowRequest {
   "uuid_idempotency_token": string,
   
   "maybe_sd_model": string,
@@ -29,16 +29,16 @@ export interface EnqueueStorytellerFilterRequest {
   }
 }
 
-export interface EnqueueStorytellerFilterResponse {
+export interface EnqueueVideoWorkflowResponse {
   success: boolean,
   inference_job_token?: string,
 }
 
-export async function EnqueueStorytellerFilter(request: EnqueueStorytellerFilterRequest) : Promise<EnqueueStorytellerFilterResponse> 
+export async function EnqueueVideoWorkflow(request: EnqueueVideoWorkflowRequest) : Promise<EnqueueVideoWorkflowResponse> 
 {
   // const endpoint = "/v1/workflow/comfy/create";
 
-  const endpoint = new ApiConfig().enqueueStorytellerFilter();
+  const endpoint = new ApiConfig().enqueueVideoWorkflow();
   
   return await fetch(endpoint, {
     method: 'POST',

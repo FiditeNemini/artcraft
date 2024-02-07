@@ -2,7 +2,7 @@ import React, { useState, memo, useEffect } from "react";
 import Searcher from "../Searcher";
 import Modal from "../Modal";
 import NonRouteTabs from "../Tabs/NonRouteTabs";
-import Input from "../Input";
+import Input from "../TempInput";
 import Button from "../Button";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import SelectMediaList from "./SelectMediaList";
@@ -122,7 +122,7 @@ const SelectModal = memo(
             />
             <Input
               disabled={true}
-              className="w-100"
+              wrapperClassName="w-100"
               placeholder="None selected"
               onClick={openModal}
               value={selectedValue.title !=="" 
