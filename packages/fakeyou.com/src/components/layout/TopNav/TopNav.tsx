@@ -186,7 +186,7 @@ export default function TopNav({
               src={domain.logo}
               alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
               height="34"
-              className="mb-2 d-none d-lg-block"
+              className="mb-1 d-none d-lg-block"
             />
             <img
               src="/fakeyou/FakeYou-Logo-Mobile.png"
