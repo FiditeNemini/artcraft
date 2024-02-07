@@ -1,0 +1,17 @@
+{
+  "button": {
+    "proceed": "ワークフロー制御に進む",
+    "process": "プロセスからワークフローへ",
+    "select": "選択する",
+    "upload": "ビデオをアップロードする"
+  },
+  "headings": {
+    "title": "ビデオワークフロー"
+  },
+  "tabTitle": {
+    "library": "メディアから選ぶ",
+    "original": "オリジナル",
+    "preview": "プレビュー",
+    "upload": "アップロード"
+  }
+}

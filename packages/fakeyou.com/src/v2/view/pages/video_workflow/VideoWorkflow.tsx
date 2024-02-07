@@ -18,7 +18,7 @@ export default function StorytellerFilter(props:{
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
 }){
   const debug=true;
-  const {t} = useLocalize("StorytellerFilter");
+  const {t} = useLocalize("VideoWorkflow");
   const { NO_FILE } = states;
   const [pageState, dispatchPageState] = useReducer(reducer, {
     status: NO_FILE,

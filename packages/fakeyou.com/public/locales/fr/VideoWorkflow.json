@@ -1,0 +1,17 @@
+{
+  "button": {
+    "proceed": "Passer aux contrôles de flux de travail",
+    "process": "Du processus au flux de travail",
+    "select": "Sélectionner",
+    "upload": "Télécharger une video"
+  },
+  "headings": {
+    "title": "Flux de travail vidéo"
+  },
+  "tabTitle": {
+    "library": "Choisissez parmi les médias",
+    "original": "Original",
+    "preview": "Aperçu",
+    "upload": "Télécharger"
+  }
+}

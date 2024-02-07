@@ -13,7 +13,7 @@ export default function TabContentUpload({t, pageState, dispatchPageState}: {
   dispatchPageState: (action: Action) => void;
 }) {
   const videoProps = useFile({});
-  const {NO_FILE, FILE_STAGED} = states;
+  const {NO_FILE, FILE_STAGED, FILE_UPLOADING} = states;
 
 
   const makeVideoUploadRequest = () => ({
@@ -38,7 +38,7 @@ export default function TabContentUpload({t, pageState, dispatchPageState}: {
   };
 
   // contains upload inout state and controls, see docs
-  if (pageState.status === NO_FILE || pageState.status === FILE_STAGED) {
+  if (pageState.status < FILE_UPLOADING) {
     return (
       <>
         <div className="row">

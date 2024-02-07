@@ -1,0 +1,17 @@
+{
+  "button": {
+    "proceed": "Continúe con los controles del flujo de trabajo",
+    "process": "Proceso al flujo de trabajo",
+    "select": "Seleccionar",
+    "upload": "Subir vídeo"
+  },
+  "headings": {
+    "title": "Flujo de trabajo de vídeo"
+  },
+  "tabTitle": {
+    "library": "Elige entre los medios",
+    "original": "Original",
+    "preview": "Avance",
+    "upload": "Subir"
+  }
+}
