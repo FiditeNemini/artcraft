@@ -1,4 +1,5 @@
 import { GetSessionInfo, GetSessionInfoIsOk, SessionInfoSuccessResponse } from '../api/session/GetSessionInfo'
+import { StudioRolloutHostnameAllowed } from '../utils/StudioRolloutHostnameAllowed';
 
 // A lot of the APIs return null or leave values absent. 
 // I need to pick a single strategy and stick with it.
@@ -42,6 +43,14 @@ export class SessionWrapper {
 
   public isLoggedIn() : boolean {
     return this.sessionStateResponse?.logged_in || false;
+  }
+
+  // Feature flag rollout for Storyteller Studio
+  // This depends on the domain name and the backend.
+  public canAccessStudio() : boolean {
+    const hostnameAllowed = StudioRolloutHostnameAllowed();
+    const userAllowed = this.sessionStateResponse?.user?.can_access_studio || false;
+    return hostnameAllowed && userAllowed;
   }
 
   // Username is all lowercase
