@@ -5,20 +5,21 @@ import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia"
 import Iframe from "react-iframe";
 import { MediaBrowser } from "components/modals";
 import { FileWrapper, Label, Spinner } from "components/common";
-import { EntityType, MediaFilterProp } from "components/entities/EntityTypes";
+import { EntityType, MediaFilterProp, WeightFilterProp } from "components/entities/EntityTypes";
 import { useFile, useMedia, useModal, useSession } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { faFileArrowUp, faGrid, faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { UploadMedia, UploadMediaResponse } from "@storyteller/components/src/api/media_files/UploadMedia";
 import { v4 as uuidv4 } from "uuid";
-import "./MocapInput.scss"
+import "./EntityInput.scss";
 
 interface Props {
   label?: string, 
   onChange?: any,
-  type?: MediaFilterProp,
-  aspectRatio?: "square" | "landscape" | "portrait"
+  mediaType?: MediaFilterProp,
+  aspectRatio?: "square" | "landscape" | "portrait",
+  weightType?: WeightFilterProp,
 }
 
 interface SlideProps {
@@ -26,10 +27,11 @@ interface SlideProps {
 };
 
 interface EmptySlideProps extends SlideProps {
+  entityType: EntityType,
+  filterType: MediaFilterProp | WeightFilterProp,
   inputProps?: any,
   onSelect: any,
   open: any,
-  type: MediaFilterProp,
   user: any
 };
 
@@ -53,32 +55,32 @@ const MocapInputFull = ({ media }: SlideProps) => {
     <Iframe
         {...{
           url: `https://engine.fakeyou.com?mode=viewer&bvh=${bvhUrl}`,
-          className: "fy-media-picker-mocap-preview",
+          className: "fy-entity-input-mocap-preview",
         }}
       />
-    <div {...{ className: "fy-media-picker-full-controls" }}>
+    <div {...{ className: "fy-entity-input-full-controls" }}>
       Your file
     </div>
   </>;
 };
 
-const MediaPickerEmpty = ({ media, onSelect, open, inputProps, type, user }: EmptySlideProps) => {
+const MediaPickerEmpty = ({ entityType, filterType, media, onSelect, open, inputProps, user }: EmptySlideProps) => {
   const browserClick = () => open({
     component: MediaBrowser,
-    props: { entityType: EntityType.media, onSelect, type, username: user?.username || "" }
+    props: { entityType, filterType, onSelect, username: user?.username || "" }
   });
 
   return <>
-    <Icon {...{ className: "fy-media-picker-icon", icon: faPersonWalking }}/>
-    <div {...{ className: "fy-media-picker-empty-controls" }}>
-      <FileWrapper {...{ containerClass: "fy-media-picker-row", panelClass: "fy-media-picker-button", noStyle: true, ...inputProps }}>
+    <Icon {...{ className: "fy-entity-input-icon", icon: faPersonWalking }}/>
+    <div {...{ className: "fy-entity-input-empty-controls" }}>
+      <FileWrapper {...{ containerClass: "fy-entity-input-row", panelClass: "fy-entity-input-button", noStyle: true, ...inputProps }}>
         <>
-        <Icon {...{ className: "fy-media-picker-label-icon", icon: faFileArrowUp }}/>
+        <Icon {...{ className: "fy-entity-input-label-icon", icon: faFileArrowUp }}/>
         Upload, click or drag here
         </>
       </FileWrapper>
-      <div {...{ className: "fy-media-picker-row fy-media-picker-button", onClick: browserClick }}>
-        <Icon {...{ className: "fy-media-picker-label-icon", icon: faGrid }}/>
+      <div {...{ className: "fy-entity-input-row fy-entity-input-button", onClick: browserClick }}>
+        <Icon {...{ className: "fy-entity-input-label-icon", icon: faGrid }}/>
         Choose from your media
       </div>
     </div>
@@ -92,7 +94,9 @@ const AniMod = ({ animating, className, isLeaving, render: Render, style, ...res
     <Render {...{ ...rest, animating }} />
   </a.div>;
 
-export default function MocapInput({ aspectRatio = "square", label, onChange, type }: Props) {
+export default function EntityInput({ aspectRatio = "square", label, onChange, mediaType, weightType }: Props) {
+  const entityType = mediaType ? EntityType.media : weightType ? EntityType.weights : EntityType.unknown;
+  const filterType = mediaType || weightType || "all";
   const { search } = useLocation();
   const presetToken = search ? new URLSearchParams(search).get("preset_token") : "";
   const [mediaToken,mediaTokenSet] = useState(presetToken || "");
@@ -135,7 +139,7 @@ export default function MocapInput({ aspectRatio = "square", label, onChange, ty
 
   return <>
     <Label {...{ label }}/>
-    <div {...{ className: `fy-mocap-input panel-inner${ aspectRatio ? " fy-media-input-" + aspectRatio : "" }`, }}>
+    <div {...{ className: `fy-entity-input panel-inner${ aspectRatio ? " fy-entity-input-" + aspectRatio : "" }`, }}>
       { 
         // media ? <MocapInputFull {...{ media }}/> : <MediaPickerEmpty {...{ inputProps, media, onSelect, open, user }}/>
         transitions((style: any, i: number, state: any) => {
@@ -143,9 +147,9 @@ export default function MocapInput({ aspectRatio = "square", label, onChange, ty
           let sharedProps = { animating, isLeaving, media, style };
 
           return [
-            <AniMod {...{ render: MediaBusy, className: "fy-media-picker-busy", ...sharedProps }}/>,
-            <AniMod {...{ render: MocapInputFull, className: "fy-media-picker-full", ...sharedProps }}/>,
-            <AniMod {...{ render: MediaPickerEmpty, className: "fy-media-picker-empty", inputProps, onSelect, open, type, user, ...sharedProps }}/>
+            <AniMod {...{ render: MediaBusy, className: "fy-entity-input-busy", ...sharedProps }}/>,
+            <AniMod {...{ render: MocapInputFull, className: "fy-entity-input-full", ...sharedProps }}/>,
+            <AniMod {...{ render: MediaPickerEmpty, className: "fy-entity-input-empty", entityType, filterType, inputProps, onSelect, open, user, ...sharedProps }}/>
           ][i];
         
         })
