@@ -237,6 +237,7 @@ impl SessionChecker {
       role: UserSessionRoleAndPermissions {
         user_role_slug: user_session.user_role_slug,
         is_banned: user_session.is_banned,
+        can_access_studio: user_session.can_access_studio,
         can_use_tts: user_session.can_use_tts,
         can_use_w2l: user_session.can_use_w2l,
         can_delete_own_tts_results: user_session.can_delete_own_tts_results,

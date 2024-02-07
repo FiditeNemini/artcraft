@@ -37,6 +37,10 @@ pub struct SessionUserRecord {
   pub preferred_w2l_result_visibility: Visibility,
   pub auto_play_video_preference: Option<bool>,
 
+  // ===== FEATURE FLAGS ===== //
+
+  pub can_access_studio: bool,
+
   // ===== ROLE ===== //
 
   pub user_role_slug: String,
@@ -116,6 +120,8 @@ SELECT
     users.user_role_slug,
     users.is_banned,
 
+    users.can_access_studio,
+
     user_roles.can_use_tts,
     user_roles.can_use_w2l,
     user_roles.can_delete_own_tts_results,
@@ -175,6 +181,8 @@ WHERE user_sessions.token = ?
         preferred_w2l_result_visibility: raw_user_record.preferred_w2l_result_visibility,
 
         is_banned: i8_to_bool(raw_user_record.is_banned),
+
+        can_access_studio: i8_to_bool(raw_user_record.can_access_studio),
 
         // Usage
         can_use_tts: nullable_i8_to_bool_default_false(raw_user_record.can_use_tts),
@@ -238,6 +246,9 @@ struct SessionUserRawDbRecord {
 
   user_role_slug: String,
   is_banned: i8,
+
+  // Feature / Rollout Flags
+  can_access_studio: i8,
 
   // NB: These are `Option` due to the JOIN not being compile-time assured.
   // Usage

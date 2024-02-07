@@ -29,6 +29,7 @@ use tokens::tokens::users::UserToken;
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use crate::util::allowed_studio_access::allowed_studio_access;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
@@ -115,7 +116,8 @@ pub async fn enqueue_comfy_ui_handler(
             EnqueueComfyError::ServerError
         })?;
 
-    let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
+    let maybe_avt_token = server_state.avt_cookie_manager
+        .get_avt_token_from_request(&http_request);
 
     // ==================== USER SESSION ==================== //
 
@@ -130,6 +132,13 @@ pub async fn enqueue_comfy_ui_handler(
 
     if let Some(user_session) = maybe_user_session.as_ref() {
         maybe_user_token = Some(UserToken::new_from_str(&user_session.user_token));
+    }
+
+    // ==================== FEATURE FLAG CHECK ==================== //
+
+    if !allowed_studio_access(maybe_user_session.as_ref(), &server_state.flags) {
+        warn!("Storyteller Studio access is not permitted for user");
+        return Err(EnqueueComfyError::NotAuthorized);
     }
 
     // TODO: Plan should handle "first anonymous use" and "investor" cases.

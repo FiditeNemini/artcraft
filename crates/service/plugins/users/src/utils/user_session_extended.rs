@@ -66,6 +66,10 @@ pub struct UserSessionRoleAndPermissions {
     pub user_role_slug: String,
     pub is_banned: bool,
 
+    // ===== FEATURE FLAGS / ROLLOUT ===== //
+    // Whether the user can access Storyteller Studio features.
+    pub can_access_studio: bool,
+
     // ===== PERMISSIONS FLAGS ===== //
     // Usage
     pub can_use_tts: bool,
