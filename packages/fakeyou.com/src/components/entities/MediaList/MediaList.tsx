@@ -1,10 +1,9 @@
 import React, { useRef } from "react";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
-// import MediaCards from "components/common/Card/MediaCards";
-// import AudioCard from "components/common/Card/AudioCard";
 import { ImagePreview, MocapPreview, VideoPreview } from '../CardPreviews';
 import { AudioCard, OverlayCard, CardWrapper } from "components/entities";
+import { EntityType } from "components/entities/EntityTypes";
 
 interface MediaCardsProps {
   props: any,
@@ -12,6 +11,7 @@ interface MediaCardsProps {
 }
 
 interface Props {
+  entityType: EntityType,
   list: MediaFile[],
   success?: boolean
 }
@@ -31,20 +31,32 @@ const MediaCards = ({ props, type }: MediaCardsProps) => {
   }
 };
 
-export default function MediaList({ list, success, ...rest }: Props) {
+const WeightsCards = ({ props, type }: MediaCardsProps) => {
+  switch (type) {
+    default:
+      return <div>Unsupported media type</div>;
+  }
+};
+
+export default function MediaList({ entityType, list, success, ...rest }: Props) {
   const gridRef = useRef<HTMLDivElement | null>(null);
 
   return list.length === 0 && success ?
     <div className="text-center mt-4 opacity-75">
       No media created yet.
     </div> : <MasonryGrid {...{ gridRef }}>
-      { list.map((data: MediaFile, key: number) => {
+      { list.map((data: any, key: number) => {
         let props = { data, type: "media", ...rest };
         return <div {...{
           className: "col-12 col-sm-6 col-xl-4 grid-item",
           key,
         }}>
-          <MediaCards {...{ type: data.media_type, props }} />
+          {
+            [ null,
+              <MediaCards {...{ type: data.media_type, props }} />,
+              <WeightsCards {...{ type: data.weight_type, props }} />
+            ][entityType]
+          }
         </div>;
       }) }
     </MasonryGrid>;

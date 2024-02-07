@@ -24,9 +24,6 @@ export default function InferenceJobsList({
     useInferenceJobs(jobType);
   const { t } = useLocalize("InferenceJobs");
 
-  // let height = 0;
-  // const transitions = useTransition(inferenceJobs,{ not right now });
-
   if (inferenceJobs.length) {
     return (
       <Panel {...{ className: "fy-inference-jobs-list", padding: true }}>

@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 import { Analytics } from "common/Analytics";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import { states, Action, State } from "../storytellerFilterReducer";
+import { states, Action, State } from "../videoWorkflowReducer";
 import { Spinner } from 'components/common';
 
 function StorytellerJobList(){
@@ -25,7 +25,7 @@ function StorytellerJobList(){
   );
 }
 
-export default function PageJobList({
+export default memo (function PageJobList({
   t, pageState, dispatchPageState
 }: {
   debug?: boolean;
@@ -46,4 +46,4 @@ export default function PageJobList({
       <StorytellerJobList />
     </>
   );
-}
+});

@@ -1,25 +1,27 @@
-import { faDiscord } from "@fortawesome/free-brands-svg-icons";
-import {
-  faBookOpen,
-  faMessageDots,
-  faTrophy,
-  faWaveformLines,
-  faStar,
-  faFaceViewfinder,
-  faCloudUpload,
-  faWandMagicSparkles,
-  faHome,
-  faCompass,
-  faUser,
-  faSignOutAlt,
-  faCameraMovie,
-  faPersonRays,
-  faMessageImage,
-  faPhotoFilm,
-} from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { NavLink, useHistory } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDiscord } from "@fortawesome/free-brands-svg-icons";
+import {
+  faArrowsTurnToDots,
+  faBookOpen,
+  faCameraMovie,
+  faCompass,
+  faCloudUpload,
+  faFaceViewfinder,
+  faHome,
+  faMessageDots,
+  faMessageImage,
+  faPersonRays,
+  faSignOutAlt,
+  faStar,
+  faTrophy,
+  faUser,
+  faWandMagicSparkles,
+  faWaveformLines,
+  faTransporter
+} from "@fortawesome/pro-solid-svg-icons";
+
 import {
   GetQueueStats,
   GetQueueStatsIsOk,
@@ -386,15 +388,15 @@ export default function SideNav({
 
             <li>
               <NavLink
-                to="/storyteller-filter"
+                to="/video-workflow"
                 activeClassName="active-link"
                 onClick={handleNavLinkClick}
               >
                 <FontAwesomeIcon
-                  icon={faPhotoFilm}
+                  icon={faArrowsTurnToDots}
                   className="sidebar-heading-icon"
                 />
-                {t("storytellerFilter")}
+                {t("videoWorkflow")}
               </NavLink>
             </li>
 
@@ -409,6 +411,20 @@ export default function SideNav({
                   className="sidebar-heading-icon"
                 />
                 Storyteller Studio
+                {/* {t("videoStorytellerStudio")} */}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/engine-compositor"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faTransporter}
+                  className="sidebar-heading-icon"
+                />
+                Engine Compositor
                 {/* {t("videoStorytellerStudio")} */}
               </NavLink>
             </li>

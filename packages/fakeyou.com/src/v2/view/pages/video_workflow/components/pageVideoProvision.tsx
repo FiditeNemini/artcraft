@@ -2,14 +2,15 @@ import React from "react";
 
 import { BasicVideo, Panel, Tabs } from "components/common";
 
-import { State, Action } from "../storytellerFilterReducer";
+import { State, Action } from "../videoWorkflowReducer";
 import TabContentUpload from "./tabContentUpload";
 import TabContentLibrary from "./tabContentLibrary";
 
 export default function PageVideoProvision({
-  debug=false, t, pageState, dispatchPageState
+  debug=false, parentPath, t, pageState, dispatchPageState
 }: {
   debug?: boolean;
+  parentPath: string;
   t: Function;
   pageState: State;
   dispatchPageState: (action: Action) => void;
@@ -21,7 +22,7 @@ export default function PageVideoProvision({
       content: <TabContentUpload {...{
         debug, t, pageState, dispatchPageState
       }} />,
-      to: "/storyteller-filter/upload",
+      to: `${parentPath}/upload`,
       padding: true,
     },
     {
@@ -29,7 +30,7 @@ export default function PageVideoProvision({
       content: <TabContentLibrary {...{
         debug, t, pageState, dispatchPageState
       }} />,
-      to: "/storyteller-filter/select-media",
+      to: `${parentPath}/select-media`,
       padding: true,
     },
   ];

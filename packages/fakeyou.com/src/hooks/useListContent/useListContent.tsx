@@ -33,6 +33,7 @@ export default function useListContent({
   urlParam = "",
   urlUpdate = true
 }: Props) {
+  console.log("💎",fetcher);
   const { pathname, search: locSearch } = useLocation();
   const history = useHistory();
   const urlQueries = new URLSearchParams(locSearch);

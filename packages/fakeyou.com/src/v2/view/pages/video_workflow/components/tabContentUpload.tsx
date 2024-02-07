@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadMedia";
 import { useFile } from "hooks";
 import { ErrorMessage, VideoInput, Spinner } from "components/common";
-import { states, Action, State } from "../storytellerFilterReducer";
+import { states, Action, State } from "../videoWorkflowReducer";
 
 export default function TabContentUpload({
   debug=false, t, pageState, dispatchPageState

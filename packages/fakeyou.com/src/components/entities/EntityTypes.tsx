@@ -8,11 +8,33 @@ export enum MediaFilters {
   fbx
 }
 
-export type MediaFilterProp = keyof typeof MediaFilters;
+export enum WeightsFilters {
+  all,
+  hifigan_tt2,
+  sd_1,
+  "sd_1.5",
+  sdxl,
+  so_vits_svc,
+  tt2,
+  loRA,
+  vall_e
+}
 
-export const MediaFilterOptions = (t = (v:string) => v) => Object.values(MediaFilters)
+export type MediaFilterProp = keyof typeof MediaFilters;
+export type WeightFilterProp = keyof typeof WeightsFilters;
+
+export enum EntityType {
+  unknown,
+  media,
+  weights
+}
+
+export const EntityFilterOptions = ( mode: EntityType, t = (v:string) => v) => {
+  const filters = [{},MediaFilters,WeightsFilters][mode];
+  return mode ? Object.values(filters)
   .filter(val => isNaN(Number(val)))
   .map((value) => {
     if (typeof value === "string") return { value, label: t(value) }
     return { label: "", value: "" };
-  });
+  }) : [];
+};

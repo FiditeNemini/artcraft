@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { MediaList } from "components/entities";
-import { MediaFilterOptions, MediaFilterProp } from "components/entities/EntityTypes";
+import { EntityType, EntityFilterOptions, MediaFilterProp, WeightFilterProp } from "components/entities/EntityTypes";
 import { TempSelect } from "components/common";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";
 import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
+import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import { useListContent, useRatings } from "hooks";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { faArrowDownWideShort, faFilter, faXmark } from "@fortawesome/pro-solid-svg-icons";
@@ -14,26 +16,27 @@ import prepFilter from "resources/prepFilter";
 import "./MediaBrowser.scss";
 
 interface Props {
+  entityType: EntityType,
   handleClose: any,
   mediaToken: string,
   onSelect?: any,
-  type?: MediaFilterProp,
+  filterType?: MediaFilterProp | WeightFilterProp,
   username: string,
 }
 
-export default function MediaBrowser({ mediaToken, handleClose = () => {}, onSelect, type, username }: Props) {
+export default function MediaBrowser({ entityType, filterType: inputFilter, mediaToken, handleClose = () => {}, onSelect, username }: Props) {
+  console.log("😎",entityType);
   const ratings = useRatings();
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
-  const [mediaType, mediaTypeSet] = useState(type || "all");
-  const [list, listSet] = useState<MediaFile[]>([]);
-  const media = useListContent({
+  const [filterType, filterTypeSet] = useState(inputFilter ||  "all");
+  const [list, listSet] = useState<MediaFile | Weight[]>([]);
+  const entities = useListContent({
     addQueries: {
       page_size: 24,
-      ...prepFilter(mediaType, "filter_media_type"),
+      ...prepFilter(filterType, ["","filter_media_type","maybe_scoped_weight_type"][entityType]),
     },
-    addSetters: { mediaTypeSet },
-    // debug: "profile media",
-    fetcher: GetMediaByUser,
+    addSetters: { filterTypeSet },
+    fetcher: [() => {},GetMediaByUser,GetWeightsByUser][entityType] || GetMediaByUser,
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
@@ -43,18 +46,18 @@ export default function MediaBrowser({ mediaToken, handleClose = () => {}, onSel
       setShowMasonryGrid(true);
     },
     requestList: true,
-    urlParam: username,
+    urlParam: "echelon",
     urlUpdate: false
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    media.pageChange(selectedItem.selected);
+    entities.pageChange(selectedItem.selected);
   };
 
   const paginationProps = {
     onPageChange: handlePageClick,
-    pageCount: media.pageCount,
-    currentPage: media.page,
+    pageCount: entities.pageCount,
+    currentPage: entities.page,
   };
 
   const sortOptions = [
@@ -71,7 +74,7 @@ export default function MediaBrowser({ mediaToken, handleClose = () => {}, onSel
   return <>
     <header {...{ className: "fy-media-browser-header" }}>
       <div {...{ className: "fy-media-browser-tools" }}>
-        <h3>Media</h3>
+        <h3>{ ["","Media","Weights"][entityType] }</h3>
         <Icon {...{ className: "icon-close-button", icon: faXmark, onClick: () => handleClose() }}/>
       </div>
       <div {...{ className: "fy-media-browser-tools" }}>
@@ -80,22 +83,22 @@ export default function MediaBrowser({ mediaToken, handleClose = () => {}, onSel
             icon: faArrowDownWideShort,
             options: sortOptions,
             name: "sort",
-            onChange: media.onChange,
-            value: media.sort,
+            onChange: entities.onChange,
+            value: entities.sort,
           }}
         />
-        { (!type || type === "all") && <TempSelect {...{
+        { (!inputFilter || inputFilter === "all") && <TempSelect {...{
               icon: faFilter,
-              options: MediaFilterOptions(),
-              name: "mediaType",
-              onChange: media.onChange,
-              value: mediaType,
+              options: EntityFilterOptions(entityType),
+              name: "filterType",
+              onChange: entities.onChange,
+              value: filterType,
             }}/> }
         <Pagination {...paginationProps} />
       </div>
     </header>
     <AudioPlayerProvider>
-      { media.isLoading ? (
+      { entities.isLoading ? (
         <div {...{ className: "row gx-3 gy-3" }}>
           {Array.from({ length: 12 }).map((_, index) => (
             <SkeletonCard key={index} />
@@ -105,7 +108,7 @@ export default function MediaBrowser({ mediaToken, handleClose = () => {}, onSel
         <>
           { showMasonryGrid && (
             <div {...{ className: "fy-media-browser-list" }}>
-              <MediaList {...{ list: media.list, success: media.status === 3, onClick }}/>
+              <MediaList {...{ entityType, list: entities.list, success: entities.status === 3, onClick }}/>
             </div>
           ) }
         </>

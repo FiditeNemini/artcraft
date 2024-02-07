@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Input from "../Input";
+import { TempInput as Input } from 'components/common';
+// import Input from "../Input";
 import { faSearch } from "@fortawesome/pro-solid-svg-icons";
 import MasonryGrid from "../MasonryGrid/MasonryGrid";
 import "./Searcher.scss";
@@ -106,7 +107,7 @@ export default function Searcher({
         placeholder="Search..."
         value={searchTerm[searcherKey]}
         onChange={handleInputChange}
-        className="mb-3"
+        type="text"
       />
       <div
         className={`searcher-container ${
