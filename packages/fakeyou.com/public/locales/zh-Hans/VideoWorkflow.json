@@ -1,0 +1,17 @@
+{
+  "button": {
+    "proceed": "继续工作流程控制",
+    "process": "流程到工作流程",
+    "select": "选择",
+    "upload": "上传视频"
+  },
+  "headings": {
+    "title": "视频工作流程"
+  },
+  "tabTitle": {
+    "library": "从媒体中选择",
+    "original": "原来的",
+    "preview": "预览",
+    "upload": "上传"
+  }
+}

@@ -20,5 +20,6 @@
   "videoFaceAnimator": "Gesichtsanimator",
   "videoMotionCapture": "Video-Bewegungserfassung",
   "videoTitle": "Videogenerierung",
-  "videoW2l": "Video-Lippensynchronisation"
+  "videoW2l": "Video-Lippensynchronisation",
+  "videoWorkflow": "Video-Workflow"
 }

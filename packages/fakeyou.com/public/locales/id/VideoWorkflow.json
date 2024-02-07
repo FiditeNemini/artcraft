@@ -1,0 +1,17 @@
+{
+  "button": {
+    "proceed": "Lanjutkan ke Kontrol Alur Kerja",
+    "process": "Proses ke Alur Kerja",
+    "select": "Pilih",
+    "upload": "Mengunggah video"
+  },
+  "headings": {
+    "title": "Alur Kerja Video"
+  },
+  "tabTitle": {
+    "library": "Pilih dari media",
+    "original": "Asli",
+    "preview": "Pratinjau",
+    "upload": "Mengunggah"
+  }
+}

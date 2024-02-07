@@ -1,0 +1,17 @@
+{
+  "button": {
+    "proceed": "Proceed to Workflow Controls",
+    "process": "Process to Workflow",
+    "select": "Select",
+    "upload": "Upload Video"
+  },
+  "headings": {
+    "title": "Video Workflow"
+  },
+  "tabTitle": {
+    "library": "Choose from media",
+    "original": "Original",
+    "preview": "Preview",
+    "upload": "Upload"
+  }
+}

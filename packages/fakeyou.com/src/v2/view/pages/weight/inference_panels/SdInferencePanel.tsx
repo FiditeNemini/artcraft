@@ -299,14 +299,14 @@ function SdInferencePanel({
               {
                 label: "All Weights",
                 tabKey: "allWeights",
-                weightTypeFilter: "sd_1.5",
+                typeFilter: "sd_1.5",
                 searcher: true,
                 type: "weights",
               },
               {
                 label: "Bookmarked",
                 tabKey: "bookmarkedWeights",
-                weightTypeFilter: "sd_1.5",
+                typeFilter: "sd_1.5",
                 searcher: false,
                 type: "weights",
               },
@@ -409,14 +409,14 @@ function SdInferencePanel({
                 {
                   label: "All LoRA Weights",
                   tabKey: "allLoraWeights",
-                  weightTypeFilter: "rvc_v2",
+                  typeFilter: "rvc_v2",
                   searcher: true,
                   type: "weights",
                 },
                 {
                   label: "Bookmarked",
                   tabKey: "bookmarkedLoraWeights",
-                  weightTypeFilter: "rvc_v2",
+                  typeFilter: "rvc_v2",
                   searcher: false,
                   type: "weights",
                 },

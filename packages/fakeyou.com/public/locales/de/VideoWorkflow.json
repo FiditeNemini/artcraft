@@ -1,0 +1,17 @@
+{
+  "button": {
+    "proceed": "Fahren Sie mit den Workflow-Kontrollen fort",
+    "process": "Vom Prozess zum Workflow",
+    "select": "Wählen",
+    "upload": "Video hochladen"
+  },
+  "headings": {
+    "title": "Video-Workflow"
+  },
+  "tabTitle": {
+    "library": "Wählen Sie aus Medien",
+    "original": "Original",
+    "preview": "Vorschau",
+    "upload": "Hochladen"
+  }
+}

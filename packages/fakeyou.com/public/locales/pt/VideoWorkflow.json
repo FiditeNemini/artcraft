@@ -1,0 +1,17 @@
+{
+  "button": {
+    "proceed": "Prossiga para os controles de fluxo de trabalho",
+    "process": "Processo para fluxo de trabalho",
+    "select": "Selecione",
+    "upload": "Envio vídeo"
+  },
+  "headings": {
+    "title": "Fluxo de trabalho de vídeo"
+  },
+  "tabTitle": {
+    "library": "Escolha entre mídias",
+    "original": "Original",
+    "preview": "Visualização",
+    "upload": "Carregar"
+  }
+}
