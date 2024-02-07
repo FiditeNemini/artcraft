@@ -24,6 +24,7 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use crate::util::allowed_studio_access::allowed_studio_access;
 
 #[derive(Deserialize, ToSchema, IntoParams)]
 pub struct ListMediaFilesQueryParams {
@@ -79,18 +80,21 @@ pub struct MediaFileListItem {
 #[derive(Debug, ToSchema)]
 pub enum ListMediaFilesError {
   ServerError,
+  NotAuthorized,
 }
 
 impl ResponseError for ListMediaFilesError {
   fn status_code(&self) -> StatusCode {
     match *self {
       ListMediaFilesError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      ListMediaFilesError::NotAuthorized => StatusCode::UNAUTHORIZED,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
       ListMediaFilesError::ServerError => "server error".to_string(),
+      ListMediaFilesError::NotAuthorized => "not authorized".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
@@ -126,6 +130,13 @@ pub async fn list_media_files_handler(
         warn!("Session checker error: {:?}", e);
         ListMediaFilesError::ServerError
       })?;
+
+  // ==================== FEATURE FLAG CHECK ==================== //
+
+  if !allowed_studio_access(maybe_user_session.as_ref(), &server_state.flags) {
+    warn!("Storyteller Studio access is not permitted for user");
+    return Err(ListMediaFilesError::NotAuthorized);
+  }
 
   let mut is_mod = false;
 
