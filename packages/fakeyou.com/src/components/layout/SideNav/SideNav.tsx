@@ -256,6 +256,96 @@ export default function SideNav({
     queueStats.legacy_tts.pending_job_count +
     queueStats.inference.by_queue.pending_tacotron2_jobs;
 
+  let maybeVideoGeneration = <></>;
+
+  if (sessionWrapper.canAccessStudio()) {
+    maybeVideoGeneration = (
+      <>
+        <li>
+          <NavLink
+            to="/video-mocap"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faPersonRays}
+              className="sidebar-heading-icon"
+            />
+            {t("videoMotionCapture")}
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink
+            to="/video-workflow"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faArrowsTurnToDots}
+              className="sidebar-heading-icon"
+            />
+            {t("videoWorkflow")}
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink
+            to="/studio"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faCameraMovie}
+              className="sidebar-heading-icon"
+            />
+            Storyteller Studio
+            {/* {t("videoStorytellerStudio")} */}
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/engine-compositor"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faTransporter}
+              className="sidebar-heading-icon"
+            />
+            Engine Compositor
+            {/* {t("videoStorytellerStudio")} */}
+          </NavLink>
+        </li>
+      </>
+    );
+  }
+
+  let maybeImageGeneration = <></>;
+
+  if (sessionWrapper.canAccessStudio()) {
+    maybeImageGeneration = (
+      <>
+        <li className="sidebar-heading">Image Generation</li>
+        <li>
+          <NavLink
+            to="/text-to-image"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faMessageImage}
+              className="sidebar-heading-icon"
+            />
+            Text to Image
+            {/* {t("videoStorytellerStudio")} */}
+          </NavLink>
+        </li>
+        <hr className="mb-3 mt-3" />
+      </>
+    );
+  }
+
   return (
     <>
       <div
@@ -360,80 +450,13 @@ export default function SideNav({
                 {t("videoFaceAnimator")}
               </NavLink>
             </li>
-            <li>
-              <NavLink
-                to="/video-mocap"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faPersonRays}
-                  className="sidebar-heading-icon"
-                />
-                {t("videoMotionCapture")}
-              </NavLink>
-            </li>
 
-            <li>
-              <NavLink
-                to="/video-workflow"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faArrowsTurnToDots}
-                  className="sidebar-heading-icon"
-                />
-                {t("videoWorkflow")}
-              </NavLink>
-            </li>
-
-            <li>
-              <NavLink
-                to="/studio"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faCameraMovie}
-                  className="sidebar-heading-icon"
-                />
-                Storyteller Studio
-                {/* {t("videoStorytellerStudio")} */}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/engine-compositor"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faTransporter}
-                  className="sidebar-heading-icon"
-                />
-                Engine Compositor
-                {/* {t("videoStorytellerStudio")} */}
-              </NavLink>
-            </li>
-            <hr className="mb-3 mt-3" />
-            <li className="sidebar-heading">Image Generation</li>
-            <li>
-              <NavLink
-                to="/text-to-image"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faMessageImage}
-                  className="sidebar-heading-icon"
-                />
-                Text to Image
-                {/* {t("videoStorytellerStudio")} */}
-              </NavLink>
-            </li>
+            {maybeVideoGeneration}
 
             <hr className="mb-3 mt-3" />
+
+            {maybeImageGeneration}
+
             <li className="sidebar-heading">{t("communityTitle")}</li>
             <li>
               <NavLink
