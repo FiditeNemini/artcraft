@@ -373,6 +373,7 @@ class PageContainer extends React.Component<
                   render={props => (
                     <WeightPage
                       key={props.match.params.weight_token}
+                      sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }
