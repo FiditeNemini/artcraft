@@ -14,24 +14,14 @@ export default function Label({
   required,
   disabled,
 }: Props) {
-  return (
-    <div
-      {...{
-        className: `fy-input-label ${disabled ? "opacity-50" : ""}`.trim(),
-      }}
-    >
-      {label ? (
-        <label
-          {...{ className: `fw-medium ${required ? " required" : ""}`.trim() }}
-        >
-          {label}
-        </label>
-      ) : null}
-      {invalidReason ? (
-        <span {...{ className: "label-error form-text red is-danger" }}>
-          {invalidReason}
-        </span>
-      ) : null}
-    </div>
-  );
+  return label ? <div {...{ className: `fy-input-label${disabled ? "opacity-50" : "" }` }}>
+    <label {...{ className: `fw-medium${required ? " required" : "" }` }} >
+      {label}
+    </label>
+    { invalidReason ? (
+      <span {...{ className: "label-error form-text red is-danger" }}>
+        {invalidReason}
+      </span>
+    ) : null }
+  </div> : null;
 }

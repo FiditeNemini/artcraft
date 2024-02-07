@@ -11,6 +11,7 @@ export enum MediaFilters {
 export enum WeightsFilters {
   all,
   hifigan_tt2,
+  rvc_v2,
   sd_1,
   "sd_1.5",
   sdxl,
@@ -35,6 +36,6 @@ export const EntityFilterOptions = ( mode: EntityType, t = (v:string) => v) => {
   .filter(val => isNaN(Number(val)))
   .map((value) => {
     if (typeof value === "string") return { value, label: t(value) }
-    return { label: "", value: "" };
+    return { label: "all", value: "all" };
   }) : [];
 };
