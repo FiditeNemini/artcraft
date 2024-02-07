@@ -8,6 +8,8 @@ import PageHeader from "components/layout/PageHeader";
 
 import { states, reducer } from "./videoWorkflowReducer";
 import SubRoutes from "./videoWorkflowRoutes";
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { StudioNotAvailable } from 'v2/view/_common/StudioNotAvailable';
 
 export default function StorytellerFilter(props:{
   enqueueInferenceJob: (
@@ -16,8 +18,9 @@ export default function StorytellerFilter(props:{
   ) => void;
   inferenceJobs: Array<InferenceJob>;
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
+  sessionWrapper: SessionWrapper;
 }){
-  const debug=true;
+  const debug = true;
   const {t} = useLocalize("VideoWorkflow");
   const { NO_FILE } = states;
   const [pageState, dispatchPageState] = useReducer(reducer, {
@@ -43,6 +46,10 @@ export default function StorytellerFilter(props:{
       });
     }
   }, [pageState, enqueueInferenceJob]);
+
+  if (!props.sessionWrapper.canAccessStudio()) {
+    return <StudioNotAvailable />
+  }
 
   return(
     <Container type="panel" className="mb-5">
