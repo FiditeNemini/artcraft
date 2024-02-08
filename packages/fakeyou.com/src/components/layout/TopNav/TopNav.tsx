@@ -12,6 +12,7 @@ import { Link, useHistory } from "react-router-dom";
 import { WebUrl } from "common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
+import { useDomainConfig } from "context/DomainConfigContext";
 
 interface TopNavProps {
   sessionWrapper: SessionWrapper;
@@ -25,12 +26,14 @@ export default function TopNav({
   querySessionCallback,
   querySessionSubscriptionsCallback,
 }: TopNavProps) {
+  const domain = useDomainConfig();
   let history = useHistory();
   const [isMobileSearchBarVisible, setIsMobileSearchBarVisible] =
     useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const wrapper = document.getElementById("wrapper");
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
+  // const { t } = useLocalize("TopNav");
 
   const handleMenuButtonClick = () => {
     if (window.innerWidth < 1200) {
@@ -179,20 +182,22 @@ export default function TopNav({
     <div id="topbar-wrapper" className="position-fixed">
       <div className="topbar-nav">
         <div className="topbar-nav-left">
-          <Link to="/">
-            <img
-              src="/fakeyou/FakeYou-Logo.png"
-              alt="FakeYou: Cartoon and Celebrity Text to Speech"
-              height="34"
-              className="mb-2 d-none d-lg-block"
-            />
-            <img
-              src="/fakeyou/FakeYou-Logo-Mobile.png"
-              alt="FakeYou: Cartoon and Celebrity Text to Speech"
-              height="36"
-              className="mb-0 d-block d-lg-none"
-            />
-          </Link>
+          <div className="d-flex gap-3 align-items-center">
+            <Link to="/">
+              <img
+                src={domain.logo}
+                alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
+                height="34"
+                className="mb-1 d-none d-lg-block"
+              />
+              <img
+                src="/fakeyou/FakeYou-Logo-Mobile.png"
+                alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
+                height="36"
+                className="mb-0 d-block d-lg-none"
+              />
+            </Link>
+          </div>
         </div>
 
         <div className="topbar-nav-center">
@@ -231,6 +236,8 @@ export default function TopNav({
           </div>
         </div>
       </div>
+
+      {/* <div className="topbar-nav bg-panel">test</div> */}
 
       {/* Mobile Searchbar */}
       {isMobileSearchBarVisible && (

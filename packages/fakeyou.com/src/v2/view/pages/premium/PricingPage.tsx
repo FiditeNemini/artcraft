@@ -17,6 +17,7 @@ import { WebUrl } from "../../../../common/WebUrl";
 import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutFlow";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { Container, Panel } from "components/common";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -147,8 +148,8 @@ function PricingPage(props: Props) {
   }
 
   return (
-    <div>
-      <div className="container pt-5 pb-4 text-center">
+    <Container type="panel">
+      <Panel clear={true} className="text-center my-5">
         <h1 className=" fw-bold">Pricing</h1>
         {/* <p className="fs-5">
           By purchasing FakeYou premium, you help us build more!
@@ -157,8 +158,9 @@ function PricingPage(props: Props) {
           <FontAwesomeIcon icon={faHeart} className="text-red me-3" />
           By purchasing FakeYou premium, you help us build more!
         </div>
-      </div>
-      <div className="container mb-5">
+      </Panel>
+
+      <Panel clear={true}>
         <div className="row gx-3 gy-4">
           {/* Starter Tier */}
           {/*<div className="col-12 col-sm-6 col-lg-3" >
@@ -712,8 +714,8 @@ function PricingPage(props: Props) {
             </div>
           </div>
         </div> */}
-      </div>
-    </div>
+      </Panel>
+    </Container>
   );
 }
 

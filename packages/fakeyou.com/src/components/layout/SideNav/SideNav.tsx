@@ -55,6 +55,13 @@ export default function SideNav({
   const isDevelopmentEnv = fakeYouFrontendEnv.isDevelopment();
   const wrapper = document.getElementById("wrapper");
   const isMenuOpen = wrapper?.classList.contains("toggled");
+  const isLoggedIn = sessionWrapper.isLoggedIn();
+  const isOnLandingPage = window.location.pathname === "/";
+  const isOnLoginOrSignUpPage =
+    window.location.pathname === "/login" ||
+    window.location.pathname === "/login/" ||
+    window.location.pathname === "/signup" ||
+    window.location.pathname === "/signup/";
 
   let history = useHistory();
   const handleNavLinkClick = () => {
@@ -104,17 +111,25 @@ export default function SideNav({
     };
   }, []);
 
-  const shouldShowSidebar = windowWidth >= 992;
+  const shouldNotShowSidebar =
+    !isLoggedIn && (isOnLandingPage || isOnLoginOrSignUpPage);
+  const shouldShowSidebar = windowWidth >= 992 && !shouldNotShowSidebar;
+  const sidebarClassName = `sidebar ${
+    shouldShowSidebar ? "visible" : ""
+  }`.trim();
 
   useEffect(() => {
     const contentWrapper = document.getElementById("page-content-wrapper");
 
-    if (windowWidth >= 992) {
+    if (
+      (shouldShowSidebar && isLoggedIn) ||
+      (shouldShowSidebar && !isOnLandingPage)
+    ) {
       contentWrapper?.classList.remove("no-padding");
     } else {
       contentWrapper?.classList.add("no-padding");
     }
-  }, [windowWidth]);
+  }, [isLoggedIn, isOnLandingPage, shouldShowSidebar]);
 
   const [queueStats, setQueueStats] = useState<GetQueueStatsSuccessResponse>({
     success: true,
@@ -348,10 +363,7 @@ export default function SideNav({
 
   return (
     <>
-      <div
-        id="sidebar-wrapper"
-        className={`sidebar ${shouldShowSidebar ? "visible" : ""}`}
-      >
+      <div id="sidebar-wrapper" className={sidebarClassName}>
         <div>
           <ul className="sidebar-nav">
             <li>
