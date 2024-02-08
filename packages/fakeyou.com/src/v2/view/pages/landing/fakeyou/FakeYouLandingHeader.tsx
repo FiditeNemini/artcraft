@@ -112,7 +112,7 @@ export default function FakeYouLandingHeader(props: FakeYouLandingHeaderProps) {
   }, []);
 
   return (
-    <Panel clear={true}>
+    <Panel clear={true} className="mt-5">
       {/* <Alert
               id="face-animation-alert"
               icon={faSparkles}

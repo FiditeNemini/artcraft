@@ -7,6 +7,7 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import { Container } from "components/common";
 import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import FakeYouDashboard from "./Dashboard";
+import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 // import StorytellerLanding from "./StorytellerLanding";
 
 interface Props {
@@ -32,6 +33,8 @@ function LandingPage(props: Props) {
         )}
 
         <FakeYouDashboard sessionWrapper={props.sessionWrapper} />
+
+        {!isLoggedIn && <FakeYouLandingBody />}
       </Container>
     </>
   );
