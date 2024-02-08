@@ -71,17 +71,16 @@ export default function useWeightFetch({ onRemove = n, onSuccess = n, token }: P
       statusSet(FetchStatus.in_progress);
       GetWeight(token, {})
         .then((res: any) => {
-          let {
-            creator_set_visibility,
-            description_markdown,
-            title: resTitle,
-          } = res;
-          statusSet(FetchStatus.success);
-          titleSet(resTitle);
-          descriptionMDSet(description_markdown);
-          visibilitySet(creator_set_visibility);
-          onSuccess(res);
-          setData(res);
+          if (res.success) {
+            let { creator_set_visibility, description_markdown, title: resTitle } = res;
+
+            statusSet(FetchStatus.success);
+            titleSet(resTitle);
+            descriptionMDSet(description_markdown);
+            visibilitySet(creator_set_visibility);
+            onSuccess(res);
+            setData(res);
+          } else { statusSet(FetchStatus.error); }
         })
         .catch(err => {
           statusSet(FetchStatus.error);
