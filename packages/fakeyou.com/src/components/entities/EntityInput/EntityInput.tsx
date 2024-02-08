@@ -8,7 +8,7 @@ import { FileWrapper, Label, Spinner } from "components/common";
 import { EntityType, MediaFilterProp, WeightFilterProp } from "components/entities/EntityTypes";
 import { useFile, useMedia, useModal, useSession } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { faFileArrowUp, faGrid, faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
+import { faDiagramSankey, faFile, faFileArrowUp, faGrid, faImage, faPersonWalking, faWaveform } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { UploadMedia, UploadMediaResponse } from "@storyteller/components/src/api/media_files/UploadMedia";
 import { v4 as uuidv4 } from "uuid";
@@ -17,6 +17,7 @@ import "./EntityInput.scss";
 interface Props {
   label?: string, 
   onChange?: any,
+  owner?: string,
   mediaType?: MediaFilterProp,
   aspectRatio?: "square" | "landscape" | "portrait",
   weightType?: WeightFilterProp,
@@ -32,6 +33,7 @@ interface EmptySlideProps extends SlideProps {
   inputProps?: any,
   onSelect: any,
   open: any,
+  owner: string,
   user: any
 };
 
@@ -64,24 +66,37 @@ const MocapInputFull = ({ media }: SlideProps) => {
   </>;
 };
 
-const MediaPickerEmpty = ({ entityType, filterType, media, onSelect, open, inputProps, user }: EmptySlideProps) => {
+const MediaPickerEmpty = ({ entityType, filterType, media, onSelect, open, owner, inputProps, user }: EmptySlideProps) => {
   const browserClick = () => open({
     component: MediaBrowser,
-    props: { entityType, filterType, onSelect, username: user?.username || "" }
+    props: { entityType, filterType, onSelect, owner, username: user?.username || "" }
   });
 
+  const mediaIcons = () => {
+    switch (filterType) {
+      case "audio": return faWaveform;
+      case "image": return faImage;
+      case "bvh": return faPersonWalking;
+      default: return faFile;
+    }
+  }
+
   return <>
-    <Icon {...{ className: "fy-entity-input-icon", icon: faPersonWalking }}/>
+    <Icon {...{ className: "fy-entity-input-icon", icon: [faFile,mediaIcons(),faDiagramSankey][entityType] }}/>
     <div {...{ className: "fy-entity-input-empty-controls" }}>
-      <FileWrapper {...{ containerClass: "fy-entity-input-row", panelClass: "fy-entity-input-button", noStyle: true, ...inputProps }}>
-        <>
-        <Icon {...{ className: "fy-entity-input-label-icon", icon: faFileArrowUp }}/>
-        Upload, click or drag here
-        </>
-      </FileWrapper>
+     { entityType ===  EntityType.media &&
+        <FileWrapper {...{ containerClass: "fy-entity-input-row", panelClass: "fy-entity-input-button", noStyle: true, ...inputProps }}>
+           <>
+             <Icon {...{ className: "fy-entity-input-label-icon", icon: faFileArrowUp }}/>
+             <div {...{ className: "fy-entity-input-upload-detail" }}>
+               Upload, click or drag here
+               { filterType !== "all" && <span>{ filterType } files supported</span> }
+             </div>
+           </>
+         </FileWrapper> }
       <div {...{ className: "fy-entity-input-row fy-entity-input-button", onClick: browserClick }}>
         <Icon {...{ className: "fy-entity-input-label-icon", icon: faGrid }}/>
-        Choose from your media
+        Choose from your { ["","media","weights"][entityType] }
       </div>
     </div>
   </>;
@@ -94,7 +109,7 @@ const AniMod = ({ animating, className, isLeaving, render: Render, style, ...res
     <Render {...{ ...rest, animating }} />
   </a.div>;
 
-export default function EntityInput({ aspectRatio = "square", label, onChange, mediaType, weightType }: Props) {
+export default function EntityInput({ aspectRatio = "square", label, onChange, owner, mediaType, weightType }: Props) {
   const entityType = mediaType ? EntityType.media : weightType ? EntityType.weights : EntityType.unknown;
   const filterType = mediaType || weightType || "all";
   const { search } = useLocation();
@@ -149,7 +164,7 @@ export default function EntityInput({ aspectRatio = "square", label, onChange, m
           return [
             <AniMod {...{ render: MediaBusy, className: "fy-entity-input-busy", ...sharedProps }}/>,
             <AniMod {...{ render: MocapInputFull, className: "fy-entity-input-full", ...sharedProps }}/>,
-            <AniMod {...{ render: MediaPickerEmpty, className: "fy-entity-input-empty", entityType, filterType, inputProps, onSelect, open, user, ...sharedProps }}/>
+            <AniMod {...{ render: MediaPickerEmpty, className: "fy-entity-input-empty", entityType, filterType, inputProps, onSelect, open, owner, user, ...sharedProps }}/>
           ][i];
         
         })

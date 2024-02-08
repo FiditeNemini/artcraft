@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { states, Action, State } from "../videoWorkflowReducer";
 import { Button } from "components/common";
-import SelectModal from "components/common/SelectModal/SelectModal";
+import SelectModal, { SelectModalData } from "components/common/SelectModal/SelectModal";
 
 export default function TabContentLibrary({
   t, pageState, dispatchPageState
@@ -14,29 +14,34 @@ export default function TabContentLibrary({
   const handleProceed = ()=>{
     dispatchPageState({type: "loadFile"})
   }
-  const handleOnSelect = (data:{token:string, title:string})=>{
-    dispatchPageState({
-      type: "selectedFile",
-      payload: {mediaFileToken: data.token}
-    });
+  const handleOnSelect = (data:SelectModalData)=>{
+    if (data.token !== ""){
+      dispatchPageState({
+        type: "selectedFile",
+        payload: {mediaFileToken: data.token}
+      });
+    }else{
+      dispatchPageState({type: "clearedFile"});
+    };
   };
+
   return (
     <div className="row g-3">
       <div className="col-12">
-      <SelectModal
-        modalTitle="Select a Video"
-        label="Select a Video"
-        onSelect={handleOnSelect}
-        tabs={[
-          {
-            label: "All Videos",
-            tabKey: "allVideos",
-            mediaTypeFilter: "video",
-            searcher: false,
-            type: "media",
-          },
-        ]}
-      />
+        <SelectModal
+          modalTitle="Select a Video"
+          label="Select a Video"
+          onSelect={handleOnSelect}
+          tabs={[
+            {
+              label: "All Videos",
+              tabKey: "allVideos",
+              typeFilter: "video",
+              searcher: false,
+              type: "media",
+            },
+          ]}
+        />
       </div>
       {pageState.status === states.FILE_SELECTED &&
         <div className="col-12 d-flex justify-content-center mt-5">

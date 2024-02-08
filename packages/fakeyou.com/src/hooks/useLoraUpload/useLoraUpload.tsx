@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { UploadModel } from "@storyteller/components/src/api/image_generation/UploadModel";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
-import { useCoverImgUpload } from "hooks";
+import { useCoverImgUpload, useInferenceJobs } from "hooks";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
 
 // this hook is mostly for organizational purposes while I work -V
@@ -13,6 +14,7 @@ export default function useLoraUpload() {
   const [descriptionMD, descriptionMDSet] = useState("");
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
   const coverImg = useCoverImgUpload();
+  const { enqueue } = useInferenceJobs(FrontendInferenceJobType.ImageGeneration);
 
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
     const todo: { [key: string]: (x: any) => void } = {
@@ -38,9 +40,11 @@ export default function useLoraUpload() {
       visibility,
     })
       .then((res: any) => {
-        writeStatusSet(FetchStatus.success);
-        console.log("🌠", res);
-        // history.replace(`/weight/${token}`);
+        if (res.success && res.inference_job_token) {
+          console.log("🌠", res);
+          writeStatusSet(FetchStatus.success);
+          enqueue(res.inference_job_token, FrontendInferenceJobType.ImageGeneration);
+      }
       })
       .catch(err => {
         writeStatusSet(FetchStatus.error);

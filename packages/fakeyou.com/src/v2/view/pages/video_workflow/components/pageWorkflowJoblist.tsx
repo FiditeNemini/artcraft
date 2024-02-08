@@ -6,7 +6,7 @@ import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/Infer
 import { states, Action, State } from "../videoWorkflowReducer";
 import { Spinner } from 'components/common';
 
-function StorytellerJobList(){
+function VideoWorkflowJobList(){
   const failures = (fail = "") => {
     switch (fail) {
       case "sample case": 
@@ -20,12 +20,12 @@ function StorytellerJobList(){
     <InferenceJobsList {...{
       failures,
       onSelect: () => Analytics.voiceConversionClickDownload(),
-      jobType: FrontendInferenceJobType.StorytellerFilter,
+      jobType: FrontendInferenceJobType.VideoWorkflow,
     }}/>
   );
 }
 
-export default memo (function PageJobList({
+export default memo (function PageWorkflowJoblist({
   t, pageState, dispatchPageState
 }: {
   debug?: boolean;
@@ -37,13 +37,13 @@ export default memo (function PageJobList({
   return(
     <>
       <h1>Jobs</h1>
-      {pageState.status === states.FILTER_ENQUEUEING &&
+      {pageState.status === states.WORKFLOW_ENQUEUEING &&
         <div>
           <h2> Requesting Filter Job</h2>
           <Spinner />
         </div>
       }
-      <StorytellerJobList />
+      <VideoWorkflowJobList />
     </>
   );
 });

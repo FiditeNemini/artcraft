@@ -496,8 +496,8 @@ class ApiConfig {
     return `${this.getApiOrigin()}/v1/mocap/mocapnet/create`;
   }
 
-  // =============== Storyteller Filter ===============
-  enqueueStorytellerFilter(): string {
+  // =============== Video Workflow ===============
+  enqueueVideoWorkflow(): string {
     return `${this.getApiOrigin()}/v1/workflow/comfy/create`;
   }
 

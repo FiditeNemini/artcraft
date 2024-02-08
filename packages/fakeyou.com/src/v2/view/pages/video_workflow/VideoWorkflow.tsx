@@ -8,6 +8,8 @@ import PageHeader from "components/layout/PageHeader";
 
 import { states, reducer } from "./videoWorkflowReducer";
 import SubRoutes from "./videoWorkflowRoutes";
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { StudioNotAvailable } from 'v2/view/_common/StudioNotAvailable';
 
 export default function StorytellerFilter(props:{
   enqueueInferenceJob: (
@@ -16,9 +18,10 @@ export default function StorytellerFilter(props:{
   ) => void;
   inferenceJobs: Array<InferenceJob>;
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
+  sessionWrapper: SessionWrapper;
 }){
-  const debug=true;
-  const {t} = useLocalize("StorytellerFilter");
+  const debug = true;
+  const {t} = useLocalize("VideoWorkflow");
   const { NO_FILE } = states;
   const [pageState, dispatchPageState] = useReducer(reducer, {
     status: NO_FILE,
@@ -26,16 +29,16 @@ export default function StorytellerFilter(props:{
 
   const { enqueueInferenceJob } = props;
   useInferenceJobs(
-    FrontendInferenceJobType.StorytellerFilter
+    FrontendInferenceJobType.VideoWorkflow
   );
   useEffect(() => {
     if (
-      pageState.status === states.FILTER_ENQUEUED &&
+      pageState.status === states.WORKFLOW_ENQUEUED &&
       pageState.inferenceJobToken
     ) {
       enqueueInferenceJob(
         pageState.inferenceJobToken,
-        FrontendInferenceJobType.StorytellerFilter
+        FrontendInferenceJobType.VideoWorkflow
       );
       dispatchPageState({
         type: "enqueueFilterSuccess",
@@ -44,8 +47,13 @@ export default function StorytellerFilter(props:{
     }
   }, [pageState, enqueueInferenceJob]);
 
+  if (!props.sessionWrapper.canAccessStudio()) {
+    return <StudioNotAvailable />
+  }
+
   return(
     <Container type="panel" className="mb-5">
+      {debug && <p>{`Status:${pageState.status} MediaToken:${pageState.mediaFileToken}`}</p>}
       <PageHeader
         title={t("headings.title")}
         subText={t("headings.subtitle")}

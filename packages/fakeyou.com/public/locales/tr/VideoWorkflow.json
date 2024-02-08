@@ -1,0 +1,17 @@
+{
+  "button": {
+    "proceed": "İş Akışı Kontrollerine Devam Edin",
+    "process": "İş Akışına Geçiş Süreci",
+    "select": "Seçme",
+    "upload": "Video yükle"
+  },
+  "headings": {
+    "title": "Video İş Akışı"
+  },
+  "tabTitle": {
+    "library": "Medya arasından seçim yapın",
+    "original": "Orijinal",
+    "preview": "Ön izleme",
+    "upload": "Yüklemek"
+  }
+}

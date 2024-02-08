@@ -6,12 +6,15 @@ import { EnqueueEngineCompositing } from "@storyteller/components/src/api/engine
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
 import "./EngineCompositor.scss"
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 interface Props {
   value?: any;
+  sessionWrapper: SessionWrapper;
 }
 
-export default function EngineCompositor({ value }: Props) {
+export default function EngineCompositor({ value, sessionWrapper }: Props) {
   const [mediaToken,mediaTokenSet] = useState();
   const onChange = ({ target }: any) => mediaTokenSet(target.value);
   const inferenceJobs = useInferenceJobs(FrontendInferenceJobType.EngineComposition);
@@ -23,12 +26,10 @@ export default function EngineCompositor({ value }: Props) {
     })
     .then((res: any) => {
         if (res && res.success) {
-          console.log("🚛 success!",{ mediaToken, res });
           inferenceJobs.enqueue( // I need to pass this
             res.inference_job_token,
             FrontendInferenceJobType.EngineComposition
           );
-
         }
       });
   }
@@ -39,6 +40,10 @@ export default function EngineCompositor({ value }: Props) {
         return "Uknown failure";
     }
   };
+
+  if (!sessionWrapper.canAccessStudio()) {
+    return <StudioNotAvailable />
+  }
 
   return <div {...{ className: "fy-engine-compositor"}}>
     <div {...{ className: "panel engine-compositor-container" }}>

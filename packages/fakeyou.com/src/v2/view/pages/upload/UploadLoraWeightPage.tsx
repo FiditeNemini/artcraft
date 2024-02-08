@@ -15,6 +15,8 @@ import {
   TempSelect,
   TempTextArea,
 } from "components/common";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import InferenceJobsList from "components/layout/InferenceJobsList";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import useLoraUpload from "hooks/useLoraUpload";
 
@@ -31,6 +33,14 @@ export default function UploadLoraWeightPage({
     { label: "Public", value: "public" },
     { label: "Private", value: "private" },
   ];
+
+
+  const failures = (fail = "") => {
+    switch (fail) {
+      default:
+        return "Uknown failure";
+    }
+  };
 
   const {
     coverImg,
@@ -66,6 +76,12 @@ export default function UploadLoraWeightPage({
 
   return (
     <Container type="panel">
+      <InferenceJobsList
+        {...{
+          failures,
+          jobType: FrontendInferenceJobType.ImageGeneration,
+        }}
+      />
       <PageHeader
         title="Upload LoRA Weight"
         titleIcon={faWaveform}

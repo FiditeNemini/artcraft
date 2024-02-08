@@ -1,11 +1,7 @@
 import React, { useState } from "react";
 import { EntityInput } from "components/entities";
-import { Button } from "components/common";
-// import { useInferenceJobs } from "hooks";
-// import InferenceJobsList from "components/layout/InferenceJobsList";
-// import { EnqueueEngineCompositing } from "@storyteller/components/src/api/engine_compositor/EnqueueEngineCompositing";
-// import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-// import { v4 as uuidv4 } from "uuid";
+import { EntityFilterOptions, EntityType, MediaFilterProp, WeightFilterProp } from "components/entities/EntityTypes";
+import { Button, SegmentButtons, TempInput, TempSelect } from "components/common";
 
 interface Props {
   value?: any;
@@ -13,34 +9,34 @@ interface Props {
 
 export default function DevMediaInput({ value }: Props) {
   const [mediaToken,mediaTokenSet] = useState();
+  const [mediaType,mediaTypeSet] = useState<MediaFilterProp>("all");
+  const [weightType,weightTypeSet] = useState<WeightFilterProp>("all");
+  const [entityType,entityTypeSet] = useState(EntityType.media);
+  const [owner,ownerSet] = useState("");
   const onChange = ({ target }: any) => mediaTokenSet(target.value);
-  // const inferenceJobs = useInferenceJobs(FrontendInferenceJobType.EngineComposition);
 
-  // const failures = (fail = "") => {
-  //   switch (fail) {
-  //     default:
-  //       return "Uknown failure";
-  //   }
-  // };
+  const options = [{ label: "Media", value: EntityType.media },{ label: "Weights", value: EntityType.weights }];
+  const changeFilter = ({ target }: { target: any }) => [mediaTypeSet,mediaTypeSet,weightTypeSet][entityType](target.value);
 
   return <div {...{ className: "fy-engine-compositor"}}>
     <div {...{ className: "panel engine-compositor-container" }}>
       <header>
         <h2>{ [526,187].map((num = 0) => String.fromCodePoint(128000 + num)) }</h2>
+        <SegmentButtons {...{ onChange: ({ target }: { target: any }) => entityTypeSet(target.value), options, value: entityType }}/>
+        <TempInput {...{ value: owner, onChange: ({ target }: { target: any }) => ownerSet(target.value), placeholder: "User" }}/>
+        <TempSelect {...{ options: EntityFilterOptions(entityType), value: ["",mediaType,weightType][entityType], onChange: changeFilter }}/>
         <Button {...{ label: "Enqueue", variant: "primary" }}/>
       </header>
-       <EntityInput {...{ aspectRatio: "landscape", label: "Choose Media File", onChange, weightType: "sd_1.5" }}/>
+       <EntityInput {...{
+          aspectRatio: "landscape",
+          label: `Choose ${ ["","media file","weight"][entityType] }`,
+          onChange,
+          owner,
+          ...([{},{ mediaType },{ weightType }][entityType])
+        }}/>
        <div>
         { mediaToken }
        </div>
     </div>
-  {
-      // <InferenceJobsList
-      //   {...{
-      //     failures,
-      //     jobType: FrontendInferenceJobType.EngineComposition,
-      //   }}
-      // />
-  }
   </div>;
 };

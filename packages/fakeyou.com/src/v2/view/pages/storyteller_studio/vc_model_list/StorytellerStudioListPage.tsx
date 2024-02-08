@@ -5,6 +5,7 @@ import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { Container, Panel } from "components/common";
 import { faCameraMovie } from "@fortawesome/pro-solid-svg-icons";
+import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -12,6 +13,10 @@ interface Props {
 }
 
 function StorytellerStudioListPage(props: Props) {
+  if (!props.sessionWrapper.canAccessStudio()) {
+    return <StudioNotAvailable />
+  }
+
   return (
     <Container type="panel">
       <PageHeaderWithImage
