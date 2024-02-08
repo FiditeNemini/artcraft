@@ -387,6 +387,7 @@ class PageContainer extends React.Component<
                         }
                         ttsInferenceJobs={this.props.ttsInferenceJobs}
                         enqueueTtsJob={this.props.enqueueTtsJob}
+                        sessionWrapper={this.props.sessionWrapper}
                       />
                     )}
                   />
@@ -841,6 +842,7 @@ class PageContainer extends React.Component<
                         inferenceJobs: this.props.inferenceJobs,
                         inferenceJobsByCategory:
                           this.props.inferenceJobsByCategory,
+                        sessionWrapper: this.props.sessionWrapper,
                       }}
                     />
                   </Route>
@@ -854,6 +856,7 @@ class PageContainer extends React.Component<
                         inferenceJobs: this.props.inferenceJobs,
                         inferenceJobsByCategory:
                           this.props.inferenceJobsByCategory,
+                        sessionWrapper: this.props.sessionWrapper,
                       }}
                     />
                   </Route>
@@ -864,6 +867,7 @@ class PageContainer extends React.Component<
                         this.props.sessionSubscriptionsWrapper
                       }
                       enqueueInferenceJob={this.props.enqueueInferenceJob}
+                      sessionWrapper={this.props.sessionWrapper}
                     />
                   </Route>
 
@@ -1362,7 +1366,9 @@ class PageContainer extends React.Component<
                   </Route>
 
                   <Route path="/engine-compositor">
-                    <EngineCompositor />
+                    <EngineCompositor
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
                   </Route>
 
                   <Route path="/voice-designer">
@@ -1382,6 +1388,7 @@ class PageContainer extends React.Component<
                         inferenceJobs: this.props.inferenceJobs,
                         inferenceJobsByCategory:
                           this.props.inferenceJobsByCategory,
+                        sessionWrapper: this.props.sessionWrapper,
                       }}
                     />
                   </Route>
