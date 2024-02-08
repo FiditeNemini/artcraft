@@ -78,21 +78,6 @@ function AboutPage(props: Props) {
       imageSrc: "/images/avatars/default-pfp.png",
     },
     {
-      name: "Evgenii",
-      role: "Gen AI Artist",
-      imageSrc: "/images/avatars/default-pfp.png",
-    },
-    {
-      name: "Steven",
-      role: "Gen AI Artist",
-      imageSrc: "/images/avatars/default-pfp.png",
-    },
-    {
-      name: "Willis",
-      role: "Gen AI Artist",
-      imageSrc: "/images/avatars/default-pfp.png",
-    },
-    {
       name: "Jose",
       role: "Data Team",
       imageSrc: "/images/team/jose.webp",
