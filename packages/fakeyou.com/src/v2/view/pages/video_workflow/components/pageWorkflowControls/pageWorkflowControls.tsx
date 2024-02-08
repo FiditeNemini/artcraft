@@ -189,14 +189,14 @@ export default function PageFilterControls({
                     {
                       label: "All LoRA Weights",
                       tabKey: "allLoraWeights",
-                      typeFilter: "rvc_v2",
+                      typeFilter: "loRA",
                       searcher: true,
                       type: "weights",
                     },
                     {
                       label: "Bookmarked",
                       tabKey: "bookmarkedLoraWeights",
-                      typeFilter: "rvc_v2",
+                      typeFilter: "loRA",
                       searcher: false,
                       type: "weights",
                     },
