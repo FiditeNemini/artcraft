@@ -25,7 +25,7 @@ function VideoWorkflowJobList(){
   );
 }
 
-export default memo (function PageJobList({
+export default memo (function PageWorkflowJoblist({
   t, pageState, dispatchPageState
 }: {
   debug?: boolean;
@@ -37,7 +37,7 @@ export default memo (function PageJobList({
   return(
     <>
       <h1>Jobs</h1>
-      {pageState.status === states.FILTER_ENQUEUEING &&
+      {pageState.status === states.WORKFLOW_ENQUEUEING &&
         <div>
           <h2> Requesting Filter Job</h2>
           <Spinner />

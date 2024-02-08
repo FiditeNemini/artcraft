@@ -32,7 +32,6 @@ export default function TabContentLibrary({
           modalTitle="Select a Video"
           label="Select a Video"
           onSelect={handleOnSelect}
-          value={{token: pageState.mediaFileToken || "", title: ""}}
           tabs={[
             {
               label: "All Videos",
