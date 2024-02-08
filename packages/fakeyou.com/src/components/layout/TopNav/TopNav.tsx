@@ -1,8 +1,13 @@
 import {
   faBars,
+  faFaceViewfinder,
+  faMessageDots,
   faSearch,
   faSignOutAlt,
+  faStar,
   faUser,
+  faWandMagicSparkles,
+  faWaveformLines,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
@@ -13,6 +18,7 @@ import { WebUrl } from "common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { useDomainConfig } from "context/DomainConfigContext";
+import NavItem from "../../common/NavItem/NavItem";
 
 interface TopNavProps {
   sessionWrapper: SessionWrapper;
@@ -34,6 +40,12 @@ export default function TopNav({
   const wrapper = document.getElementById("wrapper");
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
   // const { t } = useLocalize("TopNav");
+  const isOnLandingPage = window.location.pathname === "/";
+  const isOnLoginOrSignUpPage =
+    window.location.pathname === "/login" ||
+    window.location.pathname === "/login/" ||
+    window.location.pathname === "/signup" ||
+    window.location.pathname === "/signup/";
 
   const handleMenuButtonClick = () => {
     if (window.innerWidth < 1200) {
@@ -178,6 +190,29 @@ export default function TopNav({
     );
   }
 
+  const aiToolsDropdown = [
+    { id: 1, name: "Text to Speech", link: "/tts", icon: faMessageDots },
+    {
+      id: 2,
+      name: "Voice to Voice",
+      link: "/voice-conversion",
+      icon: faWaveformLines,
+    },
+    {
+      id: 3,
+      name: "Face Animator",
+      link: "/face-animator",
+      icon: faFaceViewfinder,
+    },
+    {
+      id: 4,
+      name: "Voice Designer",
+      link: "/voice-designer",
+      icon: faWandMagicSparkles,
+    },
+    // { id: 4, name: "Text to Image", link: "/text-to-image" },
+  ];
+
   return (
     <div id="topbar-wrapper" className="position-fixed">
       <div className="topbar-nav">
@@ -197,6 +232,16 @@ export default function TopNav({
                 className="mb-0 d-block d-lg-none"
               />
             </Link>
+            {((!loggedIn && isOnLandingPage) ||
+              (!loggedIn && isOnLoginOrSignUpPage)) && (
+              <div className="d-none d-lg-block">
+                <NavItem
+                  isHoverable={true}
+                  label="AI Tools"
+                  dropdownItems={aiToolsDropdown}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -212,6 +257,16 @@ export default function TopNav({
         </div>
 
         <div className="topbar-nav-right">
+          {((!loggedIn && isOnLandingPage) ||
+            (!loggedIn && isOnLoginOrSignUpPage)) && (
+            <NavItem
+              icon={faStar}
+              label="Pricing"
+              link="/pricing"
+              className="me-3 d-none d-lg-block"
+            />
+          )}
+
           <div className="d-flex align-items-center gap-2">
             <div className="d-none d-lg-flex gap-2">
               {userOrLoginButton}
