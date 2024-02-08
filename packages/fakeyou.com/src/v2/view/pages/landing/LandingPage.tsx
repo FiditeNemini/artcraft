@@ -26,7 +26,7 @@ function LandingPage(props: Props) {
   return (
     <>
       <Container type="panel">
-        {domain.title !== "FakeYou" ? (
+        {domain.title === "FakeYou" ? (
           <>
             {/* FAKEYOU.COM */}
             {!isLoggedIn && (
