@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import MasonryGrid from "components/common/MasonryGrid/MasonryGrid";
 import { ImagePreview, MocapPreview, VideoPreview } from '../CardPreviews';
-import { AudioCard, OverlayCard, CardWrapper } from "components/entities";
+import { AudioCard, OverlayCard, CardWrapper, WeightCard } from "components/entities";
 import { EntityType } from "components/entities/EntityTypes";
 
 interface MediaCardsProps {
@@ -33,6 +33,10 @@ const MediaCards = ({ props, type }: MediaCardsProps) => {
 
 const WeightsCards = ({ props, type }: MediaCardsProps) => {
   switch (type) {
+    case "rvc_v2":
+      return <CardWrapper {...{ ...props, card: WeightCard, padding: true }}/>;
+    case "tt2":
+      return <CardWrapper {...{ ...props, card: WeightCard, padding: true }}/>;
     default:
       return <div>Unsupported media type</div>;
   }

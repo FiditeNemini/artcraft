@@ -19,7 +19,7 @@ import {
   faUser,
   faWandMagicSparkles,
   faWaveformLines,
-  faTransporter
+  faTransporter,
 } from "@fortawesome/pro-solid-svg-icons";
 
 import {
@@ -55,6 +55,13 @@ export default function SideNav({
   const isDevelopmentEnv = fakeYouFrontendEnv.isDevelopment();
   const wrapper = document.getElementById("wrapper");
   const isMenuOpen = wrapper?.classList.contains("toggled");
+  const isLoggedIn = sessionWrapper.isLoggedIn();
+  const isOnLandingPage = window.location.pathname === "/";
+  const isOnLoginOrSignUpPage =
+    window.location.pathname === "/login" ||
+    window.location.pathname === "/login/" ||
+    window.location.pathname === "/signup" ||
+    window.location.pathname === "/signup/";
 
   let history = useHistory();
   const handleNavLinkClick = () => {
@@ -104,17 +111,25 @@ export default function SideNav({
     };
   }, []);
 
-  const shouldShowSidebar = windowWidth >= 992;
+  const shouldNotShowSidebar =
+    !isLoggedIn && (isOnLandingPage || isOnLoginOrSignUpPage);
+  const shouldShowSidebar = windowWidth >= 992 && !shouldNotShowSidebar;
+  const sidebarClassName = `sidebar ${
+    shouldShowSidebar ? "visible" : ""
+  }`.trim();
 
   useEffect(() => {
     const contentWrapper = document.getElementById("page-content-wrapper");
 
-    if (windowWidth >= 992) {
+    if (
+      (shouldShowSidebar && isLoggedIn) ||
+      (shouldShowSidebar && !isOnLandingPage)
+    ) {
       contentWrapper?.classList.remove("no-padding");
     } else {
       contentWrapper?.classList.add("no-padding");
     }
-  }, [windowWidth]);
+  }, [isLoggedIn, isOnLandingPage, shouldShowSidebar]);
 
   const [queueStats, setQueueStats] = useState<GetQueueStatsSuccessResponse>({
     success: true,
@@ -256,12 +271,99 @@ export default function SideNav({
     queueStats.legacy_tts.pending_job_count +
     queueStats.inference.by_queue.pending_tacotron2_jobs;
 
+  let maybeVideoGeneration = <></>;
+
+  if (sessionWrapper.canAccessStudio()) {
+    maybeVideoGeneration = (
+      <>
+        <li>
+          <NavLink
+            to="/video-mocap"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faPersonRays}
+              className="sidebar-heading-icon"
+            />
+            {t("videoMotionCapture")}
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink
+            to="/video-workflow"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faArrowsTurnToDots}
+              className="sidebar-heading-icon"
+            />
+            {t("videoWorkflow")}
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink
+            to="/studio"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faCameraMovie}
+              className="sidebar-heading-icon"
+            />
+            Storyteller Studio
+            {/* {t("videoStorytellerStudio")} */}
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/engine-compositor"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faTransporter}
+              className="sidebar-heading-icon"
+            />
+            Engine Compositor
+            {/* {t("videoStorytellerStudio")} */}
+          </NavLink>
+        </li>
+      </>
+    );
+  }
+
+  let maybeImageGeneration = <></>;
+
+  if (sessionWrapper.canAccessStudio()) {
+    maybeImageGeneration = (
+      <>
+        <li className="sidebar-heading">Image Generation</li>
+        <li>
+          <NavLink
+            to="/text-to-image"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faMessageImage}
+              className="sidebar-heading-icon"
+            />
+            Text to Image
+            {/* {t("videoStorytellerStudio")} */}
+          </NavLink>
+        </li>
+        <hr className="mb-3 mt-3" />
+      </>
+    );
+  }
+
   return (
     <>
-      <div
-        id="sidebar-wrapper"
-        className={`sidebar ${shouldShowSidebar ? "visible" : ""}`}
-      >
+      <div id="sidebar-wrapper" className={sidebarClassName}>
         <div>
           <ul className="sidebar-nav">
             <li>
@@ -360,80 +462,13 @@ export default function SideNav({
                 {t("videoFaceAnimator")}
               </NavLink>
             </li>
-            <li>
-              <NavLink
-                to="/video-mocap"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faPersonRays}
-                  className="sidebar-heading-icon"
-                />
-                {t("videoMotionCapture")}
-              </NavLink>
-            </li>
 
-            <li>
-              <NavLink
-                to="/video-workflow"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faArrowsTurnToDots}
-                  className="sidebar-heading-icon"
-                />
-                {t("videoWorkflow")}
-              </NavLink>
-            </li>
-
-            <li>
-              <NavLink
-                to="/studio"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faCameraMovie}
-                  className="sidebar-heading-icon"
-                />
-                Storyteller Studio
-                {/* {t("videoStorytellerStudio")} */}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/engine-compositor"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faTransporter}
-                  className="sidebar-heading-icon"
-                />
-                Engine Compositor
-                {/* {t("videoStorytellerStudio")} */}
-              </NavLink>
-            </li>
-            <hr className="mb-3 mt-3" />
-            <li className="sidebar-heading">Image Generation</li>
-            <li>
-              <NavLink
-                to="/text-to-image"
-                activeClassName="active-link"
-                onClick={handleNavLinkClick}
-              >
-                <FontAwesomeIcon
-                  icon={faMessageImage}
-                  className="sidebar-heading-icon"
-                />
-                Text to Image
-                {/* {t("videoStorytellerStudio")} */}
-              </NavLink>
-            </li>
+            {maybeVideoGeneration}
 
             <hr className="mb-3 mt-3" />
+
+            {maybeImageGeneration}
+
             <li className="sidebar-heading">{t("communityTitle")}</li>
             <li>
               <NavLink
@@ -521,7 +556,7 @@ export default function SideNav({
             </div>
           </div>
 
-          <div className="px-4 d-flex d-lg-none gap-2 mb-5">
+          <div className="px-4 d-flex d-lg-none gap-2 mb-2">
             {userOrLoginButton}
             {signupOrLogOutButton}
           </div>

@@ -19,12 +19,14 @@ import {
 } from "@storyteller/components/src/api/server/GetServerInfo";
 import { useLocalize } from "hooks";
 import { Container } from "components/common";
+import { useDomainConfig } from "context/DomainConfigContext";
 
 interface Props {
   sessionWrapper: SessionWrapper;
 }
 
 function FooterNav(props: Props) {
+  const domain = useDomainConfig();
   const { t } = useLocalize("Footer");
   const [serverInfo, setServerInfo] = useState<
     GetServerInfoSuccessResponse | undefined
@@ -84,8 +86,8 @@ function FooterNav(props: Props) {
           <div className="col-12 col-lg-3 d-flex flex-column gap-4 align-items-center align-items-lg-start">
             <Link to="/">
               <img
-                src="/fakeyou/FakeYou-Logo.png"
-                alt="FakeYou: Cartoon and Celebrity Text to Speech"
+                src={domain.logo}
+                alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
                 height="34"
               />
             </Link>
@@ -204,12 +206,8 @@ function FooterNav(props: Props) {
         </div>
 
         <div className="d-flex flex-column flex-lg-row pt-2 align-items-center gap-2 gap-xl-4 flex-wrap">
-          <span className="flex-grow-1">
-            © 2023 FakeYou by{" "}
-            <a href="https://storyteller.ai" target="_blank" rel="noreferrer">
-              Storyteller.ai
-            </a>
-          </span>
+          <span className="flex-grow-1 opacity-75">© {domain.title} 2023</span>
+
           <div className="d-flex flex-column flex-lg-row align-items-center mt-4 mt-lg-0">
             {moderationLink}
           </div>

@@ -5,6 +5,7 @@ import { InferenceJobsContext } from 'context';
 
 export default function useInferenceJobs(jobType: FrontendInferenceJobType) {
   const { byCategory, enqueue } = useContext(InferenceJobsContext);
+
   return {
     enqueue,
     inferenceJobs: (byCategory?.get(jobType) || []),

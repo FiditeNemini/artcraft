@@ -18,8 +18,8 @@ import { BeginStripeCheckoutFlow } from "../../../../common/BeginStripeCheckoutF
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import Container from "components/common/Container";
-import PageHeader from "components/layout/PageHeader";
 import Panel from "components/common/Panel";
+import { useDomainConfig } from "context/DomainConfigContext";
 
 enum FieldTriState {
   EMPTY_FALSE,
@@ -34,6 +34,7 @@ interface Props {
 
 function SignupPage(props: Props) {
   let history = useHistory();
+  const domain = useDomainConfig();
 
   const parsedQueryString = queryString.parse(window.location.search);
 
@@ -349,12 +350,11 @@ function SignupPage(props: Props) {
   }
 
   return (
-    <Container type="panel" className="login-panel">
-      <PageHeader
-        title="Sign Up"
-        subText="Create a new account."
-        panel={false}
-      />
+    <Container
+      type="panel"
+      className="login-panel d-flex flex-column align-items-center"
+    >
+      <h2 className="fw-bold mb-0 mt-5 mb-4">Sign Up for {domain.title}</h2>
 
       <Panel padding={true}>
         <form onSubmit={handleFormSubmit}>

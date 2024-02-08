@@ -20,12 +20,12 @@ interface Props {
   handleClose: any,
   mediaToken: string,
   onSelect?: any,
+  owner?: string,
   filterType?: MediaFilterProp | WeightFilterProp,
   username: string,
 }
 
-export default function MediaBrowser({ entityType, filterType: inputFilter, mediaToken, handleClose = () => {}, onSelect, username }: Props) {
-  console.log("😎",entityType);
+export default function MediaBrowser({ entityType, filterType: inputFilter, mediaToken, handleClose = () => {}, onSelect, owner, username }: Props) {
   const ratings = useRatings();
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [filterType, filterTypeSet] = useState(inputFilter ||  "all");
@@ -46,7 +46,7 @@ export default function MediaBrowser({ entityType, filterType: inputFilter, medi
       setShowMasonryGrid(true);
     },
     requestList: true,
-    urlParam: "echelon",
+    urlParam: owner || username,
     urlUpdate: false
   });
 
@@ -74,7 +74,7 @@ export default function MediaBrowser({ entityType, filterType: inputFilter, medi
   return <>
     <header {...{ className: "fy-media-browser-header" }}>
       <div {...{ className: "fy-media-browser-tools" }}>
-        <h3>{ ["","Media","Weights"][entityType] }</h3>
+        <h3>{ ["",`${ owner ? owner + "'s " : "" }Media`,"Weights"][entityType] }</h3>
         <Icon {...{ className: "icon-close-button", icon: faXmark, onClick: () => handleClose() }}/>
       </div>
       <div {...{ className: "fy-media-browser-tools" }}>

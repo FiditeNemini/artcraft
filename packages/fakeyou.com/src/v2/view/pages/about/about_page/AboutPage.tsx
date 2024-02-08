@@ -78,21 +78,6 @@ function AboutPage(props: Props) {
       imageSrc: "/images/avatars/default-pfp.png",
     },
     {
-      name: "Evgenii",
-      role: "Gen AI Artist",
-      imageSrc: "/images/avatars/default-pfp.png",
-    },
-    {
-      name: "Steven",
-      role: "Gen AI Artist",
-      imageSrc: "/images/avatars/default-pfp.png",
-    },
-    {
-      name: "Willis",
-      role: "Gen AI Artist",
-      imageSrc: "/images/avatars/default-pfp.png",
-    },
-    {
       name: "Jose",
       role: "Data Team",
       imageSrc: "/images/team/jose.webp",
@@ -104,6 +89,9 @@ function AboutPage(props: Props) {
     },
   ];
 
+  // NB: just to prevent yarn lints from complaining
+  console.log(teamMembers.length);
+
   return (
     <Container type="panel" className="mb-5">
       <PageHeaderWithImage
@@ -112,7 +100,7 @@ function AboutPage(props: Props) {
         headerImage="/mascot/kitsune_pose3.webp"
         yOffset="85%"
       />
-      <Panel padding={true} mb={true}>
+      {/*<Panel padding={true} mb={true}>
         <h2 className="mb-3 fw-bold">Lorem Ipsum</h2>
 
         <p>
@@ -124,7 +112,7 @@ function AboutPage(props: Props) {
           pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
           culpa qui officia deserunt mollit anim id est laborum.
         </p>
-      </Panel>
+      </Panel>*/}
 
       <Panel padding={true} mb={true}>
         <h2 className="mb-3 fw-bold">Our Mission</h2>
@@ -138,6 +126,7 @@ function AboutPage(props: Props) {
         </p>
       </Panel>
 
+      {/*
       <Panel padding={true}>
         <h2 className="mb-3 fw-bold">The Team</h2>
 
@@ -199,6 +188,7 @@ function AboutPage(props: Props) {
           ))}
         </div>
       </Panel>
+      */}
     </Container>
   );
 }

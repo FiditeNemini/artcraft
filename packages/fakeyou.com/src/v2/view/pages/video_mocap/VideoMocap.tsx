@@ -21,6 +21,8 @@ import {
   faPersonRays,
 } from "@fortawesome/pro-solid-svg-icons";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 export default function VideoMotionCapture(props: {
   enqueueInferenceJob: (
@@ -29,8 +31,9 @@ export default function VideoMotionCapture(props: {
   ) => void;
   inferenceJobs: Array<InferenceJob>;
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
+  sessionWrapper: SessionWrapper;
 }) {
-  const { enqueueInferenceJob } = props;
+  const { enqueueInferenceJob, sessionWrapper } = props;
   const { t } = useLocalize("VideoMotionCapture");
   const { NO_FILE, FILE_UPLOADING, MOCAPNET_ENQUEUED } = states;
   const [pageState, dispatchPageState] = useReducer(reducer, {
@@ -58,6 +61,10 @@ export default function VideoMotionCapture(props: {
     }
   }, [pageState, enqueueInferenceJob]);
   const { pathname } = useLocation();
+
+  if (!sessionWrapper.canAccessStudio()) {
+    return <StudioNotAvailable />
+  }
 
   if (pathname === `/video-mocap` || pathname === `/video-mocap/`) {
     return <Redirect to={`/video-mocap/upload`} />;

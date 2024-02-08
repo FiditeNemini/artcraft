@@ -18,6 +18,9 @@ export interface UserInfo {
   display_name: string,
   email_gravatar_hash: string,
 
+  // Rollout feature flags
+  can_access_studio: boolean,
+
   // Usage
   can_use_tts: boolean,
   can_use_w2l: boolean,

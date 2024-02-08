@@ -35,8 +35,11 @@ import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import SdInferencePanel from "./inference_panels/SdInferencePanel";
 import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
+import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 interface WeightProps {
+  sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   inferenceJobs: Array<InferenceJob>;
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -49,6 +52,7 @@ interface WeightProps {
 }
 
 export default function WeightPage({
+  sessionWrapper,
   sessionSubscriptionsWrapper,
   inferenceJobs,
   ttsInferenceJobs,
@@ -99,6 +103,15 @@ export default function WeightPage({
   } = weightTypeInfo;
 
   const deleteWeight = () => remove(!!user?.can_ban_users);
+
+  switch (weight?.weight_type) {
+    case WeightType.SD_15:
+    case WeightType.SDXL:
+    case WeightType.LORA:
+      if (!sessionWrapper.canAccessStudio()) {
+        return <StudioNotAvailable />
+      }
+  }
 
   function renderWeightComponent(weight: Weight) {
     switch (weight.weight_category) {

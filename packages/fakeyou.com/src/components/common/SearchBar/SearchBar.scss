@@ -85,6 +85,12 @@
   }
 }
 
+@media (max-width: 1200px) {
+  .search-bar-container {
+    width: 400px;
+  }
+}
+
 @media (max-width: 992px) {
   .search-bar-container {
     width: 100%;
