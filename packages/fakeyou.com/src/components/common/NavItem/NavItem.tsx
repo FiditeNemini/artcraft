@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import DropdownMenu from "./DropdownMenu";
+import DropdownMenu from "../DropdownMenu/DropdownMenu";
 import "./NavItem.scss";
 import { IconDefinition } from "@fortawesome/fontawesome-common-types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -41,7 +41,9 @@ export default function NavItem({
             {label} <FontAwesomeIcon icon={faCaretDown} className="ms-1 fs-7" />
           </span>
 
-          {isHovered && <DropdownMenu items={dropdownItems} />}
+          {isHovered && (
+            <DropdownMenu items={dropdownItems} onClose={() => {}} />
+          )}
         </>
       );
     } else {

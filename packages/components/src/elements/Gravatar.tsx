@@ -7,6 +7,7 @@ interface Props {
   username?: string;
   avatarIndex?: number;
   backgroundIndex?: number;
+  onClick?: () => void;
 }
 
 function Gravatar(props: Props) {
@@ -35,6 +36,7 @@ function Gravatar(props: Props) {
       height={props.size}
       width={props.size}
       style={{ backgroundColor: getBackgroundColor(props.backgroundIndex) }}
+      onClick={props.onClick}
     />
   );
 }

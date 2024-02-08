@@ -3,9 +3,7 @@ import {
   faFaceViewfinder,
   faMessageDots,
   faSearch,
-  faSignOutAlt,
   faStar,
-  faUser,
   faWandMagicSparkles,
   faWaveformLines,
   faXmark,
@@ -14,11 +12,11 @@ import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
 import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { WebUrl } from "common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { useDomainConfig } from "context/DomainConfigContext";
 import NavItem from "../../common/NavItem/NavItem";
+import ProfileDropdown from "components/common/ProfileDropdown";
 
 interface TopNavProps {
   sessionWrapper: SessionWrapper;
@@ -101,91 +99,28 @@ export default function TopNav({
     await Logout();
     querySessionCallback();
     querySessionSubscriptionsCallback();
-    // PosthogClient.reset();
-    // Analytics.accountLogout();
     history.push("/");
   };
 
   const loggedIn = sessionWrapper.isLoggedIn();
 
-  let userOrLoginButton = (
-    <>
-      <Button
-        label="Login"
-        small
-        variant="secondary"
-        onClick={() => {
-          history.push("/login");
-        }}
-      />
-    </>
-  );
-
-  let signupOrLogOutButton = (
-    <>
-      <Button
-        label="Sign Up"
-        small
-        onClick={() => {
-          history.push("/signup");
-        }}
-      />
-    </>
-  );
-
-  if (loggedIn) {
-    let displayName = sessionWrapper.getDisplayName();
-    // let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
-    // let gravatar = <span />;
-
-    if (displayName === undefined) {
-      displayName = "My Account";
-    }
-
-    let url = WebUrl.userProfilePage(displayName);
-    userOrLoginButton = (
-      <>
-        <Button
-          icon={faUser}
-          label="My Profile"
-          small
-          variant="secondary"
-          onClick={() => {
-            history.push(url);
-          }}
-        />
-      </>
-    );
-
-    signupOrLogOutButton = (
-      <>
-        <Button
-          icon={faSignOutAlt}
-          label="Logout"
-          small
-          variant="danger"
-          onClick={async () => {
-            await logoutHandler();
-          }}
-        />
-      </>
-    );
-  }
+  let profileDropdown = <></>;
 
   if (sessionWrapper.isLoggedIn()) {
     let displayName = sessionWrapper.getDisplayName();
-    if (displayName === undefined) {
-      displayName = "My Account";
-    }
-    let url = WebUrl.userProfilePage(displayName);
-    userOrLoginButton = (
-      <Button
-        icon={faUser}
-        label="My Profile"
-        small
-        variant="secondary"
-        onClick={() => history.push(url)}
-        className="d-none d-lg-block"
+    let username = sessionWrapper.getUsername();
+    let emailHash = sessionWrapper.getEmailGravatarHash();
+    let avatarIndex = 0; //temporary
+    let backgroundColorIndex = 0; //temporary
+
+    profileDropdown = (
+      <ProfileDropdown
+        username={username || ""}
+        displayName={displayName || ""}
+        avatarIndex={avatarIndex}
+        backgroundColorIndex={backgroundColorIndex}
+        emailHash={emailHash || ""}
+        logoutHandler={logoutHandler}
       />
     );
   }
@@ -269,8 +204,27 @@ export default function TopNav({
 
           <div className="d-flex align-items-center gap-2">
             <div className="d-none d-lg-flex gap-2">
-              {userOrLoginButton}
-              {signupOrLogOutButton}
+              {loggedIn ? (
+                profileDropdown
+              ) : (
+                <>
+                  <Button
+                    label="Login"
+                    small
+                    variant="secondary"
+                    onClick={() => {
+                      history.push("/login");
+                    }}
+                  />
+                  <Button
+                    label="Sign Up"
+                    small
+                    onClick={() => {
+                      history.push("/signup");
+                    }}
+                  />
+                </>
+              )}
             </div>
             <Button
               icon={faSearch}
