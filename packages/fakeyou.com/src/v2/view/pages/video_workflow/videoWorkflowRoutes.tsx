@@ -16,7 +16,7 @@ export default function SubRoutes ({
   const { path } = useRouteMatch();
   const history = useHistory();
   history.listen(({pathname}, action) => {
-    if (pathname === path || pathname.match(/upload|select-media/g) && pageState.status >= states.FILE_LOADING){
+    if ((pathname === path || pathname.match(/upload|select-media/g)) && pageState.status >= states.FILE_LOADING){
       //reset page if landed on page "Freshly"
       dispatchPageState({type: 'reset'})
     }
