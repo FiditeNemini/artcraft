@@ -1,6 +1,7 @@
 {
   "button": {
     "generate": "Generar",
+    "proceed": "Continúe con la captura de movimiento en cola",
     "select": "Seleccionar",
     "upload": "Subir vídeo"
   },

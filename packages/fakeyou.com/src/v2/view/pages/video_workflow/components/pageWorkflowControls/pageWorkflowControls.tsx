@@ -1,8 +1,5 @@
 import React, {useState, useRef} from "react";
 import { useParams, useHistory } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMedia } from "hooks";
 
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
@@ -11,7 +8,6 @@ import { states, Action, State } from "../../videoWorkflowReducer";
 import {
   Accordion,
   Button,
-  BasicVideo,
   ErrorMessage,
   InputSeed,
   Panel,
@@ -21,9 +17,13 @@ import {
 } from "components/common";
 
 import SectionControlNets, {ControlNetsInitialValues as CnIvs} from "./sectionControlNets";
-import SectionVideoSettings from "./sectionVideoSettings";
+import SectionVideoSettings, {VideoSettingsInitialValues as VideoIvs} from "./sectionVideoSettings";
 import SectionAdvanceOptions, {AdvanceOptionsInitialValues as AdvIvs} from "./sectionAdvanceOptions";
-import { isInputValid } from "./helpers";
+import {
+  isInputValid,
+  mapRequest,
+  WorkflowValuesType
+} from "./helpers";
 
 export default function PageFilterControls({
   debug, t, pageState, dispatchPageState, parentPath
@@ -49,7 +49,8 @@ export default function PageFilterControls({
     },
   });
 
-  const [workflowValues, setworkflowValues] = useState({
+  const [workflowValues, setworkflowValues] = useState<WorkflowValuesType>({
+    fileToken: pageState.mediaFileToken || mediaToken,
     outputPath: "vid2vid/SparseUpscaleInterp_00001.mp4",
     workflowConfig: "weight_q8sz47gmfw2zx02snrbz88ns9",
     seed: "",
@@ -57,11 +58,7 @@ export default function PageFilterControls({
     loraModelToken: "",
     posPrompt: "",
     negPrompt: "",
-    framesCap:16,
-    skipFrames:0,
-    nthFrames:2,
-    inputFps: 24,
-    interpolationMutiplier: 2,
+    ...VideoIvs,
     ...AdvIvs,
     ...CnIvs
   });
@@ -75,33 +72,8 @@ export default function PageFilterControls({
     if(debug) console.log(workflowValues)
 
     if (isInputValid(workflowValues)){
-      const request = {
-        "uuid_idempotency_token": uuidv4(),
-        "maybe_sd_model": workflowValues.sdModelToken,
-        "maybe_workflow_config": workflowValues.workflowConfig,
-        "maybe_input_file": pageState.mediaFileToken || mediaToken,
-        "maybe_output_path": workflowValues.outputPath,
-        "maybe_json_modifications": {
-          "$.510.inputs.Text": workflowValues.posPrompt,
-          "$.8.inputs.text": workflowValues.negPrompt,
-          "$.173.inputs.seed": workflowValues.seed,
-          "$.401.inputs.Value": workflowValues.firstPass,
-          "$.918.inputs.Value": workflowValues.motionScale,
-          "$.137.inputs.Value": workflowValues.framesCap,
-          "$.186.inputs.Value": workflowValues.skipFrames,
-          "$.140.inputs.Value": workflowValues.nthFrames,
-          "$.154.inputs.Value": workflowValues.inputFps,
-          "$.445.inputs.number": workflowValues.interpolationMutiplier,
-          "$.947.inputs.Value": workflowValues.cnTile,
-          "$.800.inputs.Value": workflowValues.cnCanny,
-          "$.797.inputs.Value": workflowValues.cnLinearAnime,
-          "$.796.inputs.Value": workflowValues.cnLinearRealistic,
-          "$.772.inputs.Value": workflowValues.cnDepth,
-          "$.771.inputs.Value": workflowValues.cnOpenPose,
-          "$.527.inputs.Value": workflowValues.cnPipeFace,
-          "$.403.inputs.Value": workflowValues.cnSparse
-        },
-      }
+      const request = mapRequest(workflowValues);
+      console.log(request);
       EnqueueVideoWorkflow(request).then(res => {
         if (res.success && res.inference_job_token) {
           dispatchPageState({
@@ -129,28 +101,43 @@ export default function PageFilterControls({
         <>
           <Panel>
             <div className="row g-3 p-3">
-              <div className="col-5">
+              <div className="col-6">
                 <div className="fy-basic-video">
-                  <video controls ref={videoRef}>
+                  <video controls ref={videoRef} 
+                    style={{
+                      maxHeight: "500px",
+                      objectFit: "contain"
+                    }}>
                     <source src={mediaLink} type="video/mp4"/>
                   </video>
                 </div>
               </div>
-              <div className="col-2 d-flex align-items-center justify-content-center">
-                <FontAwesomeIcon icon={faChevronRight} className="fa-7x"/>
-              </div>
-              <div className="col-5">
-                <BasicVideo src={mediaLink} />
+              <div className="col-6">
+                <SectionVideoSettings
+                  workflowValues={workflowValues}
+                  onChange={(key,val)=>handleOnChange(key,val)}
+                  videoElement={videoRef?.current}
+                />
+                <div className="d-flex my-3 justify-content-end">
+                    <Button
+                      className="me-3"
+                      label={t("button.previewWorkflow")}
+                      tooltip="feature not available yet"
+                      variant="primary"
+                      disabled
+                    />
+                    <Button
+                      className="me-3"
+                      label={t("button.enqueueWorkflow")}
+                      onClick={handleGenerate}
+                      variant="primary"
+                    />
+                </div>
+                
               </div>
             </div>
           </Panel>
           <Accordion className="mt-4">
-            <Accordion.Item title="Video Settings">
-              <SectionVideoSettings
-                onChange={(key,val)=>handleOnChange(key,val)}
-                videoElement={videoRef?.current}
-              />
-            </Accordion.Item>
             <Accordion.Item title={"Basics"} defaultOpen>
               <div className="row g-3 p-3">
                 <SelectModal 
@@ -189,14 +176,14 @@ export default function PageFilterControls({
                     {
                       label: "All LoRA Weights",
                       tabKey: "allLoraWeights",
-                      typeFilter: "rvc_v2",
+                      typeFilter: "loRA",
                       searcher: true,
                       type: "weights",
                     },
                     {
                       label: "Bookmarked",
                       tabKey: "bookmarkedLoraWeights",
-                      typeFilter: "rvc_v2",
+                      typeFilter: "loRA",
                       searcher: false,
                       type: "weights",
                     },
@@ -250,7 +237,7 @@ export default function PageFilterControls({
           <div className="row g-3 py-3">
             <div className="col-12 d-flex justify-content-end">
               <Button
-                label={t("Process Filter")}
+                label={t("button.enqueueWorkflow")}
                 onClick={handleGenerate}
                 variant="primary"
               />

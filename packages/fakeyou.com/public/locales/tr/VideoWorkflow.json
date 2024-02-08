@@ -1,11 +1,15 @@
 {
   "button": {
+    "enqueueWorkflow": "Video Oluştur",
+    "generateNewWorkflow": "Yeni Bir İş Akışı Oluşturun",
+    "previewWorkflow": "İş Akışı Sonuçlarını Önizle",
     "proceed": "İş Akışı Kontrollerine Devam Edin",
     "process": "İş Akışına Geçiş Süreci",
     "select": "Seçme",
     "upload": "Video yükle"
   },
   "headings": {
+    "subtitle": "Bu, ana iş akışımızı test etmek ve dahili olarak stiller oluşturmak için kullanılan dahili bir araçtır. Bu aracı kullandığınızda, sizi neyin rahatsız ettiğini, neyin kafa karıştırıcı olduğunu ve neyin işe yaramadığını not alın.",
     "title": "Video İş Akışı"
   },
   "tabTitle": {

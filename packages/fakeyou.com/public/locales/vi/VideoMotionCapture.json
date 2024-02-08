@@ -1,6 +1,7 @@
 {
   "button": {
     "generate": "Phát ra",
+    "proceed": "Tiến hành Enqueue Motion Capture",
     "select": "Lựa chọn",
     "upload": "Tải video lên"
   },

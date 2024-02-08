@@ -1,6 +1,7 @@
 {
   "button": {
     "generate": "Generieren",
+    "proceed": "Fahren Sie mit „Motion Capture in die Warteschlange stellen“ fort",
     "select": "Wählen",
     "upload": "Video hochladen"
   },

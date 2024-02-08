@@ -1,6 +1,7 @@
 {
   "button": {
     "generate": "Générer",
+    "proceed": "Passer à la mise en file d'attente de la capture de mouvement",
     "select": "Sélectionner",
     "upload": "Télécharger une video"
   },

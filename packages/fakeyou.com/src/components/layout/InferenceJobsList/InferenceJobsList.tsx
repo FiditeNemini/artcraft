@@ -15,6 +15,7 @@ interface JobsListProps {
   jobType?: FrontendInferenceJobType;
   value?: JobListTypes;
   onSelect?: (e: any) => any;
+  showNoJobs?: boolean;
 }
 
 export default function InferenceJobsList({
@@ -22,6 +23,7 @@ export default function InferenceJobsList({
   jobType,
   value,
   onSelect,
+  showNoJobs = false,
 }: JobsListProps) {
   // undefined specified here to allow 0.
   // jobType + 1 because the difference between FrontendInferenceJobType and JobListTypes is an "all" option
@@ -31,7 +33,7 @@ export default function InferenceJobsList({
   const { inferenceJobs = [], jobStatusDescription } = useInferenceJobs(jobValue);
   const { t } = useLocalize("InferenceJobs");
 
-  if (inferenceJobs.length) {
+  if (inferenceJobs.length || showNoJobs) {
     return (
       <Panel {...{ className: "fy-inference-jobs-list", padding: true }}>
         <h5>{t("core.heading")}</h5>
@@ -49,6 +51,9 @@ export default function InferenceJobsList({
             />
           ))
           .reverse()}
+          {!inferenceJobs.length && showNoJobs &&
+            <p>Currently, there are current no jobs pending.</p> 
+          }
       </Panel>
     );
   } else {

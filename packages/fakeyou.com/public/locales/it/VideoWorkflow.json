@@ -1,11 +1,15 @@
 {
   "button": {
+    "enqueueWorkflow": "Genera video",
+    "generateNewWorkflow": "Genera un nuovo flusso di lavoro",
+    "previewWorkflow": "Anteprima dei risultati del flusso di lavoro",
     "proceed": "Procedi ai controlli del flusso di lavoro",
     "process": "Dal processo al flusso di lavoro",
     "select": "Selezionare",
     "upload": "Carica video"
   },
   "headings": {
+    "subtitle": "Questo è uno strumento interno per testare il nostro flusso di lavoro principale e generare stili internamente. Quando usi questo strumento prendi nota di ciò che ti disturba, di ciò che crea confusione e di ciò che non sembra funzionare.",
     "title": "Flusso di lavoro video"
   },
   "tabTitle": {
