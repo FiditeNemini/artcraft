@@ -4,6 +4,7 @@ import {
   faSignOutAlt,
   faUser,
   faXmark,
+  faClipboardList
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
@@ -12,6 +13,8 @@ import { Link, useHistory } from "react-router-dom";
 import { WebUrl } from "common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
+import { useModal } from "hooks";
+import { InferenceJobsModal } from "components/modals";
 
 interface TopNavProps {
   sessionWrapper: SessionWrapper;
@@ -31,6 +34,9 @@ export default function TopNav({
   const [isFocused, setIsFocused] = useState(false);
   const wrapper = document.getElementById("wrapper");
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
+
+  const { open } = useModal();
+  const openModal = () => open({ component: InferenceJobsModal });
 
   const handleMenuButtonClick = () => {
     if (window.innerWidth < 1200) {
@@ -209,6 +215,7 @@ export default function TopNav({
         <div className="topbar-nav-right">
           <div className="d-flex align-items-center gap-2">
             <div className="d-none d-lg-flex gap-2">
+              <Button {...{ icon: faClipboardList, label: "My Jobs", onClick: openModal, variant: "secondary" }}/>
               {userOrLoginButton}
               {signupOrLogOutButton}
             </div>

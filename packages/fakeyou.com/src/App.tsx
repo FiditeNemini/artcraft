@@ -837,11 +837,11 @@ class App extends React.Component<Props, State> {
             */}
 
             <div className="migrationComponentWrapper">
-              <ModalProvider> 
               <InferenceJobs
                 {...{
                   enqueue: this.enqueueInferenceJob,
                   byCategory: this.state.inferenceJobsByCategory,
+                  inferenceJobs: this.state.inferenceJobs
                 }}
               >
                 <SessionProvider
@@ -852,6 +852,8 @@ class App extends React.Component<Props, State> {
                     sessionFetched: this.state.sessionFetched,
                   }}
                 >
+
+              <ModalProvider> 
                   <Switch>
                     <Route path="/">
                       <PageContainer
@@ -959,9 +961,9 @@ class App extends React.Component<Props, State> {
                       />
                     </Route>
                   </Switch>
+                  </ModalProvider>
                 </SessionProvider>
               </InferenceJobs>
-              </ModalProvider>
             </div>
           </div>
         </div>

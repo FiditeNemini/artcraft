@@ -97,6 +97,7 @@ import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVo
 import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
 import EngineCompositor from "./pages/EngineCompositor";
+import InferenceJobsPage from "./pages/inference_jobs_page";
 import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
 import WeightPage from "./pages/weight/WeightPage";
@@ -1313,6 +1314,10 @@ class PageContainer extends React.Component<
                   inferenceJobsByCategory={this.props.inferenceJobsByCategory}
                   ttsInferenceJobs={this.props.ttsInferenceJobs}
                 />
+              </Route>
+
+              <Route path="/inference-jobs-list">
+                <InferenceJobsPage/>
               </Route>
 
               <Route path="/engine-compositor">

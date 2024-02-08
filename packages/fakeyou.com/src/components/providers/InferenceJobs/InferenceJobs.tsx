@@ -3,12 +3,12 @@ import { InferenceJobsContext } from 'context';
 
 interface Props {
   children?: any;
-  enqueue?: any;
-  byCategory?: any;
+  // enqueue?: any;
+  // byCategory?: any;
 }
 
-export default function InferenceJobs({ byCategory, children, enqueue }: Props) {
-	return <InferenceJobsContext.Provider {...{ value: { byCategory, enqueue } }}>
+export default function InferenceJobs({  children, ...value }: Props) {
+	return <InferenceJobsContext.Provider {...{ value }}>
 		{ children }
 	</InferenceJobsContext.Provider>
 };

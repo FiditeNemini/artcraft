@@ -6,22 +6,29 @@ import {
 // import { useTransition } from "@react-spring/web";
 import JobItem from "./JobItem";
 import { useInferenceJobs, useLocalize } from "hooks";
+import { JobListTypes } from "hooks/useInferenceJobs/useInferenceJobs";
 import "./InferenceJobsList.scss";
 import { Panel } from "components/common";
 
 interface JobsListProps {
   failures: (fail: string) => string;
-  jobType: FrontendInferenceJobType;
+  jobType?: FrontendInferenceJobType;
+  value?: JobListTypes;
   onSelect?: (e: any) => any;
 }
 
 export default function InferenceJobsList({
   failures,
   jobType,
+  value,
   onSelect,
 }: JobsListProps) {
-  const { inferenceJobs = [], jobStatusDescription } =
-    useInferenceJobs(jobType);
+  // undefined specified here to allow 0.
+  // jobType + 1 because the difference between FrontendInferenceJobType and JobListTypes is an "all" option
+
+  const jobValue = value !== undefined ? value : jobType !== undefined ? (jobType || 0) + 1 : 0;
+
+  const { inferenceJobs = [], jobStatusDescription } = useInferenceJobs(jobValue);
   const { t } = useLocalize("InferenceJobs");
 
   if (inferenceJobs.length) {
@@ -34,7 +41,6 @@ export default function InferenceJobsList({
               {...{
                 failures,
                 jobStatusDescription,
-                jobType,
                 key,
                 onSelect,
                 t,

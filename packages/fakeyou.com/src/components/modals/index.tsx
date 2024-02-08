@@ -1,3 +1,4 @@
+import InferenceJobsModal from "./InferenceJobsModal";
 import MediaBrowser from "./MediaBrowser";
 
-export { MediaBrowser };
+export { InferenceJobsModal, MediaBrowser };

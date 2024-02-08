@@ -19,7 +19,8 @@ import {
   faUser,
   faWandMagicSparkles,
   faWaveformLines,
-  faTransporter
+  faTransporter,
+  faClipboardList
 } from "@fortawesome/pro-solid-svg-icons";
 
 import {
@@ -392,6 +393,19 @@ export default function SideNav({
                   className="sidebar-heading-icon"
                 />
                 Explore
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/inference-jobs-list"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faClipboardList}
+                  className="sidebar-heading-icon"
+                />
+                My Jobs
               </NavLink>
             </li>
             <hr className="mb-3 mt-3" />
