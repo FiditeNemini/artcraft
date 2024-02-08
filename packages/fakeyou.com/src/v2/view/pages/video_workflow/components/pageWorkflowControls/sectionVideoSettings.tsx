@@ -1,10 +1,11 @@
-import React, { memo, useState } from 'react'
-
-import { TempInput as Input } from 'components/common'
+import React, { memo } from 'react'
+import { TempInput as Input, NumberSliderV2 } from 'components/common'
+import { WorkflowValuesType } from './helpers';
 
 export const VideoSettingsInitialValues = {
   width: 544,
   height: 544,
+  maxFrames: 17,
   framesCap: 16,
   skipFrames: 0,
   everyNthFrame: 2,
@@ -14,46 +15,65 @@ export const VideoSettingsInitialValues = {
 
 export default memo( function SectionVideoSettings({
   onChange : handleOnChange,
+  workflowValues: wfVal,
   videoElement: ve
 } : {
   onChange: (key:string, val:number)=>void,
+  workflowValues: WorkflowValuesType,
   videoElement: HTMLVideoElement | null,
 }){
   const iv = VideoSettingsInitialValues;
-  const [{width, height}, setDimensions] = useState({
-    width:iv.width, height:iv.height
-  });
+
   if(ve && ve!==null){
     ve.onloadedmetadata = () =>{
       if (ve.videoWidth && ve.videoHeight) {
         const aspectRatio = ve.videoWidth/ve.videoHeight
         if (aspectRatio > 1){
-          setDimensions({width: 960, height: iv.height});
+          handleOnChange("width",960);
         }
         else if (aspectRatio < 1) {
-          setDimensions({width: iv.width, height: 960});
+          handleOnChange("height",960);
         }else{
           console.log(`aspectRaio: ${aspectRatio}`);
         }
       }
+      if(ve.duration){
+        handleOnChange("maxFrames", 
+          Math.floor(ve.duration)*wfVal.inputFps
+        );
+      }
+      //TODO: Optimizer to make ONE handleOnChange only
+      //TODO: deal with maxFrames with more reliable math
     }
   }
   return(
     <>
       <div className="row g-3 p-3">
         <div className="col-md-6">
-          <Input label="Width" value={width} readOnly/>
+          <Input label="Width" value={wfVal.width} readOnly/>
         </div>
         <div className="col-md-6">
-          <Input label="Height" value={height} readOnly/>
+          <Input label="Height" value={wfVal.height} readOnly/>
         </div>
       </div>
       <div className="row g-3 p-3">
         <div className="col-md-6">
-          <Input label="Frames Cap" value={iv.framesCap} readOnly/>
+          <NumberSliderV2 {...{
+            min: 16, max: wfVal.maxFrames, step: 1,
+            initialValue: wfVal.framesCap,
+            label: "Frames Cap",
+            thumbTip: "24 frames = 1 sec",
+            onChange: (val)=>{handleOnChange("framesCap",val)}
+          }}/>
         </div>
         <div className="col-md-6">
-          <Input label="Skip Frames" value={iv.skipFrames} readOnly/>
+          <NumberSliderV2 {...{
+            min: 0, max: wfVal.maxFrames-16, step: 1,
+            initialValue: wfVal.skipFrames,
+            label: "Skip Frames",
+            thumbTip: "24 frames = 1 sec",
+            onChange: (val)=>{handleOnChange("skipFrames",val)}
+          }}/>
         </div>
       </div>
       <div className="row g-3 p-3">

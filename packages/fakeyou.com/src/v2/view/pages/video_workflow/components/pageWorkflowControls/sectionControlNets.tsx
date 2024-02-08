@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import { NumberSliderV2 } from 'components/common'
+import { WorkflowValuesType } from './helpers';
 
 export const ControlNetsInitialValues = {
   cnCanny: 0,
@@ -16,7 +17,7 @@ export default memo( function SectionControlNets({
   workflowValues: wfVal, 
   onChange : handleOnChange
 } : {
-  workflowValues : any
+  workflowValues : WorkflowValuesType
   onChange: (key:string, val:number)=>void}
 ){
 
