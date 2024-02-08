@@ -1,6 +1,7 @@
 {
   "button": {
     "generate": "creare",
+    "proceed": "Procedere con l'accodamento di Motion Capture",
     "select": "Selezionare",
     "upload": "Carica video"
   },

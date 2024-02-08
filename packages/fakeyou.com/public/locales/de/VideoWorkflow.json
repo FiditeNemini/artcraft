@@ -1,11 +1,15 @@
 {
   "button": {
+    "enqueueWorkflow": "Video generieren",
+    "generateNewWorkflow": "Generieren Sie einen neuen Workflow",
+    "previewWorkflow": "Vorschau der Workflow-Ergebnisse",
     "proceed": "Fahren Sie mit den Workflow-Kontrollen fort",
     "process": "Vom Prozess zum Workflow",
     "select": "Wählen",
     "upload": "Video hochladen"
   },
   "headings": {
+    "subtitle": "Dies ist ein internes Tool zum Testen unseres Hauptworkflows und zum internen Generieren von Stilen. Wenn Sie dieses Tool verwenden, machen Sie sich Notizen darüber, was Sie stört, was verwirrend ist und was nicht zu funktionieren scheint.",
     "title": "Video-Workflow"
   },
   "tabTitle": {

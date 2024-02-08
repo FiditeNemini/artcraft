@@ -1,6 +1,7 @@
 {
   "button": {
     "generate": "产生",
+    "proceed": "继续将动作捕捉入队",
     "select": "选择",
     "upload": "上传视频"
   },
