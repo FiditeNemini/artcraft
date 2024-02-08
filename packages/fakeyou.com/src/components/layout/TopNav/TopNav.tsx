@@ -1,8 +1,11 @@
 import {
   faBars,
+  faFaceViewfinder,
+  faMessageDots,
   faSearch,
-  faSignOutAlt,
-  faUser,
+  faStar,
+  faWandMagicSparkles,
+  faWaveformLines,
   faXmark,
   faClipboardList
 } from "@fortawesome/pro-solid-svg-icons";
@@ -10,11 +13,13 @@ import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
 import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
-import { WebUrl } from "common/WebUrl";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { useModal } from "hooks";
 import { InferenceJobsModal } from "components/modals";
+import { useDomainConfig } from "context/DomainConfigContext";
+import NavItem from "../../common/NavItem/NavItem";
+import ProfileDropdown from "components/common/ProfileDropdown";
 
 interface TopNavProps {
   sessionWrapper: SessionWrapper;
@@ -28,12 +33,20 @@ export default function TopNav({
   querySessionCallback,
   querySessionSubscriptionsCallback,
 }: TopNavProps) {
+  const domain = useDomainConfig();
   let history = useHistory();
   const [isMobileSearchBarVisible, setIsMobileSearchBarVisible] =
     useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const wrapper = document.getElementById("wrapper");
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
+  // const { t } = useLocalize("TopNav");
+  const isOnLandingPage = window.location.pathname === "/";
+  const isOnLoginOrSignUpPage =
+    window.location.pathname === "/login" ||
+    window.location.pathname === "/login/" ||
+    window.location.pathname === "/signup" ||
+    window.location.pathname === "/signup/";
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
@@ -92,113 +105,85 @@ export default function TopNav({
     await Logout();
     querySessionCallback();
     querySessionSubscriptionsCallback();
-    // PosthogClient.reset();
-    // Analytics.accountLogout();
     history.push("/");
   };
 
   const loggedIn = sessionWrapper.isLoggedIn();
 
-  let userOrLoginButton = (
-    <>
-      <Button
-        label="Login"
-        small
-        variant="secondary"
-        onClick={() => {
-          history.push("/login");
-        }}
-      />
-    </>
-  );
-
-  let signupOrLogOutButton = (
-    <>
-      <Button
-        label="Sign Up"
-        small
-        onClick={() => {
-          history.push("/signup");
-        }}
-      />
-    </>
-  );
-
-  if (loggedIn) {
-    let displayName = sessionWrapper.getDisplayName();
-    // let gravatarHash = props.sessionWrapper.getEmailGravatarHash();
-    // let gravatar = <span />;
-
-    if (displayName === undefined) {
-      displayName = "My Account";
-    }
-
-    let url = WebUrl.userProfilePage(displayName);
-    userOrLoginButton = (
-      <>
-        <Button
-          icon={faUser}
-          label="My Profile"
-          small
-          variant="secondary"
-          onClick={() => {
-            history.push(url);
-          }}
-        />
-      </>
-    );
-
-    signupOrLogOutButton = (
-      <>
-        <Button
-          icon={faSignOutAlt}
-          label="Logout"
-          small
-          variant="danger"
-          onClick={async () => {
-            await logoutHandler();
-          }}
-        />
-      </>
-    );
-  }
+  let profileDropdown = <></>;
 
   if (sessionWrapper.isLoggedIn()) {
     let displayName = sessionWrapper.getDisplayName();
-    if (displayName === undefined) {
-      displayName = "My Account";
-    }
-    let url = WebUrl.userProfilePage(displayName);
-    userOrLoginButton = (
-      <Button
-        icon={faUser}
-        label="My Profile"
-        small
-        variant="secondary"
-        onClick={() => history.push(url)}
-        className="d-none d-lg-block"
+    let username = sessionWrapper.getUsername();
+    let emailHash = sessionWrapper.getEmailGravatarHash();
+    let avatarIndex = 0; //temporary
+    let backgroundColorIndex = 0; //temporary
+
+    profileDropdown = (
+      <ProfileDropdown
+        username={username || ""}
+        displayName={displayName || ""}
+        avatarIndex={avatarIndex}
+        backgroundColorIndex={backgroundColorIndex}
+        emailHash={emailHash || ""}
+        logoutHandler={logoutHandler}
       />
     );
   }
+
+  const aiToolsDropdown = [
+    { id: 1, name: "Text to Speech", link: "/tts", icon: faMessageDots },
+    {
+      id: 2,
+      name: "Voice to Voice",
+      link: "/voice-conversion",
+      icon: faWaveformLines,
+    },
+    {
+      id: 3,
+      name: "Face Animator",
+      link: "/face-animator",
+      icon: faFaceViewfinder,
+    },
+    {
+      id: 4,
+      name: "Voice Designer",
+      link: "/voice-designer",
+      icon: faWandMagicSparkles,
+    },
+    // { id: 4, name: "Text to Image", link: "/text-to-image" },
+  ];
 
   return (
     <div id="topbar-wrapper" className="position-fixed">
       <div className="topbar-nav">
         <div className="topbar-nav-left">
-          <Link to="/">
-            <img
-              src="/fakeyou/FakeYou-Logo.png"
-              alt="FakeYou: Cartoon and Celebrity Text to Speech"
-              height="34"
-              className="mb-2 d-none d-lg-block"
-            />
-            <img
-              src="/fakeyou/FakeYou-Logo-Mobile.png"
-              alt="FakeYou: Cartoon and Celebrity Text to Speech"
-              height="36"
-              className="mb-0 d-block d-lg-none"
-            />
-          </Link>
+          <div className="d-flex gap-3 align-items-center">
+            <Link to="/">
+              <img
+                src={domain.logo}
+                alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
+                height="34"
+                className="mb-1 d-none d-lg-block"
+              />
+              <img
+                src="/fakeyou/FakeYou-Logo-Mobile.png"
+                alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
+                height="36"
+                className="mb-0 d-block d-lg-none"
+              />
+            </Link>
+            {((!loggedIn && isOnLandingPage) ||
+              (!loggedIn && isOnLoginOrSignUpPage)) && (
+              <div className="d-none d-lg-block">
+                <NavItem
+                  isHoverable={true}
+                  label="AI Tools"
+                  dropdownItems={aiToolsDropdown}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="topbar-nav-center">
@@ -213,11 +198,40 @@ export default function TopNav({
         </div>
 
         <div className="topbar-nav-right">
+          {((!loggedIn && isOnLandingPage) ||
+            (!loggedIn && isOnLoginOrSignUpPage)) && (
+            <NavItem
+              icon={faStar}
+              label="Pricing"
+              link="/pricing"
+              className="me-3 d-none d-lg-block"
+            />
+          )}
+
           <div className="d-flex align-items-center gap-2">
             <div className="d-none d-lg-flex gap-2">
               <Button {...{ icon: faClipboardList, label: "My Jobs", onClick: openModal, variant: "secondary" }}/>
-              {userOrLoginButton}
-              {signupOrLogOutButton}
+              {loggedIn ? (
+                profileDropdown
+              ) : (
+                <>
+                  <Button
+                    label="Login"
+                    small
+                    variant="secondary"
+                    onClick={() => {
+                      history.push("/login");
+                    }}
+                  />
+                  <Button
+                    label="Sign Up"
+                    small
+                    onClick={() => {
+                      history.push("/signup");
+                    }}
+                  />
+                </>
+              )}
             </div>
             <Button
               icon={faSearch}
@@ -238,6 +252,8 @@ export default function TopNav({
           </div>
         </div>
       </div>
+
+      {/* <div className="topbar-nav bg-panel">test</div> */}
 
       {/* Mobile Searchbar */}
       {isMobileSearchBarVisible && (

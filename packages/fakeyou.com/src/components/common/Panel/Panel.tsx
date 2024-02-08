@@ -20,8 +20,10 @@ export default function Panel({
   return (
     <div
       className={`${clear ? "panel-clear" : "panel"}${
-        padding ? " p-3 py-4 p-md-4" : ""
-      }${mb ? " mb-4" : ""}${mt ? " mt-4" : ""}${className ? " " + className : ""}`}
+        padding ? " p-3 p-md-4" : ""
+      }${mb ? " mb-4" : ""}${mt ? " mt-4" : ""}${
+        className ? " " + className : ""
+      }`}
     >
       {children}
     </div>

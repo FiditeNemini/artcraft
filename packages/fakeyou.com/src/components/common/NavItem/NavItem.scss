@@ -1,0 +1,22 @@
+@import "scss/colours.scss";
+
+.fy-nav-item {
+  position: relative;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba($white, 0.8);
+  transition: 0.15s all;
+
+  a {
+    color: rgba($white, 0.8);
+    font-size: 15px;
+    font-weight: 500;
+    transition: 0.15s all;
+  }
+}
+
+.fy-nav-item:hover .fy-dropdown-menu {
+  display: block;
+}
