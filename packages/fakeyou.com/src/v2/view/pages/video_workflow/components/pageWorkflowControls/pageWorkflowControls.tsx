@@ -121,14 +121,14 @@ export default function PageFilterControls({
                 <div className="d-flex my-3 justify-content-end">
                     <Button
                       className="me-3"
-                      label={t("previewWorkflow")}
+                      label={t("button.previewWorkflow")}
                       tooltip="feature not available yet"
                       variant="primary"
                       disabled
                     />
                     <Button
                       className="me-3"
-                      label={t("enqueueWorkflow")}
+                      label={t("button.enqueueWorkflow")}
                       onClick={handleGenerate}
                       variant="primary"
                     />
@@ -237,7 +237,7 @@ export default function PageFilterControls({
           <div className="row g-3 py-3">
             <div className="col-12 d-flex justify-content-end">
               <Button
-                label={t("enqueueWorkflow")}
+                label={t("button.enqueueWorkflow")}
                 onClick={handleGenerate}
                 variant="primary"
               />
