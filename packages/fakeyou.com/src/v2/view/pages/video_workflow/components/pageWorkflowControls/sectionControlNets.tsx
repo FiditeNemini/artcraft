@@ -1,5 +1,4 @@
 import React, { memo } from 'react'
-
 import { NumberSliderV2 } from 'components/common'
 
 export const ControlNetsInitialValues = {
@@ -13,17 +12,21 @@ export const ControlNetsInitialValues = {
   cnTile: 0,
 }
 
-export default memo( function SectionControlNets( 
-  {onChange : handleOnChange} : {onChange: (key:string, val:number)=>void}
+export default memo( function SectionControlNets({
+  workflowValues: wfVal, 
+  onChange : handleOnChange
+} : {
+  workflowValues : any
+  onChange: (key:string, val:number)=>void}
 ){
-  const iv = ControlNetsInitialValues;
+
   return(
     <>
       <div className="row g-3 p-3">
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 0, max: 1, step: 0.1,
-            initialValue: iv.cnCanny,
+            initialValue: wfVal.cnCanny,
             label: "Canny",
             thumbTip: "Canny",
             onChange: (val)=>{handleOnChange("cnCanny", val)}
@@ -32,7 +35,7 @@ export default memo( function SectionControlNets(
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 0, max: 1, step: 0.1,
-            initialValue: iv.cnLinearAnime,
+            initialValue: wfVal.cnLinearAnime,
             label: "Line Art Anime",
             thumbTip: "Line Art Anime",
             onChange: (val)=>{handleOnChange("cnLinearAnime", val)}
@@ -43,7 +46,7 @@ export default memo( function SectionControlNets(
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 0, max: 1, step: 0.1,
-            initialValue: iv.cnDepth,
+            initialValue: wfVal.cnDepth,
             label: "Depth",
             thumbTip: "Depth",
             onChange: (val)=>{handleOnChange("cnDepth", val)}
@@ -52,7 +55,7 @@ export default memo( function SectionControlNets(
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 0, max: 1, step: 0.1,
-            initialValue: iv.cnOpenPose,
+            initialValue: wfVal.cnOpenPose,
             label: "OpenPose",
             thumbTip: "OpenPose",
             onChange: (val)=>{handleOnChange("cnOpenPose", val)}
@@ -63,7 +66,7 @@ export default memo( function SectionControlNets(
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 0, max: 1, step: 0.1,
-            initialValue: iv.cnPipeFace,
+            initialValue: wfVal.cnPipeFace,
             label: "Media Pipe Face",
             thumbTip: "Media Pipe Face",
             onChange: (val)=>{handleOnChange("cnPipeFace", val)}
@@ -72,7 +75,7 @@ export default memo( function SectionControlNets(
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 0, max: 1, step: 0.1,
-            initialValue: iv.cnSparse,
+            initialValue: wfVal.cnSparse,
             label: "Sparse Scribble",
             thumbTip: "Sparse Scribble",
             onChange: (val)=>{handleOnChange("cnSparse", val)}
@@ -83,7 +86,7 @@ export default memo( function SectionControlNets(
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 0, max: 1, step: 0.1,
-            initialValue: iv.cnLinearRealistic,
+            initialValue: wfVal.cnLinearRealistic,
             label: "Video CN (Linear Realistic)",
             thumbTip: "Video CN",
             onChange: (val)=>{handleOnChange("cnLinearRealistic", val)}
@@ -92,7 +95,7 @@ export default memo( function SectionControlNets(
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 0, max: 1, step: 0.1,
-            initialValue: iv.cnTile,
+            initialValue: wfVal.cnTile,
             label: "Tile CN",
             thumbTip: "Tile CN",
             onChange: (val)=>{handleOnChange("cnTile", val)}

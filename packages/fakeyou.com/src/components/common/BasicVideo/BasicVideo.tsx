@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from "react";
+import React, { useState } from "react";
 import { a, useSpring } from "@react-spring/web";
 import { useVideo } from "hooks";
 import makeClass from "resources/makeClass";
@@ -13,12 +13,12 @@ interface Props {
   description?: string;
 }
 
-export default forwardRef(function BasicVideo({
+export default function BasicVideo({
   className,
   src,
   title,
-  description,
-}: Props, ref:React.ForwardedRef<HTMLVideoElement>) {
+  description
+}: Props) {
   const [tint,tintSet] = useState(true);
   const [{ playCtrl },vidProps] = useVideo({ onEnded: () => tintSet(true) });
   const style = useSpring({
@@ -31,7 +31,7 @@ export default forwardRef(function BasicVideo({
   };
 
   return <div {...{ ...makeClass("fy-basic-video",className) }}>
-    <video {...{ playsInline: true, ...vidProps }} ref={ref}>
+    <video {...{ playsInline: true, ...vidProps }}>
       <source {...{ src, type: "video/mp4" }} />
     </video>
     <a.div {...{ className: "video-overlay", onClick, style }}>
@@ -40,4 +40,4 @@ export default forwardRef(function BasicVideo({
       <FontAwesomeIcon {...{ icon: faPlay }} />
     </a.div>
   </div>;
-});
+};
