@@ -19,7 +19,7 @@ import {
   faUser,
   faWandMagicSparkles,
   faWaveformLines,
-  faTransporter
+  faTransporter,
 } from "@fortawesome/pro-solid-svg-icons";
 
 import {
@@ -556,7 +556,7 @@ export default function SideNav({
             </div>
           </div>
 
-          <div className="px-4 d-flex d-lg-none gap-2 mb-5">
+          <div className="px-4 d-flex d-lg-none gap-2 mb-2">
             {userOrLoginButton}
             {signupOrLogOutButton}
           </div>
