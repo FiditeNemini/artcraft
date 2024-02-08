@@ -1,0 +1,48 @@
+@import "scss/colours.scss";
+
+.fy-nav-item {
+  position: relative;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba($white, 0.8);
+  transition: 0.15s all;
+
+  a {
+    color: rgba($white, 0.8);
+    font-size: 15px;
+    font-weight: 500;
+    transition: 0.15s all;
+  }
+}
+
+.fy-dropdown-menu {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background-color: $panel-inner;
+  border: 1px solid lighten($panel-inner, 8%);
+  border-radius: 0.5rem;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  overflow: hidden;
+}
+
+.fy-nav-item:hover .fy-dropdown-menu {
+  display: block;
+}
+
+.fy-dropdown-item {
+  padding: 10px 15px;
+  text-decoration: none;
+  display: block;
+  color: $white !important;
+  transition: 0.15s all;
+}
+
+.fy-dropdown-item:hover {
+  background-color: lighten($panel-inner, 8%);
+}
