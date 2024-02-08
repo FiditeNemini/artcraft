@@ -33,7 +33,7 @@ export default function StorytellerFilter(props:{
   );
   useEffect(() => {
     if (
-      pageState.status === states.FILTER_ENQUEUED &&
+      pageState.status === states.WORKFLOW_ENQUEUED &&
       pageState.inferenceJobToken
     ) {
       enqueueInferenceJob(
@@ -53,6 +53,7 @@ export default function StorytellerFilter(props:{
 
   return(
     <Container type="panel" className="mb-5">
+      {debug && <p>{`Status:${pageState.status} MediaToken:${pageState.mediaFileToken}`}</p>}
       <PageHeader
         title={t("headings.title")}
         subText={t("headings.subtitle")}
