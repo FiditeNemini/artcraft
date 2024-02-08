@@ -1,5 +1,5 @@
 import { createContext } from 'react';
 
-interface InferenceJobsContext { byCategory?: any, enqueue?: any }
+interface InferenceJobsContext { inferenceJobs?: any, byCategory?: any, enqueue?: any }
 
 export default createContext<InferenceJobsContext>({ });

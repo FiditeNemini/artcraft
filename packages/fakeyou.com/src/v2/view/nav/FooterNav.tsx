@@ -206,7 +206,7 @@ function FooterNav(props: Props) {
         </div>
 
         <div className="d-flex flex-column flex-lg-row pt-2 align-items-center gap-2 gap-xl-4 flex-wrap">
-          <span className="flex-grow-1 opacity-75">© {domain.title} 2023</span>
+          <span className="flex-grow-1 opacity-75">© {domain.title} 2024</span>
 
           <div className="d-flex flex-column flex-lg-row align-items-center mt-4 mt-lg-0">
             {moderationLink}

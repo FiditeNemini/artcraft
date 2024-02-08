@@ -10,9 +10,9 @@ import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWei
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import { useListContent, useRatings } from "hooks";
-import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
-import { faArrowDownWideShort, faFilter, faXmark } from "@fortawesome/pro-solid-svg-icons";
+import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
 import prepFilter from "resources/prepFilter";
+import ModalHeader from "../ModalHeader";
 import "./MediaBrowser.scss";
 
 interface Props {
@@ -66,37 +66,33 @@ export default function MediaBrowser({ entityType, filterType: inputFilter, medi
     // { value: "mostliked", label: "Most Liked" },
   ];
 
+  const title = ["",`${ owner ? owner + "'s " : "" }Media`,"Weights"][entityType];
+
   const onClick = (data: any) => {
     onSelect(data);
     handleClose();
   };
 
   return <>
-    <header {...{ className: "fy-media-browser-header" }}>
-      <div {...{ className: "fy-media-browser-tools" }}>
-        <h3>{ ["",`${ owner ? owner + "'s " : "" }Media`,"Weights"][entityType] }</h3>
-        <Icon {...{ className: "icon-close-button", icon: faXmark, onClick: () => handleClose() }}/>
-      </div>
-      <div {...{ className: "fy-media-browser-tools" }}>
-        <TempSelect
-          {...{
-            icon: faArrowDownWideShort,
-            options: sortOptions,
-            name: "sort",
+    <ModalHeader {...{ handleClose, title}}>
+      <TempSelect
+        {...{
+          icon: faArrowDownWideShort,
+          options: sortOptions,
+          name: "sort",
+          onChange: entities.onChange,
+          value: entities.sort,
+        }}
+      />
+      { (!inputFilter || inputFilter === "all") && <TempSelect {...{
+            icon: faFilter,
+            options: EntityFilterOptions(entityType),
+            name: "filterType",
             onChange: entities.onChange,
-            value: entities.sort,
-          }}
-        />
-        { (!inputFilter || inputFilter === "all") && <TempSelect {...{
-              icon: faFilter,
-              options: EntityFilterOptions(entityType),
-              name: "filterType",
-              onChange: entities.onChange,
-              value: filterType,
-            }}/> }
-        <Pagination {...paginationProps} />
-      </div>
-    </header>
+            value: filterType,
+          }}/> }
+      <Pagination {...paginationProps} />
+    </ModalHeader>
     <AudioPlayerProvider>
       { entities.isLoading ? (
         <div {...{ className: "row gx-3 gy-3" }}>

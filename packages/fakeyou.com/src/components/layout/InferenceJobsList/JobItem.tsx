@@ -8,7 +8,6 @@ import { JobState } from "@storyteller/components/src/jobs/JobStates";
 
 interface JobListItem extends InferenceJob {
   failures: (fail: string) => string,
-  jobType: FrontendInferenceJobType,
   jobStatusDescription?: any,
   onSelect?: any,
   refSet?: any,
@@ -20,13 +19,13 @@ const OuterItem = ({ className, children, success, jobToken, maybeResultToken, o
   <a.a {...{ className, href: `/media/${maybeResultToken}`, id: `ijobitem-${ jobToken }`, onClick: () => onSelect(),  ref: refSet }}>{ children }</a.a> :
   <a.div {...{ className, id: `ijobitem-${ jobToken }`, ref: refSet }}>{ children }</a.div>;
 
-export default function JobItem({ failures, maybeFailureCategory, maybeResultToken, onSelect, jobToken, jobState, jobStatusDescription, jobType: inputType, refSet, t, ...rest }: JobListItem) {
+export default function JobItem({ failures, frontendJobType, maybeFailureCategory, maybeResultToken, onSelect, jobToken, jobState, jobStatusDescription, refSet, t, ...rest }: JobListItem) {
   const [hasBounced,hasBouncedSet] = useState(false);
 
   // const [jobState,jobStateSet] = useState(0); // for animation debugging
   // useInterval({ interval: 3000, onTick: ({ index }: { index: number }) => { jobStateSet(index); if (!index) hasBouncedSet(false) } });
 
-  const jobType = FrontendInferenceJobType[inputType];
+  const jobType = FrontendInferenceJobType[frontendJobType];
   const jobStatus = jobStatusDescription(jobState);
 	const jobStatusClass = jobStatus.toLowerCase().replace("_","-");
   

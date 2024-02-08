@@ -7,6 +7,7 @@ import {
   faWandMagicSparkles,
   faWaveformLines,
   faXmark,
+  faClipboardList
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
@@ -14,6 +15,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
+import { useModal } from "hooks";
+import { InferenceJobsModal } from "components/modals";
 import { useDomainConfig } from "context/DomainConfigContext";
 import NavItem from "../../common/NavItem/NavItem";
 import ProfileDropdown from "components/common/ProfileDropdown";
@@ -44,6 +47,9 @@ export default function TopNav({
     window.location.pathname === "/login/" ||
     window.location.pathname === "/signup" ||
     window.location.pathname === "/signup/";
+
+  const { open } = useModal();
+  const openModal = () => open({ component: InferenceJobsModal });
 
   const handleMenuButtonClick = () => {
     if (window.innerWidth < 1200) {
@@ -204,6 +210,7 @@ export default function TopNav({
 
           <div className="d-flex align-items-center gap-2">
             <div className="d-none d-lg-flex gap-2">
+              <Button {...{ icon: faClipboardList, label: "My Jobs", onClick: openModal, variant: "secondary" }}/>
               {loggedIn ? (
                 profileDropdown
               ) : (

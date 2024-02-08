@@ -194,6 +194,8 @@ $topbar-height: 66px;
   .topbar-nav-center {
     grid-column: 2;
   }
+
+  .button { white-space: nowrap; }
 }
 
 .topbar-mobile-search-bar-container {

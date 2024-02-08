@@ -14,7 +14,7 @@ export default function useLoraUpload() {
   const [descriptionMD, descriptionMDSet] = useState("");
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
   const coverImg = useCoverImgUpload();
-  const { enqueue } = useInferenceJobs(FrontendInferenceJobType.ImageGeneration);
+  const { enqueue } = useInferenceJobs(FrontendInferenceJobType.ImageGeneration, true);
 
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
     const todo: { [key: string]: (x: any) => void } = {
@@ -41,9 +41,8 @@ export default function useLoraUpload() {
     })
       .then((res: any) => {
         if (res.success && res.inference_job_token) {
-          console.log("🌠", res);
           writeStatusSet(FetchStatus.success);
-          enqueue(res.inference_job_token, FrontendInferenceJobType.ImageGeneration);
+          enqueue(res.inference_job_token);
       }
       })
       .catch(err => {

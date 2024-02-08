@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Button, MocapInput } from "components/common";
+import { Button } from "components/common";
+import { EntityInput } from "components/entities";
 import { useInferenceJobs } from "hooks";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { EnqueueEngineCompositing } from "@storyteller/components/src/api/engine_compositor/EnqueueEngineCompositing";
@@ -26,10 +27,7 @@ export default function EngineCompositor({ value, sessionWrapper }: Props) {
     })
     .then((res: any) => {
         if (res && res.success) {
-          inferenceJobs.enqueue( // I need to pass this
-            res.inference_job_token,
-            FrontendInferenceJobType.EngineComposition
-          );
+          inferenceJobs.enqueue(res.inference_job_token);
         }
       });
   }
@@ -51,7 +49,7 @@ export default function EngineCompositor({ value, sessionWrapper }: Props) {
         <h2>Engine Compositor</h2>
         <Button {...{ label: "Enqueue", onClick, variant: "primary" }}/>
       </header>
-       <MocapInput {...{ aspectRatio: "landscape", label: "Choose 3D data", onChange, type: "bvh" }}/>
+       <EntityInput {...{ aspectRatio: "landscape", label: "Choose 3D data", onChange, mediaType: "bvh" }}/>
     </div>
       <InferenceJobsList
         {...{

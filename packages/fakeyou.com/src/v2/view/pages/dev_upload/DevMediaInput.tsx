@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { EntityInput } from "components/entities";
 import { EntityFilterOptions, EntityType, MediaFilterProp, WeightFilterProp } from "components/entities/EntityTypes";
+import { useModal } from "hooks";
+import { InferenceJobsModal } from "components/modals";
 import { Button, SegmentButtons, TempInput, TempSelect } from "components/common";
 
 interface Props {
@@ -15,8 +17,12 @@ export default function DevMediaInput({ value }: Props) {
   const [owner,ownerSet] = useState("");
   const onChange = ({ target }: any) => mediaTokenSet(target.value);
 
+  const { open } = useModal();
+
   const options = [{ label: "Media", value: EntityType.media },{ label: "Weights", value: EntityType.weights }];
   const changeFilter = ({ target }: { target: any }) => [mediaTypeSet,mediaTypeSet,weightTypeSet][entityType](target.value);
+
+  const openModal = () => open({ component: InferenceJobsModal });
 
   return <div {...{ className: "fy-engine-compositor"}}>
     <div {...{ className: "panel engine-compositor-container" }}>
@@ -34,6 +40,7 @@ export default function DevMediaInput({ value }: Props) {
           owner,
           ...([{},{ mediaType },{ weightType }][entityType])
         }}/>
+        <Button {...{ className: "mt-3", label: "Open modal", onClick: openModal, variant: "primary" }}/>
        <div>
         { mediaToken }
        </div>
