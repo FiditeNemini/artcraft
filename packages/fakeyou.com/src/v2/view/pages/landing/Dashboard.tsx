@@ -11,11 +11,11 @@ import { useLocalize } from "hooks";
 import React from "react";
 import { Link } from "react-router-dom";
 
-interface FakeYouDashboardProps {
+interface DashboardProps {
   sessionWrapper: SessionWrapper;
 }
 
-export default function FakeYouDashboard(props: FakeYouDashboardProps) {
+export default function Dashboard(props: DashboardProps) {
   const { t } = useLocalize("LandingPage");
   const isLoggedIn = props.sessionWrapper.isLoggedIn();
 
