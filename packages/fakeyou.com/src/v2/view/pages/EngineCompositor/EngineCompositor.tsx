@@ -1,14 +1,16 @@
 import React, { useState } from "react";
-import { Button } from "components/common";
+import { Button, Container, Panel } from "components/common";
 import { EntityInput } from "components/entities";
 import { useInferenceJobs } from "hooks";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { EnqueueEngineCompositing } from "@storyteller/components/src/api/engine_compositor/EnqueueEngineCompositing";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
-import "./EngineCompositor.scss"
+import "./EngineCompositor.scss";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTransporter } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   value?: any;
@@ -16,21 +18,22 @@ interface Props {
 }
 
 export default function EngineCompositor({ value, sessionWrapper }: Props) {
-  const [mediaToken,mediaTokenSet] = useState();
+  const [mediaToken, mediaTokenSet] = useState();
   const onChange = ({ target }: any) => mediaTokenSet(target.value);
-  const inferenceJobs = useInferenceJobs(FrontendInferenceJobType.EngineComposition);
+  const inferenceJobs = useInferenceJobs(
+    FrontendInferenceJobType.EngineComposition
+  );
 
   const onClick = () => {
-    EnqueueEngineCompositing("",{
-        uuid_idempotency_token: uuidv4(),
-        video_source: mediaToken || "",
-    })
-    .then((res: any) => {
-        if (res && res.success) {
-          inferenceJobs.enqueue(res.inference_job_token);
-        }
-      });
-  }
+    EnqueueEngineCompositing("", {
+      uuid_idempotency_token: uuidv4(),
+      video_source: mediaToken || "",
+    }).then((res: any) => {
+      if (res && res.success) {
+        inferenceJobs.enqueue(res.inference_job_token);
+      }
+    });
+  };
 
   const failures = (fail = "") => {
     switch (fail) {
@@ -40,22 +43,38 @@ export default function EngineCompositor({ value, sessionWrapper }: Props) {
   };
 
   if (!sessionWrapper.canAccessStudio()) {
-    return <StudioNotAvailable />
+    return <StudioNotAvailable />;
   }
 
-  return <div {...{ className: "fy-engine-compositor"}}>
-    <div {...{ className: "panel engine-compositor-container" }}>
-      <header>
-        <h2>Engine Compositor</h2>
-        <Button {...{ label: "Enqueue", onClick, variant: "primary" }}/>
-      </header>
-       <EntityInput {...{ aspectRatio: "landscape", label: "Choose 3D data", onChange, mediaType: "bvh" }}/>
-    </div>
-      <InferenceJobsList
-        {...{
-          failures,
-          jobType: FrontendInferenceJobType.EngineComposition,
-        }}
-      />
-  </div>;
-};
+  return (
+    <Container type="panel" className="mt-5">
+      <Panel padding={true}>
+        <div {...{ className: "fy-engine-compositor" }}>
+          <div {...{ className: "engine-compositor-container" }}>
+            <header className="d-flex gap-3 flex-wrap">
+              <h1 className="fw-semibold">
+                <FontAwesomeIcon icon={faTransporter} className="me-3 fs-2" />
+                Engine Compositor
+              </h1>
+              <Button {...{ label: "Enqueue", onClick, variant: "primary" }} />
+            </header>
+            <EntityInput
+              {...{
+                aspectRatio: "landscape",
+                label: "Choose 3D data",
+                onChange,
+                mediaType: "bvh",
+              }}
+            />
+          </div>
+          <InferenceJobsList
+            {...{
+              failures,
+              jobType: FrontendInferenceJobType.EngineComposition,
+            }}
+          />
+        </div>
+      </Panel>
+    </Container>
+  );
+}

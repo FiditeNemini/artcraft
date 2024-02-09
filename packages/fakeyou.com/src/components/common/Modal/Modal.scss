@@ -66,8 +66,8 @@
 
 .fy-core-modal {
   .modal-content {
-    width: 85vw;
-    height: 85vh;
+    // width: 85vw;
+    min-height: 70vh;
     padding: 1rem;
   }
 }
