@@ -33,7 +33,7 @@ pub enum Action {
 #[command(name="elasticsearch-cli")]
 pub struct Args {
   #[arg(name="action", long="action", help="action to take", required=true)]
-  action: String,
+  action: Action,
 
   #[arg(name="mysql", long="mysql", help="production or development")]
   mysql: Option<String>,
@@ -48,7 +48,7 @@ pub fn parse_cli_args() -> AnyhowResult<ParsedArgs> {
   Ok(ParsedArgs {
     mysql_environment: to_environment(args.mysql.as_deref())?,
     elasticsearch_environment: to_environment(args.elasticsearch.as_deref())?,
-    action: action_from_str(&args.action)?,
+    action: args.action,
   })
 }
 
