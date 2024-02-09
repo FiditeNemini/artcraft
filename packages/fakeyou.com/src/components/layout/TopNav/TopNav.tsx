@@ -7,7 +7,7 @@ import {
   faWandMagicSparkles,
   faWaveformLines,
   faXmark,
-  faClipboardList
+  faClipboardList,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
@@ -210,7 +210,15 @@ export default function TopNav({
 
           <div className="d-flex align-items-center gap-2">
             <div className="d-none d-lg-flex gap-2">
-              <Button {...{ icon: faClipboardList, label: "My Jobs", onClick: openModal, variant: "secondary" }}/>
+              <Button
+                {...{
+                  icon: faClipboardList,
+                  label: "My Jobs",
+                  onClick: openModal,
+                  variant: "secondary",
+                  small: true,
+                }}
+              />
               {loggedIn ? (
                 profileDropdown
               ) : (

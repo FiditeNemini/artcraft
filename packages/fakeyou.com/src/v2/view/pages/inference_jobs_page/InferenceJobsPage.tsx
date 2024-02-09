@@ -1,10 +1,13 @@
 import React from "react";
 import { InferenceJobsModal } from "components/modals";
+import { Container, Panel } from "components/common";
 
 export default function InferenceJobsPage() {
-  return <div {...{ className: "fy-inference-jobs-list-page p-3"}}>
-    <div {...{ className: "panel p-3" }}>
-     <InferenceJobsModal />
-    </div>
-  </div>;
-};
+  return (
+    <Container type="panel" className="mt-5">
+      <Panel padding={true}>
+        <InferenceJobsModal />
+      </Panel>
+    </Container>
+  );
+}
