@@ -3,6 +3,7 @@ import { a, useSpring } from "@react-spring/web";
 import { WorkIndicator } from 'components/svg';
 import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
+import { useHistory } from "react-router-dom";
 
 // import { useInterval } from "hooks"; // for animation debugging
 
@@ -15,9 +16,15 @@ interface JobListItem extends InferenceJob {
 }
 
 
-const OuterItem = ({ className, children, success, jobToken, maybeResultToken, onSelect = () => {}, refSet }: { className?: string, children?: any, jobToken: string, success: boolean, maybeResultToken?: any, onSelect?: any, refSet?: any }) => success ?
-  <a.a {...{ className, href: `/media/${maybeResultToken}`, id: `ijobitem-${ jobToken }`, onClick: () => onSelect(),  ref: refSet }}>{ children }</a.a> :
-  <a.div {...{ className, id: `ijobitem-${ jobToken }`, ref: refSet }}>{ children }</a.div>;
+const OuterItem = ({ className, children, success, jobToken, maybeResultToken, onSelect = () => {}, refSet }: { className?: string, children?: any, jobToken: string, success: boolean, maybeResultToken?: any, onSelect?: any, refSet?: any }) => {
+  const history = useHistory();
+  return success ?
+    <a.div {...{ className, id: `ijobitem-${ jobToken }`, onClick: () => {
+      history.push(`/media/${maybeResultToken}`);
+      onSelect();
+    },  ref: refSet }}>{ children }</a.div> :
+    <a.div {...{ className, id: `ijobitem-${ jobToken }`, ref: refSet }}>{ children }</a.div>;
+}
 
 export default function JobItem({ failures, frontendJobType, maybeFailureCategory, maybeResultToken, onSelect, jobToken, jobState, jobStatusDescription, refSet, t, ...rest }: JobListItem) {
   const [hasBounced,hasBouncedSet] = useState(false);

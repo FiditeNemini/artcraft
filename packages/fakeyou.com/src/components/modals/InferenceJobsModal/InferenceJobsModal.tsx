@@ -37,6 +37,9 @@ export default function InferenceJobsModal({ handleClose, jobType: inJobType = -
     }
     <InferenceJobsList {...{
         failures,
+        onSelect: () => {
+          if (handleClose) handleClose();
+        },
         value: 0 // fixed for now
         // value: typeObj.indexOf(jobType),
       }} />
