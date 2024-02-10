@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { UploadModel } from "@storyteller/components/src/api/image_generation/UploadModel";
+import { UploadLora } from "@storyteller/components/src/api/image_generation/UploadLora";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import { useCoverImgUpload, useInferenceJobs } from "hooks";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
@@ -28,15 +28,15 @@ export default function useLoraUpload() {
 
   const upload = () => {
     writeStatusSet(FetchStatus.in_progress);
-    UploadModel("", {
-      ...(coverImg.token
-        ? { cover_image_media_file_token: coverImg.token }
-        : {}),
+    UploadLora("", {
+      //...(coverImg.token
+      //  ? { cover_image_media_file_token: coverImg.token }
+      //  : {}),
       maybe_name: title,
       maybe_description: descriptionMD,
       uuid_idempotency_token: uuidv4(),
-      type_of_inference: "inference",
-      maybe_upload_path: uploadPath,
+      //type_of_inference: "inference",
+      maybe_lora_upload_path: uploadPath,
       visibility,
     })
       .then((res: any) => {
