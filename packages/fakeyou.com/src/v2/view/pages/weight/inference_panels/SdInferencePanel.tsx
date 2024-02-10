@@ -46,10 +46,10 @@ function SdInferencePanel({
   const [loraToken, setLoraToken] = useState<string | null>(null);
   const [weightToken, setWeightToken] = useState(sd_model_token);
 
-  const handleOnWeightSelect = (data:{token:string,title:string}) => {
+  const handleOnWeightSelect = (data: { token: string; title: string }) => {
     setWeightToken(data.token);
   };
-  const handleOnSelect = (data:{token:string,title:string}) => {
+  const handleOnSelect = (data: { token: string; title: string }) => {
     setLoraToken(data.token);
   };
 
@@ -409,14 +409,14 @@ function SdInferencePanel({
                 {
                   label: "All LoRA Weights",
                   tabKey: "allLoraWeights",
-                  typeFilter: "rvc_v2",
+                  typeFilter: "loRA",
                   searcher: true,
                   type: "weights",
                 },
                 {
                   label: "Bookmarked",
                   tabKey: "bookmarkedLoraWeights",
-                  typeFilter: "rvc_v2",
+                  typeFilter: "loRA",
                   searcher: false,
                   type: "weights",
                 },
