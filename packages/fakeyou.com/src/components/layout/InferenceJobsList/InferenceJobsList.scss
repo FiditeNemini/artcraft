@@ -1,12 +1,18 @@
 @import "scss/colours.scss";
 
-a.face-animator-job {
+.job-status-complete-success {
+  cursor: pointer;
+
+  span { 
+    color: $primary;
+  }
+
   &:hover {
     background-color: $panel-inner;
   }
 }
 
-.face-animator-job {
+.fy-inference-job {
   border-radius: .5rem;
   display: flex;
   flex-wrap: wrap;
@@ -18,9 +24,7 @@ a.face-animator-job {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    // height: 100%;
     width: min-content;
-
   }
 
   .work-indicator { margin-right: .5rem; }

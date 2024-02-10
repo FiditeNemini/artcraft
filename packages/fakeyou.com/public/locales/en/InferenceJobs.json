@@ -61,7 +61,7 @@
   },
   "core": {
     "empty": "No active jobs",
-    "heading": "Latest Jobs",
+    "heading": "My Jobs",
     "cancel": "Cancel job"
   },
   "subtitles": {

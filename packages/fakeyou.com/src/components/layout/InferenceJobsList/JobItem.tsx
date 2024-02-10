@@ -12,21 +12,41 @@ interface JobListItem extends InferenceJob {
   jobStatusDescription?: any,
   onSelect?: any,
   refSet?: any,
+  resultPaths: { [key: string]: string },
   t?: any
 }
 
-
-const OuterItem = ({ className, children, success, jobToken, maybeResultToken, onSelect = () => {}, refSet }: { className?: string, children?: any, jobToken: string, success: boolean, maybeResultToken?: any, onSelect?: any, refSet?: any }) => {
-  const history = useHistory();
-  return success ?
-    <a.div {...{ className, id: `ijobitem-${ jobToken }`, onClick: () => {
-      history.push(`/media/${maybeResultToken}`);
-      onSelect();
-    },  ref: refSet }}>{ children }</a.div> :
-    <a.div {...{ className, id: `ijobitem-${ jobToken }`, ref: refSet }}>{ children }</a.div>;
+interface OuterItemProps {
+  className?: string,
+  children?: any,
+  jobToken: string,
+  success: boolean,
+  maybeResultToken?: any,
+  onSelect?: any,
+  refSet?: any,
+  resultPath: string
 }
 
-export default function JobItem({ failures, frontendJobType, maybeFailureCategory, maybeResultToken, onSelect, jobToken, jobState, jobStatusDescription, refSet, t, ...rest }: JobListItem) {
+
+const OuterItem = ({ className, children, success, jobToken, maybeResultToken, onSelect = () => {}, refSet, resultPath }: OuterItemProps) => {
+  const history = useHistory();
+
+  return <a.div {...{
+    className,
+    id: `ijobitem-${ jobToken }`,
+    ...success && {
+      onClick: () => {
+        history.push(`${resultPath}/${maybeResultToken}`);
+        onSelect();
+      },
+    },
+    ref: refSet
+  }}>
+    { children }
+  </a.div>;
+}
+
+export default function JobItem({ failures, frontendJobType, maybeFailureCategory, maybeResultToken, onSelect, jobToken, jobState, jobStatusDescription, refSet, resultPaths, t, ...rest }: JobListItem) {
   const [hasBounced,hasBouncedSet] = useState(false);
 
   // const [jobState,jobStateSet] = useState(0); // for animation debugging
@@ -35,6 +55,7 @@ export default function JobItem({ failures, frontendJobType, maybeFailureCategor
   const jobType = FrontendInferenceJobType[frontendJobType];
   const jobStatus = jobStatusDescription(jobState);
 	const jobStatusClass = jobStatus.toLowerCase().replace("_","-");
+  const resultPath = resultPaths[jobType];
   
   const dashStatus = () => {
     switch (jobState) {
@@ -60,7 +81,7 @@ export default function JobItem({ failures, frontendJobType, maybeFailureCategor
   const headingBounce = useSpring(makeBounce(8));
   const subtitleBounce = useSpring(makeBounce(6,30));
   const subtitle = maybeFailureCategory ?`${ failures(maybeFailureCategory) }` : t(`subtitles.${jobStatus}`);
-  const className = `face-animator-job job-status-${jobStatusClass}`;
+  const className = `fy-inference-job job-status-${jobStatusClass}`;
 
   useEffect(() => {
     if (!bounce && !hasBounced && success) {
@@ -70,7 +91,7 @@ export default function JobItem({ failures, frontendJobType, maybeFailureCategor
     }
   },[bounce, hasBounced, success ]);
 
-  return <OuterItem {...{ className, jobToken, maybeResultToken, onSelect, refSet, success }}>
+  return <OuterItem {...{ className, jobToken, maybeResultToken, onSelect, refSet, resultPath, success }}>
     <WorkIndicator {...{ failure, stage: dashStatus(), success }}/>
     <div {...{ className: "job-details" }}>
       <a.h6 {...{  style: headingBounce }}>
