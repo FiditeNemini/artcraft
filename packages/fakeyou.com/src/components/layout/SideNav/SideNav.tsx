@@ -20,7 +20,7 @@ import {
   faWandMagicSparkles,
   faWaveformLines,
   faTransporter,
-  faClipboardList
+  faClipboardList,
 } from "@fortawesome/pro-solid-svg-icons";
 
 import {
@@ -538,7 +538,7 @@ export default function SideNav({
         <div className="mobile-fixed-bottom">
           <div className="d-none d-lg-block">
             <div className="sidebar-heading">Jobs Queue</div>
-            <div className="ps-4 mb-3">
+            <div className="d-flex flex-column ps-4 mb-1">
               <div>
                 {t("queueTts")}:{" "}
                 <span className="text-red">{ttsQueuedCount}</span>

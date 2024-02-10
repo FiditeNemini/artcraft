@@ -117,7 +117,7 @@ $topbar-height: 66px;
   margin-left: 1.5rem;
   margin-bottom: 0.5rem;
   opacity: 0.5;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .sidebar-heading-icon {
@@ -195,7 +195,9 @@ $topbar-height: 66px;
     grid-column: 2;
   }
 
-  .button { white-space: nowrap; }
+  .button {
+    white-space: nowrap;
+  }
 }
 
 .topbar-mobile-search-bar-container {
@@ -234,11 +236,11 @@ $topbar-height: 66px;
 .mobile-fixed-bottom {
   position: sticky;
   bottom: 0;
-  padding: 1.5rem 0rem;
+  padding: 0.75rem 0rem;
   width: 100%;
   background-color: $panel-inner;
   border-top: 1px solid lighten($panel-inner, 5%) !important;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 @media (min-width: 992px) {

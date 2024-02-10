@@ -76,7 +76,7 @@ export default function InferenceJobsList({
         <div className="d-flex flex-column p-4 gap-3 text-center align-items-center">
           <FontAwesomeIcon icon={faClipboardList} className="display-6 mb-2" />
           <div>
-            <h2 className="fw-semibold mb-1">{t("core.noJobsTitle")}</h2>
+            <h4 className="fw-semibold mb-1">{t("core.noJobsTitle")}</h4>
             <p className="opacity-75 mb-2">{t("core.noJobsSubtitle")}</p>
           </div>
 
