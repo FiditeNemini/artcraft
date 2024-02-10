@@ -17,6 +17,7 @@ use tokens::tokens::users::*;
 use tokens::tokens::zs_voice_datasets::*;
 use users_component::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use users_component::endpoints::get_profile_handler::*;
+use users_component::endpoints::session_info_handler::*;
 
 use crate::http_server::common_responses::cover_image_details::*;
 use crate::http_server::common_responses::media_file_origin_details::*;
@@ -79,6 +80,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler,
     crate::http_server::endpoints::weights::update_weight::update_weight_handler,
     users_component::endpoints::get_profile_handler::get_profile_handler,
+    users_component::endpoints::session_info_handler::session_info_handler,
   ),
   components(schemas(
     // Tokens
@@ -139,6 +141,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     EnqueueTTSRequest,
     EnqueueTTSRequestError,
     EnqueueTTSRequestSuccessResponse,
+    FakeYouPlan,
     GetMediaFileError,
     GetMediaFileModelInfo,
     GetMediaFilePathInfo,
@@ -189,6 +192,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     SearchModelWeightsError,
     SearchModelWeightsRequest,
     SearchModelWeightsSuccessResponse,
+    SessionInfoError,
+    SessionInfoSuccessResponse,
+    SessionUserInfo,
     SetModelWeightCoverImageError,
     SetModelWeightCoverImagePathInfo,
     SetModelWeightCoverImageRequest,
@@ -196,6 +202,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     SetUserRatingError,
     SetUserRatingRequest,
     SetUserRatingResponse,
+    StorytellerStreamPlan,
     UpdateWeightError,
     UpdateWeightPathInfo,
     UpdateWeightRequest,

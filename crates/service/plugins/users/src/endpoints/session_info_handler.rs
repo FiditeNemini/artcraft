@@ -10,13 +10,15 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::warn;
 use sqlx::MySqlPool;
+use utoipa::ToSchema;
 
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 
+use crate::common_responses::user_details_lite::UserDetailsLight;
 use crate::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
 use crate::utils::session_checker::SessionChecker;
 
-#[derive(Serialize, Copy, Clone)]
+#[derive(Serialize, Copy, Clone, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum FakeYouPlan {
   Free,
@@ -25,7 +27,7 @@ pub enum FakeYouPlan {
   Pro,
 }
 
-#[derive(Serialize, Copy, Clone)]
+#[derive(Serialize, Copy, Clone, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum StorytellerStreamPlan {
   Free,
@@ -34,8 +36,10 @@ pub enum StorytellerStreamPlan {
   Pro,
 }
 
-#[derive(Serialize)]
-pub struct UserInfo {
+#[derive(Serialize, ToSchema)]
+pub struct SessionUserInfo {
+  pub core_info: UserDetailsLight,
+
   pub user_token: String,
   pub username: String,
   pub display_name: String,
@@ -74,14 +78,14 @@ pub struct UserInfo {
   pub can_delete_users: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct SessionInfoSuccessResponse {
   pub success: bool,
   pub logged_in: bool,
-  pub user: Option<UserInfo>,
+  pub user: Option<SessionUserInfo>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum SessionInfoError {
   ServerError,
 }
@@ -109,6 +113,14 @@ impl fmt::Display for SessionInfoError {
   }
 }
 
+#[utoipa::path(
+  get,
+  path = "/v1/session",
+  responses(
+    (status = 200, description = "Get profile", body = SessionInfoSuccessResponse),
+    (status = 500, description = "Server error", body = SessionInfoError),
+  ),
+)]
 pub async fn session_info_handler(
   http_request: HttpRequest,
   mysql_pool: web::Data<MySqlPool>,
@@ -140,7 +152,13 @@ pub async fn session_info_handler(
       if !session_data.is_banned {
         // NB: Banned users can't be logged in
         logged_in = true;
-        user_info = Some(UserInfo {
+        user_info = Some(SessionUserInfo {
+          core_info: UserDetailsLight::from_db_fields(
+            &session_data.user_token_typed,
+            &session_data.username,
+            &session_data.display_name,
+            &session_data.email_gravatar_hash,
+          ),
           user_token: session_data.user_token.clone(),
           username: session_data.username.to_string(),
           display_name: session_data.display_name.to_string(),
