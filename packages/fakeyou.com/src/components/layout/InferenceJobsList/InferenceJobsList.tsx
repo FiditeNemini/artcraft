@@ -25,6 +25,7 @@ export default function InferenceJobsList({
   onSelect,
   showNoJobs = false,
 }: JobsListProps) {
+  console.log("🟪",jobType);
   // undefined specified here to allow 0.
   // jobType + 1 because the difference between FrontendInferenceJobType and JobListTypes is an "all" option
 
