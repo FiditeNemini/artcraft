@@ -135,35 +135,44 @@ pub async fn process_job_lora_upload(
   }
 
 
-  // download model + vae for lora
-  // use lora with whatever checkpoint make it fixed id if it works submit it
-  let weight_token_sd_model_token = ModelWeightToken::new_from_str(&sd_deps.predefined_sd_weight_token);
+//  // download model + vae for lora
+//  // use lora with whatever checkpoint make it fixed id if it works submit it
+//  let weight_token_sd_model_token = ModelWeightToken::new_from_str(&sd_deps.predefined_sd_weight_token);
+//
+//  info!("Using predefined SD weight token: {:?}", &weight_token_sd_model_token);
+//
+//  let sd_weight_record = get_weight_by_token(
+//    &weight_token_sd_model_token,
+//    false,
+//    &deps.db.mysql_pool
+//  ).await?;
+//  let sd_weight_record = match sd_weight_record {
+//    Some(val) => val,
+//    None => {
+//      return Err(
+//        ProcessSingleJobError::from_anyhow_error(anyhow!("No SD weight baked in for loRA upload inference check? thats a problem."))
+//      );
+//    }
+//  };
+//
+//  let sd_weight_details = RemoteCloudBucketDetails::new(
+//    sd_weight_record.public_bucket_hash.clone(),
+//    sd_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
+//    sd_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
+//  );
+//
+//  let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
+//  remote_cloud_file_client.download_file(sd_weight_details, path_to_string(sd_checkpoint_path.clone())).await?;
 
-  info!("Using predefined SD weight token: {:?}", &weight_token_sd_model_token);
-
-  let sd_weight_record = get_weight_by_token(
-    &weight_token_sd_model_token,
-    false,
-    &deps.db.mysql_pool
-  ).await?;
-  let sd_weight_record = match sd_weight_record {
-    Some(val) => val,
-    None => {
-      return Err(
-        ProcessSingleJobError::from_anyhow_error(anyhow!("No SD weight baked in for loRA upload inference check? thats a problem."))
-      );
-    }
-  };
-
-  let sd_weight_details = RemoteCloudBucketDetails::new(
-    sd_weight_record.public_bucket_hash.clone(),
-    sd_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
-    sd_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
-  );
-
-  let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
-  remote_cloud_file_client.download_file(sd_weight_details, path_to_string(sd_checkpoint_path.clone())).await?;
-
+  args.job_dependencies
+      .buckets
+      .public_bucket_client
+      .download_file_to_disk(&sd_deps.predefined_sd_weight_bucket_path, &sd_checkpoint_path)
+      .await
+      .map_err(|err| {
+        error!("could not download predefined SD weight: {:?}", err);
+        ProcessSingleJobError::from_anyhow_error(anyhow!("could not download predefined SD weight: {:?}", err))
+      })?;
 
   args.job_dependencies
       .buckets
@@ -256,6 +265,7 @@ pub async fn process_job_lora_upload(
 
   // If it worked and didn't fail! then we should save and create the weight.
   // upload and create weights for loRA...
+  let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
   let lora_descriptor = Box::new(WeightsLoRADescriptor{});
   let metadata = remote_cloud_file_client.upload_file(lora_descriptor,lora_path.to_str().unwrap_or_default()).await?;
 
