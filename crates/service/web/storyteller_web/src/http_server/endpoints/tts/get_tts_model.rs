@@ -21,10 +21,10 @@ use mysql_queries::column_types::vocoder_type::VocoderType;
 use redis_common::redis_cache_keys::RedisCacheKeys;
 use tts_common::text_pipelines::guess_pipeline::guess_text_pipeline_heuristic;
 use tts_common::text_pipelines::text_pipeline_type::TextPipelineType;
+use users_component::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use users_component::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 use crate::server_state::ServerState;
-use crate::util::placeholder_images::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::util::placeholder_images::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 // =============== Request ===============
 

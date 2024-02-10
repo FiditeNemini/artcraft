@@ -16,12 +16,12 @@ use errors::AnyhowResult;
 use mysql_queries::queries::tts::stats::calculate_tts_model_leaderboard::calculate_tts_model_leaderboard;
 use mysql_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::calculate_w2l_template_leaderboard;
 use tokens::tokens::users::UserToken;
+use users_component::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use users_component::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use users_component::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 
-use crate::http_server::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
-use crate::util::placeholder_images::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::util::placeholder_images::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 #[derive(Serialize)]
 pub struct LeaderboardResponse {
@@ -36,23 +36,22 @@ pub struct LeaderboardRow {
 
   pub uploaded_count: i64,
 
-  #[deprecated(note="switch to UserDetailsLight")]
+  #[deprecated(note="switch to the user field (type UserDetailsLight)")]
   pub creator_user_token: String,
 
-  #[deprecated(note="switch to UserDetailsLight")]
+  #[deprecated(note="switch to the user field (type UserDetailsLight)")]
   pub username: String,
 
-  #[deprecated(note="switch to UserDetailsLight")]
-
+  #[deprecated(note="switch to the user field (type UserDetailsLight)")]
   pub display_name: String,
 
-  #[deprecated(note="switch to UserDetailsLight")]
+  #[deprecated(note="switch to the user field (type UserDetailsLight)")]
   pub gravatar_hash: String,
 
-  #[deprecated(note="switch to UserDetailsLight")]
+  #[deprecated(note="switch to the user field (type UserDetailsLight)")]
   pub default_avatar_index: u8,
 
-  #[deprecated(note="switch to UserDetailsLight")]
+  #[deprecated(note="switch to the user field (type UserDetailsLight)")]
   pub default_avatar_color_index: u8,
 }
 

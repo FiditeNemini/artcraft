@@ -16,11 +16,11 @@ use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::model_weights::list::list_weights_by_user::{list_weights_by_creator_username, ListWeightsForUserArgs};
 use tokens::tokens::model_weights::ModelWeightToken;
-use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
+use users_component::common_responses::user_details_lite::UserDetailsLight;
 
+use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
 #[derive(Serialize, Clone, ToSchema)]

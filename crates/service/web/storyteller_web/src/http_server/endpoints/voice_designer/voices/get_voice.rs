@@ -12,8 +12,8 @@ use enums::common::visibility::Visibility;
 use mysql_queries::queries::voice_designer::voices::get_voice::get_voice_by_token;
 use tokens::tokens::users::UserToken;
 use tokens::tokens::zs_voices::ZsVoiceToken;
+use users_component::common_responses::user_details_lite::UserDetailsLight;
 
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
 #[derive(Serialize, Clone)]

@@ -2,8 +2,8 @@ use utoipa::ToSchema;
 
 use tokens::tokens::users::UserToken;
 
-use crate::util::placeholder_images::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::util::placeholder_images::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use crate::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 /// Everything we need to refer to a user on the public web interface.
 #[derive(Clone, Serialize, ToSchema)]
@@ -107,7 +107,7 @@ impl DefaultAvatarInfo {
 mod tests {
   use tokens::tokens::users::UserToken;
 
-  use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
+  use crate::common_responses::user_details_lite::UserDetailsLight;
 
   #[test]
   fn test_from_optional_db_fields() {

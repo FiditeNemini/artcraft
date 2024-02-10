@@ -15,10 +15,10 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use mysql_queries::queries::media_files::list::list_media_files_by_tokens::list_media_files_by_tokens;
 use tokens::tokens::media_files::MediaFileToken;
-use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
+use users_component::common_responses::user_details_lite::UserDetailsLight;
 
+use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
 #[derive(Serialize, ToSchema)]

@@ -7,15 +7,16 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::warn;
+use utoipa::ToSchema;
 
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::voice_designer::datasets::list_datasets_by_username::list_datasets_by_username;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
+use users_component::common_responses::user_details_lite::UserDetailsLight;
 
-use crate::http_server::common_responses::user_details_lite::UserDetailsLight;
 use crate::server_state::ServerState;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, ToSchema)]
 pub struct ZsDatasetRecord {
   dataset_token: ZsVoiceDatasetToken,
   title: String,
@@ -32,18 +33,18 @@ pub struct ZsDatasetRecord {
 }
 
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ListDatasetsByUserSuccessResponse {
   pub success: bool,
   pub datasets: Vec<ZsDatasetRecord>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct ListDatasetsByUserPathInfo {
   username: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum ListDatasetsByUserError {
   NotAuthorized,
   ServerError,
@@ -64,6 +65,18 @@ impl ResponseError for ListDatasetsByUserError {
   }
 }
 
+#[utoipa::path(
+  get,
+  path = "/v1/voice_designer/user/{username}/list",
+  responses(
+    (status = 200, description = "Found", body = ListDatasetsByUserSuccessResponse),
+    (status = 401, description = "Not authorized", body = ListDatasetsByUserError),
+    (status = 500, description = "Server error", body = ListDatasetsByUserError),
+  ),
+  params(
+    ("path" = ListDatasetsByUserPathInfo, description = "Path for Request")
+  )
+)]
 pub async fn list_datasets_by_user_handler(
   http_request: HttpRequest,
   path: Path<ListDatasetsByUserPathInfo>,

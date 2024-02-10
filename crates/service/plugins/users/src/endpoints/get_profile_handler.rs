@@ -15,6 +15,7 @@ use r2d2_redis::{r2d2, RedisConnectionManager};
 use r2d2_redis::r2d2::PooledConnection;
 use r2d2_redis::redis::Commands;
 use sqlx::MySqlPool;
+use utoipa::ToSchema;
 
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
@@ -25,15 +26,19 @@ use mysql_queries::queries::users::user_badges::list_user_badges::UserBadgeForLi
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::{get_user_profile_by_username_from_connection, UserProfileResult};
 use tokens::tokens::users::UserToken;
 
-use crate::utils::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::utils::default_avatar_from_username::default_avatar_from_username;
+use crate::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use crate::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
+use crate::common_responses::user_details_lite::UserDetailsLight;
 use crate::utils::session_checker::SessionChecker;
 
 // TODO: This is duplicated in query_user_profile
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct UserProfileRecordForResponse {
   pub user_token: UserToken,
+
+  pub core_info: UserDetailsLight,
+  
   pub username: String,
   pub display_name: String,
   pub email_gravatar_hash: String,
@@ -52,32 +57,41 @@ pub struct UserProfileRecordForResponse {
   pub github_username: Option<String>,
   pub cashapp_username: Option<String>,
   pub website_url: Option<String>,
-  pub badges: Vec<UserBadgeForList>,
+  pub badges: Vec<UserProfileUserBadge>,
   pub created_at: DateTime<Utc>,
   pub maybe_moderator_fields: Option<UserProfileModeratorFields>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct UserProfileModeratorFields {
   pub is_banned: bool,
   pub maybe_mod_comments: Option<String>,
   pub maybe_mod_user_token: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize, Clone, ToSchema)]
+pub struct UserProfileUserBadge {
+  pub slug: String,
+  pub title: String,
+  pub description: String,
+  pub image_url: String,
+  pub granted_at: DateTime<Utc>,
+}
+
+#[derive(Serialize, ToSchema)]
 pub struct ProfileSuccessResponse {
   pub success: bool,
   pub user: Option<UserProfileRecordForResponse>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, ToSchema)]
 pub enum ProfileError {
   ServerError,
   NotFound,
 }
 
 /// For the URL PathInfo
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct GetProfilePathInfo {
   username: String,
 }
@@ -102,6 +116,18 @@ impl fmt::Display for ProfileError {
   }
 }
 
+#[utoipa::path(
+  get,
+  path = "/user/{username}/profile",
+  responses(
+    (status = 200, description = "Get profile", body = UserProfileRecordForResponse),
+    (status = 404, description = "Not found", body = ProfileError),
+    (status = 500, description = "Server error", body = ProfileError),
+  ),
+  params(
+    ("path" = GetProfilePathInfo, description = "Path for Request")
+  )
+)]
 pub async fn get_profile_handler(
   http_request: HttpRequest,
   path: Path<GetProfilePathInfo>,
@@ -219,7 +245,13 @@ pub async fn get_profile_handler(
   }
 
   let mut profile_for_response = UserProfileRecordForResponse {
-    user_token: user_data.user_profile.user_token,
+    user_token: user_data.user_profile.user_token.clone(), // NB: Cloned because of ref use for avatar below
+    core_info: UserDetailsLight::from_db_fields(
+      &user_data.user_profile.user_token,
+      &user_data.user_profile.username,
+      &user_data.user_profile.display_name,
+      &user_data.user_profile.email_gravatar_hash,
+    ),
     username: user_data.user_profile.username.to_string(), // NB: Cloned because of ref use for avatar below
     display_name: user_data.user_profile.display_name,
     email_gravatar_hash: user_data.user_profile.email_gravatar_hash,
@@ -246,7 +278,15 @@ pub async fn get_profile_handler(
         maybe_mod_user_token: mod_fields.maybe_mod_user_token,
       }
     }),
-    badges: user_data.badges,
+    badges: user_data.badges
+        .into_iter()
+        .map(|badge| UserProfileUserBadge {
+          slug: badge.slug,
+          title: badge.title,
+          description: badge.description,
+          image_url: badge.image_url,
+          granted_at: badge.granted_at,
+        }).collect(),
   };
 
   if !is_mod {

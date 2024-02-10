@@ -1,8 +1,6 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-// TODO: De-duplicate with storyteller-web
-
 /// There are currently 25 avatars numbered 0 to 24 (0-indexed).
 /// The original dataset was numbered 1 - 25, but I renamed 25 to 0.
 const NUMBER_OF_AVATARS : u64 = 25;
@@ -34,7 +32,7 @@ mod tests {
 
   use rand::distributions::{Alphanumeric, DistString};
 
-  use crate::utils::default_avatar_from_username::default_avatar_from_username;
+  use crate::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
   #[test]
   fn test_stability() {

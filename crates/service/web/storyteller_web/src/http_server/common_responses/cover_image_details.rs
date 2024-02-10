@@ -1,13 +1,10 @@
 use utoipa::ToSchema;
+
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use tokens::tokens::model_weights::ModelWeightToken;
 
-use tokens::tokens::users::UserToken;
 use crate::util::placeholder_images::cover_images::default_cover_image_color_from_token::default_cover_image_color_from_token;
 use crate::util::placeholder_images::cover_images::default_cover_image_from_token::default_cover_image_from_token;
-
-use crate::util::placeholder_images::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::util::placeholder_images::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 /// Everything we need to create a cover image.
 /// Cover images are small descriptive images that can be set for any model.
@@ -71,7 +68,7 @@ impl DefaultCoverInfo {
 #[cfg(test)]
 mod tests {
   use tokens::tokens::model_weights::ModelWeightToken;
-  use tokens::tokens::users::UserToken;
+
   use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
 
   #[test]

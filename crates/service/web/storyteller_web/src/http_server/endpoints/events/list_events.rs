@@ -8,11 +8,11 @@ use derive_more::Display;
 use log::error;
 
 use mysql_queries::queries::public_event_feed::list_public_event_feed_items::list_public_event_feed_items;
+use users_component::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
+use users_component::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use crate::util::placeholder_images::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
-use crate::util::placeholder_images::user_avatars::default_avatar_from_username::default_avatar_from_username;
 
 #[derive(Serialize)]
 pub struct EventRecord {
