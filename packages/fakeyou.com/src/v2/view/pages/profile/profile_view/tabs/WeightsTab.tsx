@@ -53,6 +53,7 @@ export default function WeightsTab({ username }: { username: string }) {
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: res => {
+      console.log("🧽",res);
       bookmarks.gather({ res, key: "weight_token" }); // expand rather than replace for lazy loading
       ratings.gather({ res, key: "weight_token" });
       setShowMasonryGrid(true);

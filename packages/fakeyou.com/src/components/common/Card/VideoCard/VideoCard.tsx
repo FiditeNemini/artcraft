@@ -4,14 +4,14 @@ import useTimeAgo from "hooks/useTimeAgo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faPlayCircle } from "@fortawesome/pro-solid-svg-icons";
 import Badge from "components/common/Badge";
-import LikeButton from "components/common/LikeButton";
 import Button from "components/common/Button";
-import CreatorName from "../CreatorName";
+import { CardFooter } from "components/entities";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { Link } from "react-router-dom";
 import getCardUrl from "../getCardUrl";
 
 interface VideoCardProps {
+  bookmarks?: any;
   data: any;
   ratings?: any;
   showCreator?: boolean;
@@ -22,6 +22,7 @@ interface VideoCardProps {
 }
 
 export default function VideoCard({
+  bookmarks,
   data,
   ratings,
   showCreator,
@@ -31,10 +32,6 @@ export default function VideoCard({
   onResultSelect,
 }: VideoCardProps) {
   const linkUrl = getCardUrl(data,source,type);
-
-  const handleInnerClick = (event: any) => {
-    event.stopPropagation();
-  };
 
   const handleSelectModalResultSelect = () => {
     if (inSelectModal && onResultSelect) {
@@ -92,42 +89,13 @@ export default function VideoCard({
                   {data.weight_name}
                 </h6>
                 <p className="fs-7 opacity-75">{timeAgo}</p>
-                <hr className="my-2" />
-                <div
-                  className="d-flex align-items-center gap-2"
-                  onClick={handleInnerClick}
-                >
-                  {showCreator && (
-                    <div className="flex-grow-1">
-                      <CreatorName
-                        displayName={
-                          data.maybe_creator?.display_name || "Anonymous"
-                        }
-                        gravatarHash={data.maybe_creator?.gravatar_hash || ""}
-                        avatarIndex={
-                          data.maybe_creator?.default_avatar.image_index || ""
-                        }
-                        backgroundIndex={
-                          data.maybe_creator?.default_avatar.color_index || ""
-                        }
-                        username={data.maybe_creator?.username || "anonymous"}
-                      />
-                    </div>
-                  )}
-
-                  {ratings && (
-                    <div>
-                      <LikeButton
-                        {...{
-                          ...ratings.makeProps({
-                            entityToken: data.token,
-                            entityType: "media_file",
-                          }),
-                        }}
-                      />
-                    </div>
-                  )}
-                </div>
+                <CardFooter {...{
+                  creator: data?.maybe_creator, 
+                  entityToken: data.token,
+                  entityType: "media_file",
+                  makeBookmarksProps: bookmarks.makeProps,
+                  makeRatingsProps: ratings.makeProps
+                }}/>
               </div>
             </div>
           </div>

@@ -58,7 +58,7 @@ export default function BookmarkButton({
   const index = busy ? 0 : isToggled ? 1 : 2;
 
   return (
-    <div className="d-flex gap-2">
+    <>
       <Tippy
         theme="fakeyou"
         content={toolTip}
@@ -84,6 +84,6 @@ export default function BookmarkButton({
           </div>
         </button>
       </Tippy>
-    </div>
+    </>
   );
 }

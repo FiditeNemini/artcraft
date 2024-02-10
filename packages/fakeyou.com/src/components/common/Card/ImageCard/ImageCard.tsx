@@ -1,11 +1,9 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import Card from "../Card";
+import { CardFooter } from "components/entities";
 import useTimeAgo from "hooks/useTimeAgo";
 import Badge from "components/common/Badge";
-import LikeButton from "components/common/LikeButton";
-import BookmarkButton from "components/common/BookmarkButton";
-import CreatorName from "../CreatorName";
 import Button from "components/common/Button";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import useWeightTypeInfo from "hooks/useWeightTypeInfo/useWeightTypeInfo";
@@ -37,11 +35,6 @@ export default function ImageCard({
   const history = useHistory();
   // const { setToken, setWeightTitle } = useToken();
   const linkUrl = getCardUrl(data,source,type);
-
-  const handleInnerClick = (event: any) => {
-    console.log("handleInnderClick")
-    event.stopPropagation();
-  };
 
   const handleSelectModalResultSelect = () => {
     console.log("handleSelectModalResultSelect")
@@ -118,44 +111,13 @@ export default function ImageCard({
               <div>
                 <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
               </div>
-
-              <hr className="my-2" />
-
-              <div
-                className="d-flex align-items-center gap-2"
-                onClick={handleInnerClick}
-              >
-                {showCreator && (
-                  <div className="flex-grow-1">
-                    <CreatorName
-                      displayName={
-                        data.maybe_creator?.display_name || "Anonymous"
-                      }
-                      gravatarHash={data.maybe_creator?.gravatar_hash || null}
-                      avatarIndex={
-                        data.maybe_creator?.default_avatar.image_index || 0
-                      }
-                      backgroundIndex={
-                        data.maybe_creator?.default_avatar.color_index || 0
-                      }
-                      username={data.maybe_creator?.username || "anonymous"}
-                    />
-                  </div>
-                )}
-
-                {ratings && (
-                  <div>
-                    <LikeButton
-                      {...{
-                        ...ratings.makeProps({
-                          entityToken: data.token,
-                          entityType: "media_file",
-                        }),
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
+              <CardFooter {...{
+                creator: data?.maybe_creator, 
+                entityToken: data.token,
+                entityType: "media_file",
+                makeBookmarksProps: bookmarks.makeProps,
+                makeRatingsProps: ratings.makeProps
+              }}/>
             </div>
           </div>
         </>
@@ -206,63 +168,13 @@ export default function ImageCard({
                   <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
                 </div>
               </div>
-
-              <hr className="my-2" />
-
-              <div
-                className="d-flex align-items-center gap-2"
-                onClick={handleInnerClick}
-              >
-                {showCreator && (
-                  <div className="flex-grow-1">
-                    <CreatorName
-                      displayName={
-                        data.creator?.display_name ||
-                        data.details?.maybe_weight_data.maybe_creator
-                          .display_name ||
-                        "Anonymous"
-                      }
-                      gravatarHash={data.creator?.gravatar_hash || null}
-                      avatarIndex={
-                        data.creator?.default_avatar.image_index || 0
-                      }
-                      backgroundIndex={
-                        data.creator?.default_avatar.color_index || 0
-                      }
-                      username={
-                        data.creator?.username ||
-                        data.details?.maybe_weight_data.maybe_creator
-                          .username ||
-                        "anonymous"
-                      }
-                    />
-                  </div>
-                )}
-
-                {ratings && (
-                  <div>
-                    <LikeButton
-                      {...{
-                        ...ratings.makeProps({
-                          entityToken: data.weight_token,
-                          entityType: "model_weight",
-                        }),
-                      }}
-                    />
-                  </div>
-                )}
-
-                {bookmarks && (
-                  <BookmarkButton
-                    {...{
-                      ...bookmarks.makeProps({
-                        entityToken: data.weight_token,
-                        entityType: "model_weight",
-                      }),
-                    }}
-                  />
-                )}
-              </div>
+              <CardFooter {...{
+                creator: data?.maybe_creator, 
+                entityToken: data.weight_token,
+                entityType: "model_weight",
+                makeBookmarksProps: bookmarks.makeProps,
+                makeRatingsProps: ratings.makeProps
+              }}/>
             </div>
           </div>
         </>

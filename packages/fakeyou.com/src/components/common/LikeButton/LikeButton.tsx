@@ -58,7 +58,7 @@ export default function LikeButton({
   let likeCountShort = useShortenNumber(likeCount);
 
   return (
-    <div className="d-flex gap-2">
+    <>
       <Tippy
         theme="fakeyou"
         content={toolTip}
@@ -86,6 +86,6 @@ export default function LikeButton({
           </div>
         </button>
       </Tippy>
-    </div>
+    </>
   );
 }

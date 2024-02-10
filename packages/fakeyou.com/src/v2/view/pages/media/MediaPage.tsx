@@ -120,7 +120,7 @@ export default function MediaPage() {
         return (
           <Iframe
             {...{
-              url: `https://engine.fakeyou.com?mode=viewer&gltf=${glbUrl}`,
+              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${glbUrl}`,
               className: "fy-studio-frame",
             }}
           />
@@ -130,7 +130,7 @@ export default function MediaPage() {
         return (
           <Iframe
             {...{
-              url: `https://engine.fakeyou.com?mode=viewer&gltf=${gltfUrl}`,
+              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${gltfUrl}`,
               className: "fy-studio-frame",
             }}
           />

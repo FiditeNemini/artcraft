@@ -9,6 +9,7 @@ interface CreatorNameProps {
   avatarIndex: number;
   backgroundIndex: number;
   className?: string;
+  noHeight?: boolean;
 }
 
 export default function CreatorName({
@@ -18,13 +19,14 @@ export default function CreatorName({
   backgroundIndex,
   username,
   className,
+  noHeight
 }: CreatorNameProps) {
   const handleInnerClick = (event: any) => {
     event.stopPropagation();
   };
 
   const gravatar = (
-    <Gravatar
+    <Gravatar {...{ noHeight }}
       size={22}
       email_hash={gravatarHash}
       avatarIndex={avatarIndex || 0}
