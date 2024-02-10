@@ -57,8 +57,8 @@ export default function GLTFCard({
               creator: data?.maybe_creator, 
               entityToken: data.token,
               entityType: "media_file",
-              makeBookmarksProps: bookmarks.makeProps,
-              makeRatingsProps: ratings.makeProps,
+              makeBookmarksProps: bookmarks?.makeProps,
+              makeRatingsProps: ratings?.makeProps,
               showCreator
             }}/>
           </div>

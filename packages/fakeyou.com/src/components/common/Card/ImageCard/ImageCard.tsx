@@ -124,8 +124,8 @@ export default function ImageCard({
                   creator: data?.maybe_creator,
                   entityToken: data.token,
                   entityType: "media_file",
-                  makeBookmarksProps: bookmarks.makeProps,
-                  makeRatingsProps: ratings.makeProps,
+                  makeBookmarksProps: bookmarks?.makeProps,
+                  makeRatingsProps: ratings?.makeProps,
                   showCreator,
                 }}
               />
@@ -184,8 +184,8 @@ export default function ImageCard({
                   creator: data?.maybe_creator,
                   entityToken: data.weight_token,
                   entityType: "model_weight",
-                  makeBookmarksProps: bookmarks.makeProps,
-                  makeRatingsProps: ratings.makeProps,
+                  makeBookmarksProps: bookmarks?.makeProps,
+                  makeRatingsProps: ratings?.makeProps,
                   showCreator,
                 }}
               />
