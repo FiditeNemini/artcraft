@@ -27,7 +27,7 @@ export default function EngineCompositor({ value, sessionWrapper }: Props) {
   const onClick = () => {
     EnqueueEngineCompositing("", {
       uuid_idempotency_token: uuidv4(),
-      video_source: mediaToken || "",
+      media_file_token: mediaToken || "",
     }).then((res: any) => {
       if (res && res.success) {
         inferenceJobs.enqueue(res.inference_job_token);
