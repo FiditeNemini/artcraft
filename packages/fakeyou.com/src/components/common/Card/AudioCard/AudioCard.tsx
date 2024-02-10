@@ -168,7 +168,8 @@ export default function AudioCard({
             entityToken: data.weight_token,
             entityType: "model_weight",
             makeBookmarksProps: bookmarks.makeProps,
-            makeRatingsProps: ratings.makeProps
+            makeRatingsProps: ratings.makeProps,
+            showCreator
           }}/>
         </>
       )}

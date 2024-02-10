@@ -58,7 +58,8 @@ export default function GLBCard({
               entityToken: data.token,
               entityType: "media_file",
               makeBookmarksProps: bookmarks.makeProps,
-              makeRatingsProps: ratings.makeProps
+              makeRatingsProps: ratings.makeProps,
+              showCreator
             }}/>
           </div>
         </div>
