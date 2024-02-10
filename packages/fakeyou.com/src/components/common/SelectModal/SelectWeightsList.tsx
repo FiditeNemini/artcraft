@@ -53,7 +53,7 @@ export default function SelectWeightsList({
     list,
     listSet,
     requestList: true,
-    disableUrlQueries: true,
+    urlUpdate: false,
   });
 
   //bookmarks
@@ -71,7 +71,7 @@ export default function SelectWeightsList({
     listSet: setBookmarksList,
     requestList: true,
     urlParam: user.username,
-    disableUrlQueries: true,
+    urlUpdate: false,
   });
 
   const paginationProps = {

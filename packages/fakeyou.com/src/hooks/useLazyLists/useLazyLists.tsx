@@ -12,7 +12,7 @@ interface Props {
   onInputChange?: (x?: any) => any;
   onSuccess?: (x?: any) => any;
   requestList?: boolean;
-  disableUrlQueries?: boolean;
+  urlUpdate?: boolean;
 }
 
 const n = () => {};
@@ -27,7 +27,7 @@ export default function useLazyLists({
   onInputChange = n,
   onSuccess = n,
   requestList = false,
-  disableUrlQueries = false,
+  urlUpdate = true,
 }: Props) {
   const { pathname, search: locSearch } = useLocation();
   const history = useHistory();
@@ -92,7 +92,7 @@ export default function useLazyLists({
     if (status === FetchStatus.ready && !goingtToTop) {
       let search = new URLSearchParams(queries).toString();
       statusSet(FetchStatus.in_progress);
-      !disableUrlQueries && history.replace({ pathname, search });
+      if (urlUpdate) { history.replace({ pathname, search }); }
 
       fetcher("", {}, queries).then((res: any) => {
         if (debug)
@@ -137,7 +137,7 @@ export default function useLazyLists({
     sort,
     status,
     totalKeys,
-    disableUrlQueries,
+    urlUpdate,
     y
   ]);
 

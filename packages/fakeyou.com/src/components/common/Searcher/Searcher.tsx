@@ -97,7 +97,7 @@ export default function Searcher({
     list,
     listSet,
     requestList: true,
-    disableUrlQueries: true,
+    urlUpdate: false,
   });
 
   return (
