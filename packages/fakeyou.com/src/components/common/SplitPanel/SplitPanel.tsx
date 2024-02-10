@@ -7,7 +7,7 @@ interface HeaderProps {
   padding?: boolean;
 }
 const Header: React.FC<HeaderProps> = ({ children, padding }) => {
-  const headerClassName = `${padding ? "p-3 py-4 p-md-4" : ""}`.trim();
+  const headerClassName = `${padding ? "p-3 p-md-4 py-md-3" : ""}`.trim();
   return <div className={headerClassName}>{children}</div>;
 };
 
@@ -16,7 +16,7 @@ interface BodyProps {
   padding?: boolean;
 }
 const Body: React.FC<BodyProps> = ({ children, padding }) => {
-  const bodyClassName = `${padding ? "p-3 py-4 p-md-4" : ""}`.trim();
+  const bodyClassName = `${padding ? "p-3 p-md-4" : ""}`.trim();
   return <div className={bodyClassName}>{children}</div>;
 };
 
@@ -25,7 +25,7 @@ interface FooterProps {
   padding?: boolean;
 }
 const Footer: React.FC<FooterProps> = ({ children, padding }) => {
-  const footerClassName = `${padding ? "p-3 py-4 p-md-4" : ""}`.trim();
+  const footerClassName = `${padding ? "p-3 p-md-4" : ""}`.trim();
   return <div className={footerClassName}>{children}</div>;
 };
 
@@ -74,7 +74,7 @@ const SplitPanel: React.FC<PanelProps> & {
       {body}
       {dividerFooter && <hr className="m-0" />}
       {footer}
-      { <TintSpinner {...{ busy }} /> }
+      {<TintSpinner {...{ busy }} />}
     </div>
   );
 };
