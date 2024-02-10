@@ -116,7 +116,8 @@ export default function ImageCard({
                 entityToken: data.token,
                 entityType: "media_file",
                 makeBookmarksProps: bookmarks.makeProps,
-                makeRatingsProps: ratings.makeProps
+                makeRatingsProps: ratings.makeProps,
+                showCreator
               }}/>
             </div>
           </div>
@@ -173,7 +174,8 @@ export default function ImageCard({
                 entityToken: data.weight_token,
                 entityType: "model_weight",
                 makeBookmarksProps: bookmarks.makeProps,
-                makeRatingsProps: ratings.makeProps
+                makeRatingsProps: ratings.makeProps,
+                showCreator
               }}/>
             </div>
           </div>

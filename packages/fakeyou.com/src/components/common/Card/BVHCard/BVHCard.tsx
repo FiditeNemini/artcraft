@@ -59,7 +59,8 @@ export default function BVHCard({
               entityToken: data.token,
               entityType: "media_file",
               makeBookmarksProps: bookmarks.makeProps,
-              makeRatingsProps: ratings.makeProps
+              makeRatingsProps: ratings.makeProps,
+              showCreator
             }}/>
           </div>
         </div>
