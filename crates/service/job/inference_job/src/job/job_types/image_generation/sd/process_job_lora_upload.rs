@@ -164,6 +164,10 @@ pub async fn process_job_lora_upload(
 //  let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
 //  remote_cloud_file_client.download_file(sd_weight_details, path_to_string(sd_checkpoint_path.clone())).await?;
 
+  info!("Downloading predefined SD weight from: {:?} to {:?}",
+    &sd_deps.predefined_sd_weight_bucket_path,
+    &sd_checkpoint_path);
+
   args.job_dependencies
       .buckets
       .public_bucket_client
@@ -173,6 +177,10 @@ pub async fn process_job_lora_upload(
         error!("could not download predefined SD weight: {:?}", err);
         ProcessSingleJobError::from_anyhow_error(anyhow!("could not download predefined SD weight: {:?}", err))
       })?;
+
+  info!("Downloading predefined VAE weight from: {:?} to {:?}",
+    &sd_deps.vae_bucket_path,
+    &vae_path);
 
   args.job_dependencies
       .buckets
