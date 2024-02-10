@@ -19,7 +19,7 @@ interface ImageCardProps {
   source?: string;
   type: "media" | "weights";
   inSelectModal?: boolean;
-  onResultSelect?: (data:{token: string, title:string}) => void;
+  onResultSelect?: (data: { token: string; title: string }) => void;
 }
 
 export default function ImageCard({
@@ -34,16 +34,16 @@ export default function ImageCard({
 }: ImageCardProps) {
   const history = useHistory();
   // const { setToken, setWeightTitle } = useToken();
-  const linkUrl = getCardUrl(data,source,type);
+  const linkUrl = getCardUrl(data, source, type);
 
   const handleSelectModalResultSelect = () => {
-    console.log("handleSelectModalResultSelect")
+    console.log("handleSelectModalResultSelect");
     if (inSelectModal) {
-      
-      onResultSelect && onResultSelect({
-        token: data.weight_token,
-        title: data.title
-      });
+      onResultSelect &&
+        onResultSelect({
+          token: data.weight_token,
+          title: data.title,
+        });
     }
   };
 
@@ -111,14 +111,16 @@ export default function ImageCard({
               <div>
                 <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
               </div>
-              <CardFooter {...{
-                creator: data?.maybe_creator, 
-                entityToken: data.token,
-                entityType: "media_file",
-                makeBookmarksProps: bookmarks.makeProps,
-                makeRatingsProps: ratings.makeProps,
-                showCreator
-              }}/>
+              <CardFooter
+                {...{
+                  creator: data?.maybe_creator,
+                  entityToken: data.token,
+                  entityType: "media_file",
+                  makeBookmarksProps: bookmarks.makeProps,
+                  makeRatingsProps: ratings.makeProps,
+                  showCreator,
+                }}
+              />
             </div>
           </div>
         </>
@@ -169,14 +171,16 @@ export default function ImageCard({
                   <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
                 </div>
               </div>
-              <CardFooter {...{
-                creator: data?.maybe_creator, 
-                entityToken: data.weight_token,
-                entityType: "model_weight",
-                makeBookmarksProps: bookmarks.makeProps,
-                makeRatingsProps: ratings.makeProps,
-                showCreator
-              }}/>
+              <CardFooter
+                {...{
+                  creator: data?.maybe_creator,
+                  entityToken: data.weight_token,
+                  entityType: "model_weight",
+                  makeBookmarksProps: bookmarks.makeProps,
+                  makeRatingsProps: ratings.makeProps,
+                  showCreator,
+                }}
+              />
             </div>
           </div>
         </>

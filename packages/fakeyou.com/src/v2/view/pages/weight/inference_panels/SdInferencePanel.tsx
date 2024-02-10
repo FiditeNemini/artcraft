@@ -5,9 +5,9 @@ import {
   Input,
   Label,
   NumberSlider,
-  Panel,
   SegmentButtons,
   SelectModal,
+  SplitPanel,
   TempSelect,
   TempTextArea,
 } from "components/common";
@@ -16,6 +16,7 @@ import {
   faRectangleLandscape,
   faRectanglePortrait,
   faSquare,
+  faUpload,
 } from "@fortawesome/pro-solid-svg-icons";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -278,7 +279,7 @@ function SdInferencePanel({
         );
       }
     } else if (EnqueueImageGenIsError(response)) {
-      console.log("error",response);
+      console.log("error", response);
     }
     setIsEnqueuing(false);
 
@@ -293,186 +294,198 @@ function SdInferencePanel({
   };
 
   return (
-    <Panel padding={true}>
-      <h4 className="fw-semibold mb-4">Generate an Image</h4>
-
-      <div className="d-flex flex-column gap-3 mb-4">
-        {isStandalone && (
-          <SelectModal
-            required={true}
-            modalTitle="Select a Weight"
-            label="Select a Weight"
-            onSelect={handleOnWeightSelect}
-            tabs={[
-              {
-                label: "All Weights",
-                tabKey: "allWeights",
-                typeFilter: "sd_1.5",
-                searcher: true,
-                type: "weights",
-              },
-              {
-                label: "Bookmarked",
-                tabKey: "bookmarkedWeights",
-                typeFilter: "sd_1.5",
-                searcher: false,
-                type: "weights",
-              },
-            ]}
-          />
-        )}
-
-        <TempTextArea
-          {...{
-            label: "Prompt",
-            placeholder: "Enter a prompt",
-            onChange: handlePromptChange,
-            value: prompt,
-            required: true,
-          }}
-        />
-        <TempTextArea
-          {...{
-            label: "Negative Prompt",
-            name: "negativePrompt",
-            placeholder: "Enter a negative prompt",
-            onChange: handleNegativePromptChange,
-            value: negativePrompt,
-          }}
-        />
-        <SegmentButtons
-          {...{
-            label: "Aspect Ratio",
-            name: "aspectRatio",
-            onChange,
-            options: dimensionOpts,
-            value: aspectRatio,
-          }}
-        />
-      </div>
-
-      <Accordion>
-        <Accordion.Item title="Advanced">
-          <div className="p-3 d-flex flex-column gap-3">
-            <div>
-              <label className="sub-title">Seed</label>
-              <div className="d-flex gap-2 align-items-center">
-                <SegmentButtons
-                  {...{
-                    name: "seed",
-                    onChange: handleSeedChange,
-                    options: seedOpts,
-                    value: seed,
-                  }}
-                />
-                <Input
-                  placeholder="Random"
-                  value={seedNumber}
-                  onChange={handleSeedNumberChange}
-                  type="number"
-                  onBlur={handleBlur}
-                />
-              </div>
-            </div>
-
-            <TempSelect
-              {...{
-                label: "Sampler",
-                name: "sampler",
-                onChange,
-                options: samplerOpts,
-                value: sampler,
-              }}
+    <SplitPanel dividerHeader={true}>
+      <SplitPanel.Header padding={true}>
+        <div className="d-flex flex-wrap gap-2 align-items-center">
+          <h4 className="fw-semibold mb-0 flex-grow-1">Generate an Image</h4>
+          <div>
+            <Button
+              icon={faUpload}
+              label="Upload a Weight"
+              variant="secondary"
+              small={true}
+              to="/upload/sd"
             />
+          </div>
+        </div>
+      </SplitPanel.Header>
 
-            <NumberSlider
-              {...{
-                min: 1,
-                max: 30,
-                name: "cfgScale",
-                label: "CFG Scale",
-                onChange,
-                thumbTip: "CFG Scale",
-                value: cfgScale,
-                step: 0.5,
-              }}
-            />
-
-            <NumberSlider
-              {...{
-                min: 8,
-                max: 64,
-                name: "samples",
-                label: "Samples",
-                onChange,
-                thumbTip: "Samples",
-                value: samples,
-              }}
-            />
-
+      <SplitPanel.Body padding={true}>
+        <div className="d-flex flex-column gap-3 mb-4">
+          {isStandalone && (
             <SelectModal
-              label="Additional LoRA Weight"
-              onSelect={handleOnSelect}
+              required={true}
+              modalTitle="Select a Weight"
+              label="Select a Weight"
+              onSelect={handleOnWeightSelect}
               tabs={[
                 {
-                  label: "All LoRA Weights",
-                  tabKey: "allLoraWeights",
-                  typeFilter: "loRA",
+                  label: "All Weights",
+                  tabKey: "allWeights",
+                  typeFilter: "sd_1.5",
                   searcher: true,
                   type: "weights",
                 },
                 {
                   label: "Bookmarked",
-                  tabKey: "bookmarkedLoraWeights",
-                  typeFilter: "loRA",
+                  tabKey: "bookmarkedWeights",
+                  typeFilter: "sd_1.5",
                   searcher: false,
                   type: "weights",
                 },
               ]}
             />
+          )}
 
-            <div>
-              <Label label="Number of Generations" />
-              <PremiumLock
-                sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                requiredPlan="pro"
-              >
-                <SegmentButtons
-                  {...{
-                    name: "batchCount",
-                    onChange,
-                    options: batchCountOpts,
-                    value: batchCount,
-                  }}
-                />
-              </PremiumLock>
+          <TempTextArea
+            {...{
+              label: "Prompt",
+              placeholder: "Enter a prompt",
+              onChange: handlePromptChange,
+              value: prompt,
+              required: true,
+            }}
+          />
+          <TempTextArea
+            {...{
+              label: "Negative Prompt",
+              name: "negativePrompt",
+              placeholder: "Enter a negative prompt",
+              onChange: handleNegativePromptChange,
+              value: negativePrompt,
+            }}
+          />
+          <SegmentButtons
+            {...{
+              label: "Aspect Ratio",
+              name: "aspectRatio",
+              onChange,
+              options: dimensionOpts,
+              value: aspectRatio,
+            }}
+          />
+        </div>
+
+        <Accordion>
+          <Accordion.Item title="Advanced">
+            <div className="p-3 d-flex flex-column gap-3">
+              <div>
+                <label className="sub-title">Seed</label>
+                <div className="d-flex gap-2 align-items-center">
+                  <SegmentButtons
+                    {...{
+                      name: "seed",
+                      onChange: handleSeedChange,
+                      options: seedOpts,
+                      value: seed,
+                    }}
+                  />
+                  <Input
+                    placeholder="Random"
+                    value={seedNumber}
+                    onChange={handleSeedNumberChange}
+                    type="number"
+                    onBlur={handleBlur}
+                  />
+                </div>
+              </div>
+              <TempSelect
+                {...{
+                  label: "Sampler",
+                  name: "sampler",
+                  onChange,
+                  options: samplerOpts,
+                  value: sampler,
+                }}
+              />
+              <NumberSlider
+                {...{
+                  min: 1,
+                  max: 30,
+                  name: "cfgScale",
+                  label: "CFG Scale",
+                  onChange,
+                  thumbTip: "CFG Scale",
+                  value: cfgScale,
+                  step: 0.5,
+                }}
+              />
+              <NumberSlider
+                {...{
+                  min: 8,
+                  max: 64,
+                  name: "samples",
+                  label: "Samples",
+                  onChange,
+                  thumbTip: "Samples",
+                  value: samples,
+                }}
+              />
+              <SelectModal
+                label="Additional LoRA Weight"
+                onSelect={handleOnSelect}
+                tabs={[
+                  {
+                    label: "All LoRA Weights",
+                    tabKey: "allLoraWeights",
+                    typeFilter: "loRA",
+                    searcher: true,
+                    type: "weights",
+                  },
+                  {
+                    label: "Bookmarked",
+                    tabKey: "bookmarkedLoraWeights",
+                    typeFilter: "loRA",
+                    searcher: false,
+                    type: "weights",
+                  },
+                ]}
+              />
+              <div>
+                <Label label="Number of Generations" />
+                <PremiumLock
+                  sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+                  requiredPlan="pro"
+                >
+                  <SegmentButtons
+                    {...{
+                      name: "batchCount",
+                      onChange,
+                      options: batchCountOpts,
+                      value: batchCount,
+                    }}
+                  />
+                </PremiumLock>
+              </div>{" "}
             </div>
-          </div>
-        </Accordion.Item>
-      </Accordion>
+          </Accordion.Item>
+        </Accordion>
+        <div className="d-flex gap-2 justify-content-end mt-4 mb-3">
+          <Button
+            {...{
+              label: "Clear All",
+              variant: "secondary",
+              onClick: resetToInitialState,
+            }}
+          />
+          <Button
+            {...{
+              label: "Generate Image",
+              disabled: prompt === "" || weightToken === undefined,
+              onClick: handleEnqueueImageGen,
+              isLoading: isEnqueuing,
+            }}
+          />
+        </div>
+      </SplitPanel.Body>
 
-      <div className="d-flex gap-2 justify-content-end mt-4 mb-3">
-        <Button
-          {...{
-            label: "Clear All",
-            variant: "secondary",
-            onClick: resetToInitialState,
-          }}
-        />
-        <Button
-          {...{
-            label: "Generate Image",
-            disabled: prompt === "" || weightToken === undefined,
-            onClick: handleEnqueueImageGen,
-            isLoading: isEnqueuing,
-          }}
-        />
-      </div>
-      <InferenceJobsList {...{
-        failures,
-        jobType: FrontendInferenceJobType.ImageGeneration
-      }} />
-    </Panel>
+      <InferenceJobsList
+        {...{
+          failures,
+          jobType: FrontendInferenceJobType.ImageGeneration,
+        }}
+      />
+    </SplitPanel>
   );
 }
 

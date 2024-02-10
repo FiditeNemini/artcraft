@@ -30,7 +30,7 @@ export default function TextToImagePage({
   const hasImageGenJobs = inferenceJobs && inferenceJobs.length > 0;
 
   if (!sessionWrapper.canAccessStudio()) {
-    return <StudioNotAvailable />
+    return <StudioNotAvailable />;
   }
 
   return (
@@ -40,7 +40,7 @@ export default function TextToImagePage({
         titleIcon={faMessageImage}
         title="Text to Image"
         subText="Transform your thoughts into art."
-        yOffset="76%"
+        yOffset="68%"
       />
 
       {hasImageGenJobs && (
