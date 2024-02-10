@@ -127,6 +127,8 @@ export default function Searcher({
                   foundWeights.map((data: any, key: number) => {
                     let props = {
                       data,
+                      ratings,
+                      bookmarks,
                       type: "weights",
                       inSelectModal: true,
                       onResultSelect,

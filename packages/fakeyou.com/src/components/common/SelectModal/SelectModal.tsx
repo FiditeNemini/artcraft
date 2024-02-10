@@ -11,13 +11,14 @@ import SelectWeightsList from "./SelectWeightsList";
 export type SelectModalData = {
   token: string;
   title: string;
-}
+};
 interface TabConfig {
   label: string;
   tabKey: string;
   type: "media" | "weights";
   typeFilter?: string;
   searcher?: boolean;
+  onlyBookmarked?: boolean;
 }
 interface SelectModalProps {
   label?: string;
@@ -37,42 +38,46 @@ const SelectModal = memo(
     value,
     required,
   }: SelectModalProps) => {
-    const emptyValue =  {token:"", title:""};
-    const [{isModalOpen, selectedValue, valueType, activeTab}, setState] = useState({
-      isModalOpen:false,
-      selectedValue: value ? value : emptyValue,
-      activeTab: tabs[0].tabKey,
-      valueType: tabs[0].typeFilter || "all"
-    })
+    const emptyValue = { token: "", title: "" };
+    const [{ isModalOpen, selectedValue, valueType, activeTab }, setState] =
+      useState({
+        isModalOpen: false,
+        selectedValue: value ? value : emptyValue,
+        activeTab: tabs[0].tabKey,
+        valueType: tabs[0].typeFilter || "all",
+      });
     console.log("🔫", tabs, activeTab, valueType);
 
     // Update mediaType when activeTab changes
     useEffect(() => {
       const currentTab = tabs.find(tab => tab.tabKey === activeTab);
-      setState((curr)=>({...curr, valueType: currentTab?.typeFilter || "all"}))
+      setState(curr => ({
+        ...curr,
+        valueType: currentTab?.typeFilter || "all",
+      }));
     }, [activeTab, tabs]);
 
     const openModal = () => {
-      setState((curr)=>({...curr, isModalOpen: true}));
+      setState(curr => ({ ...curr, isModalOpen: true }));
     };
 
     const closeModal = () => {
-      setState((curr)=>({...curr, isModalOpen: false}));
+      setState(curr => ({ ...curr, isModalOpen: false }));
     };
 
     const handleRemove = () => {
-      setState((curr)=>({...curr, selectedValue: emptyValue}));
+      setState(curr => ({ ...curr, selectedValue: emptyValue }));
       if (onSelect) onSelect(emptyValue);
     };
 
-    const handleOnSelect = (data:{token:string, title:string}) => {
-      setState((curr)=>({
+    const handleOnSelect = (data: { token: string; title: string }) => {
+      setState(curr => ({
         ...curr,
-        selectedValue: {token: data.token, title: data.title || ""},
-        isModalOpen: false
+        selectedValue: { token: data.token, title: data.title || "" },
+        isModalOpen: false,
       }));
       if (onSelect) onSelect(data);
-    }
+    };
 
     const searchTabs = tabs.map(tab => ({
       label: tab.label,
@@ -93,16 +98,27 @@ const SelectModal = memo(
             />
           )}
           {tab.type === "weights" && (
-            <SelectWeightsList
-              weightType={valueType}
-              listKey={tab.tabKey}
-              onResultSelect={handleOnSelect}
-            />
+            <>
+              {tab.onlyBookmarked ? (
+                <SelectWeightsList
+                  weightType={valueType}
+                  listKey={tab.tabKey}
+                  onResultBookmarkSelect={handleOnSelect}
+                  onlyBookmarked={tab.onlyBookmarked}
+                />
+              ) : (
+                <SelectWeightsList
+                  weightType={valueType}
+                  listKey={tab.tabKey}
+                  onResultSelect={handleOnSelect}
+                />
+              )}
+            </>
           )}
         </>
       ),
       padding: true,
-      onClick: () => setState((curr)=>({...curr, activeTab: tab.tabKey})),
+      onClick: () => setState(curr => ({ ...curr, activeTab: tab.tabKey })),
     }));
 
     return (
@@ -114,32 +130,35 @@ const SelectModal = memo(
             </label>
           )}
 
-          <div className="d-flex gap-2 position-relative">
-            <div 
-              className="position-absolute w-100 h-100"
-              style={{"cursor": "pointer"}}
-              onClick={openModal} 
-            />
+          <div className="d-flex">
             <Input
-              disabled={true}
-              wrapperClassName="w-100"
+              readOnly={true}
               placeholder="None selected"
               onClick={openModal}
-              value={selectedValue.title !=="" 
-                ? selectedValue.title 
-                : selectedValue.token || ""}
+              value={
+                selectedValue.title !== ""
+                  ? selectedValue.title
+                  : selectedValue.token || ""
+              }
+              style={{ cursor: "pointer" }}
+              wrapperClassName="flex-grow-1"
             />
-            
-            <Button label={selectedValue.token !== "" ? "Change" : "Select"} onClick={openModal} />
-            {selectedValue.token && (
+
+            <div className="d-flex gap-2">
               <Button
-                square={true}
-                variant="danger"
-                icon={faTrash}
-                onClick={handleRemove}
-                tooltip="Remove"
+                label={selectedValue.token !== "" ? "Change" : "Select"}
+                onClick={openModal}
               />
-            )}
+              {selectedValue.token && (
+                <Button
+                  square={true}
+                  variant="danger"
+                  icon={faTrash}
+                  onClick={handleRemove}
+                  tooltip="Remove"
+                />
+              )}
+            </div>
           </div>
         </div>
 
