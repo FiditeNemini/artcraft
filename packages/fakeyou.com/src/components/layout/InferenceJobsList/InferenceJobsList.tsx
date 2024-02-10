@@ -37,14 +37,22 @@ export default function InferenceJobsList({
   // undefined specified here to allow 0.
   // jobType + 1 because the difference between FrontendInferenceJobType and JobListTypes is an "all" option
 
-  const jobValue = value !== undefined ? value : jobType !== undefined ? (jobType || 0) + 1 : 0;
+  const jobValue =
+    value !== undefined
+      ? value
+      : jobType !== undefined
+        ? (jobType || 0) + 1
+        : 0;
 
-  const { inferenceJobs = [], jobStatusDescription } = useInferenceJobs(jobValue);
+  const { inferenceJobs = [], jobStatusDescription } =
+    useInferenceJobs(jobValue);
   const { t } = useLocalize("InferenceJobs");
 
   if (inferenceJobs.length || showNoJobs) {
     return (
-      <Panel {...{ className: "fy-inference-jobs-list", padding: true }}>
+      <Panel
+        {...{ className: "fy-inference-jobs-list rounded", padding: true }}
+      >
         <h5>{t("core.heading")}</h5>
         {inferenceJobs
           .map((job: InferenceJob, key: number) => (
@@ -61,9 +69,9 @@ export default function InferenceJobsList({
             />
           ))
           .reverse()}
-          {!inferenceJobs.length && showNoJobs &&
-            <p>Currently, there are current no jobs pending.</p> 
-          }
+        {!inferenceJobs.length && showNoJobs && (
+          <p>Currently, there are current no jobs pending.</p>
+        )}
       </Panel>
     );
   } else {

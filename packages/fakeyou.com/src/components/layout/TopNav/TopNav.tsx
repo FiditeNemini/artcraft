@@ -242,6 +242,14 @@ export default function TopNav({
               )}
             </div>
             <Button
+              icon={faClipboardList}
+              variant="secondary"
+              small={true}
+              label="My Jobs"
+              onClick={openModal}
+              className="d-lg-none"
+            />
+            <Button
               icon={faSearch}
               variant="secondary"
               small={true}
