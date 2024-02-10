@@ -5,7 +5,6 @@ import {
   Input,
   Label,
   NumberSlider,
-  Panel,
   SegmentButtons,
   SelectModal,
   SplitPanel,
@@ -305,6 +304,7 @@ function SdInferencePanel({
               label="Upload a Weight"
               variant="secondary"
               small={true}
+              to="/upload/sd"
             />
           </div>
         </div>
