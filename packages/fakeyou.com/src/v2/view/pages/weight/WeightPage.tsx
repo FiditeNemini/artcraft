@@ -6,7 +6,13 @@ import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Skeleton from "components/common/Skeleton";
 import Button from "components/common/Button";
-import { faCircleExclamation, faLink, faImage, faMicrophone, faVolumeHigh } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faCircleExclamation,
+  faLink,
+  faImage,
+  faMicrophone,
+  faVolumeHigh,
+} from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
@@ -109,7 +115,7 @@ export default function WeightPage({
     case WeightType.SDXL:
     case WeightType.LORA:
       if (!sessionWrapper.canAccessStudio()) {
-        return <StudioNotAvailable />
+        return <StudioNotAvailable />;
       }
   }
 
@@ -163,6 +169,7 @@ export default function WeightPage({
           <div className="d-flex flex-column gap-3">
             <SdCoverImagePanel src={sdCoverImage} />
             <SdInferencePanel
+              inferenceJobs={inferenceJobs}
               sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
               sd_model_token={weight.weight_token}
               enqueueInferenceJob={enqueueInferenceJob}
@@ -361,41 +368,49 @@ export default function WeightPage({
     );
   }
 
-  const ctaButton = (ctaProps: any) => <Button {...{ 
-    variant: "primary",
-    className: "flex-grow-1",
-    ...ctaProps
-  }} />;
-
+  const ctaButton = (ctaProps: any) => (
+    <Button
+      {...{
+        variant: "primary",
+        className: "flex-grow-1",
+        ...ctaProps,
+      }}
+    />
+  );
 
   const callToAction = () => {
     switch (weight.weight_type) {
       case WeightType.TT2:
-      case WeightType.HIFIGAN_TT2: return ctaButton({
-        icon: faVolumeHigh,
-        label: "Upload your own voice model",
-        to: `/upload/tts`,
-      });
+      case WeightType.HIFIGAN_TT2:
+        return ctaButton({
+          icon: faVolumeHigh,
+          label: "Upload your own voice model",
+          to: `/upload/tts`,
+        });
       case WeightType.RVCv2:
-      case WeightType.SVC: return ctaButton({
-        icon: faMicrophone,
-        label: "Upload your own voice weight",
-        to: `/upload/voice_conversion`,
-      });
+      case WeightType.SVC:
+        return ctaButton({
+          icon: faMicrophone,
+          label: "Upload your own voice weight",
+          to: `/upload/voice_conversion`,
+        });
       case WeightType.SD_15:
-      case WeightType.SDXL: return ctaButton({
-        icon: faImage,
-        label: "Upload your own SD weight",
-        to: `/upload/sd`,
-      });
-      case WeightType.LORA: return ctaButton({
-        icon: faImage,
-        label: "Upload your own LoRa weight",
-        to: `/upload/lora`,
-      });
-      default: return null;
+      case WeightType.SDXL:
+        return ctaButton({
+          icon: faImage,
+          label: "Upload your own SD weight",
+          to: `/upload/sd`,
+        });
+      case WeightType.LORA:
+        return ctaButton({
+          icon: faImage,
+          label: "Upload your own LoRa weight",
+          to: `/upload/lora`,
+        });
+      default:
+        return null;
     }
-  }
+  };
 
   return (
     <div>
@@ -468,9 +483,7 @@ export default function WeightPage({
           </div>
           <div className="col-12 col-xl-4">
             <div className="panel panel-clear d-flex flex-column gap-3">
-              <div className="d-flex gap-2 flex-wrap">
-                { callToAction() }
-              </div>
+              <div className="d-flex gap-2 flex-wrap">{callToAction()}</div>
 
               <Panel className="rounded">
                 <div className="d-flex gap-2 p-3">

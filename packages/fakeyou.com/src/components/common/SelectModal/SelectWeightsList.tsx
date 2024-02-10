@@ -16,7 +16,7 @@ import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/Ge
 import Pagination from "../Pagination";
 
 interface SelectWeightsListProps {
-  weightType: string;
+  weightType: string | "all";
   listKey: string;
   onResultSelect?: (data: { token: string; title: string }) => void;
   onResultBookmarkSelect?: (data: { token: string; title: string }) => void;
@@ -39,7 +39,6 @@ export default function SelectWeightsList({
   const { user } = useSession();
   const [showBookmarksMasonryGrid, setShowBookmarksMasonryGrid] =
     useState(false);
-
   const handlePageClick = (selectedItem: { selected: number }) => {
     pageChange(selectedItem.selected);
   };
@@ -61,7 +60,7 @@ export default function SelectWeightsList({
   const { isLoading, page, pageChange, pageCount, status } = useListContent({
     addQueries: {
       page_size: 9,
-      ...prepFilter(weightType, "weight_type"),
+      ...prepFilter(weightType, "maybe_scoped_weight_type"),
     },
     fetcher: GetBookmarksByUser,
     onSuccess: res => {

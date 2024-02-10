@@ -826,9 +826,9 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
-                <Route path="/inference-jobs-list">
-                  <InferenceJobsPage/>
-                </Route>
+                  <Route path="/inference-jobs-list">
+                    <InferenceJobsPage />
+                  </Route>
 
                   <Route path="/voice-designer">
                     <VoiceDesignerMainPage />
@@ -873,6 +873,7 @@ class PageContainer extends React.Component<
                       }
                       enqueueInferenceJob={this.props.enqueueInferenceJob}
                       sessionWrapper={this.props.sessionWrapper}
+                      inferenceJobs={this.props.inferenceJobs}
                     />
                   </Route>
 
