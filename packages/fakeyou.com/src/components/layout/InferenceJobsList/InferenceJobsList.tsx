@@ -15,7 +15,9 @@ interface JobsListProps {
   jobType?: FrontendInferenceJobType;
   value?: JobListTypes;
   onSelect?: (e: any) => any;
+  panel?: boolean;
   showNoJobs?: boolean;
+  showHeader?: boolean;
 }
 
 const resultPaths = {
@@ -32,7 +34,9 @@ export default function InferenceJobsList({
   jobType,
   value,
   onSelect,
+  panel = true,
   showNoJobs = false,
+  showHeader = true,
 }: JobsListProps) {
   // undefined specified here to allow 0.
   // jobType + 1 because the difference between FrontendInferenceJobType and JobListTypes is an "all" option
@@ -48,31 +52,43 @@ export default function InferenceJobsList({
     useInferenceJobs(jobValue);
   const { t } = useLocalize("InferenceJobs");
 
+  const jobContent = (
+    <>
+      {showHeader && <h3 className="fw-semibold mb-3">{t("core.heading")}</h3>}
+      {inferenceJobs
+        .map((job: InferenceJob, key: number) => (
+          <JobItem
+            {...{
+              failures,
+              jobStatusDescription,
+              key,
+              onSelect,
+              resultPaths,
+              t,
+              ...job,
+            }}
+          />
+        ))
+        .reverse()}
+      {!inferenceJobs.length && showNoJobs && (
+        <p>Currently, there are current no jobs pending.</p>
+      )}
+    </>
+  );
+
   if (inferenceJobs.length || showNoJobs) {
     return (
-      <Panel
-        {...{ className: "fy-inference-jobs-list rounded", padding: true }}
-      >
-        <h5>{t("core.heading")}</h5>
-        {inferenceJobs
-          .map((job: InferenceJob, key: number) => (
-            <JobItem
-              {...{
-                failures,
-                jobStatusDescription,
-                key,
-                onSelect,
-                resultPaths,
-                t,
-                ...job,
-              }}
-            />
-          ))
-          .reverse()}
-        {!inferenceJobs.length && showNoJobs && (
-          <p>Currently, there are current no jobs pending.</p>
+      <>
+        {panel ? (
+          <Panel
+            {...{ className: "fy-inference-jobs-list rounded", padding: true }}
+          >
+            {jobContent}
+          </Panel>
+        ) : (
+          jobContent
         )}
-      </Panel>
+      </>
     );
   } else {
     return null;
