@@ -23,6 +23,7 @@ interface AudioCardProps {
   type: "media" | "weights";
   inSelectModal?: boolean;
   onResultSelect?: (data: { token: string; title: string }) => void;
+  onResultBookmarkSelect?: (data: { token: string; title: string }) => void;
   // onClick?: (e:any) => any;
 }
 
@@ -37,16 +38,24 @@ export default function AudioCard({
   inSelectModal = false,
   // onClick: inClick,
   onResultSelect,
+  onResultBookmarkSelect,
 }: AudioCardProps) {
   const linkUrl = getCardUrl(data, source, type);
   const history = useHistory();
 
   const handleSelectModalResultSelect = () => {
-    if (inSelectModal && onResultSelect) {
-      onResultSelect({
-        token: data.weight_token,
-        title: data.title,
-      });
+    if (inSelectModal) {
+      onResultSelect &&
+        onResultSelect({
+          token: data.weight_token,
+          title: data.title,
+        });
+
+      onResultBookmarkSelect &&
+        onResultBookmarkSelect({
+          token: data.details.entity_token,
+          title: data.details.maybe_weight_data.title,
+        });
     }
   };
 
@@ -90,7 +99,9 @@ export default function AudioCard({
           <div className="mb-3">
             <div className="d-flex align-items-center">
               <div className="d-flex flex-grow-1 align-items-center gap-2">
-                <Badge {...{ className: "fy-entity-type-audio", label: "Audio" }} />
+                <Badge
+                  {...{ className: "fy-entity-type-audio", label: "Audio" }}
+                />
               </div>
             </div>
 
@@ -102,14 +113,16 @@ export default function AudioCard({
             <p className="fs-7 opacity-75">{timeAgo}</p>
           </div>
           <AudioPlayer src={data.public_bucket_path} id={data.token} />
-          <CardFooter {...{
-            creator: data?.maybe_creator, 
-            entityToken: data.token,
-            entityType: "media_file",
-            makeBookmarksProps: bookmarks.makeProps,
-            makeRatingsProps: ratings.makeProps,
-            showCreator
-          }}/>
+          <CardFooter
+            {...{
+              creator: data?.maybe_creator,
+              entityToken: data.token,
+              entityType: "media_file",
+              makeBookmarksProps: bookmarks.makeProps,
+              makeRatingsProps: ratings.makeProps,
+              showCreator,
+            }}
+          />
         </>
       )}
 
@@ -163,14 +176,16 @@ export default function AudioCard({
               </div>
             </div>
           </div>
-          <CardFooter {...{
-            creator: data?.maybe_creator, 
-            entityToken: data.weight_token,
-            entityType: "model_weight",
-            makeBookmarksProps: bookmarks.makeProps,
-            makeRatingsProps: ratings.makeProps,
-            showCreator
-          }}/>
+          <CardFooter
+            {...{
+              creator: data?.maybe_creator,
+              entityToken: data.weight_token,
+              entityType: "model_weight",
+              makeBookmarksProps: bookmarks.makeProps,
+              makeRatingsProps: ratings.makeProps,
+              showCreator,
+            }}
+          />
         </>
       )}
     </Card>

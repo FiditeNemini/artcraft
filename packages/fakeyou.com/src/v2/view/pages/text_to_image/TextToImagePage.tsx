@@ -6,7 +6,7 @@ import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/Infer
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { faMessageImage } from "@fortawesome/pro-solid-svg-icons";
 import TextToImageJobsList from "./components/TextToImageJobsList";
-import { useInferenceJobs } from "hooks";
+// import { useInferenceJobs } from "hooks";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
@@ -24,11 +24,6 @@ export default function TextToImagePage({
   sessionSubscriptionsWrapper,
   enqueueInferenceJob,
 }: TextToImagePageProps) {
-  const { inferenceJobs } = useInferenceJobs(
-    FrontendInferenceJobType.ImageGeneration
-  );
-  const hasImageGenJobs = inferenceJobs && inferenceJobs.length > 0;
-
   if (!sessionWrapper.canAccessStudio()) {
     return <StudioNotAvailable />;
   }
@@ -43,17 +38,15 @@ export default function TextToImagePage({
         yOffset="68%"
       />
 
-      {hasImageGenJobs && (
-        <div className="mb-4">
-          <TextToImageJobsList />
-        </div>
-      )}
-
       <SdInferencePanel
         sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
         enqueueInferenceJob={enqueueInferenceJob}
         isStandalone={true}
       />
+
+      <div className="mt-4">
+        <TextToImageJobsList />
+      </div>
     </Container>
   );
 }

@@ -332,6 +332,7 @@ function SdInferencePanel({
                   typeFilter: "sd_1.5",
                   searcher: false,
                   type: "weights",
+                  onlyBookmarked: true,
                 },
               ]}
             />
@@ -438,6 +439,7 @@ function SdInferencePanel({
                     typeFilter: "loRA",
                     searcher: false,
                     type: "weights",
+                    onlyBookmarked: true,
                   },
                 ]}
               />

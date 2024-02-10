@@ -15,6 +15,7 @@ interface Props {
   requestList?: boolean;
   urlParam: string;
   urlUpdate?: boolean;
+  disableUrlQueries?: boolean;
 }
 
 const n = () => {};
@@ -31,12 +32,15 @@ export default function useListContent({
   pagePreset = 0,
   requestList = false,
   urlParam = "",
-  urlUpdate = true
+  urlUpdate = true,
+  disableUrlQueries = false,
 }: Props) {
   const { pathname, search: locSearch } = useLocation();
   const history = useHistory();
   const urlQueries = new URLSearchParams(locSearch);
-  const [page, pageSet] = useState(parseInt(urlQueries.get("page_index") || "") || pagePreset);
+  const [page, pageSet] = useState(
+    parseInt(urlQueries.get("page_index") || "") || pagePreset
+  );
   const [pageCount, pageCountSet] = useState(0);
   const [sort, sortSet] = useState(urlQueries.get("sort_ascending") === "true");
   const [status, statusSet] = useState(
@@ -78,8 +82,10 @@ export default function useListContent({
       if (status === FetchStatus.ready) {
         let search = new URLSearchParams(queries).toString();
         statusSet(FetchStatus.in_progress);
-        if (urlUpdate) history.replace({ pathname, search });
-        fetcher(urlParam,{},queries).then((res: any) => {
+        !disableUrlQueries &&
+          urlUpdate &&
+          history.replace({ pathname, search });
+        fetcher(urlParam, {}, queries).then((res: any) => {
           if (debug)
             console.log(`🪲 useListContent success debug at: ${debug}`, res);
           statusSet(FetchStatus.success);
@@ -103,7 +109,8 @@ export default function useListContent({
     sort,
     status,
     urlParam,
-    urlUpdate
+    urlUpdate,
+    disableUrlQueries,
   ]);
 
   return {

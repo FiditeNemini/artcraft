@@ -20,6 +20,7 @@ interface ImageCardProps {
   type: "media" | "weights";
   inSelectModal?: boolean;
   onResultSelect?: (data: { token: string; title: string }) => void;
+  onResultBookmarkSelect?: (data: { token: string; title: string }) => void;
 }
 
 export default function ImageCard({
@@ -31,6 +32,7 @@ export default function ImageCard({
   type,
   inSelectModal = false,
   onResultSelect,
+  onResultBookmarkSelect,
 }: ImageCardProps) {
   const history = useHistory();
   // const { setToken, setWeightTitle } = useToken();
@@ -43,6 +45,12 @@ export default function ImageCard({
         onResultSelect({
           token: data.weight_token,
           title: data.title,
+        });
+
+      onResultBookmarkSelect &&
+        onResultBookmarkSelect({
+          token: data.details.entity_token,
+          title: data.details.maybe_weight_data.title,
         });
     }
   };
