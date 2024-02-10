@@ -26,6 +26,7 @@ import {
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import PremiumLock from "components/PremiumLock";
+import InferenceJobsList from "components/layout/InferenceJobsList";
 
 interface SdInferencePanelProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -277,11 +278,18 @@ function SdInferencePanel({
         );
       }
     } else if (EnqueueImageGenIsError(response)) {
-      console.log("error");
+      console.log("error",response);
     }
     setIsEnqueuing(false);
 
     return false;
+  };
+
+  const failures = (fail = "") => {
+    switch (fail) {
+      default:
+        return "Uknown failure";
+    }
   };
 
   return (
@@ -443,7 +451,7 @@ function SdInferencePanel({
         </Accordion.Item>
       </Accordion>
 
-      <div className="d-flex gap-2 justify-content-end mt-4">
+      <div className="d-flex gap-2 justify-content-end mt-4 mb-3">
         <Button
           {...{
             label: "Clear All",
@@ -460,6 +468,10 @@ function SdInferencePanel({
           }}
         />
       </div>
+      <InferenceJobsList {...{
+        failures,
+        jobType: FrontendInferenceJobType.ImageGeneration
+      }} />
     </Panel>
   );
 }
