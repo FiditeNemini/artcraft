@@ -301,7 +301,7 @@ function SdInferencePanel({
           <div>
             <Button
               icon={faUpload}
-              label="Upload a Weight"
+              label="Upload Weight"
               variant="secondary"
               small={true}
               to="/upload/sd"
@@ -473,7 +473,7 @@ function SdInferencePanel({
           <Button
             {...{
               label: "Generate Image",
-              disabled: prompt === "" || weightToken === undefined,
+              disabled: prompt === "" || weightToken === "",
               onClick: handleEnqueueImageGen,
               isLoading: isEnqueuing,
             }}
