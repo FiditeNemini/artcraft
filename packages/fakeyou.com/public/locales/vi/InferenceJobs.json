@@ -20,7 +20,12 @@
     "heading": "Công việc thiết kế giọng nói"
   },
   "core": {
-    "heading": "Việc làm mới nhất"
+    "exploreBtn": "Khám phá",
+    "heading": "Việc làm mới nhất",
+    "jobsSubtitle": "Xem trạng thái công việc của bạn",
+    "jobsTitle": "Nghề của tôi",
+    "noJobsSubtitle": "Công việc xếp hàng sẽ xuất hiện ở đây",
+    "noJobsTitle": "Không có công việc nào trong hàng đợi"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "Nỗ lực hoạt hình khuôn mặt không thành công",

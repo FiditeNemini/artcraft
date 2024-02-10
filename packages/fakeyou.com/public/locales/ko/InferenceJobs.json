@@ -20,7 +20,12 @@
     "heading": "음성 디자이너 채용"
   },
   "core": {
-    "heading": "최신 채용 정보"
+    "exploreBtn": "탐구하다",
+    "heading": "최신 채용 정보",
+    "jobsSubtitle": "작업 상태 보기",
+    "jobsTitle": "내 직업",
+    "noJobsSubtitle": "대기 중인 작업이 여기에 표시됩니다.",
+    "noJobsTitle": "대기열에 작업이 없습니다."
   },
   "face_animator": {
     "ATTEMPT_FAILED": "얼굴 애니메이션 시도가 실패했습니다.",

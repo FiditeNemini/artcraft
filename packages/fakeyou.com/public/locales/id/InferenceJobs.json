@@ -20,7 +20,12 @@
     "heading": "Pekerjaan Desainer Suara"
   },
   "core": {
-    "heading": "Pekerjaan Terbaru"
+    "exploreBtn": "Mengeksplorasi",
+    "heading": "Pekerjaan Terbaru",
+    "jobsSubtitle": "Lihat status pekerjaan Anda",
+    "jobsTitle": "Pekerjaan saya",
+    "noJobsSubtitle": "Pekerjaan yang antri akan muncul di sini",
+    "noJobsTitle": "Tidak ada pekerjaan dalam antrian"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "Upaya Animasi Wajah Gagal",

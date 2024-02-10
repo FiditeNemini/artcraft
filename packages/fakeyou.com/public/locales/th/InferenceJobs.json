@@ -20,7 +20,12 @@
     "heading": "งานนักออกแบบเสียง"
   },
   "core": {
-    "heading": "งานล่าสุด"
+    "exploreBtn": "สำรวจ",
+    "heading": "งานล่าสุด",
+    "jobsSubtitle": "ดูสถานะของงานของคุณ",
+    "jobsTitle": "งานของฉัน",
+    "noJobsSubtitle": "งานที่เข้าคิวจะปรากฏที่นี่",
+    "noJobsTitle": "ไม่มีงานในคิว"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "ความพยายามในแอนิเมชั่นใบหน้าล้มเหลว",

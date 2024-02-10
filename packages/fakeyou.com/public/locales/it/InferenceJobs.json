@@ -20,7 +20,12 @@
     "heading": "Lavori di progettista vocale"
   },
   "core": {
-    "heading": "Ultimi lavori"
+    "exploreBtn": "Esplorare",
+    "heading": "Ultimi lavori",
+    "jobsSubtitle": "Visualizza lo stato dei tuoi lavori",
+    "jobsTitle": "I miei lavori",
+    "noJobsSubtitle": "I lavori in coda verranno visualizzati qui",
+    "noJobsTitle": "Nessun lavoro in coda"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "Tentativo di animazione del volto non riuscito",

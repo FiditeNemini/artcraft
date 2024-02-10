@@ -20,7 +20,12 @@
     "heading": "语音设计师职位"
   },
   "core": {
-    "heading": "最新职位"
+    "exploreBtn": "探索",
+    "heading": "最新职位",
+    "jobsSubtitle": "查看您的工作状态",
+    "jobsTitle": "我的工作",
+    "noJobsSubtitle": "排队的作业将出现在此处",
+    "noJobsTitle": "队列中没有作业"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "脸部动画尝试失败",

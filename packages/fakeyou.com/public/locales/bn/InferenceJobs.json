@@ -20,7 +20,12 @@
     "heading": "ভয়েস ডিজাইনার চাকরি"
   },
   "core": {
-    "heading": "সর্বশেষ চাকরি"
+    "exploreBtn": "অন্বেষণ",
+    "heading": "সর্বশেষ চাকরি",
+    "jobsSubtitle": "আপনার চাকরির অবস্থা দেখুন",
+    "jobsTitle": "আমার কাজ",
+    "noJobsSubtitle": "সারিবদ্ধ কাজ এখানে প্রদর্শিত হবে",
+    "noJobsTitle": "সারিতে কোনো চাকরি নেই"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "ফেস অ্যানিমেশন প্রচেষ্টা ব্যর্থ হয়েছে৷",

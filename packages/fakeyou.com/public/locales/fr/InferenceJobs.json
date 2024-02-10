@@ -20,7 +20,12 @@
     "heading": "Emplois de concepteur de voix"
   },
   "core": {
-    "heading": "Derniers emplois"
+    "exploreBtn": "Explorer",
+    "heading": "Derniers emplois",
+    "jobsSubtitle": "Afficher l'état de vos travaux",
+    "jobsTitle": "Mes emplois",
+    "noJobsSubtitle": "Les tâches en file d'attente apparaîtront ici",
+    "noJobsTitle": "Aucune tâche en file d'attente"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "Échec de la tentative d'animation du visage",

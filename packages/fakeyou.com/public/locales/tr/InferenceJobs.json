@@ -20,7 +20,12 @@
     "heading": "Ses Tasarımcısı İş İlanları"
   },
   "core": {
-    "heading": "En Son İşler"
+    "exploreBtn": "Keşfetmek",
+    "heading": "En Son İşler",
+    "jobsSubtitle": "İşlerinizin durumunu görüntüleyin",
+    "jobsTitle": "Benim işlerim",
+    "noJobsSubtitle": "Sıraya alınan işler burada görünecek",
+    "noJobsTitle": "Sırada iş yok"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "Yüz Animasyonu Denemesi Başarısız",

@@ -20,7 +20,12 @@
     "heading": "ボイスデザイナーの仕事"
   },
   "core": {
-    "heading": "最新の求人"
+    "exploreBtn": "探検する",
+    "heading": "最新の求人",
+    "jobsSubtitle": "ジョブのステータスを表示する",
+    "jobsTitle": "私の仕事",
+    "noJobsSubtitle": "キューに入れられたジョブがここに表示されます",
+    "noJobsTitle": "キューにジョブがありません"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "顔アニメーションの試行が失敗しました",

@@ -20,7 +20,12 @@
     "heading": "Jobs als Sprachdesigner"
   },
   "core": {
-    "heading": "Neueste Jobs"
+    "exploreBtn": "Erkunden",
+    "heading": "Neueste Jobs",
+    "jobsSubtitle": "Sehen Sie sich den Status Ihrer Jobs an",
+    "jobsTitle": "Meine Jobs",
+    "noJobsSubtitle": "Hier werden Aufträge in der Warteschlange angezeigt",
+    "noJobsTitle": "Keine Jobs in der Warteschlange"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "Gesichtsanimationsversuch fehlgeschlagen",

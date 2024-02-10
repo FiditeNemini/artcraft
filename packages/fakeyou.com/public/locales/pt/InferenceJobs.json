@@ -20,7 +20,12 @@
     "heading": "Empregos de designer de voz"
   },
   "core": {
-    "heading": "Últimos trabalhos"
+    "exploreBtn": "Explorar",
+    "heading": "Últimos trabalhos",
+    "jobsSubtitle": "Veja o status dos seus trabalhos",
+    "jobsTitle": "Meus trabalhos",
+    "noJobsSubtitle": "Os trabalhos na fila aparecerão aqui",
+    "noJobsTitle": "Nenhum trabalho na fila"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "Falha na tentativa de animação facial",

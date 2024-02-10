@@ -8,7 +8,9 @@ import JobItem from "./JobItem";
 import { useInferenceJobs, useLocalize } from "hooks";
 import { JobListTypes } from "hooks/useInferenceJobs/useInferenceJobs";
 import "./InferenceJobsList.scss";
-import { Panel } from "components/common";
+import { Button, Panel } from "components/common";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClipboardList } from "@fortawesome/pro-solid-svg-icons";
 
 interface JobsListProps {
   failures: (fail: string) => string;
@@ -71,7 +73,15 @@ export default function InferenceJobsList({
         ))
         .reverse()}
       {!inferenceJobs.length && showNoJobs && (
-        <p>Currently, there are current no jobs pending.</p>
+        <div className="d-flex flex-column p-4 gap-3 text-center align-items-center">
+          <FontAwesomeIcon icon={faClipboardList} className="display-6 mb-2" />
+          <div>
+            <h2 className="fw-semibold mb-1">{t("core.noJobsTitle")}</h2>
+            <p className="opacity-75 mb-2">{t("core.noJobsSubtitle")}</p>
+          </div>
+
+          <Button label={t("core.exploreBtn")} to="/explore" />
+        </div>
       )}
     </>
   );
