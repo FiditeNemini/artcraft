@@ -9,6 +9,36 @@
     "UNKNOWN": "Status da animação desconhecido",
     "heading": "Empregos de animador facial"
   },
+  "ImageGeneration": {
+    "ATTEMPT_FAILED": "Tentativa de geração de imagem malsucedida",
+    "COMPLETE_FAILURE": "Falha na geração de imagem",
+    "COMPLETE_SUCCESS": "Geração de imagem concluída",
+    "DEAD": "Geração de imagem morta",
+    "PENDING": "Geração de imagem pendente",
+    "STARTED": "Geração de imagem em andamento",
+    "UNKNOWN": "Status de geração de imagem desconhecido",
+    "heading": "Trabalhos de geração de imagens"
+  },
+  "TextToSpeech": {
+    "ATTEMPT_FAILED": "Tentativa de conversão de texto em fala malsucedida",
+    "COMPLETE_FAILURE": "Falha na conversão de texto em fala",
+    "COMPLETE_SUCCESS": "Texto para fala completo",
+    "DEAD": "Texto para fala morto",
+    "PENDING": "Texto para fala pendente",
+    "STARTED": "Texto para fala em andamento",
+    "UNKNOWN": "Texto para fala desconhecido",
+    "heading": "Trabalhos de conversão de texto em fala"
+  },
+  "VoiceConversion": {
+    "ATTEMPT_FAILED": "Tentativa de conversão de voz malsucedida",
+    "COMPLETE_FAILURE": "Falha na conversão de voz",
+    "COMPLETE_SUCCESS": "Conversão de voz concluída",
+    "DEAD": "Conversão de voz morta",
+    "PENDING": "Conversão de voz facial pendente",
+    "STARTED": "Conversão de voz em andamento",
+    "UNKNOWN": "Conversão de voz desconhecida",
+    "heading": "Trabalhos de conversão de voz"
+  },
   "VoiceDesignerCreateVoice": {
     "ATTEMPT_FAILED": "Falha na tentativa de animação facial",
     "COMPLETE_FAILURE": "Falha na animação facial.",
@@ -19,7 +49,19 @@
     "UNKNOWN": "Status do Voice Designer desconhecido",
     "heading": "Empregos de designer de voz"
   },
+  "VoiceDesignerTts": {
+    "ATTEMPT_FAILED": "Tentativa de conversão de texto em fala malsucedida",
+    "COMPLETE_FAILURE": "Falha na conversão de texto em fala",
+    "COMPLETE_SUCCESS": "Texto para fala completo",
+    "DEAD": "Texto para fala morto",
+    "PENDING": "Texto para fala pendente",
+    "STARTED": "Texto para fala em andamento",
+    "UNKNOWN": "Texto para fala desconhecido",
+    "heading": "Trabalhos de conversão de texto em fala do Voice Designer"
+  },
   "core": {
+    "cancel": "Cancelar trabalho",
+    "empty": "Nenhum trabalho ativo",
     "exploreBtn": "Explorar",
     "heading": "Últimos trabalhos",
     "jobsSubtitle": "Veja o status dos seus trabalhos",

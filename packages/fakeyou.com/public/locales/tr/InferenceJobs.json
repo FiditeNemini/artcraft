@@ -9,6 +9,36 @@
     "UNKNOWN": "Animasyon Durumu Bilinmiyor",
     "heading": "Yüz Animatörü İş İlanları"
   },
+  "ImageGeneration": {
+    "ATTEMPT_FAILED": "Görüntü Oluşturma Denemesi Başarısız",
+    "COMPLETE_FAILURE": "Görüntü Oluşturma Başarısız",
+    "COMPLETE_SUCCESS": "Görüntü Oluşturma Tamamlandı",
+    "DEAD": "Görüntü Oluşturma Öldü",
+    "PENDING": "Bekleyen Görüntü Oluşturma",
+    "STARTED": "Görüntü Oluşturma Devam Ediyor",
+    "UNKNOWN": "Görüntü Oluşturma Durumu Bilinmiyor",
+    "heading": "ImageGeneration İşleri"
+  },
+  "TextToSpeech": {
+    "ATTEMPT_FAILED": "Metinden Konuşmaya Girişim Başarısız",
+    "COMPLETE_FAILURE": "Metni Konuşmaya Dönüştürme Başarısız",
+    "COMPLETE_SUCCESS": "Metinden Konuşmaya Tamamlandı",
+    "DEAD": "Metinden Konuşmaya Ölü",
+    "PENDING": "Metin Okuma Bekleyen",
+    "STARTED": "Metinden Konuşmaya Devam Ediyor",
+    "UNKNOWN": "Metinden Konuşmaya Bilinmeyen",
+    "heading": "Metinden Konuşmaya İşler"
+  },
+  "VoiceConversion": {
+    "ATTEMPT_FAILED": "Ses Dönüştürme Denemesi Başarısız",
+    "COMPLETE_FAILURE": "Ses Dönüştürme Başarısız",
+    "COMPLETE_SUCCESS": "Ses Dönüştürme Tamamlandı",
+    "DEAD": "Ses Dönüşümü Öldü",
+    "PENDING": "Yüz Sesi Dönüşümü Bekleniyor",
+    "STARTED": "Ses Dönüşümü Devam Ediyor",
+    "UNKNOWN": "Ses Dönüşümü Bilinmiyor",
+    "heading": "Ses Dönüştürme İşleri"
+  },
   "VoiceDesignerCreateVoice": {
     "ATTEMPT_FAILED": "Yüz Animasyonu Denemesi Başarısız",
     "COMPLETE_FAILURE": "Yüz Animasyonu Başarısız.",
@@ -19,7 +49,19 @@
     "UNKNOWN": "Ses Tasarımcısı Durumu Bilinmiyor",
     "heading": "Ses Tasarımcısı İş İlanları"
   },
+  "VoiceDesignerTts": {
+    "ATTEMPT_FAILED": "Metinden Konuşmaya Girişim Başarısız",
+    "COMPLETE_FAILURE": "Metni Konuşmaya Dönüştürme Başarısız",
+    "COMPLETE_SUCCESS": "Metinden Konuşmaya Tamamlandı",
+    "DEAD": "Metinden Konuşmaya Ölü",
+    "PENDING": "Metin Okuma Bekleyen",
+    "STARTED": "Metinden Konuşmaya Devam Ediyor",
+    "UNKNOWN": "Metinden Konuşmaya Bilinmeyen",
+    "heading": "Ses Tasarımcısı Metinden Konuşmaya İşleri"
+  },
   "core": {
+    "cancel": "İşi iptal et",
+    "empty": "Aktif iş yok",
     "exploreBtn": "Keşfetmek",
     "heading": "En Son İşler",
     "jobsSubtitle": "İşlerinizin durumunu görüntüleyin",

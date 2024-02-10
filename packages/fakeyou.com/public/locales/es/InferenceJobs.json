@@ -9,6 +9,36 @@
     "UNKNOWN": "Estado de la animación desconocido",
     "heading": "Trabajos de animador facial"
   },
+  "ImageGeneration": {
+    "ATTEMPT_FAILED": "Intento de generación de imágenes fallido",
+    "COMPLETE_FAILURE": "Error en la generación de imágenes",
+    "COMPLETE_SUCCESS": "Generación de imágenes completa",
+    "DEAD": "Generación de imágenes muerta",
+    "PENDING": "Generación de imágenes pendientes",
+    "STARTED": "Generación de imágenes en progreso",
+    "UNKNOWN": "Estado de generación de imagen desconocido",
+    "heading": "Empleos de ImageGeneration"
+  },
+  "TextToSpeech": {
+    "ATTEMPT_FAILED": "Intento de texto a voz fallido",
+    "COMPLETE_FAILURE": "Error de texto a voz",
+    "COMPLETE_SUCCESS": "Texto a voz completo",
+    "DEAD": "Texto a voz muerto",
+    "PENDING": "Texto a voz pendiente",
+    "STARTED": "Texto a voz en progreso",
+    "UNKNOWN": "Texto a voz desconocido",
+    "heading": "Trabajos de texto a voz"
+  },
+  "VoiceConversion": {
+    "ATTEMPT_FAILED": "Intento de conversión de voz fallido",
+    "COMPLETE_FAILURE": "Error en la conversión de voz",
+    "COMPLETE_SUCCESS": "Conversión de voz completa",
+    "DEAD": "Conversión de voz muerta",
+    "PENDING": "Conversión de voz facial pendiente",
+    "STARTED": "Conversión de voz en progreso",
+    "UNKNOWN": "Conversión de voz desconocida",
+    "heading": "Trabajos de conversión de voz"
+  },
   "VoiceDesignerCreateVoice": {
     "ATTEMPT_FAILED": "Error al intentar animar la cara",
     "COMPLETE_FAILURE": "Error en la animación de la cara.",
@@ -19,7 +49,19 @@
     "UNKNOWN": "Estado del diseñador de voz desconocido",
     "heading": "Empleos de Diseñador de voz"
   },
+  "VoiceDesignerTts": {
+    "ATTEMPT_FAILED": "Intento de texto a voz fallido",
+    "COMPLETE_FAILURE": "Error de texto a voz",
+    "COMPLETE_SUCCESS": "Texto a voz completo",
+    "DEAD": "Texto a voz muerto",
+    "PENDING": "Texto a voz pendiente",
+    "STARTED": "Texto a voz en progreso",
+    "UNKNOWN": "Texto a voz desconocido",
+    "heading": "Trabajos de texto a voz del diseñador de voz"
+  },
   "core": {
+    "cancel": "Cancelar trabajo",
+    "empty": "No hay trabajos activos",
     "exploreBtn": "Explorar",
     "heading": "Ultimos trabajos",
     "jobsSubtitle": "Ver el estado de tus trabajos",

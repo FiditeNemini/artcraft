@@ -9,6 +9,36 @@
     "UNKNOWN": "Animationsstatus unbekannt",
     "heading": "Jobs als Gesichtsanimator"
   },
+  "ImageGeneration": {
+    "ATTEMPT_FAILED": "Bildgenerierungsversuch fehlgeschlagen",
+    "COMPLETE_FAILURE": "Bildgenerierung fehlgeschlagen",
+    "COMPLETE_SUCCESS": "Bildgenerierung abgeschlossen",
+    "DEAD": "Bilderzeugung tot",
+    "PENDING": "Ausstehende Bildgenerierung",
+    "STARTED": "Bildgenerierung läuft",
+    "UNKNOWN": "Bildgenerierungsstatus unbekannt",
+    "heading": "ImageGeneration-Jobs"
+  },
+  "TextToSpeech": {
+    "ATTEMPT_FAILED": "Text-to-Speech-Versuch fehlgeschlagen",
+    "COMPLETE_FAILURE": "Text-to-Speech fehlgeschlagen",
+    "COMPLETE_SUCCESS": "Text-to-Speech abgeschlossen",
+    "DEAD": "Text to Speech Dead",
+    "PENDING": "Ausstehende Text-zu-Sprache",
+    "STARTED": "Text-to-Speech in Bearbeitung",
+    "UNKNOWN": "Text-to-Speech unbekannt",
+    "heading": "Text-to-Speech-Jobs"
+  },
+  "VoiceConversion": {
+    "ATTEMPT_FAILED": "Sprachkonvertierungsversuch fehlgeschlagen",
+    "COMPLETE_FAILURE": "Sprachkonvertierung fehlgeschlagen",
+    "COMPLETE_SUCCESS": "Sprachkonvertierung abgeschlossen",
+    "DEAD": "Sprachkonvertierung tot",
+    "PENDING": "Ausstehende Face-Voice-Konvertierung",
+    "STARTED": "Sprachkonvertierung läuft",
+    "UNKNOWN": "Sprachkonvertierung unbekannt",
+    "heading": "Sprachkonvertierungsjobs"
+  },
   "VoiceDesignerCreateVoice": {
     "ATTEMPT_FAILED": "Gesichtsanimationsversuch fehlgeschlagen",
     "COMPLETE_FAILURE": "Gesichtsanimation fehlgeschlagen.",
@@ -19,7 +49,19 @@
     "UNKNOWN": "Voice Designer-Status unbekannt",
     "heading": "Jobs als Sprachdesigner"
   },
+  "VoiceDesignerTts": {
+    "ATTEMPT_FAILED": "Text-to-Speech-Versuch fehlgeschlagen",
+    "COMPLETE_FAILURE": "Text-to-Speech fehlgeschlagen",
+    "COMPLETE_SUCCESS": "Text-to-Speech abgeschlossen",
+    "DEAD": "Text to Speech Dead",
+    "PENDING": "Ausstehende Text-zu-Sprache",
+    "STARTED": "Text-to-Speech in Bearbeitung",
+    "UNKNOWN": "Text-to-Speech unbekannt",
+    "heading": "Voice Designer Text-to-Speech-Jobs"
+  },
   "core": {
+    "cancel": "Auftrag abbrechen",
+    "empty": "Keine aktiven Jobs",
     "exploreBtn": "Erkunden",
     "heading": "Neueste Jobs",
     "jobsSubtitle": "Sehen Sie sich den Status Ihrer Jobs an",
