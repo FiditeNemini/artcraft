@@ -1,6 +1,4 @@
-import React, {
-  // useState
-} from "react";
+import React from "react"; // useState
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 // import { TempSelect } from "components/common";
@@ -8,11 +6,14 @@ import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/Infer
 import ModalHeader from "../ModalHeader";
 
 interface Props {
-  handleClose?: any,
-  jobType?: FrontendInferenceJobType
+  handleClose?: any;
+  jobType?: FrontendInferenceJobType;
 }
 
-export default function InferenceJobsModal({ handleClose, jobType: inJobType = -1 }: Props) {
+export default function InferenceJobsModal({
+  handleClose,
+  jobType: inJobType = -1,
+}: Props) {
   // const presetFilter = enumToKeyArr(FrontendInferenceJobType)[inJobType];
   // const [jobType,jobTypeSet] = useState(inJobType > -1 ? presetFilter : "All");
   // const typeObj = ["All", ...Object.values(FrontendInferenceJobType)];
@@ -30,18 +31,24 @@ export default function InferenceJobsModal({ handleClose, jobType: inJobType = -
     }
   };
 
-  return <>
-    <ModalHeader {...{ handleClose, title: "My Jobs" }} />
-    {
-     // <TempSelect {...{ onChange: ({ target }: { target: any }) => jobTypeSet(target.value), options, value: jobType }} />
-    }
-    <InferenceJobsList {...{
-        failures,
-        onSelect: () => {
-          if (handleClose) handleClose();
-        },
-        value: 0 // fixed for now
-        // value: typeObj.indexOf(jobType),
-      }} />
-  </>;
-};
+  return (
+    <>
+      <ModalHeader {...{ handleClose, title: "My Jobs" }} />
+      {
+        // <TempSelect {...{ onChange: ({ target }: { target: any }) => jobTypeSet(target.value), options, value: jobType }} />
+      }
+      <InferenceJobsList
+        {...{
+          failures,
+          onSelect: () => {
+            if (handleClose) handleClose();
+          },
+          value: 0, // fixed for now
+          // value: typeObj.indexOf(jobType),
+          showHeader: false,
+          panel: false,
+        }}
+      />
+    </>
+  );
+}
