@@ -1,0 +1,42 @@
+import React from "react";
+import { MakeBatchProps } from "hooks/useBatchContent";
+import { MakeRatingsProps } from "hooks/useRatings";
+import BookmarkButton from "components/common/BookmarkButton";
+import LikeButton from "components/common/LikeButton";
+import CreatorName from "components/common/Card/CreatorName";
+import "./CardFooter.scss"
+
+interface CardFooterProps {
+  creator?: any,
+  entityToken: string,
+  entityType: string,
+  makeBookmarksProps?: MakeBatchProps,
+  makeRatingsProps?: MakeRatingsProps, // this is MakeBatchProps extended include likeCount
+  showCreator?: boolean
+}
+
+export default function CardFooter({ creator, entityToken, entityType, makeBookmarksProps, makeRatingsProps, showCreator }: CardFooterProps) {
+  const { default_avatar, display_name, gravatar_hash, username } = creator || {};
+  const togglesOn = makeBookmarksProps ||  makeRatingsProps;
+  const eitherOn = showCreator || togglesOn;
+  return <>
+    { ( eitherOn ) && <hr className="my-2" /> }
+    <div {...{ className: `fy-card-footer` }}>
+      { showCreator && <CreatorName {...{
+          avatarIndex: default_avatar?.image_index || 0,
+          backgroundIndex: default_avatar?.color_index || 0,
+          displayName: display_name || "Anonymous",
+          gravatarHash: gravatar_hash || null,
+          noHeight: true,
+          username
+        }} />
+      }
+      {
+        togglesOn ? <div {...{ className: "fy-card-footer-toggles" }}>
+          { makeRatingsProps && <LikeButton {...makeRatingsProps({ entityToken, entityType })} /> }
+          { makeBookmarksProps && <BookmarkButton {...makeBookmarksProps({ entityToken, entityType })} /> }
+        </div> : null
+      }
+    </div>
+  </>;
+};
