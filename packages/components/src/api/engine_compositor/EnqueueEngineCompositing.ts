@@ -12,5 +12,5 @@ export interface EnqueueEngineCompositingResponse {
 
 export const EnqueueEngineCompositing = MakeRequest<string, EnqueueEngineCompositingRequest, EnqueueEngineCompositingResponse,{}>({
   method: "POST",
-  routingFunction: () => `/v1/compositor/enqueue_engine_compositing`,
+  routingFunction: () => `/v1/conversion/enqueue_bvh_to_workflow`,
 });
