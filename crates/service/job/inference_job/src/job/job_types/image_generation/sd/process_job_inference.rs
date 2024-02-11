@@ -97,14 +97,13 @@ pub async fn process_job_inference(
       .new_tempdir(&work_temp_dir)
       .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
-  let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint.safetensors");
+  //let sd_checkpoint_path = work_temp_dir.path().join("sd_checkpoint.safetensors");
   let mut lora_path = work_temp_dir.path().join("lora.safetensors");
   //let vae_path = work_temp_dir.path().join("vae.safetensors");
   let vae_path = work_temp_dir.path().join("vae.pt"); // TODO: Should this be `.safetensors` or `.pt`?
   let output_path = work_temp_dir.path().join("output");
 
   info!("Paths to download to:");
-  info!("sd_checkpoint_path: {:?}", sd_checkpoint_path);
   info!("lora_path: {:?}", lora_path);
   info!("vae_path: {:?}", vae_path);
   info!("output_path: {:?}", output_path);
@@ -114,90 +113,106 @@ pub async fn process_job_inference(
   // // Unpack loRA and Checkpoint
   // // run inference by downloading from google drive.
   let lora_token = sd_args.maybe_lora_model_token;
-  let weight_token = sd_args.maybe_sd_model_token.clone();
+///  let weight_token = sd_args.maybe_sd_model_token.clone();
 
-  let retrieved_sd_record = match weight_token {
-    Some(ref token) => {
-      let retrieved_sd_record = get_weight_by_token(
-        &token,
-        false,
-        &deps.db.mysql_pool
-      ).await?;
-      match retrieved_sd_record {
-        Some(record) => record,
-        None => {
-          return Err(
-            ProcessSingleJobError::from_anyhow_error(anyhow!("no record of model!"))
-          );
-        }
-      }
-    }
-    None => {
-      return Err(
-        ProcessSingleJobError::from_anyhow_error(anyhow!("no sd model token for job!"))
-      );
-    }
+  let sd_model_weight_token = match sd_args.maybe_sd_model_token {
+    None => return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no sd model token for job!"))),
+    Some(ref token) => token,
   };
+
+  let sd_model_weight = get_weight_by_token(
+    sd_model_weight_token,
+    false,
+    &deps.db.mysql_pool
+  ).await?;
+
+  let sd_model_weight = match sd_model_weight {
+    None => return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no record of sd model!"))),
+    Some(record) => record,
+  };
+
+  let sd_checkpoint_path = args.job_dependencies
+      .fs
+      .model_weights_cache_directory
+      .get_model_weight_from_cache_or_bucket(&sd_model_weight)
+      .await?;
+
+  info!("sd_checkpoint_path: {:?}", sd_checkpoint_path);
+
+//  let retrieved_sd_record = match sd_args.maybe_sd_model_token {
+//    None => return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no sd model token for job!"))),
+//    Some(ref token) => {
+//      let retrieved_sd_record = get_weight_by_token(
+//        &token,
+//        false,
+//        &deps.db.mysql_pool
+//      ).await?;
+//      match retrieved_sd_record {
+//        Some(record) => record,
+//        None => return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no record of model!"))),
+//      }
+//    }
+//  };
+
   // origin file name needs to be just the file name  /tmp/downloads_long_lived/temp_stable_diffusion_inference_32.8qJJljxWWZeD/output_0.png
   // ignore if no lora token
-  let retrieved_loRA_record = match lora_token {
-    Some(token) => {
-      let retrieved_loRA_record = get_weight_by_token(
-        &token,
-        false,
-        &deps.db.mysql_pool
-      ).await?;
 
-      Some(retrieved_loRA_record)
-    }
-    None => None,
-  };
+  let mut maybe_lora_record = None;
+
+  if let Some(token) = lora_token {
+    maybe_lora_record = get_weight_by_token(
+      &token,
+      false,
+      &deps.db.mysql_pool
+    ).await?;
+  }
 
   let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
 
-  // Details for SD checkpoint
-  let details = RemoteCloudBucketDetails::new(
-    retrieved_sd_record.public_bucket_hash.clone(),
-    retrieved_sd_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
-    retrieved_sd_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
-  );
-
-  remote_cloud_file_client.download_file(
-    details,
-    path_to_string(sd_checkpoint_path.clone())
-  ).await?;
+///  // Details for SD checkpoint
+///  let details = RemoteCloudBucketDetails::new(
+///    retrieved_sd_record.public_bucket_hash.clone(),
+///    retrieved_sd_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
+///    retrieved_sd_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
+///  );
+///
+///  remote_cloud_file_client.download_file(
+///    details,
+///    path_to_string(sd_checkpoint_path.clone())
+///  ).await?;
 
   let mut lora_name = String::from("");
   let mut lora_token = String::from("");
 
-  match retrieved_loRA_record {
-    Some(record) => {
-      match record {
-        Some(model_weight_record) => {
-          let lora_details = RemoteCloudBucketDetails::new(
-            model_weight_record.public_bucket_hash.clone(),
-            model_weight_record.maybe_public_bucket_prefix
-                .clone()
-                .unwrap_or_else(|| "".to_string()),
-            model_weight_record.maybe_public_bucket_extension
-                .clone()
-                .unwrap_or_else(|| "".to_string())
-          );
-
-          lora_name = model_weight_record.title;
-          lora_token = model_weight_record.token.to_string();
-          remote_cloud_file_client.download_file(
-            lora_details,
-            path_to_string(lora_path.clone())
-          ).await?;
-        }
-        None => {
-          lora_path.clear();
-        }
-      }
-    }
+  match maybe_lora_record {
     None => {
       lora_path.clear();
+    }
+    Some(lora_record) => {
+/////      let lora_details = RemoteCloudBucketDetails::new(
+/////        lora_record.public_bucket_hash.clone(),
+/////        lora_record.maybe_public_bucket_prefix
+/////            .clone()
+/////            .unwrap_or_else(|| "".to_string()),
+/////        lora_record.maybe_public_bucket_extension
+/////            .clone()
+/////            .unwrap_or_else(|| "".to_string())
+/////      );
+/////
+/////
+/////      remote_cloud_file_client.download_file(
+/////        lora_details,
+/////        path_to_string(lora_path.clone())
+/////      ).await?;
+
+      lora_name = lora_record.title.to_string();
+      lora_token = lora_record.token.to_string();
+
+      lora_path = args.job_dependencies
+          .fs
+          .model_weights_cache_directory
+          .get_model_weight_from_cache_or_bucket(&lora_record)
+          .await?;
     }
   }
 
@@ -210,33 +225,6 @@ pub async fn process_job_inference(
         error!("could not download VAE: {:?}", err);
         ProcessSingleJobError::from_anyhow_error(anyhow!("could not download VAE: {:?}", err))
       })?;
-
-//    // VAE token for now
-//    let vae_token = String::from("REPLACE_ME");
-//    let model_weight_vae = ModelWeightToken(vae_token);
-//
-//    let vae_weight_record = get_weight_by_token(
-//        &model_weight_vae,
-//        false,
-//        &deps.db.mysql_pool
-//    ).await?;
-//
-//    let vae_weight_record = match vae_weight_record {
-//        Some(val) => val,
-//        None => {
-//            return Err(
-//                ProcessSingleJobError::from_anyhow_error(anyhow!("no VAE? thats a problem."))
-//            );
-//        }
-//    };
-//
-//    let vae_details = RemoteCloudBucketDetails::new(
-//        vae_weight_record.public_bucket_hash.clone(),
-//        vae_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
-//        vae_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
-//    );
-//
-//    remote_cloud_file_client.download_file(vae_details, path_to_string(vae_path.clone())).await?;
 
   let prompt = match sd_args.maybe_prompt {
     Some(val) => val,
@@ -359,7 +347,7 @@ pub async fn process_job_inference(
       origin_category: MediaFileOriginCategory::Upload,
       origin_product_category: MediaFileOriginProductCategory::ImageGeneration,
       maybe_origin_model_type: Some(MediaFileOriginModelType::StableDiffusion15),
-      maybe_origin_model_token: weight_token.clone(),
+      maybe_origin_model_token: Some(sd_model_weight_token.clone()),
       maybe_origin_filename: Some(file_path),
       is_batch_generated: true,
       maybe_mime_type: Some(metadata.mimetype.as_ref()),

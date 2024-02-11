@@ -25,6 +25,7 @@ use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::instrumentation::JobInstruments;
+use crate::util::model_weights_cache::model_weights_cache_directory::ModelWeightsCacheDirectory;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
@@ -164,6 +165,10 @@ pub struct FileSystemDetails {
   /// Directory to store long-term downloads (models)
   /// (In prod, typically model files from GCS / NFS PVC mount)
   pub semi_persistent_cache: SemiPersistentCacheDir,
+
+  /// The new cache scheme for model weights.
+  /// This should replace `semi_persistent_cache` for new users.
+  pub model_weights_cache_directory: ModelWeightsCacheDirectory,
 }
 
 // TODO: Move into the appropriate job-specific dependencies object.

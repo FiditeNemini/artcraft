@@ -57,6 +57,7 @@ use crate::job::job_loop::main_loop::main_loop;
 use crate::job_dependencies::{BucketDependencies, ClientDependencies, DatabaseDependencies, FileSystemDetails, JobCaches, JobDependencies, JobInstanceInfo, JobSystemControls, JobSystemDependencies};
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::instrumentation::JobInstruments;
+use crate::util::model_weights_cache::model_weights_cache_directory::ModelWeightsCacheDirectory;
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
@@ -234,6 +235,10 @@ async fn main() -> AnyhowResult<()> {
 
   let job_specific_dependencies = JobSpecificDependencies::setup_for_jobs(&scoped_execution)?;
 
+  let scoped_tempdir_for_downloads = ScopedTempDirCreator::for_directory(
+    easyenv::get_env_pathbuf_or_default(
+      "SCOPED_TEMP_DIR_LONG_LIVED_DOWNLOADS", PathBuf::from("/tmp/downloads_long_lived")));
+
   let job_dependencies = JobDependencies {
     db: DatabaseDependencies {
       mysql_pool,
@@ -245,13 +250,15 @@ async fn main() -> AnyhowResult<()> {
       scoped_temp_dir_creator_for_short_lived_downloads: ScopedTempDirCreator::for_directory(
         easyenv::get_env_pathbuf_or_default(
           "SCOPED_TEMP_DIR_SHORT_LIVED_DOWNLOADS", PathBuf::from("/tmp/downloads_short_lived"))),
-      scoped_temp_dir_creator_for_long_lived_downloads: ScopedTempDirCreator::for_directory(
-        easyenv::get_env_pathbuf_or_default(
-          "SCOPED_TEMP_DIR_LONG_LIVED_DOWNLOADS", PathBuf::from("/tmp/downloads_long_lived"))),
+      scoped_temp_dir_creator_for_long_lived_downloads: scoped_tempdir_for_downloads.clone(),
       scoped_temp_dir_creator_for_work: ScopedTempDirCreator::for_directory(
         easyenv::get_env_pathbuf_or_default(
           "SCOPED_TEMP_DIR_WORK", PathBuf::from("/tmp/downloads_long_lived"))),
       semi_persistent_cache,
+      model_weights_cache_directory: ModelWeightsCacheDirectory::setup_from_env_and_deps(
+        &scoped_tempdir_for_downloads,
+        &public_bucket_client,
+      )?,
     },
     buckets: BucketDependencies {
       public_bucket_client,
