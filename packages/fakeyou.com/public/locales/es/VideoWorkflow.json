@@ -17,5 +17,8 @@
     "original": "Original",
     "preview": "Avance",
     "upload": "Subir"
+  },
+  "video": {
+    "instruction": "Cargue o seleccione un video de la biblioteca, luego configure el flujo de trabajo de filtrado con nuestro panel de control de flujo de trabajo."
   }
 }

@@ -17,5 +17,8 @@
     "original": "Originale",
     "preview": "Anteprima",
     "upload": "Caricamento"
+  },
+  "video": {
+    "instruction": "Carica o seleziona un video dalla libreria, quindi imposta il flusso di lavoro di filtraggio con il nostro pannello di controllo del flusso di lavoro."
   }
 }

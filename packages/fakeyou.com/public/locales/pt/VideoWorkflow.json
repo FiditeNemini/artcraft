@@ -17,5 +17,8 @@
     "original": "Original",
     "preview": "Visualização",
     "upload": "Carregar"
+  },
+  "video": {
+    "instruction": "Carregue ou selecione um vídeo da biblioteca e configure o fluxo de trabalho de filtragem com nosso painel de controle de fluxo de trabalho."
   }
 }
