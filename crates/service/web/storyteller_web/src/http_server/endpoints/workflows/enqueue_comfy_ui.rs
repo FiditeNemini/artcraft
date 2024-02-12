@@ -141,6 +141,8 @@ pub async fn enqueue_comfy_ui_handler(
         return Err(EnqueueComfyError::NotAuthorized);
     }
 
+    // ==================== PAID PLAN + PRIORITY ==================== //
+
     // TODO: Plan should handle "first anonymous use" and "investor" cases.
     let plan = get_correct_plan_for_session(
         server_state.server_environment,

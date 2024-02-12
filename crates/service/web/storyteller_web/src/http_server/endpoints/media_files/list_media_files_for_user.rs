@@ -23,6 +23,7 @@ use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use crate::util::allowed_studio_access::allowed_studio_access;
 
 #[derive(Deserialize, ToSchema)]
 pub struct ListMediaFilesForUserPathInfo {
@@ -134,6 +135,12 @@ pub async fn list_media_files_for_user_handler(
   let mut is_author = false;
   let mut is_mod = false;
 
+  // NB: Temporary rollout flag.
+  let mut is_allowed_studio_access = allowed_studio_access(
+    maybe_user_session.as_ref(),
+    &server_state.flags
+  );
+
   match maybe_user_session {
     None => {},
     Some(session) => {
@@ -155,7 +162,6 @@ pub async fn list_media_files_for_user_handler(
     ViewAs::AnotherUser
   };
 
-
   let query_results = list_media_files_for_user(ListMediaFileForUserArgs {
     username: &path.username,
     maybe_filter_media_type: query.filter_media_type,
@@ -166,7 +172,6 @@ pub async fn list_media_files_for_user_handler(
     mysql_pool: &server_state.mysql_pool,
   }).await;
 
-
   let results_page = match query_results {
     Ok(results) => results,
     Err(e) => {
@@ -175,8 +180,29 @@ pub async fn list_media_files_for_user_handler(
     }
   };
 
-
   let results = results_page.records.into_iter()
+      .filter(|record| {
+        if is_allowed_studio_access {
+          return true;
+        }
+        // Don't allow access to certain media types.
+        match record.media_type {
+          MediaFileType::Mocap |
+          MediaFileType::Bvh |
+          MediaFileType::Fbx |
+          MediaFileType::Glb |
+          MediaFileType::Gltf => return false,
+          _ => {},
+        }
+        // Don't allow access to certain products.
+        match record.origin_product_category {
+          MediaFileOriginProductCategory::VideoFilter |
+          MediaFileOriginProductCategory::Mocap |
+          MediaFileOriginProductCategory::Workflow => return false,
+          _ => {},
+        }
+        true
+      })
       .map(|record| MediaFileForUserListItem {
         token: record.token,
         media_type: record.media_type,

@@ -30,8 +30,10 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
+use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::EnqueueFbxToGltfRequestError;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use crate::util::allowed_studio_access::allowed_studio_access;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.
@@ -131,6 +133,15 @@ pub async fn enqueue_bvh_to_workflow_handler(
     if let Some(user_session) = maybe_user_session.as_ref() {
         maybe_user_token = Some(UserToken::new_from_str(&user_session.user_token));
     }
+
+    // ==================== FEATURE FLAG CHECK ==================== //
+
+    if !allowed_studio_access(maybe_user_session.as_ref(), &server_state.flags) {
+      warn!("Storyteller Studio access is not permitted for user");
+      return Err(EnqueueBvhToWorkflowRequestError::NotAuthorized);
+    }
+
+    // ==================== PAID PLAN + PRIORITY ==================== //
 
     // Plan should handle "first anonymous use" and "investor" cases.
     let plan = get_correct_plan_for_session(
