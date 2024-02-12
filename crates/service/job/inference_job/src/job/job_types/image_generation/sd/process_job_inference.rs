@@ -316,6 +316,7 @@ pub async fn process_job_inference(
     }
   };
 
+  let mut maybe_first_media_file_token = None;
 
   for i in 0..sd_args.maybe_batch_count.unwrap_or(1) {
     let path = output_path.clone();
@@ -340,7 +341,7 @@ pub async fn process_job_inference(
 
 
     // extra_file_modification_info: todo!(), // JSON ENCODED STRUCT
-    let media_file_token = insert_media_file_generic(InsertArgs {
+    let (media_file_token, _id) = insert_media_file_generic(InsertArgs {
       pool: mysql_pool,
       job,
       media_type: MediaFileType::Image,
@@ -370,9 +371,14 @@ pub async fn process_job_inference(
       generated_by_cluster: Some(&args.job_dependencies.job.info.container.cluster_name),
     }).await?;
 
+    if maybe_first_media_file_token.is_none() {
+      maybe_first_media_file_token = Some(media_file_token.clone());
+    }
+
     let batch_generation_entity: BatchGenerationEntity = BatchGenerationEntity::MediaFile(
-      media_file_token.0
+      media_file_token
     );
+
     entries.push(batch_generation_entity);
   }
 
@@ -394,11 +400,15 @@ pub async fn process_job_inference(
     }
   };
 
-  Ok(JobSuccessResult { // TODO: batch token needs to go here
-    maybe_result_entity: Some(ResultEntity {
-      entity_type: InferenceResultType::MediaFile,
-      entity_token: batch_token,
-    }),
+  // TODO(bt,2024-02-12): Return the batch token instead. (We're not ready for that.)
+  Ok(JobSuccessResult {
     inference_duration,
+    maybe_result_entity: maybe_first_media_file_token
+        .map(|media_file_token| {
+          ResultEntity {
+            entity_type: InferenceResultType::MediaFile,
+            entity_token: media_file_token.to_string(),
+          }
+        }),
   })
 }
