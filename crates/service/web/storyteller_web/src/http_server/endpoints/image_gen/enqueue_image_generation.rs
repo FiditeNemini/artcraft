@@ -1,4 +1,3 @@
-// #![forbid(unused_imports)]
 #![forbid(unused_mut)]
 
 use std::fmt::{Display, Formatter};
@@ -8,7 +7,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-// #![forbid(unused_variables)]
+use actix_web::web::Json;
 use log::error;
 use log::warn;
 use serde::Deserialize;
@@ -158,8 +157,8 @@ impl ResponseError for EnqueueImageGenRequestError {
     }
 }
 
-impl std::fmt::Display for EnqueueImageGenRequestError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Display for EnqueueImageGenRequestError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }
 }
@@ -190,55 +189,10 @@ pub async fn enqueue_image_generation_request(
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, EnqueueImageGenRequestError> {
 
-    // TODO:I know ill fix this later
-    let path = http_request.path();
-    let segments: Vec<&str> = path.split('/').collect();
-    let last_segment = segments.last().map(|s| *s).unwrap_or("");
-    
-    println!("Last segment: {}", last_segment);
+    let inference_mode = inference_mode_from_http_request(&http_request)
+        .ok_or(EnqueueImageGenRequestError::BadInput("Invalid request".to_string()))?;
 
-    // use segment to determine what to do.
-    let mode;
-
-    if last_segment == "lora" {
-        mode = "lora";
-    } else if last_segment  == "model" {
-        mode = "model";
-    } else {
-        mode = "inference";
-    }
-
-    // check and ensure we also pass description and the name
-    if mode == "lora" || mode == "model" {
-        match request.maybe_name {
-            Some(_) => {},
-            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Model / Lora Name".to_string()))
-        }
-
-        match request.maybe_description {
-            Some(_) => {}
-            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Model / Lora Description".to_string()))
-        }
-    } else {
-        match request.maybe_sd_model_token {
-            Some(_) => {}
-            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Model Token".to_string()))
-        }
-    }
-
-    if mode == "lora" {
-        match request.maybe_lora_upload_path {
-            Some(_) => {}
-            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Lora Upload Path".to_string()))
-        }
-    }
-
-    if mode == "model" {
-        match request.maybe_upload_path {
-            Some(_) => {}
-            None => return Err(EnqueueImageGenRequestError::BadInput("Missing Model Upload Path".to_string()))
-        }
-    }
+    validate_request(&request, inference_mode)?;
 
     // TODO: Brandon need to figure out premium vs not premium
 
@@ -262,13 +216,6 @@ pub async fn enqueue_image_generation_request(
 
     if let Some(user_session) = maybe_user_session.as_ref() {
         maybe_user_token = Some(UserToken::new_from_str(&user_session.user_token));
-    }
-
-    // ==================== FEATURE FLAG CHECK ==================== //
-
-    if !allowed_studio_access(maybe_user_session.as_ref(), &server_state.flags) {
-        warn!("Storyteller Studio access is not permitted for user");
-        return Err(EnqueueImageGenRequestError::NotAuthorized);
     }
 
     // ==================== PLANS ==================== //
@@ -316,7 +263,6 @@ pub async fn enqueue_image_generation_request(
     let ip_address = get_request_ip(&http_request);
 
     // Check the inference args to make sure everything is all there for upload loRA / model or standard inference
-
 
     // ==================== HANDLE IDEMPOTENCY ==================== //
 
@@ -373,12 +319,15 @@ pub async fn enqueue_image_generation_request(
     let sd_weight_token = ModelWeightToken(
         request.maybe_sd_model_token.clone().unwrap_or_default()
     );
+
     let lora_token = ModelWeightToken(request.maybe_lora_model_token.clone().unwrap_or_default());
 
     let n_prompt = request.maybe_n_prompt.clone().unwrap_or_default();
+
     // we can only do 1 upload type at a time.
     // if we are uploading a model.
     let upload_path = request.maybe_upload_path.clone().unwrap_or_default();
+
     // if we are uploading a lora model.
     let lora_upload_path = request.maybe_lora_upload_path.clone().unwrap_or_default();
 
@@ -388,10 +337,13 @@ pub async fn enqueue_image_generation_request(
         seed = s;
     }
 
-    let mut version:u32 = 0;
-    let type_of_inference = mode.to_string().clone();
-    let description = request.maybe_description.clone();
-    let name = request.maybe_name.clone();
+    let mut version : u32 = 0;
+
+    let type_of_inference = match inference_mode {
+        TypeOfInference::Lora => "lora",
+        TypeOfInference::Model => "model",
+        TypeOfInference::Inference => "inference",
+    };
 
     if let Some(s) = request.maybe_version {
         version = s;
@@ -405,15 +357,15 @@ pub async fn enqueue_image_generation_request(
         maybe_seed: Some(seed),
         maybe_upload_path: Some(upload_path),
         maybe_lora_upload_path: Some(lora_upload_path),
-        type_of_inference,
+        type_of_inference: type_of_inference.to_string(),
         maybe_cfg_scale: Some(cfg_scale),
         maybe_number_of_samples: Some(number_of_samples),
         maybe_batch_count: Some(batch_count),
         maybe_width: Some(width),
         maybe_height: Some(height),
         maybe_sampler: Some(sampler),
-        maybe_description: description,
-        maybe_name: name,
+        maybe_description: request.maybe_description.clone(),
+        maybe_name: request.maybe_name.clone(),
         maybe_version: Some(version),
     };
 
@@ -465,6 +417,84 @@ pub async fn enqueue_image_generation_request(
 
     // Error handling 101 rust result type returned like so.
     Ok(HttpResponse::Ok().content_type("application/json").body(body))
+}
+
+fn validate_request(
+    request: &Json<EnqueueImageGenRequest>,
+    inference_mode: TypeOfInference
+) -> Result<(), EnqueueImageGenRequestError> {
+
+    let mut requires_name = false;
+    let mut requires_description = false;
+    let mut requires_sd_model_token = false;
+    let mut requires_lora_upload_path = false;
+    let mut requires_upload_path = false;
+
+    match inference_mode {
+        TypeOfInference::Lora => {
+            requires_name = true;
+            requires_description = true;
+            requires_lora_upload_path = true;
+        }
+        TypeOfInference::Model => {
+            requires_name = true;
+            requires_description = true;
+            requires_upload_path = true;
+        }
+        TypeOfInference::Inference => {
+            requires_sd_model_token = true;
+        }
+    }
+
+    if requires_name && request.maybe_name.is_none() {
+        return Err(EnqueueImageGenRequestError::BadInput("Missing Model / Lora Name".to_string()));
+    }
+    if requires_description && request.maybe_description.is_none() {
+        return Err(EnqueueImageGenRequestError::BadInput("Missing Model / Lora Description".to_string()));
+    }
+    if requires_sd_model_token && request.maybe_sd_model_token.is_none() {
+        return Err(EnqueueImageGenRequestError::BadInput("Missing Model Token".to_string()));
+    }
+    if requires_lora_upload_path && request.maybe_lora_upload_path.is_none() {
+        return Err(EnqueueImageGenRequestError::BadInput("Missing Lora Upload Path".to_string()));
+    }
+    if requires_upload_path && request.maybe_upload_path.is_none() {
+        return Err(EnqueueImageGenRequestError::BadInput("Missing Model Upload Path".to_string()));
+    }
+
+    Ok(())
+}
+
+fn inference_mode_from_http_request(http_request: &HttpRequest) -> Option<TypeOfInference> {
+    inference_mode_from_url_path(http_request.path())
+}
+
+fn inference_mode_from_url_path(url_path: &str) -> Option<TypeOfInference> {
+    let last_segment = url_path.split("/").last();
+    match last_segment {
+        Some("lora") => Some(TypeOfInference::Lora),
+        Some("model") => Some(TypeOfInference::Model),
+        Some("inference") => Some(TypeOfInference::Inference),
+        _ => None
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::http_server::endpoints::image_gen::enqueue_image_generation::{inference_mode_from_url_path, TypeOfInference};
+
+    #[test]
+    fn test_url_paths() {
+        // Valid routes
+        assert_eq!(inference_mode_from_url_path("/v1/image_gen/enqueue/inference"), Some(TypeOfInference::Inference));
+        assert_eq!(inference_mode_from_url_path("/v1/image_gen/upload/model"), Some(TypeOfInference::Model));
+        assert_eq!(inference_mode_from_url_path("/v1/image_gen/upload/lora"), Some(TypeOfInference::Lora));
+
+        // Non-routes
+        assert_eq!(inference_mode_from_url_path(""), None);
+        assert_eq!(inference_mode_from_url_path("/v1/image_gen/enqueue/foo"), None);
+        assert_eq!(inference_mode_from_url_path("/v1/image_gen/upload/foo"), None);
+    }
 }
 
 // with LoRA
