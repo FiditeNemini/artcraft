@@ -3,8 +3,8 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use anyhow::anyhow;
-use log::{error, info, warn};
-use serde_json::Value;
+use log::{error, info, warn, debug};
+use serde_json::{Value, json};
 use tokio::io::AsyncWriteExt;
 use walkdir::WalkDir;
 
@@ -46,6 +46,67 @@ fn recursively_delete_files_in(path: &Path) -> std::io::Result<()> {
         }
     }
     Ok(())
+}
+
+struct ThumbnailTask{
+    bucket: String,
+    path: String,
+    input_extension: String,
+    output_extension: String,
+    event_id: String,
+}
+
+impl ThumbnailTask{
+    fn new(bucket: &str, path: &str, input_extension: &str, output_extension: &str, event_id: String) -> Self {
+        Self {
+            bucket: bucket.to_string(),
+            path: path.to_string(),
+            input_extension: input_extension.to_string(),
+            output_extension: output_extension.to_string(),
+            event_id: event_id.to_string(),
+        }
+    }
+
+    // Method to generate the JSON representation of the thumbnail task
+    fn create_json(&self) -> Value {
+        let output_path = format!("{}.{}", self.path, self.output_extension);
+
+        let input = json!({
+            "bucket": self.bucket,
+            "path": self.path,
+            "type": self.input_extension,
+        });
+
+        let output = json!({
+            "bucket": self.bucket,
+            "path": output_path,
+            "type": self.output_extension,
+        });
+
+        // TODO@madhukar: add tags -> metadata for gcs objects
+        let tags = json!([]);
+
+        json!({
+            "event_id": self.event_id,
+            "input": input,
+            "output": output,
+            "tags": tags,
+        })
+    }
+
+    async fn send(&self) -> Result<(), reqwest::Error> {
+        // TODO: retries?
+        // TODO: move to config
+        let url = "http://thumbnail-generator.media-server/tasks";
+        let client = reqwest::Client::new();
+        let task_json = self.create_json();
+        client.post(url)
+            .json(&task_json)
+            .send()
+            .await?
+            .error_for_status()?;
+        Ok(())
+    }
 }
 
 pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -451,6 +512,27 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .await
         .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+    // generate thumbnail using thumbnail service
+    let thumbnail_types = match mimetype.as_str() {
+        "video/mp4" => vec!["image/gif", "image/jpeg"],
+        _ => vec![],
+    };
+
+    for output_type in thumbnail_types{
+        let thumbnail_task = ThumbnailTask::new(
+            &*args.job_dependencies.buckets.public_bucket_client.bucket().name(),
+            &*path_to_string(result_bucket_object_pathbuf.clone()),
+            mimetype.as_str(),
+            output_type,
+            job.id.0.to_string(),
+        );
+        if let Err(e) = thumbnail_task.send().await {
+            error!("Failed to send thumbnail task: {}", e);
+        }
+    }
+
+    // ==================== CLEANUP ==================== //
 
     // ==================== DELETE TEMP FILES ==================== //
 

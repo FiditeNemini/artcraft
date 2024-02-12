@@ -36,6 +36,9 @@ impl Error for BucketClientError {}
 
 
 impl BucketClient {
+  pub fn bucket(&self) -> &Bucket {
+    &self.bucket
+  }
 
   pub fn create(
     access_key: &str,
