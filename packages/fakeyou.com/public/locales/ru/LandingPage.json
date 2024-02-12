@@ -19,12 +19,14 @@
   "heroTitle": "AI-музыка, преобразование текста в речь и голос в голос",
   "productFaceAnimatorText": "Анимация лиц с помощью звука",
   "productFaceAnimatorTitle": "Лицевой Аниматор",
+  "productImageGenText": "Создание изображений из текста",
+  "productImageGenTitle": "Текст в изображение",
   "productNewTag": "НОВЫЙ",
   "productTtsText": "Генерировать аудио из текста",
   "productTtsTitle": "Текст в речь",
   "productVcText": "Говори другим голосом",
   "productVcTitle": "Голос в голос",
-  "productVideoText": "Синхронизация видео и аудио по губам",
-  "productVideoTitle": "Видео синхронизация губ",
+  "productVdText": "Создайте свой собственный голос с искусственным интеллектом",
+  "productVdTitle": "Голосовой дизайнер",
   "productsTitle": "Инструменты искусственного интеллекта"
 }

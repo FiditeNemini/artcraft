@@ -19,12 +19,14 @@
   "heroTitle": "Âm nhạc AI, Chuyển văn bản thành giọng nói và Giọng nói thành giọng nói",
   "productFaceAnimatorText": "Làm sinh động khuôn mặt bằng âm thanh",
   "productFaceAnimatorTitle": "khuôn mặt hoạt hình",
+  "productImageGenText": "Tạo hình ảnh từ văn bản",
+  "productImageGenTitle": "văn bản thành hình ảnh",
   "productNewTag": "MỚI",
   "productTtsText": "Tạo âm thanh từ văn bản",
   "productTtsTitle": "Chuyển văn bản thành giọng nói",
   "productVcText": "Nói bằng giọng khác",
   "productVcTitle": "Giọng nói thành giọng nói",
-  "productVideoText": "Hát nhép video thành âm thanh",
-  "productVideoTitle": "Hát nhép video",
+  "productVdText": "Tạo giọng nói AI của riêng bạn",
+  "productVdTitle": "Nhà thiết kế giọng nói",
   "productsTitle": "Công cụ AI"
 }

@@ -19,12 +19,14 @@
   "heroTitle": "KI-Musik, Text-to-Speech und Voice-to-Voice",
   "productFaceAnimatorText": "Animieren Sie Gesichter mit Audio",
   "productFaceAnimatorTitle": "Gesichtsanimator",
+  "productImageGenText": "Erstellen Sie Bilder aus Text",
+  "productImageGenTitle": "Text zu Bild",
   "productNewTag": "NEU",
   "productTtsText": "Generieren Sie Audio aus Text",
   "productTtsTitle": "Text zu Sprache",
   "productVcText": "Sprechen Sie mit einer anderen Stimme",
   "productVcTitle": "Stimme zu Stimme",
-  "productVideoText": "Lippensynchronisation von Video zu Audio",
-  "productVideoTitle": "Video-Lippen synchronisation",
+  "productVdText": "Erstellen Sie Ihre eigene KI-Stimme",
+  "productVdTitle": "Sprachdesigner",
   "productsTitle": "KI-Tools"
 }

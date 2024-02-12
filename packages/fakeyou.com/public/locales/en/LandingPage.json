@@ -19,12 +19,14 @@
   "heroTitle": "AI Music, Text to Speech, and Voice to Voice",
   "productFaceAnimatorText": "Animate faces with audio",
   "productFaceAnimatorTitle": "Face Animator",
+  "productImageGenText": "Create images from text",
+  "productImageGenTitle": "Text to Image",
   "productNewTag": "NEW",
   "productTtsText": "Generate audio from text",
   "productTtsTitle": "Text to Speech",
   "productVcText": "Speak in another voice",
   "productVcTitle": "Voice to Voice",
-  "productVideoText": "Lip sync video to audio",
-  "productVideoTitle": "Video Lip Sync",
+  "productVdText": "Create your own AI voice",
+  "productVdTitle": "Voice Designer",
   "productsTitle": "AI Tools"
 }

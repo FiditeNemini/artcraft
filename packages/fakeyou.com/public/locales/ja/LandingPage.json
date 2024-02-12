@@ -19,12 +19,14 @@
   "heroTitle": "AI 音楽、テキスト読み上げ、音声変換",
   "productFaceAnimatorText": "音声で顔をアニメーション化する",
   "productFaceAnimatorTitle": "フェイスアニメーター",
+  "productImageGenText": "テキストから画像を作成する",
+  "productImageGenTitle": "テキストから画像へ",
   "productNewTag": "新しい",
   "productTtsText": "テキストから音声を生成する",
   "productTtsTitle": "テキスト読み上げ",
   "productVcText": "別の声で話してください",
   "productVcTitle": "声から声へ",
-  "productVideoText": "ビデオをオーディオにリップシンク",
-  "productVideoTitle": "ビデオリップシンク",
+  "productVdText": "独自の AI 音声を作成する",
+  "productVdTitle": "ボイスデザイナー",
   "productsTitle": "AIツール"
 }

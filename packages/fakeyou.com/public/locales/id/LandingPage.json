@@ -19,12 +19,14 @@
   "heroTitle": "Musik AI, Teks ke Ucapan, dan Suara ke Suara",
   "productFaceAnimatorText": "Animasikan wajah dengan audio",
   "productFaceAnimatorTitle": "Animator Wajah",
+  "productImageGenText": "Buat gambar dari teks",
+  "productImageGenTitle": "Teks ke Gambar",
   "productNewTag": "BARU",
   "productTtsText": "Hasilkan audio dari teks",
   "productTtsTitle": "Teks pidato",
   "productVcText": "Bicaralah dengan suara lain",
   "productVcTitle": "Suara ke Suara",
-  "productVideoText": "Sinkronisasi bibir video ke audio",
-  "productVideoTitle": "Sinkronisasi Bibir Video",
+  "productVdText": "Buat suara AI Anda sendiri",
+  "productVdTitle": "Desainer Suara",
   "productsTitle": "Alat AI"
 }

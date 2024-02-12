@@ -19,12 +19,14 @@
   "heroTitle": "एआई म्यूजिक, टेक्स्ट टू स्पीच और वॉयस टू वॉयस",
   "productFaceAnimatorText": "ऑडियो के साथ चेहरों को चेतन करें",
   "productFaceAnimatorTitle": "फेस एनिमेटर",
+  "productImageGenText": "पाठ से छवियाँ बनाएँ",
+  "productImageGenTitle": "छवि पर पाठ",
   "productNewTag": "नया",
   "productTtsText": "टेक्स्ट से ऑडियो जेनरेट करें",
   "productTtsTitle": "भाषण के पाठ",
   "productVcText": "दूसरे स्वर में बोलो",
   "productVcTitle": "आवाज से आवाज",
-  "productVideoText": "लिप सिंक वीडियो से ऑडियो",
-  "productVideoTitle": "वीडियो लिप सिंक",
+  "productVdText": "अपनी खुद की एआई आवाज बनाएं",
+  "productVdTitle": "आवाज डिजाइनर",
   "productsTitle": "एआई उपकरण"
 }

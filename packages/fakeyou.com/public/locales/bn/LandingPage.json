@@ -19,12 +19,14 @@
   "heroTitle": "এআই মিউজিক, টেক্সট টু স্পিচ এবং ভয়েস টু ভয়েস",
   "productFaceAnimatorText": "অডিও দিয়ে মুখগুলোকে অ্যানিমেট করুন",
   "productFaceAnimatorTitle": "ফেস অ্যানিমেটর",
+  "productImageGenText": "পাঠ্য থেকে ছবি তৈরি করুন",
+  "productImageGenTitle": "টেক্সট টু ইমেজ",
   "productNewTag": "নতুন",
   "productTtsText": "পাঠ্য থেকে অডিও তৈরি করুন",
   "productTtsTitle": "টেক্সট টু স্পিচ",
   "productVcText": "অন্য কণ্ঠে কথা বলুন",
   "productVcTitle": "ভয়েস টু ভয়েস",
-  "productVideoText": "ঠোঁট সিঙ্ক ভিডিও অডিও",
-  "productVideoTitle": "ভিডিও লিপ সিঙ্ক",
+  "productVdText": "আপনার নিজস্ব AI ভয়েস তৈরি করুন",
+  "productVdTitle": "ভয়েস ডিজাইনার",
   "productsTitle": "এআই টুলস"
 }

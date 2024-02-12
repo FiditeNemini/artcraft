@@ -19,12 +19,14 @@
   "heroTitle": "แปลงข้อความเป็นคำพูด แปลงเสียง และร้องเพลงด้วย AI",
   "productFaceAnimatorText": "ทำให้ใบหน้าเคลื่อนไหวด้วยเสียง",
   "productFaceAnimatorTitle": "แอนิเมชั่นใบหน้า",
+  "productImageGenText": "สร้างภาพจากข้อความ",
+  "productImageGenTitle": "ข้อความเป็นรูปภาพ",
   "productNewTag": "ใหม่",
   "productTtsText": "สร้างเสียงจากข้อความ",
   "productTtsTitle": "ข้อความเป็นคำพูด",
   "productVcText": "พูดเป็นเสียงอื่น",
   "productVcTitle": "เสียงเป็นเสียง",
-  "productVideoText": "ลิปซิงค์วิดีโอกับเสียง",
-  "productVideoTitle": "วิดีโอลิปซิงค์",
+  "productVdText": "สร้างเสียง AI ของคุณเอง",
+  "productVdTitle": "นักออกแบบเสียง",
   "productsTitle": "เครื่องมือ AI"
 }
