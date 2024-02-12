@@ -21,7 +21,7 @@ export default function MediaTab() {
   const bookmarks = useBookmarks();
   const ratings = useRatings();
   const toTopBtnRef = useRef<HTMLDivElement | null>(null);
-  const onScreen = useOnScreen(toTopBtnRef,"0px");
+  const onScreen = useOnScreen(toTopBtnRef, "0px");
 
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [mediaType, mediaTypeSet] = useState(
@@ -86,20 +86,30 @@ export default function MediaTab() {
             }}
           />
         </div>
-        { media.urlCursor ? 
-          <Button {...{
-            className: `to-top-button`,
-            buttonRef: toTopBtnRef,
+        {media.urlCursor ? (
+          <div>
+            <Button
+              {...{
+                className: `to-top-button`,
+                buttonRef: toTopBtnRef,
+                label: "Back to top",
+                onClick: () => media.reset(),
+                small: true,
+              }}
+            />
+          </div>
+        ) : null}
+      </div>
+      {media.urlCursor && !onScreen ? (
+        <Button
+          {...{
+            className: `to-top-button-off-screen`,
             label: "Back to top",
             onClick: () => media.reset(),
-          }}/> : null }
-      </div>
-      { media.urlCursor && !onScreen ? 
-        <Button {...{
-          className: `to-top-button-off-screen`,
-          label: "Back to top",
-          onClick: () => media.reset(),
-        }}/> : null }
+            small: true,
+          }}
+        />
+      ) : null}
       <AudioPlayerProvider>
         {media.isLoading && !media.list.length ? (
           <div className="row gx-3 gy-3">
@@ -108,7 +118,6 @@ export default function MediaTab() {
             ))}
           </div>
         ) : (
-
           <InfiniteScroll
             dataLength={media.list.length}
             next={media.getMore}
