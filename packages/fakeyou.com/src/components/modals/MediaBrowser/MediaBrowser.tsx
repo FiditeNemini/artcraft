@@ -7,6 +7,7 @@ import SkeletonCard from "components/common/Card/SkeletonCard";
 import Pagination from "components/common/Pagination";
 import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
 import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
+import { SearchWeight } from "@storyteller/components/src/api/weights/Search";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
 import { useListContent, useRatings } from "hooks";
@@ -17,26 +18,29 @@ import "./MediaBrowser.scss";
 
 interface Props {
   entityType: EntityType,
+  filterType?: MediaFilterProp | WeightFilterProp,
   handleClose: any,
   mediaToken: string,
   onSelect?: any,
   owner?: string,
-  filterType?: MediaFilterProp | WeightFilterProp,
+  search?: string,
   username: string,
 }
 
-export default function MediaBrowser({ entityType, filterType: inputFilter, mediaToken, handleClose = () => {}, onSelect, owner, username }: Props) {
+export default function MediaBrowser({ entityType, filterType: inputFilter, mediaToken, handleClose = () => {}, onSelect, owner, search, username }: Props) {
   const ratings = useRatings();
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [filterType, filterTypeSet] = useState(inputFilter ||  "all");
   const [list, listSet] = useState<MediaFile | Weight[]>([]);
+  const fetcher = search ? SearchWeight : [() => {},GetMediaByUser,GetWeightsByUser][entityType] || GetMediaByUser;
   const entities = useListContent({
+    debug: "media browser",
     addQueries: {
-      page_size: 24,
+      ...search ? {} : { page_size: 24 },
       ...prepFilter(filterType, ["","filter_media_type","maybe_scoped_weight_type"][entityType]),
     },
     addSetters: { filterTypeSet },
-    fetcher: [() => {},GetMediaByUser,GetWeightsByUser][entityType] || GetMediaByUser,
+    fetcher,
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
@@ -45,7 +49,9 @@ export default function MediaBrowser({ entityType, filterType: inputFilter, medi
       ratings.gather({ res, key: "token" });
       setShowMasonryGrid(true);
     },
+    ...search ? { request: { search_term: search } } : {},
     requestList: true,
+    ...search ? { resultsKey: "weights" } : {},
     urlParam: owner || username,
     urlUpdate: false
   });
@@ -69,6 +75,7 @@ export default function MediaBrowser({ entityType, filterType: inputFilter, medi
   const title = ["",`${ owner ? owner + "'s " : "" }Media`,"Weights"][entityType];
 
   const onClick = (data: any) => {
+    console.log("🩵",data);
     onSelect(data);
     handleClose();
   };
