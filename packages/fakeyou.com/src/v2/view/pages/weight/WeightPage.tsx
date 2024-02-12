@@ -66,7 +66,7 @@ export default function WeightPage({
   enqueueTtsJob,
   inferenceJobsByCategory,
 }: WeightProps) {
-  const { canEditTtsModel, user } = useSession();
+  const { canEditTtsModel, canBanUsers, user } = useSession();
   const { search } = useLocation();
   const { weight_token } = useParams<{ weight_token: string }>();
   const source = search ? new URLSearchParams(search).get("source") : "";
@@ -572,7 +572,8 @@ export default function WeightPage({
                 </div>
               </Panel>
 
-              {canEditTtsModel(weight.creator?.user_token) && (
+              {(canEditTtsModel(weight.creator?.user_token) ||
+                canBanUsers()) && (
                 <div className="d-flex gap-2">
                   <Button
                     full={true}
