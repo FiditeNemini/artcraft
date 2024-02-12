@@ -43,6 +43,8 @@ export default function AudioCard({
   const linkUrl = getCardUrl(data, source, type);
   const history = useHistory();
 
+  console.log("🟩",data);
+
   const handleSelectModalResultSelect = () => {
     if (inSelectModal) {
       onResultSelect &&
@@ -178,7 +180,7 @@ export default function AudioCard({
           </div>
           <CardFooter
             {...{
-              creator: data?.maybe_creator,
+              creator: data?.creator,
               entityToken: data.weight_token,
               entityType: "model_weight",
               makeBookmarksProps: bookmarks?.makeProps,
