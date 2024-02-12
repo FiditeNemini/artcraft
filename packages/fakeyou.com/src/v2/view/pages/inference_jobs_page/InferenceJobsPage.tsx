@@ -1,10 +1,21 @@
 import React from "react";
-import { InferenceJobsModal } from "components/modals";
+import { Container, Panel } from "components/common";
+import PageHeader from "components/layout/PageHeader";
+import JobsPageList from "./JobsPageList";
+import { useLocalize } from "hooks";
 
 export default function InferenceJobsPage() {
-  return <div {...{ className: "fy-inference-jobs-list-page p-3"}}>
-    <div {...{ className: "panel p-3" }}>
-     <InferenceJobsModal />
-    </div>
-  </div>;
-};
+  const { t } = useLocalize("InferenceJobs");
+
+  return (
+    <Container type="panel">
+      <PageHeader
+        title={t("core.jobsTitle")}
+        subText={t("core.jobsSubtitle")}
+      />
+      <Panel padding={true}>
+        <JobsPageList />
+      </Panel>
+    </Container>
+  );
+}

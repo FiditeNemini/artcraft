@@ -1,6 +1,4 @@
 import React from "react";
-
-import { Analytics } from "common/Analytics";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
@@ -18,7 +16,6 @@ export default function TextToImageJobsList() {
     <InferenceJobsList
       {...{
         failures,
-        onSelect: () => Analytics.voiceConversionClickDownload(),
         jobType: FrontendInferenceJobType.ImageGeneration,
       }}
     />

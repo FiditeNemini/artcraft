@@ -1,4 +1,6 @@
 {
+  "alertTtiCta": "Şimdi dene",
+  "alertTtiText": "Yeni Metinden Görüntüye ürünümüzü denediniz mi? Metin istemlerinizi görsellere dönüştürün!",
   "communityButtonDiscord": "Discord",
   "communityButtonTwitter": "Twitter",
   "communityText": "Sizinle sohbet etmeyi çok isteriz! Sorularınız varsa lütfen Discord'da bize katılın.",
@@ -19,12 +21,14 @@
   "heroTitle": "AI Müzik, Metinden Konuşmaya ve Sesten Sese",
   "productFaceAnimatorText": "Yüzleri sesle canlandırın",
   "productFaceAnimatorTitle": "Yüz Animatörü",
+  "productImageGenText": "Metinden görseller oluşturun",
+  "productImageGenTitle": "Metinden Görüntüye",
   "productNewTag": "YENİ",
   "productTtsText": "Metinden ses oluştur",
   "productTtsTitle": "Konuşma metni",
   "productVcText": "Başka bir sesle konuş",
   "productVcTitle": "Sesten Sese",
-  "productVideoText": "Videoyu sese dudak senkronizasyonu",
-  "productVideoTitle": "Video Dudak Senkronizasyonu",
+  "productVdText": "Kendi yapay zeka sesinizi yaratın",
+  "productVdTitle": "Ses Tasarımcısı",
   "productsTitle": "Yapay Zeka Araçları"
 }

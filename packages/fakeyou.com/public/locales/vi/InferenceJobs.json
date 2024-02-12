@@ -9,6 +9,36 @@
     "UNKNOWN": "Trạng thái hoạt ảnh không xác định",
     "heading": "Công việc của nhà làm phim hoạt hình khuôn mặt"
   },
+  "ImageGeneration": {
+    "ATTEMPT_FAILED": "Cố gắng tạo hình ảnh không thành công",
+    "COMPLETE_FAILURE": "Tạo hình ảnh không thành công",
+    "COMPLETE_SUCCESS": "Tạo hình ảnh hoàn tất",
+    "DEAD": "Thế hệ hình ảnh đã chết",
+    "PENDING": "Đang chờ tạo hình ảnh",
+    "STARTED": "Đang tạo hình ảnh",
+    "UNKNOWN": "Trạng thái tạo hình ảnh không xác định",
+    "heading": "Công việc của ImageGeneration"
+  },
+  "TextToSpeech": {
+    "ATTEMPT_FAILED": "Cố gắng chuyển văn bản thành giọng nói không thành công",
+    "COMPLETE_FAILURE": "Chuyển văn bản thành giọng nói không thành công",
+    "COMPLETE_SUCCESS": "Hoàn thành chuyển văn bản thành giọng nói",
+    "DEAD": "Chuyển văn bản thành giọng nói đã chết",
+    "PENDING": "Đang chờ chuyển văn bản thành giọng nói",
+    "STARTED": "Đang chuyển văn bản thành giọng nói",
+    "UNKNOWN": "Chuyển văn bản thành giọng nói không xác định",
+    "heading": "Công việc chuyển văn bản thành giọng nói"
+  },
+  "VoiceConversion": {
+    "ATTEMPT_FAILED": "Cố gắng chuyển đổi giọng nói không thành công",
+    "COMPLETE_FAILURE": "Chuyển đổi giọng nói không thành công",
+    "COMPLETE_SUCCESS": "Chuyển đổi giọng nói hoàn tất",
+    "DEAD": "Chuyển đổi giọng nói đã chết",
+    "PENDING": "Đang chờ chuyển đổi giọng nói khuôn mặt",
+    "STARTED": "Đang tiến hành chuyển đổi giọng nói",
+    "UNKNOWN": "Chuyển đổi giọng nói không xác định",
+    "heading": "Công việc chuyển đổi giọng nói"
+  },
   "VoiceDesignerCreateVoice": {
     "ATTEMPT_FAILED": "Nỗ lực hoạt hình khuôn mặt không thành công",
     "COMPLETE_FAILURE": "Hoạt ảnh khuôn mặt không thành công.",
@@ -19,8 +49,25 @@
     "UNKNOWN": "Trạng thái của trình thiết kế giọng nói không xác định",
     "heading": "Công việc thiết kế giọng nói"
   },
+  "VoiceDesignerTts": {
+    "ATTEMPT_FAILED": "Cố gắng chuyển văn bản thành giọng nói không thành công",
+    "COMPLETE_FAILURE": "Chuyển văn bản thành giọng nói không thành công",
+    "COMPLETE_SUCCESS": "Hoàn thành chuyển văn bản thành giọng nói",
+    "DEAD": "Chuyển văn bản thành giọng nói đã chết",
+    "PENDING": "Đang chờ chuyển văn bản thành giọng nói",
+    "STARTED": "Đang chuyển văn bản thành giọng nói",
+    "UNKNOWN": "Chuyển văn bản thành giọng nói không xác định",
+    "heading": "Công việc chuyển văn bản thành giọng nói của nhà thiết kế giọng nói"
+  },
   "core": {
-    "heading": "Việc làm mới nhất"
+    "cancel": "Hủy công việc",
+    "empty": "Không có công việc đang hoạt động",
+    "exploreBtn": "Khám phá",
+    "heading": "Việc làm mới nhất",
+    "jobsSubtitle": "Xem trạng thái công việc của bạn",
+    "jobsTitle": "Nghề của tôi",
+    "noJobsSubtitle": "Công việc xếp hàng sẽ xuất hiện ở đây",
+    "noJobsTitle": "Không có công việc nào trong hàng đợi"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "Nỗ lực hoạt hình khuôn mặt không thành công",

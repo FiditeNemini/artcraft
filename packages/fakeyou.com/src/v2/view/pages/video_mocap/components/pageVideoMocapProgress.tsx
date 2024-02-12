@@ -21,8 +21,13 @@ export default function PageVideoMocapProgress({
   pageState: State;
   dispatchPageState: (action: Action) => void;
 }) {
-  const { FILE_UPLOADING, FILE_UPLOADED, FILE_SELECTED_PROCEED, MOCAPNET_ENQUEUEING } = states;
-  
+  const {
+    FILE_UPLOADING,
+    FILE_UPLOADED,
+    FILE_SELECTED_PROCEED,
+    MOCAPNET_ENQUEUEING,
+  } = states;
+
   const handleEnqueueMocapNet = () => {
     if (pageState.mediaFileToken) {
       const request = {
@@ -43,7 +48,7 @@ export default function PageVideoMocapProgress({
     }
   };
 
-  if (pageState.status === FILE_SELECTED_PROCEED){
+  if (pageState.status === FILE_SELECTED_PROCEED) {
     handleEnqueueMocapNet();
   }
 

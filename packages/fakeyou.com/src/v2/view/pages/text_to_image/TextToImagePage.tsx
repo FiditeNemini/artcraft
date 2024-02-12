@@ -2,15 +2,17 @@ import { Container } from "components/common";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import React from "react";
 import SdInferencePanel from "../weight/inference_panels/SdInferencePanel";
-import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { faMessageImage } from "@fortawesome/pro-solid-svg-icons";
-import TextToImageJobsList from "./components/TextToImageJobsList";
-import { useInferenceJobs } from "hooks";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 interface TextToImagePageProps {
+  inferenceJobs: Array<InferenceJob>;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   sessionWrapper: SessionWrapper;
   enqueueInferenceJob: (
@@ -23,14 +25,10 @@ export default function TextToImagePage({
   sessionWrapper,
   sessionSubscriptionsWrapper,
   enqueueInferenceJob,
+  inferenceJobs,
 }: TextToImagePageProps) {
-  const { inferenceJobs } = useInferenceJobs(
-    FrontendInferenceJobType.ImageGeneration
-  );
-  const hasImageGenJobs = inferenceJobs && inferenceJobs.length > 0;
-
   if (!sessionWrapper.canAccessStudio()) {
-    return <StudioNotAvailable />
+    return <StudioNotAvailable />;
   }
 
   return (
@@ -40,16 +38,11 @@ export default function TextToImagePage({
         titleIcon={faMessageImage}
         title="Text to Image"
         subText="Transform your thoughts into art."
-        yOffset="76%"
+        yOffset="68%"
       />
 
-      {hasImageGenJobs && (
-        <div className="mb-4">
-          <TextToImageJobsList />
-        </div>
-      )}
-
       <SdInferencePanel
+        inferenceJobs={inferenceJobs}
         sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
         enqueueInferenceJob={enqueueInferenceJob}
         isStandalone={true}

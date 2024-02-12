@@ -9,6 +9,7 @@ interface Props {
   title: React.ReactNode;
   subText: React.ReactNode;
   yOffset?: string;
+  extension?: React.ReactNode;
 }
 
 function PageHeaderWithImage(props: Props) {
@@ -31,6 +32,12 @@ function PageHeaderWithImage(props: Props) {
             <p className="text-center text-md-start opacity-75">
               {props.subText}
             </p>
+
+            {props.extension && (
+              <div className="d-flex justify-content-center justify-content-md-start mt-3">
+                {props.extension}
+              </div>
+            )}
           </div>
         </div>
         <div className="col-12 col-md-5 d-none d-md-block">

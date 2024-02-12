@@ -1,17 +1,12 @@
-import React from "react"; // useState
+import React from "react";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-// import { TempSelect } from "components/common";
-// import { enumToKeyArr } from "resources";
-import ModalHeader from "../ModalHeader";
-import { useLocalize } from "hooks";
-
 interface Props {
   handleClose?: any;
   jobType?: FrontendInferenceJobType;
 }
 
-export default function InferenceJobsModal({
+export default function JobsPageList({
   handleClose,
   jobType: inJobType = -1,
 }: Props) {
@@ -25,8 +20,6 @@ export default function InferenceJobsModal({
   //   return { label: "", value: "" };
   // });
 
-  const { t } = useLocalize("InferenceJobs");
-
   const failures = (fail = "") => {
     switch (fail) {
       default:
@@ -36,7 +29,6 @@ export default function InferenceJobsModal({
 
   return (
     <>
-      <ModalHeader {...{ handleClose, title: t("core.jobsTitle") }} />
       {
         // <TempSelect {...{ onChange: ({ target }: { target: any }) => jobTypeSet(target.value), options, value: jobType }} />
       }
@@ -50,6 +42,7 @@ export default function InferenceJobsModal({
           // value: typeObj.indexOf(jobType),
           showHeader: false,
           panel: false,
+          showNoJobs: true,
         }}
       />
     </>

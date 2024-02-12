@@ -8,14 +8,17 @@ import {
   Panel,
   SegmentButtons,
   SelectModal,
+  SplitPanel,
   TempSelect,
   TempTextArea,
 } from "components/common";
 import { onChanger } from "resources";
 import {
+  faList,
   faRectangleLandscape,
   faRectanglePortrait,
   faSquare,
+  faUpload,
 } from "@fortawesome/pro-solid-svg-icons";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -23,11 +26,17 @@ import {
   EnqueueImageGenIsSuccess,
   EnqueueImageGenIsError,
 } from "@storyteller/components/src/api/image_generation/EnqueueImageGen";
-import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import PremiumLock from "components/PremiumLock";
+import InferenceJobsList from "components/layout/InferenceJobsList";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface SdInferencePanelProps {
+  inferenceJobs: Array<InferenceJob>;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   sd_model_token?: string;
   enqueueInferenceJob: (
@@ -42,14 +51,15 @@ function SdInferencePanel({
   sd_model_token,
   sessionSubscriptionsWrapper,
   isStandalone = false,
+  inferenceJobs,
 }: SdInferencePanelProps) {
   const [loraToken, setLoraToken] = useState<string | null>(null);
   const [weightToken, setWeightToken] = useState(sd_model_token);
 
-  const handleOnWeightSelect = (data:{token:string,title:string}) => {
+  const handleOnWeightSelect = (data: { token: string; title: string }) => {
     setWeightToken(data.token);
   };
-  const handleOnSelect = (data:{token:string,title:string}) => {
+  const handleOnSelect = (data: { token: string; title: string }) => {
     setLoraToken(data.token);
   };
 
@@ -277,190 +287,246 @@ function SdInferencePanel({
         );
       }
     } else if (EnqueueImageGenIsError(response)) {
-      console.log("error");
+      console.log("error", response);
     }
     setIsEnqueuing(false);
 
     return false;
   };
 
+  const failures = (fail = "") => {
+    switch (fail) {
+      default:
+        return "Uknown failure";
+    }
+  };
+
   return (
-    <Panel padding={true}>
-      <h4 className="fw-semibold mb-4">Generate an Image</h4>
-
-      <div className="d-flex flex-column gap-3 mb-4">
-        {isStandalone && (
-          <SelectModal
-            required={true}
-            modalTitle="Select a Weight"
-            label="Select a Weight"
-            onSelect={handleOnWeightSelect}
-            tabs={[
-              {
-                label: "All Weights",
-                tabKey: "allWeights",
-                typeFilter: "sd_1.5",
-                searcher: true,
-                type: "weights",
-              },
-              {
-                label: "Bookmarked",
-                tabKey: "bookmarkedWeights",
-                typeFilter: "sd_1.5",
-                searcher: false,
-                type: "weights",
-              },
-            ]}
-          />
-        )}
-
-        <TempTextArea
-          {...{
-            label: "Prompt",
-            placeholder: "Enter a prompt",
-            onChange: handlePromptChange,
-            value: prompt,
-            required: true,
-          }}
-        />
-        <TempTextArea
-          {...{
-            label: "Negative Prompt",
-            name: "negativePrompt",
-            placeholder: "Enter a negative prompt",
-            onChange: handleNegativePromptChange,
-            value: negativePrompt,
-          }}
-        />
-        <SegmentButtons
-          {...{
-            label: "Aspect Ratio",
-            name: "aspectRatio",
-            onChange,
-            options: dimensionOpts,
-            value: aspectRatio,
-          }}
-        />
-      </div>
-
-      <Accordion>
-        <Accordion.Item title="Advanced">
-          <div className="p-3 d-flex flex-column gap-3">
-            <div>
-              <label className="sub-title">Seed</label>
-              <div className="d-flex gap-2 align-items-center">
-                <SegmentButtons
-                  {...{
-                    name: "seed",
-                    onChange: handleSeedChange,
-                    options: seedOpts,
-                    value: seed,
-                  }}
-                />
-                <Input
-                  placeholder="Random"
-                  value={seedNumber}
-                  onChange={handleSeedNumberChange}
-                  type="number"
-                  onBlur={handleBlur}
+    <div>
+      <SplitPanel dividerHeader={true}>
+        <SplitPanel.Header padding={true}>
+          <div className="d-flex flex-wrap gap-2 align-items-center">
+            <h4 className="fw-semibold mb-0 flex-grow-1">Generate an Image</h4>
+            {isStandalone && (
+              <div>
+                <Button
+                  icon={faUpload}
+                  label="Upload Weight"
+                  variant="secondary"
+                  small={true}
+                  to="/upload/sd"
                 />
               </div>
-            </div>
+            )}
+          </div>
+        </SplitPanel.Header>
 
-            <TempSelect
+        <SplitPanel.Body padding={true}>
+          <div className="d-flex flex-column gap-3 mb-4">
+            {isStandalone && (
+              <SelectModal
+                required={true}
+                modalTitle="Select a Weight"
+                label="Select a Weight"
+                onSelect={handleOnWeightSelect}
+                tabs={[
+                  {
+                    label: "All Weights",
+                    tabKey: "allWeights",
+                    typeFilter: "sd_1.5",
+                    searcher: true,
+                    type: "weights",
+                  },
+                  {
+                    label: "Bookmarked",
+                    tabKey: "bookmarkedWeights",
+                    typeFilter: "sd_1.5",
+                    searcher: false,
+                    type: "weights",
+                    onlyBookmarked: true,
+                  },
+                ]}
+              />
+            )}
+
+            <TempTextArea
               {...{
-                label: "Sampler",
-                name: "sampler",
-                onChange,
-                options: samplerOpts,
-                value: sampler,
+                label: "Prompt",
+                placeholder: "Enter a prompt",
+                onChange: handlePromptChange,
+                value: prompt,
+                required: true,
               }}
             />
-
-            <NumberSlider
+            <TempTextArea
               {...{
-                min: 1,
-                max: 30,
-                name: "cfgScale",
-                label: "CFG Scale",
-                onChange,
-                thumbTip: "CFG Scale",
-                value: cfgScale,
-                step: 0.5,
+                label: "Negative Prompt",
+                name: "negativePrompt",
+                placeholder: "Enter a negative prompt",
+                onChange: handleNegativePromptChange,
+                value: negativePrompt,
               }}
             />
-
-            <NumberSlider
+            <SegmentButtons
               {...{
-                min: 8,
-                max: 64,
-                name: "samples",
-                label: "Samples",
+                label: "Aspect Ratio",
+                name: "aspectRatio",
                 onChange,
-                thumbTip: "Samples",
-                value: samples,
+                options: dimensionOpts,
+                value: aspectRatio,
               }}
             />
+          </div>
 
-            <SelectModal
-              label="Additional LoRA Weight"
-              onSelect={handleOnSelect}
-              tabs={[
-                {
-                  label: "All LoRA Weights",
-                  tabKey: "allLoraWeights",
-                  typeFilter: "rvc_v2",
-                  searcher: true,
-                  type: "weights",
-                },
-                {
-                  label: "Bookmarked",
-                  tabKey: "bookmarkedLoraWeights",
-                  typeFilter: "rvc_v2",
-                  searcher: false,
-                  type: "weights",
-                },
-              ]}
-            />
-
-            <div>
-              <Label label="Number of Generations" />
-              <PremiumLock
-                sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                requiredPlan="pro"
-              >
-                <SegmentButtons
+          <Accordion>
+            <Accordion.Item title="Advanced">
+              <div className="p-3 d-flex flex-column gap-3">
+                <div>
+                  <label className="sub-title">Seed</label>
+                  <div className="d-flex gap-2 align-items-center">
+                    <SegmentButtons
+                      {...{
+                        name: "seed",
+                        onChange: handleSeedChange,
+                        options: seedOpts,
+                        value: seed,
+                      }}
+                    />
+                    <Input
+                      placeholder="Random"
+                      value={seedNumber}
+                      onChange={handleSeedNumberChange}
+                      type="number"
+                      onBlur={handleBlur}
+                    />
+                  </div>
+                </div>
+                <TempSelect
                   {...{
-                    name: "batchCount",
+                    label: "Sampler",
+                    name: "sampler",
                     onChange,
-                    options: batchCountOpts,
-                    value: batchCount,
+                    options: samplerOpts,
+                    value: sampler,
                   }}
                 />
-              </PremiumLock>
-            </div>
+                <NumberSlider
+                  {...{
+                    min: 1,
+                    max: 30,
+                    name: "cfgScale",
+                    label: "CFG Scale",
+                    onChange,
+                    thumbTip: "CFG Scale",
+                    value: cfgScale,
+                    step: 0.5,
+                  }}
+                />
+                <NumberSlider
+                  {...{
+                    min: 8,
+                    max: 64,
+                    name: "samples",
+                    label: "Samples",
+                    onChange,
+                    thumbTip: "Samples",
+                    value: samples,
+                  }}
+                />
+                <SelectModal
+                  label="Additional LoRA Weight"
+                  onSelect={handleOnSelect}
+                  tabs={[
+                    {
+                      label: "All LoRA Weights",
+                      tabKey: "allLoraWeights",
+                      typeFilter: "loRA",
+                      searcher: true,
+                      type: "weights",
+                    },
+                    {
+                      label: "Bookmarked",
+                      tabKey: "bookmarkedLoraWeights",
+                      typeFilter: "loRA",
+                      searcher: false,
+                      type: "weights",
+                      onlyBookmarked: true,
+                    },
+                  ]}
+                />
+                <div>
+                  <Label label="Number of Generations" />
+                  <PremiumLock
+                    sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+                    requiredPlan="pro"
+                  >
+                    <SegmentButtons
+                      {...{
+                        name: "batchCount",
+                        onChange,
+                        options: batchCountOpts,
+                        value: batchCount,
+                      }}
+                    />
+                  </PremiumLock>
+                </div>{" "}
+              </div>
+            </Accordion.Item>
+          </Accordion>
+          <div className="d-flex gap-2 justify-content-end mt-4 mb-3">
+            <Button
+              {...{
+                label: "Clear All",
+                variant: "secondary",
+                onClick: resetToInitialState,
+              }}
+            />
+            <Button
+              {...{
+                label: "Generate Image",
+                disabled: prompt === "" || weightToken === "",
+                onClick: handleEnqueueImageGen,
+                isLoading: isEnqueuing,
+              }}
+            />
           </div>
-        </Accordion.Item>
-      </Accordion>
+        </SplitPanel.Body>
 
-      <div className="d-flex gap-2 justify-content-end mt-4">
-        <Button
+        <InferenceJobsList
           {...{
-            label: "Clear All",
-            variant: "secondary",
-            onClick: resetToInitialState,
+            failures,
+            jobType: FrontendInferenceJobType.ImageGeneration,
           }}
         />
-        <Button
-          {...{
-            label: "Generate Image",
-            disabled: prompt === "" || weightToken === undefined,
-            onClick: handleEnqueueImageGen,
-            isLoading: isEnqueuing,
-          }}
-        />
-      </div>
-    </Panel>
+      </SplitPanel>
+
+      {inferenceJobs[0] ? (
+        <div className={isStandalone ? "mt-4" : "mt-3"}>
+          <InferenceJobsList
+            {...{
+              failures,
+              value: 0,
+              jobType: FrontendInferenceJobType.ImageGeneration,
+            }}
+          />
+        </div>
+      ) : (
+        <>
+          {isStandalone && (
+            <Panel padding={true} className="mt-4">
+              <div className="d-flex flex-column align-items-center justify-content-center gap-2 py-5 opacity-75">
+                <h4 className="fw-semibold mb-0">
+                  <FontAwesomeIcon icon={faList} className="me-2 fs-5" />
+                  No jobs queued
+                </h4>
+
+                <p>Your queued image jobs will appear here.</p>
+              </div>
+            </Panel>
+          )}
+        </>
+      )}
+    </div>
   );
 }
 

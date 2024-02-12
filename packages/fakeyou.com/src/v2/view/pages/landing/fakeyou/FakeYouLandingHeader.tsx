@@ -1,9 +1,15 @@
-import { faArrowRight, faStar, faUser } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faArrowRight,
+  faSparkles,
+  faStar,
+  faUser,
+} from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { WebUrl } from "common/WebUrl";
 import { Panel } from "components/common";
+import Alert from "components/common/Alert/Alert";
 import { useLocalize } from "hooks";
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
@@ -113,14 +119,14 @@ export default function FakeYouLandingHeader(props: FakeYouLandingHeaderProps) {
 
   return (
     <Panel clear={true} className="mt-5">
-      {/* <Alert
-              id="face-animation-alert"
-              icon={faSparkles}
-              message="Have you tried our new Face Animator? Turn photos of faces into animated lip-synced videos with just a picture and some audio!"
-              alertVariant="new"
-              link="/face-animator"
-              linkText="Try it now"
-            /> */}
+      <Alert
+        id="text-to-image-alert"
+        icon={faSparkles}
+        message={t("alertTtiText")}
+        alertVariant="new"
+        link="/text-to-image"
+        linkText={t("alertTtiCta")}
+      />
 
       <div className="row flex-md-row-reverse">
         <div className="col-12 col-lg-5 p-md-0 d-flex justify-content-center">

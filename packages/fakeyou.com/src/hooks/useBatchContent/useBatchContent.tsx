@@ -36,6 +36,8 @@ export interface BatchInputProps {
   toggle: BatchToggle
 }
 
+export type MakeBatchProps = (x: MakePropsParams) => BatchInputProps;
+
 export default function useBatchContent({
   checker,
   debug,

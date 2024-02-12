@@ -1,4 +1,6 @@
 {
+  "alertTtiCta": "现在就试试",
+  "alertTtiText": "您尝试过我们的新文本到图像吗？将您的文字提示变成图像！",
   "communityButtonDiscord": "Discord",
   "communityButtonTwitter": "Twitter",
   "communityText": "我们很乐意与您聊天！如果您有任何疑问，请加入我们的 Discord。",
@@ -19,12 +21,14 @@
   "heroTitle": "AI 音乐、文字转语音、语音转语音",
   "productFaceAnimatorText": "用音频制作面孔动画",
   "productFaceAnimatorTitle": "脸部动画师",
+  "productImageGenText": "从文本创建图像",
+  "productImageGenTitle": "文字转图像",
   "productNewTag": "新的",
   "productTtsText": "从文本生成音频",
   "productTtsTitle": "文字转语音",
   "productVcText": "用另一种声音说话",
   "productVcTitle": "语音到语音",
-  "productVideoText": "视频与音频口型同步",
-  "productVideoTitle": "视频唇形同步",
+  "productVdText": "创建您自己的人工智能声音",
+  "productVdTitle": "声音设计师",
   "productsTitle": "人工智能工具"
 }

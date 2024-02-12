@@ -31,12 +31,14 @@ export default function useListContent({
   pagePreset = 0,
   requestList = false,
   urlParam = "",
-  urlUpdate = true
+  urlUpdate = true,
 }: Props) {
   const { pathname, search: locSearch } = useLocation();
   const history = useHistory();
   const urlQueries = new URLSearchParams(locSearch);
-  const [page, pageSet] = useState(parseInt(urlQueries.get("page_index") || "") || pagePreset);
+  const [page, pageSet] = useState(
+    parseInt(urlQueries.get("page_index") || "") || pagePreset
+  );
   const [pageCount, pageCountSet] = useState(0);
   const [sort, sortSet] = useState(urlQueries.get("sort_ascending") === "true");
   const [status, statusSet] = useState(
@@ -77,9 +79,11 @@ export default function useListContent({
     if (urlParam) {
       if (status === FetchStatus.ready) {
         let search = new URLSearchParams(queries).toString();
+
+        if (urlUpdate) { history.replace({ pathname, search }); }
         statusSet(FetchStatus.in_progress);
-        if (urlUpdate) history.replace({ pathname, search });
-        fetcher(urlParam,{},queries).then((res: any) => {
+
+        fetcher(urlParam, {}, queries).then((res: any) => {
           if (debug)
             console.log(`🪲 useListContent success debug at: ${debug}`, res);
           statusSet(FetchStatus.success);

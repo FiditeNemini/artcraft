@@ -9,6 +9,36 @@
     "UNKNOWN": "Statut de l'animation inconnu",
     "heading": "Emplois d'animateur de visage"
   },
+  "ImageGeneration": {
+    "ATTEMPT_FAILED": "Tentative de génération d'images infructueuse",
+    "COMPLETE_FAILURE": "Échec de la génération d'images",
+    "COMPLETE_SUCCESS": "Génération d'images terminée",
+    "DEAD": "La génération d’images est morte",
+    "PENDING": "Génération d'image en attente",
+    "STARTED": "Génération d'images en cours",
+    "UNKNOWN": "Statut de génération d'image inconnu",
+    "heading": "Emplois ImageGeneration"
+  },
+  "TextToSpeech": {
+    "ATTEMPT_FAILED": "Tentative de synthèse vocale infructueuse",
+    "COMPLETE_FAILURE": "Échec de la synthèse vocale",
+    "COMPLETE_SUCCESS": "Synthèse vocale terminée",
+    "DEAD": "La synthèse vocale est morte",
+    "PENDING": "Synthèse vocale en attente",
+    "STARTED": "Synthèse vocale en cours",
+    "UNKNOWN": "Synthèse vocale inconnue",
+    "heading": "Travaux de synthèse vocale"
+  },
+  "VoiceConversion": {
+    "ATTEMPT_FAILED": "Tentative de conversion vocale infructueuse",
+    "COMPLETE_FAILURE": "Échec de la conversion vocale",
+    "COMPLETE_SUCCESS": "Conversion vocale terminée",
+    "DEAD": "La conversion vocale est morte",
+    "PENDING": "Conversion vocale du visage en attente",
+    "STARTED": "Conversion vocale en cours",
+    "UNKNOWN": "Conversion vocale inconnue",
+    "heading": "Travaux de conversion vocale"
+  },
   "VoiceDesignerCreateVoice": {
     "ATTEMPT_FAILED": "Échec de la tentative d'animation du visage",
     "COMPLETE_FAILURE": "Échec de l'animation du visage.",
@@ -19,8 +49,25 @@
     "UNKNOWN": "Statut de Voice Designer inconnu",
     "heading": "Emplois de concepteur de voix"
   },
+  "VoiceDesignerTts": {
+    "ATTEMPT_FAILED": "Tentative de synthèse vocale infructueuse",
+    "COMPLETE_FAILURE": "Échec de la synthèse vocale",
+    "COMPLETE_SUCCESS": "Synthèse vocale terminée",
+    "DEAD": "La synthèse vocale est morte",
+    "PENDING": "Synthèse vocale en attente",
+    "STARTED": "Synthèse vocale en cours",
+    "UNKNOWN": "Synthèse vocale inconnue",
+    "heading": "Emplois de synthèse vocale de Voice Designer"
+  },
   "core": {
-    "heading": "Derniers emplois"
+    "cancel": "Annuler le travail",
+    "empty": "Aucun emploi actif",
+    "exploreBtn": "Explorer",
+    "heading": "Derniers emplois",
+    "jobsSubtitle": "Afficher l'état de vos travaux",
+    "jobsTitle": "Mes emplois",
+    "noJobsSubtitle": "Les tâches en file d'attente apparaîtront ici",
+    "noJobsTitle": "Aucune tâche en file d'attente"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "Échec de la tentative d'animation du visage",

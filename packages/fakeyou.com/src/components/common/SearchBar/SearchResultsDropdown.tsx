@@ -23,6 +23,10 @@ export default function SearchResultsDropdown({
     event.stopPropagation();
   };
 
+  const handleMouseDown = (event: any, url: string) => {
+    history.push(url);
+  };
+
   const handleUrlPush = (event: React.MouseEvent) => {
     event.stopPropagation();
     if (searchTerm) {
@@ -40,7 +44,13 @@ export default function SearchResultsDropdown({
               useWeightTypeInfo(item.weight_type);
 
             return (
-              <Link to={`/weight/${item.weight_token}`} key={item.weight_token}>
+              <Link
+                to={`/weight/${item.weight_token}`}
+                key={item.weight_token}
+                onMouseDown={event =>
+                  handleMouseDown(event, `/weight/${item.weight_token}`)
+                }
+              >
                 <div className="search-results-dropdown-item p-3">
                   <h6 className="fw-semibold mb-1 text-white">{item.title}</h6>
                   <div className="d-flex gap-2 align-items-center">

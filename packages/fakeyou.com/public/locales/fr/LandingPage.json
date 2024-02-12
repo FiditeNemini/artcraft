@@ -1,4 +1,6 @@
 {
+  "alertTtiCta": "Essayez-le maintenant",
+  "alertTtiText": "Avez-vous essayé notre nouveau Text to Image ? Transformez vos invites textuelles en images !",
   "communityButtonDiscord": "Discord",
   "communityButtonTwitter": "Twitter",
   "communityText": "Nous serions ravis de discuter avec vous ! Veuillez nous rejoindre sur Discord si vous avez des questions.",
@@ -19,12 +21,14 @@
   "heroTitle": "Musique AI, synthèse vocale et voix à voix",
   "productFaceAnimatorText": "Animer des visages avec de l'audio",
   "productFaceAnimatorTitle": "Animateur de visage",
+  "productImageGenText": "Créer des images à partir de texte",
+  "productImageGenTitle": "Texte en image",
   "productNewTag": "NOUVEAU",
   "productTtsText": "Générer de l'audio à partir du texte",
   "productTtsTitle": "Texte pour parler",
   "productVcText": "Parle d'une autre voix",
   "productVcTitle": "Voix à voix",
-  "productVideoText": "Synchronisation labiale de la vidéo avec l'audio",
-  "productVideoTitle": "Synchronisation labiale vidéo",
+  "productVdText": "Créez votre propre voix IA",
+  "productVdTitle": "Concepteur de voix",
   "productsTitle": "Outils d'IA"
 }
