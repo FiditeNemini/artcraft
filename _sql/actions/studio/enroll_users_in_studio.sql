@@ -12,5 +12,12 @@ UPDATE users SET can_access_studio = true WHERE username IN (
     'olivicmic',
     'saltacc',
     'wilwong',
+    'yae_ph',
+    'zzz_last_item'
+);
+
+UPDATE users SET can_access_studio = true WHERE username IN (
+    'endtimes',
+    'tropicalfun',
     'zzz_last_item'
 );
