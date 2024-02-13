@@ -108,13 +108,8 @@ export default function VideoMotionCapture(props: {
               <div className="col-12 col-md-6">
                 <Tabs tabs={tabs} />
               </div>
-              <div className="col-12 col-md-6">
-                <Panel padding={true} clear={true}>
-                  <BasicVideo
-                    title="Video -> Mocap Sample"
-                    src="/videos/face-animator-instruction-en.mp4"
-                  />
-                </Panel>
+              <div className="col-12 col-md-6 p-5 mt-3">
+                <p>Upload or select a video from the library, our AI will analyze and turn it into a 3D model (aka a BVH file) </p>
               </div>
             </>
           )}
