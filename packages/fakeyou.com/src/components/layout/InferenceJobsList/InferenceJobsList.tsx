@@ -23,6 +23,7 @@ interface JobsListProps {
 }
 
 const resultPaths = {
+  EngineComposition: "/media",
   FaceAnimation: "/media",
   TextToSpeech: "/media",
   VoiceConversion: "/media",

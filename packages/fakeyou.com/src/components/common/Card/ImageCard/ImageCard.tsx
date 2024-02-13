@@ -181,7 +181,9 @@ export default function ImageCard({
               </div>
               <CardFooter
                 {...{
-                  creator: data.creator,
+                  creator:
+                    data.creator ||
+                    data.details.maybe_weight_data?.maybe_creator,
                   entityToken: data.weight_token,
                   entityType: "model_weight",
                   makeBookmarksProps: bookmarks?.makeProps,

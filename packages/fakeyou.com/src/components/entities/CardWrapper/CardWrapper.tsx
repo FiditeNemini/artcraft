@@ -20,7 +20,7 @@ export default function CardWrapper({ canHover, card: Card, data, onClick, paddi
   const className = `card ${ padding ? "p-3" : "" }${ onClick || canHover ? " card-clickable" : ""  }`;
 
   return onClick ?
-  <div {...{ className, onClick }}>
+  <div {...{ className, onClick: () => onClick(data) }}>
     <Card { ...cardProps }/>
   </div> : 
   <Link {...{ className, to: linkUrl }}>

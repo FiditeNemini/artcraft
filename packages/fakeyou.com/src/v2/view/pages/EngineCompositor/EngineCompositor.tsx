@@ -63,6 +63,7 @@ export default function EngineCompositor({ value, sessionWrapper }: Props) {
                 aspectRatio: "landscape",
                 label: "Choose 3D data",
                 onChange,
+                type: "media",
                 mediaType: "bvh",
               }}
             />

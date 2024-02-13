@@ -46,8 +46,6 @@ const SelectModal = memo(
         activeTab: tabs[0].tabKey,
         valueType: tabs[0].typeFilter || "all",
       });
-    console.log("🔫", tabs, activeTab, valueType);
-
     // Update mediaType when activeTab changes
     useEffect(() => {
       const currentTab = tabs.find(tab => tab.tabKey === activeTab);

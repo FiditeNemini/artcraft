@@ -21,12 +21,16 @@ export default function WeightsTab() {
   const bookmarks = useBookmarks();
   const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [weightType, weightTypeSet] = useState(urlQueries.get("maybe_scoped_weight_type") || "all");
-  const [weightCategory, weightCategorySet] = useState(urlQueries.get("maybe_scoped_weight_category") || "all");
+  const [weightType, weightTypeSet] = useState(
+    urlQueries.get("maybe_scoped_weight_type") || "all"
+  );
+  const [weightCategory, weightCategorySet] = useState(
+    urlQueries.get("maybe_scoped_weight_category") || "all"
+  );
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<Weight[]>([]);
   const toTopBtnRef = useRef<HTMLDivElement | null>(null);
-  const onScreen = useOnScreen(toTopBtnRef,"0px");
+  const onScreen = useOnScreen(toTopBtnRef, "0px");
   const weights = useLazyLists({
     addQueries: {
       page_size: 24,
@@ -39,8 +43,8 @@ export default function WeightsTab() {
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
-    onSuccess: (res) => {
-      bookmarks.gather({ res, expand: true, key: "weight_token" }); // expand rather than replace for lazy loading 
+    onSuccess: res => {
+      bookmarks.gather({ res, expand: true, key: "weight_token" }); // expand rather than replace for lazy loading
       ratings.gather({ res, expand: true, key: "weight_token" });
       setShowMasonryGrid(true);
     },
@@ -54,7 +58,8 @@ export default function WeightsTab() {
   //   { value: "sd", label: "Image Generation" },
   // ];
 
-  const weightTypeOpts = [ // these probably need beter labels
+  const weightTypeOpts = [
+    // these probably need beter labels
     { value: "all", label: "All weight types" },
     { value: "hifigan_tt2", label: "hifigan_tt2" },
     { value: "sd_1.5", label: "sd_1.5" },
@@ -111,20 +116,24 @@ export default function WeightsTab() {
               value: weights.sort,
             }}
           />
-          <TempSelect {...{
-            icon: faFilter,
-            options: weightCategoryOpts,
-            name: "weightCategory",
-            onChange: weights.onChange,
-            value: weightCategory,
-          }} />
-          <TempSelect {...{
-            icon: faFilter,
-            options: weightTypeOpts,
-            name: "weightType",
-            onChange: weights.onChange,
-            value: weightType,
-          }} />
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: weightCategoryOpts,
+              name: "weightCategory",
+              onChange: weights.onChange,
+              value: weightCategory,
+            }}
+          />
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: weightTypeOpts,
+              name: "weightType",
+              onChange: weights.onChange,
+              value: weightType,
+            }}
+          />
           {/* {selectedFilter === "tts" && (
             <TempSelect
               options={modelTtsOptions}
@@ -147,20 +156,31 @@ export default function WeightsTab() {
             />
           )} */}
         </div>
-        { weights.urlCursor ? 
-          <Button {...{
-            className: `to-top-button`,
-            buttonRef: toTopBtnRef,
+
+        {weights.urlCursor ? (
+          <div>
+            <Button
+              {...{
+                className: `to-top-button`,
+                buttonRef: toTopBtnRef,
+                label: "Back to top",
+                onClick: () => weights.reset(),
+                small: true,
+              }}
+            />
+          </div>
+        ) : null}
+      </div>
+      {weights.urlCursor && !onScreen ? (
+        <Button
+          {...{
+            className: `to-top-button-off-screen`,
             label: "Back to top",
             onClick: () => weights.reset(),
-          }}/> : null }
-      </div>
-      { weights.urlCursor && !onScreen ? 
-        <Button {...{
-          className: `to-top-button-off-screen`,
-          label: "Back to top",
-          onClick: () => weights.reset(),
-        }}/> : null }
+            small: true,
+          }}
+        />
+      ) : null}
       <AudioPlayerProvider>
         {weights.isLoading && !weights.list.length ? (
           <div className="row gx-3 gy-3">

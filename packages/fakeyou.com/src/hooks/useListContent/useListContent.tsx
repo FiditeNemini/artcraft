@@ -12,7 +12,9 @@ interface Props {
   onInputChange?: (x?: any) => any;
   onSuccess?: (x?: any) => any;
   pagePreset?: number;
+  request?: any;
   requestList?: boolean;
+  resultsKey?: string;
   urlParam: string;
   urlUpdate?: boolean;
 }
@@ -29,7 +31,9 @@ export default function useListContent({
   onInputChange = n,
   onSuccess = n,
   pagePreset = 0,
+  request,
   requestList = false,
+  resultsKey = "results",
   urlParam = "",
   urlUpdate = true,
 }: Props) {
@@ -71,7 +75,7 @@ export default function useListContent({
 
   useEffect(() => {
     const queries = {
-      page_index: page,
+      ...page ? { page_index: page } : {},
       ...addQueries, // eventually we should provide a way to type this ... or not. It works
       ...(sort ? { sort_ascending: true } : {}),
     };
@@ -83,15 +87,13 @@ export default function useListContent({
         if (urlUpdate) { history.replace({ pathname, search }); }
         statusSet(FetchStatus.in_progress);
 
-        fetcher(urlParam, {}, queries).then((res: any) => {
+        fetcher(urlParam, request, queries).then((res: any) => {
           if (debug)
-            console.log(`🪲 useListContent success debug at: ${debug}`, res);
+            console.log(`🪲 useListContent success debug at: ${debug}`, res, resultsKey);
           statusSet(FetchStatus.success);
           onSuccess(res);
-          if (res.results && res.pagination) {
-            pageCountSet(res.pagination.total_page_count);
-            listSet(res.results);
-          }
+          if (res[resultsKey]) { listSet(res[resultsKey]); }
+          if (res.pagination) { pageCountSet(res.pagination.total_page_count); }
         });
       }
     }
@@ -105,6 +107,8 @@ export default function useListContent({
     pathname,
     page,
     sort,
+    request,
+    resultsKey,
     status,
     urlParam,
     urlUpdate

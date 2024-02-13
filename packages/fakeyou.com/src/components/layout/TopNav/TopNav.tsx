@@ -15,7 +15,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
-import { useModal } from "hooks";
+import { useModal, useSession } from "hooks";
 import { InferenceJobsModal } from "components/modals";
 import { useDomainConfig } from "context/DomainConfigContext";
 import NavItem from "../../common/NavItem/NavItem";
@@ -112,12 +112,14 @@ export default function TopNav({
 
   let profileDropdown = <></>;
 
+  const { user } = useSession();
+
   if (sessionWrapper.isLoggedIn()) {
-    let displayName = sessionWrapper.getDisplayName();
-    let username = sessionWrapper.getUsername();
-    let emailHash = sessionWrapper.getEmailGravatarHash();
-    let avatarIndex = 0; //temporary
-    let backgroundColorIndex = 0; //temporary
+    let displayName = user.display_name;
+    let username = user.username;
+    let emailHash = user.email_gravatar_hash;
+    let avatarIndex = user.core_info.default_avatar.image_index;
+    let backgroundColorIndex = user.core_info.default_avatar.color_index;
 
     profileDropdown = (
       <ProfileDropdown
