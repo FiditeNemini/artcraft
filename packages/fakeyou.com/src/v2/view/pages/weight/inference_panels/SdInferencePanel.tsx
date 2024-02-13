@@ -18,7 +18,6 @@ import {
   faRectangleLandscape,
   faRectanglePortrait,
   faSquare,
-  faUpload,
 } from "@fortawesome/pro-solid-svg-icons";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -34,6 +33,7 @@ import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session
 import PremiumLock from "components/PremiumLock";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from "react-router-dom";
 
 interface SdInferencePanelProps {
   inferenceJobs: Array<InferenceJob>;
@@ -319,20 +319,7 @@ function SdInferencePanel({
     <div>
       <SplitPanel dividerHeader={true}>
         <SplitPanel.Header padding={true}>
-          <div className="d-flex flex-wrap gap-2 align-items-center">
-            <h4 className="fw-semibold mb-0 flex-grow-1">Generate an Image</h4>
-            {isStandalone && (
-              <div>
-                <Button
-                  icon={faUpload}
-                  label="Upload Weight"
-                  variant="secondary"
-                  small={true}
-                  to="/upload/sd"
-                />
-              </div>
-            )}
-          </div>
+          <h4 className="fw-semibold mb-0 flex-grow-1">Generate an Image</h4>
         </SplitPanel.Header>
 
         <SplitPanel.Body padding={true}>
@@ -490,22 +477,35 @@ function SdInferencePanel({
               </div>
             </Accordion.Item>
           </Accordion>
-          <div className="d-flex gap-2 justify-content-end mt-4 mb-3">
-            <Button
-              {...{
-                label: "Clear/Reset ",
-                variant: "secondary",
-                onClick: resetToInitialState,
-              }}
-            />
-            <Button
-              {...{
-                label: "Generate Image",
-                disabled: prompt === "" || sdToken === "",
-                onClick: handleEnqueueImageGen,
-                isLoading: isEnqueuing,
-              }}
-            />
+          <div className="d-flex mt-4 align-items-center flex-wrap gap-4">
+            {isStandalone && (
+              <div className="flex-grow-1">
+                <p className="fs-7">
+                  <span className="opacity-75">
+                    Can't find any model weight that you like?
+                  </span>{" "}
+                  <Link to="/upload/sd">Upload your own!</Link>
+                </p>
+              </div>
+            )}
+
+            <div className="d-flex gap-2 justify-content-end flex-grow-1">
+              <Button
+                {...{
+                  label: "Clear/Reset ",
+                  variant: "secondary",
+                  onClick: resetToInitialState,
+                }}
+              />
+              <Button
+                {...{
+                  label: "Generate Image",
+                  disabled: prompt === "" || sdToken === "",
+                  onClick: handleEnqueueImageGen,
+                  isLoading: isEnqueuing,
+                }}
+              />
+            </div>
           </div>
         </SplitPanel.Body>
 
