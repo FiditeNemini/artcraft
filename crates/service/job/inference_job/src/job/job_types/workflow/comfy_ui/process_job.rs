@@ -2,7 +2,7 @@ use std::fs::{File, read_to_string};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use anyhow::anyhow;
+use anyhow::{anyhow, Result};
 use log::{error, info, warn, debug};
 use serde_json::{Value, json};
 use tokio::io::AsyncWriteExt;
@@ -33,6 +33,16 @@ use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::Infer
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
 
+fn get_file_extension(mimetype: &str) -> Result<&'static str> {
+    let ext = match mimetype {
+        "video/mp4" => "mp4",
+        "image/png" => "png",
+        "image/jpeg" => "jpg",
+        _ => return Err(anyhow!("Mimetype not supported: {}", mimetype)),
+    };
+    Ok(ext)
+}
+
 pub struct ComfyProcessJobArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
     pub job: &'a AvailableInferenceJob,
@@ -51,20 +61,23 @@ fn recursively_delete_files_in(path: &Path) -> std::io::Result<()> {
 struct ThumbnailTask{
     bucket: String,
     path: String,
-    input_extension: String,
+    source_mimetype: String,
+    output_mimetype: String,
     output_extension: String,
     event_id: String,
 }
 
 impl ThumbnailTask{
-    fn new(bucket: &str, path: &str, input_extension: &str, output_extension: &str, event_id: String) -> Self {
-        Self {
+    fn new(bucket: &str, path: &str, source_mimetype: &str, output_mimetype: &str, event_id: String) -> Result<Self> {
+        let output_ext = get_file_extension(output_mimetype)?;
+        Ok(Self {
             bucket: bucket.to_string(),
             path: path.to_string(),
-            input_extension: input_extension.to_string(),
-            output_extension: output_extension.to_string(),
+            source_mimetype: source_mimetype.to_string(),
+            output_mimetype: output_mimetype.to_string(),
+            output_extension: output_ext.to_string(),
             event_id: event_id.to_string(),
-        }
+        })
     }
 
     // Method to generate the JSON representation of the thumbnail task
@@ -74,13 +87,13 @@ impl ThumbnailTask{
         let input = json!({
             "bucket": self.bucket,
             "path": self.path,
-            "type": self.input_extension,
+            "type": self.source_mimetype,
         });
 
         let output = json!({
             "bucket": self.bucket,
             "path": output_path,
-            "type": self.output_extension,
+            "type": self.output_mimetype,
         });
 
         // TODO@madhukar: add tags -> metadata for gcs objects
@@ -461,13 +474,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
 
     // create ext from mimetype
-    let ext = match mimetype.as_str() {
-        "video/mp4" => "mp4",
-        "image/png" => "png",
-        "image/jpeg" => "jpg",
-        _ => return Err(ProcessSingleJobError::Other(anyhow!("Mimetype not supported: {}", mimetype))),
-    };
-
+    let ext = get_file_extension(mimetype.as_str())
+        .map_err(|e| ProcessSingleJobError::Other(e))?;
     // create prefix from mimetype
     let prefix = match mimetype.as_str() {
         "video/mp4" => "video",
@@ -519,19 +527,25 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         _ => vec![],
     };
 
-    for output_type in thumbnail_types{
-        let thumbnail_task = ThumbnailTask::new(
+    for output_type in thumbnail_types {
+        // Attempt to create a ThumbnailTask
+        match ThumbnailTask::new(
             &*args.job_dependencies.buckets.public_bucket_client.bucket().name(),
             &*path_to_string(result_bucket_object_pathbuf.clone()),
             mimetype.as_str(),
             output_type,
             job.id.0.to_string(),
-        );
-        if let Err(e) = thumbnail_task.send().await {
-            error!("Failed to send thumbnail task: {}", e);
+        ) {
+            Ok(thumbnail_task) => {
+                if let Err(e) = thumbnail_task.send().await {
+                    error!("Failed to send thumbnail task: {}", e);
+                }
+            },
+            Err(e) => {
+                error!("Failed to create thumbnail task: {}", e);
+            }
         }
     }
-
     // ==================== CLEANUP ==================== //
 
     // ==================== DELETE TEMP FILES ==================== //
