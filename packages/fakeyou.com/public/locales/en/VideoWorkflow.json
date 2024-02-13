@@ -17,5 +17,8 @@
     "original": "Original",
     "preview": "Preview",
     "upload": "Upload"
+  },
+  "video": {
+    "instruction": "Upload or select a video from the library, then setup the filtering workflow with our workflow control panel."
   }
 }

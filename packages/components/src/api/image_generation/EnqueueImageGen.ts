@@ -2,7 +2,7 @@ import { ApiConfig } from "../ApiConfig";
 
 export interface EnqueueImageGenRequest {
   uuid_idempotency_token: string;
-  maybe_sd_model_token: string | undefined;
+  maybe_sd_model_token: string | null;
   maybe_lora_model_token: string | null;
   maybe_prompt: string;
   maybe_n_prompt: string;

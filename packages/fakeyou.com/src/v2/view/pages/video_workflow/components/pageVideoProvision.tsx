@@ -46,7 +46,7 @@ export default function PageVideoProvision({
           <div className="col-12 col-md-6">
             <Panel padding={true} clear={true}>
               <BasicVideo
-                title={t("video.sample")}
+                title={t("video.instruction")}
                 src="/videos/face-animator-instruction-en.mp4"
               />
             </Panel>

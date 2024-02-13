@@ -17,5 +17,8 @@
     "original": "Original",
     "preview": "Aperçu",
     "upload": "Télécharger"
+  },
+  "video": {
+    "instruction": "Téléchargez ou sélectionnez une vidéo dans la bibliothèque, puis configurez le flux de travail de filtrage avec notre panneau de contrôle de flux de travail."
   }
 }

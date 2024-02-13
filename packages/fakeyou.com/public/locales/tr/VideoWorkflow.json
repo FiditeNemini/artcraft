@@ -17,5 +17,8 @@
     "original": "Orijinal",
     "preview": "Ön izleme",
     "upload": "Yüklemek"
+  },
+  "video": {
+    "instruction": "Kitaplıktan bir video yükleyin veya seçin, ardından iş akışı kontrol panelimizle filtreleme iş akışını ayarlayın."
   }
 }
