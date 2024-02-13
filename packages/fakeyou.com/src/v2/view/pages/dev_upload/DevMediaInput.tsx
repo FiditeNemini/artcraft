@@ -31,13 +31,14 @@ export default function DevMediaInput({ value }: Props) {
         <SegmentButtons {...{ onChange: ({ target }: { target: any }) => entityTypeSet(target.value), options, value: entityType }}/>
         <TempInput {...{ value: owner, onChange: ({ target }: { target: any }) => ownerSet(target.value), placeholder: "User" }}/>
         <TempSelect {...{ options: EntityFilterOptions(entityType), value: ["",mediaType,weightType][entityType], onChange: changeFilter }}/>
-        <Button {...{ label: "Enqueue", variant: "primary" }}/>
       </header>
        <EntityInput {...{
           aspectRatio: "landscape",
           label: `Choose ${ ["","media file","weight"][entityType] }`,
           onChange,
           owner,
+          search: "Dream",
+          type: "Media",
           ...([{},{ mediaType },{ weightType }][entityType])
         }}/>
         <Button {...{ className: "mt-3", label: "Open modal", onClick: openModal, variant: "primary" }}/>

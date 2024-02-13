@@ -14,13 +14,20 @@ import { UploadMedia, UploadMediaResponse } from "@storyteller/components/src/ap
 import { v4 as uuidv4 } from "uuid";
 import "./EntityInput.scss";
 
+// enum EntityInputMode {
+//   Bookmarks = "bookmarks",
+//   Media = "media",
+//   Weights = "weights",
+//   SearchWeights = "searchWeights",
+// }
+
 interface Props {
+  aspectRatio?: "square" | "landscape" | "portrait",
+  mediaType?: MediaFilterProp,
   label?: string, 
   onChange?: any,
-  owner?: string,
-  mediaType?: MediaFilterProp,
-  aspectRatio?: "square" | "landscape" | "portrait",
-  weightType?: WeightFilterProp,
+  type: string,
+  weightType?: WeightFilterProp
 }
 
 interface SlideProps {
@@ -31,9 +38,7 @@ interface EmptySlideProps extends SlideProps {
   entityType: EntityType,
   filterType: MediaFilterProp | WeightFilterProp,
   inputProps?: any,
-  onSelect: any,
   open: any,
-  owner: string,
   user: any
 };
 
@@ -66,10 +71,10 @@ const MocapInputFull = ({ media }: SlideProps) => {
   </>;
 };
 
-const MediaPickerEmpty = ({ entityType, filterType, media, onSelect, open, owner, inputProps, user }: EmptySlideProps) => {
+const MediaPickerEmpty = ({ entityType, filterType, open, inputProps, user, ...rest }: EmptySlideProps) => {
   const browserClick = () => open({
     component: MediaBrowser,
-    props: { entityType, filterType, onSelect, owner, username: user?.username || "" }
+    props: { entityType, filterType, username: user?.username || "", ...rest }
   });
 
   const mediaIcons = () => {
@@ -109,7 +114,7 @@ const AniMod = ({ animating, className, isLeaving, render: Render, style, ...res
     <Render {...{ ...rest, animating }} />
   </a.div>;
 
-export default function EntityInput({ aspectRatio = "square", label, onChange, owner, mediaType, weightType }: Props) {
+export default function EntityInput({ aspectRatio = "square", label, onChange, mediaType, weightType, ...rest }: Props) {
   const entityType = mediaType ? EntityType.media : weightType ? EntityType.weights : EntityType.unknown;
   const filterType = mediaType || weightType || "all";
   const { search } = useLocation();
@@ -136,6 +141,7 @@ export default function EntityInput({ aspectRatio = "square", label, onChange, o
   });
   const onSelect = (data: MediaFile) => {
     mediaSet(data)
+    console.log("🔅",data);
     onChange({ target: { name: "temp", value: data.token } });
   }
   const busy = false;
@@ -164,7 +170,7 @@ export default function EntityInput({ aspectRatio = "square", label, onChange, o
           return [
             <AniMod {...{ render: MediaBusy, className: "fy-entity-input-busy", ...sharedProps }}/>,
             <AniMod {...{ render: MocapInputFull, className: "fy-entity-input-full", ...sharedProps }}/>,
-            <AniMod {...{ render: MediaPickerEmpty, className: "fy-entity-input-empty", entityType, filterType, inputProps, onSelect, open, owner, user, ...sharedProps }}/>
+            <AniMod {...{ render: MediaPickerEmpty, className: "fy-entity-input-empty", entityType, filterType, inputProps, onSelect, open, user, ...sharedProps, ...rest }}/>
           ][i];
         
         })
