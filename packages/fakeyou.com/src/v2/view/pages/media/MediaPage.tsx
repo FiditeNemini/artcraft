@@ -29,8 +29,9 @@ import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import SocialButton from "components/common/SocialButton";
 import { Badge, Input, Modal } from "components/common";
+import BookmarkButton from "components/common/BookmarkButton";
 import LikeButton from "components/common/LikeButton";
-import { useMedia, useRatings, useSession } from "hooks";
+import { useBookmarks, useMedia, useRatings, useSession } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import Iframe from "react-iframe";
@@ -38,6 +39,7 @@ import Iframe from "react-iframe";
 export default function MediaPage() {
   const { canEditTtsModel, user } = useSession();
   const { token } = useParams<{ token: string }>();
+  const bookmarks = useBookmarks();
   const ratings = useRatings();
   const { media: mediaFile, remove, status } = useMedia({
     mediaToken: token,
@@ -389,14 +391,15 @@ export default function MediaPage() {
                         }),
                       }}
                     />
-                    {/* <BookmarkButton
+                    <BookmarkButton
                         {...{
-                          entityToken: weight_token,
-                          entityType: "model_weight",
-                          onToggle: bookmarks.toggle,
                           large: true,
+                          ...bookmarks.makeProps({
+                            entityToken: token,
+                            entityType: "media_file",
+                          }),
                         }}
-                      /> */}
+                      />
                   </div>
                 </div>
               </div>
