@@ -420,7 +420,7 @@ function SdInferencePanel({
                     onChange,
                     thumbTip: "CFG Scale",
                     value: cfgScale,
-                    step: 0.5,
+                    step: 1,
                   }}
                 />
                 <NumberSlider
