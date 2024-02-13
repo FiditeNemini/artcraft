@@ -97,7 +97,7 @@ impl ThumbnailTask{
     async fn send(&self) -> Result<(), reqwest::Error> {
         // TODO: retries?
         // TODO: move to config
-        let url = "http://thumbnail-generator.media-server/tasks";
+        let url = "http://media-server.thumbnail-generator/tasks";
         let client = reqwest::Client::new();
         let task_json = self.create_json();
         client.post(url)
