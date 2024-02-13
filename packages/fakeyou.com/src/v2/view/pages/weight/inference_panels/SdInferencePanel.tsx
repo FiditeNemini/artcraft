@@ -1,4 +1,4 @@
-import React, { useRef, useState, memo } from "react";
+import React, { useRef, useState, memo, useEffect } from "react";
 import {
   Accordion,
   Button,
@@ -38,26 +38,38 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 interface SdInferencePanelProps {
   inferenceJobs: Array<InferenceJob>;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  sd_model_token?: string;
+  weight_token?: string;
   enqueueInferenceJob: (
     jobToken: string,
     frontendInferenceJobType: FrontendInferenceJobType
   ) => void;
   isStandalone?: boolean;
+  weightPageType?: "lora" | "sd";
 }
 
 function SdInferencePanel({
   enqueueInferenceJob,
-  sd_model_token,
+  weight_token,
   sessionSubscriptionsWrapper,
   isStandalone = false,
   inferenceJobs,
+  weightPageType = "sd",
 }: SdInferencePanelProps) {
   const [loraToken, setLoraToken] = useState<string | null>(null);
-  const [weightToken, setWeightToken] = useState(sd_model_token);
+  const [sdToken, setSdToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (weightPageType === "sd") {
+      setSdToken(weight_token || null);
+      setLoraToken(null);
+    } else if (weightPageType === "lora") {
+      setLoraToken(weight_token || null);
+      setSdToken(null);
+    }
+  }, [weightPageType, weight_token]);
 
   const handleOnWeightSelect = (data: { token: string; title: string }) => {
-    setWeightToken(data.token);
+    setSdToken(data.token);
   };
   const handleOnSelect = (data: { token: string; title: string }) => {
     setLoraToken(data.token);
@@ -243,7 +255,7 @@ function SdInferencePanel({
   ) => {
     ev.preventDefault();
 
-    if (!prompt || weightToken === undefined) {
+    if (!prompt || sdToken === undefined) {
       return false;
     }
 
@@ -258,10 +270,12 @@ function SdInferencePanel({
       internalSeed.current = generateRandomSeed();
     }
 
+    console.log(sdToken);
+
     const request = {
       uuid_idempotency_token: uuidv4(),
-      maybe_sd_model_token: isStandalone ? weightToken : sd_model_token,
-      maybe_lora_model_token: loraToken,
+      maybe_sd_model_token: sdToken || null,
+      maybe_lora_model_token: loraToken || null,
       maybe_prompt: prompt,
       maybe_n_prompt: negativePrompt,
       maybe_seed: internalSeed.current,
@@ -323,11 +337,11 @@ function SdInferencePanel({
 
         <SplitPanel.Body padding={true}>
           <div className="d-flex flex-column gap-3 mb-4">
-            {isStandalone && (
+            {(isStandalone || weightPageType === "lora") && (
               <SelectModal
                 required={true}
-                modalTitle="Select a Weight"
-                label="Select a Weight"
+                modalTitle="Select Stable Diffusion Weight"
+                label="Select a Stable Diffusion Weight"
                 onSelect={handleOnWeightSelect}
                 tabs={[
                   {
@@ -433,27 +447,30 @@ function SdInferencePanel({
                     value: samples,
                   }}
                 />
-                <SelectModal
-                  label="Additional LoRA Weight"
-                  onSelect={handleOnSelect}
-                  tabs={[
-                    {
-                      label: "All LoRA Weights",
-                      tabKey: "allLoraWeights",
-                      typeFilter: "loRA",
-                      searcher: true,
-                      type: "weights",
-                    },
-                    {
-                      label: "Bookmarked",
-                      tabKey: "bookmarkedLoraWeights",
-                      typeFilter: "loRA",
-                      searcher: false,
-                      type: "weights",
-                      onlyBookmarked: true,
-                    },
-                  ]}
-                />
+                {weightPageType === "sd" && (
+                  <SelectModal
+                    modalTitle="Select LoRA Weight"
+                    label="Additional LoRA Weight"
+                    onSelect={handleOnSelect}
+                    tabs={[
+                      {
+                        label: "All LoRA Weights",
+                        tabKey: "allLoraWeights",
+                        typeFilter: "loRA",
+                        searcher: true,
+                        type: "weights",
+                      },
+                      {
+                        label: "Bookmarked",
+                        tabKey: "bookmarkedLoraWeights",
+                        typeFilter: "loRA",
+                        searcher: false,
+                        type: "weights",
+                        onlyBookmarked: true,
+                      },
+                    ]}
+                  />
+                )}
                 <div>
                   <Label label="Number of Generations" />
                   <PremiumLock
@@ -476,7 +493,7 @@ function SdInferencePanel({
           <div className="d-flex gap-2 justify-content-end mt-4 mb-3">
             <Button
               {...{
-                label: "Clear All",
+                label: "Clear/Reset ",
                 variant: "secondary",
                 onClick: resetToInitialState,
               }}
@@ -484,7 +501,7 @@ function SdInferencePanel({
             <Button
               {...{
                 label: "Generate Image",
-                disabled: prompt === "" || weightToken === "",
+                disabled: prompt === "" || sdToken === "",
                 onClick: handleEnqueueImageGen,
                 isLoading: isEnqueuing,
               }}

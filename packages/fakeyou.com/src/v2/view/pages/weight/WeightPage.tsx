@@ -110,6 +110,7 @@ export default function WeightPage({
 
   const deleteWeight = () => remove(!!user?.can_ban_users);
 
+  //Studio Access feature flag
   switch (weight?.weight_type) {
     case WeightType.SD_15:
     case WeightType.SDXL:
@@ -117,6 +118,34 @@ export default function WeightPage({
       if (!sessionWrapper.canAccessStudio()) {
         return <StudioNotAvailable />;
       }
+  }
+
+  //Image generation panel if it's a lora weight or sd weight
+  let imageGenPanel = <></>;
+  switch (weight?.weight_type) {
+    case WeightType.SD_15:
+    case WeightType.SDXL:
+      imageGenPanel = (
+        <SdInferencePanel
+          inferenceJobs={inferenceJobs}
+          sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+          weight_token={weight?.weight_token}
+          enqueueInferenceJob={enqueueInferenceJob}
+          weightPageType="sd"
+        />
+      );
+      break;
+    case WeightType.LORA:
+      imageGenPanel = (
+        <SdInferencePanel
+          inferenceJobs={inferenceJobs}
+          sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+          weight_token={weight?.weight_token}
+          enqueueInferenceJob={enqueueInferenceJob}
+          weightPageType="lora"
+        />
+      );
+      break;
   }
 
   function renderWeightComponent(weight: Weight) {
@@ -168,12 +197,7 @@ export default function WeightPage({
         return (
           <div className="d-flex flex-column gap-3">
             <SdCoverImagePanel src={sdCoverImage} />
-            <SdInferencePanel
-              inferenceJobs={inferenceJobs}
-              sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-              sd_model_token={weight.weight_token}
-              enqueueInferenceJob={enqueueInferenceJob}
-            />
+            {imageGenPanel}
           </div>
         );
       default:
