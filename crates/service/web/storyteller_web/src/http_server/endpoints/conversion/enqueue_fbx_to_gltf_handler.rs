@@ -184,6 +184,10 @@ pub async fn enqueue_fbx_to_gltf_handler(
     let maybe_avt_token = server_state.avt_cookie_manager
         .get_avt_token_from_request(&http_request);
 
+    if request.media_file_token.as_str().is_empty() {
+        return Err(EnqueueFbxToGltfRequestError::BadInput("media_file_token is empty".to_string()));
+    }
+
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
         job_type: InferenceJobType::ConvertFbxToGltf,
