@@ -17,5 +17,8 @@
     "original": "Original",
     "preview": "Vorschau",
     "upload": "Hochladen"
+  },
+  "video": {
+    "instruction": "Laden Sie ein Video hoch oder wählen Sie es aus der Bibliothek aus und richten Sie dann den Filter-Workflow mit unserem Workflow-Kontrollfeld ein."
   }
 }

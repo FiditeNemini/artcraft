@@ -17,5 +17,8 @@
     "original": "Nguyên bản",
     "preview": "Xem trước",
     "upload": "Tải lên"
+  },
+  "video": {
+    "instruction": "Tải lên hoặc chọn video từ thư viện, sau đó thiết lập quy trình lọc bằng bảng điều khiển quy trình làm việc của chúng tôi."
   }
 }

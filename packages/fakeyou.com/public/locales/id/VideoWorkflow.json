@@ -17,5 +17,8 @@
     "original": "Asli",
     "preview": "Pratinjau",
     "upload": "Mengunggah"
+  },
+  "video": {
+    "instruction": "Unggah atau pilih video dari perpustakaan, lalu atur alur kerja pemfilteran dengan panel kontrol alur kerja kami."
   }
 }
