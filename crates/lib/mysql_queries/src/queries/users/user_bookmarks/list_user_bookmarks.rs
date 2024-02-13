@@ -55,7 +55,8 @@ fn select_result_fields() -> &'static str {
     entity_stats.bookmark_count as maybe_bookmark_count,
 
     media_files.media_type as maybe_media_file_type,
-    media_files.origin_product_category as maybe_media_file_origin_category,
+    media_files.origin_category as maybe_media_file_origin_category,
+    media_files.origin_product_category as maybe_media_file_origin_product,
     media_files.public_bucket_directory_hash as maybe_media_file_public_bucket_hash,
     media_files.maybe_public_bucket_prefix as maybe_media_file_public_bucket_prefix,
     media_files.maybe_public_bucket_extension as maybe_media_file_public_bucket_extension,

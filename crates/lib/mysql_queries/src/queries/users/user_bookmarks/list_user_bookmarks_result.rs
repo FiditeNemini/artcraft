@@ -3,6 +3,7 @@ use sqlx::{FromRow, Row};
 use sqlx::mysql::MySqlRow;
 
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
+use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
@@ -93,6 +94,7 @@ pub struct RawUserBookmarkRecord {
 
   pub(crate) maybe_media_file_type: Option<MediaFileType>,
   pub(crate) maybe_media_file_origin_category: Option<MediaFileOriginCategory>,
+  pub(crate) maybe_media_file_origin_product: Option<MediaFileOriginProductCategory>,
   pub(crate) maybe_media_file_public_bucket_hash: Option<String>,
   pub(crate) maybe_media_file_public_bucket_prefix: Option<String>,
   pub(crate) maybe_media_file_public_bucket_extension: Option<String>,
@@ -199,6 +201,7 @@ impl FromRow<'_, MySqlRow> for RawUserBookmarkRecord {
         maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,
         maybe_media_file_type: MediaFileType::try_from_mysql_row_nullable(row, "maybe_media_file_type")?,
         maybe_media_file_origin_category: MediaFileOriginCategory::try_from_mysql_row_nullable(row,"maybe_media_file_origin_category")?,
+        maybe_media_file_origin_product: MediaFileOriginProductCategory::try_from_mysql_row_nullable(row,"maybe_media_file_origin_product")?,
         maybe_media_file_public_bucket_hash: row.try_get("maybe_media_file_public_bucket_hash")?,
         maybe_media_file_public_bucket_prefix: row.try_get("maybe_media_file_public_bucket_prefix")?,
         maybe_media_file_public_bucket_extension: row.try_get("maybe_media_file_public_bucket_extension")?,
