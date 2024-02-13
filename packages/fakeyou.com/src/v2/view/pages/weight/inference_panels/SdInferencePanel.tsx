@@ -482,7 +482,7 @@ function SdInferencePanel({
               <div className="flex-grow-1">
                 <p className="fs-7">
                   <span className="opacity-75">
-                    Can't find any model weight that you like?
+                    Can't find the model weights you're looking for?
                   </span>{" "}
                   <Link to="/upload/sd">Upload your own!</Link>
                 </p>
