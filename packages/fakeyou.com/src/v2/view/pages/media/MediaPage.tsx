@@ -17,7 +17,7 @@ import {
   faLink,
   faFileCircleXmark,
   faArrowRightArrowLeft,
-  faVideoPlus
+  faVideoPlus,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -39,7 +39,11 @@ export default function MediaPage() {
   const { canEditTtsModel, user } = useSession();
   const { token } = useParams<{ token: string }>();
   const ratings = useRatings();
-  const { media: mediaFile, remove, status } = useMedia({
+  const {
+    media: mediaFile,
+    remove,
+    status,
+  } = useMedia({
     mediaToken: token,
     onSuccess: (res: any) => {
       ratings.gather({ res, key: "token" });
@@ -49,8 +53,6 @@ export default function MediaPage() {
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
-
-
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -294,7 +296,7 @@ export default function MediaPage() {
       break;
     default:
       mediaDetails = defaultDetails;
-      break
+      break;
   }
 
   let modMediaDetails = undefined;
@@ -368,7 +370,14 @@ export default function MediaPage() {
               <div className="d-flex gap-3 flex-wrap align-items-center">
                 <div className="d-flex gap-2 align-items-center flex-wrap">
                   <div>
-                    <Badge {...{ className: `fy-entity-type-${ mediaFile?.media_type || "" }`, label: mediaType, }}/>
+                    <Badge
+                      {...{
+                        className: `fy-entity-type-${
+                          mediaFile?.media_type || ""
+                        }`,
+                        label: mediaType,
+                      }}
+                    />
                   </div>
                   {subtitleDivider}
 
@@ -421,7 +430,7 @@ export default function MediaPage() {
           <div className="col-12 col-xl-4">
             <div className="panel panel-clear d-flex flex-column gap-3">
               <div className="d-flex gap-2 flex-wrap">
-                { mediaFile?.media_type === MediaFileType.Audio ? (
+                {mediaFile?.media_type === MediaFileType.Audio ? (
                   <Button
                     {...{
                       icon: faFaceViewfinder,
@@ -431,8 +440,8 @@ export default function MediaPage() {
                       className: "flex-grow-1",
                     }}
                   />
-                ) : null }
-                { mediaFile?.media_type === MediaFileType.BVH ? (
+                ) : null}
+                {mediaFile?.media_type === MediaFileType.BVH ? (
                   <Button
                     {...{
                       icon: faVideoPlus,
@@ -442,7 +451,7 @@ export default function MediaPage() {
                       className: "flex-grow-1",
                     }}
                   />
-                ) : null }
+                ) : null}
 
                 {mediaFile?.media_type !== MediaFileType.Audio && (
                   <Button
@@ -452,6 +461,7 @@ export default function MediaPage() {
                     href={audioLink}
                     download={audioLink}
                     variant="secondary"
+                    target="_blank"
                   />
                 )}
                 {mediaFile?.media_type === MediaFileType.Audio && (
@@ -463,6 +473,7 @@ export default function MediaPage() {
                       href={audioLink}
                       download={audioLink}
                       tooltip="Download"
+                      target="_blank"
                     />
                   </div>
                 )}
@@ -636,7 +647,7 @@ export default function MediaPage() {
         handleClose={closeDeleteModal}
         title="Delete Media"
         content={() => (
-           <>{`Are you sure you want to delete this media file? This action cannot be undone.`}</> // replace w/ dynamic later -V
+          <>{`Are you sure you want to delete this media file? This action cannot be undone.`}</> // replace w/ dynamic later -V
           // <>{`Are you sure you want to delete "${title}"? This action cannot be undone.`}</>
         )}
         onConfirm={deleteMedia}
