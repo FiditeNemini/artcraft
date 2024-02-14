@@ -196,6 +196,7 @@ pub async fn enqueue_bvh_to_workflow_handler(
         job_type: InferenceJobType::BevyToWorkflow,
         maybe_input_source_token: Some(&request.media_file_token.as_str()),
         maybe_input_source_token_type: None,
+        maybe_download_url: None,
         maybe_raw_inference_text: None,
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {

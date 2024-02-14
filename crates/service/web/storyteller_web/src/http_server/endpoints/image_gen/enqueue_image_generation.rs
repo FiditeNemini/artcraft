@@ -326,16 +326,35 @@ pub async fn enqueue_image_generation_request(
 
     // we can only do 1 upload type at a time.
     // if we are uploading a model.
-    let upload_path = request.maybe_upload_path.clone().unwrap_or_default();
+    let mut maybe_sd_upload_url = None;
+    let mut maybe_lora_upload_url = None;
 
-    // if we are uploading a lora model.
-    let lora_upload_path = request.maybe_lora_upload_path.clone().unwrap_or_default();
+    let both_fields = (
+        request.maybe_upload_path.as_deref(),
+        request.maybe_lora_upload_path.as_deref()
+    );
 
-    let mut seed = -1;
-
-    if let Some(s) = request.maybe_seed {
-        seed = s;
+    match both_fields {
+        (Some(_), Some(_)) => {
+            return Err(EnqueueImageGenRequestError::BadInput("Can't upload both lora and model".to_string()));
+        }
+        (Some(sd_url), None) => {
+            maybe_sd_upload_url = Some(sd_url.to_string());
+        }
+        (None, Some(lora_url)) => {
+            maybe_lora_upload_url = Some(lora_url.to_string());
+        }
+        _ => {}, // No-op for inference
     }
+
+    // NB: This is done to populate the new top-level field in the jobs table.
+    // We won't read this yet, but in the meantime it can serve as analytics, and in the future
+    // we can switch to it.
+    let maybe_either_download_url = maybe_sd_upload_url.as_deref()
+        .or(maybe_lora_upload_url.as_deref())
+        .map(|s| s.to_string());
+
+    let seed = request.maybe_seed.unwrap_or(-1);
 
     let mut version : u32 = 0;
 
@@ -355,8 +374,8 @@ pub async fn enqueue_image_generation_request(
         maybe_prompt: Some(request.maybe_prompt.clone().unwrap_or_default()),
         maybe_n_prompt: Some(n_prompt),
         maybe_seed: Some(seed),
-        maybe_upload_path: Some(upload_path),
-        maybe_lora_upload_path: Some(lora_upload_path),
+        maybe_upload_path: maybe_sd_upload_url,
+        maybe_lora_upload_path: maybe_lora_upload_url,
         type_of_inference: type_of_inference.to_string(),
         maybe_cfg_scale: Some(cfg_scale),
         maybe_number_of_samples: Some(number_of_samples),
@@ -381,6 +400,7 @@ pub async fn enqueue_image_generation_request(
         maybe_model_token: None, // NB: Model is static during inference
         maybe_input_source_token: None,
         maybe_input_source_token_type: None,
+        maybe_download_url: maybe_either_download_url.as_deref(),
         maybe_raw_inference_text: None,
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {

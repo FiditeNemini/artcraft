@@ -196,6 +196,7 @@ pub async fn enqueue_tts_request(
         maybe_model_token: None, // NB: Model is static during inference
         maybe_input_source_token: None,
         maybe_input_source_token_type: None,
+        maybe_download_url: None,
         maybe_raw_inference_text: Some(&request.text),
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {

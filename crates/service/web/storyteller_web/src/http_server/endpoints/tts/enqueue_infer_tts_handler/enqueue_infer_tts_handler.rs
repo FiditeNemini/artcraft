@@ -404,6 +404,7 @@ pub async fn enqueue_infer_tts_handler(
       maybe_model_token: Some(request.tts_model_token.as_str()),
       maybe_input_source_token: None, // NB: TTS doesn't have input media
       maybe_input_source_token_type: None, // NB: TTS doesn't have input media
+      maybe_download_url: None,
       maybe_raw_inference_text: Some(inference_text.as_str()),
       maybe_max_duration_seconds: Some(max_duration_seconds),
       maybe_inference_args: Some(GenericInferenceArgs {

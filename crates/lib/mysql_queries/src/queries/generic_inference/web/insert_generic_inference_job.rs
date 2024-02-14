@@ -28,6 +28,12 @@ pub struct InsertGenericInferenceArgs<'a> {
   pub maybe_input_source_token: Option<&'a str>,
   pub maybe_input_source_token_type: Option<InferenceInputSourceTokenType>,
 
+  // For jobs that perform "downloads", this is the URL to download.
+  // NB: Some jobs aren't using this field yet and will pack the URL inside of
+  //   the "GenericInferenceArgs" field. The goal is to migrate them to this
+  //   top-level field eventually.
+  pub maybe_download_url: Option<&'a str>,
+
   pub maybe_raw_inference_text: Option<&'a str>,
 
   pub maybe_max_duration_seconds: Option<i32>,
@@ -83,6 +89,8 @@ SET
   maybe_input_source_token = ?,
   maybe_input_source_token_type = ?,
 
+  maybe_download_url = ?,
+
   maybe_raw_inference_text = ?,
 
   maybe_inference_args = ?,
@@ -114,6 +122,8 @@ SET
 
         args.maybe_input_source_token,
         args.maybe_input_source_token_type,
+
+        args.maybe_download_url,
 
         args.maybe_raw_inference_text,
 

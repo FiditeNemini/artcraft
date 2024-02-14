@@ -308,6 +308,7 @@ pub async fn enqueue_voice_conversion_inference_handler(
     maybe_model_token: Some(&model_token),
     maybe_input_source_token: Some(media_token.as_str()),
     maybe_input_source_token_type: Some(InferenceInputSourceTokenType::MediaUpload),
+    maybe_download_url: None,
     maybe_raw_inference_text: None, // NB: Voice conversion isn't TTS, so there's no text.
     maybe_max_duration_seconds: None,
     maybe_inference_args: Some(GenericInferenceArgs {

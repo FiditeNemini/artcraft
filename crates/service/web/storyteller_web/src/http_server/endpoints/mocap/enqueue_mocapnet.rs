@@ -209,6 +209,7 @@ pub async fn enqueue_mocapnet_handler(
         maybe_model_token: None, // NB: Model is static during inference
         maybe_input_source_token: None, // TODO: Introduce a second foreign key ?
         maybe_input_source_token_type: None, // TODO: Introduce a second foreign key ?
+        maybe_download_url: None,
         maybe_raw_inference_text: None, // No text
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {
