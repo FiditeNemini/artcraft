@@ -38,6 +38,7 @@ fn get_file_extension(mimetype: &str) -> Result<&'static str> {
         "video/mp4" => "mp4",
         "image/png" => "png",
         "image/jpeg" => "jpg",
+        "image/gif" => "gif",
         _ => return Err(anyhow!("Mimetype not supported: {}", mimetype)),
     };
     Ok(ext)
