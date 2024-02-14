@@ -57,7 +57,8 @@ export default function useBatchContent({
   const dlog = (...dbg: any) => debug ? console.log(...dbg) : {};
 
   const gather = ({ expand, key, res }: Gather) => {
-    let tokens = res.results ? res.results.map((item: any) => item[key]) : [res[key]];
+    let tokens = res.results ? res.results.map((item: any) => item.details[key] || item[key]) : [res[key]];
+    // console.log("😎",tokens);
     let abc = tokens.reduce((obj = {},token = "") => ({ ...obj, [token]: true }),{})
     dlog("🪙",fetcher);
     tokenTypeSet(key)

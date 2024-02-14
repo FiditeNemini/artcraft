@@ -184,7 +184,7 @@ export default function ImageCard({
                   creator:
                     data.creator ||
                     data.details.maybe_weight_data?.maybe_creator,
-                  entityToken: data.weight_token,
+                  entityToken: data.weight_token || data.details?.entity_token,
                   entityType: "model_weight",
                   makeBookmarksProps: bookmarks?.makeProps,
                   makeRatingsProps: ratings?.makeProps,
