@@ -38,7 +38,7 @@ pub struct GetWeightResponse {
     creator: UserDetailsLight,
     creator_set_visibility: Visibility,
 
-    file_size_bytes: i32,
+    file_size_bytes: i64,
     file_checksum_sha2: String,
 
     /// Information about the cover image.

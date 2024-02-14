@@ -157,7 +157,7 @@
         "ordinal": 15,
         "name": "file_size_bytes",
         "type_info": {
-          "type": "Long",
+          "type": "LongLong",
           "flags": "NOT_NULL",
           "char_set": 63,
           "max_size": 10
