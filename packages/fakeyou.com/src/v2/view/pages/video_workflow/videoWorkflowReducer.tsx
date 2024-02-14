@@ -40,7 +40,10 @@ export function reducer (state: State, action: Action): State {
     case 'stagedFile':
       return {...state, status: states.FILE_STAGED}
     case 'clearedFile':
-      return {...state, status: states.NO_FILE}
+      return {...state, 
+        status: states.NO_FILE,
+        mediaFileToken: ""
+      }
     case 'selectedFile':
       return {
         ...state,

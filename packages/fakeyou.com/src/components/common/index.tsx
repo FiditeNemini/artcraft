@@ -2,7 +2,6 @@ import Accordion from "./Accordion";
 import AudioBlobPreview from "./AudioBlobPreview";
 import AudioInput from "./AudioInput";
 import Badge from "./Badge";
-import BasicVideo from "./BasicVideo";
 import Button from "./Button";
 import Checkbox from "./Checkbox";
 import Container from "./Container";
@@ -38,6 +37,7 @@ import TempTextArea from "./TempTextArea";
 import TextArea from "./TextArea";
 import TextAreaV2 from "./TextAreaV2";
 import TintSpinner from "./TintSpinner";
+import VideoBasic from "./VideoBasic";
 import VideoInput from "./VideoInput";
 
 export {
@@ -45,7 +45,6 @@ export {
   AudioBlobPreview,
   AudioInput,
   Badge,
-  BasicVideo,
   Button,
   Checkbox,
   Container,
@@ -81,5 +80,6 @@ export {
   TextArea,
   TextAreaV2,
   TintSpinner,
+  VideoBasic,
   VideoInput
 };

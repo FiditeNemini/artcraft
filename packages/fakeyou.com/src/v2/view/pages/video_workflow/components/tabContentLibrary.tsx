@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { states, Action, State } from "../videoWorkflowReducer";
 import { Button } from "components/common";
 import SelectModal, { SelectModalData } from "components/common/SelectModal/SelectModal";
+import VideoFakeyou from "components/common/VideoFakeyou";
 
 export default function TabContentLibrary({
   t, pageState, dispatchPageState
@@ -42,6 +43,9 @@ export default function TabContentLibrary({
             },
           ]}
         />
+        {pageState.mediaFileToken && 
+          <VideoFakeyou mediaToken={pageState.mediaFileToken} />
+        }
       </div>
       {pageState.status === states.FILE_SELECTED &&
         <div className="col-12 d-flex justify-content-center mt-5">

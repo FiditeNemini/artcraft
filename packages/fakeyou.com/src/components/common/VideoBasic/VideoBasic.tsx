@@ -4,7 +4,7 @@ import { useVideo } from "hooks";
 import makeClass from "resources/makeClass";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
-import "./BasicVideo.scss"
+import "./VideoBasic.scss"
 
 interface Props {
   className?: string;
@@ -13,7 +13,7 @@ interface Props {
   description?: string;
 }
 
-export default function BasicVideo({
+export default function VideoBasic({
   className,
   src,
   title,
