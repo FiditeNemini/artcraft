@@ -95,7 +95,7 @@ export default function useLazyLists({
       if (urlUpdate) { history.replace({ pathname, search }); }
 
       fetcher("", {}, queries).then((res: any) => {
-        // if (debug)
+        if (debug)
           console.log(`🐞 useLazyLists success debug at: ${debug}`, res);
         statusSet(FetchStatus.success);
         onSuccess(res);
@@ -115,7 +115,6 @@ export default function useLazyLists({
               // Key exists, just update the existing data
               const updatedObj = { ...prevObj };
               updatedObj[keyExists] = res.results;
-              console.log("💛",updatedObj);
               return updatedObj;
             }
           });
