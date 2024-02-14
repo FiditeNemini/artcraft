@@ -1,6 +1,5 @@
 import React, { memo } from 'react'
-import { 
-  ButtonRevertToDefault,
+import {
   Checkbox,
   NumberSliderV2,
 } from 'components/common'
