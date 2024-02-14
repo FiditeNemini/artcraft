@@ -23,7 +23,7 @@ import FaceAnimatorSubViews from "./sub_views";
 import FaceAnimatorTitle from "./FaceAnimatorTitle";
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FaceAnimatorCore } from "./FaceAnimatorTypes";
-import { BasicVideo } from "components/common";
+import { VideoBasic } from "components/common";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Analytics } from "common/Analytics";
@@ -252,7 +252,7 @@ export default function FaceAnimator({
         }}
       />
       <div className="face-animator-mobile-sample">
-        <BasicVideo
+        <VideoBasic
           title="Face Animator Sample"
           src="/videos/face-animator-instruction-en.mp4"
         />

@@ -3,6 +3,8 @@ import React from "react";
 import SelectModal, {SelectModalData} from "components/common/SelectModal/SelectModal";
 import { Action, State } from "../videoMocapReducer";
 import { Button } from "components/common";
+import VideoFakeyou from "components/common/VideoFakeyou";
+
 
 export default function TabContentLibrary({
   t,
@@ -46,6 +48,9 @@ export default function TabContentLibrary({
             },
           ]}
         />
+        {pageState.mediaFileToken && 
+          <VideoFakeyou mediaToken={pageState.mediaFileToken} />
+        }
       </div>
       {pageState.mediaFileToken && 
         <div className="col-12 d-flex justify-content-center mt-5">
