@@ -176,11 +176,11 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
   job_progress_reporter.log_status("uploading result")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let result_bucket_location = MediaFileBucketPath::generate_new(
+  let result_video_bucket_location = MediaFileBucketPath::generate_new(
     None,
     Some(BUCKET_FILE_EXTENSION));
 
-  let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
+  let result_bucket_object_pathbuf = result_video_bucket_location.to_full_object_pathbuf();
 
   info!("Destination bucket path: {:?}", &result_bucket_object_pathbuf);
 
@@ -193,11 +193,11 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-  let result_bucket_location = MediaFileBucketPath::from_object_hash(&result_bucket_location.get_object_hash(),
+  let result_zip_bucket_location = MediaFileBucketPath::from_object_hash(&result_video_bucket_location.get_object_hash(),
     None,
     Some(".zip"));
 
-  let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
+  let result_bucket_object_pathbuf = result_zip_bucket_location.to_full_object_pathbuf();
 
   info!("Destination bucket path: {:?}", &result_bucket_object_pathbuf);
 
@@ -226,7 +226,7 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
   let (inference_result_token, id) = insert_media_file_generic(InsertArgs {
     pool: &args.job_dependencies.db.mysql_pool,
     job: &job,
-    media_type: MediaFileType::Gltf,
+    media_type: MediaFileType::Video,
     origin_category: MediaFileOriginCategory::Processed,
     origin_product_category: MediaFileOriginProductCategory::Mocap,
     maybe_origin_model_type: None,
@@ -239,9 +239,9 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
     maybe_video_encoding: None,
     maybe_frame_width: None,
     maybe_frame_height: None,
-    public_bucket_directory_hash: result_bucket_location.get_object_hash(),
-    maybe_public_bucket_prefix: result_bucket_location.get_optional_prefix(),
-    maybe_public_bucket_extension: result_bucket_location.get_optional_extension(),
+    public_bucket_directory_hash: result_video_bucket_location.get_object_hash(),
+    maybe_public_bucket_prefix: result_video_bucket_location.get_optional_prefix(),
+    maybe_public_bucket_extension: result_video_bucket_location.get_optional_extension(),
     extra_file_modification_info: None,
     maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
     maybe_creator_category_synthetic_id_category: IdCategory::MocapResult,
