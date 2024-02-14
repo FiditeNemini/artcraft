@@ -43,8 +43,6 @@ export default function AudioCard({
   const linkUrl = getCardUrl(data, source, type);
   const history = useHistory();
 
-  console.log("🟩", data);
-
   const handleSelectModalResultSelect = () => {
     if (inSelectModal) {
       onResultSelect &&

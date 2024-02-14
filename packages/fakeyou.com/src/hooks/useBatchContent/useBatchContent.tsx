@@ -82,7 +82,7 @@ export default function useBatchContent({
         busyListSet({}); // this should be a for each key in tokens delete from busyList, but this is fine for now
         librarySet((library: any) => expand ? { ...library, ...newBatch } : newBatch);
       }
-    })
+    });
   };
 
 
