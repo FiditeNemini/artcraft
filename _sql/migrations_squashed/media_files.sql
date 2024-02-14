@@ -58,10 +58,14 @@ CREATE TABLE media_files (
   -- The original filename of the media (if uploaded by a user)
   maybe_origin_filename VARCHAR(255) DEFAULT NULL,
 
+  -- TODO: Remove after `maybe_batch_token` gains use.
   -- Whether this media file was generated as part of a batch
   -- If so, we can look up the batch in a separate query/call to the `batch_generations` table.
   -- We won't hold the batch token in this table since it'll be very sparsely populated.
   is_batch_generated BOOLEAN NOT NULL DEFAULT FALSE,
+
+  -- If the media file is generated as part of a batch, this designates the batch.
+  maybe_batch_token VARCHAR(32) DEFAULT NULL,
 
   -- ========== METADATA ==========
 
@@ -99,6 +103,9 @@ CREATE TABLE media_files (
 
   -- For videos, the original frame height.
   maybe_frame_height INT(5) DEFAULT NULL,
+
+  -- Optional text transcript for audio or video (especially TTS)
+  maybe_text_transcript TEXT DEFAULT NULL,
 
   -- Checksum of the original media
   -- SHA1 hash [SHA2 = CHAR(64), SHA1 = CHAR(40), MD5 = CHAR(32)]
@@ -212,6 +219,7 @@ CREATE TABLE media_files (
   KEY index_maybe_origin_model_type (maybe_origin_model_type),
   KEY fk_maybe_origin_model_token (maybe_origin_model_token),
   KEY fk_maybe_origin_model_type_and_token (maybe_origin_model_type, maybe_origin_model_token),
+  KEY index_maybe_batch_token (maybe_batch_token),
   KEY index_media_type (media_type),
   KEY index_checksum_sha2 (checksum_sha2),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),

@@ -72,6 +72,11 @@ CREATE TABLE generic_inference_jobs (
   -- TEXT = 65,535 bytes (64 KiB), ~= 4 bytes per UTF-8 character, ~ 16383 characters.
   maybe_raw_inference_text TEXT DEFAULT NULL,
 
+  -- For download-related jobs, this is the URL
+  -- This is nullable because not all inference jobs have a download URL.
+  -- The length of 1024 is arbitrary, but we shouldn't need anything longer.
+  maybe_download_url VARCHAR(1024) DEFAULT NULL,
+
   -- ========== SUCCESS CASE ==========
 
   -- The type of the object will vary based on the type of the upload,
@@ -81,6 +86,11 @@ CREATE TABLE generic_inference_jobs (
   -- If the job completes successfully, this is the result token.
   -- This is only populated on a successful result.
   on_success_result_entity_token VARCHAR(32) DEFAULT NULL,
+
+  -- If the job completes successfully, this is the batch token (ie. when
+  -- several results are created).
+  -- Only populated if there are actual batches generated.
+  on_success_result_batch_token VARCHAR(32) DEFAULT NULL,
 
   -- ========== CREATOR DETAILS AND PREFERENCES ==========
 

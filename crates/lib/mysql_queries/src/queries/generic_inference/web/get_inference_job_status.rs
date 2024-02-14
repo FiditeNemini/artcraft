@@ -181,7 +181,7 @@ fn raw_record_to_public_result(record: RawGenericInferenceJobStatus) -> GenericI
   if let Some(title) = record.maybe_model_weights_title.as_deref() {
     maybe_model_title = Some(title);
   }
-  
+
   if maybe_model_title.is_none() {
     maybe_model_title = match record.inference_category {
       InferenceCategory::LipsyncAnimation => Some("lipsync animation"),

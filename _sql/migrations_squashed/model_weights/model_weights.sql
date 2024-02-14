@@ -95,9 +95,8 @@ CREATE TABLE model_weights (
   -- The filename that was used at upload time (if available)
   original_filename VARCHAR(255) DEFAULT NULL,
 
-  -- TODO: Make this a BIGINT so we can store more than 2GB.
-  -- File characteristics
-  file_size_bytes INT(10) NOT NULL DEFAULT 0,
+  -- File size. BIGINT to store more than 2GB size.
+  file_size_bytes BIGINT(10) NOT NULL DEFAULT 0,
 
   -- Checksum of the original weights file
   -- SHA2 hash [SHA2 = CHAR(64), SHA1 = CHAR(40), MD5 = CHAR(32)]
