@@ -53,6 +53,7 @@ pub struct InferenceJobStatusResponsePayload {
   pub updated_at: DateTime<Utc>,
 }
 
+/// Details about what the user requested for generation
 #[derive(Serialize, ToSchema)]
 pub struct RequestDetailsResponse {
   pub inference_category: InferenceCategory,
@@ -65,6 +66,7 @@ pub struct RequestDetailsResponse {
   pub maybe_raw_inference_text: Option<String>,
 }
 
+/// Details about the ongoing job status
 #[derive(Serialize, ToSchema)]
 pub struct StatusDetailsResponse {
   /// Primary status from the database (a state machine).
@@ -90,6 +92,7 @@ pub struct StatusDetailsResponse {
   pub maybe_failure_category: Option<FrontendFailureCategory>
 }
 
+/// Details about the completed result (if any)
 #[derive(Serialize, ToSchema)]
 pub struct ResultDetailsResponse {
   pub entity_type: String,

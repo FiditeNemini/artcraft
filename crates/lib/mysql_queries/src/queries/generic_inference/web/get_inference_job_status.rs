@@ -121,6 +121,7 @@ SELECT
     jobs.on_success_result_entity_type as maybe_result_entity_type,
     jobs.on_success_result_entity_token as maybe_result_entity_token,
 
+    model_weights.title as maybe_model_weights_title,
     tts_models.title as maybe_tts_model_title,
     voice_conversion_models.title as maybe_voice_conversion_model_title,
 
@@ -144,6 +145,7 @@ SELECT
 
 FROM generic_inference_jobs as jobs
 
+LEFT OUTER JOIN model_weights ON jobs.maybe_model_token = model_weights.token
 LEFT OUTER JOIN tts_models ON jobs.maybe_model_token = tts_models.token
 LEFT OUTER JOIN voice_conversion_models ON jobs.maybe_model_token = voice_conversion_models.token
 
@@ -174,17 +176,25 @@ WHERE jobs.token = ?
 
 /// Map the internal record type (since we query over several result tables)
 fn raw_record_to_public_result(record: RawGenericInferenceJobStatus) -> GenericInferenceJobStatus {
-  let maybe_model_title = match record.inference_category {
-    InferenceCategory::LipsyncAnimation => Some("lipsync animation"),
-    InferenceCategory::TextToSpeech => record.maybe_tts_model_title.as_deref(),
-    InferenceCategory::VoiceConversion => record.maybe_voice_conversion_model_title.as_deref(),
-    InferenceCategory::VideoFilter => Some("Video Filter"),
-    InferenceCategory::ImageGeneration => Some("Image Generation"),
-    InferenceCategory::Mocap => Some("Mocap"),
-    InferenceCategory::Workflow => Some("Workflow"),
-    InferenceCategory::FormatConversion => Some("format conversion"),
-    InferenceCategory::ConvertBvhToWorkflow => Some("BVH to Workflow"),
-  };
+  let mut maybe_model_title = None;
+
+  if let Some(title) = record.maybe_model_weights_title.as_deref() {
+    maybe_model_title = Some(title);
+  }
+  
+  if maybe_model_title.is_none() {
+    maybe_model_title = match record.inference_category {
+      InferenceCategory::LipsyncAnimation => Some("lipsync animation"),
+      InferenceCategory::TextToSpeech => record.maybe_tts_model_title.as_deref(),
+      InferenceCategory::VoiceConversion => record.maybe_voice_conversion_model_title.as_deref(),
+      InferenceCategory::VideoFilter => Some("Video Filter"),
+      InferenceCategory::ImageGeneration => Some("Image Generation"),
+      InferenceCategory::Mocap => Some("Mocap"),
+      InferenceCategory::Workflow => Some("Workflow"),
+      InferenceCategory::FormatConversion => Some("format conversion"),
+      InferenceCategory::ConvertBvhToWorkflow => Some("BVH to Workflow"),
+    };
+  }
 
   // NB: A bit of a hack. We store TTS results with a full path.
   // Going forward, all other record types will store a hash.
@@ -277,6 +287,7 @@ struct RawGenericInferenceJobStatus {
   pub maybe_result_entity_type: Option<String>,
   pub maybe_result_entity_token: Option<String>,
 
+  pub maybe_model_weights_title: Option<String>,
   pub maybe_tts_model_title: Option<String>,
   pub maybe_voice_conversion_model_title: Option<String>,
 
