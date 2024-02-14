@@ -84,6 +84,8 @@ SET
   maybe_origin_model_type = ?,
   maybe_origin_model_token = ?,
 
+  maybe_text_transcript = ?,
+
   media_type = ?,
   maybe_mime_type = ?,
   file_size_bytes = ?,
@@ -115,6 +117,8 @@ SET
 
       origin_model_type.to_str(),
       args.job.maybe_model_token,
+
+      args.job.maybe_raw_inference_text,
 
       MEDIA_TYPE.to_str(),
       args.maybe_mime_type,
