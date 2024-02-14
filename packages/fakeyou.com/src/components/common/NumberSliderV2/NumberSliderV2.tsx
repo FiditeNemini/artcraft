@@ -1,10 +1,11 @@
 import React from "react";
 import { Range } from "react-range";
 import Tippy from "@tippyjs/react";
-import { Label } from "components/common";
+import { ButtonRevertToDefault, Label } from "components/common";
+import { ButtonRevertToDefaultProps } from "../ButtonRevertToDefault/ButtonRevertToDefault";
 import "./NumberSliderV2.scss";
 
-interface Props {
+interface Props{
   label?: string;
   thumbTip?: string;
   min: number;
@@ -13,6 +14,8 @@ interface Props {
   initialValue?: number;
   onChange?: (x:number) => void;
   required?: boolean;
+  withRevert?: boolean;
+  propsButtonRevertToDefault?: ButtonRevertToDefaultProps;
 }
 
 function roundToStep(x:number, step:number){
@@ -53,7 +56,10 @@ export default function NumberSlider({
   onChange: onChangeCallback,
   required,
   initialValue: initialValueProps,
+  withRevert = false,
+  propsButtonRevertToDefault,
 }: Props) {
+
   const step = stepProps && stepProps <= max-min ? stepProps 
     : max-min >= 1 ? 1 : (max-min) / 10;
   const initialValue = initialValueProps !== undefined && initialValueProps <= max && initialValueProps >= min ? initialValueProps
@@ -65,11 +71,13 @@ export default function NumberSlider({
   function handleRangeOnChange(rangeValue: number[]){
     if(onChangeCallback)onChangeCallback(rangeValue[0])
   }
-
+  function handleRevert(iv:number){
+    if(onChangeCallback)onChangeCallback(iv) 
+  }
   return (
     <div>
       <Label {...{ label, required }} />
-      <div className="fy-number-slider">
+      <div className="d-flex g-2 align-items-center fy-number-slider">
         <input 
           className="fy-number-slider-value"
           type="number"
@@ -87,6 +95,14 @@ export default function NumberSlider({
             }}
           />
         </div>
+        {withRevert && 
+          <ButtonRevertToDefault
+            {...propsButtonRevertToDefault}
+            initialValue={initialValue}
+            onRevert={handleRevert}
+          />
+        }
+        
       </div>
     </div>
   );

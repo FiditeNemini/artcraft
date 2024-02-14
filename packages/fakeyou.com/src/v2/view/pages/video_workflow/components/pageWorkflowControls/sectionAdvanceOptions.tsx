@@ -1,5 +1,9 @@
 import React, { memo } from 'react'
-import { NumberSliderV2, Checkbox } from 'components/common'
+import { 
+  ButtonRevertToDefault,
+  Checkbox,
+  NumberSliderV2,
+} from 'components/common'
 import { WorkflowValuesType } from './helpers';
 
 export const AdvanceOptionsInitialValues = {
@@ -107,6 +111,7 @@ export default memo( function SectionAdvanceOptions({
           <NumberSliderV2 {...{
             min: 1, max: 10, step: 1,
             initialValue: wfVal.lcmCFG,
+            withRevert: true,
             label: "LCM CFG",
             thumbTip: "LCM CFG",
             onChange: (val)=>{handleOnChange("lcmCFG", val)}
