@@ -81,8 +81,11 @@ pub async fn insert_media_file_from_zero_shot(
     
       origin_category = ?,
       origin_product_category = ?,
+
       maybe_origin_model_type = ?,
-    
+
+      maybe_text_transcript = ?,
+
       media_type = ?,
       maybe_mime_type = ?,
       file_size_bytes = ?,
@@ -112,6 +115,8 @@ pub async fn insert_media_file_from_zero_shot(
           ORIGIN_CATEGORY.to_str(),
           ORIGIN_PRODUCT_CATEGORY.to_str(),
           args.origin_model_type.to_str(),
+
+          args.job.maybe_raw_inference_text,
 
           MEDIA_TYPE.to_str(),
           args.maybe_mime_type,
