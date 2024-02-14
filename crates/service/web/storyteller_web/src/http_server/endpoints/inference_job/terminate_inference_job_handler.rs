@@ -6,9 +6,10 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use log::{error, warn};
+use utoipa::ToSchema;
+
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_cancelled_by_user::mark_generic_inference_job_cancelled_by_user;
-
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::{get_inference_job_status, get_inference_job_status_from_connection};
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 
@@ -16,17 +17,17 @@ use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 
 /// For the URL PathInfo
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct TerminateInferenceJobPathInfo {
   token: InferenceJobToken,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct TerminateInferenceJobSuccessResponse {
   pub success: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum TerminateInferenceJobError {
   ServerError,
   NotFound,
@@ -61,6 +62,17 @@ impl fmt::Display for TerminateInferenceJobError {
 }
 
 
+#[utoipa::path(
+  delete,
+  path = "/v1/model_inference/job/{token}",
+  params(
+    ("path" = TerminateInferenceJobPathInfo, description = "Path params for Request")
+  ),
+  responses(
+    (status = 200, body = ListUserBookmarksForEntitySuccessResponse),
+    (status = 500, body = TerminateInferenceJobError),
+  ),
+)]
 pub async fn terminate_inference_job_handler(
   http_request: HttpRequest,
   path: Path<TerminateInferenceJobPathInfo>,

@@ -8,6 +8,7 @@ use actix_web::web::Path;
 use chrono::{DateTime, Utc};
 use log::error;
 use r2d2_redis::redis::{Commands, RedisResult};
+use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use buckets::public::voice_conversion_results::bucket_file_path::VoiceConversionResultOriginalFilePath;
@@ -29,18 +30,18 @@ use crate::server_state::ServerState;
 const JOB_KEEPALIVE_TTL_SECONDS : usize = 60 * 3;
 
 /// For the URL PathInfo
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct GetInferenceJobStatusPathInfo {
   token: InferenceJobToken,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct GetInferenceJobStatusSuccessResponse {
   pub success: bool,
   pub state: InferenceJobStatusResponsePayload,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct InferenceJobStatusResponsePayload {
   pub job_token: InferenceJobToken,
 
@@ -52,7 +53,7 @@ pub struct InferenceJobStatusResponsePayload {
   pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct RequestDetailsResponse {
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>,
@@ -64,7 +65,7 @@ pub struct RequestDetailsResponse {
   pub maybe_raw_inference_text: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct StatusDetailsResponse {
   /// Primary status from the database (a state machine).
   pub status: JobStatusPlus,
@@ -89,7 +90,7 @@ pub struct StatusDetailsResponse {
   pub maybe_failure_category: Option<FrontendFailureCategory>
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct ResultDetailsResponse {
   pub entity_type: String,
   pub entity_token: String,
@@ -100,7 +101,7 @@ pub struct ResultDetailsResponse {
   pub maybe_successfully_completed_at: Option<DateTime<Utc>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum GetInferenceJobStatusError {
   ServerError,
   NotFound,
@@ -132,6 +133,17 @@ impl fmt::Display for GetInferenceJobStatusError {
 }
 
 
+#[utoipa::path(
+  get,
+  path = "/v1/model_inference/job/{token}",
+  params(
+    ("path" = GetInferenceJobStatusPathInfo, description = "Path params for Request")
+  ),
+  responses(
+    (status = 200, body = GetInferenceJobStatusSuccessResponse),
+    (status = 500, body = GetInferenceJobStatusError),
+  ),
+)]
 pub async fn get_inference_job_status_handler(
   http_request: HttpRequest,
   path: Path<GetInferenceJobStatusPathInfo>,

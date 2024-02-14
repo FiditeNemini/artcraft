@@ -51,11 +51,15 @@ use crate::http_server::endpoints::weights::search_model_weights_handler::*;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::*;
 use crate::http_server::endpoints::weights::update_weight::*;
 use crate::http_server::web_utils::response_success_helpers::*;
+use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
+use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
 
 #[derive(OpenApi)]
 #[openapi(
   paths(
     crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::enqueue_fbx_to_gltf_handler,
+    crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler,
+    crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler,
     crate::http_server::endpoints::media_files::delete_media_file::delete_media_file_handler,
     crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler,
     crate::http_server::endpoints::media_files::list_featured_media_files::list_featured_media_files_handler,
@@ -147,11 +151,15 @@ use crate::http_server::web_utils::response_success_helpers::*;
     GetMediaFilePathInfo,
     GetMediaFileSuccessResponse,
     GetProfilePathInfo,
+    GetInferenceJobStatusError,
+    GetInferenceJobStatusPathInfo,
+    GetInferenceJobStatusSuccessResponse,
     GetUserRatingError,
     GetUserRatingResponse,
     GetWeightError,
     GetWeightPathInfo,
     GetWeightResponse,
+    InferenceJobStatusResponsePayload,
     ListAvailableWeightsQuery,
     ListAvailableWeightsSuccessResponse,
     ListDatasetsByUserError,
@@ -189,6 +197,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ModelWeightSearchResult,
     ProfileError,
     RatingRow,
+    RequestDetailsResponse,
+    ResultDetailsResponse,
     SearchModelWeightsError,
     SearchModelWeightsRequest,
     SearchModelWeightsSuccessResponse,
@@ -202,7 +212,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     SetUserRatingError,
     SetUserRatingRequest,
     SetUserRatingResponse,
+    StatusDetailsResponse,
     StorytellerStreamPlan,
+    TerminateInferenceJobError,
+    TerminateInferenceJobPathInfo,
+    TerminateInferenceJobSuccessResponse,
     UpdateWeightError,
     UpdateWeightPathInfo,
     UpdateWeightRequest,
