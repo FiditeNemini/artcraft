@@ -29,6 +29,7 @@ export default function MediaTab() {
   );
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [list, listSet] = useState<MediaFile[]>([]);
+  console.log("💙",list);
   const media = useLazyLists({
     addQueries: {
       page_size: 24,
@@ -42,8 +43,10 @@ export default function MediaTab() {
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: res => {
+      console.log("😎",res);
       ratings.gather({ res, expand: true, key: "token" }); // expand rather than replace for lazy loading
       bookmarks.gather({ res, expand: true, key: "token" }); // expand rather than replace for lazy loading
+      console.log("🩵",);
       setShowMasonryGrid(true);
     },
     requestList: true,

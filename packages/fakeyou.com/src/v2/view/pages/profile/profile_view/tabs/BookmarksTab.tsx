@@ -58,8 +58,8 @@ export default function BookmarksTab({ username }: { username: string }) {
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: res => {
-      bookmarks.gather({ res, key: "weight_token" });
-      ratings.gather({ res, key: "weight_token" });
+      bookmarks.gather({ res, key: "entity_token" });
+      ratings.gather({ res, key: "entity_token" });
       setShowMasonryGrid(true);
     },
     requestList: true,
@@ -236,7 +236,7 @@ export default function BookmarksTab({ username }: { username: string }) {
                     >
                       <WeightsCards
                         {...{
-                          type: data.details.maybe_weight_data.weight_category,
+                          type: data.details.maybe_weight_data?.weight_category,
                           props: weightProps,
                         }}
                       />
