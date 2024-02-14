@@ -6,6 +6,7 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
+use actix_web::web::Json;
 use log::warn;
 use serde::Deserialize;
 use serde::Serialize;
@@ -114,6 +115,9 @@ pub async fn enqueue_bvh_to_workflow_handler(
     request: web::Json<EnqueueBvhToWorkflowRequest>,
     server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, EnqueueBvhToWorkflowRequestError> {
+
+    validate_request(&request)?;
+
     let mut maybe_user_token: Option<UserToken> = None;
 
     let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {
@@ -231,4 +235,16 @@ pub async fn enqueue_bvh_to_workflow_handler(
         .map_err(|_e| EnqueueBvhToWorkflowRequestError::ServerError)?;
 
     Ok(HttpResponse::Ok().content_type("application/json").body(body))
+}
+
+fn validate_request(request: &Json<EnqueueBvhToWorkflowRequest>) -> Result<(), EnqueueBvhToWorkflowRequestError> {
+  if request.media_file_token.0.trim().is_empty() {
+    return Err(EnqueueBvhToWorkflowRequestError::BadInput("token is empty".to_string()));
+  }
+
+  if request.uuid_idempotency_token.trim().is_empty() {
+    return Err(EnqueueBvhToWorkflowRequestError::BadInput("idempotency token is empty".to_string()));
+  }
+
+  Ok(())
 }
