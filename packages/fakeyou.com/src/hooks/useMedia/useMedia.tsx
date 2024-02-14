@@ -7,7 +7,6 @@ export default function useMedia({ mediaToken = "", onSuccess = (res:MediaFile) 
   const [status, statusSet] = useState(FetchStatus.ready);
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
   const [media,mediaSet] = useState<MediaFile | undefined>();
-
   const remove = (as_mod: boolean) => {
     writeStatusSet(FetchStatus.in_progress);
     DeleteMedia(mediaToken, {
@@ -33,6 +32,11 @@ export default function useMedia({ mediaToken = "", onSuccess = (res:MediaFile) 
       .catch((err) => {
         statusSet(FetchStatus.error);
       });
+    }
+
+    if (media && media.token !== mediaToken) {
+      mediaSet(undefined);
+      statusSet(FetchStatus.ready);
     }
 
   },[media, mediaToken, onSuccess, status, statusSet]);
