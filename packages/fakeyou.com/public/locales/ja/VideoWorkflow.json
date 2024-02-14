@@ -5,6 +5,7 @@
     "previewWorkflow": "ワークフロー結果のプレビュー",
     "proceed": "ワークフロー制御に進む",
     "process": "プロセスからワークフローへ",
+    "resetToDefault": "デフォルト値にリセットする",
     "select": "選択する",
     "upload": "ビデオをアップロードする"
   },

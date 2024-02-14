@@ -49,7 +49,7 @@ export default function useMedia({
       statusSet(FetchStatus.ready);
     }
 
-  },[media, mediaToken, onSuccess, status, statusSet]);
+  },[media, mediaToken, previousToken, onSuccess, status, statusSet]);
 
  return { media, mediaSet, remove, status, writeStatus };
 };
