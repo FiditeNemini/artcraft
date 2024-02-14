@@ -6,7 +6,7 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 
-import { BasicVideo, Button, Container, Panel, Tabs } from "components/common";
+import { Button, Container, Panel, Tabs } from "components/common";
 import { useInferenceJobs, useLocalize } from "hooks";
 
 import TabContentUpload from "./components/tabContentUpload";

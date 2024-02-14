@@ -1,6 +1,14 @@
 import React from "react";
 import { animated } from "@react-spring/web";
-import { TempAudioPlayer, AudioBlobPreview, AudioInput, BasicVideo, Checkbox, ImageInput, SegmentButtons } from "components/common";
+import {
+  TempAudioPlayer,
+  AudioBlobPreview,
+  AudioInput,
+  VideoBasic,
+  Checkbox,
+  ImageInput,
+  SegmentButtons
+} from "components/common";
 import { FaceAnimatorSlide } from "../FaceAnimatorTypes";
 
 export default function FaceAnimatorInput({ audioProps, imageProps, frameDimensions, frameDimensionsChange, disableFaceEnhancement, disableFaceEnhancementChange, preferPresetAudio,  preferPresetAudioSet,  presetAudio,  still, stillChange, toggle, style, t, removeWatermark, removeWatermarkChange, }: FaceAnimatorSlide) {
@@ -36,7 +44,7 @@ export default function FaceAnimatorInput({ audioProps, imageProps, frameDimensi
           hideActions: true,
         }}/>
       </AudioInput> }
-      <BasicVideo
+      <VideoBasic
         className="face-animator-wide-sample"
         title="Face Animator Sample"
         src="/videos/face-animator-instruction-en.mp4"

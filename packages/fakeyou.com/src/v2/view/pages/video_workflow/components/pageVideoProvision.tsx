@@ -1,6 +1,6 @@
 import React from "react";
 
-import { BasicVideo, Panel, Tabs } from "components/common";
+import { Panel, Tabs } from "components/common";
 
 import { State, Action } from "../videoWorkflowReducer";
 import TabContentUpload from "./tabContentUpload";
