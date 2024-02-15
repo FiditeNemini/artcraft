@@ -21,6 +21,7 @@ export interface MediaFile {
     maybe_weight_creator: UserDetailsLight;
     maybe_cover_image_public_bucket_path: string;
   };
+  maybe_text_transcript?: string;
 }
 
 export enum MediaFileLookupError {
