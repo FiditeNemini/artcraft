@@ -377,11 +377,36 @@ function SdInferencePanel({
                 value: aspectRatio,
               }}
             />
+            <div>
+              <Label label="Number of Generations" />
+              <PremiumLock
+                sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+                requiredPlan="pro"
+              >
+                <SegmentButtons
+                  {...{
+                    name: "batchCount",
+                    onChange,
+                    options: batchCountOpts,
+                    value: batchCount,
+                  }}
+                />
+              </PremiumLock>
+            </div>
           </div>
 
           <Accordion>
             <Accordion.Item title="Advanced">
               <div className="p-3 d-flex flex-column gap-3">
+                <TempSelect
+                  {...{
+                    label: "Sampler",
+                    name: "sampler",
+                    onChange,
+                    options: samplerOpts,
+                    value: sampler,
+                  }}
+                />
                 <div>
                   <label className="sub-title">Seed</label>
                   <div className="d-flex gap-2 align-items-center">
@@ -402,15 +427,6 @@ function SdInferencePanel({
                     />
                   </div>
                 </div>
-                <TempSelect
-                  {...{
-                    label: "Sampler",
-                    name: "sampler",
-                    onChange,
-                    options: samplerOpts,
-                    value: sampler,
-                  }}
-                />
                 <NumberSlider
                   {...{
                     min: 1,
@@ -458,22 +474,6 @@ function SdInferencePanel({
                     ]}
                   />
                 )}
-                <div>
-                  <Label label="Number of Generations" />
-                  <PremiumLock
-                    sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                    requiredPlan="pro"
-                  >
-                    <SegmentButtons
-                      {...{
-                        name: "batchCount",
-                        onChange,
-                        options: batchCountOpts,
-                        value: batchCount,
-                      }}
-                    />
-                  </PremiumLock>
-                </div>{" "}
               </div>
             </Accordion.Item>
           </Accordion>
