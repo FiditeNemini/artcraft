@@ -20,6 +20,7 @@ import MocapInput from "./MocapInput";
 import Modal from "./Modal";
 import NumberSlider from "./NumberSlider";
 import NumberSliderV2 from "./NumberSliderV2";
+import Pagination from "./Pagination";
 import Panel from "./Panel";
 import Radio from "./Radio";
 import SegmentButtons from "./SegmentButtons";
@@ -63,6 +64,7 @@ export {
   Modal,
   NumberSlider,
   NumberSliderV2,
+  Pagination,
   Panel,
   Radio,
   SegmentButtons,

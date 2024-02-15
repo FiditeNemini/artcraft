@@ -1,33 +1,27 @@
 import React, { useState } from "react";
 import { MediaList } from "components/entities";
-import {
-  EntityType,
-  EntityFilterOptions,
-  MediaFilterProp,
-  WeightFilterProp,
-} from "components/entities/EntityTypes";
-import { TempSelect } from "components/common";
+import { AcceptTypes, EntityInputMode, EntityFilterOptions, } from "components/entities/EntityTypes";
+import { Pagination, TempSelect } from "components/common";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
-import Pagination from "components/common/Pagination";
+import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
 import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
 import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
 import { SearchWeights } from "@storyteller/components/src/api/weights/SearchWeights";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
-import { useListContent, useRatings } from "hooks";
-import {
-  faArrowDownWideShort,
-  faFilter,
-} from "@fortawesome/pro-solid-svg-icons";
+import { useListContent, 
+  // useRatings
+} from "hooks";
+import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
 import prepFilter from "resources/prepFilter";
 import ModalHeader from "../ModalHeader";
 import "./MediaBrowser.scss";
 
 interface Props {
-  entityType: EntityType;
-  filterType?: MediaFilterProp | WeightFilterProp;
+  accept?: AcceptTypes[],
   handleClose: any;
+  inputMode: EntityInputMode;
   mediaToken: string;
   onSelect?: any;
   owner?: string;
@@ -36,30 +30,28 @@ interface Props {
 }
 
 export default function MediaBrowser({
-  entityType,
-  filterType: inputFilter,
+  accept,
   mediaToken,
   handleClose = () => {},
+  inputMode,
   onSelect,
   owner,
   search,
-  username,
+  username
 }: Props) {
-  const ratings = useRatings();
+  // const ratings = useRatings();
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
-  const [filterType, filterTypeSet] = useState(inputFilter || "all");
+  const [filterType, filterTypeSet] = useState(accept ? accept[0] : "all");
   const [list, listSet] = useState<MediaFile | Weight[]>([]);
-  const fetcher = search
-    ? SearchWeights
-    : [() => {}, GetMediaByUser, GetWeightsByUser][entityType] ||
-      GetMediaByUser;
+  const fetcher = [GetBookmarksByUser,GetMediaByUser,GetWeightsByUser,SearchWeights][inputMode];
+
   const entities = useListContent({
     debug: "media browser",
     addQueries: {
       ...(search ? {} : { page_size: 24 }),
       ...prepFilter(
         filterType,
-        ["", "filter_media_type", "maybe_scoped_weight_type"][entityType]
+        ["maybe_scoped_weight_type", "filter_media_type", "maybe_scoped_weight_type",""][inputMode]
       ),
     },
     addSetters: { filterTypeSet },
@@ -69,12 +61,12 @@ export default function MediaBrowser({
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: res => {
       // bookmarks.gather({ res, key: "token" });
-      ratings.gather({ res, key: "token" });
+      // ratings.gather({ res, key: "token" });
       setShowMasonryGrid(true);
     },
     ...(search ? { request: { search_term: search } } : {}),
     requestList: true,
-    ...(search ? { resultsKey: "weights" } : {}),
+    // ...(search ? { resultsKey: "weights" } : {}),
     urlParam: owner || username,
     urlUpdate: false,
   });
@@ -95,15 +87,24 @@ export default function MediaBrowser({
     // { value: "mostliked", label: "Most Liked" },
   ];
 
-  const title = ["", `${owner ? owner + "'s " : ""}Media`, "Weights"][
-    entityType
-  ];
+  const onwerTxt = (entityName: string) => `${ owner ? owner + "'s " : "" }${ entityName }`;
+
+  const title = [
+    onwerTxt("Bookmarks"),
+    onwerTxt("Media"),
+    onwerTxt("Weights"),
+    "Search"
+  ][inputMode];
 
   const onClick = (data: any) => {
-    console.log("🩵", data);
     onSelect(data);
     handleClose();
   };
+
+  const filterOptions = accept ? accept.map((value: string) => ({
+      value,
+      label: value
+    })) : EntityFilterOptions(inputMode);
 
   return (
     <>
@@ -117,11 +118,11 @@ export default function MediaBrowser({
             value: entities.sort,
           }}
         />
-        {(!inputFilter || inputFilter === "all") && (
+        {(!accept || (accept && accept.length) ) && (
           <TempSelect
             {...{
               icon: faFilter,
-              options: EntityFilterOptions(entityType),
+              options: filterOptions,
               name: "filterType",
               onChange: entities.onChange,
               value: filterType,
@@ -143,7 +144,7 @@ export default function MediaBrowser({
               <div {...{ className: "fy-media-browser-list" }}>
                 <MediaList
                   {...{
-                    entityType,
+                    entityType: 1,
                     list: entities.list,
                     success: entities.status === 3,
                     onClick,
