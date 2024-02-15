@@ -27,6 +27,8 @@ pub struct MediaFile {
   // TODO: Other media details (file size, mime type, dimensions, duration, etc.)
   // TODO: Provenance data (product, upload vs inference, model details and foreign keys)
 
+  pub maybe_text_transcript: Option<String>,
+
   pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
@@ -81,6 +83,8 @@ pub struct MediaFileRaw {
   pub media_type: MediaFileType,
 
   // TODO: Bucket hash bits.
+
+  pub maybe_text_transcript: Option<String>,
 
   pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_username: Option<String>,
@@ -143,6 +147,7 @@ pub async fn get_media_file(
   Ok(Some(MediaFile {
     token: record.token,
     media_type: record.media_type,
+    maybe_text_transcript: record.maybe_text_transcript,
     maybe_creator_user_token: record.maybe_creator_user_token,
     maybe_creator_username: record.maybe_creator_username,
     maybe_creator_display_name: record.maybe_creator_display_name,
@@ -186,6 +191,8 @@ SELECT
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
+
+    m.maybe_text_transcript,
 
     m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
@@ -251,6 +258,8 @@ SELECT
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
+
+    m.maybe_text_transcript,
 
     m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 

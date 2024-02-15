@@ -62,6 +62,9 @@ pub struct MediaFileInfo {
 
   pub creator_set_visibility: Visibility,
 
+  /// Text transcripts for TTS, etc.
+  pub maybe_text_transcript: Option<String>,
+
   /// We can simulate media files for "tts_results" records.
   /// If this is set as true, this informs the frontend and API callers not to treat
   /// the token as a media file and improperly assume it can be used with the rest of
@@ -250,6 +253,7 @@ async fn modern_media_file_lookup(
       token: result.token,
       media_type: result.media_type,
       public_bucket_path,
+      maybe_text_transcript: result.maybe_text_transcript,
       maybe_model_weight_info: match result.maybe_model_weights_token {
         None => None,
         Some(weight_token) => Some(GetMediaFileModelInfo {
@@ -349,6 +353,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
         result.maybe_creator_gravatar_hash,
       ),
       creator_set_visibility: result.creator_set_visibility,
+      maybe_text_transcript: Some(result.raw_inference_text),
       is_emulated_media_file: true,
       stats: SimpleEntityStats {
         positive_rating_count: 0,
