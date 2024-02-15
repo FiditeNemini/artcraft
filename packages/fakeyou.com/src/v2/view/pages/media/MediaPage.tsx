@@ -444,11 +444,11 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
-                {mediaFile?.media_type === MediaFileType.BVH ? (
+                {mediaFile?.media_type === MediaFileType.BVH || mediaFile?.media_type === MediaFileType.GLTF || mediaFile?.media_type === MediaFileType.GLB   ? (
                   <Button
                     {...{
                       icon: faVideoPlus,
-                      label: "Use BVH in Engine Compositor",
+                      label: "Use in Engine Compositor",
                       to: `/engine-compositor?preset_token=${mediaFile.token}`,
                       variant: "primary",
                       className: "flex-grow-1",
