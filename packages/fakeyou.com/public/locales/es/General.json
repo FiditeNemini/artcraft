@@ -1,0 +1,18 @@
+{
+  "button": {
+    "tooltip": {
+      "revert": "Volver al valor predeterminado"
+    }
+  },
+  "input": {
+    "placeholder": {
+      "randomSeed": "Generada automáticamente"
+    }
+  },
+  "segButton": {
+    "label": {
+      "customSeed": "Costumbre",
+      "randomSeed": "Aleatorio"
+    }
+  }
+}

@@ -3,6 +3,7 @@ import AudioBlobPreview from "./AudioBlobPreview";
 import AudioInput from "./AudioInput";
 import Badge from "./Badge";
 import Button from "./Button";
+import ButtonRevertToDefault from "./ButtonRevertToDefault";
 import Checkbox from "./Checkbox";
 import Container from "./Container";
 import CoverImageInput from "./CoverImageInput";
@@ -47,6 +48,7 @@ export {
   AudioInput,
   Badge,
   Button,
+  ButtonRevertToDefault,
   Checkbox,
   Container,
   CoverImageInput,

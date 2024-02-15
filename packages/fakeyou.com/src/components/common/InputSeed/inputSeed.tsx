@@ -1,4 +1,5 @@
 import React, {useState, useEffect, useCallback, memo} from 'react';
+
 import { useLocalize } from 'hooks';
 import {
   Input,
@@ -18,7 +19,7 @@ export default memo (function InputSeed({
   initialValue?: string;
   onChange: (newSeed: string)=>void;
 }){
-  const {t:tHook} = useLocalize("SeedInput");
+  const {t:tHook} = useLocalize("General");
   const t = tProps ? tProps : tHook;
   const[{firstLoad, inputType, seedValue}, setState] = useState<{
     firstLoad: boolean;
@@ -67,8 +68,8 @@ export default memo (function InputSeed({
       setNewRandomSeed(inputType);
   }
   const seedOpts = [
-    { label: t("random"), value: "random" },
-    { label: t("custom"), value: "custom" },
+    { label: t("segButton.label.randomSeed"), value: "random" },
+    { label: t("segButton.label.customSeed"), value: "custom" },
   ];
 
   return(
@@ -85,7 +86,7 @@ export default memo (function InputSeed({
         />
         <Input
           className="numberInputNoArrows"
-          placeholder={t("randomPlaceholder")}
+          placeholder={t("input.placeholder.randomSeed")}
           value={inputType === "custom" ? seedValue : ""}
           onChange={handleSeedChange}
           onBlur={handleOnBlur}
