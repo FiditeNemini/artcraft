@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, forwardRef } from "react";
 import { useMedia } from "hooks";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import makeClass from "resources/makeClass";
+
+import { Label } from "components/common"
 
 
 
@@ -10,14 +12,18 @@ interface Props {
   className?: string;
   src?: string;
   mediaToken?: string;
+  label?: string;
 }
 
-export default function VideoFromFakeyou({
+type Ref = HTMLVideoElement;
+
+const VideoFromFakeyou = forwardRef<Ref, Props>(({
   className,
   src,
   mediaToken,
+  label,
   ...rest
-}: Props) {
+}: Props, ref) => {
   const [mediaFile, setMediaFile] = useState<MediaFile>();
   useMedia({
     mediaToken: mediaToken,
@@ -31,11 +37,14 @@ export default function VideoFromFakeyou({
   if (mediaLink){
     return (
       <div {...{ ...makeClass("fy-basic-video",className) }}>
-        <video controls key={mediaToken} {...rest}>
+        {label && <Label label={label}/>}
+        <video controls key={mediaToken} {...rest} ref={ref}>
           <source src={mediaLink} type="video/mp4" />
         </video>
       </div>
     )
   }
   return null;
-};
+});
+
+export default VideoFromFakeyou;
