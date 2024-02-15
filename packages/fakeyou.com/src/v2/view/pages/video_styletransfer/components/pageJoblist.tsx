@@ -20,7 +20,7 @@ export default memo (function PageWorkflowJoblist({
       <div className="row mb-3">
         <NavLink to={`${parentPath}`}>
           <Button
-            label={t("button.generateNewWorkflow")}
+            label={t("button.generateNew")}
             variant="primary"
           />
         </NavLink>

@@ -38,6 +38,8 @@ export default function PageVSTApp({
     ...ivs
   });
 
+  const [styleStrength, setStyleStrength]= useState<number>(8);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   if(videoRef?.current){
     const ve = videoRef.current
@@ -68,8 +70,8 @@ export default function PageVSTApp({
     setWorkflowValues((curr)=>({...curr, [key]: newValue}));
   }
 
-  const mapStyleStrength = (value:number)=>{
-    if(debug) console.log(`Style Strength: ${value}, it is not map to anything`)
+  const handleStyleStrength = (value:number)=>{
+    setStyleStrength(value);
   };
   const history = useHistory();
   const handleGenerate = ()=>{
@@ -140,11 +142,11 @@ export default function PageVSTApp({
           <br/>
           <NumberSliderV2 {...{
             min: 1, max: 10, step: 1,
-            initialValue: workflowValues.upscaleMultiplier,
+            initialValue: styleStrength,
             label: t("input.label.styleStrength"),
-            thumbTip: "24 frames = 1 sec",
+            thumbTip: t("input.thumbtip.styleStrength"),
             withRevert:true,
-            onChange: (val)=>{handleOnChange("upscaleMultiplier",val)}
+            onChange: handleStyleStrength
           }}/>
         </div>
         <div className="col-12 col-md-6">
@@ -180,7 +182,7 @@ export default function PageVSTApp({
             />
           </NavLink>
           <Button
-            label={t("button.enqueueWorkflow")}
+            label={t("button.enqueue")}
             onClick={handleGenerate}
             variant="primary"
           />
