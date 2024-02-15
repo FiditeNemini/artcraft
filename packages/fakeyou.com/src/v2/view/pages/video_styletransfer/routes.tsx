@@ -1,6 +1,6 @@
 import React from "react";
 import {Switch, Route, useRouteMatch, Redirect, useHistory} from "react-router-dom";
-// import PageWorkflowControls from "./components/pageWorkflowControls";
+import PageVSTApp from "./components/pageVSTApp";
 import PageVideoProvision from "./components/pageVideoProvision";
 import PageJoblist from "./components/pageJoblist";
 import {states,State,Action} from "./reducer";
@@ -29,9 +29,9 @@ export default function SubRoutes ({
 
   return(
     <Switch>
-      {/* <Route exact path={`${path}/load/:mediaToken`} >
-        <PageWorkflowControls {...commonPageProps}/>
-      </Route> */}
+      <Route exact path={`${path}/load/:mediaToken`} >
+        <PageVSTApp {...commonPageProps}/>
+      </Route>
       <Route exact path={`${path}/upload`}>
         <PageVideoProvision {...commonPageProps}/>
       </Route>

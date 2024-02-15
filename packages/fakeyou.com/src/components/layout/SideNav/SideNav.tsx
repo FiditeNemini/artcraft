@@ -8,6 +8,7 @@ import {
   faCameraMovie,
   faCompass,
   faCloudUpload,
+  faFilms,
   faFaceViewfinder,
   faHome,
   faMessageDots,
@@ -302,6 +303,20 @@ export default function SideNav({
               className="sidebar-heading-icon"
             />
             {t("videoWorkflow")}
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink
+            to="/video-styletransfer"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faFilms}
+              className="sidebar-heading-icon"
+            />
+            {t("videoStryleTransfer")}
           </NavLink>
         </li>
 
