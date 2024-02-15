@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { EntityInput } from "components/entities";
 import { EntityFilterOptions, EntityType, MediaFilterProp, WeightFilterProp } from "components/entities/EntityTypes";
-import { useModal, 
-  // useSession 
-} from "hooks";
+import { useModal, useSession } from "hooks";
 import { InferenceJobsModal } from "components/modals";
+import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 import { Button, SegmentButtons, TempInput, TempSelect } from "components/common";
 
 interface Props {
@@ -12,8 +11,7 @@ interface Props {
 }
 
 export default function DevMediaInput({ value }: Props) {
-  // const session = useSession();
-  // console.log("🤦🏻‍♂️",session);
+  const { studioAccessCheck, user } = useSession();
   const [mediaToken,mediaTokenSet] = useState();
   const [mediaType,mediaTypeSet] = useState<MediaFilterProp>("all");
   const [weightType,weightTypeSet] = useState<WeightFilterProp>("all");
@@ -29,7 +27,9 @@ export default function DevMediaInput({ value }: Props) {
 
   const openModal = () => open({ component: InferenceJobsModal });
 
-  return <div {...{ className: "fy-engine-compositor"}}>
+  if (!user.can_access_studio) return <StudioNotAvailable />;
+
+  return studioAccessCheck(<div {...{ className: "fy-engine-compositor"}}>
     <div {...{ className: "panel engine-compositor-container" }}>
       <header>
         <h2>{ [526,187].map((num = 0) => String.fromCodePoint(128000 + num)) }</h2>
@@ -55,5 +55,5 @@ export default function DevMediaInput({ value }: Props) {
         { mediaToken }
        </div>
     </div>
-  </div>;
+  </div>);
 };
