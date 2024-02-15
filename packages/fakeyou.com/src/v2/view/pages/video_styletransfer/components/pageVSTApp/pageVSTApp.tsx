@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-
+import { NavLink } from 'react-router-dom';
 import { useParams, useHistory } from "react-router-dom";
 
 import { EnqueueVideoWorkflow } from "@storyteller/components/src/api/video_workflow";
@@ -23,7 +23,7 @@ import {
 } from "components/common";
 
 export default function PageVSTApp({
-  debug=true, t, pageState, dispatchPageState, parentPath
+  debug, t, pageState, dispatchPageState, parentPath
 }: {
   debug?: boolean;
   t: Function;
@@ -67,13 +67,17 @@ export default function PageVSTApp({
   const handleOnChange = (key: string, newValue:any,) => {
     setWorkflowValues((curr)=>({...curr, [key]: newValue}));
   }
+
+  const mapStyleStrength = (value:number)=>{
+    if(debug) console.log(`Style Strength: ${value}, it is not map to anything`)
+  };
   const history = useHistory();
   const handleGenerate = ()=>{
     if(debug) console.log(workflowValues)
 
     if (isInputValid(workflowValues)){
       const request = mapRequest(workflowValues);
-      console.log(request);
+      if (debug) console.log(request);
       EnqueueVideoWorkflow(request).then(res => {
         if (res.success && res.inference_job_token) {
           dispatchPageState({
@@ -105,7 +109,7 @@ export default function PageVSTApp({
           </div>
           <div className="col-12 col-md-6">
             <Label label={t("image.label.preview")}/>
-            {debug && <p><TableOfKeyValues keyValues={workflowValues}/></p>}
+            {debug && <TableOfKeyValues keyValues={workflowValues} height={400}/>}
           </div>
       </div>
       <div className="row g-3  mb-4">
@@ -168,11 +172,13 @@ export default function PageVSTApp({
       </div>
       <div className="row g-3">
         <div className="col-12 d-flex justify-content-between">
-          <Button
-            label={t("button.cancel")}
-            // onClick={handleGenerate}
-            variant="primary"
-          />
+          <NavLink to={`${parentPath}`}>
+            <Button
+              label={t("button.cancel")}
+              // onClick={handleGenerate}
+              variant="primary"
+            />
+          </NavLink>
           <Button
             label={t("button.enqueueWorkflow")}
             onClick={handleGenerate}

@@ -42,6 +42,7 @@ export type WorkflowValuesType = {
   cnSparse: number;
   cnTile: number;
 }
+
 export function isInputValid(keyValues: {[key:string]:number|string|boolean|undefined}){
   return (
     keyValues.sdModelToken 
@@ -85,18 +86,21 @@ export function mapRequest(workflowValues: WorkflowValuesType){
 export function TableOfKeyValues(
 {
   keyValues,
-  maxHeight=500
+  height
 }:{
   keyValues:{
     [key:string]:number|string|boolean|undefined
   };
-  maxHeight?: number
+  height?: number | string
 }){
   return(<table style={{
-    maxHeight: maxHeight,
-    overflow: "scroll",
+    display:'block',
+    height: height || "100%",
+    overflowY: "scroll",
+    overflowX: "clip",
     border: "1px solid white",
-    borderRadius: "1rem",
+    borderTopLeftRadius: "1rem",
+    borderBottomLeftRadius: "1rem",
   }}>{
     Object.entries(keyValues).map(([key, val], index: number)=>{
       return <tr key={index}><td>{`${key}`}</td><td>{`${val}`}</td></tr>
