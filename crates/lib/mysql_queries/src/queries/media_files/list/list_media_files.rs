@@ -47,6 +47,8 @@ pub struct MediaFileListItem {
   pub maybe_creator_display_name: Option<String>,
   pub maybe_creator_gravatar_hash: Option<String>,
 
+  pub maybe_text_transcript: Option<String>,
+
   pub creator_set_visibility: Visibility,
 
   #[deprecated(note = "more expensive to query")]
@@ -111,6 +113,7 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
           maybe_creator_username: record.maybe_creator_username,
           maybe_creator_display_name: record.maybe_creator_display_name,
           maybe_creator_gravatar_hash: record.maybe_creator_gravatar_hash,
+          maybe_text_transcript: record.maybe_text_transcript,
           creator_set_visibility: record.creator_set_visibility,
           comment_count: record.comment_count as u64,
           favorite_count: record.favorite_count as u64,
@@ -173,6 +176,9 @@ SELECT
   entity_stats.bookmark_count as maybe_bookmark_count,
 
   m.creator_set_visibility,
+
+  m.maybe_text_transcript,
+
   m.created_at,
   m.updated_at,
 
@@ -308,6 +314,8 @@ struct MediaFileListItemInternal {
   maybe_ratings_negative_count: Option<u32>,
   maybe_bookmark_count: Option<u32>,
 
+  maybe_text_transcript: Option<String>,
+
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
 }
@@ -346,6 +354,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_creator_display_name: row.try_get("maybe_creator_display_name")?,
       maybe_creator_gravatar_hash: row.try_get("maybe_creator_gravatar_hash")?,
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
+      maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       created_at: row.try_get("created_at")?,
       updated_at: row.try_get("updated_at")?,
       comment_count: row.try_get("comment_count")?,

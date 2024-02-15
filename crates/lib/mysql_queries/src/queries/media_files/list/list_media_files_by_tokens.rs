@@ -39,6 +39,9 @@ pub struct MediaFilesByTokensRecord {
   pub maybe_ratings_negative_count: Option<u32>,
   pub maybe_bookmark_count: Option<u32>,
 
+  /// Text transcripts for TTS, etc.
+  pub maybe_text_transcript: Option<String>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -87,6 +90,8 @@ async fn get_raw_media_files_by_tokens(
           m.maybe_public_bucket_prefix,
           m.maybe_public_bucket_extension,
 
+          m.maybe_text_transcript,
+
           entity_stats.ratings_positive_count as maybe_ratings_positive_count,
           entity_stats.ratings_negative_count as maybe_ratings_negative_count,
           entity_stats.bookmark_count as maybe_bookmark_count,
@@ -130,6 +135,8 @@ async fn get_raw_media_files_by_tokens(
           m.public_bucket_directory_hash,
           m.maybe_public_bucket_prefix,
           m.maybe_public_bucket_extension,
+
+          m.maybe_text_transcript,
 
           entity_stats.ratings_positive_count as maybe_ratings_positive_count,
           entity_stats.ratings_negative_count as maybe_ratings_negative_count,
@@ -204,6 +211,8 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
           maybe_public_bucket_prefix: media_file.maybe_public_bucket_prefix,
           maybe_public_bucket_extension: media_file.maybe_public_bucket_extension,
 
+          maybe_text_transcript: media_file.maybe_text_transcript,
+
           created_at: media_file.created_at,
           updated_at: media_file.updated_at,
         }
@@ -238,6 +247,8 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
     pub maybe_ratings_positive_count: Option<u32>,
     pub maybe_ratings_negative_count: Option<u32>,
     pub maybe_bookmark_count: Option<u32>,
+
+    pub maybe_text_transcript: Option<String>,
 
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -276,6 +287,7 @@ impl FromRow<'_, MySqlRow> for RawMediaFileJoinUser {
       maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
       maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,
       maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,
+      maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       created_at: row.try_get("created_at")?,
       updated_at: row.try_get("updated_at")?,
     })

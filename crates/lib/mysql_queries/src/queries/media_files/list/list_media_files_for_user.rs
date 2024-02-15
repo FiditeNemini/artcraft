@@ -40,6 +40,9 @@ pub struct MediaFileListItem {
 
   pub creator_set_visibility: Visibility,
 
+  /// Text transcripts for TTS, etc.
+  pub maybe_text_transcript: Option<String>,
+
   pub maybe_ratings_positive_count: Option<u32>,
   pub maybe_ratings_negative_count: Option<u32>,
   pub maybe_bookmark_count: Option<u32>,
@@ -107,6 +110,7 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
           maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
           maybe_public_bucket_extension: record.maybe_public_bucket_extension,
           creator_set_visibility: record.creator_set_visibility,
+          maybe_text_transcript: record.maybe_text_transcript,
           maybe_ratings_positive_count: record.maybe_ratings_positive_count,
           maybe_ratings_negative_count: record.maybe_ratings_negative_count,
           maybe_bookmark_count: record.maybe_bookmark_count,
@@ -145,6 +149,8 @@ fn select_result_fields() -> String {
     m.maybe_public_bucket_extension,
 
     m.creator_set_visibility,
+
+    m.maybe_text_transcript,
 
     entity_stats.ratings_positive_count as maybe_ratings_positive_count,
     entity_stats.ratings_negative_count as maybe_ratings_negative_count,
@@ -250,6 +256,9 @@ struct MediaFileListItemInternal {
 
   creator_set_visibility: Visibility,
 
+  /// Text transcripts for TTS, etc.
+  maybe_text_transcript: Option<String>,
+
   maybe_ratings_positive_count: Option<u32>,
   maybe_ratings_negative_count: Option<u32>,
   maybe_bookmark_count: Option<u32>,
@@ -285,6 +294,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
       maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
+      maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
       maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,
       maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,

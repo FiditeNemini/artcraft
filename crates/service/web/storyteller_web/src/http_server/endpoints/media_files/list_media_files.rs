@@ -73,6 +73,9 @@ pub struct MediaFileListItem {
 
   pub creator_set_visibility: Visibility,
 
+  /// Text transcripts for TTS, etc.
+  pub maybe_text_transcript: Option<String>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -242,6 +245,7 @@ pub async fn list_media_files_handler(
           bookmark_count: record.maybe_bookmark_count.unwrap_or(0),
         },
         creator_set_visibility: record.creator_set_visibility,
+        maybe_text_transcript: record.maybe_text_transcript,
         created_at: record.created_at,
         updated_at: record.updated_at,
       })

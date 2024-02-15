@@ -55,6 +55,9 @@ pub struct MediaFile {
 
   pub maybe_creator: Option<UserDetailsLight>,
 
+  /// Text transcripts for TTS, etc.
+  pub maybe_text_transcript: Option<String>,
+
   /// Statistics about the media file
   pub stats: SimpleEntityStats,
 
@@ -169,6 +172,7 @@ pub async fn list_featured_media_files_handler(
               m.maybe_creator_display_name,
               m.maybe_creator_email_gravatar_hash
             ),
+            maybe_text_transcript: m.maybe_text_transcript,
             stats: SimpleEntityStats {
               positive_rating_count: m.maybe_ratings_positive_count.unwrap_or(0),
               bookmark_count: m.maybe_bookmark_count.unwrap_or(0),
