@@ -27,9 +27,9 @@ export function TableOfKeyValues(
     border: "1px solid white",
     borderTopLeftRadius: "1rem",
     borderBottomLeftRadius: "1rem",
-  }}>{
+  }}><tbody>{
     Object.entries(keyValues).map(([key, val], index: number)=>{
       return <tr key={index}><td>{`${key}`}</td><td>{`${val}`}</td></tr>
     })
-  }</table>);
+  }</tbody></table>);
 }

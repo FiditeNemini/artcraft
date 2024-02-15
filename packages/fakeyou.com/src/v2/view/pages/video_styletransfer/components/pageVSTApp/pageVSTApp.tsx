@@ -41,7 +41,9 @@ export default function PageVSTApp({
   const [styleStrength, setStyleStrength]= useState<number>(8);
 
   const videoRef = useRef<HTMLVideoElement>(null);
+
   if(videoRef?.current){
+    if(debug) console.log("set-up video element listeners");
     const ve = videoRef.current
     ve.onloadedmetadata = () =>{
       if (ve.videoWidth && ve.videoHeight) {

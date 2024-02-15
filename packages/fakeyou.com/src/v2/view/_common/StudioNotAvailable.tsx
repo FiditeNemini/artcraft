@@ -5,7 +5,7 @@ import React from "react";
 
 export function StudioNotAvailable() {
   const subText = (
-    <p> Please visit our <DiscordLink2 /> to join the wait list. </p>
+    <> Please visit our <DiscordLink2 /> to join the wait list. </>
   );
 
   return (

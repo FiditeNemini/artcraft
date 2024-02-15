@@ -31,9 +31,11 @@ const renderTrack = ({ props: { style, ...props }, children }: any) => (
 const thumb =
   (thumbTip = "") =>
   ({ props: { style, ...props } }: any) => {
+    const key = Date.now()
     return (
       <Tippy
         {...{
+          key,
           arrow: false,
           content: thumbTip,
           placement: "bottom",
