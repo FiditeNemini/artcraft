@@ -111,6 +111,11 @@ export default function AudioCard({
                 : "Media Audio"}
             </h6>
             <p className="fs-7 opacity-75">{timeAgo}</p>
+            {data.maybe_text_transcript && (
+              <p className="fs-7 mt-2 two-line-ellipsis">
+                {data.maybe_text_transcript}
+              </p>
+            )}
           </div>
           <AudioPlayer src={data.public_bucket_path} id={data.token} />
           <CardFooter
