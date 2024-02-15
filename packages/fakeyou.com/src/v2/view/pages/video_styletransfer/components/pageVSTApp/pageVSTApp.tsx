@@ -2,14 +2,14 @@ import React, { useRef, useState } from "react";
 import { NavLink } from 'react-router-dom';
 import { useParams, useHistory } from "react-router-dom";
 
-import { EnqueueVideoWorkflow } from "@storyteller/components/src/api/video_workflow";
-import { states, Action, State } from "../../reducer";
+import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
+import { Action, State } from "../../reducer";
+import { TableOfKeyValues } from "../../commons";
 import ivs from "./initialValues";
 import {
   isInputValid,
   mapRequest,
   WorkflowValuesType,
-  TableOfKeyValues
 } from "./helpers";
 
 import {
@@ -80,10 +80,10 @@ export default function PageVSTApp({
     if (isInputValid(workflowValues)){
       const request = mapRequest(workflowValues);
       if (debug) console.log(request);
-      EnqueueVideoWorkflow(request).then(res => {
+      EnqueueVideoStyleTransfer(request).then(res => {
         if (res.success && res.inference_job_token) {
           dispatchPageState({
-            type: 'enqueueFilterSuccess',
+            type: 'enqueueJobSuccess',
             payload: {
               inferenceJobToken: res.inference_job_token
             }
@@ -92,7 +92,7 @@ export default function PageVSTApp({
           console.log(res);
         }
       })
-      dispatchPageState({type: 'enqueueFilter'})
+      dispatchPageState({type: 'enqueueJob'})
       history.push(`${parentPath}/jobs`);
     }else{
       alert("you must pick an sd weight and input a prompt");

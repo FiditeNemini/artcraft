@@ -1,9 +1,12 @@
 import React, { memo } from 'react'
 import { NavLink } from 'react-router-dom';
-import { states, Action, State } from "../reducer";
-import { Button, Spinner } from 'components/common';
 
-import CompJoblist from './compJoblist';
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import InferenceJobsList from "components/layout/InferenceJobsList";
+import { Analytics } from "common/Analytics";
+import { Button, Spinner } from 'components/common';
+import { states, Action, State } from "../reducer";
+import { inferenceFailures } from '../commons';
 
 export default memo (function PageWorkflowJoblist({
   t, pageState, dispatchPageState, parentPath
@@ -25,13 +28,18 @@ export default memo (function PageWorkflowJoblist({
           />
         </NavLink>
       </div>
-      {pageState.status === states.WORKFLOW_ENQUEUEING &&
+      {pageState.status === states.JOB_ENQUEUEING &&
         <div>
-          <h2> Requesting Filter Job</h2>
+          <h2>t("message.requestingJob")</h2>
           <Spinner />
         </div>
       }
-      <CompJoblist showNoJobs />
+      <InferenceJobsList {...{
+        showNoJobs:true,
+        failures: inferenceFailures,
+        onSelect: () => Analytics.voiceConversionClickDownload(),
+        jobType: FrontendInferenceJobType.VideoStyleTransfer,
+      }}/>
     </>
   );
 });

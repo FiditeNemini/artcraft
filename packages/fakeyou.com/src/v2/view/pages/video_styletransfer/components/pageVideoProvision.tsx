@@ -1,11 +1,17 @@
 import React from "react";
 
+
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import InferenceJobsList from "components/layout/InferenceJobsList";
+import { Analytics } from "common/Analytics";
+import { inferenceFailures } from "../commons";
+
 import { Panel, Tabs } from "components/common";
 
 import { State, Action } from "../reducer";
 import TabContentUpload from "./tabContentUpload";
 import TabContentLibrary from "./tabContentLibrary";
-import CompJoblist from "./compJoblist";
+
 
 export default function PageVideoProvision({
   debug=false, parentPath, t, pageState, dispatchPageState
@@ -48,7 +54,12 @@ export default function PageVideoProvision({
           </div>
         </div>
       </Panel>
-      <CompJoblist />
+      <InferenceJobsList {...{
+        showNoJobs:false,
+        failures: inferenceFailures,
+        onSelect: () => Analytics.voiceConversionClickDownload(),
+        jobType: FrontendInferenceJobType.VideoStyleTransfer,
+      }}/>
     </>
   );
 }

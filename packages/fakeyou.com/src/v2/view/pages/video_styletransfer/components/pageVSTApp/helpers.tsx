@@ -1,4 +1,3 @@
-import React from 'react';
 import { v4 as uuidv4 } from "uuid";
 
 export type WorkflowValuesType = {
@@ -81,29 +80,4 @@ export function mapRequest(workflowValues: WorkflowValuesType){
       "$.403.inputs.Value": workflowValues.cnSparse
     },
   }
-}
-
-export function TableOfKeyValues(
-{
-  keyValues,
-  height
-}:{
-  keyValues:{
-    [key:string]:number|string|boolean|undefined
-  };
-  height?: number | string
-}){
-  return(<table style={{
-    display:'block',
-    height: height || "100%",
-    overflowY: "scroll",
-    overflowX: "clip",
-    border: "1px solid white",
-    borderTopLeftRadius: "1rem",
-    borderBottomLeftRadius: "1rem",
-  }}>{
-    Object.entries(keyValues).map(([key, val], index: number)=>{
-      return <tr key={index}><td>{`${key}`}</td><td>{`${val}`}</td></tr>
-    })
-  }</table>);
 }

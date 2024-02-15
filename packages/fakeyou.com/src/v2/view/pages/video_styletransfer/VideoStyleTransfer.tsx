@@ -29,19 +29,19 @@ export default function VideoStyleTransfer(props:{
 
   const { enqueueInferenceJob } = props;
   useInferenceJobs(
-    FrontendInferenceJobType.VideoWorkflow
+    FrontendInferenceJobType.VideoStyleTransfer
   );
   useEffect(() => {
     if (
-      pageState.status === states.WORKFLOW_ENQUEUED &&
+      pageState.status === states.JOB_ENQUEUED &&
       pageState.inferenceJobToken
     ) {
       enqueueInferenceJob(
         pageState.inferenceJobToken,
-        FrontendInferenceJobType.VideoWorkflow
+        FrontendInferenceJobType.VideoStyleTransfer
       );
       dispatchPageState({
-        type: "enqueueFilterSuccess",
+        type: "enqueueJobSuccess",
         payload: { inferenceJobToken: undefined },
       });
     }
