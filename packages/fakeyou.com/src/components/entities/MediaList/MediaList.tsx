@@ -24,7 +24,7 @@ const MediaCards = ({ props, type }: MediaCardsProps) => {
       return <CardWrapper {...{ ...props, card: OverlayCard, preview: ImagePreview }}/>;
     case "video":
       return <CardWrapper {...{ ...props, card: OverlayCard, preview: VideoPreview }}/>;
-    case "bvh":
+    case "bvh": case "glb": case "gltf":
       return <CardWrapper {...{ ...props, card: OverlayCard, preview: MocapPreview }}/>;
     default:
       return <div>Unsupported media type</div>;
