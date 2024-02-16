@@ -299,6 +299,8 @@ class App extends React.Component<Props, State> {
     await this.querySessionSubscriptions();
 
     setInterval(async () => {
+      // See warnings in the following methods when adding new methods
+      // that affect global "state"
       await this.querySession();
       await this.querySessionSubscriptions();
     }, 60000);
@@ -309,6 +311,10 @@ class App extends React.Component<Props, State> {
   }
 
   querySession = async () => {
+    // WARNING: Making setState calls in this scope without checking existing
+    // state can cause the whole site to refresh/worsen UX. Double check if
+    // state needs to be set here, or if instead can be refreshed locally on
+    // the page where the new "state" needed
     const sessionWrapper = await SessionWrapper.lookupSession();
     const username = sessionWrapper.getDisplayName();
     const cookies = new Cookies();
@@ -336,7 +342,15 @@ class App extends React.Component<Props, State> {
   };
 
   querySessionSubscriptions = async () => {
-    this.setState({ sessionFetched: true });
+    // WARNING: Making setState calls in this scope without checking existing
+    // state can cause the whole site to refresh/worsen UX. Double check if
+    // state needs to be set here, or if instead can be refreshed locally on
+    // the page where the new "state" needed
+
+    if (this.state.sessionFetched === false){
+      this.setState({ sessionFetched: true });
+    }
+
     const cookies = new Cookies();
 
     const sessionSubscriptionsWrapper =
