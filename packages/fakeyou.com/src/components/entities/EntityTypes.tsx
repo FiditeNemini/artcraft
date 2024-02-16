@@ -41,7 +41,9 @@ export enum EntityType {
 }
 
 export const EntityFilterOptions = ( mode?: EntityInputMode, t = (v:string) => v) => {
-  const filters = mode !== undefined ? [{ ...MediaFilters, ...WeightsFilters },MediaFilters,WeightsFilters,WeightsFilters][mode] : EntityInputMode;
+  const bookmarkFilters = Object.keys({ ...MediaFilters, ...WeightsFilters }).filter(val => isNaN(Number(val))).reduce((obj,current) => ({ ...obj, [current]: current  }),{});;
+
+  const filters = mode !== undefined ? [bookmarkFilters,MediaFilters,WeightsFilters,WeightsFilters][mode] : EntityInputMode;
 
   return Object.values(filters)
   .filter(val => isNaN(Number(val)))

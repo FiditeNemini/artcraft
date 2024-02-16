@@ -17,6 +17,6 @@ export default function WeightsCards({ props, type }: Props) {
     case WeightCategory.SD:
       return <ImageCard {...props} />;
     default:
-      return <div>Unsupported media type</div>;
+      return <div>Unsupported weight type</div>;
   }
 }

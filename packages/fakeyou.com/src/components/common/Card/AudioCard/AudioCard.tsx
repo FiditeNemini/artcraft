@@ -106,7 +106,7 @@ export default function AudioCard({
             </div>
 
             <h6 className="fw-semibold text-white mb-1 mt-3">
-              {data.origin.maybe_model
+              {data.origin?.maybe_model
                 ? data.origin.maybe_model.title
                 : "Media Audio"}
             </h6>
