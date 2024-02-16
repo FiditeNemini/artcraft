@@ -184,6 +184,7 @@ pub async fn create_voice_handler(
         maybe_input_source_token: None,
         maybe_input_source_token_type: None,
         maybe_download_url: None,
+        maybe_cover_image_media_file_token: None,
         maybe_raw_inference_text: None,
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {

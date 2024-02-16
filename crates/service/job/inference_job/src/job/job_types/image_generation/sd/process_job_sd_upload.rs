@@ -252,6 +252,7 @@ pub async fn process_job_sd_upload(
     weights_type: WeightsType::StableDiffusion15,
     weights_category: WeightsCategory::ImageGeneration,
     title: sd_args.maybe_name.unwrap_or(String::from("")),
+    maybe_cover_image_media_file_token: None,
     maybe_description_markdown: sd_args.maybe_description,
     maybe_description_rendered_html: None,
     creator_user_token: Some(&creator_user_token),

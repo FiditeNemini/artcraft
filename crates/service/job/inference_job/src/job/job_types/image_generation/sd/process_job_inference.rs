@@ -139,21 +139,6 @@ pub async fn process_job_inference(
 
   info!("sd_checkpoint_path: {:?}", sd_checkpoint_path);
 
-//  let retrieved_sd_record = match sd_args.maybe_sd_model_token {
-//    None => return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no sd model token for job!"))),
-//    Some(ref token) => {
-//      let retrieved_sd_record = get_weight_by_token(
-//        &token,
-//        false,
-//        &deps.db.mysql_pool
-//      ).await?;
-//      match retrieved_sd_record {
-//        Some(record) => record,
-//        None => return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no record of model!"))),
-//      }
-//    }
-//  };
-
   // origin file name needs to be just the file name  /tmp/downloads_long_lived/temp_stable_diffusion_inference_32.8qJJljxWWZeD/output_0.png
   // ignore if no lora token
 
@@ -169,18 +154,6 @@ pub async fn process_job_inference(
 
   let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
 
-///  // Details for SD checkpoint
-///  let details = RemoteCloudBucketDetails::new(
-///    retrieved_sd_record.public_bucket_hash.clone(),
-///    retrieved_sd_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
-///    retrieved_sd_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
-///  );
-///
-///  remote_cloud_file_client.download_file(
-///    details,
-///    path_to_string(sd_checkpoint_path.clone())
-///  ).await?;
-
   let mut lora_name = String::from("");
   let mut lora_token = String::from("");
 
@@ -189,22 +162,6 @@ pub async fn process_job_inference(
       lora_path.clear();
     }
     Some(lora_record) => {
-/////      let lora_details = RemoteCloudBucketDetails::new(
-/////        lora_record.public_bucket_hash.clone(),
-/////        lora_record.maybe_public_bucket_prefix
-/////            .clone()
-/////            .unwrap_or_else(|| "".to_string()),
-/////        lora_record.maybe_public_bucket_extension
-/////            .clone()
-/////            .unwrap_or_else(|| "".to_string())
-/////      );
-/////
-/////
-/////      remote_cloud_file_client.download_file(
-/////        lora_details,
-/////        path_to_string(lora_path.clone())
-/////      ).await?;
-
       lora_name = lora_record.title.to_string();
       lora_token = lora_record.token.to_string();
 

@@ -342,6 +342,7 @@ pub async fn seed_weights_for_paging(mysql_pool: &Pool<MySql>, user_token: UserT
                 weights_type: weights_types, // replace with actual WeightsType
                 weights_category, // replace with actual WeightsCategory
                 title,
+                maybe_cover_image_media_file_token: None,
                 maybe_description_markdown: Some(description),
                 maybe_description_rendered_html: Some(description_rendered_html.to_string()),
                 creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -611,6 +612,7 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
         weights_type: WeightsType::StableDiffusion15, // replace with actual WeightsType
         weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
         title: "Dragonfruit".to_string(),
+        maybe_cover_image_media_file_token: None,
         maybe_description_markdown: Some(sd1_5_markdown_description.to_string()),
         maybe_description_rendered_html: Some("<p>Description</p>".to_string()),
         creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -632,6 +634,7 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
         token: &model_weight_token2, // replace with actual ModelWeightToken
         weights_type: WeightsType::LoRA, // replace with actual WeightsType
         weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
+        maybe_cover_image_media_file_token: None,
         title: "MIHOYO Collection 米家全家桶 (Honkai Impact 3rd | Honkai Star Rail | Genshin Impact | Zenless Zone Zero)".to_string(),
         maybe_description_markdown: Some(miyhoyo_description.to_string()),
         maybe_description_rendered_html: Some(miyhoyo_description.to_string()),
@@ -655,6 +658,7 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
         weights_type: WeightsType::StableDiffusion15, // replace with actual WeightsType
         weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
         title: "z-vae".to_string(),
+        maybe_cover_image_media_file_token: None,
         maybe_description_markdown: Some(sd_vae_description.to_string()),
         maybe_description_rendered_html: Some("<p>Description</p>".to_string()),
         creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -711,6 +715,7 @@ pub async fn seed_workflows_for_testing_inference(mysql_pool: &Pool<MySql>, user
         weights_type: WeightsType::ComfyUi, // replace with actual WeightsType
         weights_category: WeightsCategory::WorkflowConfig, // replace with actual WeightsCategory
         title: "yae-video-prod".to_string(),
+        maybe_cover_image_media_file_token: None,
         maybe_description_markdown: Some("ComfyUI Workflow".to_string()),
         maybe_description_rendered_html: Some("<p>Description</p>".to_string()),
         creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -821,6 +826,7 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 1".to_string()),
             maybe_description_rendered_html: Some("<p>Description 1</p>".to_string()),
             creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -846,6 +852,7 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::HifiganTacotron2, // replace with actual WeightsType
             weights_category: WeightsCategory::TextToSpeech, // replace with actual WeightsCategory
             title: "Title 2".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 2".to_string()),
             maybe_description_rendered_html: Some("<p>Description 2</p>".to_string()),
             creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -871,6 +878,7 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::StableDiffusion15, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 3".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 3".to_string()),
             maybe_description_rendered_html: Some("<p>Description 3</p>".to_string()),
             creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -896,6 +904,7 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 4".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 4".to_string()),
             maybe_description_rendered_html: Some("<p>Description 4</p>".to_string()),
             creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -921,6 +930,7 @@ pub async fn seed_weights_for_user_token(
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 5".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 4".to_string()),
             maybe_description_rendered_html: Some("<p>Description 4</p>".to_string()),
             creator_user_token: Some(&user_token), // replace with actual UserToken
@@ -972,6 +982,7 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>, _user_token: UserTo
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 1".to_string()),
             maybe_description_rendered_html: Some("<p>Description 1</p>".to_string()),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
@@ -997,6 +1008,7 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>, _user_token: UserTo
             weights_type: WeightsType::HifiganTacotron2, // replace with actual WeightsType
             weights_category: WeightsCategory::TextToSpeech, // replace with actual WeightsCategory
             title: "Title 2".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 2".to_string()),
             maybe_description_rendered_html: Some("<p>Description 2</p>".to_string()),
             creator_user_token: Some(&creator_token2), // replace with actual UserToken
@@ -1022,6 +1034,7 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>, _user_token: UserTo
             weights_type: WeightsType::StableDiffusion15, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 3".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 3".to_string()),
             maybe_description_rendered_html: Some("<p>Description 3</p>".to_string()),
             creator_user_token: Some(&creator_token3), // replace with actual UserToken
@@ -1047,6 +1060,7 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>, _user_token: UserTo
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 4".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 4".to_string()),
             maybe_description_rendered_html: Some("<p>Description 4</p>".to_string()),
             creator_user_token: Some(&creator_token4), // replace with actual UserToken
@@ -1072,6 +1086,7 @@ pub async fn original_seed_weights(mysql_pool: &Pool<MySql>, _user_token: UserTo
             weights_type: WeightsType::LoRA, // replace with actual WeightsType
             weights_category: WeightsCategory::ImageGeneration, // replace with actual WeightsCategory
             title: "Title 5".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 5".to_string()),
             maybe_description_rendered_html: Some("<p>Description 5</p>".to_string()),
             creator_user_token: Some(&creator_token5), // replace with actual UserToken

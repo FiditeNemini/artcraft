@@ -201,6 +201,7 @@ pub async fn enqueue_bvh_to_workflow_handler(
         maybe_input_source_token: Some(&request.media_file_token.as_str()),
         maybe_input_source_token_type: None,
         maybe_download_url: None,
+        maybe_cover_image_media_file_token: None,
         maybe_raw_inference_text: None,
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {

@@ -67,6 +67,7 @@ mod tests {
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 1".to_string()),
             maybe_description_rendered_html: Some("<p>Description 1</p>".to_string()),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
@@ -136,6 +137,7 @@ mod tests {
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 1".to_string()),
             maybe_description_rendered_html: Some("<p>Description 1</p>".to_string()),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
@@ -212,6 +214,7 @@ mod tests {
             weights_type: WeightsType::RvcV2, // replace with actual WeightsType
             weights_category: WeightsCategory::VoiceConversion, // replace with actual WeightsCategory
             title: "Title 1".to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some("Description 1".to_string()),
             maybe_description_rendered_html: Some("<p>Description 1</p>".to_string()),
             creator_user_token: Some(&creator_token1), // replace with actual UserToken
@@ -328,6 +331,7 @@ mod tests {
                 weights_type, // replace with actual WeightsType
                 weights_category, // replace with actual WeightsCategory
                 title: format!("Title {}", i),
+                maybe_cover_image_media_file_token: None,
                 maybe_description_markdown: Some(format!("Description {}", i)),
                 maybe_description_rendered_html: Some(format!("<p>Description {}</p>", i)),
                 creator_user_token: Some(&creator_token), // replace with actual UserToken
@@ -570,6 +574,7 @@ mod tests {
                 weights_type, // replace with actual WeightsType
                 weights_category, // replace with actual WeightsCategory
                 title: format!("Title {}", i),
+                maybe_cover_image_media_file_token: None,
                 maybe_description_markdown: Some(format!("Description {}", i)),
                 maybe_description_rendered_html: Some(format!("<p>Description {}</p>", i)),
                 creator_user_token: Some(&creator_token), // replace with actual UserToken

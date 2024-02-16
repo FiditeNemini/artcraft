@@ -9,6 +9,7 @@ use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
 
 use crate::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
@@ -33,6 +34,9 @@ pub struct InsertGenericInferenceArgs<'a> {
   //   the "GenericInferenceArgs" field. The goal is to migrate them to this
   //   top-level field eventually.
   pub maybe_download_url: Option<&'a str>,
+
+  // For jobs that perform "downloads", this is a possible cover image for the new model.
+  pub maybe_cover_image_media_file_token: Option<&'a MediaFileToken>,
 
   pub maybe_raw_inference_text: Option<&'a str>,
 
@@ -90,6 +94,7 @@ SET
   maybe_input_source_token_type = ?,
 
   maybe_download_url = ?,
+  maybe_cover_image_media_file_token = ?,
 
   maybe_raw_inference_text = ?,
 
@@ -124,6 +129,7 @@ SET
         args.maybe_input_source_token_type,
 
         args.maybe_download_url,
+        args.maybe_cover_image_media_file_token.map(|t| t.as_str()),
 
         args.maybe_raw_inference_text,
 

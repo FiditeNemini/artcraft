@@ -31,6 +31,7 @@ use mysql_queries::queries::generic_inference::web::insert_generic_inference_job
 };
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
@@ -118,7 +119,10 @@ pub struct EnqueueImageGenRequest {
     maybe_batch_count: Option<u32>,
     maybe_name: Option<String>,
     maybe_description: Option<String>,
-    maybe_version: Option<u32>
+    maybe_version: Option<u32>,
+
+    // Optional cover image on LoRA or SD upload
+    maybe_cover_image_media_file_token: Option<MediaFileToken>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -401,6 +405,7 @@ pub async fn enqueue_image_generation_request(
         maybe_input_source_token: None,
         maybe_input_source_token_type: None,
         maybe_download_url: maybe_either_download_url.as_deref(),
+        maybe_cover_image_media_file_token: request.maybe_cover_image_media_file_token.as_ref(),
         maybe_raw_inference_text: None,
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {

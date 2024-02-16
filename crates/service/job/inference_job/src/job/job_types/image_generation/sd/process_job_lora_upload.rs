@@ -134,36 +134,6 @@ pub async fn process_job_lora_upload(
     );
   }
 
-
-//  // download model + vae for lora
-//  // use lora with whatever checkpoint make it fixed id if it works submit it
-//  let weight_token_sd_model_token = ModelWeightToken::new_from_str(&sd_deps.predefined_sd_weight_token);
-//
-//  info!("Using predefined SD weight token: {:?}", &weight_token_sd_model_token);
-//
-//  let sd_weight_record = get_weight_by_token(
-//    &weight_token_sd_model_token,
-//    false,
-//    &deps.db.mysql_pool
-//  ).await?;
-//  let sd_weight_record = match sd_weight_record {
-//    Some(val) => val,
-//    None => {
-//      return Err(
-//        ProcessSingleJobError::from_anyhow_error(anyhow!("No SD weight baked in for loRA upload inference check? thats a problem."))
-//      );
-//    }
-//  };
-//
-//  let sd_weight_details = RemoteCloudBucketDetails::new(
-//    sd_weight_record.public_bucket_hash.clone(),
-//    sd_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
-//    sd_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
-//  );
-//
-//  let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
-//  remote_cloud_file_client.download_file(sd_weight_details, path_to_string(sd_checkpoint_path.clone())).await?;
-
   info!("Downloading predefined SD weight from: {:?} to {:?}",
     &sd_deps.predefined_sd_weight_bucket_path,
     &sd_checkpoint_path);
@@ -191,33 +161,6 @@ pub async fn process_job_lora_upload(
         error!("could not download VAE: {:?}", err);
         ProcessSingleJobError::from_anyhow_error(anyhow!("could not download VAE: {:?}", err))
       })?;
-
-//    // use this vae doesn't matter though
-//    // VAE token for now
-//    let vae_token = String::from("REPLACE_ME");
-//    let model_weight_vae = ModelWeightToken(vae_token);
-//    let vae_weight_record = get_weight_by_token(
-//        &model_weight_vae,
-//        false,
-//        &deps.db.mysql_pool
-//    ).await?;
-//    let vae_weight_record = match vae_weight_record {
-//        Some(val) => val,
-//        None => {
-//            return Err(
-//                ProcessSingleJobError::from_anyhow_error(anyhow!("no VAE? thats a problem."))
-//            );
-//        }
-//    };
-//
-//    let vae_details = RemoteCloudBucketDetails::new(
-//        vae_weight_record.public_bucket_hash.clone(),
-//        vae_weight_record.maybe_public_bucket_prefix.clone().unwrap_or_else(|| "".to_string()),
-//        vae_weight_record.maybe_public_bucket_extension.clone().unwrap_or_else(|| "".to_string())
-//    );
-//
-//    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
-//    remote_cloud_file_client.download_file(vae_details, path_to_string(vae_path.clone())).await?;
 
   let stderr_output_file = work_temp_dir.path().join("sd_err.txt");
   let stdout_output_file = work_temp_dir.path().join("sd_out.txt");
@@ -290,6 +233,7 @@ pub async fn process_job_lora_upload(
     weights_type: WeightsType::LoRA,
     weights_category: WeightsCategory::ImageGeneration,
     title: sd_args.maybe_name.unwrap_or(String::from("")),
+    maybe_cover_image_media_file_token: job.maybe_cover_image_media_file_token.clone(),
     maybe_description_markdown: sd_args.maybe_description,
     maybe_description_rendered_html: None,
     creator_user_token: Some(&creator_user_token),

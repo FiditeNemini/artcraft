@@ -10,6 +10,7 @@ use enums::common::job_status_plus::JobStatusPlus;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::media_files::MediaFileToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
@@ -35,6 +36,9 @@ pub struct AvailableInferenceJob {
   // Inference details
   pub maybe_inference_args: Option<GenericInferenceArgs>,
   pub maybe_raw_inference_text: Option<String>,
+
+  // For model uploads, a possible cover image
+  pub maybe_cover_image_media_file_token: Option<MediaFileToken>,
 
   // User information to propagate downstream
   pub maybe_creator_user_token: Option<String>,
@@ -105,6 +109,8 @@ pub async fn list_available_generic_inference_jobs(
           creator_ip_address: record.creator_ip_address,
           maybe_creator_user_token: record.maybe_creator_user_token,
           maybe_creator_anonymous_visitor_token: record.maybe_creator_anonymous_visitor_token,
+          maybe_cover_image_media_file_token: record.maybe_cover_image_media_file_token
+              .map(|s| MediaFileToken::new_from_str(&s)),
           creator_set_visibility: Visibility::from_str(&record.creator_set_visibility)
               .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
           inference_category: InferenceCategory::from_str(&record.inference_category)
@@ -194,6 +200,8 @@ SELECT
   inference_category,
   maybe_model_type,
   maybe_model_token,
+
+  maybe_cover_image_media_file_token,
 
   maybe_input_source_token,
   maybe_input_source_token_type,
@@ -287,6 +295,8 @@ struct AvailableInferenceJobRawInternal {
 
   pub maybe_inference_args: Option<String>,
   pub maybe_raw_inference_text: Option<String>,
+
+  pub maybe_cover_image_media_file_token: Option<String>,
 
   // User information to propagate downstream
   pub maybe_creator_user_token: Option<String>,

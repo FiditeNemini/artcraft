@@ -7,12 +7,14 @@ use enums::by_table::model_weights::{
 use log::warn;
 use enums::common::visibility::Visibility;
 use tokens::tokens::{ users::UserToken, model_weights::ModelWeightToken };
+use tokens::tokens::media_files::MediaFileToken;
 
 pub struct CreateModelWeightsArgs<'a> {
     pub token: &'a ModelWeightToken,
     pub weights_type: WeightsType,
     pub weights_category: WeightsCategory,
     pub title: String,
+    pub maybe_cover_image_media_file_token: Option<MediaFileToken>,
     pub maybe_description_markdown: Option<String>,
     pub maybe_description_rendered_html: Option<String>,
     pub creator_user_token: Option<&'a UserToken>,
@@ -42,6 +44,7 @@ pub async fn create_weight(args: CreateModelWeightsArgs<'_>) -> AnyhowResult<Mod
           weights_type = ?,
           weights_category = ?,
           title = ?,
+          maybe_cover_image_media_file_token = ?,
           maybe_description_markdown = ?,
           maybe_description_rendered_html = ?,
           creator_user_token = ?,
@@ -61,6 +64,7 @@ pub async fn create_weight(args: CreateModelWeightsArgs<'_>) -> AnyhowResult<Mod
             args.weights_type.to_str(),
             args.weights_category.to_str(),
             args.title,
+            args.maybe_cover_image_media_file_token.as_ref().map(|s| s.as_str()),
             args.maybe_description_markdown,
             args.maybe_description_rendered_html,
             args.creator_user_token.as_deref(),

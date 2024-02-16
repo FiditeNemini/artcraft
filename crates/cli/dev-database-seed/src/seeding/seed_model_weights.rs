@@ -129,6 +129,7 @@ pub async fn seed_weights_files(
             weights_type, // Assuming weights_type is defined elsewhere
             weights_category, // Assuming weights_category is defined elsewhere
             title: title.to_string(),
+            maybe_cover_image_media_file_token: None,
             maybe_description_markdown: Some(description.to_string()),
             maybe_description_rendered_html: Some(description_rendered_html.to_string()),
             creator_user_token: Some(&user_token),
