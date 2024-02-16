@@ -82,7 +82,7 @@ function SdInferencePanel({
   const [aspectRatio, setAspectRatio] = useState("square");
   const [cfgScale, setCfgScale] = useState(7);
   const [samples, setSamples] = useState(8);
-  const [batchCount, setBatchCount] = useState(1);
+  const [batchCount, setBatchCount] = useState(3);
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const onChange = onChanger({
@@ -104,7 +104,7 @@ function SdInferencePanel({
     sampler: "DPM++ 2M Karras",
     cfgScale: 7,
     samples: 8,
-    batchCount: 1,
+    batchCount: 3,
     loraToken: null,
   };
 
