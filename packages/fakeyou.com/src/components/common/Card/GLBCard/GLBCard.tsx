@@ -54,8 +54,8 @@ export default function GLBCard({
               <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
             </div>
             <CardFooter {...{
-              creator: data?.maybe_creator, 
-              entityToken: data.token,
+              creator: data?.maybe_creator || data.details?.maybe_media_file_data?.maybe_creator,
+              entityToken: data.details?.entity_token || data.token,
               entityType: "media_file",
               makeBookmarksProps: bookmarks?.makeProps,
               makeRatingsProps: ratings?.makeProps,

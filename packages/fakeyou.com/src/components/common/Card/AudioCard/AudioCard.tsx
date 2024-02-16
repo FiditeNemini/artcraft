@@ -117,11 +117,11 @@ export default function AudioCard({
               </p>
             )}
           </div>
-          <AudioPlayer src={data.public_bucket_path} id={data.token} />
+          <AudioPlayer src={data.details?.maybe_media_file_data?.public_bucket_path || data.public_bucket_path} id={data.token} />
           <CardFooter
             {...{
-              creator: data?.maybe_creator,
-              entityToken: data.token,
+              creator: data?.maybe_creator || data.details?.maybe_media_file_data?.maybe_creator,
+              entityToken: data.details?.entity_token || data.token,
               entityType: "media_file",
               makeBookmarksProps: bookmarks?.makeProps,
               makeRatingsProps: ratings?.makeProps,
@@ -183,8 +183,7 @@ export default function AudioCard({
           </div>
           <CardFooter
             {...{
-              creator:
-                data?.creator || data.details.maybe_weight_data?.maybe_creator,
+              creator: data?.creator || data.details.maybe_weight_data?.maybe_creator,
               entityToken: data.weight_token || data.details?.entity_token,
               entityType: "model_weight",
               makeBookmarksProps: bookmarks?.makeProps,
