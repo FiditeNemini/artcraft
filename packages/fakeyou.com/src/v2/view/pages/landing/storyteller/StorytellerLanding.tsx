@@ -18,7 +18,7 @@ export default function StorytellerLanding(props: StorytellerLandingProps) {
 
   return (
     <>
-      <Container type="panel" className="py-5">
+      {/* <Container type="panel" className="py-5">
         <Panel clear={true} className="py-lg-5">
           <div className="row g-5 g-lg-5 flex-row-reverse">
             <div className="col-12 col-md-6">
@@ -65,126 +65,121 @@ export default function StorytellerLanding(props: StorytellerLandingProps) {
             </div>
           </div>
         </Panel>
-      </Container>
+      </Container> */}
 
-      <div className="panel rounded-0 py-5 my-5">
-        <Container type="panel" className="py-lg-5">
-          <Panel clear={true}>
-            <div className="d-flex flex-column align-items-center rounded-0 mt-lg-4 pt-lg-4">
-              <div className="d-flex flex-column align-items-center text-center cta-container">
-                <h2 className="fw-bold">AI Audio Generation</h2>
-                <p className="mw-300 opacity-75">{t("ctaText")}</p>
-                <div className="d-flex d-lg-none align-items-center mt-2 cta-mobile">
-                  <img
-                    src="/images/landing/hanashi-before.webp"
-                    alt="hanashi before"
-                    width={200}
-                    height={200}
-                  />
-                  <img
-                    src="/images/landing/chevrons-red.webp"
-                    alt="red chevrons"
-                    width={95}
-                    height={80}
-                  />
-                  <img
-                    src="/images/landing/hanashi-after.webp"
-                    alt="hanashi after"
-                    width={200}
-                    height={200}
-                  />
-                </div>
+      <Container type="panel" className="py-lg-5 mt-5">
+        <Panel clear={true}>
+          <div className="d-flex flex-column align-items-center rounded-0 mt-lg-4 pt-lg-4">
+            <div className="d-flex flex-column align-items-center text-center cta-container">
+              <h2 className="fw-bold">AI Audio Generation</h2>
+              <p className="mw-300 opacity-75">{t("ctaText")}</p>
+              <div className="d-flex d-lg-none align-items-center mt-2 cta-mobile">
                 <img
                   src="/images/landing/hanashi-before.webp"
                   alt="hanashi before"
-                  className="hanashi-before d-none d-lg-block"
-                  width={311}
-                  height={311}
-                />
-                <img
-                  src="/images/landing/chevrons-grey.webp"
-                  alt="grey chevrons"
-                  className="chevrons-grey d-none d-lg-block"
-                  width={127}
-                  height={108}
+                  width={200}
+                  height={200}
                 />
                 <img
                   src="/images/landing/chevrons-red.webp"
                   alt="red chevrons"
-                  className="chevrons-red d-none d-lg-block"
-                  width={127}
-                  height={108}
+                  width={95}
+                  height={80}
                 />
                 <img
                   src="/images/landing/hanashi-after.webp"
                   alt="hanashi after"
-                  className="hanashi-after d-none d-lg-block"
-                  width={311}
-                  height={311}
+                  width={200}
+                  height={200}
                 />
               </div>
+              <img
+                src="/images/landing/hanashi-before.webp"
+                alt="hanashi before"
+                className="hanashi-before d-none d-lg-block"
+                width={311}
+                height={311}
+              />
+              <img
+                src="/images/landing/chevrons-grey.webp"
+                alt="grey chevrons"
+                className="chevrons-grey d-none d-lg-block"
+                width={127}
+                height={108}
+              />
+              <img
+                src="/images/landing/chevrons-red.webp"
+                alt="red chevrons"
+                className="chevrons-red d-none d-lg-block"
+                width={127}
+                height={108}
+              />
+              <img
+                src="/images/landing/hanashi-after.webp"
+                alt="hanashi after"
+                className="hanashi-after d-none d-lg-block"
+                width={311}
+                height={311}
+              />
             </div>
-            <div className="row gy-4 mt-lg-3">
-              <div className="col-12 col-md-6">
-                <Panel padding={true} className="panel-inner rounded h-100">
-                  <div className="d-flex gap-2">
-                    <h4 className="fw-semibold mb-4 flex-grow-1">
-                      <FontAwesomeIcon icon={faMessageDots} className="me-3" />
-                      Text to Speech
-                    </h4>
-                    <Link to="/tts">
-                      Try more voices{" "}
-                      <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
-                    </Link>
-                  </div>
+          </div>
+          <div className="row gy-4 mt-lg-3">
+            <div className="col-12 col-md-6">
+              <Panel padding={true} className="panel-inner rounded h-100">
+                <div className="d-flex gap-2">
+                  <h4 className="fw-semibold mb-4 flex-grow-1">
+                    <FontAwesomeIcon icon={faMessageDots} className="me-3" />
+                    Text to Speech
+                  </h4>
+                  <Link to="/tts">
+                    Try more voices{" "}
+                    <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
+                  </Link>
+                </div>
 
-                  <div className="d-flex flex-column gap-3">
-                    <Select label="Select a Voice" />
-                    <Input
-                      label="Your Text"
-                      placeholder="Type what you want your character to say"
+                <div className="d-flex flex-column gap-3">
+                  <Select label="Select a Voice" />
+                  <Input
+                    label="Your Text"
+                    placeholder="Type what you want your character to say"
+                  />
+                  <div className="d-flex gap-2 justify-content-end">
+                    <Button
+                      label="Generate"
+                      icon={faArrowRight}
+                      iconFlip={true}
                     />
-                    <div className="d-flex gap-2 justify-content-end">
-                      <Button
-                        label="Generate"
-                        icon={faArrowRight}
-                        iconFlip={true}
-                      />
-                    </div>
                   </div>
-                </Panel>
-              </div>
-              <div className="col-12 col-md-6">
-                <Panel padding={true} className="panel-inner rounded h-100">
-                  <div className="d-flex gap-2">
-                    <h4 className="fw-semibold mb-4 flex-grow-1">
-                      <FontAwesomeIcon
-                        icon={faWaveformLines}
-                        className="me-3"
-                      />
-                      Voice to Voice
-                    </h4>
-                    <Link to="/voice-conversion">
-                      Try more voices{" "}
-                      <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
-                    </Link>
-                  </div>
-                  <div className="d-flex flex-column gap-3">
-                    <Select label="Select a Voice" />
-                    <div className="d-flex gap-2 justify-content-end">
-                      <Button
-                        label="Generate"
-                        icon={faArrowRight}
-                        iconFlip={true}
-                      />
-                    </div>
-                  </div>
-                </Panel>
-              </div>
+                </div>
+              </Panel>
             </div>
-          </Panel>
-        </Container>
-      </div>
+            <div className="col-12 col-md-6">
+              <Panel padding={true} className="panel-inner rounded h-100">
+                <div className="d-flex gap-2">
+                  <h4 className="fw-semibold mb-4 flex-grow-1">
+                    <FontAwesomeIcon icon={faWaveformLines} className="me-3" />
+                    Voice to Voice
+                  </h4>
+                  <Link to="/voice-conversion">
+                    Try more voices{" "}
+                    <FontAwesomeIcon icon={faArrowRight} className="ms-1" />
+                  </Link>
+                </div>
+                <div className="d-flex flex-column gap-3">
+                  <Select label="Select a Voice" />
+                  <div className="d-flex gap-2 justify-content-end">
+                    <Button
+                      label="Generate"
+                      icon={faArrowRight}
+                      iconFlip={true}
+                    />
+                  </div>
+                </div>
+              </Panel>
+            </div>
+          </div>
+        </Panel>
+      </Container>
 
       <Container type="panel" className="pt-5 my-5">
         <Panel padding={true}>

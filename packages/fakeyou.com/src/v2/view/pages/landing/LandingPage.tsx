@@ -26,13 +26,13 @@ function LandingPage(props: Props) {
 
   return (
     <>
+      {domain.title === "Storyteller AI" && !isLoggedIn && <LandingVideoReel />}
       <Container type="panel">
         {domain.title === "FakeYou" ? (
           <>
             {/* FAKEYOU.COM */}
             {!isLoggedIn && (
               <>
-                <LandingVideoReel />
                 <FakeYouLandingHeader
                   sessionWrapper={props.sessionWrapper}
                   sessionSubscriptionsWrapper={
