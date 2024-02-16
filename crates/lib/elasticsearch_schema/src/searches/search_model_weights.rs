@@ -123,6 +123,7 @@ pub async fn search_model_weights(
   let search_response = client
       .search(SearchParts::Index(&[MODEL_WEIGHT_INDEX]))
       .body(search_json)
+      .size(30)
       .allow_no_indices(true)
       .send()
       .await?;
