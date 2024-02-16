@@ -27,9 +27,9 @@ export default function TextToImagePage({
   enqueueInferenceJob,
   inferenceJobs,
 }: TextToImagePageProps) {
-  if (!sessionWrapper.canAccessStudio()) {
-    return <StudioNotAvailable />;
-  }
+  //if (!sessionWrapper.canAccessStudio()) {
+  //  return <StudioNotAvailable />;
+  //}
 
   return (
     <Container type="panel">

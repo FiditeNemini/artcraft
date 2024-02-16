@@ -110,15 +110,15 @@ export default function WeightPage({
 
   const deleteWeight = () => remove(!!user?.can_ban_users);
 
-  //Studio Access feature flag
-  switch (weight?.weight_type) {
-    case WeightType.SD_15:
-    case WeightType.SDXL:
-    case WeightType.LORA:
-      if (!sessionWrapper.canAccessStudio()) {
-        return <StudioNotAvailable />;
-      }
-  }
+  ////Studio Access feature flag
+  //switch (weight?.weight_type) {
+  //  case WeightType.SD_15:
+  //  case WeightType.SDXL:
+  //  case WeightType.LORA:
+  //    if (!sessionWrapper.canAccessStudio()) {
+  //      return <StudioNotAvailable />;
+  //    }
+  //}
 
   //Image generation panel if it's a lora weight or sd weight
   let imageGenPanel = <></>;
