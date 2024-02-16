@@ -26,6 +26,7 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
+use thumbnail_generator::task_client::thumbnail_task::ThumbnailTaskBuilder;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -59,69 +60,6 @@ fn recursively_delete_files_in(path: &Path) -> std::io::Result<()> {
     Ok(())
 }
 
-struct ThumbnailTask{
-    bucket: String,
-    path: String,
-    source_mimetype: String,
-    output_mimetype: String,
-    output_extension: String,
-    event_id: String,
-}
-
-impl ThumbnailTask{
-    fn new(bucket: &str, path: &str, source_mimetype: &str, output_mimetype: &str, event_id: String) -> Result<Self> {
-        let output_ext = get_file_extension(output_mimetype)?;
-        Ok(Self {
-            bucket: bucket.to_string(),
-            path: path.to_string(),
-            source_mimetype: source_mimetype.to_string(),
-            output_mimetype: output_mimetype.to_string(),
-            output_extension: output_ext.to_string(),
-            event_id: event_id.to_string(),
-        })
-    }
-
-    // Method to generate the JSON representation of the thumbnail task
-    fn create_json(&self) -> Value {
-        let output_path = format!("{}.{}", self.path, self.output_extension);
-
-        let input = json!({
-            "bucket": self.bucket,
-            "path": self.path,
-            "type": self.source_mimetype,
-        });
-
-        let output = json!({
-            "bucket": self.bucket,
-            "path": output_path,
-            "type": self.output_mimetype,
-        });
-
-        // TODO@madhukar: add tags -> metadata for gcs objects
-        let tags = json!([]);
-
-        json!({
-            "event_id": self.event_id,
-            "input": input,
-            "output": output,
-            "tags": tags,
-        })
-    }
-
-    async fn send(&self) -> Result<(), reqwest::Error> {
-        // TODO: retries?
-        // TODO: move to config
-        let url = "http://media-server.thumbnail-generator/tasks";
-        let client = reqwest::Client::new();
-        let task_json = self.create_json();
-        client.post(url)
-            .json(&task_json)
-            .send()
-            .await?
-            .error_for_status()?;
-        Ok(())
-    }
-}
 
 pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
     let job = args.job;
@@ -529,21 +467,23 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     };
 
     for output_type in thumbnail_types {
-        // Attempt to create a ThumbnailTask
-        match ThumbnailTask::new(
-            &*args.job_dependencies.buckets.public_bucket_client.bucket().name(),
-            &*path_to_string(result_bucket_object_pathbuf.clone()),
-            mimetype.as_str(),
-            output_type,
-            job.id.0.to_string(),
-        ) {
+        let thumbnail_task_result = ThumbnailTaskBuilder::new()
+            .with_bucket(&*args.job_dependencies.buckets.public_bucket_client.bucket_name())
+            .with_path(&*path_to_string(result_bucket_object_pathbuf.clone()))
+            .with_source_mimetype(mimetype.as_str())
+            .with_output_mimetype(output_type)
+            .with_output_suffix("thumb")
+            .with_output_extension(get_file_extension(output_type).unwrap())
+            .with_event_id(&job.id.0.to_string())
+            .send()
+            .await;
+
+        match (thumbnail_task_result) {
             Ok(thumbnail_task) => {
-                if let Err(e) = thumbnail_task.send().await {
-                    error!("Failed to send thumbnail task: {}", e);
-                }
+                debug!("Thumbnail task created: {:?}", thumbnail_task);
             },
             Err(e) => {
-                error!("Failed to create thumbnail task: {}", e);
+                error!("Failed to create thumbnail task: {:?}", e);
             }
         }
     }

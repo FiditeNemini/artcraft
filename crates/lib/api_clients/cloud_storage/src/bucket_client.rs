@@ -36,8 +36,8 @@ impl Error for BucketClientError {}
 
 
 impl BucketClient {
-  pub fn bucket(&self) -> &Bucket {
-    &self.bucket
+  pub fn bucket_name(&self) -> String {
+    self.bucket.name().to_string()
   }
 
   pub fn create(

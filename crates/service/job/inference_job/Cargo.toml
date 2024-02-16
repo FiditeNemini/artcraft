@@ -20,6 +20,7 @@ bootstrap = { path = "../../../lib/bootstrap" }
 buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
+thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator"}
 collections = { path = "../../../lib/collections" }
 composite_identifiers = { path = "../../../_types/composite_identifiers" }
 concurrency = { path = "../../../lib/concurrency" }
