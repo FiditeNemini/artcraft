@@ -28,7 +28,7 @@ export default function useSdUpload() {
     writeStatusSet(FetchStatus.in_progress);
     UploadModel("", {
       ...(coverImg.token
-        ? { cover_image_media_file_token: coverImg.token }
+        ? { maybe_cover_image_media_file_token: coverImg.token }
         : {}),
       maybe_description: descriptionMD,
       uuid_idempotency_token: uuidv4(),

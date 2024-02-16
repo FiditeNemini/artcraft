@@ -29,9 +29,9 @@ export default function useLoraUpload() {
   const upload = () => {
     writeStatusSet(FetchStatus.in_progress);
     UploadLora("", {
-      //...(coverImg.token
-      //  ? { cover_image_media_file_token: coverImg.token }
-      //  : {}),
+      ...(coverImg.token
+        ? { maybe_cover_image_media_file_token: coverImg.token }
+        : {}),
       maybe_name: title,
       maybe_description: descriptionMD,
       uuid_idempotency_token: uuidv4(),
