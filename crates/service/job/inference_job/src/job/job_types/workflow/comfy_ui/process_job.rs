@@ -2,9 +2,9 @@ use std::fs::{File, read_to_string};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-use anyhow::anyhow;
-use log::{error, info, warn};
-use serde_json::Value;
+use anyhow::{anyhow, Result};
+use log::{error, info, warn, debug};
+use serde_json::{Value, json};
 use tokio::io::AsyncWriteExt;
 use walkdir::WalkDir;
 
@@ -26,12 +26,24 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
+use thumbnail_generator::task_client::thumbnail_task::ThumbnailTaskBuilder;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
+
+fn get_file_extension(mimetype: &str) -> Result<&'static str> {
+    let ext = match mimetype {
+        "video/mp4" => "mp4",
+        "image/png" => "png",
+        "image/jpeg" => "jpg",
+        "image/gif" => "gif",
+        _ => return Err(anyhow!("Mimetype not supported: {}", mimetype)),
+    };
+    Ok(ext)
+}
 
 pub struct ComfyProcessJobArgs<'a> {
     pub job_dependencies: &'a JobDependencies,
@@ -47,6 +59,7 @@ fn recursively_delete_files_in(path: &Path) -> std::io::Result<()> {
     }
     Ok(())
 }
+
 
 pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
     let job = args.job;
@@ -400,13 +413,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
 
     // create ext from mimetype
-    let ext = match mimetype.as_str() {
-        "video/mp4" => "mp4",
-        "image/png" => "png",
-        "image/jpeg" => "jpg",
-        _ => return Err(ProcessSingleJobError::Other(anyhow!("Mimetype not supported: {}", mimetype))),
-    };
-
+    let ext = get_file_extension(mimetype.as_str())
+        .map_err(|e| ProcessSingleJobError::Other(e))?;
     // create prefix from mimetype
     let prefix = match mimetype.as_str() {
         "video/mp4" => "video",
@@ -451,6 +459,35 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .await
         .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+    // generate thumbnail using thumbnail service
+    let thumbnail_types = match mimetype.as_str() {
+        "video/mp4" => vec!["image/gif", "image/jpeg"],
+        _ => vec![],
+    };
+
+    for output_type in thumbnail_types {
+        let thumbnail_task_result = ThumbnailTaskBuilder::new()
+            .with_bucket(&*args.job_dependencies.buckets.public_bucket_client.bucket_name())
+            .with_path(&*path_to_string(result_bucket_object_pathbuf.clone()))
+            .with_source_mimetype(mimetype.as_str())
+            .with_output_mimetype(output_type)
+            .with_output_suffix("thumb")
+            .with_output_extension(get_file_extension(output_type).unwrap())
+            .with_event_id(&job.id.0.to_string())
+            .send()
+            .await;
+
+        match (thumbnail_task_result) {
+            Ok(thumbnail_task) => {
+                debug!("Thumbnail task created: {:?}", thumbnail_task);
+            },
+            Err(e) => {
+                error!("Failed to create thumbnail task: {:?}", e);
+            }
+        }
+    }
+    // ==================== CLEANUP ==================== //
 
     // ==================== DELETE TEMP FILES ==================== //
 
