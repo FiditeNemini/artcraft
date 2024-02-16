@@ -9,7 +9,7 @@ import {
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { faMessageImage } from "@fortawesome/pro-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
+//import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 interface TextToImagePageProps {
   inferenceJobs: Array<InferenceJob>;

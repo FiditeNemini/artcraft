@@ -41,7 +41,7 @@ import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import SdInferencePanel from "./inference_panels/SdInferencePanel";
 import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
-import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
+//import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 interface WeightProps {
