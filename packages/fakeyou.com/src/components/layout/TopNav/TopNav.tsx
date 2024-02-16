@@ -90,8 +90,15 @@ export default function TopNav({
   };
 
   useEffect(() => {
+    const topBarWrapper = document.getElementById("topbar-wrapper");
+
     const handleMenuToggle = (event: any) => {
       setMenuButtonIcon(event.detail.isOpen ? faXmark : faBars);
+      if (event.detail.isOpen) {
+        topBarWrapper?.classList.remove("topbar-wrapper-transparent");
+      } else {
+        topBarWrapper?.classList.add("topbar-wrapper-transparent");
+      }
     };
 
     window.addEventListener("menuToggle", handleMenuToggle);

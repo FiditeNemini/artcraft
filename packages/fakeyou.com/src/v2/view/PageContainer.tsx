@@ -88,7 +88,6 @@ import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
 import { StorytellerStudioListPage } from "./pages/storyteller_studio/vc_model_list/StorytellerStudioListPage";
 import TopNav from "components/layout/TopNav/TopNav";
 import SideNav from "components/layout/SideNav/SideNav";
-import MobileMenu from "components/layout/MobileMenu/MobileMenu";
 import MediaPage from "./pages/media/MediaPage";
 import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
 import { VoiceDesignerMainPage } from "./pages/voice_designer/VoiceDesignerMainPage";
@@ -247,7 +246,6 @@ class PageContainer extends React.Component<
             />
 
             <div id="page-content-wrapper">
-              <MobileMenu sessionWrapper={this.props.sessionWrapper} />
               <div id="main">
                 <Switch>
                   <Route path="/firehose">

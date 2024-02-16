@@ -10,6 +10,7 @@ import Dashboard from "./Dashboard";
 import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 import { useDomainConfig } from "context/DomainConfigContext";
 import StorytellerLanding from "./storyteller/StorytellerLanding";
+import LandingVideoReel from "./components/LandingVideoReel";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -30,10 +31,15 @@ function LandingPage(props: Props) {
           <>
             {/* FAKEYOU.COM */}
             {!isLoggedIn && (
-              <FakeYouLandingHeader
-                sessionWrapper={props.sessionWrapper}
-                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-              />
+              <>
+                <LandingVideoReel />
+                <FakeYouLandingHeader
+                  sessionWrapper={props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    props.sessionSubscriptionsWrapper
+                  }
+                />
+              </>
             )}
 
             <Dashboard sessionWrapper={props.sessionWrapper} />
