@@ -7,9 +7,9 @@ const domainConfigs: Record<string, DomainConfig> = {
     link: "https://storyteller.ai",
   },
   "fakeyou.com": {
-    logo: "/fakeyou/Storyteller-Logo-5.png",
-    title: "Storyteller AI",
-    link: "https://storyteller.ai",
+    logo: "/fakeyou/FakeYou-Logo-2.png",
+    title: "FakeYou",
+    link: "https://fakeyou.com",
   },
   // Default to FakeYou.com
   default: {
