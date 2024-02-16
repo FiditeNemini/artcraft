@@ -41,7 +41,7 @@ import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import SdInferencePanel from "./inference_panels/SdInferencePanel";
 import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
-import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
+//import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 interface WeightProps {
@@ -110,15 +110,15 @@ export default function WeightPage({
 
   const deleteWeight = () => remove(!!user?.can_ban_users);
 
-  //Studio Access feature flag
-  switch (weight?.weight_type) {
-    case WeightType.SD_15:
-    case WeightType.SDXL:
-    case WeightType.LORA:
-      if (!sessionWrapper.canAccessStudio()) {
-        return <StudioNotAvailable />;
-      }
-  }
+  ////Studio Access feature flag
+  //switch (weight?.weight_type) {
+  //  case WeightType.SD_15:
+  //  case WeightType.SDXL:
+  //  case WeightType.LORA:
+  //    if (!sessionWrapper.canAccessStudio()) {
+  //      return <StudioNotAvailable />;
+  //    }
+  //}
 
   //Image generation panel if it's a lora weight or sd weight
   let imageGenPanel = <></>;

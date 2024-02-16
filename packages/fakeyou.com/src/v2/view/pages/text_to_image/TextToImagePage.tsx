@@ -9,7 +9,7 @@ import {
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { faMessageImage } from "@fortawesome/pro-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
+//import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 interface TextToImagePageProps {
   inferenceJobs: Array<InferenceJob>;
@@ -27,9 +27,9 @@ export default function TextToImagePage({
   enqueueInferenceJob,
   inferenceJobs,
 }: TextToImagePageProps) {
-  if (!sessionWrapper.canAccessStudio()) {
-    return <StudioNotAvailable />;
-  }
+  //if (!sessionWrapper.canAccessStudio()) {
+  //  return <StudioNotAvailable />;
+  //}
 
   return (
     <Container type="panel">

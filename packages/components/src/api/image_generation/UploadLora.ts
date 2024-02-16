@@ -8,6 +8,7 @@ export interface UploadLoraRequest {
   maybe_name: String,
   maybe_description: String,
   visibility: String,
+  maybe_cover_image_media_file_token?: String,
 }
 
 export interface UploadLoraResponse {
