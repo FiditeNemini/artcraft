@@ -77,6 +77,11 @@ CREATE TABLE generic_inference_jobs (
   -- The length of 1024 is arbitrary, but we shouldn't need anything longer.
   maybe_download_url VARCHAR(1024) DEFAULT NULL,
 
+  -- For download-related jobs, this is the cover image to set.
+  -- This is nullable because not all inference jobs have a download URL.
+  -- And furthermore, not all download URLs have a cover image.
+  maybe_cover_image_media_file_token VARCHAR(32) DEFAULT NULL,
+
   -- ========== SUCCESS CASE ==========
 
   -- The type of the object will vary based on the type of the upload,
