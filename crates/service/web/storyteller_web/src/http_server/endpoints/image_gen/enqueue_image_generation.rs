@@ -311,8 +311,9 @@ pub async fn enqueue_image_generation_request(
     };
 
     let batch_count = match request.maybe_batch_count {
-        Some(val) => if val > 6 { 6 } else { val }
-        None => 1,
+        None => 3, // NB: Default to "3" images for everyone
+        Some(0) => 1,
+        Some(val) => if val > 8 { 8 } else { val }
     };
 
     let sampler = match request.maybe_sampler.clone() {
