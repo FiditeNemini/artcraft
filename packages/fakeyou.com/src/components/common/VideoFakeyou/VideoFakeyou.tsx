@@ -13,6 +13,7 @@ interface Props {
   src?: string;
   mediaToken?: string;
   label?: string;
+  onResponse?: (res:any)=>void
 }
 
 type Ref = HTMLVideoElement;
@@ -22,6 +23,7 @@ const VideoFromFakeyou = forwardRef<Ref, Props>(({
   src,
   mediaToken,
   label,
+  onResponse,
   ...rest
 }: Props, ref) => {
   const [mediaFile, setMediaFile] = useState<MediaFile>();
@@ -29,6 +31,7 @@ const VideoFromFakeyou = forwardRef<Ref, Props>(({
     mediaToken: mediaToken,
     onSuccess: (res: any) => {
       setMediaFile(res)
+      if(onResponse) onResponse(res)
     },
   });
 

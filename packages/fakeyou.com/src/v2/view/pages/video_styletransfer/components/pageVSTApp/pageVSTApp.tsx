@@ -31,6 +31,7 @@ export default function PageVSTApp({
   parentPath: string;
   dispatchPageState: (action: Action) => void;
 }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
   const { mediaToken } = useParams<any>();
 
   const [workflowValues, setWorkflowValues] = useState<WorkflowValuesType>({
@@ -39,8 +40,6 @@ export default function PageVSTApp({
   });
 
   const [styleStrength, setStyleStrength]= useState<number>(8);
-
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   if(videoRef?.current){
     if(debug) console.log("set-up video element listeners");
@@ -109,11 +108,40 @@ export default function PageVSTApp({
               label={t("video.label.original")}
               mediaToken={workflowValues.fileToken}
               ref={videoRef}
+              onResponse={(res)=>{
+                dispatchPageState({
+                  type: 'loadFileSuccess',
+                  payload: {
+                    mediaFile: res,
+                    mediaFileToken: pageState.mediaFileToken || mediaToken
+                  }
+                });
+              }}
             />
           </div>
           <div className="col-12 col-md-6">
             <Label label={t("image.label.preview")}/>
             {debug && <TableOfKeyValues keyValues={workflowValues} height={400}/>}
+            
+            {/*TODO: MAYBE INTEGRATE INTO PLAYER */}
+            <br/>
+            <NumberSliderV2 {...{
+              min: 16, max: workflowValues.maxFrames, step: 1,
+              initialValue: workflowValues.framesCap,
+              label: "Frames Cap",
+              thumbTip: "24 frames = 1 sec",
+              onChange: (val)=>{handleOnChange("framesCap",val)}
+            }}/>
+            <br/>
+            <NumberSliderV2 {...{
+              min: 0, max: workflowValues.maxFrames-16, step: 1,
+              initialValue: workflowValues.skipFrames,
+              label: "Skip Frames",
+              thumbTip: "24 frames = 1 sec",
+              onChange: (val)=>{handleOnChange("skipFrames",val)}
+            }}/>
+            {/*TODO: END */}
+
           </div>
       </div>
       <div className="row g-3  mb-4">
