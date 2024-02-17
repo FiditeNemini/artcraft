@@ -45,24 +45,26 @@ export default function PageVSTApp({
     if(debug) console.log("set-up video element listeners");
     const ve = videoRef.current
     ve.onloadedmetadata = () =>{
+      const newValues : {
+        width?: number;
+        height?: number;
+        maxFrames?: number;
+        framesCap?: number;
+      } = {};
       if (ve.videoWidth && ve.videoHeight) {
         const aspectRatio = ve.videoWidth/ve.videoHeight
-        if (aspectRatio > 1){
-          handleOnChange("width",960);
-        }
-        else if (aspectRatio < 1) {
-          handleOnChange("height",960);
-        }else{
-          if (debug) console.log(`aspectRaio: ${aspectRatio}`);
-        }
+        if (aspectRatio > 1) newValues.width = 960;
+        else if (aspectRatio < 1) newValues.height = 960
+        else if (debug) console.log(`aspectRaio: ${aspectRatio}`);
       }
       if(ve.duration){
-        handleOnChange("maxFrames", 
-          Math.floor(ve.duration)*workflowValues.inputFps
-        );
+        newValues.maxFrames = Math.floor(ve.duration)*workflowValues.inputFps;
+        newValues.framesCap =  newValues.maxFrames;
       }
-      //TODO: Optimizer to make ONE handleOnChange only
-      //TODO: deal with maxFrames with more reliable math
+      setWorkflowValues((curr)=>({
+        ...curr,
+        ...newValues,
+      }))
     }
   }
 
@@ -70,7 +72,14 @@ export default function PageVSTApp({
   const handleOnChange = (key: string, newValue:any,) => {
     setWorkflowValues((curr)=>({...curr, [key]: newValue}));
   }
-
+  const handleFramesCap = (newValue: number)=>{
+    if(newValue - workflowValues.skipFrames >= 16)
+      setWorkflowValues((curr)=>({...curr, framesCap: newValue}));
+  }
+  const handleSkipFrames = (newValue: number)=>{
+    if(workflowValues.framesCap - newValue >= 16)
+      setWorkflowValues((curr)=>({...curr, skipFrames: newValue}));
+  }
   const handleStyleStrength = (value:number)=>{
     setStyleStrength(value);
   };
@@ -127,18 +136,18 @@ export default function PageVSTApp({
             <br/>
             <NumberSliderV2 {...{
               min: 16, max: workflowValues.maxFrames, step: 1,
-              initialValue: workflowValues.framesCap,
+              value: workflowValues.framesCap,
               label: "Frames Cap",
               thumbTip: "24 frames = 1 sec",
-              onChange: (val)=>{handleOnChange("framesCap",val)}
+              onChange: handleFramesCap
             }}/>
             <br/>
             <NumberSliderV2 {...{
               min: 0, max: workflowValues.maxFrames-16, step: 1,
-              initialValue: workflowValues.skipFrames,
+              value: workflowValues.skipFrames,
               label: "Skip Frames",
               thumbTip: "24 frames = 1 sec",
-              onChange: (val)=>{handleOnChange("skipFrames",val)}
+              onChange: handleSkipFrames
             }}/>
             {/*TODO: END */}
 
