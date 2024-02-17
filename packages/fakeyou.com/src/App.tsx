@@ -211,6 +211,7 @@ function initInferenceJobsByCategoryMap(): Map<
   inferenceJobsByCategory.set(FrontendInferenceJobType.ImageGeneration, []);
   inferenceJobsByCategory.set(FrontendInferenceJobType.ConvertFbxtoGltf, []);
   inferenceJobsByCategory.set(FrontendInferenceJobType.VideoWorkflow, [])
+  inferenceJobsByCategory.set(FrontendInferenceJobType.VideoStyleTransfer, [])
   return inferenceJobsByCategory;
 }
 

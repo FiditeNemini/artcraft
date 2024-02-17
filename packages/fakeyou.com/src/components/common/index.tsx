@@ -40,6 +40,7 @@ import TextArea from "./TextArea";
 import TextAreaV2 from "./TextAreaV2";
 import TintSpinner from "./TintSpinner";
 import VideoBasic from "./VideoBasic";
+import VideoFakeyou from "./VideoFakeyou";
 import VideoInput from "./VideoInput";
 
 export {
@@ -85,5 +86,6 @@ export {
   TextAreaV2,
   TintSpinner,
   VideoBasic,
+  VideoFakeyou,
   VideoInput
 };

@@ -1,17 +1,17 @@
-import React, {useReducer, useEffect } from 'react';
+import React, {useReducer, useEffect} from 'react';
 
+import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
+import { StudioNotAvailable } from 'v2/view/_common/StudioNotAvailable';
 import { useInferenceJobs, useLocalize } from "hooks";
 import { FrontendInferenceJobType, InferenceJob } from '@storyteller/components/src/jobs/InferenceJob';
 
 import { Container } from "components/common";
 import PageHeader from "components/layout/PageHeader";
 
-import { states, reducer } from "./videoWorkflowReducer";
-import SubRoutes from "./videoWorkflowRoutes";
-import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
-import { StudioNotAvailable } from 'v2/view/_common/StudioNotAvailable';
+import { states, reducer } from "./reducer";
+import SubRoutes from "./routes";
 
-export default function VideoWorkflow(props:{
+export default function VideoStyleTransfer(props:{
   enqueueInferenceJob: (
     jobToken: string,
     frontendInferenceJobType: FrontendInferenceJobType
@@ -21,7 +21,7 @@ export default function VideoWorkflow(props:{
   sessionWrapper: SessionWrapper;
 }){
   const debug = false;
-  const {t} = useLocalize("VideoWorkflow");
+  const {t} = useLocalize("VideoStyleTransfer");
   const { NO_FILE } = states;
   const [pageState, dispatchPageState] = useReducer(reducer, {
     status: NO_FILE,
@@ -29,19 +29,19 @@ export default function VideoWorkflow(props:{
 
   const { enqueueInferenceJob } = props;
   useInferenceJobs(
-    FrontendInferenceJobType.VideoWorkflow
+    FrontendInferenceJobType.VideoStyleTransfer
   );
   useEffect(() => {
     if (
-      pageState.status === states.WORKFLOW_ENQUEUED &&
+      pageState.status === states.JOB_ENQUEUED &&
       pageState.inferenceJobToken
     ) {
       enqueueInferenceJob(
         pageState.inferenceJobToken,
-        FrontendInferenceJobType.VideoWorkflow
+        FrontendInferenceJobType.VideoStyleTransfer
       );
       dispatchPageState({
-        type: "enqueueFilterSuccess",
+        type: "enqueueJobSuccess",
         payload: { inferenceJobToken: undefined },
       });
     }
