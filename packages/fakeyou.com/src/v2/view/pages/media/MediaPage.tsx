@@ -75,19 +75,13 @@ export default function MediaPage() {
             <MediaAudioComponent mediaFile={mediaFile} />
 
             {/* Show TTS text input if it is a TTS result */}
-            {mediaFile.public_bucket_path.includes("tts_inference_output") && (
+            {mediaFile.maybe_text_transcript && (
               <div className="mt-4">
                 <h5 className="fw-semibold">
                   <FontAwesomeIcon icon={faSquareQuote} className="me-2" />
-                  Audio Text
+                  Audio Text Transcript
                 </h5>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Pellentesque elit ullamcorper dignissim cras tincidunt
-                  lobortis. Integer malesuada nunc vel risus commodo viverra
-                  maecenas accumsan lacus.
-                </p>
+                <p>{mediaFile.maybe_text_transcript}</p>
               </div>
             )}
           </div>
@@ -401,14 +395,14 @@ export default function MediaPage() {
                       }}
                     />
                     <BookmarkButton
-                        {...{
-                          large: true,
-                          ...bookmarks.makeProps({
-                            entityToken: token,
-                            entityType: "media_file",
-                          }),
-                        }}
-                      />
+                      {...{
+                        large: true,
+                        ...bookmarks.makeProps({
+                          entityToken: token,
+                          entityType: "media_file",
+                        }),
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -444,11 +438,11 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
-                {mediaFile?.media_type === MediaFileType.BVH ? (
+                {mediaFile?.media_type === MediaFileType.BVH || mediaFile?.media_type === MediaFileType.GLTF || mediaFile?.media_type === MediaFileType.GLB   ? (
                   <Button
                     {...{
                       icon: faVideoPlus,
-                      label: "Use BVH in Engine Compositor",
+                      label: "Use in Engine Compositor",
                       to: `/engine-compositor?preset_token=${mediaFile.token}`,
                       variant: "primary",
                       className: "flex-grow-1",

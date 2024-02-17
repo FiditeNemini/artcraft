@@ -60,11 +60,11 @@ export default function EngineCompositor({ value, sessionWrapper }: Props) {
             </header>
             <EntityInput
               {...{
+                accept: ["bvh","glb","gltf"],
                 aspectRatio: "landscape",
                 label: "Choose 3D data",
                 onChange,
                 type: "media",
-                mediaType: "bvh",
               }}
             />
           </div>

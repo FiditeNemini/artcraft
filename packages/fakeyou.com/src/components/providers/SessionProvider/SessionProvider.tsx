@@ -3,6 +3,7 @@ import { SessionContext } from "context";
 import { Modal } from "components/common";
 import AccountModal from "components/layout/AccountModal";
 import { ModalView } from "context/SessionContext";
+import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 interface Props {
   children?: any;
@@ -41,12 +42,11 @@ export default function SessionProvider({
     }
   };
   const userTokenMatch = (otherUserToken: string) =>
-    !otherUserToken || !user?.user_token
-      ? false
-      : user.user_token === otherUserToken;
+    !otherUserToken || !user?.user_token ? false : user.user_token === otherUserToken;
   const canEditTtsModel = (userToken: string) =>
     user?.canEditOtherUsersTtsModels || userTokenMatch(userToken);
   const canBanUsers = () => user?.can_ban_users || false;
+  const studioAccessCheck = (content: React.ElementType) => !user?.can_access_studio ? <StudioNotAvailable /> : content;
 
   return (
     <SessionContext.Provider
@@ -60,6 +60,7 @@ export default function SessionProvider({
           querySession,
           querySubscriptions,
           sessionFetched,
+          studioAccessCheck,
           user,
           userTokenMatch,
         },

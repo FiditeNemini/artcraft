@@ -66,7 +66,7 @@ export default function ImageCard({
   let coverImage = undefined;
 
   if (type === "media") {
-    coverImage = bucketConfig.getCdnUrl(data.public_bucket_path, 600, 100);
+    coverImage = bucketConfig.getCdnUrl(data.details?.maybe_media_file_data?.public_bucket_path || data.public_bucket_path, 600, 100);
   } else if (type === "weights") {
     coverImage = `/images/default-covers/${
       data?.cover_image?.default_cover.image_index || 0
@@ -121,8 +121,8 @@ export default function ImageCard({
               </div>
               <CardFooter
                 {...{
-                  creator: data?.maybe_creator,
-                  entityToken: data.token,
+                  creator: data?.maybe_creator || data.details?.maybe_media_file_data?.maybe_creator,
+                  entityToken: data.details?.entity_token || data.token,
                   entityType: "media_file",
                   makeBookmarksProps: bookmarks?.makeProps,
                   makeRatingsProps: ratings?.makeProps,
