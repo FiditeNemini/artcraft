@@ -30,6 +30,9 @@ use crate::http_server::endpoints::conversion::enqueue_bvh_to_workflow_handler::
 use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::enqueue_fbx_to_gltf_handler;
 use crate::http_server::endpoints::download_job::enqueue_generic_download::enqueue_generic_download_handler;
 use crate::http_server::endpoints::download_job::get_generic_upload_job_status::get_generic_download_job_status_handler;
+use crate::http_server::endpoints::engine::create_scene_handler::create_scene_handler;
+use crate::http_server::endpoints::engine::get_scene_handler::get_scene_handler;
+use crate::http_server::endpoints::engine::update_scene_handler::update_scene_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_refresh_flag_handler::disable_design_refresh_flag_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
@@ -202,8 +205,10 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_user_rating_routes(app); /* /v1/user_rating/... */
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
-    app = add_image_gen_routes(app);
-    app = add_weights_routes(app);
+  app = add_image_gen_routes(app);
+  app = add_weights_routes(app);
+  app = add_engine_routes(app); /* /v1/engine/... */
+
   // if server_environment == ServerEnvironment::Development {
   //
   // }
@@ -1352,4 +1357,28 @@ fn add_weights_routes<T, B>(app: App<T>) -> App<T>
             .route("/list", web::get().to(list_available_weights_handler))
             .route("/list_featured", web::get().to(list_featured_weights_handler))
     )
+}
+// ==================== Engine Routes ====================
+
+fn add_engine_routes<T, B>(app: App<T>) -> App<T>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = ()
+      >
+{
+  app.service(web::scope("/v1/engine")
+      .service(web::resource("/create_scene")
+          .route(web::post().to(create_scene_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/scene/{token}")
+          .route(web::get().to(get_scene_handler))
+          .route(web::post().to(update_scene_handler))
+      )
+  )
 }
