@@ -1,18 +1,16 @@
 import React, {
   memo,
   ReactNode,
+  useEffect,
   useState,
-  // useEffect,
 } from "react";
 
 import {
   Button,
   TempInput as Input,
   Modal,
-  // Searcher
 } from "components/common";
 
-// import NonRouteTabs from "../Tabs/NonRouteTabs";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 export type SelectModalData = {
@@ -23,8 +21,8 @@ export type SelectModalData = {
 interface SelectModalProps {
   label?: string;
   modalTitle?: string;
-  value?: SelectModalData;
-  onSelect?: (data: SelectModalData) => void;
+  value?: string;
+  onClear: () => void;
   required?: boolean;
   children: ReactNode
 }
@@ -33,53 +31,22 @@ export default memo(function SelectModal ({
   label,
   // tabs,
   modalTitle = "Select",
-  onSelect,
-  value,
+  onClear,
+  value = "",
   required,
   children
 }: SelectModalProps) {
-    const emptyValue =  {token:"", title:""};
-    const [{
-      isModalOpen,
-      selectedValue,
-      // valueType,
-      // activeTab
-    },  setState] = useState({
-      isModalOpen:false,
-      selectedValue: value ? value : emptyValue,
-      // activeTab: tabs[0].tabKey,
-      // valueType: tabs[0].typeFilter || "all"
-    })
-    // console.log("🔫", tabs, activeTab, valueType);
-
-    // Update mediaType when activeTab changes
-    // useEffect(() => {
-    //   const currentTab = tabs.find(tab => tab.tabKey === activeTab);
-    //   setState((curr)=>({...curr, valueType: currentTab?.typeFilter || "all"}))
-    // }, [activeTab, tabs]);
-
+    const [isModalOpen, setModalOpen] = useState(false
+    )
     const openModal = () => {
-      setState((curr)=>({...curr, isModalOpen: true}));
+      setModalOpen(true);
     };
 
     const closeModal = () => {
-      setState((curr)=>({...curr, isModalOpen: false}));
+      setModalOpen(false);
     };
 
-    const handleRemove = () => {
-      setState((curr)=>({...curr, selectedValue: emptyValue}));
-      if (onSelect) onSelect(emptyValue);
-    };
-
-    const handleOnSelect = (data:{token:string, title:string}) => {
-      setState((curr)=>({
-        ...curr,
-        selectedValue: {token: data.token, title: data.title || ""},
-        isModalOpen: false
-      }));
-      if (onSelect) onSelect(data);
-    }
-
+    useEffect(closeModal, [value]);
 
     return (
       <>
@@ -101,18 +68,16 @@ export default memo(function SelectModal ({
               wrapperClassName="w-100"
               placeholder="None selected"
               onClick={openModal}
-              value={selectedValue.title !=="" 
-                ? selectedValue.title 
-                : selectedValue.token || ""}
+              value={value}
             />
             
-            <Button label={selectedValue.token !== "" ? "Change" : "Select"} onClick={openModal} />
-            {selectedValue.token && (
+            <Button label={value !== "" ? "Change" : "Select"} onClick={openModal} />
+            {value && (
               <Button
                 square={true}
                 variant="danger"
                 icon={faTrash}
-                onClick={handleRemove}
+                onClick={onClear}
                 tooltip="Remove"
               />
             )}

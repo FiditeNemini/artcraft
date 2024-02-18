@@ -12,33 +12,56 @@ import {
   MediaCards,
   Pagination,
   SkeletonCard,
-  NonRouteTabs
+  // NonRouteTabs
 } from "components/common";
 
 import { SelectModalData, SelectModalV2} from "../SelectModal";
 
 import prepFilter from "resources/prepFilter";
-import { StringLiteral } from "typescript";
 
-export default memo(function SelectModalVideoTabs({
+export default memo(function SelectModalWrapper({
   debug = false,
+  value,
   modalTitle,
   inputLabel,
-  onSelect,
+  onSelect
 }: {
   debug?: boolean;
+  value: SelectModalData;
   modalTitle: string;
   inputLabel: string;
-  onSelect?: (data:SelectModalData) => void;
+  onSelect: (data:SelectModalData) => void;
 }) {
+
+  return (
+    <SelectModalV2
+      modalTitle={modalTitle}
+      label={inputLabel}
+      value={value.title !=="" 
+      ? value.title 
+      : value.token || ""}
+      onClear={()=>{onSelect({title:"",token:""})}}
+      // searcher={true}
+    >
+      <VideoTabsContent debug={debug} onSelect={onSelect}/>
+    </SelectModalV2>
+  );
+});
+
+function VideoTabsContent({
+  debug=false,
+  onSelect
+}:{
+  debug?: boolean
+  onSelect: (data:SelectModalData) => void;
+}){
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [list, listSet] = useState<MediaFileType[]>([]);
   const { user } = useSession();
-
   const media = useListContent({
     addQueries: {
       page_size: 9,
-      ...prepFilter("mediaType", "filter_media_type"),
+      ...prepFilter("video", "filter_media_type"),
     },
     urlUpdate: false,
     debug: debug ? "Video List" : undefined,
@@ -48,7 +71,6 @@ export default memo(function SelectModalVideoTabs({
     requestList: true,
     urlParam: user?.username || ""
   });
-
   const handlePageClick = (selectedItem: { selected: number }) => {
     media.pageChange(selectedItem.selected);
   };
@@ -58,60 +80,52 @@ export default memo(function SelectModalVideoTabs({
     pageCount: media.pageCount,
     currentPage: media.page,
   };
-
-  return (
-    <SelectModalV2
-      modalTitle={modalTitle}
-      // searcher={true}
-    >
-      <p>children</p>
-      {/* <div className="searcher-container in-modal" id={listKey}>
-          <Pagination {...paginationProps} />
-          {media.isLoading ? (
-            <div className="row gx-3 gy-3">
-              {Array.from({ length: 12 }).map((_, index) => (
-                <SkeletonCard key={index} />
-              ))}
-            </div>
-          ) : (
-            <>
-              {media.list.length === 0 && media.status === 3 ? (
-                <div className="text-center mt-4 opacity-75">
-                  No media created yet.
-                </div>
-              ) : (
-                <MasonryGrid
-                  gridRef={gridContainerRef}
-                  onLayoutComplete={() => console.log("Layout complete!")}
-                >
-                  {media.list.map((data: MediaFileType, key: number) => {
-                    let props = {
-                      data,
-                      showCreator: true,
-                      type: "media",
-                      inSelectModal: true,
-                      onResultSelect,
-                    };
-                    return (
-                      <div
-                        {...{
-                          className: "col-12 col-sm-6 col-xl-4 grid-item",
-                          key,
-                        }}
-                      >
-                        <MediaCards {...{ type: data.media_type, props }} />
-                      </div>
-                    );
-                  })}
-                </MasonryGrid>
-              )}
-            </>
-          )}
-
+  if (media.isLoading){
+    return (
+      <div className="row gx-3 gy-3">
+        {Array.from({ length: 12 }).map((_, index) => (
+          <SkeletonCard key={index} />
+        ))}
+      </div>
+    );
+  }else if (media.list.length === 0 && media.status === 3){
+    return(
+      <div className="text-center m-4 opacity-75">
+        No media created yet.
+      </div>
+    );
+  }else {
+    return(
+      <>
+        <Pagination {...paginationProps} />
+        <MasonryGrid
+          gridRef={gridContainerRef}
+          onLayoutComplete={() => console.log("Layout complete!")}
+        >
+          {media.list.map((data: MediaFileType, key: number) => {
+            let props = {
+              data,
+              showCreator: true,
+              type: "media",
+              inSelectModal: true,
+              onResultSelect: onSelect,
+            };
+            return (
+              <div
+                {...{
+                  className: "col-12 col-sm-6 col-xl-4 grid-item",
+                  key,
+                }}
+              >
+                <MediaCards {...{ type: data.media_type, props }} />
+              </div>
+            );
+          })}
+        </MasonryGrid>
         <div className="d-flex justify-content-end mt-4">
           <Pagination {...paginationProps} />
-        </div>
-      </div> */}
-    </SelectModalV2>
-  );
-});
+        </div> 
+      </>
+    );
+  }
+}

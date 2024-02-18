@@ -31,6 +31,7 @@ export default function TabContentLibrary({
     <div className="row g-3">
       <div className="col-12">
         <SelectModalVideoTabs
+          value={{token:pageState.mediaFileToken||"", title:""}}
           modalTitle="Select a Video"
           inputLabel="Select a Video"
           onSelect={handleOnSelect}
