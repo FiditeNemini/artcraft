@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import MediaAudioComponent from "./MediaAudioComponent";
 import MediaVideoComponent from "./MediaVideoComponent";
@@ -36,6 +36,7 @@ import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import Iframe from "react-iframe";
 import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
+import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
 
 export default function MediaPage() {
   const { canEditTtsModel, user } = useSession();
@@ -52,10 +53,31 @@ export default function MediaPage() {
       ratings.gather({ res, key: "token" });
     },
   });
+  const batchToken = mediaFile?.maybe_batch_token;
+  const [images, setImages] = useState<string[]>([]);
 
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
+
+
+  useEffect(() => {
+    if (batchToken) {
+      GetMediaBatchImages(batchToken, {}, {})
+        .then(response => {
+          if (response.success) {
+            const imageUrls = response.results.map(result =>
+              bucketConfig.getGcsUrl(result.public_bucket_path)
+            );
+            setImages(imageUrls);
+          } else {
+            console.error("Failed to fetch batch images");
+          }
+        })
+        .catch(err => console.error("Error fetching batch images:", err));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [batchToken]);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -64,6 +86,7 @@ export default function MediaPage() {
   const openDeleteModal = () => setIsDeleteModalOpen(true);
 
   const deleteMedia = () => remove(!!user?.can_ban_users);
+
 
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
@@ -99,25 +122,15 @@ export default function MediaPage() {
         );
 
       case MediaFileType.Image:
-        const one = false;
-        const multi = one ? false : true;
-        let sdMediaImage = "/images/avatars/default-pfp.png";
-        if (mediaFile.public_bucket_path) {
-          sdMediaImage = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
-        }
-
-        //Replace this with images from btach media endpoint
-        const images = [
-          "/images/test/castle-1.png",
-          "/images/test/castle-2.png",
-        ];
+        const one = images.length === 1;
+        let sdMediaImage = one ? images[0] : "/images/avatars/default-pfp.png";
 
         return (
           <>
-            {!multi ? (
-              <SdCoverImagePanel src={sdMediaImage} />
-            ) : (
+            {!one ? (
               <SdBatchMediaPanel images={images} />
+            ) : (
+              <SdCoverImagePanel src={sdMediaImage} />
             )}
           </>
         );
