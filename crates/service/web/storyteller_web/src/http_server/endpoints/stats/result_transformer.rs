@@ -28,6 +28,7 @@ pub struct Queues {
   pub so_vits_svc: u64,
   pub tacotron2: u64, // Tacotron2 (as generic_inference_jobs; NB: included in `total_generic`)
   pub vall_e_x: u64, // Counts both model weight calculation and inference.
+  pub stable_diffusion: u64,
 }
 
 pub fn database_result_to_cacheable(database_records: Vec<QueueStatsRow>) -> CacheableQueueStats {
@@ -47,6 +48,7 @@ pub fn database_result_to_cacheable(database_records: Vec<QueueStatsRow>) -> Cac
   let so_vits_svc = unwrap(queue_lengths.get("so_vits_svc"));
   let tacotron2 = unwrap(queue_lengths.get("tacotron2"));
   let vall_e_x = unwrap(queue_lengths.get("vall_e_x"));
+  let stable_diffusion = unwrap(queue_lengths.get("stable_diffusion"));
 
   let total_generic = rvc_v2 + so_vits_svc;
 
@@ -60,6 +62,7 @@ pub fn database_result_to_cacheable(database_records: Vec<QueueStatsRow>) -> Cac
       so_vits_svc,
       tacotron2,
       vall_e_x,
+      stable_diffusion,
     },
   }
 }
