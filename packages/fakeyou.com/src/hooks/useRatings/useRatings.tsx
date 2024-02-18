@@ -34,9 +34,14 @@ export default function useRatings() {
     checker: () => true,
     // debug: "useRatings",
     modLibrary: (current: any, res: any, entity_token: string, tokenType: string) => {
-      let { positive_rating_count } = res.results ? res.results.find((item: any, i: number) => 
-        item[tokenType] === entity_token
-      ).stats : res.stats;
+      
+      let result = res.results ? res.results.find((item: any, i: number) => 
+        {
+          return (item.details || item)[tokenType] === entity_token
+        }
+      ) : res;
+
+      let { positive_rating_count } = (result.details || result).stats;
 
       return { ...current, positive_rating_count };
     },

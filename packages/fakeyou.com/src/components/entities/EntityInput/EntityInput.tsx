@@ -3,43 +3,25 @@ import { useLocation } from "react-router-dom";
 import { a, useTransition } from "@react-spring/web";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import Iframe from "react-iframe";
-import { MediaBrowser } from "components/modals";
-import { FileWrapper, Label, Spinner } from "components/common";
-import { EntityType, MediaFilterProp, WeightFilterProp } from "components/entities/EntityTypes";
+import { Label, Spinner } from "components/common";
+import { AcceptTypes, EntityInputMode, EntityModeProp } from "components/entities/EntityTypes";
 import { useFile, useMedia, useModal, useSession } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { faDiagramSankey, faFile, faFileArrowUp, faGrid, faImage, faPersonWalking, faWaveform } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import { UploadMedia, UploadMediaResponse } from "@storyteller/components/src/api/media_files/UploadMedia";
 import { v4 as uuidv4 } from "uuid";
+import EntityInputEmpty from "./EntityInputEmpty";
 import "./EntityInput.scss";
 
-// enum EntityInputMode {
-//   Bookmarks = "bookmarks",
-//   Media = "media",
-//   Weights = "weights",
-//   SearchWeights = "searchWeights",
-// }
-
 interface Props {
+  accept?: AcceptTypes | AcceptTypes[],
   aspectRatio?: "square" | "landscape" | "portrait",
-  mediaType?: MediaFilterProp,
   label?: string, 
   onChange?: any,
-  type: string,
-  weightType?: WeightFilterProp
+  type: EntityModeProp,
 }
 
-interface SlideProps {
+export interface SlideProps {
   media?: MediaFile
-};
-
-interface EmptySlideProps extends SlideProps {
-  entityType: EntityType,
-  filterType: MediaFilterProp | WeightFilterProp,
-  inputProps?: any,
-  open: any,
-  user: any
 };
 
 interface AniProps {
@@ -56,12 +38,12 @@ const MediaBusy = () => {
 
 const MocapInputFull = ({ media }: SlideProps) => {
   const bucketConfig = new BucketConfig();
-  const bvhUrl = media?.public_bucket_path ? bucketConfig.getGcsUrl(media.public_bucket_path) : "";
+  const mediaUrl = media?.public_bucket_path ? bucketConfig.getGcsUrl(media.public_bucket_path) : "";
 
   return <>
     <Iframe
         {...{
-          url: `https://engine.fakeyou.com?mode=viewer&bvh=${bvhUrl}`,
+          url: `https://engine.fakeyou.com?mode=viewer&${media?.media_type}=${mediaUrl}`,
           className: "fy-entity-input-mocap-preview",
         }}
       />
@@ -71,42 +53,6 @@ const MocapInputFull = ({ media }: SlideProps) => {
   </>;
 };
 
-const MediaPickerEmpty = ({ entityType, filterType, open, inputProps, user, ...rest }: EmptySlideProps) => {
-  const browserClick = () => open({
-    component: MediaBrowser,
-    props: { entityType, filterType, username: user?.username || "", ...rest }
-  });
-
-  const mediaIcons = () => {
-    switch (filterType) {
-      case "audio": return faWaveform;
-      case "image": return faImage;
-      case "bvh": return faPersonWalking;
-      default: return faFile;
-    }
-  }
-
-  return <>
-    <Icon {...{ className: "fy-entity-input-icon", icon: [faFile,mediaIcons(),faDiagramSankey][entityType] }}/>
-    <div {...{ className: "fy-entity-input-empty-controls" }}>
-     { entityType ===  EntityType.media &&
-        <FileWrapper {...{ containerClass: "fy-entity-input-row", panelClass: "fy-entity-input-button", noStyle: true, ...inputProps }}>
-           <>
-             <Icon {...{ className: "fy-entity-input-label-icon", icon: faFileArrowUp }}/>
-             <div {...{ className: "fy-entity-input-upload-detail" }}>
-               Upload, click or drag here
-               { filterType !== "all" && <span>{ filterType } files supported</span> }
-             </div>
-           </>
-         </FileWrapper> }
-      <div {...{ className: "fy-entity-input-row fy-entity-input-button", onClick: browserClick }}>
-        <Icon {...{ className: "fy-entity-input-label-icon", icon: faGrid }}/>
-        Choose from your { ["","media","weights"][entityType] }
-      </div>
-    </div>
-  </>;
-}
-
 const AniMod = ({ animating, className, isLeaving, render: Render, style, ...rest }: AniProps) => <a.div {...{
   className: `fy-slide-frame${ className ?  " " + className : "" }`,
   style
@@ -114,15 +60,21 @@ const AniMod = ({ animating, className, isLeaving, render: Render, style, ...res
     <Render {...{ ...rest, animating }} />
   </a.div>;
 
-export default function EntityInput({ aspectRatio = "square", label, onChange, mediaType, weightType, ...rest }: Props) {
-  const entityType = mediaType ? EntityType.media : weightType ? EntityType.weights : EntityType.unknown;
-  const filterType = mediaType || weightType || "all";
+export default function EntityInput({ accept: inAccept, aspectRatio = "square", label, onChange, type, ...rest }: Props) {
+  const accept = Array.isArray(inAccept) ? inAccept : [inAccept];
+  const inputMode = EntityInputMode[type];
   const { search } = useLocation();
   const presetToken = search ? new URLSearchParams(search).get("preset_token") : "";
   const [mediaToken,mediaTokenSet] = useState(presetToken || "");
   const { media, mediaSet } = useMedia({ mediaToken });
   const { user } = useSession();
   const { open } = useModal();
+
+  const selectToken = (token: string) => {
+    mediaTokenSet(token);
+    onChange({ target: { name: "temp", value: token } });
+  };
+
   const { clear, inputProps } = useFile({
     onChange: (inputFile: any) => {
       if (inputFile) UploadMedia({
@@ -133,17 +85,17 @@ export default function EntityInput({ aspectRatio = "square", label, onChange, m
       .then((res: UploadMediaResponse) => {
         if ("media_file_token" in res) {
           clear();
-          mediaTokenSet(res.media_file_token);
+          selectToken(res.media_file_token);
         }
       });
       else console.log("🥺 no file");
     }
   });
   const onSelect = (data: MediaFile) => {
-    mediaSet(data)
-    console.log("🔅",data);
-    onChange({ target: { name: "temp", value: data.token } });
-  }
+    mediaSet(data);
+    selectToken(data.token);
+  };
+
   const busy = false;
   const index = busy ? 0 : media ? 1 : 2;
   const [animating,animatingSet] = useState(false);
@@ -157,12 +109,10 @@ export default function EntityInput({ aspectRatio = "square", label, onChange, m
     onStart: () => animatingSet(true)
   });
 
-
   return <>
     <Label {...{ label }}/>
     <div {...{ className: `fy-entity-input panel-inner${ aspectRatio ? " fy-entity-input-" + aspectRatio : "" }`, }}>
       { 
-        // media ? <MocapInputFull {...{ media }}/> : <MediaPickerEmpty {...{ inputProps, media, onSelect, open, user }}/>
         transitions((style: any, i: number, state: any) => {
           let isLeaving = state.phase === "leave";
           let sharedProps = { animating, isLeaving, media, style };
@@ -170,9 +120,8 @@ export default function EntityInput({ aspectRatio = "square", label, onChange, m
           return [
             <AniMod {...{ render: MediaBusy, className: "fy-entity-input-busy", ...sharedProps }}/>,
             <AniMod {...{ render: MocapInputFull, className: "fy-entity-input-full", ...sharedProps }}/>,
-            <AniMod {...{ render: MediaPickerEmpty, className: "fy-entity-input-empty", entityType, filterType, inputProps, onSelect, open, user, ...sharedProps, ...rest }}/>
+            <AniMod {...{ render: EntityInputEmpty, className: "fy-entity-input-empty", accept, inputMode, inputProps, onSelect, open, user, ...sharedProps, ...rest }}/>
           ][i];
-        
         })
       }
     </div>

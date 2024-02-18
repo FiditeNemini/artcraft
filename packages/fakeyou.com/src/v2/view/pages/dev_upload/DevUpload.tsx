@@ -1,19 +1,18 @@
+import React, { useState } from "react";
 import Panel from "components/common/Panel";
 import Container from "components/common/Container";
 import PageHeader from "components/layout/PageHeader";
-import React, { useState } from "react";
+import { useSession } from "hooks";
 import { Button } from "components/common";
 import { faUpload } from "@fortawesome/pro-solid-svg-icons";
-import {
-  UploadMedia,
-  UploadMediaResponse,
-} from "@storyteller/components/src/api/media_files/UploadMedia";
+import {  UploadMedia,  UploadMediaResponse, } from "@storyteller/components/src/api/media_files/UploadMedia";
 import { v4 as uuidv4 } from "uuid";
 import { Link } from "react-router-dom";
 
 interface DevUploadProps {}
 
 export default function DevUpload(props: DevUploadProps) {
+  const { studioAccessCheck } = useSession();
   const [file, fileSet] = useState<File | null>(null);
   const [tokens, tokensSet] = useState<string[]>([]);
 
@@ -38,7 +37,7 @@ export default function DevUpload(props: DevUploadProps) {
     else console.log("🥺 no file");
   };
 
-  return (
+  return studioAccessCheck(
     <Container type="padded" className="pt-4 pt-lg-5">
       <PageHeader
         title="Upload Generic File"

@@ -8,6 +8,7 @@ import {
   faCameraMovie,
   faCompass,
   faCloudUpload,
+  faFilms,
   faFaceViewfinder,
   faHome,
   faMessageDots,
@@ -307,6 +308,20 @@ export default function SideNav({
 
         <li>
           <NavLink
+            to="/video-styletransfer"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon
+              icon={faFilms}
+              className="sidebar-heading-icon"
+            />
+            {t("videoStryleTransfer")}
+          </NavLink>
+        </li>
+
+        <li>
+          <NavLink
             to="/studio"
             activeClassName="active-link"
             onClick={handleNavLinkClick}
@@ -337,30 +352,26 @@ export default function SideNav({
     );
   }
 
-  let maybeImageGeneration = <></>;
-
-  if (sessionWrapper.canAccessStudio()) {
-    maybeImageGeneration = (
-      <>
-        <li className="sidebar-heading">Image Generation</li>
-        <li>
-          <NavLink
-            to="/text-to-image"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon
-              icon={faMessageImage}
-              className="sidebar-heading-icon"
-            />
-            Text to Image
-            {/* {t("videoStorytellerStudio")} */}
-          </NavLink>
-        </li>
-        <hr className="mb-3 mt-3" />
-      </>
-    );
-  }
+  let maybeImageGeneration = (
+    <>
+      <li className="sidebar-heading">Image Generation</li>
+      <li>
+        <NavLink
+          to="/text-to-image"
+          activeClassName="active-link"
+          onClick={handleNavLinkClick}
+        >
+          <FontAwesomeIcon
+            icon={faMessageImage}
+            className="sidebar-heading-icon"
+          />
+          Text to Image
+          {/* {t("videoStorytellerStudio")} */}
+        </NavLink>
+      </li>
+      <hr className="mb-3 mt-3" />
+    </>
+  );
 
   return (
     <>

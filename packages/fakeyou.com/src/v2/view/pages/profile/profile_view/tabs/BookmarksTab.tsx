@@ -11,7 +11,7 @@ import Pagination from "components/common/Pagination";
 
 import { useBookmarks, useListContent, useRatings } from "hooks";
 import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
-import WeightsCards from "components/common/Card/WeightsCards";
+import BookmarksCards from "components/common/Card/BookmarksCards";
 import prepFilter from "resources/prepFilter";
 
 export default function BookmarksTab({ username }: { username: string }) {
@@ -58,8 +58,8 @@ export default function BookmarksTab({ username }: { username: string }) {
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
     onSuccess: res => {
-      bookmarks.gather({ res, key: "weight_token" });
-      ratings.gather({ res, key: "weight_token" });
+      bookmarks.gather({ res, key: "entity_token" });
+      ratings.gather({ res, key: "entity_token" });
       setShowMasonryGrid(true);
     },
     requestList: true,
@@ -210,22 +210,16 @@ export default function BookmarksTab({ username }: { username: string }) {
                 onLayoutComplete={() => console.log("Layout complete!")}
               >
                 {dataList.map((data: any, key: number) => {
-                  let weightProps = {
+                  let props = {
                     bookmarks,
                     data,
+                    //   origin,
                     ratings,
                     showCreator: true,
                     source,
-                    type: "weights",
+                    type: data.details?.entity_type === "media_file" ?
+                      "media" : "weights", // this is gross, but I'm replacing all of this anyway -V
                   };
-
-                  // let mediaProps = {
-                  //   bookmarks,
-                  //   data,
-                  //   origin,
-                  //   type: "media",
-                  //   showCreator: true,
-                  // };
 
                   return (
                     <div
@@ -234,15 +228,11 @@ export default function BookmarksTab({ username }: { username: string }) {
                         key,
                       }}
                     >
-                      <WeightsCards
-                        {...{
-                          type: data.details.maybe_weight_data.weight_category,
-                          props: weightProps,
-                        }}
-                      />
-                      {/* <MediaCards
-                        {...{ type: data.media_type, props: mediaProps }}
-                      /> */}
+                     <BookmarksCards {...{
+                        entityType: data.details?.entity_type,
+                        type: data.details.maybe_weight_data?.weight_category || data.details.maybe_media_file_data?.media_type,
+                        props,
+                      }} />
                     </div>
                   );
                 })}

@@ -43,8 +43,6 @@ export default function AudioCard({
   const linkUrl = getCardUrl(data, source, type);
   const history = useHistory();
 
-  console.log("🟩", data);
-
   const handleSelectModalResultSelect = () => {
     if (inSelectModal) {
       onResultSelect &&
@@ -108,17 +106,22 @@ export default function AudioCard({
             </div>
 
             <h6 className="fw-semibold text-white mb-1 mt-3">
-              {data.origin.maybe_model
+              {data.origin?.maybe_model
                 ? data.origin.maybe_model.title
                 : "Media Audio"}
             </h6>
             <p className="fs-7 opacity-75">{timeAgo}</p>
+            {data.maybe_text_transcript && (
+              <p className="fs-7 mt-2 two-line-ellipsis">
+                {data.maybe_text_transcript}
+              </p>
+            )}
           </div>
-          <AudioPlayer src={data.public_bucket_path} id={data.token} />
+          <AudioPlayer src={data.details?.maybe_media_file_data?.public_bucket_path || data.public_bucket_path} id={data.token} />
           <CardFooter
             {...{
-              creator: data?.maybe_creator,
-              entityToken: data.token,
+              creator: data?.maybe_creator || data.details?.maybe_media_file_data?.maybe_creator,
+              entityToken: data.details?.entity_token || data.token,
               entityType: "media_file",
               makeBookmarksProps: bookmarks?.makeProps,
               makeRatingsProps: ratings?.makeProps,
@@ -180,9 +183,8 @@ export default function AudioCard({
           </div>
           <CardFooter
             {...{
-              creator:
-                data?.creator || data.details.maybe_weight_data?.maybe_creator,
-              entityToken: data.weight_token,
+              creator: data?.creator || data.details.maybe_weight_data?.maybe_creator,
+              entityToken: data.weight_token || data.details?.entity_token,
               entityType: "model_weight",
               makeBookmarksProps: bookmarks?.makeProps,
               makeRatingsProps: ratings?.makeProps,

@@ -49,7 +49,7 @@ export default function PageFilterControls({
     },
   });
 
-  const [workflowValues, setworkflowValues] = useState<WorkflowValuesType>({
+  const [workflowValues, setWorkflowValues] = useState<WorkflowValuesType>({
     fileToken: pageState.mediaFileToken || mediaToken,
     outputPath: "vid2vid/SparseUpscaleInterp_00001.mp4",
     workflowConfig: "weight_q8sz47gmfw2zx02snrbz88ns9",
@@ -64,9 +64,26 @@ export default function PageFilterControls({
   });
 
   const handleOnChange = (key: string, newValue:any,) => {
-    setworkflowValues((curr)=>({...curr, [key]: newValue}));
+    setWorkflowValues((curr)=>({...curr, [key]: newValue}));
   }
-
+  const handleReset = ()=>{
+    setWorkflowValues((curr)=>({
+      fileToken: pageState.mediaFileToken || mediaToken,
+      outputPath: "vid2vid/SparseUpscaleInterp_00001.mp4",
+      workflowConfig: "weight_q8sz47gmfw2zx02snrbz88ns9",
+      seed: curr.seed,
+      sdModelToken: "",
+      loraModelToken: "",
+      posPrompt: "",
+      negPrompt: "",
+      ...VideoIvs,
+      width: curr.width,
+      height: curr.height,
+      maxFrames: curr.maxFrames,
+      ...AdvIvs,
+      ...CnIvs
+    }));
+  }
   const history = useHistory();
   const handleGenerate = ()=>{
     if(debug) console.log(workflowValues)
@@ -125,6 +142,13 @@ export default function PageFilterControls({
                       tooltip="feature not available yet"
                       variant="primary"
                       disabled
+                    />
+                    <Button
+                      className="me-3"
+                      label={t("button.resetToDefault")}
+                      tooltip="Reset all variables to default values"
+                      variant="primary"
+                      onClick={handleReset}
                     />
                     <Button
                       className="me-3"

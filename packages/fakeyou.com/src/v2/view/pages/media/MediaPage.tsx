@@ -29,8 +29,9 @@ import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import SocialButton from "components/common/SocialButton";
 import { Badge, Input, Modal } from "components/common";
+import BookmarkButton from "components/common/BookmarkButton";
 import LikeButton from "components/common/LikeButton";
-import { useMedia, useRatings, useSession } from "hooks";
+import { useBookmarks, useMedia, useRatings, useSession } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import Iframe from "react-iframe";
@@ -38,6 +39,7 @@ import Iframe from "react-iframe";
 export default function MediaPage() {
   const { canEditTtsModel, user } = useSession();
   const { token } = useParams<{ token: string }>();
+  const bookmarks = useBookmarks();
   const ratings = useRatings();
   const {
     media: mediaFile,
@@ -73,19 +75,13 @@ export default function MediaPage() {
             <MediaAudioComponent mediaFile={mediaFile} />
 
             {/* Show TTS text input if it is a TTS result */}
-            {mediaFile.public_bucket_path.includes("tts_inference_output") && (
+            {mediaFile.maybe_text_transcript && (
               <div className="mt-4">
                 <h5 className="fw-semibold">
                   <FontAwesomeIcon icon={faSquareQuote} className="me-2" />
-                  Audio Text
+                  Audio Text Transcript
                 </h5>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Pellentesque elit ullamcorper dignissim cras tincidunt
-                  lobortis. Integer malesuada nunc vel risus commodo viverra
-                  maecenas accumsan lacus.
-                </p>
+                <p>{mediaFile.maybe_text_transcript}</p>
               </div>
             )}
           </div>
@@ -398,14 +394,15 @@ export default function MediaPage() {
                         }),
                       }}
                     />
-                    {/* <BookmarkButton
-                        {...{
-                          entityToken: weight_token,
-                          entityType: "model_weight",
-                          onToggle: bookmarks.toggle,
-                          large: true,
-                        }}
-                      /> */}
+                    <BookmarkButton
+                      {...{
+                        large: true,
+                        ...bookmarks.makeProps({
+                          entityToken: token,
+                          entityType: "media_file",
+                        }),
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -441,11 +438,11 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
-                {mediaFile?.media_type === MediaFileType.BVH ? (
+                {mediaFile?.media_type === MediaFileType.BVH || mediaFile?.media_type === MediaFileType.GLTF || mediaFile?.media_type === MediaFileType.GLB   ? (
                   <Button
                     {...{
                       icon: faVideoPlus,
-                      label: "Use BVH in Engine Compositor",
+                      label: "Use in Engine Compositor",
                       to: `/engine-compositor?preset_token=${mediaFile.token}`,
                       variant: "primary",
                       className: "flex-grow-1",

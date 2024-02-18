@@ -1,6 +1,6 @@
 import React from "react";
 
-import { BasicVideo, Panel, Tabs } from "components/common";
+import { Panel, Tabs } from "components/common";
 
 import { State, Action } from "../videoWorkflowReducer";
 import TabContentUpload from "./tabContentUpload";
@@ -43,13 +43,8 @@ export default function PageVideoProvision({
           <div className="col-12 col-md-6">
             <Tabs tabs={tabs} />
           </div>
-          <div className="col-12 col-md-6">
-            <Panel padding={true} clear={true}>
-              <BasicVideo
-                title={t("video.instruction")}
-                src="/videos/face-animator-instruction-en.mp4"
-              />
-            </Panel>
+          <div className="col-12 col-md-6 p-5 mt-3">
+            <p>{t("video.instruction")}</p>
           </div>
         </div>
       </Panel>

@@ -53,6 +53,7 @@ export default function useListContent({
   const fetchError = status === FetchStatus.error;
 
   const pageChange = (page: number) => {
+    onInputChange();
     pageSet(page);
     statusSet(FetchStatus.ready);
   };

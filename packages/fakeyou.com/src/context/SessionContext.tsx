@@ -21,6 +21,7 @@ interface SessionContextType {
   querySession?: any;
   querySubscriptions?: any;
   sessionFetched: boolean;
+  studioAccessCheck: (x:any) => any,
   user?: any;
   userTokenMatch: (token: string) => boolean;
 }
@@ -31,6 +32,7 @@ export default createContext<SessionContextType>({
   check: () => false,
   loggedIn: false,
   sessionFetched: false,
+  studioAccessCheck: () => null,
   modal: {
     close: () => {},
     open: () => {},

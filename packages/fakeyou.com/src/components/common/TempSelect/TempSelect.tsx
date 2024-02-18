@@ -4,8 +4,10 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import ReactSelect, { Props as ReactSelectProps } from "react-select";
 import "./TempSelect.scss";
 
+type OptionValue = string | number | boolean;
+
 export interface Option {
-  value: string | number | boolean;
+  value: OptionValue;
   label: string;
 }
 
@@ -33,8 +35,14 @@ export default function Select({
 }: SelectProps) {
   const valueLabel =
     options.find((option: any) => option.value === value)?.label || "";
-  const onChange = ({ value }: any) =>
-    inChange({ target: { value, name, type: "select" } });
+  const onChange = (option: any, x: any) => {
+    // console.log("🧪",option, x); // WIP -V
+    if (Array.isArray(option)) {
+
+    } else {
+      inChange({ target: {value: option.value, name, type: "select" } });
+    }
+  }
   const className = `${icon ? " input-icon" : ""}${
     small ? " select-small" : ""
   }`;

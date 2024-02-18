@@ -57,11 +57,11 @@ export default function useBatchContent({
   const dlog = (...dbg: any) => debug ? console.log(...dbg) : {};
 
   const gather = ({ expand, key, res }: Gather) => {
-    let tokens = res.results ? res.results.map((item: any) => item[key]) : [res[key]];
-    let abc = tokens.reduce((obj = {},token = "") => ({ ...obj, [token]: true }),{})
+    let tokens = res.results ? res.results.map((item: any) => (item.details || item)[key]) : [res[key]];
+    let loadingTokens = tokens.reduce((obj = {},token = "") => ({ ...obj, [token]: true }),{})
     dlog("🪙",fetcher);
     tokenTypeSet(key)
-    busyListSet(abc); // add current batch to busy list
+    busyListSet(loadingTokens); // add current batch to busy list
     fetcher("",{},{ tokens }).then((batchRes: any) => {
 
     // console.log("🦄",resultsKey,  res, modLibrary);
@@ -82,7 +82,7 @@ export default function useBatchContent({
         busyListSet({}); // this should be a for each key in tokens delete from busyList, but this is fine for now
         librarySet((library: any) => expand ? { ...library, ...newBatch } : newBatch);
       }
-    })
+    });
   };
 
 
