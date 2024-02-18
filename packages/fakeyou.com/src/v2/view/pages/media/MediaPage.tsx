@@ -35,6 +35,7 @@ import { useBookmarks, useMedia, useRatings, useSession } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import Iframe from "react-iframe";
+import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
 
 export default function MediaPage() {
   const { canEditTtsModel, user } = useSession();
@@ -98,11 +99,33 @@ export default function MediaPage() {
         );
 
       case MediaFileType.Image:
+        const one = false;
+        const multi = one ? false : true;
         let sdMediaImage = "/images/avatars/default-pfp.png";
         if (mediaFile.public_bucket_path) {
           sdMediaImage = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         }
-        return <SdCoverImagePanel src={sdMediaImage} />;
+
+        const images = [
+          "https://swiperjs.com/demos/images/nature-1.jpg",
+          "https://swiperjs.com/demos/images/nature-2.jpg",
+          "https://swiperjs.com/demos/images/nature-3.jpg",
+          "https://swiperjs.com/demos/images/nature-4.jpg",
+          "https://swiperjs.com/demos/images/nature-5.jpg",
+          "https://swiperjs.com/demos/images/nature-6.jpg",
+          "https://swiperjs.com/demos/images/nature-7.jpg",
+          "https://swiperjs.com/demos/images/nature-8.jpg",
+        ];
+
+        return (
+          <>
+            {!multi ? (
+              <SdCoverImagePanel src={sdMediaImage} />
+            ) : (
+              <SdBatchMediaPanel images={images} />
+            )}
+          </>
+        );
       case MediaFileType.BVH:
         const bvhUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         return (

@@ -75,6 +75,7 @@
     "react-twitch-embed": "^3.0.1",
     "react-wavesurfer.js": "^0.0.8",
     "sass": "^1.57.1",
+    "swiper": "^11.0.5",
     "typescript": "^3.7.5",
     "universal-cookie": "^6.1.1",
     "uuid": "^8.3.2",
