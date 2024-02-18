@@ -106,15 +106,10 @@ export default function MediaPage() {
           sdMediaImage = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         }
 
+        //Replace this with images from btach media endpoint
         const images = [
-          "https://swiperjs.com/demos/images/nature-1.jpg",
-          "https://swiperjs.com/demos/images/nature-2.jpg",
-          "https://swiperjs.com/demos/images/nature-3.jpg",
-          "https://swiperjs.com/demos/images/nature-4.jpg",
-          "https://swiperjs.com/demos/images/nature-5.jpg",
-          "https://swiperjs.com/demos/images/nature-6.jpg",
-          "https://swiperjs.com/demos/images/nature-7.jpg",
-          "https://swiperjs.com/demos/images/nature-8.jpg",
+          "/images/test/castle-1.png",
+          "/images/test/castle-2.png",
         ];
 
         return (
