@@ -120,13 +120,15 @@ export default function MediaPage() {
         );
 
       case MediaFileType.Image:
-        const one = images.length === 1;
-        let sdMediaImage = one ? images[0] : "/images/avatars/default-pfp.png";
+        let sdMediaImage = "/images/avatars/default-pfp.png";
+        if (mediaFile.public_bucket_path) {
+          sdMediaImage = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
+        }
 
         return (
           <>
-            {!one ? (
-              <SdBatchMediaPanel images={images} />
+            {mediaFile.maybe_batch_token ? (
+              <SdBatchMediaPanel key={images.length} images={images} />
             ) : (
               <SdCoverImagePanel src={sdMediaImage} />
             )}

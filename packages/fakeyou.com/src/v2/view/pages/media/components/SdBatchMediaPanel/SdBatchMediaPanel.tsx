@@ -1,5 +1,5 @@
 import { Panel } from "components/common";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/free-mode";
@@ -15,27 +15,54 @@ interface SdCoverImagePanelProps {
 
 export default function SdBatchMediaPanel({ images }: SdCoverImagePanelProps) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
+  const [forceUpdateKey, setForceUpdateKey] = useState(0);
+  const [isPortrait, setIsPortrait] = useState(false);
+
+  useEffect(() => {
+    images.forEach(imgSrc => {
+      const img = new Image();
+      img.onload = () => {
+        // If any image is portrait, update isPortrait to true
+        if (img.height > img.width && !isPortrait) {
+          setIsPortrait(true);
+        }
+      };
+      img.src = imgSrc;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [images]);
+
+  useEffect(() => {
+    if (images.length > 0) {
+      // Force re-render of the Swiper component by updating a key
+      setForceUpdateKey(prevKey => prevKey + 1);
+    }
+  }, [images]);
 
   const handleSwiper = (swiper: SwiperType) => {
     setThumbsSwiper(swiper);
   };
 
+  const secondSwiperClass = `secondSwiper ${
+    isPortrait ? "portrait" : "landscape"
+  }`;
+
   return (
-    <Panel padding={true}>
+    <Panel padding={true} className="d-flex flex-column gap-4">
       <Swiper
+        key={forceUpdateKey}
         loop={true}
         spaceBetween={10}
         navigation={true}
         thumbs={{ swiper: thumbsSwiper }}
         modules={[FreeMode, Navigation, Thumbs]}
-        className="secondSwiper"
+        className={secondSwiperClass}
         slidesPerView={1}
+        initialSlide={0}
       >
         {images.map((imgSrc, index) => (
           <SwiperSlide key={index}>
-            <div className="media-img-container">
-              <img src={imgSrc} alt={`Slide ${index + 1}`} />
-            </div>
+            <img src={imgSrc} alt={`Slide ${index + 1}`} />
           </SwiperSlide>
         ))}
       </Swiper>
@@ -48,6 +75,7 @@ export default function SdBatchMediaPanel({ images }: SdCoverImagePanelProps) {
         watchSlidesProgress={true}
         modules={[FreeMode, Navigation, Thumbs]}
         className="firstSwiper"
+        initialSlide={0}
       >
         {images.map((imgSrc, index) => (
           <SwiperSlide key={index}>
