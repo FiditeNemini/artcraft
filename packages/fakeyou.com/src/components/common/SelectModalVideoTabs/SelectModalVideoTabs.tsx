@@ -12,7 +12,7 @@ import {
   MediaCards,
   Pagination,
   SkeletonCard,
-  // NonRouteTabs
+  NonRouteTabs
 } from "components/common";
 
 import { SelectModalData, SelectModalV2} from "../SelectModal";
@@ -21,29 +21,33 @@ import prepFilter from "resources/prepFilter";
 
 export default memo(function SelectModalWrapper({
   debug = false,
-  value,
+  value = "",
   modalTitle,
   inputLabel,
   onSelect
 }: {
   debug?: boolean;
-  value: SelectModalData;
+  value?: string;
   modalTitle: string;
   inputLabel: string;
   onSelect: (data:SelectModalData) => void;
 }) {
-
+  const tabs = [{
+    label: "All Videos",
+    content: (
+      <div className="searcher-container in-modal" id="allVideos">
+        <VideoTabsContent debug={debug} onSelect={onSelect}/>
+      </div>
+    )
+  }]
   return (
     <SelectModalV2
       modalTitle={modalTitle}
       label={inputLabel}
-      value={value.title !=="" 
-      ? value.title 
-      : value.token || ""}
+      value={value}
       onClear={()=>{onSelect({title:"",token:""})}}
-      // searcher={true}
     >
-      <VideoTabsContent debug={debug} onSelect={onSelect}/>
+      <NonRouteTabs tabs={tabs} />
     </SelectModalV2>
   );
 });
