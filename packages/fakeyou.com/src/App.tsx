@@ -60,11 +60,9 @@ import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import HttpBackend from "i18next-http-backend";
 
-import {
-  InferenceJobs,
-  ModalProvider,
-  SessionProvider,
-} from "components/providers";
+import { SessionProvider, InferenceJobs } from "components/providers";
+//this caused an error for me (Bombay) so i had to import it as a default
+import ModalProvider from "components/providers/ModalProvider";
 
 // NB: We're transitioning over to this instance of i18n-next that loads translations over HTTP from Json Files.
 // The old i18n-next instance (see below) bakes in translations into the compiled javascript blob.
@@ -210,8 +208,8 @@ function initInferenceJobsByCategoryMap(): Map<
   inferenceJobsByCategory.set(FrontendInferenceJobType.VideoMotionCapture, []);
   inferenceJobsByCategory.set(FrontendInferenceJobType.ImageGeneration, []);
   inferenceJobsByCategory.set(FrontendInferenceJobType.ConvertFbxtoGltf, []);
-  inferenceJobsByCategory.set(FrontendInferenceJobType.VideoWorkflow, [])
-  inferenceJobsByCategory.set(FrontendInferenceJobType.VideoStyleTransfer, [])
+  inferenceJobsByCategory.set(FrontendInferenceJobType.VideoWorkflow, []);
+  inferenceJobsByCategory.set(FrontendInferenceJobType.VideoStyleTransfer, []);
   return inferenceJobsByCategory;
 }
 
@@ -348,7 +346,7 @@ class App extends React.Component<Props, State> {
     // state needs to be set here, or if instead can be refreshed locally on
     // the page where the new "state" needed
 
-    if (this.state.sessionFetched === false){
+    if (this.state.sessionFetched === false) {
       this.setState({ sessionFetched: true });
     }
 
@@ -856,7 +854,7 @@ class App extends React.Component<Props, State> {
                 {...{
                   enqueue: this.enqueueInferenceJob,
                   byCategory: this.state.inferenceJobsByCategory,
-                  inferenceJobs: this.state.inferenceJobs
+                  inferenceJobs: this.state.inferenceJobs,
                 }}
               >
                 <SessionProvider
@@ -867,115 +865,126 @@ class App extends React.Component<Props, State> {
                     sessionFetched: this.state.sessionFetched,
                   }}
                 >
-
-              <ModalProvider> 
-                  <Switch>
-                    <Route path="/">
-                      <PageContainer
-                        sessionWrapper={this.state.sessionWrapper}
-                        querySessionAction={this.querySession}
-                        sessionSubscriptionsWrapper={
-                          this.state.sessionSubscriptionsWrapper
-                        }
-                        querySessionSubscriptionsAction={
-                          this.querySessionSubscriptions
-                        }
-                        isShowingVocodesNotice={
-                          this.state.isShowingVocodesNotice
-                        }
-                        clearVocodesNotice={this.clearVocodesNotice}
-                        isShowingLangaugeNotice={
-                          this.state.isShowingLanguageNotice
-                        }
-                        clearLanguageNotice={this.clearLanguageNotice}
-                        displayLanguage={this.state.displayLanguage}
-                        primaryLanguageCode={this.state.primaryLanguageCode}
-                        isShowingTwitchTtsNotice={
-                          this.state.isShowingTwitchTtsNotice
-                        }
-                        clearTwitchTtsNotice={this.clearTwitchTtsNotice}
-                        isShowingPleaseFollowNotice={
-                          this.state.isShowingPleaseFollowNotice
-                        }
-                        clearPleaseFollowNotice={this.clearPleaseFollowNotice}
-                        isShowingBootstrapLanguageNotice={
-                          this.state.isShowingBootstrapLanguageNotice
-                        }
-                        clearBootstrapLanguageNotice={
-                          this.clearBootstrapLanguageNotice
-                        }
-                        enqueueInferenceJob={this.enqueueInferenceJob}
-                        inferenceJobs={this.state.inferenceJobs}
-                        inferenceJobsByCategory={
-                          this.state.inferenceJobsByCategory
-                        }
-                        enqueueTtsJob={this.enqueueTtsJob}
-                        ttsInferenceJobs={this.state.ttsInferenceJobs}
-                        enqueueW2lJob={this.enqueueW2lJob}
-                        w2lInferenceJobs={this.state.w2lInferenceJobs}
-                        enqueueTtsModelUploadJob={this.enqueueTtsModelUploadJob}
-                        ttsModelUploadJobs={this.state.ttsModelUploadJobs}
-                        enqueueW2lTemplateUploadJob={
-                          this.enqueueW2lTemplateUploadJob
-                        }
-                        w2lTemplateUploadJobs={this.state.w2lTemplateUploadJobs}
-                        enqueueVocoderUploadJob={this.enqueueVocoderUploadJob}
-                        vocoderUploadJobs={this.state.vocoderUploadJobs}
-                        enqueueVoiceConversionModelUploadJob={
-                          this.enqueueVoiceConversionModelUploadJob
-                        }
-                        voiceConversionModelUploadJobs={
-                          this.state.voiceConversionModelUploadJobs
-                        }
-                        textBuffer={this.state.textBuffer}
-                        setTextBuffer={this.setTextBuffer}
-                        clearTextBuffer={this.clearTextBuffer}
-                        ttsModels={this.props.allTtsModels}
-                        setTtsModels={this.props.setAllTtsModels}
-                        allTtsCategories={this.props.allTtsCategories}
-                        setAllTtsCategories={this.props.setAllTtsCategories}
-                        computedTtsCategoryAssignments={
-                          this.props.computedTtsCategoryAssignments
-                        }
-                        setComputedTtsCategoryAssignments={
-                          this.props.setComputedTtsCategoryAssignments
-                        }
-                        allTtsCategoriesByTokenMap={
-                          this.props.allTtsCategoriesByTokenMap
-                        }
-                        allTtsModelsByTokenMap={
-                          this.props.allTtsModelsByTokenMap
-                        }
-                        ttsModelsByCategoryToken={
-                          this.props.ttsModelsByCategoryToken
-                        }
-                        dropdownCategories={this.props.dropdownCategories}
-                        setDropdownCategories={this.props.setDropdownCategories}
-                        selectedCategories={this.props.selectedCategories}
-                        setSelectedCategories={this.props.setSelectedCategories}
-                        maybeSelectedTtsModel={this.props.maybeSelectedTtsModel}
-                        setMaybeSelectedTtsModel={
-                          this.props.setMaybeSelectedTtsModel
-                        }
-                        selectedTtsLanguageScope={
-                          this.props.selectedTtsLanguageScope
-                        }
-                        setSelectedTtsLanguageScope={
-                          this.props.setSelectedTtsLanguageScope
-                        }
-                        voiceConversionModels={this.state.voiceConversionModels}
-                        setVoiceConversionModels={
-                          this.setAllVoiceConversionModels
-                        }
-                        maybeSelectedVoiceConversionModel={
-                          this.state.maybeSelectedVoiceConversionModel
-                        }
-                        setMaybeSelectedVoiceConversionModel={
-                          this.setMaybeSelectedVoiceConversionModel
-                        }
-                      />
-                    </Route>
-                  </Switch>
+                  <ModalProvider>
+                    <Switch>
+                      <Route path="/">
+                        <PageContainer
+                          sessionWrapper={this.state.sessionWrapper}
+                          querySessionAction={this.querySession}
+                          sessionSubscriptionsWrapper={
+                            this.state.sessionSubscriptionsWrapper
+                          }
+                          querySessionSubscriptionsAction={
+                            this.querySessionSubscriptions
+                          }
+                          isShowingVocodesNotice={
+                            this.state.isShowingVocodesNotice
+                          }
+                          clearVocodesNotice={this.clearVocodesNotice}
+                          isShowingLangaugeNotice={
+                            this.state.isShowingLanguageNotice
+                          }
+                          clearLanguageNotice={this.clearLanguageNotice}
+                          displayLanguage={this.state.displayLanguage}
+                          primaryLanguageCode={this.state.primaryLanguageCode}
+                          isShowingTwitchTtsNotice={
+                            this.state.isShowingTwitchTtsNotice
+                          }
+                          clearTwitchTtsNotice={this.clearTwitchTtsNotice}
+                          isShowingPleaseFollowNotice={
+                            this.state.isShowingPleaseFollowNotice
+                          }
+                          clearPleaseFollowNotice={this.clearPleaseFollowNotice}
+                          isShowingBootstrapLanguageNotice={
+                            this.state.isShowingBootstrapLanguageNotice
+                          }
+                          clearBootstrapLanguageNotice={
+                            this.clearBootstrapLanguageNotice
+                          }
+                          enqueueInferenceJob={this.enqueueInferenceJob}
+                          inferenceJobs={this.state.inferenceJobs}
+                          inferenceJobsByCategory={
+                            this.state.inferenceJobsByCategory
+                          }
+                          enqueueTtsJob={this.enqueueTtsJob}
+                          ttsInferenceJobs={this.state.ttsInferenceJobs}
+                          enqueueW2lJob={this.enqueueW2lJob}
+                          w2lInferenceJobs={this.state.w2lInferenceJobs}
+                          enqueueTtsModelUploadJob={
+                            this.enqueueTtsModelUploadJob
+                          }
+                          ttsModelUploadJobs={this.state.ttsModelUploadJobs}
+                          enqueueW2lTemplateUploadJob={
+                            this.enqueueW2lTemplateUploadJob
+                          }
+                          w2lTemplateUploadJobs={
+                            this.state.w2lTemplateUploadJobs
+                          }
+                          enqueueVocoderUploadJob={this.enqueueVocoderUploadJob}
+                          vocoderUploadJobs={this.state.vocoderUploadJobs}
+                          enqueueVoiceConversionModelUploadJob={
+                            this.enqueueVoiceConversionModelUploadJob
+                          }
+                          voiceConversionModelUploadJobs={
+                            this.state.voiceConversionModelUploadJobs
+                          }
+                          textBuffer={this.state.textBuffer}
+                          setTextBuffer={this.setTextBuffer}
+                          clearTextBuffer={this.clearTextBuffer}
+                          ttsModels={this.props.allTtsModels}
+                          setTtsModels={this.props.setAllTtsModels}
+                          allTtsCategories={this.props.allTtsCategories}
+                          setAllTtsCategories={this.props.setAllTtsCategories}
+                          computedTtsCategoryAssignments={
+                            this.props.computedTtsCategoryAssignments
+                          }
+                          setComputedTtsCategoryAssignments={
+                            this.props.setComputedTtsCategoryAssignments
+                          }
+                          allTtsCategoriesByTokenMap={
+                            this.props.allTtsCategoriesByTokenMap
+                          }
+                          allTtsModelsByTokenMap={
+                            this.props.allTtsModelsByTokenMap
+                          }
+                          ttsModelsByCategoryToken={
+                            this.props.ttsModelsByCategoryToken
+                          }
+                          dropdownCategories={this.props.dropdownCategories}
+                          setDropdownCategories={
+                            this.props.setDropdownCategories
+                          }
+                          selectedCategories={this.props.selectedCategories}
+                          setSelectedCategories={
+                            this.props.setSelectedCategories
+                          }
+                          maybeSelectedTtsModel={
+                            this.props.maybeSelectedTtsModel
+                          }
+                          setMaybeSelectedTtsModel={
+                            this.props.setMaybeSelectedTtsModel
+                          }
+                          selectedTtsLanguageScope={
+                            this.props.selectedTtsLanguageScope
+                          }
+                          setSelectedTtsLanguageScope={
+                            this.props.setSelectedTtsLanguageScope
+                          }
+                          voiceConversionModels={
+                            this.state.voiceConversionModels
+                          }
+                          setVoiceConversionModels={
+                            this.setAllVoiceConversionModels
+                          }
+                          maybeSelectedVoiceConversionModel={
+                            this.state.maybeSelectedVoiceConversionModel
+                          }
+                          setMaybeSelectedVoiceConversionModel={
+                            this.setMaybeSelectedVoiceConversionModel
+                          }
+                        />
+                      </Route>
+                    </Switch>
                   </ModalProvider>
                 </SessionProvider>
               </InferenceJobs>

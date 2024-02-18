@@ -55,11 +55,10 @@ export default function MediaPage() {
   });
   const batchToken = mediaFile?.maybe_batch_token;
   const [images, setImages] = useState<string[]>([]);
-
+  const bucketConfig = new BucketConfig();
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
-
 
   useEffect(() => {
     if (batchToken) {
@@ -86,7 +85,6 @@ export default function MediaPage() {
   const openDeleteModal = () => setIsDeleteModalOpen(true);
 
   const deleteMedia = () => remove(!!user?.can_ban_users);
-
 
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
@@ -366,8 +364,6 @@ export default function MediaPage() {
 
   const subtitleDivider = <span className="opacity-25 fs-5 fw-light">|</span>;
 
-  const bucketConfig = new BucketConfig();
-
   let weightUsedCoverImage = "/images/avatars/default-pfp.png";
   if (
     mediaFile?.maybe_model_weight_info !== null &&
@@ -469,7 +465,9 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
-                {mediaFile?.media_type === MediaFileType.BVH || mediaFile?.media_type === MediaFileType.GLTF || mediaFile?.media_type === MediaFileType.GLB   ? (
+                {mediaFile?.media_type === MediaFileType.BVH ||
+                mediaFile?.media_type === MediaFileType.GLTF ||
+                mediaFile?.media_type === MediaFileType.GLB ? (
                   <Button
                     {...{
                       icon: faVideoPlus,
