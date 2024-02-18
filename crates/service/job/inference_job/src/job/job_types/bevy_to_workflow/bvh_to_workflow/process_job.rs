@@ -246,7 +246,7 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
     maybe_creator_file_synthetic_id_category: IdCategory::MediaFile,
     maybe_creator_category_synthetic_id_category: IdCategory::MocapResult,
     maybe_mod_user_token: None,
-    is_batch_generated: false,
+    maybe_batch_token: None,
     is_generated_on_prem: false,
     checksum_sha2: &file_checksum,
     generated_by_worker: Some(&args.job_dependencies.job.info.container.hostname),

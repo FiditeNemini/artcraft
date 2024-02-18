@@ -34,6 +34,7 @@ use mysql_queries::queries::model_weights::create::create_weight::{
 };
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
+use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
@@ -273,6 +274,8 @@ pub async fn process_job_inference(
     }
   };
 
+  let batch_token = BatchGenerationToken::generate();
+
   let mut maybe_first_media_file_token = None;
 
   for i in 0..sd_args.maybe_batch_count.unwrap_or(1) {
@@ -296,7 +299,6 @@ pub async fn process_job_inference(
       }
     };
 
-
     // extra_file_modification_info: todo!(), // JSON ENCODED STRUCT
     let (media_file_token, _id) = insert_media_file_generic(InsertArgs {
       pool: mysql_pool,
@@ -307,7 +309,7 @@ pub async fn process_job_inference(
       maybe_origin_model_type: Some(MediaFileOriginModelType::StableDiffusion15),
       maybe_origin_model_token: Some(sd_model_weight_token.clone()),
       maybe_origin_filename: Some(file_path),
-      is_batch_generated: true,
+      maybe_batch_token: Some(&batch_token),
       maybe_mime_type: Some(metadata.mimetype.as_ref()),
       file_size_bytes: metadata.file_size_bytes,
       maybe_duration_millis: Some(inference_duration.as_millis() as u64),
@@ -343,10 +345,11 @@ pub async fn process_job_inference(
 
   let batch_token_result = insert_batch_generation_records(InsertBatchArgs {
     entries,
+    maybe_existing_batch_token: Some(&batch_token),
     transaction: &mut transaction,
   }).await;
 
-  let batch_token = match batch_token_result {
+  let _batch_token = match batch_token_result {
     Ok(v) => { v.to_string() }
     Err(_err) => {
       return Err(

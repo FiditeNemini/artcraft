@@ -13,6 +13,7 @@ pub struct BatchEntry {
 
 pub struct InsertBatchArgs<'a, 'b> {
   pub entries: Vec<BatchGenerationEntity>,
+  pub maybe_existing_batch_token: Option<&'a BatchGenerationToken>,
   pub transaction: &'a mut Transaction<'b, MySql>,
 }
 
@@ -21,7 +22,11 @@ pub struct InsertBatchArgs<'a, 'b> {
 ///
 /// NB: Calling code is responsible for rolling back the transaction if this fails.
 pub async fn insert_batch_generation_records<'a, 'b>(args: InsertBatchArgs<'a, 'b>) -> AnyhowResult<BatchGenerationToken> {
-  let batch_token = BatchGenerationToken::generate();
+
+  let batch_token = match args.maybe_existing_batch_token {
+    Some(existing_token) => existing_token.clone(),
+    None => BatchGenerationToken::generate(),
+  };
 
   let mut query_builder = QueryBuilder::new(r#"
     INSERT INTO batch_generations (token, entity_type, entity_token) VALUES

@@ -8,6 +8,7 @@ use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginM
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use errors::AnyhowResult;
+use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
@@ -29,8 +30,8 @@ pub struct InsertArgs<'a> {
     pub maybe_origin_model_token: Option<ModelWeightToken>,
     pub maybe_origin_filename: Option<String>,
 
-    // Generation flags and media details
-    pub is_batch_generated: bool,  // Assuming you set this in your application logic
+    // If batch generated, this is the batch token.
+    pub maybe_batch_token: Option<&'a BatchGenerationToken>,
 
     pub maybe_mime_type: Option<&'a str>,
     
@@ -67,6 +68,8 @@ pub async fn insert_media_file_generic(
     let mut maybe_creator_file_synthetic_id : Option<u64> = None;
     let mut maybe_creator_category_synthetic_id : Option<u64> = None;
 
+    let is_batch_generated = args.maybe_batch_token.is_some();
+
     let mut transaction = args.pool.begin().await?;
     
     // create a user token
@@ -102,7 +105,8 @@ pub async fn insert_media_file_generic(
             maybe_origin_model_token = ?, 
             maybe_origin_filename = ?,
 
-            is_batch_generated = ?, 
+            is_batch_generated = ?,
+            maybe_batch_token = ?,
 
             maybe_mime_type = ?,
             file_size_bytes = ?,
@@ -141,7 +145,8 @@ pub async fn insert_media_file_generic(
         args.maybe_origin_model_token.map(|e| e.to_string()),
         args.maybe_origin_filename,
 
-        args.is_batch_generated,
+        is_batch_generated,
+        args.maybe_batch_token.map(|e| e.to_string()),
 
         args.maybe_mime_type,
         args.file_size_bytes, 
