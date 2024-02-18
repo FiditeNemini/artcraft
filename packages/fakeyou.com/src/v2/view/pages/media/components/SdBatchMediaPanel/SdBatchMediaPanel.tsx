@@ -48,7 +48,7 @@ export default function SdBatchMediaPanel({ images }: SdCoverImagePanelProps) {
   }`;
 
   return (
-    <Panel padding={true} className="d-flex flex-column gap-4">
+    <Panel padding={false} clear className="d-flex flex-column gap-3">
       <Swiper
         key={forceUpdateKey}
         loop={images.length > 1}
