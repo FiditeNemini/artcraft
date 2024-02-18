@@ -90,18 +90,18 @@ function CreateCommentForm(props: Props) {
 
   let gravatarHash = user?.email_gravatar_hash;
   let gravatar = <span />;
-  let username = user.username;
-  let emailHash = user.email_gravatar_hash;
-  let avatarIndex = user.core_info.default_avatar.image_index;
-  let backgroundColorIndex = user.core_info.default_avatar.color_index;
+  let username = user?.username;
+  let emailHash = user?.email_gravatar_hash;
+  let avatarIndex = user?.core_info.default_avatar.image_index;
+  let backgroundColorIndex = user?.core_info.default_avatar.color_index;
 
   if (gravatarHash !== undefined) {
     gravatar = (
       <Gravatar
-        email_hash={emailHash}
-        avatarIndex={avatarIndex}
-        username={username}
-        backgroundIndex={backgroundColorIndex}
+        email_hash={emailHash || ""}
+        username={username || ""}
+        avatarIndex={avatarIndex || 0}
+        backgroundIndex={backgroundColorIndex || 0}
         size={40}
       />
     );

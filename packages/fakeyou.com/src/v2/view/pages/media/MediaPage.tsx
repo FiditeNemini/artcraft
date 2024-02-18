@@ -32,7 +32,6 @@ import { Badge, Input, Modal } from "components/common";
 import BookmarkButton from "components/common/BookmarkButton";
 import LikeButton from "components/common/LikeButton";
 import { useBookmarks, useMedia, useRatings, useSession } from "hooks";
-import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import Iframe from "react-iframe";
 import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
@@ -120,19 +119,16 @@ export default function MediaPage() {
         );
 
       case MediaFileType.Image:
-        let sdMediaImage = "/images/avatars/default-pfp.png";
+        let sdMediaImage = ["/images/avatars/default-pfp.png"];
         if (mediaFile.public_bucket_path) {
-          sdMediaImage = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
+          sdMediaImage = [bucketConfig.getGcsUrl(mediaFile.public_bucket_path)];
         }
 
         return (
-          <>
-            {mediaFile.maybe_batch_token ? (
-              <SdBatchMediaPanel key={images.length} images={images} />
-            ) : (
-              <SdCoverImagePanel src={sdMediaImage} />
-            )}
-          </>
+          <SdBatchMediaPanel
+            key={images.length}
+            images={mediaFile.maybe_batch_token ? images : sdMediaImage}
+          />
         );
       case MediaFileType.BVH:
         const bvhUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
