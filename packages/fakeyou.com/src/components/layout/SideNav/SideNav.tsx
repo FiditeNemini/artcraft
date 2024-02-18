@@ -146,6 +146,7 @@ export default function SideNav({
         pending_svc_jobs: 0,
         pending_tacotron2_jobs: 0,
         pending_voice_designer: 0,
+        pending_stable_diffusion: 0,
       },
     },
     legacy_tts: {
@@ -564,6 +565,12 @@ export default function SideNav({
                 {t("queueSvc")}:{" "}
                 <span className="text-red">
                   {queueStats.inference.by_queue.pending_svc_jobs}
+                </span>
+              </div>
+              <div>
+                Image Generation:{" "}
+                <span className="text-red">
+                  {queueStats.inference.by_queue.pending_stable_diffusion}
                 </span>
               </div>
               <div>
