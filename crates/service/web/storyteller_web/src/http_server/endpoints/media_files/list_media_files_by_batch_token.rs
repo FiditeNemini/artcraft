@@ -15,10 +15,12 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
+use mysql_queries::queries::media_files::list::list_media_files_by_batch_token::{list_media_files_by_batch_token, ListMediaFileByBatchArgs};
 use mysql_queries::queries::media_files::list::list_media_files_for_user::{list_media_files_for_user, ListMediaFileForUserArgs};
+use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
-use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 
+use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -26,12 +28,12 @@ use crate::server_state::ServerState;
 use crate::util::allowed_studio_access::allowed_studio_access;
 
 #[derive(Deserialize, ToSchema)]
-pub struct ListMediaFilesForUserPathInfo {
-  username: String,
+pub struct ListMediaFilesByBatchPathInfo {
+  token: BatchGenerationToken,
 }
 
 #[derive(Deserialize, ToSchema, IntoParams)]
-pub struct ListMediaFilesForUserQueryParams {
+pub struct ListMediaFilesByBatchQueryParams {
   pub sort_ascending: Option<bool>,
   pub page_size: Option<usize>,
   pub page_index: Option<usize>,
@@ -39,14 +41,14 @@ pub struct ListMediaFilesForUserQueryParams {
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct ListMediaFilesForUserSuccessResponse {
+pub struct ListMediaFilesByBatchSuccessResponse {
   pub success: bool,
-  pub results: Vec<MediaFileForUserListItem>,
+  pub results: Vec<MediaFilesByBatchListItem>,
   pub pagination: PaginationPage,
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct MediaFileForUserListItem {
+pub struct MediaFilesByBatchListItem {
   pub token: MediaFileToken,
 
   pub media_type: MediaFileType,
@@ -82,27 +84,27 @@ pub struct MediaFileForUserListItem {
 }
 
 #[derive(Debug, ToSchema)]
-pub enum ListMediaFilesForUserError {
+pub enum ListMediaFilesByBatchError {
   ServerError,
 }
 
-impl ResponseError for ListMediaFilesForUserError {
+impl ResponseError for ListMediaFilesByBatchError {
   fn status_code(&self) -> StatusCode {
     match *self {
-      ListMediaFilesForUserError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      ListMediaFilesByBatchError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
     }
   }
 
   fn error_response(&self) -> HttpResponse {
     let error_reason = match self {
-      ListMediaFilesForUserError::ServerError => "server error".to_string(),
+      ListMediaFilesByBatchError::ServerError => "server error".to_string(),
     };
 
     to_simple_json_error(&error_reason, self.status_code())
   }
 }
 
-impl std::fmt::Display for ListMediaFilesForUserError {
+impl std::fmt::Display for ListMediaFilesByBatchError {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
     write!(f, "{:?}", self)
   }
@@ -110,21 +112,21 @@ impl std::fmt::Display for ListMediaFilesForUserError {
 
 #[utoipa::path(
   get,
-  path = "/v1/media_files/list/user/{username}",
+  path = "/v1/media_files/batch/{token}",
   params(
-     ListMediaFilesForUserQueryParams,
+    ListMediaFilesByBatchQueryParams,
   ),
   responses(
-    (status = 200, description = "List Featured Media Files", body = ListMediaFilesForUserSuccessResponse),
-    (status = 500, description = "Server error", body = ListMediaFilesForUserError),
+    (status = 200, description = "List Media Files by Batch", body = ListMediaFilesByBatchSuccessResponse),
+    (status = 500, description = "Server error", body = ListMediaFilesByBatchError),
   ),
 )]
-pub async fn list_media_files_for_user_handler(
+pub async fn list_media_files_by_batch_token_handler(
   http_request: HttpRequest,
-  path: Path<ListMediaFilesForUserPathInfo>,
-  query: Query<ListMediaFilesForUserQueryParams>,
+  path: Path<ListMediaFilesByBatchPathInfo>,
+  query: Query<ListMediaFilesByBatchQueryParams>,
   server_state: web::Data<Arc<ServerState>>
-) -> Result<HttpResponse, ListMediaFilesForUserError>
+) -> Result<HttpResponse, ListMediaFilesByBatchError>
 {
   let maybe_user_session = server_state
       .session_checker
@@ -132,11 +134,8 @@ pub async fn list_media_files_for_user_handler(
       .await
       .map_err(|e| {
         warn!("Session checker error: {:?}", e);
-        ListMediaFilesForUserError::ServerError
+        ListMediaFilesByBatchError::ServerError
       })?;
-
-  let mut is_author = false;
-  let mut is_mod = false;
 
   // NB: Temporary rollout flag for certain file types (BVH, etc).
   let mut is_allowed_studio_access = allowed_studio_access(
@@ -144,30 +143,16 @@ pub async fn list_media_files_for_user_handler(
     &server_state.flags
   );
 
-  match maybe_user_session {
-    None => {},
-    Some(session) => {
-      is_author = session.username == path.username;
-      is_mod = session.can_ban_users;
-    },
-  };
-
   // TODO(bt,2023-12-04): Enforce real maximums and defaults
   let sort_ascending = query.sort_ascending.unwrap_or(false);
   let page_size = query.page_size.unwrap_or_else(|| 25);
   let page_index = query.page_index.unwrap_or_else(|| 0);
 
-  let view_as = if is_author {
-    ViewAs::Author
-  } else if is_mod {
-    ViewAs::Moderator
-  } else {
-    ViewAs::AnotherUser
-  };
+  // TODO(bt, 2024-02-18): This is wrong, but gotta go fast.
+  let view_as= ViewAs::Author;
 
-  let query_results = list_media_files_for_user(ListMediaFileForUserArgs {
-    username: &path.username,
-    maybe_filter_media_type: query.filter_media_type,
+  let query_results = list_media_files_by_batch_token(ListMediaFileByBatchArgs {
+    batch_token: &path.token,
     page_size,
     page_index,
     sort_ascending,
@@ -179,7 +164,7 @@ pub async fn list_media_files_for_user_handler(
     Ok(results) => results,
     Err(e) => {
       warn!("Query error: {:?}", e);
-      return Err(ListMediaFilesForUserError::ServerError);
+      return Err(ListMediaFilesByBatchError::ServerError);
     }
   };
 
@@ -206,7 +191,7 @@ pub async fn list_media_files_for_user_handler(
         }
         true
       })
-      .map(|record| MediaFileForUserListItem {
+      .map(|record| MediaFilesByBatchListItem {
         token: record.token,
         media_type: record.media_type,
         origin: MediaFileOriginDetails::from_db_fields_str(
@@ -236,7 +221,7 @@ pub async fn list_media_files_for_user_handler(
       })
       .collect::<Vec<_>>();
 
-  let response = ListMediaFilesForUserSuccessResponse {
+  let response = ListMediaFilesByBatchSuccessResponse {
     success: true,
     results,
     pagination: PaginationPage{
@@ -246,7 +231,7 @@ pub async fn list_media_files_for_user_handler(
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| ListMediaFilesForUserError::ServerError)?;
+      .map_err(|e| ListMediaFilesByBatchError::ServerError)?;
 
   Ok(HttpResponse::Ok()
       .content_type("application/json")

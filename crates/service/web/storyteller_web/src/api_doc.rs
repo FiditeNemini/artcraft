@@ -9,6 +9,7 @@ use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEnti
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use enums::common::visibility::Visibility;
+use tokens::tokens::batch_generations::*;
 use tokens::tokens::generic_inference_jobs::*;
 use tokens::tokens::media_files::*;
 use tokens::tokens::model_weights::*;
@@ -30,6 +31,7 @@ use crate::http_server::endpoints::media_files::delete_media_file::*;
 use crate::http_server::endpoints::media_files::get_media_file::*;
 use crate::http_server::endpoints::media_files::list_featured_media_files::*;
 use crate::http_server::endpoints::media_files::list_media_files::*;
+use crate::http_server::endpoints::media_files::list_media_files_by_batch_token::*;
 use crate::http_server::endpoints::media_files::list_media_files_for_user::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload_media_file::*;
@@ -64,6 +66,7 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
     crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler,
     crate::http_server::endpoints::media_files::list_featured_media_files::list_featured_media_files_handler,
     crate::http_server::endpoints::media_files::list_media_files::list_media_files_handler,
+    crate::http_server::endpoints::media_files::list_media_files_by_batch_token::list_media_files_by_batch_token_handler,
     crate::http_server::endpoints::media_files::list_media_files_for_user::list_media_files_for_user_handler,
     crate::http_server::endpoints::media_files::upload_media_file::upload_media_file_handler,
     crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler,
@@ -88,6 +91,7 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
   ),
   components(schemas(
     // Tokens
+    BatchGenerationToken,
     InferenceJobToken,
     MediaFileToken,
     ModelWeightToken,
@@ -146,14 +150,14 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
     EnqueueTTSRequestError,
     EnqueueTTSRequestSuccessResponse,
     FakeYouPlan,
+    GetInferenceJobStatusError,
+    GetInferenceJobStatusPathInfo,
+    GetInferenceJobStatusSuccessResponse,
     GetMediaFileError,
     GetMediaFileModelInfo,
     GetMediaFilePathInfo,
     GetMediaFileSuccessResponse,
     GetProfilePathInfo,
-    GetInferenceJobStatusError,
-    GetInferenceJobStatusPathInfo,
-    GetInferenceJobStatusSuccessResponse,
     GetUserRatingError,
     GetUserRatingResponse,
     GetWeightError,
@@ -167,6 +171,9 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
     ListDatasetsByUserSuccessResponse,
     ListFeaturedMediaFilesError,
     ListFeaturedMediaFilesSuccessResponse,
+    ListMediaFilesByBatchError,
+    ListMediaFilesByBatchPathInfo,
+    ListMediaFilesByBatchSuccessResponse,
     ListMediaFilesError,
     ListMediaFilesForUserError,
     ListMediaFilesForUserPathInfo,
@@ -192,6 +199,7 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
     MediaFileInfo,
     MediaFileListItem,
     MediaFileUploadError,
+    MediaFilesByBatchListItem,
     ModelWeightForList,
     ModelWeightForList,
     ModelWeightSearchResult,
