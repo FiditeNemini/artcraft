@@ -16,6 +16,7 @@ use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
+use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
@@ -43,6 +44,9 @@ pub struct MediaFileInfo {
   /// Type of media will dictate which fields are populated and what
   /// the frontend should display (eg. video player vs audio player).
   pub media_type: MediaFileType,
+  
+  /// If the file was generated as part of a batch, this is the token for the batch.
+  pub maybe_batch_token: Option<BatchGenerationToken>,
 
   /// URL to the media file
   pub public_bucket_path: String,
@@ -252,6 +256,7 @@ async fn modern_media_file_lookup(
     media_file: MediaFileInfo {
       token: result.token,
       media_type: result.media_type,
+      maybe_batch_token: result.maybe_batch_token,
       public_bucket_path,
       maybe_text_transcript: result.maybe_text_transcript,
       maybe_model_weight_info: match result.maybe_model_weights_token {
@@ -336,6 +341,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
     media_file: MediaFileInfo {
       token,
       media_type: MediaFileType::Audio, // NB: Always audio
+      maybe_batch_token: None,
       public_bucket_path,
       maybe_model_weight_info: Some(GetMediaFileModelInfo {
         // NB: These should be reasonable synthetic defaults for emulated TT2 results, even the "ModelWeightToken".

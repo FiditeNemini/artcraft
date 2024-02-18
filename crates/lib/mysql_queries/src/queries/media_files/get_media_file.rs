@@ -12,6 +12,7 @@ use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
@@ -26,6 +27,8 @@ pub struct MediaFile {
 
   // TODO: Other media details (file size, mime type, dimensions, duration, etc.)
   // TODO: Provenance data (product, upload vs inference, model details and foreign keys)
+
+  pub maybe_batch_token: Option<BatchGenerationToken>,
 
   pub maybe_text_transcript: Option<String>,
 
@@ -83,6 +86,8 @@ pub struct MediaFileRaw {
   pub media_type: MediaFileType,
 
   // TODO: Bucket hash bits.
+
+  pub maybe_batch_token: Option<BatchGenerationToken>,
 
   pub maybe_text_transcript: Option<String>,
 
@@ -147,6 +152,7 @@ pub async fn get_media_file(
   Ok(Some(MediaFile {
     token: record.token,
     media_type: record.media_type,
+    maybe_batch_token: record.maybe_batch_token,
     maybe_text_transcript: record.maybe_text_transcript,
     maybe_creator_user_token: record.maybe_creator_user_token,
     maybe_creator_username: record.maybe_creator_username,
@@ -191,6 +197,8 @@ SELECT
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
+
+    m.maybe_batch_token as `maybe_batch_token: tokens::tokens::batch_generations::BatchGenerationToken`,
 
     m.maybe_text_transcript,
 
@@ -258,6 +266,8 @@ SELECT
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
+
+    m.maybe_batch_token as `maybe_batch_token: tokens::tokens::batch_generations::BatchGenerationToken`,
 
     m.maybe_text_transcript,
 
