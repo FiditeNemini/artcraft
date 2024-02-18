@@ -1,6 +1,7 @@
 {
   "button": {
     "generate": "สร้าง",
+    "proceed": "ดำเนินการต่อเพื่อเข้าคิว Motion Capture",
     "select": "เลือก",
     "upload": "อัปโหลดวิดีโอ"
   },

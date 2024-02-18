@@ -1,6 +1,12 @@
 import { GetRatings } from "@storyteller/components/src/api/user_ratings/GetRatings";
 import { SetRating } from "@storyteller/components/src/api/user_ratings/SetRating";
-import { useBatchContent } from "hooks";
+import useBatchContent, { BatchInputProps, MakePropsParams } from "hooks/useBatchContent";
+
+export interface RatingsProps extends BatchInputProps {
+  likeCount: 0
+}
+
+export type MakeRatingsProps = (x: MakePropsParams) => RatingsProps;
 
 export default function useRatings() {
   const fetch = (entity_token: string, entity_type: string, lib: any) => {
@@ -28,9 +34,14 @@ export default function useRatings() {
     checker: () => true,
     // debug: "useRatings",
     modLibrary: (current: any, res: any, entity_token: string, tokenType: string) => {
-      let { positive_rating_count } = res.results ? res.results.find((item: any, i: number) => 
-        item[tokenType] === entity_token
-      ).stats : res.stats;
+      
+      let result = res.results ? res.results.find((item: any, i: number) => 
+        {
+          return (item.details || item)[tokenType] === entity_token
+        }
+      ) : res;
+
+      let { positive_rating_count } = (result.details || result).stats;
 
       return { ...current, positive_rating_count };
     },
@@ -40,11 +51,13 @@ export default function useRatings() {
     toggleCheck: (entity: any) => (entity?.rating_value || "") === "positive"
   });
 
+  const makeProps: MakeRatingsProps = ({ entityToken, entityType }: MakePropsParams) => ({
+    ...ratings.makeProps({ entityToken, entityType }),
+    likeCount: ratings.library[entityToken]?.positive_rating_count || 0,
+  });
+
   return {
     ...ratings,
-    makeProps: ({ entityToken, entityType }: { entityToken: string, entityType: string }) => ({
-      ...ratings.makeProps({ entityToken, entityType }),
-      likeCount: ratings.library[entityToken]?.positive_rating_count || 0,
-    })
+    makeProps
   }
 };

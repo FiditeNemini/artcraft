@@ -67,7 +67,7 @@ import { SearchOmnibar } from "./search/SearchOmnibar";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { useLocalize } from "hooks";
 import { Container, Panel } from "components/common";
-import { PageHeaderWithImage } from "v2/view/_common/PageHeaderWithImage";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { faMessageDots } from "@fortawesome/pro-solid-svg-icons";
 
 export interface EnqueueJobResponsePayload {

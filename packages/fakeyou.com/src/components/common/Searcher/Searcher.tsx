@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Input from "../Input";
+import { TempInput as Input } from "components/common";
+// import Input from "../Input";
 import { faSearch } from "@fortawesome/pro-solid-svg-icons";
 import MasonryGrid from "../MasonryGrid/MasonryGrid";
 import "./Searcher.scss";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
-import { useLazyLists } from "hooks";
+import { useBookmarks, useLazyLists, useRatings } from "hooks";
 import { SearchWeights } from "@storyteller/components/src/api/weights/SearchWeights";
 import debounce from "lodash.debounce";
 import WeightsCards from "../Card/WeightsCards";
@@ -17,7 +18,7 @@ interface SearcherProps {
   type?: "page" | "modal";
   dataType?: "media" | "weights";
   weightType?: string;
-  onResultSelect?: () => void;
+  onResultSelect?: (data: { token: string; title: string }) => void;
   searcherKey: string;
 }
 
@@ -33,8 +34,8 @@ export default function Searcher({
   const [foundWeights, setFoundWeights] = useState<Weight[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchCompleted, setSearchCompleted] = useState(0);
-  // const bookmarks = useBookmarks();
-  // const ratings = useRatings();
+  const bookmarks = useBookmarks();
+  const ratings = useRatings();
   const [list, listSet] = useState<Weight[]>([]);
 
   useEffect(() => {
@@ -96,7 +97,7 @@ export default function Searcher({
     list,
     listSet,
     requestList: true,
-    disableUrlQueries: true,
+    urlUpdate: false,
   });
 
   return (
@@ -106,7 +107,7 @@ export default function Searcher({
         placeholder="Search..."
         value={searchTerm[searcherKey]}
         onChange={handleInputChange}
-        className="mb-3"
+        type="text"
       />
       <div
         className={`searcher-container ${
@@ -126,7 +127,8 @@ export default function Searcher({
                   foundWeights.map((data: any, key: number) => {
                     let props = {
                       data,
-                      showCreator: true,
+                      ratings,
+                      bookmarks,
                       type: "weights",
                       inSelectModal: true,
                       onResultSelect,
@@ -184,6 +186,8 @@ export default function Searcher({
                     {weights.list.map((data: any, key: number) => {
                       let props = {
                         data,
+                        ratings,
+                        bookmarks,
                         showCreator: true,
                         type: "weights",
                         inSelectModal: true,

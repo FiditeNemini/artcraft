@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import { PageHeaderWithImage } from "v2/view/_common/PageHeaderWithImage";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { Panel } from "v2/view/_common/Panel";
 import { motion } from "framer-motion";
 import { container } from "data/animation";

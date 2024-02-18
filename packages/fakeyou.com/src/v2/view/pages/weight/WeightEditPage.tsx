@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useParams } from "react-router-dom";
 import {
   faCircleExclamation,
@@ -20,7 +20,7 @@ import {
 } from "components/common";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { useWeightFetch } from "hooks";
+import { useSession, useWeightFetch } from "hooks";
 import "./WeightEditPage.scss";
 
 interface WeightEditPageProps {
@@ -30,11 +30,11 @@ interface WeightEditPageProps {
 export default function WeightEditPage({
   sessionWrapper,
 }: WeightEditPageProps) {
+  const { user, canEditTtsModel } = useSession();
   // const [language, languageSet] = useState("en");
   // const [fetched, fetchedSet] = useState(false);
   // const history = useHistory();
   const { weight_token } = useParams<{ weight_token: string }>();
-  const [weightCreatorToken] = useState("");
 
   const {
     coverImg,
@@ -48,10 +48,11 @@ export default function WeightEditPage({
     update,
     visibility,
     writeStatus,
+    // status
   } = useWeightFetch({ token: weight_token });
 
   const basePath =
-    weight?.cover_image.maybe_cover_image_public_bucket_path || "";
+    weight?.cover_image?.maybe_cover_image_public_bucket_path || "";
   const currentPath = basePath ? new BucketConfig().getGcsUrl(basePath) : "";
 
   usePrefixedDocumentTitle("Edit Voice");
@@ -61,16 +62,51 @@ export default function WeightEditPage({
     { label: "Private", value: "private" },
   ];
 
-  if (
-    !sessionWrapper.canEditTtsModelByUserToken(weightCreatorToken) === false ||
-    !weight_token
-  ) {
+  let weightToken = weight?.creator?.user_token;
+
+  if (isLoading) {
+    return <Panel padding={true}>
+      <div className="d-flex flex-column gap-3">
+        <Skeleton type="short" />
+        <Skeleton height="40px" />
+        <Skeleton type="short" />
+        <Skeleton height="40px" />
+        <div className="d-flex justify-content-end mt-3 gap-2">
+          <Skeleton height="40px" width="120px" />
+          <Skeleton height="40px" width="120px" />
+        </div>
+      </div>
+    </Panel>;
+  } else {
+      if (!weightToken) {
     return (
       <Container type="panel">
         <PageHeader
           titleIcon={faCircleExclamation}
           title="Access Denied"
           subText="This weight does not exist or is not owned by you."
+          panel={true}
+          extension={
+            <div className="d-flex">
+              <Button
+                label="Back to homepage"
+                to={`/weight/{}`}
+                className="d-flex"
+              />
+            </div>
+          }
+        />
+      </Container>
+    );
+  }
+
+  if (!canEditTtsModel(user?.user_token || "")) {
+    return (
+      <Container type="panel">
+        <PageHeader
+          titleIcon={faCircleExclamation}
+          title="Access Denied"
+          subText="You do not have permission to edit this model."
           panel={true}
           extension={
             <div className="d-flex">
@@ -97,89 +133,72 @@ export default function WeightEditPage({
         backbuttonLabel="Back"
         backbuttonTo={`/weight/${weight_token}`}
       />
-
-      <>
-        {isLoading ? (
-          <Panel padding={true}>
-            <div className="d-flex flex-column gap-3">
-              <Skeleton type="short" />
-              <Skeleton height="40px" />
-              <Skeleton type="short" />
-              <Skeleton height="40px" />
-              <div className="d-flex justify-content-end mt-3 gap-2">
-                <Skeleton height="40px" width="120px" />
-                <Skeleton height="40px" width="120px" />
+        <SplitPanel {...{ busy: writeStatus > 0, dividerFooter: true }}>
+          <SplitPanel.Body padding={true}>
+            <div {...{ className: "weight-editor row gy-3 gx-4" }}>
+              <div {...{ className: "col-12 col-lg-5" }}>
+                <label className="sub-title">Cover Image</label>
+                <CoverImageInput
+                  {...{
+                    currentPath,
+                    onClick: coverImg.upload,
+                    status: coverImg.status,
+                    ...coverImg.fileProps,
+                  }}
+                />
+              </div>
+              <div {...{ className: "col-lg-7 order-first  order-lg-last" }}>
+                <TempInput
+                  {...{
+                    label: "Title",
+                    name: "title",
+                    onChange,
+                    placeholder: "Title",
+                    value: title,
+                  }}
+                />
+                <TempSelect
+                  {...{
+                    icon: faEye,
+                    label: "Visibility",
+                    name: "visibility",
+                    options: visibilityOptions,
+                    onChange,
+                    placeholder: "Voice name",
+                    value: visibility,
+                  }}
+                />
+                <TempTextArea
+                  {...{
+                    label: "Description",
+                    name: "descriptionMD",
+                    onChange,
+                    placeholder: "Description",
+                    value: descriptionMD,
+                  }}
+                />
               </div>
             </div>
-          </Panel>
-        ) : (
-          <SplitPanel {...{ busy: writeStatus > 0, dividerFooter: true }}>
-            <SplitPanel.Body padding={true}>
-              <div {...{ className: "weight-editor row gy-3 gx-4" }}>
-                <div {...{ className: "col-12 col-lg-5" }}>
-                  <label className="sub-title">Cover Image</label>
-                  <CoverImageInput
-                    {...{
-                      currentPath,
-                      onClick: coverImg.upload,
-                      status: coverImg.status,
-                      ...coverImg.fileProps,
-                    }}
-                  />
-                </div>
-                <div {...{ className: "col-lg-7 order-first  order-lg-last" }}>
-                  <TempInput
-                    {...{
-                      label: "Title",
-                      name: "title",
-                      onChange,
-                      placeholder: "Title",
-                      value: title,
-                    }}
-                  />
-                  <TempSelect
-                    {...{
-                      icon: faEye,
-                      label: "Visibility",
-                      name: "visibility",
-                      options: visibilityOptions,
-                      onChange,
-                      placeholder: "Voice name",
-                      value: visibility,
-                    }}
-                  />
-                  <TempTextArea
-                    {...{
-                      label: "Description",
-                      name: "descriptionMD",
-                      onChange,
-                      placeholder: "Description",
-                      value: descriptionMD,
-                    }}
-                  />
-                </div>
-              </div>
-            </SplitPanel.Body>
-            <SplitPanel.Footer padding={true}>
-              <div className="d-flex gap-2 justify-content-end">
-                <Button
-                  {...{
-                    label: "Cancel",
-                    to: `/weight/${weight_token}`,
-                    variant: "secondary",
-                  }}
-                />
-                <Button
-                  {...{
-                    label: "Save Changes",
-                    onClick: update,
-                  }}
-                />
-              </div>
-            </SplitPanel.Footer>
-          </SplitPanel>
-        )}
-      </>
+          </SplitPanel.Body>
+          <SplitPanel.Footer padding={true}>
+            <div className="d-flex gap-2 justify-content-end">
+              <Button
+                {...{
+                  label: "Cancel",
+                  to: `/weight/${weight_token}`,
+                  variant: "secondary",
+                }}
+              />
+              <Button
+                {...{
+                  label: "Save Changes",
+                  onClick: update,
+                }}
+              />
+            </div>
+          </SplitPanel.Footer>
+        </SplitPanel>
     </Container>
   );
+  }
 }

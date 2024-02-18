@@ -5,9 +5,10 @@ export interface UploadModelRequest {
   type_of_inference: String, // upload_lora / check_point / inference
   maybe_upload_path?: String,
   maybe_lora_upload_path?: String,
-  title: String,
+  maybe_name: String,
+  maybe_description: String,
   visibility: String,
-  description: String
+  maybe_cover_image_media_file_token?: String,
 }
 
 export interface UploadModelResponse {
@@ -18,5 +19,5 @@ export interface UploadModelResponse {
 
 export const UploadModel = MakeRequest<string, UploadModelRequest, UploadModelResponse,{}>({
     method: "POST", 
-    routingFunction: () => "/v1/image_gen/model/upload",
+    routingFunction: () => "/v1/image_gen/upload/model",
 });

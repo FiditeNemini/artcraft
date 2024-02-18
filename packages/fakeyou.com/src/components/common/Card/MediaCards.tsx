@@ -3,6 +3,7 @@ import AudioCard from "./AudioCard";
 import ImageCard from "./ImageCard";
 import VideoCard from "./VideoCard";
 import BVHCard from "./BVHCard";
+import GLBCard from "./GLBCard";
 import GLTFCard from "./GLTFCard";
 import FBXCard from "./FBXCard";
 
@@ -19,6 +20,8 @@ export default function MediaCards({ props, type }: Props) {
       return <ImageCard {...props} />;
     case "bvh":
       return <BVHCard {...props} />;
+    case "glb":
+      return <GLBCard {...props} />;
     case "gltf":
       return <GLTFCard {...props} />;
     case "fbx":

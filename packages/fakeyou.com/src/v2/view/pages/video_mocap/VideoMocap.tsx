@@ -6,8 +6,7 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 
-import { BasicVideo, Button, Container, Panel, Tabs } from "components/common";
-import PageHeader from "components/layout/PageHeader";
+import { Button, Container, Panel, Tabs } from "components/common";
 import { useInferenceJobs, useLocalize } from "hooks";
 
 import TabContentUpload from "./components/tabContentUpload";
@@ -19,7 +18,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRotateLeft,
   faPersonCircleCheck,
+  faPersonRays,
 } from "@fortawesome/pro-solid-svg-icons";
+import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 export default function VideoMotionCapture(props: {
   enqueueInferenceJob: (
@@ -28,8 +31,9 @@ export default function VideoMotionCapture(props: {
   ) => void;
   inferenceJobs: Array<InferenceJob>;
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
+  sessionWrapper: SessionWrapper;
 }) {
-  const { enqueueInferenceJob } = props;
+  const { enqueueInferenceJob, sessionWrapper } = props;
   const { t } = useLocalize("VideoMotionCapture");
   const { NO_FILE, FILE_UPLOADING, MOCAPNET_ENQUEUED } = states;
   const [pageState, dispatchPageState] = useReducer(reducer, {
@@ -58,6 +62,10 @@ export default function VideoMotionCapture(props: {
   }, [pageState, enqueueInferenceJob]);
   const { pathname } = useLocation();
 
+  if (!sessionWrapper.canAccessStudio()) {
+    return <StudioNotAvailable />
+  }
+
   if (pathname === `/video-mocap` || pathname === `/video-mocap/`) {
     return <Redirect to={`/video-mocap/upload`} />;
   }
@@ -79,10 +87,12 @@ export default function VideoMotionCapture(props: {
 
   return (
     <Container type="panel" className="mb-5">
-      <PageHeader
+      <PageHeaderWithImage
         title={t("headings.title")}
         subText={t("headings.subtitle")}
-        imageUrl="/images/header/video-mocap.png"
+        headerImage="/mascot/video-mocap.webp"
+        yOffset="62%"
+        titleIcon={faPersonRays}
       />
 
       {hasMotionCaptureJobs && (
@@ -98,13 +108,8 @@ export default function VideoMotionCapture(props: {
               <div className="col-12 col-md-6">
                 <Tabs tabs={tabs} />
               </div>
-              <div className="col-12 col-md-6">
-                <Panel padding={true} clear={true}>
-                  <BasicVideo
-                    title="Video -> Mocap Sample"
-                    src="/videos/face-animator-instruction-en.mp4"
-                  />
-                </Panel>
+              <div className="col-12 col-md-6 p-5 mt-3">
+                <p>Upload or select a video from the library, our AI will analyze and turn it into a 3D model (aka a BVH file) </p>
               </div>
             </>
           )}
@@ -130,7 +135,7 @@ export default function VideoMotionCapture(props: {
                     iconFlip={true}
                     label="Generate Another"
                     onClick={() => {
-                      dispatchPageState({type:"restart"})
+                      dispatchPageState({ type: "restart" });
                     }} //back to first state
                     variant="primary"
                   />

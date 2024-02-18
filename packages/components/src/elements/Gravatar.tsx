@@ -7,6 +7,8 @@ interface Props {
   username?: string;
   avatarIndex?: number;
   backgroundIndex?: number;
+  noHeight?: boolean;
+  onClick?: () => void;
 }
 
 function Gravatar(props: Props) {
@@ -29,12 +31,13 @@ function Gravatar(props: Props) {
 
   return (
     <img
-      className="rounded-circle border border-2 h-100 gravatar-img"
+      className={`rounded-circle border border-2 ${ props.noHeight ? "" : "h-100" } gravatar-img`}
       alt={altText}
       src={gravatarUrl}
       height={props.size}
       width={props.size}
       style={{ backgroundColor: getBackgroundColor(props.backgroundIndex) }}
+      onClick={props.onClick}
     />
   );
 }

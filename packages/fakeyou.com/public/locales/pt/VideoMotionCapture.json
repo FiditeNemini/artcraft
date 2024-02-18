@@ -1,6 +1,7 @@
 {
   "button": {
     "generate": "Gerar",
+    "proceed": "Prossiga para enfileirar a captura de movimento",
     "select": "Selecione",
     "upload": "Envio vídeo"
   },

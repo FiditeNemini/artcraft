@@ -488,13 +488,23 @@ class ApiConfig {
   // =============== Image Generation ===============
 
   enqueueImageGeneration(): string {
-    return `${this.getApiOrigin()}/v1/image_gen/inference/enqueue_image_gen`;
+    return `${this.getApiOrigin()}/v1/image_gen/enqueue/inference`;
   }
 
   // =============== Motion Capture / mocap ===============
   enqueueVideoMotionCapture(): string {
     return `${this.getApiOrigin()}/v1/mocap/mocapnet/create`;
   }
+
+  // =============== Video Workflow ===============
+  enqueueVideoWorkflow(): string {
+    return `${this.getApiOrigin()}/v1/workflow/comfy/create`;
+  }
+
+    // =============== Video Styletransfer ===============
+    enqueueVideoStyleTransfer(): string {
+      return `${this.getApiOrigin()}/v1/workflow/comfy/create`;
+    }
 
   // =============== Convert FBX to glTF ===============
   enqueueFbxToGltf(): string {

@@ -1,37 +1,59 @@
 @import "scss/colours.scss";
 
-a.face-animator-job {
+.job-status-complete-success {
+  cursor: pointer;
+
+  span {
+    color: $primary;
+  }
+
   &:hover {
     background-color: $panel-inner;
   }
 }
 
-.face-animator-job {
-  border-radius: .5rem;
+.fy-inference-job {
+  border-radius: 0.5rem;
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  margin-top: .5rem;
-  padding: .5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
 
   .job-details {
     display: flex;
+    gap: 5px;
     align-items: center;
     flex-wrap: wrap;
-    // height: 100%;
     width: min-content;
 
+    .result-link {
+      cursor: pointer;
+      color: $primary;
+      opacity: 1;
+      font-weight: 400;
+      transition: 0.1s;
+
+      &:hover {
+        color: lighten($primary, 5%);
+      }
+    }
   }
 
-  .work-indicator { margin-right: .5rem; }
+  .work-indicator {
+    margin-right: 0.5rem;
+  }
 
-  h6 { 
+  h6 {
     color: #fff;
     line-height: 1rem;
     height: 1rem;
     margin-bottom: 0;
-    white-space: nowrap
+    white-space: nowrap;
   }
-  
-  span { font-weight: lighter; line-height: 1rem; }
+
+  span {
+    font-weight: lighter;
+    line-height: 1rem;
+  }
 }

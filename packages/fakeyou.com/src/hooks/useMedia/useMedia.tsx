@@ -1,13 +1,35 @@
 import { useEffect, useState } from 'react';
 import { GetMedia, MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import { DeleteMedia } from "@storyteller/components/src/api/media_files/DeleteMedia";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
+import {usePrevious} from "hooks";
 
-export default function useMedia({ mediaToken = "", onSuccess = (res:MediaFile) => {} }) {
+export default function useMedia({
+  mediaToken = "",
+  onSuccess = (res:MediaFile) => {},
+  onRemove = (res: any) => {},
+}) {
   const [status, statusSet] = useState(FetchStatus.ready);
+  const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
   const [media,mediaSet] = useState<MediaFile | undefined>();
-
+  const remove = (as_mod: boolean) => {
+    writeStatusSet(FetchStatus.in_progress);
+    DeleteMedia(mediaToken, {
+      as_mod,
+      set_delete: true,
+    }).then((res: any) => {
+      writeStatusSet(FetchStatus.success);
+      onRemove(res);
+    });
+  };
+  
+  const previousToken = usePrevious(mediaToken);
+  
   useEffect(() => {
-    if (mediaToken && status === FetchStatus.ready) {
+    if (
+      mediaToken &&
+      (!media || previousToken !== mediaToken )
+    ) {
       statusSet(FetchStatus.in_progress);
       GetMedia(mediaToken,{})
       .then((res) => {
@@ -22,6 +44,12 @@ export default function useMedia({ mediaToken = "", onSuccess = (res:MediaFile) 
       });
     }
 
-  },[mediaToken, onSuccess, status, statusSet]);
- return { media, status };
+    if (media && media.token !== mediaToken) {
+      mediaSet(undefined);
+      statusSet(FetchStatus.ready);
+    }
+
+  },[media, mediaToken, previousToken, onSuccess, status, statusSet]);
+
+ return { media, mediaSet, remove, status, writeStatus };
 };

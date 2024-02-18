@@ -9,6 +9,36 @@
     "UNKNOWN": "动画状态未知",
     "heading": "脸部动画师职位"
   },
+  "ImageGeneration": {
+    "ATTEMPT_FAILED": "图像生成尝试失败",
+    "COMPLETE_FAILURE": "图像生成失败",
+    "COMPLETE_SUCCESS": "图像生成完成",
+    "DEAD": "图像生成失效",
+    "PENDING": "待处理图像生成",
+    "STARTED": "图像生成正在进行中",
+    "UNKNOWN": "图像生成状态未知",
+    "heading": "图像生成工作"
+  },
+  "TextToSpeech": {
+    "ATTEMPT_FAILED": "文本转语音尝试失败",
+    "COMPLETE_FAILURE": "文本转语音失败",
+    "COMPLETE_SUCCESS": "文字转语音完成",
+    "DEAD": "文字转语音已死",
+    "PENDING": "待处理的文本转语音",
+    "STARTED": "文本转语音正在进行中",
+    "UNKNOWN": "文字转语音未知",
+    "heading": "文字转语音工作"
+  },
+  "VoiceConversion": {
+    "ATTEMPT_FAILED": "语音转换尝试失败",
+    "COMPLETE_FAILURE": "语音转换失败",
+    "COMPLETE_SUCCESS": "语音转换完成",
+    "DEAD": "语音转换失效",
+    "PENDING": "待处理的面部语音转换",
+    "STARTED": "语音转换正在进行中",
+    "UNKNOWN": "语音转换未知",
+    "heading": "语音转换工作"
+  },
   "VoiceDesignerCreateVoice": {
     "ATTEMPT_FAILED": "面部动画尝试失败",
     "COMPLETE_FAILURE": "脸部动画失败。",
@@ -19,8 +49,25 @@
     "UNKNOWN": "语音设计师状态未知",
     "heading": "语音设计师职位"
   },
+  "VoiceDesignerTts": {
+    "ATTEMPT_FAILED": "文本转语音尝试失败",
+    "COMPLETE_FAILURE": "文本转语音失败",
+    "COMPLETE_SUCCESS": "文字转语音完成",
+    "DEAD": "文字转语音已死",
+    "PENDING": "待处理的文本转语音",
+    "STARTED": "文本转语音正在进行中",
+    "UNKNOWN": "文字转语音未知",
+    "heading": "语音设计师文本转语音职位"
+  },
   "core": {
-    "heading": "最新职位"
+    "cancel": "取消作业",
+    "empty": "没有活跃的职位",
+    "exploreBtn": "探索",
+    "heading": "最新职位",
+    "jobsSubtitle": "查看您的工作状态",
+    "jobsTitle": "我的工作",
+    "noJobsSubtitle": "排队的作业将出现在此处",
+    "noJobsTitle": "队列中没有作业"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "脸部动画尝试失败",

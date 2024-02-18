@@ -1,48 +1,61 @@
-import SelectModal from "components/common/SelectModal/SelectModal";
-import React, {useState} from "react";
+import React from "react";
+
+import SelectModal, {SelectModalData} from "components/common/SelectModal/SelectModal";
 import { Action, State } from "../videoMocapReducer";
 import { Button } from "components/common";
+import VideoFakeyou from "components/common/VideoFakeyou";
+
 
 export default function TabContentLibrary({
-  t, pageState, dispatchPageState
+  t,
+  pageState,
+  dispatchPageState,
 }: {
   t: Function;
   pageState: State;
   dispatchPageState: (action: Action) => void;
-}){
-  const [token, setToken] = useState<string|undefined>();
-  const handleProceed = ()=>{
-    if(token)
+}) {
+
+  const handleProceed = () => {
+      dispatchPageState({ type: "proceedSelectedFile" });
+  };
+  const handleOnSelect = (data:SelectModalData) => {
+    if (data.token !==""){
       dispatchPageState({
         type: "selectedFile",
-        payload: {mediaFileToken: token}
+        payload: { mediaFileToken: data.token },
       });
-  }
-  const handleOnSelect = (token:string)=>{
-    setToken(token);
+    }else{
+      dispatchPageState({type: "clearedFile"});
+    }
   };
 
   return (
-    <div>
-      <SelectModal
-        modalTitle="Select a Video"
-        label="Select a Video"
-        onSelect={handleOnSelect}
-        tabs={[
-          {
-            label: "All Videos",
-            tabKey: "allVideos",
-            mediaTypeFilter: "video",
-            searcher: false,
-            type: "media",
-          },
-        ]}
-      />
-      {token && 
-        <Button 
-          label={t("button.proceed")}
-          onClick={handleProceed}
+    <div className="row g-3">
+      <div className="col-12">
+        <SelectModal
+          modalTitle="Select a Video"
+          label="Select a Video"
+          onSelect={handleOnSelect}
+          value={{token: pageState.mediaFileToken || "", title: ""}}
+          tabs={[
+            {
+              label: "All Videos",
+              tabKey: "allVideos",
+              typeFilter: "video",
+              searcher: false,
+              type: "media",
+            },
+          ]}
         />
+        {pageState.mediaFileToken && 
+          <VideoFakeyou mediaToken={pageState.mediaFileToken} />
+        }
+      </div>
+      {pageState.mediaFileToken && 
+        <div className="col-12 d-flex justify-content-center mt-5">
+          <Button label={t("button.proceed")} onClick={handleProceed} />
+        </div>
       }
     </div>
   );

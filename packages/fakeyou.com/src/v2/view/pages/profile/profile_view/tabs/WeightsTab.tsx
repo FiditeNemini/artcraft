@@ -27,8 +27,12 @@ export default function WeightsTab({ username }: { username: string }) {
   // const { maybe_scoped_weight_type, ...yadda } = useParams<{ maybe_scoped_weight_type: string }>();
   const urlQueries = new URLSearchParams(search);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const [weightType, weightTypeSet] = useState(urlQueries.get("maybe_scoped_weight_type") || "all");
-  const [weightCategory, weightCategorySet] = useState(urlQueries.get("maybe_scoped_weight_category") || "all");
+  const [weightType, weightTypeSet] = useState(
+    urlQueries.get("maybe_scoped_weight_type") || "all"
+  );
+  const [weightCategory, weightCategorySet] = useState(
+    urlQueries.get("maybe_scoped_weight_category") || "all"
+  );
   const [sd, sdSet] = useState("all");
   const [tts, ttsSet] = useState("all");
   const [vc, vcSet] = useState("all");
@@ -48,13 +52,13 @@ export default function WeightsTab({ username }: { username: string }) {
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
-    onSuccess: (res) => {
-      bookmarks.gather({ res, key: "weight_token" }); // expand rather than replace for lazy loading 
+    onSuccess: res => {
+      bookmarks.gather({ res, key: "weight_token" }); // expand rather than replace for lazy loading
       ratings.gather({ res, key: "weight_token" });
       setShowMasonryGrid(true);
     },
     requestList: true,
-    urlParam: username,
+    urlParam: username.toLowerCase(),
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -68,7 +72,8 @@ export default function WeightsTab({ username }: { username: string }) {
   //   { value: "sd", label: "Image Generation" },
   // ];
 
-  const weightTypeOpts = [ // these probably need beter labels
+  const weightTypeOpts = [
+    // these probably need beter labels
     { value: "all", label: "All weight types" },
     { value: "hifigan_tt2", label: "hifigan_tt2" },
     { value: "sd_1.5", label: "sd_1.5" },
@@ -131,20 +136,24 @@ export default function WeightsTab({ username }: { username: string }) {
               value: weights.sort,
             }}
           />
-          <TempSelect {...{
-            icon: faFilter,
-            options: weightCategoryOpts,
-            name: "weightCategory",
-            onChange: weights.onChange,
-            value: weightCategory,
-          }} />
-          <TempSelect {...{
-            icon: faFilter,
-            options: weightTypeOpts,
-            name: "weightType",
-            onChange: weights.onChange,
-            value: weightType,
-          }} />
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: weightCategoryOpts,
+              name: "weightCategory",
+              onChange: weights.onChange,
+              value: weightCategory,
+            }}
+          />
+          <TempSelect
+            {...{
+              icon: faFilter,
+              options: weightTypeOpts,
+              name: "weightType",
+              onChange: weights.onChange,
+              value: weightType,
+            }}
+          />
           {weightType === "tts" && (
             <TempSelect
               {...{
@@ -198,7 +207,14 @@ export default function WeightsTab({ username }: { username: string }) {
                   onLayoutComplete={() => console.log("Layout complete!")}
                 >
                   {weights.list.map((data: any, key: number) => {
-                    let props = { bookmarks, data, ratings, showCreator: true, type: "weights", source };
+                    let props = {
+                      bookmarks,
+                      data,
+                      ratings,
+                      showCreator: true,
+                      type: "weights",
+                      source,
+                    };
 
                     return (
                       <div

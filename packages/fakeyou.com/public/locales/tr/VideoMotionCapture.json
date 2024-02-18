@@ -1,6 +1,7 @@
 {
   "button": {
     "generate": "Oluştur",
+    "proceed": "Hareket Yakalamayı Sıralamaya Devam Edin",
     "select": "Seçme",
     "upload": "Video yükle"
   },

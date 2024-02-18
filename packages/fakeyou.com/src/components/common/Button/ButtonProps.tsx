@@ -2,6 +2,7 @@ import { ButtonHTMLAttributes } from "react";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 export default interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  buttonRef?: any;
   label?: string | null;
   icon?: IconDefinition;
   small?: boolean;

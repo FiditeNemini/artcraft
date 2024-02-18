@@ -6,7 +6,13 @@ import Panel from "components/common/Panel";
 import PageHeader from "components/layout/PageHeader";
 import Skeleton from "components/common/Skeleton";
 import Button from "components/common/Button";
-import { faCircleExclamation, faLink } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faCircleExclamation,
+  faLink,
+  faImage,
+  faMicrophone,
+  faVolumeHigh,
+} from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
@@ -35,8 +41,11 @@ import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import SdInferencePanel from "./inference_panels/SdInferencePanel";
 import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
+//import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 interface WeightProps {
+  sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
   inferenceJobs: Array<InferenceJob>;
   ttsInferenceJobs: Array<TtsInferenceJob>;
@@ -49,6 +58,7 @@ interface WeightProps {
 }
 
 export default function WeightPage({
+  sessionWrapper,
   sessionSubscriptionsWrapper,
   inferenceJobs,
   ttsInferenceJobs,
@@ -56,7 +66,7 @@ export default function WeightPage({
   enqueueTtsJob,
   inferenceJobsByCategory,
 }: WeightProps) {
-  const { canEditTtsModel, user } = useSession();
+  const { canEditTtsModel, canBanUsers, user } = useSession();
   const { search } = useLocation();
   const { weight_token } = useParams<{ weight_token: string }>();
   const source = search ? new URLSearchParams(search).get("source") : "";
@@ -99,6 +109,44 @@ export default function WeightPage({
   } = weightTypeInfo;
 
   const deleteWeight = () => remove(!!user?.can_ban_users);
+
+  ////Studio Access feature flag
+  //switch (weight?.weight_type) {
+  //  case WeightType.SD_15:
+  //  case WeightType.SDXL:
+  //  case WeightType.LORA:
+  //    if (!sessionWrapper.canAccessStudio()) {
+  //      return <StudioNotAvailable />;
+  //    }
+  //}
+
+  //Image generation panel if it's a lora weight or sd weight
+  let imageGenPanel = <></>;
+  switch (weight?.weight_type) {
+    case WeightType.SD_15:
+    case WeightType.SDXL:
+      imageGenPanel = (
+        <SdInferencePanel
+          inferenceJobs={inferenceJobs}
+          sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+          weight_token={weight?.weight_token}
+          enqueueInferenceJob={enqueueInferenceJob}
+          weightPageType="sd"
+        />
+      );
+      break;
+    case WeightType.LORA:
+      imageGenPanel = (
+        <SdInferencePanel
+          inferenceJobs={inferenceJobs}
+          sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+          weight_token={weight?.weight_token}
+          enqueueInferenceJob={enqueueInferenceJob}
+          weightPageType="lora"
+        />
+      );
+      break;
+  }
 
   function renderWeightComponent(weight: Weight) {
     switch (weight.weight_category) {
@@ -149,11 +197,7 @@ export default function WeightPage({
         return (
           <div className="d-flex flex-column gap-3">
             <SdCoverImagePanel src={sdCoverImage} />
-            <SdInferencePanel
-              sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-              sd_model_token={weight.weight_token}
-              enqueueInferenceJob={enqueueInferenceJob}
-            />
+            {imageGenPanel}
           </div>
         );
       default:
@@ -348,6 +392,50 @@ export default function WeightPage({
     );
   }
 
+  const ctaButton = (ctaProps: any) => (
+    <Button
+      {...{
+        variant: "primary",
+        className: "flex-grow-1",
+        ...ctaProps,
+      }}
+    />
+  );
+
+  const callToAction = () => {
+    switch (weight.weight_type) {
+      case WeightType.TT2:
+      case WeightType.HIFIGAN_TT2:
+        return ctaButton({
+          icon: faVolumeHigh,
+          label: "Upload your own voice model",
+          to: `/upload/tts`,
+        });
+      case WeightType.RVCv2:
+      case WeightType.SVC:
+        return ctaButton({
+          icon: faMicrophone,
+          label: "Upload your own voice weight",
+          to: `/upload/voice_conversion`,
+        });
+      case WeightType.SD_15:
+      case WeightType.SDXL:
+        return ctaButton({
+          icon: faImage,
+          label: "Upload your own SD weight",
+          to: `/upload/sd`,
+        });
+      case WeightType.LORA:
+        return ctaButton({
+          icon: faImage,
+          label: "Upload your own LoRa weight",
+          to: `/upload/lora`,
+        });
+      default:
+        return null;
+    }
+  };
+
   return (
     <div>
       <Container type="panel" className="mb-5">
@@ -419,33 +507,7 @@ export default function WeightPage({
           </div>
           <div className="col-12 col-xl-4">
             <div className="panel panel-clear d-flex flex-column gap-3">
-              {/* <div className="d-flex gap-2 flex-wrap">
-                <Button
-                  variant="secondary"
-                  icon={faShare}
-                  label="Share"
-                  className="flex-grow-1"
-                  onClick={openShareModal}
-                />
-
-                <div className="d-flex gap-2">
-                  <Button
-                    square={true}
-                    variant="secondary"
-                    icon={faCirclePlay}
-                    onClick={() => {}}
-                    tooltip="Create"
-                  />
-
-                  <Button
-                    square={true}
-                    variant="secondary"
-                    icon={faShare}
-                    onClick={() => {}}
-                    tooltip="Share"
-                  />
-                </div>
-              </div> */}
+              <div className="d-flex gap-2 flex-wrap">{callToAction()}</div>
 
               <Panel className="rounded">
                 <div className="d-flex gap-2 p-3">
@@ -534,7 +596,8 @@ export default function WeightPage({
                 </div>
               </Panel>
 
-              {canEditTtsModel(weight.creator?.user_token) && (
+              {(canEditTtsModel(weight.creator?.user_token) ||
+                canBanUsers()) && (
                 <div className="d-flex gap-2">
                   <Button
                     full={true}

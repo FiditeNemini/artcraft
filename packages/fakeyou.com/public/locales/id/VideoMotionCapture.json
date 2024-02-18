@@ -1,6 +1,7 @@
 {
   "button": {
     "generate": "Menghasilkan",
+    "proceed": "Lanjutkan ke Enqueue Motion Capture",
     "select": "Pilih",
     "upload": "Mengunggah video"
   },

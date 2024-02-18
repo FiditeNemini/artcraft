@@ -13,13 +13,13 @@ import Pagination from "components/common/Pagination";
 
 import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
-import { useListContent, useRatings } from "hooks";
+import { useBookmarks, useListContent, useRatings } from "hooks";
 import prepFilter from "resources/prepFilter";
 
 export default function MediaTab({ username }: { username: string }) {
   const { pathname: source, search } = useLocation();
   const urlQueries = new URLSearchParams(search);
-  // const bookmarks = useBookmarks();
+  const bookmarks = useBookmarks();
   const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
@@ -38,13 +38,13 @@ export default function MediaTab({ username }: { username: string }) {
     list,
     listSet,
     onInputChange: () => setShowMasonryGrid(false),
-    onSuccess: (res) => {
-      // bookmarks.gather({ res, key: "token" });
+    onSuccess: res => {
+      bookmarks.gather({ res, key: "token" });
       ratings.gather({ res, key: "token" });
       setShowMasonryGrid(true);
     },
     requestList: true,
-    urlParam: username,
+    urlParam: username.toLowerCase(),
   });
 
   const handlePageClick = (selectedItem: { selected: number }) => {
@@ -116,7 +116,7 @@ export default function MediaTab({ username }: { username: string }) {
                     onLayoutComplete={() => console.log("Layout complete!")}
                   >
                     {media.list.map((data: MediaFile, key: number) => {
-                      let props = { data, source, ratings, type: "media" };
+                      let props = { bookmarks, data, source, ratings, type: "media" };
                       return (
                         <div
                           {...{

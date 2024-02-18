@@ -60,7 +60,11 @@ import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import HttpBackend from "i18next-http-backend";
 
-import { InferenceJobs, SessionProvider } from "components/providers";
+import {
+  InferenceJobs,
+  ModalProvider,
+  SessionProvider,
+} from "components/providers";
 
 // NB: We're transitioning over to this instance of i18n-next that loads translations over HTTP from Json Files.
 // The old i18n-next instance (see below) bakes in translations into the compiled javascript blob.
@@ -204,7 +208,10 @@ function initInferenceJobsByCategoryMap(): Map<
   );
   inferenceJobsByCategory.set(FrontendInferenceJobType.VoiceDesignerTts, []);
   inferenceJobsByCategory.set(FrontendInferenceJobType.VideoMotionCapture, []);
+  inferenceJobsByCategory.set(FrontendInferenceJobType.ImageGeneration, []);
   inferenceJobsByCategory.set(FrontendInferenceJobType.ConvertFbxtoGltf, []);
+  inferenceJobsByCategory.set(FrontendInferenceJobType.VideoWorkflow, [])
+  inferenceJobsByCategory.set(FrontendInferenceJobType.VideoStyleTransfer, [])
   return inferenceJobsByCategory;
 }
 
@@ -293,6 +300,8 @@ class App extends React.Component<Props, State> {
     await this.querySessionSubscriptions();
 
     setInterval(async () => {
+      // See warnings in the following methods when adding new methods
+      // that affect global "state"
       await this.querySession();
       await this.querySessionSubscriptions();
     }, 60000);
@@ -303,6 +312,10 @@ class App extends React.Component<Props, State> {
   }
 
   querySession = async () => {
+    // WARNING: Making setState calls in this scope without checking existing
+    // state can cause the whole site to refresh/worsen UX. Double check if
+    // state needs to be set here, or if instead can be refreshed locally on
+    // the page where the new "state" needed
     const sessionWrapper = await SessionWrapper.lookupSession();
     const username = sessionWrapper.getDisplayName();
     const cookies = new Cookies();
@@ -330,7 +343,15 @@ class App extends React.Component<Props, State> {
   };
 
   querySessionSubscriptions = async () => {
-    this.setState({ sessionFetched: true });
+    // WARNING: Making setState calls in this scope without checking existing
+    // state can cause the whole site to refresh/worsen UX. Double check if
+    // state needs to be set here, or if instead can be refreshed locally on
+    // the page where the new "state" needed
+
+    if (this.state.sessionFetched === false){
+      this.setState({ sessionFetched: true });
+    }
+
     const cookies = new Cookies();
 
     const sessionSubscriptionsWrapper =
@@ -833,7 +854,9 @@ class App extends React.Component<Props, State> {
             <div className="migrationComponentWrapper">
               <InferenceJobs
                 {...{
+                  enqueue: this.enqueueInferenceJob,
                   byCategory: this.state.inferenceJobsByCategory,
+                  inferenceJobs: this.state.inferenceJobs
                 }}
               >
                 <SessionProvider
@@ -844,6 +867,8 @@ class App extends React.Component<Props, State> {
                     sessionFetched: this.state.sessionFetched,
                   }}
                 >
+
+              <ModalProvider> 
                   <Switch>
                     <Route path="/">
                       <PageContainer
@@ -951,6 +976,7 @@ class App extends React.Component<Props, State> {
                       />
                     </Route>
                   </Switch>
+                  </ModalProvider>
                 </SessionProvider>
               </InferenceJobs>
             </div>

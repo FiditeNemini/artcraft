@@ -1,0 +1,42 @@
+.fy-media-browser-tools {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: space-between;
+
+  .pagination {
+    margin: auto 0 auto auto;
+  }
+
+  .fy-temp-select { margin-bottom: 0 }
+}
+
+.fy-media-browser-header{
+  h3 { margin-bottom: 0 }
+  > * {
+    margin-bottom: 1rem;
+  }
+
+  .icon-close-button {
+    cursor: pointer;
+    height: 1.5rem;
+    opacity: .33;
+    // transition: .25s all ease-in-out;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+
+.fy-media-browser-list {
+  flex-grow: 1;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  height: 50vh;
+}
+
+.fy-media-browser-footer {
+  margin-top: 1rem;
+}

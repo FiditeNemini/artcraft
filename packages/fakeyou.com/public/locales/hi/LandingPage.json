@@ -1,4 +1,6 @@
 {
+  "alertTtiCta": "अब इसे आजमाओ",
+  "alertTtiText": "क्या आपने हमारा नया टेक्स्ट टू इमेज आज़माया है? अपने टेक्स्ट संकेतों को छवियों में बदलें!",
   "communityButtonDiscord": "Discord",
   "communityButtonTwitter": "Twitter",
   "communityText": "हमें आपसे चैट करना अच्छा लगेगा! यदि आपके कोई प्रश्न हैं तो कृपया डिस्कॉर्ड में हमसे जुड़ें।",
@@ -19,12 +21,14 @@
   "heroTitle": "एआई म्यूजिक, टेक्स्ट टू स्पीच और वॉयस टू वॉयस",
   "productFaceAnimatorText": "ऑडियो के साथ चेहरों को चेतन करें",
   "productFaceAnimatorTitle": "फेस एनिमेटर",
+  "productImageGenText": "पाठ से छवियाँ बनाएँ",
+  "productImageGenTitle": "छवि पर पाठ",
   "productNewTag": "नया",
   "productTtsText": "टेक्स्ट से ऑडियो जेनरेट करें",
   "productTtsTitle": "भाषण के पाठ",
   "productVcText": "दूसरे स्वर में बोलो",
   "productVcTitle": "आवाज से आवाज",
-  "productVideoText": "लिप सिंक वीडियो से ऑडियो",
-  "productVideoTitle": "वीडियो लिप सिंक",
+  "productVdText": "अपनी खुद की एआई आवाज बनाएं",
+  "productVdTitle": "आवाज डिजाइनर",
   "productsTitle": "एआई उपकरण"
 }

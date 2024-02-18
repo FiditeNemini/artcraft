@@ -1,0 +1,18 @@
+{
+  "button": {
+    "tooltip": {
+      "revert": "デフォルト値に戻す"
+    }
+  },
+  "input": {
+    "placeholder": {
+      "randomSeed": "自動生成"
+    }
+  },
+  "segButton": {
+    "label": {
+      "customSeed": "カスタム",
+      "randomSeed": "ランダム"
+    }
+  }
+}

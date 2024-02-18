@@ -17,6 +17,7 @@ import {
   faLink,
   faFileCircleXmark,
   faArrowRightArrowLeft,
+  faVideoPlus,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -27,11 +28,10 @@ import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import moment from "moment";
 import WeightCoverImage from "components/common/WeightCoverImage";
 import SocialButton from "components/common/SocialButton";
-import { Input } from "components/common";
+import { Badge, Input, Modal } from "components/common";
+import BookmarkButton from "components/common/BookmarkButton";
 import LikeButton from "components/common/LikeButton";
-import Badge from "components/common/Badge";
-import useMediaFileTypeInfo from "hooks/useMediaFileTypeInfo";
-import { useMedia, useRatings, useSession } from "hooks";
+import { useBookmarks, useMedia, useRatings, useSession } from "hooks";
 import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import Iframe from "react-iframe";
@@ -39,10 +39,15 @@ import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel"
 import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
 
 export default function MediaPage() {
-  const { user } = useSession();
+  const { canEditTtsModel, user } = useSession();
   const { token } = useParams<{ token: string }>();
+  const bookmarks = useBookmarks();
   const ratings = useRatings();
-  const { media: mediaFile, status } = useMedia({
+  const {
+    media: mediaFile,
+    remove,
+    status,
+  } = useMedia({
     mediaToken: token,
     onSuccess: (res: any) => {
       ratings.gather({ res, key: "token" });
@@ -54,6 +59,7 @@ export default function MediaPage() {
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
+
 
   useEffect(() => {
     if (batchToken) {
@@ -73,6 +79,15 @@ export default function MediaPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [batchToken]);
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const closeDeleteModal = () => setIsDeleteModalOpen(false);
+
+  const openDeleteModal = () => setIsDeleteModalOpen(true);
+
+  const deleteMedia = () => remove(!!user?.can_ban_users);
+
+
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
       case MediaFileType.Audio:
@@ -84,19 +99,13 @@ export default function MediaPage() {
             <MediaAudioComponent mediaFile={mediaFile} />
 
             {/* Show TTS text input if it is a TTS result */}
-            {mediaFile.public_bucket_path.includes("tts_inference_output") && (
+            {mediaFile.maybe_text_transcript && (
               <div className="mt-4">
                 <h5 className="fw-semibold">
                   <FontAwesomeIcon icon={faSquareQuote} className="me-2" />
-                  Audio Text
+                  Audio Text Transcript
                 </h5>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Pellentesque elit ullamcorper dignissim cras tincidunt
-                  lobortis. Integer malesuada nunc vel risus commodo viverra
-                  maecenas accumsan lacus.
-                </p>
+                <p>{mediaFile.maybe_text_transcript}</p>
               </div>
             )}
           </div>
@@ -135,12 +144,22 @@ export default function MediaPage() {
             }}
           />
         );
+      case MediaFileType.GLB:
+        const glbUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
+        return (
+          <Iframe
+            {...{
+              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${glbUrl}`,
+              className: "fy-studio-frame",
+            }}
+          />
+        );
       case MediaFileType.GLTF:
         const gltfUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         return (
           <Iframe
             {...{
-              url: `https://engine.fakeyou.com?mode=viewer&gltf=${gltfUrl}`,
+              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${gltfUrl}`,
               className: "fy-studio-frame",
             }}
           />
@@ -170,10 +189,7 @@ export default function MediaPage() {
     }
   }
 
-  const mediaTypeInfo = useMediaFileTypeInfo(
-    mediaFile?.media_type || MediaFileType.None
-  );
-  const { label: mediaType, color: mediaTagColor } = mediaTypeInfo;
+  const mediaType = mediaFile?.media_type || ""; // THIS SHOULD BECOME A TRANSLATION STRING, THIS IS NOT DATA -V
 
   let audioLink = new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path);
 
@@ -287,49 +303,7 @@ export default function MediaPage() {
     },*/
   ];
 
-  const videoDetails = [
-    { property: "Type", value: mediaFile?.media_type || "" },
-    {
-      property: "Visibility",
-      value: mediaFile?.creator_set_visibility.toString() || "",
-    },
-    { property: "Created at", value: dateCreated || "" },
-  ];
-
-  const imageDetails = [
-    { property: "Type", value: mediaFile?.media_type || "" },
-    {
-      property: "Visibility",
-      value: mediaFile?.creator_set_visibility.toString() || "",
-    },
-    { property: "Created at", value: dateCreated || "" },
-  ];
-
-  const bvhDetails = [
-    {
-      property: "Type",
-      value: mediaType || "",
-    },
-    {
-      property: "Visibility",
-      value: mediaFile?.creator_set_visibility.toString() || "",
-    },
-    { property: "Created at", value: dateCreated || "" },
-  ];
-
-  const gltfDetails = [
-    {
-      property: "Type",
-      value: mediaType || "",
-    },
-    {
-      property: "Visibility",
-      value: mediaFile?.creator_set_visibility.toString() || "",
-    },
-    { property: "Created at", value: dateCreated || "" },
-  ];
-
-  const fbxDetails = [
+  const defaultDetails = [
     {
       property: "Type",
       value: mediaType || "",
@@ -347,22 +321,9 @@ export default function MediaPage() {
     case MediaFileType.Audio:
       mediaDetails = audioDetails;
       break;
-    case MediaFileType.Video:
-      mediaDetails = videoDetails;
-      break;
-    case MediaFileType.Image:
-      mediaDetails = imageDetails;
-      break;
-    case MediaFileType.BVH:
-      mediaDetails = bvhDetails;
-      break;
-    case MediaFileType.GLTF:
-      mediaDetails = gltfDetails;
-      break;
-    case MediaFileType.FBX:
-      mediaDetails = fbxDetails;
-      break;
     default:
+      mediaDetails = defaultDetails;
+      break;
   }
 
   let modMediaDetails = undefined;
@@ -436,7 +397,14 @@ export default function MediaPage() {
               <div className="d-flex gap-3 flex-wrap align-items-center">
                 <div className="d-flex gap-2 align-items-center flex-wrap">
                   <div>
-                    <Badge label={mediaType} color={mediaTagColor} />
+                    <Badge
+                      {...{
+                        className: `fy-entity-type-${
+                          mediaFile?.media_type || ""
+                        }`,
+                        label: mediaType,
+                      }}
+                    />
                   </div>
                   {subtitleDivider}
 
@@ -457,14 +425,15 @@ export default function MediaPage() {
                         }),
                       }}
                     />
-                    {/* <BookmarkButton
-                        {...{
-                          entityToken: weight_token,
-                          entityType: "model_weight",
-                          onToggle: bookmarks.toggle,
-                          large: true,
-                        }}
-                      /> */}
+                    <BookmarkButton
+                      {...{
+                        large: true,
+                        ...bookmarks.makeProps({
+                          entityToken: token,
+                          entityType: "media_file",
+                        }),
+                      }}
+                    />
                   </div>
                 </div>
               </div>
@@ -500,6 +469,17 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
+                {mediaFile?.media_type === MediaFileType.BVH || mediaFile?.media_type === MediaFileType.GLTF || mediaFile?.media_type === MediaFileType.GLB   ? (
+                  <Button
+                    {...{
+                      icon: faVideoPlus,
+                      label: "Use in Engine Compositor",
+                      to: `/engine-compositor?preset_token=${mediaFile.token}`,
+                      variant: "primary",
+                      className: "flex-grow-1",
+                    }}
+                  />
+                ) : null}
 
                 {mediaFile?.media_type !== MediaFileType.Audio && (
                   <Button
@@ -509,6 +489,7 @@ export default function MediaPage() {
                     href={audioLink}
                     download={audioLink}
                     variant="secondary"
+                    target="_blank"
                   />
                 )}
                 {mediaFile?.media_type === MediaFileType.Audio && (
@@ -520,6 +501,7 @@ export default function MediaPage() {
                       href={audioLink}
                       download={audioLink}
                       tooltip="Download"
+                      target="_blank"
                     />
                   </div>
                 )}
@@ -661,6 +643,17 @@ export default function MediaPage() {
                   </div>
                 </div>
               </Panel>
+
+              {canEditTtsModel(user?.user_token || "") && (
+                <div className="d-flex gap-2">
+                  <Button
+                    full={true}
+                    variant="danger"
+                    label="Delete Media"
+                    onClick={openDeleteModal}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -677,6 +670,16 @@ export default function MediaPage() {
           </Panel>
         </Container>
       </div>
+      <Modal
+        show={isDeleteModalOpen}
+        handleClose={closeDeleteModal}
+        title="Delete Media"
+        content={() => (
+          <>{`Are you sure you want to delete this media file? This action cannot be undone.`}</> // replace w/ dynamic later -V
+          // <>{`Are you sure you want to delete "${title}"? This action cannot be undone.`}</>
+        )}
+        onConfirm={deleteMedia}
+      />
     </div>
   );
 }

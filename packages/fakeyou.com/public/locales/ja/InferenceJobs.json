@@ -9,6 +9,36 @@
     "UNKNOWN": "アニメーションステータス不明",
     "heading": "フェイスアニメーターの仕事"
   },
+  "ImageGeneration": {
+    "ATTEMPT_FAILED": "イメージ生成の試行が失敗しました",
+    "COMPLETE_FAILURE": "画像生成に失敗しました",
+    "COMPLETE_SUCCESS": "画像生成が完了しました",
+    "DEAD": "画像生成のデッド",
+    "PENDING": "保留中のイメージ生成",
+    "STARTED": "画像生成中",
+    "UNKNOWN": "イメージ生成ステータスが不明",
+    "heading": "画像生成ジョブ"
+  },
+  "TextToSpeech": {
+    "ATTEMPT_FAILED": "テキスト読み上げの試行が失敗しました",
+    "COMPLETE_FAILURE": "テキスト読み上げに失敗しました",
+    "COMPLETE_SUCCESS": "テキスト読み上げの完了",
+    "DEAD": "テキスト読み上げ機能が死んでいる",
+    "PENDING": "保留中のテキスト読み上げ",
+    "STARTED": "テキスト読み上げが進行中です",
+    "UNKNOWN": "テキスト読み上げ機能不明",
+    "heading": "テキスト読み上げジョブ"
+  },
+  "VoiceConversion": {
+    "ATTEMPT_FAILED": "音声変換の試行は失敗しました",
+    "COMPLETE_FAILURE": "音声変換に失敗しました",
+    "COMPLETE_SUCCESS": "音声変換完了",
+    "DEAD": "音声変換のデッド",
+    "PENDING": "顔の音声変換を保留中",
+    "STARTED": "音声変換中",
+    "UNKNOWN": "音声変換不明",
+    "heading": "音声変換ジョブ"
+  },
   "VoiceDesignerCreateVoice": {
     "ATTEMPT_FAILED": "顔アニメーションの試行が失敗しました",
     "COMPLETE_FAILURE": "顔のアニメーションが失敗しました。",
@@ -19,8 +49,25 @@
     "UNKNOWN": "ボイスデザイナーステータス不明",
     "heading": "ボイスデザイナーの仕事"
   },
+  "VoiceDesignerTts": {
+    "ATTEMPT_FAILED": "テキスト読み上げの試行が失敗しました",
+    "COMPLETE_FAILURE": "テキスト読み上げに失敗しました",
+    "COMPLETE_SUCCESS": "テキスト読み上げの完了",
+    "DEAD": "テキスト読み上げ機能が死んでいる",
+    "PENDING": "保留中のテキスト読み上げ",
+    "STARTED": "テキスト読み上げが進行中です",
+    "UNKNOWN": "テキスト読み上げ機能不明",
+    "heading": "音声デザイナーのテキスト読み上げの仕事"
+  },
   "core": {
-    "heading": "最新の求人"
+    "cancel": "ジョブをキャンセルする",
+    "empty": "アクティブなジョブはありません",
+    "exploreBtn": "探検する",
+    "heading": "最新の求人",
+    "jobsSubtitle": "ジョブのステータスを表示する",
+    "jobsTitle": "私の仕事",
+    "noJobsSubtitle": "キューに入れられたジョブがここに表示されます",
+    "noJobsTitle": "キューにジョブがありません"
   },
   "face_animator": {
     "ATTEMPT_FAILED": "顔アニメーションの試行が失敗しました",

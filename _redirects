@@ -10,11 +10,13 @@
 /coming-soon*   /index.html   200
 /commissions*   /index.html   200
 /contribute*   /index.html   200
+/engine-compositor*   /index.html   200
 /explore*   /index.html   200
 /face-animator*   /index.html   200
 /fbx-to-gltf*   /index.html   200
 /firehose*   /index.html   200
 /guide*   /index.html   200
+/inference-jobs-list*   /index.html   200
 /jobs*   /index.html   200
 /landing*   /index.html   200
 /landing_temp*   /index.html   200
@@ -39,6 +41,7 @@
 /studio*   /index.html   200
 /terms*   /index.html   200
 /testing*   /index.html   200
+/text-to-image*   /index.html   200
 /tts*   /index.html   200
 /tts_configs*   /index.html   200
 /twitch*   /index.html   200

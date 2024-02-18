@@ -1,4 +1,6 @@
 {
+  "alertTtiCta": "Tente agora",
+  "alertTtiText": "Você já experimentou nosso novo Texto para Imagem? Transforme suas instruções de texto em imagens!",
   "communityButtonDiscord": "Discord",
   "communityButtonTwitter": "Twitter",
   "communityText": "Adoraríamos conversar com você! Junte-se a nós no Discord se tiver alguma dúvida.",
@@ -19,12 +21,14 @@
   "heroTitle": "Música AI, texto em fala e voz em voz",
   "productFaceAnimatorText": "Animar rostos com áudio",
   "productFaceAnimatorTitle": "Animador facial",
+  "productImageGenText": "Crie imagens a partir de texto",
+  "productImageGenTitle": "Texto para imagem",
   "productNewTag": "NOVO",
   "productTtsText": "Gerar áudio a partir de texto",
   "productTtsTitle": "Texto para fala",
   "productVcText": "Fale com outra voz",
   "productVcTitle": "Voz para Voz",
-  "productVideoText": "Sincronização labial de vídeo com áudio",
-  "productVideoTitle": "Sincronização labial de vídeo",
+  "productVdText": "Crie sua própria voz de IA",
+  "productVdTitle": "Designer de voz",
   "productsTitle": "Ferramentas de IA"
 }

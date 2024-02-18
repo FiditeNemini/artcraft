@@ -1,16 +1,20 @@
-import React, { useRef, useState, memo } from "react";
+import React, { useRef, useState, memo, useEffect } from "react";
 import {
+  Accordion,
   Button,
   Input,
+  Label,
   NumberSlider,
   Panel,
   SegmentButtons,
+  SelectModal,
+  SplitPanel,
   TempSelect,
   TempTextArea,
 } from "components/common";
 import { onChanger } from "resources";
-import Accordion from "components/common/Accordion";
 import {
+  faList,
   faRectangleLandscape,
   faRectanglePortrait,
   faSquare,
@@ -21,29 +25,54 @@ import {
   EnqueueImageGenIsSuccess,
   EnqueueImageGenIsError,
 } from "@storyteller/components/src/api/image_generation/EnqueueImageGen";
-import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-import SelectModal from "components/common/SelectModal/SelectModal";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import PremiumLock from "components/PremiumLock";
+import InferenceJobsList from "components/layout/InferenceJobsList";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link } from "react-router-dom";
 
 interface SdInferencePanelProps {
+  inferenceJobs: Array<InferenceJob>;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
-  sd_model_token: string;
+  weight_token?: string;
   enqueueInferenceJob: (
     jobToken: string,
     frontendInferenceJobType: FrontendInferenceJobType
   ) => void;
+  isStandalone?: boolean;
+  weightPageType?: "lora" | "sd";
 }
 
 function SdInferencePanel({
   enqueueInferenceJob,
-  sd_model_token,
+  weight_token,
   sessionSubscriptionsWrapper,
+  isStandalone = false,
+  inferenceJobs,
+  weightPageType = "sd",
 }: SdInferencePanelProps) {
   const [loraToken, setLoraToken] = useState<string | null>(null);
+  const [sdToken, setSdToken] = useState<string | null>(null);
 
-  const handleOnSelect = (token: string) => {
-    setLoraToken(token);
+  useEffect(() => {
+    if (weightPageType === "sd") {
+      setSdToken(weight_token || null);
+      setLoraToken(null);
+    } else if (weightPageType === "lora") {
+      setLoraToken(weight_token || null);
+      setSdToken(null);
+    }
+  }, [weightPageType, weight_token]);
+
+  const handleOnWeightSelect = (data: { token: string; title: string }) => {
+    setSdToken(data.token);
+  };
+  const handleOnSelect = (data: { token: string; title: string }) => {
+    setLoraToken(data.token);
   };
 
   const [isEnqueuing, setIsEnqueuing] = useState(false);
@@ -53,7 +82,7 @@ function SdInferencePanel({
   const [aspectRatio, setAspectRatio] = useState("square");
   const [cfgScale, setCfgScale] = useState(7);
   const [samples, setSamples] = useState(8);
-  const [batchCount, setBatchCount] = useState(1);
+  const [batchCount, setBatchCount] = useState(3);
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const onChange = onChanger({
@@ -75,7 +104,7 @@ function SdInferencePanel({
     sampler: "DPM++ 2M Karras",
     cfgScale: 7,
     samples: 8,
-    batchCount: 1,
+    batchCount: 3,
     loraToken: null,
   };
 
@@ -226,7 +255,7 @@ function SdInferencePanel({
   ) => {
     ev.preventDefault();
 
-    if (!prompt) {
+    if (!prompt || sdToken === undefined) {
       return false;
     }
 
@@ -241,10 +270,12 @@ function SdInferencePanel({
       internalSeed.current = generateRandomSeed();
     }
 
+    console.log(sdToken);
+
     const request = {
       uuid_idempotency_token: uuidv4(),
-      maybe_sd_model_token: sd_model_token,
-      maybe_lora_model_token: loraToken,
+      maybe_sd_model_token: sdToken || null,
+      maybe_lora_model_token: loraToken || null,
       maybe_prompt: prompt,
       maybe_n_prompt: negativePrompt,
       maybe_seed: internalSeed.current,
@@ -270,172 +301,249 @@ function SdInferencePanel({
         );
       }
     } else if (EnqueueImageGenIsError(response)) {
-      console.log("error");
+      console.log("error", response);
     }
     setIsEnqueuing(false);
 
     return false;
   };
 
+  const failures = (fail = "") => {
+    switch (fail) {
+      default:
+        return "Uknown failure";
+    }
+  };
+
   return (
-    <Panel padding={true}>
-      <h4 className="fw-semibold mb-4">Generate an Image</h4>
+    <div>
+      <SplitPanel dividerHeader={true}>
+        <SplitPanel.Header padding={true}>
+          <h4 className="fw-semibold mb-0 flex-grow-1">Generate an Image</h4>
+        </SplitPanel.Header>
 
-      <div className="d-flex flex-column gap-3 mb-4">
-        <TempTextArea
-          {...{
-            label: "Prompt",
-            placeholder: "Enter a prompt",
-            onChange: handlePromptChange,
-            value: prompt,
-            required: true,
-          }}
-        />
-        <TempTextArea
-          {...{
-            label: "Negative prompt",
-            name: "negativePrompt",
-            placeholder: "Enter a negative prompt",
-            onChange: handleNegativePromptChange,
-            value: negativePrompt,
-          }}
-        />
-        <SegmentButtons
-          {...{
-            label: "Aspect Ratio",
-            name: "aspectRatio",
-            onChange,
-            options: dimensionOpts,
-            value: aspectRatio,
-          }}
-        />
-      </div>
+        <SplitPanel.Body padding={true}>
+          <div className="d-flex flex-column gap-3 mb-4">
+            {(isStandalone || weightPageType === "lora") && (
+              <SelectModal
+                required={true}
+                modalTitle="Select Stable Diffusion Weight"
+                label="Select a Stable Diffusion Weight"
+                onSelect={handleOnWeightSelect}
+                tabs={[
+                  {
+                    label: "All Weights",
+                    tabKey: "allWeights",
+                    typeFilter: "sd_1.5",
+                    searcher: true,
+                    type: "weights",
+                  },
+                  {
+                    label: "Bookmarked",
+                    tabKey: "bookmarkedWeights",
+                    typeFilter: "sd_1.5",
+                    searcher: false,
+                    type: "weights",
+                    onlyBookmarked: true,
+                  },
+                ]}
+              />
+            )}
 
-      <Accordion>
-        <Accordion.Item title="Advanced">
-          <div className="p-3 d-flex flex-column gap-3">
+            <TempTextArea
+              {...{
+                label: "Prompt",
+                placeholder: "Enter a prompt",
+                onChange: handlePromptChange,
+                value: prompt,
+                required: true,
+              }}
+            />
+            <TempTextArea
+              {...{
+                label: "Negative Prompt",
+                name: "negativePrompt",
+                placeholder: "Enter a negative prompt",
+                onChange: handleNegativePromptChange,
+                value: negativePrompt,
+              }}
+            />
+            <SegmentButtons
+              {...{
+                label: "Aspect Ratio",
+                name: "aspectRatio",
+                onChange,
+                options: dimensionOpts,
+                value: aspectRatio,
+              }}
+            />
             <div>
-              <label className="sub-title">Seed</label>
-              <div className="d-flex gap-2 align-items-center">
+              <Label label="Number of Generations" />
+              <PremiumLock
+                sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+                requiredPlan="pro"
+              >
                 <SegmentButtons
                   {...{
-                    name: "seed",
-                    onChange: handleSeedChange,
-                    options: seedOpts,
-                    value: seed,
+                    name: "batchCount",
+                    onChange,
+                    options: batchCountOpts,
+                    value: batchCount,
                   }}
                 />
-                <Input
-                  placeholder="Random"
-                  value={seedNumber}
-                  onChange={handleSeedNumberChange}
-                  type="number"
-                  onBlur={handleBlur}
-                />
-              </div>
+              </PremiumLock>
             </div>
+          </div>
 
-            <TempSelect
-              {...{
-                label: "Sampler",
-                name: "sampler",
-                onChange,
-                options: samplerOpts,
-                value: sampler,
-              }}
-            />
+          <Accordion>
+            <Accordion.Item title="Advanced">
+              <div className="p-3 d-flex flex-column gap-3">
+                <TempSelect
+                  {...{
+                    label: "Sampler",
+                    name: "sampler",
+                    onChange,
+                    options: samplerOpts,
+                    value: sampler,
+                  }}
+                />
+                <div>
+                  <label className="sub-title">Seed</label>
+                  <div className="d-flex gap-2 align-items-center">
+                    <SegmentButtons
+                      {...{
+                        name: "seed",
+                        onChange: handleSeedChange,
+                        options: seedOpts,
+                        value: seed,
+                      }}
+                    />
+                    <Input
+                      placeholder="Random"
+                      value={seedNumber}
+                      onChange={handleSeedNumberChange}
+                      type="number"
+                      onBlur={handleBlur}
+                    />
+                  </div>
+                </div>
+                <NumberSlider
+                  {...{
+                    min: 1,
+                    max: 30,
+                    name: "cfgScale",
+                    label: "CFG Scale",
+                    onChange,
+                    thumbTip: "CFG Scale",
+                    value: cfgScale,
+                    step: 0.5,
+                  }}
+                />
+                <NumberSlider
+                  {...{
+                    min: 8,
+                    max: 64,
+                    name: "samples",
+                    label: "Samples",
+                    onChange,
+                    thumbTip: "Samples",
+                    value: samples,
+                  }}
+                />
+                {weightPageType === "sd" && (
+                  <SelectModal
+                    modalTitle="Select LoRA Weight"
+                    label="Additional LoRA Weight"
+                    onSelect={handleOnSelect}
+                    tabs={[
+                      {
+                        label: "All LoRA Weights",
+                        tabKey: "allLoraWeights",
+                        typeFilter: "loRA",
+                        searcher: true,
+                        type: "weights",
+                      },
+                      {
+                        label: "Bookmarked",
+                        tabKey: "bookmarkedLoraWeights",
+                        typeFilter: "loRA",
+                        searcher: false,
+                        type: "weights",
+                        onlyBookmarked: true,
+                      },
+                    ]}
+                  />
+                )}
+              </div>
+            </Accordion.Item>
+          </Accordion>
+          <div className="d-flex mt-4 align-items-center flex-wrap gap-4">
+            {isStandalone && (
+              <div className="flex-grow-1">
+                <p className="fs-7">
+                  <span className="opacity-75">
+                    Can't find the model weights you're looking for?
+                  </span>{" "}
+                  <Link to="/upload/sd">Upload your own!</Link>
+                </p>
+              </div>
+            )}
 
-            <NumberSlider
-              {...{
-                min: 1,
-                max: 30,
-                name: "cfgScale",
-                label: "CFG Scale",
-                onChange,
-                thumbTip: "CFG Scale",
-                value: cfgScale,
-                step: 0.5,
-              }}
-            />
-
-            <NumberSlider
-              {...{
-                min: 8,
-                max: 64,
-                name: "samples",
-                label: "Samples",
-                onChange,
-                thumbTip: "Samples",
-                value: samples,
-              }}
-            />
-
-            <SelectModal
-              label="Additional LoRA Weight"
-              onSelect={handleOnSelect}
-              tabs={[
-                {
-                  label: "All LoRA Weights",
-                  tabKey: "allLoraWeights",
-                  weightTypeFilter: "lora",
-                  searcher: true,
-                },
-                {
-                  label: "Bookmarked",
-                  tabKey: "bookmarkedLoraWeights",
-                  weightTypeFilter: "lora",
-                  searcher: false,
-                },
-              ]}
-            />
-
-            {/* Checkpoint Use weight token */}
-            {/* <TempSelect
-              {...{
-                label: "Checkpoint",
-                name: "checkPoint",
-                onChange,
-                options: tempDeleteMeOpts,
-                value: checkPoint,
-              }}
-            /> */}
-
-            <PremiumLock
-              sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-              requiredPlan="pro"
-            >
-              <SegmentButtons
+            <div className="d-flex gap-2 justify-content-end flex-grow-1">
+              <Button
                 {...{
-                  label: "Number of Generations",
-                  name: "batchCount",
-                  onChange,
-                  options: batchCountOpts,
-                  value: batchCount,
+                  label: "Clear/Reset ",
+                  variant: "secondary",
+                  onClick: resetToInitialState,
                 }}
               />
-            </PremiumLock>
+              <Button
+                {...{
+                  label: "Generate Image",
+                  disabled: prompt === "" || sdToken === "",
+                  onClick: handleEnqueueImageGen,
+                  isLoading: isEnqueuing,
+                }}
+              />
+            </div>
           </div>
-        </Accordion.Item>
-      </Accordion>
+        </SplitPanel.Body>
 
-      <div className="d-flex gap-2 justify-content-end mt-4">
-        <Button
+        <InferenceJobsList
           {...{
-            label: "Clear All",
-            variant: "secondary",
-            onClick: resetToInitialState,
+            failures,
+            jobType: FrontendInferenceJobType.ImageGeneration,
           }}
         />
-        <Button
-          {...{
-            label: "Generate Image",
-            disabled: prompt === "",
-            onClick: handleEnqueueImageGen,
-            isLoading: isEnqueuing,
-          }}
-        />
-      </div>
-    </Panel>
+      </SplitPanel>
+
+      {inferenceJobs[0] ? (
+        <div className={isStandalone ? "mt-4" : "mt-3"}>
+          <InferenceJobsList
+            {...{
+              failures,
+              value: 0,
+              jobType: FrontendInferenceJobType.ImageGeneration,
+            }}
+          />
+        </div>
+      ) : (
+        <>
+          {isStandalone && (
+            <Panel padding={true} className="mt-4">
+              <div className="d-flex flex-column align-items-center justify-content-center gap-2 py-5 opacity-75">
+                <h4 className="fw-semibold mb-0">
+                  <FontAwesomeIcon icon={faList} className="me-2 fs-5" />
+                  No jobs queued
+                </h4>
+
+                <p>Your queued image jobs will appear here.</p>
+              </div>
+            </Panel>
+          )}
+        </>
+      )}
+    </div>
   );
 }
 

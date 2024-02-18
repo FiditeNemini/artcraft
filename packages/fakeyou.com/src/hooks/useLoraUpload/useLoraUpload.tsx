@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { UploadModel } from "@storyteller/components/src/api/image_generation/UploadModel";
+import { UploadLora } from "@storyteller/components/src/api/image_generation/UploadLora";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
-import { useCoverImgUpload } from "hooks";
+import { useCoverImgUpload, useInferenceJobs } from "hooks";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
 
 // this hook is mostly for organizational purposes while I work -V
@@ -13,6 +14,7 @@ export default function useLoraUpload() {
   const [descriptionMD, descriptionMDSet] = useState("");
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
   const coverImg = useCoverImgUpload();
+  const { enqueue } = useInferenceJobs(FrontendInferenceJobType.ImageGeneration, true);
 
   const onChange = ({ target }: { target: { name: string; value: any } }) => {
     const todo: { [key: string]: (x: any) => void } = {
@@ -26,21 +28,22 @@ export default function useLoraUpload() {
 
   const upload = () => {
     writeStatusSet(FetchStatus.in_progress);
-    UploadModel("", {
+    UploadLora("", {
       ...(coverImg.token
-        ? { cover_image_media_file_token: coverImg.token }
+        ? { maybe_cover_image_media_file_token: coverImg.token }
         : {}),
-      description: descriptionMD,
+      maybe_name: title,
+      maybe_description: descriptionMD,
       uuid_idempotency_token: uuidv4(),
-      type_of_inference: "inference",
-      maybe_upload_path: uploadPath,
-      title,
+      //type_of_inference: "inference",
+      maybe_lora_upload_path: uploadPath,
       visibility,
     })
       .then((res: any) => {
-        writeStatusSet(FetchStatus.success);
-        console.log("🌠", res);
-        // history.replace(`/weight/${token}`);
+        if (res.success && res.inference_job_token) {
+          writeStatusSet(FetchStatus.success);
+          enqueue(res.inference_job_token);
+      }
       })
       .catch(err => {
         writeStatusSet(FetchStatus.error);

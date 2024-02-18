@@ -24,6 +24,20 @@ interface Gather {
   res: any
 }
 
+type BatchToggle = (entity_token: string, entity_type: string) => boolean;
+
+export interface MakePropsParams { entityToken: string, entityType: string }
+
+export interface BatchInputProps {
+  busy: boolean,
+  entityToken: string,
+  entityType: string,
+  isToggled: boolean,
+  toggle: BatchToggle
+}
+
+export type MakeBatchProps = (x: MakePropsParams) => BatchInputProps;
+
 export default function useBatchContent({
   checker,
   debug,
@@ -43,11 +57,11 @@ export default function useBatchContent({
   const dlog = (...dbg: any) => debug ? console.log(...dbg) : {};
 
   const gather = ({ expand, key, res }: Gather) => {
-    let tokens = res.results ? res.results.map((item: any) => item[key]) : [res[key]];
-    let abc = tokens.reduce((obj = {},token = "") => ({ ...obj, [token]: true }),{})
+    let tokens = res.results ? res.results.map((item: any) => (item.details || item)[key]) : [res[key]];
+    let loadingTokens = tokens.reduce((obj = {},token = "") => ({ ...obj, [token]: true }),{})
     dlog("🪙",fetcher);
     tokenTypeSet(key)
-    busyListSet(abc); // add current batch to busy list
+    busyListSet(loadingTokens); // add current batch to busy list
     fetcher("",{},{ tokens }).then((batchRes: any) => {
 
     // console.log("🦄",resultsKey,  res, modLibrary);
@@ -68,7 +82,7 @@ export default function useBatchContent({
         busyListSet({}); // this should be a for each key in tokens delete from busyList, but this is fine for now
         librarySet((library: any) => expand ? { ...library, ...newBatch } : newBatch);
       }
-    })
+    });
   };
 
 
@@ -80,7 +94,7 @@ export default function useBatchContent({
     return newState;
   });
 
-  const toggle = (entity_token: string, entity_type: string) => {
+  const toggle: BatchToggle = (entity_token, entity_type) => {
     if (session.check()) {
       let inLibrary = library[entity_token];
       statusSet(FetchStatus.in_progress);
@@ -114,7 +128,7 @@ export default function useBatchContent({
 
   const toggled = ( entity_token = "" ) => toggleCheck(library[entity_token]);
 
-  const makeProps = ({ entityToken, entityType }: { entityToken: string, entityType: string }) => ({
+  const makeProps = ({ entityToken, entityType }: MakePropsParams) => ({
     busy: busyList[entityToken],
     entityToken,
     entityType,
