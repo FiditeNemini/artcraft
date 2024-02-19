@@ -63,28 +63,6 @@ pub async fn process_job_inference(
     Some(val) => { val }
   };
 
-  let _creator_user_token: UserToken;
-  let _anon_user_token: Option<AnonymousVisitorTrackingToken>;
-
-  match &job.maybe_creator_anonymous_visitor_token {
-    Some(token) => {
-      let anonymous_visitor_token = AnonymousVisitorTrackingToken::new_from_str(token);
-      _anon_user_token = Some(anonymous_visitor_token);
-    }
-    None => {
-      _anon_user_token = None;
-    }
-  }
-
-  match &job.maybe_creator_user_token {
-    Some(token) => {
-      _creator_user_token = UserToken::new_from_str(token);
-    }
-    None => {
-      return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")));
-    }
-  }
-
   let _job_progress_reporter = args.job_dependencies.clients.job_progress_reporter
       .new_generic_inference(job.inference_job_token.as_str())
       .map_err(|e| ProcessSingleJobError::Other(anyhow!(e)))?;
