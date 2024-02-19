@@ -197,6 +197,12 @@ export default function WeightPage({
         return (
           <div className="d-flex flex-column gap-3">
             <SdCoverImagePanel src={sdCoverImage} />
+            {descriptionMD !== "" && (
+              <Panel padding={true}>
+                <h5 className="fw-semibold mb-2">Description</h5>
+                <p className="fs-7">{descriptionMD}</p>
+              </Panel>
+            )}
             {imageGenPanel}
           </div>
         );
@@ -490,10 +496,10 @@ export default function WeightPage({
           <div className="col-12 col-xl-8 d-flex flex-column gap-3">
             <div className="media-wrapper">{renderWeightComponent(weight)}</div>
 
-            {descriptionMD !== "" && (
+            {descriptionMD !== "" && !WeightCategory.SD && (
               <Panel padding={true}>
-                <h4 className="fw-semibold mb-3">Description</h4>
-                <p>{descriptionMD}</p>
+                <h5 className="fw-semibold mb-2">Description</h5>
+                <p className="fs-7">{descriptionMD}</p>
               </Panel>
             )}
 
