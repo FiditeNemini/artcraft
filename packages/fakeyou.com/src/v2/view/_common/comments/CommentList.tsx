@@ -2,7 +2,6 @@ import React from "react";
 import { formatDistance } from "date-fns";
 import { Comment } from "@storyteller/components/src/api/comments/ListComments";
 import { SafeDeleteCommentButton } from "./SafeDeleteCommentButton";
-
 import { Gravatar } from "@storyteller/components/src/elements/Gravatar";
 import { Link } from "react-router-dom";
 import { useSession } from "hooks";
@@ -57,12 +56,22 @@ function CommentList(props: Props) {
     }
 
     let profileLink = `/profile/${comment.username}`;
+    let username = comment?.user.username;
+    let gravatarHash = comment?.user.gravatar_hash;
+    let avatarIndex = comment?.user.default_avatar.image_index;
+    let backgroundColorIndex = comment?.user.default_avatar.color_index;
 
     rows.push(
       <tr key={comment.token}>
         <td className="px-0">
           <div className="d-flex gap-3 py-3">
-            <Gravatar size={42} email_hash={comment.user_gravatar_hash} />
+            <Gravatar
+              email_hash={gravatarHash || ""}
+              username={username || ""}
+              avatarIndex={avatarIndex || 0}
+              backgroundIndex={backgroundColorIndex || 0}
+              size={40}
+            />
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
                 <Link to={profileLink} className="fw-medium text-white">
