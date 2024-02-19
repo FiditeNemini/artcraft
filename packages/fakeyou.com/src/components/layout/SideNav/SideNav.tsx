@@ -193,6 +193,7 @@ export default function SideNav({
         variant="secondary"
         onClick={() => {
           history.push("/login");
+          handleNavLinkClick();
         }}
       />
     </>
@@ -205,6 +206,7 @@ export default function SideNav({
         small
         onClick={() => {
           history.push("/signup");
+          handleNavLinkClick();
         }}
       />
     </>
@@ -229,6 +231,7 @@ export default function SideNav({
           variant="secondary"
           onClick={() => {
             history.push(url);
+            handleNavLinkClick();
           }}
         />
       </>
@@ -243,6 +246,7 @@ export default function SideNav({
           variant="danger"
           onClick={async () => {
             await logoutHandler();
+            handleNavLinkClick();
           }}
         />
       </>
@@ -313,10 +317,7 @@ export default function SideNav({
             activeClassName="active-link"
             onClick={handleNavLinkClick}
           >
-            <FontAwesomeIcon
-              icon={faFilms}
-              className="sidebar-heading-icon"
-            />
+            <FontAwesomeIcon icon={faFilms} className="sidebar-heading-icon" />
             {t("videoStryleTransfer")}
           </NavLink>
         </li>
