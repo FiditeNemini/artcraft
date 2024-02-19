@@ -7,6 +7,8 @@ pub struct EnrichedPrompts {
   pub maybe_negative_prompt: Option<String>,
 }
 
+const DEFAULT_NEGATIVE_PROMPT : &str = "nudity, nsfw, naked, sex";
+
 /// Enrich the user-provided prompts.
 /// In the future, we can add prompt engineering to these.
 pub fn enrich_prompt(request: &EnqueueImageGenRequest) -> Option<EnrichedPrompts> {
@@ -15,9 +17,24 @@ pub fn enrich_prompt(request: &EnqueueImageGenRequest) -> Option<EnrichedPrompts
     Some(prompt) => prompt.to_string(),
   };
 
-  let mut maybe_negative_prompt = request.maybe_n_prompt.clone();
+  let mut maybe_negative_prompt = request.maybe_n_prompt
+      .as_ref()
+      .map(|prompt| prompt.to_string());
 
   let classification = classify_prompt(&positive_prompt);
+
+  if !classification.prompt_references_sex {
+    // If the prompt doesn't have sex terms in it, try to make sure it doesn't get generated.
+    match maybe_negative_prompt.as_deref() {
+      None => {
+        maybe_negative_prompt = Some(DEFAULT_NEGATIVE_PROMPT.to_string());
+      }
+      Some(negative_prompt) => {
+        let new_negative_prompt = format!("{}, {}", negative_prompt, DEFAULT_NEGATIVE_PROMPT);
+        maybe_negative_prompt = Some(new_negative_prompt);
+      }
+    }
+  }
 
   if classification.is_abusive() {
     // NB: Save the original prompt as the negative prompt so that we can study it.
