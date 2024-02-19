@@ -24,13 +24,14 @@ impl PromptClassification {
   }
 }
 
+
 pub fn classify_prompt(text_prompt: &str) -> PromptClassification  {
-  let prompt_tokens_alpha = text_prompt.split_whitespace()
+  let prompt_tokens_alpha = SPACES_REGEX.split(text_prompt)
       .map(|term| term.trim().to_lowercase())
       .map(|term| term.chars().filter(|c| c.is_alphanumeric()).collect::<String>())
       .collect::<Vec<String>>();
 
-  let mut prompt_tokens_lower = text_prompt.split_whitespace()
+  let mut prompt_tokens_lower = SPACES_REGEX.split(text_prompt)
       .map(|term| term.trim().to_lowercase())
       .collect::<Vec<String>>();
 
@@ -84,11 +85,38 @@ fn references_racism(prompt_tokens: &[String]) -> bool {
   false
 }
 
+static SPACES_REGEX : Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r"[\s,;]+").expect("regex should be valid")
+});
+
 
 #[cfg(test)]
 mod tests {
-  use crate::util::classify_prompt::classify_prompt;
+  use crate::util::classify_prompt::{classify_prompt, SPACES_REGEX};
   use speculoos::asserting;
+
+  fn regex_split(text: &str) -> Vec<&str> {
+    SPACES_REGEX.split(text).map(|s| s.trim()).collect()
+  }
+
+  #[test]
+  fn test_regex() {
+    asserting("regex works")
+        .that(&regex_split("foo,bar,baz"))
+        .is_equal_to(vec!["foo", "bar", "baz"]);
+
+    asserting("regex works")
+        .that(&regex_split("foo;bar;baz"))
+        .is_equal_to(vec!["foo", "bar", "baz"]);
+
+    asserting("regex works")
+        .that(&regex_split("foo, bar, baz"))
+        .is_equal_to(vec!["foo", "bar", "baz"]);
+
+    asserting("regex works")
+        .that(&regex_split("foo\n\nbar  baz"))
+        .is_equal_to(vec!["foo", "bar", "baz"]);
+  }
 
   #[test]
   fn test_bad_user_csam_prompts() {
@@ -138,9 +166,9 @@ mod tests {
   fn borderline_cases() {
     // These are actual user prompts that use borderline language, but are safe
     let prompts = [
+      "4 year old girl, wearing a headset microphone",
+      "6 year old girl",
       "Create an Korean child playing with a polish child on play ground",
-      "Girl naked, masturbating, ahegao, squatting",
-      "Girl naked, masturbating, ahegao, squatting, ultra realistic",
       "girl in a strapless dress in a feald of flower",
       "two girls kissing in bed",
     ];
@@ -166,13 +194,35 @@ mod tests {
     let prompts = [
       "((san from princess mononoke)), ((having sex)), (cowgirl position), ((penis in vagina)), ((short ginger hair)), (crop top),(lifting top), (showing tits), (nipples), ((small breast)), ((muscular)), hotelroom, ((drunk:1.2)), ((no panties)), (kneeling over a man), (((gaping pussy))),  ((skirt)), horny, (in heat), (furrowed brow), (angry expression), ((sweat:1.2)), absurd resolution, masterpiece, ultra-detailed, vivid, intricate details, (((photorealistic))), visceral experience, (dynamic angle), (sharp focus), perfect face, looking down, perfect nipples, perfect feet",
       "2B. white swimsuit, butt, black eyeliner, white droplets on ass, sunscreen bottle in hand",
+      "A pornstar getting semen on her face stylized in 4k, realism, high resolution and NSFW.",
+      "Anime Girl (NSFW)",
+      "Anime girl moaning cum naked",
       "Big boobs",
+      "Big naked but girl with huge eyes on each cheek",
       "COCK COCK AND DICK BALLS HEELLPPPP",
+      "Creampie (NSFW)",
+      "Full body naked big boobs open pussy moaning anime girl",
+      "Full body, ultra giant boobs, ultra thicc, naked, facing viewer, in the sewers",
+      "Generate a beautiful picture of a naked woman.",
+      "Girl naked, masturbating, ahegao, squatting",
+      "Girl naked, masturbating, ahegao, squatting, ultra realistic",
       "Girl nude, pink hair, pink pussy ",
       "Hot naked anime maids",
+      "Huge breasts naked anime girl",
       "LOOK AT MY MASSIVE DICK",
+      "Naked Gardevoir",
+      "Naked woman giving birth",
+      "Naked woman",
       "Naked, cute, hot, nice boobs",
+      "Sexy woman, ultra giant boobs, ultra thicc, facing viewer, standing, arms behind back, naked, in the mall",
+      "a gay black guy with nipples and has undies on",
+      "a poop dressed as a princess",
+      "ahh daddy ahh fuck me",
+      "anime girl naked moaning lots of cum",
+      "anthropomorphic poop princess in a castle bedroom",
       "black women, cum inflation, cute, sex, big boobs, big ass",
+      "girl in a tight thong. NSFW, k, realistic, photorealsitic.",
+      "guy shitting in the toilet",
       "hot cat girl pussy getting fucked by a dick",
       "hot gaping pussy and ass legs wide open",
       "hot girl with a tight vagina",
@@ -184,13 +234,19 @@ mod tests {
       "inflation, water inflation, oral, hose in mouth, water, orgasm, english dialouge, solo female, belly expansion, expansion, cum, inflation, water inflation, water inflation, water inflation, water inflation, human girl, orgasm, human girl inflation",
       "intercource between man and women",
       "minecraft creeper having sex in the pussy with another minecraft creeper",
+      "moaning anime girl",
       "naked girl sitting in chair",
       "naked women fingring",
+      "nutsack",
+      "pov your having sex with a naked anime girl",
       "sex",
+      "sexy,high heels,long brown hair,big breast,KTV,seducing",
       "titfuck, huge boobs",
+      "woman pleasuring herself stylized in photorealist, 4k, high-res, and NSFW (Nude)",
+      "woman sucking dick.",
+      "yuki tsukumo woman face feet five toes anime two feet normal sized feet tall body two legs 5,9 watery substance on feet feet in air sitting by bed blonde,long hair,grinning no clothes 35 year old big boobs long toes legs up in the air inviting to pussy two legs up in the air exposed nipples and breasts dripping wet pussy black tanktop blue jeans lipstick holding legs in the air moaning\n\nshowing her soles to the camera",
 
-      // Spanish
-      "Una mujer japonesa embarazada pero más femenina con cabello blanco, ojos azules, un traje rojo de artes marciales de cuerpo completo, una cicatriz en la mejilla, con un efecto de nieve en el fondo de ciudad, en estilo de dibujo manga",
+      // Non-english
     ];
 
     for prompt in prompts {
@@ -202,44 +258,88 @@ mod tests {
       asserting(&format!("is child abuse - prompt: {}", prompt))
           .that(&classification.is_child_abuse())
           .is_equal_to(false);
+
+      asserting(&format!("is nsfw - prompt: {}", prompt))
+          .that(&classification.prompt_references_sex)
+          .is_equal_to(true);
     }
   }
 
   #[test]
   fn okay_cases() {
     // These are actual user prompts that use borderline language, but are safe
+    // Eventually we'll want to classify prompts that are sufficiently engineered vs prompts that need enrichment.
     let prompts = [
+      "(masterpiece, best quality), 1girl, blonde hair, red dress, pantyhose, cute face, blush",
+      "1girl, blue hair, sitting on top of a table, smile",
+      "1girl, purple hair, school uniform, smug, looking at viewer, heterochromia",
+      "1girl, red hair, city streets",
+      "1girl, schoolgirl, blue hair, eating icecream",
+      "1girl, steampunk, holding a wrench",
+      "2d hand drawn disney princess covered in chocolate, peanuts and corn",
       "3 dancing people in a concert",
       "A 12 ft tall terrifying shadow analog horror demon",
       "A boy, yellow short hair, blue eyes a star in it, hikaru kamiki",
       "A cute small fox in the woods",
       "A girl from Robotech universe, SDF1 mecha superdimensional fortess",
       "A real life pikachu being walked like a dog.",
+      "A shark getting attacked by a vending machine.",
+      "Big booty joe",
+      "Boy named axel davidson has a big belly and a girl called macey steward holds his belly in the sunset",
+      "Eazy-E wearing a Cuban Link, Rolex, and white Nike's with a AR-15 in his left hand.",
       "Foxy from five nights at Freddy’s eating a burger",
+      "Generate what would Eazy-E would look like today",
+      "Giant anime hamburger attacking Los Angeles",
       "Glamorous white gold and pink themed room",
+      "Hank Hill in armor closeup",
       "Has short yellow hair, blue eyes a star in it, Teenager",
+      "Horse running on a race track",
       "I really tall old man. He is at least 13 feet tall, and with his familiy in a family photo. The next tallest member is 4 foot, so he is MASSIVE. He looks like a slitherman, but white old man",
+      "Lightning mcqueen from pixar cars but as an anime",
       "Maid with the prince standing next to her",
+      "Maroon 5 playing on the jimmy fallon stage",
       "Nami from one peice on the beach angry",
       "Overweight Taco Bell manager Female. Hair and a bun with braces, smiling. Black uniform with apron.",
       "Scary, fear, horror, creepypasta, spooky",
+      "Shigeru Miyamoto fighting through a crowd of nerds",
+      "Sonic beats up Mario",
+      "Sonic meets the Powerpuff Girls",
+      "The Rock eating rocks.",
+      "The biggest of biggest guys",
+      "The healthiest hamburger in all the land",
       "Tifa and aerith. Bikini. Laughing. Squirting sunscreen on each other",
       "White and blue fox furry in a river",
+      "World's biggest Mountain Dew Baja Blast",
+      "XXXTENTACION",
+      "a man that is also a car",
       "an image of kojiro hiuga kicking tsubasa osora in the stomach",
+      "anime, hand-drawn and cel animation techniques, iron man from marvel, natural design, beautifully rendered and expressive rich colors, vibrant pastel colors, imaginative and fantastical landscapes, sharp attention to detail, realism and a strong sense of nostalgia and warmth, sharp attention to small details and textures, fantastical creatures, settings, depth and emotions emphasized and accentuated by lighting and shading, extremely high quality, incredibly high finite definition, high resolution, hand-drawn and cel animation techniques",
       "boy with black and blue hair in a red shirt and jeans happy",
       "dead girl in a white dress with blood comeing frome her head in an abendend hospitel",
       "demon girl with white hair light blue eyes with red horns and a tail in a castel",
+      "girl hair pink , dance , japan",
       "girl in a prom dress crying in the rain",
       "girl teen in a dress with horns and a tail in a feald of flowers",
       "girl with bloned hair wering a light blue dress whell drawing with a boy with black hair wering a red shirt siting nex to her",
       "girl with horns and a tail that has durdyblond hair wereing a pink sweter and riped jeans",
+      "girl with lightblue hair cute",
+      "kawaii anime frog",
+      "kinda bug and kinda snack.",
+      "lovander palworld",
+      "mank walking",
+      "masterpiece, best quality, white dress, plump,",
       "morbidly obese blonde woman",
+      "person waving",
       "pichu witch pockimon",
+      "touhou project, marisa kirisame, forest background",
       "verey fansey dresses",
+      "white rabbit speaking into studio mic",
+      "will smith slapping Donald Trump at the Oscars. 4k, realistic",
 
       // Non-english
       "Uma mulher chorando", // NB: "A woman crying"
       "Una mujer con piel de dragon, y cuernos", // NB: "A woman with dragon skin and horns"
+      "Una mujer japonesa embarazada pero más femenina con cabello blanco, ojos azules, un traje rojo de artes marciales de cuerpo completo, una cicatriz en la mejilla, con un efecto de nieve en el fondo de ciudad, en estilo de dibujo manga",
       "rio con personas", // NB: "river with people"
     ];
 
