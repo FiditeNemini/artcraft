@@ -318,7 +318,7 @@ export default function SideNav({
             onClick={handleNavLinkClick}
           >
             <FontAwesomeIcon icon={faFilms} className="sidebar-heading-icon" />
-            {t("videoStryleTransfer")}
+            {t("videoStyleTransfer")}
           </NavLink>
         </li>
 
