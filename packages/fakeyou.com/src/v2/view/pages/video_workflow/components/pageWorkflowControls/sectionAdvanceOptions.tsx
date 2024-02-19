@@ -23,7 +23,7 @@ export default memo( function SectionAdvanceOptions({
   onChange : handleOnChange
 } : {
   workflowValues : WorkflowValuesType
-  onChange: (key:string, val:number|boolean)=>void}
+  onChange: (val:{[key: string]: number|string|boolean})=>void}
 ){
 
   return(
@@ -35,7 +35,7 @@ export default memo( function SectionAdvanceOptions({
               initialValue: wfVal.firstPass,
               label: " Denoise First Pass",
               thumbTip: "Denoise First Pass",
-              onChange: (val)=>{handleOnChange("firstPass",val)}
+              onChange: (val)=>{handleOnChange({firstPass:val})}
             }}/>
         </div>
         <div className="col-md-6">
@@ -44,7 +44,7 @@ export default memo( function SectionAdvanceOptions({
             initialValue: wfVal.upscalePass,
             label: "Denoise Upscale Pass",
             thumbTip: "Denoise Upscale Pass",
-            onChange: (val)=>{handleOnChange("upscalePass", val)}
+            onChange: (val)=>{handleOnChange({upscalePass: val})}
           }}/>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default memo( function SectionAdvanceOptions({
             initialValue: wfVal.motionScale,
             label: "Motion Scale",
             thumbTip: "Motion Scale",
-            onChange: (val)=>{handleOnChange("motionScale", val)}
+            onChange: (val)=>{handleOnChange({motionScale: val})}
           }}/>
         </div>
         <div className="col-md-6">
@@ -64,7 +64,7 @@ export default memo( function SectionAdvanceOptions({
             initialValue: wfVal.upscaleMultiplier,
             label: "Upscale Multiplier",
             thumbTip: "Upscale Multiplier",
-            onChange: (val)=>{handleOnChange("upscaleMultiplier", val)}
+            onChange: (val)=>{handleOnChange({upscaleMultiplier: val})}
           }}/>
         </div>
       </div>
@@ -73,14 +73,14 @@ export default memo( function SectionAdvanceOptions({
           <Checkbox 
             label="Use Empty Latent" 
             checked={wfVal.useEmptyLatent}
-            onChange={(e:{target:{ checked: boolean, name:string, type: string }})=>{handleOnChange("useEmptyLatent", e.target.checked)}}
+            onChange={(e:{target:{ checked: boolean, name:string, type: string }})=>{handleOnChange({useEmptyLatent: e.target.checked})}}
           />
         </div>
         <div className="col-md-6">
           <Checkbox 
             label="Use Face Detailer" 
             checked={wfVal.useFaceDetailer}
-            onChange={(e:{target:{ checked: boolean, name:string, type: string }})=>{handleOnChange("useFaceDetailer", e.target.checked)}}
+            onChange={(e:{target:{ checked: boolean, name:string, type: string }})=>{handleOnChange({useFaceDetailer: e.target.checked})}}
           />
         </div>
       </div>
@@ -94,7 +94,7 @@ export default memo( function SectionAdvanceOptions({
             initialValue: wfVal.denoiseFaceDetailer,
             label: "Denoise Face Detailer",
             thumbTip: "Denoise Face Detailer",
-            onChange: (val)=>{handleOnChange("denoiseFaceDetailer", val)}
+            onChange: (val)=>{handleOnChange({denoiseFaceDetailer: val})}
           }}/>
         </div>
       </div>
@@ -102,7 +102,7 @@ export default memo( function SectionAdvanceOptions({
         <Checkbox 
           label="Use LCM" 
           checked={wfVal.useLCM}
-          onChange={(e:{target:{ checked: boolean, name:string, type: string }})=>{handleOnChange("useLCM", e.target.checked)}}
+          onChange={(e:{target:{ checked: boolean, name:string, type: string }})=>{handleOnChange({useLCM: e.target.checked})}}
         />
       </div>
       <div className="row g-3 p-3">
@@ -113,7 +113,7 @@ export default memo( function SectionAdvanceOptions({
             withRevert: true,
             label: "LCM CFG",
             thumbTip: "LCM CFG",
-            onChange: (val)=>{handleOnChange("lcmCFG", val)}
+            onChange: (val)=>{handleOnChange({lcmCFG: val})}
           }}/>
         </div>
         <div className="col-md-6">
@@ -122,7 +122,7 @@ export default memo( function SectionAdvanceOptions({
             initialValue: wfVal.lcmSteps,
             label: "LCM Steps",
             thumbTip: "LCM Steps",
-            onChange: (val)=>{handleOnChange("lcmSteps", val)}
+            onChange: (val)=>{handleOnChange({lcmSteps: val})}
           }}/>
         </div>
       </div>

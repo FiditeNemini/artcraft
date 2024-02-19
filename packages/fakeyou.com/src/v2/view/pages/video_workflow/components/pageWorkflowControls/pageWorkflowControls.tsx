@@ -65,8 +65,8 @@ export default function PageFilterControls({
     ...CnIvs
   });
 
-  const handleOnChange = (key: string, newValue:any,) => {
-    setWorkflowValues((curr)=>({...curr, [key]: newValue}));
+  const handleOnChange = (val:{[key: string]: number|string|boolean|undefined}) => {
+    setWorkflowValues((curr)=>({...curr, ...val}));
   }
   const handleReset = ()=>{
     setWorkflowValues((curr)=>({
@@ -134,7 +134,7 @@ export default function PageFilterControls({
               <div className="col-6">
                 <SectionVideoSettings
                   workflowValues={workflowValues}
-                  onChange={(key,val)=>handleOnChange(key,val)}
+                  onChange={handleOnChange}
                   videoElement={videoRef?.current}
                 />
                 <div className="d-flex my-3 justify-content-end">
@@ -193,8 +193,10 @@ export default function PageFilterControls({
                   modalTitle="Select a Stable Diffusion Weight"
                   inputLabel="Select a Stable Diffusion Weight"
                   onSelect={({title,token})=>{
-                    handleOnChange("sdModelToken", token);
-                    // handleOnChange("sdModelTitle", title);
+                    handleOnChange({
+                      "sdModelTitle": title,
+                      "sdModelToken": token,
+                    });
                   }}
                   value={{
                     token:workflowValues.sdModelToken,
@@ -206,9 +208,12 @@ export default function PageFilterControls({
                 <SelectModal
                   modalTitle="Select a LoRA Weight"
                   label="Additional LoRA Weight"
-                  onSelect={({token})=>{
+                  onSelect={({title,token})=>{
                     console.log(`calling from select modal result select ${token}`);
-                    handleOnChange("loraModelToken", token);
+                    handleOnChange({
+                      "loraModelTitle": title,
+                      "loraModelToken": token
+                    });
                   }}
                   tabs={[
                     {
@@ -234,7 +239,7 @@ export default function PageFilterControls({
                     {...{
                       label: "Prompt",
                       placeholder: "Enter a prompt",
-                      onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange("posPrompt", e.target.value),
+                      onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange({"posPrompt": e.target.value}),
                       value: workflowValues.posPrompt,
                       required: false,
                     }}
@@ -245,7 +250,7 @@ export default function PageFilterControls({
                     {...{
                       label: "Negative Prompt",
                       placeholder: "Enter Negative Prompt",
-                      onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange("negPrompt", e.target.value),
+                      onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange({"negPrompt": e.target.value}),
                       value: workflowValues.negPrompt,
                       required: false,
                     }}
@@ -254,7 +259,7 @@ export default function PageFilterControls({
               </div>
               <div className="row g-3 p-3">
                 <InputSeed label="Seed" onChange={
-                  (val:string)=>handleOnChange("seed", val)
+                  (val:string)=>handleOnChange({seed: val})
                 }/>
               </div>
               
@@ -262,13 +267,13 @@ export default function PageFilterControls({
             <Accordion.Item title="Advance" defaultOpen>
               <SectionAdvanceOptions
                   workflowValues={workflowValues}
-                  onChange={(key,val)=>handleOnChange(key,val)}
+                  onChange={handleOnChange}
                 />
             </Accordion.Item>
             <Accordion.Item title="Control Nets" defaultOpen>
               <SectionControlNets
                 workflowValues={workflowValues}
-                onChange={(key,val)=>handleOnChange(key,val)}
+                onChange={handleOnChange}
               />
             </Accordion.Item>
           </Accordion>
