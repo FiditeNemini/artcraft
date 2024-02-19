@@ -176,6 +176,6 @@ http = "0.2.11"
 diesel = { version = "2.1.3", features = ["mysql"] }
 
 [dev-dependencies]
-speculoos = "0.9.0" # Fluent assertions
+speculoos = "0.11.0" # Fluent assertions
 strum = { version = "0.25", features = ["derive"] }
 

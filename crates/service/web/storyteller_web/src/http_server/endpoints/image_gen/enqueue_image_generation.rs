@@ -13,6 +13,7 @@ use log::warn;
 use serde::Deserialize;
 use serde::Serialize;
 use utoipa::ToSchema;
+use web::Data;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
@@ -39,6 +40,7 @@ use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_se
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::util::allowed_studio_access::allowed_studio_access;
+use crate::util::classify_prompt::classify_prompt;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
@@ -189,8 +191,8 @@ impl Display for EnqueueImageGenRequestError {
 )]
 pub async fn enqueue_image_generation_request(
     http_request: HttpRequest,
-    request: web::Json<EnqueueImageGenRequest>,
-    server_state: web::Data<Arc<ServerState>>
+    request: Json<EnqueueImageGenRequest>,
+    server_state: Data<Arc<ServerState>>
 ) -> Result<HttpResponse, EnqueueImageGenRequestError> {
 
     let inference_mode = inference_mode_from_http_request(&http_request)
@@ -486,6 +488,13 @@ fn validate_request(
     }
     if requires_upload_path && request.maybe_upload_path.is_none() {
         return Err(EnqueueImageGenRequestError::BadInput("Missing Model Upload Path".to_string()));
+    }
+
+    if let Some(prompt) = request.maybe_prompt.as_deref() {
+        let classification = classify_prompt(prompt);
+        if classification.is_child_abuse() {
+            return Err(EnqueueImageGenRequestError::BadInput("Abusive prompt detected".to_string()));
+        }
     }
 
     Ok(())
