@@ -166,32 +166,10 @@ export default function PageFilterControls({
           <Accordion className="mt-4">
             <Accordion.Item title={"Basics"} defaultOpen>
               <div className="row g-3 p-3">
-                {/* <SelectModal 
-                  modalTitle="Select a Stable Diffusion Weight"
-                  label="Select a Stable Diffusion Weight"
-                  onSelect={({token})=>{
-                    handleOnChange("sdModelToken", token);
-                  }}
-                  tabs={[
-                    {
-                      label: "All Weights",
-                      tabKey: "allWeights",
-                      typeFilter: "sd_1.5",
-                      searcher: true,
-                      type: "weights",
-                    },
-                    {
-                      label: "Bookmarked",
-                      tabKey: "bookmarkedWeights",
-                      typeFilter: "sd_1.5",
-                      searcher: false,
-                      type: "weights",
-                    },
-                  ]}
-                /> */}
                 <SelectModalWeightsTabs 
                   modalTitle="Select a Stable Diffusion Weight"
                   inputLabel="Select a Stable Diffusion Weight"
+                  weightType="sd_1.5"
                   onSelect={({title,token})=>{
                     handleOnChange({
                       "sdModelTitle": title,
