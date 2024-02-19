@@ -1,4 +1,5 @@
 use std::time::Duration;
+use log::warn;
 use opentelemetry::KeyValue;
 use opentelemetry::metrics::{Counter, Histogram, Meter, Unit};
 use opentelemetry_otlp::WithExportConfig;
@@ -35,6 +36,13 @@ pub fn init_otel_metrics_pipeline(
         .with_temporality_selector(DefaultTemporalitySelector::new())
         .build()?;
     opentelemetry::global::set_meter_provider(provider);
+
+    if let(err) = opentelemetry::global::set_error_handler(|error| {
+        warn!("OpenTelemetry error: {}", error);
+    }){
+        warn!("Failed to set OpenTelemetry error handler: {:?}", err);
+    };
+
     Ok(())
 }
 
