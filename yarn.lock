@@ -4484,6 +4484,7 @@ __metadata:
     react-twitch-embed: ^3.0.1
     react-wavesurfer.js: ^0.0.8
     sass: ^1.57.1
+    swiper: ^11.0.5
     typescript: ^3.7.5
     universal-cookie: ^6.1.1
     uuid: ^8.3.2
@@ -20175,6 +20176,13 @@ __metadata:
   bin:
     svgo: bin/svgo
   checksum: b92f71a8541468ffd0b81b8cdb36b1e242eea320bf3c1a9b2c8809945853e9d8c80c19744267eb91cabf06ae9d5fff3592d677df85a31be4ed59ff78534fa420
+  languageName: node
+  linkType: hard
+
+"swiper@npm:^11.0.5":
+  version: 11.0.5
+  resolution: "swiper@npm:11.0.5"
+  checksum: 83b125d16733a66ed5f58627c81263116e39eea5cead92667d2e24692ff94632de9aa05fec1ed80dc352779c0d7525e9a18424fce1c39c5e970823414b212edb
   languageName: node
   linkType: hard
 

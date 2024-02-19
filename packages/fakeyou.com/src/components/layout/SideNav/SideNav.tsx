@@ -146,6 +146,7 @@ export default function SideNav({
         pending_svc_jobs: 0,
         pending_tacotron2_jobs: 0,
         pending_voice_designer: 0,
+        pending_stable_diffusion: 0,
       },
     },
     legacy_tts: {
@@ -192,6 +193,7 @@ export default function SideNav({
         variant="secondary"
         onClick={() => {
           history.push("/login");
+          handleNavLinkClick();
         }}
       />
     </>
@@ -204,6 +206,7 @@ export default function SideNav({
         small
         onClick={() => {
           history.push("/signup");
+          handleNavLinkClick();
         }}
       />
     </>
@@ -228,6 +231,7 @@ export default function SideNav({
           variant="secondary"
           onClick={() => {
             history.push(url);
+            handleNavLinkClick();
           }}
         />
       </>
@@ -242,6 +246,7 @@ export default function SideNav({
           variant="danger"
           onClick={async () => {
             await logoutHandler();
+            handleNavLinkClick();
           }}
         />
       </>
@@ -312,10 +317,7 @@ export default function SideNav({
             activeClassName="active-link"
             onClick={handleNavLinkClick}
           >
-            <FontAwesomeIcon
-              icon={faFilms}
-              className="sidebar-heading-icon"
-            />
+            <FontAwesomeIcon icon={faFilms} className="sidebar-heading-icon" />
             {t("videoStryleTransfer")}
           </NavLink>
         </li>
@@ -564,6 +566,12 @@ export default function SideNav({
                 {t("queueSvc")}:{" "}
                 <span className="text-red">
                   {queueStats.inference.by_queue.pending_svc_jobs}
+                </span>
+              </div>
+              <div>
+                Image Generation:{" "}
+                <span className="text-red">
+                  {queueStats.inference.by_queue.pending_stable_diffusion}
                 </span>
               </div>
               <div>

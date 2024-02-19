@@ -6,6 +6,7 @@ MASTER_BRANCH='master'
 PRODUCTION_BRANCH='production-fakeyou'
 
 git stash
+git branch --set-upstream-to="origin/${MASTER_BRANCH}" ${MASTER_BRANCH}
 git checkout $MASTER_BRANCH
 git pull
 
