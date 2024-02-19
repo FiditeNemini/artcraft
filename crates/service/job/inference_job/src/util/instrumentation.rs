@@ -1,5 +1,42 @@
-use opentelemetry::metrics::{Counter, Histogram, Meter, Unit, UpDownCounter};
-use opentelemetry_sdk::metrics::data::Gauge;
+use std::time::Duration;
+use opentelemetry::KeyValue;
+use opentelemetry::metrics::{Counter, Histogram, Meter, Unit};
+use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_sdk::metrics::reader::{DefaultAggregationSelector, DefaultTemporalitySelector};
+use opentelemetry_sdk::Resource;
+
+
+pub struct JobInstrumentLabels {
+    pub service_name: String,
+    pub service_namespace: String,
+    pub service_version: String,
+    pub service_instance_id: String,
+    pub service_job_scope: String,
+}
+
+// TODO(kasisnu, 12/02/24): move this into a config struct/better type once more binaries are instrumented
+pub fn init_otel_metrics_pipeline(
+    job_instrument_labels: JobInstrumentLabels,
+) -> Result<(), opentelemetry::metrics::MetricsError>  {
+    let provider = opentelemetry_otlp::new_pipeline()
+        .metrics(opentelemetry_sdk::runtime::Tokio)
+        // TODO: 1. read host from env 2. Single pod of otel-collector is probably not good enough, run daemonset?
+        .with_exporter(opentelemetry_otlp::new_exporter().tonic().with_endpoint("http://adot-collector.adot-collector-kubeprometheus:4317"))
+        .with_resource(Resource::new(vec![
+            KeyValue::new("service.name", job_instrument_labels.service_name),
+            KeyValue::new("service.namespace", job_instrument_labels.service_namespace),
+            KeyValue::new("service.version", job_instrument_labels.service_version),
+            KeyValue::new("service.instance.id", job_instrument_labels.service_instance_id),
+            KeyValue::new("service.job.scope", job_instrument_labels.service_job_scope),
+        ]))
+        .with_period(Duration::from_secs(3))
+        .with_timeout(Duration::from_secs(10))
+        .with_aggregation_selector(DefaultAggregationSelector::new())
+        .with_temporality_selector(DefaultTemporalitySelector::new())
+        .build()?;
+    opentelemetry::global::set_meter_provider(provider);
+    Ok(())
+}
 
 pub struct JobInstruments {
     pub job_duration: Histogram<u64>,

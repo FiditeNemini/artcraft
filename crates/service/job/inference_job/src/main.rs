@@ -58,6 +58,7 @@ use crate::job_dependencies::{BucketDependencies, ClientDependencies, DatabaseDe
 use crate::job_specific_dependencies::JobSpecificDependencies;
 use crate::util::instrumentation::JobInstruments;
 use crate::util::model_weights_cache::model_weights_cache_directory::ModelWeightsCacheDirectory;
+use crate::util::instrumentation::{init_otel_metrics_pipeline, JobInstrumentLabels };
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
@@ -81,39 +82,22 @@ const ENV_TTS_INFERENCE_SIDECAR_HOSTNAME: &str = "TTS_INFERENCE_SIDECAR_HOSTNAME
 
 const OTEL_METER_NAME: &str = "inference-job";
 
-// TODO@madhukar93: labels for model etc
-fn init_otel_metrics_pipeline() -> Result<(), opentelemetry::metrics::MetricsError>  {
- let provider = opentelemetry_otlp::new_pipeline()
-     .metrics(opentelemetry_sdk::runtime::Tokio)
-     // TODO: 1. read host from env 2. Single pod of otel-collector is probably not good enough, run daemonset?
-     .with_exporter(opentelemetry_otlp::new_exporter().tonic().with_endpoint("http://adot-collector.adot-collector-kubeprometheus:4317"))
-     .with_resource(Resource::new(vec![KeyValue::new("service.name", "inference-job")]))
-     .with_period(Duration::from_secs(3))
-     .with_timeout(Duration::from_secs(10))
-     .with_aggregation_selector(DefaultAggregationSelector::new())
-     .with_temporality_selector(DefaultTemporalitySelector::new())
-     .build()?;
-  opentelemetry::global::set_meter_provider(provider);
-  Ok(())
-}
+
 
 //#[tokio::main]
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {
 
-  if let Err(e) = init_otel_metrics_pipeline() {
-    warn!("Failed to initialize OpenTelemetry metrics pipeline, continuing execution: {}", e);
-  }
-
-  let meter = opentelemetry::global::meter("inference-job");
+  let app_name = "inference-job";
 
   let container_environment = bootstrap(BootstrapArgs {
-    app_name: "inference-job",
+    app_name: app_name,
     default_logging_override: Some(DEFAULT_RUST_LOG),
     config_search_directories: &[".", "./config", "crates/service/job/inference_job/config"],
   })?;
 
   info!("Hostname: {}", &container_environment.hostname);
+
 
   // NB: These are non-standard env vars we're injecting ourselves.
   let _k8s_node_name = easyenv::get_env_string_optional("K8S_NODE_NAME");
@@ -232,6 +216,25 @@ async fn main() -> AnyhowResult<()> {
   };
 
   let scoped_execution = ScopedExecution::new_from_env()?;
+
+  let build_sha = std::fs::read_to_string("/GIT_SHA")
+      .unwrap_or(String::from("unknown"))
+      .trim()
+      .to_string();
+
+  if let Err(e) = init_otel_metrics_pipeline(
+    JobInstrumentLabels{
+      service_name: app_name.to_string(),
+      service_namespace: container_environment.cluster_name.clone(),
+      service_version: build_sha,
+      service_instance_id: container_environment.hostname.clone(),
+      service_job_scope: easyenv::get_env_string_optional("SCOPED_EXECUTION_MODEL_TYPES").unwrap_or_else(|| "unknown".to_string()),
+    }
+  ) {
+    warn!("Failed to initialize OpenTelemetry metrics pipeline, continuing execution: {}", e);
+  }
+
+  let meter = opentelemetry::global::meter("inference-job");
 
   let job_specific_dependencies = JobSpecificDependencies::setup_for_jobs(&scoped_execution)?;
 
