@@ -27,6 +27,12 @@ export default function SideNavJobs({ byQueue, t, ttsQueuedCount }: Props) {
         </span>
       </div>
       <div>
+        Image Generation:{" "}
+        <span className="text-red">
+          { byQueue.pending_stable_diffusion }
+        </span>
+      </div>
+      <div>
         {t("queueFaceAnimator")}:{" "}
         <span className="text-red">
           { byQueue.pending_face_animation_jobs }

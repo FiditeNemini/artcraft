@@ -24,6 +24,15 @@ export default memo( function SectionVideoSettings({
 }){
   const iv = VideoSettingsInitialValues;
 
+  const handleFramesCap = (newValue: number)=>{
+    if(newValue - wfVal.skipFrames >= 16)
+    handleOnChange("framesCap",newValue);
+  }
+  const handleSkipFrames = (newValue: number)=>{
+    if(wfVal.framesCap - newValue >= 16)
+    handleOnChange("skipFrames",newValue);
+  }
+
   if(ve && ve!==null){
     ve.onloadedmetadata = () =>{
       if (ve.videoWidth && ve.videoHeight) {
@@ -60,19 +69,19 @@ export default memo( function SectionVideoSettings({
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 16, max: wfVal.maxFrames, step: 1,
-            initialValue: wfVal.framesCap,
+            value: wfVal.framesCap,
             label: "Frames Cap",
             thumbTip: "24 frames = 1 sec",
-            onChange: (val)=>{handleOnChange("framesCap",val)}
+            onChange: handleFramesCap
           }}/>
         </div>
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 0, max: wfVal.maxFrames-16, step: 1,
-            initialValue: wfVal.skipFrames,
+            value: wfVal.skipFrames,
             label: "Skip Frames",
             thumbTip: "24 frames = 1 sec",
-            onChange: (val)=>{handleOnChange("skipFrames",val)}
+            onChange: handleSkipFrames
           }}/>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import MediaAudioComponent from "./MediaAudioComponent";
 import MediaVideoComponent from "./MediaVideoComponent";
@@ -32,9 +32,10 @@ import { Badge, Input, Modal } from "components/common";
 import BookmarkButton from "components/common/BookmarkButton";
 import LikeButton from "components/common/LikeButton";
 import { useBookmarks, useMedia, useRatings, useSession } from "hooks";
-import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import Iframe from "react-iframe";
+import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
+import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
 
 export default function MediaPage() {
   const { canEditTtsModel, user } = useSession();
@@ -51,10 +52,30 @@ export default function MediaPage() {
       ratings.gather({ res, key: "token" });
     },
   });
-
+  const batchToken = mediaFile?.maybe_batch_token;
+  const [images, setImages] = useState<string[]>([]);
+  const bucketConfig = new BucketConfig();
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
+
+  useEffect(() => {
+    if (batchToken) {
+      GetMediaBatchImages(batchToken, {}, {})
+        .then(response => {
+          if (response.success) {
+            const imageUrls = response.results.map(result =>
+              bucketConfig.getGcsUrl(result.public_bucket_path)
+            );
+            setImages(imageUrls);
+          } else {
+            console.error("Failed to fetch batch images");
+          }
+        })
+        .catch(err => console.error("Error fetching batch images:", err));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [batchToken]);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -98,11 +119,17 @@ export default function MediaPage() {
         );
 
       case MediaFileType.Image:
-        let sdMediaImage = "/images/avatars/default-pfp.png";
+        let sdMediaImage = ["/images/avatars/default-pfp.png"];
         if (mediaFile.public_bucket_path) {
-          sdMediaImage = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
+          sdMediaImage = [bucketConfig.getGcsUrl(mediaFile.public_bucket_path)];
         }
-        return <SdCoverImagePanel src={sdMediaImage} />;
+
+        return (
+          <SdBatchMediaPanel
+            key={images.length}
+            images={mediaFile.maybe_batch_token ? images : sdMediaImage}
+          />
+        );
       case MediaFileType.BVH:
         const bvhUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         return (
@@ -335,8 +362,6 @@ export default function MediaPage() {
 
   const subtitleDivider = <span className="opacity-25 fs-5 fw-light">|</span>;
 
-  const bucketConfig = new BucketConfig();
-
   let weightUsedCoverImage = "/images/avatars/default-pfp.png";
   if (
     mediaFile?.maybe_model_weight_info !== null &&
@@ -438,7 +463,9 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
-                {mediaFile?.media_type === MediaFileType.BVH || mediaFile?.media_type === MediaFileType.GLTF || mediaFile?.media_type === MediaFileType.GLB   ? (
+                {mediaFile?.media_type === MediaFileType.BVH ||
+                mediaFile?.media_type === MediaFileType.GLTF ||
+                mediaFile?.media_type === MediaFileType.GLB ? (
                   <Button
                     {...{
                       icon: faVideoPlus,

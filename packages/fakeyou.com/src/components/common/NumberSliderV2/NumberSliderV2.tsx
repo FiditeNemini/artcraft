@@ -12,6 +12,7 @@ interface Props{
   max: number;
   step?: number;
   initialValue?: number;
+  value?: number;
   onChange?: (x:number) => void;
   required?: boolean;
   withRevert?: boolean;
@@ -31,9 +32,11 @@ const renderTrack = ({ props: { style, ...props }, children }: any) => (
 const thumb =
   (thumbTip = "") =>
   ({ props: { style, ...props } }: any) => {
+    const key = Date.now()
     return (
       <Tippy
         {...{
+          key,
           arrow: false,
           content: thumbTip,
           placement: "bottom",
@@ -56,6 +59,7 @@ export default function NumberSlider({
   onChange: onChangeCallback,
   required,
   initialValue: initialValueProps,
+  value,
   withRevert = false,
   propsButtonRevertToDefault,
 }: Props) {
@@ -63,7 +67,8 @@ export default function NumberSlider({
   const step = stepProps && stepProps <= max-min ? stepProps 
     : max-min >= 1 ? 1 : (max-min) / 10;
   const initialValue = initialValueProps !== undefined && initialValueProps <= max && initialValueProps >= min ? initialValueProps
-  : max-min === step ? min : roundToStep((max+min)/2, step);
+  : value !== undefined && value <=max && value>=min ? value
+  :max-min === step ? min : roundToStep((max+min)/2, step);
 
   function handleInputOnChange(e: React.ChangeEvent<HTMLInputElement>){
     if(onChangeCallback)onChangeCallback(Number.parseInt(e.target.value))
@@ -81,7 +86,7 @@ export default function NumberSlider({
         <input 
           className="fy-number-slider-value"
           type="number"
-          {...{ min, max, step, value:initialValue}}
+          {...{ min, max, step, value:value || initialValue}}
           onChange={handleInputOnChange}
         />
         <div className="fy-number-slider-range">
@@ -91,7 +96,7 @@ export default function NumberSlider({
               renderThumb: thumb(thumbTip),
               renderTrack,
               thumbTip,
-              values: [initialValue],
+              values: [value || initialValue],
             }}
           />
         </div>
