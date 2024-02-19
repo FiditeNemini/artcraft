@@ -16,6 +16,8 @@ import {
   TextArea
 } from "components/common";
 
+import SelectModalWeightsTabs from "components/common/SelectModalWeightsTabs";
+
 import SectionControlNets, {ControlNetsInitialValues as CnIvs} from "./sectionControlNets";
 import SectionVideoSettings, {VideoSettingsInitialValues as VideoIvs} from "./sectionVideoSettings";
 import SectionAdvanceOptions, {AdvanceOptionsInitialValues as AdvIvs} from "./sectionAdvanceOptions";
@@ -164,7 +166,7 @@ export default function PageFilterControls({
           <Accordion className="mt-4">
             <Accordion.Item title={"Basics"} defaultOpen>
               <div className="row g-3 p-3">
-                <SelectModal 
+                {/* <SelectModal 
                   modalTitle="Select a Stable Diffusion Weight"
                   label="Select a Stable Diffusion Weight"
                   onSelect={({token})=>{
@@ -186,6 +188,18 @@ export default function PageFilterControls({
                       type: "weights",
                     },
                   ]}
+                /> */}
+                <SelectModalWeightsTabs 
+                  modalTitle="Select a Stable Diffusion Weight"
+                  inputLabel="Select a Stable Diffusion Weight"
+                  onSelect={({title,token})=>{
+                    handleOnChange("sdModelToken", token);
+                    // handleOnChange("sdModelTitle", title);
+                  }}
+                  value={{
+                    token:workflowValues.sdModelToken,
+                    title:""
+                  }}
                 />
               </div>
               <div className="row g-3 p-3">

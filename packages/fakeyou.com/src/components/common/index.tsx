@@ -8,6 +8,7 @@ import Checkbox from "./Checkbox";
 import {
   MediaCards,
   SkeletonCard,
+  WeightsCards,
 } from "./Card";
 import Container from "./Container";
 import CoverImageInput from "./CoverImageInput";
@@ -58,6 +59,7 @@ export {
   //Cards
   MediaCards,
   SkeletonCard,
+  WeightsCards,
   //End Cards
   ButtonRevertToDefault,
   Checkbox,

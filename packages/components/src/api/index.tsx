@@ -3,9 +3,21 @@ import {
   GetMediaByUser
 } from "./media_files";
 
+import {
+  Weight,
+  ListWeights
+} from "./weights";
+
+import {
+  GetBookmarksByUser
+} from "./bookmarks/GetBookmarksByUser";
+
 export type{
-  MediaFileType
+  MediaFileType,
+  Weight
 }
 export {
-  GetMediaByUser
+  GetBookmarksByUser,
+  GetMediaByUser,
+  ListWeights
 };
