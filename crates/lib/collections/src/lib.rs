@@ -20,4 +20,5 @@
 #![allow(non_snake_case)]
 
 pub mod multiple_random_from_vec;
+pub mod random_from_array;
 pub mod random_from_vec;

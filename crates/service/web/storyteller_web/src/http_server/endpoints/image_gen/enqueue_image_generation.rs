@@ -37,6 +37,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
+use crate::http_server::endpoints::image_gen::prompt_enrichment::enrich_prompt;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::util::allowed_studio_access::allowed_studio_access;
@@ -104,27 +105,27 @@ pub fn is_valid_string(input: &str) -> bool {
 
 #[derive(Deserialize, ToSchema)]
 pub struct EnqueueImageGenRequest {
-    uuid_idempotency_token: String,
-    maybe_image_source: Option<String>,
-    maybe_sd_model_token: Option<String>,
-    maybe_lora_model_token: Option<String>,
-    maybe_prompt: Option<String>,
-    maybe_n_prompt: Option<String>,
-    maybe_seed: Option<i64>,
-    maybe_width: Option<u32>,
-    maybe_height: Option<u32>,
-    maybe_sampler: Option<String>,
-    maybe_upload_path: Option<String>,
-    maybe_lora_upload_path: Option<String>,
-    maybe_cfg_scale: Option<u32>,
-    maybe_number_of_samples: Option<u32>,
-    maybe_batch_count: Option<u32>,
-    maybe_name: Option<String>,
-    maybe_description: Option<String>,
-    maybe_version: Option<u32>,
+    pub uuid_idempotency_token: String,
+    pub maybe_image_source: Option<String>,
+    pub maybe_sd_model_token: Option<String>,
+    pub maybe_lora_model_token: Option<String>,
+    pub maybe_prompt: Option<String>,
+    pub maybe_n_prompt: Option<String>,
+    pub maybe_seed: Option<i64>,
+    pub maybe_width: Option<u32>,
+    pub maybe_height: Option<u32>,
+    pub maybe_sampler: Option<String>,
+    pub maybe_upload_path: Option<String>,
+    pub maybe_lora_upload_path: Option<String>,
+    pub maybe_cfg_scale: Option<u32>,
+    pub maybe_number_of_samples: Option<u32>,
+    pub maybe_batch_count: Option<u32>,
+    pub maybe_name: Option<String>,
+    pub maybe_description: Option<String>,
+    pub maybe_version: Option<u32>,
 
     // Optional cover image on LoRA or SD upload
-    maybe_cover_image_media_file_token: Option<MediaFileToken>,
+    pub maybe_cover_image_media_file_token: Option<MediaFileToken>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -375,11 +376,13 @@ pub async fn enqueue_image_generation_request(
         version = s;
     }
 
+    let maybe_enriched_prompts = enrich_prompt(&request);
+
     let inference_args = StableDiffusionArgs {
         maybe_sd_model_token: Some(sd_weight_token),
         maybe_lora_model_token: Some(lora_token),
-        maybe_prompt: Some(request.maybe_prompt.clone().unwrap_or_default()),
-        maybe_n_prompt: Some(n_prompt),
+        maybe_prompt: maybe_enriched_prompts.as_ref().map(|p| p.positive_prompt.clone()),
+        maybe_n_prompt: maybe_enriched_prompts.as_ref().and_then(|p| p.maybe_negative_prompt.clone()),
         maybe_seed: Some(seed),
         maybe_upload_path: maybe_sd_upload_url,
         maybe_lora_upload_path: maybe_lora_upload_url,
@@ -488,13 +491,6 @@ fn validate_request(
     }
     if requires_upload_path && request.maybe_upload_path.is_none() {
         return Err(EnqueueImageGenRequestError::BadInput("Missing Model Upload Path".to_string()));
-    }
-
-    if let Some(prompt) = request.maybe_prompt.as_deref() {
-        let classification = classify_prompt(prompt);
-        if classification.is_child_abuse() {
-            return Err(EnqueueImageGenRequestError::BadInput("Abusive prompt detected".to_string()));
-        }
     }
 
     Ok(())

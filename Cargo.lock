@@ -6340,6 +6340,7 @@ dependencies = [
  "buckets",
  "chrono",
  "cloud_storage",
+ "collections",
  "composite_identifiers",
  "config",
  "container_common",
