@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { EntityInput } from "components/entities";
-import { EntityFilterOptions, EntityInputMode, EntityModeProp } from "components/entities/EntityTypes";
+import { EntityFilterOptions, EntityInputMode, EntityModeProp, ListEntityFilters } from "components/entities/EntityTypes";
 import { useModal, useSession } from "hooks";
 import { InferenceJobsModal } from "components/modals";
 import { Button, SegmentButtons, TempInput, TempSelect } from "components/common";
@@ -10,19 +10,21 @@ interface Props {
 }
 
 interface Yank {
-  [key: string]: string
+  [key: string]: any[]
 }
 
 export default function DevMediaInput({ value }: Props) {
   const { studioAccessCheck } = useSession();
   const [mediaToken,mediaTokenSet] = useState();
   const [mode, modeSet] = useState<EntityModeProp>("media");
-  const [filters,filtersSet] = useState<Yank>({
-    bookmarks: "",
-    media: "",
-    weights: "",
-    searchWeights: "",
-  });
+  const yadda = Object.keys(EntityInputMode).filter(val => isNaN(Number(val))).reduce((obj,modeType,i) => {
+    return {
+      [modeType]: ListEntityFilters(i),
+      ...obj
+    };
+  },{});
+
+  const [filters,filtersSet] = useState<Yank>(yadda);
   const [owner,ownerSet] = useState("");
   const onChange = ({ target }: any) => mediaTokenSet(target.value);
   const { open } = useModal();
@@ -32,9 +34,9 @@ export default function DevMediaInput({ value }: Props) {
   const options = EntityFilterOptions();
   const filterOptions = EntityFilterOptions(inputMode);
 
-  // console.log("❌", mode, inputMode, filterOptions);
+  console.log("❌", mode, inputMode, filterOptions);
 
-  const changeFilter = ({ target }: { target: any }) => filtersSet({ ...filters, [inputMode]: target.value });
+  const changeFilter = ({ target }: { target: any }) => filtersSet({ ...filters, [mode]: target.value });
 
   const openModal = () => open({ component: InferenceJobsModal });
 
@@ -45,17 +47,9 @@ export default function DevMediaInput({ value }: Props) {
         <SegmentButtons {...{ onChange: ({ target }: { target: any }) => modeSet(target.value), options, value: mode }}/>
         <TempInput {...{ value: owner, onChange: ({ target }: { target: any }) => ownerSet(target.value), placeholder: "User" }}/>
       </header>
-{      
-  // <div {...{ className: "d-flex" }}>
-  //       { filterOptions.map((option,i) => {
-  //         return <Button {...{ label: option.label }}/>
-  //       }) }
-  //     </div>
-    }
       <TempSelect {...{
-        isMulti: true,
         options: filterOptions,
-        value: filters[inputMode],
+        value: filters[mode],
         onChange: changeFilter
       }}/>
      <EntityInput {...{

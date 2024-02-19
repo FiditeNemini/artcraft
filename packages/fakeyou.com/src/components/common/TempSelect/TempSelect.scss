@@ -1,9 +1,39 @@
+@import "scss/colours.scss";
+
 .fy-temp-select {
   margin-bottom: 1rem;
 
   &:only-child,
   &:last-child {
     margin-bottom: 0;
+  }
+
+  .select__value-container--is-multi {
+    gap: .25rem;
+    padding: 0;
+  }
+
+  [class^="select__multi-value"] {
+    color: #fff;
+  }
+
+  .select__multi-value {
+    border-radius: .5rem;
+    overflow: hidden;
+    padding: 0 0 0 .125rem;
+    background: $secondary-lighter
+  }
+
+  .select__multi-value__remove {
+    display: flex;
+    justify-content: center;
+    border-radius: 0;
+    width: 1.5rem;
+
+    &:hover {
+      color: #fff;
+      background: $secondary-very-light;
+    }
   }
 }
 

@@ -40,14 +40,16 @@ export enum EntityType {
   weights
 }
 
-export const EntityFilterOptions = ( mode?: EntityInputMode, t = (v:string) => v) => {
-  const bookmarkFilters = Object.keys({ ...MediaFilters, ...WeightsFilters }).filter(val => isNaN(Number(val))).reduce((obj,current) => ({ ...obj, [current]: current  }),{});;
+export const ListEntityFilters = (mode?: number) => {
+  const bookmarkFilters = Object.keys({ ...MediaFilters, ...WeightsFilters }).filter(val => isNaN(Number(val))).reduce((obj,current) => ({ ...obj, [current]: current  }),{});
 
-  const filters = mode !== undefined ? [bookmarkFilters,MediaFilters,WeightsFilters,WeightsFilters][mode] : EntityInputMode;
+  const selectedFilters = mode !== undefined ? [bookmarkFilters,MediaFilters,WeightsFilters,WeightsFilters][mode] : EntityInputMode;
 
-  return Object.values(filters)
-  .filter(val => isNaN(Number(val)))
-  .map((value) => {
+  return Object.values(selectedFilters).filter(val => isNaN(Number(val)));
+};
+
+export const EntityFilterOptions = (mode?: EntityInputMode, t = (v:string) => v) => {
+  return ListEntityFilters(mode).map((value) => {
     if (typeof value === "string") return { value, label: t(value) }
     return { label: "all", value: "all" };
   });

@@ -75,11 +75,10 @@ export default function WeightPage({
   const ratings = useRatings();
   const {
     data: weight,
-    descriptionMD,
     fetchError,
     isLoading,
     title,
-    remove,
+    remove
   } = useWeightFetch({
     onRemove: () => {
       history.push(source || "");
@@ -490,10 +489,10 @@ export default function WeightPage({
           <div className="col-12 col-xl-8 d-flex flex-column gap-3">
             <div className="media-wrapper">{renderWeightComponent(weight)}</div>
 
-            {descriptionMD !== "" && (
+            {!!weight.description_rendered_html && (
               <Panel padding={true}>
                 <h4 className="fw-semibold mb-3">Description</h4>
-                <p>{descriptionMD}</p>
+                <p>{weight.description_rendered_html}</p>
               </Panel>
             )}
 
