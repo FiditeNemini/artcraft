@@ -29,7 +29,7 @@ export default function MediaTab({ username }: { username: string }) {
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useListContent({
     addQueries: {
-      page_size: 24,
+      page_size: urlQueries.get("page_size") || "24",
       ...prepFilter(mediaType, "filter_media_type"),
     },
     addSetters: { mediaTypeSet },

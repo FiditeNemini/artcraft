@@ -31,7 +31,7 @@ export default function MediaTab() {
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useLazyLists({
     addQueries: {
-      page_size: 24,
+      page_size: urlQueries.get("page_size") || "24",
       //...prepFilter(weightType, "maybe_scoped_weight_type"),
       ...prepFilter(mediaType, "filter_media_type"),
     },

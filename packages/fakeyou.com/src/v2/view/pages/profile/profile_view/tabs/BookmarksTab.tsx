@@ -47,7 +47,7 @@ export default function BookmarksTab({ username }: { username: string }) {
     status,
   } = useListContent({
     addQueries: {
-      page_size: 24,
+      page_size: urlQueries.get("page_size") || "24",
       ...prepFilter(weightType, "maybe_scoped_weight_type"),
       ...prepFilter(weightCategory, "maybe_scoped_weight_category"),
     },
