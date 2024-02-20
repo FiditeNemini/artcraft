@@ -169,8 +169,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
     info!("Downloaded workflow to {:?}", workflow_path);
 
-    info!("Downloading workflow to {:?}", workflow_path);
-
     // download_file(comfy_deps.workflow_bucket_path.clone(), PathBuf::from(workflow_path.clone())).await.map_err(|e| ProcessSingleJobError::Other(e))?;
 
     let maybe_args = job.maybe_inference_args
