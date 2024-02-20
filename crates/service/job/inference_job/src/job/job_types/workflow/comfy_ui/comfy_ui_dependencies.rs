@@ -6,7 +6,6 @@ use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::Comfy
 pub struct ComfyDependencies {
     pub inference_command: ComfyInferenceCommand,
     pub dependency_tokens: RequiredModels,
-    pub workflow_bucket_path: String,
 }
 
 impl ComfyDependencies {
@@ -14,7 +13,6 @@ impl ComfyDependencies {
         Ok(Self {
             inference_command: ComfyInferenceCommand::from_env()?,
             dependency_tokens: RequiredModels::init(),
-            workflow_bucket_path: easyenv::get_env_string_required("COMFY_WORKFLOW_BUCKET_PATH")?,
         })
     }
 }
@@ -132,6 +130,14 @@ impl RequiredModels {
                 ComfyDependency {
                     location: PathBuf::from("input/example.png"),
                     url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/example.png".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("custom_nodes/ComfyUI-AnimateDiff-Evolved/models/sd15_t2v_beta_motion.ckpt"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/sd15_t2v_beta_motion.ckpt".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("loras/LCM_LoRA_Weights_SD15.safetensors"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/LCM_LoRA_Weights_SD15.safetensors".to_string(),
                 },
             ],
         }

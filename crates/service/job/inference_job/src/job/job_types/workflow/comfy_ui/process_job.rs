@@ -155,34 +155,23 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     let workflow_path = workflow_dir.join("prompt.json").to_str().unwrap().to_string();
 
-    // let retrieved_workflow_record =  get_weight_by_token(
-    //    job_args.workflow_source,
-    //    false,
-    //    &deps.db.mysql_pool
-    // ).await?.unwrap();
-    //
-    // let bucket_details = RemoteCloudBucketDetails {
-    //    object_hash: retrieved_workflow_record.public_bucket_hash,
-    //    prefix: retrieved_workflow_record.maybe_public_bucket_prefix.unwrap(),
-    //    suffix: retrieved_workflow_record.maybe_public_bucket_extension.unwrap(),
-    // };
-    // remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
-    // info!("Downloaded workflow to {:?}", workflow_path);
+    let retrieved_workflow_record =  get_weight_by_token(
+       job_args.workflow_source,
+       false,
+       &deps.db.mysql_pool
+    ).await?.unwrap();
 
-    info!("Downloading workflow {:?}", &comfy_deps.workflow_bucket_path);
+    let bucket_details = RemoteCloudBucketDetails {
+       object_hash: retrieved_workflow_record.public_bucket_hash,
+       prefix: retrieved_workflow_record.maybe_public_bucket_prefix.unwrap(),
+       suffix: retrieved_workflow_record.maybe_public_bucket_extension.unwrap(),
+    };
+    remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
+    info!("Downloaded workflow to {:?}", workflow_path);
+
     info!("Downloading workflow to {:?}", workflow_path);
 
     // download_file(comfy_deps.workflow_bucket_path.clone(), PathBuf::from(workflow_path.clone())).await.map_err(|e| ProcessSingleJobError::Other(e))?;
-
-    args.job_dependencies
-        .buckets
-        .public_bucket_client
-        .download_file_to_disk(&comfy_deps.workflow_bucket_path, &workflow_path)
-        .await
-        .map_err(|err| {
-            error!("could not download workflow: {:?}", err);
-            ProcessSingleJobError::from_anyhow_error(anyhow!("could not download workflow: {:?}", err))
-        })?;
 
     let maybe_args = job.maybe_inference_args
         .as_ref()
@@ -212,7 +201,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         let prompt_file = File::create(&workflow_path).unwrap();
         serde_json::to_writer(prompt_file, &prompt_json).unwrap();
     }
-
 
     // ==================== QUERY AND DOWNLOAD FILES ==================== //
 
