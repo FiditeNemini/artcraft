@@ -44,6 +44,14 @@ use crate::util::allowed_studio_access::allowed_studio_access;
 use crate::util::classify_prompt::classify_prompt;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
+/// This is the number of images (batch size) to generate for each request.
+/// We should allow all users to have multiple images generated at once as this
+/// is what other providers do.
+const MINIMUM_IMAGE_COUNT : u32 = 4;
+
+/// The maximum number of images (batch size) to generate for each request.
+const MAXIMUM_IMAGE_COUNT : u32 = 8;
+
 /// Debug requests can get routed to special "debug-only" workers, which can
 /// be used to trial new code, run debugging, etc.
 const DEBUG_HEADER_NAME: &str = "enable-debug-mode";
@@ -314,9 +322,9 @@ pub async fn enqueue_image_generation_request(
     };
 
     let batch_count = match request.maybe_batch_count {
-        None => 3, // NB: Default to "3" images for everyone
-        Some(0) => 1,
-        Some(val) => if val > 8 { 8 } else { val }
+        None => MINIMUM_IMAGE_COUNT, // NB: Default to "3" images for everyone
+        Some(0...MINIMUM_IMAGE_COUNT) => MINIMUM_IMAGE_COUNT,
+        Some(val) => if val > MAXIMUM_IMAGE_COUNT { MAXIMUM_IMAGE_COUNT } else { val }
     };
 
     let sampler = match request.maybe_sampler.clone() {
