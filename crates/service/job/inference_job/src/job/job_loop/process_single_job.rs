@@ -23,6 +23,7 @@ use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
 use crate::job::job_types::videofilter::process_single_vf_job::process_single_vf_job;
 use crate::job::job_types::workflow::process_single_wf_job::process_single_wf_job;
 use crate::job_dependencies::JobDependencies;
+use opentelemetry::{global as otel, KeyValue as OtelAttribute, metrics::Unit};
 
 pub async fn process_single_job(
   job_dependencies: &JobDependencies,
@@ -238,7 +239,17 @@ async fn do_process_single_job(
 
   info!("Saved model record: {} - {}", job.id.0, &job.inference_job_token);
 
-  job_dependencies.job_instruments.inference_command_execution_duration.record(inference_duration.as_millis() as u64, &[]);
+  let model_type_str = job.maybe_model_type
+      .as_ref()
+      .map(|model_type| model_type.to_str())
+      .unwrap_or("unknown");
+
+  job_dependencies.job_instruments.inference_command_execution_duration.record(inference_duration.as_millis() as u64, &[
+    OtelAttribute::new("job_user_is_premium", job.is_from_premium_user),
+    OtelAttribute::new("job_model", model_type_str),
+    OtelAttribute::new("job_status", "complete_success"),
+    OtelAttribute::new("job_inference_category", job.inference_category.to_str()),
+  ]);
 
   // TODO(bt, 2023-01-11): Need to publish that the job finished.
   //  Publish the *correct type* of event.
