@@ -33,7 +33,7 @@ export default function WeightsTab() {
   const onScreen = useOnScreen(toTopBtnRef, "0px");
   const weights = useLazyLists({
     addQueries: {
-      page_size: 24,
+      page_size: urlQueries.get("page_size") || "24",
       ...prepFilter(weightType, "weight_type"),
       ...prepFilter(weightCategory, "weight_category"),
     },

@@ -33,12 +33,12 @@ export default function Select({
   required,
   ...rest
 }: SelectProps) {
+  const isMulti = Array.isArray(value);
   const valueLabel =
     options.find((option: any) => option.value === value)?.label || "";
   const onChange = (option: any, x: any) => {
-    // console.log("🧪",option, x); // WIP -V
     if (Array.isArray(option)) {
-
+      inChange({ target: {value: option.map(({ value = "" }) => value), name, type: "select" } });
     } else {
       inChange({ target: {value: option.value, name, type: "select" } });
     }
@@ -76,10 +76,13 @@ export default function Select({
             {...{
               classNamePrefix: "select",
               classNames,
+              isMulti,
               name,
               onChange,
               options,
-              value: { label: valueLabel, value },
+              ...isMulti ? { value: Array.isArray(value) ?
+                value.map((val: any) => ({ label: val, value: val })) : [] } :
+                { value: { label: valueLabel, value } },
               ...rest,
             }}
           />
