@@ -35,7 +35,7 @@ export default memo(function SelectModalWrapper({
   const tabs = [{
     label: "All Videos",
     content: (
-      <div className="searcher-container in-modal" id="allVideos">
+      <div className="searcher-container in-modal m-4" id="allVideos">
         <VideoTabsContent debug={debug} onSelect={onSelect}/>
       </div>
     )
@@ -81,7 +81,7 @@ function VideoTabsContent({
 
   const paginationProps = {
     onPageChange: handlePageClick,
-    pageCount: media.pageCount,
+    pageCount: media.pageCount+1, // account for index 0
     currentPage: media.page,
   };
   if (media.isLoading){
@@ -101,10 +101,14 @@ function VideoTabsContent({
   }else {
     return(
       <>
-        <Pagination {...paginationProps} />
+        {media.pageCount > 1 && 
+          <div className="d-flex justify-content-end mb-4">
+            <Pagination {...paginationProps} />
+          </div>
+        }
         <MasonryGrid
           gridRef={gridContainerRef}
-          onLayoutComplete={() => console.log("Layout complete!")}
+          onLayoutComplete={() => {if (debug) console.log("Layout complete!")}}
         >
           {media.list.map((data: MediaFileType, key: number) => {
             let props = {
@@ -126,9 +130,11 @@ function VideoTabsContent({
             );
           })}
         </MasonryGrid>
-        <div className="d-flex justify-content-end mt-4">
-          <Pagination {...paginationProps} />
-        </div> 
+        {media.pageCount > 1 && 
+          <div className="d-flex justify-content-end mt-4">
+            <Pagination {...paginationProps} />
+          </div> 
+        }
       </>
     );
   }
