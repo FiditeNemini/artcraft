@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { a, useTransition } from "@react-spring/web";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
@@ -15,9 +15,11 @@ import "./EntityInput.scss";
 interface Props {
   accept?: AcceptTypes | AcceptTypes[],
   aspectRatio?: "square" | "landscape" | "portrait",
-  label?: string, 
+  label?: string,
+  name?: string,
   onChange?: any,
   type: EntityModeProp,
+  value?: string
 }
 
 export interface SlideProps {
@@ -60,19 +62,19 @@ const AniMod = ({ animating, className, isLeaving, render: Render, style, ...res
     <Render {...{ ...rest, animating }} />
   </a.div>;
 
-export default function EntityInput({ accept: inAccept, aspectRatio = "square", label, onChange, type, ...rest }: Props) {
+export default function EntityInput({ accept: inAccept, aspectRatio = "square", label, name = "", onChange, type, value, ...rest }: Props) {
   const accept = Array.isArray(inAccept) ? inAccept : [inAccept];
   const inputMode = EntityInputMode[type];
   const { search } = useLocation();
   const presetToken = search ? new URLSearchParams(search).get("preset_token") : "";
-  const [mediaToken,mediaTokenSet] = useState(presetToken || "");
+  const [mediaToken,mediaTokenSet] = useState(presetToken || value || "");
   const { media, mediaSet } = useMedia({ mediaToken });
   const { user } = useSession();
   const { open } = useModal();
 
   const selectToken = (token: string) => {
     mediaTokenSet(token);
-    onChange({ target: { name: "temp", value: token } });
+    onChange({ target: { name, value: token } });
   };
 
   const { clear, inputProps } = useFile({
@@ -108,6 +110,10 @@ export default function EntityInput({ accept: inAccept, aspectRatio = "square", 
     onRest: () => animatingSet(false),
     onStart: () => animatingSet(true)
   });
+
+  useEffect(() => {
+    if (presetToken && value !== presetToken) onChange({ target: { name, value: presetToken } });
+  },[presetToken, name, onChange, value]);
 
   return <>
     <Label {...{ label }}/>
