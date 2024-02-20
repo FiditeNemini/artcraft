@@ -1,6 +1,7 @@
-use crate::http_server::endpoints::image_gen::enqueue_image_generation::{EnqueueImageGenRequest, EnqueueImageGenRequestError};
+use classify_text::classify_prompt::classify_prompt;
+
+use crate::http_server::endpoints::image_gen::enqueue_image_generation::EnqueueImageGenRequest;
 use crate::http_server::endpoints::image_gen::replacement_prompts::get_replacement_prompt;
-use crate::util::classify_prompt::classify_prompt;
 
 pub struct EnrichedPrompts {
   pub positive_prompt: String,

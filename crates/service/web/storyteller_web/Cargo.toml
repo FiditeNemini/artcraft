@@ -23,6 +23,7 @@ path = "src/api_doc_server.rs"
 actix_helpers = { path = "../../../lib/actix_helpers" }
 bootstrap = { path = "../../../lib/bootstrap" }
 buckets = { path = "../../../_types/buckets" }
+classify_text = { path = "../../../lib/classify_text" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
 collections = { path = "../../../lib/collections" }
 composite_identifiers = { path = "../../../_types/composite_identifiers" }

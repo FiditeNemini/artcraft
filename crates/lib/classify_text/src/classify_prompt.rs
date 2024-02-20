@@ -1,9 +1,10 @@
 use std::collections::HashSet;
+
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-const CHILD_TERMS : &str = include_str!("../../../../../../includes/binary_includes/dictionary_children_terms.txt");
-const SEX_TERMS : &str = include_str!("../../../../../../includes/binary_includes/dictionary_sex_terms.txt");
+const CHILD_TERMS : &str = include_str!("../../../../includes/binary_includes/dictionary_children_terms.txt");
+const SEX_TERMS : &str = include_str!("../../../../includes/binary_includes/dictionary_sex_terms.txt");
 
 /// Classification of a text prompt
 pub struct PromptClassification {
@@ -31,7 +32,7 @@ pub fn classify_prompt(text_prompt: &str) -> PromptClassification  {
       .map(|term| term.chars().filter(|c| c.is_alphanumeric()).collect::<String>())
       .collect::<Vec<String>>();
 
-  let mut prompt_tokens_lower = SPACES_REGEX.split(text_prompt)
+  let prompt_tokens_lower = SPACES_REGEX.split(text_prompt)
       .map(|term| term.trim().to_lowercase())
       .collect::<Vec<String>>();
 
@@ -77,12 +78,12 @@ fn references_sex(prompt_tokens: &[String]) -> bool {
   prompt_tokens.iter().any(|term| SEX_TERM_DICTIONARY.contains(term))
 }
 
-fn references_violence(prompt_tokens: &[String]) -> bool {
+fn references_violence(_prompt_tokens: &[String]) -> bool {
   // TODO(bt,2024-02-19): Need to implement
   false
 }
 
-fn references_racism(prompt_tokens: &[String]) -> bool {
+fn references_racism(_prompt_tokens: &[String]) -> bool {
   // TODO(bt,2024-02-19): Need to implement
   false
 }
@@ -94,8 +95,9 @@ static SPACES_REGEX : Lazy<Regex> = Lazy::new(|| {
 
 #[cfg(test)]
 mod tests {
-  use crate::util::classify_prompt::{classify_prompt, SPACES_REGEX};
   use speculoos::asserting;
+
+  use crate::classify_prompt::{classify_prompt, SPACES_REGEX};
 
   fn regex_split(text: &str) -> Vec<&str> {
     SPACES_REGEX.split(text).map(|s| s.trim()).collect()
