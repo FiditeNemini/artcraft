@@ -18,5 +18,6 @@
 #![allow(dead_code)]
 #![allow(non_snake_case)]
 
+pub (crate) mod minor_regex;
 
 pub mod classify_prompt;
