@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {
-  useBookmarks,
+  // useBookmarks,
   useListContent,
   useRatings,
   useSession

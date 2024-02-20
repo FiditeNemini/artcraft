@@ -31,7 +31,13 @@ export default function WeightsTabsContent({
   const bookmarks = useBookmarks();
   const ratings = useRatings();
   const [list, listSet] = useState<WeightI[]>([]);
-  const [pageCount, setPageCount] = useState(0);
+  const [pages, setPages] = useState<{
+    currPageWeights: any[],
+    lookup: string[]
+  }>({
+    currPageWeights: [],
+    lookup: []
+  });
   
   const weights = useLazyLists({
     addQueries: {
@@ -40,9 +46,11 @@ export default function WeightsTabsContent({
     },
     fetcher: ListWeights,
     onSuccess: (res)=>{
-      setPageCount((curr)=>{
-        if (curr==0) return res.pagination.maybe_next ? 2 : 0
-        else return curr+res.pagination.maybe_next ? 1 : 0
+      setPages((curr)=>{
+        return{
+          currPageWeights: [...res.results],
+          lookup: [...curr.lookup, res.pagination.maybe_next]
+        }
       })
     },
     list,
@@ -53,13 +61,12 @@ export default function WeightsTabsContent({
 
 
   const handlePageClick = (selectedItem: { selected: number }) => {
-    console.log("PAGECLICK")
     weights.getMore();
   };
 
   const paginationProps = {
     onPageChange: handlePageClick,
-    pageCount: pageCount,
+    pageCount: pages.lookup.length+1,
     currentPage: 0,
   };
   if (weights.isLoading){
@@ -84,9 +91,9 @@ export default function WeightsTabsContent({
         </div>
         <MasonryGrid
           gridRef={gridContainerRef}
-          onLayoutComplete={() => console.log("Layout complete!")}
+          // onLayoutComplete={() => console.log("Layout complete!")}
         >
-          {weights.list.map((data: any, key: number) => {
+          {pages.currPageWeights.map((data: any, key: number) => {
             let props = {
               data,
               ratings,
