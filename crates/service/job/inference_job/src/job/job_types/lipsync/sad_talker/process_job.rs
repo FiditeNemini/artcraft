@@ -2,18 +2,20 @@ use std::fs::read_to_string;
 use std::time::Instant;
 
 use anyhow::anyhow;
-use log::{error, info, warn};
+use log::{debug, error, info, warn};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use filesys::check_file_exists::check_file_exists;
 use filesys::file_size::file_size;
+use filesys::path_to_string::path_to_string;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_face_animation::{insert_media_file_from_face_animation, InsertArgs};
+use thumbnail_generator::task_client::thumbnail_task::ThumbnailTaskBuilder;
 use tokens::tokens::users::UserToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
@@ -317,6 +319,39 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
       .await
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
+  let thumbnail_types = match mimetype.as_str() {
+    "video/mp4" => vec!["image/gif", "image/jpeg"],
+    _ => vec![],
+  };
+
+  for output_type in thumbnail_types {
+    match get_output_file_extension_from_mimetype(output_type) {
+      Ok(output_extension) => {
+        let thumbnail_task_result = ThumbnailTaskBuilder::new()
+            .with_bucket(&*args.job_dependencies.buckets.public_bucket_client.bucket_name())
+            .with_path(&*path_to_string(result_bucket_object_pathbuf.clone()))
+            .with_source_mimetype(mimetype.as_str())
+            .with_output_mimetype(output_type)
+            .with_output_suffix("thumb")
+            .with_output_extension(output_extension)
+            .with_event_id(&job.id.0.to_string())
+            .send()
+            .await;
+
+        match (thumbnail_task_result) {
+          Ok(thumbnail_task) => {
+            debug!("Thumbnail task created: {:?}", thumbnail_task);
+          },
+          Err(e) => {
+            error!("Failed to create thumbnail task: {:?}", e);
+          }
+        }
+      },
+      Err(e) => {
+          error!("Failed to get output file extension from mimetype: {:?}", e);
+      }
+    }
+  }
   // ==================== DELETE TEMP FILES ==================== //
 
   safe_delete_temp_file(&output_video_fs_path);
@@ -375,4 +410,13 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
     }),
     inference_duration,
   })
+}
+
+fn get_output_file_extension_from_mimetype(mimetype: &str) -> anyhow::Result<&'static str> {
+  let ext = match mimetype {
+    "image/jpeg" => "jpg",
+    "image/gif" => "gif",
+    _ => return Err(anyhow!("Mimetype not supported: {}", mimetype)),
+  };
+  Ok(ext)
 }

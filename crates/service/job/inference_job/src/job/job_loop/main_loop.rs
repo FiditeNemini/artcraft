@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 
-use log::{error, info, warn};
 use opentelemetry::KeyValue as OtelAttribute;
+use log::{error, info, warn};
 
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use errors::AnyhowResult;
@@ -132,9 +132,21 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
 
     let start_time = Instant::now();
     let result = process_single_job(job_dependencies, &job).await;
+    let job_duration = Instant::now().duration_since(start_time);
+
+    let model_type_str = match job.maybe_model_type {
+      Some(model_type) => model_type.to_string(),
+      None => "unknown".to_string(),
+    };
+
+    let mut job_duration_instrumentation_attributes = vec![
+      OtelAttribute::new("job_user_is_premium", job.is_from_premium_user),
+      OtelAttribute::new("job_model", model_type_str),
+      OtelAttribute::new("job_inference_category", job.inference_category.to_str()),
+    ];
 
 
-    match result {
+    let managed_result =  match result {
       Ok(success_case) => {
         info!("Job loop iteration ({i} of {job_count} batch) \"success\": {:?}", success_case);
 
@@ -150,32 +162,24 @@ async fn process_job_batch(job_dependencies: &JobDependencies, jobs: Vec<Availab
           job_dependencies.job_instruments.job_success_count.add(1, &[]);
           warn!("Success stats: {:?}", stats);
         }
+
+        Ok(())
       },
       Err(err) => {
         error!(
           r#"Failure to process job ({i} of {job_count} batch): {:?} -
             {:?}
           "#,job.inference_job_token, err);
-        let _r = handle_error(&job_dependencies, &job, err).await?;
+        // we try to handle the error and report details
+        handle_error(&job_dependencies, &job, err).await
       }
-    }
-    let job_duration = Instant::now().duration_since(start_time);;
-
-    let model_type_str = match job.maybe_model_type {
-      Some(model_type) => model_type.to_string(),
-      None => "unknown".to_string(),
     };
 
-    job_dependencies.job_instruments.job_duration.record(job_duration.as_millis() as u64,
-      &[
-        OtelAttribute::new("job_user_is_premium", job.is_from_premium_user),
-        OtelAttribute::new("job_model", model_type_str),
-        OtelAttribute::new("job_status", job.status.to_str()),
-        OtelAttribute::new("job_inference_category", job.inference_category.to_str()),
-      ]
-    );
-  }
+    job_duration_instrumentation_attributes.push(OtelAttribute::new("job_status", managed_result.is_err().then(|| "possibly_failed").unwrap_or("possibly_succeeded")));
 
+    job_dependencies.job_instruments.job_duration.record(job_duration.as_millis() as u64,
+        &job_duration_instrumentation_attributes);
+  }
   Ok(())
 }
 

@@ -35,12 +35,15 @@ pub fn init_otel_metrics_pipeline(
         .with_aggregation_selector(DefaultAggregationSelector::new())
         .with_temporality_selector(DefaultTemporalitySelector::new())
         .build()?;
+
     opentelemetry::global::set_meter_provider(provider);
 
-    if let err= opentelemetry::global::set_error_handler(|error| {
+    match opentelemetry::global::set_error_handler(|error| {
         warn!("OpenTelemetry error: {}", error);
-    }){
-        warn!("Failed to set OpenTelemetry error handler: {:?}", err);
+    }) {
+        (err) => {
+            warn!("Failed to set OpenTelemetry error handler: {:?}", err);
+        }
     };
 
     Ok(())
