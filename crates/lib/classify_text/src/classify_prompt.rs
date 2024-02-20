@@ -6,6 +6,7 @@ use crate::minor_regex::lowercase_mentions_underage;
 
 const CHILD_TERMS : &str = include_str!("../../../../includes/binary_includes/dictionary_children_terms.txt");
 const SEX_TERMS : &str = include_str!("../../../../includes/binary_includes/dictionary_sex_terms.txt");
+const RACIST_TERMS : &str = include_str!("../../../../includes/binary_includes/dictionary_racist_terms.txt");
 
 /// Classification of a text prompt
 pub struct PromptClassification {
@@ -90,9 +91,15 @@ fn references_violence(_prompt_tokens: &[String]) -> bool {
   false
 }
 
-fn references_racism(_prompt_tokens: &[String]) -> bool {
-  // TODO(bt,2024-02-19): Need to implement
-  false
+fn references_racism(prompt_tokens: &[String]) -> bool {
+  static RACIST_TERM_DICTIONARY : Lazy<HashSet<String>> = Lazy::new(|| {
+    RACIST_TERMS.lines()
+        .map(|line| line.trim().to_lowercase())
+        .filter(|line| !line.is_empty() && !line.starts_with("#"))
+        .collect::<HashSet<String>>()
+  });
+
+  prompt_tokens.iter().any(|term| RACIST_TERM_DICTIONARY.contains(term))
 }
 
 static SPACES_REGEX : Lazy<Regex> = Lazy::new(|| {
@@ -194,6 +201,27 @@ mod tests {
           .is_equal_to(true);
     }
   }
+
+  #[test]
+  fn test_bad_user_racist_prompts() {
+    let prompts = [
+      "adolf hitler having tea with joe biden",
+      "niggers",
+    ];
+
+    for prompt in prompts {
+      let classification = classify_prompt(prompt);
+
+      asserting(&format!("is abusive - prompt: {}", prompt))
+          .that(&classification.is_abusive())
+          .is_equal_to(true);
+
+      asserting(&format!("is racism - prompt: {}", prompt))
+          .that(&classification.prompt_references_racism)
+          .is_equal_to(true);
+    }
+  }
+
 
   #[test]
   fn borderline_cases() {
