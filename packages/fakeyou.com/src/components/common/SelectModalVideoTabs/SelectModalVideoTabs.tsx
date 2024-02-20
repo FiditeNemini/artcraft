@@ -101,7 +101,7 @@ function VideoTabsContent({
   }else {
     return(
       <>
-        {media.pageCount > 1 && 
+        {paginationProps.pageCount > 1 && 
           <div className="d-flex justify-content-end mb-4">
             <Pagination {...paginationProps} />
           </div>
@@ -130,7 +130,7 @@ function VideoTabsContent({
             );
           })}
         </MasonryGrid>
-        {media.pageCount > 1 && 
+        {paginationProps.pageCount > 1 && 
           <div className="d-flex justify-content-end mt-4">
             <Pagination {...paginationProps} />
           </div> 

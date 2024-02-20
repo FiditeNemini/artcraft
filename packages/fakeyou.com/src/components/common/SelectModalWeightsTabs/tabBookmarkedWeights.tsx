@@ -28,7 +28,7 @@ export default function WeightsTabsContent({
   onSelect: (data:SelectModalData) => void;
 }){
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
-  const bookmarks = useBookmarks();
+  // const bookmarks = useBookmarks();
   const ratings = useRatings();
   const [list, listSet] = useState<WeightI[]>([]);
   const { user } = useSession();
@@ -48,10 +48,11 @@ export default function WeightsTabsContent({
   const handlePageClick = (selectedItem: { selected: number }) => {
     weights.pageChange(selectedItem.selected);
   };
-
+  console.log("BOOKMARKED");
+  console.log(weights);
   const paginationProps = {
     onPageChange: handlePageClick,
-    pageCount: weights.pageCount,
+    pageCount: weights.pageCount + 1,
     currentPage: weights.page,
   };
   if (weights.isLoading){
@@ -71,7 +72,11 @@ export default function WeightsTabsContent({
   }else {
     return(
       <>
-        <Pagination {...paginationProps} />
+        {paginationProps.pageCount > 1 && 
+          <div className="d-flex justify-content-end mb-4">
+            <Pagination {...paginationProps} />
+          </div>
+        }
         <MasonryGrid
           gridRef={gridContainerRef}
           onLayoutComplete={() => console.log("Layout complete!")}
@@ -81,7 +86,7 @@ export default function WeightsTabsContent({
             let props = {
               data,
               ratings,
-              bookmarks,
+              // bookmarks,
               showCreator: true,
               type: "weights",
               inSelectModal: true,
@@ -100,9 +105,11 @@ export default function WeightsTabsContent({
             );
           })}
         </MasonryGrid>
-        <div className="d-flex justify-content-end mt-4">
-          <Pagination {...paginationProps} />
-        </div> 
+        {paginationProps.pageCount > 1 && 
+          <div className="d-flex justify-content-end mt-4">
+            <Pagination {...paginationProps} />
+          </div>
+        }
       </>
     );
   }

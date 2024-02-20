@@ -1,9 +1,9 @@
 import React, {useRef, useState} from 'react';
 import {
   useBookmarks,
-  useListContent,
+  useLazyLists,
   useRatings,
-  useSession
+  // useSession
 } from "hooks";
 import {
   Weight as WeightI,
@@ -31,28 +31,36 @@ export default function WeightsTabsContent({
   const bookmarks = useBookmarks();
   const ratings = useRatings();
   const [list, listSet] = useState<WeightI[]>([]);
-  const { user } = useSession();
-  const weights = useListContent({
+  const [pageCount, setPageCount] = useState(0);
+  
+  const weights = useLazyLists({
     addQueries: {
       page_size: 9,
-      ...prepFilter("sd_1.5", "weight_type"),
+      ...prepFilter(weightType, "weight_type"),
     },
-    urlUpdate: false,
-    debug: debug ? "All Weights" : undefined,
     fetcher: ListWeights,
+    onSuccess: (res)=>{
+      setPageCount((curr)=>{
+        if (curr==0) return res.pagination.maybe_next ? 2 : 0
+        else return curr+res.pagination.maybe_next ? 1 : 0
+      })
+    },
     list,
     listSet,
     requestList: true,
-    urlParam: user?.username || ""
+    urlUpdate: false,
   });
+
+
   const handlePageClick = (selectedItem: { selected: number }) => {
-    weights.pageChange(selectedItem.selected);
+    console.log("PAGECLICK")
+    weights.getMore();
   };
 
   const paginationProps = {
     onPageChange: handlePageClick,
-    pageCount: weights.pageCount,
-    currentPage: weights.page,
+    pageCount: pageCount,
+    currentPage: 0,
   };
   if (weights.isLoading){
     return (
@@ -71,12 +79,14 @@ export default function WeightsTabsContent({
   }else {
     return(
       <>
-        <Pagination {...paginationProps} />
+        <div className="d-flex justify-content-end mb-4">
+          <Pagination {...paginationProps} />
+        </div>
         <MasonryGrid
           gridRef={gridContainerRef}
           onLayoutComplete={() => console.log("Layout complete!")}
         >
-          {weights.list.map((data: WeightI, key: number) => {
+          {weights.list.map((data: any, key: number) => {
             let props = {
               data,
               ratings,
