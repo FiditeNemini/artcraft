@@ -67,4 +67,6 @@ youths
 
 # Spanish
 chica
+niiña
+niña
 niño
