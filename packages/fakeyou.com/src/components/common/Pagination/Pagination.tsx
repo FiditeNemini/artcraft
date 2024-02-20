@@ -13,9 +13,11 @@ interface PaginationComponentProps {
   pageCount: number
 }
 
-export default function Pagination({ currentPage, onPageChange, pageCount }: PaginationComponentProps) {
-  // const pageCount = Math.ceil(totalItems / itemsPerPage);
-
+export default function Pagination({
+  currentPage,
+  onPageChange,
+  pageCount
+}: PaginationComponentProps) {
   return (
     <ReactPaginate
       previousLabel={<FontAwesomeIcon icon={faChevronLeft} />}
