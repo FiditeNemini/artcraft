@@ -1,50 +1,29 @@
 use std::fs::read_to_string;
-use std::path::PathBuf;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use actix_web::dev::ResourcePath;
 use anyhow::anyhow;
 use log::{error, info, warn};
-use serde_json;
 
-use cloud_storage::remote_file_manager::media_descriptor::MediaImagePngDescriptor;
-use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
-use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor};
-use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
+use cloud_storage::remote_file_manager::weights_descriptor::WeightsLoRADescriptor;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
-use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
-use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
-use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
-use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
-use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use filesys::file_exists::file_exists;
 use filesys::path_to_string::path_to_string;
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs;
-use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
-use mysql_queries::queries::batch_generations::insert_batch_generation_records::insert_batch_generation_records;
-use mysql_queries::queries::batch_generations::insert_batch_generation_records::InsertBatchArgs;
-use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_files::create::insert_media_file_generic::insert_media_file_generic;
-use mysql_queries::queries::media_files::create::insert_media_file_generic::InsertArgs;
 use mysql_queries::queries::model_weights::create::create_weight::{
   create_weight,
   CreateModelWeightsArgs,
 };
-use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
-use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::image_generation::sd::process_job::{sd_args_from_job, StableDiffusionProcessArgs};
-use crate::job::job_types::image_generation::sd::process_job_sd_upload::process_job_sd_upload;
 use crate::job::job_types::image_generation::sd::sd_inference_command::InferenceArgs;
-use crate::job_dependencies::JobDependencies;
 
 pub async fn process_job_lora_upload(
   args: &StableDiffusionProcessArgs<'_>

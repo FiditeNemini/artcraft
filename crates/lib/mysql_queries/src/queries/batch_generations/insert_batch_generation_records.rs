@@ -96,6 +96,7 @@ mod tests {
 
     let r = insert_batch_generation_records(InsertBatchArgs {
       entries,
+      maybe_existing_batch_token: None,
       transaction: &mut transaction,
     }).await;
 

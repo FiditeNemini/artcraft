@@ -22,11 +22,6 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use log::{info, warn};
-use opentelemetry::{KeyValue};
-use opentelemetry::metrics::Unit;
-use opentelemetry_otlp::WithExportConfig;
-use opentelemetry_sdk::metrics::reader::{DefaultAggregationSelector, DefaultTemporalitySelector};
-use opentelemetry_sdk::Resource;
 use r2d2_redis::r2d2;
 use r2d2_redis::RedisConnectionManager;
 use sqlx::mysql::MySqlPoolOptions;
@@ -56,9 +51,9 @@ use crate::http_server::run_http_server::launch_http_server;
 use crate::job::job_loop::main_loop::main_loop;
 use crate::job_dependencies::{BucketDependencies, ClientDependencies, DatabaseDependencies, FileSystemDetails, JobCaches, JobDependencies, JobInstanceInfo, JobSystemControls, JobSystemDependencies};
 use crate::job_specific_dependencies::JobSpecificDependencies;
+use crate::util::instrumentation::{init_otel_metrics_pipeline, JobInstrumentLabels};
 use crate::util::instrumentation::JobInstruments;
 use crate::util::model_weights_cache::model_weights_cache_directory::ModelWeightsCacheDirectory;
-use crate::util::instrumentation::{init_otel_metrics_pipeline, JobInstrumentLabels };
 use crate::util::scoped_execution::ScopedExecution;
 use crate::util::scoped_temp_dir_creator::ScopedTempDirCreator;
 
@@ -91,7 +86,7 @@ async fn main() -> AnyhowResult<()> {
   let app_name = "inference-job";
 
   let container_environment = bootstrap(BootstrapArgs {
-    app_name: app_name,
+    app_name,
     default_logging_override: Some(DEFAULT_RUST_LOG),
     config_search_directories: &[".", "./config", "crates/service/job/inference_job/config"],
   })?;

@@ -6,7 +6,7 @@ use sqlx::{MySql, Pool};
 
 use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloudBucketDetails;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
-use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsSD15CkptDescriptor, WeightsWorkflowDescriptor};
+use cloud_storage::remote_file_manager::weights_descriptor::{WeightsLoRADescriptor, WeightsSD15Descriptor, WeightsWorkflowDescriptor};
 use enums::by_table::model_weights::{
     weights_category::WeightsCategory,
     weights_types::WeightsType,
@@ -685,9 +685,9 @@ Noosphere by skumerz + dalcefoPainting + 饭特稀V08 by zhazhahui345 + GhostMix
 
 pub async fn seed_workflows_for_testing_inference(mysql_pool: &Pool<MySql>, user_token: UserToken) -> AnyhowResult<()>{
     let model_weight_token1 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
-    let model_weight_token2 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
-    let model_weight_token3 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
-    let model_weight_token4 = ModelWeightToken::new_from_str("weight_n8sz47gmfw2zx02snrbz88ns9");
+    //let model_weight_token2 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    //let model_weight_token3 = ModelWeightToken::generate_for_testing_and_dev_seeding_never_use_in_production_seriously();
+    //let model_weight_token4 = ModelWeightToken::new_from_str("weight_n8sz47gmfw2zx02snrbz88ns9");
 
     let mut path_to_comfy = get_seed_tool_data_root();
     path_to_comfy.push("models/workflows/comfyui/yae_video_prod.json");

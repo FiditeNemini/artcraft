@@ -3,8 +3,8 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 use anyhow::{anyhow, Result};
-use log::{error, info, warn, debug};
-use serde_json::{Value, json};
+use log::{debug, error, info, warn};
+use serde_json::Value;
 use tokio::io::AsyncWriteExt;
 use walkdir::WalkDir;
 
@@ -478,7 +478,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             .send()
             .await;
 
-        match (thumbnail_task_result) {
+        match thumbnail_task_result {
             Ok(thumbnail_task) => {
                 debug!("Thumbnail task created: {:?}", thumbnail_task);
             },

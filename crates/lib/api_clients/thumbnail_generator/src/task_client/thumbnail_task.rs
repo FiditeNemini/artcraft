@@ -1,7 +1,5 @@
-use reqwest::Error;
-use serde_json::{Value, json};
 use log::error;
-
+use serde_json::{json, Value};
 
 #[derive(Debug)]
 pub enum ThumbnailTaskError {

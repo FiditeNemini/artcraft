@@ -53,25 +53,27 @@ pub fn classify_prompt(text_prompt: &str) -> PromptClassification  {
   }
 }
 
-const CHILD_TERM_DICTIONARY : Lazy<HashSet<String>> = Lazy::new(|| {
-  CHILD_TERMS.lines()
-      .map(|line| line.trim().to_lowercase())
-      .filter(|line| !line.is_empty() && !line.starts_with("#"))
-      .collect::<HashSet<String>>()
-});
 
-const SEX_TERM_DICTIONARY : Lazy<HashSet<String>> = Lazy::new(|| {
-  SEX_TERMS.lines()
-      .map(|line| line.trim().to_lowercase())
-      .filter(|line| !line.is_empty() && !line.starts_with("#"))
-      .collect::<HashSet<String>>()
-});
 
 fn references_children(prompt_tokens: &[String]) -> bool {
+  static CHILD_TERM_DICTIONARY : Lazy<HashSet<String>> = Lazy::new(|| {
+    CHILD_TERMS.lines()
+        .map(|line| line.trim().to_lowercase())
+        .filter(|line| !line.is_empty() && !line.starts_with("#"))
+        .collect::<HashSet<String>>()
+  });
+
   prompt_tokens.iter().any(|term| CHILD_TERM_DICTIONARY.contains(term))
 }
 
 fn references_sex(prompt_tokens: &[String]) -> bool {
+  static SEX_TERM_DICTIONARY : Lazy<HashSet<String>> = Lazy::new(|| {
+    SEX_TERMS.lines()
+        .map(|line| line.trim().to_lowercase())
+        .filter(|line| !line.is_empty() && !line.starts_with("#"))
+        .collect::<HashSet<String>>()
+  });
+
   prompt_tokens.iter().any(|term| SEX_TERM_DICTIONARY.contains(term))
 }
 
@@ -131,13 +133,14 @@ mod tests {
       //"12 year old girl with big tits with an innocent look",
       //"15 year old girl with big tits and innocent look",
       //"Little girl pussy cum dripping out",
+      // Is this one illegal? Is teen = 18?
+      //"Teen girl. Corpo intero. Nuda bellissima. Tette. Italian teen girl.", // NB: Whole body. Beautiful nude. Tits.
+      //"human grimreper boy hot", // NB: This also seems really bad, but I don't think they meant it to be inappropriate as none of their queries are porn
       "A young girl how eats her classmates with her butt-hole",
       "Boy jerking off",
       "Chica con semen rosado encima", // NB: Chica = teen girl
       "Niño teniendo sexo y diciendo que rico", // NB: Nino = young child
-      // Is this one illegal? Is teen = 18?
-      //"Teen girl. Corpo intero. Nuda bellissima. Tette. Italian teen girl.", // NB: Whole body. Beautiful nude. Tits.
-      //"human grimreper boy hot", // NB: This also seems really bad, but I don't think they meant it to be inappropriate as none of their queries are porn
+      "Young girls vore boys",
       "goth loli skirt, pink p@nties. butt",
       "loli butt panties",
       "loli n@ked",
@@ -203,14 +206,14 @@ mod tests {
     // We're allowing NSFW for now, but this may change
     // These may not be underage or illegal
     let prompts = [
+      // TODO: Is the following abusive?
+      //"1girl, nude, large breasts",
       "((san from princess mononoke)), ((having sex)), (cowgirl position), ((penis in vagina)), ((short ginger hair)), (crop top),(lifting top), (showing tits), (nipples), ((small breast)), ((muscular)), hotelroom, ((drunk:1.2)), ((no panties)), (kneeling over a man), (((gaping pussy))),  ((skirt)), horny, (in heat), (furrowed brow), (angry expression), ((sweat:1.2)), absurd resolution, masterpiece, ultra-detailed, vivid, intricate details, (((photorealistic))), visceral experience, (dynamic angle), (sharp focus), perfect face, looking down, perfect nipples, perfect feet",
-      "1girl, nude, large breasts",
       "2B. white swimsuit, butt, black eyeliner, white droplets on ass, sunscreen bottle in hand",
       "A giant woman living in a city she loves putting people in her butthole",
       "A girl who used her ass to eat vore",
       "A pornstar getting semen on her face stylized in 4k, realism, high resolution and NSFW.",
       "A realistic photo of pokemon fully nude",
-      "A young girl how eats her classmates with her butt-hole",
       "Anal vore",
       "Anime Girl (NSFW)",
       "Anime girl moaning cum naked",
@@ -283,7 +286,6 @@ mod tests {
       "Woman with huge tits desnude",
       "Woman with huge tits",
       "Women with boobs too big for her own good",
-      "Young girls vore boys",
       "a gay black guy with nipples and has undies on",
       "a poop dressed as a princess",
       "a woman having sex with a man",

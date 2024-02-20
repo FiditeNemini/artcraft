@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use sqlx::{Executor, MySql, Row};
+use sqlx::{Executor, MySql};
 
 use enums::by_table::model_weights::weights_types::WeightsType;
 use errors::AnyhowResult;

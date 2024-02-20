@@ -1,6 +1,7 @@
 use std::time::{Duration, Instant};
 
 use log::{error, info, warn};
+use opentelemetry::KeyValue as OtelAttribute;
 
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use errors::AnyhowResult;
@@ -9,16 +10,12 @@ use jobs_common::noop_logger::NoOpLogger;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::{AvailableInferenceJob, list_available_generic_inference_jobs, ListAvailableGenericInferenceJobArgs};
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_completely_failed::mark_generic_inference_job_completely_failed;
 use mysql_queries::queries::generic_inference::job::mark_generic_inference_job_failure::mark_generic_inference_job_failure;
-use opentelemetry::metrics::AsyncInstrument;
 
-use crate::OTEL_METER_NAME;
 use crate::job::job_loop::clear_full_filesystem::clear_full_filesystem;
 use crate::job::job_loop::process_single_job::process_single_job;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_loop::process_single_job_success_case::ProcessSingleJobSuccessCase;
 use crate::job_dependencies::JobDependencies;
-
-use opentelemetry::{global as otel, KeyValue as OtelAttribute, metrics::Unit};
 
 // Job runner timeouts (guards MySQL)
 const START_TIMEOUT_MILLIS : u64 = 500;

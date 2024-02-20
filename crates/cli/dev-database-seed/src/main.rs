@@ -5,10 +5,8 @@ use sqlx::mysql::MySqlPoolOptions;
 use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG};
 use errors::AnyhowResult;
 
-use crate::bucket_clients::get_bucket_clients;
 use crate::cli_args::parse_cli_args;
-use crate::seeding::model_weights::seed_weights;
-use crate::seeding::users::seed_user_accounts;
+
 pub mod bucket_clients;
 
 pub mod cli_args;
@@ -28,18 +26,18 @@ pub async fn main() -> AnyhowResult<()> {
         "MYSQL_URL",
         DEFAULT_MYSQL_CONNECTION_STRING);
 
-  let pool = MySqlPoolOptions::new()
+  let _pool = MySqlPoolOptions::new()
       .max_connections(easyenv::get_env_num("MYSQL_MAX_CONNECTIONS", 3)?)
       .connect(&db_connection_string)
       .await?;
 
-  let args = parse_cli_args()?;
+  let _args = parse_cli_args()?;
 
-  let mut maybe_bucket_clients = None;
+  //let mut maybe_bucket_clients = None;
 
-  if args.seed_cloud_bucket {
-    maybe_bucket_clients = Some(get_bucket_clients()?);
-  }
+  //if args.seed_cloud_bucket {
+  //  maybe_bucket_clients = Some(get_bucket_clients()?);
+  //}
 
 //  let mut maybe_elasticsearch = None;
 //

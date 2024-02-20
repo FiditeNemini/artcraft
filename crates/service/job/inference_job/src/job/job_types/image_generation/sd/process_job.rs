@@ -1,6 +1,4 @@
-use actix_web::dev::ResourcePath;
 use anyhow::anyhow;
-use serde_json;
 
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
 use mysql_queries::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;

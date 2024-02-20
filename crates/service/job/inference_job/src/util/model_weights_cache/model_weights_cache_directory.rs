@@ -3,7 +3,6 @@ use std::sync::Arc;
 
 use log::{error, info, warn};
 
-use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use buckets::public::weight_files::bucket_file_path::WeightFileBucketPath;
 use cloud_storage::bucket_client::BucketClient;
 use errors::AnyhowResult;
@@ -77,7 +76,7 @@ impl ModelWeightsCacheDirectory {
     if !self.local_cache_directory.exists() {
       std::fs::create_dir_all(&self.local_cache_directory)?;
     }
-    return Ok(())
+    Ok(())
   }
 
 
