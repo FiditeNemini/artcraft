@@ -27,31 +27,44 @@ export default function WeightsTabsContent({
   weightType: "sd_1.5" | "loRA";
   onSelect: (data:SelectModalData) => void;
 }){
+  const pageSize = 9;
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const bookmarks = useBookmarks();
   const ratings = useRatings();
   const [list, listSet] = useState<WeightI[]>([]);
   const [pages, setPages] = useState<{
     currPageWeights: any[],
-    lookup: string[]
+    currPageIndex: number,
+    lookup: string[],
+    hasNext: 0|1
   }>({
     currPageWeights: [],
-    lookup: []
+    currPageIndex: 0,
+    lookup: [],
+    hasNext: 0
   });
   
   const weights = useLazyLists({
     addQueries: {
-      page_size: 9,
+      page_size: pageSize,
       ...prepFilter(weightType, "weight_type"),
     },
     fetcher: ListWeights,
     onSuccess: (res)=>{
-      setPages((curr)=>{
-        return{
+      if (res.results.length>0
+         && res.pagination.maybe_next !== pages.lookup[pages.lookup.length -1]){
+        setPages((curr)=>({
           currPageWeights: [...res.results],
+          currPageIndex: curr.lookup.length,
+          hasNext: 1,
           lookup: [...curr.lookup, res.pagination.maybe_next]
-        }
-      })
+        }));
+      }else if (res.results.length === 0) {
+        setPages((curr)=>({
+          ...curr,
+          hasNext: 0,
+        }));
+      }
     },
     list,
     listSet,
@@ -59,15 +72,19 @@ export default function WeightsTabsContent({
     urlUpdate: false,
   });
 
-
   const handlePageClick = (selectedItem: { selected: number }) => {
-    weights.getMore();
+    if(selectedItem.selected * 9 + 9 > weights.list.length)
+      weights.getMore();
+    else{
+      //TODO:
+      console.log('dealing with slicing list here');
+    }
   };
 
   const paginationProps = {
     onPageChange: handlePageClick,
-    pageCount: pages.lookup.length+1,
-    currentPage: 0,
+    pageCount: pages.lookup.length+pages.hasNext,
+    currentPage: pages.currPageIndex,
   };
   if (weights.isLoading){
     return (
