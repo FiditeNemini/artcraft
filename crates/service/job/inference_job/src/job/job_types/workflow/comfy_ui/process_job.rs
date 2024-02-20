@@ -149,7 +149,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 info!("Checking if path exists: {:?}", dep_path);
                 if !dep_path.exists() {
                     warn!("Path does not exist: {:?}", dep_path);
-                    download_file(model.url.clone(), dep_path.clone()).await.map_err(|e| ProcessSingleJobError::Other(e))?;
+                    download_file(model.url.clone(), dep_path.clone()).await.map_err(|e| ProcessSingleJobError::Other(e.into()))?;
                     info!("Downloaded model to {:?}", dep_path);
                 }
             }
@@ -168,31 +168,21 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     let workflow_path = workflow_dir.join("prompt.json").to_str().unwrap().to_string();
 
-    //let retrieved_workflow_record =  get_weight_by_token(
-    //    job_args.workflow_source,
-    //    false,
-    //    &deps.db.mysql_pool
-    //).await?.unwrap();
+    let retrieved_workflow_record =  get_weight_by_token(
+       job_args.workflow_source,
+       false,
+       &deps.db.mysql_pool
+    ).await?.unwrap();
 
-    //let bucket_details = RemoteCloudBucketDetails {
-    //    object_hash: retrieved_workflow_record.public_bucket_hash,
-    //    prefix: retrieved_workflow_record.maybe_public_bucket_prefix.unwrap(),
-    //    suffix: retrieved_workflow_record.maybe_public_bucket_extension.unwrap(),
-    //};
-    //remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
+    let bucket_details = RemoteCloudBucketDetails {
+       object_hash: retrieved_workflow_record.public_bucket_hash,
+       prefix: retrieved_workflow_record.maybe_public_bucket_prefix.unwrap(),
+       suffix: retrieved_workflow_record.maybe_public_bucket_extension.unwrap(),
+    };
+    remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
+    info!("Downloaded workflow to {:?}", workflow_path);
 
-    info!("Downloading workflow {:?}", &comfy_deps.workflow_bucket_path);
-    info!("Downloading workflow to {:?}", workflow_path);
-
-    args.job_dependencies
-        .buckets
-        .public_bucket_client
-        .download_file_to_disk(&comfy_deps.workflow_bucket_path, &workflow_path)
-        .await
-        .map_err(|err| {
-            error!("could not download workflow: {:?}", err);
-            ProcessSingleJobError::from_anyhow_error(anyhow!("could not download workflow: {:?}", err))
-        })?;
+    // download_file(comfy_deps.workflow_bucket_path.clone(), PathBuf::from(workflow_path.clone())).await.map_err(|e| ProcessSingleJobError::Other(e))?;
 
     let maybe_args = job.maybe_inference_args
         .as_ref()
@@ -216,13 +206,12 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         let mut prompt_json: Value = serde_json::from_reader(prompt_file).unwrap();
         // Modify json
         for (path, new_value) in modifications {
-            prompt_json = replace_json_value(prompt_json, &path, new_value).map_err(|e| ProcessSingleJobError::Other(e))?;
+            prompt_json = replace_json_value(prompt_json, &path, new_value).map_err(|e| ProcessSingleJobError::Other(e.into()))?;
         }
         // Save prompt.json
         let prompt_file = File::create(&workflow_path).unwrap();
         serde_json::to_writer(prompt_file, &prompt_json).unwrap();
     }
-
 
     // ==================== QUERY AND DOWNLOAD FILES ==================== //
 
@@ -512,6 +501,9 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ==================== SAVE RECORDS ==================== //
 
+    // create a json detailing the args used to create the media
+    let args_json = serde_json::to_string(&job_args).map_err(|e| ProcessSingleJobError::Other(e.into()))?;
+
     info!("Saving ComfyUI result (media_files table record) ...");
 
     let (media_file_token, id) = insert_media_file_from_comfy_ui(InsertArgs {
@@ -527,6 +519,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         worker_hostname: &args.job_dependencies.job.info.container.hostname,
         worker_cluster: &args.job_dependencies.job.info.container.cluster_name,
         media_file_type: media_type,
+        extra_file_modification_info: Some(&args_json),
     })
         .await
         .map_err(|e| ProcessSingleJobError::Other(e))?;

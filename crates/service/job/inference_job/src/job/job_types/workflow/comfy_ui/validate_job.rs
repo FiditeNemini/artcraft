@@ -9,6 +9,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
+#[derive(Serialize, Debug)]
 pub struct JobArgs<'a> {
     pub workflow_source: &'a ModelWeightToken,
     pub output_path: &'a String,
