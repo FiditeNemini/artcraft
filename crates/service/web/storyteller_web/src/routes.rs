@@ -174,6 +174,7 @@ use crate::http_server::endpoints::weights::search_model_weights_handler::search
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler;
 use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
 use crate::http_server::endpoints::workflows::enqueue_comfy_ui::enqueue_comfy_ui_handler;
+use crate::http_server::endpoints::workflows::enqueue_workflow_upload_request::enqueue_workflow_upload_request;
 
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
@@ -1328,6 +1329,28 @@ fn add_image_gen_routes<T,B> (app:App<T>)-> App<T>
                     .route("/inference", web::post().to(enqueue_image_generation_request))
             )
     )
+}
+
+
+fn add_workflow_routes<T,B> (app:App<T>)-> App<T>
+    where
+        B: MessageBody,
+        T: ServiceFactory<
+            ServiceRequest,
+            Config = (),
+            Response = ServiceResponse<B>,
+            Error = Error,
+            InitError = (),
+        >,
+{
+    app.service(
+        web::scope("/v1/workflow")
+            .service(
+                web::scope("/upload")              
+                    .route("/prompt", web::post().to(enqueue_workflow_upload_request))
+            )
+    )
+    
 }
 
 // ==================== Weights ROUTES ====================

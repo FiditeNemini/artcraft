@@ -52,7 +52,7 @@ pub struct EnqueueComfyRequest {
     maybe_workflow_config: Option<ModelWeightToken>,
     maybe_input_file: Option<MediaFileToken>,
     maybe_output_path: Option<String>,
-
+   
     creator_set_visibility: Option<Visibility>,
 }
 
@@ -211,6 +211,7 @@ pub async fn enqueue_comfy_ui_handler(
         maybe_workflow_config: request.maybe_workflow_config.clone(),
         maybe_input_file: request.maybe_input_file.clone(),
         maybe_output_path: request.maybe_output_path.clone(),
+        maybe_google_drive_link: None
     };
 
     info!("Creating ComfyUI job record...");
@@ -234,7 +235,7 @@ pub async fn enqueue_comfy_ui_handler(
         maybe_creator_user_token: maybe_user_token.as_ref(),
         maybe_avt_token: maybe_avt_token.as_ref(),
         creator_ip_address: &ip_address,
-        creator_set_visibility: set_visibility,
+        creator_set_visibility:  set_visibility,
         priority_level,
         requires_keepalive: plan.workflow_requires_frontend_keepalive(),
         is_debug_request,
