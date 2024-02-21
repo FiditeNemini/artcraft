@@ -14,11 +14,11 @@ use serde::Deserialize;
 use serde::Serialize;
 use utoipa::ToSchema;
 use web::Data;
-use enums::common::visibility::Visibility;
+
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
-
+use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
@@ -39,11 +39,8 @@ use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
-
 use crate::server_state::ServerState;
-
 use crate::util::allowed_studio_access::allowed_studio_access;
-use crate::util::classify_prompt::classify_prompt;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
@@ -122,7 +119,7 @@ pub async fn enqueue_workflow_upload_request(
     } 
 
     let mut maybe_user_token: Option<UserToken> = None;
-    let visbility = enums::common::visibility::Visibility::Private;
+    let visibility = Visibility::Private;
 
     let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {
         warn!("MySql pool error: {:?}", err);
