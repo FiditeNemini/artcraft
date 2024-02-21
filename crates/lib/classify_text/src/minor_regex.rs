@@ -8,8 +8,8 @@ pub (crate) fn lowercase_mentions_underage(text: &str) -> bool {
   static AGE_REGEX: Lazy<RegexSet> = Lazy::new(|| {
     let patterns = [
       // English
-      r"(age(ds)?)([^\d])+\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)\b",
-      r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)([^\d])+(years?)",
+      r"(age(ds)?)([^\d]){1,3}\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)\b",
+      r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)([^\d]){1,3}(years?)",
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)yrs?",
 
       // Spanish
@@ -183,6 +183,8 @@ mod tests {
     #[test]
     fn test_good_user_inputs() {
       let prompts = [
+        "(masterpiece), best quality, expressive eyes, perfect face, 1girl, anime, plump, solo, headphones, blonde hair, breasts, swimsuit, twintails, bikini, huge breasts, orange eyes, white bikini, short hair, blush, navel, smile, open mouth, looking at viewer, cleavage, barefoot, standing, render, full body, <lora:tachie:0.7>, massive belly, roundybelly, pregnant belly, <lora:BGV5EX:0.7>, animated",
+        "<lora:tachie:0.7>, ",
         "person waving",
         "pichu witch pockimon",
         "plum (plum landing) at comic con",

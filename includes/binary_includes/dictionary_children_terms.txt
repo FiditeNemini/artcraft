@@ -1,5 +1,6 @@
 # English
 #girl - this seems to be used in non-youth contexts
+#1girl - this seems to be used in non-youth contexts
 babies
 baby
 boy
@@ -46,7 +47,6 @@ youngsters
 youth
 youths
 1boy
-1girl
 1yo
 2yo
 3yo
