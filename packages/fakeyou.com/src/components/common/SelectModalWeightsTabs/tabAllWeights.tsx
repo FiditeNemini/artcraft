@@ -1,11 +1,12 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {
   useBookmarks,
   useLazyLists,
   useRatings,
-  // useSession
 } from "hooks";
+
 import {
+  FetchStatus,
   Weight as WeightI,
   ListWeights
 } from "@storyteller/components/src/api";
@@ -27,31 +28,48 @@ export default function WeightsTabsContent({
   weightType: "sd_1.5" | "loRA";
   onSelect: (data:SelectModalData) => void;
 }){
+  const pageSize = 9;
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const bookmarks = useBookmarks();
   const ratings = useRatings();
   const [list, listSet] = useState<WeightI[]>([]);
-  const [pages, setPages] = useState<{
+  const [lazyPages, setLazyPages] = useState<{
     currPageWeights: any[],
-    lookup: string[]
+    currPageIndex: number,
+    pageLookup: string[],
+    hasNext: boolean
   }>({
     currPageWeights: [],
-    lookup: []
+    currPageIndex: 0,
+    pageLookup: [],
+    hasNext: true
   });
-  
+  const {currPageWeights, currPageIndex, pageLookup} = lazyPages;
+
   const weights = useLazyLists({
     addQueries: {
-      page_size: 9,
+      page_size: pageSize,
       ...prepFilter(weightType, "weight_type"),
     },
     fetcher: ListWeights,
     onSuccess: (res)=>{
-      setPages((curr)=>{
-        return{
+      if(debug) console.log(res);
+      //case of first load
+      if(currPageWeights.length === 0){
+        setLazyPages((prev)=>({
           currPageWeights: [...res.results],
-          lookup: [...curr.lookup, res.pagination.maybe_next]
-        }
-      })
+          currPageIndex: 0,
+          hasNext: true,
+          pageLookup: [...prev.pageLookup, res.pagination.maybe_next]
+        }));
+      }
+      //case of last page
+      if (res.results.length === 0) {
+        setLazyPages((prevState)=>({
+          ...prevState,
+          hasNext: false,
+        }));
+      }
     },
     list,
     listSet,
@@ -59,15 +77,36 @@ export default function WeightsTabsContent({
     urlUpdate: false,
   });
 
+  useEffect(()=>{
+    if (weights.next && lazyPages.hasNext
+    && (currPageIndex+1)*pageSize >= weights.list.length
+    && weights.status === FetchStatus.success
+    ){
+      //preload nextPage
+      // if(debug) console.log('useEffect: getMore')
+      weights.getMore();
+    }
+  },[weights, currPageIndex, lazyPages.hasNext]);
 
-  const handlePageClick = (selectedItem: { selected: number }) => {
-    weights.getMore();
+  const handlePageChange = (selectedItem: { selected: number }) => {
+    if(debug)console.log(`selected page: ${selectedItem.selected}`)
+    const startIdx = selectedItem.selected * 9
+    const endIdx = (selectedItem.selected+1)*9 <= weights.list.length
+      ? (selectedItem.selected+1)*9 : weights.list.length;
+    if (debug) console.log(`should slice ${startIdx}-${endIdx}`)
+    if (debug) console.log(weights.list)
+    setLazyPages((prevState)=>({
+      ...prevState,
+      currPageWeights: weights.list.slice(startIdx,endIdx),
+      currPageIndex: selectedItem.selected,
+    }));
+  // }
   };
 
   const paginationProps = {
-    onPageChange: handlePageClick,
-    pageCount: pages.lookup.length+1,
-    currentPage: 0,
+    onPageChange: handlePageChange,
+    pageCount: pageLookup.length+1,
+    currentPage: currPageIndex,
   };
   if (weights.isLoading){
     return (
@@ -91,9 +130,9 @@ export default function WeightsTabsContent({
         </div>
         <MasonryGrid
           gridRef={gridContainerRef}
-          // onLayoutComplete={() => console.log("Layout complete!")}
+          onLayoutComplete={() => {if(debug)console.log("Layout complete!")}}
         >
-          {pages.currPageWeights.map((data: any, key: number) => {
+          {currPageWeights.map((data: any, key: number) => {
             let props = {
               data,
               ratings,
