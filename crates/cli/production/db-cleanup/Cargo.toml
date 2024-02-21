@@ -1,5 +1,5 @@
 [package]
-name = "database-cleanup"
+name = "db-cleanup"
 publish = false
 edition = "2018"
 version = "0.0.1"
@@ -9,7 +9,7 @@ authors = [
 ]
 
 [[bin]]
-name = "database-cleanup"
+name = "db-cleanup"
 path = "src/main.rs"
 
 [dependencies]

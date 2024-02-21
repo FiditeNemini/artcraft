@@ -1739,40 +1739,40 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e962a19be5cfc3f3bf6dd8f61eb50107f356ad6270fbb3ed41476571db78be5"
 
 [[package]]
-name = "database-backup"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "container_common",
- "dotenv",
- "easyenv",
- "log",
- "my-workspace-hack",
- "serde",
- "serde_derive",
-]
-
-[[package]]
-name = "database-cleanup"
-version = "0.0.1"
-dependencies = [
- "anyhow",
- "container_common",
- "dotenv",
- "easyenv",
- "log",
- "my-workspace-hack",
- "serde",
- "serde_derive",
-]
-
-[[package]]
 name = "datetimes"
 version = "0.0.1"
 dependencies = [
  "chrono",
  "my-workspace-hack",
  "once_cell",
+]
+
+[[package]]
+name = "db-backup"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "container_common",
+ "dotenv",
+ "easyenv",
+ "log",
+ "my-workspace-hack",
+ "serde",
+ "serde_derive",
+]
+
+[[package]]
+name = "db-cleanup"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "container_common",
+ "dotenv",
+ "easyenv",
+ "log",
+ "my-workspace-hack",
+ "serde",
+ "serde_derive",
 ]
 
 [[package]]
