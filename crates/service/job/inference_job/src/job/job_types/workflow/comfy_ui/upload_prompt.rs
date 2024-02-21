@@ -1,29 +1,25 @@
+use std::time::Duration;
 
-use std::time::{Duration};
-use cloud_storage::remote_file_manager::weights_descriptor::{WeightsSD15Descriptor, WeightsWorkflowDescriptor};
+use anyhow::{anyhow, Result};
+use log::info;
+
+use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
+use cloud_storage::remote_file_manager::weights_descriptor::WeightsWorkflowDescriptor;
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use filesys::file_exists::file_exists;
-use anyhow::{anyhow, Result};
 use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
-use log::{debug, error, info, warn};
-use mysql_queries::queries::model_weights::create::create_model_weight_from_voice_conversion_download_job::CreateModelWeightArgs;
 use mysql_queries::queries::model_weights::create::create_weight;
+use mysql_queries::queries::model_weights::create::create_weight::CreateModelWeightsArgs;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
-use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
-use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
-use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
-use mysql_queries::queries::model_weights::create::create_weight::CreateModelWeightsArgs;
-
-
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::process_single_wf_job::get_workflow_args_from_job;
-use crate::job_dependencies::JobDependencies;
 use crate::job::job_types::workflow::comfy_ui::process_job::ComfyProcessJobArgs;
+use crate::job::job_types::workflow::process_single_wf_job::get_workflow_args_from_job;
 
 pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError>{
    let job = args.job;
@@ -60,8 +56,9 @@ pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessRe
         return Err(ProcessSingleJobError::InvalidJob(anyhow!("Download URL Too Short")));
     }
 
-    let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script,
-    None, None, None);
+    let google_drive_downloader = GoogleDriveDownloadCommand::new(
+      &download_script, None, None, None);
+
     info!("Downloading {}", download_url);
 
     let work_temp_dir = format!("workflow_upload_{}", job.id.0);
@@ -86,10 +83,8 @@ pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessRe
     }
 
     info!("File Retrieved at {}", download_file_path.display());
-    let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script,
-                                                                None, None, None);
 
-    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;                                                        
+    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;
                                                    
     let weights_sd_descriptor = Box::new(WeightsWorkflowDescriptor{});
     let metadata = remote_cloud_file_client.upload_file(weights_sd_descriptor,download_file_path.to_str().unwrap_or_default()).await?;

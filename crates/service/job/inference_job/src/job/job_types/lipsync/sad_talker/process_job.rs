@@ -338,7 +338,7 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
             .send()
             .await;
 
-        match (thumbnail_task_result) {
+        match thumbnail_task_result {
           Ok(thumbnail_task) => {
             debug!("Thumbnail task created: {:?}", thumbnail_task);
           },

@@ -2,6 +2,7 @@ use std::time::Instant;
 
 use anyhow::anyhow;
 use log::{error, info, warn};
+use opentelemetry::KeyValue as OtelAttribute;
 use r2d2_redis::redis::Commands;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
@@ -23,7 +24,6 @@ use crate::job::job_types::vc::process_single_vc_job::process_single_vc_job;
 use crate::job::job_types::videofilter::process_single_vf_job::process_single_vf_job;
 use crate::job::job_types::workflow::process_single_wf_job::process_single_wf_job;
 use crate::job_dependencies::JobDependencies;
-use opentelemetry::{global as otel, KeyValue as OtelAttribute, metrics::Unit};
 
 pub async fn process_single_job(
   job_dependencies: &JobDependencies,

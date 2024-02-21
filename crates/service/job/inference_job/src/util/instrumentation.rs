@@ -41,7 +41,7 @@ pub fn init_otel_metrics_pipeline(
     match opentelemetry::global::set_error_handler(|error| {
         warn!("OpenTelemetry error: {}", error);
     }) {
-        (err) => {
+        err => {
             warn!("Failed to set OpenTelemetry error handler: {:?}", err);
         }
     };

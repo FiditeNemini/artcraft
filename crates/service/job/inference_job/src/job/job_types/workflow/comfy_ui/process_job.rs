@@ -135,7 +135,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         Ok(())
     }
 
-    let comfy_deps = match args.job_dependencies.job.job_specific_dependencies.maybe_comfy_ui_dependencies {
+    let _comfy_deps = match args.job_dependencies.job.job_specific_dependencies.maybe_comfy_ui_dependencies {
         Some(ref deps) => deps,
         None => return Err(ProcessSingleJobError::from(anyhow!("no comfy deps"))),
     };

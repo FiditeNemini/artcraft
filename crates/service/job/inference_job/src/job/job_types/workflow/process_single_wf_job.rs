@@ -1,13 +1,12 @@
+use errors::anyhow;
 use mysql_queries::{payloads::generic_inference_args::{generic_inference_args::PolymorphicInferenceArgs, workflow_payload::WorkflowArgs}, queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob};
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
+
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui;
 use crate::job::job_types::workflow::comfy_ui::process_job::ComfyProcessJobArgs;
 use crate::job_dependencies::JobDependencies;
-
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
-use errors::{anyhow};
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
 
 pub async fn get_workflow_args_from_job(
     args: &ComfyProcessJobArgs<'_>
@@ -50,7 +49,7 @@ pub async fn process_single_wf_job(job_dependencies: &JobDependencies,
 
     // pass link in and download 
     match workflow_args.maybe_google_drive_link {
-        Some(link) => {
+        Some(_link) => {
             let job_success_result = comfy_ui::upload_prompt::upload_prompt(
                 args
             ).await?;
