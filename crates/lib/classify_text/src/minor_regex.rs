@@ -15,6 +15,9 @@ pub (crate) fn lowercase_mentions_underage(text: &str) -> bool {
 
       // Spanish
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)([^\d])+(años?)",
+
+      // Italian
+      r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)([^\d])+(anni)",
     ];
     RegexSet::new(&patterns).expect("regex should be valid")
   });
@@ -146,6 +149,28 @@ mod tests {
     }
   }
 
+
+
+  mod italian {
+    use super::*;
+
+    mod positive_match {
+      use super::*;
+
+      #[test]
+      fn spot_check_matches() {
+        assert!(lowercase_mentions_underage("13 anni"));
+        assert!(lowercase_mentions_underage("17 anni"));
+      }
+
+      #[test]
+      fn test_ranges() {
+        for i in 0..18 {
+          assert!(lowercase_mentions_underage(&format!("{} anni", i).as_str()));
+        }
+      }
+    }
+  }
 
   mod user_inputs {
     use speculoos::asserting;

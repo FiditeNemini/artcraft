@@ -73,3 +73,7 @@ chica
 niiña
 niña
 niño
+
+# Italian
+adolescente
+giovane
