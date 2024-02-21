@@ -14,18 +14,18 @@ path = "src/main.rs"
 
 [dependencies]
 # Internal
-buckets = { path = "../../_types/buckets" }
-config = { path = "../../lib/deprecated/config" }
-easyenv = { path = "../../lib/easyenv" }
-elasticsearch_schema = { path = "../../lib/elasticsearch_schema" }
-enums = { path = "../../_types/enums" }
-errors = { path = "../../lib/errors" }
-mysql_queries = { path = "../../lib/mysql_queries" }
-storyteller_root = { path = "../../lib/storyteller_root" }
-tokens = { path = "../../_types/tokens" }
+buckets = { path = "../../../_types/buckets" }
+config = { path = "../../../lib/deprecated/config" }
+easyenv = { path = "../../../lib/easyenv" }
+elasticsearch_schema = { path = "../../../lib/elasticsearch_schema" }
+enums = { path = "../../../_types/enums" }
+errors = { path = "../../../lib/errors" }
+mysql_queries = { path = "../../../lib/mysql_queries" }
+storyteller_root = { path = "../../../lib/storyteller_root" }
+tokens = { path = "../../../_types/tokens" }
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
 log = "0.4.14"

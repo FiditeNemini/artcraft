@@ -14,20 +14,20 @@ path = "src/main.rs"
 
 [dependencies]
 # Internal
-buckets = { path = "../../_types/buckets" }
-cloud_storage = { path = "../../lib/api_clients/cloud_storage" }
-config = { path = "../../lib/deprecated/config" }
-easyenv = { path = "../../lib/easyenv" }
-enums = { path = "../../_types/enums" }
-errors = { path = "../../lib/errors" }
-filesys = { path = "../../lib/files/filesys" }
-hashing = { path = "../../lib/files/hashing" }
-mysql_queries = { path = "../../lib/mysql_queries" }
-storyteller_root = { path = "../../lib/storyteller_root" }
-tokens = { path = "../../_types/tokens" }
+buckets = { path = "../../../_types/buckets" }
+cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
+config = { path = "../../../lib/deprecated/config" }
+easyenv = { path = "../../../lib/easyenv" }
+enums = { path = "../../../_types/enums" }
+errors = { path = "../../../lib/errors" }
+filesys = { path = "../../../lib/files/filesys" }
+hashing = { path = "../../../lib/files/hashing" }
+mysql_queries = { path = "../../../lib/mysql_queries" }
+storyteller_root = { path = "../../../lib/storyteller_root" }
+tokens = { path = "../../../_types/tokens" }
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
 clap = "4.4.8"

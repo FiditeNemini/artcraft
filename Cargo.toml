@@ -11,15 +11,15 @@ members = [
   "crates/_types/tokens",
 
   # CLI tools for operations, etc.
-  "crates/cli/database-backup",
-  "crates/cli/database-cleanup",
-  "crates/cli/dev-database-seed",
-  "crates/cli/dev-upload-media-file",
-  "crates/cli/elasticsearch-cli",
-  "crates/cli/kubectl-pod-cleanup",
-  "crates/cli/lru-delete-models",
-  "crates/cli/migration-tool",
-  "crates/cli/scrape-test",
+  "crates/cli/devenv/dev-database-seed",
+  "crates/cli/devenv/dev-upload-media-file",
+  "crates/cli/devenv/scrape-test",
+  "crates/cli/production/database-backup",
+  "crates/cli/production/database-cleanup",
+  "crates/cli/production/elasticsearch-cli",
+  "crates/cli/production/kubectl-pod-cleanup",
+  "crates/cli/production/lru-delete-models",
+  "crates/cli/production/migration-tool",
 
   # Shared libraries
   "crates/lib/actix_helpers",

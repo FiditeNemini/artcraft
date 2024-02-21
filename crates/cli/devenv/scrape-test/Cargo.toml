@@ -15,11 +15,11 @@ path = "src/main.rs"
 [dependencies]
 
 # Internal
-errors = { path = "../../lib/errors" }
-web_scrapers = { path = "../../lib/web_scrapers" }
+errors = { path = "../../../lib/errors" }
+web_scrapers = { path = "../../../lib/web_scrapers" }
 
 # Workspace hack (faster compile times)
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
 clap = "4.4.8"

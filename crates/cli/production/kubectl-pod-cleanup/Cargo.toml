@@ -14,12 +14,12 @@ path = "src/main.rs"
 
 [dependencies]
 # Internal
-config = { path = "../../lib/deprecated/config" }
-easyenv = { path = "../../lib/easyenv" }
-errors = { path = "../../lib/errors" }
+config = { path = "../../../lib/deprecated/config" }
+easyenv = { path = "../../../lib/easyenv" }
+errors = { path = "../../../lib/errors" }
 
 # Workspace hack (faster compile yytimes)
-my-workspace-hack = { version = "0.1", path = "../../my-workspace-hack" }
+my-workspace-hack = { version = "0.1", path = "../../../my-workspace-hack" }
 
 # External
 log = "0.4.20"
