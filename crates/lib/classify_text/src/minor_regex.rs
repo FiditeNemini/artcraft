@@ -12,6 +12,7 @@ pub (crate) fn lowercase_mentions_underage(text: &str) -> bool {
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)([^\d]){1,3}(years?)",
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)yos?",
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)yrs?",
+      r"\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|tweleve|thirteen|fourteen|fifteen|sixteen|seventeen)(.{1,3}|\w+)(years?)(.{1,3}|\w+)(old)",
 
       // Spanish
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)([^\d])+(años?)",
@@ -75,6 +76,7 @@ mod tests {
         assert!(lowercase_mentions_underage("ages 16"));
         assert!(lowercase_mentions_underage("17 year old"));
         assert!(lowercase_mentions_underage("1-year old"));
+        assert!(lowercase_mentions_underage("7 year old girl"));
       }
 
       #[test]
@@ -190,6 +192,7 @@ mod tests {
         "a blonde girl of 13 years old with blue eyes.she's naked ,showing her private parts. i'm fucking her now",
         "a blonde girl of 13 years old with blue eyes.she's naked ,showing her tits and ass",
         "naked 8yo blonde girl",
+        "seven year old girl naked legs spread",
         "young loli butt, 13 years old",
 
         // Spanish
