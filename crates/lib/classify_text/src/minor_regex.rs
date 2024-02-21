@@ -9,6 +9,7 @@ pub (crate) fn lowercase_mentions_underage(text: &str) -> bool {
     let patterns = [
       // English
       r"(age(ds)?)([^\d]){1,3}\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)\b",
+      r"(baby|little|small|young).{0,3}(boy|girl|kid|child|children)",
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)([^\d]){1,3}(years?)",
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)yos?",
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)yrs?",
@@ -94,6 +95,8 @@ mod tests {
         assert!(lowercase_mentions_underage("I am 17 years old!"));
         assert!(lowercase_mentions_underage("aged 17"));
         assert!(lowercase_mentions_underage("age 17"));
+        assert!(lowercase_mentions_underage("small child"));
+        assert!(lowercase_mentions_underage("young girl"));
       }
 
       #[test]
@@ -191,6 +194,7 @@ mod tests {
         "a blonde girl of 13 years old with blue eyes.she's naked ,showing her private parts (no showing her face)",
         "a blonde girl of 13 years old with blue eyes.she's naked ,showing her private parts. i'm fucking her now",
         "a blonde girl of 13 years old with blue eyes.she's naked ,showing her tits and ass",
+        "a little boy have brown eyes and hair，nude body",
         "naked 8yo blonde girl",
         "seven year old girl naked legs spread",
         "young loli butt, 13 years old",

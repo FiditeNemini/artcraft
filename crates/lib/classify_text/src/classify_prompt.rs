@@ -104,7 +104,8 @@ fn references_racism(prompt_tokens: &[String]) -> bool {
 }
 
 static SPACES_REGEX : Lazy<Regex> = Lazy::new(|| {
-  Regex::new(r"[\s,;]+").expect("regex should be valid")
+  // NB: Includes non-ascii, such as "，".
+  Regex::new(r"[\s,;，]+").expect("regex should be valid")
 });
 
 

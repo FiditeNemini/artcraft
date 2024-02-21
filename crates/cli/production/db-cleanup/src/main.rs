@@ -21,6 +21,13 @@ Users that have had files deleted:
 - regista2
 - regista77
 
+TODO:
+- juanfra3567
+- ceistin
+- elfabro17
+- sodoka
+- fluffernater
+
 */
 
 #[tokio::main]
