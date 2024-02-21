@@ -11,6 +11,18 @@ use crate::operations::delete_user_files::delete_user_files::delete_user_files;
 mod cli_args;
 mod operations;
 
+/*
+
+Users that have had files deleted:
+- cheesetherat
+- endtimes
+- expandinggirl
+- markiwrench
+- regista2
+- regista77
+
+*/
+
 #[tokio::main]
 async fn main() -> AnyhowResult<()> {
   println!("db-cleanup: hard or soft delete database records");
