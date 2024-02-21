@@ -3,7 +3,6 @@
 //! Migrate database records.
 //!
 
-
 use std::time::Duration;
 
 use log::info;

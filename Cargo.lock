@@ -1765,14 +1765,23 @@ dependencies = [
 name = "db-cleanup"
 version = "0.0.1"
 dependencies = [
- "anyhow",
+ "buckets",
+ "clap",
  "container_common",
  "dotenv",
  "easyenv",
+ "enums",
+ "errors",
  "log",
  "my-workspace-hack",
+ "mysql_queries",
  "serde",
  "serde_derive",
+ "serde_json",
+ "sqlx",
+ "storyteller_root",
+ "tokens",
+ "tokio",
 ]
 
 [[package]]

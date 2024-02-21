@@ -11,7 +11,7 @@ use tokens::tokens::users::UserToken;
 use crate::helpers::boolean_converters::i8_to_bool;
 
 // TODO: Make non-`Serialize` and make the HTTP endpoints do the work
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserProfileResult {
   pub user_token: UserToken,
   pub username: String,
@@ -47,7 +47,7 @@ pub struct UserProfileResult {
 }
 
 // TODO: Make non-`Serialize` and make the HTTP endpoints do the work
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct UserProfileModeratorFields {
   pub is_banned: bool,
   pub maybe_mod_comments: Option<String>,
