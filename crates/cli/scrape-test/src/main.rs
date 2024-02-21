@@ -4,7 +4,7 @@ use errors::AnyhowResult;
 use web_scrapers::scrape_supported_webpage::scrape_supported_webpage;
 
 #[derive(Parser, Debug)]
-#[command(name = "scrape_test")]
+#[command(name = "scrape-test")]
 pub struct Args {
   #[arg(name="url", short='u', long = "url", help = "URL of the page to scrape", required = true)]
   url: String,

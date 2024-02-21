@@ -1,5 +1,5 @@
 [package]
-name = "scrape_test"
+name = "scrape-test"
 publish = false
 edition = "2021"
 version = "0.0.1"
@@ -9,7 +9,7 @@ authors = [
 ]
 
 [[bin]]
-name = "scrape_test"
+name = "scrape-test"
 path = "src/main.rs"
 
 [dependencies]

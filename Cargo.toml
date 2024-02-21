@@ -19,7 +19,7 @@ members = [
   "crates/cli/kubectl-pod-cleanup",
   "crates/cli/lru-delete-models",
   "crates/cli/migration-tool",
-  "crates/cli/scrape_test",
+  "crates/cli/scrape-test",
 
   # Shared libraries
   "crates/lib/actix_helpers",
