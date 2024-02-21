@@ -30,9 +30,8 @@ use thumbnail_generator::task_client::thumbnail_task::ThumbnailTaskBuilder;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
-use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
+use crate::job::job_types::workflow::comfy_ui::process_job::ComfyProcessJobArgs;
 
 fn get_file_extension(mimetype: &str) -> Result<&'static str> {
     let ext = match mimetype {
@@ -45,12 +44,7 @@ fn get_file_extension(mimetype: &str) -> Result<&'static str> {
     Ok(ext)
 }
 
-pub struct ComfyProcessJobArgs<'a> {
-    pub job_dependencies: &'a JobDependencies,
-    pub job: &'a AvailableInferenceJob,
-}
-
-pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
+pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError>{
     let job = args.job;
     let deps = args.job_dependencies;
 
