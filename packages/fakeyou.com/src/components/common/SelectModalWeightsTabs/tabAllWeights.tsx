@@ -72,17 +72,27 @@ export default function WeightsTabsContent({
     urlUpdate: false,
   });
 
-  const handlePageClick = (selectedItem: { selected: number }) => {
-    if(selectedItem.selected * 9 + 9 > weights.list.length)
+  const handlePageChange = (selectedItem: { selected: number }) => {
+    console.log(`selected page: ${selectedItem.selected}`)
+    if(selectedItem.selected * 9 + 9 > weights.list.length && pages.hasNext){
+      console.log("should get more")
       weights.getMore();
-    else{
-      //TODO:
-      console.log('dealing with slicing list here');
+    }else{
+      const startIdx = selectedItem.selected * 9
+      const endIdx = (selectedItem.selected+1)*9 <= weights.list.length
+      ? (selectedItem.selected+1)*9 : weights.list.length;
+      console.log(`should slice ${startIdx}-${endIdx}`)
+      console.log(weights.list)
+      setPages((curr)=>({
+        ...curr,
+        currPageWeights: weights.list.slice(startIdx,endIdx),
+        currPageIndex: selectedItem.selected,
+      }));
     }
   };
 
   const paginationProps = {
-    onPageChange: handlePageClick,
+    onPageChange: handlePageChange,
     pageCount: pages.lookup.length+pages.hasNext,
     currentPage: pages.currPageIndex,
   };
@@ -108,7 +118,7 @@ export default function WeightsTabsContent({
         </div>
         <MasonryGrid
           gridRef={gridContainerRef}
-          // onLayoutComplete={() => console.log("Layout complete!")}
+          onLayoutComplete={() => console.log("Layout complete!")}
         >
           {pages.currPageWeights.map((data: any, key: number) => {
             let props = {
