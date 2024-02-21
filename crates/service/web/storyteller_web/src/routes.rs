@@ -247,11 +247,6 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
       .add_post("/v1/mocap/mocapnet/create", enqueue_mocapnet_handler)
       .into_app();
 
-  // ==================== Workflows ====================
-    let mut app = RouteBuilder::from_app(app)
-        .add_post("/v1/workflow/comfy/create", enqueue_comfy_ui_handler)
-        .into_app();
-
   // ==================== "Generic" Inference ====================
 
   let mut app = RouteBuilder::from_app(app)
@@ -1350,6 +1345,11 @@ fn add_workflow_routes<T,B> (app:App<T>)-> App<T>
                 web::scope("/upload")              
                     .route("/prompt", web::post().to(enqueue_workflow_upload_request))
             )
+            .service(
+                web::scope("/comfy")
+                    .route("/create", web::post().to(enqueue_comfy_ui_handler))
+
+        )
     )
 }
 
