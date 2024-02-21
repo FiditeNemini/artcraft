@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef, useState, useEffect} from 'react';
 import {
   useBookmarks,
   useLazyLists,
@@ -32,18 +32,19 @@ export default function WeightsTabsContent({
   const bookmarks = useBookmarks();
   const ratings = useRatings();
   const [list, listSet] = useState<WeightI[]>([]);
-  const [pages, setPages] = useState<{
+  const [lazyPages, setLazyPages] = useState<{
     currPageWeights: any[],
     currPageIndex: number,
-    lookup: string[],
-    hasNext: 0|1
+    pageLookup: string[],
+    hasNext: boolean
   }>({
     currPageWeights: [],
     currPageIndex: 0,
-    lookup: [],
-    hasNext: 0
+    pageLookup: [],
+    hasNext: true
   });
-  
+  const {currPageWeights, currPageIndex, pageLookup} = lazyPages;
+
   const weights = useLazyLists({
     addQueries: {
       page_size: pageSize,
@@ -51,18 +52,21 @@ export default function WeightsTabsContent({
     },
     fetcher: ListWeights,
     onSuccess: (res)=>{
-      if (res.results.length>0
-         && res.pagination.maybe_next !== pages.lookup[pages.lookup.length -1]){
-        setPages((curr)=>({
+      if(debug) console.log(res);
+      //case of first load
+      if(currPageWeights.length === 0){
+        setLazyPages((prev)=>({
           currPageWeights: [...res.results],
-          currPageIndex: curr.lookup.length,
-          hasNext: 1,
-          lookup: [...curr.lookup, res.pagination.maybe_next]
+          currPageIndex: 0,
+          hasNext: true,
+          pageLookup: [...prev.pageLookup, res.pagination.maybe_next]
         }));
-      }else if (res.results.length === 0) {
-        setPages((curr)=>({
-          ...curr,
-          hasNext: 0,
+      }
+      //case of last page
+      if (res.results.length === 0) {
+        setLazyPages((prevState)=>({
+          ...prevState,
+          hasNext: false,
         }));
       }
     },
@@ -72,29 +76,35 @@ export default function WeightsTabsContent({
     urlUpdate: false,
   });
 
+  useEffect(()=>{
+
+    if(weights.next && lazyPages.hasNext && 
+      (currPageIndex+1)*pageSize >= weights.list.length){
+      //preload nextPage
+      console.log('getMore')
+      weights.getMore();
+    }
+  },[weights, currPageIndex]);
+
   const handlePageChange = (selectedItem: { selected: number }) => {
     console.log(`selected page: ${selectedItem.selected}`)
-    if(selectedItem.selected * 9 + 9 > weights.list.length && pages.hasNext){
-      console.log("should get more")
-      weights.getMore();
-    }else{
       const startIdx = selectedItem.selected * 9
       const endIdx = (selectedItem.selected+1)*9 <= weights.list.length
       ? (selectedItem.selected+1)*9 : weights.list.length;
-      console.log(`should slice ${startIdx}-${endIdx}`)
-      console.log(weights.list)
-      setPages((curr)=>({
-        ...curr,
+      if (debug) console.log(`should slice ${startIdx}-${endIdx}`)
+      if (debug) console.log(weights.list)
+      setLazyPages((prevState)=>({
+        ...prevState,
         currPageWeights: weights.list.slice(startIdx,endIdx),
         currPageIndex: selectedItem.selected,
       }));
-    }
+    // }
   };
 
   const paginationProps = {
     onPageChange: handlePageChange,
-    pageCount: pages.lookup.length+pages.hasNext,
-    currentPage: pages.currPageIndex,
+    pageCount: pageLookup.length+1,
+    currentPage: currPageIndex,
   };
   if (weights.isLoading){
     return (
@@ -120,7 +130,7 @@ export default function WeightsTabsContent({
           gridRef={gridContainerRef}
           onLayoutComplete={() => console.log("Layout complete!")}
         >
-          {pages.currPageWeights.map((data: any, key: number) => {
+          {currPageWeights.map((data: any, key: number) => {
             let props = {
               data,
               ratings,
