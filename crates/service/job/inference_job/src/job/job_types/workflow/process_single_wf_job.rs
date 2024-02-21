@@ -9,7 +9,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::Pol
 use errors::{anyhow};
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
 
-pub async fn get_args_from_job(
+pub async fn get_workflow_args_from_job(
     args: &ComfyProcessJobArgs<'_>
 ) -> Result<WorkflowArgs, ProcessSingleJobError> {
     let inference_args = args.job.maybe_inference_args
@@ -46,7 +46,7 @@ pub async fn process_single_wf_job(job_dependencies: &JobDependencies,
         job,
     };
 
-    let workflow_args = get_args_from_job(&args).await?;
+    let workflow_args = get_workflow_args_from_job(&args).await?;
 
     // pass link in and download 
     match workflow_args.maybe_google_drive_link {
