@@ -48,8 +48,8 @@ export default function WeightsTabsContent({
   const handlePageClick = (selectedItem: { selected: number }) => {
     weights.pageChange(selectedItem.selected);
   };
-  console.log("BOOKMARKED");
-  console.log(weights);
+  // console.log("BOOKMARKED");
+  // console.log(weights);
   const paginationProps = {
     onPageChange: handlePageClick,
     pageCount: weights.pageCount + 1,
@@ -79,7 +79,7 @@ export default function WeightsTabsContent({
         }
         <MasonryGrid
           gridRef={gridContainerRef}
-          onLayoutComplete={() => console.log("Layout complete!")}
+          onLayoutComplete={() => {if(debug)console.log("Layout complete!")}}
         >
           {weights.list.map((data: any, key: number) => {
             //TODO: data should be TYPED

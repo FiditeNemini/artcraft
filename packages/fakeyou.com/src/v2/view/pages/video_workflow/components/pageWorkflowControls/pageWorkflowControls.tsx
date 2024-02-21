@@ -167,7 +167,6 @@ export default function PageFilterControls({
             <Accordion.Item title={"Basics"} defaultOpen>
               <div className="row g-3 p-3">
                 <SelectModalWeightsTabs 
-                  debug={true}
                   modalTitle="Select a Stable Diffusion Weight"
                   inputLabel="Select a Stable Diffusion Weight"
                   weightType="sd_1.5"

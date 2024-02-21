@@ -3,9 +3,10 @@ import {
   useBookmarks,
   useLazyLists,
   useRatings,
-  // useSession
 } from "hooks";
+
 import {
+  FetchStatus,
   Weight as WeightI,
   ListWeights
 } from "@storyteller/components/src/api";
@@ -77,28 +78,29 @@ export default function WeightsTabsContent({
   });
 
   useEffect(()=>{
-
-    if(weights.next && lazyPages.hasNext && 
-      (currPageIndex+1)*pageSize >= weights.list.length){
+    if (weights.next && lazyPages.hasNext
+    && (currPageIndex+1)*pageSize >= weights.list.length
+    && weights.status === FetchStatus.success
+    ){
       //preload nextPage
-      console.log('getMore')
+      // if(debug) console.log('useEffect: getMore')
       weights.getMore();
     }
-  },[weights, currPageIndex]);
+  },[weights, currPageIndex, lazyPages.hasNext]);
 
   const handlePageChange = (selectedItem: { selected: number }) => {
-    console.log(`selected page: ${selectedItem.selected}`)
-      const startIdx = selectedItem.selected * 9
-      const endIdx = (selectedItem.selected+1)*9 <= weights.list.length
+    if(debug)console.log(`selected page: ${selectedItem.selected}`)
+    const startIdx = selectedItem.selected * 9
+    const endIdx = (selectedItem.selected+1)*9 <= weights.list.length
       ? (selectedItem.selected+1)*9 : weights.list.length;
-      if (debug) console.log(`should slice ${startIdx}-${endIdx}`)
-      if (debug) console.log(weights.list)
-      setLazyPages((prevState)=>({
-        ...prevState,
-        currPageWeights: weights.list.slice(startIdx,endIdx),
-        currPageIndex: selectedItem.selected,
-      }));
-    // }
+    if (debug) console.log(`should slice ${startIdx}-${endIdx}`)
+    if (debug) console.log(weights.list)
+    setLazyPages((prevState)=>({
+      ...prevState,
+      currPageWeights: weights.list.slice(startIdx,endIdx),
+      currPageIndex: selectedItem.selected,
+    }));
+  // }
   };
 
   const paginationProps = {
@@ -128,7 +130,7 @@ export default function WeightsTabsContent({
         </div>
         <MasonryGrid
           gridRef={gridContainerRef}
-          onLayoutComplete={() => console.log("Layout complete!")}
+          onLayoutComplete={() => {if(debug)console.log("Layout complete!")}}
         >
           {currPageWeights.map((data: any, key: number) => {
             let props = {
