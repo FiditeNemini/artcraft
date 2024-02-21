@@ -209,6 +209,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
   app = add_image_gen_routes(app);
   app = add_weights_routes(app);
+  app = add_workflow_routes(app);
   app = add_engine_routes(app); /* /v1/engine/... */
 
   // if server_environment == ServerEnvironment::Development {
@@ -1350,7 +1351,6 @@ fn add_workflow_routes<T,B> (app:App<T>)-> App<T>
                     .route("/prompt", web::post().to(enqueue_workflow_upload_request))
             )
     )
-    
 }
 
 // ==================== Weights ROUTES ====================

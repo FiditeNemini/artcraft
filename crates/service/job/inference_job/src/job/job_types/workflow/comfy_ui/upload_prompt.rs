@@ -16,6 +16,7 @@ use tokens::tokens::users::UserToken;
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
+use mysql_queries::queries::model_weights::create::create_weight::CreateModelWeightsArgs;
 
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
@@ -106,9 +107,9 @@ pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessRe
         token: &model_weight_token,
         weights_type: WeightsType::ComfyUi,
         weights_category: WeightsCategory::WorkflowConfig,
-        title: "",
+        title: "".parse().unwrap(),
         maybe_cover_image_media_file_token: job.maybe_cover_image_media_file_token.clone(),
-        maybe_description_markdown: "",
+        maybe_description_markdown: Some("".parse().unwrap()),
         maybe_description_rendered_html: None,
         creator_user_token: Some(&creator_user_token),
         creator_ip_address,
