@@ -174,6 +174,7 @@ use crate::http_server::endpoints::weights::search_model_weights_handler::search
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler;
 use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
 use crate::http_server::endpoints::workflows::enqueue_comfy_ui::enqueue_comfy_ui_handler;
+use crate::http_server::endpoints::workflows::enqueue_workflow_upload_request::enqueue_workflow_upload_request;
 
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
@@ -208,6 +209,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
   app = add_image_gen_routes(app);
   app = add_weights_routes(app);
+  app = add_workflow_routes(app);
   app = add_engine_routes(app); /* /v1/engine/... */
 
   // if server_environment == ServerEnvironment::Development {
@@ -244,11 +246,6 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   let mut app = RouteBuilder::from_app(app)
       .add_post("/v1/mocap/mocapnet/create", enqueue_mocapnet_handler)
       .into_app();
-
-  // ==================== Workflows ====================
-    let mut app = RouteBuilder::from_app(app)
-        .add_post("/v1/workflow/comfy/create", enqueue_comfy_ui_handler)
-        .into_app();
 
   // ==================== "Generic" Inference ====================
 
@@ -1327,6 +1324,32 @@ fn add_image_gen_routes<T,B> (app:App<T>)-> App<T>
                 web::scope("/enqueue")
                     .route("/inference", web::post().to(enqueue_image_generation_request))
             )
+    )
+}
+
+
+fn add_workflow_routes<T,B> (app:App<T>)-> App<T>
+    where
+        B: MessageBody,
+        T: ServiceFactory<
+            ServiceRequest,
+            Config = (),
+            Response = ServiceResponse<B>,
+            Error = Error,
+            InitError = (),
+        >,
+{
+    app.service(
+        web::scope("/v1/workflow")
+            .service(
+                web::scope("/upload")              
+                    .route("/prompt", web::post().to(enqueue_workflow_upload_request))
+            )
+            .service(
+                web::scope("/comfy")
+                    .route("/create", web::post().to(enqueue_comfy_ui_handler))
+
+        )
     )
 }
 

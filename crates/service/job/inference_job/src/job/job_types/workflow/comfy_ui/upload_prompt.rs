@@ -1,0 +1,137 @@
+
+use std::time::{Duration};
+use cloud_storage::remote_file_manager::weights_descriptor::{WeightsSD15Descriptor, WeightsWorkflowDescriptor};
+use enums::by_table::model_weights::weights_category::WeightsCategory;
+use enums::by_table::model_weights::weights_types::WeightsType;
+use enums::common::visibility::Visibility;
+use filesys::file_exists::file_exists;
+use anyhow::{anyhow, Result};
+use google_drive_common::google_drive_download_command::GoogleDriveDownloadCommand;
+use log::{debug, error, info, warn};
+use mysql_queries::queries::model_weights::create::create_model_weight_from_voice_conversion_download_job::CreateModelWeightArgs;
+use mysql_queries::queries::model_weights::create::create_weight;
+use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::users::UserToken;
+
+use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
+use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
+use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
+use mysql_queries::queries::model_weights::create::create_weight::CreateModelWeightsArgs;
+
+
+use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
+use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::workflow::process_single_wf_job::get_workflow_args_from_job;
+use crate::job_dependencies::JobDependencies;
+use crate::job::job_types::workflow::comfy_ui::process_job::ComfyProcessJobArgs;
+
+pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError>{
+   let job = args.job;
+   let deps = args.job_dependencies;
+   let mysql_pool = &deps.db.mysql_pool;
+
+    let wf_args = get_workflow_args_from_job(&args).await?;
+
+    let file_name = "workflow.json";
+
+    let download_script = easyenv::get_env_string_or_default(
+        "DOWNLOAD_SCRIPT",
+        "download_internet_file.py"
+    );
+
+    let creator_ip_address = &job.creator_ip_address;
+    let creator_user_token: UserToken;
+  
+    match &job.maybe_creator_user_token {
+      Some(token) => {
+        creator_user_token = UserToken::new_from_str(token);
+      }
+      None => {
+        return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")));
+      }
+    }
+    
+    let download_url = match wf_args.maybe_google_drive_link {
+        Some(val) => val,
+        None => "".to_string() 
+    };
+
+    if download_url.len() == 0 {
+        return Err(ProcessSingleJobError::InvalidJob(anyhow!("Download URL Too Short")));
+    }
+
+    let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script,
+    None, None, None);
+    info!("Downloading {}", download_url);
+
+    let work_temp_dir = format!("workflow_upload_{}", job.id.0);
+    let work_temp_dir = args.job_dependencies.fs.scoped_temp_dir_creator_for_work
+        .new_tempdir(&work_temp_dir)
+        .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
+
+    let download_filename = match google_drive_downloader.download_file_with_file_name(
+        &download_url,
+        &work_temp_dir,
+        file_name
+        ).await
+    {
+        Ok(filename) => filename,
+        Err(_e) => return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Download"))),
+    };
+
+    let download_file_path = work_temp_dir.path().join(download_filename);
+
+    if file_exists(download_file_path.as_path()) == false {
+        return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to Download Work Flow  from Google")));
+    }
+
+    info!("File Retrieved at {}", download_file_path.display());
+    let google_drive_downloader = GoogleDriveDownloadCommand::new(&download_script,
+                                                                None, None, None);
+
+    let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await?;                                                        
+                                                   
+    let weights_sd_descriptor = Box::new(WeightsWorkflowDescriptor{});
+    let metadata = remote_cloud_file_client.upload_file(weights_sd_descriptor,download_file_path.to_str().unwrap_or_default()).await?;
+    // chekc the model hash for duplicated models.
+    let bucket_details = match metadata.bucket_details {
+        Some(metadata) => metadata,
+        None => {
+        return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("Failed to generate bucket details!")));
+        }
+    };
+    
+    let model_weight_token: &ModelWeightToken = &ModelWeightToken::generate();
+    
+    let model_weight_token_result = create_weight::create_weight(CreateModelWeightsArgs {
+        token: &model_weight_token,
+        weights_type: WeightsType::ComfyUi,
+        weights_category: WeightsCategory::WorkflowConfig,
+        title: "".parse().unwrap(),
+        maybe_cover_image_media_file_token: job.maybe_cover_image_media_file_token.clone(),
+        maybe_description_markdown: Some("".parse().unwrap()),
+        maybe_description_rendered_html: None,
+        creator_user_token: Some(&creator_user_token),
+        creator_ip_address,
+        creator_set_visibility: Visibility::Private,
+        maybe_last_update_user_token: None,
+        original_download_url: Some(download_url),
+        original_filename: None,
+        // file_size_bytes: metadata.file_size_bytes, // TODO(bt,2024-02-03): We need to migrate the column to be BIGINT
+        file_size_bytes: 0,
+        file_checksum_sha2: metadata.sha256_checksum,
+        public_bucket_hash: bucket_details.object_hash,
+        maybe_public_bucket_prefix: Some(bucket_details.prefix),
+        maybe_public_bucket_extension:Some(bucket_details.suffix),
+        version: 0,
+        mysql_pool,
+    }).await?;
+    
+    Ok(JobSuccessResult {
+        maybe_result_entity: Some(ResultEntity {
+        entity_type: InferenceResultType::UploadModel,
+        entity_token: model_weight_token_result.to_string(),
+        }),
+        inference_duration: Duration::from_secs(0),
+    })
+}

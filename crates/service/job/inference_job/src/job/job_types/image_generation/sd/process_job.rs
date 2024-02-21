@@ -57,7 +57,7 @@ pub async fn sd_args_from_job(
             );
         }
     };
-
+ 
     let stable_diffusion_args: StableDiffusionArgs = StableDiffusionArgs::from(sd_args.clone());
     Ok(stable_diffusion_args)
 }

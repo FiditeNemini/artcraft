@@ -36,4 +36,9 @@ pub struct WorkflowArgs {
     #[serde(rename = "out")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_output_path: Option<String>,
+
+    // google drive link for uploads
+    #[serde(rename = "gd")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_google_drive_link: Option<String>
 }
