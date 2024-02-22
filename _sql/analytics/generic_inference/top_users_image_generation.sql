@@ -7,6 +7,7 @@
 
 select
     u.username,
+    u.email_address,
     count(*) as use_count
 from users as u
 join
@@ -17,5 +18,5 @@ join
       AND created_at > NOW() - INTERVAL 24 HOUR
 ) as jobs
 ON jobs.user_token = u.token
-group by u.username
+group by u.username, u.email_address
 order by use_count desc
