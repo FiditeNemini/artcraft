@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
+use enums::common::visibility::Visibility;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
@@ -37,8 +38,25 @@ pub struct WorkflowArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_output_path: Option<String>,
 
+    // Upload information
     // google drive link for uploads
     #[serde(rename = "gd")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_google_drive_link: Option<String>
+    pub maybe_google_drive_link: Option<String>,
+
+    #[serde(rename = "ti")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_title: Option<String>,
+
+    #[serde(rename = "de")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_description: Option<String>,
+
+    #[serde(rename = "ch")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub maybe_commit_hash: Option<String>,
+
+    #[serde(rename = "cv")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub creator_visibility: Option<Visibility>,
 }
