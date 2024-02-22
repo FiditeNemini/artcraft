@@ -1,0 +1,79 @@
+@import "scss/colours.scss";
+
+.selection-bubbles-wrapper {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s;
+
+  .scroll-indicator {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    right: 0px;
+    transform: translateY(-50%);
+    color: rgba($white, 0.2);
+    pointer-events: none;
+    transition: all 0.4s;
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 80px;
+    background: linear-gradient(to right, rgba($panel, 0), $panel);
+    pointer-events: none;
+    display: none;
+    transition: all 0.4s;
+  }
+
+  &.show-gradient:after {
+    display: block;
+    transition: all 0.4s;
+  }
+}
+
+.selection-bubbles {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    flex-wrap: wrap;
+    justify-content: start;
+    overflow-x: visible;
+  }
+}
+
+.bubble-button {
+  flex: 0 0 auto;
+  border: 2px solid darken($secondary, 3%);
+  padding: 8px 16px;
+  border-radius: 0.5rem;
+  background-color: darken($secondary, 3%);
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba($white, 0.75);
+  white-space: nowrap;
+}
+
+.bubble-button:hover {
+  background-color: $secondary;
+  border-color: $secondary;
+}
+
+.bubble-button.selected {
+  color: $white;
+  border-color: $primary;
+  background-color: lighten($secondary, 6%);
+}

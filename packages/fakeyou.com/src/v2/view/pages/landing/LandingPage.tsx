@@ -10,10 +10,24 @@ import Dashboard from "./Dashboard";
 import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 import { useDomainConfig } from "context/DomainConfigContext";
 import StorytellerLanding from "./storyteller/StorytellerLanding";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
+import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
+import "./LandingPage.scss";
 
 interface Props {
   sessionWrapper: SessionWrapper;
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
+  inferenceJobs: Array<InferenceJob>;
+  ttsInferenceJobs: Array<TtsInferenceJob>;
+  enqueueInferenceJob: (
+    jobToken: string,
+    frontendInferenceJobType: FrontendInferenceJobType
+  ) => void;
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
+  enqueueTtsJob: (jobToken: string) => void;
 }
 
 function LandingPage(props: Props) {
@@ -33,6 +47,11 @@ function LandingPage(props: Props) {
               <FakeYouLandingHeader
                 sessionWrapper={props.sessionWrapper}
                 sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+                inferenceJobs={props.inferenceJobs}
+                ttsInferenceJobs={props.ttsInferenceJobs}
+                enqueueInferenceJob={props.enqueueInferenceJob}
+                inferenceJobsByCategory={props.inferenceJobsByCategory}
+                enqueueTtsJob={props.enqueueTtsJob}
               />
             )}
 

@@ -1545,6 +1545,13 @@ class PageContainer extends React.Component<
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }
+                      enqueueInferenceJob={this.props.enqueueInferenceJob}
+                      inferenceJobs={this.props.inferenceJobs}
+                      inferenceJobsByCategory={
+                        this.props.inferenceJobsByCategory
+                      }
+                      ttsInferenceJobs={this.props.ttsInferenceJobs}
+                      enqueueTtsJob={this.props.enqueueTtsJob}
                     />
                   </Route>
                 </Switch>

@@ -41,7 +41,7 @@ export default memo(function SelectModalWrapper({
     <SelectModalV2
       modalTitle={modalTitle}
       label={inputLabel}
-      value={value.title || value.token}
+      value={value}
       onClear={()=>{onSelect({title:"",token:""})}}
     >
       <NonRouteTabs tabs={tabs} />
