@@ -10,6 +10,7 @@ import {
   faVolumeHigh,
   faTags,
   faHandsHelping,
+  faArrowsTurnToDots,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
@@ -130,6 +131,13 @@ function ContributeIndexPage(props: Props) {
                   icon={faImage}
                   label="Upload LoRa Weight"
                   to="/upload/lora"
+                />
+              </div>
+              <div className="col-12 col-md-6">
+                <Button
+                  icon={faArrowsTurnToDots}
+                  label="Upload Workflow"
+                  to="/upload/workflow"
                 />
               </div>
             </div>
