@@ -213,7 +213,7 @@ export default function TopNav({
         <div className="topbar-nav-center">
           {/* Search Bar */}
           <div className="d-none d-lg-block">
-            {isScrolled && (
+            {(isOnLandingPage ? isScrolled : true) && (
               <SearchBar
                 onFocus={onFocusHandler}
                 onBlur={onBlurHandler}
