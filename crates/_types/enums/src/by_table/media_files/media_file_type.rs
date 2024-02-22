@@ -11,7 +11,7 @@ use utoipa::ToSchema;
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Deserialize, Serialize, ToSchema)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 pub enum MediaFileType {
   /// Audio files: wav, mp3, etc.
   Audio,
@@ -39,6 +39,10 @@ pub enum MediaFileType {
 
   /// glTF files (for Bevy)
   Gltf,
+
+  /// Bevy's scene files (in RON; Rusty Object Notation)
+  /// This will be replaced with another format in future versions of Bevy
+  SceneRon,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -58,6 +62,7 @@ impl MediaFileType {
       Self::Fbx => "fbx",
       Self::Glb => "glb",
       Self::Gltf => "gltf",
+      Self::SceneRon => "scene_ron",
     }
   }
 
@@ -71,6 +76,7 @@ impl MediaFileType {
       "fbx" => Ok(Self::Fbx),
       "glb" => Ok(Self::Glb),
       "gltf" => Ok(Self::Gltf),
+      "scene_ron" => Ok(Self::SceneRon),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -87,6 +93,7 @@ impl MediaFileType {
       Self::Fbx,
       Self::Glb,
       Self::Gltf,
+      Self::SceneRon,
     ])
   }
 }
@@ -109,6 +116,7 @@ mod tests {
       assert_serialization(MediaFileType::Fbx, "fbx");
       assert_serialization(MediaFileType::Glb, "glb");
       assert_serialization(MediaFileType::Gltf, "gltf");
+      assert_serialization(MediaFileType::SceneRon, "scene_ron");
     }
   }
 
@@ -120,10 +128,12 @@ mod tests {
       assert_eq!(MediaFileType::Audio.to_str(), "audio");
       assert_eq!(MediaFileType::Image.to_str(), "image");
       assert_eq!(MediaFileType::Video.to_str(), "video");
+      assert_eq!(MediaFileType::Mocap.to_str(), "mocap");
       assert_eq!(MediaFileType::Bvh.to_str(), "bvh");
       assert_eq!(MediaFileType::Fbx.to_str(), "fbx");
       assert_eq!(MediaFileType::Glb.to_str(), "glb");
       assert_eq!(MediaFileType::Gltf.to_str(), "gltf");
+      assert_eq!(MediaFileType::SceneRon.to_str(), "scene_ron");
     }
 
     #[test]
@@ -136,6 +146,7 @@ mod tests {
       assert_eq!(MediaFileType::from_str("fbx").unwrap(), MediaFileType::Fbx);
       assert_eq!(MediaFileType::from_str("glb").unwrap(), MediaFileType::Glb);
       assert_eq!(MediaFileType::from_str("gltf").unwrap(), MediaFileType::Gltf);
+      assert_eq!(MediaFileType::from_str("scene_ron").unwrap(), MediaFileType::SceneRon);
       assert!(MediaFileType::from_str("foo").is_err());
     }
   }
@@ -146,7 +157,7 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileType::all_variants();
-      assert_eq!(variants.len(), 8);
+      assert_eq!(variants.len(), 9);
       assert_eq!(variants.pop_first(), Some(MediaFileType::Audio));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Image));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Video));
@@ -155,6 +166,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileType::Fbx));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Glb));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Gltf));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::SceneRon));
       assert_eq!(variants.pop_first(), None);
     }
   }

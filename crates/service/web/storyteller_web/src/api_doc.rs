@@ -27,6 +27,9 @@ use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::*;
+use crate::http_server::endpoints::engine::create_scene_handler::*;
+use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
+use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
 use crate::http_server::endpoints::media_files::delete_media_file::*;
 use crate::http_server::endpoints::media_files::get_media_file::*;
 use crate::http_server::endpoints::media_files::list_featured_media_files::*;
@@ -53,13 +56,12 @@ use crate::http_server::endpoints::weights::search_model_weights_handler::*;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::*;
 use crate::http_server::endpoints::weights::update_weight::*;
 use crate::http_server::web_utils::response_success_helpers::*;
-use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
-use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
 
 #[derive(OpenApi)]
 #[openapi(
   paths(
     crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::enqueue_fbx_to_gltf_handler,
+    crate::http_server::endpoints::engine::create_scene_handler::create_scene_handler,
     crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler,
     crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler,
     crate::http_server::endpoints::media_files::delete_media_file::delete_media_file_handler,
@@ -129,6 +131,8 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
     BatchGetUserRatingQueryParams,
     BatchGetUserRatingResponse,
     BookmarkRow,
+    CreateSceneError,
+    CreateSceneSuccessResponse,
     CreateUserBookmarkError,
     CreateUserBookmarkRequest,
     CreateUserBookmarkSuccessResponse,
@@ -139,9 +143,7 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
     DeleteUserBookmarkPathInfo,
     DeleteUserBookmarkRequest,
     DeleteWeightError,
-    DeleteWeightError,
     DeleteWeightPathInfo,
-    DeleteWeightRequest,
     DeleteWeightRequest,
     EnqueueFbxToGltfRequest,
     EnqueueFbxToGltfRequestError,
@@ -188,19 +190,16 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
     ListUserBookmarksForUserSuccessResponse,
     ListUserBookmarksPathInfo,
     ListWeightError,
-    ListWeightError,
     ListWeightsByUserError,
     ListWeightsByUserPathInfo,
     ListWeightsByUserSuccessResponse,
     MediaFile,
     MediaFileData,
     MediaFileForUserListItem,
-    MediaFileForUserListItem,
     MediaFileInfo,
     MediaFileListItem,
-    MediaFileUploadError,
     MediaFilesByBatchListItem,
-    ModelWeightForList,
+    MediaFileUploadError,
     ModelWeightForList,
     ModelWeightSearchResult,
     ProfileError,
@@ -227,8 +226,6 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
     TerminateInferenceJobSuccessResponse,
     UpdateWeightError,
     UpdateWeightPathInfo,
-    UpdateWeightRequest,
-    UpdateWeightRequest,
     UpdateWeightRequest,
     UploadMediaSuccessResponse,
     UserBookmarkDetailsForUserList,

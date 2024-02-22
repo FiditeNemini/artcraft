@@ -17,6 +17,7 @@ use crate::queries::generic_synthetic_ids::transactional_increment_generic_synth
 pub enum UploadType {
   Filesystem,
   DeviceCaptureApi,
+  StorytellerEngine,
 }
 
 pub struct InsertMediaFileFromUploadArgs<'a> {
@@ -52,6 +53,7 @@ pub async fn insert_media_file_from_file_upload(
   let origin_category = match args.upload_type {
     UploadType::Filesystem => MediaFileOriginCategory::Upload,
     UploadType::DeviceCaptureApi => MediaFileOriginCategory::DeviceApi,
+    UploadType::StorytellerEngine => MediaFileOriginCategory::StoryEngine,
   };
 
   let mut maybe_creator_file_synthetic_id : Option<u64> = None;

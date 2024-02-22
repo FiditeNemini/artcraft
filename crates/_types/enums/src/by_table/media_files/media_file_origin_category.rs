@@ -26,6 +26,9 @@ pub enum MediaFileOriginCategory {
 
   /// User uploaded files recorded directly from their device (browser, mobile), typically using device APIs.
   DeviceApi,
+
+  /// From Storyteller Studio Engine
+  StoryEngine,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -41,6 +44,7 @@ impl MediaFileOriginCategory {
       Self::Processed => "processed",
       Self::Upload => "upload",
       Self::DeviceApi => "device_api",
+      Self::StoryEngine => "story_engine",
     }
   }
 
@@ -50,6 +54,7 @@ impl MediaFileOriginCategory {
       "processed" => Ok(Self::Processed),
       "upload" => Ok(Self::Upload),
       "device_api" => Ok(Self::DeviceApi),
+      "story_engine" => Ok(Self::StoryEngine),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -62,6 +67,7 @@ impl MediaFileOriginCategory {
       Self::Processed,
       Self::Upload,
       Self::DeviceApi,
+      Self::StoryEngine,
     ])
   }
 }
@@ -80,6 +86,7 @@ mod tests {
       assert_serialization(MediaFileOriginCategory::Processed, "processed");
       assert_serialization(MediaFileOriginCategory::Upload, "upload");
       assert_serialization(MediaFileOriginCategory::DeviceApi, "device_api");
+      assert_serialization(MediaFileOriginCategory::StoryEngine, "story_engine");
     }
 
     #[test]
@@ -87,7 +94,7 @@ mod tests {
       assert_eq!(MediaFileOriginCategory::Inference.to_str(), "inference");
       assert_eq!(MediaFileOriginCategory::Processed.to_str(), "processed");
       assert_eq!(MediaFileOriginCategory::Upload.to_str(), "upload");
-      assert_eq!(MediaFileOriginCategory::DeviceApi.to_str(), "device_api");
+      assert_eq!(MediaFileOriginCategory::StoryEngine.to_str(), "story_engine");
     }
 
     #[test]
@@ -96,17 +103,19 @@ mod tests {
       assert_eq!(MediaFileOriginCategory::from_str("processed").unwrap(), MediaFileOriginCategory::Processed);
       assert_eq!(MediaFileOriginCategory::from_str("upload").unwrap(), MediaFileOriginCategory::Upload);
       assert_eq!(MediaFileOriginCategory::from_str("device_api").unwrap(), MediaFileOriginCategory::DeviceApi);
+      assert_eq!(MediaFileOriginCategory::from_str("story_engine").unwrap(), MediaFileOriginCategory::StoryEngine);
       assert!(MediaFileOriginCategory::from_str("foo").is_err());
     }
 
     #[test]
     fn all_variants() {
       let mut variants = MediaFileOriginCategory::all_variants();
-      assert_eq!(variants.len(), 4);
+      assert_eq!(variants.len(), 5);
       assert_eq!(variants.pop_first(), Some(MediaFileOriginCategory::Inference));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginCategory::Processed));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginCategory::Upload));
       assert_eq!(variants.pop_first(), Some(MediaFileOriginCategory::DeviceApi));
+      assert_eq!(variants.pop_first(), Some(MediaFileOriginCategory::StoryEngine));
       assert_eq!(variants.pop_first(), None);
     }
   }
@@ -126,6 +135,16 @@ mod tests {
         assert_eq!(variant, MediaFileOriginCategory::from_str(variant.to_str()).unwrap());
         assert_eq!(variant, MediaFileOriginCategory::from_str(&format!("{}", variant)).unwrap());
         assert_eq!(variant, MediaFileOriginCategory::from_str(&format!("{:?}", variant)).unwrap());
+      }
+    }
+
+    #[test]
+    fn serialized_length_ok_for_database() {
+      const MAX_LENGTH : usize = 16;
+      for variant in MediaFileOriginCategory::all_variants() {
+        let serialized = variant.to_str();
+        assert!(serialized.len() > 0, "variant {:?} is too short", variant);
+        assert!(serialized.len() <= MAX_LENGTH, "variant {:?} is too long", variant);
       }
     }
   }
