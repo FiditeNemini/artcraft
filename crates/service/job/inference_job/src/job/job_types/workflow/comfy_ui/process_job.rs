@@ -172,7 +172,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
        job_args.workflow_source,
        false,
        &deps.db.mysql_pool
-    ).await?.unwrap();
+    ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Workflow not found")))?;
 
     let bucket_details = RemoteCloudBucketDetails {
        object_hash: retrieved_workflow_record.public_bucket_hash,
