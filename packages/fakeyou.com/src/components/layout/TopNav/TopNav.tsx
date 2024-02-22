@@ -20,6 +20,7 @@ import { InferenceJobsModal } from "components/modals";
 import { useDomainConfig } from "context/DomainConfigContext";
 import NavItem from "../../common/NavItem/NavItem";
 import ProfileDropdown from "components/common/ProfileDropdown";
+import "./TopNav.scss";
 
 interface TopNavProps {
   sessionWrapper: SessionWrapper;
@@ -50,6 +51,9 @@ export default function TopNav({
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
+  const [isScrolled, setIsScrolled] = useState(false);
+  const loggedIn = sessionWrapper.isLoggedIn();
+  const showNavItem = !loggedIn && (isOnLandingPage || isOnLoginOrSignUpPage);
 
   const handleMenuButtonClick = () => {
     if (window.innerWidth < 1200) {
@@ -101,14 +105,28 @@ export default function TopNav({
     };
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   const logoutHandler = async () => {
     await Logout();
     querySessionCallback();
     querySessionSubscriptionsCallback();
     history.push("/");
   };
-
-  const loggedIn = sessionWrapper.isLoggedIn();
 
   let profileDropdown = <></>;
 
@@ -157,7 +175,12 @@ export default function TopNav({
   ];
 
   return (
-    <div id="topbar-wrapper" className="position-fixed">
+    <div
+      id="topbar-wrapper"
+      className={`position-fixed ${
+        !loggedIn && isOnLandingPage && !isScrolled ? "topbar-bg-dark" : ""
+      }`}
+    >
       <div className="topbar-nav">
         <div className="topbar-nav-left">
           <div className="d-flex gap-3 align-items-center">
@@ -175,8 +198,7 @@ export default function TopNav({
                 className="mb-0 d-block d-lg-none"
               />
             </Link>
-            {((!loggedIn && isOnLandingPage) ||
-              (!loggedIn && isOnLoginOrSignUpPage)) && (
+            {showNavItem && (
               <div className="d-none d-lg-block">
                 <NavItem
                   isHoverable={true}
@@ -191,17 +213,18 @@ export default function TopNav({
         <div className="topbar-nav-center">
           {/* Search Bar */}
           <div className="d-none d-lg-block">
-            <SearchBar
-              onFocus={onFocusHandler}
-              onBlur={onBlurHandler}
-              isFocused={isFocused}
-            />
+            {isScrolled && (
+              <SearchBar
+                onFocus={onFocusHandler}
+                onBlur={onBlurHandler}
+                isFocused={isFocused}
+              />
+            )}
           </div>
         </div>
 
         <div className="topbar-nav-right">
-          {((!loggedIn && isOnLandingPage) ||
-            (!loggedIn && isOnLoginOrSignUpPage)) && (
+          {showNavItem && (
             <NavItem
               icon={faStar}
               label="Pricing"
@@ -212,15 +235,18 @@ export default function TopNav({
 
           <div className="d-flex align-items-center gap-2">
             <div className="d-none d-lg-flex gap-2">
-              <Button
-                {...{
-                  icon: faClipboardList,
-                  label: "My Jobs",
-                  onClick: openModal,
-                  variant: "secondary",
-                  small: true,
-                }}
-              />
+              {!showNavItem && (
+                <Button
+                  {...{
+                    icon: faClipboardList,
+                    label: "My Jobs",
+                    onClick: openModal,
+                    variant: "secondary",
+                    small: true,
+                  }}
+                />
+              )}
+
               {loggedIn ? (
                 profileDropdown
               ) : (

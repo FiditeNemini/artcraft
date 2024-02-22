@@ -15,6 +15,7 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
+import "./LandingPage.scss";
 
 interface Props {
   sessionWrapper: SessionWrapper;

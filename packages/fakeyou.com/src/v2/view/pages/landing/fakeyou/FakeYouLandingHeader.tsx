@@ -37,7 +37,7 @@ export default function FakeYouLandingHeader({
   const { t } = useLocalize("LandingPage");
 
   return (
-    <>
+    <div className="d-flex flex-column fy-header">
       <Alert
         id="text-to-image-alert"
         icon={faSparkles}
@@ -79,6 +79,6 @@ export default function FakeYouLandingHeader({
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }

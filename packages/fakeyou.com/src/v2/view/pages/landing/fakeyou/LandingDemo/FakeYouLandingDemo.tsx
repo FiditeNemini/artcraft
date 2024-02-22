@@ -56,6 +56,23 @@ export default function LandingDemo({
   const [lastSelectedVoice, setLastSelectedVoice] = useState<string | null>(
     null
   );
+  const [placeholder, setPlaceholder] = useState("");
+
+  const placeholderTexts = [
+    "You can make a video, animation, or any content you want with your favorite voices.",
+    "Try using this voice to make a custom greeting, away message, or something special for your friends.",
+    "You can change what I say with this voice. Just type it!",
+    "Enter the text you want the voice to say here...",
+  ];
+
+  useEffect(() => {
+    // Randomize placeholder text on component mount
+    const randomPlaceholderIndex = Math.floor(
+      Math.random() * placeholderTexts.length
+    );
+    setPlaceholder(placeholderTexts[randomPlaceholderIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const textValue = (ev.target as HTMLTextAreaElement).value;
@@ -228,7 +245,7 @@ export default function LandingDemo({
             />
           </div>
           <TextArea
-            placeholder="Enter the text you want the voice to say here..."
+            placeholder={placeholder}
             value={textBuffer}
             onChange={handleChangeText}
             rows={4}
