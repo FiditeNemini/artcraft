@@ -10,7 +10,7 @@ export default function SelectionBubbles({
   options,
   onSelect,
 }: SelectionBubbleProps) {
-  //Select first one as default
+  //Select first one as defaults
   const [selectedOption, setSelectedOption] = useState<string | null>(
     options.length > 0 ? options[0] : null
   );

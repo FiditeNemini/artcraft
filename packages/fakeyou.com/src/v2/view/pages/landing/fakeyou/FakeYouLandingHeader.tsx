@@ -4,7 +4,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import Alert from "components/common/Alert/Alert";
 import { useLocalize } from "hooks";
 import React from "react";
-import LandingDemo from "./FakeYouLandingDemo";
+import LandingDemo from "./LandingDemo/FakeYouLandingDemo";
 import {
   FrontendInferenceJobType,
   InferenceJob,

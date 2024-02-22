@@ -1,13 +1,7 @@
-import React, { useState } from "react";
-import { faDeleteLeft, faPlay } from "@fortawesome/pro-solid-svg-icons";
+import React, { useEffect, useState } from "react";
+import { faPause, faPlay, faShuffle } from "@fortawesome/pro-solid-svg-icons";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import {
-  Panel,
-  Button,
-  TextArea,
-  SelectionBubbles,
-  Accordion,
-} from "components/common";
+import { Panel, Button, TextArea, SelectionBubbles } from "components/common";
 import {
   FrontendInferenceJobType,
   InferenceJob,
@@ -21,8 +15,14 @@ import {
   GenerateTtsAudioIsOk,
 } from "@storyteller/components/src/api/tts/GenerateTtsAudio";
 import { Analytics } from "common/Analytics";
-import { Link } from "react-router-dom";
-import { SessionTtsInferenceResultList } from "v2/view/_common/SessionTtsInferenceResultsList";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import DemoTtsAudioPlayer from "./DemoAudioPlayer";
+import {
+  GetTtsInferenceJobStatus,
+  GetTtsInferenceJobStatusIsOk,
+} from "@storyteller/components/src/api/jobs/GetTtsInferenceJobStatus";
+import RandomTexts from "./RandomTexts";
+import "./LandingDemo.scss";
 
 interface TtsInferencePanelProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -45,23 +45,29 @@ export default function LandingDemo({
   inferenceJobsByCategory,
 }: TtsInferencePanelProps) {
   const [textBuffer, setTextBuffer] = useState("");
-  const [isEnqueuing, setIsEnqueuing] = useState(false);
   const [maybeTtsError, setMaybeTtsError] = useState<
     GenerateTtsAudioErrorType | undefined
   >(undefined);
-  const [isAudioLimitAlertVisible, setAudioLimitAlertVisible] = useState(false);
+  const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [jobToken, setJobToken] = useState<string | null>(null);
+  const [lastEnqueuedText, setLastEnqueuedText] = useState<string | null>(null);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const [lastSelectedVoice, setLastSelectedVoice] = useState<string | null>(
+    null
+  );
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const textValue = (ev.target as HTMLTextAreaElement).value;
     setTextBuffer(textValue);
-    setAudioLimitAlertVisible(textValue.length > 100);
   };
 
+  //Set voices here
   const voiceModelTokenMap: { [key: string]: string } = {
-    Spongebob: "weight_vrx7j407cxk45jenkrd769h9b",
-    Trump: "trump_model_token",
-    Messi: "messi_model_token",
-    // Add more voice options and their modelTokens as needed
+    Rick: "weight_0f762jdzgsy1dhpb86qxy4ssm",
+    Mickey: "weight_sfyjyr67ag1647xs0r7gmvkks",
+    Eric: "weight_h8ebh6fyjyrr1vsjregw6yz8y",
+    "Angry Male": "weight_hehgvegadf08mfp5rzd69dmh4",
   };
 
   const [voiceToken, setVoiceToken] = useState(voiceModelTokenMap["Spongebob"]);
@@ -78,7 +84,14 @@ export default function LandingDemo({
       return false;
     }
 
-    setIsEnqueuing(true);
+    // Check if the text hasn't changed and the voice hasn't changed
+    if (textBuffer === lastEnqueuedText && voiceToken === lastSelectedVoice) {
+      setIsPlaying(!isPlaying);
+      setIsAudioLoading(false);
+      return false;
+    }
+
+    setIsAudioLoading(true);
 
     const modelToken = voiceToken;
 
@@ -103,15 +116,52 @@ export default function LandingDemo({
       } else {
         enqueueTtsJob(response.inference_job_token);
       }
+      // Store the job token
+      setJobToken(response.inference_job_token);
+      // Store the last enqueued text
+      setLastEnqueuedText(textBuffer);
+      // Store the last selected voice
+      setLastSelectedVoice(voiceToken);
     } else if (GenerateTtsAudioIsError(response)) {
       setMaybeTtsError(response.error);
     }
 
-    setIsEnqueuing(false);
-
     return false;
   };
 
+  useEffect(() => {
+    if (!jobToken) return;
+
+    const fetch = async () => {
+      const jobStatusResponse = await GetTtsInferenceJobStatus(jobToken);
+
+      if (GetTtsInferenceJobStatusIsOk(jobStatusResponse)) {
+        const job = inferenceJobs.find(job => job.jobToken === jobToken);
+        if (job && jobStatusResponse.state.maybe_public_bucket_wav_audio_path) {
+          const audioLink = new BucketConfig().getGcsUrl(
+            jobStatusResponse.state.maybe_public_bucket_wav_audio_path
+          );
+          setCurrentAudioUrl(audioLink);
+
+          if (audioLink !== currentAudioUrl) {
+            setIsAudioLoading(false);
+            setIsPlaying(true);
+          }
+        }
+      }
+    };
+
+    fetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [jobToken, inferenceJobs, isPlaying]);
+
+  const handleAudioFinish = () => {
+    setIsPlaying(false);
+  };
+
+  const voiceOptions = Object.keys(voiceModelTokenMap);
+
+  // Show errors on TTS failure
   let maybeError = <></>;
   if (!!maybeTtsError) {
     let hasMessage = false;
@@ -119,7 +169,9 @@ export default function LandingDemo({
     switch (maybeTtsError) {
       case GenerateTtsAudioErrorType.TooManyRequests:
         hasMessage = true;
-        message = <>Error: Too many requests. Please try again in a bit.</>;
+        message = (
+          <>Too many requests! Please wait a few minutes then try again.</>
+        );
         break;
       case GenerateTtsAudioErrorType.ServerError |
         GenerateTtsAudioErrorType.BadRequest |
@@ -145,33 +197,17 @@ export default function LandingDemo({
     }
   }
 
-  let audioLimitAlert = <></>;
-  if (
-    isAudioLimitAlertVisible &&
-    !sessionSubscriptionsWrapper.hasPaidFeatures()
-  ) {
-    audioLimitAlert = (
-      <>
-        <div className="alert alert-warning fs-7 mb-0">
-          <span className="fw-semibold">
-            <u>Note:</u> Non-premium is limited to 12 seconds of audio.{" "}
-            <Link className="fw-semibold" to="/pricing">
-              Upgrade now
-            </Link>
-            .
-          </span>
-        </div>
-      </>
-    );
-  }
-
-  const voiceOptions = Object.keys(voiceModelTokenMap);
+  const generateRandomText = () => {
+    const randomIndex = Math.floor(Math.random() * RandomTexts.length);
+    const randomText = RandomTexts[randomIndex];
+    setTextBuffer(randomText);
+  };
 
   return (
     <Panel padding={true}>
       <form className="d-flex flex-column">
         <div>
-          <div>
+          <div className="d-flex">
             <label className="sub-title flex-grow-1">Select a Voice</label>
           </div>
           <SelectionBubbles
@@ -181,8 +217,15 @@ export default function LandingDemo({
         </div>
 
         <div className="d-flex flex-column mt-3">
-          <div>
-            <label className="sub-title flex-grow-1">Your Text</label>
+          <div className="d-flex justify-content-center pb-2">
+            <label className="sub-title flex-grow-1 pb-0">Your Text</label>
+            <Button
+              icon={faShuffle}
+              label="Randomize Text"
+              onClick={generateRandomText}
+              variant="link"
+              className="fs-7 randomize-text-button"
+            />
           </div>
           <TextArea
             placeholder="Enter the text you want the voice to say here..."
@@ -191,41 +234,25 @@ export default function LandingDemo({
             rows={4}
             resize={false}
           />
-          {audioLimitAlert}
         </div>
+
+        {maybeError}
 
         <div className="d-flex gap-3 align-items-center mt-4">
           <Button
-            icon={faPlay}
+            icon={isPlaying ? faPause : faPlay}
             square={true}
             onClick={handleEnqueueTts}
-            isLoading={isEnqueuing}
+            isLoading={isAudioLoading}
             disabled={textBuffer.length === 0}
           />
-          <>Autoplaying audio player here</>
+          <DemoTtsAudioPlayer
+            filename={currentAudioUrl || ""}
+            play={isPlaying}
+            onFinish={handleAudioFinish}
+          />
         </div>
       </form>
-
-      {inferenceJobs[0] && (
-        <div className="mt-4">
-          <Accordion>
-            <Accordion.Item title="Session TTS Results" defaultOpen={true}>
-              <div className="p-3">
-                <SessionTtsInferenceResultList
-                  inferenceJobs={
-                    inferenceJobsByCategory.get(
-                      FrontendInferenceJobType.TextToSpeech
-                    )!
-                  }
-                  ttsInferenceJobs={ttsInferenceJobs}
-                  sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                />
-              </div>
-            </Accordion.Item>
-          </Accordion>
-          {maybeError}
-        </div>
-      )}
     </Panel>
   );
 }
