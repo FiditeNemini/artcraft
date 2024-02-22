@@ -176,9 +176,8 @@ pub fn add_legacy_trumped(cors: Cors, is_production: bool) -> Cors {
 pub fn add_development_only(cors: Cors) -> Cors {
   cors
       // Local Development (Localhost)
-      .allowed_origin("http://localhost:12345")
       .allowed_origin("http://localhost:3000")
-      .allowed_origin("http://localhost:54321")
+      .allowed_origin("http://localhost:4200")
       .allowed_origin("http://localhost:5555")
       .allowed_origin("http://localhost:7000")
       .allowed_origin("http://localhost:7001")
@@ -192,6 +191,8 @@ pub fn add_development_only(cors: Cors) -> Cors {
       .allowed_origin("http://localhost:7009")
       .allowed_origin("http://localhost:8000")
       .allowed_origin("http://localhost:8080")
+      .allowed_origin("http://localhost:12345")
+      .allowed_origin("http://localhost:54321")
       // Local Development (JungleHorse)
       .allowed_origin("http://api.jungle.horse")
       .allowed_origin("http://jungle.horse")
