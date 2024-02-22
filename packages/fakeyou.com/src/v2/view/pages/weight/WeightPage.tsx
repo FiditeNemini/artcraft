@@ -78,7 +78,7 @@ export default function WeightPage({
     fetchError,
     isLoading,
     title,
-    remove
+    remove,
   } = useWeightFetch({
     onRemove: () => {
       history.push(source || "");
@@ -196,12 +196,17 @@ export default function WeightPage({
         return (
           <div className="d-flex flex-column gap-3">
             <SdCoverImagePanel src={sdCoverImage} />
-            {!!weight.description_rendered_html && (
+            {weight && weight.description_rendered_html ? (
               <Panel padding={true}>
                 <h5 className="fw-semibold mb-2">Description</h5>
-                <p className="fs-7">{weight.description_rendered_html}</p>
+                <p
+                  className="fs-7"
+                  dangerouslySetInnerHTML={{
+                    __html: weight.description_rendered_html || "",
+                  }}
+                />
               </Panel>
-            )}
+            ) : null}
             {imageGenPanel}
           </div>
         );
@@ -493,13 +498,19 @@ export default function WeightPage({
 
         <div className="row g-4">
           <div className="col-12 col-xl-8 d-flex flex-column gap-3">
-            { !!weight.description_rendered_html && (
+            {weight &&
+            weight.description_rendered_html &&
+            weight.weight_category !== WeightCategory.SD ? (
               <Panel padding={true}>
-                <h4 className="fw-semibold mb-3">Description</h4>
-                <p>{weight.description_rendered_html}</p>
+                <h5 className="fw-semibold mb-2">Description</h5>
+                <p
+                  className="fs-7"
+                  dangerouslySetInnerHTML={{
+                    __html: weight.description_rendered_html || "",
+                  }}
+                />
               </Panel>
-              )
-            }
+            ) : null}
             <div className="media-wrapper">{renderWeightComponent(weight)}</div>
 
             <div className="panel p-3 py-4 p-md-4 d-none d-xl-block">
