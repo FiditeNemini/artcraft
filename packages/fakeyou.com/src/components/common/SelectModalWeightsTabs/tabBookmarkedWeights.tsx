@@ -90,7 +90,7 @@ export default function WeightsTabsContent({
               showCreator: true,
               type: "weights",
               inSelectModal: true,
-              onResultSelect: onSelect,
+              onResultBookmarkSelect: onSelect,
             };
             return (
               <div

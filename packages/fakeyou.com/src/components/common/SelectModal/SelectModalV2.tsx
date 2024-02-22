@@ -21,7 +21,7 @@ export type SelectModalData = {
 interface SelectModalProps {
   label?: string;
   modalTitle?: string;
-  value?: string;
+  value?: string | SelectModalData;
   onClear: () => void;
   required?: boolean;
   children: ReactNode
@@ -32,21 +32,15 @@ export default memo(function SelectModal ({
   // tabs,
   modalTitle = "Select",
   onClear,
-  value = "",
+  value:valueProps = "",
   required,
   children
 }: SelectModalProps) {
-    const [isModalOpen, setModalOpen] = useState(false
-    )
-    const openModal = () => {
-      setModalOpen(true);
-    };
-
-    const closeModal = () => {
-      setModalOpen(false);
-    };
-
-    useEffect(closeModal, [value]);
+    const [isModalOpen, setModalOpen] = useState(false)
+    const openModal = () => setModalOpen(true);
+    const closeModal = () => setModalOpen(false);
+    useEffect(closeModal, [valueProps]);
+    const value = typeof valueProps === "string" ? valueProps : valueProps.title;
 
     return (
       <>

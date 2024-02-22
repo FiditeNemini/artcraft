@@ -17,7 +17,9 @@ export type WorkflowValuesType = {
   workflowConfig: string;
   seed: string;
   sdModelToken: string;
+  sdModelTitle: string;
   loraModelToken: string;
+  loraModelTitle: string;
   posPrompt: string;
   negPrompt: string;
   // Advance Options Values
