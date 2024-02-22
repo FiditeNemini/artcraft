@@ -213,15 +213,15 @@ export default function TopNav({
         <div className="topbar-nav-center">
           {/* Search Bar */}
           <div className="d-none d-lg-block">
-            {(!isOnLandingPage ||
-              loggedIn ||
-              (isOnLandingPage && isScrolled)) && (
+            {(!isOnLandingPage && !isOnLoginOrSignUpPage) ||
+            (loggedIn && !isOnLoginOrSignUpPage) ||
+            (isOnLandingPage && isScrolled && !isOnLoginOrSignUpPage) ? (
               <SearchBar
                 onFocus={onFocusHandler}
                 onBlur={onBlurHandler}
                 isFocused={isFocused}
               />
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -271,22 +271,27 @@ export default function TopNav({
                 </>
               )}
             </div>
-            <Button
-              icon={faClipboardList}
-              variant="secondary"
-              small={true}
-              label="My Jobs"
-              onClick={openModal}
-              className="d-lg-none"
-            />
-            <Button
-              icon={faSearch}
-              variant="secondary"
-              small={true}
-              square={true}
-              onClick={handleSearchButtonClick}
-              className="d-lg-none"
-            />
+            {!showNavItem && (
+              <>
+                <Button
+                  icon={faClipboardList}
+                  variant="secondary"
+                  small={true}
+                  label="My Jobs"
+                  onClick={openModal}
+                  className="d-lg-none"
+                />
+                <Button
+                  icon={faSearch}
+                  variant="secondary"
+                  small={true}
+                  square={true}
+                  onClick={handleSearchButtonClick}
+                  className="d-lg-none"
+                />
+              </>
+            )}
+
             <Button
               icon={menuButtonIcon}
               variant="secondary"

@@ -38,16 +38,19 @@ export default function FakeYouLandingHeader({
 
   return (
     <div className="d-flex flex-column fy-header">
-      <Alert
-        id="text-to-image-alert"
-        icon={faSparkles}
-        message={t("alertTtiText")}
-        alertVariant="new"
-        link="/text-to-image"
-        linkText={t("alertTtiCta")}
-      />
+      <Panel clear={true}>
+        <Alert
+          id="text-to-image-alert"
+          icon={faSparkles}
+          message={t("alertTtiText")}
+          alertVariant="new"
+          link="/text-to-image"
+          linkText={t("alertTtiCta")}
+          className="my-3"
+        />
+      </Panel>
 
-      <div className="my-5 py-5">
+      <div className="my-lg-5 py-lg-5 pt-4 pb-5">
         <div className="row g-5">
           <div className="col-12 col-lg-6 order-lg-2">
             <LandingDemo

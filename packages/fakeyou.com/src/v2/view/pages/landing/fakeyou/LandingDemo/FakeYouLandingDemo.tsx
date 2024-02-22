@@ -84,6 +84,8 @@ export default function LandingDemo({
     Rick: "weight_0f762jdzgsy1dhpb86qxy4ssm",
     Mickey: "weight_sfyjyr67ag1647xs0r7gmvkks",
     Eric: "weight_h8ebh6fyjyrr1vsjregw6yz8y",
+    Stan: "weight_0cg1294gaf52c7rh0vz7a2ger",
+    Zelda: "weight_b8rncypy7gw6nb0wthnwe2kk4",
     "Angry Male": "weight_hehgvegadf08mfp5rzd69dmh4",
   };
 
@@ -199,7 +201,7 @@ export default function LandingDemo({
     if (hasMessage) {
       maybeError = (
         <div
-          className="alert alert-primary alert-dismissible fade show m-0"
+          className="alert alert-primary alert-dismissible fade show mt-3"
           role="alert"
         >
           <button

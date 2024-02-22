@@ -22,6 +22,7 @@ interface AlertProps {
   icon?: IconProp;
   link?: string;
   linkText?: string;
+  className?: string;
 }
 
 function Alert({
@@ -32,6 +33,7 @@ function Alert({
   icon,
   linkText,
   link,
+  className,
 }: AlertProps) {
   const [show, setShow] = useState<boolean>(() => {
     const closedAt = localStorage.getItem(`alertClosedAt_${id}`);
@@ -55,7 +57,9 @@ function Alert({
     <>
       {show && (
         <div
-          className={`alert alert-${alertVariant} alert-dismissible fade show`}
+          className={`alert alert-${alertVariant} alert-dismissible fade show ${
+            className && className
+          }`.trim()}
           role="alert"
         >
           {icon && <FontAwesomeIcon icon={icon} className="me-2" />}
