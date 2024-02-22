@@ -57,7 +57,9 @@ export default function PageFilterControls({
     workflowConfig: "weight_q8sz47gmfw2zx02snrbz88ns9",
     seed: "",
     sdModelToken: "",
+    sdModelTitle:"",
     loraModelToken: "",
+    loraModelTitle: "",
     posPrompt: "",
     negPrompt: "",
     ...VideoIvs,
@@ -75,7 +77,9 @@ export default function PageFilterControls({
       workflowConfig: "weight_q8sz47gmfw2zx02snrbz88ns9",
       seed: curr.seed,
       sdModelToken: "",
+      sdModelTitle: "",
       loraModelToken: "",
+      loraModelTitle: "",
       posPrompt: "",
       negPrompt: "",
       ...VideoIvs,
@@ -178,7 +182,7 @@ export default function PageFilterControls({
                   }}
                   value={{
                     token:workflowValues.sdModelToken,
-                    title:""
+                    title:workflowValues.sdModelTitle,
                   }}
                 />
               </div>
