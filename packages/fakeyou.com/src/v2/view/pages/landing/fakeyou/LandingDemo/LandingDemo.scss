@@ -1,0 +1,11 @@
+@import "scss/colours.scss";
+
+.randomize-text-button {
+  color: desaturate($primary, 30%) !important;
+  opacity: 1;
+
+  &:hover {
+    color: desaturate($primary, 10%) !important;
+    opacity: 0.85;
+  }
+}

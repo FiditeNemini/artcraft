@@ -5,14 +5,10 @@ import Badge from "./Badge";
 import Button from "./Button";
 import ButtonRevertToDefault from "./ButtonRevertToDefault";
 import Checkbox from "./Checkbox";
-import {
-  MediaCards,
-  SkeletonCard,
-  WeightsCards,
-} from "./Card";
+import { MediaCards, SkeletonCard, WeightsCards } from "./Card";
 import Container from "./Container";
 import CoverImageInput from "./CoverImageInput";
-import ErrorMessage from "./ErrorMessage"
+import ErrorMessage from "./ErrorMessage";
 import FileActions from "./FileActions";
 import FileDetails from "./FileDetails";
 import FileWrapper from "./FileWrapper";
@@ -38,7 +34,7 @@ import Skeleton from "./Skeleton";
 import Slider from "./Slider";
 import Spinner from "./Spinner";
 import SplitPanel from "./SplitPanel";
-import Tabs, {NonRouteTabs} from "./Tabs";
+import Tabs, { NonRouteTabs } from "./Tabs";
 import TempAudioPlayer from "./TempAudioPlayer";
 import TempInput from "./TempInput";
 import TempSelect from "./TempSelect";
@@ -49,6 +45,7 @@ import TintSpinner from "./TintSpinner";
 import VideoBasic from "./VideoBasic";
 import VideoFakeyou from "./VideoFakeyou";
 import VideoInput from "./VideoInput";
+import SelectionBubbles from "./SelectionBubbles";
 
 export {
   Accordion,
@@ -102,5 +99,6 @@ export {
   TintSpinner,
   VideoBasic,
   VideoFakeyou,
-  VideoInput
+  VideoInput,
+  SelectionBubbles,
 };

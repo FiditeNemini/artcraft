@@ -168,8 +168,9 @@ $topbar-height: 66px;
   width: 100%;
   height: $topbar-height;
   background: $panel;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.0705882353) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.0705882353);
   z-index: 1000;
+  transition: all 0.1s ease;
 }
 
 .topbar-nav {

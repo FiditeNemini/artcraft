@@ -33,7 +33,9 @@ export default function Button({
 
   const SpinnerComponent = isLoading ? (
     <div
-      className="spinner-border spinner-border-sm text-white ms-2"
+      className={`spinner-border spinner-border-sm text-white ${
+        square ? "" : "ms-2"
+      }`.trim()}
       role="status"
     >
       <span className="visually-hidden">Loading...</span>
@@ -59,7 +61,7 @@ export default function Button({
     </>
   ) : (
     <>
-      {IconComponent}
+      {isLoading ? null : IconComponent}
       {LabelComponent}
       {SpinnerComponent}
     </>
