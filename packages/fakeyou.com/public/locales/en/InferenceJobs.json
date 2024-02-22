@@ -81,7 +81,7 @@
   "subtitles": {
     "ATTEMPT_FAILED": "Atempt {{attemptCount}} failed, trying again.",
     "COMPLETE_FAILURE": "Please try again",
-    "COMPLETE_SUCCESS": "View result",
+    "COMPLETE_SUCCESS": "Job finished successfully",
     "DEAD": "Please try again",
     "PENDING": "Adding to queue",
     "STARTED": "Please wait",

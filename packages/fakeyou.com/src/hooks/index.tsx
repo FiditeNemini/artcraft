@@ -18,6 +18,7 @@ import usePrevious from './usePrevious';
 import useRatings from './useRatings';
 import useSdUpload from './useSdUpload';
 import useSession from './useSession';
+import useSlides from './useSlides';
 import useVideo from './useVideo';
 import useWeightFetch from './useWeightFetch';
 
@@ -42,6 +43,7 @@ export {
   useRatings,
   useSdUpload,
   useSession,
+  useSlides,
   useVideo,
   useWeightFetch
 };

@@ -9,8 +9,8 @@ interface Props {
   success: boolean
 }
 
-export default function WorkIndicator({ failure = false, stage = 0, success = false }: Props) {
-  return <svg {...{ className: "work-indicator" }}>
+export default function WorkIndicator({ failure = false, stage = 0, success = false, ...rest }: Props) {
+  return <svg {...{ className: "work-indicator", ...rest }}>
     <circle {...{ ...circle, className: "work-indicator-circle-track" }} />
     <DashedCircle {...{ className: "work-indicator-circle-marker", stage }}/>
     <AniX {...{ checked: failure }}/>

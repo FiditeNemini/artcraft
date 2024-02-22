@@ -57,11 +57,15 @@ export default function InferenceJobsList({
 
   const jobContent = (
     <>
-      {showHeader && <h3 className="fw-semibold mb-3">{t("core.heading")}</h3>}
-      {inferenceJobs
-        .map((job: InferenceJob, key: number) => (
-          <JobItem
-            {...{
+      {showHeader &&<h3 className="fw-semibold mb-3">{t("core.heading")}</h3>}
+{      
+      // <div>
+        
+      // </div>
+}
+      <div {...{ className: "fy-inference-jobs-list-grid" }}>
+        { inferenceJobs.map((job: InferenceJob, key: number) => 
+          <JobItem {...{
               failures,
               jobStatusDescription,
               key,
@@ -69,10 +73,9 @@ export default function InferenceJobsList({
               resultPaths,
               t,
               ...job,
-            }}
-          />
-        ))
-        .reverse()}
+            }}/>
+        ).reverse() }
+      </div>
       {!inferenceJobs.length && showNoJobs && (
         <div className="d-flex flex-column p-4 gap-3 text-center align-items-center">
           <FontAwesomeIcon icon={faClipboardList} className="display-6 mb-2" />
@@ -88,19 +91,13 @@ export default function InferenceJobsList({
   );
 
   if (inferenceJobs.length || showNoJobs) {
-    return (
-      <>
-        {panel ? (
-          <Panel
-            {...{ className: "fy-inference-jobs-list rounded", padding: true }}
-          >
-            {jobContent}
-          </Panel>
-        ) : (
-          jobContent
-        )}
-      </>
-    );
+    return <>
+        { panel ? <Panel {...{ className: "fy-inference-jobs-list rounded", padding: true }}>
+            { jobContent }
+          </Panel> :
+          <>{ jobContent }</>
+        }
+      </>;
   } else {
     return null;
   }

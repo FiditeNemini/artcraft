@@ -1,13 +1,18 @@
-.work-indicator {
-  height: 2.25rem;
-  width: 2.25rem;
-  fill: none;
+@import "scss/colours.scss";
+@import "scss/site-refresh.scss";
 
-  circle, line, polyline {
-  stroke-width: 4px;
-  stroke-linecap: round;
-  stroke: #fff;
-  }
+
+.work-indicator {
+  @include medium-svg;
+  // height: 2.25rem;
+  // width: 2.25rem;
+  // fill: none;
+
+  // circle, line, polyline {
+  //   stroke-width: 4px;
+  //   stroke-linecap: round;
+  //   stroke: #fff;
+  // }
 
   polyline { transform: translate(2px,2px); }
 

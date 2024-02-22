@@ -1,80 +1,47 @@
 import React, { useEffect, useState } from "react";
 import { a, useSpring } from "@react-spring/web";
-import { WorkIndicator } from "components/svg";
-import {
-  FrontendInferenceJobType,
-  InferenceJob,
-} from "@storyteller/components/src/jobs/InferenceJob";
+import { ArrowX, WorkIndicator } from "components/svg";
+import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
+import { CancelJob, CancelJobResponse } from "@storyteller/components/src/api/jobs/CancelJob";
+import { useHover, useSlides } from "hooks";
 import { JobState } from "@storyteller/components/src/jobs/JobStates";
 import { useHistory } from "react-router-dom";
-
-// import { useInterval } from "hooks"; // for animation debugging
 
 interface JobListItem extends InferenceJob {
   failures: (fail: string) => string;
   jobStatusDescription?: any;
   onSelect?: any;
-  refSet?: any;
   resultPaths: { [key: string]: string };
   t?: any;
 }
 
-interface OuterItemProps {
-  className?: string;
-  children?: any;
-  jobToken: string;
-  success: boolean;
-  maybeResultToken?: any;
-  onSelect?: any;
-  refSet?: any;
-  resultPath: string;
-}
-
-const OuterItem = ({
-  className,
-  children,
-  success,
-  jobToken,
-  maybeResultToken,
-  onSelect = () => {},
-  refSet,
-  resultPath,
-}: OuterItemProps) => {
-  const history = useHistory();
-
-  return (
-    <a.div
-      {...{
-        className,
-        id: `ijobitem-${jobToken}`,
-        ...(success && {
-          onClick: () => {
-            history.push(`${resultPath}/${maybeResultToken}`);
-            onSelect();
-          },
-        }),
-        ref: refSet,
-      }}
-    >
-      {children}
-    </a.div>
-  );
-};
+  const BaseAction = ({ success = false, toggleSlide = () => {} }) => <svg {...{
+    className: `fy-inference-job-action${ success ? "-success" : "" }`, 
+    ...success ? {} : { onClick: toggleSlide }
+  }}>
+    <ArrowX {...{ checked: success }}/>
+  </svg>;
+  const StopConfirm = ({ stopClick = () => {}, toggleSlide = () => {} }) => <>
+    Stop job?
+    <div {...{ className: "job-stop-confirm", onClick: stopClick }}>Yes</div>
+    <div {...{ className: "job-stop-cancel", onClick: toggleSlide }}>No</div>
+  </>;
 
 export default function JobItem({
   failures,
   frontendJobType,
   maybeFailureCategory,
+  maybeModelTitle,
   maybeResultToken,
   onSelect,
   jobToken,
   jobState,
   jobStatusDescription,
-  refSet,
   resultPaths,
-  t,
-  ...rest
+  t
 }: JobListItem) {
+  const [ hover, hoverSet = {} ] = useHover({});
+  const history = useHistory();
   const [hasBounced, hasBouncedSet] = useState(false);
 
   // const [jobState,jobStateSet] = useState(0); // for animation debugging
@@ -82,7 +49,7 @@ export default function JobItem({
 
   const jobType = FrontendInferenceJobType[frontendJobType];
   const jobStatus = jobStatusDescription(jobState);
-  const jobStatusClass = jobStatus.toLowerCase().replace("_", "-");
+  // const jobStatusClass = jobStatus.toLowerCase().replace("_", "-");
   const resultPath = resultPaths[jobType];
 
   const dashStatus = () => {
@@ -100,6 +67,15 @@ export default function JobItem({
         return 0;
     }
   };
+
+  const showModel = () => {
+    switch (frontendJobType) {
+      case FrontendInferenceJobType.TextToSpeech: return true;
+      default:
+        return false;
+    }
+  };
+
   const success = jobState === JobState.COMPLETE_SUCCESS;
   const failure =
     jobState === JobState.COMPLETE_FAILURE || jobState === JobState.DEAD;
@@ -115,7 +91,6 @@ export default function JobItem({
   const subtitle = maybeFailureCategory
     ? `${failures(maybeFailureCategory)}`
     : t(`subtitles.${jobStatus}`);
-  const className = `fy-inference-job job-status-${jobStatusClass}`;
 
   useEffect(() => {
     if (!bounce && !hasBounced && success) {
@@ -125,32 +100,63 @@ export default function JobItem({
     }
   }, [bounce, hasBounced, success]);
 
-  return (
-    <OuterItem
-      {...{
-        className,
-        jobToken,
-        maybeResultToken,
-        onSelect,
-        refSet,
-        resultPath,
-        success,
-      }}
-    >
-      <WorkIndicator {...{ failure, stage: dashStatus(), success }} />
-      <div {...{ className: "job-details" }}>
-        <a.h6 {...{ style: headingBounce }}>
-          {t(`${jobType}.${jobStatus}`)}
-        </a.h6>
-        <a.span
-          {...{
-            style: subtitleBounce,
-            className: success ? "result-link" : "",
-          }}
-        >
-          {success ? subtitle + " >" : subtitle}
-        </a.span>
-      </div>
-    </OuterItem>
-  );
+  const [index,indexSet] = useState(0);
+  const toggleSlide = (e: any) => {
+    e.stopPropagation();
+    console.log("👙",index);
+    indexSet(index ? 0 : 1);
+  }
+  const outerProps = (c: string) => ({
+    className: `${ c } fy-inference-job-hover-${
+      hover ? "on" : "off"
+    }${
+      success ? " fy-inference-job-success" : ""
+    }`,
+    onClick: () => {
+      if (success) {
+        history.push(`${resultPath}/${maybeResultToken}`);
+        onSelect();
+      }
+    }
+  });
+
+  const stopClick = (e: any) => {
+    toggleSlide(e);
+    CancelJob(jobToken,{})
+    .then((res: CancelJobResponse) => {});
+  };
+
+  const slides = useSlides({ index, slides: [{ component: BaseAction, props: { success, toggleSlide } },{ component: StopConfirm, props: { stopClick, toggleSlide } }] });
+
+  return <>
+    <div {...{ ...outerProps("fy-inference-job-indicator"), ...hoverSet }}>
+      <WorkIndicator {...{ failure, stage: dashStatus(), success, }} />
+    </div>
+    <div {...{ ...outerProps("fy-inference-job-details"), ...hoverSet }}>
+      <a.h6 {...{ style: headingBounce }}>
+        { t(`${jobType}.${jobStatus}`) }
+      </a.h6>
+      <a.span {...{
+        style: subtitleBounce,
+        className: `fy-inference-job-subtitle${ success ? "-success" : "" }`,
+      }}>
+        { subtitle }
+      </a.span>
+    </div>
+    <div {...{ ...outerProps("fy-inference-job-info"), ...hoverSet }}>
+{     showModel() && <>
+      <div {...{ className: "job-info-label" }}>Model</div>
+      <div {...{ className: "job-info-value" }}>{ maybeModelTitle }</div>
+      </>
+      }
+    </div>
+    <div {...{ ...outerProps(`fy-inference-job-action-frame`), ...hoverSet }}>
+      { slides }
+    </div>
+    {
+      // <div {...{ className: "fy-inference-job-previews" }}>
+      //   {  }
+      // </div>
+    }
+  </>;
 }
