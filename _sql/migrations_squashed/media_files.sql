@@ -107,6 +107,9 @@ CREATE TABLE media_files (
   -- Optional text transcript for audio or video (especially TTS)
   maybe_text_transcript TEXT DEFAULT NULL,
 
+  -- Optional pointer to the prompt that generated this media file, if relevant.
+  maybe_prompt_token VARCHAR(32) DEFAULT NULL,
+
   -- Checksum of the original media
   -- SHA1 hash [SHA2 = CHAR(64), SHA1 = CHAR(40), MD5 = CHAR(32)]
   -- checksum_sha1 CHAR(40) NOT NULL,
@@ -221,6 +224,7 @@ CREATE TABLE media_files (
   KEY fk_maybe_origin_model_type_and_token (maybe_origin_model_type, maybe_origin_model_token),
   KEY index_maybe_batch_token (maybe_batch_token),
   KEY index_media_type (media_type),
+  KEY fk_maybe_prompt_token (maybe_prompt_token),
   KEY index_checksum_sha2 (checksum_sha2),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
   KEY fk_maybe_mod_user_token (maybe_mod_user_token),

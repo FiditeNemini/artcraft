@@ -13,6 +13,7 @@ pub mod media_uploads;
 pub mod model_categories;
 pub mod model_weights;
 pub mod password_reset;
+pub mod prompts;
 pub mod sqlite;
 pub mod tts_inference_jobs;
 pub mod tts_model_upload_jobs;
