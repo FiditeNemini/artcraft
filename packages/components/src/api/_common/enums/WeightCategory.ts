@@ -4,4 +4,5 @@ export enum WeightCategory {
   VC = "voice_conversion",
   ZS = "zero_shot",
   SD = "image_generation",
+  WF = "workflow_config",
 }
