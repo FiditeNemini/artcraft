@@ -30,9 +30,16 @@ import { TtsModelViewPage } from "./pages/tts/tts_model_view/TtsModelViewPage";
 import { TtsResultDeletePage } from "./pages/tts/tts_result_delete/TtsResultDeletePage";
 import { TtsResultViewPage } from "./pages/tts/tts_result_view/TtsResultViewPage";
 import { ContributeIndexPage } from "./pages/contribute/ContributeIndexPage";
+
 import { UploadTtsModelPage } from "./pages/upload/UploadTtsModelPage";
 import { UploadW2lPhotoPage } from "./pages/upload/UploadW2lPhotoPage";
 import { UploadW2lVideoPage } from "./pages/upload/UploadW2lVideoPage";
+import { UploadVocoderPage } from "./pages/upload/UploadVocoderPage";
+import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
+import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
+import UploadLoraWeightPage from "./pages/upload/UploadLoraWeightPage";
+import UploadWorkflowPage from "./pages/upload/UploadWorkflowPage";
+
 import { W2lResultViewPage } from "./pages/w2l/w2l_result_view/W2lResultViewPage";
 import { W2lTemplateListPage } from "./pages/w2l/w2l_template_list/W2lTemplateListPage";
 import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
@@ -61,7 +68,7 @@ import { PatronPage } from "./pages/patrons/PatronPage";
 import { Language } from "@storyteller/components/src/i18n/Language";
 import { VoiceCloneRequestPage } from "./pages/clone_voice_requests/VoiceCloneRequestPage";
 import { VocodesPage } from "./pages/vocodes/VocodesPage";
-import { UploadVocoderPage } from "./pages/upload/UploadVocoderPage";
+
 import { PricingPage } from "./pages/premium/PricingPage";
 import { CheckoutSuccessPage } from "./pages/premium/CheckoutSuccessPage";
 import { CheckoutCancelPage } from "./pages/premium/CheckoutCancelPage";
@@ -78,7 +85,7 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 //import { LandingPage } from "./pages/landing/LandingPage";
 import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
-import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
+
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
@@ -106,16 +113,17 @@ import ExplorePage from "./pages/explore/ExplorePage";
 import SearchPage from "./pages/search/SearchPage";
 import { SearchProvider } from "context/SearchContext";
 import WeightEditPage from "./pages/weight/WeightEditPage";
-import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
+
 import { FooterNav } from "./nav/FooterNav";
 import FbxToGltfPage from "./pages/fbx_to_gltf/FbxToGltfPage";
-import UploadLoraWeightPage from "./pages/upload/UploadLoraWeightPage";
+
 import VideoWorkflowPage from "./pages/video_workflow/VideoWorkflow";
 import ScrollToTop from "./_common/ScrollToTop";
 import TextToImagePage from "./pages/text_to_image/TextToImagePage";
 import DomainConfigProvider from "context/DomainConfigContext";
 import DevUpload from "./pages/dev_upload/DevUpload";
 import DevMediaInput from "./pages/dev_upload/DevMediaInput";
+
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -561,6 +569,12 @@ class PageContainer extends React.Component<
 
                   <Route path="/upload/lora">
                     <UploadLoraWeightPage
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
+                  </Route>
+
+                  <Route path="/upload/workflow">
+                    <UploadWorkflowPage
                       sessionWrapper={this.props.sessionWrapper}
                     />
                   </Route>
