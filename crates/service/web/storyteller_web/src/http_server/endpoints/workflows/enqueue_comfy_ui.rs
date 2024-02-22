@@ -211,7 +211,11 @@ pub async fn enqueue_comfy_ui_handler(
         maybe_workflow_config: request.maybe_workflow_config.clone(),
         maybe_input_file: request.maybe_input_file.clone(),
         maybe_output_path: request.maybe_output_path.clone(),
-        maybe_google_drive_link: None
+        maybe_google_drive_link: None,
+        maybe_title: None,
+        maybe_commit_hash:None,
+        maybe_description:None,
+        creator_visibility:Some(set_visibility)
     };
 
     info!("Creating ComfyUI job record...");

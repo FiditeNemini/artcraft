@@ -56,8 +56,12 @@ const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 pub struct EnqueueWorkFlowRequest {
     pub uuid_idempotency_token: String,
     pub google_drive_link: String, 
+    pub title: String,
+    pub description: String,
+    pub commit_hash: String,
     // Optional cover image for workflow.
     pub maybe_cover_image_media_file_token: Option<MediaFileToken>,
+    pub creator_set_visibility:Option<Visibility>
 }
 
 #[derive(Serialize, ToSchema)]
@@ -118,8 +122,22 @@ pub async fn enqueue_workflow_upload_request(
         return Err(EnqueueWorkFlowRequestError::BadInput("Missing Google Drive Link".to_string()));
     } 
 
+    if request.title.is_empty() {
+        return Err(EnqueueWorkFlowRequestError::BadInput("Missing Title".to_string()));
+    }
+
+    if request.description.is_empty() {
+        return Err(EnqueueWorkFlowRequestError::BadInput("Missing Description".to_string()));
+    }
+
+    if request.commit_hash.is_empty() {
+        return Err(EnqueueWorkFlowRequestError::BadInput("Missing commit hash".to_string()));
+    }
+
     let mut maybe_user_token: Option<UserToken> = None;
-    let visibility = Visibility::Private;
+
+    let visibility = request.creator_set_visibility
+    .unwrap_or(Visibility::Private);
 
     let mut mysql_connection = server_state.mysql_pool.acquire().await.map_err(|err| {
         warn!("MySql pool error: {:?}", err);
@@ -201,7 +219,10 @@ pub async fn enqueue_workflow_upload_request(
     // ==================== INFERENCE ARGS ==================== //
 
     let google_drive_link = request.google_drive_link.clone();
-    
+    let title = request.title.clone();
+    let description = request.description.clone();
+    let commit_hash = request.commit_hash.clone();
+
     let inference_args = WorkflowArgs {
         maybe_sd_model: None,
         maybe_lora_model: None,
@@ -209,7 +230,11 @@ pub async fn enqueue_workflow_upload_request(
         maybe_workflow_config: None,
         maybe_input_file: None,
         maybe_output_path: None,
-        maybe_google_drive_link: Some(google_drive_link)
+        maybe_google_drive_link: Some(google_drive_link),
+        maybe_title: Some(title),
+        maybe_description: Some(description),
+        maybe_commit_hash: Some(commit_hash),
+        creator_visibility: Some(visibility),
     }; 
    
     // create the inference args here
