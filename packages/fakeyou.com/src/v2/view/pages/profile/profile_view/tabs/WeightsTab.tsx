@@ -90,6 +90,7 @@ export default function WeightsTab({ username }: { username: string }) {
     { value: "text_to_speech", label: "Text to speech" },
     { value: "vocoder", label: "Vocoder" },
     { value: "voice_conversion", label: "Voice conversion" },
+    { value: "workflow_config", label: "Workflow config" },
   ];
 
   const sortOptions = [

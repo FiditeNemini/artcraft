@@ -9,12 +9,14 @@ interface Props {
 }
 
 export default function WeightsCards({ props, type }: Props) {
+  console.log(props);
   switch (type) {
     case WeightCategory.TTS:
     case WeightCategory.VC:
     case WeightCategory.ZS:
       return <AudioCard { ...props} showCover />;
     case WeightCategory.SD:
+    case WeightCategory.WF:
       return <ImageCard {...props} />;
     default:
       return <div>Unsupported weight type</div>;
