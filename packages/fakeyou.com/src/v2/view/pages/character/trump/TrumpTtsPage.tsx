@@ -47,6 +47,7 @@ import { InferenceJob } from "@storyteller/components/src/jobs/InferenceJob";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { faVolumeHigh } from "@fortawesome/pro-solid-svg-icons";
+import { Container, Panel } from "components/common";
 
 const PAGE_MODEL_TOKENS = new Set<string>([
   "TM:pmd1wm3kf6az", // Development: "Fake Donald Trump #1"
@@ -378,124 +379,116 @@ function TrumpTtsPage(props: Props) {
   }
 
   return (
-    <div>
+    <Container type="panel">
       <PageHeaderWithImage
         headerImage="/mascot/trump.webp"
         titleIcon={faVolumeHigh}
         title="Donald Trump TTS"
         subText="FakeYou has the very best Donald Trump AI voice on the internet. Use deep
         fake Donald Trump to say your favorite memes."
+        yOffset="60%"
       />
 
-      <div className="container-panel pb-5 mb-4">
-        <div className="panel p-3 py-4 p-md-4">
-          <i className="fas fa-volume-high"></i>
+      <Panel padding={true}>
+        <i className="fas fa-volume-high"></i>
 
-          <div className="d-flex gap-4">
-            <form
-              className="w-100 d-flex flex-column"
-              onSubmit={handleFormSubmit}
-            >
-              {/* Explore Rollout */}
-              <SearchOmnibar
-                allTtsCategories={props.allTtsCategories}
-                allTtsModels={trumpModels}
-                allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
-                allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
-                ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
-                dropdownCategories={props.dropdownCategories}
-                setDropdownCategories={props.setDropdownCategories}
-                selectedCategories={props.selectedCategories}
-                setSelectedCategories={props.setSelectedCategories}
-                maybeSelectedTtsModel={maybeSelectedModel}
-                setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
-                selectedTtsLanguageScope={props.selectedTtsLanguageScope}
-                setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
-              />
-              {/*
+        <div className="d-flex gap-4">
+          <form
+            className="w-100 d-flex flex-column"
+            onSubmit={handleFormSubmit}
+          >
+            {/* Explore Rollout */}
+            <SearchOmnibar
+              allTtsCategories={props.allTtsCategories}
+              allTtsModels={trumpModels}
+              allTtsCategoriesByTokenMap={props.allTtsCategoriesByTokenMap}
+              allTtsModelsByTokenMap={props.allTtsModelsByTokenMap}
+              ttsModelsByCategoryToken={props.ttsModelsByCategoryToken}
+              dropdownCategories={props.dropdownCategories}
+              setDropdownCategories={props.setDropdownCategories}
+              selectedCategories={props.selectedCategories}
+              setSelectedCategories={props.setSelectedCategories}
+              maybeSelectedTtsModel={maybeSelectedModel}
+              setMaybeSelectedTtsModel={props.setMaybeSelectedTtsModel}
+              selectedTtsLanguageScope={props.selectedTtsLanguageScope}
+              setSelectedTtsLanguageScope={props.setSelectedTtsLanguageScope}
+            />
+            {/*
                 
                 
                 EXPLORE OMNIBAR GOES HERE TODO
                 
                 */}
 
-              <div className="row gx-5 gy-5">
-                <div className="col-12 col-lg-6 d-flex flex-column gap-3">
-                  <div className="d-flex flex-column gap-3 h-100">
-                    <div className="d-flex gap-2">
-                      <label className="sub-title pb-0">
-                        {t("tts.TtsModelListPage.form.yourTextLabel")}
-                      </label>
-                    </div>
-                    <textarea
-                      onClick={() => {
-                        Analytics.ttsClickTextInputBox();
-                      }}
-                      onChange={handleChangeText}
-                      className="form-control text-message h-100"
-                      value={props.textBuffer}
-                      placeholder={t(
-                        "tts.TtsModelListPage.form.textInputHint",
-                        {
-                          voice:
-                            props.maybeSelectedTtsModel?.title || "the voice",
-                        }
-                      )}
-                    ></textarea>
-                    {audioLimitAlert}
-                    <div className="d-flex gap-3">
-                      <button
-                        className={speakButtonClass}
-                        disabled={
-                          remainingCharactersButtonDisabled ||
-                          noTextInputButtonDisabled
-                        }
-                        onClick={handleLoading}
-                        type="submit"
-                      >
-                        <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
-                        {t("tts.TtsModelListPage.form.buttons.speak")}
-
-                        {loading && <LoadingIcon />}
-                      </button>
-                      <button
-                        className="btn btn-destructive w-100"
-                        onClick={handleClearClick}
-                        disabled={noTextInputButtonDisabled}
-                      >
-                        <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />
-                        {t("tts.TtsModelListPage.form.buttons.clear")}
-                      </button>
-                    </div>
+            <div className="row gx-5 gy-5">
+              <div className="col-12 col-lg-6 d-flex flex-column gap-3">
+                <div className="d-flex flex-column gap-3 h-100">
+                  <div className="d-flex gap-2">
+                    <label className="sub-title pb-0">
+                      {t("tts.TtsModelListPage.form.yourTextLabel")}
+                    </label>
                   </div>
-                </div>
-                <div className="col-12 col-lg-6">
-                  <div className="d-flex flex-column gap-3">
-                    <h4 className="text-center text-lg-start">
-                      <FontAwesomeIcon
-                        icon={faBarsStaggered}
-                        className="me-3"
-                      />
-                      {t("tts.TtsModelListPage.sessionTtsResultsLabel")}
-                    </h4>
-                    <div className="d-flex flex-column gap-3 session-tts-section">
-                      <SessionTtsInferenceResultList
-                        inferenceJobs={props.inferenceJobs}
-                        ttsInferenceJobs={props.ttsInferenceJobs}
-                        sessionSubscriptionsWrapper={
-                          props.sessionSubscriptionsWrapper
-                        }
-                      />
-                    </div>
+                  <textarea
+                    onClick={() => {
+                      Analytics.ttsClickTextInputBox();
+                    }}
+                    onChange={handleChangeText}
+                    className="form-control text-message h-100"
+                    value={props.textBuffer}
+                    placeholder={t("tts.TtsModelListPage.form.textInputHint", {
+                      voice: props.maybeSelectedTtsModel?.title || "the voice",
+                    })}
+                  ></textarea>
+                  {audioLimitAlert}
+                  <div className="d-flex gap-3">
+                    <button
+                      className={speakButtonClass}
+                      disabled={
+                        remainingCharactersButtonDisabled ||
+                        noTextInputButtonDisabled
+                      }
+                      onClick={handleLoading}
+                      type="submit"
+                    >
+                      <FontAwesomeIcon icon={faVolumeHigh} className="me-2" />
+                      {t("tts.TtsModelListPage.form.buttons.speak")}
+
+                      {loading && <LoadingIcon />}
+                    </button>
+                    <button
+                      className="btn btn-destructive w-100"
+                      onClick={handleClearClick}
+                      disabled={noTextInputButtonDisabled}
+                    >
+                      <FontAwesomeIcon icon={faDeleteLeft} className="me-2" />
+                      {t("tts.TtsModelListPage.form.buttons.clear")}
+                    </button>
                   </div>
                 </div>
               </div>
-              {maybeError}
-            </form>
-          </div>
+              <div className="col-12 col-lg-6">
+                <div className="d-flex flex-column gap-3">
+                  <h4 className="text-center text-lg-start">
+                    <FontAwesomeIcon icon={faBarsStaggered} className="me-3" />
+                    {t("tts.TtsModelListPage.sessionTtsResultsLabel")}
+                  </h4>
+                  <div className="d-flex flex-column gap-3 session-tts-section">
+                    <SessionTtsInferenceResultList
+                      inferenceJobs={props.inferenceJobs}
+                      ttsInferenceJobs={props.ttsInferenceJobs}
+                      sessionSubscriptionsWrapper={
+                        props.sessionSubscriptionsWrapper
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {maybeError}
+          </form>
         </div>
-      </div>
-    </div>
+      </Panel>
+    </Container>
   );
 }
 
