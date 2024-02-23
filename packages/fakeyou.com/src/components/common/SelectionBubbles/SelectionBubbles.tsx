@@ -43,25 +43,11 @@ export default function SelectionBubbles({
     if (bubblesRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = bubblesRef.current;
       const isAtEnd = scrollWidth - Math.round(scrollLeft + clientWidth) <= 1;
-      const isAtStart = scrollLeft <= 1; // Check if at the start
+      const isAtStart = scrollLeft <= 1;
       setShowGradient(!isAtEnd);
       setShowLeftGradient(!isAtStart);
     }
   };
-
-  const checkForOverflowContent = () => {
-    if (bubblesRef.current) {
-      const { scrollWidth, clientWidth } = bubblesRef.current;
-      const isOverflowing = scrollWidth > clientWidth;
-      setShowGradient(isOverflowing);
-    }
-  };
-
-  useEffect(() => {
-    checkForOverflowContent();
-    window.addEventListener("resize", checkForOverflowContent);
-    return () => window.removeEventListener("resize", checkForOverflowContent);
-  }, [options]);
 
   useEffect(() => {
     if (bubblesRef.current) {
