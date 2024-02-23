@@ -62,7 +62,7 @@ export default function LandingDemo({
   const placeholderTexts = [
     "Type here and hear it in your favorite voice.",
     "What would you like to hear? Type it in!",
-    "Your words, our voices. Start typing...",
+    "Your words, different voices. Start typing...",
     "Enter text, get speech. Try it out!",
     "Say it without speaking. Type something!",
     "Make this voice say what you want.",
@@ -72,7 +72,7 @@ export default function LandingDemo({
     "Enter the text you want the voice to say here...",
     "Try using this voice to make a custom greeting, away message, or something special for your friends.",
     "Your words, our voice. Create a personal message now.",
-    "Draft a heartfelt note and let our voice deliver it.",
+    "Draft a heartfelt note and let the voice deliver it.",
     "Envision your story being told. Start typing here.",
     "Got a script? Type it, and we'll voice it for you.",
     "Craft an inspiring quote and listen to it in any voice.",
