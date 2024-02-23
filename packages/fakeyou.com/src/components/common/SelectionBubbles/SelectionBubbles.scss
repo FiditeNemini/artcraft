@@ -11,7 +11,18 @@
     top: 50%;
     right: 0px;
     transform: translateY(-50%);
-    color: rgba($white, 0.2);
+    color: rgba($white, 0.3);
+    pointer-events: none;
+    transition: all 0.4s;
+  }
+
+  .scroll-indicator-left {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    left: 0px;
+    transform: translateY(-50%);
+    color: rgba($white, 0.3);
     pointer-events: none;
     transition: all 0.4s;
   }
@@ -22,8 +33,21 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: 80px;
+    width: 60px;
     background: linear-gradient(to right, rgba($panel, 0), $panel);
+    pointer-events: none;
+    display: none;
+    transition: all 0.4s;
+  }
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 60px;
+    background: linear-gradient(to left, rgba($panel, 0), $panel);
     pointer-events: none;
     display: none;
     transition: all 0.4s;
@@ -31,7 +55,10 @@
 
   &.show-gradient:after {
     display: block;
-    transition: all 0.4s;
+  }
+
+  &.show-left-gradient:before {
+    display: block;
   }
 }
 
