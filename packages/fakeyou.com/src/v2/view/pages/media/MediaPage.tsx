@@ -18,6 +18,7 @@ import {
   faFileCircleXmark,
   faArrowRightArrowLeft,
   faVideoPlus,
+  faCopy,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -44,7 +45,7 @@ export default function MediaPage() {
   const ratings = useRatings();
   const {
     media: mediaFile,
-    // prompt,
+    prompt,
     remove,
     status,
   } = useMedia({
@@ -59,6 +60,8 @@ export default function MediaPage() {
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
+  const [copyPositiveButtonText, setCopyPositiveButtonText] = useState("Copy");
+  const [copyNegativeButtonText, setCopyNegativeButtonText] = useState("Copy");
 
   useEffect(() => {
     if (batchToken) {
@@ -85,6 +88,19 @@ export default function MediaPage() {
   const openDeleteModal = () => setIsDeleteModalOpen(true);
 
   const deleteMedia = () => remove(!!user?.can_ban_users);
+
+  const copyToClipboard = async (
+    text: string,
+    setButtonText: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setButtonText("Copied!");
+      setTimeout(() => setButtonText("Copy"), 2000); // Change back after 2 seconds
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
 
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
@@ -126,10 +142,59 @@ export default function MediaPage() {
         }
 
         return (
-          <SdBatchMediaPanel
-            key={images.length}
-            images={mediaFile.maybe_batch_token ? images : sdMediaImage}
-          />
+          <>
+            <SdBatchMediaPanel
+              key={images.length}
+              images={mediaFile.maybe_batch_token ? images : sdMediaImage}
+            />
+            {prompt?.maybe_positive_prompt && (
+              <Panel padding={true} className="mt-3">
+                <div className="d-flex gap-3 align-items-center mb-2">
+                  <h6 className="fw-semibold mb-0 flex-grow-1">Prompt</h6>
+                  <Button
+                    icon={faCopy}
+                    onClick={() =>
+                      copyToClipboard(
+                        prompt.maybe_positive_prompt || "",
+                        setCopyPositiveButtonText
+                      )
+                    }
+                    label={copyPositiveButtonText}
+                    variant="link"
+                    className="fs-7"
+                  />
+                </div>
+                <div className="panel-inner p-2 rounded">
+                  <p className="fs-7">{prompt.maybe_positive_prompt}</p>
+                </div>
+
+                {prompt?.maybe_negative_prompt && (
+                  <>
+                    <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                      <h6 className="fw-semibold mb-0 flex-grow-1">
+                        Negative Prompt
+                      </h6>
+                      <Button
+                        icon={faCopy}
+                        onClick={() =>
+                          copyToClipboard(
+                            prompt.maybe_negative_prompt || "",
+                            setCopyNegativeButtonText
+                          )
+                        }
+                        label={copyNegativeButtonText}
+                        variant="link"
+                        className="fs-7"
+                      />
+                    </div>
+                    <div className="panel-inner p-2 rounded">
+                      <p className="fs-7">{prompt.maybe_negative_prompt}</p>
+                    </div>
+                  </>
+                )}
+              </Panel>
+            )}
+          </>
         );
       case MediaFileType.BVH:
         const bvhUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
