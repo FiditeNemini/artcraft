@@ -81,6 +81,7 @@ use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user
 use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
 use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
 use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
+use crate::http_server::endpoints::prompts::get_prompt::get_prompt_handler;
 use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
 use crate::http_server::endpoints::service::public_info_handler::get_public_info_handler;
 use crate::http_server::endpoints::stats::get_unified_queue_stats::get_unified_queue_stats_handler;
@@ -258,7 +259,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   // ==================== Prompts ====================
 
   let mut app = RouteBuilder::from_app(app)
-      .add_get("/v1/prompts/{token}", get_profile_handler)
+      .add_get("/v1/prompts/{token}", get_prompt_handler)
       .into_app();
 
   // ==================== Format Conversion ====================
