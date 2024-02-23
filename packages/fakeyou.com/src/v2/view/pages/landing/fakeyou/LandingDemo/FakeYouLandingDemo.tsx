@@ -21,7 +21,7 @@ import {
   GetTtsInferenceJobStatus,
   GetTtsInferenceJobStatusIsOk,
 } from "@storyteller/components/src/api/jobs/GetTtsInferenceJobStatus";
-import RandomTexts from "./RandomTexts";
+import { RandomTexts, PlaceholderTexts } from "./RandomTexts";
 import "./LandingDemo.scss";
 import { isMobile } from "react-device-detect";
 
@@ -59,34 +59,12 @@ export default function LandingDemo({
   );
   const [placeholder, setPlaceholder] = useState("");
 
-  const placeholderTexts = [
-    "Type here and hear it in your favorite voice.",
-    "What would you like to hear? Type it in!",
-    "Your words, different voices. Start typing...",
-    "Enter text, get speech. Try it out!",
-    "Say it without speaking. Type something!",
-    "Make this voice say what you want.",
-    "Type a message and press play.",
-    "Imagine it, then type it. Hear it out loud.",
-    "Your text's voiceover starts here. Go ahead.",
-    "Enter the text you want the voice to say here...",
-    "Try using this voice to make a custom greeting, away message, or something special for your friends.",
-    "Your words, our voice. Create a personal message now.",
-    "Draft a heartfelt note and let the voice deliver it.",
-    "Envision your story being told. Start typing here.",
-    "Got a script? Type it, and we'll voice it for you.",
-    "Craft an inspiring quote and listen to it in any voice.",
-    "Compose a catchy slogan and hear how it sounds aloud.",
-    "Enter the text you want the voice to say here...",
-    "You can make a video, animation, or any content you want with your favorite voices.",
-  ];
-
   useEffect(() => {
     // Randomize placeholder text on component mount
     const randomPlaceholderIndex = Math.floor(
-      Math.random() * placeholderTexts.length
+      Math.random() * PlaceholderTexts.length
     );
-    setPlaceholder(placeholderTexts[randomPlaceholderIndex]);
+    setPlaceholder(PlaceholderTexts[randomPlaceholderIndex]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [textBuffer]);
 
