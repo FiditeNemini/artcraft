@@ -8,7 +8,7 @@ use errors::AnyhowResult;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 
-pub struct InsertArgs<'e, 'c,  E>
+pub struct InsertPromptArgs<'e, 'c,  E>
   where E: 'e + Executor<'c, Database = MySql>
 {
   /// If we need to generate the prompt token upfront, this will be the token to use for the insert.
@@ -34,7 +34,7 @@ pub struct InsertArgs<'e, 'c,  E>
   pub phantom: PhantomData<&'c E>,
 }
 
-pub async fn insert_prompt<'e, 'c : 'e, E>(args: InsertArgs<'e, 'c, E>)
+pub async fn insert_prompt<'e, 'c : 'e, E>(args: InsertPromptArgs<'e, 'c, E>)
   -> AnyhowResult<PromptToken>
   where E: 'e + Executor<'c, Database = MySql>
 {

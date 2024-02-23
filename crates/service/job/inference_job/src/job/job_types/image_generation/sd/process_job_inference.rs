@@ -14,11 +14,14 @@ use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCat
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::by_table::prompts::prompt_type::PromptType;
 use filesys::path_to_string::path_to_string;
 use mysql_queries::queries::batch_generations::insert_batch_generation_records::{insert_batch_generation_records, InsertBatchArgs};
 use mysql_queries::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
+use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
 use tokens::tokens::batch_generations::BatchGenerationToken;
+use tokens::tokens::prompts::PromptToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -71,7 +74,6 @@ pub async fn process_job_inference(
   // // Unpack loRA and Checkpoint
   // // run inference by downloading from google drive.
   let lora_token = sd_args.maybe_lora_model_token;
-///  let weight_token = sd_args.maybe_sd_model_token.clone();
 
   let sd_model_weight_token = match sd_args.maybe_sd_model_token {
     None => return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("no sd model token for job!"))),
@@ -81,7 +83,7 @@ pub async fn process_job_inference(
   let sd_model_weight = get_weight_by_token(
     sd_model_weight_token,
     false,
-    &deps.db.mysql_pool
+    &deps.db.mysql_pool,
   ).await?;
 
   let sd_model_weight = match sd_model_weight {
@@ -97,7 +99,8 @@ pub async fn process_job_inference(
 
   info!("sd_checkpoint_path: {:?}", sd_checkpoint_path);
 
-  // origin file name needs to be just the file name  /tmp/downloads_long_lived/temp_stable_diffusion_inference_32.8qJJljxWWZeD/output_0.png
+  // origin file name needs to be just the file name
+  // /tmp/downloads_long_lived/temp_stable_diffusion_inference_32.8qJJljxWWZeD/output_0.png
   // ignore if no lora token
 
   let mut maybe_lora_record = None;
@@ -106,7 +109,7 @@ pub async fn process_job_inference(
     maybe_lora_record = get_weight_by_token(
       &token,
       false,
-      &deps.db.mysql_pool
+      &deps.db.mysql_pool,
     ).await?;
   }
 
@@ -151,10 +154,10 @@ pub async fn process_job_inference(
   let stderr_output_file = work_temp_dir.path().join("sd_err.txt");
   let stdout_output_file = work_temp_dir.path().join("sd_out.txt");
 
-  let number_of_samples = match sd_args.maybe_number_of_samples {
-    Some(val) => val,
-    None => 20,
-  };
+  let number_of_samples = sd_args.maybe_number_of_samples.unwrap_or(20);
+
+  let positive_prompt = prompt.clone();
+  let maybe_negative_prompt = sd_args.maybe_n_prompt.clone();
 
   let inference_start_time = Instant::now();
 
@@ -163,8 +166,8 @@ pub async fn process_job_inference(
     output_file: output_path.clone(),
     stderr_output_file: &stderr_output_file,
     stdout_output_file: &stdout_output_file,
-    prompt: prompt.clone(),
-    negative_prompt: sd_args.maybe_n_prompt.clone().unwrap_or_default(),
+    prompt: positive_prompt.clone(),
+    negative_prompt: maybe_negative_prompt.clone().unwrap_or_default(),
     number_of_samples,
     samplers: sd_args.maybe_sampler.clone().unwrap_or(String::from("Euler a")),
     width: sd_args.maybe_width.unwrap_or(512),
@@ -232,6 +235,7 @@ pub async fn process_job_inference(
   };
 
   let batch_token = BatchGenerationToken::generate();
+  let prompt_token = PromptToken::generate();
 
   let mut maybe_first_media_file_token = None;
 
@@ -244,7 +248,7 @@ pub async fn process_job_inference(
 
     let metadata = remote_cloud_file_client.upload_file(
       Box::new(MediaImagePngDescriptor {}),
-      file_path.as_ref()
+      file_path.as_ref(),
     ).await?;
 
     let bucket_details = match metadata.bucket_details {
@@ -267,6 +271,7 @@ pub async fn process_job_inference(
       maybe_origin_model_token: Some(sd_model_weight_token.clone()),
       maybe_origin_filename: Some(file_path),
       maybe_batch_token: Some(&batch_token),
+      maybe_prompt_token: Some(&prompt_token),
       maybe_mime_type: Some(metadata.mimetype.as_ref()),
       file_size_bytes: metadata.file_size_bytes,
       maybe_duration_millis: Some(inference_duration.as_millis() as u64),
@@ -298,7 +303,11 @@ pub async fn process_job_inference(
     entries.push(batch_generation_entity);
   }
 
-  let mut transaction = mysql_pool.begin().await.unwrap();
+  // TODO(bt,2024-02-22): This transaction should wrap everything
+  let mut transaction = mysql_pool
+      .begin()
+      .await
+      .map_err(|e| ProcessSingleJobError::from_anyhow_error(anyhow!(e)))?;
 
   let batch_token_result = insert_batch_generation_records(InsertBatchArgs {
     entries,
@@ -316,6 +325,27 @@ pub async fn process_job_inference(
       );
     }
   };
+
+  // NB: Don't fail the job if the query fails.
+  let prompt_result = insert_prompt(InsertPromptArgs {
+    maybe_apriori_prompt_token: Some(&prompt_token),
+    prompt_type: PromptType::StableDiffusion,
+    maybe_creator_user_token: job.maybe_creator_user_token_typed.as_ref(),
+    maybe_positive_prompt: Some(&positive_prompt),
+    maybe_negative_prompt: maybe_negative_prompt.as_deref(),
+    maybe_other_args: None, // TODO(bt,2024-02-22): Support other arguments
+    creator_ip_address: &job.creator_ip_address,
+    mysql_executor: &mut *transaction,
+    phantom: Default::default(),
+  }).await;
+
+  match prompt_result {
+    Ok(_token) => {}
+    Err(err) => {
+      error!("No prompt result token? something has failed: {:?}", err);
+      return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No prompt result token? something has failed.")));
+    }
+  }
 
   // TODO(bt,2024-02-12): Return the batch token instead. (We're not ready for that.)
   Ok(JobSuccessResult {

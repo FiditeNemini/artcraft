@@ -11,6 +11,7 @@ use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::users::UserToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 use crate::payloads::generic_inference_args::generic_inference_args::GenericInferenceArgs;
@@ -42,6 +43,8 @@ pub struct AvailableInferenceJob {
 
   // User information to propagate downstream
   pub maybe_creator_user_token: Option<String>,
+  /// Same user token, but a `UserToken`.
+  pub maybe_creator_user_token_typed: Option<UserToken>,
   pub maybe_creator_anonymous_visitor_token: Option<String>,
   pub creator_ip_address: String,
   pub creator_set_visibility: Visibility,
@@ -102,12 +105,17 @@ pub async fn list_available_generic_inference_jobs(
 
   let job_records : Vec<AvailableInferenceJob> = job_records.into_iter()
       .map(|record : AvailableInferenceJobRawInternal| {
-        let record = AvailableInferenceJob {
+        let maybe_creator_user_token_typed = record.maybe_creator_user_token
+            .as_ref()
+            .map(|s| UserToken::new_from_str(s));
+
+        Ok(AvailableInferenceJob {
           id: GenericInferenceJobId(record.id),
           inference_job_token: InferenceJobToken::new(record.inference_job_token),
           uuid_idempotency_token: record.uuid_idempotency_token,
           creator_ip_address: record.creator_ip_address,
-          maybe_creator_user_token: record.maybe_creator_user_token,
+          maybe_creator_user_token: record.maybe_creator_user_token.clone(),
+          maybe_creator_user_token_typed,
           maybe_creator_anonymous_visitor_token: record.maybe_creator_anonymous_visitor_token,
           maybe_cover_image_media_file_token: record.maybe_cover_image_media_file_token
               .map(|s| MediaFileToken::new_from_str(&s)),
@@ -143,8 +151,7 @@ pub async fn list_available_generic_inference_jobs(
           updated_at: record.updated_at,
           retry_at: record.retry_at,
           database_clock: record.database_clock,
-        };
-        Ok(record)
+        })
       })
       // NB: Magic Vec<Result> -> Result<Vec<>>
       // https://stackoverflow.com/a/63798748

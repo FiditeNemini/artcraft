@@ -11,6 +11,7 @@ use errors::AnyhowResult;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -41,6 +42,7 @@ pub struct InsertArgs<'a> {
     pub maybe_video_encoding: Option<&'a str>,
     pub maybe_frame_width: Option<u32>,
     pub maybe_frame_height: Option<u32>,
+    pub maybe_prompt_token: Option<&'a PromptToken>,
     pub checksum_sha2: &'a str,
 
     // Storage details
@@ -114,7 +116,8 @@ pub async fn insert_media_file_generic(
             maybe_audio_encoding = ?, 
             maybe_video_encoding = ?, 
             maybe_frame_width = ?, 
-            maybe_frame_height = ?, 
+            maybe_frame_height = ?,
+            maybe_prompt_token = ?,
             checksum_sha2 = ?,
 
             public_bucket_directory_hash = ?, 
@@ -146,7 +149,7 @@ pub async fn insert_media_file_generic(
         args.maybe_origin_filename,
 
         is_batch_generated,
-        args.maybe_batch_token.map(|e| e.to_string()),
+        args.maybe_batch_token.map(|e| e.as_str()),
 
         args.maybe_mime_type,
         args.file_size_bytes, 
@@ -154,7 +157,8 @@ pub async fn insert_media_file_generic(
         args.maybe_audio_encoding,
         args.maybe_video_encoding,
         args.maybe_frame_width, 
-        args.maybe_frame_height, 
+        args.maybe_frame_height,
+        args.maybe_prompt_token.map(|e| e.as_str()),
         args.checksum_sha2,
 
         args.public_bucket_directory_hash,
