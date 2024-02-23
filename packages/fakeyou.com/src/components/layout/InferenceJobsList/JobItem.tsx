@@ -15,17 +15,18 @@ interface JobListItem extends InferenceJob {
   t?: any;
 }
 
-  const BaseAction = ({ success = false, toggleSlide = () => {} }) => <svg {...{
-    className: `fy-inference-job-action${ success ? "-success" : "" }`, 
-    ...success ? {} : { onClick: toggleSlide }
-  }}>
-    <ArrowX {...{ checked: success }}/>
-  </svg>;
-  const StopConfirm = ({ stopClick = () => {}, toggleSlide = () => {} }) => <>
-    Stop job?
-    <div {...{ className: "job-stop-confirm", onClick: stopClick }}>Yes</div>
-    <div {...{ className: "job-stop-cancel", onClick: toggleSlide }}>No</div>
-  </>;
+const BaseAction = ({ canStop = false, success = false, toggleSlide = () => {} }) => canStop || success ? <svg {...{
+  className: `fy-inference-job-action${ success ? "-success" : "" }`, 
+  ...success ? {} : { onClick: toggleSlide }
+}}>
+  <ArrowX {...{ checked: success }}/>
+</svg> : <></>;
+
+const StopConfirm = ({ stopClick = () => {}, toggleSlide = () => {} }) => <>
+  Stop job?
+  <div {...{ className: "job-stop-confirm", onClick: stopClick }}>Yes</div>
+  <div {...{ className: "job-stop-cancel", onClick: toggleSlide }}>No</div>
+</>;
 
 export default function JobItem({
   failures,
@@ -40,23 +41,28 @@ export default function JobItem({
   resultPaths,
   t
 }: JobListItem) {
-  const [ hover, hoverSet = {} ] = useHover({});
   const history = useHistory();
+  const [ hover, hoverSet = {} ] = useHover({});
   const [hasBounced, hasBouncedSet] = useState(false);
-
-  // const [jobState,jobStateSet] = useState(0); // for animation debugging
-  // useInterval({ interval: 3000, onTick: ({ index }: { index: number }) => { jobStateSet(index); if (!index) hasBouncedSet(false) } });
-
+  const [bounce, bounceSet] = useState(false);
+  const [index,indexSet] = useState(0);
   const jobType = FrontendInferenceJobType[frontendJobType];
   const jobStatus = jobStatusDescription(jobState);
   // const jobStatusClass = jobStatus.toLowerCase().replace("_", "-");
   const resultPath = resultPaths[jobType];
+  const success = jobState === JobState.COMPLETE_SUCCESS;
+  const failure =
+    jobState === JobState.COMPLETE_FAILURE || jobState === JobState.DEAD || jobState === JobState.CANCELED_BY_USER;
+
+      // const [jobState,jobStateSet] = useState(0); // for animation debugging
+  // useInterval({ interval: 3000, onTick: ({ index }: { index: number }) => { jobStateSet(index); if (!index) hasBouncedSet(false) } });
 
   const dashStatus = () => {
     switch (jobState) {
       case JobState.COMPLETE_SUCCESS:
       case JobState.COMPLETE_FAILURE:
       case JobState.DEAD:
+      case JobState.CANCELED_BY_USER:
         return 2;
       case JobState.STARTED:
       case JobState.ATTEMPT_FAILED:
@@ -68,18 +74,25 @@ export default function JobItem({
     }
   };
 
+  const canStop = () => {
+    switch (jobState) {
+      case JobState.ATTEMPT_FAILED:
+      case JobState.PENDING:
+      case JobState.UNKNOWN: return true;
+      default: return false;
+    }
+  };
+
   const showModel = () => {
     switch (frontendJobType) {
+      case FrontendInferenceJobType.VoiceConversion:
+      case FrontendInferenceJobType.VoiceDesignerTts:
+      case FrontendInferenceJobType.ImageGeneration: 
       case FrontendInferenceJobType.TextToSpeech: return true;
       default:
         return false;
     }
   };
-
-  const success = jobState === JobState.COMPLETE_SUCCESS;
-  const failure =
-    jobState === JobState.COMPLETE_FAILURE || jobState === JobState.DEAD;
-  const [bounce, bounceSet] = useState(false);
 
   const makeBounce = (amount = 0, delay = 0) => ({
     delay,
@@ -92,18 +105,8 @@ export default function JobItem({
     ? `${failures(maybeFailureCategory)}`
     : t(`subtitles.${jobStatus}`);
 
-  useEffect(() => {
-    if (!bounce && !hasBounced && success) {
-      hasBouncedSet(true);
-      bounceSet(true);
-      setTimeout(() => bounceSet(false), 250);
-    }
-  }, [bounce, hasBounced, success]);
-
-  const [index,indexSet] = useState(0);
   const toggleSlide = (e: any) => {
     e.stopPropagation();
-    console.log("👙",index);
     indexSet(index ? 0 : 1);
   }
   const outerProps = (c: string) => ({
@@ -121,12 +124,28 @@ export default function JobItem({
   });
 
   const stopClick = (e: any) => {
-    toggleSlide(e);
-    CancelJob(jobToken,{})
-    .then((res: CancelJobResponse) => {});
+    if (canStop()) {
+      toggleSlide(e);
+      CancelJob(jobToken,{})
+      .then((res: CancelJobResponse) => {});
+    }
   };
 
-  const slides = useSlides({ index, slides: [{ component: BaseAction, props: { success, toggleSlide } },{ component: StopConfirm, props: { stopClick, toggleSlide } }] });
+  const slides = useSlides({
+    index,
+    slides:[
+      { component: BaseAction, props: { success, toggleSlide, canStop: canStop() } },
+      { component: StopConfirm, props: { stopClick, toggleSlide } }
+    ]
+  });
+
+  useEffect(() => {
+    if (!bounce && !hasBounced && success) {
+      hasBouncedSet(true);
+      bounceSet(true);
+      setTimeout(() => bounceSet(false), 250);
+    }
+  }, [bounce, hasBounced, success]);
 
   return <>
     <div {...{ ...outerProps("fy-inference-job-indicator"), ...hoverSet }}>

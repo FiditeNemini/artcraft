@@ -7,21 +7,21 @@ export interface IntervalEvent {
 }
 
 export default function useInterval(props: any) {
-  const things = useRef({
+  const config = useRef({
     index: props.start || 0,
     ...props
   });
 
   useEffect(() => {
     const ticker = setInterval(() => {
-      const { end = 3, index, onTick = (e: IntervalEvent) => {}, start = 0 } = things.current;
-    	things.current.index = index < end ? index + 1 : start;
-      onTick(things.current);
+      const { end = 3, index, onTick = (e: IntervalEvent) => {}, start = 0 } = config.current;
+    	config.current.index = index < end ? index + 1 : start;
+      onTick(config.current);
 
-    }, things.current.interval);
+    }, config.current.interval);
 
     return () => clearInterval(ticker);
   },[]);
 
-  return things.current;
+  return config.current;
 };

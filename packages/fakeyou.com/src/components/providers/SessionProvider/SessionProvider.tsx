@@ -10,6 +10,7 @@ interface Props {
   querySession: any;
   querySubscriptions: any;
   sessionFetched: boolean;
+  sessionSubscriptions: any;
   sessionWrapper?: any;
 }
 
@@ -18,6 +19,7 @@ export default function SessionProvider({
   querySession,
   querySubscriptions,
   sessionFetched,
+  sessionSubscriptions,
   sessionWrapper,
 }: Props) {
   const sessionResponse = sessionWrapper?.sessionStateResponse || {
@@ -60,6 +62,7 @@ export default function SessionProvider({
           querySession,
           querySubscriptions,
           sessionFetched,
+          sessionSubscriptions,
           studioAccessCheck,
           user,
           userTokenMatch,

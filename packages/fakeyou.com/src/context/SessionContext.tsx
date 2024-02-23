@@ -21,6 +21,7 @@ interface SessionContextType {
   querySession?: any;
   querySubscriptions?: any;
   sessionFetched: boolean;
+  sessionSubscriptions?: any;
   studioAccessCheck: (x:any) => any,
   user?: any;
   userTokenMatch: (token: string) => boolean;

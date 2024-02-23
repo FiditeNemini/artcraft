@@ -15,6 +15,7 @@ import useMedia from './useMedia';
 import useModal from './useModal';
 import useOnScreen from "./useOnScreen";
 import usePrevious from './usePrevious';
+import useQueueStats from './useQueueStats';
 import useRatings from './useRatings';
 import useSdUpload from './useSdUpload';
 import useSession from './useSession';
@@ -40,6 +41,7 @@ export {
   useModal,
   useOnScreen,
   usePrevious,
+  useQueueStats,
   useRatings,
   useSdUpload,
   useSession,
