@@ -10,6 +10,7 @@ export interface MediaFile {
   public_bucket_path: string;
   maybe_batch_token: string;
   maybe_creator_user: UserDetailsLight | null;
+  maybe_prompt_token: string | null;
   creator_set_visibility: string;
   created_at: Date;
   updated_at: Date;

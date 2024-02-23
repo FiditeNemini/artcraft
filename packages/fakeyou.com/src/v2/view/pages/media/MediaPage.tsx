@@ -44,6 +44,7 @@ export default function MediaPage() {
   const ratings = useRatings();
   const {
     media: mediaFile,
+    // prompt,
     remove,
     status,
   } = useMedia({
