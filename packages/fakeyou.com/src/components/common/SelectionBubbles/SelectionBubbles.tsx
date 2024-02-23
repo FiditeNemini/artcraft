@@ -59,6 +59,14 @@ export default function SelectionBubbles({
     }
   }, [options]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      handleScroll();
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div
       className={`selection-bubbles-wrapper ${
