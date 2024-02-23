@@ -60,10 +60,25 @@ export default function LandingDemo({
   const [placeholder, setPlaceholder] = useState("");
 
   const placeholderTexts = [
-    "You can make a video, animation, or any content you want with your favorite voices.",
-    "Try using this voice to make a custom greeting, away message, or something special for your friends.",
-    "You can change what I say with this voice. Just type it!",
+    "Type here and hear it in your favorite voice.",
+    "What would you like to hear? Type it in!",
+    "Your words, our voices. Start typing...",
+    "Enter text, get speech. Try it out!",
+    "Say it without speaking. Type something!",
+    "Make this voice say what you want.",
+    "Type a message and press play.",
+    "Imagine it, then type it. Hear it out loud.",
+    "Your text's voiceover starts here. Go ahead.",
     "Enter the text you want the voice to say here...",
+    "Try using this voice to make a custom greeting, away message, or something special for your friends.",
+    "Your words, our voice. Create a personal message now.",
+    "Draft a heartfelt note and let our voice deliver it.",
+    "Envision your story being told. Start typing here.",
+    "Got a script? Type it, and we'll voice it for you.",
+    "Craft an inspiring quote and listen to it in any voice.",
+    "Compose a catchy slogan and hear how it sounds aloud.",
+    "Enter the text you want the voice to say here...",
+    "You can make a video, animation, or any content you want with your favorite voices.",
   ];
 
   useEffect(() => {
@@ -73,7 +88,7 @@ export default function LandingDemo({
     );
     setPlaceholder(placeholderTexts[randomPlaceholderIndex]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [textBuffer]);
 
   const handleChangeText = (ev: React.FormEvent<HTMLTextAreaElement>) => {
     const textValue = (ev.target as HTMLTextAreaElement).value;
