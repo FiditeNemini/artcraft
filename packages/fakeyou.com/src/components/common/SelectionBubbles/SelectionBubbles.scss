@@ -7,7 +7,7 @@
 
   .scroll-indicator {
     position: absolute;
-    z-index: 2;
+    z-index: 3;
     top: 50%;
     right: 0px;
     transform: translateY(-50%);
@@ -18,7 +18,7 @@
 
   .scroll-indicator-left {
     position: absolute;
-    z-index: 2;
+    z-index: 3;
     top: 50%;
     left: 0px;
     transform: translateY(-50%);
@@ -30,6 +30,7 @@
   &:after {
     content: "";
     position: absolute;
+    z-index: 2;
     top: 0;
     right: 0;
     bottom: 0;
@@ -43,6 +44,7 @@
   &:before {
     content: "";
     position: absolute;
+    z-index: 2;
     top: 0;
     left: 0;
     bottom: 0;
