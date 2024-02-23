@@ -347,6 +347,11 @@ pub async fn process_job_inference(
     }
   }
 
+  let _r = transaction
+      .commit()
+      .await
+      .map_err(|e| ProcessSingleJobError::from_anyhow_error(anyhow!(e)))?;
+
   // TODO(bt,2024-02-12): Return the batch token instead. (We're not ready for that.)
   Ok(JobSuccessResult {
     inference_duration,
