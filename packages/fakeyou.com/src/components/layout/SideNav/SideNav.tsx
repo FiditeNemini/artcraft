@@ -23,20 +23,12 @@ import {
   faTransporter,
   faClipboardList,
 } from "@fortawesome/pro-solid-svg-icons";
-
-import {
-  GetQueueStats,
-  GetQueueStatsIsOk,
-  GetQueueStatsSuccessResponse,
-} from "@storyteller/components/src/api/stats/queues/GetQueueStats";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
-import { useLocalize } from "hooks";
+import { useInferenceJobs, useLocalize } from "hooks";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Button } from "components/common";
 import { WebUrl } from "common/WebUrl";
-
-const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
 interface SideNavProps {
   sessionWrapper: SessionWrapper;
@@ -51,6 +43,7 @@ export default function SideNav({
   querySessionSubscriptionsCallback,
 }: SideNavProps) {
   const { t } = useLocalize("SideNav");
+  const { queueStats } = useInferenceJobs();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const fakeYouFrontendEnv = FakeYouFrontendEnvironment.getInstance();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -132,47 +125,6 @@ export default function SideNav({
       contentWrapper?.classList.add("no-padding");
     }
   }, [isLoggedIn, isOnLandingPage, shouldShowSidebar]);
-
-  const [queueStats, setQueueStats] = useState<GetQueueStatsSuccessResponse>({
-    success: true,
-    cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
-    refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
-    inference: {
-      total_pending_job_count: 0,
-      pending_job_count: 0,
-      by_queue: {
-        pending_face_animation_jobs: 0,
-        pending_rvc_jobs: 0,
-        pending_svc_jobs: 0,
-        pending_tacotron2_jobs: 0,
-        pending_voice_designer: 0,
-        pending_stable_diffusion: 0,
-      },
-    },
-    legacy_tts: {
-      pending_job_count: 0,
-    },
-  });
-
-  useEffect(() => {
-    const fetch = async () => {
-      const response = await GetQueueStats();
-      if (GetQueueStatsIsOk(response)) {
-        if (response.cache_time.getTime() > queueStats.cache_time.getTime()) {
-          setQueueStats(response);
-        }
-      }
-    };
-    // TODO: We're having an outage and need to lower this.
-    //const interval = setInterval(async () => fetch(), 15000);
-    const refreshInterval = Math.max(
-      DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
-      queueStats.refresh_interval_millis
-    );
-    const interval = setInterval(async () => fetch(), refreshInterval);
-    fetch();
-    return () => clearInterval(interval);
-  }, [queueStats]);
 
   const logoutHandler = async () => {
     await Logout();

@@ -3,7 +3,7 @@ import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/
 import { Link } from "react-router-dom";
 // import { useTransition } from "@react-spring/web";
 import JobItem from "./JobItem";
-import { useInferenceJobs,  useLocalize, useQueueStats, useSession } from "hooks";
+import { useInferenceJobs,  useLocalize, useSession } from "hooks";
 import { JobListTypes } from "hooks/useInferenceJobs/useInferenceJobs";
 import "./InferenceJobsList.scss";
 import { Button, Panel } from "components/common";
@@ -41,17 +41,15 @@ export default function InferenceJobsList({
   showNoJobs = false,
   showHeader = true,
 }: JobsListProps) {
-
-  const { sessionSubscriptions } = useSession();
-  const hasPaidFeatures = sessionSubscriptions?.hasPaidFeatures();
-  const { inference, legacy_tts } = useQueueStats({});
+  const jobValue = value !== undefined ? value : jobType !== undefined ? (jobType || 0) + 1 : 0;
   // undefined specified here to allow 0.
   // jobType + 1 because the difference between FrontendInferenceJobType and JobListTypes is an "all" option
 
-  const jobValue = value !== undefined ? value : jobType !== undefined ? (jobType || 0) + 1 : 0;
+  const { sessionSubscriptions } = useSession();
+  const hasPaidFeatures = sessionSubscriptions?.hasPaidFeatures();
+  const { inferenceJobs = [], jobStatusDescription, queueStats } = useInferenceJobs(jobValue);
+  const { inference, legacy_tts } = queueStats;
 
-  const { inferenceJobs = [], jobStatusDescription } =
-    useInferenceJobs(jobValue);
   const { t } = useLocalize("InferenceJobs");
 
   const jobContent = (

@@ -14,14 +14,15 @@ export default function useInterval(props: any) {
 
   useEffect(() => {
     const ticker = setInterval(() => {
-      const { end = 3, index, onTick = (e: IntervalEvent) => {}, start = 0 } = config.current;
+      const { end = 3, index,  onTick = (e: IntervalEvent) => {}, start = 0 } = config.current;
     	config.current.index = index < end ? index + 1 : start;
-      onTick(config.current);
+      
+      if (!props.locked) onTick(config.current);
 
-    }, config.current.interval);
+    }, props.interval || 1000);
 
     return () => clearInterval(ticker);
-  },[]);
+  },[props]);
 
   return config.current;
 };
