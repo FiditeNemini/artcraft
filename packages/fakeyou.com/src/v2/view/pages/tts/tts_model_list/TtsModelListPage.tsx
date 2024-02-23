@@ -59,7 +59,6 @@ import {
   AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP,
   ENGLISH_LANGUAGE,
 } from "../../../../../_i18n/AvailableLanguageMap";
-import { WebUrl } from "../../../../../common/WebUrl";
 import { usePrefixedDocumentTitle } from "../../../../../common/UsePrefixedDocumentTitle";
 import { RatingButtons } from "../../../_common/ratings/RatingButtons";
 import { RatingStats } from "../../../_common/ratings/RatingStats";
@@ -337,9 +336,7 @@ function TtsModelListPage(props: Props) {
   let directViewLink = <span />;
 
   if (props.maybeSelectedTtsModel) {
-    const modelLink = WebUrl.ttsModelPage(
-      props.maybeSelectedTtsModel.model_token
-    );
+    const modelLink = `/weight/${props.maybeSelectedTtsModel.model_token}`;
     const modelLanguage =
       AVAILABLE_TTS_LANGUAGE_CATEGORY_MAP[
         props.maybeSelectedTtsModel
