@@ -309,22 +309,22 @@ pub async fn process_job_inference(
       .await
       .map_err(|e| ProcessSingleJobError::from_anyhow_error(anyhow!(e)))?;
 
-  let batch_token_result = insert_batch_generation_records(InsertBatchArgs {
-    entries,
-    maybe_existing_batch_token: Some(&batch_token),
-    transaction: &mut transaction,
-  }).await;
-
-  let _batch_token = match batch_token_result {
-    Ok(v) => { v.to_string() }
-    Err(_err) => {
-      return Err(
-        ProcessSingleJobError::from_anyhow_error(
-          anyhow!("No batch token? something has failed.")
-        )
-      );
-    }
-  };
+  //let batch_token_result = insert_batch_generation_records(InsertBatchArgs {
+  //  entries,
+  //  maybe_existing_batch_token: Some(&batch_token),
+  //  transaction: &mut transaction,
+  //}).await;
+  //
+  //let _batch_token = match batch_token_result {
+  //  Ok(v) => { v.to_string() }
+  //  Err(_err) => {
+  //    return Err(
+  //      ProcessSingleJobError::from_anyhow_error(
+  //        anyhow!("No batch token? something has failed.")
+  //      )
+  //    );
+  //  }
+  //};
 
   // NB: Don't fail the job if the query fails.
   let prompt_result = insert_prompt(InsertPromptArgs {
