@@ -59,6 +59,7 @@
     "react": "^16.13.1",
     "react-audio-voice-recorder": "^1.0.5",
     "react-autocomplete": "^1.8.1",
+    "react-device-detect": "^2.2.3",
     "react-dom": "^16.13.1",
     "react-drag-drop-files": "^2.3.9",
     "react-i18next": "^11.15.4",

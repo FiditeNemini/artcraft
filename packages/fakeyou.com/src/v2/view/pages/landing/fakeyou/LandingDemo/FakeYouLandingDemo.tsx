@@ -23,6 +23,7 @@ import {
 } from "@storyteller/components/src/api/jobs/GetTtsInferenceJobStatus";
 import RandomTexts from "./RandomTexts";
 import "./LandingDemo.scss";
+import { isMobile } from "react-device-detect";
 
 interface TtsInferencePanelProps {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
@@ -252,6 +253,7 @@ export default function LandingDemo({
             onChange={handleChangeText}
             rows={4}
             resize={false}
+            autoFocus={isMobile ? false : true}
           />
         </div>
 
