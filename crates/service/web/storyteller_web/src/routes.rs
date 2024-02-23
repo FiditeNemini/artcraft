@@ -255,6 +255,12 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
       .add_get("/v1/model_inference/queue_length", get_pending_inference_job_count_handler)
       .into_app();
 
+  // ==================== Prompts ====================
+
+  let mut app = RouteBuilder::from_app(app)
+      .add_get("/v1/prompts/{token}", get_profile_handler)
+      .into_app();
+
   // ==================== Format Conversion ====================
 
   let mut app = RouteBuilder::from_app(app)
@@ -1386,6 +1392,7 @@ fn add_weights_routes<T, B>(app: App<T>) -> App<T>
             .route("/list_featured", web::get().to(list_featured_weights_handler))
     )
 }
+
 // ==================== Engine Routes ====================
 
 fn add_engine_routes<T, B>(app: App<T>) -> App<T>

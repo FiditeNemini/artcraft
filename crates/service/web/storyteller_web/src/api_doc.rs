@@ -5,6 +5,7 @@ use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginM
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::{weights_category::WeightsCategory, weights_types::WeightsType};
+use enums::by_table::prompts::prompt_type::PromptType;
 use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEntityType;
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
@@ -13,6 +14,7 @@ use tokens::tokens::batch_generations::*;
 use tokens::tokens::generic_inference_jobs::*;
 use tokens::tokens::media_files::*;
 use tokens::tokens::model_weights::*;
+use tokens::tokens::prompts::*;
 use tokens::tokens::user_bookmarks::*;
 use tokens::tokens::users::*;
 use tokens::tokens::zs_voice_datasets::*;
@@ -38,6 +40,7 @@ use crate::http_server::endpoints::media_files::list_media_files_by_batch_token:
 use crate::http_server::endpoints::media_files::list_media_files_for_user::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload_media_file::*;
+use crate::http_server::endpoints::prompts::get_prompt::*;
 use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::*;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::*;
 use crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::*;
@@ -71,6 +74,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::list_media_files_by_batch_token::list_media_files_by_batch_token_handler,
     crate::http_server::endpoints::media_files::list_media_files_for_user::list_media_files_for_user_handler,
     crate::http_server::endpoints::media_files::upload_media_file::upload_media_file_handler,
+    crate::http_server::endpoints::prompts::get_prompt::get_prompt_handler,
     crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler,
     crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler,
     crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::delete_user_bookmark_handler,
@@ -97,6 +101,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     InferenceJobToken,
     MediaFileToken,
     ModelWeightToken,
+    PromptToken,
     UserBookmarkToken,
     UserToken,
     ZsVoiceDatasetToken,
@@ -106,6 +111,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileOriginModelType,
     MediaFileOriginProductCategory,
     MediaFileType,
+    PromptType,
     WeightsCategory,
     WeightsType,
 
@@ -160,6 +166,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     GetMediaFilePathInfo,
     GetMediaFileSuccessResponse,
     GetProfilePathInfo,
+    GetPromptError,
+    GetPromptPathInfo,
+    GetPromptSuccessResponse,
     GetUserRatingError,
     GetUserRatingResponse,
     GetWeightError,
@@ -198,8 +207,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileForUserListItem,
     MediaFileInfo,
     MediaFileListItem,
-    MediaFilesByBatchListItem,
     MediaFileUploadError,
+    MediaFilesByBatchListItem,
     ModelWeightForList,
     ModelWeightSearchResult,
     ProfileError,

@@ -15,6 +15,7 @@ use errors::AnyhowResult;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 
 #[derive(Serialize, Debug)]
@@ -38,6 +39,8 @@ pub struct MediaFile {
   pub maybe_creator_gravatar_hash: Option<String>,
 
   pub creator_set_visibility: Visibility,
+
+  pub maybe_prompt_token: Option<PromptToken>,
 
   pub maybe_model_weights_token: Option<ModelWeightToken>,
   pub maybe_model_weights_title: Option<String>,
@@ -97,6 +100,8 @@ pub struct MediaFileRaw {
   pub maybe_creator_gravatar_hash: Option<String>,
 
   pub creator_set_visibility: Visibility,
+
+  pub maybe_prompt_token: Option<PromptToken>,
 
   pub maybe_model_weights_token: Option<ModelWeightToken>,
   pub maybe_model_weights_title: Option<String>,
@@ -159,6 +164,7 @@ pub async fn get_media_file(
     maybe_creator_display_name: record.maybe_creator_display_name,
     maybe_creator_gravatar_hash: record.maybe_creator_gravatar_hash,
     creator_set_visibility: record.creator_set_visibility,
+    maybe_prompt_token: record.maybe_prompt_token,
     maybe_model_weights_token: record.maybe_model_weights_token,
     maybe_model_weights_title: record.maybe_model_weights_title,
     maybe_model_weights_type: record.maybe_model_weights_type,
@@ -201,6 +207,8 @@ SELECT
     m.maybe_batch_token as `maybe_batch_token: tokens::tokens::batch_generations::BatchGenerationToken`,
 
     m.maybe_text_transcript,
+
+    m.maybe_prompt_token as `maybe_prompt_token: tokens::tokens::prompts::PromptToken`,
 
     m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
@@ -270,6 +278,8 @@ SELECT
     m.maybe_batch_token as `maybe_batch_token: tokens::tokens::batch_generations::BatchGenerationToken`,
 
     m.maybe_text_transcript,
+
+    m.maybe_prompt_token as `maybe_prompt_token: tokens::tokens::prompts::PromptToken`,
 
     m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 

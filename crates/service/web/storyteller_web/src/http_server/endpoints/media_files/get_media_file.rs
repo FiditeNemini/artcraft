@@ -19,6 +19,7 @@ use mysql_queries::queries::tts::tts_results::query_tts_result::select_tts_resul
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
+use tokens::tokens::prompts::PromptToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
@@ -68,6 +69,9 @@ pub struct MediaFileInfo {
 
   /// Text transcripts for TTS, etc.
   pub maybe_text_transcript: Option<String>,
+
+  /// The foreign key to the prompt used to generate the media, if applicable.
+  pub maybe_prompt_token: Option<PromptToken>,
 
   /// We can simulate media files for "tts_results" records.
   /// If this is set as true, this informs the frontend and API callers not to treat
@@ -284,6 +288,7 @@ async fn modern_media_file_lookup(
         result.maybe_creator_gravatar_hash,
       ),
       creator_set_visibility: result.creator_set_visibility,
+      maybe_prompt_token: result.maybe_prompt_token,
       is_emulated_media_file: false,
       stats: SimpleEntityStats {
         positive_rating_count: result.maybe_ratings_positive_count.unwrap_or(0),
@@ -358,6 +363,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
         result.maybe_creator_display_name,
         result.maybe_creator_gravatar_hash,
       ),
+      maybe_prompt_token: None,
       creator_set_visibility: result.creator_set_visibility,
       maybe_text_transcript: Some(result.raw_inference_text),
       is_emulated_media_file: true,
