@@ -15,6 +15,7 @@ pub mod media_files;
 pub mod media_uploads;
 pub mod model_categories;
 pub mod model_weights;
+pub mod prompts;
 pub mod public_event_feed;
 pub mod stats;
 pub mod trending_model_analytics;
