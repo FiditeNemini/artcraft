@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./SelectionBubbles.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faChevronLeft,
+  faChevronRight,
+} from "@fortawesome/pro-solid-svg-icons";
 
 interface SelectionBubbleProps {
   options: string[];
@@ -17,6 +20,7 @@ export default function SelectionBubbles({
     options.length > 0 ? options[0] : null
   );
   const [showGradient, setShowGradient] = useState(true);
+  const [showLeftGradient, setShowLeftGradient] = useState(false);
   const bubblesRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (
@@ -38,40 +42,43 @@ export default function SelectionBubbles({
   const handleScroll = () => {
     if (bubblesRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = bubblesRef.current;
-      const isAtEnd = scrollWidth - Math.round(scrollLeft + clientWidth) <= 1; // Adjust tolerance as needed
+      const isAtEnd = scrollWidth - Math.round(scrollLeft + clientWidth) <= 1;
+      const isAtStart = scrollLeft <= 1;
       setShowGradient(!isAtEnd);
+      setShowLeftGradient(!isAtStart);
     }
   };
-
-  const checkForOverflowContent = () => {
-    if (bubblesRef.current) {
-      const { scrollWidth, clientWidth } = bubblesRef.current;
-      const isOverflowing = scrollWidth > clientWidth;
-      setShowGradient(isOverflowing);
-    }
-  };
-
-  useEffect(() => {
-    checkForOverflowContent();
-    window.addEventListener("resize", checkForOverflowContent);
-    return () => window.removeEventListener("resize", checkForOverflowContent);
-  }, [options]);
 
   useEffect(() => {
     if (bubblesRef.current) {
       bubblesRef.current.addEventListener("scroll", handleScroll);
+      handleScroll();
       return () =>
         // eslint-disable-next-line react-hooks/exhaustive-deps
         bubblesRef.current?.removeEventListener("scroll", handleScroll);
     }
+  }, [options]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      handleScroll();
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
     <div
       className={`selection-bubbles-wrapper ${
         showGradient ? "show-gradient" : ""
-      }`}
+      } ${showLeftGradient ? "show-left-gradient" : ""}`.trim()}
     >
+      {showLeftGradient && (
+        <FontAwesomeIcon
+          icon={faChevronLeft}
+          className="scroll-indicator-left fs-5"
+        />
+      )}
       <div className="selection-bubbles" ref={bubblesRef}>
         {options.map(option => (
           <button

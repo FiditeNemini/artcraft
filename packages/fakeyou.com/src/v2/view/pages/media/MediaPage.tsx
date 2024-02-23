@@ -265,6 +265,7 @@ export default function MediaPage() {
       [WeightCategory.SD]: { weightCategory: "Image Generation" },
       [WeightCategory.ZS]: { weightCategory: "Voice Designer" },
       [WeightCategory.VOCODER]: { weightCategory: "Vocoder" },
+      [WeightCategory.WF]: { weightCategory: "Workflow Config" },
     };
 
   let weightCategory = "none";

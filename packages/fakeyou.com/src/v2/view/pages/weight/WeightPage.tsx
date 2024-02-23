@@ -73,13 +73,7 @@ export default function WeightPage({
   const history = useHistory();
   const bookmarks = useBookmarks();
   const ratings = useRatings();
-  const {
-    data: weight,
-    fetchError,
-    isLoading,
-    title,
-    remove,
-  } = useWeightFetch({
+  const fetchedWeight = useWeightFetch({
     onRemove: () => {
       history.push(source || "");
     },
@@ -89,7 +83,14 @@ export default function WeightPage({
     },
     token: weight_token,
   });
-
+  const {
+    data: weight,
+    fetchError,
+    isLoading,
+    title,
+    remove,
+  } = fetchedWeight;
+  console.log(fetchedWeight);
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
   const dateUpdated = moment(weight?.updated_at || "").format("LLL");
   const dateCreated = moment(weight?.created_at || "").format("LLL");
@@ -287,6 +288,7 @@ export default function WeightPage({
       [WeightCategory.SD]: { weightCategory: "Image Generation" },
       [WeightCategory.ZS]: { weightCategory: "Voice Designer" },
       [WeightCategory.VOCODER]: { weightCategory: "Vocoder" },
+      [WeightCategory.WF]: { weightCategory: "Workflow Config" },
     };
 
   let { weightCategory } = weightCategoryMap[weight.weight_category] || {
@@ -321,14 +323,11 @@ export default function WeightPage({
 
   switch (weight.weight_category) {
     case WeightCategory.TTS:
-      weightDetails = <DataTable data={voiceDetails} />;
-      break;
     case WeightCategory.VC:
-      weightDetails = <DataTable data={voiceDetails} />;
-      break;
     case WeightCategory.ZS:
       weightDetails = <DataTable data={voiceDetails} />;
       break;
+    case WeightCategory.WF:
     case WeightCategory.SD:
       weightDetails = <DataTable data={imageDetails} />;
       break;
