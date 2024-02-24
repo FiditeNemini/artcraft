@@ -226,6 +226,19 @@ export default function MediaPage() {
             }}
           />
         );
+      case MediaFileType.SceneRon:
+        // NB: Storyteller Engine makes the API call to load the scene.
+        // We don't need to pass the bucket path.
+        // The engine, does, however, need a `.scn.ron` file extension.
+        const sceneRonUrl = `remote://${mediaFile.token}.scn.ron`;
+        return (
+          <Iframe
+            {...{
+              url: `https://engine.fakeyou.com?mode=studio&scene=${sceneRonUrl}`,
+              className: "fy-studio-frame",
+            }}
+          />
+        );
       case MediaFileType.FBX:
         return (
           <Panel padding={true}>
