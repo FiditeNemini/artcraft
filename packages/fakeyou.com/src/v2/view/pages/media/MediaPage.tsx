@@ -37,6 +37,7 @@ import { WeightCategory } from "@storyteller/components/src/api/_common/enums/We
 import Iframe from "react-iframe";
 import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
 import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
+import { mediaTypeLabels } from "utils/mediaTypeLabels";
 
 export default function MediaPage() {
   const { canEditTtsModel, user } = useSession();
@@ -264,7 +265,9 @@ export default function MediaPage() {
     }
   }
 
-  const mediaType = mediaFile?.media_type || ""; // THIS SHOULD BECOME A TRANSLATION STRING, THIS IS NOT DATA -V
+  const mediaType = mediaFile?.media_type
+    ? mediaTypeLabels[mediaFile?.media_type]
+    : "";
 
   let audioLink = new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path);
 
