@@ -2,6 +2,7 @@ use once_cell::sync::Lazy;
 use regex::RegexSet;
 
 pub (crate) fn lowercase_mentions_underage(text: &str) -> bool {
+  let text = text.to_lowercase();
 
   // NB: Unfortunately Rust Regex does not support look-around, so our age matching is awkward
   // Matching digits "0" and "1" are tricky because they would match "19" and "0100".
@@ -13,7 +14,10 @@ pub (crate) fn lowercase_mentions_underage(text: &str) -> bool {
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)([^\d]){1,3}(years?)",
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)yos?",
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)yrs?",
-      r"\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|tweleve|thirteen|fourteen|fifteen|sixteen|seventeen)(.{1,3}|\w+)(years?)(.{1,3}|\w+)(old)",
+      r"\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen)(.{0,3}|\w+)(years?)(.{0,3}|\w+)(old)",
+
+      // English typos
+      r"\b(tweleve|fiveteen)(.{0,3}|\w+)(years?)(.{0,3}|\w+)(old)",
 
       // Spanish
       r"\b(0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17)([^\d])+(años?)",
@@ -26,7 +30,7 @@ pub (crate) fn lowercase_mentions_underage(text: &str) -> bool {
 
   //println!("text: {:?}", text);
 
-  AGE_REGEX.matches(text).matched_any()
+  AGE_REGEX.matches(&text).matched_any()
 }
 
 #[cfg(test)]
@@ -195,8 +199,10 @@ mod tests {
         "a blonde girl of 13 years old with blue eyes.she's naked ,showing her private parts. i'm fucking her now",
         "a blonde girl of 13 years old with blue eyes.she's naked ,showing her tits and ass",
         "a little boy have brown eyes and hair，nude body",
+        "Fiveteen years old, naked, Brown hair, big ass, Brest d, open mouth, close eyes, seamen face",
         "naked 8yo blonde girl",
         "seven year old girl naked legs spread",
+        "Twelve years old girl , sucking thirty years old cock men",
         "young loli butt, 13 years old",
 
         // Spanish

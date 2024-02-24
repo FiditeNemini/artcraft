@@ -110,7 +110,7 @@ pub fn is_valid_string(input: &str) -> bool {
     valid_strings.contains(&input)
 }
 
-#[derive(Deserialize, ToSchema)]
+#[derive(Deserialize, Default, ToSchema)]
 pub struct EnqueueImageGenRequest {
     pub uuid_idempotency_token: String,
     pub maybe_image_source: Option<String>,

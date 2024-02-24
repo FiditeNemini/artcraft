@@ -4,6 +4,7 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 
 use crate::minor_regex::lowercase_mentions_underage;
+use crate::potential_minor_regex::lowercase_mentions_potential_underage;
 
 const CHILD_TERMS : &str = include_str!("../../../../includes/binary_includes/dictionary_children_terms.txt");
 const SEX_TERMS : &str = include_str!("../../../../includes/binary_includes/dictionary_sex_terms.txt");
@@ -12,6 +13,7 @@ const RACIST_TERMS : &str = include_str!("../../../../includes/binary_includes/d
 /// Classification of a text prompt
 pub struct PromptClassification {
   pub prompt_references_children: bool,
+  pub prompt_references_potential_minors: bool,
   pub prompt_references_sex: bool,
   pub prompt_references_violence: bool,
   pub prompt_references_racism: bool,
@@ -46,24 +48,20 @@ pub fn classify_prompt(text_prompt: &str) -> PromptClassification  {
   prompt_tokens.extend(prompt_tokens_alpha);
   prompt_tokens.extend(prompt_tokens_lower);
 
-  let mut prompt_references_children = references_children(&prompt_tokens);
+  let prompt_references_children = references_children(&prompt_tokens) ||  lowercase_mentions_underage(&text_prompt);
+  let prompt_references_potential_minors = lowercase_mentions_potential_underage(&text_prompt);
   let prompt_references_sex = references_sex(&prompt_tokens);
   let prompt_references_violence = references_violence(&prompt_tokens);
   let prompt_references_racism = references_racism(&prompt_tokens);
 
-  if lowercase_mentions_underage(&text_prompt) {
-    prompt_references_children = true;
-  }
-
   PromptClassification {
     prompt_references_children,
+    prompt_references_potential_minors,
     prompt_references_sex,
     prompt_references_violence,
     prompt_references_racism,
   }
 }
-
-
 
 fn references_children(prompt_tokens: &[String]) -> bool {
   static CHILD_TERM_DICTIONARY : Lazy<HashSet<String>> = Lazy::new(|| {
