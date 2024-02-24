@@ -1220,17 +1220,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "702fc72eb24e5a1e48ce58027a675bc24edd52096d5397d4aea7c6dd9eca0bd1"
 
 [[package]]
-name = "classify_text"
-version = "0.1.0"
-dependencies = [
- "errors",
- "my-workspace-hack",
- "once_cell",
- "regex",
- "speculoos 0.11.0",
-]
-
-[[package]]
 name = "cloud_storage"
 version = "0.0.1"
 dependencies = [
@@ -4813,6 +4802,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "prompt_engineering"
+version = "0.1.0"
+dependencies = [
+ "errors",
+ "my-workspace-hack",
+ "once_cell",
+ "regex",
+ "speculoos 0.11.0",
+]
+
+[[package]]
 name = "prost"
 version = "0.11.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6359,7 +6359,6 @@ dependencies = [
  "bootstrap",
  "buckets",
  "chrono",
- "classify_text",
  "cloud_storage",
  "collections",
  "composite_identifiers",
@@ -6408,6 +6407,7 @@ dependencies = [
  "native-tls",
  "once_cell",
  "pin-project-lite",
+ "prompt_engineering",
  "pulldown-cmark",
  "r2d2_redis",
  "rand 0.8.5",

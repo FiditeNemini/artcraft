@@ -1,5 +1,5 @@
 [package]
-name = "classify_text"
+name = "prompt_engineering"
 version = "0.1.0"
 edition = "2021"
 
