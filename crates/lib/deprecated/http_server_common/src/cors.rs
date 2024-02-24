@@ -56,6 +56,8 @@ pub fn add_fakeyou(cors: Cors, is_production: bool) -> Cors {
         .allowed_origin("http://fakeyou.com")
         .allowed_origin("https://api.fakeyou.com")
         .allowed_origin("https://fakeyou.com")
+        // Storyteller Engine (Production)
+        .allowed_origin("https://engine.fakeyou.com")
         // FakeYou (Staging)
         .allowed_origin("http://staging.fakeyou.com")
         .allowed_origin("https://staging.fakeyou.com")
@@ -72,6 +74,8 @@ pub fn add_fakeyou(cors: Cors, is_production: bool) -> Cors {
         .allowed_origin("https://dev.fakeyou.com:7000") // Yarn default port
         .allowed_origin("https://dev.fakeyou.com:7001") // NB: Mac frontend
         .allowed_origin("https://development.fakeyou.com")
+        // Storyteller Engine (Development)
+        .allowed_origin("https://engine.fakeyou.com") // NB: We use prod for integration testing
   }
 }
 
