@@ -19,6 +19,9 @@ pub struct Args {
 #[derive(Clone, Copy, Debug, Deserialize, ValueEnum)]
 #[serde(rename_all = "snake_case")]
 pub enum Action {
+  /// Delete all anonymous user images.
+  DeleteAllAnonymousUserImages,
+
   /// Delete files for a particular user.
   DeleteUserFiles,
 }

@@ -6,10 +6,12 @@ use container_common::anyhow_result::AnyhowResult;
 use easyenv::init_all_with_default_logging;
 
 use crate::cli_args::Action;
+use crate::operations::delete_all_anonymous_user_images::delete_all_anonymous_user_images::delete_all_anonymous_user_images;
 use crate::operations::delete_user_files::delete_user_files::delete_user_files;
 
 mod cli_args;
 mod operations;
+mod util;
 
 /*
 
@@ -45,6 +47,9 @@ async fn main() -> AnyhowResult<()> {
   let mysql = get_mysql("MYSQL_PRODUCTION_URL").await?;
 
   match args.action {
+    Action::DeleteAllAnonymousUserImages => {
+      delete_all_anonymous_user_images(&args, &mysql).await?;
+    }
     Action::DeleteUserFiles => {
       delete_user_files(&args, &mysql).await?;
     }

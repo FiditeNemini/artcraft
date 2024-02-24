@@ -10,8 +10,7 @@ use mysql_queries::queries::media_files::list::list_media_files_for_user::{list_
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_username::get_user_profile_by_username;
 
 use crate::cli_args::Args;
-
-const ECHELON_USER_TOKEN : &str = "U:937C1VN0S5G8H";
+use crate::util::constants::ECHELON_USER_TOKEN;
 
 pub async fn delete_user_files(args: &Args, mysql: &Pool<MySql>) -> AnyhowResult<()> {
   info!("delete user files for username: {:?}", args.username);
