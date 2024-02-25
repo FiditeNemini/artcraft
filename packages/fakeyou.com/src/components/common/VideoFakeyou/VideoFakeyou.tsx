@@ -1,11 +1,11 @@
 import React, { useState, forwardRef } from "react";
 import { useMedia } from "hooks";
-import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
+import { MediaFileType } from "@storyteller/components/src/api";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import makeClass from "resources/makeClass";
 
-import { Label } from "components/common"
-
+import { Label } from "components/common";
+import './styles.scss';
 
 
 interface Props {
@@ -26,7 +26,7 @@ const VideoFromFakeyou = forwardRef<Ref, Props>(({
   onResponse,
   ...rest
 }: Props, ref) => {
-  const [mediaFile, setMediaFile] = useState<MediaFile>();
+  const [mediaFile, setMediaFile] = useState<MediaFileType>();
   useMedia({
     mediaToken: mediaToken,
     onSuccess: (res: any) => {
@@ -39,9 +39,15 @@ const VideoFromFakeyou = forwardRef<Ref, Props>(({
 
   if (mediaLink){
     return (
-      <div {...{ ...makeClass("fy-basic-video",className) }}>
+      <div {...{ ...makeClass("fy-video vh50",className) }}>
         {label && <Label label={label}/>}
-        <video controls key={mediaToken} {...rest} ref={ref}>
+        <video 
+          controls 
+          ref={ref} 
+          key={mediaToken}
+          className="object-fit-contain"
+          {...rest}
+        >
           <source src={mediaLink} type="video/mp4" />
         </video>
       </div>

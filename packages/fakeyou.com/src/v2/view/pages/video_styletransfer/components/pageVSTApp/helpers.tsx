@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { hiddenValues } from "./defaultValues";
 
 export type WorkflowValuesType = {
   // File Settings
@@ -60,8 +61,10 @@ export function mapRequest(workflowValues: WorkflowValuesType){
     "maybe_input_file": workflowValues.fileToken,
     "maybe_output_path": workflowValues.outputPath,
     "maybe_json_modifications": {
-      "$.510.inputs.Text": workflowValues.posPrompt,
-      "$.8.inputs.text": workflowValues.negPrompt,
+      "$.510.inputs.Text":
+        hiddenValues.posPrompt + workflowValues.posPrompt,
+      "$.8.inputs.text": 
+        hiddenValues.negPrompt+ workflowValues.negPrompt,
       "$.173.inputs.seed": workflowValues.seed,
       "$.401.inputs.Value": workflowValues.firstPass,
       "$.918.inputs.Value": workflowValues.motionScale,
