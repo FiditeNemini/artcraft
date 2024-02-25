@@ -12,6 +12,9 @@ import {
 } from "components/common";
 
 import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
+import generateRandomSeed from 'resources/generateRandomSeed';
+
+
 import { Action, State } from "../../reducer";
 import { TableOfKeyValues } from "../../commons";
 import { initialValues } from "./defaultValues";
@@ -19,6 +22,7 @@ import {
   mapRequest,
   WorkflowValuesType,
 } from "./helpers";
+
 import SectionAdvanceOptions from "./sectionAdvanceOptions";
 
 
@@ -37,7 +41,8 @@ export default function PageVSTApp({
 
   const [workflowValues, setWorkflowValues] = useState<WorkflowValuesType>({
     fileToken: pageState.mediaFileToken || mediaToken,
-    ...initialValues
+    ...initialValues,
+    seed: generateRandomSeed(),
   });
 
 
