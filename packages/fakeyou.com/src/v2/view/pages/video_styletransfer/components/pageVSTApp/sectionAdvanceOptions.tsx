@@ -16,13 +16,13 @@ import {
   Label,
   NumberSliderV2
 } from 'components/common';
-import { WorkflowValuesType } from './helpers';
+import { VSTType } from './helpers';
 
 export default function sectionAdvanceOptions({
-  workflowValues: wfVal,
+  vstValues: vstVal,
   onChange: handleOnChange
 }:{
-  workflowValues : WorkflowValuesType,
+  vstValues : VSTType,
   onChange: (val:{[key: string]: number|string|boolean|undefined})=>void
 }){
   return (
@@ -41,7 +41,7 @@ export default function sectionAdvanceOptions({
             <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
-                initialValue: wfVal.cnCanny,
+                initialValue: vstVal.cnCanny,
                 label: "Canny",
                 thumbTip: "Canny",
                 onChange: (val)=>{handleOnChange({cnCanny: val})}
@@ -50,7 +50,7 @@ export default function sectionAdvanceOptions({
             <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
-                initialValue: wfVal.cnLinearAnime,
+                initialValue: vstVal.cnLinearAnime,
                 label: "Line Art Anime",
                 thumbTip: "Line Art Anime",
                 onChange: (val)=>{handleOnChange({cnLinearAnime: val})}
@@ -61,7 +61,7 @@ export default function sectionAdvanceOptions({
             <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
-                initialValue: wfVal.cnDepth,
+                initialValue: vstVal.cnDepth,
                 label: "Depth",
                 thumbTip: "Depth",
                 onChange: (val)=>{handleOnChange({cnDepth: val})}
@@ -70,7 +70,7 @@ export default function sectionAdvanceOptions({
             <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
-                initialValue: wfVal.cnOpenPose,
+                initialValue: vstVal.cnOpenPose,
                 label: "OpenPose",
                 thumbTip: "OpenPose",
                 onChange: (val)=>{handleOnChange({cnOpenPose: val})}
@@ -81,7 +81,7 @@ export default function sectionAdvanceOptions({
             <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
-                initialValue: wfVal.cnPipeFace,
+                initialValue: vstVal.cnPipeFace,
                 label: "Media Pipe Face",
                 thumbTip: "Media Pipe Face",
                 onChange: (val)=>{handleOnChange({cnPipeFace: val})}
@@ -90,7 +90,7 @@ export default function sectionAdvanceOptions({
             <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
-                initialValue: wfVal.cnSparse,
+                initialValue: vstVal.cnSparseScribble,
                 label: "Sparse Scribble",
                 thumbTip: "Sparse Scribble",
                 onChange: (val)=>{handleOnChange({cnSparse: val})}
@@ -101,21 +101,12 @@ export default function sectionAdvanceOptions({
             <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
-                initialValue: wfVal.cnLinearRealistic,
+                initialValue: vstVal.cnLinearRealistic,
                 label: "Video CN (Linear Realistic)",
                 thumbTip: "Video CN",
                 onChange: (val)=>{handleOnChange({cnLinearRealistic: val})}
                 }}/>
             </div>
-            {/* <div className="col-md-6">
-              <NumberSliderV2 {...{
-                min: 0, max: 1, step: 0.1,
-                initialValue: wfVal.cnTile,
-                label: "Tile CN",
-                thumbTip: "Tile CN",
-                onChange: (val)=>{handleOnChange({cnTile: val})}
-                }}/>
-            </div> */}
           </div>
           <div className="d-flex p-3 justify-content-end">
             <Button icon={faRotateLeft} label="Reset"/>

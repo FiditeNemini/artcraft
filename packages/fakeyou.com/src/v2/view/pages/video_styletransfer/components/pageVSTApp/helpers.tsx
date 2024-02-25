@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { hiddenValues } from "./defaultValues";
 
-export type WorkflowValuesType = {
+export type VSTType = {
   // File Settings
   fileToken: string;
   outputPath: string;
@@ -11,36 +11,30 @@ export type WorkflowValuesType = {
   maxFrames: number;
   framesCap: number;
   skipFrames: number;
-  everyNthFrame: number;
-  inputFps: number;
-  interpolationMultiplier: number;
-  // Basic Inputs
+  
+  // Presets
   workflowConfig: string;
-  seed: string;
   sdModelToken: string;
-  loraModelToken: string;
+  // loraModelToken: string;
+  // loraModelStrength: number;
+
+  //basics
+  inputFps: number;
   posPrompt: string;
   negPrompt: string;
-  // Advance Options Values
-  firstPass: number;
-  upscalePass: number;
-  motionScale: number;
-  upscaleMultiplier: number;
-  useEmptyLatent: boolean;
-  useFaceDetailer: boolean;
-  denoiseFaceDetailer: number;
-  useLCM: boolean;
-  lcmCFG: number;
-  lcmSteps: number;
-  // Control Net Values
+  visibility: string;
+
+  //advance
   cnCanny: number;
   cnDepth: number;
   cnLinearAnime: number;
   cnLinearRealistic: number;
+  cnLipsStrength: number;
   cnOpenPose: number;
   cnPipeFace: number;
-  cnSparse: number;
-  // cnTile: number;
+  cnSparseScribble: number;
+  cnSoftEdge: number;
+  cnRegularSteps: number
 }
 
 export function isInputValid(keyValues: {[key:string]:number|string|boolean|undefined}){
@@ -52,35 +46,35 @@ export function isInputValid(keyValues: {[key:string]:number|string|boolean|unde
   );
 }
 
-export function mapRequest(workflowValues: WorkflowValuesType){
+export function mapRequest(vstValues: VSTType){
   //TODO: improve the typing of this
-  return {
+  return{
     "uuid_idempotency_token": uuidv4(),
-    "maybe_sd_model": workflowValues.sdModelToken,
-    "maybe_workflow_config": workflowValues.workflowConfig,
-    "maybe_input_file": workflowValues.fileToken,
-    "maybe_output_path": workflowValues.outputPath,
+    "maybe_sd_model": vstValues.sdModelToken,
+    "maybe_workflow_config":vstValues.workflowConfig,
+    "maybe_input_file": vstValues.fileToken,
+    "maybe_output_path":"", 
+    "creator_set_visibility": vstValues.visibility,
     "maybe_json_modifications": {
+      "$.154.inputs.Value": vstValues.inputFps,
       "$.510.inputs.Text":
-        hiddenValues.posPrompt + workflowValues.posPrompt,
+        hiddenValues.posPrompt + vstValues.posPrompt,
       "$.8.inputs.text": 
-        hiddenValues.negPrompt+ workflowValues.negPrompt,
-      "$.173.inputs.seed": workflowValues.seed,
-      "$.401.inputs.Value": workflowValues.firstPass,
-      "$.918.inputs.Value": workflowValues.motionScale,
-      "$.137.inputs.Value": workflowValues.framesCap,
-      "$.186.inputs.Value": workflowValues.skipFrames,
-      "$.140.inputs.Value": workflowValues.everyNthFrame,
-      "$.154.inputs.Value": workflowValues.inputFps,
-      "$.445.inputs.number": workflowValues.interpolationMultiplier,
-      // "$.947.inputs.Value": workflowValues.cnTile,
-      "$.800.inputs.Value": workflowValues.cnCanny,
-      "$.797.inputs.Value": workflowValues.cnLinearAnime,
-      "$.796.inputs.Value": workflowValues.cnLinearRealistic,
-      "$.772.inputs.Value": workflowValues.cnDepth,
-      "$.771.inputs.Value": workflowValues.cnOpenPose,
-      "$.527.inputs.Value": workflowValues.cnPipeFace,
-      "$.403.inputs.Value": workflowValues.cnSparse
+        hiddenValues.negPrompt+ vstValues.negPrompt,
+
+      "$.800.inputs.Value": vstValues.cnCanny,
+      "$.772.inputs.Value": vstValues.cnDepth, 
+      "$.797.inputs.Value": vstValues.cnLinearAnime, 
+      "$.796.inputs.Value": vstValues.cnLinearRealistic,
+      "$.1636.inputs.Value": vstValues.cnLipsStrength,
+      "$.771.inputs.Value": vstValues.cnOpenPose, 
+      "$.403.inputs.Value": vstValues.cnSparseScribble, 
+      "$.1398.inputs.Value": vstValues.cnSoftEdge,
+      "$.1531.inputs.Value": vstValues.cnRegularSteps,
+      
+      // "$.208.inputs.lora_01": vstValues.loraModelToken,
+      // "$.208.inputs.strength_01": vstValues.loraModelStrength
     },
+
   }
 }

@@ -41,7 +41,6 @@ export type WorkflowValuesType = {
   cnOpenPose: number;
   cnPipeFace: number;
   cnSparse: number;
-  // cnTile: number;
 }
 export function isInputValid(keyValues: {[key:string]:number|string|boolean|undefined}){
   return (
@@ -71,7 +70,6 @@ export function mapRequest(workflowValues: WorkflowValuesType){
       "$.140.inputs.Value": workflowValues.everyNthFrame,
       "$.154.inputs.Value": workflowValues.inputFps,
       "$.445.inputs.number": workflowValues.interpolationMultiplier,
-      // "$.947.inputs.Value": workflowValues.cnTile,
       "$.800.inputs.Value": workflowValues.cnCanny,
       "$.797.inputs.Value": workflowValues.cnLinearAnime,
       "$.796.inputs.Value": workflowValues.cnLinearRealistic,

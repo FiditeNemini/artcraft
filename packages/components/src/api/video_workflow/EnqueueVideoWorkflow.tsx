@@ -18,7 +18,6 @@ export interface EnqueueVideoWorkflowRequest {
     "$.140.inputs.Value":number,
     "$.154.inputs.Value": number,
     "$.445.inputs.number": number,
-    // "$.947.inputs.Value": number,
     "$.800.inputs.Value": number,
     "$.797.inputs.Value": number,
     "$.796.inputs.Value": number,
@@ -36,8 +35,6 @@ export interface EnqueueVideoWorkflowResponse {
 
 export async function EnqueueVideoWorkflow(request: EnqueueVideoWorkflowRequest) : Promise<EnqueueVideoWorkflowResponse> 
 {
-  // const endpoint = "/v1/workflow/comfy/create";
-
   const endpoint = new ApiConfig().enqueueVideoWorkflow();
   
   return await fetch(endpoint, {
