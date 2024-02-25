@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
@@ -54,7 +55,8 @@ pub struct MediaFileListItem {
 
 pub struct ListMediaFileForUserArgs<'a> {
   pub username: &'a str,
-  pub maybe_filter_media_type: Option<MediaFileType>,
+  //pub maybe_filter_media_type: Option<MediaFileType>,
+  pub maybe_filter_media_types: Option<&'a HashSet<MediaFileType>>,
   pub page_size: usize,
   pub page_index: usize,
   pub sort_ascending: bool,
@@ -66,7 +68,8 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
   /// Let's figure out how many results we could have returned total
   let count_fields = select_total_count_field();
   let mut count_query_builder = query_builder(
-    args.maybe_filter_media_type,
+    //args.maybe_filter_media_type,
+    args.maybe_filter_media_types,
     args.username,
     false,
     0,
@@ -82,7 +85,8 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
   /// Now fetch the actual results with all the fields
   let result_fields = select_result_fields();
   let mut query = query_builder(
-    args.maybe_filter_media_type,
+    //args.maybe_filter_media_type,
+    args.maybe_filter_media_types,
     args.username,
     true,
     args.page_index,
@@ -170,7 +174,8 @@ fn select_total_count_field() -> String {
 }
 
 fn query_builder<'a>(
-  maybe_filter_media_type: Option<MediaFileType>,
+  //maybe_filter_media_type: Option<MediaFileType>,
+  maybe_filter_media_types: Option<&HashSet<MediaFileType>>,
   username: &'a str,
   enforce_limits: bool,
   page_index: usize,
@@ -199,12 +204,28 @@ LEFT OUTER JOIN entity_stats
   query_builder.push(" WHERE u.username = ");
   query_builder.push_bind(username);
 
-  if let Some(media_type) = maybe_filter_media_type {
-    // FIXME: Binding shouldn't require to_str().
-    //  Otherwise, it's calling the Display trait on the raw type which is resulting in an
-    //  incorrect binding and runtime error.
-    query_builder.push(" AND m.media_type = ");
-    query_builder.push_bind(media_type.to_str());
+  //if let Some(media_type) = maybe_filter_media_type {
+  //  // FIXME: Binding shouldn't require to_str().
+  //  //  Otherwise, it's calling the Display trait on the raw type which is resulting in an
+  //  //  incorrect binding and runtime error.
+  //  query_builder.push(" AND m.media_type = ");
+  //  query_builder.push_bind(media_type.to_str());
+  //}
+
+  if let Some(media_types) = maybe_filter_media_types {
+    // NB: `WHERE IN` comma separated syntax will be wrong if list has zero length
+    // We'll skip the predicate if the list isn't empty.
+    if !media_types.is_empty() {
+      query_builder.push(" AND m.media_type IN ( ");
+
+      let mut separated = query_builder.separated(", ");
+
+      for media_type in media_types.iter() {
+        separated.push_bind(media_type.to_str());
+      }
+
+      separated.push_unseparated(") ");
+    }
   }
 
   match view_as {

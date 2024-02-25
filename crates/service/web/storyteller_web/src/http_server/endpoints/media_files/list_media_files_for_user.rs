@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::sync::Arc;
 
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
@@ -5,7 +6,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Query};
 use chrono::{DateTime, Utc};
-use log::warn;
+use log::{info, warn};
 use utoipa::{IntoParams, ToSchema};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
@@ -17,8 +18,8 @@ use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_files::list::list_media_files_for_user::{list_media_files_for_user, ListMediaFileForUserArgs};
 use tokens::tokens::media_files::MediaFileToken;
-use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 
+use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -35,7 +36,9 @@ pub struct ListMediaFilesForUserQueryParams {
   pub sort_ascending: Option<bool>,
   pub page_size: Option<usize>,
   pub page_index: Option<usize>,
+
   pub filter_media_type: Option<MediaFileType>,
+  pub filter_media_types: Option<HashSet<MediaFileType>>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -165,9 +168,11 @@ pub async fn list_media_files_for_user_handler(
     ViewAs::AnotherUser
   };
 
+  let mut maybe_filter_media_types = get_scoped_media_types(&query);
+
   let query_results = list_media_files_for_user(ListMediaFileForUserArgs {
     username: &path.username,
-    maybe_filter_media_type: query.filter_media_type,
+    maybe_filter_media_types: maybe_filter_media_types.as_ref(),
     page_size,
     page_index,
     sort_ascending,
@@ -194,7 +199,8 @@ pub async fn list_media_files_for_user_handler(
           MediaFileType::Bvh |
           MediaFileType::Fbx |
           MediaFileType::Glb |
-          MediaFileType::Gltf => return false,
+          MediaFileType::Gltf |
+          MediaFileType::SceneRon => return false,
           _ => {},
         }
         // Don't allow access to certain products.
@@ -251,4 +257,18 @@ pub async fn list_media_files_for_user_handler(
   Ok(HttpResponse::Ok()
       .content_type("application/json")
       .body(body))
+}
+
+fn get_scoped_media_types(
+  query: &Query<ListMediaFilesForUserQueryParams>,
+) -> Option<HashSet<MediaFileType>> {
+  if let Some(media_type) = query.filter_media_type {
+    info!("Scoping to single media type: {:?}", media_type);
+    Some(HashSet::from([media_type]))
+  } else if let Some(media_types) = query.filter_media_types.as_ref() {
+    info!("Scoping to multiple media types: {:?}", media_types);
+    Some(media_types.clone())
+  } else {
+    None
+  }
 }

@@ -42,7 +42,7 @@ pub async fn delete_all_files(username: &str, mysql: &Pool<MySql>) -> AnyhowResu
 
     let media_files = list_media_files_for_user(ListMediaFileForUserArgs {
       username,
-      maybe_filter_media_type: None,
+      maybe_filter_media_types: None,
       page_size: 100,
       page_index,
       sort_ascending: false,
