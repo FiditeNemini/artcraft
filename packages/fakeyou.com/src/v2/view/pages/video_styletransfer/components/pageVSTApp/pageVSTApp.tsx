@@ -3,10 +3,10 @@ import { NavLink } from 'react-router-dom';
 import { useParams, useHistory } from "react-router-dom";
 
 import {
-  Accordion,
   Button,
   Label,
   Panel,
+  NumberSliderV2,
   TextArea,
   VideoFakeyou
 } from "components/common";
@@ -145,14 +145,23 @@ export default function PageVSTApp({
           />
         </div>
       </div>
-      <Accordion className="mt-4">
-        <Accordion.Item title={"Advanced Options"} defaultOpen>
-          <SectionAdvanceOptions 
-            onChange={handleOnChange}
-            workflowValues={workflowValues}
-          />
-        </Accordion.Item>
-      </Accordion>
+      <div className="row g-3  mb-4">
+        <div className="col-12 col-md-6">
+          <NumberSliderV2 {...{
+            min: 1, max: 60, step: 1,
+            initialValue: workflowValues.inputFps,
+            label: "Input FPS",
+            thumbTip: "Input FPS",
+            onChange: (val)=>{handleOnChange({inputFps: val})}
+            }}/>
+        </div>
+      </div>
+      <div className="row g-3 mt-4">
+        <SectionAdvanceOptions 
+          onChange={handleOnChange}
+          workflowValues={workflowValues}
+        />
+      </div>
       <div className="row g-3 mt-4">
         <div className="col-12 d-flex justify-content-between">
           <NavLink to={`${parentPath}`}>
