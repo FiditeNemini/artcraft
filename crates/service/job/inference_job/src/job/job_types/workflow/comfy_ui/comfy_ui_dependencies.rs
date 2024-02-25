@@ -136,7 +136,7 @@ impl RequiredModels {
                     url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/sd15_t2v_beta_motion.ckpt".to_string(),
                 },
                 ComfyDependency {
-                    location: PathBuf::from("loras/LCM_LoRA_Weights_SD15.safetensors"),
+                    location: PathBuf::from("models/loras/LCM_LoRA_Weights_SD15.safetensors"),
                     url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/LCM_LoRA_Weights_SD15.safetensors".to_string(),
                 },
             ],
