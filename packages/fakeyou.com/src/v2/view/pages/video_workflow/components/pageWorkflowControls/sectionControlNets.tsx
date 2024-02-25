@@ -10,6 +10,7 @@ export const ControlNetsInitialValues = {
   cnOpenPose: 0,
   cnPipeFace: 0,
   cnSparse: 0.7,
+  cnTile: 0.7,
 }
 
 export default memo( function SectionControlNets({
@@ -90,6 +91,15 @@ export default memo( function SectionControlNets({
             label: "Video CN (Linear Realistic)",
             thumbTip: "Video CN",
             onChange: (val)=>{handleOnChange({cnLinearRealistic: val})}
+            }}/>
+        </div>
+        <div className="col-md-6">
+          <NumberSliderV2 {...{
+            min: 0, max: 1, step: 0.1,
+            initialValue: wfVal.cnTile,
+            label: "Tile CN",
+            thumbTip: "Tile CN",
+            onChange: (val)=>{handleOnChange({cnTile: val})}
             }}/>
         </div>
       </div>

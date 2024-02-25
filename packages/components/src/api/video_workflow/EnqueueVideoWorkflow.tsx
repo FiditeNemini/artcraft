@@ -18,6 +18,7 @@ export interface EnqueueVideoWorkflowRequest {
     "$.140.inputs.Value":number,
     "$.154.inputs.Value": number,
     "$.445.inputs.number": number,
+    "$.947.inputs.Value": number,
     "$.800.inputs.Value": number,
     "$.797.inputs.Value": number,
     "$.796.inputs.Value": number,
