@@ -41,7 +41,7 @@ const initialValues = {
   cnOpenPose: 0.7,
   cnPipeFace: 0.7,
   cnSparse: 0.7,
-  cnTile: 0.7,
+  // cnTile: 0.7,
 };
 const hiddenValues = {
   posPrompt: "(masterpiece,detailed,highres:1.4), ",

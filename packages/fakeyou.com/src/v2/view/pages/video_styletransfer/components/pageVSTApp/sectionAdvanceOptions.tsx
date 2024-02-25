@@ -107,7 +107,7 @@ export default function sectionAdvanceOptions({
                 onChange: (val)=>{handleOnChange({cnLinearRealistic: val})}
                 }}/>
             </div>
-            <div className="col-md-6">
+            {/* <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
                 initialValue: wfVal.cnTile,
@@ -115,7 +115,7 @@ export default function sectionAdvanceOptions({
                 thumbTip: "Tile CN",
                 onChange: (val)=>{handleOnChange({cnTile: val})}
                 }}/>
-            </div>
+            </div> */}
           </div>
           <div className="d-flex p-3 justify-content-end">
             <Button icon={faRotateLeft} label="Reset"/>
