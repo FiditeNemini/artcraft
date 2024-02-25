@@ -17,7 +17,7 @@ const initialValues = {
   //basics
   seed: "",
   sdModelToken: "weight_83xpresyjswy97ppk0fyct146",
-  loraModelToken: "",
+  loraModelToken: "weight_13yfxfafv195ejwh3meesebdk",
   posPrompt: "",
   negPrompt: "",
 
