@@ -1,4 +1,4 @@
-type VSTPreset = 
+type CNPreset = 
   'custom'|
   'closeup'|
   'halfbody'|
@@ -7,7 +7,7 @@ type VSTPreset =
   'typog';
 
 const defaultPreset = {
-  cnCanny: 0.7,
+  cnCanny: 0,
   cnDepth: 0.7,
   cnLineArtAnime: 0.7,
   cnLineArtRealistic: 0.7,
@@ -81,7 +81,7 @@ const typogPreset = {
 }
 
 export type {
-  VSTPreset
+  CNPreset
 }
 export {
   defaultPreset,

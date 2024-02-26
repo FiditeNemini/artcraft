@@ -18,14 +18,14 @@ import {
 } from 'components/common';
 import { VSTType } from './helpers';
 import { 
-  VSTPreset,
+  CNPreset,
   closeupPreset,
   halfbodyPreset,
   fullbodyPreset,
   landscapePreset,
   typogPreset,
   defaultPreset,
-} from './vstPresets';
+} from './cnPresets';
 
 
 export default function SectionAdvanceOptions({
@@ -36,8 +36,8 @@ export default function SectionAdvanceOptions({
   onChange: (val:{[key: string]: number|string|boolean|undefined})=>void
 }){
 
-  const [preset, pickPreset] = useState<VSTPreset>('custom')
-  function handlePreset(newPreset: VSTPreset){
+  const [preset, pickPreset] = useState<CNPreset>('custom')
+  function handlePreset(newPreset: CNPreset){
     switch (newPreset){
       case 'closeup':
         handleOnChange(closeupPreset);

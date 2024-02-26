@@ -20,7 +20,7 @@ export default function VideoStyleTransfer(props:{
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
   sessionWrapper: SessionWrapper;
 }){
-  const debug = true;
+  const debug = false;
   const {t} = useLocalize("VideoStyleTransfer");
   const { NO_FILE } = states;
   const [pageState, dispatchPageState] = useReducer(reducer, {

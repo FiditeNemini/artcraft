@@ -1,3 +1,4 @@
+import { defaultPreset as defaultCN } from "./cnPresets";
 export {initialValues, hiddenValues};
 const initialValues = {
   //files Settings
@@ -25,16 +26,7 @@ const initialValues = {
   visibility: "private",
 
   //Control Net
-  cnCanny: 0.7,
-  cnDepth: 0.7,
-  cnLineArtAnime: 0.7,
-  cnLineArtRealistic: 0.7,
-  cnLipsStrength: 0,
-  cnOpenPose: 0.7,
-  cnPipeFace: 0.7,
-  cnSparseScribble: 0.7,
-  cnSoftEdge: 0.7,
-  cnRegularSteps: 30,
+  ...defaultCN
 };
 
 const hiddenValues = {
