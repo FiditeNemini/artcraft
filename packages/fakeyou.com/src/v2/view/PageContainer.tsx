@@ -1,4 +1,5 @@
 import React from "react";
+import ComponentsLibrary from "./pages/components_library";
 import { AboutPage } from "./pages/about/about_page/AboutPage";
 import { GuidePage } from "./pages/about/guide_page/GuidePage";
 import { FirehoseEventListPage } from "./pages/firehose/FirehoseEventListPage";
@@ -256,6 +257,11 @@ class PageContainer extends React.Component<
             <div id="page-content-wrapper">
               <div id="main">
                 <Switch>
+                  <Route path="/comp-lib">
+                    <ComponentsLibrary
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
+                  </Route>
                   <Route path="/firehose">
                     <FirehoseEventListPage
                       sessionWrapper={this.props.sessionWrapper}
