@@ -62,11 +62,11 @@ export function mapRequest(vstValues: VSTType){
       "$.8.inputs.text": 
         hiddenValues.negPrompt+ vstValues.negPrompt,
 
-      "$.800.inputs.Value": 0, //vstValues.cnCanny,
+      //"$.800.inputs.Value": 0, // vstValues.cnCanny,
       "$.772.inputs.Value": vstValues.cnDepth, 
       "$.797.inputs.Value": vstValues.cnLineArtAnime, 
       "$.796.inputs.Value": vstValues.cnLineArtRealistic,
-      "$.1636.inputs.Value": 0, //vstValues.cnLipsStrength,
+      //"$.1636.inputs.Value": 0, //vstValues.cnLipsStrength,
       "$.771.inputs.Value": vstValues.cnOpenPose, 
       "$.403.inputs.Value": vstValues.cnSparseScribble, 
       "$.1398.inputs.Value": vstValues.cnSoftEdge,

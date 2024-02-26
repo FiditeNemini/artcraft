@@ -251,8 +251,11 @@ export default function SectionAdvanceOptions({
           <div className="d-flex p-3 justify-content-end">
             <Button
               icon={faRotateLeft}
-              label="Reset"
-              onClick={()=>{handlePreset('custom')}}
+              label="Reset to Default"
+              onClick={()=>{
+                handlePreset('default');
+                pickPreset('default');
+              }}
             />
           </div>
         </Accordion.Item>

@@ -12,11 +12,11 @@ export interface EnqueueVideoStyleTransferRequest {
     "$.510.inputs.Text": string;
     "$.8.inputs.text": string;
 
-    "$.800.inputs.Value": number;
+    //"$.800.inputs.Value": number;
     "$.772.inputs.Value": number;
     "$.797.inputs.Value": number; 
     "$.796.inputs.Value": number;
-    "$.1636.inputs.Value": number;
+    //"$.1636.inputs.Value": number;
     "$.771.inputs.Value": number;
     "$.403.inputs.Value": number;
     "$.1398.inputs.Value": number;
