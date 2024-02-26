@@ -1,6 +1,7 @@
 type CNPreset = 
   'custom'|
   'closeup'|
+  'default' |
   'halfbody'|
   'fullbody'|
   'landscape'|
