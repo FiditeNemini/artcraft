@@ -37,8 +37,9 @@ pub struct ListMediaFilesForUserQueryParams {
   pub page_size: Option<usize>,
   pub page_index: Option<usize>,
 
-  pub filter_media_type: Option<MediaFileType>,
-  pub filter_media_types: Option<HashSet<MediaFileType>>,
+  /// NB: This can be one (or more comma-separated values) from `MediaFileType`.
+  /// ?filter_media_type=image or ?filter_media_type=image,video (etc.)
+  pub filter_media_type: Option<String>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -170,6 +171,8 @@ pub async fn list_media_files_for_user_handler(
 
   let mut maybe_filter_media_types = get_scoped_media_types(&query);
 
+  info!("Querying media files for user: {:?} - {:?}", path.username, maybe_filter_media_types);
+
   let query_results = list_media_files_for_user(ListMediaFileForUserArgs {
     username: &path.username,
     maybe_filter_media_types: maybe_filter_media_types.as_ref(),
@@ -259,16 +262,25 @@ pub async fn list_media_files_for_user_handler(
       .body(body))
 }
 
+
 fn get_scoped_media_types(
   query: &Query<ListMediaFilesForUserQueryParams>,
 ) -> Option<HashSet<MediaFileType>> {
-  if let Some(media_type) = query.filter_media_type {
-    info!("Scoping to single media type: {:?}", media_type);
-    Some(HashSet::from([media_type]))
-  } else if let Some(media_types) = query.filter_media_types.as_ref() {
-    info!("Scoping to multiple media types: {:?}", media_types);
-    Some(media_types.clone())
-  } else {
-    None
+
+  let types = match query.filter_media_type.as_deref() {
+    None => return None,
+    Some(types) => types,
+  };
+
+  // NB: This silently fails on invalid values. Probably not the best tactic.
+  let types = types.split(",")
+      .map(|ty| MediaFileType::from_str(ty))
+      .flatten()
+      .collect::<HashSet<_>>();
+
+  if types.is_empty() {
+    return None;
   }
+
+  Some(types)
 }
