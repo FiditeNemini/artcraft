@@ -1,12 +1,15 @@
 import React, {useState} from 'react';
 
 import {
+  faBuildingColumns,
   faFaceViewfinder,
   faPerson,
-  faUser,
-  faBuildingColumns,
-  faText,
   faRotateLeft,
+  faStar,
+  faSparkles,
+  faText,
+  faUser,
+  
 }
 from "@fortawesome/pro-solid-svg-icons";
 
@@ -64,7 +67,25 @@ export default function SectionAdvanceOptions({
   return (
     <>
       <Label label="Video's Camera Angle"/>
-      <div className="d-flex justify-content-between w-100">
+      <div className="d-flex flex-wrap w-100">
+        <div className="my-1 me-1">
+          <Button
+            icon={faStar}
+            label="Default"
+            isActive={preset==='default'}
+            onClick={()=>handlePreset('default')}
+          />
+        </div>
+        <div className="my-1 me-1">
+          <Button
+            icon={faSparkles}
+            label="Custom"
+            isActive={preset==='custom'}
+            disabled
+          />
+        </div>
+      </div>
+      <div className="d-flex flex-wrap w-100">
         <div className="my-1 me-1">
           <Button
             icon={faFaceViewfinder}

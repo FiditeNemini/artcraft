@@ -99,10 +99,10 @@ export default function PageVSTApp({
     history.push(`${parentPath}/jobs`);
   }
 
-  // const handleFakeGen = ()=>{
-  //   const request = mapRequest(vstValues);
-  //   console.log(request);
-  // }
+  const handleFakeGen = ()=>{
+    const request = mapRequest(vstValues);
+    console.log(request);
+  }
 
   return(
     <Panel className="mb-4 p-4">
@@ -179,11 +179,11 @@ export default function PageVSTApp({
               variant="primary"
             />
           </NavLink>
-          {/* <Button
+          <Button
             label="Fake Gen"
             onClick={handleFakeGen}
             variant="primary"
-          /> */}
+          /> 
           <Button
             label={t("button.enqueue")}
             onClick={handleGenerate}
