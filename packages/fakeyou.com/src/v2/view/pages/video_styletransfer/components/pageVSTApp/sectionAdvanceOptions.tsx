@@ -54,6 +54,7 @@ export default function SectionAdvanceOptions({
       case 'typog':
         handleOnChange(typogPreset);
         break;
+      case 'custom':
       default:
         handleOnChange(defaultPreset);
         break;
@@ -227,7 +228,11 @@ export default function SectionAdvanceOptions({
             </div>
           </div>
           <div className="d-flex p-3 justify-content-end">
-            <Button icon={faRotateLeft} label="Reset"/>
+            <Button
+              icon={faRotateLeft}
+              label="Reset"
+              onClick={()=>{handlePreset('custom')}}
+            />
           </div>
         </Accordion.Item>
       </Accordion>

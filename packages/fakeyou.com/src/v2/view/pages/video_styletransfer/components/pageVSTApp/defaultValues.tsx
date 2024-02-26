@@ -13,7 +13,7 @@ const initialValues = {
 
   //Presents
   // workflowConfig: "weight_f5qh4s1dtp266yv313p09tkpa",
-  workflowConfig: "weight_f5qh4s1dtp266yv313p09tkpa",
+  workflowConfig: "weight_99tz2nzbp5x9v55gqn5ekj1sd",
   sdModelToken: "weight_83xpresyjswy97ppk0fyct146",
   loraModelToken: "weight_13yfxfafv195ejwh3meesebdk",
   loraModelStrength: 1,
