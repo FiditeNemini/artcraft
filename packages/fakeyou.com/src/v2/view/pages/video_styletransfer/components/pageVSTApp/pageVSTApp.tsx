@@ -4,7 +4,7 @@ import { useParams, useHistory } from "react-router-dom";
 
 import {
   Button,
-  Label,
+  // Label,
   Panel,
   NumberSliderV2,
   TextArea,
@@ -15,7 +15,7 @@ import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_sty
 
 
 import { Action, State } from "../../reducer";
-import { TableOfKeyValues } from "../../commons";
+// import { TableOfKeyValues } from "../../commons";
 import { initialValues } from "./defaultValues";
 import {
   mapRequest,
@@ -99,10 +99,10 @@ export default function PageVSTApp({
     history.push(`${parentPath}/jobs`);
   }
 
-  const handleFakeGen = ()=>{
-    const request = mapRequest(vstValues);
-    console.log(request);
-  }
+  // const handleFakeGen = ()=>{
+  //   const request = mapRequest(vstValues);
+  //   console.log(request);
+  // }
 
   return(
     <Panel className="mb-4 p-4">
