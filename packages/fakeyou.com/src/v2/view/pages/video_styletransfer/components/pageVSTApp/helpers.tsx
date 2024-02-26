@@ -53,7 +53,7 @@ export function mapRequest(vstValues: VSTType){
     "maybe_sd_model": vstValues.sdModelToken,
     "maybe_workflow_config":vstValues.workflowConfig,
     "maybe_input_file": vstValues.fileToken,
-    "maybe_output_path":"", 
+    "maybe_output_path": "vid2vid/SparseUpscaleInterp_00001.mp4", 
     "creator_set_visibility": vstValues.visibility,
     "maybe_json_modifications": {
       "$.154.inputs.Value": vstValues.inputFps,
@@ -71,8 +71,6 @@ export function mapRequest(vstValues: VSTType){
       "$.403.inputs.Value": vstValues.cnSparseScribble, 
       "$.1398.inputs.Value": vstValues.cnSoftEdge,
       "$.1531.inputs.Value": vstValues.cnRegularSteps,
-      
-      "$.1449.inputs.filename_prefix": "vid2vid/SparseUpscaleInterp",
 
       // "$.208.inputs.lora_01": vstValues.loraModelToken,
       // "$.208.inputs.strength_01": vstValues.loraModelStrength
