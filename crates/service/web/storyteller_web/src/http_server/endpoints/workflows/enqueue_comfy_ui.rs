@@ -27,6 +27,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
+use crate::configs::plans::plan_category::PlanCategory;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::util::allowed_studio_access::allowed_studio_access;
@@ -52,7 +53,14 @@ pub struct EnqueueComfyRequest {
     maybe_workflow_config: Option<ModelWeightToken>,
     maybe_input_file: Option<MediaFileToken>,
     maybe_output_path: Option<String>,
-   
+
+    maybe_trim_start_seconds: Option<u32>,
+    maybe_trim_end_seconds: Option<u32>,
+
+    maybe_target_fps: Option<u32>,
+    maybe_scale_width: Option<u32>,
+    maybe_scale_height: Option<u32>,
+
     creator_set_visibility: Option<Visibility>,
 }
 
@@ -204,6 +212,53 @@ pub async fn enqueue_comfy_ui_handler(
         .or(maybe_user_preferred_visibility)
         .unwrap_or(Visibility::Public);
 
+
+    let trim_start_seconds = request.maybe_trim_start_seconds.unwrap_or(0);
+    let trim_end_seconds: u32 = request.maybe_trim_end_seconds.unwrap_or(3);
+    
+    // set to default 24 if beyond 60 set to 24 else set to 30
+    let mut target_fps = request.maybe_target_fps.unwrap_or(24);
+    if target_fps < 24 || target_fps > 60 || (target_fps != 30 && target_fps != 60) {
+        target_fps = 24;
+    }
+
+    let mut scale_width = request.maybe_scale_width.unwrap_or(1024);
+    let mut scale_height = request.maybe_scale_height.unwrap_or(1024);
+
+    if scale_width < 768 || scale_width > 1024 {
+        scale_width = 768;
+    }
+    if scale_height < 768 || scale_height > 1024 {
+        scale_height = 768;
+    }
+
+    let trim_start_seconds = request.maybe_trim_start_seconds.unwrap_or(0);
+    let trim_end_seconds = request.maybe_trim_end_seconds.unwrap_or(3);
+
+    let trim_start_seconds = request.maybe_trim_start_seconds.unwrap_or(0);
+    let trim_end_seconds = request.maybe_trim_end_seconds.unwrap_or(0);
+
+    // Plan should handle "first anonymous use" and "investor" cases.
+    let plan = get_correct_plan_for_session(
+        server_state.server_environment,
+        maybe_user_session.as_ref()
+    );
+
+    // block trim too much 
+    if plan.plan_category() == PlanCategory::Paid {
+        if trim_end_seconds - trim_start_seconds > 10 {
+            trim_start_seconds = 0;
+            trim_end_seconds = 3;
+        }
+    } else {
+        if trim_end_seconds - trim_start_seconds > 3 {
+            trim_start_seconds = 0;
+            trim_end_seconds = 3;
+        }
+    }
+
+
+
     let inference_args = WorkflowArgs {
         maybe_sd_model: request.maybe_sd_model.clone(),
         maybe_lora_model: request.maybe_lora_model.clone(),
@@ -215,7 +270,12 @@ pub async fn enqueue_comfy_ui_handler(
         maybe_title: None,
         maybe_commit_hash:None,
         maybe_description:None,
-        creator_visibility:Some(set_visibility)
+        creator_visibility:Some(set_visibility),
+        trim_start_seconds: Some(trim_start_seconds),
+        trim_end_seconds: Some(trim_end_seconds),
+        target_fps:Some(target_fps),
+        scale_width:Some(scale_width),
+        scale_height:Some(scale_height)
     };
 
     info!("Creating ComfyUI job record...");
