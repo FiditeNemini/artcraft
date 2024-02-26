@@ -16,6 +16,7 @@ import FileLabel from "./FileLabel";
 import ImageInput from "./ImageInput";
 import Input from "./Input";
 import InputSeed from "./InputSeed";
+import JobQueueTicker from "./JobQueueTicker";
 import Label from "./Label";
 import LikeButton from "./LikeButton";
 import MocapInput from "./MocapInput";
@@ -70,6 +71,7 @@ export {
   ImageInput,
   Input,
   InputSeed,
+  JobQueueTicker,
   Label,
   LikeButton,
   MocapInput,

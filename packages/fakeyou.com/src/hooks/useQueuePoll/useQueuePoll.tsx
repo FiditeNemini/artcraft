@@ -28,7 +28,7 @@ export default function useQueuePoll() {
     }
   },[initialized,queueStats]);
 
-  useInterval({ currentQueue: queueStats, interval, locked: !initialized, onTick });
+  useInterval({ currentQueue: queueStats, interval, onTick, initialized, locked: !initialized, });
 
   return queueStats;
 };
