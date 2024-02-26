@@ -38,7 +38,10 @@ export default function VideoQuickTrim({
   }
   return (
     <div className="fy-video-quicktrim">
-      <VideoFakeyou {...rest} controls={false}/>
+      <div className="video-wrapper">
+        <VideoFakeyou {...rest} controls={false}/>
+        <div className="playpause-overlay">PLAY</div>
+      </div>
       <div className="playbar">
         <div className="trimzone" />
         <div className="playcursor"/>

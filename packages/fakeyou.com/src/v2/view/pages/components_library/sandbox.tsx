@@ -17,5 +17,12 @@ export default function ComponentSandbox(
       onChange={onChange}
       mediaToken='m_wdptbe5rfzpb1gzhva78gpw8qrkgs9'
     />
+    <br/>
+    <br/>
+    <VideoQuickTrim 
+      onChange={onChange}
+      mediaToken='m_h21nykes0j3ph23y5z7w9axtjjn2rr'
+    />
+
   </>);
 }
