@@ -139,6 +139,10 @@ impl RequiredModels {
                     location: PathBuf::from("models/loras/LCM_LoRA_Weights_SD15.safetensors"),
                     url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/LCM_LoRA_Weights_SD15.safetensors".to_string(),
                 },
+                ComfyDependency {
+                    location: PathBuf::from("models/controlnet/control_v11p_sd15_canny.safetensors"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/control_v11p_sd15_canny.safetensors".to_string(),
+                },
             ],
         }
     }
