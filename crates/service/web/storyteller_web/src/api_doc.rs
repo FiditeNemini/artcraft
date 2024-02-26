@@ -34,12 +34,12 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
 use crate::http_server::endpoints::media_files::delete_media_file::*;
 use crate::http_server::endpoints::media_files::get_media_file::*;
-use crate::http_server::endpoints::media_files::list_featured_media_files::*;
-use crate::http_server::endpoints::media_files::list_media_files::*;
-use crate::http_server::endpoints::media_files::list_media_files_by_batch_token::*;
-use crate::http_server::endpoints::media_files::list_media_files_for_user::*;
+use crate::http_server::endpoints::media_files::list::list_featured_media_files::*;
+use crate::http_server::endpoints::media_files::list::list_media_files::*;
+use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token::*;
+use crate::http_server::endpoints::media_files::list::list_media_files_for_user::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
-use crate::http_server::endpoints::media_files::upload_media_file::*;
+use crate::http_server::endpoints::media_files::upload::upload_media_file_handler::*;
 use crate::http_server::endpoints::prompts::get_prompt::*;
 use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::*;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::*;
@@ -69,11 +69,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler,
     crate::http_server::endpoints::media_files::delete_media_file::delete_media_file_handler,
     crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler,
-    crate::http_server::endpoints::media_files::list_featured_media_files::list_featured_media_files_handler,
-    crate::http_server::endpoints::media_files::list_media_files::list_media_files_handler,
-    crate::http_server::endpoints::media_files::list_media_files_by_batch_token::list_media_files_by_batch_token_handler,
-    crate::http_server::endpoints::media_files::list_media_files_for_user::list_media_files_for_user_handler,
-    crate::http_server::endpoints::media_files::upload_media_file::upload_media_file_handler,
+    crate::http_server::endpoints::media_files::list::list_featured_media_files::list_featured_media_files_handler,
+    crate::http_server::endpoints::media_files::list::list_media_files::list_media_files_handler,
+    crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token::list_media_files_by_batch_token_handler,
+    crate::http_server::endpoints::media_files::list::list_media_files_for_user::list_media_files_for_user_handler,
+    crate::http_server::endpoints::media_files::upload::upload_media_file_handler::upload_media_file_handler,
     crate::http_server::endpoints::prompts::get_prompt::get_prompt_handler,
     crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler,
     crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler,
