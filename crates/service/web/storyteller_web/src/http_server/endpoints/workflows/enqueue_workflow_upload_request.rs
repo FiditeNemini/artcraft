@@ -235,7 +235,12 @@ pub async fn enqueue_workflow_upload_request(
         maybe_description: Some(description),
         maybe_commit_hash: Some(commit_hash),
         creator_visibility: Some(visibility),
-    }; 
+        trim_start_seconds: None,
+        trim_end_seconds: None,
+        target_fps: None,
+        scale_width: None,
+        scale_height: None,
+    };
    
     // create the inference args here
     let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);

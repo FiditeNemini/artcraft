@@ -213,8 +213,8 @@ pub async fn enqueue_comfy_ui_handler(
         .unwrap_or(Visibility::Public);
 
 
-    let trim_start_seconds = request.maybe_trim_start_seconds.unwrap_or(0);
-    let trim_end_seconds: u32 = request.maybe_trim_end_seconds.unwrap_or(3);
+    let mut trim_start_seconds = request.maybe_trim_start_seconds.unwrap_or(0);
+    let mut trim_end_seconds: u32 = request.maybe_trim_end_seconds.unwrap_or(3);
     
     // set to default 24 if beyond 60 set to 24 else set to 30
     let mut target_fps = request.maybe_target_fps.unwrap_or(24);
@@ -231,12 +231,6 @@ pub async fn enqueue_comfy_ui_handler(
     if scale_height < 768 || scale_height > 1024 {
         scale_height = 768;
     }
-
-    let trim_start_seconds = request.maybe_trim_start_seconds.unwrap_or(0);
-    let trim_end_seconds = request.maybe_trim_end_seconds.unwrap_or(3);
-
-    let trim_start_seconds = request.maybe_trim_start_seconds.unwrap_or(0);
-    let trim_end_seconds = request.maybe_trim_end_seconds.unwrap_or(0);
 
     // Plan should handle "first anonymous use" and "investor" cases.
     let plan = get_correct_plan_for_session(
@@ -256,8 +250,6 @@ pub async fn enqueue_comfy_ui_handler(
             trim_end_seconds = 3;
         }
     }
-
-
 
     let inference_args = WorkflowArgs {
         maybe_sd_model: request.maybe_sd_model.clone(),
