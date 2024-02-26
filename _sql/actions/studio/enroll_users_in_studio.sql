@@ -12,6 +12,7 @@ UPDATE users SET can_access_studio = true WHERE username IN (
     'crossproduct1',
     'echelon',
     'fyscott',
+    'mrvintage',
     'olivicmic',
     'saltacc',
     'teddanson',
