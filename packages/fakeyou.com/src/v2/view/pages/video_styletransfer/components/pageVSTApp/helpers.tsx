@@ -27,8 +27,8 @@ export type VSTType = {
   //advance
   cnCanny: number;
   cnDepth: number;
-  cnLinearAnime: number;
-  cnLinearRealistic: number;
+  cnLineArtAnime: number;
+  cnLineArtRealistic: number;
   cnLipsStrength: number;
   cnOpenPose: number;
   cnPipeFace: number;
@@ -64,14 +64,16 @@ export function mapRequest(vstValues: VSTType){
 
       "$.800.inputs.Value": vstValues.cnCanny,
       "$.772.inputs.Value": vstValues.cnDepth, 
-      "$.797.inputs.Value": vstValues.cnLinearAnime, 
-      "$.796.inputs.Value": vstValues.cnLinearRealistic,
+      "$.797.inputs.Value": vstValues.cnLineArtAnime, 
+      "$.796.inputs.Value": vstValues.cnLineArtRealistic,
       "$.1636.inputs.Value": vstValues.cnLipsStrength,
       "$.771.inputs.Value": vstValues.cnOpenPose, 
       "$.403.inputs.Value": vstValues.cnSparseScribble, 
       "$.1398.inputs.Value": vstValues.cnSoftEdge,
       "$.1531.inputs.Value": vstValues.cnRegularSteps,
       
+      "$.1449.inputs.filename_prefix": "vid2vid/SparseUpscaleInterp",
+
       // "$.208.inputs.lora_01": vstValues.loraModelToken,
       // "$.208.inputs.strength_01": vstValues.loraModelStrength
     },

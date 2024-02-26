@@ -11,7 +11,7 @@ export default function Button({
   label,
   icon,
   small,
-  variant = "primary",
+  variant: variantProps = "primary",
   to,
   href,
   target = "_self",
@@ -22,8 +22,14 @@ export default function Button({
   download,
   disabled,
   isLoading = false,
+  isActive,
   ...rest
 }: ButtonProps) {
+  let variant = variantProps;
+  if(isActive !== undefined){
+    if(isActive) variant = "primary"
+    else variant = "secondary"
+  }
   let iconMarginClass = !square && label ? (iconFlip ? "ms-2" : "me-2") : "";
   let IconComponent = icon ? (
     <FontAwesomeIcon icon={icon} className={iconMarginClass} />

@@ -99,6 +99,11 @@ export default function PageVSTApp({
     history.push(`${parentPath}/jobs`);
   }
 
+  const handleFakeGen = ()=>{
+    const request = mapRequest(vstValues);
+    console.log(request);
+  }
+
   return(
     <Panel className="mb-4 p-4">
       <div className="row g-3 mb-4">
@@ -118,13 +123,13 @@ export default function PageVSTApp({
               }}
             />
           </div>
-          <div className="col-12 col-md-6">
+          {/* <div className="col-12 col-md-6">
             <Label label={t("image.label.preview")}/>
             {debug && <TableOfKeyValues keyValues={vstValues} height={400}/>}
 
           </div>
       </div>
-      <div className="row g-3  mb-4">
+      <div className="row g-3  mb-4"> */}
         <div className="col-12 col-md-6">
           <TextArea
           {...{
@@ -135,8 +140,8 @@ export default function PageVSTApp({
             required: false,
           }}
           />
-        </div>
-        <div className="col-12 col-md-6">
+        {/* </div>
+        <div className="col-12 col-md-6"> */}
           <TextArea
           {...{
             label: t("input.label.negPrompt"),
@@ -146,10 +151,10 @@ export default function PageVSTApp({
             required: false,
           }}
           />
-        </div>
+        {/* </div>
       </div>
       <div className="row g-3  mb-4">
-        <div className="col-12 col-md-6">
+        <div className="col-12 col-md-6"> */}
           <NumberSliderV2 {...{
             min: 1, max: 60, step: 1,
             initialValue: vstValues.inputFps,
@@ -174,6 +179,11 @@ export default function PageVSTApp({
               variant="primary"
             />
           </NavLink>
+          {/* <Button
+            label="Fake Gen"
+            onClick={handleFakeGen}
+            variant="primary"
+          /> */}
           <Button
             label={t("button.enqueue")}
             onClick={handleGenerate}

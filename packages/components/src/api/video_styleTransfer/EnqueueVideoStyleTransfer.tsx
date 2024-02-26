@@ -22,6 +22,7 @@ export interface EnqueueVideoStyleTransferRequest {
     "$.1398.inputs.Value": number;
     "$.1531.inputs.Value": number;
     
+    "$.1449.inputs.filename_prefix": string;
     // "$.208.inputs.lora_01": string;
     // "$.208.inputs.strength_01": number;
   }

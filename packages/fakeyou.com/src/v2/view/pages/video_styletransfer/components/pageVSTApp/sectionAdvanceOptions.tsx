@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 import {
   faFaceViewfinder,
@@ -17,23 +17,93 @@ import {
   NumberSliderV2
 } from 'components/common';
 import { VSTType } from './helpers';
+import { 
+  VSTPreset,
+  closeupPreset,
+  halfbodyPreset,
+  fullbodyPreset,
+  landscapePreset,
+  typogPreset,
+  defaultPreset,
+} from './vstPresets';
 
-export default function sectionAdvanceOptions({
+
+export default function SectionAdvanceOptions({
   vstValues: vstVal,
   onChange: handleOnChange
 }:{
   vstValues : VSTType,
   onChange: (val:{[key: string]: number|string|boolean|undefined})=>void
 }){
+
+  const [preset, pickPreset] = useState<VSTPreset>('custom')
+  function handlePreset(newPreset: VSTPreset){
+    switch (newPreset){
+      case 'closeup':
+        handleOnChange(closeupPreset);
+        break;
+      case 'halfbody':
+        handleOnChange(halfbodyPreset);
+        break;
+      case 'fullbody':
+        handleOnChange(fullbodyPreset);
+        break;
+      case 'landscape':
+        handleOnChange(landscapePreset);
+        break;
+      case 'typog':
+        handleOnChange(typogPreset);
+        break;
+      default:
+        handleOnChange(defaultPreset);
+        break;
+    }
+    pickPreset(newPreset);
+  }
   return (
     <>
       <Label label="Video's Camera Angle"/>
       <div className="d-flex justify-content-between w-100">
-        <Button icon={faFaceViewfinder} label="Face Closeups"/>
-        <Button icon={faUser} label="Half Body Shots"/>
-        <Button icon={faPerson} label="Full Body Shots"/>
-        <Button icon={faBuildingColumns} label="Architecture or Landscape"/>
-        <Button icon={faText} label="Flat Logos, or Typographies"/>
+        <div className="my-1 me-1">
+          <Button
+            icon={faFaceViewfinder}
+            label="Face Closeups"
+            isActive={preset==='closeup'}
+            onClick={()=>handlePreset('closeup')}
+          />
+        </div>
+        <div className="m-1">
+          <Button
+            icon={faUser}
+            label="Half Body Shots"
+            isActive={preset==='halfbody'}
+            onClick={()=>handlePreset('halfbody')}
+          />
+        </div>
+        <div className="m-1">
+          <Button
+            icon={faPerson}
+            label="Full Body Shots"
+            isActive={preset==='fullbody'}
+            onClick={()=>handlePreset('fullbody')}
+          />
+        </div>
+        <div className="m-1">
+          <Button
+            icon={faBuildingColumns}
+            label="Architecture or Landscape"
+            isActive={preset==='landscape'}
+            onClick={()=>handlePreset('landscape')}
+          />
+        </div>
+        <div className="my-1 ms-1">
+          <Button
+            icon={faText}
+            label="Flat Logos, or Typographies"
+            isActive={preset==='typog'}
+            onClick={()=>handlePreset('typog')}
+          />
+        </div>
       </div>
       <Accordion className="mt-4">
         <Accordion.Item title={"Advanced Options"}>
@@ -44,68 +114,116 @@ export default function sectionAdvanceOptions({
                 initialValue: vstVal.cnCanny,
                 label: "Canny",
                 thumbTip: "Canny",
-                onChange: (val)=>{handleOnChange({cnCanny: val})}
-                }}/>
+                onChange: (val)=>{
+                  handleOnChange({cnCanny: val});
+                  pickPreset('custom');
+                }
+              }}/>
             </div>
-            <div className="col-md-6">
-              <NumberSliderV2 {...{
-                min: 0, max: 1, step: 0.1,
-                initialValue: vstVal.cnLinearAnime,
-                label: "Line Art Anime",
-                thumbTip: "Line Art Anime",
-                onChange: (val)=>{handleOnChange({cnLinearAnime: val})}
-                }}/>
-            </div>
-          </div>
-          <div className="row g-3 p-3">
             <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
                 initialValue: vstVal.cnDepth,
                 label: "Depth",
                 thumbTip: "Depth",
-                onChange: (val)=>{handleOnChange({cnDepth: val})}
-                }}/>
+                onChange: (val)=>{
+                  handleOnChange({cnDepth: val});
+                  pickPreset('custom');
+                }
+              }}/>
             </div>
+
+          </div>
+          <div className="row g-3 p-3">
+          <div className="col-md-6">
+              <NumberSliderV2 {...{
+                min: 0, max: 1, step: 0.1,
+                initialValue: vstVal.cnLineArtAnime,
+                label: "Line Art - Anime",
+                thumbTip: "Line Art - Anime",
+                onChange: (val)=>{
+                  handleOnChange({cnLineArtAnime: val});
+                  pickPreset('custom');
+                }
+              }}/>
+            </div>
+            <div className="col-md-6">
+              <NumberSliderV2 {...{
+                min: 0, max: 1, step: 0.1,
+                initialValue: vstVal.cnLineArtRealistic,
+                label: "Line Art - Realistic",
+                thumbTip: "Line Art - Realistic)",
+                onChange: (val)=>{
+                  handleOnChange({cnLineArtRealistic: val});
+                  pickPreset('custom');
+                }
+              }}/>
+            </div>
+          </div>
+          <div className="row g-3 p-3">
             <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
                 initialValue: vstVal.cnOpenPose,
                 label: "OpenPose",
                 thumbTip: "OpenPose",
-                onChange: (val)=>{handleOnChange({cnOpenPose: val})}
-                }}/>
+                onChange: (val)=>{
+                  handleOnChange({cnOpenPose: val});
+                  pickPreset('custom');
+                }
+              }}/>
             </div>
-          </div>
-          <div className="row g-3 p-3">
             <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
                 initialValue: vstVal.cnPipeFace,
                 label: "Media Pipe Face",
                 thumbTip: "Media Pipe Face",
-                onChange: (val)=>{handleOnChange({cnPipeFace: val})}
-                }}/>
-            </div>
-            <div className="col-md-6">
-              <NumberSliderV2 {...{
-                min: 0, max: 1, step: 0.1,
-                initialValue: vstVal.cnSparseScribble,
-                label: "Sparse Scribble",
-                thumbTip: "Sparse Scribble",
-                onChange: (val)=>{handleOnChange({cnSparse: val})}
-                }}/>
+                onChange: (val)=>{
+                  handleOnChange({cnPipeFace: val})
+                  pickPreset('custom');
+                }
+              }}/>
             </div>
           </div>
           <div className="row g-3 p-3">
             <div className="col-md-6">
               <NumberSliderV2 {...{
                 min: 0, max: 1, step: 0.1,
-                initialValue: vstVal.cnLinearRealistic,
-                label: "Video CN (Linear Realistic)",
-                thumbTip: "Video CN",
-                onChange: (val)=>{handleOnChange({cnLinearRealistic: val})}
-                }}/>
+                initialValue: vstVal.cnSparseScribble,
+                label: "Sparse Scribble",
+                thumbTip: "Sparse Scribble",
+                onChange: (val)=>{
+                  handleOnChange({cnSparseScribble: val})
+                  pickPreset('custom');
+                }
+              }}/>
+            </div>
+            <div className="col-md-6">
+              <NumberSliderV2 {...{
+                min: 0, max: 1, step: 0.1,
+                initialValue: vstVal.cnSoftEdge,
+                label: "Soft Edge",
+                thumbTip: "SoftEdge",
+                onChange: (val)=>{
+                  handleOnChange({cnSoftEdge: val});
+                  pickPreset('custom');
+                }
+              }}/>
+            </div>
+          </div>
+          <div className="row g-3 p-3">
+            <div className="col-md-6">
+              <NumberSliderV2 {...{
+                min: 1, max: 64, step: 30,
+                initialValue: vstVal.cnRegularSteps,
+                label: "Regular Steps",
+                thumbTip: "Regular Steps",
+                onChange: (val)=>{
+                  handleOnChange({cnRegularSteps: val});
+                  pickPreset('custom');
+                }
+              }}/>
             </div>
           </div>
           <div className="d-flex p-3 justify-content-end">

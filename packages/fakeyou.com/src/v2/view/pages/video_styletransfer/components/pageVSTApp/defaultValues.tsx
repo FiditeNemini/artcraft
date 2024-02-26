@@ -13,7 +13,7 @@ const initialValues = {
 
   //Presents
   // workflowConfig: "weight_f5qh4s1dtp266yv313p09tkpa",
-  workflowConfig: "weight_8y19y1gfe0vfnvawgz2z9w7ms",
+  workflowConfig: "weight_f5qh4s1dtp266yv313p09tkpa",
   sdModelToken: "weight_83xpresyjswy97ppk0fyct146",
   loraModelToken: "weight_13yfxfafv195ejwh3meesebdk",
   loraModelStrength: 1,
@@ -27,9 +27,9 @@ const initialValues = {
   //Control Net
   cnCanny: 0.7,
   cnDepth: 0.7,
-  cnLinearAnime: 0.7,
-  cnLinearRealistic: 0.7,
-  cnLipsStrength: 0.7,
+  cnLineArtAnime: 0.7,
+  cnLineArtRealistic: 0.7,
+  cnLipsStrength: 0,
   cnOpenPose: 0.7,
   cnPipeFace: 0.7,
   cnSparseScribble: 0.7,
