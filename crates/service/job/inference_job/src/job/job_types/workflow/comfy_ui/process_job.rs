@@ -358,7 +358,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     // check stdout for success and check if file exists
     let stdout_output = read_to_string(&stdout_output_file).unwrap();
     // check for "Prompt executed" in stdout (comfyui only outputs this for success)
-    if !stdout_output.contains("Prompt executed") || check_file_exists(&output_file).is_err() {
+    if check_file_exists(&output_file).is_err() {
         error!("Inference failed: {:?}", command_exit_status);
 
         error!("Captured stdout output: {}", stdout_output);
