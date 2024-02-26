@@ -1,31 +1,30 @@
 import { ApiConfig } from "@storyteller/components";
 
 export interface EnqueueVideoStyleTransferRequest {
-  "uuid_idempotency_token": string,
-  
-  "maybe_sd_model": string,
-  "maybe_workflow_config": string,
-  "maybe_input_file": string,
-  "maybe_output_path": string,
+  "uuid_idempotency_token":string;
+  "maybe_sd_model": string;
+  "maybe_workflow_config": string;
+  "maybe_input_file": string;
+  "maybe_output_path": string; 
+  "creator_set_visibility": string;
   "maybe_json_modifications": {
-    "$.510.inputs.Text": string,
-    "$.8.inputs.text": string,
-    "$.173.inputs.seed": string,
-    "$.401.inputs.Value": number,
-    "$.918.inputs.Value": number,
-    "$.137.inputs.Value": number,
-    "$.186.inputs.Value": number,
-    "$.140.inputs.Value":number,
-    "$.154.inputs.Value": number,
-    "$.445.inputs.number": number,
-    "$.947.inputs.Value": number,
-    "$.800.inputs.Value": number,
-    "$.797.inputs.Value": number,
-    "$.796.inputs.Value": number,
-    "$.772.inputs.Value": number,
-    "$.771.inputs.Value": number,
-    "$.527.inputs.Value": number,
-    "$.403.inputs.Value": number,
+    "$.154.inputs.Value": number;
+    "$.510.inputs.Text": string;
+    "$.8.inputs.text": string;
+
+    //"$.800.inputs.Value": number;
+    "$.772.inputs.Value": number;
+    "$.797.inputs.Value": number; 
+    "$.796.inputs.Value": number;
+    //"$.1636.inputs.Value": number;
+    "$.771.inputs.Value": number;
+    "$.403.inputs.Value": number;
+    "$.1398.inputs.Value": number;
+    "$.1531.inputs.Value": number;
+    
+    // "$.1449.inputs.filename_prefix": string;
+    // "$.208.inputs.lora_01": string;
+    // "$.208.inputs.strength_01": number;
   }
 }
 

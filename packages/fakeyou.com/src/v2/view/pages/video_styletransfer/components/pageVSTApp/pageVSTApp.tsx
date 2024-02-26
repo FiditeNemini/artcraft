@@ -2,25 +2,29 @@ import React, { useRef, useState } from "react";
 import { NavLink } from 'react-router-dom';
 import { useParams, useHistory } from "react-router-dom";
 
-import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
-import { Action, State } from "../../reducer";
-import { TableOfKeyValues } from "../../commons";
-import ivs from "./initialValues";
-import {
-  isInputValid,
-  mapRequest,
-  WorkflowValuesType,
-} from "./helpers";
-
 import {
   Button,
-  Label,
-  NumberSliderV2,
+  // Label,
   Panel,
-  SelectModal,
+  NumberSliderV2,
   TextArea,
   VideoFakeyou
 } from "components/common";
+
+import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
+
+
+import { Action, State } from "../../reducer";
+// import { TableOfKeyValues } from "../../commons";
+import { initialValues } from "./defaultValues";
+import {
+  mapRequest,
+  VSTType,
+} from "./helpers";
+
+import SectionAdvanceOptions from "./sectionAdvanceOptions";
+
+
 
 export default function PageVSTApp({
   debug, t, pageState, dispatchPageState, parentPath
@@ -34,12 +38,11 @@ export default function PageVSTApp({
   const videoRef = useRef<HTMLVideoElement>(null);
   const { mediaToken } = useParams<any>();
 
-  const [workflowValues, setWorkflowValues] = useState<WorkflowValuesType>({
+  const [vstValues, setVstValues] = useState<VSTType>({
+    ...initialValues,
     fileToken: pageState.mediaFileToken || mediaToken,
-    ...ivs
   });
 
-  const [styleStrength, setStyleStrength]= useState<number>(8);
 
   if(videoRef?.current){
     if(debug) console.log("set-up video element listeners");
@@ -58,10 +61,10 @@ export default function PageVSTApp({
         else if (debug) console.log(`aspectRaio: ${aspectRatio}`);
       }
       if(ve.duration){
-        newValues.maxFrames = Math.floor(ve.duration)*workflowValues.inputFps;
+        newValues.maxFrames = Math.floor(ve.duration)*vstValues.inputFps;
         newValues.framesCap =  newValues.maxFrames;
       }
-      setWorkflowValues((curr)=>({
+      setVstValues((curr)=>({
         ...curr,
         ...newValues,
       }))
@@ -69,44 +72,36 @@ export default function PageVSTApp({
   }
 
 
-  const handleOnChange = (key: string, newValue:any,) => {
-    setWorkflowValues((curr)=>({...curr, [key]: newValue}));
+  const handleOnChange = (val:{[key: string]: number|string|boolean|undefined}) => {
+    setVstValues((curr)=>({...curr, ...val}));
   }
-  const handleFramesCap = (newValue: number)=>{
-    if(newValue - workflowValues.skipFrames >= 16)
-      setWorkflowValues((curr)=>({...curr, framesCap: newValue}));
-  }
-  const handleSkipFrames = (newValue: number)=>{
-    if(workflowValues.framesCap - newValue >= 16)
-      setWorkflowValues((curr)=>({...curr, skipFrames: newValue}));
-  }
-  const handleStyleStrength = (value:number)=>{
-    setStyleStrength(value);
-  };
+  
+
   const history = useHistory();
   const handleGenerate = ()=>{
-    if(debug) console.log(workflowValues)
+    if(debug) console.log(vstValues)
 
-    if (isInputValid(workflowValues)){
-      const request = mapRequest(workflowValues);
-      if (debug) console.log(request);
-      EnqueueVideoStyleTransfer(request).then(res => {
-        if (res.success && res.inference_job_token) {
-          dispatchPageState({
-            type: 'enqueueJobSuccess',
-            payload: {
-              inferenceJobToken: res.inference_job_token
-            }
-          })
-        }else{
-          console.log(res);
-        }
-      })
-      dispatchPageState({type: 'enqueueJob'})
-      history.push(`${parentPath}/jobs`);
-    }else{
-      alert("you must pick an sd weight and input a prompt");
-    }
+    const request = mapRequest(vstValues);
+    if (debug) console.log(request);
+    EnqueueVideoStyleTransfer(request).then(res => {
+      if (res.success && res.inference_job_token) {
+        dispatchPageState({
+          type: 'enqueueJobSuccess',
+          payload: {
+            inferenceJobToken: res.inference_job_token
+          }
+        })
+      }else{
+        console.log(res);
+      }
+    })
+    dispatchPageState({type: 'enqueueJob'})
+    history.push(`${parentPath}/jobs`);
+  }
+
+  const handleFakeGen = ()=>{
+    const request = mapRequest(vstValues);
+    console.log(request);
   }
 
   return(
@@ -115,7 +110,7 @@ export default function PageVSTApp({
           <div className="col-12 col-md-6">
             <VideoFakeyou
               label={t("video.label.original")}
-              mediaToken={workflowValues.fileToken}
+              mediaToken={vstValues.fileToken}
               ref={videoRef}
               onResponse={(res)=>{
                 dispatchPageState({
@@ -128,90 +123,54 @@ export default function PageVSTApp({
               }}
             />
           </div>
-          <div className="col-12 col-md-6">
+          {/* <div className="col-12 col-md-6">
             <Label label={t("image.label.preview")}/>
-            {debug && <TableOfKeyValues keyValues={workflowValues} height={400}/>}
-            
-            {/*TODO: MAYBE INTEGRATE INTO PLAYER */}
-            <br/>
-            <NumberSliderV2 {...{
-              min: 16, max: workflowValues.maxFrames, step: 1,
-              value: workflowValues.framesCap,
-              label: "Frames Cap",
-              thumbTip: "24 frames = 1 sec",
-              onChange: handleFramesCap
-            }}/>
-            <br/>
-            <NumberSliderV2 {...{
-              min: 0, max: workflowValues.maxFrames-16, step: 1,
-              value: workflowValues.skipFrames,
-              label: "Skip Frames",
-              thumbTip: "24 frames = 1 sec",
-              onChange: handleSkipFrames
-            }}/>
-            {/*TODO: END */}
+            {debug && <TableOfKeyValues keyValues={vstValues} height={400}/>}
 
           </div>
       </div>
-      <div className="row g-3  mb-4">
-        <div className="col-12 col-md-6">
-          <SelectModal 
-            modalTitle={t("modal.title.selectStyle")}
-            label={t("input.label.selectStyle")}
-            onSelect={({token})=>{
-              handleOnChange("sdModelToken", token);
-            }}
-            tabs={[
-              {
-                label: "All Weights",
-                tabKey: "allWeights",
-                typeFilter: "sd_1.5",
-                searcher: true,
-                type: "weights",
-              },
-              {
-                label: "Bookmarked",
-                tabKey: "bookmarkedWeights",
-                typeFilter: "sd_1.5",
-                searcher: false,
-                type: "weights",
-              },
-            ]}
-          />
-          <br/>
-          <NumberSliderV2 {...{
-            min: 1, max: 10, step: 1,
-            initialValue: styleStrength,
-            label: t("input.label.styleStrength"),
-            thumbTip: t("input.thumbtip.styleStrength"),
-            withRevert:true,
-            onChange: handleStyleStrength
-          }}/>
-        </div>
+      <div className="row g-3  mb-4"> */}
         <div className="col-12 col-md-6">
           <TextArea
-            {...{
-              label: t("input.label.prompt"),
-              placeholder: t("input.placeholder.prompt"),
-              onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange("posPrompt", e.target.value),
-              value: workflowValues.posPrompt,
-              required: false,
-            }}
+          {...{
+            label: t("input.label.prompt"),
+            placeholder: t("input.placeholder.prompt"),
+            onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange({posPrompt: e.target.value}),
+            value: vstValues.posPrompt,
+            required: false,
+          }}
           />
-          <br/>
-          <br/>
+        {/* </div>
+        <div className="col-12 col-md-6"> */}
           <TextArea
           {...{
             label: t("input.label.negPrompt"),
             placeholder: t("input.placeholder.negPrompt"),
-            onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange("negPrompt", e.target.value),
-            value: workflowValues.negPrompt,
+            onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange({negPrompt: e.target.value}),
+            value: vstValues.negPrompt,
             required: false,
           }}
           />
+        {/* </div>
+      </div>
+      <div className="row g-3  mb-4">
+        <div className="col-12 col-md-6"> */}
+          <NumberSliderV2 {...{
+            min: 1, max: 60, step: 1,
+            initialValue: vstValues.inputFps,
+            label: "Input FPS",
+            thumbTip: "Input FPS",
+            onChange: (val)=>{handleOnChange({inputFps: val})}
+            }}/>
         </div>
       </div>
-      <div className="row g-3">
+      <div className="row g-3 mt-4">
+        <SectionAdvanceOptions 
+          onChange={handleOnChange}
+          vstValues={vstValues}
+        />
+      </div>
+      <div className="row g-3 mt-4">
         <div className="col-12 d-flex justify-content-between">
           <NavLink to={`${parentPath}`}>
             <Button
@@ -220,6 +179,11 @@ export default function PageVSTApp({
               variant="primary"
             />
           </NavLink>
+          <Button
+            label="Fake Gen"
+            onClick={handleFakeGen}
+            variant="primary"
+          /> 
           <Button
             label={t("button.enqueue")}
             onClick={handleGenerate}

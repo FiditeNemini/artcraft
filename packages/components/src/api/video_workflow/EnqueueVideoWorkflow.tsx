@@ -36,8 +36,6 @@ export interface EnqueueVideoWorkflowResponse {
 
 export async function EnqueueVideoWorkflow(request: EnqueueVideoWorkflowRequest) : Promise<EnqueueVideoWorkflowResponse> 
 {
-  // const endpoint = "/v1/workflow/comfy/create";
-
   const endpoint = new ApiConfig().enqueueVideoWorkflow();
   
   return await fetch(endpoint, {
