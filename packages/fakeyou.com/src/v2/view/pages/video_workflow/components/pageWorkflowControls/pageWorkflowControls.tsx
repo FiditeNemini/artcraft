@@ -53,7 +53,7 @@ export default function PageFilterControls({
 
   const [workflowValues, setWorkflowValues] = useState<WorkflowValuesType>({
     fileToken: pageState.mediaFileToken || mediaToken,
-    outputPath: "vid2vid/SparseUpscaleInterp_00001.mp4",
+    outputPath: "",
     workflowConfig: "weight_q8sz47gmfw2zx02snrbz88ns9",
     seed: "",
     sdModelToken: "",

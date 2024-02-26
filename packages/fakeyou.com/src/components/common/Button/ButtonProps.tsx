@@ -18,4 +18,5 @@ export default interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElem
   download?: boolean | string;
   disabled?: boolean;
   isLoading?: boolean;
+  isActive?: boolean;
 }

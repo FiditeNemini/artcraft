@@ -10,7 +10,7 @@ export const ControlNetsInitialValues = {
   cnOpenPose: 0,
   cnPipeFace: 0,
   cnSparse: 0.7,
-  cnTile: 0,
+  cnTile: 0.7,
 }
 
 export default memo( function SectionControlNets({
