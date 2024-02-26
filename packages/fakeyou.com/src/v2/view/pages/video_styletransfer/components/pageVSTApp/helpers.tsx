@@ -72,6 +72,7 @@ export function mapRequest(vstValues: VSTType){
       "$.1398.inputs.Value": vstValues.cnSoftEdge,
       "$.1531.inputs.Value": vstValues.cnRegularSteps,
 
+      // "$.1449.inputs.filename_prefix": "vid2vid/SparseUpscaleInterp",
       // "$.208.inputs.lora_01": vstValues.loraModelToken,
       // "$.208.inputs.strength_01": vstValues.loraModelStrength
     },
