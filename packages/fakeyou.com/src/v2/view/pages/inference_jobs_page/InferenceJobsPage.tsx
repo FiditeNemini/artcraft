@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Panel } from "components/common";
+import { InferenceJobsModal } from "components/modals";
 import PageHeader from "components/layout/PageHeader";
-import JobsPageList from "./JobsPageList";
 import { useLocalize } from "hooks";
 
 export default function InferenceJobsPage() {
@@ -14,7 +14,7 @@ export default function InferenceJobsPage() {
         subText={t("core.jobsSubtitle")}
       />
       <Panel padding={true}>
-        <JobsPageList />
+        <InferenceJobsModal {...{ showModalHeader: false }} />
       </Panel>
     </Container>
   );

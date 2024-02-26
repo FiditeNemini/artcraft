@@ -15,6 +15,7 @@ interface JobsListProps {
   value?: JobListTypes;
   onSelect?: (e: any) => any;
   panel?: boolean;
+  showJobQueue?: boolean;
   showNoJobs?: boolean;
   showHeader?: boolean;
 }
@@ -35,8 +36,9 @@ export default function InferenceJobsList({
   value,
   onSelect,
   panel = true,
-  showNoJobs = false,
   showHeader = true,
+  showJobQueue = false,
+  showNoJobs = false
 }: JobsListProps) {
   const jobValue = value !== undefined ? value : jobType !== undefined ? (jobType || 0) + 1 : 0;
   // undefined specified here to allow 0.
@@ -51,7 +53,7 @@ export default function InferenceJobsList({
   const jobContent = (
     <>
       {showHeader &&<h3 className="fw-semibold mb-3">{t("core.heading")}</h3>}
-      <JobQueueTicker {...{ hasPaidFeatures }}/>
+      { showJobQueue && <JobQueueTicker {...{ hasPaidFeatures }}/> }
       <div {...{ className: "fy-inference-jobs-list-grid" }}>
         { inferenceJobs.map((job: InferenceJob, key: number) => 
           <JobItem {...{
