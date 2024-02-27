@@ -2,29 +2,31 @@ import { ApiConfig } from "@storyteller/components";
 
 export interface EnqueueVideoStyleTransferRequest {
   "uuid_idempotency_token":string;
-  "maybe_sd_model": string;
-  "maybe_workflow_config": string;
-  "maybe_input_file": string;
-  "maybe_output_path": string; 
-  "creator_set_visibility": string;
+  "maybe_sd_model": string;           // SD Token
+  "maybe_workflow_config": string;    // Workflow Toekn
+  "maybe_input_file": string;         // Input File Token
+  "maybe_output_path": string;        // Result Path
+  "creator_set_visibility": string;   // Result Privacy
   "maybe_json_modifications": {
-    "$.154.inputs.Value": number;
-    "$.510.inputs.Text": string;
-    "$.8.inputs.text": string;
+    "$.154.inputs.Value": number;  // input FPS
+    "$.510.inputs.Text": string;   // positive Prompt
+    "$.8.inputs.text": string;     // negative Prompt
 
-    //"$.800.inputs.Value": number;
-    "$.772.inputs.Value": number;
-    "$.797.inputs.Value": number; 
-    "$.796.inputs.Value": number;
-    //"$.1636.inputs.Value": number;
-    "$.771.inputs.Value": number;
-    "$.403.inputs.Value": number;
-    "$.1398.inputs.Value": number;
-    "$.1531.inputs.Value": number;
     
-    // "$.1449.inputs.filename_prefix": string;
-    // "$.208.inputs.lora_01": string;
-    // "$.208.inputs.strength_01": number;
+    "$.403.inputs.Value": number;  // CN - SparseScribble
+    "$.771.inputs.Value": number;  // CN - Open Pose
+    "$.772.inputs.Value": number;  // CN - Depth
+    "$.796.inputs.Value": number;  // CN - Line Art Realistic
+    "$.797.inputs.Value": number;  // CN - Line Art Anime
+    "$.1398.inputs.Value": number; // CN - Soft Edge
+    "$.1531.inputs.Value": number; // CN - Regular Steps
+    
+    //"$.800.inputs.Value": number;   // CN - Canny
+    //"$.1636.inputs.Value": number;  // CN - Libs Strength
+    
+    // "$.1449.inputs.filename_prefix": string;   // Output Path Prefix
+    // "$.208.inputs.lora_01": string;            // LoRA Model Token
+    // "$.208.inputs.strength_01": number;        // LoRA Model Strength
   }
 }
 
