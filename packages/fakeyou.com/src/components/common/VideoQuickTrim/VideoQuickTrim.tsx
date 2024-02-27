@@ -1,5 +1,6 @@
 import React, {
   useCallback,
+  useEffect,
   useLayoutEffect,
   useState,
   useRef,
@@ -32,9 +33,10 @@ function formatSecondsToHHMMSS(seconds:number){
   else
     return new Date(seconds * 1000).toISOString().slice(11, 19);
 }
+
 export type QuickTrimType = {
   trimStartSeconds: number;
-  trimEndSecondds: number;
+  trimEndSeconds: number;
 }
 
 interface VideoQuickTrimProps extends VideoFakeyouProps{
@@ -85,9 +87,11 @@ export default function VideoQuickTrim({
   const [{playbarWidth, timeCursorOffset}, setPlaybarState] = useState<PlaybarState>(initialPlaybarState);
   const [playpause, setPlaypause] = useState<'playing'|'paused'|'stopped'>('paused');
   const [{
+    trimStart,
+    trimEnd,
     trimDuration,
     isScrubbingTrim,
-  }, setState] = useState<TrimState>(initialTrimState);
+  }, setTrimState] = useState<TrimState>(initialTrimState);
   
 
 
@@ -130,12 +134,18 @@ export default function VideoQuickTrim({
   },[]);
 
   const handleChangeTrimDuration = (selected: string) =>{
-    setState((curr)=>({
+    setTrimState((curr)=>({
       ...curr,
       trimDuration: trimOptions[selected],
       trimEnd: curr.trimStart+ trimOptions[selected],
     }))
   }
+  useEffect(()=>{
+    onSelect({
+      trimStartSeconds: trimStart,
+      trimEndSeconds: trimEnd,
+    });
+  },[trimStart, trimEnd])
   const handlePlaypause = ()=>{
     if (playpause === 'paused' || playpause === 'stopped'){
       videoRef.current?.play();
@@ -179,7 +189,7 @@ export default function VideoQuickTrim({
           onPointerDown={()=>{
             if(trimZoneRef.current){
               trimZoneRef.current.style.cursor = 'grabbing';
-              setState((curr)=>({
+              setTrimState((curr)=>({
                 ...curr,
                 isScrubbingTrim: true,
               }))
@@ -188,7 +198,7 @@ export default function VideoQuickTrim({
           onPointerUp={()=>{
             if(trimZoneRef.current) {
               trimZoneRef.current.style.cursor = 'grab';
-              setState((curr)=>({
+              setTrimState((curr)=>({
                 ...curr,
                 isScrubbingTrim: false,
               }));
