@@ -36,7 +36,7 @@ export default function VideoQuickTrim({
     }
 
   const [playpause, setPlaypause] = useState<'playing'|'paused'|'stopped'>('paused');
-  const [{trimDuration, ...state}, setState] = useState<State>({
+  const [{trimDuration}, setState] = useState<State>({
     trimDuration:3,
     fps: 24,
     skipFrame:0,
