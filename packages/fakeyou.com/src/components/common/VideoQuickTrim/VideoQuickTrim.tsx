@@ -25,6 +25,15 @@ export default function VideoQuickTrim({
   ...rest
 }: VideoQuickTrimProps){
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [currentTimePortion, setCurretTimePortion] = useState<number>(0);
+  if(videoRef.current)
+    videoRef.current.ontimeupdate = (e)=>{
+      if(videoRef.current){
+        console.log(`${videoRef.current.currentTime}/${videoRef.current.duration}  ${videoRef.current.currentTime / videoRef.current.duration}`);
+        setCurretTimePortion(
+          Math.round(videoRef.current.currentTime / videoRef.current.duration * 10000) / 100);
+      }
+    }
 
   const [playpause, setPlaypause] = useState<'playing'|'paused'|'stopped'>('paused');
   const [{trimDuration, ...state}, setState] = useState<State>({
@@ -35,7 +44,7 @@ export default function VideoQuickTrim({
     maxFrame: 3*24,
   });
 
-  console.log(state);
+  // console.log(state);
 
   const handleChangeTrimDuration = (newTrim: number) =>{
     setState((curr)=>({
@@ -46,10 +55,10 @@ export default function VideoQuickTrim({
   }
   const handlePlaypause = ()=>{
     if (playpause === 'paused' || playpause === 'stopped'){
-      videoRef?.current?.play();
+      videoRef.current?.play();
       setPlaypause('playing');
     }else{
-      videoRef?.current?.pause();
+      videoRef.current?.pause();
       setPlaypause('paused');
     }
   }
@@ -62,14 +71,22 @@ export default function VideoQuickTrim({
           {...rest}
         />
         <div className="playpause-overlay" onClick={handlePlaypause}>
-          {playpause === 'paused' && <FontAwesomeIcon icon={faPlay} size="8x"/>}
-          {playpause === 'playing' && <FontAwesomeIcon icon={faPause} size="8x"/>}
+          {playpause === 'paused' && 
+            <FontAwesomeIcon className="playpause-icon"
+              icon={faPlay} size="8x"
+            />
+          }
+          {playpause === 'playing' &&
+            <FontAwesomeIcon className="playpause-icon"
+              icon={faPause} size="8x"
+            />
+          }
           
         </div>
       </div>
       <div className="playbar">
         <div className="trimzone" />
-        <div className="playcursor"/>
+        <div className="playcursor" style={{left: currentTimePortion+"%"}}/>
       </div>
       <div className="d-flex w-100 justify-content-center">
         <Button label="3s"

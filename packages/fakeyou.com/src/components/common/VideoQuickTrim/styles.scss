@@ -4,6 +4,7 @@
   }
   .playpause-overlay{
     position: absolute;
+    cursor: pointer;
     height: 100%;
     width: 100%;
     top:0;
@@ -11,6 +12,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
+    svg{
+      opacity: 0;
+      transition: opacity 0.5s;  
+    }
+    &:hover svg{
+      opacity: 1;
+    }
   }
   .playbar{
     position:relative;
