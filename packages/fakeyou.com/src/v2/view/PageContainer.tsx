@@ -216,8 +216,6 @@ interface Props {
   ) => void;
 }
 
-const isOnStudioPage = window.location.pathname === "/studio";
-
 interface State {}
 
 class PageContainer extends React.Component<
@@ -1575,9 +1573,7 @@ class PageContainer extends React.Component<
                   </Route>
                 </Switch>
               </div>
-              {!isOnStudioPage && (
-                <FooterNav sessionWrapper={this.props.sessionWrapper} />
-              )}
+              <FooterNav sessionWrapper={this.props.sessionWrapper} />
             </div>
           </div>
         </SearchProvider>
