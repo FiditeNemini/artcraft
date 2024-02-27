@@ -10,12 +10,14 @@ interface SelectionBubbleProps {
   options: string[];
   onSelect: (selected: string) => void;
   selectedStyle?: "outline" | "fill";
+  mobileSideScroll?: boolean;
 }
 
 export default function SelectionBubbles({
   options,
   onSelect,
   selectedStyle = "outline",
+  mobileSideScroll = false,
 }: SelectionBubbleProps) {
   //Select first one as default on mount
   const [selectedOption, setSelectedOption] = useState<string | null>(
@@ -72,16 +74,23 @@ export default function SelectionBubbles({
   return (
     <div
       className={`selection-bubbles-wrapper ${
-        showGradient ? "show-gradient" : ""
-      } ${showLeftGradient ? "show-left-gradient" : ""}`.trim()}
+        showGradient && mobileSideScroll ? "show-gradient" : ""
+      } ${
+        showLeftGradient && mobileSideScroll ? "show-left-gradient" : ""
+      }`.trim()}
     >
-      {showLeftGradient && (
+      {showLeftGradient && mobileSideScroll && (
         <FontAwesomeIcon
           icon={faChevronLeft}
           className="scroll-indicator-left fs-5"
         />
       )}
-      <div className="selection-bubbles" ref={bubblesRef}>
+      <div
+        className={`selection-bubbles ${
+          !mobileSideScroll ? "no-side-scroll" : ""
+        }`.trim()}
+        ref={bubblesRef}
+      >
         {options.map(option => (
           <button
             key={option}
@@ -96,7 +105,7 @@ export default function SelectionBubbles({
           </button>
         ))}
       </div>
-      {showGradient && (
+      {showGradient && mobileSideScroll && (
         <FontAwesomeIcon
           icon={faChevronRight}
           className="scroll-indicator fs-5"

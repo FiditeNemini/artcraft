@@ -228,6 +228,7 @@ export default function LandingDemo({
           <SelectionBubbles
             options={voiceOptions}
             onSelect={handleVoiceSelection}
+            mobileSideScroll={true}
           />
         </div>
 

@@ -79,6 +79,10 @@
     justify-content: start;
     overflow-x: visible;
   }
+
+  &.no-side-scroll {
+    flex-wrap: wrap;
+  }
 }
 
 .bubble-button {
