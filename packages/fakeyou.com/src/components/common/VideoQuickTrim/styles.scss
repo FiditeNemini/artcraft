@@ -1,0 +1,45 @@
+.fy-video-quicktrim {
+  .video-wrapper{
+    position: relative;
+  }
+  .playpause-overlay{
+    position: absolute;
+    cursor: pointer;
+    height: 100%;
+    width: 100%;
+    top:0;
+    left:0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    svg{
+      opacity: 0;
+      transition: opacity 0.5s;  
+    }
+    &:hover svg{
+      opacity: 1;
+    }
+  }
+  .playbar{
+    position:relative;
+    height: 2rem;
+    width: 100%;
+    background-color: rgba(255,255,255,0.6);
+  }
+  .trimzone{
+    position: absolute;
+    top:0;
+    width: 30px;
+    height: 2rem;
+    background-color: #e66462;
+    opacity: 0.8;
+  }
+  .playcursor{
+    position: absolute;
+    top:0;
+    width: 1px;
+    height: 2rem;
+    background-color: red;
+  }
+}
