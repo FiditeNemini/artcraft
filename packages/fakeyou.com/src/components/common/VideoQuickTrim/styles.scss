@@ -1,6 +1,11 @@
+@import "scss/colours.scss";
+
 .fy-video-quicktrim {
   .video-wrapper{
     position: relative;
+    background-color: $bg;
+    border-radius: 0.5rem 0.5rem 0 0;
+    border: $panel-inner-border 1px solid;
   }
   .playpause-overlay{
     position: absolute;
@@ -33,6 +38,8 @@
     height: 2rem;
     background-color: #e66462;
     opacity: 0.8;
+
+    cursor: grab;
   }
   .playcursor{
     position: absolute;

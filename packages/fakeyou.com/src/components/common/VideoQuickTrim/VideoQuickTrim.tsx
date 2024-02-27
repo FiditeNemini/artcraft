@@ -1,4 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+  PointerEvent
+} from "react";
 import {
   faPlay,
   faPause
@@ -9,48 +15,66 @@ import { VideoFakeyouProps } from "../VideoFakeyou/VideoFakeyou";
 
 import './styles.scss'
 
-interface VideoQuickTrimProps extends VideoFakeyouProps{
-  onChange: ()=>void
+function fractionToPercentage(fraction:number){
+  return Math.round(fraction * 10000) / 100;
 }
 
-type State = {
-  trimDuration: number;
-  fps: number;
-  skipFrame: number; //start time
-  frameCap: number; //endtime
-  maxFrame: number; //totally duration 
+interface VideoQuickTrimProps extends VideoFakeyouProps{
+  onChange: ()=>void;
 }
+
+type TrimState = {
+  isScrubbingTrim: boolean;
+  trimDuration: number;
+  trimStart: number;
+  trimEnd: number;
+  maxDuration: number;
+}
+
+const initialState = {
+  isScrubbingTrim: false,
+  trimDuration: 3,
+  trimStart: 0,
+  trimEnd: 0,
+  maxDuration: 0,
+}
+
 export default function VideoQuickTrim({
   onChange,
   ...rest
 }: VideoQuickTrimProps){
-  const videoRef = useRef<HTMLVideoElement>(null);
+  console.log("Rerender!!");
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [currentTimePortion, setCurretTimePortion] = useState<number>(0);
-  if(videoRef.current)
-    videoRef.current.ontimeupdate = (e)=>{
-      if(videoRef.current){
-        console.log(`${videoRef.current.currentTime}/${videoRef.current.duration}  ${videoRef.current.currentTime / videoRef.current.duration}`);
+  const videoRefCallback = useCallback(node => {
+    if (node !== null) { 
+      // DOM node referenced by ref has changed and exists
+      videoRef.current = node;
+      node.ontimeupdate = (e: PointerEvent)=>{
+        console.log(`${node.currentTime}/${node.duration}  ${node.currentTime / node.duration}`);
         setCurretTimePortion(
-          Math.round(videoRef.current.currentTime / videoRef.current.duration * 10000) / 100);
+          fractionToPercentage(node.currentTime / node.duration)
+        );
       }
+    } else {
+      // DOM node referenced by ref has been unmounted
     }
+  }, []); //END videoRefCallback
 
+  const trimZoneRef = useRef<HTMLDivElement>(null);
+  const playbarRef = useRef<HTMLDivElement>(null);
   const [playpause, setPlaypause] = useState<'playing'|'paused'|'stopped'>('paused');
-  const [{trimDuration}, setState] = useState<State>({
-    trimDuration:3,
-    fps: 24,
-    skipFrame:0,
-    frameCap: 3*24,
-    maxFrame: 3*24,
-  });
-
-  // console.log(state);
+  const [{
+    trimDuration,
+    isScrubbingTrim,
+  }, setState] = useState<TrimState>(initialState);
 
   const handleChangeTrimDuration = (newTrim: number) =>{
     setState((curr)=>({
       ...curr,
       trimDuration: newTrim,
-      frameCap: curr.skipFrame+ newTrim*curr.fps
+      trimEnd: curr.trimStart+ newTrim,
     }))
   }
   const handlePlaypause = ()=>{
@@ -67,7 +91,7 @@ export default function VideoQuickTrim({
       <div className="video-wrapper">
         <VideoFakeyou
           controls={false}
-          ref={videoRef}
+          ref={videoRefCallback}
           {...rest}
         />
         <div className="playpause-overlay" onClick={handlePlaypause}>
@@ -83,16 +107,44 @@ export default function VideoQuickTrim({
           }
           
         </div>
-      </div>
-      <div className="playbar">
-        <div className="trimzone" style={{width: (
-          videoRef.current ? 
-            (trimDuration / videoRef.current.duration * 100) 
-            : 0
-          ) + "%"}}
-        />
-        <div className="playcursor" style={{left: currentTimePortion+"%"}}/>
-      </div>
+     
+        <div className="playbar" ref={playbarRef}>
+          <div className="trimzone" 
+            ref={trimZoneRef}
+            style={{width: (
+              videoRef.current ? 
+                (trimDuration / videoRef.current.duration * 100) 
+                : 0
+            ) + "%"}}
+            onPointerDown={()=>{
+              if(trimZoneRef.current){
+                trimZoneRef.current.style.cursor = 'grabbing';
+                setState((curr)=>({
+                  ...curr,
+                  isScrubbingTrim: true,
+                }))
+              }
+            }}
+            onPointerUp={()=>{
+              if(trimZoneRef.current) {
+                trimZoneRef.current.style.cursor = 'grab';
+                setState((curr)=>({
+                  ...curr,
+                  isScrubbingTrim: true,
+                }));
+              }
+            }}
+            onPointerMove={(e: PointerEvent<HTMLDivElement>)=>{
+              if(trimZoneRef.current && playbarRef.current && isScrubbingTrim){
+                console.log(fractionToPercentage(
+                  (e.clientX - trimZoneRef.current.getBoundingClientRect().left) / playbarRef.current.getBoundingClientRect().width
+                ) + "%");
+              }
+            }}
+          />
+          <div className="playcursor" style={{left: currentTimePortion+"%"}}/>
+        </div> {/* END of Playbar */}
+      </div>{/* END of Video Wrapper */}
       <div className="d-flex w-100 justify-content-center">
         <Button label="3s"
           isActive={trimDuration===3}
