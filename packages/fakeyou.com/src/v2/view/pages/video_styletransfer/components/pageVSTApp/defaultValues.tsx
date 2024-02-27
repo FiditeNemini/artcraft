@@ -3,19 +3,18 @@ export {initialValues, hiddenValues};
 const initialValues = {
   //files Settings
   fileToken: "",
-  outputPath: "",
+  outputPath: "vid2vid/SparseUpscaleInterp_00001.mp4",
 
   //video Settings
-  width: 544,
-  height: 544,
-  maxFrames: 17,
-  framesCap: 16,
-  skipFrames: 0,
+  width: 1024,
+  height: 1024,
+  maxDuration: 2,
+  trimStart: 0,
+  trimEnd: 5,
 
   //Presents
-  // workflowConfig: "weight_f5qh4s1dtp266yv313p09tkpa",
   workflowConfig: "weight_99tz2nzbp5x9v55gqn5ekj1sd",
-  sdModelToken: "weight_83xpresyjswy97ppk0fyct146",
+  sdModelToken: "weight_p5x93dw8ec24zf9hz1zezsata",
   loraModelToken: "weight_13yfxfafv195ejwh3meesebdk",
   loraModelStrength: 1,
 
