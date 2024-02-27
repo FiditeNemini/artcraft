@@ -17,7 +17,7 @@ const defaultPreset = {
   cnPipeFace: 0.7,
   cnSparseScribble: 0.7,
   cnSoftEdge: 0.7,
-  cnRegularSteps: 30,
+  cnRegularSteps: 20,
 }
 const closeupPreset = {
   cnCanny: 0,

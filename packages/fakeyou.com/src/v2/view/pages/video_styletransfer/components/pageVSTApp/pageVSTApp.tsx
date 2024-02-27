@@ -51,18 +51,18 @@ export default function PageVSTApp({
       const newValues : {
         width?: number;
         height?: number;
-        maxFrames?: number;
-        framesCap?: number;
+        maxDuration?: number;
+        // trim?: number;
       } = {};
-      if (ve.videoWidth && ve.videoHeight) {
-        const aspectRatio = ve.videoWidth/ve.videoHeight
-        if (aspectRatio > 1) newValues.width = 960;
-        else if (aspectRatio < 1) newValues.height = 960
-        else if (debug) console.log(`aspectRaio: ${aspectRatio}`);
-      }
+      // if (ve.videoWidth && ve.videoHeight) {
+      //   const aspectRatio = ve.videoWidth/ve.videoHeight
+      //   if (aspectRatio > 1) newValues.width = 960;
+      //   else if (aspectRatio < 1) newValues.height = 960
+      //   else if (debug) console.log(`aspectRaio: ${aspectRatio}`);
+      // }
       if(ve.duration){
-        newValues.maxFrames = Math.floor(ve.duration)*vstValues.inputFps;
-        newValues.framesCap =  newValues.maxFrames;
+        newValues.maxDuration = ve.duration
+        // newValues.framesCap =  newValues.maxFrames;
       }
       setVstValues((curr)=>({
         ...curr,
