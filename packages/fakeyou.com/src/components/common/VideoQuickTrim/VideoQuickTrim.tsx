@@ -145,7 +145,8 @@ export default function VideoQuickTrim({
       trimStartSeconds: trimStart,
       trimEndSeconds: trimEnd,
     });
-  },[trimStart, trimEnd])
+  },[trimStart, trimEnd, onSelect]);
+
   const handlePlaypause = ()=>{
     if (playpause === 'paused' || playpause === 'stopped'){
       videoRef.current?.play();
