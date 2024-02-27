@@ -66,7 +66,7 @@ pub async fn insert_media_file_from_mocapnet(
     const ORIGIN_CATEGORY : MediaFileOriginCategory = MediaFileOriginCategory::Inference;
     const ORIGIN_PRODUCT_CATEGORY : MediaFileOriginProductCategory = MediaFileOriginProductCategory::Mocap;
     const ORIGIN_MODEL_TYPE : MediaFileOriginModelType = MediaFileOriginModelType::MocapNet;
-    const MEDIA_TYPE : MediaFileType = MediaFileType::Mocap;
+    const MEDIA_TYPE : MediaFileType = MediaFileType::Bvh;
 
     let record_id = {
         let query_result = sqlx::query!(
