@@ -52,12 +52,10 @@ export default function SideNav({
   const isMenuOpen = wrapper?.classList.contains("toggled");
   const isLoggedIn = sessionWrapper.isLoggedIn();
   const isOnLandingPage = window.location.pathname === "/";
-  const isOnLoginOrSignUpPage =
-    window.location.pathname === "/login" ||
-    window.location.pathname === "/login/" ||
-    window.location.pathname === "/signup" ||
-    window.location.pathname === "/signup/";
-  const isOnStudioPage = window.location.pathname === "/studio";
+  const isOnLoginOrSignUpPage = window.location.pathname.includes(
+    "/login" || "/signup"
+  );
+  const isOnStudioPage = window.location.pathname.includes("/studio");
 
   let history = useHistory();
   const handleNavLinkClick = () => {
