@@ -1,5 +1,6 @@
 import React, {
   useCallback,
+  useLayoutEffect,
   useState,
   useRef,
   PointerEvent
@@ -31,8 +32,13 @@ function formatSecondsToHHMMSS(seconds:number){
   else
     return new Date(seconds * 1000).toISOString().slice(11, 19);
 }
+export type QuickTrimType = {
+  trimStartSeconds: number;
+  trimEndSecondds: number;
+}
+
 interface VideoQuickTrimProps extends VideoFakeyouProps{
-  onChange: ()=>void;
+  onSelect: (val: QuickTrimType)=>void;
 }
 
 type TrimState = {
@@ -42,37 +48,27 @@ type TrimState = {
   trimEnd: number;
   maxDuration: number;
 }
-
-const initialState = {
+const initialTrimState = {
   isScrubbingTrim: false,
   trimDuration: 3,
   trimStart: 0,
   trimEnd: 0,
   maxDuration: 0,
 }
+type PlaybarState = {
+  playbarWidth: number;
+  timeCursorOffset: number;
+}
+const initialPlaybarState = {
+  playbarWidth: 0,
+  timeCursorOffset: 0,
+}
 
 export default function VideoQuickTrim({
-  onChange,
+  onSelect,
   ...rest
 }: VideoQuickTrimProps){
   console.log("Rerender!!");
-
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [currentTimePortion, setCurretTimePortion] = useState<number>(0);
-  const videoRefCallback = useCallback(node => {
-    if (node !== null) { 
-      // DOM node referenced by ref has changed and exists
-      videoRef.current = node;
-      node.ontimeupdate = (e: PointerEvent)=>{
-        console.log(`${node.currentTime}/${node.duration}  ${node.currentTime / node.duration}`);
-        setCurretTimePortion(
-          fractionToPercentage(node.currentTime / node.duration)
-        );
-      }
-    } else {
-      // DOM node referenced by ref has been unmounted
-    }
-  }, []); //END videoRefCallback
 
   const trimOptions: { [key: string]: number } = {
     "3s": 3,
@@ -81,13 +77,57 @@ export default function VideoQuickTrim({
     "15s" : 15,
     "20s" : 20,
   };
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const playbarRef = useRef<HTMLDivElement | null>(null);
   const trimZoneRef = useRef<HTMLDivElement>(null);
-  const playbarRef = useRef<HTMLDivElement>(null);
+
+  const [{playbarWidth, timeCursorOffset}, setPlaybarState] = useState<PlaybarState>(initialPlaybarState);
   const [playpause, setPlaypause] = useState<'playing'|'paused'|'stopped'>('paused');
   const [{
     trimDuration,
     isScrubbingTrim,
-  }, setState] = useState<TrimState>(initialState);
+  }, setState] = useState<TrimState>(initialTrimState);
+  
+
+
+  const videoRefCallback = useCallback(node => {
+    if (node !== null) { 
+      // DOM node referenced by ref has changed and exists
+      videoRef.current = node;
+      node.ontimeupdate = (e: PointerEvent)=>{
+        setPlaybarState((curr)=>({
+          ...curr,
+          timeCursorOffset: (node.currentTime / node.duration) * (playbarWidth-8)
+        }));
+      }
+    } // else{} DOM node referenced by ref has been unmounted 
+  }, [playbarWidth]); //END videoRefCallback
+
+  function handleWindowResize() {
+    if(playbarRef.current !== null){
+      const newWidth = playbarRef.current.getBoundingClientRect().width;
+      setPlaybarState((curr)=>({
+        playbarWidth: newWidth,
+        timeCursorOffset: (curr.timeCursorOffset / (curr.playbarWidth-8)) * (newWidth-8)
+      }));
+    }
+  }
+  const playbarRefCallback = useCallback(node => {
+    if(node !== null) {
+      playbarRef.current = node;
+      setPlaybarState((curr)=>({
+        ...curr,
+        playbarWidth: node.getBoundingClientRect().width
+      }));
+    }
+  }, []);
+  useLayoutEffect(()=>{
+    window.addEventListener('resize', handleWindowResize);
+    return () => {
+      window.removeEventListener('resize', handleWindowResize);
+    };
+  },[]);
 
   const handleChangeTrimDuration = (selected: string) =>{
     setState((curr)=>({
@@ -127,7 +167,7 @@ export default function VideoQuickTrim({
           
         </div>
       </div>{/* END of Video Wrapper */}
-      <div className="playbar" ref={playbarRef}>
+      <div className="playbar" ref={playbarRefCallback}>
         <div className="playbar-bg" />
         <div className="trimzone" 
           ref={trimZoneRef}
@@ -150,7 +190,7 @@ export default function VideoQuickTrim({
               trimZoneRef.current.style.cursor = 'grab';
               setState((curr)=>({
                 ...curr,
-                isScrubbingTrim: true,
+                isScrubbingTrim: false,
               }));
             }
           }}
@@ -164,7 +204,7 @@ export default function VideoQuickTrim({
         >
           <FontAwesomeIcon icon={faGripDots} />
         </div>
-        <div className="playcursor" style={{left: currentTimePortion+"%"}}/>
+        <div className="playcursor" style={{left: timeCursorOffset+"px"}}/>
       </div> {/* END of Playbar */}
 
       <div className="d-flex w-100 justify-content-between mt-3 flex-wrap">

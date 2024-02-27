@@ -7,8 +7,9 @@ import {Container, Panel} from 'components/common';
 export default function ComponentSandbox(
   {parentPath}:{parentPath:string}
 ){
-  const onChange = ()=>{
+  const handleCallback = (val:any)=>{
     console.log('onChange is triggered')
+    console.log(val);
   }
   return (<Container>
     <NavLink to={`${parentPath}`}>← Back</NavLink>
@@ -17,7 +18,7 @@ export default function ComponentSandbox(
       
       <div className="m-4">
         <VideoQuickTrim 
-          onChange={onChange}
+          onSelect={handleCallback}
           mediaToken='m_wdptbe5rfzpb1gzhva78gpw8qrkgs9'
         />
       </div>
@@ -25,7 +26,7 @@ export default function ComponentSandbox(
       <br/>
       <div className="m-4">
       <VideoQuickTrim 
-        onChange={onChange}
+        onSelect={handleCallback}
         mediaToken='m_h21nykes0j3ph23y5z7w9axtjjn2rr'
       />
       </div>
