@@ -9,13 +9,15 @@ import {
 interface SelectionBubbleProps {
   options: string[];
   onSelect: (selected: string) => void;
+  selectedStyle?: "outline" | "fill";
 }
 
 export default function SelectionBubbles({
   options,
   onSelect,
+  selectedStyle = "outline",
 }: SelectionBubbleProps) {
-  //Select first one as defaults
+  //Select first one as default on mount
   const [selectedOption, setSelectedOption] = useState<string | null>(
     options.length > 0 ? options[0] : null
   );
@@ -84,8 +86,10 @@ export default function SelectionBubbles({
           <button
             key={option}
             className={`bubble-button ${
-              selectedOption === option ? "selected" : ""
-            }`}
+              selectedOption === option
+                ? `selected ${selectedStyle === "fill" ? "fill" : ""}`
+                : ""
+            }`.trim()}
             onClick={event => handleSelect(event, option)}
           >
             {option}

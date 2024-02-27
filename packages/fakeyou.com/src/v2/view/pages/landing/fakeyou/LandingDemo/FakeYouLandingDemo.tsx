@@ -83,7 +83,9 @@ export default function LandingDemo({
     "Angry Male": "weight_hehgvegadf08mfp5rzd69dmh4",
   };
 
-  const [voiceToken, setVoiceToken] = useState(voiceModelTokenMap["Spongebob"]);
+  const [voiceToken, setVoiceToken] = useState(
+    voiceModelTokenMap[Object.keys(voiceModelTokenMap)[0]]
+  );
 
   const handleVoiceSelection = (selected: string) => {
     console.log(`Selected option: ${selected}`);
