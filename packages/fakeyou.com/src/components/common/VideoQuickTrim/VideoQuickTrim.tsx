@@ -85,7 +85,12 @@ export default function VideoQuickTrim({
         </div>
       </div>
       <div className="playbar">
-        <div className="trimzone" />
+        <div className="trimzone" style={{width: (
+          videoRef.current ? 
+            (trimDuration / videoRef.current.duration * 100) 
+            : 0
+          ) + "%"}}
+        />
         <div className="playcursor" style={{left: currentTimePortion+"%"}}/>
       </div>
       <div className="d-flex w-100 justify-content-center">
