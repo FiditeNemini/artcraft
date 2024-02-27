@@ -3,6 +3,7 @@ import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapp
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 import { Scene3D } from "components/common";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -10,6 +11,8 @@ interface Props {
 }
 
 function StorytellerStudioListPage(props: Props) {
+  usePrefixedDocumentTitle("Storyteller Studio");
+
   if (!props.sessionWrapper.canAccessStudio()) {
     return <StudioNotAvailable />;
   }

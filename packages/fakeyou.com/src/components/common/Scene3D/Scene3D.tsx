@@ -24,7 +24,6 @@ export default function Scene3D({
         width="100%"
         height="100%"
         id=""
-        className="rounded"
       />
     </div>
   );
