@@ -41,6 +41,9 @@ pub struct ComfyInferenceCommand {
     // Where to mount the filesystem
     pub(crate) mounts_directory: PathBuf,
 
+    // Video processing script
+    pub(crate) processing_script: PathBuf,
+
     /// Config file to use
     config_path: Option<PathBuf>,
 
@@ -112,11 +115,15 @@ impl ComfyInferenceCommand {
         let mounts_directory = easyenv::get_env_pathbuf_required(
             "COMFY_MOUNTS_DIRECTORY")?;
 
+        let processing_script = easyenv::get_env_pathbuf_required(
+            "COMFY_VIDEO_PROCESSING_SCRIPT")?;
+
         Ok(Self {
             comfy_root_code_directory,
             executable_or_command,
             config_path,
             mounts_directory,
+            processing_script,
             maybe_virtual_env_activation_command,
             maybe_docker_options,
             maybe_execution_timeout,

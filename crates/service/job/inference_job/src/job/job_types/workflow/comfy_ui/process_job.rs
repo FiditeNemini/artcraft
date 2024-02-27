@@ -1,5 +1,6 @@
 use std::fs::{File, read_to_string};
 use std::path::{Path, PathBuf};
+use std::process::Command;
 use std::time::Instant;
 
 use anyhow::{anyhow, Result};
@@ -275,6 +276,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     }
     // Download Input file if specified
     let mut maybe_input_path: Option<PathBuf> = None;
+    let mut maybe_original_input_path: Option<PathBuf> = None;
     match job_args.maybe_input_file {
         Some(input_file) => {
             let input_dir = root_comfy_path.join("input");
@@ -294,7 +296,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 retrieved_input_record.maybe_public_bucket_extension.as_deref());
 
             //let input_filename = format!("input.{}", retrieved_input_record.maybe_public_bucket_extension.unwrap());
-            let input_filename = "input.mp4".to_string();
+            let input_filename = "video.mp4".to_string();
             let input_path = path_to_string(input_dir.join(input_filename));
 
             //let bucket_details = RemoteCloudBucketDetails {
@@ -308,7 +310,40 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             remote_cloud_file_client.download_media_file(&media_file_bucket_path, input_path.clone()).await?;
 
             info!("Downloaded input file to {:?}", input_path);
-            maybe_input_path = Some(input_path.parse().unwrap());
+
+            maybe_original_input_path = Some(input_path.parse().unwrap());
+
+            // ========================= PROCESS VIDEO ======================== //
+
+            // get params from comfy args
+            let vid_max_height = comfy_args.scale_width.unwrap_or(768);
+            let vid_max_width = comfy_args.scale_height.unwrap_or(768);
+            let target_fps = comfy_args.target_fps.unwrap_or(24);
+            let trim_start_seconds = comfy_args.trim_start_seconds.unwrap_or(0);
+            let trim_end_seconds = comfy_args.trim_end_seconds.unwrap_or(3);
+            let video_processing_script = model_dependencies.inference_command.processing_script.clone();
+
+            // shell out to python script
+            let output = Command::new("python3")
+                .arg(video_processing_script)
+                .arg(input_path.clone())
+                .arg(format!("{:?}x{:?}", vid_max_width, vid_max_height))
+                .arg(format!("{:?}", trim_start_seconds * 1000))
+                .arg(format!("{:?}", trim_end_seconds * 1000))
+                .arg(format!("{:?}", target_fps))
+                .output()
+                .map_err(|e| ProcessSingleJobError::Other(e.into()))?;
+
+            // check if the command was successful
+            if !output.status.success() {
+                // print stdout and stderr
+                error!("Video processing failed: {:?}", output.status);
+                error!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+                error!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+                return Err(ProcessSingleJobError::Other(anyhow!("Command failed: {:?}", output.status)));
+            }
+
+            maybe_input_path = Some(input_dir.join("input.mp4"));
         }
         None => {}
     }
@@ -382,6 +417,9 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
         if let Some(input_path) = maybe_input_path {
             safe_delete_temp_file(&input_path);
+        }
+        if let Some(original_input_path) = maybe_original_input_path {
+            safe_delete_temp_file(&original_input_path);
         }
         let output_dir = root_comfy_path.join("output");
         recursively_delete_files_in(&output_dir).unwrap();
@@ -492,7 +530,9 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     if let Some(input_path) = maybe_input_path {
         safe_delete_temp_file(&input_path);
     }
-
+    if let Some(original_input_path) = maybe_original_input_path {
+        safe_delete_temp_file(&original_input_path);
+    }
     let output_dir = root_comfy_path.join("output");
     recursively_delete_files_in(&output_dir).unwrap();
 
