@@ -6,7 +6,8 @@ import React, {
 } from "react";
 import {
   faPlay,
-  faPause
+  faPause,
+  faGripDots
 } from "@fortawesome/pro-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -160,7 +161,9 @@ export default function VideoQuickTrim({
               ) + "%");
             }
           }}
-        />
+        >
+          <FontAwesomeIcon icon={faGripDots} />
+        </div>
         <div className="playcursor" style={{left: currentTimePortion+"%"}}/>
       </div> {/* END of Playbar */}
 

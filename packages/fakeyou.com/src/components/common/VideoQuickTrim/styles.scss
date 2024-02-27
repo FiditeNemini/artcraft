@@ -46,18 +46,28 @@ $playbar-height: 2rem;
   }
   .trimzone{
     position: absolute;
-    top:0;
-    height: 2rem;
+    top:-1rem;
+    height: 3rem;
     background-color: #e66462;
     opacity: 0.8;
-
+    outline: 0.125rem $white solid;
+    border-top: 1rem $white solid;
+    border-radius: 0.25rem 0.25rem 0.125rem 0.125rem;
     cursor: grab;
+
+    display: flex;
+    justify-content: center;
+
+    .fa-grip-dots {
+      margin-top: -1rem;
+      color: $panel-inner-border;
+    }
   }
   .playcursor{
     position: absolute;
     top:0;
     width: 0.5rem;
     height: $playbar-height;
-    background-color: white;
+    background-color: $white;
   }
 }
