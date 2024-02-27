@@ -33,7 +33,9 @@ styles with important tags:
   width: 2.25rem;
   fill: none;
 
-  circle, line, polyline {
+  circle,
+  line,
+  polyline {
     stroke-width: 3px;
     stroke-linecap: round;
     stroke: #fff;

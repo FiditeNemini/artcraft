@@ -57,6 +57,7 @@ export default function SideNav({
     window.location.pathname === "/login/" ||
     window.location.pathname === "/signup" ||
     window.location.pathname === "/signup/";
+  const isOnStudioPage = window.location.pathname === "/studio";
 
   let history = useHistory();
   const handleNavLinkClick = () => {
@@ -107,7 +108,8 @@ export default function SideNav({
   }, []);
 
   const shouldNotShowSidebar =
-    !isLoggedIn && (isOnLandingPage || isOnLoginOrSignUpPage);
+    (!isLoggedIn && (isOnLandingPage || isOnLoginOrSignUpPage)) ||
+    isOnStudioPage;
   const shouldShowSidebar = windowWidth >= 992 && !shouldNotShowSidebar;
   const sidebarClassName = `sidebar ${
     shouldShowSidebar ? "visible" : ""
@@ -116,15 +118,13 @@ export default function SideNav({
   useEffect(() => {
     const contentWrapper = document.getElementById("page-content-wrapper");
 
-    if (
-      (shouldShowSidebar && isLoggedIn) ||
-      (shouldShowSidebar && !isOnLandingPage)
-    ) {
+    // Adjusted logic to ensure no padding is added when on the studio page
+    if (shouldShowSidebar && !isOnStudioPage) {
       contentWrapper?.classList.remove("no-padding");
     } else {
       contentWrapper?.classList.add("no-padding");
     }
-  }, [isLoggedIn, isOnLandingPage, shouldShowSidebar]);
+  }, [shouldShowSidebar, isOnStudioPage]);
 
   const logoutHandler = async () => {
     await Logout();

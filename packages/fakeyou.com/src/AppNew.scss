@@ -54,7 +54,7 @@ $headings-font-family: "Fira Sans", sans-serif;
 
   #main {
     position: relative; // Footer attachment.
-    min-height: 100vh;
+    min-height: calc(100vh - 66px);
     overflow: hidden;
   }
 
@@ -339,8 +339,8 @@ $headings-font-family: "Fira Sans", sans-serif;
     left: 0;
     right: 0;
     z-index: 3;
-    
-      box-shadow: 0px 5px 20px rgba($black, 0.3);
+
+    box-shadow: 0px 5px 20px rgba($black, 0.3);
   }
 }
 

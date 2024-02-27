@@ -94,7 +94,7 @@ import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
-import { StorytellerStudioListPage } from "./pages/storyteller_studio/vc_model_list/StorytellerStudioListPage";
+import { StorytellerStudioListPage } from "./pages/storyteller_studio/StorytellerStudioPage";
 import TopNav from "components/layout/TopNav/TopNav";
 import SideNav from "components/layout/SideNav/SideNav";
 import MediaPage from "./pages/media/MediaPage";
@@ -215,6 +215,8 @@ interface Props {
     maybeSelectedVoiceConversionModel: VoiceConversionModelListItem
   ) => void;
 }
+
+const isOnStudioPage = window.location.pathname === "/studio";
 
 interface State {}
 
@@ -1573,7 +1575,9 @@ class PageContainer extends React.Component<
                   </Route>
                 </Switch>
               </div>
-              <FooterNav sessionWrapper={this.props.sessionWrapper} />
+              {!isOnStudioPage && (
+                <FooterNav sessionWrapper={this.props.sessionWrapper} />
+              )}
             </div>
           </div>
         </SearchProvider>

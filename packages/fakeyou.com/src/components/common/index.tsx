@@ -30,7 +30,7 @@ import Radio from "./Radio";
 import Searcher from "./Searcher";
 import SegmentButtons from "./SegmentButtons";
 import Select from "./Select";
-import SelectModal, { SelectModalData }  from "./SelectModal";
+import SelectModal, { SelectModalData } from "./SelectModal";
 import SelectModalVideoTabs from "./SelectModalVideoTabs";
 import SelectModalWeightsTabs from "./SelectModalWeightsTabs";
 import Skeleton from "./Skeleton";
@@ -49,10 +49,9 @@ import VideoBasic from "./VideoBasic";
 import VideoFakeyou from "./VideoFakeyou";
 import VideoInput from "./VideoInput";
 import SelectionBubbles from "./SelectionBubbles";
+import Scene3D from "./Scene3D";
 
-export type{
-  SelectModalData
-};
+export type { SelectModalData };
 
 export {
   Accordion,
@@ -111,4 +110,5 @@ export {
   VideoFakeyou,
   VideoInput,
   SelectionBubbles,
+  Scene3D,
 };
