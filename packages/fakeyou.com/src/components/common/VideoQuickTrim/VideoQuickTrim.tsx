@@ -1,4 +1,9 @@
 import React, { useState, useRef } from "react";
+import {
+  faPlay,
+  faPause
+} from "@fortawesome/pro-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, VideoFakeyou } from "components/common";
 import { VideoFakeyouProps } from "../VideoFakeyou/VideoFakeyou";
 
@@ -19,6 +24,9 @@ export default function VideoQuickTrim({
   onChange,
   ...rest
 }: VideoQuickTrimProps){
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const [playpause, setPlaypause] = useState<'playing'|'paused'|'stopped'>('paused');
   const [{trimDuration, ...state}, setState] = useState<State>({
     trimDuration:3,
     fps: 24,
@@ -36,11 +44,28 @@ export default function VideoQuickTrim({
       frameCap: curr.skipFrame+ newTrim*curr.fps
     }))
   }
+  const handlePlaypause = ()=>{
+    if (playpause === 'paused' || playpause === 'stopped'){
+      videoRef?.current?.play();
+      setPlaypause('playing');
+    }else{
+      videoRef?.current?.pause();
+      setPlaypause('paused');
+    }
+  }
   return (
     <div className="fy-video-quicktrim">
       <div className="video-wrapper">
-        <VideoFakeyou {...rest} controls={false}/>
-        <div className="playpause-overlay">PLAY</div>
+        <VideoFakeyou
+          controls={false}
+          ref={videoRef}
+          {...rest}
+        />
+        <div className="playpause-overlay" onClick={handlePlaypause}>
+          {playpause === 'paused' && <FontAwesomeIcon icon={faPlay} size="8x"/>}
+          {playpause === 'playing' && <FontAwesomeIcon icon={faPause} size="8x"/>}
+          
+        </div>
       </div>
       <div className="playbar">
         <div className="trimzone" />

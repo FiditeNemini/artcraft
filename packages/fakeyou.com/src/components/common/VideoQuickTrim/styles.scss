@@ -4,9 +4,13 @@
   }
   .playpause-overlay{
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    height: 100%;
+    width: 100%;
+    top:0;
+    left:0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .playbar{
     position:relative;
