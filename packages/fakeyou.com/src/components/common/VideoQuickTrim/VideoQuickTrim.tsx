@@ -65,6 +65,7 @@ export default function VideoQuickTrim({
 
   const [{playbarWidth, timeCursorOffset}, setPlaybarState] = useState<PlaybarStates>(initialPlaybarState);
   const [playpause, setPlaypause] = useState<'playing'|'paused'|'stopped'>('paused');
+  const [isMuted, setIsMuted] = useState<boolean>(false);
   const [{
     trimStart,
     trimEnd,
@@ -135,11 +136,15 @@ export default function VideoQuickTrim({
       setPlaypause('paused');
     }
   }
+  const handleMute = ()=> {
+    
+  }
   return (
     <div className="fy-video-quicktrim">
       <div className="video-wrapper">
         <VideoFakeyou
           controls={false}
+          muted={isMuted}
           ref={videoRefCallback}
           {...rest}
         />
@@ -154,7 +159,6 @@ export default function VideoQuickTrim({
               icon={faPause} size="8x"
             />
           }
-          
         </div>
       </div>{/* END of Video Wrapper */}
       <div className="playbar" ref={playbarRefCallback}>
@@ -200,9 +204,16 @@ export default function VideoQuickTrim({
       <div className="d-flex w-100 justify-content-between mt-3 flex-wrap">
         <div className="playpause-external d-flex align-items-center flex-wrap mb-2">
           <Button
+            className="button-playpause"
             icon={playpause === 'playing' ? faPause : faPlay}
             variant="secondary"
             onClick={handlePlaypause}
+          />
+          <Button
+            className="button-mute"
+            icon={isMuted ? faVolumeSlash : faVolume}
+            variant="secondary"
+            onClick={()=>setIsMuted((curr)=>(!curr))}
           />
           <div className="playtime ms-3 d-flex">
             <span >

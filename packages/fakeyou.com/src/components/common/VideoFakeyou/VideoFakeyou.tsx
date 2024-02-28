@@ -11,6 +11,7 @@ import './styles.scss';
 export interface VideoFakeyouProps{
   wrapperClassName?: string;
   controls?:boolean;
+  muted?:boolean;
   className?:string;
   src?:string;
   mediaToken?: string;
@@ -23,6 +24,7 @@ type Ref = HTMLVideoElement;
 const VideoFakeyou = forwardRef<Ref, VideoFakeyouProps>(({
   wrapperClassName,
   controls,
+  muted,
   className,
   src,
   mediaToken,
@@ -47,6 +49,7 @@ const VideoFakeyou = forwardRef<Ref, VideoFakeyouProps>(({
         {label && <Label label={label}/>}
         <video
           controls={controls}
+          muted={muted}
           ref={ref} 
           key={mediaToken}
           {...{
