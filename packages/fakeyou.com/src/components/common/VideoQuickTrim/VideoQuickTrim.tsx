@@ -77,20 +77,28 @@ export default memo(function VideoQuickTrim({
     if (node !== null) { 
       // DOM node referenced by ref has changed and exists
       videoRef.current = node;
-      if (node.duration >= 3){
-        setTrimState((curr)=>({
-          ...curr,
-          canNotTrim: false,
-          trimDuration: 3,
-          trimEnd: 0,
-          maxDuration: node.duration
-        }));
-        node.ontimeupdate = (e: PointerEvent)=>{
-          setPlaybarState((curr)=>({
+      
+      node.onloadedmetadata = ()=>{
+        if (node.duration >= 3){
+          setTrimState((curr)=>({
             ...curr,
-            timeCursorOffset: (node.currentTime / node.duration) * (playbarWidth-8)
+            canNotTrim: false,
+            trimDuration: 3,
+            trimEnd: 3,
+            maxDuration: node.duration
           }));
+          onSelect({
+            trimStartSeconds: 0,
+            trimEndSeconds: 3,
+          })
         }
+      }
+      
+      node.ontimeupdate = (e: PointerEvent)=>{
+        setPlaybarState((curr)=>({
+          ...curr,
+          timeCursorOffset: (node.currentTime / node.duration) * (playbarWidth-8)
+        }));
       }
     } // else{} DOM node referenced by ref has been unmounted 
   }, [playbarWidth]); //END videoRefCallback
@@ -121,15 +129,17 @@ export default memo(function VideoQuickTrim({
   },[]);
 
   const handleChangeTrimDuration = (selected: string) =>{
-    setTrimState((curr)=>({
-      ...curr,
-      trimDuration: trimOptions[selected],
-      trimEnd: trimStart+ trimOptions[selected],
-    }))
-    onSelect({
-      trimStartSeconds: trimStart,
-      trimEndSeconds: trimStart+ trimOptions[selected],
-    });
+    if(!canNotTrim){
+      setTrimState((curr)=>({
+        ...curr,
+        trimDuration: trimOptions[selected],
+        trimEnd: trimStart+ trimOptions[selected],
+      }))
+      onSelect({
+        trimStartSeconds: trimStart,
+        trimEndSeconds: trimStart+ trimOptions[selected],
+      });
+    }
   }
 
   const handlePlaypause = ()=>{
@@ -172,7 +182,8 @@ export default memo(function VideoQuickTrim({
         </div>
         {videoRef.current && canNotTrim &&
           <div className="warning-too-short">
-            Warning: Sorry Your Video is TOO Short
+            <div className="background"></div>
+            <p>Warning: Sorry Your Video is TOO Short</p>
           </div>
         }
       </div>{/* END of Video Wrapper */}

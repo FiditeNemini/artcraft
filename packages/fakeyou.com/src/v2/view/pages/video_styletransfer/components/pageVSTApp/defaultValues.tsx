@@ -8,9 +8,9 @@ const initialValues = {
   //video Settings
   width: 1024,
   height: 1024,
-  maxDuration: 3,
+  maxDuration: 0,
   trimStart: 0,
-  trimEnd: 3,
+  trimEnd: 0,
 
   //Presents
   workflowConfig: "weight_99tz2nzbp5x9v55gqn5ekj1sd",
