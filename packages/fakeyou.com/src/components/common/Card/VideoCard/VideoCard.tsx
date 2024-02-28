@@ -51,6 +51,8 @@ export default function VideoCard({
     data?.cover_image?.default_cover.image_index || 0
   }.webp`;
 
+  // We are checking the existence of the bucket gif files because it seems as though we can't check the cdn file's existence without running into cors issues
+  // CDN URLS
   const staticImageUrl = data?.public_bucket_path
     ? bucketConfig.getCdnUrl(data.public_bucket_path + "-thumb.jpg", 600, 100)
     : defaultImageUrl;
@@ -58,17 +60,17 @@ export default function VideoCard({
     ? bucketConfig.getCdnUrl(data.public_bucket_path + "-thumb.gif", 360, 20)
     : null;
 
+  // BUCKET URLS
   const bucketGifUrl = data?.public_bucket_path
     ? bucketConfig.getGcsUrl(data.public_bucket_path + "-thumb.gif")
     : null;
-
   const bucketImageUrl = data?.public_bucket_path
     ? bucketConfig.getGcsUrl(data.public_bucket_path + "-thumb.jpg")
     : null;
 
   const checkGifExists = async (url: string) => {
     try {
-      const response = await fetch(url, { method: "GET" });
+      const response = await fetch(url, { method: "HEAD" });
       return response.ok;
     } catch (error) {
       return false;
@@ -77,7 +79,7 @@ export default function VideoCard({
 
   const checkImageExists = async (url: string) => {
     try {
-      const response = await fetch(url, { method: "GET" });
+      const response = await fetch(url, { method: "HEAD" });
       return response.ok;
     } catch (error) {
       return false;
