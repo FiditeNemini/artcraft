@@ -6,6 +6,8 @@ interface CardProps {
   children?: React.ReactNode;
   onClick?: () => void;
   canHover?: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
 }
 
 export default function Card({
@@ -13,6 +15,8 @@ export default function Card({
   children,
   onClick,
   canHover,
+  onMouseEnter,
+  onMouseLeave,
 }: CardProps) {
   return (
     <div
@@ -20,6 +24,8 @@ export default function Card({
         onClick || canHover ? "card-clickable" : ""
       }`}
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {children}
     </div>
