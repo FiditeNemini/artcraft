@@ -60,7 +60,7 @@ export default function VideoCard({
 
   const checkGifExists = async (url: string) => {
     try {
-      const response = await fetch(url, { method: "HEAD" });
+      const response = await fetch(url, { method: "GET" });
       return response.ok;
     } catch (error) {
       return false;
