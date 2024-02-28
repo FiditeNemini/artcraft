@@ -69,7 +69,6 @@ export default function VideoCard({
   const checkGifExists = async (url: string) => {
     try {
       const response = await fetch(url, { method: "GET" });
-      console.log("RESPONSE GIF", response);
       return response.ok;
     } catch (error) {
       return false;
@@ -79,7 +78,6 @@ export default function VideoCard({
   const checkImageExists = async (url: string) => {
     try {
       const response = await fetch(url, { method: "GET" });
-      console.log("RESPONSE IMAGE", response);
       return response.ok;
     } catch (error) {
       return false;
@@ -112,10 +110,10 @@ export default function VideoCard({
   }, [bucketGifUrl, staticImageUrl, defaultImageUrl, bucketImageUrl]);
 
   useEffect(() => {
-    if (isHovered && gifExists && gifUrl && staticImageExists) {
-      setImageSrc(gifUrl);
+    if (isHovered && gifExists && bucketGifUrl && staticImageExists) {
+      setImageSrc(gifUrl!);
     } else if (staticImageExists) {
-      setImageSrc(staticImageUrl);
+      setImageSrc(bucketImageUrl!);
     } else {
       setImageSrc(defaultImageUrl);
     }
@@ -123,9 +121,11 @@ export default function VideoCard({
     isHovered,
     gifExists,
     gifUrl,
+    bucketGifUrl,
     staticImageUrl,
     staticImageExists,
     defaultImageUrl,
+    bucketImageUrl,
   ]);
 
   const card = (
