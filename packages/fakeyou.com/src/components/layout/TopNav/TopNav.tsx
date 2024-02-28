@@ -9,6 +9,7 @@ import {
   faXmark,
   faClipboardList,
   faChevronLeft,
+  faMessageImage,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
@@ -170,6 +171,12 @@ export default function TopNav({
       name: "Voice Designer",
       link: "/voice-designer",
       icon: faWandMagicSparkles,
+    },
+    {
+      id: 5,
+      name: "Text to Image",
+      link: "/text-to-image",
+      icon: faMessageImage,
     },
     // { id: 4, name: "Text to Image", link: "/text-to-image" },
   ];
