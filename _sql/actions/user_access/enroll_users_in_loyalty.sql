@@ -33,3 +33,34 @@ where token IN (
 );
 
 
+-- Staff
+-- teddanson is victor's alt
+-- endtimes is @sugarbro (testing)
+-- el_cid_93 is for testing
+-- NB: 'echelon' is absent
+-- SELECT token, username FROM users WHERE username IN (
+UPDATE users SET maybe_loyalty_program_key = 'fakeyou_contributor' WHERE username IN (
+  'bflat',
+  'brandon',
+  'crossproduct',
+  'crossproduct1',
+  'el_cid_93',
+  'endtimes',
+  'fyscott',
+  'jags111',
+  'mrvintage',
+  'olivicmic',
+  'rewin123',
+  'saltacc',
+  'teddanson',
+  'vegito1089',
+  'wilwong',
+  'yae_ph',
+  'zzz_last_item'
+);
+
+UPDATE users SET maybe_loyalty_program_key = 'fakeyou_contributor' WHERE username IN (
+  'endtimes',
+  'tropicalfun',
+  'zzz_last_item'
+);
