@@ -9,16 +9,17 @@ type CNPreset =
 
 const defaultPreset = {
   cnCanny: 0,
-  cnDepth: 0.7,
+  cnDepth: 0,
   cnLineArtAnime: 0.7,
-  cnLineArtRealistic: 0.7,
+  cnLineArtRealistic: 0,
   cnLipsStrength: 0,
-  cnOpenPose: 0.7,
-  cnPipeFace: 0.7,
-  cnSparseScribble: 0.7,
-  cnSoftEdge: 0.7,
+  cnOpenPose: 1,
+  cnPipeFace: 0,
+  cnSparseScribble: 0,
+  cnSoftEdge: 1,
   cnRegularSteps: 20,
 }
+
 const closeupPreset = {
   cnCanny: 0,
   cnDepth: 0,
@@ -29,7 +30,7 @@ const closeupPreset = {
   cnPipeFace: 0,
   cnSparseScribble: 0.7,
   cnSoftEdge: 0.7,
-  cnRegularSteps: 30,
+  cnRegularSteps: 20,
 }
 const halfbodyPreset = {
   cnCanny: 0,
@@ -41,7 +42,7 @@ const halfbodyPreset = {
   cnPipeFace: 0,
   cnSparseScribble: 0.7,
   cnSoftEdge: 0.7,
-  cnRegularSteps: 30,
+  cnRegularSteps: 20,
 }
 const fullbodyPreset = {
   cnCanny: 0,
@@ -53,7 +54,7 @@ const fullbodyPreset = {
   cnPipeFace: 0,
   cnSparseScribble: 0.7,
   cnSoftEdge: 0.7,
-  cnRegularSteps: 30,
+  cnRegularSteps: 20,
 }
 const landscapePreset = {
   cnCanny: 0.7,
@@ -65,7 +66,7 @@ const landscapePreset = {
   cnPipeFace: 0,
   cnSparseScribble: 0.7,
   cnSoftEdge: 0.7,
-  cnRegularSteps: 30,
+  cnRegularSteps: 20,
 }
 
 const typogPreset = {
@@ -78,7 +79,7 @@ const typogPreset = {
   cnPipeFace: 0,
   cnSparseScribble: 0,
   cnSoftEdge: 0.7,
-  cnRegularSteps: 30,
+  cnRegularSteps: 20,
 }
 
 export type {

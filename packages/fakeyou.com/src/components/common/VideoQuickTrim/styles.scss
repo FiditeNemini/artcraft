@@ -70,4 +70,15 @@ $playbar-height: 2rem;
     height: $playbar-height;
     background-color: $white;
   }
+  .playtime{
+    span{
+      width: 60px;
+    }
+    div{
+      width: 10px;
+      margin-left: 3px;
+      margin-right: 5px;
+      text-align: center;
+    }
+  }
 }

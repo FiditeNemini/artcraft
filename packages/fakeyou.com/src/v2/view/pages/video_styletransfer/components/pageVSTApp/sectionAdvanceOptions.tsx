@@ -234,10 +234,10 @@ export default function SectionAdvanceOptions({
               }}/>
             </div>
           </div>
-          <div className="row g-3 p-3">
+          {/* <div className="row g-3 p-3">
             <div className="col-md-6">
               <NumberSliderV2 {...{
-                min: 1, max: 64, step: 30,
+                min: 1, max: 64, step: 1,
                 initialValue: vstVal.cnRegularSteps,
                 label: "Regular Steps",
                 thumbTip: "Regular Steps",
@@ -247,7 +247,7 @@ export default function SectionAdvanceOptions({
                 }
               }}/>
             </div>
-          </div>
+          </div> */}
           <div className="d-flex p-3 justify-content-end">
             <Button
               icon={faRotateLeft}

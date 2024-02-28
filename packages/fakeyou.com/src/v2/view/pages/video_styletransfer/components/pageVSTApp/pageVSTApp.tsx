@@ -10,6 +10,7 @@ import {
   TextArea,
   VideoFakeyou
 } from "components/common";
+import VideoQuickTrim from 'components/common/VideoQuickTrim';
 
 import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
 

@@ -48,6 +48,7 @@ import TintSpinner from "./TintSpinner";
 import VideoBasic from "./VideoBasic";
 import VideoFakeyou from "./VideoFakeyou";
 import VideoInput from "./VideoInput";
+// import VideoQuickTrim, {QuickTrimType} from "./VideoQuickTrim";
 import SelectionBubbles from "./SelectionBubbles";
 import Scene3D from "./Scene3D";
 
@@ -109,6 +110,7 @@ export {
   VideoBasic,
   VideoFakeyou,
   VideoInput,
+  // VideoQuickTrim,
   SelectionBubbles,
   Scene3D,
 };
