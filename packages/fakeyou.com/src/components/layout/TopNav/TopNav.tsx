@@ -188,7 +188,7 @@ export default function TopNav({
               <img
                 src={domain.logo}
                 alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
-                height="34"
+                height="36"
                 className="mb-1 d-none d-lg-block"
               />
               <img

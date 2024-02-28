@@ -321,7 +321,6 @@ export default function SideNav({
           {/* {t("videoStorytellerStudio")} */}
         </NavLink>
       </li>
-      <hr className="mb-3 mt-3" />
     </>
   );
 
@@ -383,7 +382,6 @@ export default function SideNav({
                 My Jobs
               </NavLink>
             </li>
-            <hr className="mb-3 mt-3" />
             <li className="sidebar-heading">{t("speechTitle")}</li>
             <li>
               <NavLink
@@ -424,7 +422,6 @@ export default function SideNav({
                 {"Voice Designer"}
               </NavLink>
             </li>
-            <hr className="mb-3 mt-3" />
             <li className="sidebar-heading">{t("videoTitle")}</li>
             <li>
               <NavLink
@@ -441,8 +438,6 @@ export default function SideNav({
             </li>
 
             {maybeVideoGeneration}
-
-            <hr className="mb-3 mt-3" />
 
             {maybeImageGeneration}
 

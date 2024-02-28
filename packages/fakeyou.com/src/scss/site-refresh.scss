@@ -13,7 +13,7 @@ styles with important tags:
 
 @mixin panel {
   background-color: $panel;
-  border-color: #ffffff12 !important;
+  border-color: rgba(255, 255, 255, 0.04) !important;
   border: 1px solid;
   border-left: none;
   border-right: none;
