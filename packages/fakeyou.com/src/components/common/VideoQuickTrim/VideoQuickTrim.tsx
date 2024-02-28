@@ -54,7 +54,7 @@ export default memo(function VideoQuickTrim({
   onSelect,
   ...rest
 }: VideoQuickTrimProps){
-  console.log("VideoQuickTrim Rerender!!");
+  // console.log("VideoQuickTrim Rerender!!");
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playbarRef = useRef<HTMLDivElement | null>(null);
@@ -101,7 +101,7 @@ export default memo(function VideoQuickTrim({
         }));
       }
     } // else{} DOM node referenced by ref has been unmounted 
-  }, [playbarWidth]); //END videoRefCallback
+  }, [playbarWidth, onSelect]); //END videoRefCallback
 
   function handleWindowResize() {
     if(playbarRef.current !== null){
