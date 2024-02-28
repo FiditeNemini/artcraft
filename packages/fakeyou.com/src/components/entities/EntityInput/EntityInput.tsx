@@ -133,3 +133,8 @@ export default function EntityInput({ accept: inAccept, aspectRatio = "square", 
     </div>
   </>;
 };
+
+  // const handleTargetChange = (ev: React.FormEvent<HTMLSelectElement>) => {
+  //   const value = (ev.target as HTMLSelectElement).value;
+  //   setTarget(value);
+  // };

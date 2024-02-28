@@ -6,9 +6,13 @@ import "./TempSelect.scss";
 
 type OptionValue = string | number | boolean;
 
-export interface Option {
-  value: OptionValue;
+export interface BaseOption {
+  value?: OptionValue;
   label: string;
+}
+
+export interface Option extends BaseOption {
+  options?: BaseOption[];
 }
 
 export interface SelectProps extends ReactSelectProps {
@@ -34,8 +38,21 @@ export default function Select({
   ...rest
 }: SelectProps) {
   const isMulti = Array.isArray(value);
-  const valueLabel =
-    options.find((option: any) => option.value === value)?.label || "";
+  const findVal = (opts: Option[], nest = 0): Option | undefined => {
+    let val: Option | undefined;
+    opts.forEach((option) => {
+      if (!val) {
+        if (option.options) {
+          val = findVal(option.options,++nest);
+        } else if (option.value === value) {
+          val = option
+        } 
+      }
+    });
+    return val;
+  };
+
+  const valueLabel = findVal(options)?.label || "";
   const onChange = (option: any, x: any) => {
     if (Array.isArray(option)) {
       inChange({ target: {value: option.map(({ value = "" }) => value), name, type: "select" } });
@@ -80,9 +97,9 @@ export default function Select({
               name,
               onChange,
               options,
-              ...isMulti ? { value: Array.isArray(value) ?
-                value.map((val: any) => ({ label: val, value: val })) : [] } :
-                { value: { label: valueLabel, value } },
+              ...value && (isMulti ? { 
+                value: Array.isArray(value) ? value.map((val: any) => ({ label: val, value: val })) : [] 
+              } : { value: { label: valueLabel, value } }),
               ...rest,
             }}
           />

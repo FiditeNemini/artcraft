@@ -1,0 +1,24 @@
+{
+  "WeightTypes": {
+    "all": "All weights",
+    "hifigan_tt2": "HiFi-GAN TT2",
+    "rvc_v2": "RVCv2",
+    "sd_1": "SD 1.0",
+    "sd_1.5": "SD 1.5",
+    "sdxl": "SDXL",
+    "so_vits_svc": "so_vits_svc",
+    "tt2": "TT2",
+    "lora": "loRA",
+    "vall_e": "vall_e"
+  },
+  "MediaTypes": {
+    "all": "All media",
+    "audio": "Audio",
+    "image": "Image",
+    "video": "Video",
+    "bvh": "BVH",
+    "glb": "GLB",
+    "gltf": "gltf",
+    "fbx": "FBX"
+  },
+}

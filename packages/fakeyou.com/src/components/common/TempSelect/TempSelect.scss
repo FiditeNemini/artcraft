@@ -8,6 +8,21 @@
     margin-bottom: 0;
   }
 
+  .select-container {
+    overflow: hidden;
+  }
+
+  .select-option {
+    background: none;
+  }
+
+  .select-option.select__option--is-selected {
+    background-color: $secondary-lighter;
+    &.select__option--is-focused {
+      background-color: $secondary-very-light;
+    }
+  }
+
   .select__value-container--is-multi {
     height: min-content;
     // background: red;

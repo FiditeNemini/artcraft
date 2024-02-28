@@ -29,10 +29,19 @@ export enum WeightsFilters {
   vall_e
 }
 
+export enum WeightsCategories {
+  all,
+  faceAnimation,
+  tts,
+  voiceConversion
+}
+
 export type EntityModeProp = keyof typeof EntityInputMode;
 export type MediaFilterProp = keyof typeof MediaFilters;
 export type WeightFilterProp = keyof typeof WeightsFilters;
+export type WeightCategoriesProp = keyof typeof WeightsCategories;
 export type AcceptTypes = MediaFilterProp | WeightFilterProp;
+export type JobSelection = WeightCategoriesProp | WeightFilterProp;
 
 export enum EntityType {
   unknown,
