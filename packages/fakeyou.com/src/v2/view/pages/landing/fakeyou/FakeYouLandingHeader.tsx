@@ -1,7 +1,7 @@
-import { faArrowRight, faSparkles } from "@fortawesome/pro-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import Alert from "components/common/Alert/Alert";
+// import Alert from "components/common/Alert/Alert";
 import { useLocalize } from "hooks";
 import React from "react";
 import LandingDemo from "./LandingDemo/FakeYouLandingDemo";
@@ -38,7 +38,7 @@ export default function FakeYouLandingHeader({
 
   return (
     <div className="d-flex flex-column fy-header">
-      <Panel clear={true}>
+      {/* <Panel clear={true}>
         <Alert
           id="text-to-image-alert"
           icon={faSparkles}
@@ -48,7 +48,7 @@ export default function FakeYouLandingHeader({
           linkText={t("alertTtiCta")}
           className="my-3"
         />
-      </Panel>
+      </Panel> */}
 
       <div className="my-lg-5 py-lg-5 pt-3 pb-5">
         <div className="row g-5">
