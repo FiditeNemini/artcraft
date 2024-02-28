@@ -19,7 +19,7 @@ function StorytellerStudioListPage(props: Props) {
 
   return (
     <>
-      <Scene3D fullScreen={true} mode="studio" />
+      <Scene3D fullScreen={true} mode="studio" objectId="sample-room.gltf" />
     </>
   );
 }
