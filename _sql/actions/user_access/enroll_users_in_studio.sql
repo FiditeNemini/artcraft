@@ -16,6 +16,7 @@ UPDATE users SET can_access_studio = true WHERE username IN (
     'el_cid_93',
     'endtimes',
     'fyscott',
+    'gateway',
     'jags111',
     'mrvintage',
     'olivicmic',

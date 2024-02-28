@@ -47,6 +47,7 @@ UPDATE users SET maybe_loyalty_program_key = 'fakeyou_contributor' WHERE usernam
   'el_cid_93',
   'endtimes',
   'fyscott',
+  'gateway',
   'jags111',
   'mrvintage',
   'olivicmic',
