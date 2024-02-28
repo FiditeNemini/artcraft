@@ -62,7 +62,7 @@ export default function FakeYouLandingHeader({
               enqueueTtsJob={enqueueTtsJob}
             />
           </div>
-          <div className="col-12 col-lg-6 order-lg-1 d-flex flex-column align-items-center justify-content-center pt-3 pt-lg-0">
+          <div className="col-12 col-lg-6 order-lg-1 d-flex flex-column align-items-center pt-3 pt-lg-0">
             <Panel clear={true}>
               <h1 className="fw-bold display-5 text-center text-lg-start px-md-5 px-lg-0">
                 {t("heroTitle")}
