@@ -58,6 +58,14 @@ export default function VideoCard({
     ? bucketConfig.getCdnUrl(data.public_bucket_path + "-thumb.gif", 360, 20)
     : null;
 
+  const bucketGifUrl = data?.public_bucket_path
+    ? bucketConfig.getGcsUrl(data.public_bucket_path + "-thumb.gif")
+    : null;
+
+  const bucketImageUrl = data?.public_bucket_path
+    ? bucketConfig.getGcsUrl(data.public_bucket_path + "-thumb.jpg")
+    : null;
+
   const checkGifExists = async (url: string) => {
     try {
       const response = await fetch(url, { method: "GET" });
@@ -81,26 +89,27 @@ export default function VideoCard({
   // Preload images and check if the GIF exists when the component mounts
   useEffect(() => {
     // Check if the static image exists
-    checkImageExists(staticImageUrl).then(staticExists => {
+
+    if (bucketImageUrl === null) return;
+    checkImageExists(bucketImageUrl).then(staticExists => {
       setStaticImageExists(staticExists);
       if (staticExists) {
-        setImageSrc(staticImageUrl);
+        setImageSrc(bucketImageUrl);
       } else {
         setImageSrc(defaultImageUrl);
       }
     });
 
     // Check and preload the GIF if it exists
-    if (gifUrl) {
-      checkGifExists(gifUrl).then(gifExists => {
-        setGifExists(gifExists);
-        if (gifExists) {
-          const imgGif = new Image();
-          imgGif.src = gifUrl;
-        }
-      });
-    }
-  }, [gifUrl, staticImageUrl, defaultImageUrl]);
+    if (bucketGifUrl === null) return;
+    checkGifExists(bucketGifUrl).then(gifExists => {
+      setGifExists(gifExists);
+      if (gifExists) {
+        const imgGif = new Image();
+        imgGif.src = bucketGifUrl;
+      }
+    });
+  }, [bucketGifUrl, staticImageUrl, defaultImageUrl, bucketImageUrl]);
 
   useEffect(() => {
     if (isHovered && gifExists && gifUrl && staticImageExists) {
