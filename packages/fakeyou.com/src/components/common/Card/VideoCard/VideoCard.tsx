@@ -60,7 +60,7 @@ export default function VideoCard({
 
   const checkGifExists = async (url: string) => {
     try {
-      const response = await fetch(url, { method: "GET" });
+      const response = await fetch(url, { method: "GET", mode: "no-cors" });
       return response.ok;
     } catch (error) {
       return false;
@@ -69,7 +69,7 @@ export default function VideoCard({
 
   const checkImageExists = async (url: string) => {
     try {
-      const response = await fetch(url, { method: "GET" });
+      const response = await fetch(url, { method: "GET", mode: "no-cors" });
       return response.ok;
     } catch (error) {
       return false;
