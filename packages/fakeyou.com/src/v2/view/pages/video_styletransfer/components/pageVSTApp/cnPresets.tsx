@@ -68,7 +68,7 @@ const landscapePreset = {
   cnOpenPose: 0,
   cnPipeFace: 0,
   cnSparseScribble: 0,
-  cnSoftEdge: 1,
+  cnSoftEdge: 0,
   cnRegularSteps: 20,
 }
 

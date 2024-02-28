@@ -66,7 +66,7 @@ export default memo(function VideoQuickTrim({
     trimStart,
     // trimEnd,
     trimDuration,
-    isScrubbingTrim,
+    // isScrubbingTrim,
   }, setTrimState] = useState<TrimStates>(initialTrimState);
   
 
@@ -131,6 +131,12 @@ export default memo(function VideoQuickTrim({
     }
   }
 
+  const trimZoneWidth = videoRef.current 
+    ? trimDuration < videoRef.current.duration 
+      ? (trimDuration / videoRef.current.duration * 100) 
+      : 100
+    : 0;
+
   return (
     <div className="fy-video-quicktrim">
       <div className="video-wrapper">
@@ -157,36 +163,32 @@ export default memo(function VideoQuickTrim({
         <div className="playbar-bg" />
         <div className="trimzone" 
           ref={trimZoneRef}
-          style={{width: (
-            videoRef.current ? 
-              (trimDuration / videoRef.current.duration * 100) 
-              : 0
-          ) + "%"}}
-          onPointerDown={()=>{
-            if(trimZoneRef.current){
-              trimZoneRef.current.style.cursor = 'grabbing';
-              setTrimState((curr)=>({
-                ...curr,
-                isScrubbingTrim: true,
-              }))
-            }
-          }}
-          onPointerUp={()=>{
-            if(trimZoneRef.current) {
-              trimZoneRef.current.style.cursor = 'grab';
-              setTrimState((curr)=>({
-                ...curr,
-                isScrubbingTrim: false,
-              }));
-            }
-          }}
-          onPointerMove={(e: PointerEvent<HTMLDivElement>)=>{
-            if(trimZoneRef.current && playbarRef.current && isScrubbingTrim){
-              // console.log(fractionToPercentage(
-              //   (e.clientX - trimZoneRef.current.getBoundingClientRect().left) / (playbarRef.current.getBoundingClientRect().width)
-              // ) + "%");
-            }
-          }}
+          style={{width: trimZoneWidth + "%"}}
+          // onPointerDown={()=>{
+          //   if(trimZoneRef.current){
+          //     trimZoneRef.current.style.cursor = 'grabbing';
+          //     setTrimState((curr)=>({
+          //       ...curr,
+          //       isScrubbingTrim: true,
+          //     }))
+          //   }
+          // }}
+          // onPointerUp={()=>{
+          //   if(trimZoneRef.current) {
+          //     trimZoneRef.current.style.cursor = 'grab';
+          //     setTrimState((curr)=>({
+          //       ...curr,
+          //       isScrubbingTrim: false,
+          //     }));
+          //   }
+          // }}
+          // onPointerMove={(e: PointerEvent<HTMLDivElement>)=>{
+          //   if(trimZoneRef.current && playbarRef.current && isScrubbingTrim){
+          //     // console.log(fractionToPercentage(
+          //     //   (e.clientX - trimZoneRef.current.getBoundingClientRect().left) / (playbarRef.current.getBoundingClientRect().width)
+          //     // ) + "%");
+          //   }
+          // }}
         >
           <FontAwesomeIcon icon={faGripDots} />
         </div>
