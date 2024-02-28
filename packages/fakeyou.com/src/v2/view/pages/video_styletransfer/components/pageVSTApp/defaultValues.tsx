@@ -20,7 +20,7 @@ const initialValues = {
 
   //basics
   inputFps: 24,
-  posPrompt: "",
+  posPrompt: "perfect anime illustration,(best-quality:0.8),",
   negPrompt: "",
   visibility: "private",
 
@@ -29,6 +29,6 @@ const initialValues = {
 };
 
 const hiddenValues = {
-  posPrompt: "perfect anime illustration,(best-quality:0.8), ",
+  posPrompt: "",
   negPrompt: "flare, lens flare, glare,naked, nsfw, text, logo, watermark:1.3, letterboxed,embedding:easynegative,  embedding:badhandv4,(worst quality, low quality:1.4), lowres, blurry, monochrome, ",
 }
