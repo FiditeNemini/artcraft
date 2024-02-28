@@ -45,7 +45,7 @@ const VideoFakeyou = forwardRef<Ref, VideoFakeyouProps>(({
 
   if (mediaLink){
     return (
-      <div {...{ ...makeClass("fy-video vh50",wrapperClassName) }}>
+      <div {...{ ...makeClass("fy-video",wrapperClassName) }}>
         {label && <Label label={label}/>}
         <video
           controls={controls}

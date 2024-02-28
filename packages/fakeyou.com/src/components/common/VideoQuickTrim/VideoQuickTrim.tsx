@@ -1,7 +1,6 @@
 import React, {
-  forwardRef,
+  memo,
   useCallback,
-  useEffect,
   useLayoutEffect,
   useState,
   useRef,
@@ -12,7 +11,6 @@ import {
   faPause,
   faGripDots,
   faVolume,
-  faVolumeMute,
   faVolumeSlash,
 } from "@fortawesome/pro-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -31,6 +29,12 @@ interface VideoQuickTrimProps extends VideoFakeyouProps{
   onSelect: (values: QuickTrimData)=>void;
 }
 
+const trimOptions: { [key: string]: number } = {
+  "3s": 3,
+  "5s": 5,
+  "10s": 10,
+  "15s" : 15,
+};
 
 const initialTrimState:TrimStates = {
   isScrubbingTrim: false,
@@ -45,19 +49,11 @@ const initialPlaybarState:PlaybarStates = {
   timeCursorOffset: 0,
 }
 
-export default function VideoQuickTrim({
+export default memo(function VideoQuickTrim({
   onSelect,
   ...rest
 }: VideoQuickTrimProps){
-  console.log("Rerender!!");
-
-  const trimOptions: { [key: string]: number } = {
-    "3s": 3,
-    "5s": 5,
-    "10s": 10,
-    "15s" : 15,
-    // "20s" : 20,
-  };
+  console.log("VideoQuickTrim Rerender!!");
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playbarRef = useRef<HTMLDivElement | null>(null);
@@ -117,15 +113,13 @@ export default function VideoQuickTrim({
     setTrimState((curr)=>({
       ...curr,
       trimDuration: trimOptions[selected],
-      trimEnd: curr.trimStart+ trimOptions[selected],
+      trimEnd: trimStart+ trimOptions[selected],
     }))
-  }
-  useEffect(()=>{
     onSelect({
       trimStartSeconds: trimStart,
-      trimEndSeconds: trimEnd,
+      trimEndSeconds: trimStart+ trimOptions[selected],
     });
-  },[trimStart, trimEnd, onSelect]);
+  }
 
   const handlePlaypause = ()=>{
     if (playpause === 'paused' || playpause === 'stopped'){
@@ -136,9 +130,7 @@ export default function VideoQuickTrim({
       setPlaypause('paused');
     }
   }
-  const handleMute = ()=> {
-    
-  }
+
   return (
     <div className="fy-video-quicktrim">
       <div className="video-wrapper">
@@ -215,7 +207,7 @@ export default function VideoQuickTrim({
             variant="secondary"
             onClick={()=>setIsMuted((curr)=>(!curr))}
           />
-          <div className="playtime ms-3 d-flex">
+          <div className="playtime ms-2 d-flex">
             <span >
               <p>
                 {`${formatSecondsToHHMMSSCS(videoRef.current?.currentTime || 0)}`}
@@ -236,4 +228,4 @@ export default function VideoQuickTrim({
       </div>
     </div>
   );
-};
+});

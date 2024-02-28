@@ -11,6 +11,9 @@ $playbar-height: 2rem;
     border-left: $panel-inner-border 1px solid;
     border-right: $panel-inner-border 1px solid;
   }
+  .fy-video{
+    height: 500px;
+  }
   .playpause-overlay{
     position: absolute;
     cursor: pointer;

@@ -39,7 +39,7 @@ export default function SectionAdvanceOptions({
   onChange: (val:{[key: string]: number|string|boolean|undefined})=>void
 }){
 
-  const [preset, pickPreset] = useState<CNPreset>('custom')
+  const [preset, pickPreset] = useState<CNPreset>('default')
   function handlePreset(newPreset: CNPreset){
     switch (newPreset){
       case 'closeup':

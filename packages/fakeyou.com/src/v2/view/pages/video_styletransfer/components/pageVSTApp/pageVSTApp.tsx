@@ -4,13 +4,11 @@ import { useParams, useHistory } from "react-router-dom";
 
 import {
   Button,
-  // Label,
   Panel,
   NumberSliderV2,
   TextArea,
-  VideoFakeyou
 } from "components/common";
-import VideoQuickTrim from 'components/common/VideoQuickTrim';
+import VideoQuickTrim, {QuickTrimData} from 'components/common/VideoQuickTrim';
 
 import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
 
@@ -24,7 +22,6 @@ import {
 } from "./helpers";
 
 import SectionAdvanceOptions from "./sectionAdvanceOptions";
-
 
 
 export default function PageVSTApp({
@@ -53,7 +50,6 @@ export default function PageVSTApp({
         width?: number;
         height?: number;
         maxDuration?: number;
-        // trim?: number;
       } = {};
       // if (ve.videoWidth && ve.videoHeight) {
       //   const aspectRatio = ve.videoWidth/ve.videoHeight
@@ -109,10 +105,14 @@ export default function PageVSTApp({
     <Panel className="mb-4 p-4">
       <div className="row g-3 mb-4">
           <div className="col-12 col-md-6">
-            <VideoFakeyou
-              label={t("video.label.original")}
+            <VideoQuickTrim
+              // label={t("video.label.original")}
               mediaToken={vstValues.fileToken}
-              ref={videoRef}
+              // ref={videoRef}
+              onSelect={(val:QuickTrimData)=>handleOnChange({
+                trimStart: val.trimStartSeconds,
+                trimEnd: val.trimEndSeconds
+              })}
               onResponse={(res)=>{
                 dispatchPageState({
                   type: 'loadFileSuccess',
@@ -176,14 +176,13 @@ export default function PageVSTApp({
           <NavLink to={`${parentPath}`}>
             <Button
               label={t("button.cancel")}
-              // onClick={handleGenerate}
               variant="primary"
             />
           </NavLink>
           <Button
             label="Fake Gen"
             onClick={handleFakeGen}
-            variant="primary"
+            variant="secondary"
           /> 
           <Button
             label={t("button.enqueue")}
