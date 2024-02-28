@@ -27,7 +27,7 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
-use crate::configs::plans::plan_category::PlanCategory;
+use crate::configs::plans::plan_category::{self, PlanCategory};
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
 use crate::util::allowed_studio_access::allowed_studio_access;
@@ -239,8 +239,8 @@ pub async fn enqueue_comfy_ui_handler(
     );
 
     // block trim too much 
-    if plan.plan_category() == PlanCategory::Paid {
-        if trim_end_seconds - trim_start_seconds > 10 {
+    if plan.plan_slug() == "fakeyou_contributor" || plan.plan_category() == PlanCategory::Paid {
+        if trim_end_seconds - trim_start_seconds > 20 {
             trim_start_seconds = 0;
             trim_end_seconds = 3;
         }
