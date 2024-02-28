@@ -21,6 +21,11 @@ export interface EnqueueVideoStyleTransferRequest {
     "$.1398.inputs.Value": number; // CN - Soft Edge
     "$.1531.inputs.Value": number; // CN - Regular Steps
     
+    //HARD CODE VALUES FOR NOW
+    "$.401.inputs.Value": number, //Denoise First Pass
+    "$.140.inputs.Value": number,   // Every nth frame
+    "$.536.inputs.boolean_number": number, // use LCM
+
     //"$.800.inputs.Value": number;   // CN - Canny
     //"$.1636.inputs.Value": number;  // CN - Libs Strength
     

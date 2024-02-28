@@ -37,8 +37,9 @@ const trimOptions: { [key: string]: number } = {
 };
 
 const initialTrimState:TrimStates = {
+  canNotTrim: true,
   isScrubbingTrim: false,
-  trimDuration: 3,
+  trimDuration: 0,
   trimStart: 0,
   trimEnd: 0,
   maxDuration: 0,
@@ -63,6 +64,7 @@ export default memo(function VideoQuickTrim({
   const [playpause, setPlaypause] = useState<'playing'|'paused'|'stopped'>('paused');
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [{
+    canNotTrim,
     trimStart,
     // trimEnd,
     trimDuration,
@@ -75,11 +77,20 @@ export default memo(function VideoQuickTrim({
     if (node !== null) { 
       // DOM node referenced by ref has changed and exists
       videoRef.current = node;
-      node.ontimeupdate = (e: PointerEvent)=>{
-        setPlaybarState((curr)=>({
+      if (node.duration >= 3){
+        setTrimState((curr)=>({
           ...curr,
-          timeCursorOffset: (node.currentTime / node.duration) * (playbarWidth-8)
+          canNotTrim: false,
+          trimDuration: 3,
+          trimEnd: 0,
+          maxDuration: node.duration
         }));
+        node.ontimeupdate = (e: PointerEvent)=>{
+          setPlaybarState((curr)=>({
+            ...curr,
+            timeCursorOffset: (node.currentTime / node.duration) * (playbarWidth-8)
+          }));
+        }
       }
     } // else{} DOM node referenced by ref has been unmounted 
   }, [playbarWidth]); //END videoRefCallback
@@ -132,7 +143,7 @@ export default memo(function VideoQuickTrim({
   }
 
   const trimZoneWidth = videoRef.current 
-    ? trimDuration < videoRef.current.duration 
+    ? trimDuration > 0 && trimDuration < videoRef.current.duration 
       ? (trimDuration / videoRef.current.duration * 100) 
       : 100
     : 0;
@@ -146,6 +157,7 @@ export default memo(function VideoQuickTrim({
           ref={videoRefCallback}
           {...rest}
         />
+
         <div className="playpause-overlay" onClick={handlePlaypause}>
           {playpause === 'paused' && 
             <FontAwesomeIcon className="playpause-icon"
@@ -158,6 +170,11 @@ export default memo(function VideoQuickTrim({
             />
           }
         </div>
+        {videoRef.current && canNotTrim &&
+          <div className="warning-too-short">
+            Warning: Sorry Your Video is TOO Short
+          </div>
+        }
       </div>{/* END of Video Wrapper */}
       <div className="playbar" ref={playbarRefCallback}>
         <div className="playbar-bg" />

@@ -64,6 +64,10 @@ export function mapRequest(vstValues: VSTType){
       "$.8.inputs.text": 
         hiddenValues.negPrompt+ vstValues.negPrompt,
 
+      "$.401.inputs.Value": 0.7, //Denoise First Pass
+      "$.140.inputs.Value": 1,     // Every nth frame
+      "$.536.inputs.boolean_number": 1,    // use LCM
+
       "$.403.inputs.Value": vstValues.cnSparseScribble, 
       "$.771.inputs.Value": vstValues.cnOpenPose, 
       "$.772.inputs.Value": vstValues.cnDepth, 

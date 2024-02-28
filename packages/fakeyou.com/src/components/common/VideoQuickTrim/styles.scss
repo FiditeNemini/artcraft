@@ -33,6 +33,21 @@ $playbar-height: 2rem;
       opacity: 1;
     }
   }
+  .warning-too-short{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top:0;
+    left:0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #e66462;
+    opacity: 70%;
+    p{
+      opacity: 1;
+    }
+  }
   .playbar{
     position:relative;
     height: $playbar-height;
@@ -73,6 +88,7 @@ $playbar-height: 2rem;
     height: $playbar-height;
     background-color: $white;
   }
+
   .playpause-external{
     .button-playpause{
       width: 55px;
