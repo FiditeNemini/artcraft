@@ -79,6 +79,10 @@
     justify-content: start;
     overflow-x: visible;
   }
+
+  &.no-side-scroll {
+    flex-wrap: wrap;
+  }
 }
 
 .bubble-button {
@@ -94,15 +98,24 @@
   font-weight: 500;
   color: rgba($white, 0.75);
   white-space: nowrap;
-}
 
-.bubble-button:hover {
-  background-color: $secondary;
-  border-color: $secondary;
-}
+  &:hover {
+    background-color: $secondary;
+    border-color: $secondary;
 
-.bubble-button.selected {
-  color: $white;
-  border-color: $primary;
-  background-color: lighten($secondary, 6%);
+    &.fill {
+      border-color: $primary;
+      background-color: $primary;
+    }
+  }
+
+  &.selected {
+    color: $white;
+    border-color: $primary;
+    background-color: lighten($secondary, 6%);
+
+    &.fill {
+      background-color: $primary;
+    }
+  }
 }

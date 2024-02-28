@@ -8,9 +8,11 @@ import { Label } from "components/common";
 import './styles.scss';
 
 
-interface Props {
-  className?: string;
-  src?: string;
+export interface VideoFakeyouProps{
+  wrapperClassName?: string;
+  controls?:boolean;
+  className?:string;
+  src?:string;
   mediaToken?: string;
   label?: string;
   onResponse?: (res:any)=>void
@@ -18,14 +20,16 @@ interface Props {
 
 type Ref = HTMLVideoElement;
 
-const VideoFromFakeyou = forwardRef<Ref, Props>(({
+const VideoFakeyou = forwardRef<Ref, VideoFakeyouProps>(({
+  wrapperClassName,
+  controls,
   className,
   src,
   mediaToken,
   label,
   onResponse,
   ...rest
-}: Props, ref) => {
+}: VideoFakeyouProps, ref) => {
   const [mediaFile, setMediaFile] = useState<MediaFileType>();
   useMedia({
     mediaToken: mediaToken,
@@ -39,14 +43,16 @@ const VideoFromFakeyou = forwardRef<Ref, Props>(({
 
   if (mediaLink){
     return (
-      <div {...{ ...makeClass("fy-video vh50",className) }}>
+      <div {...{ ...makeClass("fy-video vh50",wrapperClassName) }}>
         {label && <Label label={label}/>}
-        <video 
-          controls 
+        <video
+          controls={controls}
           ref={ref} 
           key={mediaToken}
-          className="object-fit-contain"
-          {...rest}
+          {...{
+            ...makeClass("object-fit-contain",className),
+            ...rest
+          }}
         >
           <source src={mediaLink} type="video/mp4" />
         </video>
@@ -56,4 +62,4 @@ const VideoFromFakeyou = forwardRef<Ref, Props>(({
   return null;
 });
 
-export default VideoFromFakeyou;
+export default VideoFakeyou;

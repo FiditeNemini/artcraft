@@ -1,4 +1,5 @@
 import React from "react";
+import ComponentsLibrary from "./pages/components_library";
 import { AboutPage } from "./pages/about/about_page/AboutPage";
 import { GuidePage } from "./pages/about/guide_page/GuidePage";
 import { FirehoseEventListPage } from "./pages/firehose/FirehoseEventListPage";
@@ -93,7 +94,7 @@ import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
-import { StorytellerStudioListPage } from "./pages/storyteller_studio/vc_model_list/StorytellerStudioListPage";
+import { StorytellerStudioListPage } from "./pages/storyteller_studio/StorytellerStudioPage";
 import TopNav from "components/layout/TopNav/TopNav";
 import SideNav from "components/layout/SideNav/SideNav";
 import MediaPage from "./pages/media/MediaPage";
@@ -256,6 +257,11 @@ class PageContainer extends React.Component<
             <div id="page-content-wrapper">
               <div id="main">
                 <Switch>
+                  <Route path="/comp-lib">
+                    <ComponentsLibrary
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
+                  </Route>
                   <Route path="/firehose">
                     <FirehoseEventListPage
                       sessionWrapper={this.props.sessionWrapper}

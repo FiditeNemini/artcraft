@@ -8,6 +8,7 @@ import {
   faWaveformLines,
   faXmark,
   faClipboardList,
+  faChevronLeft,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
@@ -43,11 +44,10 @@ export default function TopNav({
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
   // const { t } = useLocalize("TopNav");
   const isOnLandingPage = window.location.pathname === "/";
-  const isOnLoginOrSignUpPage =
-    window.location.pathname === "/login" ||
-    window.location.pathname === "/login/" ||
-    window.location.pathname === "/signup" ||
-    window.location.pathname === "/signup/";
+  const isOnLoginOrSignUpPage = window.location.pathname.includes(
+    "/login" || "/signup"
+  );
+  const isOnStudioPage = window.location.pathname.includes("/studio");
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
@@ -188,7 +188,7 @@ export default function TopNav({
               <img
                 src={domain.logo}
                 alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
-                height="34"
+                height="36"
                 className="mb-1 d-none d-lg-block"
               />
               <img
@@ -207,15 +207,28 @@ export default function TopNav({
                 />
               </div>
             )}
+            {isOnStudioPage && loggedIn && (
+              <Button
+                icon={faChevronLeft}
+                label="Back to Dashboard"
+                small={true}
+                variant="secondary"
+                to="/"
+                className="ms-2"
+              />
+            )}
           </div>
         </div>
 
         <div className="topbar-nav-center">
           {/* Search Bar */}
           <div className="d-none d-lg-block">
-            {(!isOnLandingPage && !isOnLoginOrSignUpPage) ||
-            (loggedIn && !isOnLoginOrSignUpPage) ||
-            (isOnLandingPage && isScrolled && !isOnLoginOrSignUpPage) ? (
+            {(!isOnLandingPage && !isOnLoginOrSignUpPage && !isOnStudioPage) ||
+            (loggedIn && !isOnLoginOrSignUpPage && !isOnStudioPage) ||
+            (isOnLandingPage &&
+              isScrolled &&
+              !isOnLoginOrSignUpPage &&
+              !isOnStudioPage) ? (
               <SearchBar
                 onFocus={onFocusHandler}
                 onBlur={onBlurHandler}

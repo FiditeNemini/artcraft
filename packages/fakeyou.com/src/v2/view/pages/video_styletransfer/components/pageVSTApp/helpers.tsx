@@ -8,9 +8,9 @@ export type VSTType = {
   // Video Settings
   width: number;
   height: number;
-  maxFrames: number;
-  framesCap: number;
-  skipFrames: number;
+  maxDuration: number;
+  trimStart: number;
+  trimEnd: number;
   
   // Presets
   workflowConfig: string;
@@ -53,7 +53,9 @@ export function mapRequest(vstValues: VSTType){
     "maybe_sd_model": vstValues.sdModelToken,
     "maybe_workflow_config":vstValues.workflowConfig,
     "maybe_input_file": vstValues.fileToken,
-    "maybe_output_path": "vid2vid/SparseUpscaleInterp_00001.mp4", 
+    "maybe_trim_start_seconds": vstValues.trimStart,
+    "maybe_trim_end_seconds": vstValues.trimEnd,
+    "maybe_output_path": vstValues.outputPath, 
     "creator_set_visibility": vstValues.visibility,
     "maybe_json_modifications": {
       "$.154.inputs.Value": vstValues.inputFps,
@@ -62,19 +64,20 @@ export function mapRequest(vstValues: VSTType){
       "$.8.inputs.text": 
         hiddenValues.negPrompt+ vstValues.negPrompt,
 
-      //"$.800.inputs.Value": 0, // vstValues.cnCanny,
-      "$.772.inputs.Value": vstValues.cnDepth, 
-      "$.797.inputs.Value": vstValues.cnLineArtAnime, 
-      "$.796.inputs.Value": vstValues.cnLineArtRealistic,
-      //"$.1636.inputs.Value": 0, //vstValues.cnLipsStrength,
-      "$.771.inputs.Value": vstValues.cnOpenPose, 
       "$.403.inputs.Value": vstValues.cnSparseScribble, 
+      "$.771.inputs.Value": vstValues.cnOpenPose, 
+      "$.772.inputs.Value": vstValues.cnDepth, 
+      "$.796.inputs.Value": vstValues.cnLineArtRealistic,
+      "$.797.inputs.Value": vstValues.cnLineArtAnime, 
       "$.1398.inputs.Value": vstValues.cnSoftEdge,
       "$.1531.inputs.Value": vstValues.cnRegularSteps,
 
-      // "$.1449.inputs.filename_prefix": "vid2vid/SparseUpscaleInterp",
+      //"$.800.inputs.Value": 0, // vstValues.cnCanny,
+      //"$.1636.inputs.Value": 0, //vstValues.cnLipsStrength,
+      
       // "$.208.inputs.lora_01": vstValues.loraModelToken,
       // "$.208.inputs.strength_01": vstValues.loraModelStrength
+      // "$.1449.inputs.filename_prefix": "vid2vid/SparseUpscaleInterp",
     },
 
   }

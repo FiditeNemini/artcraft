@@ -52,11 +52,10 @@ export default function SideNav({
   const isMenuOpen = wrapper?.classList.contains("toggled");
   const isLoggedIn = sessionWrapper.isLoggedIn();
   const isOnLandingPage = window.location.pathname === "/";
-  const isOnLoginOrSignUpPage =
-    window.location.pathname === "/login" ||
-    window.location.pathname === "/login/" ||
-    window.location.pathname === "/signup" ||
-    window.location.pathname === "/signup/";
+  const isOnLoginOrSignUpPage = window.location.pathname.includes(
+    "/login" || "/signup"
+  );
+  const isOnStudioPage = window.location.pathname.includes("/studio");
 
   let history = useHistory();
   const handleNavLinkClick = () => {
@@ -107,7 +106,8 @@ export default function SideNav({
   }, []);
 
   const shouldNotShowSidebar =
-    !isLoggedIn && (isOnLandingPage || isOnLoginOrSignUpPage);
+    (!isLoggedIn && (isOnLandingPage || isOnLoginOrSignUpPage)) ||
+    isOnStudioPage;
   const shouldShowSidebar = windowWidth >= 992 && !shouldNotShowSidebar;
   const sidebarClassName = `sidebar ${
     shouldShowSidebar ? "visible" : ""
@@ -116,15 +116,13 @@ export default function SideNav({
   useEffect(() => {
     const contentWrapper = document.getElementById("page-content-wrapper");
 
-    if (
-      (shouldShowSidebar && isLoggedIn) ||
-      (shouldShowSidebar && !isOnLandingPage)
-    ) {
+    // Adjusted logic to ensure no padding is added when on the studio page
+    if (shouldShowSidebar && !isOnStudioPage) {
       contentWrapper?.classList.remove("no-padding");
     } else {
       contentWrapper?.classList.add("no-padding");
     }
-  }, [isLoggedIn, isOnLandingPage, shouldShowSidebar]);
+  }, [shouldShowSidebar, isOnStudioPage]);
 
   const logoutHandler = async () => {
     await Logout();
@@ -323,7 +321,6 @@ export default function SideNav({
           {/* {t("videoStorytellerStudio")} */}
         </NavLink>
       </li>
-      <hr className="mb-3 mt-3" />
     </>
   );
 
@@ -385,7 +382,6 @@ export default function SideNav({
                 My Jobs
               </NavLink>
             </li>
-            <hr className="mb-3 mt-3" />
             <li className="sidebar-heading">{t("speechTitle")}</li>
             <li>
               <NavLink
@@ -426,7 +422,6 @@ export default function SideNav({
                 {"Voice Designer"}
               </NavLink>
             </li>
-            <hr className="mb-3 mt-3" />
             <li className="sidebar-heading">{t("videoTitle")}</li>
             <li>
               <NavLink
@@ -443,8 +438,6 @@ export default function SideNav({
             </li>
 
             {maybeVideoGeneration}
-
-            <hr className="mb-3 mt-3" />
 
             {maybeImageGeneration}
 

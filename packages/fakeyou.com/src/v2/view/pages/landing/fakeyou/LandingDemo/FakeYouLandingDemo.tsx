@@ -58,6 +58,7 @@ export default function LandingDemo({
     null
   );
   const [placeholder, setPlaceholder] = useState("");
+  const [isHanashiHovered, setIsHanashiHovered] = useState(false);
 
   useEffect(() => {
     // Randomize placeholder text on component mount
@@ -83,7 +84,9 @@ export default function LandingDemo({
     "Angry Male": "weight_hehgvegadf08mfp5rzd69dmh4",
   };
 
-  const [voiceToken, setVoiceToken] = useState(voiceModelTokenMap["Spongebob"]);
+  const [voiceToken, setVoiceToken] = useState(
+    voiceModelTokenMap[Object.keys(voiceModelTokenMap)[0]]
+  );
 
   const handleVoiceSelection = (selected: string) => {
     console.log(`Selected option: ${selected}`);
@@ -217,56 +220,71 @@ export default function LandingDemo({
   };
 
   return (
-    <Panel padding={true}>
-      <form className="d-flex flex-column">
-        <div>
-          <div className="d-flex">
-            <label className="sub-title flex-grow-1">Select a Voice</label>
-          </div>
-          <SelectionBubbles
-            options={voiceOptions}
-            onSelect={handleVoiceSelection}
-          />
-        </div>
-
-        <div className="d-flex flex-column mt-3">
-          <div className="d-flex justify-content-center pb-2">
-            <label className="sub-title flex-grow-1 pb-0">Your Text</label>
-            <Button
-              icon={faShuffle}
-              label="Randomize Text"
-              onClick={generateRandomText}
-              variant="link"
-              className="fs-7 randomize-text-button"
+    <div className="position-relative">
+      <img
+        src={
+          isHanashiHovered
+            ? "/images/landing/hanashi-demo-2.webp"
+            : "/images/landing/hanashi-demo-1.webp"
+        }
+        alt="Hanashi Demo"
+        onMouseEnter={() => setIsHanashiHovered(true)}
+        onMouseLeave={() => setIsHanashiHovered(false)}
+        className="hanashi-demo-image"
+        draggable="false"
+      />
+      <Panel padding={true}>
+        <form className="d-flex flex-column">
+          <div>
+            <div className="d-flex">
+              <label className="sub-title flex-grow-1">Select a Voice</label>
+            </div>
+            <SelectionBubbles
+              options={voiceOptions}
+              onSelect={handleVoiceSelection}
+              mobileSideScroll={true}
             />
           </div>
-          <TextArea
-            placeholder={placeholder}
-            value={textBuffer}
-            onChange={handleChangeText}
-            rows={4}
-            resize={false}
-            autoFocus={isMobile ? false : true}
-          />
-        </div>
 
-        {maybeError}
+          <div className="d-flex flex-column mt-3">
+            <div className="d-flex justify-content-center pb-2">
+              <label className="sub-title flex-grow-1 pb-0">Your Text</label>
+              <Button
+                icon={faShuffle}
+                label="Randomize Text"
+                onClick={generateRandomText}
+                variant="link"
+                className="fs-7 randomize-text-button"
+              />
+            </div>
+            <TextArea
+              placeholder={placeholder}
+              value={textBuffer}
+              onChange={handleChangeText}
+              rows={4}
+              resize={false}
+              autoFocus={isMobile ? false : true}
+            />
+          </div>
 
-        <div className="d-flex gap-3 align-items-center mt-4">
-          <Button
-            icon={isPlaying ? faPause : faPlay}
-            square={true}
-            onClick={handleEnqueueTts}
-            isLoading={isAudioLoading}
-            disabled={textBuffer.length === 0}
-          />
-          <DemoTtsAudioPlayer
-            filename={currentAudioUrl || ""}
-            play={isPlaying}
-            onFinish={handleAudioFinish}
-          />
-        </div>
-      </form>
-    </Panel>
+          {maybeError}
+
+          <div className="d-flex gap-3 align-items-center mt-4">
+            <Button
+              icon={isPlaying ? faPause : faPlay}
+              square={true}
+              onClick={handleEnqueueTts}
+              isLoading={isAudioLoading}
+              disabled={textBuffer.length === 0}
+            />
+            <DemoTtsAudioPlayer
+              filename={currentAudioUrl || ""}
+              play={isPlaying}
+              onFinish={handleAudioFinish}
+            />
+          </div>
+        </form>
+      </Panel>
+    </div>
   );
 }
