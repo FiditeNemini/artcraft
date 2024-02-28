@@ -42,10 +42,21 @@ $playbar-height: 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #e66462;
-    opacity: 70%;
+
+    div{
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      top:0;
+      left:0;
+      background-color: #e66462;
+      opacity: 70%;
+    }
     p{
-      opacity: 1;
+      position: absolute;
+      margin-top: 230px;
+      width: 100%;
+      top:0;
     }
   }
   .playbar{

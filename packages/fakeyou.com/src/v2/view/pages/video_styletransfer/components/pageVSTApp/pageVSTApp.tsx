@@ -147,6 +147,11 @@ export default function PageVSTApp({
             required: false,
           }}
           />
+          <br/>
+          <SectionAdvanceOptions 
+            onChange={handleOnChange}
+            vstValues={vstValues}
+          />
        {/* </div>
         </div>
         <div className="row g-3  mb-4">
@@ -160,12 +165,12 @@ export default function PageVSTApp({
               }}/> */}
         </div>
       </div>
-      <div className="row g-3 mt-4">
+      {/* <div className="row g-3 mt-4">
         <SectionAdvanceOptions 
           onChange={handleOnChange}
           vstValues={vstValues}
         />
-      </div>
+      </div> */}
       <div className="row g-3 mt-4">
         <div className="col-12 d-flex justify-content-between">
           <NavLink to={`${parentPath}`}>
@@ -186,6 +191,7 @@ export default function PageVSTApp({
             label={t("button.enqueue")}
             onClick={handleGenerate}
             variant="primary"
+            disabled={vstValues.trimEnd === 0}
           />
         </div>
       </div>

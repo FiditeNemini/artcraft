@@ -4,9 +4,9 @@ import {
   faBuildingColumns,
   faFaceViewfinder,
   faPerson,
-  faRotateLeft,
+  // faRotateLeft,
   faStar,
-  faSparkles,
+  // faSparkles,
   faText,
   faUser,
   
@@ -14,10 +14,10 @@ import {
 from "@fortawesome/pro-solid-svg-icons";
 
 import {
-  Accordion,
+  // Accordion,
   Button,
   Label,
-  NumberSliderV2
+  // NumberSliderV2
 } from 'components/common';
 import { VSTType } from './helpers';
 import { 
@@ -67,7 +67,7 @@ export default function SectionAdvanceOptions({
   return (
     <>
       <Label label="Video's Camera Angle"/>
-      <div className="d-flex flex-wrap w-100">
+      {/* <div className="d-flex flex-wrap w-100">
         <div className="my-1 me-1">
           <Button
             icon={faStar}
@@ -76,17 +76,25 @@ export default function SectionAdvanceOptions({
             onClick={()=>handlePreset('default')}
           />
         </div>
-        <div className="my-1 me-1">
+         <div className="my-1 me-1">
           <Button
             icon={faSparkles}
             label="Custom"
             isActive={preset==='custom'}
             disabled
           />
-        </div>
-      </div>
+        </div> 
+      </div> */}
       <div className="d-flex flex-wrap w-100">
-        <div className="my-1 me-1">
+        <div className="m-1">
+          <Button
+            icon={faStar}
+            label="Default"
+            isActive={preset==='default'}
+            onClick={()=>handlePreset('default')}
+          />
+        </div>
+        <div className="m-1">
           <Button
             icon={faFaceViewfinder}
             label="Face Closeups"
@@ -118,7 +126,7 @@ export default function SectionAdvanceOptions({
             onClick={()=>handlePreset('landscape')}
           />
         </div>
-        <div className="my-1 ms-1">
+        <div className="m-1">
           <Button
             icon={faText}
             label="Flat Logos, or Typographies"
@@ -127,7 +135,7 @@ export default function SectionAdvanceOptions({
           />
         </div>
       </div>
-      <Accordion className="mt-4">
+      {/* <Accordion className="mt-4">
         <Accordion.Item title={"Advanced Options"}>
           <div className="row g-3 p-3">
             <div className="col-md-6">
@@ -247,7 +255,7 @@ export default function SectionAdvanceOptions({
                 }
               }}/>
             </div>
-          </div> */}
+          </div> 
           <div className="d-flex p-3 justify-content-end">
             <Button
               icon={faRotateLeft}
@@ -259,7 +267,7 @@ export default function SectionAdvanceOptions({
             />
           </div>
         </Accordion.Item>
-      </Accordion>
+      </Accordion> */}
     </>
   );
 }
