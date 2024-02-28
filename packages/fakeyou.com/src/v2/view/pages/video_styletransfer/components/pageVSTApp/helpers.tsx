@@ -67,6 +67,10 @@ export function mapRequest(vstValues: VSTType){
       "$.401.inputs.Value": 0.7, //Denoise First Pass
       "$.140.inputs.Value": 1,     // Every nth frame
       "$.536.inputs.boolean_number": 1,    // use LCM
+      "$.1075.inputs.Value": 1280,
+      "$.1076.inputs.Value": 720,
+      "$.1079.inputs.Value": 1280,
+      "$.1080.inputs.Value": 720,
 
       "$.403.inputs.Value": vstValues.cnSparseScribble, 
       "$.771.inputs.Value": vstValues.cnOpenPose, 
