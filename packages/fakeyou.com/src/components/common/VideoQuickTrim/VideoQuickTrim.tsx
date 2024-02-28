@@ -64,7 +64,7 @@ export default memo(function VideoQuickTrim({
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [{
     trimStart,
-    trimEnd,
+    // trimEnd,
     trimDuration,
     isScrubbingTrim,
   }, setTrimState] = useState<TrimStates>(initialTrimState);
