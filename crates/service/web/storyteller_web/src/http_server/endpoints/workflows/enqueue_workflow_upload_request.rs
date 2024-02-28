@@ -238,8 +238,8 @@ pub async fn enqueue_workflow_upload_request(
         trim_start_seconds: None,
         trim_end_seconds: None,
         target_fps: None,
-        scale_width: None,
-        scale_height: None,
+        // scale_width: None,
+        // scale_height: None,
     };
    
     // create the inference args here

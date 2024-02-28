@@ -72,11 +72,11 @@ pub struct WorkflowArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub target_fps: Option<u32>,
 
-    #[serde(rename = "sw")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub scale_width: Option<u32>,
-
-    #[serde(rename = "sh")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub scale_height: Option<u32> 
+    // #[serde(rename = "sw")]
+    // #[serde(skip_serializing_if = "Option::is_none")]
+    // pub scale_width: Option<u32>,
+    //
+    // #[serde(rename = "sh")]
+    // #[serde(skip_serializing_if = "Option::is_none")]
+    // pub scale_height: Option<u32>
 }

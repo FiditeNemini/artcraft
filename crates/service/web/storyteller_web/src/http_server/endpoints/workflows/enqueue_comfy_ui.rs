@@ -58,8 +58,8 @@ pub struct EnqueueComfyRequest {
     maybe_trim_end_seconds: Option<u32>,
 
     maybe_target_fps: Option<u32>,
-    maybe_scale_width: Option<u32>,
-    maybe_scale_height: Option<u32>,
+    // maybe_scale_width: Option<u32>,
+    // maybe_scale_height: Option<u32>,
 
     creator_set_visibility: Option<Visibility>,
 }
@@ -222,15 +222,15 @@ pub async fn enqueue_comfy_ui_handler(
         target_fps = 24;
     }
 
-    let mut scale_width = request.maybe_scale_width.unwrap_or(1024);
-    let mut scale_height = request.maybe_scale_height.unwrap_or(1024);
-
-    if scale_width < 768 || scale_width > 1024 {
-        scale_width = 768;
-    }
-    if scale_height < 768 || scale_height > 1024 {
-        scale_height = 768;
-    }
+    // let mut scale_width = request.maybe_scale_width.unwrap_or(1024);
+    // let mut scale_height = request.maybe_scale_height.unwrap_or(1024);
+    //
+    // if scale_width < 768 || scale_width > 1024 {
+    //     scale_width = 768;
+    // }
+    // if scale_height < 768 || scale_height > 1024 {
+    //     scale_height = 768;
+    // }
 
     // Plan should handle "first anonymous use" and "investor" cases.
     let plan = get_correct_plan_for_session(
@@ -266,8 +266,8 @@ pub async fn enqueue_comfy_ui_handler(
         trim_start_seconds: Some(trim_start_seconds),
         trim_end_seconds: Some(trim_end_seconds),
         target_fps:Some(target_fps),
-        scale_width:Some(scale_width),
-        scale_height:Some(scale_height)
+        // scale_width:Some(scale_width),
+        // scale_height:Some(scale_height)
     };
 
     info!("Creating ComfyUI job record...");

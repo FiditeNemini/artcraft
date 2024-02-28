@@ -316,8 +316,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             // ========================= PROCESS VIDEO ======================== //
 
             // get params from comfy args
-            let vid_max_height = comfy_args.scale_width.unwrap_or(768);
-            let vid_max_width = comfy_args.scale_height.unwrap_or(768);
+            // let vid_max_height = comfy_args.scale_width.unwrap_or(768);
+            // let vid_max_width = comfy_args.scale_height.unwrap_or(768);
             let target_fps = comfy_args.target_fps.unwrap_or(24);
             let trim_start_seconds = comfy_args.trim_start_seconds.unwrap_or(0);
             let trim_end_seconds = comfy_args.trim_end_seconds.unwrap_or(3);
@@ -327,7 +327,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             let output = Command::new("python3")
                 .arg(video_processing_script)
                 .arg(input_path.clone())
-                .arg(format!("{:?}x{:?}", vid_max_width, vid_max_height))
+                // .arg(format!("{:?}x{:?}", vid_max_width, vid_max_height))
                 .arg(format!("{:?}", trim_start_seconds * 1000))
                 .arg(format!("{:?}", trim_end_seconds * 1000))
                 .arg(format!("{:?}", target_fps))
