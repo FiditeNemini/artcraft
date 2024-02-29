@@ -5,7 +5,7 @@ import { useParams, useHistory } from "react-router-dom";
 import {
   Button,
   Panel,
-  NumberSliderV2,
+  // NumberSliderV2,
   TextArea,
 } from "components/common";
 import VideoQuickTrim, {QuickTrimData} from 'components/common/VideoQuickTrim';
@@ -96,11 +96,6 @@ export default function PageVSTApp({
     history.push(`${parentPath}/jobs`);
   }
 
-  const handleFakeGen = ()=>{
-    const request = mapRequest(vstValues);
-    console.log(request);
-  }
-
   return(
     <Panel className="mb-4 p-4">
       <div className="row g-3 mb-4">
@@ -152,25 +147,30 @@ export default function PageVSTApp({
             required: false,
           }}
           />
-        {/* </div>
-      </div>
-      <div className="row g-3  mb-4">
-        <div className="col-12 col-md-6"> */}
-          <NumberSliderV2 {...{
-            min: 1, max: 60, step: 1,
-            initialValue: vstValues.inputFps,
-            label: "Input FPS",
-            thumbTip: "Input FPS",
-            onChange: (val)=>{handleOnChange({inputFps: val})}
-            }}/>
+          <br/>
+          <SectionAdvanceOptions 
+            onChange={handleOnChange}
+            vstValues={vstValues}
+          />
+       {/* </div>
+        </div>
+        <div className="row g-3  mb-4">
+          <div className="col-12 col-md-6">
+            <NumberSliderV2 {...{
+              min: 1, max: 60, step: 1,
+              initialValue: vstValues.inputFps,
+              label: "Input FPS",
+              thumbTip: "Input FPS",
+              onChange: (val)=>{handleOnChange({inputFps: val})}
+              }}/> */}
         </div>
       </div>
-      <div className="row g-3 mt-4">
+      {/* <div className="row g-3 mt-4">
         <SectionAdvanceOptions 
           onChange={handleOnChange}
           vstValues={vstValues}
         />
-      </div>
+      </div> */}
       <div className="row g-3 mt-4">
         <div className="col-12 d-flex justify-content-between">
           <NavLink to={`${parentPath}`}>
@@ -179,15 +179,19 @@ export default function PageVSTApp({
               variant="primary"
             />
           </NavLink>
-          <Button
+          {/* <Button
             label="Fake Gen"
-            onClick={handleFakeGen}
+            onClick={()=>{
+              const request = mapRequest(vstValues);
+              console.log(request);
+            }}
             variant="secondary"
-          /> 
+          />  */}
           <Button
             label={t("button.enqueue")}
             onClick={handleGenerate}
             variant="primary"
+            disabled={vstValues.trimEnd === 0}
           />
         </div>
       </div>

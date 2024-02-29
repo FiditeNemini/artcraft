@@ -8,19 +8,19 @@ const initialValues = {
   //video Settings
   width: 1024,
   height: 1024,
-  maxDuration: 3,
+  maxDuration: 0,
   trimStart: 0,
-  trimEnd: 3,
+  trimEnd: 0,
 
   //Presents
   workflowConfig: "weight_99tz2nzbp5x9v55gqn5ekj1sd",
-  sdModelToken: "weight_p5x93dw8ec24zf9hz1zezsata",
-  loraModelToken: "weight_13yfxfafv195ejwh3meesebdk",
-  loraModelStrength: 1,
+  sdModelToken: "weight_yqexh77ntqyawzgh9fzash798",
+  loraModelToken: "",
+  loraModelStrength: 0,
 
   //basics
   inputFps: 24,
-  posPrompt: "",
+  posPrompt: "perfect anime illustration,(best-quality:0.8),",
   negPrompt: "",
   visibility: "private",
 
@@ -29,6 +29,6 @@ const initialValues = {
 };
 
 const hiddenValues = {
-  posPrompt: "(masterpiece,detailed,highres:1.4), ",
-  negPrompt: "flare, lens flare, glare, naked, nsfw, text, logo, Shutterstock, watermark:1.3, embedding:easynegative, embedding:badhandv4,(worst quality, low quality:1.4), lowres, blurry, monochrome, ",
+  posPrompt: "",
+  negPrompt: "flare, lens flare, glare,naked, nsfw, text, logo, watermark:1.3, letterboxed,embedding:easynegative,  embedding:badhandv4,(worst quality, low quality:1.4), lowres, blurry, monochrome, ",
 }

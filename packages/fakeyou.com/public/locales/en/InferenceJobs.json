@@ -7,7 +7,6 @@
     "PENDING": "Pending Face Animation",
     "STARTED": "Face Animation In Progress",
     "UNKNOWN": "Animation Status Unknown",
-    "CANCELED_BY_USER": "Face Animation Canceled",
     "heading": "Face Animator Jobs"
   },
   "ImageGeneration": {
@@ -18,7 +17,6 @@
     "PENDING": "Pending Image Generation",
     "STARTED": "Image Generation in Progress",
     "UNKNOWN": "Image Generation Status Unknown",
-    "CANCELED_BY_USER": "Image Generation Canceled",
     "heading": "ImageGeneration Jobs"
   },
   "TextToSpeech": {
@@ -29,7 +27,6 @@
     "PENDING": "Pending Text to Speech",
     "STARTED": "Text to Speech in Progress",
     "UNKNOWN": "Text to Speech Unknown",
-    "CANCELED_BY_USER": "Text to Speech Canceled",
     "heading": "Text to Speech Jobs"
   },
   "VoiceConversion": {
@@ -40,18 +37,16 @@
     "PENDING": "Pending Face Voice Conversion",
     "STARTED": "Voice Conversion in Progress",
     "UNKNOWN": "Voice Conversion Unknown",
-    "CANCELED_BY_USER": "Voice Conversion Canceled",
     "heading": "Voice Conversion Jobs"
   },
   "VoiceDesignerCreateVoice": {
-    "ATTEMPT_FAILED": "Voice Designer Atempt Failed",
-    "COMPLETE_FAILURE": "Voice Designer Failed.",
-    "COMPLETE_SUCCESS": "Voice Designer Complete",
+    "ATTEMPT_FAILED": "Face Animation Atempt Failed",
+    "COMPLETE_FAILURE": "Face Animation Failed.",
+    "COMPLETE_SUCCESS": "Face Animation Complete",
     "DEAD": "Voice Designer Dead",
     "PENDING": "Voice Designer Pending",
     "STARTED": "Voice Designer In Progress",
     "UNKNOWN": "Voice Designer Status Unknown",
-    "CANCELED_BY_USER": "Voice Animator Canceled",
     "heading": "Voice Designer Jobs"
   },
   "VoiceDesignerTts": {
@@ -62,7 +57,6 @@
     "PENDING": "Pending Text to Speech",
     "STARTED": "Text to Speech in Progress",
     "UNKNOWN": "Text to Speech Unknown",
-    "CANCELED_BY_USER": "Text to Speeh Canceled",
     "heading": "Voice Designer Text to Speech Jobs"
   },
   "core": {
@@ -87,12 +81,11 @@
   "subtitles": {
     "ATTEMPT_FAILED": "Atempt {{attemptCount}} failed, trying again.",
     "COMPLETE_FAILURE": "Please try again",
-    "COMPLETE_SUCCESS": "Job finished successfully",
+    "COMPLETE_SUCCESS": "View result",
     "DEAD": "Please try again",
     "PENDING": "Adding to queue",
     "STARTED": "Please wait",
-    "UNKNOWN": "Please wait or try again",
-    "CANCELED_BY_USER": "Try again?"
+    "UNKNOWN": "Please wait or try again"
   },
   "voice_designer": {
     "ATTEMPT_FAILED": "Face Animation Atempt Failed",

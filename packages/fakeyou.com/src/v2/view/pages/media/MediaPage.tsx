@@ -39,6 +39,14 @@ import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel"
 import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
 import { mediaTypeLabels } from "utils/mediaTypeLabels";
 
+// Storyteller Engine parameters
+// These are documented here: 
+// https://www.notion.so/storytellerai/Studio-Iframe-Query-Params-a748a9929ec3404780c3884e7fb89bdb
+const SKYBOX = "333348"; // Looks good (lighter)
+//const SKYBOX = "242433"; // Looks good
+//const SKYBOX = "1a1a27"; // Too dark
+//const SKYBOX = "3f3f55"; // too light
+
 export default function MediaPage() {
   const { canEditTtsModel, user } = useSession();
   const { token } = useParams<{ token: string }>();
@@ -202,7 +210,7 @@ export default function MediaPage() {
         return (
           <Iframe
             {...{
-              url: `https://engine.fakeyou.com?mode=viewer&bvh=${bvhUrl}`,
+              url: `https://engine.fakeyou.com?mode=viewer&bvh=${bvhUrl}&skybox=${SKYBOX}`,
               className: "fy-studio-frame",
             }}
           />
@@ -212,7 +220,7 @@ export default function MediaPage() {
         return (
           <Iframe
             {...{
-              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${glbUrl}`,
+              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${glbUrl}&skybox=${SKYBOX}`,
               className: "fy-studio-frame",
             }}
           />
@@ -222,7 +230,7 @@ export default function MediaPage() {
         return (
           <Iframe
             {...{
-              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${gltfUrl}`,
+              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${gltfUrl}&skybox=${SKYBOX}`,
               className: "fy-studio-frame",
             }}
           />
@@ -232,10 +240,11 @@ export default function MediaPage() {
         // We don't need to pass the bucket path.
         // The engine, does, however, need a `.scn.ron` file extension.
         const sceneRonUrl = `remote://${mediaFile.token}.scn.ron`;
+        // NB: Skybox param doesn't work with scenes. Scenes will bake in a skybox in the future.
         return (
           <Iframe
             {...{
-              url: `https://engine.fakeyou.com?mode=studio&scene=${sceneRonUrl}`,
+              url: `https://engine.fakeyou.com?mode=viewer&scene=${sceneRonUrl}`,
               className: "fy-studio-frame",
             }}
           />
