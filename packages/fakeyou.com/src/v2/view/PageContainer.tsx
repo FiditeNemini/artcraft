@@ -124,6 +124,9 @@ import DomainConfigProvider from "context/DomainConfigContext";
 import DevUpload from "./pages/dev_upload/DevUpload";
 import DevMediaInput from "./pages/dev_upload/DevMediaInput";
 import DevTTS from "./pages/dev_tts/DevTTS";
+import { StudioIntroPage } from "./pages/storyteller_studio_intro/StudioIntroPage";
+import StudioVSTPage from "./pages/storyteller_studio_intro/StudioVST/StudioVSTPage";
+import { StudioIntroResultPage } from "./pages/storyteller_studio_intro/StudioIntroResultPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -756,6 +759,28 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
+                  <Route path="/studio-intro/result/:jobToken?">
+                    <StudioIntroResultPage
+                      sessionWrapper={this.props.sessionWrapper}
+                      sessionSubscriptionsWrapper={
+                        this.props.sessionSubscriptionsWrapper
+                      }
+                    />
+                  </Route>
+
+                  <Route path="/studio-intro/style/:jobToken?">
+                    <StudioVSTPage />
+                  </Route>
+
+                  <Route path="/studio-intro/:mediaToken?">
+                    <StudioIntroPage
+                      sessionWrapper={this.props.sessionWrapper}
+                      sessionSubscriptionsWrapper={
+                        this.props.sessionSubscriptionsWrapper
+                      }
+                    />
+                  </Route>
+
                   <Route path="/commissions">
                     <CommunityCommissionsPage />
                   </Route>
@@ -784,11 +809,10 @@ class PageContainer extends React.Component<
                     <DevMediaInput />
                   </Route>
 
-{
                   <Route path="/dev-tts">
                     <DevTTS />
                   </Route>
-}
+                  
                   {/* Route for initial voice creation */}
                   <Route exact path="/voice-designer/create">
                     <VoiceDesignerFormPage
@@ -1312,15 +1336,6 @@ class PageContainer extends React.Component<
                         inferenceJobsByCategory:
                           this.props.inferenceJobsByCategory,
                       }}
-                    />
-                  </Route>
-
-                  <Route path="/studio">
-                    <StorytellerStudioListPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      sessionSubscriptionsWrapper={
-                        this.props.sessionSubscriptionsWrapper
-                      }
                     />
                   </Route>
 
