@@ -143,6 +143,14 @@ impl RequiredModels {
                     location: PathBuf::from("models/controlnet/control_v11p_sd15_canny.safetensors"),
                     url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/control_v11p_sd15_canny.safetensors".to_string(),
                 },
+                ComfyDependency {
+                    location: PathBuf::from("models/grounding-dino/GroundingDINO_SwinT_OGC.cfg.py"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/GroundingDINO_SwinT_OGC.py".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("models/grounding-dino/groundingdino_swint_ogc.pth"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/groundingdino_swint_ogc.pth".to_string(),
+                },
             ],
         }
     }
