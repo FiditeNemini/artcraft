@@ -123,6 +123,7 @@ import TextToImagePage from "./pages/text_to_image/TextToImagePage";
 import DomainConfigProvider from "context/DomainConfigContext";
 import DevUpload from "./pages/dev_upload/DevUpload";
 import DevMediaInput from "./pages/dev_upload/DevMediaInput";
+// import DevTTS from "./pages/dev_tts/DevTTS";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -746,7 +747,7 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
-                  <Route path="/studio">
+                  <Route path="/studio/:mediaToken?">
                     <StorytellerStudioListPage
                       sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={
@@ -783,6 +784,11 @@ class PageContainer extends React.Component<
                     <DevMediaInput />
                   </Route>
 
+{
+                  // <Route path="/dev-tts">
+                  //   <DevTTS />
+                  // </Route>
+}
                   {/* Route for initial voice creation */}
                   <Route exact path="/voice-designer/create">
                     <VoiceDesignerFormPage
