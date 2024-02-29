@@ -4,12 +4,12 @@ import React, {
   useLayoutEffect,
   useState,
   useRef,
-  PointerEvent,
+  // PointerEvent,
 } from "react";
 import {
   faPlay,
   faPause,
-  faGripDots,
+  // faGripDots,
   faVolume,
   faVolumeSlash,
 } from "@fortawesome/pro-solid-svg-icons"
@@ -23,6 +23,7 @@ import { VideoFakeyouProps } from "../VideoFakeyou/VideoFakeyou";
 
 import { QuickTrimData, TrimStates, PlaybarStates } from "./types";
 import { formatSecondsToHHMMSSCS } from "./helpers";
+import TrimScrbber from "./TrimScrubber";
 import './styles.scss'
 
 interface VideoQuickTrimProps extends VideoFakeyouProps{
@@ -58,10 +59,9 @@ export default memo(function VideoQuickTrim({
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playbarRef = useRef<HTMLDivElement | null>(null);
-  const trimZoneRef = useRef<HTMLDivElement>(null);
 
   const [{playbarWidth, timeCursorOffset}, setPlaybarState] = useState<PlaybarStates>(initialPlaybarState);
-  const [playpause, setPlaypause] = useState<'playing'|'paused'|'stopped'>('paused');
+  const [playpause, setPlaypause] = useState<'playing'|'paused'|'ended'>('paused');
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [{
     canNotTrim,
@@ -74,6 +74,7 @@ export default memo(function VideoQuickTrim({
 
 
   const videoRefCallback = useCallback(node => {
+    console.log("videoRefCallback");
     if (node !== null) { 
       // DOM node referenced by ref has changed and exists
       videoRef.current = node;
@@ -87,19 +88,26 @@ export default memo(function VideoQuickTrim({
             trimEnd: 3,
             maxDuration: node.duration
           }));
+          //TODO: this sbould be set in USEEFFECT
+          //IFF USEEFFECT starts working again
           onSelect({
             trimStartSeconds: 0,
             trimEndSeconds: 3,
           })
         }
-      }
+      };
       
-      node.ontimeupdate = (e: PointerEvent)=>{
+      node.ontimeupdate = ()=>{
         setPlaybarState((curr)=>({
           ...curr,
           timeCursorOffset: (node.currentTime / node.duration) * (playbarWidth-8)
         }));
-      }
+      };
+
+      node.onplay = ()=>{ setPlaypause("playing");};
+      node.onpause = ()=>{setPlaypause("paused");};
+      node.onended = ()=>{setPlaypause("ended");};
+
     } // else{} DOM node referenced by ref has been unmounted 
   }, [playbarWidth, onSelect]); //END videoRefCallback
 
@@ -143,7 +151,7 @@ export default memo(function VideoQuickTrim({
   }
 
   const handlePlaypause = ()=>{
-    if (playpause === 'paused' || playpause === 'stopped'){
+    if (playpause === 'paused' || playpause === 'ended'){
       videoRef.current?.play();
       setPlaypause('playing');
     }else{
@@ -152,7 +160,7 @@ export default memo(function VideoQuickTrim({
     }
   }
 
-  const trimZoneWidth = videoRef.current 
+  const trimScrubberWidth = videoRef.current 
     ? trimDuration > 0 && trimDuration < videoRef.current.duration 
       ? (trimDuration / videoRef.current.duration * 100) 
       : 100
@@ -189,37 +197,7 @@ export default memo(function VideoQuickTrim({
       </div>{/* END of Video Wrapper */}
       <div className="playbar" ref={playbarRefCallback}>
         <div className="playbar-bg" />
-        <div className="trimzone" 
-          ref={trimZoneRef}
-          style={{width: trimZoneWidth + "%"}}
-          // onPointerDown={()=>{
-          //   if(trimZoneRef.current){
-          //     trimZoneRef.current.style.cursor = 'grabbing';
-          //     setTrimState((curr)=>({
-          //       ...curr,
-          //       isScrubbingTrim: true,
-          //     }))
-          //   }
-          // }}
-          // onPointerUp={()=>{
-          //   if(trimZoneRef.current) {
-          //     trimZoneRef.current.style.cursor = 'grab';
-          //     setTrimState((curr)=>({
-          //       ...curr,
-          //       isScrubbingTrim: false,
-          //     }));
-          //   }
-          // }}
-          // onPointerMove={(e: PointerEvent<HTMLDivElement>)=>{
-          //   if(trimZoneRef.current && playbarRef.current && isScrubbingTrim){
-          //     // console.log(fractionToPercentage(
-          //     //   (e.clientX - trimZoneRef.current.getBoundingClientRect().left) / (playbarRef.current.getBoundingClientRect().width)
-          //     // ) + "%");
-          //   }
-          // }}
-        >
-          <FontAwesomeIcon icon={faGripDots} />
-        </div>
+        <TrimScrbber width={trimScrubberWidth} />
         <div className="playcursor" style={{left: timeCursorOffset+"px"}}/>
       </div> {/* END of Playbar */}
 
