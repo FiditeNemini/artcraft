@@ -7,9 +7,9 @@ import React, {
   // PointerEvent,
 } from "react";
 import {
+  faArrowsRepeat,
   faPlay,
   faPause,
-  // faGripDots,
   faVolume,
   faVolumeSlash,
 } from "@fortawesome/pro-solid-svg-icons"
@@ -60,13 +60,17 @@ export default memo(function VideoQuickTrim({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playbarRef = useRef<HTMLDivElement | null>(null);
 
-  const [{playbarWidth, timeCursorOffset}, setPlaybarState] = useState<PlaybarStates>(initialPlaybarState);
+  const [{
+    playbarWidth,
+    timeCursorOffset
+  }, setPlaybarState] = useState<PlaybarStates>(initialPlaybarState);
   const [playpause, setPlaypause] = useState<'playing'|'paused'|'ended'>('paused');
   const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [isRepeatOn, setIsRepatOn] = useState<boolean>(true);
   const [{
     canNotTrim,
     trimStart,
-    // trimEnd,
+    trimEnd,
     trimDuration,
     // isScrubbingTrim,
   }, setTrimState] = useState<TrimStates>(initialTrimState);
@@ -98,10 +102,14 @@ export default memo(function VideoQuickTrim({
       };
       
       node.ontimeupdate = ()=>{
+        if(isRepeatOn && node.currentTime >= trimEnd){
+          node.currentTime = 0;
+        }
         setPlaybarState((curr)=>({
           ...curr,
           timeCursorOffset: (node.currentTime / node.duration) * (playbarWidth-8)
         }));
+        
       };
 
       node.onplay = ()=>{ setPlaypause("playing");};
@@ -109,7 +117,7 @@ export default memo(function VideoQuickTrim({
       node.onended = ()=>{setPlaypause("ended");};
 
     } // else{} DOM node referenced by ref has been unmounted 
-  }, [playbarWidth, onSelect]); //END videoRefCallback
+  }, [playbarWidth, onSelect, isRepeatOn, trimEnd]); //END videoRefCallback
 
   function handleWindowResize() {
     if(playbarRef.current !== null){
@@ -138,25 +146,30 @@ export default memo(function VideoQuickTrim({
 
   const handleChangeTrimDuration = (selected: string) =>{
     if(!canNotTrim){
+      const newTrimEnd = trimStart+ trimOptions[selected];
       setTrimState((curr)=>({
         ...curr,
         trimDuration: trimOptions[selected],
-        trimEnd: trimStart+ trimOptions[selected],
+        trimEnd: newTrimEnd,
       }))
       onSelect({
         trimStartSeconds: trimStart,
-        trimEndSeconds: trimStart+ trimOptions[selected],
+        trimEndSeconds: newTrimEnd,
       });
+      if (isRepeatOn 
+          && videoRef.current 
+          && videoRef.current.currentTime > newTrimEnd
+      ){
+        videoRef.current.currentTime = trimStart;
+      }
     }
   }
 
   const handlePlaypause = ()=>{
     if (playpause === 'paused' || playpause === 'ended'){
       videoRef.current?.play();
-      setPlaypause('playing');
     }else{
       videoRef.current?.pause();
-      setPlaypause('paused');
     }
   }
 
@@ -210,12 +223,18 @@ export default memo(function VideoQuickTrim({
             onClick={handlePlaypause}
           />
           <Button
+            className="button-repeat"
+            icon={faArrowsRepeat}
+            variant={isRepeatOn ? "primary":"secondary"}
+            onClick={()=>setIsRepatOn((curr)=>(!curr))}
+          />
+          <Button
             className="button-mute"
             icon={isMuted ? faVolumeSlash : faVolume}
             variant="secondary"
             onClick={()=>setIsMuted((curr)=>(!curr))}
           />
-          <div className="playtime ms-2 d-flex">
+          <div className="playtime d-flex">
             <span >
               <p>
                 {`${formatSecondsToHHMMSSCS(videoRef.current?.currentTime || 0)}`}
