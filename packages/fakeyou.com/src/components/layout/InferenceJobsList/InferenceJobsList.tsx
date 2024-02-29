@@ -24,6 +24,7 @@ const resultPaths = {
   EngineComposition: "/media",
   FaceAnimation: "/media",
   TextToSpeech: "/media",
+  VideoStyleTransfer: "/media",
   VoiceConversion: "/media",
   VoiceDesignerCreateVoice: "/voice-designer/voice",
   VoiceDesignerTts: "/media",
