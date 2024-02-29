@@ -30,7 +30,7 @@ export default function MediaTab({ username }: { username: string }) {
   const media = useListContent({
     addQueries: {
       page_size: urlQueries.get("page_size") || "24",
-      ...prepFilter(mediaType, "filter_media_type",mediaType === "3dFile" ? "bvh,glb,gltf" : "" ),
+      ...prepFilter(mediaType, "filter_media_type",mediaType === "3dFile" ? "bvh,glb,gltf,scene_ron" : "" ),
     },
     addSetters: { mediaTypeSet },
     // debug: "profile media",
