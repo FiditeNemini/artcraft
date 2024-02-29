@@ -798,6 +798,11 @@ class PageContainer extends React.Component<
                     <DevMediaInput />
                   </Route>
 
+                  {
+                    // <Route path="/dev-tts">
+                    //   <DevTTS />
+                    // </Route>
+                  }
                   {/* Route for initial voice creation */}
                   <Route exact path="/voice-designer/create">
                     <VoiceDesignerFormPage
