@@ -145,14 +145,14 @@ export default function PageVSTApp({
               variant="primary"
             />
           </NavLink>
-          {/* <Button
+          <Button
             label="Fake Gen"
             onClick={()=>{
               const request = mapRequest(vstValues);
               console.log(request);
             }}
             variant="secondary"
-          />  */}
+          /> 
           <Button
             label={t("button.enqueue")}
             onClick={handleGenerate}
