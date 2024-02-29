@@ -12,6 +12,7 @@ interface Scene3DProps {
   urlParams?: string;
   objectId?: string;
   sceneMediaFileToken?: string;
+  className?: string;
 }
 
 export default function Scene3D({
@@ -20,8 +21,8 @@ export default function Scene3D({
   objectId,
   sceneMediaFileToken,
   urlParams,
+  className,
 }: Scene3DProps) {
-
   let engineUrl = `https://engine.fakeyou.com?mode=${mode}`;
 
   if (sceneMediaFileToken) {
@@ -35,14 +36,9 @@ export default function Scene3D({
     <div
       className={`${
         fullScreen ? "fy-scene-3d-fullscreen" : "fy-scene-3d-default"
-      }`.trim()}
+      } ${className ? className : ""}`.trim()}
     >
-      <IframeResizer
-        src={engineUrl}
-        width="100%"
-        height="100%"
-        id=""
-      />
+      <IframeResizer src={engineUrl} width="100%" height="100%" id="" />
     </div>
   );
 }
