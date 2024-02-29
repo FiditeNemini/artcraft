@@ -13,15 +13,17 @@ import VideoQuickTrim, {
 import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
 import { initialValues } from "./defaultValues";
 import { mapRequest, VSTType } from "./helpers";
+import LoadingSpinner from "components/common/LoadingSpinner";
 // import SectionAdvanceOptions from "./sectionAdvanceOptions";
 
 export default function PageVSTApp() {
-  const { jobToken } = useParams<any>();
+  const { jobToken } = useParams<{ jobToken: string }>();
   const videoRef = useRef<HTMLVideoElement>(null);
   const history = useHistory();
-  const [isLoading, setIsLoading] = useState(false);
-  const [mediaToken, setMediaToken] = useState("");
-
+  const [mediaToken, setMediaToken] = useState(
+    "m_wnnz9jey96dwhss9qk1891v9gmvnj8" // Currently hardcoded video media token value. Let a job polling function set the value when job returns media on success.
+  );
+  // const [jobExists, setJobExists] = useState<boolean | null>(null);
   const [vstValues, setVstValues] = useState<VSTType>({
     ...initialValues,
     fileToken: mediaToken,
@@ -38,7 +40,7 @@ export default function PageVSTApp() {
     EnqueueVideoStyleTransfer(request).then(res => {
       if (res.success && res.inference_job_token) {
         console.log("Job enqueued successfully", res.inference_job_token);
-        history.push(`/jobs`); // Adjusted to use a fixed path
+        history.push(`/studio-intro/result/${res.inference_job_token}`);
       } else {
         console.log("Failed to enqueue job", res);
       }
@@ -64,7 +66,7 @@ export default function PageVSTApp() {
   }
 
   const styleMap: { [key: string]: string } = {
-    Anime: "weight_yqexh77ntqyawzgh9fzash798",
+    Anime: "weight_yqexh77ntqyawzgh9fzash798", // set SD Model Weight Tokens, currently hardcoded all to Anime style
     Pixel: "weight_yqexh77ntqyawzgh9fzash798",
     Painting: "weight_yqexh77ntqyawzgh9fzash798",
   };
@@ -76,37 +78,58 @@ export default function PageVSTApp() {
 
   const styleOptions = Object.keys(styleMap);
 
+  if (!jobToken) {
+    history.push("/");
+  }
+
+  // Should also check if job actually exists or not
+  //
+  // if (!jobExists) {
+  //   history.push("/");
+  // }
+
   return (
     <Container type="panel" className="mt-5">
+      <Panel clear={true}>
+        <h2 className="fw-bold mb-0 mb-5 text-center">Style Your Scene</h2>
+      </Panel>
       <Panel padding={true}>
-        <div className="row g-4">
+        <div className="row g-5">
           <div className="col-12 col-md-6">
-            <VideoQuickTrim
-              mediaToken={vstValues.fileToken}
-              onSelect={(val: QuickTrimData) =>
-                handleOnChange({
-                  trimStart: val.trimStartSeconds,
-                  trimEnd: val.trimEndSeconds,
-                })
-              }
-            />
+            {vstValues.fileToken ? (
+              <VideoQuickTrim
+                mediaToken={vstValues.fileToken}
+                onSelect={(val: QuickTrimData) =>
+                  handleOnChange({
+                    trimStart: val.trimStartSeconds,
+                    trimEnd: val.trimEndSeconds,
+                  })
+                }
+              />
+            ) : (
+              <div className="ratio ratio-4x3 panel-inner rounded">
+                <LoadingSpinner label="Loading Video" />
+              </div>
+            )}
           </div>
-          <div className="col-12 col-md-6 d-flex flex-column gap-3">
+          <div className="col-12 col-md-6 d-flex flex-column gap-3 justify-content-center">
             <div>
               <label className="sub-title">Select a Style</label>
               <SelectionBubbles
                 options={styleOptions}
                 onSelect={handleStyleSelection}
-                selectedStyle="fill"
+                selectedStyle="outline"
               />
             </div>
 
             <TextArea
-              label="Prompt"
-              placeholder="Enter your prompt"
+              label="Describe Your Scene"
+              placeholder="Enter your description..."
               onChange={e => handleOnChange({ posPrompt: e.target.value })}
               value={vstValues.posPrompt}
               required={false}
+              rows={5}
+              resize={false}
             />
             {/* <TextArea
               label="Negative Prompt"
@@ -119,19 +142,17 @@ export default function PageVSTApp() {
               onChange={handleOnChange}
               vstValues={vstValues}
             /> */}
-          </div>
-        </div>
-        <div className="row g-3 mt-4">
-          <div className="col-12 d-flex justify-content-between">
-            <NavLink to="/">
-              <Button label="Cancel" variant="primary" />
-            </NavLink>
-            <Button
-              label="Enqueue"
-              onClick={handleGenerate}
-              variant="primary"
-              disabled={vstValues.trimEnd === 0}
-            />
+            <div className="d-flex gap-2 justify-content-end mt-3">
+              <NavLink to="/">
+                <Button label="Cancel" variant="secondary" />
+              </NavLink>
+              <Button
+                label="Generate Your Movie"
+                onClick={handleGenerate}
+                variant="primary"
+                disabled={!vstValues.fileToken}
+              />
+            </div>
           </div>
         </div>
       </Panel>

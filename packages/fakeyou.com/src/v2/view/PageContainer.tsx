@@ -125,6 +125,7 @@ import DevUpload from "./pages/dev_upload/DevUpload";
 import DevMediaInput from "./pages/dev_upload/DevMediaInput";
 import { StudioIntroPage } from "./pages/storyteller_studio_intro/StudioIntroPage";
 import StudioVSTPage from "./pages/storyteller_studio_intro/StudioVST/StudioVSTPage";
+import { StudioIntroResultPage } from "./pages/storyteller_studio_intro/StudioIntroResultPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -750,6 +751,15 @@ class PageContainer extends React.Component<
 
                   <Route path="/studio/:mediaToken?">
                     <StorytellerStudioListPage
+                      sessionWrapper={this.props.sessionWrapper}
+                      sessionSubscriptionsWrapper={
+                        this.props.sessionSubscriptionsWrapper
+                      }
+                    />
+                  </Route>
+
+                  <Route path="/studio-intro/result/:jobToken?">
+                    <StudioIntroResultPage
                       sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper

@@ -12,149 +12,154 @@ import {
   faGripDots,
   faVolume,
   faVolumeSlash,
-} from "@fortawesome/pro-solid-svg-icons"
+} from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  Button,
-  SelectionBubbles,
-  VideoFakeyou
-} from "components/common";
+import { Button, SelectionBubbles, VideoFakeyou } from "components/common";
 import { VideoFakeyouProps } from "../VideoFakeyou/VideoFakeyou";
 
 import { QuickTrimData, TrimStates, PlaybarStates } from "./types";
 import { formatSecondsToHHMMSSCS } from "./helpers";
-import './styles.scss'
+import "./styles.scss";
 
-interface VideoQuickTrimProps extends VideoFakeyouProps{
-  onSelect: (values: QuickTrimData)=>void;
+interface VideoQuickTrimProps extends VideoFakeyouProps {
+  onSelect: (values: QuickTrimData) => void;
 }
 
 const trimOptions: { [key: string]: number } = {
   "3s": 3,
   "5s": 5,
   "10s": 10,
-  "15s" : 15,
+  "15s": 15,
 };
 
-const initialTrimState:TrimStates = {
+const initialTrimState: TrimStates = {
   canNotTrim: true,
   isScrubbingTrim: false,
   trimDuration: 0,
   trimStart: 0,
   trimEnd: 0,
   maxDuration: 0,
-}
+};
 
-const initialPlaybarState:PlaybarStates = {
+const initialPlaybarState: PlaybarStates = {
   playbarWidth: 0,
   timeCursorOffset: 0,
-}
+};
 
 export default memo(function VideoQuickTrim({
   onSelect,
   ...rest
-}: VideoQuickTrimProps){
+}: VideoQuickTrimProps) {
   // console.log("VideoQuickTrim Rerender!!");
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const playbarRef = useRef<HTMLDivElement | null>(null);
   const trimZoneRef = useRef<HTMLDivElement>(null);
 
-  const [{playbarWidth, timeCursorOffset}, setPlaybarState] = useState<PlaybarStates>(initialPlaybarState);
-  const [playpause, setPlaypause] = useState<'playing'|'paused'|'stopped'>('paused');
+  const [{ playbarWidth, timeCursorOffset }, setPlaybarState] =
+    useState<PlaybarStates>(initialPlaybarState);
+  const [playpause, setPlaypause] = useState<"playing" | "paused" | "stopped">(
+    "paused"
+  );
   const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [{
-    canNotTrim,
-    trimStart,
-    // trimEnd,
-    trimDuration,
-    // isScrubbingTrim,
-  }, setTrimState] = useState<TrimStates>(initialTrimState);
-  
+  const [
+    {
+      canNotTrim,
+      trimStart,
+      // trimEnd,
+      trimDuration,
+      // isScrubbingTrim,
+    },
+    setTrimState,
+  ] = useState<TrimStates>(initialTrimState);
 
+  const videoRefCallback = useCallback(
+    node => {
+      if (node !== null) {
+        // DOM node referenced by ref has changed and exists
+        videoRef.current = node;
 
-  const videoRefCallback = useCallback(node => {
-    if (node !== null) { 
-      // DOM node referenced by ref has changed and exists
-      videoRef.current = node;
-      
-      node.onloadedmetadata = ()=>{
-        if (node.duration >= 3){
-          setTrimState((curr)=>({
+        node.onloadedmetadata = () => {
+          if (node.duration >= 3) {
+            setTrimState(curr => ({
+              ...curr,
+              canNotTrim: false,
+              trimDuration: 3,
+              trimEnd: 3,
+              maxDuration: node.duration,
+            }));
+            onSelect({
+              trimStartSeconds: 0,
+              trimEndSeconds: 3,
+            });
+          }
+        };
+
+        node.ontimeupdate = (e: PointerEvent) => {
+          setPlaybarState(curr => ({
             ...curr,
-            canNotTrim: false,
-            trimDuration: 3,
-            trimEnd: 3,
-            maxDuration: node.duration
+            timeCursorOffset:
+              (node.currentTime / node.duration) * (playbarWidth - 8),
           }));
-          onSelect({
-            trimStartSeconds: 0,
-            trimEndSeconds: 3,
-          })
-        }
-      }
-      
-      node.ontimeupdate = (e: PointerEvent)=>{
-        setPlaybarState((curr)=>({
-          ...curr,
-          timeCursorOffset: (node.currentTime / node.duration) * (playbarWidth-8)
-        }));
-      }
-    } // else{} DOM node referenced by ref has been unmounted 
-  }, [playbarWidth, onSelect]); //END videoRefCallback
+        };
+      } // else{} DOM node referenced by ref has been unmounted
+    },
+    [playbarWidth, onSelect]
+  ); //END videoRefCallback
 
   function handleWindowResize() {
-    if(playbarRef.current !== null){
+    if (playbarRef.current !== null) {
       const newWidth = playbarRef.current.getBoundingClientRect().width;
-      setPlaybarState((curr)=>({
+      setPlaybarState(curr => ({
         playbarWidth: newWidth,
-        timeCursorOffset: (curr.timeCursorOffset / (curr.playbarWidth-8)) * (newWidth-8)
+        timeCursorOffset:
+          (curr.timeCursorOffset / (curr.playbarWidth - 8)) * (newWidth - 8),
       }));
     }
   }
   const playbarRefCallback = useCallback(node => {
-    if(node !== null) {
+    if (node !== null) {
       playbarRef.current = node;
-      setPlaybarState((curr)=>({
+      setPlaybarState(curr => ({
         ...curr,
-        playbarWidth: node.getBoundingClientRect().width
+        playbarWidth: node.getBoundingClientRect().width,
       }));
     }
   }, []);
-  useLayoutEffect(()=>{
-    window.addEventListener('resize', handleWindowResize);
+  useLayoutEffect(() => {
+    window.addEventListener("resize", handleWindowResize);
     return () => {
-      window.removeEventListener('resize', handleWindowResize);
+      window.removeEventListener("resize", handleWindowResize);
     };
-  },[]);
+  }, []);
 
-  const handleChangeTrimDuration = (selected: string) =>{
-    if(!canNotTrim){
-      setTrimState((curr)=>({
+  const handleChangeTrimDuration = (selected: string) => {
+    if (!canNotTrim) {
+      setTrimState(curr => ({
         ...curr,
         trimDuration: trimOptions[selected],
-        trimEnd: trimStart+ trimOptions[selected],
-      }))
+        trimEnd: trimStart + trimOptions[selected],
+      }));
       onSelect({
         trimStartSeconds: trimStart,
-        trimEndSeconds: trimStart+ trimOptions[selected],
+        trimEndSeconds: trimStart + trimOptions[selected],
       });
     }
-  }
+  };
 
-  const handlePlaypause = ()=>{
-    if (playpause === 'paused' || playpause === 'stopped'){
+  const handlePlaypause = () => {
+    if (playpause === "paused" || playpause === "stopped") {
       videoRef.current?.play();
-      setPlaypause('playing');
-    }else{
+      setPlaypause("playing");
+    } else {
       videoRef.current?.pause();
-      setPlaypause('paused');
+      setPlaypause("paused");
     }
-  }
+  };
 
-  const trimZoneWidth = videoRef.current 
-    ? trimDuration > 0 && trimDuration < videoRef.current.duration 
-      ? (trimDuration / videoRef.current.duration * 100) 
+  const trimZoneWidth = videoRef.current
+    ? trimDuration > 0 && trimDuration < videoRef.current.duration
+      ? (trimDuration / videoRef.current.duration) * 100
       : 100
     : 0;
 
@@ -169,29 +174,35 @@ export default memo(function VideoQuickTrim({
         />
 
         <div className="playpause-overlay" onClick={handlePlaypause}>
-          {playpause === 'paused' && 
-            <FontAwesomeIcon className="playpause-icon"
-              icon={faPlay} size="8x"
+          {playpause === "paused" && (
+            <FontAwesomeIcon
+              className="playpause-icon"
+              icon={faPlay}
+              size="8x"
             />
-          }
-          {playpause === 'playing' &&
-            <FontAwesomeIcon className="playpause-icon"
-              icon={faPause} size="8x"
+          )}
+          {playpause === "playing" && (
+            <FontAwesomeIcon
+              className="playpause-icon"
+              icon={faPause}
+              size="8x"
             />
-          }
+          )}
         </div>
-        {videoRef.current && canNotTrim &&
+        {videoRef.current && canNotTrim && (
           <div className="warning-too-short">
             <div className="background"></div>
             <p>Warning: Sorry Your Video is TOO Short</p>
           </div>
-        }
-      </div>{/* END of Video Wrapper */}
+        )}
+      </div>
+      {/* END of Video Wrapper */}
       <div className="playbar" ref={playbarRefCallback}>
         <div className="playbar-bg" />
-        <div className="trimzone" 
+        <div
+          className="trimzone"
           ref={trimZoneRef}
-          style={{width: trimZoneWidth + "%"}}
+          style={{ width: trimZoneWidth + "%" }}
           // onPointerDown={()=>{
           //   if(trimZoneRef.current){
           //     trimZoneRef.current.style.cursor = 'grabbing';
@@ -220,14 +231,14 @@ export default memo(function VideoQuickTrim({
         >
           <FontAwesomeIcon icon={faGripDots} />
         </div>
-        <div className="playcursor" style={{left: timeCursorOffset+"px"}}/>
-      </div> {/* END of Playbar */}
-
+        <div className="playcursor" style={{ left: timeCursorOffset + "px" }} />
+      </div>{" "}
+      {/* END of Playbar */}
       <div className="d-flex w-100 justify-content-between mt-3 flex-wrap">
         <div className="playpause-external d-flex align-items-center flex-wrap mb-2">
           <Button
             className="button-playpause"
-            icon={playpause === 'playing' ? faPause : faPlay}
+            icon={playpause === "playing" ? faPause : faPlay}
             variant="secondary"
             onClick={handlePlaypause}
           />
@@ -235,12 +246,14 @@ export default memo(function VideoQuickTrim({
             className="button-mute"
             icon={isMuted ? faVolumeSlash : faVolume}
             variant="secondary"
-            onClick={()=>setIsMuted((curr)=>(!curr))}
+            onClick={() => setIsMuted(curr => !curr)}
           />
           <div className="playtime ms-2 d-flex">
-            <span >
+            <span>
               <p>
-                {`${formatSecondsToHHMMSSCS(videoRef.current?.currentTime || 0)}`}
+                {`${formatSecondsToHHMMSSCS(
+                  videoRef.current?.currentTime || 0
+                )}`}
               </p>
             </span>
             <div>/</div>
@@ -254,6 +267,7 @@ export default memo(function VideoQuickTrim({
         <SelectionBubbles
           options={Object.keys(trimOptions)}
           onSelect={handleChangeTrimDuration}
+          selectedStyle="outline"
         />
       </div>
     </div>

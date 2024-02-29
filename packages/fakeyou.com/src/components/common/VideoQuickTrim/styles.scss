@@ -3,7 +3,7 @@
 $playbar-height: 2rem;
 
 .fy-video-quicktrim {
-  .video-wrapper{
+  .video-wrapper {
     position: relative;
     background-color: $bg;
     border-radius: 0.5rem 0.5rem 0 0;
@@ -11,71 +11,76 @@ $playbar-height: 2rem;
     border-left: $panel-inner-border 1px solid;
     border-right: $panel-inner-border 1px solid;
   }
-  .fy-video{
-    height: 500px;
+  .fy-video {
+    max-height: 500px;
+    margin-bottom: -7px;
+
+    video {
+      border-radius: 0.5rem 0.5rem 0 0;
+    }
   }
-  .playpause-overlay{
+  .playpause-overlay {
     position: absolute;
     cursor: pointer;
     height: 100%;
     width: 100%;
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
     display: flex;
     justify-content: center;
     align-items: center;
 
-    svg{
+    svg {
       opacity: 0;
-      transition: opacity 0.5s;  
+      transition: opacity 0.5s;
     }
-    &:hover svg{
+    &:hover svg {
       opacity: 1;
     }
   }
-  .warning-too-short{
+  .warning-too-short {
     position: absolute;
     height: 100%;
     width: 100%;
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
     display: flex;
     justify-content: center;
     align-items: center;
 
-    div{
+    div {
       position: absolute;
       height: 100%;
       width: 100%;
-      top:0;
-      left:0;
+      top: 0;
+      left: 0;
       background-color: #e66462;
       opacity: 70%;
     }
-    p{
+    p {
       position: absolute;
       margin-top: 230px;
       width: 100%;
-      top:0;
+      top: 0;
     }
   }
-  .playbar{
-    position:relative;
+  .playbar {
+    position: relative;
     height: $playbar-height;
     width: 100%;
   }
-  .playbar-bg{
+  .playbar-bg {
     position: absolute;
     height: 100%;
     width: 100%;
-    top:0;
+    top: 0;
     left: 0;
     background-color: $panel-inner-border;
     border-radius: 0 0 0.5rem 0.5rem;
   }
-  .trimzone{
+  .trimzone {
     position: absolute;
-    top:-1rem;
+    top: -1rem;
     height: 3rem;
     background-color: #e66462;
     opacity: 0.8;
@@ -92,29 +97,29 @@ $playbar-height: 2rem;
       color: $panel-inner-border;
     }
   }
-  .playcursor{
+  .playcursor {
     position: absolute;
-    top:0;
+    top: 0;
     width: 0.5rem;
     height: $playbar-height;
     background-color: $white;
   }
 
-  .playpause-external{
-    .button-playpause{
+  .playpause-external {
+    .button-playpause {
       width: 55px;
       height: 40px;
       margin-right: 0.5rem;
     }
-    .button-mute{
+    .button-mute {
       width: 40px;
       height: 40px;
     }
-    .playtime{
-      span{
+    .playtime {
+      span {
         width: 60px;
       }
-      div{
+      div {
         width: 10px;
         margin-left: 3px;
         margin-right: 5px;

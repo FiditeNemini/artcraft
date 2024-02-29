@@ -42,6 +42,7 @@ function StudioIntroPage(props: Props) {
   }
 
   const onClick = () => {
+    // This opens the job modal. Needs to be disabled.
     EnqueueEngineCompositing("", {
       uuid_idempotency_token: uuidv4(),
       media_file_token: mediaToken || "",

@@ -21,7 +21,7 @@ const initialValues = {
 
   //basics
   inputFps: 24,
-  posPrompt: "perfect anime illustration,(best-quality:0.8),",
+  posPrompt: "",
   negPrompt: "",
   visibility: "private",
 
