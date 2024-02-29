@@ -10,6 +10,7 @@ import {
 import VideoQuickTrim, {
   QuickTrimData,
 } from "components/common/VideoQuickTrim";
+import { useJobStatus } from "hooks";
 import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
 import { initialValues } from "./defaultValues";
 import { mapRequest, VSTType } from "./helpers";
@@ -20,14 +21,12 @@ export default function PageVSTApp() {
   const { jobToken } = useParams<{ jobToken: string }>();
   const videoRef = useRef<HTMLVideoElement>(null);
   const history = useHistory();
-  // const [mediaToken, setMediaToken] = useState(
-  //   "m_wnnz9jey96dwhss9qk1891v9gmvnj8" // Currently hardcoded video media token value. Let a job polling function set the value when job returns media on success.
-  // );
-  const mediaToken = "m_wnnz9jey96dwhss9qk1891v9gmvnj8";
-  // const [jobExists, setJobExists] = useState<boolean | null>(null);
+
+  const job = useJobStatus({ jobToken });
+
   const [vstValues, setVstValues] = useState<VSTType>({
     ...initialValues,
-    fileToken: mediaToken,
+    fileToken: job?.maybe_result?.entity_token || "",
   });
 
   const handleOnChange = (val: {
@@ -97,9 +96,10 @@ export default function PageVSTApp() {
       <Panel padding={true}>
         <div className="row g-5">
           <div className="col-12 col-md-6">
-            {vstValues.fileToken ? (
+            {
+              job.isSuccessful && job.maybe_result ? (
               <VideoQuickTrim
-                mediaToken={vstValues.fileToken}
+                mediaToken={job.maybe_result.entity_token}
                 onSelect={(val: QuickTrimData) =>
                   handleOnChange({
                     trimStart: val.trimStartSeconds,
@@ -111,7 +111,8 @@ export default function PageVSTApp() {
               <div className="ratio ratio-4x3 panel-inner rounded">
                 <LoadingSpinner label="Loading Video" />
               </div>
-            )}
+            )
+          }
           </div>
           <div className="col-12 col-md-6 d-flex flex-column gap-3 justify-content-center">
             <div>
@@ -151,7 +152,7 @@ export default function PageVSTApp() {
                 label="Generate Your Movie"
                 onClick={handleGenerate}
                 variant="primary"
-                disabled={!vstValues.fileToken}
+                disabled={!job.isSuccessful}
               />
             </div>
           </div>

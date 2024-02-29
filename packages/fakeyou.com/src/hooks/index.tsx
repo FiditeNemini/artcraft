@@ -9,6 +9,7 @@ import useId from './useId';
 import useIdempotency from './useIdempotency';
 import useInferenceJobs from './useInferenceJobs';
 import useInterval from './useInterval';
+import useJobStatus from './useJobStatus';
 import useLazyLists from './useLazyLists';
 import useListContent from './useListContent';
 import useLocalize from './useLocalize';
@@ -36,6 +37,7 @@ export {
   useIdempotency,
   useInferenceJobs,
   useInterval,
+  useJobStatus,
   useLazyLists,
   useListContent,
   useLocalize,

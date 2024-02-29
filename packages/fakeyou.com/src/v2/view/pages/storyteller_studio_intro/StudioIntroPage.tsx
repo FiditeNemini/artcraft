@@ -48,7 +48,7 @@ function StudioIntroPage(props: Props) {
       media_file_token: mediaToken || "",
     }).then((res: any) => {
       if (res && res.success) {
-        inferenceJobs.enqueue(res.inference_job_token);
+        inferenceJobs.enqueue(res.inference_job_token,true); // noModalPls = true
         history.push(`/studio-intro/style/${res.inference_job_token}`);
       }
     });
