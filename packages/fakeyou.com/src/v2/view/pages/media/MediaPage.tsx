@@ -559,6 +559,17 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
+                {mediaFile?.media_type === MediaFileType.SceneRon ? (
+                  <Button
+                    {...{
+                      icon: faFaceViewfinder,
+                      label: "Open in studio",
+                      to: `/studio/${mediaFile.token}`,
+                      variant: "primary",
+                      className: "flex-grow-1",
+                    }}
+                  />
+                ) : null}
 
                 {mediaFile?.media_type !== MediaFileType.Audio && (
                   <Button
