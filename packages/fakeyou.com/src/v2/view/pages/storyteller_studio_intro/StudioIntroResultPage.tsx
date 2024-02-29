@@ -20,10 +20,10 @@ interface Props {
 function StudioIntroResultPage(props: Props) {
   const { jobToken } = useParams<{ jobToken: string }>();
   const history = useHistory();
-  const [mediaToken, setMediaToken] = useState(
-    "m_f5kp3hm74qeq16eq7536jb73jkbvkh"
-  ); // Set the media token after polling success
-
+  // const [mediaToken, setMediaToken] = useState(
+  //   "m_f5kp3hm74qeq16eq7536jb73jkbvkh"
+  // ); // Set the media token after polling success
+  const mediaToken = "m_f5kp3hm74qeq16eq7536jb73jkbvkh"
   // const [jobExists, setJobExists] = useState<boolean | null>(null);
 
   const [mediaFile, setMediaFile] = useState<MediaFileType>();

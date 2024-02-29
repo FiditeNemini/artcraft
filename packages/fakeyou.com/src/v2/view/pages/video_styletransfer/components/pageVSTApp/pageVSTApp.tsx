@@ -1,4 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { 
+  // useRef, 
+  useState,
+} from "react";
 import { NavLink } from 'react-router-dom';
 import { useParams, useHistory } from "react-router-dom";
 
@@ -14,7 +17,6 @@ import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_sty
 
 
 import { Action, State } from "../../reducer";
-// import { TableOfKeyValues } from "../../commons";
 import { initialValues } from "./defaultValues";
 import {
   mapRequest,
@@ -33,41 +35,12 @@ export default function PageVSTApp({
   parentPath: string;
   dispatchPageState: (action: Action) => void;
 }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const { mediaToken } = useParams<any>();
 
   const [vstValues, setVstValues] = useState<VSTType>({
     ...initialValues,
     fileToken: pageState.mediaFileToken || mediaToken,
   });
-
-
-  if(videoRef?.current){
-    if(debug) console.log("set-up video element listeners");
-    const ve = videoRef.current
-    ve.onloadedmetadata = () =>{
-      const newValues : {
-        width?: number;
-        height?: number;
-        maxDuration?: number;
-      } = {};
-      // if (ve.videoWidth && ve.videoHeight) {
-      //   const aspectRatio = ve.videoWidth/ve.videoHeight
-      //   if (aspectRatio > 1) newValues.width = 960;
-      //   else if (aspectRatio < 1) newValues.height = 960
-      //   else if (debug) console.log(`aspectRaio: ${aspectRatio}`);
-      // }
-      if(ve.duration){
-        newValues.maxDuration = ve.duration
-        // newValues.framesCap =  newValues.maxFrames;
-      }
-      setVstValues((curr)=>({
-        ...curr,
-        ...newValues,
-      }))
-    }
-  }
-
 
   const handleOnChange = (val:{[key: string]: number|string|boolean|undefined}) => {
     setVstValues((curr)=>({...curr, ...val}));
@@ -119,13 +92,6 @@ export default function PageVSTApp({
               }}
             />
           </div>
-          {/* <div className="col-12 col-md-6">
-            <Label label={t("image.label.preview")}/>
-            {debug && <TableOfKeyValues keyValues={vstValues} height={400}/>}
-
-          </div>
-      </div>
-      <div className="row g-3  mb-4"> */}
         <div className="col-12 col-md-6">
           <TextArea
           {...{

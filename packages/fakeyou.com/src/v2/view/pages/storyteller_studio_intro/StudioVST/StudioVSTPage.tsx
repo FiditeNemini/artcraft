@@ -20,9 +20,10 @@ export default function PageVSTApp() {
   const { jobToken } = useParams<{ jobToken: string }>();
   const videoRef = useRef<HTMLVideoElement>(null);
   const history = useHistory();
-  const [mediaToken, setMediaToken] = useState(
-    "m_wnnz9jey96dwhss9qk1891v9gmvnj8" // Currently hardcoded video media token value. Let a job polling function set the value when job returns media on success.
-  );
+  // const [mediaToken, setMediaToken] = useState(
+  //   "m_wnnz9jey96dwhss9qk1891v9gmvnj8" // Currently hardcoded video media token value. Let a job polling function set the value when job returns media on success.
+  // );
+  const mediaToken = "m_wnnz9jey96dwhss9qk1891v9gmvnj8";
   // const [jobExists, setJobExists] = useState<boolean | null>(null);
   const [vstValues, setVstValues] = useState<VSTType>({
     ...initialValues,

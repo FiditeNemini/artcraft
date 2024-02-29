@@ -78,7 +78,7 @@ $playbar-height: 2rem;
     background-color: $panel-inner-border;
     border-radius: 0 0 0.5rem 0.5rem;
   }
-  .trimzone {
+  .trim-scrubber{
     position: absolute;
     top: -1rem;
     height: 3rem;
@@ -111,13 +111,15 @@ $playbar-height: 2rem;
       height: 40px;
       margin-right: 0.5rem;
     }
-    .button-mute {
+    .button-mute, .button-repeat{
       width: 40px;
       height: 40px;
+      margin-right: 0.5rem;
     }
-    .playtime {
-      span {
-        width: 60px;
+    .playtime{
+      font-size: smaller;
+      span{
+        width: 50px;
       }
       div {
         width: 10px;
