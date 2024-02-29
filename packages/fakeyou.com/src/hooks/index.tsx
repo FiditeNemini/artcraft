@@ -2,6 +2,7 @@ import useBatchContent from './useBatchContent';
 import useBookmarks from './useBookmarks';
 import useChanger from './useChanger';
 import useCoverImgUpload from './useCoverImgUpload';
+import useDebounce from './useDebounce';
 import useFile from './useFile';
 import useHover from './useHover';
 import useId from './useId';
@@ -28,6 +29,7 @@ export {
   useBookmarks,
   useChanger,
   useCoverImgUpload,
+  useDebounce,
   useFile,
   useHover,
   useId,

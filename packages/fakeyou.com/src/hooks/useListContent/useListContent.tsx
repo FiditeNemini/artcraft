@@ -81,7 +81,7 @@ export default function useListContent({
       ...(sort ? { sort_ascending: true } : {}),
     };
 
-    if (urlParam) {
+    if (urlParam !== undefined) {
       if (status === FetchStatus.ready) {
         let search = new URLSearchParams(queries).toString();
 
