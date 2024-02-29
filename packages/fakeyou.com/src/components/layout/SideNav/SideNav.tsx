@@ -228,11 +228,12 @@ export default function SideNav({
     queueStats.legacy_tts.pending_job_count +
     queueStats.inference.by_queue.pending_tacotron2_jobs;
 
-  let maybeVideoGeneration = <></>;
+  let maybeBetaFeatures = <></>;
 
   if (sessionWrapper.canAccessStudio()) {
-    maybeVideoGeneration = (
+    maybeBetaFeatures= (
       <>
+        <li className="sidebar-heading">Beta Features</li>
         <li>
           <NavLink
             to="/video-mocap"
@@ -258,17 +259,6 @@ export default function SideNav({
               className="sidebar-heading-icon"
             />
             {t("videoWorkflow")}
-          </NavLink>
-        </li>
-
-        <li>
-          <NavLink
-            to="/video-styletransfer"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon icon={faFilms} className="sidebar-heading-icon" />
-            {t("videoStyleTransfer")}
           </NavLink>
         </li>
 
@@ -423,6 +413,18 @@ export default function SideNav({
               </NavLink>
             </li>
             <li className="sidebar-heading">{t("videoTitle")}</li>
+
+            <li>
+              <NavLink
+                to="/video-styletransfer"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon icon={faFilms} className="sidebar-heading-icon" />
+                {t("videoStyleTransfer")}
+              </NavLink>
+            </li>
+
             <li>
               <NavLink
                 to="/face-animator"
@@ -437,9 +439,9 @@ export default function SideNav({
               </NavLink>
             </li>
 
-            {maybeVideoGeneration}
-
             {maybeImageGeneration}
+
+            {maybeBetaFeatures}
 
             <li className="sidebar-heading">{t("communityTitle")}</li>
             <li>

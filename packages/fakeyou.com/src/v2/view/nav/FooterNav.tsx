@@ -153,6 +153,10 @@ function FooterNav(props: Props) {
                 </li>
 
                 <li>
+                  <Link to="/video-styletransfer">Video Style Transfer</Link>
+                </li>
+
+                <li>
                   <Link to="/contribute">{t("productUploadModels")}</Link>
                 </li>
               </div>
