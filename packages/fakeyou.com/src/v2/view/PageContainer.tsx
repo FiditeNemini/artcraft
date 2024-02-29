@@ -746,7 +746,7 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
-                  <Route path="/studio">
+                  <Route path="/studio/:mediaToken?">
                     <StorytellerStudioListPage
                       sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={

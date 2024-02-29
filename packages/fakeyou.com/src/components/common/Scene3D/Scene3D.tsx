@@ -4,23 +4,30 @@ import "./Scene3D.scss";
 
 // See the following page for Storyteller Engine's query param documentation:
 // https://www.notion.so/storytellerai/Studio-Iframe-Query-Params-a748a9929ec3404780c3884e7fb89bdb
+//
+// You can supply either an `objectId` or a `sceneMediaFileToken` when loading in studio mode.
 interface Scene3DProps {
   mode: string;
   fullScreen?: boolean;
   urlParams?: string;
   objectId?: string;
+  sceneMediaFileToken?: string;
 }
 
 export default function Scene3D({
   mode,
   fullScreen = false,
   objectId,
+  sceneMediaFileToken,
   urlParams,
 }: Scene3DProps) {
 
   let engineUrl = `https://engine.fakeyou.com?mode=${mode}`;
 
-  if (objectId) {
+  if (sceneMediaFileToken) {
+    const sceneUrlRef = `remote://${sceneMediaFileToken}.scn.ron`;
+    engineUrl += `&scene=${sceneUrlRef}`;
+  } else if (objectId) {
     engineUrl += `&objectId=${objectId}`;
   }
 
