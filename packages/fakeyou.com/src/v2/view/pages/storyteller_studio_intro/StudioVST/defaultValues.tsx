@@ -11,7 +11,7 @@ const initialValues = {
   height: 1024,
   maxDuration: 0,
   trimStart: 0,
-  trimEnd: 0,
+  trimEnd: 3,
 
   //Presents
   workflowConfig: "weight_99tz2nzbp5x9v55gqn5ekj1sd",
