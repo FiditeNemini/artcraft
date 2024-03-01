@@ -123,7 +123,9 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
             input_file: &original_media_upload_fs_path,
             output_directory: &output_directory,
           }),
-          maybe_stderr_output_file: Some(FileOrCreate::NewFileWithName(&stderr_output_file)),
+          //maybe_stderr_output_file: Some(FileOrCreate::NewFileWithName(&stderr_output_file)),
+          // NB(bt,2024-02-29): Bevy's stdout goes to stderr, so we can't capture the semantics we want
+          maybe_stderr_output_file: None,
           maybe_stdout_output_file: None,
         })
   };
