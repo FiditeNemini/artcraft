@@ -1,33 +1,27 @@
-import React, {
-  useState,
-} from "react";
-import { NavLink } from 'react-router-dom';
+import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
 import { useParams, useHistory } from "react-router-dom";
 
-import {
-  Button,
-  Panel,
-  TextArea,
-  WeightsCards,
-} from "components/common";
-import VideoQuickTrim, {QuickTrimData} from 'components/common/VideoQuickTrim';
+import { Button, Panel, TextArea, WeightsCards } from "components/common";
+import VideoQuickTrim, {
+  QuickTrimData,
+} from "components/common/VideoQuickTrim";
 import { SelectModalV2 } from "components/common/SelectModal";
 import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
 
-
 import { Action, State } from "../../reducer";
 import { initialValues } from "./defaultValues";
-import {
-  mapRequest,
-  VSTType,
-} from "./helpers";
+import { mapRequest, VSTType } from "./helpers";
 
 import styleModels from "./styleModel";
 import SectionAdvanceOptions from "./sectionAdvanceOptions";
 
-
 export default function PageVSTApp({
-  debug, t, pageState, dispatchPageState, parentPath
+  debug,
+  t,
+  pageState,
+  dispatchPageState,
+  parentPath,
 }: {
   debug?: boolean;
   t: Function;
@@ -42,104 +36,103 @@ export default function PageVSTApp({
     fileToken: pageState.mediaFileToken || mediaToken,
   });
 
-  const handleOnChange = (val:{[key: string]: number|string|boolean|undefined}) => {
-    setVstValues((curr)=>({...curr, ...val}));
-  }
-  
+  const handleOnChange = (val: {
+    [key: string]: number | string | boolean | undefined;
+  }) => {
+    setVstValues(curr => ({ ...curr, ...val }));
+  };
 
   const history = useHistory();
-  const handleGenerate = ()=>{
-    if(debug) console.log(vstValues)
+  const handleGenerate = () => {
+    if (debug) console.log(vstValues);
 
     const request = mapRequest(vstValues);
     if (debug) console.log(request);
     EnqueueVideoStyleTransfer(request).then(res => {
       if (res.success && res.inference_job_token) {
         dispatchPageState({
-          type: 'enqueueJobSuccess',
+          type: "enqueueJobSuccess",
           payload: {
-            inferenceJobToken: res.inference_job_token
-          }
-        })
-      }else{
+            inferenceJobToken: res.inference_job_token,
+          },
+        });
+      } else {
         console.log(res);
       }
-    })
-    dispatchPageState({type: 'enqueueJob'})
+    });
+    dispatchPageState({ type: "enqueueJob" });
     history.push(`${parentPath}/jobs`);
-  }
+  };
 
-  return(
-    <Panel className="mb-4 p-4">
-      <div className="row g-3 mb-4">
-          <div className="col-12 col-md-6">
-            <VideoQuickTrim
-              mediaToken={vstValues.fileToken}
-              onSelect={(val:QuickTrimData)=>handleOnChange({
-                trimStart: val.trimStartSeconds,
-                trimEnd: val.trimEndSeconds
-              })}
-              onResponse={(res)=>{
-                dispatchPageState({
-                  type: 'loadFileSuccess',
-                  payload: {
-                    mediaFile: res,
-                    mediaFileToken: pageState.mediaFileToken || mediaToken
-                  }
-                });
-              }}
-            />
-          </div>
+  return (
+    <Panel padding={true}>
+      <div className="row g-5 mb-4">
         <div className="col-12 col-md-6">
+          <VideoQuickTrim
+            mediaToken={vstValues.fileToken}
+            onSelect={(val: QuickTrimData) =>
+              handleOnChange({
+                trimStart: val.trimStartSeconds,
+                trimEnd: val.trimEndSeconds,
+              })
+            }
+            onResponse={res => {
+              dispatchPageState({
+                type: "loadFileSuccess",
+                payload: {
+                  mediaFile: res,
+                  mediaFileToken: pageState.mediaFileToken || mediaToken,
+                },
+              });
+            }}
+          />
+        </div>
+        <div className="col-12 col-md-6 d-flex flex-column gap-3">
           <TextArea
-          {...{
-            label: t("input.label.prompt"),
-            placeholder: t("input.placeholder.prompt"),
-            onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange({posPrompt: e.target.value}),
-            value: vstValues.posPrompt,
-            required: false,
-          }}
+            {...{
+              label: t("input.label.prompt"),
+              placeholder: t("input.placeholder.prompt"),
+              onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                handleOnChange({ posPrompt: e.target.value }),
+              value: vstValues.posPrompt,
+              required: false,
+            }}
           />
           <TextArea
-          {...{
-            label: t("input.label.negPrompt"),
-            placeholder: t("input.placeholder.negPrompt"),
-            onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange({negPrompt: e.target.value}),
-            value: vstValues.negPrompt,
-            required: false,
-          }}
+            {...{
+              label: t("input.label.negPrompt"),
+              placeholder: t("input.placeholder.negPrompt"),
+              onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                handleOnChange({ negPrompt: e.target.value }),
+              value: vstValues.negPrompt,
+              required: false,
+            }}
           />
-          
+
           <SelectModalV2
             modalTitle="Select Styles"
             label="Select Style"
             value={vstValues.sdModelTitle}
-            onClear={()=>{
-              setVstValues((curr)=>({
+            onClear={() => {
+              setVstValues(curr => ({
                 ...curr,
-                sdModelToken: ""
-              }))
+                sdModelToken: "",
+              }));
             }}
           >
-            {styleModels.map((data:any, key:number)=>{
-              const weightProps = {data}
+            {styleModels.map((data: any, key: number) => {
+              const weightProps = { data };
               console.log(data);
-              return(
-                <WeightsCards
-                  type="image_generation"
-                  props={weightProps}
-                />
-              )
+              return (
+                <WeightsCards type="image_generation" props={weightProps} />
+              );
             })}
-            
           </SelectModalV2>
 
-          <SectionAdvanceOptions 
+          <SectionAdvanceOptions
             onChange={handleOnChange}
             vstValues={vstValues}
           />
-
-          
         </div>
       </div>
       {/* <div className="row g-3 mt-4">
@@ -151,10 +144,7 @@ export default function PageVSTApp({
       <div className="row g-3 mt-4">
         <div className="col-12 d-flex justify-content-between">
           <NavLink to={`${parentPath}`}>
-            <Button
-              label={t("button.cancel")}
-              variant="primary"
-            />
+            <Button label={t("button.cancel")} variant="secondary" />
           </NavLink>
           {/* <Button
             label="Fake Gen"
@@ -174,4 +164,4 @@ export default function PageVSTApp({
       </div>
     </Panel>
   );
-};
+}

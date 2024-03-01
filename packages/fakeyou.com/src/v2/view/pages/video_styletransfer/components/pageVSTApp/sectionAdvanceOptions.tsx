@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from "react";
 
 import {
   faBuildingColumns,
@@ -9,18 +9,16 @@ import {
   // faSparkles,
   faText,
   faUser,
-  
-}
-from "@fortawesome/pro-solid-svg-icons";
+} from "@fortawesome/pro-solid-svg-icons";
 
 import {
   // Accordion,
   Button,
   Label,
   // NumberSliderV2
-} from 'components/common';
-import { VSTType } from './helpers';
-import { 
+} from "components/common";
+import { VSTType } from "./helpers";
+import {
   CNPreset,
   closeupPreset,
   halfbodyPreset,
@@ -28,36 +26,36 @@ import {
   landscapePreset,
   typogPreset,
   defaultPreset,
-} from './cnPresets';
-
+} from "./cnPresets";
 
 export default function SectionAdvanceOptions({
   vstValues: vstVal,
-  onChange: handleOnChange
-}:{
-  vstValues : VSTType,
-  onChange: (val:{[key: string]: number|string|boolean|undefined})=>void
-}){
-
-  const [preset, pickPreset] = useState<CNPreset>('default')
-  function handlePreset(newPreset: CNPreset){
-    switch (newPreset){
-      case 'closeup':
+  onChange: handleOnChange,
+}: {
+  vstValues: VSTType;
+  onChange: (val: {
+    [key: string]: number | string | boolean | undefined;
+  }) => void;
+}) {
+  const [preset, pickPreset] = useState<CNPreset>("default");
+  function handlePreset(newPreset: CNPreset) {
+    switch (newPreset) {
+      case "closeup":
         handleOnChange(closeupPreset);
         break;
-      case 'halfbody':
+      case "halfbody":
         handleOnChange(halfbodyPreset);
         break;
-      case 'fullbody':
+      case "fullbody":
         handleOnChange(fullbodyPreset);
         break;
-      case 'landscape':
+      case "landscape":
         handleOnChange(landscapePreset);
         break;
-      case 'typog':
+      case "typog":
         handleOnChange(typogPreset);
         break;
-      case 'custom':
+      case "custom":
       default:
         handleOnChange(defaultPreset);
         break;
@@ -65,8 +63,8 @@ export default function SectionAdvanceOptions({
     pickPreset(newPreset);
   }
   return (
-    <>
-      <Label label="Video's Camera Angle"/>
+    <div>
+      <Label label="Video's Camera Angle" />
       {/* <div className="d-flex flex-wrap w-100">
         <div className="my-1 me-1">
           <Button
@@ -90,48 +88,48 @@ export default function SectionAdvanceOptions({
           <Button
             icon={faStar}
             label="Default"
-            isActive={preset==='default'}
-            onClick={()=>handlePreset('default')}
+            isActive={preset === "default"}
+            onClick={() => handlePreset("default")}
           />
         </div>
         <div className="m-1">
           <Button
             icon={faFaceViewfinder}
             label="Face Closeups"
-            isActive={preset==='closeup'}
-            onClick={()=>handlePreset('closeup')}
+            isActive={preset === "closeup"}
+            onClick={() => handlePreset("closeup")}
           />
         </div>
         <div className="m-1">
           <Button
             icon={faUser}
             label="Half Body Shots"
-            isActive={preset==='halfbody'}
-            onClick={()=>handlePreset('halfbody')}
+            isActive={preset === "halfbody"}
+            onClick={() => handlePreset("halfbody")}
           />
         </div>
         <div className="m-1">
           <Button
             icon={faPerson}
             label="Full Body Shots"
-            isActive={preset==='fullbody'}
-            onClick={()=>handlePreset('fullbody')}
+            isActive={preset === "fullbody"}
+            onClick={() => handlePreset("fullbody")}
           />
         </div>
         <div className="m-1">
           <Button
             icon={faBuildingColumns}
             label="Architecture or Landscape"
-            isActive={preset==='landscape'}
-            onClick={()=>handlePreset('landscape')}
+            isActive={preset === "landscape"}
+            onClick={() => handlePreset("landscape")}
           />
         </div>
         <div className="m-1">
           <Button
             icon={faText}
             label="Flat Logos, or Typographies"
-            isActive={preset==='typog'}
-            onClick={()=>handlePreset('typog')}
+            isActive={preset === "typog"}
+            onClick={() => handlePreset("typog")}
           />
         </div>
       </div>
@@ -268,6 +266,6 @@ export default function SectionAdvanceOptions({
           </div>
         </Accordion.Item>
       </Accordion> */}
-    </>
+    </div>
   );
 }
