@@ -177,8 +177,8 @@ async fn main() -> AnyhowResult<()> {
   // We want to turn this off in the on-premises workers since we're not tunneling to the production Redis.
   let job_progress_reporter : Box<dyn JobProgressReporterBuilder>;
 
-  job_progress_reporter = match easyenv::get_env_string_optional("REDIS_FOR_JOB_PROGRESS") {
-    None => {
+  job_progress_reporter = match easyenv::get_env_string_optional("REDIS_FOR_JOB_PROGRESS").as_deref() {
+    None | Some("") => {
       warn!("Redis for job progress status reports is DISABLED! Users will not see in-flight details of inference progress.");
       Box::new(NoOpJobProgressReporterBuilder {})
     },
@@ -192,8 +192,8 @@ async fn main() -> AnyhowResult<()> {
   };
 
   let maybe_keepalive_redis_pool =
-      match easyenv::get_env_string_optional("REDIS_FOR_KEEPALIVE_URL") {
-        None => {
+      match easyenv::get_env_string_optional("REDIS_FOR_KEEPALIVE_URL").as_deref() {
+        None | Some("") => {
           warn!("Redis for job keepalive is DISABLED! This might break some jobs.");
           None
         },
