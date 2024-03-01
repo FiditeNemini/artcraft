@@ -38,6 +38,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
+use crate::util::common_commands::ffmpeg_logo_watermark_command;
 
 fn get_file_extension(mimetype: &str) -> Result<&'static str> {
     let ext = match mimetype {
@@ -442,19 +443,18 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Inference took duration to complete: {:?}", &inference_duration);
 
-    // ==================== GET OUTPUT FILE ======================== //
-    let mut output_file = root_comfy_path.join("output");
-    output_file = output_file.join(job_args.output_path);
-
-    // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
-
     // check stdout for success and check if file exists
     if let Ok(contents) = read_to_string(&stdout_output_file) {
         info!("Captured stduout output: {}", contents);
     }
 
+    // ==================== CHECK OUTPUT FILE ======================== //
+
+    let mut comfy_output_video_file = root_comfy_path.join("output");
+    comfy_output_video_file = comfy_output_video_file.join(job_args.output_path);
+
     // check for "Prompt executed" in stdout (comfyui only outputs this for success)
-    if let Err(err) = check_file_exists(&output_file) {
+    if let Err(err) = check_file_exists(&comfy_output_video_file) {
         error!("Output file does not  exist: {:?}", err);
 
         error!("Inference failed: {:?}", command_exit_status);
@@ -485,17 +485,58 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         recursively_delete_files_in(&output_dir).unwrap();
 
         return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
-            &output_file)));
+            &comfy_output_video_file)));
     }
+
+    // ==================== OPTIONAL WATERMARK ==================== //
+
+    let mut final_finished_video_file = comfy_output_video_file.clone();
+
+    // TODO(bt, 2024-03-01): Interrogate account for premium
+    const REMOVE_WATERMARK : bool = false;
+
+    if !REMOVE_WATERMARK {
+        info!("Adding watermark...");
+
+        let output_video_fs_path_watermark = comfy_output_video_file.with_extension("_watermark.mp4");
+
+        let command_exit_status = model_dependencies
+            .ffmpeg_watermark_command
+            .execute_inference(ffmpeg_logo_watermark_command::InferenceArgs {
+                video_path: &comfy_output_video_file,
+                maybe_override_logo_path: None,
+                alpha: 0.6,
+                output_path: &output_video_fs_path_watermark,
+            });
+
+        let mut use_watermarked_file = true;
+
+        // NB: Don't fail the entire command if watermarking fails.
+        if let Err(err) = check_file_exists(&output_video_fs_path_watermark) {
+            use_watermarked_file = false;
+            error!("Watermarking failed: {:?}", err);
+        }
+
+        if !command_exit_status.is_success() {
+            use_watermarked_file = false;
+            error!("Watermark failed: {:?} ; we'll save the non-watermarked copy.", command_exit_status);
+        }
+
+        if use_watermarked_file {
+            final_finished_video_file = output_video_fs_path_watermark.clone();
+        }
+    }
+
+    // ==================== GET METADATA ==================== //
 
     info!("Interrogating result file size ...");
 
-    let file_size_bytes = file_size(&output_file)
+    let file_size_bytes = file_size(&final_finished_video_file)
         .map_err(|err| ProcessSingleJobError::Other(err))?;
 
     info!("Interrogating result mimetype ...");
 
-    let mimetype = get_mimetype_for_file(&output_file)
+    let mimetype = get_mimetype_for_file(&final_finished_video_file)
         .map_err(|err| ProcessSingleJobError::from_io_error(err))?
         .map(|mime| mime.to_string())
         .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
@@ -522,7 +563,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Calculating sha256...");
 
-    let file_checksum = sha256_hash_file(&output_file)
+    let file_checksum = sha256_hash_file(&final_finished_video_file)
         .map_err(|err| {
             ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
         })?;
@@ -544,7 +585,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
         &result_bucket_object_pathbuf,
-        &output_file,
+        &final_finished_video_file,
         &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .await
         .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -581,6 +622,11 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     safe_delete_temp_file(&stderr_output_file);
     safe_delete_temp_file(&stdout_output_file);
+    safe_delete_temp_file(&final_finished_video_file);
+    safe_delete_temp_file(&comfy_output_video_file);
+
+    // TODO(bt,2024-03-01): Do we really want to delete the workflow, models, etc.?
+
     safe_delete_temp_file(&workflow_path);
 
     if let Some(sd_path) = maybe_sd_path {
