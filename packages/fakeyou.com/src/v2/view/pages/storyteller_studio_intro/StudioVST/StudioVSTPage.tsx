@@ -26,8 +26,12 @@ export default function PageVSTApp() {
 
   const [vstValues, setVstValues] = useState<VSTType>({
     ...initialValues,
-    fileToken: job?.maybe_result?.entity_token || "",
+    // fileToken: job?.maybe_result?.entity_token || "",
   });
+
+  console.log(job);
+  console.log(job?.maybe_result);
+  console.log(job?.maybe_result?.entity_token);
 
   const handleOnChange = (val: {
     [key: string]: number | string | boolean | undefined;
@@ -37,7 +41,17 @@ export default function PageVSTApp() {
   };
 
   const handleGenerate = () => {
-    const request = mapRequest(vstValues);
+    let updatedVSTValues = Object.assign({}, vstValues);
+    updatedVSTValues.fileToken = job?.maybe_result?.entity_token || "";
+    updatedVSTValues.trimStart = 0;
+    updatedVSTValues.trimEnd = 3;
+
+    const request = mapRequest(updatedVSTValues);
+
+    // request.maybe_input_file = job?.maybe_result?.entity_token || "";
+    // request.maybe_trim_start_seconds = 0;
+    // request.maybe_trim_end_seconds = 3;
+
     EnqueueVideoStyleTransfer(request).then(res => {
       if (res.success && res.inference_job_token) {
         console.log("Job enqueued successfully", res.inference_job_token);
