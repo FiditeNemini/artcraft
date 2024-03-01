@@ -8,6 +8,7 @@ import {
   Button,
   Panel,
   TextArea,
+  WeightsCards,
 } from "components/common";
 import VideoQuickTrim, {QuickTrimData} from 'components/common/VideoQuickTrim';
 import { SelectModalV2 } from "components/common/SelectModal";
@@ -21,6 +22,7 @@ import {
   VSTType,
 } from "./helpers";
 
+import styleModels from "./styleModel";
 import SectionAdvanceOptions from "./sectionAdvanceOptions";
 
 
@@ -108,15 +110,10 @@ export default function PageVSTApp({
           }}
           />
           
-          <SectionAdvanceOptions 
-            onChange={handleOnChange}
-            vstValues={vstValues}
-          />
-
           <SelectModalV2
             modalTitle="Select Styles"
             label="Select Style"
-            value={vstValues.sdModelToken}
+            value={vstValues.sdModelTitle}
             onClear={()=>{
               setVstValues((curr)=>({
                 ...curr,
@@ -124,8 +121,25 @@ export default function PageVSTApp({
               }))
             }}
           >
-            <p>pick styles here</p>
+            {styleModels.map((data:any, key:number)=>{
+              const weightProps = {data}
+              console.log(data);
+              return(
+                <WeightsCards
+                  type="image_generation"
+                  props={weightProps}
+                />
+              )
+            })}
+            
           </SelectModalV2>
+
+          <SectionAdvanceOptions 
+            onChange={handleOnChange}
+            vstValues={vstValues}
+          />
+
+          
         </div>
       </div>
       {/* <div className="row g-3 mt-4">
