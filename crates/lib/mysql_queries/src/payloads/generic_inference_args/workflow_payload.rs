@@ -12,6 +12,17 @@ pub enum NewValue {
     Bool(bool),
 }
 
+impl NewValue {
+    pub fn to_string(&self) -> String {
+        match self {
+            NewValue::String(s) => s.to_string(),
+            NewValue::Int(s) => s.to_string(),
+            NewValue::Float(s) => s.to_string(),
+            NewValue::Bool(s) => s.to_string(),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct WorkflowArgs {
     #[serde(rename = "sd")]

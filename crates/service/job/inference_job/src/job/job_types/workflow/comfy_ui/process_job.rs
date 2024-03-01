@@ -14,6 +14,8 @@ use cloud_storage::remote_file_manager::remote_cloud_bucket_details::RemoteCloud
 use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFileClient;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::by_table::prompts::prompt_type::PromptType;
+use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
 use filesys::file_size::file_size;
 use filesys::path_to_string::path_to_string;
@@ -27,7 +29,9 @@ use mysql_queries::queries::generic_inference::job::list_available_generic_infer
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
+use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
 use thumbnail_generator::task_client::thumbnail_task::ThumbnailTaskBuilder;
+use tokens::tokens::prompts::PromptToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -200,15 +204,33 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         _ => return Err(ProcessSingleJobError::Other(anyhow!("ComfyUi args not found"))),
     };
 
+    let mut maybe_positive_prompt = None;
+    let mut maybe_negative_prompt = None;
+
     // Apply modifications if they exist
-    if let Some(modifications) = comfy_args.maybe_json_modifications.clone() {
+    if let Some(modifications) = comfy_args.maybe_json_modifications.as_ref() {
+        info!("Prompt modifications: #{:?}", modifications);
+
+        // Save prompts for later (if they exist)
+        maybe_positive_prompt = modifications.get("$.510.inputs.Text")
+            .map(|v| v.to_string());
+
+        maybe_negative_prompt = modifications.get("$.8.inputs.text")
+            .map(|v| v.to_string());
+
         // Load prompt.json
         let prompt_file = File::open(&workflow_path).unwrap();
         let mut prompt_json: Value = serde_json::from_reader(prompt_file).unwrap();
+
         // Modify json
-        for (path, new_value) in modifications {
-            prompt_json = replace_json_value(prompt_json, &path, new_value).map_err(|e| ProcessSingleJobError::Other(e.into()))?;
+        for (path, new_value) in modifications
+            .iter()
+            .map(|(k, v)| (k.as_str(), v))
+        {
+            prompt_json = replace_json_value(prompt_json, path, new_value)
+                .map_err(|e| ProcessSingleJobError::Other(anyhow!("error replacing prompt json: {:?}", e)))?;
         }
+
         // Save prompt.json
         let prompt_file = File::create(&workflow_path).unwrap();
         serde_json::to_writer(prompt_file, &prompt_json).unwrap();
@@ -409,6 +431,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         safe_delete_temp_file(&stdout_output_file);
         safe_delete_temp_directory(&work_temp_dir);
         safe_delete_temp_file(&workflow_path);
+
         if let Some(sd_path) = maybe_sd_path {
             safe_delete_temp_file(&sd_path);
         }
@@ -421,6 +444,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         if let Some(original_input_path) = maybe_original_input_path {
             safe_delete_temp_file(&original_input_path);
         }
+
         let output_dir = root_comfy_path.join("output");
         recursively_delete_files_in(&output_dir).unwrap();
 
@@ -514,13 +538,13 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             }
         }
     }
-    // ==================== CLEANUP ==================== //
 
-    // ==================== DELETE TEMP FILES ==================== //
+    // ==================== CLEANUP/ DELETE TEMP FILES ==================== //
 
     safe_delete_temp_file(&stderr_output_file);
     safe_delete_temp_file(&stdout_output_file);
     safe_delete_temp_file(&workflow_path);
+
     if let Some(sd_path) = maybe_sd_path {
         safe_delete_temp_file(&sd_path);
     }
@@ -533,6 +557,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     if let Some(original_input_path) = maybe_original_input_path {
         safe_delete_temp_file(&original_input_path);
     }
+
     let output_dir = root_comfy_path.join("output");
     recursively_delete_files_in(&output_dir).unwrap();
 
@@ -546,12 +571,15 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Saving ComfyUI result (media_files table record) ...");
 
+    let prompt_token = PromptToken::generate();
+
     let (media_file_token, id) = insert_media_file_from_comfy_ui(InsertArgs {
         pool: &args.job_dependencies.db.mysql_pool,
         job: &job,
         maybe_mime_type: Some(&mimetype),
         file_size_bytes,
         sha256_checksum: &file_checksum,
+        maybe_prompt_token: Some(&prompt_token),
         public_bucket_directory_hash: result_bucket_location.get_object_hash(),
         maybe_public_bucket_prefix: Some(prefix),
         maybe_public_bucket_extension: Some(ext),
@@ -563,6 +591,32 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     })
         .await
         .map_err(|e| ProcessSingleJobError::Other(e))?;
+
+    if maybe_positive_prompt.is_some() {
+        info!("Logging prompt record");
+
+        // NB: Don't fail the job if the query fails.
+        let prompt_result = insert_prompt(InsertPromptArgs {
+            maybe_apriori_prompt_token: Some(&prompt_token),
+            prompt_type: PromptType::ComfyUi,
+            maybe_creator_user_token: job.maybe_creator_user_token_typed.as_ref(),
+            maybe_positive_prompt: maybe_positive_prompt.as_deref(),
+            maybe_negative_prompt: maybe_negative_prompt.as_deref(),
+            maybe_other_args: None, // TODO(bt,2024-02-22): Support other arguments
+            creator_ip_address: &job.creator_ip_address,
+            mysql_executor: &args.job_dependencies.db.mysql_pool,
+            phantom: Default::default(),
+        }).await;
+
+        match prompt_result {
+            Ok(_token) => {}
+            Err(err) => {
+                error!("No prompt result token? something has failed: {:?}", err);
+                return Err(ProcessSingleJobError::from_anyhow_error(
+                    anyhow!("No prompt result token? something has failed.")));
+            }
+        }
+    }
 
     info!("ComfyUI Done.");
 
@@ -581,7 +635,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     })
 }
 
-fn replace_json_value(json: Value, path: &str, new_value: NewValue) -> anyhow::Result<Value> {
+fn replace_json_value(json: Value, path: &str, new_value: &NewValue) -> AnyhowResult<Value> {
     // First, attempt to read the value at the specified path
     let results = jsonpath_lib::select(&json, path).map_err(|err| {
         anyhow!("Invalid jsonpath '{}': {:?}", path, err)
@@ -595,7 +649,7 @@ fn replace_json_value(json: Value, path: &str, new_value: NewValue) -> anyhow::R
     // If the path exists, proceed with the replacement
     // Assuming replace_with returns a Result, handle it appropriately
     jsonpath_lib::replace_with(json, path, &mut |_| {
-        match &new_value {
+        match new_value {
             NewValue::String(s) => Some(Value::String(s.clone())),
             NewValue::Float(f) => serde_json::Number::from_f64(*f as f64)
                 .map(Value::Number) // Convert Option to Some(Value::Number) if Some, else None

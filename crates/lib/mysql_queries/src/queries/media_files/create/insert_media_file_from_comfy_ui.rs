@@ -9,6 +9,7 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 
 use crate::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -23,6 +24,8 @@ pub struct InsertArgs<'a> {
     pub sha256_checksum: &'a str,
     // TODO: Media duration.
     //pub duration_millis: u64,
+
+    pub maybe_prompt_token: Option<&'a PromptToken>,
 
     pub public_bucket_directory_hash: &'a str,
     pub maybe_public_bucket_prefix: Option<&'a str>,
@@ -85,6 +88,8 @@ SET
 
   checksum_sha2 = ?,
 
+  maybe_prompt_token = ?,
+
   public_bucket_directory_hash = ?,
   maybe_public_bucket_prefix = ?,
   maybe_public_bucket_extension = ?,
@@ -115,6 +120,8 @@ SET
       args.file_size_bytes,
 
       args.sha256_checksum,
+
+      args.maybe_prompt_token.map(|e| e.as_str()),
 
       args.public_bucket_directory_hash,
       args.maybe_public_bucket_prefix,
