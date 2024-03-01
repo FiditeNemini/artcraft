@@ -204,10 +204,12 @@ impl ComfyInferenceCommand {
 
         info!("stderr will be written to file: {:?}", args.stderr_output_file.as_os_str());
 
-        let stderr_file = File::create(&args.stderr_output_file)?;
-        let stdout_file = File::create(&args.stdout_output_file)?;
-        config.stderr = Redirection::File(stderr_file);
-        config.stdout = Redirection::File(stdout_file);
+        let _stderr_file = File::create(&args.stderr_output_file)?;
+        let _stdout_file = File::create(&args.stdout_output_file)?;
+
+        // NB(bt, 2024-03-01): Let's actually emit these lots to the rust logs so we can see what happens.
+        //config.stderr = Redirection::File(stderr_file);
+        //config.stdout = Redirection::File(stdout_file);
 
         if !env_vars.is_empty() {
             config.env = Some(env_vars);
