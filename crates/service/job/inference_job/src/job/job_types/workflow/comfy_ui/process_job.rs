@@ -296,26 +296,37 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
         None => {}
     }
+
     // Download Input file if specified
     let mut maybe_input_path: Option<PathBuf> = None;
     let mut maybe_original_input_path: Option<PathBuf> = None;
+
     match job_args.maybe_input_file {
-        Some(input_file) => {
+        Some(input_media_file_token) => {
             let input_dir = root_comfy_path.join("input");
             // make if not exist
             if !input_dir.exists() {
-                std::fs::create_dir_all(&input_dir).unwrap();
+                std::fs::create_dir_all(&input_dir)
+                    .map_err(|err| ProcessSingleJobError::IoError(err))?;
             }
+
+            info!("Querying input media file by token: {:?}", &input_media_file_token);
+
             let retrieved_input_record =  get_media_file(
-                input_file,
+                input_media_file_token,
                 false,
                 &deps.db.mysql_pool
-            ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Input file not found")))?;
+            ).await?.ok_or_else(|| {
+                error!("input media_file not found: {:?}", &input_media_file_token);
+                ProcessSingleJobError::Other(anyhow!("input media_file not found: {:?}", input_media_file_token))
+            })?;
 
             let media_file_bucket_path = MediaFileBucketPath::from_object_hash(
                 &retrieved_input_record.public_bucket_directory_hash,
                 retrieved_input_record.maybe_public_bucket_prefix.as_deref(),
                 retrieved_input_record.maybe_public_bucket_extension.as_deref());
+
+            info!("Input media file cloud bucket path: {:?}", media_file_bucket_path.get_full_object_path_str());
 
             //let input_filename = format!("input.{}", retrieved_input_record.maybe_public_bucket_extension.unwrap());
             let input_filename = "video.mp4".to_string();
