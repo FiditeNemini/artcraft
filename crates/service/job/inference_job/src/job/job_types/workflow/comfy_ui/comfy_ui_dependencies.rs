@@ -3,9 +3,11 @@ use std::process::Command;
 use errors::AnyhowResult;
 
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::ComfyInferenceCommand;
+use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
 
 pub struct ComfyDependencies {
     pub inference_command: ComfyInferenceCommand,
+    pub ffmpeg_watermark_command: FfmpegLogoWatermarkCommand,
     pub dependency_tokens: RequiredModels,
 }
 
@@ -29,6 +31,7 @@ impl ComfyDependencies {
         Ok(Self {
             inference_command: inference_command,
             dependency_tokens: RequiredModels::init(),
+            ffmpeg_watermark_command: FfmpegLogoWatermarkCommand::from_env()?,
         })
     }
 }
