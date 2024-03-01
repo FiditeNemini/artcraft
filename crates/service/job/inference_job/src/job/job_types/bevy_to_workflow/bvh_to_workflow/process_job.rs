@@ -69,8 +69,11 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
 
   info!("Download media for conversion...");
 
+  let asset_filename = get_asset_filename(&media_file)
+      .ok_or(ProcessSingleJobError::Other(anyhow!("media_file has the wrong file type")))?;
+
   let original_media_upload_fs_path = {
-    let original_media_file_fs_path = work_temp_dir.path().join("original.bvh");
+    let original_media_file_fs_path = work_temp_dir.path().join(asset_filename);
 
     let media_file_bucket_path = MediaFileBucketPath::from_object_hash(
       &media_file.public_bucket_directory_hash,
@@ -79,7 +82,9 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
 
     let bucket_object_path = media_file_bucket_path.to_full_object_pathbuf();
 
-    info!("Downloading media to bucket path: {:?}", &bucket_object_path);
+    info!("Downloading media to bucket path: {:?} to filesystem path: {:?}",
+      &bucket_object_path,
+      &original_media_file_fs_path);
 
     maybe_download_file_from_bucket(MaybeDownloadArgs {
       name_or_description_of_file: "media upload (original file)",
@@ -280,6 +285,17 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
     }),
     inference_duration: execution_duration,
   })
+}
+
+/// Storyteller Engine uses the file extension to determine engine behavior,
+/// so this is essential to map correctly.
+fn get_asset_filename(media_file: &&MediaFileForInference) -> Option<&'static str> {
+  match media_file.media_type {
+    MediaFileType::Bvh => Some("original.bvh"),
+    MediaFileType::Glb => Some("original.scn.gltf"), // TODO(bt): Is the extension "gltf" for "glb" ??
+    MediaFileType::SceneRon => Some("original.scn.ron"),
+    _ => None,
+  }
 }
 
 #[derive(Deserialize, Default)]
