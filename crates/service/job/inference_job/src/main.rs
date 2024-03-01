@@ -139,12 +139,14 @@ async fn main() -> AnyhowResult<()> {
         "MYSQL_URL",
         DEFAULT_MYSQL_CONNECTION_STRING);
 
-  info!("Connecting to database...");
+  info!("Connecting to MySQL database...");
 
   let mysql_pool = MySqlPoolOptions::new()
       .max_connections(2)
       .connect(&db_connection_string)
       .await?;
+
+  info!("Connected to MySQL.");
 
   let common_env = CommonEnv::read_from_env()?;
 
@@ -191,8 +193,12 @@ async fn main() -> AnyhowResult<()> {
 
   let maybe_keepalive_redis_pool =
       match easyenv::get_env_string_optional("REDIS_FOR_KEEPALIVE_URL") {
-        None => None,
+        None => {
+          warn!("Redis for job keepalive is DISABLED! This might break some jobs.");
+          None
+        },
         Some(redis_url) => {
+          info!("Connecting to Redis for keepalive signals... {}", redis_url);
           let redis_manager = RedisConnectionManager::new(redis_url)?;
           let redis_pool = r2d2::Pool::builder().build(redis_manager)?;
           Some(redis_pool)

@@ -1,5 +1,5 @@
 use std::time::Duration;
-use log::warn;
+use log::{info, warn};
 use opentelemetry::KeyValue;
 use opentelemetry::metrics::{Counter, Histogram, Meter, Unit};
 use opentelemetry_otlp::WithExportConfig;
@@ -19,6 +19,8 @@ pub struct JobInstrumentLabels {
 pub fn init_otel_metrics_pipeline(
     job_instrument_labels: JobInstrumentLabels,
 ) -> Result<(), opentelemetry::metrics::MetricsError>  {
+    info!("Setting up otel metrics pipeline...");
+
     let provider = opentelemetry_otlp::new_pipeline()
         .metrics(opentelemetry_sdk::runtime::Tokio)
         // TODO: 1. read host from env 2. Single pod of otel-collector is probably not good enough, run daemonset?
