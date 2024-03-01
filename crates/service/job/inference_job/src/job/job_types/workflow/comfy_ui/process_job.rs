@@ -254,7 +254,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
             let retrieved_sd_record =  get_weight_by_token(
                 sd_model_weight_token,
-                false,
+                true,
                 &deps.db.mysql_pool
             ).await?.ok_or_else(|| {
                 error!("SD model not found: {:?}", sd_model_weight_token);
@@ -293,7 +293,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
             let retrieved_lora_record =  get_weight_by_token(
                 lora_model_weight_token,
-                false,
+                true,
                 &deps.db.mysql_pool
             ).await?.ok_or_else(|| {
                 error!("Lora model not found: {:?}", lora_model_weight_token);
