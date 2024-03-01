@@ -256,7 +256,10 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 sd_model_weight_token,
                 false,
                 &deps.db.mysql_pool
-            ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("SD model not found")))?;
+            ).await?.ok_or_else(|| {
+                error!("SD model not found: {:?}", sd_model_weight_token);
+                ProcessSingleJobError::Other(anyhow!("SD model not found: {:?}", sd_model_weight_token))
+            })?;
 
             let bucket_details = RemoteCloudBucketDetails {
                 object_hash: retrieved_sd_record.public_bucket_hash,
@@ -292,7 +295,10 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 lora_model_weight_token,
                 false,
                 &deps.db.mysql_pool
-            ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Lora model not found")))?;
+            ).await?.ok_or_else(|| {
+                error!("Lora model not found: {:?}", lora_model_weight_token);
+                ProcessSingleJobError::Other(anyhow!("Lora model not found: {:?}", lora_model_weight_token))
+            })?;
 
             let bucket_details = RemoteCloudBucketDetails {
                 object_hash: retrieved_lora_record.public_bucket_hash,
