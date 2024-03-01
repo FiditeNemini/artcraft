@@ -33,6 +33,7 @@ export default function PageVSTApp() {
     [key: string]: number | string | boolean | undefined;
   }) => {
     setVstValues(curr => ({ ...curr, ...val }));
+    console.log("VST Values", vstValues);
   };
 
   const handleGenerate = () => {
@@ -96,8 +97,7 @@ export default function PageVSTApp() {
       <Panel padding={true}>
         <div className="row g-5">
           <div className="col-12 col-md-6">
-            {
-              job.isSuccessful && job.maybe_result ? (
+            {job.isSuccessful && job.maybe_result ? (
               <VideoQuickTrim
                 mediaToken={job.maybe_result.entity_token}
                 onSelect={(val: QuickTrimData) =>
@@ -111,8 +111,7 @@ export default function PageVSTApp() {
               <div className="ratio ratio-4x3 panel-inner rounded">
                 <LoadingSpinner label="Loading Video" />
               </div>
-            )
-          }
+            )}
           </div>
           <div className="col-12 col-md-6 d-flex flex-column gap-3 justify-content-center">
             <div>

@@ -40,7 +40,7 @@ import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files
 import { mediaTypeLabels } from "utils/mediaTypeLabels";
 
 // Storyteller Engine parameters
-// These are documented here: 
+// These are documented here:
 // https://www.notion.so/storytellerai/Studio-Iframe-Query-Params-a748a9929ec3404780c3884e7fb89bdb
 const SKYBOX = "333348"; // Looks good (lighter)
 //const SKYBOX = "242433"; // Looks good
@@ -111,6 +111,58 @@ export default function MediaPage() {
     }
   };
 
+  const promptSection = (
+    <>
+      {prompt?.maybe_positive_prompt && (
+        <Panel padding={true} className="mt-3">
+          <div className="d-flex gap-3 align-items-center mb-2">
+            <h6 className="fw-semibold mb-0 flex-grow-1">Prompt</h6>
+            <Button
+              icon={faCopy}
+              onClick={() =>
+                copyToClipboard(
+                  prompt.maybe_positive_prompt || "",
+                  setCopyPositiveButtonText
+                )
+              }
+              label={copyPositiveButtonText}
+              variant="link"
+              className="fs-7"
+            />
+          </div>
+          <div className="panel-inner p-2 rounded">
+            <p className="fs-7">{prompt.maybe_positive_prompt}</p>
+          </div>
+
+          {prompt?.maybe_negative_prompt && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                <h6 className="fw-semibold mb-0 flex-grow-1">
+                  Negative Prompt
+                </h6>
+                <Button
+                  icon={faCopy}
+                  onClick={() =>
+                    copyToClipboard(
+                      prompt.maybe_negative_prompt || "",
+                      setCopyNegativeButtonText
+                    )
+                  }
+                  label={copyNegativeButtonText}
+                  variant="link"
+                  className="fs-7"
+                />
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">{prompt.maybe_negative_prompt}</p>
+              </div>
+            </>
+          )}
+        </Panel>
+      )}
+    </>
+  );
+
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
       case MediaFileType.Audio:
@@ -141,6 +193,7 @@ export default function MediaPage() {
                 <MediaVideoComponent mediaFile={mediaFile} />
               </div>
             </div>
+            {promptSection}
           </>
         );
 
@@ -156,53 +209,7 @@ export default function MediaPage() {
               key={images.length}
               images={mediaFile.maybe_batch_token ? images : sdMediaImage}
             />
-            {prompt?.maybe_positive_prompt && (
-              <Panel padding={true} className="mt-3">
-                <div className="d-flex gap-3 align-items-center mb-2">
-                  <h6 className="fw-semibold mb-0 flex-grow-1">Prompt</h6>
-                  <Button
-                    icon={faCopy}
-                    onClick={() =>
-                      copyToClipboard(
-                        prompt.maybe_positive_prompt || "",
-                        setCopyPositiveButtonText
-                      )
-                    }
-                    label={copyPositiveButtonText}
-                    variant="link"
-                    className="fs-7"
-                  />
-                </div>
-                <div className="panel-inner p-2 rounded">
-                  <p className="fs-7">{prompt.maybe_positive_prompt}</p>
-                </div>
-
-                {prompt?.maybe_negative_prompt && (
-                  <>
-                    <div className="d-flex gap-3 align-items-center mb-2 mt-3">
-                      <h6 className="fw-semibold mb-0 flex-grow-1">
-                        Negative Prompt
-                      </h6>
-                      <Button
-                        icon={faCopy}
-                        onClick={() =>
-                          copyToClipboard(
-                            prompt.maybe_negative_prompt || "",
-                            setCopyNegativeButtonText
-                          )
-                        }
-                        label={copyNegativeButtonText}
-                        variant="link"
-                        className="fs-7"
-                      />
-                    </div>
-                    <div className="panel-inner p-2 rounded">
-                      <p className="fs-7">{prompt.maybe_negative_prompt}</p>
-                    </div>
-                  </>
-                )}
-              </Panel>
-            )}
+            {promptSection}
           </>
         );
       case MediaFileType.BVH:
