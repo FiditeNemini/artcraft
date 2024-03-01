@@ -384,7 +384,10 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 .arg(format!("{:?}", trim_end_seconds * 1000))
                 .arg(format!("{:?}", target_fps))
                 .output()
-                .map_err(|e| ProcessSingleJobError::Other(e.into()))?;
+                .map_err(|e| {
+                    error!("Error running inference: {:?}", e);
+                    ProcessSingleJobError::Other(e.into())
+                })?;
 
             // check if the command was successful
             if !output.status.success() {
@@ -403,7 +406,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     // make outputs dir if not exist
     let output_dir = root_comfy_path.join("output");
     if !output_dir.exists() {
-        std::fs::create_dir_all(&output_dir).unwrap();
+        std::fs::create_dir_all(&output_dir)
+            .map_err(|err| ProcessSingleJobError::IoError(err))?;
     }
 
     // ==================== SETUP FOR INFERENCE ==================== //
@@ -445,16 +449,15 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     // ==================== CHECK ALL FILES EXIST AND GET METADATA ==================== //
 
     // check stdout for success and check if file exists
-    let stdout_output = read_to_string(&stdout_output_file).unwrap();
+    if let Ok(contents) = read_to_string(&stdout_output_file) {
+        info!("Captured stduout output: {}", contents);
+    }
 
     // check for "Prompt executed" in stdout (comfyui only outputs this for success)
-    if check_file_exists(&output_file).is_err() {
+    if let Err(err) = check_file_exists(&output_file) {
+        error!("Output file does not  exist: {:?}", err);
+
         error!("Inference failed: {:?}", command_exit_status);
-
-        error!("Captured stdout output: {}", stdout_output);
-        error!("Captured stderr output: {}", read_to_string(&stderr_output_file).unwrap());
-
-        let error = ProcessSingleJobError::Other(anyhow!("CommandExitStatus: {:?}", command_exit_status));
 
         if let Ok(contents) = read_to_string(&stderr_output_file) {
             warn!("Captured stderr output: {}", contents);
@@ -481,7 +484,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         let output_dir = root_comfy_path.join("output");
         recursively_delete_files_in(&output_dir).unwrap();
 
-        return Err(error);
+        return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
+            &output_file)));
     }
 
     info!("Interrogating result file size ...");
@@ -601,7 +605,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     // ==================== SAVE RECORDS ==================== //
 
     // create a json detailing the args used to create the media
-    let args_json = serde_json::to_string(&job_args).map_err(|e| ProcessSingleJobError::Other(e.into()))?;
+    let args_json = serde_json::to_string(&job_args)
+        .map_err(|e| ProcessSingleJobError::Other(e.into()))?;
 
     info!("Saving ComfyUI result (media_files table record) ...");
 
@@ -624,7 +629,10 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         extra_file_modification_info: Some(&args_json),
     })
         .await
-        .map_err(|e| ProcessSingleJobError::Other(e))?;
+        .map_err(|e| {
+            error!("Error saving media file record: {:?}", e);
+            ProcessSingleJobError::Other(e)
+        })?;
 
     if maybe_positive_prompt.is_some() {
         info!("Logging prompt record");
@@ -642,13 +650,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             phantom: Default::default(),
         }).await;
 
-        match prompt_result {
-            Ok(_token) => {}
-            Err(err) => {
-                error!("No prompt result token? something has failed: {:?}", err);
-                return Err(ProcessSingleJobError::from_anyhow_error(
-                    anyhow!("No prompt result token? something has failed.")));
-            }
+        if let Err(err) = prompt_result {
+            error!("No prompt result token? something has failed: {:?} (we'll ignore this error)", err);
         }
     }
 
