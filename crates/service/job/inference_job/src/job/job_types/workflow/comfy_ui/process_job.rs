@@ -240,15 +240,20 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // Download SD model if specified
     let mut maybe_sd_path: Option<PathBuf> = None;
+
     match job_args.maybe_sd_model {
-        Some(sd_model) => {
+        Some(sd_model_weight_token) => {
             let sd_dir = root_comfy_path.join("models").join("checkpoints");
             // make if not exist
             if !sd_dir.exists() {
-                std::fs::create_dir_all(&sd_dir).unwrap();
+                std::fs::create_dir_all(&sd_dir)
+                    .map_err(|err| ProcessSingleJobError::IoError(err))?;
             }
+
+            info!("Querying SD model by token: {:?} ...", &sd_model_weight_token);
+
             let retrieved_sd_record =  get_weight_by_token(
-                sd_model,
+                sd_model_weight_token,
                 false,
                 &deps.db.mysql_pool
             ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("SD model not found")))?;
@@ -258,6 +263,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 prefix: retrieved_sd_record.maybe_public_bucket_prefix.unwrap(),
                 suffix: retrieved_sd_record.maybe_public_bucket_extension.unwrap(),
             };
+
             let sd_filename = "model.safetensors";
             let sd_path = sd_dir.join(sd_filename).to_str().unwrap().to_string();
             remote_cloud_file_client.download_file(bucket_details, sd_path.clone()).await?;
@@ -267,20 +273,27 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
         None => {}
     }
+
     // Download Lora model if specified
     let mut maybe_lora_path: Option<PathBuf> = None;
+
     match job_args.maybe_lora_model {
-        Some(lora_model) => {
+        Some(lora_model_weight_token) => {
             let lora_dir = root_comfy_path.join("models").join("loras");
             // make if not exist
             if !lora_dir.exists() {
-                std::fs::create_dir_all(&lora_dir).unwrap();
+                std::fs::create_dir_all(&lora_dir)
+                    .map_err(|err| ProcessSingleJobError::IoError(err))?;
             }
+
+            info!("Querying lora model by token: {:?} ...", &lora_model_weight_token);
+
             let retrieved_lora_record =  get_weight_by_token(
-                lora_model,
+                lora_model_weight_token,
                 false,
                 &deps.db.mysql_pool
             ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Lora model not found")))?;
+
             let bucket_details = RemoteCloudBucketDetails {
                 object_hash: retrieved_lora_record.public_bucket_hash,
                 prefix: retrieved_lora_record.maybe_public_bucket_prefix.unwrap(),
@@ -310,7 +323,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                     .map_err(|err| ProcessSingleJobError::IoError(err))?;
             }
 
-            info!("Querying input media file by token: {:?}", &input_media_file_token);
+            info!("Querying input media file by token: {:?} ...", &input_media_file_token);
 
             let retrieved_input_record =  get_media_file(
                 input_media_file_token,
@@ -415,6 +428,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     let inference_duration = Instant::now().duration_since(inference_start_time);
 
+    info!("Inference command exited with status: {:?}", command_exit_status);
+
     info!("Inference took duration to complete: {:?}", &inference_duration);
 
     // ==================== GET OUTPUT FILE ======================== //
@@ -425,6 +440,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // check stdout for success and check if file exists
     let stdout_output = read_to_string(&stdout_output_file).unwrap();
+
     // check for "Prompt executed" in stdout (comfyui only outputs this for success)
     if check_file_exists(&output_file).is_err() {
         error!("Inference failed: {:?}", command_exit_status);
@@ -477,6 +493,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     // create ext from mimetype
     let ext = get_file_extension(mimetype.as_str())
         .map_err(|e| ProcessSingleJobError::Other(e))?;
+
     // create prefix from mimetype
     let prefix = match mimetype.as_str() {
         "video/mp4" => "video",
