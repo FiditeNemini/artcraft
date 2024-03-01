@@ -23,7 +23,6 @@ function StudioIntroResultPage(props: Props) {
   // const [mediaToken, setMediaToken] = useState(
   //   "m_f5kp3hm74qeq16eq7536jb73jkbvkh"
   // ); // Set the media token after polling success
-  const mediaToken = "m_f5kp3hm74qeq16eq7536jb73jkbvkh"
   // const [jobExists, setJobExists] = useState<boolean | null>(null);
 
   const job = useJobStatus({ jobToken });
@@ -32,8 +31,10 @@ function StudioIntroResultPage(props: Props) {
 
   const [mediaFile, setMediaFile] = useState<MediaFileType>();
 
+  const mediaToken = job?.maybe_result?.entity_token || "";
+
   useMedia({
-    mediaToken: job?.maybe_result?.entity_token || "",
+    mediaToken,
     onSuccess: (res: any) => {
       setMediaFile(res);
     },
