@@ -13,7 +13,7 @@ const initialValues = {
   trimEnd: 0,
 
   //Presents
-  workflowConfig: "weight_n1zc1cyjdc3m10139ab0vjm44",
+  workflowConfig: "weight_e5q2e00sn0ww35g9hjm1g1f9q",
   sdModelToken: "weight_yqexh77ntqyawzgh9fzash798",
   loraModelToken: "",
   loraModelStrength: 0,

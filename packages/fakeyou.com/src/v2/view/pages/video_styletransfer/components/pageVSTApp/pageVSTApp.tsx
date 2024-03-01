@@ -1,5 +1,4 @@
-import React, { 
-  // useRef, 
+import React, {
   useState,
 } from "react";
 import { NavLink } from 'react-router-dom';
@@ -8,11 +7,10 @@ import { useParams, useHistory } from "react-router-dom";
 import {
   Button,
   Panel,
-  // NumberSliderV2,
   TextArea,
 } from "components/common";
 import VideoQuickTrim, {QuickTrimData} from 'components/common/VideoQuickTrim';
-
+import { SelectModalV2 } from "components/common/SelectModal";
 import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
 
 
@@ -74,9 +72,7 @@ export default function PageVSTApp({
       <div className="row g-3 mb-4">
           <div className="col-12 col-md-6">
             <VideoQuickTrim
-              // label={t("video.label.original")}
               mediaToken={vstValues.fileToken}
-              // ref={videoRef}
               onSelect={(val:QuickTrimData)=>handleOnChange({
                 trimStart: val.trimStartSeconds,
                 trimEnd: val.trimEndSeconds
@@ -102,8 +98,6 @@ export default function PageVSTApp({
             required: false,
           }}
           />
-        {/* </div>
-        <div className="col-12 col-md-6"> */}
           <TextArea
           {...{
             label: t("input.label.negPrompt"),
@@ -113,22 +107,25 @@ export default function PageVSTApp({
             required: false,
           }}
           />
-          <br/>
+          
           <SectionAdvanceOptions 
             onChange={handleOnChange}
             vstValues={vstValues}
           />
-       {/* </div>
-        </div>
-        <div className="row g-3  mb-4">
-          <div className="col-12 col-md-6">
-            <NumberSliderV2 {...{
-              min: 1, max: 60, step: 1,
-              initialValue: vstValues.inputFps,
-              label: "Input FPS",
-              thumbTip: "Input FPS",
-              onChange: (val)=>{handleOnChange({inputFps: val})}
-              }}/> */}
+
+          <SelectModalV2
+            modalTitle="Select Styles"
+            label="Select Style"
+            value={vstValues.sdModelToken}
+            onClear={()=>{
+              setVstValues((curr)=>({
+                ...curr,
+                sdModelToken: ""
+              }))
+            }}
+          >
+            <p>pick styles here</p>
+          </SelectModalV2>
         </div>
       </div>
       {/* <div className="row g-3 mt-4">
