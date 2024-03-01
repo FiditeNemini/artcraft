@@ -14,7 +14,7 @@ const initialValues = {
   trimEnd: 0,
 
   //Presents
-  workflowConfig: "weight_4bfwt3y8sv04zjh3z9as14z92",
+  workflowConfig: "weight_0a04e66y14t4e2bwxjfyg1mb2",
   sdModelToken: styleModels[0].weight_token,
   sdModelTitle: styleModels[0].title,
   loraModelToken: "",
