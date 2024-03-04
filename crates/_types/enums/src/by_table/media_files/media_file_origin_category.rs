@@ -94,6 +94,7 @@ mod tests {
       assert_eq!(MediaFileOriginCategory::Inference.to_str(), "inference");
       assert_eq!(MediaFileOriginCategory::Processed.to_str(), "processed");
       assert_eq!(MediaFileOriginCategory::Upload.to_str(), "upload");
+      assert_eq!(MediaFileOriginCategory::DeviceApi.to_str(), "device_api");
       assert_eq!(MediaFileOriginCategory::StoryEngine.to_str(), "story_engine");
     }
 
