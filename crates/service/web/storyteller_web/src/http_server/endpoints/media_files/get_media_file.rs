@@ -10,6 +10,7 @@ use log::warn;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
@@ -45,7 +46,11 @@ pub struct MediaFileInfo {
   /// Type of media will dictate which fields are populated and what
   /// the frontend should display (eg. video player vs audio player).
   pub media_type: MediaFileType,
-  
+
+  /// If the media file has a subtype, we'll report it.
+  /// This is mostly used for Bevy engine files.
+  pub maybe_media_subtype: Option<MediaFileSubtype>,
+
   /// If the file was generated as part of a batch, this is the token for the batch.
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
@@ -260,6 +265,7 @@ async fn modern_media_file_lookup(
     media_file: MediaFileInfo {
       token: result.token,
       media_type: result.media_type,
+      maybe_media_subtype: result.maybe_media_subtype,
       maybe_batch_token: result.maybe_batch_token,
       public_bucket_path,
       maybe_text_transcript: result.maybe_text_transcript,
@@ -346,6 +352,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
     media_file: MediaFileInfo {
       token,
       media_type: MediaFileType::Audio, // NB: Always audio
+      maybe_media_subtype: None,
       maybe_batch_token: None,
       public_bucket_path,
       maybe_model_weight_info: Some(GetMediaFileModelInfo {
