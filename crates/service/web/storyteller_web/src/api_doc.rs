@@ -3,6 +3,7 @@ use utoipa::OpenApi;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
+use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::{weights_category::WeightsCategory, weights_types::WeightsType};
 use enums::by_table::prompts::prompt_type::PromptType;
@@ -113,6 +114,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileOriginCategory,
     MediaFileOriginModelType,
     MediaFileOriginProductCategory,
+    MediaFileSubtype,
     MediaFileType,
     PromptType,
     WeightsCategory,
