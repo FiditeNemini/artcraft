@@ -7,8 +7,8 @@
     "upload": "Carregar"
   },
   "headings": {
-    "subtitle": "Mude o estilo do seu vídeo de um para outro",
-    "title": "Transferência de estilo de vídeo"
+    "subtitle": "Nesta versão beta, transformamos seu vídeo em estilo cartoon",
+    "title": "Transferência de estilo de vídeo (beta.)"
   },
   "image": {
     "label": {
@@ -24,10 +24,14 @@
     },
     "placeholder": {
       "negPrompt": "Digite prompt aqui. Ex.: O homem não é um urso",
-      "prompt": "Digite prompt aqui. Ex.: Homem dançando no estilo anime"
+      "prompt": "Digite prompt aqui. Ex.: Homem dançando no estilo anime",
+      "selectStyle": "Nenhum selecionado"
     },
     "thumbtip": {
       "styleStrength": "Força"
+    },
+    "title": {
+      "selectStyle": "Selecione um estilo"
     }
   },
   "message": {

@@ -1,5 +1,5 @@
-import { defaultPreset as defaultCN } from "./cnPresets";
-import styleModels from "./styleModel";
+import { defaultPreset as defaultCN } from "./dataCnPresets";
+import styleModels from "./dataStyleModels";
 export {initialValues, hiddenValues};
 const initialValues = {
   //files Settings
