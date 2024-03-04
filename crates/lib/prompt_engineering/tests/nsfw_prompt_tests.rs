@@ -1,5 +1,6 @@
 use speculoos::asserting;
-use classify_text::classify_prompt::classify_prompt;
+
+use prompt_engineering::classify_prompt::classify_prompt;
 
 #[test]
 fn english_nsfw_prompts_test() {

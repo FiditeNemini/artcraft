@@ -1,7 +1,8 @@
 //! Tests that could be close to CSAM, but appear to be completely SFW
 
 use speculoos::asserting;
-use classify_text::classify_prompt::classify_prompt;
+
+use prompt_engineering::classify_prompt::classify_prompt;
 
 #[test]
 fn borderline_cases() {

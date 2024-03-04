@@ -1,22 +1,21 @@
-use std::collections::HashSet;
-
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-use crate::minor_regex::lowercase_mentions_underage;
-use crate::potential_minor_regex::lowercase_mentions_potential_underage;
-
-const CHILD_TERMS : &str = include_str!("../../../../includes/binary_includes/dictionary_children_terms.txt");
-const SEX_TERMS : &str = include_str!("../../../../includes/binary_includes/dictionary_sex_terms.txt");
-const RACIST_TERMS : &str = include_str!("../../../../includes/binary_includes/dictionary_racist_terms.txt");
+use crate::keywords::contains_children_keyword::contains_children_keyword;
+use crate::keywords::contains_potential_minor_keyword::contains_potential_minor_keyword;
+use crate::keywords::contains_racist_keyword::contains_racist_keyword;
+use crate::keywords::contains_sex_keyword::contains_sex_keyword;
+use crate::regexes::minor_regex::lowercase_mentions_underage;
+use crate::regexes::nsfw_regex::nsfw_regex;
+use crate::regexes::potential_minor_regex::potential_minor_regex;
 
 /// Classification of a text prompt
 pub struct PromptClassification {
   pub prompt_references_children: bool,
   pub prompt_references_potential_minors: bool,
   pub prompt_references_sex: bool,
-  pub prompt_references_violence: bool,
   pub prompt_references_racism: bool,
+  pub prompt_references_violence: bool,
 }
 
 impl PromptClassification {
@@ -48,57 +47,19 @@ pub fn classify_prompt(text_prompt: &str) -> PromptClassification  {
   prompt_tokens.extend(prompt_tokens_alpha);
   prompt_tokens.extend(prompt_tokens_lower);
 
-  let prompt_references_children = references_children(&prompt_tokens) ||  lowercase_mentions_underage(&text_prompt);
-  let prompt_references_potential_minors = lowercase_mentions_potential_underage(&text_prompt);
-  let prompt_references_sex = references_sex(&prompt_tokens);
-  let prompt_references_violence = references_violence(&prompt_tokens);
-  let prompt_references_racism = references_racism(&prompt_tokens);
+  let prompt_references_children = contains_children_keyword(&prompt_tokens) ||  lowercase_mentions_underage(&text_prompt);
+  let prompt_references_potential_minors = contains_potential_minor_keyword(&prompt_tokens) || potential_minor_regex(&text_prompt);
+  let prompt_references_sex = contains_sex_keyword(&prompt_tokens) || nsfw_regex(&text_prompt);
+  let prompt_references_racism = contains_racist_keyword(&prompt_tokens);
+  let prompt_references_violence = false; // TODO
 
   PromptClassification {
     prompt_references_children,
     prompt_references_potential_minors,
     prompt_references_sex,
-    prompt_references_violence,
     prompt_references_racism,
+    prompt_references_violence,
   }
-}
-
-fn references_children(prompt_tokens: &[String]) -> bool {
-  static CHILD_TERM_DICTIONARY : Lazy<HashSet<String>> = Lazy::new(|| {
-    CHILD_TERMS.lines()
-        .map(|line| line.trim().to_lowercase())
-        .filter(|line| !line.is_empty() && !line.starts_with("#"))
-        .collect::<HashSet<String>>()
-  });
-
-  prompt_tokens.iter().any(|term| CHILD_TERM_DICTIONARY.contains(term))
-}
-
-fn references_sex(prompt_tokens: &[String]) -> bool {
-  static SEX_TERM_DICTIONARY : Lazy<HashSet<String>> = Lazy::new(|| {
-    SEX_TERMS.lines()
-        .map(|line| line.trim().to_lowercase())
-        .filter(|line| !line.is_empty() && !line.starts_with("#"))
-        .collect::<HashSet<String>>()
-  });
-
-  prompt_tokens.iter().any(|term| SEX_TERM_DICTIONARY.contains(term))
-}
-
-fn references_violence(_prompt_tokens: &[String]) -> bool {
-  // TODO(bt,2024-02-19): Need to implement
-  false
-}
-
-fn references_racism(prompt_tokens: &[String]) -> bool {
-  static RACIST_TERM_DICTIONARY : Lazy<HashSet<String>> = Lazy::new(|| {
-    RACIST_TERMS.lines()
-        .map(|line| line.trim().to_lowercase())
-        .filter(|line| !line.is_empty() && !line.starts_with("#"))
-        .collect::<HashSet<String>>()
-  });
-
-  prompt_tokens.iter().any(|term| RACIST_TERM_DICTIONARY.contains(term))
 }
 
 static SPACES_REGEX : Lazy<Regex> = Lazy::new(|| {
