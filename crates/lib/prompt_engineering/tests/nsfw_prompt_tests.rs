@@ -9,6 +9,7 @@ fn english_nsfw_prompts_test() {
     "1girl, nude, large breasts",
     "2B. white swimsuit, butt, black eyeliner, white droplets on ass, sunscreen bottle in hand",
     "3 naked Latina women in a swimming pool",
+    "A beautiful, young, curvy woman with ginger hair, huge breasts twice the size of her head, wearing (red glasses) and a (((sexy white nurse costume with a front red zip))), playfully flirting with the viewer; ((pulling on the front zip, showing off her cleavage)), (no background; solid colour background). Mind-broken; sexual ecstasy, ahegao, happy, (Horny, naughty face), ((cock hungry, cock worship, penis awe)), 3/4 head shot; head, hair and arms in frame",
     "a gay black guy with nipples and has undies on",
     "A giant woman living in a city she loves putting people in her butthole",
     "A girl who used her ass to eat vore",
@@ -20,23 +21,6 @@ fn english_nsfw_prompts_test() {
     "a woman having sex with a man",
     "Adult film star Lisa Ann, naked, posing for viewer <lora:winking_v1:1>",
     "ahh daddy ahh fuck me",
-    "hot and pretty faced naked girls",
-    "hot girl with a tight vagina",
-    "vagina",
-    "hot naked girl",
-    "hot anime girl gaping pussy and ass legs wide open",
-    "hot gaping pussy and ass close up",
-    "girls gaping pussy and ass close up in the camera",
-    "girl getting fucked in a pussy and another girl showing her ass in the image",
-    "hot girl gaping pussy and ass close up in the camera",
-    "hot cat girl pussy getting fucked by a dick",
-    "hot wet gaping pussy close up",
-    "hot naked girl full body",
-    "juicy wet pussy close up",
-    "Anime girls squiring from thier vaginas",
-    "Naked girl showing her cum covered vagina ",
-    "Wet vagina after cream pie\n",
-    "The wettest vagina",
     "Anal vore",
     "Anime Girl (NSFW)",
     "anime girl getting fucked in the pussy",
@@ -68,6 +52,7 @@ fn english_nsfw_prompts_test() {
     "Futanari holding her penis in one hand",
     "Futanari",
     "Generate a beautiful picture of a naked woman.",
+    "girl getting fucked in a pussy and another girl showing her ass in the image",
     "girl in a tight thong. NSFW, k, realistic, photorealsitic.",
     "Girl naked, masturbating, ahegao, squatting",
     "Girl naked, masturbating, ahegao, squatting, ultra realistic",
@@ -75,17 +60,23 @@ fn english_nsfw_prompts_test() {
     "Girl with big ass in white pants shake her ass",
     "Girl with big ass sits on chair on tight skirt",
     "Girl with big boobs and small bro touch her boobs and make a lusty eye contact",
+    "girls gaping pussy and ass close up in the camera",
     "guy shitting in the toilet",
     "hentai",
     "Hitomi Tanaka with nude big boobs and pussy open",
     "hot and pretty faced naked girls",
+    "hot anime girl gaping pussy and ass legs wide open",
     "hot cat girl pussy getting fucked by a dick",
+    "hot gaping pussy and ass close up",
     "hot gaping pussy and ass legs wide open",
+    "hot girl gaping pussy and ass close up in the camera",
     "hot girl with a tight vagina",
     "Hot girl with big boobs in white dress",
     "hot hentai fuck",
     "Hot naked anime maids",
+    "hot naked girl full body",
     "hot naked girl",
+    "hot wet gaping pussy close up",
     "hot white girl gaping pussy and ass close up in the camera",
     "Hottest anime girl spreading apart her vagina",
     "Huge breasts naked anime girl",
@@ -99,6 +90,7 @@ fn english_nsfw_prompts_test() {
     "intercource between man and women",
     "Iran blowjob girl",
     "Iranian girl suck dick",
+    "juicy wet pussy close up",
     "Kyu Sugardust from the game Huniepop",
     "leaked sex tape",
     "Lesbians in a park nude",
@@ -114,6 +106,7 @@ fn english_nsfw_prompts_test() {
     "naked anime girl",
     "Naked Gardevoir",
     "Naked girl showing her creampied vagina",
+    "Naked girl showing her cum covered vagina ",
     "Naked girl showing her cum covered vagina",
     "naked girl sitting in chair",
     "Naked girl spreading her pussy",
@@ -144,6 +137,7 @@ fn english_nsfw_prompts_test() {
     "short blonde hair side shaved, black lingerie, black eyeliner, cum on face",
     "The Love Fairy Kyu Sugardust from the game Huniepop",
     "The wettest vagina ",
+    "The wettest vagina",
     "titfuck, huge boobs",
     "Vagina cuming",
     "Vagina hole",
@@ -151,6 +145,7 @@ fn english_nsfw_prompts_test() {
     "vagina",
     "Vegeta female version with big boobs from Dragonball",
     "Wet vagina after cream pie",
+    "Wet vagina after cream pie\n",
     "woman pleasuring herself stylized in photorealist, 4k, high-res, and NSFW (Nude)",
     "woman sucking dick.",
     "Woman with huge tits desnude",
@@ -173,6 +168,15 @@ fn spanish_nsfw_prompts_test() {
 fn assert_prompts_are_nsfw(prompts: &[&str]) {
   for prompt in prompts {
     let classification = classify_prompt(prompt);
+
+    asserting(&format!("is nsfw - prompt: {}", prompt))
+        .that(&classification.prompt_references_sex)
+        .is_equal_to(true);
+
+    asserting(&format!("references children - prompt: {}", prompt))
+        .that(&classification.prompt_references_children)
+        .is_equal_to(false);
+
     asserting(&format!("is abusive - prompt: {}", prompt))
         .that(&classification.is_abusive())
         .is_equal_to(false);
@@ -180,9 +184,5 @@ fn assert_prompts_are_nsfw(prompts: &[&str]) {
     asserting(&format!("is child abuse - prompt: {}", prompt))
         .that(&classification.is_child_abuse())
         .is_equal_to(false);
-
-    asserting(&format!("is nsfw - prompt: {}", prompt))
-        .that(&classification.prompt_references_sex)
-        .is_equal_to(true);
   }
 }
