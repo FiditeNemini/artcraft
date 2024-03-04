@@ -15,6 +15,7 @@ export type VSTType = {
   // Presets
   workflowConfig: string;
   sdModelToken: string;
+  sdModelTitle: string;
   // loraModelToken: string;
   // loraModelStrength: number;
 

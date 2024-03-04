@@ -1,4 +1,5 @@
 import { defaultPreset as defaultCN } from "./cnPresets";
+import styleModels from "./styleModel";
 export {initialValues, hiddenValues};
 const initialValues = {
   //files Settings
@@ -13,8 +14,9 @@ const initialValues = {
   trimEnd: 0,
 
   //Presents
-  workflowConfig: "weight_99tz2nzbp5x9v55gqn5ekj1sd",
-  sdModelToken: "weight_yqexh77ntqyawzgh9fzash798",
+  workflowConfig: "weight_0a04e66y14t4e2bwxjfyg1mb2",
+  sdModelToken: styleModels[0].weight_token,
+  sdModelTitle: styleModels[0].title,
   loraModelToken: "",
   loraModelStrength: 0,
 

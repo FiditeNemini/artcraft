@@ -6,14 +6,20 @@
   cursor: pointer;
   font-size: 15px;
   font-weight: 500;
-  color: rgba($white, 0.8);
+  color: rgba($white, 0.8) !important;
   transition: 0.15s all;
 
   a {
-    color: rgba($white, 0.8);
+    color: rgba($white, 0.8) !important;
     font-size: 15px;
-    font-weight: 500;
+    font-weight: 500 !important;
     transition: 0.15s all;
+  }
+
+  &:hover {
+    a {
+      color: $white !important;
+    }
   }
 }
 

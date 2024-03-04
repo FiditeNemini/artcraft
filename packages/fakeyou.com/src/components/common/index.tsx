@@ -27,9 +27,11 @@ import NumberSliderV2 from "./NumberSliderV2";
 import Pagination from "./Pagination";
 import Panel from "./Panel";
 import Radio from "./Radio";
+import Scene3D from "./Scene3D";
 import Searcher from "./Searcher";
 import SegmentButtons from "./SegmentButtons";
 import Select from "./Select";
+import SelectionBubbles from "./SelectionBubbles";
 import SelectModal, { SelectModalData } from "./SelectModal";
 import SelectModalVideoTabs from "./SelectModalVideoTabs";
 import SelectModalWeightsTabs from "./SelectModalWeightsTabs";
@@ -49,9 +51,7 @@ import VideoBasic from "./VideoBasic";
 import VideoFakeyou from "./VideoFakeyou";
 import VideoInput from "./VideoInput";
 // import VideoQuickTrim, {QuickTrimType} from "./VideoQuickTrim";
-import SelectionBubbles from "./SelectionBubbles";
-import Scene3D from "./Scene3D";
-
+import WeightCoverImage from "./WeightCoverImage";
 export type { SelectModalData };
 
 export {
@@ -89,9 +89,11 @@ export {
   Pagination,
   Panel,
   Radio,
+  Scene3D,
   SegmentButtons,
   Searcher,
   Select,
+  SelectionBubbles,
   SelectModal,
   SelectModalVideoTabs,
   SelectModalWeightsTabs,
@@ -110,7 +112,6 @@ export {
   VideoBasic,
   VideoFakeyou,
   VideoInput,
+  WeightCoverImage,
   // VideoQuickTrim,
-  SelectionBubbles,
-  Scene3D,
 };

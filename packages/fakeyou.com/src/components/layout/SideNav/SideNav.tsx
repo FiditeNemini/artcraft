@@ -22,6 +22,7 @@ import {
   faWaveformLines,
   faTransporter,
   faClipboardList,
+  faFilm,
 } from "@fortawesome/pro-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
@@ -231,9 +232,20 @@ export default function SideNav({
   let maybeBetaFeatures = <></>;
 
   if (sessionWrapper.canAccessStudio()) {
-    maybeBetaFeatures= (
+    maybeBetaFeatures = (
       <>
         <li className="sidebar-heading">Beta Features</li>
+        <li>
+          <NavLink
+            to="/studio-intro/m_ejhs95fc5aybp36h4a79k7523ds6an"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon icon={faFilm} className="sidebar-heading-icon" />
+            Storyteller Onboarding
+            {/* {t("videoStorytellerStudio")} */}
+          </NavLink>
+        </li>
         <li>
           <NavLink
             to="/video-mocap"
@@ -420,7 +432,10 @@ export default function SideNav({
                 activeClassName="active-link"
                 onClick={handleNavLinkClick}
               >
-                <FontAwesomeIcon icon={faFilms} className="sidebar-heading-icon" />
+                <FontAwesomeIcon
+                  icon={faFilms}
+                  className="sidebar-heading-icon"
+                />
                 {t("videoStyleTransfer")}
               </NavLink>
             </li>

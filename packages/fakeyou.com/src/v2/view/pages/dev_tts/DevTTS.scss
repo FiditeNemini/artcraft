@@ -1,0 +1,37 @@
+@import "scss/colours.scss";
+@import "scss/site-refresh.scss";
+
+.fy-weight-picker {
+	
+  @include panel;
+	border-radius: .5rem;
+	background-color: rgba($secondary, .6);
+
+	&.fy-weight-picker-full {
+		.fy-input input { border-radius: .5rem .5rem 0 0 }
+	}
+
+	.fy-weight-picker-preview {
+		border-top: 1px solid rgba(#fff,.15);
+		display: flex;
+	}
+
+	.fy-card-badge {
+		display: inline-flex;
+		margin-left: .5rem;
+	}
+
+	.fy-input { margin-bottom: 0 }
+
+	.fy-weight-picker-reselect {
+		background-color: $secondary-light;
+		border-radius: .5rem;
+		padding: .5rem;
+		margin: 0 0 auto auto;
+	}
+}
+
+.fy-card-badge {
+	display: flex;
+	height: min-content;
+}

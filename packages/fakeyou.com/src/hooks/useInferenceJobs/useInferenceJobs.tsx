@@ -16,8 +16,8 @@ export default function useInferenceJobs(jobType: JobListTypes = 0, debug = fals
 
   return {
     // enqueue,
-    enqueue: (jobToken: string) => {
-      openJobListModal();
+    enqueue: (jobToken: string, noModalPls = false) => {
+      if (!noModalPls) { openJobListModal(); }
       enqueue(jobToken,jobType);
     },
     inferenceJobs: jobType === JobListAll.All ? inferenceJobs : (byCategory?.get(jobType - 1) || []),

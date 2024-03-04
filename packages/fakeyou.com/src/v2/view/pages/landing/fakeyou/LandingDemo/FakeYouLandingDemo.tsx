@@ -248,7 +248,9 @@ export default function LandingDemo({
 
           <div className="d-flex flex-column mt-3">
             <div className="d-flex justify-content-center pb-2">
-              <label className="sub-title flex-grow-1 pb-0">Your Text</label>
+              <label className="sub-title flex-grow-1 pb-0">
+                What would you like to say?
+              </label>
               <Button
                 icon={faShuffle}
                 label="Randomize Text"
@@ -272,7 +274,7 @@ export default function LandingDemo({
           <div className="d-flex gap-3 align-items-center mt-4">
             <Button
               icon={isPlaying ? faPause : faPlay}
-              square={true}
+              label="Speak"
               onClick={handleEnqueueTts}
               isLoading={isAudioLoading}
               disabled={textBuffer.length === 0}

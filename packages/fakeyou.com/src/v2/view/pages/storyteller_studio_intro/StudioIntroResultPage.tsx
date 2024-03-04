@@ -6,7 +6,7 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { useHistory, useParams } from "react-router-dom";
 import "./StudioIntro.scss";
 import LoadingSpinner from "components/common/LoadingSpinner";
-import { useMedia } from "hooks";
+import { useMedia, useJobStatus } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { MediaFileType } from "@storyteller/components/src/api/media_files";
 
@@ -23,13 +23,18 @@ function StudioIntroResultPage(props: Props) {
   // const [mediaToken, setMediaToken] = useState(
   //   "m_f5kp3hm74qeq16eq7536jb73jkbvkh"
   // ); // Set the media token after polling success
-  const mediaToken = "m_f5kp3hm74qeq16eq7536jb73jkbvkh"
   // const [jobExists, setJobExists] = useState<boolean | null>(null);
+
+  const job = useJobStatus({ jobToken });
+
+  console.log("🩵",job);
 
   const [mediaFile, setMediaFile] = useState<MediaFileType>();
 
+  const mediaToken = job?.maybe_result?.entity_token || "";
+
   useMedia({
-    mediaToken: mediaToken,
+    mediaToken,
     onSuccess: (res: any) => {
       setMediaFile(res);
     },
