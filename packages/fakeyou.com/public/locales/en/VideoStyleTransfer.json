@@ -24,10 +24,14 @@
     },
     "placeholder": {
       "negPrompt": "Type prompt here. Eg: Man is not a bear",
-      "prompt": "Type prompt here. Eg: Man dancing in the style of anime"
+      "prompt": "Type prompt here. Eg: Man dancing in the style of anime",
+      "selectStyle": "None Selected"
     },
     "thumbtip": {
       "styleStrength": "Strength"
+    },
+    "title": {
+      "selectStyle": "Select a style"
     }
   },
   "message": {

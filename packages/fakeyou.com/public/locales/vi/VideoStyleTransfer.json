@@ -7,8 +7,8 @@
     "upload": "Tải lên"
   },
   "headings": {
-    "subtitle": "Thay đổi phong cách video của bạn từ cái này sang cái khác",
-    "title": "Chuyển kiểu video"
+    "subtitle": "Trong phiên bản beta này, chúng tôi thay đổi video của bạn thành phong cách hoạt hình",
+    "title": "Chuyển kiểu video (beta.)"
   },
   "image": {
     "label": {
@@ -24,10 +24,14 @@
     },
     "placeholder": {
       "negPrompt": "Nhập lời nhắc ở đây. Ví dụ: Con người không phải là gấu",
-      "prompt": "Nhập lời nhắc ở đây. Ví dụ: Người đàn ông nhảy theo phong cách anime"
+      "prompt": "Nhập lời nhắc ở đây. Ví dụ: Người đàn ông nhảy theo phong cách anime",
+      "selectStyle": "Không có gì được chọn"
     },
     "thumbtip": {
       "styleStrength": "Sức mạnh"
+    },
+    "title": {
+      "selectStyle": "Chọn một phong cách"
     }
   },
   "message": {

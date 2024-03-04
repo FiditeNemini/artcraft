@@ -26,12 +26,16 @@ import {
   landscapePreset,
   typogPreset,
   defaultPreset,
-} from "./cnPresets";
+} from "./dataCnPresets";
 
 export default function SectionAdvanceOptions({
+  debug,
+  t,
   vstValues: vstVal,
   onChange: handleOnChange,
 }: {
+  debug?: boolean;
+  t: Function;
   vstValues: VSTType;
   onChange: (val: {
     [key: string]: number | string | boolean | undefined;
