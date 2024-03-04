@@ -523,7 +523,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
 
         if use_watermarked_file {
-            final_finished_video_file = output_video_fs_path_watermark.clone();
+            info!("Using watermark file: {:?}", output_video_fs_path_watermark);
+            final_finished_video_file = output_video_fs_path_watermark;
         }
     }
 

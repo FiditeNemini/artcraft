@@ -81,6 +81,12 @@ CREATE TABLE media_files (
   --   * 'video' for a variety of video types.
   media_type VARCHAR(16) NOT NULL,
 
+  -- A media file's possible subtype. Typically used for Storyteller Studio.
+  -- * 'mixamo' for mixamo animations (eg. for BVH, GLB, FBX, etc. files)
+  -- * 'mocap_net' for mocapnet animations (eg. for BVH files)
+  -- * 'scene' for generic scenes (eg. for BVH, GLB, FBX, etc. files)
+  maybe_media_subtype VARCHAR(32) DEFAULT NULL,
+
   -- The file's mime type.
   maybe_mime_type VARCHAR(32) DEFAULT NULL,
 
