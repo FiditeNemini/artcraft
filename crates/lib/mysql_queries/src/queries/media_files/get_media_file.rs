@@ -7,6 +7,7 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
 
+use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
@@ -23,6 +24,7 @@ pub struct MediaFile {
   pub token: MediaFileToken,
 
   pub media_type: MediaFileType,
+  pub maybe_media_subtype: Option<MediaFileSubtype>,
 
   // TODO: Bucket hash bits.
 
@@ -87,6 +89,7 @@ pub struct MediaFileRaw {
   pub token: MediaFileToken,
 
   pub media_type: MediaFileType,
+  pub maybe_media_subtype: Option<MediaFileSubtype>,
 
   // TODO: Bucket hash bits.
 
@@ -157,6 +160,7 @@ pub async fn get_media_file(
   Ok(Some(MediaFile {
     token: record.token,
     media_type: record.media_type,
+    maybe_media_subtype: record.maybe_media_subtype,
     maybe_batch_token: record.maybe_batch_token,
     maybe_text_transcript: record.maybe_text_transcript,
     maybe_creator_user_token: record.maybe_creator_user_token,
@@ -198,6 +202,7 @@ SELECT
     m.token as `token: tokens::tokens::media_files::MediaFileToken`,
 
     m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,
+    m.maybe_media_subtype as `maybe_media_subtype: enums::by_table::media_files::media_file_subtype::MediaFileSubtype`,
 
     users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
     users.username as maybe_creator_username,
@@ -269,6 +274,7 @@ SELECT
     m.token as `token: tokens::tokens::media_files::MediaFileToken`,
 
     m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,
+    m.maybe_media_subtype as `maybe_media_subtype: enums::by_table::media_files::media_file_subtype::MediaFileSubtype`,
 
     users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
     users.username as maybe_creator_username,
