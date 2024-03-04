@@ -1,7 +1,8 @@
 //! These prompts should be fully innocent and allowed
 
 use speculoos::asserting;
-use classify_text::classify_prompt::classify_prompt;
+
+use prompt_engineering::classify_prompt::classify_prompt;
 
 #[test]
 fn sfw_english_test() {

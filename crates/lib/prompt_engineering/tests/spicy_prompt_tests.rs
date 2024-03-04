@@ -3,7 +3,8 @@
 //! to steer the image generation away from NSFW territory.
 //!
 use speculoos::asserting;
-use classify_text::classify_prompt::classify_prompt;
+
+use prompt_engineering::classify_prompt::classify_prompt;
 
 #[test]
 fn permissible_sexy_tests() {

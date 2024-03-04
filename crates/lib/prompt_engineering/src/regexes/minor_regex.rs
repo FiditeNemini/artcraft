@@ -35,7 +35,7 @@ pub (crate) fn lowercase_mentions_underage(text: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-  use crate::minor_regex::lowercase_mentions_underage;
+  use crate::regexes::minor_regex::lowercase_mentions_underage;
 
   mod english {
     use super::*;
@@ -117,7 +117,7 @@ mod tests {
   mod spanish {
     use super::*;
 
-    //mod non_match {
+//mod non_match {
     //  #[test]
     //  fn prefix_and_suffix_digits() {
     //    // TODO
@@ -184,7 +184,7 @@ mod tests {
   mod user_inputs {
     use speculoos::asserting;
 
-    use crate::minor_regex::lowercase_mentions_underage;
+    use super::*;
 
     #[test]
     fn test_bad_user_csam_inputs() {
@@ -199,6 +199,7 @@ mod tests {
         "a blonde girl of 13 years old with blue eyes.she's naked ,showing her private parts. i'm fucking her now",
         "a blonde girl of 13 years old with blue eyes.she's naked ,showing her tits and ass",
         "a little boy have brown eyes and hair，nude body",
+        "Cute hot 15 year old girl, no bra, no shirt.",
         "Fiveteen years old, naked, Brown hair, big ass, Brest d, open mouth, close eyes, seamen face",
         "naked 8yo blonde girl",
         "seven year old girl naked legs spread",
