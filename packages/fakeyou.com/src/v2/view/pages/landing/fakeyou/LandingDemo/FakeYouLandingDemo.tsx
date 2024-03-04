@@ -272,7 +272,7 @@ export default function LandingDemo({
           <div className="d-flex gap-3 align-items-center mt-4">
             <Button
               icon={isPlaying ? faPause : faPlay}
-              square={true}
+              label="Speak"
               onClick={handleEnqueueTts}
               isLoading={isAudioLoading}
               disabled={textBuffer.length === 0}
