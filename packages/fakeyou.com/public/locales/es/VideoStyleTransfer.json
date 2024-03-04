@@ -7,8 +7,8 @@
     "upload": "Subir"
   },
   "headings": {
-    "subtitle": "Cambia el estilo de tu vídeo de uno a otro",
-    "title": "Transferencia de estilo de vídeo"
+    "subtitle": "En esta versión beta, cambiamos tu video al estilo de dibujos animados.",
+    "title": "Transferencia de estilo de vídeo (beta.)"
   },
   "image": {
     "label": {
@@ -24,10 +24,14 @@
     },
     "placeholder": {
       "negPrompt": "Escriba el mensaje aquí. Por ejemplo: el hombre no es un oso",
-      "prompt": "Escriba el mensaje aquí. Por ejemplo: hombre bailando al estilo anime."
+      "prompt": "Escriba el mensaje aquí. Por ejemplo: hombre bailando al estilo anime.",
+      "selectStyle": "Ninguna seleccionada"
     },
     "thumbtip": {
       "styleStrength": "Fortaleza"
+    },
+    "title": {
+      "selectStyle": "Selecciona un estilo"
     }
   },
   "message": {

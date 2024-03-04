@@ -7,8 +7,8 @@
     "upload": "Hochladen"
   },
   "headings": {
-    "subtitle": "Ändern Sie den Stil Ihres Videos von einem zum anderen",
-    "title": "Übertragung des Videostils"
+    "subtitle": "In dieser Beta verwandeln wir Ihr Video in einen Cartoon-Stil",
+    "title": "Videostilübertragung (Beta)"
   },
   "image": {
     "label": {
@@ -24,10 +24,14 @@
     },
     "placeholder": {
       "negPrompt": "Geben Sie hier prompt ein. ZB: Der Mensch ist kein Bär",
-      "prompt": "Geben Sie hier prompt ein. Beispiel: Mann tanzt im Anime-Stil"
+      "prompt": "Geben Sie hier prompt ein. Beispiel: Mann tanzt im Anime-Stil",
+      "selectStyle": "Nichts ausgewählt"
     },
     "thumbtip": {
       "styleStrength": "Stärke"
+    },
+    "title": {
+      "selectStyle": "Wählen Sie einen Stil aus"
     }
   },
   "message": {

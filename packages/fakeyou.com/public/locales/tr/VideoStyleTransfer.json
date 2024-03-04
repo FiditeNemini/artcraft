@@ -7,8 +7,8 @@
     "upload": "Yüklemek"
   },
   "headings": {
-    "subtitle": "Videonuzun stilini birinden diğerine değiştirin",
-    "title": "Video Stili Aktarımı"
+    "subtitle": "Bu betada videonuzu çizgi film stiline dönüştürüyoruz",
+    "title": "Video Stili Aktarımı (beta.)"
   },
   "image": {
     "label": {
@@ -24,10 +24,14 @@
     },
     "placeholder": {
       "negPrompt": "İstemi buraya yazın. Örnek: İnsan ayı değildir",
-      "prompt": "İstemi buraya yazın. Örnek: Anime tarzında dans eden adam"
+      "prompt": "İstemi buraya yazın. Örnek: Anime tarzında dans eden adam",
+      "selectStyle": "Hiçbiri seçilmedi"
     },
     "thumbtip": {
       "styleStrength": "Kuvvet"
+    },
+    "title": {
+      "selectStyle": "Bir stil seçin"
     }
   },
   "message": {

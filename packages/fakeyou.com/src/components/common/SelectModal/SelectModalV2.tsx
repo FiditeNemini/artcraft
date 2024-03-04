@@ -20,18 +20,21 @@ export type SelectModalData = {
 
 interface SelectModalProps {
   label?: string;
+  placeholder?: string;
   modalTitle?: string;
   value?: string | SelectModalData;
   onClear: () => void;
+  forcedClose?: Date; //if you need to force close modal, supply date
   required?: boolean;
   children: ReactNode
 }
 
 export default memo(function SelectModal ({
   label,
-  // tabs,
   modalTitle = "Select",
+  placeholder = "None selected",
   onClear,
+  forcedClose,
   value:valueProps = "",
   required,
   children
@@ -39,7 +42,7 @@ export default memo(function SelectModal ({
     const [isModalOpen, setModalOpen] = useState(false)
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
-    useEffect(closeModal, [valueProps]);
+    useEffect(closeModal, [valueProps, forcedClose]);
     const value = typeof valueProps === "string" ? valueProps : valueProps.title;
 
     return (
@@ -60,7 +63,7 @@ export default memo(function SelectModal ({
             <Input
               disabled={true}
               wrapperClassName="w-100"
-              placeholder="None selected"
+              placeholder={placeholder}
               onClick={openModal}
               value={value}
             />

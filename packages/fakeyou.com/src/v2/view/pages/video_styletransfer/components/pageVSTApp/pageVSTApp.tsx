@@ -2,22 +2,21 @@ import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useParams, useHistory } from "react-router-dom";
 
-import { Button, Panel, TextArea, WeightsCards } from "components/common";
+import { Button, Panel, TextArea } from "components/common";
 import VideoQuickTrim, {
   QuickTrimData,
 } from "components/common/VideoQuickTrim";
-import { SelectModalV2 } from "components/common/SelectModal";
 import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
 
 import { Action, State } from "../../reducer";
-import { initialValues } from "./defaultValues";
+import { initialValues } from "./dataDefaultValues";
 import { mapRequest, VSTType } from "./helpers";
 
-import styleModels from "./styleModel";
-import SectionAdvanceOptions from "./sectionAdvanceOptions";
+import CompStyleModal from "./compStyleModal";
+import CompAdvanceOptions from "./compAdvanceOptions";
 
 export default function PageVSTApp({
-  debug,
+  debug: debugProps,
   t,
   pageState,
   dispatchPageState,
@@ -29,6 +28,7 @@ export default function PageVSTApp({
   parentPath: string;
   dispatchPageState: (action: Action) => void;
 }) {
+  const debug = debugProps || true;
   const { mediaToken } = useParams<any>();
 
   const [vstValues, setVstValues] = useState<VSTType>({
@@ -109,51 +109,26 @@ export default function PageVSTApp({
             }}
           />
 
-          <SelectModalV2
-            modalTitle="Select Styles"
-            label="Select Style"
+          <CompStyleModal
+            debug={debug}
+            t={t}
             value={vstValues.sdModelTitle}
-            onClear={() => {
-              setVstValues(curr => ({
-                ...curr,
-                sdModelToken: "",
-              }));
-            }}
-          >
-            {styleModels.map((data: any, key: number) => {
-              const weightProps = { data };
-              console.log(data);
-              return (
-                <WeightsCards type="image_generation" props={weightProps} />
-              );
-            })}
-          </SelectModalV2>
-
-          <SectionAdvanceOptions
+            onChange={handleOnChange}
+          />
+          <CompAdvanceOptions
+            debug={debug}
+            t={t}
             onChange={handleOnChange}
             vstValues={vstValues}
           />
         </div>
       </div>
-      {/* <div className="row g-3 mt-4">
-        <SectionAdvanceOptions 
-          onChange={handleOnChange}
-          vstValues={vstValues}
-        />
-      </div> */}
+
       <div className="row g-3 mt-4">
         <div className="col-12 d-flex justify-content-between">
           <NavLink to={`${parentPath}`}>
             <Button label={t("button.cancel")} variant="secondary" />
           </NavLink>
-          <Button
-            label="Fake Gen"
-            onClick={()=>{
-              const request = mapRequest(vstValues);
-              console.log(request);
-            }}
-            variant="secondary"
-          /> 
           <Button
             label={t("button.enqueue")}
             onClick={handleGenerate}
@@ -161,6 +136,27 @@ export default function PageVSTApp({
             disabled={vstValues.trimEnd === 0}
           />
         </div>
+        {debug && 
+          <div className="col-12 d-flex justify-content-end align-items-center">
+            <p className="me-3"><b>Debug Values: </b></p>
+            <Button
+              className="me-3"
+              label="Console Log State"
+              onClick={()=>{
+                console.log(vstValues);
+              }}
+              variant="secondary"
+            />
+            <Button
+              label="Console Log Request"
+              onClick={()=>{
+                const request = mapRequest(vstValues);
+                console.log(request);
+              }}
+              variant="secondary"
+            />
+          </div>
+        }
       </div>
     </Panel>
   );
