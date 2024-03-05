@@ -30,6 +30,7 @@ CREATE TABLE users (
   -- Possible flag values (multiple is okay) :
   --   - "explore_media"
   --   - "studio"
+  --   - "video_style_transfer"
   maybe_feature_flags VARCHAR(255) DEFAULT NULL,
 
   -- DEPRECATED
