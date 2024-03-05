@@ -15,6 +15,8 @@ $playbar-height: 2rem;
     max-height: 500px;
     width: 100%;
     margin-bottom: -7px;
+    border-radius: 0.5rem 0.5rem 0 0;
+    border: none;
 
     video {
       border-radius: 0.5rem 0.5rem 0 0;
@@ -88,7 +90,7 @@ $playbar-height: 2rem;
     outline: 0.125rem $white solid;
     border-top: 1rem $white solid;
     border-radius: 0.25rem 0.25rem 0.125rem 0.125rem;
-    cursor: grab;
+    // cursor: grab;
 
     display: flex;
     justify-content: center;

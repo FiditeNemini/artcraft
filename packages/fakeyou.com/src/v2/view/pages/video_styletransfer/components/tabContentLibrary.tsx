@@ -12,6 +12,7 @@ export default function TabContentLibrary({
   pageState: State;
   dispatchPageState: (action: Action) => void;
 }){
+  console.log(`Tab Rerender, selected: ${pageState.mediaFileToken}`);
   const handleProceed = ()=>{
     dispatchPageState({type: "loadFile"})
   }
@@ -35,12 +36,16 @@ export default function TabContentLibrary({
           inputLabel="Select a Video"
           onSelect={handleOnSelect}
         />
-        {pageState.mediaFileToken && 
-          <VideoFakeyou mediaToken={pageState.mediaFileToken} />
+        <br/>
+        {pageState.mediaFileToken &&
+          <VideoFakeyou
+            height={500}
+            mediaToken={pageState.mediaFileToken}
+          />
         }
       </div>
       {pageState.status === states.FILE_SELECTED &&
-        <div className="col-12 d-flex justify-content-center mt-5">
+        <div className="col-12 d-flex justify-content-center mt-4">
           <NavLink to={`load/${pageState.mediaFileToken}`}>
             <Button 
               label={t("button.proceed")}
