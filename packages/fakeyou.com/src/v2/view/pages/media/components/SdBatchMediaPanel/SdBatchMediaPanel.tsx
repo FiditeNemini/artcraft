@@ -9,38 +9,72 @@ import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper/types";
 import "./SdBatchMediaPanel.scss";
 
-interface SdCoverImagePanelProps {
-  images: string[];
+interface ImageWithToken {
+  url: string;
+  token: string;
 }
 
-export default function SdBatchMediaPanel({ images }: SdCoverImagePanelProps) {
+interface SdBatchMediaPanelProps {
+  images: ImageWithToken[];
+  onActiveSlideChange: (image: ImageWithToken) => void;
+}
+
+export default function SdBatchMediaPanel({
+  images,
+  onActiveSlideChange,
+}: SdBatchMediaPanelProps) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
   const [forceUpdateKey, setForceUpdateKey] = useState(0);
   const [isPortrait, setIsPortrait] = useState(false);
+  const [initialSlide, setInitialSlide] = useState(0);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   useEffect(() => {
-    images.forEach(imgSrc => {
+    const currentUrl = new URL(window.location.href);
+    const currentToken = currentUrl.pathname.split("/media/")[1].split("?")[0];
+    const initialSlideIndex = images.findIndex(
+      image => image.token === currentToken
+    );
+    if (initialSlideIndex !== -1) {
+      setInitialSlide(initialSlideIndex);
+    }
+    setIsFirstLoad(false);
+  }, [images]);
+
+  useEffect(() => {
+    images.forEach(image => {
       const img = new Image();
       img.onload = () => {
-        // If any image is portrait, update isPortrait to true
         if (img.height > img.width && !isPortrait) {
           setIsPortrait(true);
         }
       };
-      img.src = imgSrc;
+      img.src = image.url;
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [images]);
+  }, [images, isPortrait]);
 
   useEffect(() => {
     if (images.length > 0) {
-      // Force re-render of the Swiper component by updating a key
       setForceUpdateKey(prevKey => prevKey + 1);
     }
   }, [images]);
 
   const handleSwiper = (swiper: SwiperType) => {
     setThumbsSwiper(swiper);
+  };
+
+  const handleSlideChange = (swiper: SwiperType) => {
+    if (!isFirstLoad) {
+      // Only update URL if it's not the first load
+      const currentSlideIndex = swiper.realIndex;
+      const currentImage = images[currentSlideIndex];
+      const currentImageToken = images[currentSlideIndex].token;
+      const baseUrl = window.location.href.split("/media/")[0]; // Get the base URL before the token
+      const queryParams = window.location.search; // Get query parameters if any
+      const newUrl = `${baseUrl}/media/${currentImageToken}${queryParams}`; // Construct the new URL
+      window.history.replaceState(null, "", newUrl); // Replace the current history state
+      onActiveSlideChange(currentImage);
+    }
   };
 
   const secondSwiperClass = `secondSwiper ${
@@ -58,29 +92,30 @@ export default function SdBatchMediaPanel({ images }: SdCoverImagePanelProps) {
         modules={[FreeMode, Navigation, Thumbs]}
         className={secondSwiperClass}
         slidesPerView={1}
-        initialSlide={0}
+        initialSlide={initialSlide}
+        onSlideChange={handleSlideChange}
       >
-        {images.map((imgSrc, index) => (
+        {images.map((image, index) => (
           <SwiperSlide key={index}>
-            <img src={imgSrc} alt={`Slide ${index + 1}`} />
+            <img src={image.url} alt={`Slide ${index + 1}`} />
           </SwiperSlide>
         ))}
       </Swiper>
       {images.length > 1 && (
         <Swiper
           onSwiper={handleSwiper}
-          loop={true}
+          loop={false}
           spaceBetween={10}
           slidesPerView={5}
           freeMode={true}
           watchSlidesProgress={true}
           modules={[FreeMode, Navigation, Thumbs]}
           className="firstSwiper"
-          initialSlide={0}
+          initialSlide={initialSlide}
         >
-          {images.map((imgSrc, index) => (
+          {images.map((image, index) => (
             <SwiperSlide key={index}>
-              <img src={imgSrc} alt={`Thumbnail ${index + 1}`} />
+              <img src={image.url} alt={`Thumbnail ${index + 1}`} />
             </SwiperSlide>
           ))}
         </Swiper>
