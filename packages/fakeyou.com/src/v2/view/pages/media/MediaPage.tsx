@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import MediaAudioComponent from "./MediaAudioComponent";
+import MediaAudioPlayer from "./MediaAudioPlayer";
 import MediaVideoComponent from "./MediaVideoComponent";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
 import Container from "components/common/Container";
@@ -179,7 +179,9 @@ export default function MediaPage() {
             {/* Voice model name that is used to generate the audio */}
             {/*<h3 className="fw-bold mb-4">[Voice Model Name]</h3> */}
 
-            <MediaAudioComponent mediaFile={mediaFile} />
+            <div className="w-100">
+              <MediaAudioPlayer mediaFile={mediaFile} />
+            </div>
 
             {/* Show TTS text input if it is a TTS result */}
             {mediaFile.maybe_text_transcript && (
