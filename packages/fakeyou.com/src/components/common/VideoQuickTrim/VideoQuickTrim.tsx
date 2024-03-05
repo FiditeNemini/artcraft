@@ -98,8 +98,10 @@ export default memo(function VideoQuickTrim({
       };
       
       node.ontimeupdate = ()=>{
-        if(isRepeatOn && node.currentTime >= trimEnd){
-          node.currentTime = 0;
+        if(isRepeatOn && 
+            (node.currentTime >= trimEnd || node.currentTime <= trimStart)
+          ){
+          node.currentTime = trimStart;
         }
         setPlaybarState((curr)=>({
           ...curr,
@@ -220,7 +222,9 @@ export default memo(function VideoQuickTrim({
       {/* END of Video Wrapper */}
       <div className="playbar" ref={playbarRefCallback}>
         <div className="playbar-bg" />
-        {videoRef.current && 
+        {trimScrubberWidth > 0 && 
+          playbarWidth > 0 && 
+          maxDuration > 0 &&
           <TrimScrbber
             key={trimReset.toString()}
             boundingWidth={playbarWidth}
