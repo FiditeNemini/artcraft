@@ -22,6 +22,18 @@ CREATE TABLE users (
   -- The role assigned to the user confers permissions.
   user_role_slug VARCHAR(16) NOT NULL,
 
+  -- An optional comma separated list of flags for user accounts
+  -- If a user has a flag, then they're enabled for that given feature.
+  -- There are better ways to do this, but this hack will do for now.
+  -- This should replace `can_access_studio`.
+  --
+  -- Possible flag values (multiple is okay) :
+  --   - "explore_media"
+  --   - "studio"
+  maybe_feature_flags VARCHAR(255) DEFAULT NULL,
+
+  -- DEPRECATED
+  -- TODO(bt, 2024-03-05): Remove after new flags are in place.
   -- Rollout flag for Storyteller Studio
   -- Default to false until rollout is 100%, then remove the column.
   can_access_studio BOOLEAN NOT NULL DEFAULT false,
