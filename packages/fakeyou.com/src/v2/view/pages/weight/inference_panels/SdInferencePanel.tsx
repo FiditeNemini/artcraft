@@ -103,7 +103,7 @@ function SdInferencePanel({
     seedNumber: "",
     sampler: "DPM++ 2M Karras",
     cfgScale: 7,
-    samples: 8,
+    samples: 25,
     batchCount: 3,
     loraToken: null,
   };
