@@ -115,7 +115,7 @@ export default memo(function VideoQuickTrim({
       node.onended = ()=>{setPlaypause("ended");};
 
     } // else{} DOM node referenced by ref has been unmounted 
-  }, [playbarWidth, onSelect, isRepeatOn, trimEnd]); //END videoRefCallback
+  }, [playbarWidth, onSelect, isRepeatOn, trimStart, trimEnd]); //END videoRefCallback
 
   function handleWindowResize() {
     if (playbarRef.current !== null) {
