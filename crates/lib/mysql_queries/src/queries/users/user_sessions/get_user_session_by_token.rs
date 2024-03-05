@@ -2,14 +2,11 @@
 #![forbid(unused_imports)]
 #![forbid(unused_mut)]
 
-use std::collections::HashSet;
-
 use anyhow::anyhow;
 use log::warn;
 use sqlx::{Executor, MySql};
 use sqlx::pool::PoolConnection;
 
-use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::users::UserToken;
@@ -84,18 +81,6 @@ impl SessionUserRecord {
   // TODO(bt, 2022-12-20): Convert all users of the bare record to using `UserToken`, then get rid of this method.
   pub fn get_strongly_typed_user_token(&self) -> UserToken {
     UserToken::new_from_str(&self.user_token)
-  }
-
-  pub fn get_flags(&self) -> HashSet<UserFeatureFlag> {
-    match self.maybe_feature_flags.as_deref() {
-      None => HashSet::new(),
-      Some(feature_flags) => {
-        feature_flags
-            .split(",")
-            .filter_map(|flag| UserFeatureFlag::from_str(flag).ok())
-            .collect()
-      }
-    }
   }
 }
 
