@@ -177,6 +177,7 @@ export default memo(function VideoQuickTrim({
     <div className="fy-video-quicktrim">
       <div className="video-wrapper">
         <VideoFakeyou
+          height={500}
           controls={false}
           muted={isMuted}
           ref={videoRefCallback}
