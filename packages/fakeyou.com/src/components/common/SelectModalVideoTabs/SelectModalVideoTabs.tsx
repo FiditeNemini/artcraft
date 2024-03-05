@@ -32,11 +32,18 @@ export default memo(function SelectModalWrapper({
   inputLabel: string;
   onSelect: (data:SelectModalData) => void;
 }) {
+  const [onSelectTimeStamp, setOnSelectTimeStamp] = useState<Date>(new Date());
   const tabs = [{
     label: "All Videos",
     content: (
       <div className="searcher-container in-modal m-4" id="allVideos">
-        <VideoTabsContent debug={debug} onSelect={onSelect}/>
+        <VideoTabsContent
+          debug={debug}
+          onSelect={(data)=>{
+            onSelect(data)
+            setOnSelectTimeStamp(new Date());
+          }}
+        />
       </div>
     )
   }]
@@ -45,6 +52,7 @@ export default memo(function SelectModalWrapper({
       modalTitle={modalTitle}
       label={inputLabel}
       value={value}
+      forcedClose={onSelectTimeStamp}
       onClear={()=>{onSelect({title:"",token:""})}}
     >
       <NonRouteTabs tabs={tabs} />

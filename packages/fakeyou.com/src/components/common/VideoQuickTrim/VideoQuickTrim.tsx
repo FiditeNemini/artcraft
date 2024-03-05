@@ -4,7 +4,6 @@ import React, {
   useLayoutEffect,
   useState,
   useRef,
-  // PointerEvent,
 } from "react";
 import {
   faArrowsRepeat,
@@ -35,7 +34,6 @@ const trimOptions: { [key: string]: number } = {
 
 const initialTrimState: TrimStates = {
   canNotTrim: true,
-  isScrubbingTrim: false,
   trimDuration: 0,
   trimStart: 0,
   trimEnd: 0,
@@ -68,7 +66,6 @@ export default memo(function VideoQuickTrim({
     trimStart,
     trimEnd,
     trimDuration,
-    // isScrubbingTrim,
   }, setTrimState] = useState<TrimStates>(initialTrimState);
   
 
@@ -212,7 +209,19 @@ export default memo(function VideoQuickTrim({
       {/* END of Video Wrapper */}
       <div className="playbar" ref={playbarRefCallback}>
         <div className="playbar-bg" />
-        <TrimScrbber width={trimScrubberWidth} />
+        <TrimScrbber 
+          boundingWidth={playbarWidth}
+          width={trimScrubberWidth}
+          trimStart={trimStart}
+          trimEnd={trimEnd}
+          onChange={(val: QuickTrimData)=>{
+            setTrimState((curr)=>({
+              ...curr,
+              trimStart: val.trimStartSeconds,
+              trimEnd: val.trimEndSeconds
+            }))
+          }}
+        />
         <div className="playcursor" style={{left: timeCursorOffset+"px"}}/>
       </div> {/* END of Playbar */}
 
