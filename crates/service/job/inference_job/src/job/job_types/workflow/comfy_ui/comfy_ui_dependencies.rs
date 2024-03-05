@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+use std::process::Command;
 use errors::AnyhowResult;
 
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::ComfyInferenceCommand;
@@ -10,8 +11,23 @@ pub struct ComfyDependencies {
 
 impl ComfyDependencies {
     pub fn setup() -> AnyhowResult<Self> {
+        // run the setup scripts for the comfy dependencies
+        let inference_command = ComfyInferenceCommand::from_env()?;
+        // check to see if the flag file exists
+        if PathBuf::from("comfy_setup_complete").exists() {
+            println!("Comfy setup already complete");
+        } else {
+            // if the flag file does not exist, run the setup script
+            // run setup script
+            let comfy_setup_script = inference_command.clone().comfy_setup_script;
+                let output = Command::new("python3")
+                    .arg(comfy_setup_script)
+                    .output()
+                    .expect("failed to run comfyui setup script");
+                println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+             }
         Ok(Self {
-            inference_command: ComfyInferenceCommand::from_env()?,
+            inference_command: inference_command,
             dependency_tokens: RequiredModels::init(),
         })
     }
