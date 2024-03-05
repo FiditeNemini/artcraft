@@ -28,7 +28,7 @@ import {
   defaultPreset,
 } from "./dataCnPresets";
 
-export default function SectionAdvanceOptions({
+export default function CompAdvanceOptions({
   debug,
   t,
   vstValues: vstVal,

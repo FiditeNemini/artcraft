@@ -1,7 +1,6 @@
 import React, {
   useRef,
   useState,
-  useCallback,
   PointerEvent
 } from 'react';
 import {
@@ -14,7 +13,7 @@ export default function TrimScrubber({
   trimStart,
   trimDuration,
   duration,
-  widthPercent,
+  width,
   boundingWidth,
   onChange
 }:{
@@ -22,7 +21,7 @@ export default function TrimScrubber({
   trimDuration: number;
   duration: number;
   boundingWidth: number;
-  widthPercent:number;
+  width:number;
   onChange:(val:QuickTrimData)=>void
 }){
   const [{
@@ -35,7 +34,7 @@ export default function TrimScrubber({
     pointerStart:number
   }>({
     left: trimStart/duration*boundingWidth,
-    leftOffset:0,//trimStart/duration*boundingWidth,
+    leftOffset: trimStart/duration*boundingWidth,
     pointerStart: -1
   });
   const ref = useRef<HTMLDivElement | null>(null);
@@ -73,8 +72,8 @@ export default function TrimScrubber({
       // console.log(`${e.clientX} - ${pointerStart} = ${e.clientX-pointerStart}`)
       let newLeft = leftOffset + e.clientX - pointerStart;
       // console.log(`${newLeft} + ${boundingWidth * widthPercent/100} > ${boundingWidth}`)
-      if (newLeft + boundingWidth * widthPercent/100 > boundingWidth) {
-        newLeft = boundingWidth - boundingWidth * widthPercent/100;
+      if (newLeft + width > boundingWidth) {
+        newLeft = boundingWidth - width;
       }else if(newLeft < 0) {
         newLeft = 0;
       }
@@ -88,7 +87,7 @@ export default function TrimScrubber({
     <div className="trim-scrubber" 
       ref={ref}
       style={{
-        width: widthPercent + "%",
+        width: width + "px",
         left: left,
       }}
       onPointerDown={handleScrubStart}
