@@ -2,11 +2,14 @@
 #![forbid(unused_imports)]
 #![forbid(unused_mut)]
 
+use std::collections::HashSet;
+
 use anyhow::anyhow;
 use log::warn;
 use sqlx::{Executor, MySql};
 use sqlx::pool::PoolConnection;
 
+use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
 use tokens::tokens::users::UserToken;
@@ -38,6 +41,9 @@ pub struct SessionUserRecord {
   pub auto_play_video_preference: Option<bool>,
 
   // ===== FEATURE FLAGS ===== //
+
+  // Optional comma-separated list of parseable `UserFeatureFlag` enum features
+  pub maybe_feature_flags: Option<String>,
 
   pub can_access_studio: bool,
 
@@ -78,6 +84,18 @@ impl SessionUserRecord {
   // TODO(bt, 2022-12-20): Convert all users of the bare record to using `UserToken`, then get rid of this method.
   pub fn get_strongly_typed_user_token(&self) -> UserToken {
     UserToken::new_from_str(&self.user_token)
+  }
+
+  pub fn get_flags(&self) -> HashSet<UserFeatureFlag> {
+    match self.maybe_feature_flags.as_deref() {
+      None => HashSet::new(),
+      Some(feature_flags) => {
+        feature_flags
+            .split(",")
+            .filter_map(|flag| UserFeatureFlag::from_str(flag).ok())
+            .collect()
+      }
+    }
   }
 }
 
@@ -121,6 +139,7 @@ SELECT
     users.is_banned,
 
     users.can_access_studio,
+    users.maybe_feature_flags,
 
     user_roles.can_use_tts,
     user_roles.can_use_w2l,
@@ -183,6 +202,7 @@ WHERE user_sessions.token = ?
         is_banned: i8_to_bool(raw_user_record.is_banned),
 
         can_access_studio: i8_to_bool(raw_user_record.can_access_studio),
+        maybe_feature_flags: raw_user_record.maybe_feature_flags,
 
         // Usage
         can_use_tts: nullable_i8_to_bool_default_false(raw_user_record.can_use_tts),
@@ -249,6 +269,8 @@ struct SessionUserRawDbRecord {
 
   // Feature / Rollout Flags
   can_access_studio: i8,
+
+  maybe_feature_flags: Option<String>,
 
   // NB: These are `Option` due to the JOIN not being compile-time assured.
   // Usage

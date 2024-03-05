@@ -1,5 +1,8 @@
+use std::collections::HashSet;
+
 use chrono::{DateTime, Utc};
 
+use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use enums::common::visibility::Visibility;
 
 #[derive(Clone, Default)]
@@ -9,6 +12,7 @@ pub struct UserSessionExtended {
     pub premium: UserSessionPremiumPlanInfo,
     pub preferences: UserSessionPreferences,
     pub role: UserSessionRoleAndPermissions,
+    pub feature_flags: UserSessionFeatureFlags,
 }
 
 #[derive(Clone, Default)]
@@ -95,4 +99,24 @@ pub struct UserSessionRoleAndPermissions {
     pub can_delete_other_users_w2l_results: bool,
     pub can_ban_users: bool,
     pub can_delete_users: bool,
+}
+
+#[derive(Default, Clone)]
+pub struct UserSessionFeatureFlags {
+    // Optional comma-separated list of parseable `UserFeatureFlag` enum features
+    pub maybe_feature_flags: Option<String>,
+}
+
+impl UserSessionFeatureFlags {
+    pub fn get_flags(&self) -> HashSet<UserFeatureFlag> {
+        match self.maybe_feature_flags.as_deref() {
+            None => HashSet::new(),
+            Some(feature_flags) => {
+                feature_flags
+                    .split(",")
+                    .filter_map(|flag| UserFeatureFlag::from_str(flag).ok())
+                    .collect()
+            }
+        }
+    }
 }
