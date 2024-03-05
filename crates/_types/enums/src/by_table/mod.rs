@@ -17,6 +17,7 @@ pub mod tts_models;
 pub mod usages;
 pub mod user_bookmarks;
 pub mod user_ratings;
+pub mod users;
 pub mod voice_conversion_models;
 pub mod voice_conversion_results;
 pub mod zs_voices;
