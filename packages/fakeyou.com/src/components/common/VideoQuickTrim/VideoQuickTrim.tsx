@@ -66,6 +66,7 @@ export default memo(function VideoQuickTrim({
     trimStart,
     trimEnd,
     trimDuration,
+    maxDuration
   }, setTrimState] = useState<TrimStates>(initialTrimState);
   
 
@@ -210,19 +211,23 @@ export default memo(function VideoQuickTrim({
       {/* END of Video Wrapper */}
       <div className="playbar" ref={playbarRefCallback}>
         <div className="playbar-bg" />
-        <TrimScrbber 
-          boundingWidth={playbarWidth}
-          width={trimScrubberWidth}
-          trimStart={trimStart}
-          trimEnd={trimEnd}
-          onChange={(val: QuickTrimData)=>{
-            setTrimState((curr)=>({
-              ...curr,
-              trimStart: val.trimStartSeconds,
-              trimEnd: val.trimEndSeconds
-            }))
-          }}
-        />
+        {videoRef.current && 
+          <TrimScrbber 
+            boundingWidth={playbarWidth}
+            widthPercent={trimScrubberWidth}
+            trimStart={trimStart}
+            trimDuration={trimDuration}
+            duration={maxDuration}
+            onChange={(val: QuickTrimData)=>{
+              console.log(val);
+              setTrimState((curr)=>({
+                ...curr,
+                trimStart: val.trimStartSeconds,
+                trimEnd: val.trimEndSeconds
+              }))
+            }}
+          />
+        }
         <div className="playcursor" style={{left: timeCursorOffset+"px"}}/>
       </div> {/* END of Playbar */}
 

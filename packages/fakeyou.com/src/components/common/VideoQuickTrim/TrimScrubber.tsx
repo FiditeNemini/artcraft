@@ -1,6 +1,7 @@
 import React, {
   useRef,
   useState,
+  useCallback,
   PointerEvent
 } from 'react';
 import {
@@ -11,17 +12,19 @@ import { QuickTrimData } from './types';
 
 export default function TrimScrubber({
   trimStart,
-  trimEnd,
-  width,
+  trimDuration,
+  duration,
+  widthPercent,
+  boundingWidth,
   onChange
 }:{
   trimStart:number;
-  trimEnd: number;
+  trimDuration: number;
+  duration: number;
   boundingWidth: number;
-  width:number;
+  widthPercent:number;
   onChange:(val:QuickTrimData)=>void
 }){
-  const ref = useRef<HTMLDivElement>(null);
   const [{
     left,
     leftOffset,
@@ -31,39 +34,53 @@ export default function TrimScrubber({
     leftOffset:number
     pointerStart:number
   }>({
-    left:0,
-    leftOffset:0,
+    left: trimStart/duration*boundingWidth,
+    leftOffset:0,//trimStart/duration*boundingWidth,
     pointerStart: -1
   });
+  const ref = useRef<HTMLDivElement | null>(null);
 
   if(ref.current){
     ref.current.style.cursor = pointerStart >= 0 
     ? 'grabbing' : 'grab';
   }
+
   function handleScrubStart(e: PointerEvent<HTMLDivElement>){
     e.persist();
-    console.log(`start: ${pointerStart}` );
+    // console.log(`start: ${pointerStart}` );
     setState((curr)=>({
       ...curr,
       pointerStart: e.clientX
     })); 
   }
   function handleScrubEnd(e: PointerEvent<HTMLDivElement>){
-    // e.persist();
-    console.log(`end` );
+    e.persist();
+    // console.log(`end` );
     setState((curr)=>({
       ...curr,
       pointerStart: -1,
-      leftOffset: curr.left,
+      leftOffset: left,
     })); 
+    console.log(`${duration} * ${left} / ${boundingWidth} = ${duration * left / boundingWidth}`)
+    onChange(({
+      trimStartSeconds: duration * left / boundingWidth,
+      trimEndSeconds: duration  * left / boundingWidth + trimDuration,
+    }))
   }
   function handleScrubMove(e: PointerEvent<HTMLDivElement>){
     e.persist();
     if(pointerStart >= 0 && pointerStart!==null && ref.current){
-      console.log(`${e.clientX} - ${pointerStart} = ${e.clientX-pointerStart}`)
+      // console.log(`${e.clientX} - ${pointerStart} = ${e.clientX-pointerStart}`)
+      let newLeft = leftOffset + e.clientX - pointerStart;
+      // console.log(`${newLeft} + ${boundingWidth * widthPercent/100} > ${boundingWidth}`)
+      if (newLeft + boundingWidth * widthPercent/100 > boundingWidth) {
+        newLeft = boundingWidth - boundingWidth * widthPercent/100;
+      }else if(newLeft < 0) {
+        newLeft = 0;
+      }
       setState((curr)=>({
         ...curr,
-        left: leftOffset + e.clientX - pointerStart
+        left: newLeft
       }));
     }
   }
@@ -71,8 +88,8 @@ export default function TrimScrubber({
     <div className="trim-scrubber" 
       ref={ref}
       style={{
-        width: width + "%",
-        left: left
+        width: widthPercent + "%",
+        left: left,
       }}
       onPointerDown={handleScrubStart}
       onPointerUp={handleScrubEnd}
