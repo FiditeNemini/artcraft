@@ -259,18 +259,12 @@ function SdInferencePanel({
       return false;
     }
 
-    if (!sessionSubscriptionsWrapper.hasActiveProSubscription()) {
-      setBatchCount(1);
-    }
-
     setIsEnqueuing(true);
 
     //make sure seed is random on generation if random is selected
     if (seed === "random") {
       internalSeed.current = generateRandomSeed();
     }
-
-    console.log(sdToken);
 
     const request = {
       uuid_idempotency_token: uuidv4(),
@@ -287,13 +281,9 @@ function SdInferencePanel({
       maybe_batch_count: batchCount,
     };
 
-    console.log("request", request);
-
     const response = await EnqueueImageGen(request);
 
     if (EnqueueImageGenIsSuccess(response)) {
-      console.log("enqueuing...");
-
       if (response.inference_job_token) {
         enqueueInferenceJob(
           response.inference_job_token,
