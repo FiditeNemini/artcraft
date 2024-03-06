@@ -1,17 +1,24 @@
 import React,{
-  useRef,
   useState,
+  useLayoutEffect,
+  useCallback,
   PointerEvent,
 } from 'react';
 
 export interface withScrubbingPropsI {
   boundingWidth: number;
   scrubberWidth: number;
+  initialLeftOffset?: number; //in pixels
+  initialLeftOffsetPercent?: number; // in %, 0 < % < 1
   styleOverride?: {[key: string]: string|number };
-  onScrubEnds?: ()=>number; //return scrubber location as %
-  onScrubChanges?: ()=>number; //return scrubber location as %
+  onScrubEnds?: (posPercent: number)=>void;
+  //return scrubber location as %, where 0 < % < 1
+  onScrubChanges?: (posPercent:number)=>void;
+  //return scrubber location as %, where 0 < % < 1
 }
+
 type withSrcubbingStates = {
+  key: Date,
   currLeftOffset: number,
   prevLeftOffset: number;
   pointerStartPos: number;
@@ -20,56 +27,87 @@ type withSrcubbingStates = {
 export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.ComponentType<P>) => ({
   boundingWidth,
   scrubberWidth,
+  initialLeftOffset : initialLeftOffsetProps = 0,
+  initialLeftOffsetPercent = 0,
   styleOverride = {},
   onScrubEnds,
   onScrubChanges,
   ...rest
 }: withScrubbingPropsI) => {
-  // return (props: Omit<P, keyof withScrubbingPropsI>)=>{
-  const ref = useRef<HTMLDivElement | null>(null)
+  console.log('withScrubbing reRender');
+  // const initialLeftOffset = 
+  //   initialLeftOffsetPercent > 0 ? boundingWidth * initialLeftOffsetPercent 
+  //   : initialLeftOffsetProps;
+  const initialLeftOffset = 0;
   const [{
-    currLeftOffset, prevLeftOffset, pointerStartPos
+    key, currLeftOffset, pointerStartPos
+    // prevLeftOffset,
   }, setStates] = useState<withSrcubbingStates>({
-    currLeftOffset: 0, // in pixels
-    prevLeftOffset: 0, //in pixels
+    key: new Date(),
+    currLeftOffset: initialLeftOffset, // in pixels
+    prevLeftOffset: initialLeftOffset, //in pixels
     pointerStartPos: -1 // negative denotes pointer not engaged
   });
 
-  function handleScrubStart(e: PointerEvent<HTMLDivElement>){
-    e.persist();
+  function handleScrubStart (e: PointerEvent<HTMLDivElement>){
+    // e.persist();
+    e.preventDefault();
+    e.stopPropagation();
     console.log(`start: ${pointerStartPos} -> ${e.clientX}` );
     setStates((curr)=>({
       ...curr,
       pointerStartPos: e.clientX
     })); 
   }
-  function handleScrubEnd(e: PointerEvent<HTMLDivElement>){
-    e.persist();
-    console.log(`end` );
+  const handleScrubEnd = useCallback((e: MouseEvent)=>{
+    // e.persist();
+    e.preventDefault();
+    e.stopPropagation();
     setStates((curr)=>({
       ...curr,
       pointerStartPos: -1,
-      prevLeftOffset: currLeftOffset,
+      prevLeftOffset: curr.currLeftOffset,
     })); 
-  }
-  function handleScrubMove(e: PointerEvent<HTMLDivElement>){
-    e.persist();
-    if(pointerStartPos >= 0 && pointerStartPos!==null){
-      let newLeftOffset = prevLeftOffset + e.clientX - pointerStartPos;
-      if (newLeftOffset + scrubberWidth > boundingWidth) {
-        newLeftOffset = boundingWidth - scrubberWidth;
-      }else if(newLeftOffset < 0) {
-        newLeftOffset = 0;
+    // if (onScrubEnds) onScrubEnds(currLeftOffset/boundingWidth);
+  }, []);
+  const handleScrubMove = useCallback ((e: MouseEvent)=>{
+    // e.persist();
+    e.preventDefault();
+    e.stopPropagation();
+    setStates((curr)=>{
+      if(curr.pointerStartPos >= 0 && curr.pointerStartPos!==null){
+        let newLeftOffset = curr.prevLeftOffset + e.clientX - curr.pointerStartPos;
+        if (newLeftOffset + scrubberWidth > boundingWidth) {
+          newLeftOffset = boundingWidth - scrubberWidth;
+        }else if(newLeftOffset < 0) {
+          newLeftOffset = 0;
+        }
+        if(newLeftOffset !== curr.currLeftOffset){
+          return{
+            ...curr,
+            currLeftOffset: newLeftOffset
+          }
+        }
       }
-      setStates((curr)=>({
-        ...curr,
-        currLeftOffset: newLeftOffset
-      }));
+      return curr;
+    });
+      // if (onScrubChanges) onScrubChanges(newLeftOffset/boundingWidth);
+  },[scrubberWidth, boundingWidth]);
+
+  useLayoutEffect(() => {
+    if(!(window as any)[`${key}listenders`]){
+      (window as any)[`${key}listenders`] = true;
+      window.addEventListener("pointerup", handleScrubEnd);
+      window.addEventListener("pointermove", handleScrubMove);
+      return () => {
+        (window as any)[`${key}listenders`] = false;
+        window.removeEventListener("pointerup", handleScrubEnd);
+        window.removeEventListener("pointermove", handleScrubMove);
+      };
     }
-  }
+  }, [handleScrubEnd, handleScrubMove, key]);
   return(
     <div
-      ref={ref}
       className="scrubber-wrapper"
       style={{
         position: 'absolute',
@@ -80,14 +118,10 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
         ...styleOverride
       }}
       onPointerDown={handleScrubStart}
-      onPointerUp={handleScrubEnd}
-      onPointerLeave={handleScrubEnd}
-      onPointerMove={handleScrubMove}
     >
       <Component 
         {...rest as P}
       />
     </div>
   );
-// }
 };

@@ -1,4 +1,7 @@
-import React from 'react';
+import React, {
+  memo,
+  useCallback
+} from 'react';
 import {
   faGripDots
 } from "@fortawesome/pro-solid-svg-icons";
@@ -12,8 +15,13 @@ interface TrimScrubberPropsI extends withScrubbingPropsI {
   duration: number;
   onChange:(val:QuickTrimData)=>void
 }
-export const TrimScrubber = (props:TrimScrubberPropsI)=>{
-
+export const TrimScrubber = memo(({
+  trimStart,
+  trimDuration,
+  duration,
+  onChange,
+  ...rest
+}:TrimScrubberPropsI)=>{
   const TrimScrubberWithScrubbing = 
     withScrubbing<TrimScrubberPropsI>(() => {
       return(
@@ -22,15 +30,23 @@ export const TrimScrubber = (props:TrimScrubberPropsI)=>{
         </div>
       );
     });
-
+  
+  const handleOnChange = useCallback((posPercent:number)=>{
+    onChange({
+      trimStartSeconds: duration * posPercent,
+      trimEndSeconds: duration * posPercent + trimDuration,
+    });
+  }, [onChange])
   return (
     <TrimScrubberWithScrubbing
       styleOverride={{
         top: '-1rem',
       }}
-      {...props}
+      // initialLeftOffsetPercent={trimStart/trimDuration}
+      onScrubEnds={handleOnChange}
+      {...rest}
     />
   )
-}
+});
 
 

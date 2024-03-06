@@ -226,8 +226,8 @@ export default memo(function VideoQuickTrim({
           playbarWidth > 0 && 
           maxDuration > 0 &&
           <TrimScrubber
-            key={trimReset.toString()}
-            boundingWidth={playbarWidth}
+            // key={trimReset.toString()}
+            boundingWidth={playbarWidth-trimScrubberWidth}
             scrubberWidth={trimScrubberWidth}
             trimStart={trimStart}
             trimDuration={trimDuration}
