@@ -1,7 +1,6 @@
 import { Badge, Button, Panel } from "components/common";
 import React, { useEffect, useRef, useState } from "react";
 import "./VstSectionV1.scss";
-import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 
 interface VstSectionV1Props {}
 
