@@ -1,6 +1,7 @@
-import { Badge, Panel } from "components/common";
+import { Badge, Button, Panel } from "components/common";
 import React, { useEffect, useRef, useState } from "react";
 import "./VstSectionV1.scss";
+import { faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 
 interface VstSectionV1Props {}
 
@@ -62,6 +63,14 @@ export default function VstSectionV1(props: VstSectionV1Props) {
                 </video>
                 <div className="vst-sbs-video-overlay-text">
                   <Badge label={column.title} color="gray" />
+                </div>
+                <div className="vst-sbs-video-overlay-cta">
+                  <Button
+                    variant="link"
+                    label="Try this style"
+                    to="/video-styletransfer"
+                    className="fs-7"
+                  />
                 </div>
               </div>
             </div>
