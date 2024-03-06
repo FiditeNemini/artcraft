@@ -1,0 +1,62 @@
+@import "scss/colours.scss";
+
+.vst-sbs-panel {
+  background-color: $panel;
+  height: 500px;
+  overflow: hidden;
+  border: lighten($panel, 10%) solid 1px;
+}
+
+.column-1 .vst-sbs-panel,
+.column-4 .vst-sbs-panel {
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.column-2 .vst-sbs-panel,
+.column-3 .vst-sbs-panel {
+  border-radius: 0;
+}
+
+.column-4 .vst-sbs-panel {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.column-1 .vst-sbs-panel,
+.column-2 .vst-sbs-panel,
+.column-3 .vst-sbs-panel {
+  border-right: 1px solid $panel-inner;
+}
+
+.vst-sbs-video-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  z-index: 1;
+}
+
+.vst-sbs-video-overlay-container {
+  position: relative;
+  height: 100%;
+}
+
+.vst-sbs-video-overlay-text {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  color: white;
+  padding: 0.75rem;
+}
+
+@media (max-width: 992px) {
+  .vst-sbs-panel {
+    height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .vst-sbs-panel {
+    height: 240px;
+  }
+}
