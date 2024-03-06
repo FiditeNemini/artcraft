@@ -36,17 +36,15 @@ export const TrimScrubber = memo(({
       trimStartSeconds: duration * posPercent,
       trimEndSeconds: duration * posPercent + trimDuration,
     });
-  }, [onChange])
+  }, [onChange, duration, trimDuration])
   return (
     <TrimScrubberWithScrubbing
       styleOverride={{
         top: '-1rem',
       }}
-      // initialLeftOffsetPercent={trimStart/trimDuration}
+      initialLeftOffsetPercent={trimStart/trimDuration}
       onScrubEnds={handleOnChange}
       {...rest}
     />
   )
 });
-
-

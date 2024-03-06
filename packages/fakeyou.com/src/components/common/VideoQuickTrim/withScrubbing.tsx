@@ -18,7 +18,7 @@ export interface withScrubbingPropsI {
 }
 
 type withSrcubbingStates = {
-  key: Date,
+  key: number,
   currLeftOffset: number,
   prevLeftOffset: number;
   pointerStartPos: number;
@@ -36,15 +36,15 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
 }: withScrubbingPropsI) => {
   console.log('withScrubbing reRender');
   const refEl = useRef<HTMLDivElement| null>(null);
-  // const initialLeftOffset = 
-  //   initialLeftOffsetPercent > 0 ? boundingWidth * initialLeftOffsetPercent 
-  //   : initialLeftOffsetProps;
-  const initialLeftOffset = 0;
+  const initialLeftOffset = 
+    initialLeftOffsetPercent > 0 ? boundingWidth * initialLeftOffsetPercent 
+    : initialLeftOffsetProps;
+  // const initialLeftOffset = 0;
   const [{
     key, currLeftOffset, pointerStartPos
     // prevLeftOffset,
   }, setStates] = useState<withSrcubbingStates>({
-    key: new Date(),
+    key: Date.now(),
     currLeftOffset: initialLeftOffset, // in pixels
     prevLeftOffset: initialLeftOffset, //in pixels
     pointerStartPos: -1 // negative denotes pointer not engaged
@@ -98,19 +98,19 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   },[scrubberWidth, boundingWidth]);
 
   useLayoutEffect(() => {
-    if(!(window as any)[`${key}listenders`]){
-      (window as any)[`${key}listenders`] = true;
+    if(!(window as any)[`listener-id-${key}`]){
+      (window as any)[`listender-id-${key}`] = true;
       window.addEventListener("mousedown", handleScrubStart);
       window.addEventListener("mouseup", handleScrubEnd);
       window.addEventListener("mousemove", handleScrubMove);
       return () => {
-        (window as any)[`${key}listenders`] = false;
+        (window as any)[`${key}listeners`] = false;
         window.removeEventListener("mousedown", handleScrubStart);
         window.removeEventListener("mouseup", handleScrubEnd);
         window.removeEventListener("mousemove", handleScrubMove);
       };
     }
-  }, [handleScrubEnd, handleScrubMove, key]);
+  }, [handleScrubStart, handleScrubEnd, handleScrubMove, key]);
   return(
     <div
       className="scrubber-wrapper"

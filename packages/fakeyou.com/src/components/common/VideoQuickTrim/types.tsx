@@ -7,7 +7,7 @@ export type QuickTrimData = {
 // INTERNALS
 export type TrimStates = {
   canNotTrim: boolean;
-  trimReset: Date;
+  trimReset: number;
   trimDuration: number;
   trimStart: number;
   trimEnd: number;

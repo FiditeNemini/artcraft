@@ -35,7 +35,7 @@ const trimOptions: { [key: string]: number } = {
 const initialTrimState: TrimStates = {
   canNotTrim: true,
   trimDuration: 0,
-  trimReset: new Date(),
+  trimReset: Date.now(),
   trimStart: 0,
   trimEnd: 0,
   maxDuration: 0,
@@ -153,7 +153,7 @@ export default memo(function VideoQuickTrim({
       }
       setTrimState((curr)=>({
         ...curr,
-        trimReset: new Date(),
+        trimReset: Date.now(),
         trimDuration: trimOptions[selected],
         trimStart: newTrimStart,
         trimEnd: newTrimEnd,
@@ -226,7 +226,7 @@ export default memo(function VideoQuickTrim({
           playbarWidth > 0 && 
           maxDuration > 0 &&
           <TrimScrubber
-            // key={trimReset.toString()}
+            key={trimReset}
             boundingWidth={playbarWidth-trimScrubberWidth}
             scrubberWidth={trimScrubberWidth}
             trimStart={trimStart}
