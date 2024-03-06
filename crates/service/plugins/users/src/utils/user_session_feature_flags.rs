@@ -9,6 +9,13 @@ pub struct UserSessionFeatureFlags {
 }
 
 impl UserSessionFeatureFlags {
+
+  pub fn new(maybe_feature_flags: Option<&str>) -> Self {
+    Self {
+      maybe_feature_flags: maybe_feature_flags.map(|s| s.to_string()),
+    }
+  }
+
   pub fn get_flags(&self) -> HashSet<UserFeatureFlag> {
     match self.maybe_feature_flags.as_deref() {
       None => HashSet::new(),
