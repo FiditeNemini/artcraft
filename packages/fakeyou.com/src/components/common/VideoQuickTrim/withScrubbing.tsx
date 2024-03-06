@@ -1,8 +1,8 @@
 import React,{
+  useRef,
   useState,
   useLayoutEffect,
   useCallback,
-  PointerEvent,
 } from 'react';
 
 export interface withScrubbingPropsI {
@@ -35,6 +35,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   ...rest
 }: withScrubbingPropsI) => {
   console.log('withScrubbing reRender');
+  const refEl = useRef<HTMLDivElement| null>(null);
   // const initialLeftOffset = 
   //   initialLeftOffsetPercent > 0 ? boundingWidth * initialLeftOffsetPercent 
   //   : initialLeftOffsetProps;
@@ -49,16 +50,18 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
     pointerStartPos: -1 // negative denotes pointer not engaged
   });
 
-  function handleScrubStart (e: PointerEvent<HTMLDivElement>){
-    // e.persist();
-    e.preventDefault();
-    e.stopPropagation();
-    console.log(`start: ${pointerStartPos} -> ${e.clientX}` );
-    setStates((curr)=>({
-      ...curr,
-      pointerStartPos: e.clientX
-    })); 
-  }
+  const handleScrubStart = useCallback( (e: MouseEvent) => {
+    if(refEl.current){
+      console.log(`start: ${e.clientX}` );
+      if(refEl.current.contains(e.target as Node)){
+        setStates((curr)=>({
+          ...curr,
+          pointerStartPos: e.clientX
+        })); 
+        return true;
+      }
+    }
+  },[]);
   const handleScrubEnd = useCallback((e: MouseEvent)=>{
     // e.persist();
     e.preventDefault();
@@ -97,18 +100,21 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   useLayoutEffect(() => {
     if(!(window as any)[`${key}listenders`]){
       (window as any)[`${key}listenders`] = true;
-      window.addEventListener("pointerup", handleScrubEnd);
-      window.addEventListener("pointermove", handleScrubMove);
+      window.addEventListener("mousedown", handleScrubStart);
+      window.addEventListener("mouseup", handleScrubEnd);
+      window.addEventListener("mousemove", handleScrubMove);
       return () => {
         (window as any)[`${key}listenders`] = false;
-        window.removeEventListener("pointerup", handleScrubEnd);
-        window.removeEventListener("pointermove", handleScrubMove);
+        window.removeEventListener("mousedown", handleScrubStart);
+        window.removeEventListener("mouseup", handleScrubEnd);
+        window.removeEventListener("mousemove", handleScrubMove);
       };
     }
   }, [handleScrubEnd, handleScrubMove, key]);
   return(
     <div
       className="scrubber-wrapper"
+      ref={refEl}
       style={{
         position: 'absolute',
         top:0,
@@ -117,7 +123,6 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
         cursor: pointerStartPos >=0 ? 'grabbing': 'grab',
         ...styleOverride
       }}
-      onPointerDown={handleScrubStart}
     >
       <Component 
         {...rest as P}
