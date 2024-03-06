@@ -29,6 +29,22 @@
   border-radius: 0.5rem;
   overflow: hidden;
   position: relative;
+  display: flex;
+  flex-wrap: wrap;
+
+  > div {
+    border-left: lighten($panel, 3%) solid 2px;
+    border-top: lighten($panel, 3%) solid 2px;
+    box-sizing: border-box;
+  }
+
+  > div:nth-child(-n + 2) {
+    border-top: none;
+  }
+
+  > div:nth-child(2n + 1) {
+    border-left: none;
+  }
 
   video {
     width: 100%;
