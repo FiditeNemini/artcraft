@@ -18,7 +18,7 @@ import { VideoFakeyouProps } from "../VideoFakeyou/VideoFakeyou";
 
 import { QuickTrimData, TrimStates, PlaybarStates } from "./types";
 import { formatSecondsToHHMMSSCS } from "./helpers";
-import TrimScrbber from "./TrimScrubber";
+import {TrimScrubber} from "./TrimScrubber";
 import './styles.scss'
 
 interface VideoQuickTrimProps extends VideoFakeyouProps {
@@ -225,10 +225,10 @@ export default memo(function VideoQuickTrim({
         {trimScrubberWidth > 0 && 
           playbarWidth > 0 && 
           maxDuration > 0 &&
-          <TrimScrbber
+          <TrimScrubber
             key={trimReset.toString()}
             boundingWidth={playbarWidth}
-            width={trimScrubberWidth}
+            scrubberWidth={trimScrubberWidth}
             trimStart={trimStart}
             trimDuration={trimDuration}
             duration={maxDuration}

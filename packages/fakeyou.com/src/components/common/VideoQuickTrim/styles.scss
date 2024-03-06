@@ -82,15 +82,12 @@ $playbar-height: 2rem;
     border-radius: 0 0 0.5rem 0.5rem;
   }
   .trim-scrubber{
-    position: absolute;
-    top: -1rem;
     height: 3rem;
     background-color: #e66462;
     opacity: 0.8;
     outline: 0.125rem $white solid;
     border-top: 1rem $white solid;
     border-radius: 0.25rem 0.25rem 0.125rem 0.125rem;
-    cursor: grab;
 
     display: flex;
     justify-content: center;
