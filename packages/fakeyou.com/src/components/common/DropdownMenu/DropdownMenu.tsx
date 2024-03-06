@@ -71,6 +71,7 @@ export default function DropdownMenu({
           </Link>
           );
         }//end if
+        return null;
       })} {/*end items map */}
     </a.div>
   );
