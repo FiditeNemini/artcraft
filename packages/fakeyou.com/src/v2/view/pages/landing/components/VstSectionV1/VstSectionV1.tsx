@@ -9,10 +9,23 @@ const columns = [
   {
     title: "Original Video",
     videoSrc: "videos/face-animator-instruction-en.mp4",
+    ctaLink: "/video-styletransfer",
   },
-  { title: "Anime Style", videoSrc: "videos/face-animator-instruction-en.mp4" },
-  { title: "Pixel Style", videoSrc: "videos/face-animator-instruction-en.mp4" },
-  { title: "Ink Style", videoSrc: "videos/face-animator-instruction-en.mp4" },
+  {
+    title: "Anime Style",
+    videoSrc: "videos/face-animator-instruction-en.mp4",
+    ctaLink: "/video-styletransfer",
+  },
+  {
+    title: "Pixel Style",
+    videoSrc: "videos/face-animator-instruction-en.mp4",
+    ctaLink: "/video-styletransfer",
+  },
+  {
+    title: "Ink Style",
+    videoSrc: "videos/face-animator-instruction-en.mp4",
+    ctaLink: "/video-styletransfer",
+  },
 ];
 
 export default function VstSectionV1(props: VstSectionV1Props) {
@@ -77,7 +90,7 @@ export default function VstSectionV1(props: VstSectionV1Props) {
                   <Button
                     variant="link"
                     label="Try this style"
-                    to="/video-styletransfer"
+                    to={column.ctaLink || "/video-styletransfer"}
                     className="fs-7"
                   />
                 </div>
