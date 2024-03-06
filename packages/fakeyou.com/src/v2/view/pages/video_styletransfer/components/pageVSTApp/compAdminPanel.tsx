@@ -1,7 +1,7 @@
 import React, {
   useState
 } from "react";
-
+import { useHistory } from "react-router-dom";
 import {
   Accordion,
   Button,
@@ -14,13 +14,17 @@ import { Action } from "../../reducer";
 import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
 
 export const CompAdminPanel = ({
+  parentPath,
   vstValues,
   dispatchPageState
 }:{
-  vstValues : VSTType
+  parentPath: string;
+  vstValues : VSTType;
   dispatchPageState: (action: Action) => void;
 })=>{
-  const [jsonRequest, setJsonRequest] = useState<string>("{}");
+  const history = useHistory();
+  const exampleJSON = JSON.stringify(mapRequest(vstValues));
+  const [jsonRequest, setJsonRequest] = useState<string>(exampleJSON);
   const handleSendRequest = ()=>{
     EnqueueVideoStyleTransfer(JSON.parse(jsonRequest)).then(res => {
       if (res.success && res.inference_job_token) {
@@ -35,6 +39,8 @@ export const CompAdminPanel = ({
         console.log(res);
       }
     });
+    dispatchPageState({ type: "enqueueJob" });
+    history.push(`${parentPath}/jobs`);
   }
 
   return (

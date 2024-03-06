@@ -139,6 +139,7 @@ export default function PageVSTApp({
         </div>
         {debug && 
           <CompAdminPanel
+            parentPath={parentPath}
             dispatchPageState={dispatchPageState}
             vstValues={vstValues}
           />
