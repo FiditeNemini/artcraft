@@ -47,6 +47,7 @@ pub struct SessionUserInfo {
 
   // Feature / rollout flags:
   pub can_access_studio: bool,
+  pub maybe_feature_flags: Option<String>,
 
   // Premium plans:
   pub fakeyou_plan: FakeYouPlan,
@@ -166,6 +167,7 @@ pub async fn session_info_handler(
 
           // Rollout / feature flags:
           can_access_studio: session_data.can_access_studio,
+          maybe_feature_flags: session_data.maybe_feature_flags,
 
           // Premium plans:
           fakeyou_plan: FakeYouPlan::Free,
