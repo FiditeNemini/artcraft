@@ -8,22 +8,22 @@ interface VstSectionV1Props {}
 const columns = [
   {
     title: "Original Video",
-    videoSrc: "videos/face-animator-instruction-en.mp4",
+    videoSrc: "/videos/landing/vst/1-original.mp4",
     ctaLink: "/video-styletransfer",
   },
   {
-    title: "Anime Style",
-    videoSrc: "videos/face-animator-instruction-en.mp4",
+    title: "2D Flat Anime",
+    videoSrc: "/videos/landing/vst/1-2d_flat_anime.mp4",
     ctaLink: "/video-styletransfer",
   },
   {
-    title: "Pixel Style",
-    videoSrc: "videos/face-animator-instruction-en.mp4",
+    title: "Ink B&W",
+    videoSrc: "/videos/landing/vst/1-ink_bw.mp4",
     ctaLink: "/video-styletransfer",
   },
   {
-    title: "Ink Style",
-    videoSrc: "videos/face-animator-instruction-en.mp4",
+    title: "Origami",
+    videoSrc: "/videos/landing/vst/1-origami.mp4",
     ctaLink: "/video-styletransfer",
   },
 ];
@@ -58,7 +58,7 @@ export default function VstSectionV1(props: VstSectionV1Props) {
   return (
     <Panel clear={true} className="vst-section">
       <div className="col-12 col-lg-6 mb-5 pb-lg-3">
-        <h1 className="fw-bold">Video Style Transfer</h1>
+        <h1 className="fw-bold">Video Style Transfer 1</h1>
         <p className="opacity-75 mb-4">
           Transform your videos effortlessly with video style transfer. Apply
           unique styles and effects to create visually captivating content.

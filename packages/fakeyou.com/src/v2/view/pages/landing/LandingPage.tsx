@@ -17,6 +17,7 @@ import {
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import "./LandingPage.scss";
 import VstSectionV1 from "./components/VstSectionV1";
+import VstSectionV2 from "./components/VstSectionV2";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -57,6 +58,8 @@ function LandingPage(props: Props) {
             )}
 
             <VstSectionV1 />
+
+            <VstSectionV2 />
 
             <Dashboard sessionWrapper={props.sessionWrapper} />
 

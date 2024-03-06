@@ -1,0 +1,102 @@
+@import "scss/colours.scss";
+
+.vst-section {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.vst-carousel-panel {
+  background-color: $panel;
+  overflow: hidden;
+  border: lighten($panel, 3%) solid 2px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  position: relative;
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.vst-styled-videos-panel {
+  width: 100%;
+  height: 100%;
+  background-color: $panel;
+  overflow: hidden;
+  border: lighten($panel, 3%) solid 2px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  position: relative;
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.vst-styled-videos-panel-overlay-text {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  color: white;
+  padding: 0.75rem;
+  display: flex;
+  height: auto;
+}
+
+.swiper {
+  width: 100%;
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  user-select: none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+
+  &.vst-swiper-main {
+    height: auto !important;
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  &.vst-swiper-thumbs {
+    height: auto !important;
+
+    .swiper-slide {
+      opacity: 0.4;
+      cursor: pointer;
+      transition: 0.2s;
+
+      .vst-carousel-panel {
+        border: lighten($panel, 15%) solid 2px;
+      }
+    }
+
+    .swiper-slide-thumb-active {
+      opacity: 1;
+
+      .vst-carousel-panel {
+        border: $primary solid 2px;
+      }
+    }
+  }
+}
+
+.swiper-slide {
+  background-size: contain;
+  background-position: center;
+}
+
+.vst-swiper-main-overlay-text {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  color: white;
+  padding: 0.75rem;
+}
