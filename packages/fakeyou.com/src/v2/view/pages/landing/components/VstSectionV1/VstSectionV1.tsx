@@ -1,6 +1,7 @@
 import { Badge, Button, Panel } from "components/common";
 import React, { useEffect, useRef, useState } from "react";
 import "./VstSectionV1.scss";
+import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 
 interface VstSectionV1Props {}
 
@@ -45,10 +46,19 @@ export default function VstSectionV1(props: VstSectionV1Props) {
     <Panel clear={true} className="vst-section">
       <div className="col-12 col-lg-6 mb-5 pb-lg-3">
         <h1 className="fw-bold">Video Style Transfer</h1>
-        <p className="opacity-75">
+        <p className="opacity-75 mb-4">
           Transform your videos effortlessly with video style transfer. Apply
           unique styles and effects to create visually captivating content.
         </p>
+        <div className="d-flex">
+          <Button
+            label="Try Video Style Transfer"
+            small={true}
+            icon={faArrowRight}
+            iconFlip={true}
+            to="/video-styletransfer"
+          />
+        </div>
       </div>
 
       <div className="row g-3">
