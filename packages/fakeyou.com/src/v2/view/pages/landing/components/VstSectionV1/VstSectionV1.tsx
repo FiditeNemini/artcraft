@@ -1,5 +1,5 @@
 import { Badge, Panel } from "components/common";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./VstSectionV1.scss";
 
 interface VstSectionV1Props {}
@@ -15,17 +15,43 @@ const columns = [
 ];
 
 export default function VstSectionV1(props: VstSectionV1Props) {
+  const videosRef = useRef<HTMLVideoElement[]>([]);
+  const [loadedVideos, setLoadedVideos] = useState(0);
+
+  useEffect(() => {
+    const checkAllVideosLoaded = () => {
+      setLoadedVideos(prevLoaded => prevLoaded + 1);
+    };
+
+    videosRef.current.forEach(video => {
+      video.addEventListener("canplaythrough", checkAllVideosLoaded);
+    });
+
+    return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      videosRef.current.forEach(video => {
+        video.removeEventListener("canplaythrough", checkAllVideosLoaded);
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    if (loadedVideos === columns.length) {
+      videosRef.current.forEach(video => video.play());
+    }
+  }, [loadedVideos]);
+
   return (
-    <Panel clear={true} className="pb-5">
-      <div className="mb-5">
+    <Panel clear={true} className="vst-section">
+      <div className="col-12 col-lg-6 mb-5 pb-lg-3">
         <h1 className="fw-bold">Video Style Transfer</h1>
-        <p>
+        <p className="opacity-75">
           Transform your videos effortlessly with video style transfer. Apply
           unique styles and effects to create visually captivating content.
         </p>
       </div>
 
-      <div className="row g-0">
+      <div className="row g-3">
         {columns.map((column, index) => (
           <div className={`col-6 col-lg-3 column-${index + 1}`} key={index}>
             <div className="vst-sbs-panel">
