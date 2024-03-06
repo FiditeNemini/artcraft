@@ -1,7 +1,6 @@
 import React, { useReducer, useEffect } from "react";
 
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
-import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 import { useInferenceJobs, useLocalize } from "hooks";
 import {
   FrontendInferenceJobType,
@@ -13,6 +12,7 @@ import { states, reducer } from "./reducer";
 import SubRoutes from "./routes";
 import PageHeaderWithImage from "components/layout/PageHeaderWithImage";
 import { faFilms } from "@fortawesome/pro-solid-svg-icons";
+import { VideoStyleTransferNotAvailable } from "v2/view/_common/VideoStyleTransferNotAvailable";
 
 export default function VideoStyleTransfer(props: {
   enqueueInferenceJob: (
@@ -48,8 +48,8 @@ export default function VideoStyleTransfer(props: {
     }
   }, [pageState, enqueueInferenceJob]);
 
-  if (!props.sessionWrapper.canAccessStudio()) {
-    return <StudioNotAvailable />;
+  if (!props.sessionWrapper.canAccessVideoStyleTransfer()) {
+    return <VideoStyleTransferNotAvailable />;
   }
 
   return (

@@ -20,6 +20,7 @@ export interface UserInfo {
 
   // Rollout feature flags
   can_access_studio: boolean,
+  maybe_feature_flags: string[],
 
   // Usage
   can_use_tts: boolean,

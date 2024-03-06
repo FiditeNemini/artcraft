@@ -48,6 +48,7 @@ export default function VideoWorkflow(props:{
   }, [pageState, enqueueInferenceJob]);
 
   if (!props.sessionWrapper.canAccessStudio()) {
+    //return <VideoStyleTransferNotAvailable />
     return <StudioNotAvailable />
   }
 
