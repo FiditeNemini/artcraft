@@ -14,6 +14,7 @@ import { mapRequest, VSTType } from "./helpers";
 
 import CompStyleModal from "./compStyleModal";
 import CompAdvanceOptions from "./compAdvanceOptions";
+import { CompAdminPanel } from "./compAdminPanel";
 
 export default function PageVSTApp({
   debug: debugProps,
@@ -137,25 +138,10 @@ export default function PageVSTApp({
           />
         </div>
         {debug && 
-          <div className="col-12 d-flex justify-content-end align-items-center">
-            <p className="me-3"><b>Debug Values: </b></p>
-            <Button
-              className="me-3"
-              label="Console Log State"
-              onClick={()=>{
-                console.log(vstValues);
-              }}
-              variant="secondary"
-            />
-            <Button
-              label="Console Log Request"
-              onClick={()=>{
-                const request = mapRequest(vstValues);
-                console.log(request);
-              }}
-              variant="secondary"
-            />
-          </div>
+          <CompAdminPanel
+            dispatchPageState={dispatchPageState}
+            vstValues={vstValues}
+          />
         }
       </div>
     </Panel>

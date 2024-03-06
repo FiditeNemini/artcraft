@@ -60,7 +60,7 @@ export default function TrimScrubber({
       pointerStart: -1,
       leftOffset: left,
     })); 
-    console.log(`${duration} * ${left} / ${boundingWidth} = ${duration * left / boundingWidth}`)
+    //console.log(`${duration} * ${left} / ${boundingWidth} = ${duration * left / boundingWidth}`)
     onChange(({
       trimStartSeconds: duration * left / boundingWidth,
       trimEndSeconds: duration  * left / boundingWidth + trimDuration,
