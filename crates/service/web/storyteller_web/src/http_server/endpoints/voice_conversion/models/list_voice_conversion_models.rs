@@ -134,7 +134,7 @@ pub async fn list_voice_conversion_models_handler(
           })?;
 
       // TODO: Fail open in case the DB is down. Pull from expired cache if query fails.
-      let models = get_all_models(&mut mysql_connection, server_state.flags.switch_voice_conversion_to_model_weights)
+      let models = get_all_models(&mut mysql_connection, true)
           .await
           .map_err(|e| {
             error!("Error querying database: {:?}", e);

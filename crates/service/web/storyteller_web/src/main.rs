@@ -357,8 +357,6 @@ async fn main() -> AnyhowResult<()> {
     troll_ban_user_percent: easyenv::get_env_num("FF_TROLL_BANNED_USER_PERCENT", 0)?,
 
     // Temporary flags
-    enable_enqueue_generic_tts_job: easyenv::get_env_bool_or_default("FF_ENABLE_ENQUEUE_GENERIC_TTS_JOB", false),
-    switch_voice_conversion_to_model_weights: easyenv::get_env_bool_or_default("FF_SWITCH_VOICE_CONVERSION_TO_MODEL_WEIGHTS", false),
     switch_tts_to_model_weights: easyenv::get_env_bool_or_default("FF_SWITCH_TTS_TO_MODEL_WEIGHTS", false),
     force_session_studio_flags: easyenv::get_env_bool_or_default("FF_FORCE_SESSION_STUDIO_FLAG", false),
     force_session_video_style_transfer_flags: easyenv::get_env_bool_or_default("FF_FORCE_SESSION_VST_FLAG", false),
