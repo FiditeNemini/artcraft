@@ -32,9 +32,9 @@ export default function DropdownMenu({
 
   return (
     <a.div style={fadeIn} className={`fy-dropdown-menu ${className}`.trim()}>
-      {items.map(item => (
-        <>
-          {item.onClick ? (
+      {items.map(item => {
+         if(item.onClick){
+          return(
             <div
               key={item.id}
               onClick={e => {
@@ -53,27 +53,25 @@ export default function DropdownMenu({
                 {item.name}
               </span>
             </div>
-          ) : (
-            <>
-              {item.link && (
-                <Link
-                  key={item.id}
-                  to={item.link}
-                  className="fy-dropdown-item"
-                  onClick={() => onClose()}
-                >
-                  <span>
-                    {item.icon && (
-                      <FontAwesomeIcon icon={item.icon} className="me-2 fs-7" />
-                    )}
-                    {item.name}
-                  </span>
-                </Link>
+          );
+        } else if (item.link) {
+          return(
+            <Link
+            key={item.id}
+            to={item.link}
+            className="fy-dropdown-item"
+            onClick={() => onClose()}
+          >
+            <span>
+              {item.icon && (
+                <FontAwesomeIcon icon={item.icon} className="me-2 fs-7" />
               )}
-            </>
-          )}
-        </>
-      ))}
+              {item.name}
+            </span>
+          </Link>
+          );
+        }//end if
+      })} {/*end items map */}
     </a.div>
   );
 }
