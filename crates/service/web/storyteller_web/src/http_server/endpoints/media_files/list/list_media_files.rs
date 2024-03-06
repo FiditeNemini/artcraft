@@ -24,6 +24,7 @@ use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
+use crate::util::allowed_explore_media_access::allowed_explore_media_access;
 use crate::util::allowed_studio_access::allowed_studio_access;
 
 #[derive(Deserialize, ToSchema, IntoParams)]
@@ -136,8 +137,8 @@ pub async fn list_media_files_handler(
 
   // ==================== FEATURE FLAG CHECK ==================== //
 
-  if !allowed_studio_access(maybe_user_session.as_ref(), &server_state.flags) {
-    warn!("Storyteller Studio access is not permitted for user");
+  if !allowed_explore_media_access(maybe_user_session.as_ref()) {
+    warn!("Explore media access is not permitted for user");
     return Err(ListMediaFilesError::NotAuthorized);
   }
 

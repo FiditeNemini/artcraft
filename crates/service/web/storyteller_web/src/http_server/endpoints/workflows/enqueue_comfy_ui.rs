@@ -27,10 +27,10 @@ use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
-use crate::configs::plans::plan_category::{PlanCategory};
+use crate::configs::plans::plan_category::PlanCategory;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
-use crate::util::allowed_studio_access::allowed_studio_access;
+use crate::util::allowed_video_style_transfer_access::allowed_video_style_transfer_access;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Debug requests can get routed to special "debug-only" workers, which can
@@ -144,8 +144,8 @@ pub async fn enqueue_comfy_ui_handler(
 
     // ==================== FEATURE FLAG CHECK ==================== //
 
-    if !allowed_studio_access(maybe_user_session.as_ref(), &server_state.flags) {
-        warn!("Storyteller Studio access is not permitted for user");
+    if !allowed_video_style_transfer_access(maybe_user_session.as_ref(), &server_state.flags) {
+        warn!("Video style transfer access is not permitted for user");
         return Err(EnqueueComfyError::NotAuthorized);
     }
 

@@ -361,6 +361,7 @@ async fn main() -> AnyhowResult<()> {
     switch_voice_conversion_to_model_weights: easyenv::get_env_bool_or_default("FF_SWITCH_VOICE_CONVERSION_TO_MODEL_WEIGHTS", false),
     switch_tts_to_model_weights: easyenv::get_env_bool_or_default("FF_SWITCH_TTS_TO_MODEL_WEIGHTS", false),
     force_session_studio_flags: easyenv::get_env_bool_or_default("FF_FORCE_SESSION_STUDIO_FLAG", false),
+    force_session_video_style_transfer_flags: easyenv::get_env_bool_or_default("FF_FORCE_SESSION_VST_FLAG", false),
   };
 
   let third_party_url_redirector = ThirdPartyUrlRedirector::new(server_environment);

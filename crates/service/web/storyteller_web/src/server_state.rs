@@ -273,6 +273,11 @@ pub struct StaticFeatureFlags {
   /// TEMPORARY: Require users to have a studio flag on their `users` table record to use studio features.
   /// This will also prevent anonymous users from using the service APIs marked as studio-only.
   pub force_session_studio_flags: bool,
+
+  // TODO(2024-03-05): Remove when done.
+  /// TEMPORARY: Require users to have a flag on their `users` table record to use video style transfer.
+  /// This will also prevent anonymous users from using the service APIs marked as VST-only.
+  pub force_session_video_style_transfer_flags: bool,
 }
 
 /// Instead of top level service denial, these are bans against entities that instead return

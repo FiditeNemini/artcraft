@@ -1,4 +1,6 @@
+pub mod allowed_explore_media_access;
 pub mod allowed_studio_access;
+pub mod allowed_video_style_transfer_access;
 pub mod delete_role_disambiguation;
 pub mod encrypted_sort_id;
 pub mod placeholder_images;
