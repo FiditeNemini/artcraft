@@ -192,8 +192,12 @@ export default function TopNav({
     <div
       id="topbar-wrapper"
       className={`position-fixed ${
-        !loggedIn && isOnLandingPage && !isScrolled ? "topbar-bg-dark" : ""
-      }`}
+        domain.title !== "FakeYou"
+          ? "topbar-bg-transparent"
+          : !loggedIn && isOnLandingPage && !isScrolled
+            ? "topbar-bg-dark"
+            : ""
+      }`.trim()}
     >
       <div className="topbar-nav">
         <div className="topbar-nav-left">

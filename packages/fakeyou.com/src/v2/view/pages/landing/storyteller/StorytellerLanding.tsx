@@ -6,7 +6,6 @@ import {
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
-import FakeYouLandingHeader from "../fakeyou/FakeYouLandingHeader";
 
 interface StorytellerLandingProps {
   sessionWrapper: SessionWrapper;
