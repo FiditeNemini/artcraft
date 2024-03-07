@@ -17,6 +17,7 @@ use redis_common::redis_cache_keys::RedisCacheKeys;
 
 use crate::cookies::session::session_cookie_manager::SessionCookieManager;
 use crate::utils::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
+use crate::utils::user_session_feature_flags::UserSessionFeatureFlags;
 
 #[derive(Clone)]
 pub struct SessionChecker {
@@ -168,7 +169,6 @@ impl SessionChecker {
   }
 
 
-
   // ==================== UserSessionExtended ====================
 
   //#[deprecated = "Use the PoolConnection<MySql> method instead of the MySqlPool one."]
@@ -258,6 +258,9 @@ impl SessionChecker {
         can_ban_users: user_session.can_ban_users,
         can_delete_users: user_session.can_delete_users,
       },
+      feature_flags: UserSessionFeatureFlags {
+        maybe_feature_flags: user_session.maybe_feature_flags,
+      }
     }))
   }
 

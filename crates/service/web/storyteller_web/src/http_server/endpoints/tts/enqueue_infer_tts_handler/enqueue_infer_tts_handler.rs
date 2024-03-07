@@ -24,9 +24,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use migration::text_to_speech::get_tts_model_for_enqueue_inference_migration::TtsModelForEnqueueInferenceMigrationWrapper;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated};
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
-use mysql_queries::queries::tts::tts_inference_jobs::insert_tts_inference_job::TtsInferenceJobInsertBuilder;
 use redis_common::redis_keys::RedisKeys;
-use tokens::tokens::tts_inference_jobs::TtsInferenceJobToken;
 use tokens::tokens::users::UserToken;
 use tts_common::priority::{FAKEYOU_DEFAULT_VALID_API_TOKEN_PRIORITY_LEVEL, FAKEYOU_INVESTOR_PRIORITY_LEVEL};
 use user_input_common::check_for_slurs::contains_slurs;
@@ -54,10 +52,6 @@ const STORYTELLER_DEMO_COOKIE_NAME : &str = "storyteller_demo";
 ///    "routing tags" that is independent of this flag.)
 ///
 const DEBUG_HEADER_NAME : &str = "enable-debug-mode";
-
-/// Requests with this header can be forced onto the new jobs system.
-/// It'll be used to help test TT2 on the new system before it is rolled out for everyone.
-const NEW_JOB_SYSTEM_HEADER_NAME : &str = "new-job-system";
 
 /// The routing tag header can send workloads to particular k8s hosts.
 /// This is useful for catching the live logs or intercepting the job.
@@ -234,9 +228,6 @@ pub async fn enqueue_infer_tts_handler(
   let is_debug_request = get_request_header_optional(&http_request, DEBUG_HEADER_NAME)
       .is_some();
 
-  let use_new_job_system_for_request  = get_request_header_optional(&http_request, NEW_JOB_SYSTEM_HEADER_NAME)
-      .is_some();
-
   let maybe_routing_tag=
       get_request_header_optional(&http_request, ROUTING_TAG_HEADER_NAME)
           .map(|routing_tag| routing_tag.trim().to_string());
@@ -377,95 +368,55 @@ pub async fn enqueue_infer_tts_handler(
 
   // ==================== ENQUEUE APPROPRIATE TTS TYPE ==================== //
 
-  let use_new_job_system = use_new_job_system_for_request || server_state.flags.enable_enqueue_generic_tts_job;
-
-  let job_token;
-  let job_token_type;
-
   let model_type = InferenceModelType::Tacotron2;
 
   let max_duration_seconds = plan.tts_max_duration_seconds();
 
-  if use_new_job_system {
-    // This branch uses the `generic-inference-job` service and tables.
-    info!("Creating tts inference job record (new generic job system)...");
+  // This branch uses the `generic-inference-job` service and tables.
+  info!("Creating tts inference job record (new generic job system)...");
 
-    let maybe_creator_user_token_typed = maybe_user_token
-        .as_deref()
-        .map(|token| UserToken::new_from_str(token));
+  let maybe_creator_user_token_typed = maybe_user_token
+      .as_deref()
+      .map(|token| UserToken::new_from_str(token));
 
-    let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
+  let maybe_avt_token = server_state.avt_cookie_manager.get_avt_token_from_request(&http_request);
 
-    let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
-      uuid_idempotency_token: &request.uuid_idempotency_token,
-      job_type: InferenceJobType::Tacotron2,
-      inference_category: InferenceCategory::TextToSpeech,
-      maybe_model_type: Some(model_type),
-      maybe_model_token: Some(request.tts_model_token.as_str()),
-      maybe_input_source_token: None, // NB: TTS doesn't have input media
-      maybe_input_source_token_type: None, // NB: TTS doesn't have input media
-      maybe_download_url: None,
-      maybe_cover_image_media_file_token: None,
-      maybe_raw_inference_text: Some(inference_text.as_str()),
-      maybe_max_duration_seconds: Some(max_duration_seconds),
-      maybe_inference_args: Some(GenericInferenceArgs {
-        inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
-        args: None, // NB: We don't need to encode any args yet.
-      }),
-      maybe_creator_user_token: maybe_creator_user_token_typed.as_ref(),
-      maybe_avt_token: maybe_avt_token.as_ref(),
-      creator_ip_address: &ip_address,
-      creator_set_visibility: set_visibility,
-      priority_level,
-      requires_keepalive: false, // TODO: We may want this to be the case in the future.
-      is_debug_request,
-      maybe_routing_tag: maybe_routing_tag.as_deref(),
-      mysql_pool: &server_state.mysql_pool,
-    }).await;
+  let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
+    uuid_idempotency_token: &request.uuid_idempotency_token,
+    job_type: InferenceJobType::Tacotron2,
+    inference_category: InferenceCategory::TextToSpeech,
+    maybe_model_type: Some(model_type),
+    maybe_model_token: Some(request.tts_model_token.as_str()),
+    maybe_input_source_token: None, // NB: TTS doesn't have input media
+    maybe_input_source_token_type: None, // NB: TTS doesn't have input media
+    maybe_download_url: None,
+    maybe_cover_image_media_file_token: None,
+    maybe_raw_inference_text: Some(inference_text.as_str()),
+    maybe_max_duration_seconds: Some(max_duration_seconds),
+    maybe_inference_args: Some(GenericInferenceArgs {
+      inference_category: Some(InferenceCategoryAbbreviated::TextToSpeech),
+      args: None, // NB: We don't need to encode any args yet.
+    }),
+    maybe_creator_user_token: maybe_creator_user_token_typed.as_ref(),
+    maybe_avt_token: maybe_avt_token.as_ref(),
+    creator_ip_address: &ip_address,
+    creator_set_visibility: set_visibility,
+    priority_level,
+    requires_keepalive: false, // TODO: We may want this to be the case in the future.
+    is_debug_request,
+    maybe_routing_tag: maybe_routing_tag.as_deref(),
+    mysql_pool: &server_state.mysql_pool,
+  }).await;
 
-    let inference_job_token = match query_result {
-      Ok((inference_job_token, _id)) => inference_job_token,
-      Err(err) => {
-        warn!("New (generic) tts inference job creation DB error: {:?}", err);
-        return Err(InferTtsError::ServerError);
-      }
-    };
-
-    job_token = inference_job_token.to_string();
-    job_token_type = InferenceJobTokenType::Generic;
-
-  } else {
-    // This branch uses the `tts-inference-job` service and tables.
-    info!("Creating tts inference job record (legacy job system)...");
-
-    // This token is returned to the client.
-    job_token = TtsInferenceJobToken::generate().to_string();
-
-    let query_result = TtsInferenceJobInsertBuilder::new_for_fakeyou_request()
-        .set_job_token(&job_token)
-        .set_uuid_idempotency_token(&request.uuid_idempotency_token)
-        .set_model_token(&request.tts_model_token)
-        .set_raw_inference_text(&inference_text)
-        .set_maybe_creator_user_token(maybe_user_token.as_deref())
-        .set_creator_ip_address(&ip_address)
-        .set_creator_set_visibility(set_visibility.to_str())
-        .set_priority_level(priority_level)
-        .set_max_duration_seconds(max_duration_seconds)
-        .set_is_from_api(is_from_api)
-        .set_is_debug_request(is_debug_request)
-        .insert(&server_state.mysql_pool)
-        .await;
-
-    match query_result {
-      Ok(_) => {},
-      Err(err) => {
-        warn!("New tts inference job creation DB error: {:?}", err);
-        return Err(InferTtsError::ServerError);
-      }
+  let inference_job_token = match query_result {
+    Ok((inference_job_token, _id)) => inference_job_token,
+    Err(err) => {
+      warn!("New (generic) tts inference job creation DB error: {:?}", err);
+      return Err(InferTtsError::ServerError);
     }
+  };
 
-    job_token_type = InferenceJobTokenType::LegacyTts;
-  }
+  let job_token = inference_job_token.to_string();
 
   server_state.firehose_publisher.enqueue_tts_inference(maybe_user_token.as_deref(), &job_token, &request.tts_model_token)
       .await
@@ -476,8 +427,8 @@ pub async fn enqueue_infer_tts_handler(
 
   let response = InferTtsSuccessResponse {
     success: true,
-    inference_job_token: job_token.to_string(),
-    inference_job_token_type: job_token_type,
+    inference_job_token: job_token,
+    inference_job_token_type: InferenceJobTokenType::Generic,
   };
 
   let body = serde_json::to_string(&response)

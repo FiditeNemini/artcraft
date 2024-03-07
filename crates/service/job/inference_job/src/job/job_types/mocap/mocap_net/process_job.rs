@@ -1,4 +1,6 @@
-use std::fs::read_to_string;
+use std::fs::{File, read_to_string};
+use std::io::{BufReader, Read};
+use std::path::PathBuf;
 use std::time::Instant;
 
 use anyhow::anyhow;
@@ -14,6 +16,7 @@ use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Mc;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_mocapnet::{insert_media_file_from_mocapnet, InsertArgs};
+use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, Mp4Info};
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
@@ -53,6 +56,23 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
 
     let job_args = validate_job(job)?;
 
+    // ==================== JOB ARGS ==================== //
+
+    let maybe_args = job.maybe_inference_args
+        .as_ref()
+        .map(|args| args.args.as_ref())
+        .flatten();
+
+    let poly_args = match maybe_args {
+        None => return Err(ProcessSingleJobError::Other(anyhow!("Mocap args not found"))),
+        Some(args) => args,
+    };
+
+    let mc_args = match poly_args {
+        Mc(args) => args,
+        _ => return Err(ProcessSingleJobError::Other(anyhow!("Mocap args not found"))),
+    };
+
     // ==================== TEMP DIR ==================== //
 
     let work_temp_dir = format!("temp_mocapnet_inference_{}", job.id.0);
@@ -86,6 +106,22 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
 
     info!("Used video file: {:?}", usable_video_path);
 
+    // ==================== EXTRACT FILE METADATA (IF POSSIBLE) ==================== //
+
+    // TODO(bt): better check for video file type
+    let video_read_result = try_get_video_info(&video_path.filesystem_path);
+
+    let mut maybe_width = mc_args.maybe_size1.clone();
+    let mut maybe_height = mc_args.maybe_size2.clone();
+
+    // NB: Fail open. In the event this fails, we want to continue processing.
+    if let Some(video_info) = video_read_result {
+        info!("Read video info from file: {:?}", video_info);
+
+        maybe_width = Some(video_info.width as i32);
+        maybe_height = Some(video_info.height as i32);
+    }
+
     // ==================== SETUP FOR INFERENCE ==================== //
 
     info!("Ready for MocapNET inference...");
@@ -102,21 +138,6 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
 
     // TODO: Limit output length for non-premium (???)
 
-    let maybe_args = job.maybe_inference_args
-        .as_ref()
-        .map(|args| args.args.as_ref())
-        .flatten();
-
-    let poly_args = match maybe_args {
-        None => return Err(ProcessSingleJobError::Other(anyhow!("Mocap args not found"))),
-        Some(args) => args,
-    };
-
-    let mc_args = match poly_args {
-        Mc(args) => args,
-        _ => return Err(ProcessSingleJobError::Other(anyhow!("Mocap args not found"))),
-    };
-
     // ==================== RUN INFERENCE SCRIPT ==================== //
     let stderr_output_file = work_temp_dir.path().join("stderr.txt");
     let inference_start_time = Instant::now();
@@ -130,8 +151,8 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
             maybe_ik3: &mc_args.maybe_ik3,
             maybe_smoothing1: &mc_args.maybe_smoothing1,
             maybe_smoothing2: &mc_args.maybe_smoothing2,
-            maybe_size1: &mc_args.maybe_size1,
-            maybe_size2: &mc_args.maybe_size2,
+            maybe_size1: &maybe_width,
+            maybe_size2: &maybe_height,
             stderr_output_file: &stderr_output_file,
         });
 
@@ -254,4 +275,13 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
         }),
         inference_duration,
     })
+}
+
+// Fail open if this doesn't work
+fn try_get_video_info(video_filename: &PathBuf) -> Option<Mp4Info> {
+    let video_file = File::open(video_filename).ok()?;
+    let file_length = video_file.metadata().ok()?.len();
+    let reader = BufReader::new(video_file);
+    let info = get_mp4_info(reader, file_length).ok()?;
+    Some(info)
 }

@@ -340,7 +340,11 @@ async fn main() -> AnyhowResult<()> {
       .ok_or(anyhow!("invalid server environment"))?;
 
   let service_feature_flags = StaticFeatureFlags {
-    // Permanent (control plane / safety) flags
+    // Permanent (control plane / safety) flags : messaging
+    maybe_status_alert_category: easyenv::get_env_string_optional("FF_STATUS_ALERT_CATEGORY"),
+    maybe_status_alert_custom_message: easyenv::get_env_string_optional("FF_STATUS_ALERT_CUSTOM_MESSAGE"),
+
+    // Permanent (control plane / safety) flags : disabling features
     global_429_pushback_filter_enabled: easyenv::get_env_bool_or_default("FF_GLOBAL_429_PUSHBACK_FILTER_ENABLED", false),
     disable_unified_queue_stats_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_QUEUE_STATS_ENDPOINT", false),
     disable_inference_queue_length_endpoint: easyenv::get_env_bool_or_default("FF_DISABLE_INFERENCE_QUEUE_LENGTH_ENDPOINT", false),
@@ -357,10 +361,9 @@ async fn main() -> AnyhowResult<()> {
     troll_ban_user_percent: easyenv::get_env_num("FF_TROLL_BANNED_USER_PERCENT", 0)?,
 
     // Temporary flags
-    enable_enqueue_generic_tts_job: easyenv::get_env_bool_or_default("FF_ENABLE_ENQUEUE_GENERIC_TTS_JOB", false),
-    switch_voice_conversion_to_model_weights: easyenv::get_env_bool_or_default("FF_SWITCH_VOICE_CONVERSION_TO_MODEL_WEIGHTS", false),
     switch_tts_to_model_weights: easyenv::get_env_bool_or_default("FF_SWITCH_TTS_TO_MODEL_WEIGHTS", false),
     force_session_studio_flags: easyenv::get_env_bool_or_default("FF_FORCE_SESSION_STUDIO_FLAG", false),
+    force_session_video_style_transfer_flags: easyenv::get_env_bool_or_default("FF_FORCE_SESSION_VST_FLAG", false),
   };
 
   let third_party_url_redirector = ThirdPartyUrlRedirector::new(server_environment);

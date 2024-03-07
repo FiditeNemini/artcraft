@@ -2,6 +2,8 @@ use chrono::{DateTime, Utc};
 
 use enums::common::visibility::Visibility;
 
+use crate::utils::user_session_feature_flags::UserSessionFeatureFlags;
+
 #[derive(Clone, Default)]
 pub struct UserSessionExtended {
     pub user_token: String,
@@ -9,6 +11,7 @@ pub struct UserSessionExtended {
     pub premium: UserSessionPremiumPlanInfo,
     pub preferences: UserSessionPreferences,
     pub role: UserSessionRoleAndPermissions,
+    pub feature_flags: UserSessionFeatureFlags,
 }
 
 #[derive(Clone, Default)]
@@ -96,3 +99,4 @@ pub struct UserSessionRoleAndPermissions {
     pub can_ban_users: bool,
     pub can_delete_users: bool,
 }
+

@@ -3,6 +3,7 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::collections::HashSet;
 use std::fmt;
 
 use actix_web::{HttpRequest, HttpResponse, web};
@@ -12,11 +13,13 @@ use log::warn;
 use sqlx::MySqlPool;
 use utoipa::ToSchema;
 
+use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 
 use crate::common_responses::user_details_lite::UserDetailsLight;
 use crate::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
 use crate::utils::session_checker::SessionChecker;
+use crate::utils::user_session_feature_flags::UserSessionFeatureFlags;
 
 #[derive(Serialize, Copy, Clone, ToSchema)]
 #[serde(rename_all = "snake_case")]
@@ -47,6 +50,7 @@ pub struct SessionUserInfo {
 
   // Feature / rollout flags:
   pub can_access_studio: bool,
+  pub maybe_feature_flags: HashSet<UserFeatureFlag>,
 
   // Premium plans:
   pub fakeyou_plan: FakeYouPlan,
@@ -149,6 +153,9 @@ pub async fn session_info_handler(
   match maybe_user_session {
     None => {}
     Some(session_data) => {
+      let feature_flags =
+          UserSessionFeatureFlags::new(session_data.maybe_feature_flags.as_deref());
+
       if !session_data.is_banned {
         // NB: Banned users can't be logged in
         logged_in = true;
@@ -166,6 +173,7 @@ pub async fn session_info_handler(
 
           // Rollout / feature flags:
           can_access_studio: session_data.can_access_studio,
+          maybe_feature_flags: feature_flags.get_flags(),
 
           // Premium plans:
           fakeyou_plan: FakeYouPlan::Free,

@@ -39,6 +39,9 @@ pub struct SessionUserRecord {
 
   // ===== FEATURE FLAGS ===== //
 
+  // Optional comma-separated list of parseable `UserFeatureFlag` enum features
+  pub maybe_feature_flags: Option<String>,
+
   pub can_access_studio: bool,
 
   // ===== ROLE ===== //
@@ -121,6 +124,7 @@ SELECT
     users.is_banned,
 
     users.can_access_studio,
+    users.maybe_feature_flags,
 
     user_roles.can_use_tts,
     user_roles.can_use_w2l,
@@ -183,6 +187,7 @@ WHERE user_sessions.token = ?
         is_banned: i8_to_bool(raw_user_record.is_banned),
 
         can_access_studio: i8_to_bool(raw_user_record.can_access_studio),
+        maybe_feature_flags: raw_user_record.maybe_feature_flags,
 
         // Usage
         can_use_tts: nullable_i8_to_bool_default_false(raw_user_record.can_use_tts),
@@ -249,6 +254,8 @@ struct SessionUserRawDbRecord {
 
   // Feature / Rollout Flags
   can_access_studio: i8,
+
+  maybe_feature_flags: Option<String>,
 
   // NB: These are `Option` due to the JOIN not being compile-time assured.
   // Usage

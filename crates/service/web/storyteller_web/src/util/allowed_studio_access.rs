@@ -1,5 +1,7 @@
+use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token::SessionUserRecord;
 use users_component::utils::user_session_extended::UserSessionExtended;
+use users_component::utils::user_session_feature_flags::UserSessionFeatureFlags;
 
 use crate::server_state::StaticFeatureFlags;
 
@@ -20,24 +22,44 @@ pub trait UserSessionStudioFlag {
 
 impl UserSessionStudioFlag for UserSessionExtended {
   fn can_access_studio(&self) -> bool {
-    self.role.can_access_studio
+    self.role.can_access_studio || self.feature_flags.has_permission_unoptimized(UserFeatureFlag::Studio)
   }
 }
 
 impl UserSessionStudioFlag for &UserSessionExtended {
   fn can_access_studio(&self) -> bool {
-    self.role.can_access_studio
+    self.role.can_access_studio || self.feature_flags.has_permission_unoptimized(UserFeatureFlag::Studio)
   }
 }
 
 impl UserSessionStudioFlag for SessionUserRecord {
   fn can_access_studio(&self) -> bool {
-    self.can_access_studio
+    if self.can_access_studio {
+      return true
+    }
+
+    // TODO(bt, 2024-03-05): this is horrible.
+    //  There should be a wrapper class between the query and the caller.
+    let flags = UserSessionFeatureFlags {
+      maybe_feature_flags: self.maybe_feature_flags.clone(),
+    };
+
+    flags.has_permission_unoptimized(UserFeatureFlag::Studio)
   }
 }
 
 impl UserSessionStudioFlag for &SessionUserRecord {
   fn can_access_studio(&self) -> bool {
-    self.can_access_studio
+    if self.can_access_studio {
+      return true
+    }
+
+    // TODO(bt, 2024-03-05): this is horrible.
+    //  There should be a wrapper class between the query and the caller.
+    let flags = UserSessionFeatureFlags {
+      maybe_feature_flags: self.maybe_feature_flags.clone(),
+    };
+
+    flags.has_permission_unoptimized(UserFeatureFlag::Studio)
   }
 }
