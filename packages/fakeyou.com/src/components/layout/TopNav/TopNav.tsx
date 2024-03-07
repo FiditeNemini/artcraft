@@ -45,16 +45,16 @@ export default function TopNav({
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
   // const { t } = useLocalize("TopNav");
   const isOnLandingPage = window.location.pathname === "/";
-  const isOnLoginOrSignUpPage = window.location.pathname.includes(
-    "/login" || "/signup"
-  );
+  const isOnLoginPage = window.location.pathname.includes("/login");
+  const isOnSignUpPage = window.location.pathname.includes("/signup");
   const isOnStudioPage = window.location.pathname.includes("/studio");
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
   const [isScrolled, setIsScrolled] = useState(false);
   const loggedIn = sessionWrapper.isLoggedIn();
-  const showNavItem = !loggedIn && (isOnLandingPage || isOnLoginOrSignUpPage);
+  const showNavItem =
+    !loggedIn && (isOnLandingPage || isOnLoginPage || isOnSignUpPage);
 
   const handleMenuButtonClick = () => {
     if (window.innerWidth < 1200) {
@@ -95,8 +95,15 @@ export default function TopNav({
   };
 
   useEffect(() => {
+    const topBarWrapper = document.getElementById("topbar-wrapper");
+
     const handleMenuToggle = (event: any) => {
       setMenuButtonIcon(event.detail.isOpen ? faXmark : faBars);
+      if (event.detail.isOpen) {
+        topBarWrapper?.classList.remove("topbar-wrapper-transparent");
+      } else {
+        topBarWrapper?.classList.add("topbar-wrapper-transparent");
+      }
     };
 
     window.addEventListener("menuToggle", handleMenuToggle);
@@ -185,8 +192,12 @@ export default function TopNav({
     <div
       id="topbar-wrapper"
       className={`position-fixed ${
-        !loggedIn && isOnLandingPage && !isScrolled ? "topbar-bg-dark" : ""
-      }`}
+        domain.title !== "FakeYou"
+          ? "topbar-bg-transparent"
+          : !loggedIn && isOnLandingPage && !isScrolled
+            ? "topbar-bg-dark"
+            : ""
+      }`.trim()}
     >
       <div className="topbar-nav">
         <div className="topbar-nav-left">
@@ -230,11 +241,18 @@ export default function TopNav({
         <div className="topbar-nav-center">
           {/* Search Bar */}
           <div className="d-none d-lg-block">
-            {(!isOnLandingPage && !isOnLoginOrSignUpPage && !isOnStudioPage) ||
-            (loggedIn && !isOnLoginOrSignUpPage && !isOnStudioPage) ||
+            {(!isOnLandingPage &&
+              !isOnLoginPage &&
+              !isOnSignUpPage &&
+              !isOnStudioPage) ||
+            (loggedIn &&
+              !isOnLoginPage &&
+              !isOnSignUpPage &&
+              !isOnStudioPage) ||
             (isOnLandingPage &&
               isScrolled &&
-              !isOnLoginOrSignUpPage &&
+              !isOnLoginPage &&
+              !isOnSignUpPage &&
               !isOnStudioPage) ? (
               <SearchBar
                 onFocus={onFocusHandler}

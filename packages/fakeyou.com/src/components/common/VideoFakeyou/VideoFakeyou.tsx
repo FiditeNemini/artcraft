@@ -43,7 +43,7 @@ const VideoFakeyou = memo(forwardRef<Ref, VideoFakeyouProps>(({
   onResponse,
   ...rest
 }: VideoFakeyouProps, ref) => {
-  console.log(`Video Player rerender: ${mediaToken}`);
+  //console.log(`Video Player rerender: ${mediaToken}`);
 
   const [mediaFile, setMediaFile] = useState<MediaFileType|null>(null);
   useEffect(()=>{

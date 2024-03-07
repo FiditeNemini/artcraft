@@ -74,7 +74,7 @@ export default memo(function VideoQuickTrim({
 
 
   const videoRefCallback = useCallback(node => {
-    console.log("videoRefCallback");
+    //console.log("videoRefCallback");
     if (node !== null) { 
       // DOM node referenced by ref has changed and exists
       videoRef.current = node;
@@ -233,7 +233,7 @@ export default memo(function VideoQuickTrim({
             trimDuration={trimDuration}
             duration={maxDuration}
             onChange={(val: QuickTrimData)=>{
-              console.log(val);
+              //console.log(val);
               setTrimState((curr)=>({
                 ...curr,
                 trimStart: val.trimStartSeconds,

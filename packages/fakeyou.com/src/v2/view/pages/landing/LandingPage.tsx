@@ -10,6 +10,7 @@ import Dashboard from "./Dashboard";
 import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 import { useDomainConfig } from "context/DomainConfigContext";
 import StorytellerLanding from "./storyteller/StorytellerLanding";
+import LandingVideoReel from "./components/LandingVideoReel";
 import {
   FrontendInferenceJobType,
   InferenceJob,
@@ -39,6 +40,7 @@ function LandingPage(props: Props) {
 
   return (
     <>
+      {domain.title === "Storyteller AI" && !isLoggedIn && <LandingVideoReel />}
       <Container type="panel">
         {domain.title === "FakeYou" ? (
           <>
@@ -63,7 +65,15 @@ function LandingPage(props: Props) {
           <>
             {/* STORYTELLER,AI */}
             {!isLoggedIn ? (
-              <StorytellerLanding />
+              <StorytellerLanding
+                sessionWrapper={props.sessionWrapper}
+                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+                inferenceJobs={props.inferenceJobs}
+                ttsInferenceJobs={props.ttsInferenceJobs}
+                enqueueInferenceJob={props.enqueueInferenceJob}
+                inferenceJobsByCategory={props.inferenceJobsByCategory}
+                enqueueTtsJob={props.enqueueTtsJob}
+              />
             ) : (
               <Dashboard sessionWrapper={props.sessionWrapper} />
             )}

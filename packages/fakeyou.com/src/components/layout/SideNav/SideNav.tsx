@@ -53,9 +53,8 @@ export default function SideNav({
   const isMenuOpen = wrapper?.classList.contains("toggled");
   const isLoggedIn = sessionWrapper.isLoggedIn();
   const isOnLandingPage = window.location.pathname === "/";
-  const isOnLoginOrSignUpPage = window.location.pathname.includes(
-    "/login" || "/signup"
-  );
+  const isOnLoginPage = window.location.pathname.includes("/login");
+  const isOnSignUpPage = window.location.pathname.includes("/signup");
   const isOnStudioPage = window.location.pathname.includes("/studio");
 
   let history = useHistory();
@@ -107,7 +106,7 @@ export default function SideNav({
   }, []);
 
   const shouldNotShowSidebar =
-    (!isLoggedIn && (isOnLandingPage || isOnLoginOrSignUpPage)) ||
+    (!isLoggedIn && (isOnLandingPage || isOnLoginPage || isOnSignUpPage)) ||
     isOnStudioPage;
   const shouldShowSidebar = windowWidth >= 992 && !shouldNotShowSidebar;
   const sidebarClassName = `sidebar ${

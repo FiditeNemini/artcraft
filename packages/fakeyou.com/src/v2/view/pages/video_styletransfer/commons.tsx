@@ -11,9 +11,11 @@ export const inferenceFailures = (fail = "") => {
 
 export function TableOfKeyValues(
 {
+  title,
   keyValues,
   height
 }:{
+  title: string;
   keyValues:{
     [key:string]:number|string|boolean|undefined
   };
@@ -24,11 +26,11 @@ export function TableOfKeyValues(
     height: height || "100%",
     overflowY: "scroll",
     overflowX: "clip",
-    border: "1px solid white",
-    borderTopLeftRadius: "1rem",
-    borderBottomLeftRadius: "1rem",
+    // border: "1px solid white",
+    // borderTopLeftRadius: "1rem",
+    // borderBottomLeftRadius: "1rem",
   }}><tbody>
-    <tr><th>Debug of a certain Key-Values set</th></tr>
+    <tr><th>{title}</th></tr>
     {
       Object.entries(keyValues).map(([key, val], index: number)=>{
         return <tr key={index}><td>{`${key}`}</td><td>{`${val}`}</td></tr>
