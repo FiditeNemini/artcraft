@@ -44,6 +44,7 @@ use crate::http_server::endpoints::media_files::upload::upload_media_file_handle
 use crate::http_server::endpoints::media_files::upload_video::upload_error::VideoMediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload_video::upload_video_media_file_handler::*;
 use crate::http_server::endpoints::prompts::get_prompt::*;
+use crate::http_server::endpoints::service::status_alert_handler::*;
 use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::*;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::*;
 use crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::*;
@@ -79,6 +80,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::upload::upload_media_file_handler::upload_media_file_handler,
     crate::http_server::endpoints::media_files::upload_video::upload_video_media_file_handler::upload_video_media_file_handler,
     crate::http_server::endpoints::prompts::get_prompt::get_prompt_handler,
+    crate::http_server::endpoints::service::status_alert_handler::status_alert_handler,
     crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler,
     crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler,
     crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::delete_user_bookmark_handler,
@@ -233,10 +235,12 @@ use crate::http_server::web_utils::response_success_helpers::*;
     SetUserRatingError,
     SetUserRatingRequest,
     SetUserRatingResponse,
+    StatusAlertCategory,
+    StatusAlertError,
+    StatusAlertInfo,
+    StatusAlertResponse,
     StatusDetailsResponse,
     StorytellerStreamPlan,
-    VideoMediaFileUploadError,
-    UploadVideoMediaSuccessResponse,
     TerminateInferenceJobError,
     TerminateInferenceJobPathInfo,
     TerminateInferenceJobSuccessResponse,
@@ -244,6 +248,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     UpdateWeightPathInfo,
     UpdateWeightRequest,
     UploadMediaSuccessResponse,
+    UploadVideoMediaSuccessResponse,
     UserBookmarkDetailsForUserList,
     UserBookmarkEntityType,
     UserBookmarkForEntityListItem,
@@ -253,6 +258,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     UserProfileUserBadge,
     UserRatingEntityType,
     UserRatingValue,
+    VideoMediaFileUploadError,
     Weight,
     WeightsData,
     ZsDatasetRecord,

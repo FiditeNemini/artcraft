@@ -85,6 +85,7 @@ use crate::http_server::endpoints::moderation::users::list_users::list_users_han
 use crate::http_server::endpoints::prompts::get_prompt::get_prompt_handler;
 use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
 use crate::http_server::endpoints::service::public_info_handler::get_public_info_handler;
+use crate::http_server::endpoints::service::status_alert_handler::status_alert_handler;
 use crate::http_server::endpoints::stats::get_unified_queue_stats::get_unified_queue_stats_handler;
 use crate::http_server::endpoints::stubs::app_model_downloads::get_app_model_downloads_handler;
 use crate::http_server::endpoints::stubs::app_news::get_app_news_handler;
@@ -270,6 +271,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
       .into_app();
 
   // =================== BVH from Workflow ====================
+
   let mut app = RouteBuilder::from_app(app)
     .add_post("/v1/conversion/enqueue_bvh_to_workflow", enqueue_bvh_to_workflow_handler)
     .into_app();
@@ -278,6 +280,12 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
 
   let mut app = RouteBuilder::from_app(app)
       .add_get("/v1/stats/queues", get_unified_queue_stats_handler)
+      .into_app();
+
+  // ==================== Service Status ====================
+
+  let mut app = RouteBuilder::from_app(app)
+      .add_get("/v1/status_alert_check", status_alert_handler)
       .into_app();
 
   // ==================== COMPONENTS ====================
