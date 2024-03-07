@@ -51,12 +51,14 @@ SET
     can_access_studio = false,
     maybe_feature_flags = 'video_style_transfer'
 WHERE username IN (
+    'fuxta',
     'kenjoplays',
     'ofccccccc',
     'sonicgt2',
     'stewiegroffin',
     'tanooki426',
     'wawoul',
+    'waynut',
     'zzz_last_item'
 );
 
