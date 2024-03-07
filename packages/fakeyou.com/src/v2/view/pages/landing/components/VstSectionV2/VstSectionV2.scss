@@ -120,10 +120,14 @@
       .vst-carousel-panel {
         border: lighten($panel, 15%) solid 2px;
       }
+
+      &:hover {
+        opacity: 0.75;
+      }
     }
 
     .swiper-slide-thumb-active {
-      opacity: 1;
+      opacity: 1 !important;
 
       .vst-carousel-panel {
         border: $primary solid 2px;
