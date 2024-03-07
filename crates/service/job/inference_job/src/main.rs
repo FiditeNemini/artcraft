@@ -237,7 +237,7 @@ async fn main() -> AnyhowResult<()> {
 
   let meter = opentelemetry::global::meter("inference-job");
 
-  let job_specific_dependencies = JobSpecificDependencies::setup_for_jobs(&scoped_execution)?;
+  let job_specific_dependencies = JobSpecificDependencies::setup_for_jobs(&scoped_execution).await?;
 
   let scoped_tempdir_for_downloads = ScopedTempDirCreator::for_directory(
     easyenv::get_env_pathbuf_or_default(

@@ -46,6 +46,8 @@ pub struct ComfyInferenceCommand {
 
     pub(crate) comfy_setup_script: PathBuf,
 
+    pub(crate) comfy_launch_command: PathBuf,
+
     /// Config file to use
     config_path: Option<PathBuf>,
 
@@ -100,6 +102,9 @@ impl ComfyInferenceCommand {
         let comfy_setup_script = easyenv::get_env_pathbuf_required(
             "COMFY_SETUP_SCRIPT")?;
 
+        let comfy_launch_command = easyenv::get_env_pathbuf_required(
+            "COMFY_LAUNCH_COMMAND")?;
+
         let maybe_virtual_env_activation_command = easyenv::get_env_string_optional(
             "COMFY_INFERENCE_MAYBE_VENV_COMMAND");
 
@@ -130,6 +135,7 @@ impl ComfyInferenceCommand {
             mounts_directory,
             processing_script,
             comfy_setup_script,
+            comfy_launch_command,
             maybe_virtual_env_activation_command,
             maybe_docker_options,
             maybe_execution_timeout,

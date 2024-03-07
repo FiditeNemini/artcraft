@@ -1,6 +1,10 @@
 use std::path::PathBuf;
-use std::process::Command;
+use tokio::process::Command;
+use std::time::{Duration, Instant};
+use actix_web::http::StatusCode;
 use errors::AnyhowResult;
+use reqwest::blocking::Client;
+use tokio::time::sleep;
 
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::ComfyInferenceCommand;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
@@ -12,24 +16,56 @@ pub struct ComfyDependencies {
 }
 
 impl ComfyDependencies {
-    pub fn setup() -> AnyhowResult<Self> {
-        // run the setup scripts for the comfy dependencies
+    pub async fn setup() -> AnyhowResult<Self> {
         let inference_command = ComfyInferenceCommand::from_env()?;
-        // check to see if the flag file exists
-        if PathBuf::from("comfy_setup_complete").exists() {
-            println!("Comfy setup already complete");
-        } else {
-            // if the flag file does not exist, run the setup script
-            // run setup script
-            let comfy_setup_script = inference_command.clone().comfy_setup_script;
-                let output = Command::new("python3")
-                    .arg(comfy_setup_script)
-                    .output()
-                    .expect("failed to run comfyui setup script");
-                println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-             }
+        let comfy_setup_script = inference_command.clone().comfy_setup_script;
+        let output = Command::new("python3")
+            .arg(&comfy_setup_script)
+            .output()
+            .await.expect("failed to run comfyui setup script");
+        println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+
+        // Start the comfy start script as a daemon process
+        let launch_command = format!(
+            "cd {} && {}",
+            inference_command.clone().comfy_root_code_directory.display(),
+            inference_command.clone().comfy_launch_command.display()
+        );
+
+        let _ = Command::new("sh")
+            .arg("-c")
+            .arg(&launch_command)
+            .stdout(std::process::Stdio::inherit())  // Inherit the stdout to stream the output
+            .spawn()
+            .expect("failed to start comfy start script");
+
+        let mut success = false;
+
+        let client = reqwest::Client::new();
+        let start = Instant::now();
+        let timeout = Duration::from_secs(60);
+        while Instant::now().duration_since(start) < timeout {
+            let response = client.get("http://127.0.0.1:8188/prompt").send().await;
+            match response {
+                Ok(r) if r.status() == StatusCode::OK => {
+                    println!("Received 200 response from http://127.0.0.1:8188/prompt");
+                    success = true;
+                    break;
+                },
+                _ => {
+                    println!("Did not receive 200 response, retrying...");
+                    sleep(Duration::from_secs(5)).await;
+                }
+            }
+        }
+
+        if !success {
+            println!("Timeout reached without receiving a 200 response.");
+            panic!("Comfy start failed");
+        }
+
         Ok(Self {
-            inference_command: inference_command,
+            inference_command,
             dependency_tokens: RequiredModels::init(),
             ffmpeg_watermark_command: FfmpegLogoWatermarkCommand::from_env()?,
         })

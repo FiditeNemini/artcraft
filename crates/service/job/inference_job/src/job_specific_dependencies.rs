@@ -34,7 +34,7 @@ pub struct JobSpecificDependencies {
 
 impl JobSpecificDependencies {
 
-  pub fn setup_for_jobs(scoped_execution: &ScopedExecution) -> AnyhowResult<Self> {
+  pub async fn setup_for_jobs(scoped_execution: &ScopedExecution) -> AnyhowResult<Self> {
     let mut maybe_rvc_v2_dependencies = None;
     let mut maybe_sad_talker_dependencies = None;
     let mut maybe_svc_dependencies = None;
@@ -101,7 +101,7 @@ impl JobSpecificDependencies {
 
     if scoped_execution.can_run_job(InferenceModelType::ComfyUi) {
       print_with_space("Setting ComfyUI dependencies...");
-      maybe_comfy_ui_dependencies = Some(ComfyDependencies::setup()?);
+      maybe_comfy_ui_dependencies = Some(ComfyDependencies::setup().await?);
     }
 
     if scoped_execution.can_run_job(InferenceModelType::ConvertFbxToGltf) {
