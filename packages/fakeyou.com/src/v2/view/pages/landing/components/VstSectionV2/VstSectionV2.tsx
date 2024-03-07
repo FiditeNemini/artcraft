@@ -78,26 +78,26 @@ export default function VstSectionV2(props: VstSectionV2Props) {
       ],
     },
     {
-      src: "videos/face-animator-instruction-en.mp4",
+      src: "/videos/landing/vst/2-original.mp4",
       styledVideos: [
         {
-          src: "videos/face-animator-instruction-en.mp4",
-          label: "Anime",
+          src: "/videos/landing/vst/2-2d_flat_anime.mp4",
+          label: "2D Flat Anime",
           ctaLink: "/video-styletransfer",
         },
         {
-          src: "videos/face-animator-instruction-en.mp4",
-          label: "Pixel",
+          src: "/videos/landing/vst/2-pop_art.mp4",
+          label: "Pop Art",
           ctaLink: "/video-styletransfer",
         },
         {
-          src: "videos/face-animator-instruction-en.mp4",
-          label: "Ink",
+          src: "/videos/landing/vst/2-ink_splash.mp4",
+          label: "Ink Splash",
           ctaLink: "/video-styletransfer",
         },
         {
-          src: "videos/face-animator-instruction-en.mp4",
-          label: "Painting",
+          src: "/videos/landing/vst/2-origami.mp4",
+          label: "Origami",
           ctaLink: "/video-styletransfer",
         },
       ],
