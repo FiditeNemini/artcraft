@@ -1,24 +1,50 @@
-import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
-import {
-  faArrowRight,
-  faCompass,
-  faMessageDots,
-  faWaveformLines,
-} from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Container, Input, Panel, Select } from "components/common";
-import { useLocalize } from "hooks";
 import React from "react";
-import { Link } from "react-router-dom";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
+import {
+  FrontendInferenceJobType,
+  InferenceJob,
+} from "@storyteller/components/src/jobs/InferenceJob";
+import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
+import FakeYouLandingHeader from "../fakeyou/FakeYouLandingHeader";
 
-interface StorytellerLandingProps {}
+interface StorytellerLandingProps {
+  sessionWrapper: SessionWrapper;
+  sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
+  inferenceJobs: Array<InferenceJob>;
+  ttsInferenceJobs: Array<TtsInferenceJob>;
+  enqueueInferenceJob: (
+    jobToken: string,
+    frontendInferenceJobType: FrontendInferenceJobType
+  ) => void;
+  inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
+  enqueueTtsJob: (jobToken: string) => void;
+}
 
-export default function StorytellerLanding(props: StorytellerLandingProps) {
-  const { t } = useLocalize("LandingPage");
+export default function StorytellerLanding({
+  sessionWrapper,
+  sessionSubscriptionsWrapper,
+  inferenceJobs,
+  ttsInferenceJobs,
+  enqueueInferenceJob,
+  inferenceJobsByCategory,
+  enqueueTtsJob,
+}: StorytellerLandingProps) {
+  // const { t } = useLocalize("LandingPage");
 
   return (
     <>
-      <Container type="panel" className="py-5">
+      <FakeYouLandingHeader
+        sessionWrapper={sessionWrapper}
+        sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+        inferenceJobs={inferenceJobs}
+        ttsInferenceJobs={ttsInferenceJobs}
+        enqueueInferenceJob={enqueueInferenceJob}
+        inferenceJobsByCategory={inferenceJobsByCategory}
+        enqueueTtsJob={enqueueTtsJob}
+      />
+
+      {/* <Container type="panel" className="py-5">
         <Panel clear={true} className="py-lg-5">
           <div className="row g-5 g-lg-5 flex-row-reverse">
             <div className="col-12 col-md-6">
@@ -65,9 +91,9 @@ export default function StorytellerLanding(props: StorytellerLandingProps) {
             </div>
           </div>
         </Panel>
-      </Container>
+      </Container> */}
 
-      <div className="panel rounded-0 py-5 my-5">
+      {/* <div className="panel rounded-0 py-5 my-5">
         <Container type="panel" className="py-lg-5">
           <Panel clear={true}>
             <div className="d-flex flex-column align-items-center rounded-0 mt-lg-4 pt-lg-4">
@@ -184,9 +210,9 @@ export default function StorytellerLanding(props: StorytellerLandingProps) {
             </div>
           </Panel>
         </Container>
-      </div>
+      </div> */}
 
-      <Container type="panel" className="pt-5 my-5">
+      {/* <Container type="panel" className="pt-5 my-5">
         <Panel padding={true}>
           <div className="d-flex flex-column align-items-center py-5">
             <h2 className="fw-bold mb-2">{t("communityTitle")}</h2>
@@ -218,7 +244,7 @@ export default function StorytellerLanding(props: StorytellerLandingProps) {
             className="dots-left-bottom me-3"
           />
         </Panel>
-      </Container>
+      </Container> */}
     </>
   );
 }

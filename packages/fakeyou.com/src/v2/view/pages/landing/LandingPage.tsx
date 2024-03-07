@@ -63,7 +63,15 @@ function LandingPage(props: Props) {
           <>
             {/* STORYTELLER,AI */}
             {!isLoggedIn ? (
-              <StorytellerLanding />
+              <StorytellerLanding
+                sessionWrapper={props.sessionWrapper}
+                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+                inferenceJobs={props.inferenceJobs}
+                ttsInferenceJobs={props.ttsInferenceJobs}
+                enqueueInferenceJob={props.enqueueInferenceJob}
+                inferenceJobsByCategory={props.inferenceJobsByCategory}
+                enqueueTtsJob={props.enqueueTtsJob}
+              />
             ) : (
               <Dashboard sessionWrapper={props.sessionWrapper} />
             )}
