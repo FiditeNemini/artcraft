@@ -75,7 +75,7 @@ export default function VstSectionV1(props: VstSectionV1Props) {
         </div>
       </div>
 
-      <div className="row g-4">
+      <div className="row g-3 g-lg-4">
         {columns.map((column, index) => (
           <div className={`col-6 col-lg-3 column-${index + 1}`} key={index}>
             <div className="vst-sbs-panel">
