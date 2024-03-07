@@ -1,7 +1,7 @@
 import React from "react"; // useState
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-// import { TempSelect } from "components/common";
+// import { TempSelect as Select } from "components/common";
 // import { enumToKeyArr } from "resources";
 import ModalHeader from "../ModalHeader";
 import { useLocalize } from "hooks";
@@ -9,11 +9,14 @@ import { useLocalize } from "hooks";
 interface Props {
   handleClose?: any;
   jobType?: FrontendInferenceJobType;
+  showModalHeader?: boolean;
 }
 
 export default function InferenceJobsModal({
   handleClose,
   jobType: inJobType = -1,
+  showModalHeader = true,
+  ...rest
 }: Props) {
   // const presetFilter = enumToKeyArr(FrontendInferenceJobType)[inJobType];
   // const [jobType,jobTypeSet] = useState(inJobType > -1 ? presetFilter : "All");
@@ -36,9 +39,9 @@ export default function InferenceJobsModal({
 
   return (
     <>
-      <ModalHeader {...{ handleClose, title: t("core.jobsTitle") }} />
+      { showModalHeader && <ModalHeader {...{ handleClose, title: t("core.jobsTitle") }} /> }
       {
-        // <TempSelect {...{ onChange: ({ target }: { target: any }) => jobTypeSet(target.value), options, value: jobType }} />
+        // <Select {...{ onChange: ({ target }: { target: any }) => jobTypeSet(target.value), options, value: jobType }} />
       }
       <InferenceJobsList
         {...{
@@ -49,7 +52,10 @@ export default function InferenceJobsModal({
           value: 0, // fixed for now
           // value: typeObj.indexOf(jobType),
           showHeader: false,
+          showJobQueue: true,
+          showNoJobs: true,
           panel: false,
+          ...rest
         }}
       />
     </>

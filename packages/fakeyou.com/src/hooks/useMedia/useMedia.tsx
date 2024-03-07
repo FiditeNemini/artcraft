@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { GetMedia, MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import { GetPrompts, Prompt } from "@storyteller/components/src/api/prompts/GetPrompts";
 import { DeleteMedia } from "@storyteller/components/src/api/media_files/DeleteMedia";
 import { FetchStatus } from "@storyteller/components/src/api/_common/SharedFetchTypes";
 import {usePrevious} from "hooks";
@@ -12,6 +13,7 @@ export default function useMedia({
   const [status, statusSet] = useState(FetchStatus.ready);
   const [writeStatus, writeStatusSet] = useState(FetchStatus.paused);
   const [media,mediaSet] = useState<MediaFile | undefined>();
+  const [prompt, promptSet] = useState<Prompt | undefined>();
   const remove = (as_mod: boolean) => {
     writeStatusSet(FetchStatus.in_progress);
     DeleteMedia(mediaToken, {
@@ -37,6 +39,14 @@ export default function useMedia({
           statusSet(FetchStatus.success);
           onSuccess(res.media_file);
           mediaSet(res.media_file);
+          if (res.media_file.maybe_prompt_token) {
+            GetPrompts(res.media_file.maybe_prompt_token,{})
+            .then((promptRes) => {
+              if (promptRes.prompt) {
+                promptSet(promptRes.prompt);
+              }
+            });
+          }
         }
       })
       .catch((err) => {
@@ -49,7 +59,7 @@ export default function useMedia({
       statusSet(FetchStatus.ready);
     }
 
-  },[media, mediaToken, previousToken, onSuccess, status, statusSet]);
+  },[media, mediaToken, previousToken, prompt, onSuccess, status, statusSet]);
 
- return { media, mediaSet, remove, status, writeStatus };
+ return { media, mediaSet, prompt, remove, status, writeStatus };
 };

@@ -10,6 +10,7 @@ interface Props {
   querySession: any;
   querySubscriptions: any;
   sessionFetched: boolean;
+  sessionSubscriptions: any;
   sessionWrapper?: any;
 }
 
@@ -18,6 +19,7 @@ export default function SessionProvider({
   querySession,
   querySubscriptions,
   sessionFetched,
+  sessionSubscriptions,
   sessionWrapper,
 }: Props) {
   const sessionResponse = sessionWrapper?.sessionStateResponse || {
@@ -46,7 +48,7 @@ export default function SessionProvider({
   const canEditTtsModel = (userToken: string) =>
     user?.canEditOtherUsersTtsModels || userTokenMatch(userToken);
   const canBanUsers = () => user?.can_ban_users || false;
-  const studioAccessCheck = (content: React.ElementType) => !user?.can_access_studio ? <StudioNotAvailable /> : content;
+  const studioAccessCheck = (content: React.ElementType) => !sessionWrapper?.canAccessStudio() ? <StudioNotAvailable /> : content;
 
   return (
     <SessionContext.Provider
@@ -60,6 +62,7 @@ export default function SessionProvider({
           querySession,
           querySubscriptions,
           sessionFetched,
+          sessionSubscriptions,
           studioAccessCheck,
           user,
           userTokenMatch,

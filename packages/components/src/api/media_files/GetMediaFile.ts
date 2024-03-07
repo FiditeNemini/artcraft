@@ -22,6 +22,7 @@ export interface MediaFile {
     maybe_cover_image_public_bucket_path: string;
   };
   maybe_text_transcript?: string;
+  maybe_batch_token?: string;
 }
 
 export enum MediaFileLookupError {

@@ -7,6 +7,7 @@ import Button from "../Button";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import SelectMediaList from "./SelectMediaList";
 import SelectWeightsList from "./SelectWeightsList";
+import { useSession } from "hooks";
 
 export type SelectModalData = {
   token: string;
@@ -39,6 +40,7 @@ const SelectModal = memo(
     required,
   }: SelectModalProps) => {
     const emptyValue = { token: "", title: "" };
+    const { user } = useSession();
     const [{ isModalOpen, selectedValue, valueType, activeTab }, setState] =
       useState({
         isModalOpen: false,
@@ -98,12 +100,20 @@ const SelectModal = memo(
           {tab.type === "weights" && (
             <>
               {tab.onlyBookmarked ? (
-                <SelectWeightsList
-                  weightType={valueType}
-                  listKey={tab.tabKey}
-                  onResultBookmarkSelect={handleOnSelect}
-                  onlyBookmarked={tab.onlyBookmarked}
-                />
+                <>
+                  {user ? (
+                    <SelectWeightsList
+                      weightType={valueType}
+                      listKey={tab.tabKey}
+                      onResultBookmarkSelect={handleOnSelect}
+                      onlyBookmarked={tab.onlyBookmarked}
+                    />
+                  ) : (
+                    <div className="text-center py-3">
+                      <p>Please login to view your bookmarks.</p>
+                    </div>
+                  )}
+                </>
               ) : (
                 <SelectWeightsList
                   weightType={valueType}

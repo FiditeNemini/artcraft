@@ -4,9 +4,15 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import ReactSelect, { Props as ReactSelectProps } from "react-select";
 import "./TempSelect.scss";
 
-export interface Option {
-  value: string | number | boolean;
+type OptionValue = string | number | boolean;
+
+export interface BaseOption {
+  value?: OptionValue;
   label: string;
+}
+
+export interface Option extends BaseOption {
+  options?: BaseOption[];
 }
 
 export interface SelectProps extends ReactSelectProps {
@@ -31,10 +37,29 @@ export default function Select({
   required,
   ...rest
 }: SelectProps) {
-  const valueLabel =
-    options.find((option: any) => option.value === value)?.label || "";
-  const onChange = ({ value }: any) =>
-    inChange({ target: { value, name, type: "select" } });
+  const isMulti = Array.isArray(value);
+  const findVal = (opts: Option[], nest = 0): Option | undefined => {
+    let val: Option | undefined;
+    opts.forEach((option) => {
+      if (!val) {
+        if (option.options) {
+          val = findVal(option.options,++nest);
+        } else if (option.value === value) {
+          val = option
+        } 
+      }
+    });
+    return val;
+  };
+
+  const valueLabel = findVal(options)?.label || "";
+  const onChange = (option: any, x: any) => {
+    if (Array.isArray(option)) {
+      inChange({ target: {value: option.map(({ value = "" }) => value), name, type: "select" } });
+    } else {
+      inChange({ target: {value: option.value, name, type: "select" } });
+    }
+  }
   const className = `${icon ? " input-icon" : ""}${
     small ? " select-small" : ""
   }`;
@@ -68,10 +93,13 @@ export default function Select({
             {...{
               classNamePrefix: "select",
               classNames,
+              isMulti,
               name,
               onChange,
               options,
-              value: { label: valueLabel, value },
+              ...value && (isMulti ? { 
+                value: Array.isArray(value) ? value.map((val: any) => ({ label: val, value: val })) : [] 
+              } : { value: { label: valueLabel, value } }),
               ...rest,
             }}
           />

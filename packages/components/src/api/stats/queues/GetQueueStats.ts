@@ -20,6 +20,7 @@ export interface ByQueueStats {
   pending_svc_jobs: number,
   pending_tacotron2_jobs: number,
   pending_voice_designer: number,
+  pending_stable_diffusion: number,
 }
 
 export interface LegacyTtsInfo {

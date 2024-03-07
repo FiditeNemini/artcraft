@@ -6,6 +6,7 @@ export enum JobState {
   COMPLETE_FAILURE,
   ATTEMPT_FAILED,
   DEAD,
+  CANCELED_BY_USER
 }
 
 export function jobStateFromString(jobStateString: string) : JobState {
@@ -22,6 +23,8 @@ export function jobStateFromString(jobStateString: string) : JobState {
       return JobState.ATTEMPT_FAILED;
     case 'dead':
       return JobState.DEAD;
+    case 'cancelled_by_user':
+      return JobState.CANCELED_BY_USER;
   }
 
   return JobState.UNKNOWN;
@@ -38,6 +41,7 @@ export function jobStateCanChange(jobState: JobState) : boolean {
     case JobState.COMPLETE_SUCCESS:
     case JobState.COMPLETE_FAILURE:
     case JobState.DEAD:
+    case JobState.CANCELED_BY_USER:
     default:
       return false;
   }

@@ -30,7 +30,7 @@ export default function NavItem({
 }: NavItemProps) {
   const [isHovered, setIsHovered] = useState(false);
 
-  const textHover = `${isHovered && "text-white"}`.trim();
+  const textHover = `${isHovered ? "text-white" : ""}`.trim();
 
   const renderContent = () => {
     if (isHoverable && dropdownItems) {

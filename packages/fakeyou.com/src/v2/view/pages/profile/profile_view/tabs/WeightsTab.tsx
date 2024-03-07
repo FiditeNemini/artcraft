@@ -42,9 +42,9 @@ export default function WeightsTab({ username }: { username: string }) {
   const [list, listSet] = useState<any[]>([]);
   const weights = useListContent({
     addQueries: {
+      page_size: urlQueries.get("page_size") || "24",
       ...prepFilter(weightType, "maybe_scoped_weight_type"),
-      ...prepFilter(weightCategory, "maybe_scoped_weight_category"),
-      page_size: 24,
+      ...prepFilter(weightCategory, "maybe_scoped_weight_category")
     },
     addSetters: { sdSet, ttsSet, vcSet, weightCategorySet, weightTypeSet },
     debug: "Weights tab",
@@ -90,6 +90,7 @@ export default function WeightsTab({ username }: { username: string }) {
     { value: "text_to_speech", label: "Text to speech" },
     { value: "vocoder", label: "Vocoder" },
     { value: "voice_conversion", label: "Voice conversion" },
+    { value: "workflow_config", label: "Workflow config" },
   ];
 
   const sortOptions = [

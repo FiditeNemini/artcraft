@@ -1,4 +1,5 @@
 import React from "react";
+import ComponentsLibrary from "./pages/components_library";
 import { AboutPage } from "./pages/about/about_page/AboutPage";
 import { GuidePage } from "./pages/about/guide_page/GuidePage";
 import { FirehoseEventListPage } from "./pages/firehose/FirehoseEventListPage";
@@ -8,6 +9,7 @@ import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
 import FaceAnimator from "./pages/face_animator";
 import VideoMocap from "./pages/video_mocap";
+import VideoStyleTransfer from "./pages/video_styletransfer";
 import { ProfileEditFc } from "./pages/profile/profile_edit/ProfileEditFc";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
@@ -29,9 +31,16 @@ import { TtsModelViewPage } from "./pages/tts/tts_model_view/TtsModelViewPage";
 import { TtsResultDeletePage } from "./pages/tts/tts_result_delete/TtsResultDeletePage";
 import { TtsResultViewPage } from "./pages/tts/tts_result_view/TtsResultViewPage";
 import { ContributeIndexPage } from "./pages/contribute/ContributeIndexPage";
+
 import { UploadTtsModelPage } from "./pages/upload/UploadTtsModelPage";
 import { UploadW2lPhotoPage } from "./pages/upload/UploadW2lPhotoPage";
 import { UploadW2lVideoPage } from "./pages/upload/UploadW2lVideoPage";
+import { UploadVocoderPage } from "./pages/upload/UploadVocoderPage";
+import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
+import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
+import UploadLoraWeightPage from "./pages/upload/UploadLoraWeightPage";
+import UploadWorkflowPage from "./pages/upload/UploadWorkflowPage";
+
 import { W2lResultViewPage } from "./pages/w2l/w2l_result_view/W2lResultViewPage";
 import { W2lTemplateListPage } from "./pages/w2l/w2l_template_list/W2lTemplateListPage";
 import { W2lTemplateUploadJob } from "@storyteller/components/src/jobs/W2lTemplateUploadJobs";
@@ -60,7 +69,7 @@ import { PatronPage } from "./pages/patrons/PatronPage";
 import { Language } from "@storyteller/components/src/i18n/Language";
 import { VoiceCloneRequestPage } from "./pages/clone_voice_requests/VoiceCloneRequestPage";
 import { VocodesPage } from "./pages/vocodes/VocodesPage";
-import { UploadVocoderPage } from "./pages/upload/UploadVocoderPage";
+
 import { PricingPage } from "./pages/premium/PricingPage";
 import { CheckoutSuccessPage } from "./pages/premium/CheckoutSuccessPage";
 import { CheckoutCancelPage } from "./pages/premium/CheckoutCancelPage";
@@ -77,7 +86,7 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 //import { LandingPage } from "./pages/landing/LandingPage";
 import { VcModelListPage } from "./pages/vc/vc_model_list/VcModelListPage";
-import { UploadVoiceConversionModel } from "./pages/upload/UploadVoiceConversionModel";
+
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import { CommunityCommissionsPage } from "./pages/contest/CommunityCommissionsPage";
 import { ProductUsageInfoPage } from "./pages/product_usage_info/ProductUsageInfoPage";
@@ -85,7 +94,7 @@ import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
-import { StorytellerStudioListPage } from "./pages/storyteller_studio/vc_model_list/StorytellerStudioListPage";
+import { StorytellerStudioListPage } from "./pages/storyteller_studio/StorytellerStudioPage";
 import TopNav from "components/layout/TopNav/TopNav";
 import SideNav from "components/layout/SideNav/SideNav";
 import MediaPage from "./pages/media/MediaPage";
@@ -104,16 +113,20 @@ import ExplorePage from "./pages/explore/ExplorePage";
 import SearchPage from "./pages/search/SearchPage";
 import { SearchProvider } from "context/SearchContext";
 import WeightEditPage from "./pages/weight/WeightEditPage";
-import UploadSdWeightPage from "./pages/upload/UploadSdWeightPage";
+
 import { FooterNav } from "./nav/FooterNav";
 import FbxToGltfPage from "./pages/fbx_to_gltf/FbxToGltfPage";
-import UploadLoraWeightPage from "./pages/upload/UploadLoraWeightPage";
+
 import VideoWorkflowPage from "./pages/video_workflow/VideoWorkflow";
 import ScrollToTop from "./_common/ScrollToTop";
 import TextToImagePage from "./pages/text_to_image/TextToImagePage";
 import DomainConfigProvider from "context/DomainConfigContext";
 import DevUpload from "./pages/dev_upload/DevUpload";
 import DevMediaInput from "./pages/dev_upload/DevMediaInput";
+import DevTTS from "./pages/dev_tts/DevTTS";
+import { StudioIntroPage } from "./pages/storyteller_studio_intro/StudioIntroPage";
+import StudioVSTPage from "./pages/storyteller_studio_intro/StudioVST/StudioVSTPage";
+import { StudioIntroResultPage } from "./pages/storyteller_studio_intro/StudioIntroResultPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -248,6 +261,11 @@ class PageContainer extends React.Component<
             <div id="page-content-wrapper">
               <div id="main">
                 <Switch>
+                  <Route path="/comp-lib">
+                    <ComponentsLibrary
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
+                  </Route>
                   <Route path="/firehose">
                     <FirehoseEventListPage
                       sessionWrapper={this.props.sessionWrapper}
@@ -562,6 +580,12 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
+                  <Route path="/upload/workflow">
+                    <UploadWorkflowPage
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
+                  </Route>
+
                   <Route path="/contribute">
                     <ContributeIndexPage
                       sessionWrapper={this.props.sessionWrapper}
@@ -726,8 +750,30 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
-                  <Route path="/studio">
+                  <Route path="/studio/:mediaToken?">
                     <StorytellerStudioListPage
+                      sessionWrapper={this.props.sessionWrapper}
+                      sessionSubscriptionsWrapper={
+                        this.props.sessionSubscriptionsWrapper
+                      }
+                    />
+                  </Route>
+
+                  <Route path="/studio-intro/result/:jobToken?">
+                    <StudioIntroResultPage
+                      sessionWrapper={this.props.sessionWrapper}
+                      sessionSubscriptionsWrapper={
+                        this.props.sessionSubscriptionsWrapper
+                      }
+                    />
+                  </Route>
+
+                  <Route path="/studio-intro/style/:jobToken?">
+                    <StudioVSTPage />
+                  </Route>
+
+                  <Route path="/studio-intro/:mediaToken?">
+                    <StudioIntroPage
                       sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
@@ -763,6 +809,10 @@ class PageContainer extends React.Component<
                     <DevMediaInput />
                   </Route>
 
+                  <Route path="/dev-tts">
+                    <DevTTS />
+                  </Route>
+                  
                   {/* Route for initial voice creation */}
                   <Route exact path="/voice-designer/create">
                     <VoiceDesignerFormPage
@@ -852,6 +902,20 @@ class PageContainer extends React.Component<
 
                   <Route path="/video-workflow">
                     <VideoWorkflowPage
+                      {...{
+                        enqueueInferenceJob: this.props.enqueueInferenceJob,
+                        sessionSubscriptionsWrapper:
+                          this.props.sessionSubscriptionsWrapper,
+                        inferenceJobs: this.props.inferenceJobs,
+                        inferenceJobsByCategory:
+                          this.props.inferenceJobsByCategory,
+                        sessionWrapper: this.props.sessionWrapper,
+                      }}
+                    />
+                  </Route>
+
+                  <Route path="/video-styletransfer">
+                    <VideoStyleTransfer
                       {...{
                         enqueueInferenceJob: this.props.enqueueInferenceJob,
                         sessionSubscriptionsWrapper:
@@ -1275,15 +1339,6 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
-                  <Route path="/studio">
-                    <StorytellerStudioListPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      sessionSubscriptionsWrapper={
-                        this.props.sessionSubscriptionsWrapper
-                      }
-                    />
-                  </Route>
-
                   <Route path="/commissions">
                     <CommunityCommissionsPage />
                   </Route>
@@ -1528,6 +1583,13 @@ class PageContainer extends React.Component<
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper
                       }
+                      enqueueInferenceJob={this.props.enqueueInferenceJob}
+                      inferenceJobs={this.props.inferenceJobs}
+                      inferenceJobsByCategory={
+                        this.props.inferenceJobsByCategory
+                      }
+                      ttsInferenceJobs={this.props.ttsInferenceJobs}
+                      enqueueTtsJob={this.props.enqueueTtsJob}
                     />
                   </Route>
                 </Switch>

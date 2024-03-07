@@ -18,32 +18,40 @@ export default memo( function SectionVideoSettings({
   workflowValues: wfVal,
   videoElement: ve
 } : {
-  onChange: (key:string, val:number)=>void,
+  onChange: (val:{[key: string]: number|string|boolean|undefined})=>void,
   workflowValues: WorkflowValuesType,
   videoElement: HTMLVideoElement | null,
 }){
   const iv = VideoSettingsInitialValues;
 
+  const handleFramesCap = (newValue: number)=>{
+    if(newValue - wfVal.skipFrames >= 16)
+    handleOnChange({framesCap:newValue});
+  }
+  const handleSkipFrames = (newValue: number)=>{
+    if(wfVal.framesCap - newValue >= 16)
+    handleOnChange({skipFrames:newValue});
+  }
+
   if(ve && ve!==null){
     ve.onloadedmetadata = () =>{
+      const newValues : {
+        width?: number;
+        height?: number;
+        maxFrames?: number;
+        framesCap?: number;
+      } = {};
       if (ve.videoWidth && ve.videoHeight) {
         const aspectRatio = ve.videoWidth/ve.videoHeight
-        if (aspectRatio > 1){
-          handleOnChange("width",960);
-        }
-        else if (aspectRatio < 1) {
-          handleOnChange("height",960);
-        }else{
-          console.log(`aspectRaio: ${aspectRatio}`);
-        }
+        if (aspectRatio > 1) newValues.width = 960;
+        else if (aspectRatio < 1) newValues.height = 960
+        else console.log(`aspectRaio: ${aspectRatio}`);
       }
       if(ve.duration){
-        handleOnChange("maxFrames", 
-          Math.floor(ve.duration)*wfVal.inputFps
-        );
+        newValues.maxFrames = Math.floor(ve.duration)*wfVal.inputFps;
+        newValues.framesCap =  newValues.maxFrames;
       }
-      //TODO: Optimizer to make ONE handleOnChange only
-      //TODO: deal with maxFrames with more reliable math
+      handleOnChange(newValues);
     }
   }
   return(
@@ -60,19 +68,19 @@ export default memo( function SectionVideoSettings({
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 16, max: wfVal.maxFrames, step: 1,
-            initialValue: wfVal.framesCap,
+            value: wfVal.framesCap,
             label: "Frames Cap",
             thumbTip: "24 frames = 1 sec",
-            onChange: (val)=>{handleOnChange("framesCap",val)}
+            onChange: handleFramesCap
           }}/>
         </div>
         <div className="col-md-6">
           <NumberSliderV2 {...{
             min: 0, max: wfVal.maxFrames-16, step: 1,
-            initialValue: wfVal.skipFrames,
+            value: wfVal.skipFrames,
             label: "Skip Frames",
             thumbTip: "24 frames = 1 sec",
-            onChange: (val)=>{handleOnChange("skipFrames",val)}
+            onChange: handleSkipFrames
           }}/>
         </div>
       </div>

@@ -1,3 +1,4 @@
-const prepFilter = (value: string, queryKey: string) => ({ ...value !== "all" ? { [queryKey]: value } : {} });
+const prepFilter = (value: string, queryKey: string, override?: any) =>
+	({ ...value !== "all" ? { [queryKey]: override || value } : {} });
 
 export default prepFilter;

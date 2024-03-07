@@ -28,7 +28,7 @@ export function DashboardItem({
   badgeContent,
 }: DashboardItemProps) {
   return (
-    <div className="col-12 col-md-4">
+    <div className="col-12 col-md-6 col-lg-4">
       <Link
         to={to}
         className="panel panel-select d-flex flex-column align-items-center"

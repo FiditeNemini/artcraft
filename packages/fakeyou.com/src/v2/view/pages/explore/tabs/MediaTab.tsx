@@ -31,9 +31,9 @@ export default function MediaTab() {
   const [list, listSet] = useState<MediaFile[]>([]);
   const media = useLazyLists({
     addQueries: {
-      page_size: 24,
+      page_size: urlQueries.get("page_size") || "24",
       //...prepFilter(weightType, "maybe_scoped_weight_type"),
-      ...prepFilter(mediaType, "filter_media_type"),
+       ...prepFilter(mediaType, "filter_media_type",mediaType === "3dFile" ? "bvh,glb,gltf" : "" ),
     },
     addSetters: { mediaTypeSet },
     // debug: "explore media tab",
@@ -54,7 +54,7 @@ export default function MediaTab() {
     { value: "image", label: "Images" },
     { value: "audio", label: "Audio" },
     { value: "video", label: "Video" },
-    { value: "mocap", label: "Motion Capture" },
+    { value: "3dFile", label: "3D Files" },
   ];
 
   const sortOptions = [

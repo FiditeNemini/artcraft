@@ -16,6 +16,8 @@ import {
   TextArea
 } from "components/common";
 
+import SelectModalWeightsTabs from "components/common/SelectModalWeightsTabs";
+
 import SectionControlNets, {ControlNetsInitialValues as CnIvs} from "./sectionControlNets";
 import SectionVideoSettings, {VideoSettingsInitialValues as VideoIvs} from "./sectionVideoSettings";
 import SectionAdvanceOptions, {AdvanceOptionsInitialValues as AdvIvs} from "./sectionAdvanceOptions";
@@ -51,11 +53,13 @@ export default function PageFilterControls({
 
   const [workflowValues, setWorkflowValues] = useState<WorkflowValuesType>({
     fileToken: pageState.mediaFileToken || mediaToken,
-    outputPath: "vid2vid/SparseUpscaleInterp_00001.mp4",
+    outputPath: "",
     workflowConfig: "weight_q8sz47gmfw2zx02snrbz88ns9",
     seed: "",
     sdModelToken: "",
+    sdModelTitle:"",
     loraModelToken: "",
+    loraModelTitle: "",
     posPrompt: "",
     negPrompt: "",
     ...VideoIvs,
@@ -63,8 +67,8 @@ export default function PageFilterControls({
     ...CnIvs
   });
 
-  const handleOnChange = (key: string, newValue:any,) => {
-    setWorkflowValues((curr)=>({...curr, [key]: newValue}));
+  const handleOnChange = (val:{[key: string]: number|string|boolean|undefined}) => {
+    setWorkflowValues((curr)=>({...curr, ...val}));
   }
   const handleReset = ()=>{
     setWorkflowValues((curr)=>({
@@ -73,7 +77,9 @@ export default function PageFilterControls({
       workflowConfig: "weight_q8sz47gmfw2zx02snrbz88ns9",
       seed: curr.seed,
       sdModelToken: "",
+      sdModelTitle: "",
       loraModelToken: "",
+      loraModelTitle: "",
       posPrompt: "",
       negPrompt: "",
       ...VideoIvs,
@@ -132,7 +138,7 @@ export default function PageFilterControls({
               <div className="col-6">
                 <SectionVideoSettings
                   workflowValues={workflowValues}
-                  onChange={(key,val)=>handleOnChange(key,val)}
+                  onChange={handleOnChange}
                   videoElement={videoRef?.current}
                 />
                 <div className="d-flex my-3 justify-content-end">
@@ -164,37 +170,32 @@ export default function PageFilterControls({
           <Accordion className="mt-4">
             <Accordion.Item title={"Basics"} defaultOpen>
               <div className="row g-3 p-3">
-                <SelectModal 
+                <SelectModalWeightsTabs 
                   modalTitle="Select a Stable Diffusion Weight"
-                  label="Select a Stable Diffusion Weight"
-                  onSelect={({token})=>{
-                    handleOnChange("sdModelToken", token);
+                  inputLabel="Select a Stable Diffusion Weight"
+                  weightType="sd_1.5"
+                  onSelect={({title,token})=>{
+                    handleOnChange({
+                      "sdModelTitle": title,
+                      "sdModelToken": token,
+                    });
                   }}
-                  tabs={[
-                    {
-                      label: "All Weights",
-                      tabKey: "allWeights",
-                      typeFilter: "sd_1.5",
-                      searcher: true,
-                      type: "weights",
-                    },
-                    {
-                      label: "Bookmarked",
-                      tabKey: "bookmarkedWeights",
-                      typeFilter: "sd_1.5",
-                      searcher: false,
-                      type: "weights",
-                    },
-                  ]}
+                  value={{
+                    token:workflowValues.sdModelToken,
+                    title:workflowValues.sdModelTitle,
+                  }}
                 />
               </div>
               <div className="row g-3 p-3">
                 <SelectModal
                   modalTitle="Select a LoRA Weight"
                   label="Additional LoRA Weight"
-                  onSelect={({token})=>{
+                  onSelect={({title,token})=>{
                     console.log(`calling from select modal result select ${token}`);
-                    handleOnChange("loraModelToken", token);
+                    handleOnChange({
+                      "loraModelTitle": title,
+                      "loraModelToken": token
+                    });
                   }}
                   tabs={[
                     {
@@ -220,7 +221,7 @@ export default function PageFilterControls({
                     {...{
                       label: "Prompt",
                       placeholder: "Enter a prompt",
-                      onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange("posPrompt", e.target.value),
+                      onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange({"posPrompt": e.target.value}),
                       value: workflowValues.posPrompt,
                       required: false,
                     }}
@@ -231,7 +232,7 @@ export default function PageFilterControls({
                     {...{
                       label: "Negative Prompt",
                       placeholder: "Enter Negative Prompt",
-                      onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange("negPrompt", e.target.value),
+                      onChange: (e:React.ChangeEvent<HTMLTextAreaElement>)=>handleOnChange({"negPrompt": e.target.value}),
                       value: workflowValues.negPrompt,
                       required: false,
                     }}
@@ -240,7 +241,7 @@ export default function PageFilterControls({
               </div>
               <div className="row g-3 p-3">
                 <InputSeed label="Seed" onChange={
-                  (val:string)=>handleOnChange("seed", val)
+                  (val:string)=>handleOnChange({seed: val})
                 }/>
               </div>
               
@@ -248,13 +249,13 @@ export default function PageFilterControls({
             <Accordion.Item title="Advance" defaultOpen>
               <SectionAdvanceOptions
                   workflowValues={workflowValues}
-                  onChange={(key,val)=>handleOnChange(key,val)}
+                  onChange={handleOnChange}
                 />
             </Accordion.Item>
             <Accordion.Item title="Control Nets" defaultOpen>
               <SectionControlNets
                 workflowValues={workflowValues}
-                onChange={(key,val)=>handleOnChange(key,val)}
+                onChange={handleOnChange}
               />
             </Accordion.Item>
           </Accordion>

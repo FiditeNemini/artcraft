@@ -2,7 +2,8 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { states, Action, State } from "../videoWorkflowReducer";
 import { Button } from "components/common";
-import SelectModal, { SelectModalData } from "components/common/SelectModal/SelectModal";
+import SelectModalVideoTabs from "components/common/SelectModalVideoTabs";
+import { SelectModalData } from "components/common/SelectModal/SelectModalV2";
 import VideoFakeyou from "components/common/VideoFakeyou";
 
 export default function TabContentLibrary({
@@ -29,19 +30,11 @@ export default function TabContentLibrary({
   return (
     <div className="row g-3">
       <div className="col-12">
-        <SelectModal
+        <SelectModalVideoTabs
+          value={pageState.mediaFileToken}
           modalTitle="Select a Video"
-          label="Select a Video"
+          inputLabel="Select a Video"
           onSelect={handleOnSelect}
-          tabs={[
-            {
-              label: "All Videos",
-              tabKey: "allVideos",
-              typeFilter: "video",
-              searcher: false,
-              type: "media",
-            },
-          ]}
         />
         {pageState.mediaFileToken && 
           <VideoFakeyou mediaToken={pageState.mediaFileToken} />

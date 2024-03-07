@@ -9,18 +9,19 @@ export enum JobListAll { All }
 
 export type JobListTypes = FrontendInferenceJobType | JobListAll;
 
-export default function useInferenceJobs(jobType: JobListTypes, debug = false) {
-  const { byCategory, enqueue, inferenceJobs } = useContext(InferenceJobsContext);
+export default function useInferenceJobs(jobType: JobListTypes = 0, debug = false) {
+  const { byCategory, enqueue, inferenceJobs, queueStats } = useContext(InferenceJobsContext);
   const { open } = useModal();
   const openJobListModal = () => open({ component: InferenceJobsModal, props: { jobType } });
 
   return {
     // enqueue,
-    enqueue: (jobToken: string) => {
-      openJobListModal();
+    enqueue: (jobToken: string, noModalPls = false) => {
+      if (!noModalPls) { openJobListModal(); }
       enqueue(jobToken,jobType);
     },
     inferenceJobs: jobType === JobListAll.All ? inferenceJobs : (byCategory?.get(jobType - 1) || []),
-    jobStatusDescription: (jobState: JobState) => Object.keys(JobState).filter(key => isNaN(Number(key)))[jobState]
+    jobStatusDescription: (jobState: JobState) => Object.keys(JobState).filter(key => isNaN(Number(key)))[jobState],
+    queueStats
   };
 };

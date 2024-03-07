@@ -13,7 +13,7 @@ styles with important tags:
 
 @mixin panel {
   background-color: $panel;
-  border-color: #ffffff12 !important;
+  border-color: rgba(255, 255, 255, 0.04) !important;
   border: 1px solid;
   border-left: none;
   border-right: none;
@@ -26,6 +26,20 @@ styles with important tags:
     0 10px 8px rgb(0 0 0 / 3%),
     0 4px 4px rgb(0 0 0 / 2%),
     0 2px 2px rgb(0 0 0 / 1%) !important;
+}
+
+@mixin medium-svg {
+  height: 2.25rem;
+  width: 2.25rem;
+  fill: none;
+
+  circle,
+  line,
+  polyline {
+    stroke-width: 3px;
+    stroke-linecap: round;
+    stroke: #fff;
+  }
 }
 
 .fakeyou-refresh {

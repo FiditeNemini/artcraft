@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import MediaAudioComponent from "./MediaAudioComponent";
+import MediaAudioPlayer from "./MediaAudioPlayer";
 import MediaVideoComponent from "./MediaVideoComponent";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
 import Container from "components/common/Container";
@@ -18,6 +18,7 @@ import {
   faFileCircleXmark,
   faArrowRightArrowLeft,
   faVideoPlus,
+  faCopy,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -32,9 +33,19 @@ import { Badge, Input, Modal } from "components/common";
 import BookmarkButton from "components/common/BookmarkButton";
 import LikeButton from "components/common/LikeButton";
 import { useBookmarks, useMedia, useRatings, useSession } from "hooks";
-import SdCoverImagePanel from "../weight/cover_image_panels/SdCoverImagePanel";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import Iframe from "react-iframe";
+import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
+import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
+import { mediaTypeLabels } from "utils/mediaTypeLabels";
+
+// Storyteller Engine parameters
+// These are documented here:
+// https://www.notion.so/storytellerai/Studio-Iframe-Query-Params-a748a9929ec3404780c3884e7fb89bdb
+const SKYBOX = "333348"; // Looks good (lighter)
+//const SKYBOX = "242433"; // Looks good
+//const SKYBOX = "1a1a27"; // Too dark
+//const SKYBOX = "3f3f55"; // too light
 
 export default function MediaPage() {
   const { canEditTtsModel, user } = useSession();
@@ -43,6 +54,7 @@ export default function MediaPage() {
   const ratings = useRatings();
   const {
     media: mediaFile,
+    prompt,
     remove,
     status,
   } = useMedia({
@@ -51,10 +63,36 @@ export default function MediaPage() {
       ratings.gather({ res, key: "token" });
     },
   });
-
+  const batchToken = mediaFile?.maybe_batch_token;
+  const [images, setImages] = useState<{ url: string; token: string }[]>([]);
+  const bucketConfig = new BucketConfig();
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
+  const [copyPositiveButtonText, setCopyPositiveButtonText] = useState("Copy");
+  const [copyNegativeButtonText, setCopyNegativeButtonText] = useState("Copy");
+  const [activeSlide, setActiveSlide] = useState({ url: "", token: "" });
+
+  // Inside MediaPage.tsx
+
+  useEffect(() => {
+    if (batchToken) {
+      GetMediaBatchImages(batchToken, {}, {})
+        .then(response => {
+          if (response.success) {
+            const mediaItems = response.results.map(result => ({
+              url: bucketConfig.getGcsUrl(result.public_bucket_path),
+              token: result.token,
+            }));
+            setImages(mediaItems);
+          } else {
+            console.error("Failed to fetch batch images");
+          }
+        })
+        .catch(err => console.error("Error fetching batch images:", err));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [batchToken]);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -64,6 +102,75 @@ export default function MediaPage() {
 
   const deleteMedia = () => remove(!!user?.can_ban_users);
 
+  const copyToClipboard = async (
+    text: string,
+    setButtonText: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setButtonText("Copied!");
+      setTimeout(() => setButtonText("Copy"), 2000); // Change back after 2 seconds
+    } catch (err) {
+      console.error("Failed to copy: ", err);
+    }
+  };
+
+  const handleActiveSlideChange = (image: any) => {
+    setActiveSlide(image);
+  };
+
+  const promptSection = (
+    <>
+      {prompt?.maybe_positive_prompt && (
+        <Panel padding={true} className="mt-3">
+          <div className="d-flex gap-3 align-items-center mb-2">
+            <h6 className="fw-semibold mb-0 flex-grow-1">Prompt</h6>
+            <Button
+              icon={faCopy}
+              onClick={() =>
+                copyToClipboard(
+                  prompt.maybe_positive_prompt || "",
+                  setCopyPositiveButtonText
+                )
+              }
+              label={copyPositiveButtonText}
+              variant="link"
+              className="fs-7"
+            />
+          </div>
+          <div className="panel-inner p-2 rounded">
+            <p className="fs-7">{prompt.maybe_positive_prompt}</p>
+          </div>
+
+          {prompt?.maybe_negative_prompt && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                <h6 className="fw-semibold mb-0 flex-grow-1">
+                  Negative Prompt
+                </h6>
+                <Button
+                  icon={faCopy}
+                  onClick={() =>
+                    copyToClipboard(
+                      prompt.maybe_negative_prompt || "",
+                      setCopyNegativeButtonText
+                    )
+                  }
+                  label={copyNegativeButtonText}
+                  variant="link"
+                  className="fs-7"
+                />
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">{prompt.maybe_negative_prompt}</p>
+              </div>
+            </>
+          )}
+        </Panel>
+      )}
+    </>
+  );
+
   function renderMediaComponent(mediaFile: MediaFile) {
     switch (mediaFile.media_type) {
       case MediaFileType.Audio:
@@ -72,7 +179,9 @@ export default function MediaPage() {
             {/* Voice model name that is used to generate the audio */}
             {/*<h3 className="fw-bold mb-4">[Voice Model Name]</h3> */}
 
-            <MediaAudioComponent mediaFile={mediaFile} />
+            <div className="w-100">
+              <MediaAudioPlayer mediaFile={mediaFile} />
+            </div>
 
             {/* Show TTS text input if it is a TTS result */}
             {mediaFile.maybe_text_transcript && (
@@ -94,21 +203,39 @@ export default function MediaPage() {
                 <MediaVideoComponent mediaFile={mediaFile} />
               </div>
             </div>
+            {promptSection}
           </>
         );
 
       case MediaFileType.Image:
-        let sdMediaImage = "/images/avatars/default-pfp.png";
+        let sdMediaImage = [
+          { url: "/images/avatars/default-pfp.png", token: "default" },
+        ];
         if (mediaFile.public_bucket_path) {
-          sdMediaImage = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
+          sdMediaImage = [
+            {
+              url: bucketConfig.getGcsUrl(mediaFile.public_bucket_path),
+              token: mediaFile?.token,
+            },
+          ];
         }
-        return <SdCoverImagePanel src={sdMediaImage} />;
+
+        return (
+          <>
+            <SdBatchMediaPanel
+              key={images.length}
+              images={mediaFile.maybe_batch_token ? images : sdMediaImage}
+              onActiveSlideChange={handleActiveSlideChange}
+            />
+            {promptSection}
+          </>
+        );
       case MediaFileType.BVH:
         const bvhUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
         return (
           <Iframe
             {...{
-              url: `https://engine.fakeyou.com?mode=viewer&bvh=${bvhUrl}`,
+              url: `https://engine.fakeyou.com?mode=viewer&bvh=${bvhUrl}&skybox=${SKYBOX}`,
               className: "fy-studio-frame",
             }}
           />
@@ -118,7 +245,7 @@ export default function MediaPage() {
         return (
           <Iframe
             {...{
-              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${glbUrl}`,
+              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${glbUrl}&skybox=${SKYBOX}`,
               className: "fy-studio-frame",
             }}
           />
@@ -128,7 +255,21 @@ export default function MediaPage() {
         return (
           <Iframe
             {...{
-              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${gltfUrl}`,
+              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${gltfUrl}&skybox=${SKYBOX}`,
+              className: "fy-studio-frame",
+            }}
+          />
+        );
+      case MediaFileType.SceneRon:
+        // NB: Storyteller Engine makes the API call to load the scene.
+        // We don't need to pass the bucket path.
+        // The engine, does, however, need a `.scn.ron` file extension.
+        const sceneRonUrl = `remote://${mediaFile.token}.scn.ron`;
+        // NB: Skybox param doesn't work with scenes. Scenes will bake in a skybox in the future.
+        return (
+          <Iframe
+            {...{
+              url: `https://engine.fakeyou.com?mode=viewer&scene=${sceneRonUrl}`,
               className: "fy-studio-frame",
             }}
           />
@@ -158,11 +299,16 @@ export default function MediaPage() {
     }
   }
 
-  const mediaType = mediaFile?.media_type || ""; // THIS SHOULD BECOME A TRANSLATION STRING, THIS IS NOT DATA -V
+  const mediaType = mediaFile?.media_type
+    ? mediaTypeLabels[mediaFile?.media_type]
+    : "";
 
-  let audioLink = new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path);
+  let downloadLink =
+    activeSlide.url || bucketConfig.getGcsUrl(mediaFile?.public_bucket_path);
 
-  const shareUrl = `https://fakeyou.com/media/${mediaFile?.token || ""}`;
+  const shareUrl = `https://fakeyou.com/media/${
+    activeSlide.token || mediaFile?.token || ""
+  }`;
   const shareText = "Check out this media on FakeYou.com!";
 
   if (status < 3)
@@ -237,6 +383,7 @@ export default function MediaPage() {
       [WeightCategory.SD]: { weightCategory: "Image Generation" },
       [WeightCategory.ZS]: { weightCategory: "Voice Designer" },
       [WeightCategory.VOCODER]: { weightCategory: "Vocoder" },
+      [WeightCategory.WF]: { weightCategory: "Workflow Config" },
     };
 
   let weightCategory = "none";
@@ -334,8 +481,6 @@ export default function MediaPage() {
   };
 
   const subtitleDivider = <span className="opacity-25 fs-5 fw-light">|</span>;
-
-  const bucketConfig = new BucketConfig();
 
   let weightUsedCoverImage = "/images/avatars/default-pfp.png";
   if (
@@ -438,12 +583,25 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
-                {mediaFile?.media_type === MediaFileType.BVH || mediaFile?.media_type === MediaFileType.GLTF || mediaFile?.media_type === MediaFileType.GLB   ? (
+                {mediaFile?.media_type === MediaFileType.BVH ||
+                mediaFile?.media_type === MediaFileType.GLTF ||
+                mediaFile?.media_type === MediaFileType.GLB ? (
                   <Button
                     {...{
                       icon: faVideoPlus,
                       label: "Use in Engine Compositor",
                       to: `/engine-compositor?preset_token=${mediaFile.token}`,
+                      variant: "primary",
+                      className: "flex-grow-1",
+                    }}
+                  />
+                ) : null}
+                {mediaFile?.media_type === MediaFileType.SceneRon ? (
+                  <Button
+                    {...{
+                      icon: faFaceViewfinder,
+                      label: "Open in studio",
+                      to: `/studio/${mediaFile.token}`,
                       variant: "primary",
                       className: "flex-grow-1",
                     }}
@@ -455,8 +613,8 @@ export default function MediaPage() {
                     icon={faArrowDownToLine}
                     label="Download"
                     className="flex-grow-1"
-                    href={audioLink}
-                    download={audioLink}
+                    href={downloadLink}
+                    download={downloadLink}
                     variant="secondary"
                     target="_blank"
                   />
@@ -467,8 +625,8 @@ export default function MediaPage() {
                       icon={faArrowDownToLine}
                       square={true}
                       variant="secondary"
-                      href={audioLink}
-                      download={audioLink}
+                      href={downloadLink}
+                      download={downloadLink}
                       tooltip="Download"
                       target="_blank"
                     />

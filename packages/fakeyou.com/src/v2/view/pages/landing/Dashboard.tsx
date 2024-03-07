@@ -78,7 +78,7 @@ export default function Dashboard(props: DashboardProps) {
       to: "/voice-conversion",
       title: t("productVcTitle"),
       text: t("productVcText"),
-      imgSrc: "/images/landing/select-vc.webp",
+      imgSrc: "/images/landing/select-v2v.webp",
       imgAlt: "Voice Conversion",
     },
     {
@@ -97,7 +97,7 @@ export default function Dashboard(props: DashboardProps) {
       to: "/face-animator",
       title: t("productFaceAnimatorTitle"),
       text: t("productFaceAnimatorText"),
-      imgSrc: "/images/landing/select-w2l.webp",
+      imgSrc: "/images/landing/select-fa.webp",
       imgAlt: "Face Animator",
     },
     {
@@ -106,6 +106,18 @@ export default function Dashboard(props: DashboardProps) {
       text: t("productImageGenText"),
       imgSrc: "/images/landing/select-tti.webp",
       imgAlt: "AI Image Generation",
+      badgeContent: {
+        type: "new",
+        icon: faSparkles,
+        label: "NEW",
+      },
+    },
+    {
+      to: "/video-styletransfer",
+      title: t("productVideoStyleTransferTitle"),
+      text: t("productVideoStyleTransferText"),
+      imgSrc: "/images/landing/select-vst.webp",
+      imgAlt: "Video Style Transfer",
       badgeContent: {
         type: "new",
         icon: faSparkles,

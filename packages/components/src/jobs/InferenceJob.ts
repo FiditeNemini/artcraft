@@ -13,6 +13,7 @@ export enum FrontendInferenceJobType {
   ConvertFbxtoGltf,
   EngineComposition,
   VideoWorkflow,
+  VideoStyleTransfer,
 }
 
 // NB: Many of these fields are optional despite the response payload containing them

@@ -17,6 +17,11 @@
     margin-bottom: 1rem;
   }
 
+  .fy-input {
+    margin-bottom: 0;
+    flex-grow: 1;
+  }
+
   .icon-close-button {
     cursor: pointer;
     height: 1.5rem;

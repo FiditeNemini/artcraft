@@ -10,7 +10,7 @@ export const ControlNetsInitialValues = {
   cnOpenPose: 0,
   cnPipeFace: 0,
   cnSparse: 0.7,
-  cnTile: 0,
+  cnTile: 0.7,
 }
 
 export default memo( function SectionControlNets({
@@ -18,7 +18,7 @@ export default memo( function SectionControlNets({
   onChange : handleOnChange
 } : {
   workflowValues : WorkflowValuesType
-  onChange: (key:string, val:number)=>void}
+  onChange: (val:{[key: string]: number|string|boolean})=>void}
 ){
 
   return(
@@ -30,7 +30,7 @@ export default memo( function SectionControlNets({
             initialValue: wfVal.cnCanny,
             label: "Canny",
             thumbTip: "Canny",
-            onChange: (val)=>{handleOnChange("cnCanny", val)}
+            onChange: (val)=>{handleOnChange({cnCanny: val})}
             }}/>
         </div>
         <div className="col-md-6">
@@ -39,7 +39,7 @@ export default memo( function SectionControlNets({
             initialValue: wfVal.cnLinearAnime,
             label: "Line Art Anime",
             thumbTip: "Line Art Anime",
-            onChange: (val)=>{handleOnChange("cnLinearAnime", val)}
+            onChange: (val)=>{handleOnChange({cnLinearAnime: val})}
             }}/>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default memo( function SectionControlNets({
             initialValue: wfVal.cnDepth,
             label: "Depth",
             thumbTip: "Depth",
-            onChange: (val)=>{handleOnChange("cnDepth", val)}
+            onChange: (val)=>{handleOnChange({cnDepth: val})}
             }}/>
         </div>
         <div className="col-md-6">
@@ -59,7 +59,7 @@ export default memo( function SectionControlNets({
             initialValue: wfVal.cnOpenPose,
             label: "OpenPose",
             thumbTip: "OpenPose",
-            onChange: (val)=>{handleOnChange("cnOpenPose", val)}
+            onChange: (val)=>{handleOnChange({cnOpenPose: val})}
             }}/>
         </div>
       </div>
@@ -70,7 +70,7 @@ export default memo( function SectionControlNets({
             initialValue: wfVal.cnPipeFace,
             label: "Media Pipe Face",
             thumbTip: "Media Pipe Face",
-            onChange: (val)=>{handleOnChange("cnPipeFace", val)}
+            onChange: (val)=>{handleOnChange({cnPipeFace: val})}
             }}/>
         </div>
         <div className="col-md-6">
@@ -79,7 +79,7 @@ export default memo( function SectionControlNets({
             initialValue: wfVal.cnSparse,
             label: "Sparse Scribble",
             thumbTip: "Sparse Scribble",
-            onChange: (val)=>{handleOnChange("cnSparse", val)}
+            onChange: (val)=>{handleOnChange({cnSparse: val})}
             }}/>
         </div>
       </div>
@@ -90,7 +90,7 @@ export default memo( function SectionControlNets({
             initialValue: wfVal.cnLinearRealistic,
             label: "Video CN (Linear Realistic)",
             thumbTip: "Video CN",
-            onChange: (val)=>{handleOnChange("cnLinearRealistic", val)}
+            onChange: (val)=>{handleOnChange({cnLinearRealistic: val})}
             }}/>
         </div>
         <div className="col-md-6">
@@ -99,7 +99,7 @@ export default memo( function SectionControlNets({
             initialValue: wfVal.cnTile,
             label: "Tile CN",
             thumbTip: "Tile CN",
-            onChange: (val)=>{handleOnChange("cnTile", val)}
+            onChange: (val)=>{handleOnChange({cnTile: val})}
             }}/>
         </div>
       </div>

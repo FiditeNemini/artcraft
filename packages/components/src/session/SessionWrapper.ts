@@ -56,8 +56,15 @@ export class SessionWrapper {
   public canAccessStudio(): boolean {
     const hostnameAllowed = StudioRolloutHostnameAllowed();
     const userAllowed =
-      this.sessionStateResponse?.user?.can_access_studio || false;
+      this.sessionStateResponse?.user?.can_access_studio || 
+      this.sessionStateResponse?.user?.maybe_feature_flags.includes("studio") ||
+      false;
     return hostnameAllowed && userAllowed;
+  }
+
+  // Feature flag rollout for Video Style Transfer
+  public canAccessVideoStyleTransfer(): boolean {
+    return this.sessionStateResponse?.user?.maybe_feature_flags.includes("video_style_transfer") || false;
   }
 
   // Username is all lowercase

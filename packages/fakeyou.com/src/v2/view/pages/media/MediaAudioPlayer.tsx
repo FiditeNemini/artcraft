@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect, useState, memo } from "react";
 import WaveSurfer from "wavesurfer.js";
-import { useEffect, useState } from "react";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import {
   faPlay,
@@ -21,7 +20,7 @@ interface MediaAudioPlayerProps {
   mediaFile: MediaFile;
 }
 
-export default function MediaAudioPlayer({ mediaFile }: MediaAudioPlayerProps) {
+const MediaAudioPlayer = memo(({ mediaFile }: MediaAudioPlayerProps) => {
   let [isPlaying, setIsPlaying] = useState(false);
   let [isRepeating, setIsRepeating] = useState(false);
   let [playbackSpeed, setPlaybackSpeed] = useState(PlaybackSpeed.NORMAL);
@@ -29,7 +28,7 @@ export default function MediaAudioPlayer({ mediaFile }: MediaAudioPlayerProps) {
 
   useEffect(() => {
     const wavesurferInstance = WaveSurfer.create({
-      container: "#waveform", // Previousy I used 'this.ref.current' and React.createRef()
+      container: "#waveform",
       height: 200,
       responsive: true,
       waveColor: "#cbcbcb",
@@ -49,11 +48,12 @@ export default function MediaAudioPlayer({ mediaFile }: MediaAudioPlayerProps) {
     if (waveSurfer) {
       waveSurfer.load(audioLink);
     }
-  }, [waveSurfer, mediaFile]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [waveSurfer, mediaFile.public_bucket_path, BucketConfig]);
 
   useEffect(() => {
     if (waveSurfer) {
-      waveSurfer.unAll(); // NB: Otherwise we keep reinstalling the hooks and cause chaos
+      waveSurfer.unAll();
       waveSurfer.on("pause", () => {
         setIsPlaying(waveSurfer!.isPlaying());
       });
@@ -83,7 +83,7 @@ export default function MediaAudioPlayer({ mediaFile }: MediaAudioPlayerProps) {
     switch (playbackSpeed) {
       case PlaybackSpeed.NORMAL:
         nextSpeed = PlaybackSpeed.DOUBLE;
-        waveSurfer!.setPlaybackRate(1.5); // Okay, so a lie...
+        waveSurfer!.setPlaybackRate(1.5);
         break;
       case PlaybackSpeed.DOUBLE:
         nextSpeed = PlaybackSpeed.HALF;
@@ -97,51 +97,36 @@ export default function MediaAudioPlayer({ mediaFile }: MediaAudioPlayerProps) {
     setPlaybackSpeed(nextSpeed);
   };
 
-  let playButtonIcon = faPlay;
-  if (isPlaying) {
-    playButtonIcon = faPause;
-  }
-
+  let playButtonIcon = isPlaying ? faPause : faPlay;
   let repeatButtonIcon = isRepeating ? faRepeat : faArrowRight;
-
-  let speedButtonText = "1x";
-  switch (playbackSpeed) {
-    case PlaybackSpeed.NORMAL:
-      speedButtonText = "1x";
-      break;
-    case PlaybackSpeed.DOUBLE:
-      speedButtonText = "2x";
-      break;
-    case PlaybackSpeed.HALF:
-      speedButtonText = "0.5x";
-      break;
-  }
+  let speedButtonText =
+    playbackSpeed === PlaybackSpeed.NORMAL
+      ? "1x"
+      : playbackSpeed === PlaybackSpeed.DOUBLE
+        ? "2x"
+        : "0.5x";
 
   return (
     <div>
       <div id="waveform"></div>
       <div className="d-flex justify-content-center gap-2 mt-3">
-        <Button
-          square={true}
-          icon={playButtonIcon}
-          onClick={() => togglePlayPause()}
-        />
-
+        <Button square={true} icon={playButtonIcon} onClick={togglePlayPause} />
         <Button
           tooltip="Toggle Repeat"
           variant="secondary"
           square={true}
           icon={repeatButtonIcon}
-          onClick={() => toggleIsRepeating()}
+          onClick={toggleIsRepeating}
         />
-
         <Button
           tooltip="Speed"
           label={speedButtonText}
           variant="secondary"
-          onClick={() => togglePlaybackSpeed()}
+          onClick={togglePlaybackSpeed}
         />
       </div>
     </div>
   );
-}
+});
+
+export default MediaAudioPlayer;

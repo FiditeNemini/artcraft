@@ -41,7 +41,7 @@ import WeightCoverImage from "components/common/WeightCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import SdInferencePanel from "./inference_panels/SdInferencePanel";
 import SdCoverImagePanel from "./cover_image_panels/SdCoverImagePanel";
-import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
+//import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 
 interface WeightProps {
@@ -73,14 +73,7 @@ export default function WeightPage({
   const history = useHistory();
   const bookmarks = useBookmarks();
   const ratings = useRatings();
-  const {
-    data: weight,
-    descriptionMD,
-    fetchError,
-    isLoading,
-    title,
-    remove,
-  } = useWeightFetch({
+  const fetchedWeight = useWeightFetch({
     onRemove: () => {
       history.push(source || "");
     },
@@ -90,7 +83,14 @@ export default function WeightPage({
     },
     token: weight_token,
   });
-
+  const {
+    data: weight,
+    fetchError,
+    isLoading,
+    title,
+    remove,
+  } = fetchedWeight;
+  console.log(fetchedWeight);
   const timeUpdated = moment(weight?.updated_at || "").fromNow();
   const dateUpdated = moment(weight?.updated_at || "").format("LLL");
   const dateCreated = moment(weight?.created_at || "").format("LLL");
@@ -110,15 +110,15 @@ export default function WeightPage({
 
   const deleteWeight = () => remove(!!user?.can_ban_users);
 
-  //Studio Access feature flag
-  switch (weight?.weight_type) {
-    case WeightType.SD_15:
-    case WeightType.SDXL:
-    case WeightType.LORA:
-      if (!sessionWrapper.canAccessStudio()) {
-        return <StudioNotAvailable />;
-      }
-  }
+  ////Studio Access feature flag
+  //switch (weight?.weight_type) {
+  //  case WeightType.SD_15:
+  //  case WeightType.SDXL:
+  //  case WeightType.LORA:
+  //    if (!sessionWrapper.canAccessStudio()) {
+  //      return <StudioNotAvailable />;
+  //    }
+  //}
 
   //Image generation panel if it's a lora weight or sd weight
   let imageGenPanel = <></>;
@@ -197,6 +197,17 @@ export default function WeightPage({
         return (
           <div className="d-flex flex-column gap-3">
             <SdCoverImagePanel src={sdCoverImage} />
+            {weight && weight.description_rendered_html ? (
+              <Panel padding={true}>
+                <h5 className="fw-semibold mb-2">Description</h5>
+                <p
+                  className="fs-7"
+                  dangerouslySetInnerHTML={{
+                    __html: weight.description_rendered_html || "",
+                  }}
+                />
+              </Panel>
+            ) : null}
             {imageGenPanel}
           </div>
         );
@@ -277,6 +288,7 @@ export default function WeightPage({
       [WeightCategory.SD]: { weightCategory: "Image Generation" },
       [WeightCategory.ZS]: { weightCategory: "Voice Designer" },
       [WeightCategory.VOCODER]: { weightCategory: "Vocoder" },
+      [WeightCategory.WF]: { weightCategory: "Workflow Config" },
     };
 
   let { weightCategory } = weightCategoryMap[weight.weight_category] || {
@@ -311,14 +323,11 @@ export default function WeightPage({
 
   switch (weight.weight_category) {
     case WeightCategory.TTS:
-      weightDetails = <DataTable data={voiceDetails} />;
-      break;
     case WeightCategory.VC:
-      weightDetails = <DataTable data={voiceDetails} />;
-      break;
     case WeightCategory.ZS:
       weightDetails = <DataTable data={voiceDetails} />;
       break;
+    case WeightCategory.WF:
     case WeightCategory.SD:
       weightDetails = <DataTable data={imageDetails} />;
       break;
@@ -488,14 +497,20 @@ export default function WeightPage({
 
         <div className="row g-4">
           <div className="col-12 col-xl-8 d-flex flex-column gap-3">
-            <div className="media-wrapper">{renderWeightComponent(weight)}</div>
-
-            {descriptionMD !== "" && (
+            {weight &&
+            weight.description_rendered_html &&
+            weight.weight_category !== WeightCategory.SD ? (
               <Panel padding={true}>
-                <h4 className="fw-semibold mb-3">Description</h4>
-                <p>{descriptionMD}</p>
+                <h5 className="fw-semibold mb-2">Description</h5>
+                <p
+                  className="fs-7"
+                  dangerouslySetInnerHTML={{
+                    __html: weight.description_rendered_html || "",
+                  }}
+                />
               </Panel>
-            )}
+            ) : null}
+            <div className="media-wrapper">{renderWeightComponent(weight)}</div>
 
             <div className="panel p-3 py-4 p-md-4 d-none d-xl-block">
               <h4 className="fw-semibold mb-3">Comments</h4>

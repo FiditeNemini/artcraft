@@ -29,10 +29,19 @@ export enum WeightsFilters {
   vall_e
 }
 
+export enum WeightsCategories {
+  all,
+  faceAnimation,
+  tts,
+  voiceConversion
+}
+
 export type EntityModeProp = keyof typeof EntityInputMode;
 export type MediaFilterProp = keyof typeof MediaFilters;
 export type WeightFilterProp = keyof typeof WeightsFilters;
+export type WeightCategoriesProp = keyof typeof WeightsCategories;
 export type AcceptTypes = MediaFilterProp | WeightFilterProp;
+export type JobSelection = WeightCategoriesProp | WeightFilterProp;
 
 export enum EntityType {
   unknown,
@@ -40,12 +49,16 @@ export enum EntityType {
   weights
 }
 
-export const EntityFilterOptions = ( mode?: EntityInputMode, t = (v:string) => v) => {
-  const filters = mode !== undefined ? [{ ...MediaFilters, ...WeightsFilters },MediaFilters,WeightsFilters,WeightsFilters][mode] : EntityInputMode;
+export const ListEntityFilters = (mode?: number) => {
+  const bookmarkFilters = Object.keys({ ...MediaFilters, ...WeightsFilters }).filter(val => isNaN(Number(val))).reduce((obj,current) => ({ ...obj, [current]: current  }),{});
 
-  return Object.values(filters)
-  .filter(val => isNaN(Number(val)))
-  .map((value) => {
+  const selectedFilters = mode !== undefined ? [bookmarkFilters,MediaFilters,WeightsFilters,WeightsFilters][mode] : EntityInputMode;
+
+  return Object.values(selectedFilters).filter(val => isNaN(Number(val)));
+};
+
+export const EntityFilterOptions = (mode?: EntityInputMode, t = (v:string) => v) => {
+  return ListEntityFilters(mode).map((value) => {
     if (typeof value === "string") return { value, label: t(value) }
     return { label: "all", value: "all" };
   });

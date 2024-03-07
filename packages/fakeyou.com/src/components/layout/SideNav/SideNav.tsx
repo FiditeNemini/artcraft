@@ -8,6 +8,7 @@ import {
   faCameraMovie,
   faCompass,
   faCloudUpload,
+  faFilms,
   faFaceViewfinder,
   faHome,
   faMessageDots,
@@ -21,21 +22,14 @@ import {
   faWaveformLines,
   faTransporter,
   faClipboardList,
+  faFilm,
 } from "@fortawesome/pro-solid-svg-icons";
-
-import {
-  GetQueueStats,
-  GetQueueStatsIsOk,
-  GetQueueStatsSuccessResponse,
-} from "@storyteller/components/src/api/stats/queues/GetQueueStats";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
-import { useLocalize } from "hooks";
+import { useInferenceJobs, useLocalize } from "hooks";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Button } from "components/common";
 import { WebUrl } from "common/WebUrl";
-
-const DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS = 15000;
 
 interface SideNavProps {
   sessionWrapper: SessionWrapper;
@@ -50,6 +44,7 @@ export default function SideNav({
   querySessionSubscriptionsCallback,
 }: SideNavProps) {
   const { t } = useLocalize("SideNav");
+  const { queueStats } = useInferenceJobs();
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const fakeYouFrontendEnv = FakeYouFrontendEnvironment.getInstance();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -58,11 +53,10 @@ export default function SideNav({
   const isMenuOpen = wrapper?.classList.contains("toggled");
   const isLoggedIn = sessionWrapper.isLoggedIn();
   const isOnLandingPage = window.location.pathname === "/";
-  const isOnLoginOrSignUpPage =
-    window.location.pathname === "/login" ||
-    window.location.pathname === "/login/" ||
-    window.location.pathname === "/signup" ||
-    window.location.pathname === "/signup/";
+  const isOnLoginOrSignUpPage = window.location.pathname.includes(
+    "/login" || "/signup"
+  );
+  const isOnStudioPage = window.location.pathname.includes("/studio");
 
   let history = useHistory();
   const handleNavLinkClick = () => {
@@ -113,7 +107,8 @@ export default function SideNav({
   }, []);
 
   const shouldNotShowSidebar =
-    !isLoggedIn && (isOnLandingPage || isOnLoginOrSignUpPage);
+    (!isLoggedIn && (isOnLandingPage || isOnLoginOrSignUpPage)) ||
+    isOnStudioPage;
   const shouldShowSidebar = windowWidth >= 992 && !shouldNotShowSidebar;
   const sidebarClassName = `sidebar ${
     shouldShowSidebar ? "visible" : ""
@@ -122,55 +117,13 @@ export default function SideNav({
   useEffect(() => {
     const contentWrapper = document.getElementById("page-content-wrapper");
 
-    if (
-      (shouldShowSidebar && isLoggedIn) ||
-      (shouldShowSidebar && !isOnLandingPage)
-    ) {
+    // Adjusted logic to ensure no padding is added when on the studio page
+    if (shouldShowSidebar && !isOnStudioPage) {
       contentWrapper?.classList.remove("no-padding");
     } else {
       contentWrapper?.classList.add("no-padding");
     }
-  }, [isLoggedIn, isOnLandingPage, shouldShowSidebar]);
-
-  const [queueStats, setQueueStats] = useState<GetQueueStatsSuccessResponse>({
-    success: true,
-    cache_time: new Date(0), // NB: Epoch is used for vector clock's initial state
-    refresh_interval_millis: DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
-    inference: {
-      total_pending_job_count: 0,
-      pending_job_count: 0,
-      by_queue: {
-        pending_face_animation_jobs: 0,
-        pending_rvc_jobs: 0,
-        pending_svc_jobs: 0,
-        pending_tacotron2_jobs: 0,
-        pending_voice_designer: 0,
-      },
-    },
-    legacy_tts: {
-      pending_job_count: 0,
-    },
-  });
-
-  useEffect(() => {
-    const fetch = async () => {
-      const response = await GetQueueStats();
-      if (GetQueueStatsIsOk(response)) {
-        if (response.cache_time.getTime() > queueStats.cache_time.getTime()) {
-          setQueueStats(response);
-        }
-      }
-    };
-    // TODO: We're having an outage and need to lower this.
-    //const interval = setInterval(async () => fetch(), 15000);
-    const refreshInterval = Math.max(
-      DEFAULT_QUEUE_REFRESH_INTERVAL_MILLIS,
-      queueStats.refresh_interval_millis
-    );
-    const interval = setInterval(async () => fetch(), refreshInterval);
-    fetch();
-    return () => clearInterval(interval);
-  }, [queueStats]);
+  }, [shouldShowSidebar, isOnStudioPage]);
 
   const logoutHandler = async () => {
     await Logout();
@@ -191,6 +144,7 @@ export default function SideNav({
         variant="secondary"
         onClick={() => {
           history.push("/login");
+          handleNavLinkClick();
         }}
       />
     </>
@@ -203,6 +157,7 @@ export default function SideNav({
         small
         onClick={() => {
           history.push("/signup");
+          handleNavLinkClick();
         }}
       />
     </>
@@ -227,6 +182,7 @@ export default function SideNav({
           variant="secondary"
           onClick={() => {
             history.push(url);
+            handleNavLinkClick();
           }}
         />
       </>
@@ -241,6 +197,7 @@ export default function SideNav({
           variant="danger"
           onClick={async () => {
             await logoutHandler();
+            handleNavLinkClick();
           }}
         />
       </>
@@ -272,11 +229,23 @@ export default function SideNav({
     queueStats.legacy_tts.pending_job_count +
     queueStats.inference.by_queue.pending_tacotron2_jobs;
 
-  let maybeVideoGeneration = <></>;
+  let maybeBetaFeatures = <></>;
 
   if (sessionWrapper.canAccessStudio()) {
-    maybeVideoGeneration = (
+    maybeBetaFeatures = (
       <>
+        <li className="sidebar-heading">Beta Features</li>
+        <li>
+          <NavLink
+            to="/studio-intro/m_ejhs95fc5aybp36h4a79k7523ds6an"
+            activeClassName="active-link"
+            onClick={handleNavLinkClick}
+          >
+            <FontAwesomeIcon icon={faFilm} className="sidebar-heading-icon" />
+            Storyteller Onboarding
+            {/* {t("videoStorytellerStudio")} */}
+          </NavLink>
+        </li>
         <li>
           <NavLink
             to="/video-mocap"
@@ -337,30 +306,25 @@ export default function SideNav({
     );
   }
 
-  let maybeImageGeneration = <></>;
-
-  if (sessionWrapper.canAccessStudio()) {
-    maybeImageGeneration = (
-      <>
-        <li className="sidebar-heading">Image Generation</li>
-        <li>
-          <NavLink
-            to="/text-to-image"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon
-              icon={faMessageImage}
-              className="sidebar-heading-icon"
-            />
-            Text to Image
-            {/* {t("videoStorytellerStudio")} */}
-          </NavLink>
-        </li>
-        <hr className="mb-3 mt-3" />
-      </>
-    );
-  }
+  let maybeImageGeneration = (
+    <>
+      <li className="sidebar-heading">Image Generation</li>
+      <li>
+        <NavLink
+          to="/text-to-image"
+          activeClassName="active-link"
+          onClick={handleNavLinkClick}
+        >
+          <FontAwesomeIcon
+            icon={faMessageImage}
+            className="sidebar-heading-icon"
+          />
+          Text to Image
+          {/* {t("videoStorytellerStudio")} */}
+        </NavLink>
+      </li>
+    </>
+  );
 
   return (
     <>
@@ -420,7 +384,6 @@ export default function SideNav({
                 My Jobs
               </NavLink>
             </li>
-            <hr className="mb-3 mt-3" />
             <li className="sidebar-heading">{t("speechTitle")}</li>
             <li>
               <NavLink
@@ -461,8 +424,22 @@ export default function SideNav({
                 {"Voice Designer"}
               </NavLink>
             </li>
-            <hr className="mb-3 mt-3" />
             <li className="sidebar-heading">{t("videoTitle")}</li>
+
+            <li>
+              <NavLink
+                to="/video-styletransfer"
+                activeClassName="active-link"
+                onClick={handleNavLinkClick}
+              >
+                <FontAwesomeIcon
+                  icon={faFilms}
+                  className="sidebar-heading-icon"
+                />
+                {t("videoStyleTransfer")}
+              </NavLink>
+            </li>
+
             <li>
               <NavLink
                 to="/face-animator"
@@ -477,11 +454,9 @@ export default function SideNav({
               </NavLink>
             </li>
 
-            {maybeVideoGeneration}
-
-            <hr className="mb-3 mt-3" />
-
             {maybeImageGeneration}
+
+            {maybeBetaFeatures}
 
             <li className="sidebar-heading">{t("communityTitle")}</li>
             <li>
@@ -553,6 +528,12 @@ export default function SideNav({
                 {t("queueSvc")}:{" "}
                 <span className="text-red">
                   {queueStats.inference.by_queue.pending_svc_jobs}
+                </span>
+              </div>
+              <div>
+                Image Generation:{" "}
+                <span className="text-red">
+                  {queueStats.inference.by_queue.pending_stable_diffusion}
                 </span>
               </div>
               <div>

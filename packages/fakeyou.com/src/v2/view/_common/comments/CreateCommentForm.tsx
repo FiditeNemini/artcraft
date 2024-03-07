@@ -24,9 +24,8 @@ function CreateCommentForm(props: Props) {
   const { entityType, entityToken, loadComments } = props;
 
   const [commentMarkdown, setCommentMarkdown] = useState<string>("");
-  const [uuidIdempotencyToken, setUuidIdempotencyToken] = useState<string>(
-    uuidv4()
-  );
+  const [uuidIdempotencyToken, setUuidIdempotencyToken] =
+    useState<string>(uuidv4());
   const [buttonVisible, setButtonVisible] = useState(false);
 
   const postComment = useCallback(async () => {
@@ -91,8 +90,21 @@ function CreateCommentForm(props: Props) {
 
   let gravatarHash = user?.email_gravatar_hash;
   let gravatar = <span />;
+  let username = user?.username;
+  let emailHash = user?.email_gravatar_hash;
+  let avatarIndex = user?.core_info.default_avatar.image_index;
+  let backgroundColorIndex = user?.core_info.default_avatar.color_index;
+
   if (gravatarHash !== undefined) {
-    gravatar = <Gravatar email_hash={gravatarHash} size={40} />;
+    gravatar = (
+      <Gravatar
+        email_hash={emailHash || ""}
+        username={username || ""}
+        avatarIndex={avatarIndex || 0}
+        backgroundIndex={backgroundColorIndex || 0}
+        size={40}
+      />
+    );
   }
 
   let commentButton = <></>;

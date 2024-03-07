@@ -82,7 +82,7 @@ function SdInferencePanel({
   const [aspectRatio, setAspectRatio] = useState("square");
   const [cfgScale, setCfgScale] = useState(7);
   const [samples, setSamples] = useState(8);
-  const [batchCount, setBatchCount] = useState(1);
+  const [batchCount, setBatchCount] = useState(3);
   const [prompt, setPrompt] = useState("");
   const [negativePrompt, setNegativePrompt] = useState("");
   const onChange = onChanger({
@@ -103,8 +103,8 @@ function SdInferencePanel({
     seedNumber: "",
     sampler: "DPM++ 2M Karras",
     cfgScale: 7,
-    samples: 8,
-    batchCount: 1,
+    samples: 25,
+    batchCount: 3,
     loraToken: null,
   };
 
@@ -259,18 +259,12 @@ function SdInferencePanel({
       return false;
     }
 
-    if (!sessionSubscriptionsWrapper.hasActiveProSubscription()) {
-      setBatchCount(1);
-    }
-
     setIsEnqueuing(true);
 
     //make sure seed is random on generation if random is selected
     if (seed === "random") {
       internalSeed.current = generateRandomSeed();
     }
-
-    console.log(sdToken);
 
     const request = {
       uuid_idempotency_token: uuidv4(),
@@ -287,13 +281,9 @@ function SdInferencePanel({
       maybe_batch_count: batchCount,
     };
 
-    console.log("request", request);
-
     const response = await EnqueueImageGen(request);
 
     if (EnqueueImageGenIsSuccess(response)) {
-      console.log("enqueuing...");
-
       if (response.inference_job_token) {
         enqueueInferenceJob(
           response.inference_job_token,

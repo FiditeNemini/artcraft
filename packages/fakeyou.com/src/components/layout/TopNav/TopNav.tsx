@@ -8,6 +8,8 @@ import {
   faWaveformLines,
   faXmark,
   faClipboardList,
+  faChevronLeft,
+  faMessageImage,
 } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import SearchBar from "components/common/SearchBar";
@@ -20,6 +22,7 @@ import { InferenceJobsModal } from "components/modals";
 import { useDomainConfig } from "context/DomainConfigContext";
 import NavItem from "../../common/NavItem/NavItem";
 import ProfileDropdown from "components/common/ProfileDropdown";
+import "./TopNav.scss";
 
 interface TopNavProps {
   sessionWrapper: SessionWrapper;
@@ -42,14 +45,16 @@ export default function TopNav({
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
   // const { t } = useLocalize("TopNav");
   const isOnLandingPage = window.location.pathname === "/";
-  const isOnLoginOrSignUpPage =
-    window.location.pathname === "/login" ||
-    window.location.pathname === "/login/" ||
-    window.location.pathname === "/signup" ||
-    window.location.pathname === "/signup/";
+  const isOnLoginOrSignUpPage = window.location.pathname.includes(
+    "/login" || "/signup"
+  );
+  const isOnStudioPage = window.location.pathname.includes("/studio");
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
+  const [isScrolled, setIsScrolled] = useState(false);
+  const loggedIn = sessionWrapper.isLoggedIn();
+  const showNavItem = !loggedIn && (isOnLandingPage || isOnLoginOrSignUpPage);
 
   const handleMenuButtonClick = () => {
     if (window.innerWidth < 1200) {
@@ -108,14 +113,28 @@ export default function TopNav({
     };
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   const logoutHandler = async () => {
     await Logout();
     querySessionCallback();
     querySessionSubscriptionsCallback();
     history.push("/");
   };
-
-  const loggedIn = sessionWrapper.isLoggedIn();
 
   let profileDropdown = <></>;
 
@@ -160,11 +179,22 @@ export default function TopNav({
       link: "/voice-designer",
       icon: faWandMagicSparkles,
     },
+    {
+      id: 5,
+      name: "Text to Image",
+      link: "/text-to-image",
+      icon: faMessageImage,
+    },
     // { id: 4, name: "Text to Image", link: "/text-to-image" },
   ];
 
   return (
-    <div id="topbar-wrapper" className="position-fixed">
+    <div
+      id="topbar-wrapper"
+      className={`position-fixed ${
+        !loggedIn && isOnLandingPage && !isScrolled ? "topbar-bg-dark" : ""
+      }`}
+    >
       <div className="topbar-nav">
         <div className="topbar-nav-left">
           <div className="d-flex gap-3 align-items-center">
@@ -172,7 +202,7 @@ export default function TopNav({
               <img
                 src={domain.logo}
                 alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
-                height="34"
+                height="36"
                 className="mb-1 d-none d-lg-block"
               />
               <img
@@ -182,8 +212,7 @@ export default function TopNav({
                 className="mb-0 d-block d-lg-none"
               />
             </Link>
-            {((!loggedIn && isOnLandingPage) ||
-              (!loggedIn && isOnLoginOrSignUpPage)) && (
+            {showNavItem && (
               <div className="d-none d-lg-block">
                 <NavItem
                   isHoverable={true}
@@ -192,23 +221,39 @@ export default function TopNav({
                 />
               </div>
             )}
+            {isOnStudioPage && loggedIn && (
+              <Button
+                icon={faChevronLeft}
+                label="Back to Dashboard"
+                small={true}
+                variant="secondary"
+                to="/"
+                className="ms-2"
+              />
+            )}
           </div>
         </div>
 
         <div className="topbar-nav-center">
           {/* Search Bar */}
           <div className="d-none d-lg-block">
-            <SearchBar
-              onFocus={onFocusHandler}
-              onBlur={onBlurHandler}
-              isFocused={isFocused}
-            />
+            {(!isOnLandingPage && !isOnLoginOrSignUpPage && !isOnStudioPage) ||
+            (loggedIn && !isOnLoginOrSignUpPage && !isOnStudioPage) ||
+            (isOnLandingPage &&
+              isScrolled &&
+              !isOnLoginOrSignUpPage &&
+              !isOnStudioPage) ? (
+              <SearchBar
+                onFocus={onFocusHandler}
+                onBlur={onBlurHandler}
+                isFocused={isFocused}
+              />
+            ) : null}
           </div>
         </div>
 
         <div className="topbar-nav-right">
-          {((!loggedIn && isOnLandingPage) ||
-            (!loggedIn && isOnLoginOrSignUpPage)) && (
+          {showNavItem && (
             <NavItem
               icon={faStar}
               label="Pricing"
@@ -219,15 +264,18 @@ export default function TopNav({
 
           <div className="d-flex align-items-center gap-2">
             <div className="d-none d-lg-flex gap-2">
-              <Button
-                {...{
-                  icon: faClipboardList,
-                  label: "My Jobs",
-                  onClick: openModal,
-                  variant: "secondary",
-                  small: true,
-                }}
-              />
+              {!showNavItem && (
+                <Button
+                  {...{
+                    icon: faClipboardList,
+                    label: "My Jobs",
+                    onClick: openModal,
+                    variant: "secondary",
+                    small: true,
+                  }}
+                />
+              )}
+
               {loggedIn ? (
                 profileDropdown
               ) : (
@@ -250,22 +298,27 @@ export default function TopNav({
                 </>
               )}
             </div>
-            <Button
-              icon={faClipboardList}
-              variant="secondary"
-              small={true}
-              label="My Jobs"
-              onClick={openModal}
-              className="d-lg-none"
-            />
-            <Button
-              icon={faSearch}
-              variant="secondary"
-              small={true}
-              square={true}
-              onClick={handleSearchButtonClick}
-              className="d-lg-none"
-            />
+            {!showNavItem && (
+              <>
+                <Button
+                  icon={faClipboardList}
+                  variant="secondary"
+                  small={true}
+                  label="My Jobs"
+                  onClick={openModal}
+                  className="d-lg-none"
+                />
+                <Button
+                  icon={faSearch}
+                  variant="secondary"
+                  small={true}
+                  square={true}
+                  onClick={handleSearchButtonClick}
+                  className="d-lg-none"
+                />
+              </>
+            )}
+
             <Button
               icon={menuButtonIcon}
               variant="secondary"

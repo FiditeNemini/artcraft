@@ -2,12 +2,14 @@ import useBatchContent from './useBatchContent';
 import useBookmarks from './useBookmarks';
 import useChanger from './useChanger';
 import useCoverImgUpload from './useCoverImgUpload';
+import useDebounce from './useDebounce';
 import useFile from './useFile';
 import useHover from './useHover';
 import useId from './useId';
 import useIdempotency from './useIdempotency';
 import useInferenceJobs from './useInferenceJobs';
 import useInterval from './useInterval';
+import useJobStatus from './useJobStatus';
 import useLazyLists from './useLazyLists';
 import useListContent from './useListContent';
 import useLocalize from './useLocalize';
@@ -15,9 +17,11 @@ import useMedia from './useMedia';
 import useModal from './useModal';
 import useOnScreen from "./useOnScreen";
 import usePrevious from './usePrevious';
+import useQueuePoll from './useQueuePoll';
 import useRatings from './useRatings';
 import useSdUpload from './useSdUpload';
 import useSession from './useSession';
+import useSlides from './useSlides';
 import useVideo from './useVideo';
 import useWeightFetch from './useWeightFetch';
 
@@ -26,12 +30,14 @@ export {
   useBookmarks,
   useChanger,
   useCoverImgUpload,
+  useDebounce,
   useFile,
   useHover,
   useId,
   useIdempotency,
   useInferenceJobs,
   useInterval,
+  useJobStatus,
   useLazyLists,
   useListContent,
   useLocalize,
@@ -39,9 +45,11 @@ export {
   useModal,
   useOnScreen,
   usePrevious,
+  useQueuePoll,
   useRatings,
   useSdUpload,
   useSession,
+  useSlides,
   useVideo,
   useWeightFetch
 };

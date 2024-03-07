@@ -7,10 +7,10 @@ import SkeletonCard from "components/common/Card/SkeletonCard";
 import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
 import { GetMediaByUser } from "@storyteller/components/src/api/media_files/GetMediaByUser";
 import { GetWeightsByUser } from "@storyteller/components/src/api/weights/GetWeightsByUser";
-import { SearchWeights } from "@storyteller/components/src/api/weights/SearchWeights";
+import { SearchWeight } from "@storyteller/components/src/api/weights/Search";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import { Weight } from "@storyteller/components/src/api/weights/GetWeight";
-import { useListContent, 
+import { useDebounce, useListContent,
   // useRatings
 } from "hooks";
 import { faArrowDownWideShort, faFilter } from "@fortawesome/pro-solid-svg-icons";
@@ -18,11 +18,14 @@ import prepFilter from "resources/prepFilter";
 import ModalHeader from "../ModalHeader";
 import "./MediaBrowser.scss";
 
+const n = () => {};
+
 interface Props {
   accept?: AcceptTypes[],
   handleClose: any;
   inputMode: EntityInputMode;
   mediaToken: string;
+  onSearchChange?: (e: any) => void;
   onSelect?: any;
   owner?: string;
   search?: string;
@@ -32,8 +35,9 @@ interface Props {
 export default function MediaBrowser({
   accept,
   mediaToken,
-  handleClose = () => {},
+  handleClose = n,
   inputMode,
+  onSearchChange = n,
   onSelect,
   owner,
   search,
@@ -43,15 +47,17 @@ export default function MediaBrowser({
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [filterType, filterTypeSet] = useState(accept ? accept[0] : "all");
   const [list, listSet] = useState<MediaFile | Weight[]>([]);
-  const fetcher = [GetBookmarksByUser,GetMediaByUser,GetWeightsByUser,SearchWeights][inputMode];
+  const [localSearch,localSearchSet] = useState(search);
+  const [searchUpdated,searchUpdatedSet] = useState(false);
+  const fetcher = [GetBookmarksByUser,GetMediaByUser,GetWeightsByUser,SearchWeight][inputMode];
 
   const entities = useListContent({
     debug: "media browser",
     addQueries: {
-      ...(search ? {} : { page_size: 24 }),
+      ...(localSearch ? {} : { page_size: 24 }),
       ...prepFilter(
         filterType,
-        ["maybe_scoped_weight_type", "filter_media_type", "maybe_scoped_weight_type",""][inputMode]
+        ["maybe_scoped_weight_type", "filter_media_type", "maybe_scoped_weight_type","abc"][inputMode]
       ),
     },
     addSetters: { filterTypeSet },
@@ -64,12 +70,27 @@ export default function MediaBrowser({
       // ratings.gather({ res, key: "token" });
       setShowMasonryGrid(true);
     },
-    ...(search ? { request: { search_term: search } } : {}),
+    ...(localSearch ? { request: { search_term: localSearch } } : {}),
     requestList: true,
-    // ...(search ? { resultsKey: "weights" } : {}),
-    urlParam: owner || username,
+    ...(localSearch ? { resultsKey: "weights" } : {}),
+    urlParam: owner || username || "",
     urlUpdate: false,
   });
+
+  useDebounce({
+    blocked: !searchUpdated,
+    onTimeout: () => {
+      searchUpdatedSet(false);
+      entities.reFetch();
+    }
+  })
+
+  const localSearchChange = ({ target }: { target: any }) => {
+    searchUpdatedSet(true);
+    // entities.reFetch();
+    onSearchChange({ target });
+    localSearchSet(target.value);
+  };
 
   const handlePageClick = (selectedItem: { selected: number }) => {
     entities.pageChange(selectedItem.selected);
@@ -108,7 +129,12 @@ export default function MediaBrowser({
 
   return (
     <>
-      <ModalHeader {...{ handleClose, title }}>
+      <ModalHeader {...{
+        onSearchChange: localSearchChange,
+        handleClose,
+        search: localSearch,
+        title
+      }}>
         <TempSelect
           {...{
             icon: faArrowDownWideShort,
@@ -144,7 +170,7 @@ export default function MediaBrowser({
               <div {...{ className: "fy-media-browser-list" }}>
                 <MediaList
                   {...{
-                    entityType: 1,
+                    entityType: 2,
                     list: entities.list,
                     success: entities.status === 3,
                     onClick,

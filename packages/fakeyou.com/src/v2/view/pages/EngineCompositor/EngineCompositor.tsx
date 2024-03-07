@@ -65,6 +65,7 @@ export default function EngineCompositor({ value, sessionWrapper }: Props) {
                 label: "Choose 3D data",
                 onChange,
                 type: "media",
+                value: mediaToken
               }}
             />
           </div>

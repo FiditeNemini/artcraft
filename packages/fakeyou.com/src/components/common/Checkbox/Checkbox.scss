@@ -3,16 +3,38 @@
 .fy-checkbox-frame {
   margin-bottom: .5rem;
   white-space: nowrap;
+  cursor: pointer;
 
   label {
     margin-left: .5rem;
+  cursor: pointer;
+  }
+}
+
+.fy-checkbox-primary-unchecked, .fy-checkbox-primary-checked {
+  .fy-checkbox {
+    background-color: $primary;
+  }
+   &:hover {
+    .fy-checkbox {
+      background-color: lighten($primary, 5%);
+    }
+  }
+}
+
+.fy-checkbox-secondary-unchecked, .fy-checkbox-secondary-checked {
+  .fy-checkbox {
+    background-color: $secondary;
+  }
+   &:hover {
+    .fy-checkbox {
+      background-color: $secondary-light;
+    }
   }
 }
 
 .fy-checkbox {
-  background-color: $primary;
   border-radius: .5rem;
-  cursor: pointer;
   display: inline-block;
   vertical-align: middle;
   height: 2rem;

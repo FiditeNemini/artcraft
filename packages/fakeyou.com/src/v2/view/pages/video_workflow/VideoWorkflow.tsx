@@ -11,7 +11,7 @@ import SubRoutes from "./videoWorkflowRoutes";
 import { SessionWrapper } from '@storyteller/components/src/session/SessionWrapper';
 import { StudioNotAvailable } from 'v2/view/_common/StudioNotAvailable';
 
-export default function StorytellerFilter(props:{
+export default function VideoWorkflow(props:{
   enqueueInferenceJob: (
     jobToken: string,
     frontendInferenceJobType: FrontendInferenceJobType
@@ -48,6 +48,7 @@ export default function StorytellerFilter(props:{
   }, [pageState, enqueueInferenceJob]);
 
   if (!props.sessionWrapper.canAccessStudio()) {
+    //return <VideoStyleTransferNotAvailable />
     return <StudioNotAvailable />
   }
 
