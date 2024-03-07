@@ -10,6 +10,7 @@ import Dashboard from "./Dashboard";
 import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 import { useDomainConfig } from "context/DomainConfigContext";
 import StorytellerLanding from "./storyteller/StorytellerLanding";
+import LandingVideoReel from "./components/LandingVideoReel";
 import {
   FrontendInferenceJobType,
   InferenceJob,
@@ -39,6 +40,7 @@ function LandingPage(props: Props) {
 
   return (
     <>
+      {domain.title === "Storyteller AI" && !isLoggedIn && <LandingVideoReel />}
       <Container type="panel">
         {domain.title === "FakeYou" ? (
           <>
