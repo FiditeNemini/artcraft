@@ -45,16 +45,16 @@ export default function TopNav({
   const [menuButtonIcon, setMenuButtonIcon] = useState(faBars);
   // const { t } = useLocalize("TopNav");
   const isOnLandingPage = window.location.pathname === "/";
-  const isOnLoginOrSignUpPage = window.location.pathname.includes(
-    "/login" || "/signup"
-  );
+  const isOnLoginPage = window.location.pathname.includes("/login");
+  const isOnSignUpPage = window.location.pathname.includes("/signup");
   const isOnStudioPage = window.location.pathname.includes("/studio");
 
   const { open } = useModal();
   const openModal = () => open({ component: InferenceJobsModal });
   const [isScrolled, setIsScrolled] = useState(false);
   const loggedIn = sessionWrapper.isLoggedIn();
-  const showNavItem = !loggedIn && (isOnLandingPage || isOnLoginOrSignUpPage);
+  const showNavItem =
+    !loggedIn && (isOnLandingPage || isOnLoginPage || isOnSignUpPage);
 
   const handleMenuButtonClick = () => {
     if (window.innerWidth < 1200) {
@@ -241,11 +241,18 @@ export default function TopNav({
         <div className="topbar-nav-center">
           {/* Search Bar */}
           <div className="d-none d-lg-block">
-            {(!isOnLandingPage && !isOnLoginOrSignUpPage && !isOnStudioPage) ||
-            (loggedIn && !isOnLoginOrSignUpPage && !isOnStudioPage) ||
+            {(!isOnLandingPage &&
+              !isOnLoginPage &&
+              !isOnSignUpPage &&
+              !isOnStudioPage) ||
+            (loggedIn &&
+              !isOnLoginPage &&
+              !isOnSignUpPage &&
+              !isOnStudioPage) ||
             (isOnLandingPage &&
               isScrolled &&
-              !isOnLoginOrSignUpPage &&
+              !isOnLoginPage &&
+              !isOnSignUpPage &&
               !isOnStudioPage) ? (
               <SearchBar
                 onFocus={onFocusHandler}
