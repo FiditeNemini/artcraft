@@ -21,6 +21,11 @@ pub fn init_otel_metrics_pipeline(
 ) -> Result<(), opentelemetry::metrics::MetricsError>  {
     info!("Setting up otel metrics pipeline...");
 
+    // check env var to see if we should skip telemetry
+    if std::env::var("SKIP_TELEMETRY").is_ok() {
+        warn!("Skipping telemetry setup due to SKIP_TELEMETRY env var");
+        return Ok(());
+    }
     let provider = opentelemetry_otlp::new_pipeline()
         .metrics(opentelemetry_sdk::runtime::Tokio)
         // TODO: 1. read host from env 2. Single pod of otel-collector is probably not good enough, run daemonset?
