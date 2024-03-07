@@ -2,6 +2,7 @@ import { Badge, Button, Panel } from "components/common";
 import React, { useEffect, useRef, useState } from "react";
 import "./VstSectionV1.scss";
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 interface VstSectionV1Props {}
 
@@ -87,12 +88,9 @@ export default function VstSectionV1(props: VstSectionV1Props) {
                   <Badge label={column.title} color="gray" />
                 </div>
                 <div className="vst-sbs-video-overlay-cta">
-                  <Button
-                    variant="link"
-                    label="Try this style"
-                    to={column.ctaLink || "/video-styletransfer"}
-                    className="fs-7"
-                  />
+                  <Link to={column.ctaLink || "/video-styletransfer"}>
+                    <Badge label="Try this style" />
+                  </Link>
                 </div>
               </div>
             </div>
