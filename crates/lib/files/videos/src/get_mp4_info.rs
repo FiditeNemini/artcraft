@@ -6,23 +6,38 @@ use mp4::TrackType;
 
 use errors::AnyhowResult;
 
+#[derive(Debug, Clone)]
 pub struct Mp4Info {
   /// Framerate of the longest video track.
   pub framerate: f64,
+
   /// Duration of the entire mp4.
   pub duration_millis: u128,
+
+  /// Width of the longest video track.
+  pub width: u16,
+
+  /// Height of the longest video track.
+  pub height: u16,
 }
 
-pub fn get_mp4_info_for_bytes(file_bytes: &[u8], file_size: u64) -> AnyhowResult<Mp4Info> {
+pub fn get_mp4_info_for_bytes(file_bytes: &[u8]) -> AnyhowResult<Mp4Info> {
+  get_mp4_info_for_bytes_and_len(file_bytes, file_bytes.len())
+}
+
+pub fn get_mp4_info_for_bytes_and_len(file_bytes: &[u8], file_size: usize) -> AnyhowResult<Mp4Info> {
   let reader = BufReader::new(Cursor::new(file_bytes));
-  get_mp4_info(reader, file_size)
+  get_mp4_info(reader, file_size as u64)
 }
 
 pub fn get_mp4_info<T: Seek + Read>(reader: T, file_size: u64) -> AnyhowResult<Mp4Info> {
   let mp4 = mp4::Mp4Reader::read_header(reader, file_size)?;
 
-  let mut framerate = 0.0;
   let mut longest_duration = Duration::from_secs(0);
+
+  let mut framerate = 0.0;
+  let mut width = 0;
+  let mut height = 0;
 
   for track in mp4.tracks().values() {
     match track.track_type() {
@@ -30,6 +45,8 @@ pub fn get_mp4_info<T: Seek + Read>(reader: T, file_size: u64) -> AnyhowResult<M
         if track.duration() > longest_duration {
           longest_duration = track.duration();
           framerate = track.frame_rate();
+          width = track.width();
+          height = track.height();
         }
       }
       Err(err) => {
@@ -43,6 +60,8 @@ pub fn get_mp4_info<T: Seek + Read>(reader: T, file_size: u64) -> AnyhowResult<M
   Ok(Mp4Info {
     framerate,
     duration_millis: mp4.duration().as_millis(),
+    width,
+    height,
   })
 }
 
@@ -76,5 +95,7 @@ pub mod tests {
 
     assert_eq!(info.framerate, 30.0);
     assert_eq!(info.duration_millis, 15168);
+    assert_eq!(info.width, 640);
+    assert_eq!(info.height, 480);
   }
 }

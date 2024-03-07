@@ -19,8 +19,6 @@ actix_helpers = { path = "../../../lib/actix_helpers" }
 bootstrap = { path = "../../../lib/bootstrap" }
 buckets = { path = "../../../_types/buckets" }
 cloud_storage = { path = "../../../lib/api_clients/cloud_storage" }
-google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
-thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator"}
 collections = { path = "../../../lib/collections" }
 composite_identifiers = { path = "../../../_types/composite_identifiers" }
 concurrency = { path = "../../../lib/concurrency" }
@@ -29,6 +27,7 @@ easyenv = { path = "../../../lib/easyenv" }
 enums = { path = "../../../_types/enums" }
 errors = { path = "../../../lib/errors" }
 filesys = { path = "../../../lib/files/filesys" }
+google_drive_common = { path = "../../../lib/api_clients/google_drive_common" }
 hashing = { path = "../../../lib/files/hashing" }
 images = { path = "../../../lib/files/images" }
 jobs_common = { path = "../../../lib/jobs_common" }
@@ -39,8 +38,10 @@ mimetypes = { path = "../../../lib/files/mimetypes" }
 mysql_queries = { path = "../../../lib/mysql_queries" }
 redis_common = { path = "../../../lib/redis_common" }
 subprocess_common = { path = "../../../lib/subprocess_common" }
+thumbnail_generator = { path = "../../../lib/api_clients/thumbnail_generator"}
 tokens = { path = "../../../_types/tokens" }
 tts_common = { path = "../../../lib/tts_common" }
+videos = { path = "../../../lib/files/videos" }
 
 # External
 anyhow = "1.0.75"

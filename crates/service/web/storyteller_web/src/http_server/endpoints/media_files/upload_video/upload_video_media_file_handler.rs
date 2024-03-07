@@ -18,7 +18,7 @@ use mimetypes::mimetype_to_extension::mimetype_to_extension;
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use mysql_queries::queries::media_files::create::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
 use tokens::tokens::media_files::MediaFileToken;
-use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes};
+use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
 use crate::http_server::endpoints::engine::create_scene_handler::{CreateSceneError, CreateSceneSuccessResponse};
 use crate::http_server::endpoints::media_files::upload_video::drain_multipart_request::drain_multipart_request;
@@ -176,7 +176,7 @@ pub async fn upload_video_media_file_handler(
 
   // ==================== FRAME RATE ==================== //
 
-  let mp4_info = get_mp4_info_for_bytes(file_bytes.as_ref(), file_size_bytes as u64)
+  let mp4_info = get_mp4_info_for_bytes(file_bytes.as_ref())
       .map_err(|err| {
         warn!("Error reading mp4 info: {:?}", err);
         VideoMediaFileUploadError::ServerError
