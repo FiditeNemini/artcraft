@@ -84,9 +84,30 @@ pub async fn status_alert_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, StatusAlertError> {
 
+  let maybe_category = server_state
+      .flags
+      .maybe_status_alert_category
+      .as_deref()
+      .map(|category| category_to_enum(&category))
+      .flatten();
+
+  let maybe_message = server_state
+      .flags
+      .maybe_status_alert_custom_message
+      .as_deref()
+      .map(|message| message.trim().to_string());
+
+  let maybe_alert = match (maybe_category, maybe_message) {
+    (None, None) => None,
+    (category, message) => Some(StatusAlertInfo {
+      maybe_category: category,
+      maybe_message: message,
+    }),
+  };
+
   let response = StatusAlertResponse {
     success: true,
-    maybe_alert: None,
+    maybe_alert,
   };
 
   let body = serde_json::to_string(&response)
@@ -95,4 +116,12 @@ pub async fn status_alert_handler(
   Ok(HttpResponse::Ok()
       .content_type("application/json")
       .body(body))
+}
+
+fn category_to_enum(category: &str) -> Option<StatusAlertCategory> {
+  let key = category.trim();
+  match key {
+    "down_for_maintenance" => Some(StatusAlertCategory::DownForMaintenance),
+    _ => None,
+  }
 }

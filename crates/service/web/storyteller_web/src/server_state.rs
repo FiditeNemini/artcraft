@@ -223,6 +223,12 @@ pub struct StaticFeatureFlags {
   /// Used to bring the service back online slowly.
   pub global_429_pushback_filter_enabled: bool,
 
+  /// If we're suffering an outage, set the alert category to display a predefined message to users.
+  pub maybe_status_alert_category: Option<String>,
+
+  /// If we're suffering an outage, set custom text for the alert message.
+  pub maybe_status_alert_custom_message: Option<String>,
+
   /// Disable the live `/v1/stats/queues` endpoint for all users and serve a static value instead.
   pub disable_unified_queue_stats_endpoint: bool,
 
