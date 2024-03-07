@@ -23,7 +23,7 @@ export const CompAdminPanel = ({
   dispatchPageState: (action: Action) => void;
 })=>{
   const history = useHistory();
-  const exampleJSON = JSON.stringify(mapRequest(vstValues));
+  const exampleJSON = JSON.stringify(mapRequest(vstValues), null, 4);
   const [jsonRequest, setJsonRequest] = useState<string>(exampleJSON);
   const handleSendRequest = ()=>{
     EnqueueVideoStyleTransfer(JSON.parse(jsonRequest)).then(res => {
