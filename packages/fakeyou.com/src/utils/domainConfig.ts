@@ -1,12 +1,12 @@
 type DomainConfig = Record<string, any>;
 
 const domainConfigs: Record<string, DomainConfig> = {
-  "fakeyou.com": {
+  "storyteller.ai": {
     logo: "/fakeyou/Storyteller-Logo-1.png",
     title: "Storyteller AI",
     link: "https://storyteller.ai",
   },
-  "storyteller.ai": {
+  "fakeyou.com": {
     logo: "/fakeyou/FakeYou-Logo-2.png",
     title: "FakeYou",
     link: "https://fakeyou.com",
