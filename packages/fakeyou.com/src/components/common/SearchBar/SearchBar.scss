@@ -16,11 +16,16 @@
     padding-top: 7.25px !important;
     padding-bottom: 7.25px !important;
     border-radius: 0.5rem 0 0 0.5rem !important;
+    background-color: $input-dark !important;
     position: relative;
     z-index: 3;
 
     &::placeholder {
       color: rgba($white, 0.3) !important;
+    }
+
+    &.landing-search {
+      background-color: rgba($input-dark, 0.5) !important;
     }
   }
 }
