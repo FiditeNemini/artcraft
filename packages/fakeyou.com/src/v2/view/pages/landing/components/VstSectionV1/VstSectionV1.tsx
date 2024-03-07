@@ -59,7 +59,7 @@ export default function VstSectionV1(props: VstSectionV1Props) {
   return (
     <Panel clear={true} className="vst-section">
       <div className="col-12 col-lg-6 mb-5 pb-lg-3">
-        <h1 className="fw-bold">Video Style Transfer 1</h1>
+        <h1 className="fw-bold">Video Style Transfer</h1>
         <p className="opacity-75 mb-4">
           Transform your videos effortlessly with video style transfer. Apply
           unique styles and effects to create visually captivating content.

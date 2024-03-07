@@ -7,7 +7,6 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import { Container } from "components/common";
 import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import Dashboard from "./Dashboard";
-import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 import { useDomainConfig } from "context/DomainConfigContext";
 import StorytellerLanding from "./storyteller/StorytellerLanding";
 import {
@@ -46,24 +45,25 @@ function LandingPage(props: Props) {
           <>
             {/* FAKEYOU.COM */}
             {!isLoggedIn && (
-              <FakeYouLandingHeader
-                sessionWrapper={props.sessionWrapper}
-                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-                inferenceJobs={props.inferenceJobs}
-                ttsInferenceJobs={props.ttsInferenceJobs}
-                enqueueInferenceJob={props.enqueueInferenceJob}
-                inferenceJobsByCategory={props.inferenceJobsByCategory}
-                enqueueTtsJob={props.enqueueTtsJob}
-              />
+              <>
+                <FakeYouLandingHeader
+                  sessionWrapper={props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    props.sessionSubscriptionsWrapper
+                  }
+                  inferenceJobs={props.inferenceJobs}
+                  ttsInferenceJobs={props.ttsInferenceJobs}
+                  enqueueInferenceJob={props.enqueueInferenceJob}
+                  inferenceJobsByCategory={props.inferenceJobsByCategory}
+                  enqueueTtsJob={props.enqueueTtsJob}
+                />
+                <VstSectionV1 />
+                <VstSectionV2 />
+                {/* <FakeYouLandingBody /> */}
+              </>
             )}
 
-            <VstSectionV1 />
-
-            <VstSectionV2 />
-
             <Dashboard sessionWrapper={props.sessionWrapper} />
-
-            {!isLoggedIn && <FakeYouLandingBody />}
           </>
         ) : (
           <>
