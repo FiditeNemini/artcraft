@@ -14,7 +14,7 @@ import {
   faArrowRight,
   faArrowRightLong,
 } from "@fortawesome/pro-solid-svg-icons";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 interface VstSectionV2Props {}
 
@@ -225,11 +225,11 @@ export default function VstSectionV2(props: VstSectionV2Props) {
                 <div className="vst-styled-videos-panel-overlay-text">
                   <Badge label={styledVideo.label} color="gray" />
                 </div>
-                <div className="vst-styled-videos-panel-overlay-cta">
+                {/* <div className="vst-styled-videos-panel-overlay-cta">
                   <Link to={styledVideo.ctaLink || "/video-styletransfer"}>
                     <Badge label="Try this style" />
                   </Link>
-                </div>
+                </div> */}
               </div>
             ))}
           </div>

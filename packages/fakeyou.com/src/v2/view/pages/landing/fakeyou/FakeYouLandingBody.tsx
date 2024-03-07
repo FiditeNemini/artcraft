@@ -1,9 +1,9 @@
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Panel } from "components/common";
+// import { Panel } from "components/common";
 import { useLocalize } from "hooks";
 import React from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 interface FakeYouLandingBodyProps {}
 
@@ -12,7 +12,7 @@ export default function FakeYouLandingBody(props: FakeYouLandingBodyProps) {
 
   return (
     <>
-      <Panel clear={true}>
+      {/* <Panel clear={true}>
         <div className="section px-md-5 px-xl-3">
           <div className="row g-4 g-lg-5 flex-row-reverse">
             <div className="col-12 col-md-6 col-lg-7">
@@ -48,9 +48,9 @@ export default function FakeYouLandingBody(props: FakeYouLandingBodyProps) {
             </div>
           </div>
         </div>
-      </Panel>
+      </Panel> */}
 
-      <div className="py-4 mb-4">
+      <div className="section">
         <div className="container text-center community-container">
           <div className="panel px-4 py-5 d-flex flex-column align-items-center community-container rounded">
             <h2 className="fw-bold mb-2">{t("communityTitle")}</h2>

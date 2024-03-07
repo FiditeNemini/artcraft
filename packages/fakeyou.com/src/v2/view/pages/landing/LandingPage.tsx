@@ -15,8 +15,9 @@ import {
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import "./LandingPage.scss";
-import VstSectionV1 from "./components/VstSectionV1";
+// import VstSectionV1 from "./components/VstSectionV1";
 import VstSectionV2 from "./components/VstSectionV2";
+import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -57,13 +58,14 @@ function LandingPage(props: Props) {
                   inferenceJobsByCategory={props.inferenceJobsByCategory}
                   enqueueTtsJob={props.enqueueTtsJob}
                 />
-                <VstSectionV1 />
+                {/* <VstSectionV1 /> */}
                 <VstSectionV2 />
-                {/* <FakeYouLandingBody /> */}
               </>
             )}
 
             <Dashboard sessionWrapper={props.sessionWrapper} />
+
+            {!isLoggedIn && <FakeYouLandingBody />}
           </>
         ) : (
           <>
