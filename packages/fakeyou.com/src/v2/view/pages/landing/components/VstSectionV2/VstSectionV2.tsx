@@ -1,4 +1,4 @@
-import { Badge, Button, Panel } from "components/common";
+import { Badge, Panel } from "components/common";
 import React, { useEffect, useRef, useState } from "react";
 import "./VstSectionV2.scss";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -9,13 +9,12 @@ import "swiper/css/thumbs";
 import { Navigation, Thumbs } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { open } from '@typeform/embed';
 
 import {
   faArrowDownLong,
-  faArrowRight,
   faArrowRightLong,
 } from "@fortawesome/pro-solid-svg-icons";
+import TypeformButton from "components/common/TypeformButton";
 // import { Link } from "react-router-dom";
 
 interface VstSectionV2Props {}
@@ -29,9 +28,6 @@ export default function VstSectionV2(props: VstSectionV2Props) {
   //   setIsPlaying(!isPlaying);
   // };
 
-  const openTypeform = () => {
-    open('oWnV91Z9', { mode: 'popup' });
-  };
   const handleVideoPlay = () => {
     if (!isPlaying) {
       setIsPlaying(true);
@@ -122,13 +118,17 @@ export default function VstSectionV2(props: VstSectionV2Props) {
           unique styles and effects to create visually captivating content.
         </p>
         <div className="d-flex">
-          <Button
+          {/* <Button
             onClick={openTypeform}
             label="Join Waitlist for Video Style Transfer"
             small={true}
             icon={faArrowRight}
             iconFlip={true}
-            
+          /> */}
+          <TypeformButton
+            label="Join the Waitlist"
+            formId="oWnV91Z9"
+            labelSubmitted="You're on the waitlist!"
           />
         </div>
       </div>
