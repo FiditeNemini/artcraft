@@ -1,7 +1,9 @@
 use actix_multipart::Multipart;
 use actix_web::web::BytesMut;
+use anyhow::anyhow;
 use futures::TryStreamExt;
 use log::warn;
+use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 
 use errors::AnyhowResult;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
@@ -12,6 +14,7 @@ pub struct MediaFileUploadData {
   pub uuid_idempotency_token: Option<String>,
   pub file_name: Option<String>,
   pub file_bytes: Option<BytesMut>,
+  pub media_file_subtype: Option<MediaFileSubtype>,
 }
 
 /// Pull common parts out of multipart media HTTP requests, typically for handling file uploads.
@@ -19,6 +22,7 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
   let mut uuid_idempotency_token = None;
   let mut file_bytes = None;
   let mut file_name = None;
+  let mut media_file_subtype = None;
 
   while let Ok(Some(mut field)) = multipart_payload.try_next().await {
     let mut field_name = None;
@@ -34,17 +38,30 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
     match field_name.as_deref() {
       Some("uuid_idempotency_token") => {
         uuid_idempotency_token = read_multipart_field_as_text(&mut field).await
-            .map_err(|e| {
-              warn!("Error reading idempotency token: {:}", &e);
-              e
+            .map_err(|err| {
+              warn!("Error reading idempotency token: {:?}", &err);
+              err
             })?;
       },
       Some("file") => {
         file_name = field_filename.clone();
         file_bytes = checked_read_multipart_bytes(&mut field).await
-            .map_err(|e| {
-              warn!("Error reading audio upload: {:}", &e);
-              e
+            .map_err(|err| {
+              warn!("Error reading audio upload: {:?}", &err);
+              err
+            })?;
+      },
+      Some("media_file_subtype") => {
+        media_file_subtype = read_multipart_field_as_text(&mut field).await
+            .map_err(|err| {
+              warn!("Error reading source: {:?}", &err);
+              err
+            })?
+            .map(|field| MediaFileSubtype::from_str(&field))
+            .transpose()
+            .map_err(|err| {
+              warn!("Wrong MediaFileSubtype: {:?}", &err);
+              anyhow!("Wrong MediaFileSubtype: {:?}", &err)
             })?;
       },
       _ => continue,
@@ -55,5 +72,6 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
     uuid_idempotency_token,
     file_name,
     file_bytes,
+    media_file_subtype,
   })
 }

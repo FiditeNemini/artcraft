@@ -23,9 +23,22 @@ pub enum MediaFileSubtype {
   /// Primarily used for BVH.
   MocapNet,
 
-  /// Generic 3D scene file.
-  /// Can pertain to BVH, GLB, FBX, etc.
+  /// Generic animation case
+  /// Used for BVH files, but can also pertain to animation-only files of other types.
+  AnimationOnly,
+
+  // TODO(bt,2024-03-08): Migrate records and code, then remove
+  /// DEPRECATED: Use `SceneImport` instead.
+  #[deprecated(note="Use `SceneImport` instead")]
   Scene,
+
+  /// Generic 3D scene file.
+  /// Can pertain to glTF, glB, FBX, etc.
+  SceneImport,
+
+  /// Native Storyteller scene format.
+  /// Typically stored in a `.scn.ron` file.
+  StorytellerScene,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -38,8 +51,11 @@ impl MediaFileSubtype {
   pub fn to_str(&self) -> &'static str {
     match self {
       Self::Mixamo => "mixamo",
-      Self::Scene => "scene",
       Self::MocapNet => "mocap_net",
+      Self::AnimationOnly => "animation_only",
+      Self::Scene => "scene",
+      Self::SceneImport => "scene_import",
+      Self::StorytellerScene => "storyteller_scene",
     }
   }
 
@@ -47,7 +63,10 @@ impl MediaFileSubtype {
     match value {
       "mixamo" => Ok(Self::Mixamo),
       "mocap_net" => Ok(Self::MocapNet),
+      "animation_only" => Ok(Self::AnimationOnly),
       "scene" => Ok(Self::Scene),
+      "scene_import" => Ok(Self::SceneImport),
+      "storyteller_scene" => Ok(Self::StorytellerScene),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -58,7 +77,10 @@ impl MediaFileSubtype {
     BTreeSet::from([
       Self::Mixamo,
       Self::MocapNet,
+      Self::AnimationOnly,
       Self::Scene,
+      Self::SceneImport,
+      Self::StorytellerScene,
     ])
   }
 }
@@ -75,31 +97,43 @@ mod tests {
     fn test_serialization() {
       assert_serialization(MediaFileSubtype::Mixamo, "mixamo");
       assert_serialization(MediaFileSubtype::MocapNet, "mocap_net");
+      assert_serialization(MediaFileSubtype::AnimationOnly, "animation_only");
       assert_serialization(MediaFileSubtype::Scene, "scene");
+      assert_serialization(MediaFileSubtype::SceneImport, "scene_import");
+      assert_serialization(MediaFileSubtype::StorytellerScene, "storyteller_scene");
     }
 
     #[test]
     fn test_to_str() {
       assert_eq!(MediaFileSubtype::Mixamo.to_str(), "mixamo");
       assert_eq!(MediaFileSubtype::MocapNet.to_str(), "mocap_net");
+      assert_eq!(MediaFileSubtype::AnimationOnly.to_str(), "animation_only");
       assert_eq!(MediaFileSubtype::Scene.to_str(), "scene");
+      assert_eq!(MediaFileSubtype::SceneImport.to_str(), "scene_import");
+      assert_eq!(MediaFileSubtype::StorytellerScene.to_str(), "storyteller_scene");
     }
 
     #[test]
     fn test_from_str() {
       assert_eq!(MediaFileSubtype::from_str("mixamo").unwrap(), MediaFileSubtype::Mixamo);
       assert_eq!(MediaFileSubtype::from_str("mocap_net").unwrap(), MediaFileSubtype::MocapNet);
+      assert_eq!(MediaFileSubtype::from_str("animation_only").unwrap(), MediaFileSubtype::AnimationOnly);
       assert_eq!(MediaFileSubtype::from_str("scene").unwrap(), MediaFileSubtype::Scene);
+      assert_eq!(MediaFileSubtype::from_str("scene_import").unwrap(), MediaFileSubtype::SceneImport);
+      assert_eq!(MediaFileSubtype::from_str("storyteller_scene").unwrap(), MediaFileSubtype::StorytellerScene);
       assert!(MediaFileSubtype::from_str("foo").is_err());
     }
 
     #[test]
     fn all_variants() {
       let mut variants = MediaFileSubtype::all_variants();
-      assert_eq!(variants.len(), 3);
+      assert_eq!(variants.len(), 6);
       assert_eq!(variants.pop_first(), Some(MediaFileSubtype::Mixamo));
       assert_eq!(variants.pop_first(), Some(MediaFileSubtype::MocapNet));
+      assert_eq!(variants.pop_first(), Some(MediaFileSubtype::AnimationOnly));
       assert_eq!(variants.pop_first(), Some(MediaFileSubtype::Scene));
+      assert_eq!(variants.pop_first(), Some(MediaFileSubtype::SceneImport));
+      assert_eq!(variants.pop_first(), Some(MediaFileSubtype::StorytellerScene));
       assert_eq!(variants.pop_first(), None);
     }
   }
