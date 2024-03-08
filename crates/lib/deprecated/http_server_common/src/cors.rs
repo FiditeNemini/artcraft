@@ -63,6 +63,7 @@ pub fn add_fakeyou(cors: Cors, is_production: bool) -> Cors {
         .allowed_origin("https://staging.fakeyou.com")
         // FakeYou (Netlify Staging / Production)
         .allowed_origin("https://feature-mvp--fakeyou.netlify.app")
+        .allowed_origin("https://feature-marketing--fakeyou.netlify.app")
   } else {
     cors
         // FakeYou (Development)
