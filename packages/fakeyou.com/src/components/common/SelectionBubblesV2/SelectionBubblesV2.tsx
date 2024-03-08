@@ -36,10 +36,10 @@ export default function SelectionBubblesV2({
   const bubblesRef = useRef<HTMLDivElement>(null);
 
   const handleSelect = (
-    event: React.MouseEvent<HTMLButtonElement>,
+    event: React.MouseEvent<HTMLButtonElement> | null,
     optionLabel: string
   ) => {
-    event.preventDefault();
+    event?.preventDefault();
     setSelectedOption(optionLabel);
     onSelect(optionLabel);
   };
@@ -69,6 +69,13 @@ export default function SelectionBubblesV2({
     const handleResize = () => handleScroll();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (options.length > 0 && selectedOption !== null) {
+      onSelect(options[0].label);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

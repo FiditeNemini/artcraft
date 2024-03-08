@@ -73,31 +73,33 @@ export default function PageVSTApp() {
     };
   }
 
-  const styleOptions = {
-    Anime: {
+  const styleOptions = [
+    {
       label: "Anime",
       imageUrl: "/images/dummy-image.jpg",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "weight_yqexh77ntqyawzgh9fzash7981",
     },
-    Pixel: {
+    {
       label: "Pixel",
       imageUrl: "/images/dummy-image-2.jpg",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "weight_yqexh77ntqyawzgh9fzash7982",
     },
-    Painting: {
+    {
       label: "Painting",
       imageUrl: "/images/dummy-image-3.jpg",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "weight_yqexh77ntqyawzgh9fzash7983",
     },
-    Test: {
+    {
       label: "Ink",
       imageUrl: "/images/dummy-image-4.jpg",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "weight_yqexh77ntqyawzgh9fzash7984",
     },
-  } as { [key: string]: { label: string; imageUrl: string; token: string } };
+  ];
 
-  const handleStyleSelection = (selected: string) => {
-    const selectedOption = styleOptions[selected];
+  const handleStyleSelection = (selectedLabel: any) => {
+    const selectedOption = styleOptions.find(
+      option => option.label === selectedLabel
+    );
     const selectedSdModelToken = selectedOption ? selectedOption.token : null;
     if (selectedSdModelToken) {
       setVstValues(curr => ({ ...curr, sdModelToken: selectedSdModelToken }));
