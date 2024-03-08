@@ -29,7 +29,7 @@ export default function Scene3D({
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-
+  
   const onMessage = useCallback((event: MessageEvent) => {
     if (event.origin !== engineBaseUrl)
       return;
@@ -37,8 +37,12 @@ export default function Scene3D({
     console.log("engine message received", event.data, event);
 
     if (event.data === "studio-ready") {
+      console.log("studio-ready message (1)");
+
       const studio = iframeRef.current?.contentWindow;
       if (!studio) return;
+
+      console.log("studio-ready message (2)");
 
       studio.postMessage("save-scene", engineBaseUrl);
     } else if (
@@ -68,6 +72,8 @@ export default function Scene3D({
   } else if (objectId) {
     engineUrl += `&objectId=${objectId}`;
   }
+
+  console.log('installing iframe engine');
 
   return (
     <div
