@@ -66,6 +66,8 @@ export default function Scene3D({
       (ref as any).addEventListener("message", onMessage);
 
       return () => {
+        console.log("uninstalling event listener for messages");
+
         // TODO(bt,2024-03-08): Fix typescript 'any' hack
         (ref as any).removeEventListener("message", onMessage);
       }
@@ -82,7 +84,7 @@ export default function Scene3D({
     engineUrl += `&objectId=${objectId}`;
   }
 
-  console.log('installing iframe engine');
+  console.log('installing iframe engine and callbacks');
 
   return (
     <div
