@@ -57,6 +57,8 @@ export default function Scene3D({
 
   useEffect(() => {
     if (iframeRef && iframeRef.current) {
+      console.log("installing event listener for messages");
+      
       // NB: Compiler complains about ref going out of scope before destructor is called.
       let ref = iframeRef.current;
 
