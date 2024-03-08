@@ -78,6 +78,10 @@ pub struct MediaFileInfo {
   /// The foreign key to the prompt used to generate the media, if applicable.
   pub maybe_prompt_token: Option<PromptToken>,
 
+  /// The original filename for uploaded files, if they were provided.
+  /// In the future we'll provide our own internal optional filenames.
+  pub maybe_original_filename: Option<String>,
+
   /// We can simulate media files for "tts_results" records.
   /// If this is set as true, this informs the frontend and API callers not to treat
   /// the token as a media file and improperly assume it can be used with the rest of
@@ -295,6 +299,7 @@ async fn modern_media_file_lookup(
       ),
       creator_set_visibility: result.creator_set_visibility,
       maybe_prompt_token: result.maybe_prompt_token,
+      maybe_original_filename: result.maybe_origin_filename,
       is_emulated_media_file: false,
       stats: SimpleEntityStats {
         positive_rating_count: result.maybe_ratings_positive_count.unwrap_or(0),
@@ -373,6 +378,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       maybe_prompt_token: None,
       creator_set_visibility: result.creator_set_visibility,
       maybe_text_transcript: Some(result.raw_inference_text),
+      maybe_original_filename: None,
       is_emulated_media_file: true,
       stats: SimpleEntityStats {
         positive_rating_count: 0,
