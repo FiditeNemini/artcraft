@@ -1,4 +1,4 @@
-import { TRIM_OPTIONS } from "./utilities";
+import { MIN_VID_DURATION, TIME_CURSOR_WIDTH, TRIM_OPTIONS } from "./utilities";
 
 export enum STATE_STATUSES {
   INIT = "init",
@@ -62,6 +62,7 @@ export enum ACTION_TYPES {
   SET_PLAYPUASE = "set_playpause",
   SET_PLAYBAR_LAYOUT = "set_playbar_layout",
   SET_TRIM_DURATION = "set_trim_duration",
+  MOVE_TRIM = "move_trim"
 }
 
 export type Action = 
@@ -73,13 +74,16 @@ export type Action =
   | {type: ACTION_TYPES.SET_PLAYPUASE, payload:{ playpause: string}}
   | {type: ACTION_TYPES.SET_PLAYBAR_LAYOUT, payload:{ playbarWidth: number}}
   | {type: ACTION_TYPES.SET_TRIM_DURATION, payload:{ trimDurationString: string}}
+  | {type: ACTION_TYPES.MOVE_TRIM, payload:{
+    trimStartSeconds: number,
+    trimEndSeconds: number,
+  }}
 ;
 
 export function reducer(state: State, action: Action): State {
   console.log("VideoQuickTrim State Dispatch");
   console.log(action);
-  const timeCursorWidth = 8;
-  const minVideoDuration = 3;
+
   switch(action.type){
     case ACTION_TYPES.SET_PLAYPUASE:{
       return {...state, ...action.payload};
@@ -91,7 +95,7 @@ export function reducer(state: State, action: Action): State {
       return {...state, isMuted: !state.isMuted}
     }
     case ACTION_TYPES.ON_LOADED_METADATA:{
-      if(action.payload.videoDuration >= minVideoDuration){
+      if(action.payload.videoDuration >= MIN_VID_DURATION){
         return{
           ...state,
           status: STATE_STATUSES.VIDEO_METADATA_LOADED,
@@ -119,7 +123,7 @@ export function reducer(state: State, action: Action): State {
           playpause: PLAYPUASE_STATES.READY,
           playbarWidth: newWidth,
           scrubberWidth: newWidth * (state.trimDuration / state.videoDuration),
-          timeCursorOffset: (newWidth-timeCursorWidth)*(prevOffset/ state.videoDuration)
+          timeCursorOffset: (newWidth-TIME_CURSOR_WIDTH)*(prevOffset/ state.videoDuration)
         };
       }else{
         return{
@@ -162,6 +166,13 @@ export function reducer(state: State, action: Action): State {
           status: STATE_STATUSES.LOAD_ORDER_ERROR,
           errorMessage: [...state.errorMessage, 'Setting trim duration before video and trim are loaded']
         }
+      }
+    }
+    case ACTION_TYPES.MOVE_TRIM:{
+      return{
+        ...state,
+        trimStartSeconds: action.payload.trimStartSeconds,
+        trimEndSeconds: action.payload.trimEndSeconds,
       }
     }
     case ACTION_TYPES.MOVE_TIMECURSOR:{

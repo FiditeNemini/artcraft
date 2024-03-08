@@ -23,13 +23,13 @@ export default function ComponentSandbox(
         />
       </div>
       <br/>
-      <br/>
+      {/* <br/>
       <div className="m-4">
       <VideoQuickTrim 
         onSelect={handleCallback}
         mediaToken='m_h21nykes0j3ph23y5z7w9axtjjn2rr'
       />
-      </div>
+      </div> */}
     </Panel>
   </Container>);
 }

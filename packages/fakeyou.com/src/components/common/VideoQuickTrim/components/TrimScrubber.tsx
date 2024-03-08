@@ -1,51 +1,50 @@
 import React, {
   memo,
-  useMemo,
   useCallback
 } from 'react';
 import {
   faGripDots
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { QuickTrimData } from '../types';
+import { QuickTrimData } from '../utilities';
 import {withScrubbing, withScrubbingPropsI} from './withScrubbing';
 
 interface TrimScrubberPropsI extends withScrubbingPropsI {
-  trimStart:number;
+  trimStartSeconds:number;
   trimDuration: number;
-  duration: number;
+  videoDuration: number;
   onChange:(val:QuickTrimData)=>void
 }
 export const TrimScrubber = memo(({
-  trimStart,
+  trimStartSeconds,
   trimDuration,
-  duration,
+  videoDuration,
   onChange,
   ...rest
 }:TrimScrubberPropsI)=>{
-  // console.log(`TrimsSrubber reRender!!  ${Date.now()}`);
-  const TrimScrubberWithScrubbing = 
-    useMemo(()=>withScrubbing<TrimScrubberPropsI>(() => {
-      return(
-        <div className="trim-scrubber">
-          <FontAwesomeIcon icon={faGripDots} />
-        </div>
-      );
-    }), []);
+
+  const TrimScrubberWithScrubbing = withScrubbing<TrimScrubberPropsI>(() => {
+    return(
+      <div className="trim-scrubber">
+        <FontAwesomeIcon icon={faGripDots} />
+      </div>
+    );
+  });
   
   const handleOnChange = useCallback((posPercent:number)=>{
+    console.log(`handle on moving trim scrubber, pos%=${posPercent}`);
     onChange({
-      trimStartSeconds: duration * posPercent,
-      trimEndSeconds: duration * posPercent + trimDuration,
+      trimStartSeconds: videoDuration * posPercent,
+      trimEndSeconds: videoDuration * posPercent + trimDuration,
     });
-  }, [onChange, duration, trimDuration]);
+  }, [onChange, videoDuration, trimDuration]);
 
   return (
     <TrimScrubberWithScrubbing
       styleOverride={{
         top: '-1rem',
       }}
-      initialLeftOffsetPercent={trimStart/trimDuration}
+      initialLeftOffsetPercent={trimStartSeconds/videoDuration}
       onScrubEnds={handleOnChange}
       {...rest}
     />

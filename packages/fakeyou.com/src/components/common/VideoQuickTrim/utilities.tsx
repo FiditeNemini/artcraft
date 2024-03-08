@@ -1,4 +1,7 @@
 //For integration into other components 
+export const TIME_CURSOR_WIDTH = 8;
+export const MIN_VID_DURATION = 3;
+
 export type QuickTrimData = {
   trimStartSeconds: number;
   trimEndSeconds: number;

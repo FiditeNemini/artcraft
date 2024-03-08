@@ -8,7 +8,7 @@ import {
   Action,
   ACTION_TYPES,
 } from '../reducer';
-import { QuickTrimData } from '../types';
+import { QuickTrimData } from '../utilities';
 import { TrimScrubber } from './TrimScrubber';
 
 export const ProgressBar = memo(({
@@ -46,9 +46,9 @@ export const ProgressBar = memo(({
     }else{
       // console.log(node);
     }
-  }, []);
+  }, [dispatchCompState]);
 
-  function handleWindowResize() {
+  const handleWindowResize = useCallback(()=> {
     if (playbarRef.current !== null && readyToMount){
       dispatchCompState({
         type: ACTION_TYPES.SET_PLAYBAR_LAYOUT,
@@ -57,13 +57,13 @@ export const ProgressBar = memo(({
         }
       });
     }
-  }
+  },[dispatchCompState, readyToMount]);
   useLayoutEffect(() => {
     window.addEventListener("resize", handleWindowResize);
     return () => {
       window.removeEventListener("resize", handleWindowResize);
     };
-  }, []);
+  }, [handleWindowResize]);
 
   if(readyToMount){
     // console.log('progress bar rendering');
@@ -72,18 +72,20 @@ export const ProgressBar = memo(({
         <div className="playbar-bg" />
         <TrimScrubber
           // key={trimReset}
-          boundingWidth={playbarWidth-scrubberWidth}
+          boundingWidth={playbarWidth}
           scrubberWidth={scrubberWidth}
-          trimStart={trimStartSeconds}
+          trimStartSeconds={trimStartSeconds}
           trimDuration={trimDuration}
-          duration={videoDuration}
+          videoDuration={videoDuration}
           onChange={(val: QuickTrimData)=>{
-            console.log(val);
-            // setTrimState((curr)=>({
-            //   ...curr,
-            //   trimStart: val.trimStartSeconds,
-            //   trimEnd: val.trimEndSeconds
-            // }))
+            
+            dispatchCompState({
+              type: ACTION_TYPES.MOVE_TRIM,
+              payload: {
+                trimStartSeconds: val.trimStartSeconds,
+                trimEndSeconds: val.trimEndSeconds
+              }
+            });
             // onSelect({
             //   trimStartSeconds: val.trimStartSeconds,
             //   trimEndSeconds: val.trimEndSeconds,

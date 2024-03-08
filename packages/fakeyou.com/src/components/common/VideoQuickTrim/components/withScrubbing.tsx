@@ -1,8 +1,9 @@
 import React,{
+  // useEffect,
   useRef,
   useState,
   useLayoutEffect,
-  useCallback,
+  // useCallback,
 } from 'react';
 
 export interface withScrubbingPropsI {
@@ -34,14 +35,17 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   onScrubChanges,
   ...rest
 }: withScrubbingPropsI) => {
-  console.log(`withScrubbing reRender!!  ${Date.now()}`);
+  // console.log(`withScrubbing reRender!! ${Date.now()}`);
   const refEl = useRef<HTMLDivElement| null>(null);
+  const refListener = useRef<number>(Date.now());
+
   const initialLeftOffset = 
     initialLeftOffsetPercent > 0 ? boundingWidth * initialLeftOffsetPercent 
     : initialLeftOffsetProps;
   // const initialLeftOffset = 0;
   const [{
-    key, currLeftOffset, pointerStartPos
+    // key, 
+    currLeftOffset, pointerStartPos,
     // prevLeftOffset,
   }, setStates] = useState<withSrcubbingStates>({
     key: Date.now(),
@@ -50,67 +54,64 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
     pointerStartPos: -1 // negative denotes pointer not engaged
   });
 
-  const handleScrubStart = useCallback( (e: MouseEvent) => {
-    if(refEl.current){
-      console.log(`start: ${e.clientX}` );
-      if(refEl.current.contains(e.target as Node)){
-        setStates((curr)=>({
-          ...curr,
-          pointerStartPos: e.clientX
-        })); 
-        return true;
-      }
-    }
-  },[]);
-  const handleScrubEnd = useCallback((e: MouseEvent)=>{
-    // e.persist();
-    e.preventDefault();
-    e.stopPropagation();
-    setStates((curr)=>({
-      ...curr,
-      pointerStartPos: -1,
-      prevLeftOffset: curr.currLeftOffset,
-    })); 
-    // if (onScrubEnds) onScrubEnds(currLeftOffset/boundingWidth);
-  }, []);
-  const handleScrubMove = useCallback ((e: MouseEvent)=>{
-    // e.persist();
-    e.preventDefault();
-    e.stopPropagation();
-    setStates((curr)=>{
-      if(curr.pointerStartPos >= 0 && curr.pointerStartPos!==null){
-        let newLeftOffset = curr.prevLeftOffset + e.clientX - curr.pointerStartPos;
-        if (newLeftOffset + scrubberWidth > boundingWidth) {
-          newLeftOffset = boundingWidth - scrubberWidth;
-        }else if(newLeftOffset < 0) {
-          newLeftOffset = 0;
-        }
-        if(newLeftOffset !== curr.currLeftOffset){
-          return{
+  useLayoutEffect(() => {
+    function handleScrubStart (e: MouseEvent) {
+      if(refEl.current){
+        if(refEl.current.contains(e.target as Node)){
+          setStates((curr)=>({
             ...curr,
-            currLeftOffset: newLeftOffset
+            pointerStartPos: e.clientX
+          })); 
+          return true;
+        }
+      }
+    };
+    function handleScrubEnd (e: MouseEvent){
+      e.preventDefault();
+      e.stopPropagation();
+      setStates((curr)=>({
+        ...curr,
+        pointerStartPos: -1,
+        prevLeftOffset: curr.currLeftOffset,
+      })); 
+    };
+    function handleScrubMove (e: MouseEvent){
+      e.preventDefault();
+      e.stopPropagation();
+      setStates((curr)=>{
+        if(curr.pointerStartPos >= 0 && curr.pointerStartPos!==null){
+          let newLeftOffset = curr.prevLeftOffset + e.clientX - curr.pointerStartPos;
+          if (newLeftOffset + scrubberWidth > boundingWidth) {
+            newLeftOffset = boundingWidth - scrubberWidth;
+          }else if(newLeftOffset < 0) {
+            newLeftOffset = 0;
+          }
+          if(newLeftOffset !== curr.currLeftOffset){
+            return{
+              ...curr,
+              currLeftOffset: newLeftOffset
+            }
           }
         }
-      }
-      return curr;
-    });
-      // if (onScrubChanges) onScrubChanges(newLeftOffset/boundingWidth);
-  },[scrubberWidth, boundingWidth]);
-
-  useLayoutEffect(() => {
-    if(!(window as any)[`listener-id-${key}`]){
-      (window as any)[`listender-id-${key}`] = true;
+        return curr;
+      });
+    };
+    if(!(window as any)[`listener-id-${refListener}`]){
+      (window as any)[`listender-id-${refListener}`] = true;
       window.addEventListener("mousedown", handleScrubStart);
       window.addEventListener("mouseup", handleScrubEnd);
       window.addEventListener("mousemove", handleScrubMove);
       return () => {
-        (window as any)[`${key}listeners`] = false;
+        (window as any)[`listener-id-${refListener}`] = false;
         window.removeEventListener("mousedown", handleScrubStart);
         window.removeEventListener("mouseup", handleScrubEnd);
         window.removeEventListener("mousemove", handleScrubMove);
       };
     }
-  }, [handleScrubStart, handleScrubEnd, handleScrubMove, key]);
+  }, []);
+  // useEffect(()=>{
+  //   if(onScrubEnds)onScrubEnds(prevLeftOffset/boundingWidth);
+  // },[prevLeftOffset, boundingWidth, onScrubEnds]);
   return(
     <div
       className="scrubber-wrapper"
