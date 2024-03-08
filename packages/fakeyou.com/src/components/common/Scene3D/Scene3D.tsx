@@ -56,14 +56,21 @@ export default function Scene3D({
 
 
   useEffect(() => {
-    window.addEventListener("message", onMessage);
+    if (iframeRef && iframeRef.current) {
+      // NB: Compiler complains about ref going out of scope before destructor is called.
+      let ref = iframeRef.current;
 
-    return () => {
-      window.removeEventListener("message", onMessage);
+      // TODO(bt,2024-03-08): Fix typescript 'any' hack
+      (ref as any).addEventListener("message", onMessage);
+
+      return () => {
+        // TODO(bt,2024-03-08): Fix typescript 'any' hack
+        (ref as any).removeEventListener("message", onMessage);
+      }
     }
-  }, [onMessage]);
+  }, [onMessage, iframeRef]);
 
-  
+
   let engineUrl = `${engineBaseUrl}/?mode=${mode}`;
 
   if (sceneMediaFileToken) {
