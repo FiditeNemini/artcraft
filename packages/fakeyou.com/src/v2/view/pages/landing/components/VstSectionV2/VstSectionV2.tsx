@@ -9,6 +9,8 @@ import "swiper/css/thumbs";
 import { Navigation, Thumbs } from "swiper/modules";
 import { Swiper as SwiperType } from "swiper/types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { open } from '@typeform/embed';
+
 import {
   faArrowDownLong,
   faArrowRight,
@@ -27,6 +29,9 @@ export default function VstSectionV2(props: VstSectionV2Props) {
   //   setIsPlaying(!isPlaying);
   // };
 
+  const openTypeform = () => {
+    open('oWnV91Z9', { mode: 'popup' });
+  };
   const handleVideoPlay = () => {
     if (!isPlaying) {
       setIsPlaying(true);
@@ -118,11 +123,12 @@ export default function VstSectionV2(props: VstSectionV2Props) {
         </p>
         <div className="d-flex">
           <Button
-            label="Try Video Style Transfer"
+            onClick={openTypeform}
+            label="Join Waitlist for Video Style Transfer"
             small={true}
             icon={faArrowRight}
             iconFlip={true}
-            to="/video-styletransfer"
+            
           />
         </div>
       </div>
