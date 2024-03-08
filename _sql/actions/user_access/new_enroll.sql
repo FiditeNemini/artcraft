@@ -40,9 +40,19 @@ WHERE username IN (
     'justinjohn0306',
     'mrvintage',
     'rewin123',
-    'tammieteller',
     'tropicalfun',
     'yae_ph',
+    'zzz_last_item'
+);
+
+-- Early access (investors)
+UPDATE users
+SET
+    can_access_studio = false,
+    maybe_feature_flags = 'studio,video_style_transfer'
+WHERE username IN (
+    'vagata',
+    'tammieteller',
     'zzz_last_item'
 );
 
