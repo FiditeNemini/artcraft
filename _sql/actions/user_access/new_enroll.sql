@@ -31,6 +31,7 @@ SET
     can_access_studio = false,
     maybe_feature_flags = 'studio,video_style_transfer'
 WHERE username IN (
+    'dannymcgee',
     'el_cid_93',
     'endtimes',
     'fyscott',

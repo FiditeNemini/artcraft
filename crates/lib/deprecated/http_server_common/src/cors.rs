@@ -99,22 +99,28 @@ pub fn add_storyteller(cors: Cors, is_production: bool) -> Cors {
   // TODO: Remove non-SSL "http://" from production in safe rollout
   if is_production {
     cors
-        // Storyteller.io (Production)
-        .allowed_origin("http://api.storyteller.io")
-        .allowed_origin("http://storyteller.io")
-        .allowed_origin("https://api.storyteller.io")
-        .allowed_origin("https://storyteller.io")
-        // Storyteller.io (Staging)
-        .allowed_origin("http://staging.storyteller.io")
-        .allowed_origin("https://staging.storyteller.io")
-        // Storyteller.io (Development Proxy)
-        .allowed_origin("http://development-proxy.storyteller.io")
-        .allowed_origin("https://development-proxy.storyteller.io")
+        // Storyteller (Production)
+        .allowed_origin("http://api.storyteller.ai")
+        .allowed_origin("http://storyteller.ai")
+        .allowed_origin("https://api.storyteller.ai")
+        .allowed_origin("https://storyteller.ai")
+        // Storyteller (Staging)
+        .allowed_origin("http://staging.storyteller.ai")
+        .allowed_origin("https://staging.storyteller.ai")
+        // Storyteller (Netlify Staging / Production)
+        .allowed_origin("https://feature-mvp--storyteller-ai.netlify.app")
+        .allowed_origin("https://feature-marketing--storyteller-ai.netlify.app")
   } else {
     cors
-        // Storyteller.io (Development)
-        .allowed_origin("http://dev.storyteller.io")
-        .allowed_origin("https://dev.storyteller.io")
+        // Storyteller (Development)
+        .allowed_origin("http://dev.storyteller.ai")
+        .allowed_origin("http://dev.storyteller.ai:7000") // Yarn default port
+        .allowed_origin("http://dev.storyteller.ai:7001") // NB: Mac frontend
+        .allowed_origin("http://development.storyteller.ai")
+        .allowed_origin("https://dev.storyteller.ai")
+        .allowed_origin("https://dev.storyteller.ai:7000") // Yarn default port
+        .allowed_origin("https://dev.storyteller.ai:7001") // NB: Mac frontend
+        .allowed_origin("https://development.storyteller.ai")
   }
 }
 
