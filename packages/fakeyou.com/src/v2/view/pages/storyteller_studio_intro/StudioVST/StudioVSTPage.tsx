@@ -31,7 +31,6 @@ export default function PageVSTApp() {
     [key: string]: number | string | boolean | undefined;
   }) => {
     setVstValues(curr => ({ ...curr, ...val }));
-    console.log("VST Values", vstValues);
   };
 
   const handleGenerate = () => {
@@ -48,7 +47,7 @@ export default function PageVSTApp() {
 
     EnqueueVideoStyleTransfer(request).then(res => {
       if (res.success && res.inference_job_token) {
-        console.log("Job enqueued successfully", res.inference_job_token);
+        // console.log("Job enqueued successfully", res.inference_job_token);
         history.push(`/studio-intro/result/${res.inference_job_token}`);
       } else {
         console.log("Failed to enqueue job", res);
