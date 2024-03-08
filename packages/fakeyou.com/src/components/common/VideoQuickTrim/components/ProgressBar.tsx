@@ -14,7 +14,7 @@ import { TrimScrubber } from './TrimScrubber';
 export const ProgressBar = memo(({
   readyToMount,
   timeCursorOffset,
-  trimReset,
+  // trimReset,
   trimStartSeconds,
   trimDuration,
   playbarWidth,
@@ -24,7 +24,7 @@ export const ProgressBar = memo(({
 }:{
   readyToMount: boolean;
   timeCursorOffset: number;
-  trimReset: number;
+  // trimReset: number;
   trimStartSeconds: number;
   trimDuration: number;
   playbarWidth: number;
@@ -34,23 +34,9 @@ export const ProgressBar = memo(({
 })=>{
   const playbarRef = useRef<HTMLDivElement | null>(null);
 
-  function setPlaybarLayout(playbarWidth: number){
-    if(readyToMount) {
-      dispatchCompState({
-        type: ACTION_TYPES.SET_PLAYBAR_LAYOUT,
-        payload: {
-          playbarWidth: playbarWidth,
-        }
-      })
-    }else{
-      console.log('set playbar layout but not ready to mount')
-    }
-  }
   const playbarRefCallback = useCallback(node => {
-    console.log('playbar usecallback fired');
     if (node !== null) {
       playbarRef.current = node;
-      // setPlaybarLayout(node.getBoundingClientRect().width);
       dispatchCompState({
         type: ACTION_TYPES.SET_PLAYBAR_LAYOUT,
         payload: {
@@ -58,13 +44,18 @@ export const ProgressBar = memo(({
         }
       })
     }else{
-      console.log(node);
+      // console.log(node);
     }
   }, []);
 
   function handleWindowResize() {
-    if (playbarRef.current !== null ){
-      setPlaybarLayout(playbarRef.current.getBoundingClientRect().width);
+    if (playbarRef.current !== null && readyToMount){
+      dispatchCompState({
+        type: ACTION_TYPES.SET_PLAYBAR_LAYOUT,
+        payload: {
+          playbarWidth: playbarRef.current.getBoundingClientRect().width,
+        }
+      });
     }
   }
   useLayoutEffect(() => {
@@ -75,12 +66,12 @@ export const ProgressBar = memo(({
   }, []);
 
   if(readyToMount){
-    console.log('progress bar rendering');
+    // console.log('progress bar rendering');
     return(
       <div className="playbar" ref={playbarRefCallback}>
         <div className="playbar-bg" />
         <TrimScrubber
-          key={trimReset}
+          // key={trimReset}
           boundingWidth={playbarWidth-scrubberWidth}
           scrubberWidth={scrubberWidth}
           trimStart={trimStartSeconds}
@@ -103,35 +94,7 @@ export const ProgressBar = memo(({
       {/* END of Playbar */}</div>  
     );
   }else{
-    console.log('progress bar rendering null');
+    console.log('TODO: ProgressBar should rendering loading state instead of null');
     return null;
   }
-  
-  /*trimScrubberWidth > 0 && 
-    playbarWidth > 0 && 
-    maxDuration > 0 &&
-    <TrimScrubber
-      key={trimReset}
-      boundingWidth={playbarWidth-trimScrubberWidth}
-      scrubberWidth={trimScrubberWidth}
-      trimStart={trimStart}
-      trimDuration={trimDuration}
-      duration={maxDuration}
-      onChange={(val: QuickTrimData)=>{
-        //console.log(val);
-        setTrimState((curr)=>({
-          ...curr,
-          trimStart: val.trimStartSeconds,
-          trimEnd: val.trimEndSeconds
-        }))
-        onSelect({
-          trimStartSeconds: val.trimStartSeconds,
-          trimEndSeconds: val.trimEndSeconds,
-        });
-      }}
-    />
-  } */
-    
-
-
 });

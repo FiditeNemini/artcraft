@@ -40,7 +40,6 @@ export const VideoQuickTrim = memo(({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [compState, dispatchCompState] = useReducer(reducer, initialState);
   
-
   if(compState.status === STATE_STATUSES.LOAD_ORDER_ERROR){
     console.log(`${compState.errorMessage[compState.errorMessage.length -1]}`);
   }
@@ -95,7 +94,12 @@ export const VideoQuickTrim = memo(({
       node.onpause = ()=>setPlaypause(PLAYPUASE_STATES.PAUSED);
       node.onended = ()=>setPlaypause(PLAYPUASE_STATES.ENDED);
     } // else{} DOM node referenced by ref has been unmounted 
-  }, [compState.trimStartSeconds, compState.trimEndSeconds, compState.playbarWidth]); //END videoRefCallback\
+  }, [
+    compState.trimStartSeconds, 
+    compState.trimEndSeconds,
+    compState.playbarWidth,
+    compState.isRepeatOn
+  ]); //END videoRefCallback\
 
   function videoCanPlay(){
     return (compState.playpause === PLAYPUASE_STATES.PAUSED 
@@ -151,7 +155,7 @@ export const VideoQuickTrim = memo(({
       <ProgressBar
         readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}
         timeCursorOffset={compState.timeCursorOffset || 0 }
-        trimReset={compState.trimReset}
+        // trimReset={compState.trimReset}
         trimStartSeconds={compState.trimStartSeconds ||0}
         trimDuration={compState.trimDuration ||0}
         playbarWidth={compState.playbarWidth ||0}
@@ -160,6 +164,7 @@ export const VideoQuickTrim = memo(({
         dispatchCompState={dispatchCompState}
       />
       <ControlBar
+        readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}
         videoCurrentTime={videoRef.current?.currentTime}
         videoDuration={videoRef.current?.duration}
         isMuted={compState.isMuted}

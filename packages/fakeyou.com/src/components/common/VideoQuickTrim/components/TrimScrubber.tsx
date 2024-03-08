@@ -23,7 +23,7 @@ export const TrimScrubber = memo(({
   onChange,
   ...rest
 }:TrimScrubberPropsI)=>{
-  console.log(`TrimsSrubber reRender!!  ${Date.now()}`);
+  // console.log(`TrimsSrubber reRender!!  ${Date.now()}`);
   const TrimScrubberWithScrubbing = 
     useMemo(()=>withScrubbing<TrimScrubberPropsI>(() => {
       return(

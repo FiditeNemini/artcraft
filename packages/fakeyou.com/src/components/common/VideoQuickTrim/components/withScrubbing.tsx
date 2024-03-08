@@ -119,7 +119,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
         position: 'absolute',
         top:0,
         width: scrubberWidth + 'px',
-        left: currLeftOffset,
+        left: currLeftOffset + 'px',
         cursor: pointerStartPos >=0 ? 'grabbing': 'grab',
         ...styleOverride
       }}

@@ -75,15 +75,6 @@ export type Action =
   | {type: ACTION_TYPES.SET_TRIM_DURATION, payload:{ trimDurationString: string}}
 ;
 
-function isReadyToSetTrim(selectedTrim:string, state:State){
-  return (
-    state.canNotTrim !== undefined 
-    && state.canNotTrim === false 
-    && state.videoDuration !== undefined
-    && TRIM_OPTIONS[selectedTrim] <= state.videoDuration
-  )
-}
-
 export function reducer(state: State, action: Action): State {
   console.log("VideoQuickTrim State Dispatch");
   console.log(action);
@@ -140,7 +131,13 @@ export function reducer(state: State, action: Action): State {
     }
     case ACTION_TYPES.SET_TRIM_DURATION:{
       const selected = action.payload.trimDurationString;
-      if( isReadyToSetTrim(selected, state) && state.trimStartSeconds && state.videoDuration ){
+      if( state.canNotTrim !== undefined 
+        && state.canNotTrim === false 
+        && state.playbarWidth !==undefined
+        && state.videoDuration !== undefined
+        && TRIM_OPTIONS[selected] <= state.videoDuration
+        && state.trimStartSeconds !== undefined 
+      ){
         let newTrimStart = state.trimStartSeconds;
         let newTrimEnd = state.trimStartSeconds + TRIM_OPTIONS[selected];
         if (newTrimEnd > state.videoDuration){
@@ -153,10 +150,11 @@ export function reducer(state: State, action: Action): State {
         }
         return{
           ...state,
-          trimReset: Date.now(),
+          // trimReset: Date.now(),
           trimDuration: TRIM_OPTIONS[selected],
           trimStartSeconds: newTrimStart,
           trimEndSeconds: newTrimEnd,
+          scrubberWidth: state.playbarWidth * (newTrimEnd-newTrimStart)/state.videoDuration
         }
       }else{
         return {
