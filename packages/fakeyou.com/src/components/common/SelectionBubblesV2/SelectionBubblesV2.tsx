@@ -130,6 +130,7 @@ export default function SelectionBubblesV2({
                         src={imageUrl}
                         alt={label}
                         className="bubble-image"
+                        draggable="false"
                       />
                     )}
                     <span className="bubble-text">{label}</span>
