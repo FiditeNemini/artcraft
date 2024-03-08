@@ -19,6 +19,7 @@ import "./LandingPage.scss";
 // import VstSectionV1 from "./components/VstSectionV1";
 import VstSectionV2 from "./components/VstSectionV2";
 import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
+import { DomainConfig, Website } from "utils/domainConfig";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -35,16 +36,18 @@ interface Props {
 
 function LandingPage(props: Props) {
   usePrefixedDocumentTitle("FakeYou Celebrity Voice Generator");
+
   PosthogClient.recordPageview();
-  const domain = useDomainConfig();
+
+  const domain : DomainConfig = useDomainConfig();
 
   const isLoggedIn = props.sessionWrapper.isLoggedIn();
 
   return (
     <>
-      {domain.title === "Storyteller AI" && !isLoggedIn && <LandingVideoReel />}
+      {domain.website === Website.StorytellerAi && !isLoggedIn && <LandingVideoReel />}
       <Container type="panel">
-        {domain.title === "FakeYou" ? (
+        {domain.website === Website.FakeYou ? (
           <>
             {/* FAKEYOU.COM */}
             {!isLoggedIn && (
