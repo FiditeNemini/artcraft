@@ -25,16 +25,13 @@ export default function Scene3D({
 }: Scene3DProps) {
   const engineBaseUrl = "https://engine.fakeyou.com";
 
-  let engineUrl = `${engineBaseUrl}/?mode=${mode}`;
-
   const iframeRef = useRef<HTMLIFrameElement>(null);
-
   
   const onMessage = useCallback((event: MessageEvent) => {
+    console.log("engine message received", event.data, event);
+
     if (event.origin !== engineBaseUrl)
       return;
-    
-    console.log("engine message received", event.data, event);
 
     if (event.data === "studio-ready") {
       console.log("studio-ready message (1)");
@@ -65,6 +62,9 @@ export default function Scene3D({
       window.removeEventListener("message", onMessage);
     }
   }, [onMessage]);
+
+  
+  let engineUrl = `${engineBaseUrl}/?mode=${mode}`;
 
   if (sceneMediaFileToken) {
     const sceneUrlRef = `remote://${sceneMediaFileToken}.scn.ron`;
