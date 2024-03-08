@@ -1,5 +1,5 @@
 import React,{
-  // useEffect,
+  useEffect,
   useRef,
   useState,
   useLayoutEffect,
@@ -13,8 +13,6 @@ export interface withScrubbingPropsI {
   initialLeftOffsetPercent?: number; // in %, 0 < % < 1
   styleOverride?: {[key: string]: string|number };
   onScrubEnds?: (posPercent: number)=>void;
-  //return scrubber location as %, where 0 < % < 1
-  onScrubChanges?: (posPercent:number)=>void;
   //return scrubber location as %, where 0 < % < 1
 }
 
@@ -32,10 +30,9 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   initialLeftOffsetPercent = 0,
   styleOverride = {},
   onScrubEnds,
-  onScrubChanges,
   ...rest
 }: withScrubbingPropsI) => {
-  // console.log(`withScrubbing reRender!! ${Date.now()}`);
+  console.log(`withSCRUBBING reRender!! `);
   const refEl = useRef<HTMLDivElement| null>(null);
   const refListener = useRef<number>(Date.now());
 
@@ -46,7 +43,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   const [{
     // key, 
     currLeftOffset, pointerStartPos,
-    // prevLeftOffset,
+    prevLeftOffset,
   }, setStates] = useState<withSrcubbingStates>({
     key: Date.now(),
     currLeftOffset: initialLeftOffset, // in pixels
@@ -108,10 +105,12 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
         window.removeEventListener("mousemove", handleScrubMove);
       };
     }
-  }, []);
-  // useEffect(()=>{
-  //   if(onScrubEnds)onScrubEnds(prevLeftOffset/boundingWidth);
-  // },[prevLeftOffset, boundingWidth, onScrubEnds]);
+  }, [scrubberWidth, boundingWidth]);
+
+  useEffect(()=>{
+    if(onScrubEnds)onScrubEnds(prevLeftOffset/boundingWidth);
+  },[prevLeftOffset, boundingWidth, onScrubEnds]);
+
   return(
     <div
       className="scrubber-wrapper"
