@@ -331,6 +331,7 @@ pub async fn process_upload_media_file(
     upload_type,
     media_file_type,
     maybe_mime_type: Some(mime_type),
+    maybe_media_subtype: None,
     file_size_bytes: file_size_bytes as u64,
     duration_millis: 0, // TODO
     sha256_checksum: &hash,

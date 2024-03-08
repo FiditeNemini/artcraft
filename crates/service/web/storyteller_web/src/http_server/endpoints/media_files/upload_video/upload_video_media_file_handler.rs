@@ -211,6 +211,7 @@ pub async fn upload_video_media_file_handler(
     creator_ip_address: &ip_address,
     creator_set_visibility,
     upload_type,
+    maybe_media_subtype: None,
     media_file_type: MediaFileType::Video,
     maybe_mime_type: Some(mimetype),
     file_size_bytes: file_size_bytes as u64,

@@ -5,6 +5,7 @@ use sqlx::MySqlPool;
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
+use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
@@ -31,6 +32,7 @@ pub struct InsertMediaFileFromUploadArgs<'a> {
   pub upload_type: UploadType,
 
   pub media_file_type: MediaFileType,
+  pub maybe_media_subtype: Option<MediaFileSubtype>,
   pub maybe_mime_type: Option<&'a str>,
   pub file_size_bytes: u64,
   pub duration_millis: u64,
@@ -95,6 +97,7 @@ SET
   maybe_origin_model_token = NULL,
 
   media_type = ?,
+  maybe_media_subtype = ?,
   maybe_mime_type = ?,
   file_size_bytes = ?,
 
@@ -119,6 +122,7 @@ SET
       ORIGIN_PRODUCT_CATEGORY.to_str(),
 
       args.media_file_type.to_str(),
+      args.maybe_media_subtype.map(|s| s.to_str()),
       args.maybe_mime_type,
       args.file_size_bytes,
 
