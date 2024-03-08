@@ -3,5 +3,5 @@ pub mod get_media_file;
 pub mod list;
 pub mod update_media_file;
 pub mod upload;
+pub mod upload_engine_asset;
 pub mod upload_video;
-

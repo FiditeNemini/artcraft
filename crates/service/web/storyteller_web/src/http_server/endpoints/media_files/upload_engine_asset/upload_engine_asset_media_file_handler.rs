@@ -1,5 +1,6 @@
 use std::collections::HashSet;
 use std::io::{BufReader, Cursor};
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use actix_multipart::Multipart;
@@ -20,30 +21,23 @@ use mysql_queries::queries::media_files::create::insert_media_file_from_file_upl
 use tokens::tokens::media_files::MediaFileToken;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
-use crate::http_server::endpoints::media_files::upload_video::drain_multipart_request::drain_multipart_request;
-use crate::http_server::endpoints::media_files::upload_video::drain_multipart_request::MediaFileUploadSource;
-use crate::http_server::endpoints::media_files::upload_video::upload_error::VideoMediaFileUploadError;
+use crate::http_server::endpoints::media_files::upload::drain_multipart_request::MediaFileUploadSource;
+use crate::http_server::endpoints::media_files::upload_engine_asset::drain_multipart_request::drain_multipart_request;
+use crate::http_server::endpoints::media_files::upload_engine_asset::upload_error::EngineAssetMediaFileUploadError;
 use crate::server_state::ServerState;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 #[derive(Serialize, ToSchema)]
-pub struct UploadVideoMediaSuccessResponse {
+pub struct UploadEngineAssetMediaSuccessResponse {
   pub success: bool,
   pub media_file_token: MediaFileToken,
 }
 
-static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
-  HashSet::from([
-    // Video
-    "video/mp4", // NB: Only mp4 for now.
-  ])
-});
-
 #[utoipa::path(
   post,
-  path = "/v1/media_files/upload/video",
+  path = "/v1/media_files/upload/engine_asset",
   responses(
-    (status = 200, description = "Success Update", body = UploadVideoMediaSuccessResponse),
+    (status = 200, description = "Success Update", body = UploadEngineAssetMediaSuccessResponse),
     (status = 400, description = "Bad input", body = MediaFileUploadError),
     (status = 401, description = "Not authorized", body = MediaFileUploadError),
     (status = 429, description = "Too many requests", body = MediaFileUploadError),
@@ -53,18 +47,18 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
     ("request" = (), description = "Ask Brandon. This is form-multipart."),
   )
 )]
-pub async fn upload_video_media_file_handler(
+pub async fn upload_engine_asset_media_file_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
   mut multipart_payload: Multipart,
-) -> Result<HttpResponse, VideoMediaFileUploadError> {
+) -> Result<HttpResponse, EngineAssetMediaFileUploadError > {
 
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
       .await
       .map_err(|err| {
         error!("MySql pool error: {:?}", err);
-        VideoMediaFileUploadError::ServerError
+        EngineAssetMediaFileUploadError ::ServerError
       })?;
 
   // ==================== READ SESSION ==================== //
@@ -75,7 +69,7 @@ pub async fn upload_video_media_file_handler(
       .await
       .map_err(|e| {
         error!("Session checker error: {:?}", e);
-        VideoMediaFileUploadError::ServerError
+        EngineAssetMediaFileUploadError ::ServerError
       })?;
 
   let maybe_avt_token = server_state
@@ -86,7 +80,7 @@ pub async fn upload_video_media_file_handler(
 
   if let Some(ref user) = maybe_user_session {
     if user.is_banned {
-      return Err(VideoMediaFileUploadError::NotAuthorized);
+      return Err(EngineAssetMediaFileUploadError ::NotAuthorized);
     }
   }
 
@@ -98,7 +92,7 @@ pub async fn upload_video_media_file_handler(
   };
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-    return Err(VideoMediaFileUploadError::RateLimited);
+    return Err(EngineAssetMediaFileUploadError ::RateLimited);
   }
 
   // ==================== READ MULTIPART REQUEST ==================== //
@@ -107,24 +101,24 @@ pub async fn upload_video_media_file_handler(
       .await
       .map_err(|e| {
         // TODO: Error handling could be nicer.
-        VideoMediaFileUploadError::BadInput("bad request".to_string())
+        EngineAssetMediaFileUploadError ::BadInput("bad request".to_string())
       })?;
 
   // TODO(bt, 2024-02-26): This should be a transaction.
   let uuid_idempotency_token = upload_media_request.uuid_idempotency_token
-      .ok_or(VideoMediaFileUploadError::BadInput("no uuid".to_string()))?;
+      .ok_or(EngineAssetMediaFileUploadError ::BadInput("no uuid".to_string()))?;
 
   // ==================== HANDLE IDEMPOTENCY ==================== //
 
   if let Err(reason) = validate_idempotency_token_format(&uuid_idempotency_token) {
-    return Err(VideoMediaFileUploadError::BadInput(reason));
+    return Err(EngineAssetMediaFileUploadError ::BadInput(reason));
   }
 
   insert_idempotency_token(&uuid_idempotency_token, &mut *mysql_connection)
       .await
       .map_err(|err| {
         error!("Error inserting idempotency token: {:?}", err);
-        VideoMediaFileUploadError::BadInput("invalid idempotency token".to_string())
+        EngineAssetMediaFileUploadError ::BadInput("invalid idempotency token".to_string())
       })?;
 
   // ==================== UPLOAD METADATA ==================== //
@@ -133,12 +127,6 @@ pub async fn upload_video_media_file_handler(
       .as_ref()
       .map(|user_session| user_session.preferred_tts_result_visibility) // TODO: We need a new type of visibility control.
       .unwrap_or(Visibility::default());
-
-  let upload_type = match upload_media_request.media_source {
-    MediaFileUploadSource::Unknown => UploadType::Filesystem,
-    MediaFileUploadSource::UserFile => UploadType::Filesystem,
-    MediaFileUploadSource::UserDeviceApi => UploadType::DeviceCaptureApi,
-  };
 
   // ==================== USER DATA ==================== //
 
@@ -150,18 +138,31 @@ pub async fn upload_video_media_file_handler(
   // ==================== FILE DATA ==================== //
 
   let file_bytes = match upload_media_request.file_bytes {
-    None => return Err(VideoMediaFileUploadError::BadInput("missing file contents".to_string())),
+    None => return Err(EngineAssetMediaFileUploadError::BadInput("missing file contents".to_string())),
     Some(bytes) => bytes,
   };
 
-  let mut maybe_mimetype = get_mimetype_for_bytes(&file_bytes);
+  let maybe_filename = upload_media_request.file_name
+      .as_deref()
+      .map(|filename| PathBuf::from(filename));
 
-  let mimetype = match maybe_mimetype {
-    None => return Err(VideoMediaFileUploadError::BadInput("unknown mimetype".to_string())),
-    Some(mimetype) => if ALLOWED_MIME_TYPES.contains(mimetype) {
-      mimetype
-    } else {
-      return Err(VideoMediaFileUploadError::BadInput("unsupported mimetype".to_string()));
+  let maybe_file_extension = maybe_filename
+      .as_ref()
+      .and_then(|filename| filename.extension())
+      .and_then(|ext| ext.to_str());
+
+  let (suffix, media_file_type, mimetype) = match maybe_file_extension {
+    None => {
+      return Err(EngineAssetMediaFileUploadError::BadInput("no file extension".to_string()));
+    }
+    Some("bvh") => (".bvh", MediaFileType::Bvh, "application/octet-stream"),
+    Some("fbx") => (".fbx", MediaFileType::Fbx, "application/octet-stream"),
+    Some("glb") => (".glb", MediaFileType::Glb, "application/octet-stream"),
+    Some("gltf") => (".gltf", MediaFileType::Gltf, "application/octet-stream"),
+    Some("ron") => (".scn.ron", MediaFileType::SceneRon, "application/octet-stream"),
+    _ => {
+      return Err(EngineAssetMediaFileUploadError::BadInput(
+        "unsupported file extension. Must be bvh, glb, gltf, or fbx.".to_string()));
     }
   };
 
@@ -170,27 +171,14 @@ pub async fn upload_video_media_file_handler(
   let hash = sha256_hash_bytes(&file_bytes)
       .map_err(|io_error| {
         error!("Problem hashing bytes: {:?}", io_error);
-        VideoMediaFileUploadError::ServerError
-      })?;
-
-  // ==================== FRAME RATE ==================== //
-
-  let mp4_info = get_mp4_info_for_bytes(file_bytes.as_ref())
-      .map_err(|err| {
-        warn!("Error reading mp4 info: {:?}", err);
-        VideoMediaFileUploadError::ServerError
+        EngineAssetMediaFileUploadError::ServerError
       })?;
 
   // ==================== UPLOAD AND SAVE ==================== //
 
-  // TODO(bt,2024-02-26): We statically know the extension if it was an allowed mimetype. Fix this.
-  let mut extension = mimetype_to_extension(mimetype)
-      .map(|extension| format!(".{extension}"))
-      .unwrap_or(".mp4".to_string());
+  const PREFIX : Option<&str> = Some("upload_");
 
-  const PREFIX : Option<&str> = Some("video_");
-
-  let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, Some(&extension));
+  let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, Some(suffix));
 
   info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
 
@@ -201,7 +189,7 @@ pub async fn upload_video_media_file_handler(
       .await
       .map_err(|e| {
         warn!("Upload media bytes to bucket error: {:?}", e);
-        VideoMediaFileUploadError::ServerError
+        EngineAssetMediaFileUploadError ::ServerError
       })?;
 
   // TODO(bt, 2024-02-22): This should be a transaction.
@@ -210,32 +198,32 @@ pub async fn upload_video_media_file_handler(
     maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility,
-    upload_type,
-    media_file_type: MediaFileType::Video,
+    upload_type: UploadType::Filesystem,
+    media_file_type,
     maybe_mime_type: Some(mimetype),
     file_size_bytes: file_size_bytes as u64,
-    duration_millis: mp4_info.duration_millis as u64,
+    duration_millis: 0,
     sha256_checksum: &hash,
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
-    maybe_public_bucket_extension: Some(&extension),
+    maybe_public_bucket_extension: Some(suffix),
     pool: &server_state.mysql_pool,
   })
       .await
       .map_err(|err| {
         warn!("New file creation DB error: {:?}", err);
-        VideoMediaFileUploadError::ServerError
+        EngineAssetMediaFileUploadError ::ServerError
       })?;
 
   info!("new media file id: {} token: {:?}", record_id, &token);
 
-  let response = UploadVideoMediaSuccessResponse {
+  let response = UploadEngineAssetMediaSuccessResponse {
     success: true,
     media_file_token: token,
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| VideoMediaFileUploadError::ServerError)?;
+      .map_err(|e| EngineAssetMediaFileUploadError ::ServerError)?;
 
   return Ok(HttpResponse::Ok()
       .content_type("application/json")
