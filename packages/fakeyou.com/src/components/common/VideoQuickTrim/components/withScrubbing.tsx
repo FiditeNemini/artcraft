@@ -34,7 +34,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   onScrubChanges,
   ...rest
 }: withScrubbingPropsI) => {
-  console.log('withScrubbing reRender');
+  console.log(`withScrubbing reRender!!  ${Date.now()}`);
   const refEl = useRef<HTMLDivElement| null>(null);
   const initialLeftOffset = 
     initialLeftOffsetPercent > 0 ? boundingWidth * initialLeftOffsetPercent 

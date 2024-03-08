@@ -60,11 +60,11 @@ $playbar-height: 2rem;
       background-color: #e66462;
       opacity: 70%;
     }
-    p {
+    h1 {
       position: absolute;
-      margin-top: 230px;
-      width: 100%;
-      top: 0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
   }
   .playbar {
@@ -81,6 +81,9 @@ $playbar-height: 2rem;
     background-color: $panel-inner-border;
     border-radius: 0 0 0.5rem 0.5rem;
   }
+  .scrubber-wrapper{
+    box-shadow: 1px 1px 4px 0px rgba(0,0,0,1);
+  }
   .trim-scrubber{
     height: 3rem;
     background-color: #e66462;
@@ -88,6 +91,7 @@ $playbar-height: 2rem;
     outline: 0.125rem $white solid;
     border-top: 1rem $white solid;
     border-radius: 0.25rem 0.25rem 0.125rem 0.125rem;
+    
 
     display: flex;
     justify-content: center;
@@ -103,6 +107,8 @@ $playbar-height: 2rem;
     width: 0.5rem;
     height: $playbar-height;
     background-color: $white;
+    border-radius: 1px;
+    box-shadow: 1px 1px 4px 0px rgba(0,0,0,0.2);
   }
 
   .playpause-external {
