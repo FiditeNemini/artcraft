@@ -23,9 +23,9 @@ export default function PageVSTApp() {
     // fileToken: job?.maybe_result?.entity_token || "",
   });
 
-  console.log(job);
-  console.log(job?.maybe_result);
-  console.log(job?.maybe_result?.entity_token);
+  // console.log(job);
+  // console.log(job?.maybe_result);
+  // console.log(job?.maybe_result?.entity_token);
 
   const handleOnChange = (val: {
     [key: string]: number | string | boolean | undefined;
