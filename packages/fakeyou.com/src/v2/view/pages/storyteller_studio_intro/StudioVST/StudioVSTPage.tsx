@@ -77,22 +77,22 @@ export default function PageVSTApp() {
     {
       label: "Anime",
       imageUrl: "/images/dummy-image.jpg",
-      token: "weight_yqexh77ntqyawzgh9fzash7981",
+      token: "weight_yqexh77ntqyawzgh9fzash798",
     },
     {
       label: "Pixel",
       imageUrl: "/images/dummy-image-2.jpg",
-      token: "weight_yqexh77ntqyawzgh9fzash7982",
+      token: "weight_yqexh77ntqyawzgh9fzash798",
     },
     {
       label: "Painting",
       imageUrl: "/images/dummy-image-3.jpg",
-      token: "weight_yqexh77ntqyawzgh9fzash7983",
+      token: "weight_yqexh77ntqyawzgh9fzash798",
     },
     {
       label: "Ink",
       imageUrl: "/images/dummy-image-4.jpg",
-      token: "weight_yqexh77ntqyawzgh9fzash7984",
+      token: "weight_yqexh77ntqyawzgh9fzash798",
     },
   ];
 
