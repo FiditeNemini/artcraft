@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import MediaAudioComponent from "./MediaAudioComponent";
+import MediaAudioPlayer from "./MediaAudioPlayer";
 import MediaVideoComponent from "./MediaVideoComponent";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
 import Container from "components/common/Container";
@@ -64,23 +64,27 @@ export default function MediaPage() {
     },
   });
   const batchToken = mediaFile?.maybe_batch_token;
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<{ url: string; token: string }[]>([]);
   const bucketConfig = new BucketConfig();
   const timeCreated = moment(mediaFile?.created_at || "").fromNow();
   const dateCreated = moment(mediaFile?.created_at || "").format("LLL");
   const [buttonLabel, setButtonLabel] = useState("Copy");
   const [copyPositiveButtonText, setCopyPositiveButtonText] = useState("Copy");
   const [copyNegativeButtonText, setCopyNegativeButtonText] = useState("Copy");
+  const [activeSlide, setActiveSlide] = useState({ url: "", token: "" });
+
+  // Inside MediaPage.tsx
 
   useEffect(() => {
     if (batchToken) {
       GetMediaBatchImages(batchToken, {}, {})
         .then(response => {
           if (response.success) {
-            const imageUrls = response.results.map(result =>
-              bucketConfig.getGcsUrl(result.public_bucket_path)
-            );
-            setImages(imageUrls);
+            const mediaItems = response.results.map(result => ({
+              url: bucketConfig.getGcsUrl(result.public_bucket_path),
+              token: result.token,
+            }));
+            setImages(mediaItems);
           } else {
             console.error("Failed to fetch batch images");
           }
@@ -109,6 +113,10 @@ export default function MediaPage() {
     } catch (err) {
       console.error("Failed to copy: ", err);
     }
+  };
+
+  const handleActiveSlideChange = (image: any) => {
+    setActiveSlide(image);
   };
 
   const promptSection = (
@@ -171,7 +179,9 @@ export default function MediaPage() {
             {/* Voice model name that is used to generate the audio */}
             {/*<h3 className="fw-bold mb-4">[Voice Model Name]</h3> */}
 
-            <MediaAudioComponent mediaFile={mediaFile} />
+            <div className="w-100">
+              <MediaAudioPlayer mediaFile={mediaFile} />
+            </div>
 
             {/* Show TTS text input if it is a TTS result */}
             {mediaFile.maybe_text_transcript && (
@@ -198,9 +208,16 @@ export default function MediaPage() {
         );
 
       case MediaFileType.Image:
-        let sdMediaImage = ["/images/avatars/default-pfp.png"];
+        let sdMediaImage = [
+          { url: "/images/avatars/default-pfp.png", token: "default" },
+        ];
         if (mediaFile.public_bucket_path) {
-          sdMediaImage = [bucketConfig.getGcsUrl(mediaFile.public_bucket_path)];
+          sdMediaImage = [
+            {
+              url: bucketConfig.getGcsUrl(mediaFile.public_bucket_path),
+              token: mediaFile?.token,
+            },
+          ];
         }
 
         return (
@@ -208,6 +225,7 @@ export default function MediaPage() {
             <SdBatchMediaPanel
               key={images.length}
               images={mediaFile.maybe_batch_token ? images : sdMediaImage}
+              onActiveSlideChange={handleActiveSlideChange}
             />
             {promptSection}
           </>
@@ -285,9 +303,12 @@ export default function MediaPage() {
     ? mediaTypeLabels[mediaFile?.media_type]
     : "";
 
-  let audioLink = new BucketConfig().getGcsUrl(mediaFile?.public_bucket_path);
+  let downloadLink =
+    activeSlide.url || bucketConfig.getGcsUrl(mediaFile?.public_bucket_path);
 
-  const shareUrl = `https://fakeyou.com/media/${mediaFile?.token || ""}`;
+  const shareUrl = `https://fakeyou.com/media/${
+    activeSlide.token || mediaFile?.token || ""
+  }`;
   const shareText = "Check out this media on FakeYou.com!";
 
   if (status < 3)
@@ -592,8 +613,8 @@ export default function MediaPage() {
                     icon={faArrowDownToLine}
                     label="Download"
                     className="flex-grow-1"
-                    href={audioLink}
-                    download={audioLink}
+                    href={downloadLink}
+                    download={downloadLink}
                     variant="secondary"
                     target="_blank"
                   />
@@ -604,8 +625,8 @@ export default function MediaPage() {
                       icon={faArrowDownToLine}
                       square={true}
                       variant="secondary"
-                      href={audioLink}
-                      download={audioLink}
+                      href={downloadLink}
+                      download={downloadLink}
                       tooltip="Download"
                       target="_blank"
                     />

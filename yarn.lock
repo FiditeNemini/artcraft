@@ -4484,6 +4484,7 @@ __metadata:
     react-select: ^5.7.0
     react-share: ^4.4.1
     react-twitch-embed: ^3.0.1
+    react-typeform-embed: ^1.0.8
     react-wavesurfer.js: ^0.0.8
     sass: ^1.57.1
     swiper: ^11.0.5
@@ -4591,10 +4592,13 @@ __metadata:
   resolution: "@storyteller/root@workspace:."
   dependencies:
     "@react-spring/types": ^9.7.3
+    "@typeform/embed": ^4.8.1
+    "@typeform/embed-react": ^3.15.0
     craco: ^0.0.3
     cross-env: ^7.0.3
     husky: ^8.0.3
     lerna: ^4.0.0
+    local-storage: ^2.0.0
     moment: ^2.29.4
     prettier: ^3.1.0
     pretty-quick: ^3.1.3
@@ -5030,6 +5034,32 @@ __metadata:
   version: 1.0.2
   resolution: "@tsconfig/node16@npm:1.0.2"
   checksum: ca94d3639714672bbfd55f03521d3f56bb6a25479bd425da81faf21f13e1e9d15f40f97377dedbbf477a5841c5b0c8f4cd1b391f33553d750b9202c54c2c07aa
+  languageName: node
+  linkType: hard
+
+"@typeform/embed-react@npm:^3.15.0":
+  version: 3.15.0
+  resolution: "@typeform/embed-react@npm:3.15.0"
+  dependencies:
+    "@typeform/embed": 4.8.1
+    fast-deep-equal: ^3.1.3
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: d5e5d4b1cdfc128de2ce6c17ba648adbe98bfecc5a2c296fbedc8fb32da0c302e813baa6ce3ecc3de9dc84f36ccfd42250a4693f846d84ce2574e6fedcaa86e5
+  languageName: node
+  linkType: hard
+
+"@typeform/embed@npm:4.8.1, @typeform/embed@npm:^4.8.1":
+  version: 4.8.1
+  resolution: "@typeform/embed@npm:4.8.1"
+  checksum: 1e7ac3d0d95c1ea823160f1478a973f871550a4bab7de1501f557b1e18966ab5a740b6a913d9436b5ee59d0f25d707b66582a8c41dea195383cca3afb1955b23
+  languageName: node
+  linkType: hard
+
+"@typeform/embed@npm:^1.28.2":
+  version: 1.38.0
+  resolution: "@typeform/embed@npm:1.38.0"
+  checksum: 41115134e5cee28f5e031181b4525c7885d23707699cf183921110262717c7544bfd101428267410b812914c235687783e373ce98e37bdc447d72f8177663597
   languageName: node
   linkType: hard
 
@@ -14247,6 +14277,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"local-storage@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "local-storage@npm:2.0.0"
+  checksum: 921f381cafc4c0cac263a87e9e11093adf0bfb13b3520107bb5065bbccf5e7d22eea81148a40bc10d9f44aba8a5afe0157183205714d0221e02e36cb8afaa70b
+  languageName: node
+  linkType: hard
+
 "locate-path@npm:^2.0.0":
   version: 2.0.0
   resolution: "locate-path@npm:2.0.0"
@@ -18174,6 +18211,18 @@ __metadata:
     react: ^18.2.0
     react-dom: ^18.2.0
   checksum: 07e885abc479afcf2918584fd449f516c37d3a766762004fdbb92f84a3d3177287e92009755f16bbc9e68b022820e26af1bf86b1edddef2499abe750345b662b
+  languageName: node
+  linkType: hard
+
+"react-typeform-embed@npm:^1.0.8":
+  version: 1.0.8
+  resolution: "react-typeform-embed@npm:1.0.8"
+  dependencies:
+    "@typeform/embed": ^1.28.2
+  peerDependencies:
+    react: ^17.0.2
+    react-dom: ^17.0.2
+  checksum: f47ee0077046e282a482ef1a9d754ff255be65174e05b58f4c51c873ce8d771d1af98c5829f8860f2a33b0f4ebabcc4557e0f1e3b14b0d8bf3b23f460f1df18a
   languageName: node
   linkType: hard
 

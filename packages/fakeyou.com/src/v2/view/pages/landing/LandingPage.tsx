@@ -7,15 +7,19 @@ import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClie
 import { Container } from "components/common";
 import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import Dashboard from "./Dashboard";
-import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 import { useDomainConfig } from "context/DomainConfigContext";
 import StorytellerLanding from "./storyteller/StorytellerLanding";
+import LandingVideoReel from "./components/LandingVideoReel";
 import {
   FrontendInferenceJobType,
   InferenceJob,
 } from "@storyteller/components/src/jobs/InferenceJob";
 import { TtsInferenceJob } from "@storyteller/components/src/jobs/TtsInferenceJobs";
 import "./LandingPage.scss";
+// import VstSectionV1 from "./components/VstSectionV1";
+import VstSectionV2 from "./components/VstSectionV2";
+import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
+import { DomainConfig, Website } from "utils/domainConfig";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -32,27 +36,36 @@ interface Props {
 
 function LandingPage(props: Props) {
   usePrefixedDocumentTitle("FakeYou Celebrity Voice Generator");
+
   PosthogClient.recordPageview();
-  const domain = useDomainConfig();
+
+  const domain : DomainConfig = useDomainConfig();
 
   const isLoggedIn = props.sessionWrapper.isLoggedIn();
 
   return (
     <>
+      {domain.website === Website.StorytellerAi && !isLoggedIn && <LandingVideoReel />}
       <Container type="panel">
-        {domain.title === "FakeYou" ? (
+        {domain.website === Website.FakeYou ? (
           <>
             {/* FAKEYOU.COM */}
             {!isLoggedIn && (
-              <FakeYouLandingHeader
-                sessionWrapper={props.sessionWrapper}
-                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-                inferenceJobs={props.inferenceJobs}
-                ttsInferenceJobs={props.ttsInferenceJobs}
-                enqueueInferenceJob={props.enqueueInferenceJob}
-                inferenceJobsByCategory={props.inferenceJobsByCategory}
-                enqueueTtsJob={props.enqueueTtsJob}
-              />
+              <>
+                <FakeYouLandingHeader
+                  sessionWrapper={props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    props.sessionSubscriptionsWrapper
+                  }
+                  inferenceJobs={props.inferenceJobs}
+                  ttsInferenceJobs={props.ttsInferenceJobs}
+                  enqueueInferenceJob={props.enqueueInferenceJob}
+                  inferenceJobsByCategory={props.inferenceJobsByCategory}
+                  enqueueTtsJob={props.enqueueTtsJob}
+                />
+                {/* <VstSectionV1 /> */}
+                <VstSectionV2 />
+              </>
             )}
 
             <Dashboard sessionWrapper={props.sessionWrapper} />
@@ -63,7 +76,15 @@ function LandingPage(props: Props) {
           <>
             {/* STORYTELLER,AI */}
             {!isLoggedIn ? (
-              <StorytellerLanding />
+              <StorytellerLanding
+                sessionWrapper={props.sessionWrapper}
+                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+                inferenceJobs={props.inferenceJobs}
+                ttsInferenceJobs={props.ttsInferenceJobs}
+                enqueueInferenceJob={props.enqueueInferenceJob}
+                inferenceJobsByCategory={props.inferenceJobsByCategory}
+                enqueueTtsJob={props.enqueueTtsJob}
+              />
             ) : (
               <Dashboard sessionWrapper={props.sessionWrapper} />
             )}

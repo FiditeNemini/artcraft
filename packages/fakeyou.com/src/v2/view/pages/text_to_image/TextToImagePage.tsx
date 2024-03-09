@@ -9,6 +9,7 @@ import {
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { faMessageImage } from "@fortawesome/pro-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 //import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 
 interface TextToImagePageProps {
@@ -30,6 +31,8 @@ export default function TextToImagePage({
   //if (!sessionWrapper.canAccessStudio()) {
   //  return <StudioNotAvailable />;
   //}
+
+  usePrefixedDocumentTitle("Text to Image");
 
   return (
     <Container type="panel">

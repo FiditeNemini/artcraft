@@ -4,7 +4,6 @@ import React, {
   useLayoutEffect,
   useState,
   useRef,
-  // PointerEvent,
 } from "react";
 import {
   faArrowsRepeat,
@@ -35,8 +34,8 @@ const trimOptions: { [key: string]: number } = {
 
 const initialTrimState: TrimStates = {
   canNotTrim: true,
-  isScrubbingTrim: false,
   trimDuration: 0,
+  trimReset: new Date(),
   trimStart: 0,
   trimEnd: 0,
   maxDuration: 0,
@@ -65,16 +64,17 @@ export default memo(function VideoQuickTrim({
   const [isRepeatOn, setIsRepatOn] = useState<boolean>(true);
   const [{
     canNotTrim,
+    trimReset,
     trimStart,
     trimEnd,
     trimDuration,
-    // isScrubbingTrim,
+    maxDuration
   }, setTrimState] = useState<TrimStates>(initialTrimState);
   
 
 
   const videoRefCallback = useCallback(node => {
-    console.log("videoRefCallback");
+    //console.log("videoRefCallback");
     if (node !== null) { 
       // DOM node referenced by ref has changed and exists
       videoRef.current = node;
@@ -98,8 +98,10 @@ export default memo(function VideoQuickTrim({
       };
       
       node.ontimeupdate = ()=>{
-        if(isRepeatOn && node.currentTime >= trimEnd){
-          node.currentTime = 0;
+        if(isRepeatOn && 
+            (node.currentTime >= trimEnd || node.currentTime <= trimStart)
+          ){
+          node.currentTime = trimStart;
         }
         setPlaybarState((curr)=>({
           ...curr,
@@ -113,7 +115,7 @@ export default memo(function VideoQuickTrim({
       node.onended = ()=>{setPlaypause("ended");};
 
     } // else{} DOM node referenced by ref has been unmounted 
-  }, [playbarWidth, onSelect, isRepeatOn, trimEnd]); //END videoRefCallback
+  }, [playbarWidth, onSelect, isRepeatOn, trimStart, trimEnd]); //END videoRefCallback
 
   function handleWindowResize() {
     if (playbarRef.current !== null) {
@@ -142,22 +144,29 @@ export default memo(function VideoQuickTrim({
   }, []);
 
   const handleChangeTrimDuration = (selected: string) =>{
-    if(!canNotTrim){
-      const newTrimEnd = trimStart+ trimOptions[selected];
+    if(!canNotTrim && maxDuration > 0 && trimOptions[selected] <= maxDuration){
+      let newTrimStart = trimStart;
+      let newTrimEnd = trimStart+ trimOptions[selected];
+      if (newTrimEnd > maxDuration){
+        newTrimEnd = maxDuration;
+        newTrimStart = maxDuration - trimOptions[selected];
+      }
       setTrimState((curr)=>({
         ...curr,
+        trimReset: new Date(),
         trimDuration: trimOptions[selected],
+        trimStart: newTrimStart,
         trimEnd: newTrimEnd,
       }))
       onSelect({
-        trimStartSeconds: trimStart,
+        trimStartSeconds: newTrimStart,
         trimEndSeconds: newTrimEnd,
       });
       if (isRepeatOn 
           && videoRef.current 
           && videoRef.current.currentTime > newTrimEnd
       ){
-        videoRef.current.currentTime = trimStart;
+        videoRef.current.currentTime = newTrimStart;
       }
     }
   }
@@ -170,16 +179,17 @@ export default memo(function VideoQuickTrim({
     }
   };
 
-  const trimScrubberWidth = videoRef.current 
+  const trimScrubberWidth = videoRef.current && playbarWidth > 0
     ? trimDuration > 0 && trimDuration < videoRef.current.duration 
-      ? (trimDuration / videoRef.current.duration * 100) 
-      : 100
+      ? (trimDuration / videoRef.current.duration * playbarWidth) 
+      : playbarWidth
     : 0;
 
   return (
     <div className="fy-video-quicktrim">
       <div className="video-wrapper">
         <VideoFakeyou
+          height={500}
           controls={false}
           muted={isMuted}
           ref={videoRefCallback}
@@ -212,7 +222,30 @@ export default memo(function VideoQuickTrim({
       {/* END of Video Wrapper */}
       <div className="playbar" ref={playbarRefCallback}>
         <div className="playbar-bg" />
-        <TrimScrbber width={trimScrubberWidth} />
+        {trimScrubberWidth > 0 && 
+          playbarWidth > 0 && 
+          maxDuration > 0 &&
+          <TrimScrbber
+            key={trimReset.toString()}
+            boundingWidth={playbarWidth}
+            width={trimScrubberWidth}
+            trimStart={trimStart}
+            trimDuration={trimDuration}
+            duration={maxDuration}
+            onChange={(val: QuickTrimData)=>{
+              //console.log(val);
+              setTrimState((curr)=>({
+                ...curr,
+                trimStart: val.trimStartSeconds,
+                trimEnd: val.trimEndSeconds
+              }))
+              onSelect({
+                trimStartSeconds: val.trimStartSeconds,
+                trimEndSeconds: val.trimEndSeconds,
+              });
+            }}
+          />
+        }
         <div className="playcursor" style={{left: timeCursorOffset+"px"}}/>
       </div> {/* END of Playbar */}
 

@@ -1,18 +1,24 @@
-type DomainConfig = Record<string, any>;
+export enum Website {
+  FakeYou,
+  StorytellerAi,
+}
+
+export interface DomainConfig {
+  website: Website,
+  logo: string,
+  title: string,
+  link: string,
+}
 
 const domainConfigs: Record<string, DomainConfig> = {
-  "storyteller.ai": {
-    logo: "/fakeyou/Storyteller-Logo-5.png",
+  "storyteller": {
+    website: Website.StorytellerAi,
+    logo: "/fakeyou/Storyteller-Logo-1.png",
     title: "Storyteller AI",
     link: "https://storyteller.ai",
   },
-  "fakeyou.com": {
-    logo: "/fakeyou/FakeYou-Logo-2.png",
-    title: "FakeYou",
-    link: "https://fakeyou.com",
-  },
-  // Default to FakeYou.com
-  default: {
+  "fakeyou": {
+    website: Website.FakeYou,
     logo: "/fakeyou/FakeYou-Logo-2.png",
     title: "FakeYou",
     link: "https://fakeyou.com",
@@ -20,16 +26,18 @@ const domainConfigs: Record<string, DomainConfig> = {
 };
 
 export const getCurrentDomainConfig = (): DomainConfig => {
-  const currentHostname = window.location.hostname;
+  // Fast resolve without leaking domain details
+  switch (window.location.hostname) {
+    case "fakeyou.com":
+      return domainConfigs.fakeyou;
+    case "storyteller.ai":
+      return domainConfigs.storyteller;
+  }
 
-  const matchingConfigKey = Object.keys(domainConfigs).find(
-    key => currentHostname === key || currentHostname.endsWith(`.${key}`)
-  );
+  if (window.location.hostname.includes("storyteller")) {
+      return domainConfigs.storyteller;
+  }
 
-  const domainConfig =
-    matchingConfigKey !== undefined
-      ? domainConfigs[matchingConfigKey]
-      : domainConfigs["default"];
-
-  return domainConfig;
+  // Default fallback
+  return domainConfigs.fakeyou;
 };

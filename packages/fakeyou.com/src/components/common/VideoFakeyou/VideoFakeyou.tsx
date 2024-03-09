@@ -1,14 +1,22 @@
-import React, { useState, forwardRef } from "react";
+import React, {
+  useState,
+  forwardRef,
+  memo,
+  useEffect,
+} from "react";
 import { useMedia } from "hooks";
 import { MediaFileType } from "@storyteller/components/src/api";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import makeClass from "resources/makeClass";
 
-import { Label } from "components/common";
+import { Label, Spinner } from "components/common";
 import './styles.scss';
 
 
 export interface VideoFakeyouProps{
+  width?: number|string;
+  height?: number|string;
+  hideIfNoMedia?: boolean;
   wrapperClassName?: string;
   controls?:boolean;
   muted?:boolean;
@@ -21,9 +29,12 @@ export interface VideoFakeyouProps{
 
 type Ref = HTMLVideoElement;
 
-const VideoFakeyou = forwardRef<Ref, VideoFakeyouProps>(({
+const VideoFakeyou = memo(forwardRef<Ref, VideoFakeyouProps>(({
+  width,
+  height,
+  hideIfNoMedia = false,
   wrapperClassName,
-  controls,
+  controls = true,
   muted,
   className,
   src,
@@ -32,7 +43,12 @@ const VideoFakeyou = forwardRef<Ref, VideoFakeyouProps>(({
   onResponse,
   ...rest
 }: VideoFakeyouProps, ref) => {
-  const [mediaFile, setMediaFile] = useState<MediaFileType>();
+  //console.log(`Video Player rerender: ${mediaToken}`);
+
+  const [mediaFile, setMediaFile] = useState<MediaFileType|null>(null);
+  useEffect(()=>{
+    setMediaFile(null);
+  },[mediaToken])
   useMedia({
     mediaToken: mediaToken,
     onSuccess: (res: any) => {
@@ -42,10 +58,20 @@ const VideoFakeyou = forwardRef<Ref, VideoFakeyouProps>(({
   });
 
   const mediaLink = src || (mediaFile && new BucketConfig().getGcsUrl(mediaFile.public_bucket_path));
-
+  const sizing = {
+    height: typeof height === "number" ? height+'px' 
+    : typeof height === "string" ? height
+    :"auto",
+    width: typeof width === "number" ? width+'px' 
+    : typeof width === "string" ? width
+    :"auto",
+  }
   if (mediaLink){
     return (
-      <div {...{ ...makeClass("fy-video",wrapperClassName) }}>
+      <div
+        style={sizing}
+        {...{ ...makeClass("fy-video",wrapperClassName) }}
+      >
         {label && <Label label={label}/>}
         <video
           controls={controls}
@@ -60,9 +86,17 @@ const VideoFakeyou = forwardRef<Ref, VideoFakeyouProps>(({
           <source src={mediaLink} type="video/mp4" />
         </video>
       </div>
-    )
-  }
-  return null;
-});
+    );
+  }else if (!hideIfNoMedia){
+    return(
+      <div
+        style={sizing}
+        {...{ ...makeClass("fy-video",wrapperClassName) }}
+      >
+        <Spinner/>
+      </div>
+    );
+  } return null;
+}));
 
 export default VideoFakeyou;

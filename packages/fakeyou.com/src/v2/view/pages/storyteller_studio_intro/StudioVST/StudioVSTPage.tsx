@@ -1,12 +1,6 @@
 import React, { useRef, useState } from "react";
 import { NavLink, useParams, useHistory } from "react-router-dom";
-import {
-  Button,
-  Container,
-  Panel,
-  SelectionBubbles,
-  TextArea,
-} from "components/common";
+import { Button, Container, Panel, TextArea } from "components/common";
 import VideoQuickTrim, {
   QuickTrimData,
 } from "components/common/VideoQuickTrim";
@@ -15,7 +9,7 @@ import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_sty
 import { initialValues } from "./defaultValues";
 import { mapRequest, VSTType } from "./helpers";
 import LoadingSpinner from "components/common/LoadingSpinner";
-// import SectionAdvanceOptions from "./sectionAdvanceOptions";
+import SelectionBubblesV2 from "components/common/SelectionBubblesV2";
 
 export default function PageVSTApp() {
   const { jobToken } = useParams<{ jobToken: string }>();
@@ -29,15 +23,14 @@ export default function PageVSTApp() {
     // fileToken: job?.maybe_result?.entity_token || "",
   });
 
-  console.log(job);
-  console.log(job?.maybe_result);
-  console.log(job?.maybe_result?.entity_token);
+  // console.log(job);
+  // console.log(job?.maybe_result);
+  // console.log(job?.maybe_result?.entity_token);
 
   const handleOnChange = (val: {
     [key: string]: number | string | boolean | undefined;
   }) => {
     setVstValues(curr => ({ ...curr, ...val }));
-    console.log("VST Values", vstValues);
   };
 
   const handleGenerate = () => {
@@ -54,7 +47,7 @@ export default function PageVSTApp() {
 
     EnqueueVideoStyleTransfer(request).then(res => {
       if (res.success && res.inference_job_token) {
-        console.log("Job enqueued successfully", res.inference_job_token);
+        // console.log("Job enqueued successfully", res.inference_job_token);
         history.push(`/studio-intro/result/${res.inference_job_token}`);
       } else {
         console.log("Failed to enqueue job", res);
@@ -80,18 +73,38 @@ export default function PageVSTApp() {
     };
   }
 
-  const styleMap: { [key: string]: string } = {
-    Anime: "weight_yqexh77ntqyawzgh9fzash798", // set SD Model Weight Tokens, currently hardcoded all to Anime style
-    Pixel: "weight_yqexh77ntqyawzgh9fzash798",
-    Painting: "weight_yqexh77ntqyawzgh9fzash798",
-  };
+  const styleOptions = [
+    {
+      label: "Anime",
+      imageUrl: "/images/dummy-image.jpg",
+      token: "weight_yqexh77ntqyawzgh9fzash798",
+    },
+    {
+      label: "Pixel",
+      imageUrl: "/images/dummy-image-2.jpg",
+      token: "weight_yqexh77ntqyawzgh9fzash798",
+    },
+    {
+      label: "Painting",
+      imageUrl: "/images/dummy-image-3.jpg",
+      token: "weight_yqexh77ntqyawzgh9fzash798",
+    },
+    {
+      label: "Ink",
+      imageUrl: "/images/dummy-image-4.jpg",
+      token: "weight_yqexh77ntqyawzgh9fzash798",
+    },
+  ];
 
-  const handleStyleSelection = (selected: string) => {
-    const selectedSdModelToken = styleMap[selected];
-    setVstValues(curr => ({ ...curr, sdModelToken: selectedSdModelToken }));
+  const handleStyleSelection = (selectedLabel: any) => {
+    const selectedOption = styleOptions.find(
+      option => option.label === selectedLabel
+    );
+    const selectedSdModelToken = selectedOption ? selectedOption.token : null;
+    if (selectedSdModelToken) {
+      setVstValues(curr => ({ ...curr, sdModelToken: selectedSdModelToken }));
+    }
   };
-
-  const styleOptions = Object.keys(styleMap);
 
   if (!jobToken) {
     history.push("/");
@@ -130,10 +143,12 @@ export default function PageVSTApp() {
           <div className="col-12 col-md-6 d-flex flex-column gap-3 justify-content-center">
             <div>
               <label className="sub-title">Select a Style</label>
-              <SelectionBubbles
-                options={styleOptions}
+              <SelectionBubblesV2
+                options={Object.values(styleOptions)}
                 onSelect={handleStyleSelection}
                 selectedStyle="outline"
+                variant="card"
+                mobileSideScroll={true}
               />
             </div>
 

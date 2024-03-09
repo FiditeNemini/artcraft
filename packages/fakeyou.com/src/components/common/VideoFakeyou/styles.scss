@@ -5,7 +5,15 @@
   width: 100%;
   margin: 0;
   position: relative;
-
+  background-color: $bg;
+  border-radius: 0.5rem;
+  border: $panel-inner-border 1px solid;
+  .fy-spinner{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
   &.fit-content {
     height: fit-content;
   }

@@ -53,7 +53,7 @@ export default function CompStyleModal({
             setOnSelectTimeStamp(new Date());
           }
         };
-        console.log(data);
+        //console.log(data);
         return (
           <div key={key}
             className="col-12 col-sm-6 col-xl-4 grid-item"
