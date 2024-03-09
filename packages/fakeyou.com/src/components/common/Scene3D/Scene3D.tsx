@@ -76,11 +76,11 @@ export default function Scene3D({
     */
 
     console.log("installing event listener for messages");
-    window.addEventListener("message", onMessage);
+    window.addEventListener("message", onMessage, false);
 
     return () => {
       console.log("uninstalling event listener for messages");
-      window.removeEventListener("message", onMessage);
+      window.removeEventListener("message", onMessage, false);
     }
   }, [onMessage]);
   //}, [onMessage, iframeRef]);
