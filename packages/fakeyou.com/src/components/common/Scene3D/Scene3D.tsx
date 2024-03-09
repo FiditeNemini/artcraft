@@ -56,6 +56,7 @@ export default function Scene3D({
 
 
   useEffect(() => {
+    /*
     if (iframeRef && iframeRef.current) {
       console.log("installing event listener for messages");
       
@@ -72,7 +73,17 @@ export default function Scene3D({
         (ref as any).removeEventListener("message", onMessage);
       }
     }
-  }, [onMessage, iframeRef]);
+    */
+
+    console.log("installing event listener for messages");
+    window.addEventListener("message", onMessage);
+
+    return () => {
+      console.log("uninstalling event listener for messages");
+      window.removeEventListener("message", onMessage);
+    }
+  }, [onMessage]);
+  //}, [onMessage, iframeRef]);
 
 
   let engineUrl = `${engineBaseUrl}/?mode=${mode}`;
