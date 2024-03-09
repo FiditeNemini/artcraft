@@ -60,7 +60,7 @@ import { VoiceConversionModelUploadJob } from "@storyteller/components/src/jobs/
 import { VoiceConversionModelListItem } from "@storyteller/components/src/api/voice_conversion/ListVoiceConversionModels";
 import HttpBackend from "i18next-http-backend";
 
-import { SessionProvider, InferenceJobsProvider } from "components/providers";
+import { InferenceJobsProvider, NotificationProvider, SessionProvider } from "components/providers";
 //this caused an error for me (Bombay) so i had to import it as a default
 import ModalProvider from "components/providers/ModalProvider";
 
@@ -850,6 +850,7 @@ class App extends React.Component<Props, State> {
             */}
 
             <div className="migrationComponentWrapper">
+              <NotificationProvider>
               <InferenceJobsProvider
                 {...{ // I intend to consolidate these providers into a grouped provider for cleanliness -v
                   enqueue: this.enqueueInferenceJob,
@@ -989,6 +990,7 @@ class App extends React.Component<Props, State> {
                   </ModalProvider>
                 </SessionProvider>
               </InferenceJobsProvider>
+              </NotificationProvider>
             </div>
           </div>
         </div>

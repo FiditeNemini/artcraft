@@ -42,6 +42,16 @@ styles with important tags:
   }
 }
 
+@mixin close-parent {
+  .icon-close-button {
+    cursor: pointer;
+    height: 1.5rem;
+    opacity: .33;
+
+    &:hover { opacity: 1; }
+  }
+}
+
 .fakeyou-refresh {
   //- BS5 classnames -//
   .object-fit-cover {

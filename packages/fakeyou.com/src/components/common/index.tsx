@@ -22,6 +22,7 @@ import LikeButton from "./LikeButton";
 import MocapInput from "./MocapInput";
 import MasonryGrid from "./MasonryGrid/MasonryGrid";
 import Modal from "./Modal";
+import Notification from "./Notification";
 import NumberSlider from "./NumberSlider";
 import NumberSliderV2 from "./NumberSliderV2";
 import Pagination from "./Pagination";
@@ -84,6 +85,7 @@ export {
   MasonryGrid,
   Modal,
   NonRouteTabs,
+  Notification,
   NumberSlider,
   NumberSliderV2,
   Pagination,

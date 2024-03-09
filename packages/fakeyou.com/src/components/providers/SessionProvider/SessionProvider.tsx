@@ -43,6 +43,7 @@ export default function SessionProvider({
       return false;
     }
   };
+
   const userTokenMatch = (otherUserToken: string) =>
     !otherUserToken || !user?.user_token ? false : user.user_token === otherUserToken;
   const canEditTtsModel = (userToken: string) =>

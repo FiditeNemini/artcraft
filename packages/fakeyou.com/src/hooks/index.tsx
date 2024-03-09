@@ -15,6 +15,7 @@ import useListContent from './useListContent';
 import useLocalize from './useLocalize';
 import useMedia from './useMedia';
 import useModal from './useModal';
+import useNotifications from './useNotifications';
 import useOnScreen from "./useOnScreen";
 import usePrevious from './usePrevious';
 import useQueuePoll from './useQueuePoll';
@@ -43,6 +44,7 @@ export {
   useLocalize,
   useMedia,
   useModal,
+  useNotifications,
   useOnScreen,
   usePrevious,
   useQueuePoll,
