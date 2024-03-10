@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::time::Duration;
 
 use actix_web::{HttpRequest, HttpResponse, ResponseError, web};
 use actix_web::http::StatusCode;
@@ -8,6 +9,9 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 
 use crate::server_state::ServerState;
 
+/// How often the client should poll
+const REFRESH_INTERVAL: Duration = Duration::from_secs(60);
+
 #[derive(Serialize, ToSchema)]
 pub struct StatusAlertResponse {
   pub success: bool,
@@ -16,6 +20,10 @@ pub struct StatusAlertResponse {
   /// The sub keys are optional, but at least one of them will be set.
   /// i.e. we can have an alert with no message or no predefined category.
   pub maybe_alert: Option<StatusAlertInfo>,
+
+  /// Tell the frontend client how fast to refresh their view of this list.
+  /// During an attack, we may want this to go extremely slow.
+  pub refresh_interval_millis: u64,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -108,6 +116,7 @@ pub async fn status_alert_handler(
   let response = StatusAlertResponse {
     success: true,
     maybe_alert,
+    refresh_interval_millis: REFRESH_INTERVAL.as_millis() as u64,
   };
 
   let body = serde_json::to_string(&response)
