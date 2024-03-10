@@ -39,6 +39,7 @@ launch_mac() {
   # NB: '7001' port is being chosen because something on the system is hogging port 7000.
   # chrome://flags/#unsafely-treat-insecure-origin-as-secure - allow microphone recording
   # otherwise getUserMedia() / navigator.mediaDevices will not function
+  # --guest: no Google login screen
   open -na "Google Chrome" --args \
     --disable-features=ChromeLabs \
     --disable-site-isolation-trials \
@@ -49,6 +50,7 @@ launch_mac() {
     --user-data-dir="${chrome_dir}" \
     --window-position=1200,300 \
     --window-size=1500,1700 \
+    --guest \
     http://dev.fakeyou.com:7001
 }
 
