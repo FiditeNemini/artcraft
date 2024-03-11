@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
@@ -18,12 +18,22 @@ interface Props {
 
 function StudioIntroPage(props: Props) {
   const { mediaToken } = useParams<{ mediaToken: string }>();
+
   const history = useHistory();
+
   const inferenceJobs = useInferenceJobs(
     FrontendInferenceJobType.EngineComposition
   );
 
+  // If the user saves the scene in the engine, we'll need to use the new token 
+  // for subsequent steps of this flow.
+  const [savedMediaToken, setSavedMediaToken] = useState(mediaToken);
+
   usePrefixedDocumentTitle("Storyteller Studio");
+
+  const onSaveCallback = useCallback((sceneMediaToken: string) => {
+    setSavedMediaToken(sceneMediaToken);
+  }, [setSavedMediaToken]);
 
   if (!props.sessionWrapper.canAccessStudio()) {
     return <StudioNotAvailable />;
@@ -31,6 +41,8 @@ function StudioIntroPage(props: Props) {
 
   let engineParams = {};
 
+  // We should prefer to start the onboarding flow with an existing scene, but if 
+  // one is unavailable, we should show the sample room.
   if (mediaToken) {
     engineParams = {
       sceneMediaFileToken: mediaToken,
@@ -45,10 +57,10 @@ function StudioIntroPage(props: Props) {
     // This opens the job modal. Needs to be disabled.
     EnqueueEngineCompositing("", {
       uuid_idempotency_token: uuidv4(),
-      media_file_token: mediaToken || "",
+      media_file_token: savedMediaToken,
     }).then((res: any) => {
       if (res && res.success) {
-        inferenceJobs.enqueue(res.inference_job_token,true); // noModalPls = true
+        inferenceJobs.enqueue(res.inference_job_token, true); // noModalPls = true
         history.push(`/studio-intro/style/${res.inference_job_token}`);
       }
     });
@@ -60,6 +72,7 @@ function StudioIntroPage(props: Props) {
         fullScreen={true}
         mode="studio"
         className="flex-grow-1"
+        onSceneSavedCallback={onSaveCallback}
         {...engineParams}
       />
       <div className="d-flex justify-content-center p-3">

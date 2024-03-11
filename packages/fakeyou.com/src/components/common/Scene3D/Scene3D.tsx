@@ -13,6 +13,7 @@ interface Scene3DProps {
   objectId?: string;
   sceneMediaFileToken?: string;
   className?: string;
+  onSceneSavedCallback?: (mediaToken: string) => void;
 }
 
 export default function Scene3D({
@@ -22,6 +23,7 @@ export default function Scene3D({
   sceneMediaFileToken,
   urlParams,
   className,
+  onSceneSavedCallback,
 }: Scene3DProps) {
   const engineBaseUrl = "https://engine.fakeyou.com";
 
@@ -48,6 +50,10 @@ export default function Scene3D({
     ) {
       const mediaToken = event.data.match(/scene-saved:(.+)/)?.[1];
       console.log("saved scene media token:", mediaToken);
+
+      if (onSceneSavedCallback !== undefined && mediaToken !== undefined) {
+        onSceneSavedCallback(mediaToken);
+      }
 
     } else if (event.data === "scene-save-failed") {
       console.error("Failed to save the scene!");
