@@ -3,10 +3,12 @@ import { UserDetailsLight } from "../_common/UserDetailsLight";
 import { MediaFileType } from "../_common/enums/MediaFileType";
 import { WeightCategory } from "../_common/enums/WeightCategory";
 import { WeightType } from "../_common/enums/WeightType";
+import { MediaFileSubtype } from "../enums/MediaFileSubtype";
 
 export interface MediaFile {
   token: string;
   media_type: MediaFileType;
+  maybe_media_subtype: MediaFileSubtype | null;
   public_bucket_path: string;
   maybe_batch_token: string;
   maybe_creator_user: UserDetailsLight | null;
