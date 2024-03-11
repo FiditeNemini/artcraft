@@ -78,21 +78,21 @@ function SdInferencePanel({
   const [isEnqueuing, setIsEnqueuing] = useState(false);
   const [seed, setSeed] = useState("random");
   const [seedNumber, setSeedNumber] = useState("");
-  const [sampler, setSampler] = useState("DPM++ 2M Karras");
-  const [aspectRatio, setAspectRatio] = useState("square");
-  const [cfgScale, setCfgScale] = useState(7);
-  const [samples, setSamples] = useState(8);
-  const [batchCount, setBatchCount] = useState(3);
-  const [prompt, setPrompt] = useState("");
-  const [negativePrompt, setNegativePrompt] = useState("");
+  const [sampler, samplerSet] = useState("DPM++ 2M Karras");
+  const [aspectRatio, aspectRatioSet] = useState("square");
+  const [cfgScale, cfgScaleSet] = useState(7);
+  const [samples, samplesSet] = useState(8);
+  const [batchCount, batchCountSet] = useState(3);
+  const [prompt, prompSet] = useState("");
+  const [negativePrompt, negativePromptSet] = useState("");
   const onChange = onChanger({
-    setBatchCount,
-    setCfgScale,
-    setSampler,
-    setAspectRatio,
-    setPrompt,
-    setNegativePrompt,
-    setSamples,
+    batchCountSet,
+    cfgScaleSet,
+    samplerSet,
+    aspectRatioSet,
+    prompSet,
+    negativePromptSet,
+    samplesSet,
   });
 
   const initialState = {
@@ -109,15 +109,15 @@ function SdInferencePanel({
   };
 
   const resetToInitialState = () => {
-    setPrompt(initialState.prompt);
-    setNegativePrompt(initialState.negativePrompt);
-    setAspectRatio(initialState.aspectRatio);
+    prompSet(initialState.prompt);
+    negativePromptSet(initialState.negativePrompt);
+    aspectRatioSet(initialState.aspectRatio);
     setSeed(initialState.seed);
     setSeedNumber(initialState.seedNumber);
-    setSampler(initialState.sampler);
-    setCfgScale(initialState.cfgScale);
-    setSamples(initialState.samples);
-    setBatchCount(initialState.batchCount);
+    samplerSet(initialState.sampler);
+    cfgScaleSet(initialState.cfgScale);
+    samplesSet(initialState.samples);
+    batchCountSet(initialState.batchCount);
   };
 
   const samplerOpts = [
@@ -207,13 +207,13 @@ function SdInferencePanel({
   const handlePromptChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    setPrompt(event.target.value);
+    prompSet(event.target.value);
   };
 
   const handleNegativePromptChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    setNegativePrompt(event.target.value);
+    negativePromptSet(event.target.value);
   };
 
   const generateRandomSeed = () => Math.floor(Math.random() * Math.pow(2, 32));
@@ -257,6 +257,10 @@ function SdInferencePanel({
 
     if (!prompt || sdToken === undefined) {
       return false;
+    }
+
+    if (!sessionSubscriptionsWrapper.hasActiveProSubscription()) {
+      batchCountSet(1);
     }
 
     setIsEnqueuing(true);

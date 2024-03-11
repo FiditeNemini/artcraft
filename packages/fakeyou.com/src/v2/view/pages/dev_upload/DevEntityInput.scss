@@ -7,7 +7,15 @@
       width: 100%;
     }
     
-	>:not(.fy-input-label) {
+	>:not(.fy-input-label), {
 		margin-bottom: 1rem;
 	}
+
+    .lower-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 0;
+    }
 }

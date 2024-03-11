@@ -1,3 +1,6 @@
+@import "scss/colours.scss";
+@import "scss/site-refresh.scss";
+
 .fy-media-browser-tools {
   display: flex;
   align-items: center;
@@ -22,16 +25,7 @@
     flex-grow: 1;
   }
 
-  .icon-close-button {
-    cursor: pointer;
-    height: 1.5rem;
-    opacity: .33;
-    // transition: .25s all ease-in-out;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
+  @include close-parent;
 }
 
 
