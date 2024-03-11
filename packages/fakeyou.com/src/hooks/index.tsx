@@ -23,6 +23,7 @@ import useRatings from './useRatings';
 import useSdUpload from './useSdUpload';
 import useSession from './useSession';
 import useSlides from './useSlides';
+import useStatusPoll from './useStatusPoll';
 import useVideo from './useVideo';
 import useWeightFetch from './useWeightFetch';
 
@@ -52,6 +53,7 @@ export {
   useSdUpload,
   useSession,
   useSlides,
+  useStatusPoll,
   useVideo,
   useWeightFetch
 };
