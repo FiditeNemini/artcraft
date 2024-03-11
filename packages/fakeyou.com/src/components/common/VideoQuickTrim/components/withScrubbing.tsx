@@ -1,4 +1,5 @@
 import React,{
+  memo,
   useEffect,
   useRef,
   useState,
@@ -12,7 +13,7 @@ export interface withScrubbingPropsI {
   initialLeftOffset?: number; //in pixels
   initialLeftOffsetPercent?: number; // in %, 0 < % < 1
   styleOverride?: {[key: string]: string|number };
-  onScrubEnds?: (posPercent: number)=>void;
+  onScrubChanged?: (posPercent: number)=>void;
   //return scrubber location as %, where 0 < % < 1
 }
 
@@ -23,23 +24,23 @@ type withSrcubbingStates = {
   pointerStartPos: number;
 }
 
-export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.ComponentType<P>) => ({
+export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.ComponentType<P>) => memo(({
   boundingWidth,
   scrubberWidth,
   initialLeftOffset : initialLeftOffsetProps = 0,
   initialLeftOffsetPercent = 0,
   styleOverride = {},
-  onScrubEnds,
+  onScrubChanged,
   ...rest
 }: withScrubbingPropsI) => {
-  console.log(`withSCRUBBING reRender!! `);
+  console.log(`withSCRUBBING reRENDERING!! `);
   const refEl = useRef<HTMLDivElement| null>(null);
   const refListener = useRef<number>(Date.now());
 
   const initialLeftOffset = 
     initialLeftOffsetPercent > 0 ? boundingWidth * initialLeftOffsetPercent 
     : initialLeftOffsetProps;
-  // const initialLeftOffset = 0;
+
   const [{
     // key, 
     currLeftOffset, pointerStartPos,
@@ -52,6 +53,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   });
 
   useLayoutEffect(() => {
+    console.log(`withSCRUBBING useLAYOUTeffect!! `);
     function handleScrubStart (e: MouseEvent) {
       if(refEl.current){
         if(refEl.current.contains(e.target as Node)){
@@ -108,8 +110,15 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   }, [scrubberWidth, boundingWidth]);
 
   useEffect(()=>{
-    if(onScrubEnds)onScrubEnds(prevLeftOffset/boundingWidth);
-  },[prevLeftOffset, boundingWidth, onScrubEnds]);
+    console.log(`withSCRUBBING useEFFECT!! `);
+    const positionInPercentage = prevLeftOffset/boundingWidth;
+    if(onScrubChanged 
+      && typeof positionInPercentage === "number" 
+      && positionInPercentage >= 0
+    ){
+      onScrubChanged(prevLeftOffset/boundingWidth);
+    }
+  },[prevLeftOffset, boundingWidth, onScrubChanged]);
 
   return(
     <div
@@ -129,4 +138,4 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
       />
     </div>
   );
-};
+});

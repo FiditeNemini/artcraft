@@ -45,7 +45,7 @@ export const TrimScrubber = memo(({
         top: '-1rem',
       }}
       initialLeftOffsetPercent={trimStartSeconds/videoDuration}
-      onScrubEnds={handleOnChange}
+      onScrubChanged={handleOnChange}
       {...rest}
     />
   )
