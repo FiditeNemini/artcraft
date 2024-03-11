@@ -34,7 +34,7 @@ export const TrimScrubber = memo(({
       styleOverride={{
         top: '-1rem',
       }}
-      scrubPosition={trimStartSeconds/videoDuration*(rest.boundingWidth-rest.scrubberWidth)}
+      scrubPosition={trimStartSeconds/videoDuration*(rest.boundingWidth)}
       onScrubChanged={onChange}
       {...rest}
     />

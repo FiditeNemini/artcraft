@@ -103,7 +103,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
 
   useEffect(()=>{
     console.log(`withSCRUBBING useEFFECT!! `);
-    if(onScrubChanged && boundingWidth > 0 && prevLeftOffset >= 0 ){
+    if(onScrubChanged && boundingWidth > 0 && prevLeftOffset >= 0 && propsLeftOffset !== prevLeftOffset){
       onScrubChanged(prevLeftOffset);
     }
   },[prevLeftOffset, boundingWidth, onScrubChanged]);

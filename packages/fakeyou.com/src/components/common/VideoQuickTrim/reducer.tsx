@@ -26,7 +26,9 @@ export type State = {
   trimDuration: number | undefined;
   trimStartSeconds: number | undefined;
   trimEndSeconds: number | undefined;
+  videoLoadProgress: number | undefined;
   videoDuration: number | undefined;
+
 
   playbarWidth: number | undefined;
   scrubberWidth: number | undefined;
@@ -45,6 +47,7 @@ export const initialState = {
   trimDuration: undefined,
   trimStartSeconds: undefined,
   trimEndSeconds: undefined,
+  videoLoadProgress: undefined,
   videoDuration: undefined,
   playbarWidth: undefined,
   scrubberWidth: undefined,
@@ -62,6 +65,7 @@ export enum ACTION_TYPES {
   SET_PLAYPUASE = "set_playpause",
   SET_PLAYBAR_LAYOUT = "set_playbar_layout",
   SET_TRIM_DURATION = "set_trim_duration",
+  SET_VIDEO_LOAD_PROGRESS = "set_video_load_progress",
   MOVE_TRIM = "move_trim"
 }
 
@@ -74,6 +78,9 @@ export type Action =
   | {type: ACTION_TYPES.SET_PLAYPUASE, payload:{ playpause: string}}
   | {type: ACTION_TYPES.SET_PLAYBAR_LAYOUT, payload:{ playbarWidth: number}}
   | {type: ACTION_TYPES.SET_TRIM_DURATION, payload:{ trimDurationString: string}}
+  | {type: ACTION_TYPES.SET_VIDEO_LOAD_PROGRESS, payload: {
+      videoLoadProgress: number
+    }}
   | {type: ACTION_TYPES.MOVE_TRIM, payload:{
     trimStartSeconds: number,
     trimEndSeconds: number,
@@ -108,11 +115,16 @@ export function reducer(state: State, action: Action): State {
       }else{
         return {
           ...state,
-          // status: STATE_STATUSES.VIDEO_METADATA_LOADED,
           videoDuration: action.payload.videoDuration,
           canNotTrim: true
         }
       }
+    }
+    case ACTION_TYPES.SET_VIDEO_LOAD_PROGRESS:{
+      return{
+        ...state,
+        videoLoadProgress: action.payload.videoLoadProgress
+      };
     }
     case ACTION_TYPES.SET_PLAYBAR_LAYOUT:{
       const newWidth = action.payload.playbarWidth;

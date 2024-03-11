@@ -80,7 +80,23 @@ $playbar-height: 2rem;
     left: 0;
     background-color: $panel-inner-border;
     border-radius: 0 0 0.5rem 0.5rem;
+    overflow: hidden;
+
+    .played, .loaded{
+      position: absolute;
+      height: 100%;
+      top: 0;
+      left: 0;
+      opacity: 0.5;
+    }
+    .played{
+      background-color: $primary-dark;
+    }
+    .loaded{
+      background-color: $gray-600;
+    }
   }
+
   .scrubber-wrapper{
     box-shadow: 1px 1px 4px 0px rgba(0,0,0,1);
   }

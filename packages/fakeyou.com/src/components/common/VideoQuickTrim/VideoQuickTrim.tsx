@@ -82,7 +82,7 @@ export const VideoQuickTrim = memo(({
           dispatchCompState({
             type: ACTION_TYPES.MOVE_TIMECURSOR,
             payload: {
-              timeCursorOffset: (node.currentTime / node.duration) * (compState.playbarWidth-8)
+              timeCursorOffset: (node.currentTime / node.duration) * (compState.playbarWidth)
             }
           });
         }else{
@@ -159,6 +159,7 @@ export const VideoQuickTrim = memo(({
         trimDuration={compState.trimDuration ||0}
         playbarWidth={compState.playbarWidth ||0}
         scrubberWidth={compState.scrubberWidth ||0}
+        videoBuffered={videoRef.current?.buffered}
         videoDuration={compState.videoDuration ||0}
         dispatchCompState={dispatchCompState}
       />

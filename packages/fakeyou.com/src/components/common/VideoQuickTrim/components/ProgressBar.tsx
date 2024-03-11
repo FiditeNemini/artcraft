@@ -19,6 +19,7 @@ export const ProgressBar = memo(({
   playbarWidth,
   scrubberWidth,
   videoDuration,
+  videoBuffered,
   dispatchCompState
 }:{
   readyToMount: boolean;
@@ -28,6 +29,7 @@ export const ProgressBar = memo(({
   playbarWidth: number;
   scrubberWidth: number;
   videoDuration: number;
+  videoBuffered:TimeRanges | undefined;
   dispatchCompState: (action: Action) => void;
 })=>{
   const playbarRef = useRef<HTMLDivElement | null>(null);
@@ -67,7 +69,12 @@ export const ProgressBar = memo(({
     // console.log('progress bar rendering');
     return(
       <div className="playbar" ref={playbarRefCallback}>
-        <div className="playbar-bg" />
+        <div className="playbar-bg">
+          {videoBuffered !== undefined && 
+            <span className="loaded" style={{width: (videoBuffered.end(0) / videoDuration* 100) + "%"}} />
+          }
+          <span className="played" style={{width: timeCursorOffset+"px"}} />
+        </div>
         <TrimScrubber
           boundingWidth={playbarWidth}
           scrubberWidth={scrubberWidth}
@@ -75,7 +82,7 @@ export const ProgressBar = memo(({
           trimDuration={trimDuration}
           videoDuration={videoDuration}
           onChange={(newPos: number)=>{
-            const newTrimStartSeconds = newPos / (playbarWidth - scrubberWidth) * videoDuration;
+            const newTrimStartSeconds = newPos / (playbarWidth) * videoDuration;
             dispatchCompState({
               type: ACTION_TYPES.MOVE_TRIM,
               payload: {
@@ -91,7 +98,7 @@ export const ProgressBar = memo(({
           boundingWidth={playbarWidth}
           scrubberWidth={8}
         />
-      {/* END of Playbar */}</div>  
+      {/* END of Playbar */}</div>
     );
   }else{
     console.log('TODO: ProgressBar should rendering loading state instead of null');
