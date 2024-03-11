@@ -15,7 +15,7 @@ find . -type f -exec sed -i "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} +
 # find . -type f -exec sed -i '' -e "s/CURRENT_STORYTELLER_VERSION/${SHORT_SHA}/g" {} + 
 
 # Run tests first
-yarn test-fakeyou --verbose --ignore-optional --ignore-engines
+yarn test-fakeyou --verbose
 
 # --ignore-engines: https://stackoverflow.com/a/59615348
 yarn build-fakeyou --verbose --ignore-optional --ignore-engines
