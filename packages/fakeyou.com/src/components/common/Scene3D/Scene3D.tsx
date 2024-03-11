@@ -8,27 +8,42 @@ import "./Scene3D.scss";
 // You can supply either an `objectId` or a `sceneMediaFileToken` when loading in studio mode.
 interface Scene3DProps {
   mode: string;
+  skybox?: string;
   fullScreen?: boolean;
   urlParams?: string;
-  objectId?: string;
-  sceneMediaFileToken?: string;
   className?: string;
   onSceneSavedCallback?: (mediaToken: string) => void;
+
+  // NB: The following parameters are mutally exclusive.
+  // We should use Typescript to enforce this.
+  objectId?: string; // built-in objects
+  sceneMediaFileToken?: string; // scn.ron native storyteller engine scenes
+  mixamoUrl?: string; // a mixamo animation
+  bvhUrl?: string; // a MocapNet animation in BVH format
+  sceneImportUrl?: string; // a generic (non-storyteller) scene: GLB, GLTF, etc.
 }
 
 export default function Scene3D({
   mode,
+  skybox,
   fullScreen = false,
-  objectId,
-  sceneMediaFileToken,
-  urlParams,
   className,
   onSceneSavedCallback,
+
+  // NB: The following parameters are mutally exclusive.
+  // We should use Typescript to enforce this.
+  objectId,
+  sceneMediaFileToken,
+  mixamoUrl,
+  bvhUrl,
+  sceneImportUrl,
+
 }: Scene3DProps) {
   const engineBaseUrl = "https://engine.fakeyou.com";
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   
+
   const onMessage = useCallback((event: MessageEvent) => {
     console.log("engine message received", event.data, event);
 
@@ -43,7 +58,8 @@ export default function Scene3D({
 
       console.log("studio-ready message (2)");
 
-      studio.postMessage("save-scene", engineBaseUrl);
+      // NB: Example of how to call the API in the other direction:
+      //  studio.postMessage("save-scene", engineBaseUrl);
     } else if (
       typeof event.data === "string"
       && event.data.startsWith("scene-saved:")
@@ -58,50 +74,42 @@ export default function Scene3D({
     } else if (event.data === "scene-save-failed") {
       console.error("Failed to save the scene!");
     }
-  }, []);
+  }, [onSceneSavedCallback]);
 
 
   useEffect(() => {
-    /*
-    if (iframeRef && iframeRef.current) {
-      console.log("installing event listener for messages");
-      
-      // NB: Compiler complains about ref going out of scope before destructor is called.
-      let ref = iframeRef.current;
-
-      // TODO(bt,2024-03-08): Fix typescript 'any' hack
-      (ref as any).addEventListener("message", onMessage);
-
-      return () => {
-        console.log("uninstalling event listener for messages");
-
-        // TODO(bt,2024-03-08): Fix typescript 'any' hack
-        (ref as any).removeEventListener("message", onMessage);
-      }
-    }
-    */
-
-    console.log("installing event listener for messages");
     window.addEventListener("message", onMessage, false);
-
     return () => {
-      console.log("uninstalling event listener for messages");
       window.removeEventListener("message", onMessage, false);
     }
   }, [onMessage]);
-  //}, [onMessage, iframeRef]);
 
 
   let engineUrl = `${engineBaseUrl}/?mode=${mode}`;
 
+  if (skybox) {
+    engineUrl += `&skybox=${skybox}`;
+  }
+
   if (sceneMediaFileToken) {
+    // NB: Storyteller Engine makes the API call to load the scene.
+    // We don't need to pass the bucket path.
+    // The engine, does, however, need a `.scn.ron` file extension.
     const sceneUrlRef = `remote://${sceneMediaFileToken}.scn.ron`;
     engineUrl += `&scene=${sceneUrlRef}`;
   } else if (objectId) {
+    // NB: This is an engine built-in, eg. `couch.gltf` or `sample-room.gltf`.
     engineUrl += `&objectId=${objectId}`;
+  } else if (mixamoUrl) {
+    // NB: This should be a full bucket path to an asset.
+    engineUrl += `&mixamo=${mixamoUrl}`;
+  } else if (bvhUrl) {
+    // NB: This should be a full bucket path to an asset.
+    engineUrl += `&bvh=${bvhUrl}`;
+  } else if (sceneImportUrl) {
+    // TODO: Not sure what the format of this should be.
+    engineUrl += `&sceneImport=${sceneImportUrl}`;
   }
-
-  console.log('installing iframe engine and callbacks');
 
   return (
     <div
@@ -109,6 +117,7 @@ export default function Scene3D({
         fullScreen ? "fy-scene-3d-fullscreen" : "fy-scene-3d-default"
       } ${className ? className : ""}`.trim()}
     >
+      {/* IframeResizer was causing some glitches passing messages. Need to test more. */}
       {/*<IframeResizer src={engineUrl} width="100%" height="100%" id="" />*/}
       <iframe
         title="Storyteller Engine"
