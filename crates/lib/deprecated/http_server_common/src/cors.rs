@@ -51,13 +51,13 @@ pub fn add_fakeyou(cors: Cors, is_production: bool) -> Cors {
   // TODO: Remove non-SSL "http://" from production in safe rollout
   if is_production {
     cors
+        // Storyteller Engine (Production)
+        .allowed_origin("https://engine.fakeyou.com")
         // FakeYou (Production)
         .allowed_origin("http://api.fakeyou.com")
         .allowed_origin("http://fakeyou.com")
         .allowed_origin("https://api.fakeyou.com")
         .allowed_origin("https://fakeyou.com")
-        // Storyteller Engine (Production)
-        .allowed_origin("https://engine.fakeyou.com")
         // FakeYou (Staging)
         .allowed_origin("http://staging.fakeyou.com")
         .allowed_origin("https://staging.fakeyou.com")
@@ -70,11 +70,9 @@ pub fn add_fakeyou(cors: Cors, is_production: bool) -> Cors {
         .allowed_origin("http://dev.fakeyou.com")
         .allowed_origin("http://dev.fakeyou.com:7000") // Yarn default port
         .allowed_origin("http://dev.fakeyou.com:7001") // NB: Mac frontend
-        .allowed_origin("http://development.fakeyou.com")
         .allowed_origin("https://dev.fakeyou.com")
         .allowed_origin("https://dev.fakeyou.com:7000") // Yarn default port
         .allowed_origin("https://dev.fakeyou.com:7001") // NB: Mac frontend
-        .allowed_origin("https://development.fakeyou.com")
         // Storyteller Engine (Development)
         .allowed_origin("https://engine.fakeyou.com") // NB: We use prod for integration testing
   }
@@ -99,28 +97,33 @@ pub fn add_storyteller(cors: Cors, is_production: bool) -> Cors {
   // TODO: Remove non-SSL "http://" from production in safe rollout
   if is_production {
     cors
-        // Storyteller (Production)
+        // Storyteller Engine (Production)
+        .allowed_origin("https://engine.storyteller.ai")
+        // Storyteller.ai (Production)
         .allowed_origin("http://api.storyteller.ai")
         .allowed_origin("http://storyteller.ai")
         .allowed_origin("https://api.storyteller.ai")
         .allowed_origin("https://storyteller.ai")
-        // Storyteller (Staging)
+        // Storyteller.ai (Staging)
         .allowed_origin("http://staging.storyteller.ai")
         .allowed_origin("https://staging.storyteller.ai")
-        // Storyteller (Netlify Staging / Production)
-        .allowed_origin("https://feature-mvp--storyteller-ai.netlify.app")
+        // Storyteller.ai (Development Proxy)
+        .allowed_origin("http://devproxy.storyteller.ai")
+        .allowed_origin("https://devproxy.storyteller.ai")
+        // Storyteller.ai (Netlify Staging / Production)
         .allowed_origin("https://feature-marketing--storyteller-ai.netlify.app")
+        .allowed_origin("https://feature-mvp--storyteller-ai.netlify.app")
   } else {
     cors
-        // Storyteller (Development)
+        // Storyteller.ai (Development)
         .allowed_origin("http://dev.storyteller.ai")
         .allowed_origin("http://dev.storyteller.ai:7000") // Yarn default port
         .allowed_origin("http://dev.storyteller.ai:7001") // NB: Mac frontend
-        .allowed_origin("http://development.storyteller.ai")
+        .allowed_origin("http://dev.storyteller.ai:7002") // NB: Mac frontend
         .allowed_origin("https://dev.storyteller.ai")
         .allowed_origin("https://dev.storyteller.ai:7000") // Yarn default port
         .allowed_origin("https://dev.storyteller.ai:7001") // NB: Mac frontend
-        .allowed_origin("https://development.storyteller.ai")
+        .allowed_origin("https://dev.storyteller.ai:7002") // NB: Mac frontend
   }
 }
 
