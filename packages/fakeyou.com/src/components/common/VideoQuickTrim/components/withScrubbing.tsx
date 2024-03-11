@@ -4,31 +4,29 @@ import React,{
   useRef,
   useState,
   useLayoutEffect,
-  // useCallback,
 } from 'react';
 
 export interface withScrubbingPropsI {
   boundingWidth: number;
   scrubberWidth: number;
-  initialLeftOffset?: number; //in pixels
-  initialLeftOffsetPercent?: number; // in %, 0 < % < 1
+  scrubPosition?: number;
+  // scrubber location as px
   styleOverride?: {[key: string]: string|number };
-  onScrubChanged?: (posPercent: number)=>void;
-  //return scrubber location as %, where 0 < % < 1
+  onScrubChanged?: (newPos: number)=>void;
+  //return scrubber location as px
 }
 
 type withSrcubbingStates = {
-  key: number,
   currLeftOffset: number,
   prevLeftOffset: number;
+  prevPropsLeftOffset: number;
   pointerStartPos: number;
 }
 
 export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.ComponentType<P>) => memo(({
   boundingWidth,
   scrubberWidth,
-  initialLeftOffset : initialLeftOffsetProps = 0,
-  initialLeftOffsetPercent = 0,
+  scrubPosition: propsLeftOffset = 0,
   styleOverride = {},
   onScrubChanged,
   ...rest
@@ -37,18 +35,14 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   const refEl = useRef<HTMLDivElement| null>(null);
   const refListener = useRef<number>(Date.now());
 
-  const initialLeftOffset = 
-    initialLeftOffsetPercent > 0 ? boundingWidth * initialLeftOffsetPercent 
-    : initialLeftOffsetProps;
 
   const [{
-    // key, 
     currLeftOffset, pointerStartPos,
-    prevLeftOffset,
+    prevLeftOffset
   }, setStates] = useState<withSrcubbingStates>({
-    key: Date.now(),
-    currLeftOffset: initialLeftOffset, // in pixels
-    prevLeftOffset: initialLeftOffset, //in pixels
+    currLeftOffset: propsLeftOffset,
+    prevLeftOffset: propsLeftOffset,
+    prevPropsLeftOffset: propsLeftOffset,
     pointerStartPos: -1 // negative denotes pointer not engaged
   });
 
@@ -72,6 +66,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
         ...curr,
         pointerStartPos: -1,
         prevLeftOffset: curr.currLeftOffset,
+        setBySelf: Date.now(),
       })); 
     };
     function handleScrubMove (e: MouseEvent){
@@ -88,7 +83,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
           if(newLeftOffset !== curr.currLeftOffset){
             return{
               ...curr,
-              currLeftOffset: newLeftOffset
+              currLeftOffset: newLeftOffset,
             }
           }
         }
@@ -111,14 +106,28 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
 
   useEffect(()=>{
     console.log(`withSCRUBBING useEFFECT!! `);
-    const positionInPercentage = prevLeftOffset/boundingWidth;
-    if(onScrubChanged 
-      && typeof positionInPercentage === "number" 
-      && positionInPercentage >= 0
-    ){
-      onScrubChanged(prevLeftOffset/boundingWidth);
+    if(onScrubChanged && boundingWidth > 0 && prevLeftOffset >= 0 ){
+      onScrubChanged(prevLeftOffset);
     }
   },[prevLeftOffset, boundingWidth, onScrubChanged]);
+
+  useEffect(()=>{
+    // this takes a forced reset on leftoffset
+    setStates((curr)=>{
+      if(curr.prevLeftOffset === curr.currLeftOffset
+        && propsLeftOffset !== curr.prevLeftOffset
+        && propsLeftOffset !== curr.prevLeftOffset
+      ){
+        return {
+          ...curr,
+          currLeftOffset: propsLeftOffset, // in pixels
+          prevLeftOffset: propsLeftOffset, //in pixels
+        }
+      }else{
+        return curr
+      }
+    });
+  }, [propsLeftOffset])
 
   return(
     <div

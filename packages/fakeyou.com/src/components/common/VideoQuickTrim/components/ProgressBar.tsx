@@ -8,13 +8,12 @@ import {
   Action,
   ACTION_TYPES,
 } from '../reducer';
-import { QuickTrimData } from '../utilities';
 import { TrimScrubber } from './TrimScrubber';
+import { PlayCursor } from './PlayCursor';
 
 export const ProgressBar = memo(({
   readyToMount,
   timeCursorOffset,
-  // trimReset,
   trimStartSeconds,
   trimDuration,
   playbarWidth,
@@ -24,7 +23,6 @@ export const ProgressBar = memo(({
 }:{
   readyToMount: boolean;
   timeCursorOffset: number;
-  // trimReset: number;
   trimStartSeconds: number;
   trimDuration: number;
   playbarWidth: number;
@@ -71,28 +69,28 @@ export const ProgressBar = memo(({
       <div className="playbar" ref={playbarRefCallback}>
         <div className="playbar-bg" />
         <TrimScrubber
-          // key={trimReset}
           boundingWidth={playbarWidth}
           scrubberWidth={scrubberWidth}
           trimStartSeconds={trimStartSeconds}
           trimDuration={trimDuration}
           videoDuration={videoDuration}
-          onChange={(val: QuickTrimData)=>{
-            
+          onChange={(newPos: number)=>{
+            const newTrimStartSeconds = newPos / (playbarWidth - scrubberWidth) * videoDuration;
             dispatchCompState({
               type: ACTION_TYPES.MOVE_TRIM,
               payload: {
-                trimStartSeconds: val.trimStartSeconds,
-                trimEndSeconds: val.trimEndSeconds
+                trimStartSeconds: newTrimStartSeconds,
+                trimEndSeconds: newTrimStartSeconds + trimDuration
               }
             });
-            // onSelect({
-            //   trimStartSeconds: val.trimStartSeconds,
-            //   trimEndSeconds: val.trimEndSeconds,
-            // });
           }}
         />
-        <div className="playcursor" style={{left:timeCursorOffset+"px"}}/>
+        <PlayCursor 
+          scrubPosition={timeCursorOffset}
+          onChanged={(onChangedVal)=>{console.log(onChangedVal)}}
+          boundingWidth={playbarWidth}
+          scrubberWidth={8}
+        />
       {/* END of Playbar */}</div>  
     );
   }else{
