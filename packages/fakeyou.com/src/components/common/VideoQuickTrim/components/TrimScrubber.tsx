@@ -11,7 +11,6 @@ interface TrimScrubberPropsI extends withScrubbingPropsI {
   trimStartSeconds:number;
   trimDuration: number;
   videoDuration: number;
-  // onChange:(val:QuickTrimData)=>void
   onChange:(newPos:number)=>void
 }
 export const TrimScrubber = memo(({

@@ -154,11 +154,10 @@ export function reducer(state: State, action: Action): State {
         }
         return{
           ...state,
-          // trimReset: Date.now(),
-          trimDuration: TRIM_OPTIONS[selected],
+          trimDuration: newTrimEnd-newTrimStart,
           trimStartSeconds: newTrimStart,
           trimEndSeconds: newTrimEnd,
-          scrubberWidth: state.playbarWidth * (newTrimEnd-newTrimStart)/state.videoDuration
+          scrubberWidth: (newTrimEnd-newTrimStart)/state.videoDuration * state.playbarWidth,
         }
       }else{
         return {

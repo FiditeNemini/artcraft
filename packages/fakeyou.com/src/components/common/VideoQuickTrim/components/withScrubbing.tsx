@@ -9,8 +9,7 @@ import React,{
 export interface withScrubbingPropsI {
   boundingWidth: number;
   scrubberWidth: number;
-  scrubPosition?: number;
-  // scrubber location as px
+  scrubPosition?: number; // scrubber location as px
   styleOverride?: {[key: string]: string|number };
   onScrubChanged?: (newPos: number)=>void;
   //return scrubber location as px
@@ -19,7 +18,6 @@ export interface withScrubbingPropsI {
 type withSrcubbingStates = {
   currLeftOffset: number,
   prevLeftOffset: number;
-  prevPropsLeftOffset: number;
   pointerStartPos: number;
 }
 
@@ -42,7 +40,6 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   }, setStates] = useState<withSrcubbingStates>({
     currLeftOffset: propsLeftOffset,
     prevLeftOffset: propsLeftOffset,
-    prevPropsLeftOffset: propsLeftOffset,
     pointerStartPos: -1 // negative denotes pointer not engaged
   });
 

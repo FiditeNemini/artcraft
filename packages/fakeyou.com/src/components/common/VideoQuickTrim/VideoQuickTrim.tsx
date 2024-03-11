@@ -154,8 +154,7 @@ export const VideoQuickTrim = memo(({
       </div>{/* END of Video Wrapper */}
       <ProgressBar
         readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}
-        timeCursorOffset={compState.timeCursorOffset || 0 }
-        // trimReset={compState.trimReset}
+        timeCursorOffset={compState.timeCursorOffset ||0}
         trimStartSeconds={compState.trimStartSeconds ||0}
         trimDuration={compState.trimDuration ||0}
         playbarWidth={compState.playbarWidth ||0}
