@@ -34,16 +34,17 @@ where token IN (
 
 
 -- Staff
--- teddanson is victor's alt
--- endtimes is @sugarbro (testing)
--- el_cid_93 is for testing
 -- NB: 'echelon' is absent
--- SELECT token, username FROM users WHERE username IN (
+--  * devdude123 is Joel
+--  * el_cid_93 is for testing
+--  * endtimes is @sugarbro (testing)
+--  * teddanson is victor's alt
 UPDATE users SET maybe_loyalty_program_key = 'fakeyou_contributor' WHERE username IN (
   'bflat',
   'brandon',
   'crossproduct',
   'crossproduct1',
+  'devdude123',
   'el_cid_93',
   'endtimes',
   'fyscott',

@@ -23,6 +23,7 @@ WHERE username IN (
 );
 
 -- Staff (2)
+--  * devdude123 is Joel
 --  * el_cid_93 is for testing (who is this??)
 --  * endtimes is @sugarbro (testing)
 --  * tammieteller is Tammie (Pebblebed)
@@ -32,6 +33,7 @@ SET
     maybe_feature_flags = 'studio,video_style_transfer'
 WHERE username IN (
     'dannymcgee',
+    'devdude123',
     'el_cid_93',
     'endtimes',
     'fyscott',
