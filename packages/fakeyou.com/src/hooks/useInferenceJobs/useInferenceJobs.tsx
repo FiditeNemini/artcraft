@@ -5,11 +5,7 @@ import { InferenceJobsContext } from 'context';
 import { useModal } from "hooks";
 import { InferenceJobsModal } from "components/modals";
 
-export enum JobListAll { All }
-
-export type JobListTypes = FrontendInferenceJobType | JobListAll;
-
-export default function useInferenceJobs(jobType: JobListTypes = 0, debug = false) {
+export default function useInferenceJobs(jobType?: FrontendInferenceJobType, debug = false) {
   const { byCategory, enqueue, inferenceJobs, queueStats } = useContext(InferenceJobsContext);
   const { open } = useModal();
   const openJobListModal = () => open({ component: InferenceJobsModal, props: { jobType } });
@@ -20,7 +16,8 @@ export default function useInferenceJobs(jobType: JobListTypes = 0, debug = fals
       if (!noModalPls) { openJobListModal(); }
       enqueue(jobToken,jobType);
     },
-    inferenceJobs: jobType === JobListAll.All ? inferenceJobs : (byCategory?.get(jobType - 1) || []),
+    inferenceJobs: jobType === undefined ? inferenceJobs : (byCategory?.get(jobType) || []),
+    // inferenceJobs: jobType === AllInferenceJobs.All ? inferenceJobs : (byCategory?.get(jobType) || []),
     jobStatusDescription: (jobState: JobState) => Object.keys(JobState).filter(key => isNaN(Number(key)))[jobState],
     queueStats
   };

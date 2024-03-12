@@ -1,8 +1,8 @@
-import React from "react"; // useState
+import React, { useState } from "react"; // useState
 import InferenceJobsList from "components/layout/InferenceJobsList";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
-// import { TempSelect as Select } from "components/common";
-// import { enumToKeyArr } from "resources";
+import { TempSelect as Select } from "components/common";
+import { enumToKeyArr } from "resources";
 import ModalHeader from "../ModalHeader";
 import { useLocalize } from "hooks";
 
@@ -18,18 +18,16 @@ export default function InferenceJobsModal({
   showModalHeader = true,
   ...rest
 }: Props) {
-  // const presetFilter = enumToKeyArr(FrontendInferenceJobType)[inJobType];
-  // const [jobType,jobTypeSet] = useState(inJobType > -1 ? presetFilter : "All");
-  // const typeObj = ["All", ...Object.values(FrontendInferenceJobType)];
-
-  // const options = typeObj.filter(val => isNaN(Number(val)))
-  // .map((value) => {
-  //   if (typeof value === "string") return { value, label: value }
-  //   return { label: "", value: "" };
-  // });
-
+  const presetFilter = enumToKeyArr(FrontendInferenceJobType)[inJobType];
+  const [jobType,jobTypeSet] = useState(inJobType > -1 ? presetFilter : "All");
+  const typeObj = ["All", ...Object.values(FrontendInferenceJobType)];
+  const options = typeObj.filter(val => isNaN(Number(val)))
+  .map((value) => {
+    if (typeof value === "string") return { value, label: value }
+    return { label: "", value: "" };
+  });
   const { t } = useLocalize("InferenceJobs");
-
+  const selectedType = typeObj.indexOf(jobType) - 1;
   const failures = (fail = "") => {
     switch (fail) {
       default:
@@ -41,7 +39,7 @@ export default function InferenceJobsModal({
     <>
       { showModalHeader && <ModalHeader {...{ handleClose, title: t("core.jobsTitle") }} /> }
       {
-        // <Select {...{ onChange: ({ target }: { target: any }) => jobTypeSet(target.value), options, value: jobType }} />
+        <Select {...{ onChange: ({ target }: { target: any }) => jobTypeSet(target.value), options, value: jobType }} />
       }
       <InferenceJobsList
         {...{
@@ -49,8 +47,7 @@ export default function InferenceJobsModal({
           onSelect: () => {
             if (handleClose) handleClose();
           },
-          value: 0, // fixed for now
-          // value: typeObj.indexOf(jobType),
+          ...selectedType > -1 ? { jobType: selectedType } : {},
           showHeader: false,
           showJobQueue: true,
           showNoJobs: true,
