@@ -106,7 +106,7 @@ describe('media files', () => {
 
   // Production examples:
   //   [without subtype]       https://feature-mvp--fakeyou.netlify.app/media/m_tcj2zzncmvmn32f0yavmys5jdrc8cc (Majora's Mask GLB)
-  //   [scene import subtype]  https://feature-mvp--fakeyou.netlify.app/media/m_a504ma0n7vv3y80bw7bvgx7q2cecmb (Goron)
+  //   [scene_import subtype]  https://feature-mvp--fakeyou.netlify.app/media/m_a504ma0n7vv3y80bw7bvgx7q2cecmb (Goron GLB)
   describe('generic scene file (not storyteller studio scene)', () => {
     test('glb without subtype', () => {
       mediaFile.media_type = MediaFileType.GLB;
@@ -127,6 +127,10 @@ describe('media files', () => {
     });
   });
 
+  // Production examples:
+  //   [mixamo glb]  https://feature-mvp--fakeyou.netlify.app/media/m_qgyq1n8mte3cdhsqrpxhca9xm3vpbj (waiting animation)
+  //   [mixamo glb]  https://feature-mvp--fakeyou.netlify.app/media/m_fqvad63311epbts51kqdrc53rjzfe4 (swimming animation)
+  //   [mixamo glb]  https://feature-mvp--fakeyou.netlify.app/media/m_ydwhanqm101tbm3zpt0ttrrvj1fh4j (YMCA dance animation)
   describe('mixamo animations', () => {
     test('from media subtype', () => {
       mediaFile.media_type = MediaFileType.Audio; // NB: Not the real time; forcing test to act on subtype.
