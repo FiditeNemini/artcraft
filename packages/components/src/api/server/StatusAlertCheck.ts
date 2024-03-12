@@ -9,7 +9,8 @@ export interface AlertObject {
 
 export interface StatusAlertCheckResponse {
   success?: boolean,
-  maybe_alert?: AlertObject
+  maybe_alert?: AlertObject,
+  refresh_interval_millis?: number
 }
 
 export const StatusAlertCheck = MakeRequest<string, StatusAlertCheckRequest, StatusAlertCheckResponse,{}>({
