@@ -13,7 +13,7 @@ interface GetEngineUrlArgs {
   mode: EngineMode,
 
   // Polymorphic type of asset we're loading into the engine.
-  load: LoadableAsset
+  asset: LoadableAsset
 
   // Optional skybox color (hex) or name
   //  - Predefined skyboxes, eg. `gum_trees_4k`, `kloofendal_28d_misty_4k`, `meadow_4k`, `promenade_de_vidy_4k`, `scythian_tombs_4k`
@@ -29,7 +29,13 @@ interface EngineObject {
   objectId: string;
 }
 
-type LoadableAsset = MediaFile | EngineObject;
+// Used to load media files that are known a priori to be 
+// Storyteller Engine scenes (scene.ron files).
+interface StorytellerSceneMediaFileToken {
+  storytellerSceneMediaFileToken: string;
+}
+
+export type LoadableAsset = MediaFile | EngineObject | StorytellerSceneMediaFileToken;
 
 const ENGINE_BASE_URL = "https://engine.fakeyou.com";
 
@@ -41,35 +47,43 @@ export function GetEngineUrl(args: GetEngineUrlArgs) : string {
     engineUrl += `&skybox=${args.skybox}`;
   }
 
-  if (isMediaFile(args.load)) {
+  if (isMediaFile(args.asset)) {
 
-    const bucketAssetUrl = new BucketConfig().getGcsUrl(args.load.public_bucket_path);
+    const bucketAssetUrl = new BucketConfig().getGcsUrl(args.asset.public_bucket_path);
 
     if (
-        args.load.maybe_media_subtype === MediaFileSubtype.StorytellerScene || 
-        args.load.media_type === MediaFileType.SceneRon
+        args.asset.maybe_media_subtype === MediaFileSubtype.StorytellerScene || 
+        args.asset.media_type === MediaFileType.SceneRon
     ) {
         // Storyteller Engine Scenes
         // NB: Storyteller Engine makes the API call to load the scene.
         // We don't need to pass the bucket path.
         // The engine, does, however, need a `.scn.ron` file extension.
-        const sceneUrlRef = `remote://${args.load.token}.scn.ron`;
+        const sceneUrlRef = `remote://${args.asset.token}.scn.ron`;
         engineUrl += `&scene=${sceneUrlRef}`;
     } else if (
-        args.load.maybe_media_subtype === MediaFileSubtype.Mixamo
+        args.asset.maybe_media_subtype === MediaFileSubtype.Mixamo
     ) {
         engineUrl += `&mixamo=${bucketAssetUrl}`;
     } else if (
-        args.load.maybe_media_subtype === MediaFileSubtype.MocapNet
+        args.asset.maybe_media_subtype === MediaFileSubtype.MocapNet
     ) {
         engineUrl += `&bvh=${bucketAssetUrl}`;
     } else {
         engineUrl += `&sceneImport=${bucketAssetUrl}`;
     }
 
-  } else if (isEngineObject(args.load)) {
+  } else if (isStorytellerSceneMediaFileToken(args.asset)) {
+    // Storyteller Engine Scenes
+    // NB: Storyteller Engine makes the API call to load the scene.
+    // We don't need to pass the bucket path.
+    // The engine, does, however, need a `.scn.ron` file extension.
+    const sceneUrlRef = `remote://${args.asset.storytellerSceneMediaFileToken}.scn.ron`;
+    engineUrl += `&scene=${sceneUrlRef}`;
+
+  } else if (isEngineObject(args.asset)) {
     // NB: This is an engine built-in, eg. `couch.gltf` or `sample-room.gltf`.
-    engineUrl += `&objectId=${args.load.objectId}`;
+    engineUrl += `&objectId=${args.asset.objectId}`;
   }
 
   return engineUrl;
@@ -83,5 +97,10 @@ const isMediaFile = (loadable: LoadableAsset) : loadable is MediaFile => {
 // Type guard for engine objects
 const isEngineObject = (loadable: LoadableAsset) : loadable is EngineObject => {
   return "objectId" in loadable;
+}
+
+// Type guard for engine objects
+const isStorytellerSceneMediaFileToken = (loadable: LoadableAsset) : loadable is StorytellerSceneMediaFileToken => {
+  return "storytellerSceneMediaFileToken" in loadable;
 }
 

@@ -7,31 +7,38 @@ import { MediaFileSubtype } from "@storyteller/components/src/api/enums/MediaFil
 
 describe('mode', () => {
   test('studio', () => {
-    const url = GetEngineUrl({mode: EngineMode.Studio, load: { objectId: "foo" } });
+    const url = GetEngineUrl({mode: EngineMode.Studio, asset: { objectId: "foo" } });
     expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&objectId=foo");
   });
 
   test('viewer', () => {
-    const url = GetEngineUrl({mode: EngineMode.Viewer, load: { objectId: "foo" } });
+    const url = GetEngineUrl({mode: EngineMode.Viewer, asset: { objectId: "foo" } });
     expect(url).toEqual("https://engine.fakeyou.com/?mode=viewer&objectId=foo");
   });
 });
 
 describe('skybox', () => {
   test('from named skybox', () => {
-    const url = GetEngineUrl({mode: EngineMode.Studio, load: { objectId: "foo" }, skybox: "gum_trees_4k" });
+    const url = GetEngineUrl({mode: EngineMode.Studio, asset: { objectId: "foo" }, skybox: "gum_trees_4k" });
     expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&skybox=gum_trees_4k&objectId=foo");
   });
 
   test('from hex color', () => {
-    const url = GetEngineUrl({mode: EngineMode.Studio, load: { objectId: "foo" }, skybox: "ff0000" });
+    const url = GetEngineUrl({mode: EngineMode.Studio, asset: { objectId: "foo" }, skybox: "ff0000" });
     expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&skybox=ff0000&objectId=foo");
+  });
+});
+
+describe('storyteller scene media file tokens', () => {
+  test('scene token urls should work', () => {
+    const url = GetEngineUrl({mode: EngineMode.Studio, asset: { storytellerSceneMediaFileToken: "TOKEN" } });
+    expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&scene=remote://TOKEN.scn.ron");
   });
 });
 
 describe('object ids', () => {
   test('object id urls should work', () => {
-    const url = GetEngineUrl({mode: EngineMode.Studio, load: { objectId: "foo" } });
+    const url = GetEngineUrl({mode: EngineMode.Studio, asset: { objectId: "foo" } });
     expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&objectId=foo");
   });
 });
@@ -48,7 +55,7 @@ describe('media files', () => {
     updated_at: new Date(),
     maybe_creator_user: null,
     creator_set_visibility: "public",
-    // TODO(bt,2024-03-11): Make optional
+    // TODO(bt,2024-03-11): Make these fields optional
     maybe_model_weight_info: {
       title: "title",
       weight_token: "WEIGHT_TOKEN",
@@ -75,7 +82,7 @@ describe('media files', () => {
       // NB: Not the real subtype; forcing test to act on type.
       mediaFile.maybe_media_subtype = null; 
 
-      const url = GetEngineUrl({mode: EngineMode.Studio, load: mediaFile });
+      const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&scene=remote://MEDIA_FILE_TOKEN.scn.ron");
     });
 
@@ -83,10 +90,10 @@ describe('media files', () => {
       // NB: Not the real time; forcing test to act on subtype.
       mediaFile.media_type = MediaFileType.Audio; 
 
-      // TODO(bt,2024-03-11): Why does the IDE complain here?
+      // TODO(bt,2024-03-11): Why does the IDE complain about types here?
       mediaFile.maybe_media_subtype = MediaFileSubtype.StorytellerScene as any; 
 
-      const url = GetEngineUrl({mode: EngineMode.Studio, load: mediaFile });
+      const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&scene=remote://MEDIA_FILE_TOKEN.scn.ron");
     });
   });
@@ -96,10 +103,10 @@ describe('media files', () => {
       // NB: Not the real time; forcing test to act on subtype.
       mediaFile.media_type = MediaFileType.Audio; 
 
-      // TODO(bt,2024-03-11): Why does the IDE complain here?
+      // TODO(bt,2024-03-11): Why does the IDE complain about types here?
       mediaFile.maybe_media_subtype = MediaFileSubtype.Mixamo as any; 
 
-      const url = GetEngineUrl({mode: EngineMode.Studio, load: mediaFile });
+      const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&mixamo=https://storage.googleapis.com/dev-vocodes-public/path/to/file");
     });
   });
@@ -109,10 +116,10 @@ describe('media files', () => {
       // NB: Not the real time; forcing test to act on subtype.
       mediaFile.media_type = MediaFileType.Audio; 
 
-      // TODO(bt,2024-03-11): Why does the IDE complain here?
+      // TODO(bt,2024-03-11): Why does the IDE complain about types here?
       mediaFile.maybe_media_subtype = MediaFileSubtype.MocapNet as any; 
 
-      const url = GetEngineUrl({mode: EngineMode.Studio, load: mediaFile });
+      const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&bvh=https://storage.googleapis.com/dev-vocodes-public/path/to/file");
     });
   });
