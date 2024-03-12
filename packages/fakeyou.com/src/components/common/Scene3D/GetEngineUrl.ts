@@ -52,25 +52,34 @@ export function GetEngineUrl(args: GetEngineUrlArgs) : string {
     const bucketAssetUrl = new BucketConfig().getGcsUrl(args.asset.public_bucket_path);
 
     if (
-        args.asset.maybe_media_subtype === MediaFileSubtype.StorytellerScene || 
-        args.asset.media_type === MediaFileType.SceneRon
+      args.asset.maybe_media_subtype === MediaFileSubtype.StorytellerScene || 
+      args.asset.media_type === MediaFileType.SceneRon
     ) {
-        // Storyteller Engine Scenes
-        // NB: Storyteller Engine makes the API call to load the scene.
-        // We don't need to pass the bucket path.
-        // The engine, does, however, need a `.scn.ron` file extension.
-        const sceneUrlRef = `remote://${args.asset.token}.scn.ron`;
-        engineUrl += `&scene=${sceneUrlRef}`;
+      // Storyteller Engine Scenes
+      // NB: Storyteller Engine makes the API call to load the scene.
+      // We don't need to pass the bucket path.
+      // The engine, does, however, need a `.scn.ron` file extension.
+      const sceneUrlRef = `remote://${args.asset.token}.scn.ron`;
+      engineUrl += `&scene=${sceneUrlRef}`;
     } else if (
-        args.asset.maybe_media_subtype === MediaFileSubtype.Mixamo
+      args.asset.maybe_media_subtype === MediaFileSubtype.Mixamo
     ) {
-        engineUrl += `&mixamo=${bucketAssetUrl}`;
+      engineUrl += `&mixamo=${bucketAssetUrl}`;
     } else if (
-        args.asset.maybe_media_subtype === MediaFileSubtype.MocapNet
+      args.asset.maybe_media_subtype === MediaFileSubtype.MocapNet
     ) {
-        engineUrl += `&bvh=${bucketAssetUrl}`;
+      engineUrl += `&bvh=${bucketAssetUrl}`;
+    } else if (
+      args.asset.media_type === MediaFileType.BVH && (
+        args.asset.maybe_media_subtype === null || 
+        args.asset.maybe_media_subtype === undefined
+      )
+    ){
+      // NB: Older BVH files that do not specify a subtype are MocapNet, 
+      // which will take a bare "bvh" argument.
+      engineUrl += `&bvh=${bucketAssetUrl}`;
     } else {
-        engineUrl += `&sceneImport=${bucketAssetUrl}`;
+      engineUrl += `&sceneImport=${bucketAssetUrl}`;
     }
 
   } else if (isStorytellerSceneMediaFileToken(args.asset)) {

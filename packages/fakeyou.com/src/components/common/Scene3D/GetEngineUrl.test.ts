@@ -4,6 +4,10 @@ import { GetEngineUrl } from "./GetEngineUrl";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import { WeightType } from "@storyteller/components/src/api/_common/enums/WeightType";
 import { MediaFileSubtype } from "@storyteller/components/src/api/enums/MediaFileSubtype";
+import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+
+// These tests are important - constructing Storyteller Engine URLs is complicated, 
+// and we want to make sure we test the various cases that occur in production.
 
 describe('mode', () => {
   test('studio', () => {
@@ -45,79 +49,108 @@ describe('object ids', () => {
 
 // TODO(bt,2024-03-11): We're only testing one type of media file
 describe('media files', () => {
-  let mediaFile = {
-    token: "MEDIA_FILE_TOKEN",
-    media_type: MediaFileType.GLB,
-    maybe_media_subtype: null,
-    public_bucket_path: "path/to/file",
-    maybe_batch_token: "BATCH_TOKEN",
-    created_at: new Date(),
-    updated_at: new Date(),
-    maybe_creator_user: null,
-    creator_set_visibility: "public",
-    // TODO(bt,2024-03-11): Make these fields optional
-    maybe_model_weight_info: {
-      title: "title",
-      weight_token: "WEIGHT_TOKEN",
-      weight_category: WeightCategory.SD,
-      weight_type: WeightType.HIFIGAN_TT2,
-      maybe_cover_image_public_bucket_path: "image",
-      maybe_weight_creator: {
-        user_token: "USER_TOKEN",
-        username: "username",
-        display_name: "display_name",
-        gravatar_hash: "foo",
-        default_avatar: {
-          image_index: 1,
-          color_index: 2,
-        }
-      },
-    }
-  };
+  let mediaFile : MediaFile;
 
-  describe('scene files', () => {
+  beforeEach(() => {
+    mediaFile = {
+      token: "MEDIA_FILE_TOKEN",
+      media_type: MediaFileType.GLB,
+      maybe_media_subtype: null,
+      maybe_prompt_token: null,
+      public_bucket_path: "path/to/file",
+      maybe_batch_token: "BATCH_TOKEN",
+      created_at: new Date(),
+      updated_at: new Date(),
+      maybe_creator_user: null,
+      creator_set_visibility: "public",
+      // TODO(bt,2024-03-11): Make these fields optional
+      maybe_model_weight_info: {
+        title: "title",
+        weight_token: "WEIGHT_TOKEN",
+        weight_category: WeightCategory.SD,
+        weight_type: WeightType.HIFIGAN_TT2,
+        maybe_cover_image_public_bucket_path: "image",
+        maybe_weight_creator: {
+          user_token: "USER_TOKEN",
+          username: "username",
+          display_name: "display_name",
+          gravatar_hash: "foo",
+          default_avatar: {
+            image_index: 1,
+            color_index: 2,
+          }
+        },
+      }
+    };
+  });
+
+  // Production example: 
+  //   [from media type]  https://feature-mvp--fakeyou.netlify.app/studio-intro/m_ejhs95fc5aybp36h4a79k7523ds6an (scene file)
+  describe('storyteller scene files', () => {
     test('from media type', () => {
       mediaFile.media_type = MediaFileType.SceneRon;
-
-      // NB: Not the real subtype; forcing test to act on type.
-      mediaFile.maybe_media_subtype = null; 
+      mediaFile.maybe_media_subtype = null; // NB: Not the real subtype; forcing test to act on type.
 
       const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&scene=remote://MEDIA_FILE_TOKEN.scn.ron");
     });
 
     test('from media subtype', () => {
-      // NB: Not the real time; forcing test to act on subtype.
-      mediaFile.media_type = MediaFileType.Audio; 
-
-      // TODO(bt,2024-03-11): Why does the IDE complain about types here?
-      mediaFile.maybe_media_subtype = MediaFileSubtype.StorytellerScene as any; 
+      mediaFile.media_type = MediaFileType.Audio; // NB: Not the real time; forcing test to act on subtype.
+      mediaFile.maybe_media_subtype = MediaFileSubtype.StorytellerScene; 
 
       const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&scene=remote://MEDIA_FILE_TOKEN.scn.ron");
     });
   });
 
+  // Production examples:
+  //   [without subtype]       https://feature-mvp--fakeyou.netlify.app/media/m_tcj2zzncmvmn32f0yavmys5jdrc8cc (Majora's Mask GLB)
+  //   [scene import subtype]  https://feature-mvp--fakeyou.netlify.app/media/m_a504ma0n7vv3y80bw7bvgx7q2cecmb (Goron)
+  describe('generic scene file (not storyteller studio scene)', () => {
+    test('glb without subtype', () => {
+      mediaFile.media_type = MediaFileType.GLB;
+      mediaFile.maybe_media_subtype = null; // NB: Null in production (unless we backfill it)
+      mediaFile.public_bucket_path = "path/to/file.gltf"; // NB: We still write extension ".gltf" for glb.
+
+      const url = GetEngineUrl({mode: EngineMode.Viewer, asset: mediaFile });
+      expect(url).toEqual("https://engine.fakeyou.com/?mode=viewer&sceneImport=https://storage.googleapis.com/dev-vocodes-public/path/to/file.gltf");
+    });
+
+    test('glb with scene_import subtype', () => {
+      mediaFile.media_type = MediaFileType.GLB;
+      mediaFile.maybe_media_subtype = MediaFileSubtype.SceneImport;
+      mediaFile.public_bucket_path = "path/to/file.gltf"; // NB: We still write extension ".gltf" for glb.
+
+      const url = GetEngineUrl({mode: EngineMode.Viewer, asset: mediaFile });
+      expect(url).toEqual("https://engine.fakeyou.com/?mode=viewer&sceneImport=https://storage.googleapis.com/dev-vocodes-public/path/to/file.gltf");
+    });
+  });
+
   describe('mixamo animations', () => {
     test('from media subtype', () => {
-      // NB: Not the real time; forcing test to act on subtype.
-      mediaFile.media_type = MediaFileType.Audio; 
-
-      // TODO(bt,2024-03-11): Why does the IDE complain about types here?
-      mediaFile.maybe_media_subtype = MediaFileSubtype.Mixamo as any; 
+      mediaFile.media_type = MediaFileType.Audio; // NB: Not the real time; forcing test to act on subtype.
+      mediaFile.maybe_media_subtype = MediaFileSubtype.Mixamo; 
 
       const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&mixamo=https://storage.googleapis.com/dev-vocodes-public/path/to/file");
     });
   });
 
+  // Production examples:
+  //   [without subtype]  https://feature-mvp--fakeyou.netlify.app/media/m_djbs4gjsjym41vn65py6ydzvy4ns3b (broken MocapNet animation)
   describe('bvh animations', () => {
     test('from media subtype', () => {
-      // NB: Not the real time; forcing test to act on subtype.
-      mediaFile.media_type = MediaFileType.Audio; 
+      mediaFile.media_type = MediaFileType.Audio; // NB: Not the real time; forcing test to act on subtype.
+      mediaFile.maybe_media_subtype = MediaFileSubtype.MocapNet; 
 
-      // TODO(bt,2024-03-11): Why does the IDE complain about types here?
-      mediaFile.maybe_media_subtype = MediaFileSubtype.MocapNet as any; 
+      const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
+      expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&bvh=https://storage.googleapis.com/dev-vocodes-public/path/to/file");
+    });
+
+    test('bvh with empty subtype', () => {
+      mediaFile.media_type = MediaFileType.BVH;
+      mediaFile.maybe_media_subtype = null; // NB: Older BVH files do not specify the subtype
 
       const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&bvh=https://storage.googleapis.com/dev-vocodes-public/path/to/file");
