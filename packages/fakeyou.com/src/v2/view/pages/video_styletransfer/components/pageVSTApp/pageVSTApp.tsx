@@ -70,6 +70,8 @@ export default function PageVSTApp({
       <div className="row g-5 mb-4">
         <div className="col-12 col-md-6">
           <VideoQuickTrim
+            trimStartSeconds={vstValues.trimStart}
+            trimEndSeconds={vstValues.trimEnd}
             mediaToken={vstValues.fileToken}
             onSelect={(val: QuickTrimData) =>
               handleOnChange({

@@ -79,7 +79,7 @@ export default function FakeYouLandingBody(props: FakeYouLandingBodyProps) {
           <img
             src="/images/landing/bg-dots.webp"
             alt="background dots"
-            className="dots-left-bottom me-3"
+            className="dots-right-bottom me-3"
           />
         </div>
       </div>

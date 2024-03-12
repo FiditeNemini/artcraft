@@ -3,6 +3,14 @@
 .vst-section {
   padding-top: 5rem;
   padding-bottom: 5rem;
+
+  video::-webkit-media-controls {
+    display: none;
+  }
+
+  video::-webkit-media-controls-start-playback-button {
+    display: none;
+  }
 }
 
 .vst-carousel-panel {
@@ -165,5 +173,10 @@
     .fy-badge {
       font-size: 11px;
     }
+  }
+
+  .vst-section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
   }
 }

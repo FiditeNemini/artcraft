@@ -2,14 +2,12 @@ import React from "react";
 import { usePrefixedDocumentTitle } from "../../../../common/UsePrefixedDocumentTitle";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
-import {} from "@fortawesome/pro-solid-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
 import { Container } from "components/common";
 import FakeYouLandingHeader from "./fakeyou/FakeYouLandingHeader";
 import Dashboard from "./Dashboard";
 import { useDomainConfig } from "context/DomainConfigContext";
-import StorytellerLanding from "./storyteller/StorytellerLanding";
-import LandingVideoReel from "./components/LandingVideoReel";
+import LandingVideoReel from "./components/LandingVideoReel/LandingVideoReel";
 import {
   FrontendInferenceJobType,
   InferenceJob,
@@ -20,6 +18,8 @@ import "./LandingPage.scss";
 import VstSectionV2 from "./components/VstSectionV2";
 import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
 import { DomainConfig, Website } from "utils/domainConfig";
+import OnboardingSelection from "./storyteller/OnboardingSelection";
+import TtsDemoSection from "./components/TtsDemoSection/TtsDemoSection";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -39,13 +39,15 @@ function LandingPage(props: Props) {
 
   PosthogClient.recordPageview();
 
-  const domain : DomainConfig = useDomainConfig();
+  const domain: DomainConfig = useDomainConfig();
 
   const isLoggedIn = props.sessionWrapper.isLoggedIn();
 
   return (
     <>
-      {domain.website === Website.StorytellerAi && !isLoggedIn && <LandingVideoReel />}
+      {domain.website === Website.StorytellerAi && !isLoggedIn && (
+        <LandingVideoReel />
+      )}
       <Container type="panel">
         {domain.website === Website.FakeYou ? (
           <>
@@ -76,15 +78,23 @@ function LandingPage(props: Props) {
           <>
             {/* STORYTELLER,AI */}
             {!isLoggedIn ? (
-              <StorytellerLanding
-                sessionWrapper={props.sessionWrapper}
-                sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
-                inferenceJobs={props.inferenceJobs}
-                ttsInferenceJobs={props.ttsInferenceJobs}
-                enqueueInferenceJob={props.enqueueInferenceJob}
-                inferenceJobsByCategory={props.inferenceJobsByCategory}
-                enqueueTtsJob={props.enqueueTtsJob}
-              />
+              <>
+                <OnboardingSelection />
+                <VstSectionV2 />
+                <TtsDemoSection
+                  sessionWrapper={props.sessionWrapper}
+                  sessionSubscriptionsWrapper={
+                    props.sessionSubscriptionsWrapper
+                  }
+                  inferenceJobs={props.inferenceJobs}
+                  ttsInferenceJobs={props.ttsInferenceJobs}
+                  enqueueInferenceJob={props.enqueueInferenceJob}
+                  inferenceJobsByCategory={props.inferenceJobsByCategory}
+                  enqueueTtsJob={props.enqueueTtsJob}
+                />
+                <Dashboard sessionWrapper={props.sessionWrapper} />
+                <FakeYouLandingBody />
+              </>
             ) : (
               <Dashboard sessionWrapper={props.sessionWrapper} />
             )}

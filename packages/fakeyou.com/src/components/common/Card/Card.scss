@@ -87,6 +87,17 @@
     &:hover .card-video-play {
       color: rgba($white, 0.7);
     }
+
+    &.card-hover-border-red {
+      &:hover {
+        border: 1px solid $primary;
+      }
+    }
+
+    &.bottom-text-hover {
+      background-color: lighten($panel-inner, 2%);
+      border: 1px solid $primary;
+    }
   }
 
   h6 {
@@ -96,4 +107,15 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+}
+
+.card-bottom-text {
+  padding-top: 0.75rem;
+  cursor: pointer;
+}
+
+.centered-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }

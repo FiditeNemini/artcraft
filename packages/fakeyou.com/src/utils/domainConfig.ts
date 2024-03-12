@@ -4,20 +4,20 @@ export enum Website {
 }
 
 export interface DomainConfig {
-  website: Website,
-  logo: string,
-  title: string,
-  link: string,
+  website: Website;
+  logo: string;
+  title: string;
+  link: string;
 }
 
 const domainConfigs: Record<string, DomainConfig> = {
-  "storyteller": {
+  storyteller: {
     website: Website.StorytellerAi,
     logo: "/fakeyou/Storyteller-Logo-1.png",
     title: "Storyteller AI",
     link: "https://storyteller.ai",
   },
-  "fakeyou": {
+  fakeyou: {
     website: Website.FakeYou,
     logo: "/fakeyou/FakeYou-Logo-2.png",
     title: "FakeYou",
@@ -35,7 +35,7 @@ export const getCurrentDomainConfig = (): DomainConfig => {
   }
 
   if (window.location.hostname.includes("storyteller")) {
-      return domainConfigs.storyteller;
+    return domainConfigs.storyteller;
   }
 
   // Default fallback

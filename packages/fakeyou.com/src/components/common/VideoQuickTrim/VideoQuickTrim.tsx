@@ -1,296 +1,231 @@
 import React, {
   memo,
   useCallback,
-  useLayoutEffect,
-  useState,
+  useEffect,
+  useReducer,
   useRef,
 } from "react";
 import {
-  faArrowsRepeat,
   faPlay,
   faPause,
-  faVolume,
-  faVolumeSlash,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, SelectionBubbles, VideoFakeyou } from "components/common";
+
+import { useLocalize } from "hooks";
+import { VideoFakeyou } from "components/common";
 import { VideoFakeyouProps } from "../VideoFakeyou/VideoFakeyou";
 
-import { QuickTrimData, TrimStates, PlaybarStates } from "./types";
-import { formatSecondsToHHMMSSCS } from "./helpers";
-import TrimScrbber from "./TrimScrubber";
+import {
+  reducer,
+  initialState,
+  ACTION_TYPES,
+  PLAYPUASE_STATES,
+  STATE_STATUSES,
+} from "./reducer";
+
+import { QuickTrimData, ONE_MS } from "./utilities";
+
+import { ProgressBar } from "./components/ProgressBar";
+import { ControlBar } from "./components/ControlBar";
 import './styles.scss'
 
 interface VideoQuickTrimProps extends VideoFakeyouProps {
+  debug?: boolean
   onSelect: (values: QuickTrimData) => void;
+  trimStartSeconds: number;
+  trimEndSeconds: number;
 }
 
-const trimOptions: { [key: string]: number } = {
-  "3s": 3,
-  "5s": 5,
-  "10s": 10,
-  "15s": 15,
-};
-
-const initialTrimState: TrimStates = {
-  canNotTrim: true,
-  trimDuration: 0,
-  trimReset: new Date(),
-  trimStart: 0,
-  trimEnd: 0,
-  maxDuration: 0,
-};
-
-const initialPlaybarState: PlaybarStates = {
-  playbarWidth: 0,
-  timeCursorOffset: 0,
-};
-
-export default memo(function VideoQuickTrim({
+export const VideoQuickTrim = memo(({
+  debug: propsDebug = false,
   onSelect,
+  trimStartSeconds: propsTrimStartSeconds,
+  trimEndSeconds : propsTrimEndSeconds,
   ...rest
-}: VideoQuickTrimProps) {
-  // console.log("VideoQuickTrim Rerender!!");
+}: VideoQuickTrimProps) => {
+  const debug = true || propsDebug;
 
+  const { t } = useLocalize("VideoPlayerQuickTrim");
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const playbarRef = useRef<HTMLDivElement | null>(null);
-
-  const [{
-    playbarWidth,
-    timeCursorOffset
-  }, setPlaybarState] = useState<PlaybarStates>(initialPlaybarState);
-  const [playpause, setPlaypause] = useState<'playing'|'paused'|'ended'>('paused');
-  const [isMuted, setIsMuted] = useState<boolean>(false);
-  const [isRepeatOn, setIsRepatOn] = useState<boolean>(true);
-  const [{
-    canNotTrim,
-    trimReset,
-    trimStart,
-    trimEnd,
-    trimDuration,
-    maxDuration
-  }, setTrimState] = useState<TrimStates>(initialTrimState);
+  const [compState, dispatchCompState] = useReducer(reducer, initialState);
   
-
+  if(compState.status === STATE_STATUSES.LOAD_ORDER_ERROR){
+    console.log(`${compState.errorMessage[compState.errorMessage.length -1]}`);
+  }
 
   const videoRefCallback = useCallback(node => {
-    //console.log("videoRefCallback");
+    function setPlaypause(newState: PLAYPUASE_STATES){
+      dispatchCompState({
+        type: ACTION_TYPES.SET_PLAYPUASE,
+        payload: { playpause: newState}
+      })
+    }
     if (node !== null) { 
       // DOM node referenced by ref has changed and exists
       videoRef.current = node;
-      
       node.onloadedmetadata = ()=>{
-        if (node.duration >= 3){
-          setTrimState((curr)=>({
-            ...curr,
-            canNotTrim: false,
-            trimDuration: 3,
-            trimEnd: 3,
-            maxDuration: node.duration
-          }));
-          //TODO: this sbould be set in USEEFFECT
-          //IFF USEEFFECT starts working again
-          onSelect({
-            trimStartSeconds: 0,
-            trimEndSeconds: 3,
-          })
-        }
+        dispatchCompState({
+          type: ACTION_TYPES.ON_LOADED_METADATA,
+          payload:{ videoDuration: node.duration,}
+        });
       };
-      
+
       node.ontimeupdate = ()=>{
-        if(isRepeatOn && 
-            (node.currentTime >= trimEnd || node.currentTime <= trimStart)
+        if(compState.trimStartSeconds !== undefined && 
+          compState.trimEndSeconds !== undefined && 
+          compState.playbarWidth !== undefined){
+          // reset current time when on repeat
+          if(compState.isRepeatOn && 
+            (node.currentTime > compState.trimEndSeconds || node.currentTime < compState.trimStartSeconds)
           ){
-          node.currentTime = trimStart;
+            node.currentTime = compState.trimStartSeconds + ONE_MS;
+            // if (debug){
+            //   console.log(`Loop Playing trimStart@${compState.trimStartSeconds}`);
+            //   console.log(`Loop Playing currentTime@${node.currentTime}`);
+            // }
+          }
+
+          dispatchCompState({
+            type: ACTION_TYPES.MOVE_TIMECURSOR,
+            payload: {
+              timeCursorOffset: (node.currentTime / node.duration) * (compState.playbarWidth)
+            }
+          });
+        }else{
+          console.log('ontimeupdate failed');
         }
-        setPlaybarState((curr)=>({
-          ...curr,
-          timeCursorOffset: (node.currentTime / node.duration) * (playbarWidth-8)
-        }));
-        
       };
 
-      node.onplay = ()=>{ setPlaypause("playing");};
-      node.onpause = ()=>{setPlaypause("paused");};
-      node.onended = ()=>{setPlaypause("ended");};
+      node.onplay = ()=>setPlaypause(PLAYPUASE_STATES.PLAYING);
+      node.onpause = ()=>setPlaypause(PLAYPUASE_STATES.PAUSED);
+      node.onended = ()=>setPlaypause(PLAYPUASE_STATES.ENDED);
 
+      node.onprogress = ()=>{
+        console.log(node.buffered);
+        if(node.buffered.length > 0){
+          dispatchCompState({
+            type: ACTION_TYPES.SET_VIDEO_LOAD_PROGRESS,
+            payload: {videoLoadProgress: node.buffered}
+          });
+        }
+      }
     } // else{} DOM node referenced by ref has been unmounted 
-  }, [playbarWidth, onSelect, isRepeatOn, trimStart, trimEnd]); //END videoRefCallback
+  }, [
+    compState.trimStartSeconds, 
+    compState.trimEndSeconds,
+    compState.playbarWidth,
+    compState.isRepeatOn
+  ]); //END videoRefCallback\
 
-  function handleWindowResize() {
-    if (playbarRef.current !== null) {
-      const newWidth = playbarRef.current.getBoundingClientRect().width;
-      setPlaybarState(curr => ({
-        playbarWidth: newWidth,
-        timeCursorOffset:
-          (curr.timeCursorOffset / (curr.playbarWidth - 8)) * (newWidth - 8),
-      }));
-    }
-  }
-  const playbarRefCallback = useCallback(node => {
-    if (node !== null) {
-      playbarRef.current = node;
-      setPlaybarState(curr => ({
-        ...curr,
-        playbarWidth: node.getBoundingClientRect().width,
-      }));
-    }
-  }, []);
-  useLayoutEffect(() => {
-    window.addEventListener("resize", handleWindowResize);
-    return () => {
-      window.removeEventListener("resize", handleWindowResize);
-    };
-  }, []);
-
-  const handleChangeTrimDuration = (selected: string) =>{
-    if(!canNotTrim && maxDuration > 0 && trimOptions[selected] <= maxDuration){
-      let newTrimStart = trimStart;
-      let newTrimEnd = trimStart+ trimOptions[selected];
-      if (newTrimEnd > maxDuration){
-        newTrimEnd = maxDuration;
-        newTrimStart = maxDuration - trimOptions[selected];
+  useEffect(()=>{
+    if( compState.trimStartSeconds
+      && compState.trimEndSeconds
+      && (
+        compState.trimStartSeconds !== propsTrimStartSeconds
+        || compState.trimEndSeconds !== propsTrimEndSeconds
+      )
+    ){
+        onSelect({
+          trimStartSeconds: compState.trimStartSeconds,
+          trimEndSeconds: compState.trimEndSeconds,
+        });
       }
-      setTrimState((curr)=>({
-        ...curr,
-        trimReset: new Date(),
-        trimDuration: trimOptions[selected],
-        trimStart: newTrimStart,
-        trimEnd: newTrimEnd,
-      }))
-      onSelect({
-        trimStartSeconds: newTrimStart,
-        trimEndSeconds: newTrimEnd,
-      });
-      if (isRepeatOn 
-          && videoRef.current 
-          && videoRef.current.currentTime > newTrimEnd
-      ){
-        videoRef.current.currentTime = newTrimStart;
-      }
-    }
-  }
+  }, [onSelect, compState.trimStartSeconds, compState.trimEndSeconds, propsTrimStartSeconds, propsTrimEndSeconds])
 
-  const handlePlaypause = ()=>{
-    if (playpause === 'paused' || playpause === 'ended'){
+  function videoCanPlay(){
+    return (compState.playpause === PLAYPUASE_STATES.PAUSED 
+      || compState.playpause === PLAYPUASE_STATES.ENDED
+      || compState.playpause === PLAYPUASE_STATES.READY
+    );
+  }
+  function handlePlaypause(){
+    if (videoCanPlay()){
       videoRef.current?.play();
-    }else{
+    }else if (compState.playpause === PLAYPUASE_STATES.PLAYING){
       videoRef.current?.pause();
+    }else {
+      console.log('Playpause is triggered while it is NOT_READY');
     }
   };
-
-  const trimScrubberWidth = videoRef.current && playbarWidth > 0
-    ? trimDuration > 0 && trimDuration < videoRef.current.duration 
-      ? (trimDuration / videoRef.current.duration * playbarWidth) 
-      : playbarWidth
-    : 0;
-
+  function disableRepeatOn(){
+    dispatchCompState({
+      type: ACTION_TYPES.TOGGLE_REPEAT,
+      payload: {isRepeatOn: false}
+    });
+  }
   return (
     <div className="fy-video-quicktrim">
       <div className="video-wrapper">
         <VideoFakeyou
+          debug={false}
           height={500}
           controls={false}
-          muted={isMuted}
+          muted={compState.isMuted}
           ref={videoRefCallback}
           {...rest}
         />
-
-        <div className="playpause-overlay" onClick={handlePlaypause}>
-          {playpause === "paused" && (
-            <FontAwesomeIcon
-              className="playpause-icon"
-              icon={faPlay}
-              size="8x"
-            />
-          )}
-          {playpause === "playing" && (
-            <FontAwesomeIcon
-              className="playpause-icon"
-              icon={faPause}
-              size="8x"
-            />
-          )}
-        </div>
-        {videoRef.current && canNotTrim && (
+        {compState.playpause !== PLAYPUASE_STATES.NOT_READY &&
+          <div className="playpause-overlay" onClick={handlePlaypause}>
+            {videoCanPlay() && (
+              <FontAwesomeIcon
+                className="playpause-icon"
+                icon={faPlay}
+                size="8x"
+              />
+            )}
+            {compState.playpause === PLAYPUASE_STATES.PLAYING && (
+              <FontAwesomeIcon
+                className="playpause-icon"
+                icon={faPause}
+                size="8x"
+              />
+            )}
+          </div>
+        }
+        { compState.canNotTrim === true &&
           <div className="warning-too-short">
             <div className="background"></div>
-            <p>Warning: Sorry Your Video is TOO Short</p>
+            <h1>{t('error.videoTooShort')}</h1>
           </div>
-        )}
-      </div>
-      {/* END of Video Wrapper */}
-      <div className="playbar" ref={playbarRefCallback}>
-        <div className="playbar-bg" />
-        {trimScrubberWidth > 0 && 
-          playbarWidth > 0 && 
-          maxDuration > 0 &&
-          <TrimScrbber
-            key={trimReset.toString()}
-            boundingWidth={playbarWidth}
-            width={trimScrubberWidth}
-            trimStart={trimStart}
-            trimDuration={trimDuration}
-            duration={maxDuration}
-            onChange={(val: QuickTrimData)=>{
-              //console.log(val);
-              setTrimState((curr)=>({
-                ...curr,
-                trimStart: val.trimStartSeconds,
-                trimEnd: val.trimEndSeconds
-              }))
-              onSelect({
-                trimStartSeconds: val.trimStartSeconds,
-                trimEndSeconds: val.trimEndSeconds,
-              });
-            }}
-          />
         }
-        <div className="playcursor" style={{left: timeCursorOffset+"px"}}/>
-      </div> {/* END of Playbar */}
-
-      <div className="d-flex w-100 justify-content-between mt-3 flex-wrap">
-        <div className="playpause-external d-flex align-items-center flex-wrap mb-2">
-          <Button
-            className="button-playpause"
-            icon={playpause === "playing" ? faPause : faPlay}
-            variant="secondary"
-            onClick={handlePlaypause}
-          />
-          <Button
-            className="button-repeat"
-            icon={faArrowsRepeat}
-            variant={isRepeatOn ? "primary":"secondary"}
-            onClick={()=>setIsRepatOn((curr)=>(!curr))}
-          />
-          <Button
-            className="button-mute"
-            icon={isMuted ? faVolumeSlash : faVolume}
-            variant="secondary"
-            onClick={() => setIsMuted(curr => !curr)}
-          />
-          <div className="playtime d-flex">
-            <span >
-              <p>
-                {`${formatSecondsToHHMMSSCS(
-                  videoRef.current?.currentTime || 0
-                )}`}
-              </p>
-            </span>
-            <div>/</div>
-            <span>
-              <p>
-                {`${formatSecondsToHHMMSSCS(videoRef.current?.duration || 0)}`}
-              </p>
-            </span>
-          </div>
-        </div>
-        <SelectionBubbles
-          options={Object.keys(trimOptions)}
-          onSelect={handleChangeTrimDuration}
-          selectedStyle="outline"
-        />
-      </div>
+      </div>{/* END of Video Wrapper */}
+      <ProgressBar
+        debug={debug}
+        readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}
+        timeCursorOffset={compState.timeCursorOffset ||0}
+        trimStartSeconds={compState.trimStartSeconds ||0}
+        trimDuration={compState.trimDuration ||0}
+        playbarWidth={compState.playbarWidth ||0}
+        scrubberWidth={compState.scrubberWidth ||0}
+        videoBuffered={compState.videoLoadProgress || undefined}
+        videoDuration={compState.videoDuration ||0}
+        dispatchCompState={dispatchCompState}
+        onPlayCursorChanged={(newPos: number)=>{
+          if(videoRef.current !== null && videoRef.current.currentTime
+            && compState.playbarWidth && compState.videoDuration){
+            const newTime = newPos / compState.playbarWidth * compState.videoDuration;
+            if(compState.trimStartSeconds
+              && compState.trimEndSeconds
+              && (newTime < compState.trimStartSeconds
+                || newTime > compState.trimEndSeconds
+              )){
+                disableRepeatOn();
+            }
+            videoRef.current.currentTime = newTime;
+          }
+        }}
+      />
+      <ControlBar
+        debug={debug}
+        readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}
+        videoCurrentTime={videoRef.current?.currentTime}
+        videoDuration={videoRef.current?.duration}
+        isMuted={compState.isMuted}
+        isRepeatOn={compState.isRepeatOn}
+        playpause={compState.playpause}
+        handlePlaypause={handlePlaypause}
+        dispatchCompState={dispatchCompState}
+      />
     </div>
   );
 });

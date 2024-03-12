@@ -155,6 +155,8 @@ export default function VstSectionV2(props: VstSectionV2Props) {
                     autoPlay
                     loop
                     muted
+                    playsInline
+                    controls={false}
                     key={`${index}-${activeIndex}`}
                     onPlay={handleVideoPlay}
                     onPause={handleVideoPause}
@@ -184,7 +186,7 @@ export default function VstSectionV2(props: VstSectionV2Props) {
             {videoSet.map((video, index) => (
               <SwiperSlide key={index}>
                 <div className="ratio ratio-16x9 vst-carousel-panel">
-                  <video loop muted>
+                  <video loop muted playsInline controls={false}>
                     <source src={video.src} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
@@ -214,6 +216,8 @@ export default function VstSectionV2(props: VstSectionV2Props) {
                   autoPlay
                   loop
                   muted
+                  playsInline
+                  controls={false}
                   key={styledVideo.src}
                   onPlay={handleVideoPlay}
                   onPause={handleVideoPause}

@@ -1,0 +1,67 @@
+import { Panel } from "components/common";
+import Card from "components/common/Card";
+import React from "react";
+import { useHistory } from "react-router-dom";
+
+interface OnboardingSelectionProps {}
+
+export default function OnboardingSelection(props: OnboardingSelectionProps) {
+  const history = useHistory();
+
+  const cards = [
+    {
+      text: "Scene 1",
+      backgroundImage: "",
+      onClick: () => {
+        history.push("/studio-intro/");
+      },
+    },
+    {
+      text: "Scene 2",
+      backgroundImage: "",
+      onClick: () => {
+        history.push("/studio-intro/");
+      },
+    },
+    {
+      text: "Scene 3",
+      backgroundImage: "",
+      onClick: () => {
+        history.push("/studio-intro/");
+      },
+    },
+    {
+      text: "Scene 4",
+      backgroundImage: "",
+      onClick: () => {
+        history.push("/studio-intro/");
+      },
+    },
+  ];
+
+  return (
+    <Panel clear={true}>
+      <div className="text-center my-5 pb-5">
+        <h1 className="fw-bold">Explore scene examples</h1>
+        <p className="opacity-75">
+          Try generating a movie by clicking a scene below
+        </p>
+        <div className="row g-3 g-lg-4 mt-3 centered-row">
+          {cards.map((card, index) => (
+            <div className="col-6 col-lg-3" key={index}>
+              <Card
+                backgroundImage={card.backgroundImage}
+                aspectRatio="16/9"
+                canHover={true}
+                borderWidth="2px"
+                hoverPrimaryColor={true}
+                onClick={card.onClick}
+                bottomText={card.text}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </Panel>
+  );
+}

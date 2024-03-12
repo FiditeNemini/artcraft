@@ -35,6 +35,8 @@ interface TtsInferencePanelProps {
   ) => void;
   inferenceJobsByCategory: Map<FrontendInferenceJobType, Array<InferenceJob>>;
   enqueueTtsJob: (jobToken: string) => void;
+  showHanashi?: boolean;
+  autoFocusTextBox?: boolean;
 }
 
 export default function LandingDemo({
@@ -44,6 +46,8 @@ export default function LandingDemo({
   enqueueInferenceJob,
   enqueueTtsJob,
   inferenceJobsByCategory,
+  showHanashi = true,
+  autoFocusTextBox = true,
 }: TtsInferencePanelProps) {
   const [textBuffer, setTextBuffer] = useState("");
   const [maybeTtsError, setMaybeTtsError] = useState<
@@ -221,18 +225,21 @@ export default function LandingDemo({
 
   return (
     <div className="position-relative">
-      <img
-        src={
-          isHanashiHovered
-            ? "/images/landing/hanashi-demo-2.webp"
-            : "/images/landing/hanashi-demo-1.webp"
-        }
-        alt="Hanashi Demo"
-        onMouseEnter={() => setIsHanashiHovered(true)}
-        onMouseLeave={() => setIsHanashiHovered(false)}
-        className="hanashi-demo-image"
-        draggable="false"
-      />
+      {showHanashi && (
+        <img
+          src={
+            isHanashiHovered
+              ? "/images/landing/hanashi-demo-2.webp"
+              : "/images/landing/hanashi-demo-1.webp"
+          }
+          alt="Hanashi Demo"
+          onMouseEnter={() => setIsHanashiHovered(true)}
+          onMouseLeave={() => setIsHanashiHovered(false)}
+          className="hanashi-demo-image"
+          draggable="false"
+        />
+      )}
+
       <Panel padding={true}>
         <form className="d-flex flex-column">
           <div>
@@ -265,7 +272,7 @@ export default function LandingDemo({
               onChange={handleChangeText}
               rows={4}
               resize={false}
-              autoFocus={isMobile ? false : true}
+              autoFocus={isMobile ? false : autoFocusTextBox ? true : false}
             />
           </div>
 
