@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
-import { Button, Scene3D } from "components/common";
+import { Button } from "components/common";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { useParams, useHistory } from "react-router-dom";
 import { useInferenceJobs } from "hooks";
@@ -10,6 +10,8 @@ import { EnqueueEngineCompositing } from "@storyteller/components/src/api/engine
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
 import "./StudioIntro.scss";
+import Scene3D from "components/common/Scene3D/Scene3D";
+import { EngineMode } from "components/common/Scene3D/EngineMode";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -39,16 +41,16 @@ function StudioIntroPage(props: Props) {
     return <StudioNotAvailable />;
   }
 
-  let engineParams = {};
+  let assetDescriptor;
 
   // We should prefer to start the onboarding flow with an existing scene, but if 
   // one is unavailable, we should show the sample room.
   if (mediaToken) {
-    engineParams = {
-      sceneMediaFileToken: mediaToken,
+    assetDescriptor = {
+      storytellerSceneMediaFileToken: mediaToken,
     };
   } else {
-    engineParams = {
+    assetDescriptor = {
       objectId: "sample-room.gltf",
     };
   }
@@ -70,10 +72,10 @@ function StudioIntroPage(props: Props) {
     <div className="studio-intro-page">
       <Scene3D
         fullScreen={true}
-        mode="studio"
+        mode={EngineMode.Studio}
+        asset={assetDescriptor}
         className="flex-grow-1"
         onSceneSavedCallback={onSaveCallback}
-        {...engineParams}
       />
       <div className="d-flex justify-content-center p-3">
         <Button label="Create Movie from 3D Scene" onClick={onClick} />
