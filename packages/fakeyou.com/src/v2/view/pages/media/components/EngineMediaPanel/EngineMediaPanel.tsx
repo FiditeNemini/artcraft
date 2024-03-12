@@ -1,6 +1,6 @@
 import React from "react";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMediaFile";
-import Scene3dNext from "components/common/Scene3D/Scene3dNext";
+import Scene3D from "components/common/Scene3D/Scene3D";
 import { EngineMode } from "components/common/Scene3D/EngineMode";
 
 // Storyteller Engine parameters
@@ -17,7 +17,7 @@ export interface EngineMediaPanelArgs {
 
 export function EngineMediaPanel({ mediaFile } : EngineMediaPanelArgs) {
   return (
-    <Scene3dNext
+    <Scene3D
       mode={EngineMode.Viewer}
       skybox={SKYBOX}
       fullScreen={false}

@@ -2,9 +2,10 @@ import React from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
-import { Scene3D } from "components/common";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { useParams } from "react-router-dom";
+import Scene3D from "components/common/Scene3D/Scene3D";
+import { EngineMode } from "components/common/Scene3D/EngineMode";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -20,24 +21,25 @@ function StorytellerStudioListPage(props: Props) {
     return <StudioNotAvailable />;
   }
 
-  let engineParams = {};
+  let assetDescriptor;
 
   if (mediaToken) {
-    engineParams = {
-      sceneMediaFileToken: mediaToken
+    assetDescriptor = {
+      storytellerSceneMediaFileToken: mediaToken
     };
   } else {
-    engineParams = {
+    assetDescriptor = {
       objectId: "sample-room.gltf"
     };
   }
 
   return (
     <>
-      <Scene3D 
+      <Scene3D
         fullScreen={true} 
-        mode="studio" 
-        {...engineParams} />
+        mode={EngineMode.Studio}
+        asset={assetDescriptor}
+      />
     </>
   );
 }

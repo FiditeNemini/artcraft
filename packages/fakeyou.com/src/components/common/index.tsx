@@ -28,7 +28,7 @@ import NumberSliderV2 from "./NumberSliderV2";
 import Pagination from "./Pagination";
 import Panel from "./Panel";
 import Radio from "./Radio";
-import Scene3D from "./Scene3D";
+import Scene3D from "./Scene3D/Scene3D";
 import Searcher from "./Searcher";
 import SegmentButtons from "./SegmentButtons";
 import Select from "./Select";

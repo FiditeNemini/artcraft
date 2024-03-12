@@ -10,7 +10,7 @@ import { EnqueueEngineCompositing } from "@storyteller/components/src/api/engine
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
 import "./StudioIntro.scss";
-import Scene3dNext from "components/common/Scene3D/Scene3dNext";
+import Scene3D from "components/common/Scene3D/Scene3D";
 import { EngineMode } from "components/common/Scene3D/EngineMode";
 
 interface Props {
@@ -70,7 +70,7 @@ function StudioIntroPage(props: Props) {
 
   return (
     <div className="studio-intro-page">
-      <Scene3dNext
+      <Scene3D
         fullScreen={true}
         mode={EngineMode.Studio}
         asset={assetDescriptor}
