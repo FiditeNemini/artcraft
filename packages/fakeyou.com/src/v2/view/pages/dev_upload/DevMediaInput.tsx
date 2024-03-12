@@ -19,7 +19,7 @@ interface Yank {
 
 export default function DevMediaInput({ value }: Props) {
   // const { studioAccessCheck } = useSession();
-  const { create } = useNotifications()
+  const { create } = useNotifications();
   const [mediaToken,mediaTokenSet] = useState();
   const [notTitle,notTitleSet] = useState("Notification Title");
   const [notContent,notContentSet] = useState("Notification Content");

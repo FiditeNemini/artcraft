@@ -1,5 +1,6 @@
-import React from 'react';
+import React from "react";
 import { InferenceJobsProvider, ModalProvider, NotificationProvider, SessionProvider } from "components/providers";
+import ServerStatusChecker from "./ServerStatusChecker";
 
 interface Props {
   children?: any,
@@ -26,6 +27,7 @@ export default function CoreServicesProvider({ children, enqueue, querySession, 
   return <SessionProvider {...sessionProps} >
     <InferenceJobsProvider {...inferenceJobsProps}>
       <NotificationProvider>
+        <ServerStatusChecker />
         <ModalProvider>
           { children }
         </ModalProvider>
