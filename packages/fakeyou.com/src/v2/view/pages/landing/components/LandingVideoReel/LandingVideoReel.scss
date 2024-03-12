@@ -1,0 +1,34 @@
+@import "scss/colours.scss";
+
+.storyteller-landing-reel {
+  display: flex;
+  height: 74vh;
+  justify-content: center;
+  position: relative;
+
+  video {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .reel-overlay {
+    z-index: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(20, 20, 27, 0.6);
+
+    &:after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 20%;
+      background: linear-gradient(transparent, $bg);
+      z-index: 1;
+    }
+  }
+}

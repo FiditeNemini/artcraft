@@ -1,5 +1,7 @@
+import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
 import React, { useEffect } from "react";
+import "./LandingVideoReel.scss";
 
 interface LandingVideoReelProps {}
 
@@ -42,27 +44,30 @@ export default function LandingVideoReel(props: LandingVideoReelProps) {
   }, [isOnLandingPage]);
 
   return (
-    <div className="vh-100 d-flex align-items-center justify-content-center position-relative">
-      <video
-        autoPlay
-        muted
-        loop
-        className="position-absolute w-100 h-100"
-        style={{ objectFit: "cover" }}
-      >
+    <div className="storyteller-landing-reel">
+      <video autoPlay muted loop>
         <source src="/videos/landing-reel.mp4" type="video/mp4" />
       </video>
-      <div
-        className="position-absolute w-100 h-100"
-        style={{ backgroundColor: "rgba(20, 20, 27, 0.6)", zIndex: 0 }}
-      />
-      <div className="text-center text-white d-flex flex-column align-items-center zi-2">
-        <h1 className="display-2 fw-bolder">Enabling Anyone to Make Professional Film, Animation, and Music</h1>
-        <h5 className="fw-normal mb-3 mt-2 w-75 lh-base opacity-75">
-          StorytellerAI's powerful new engine combines Generative AI and 
-          User Generated Content to radically democratize both audio and video production.
-        </h5>
-        <Button label="Sign Up Now" to="/signup" className="mt-5" />
+      <div className="reel-overlay">
+        <div className="container h-100">
+          <div className="text-center text-white d-flex flex-column justify-content-center align-items-center zi-2 h-100">
+            <h1 className="display-3 fw-bold">
+              Enabling Anyone to Make Professional Film, Animation, and Music
+            </h1>
+            <h5 className="fw-normal mb-2 mt-2 w-75 lh-base opacity-75">
+              StorytellerAI's powerful new engine combines Generative AI and
+              User Generated Content to radically democratize both audio and
+              video production.
+            </h5>
+            <Button
+              icon={faArrowRight}
+              iconFlip={true}
+              label="Sign Up Now"
+              to="/signup"
+              className="mt-4"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
