@@ -155,6 +155,18 @@ impl RequiredModels {
                     location: PathBuf::from("models/grounding-dino/groundingdino_swint_ogc.pth"),
                     url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/groundingdino_swint_ogc.pth".to_string(),
                 },
+                ComfyDependency {
+                    location: PathBuf::from("models/grounding-dino/groundingdino_swint_ogc.pth"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/groundingdino_swint_ogc.pth".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("models/grounding-dino/groundingdino_swint_ogc.pth"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/groundingdino_swint_ogc.pth".to_string(),
+                },
+                ComfyDependency {
+                    location: PathBuf::from("models/vae/vae-ft-mse-840000-ema-pruned.ckpt"),
+                    url: "https://storage.googleapis.com/vocodes-public/comfyui-deps/vae-ft-mse-840000-ema-pruned.ckpt".to_string(),
+                },        
             ],
         }
     }
