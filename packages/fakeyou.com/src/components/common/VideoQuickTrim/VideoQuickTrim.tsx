@@ -23,24 +23,28 @@ import {
   STATE_STATUSES,
 } from "./reducer";
 
-import { QuickTrimData } from "./utilities";
+import { QuickTrimData, ONE_MS } from "./utilities";
 
 import { ProgressBar } from "./components/ProgressBar";
 import { ControlBar } from "./components/ControlBar";
 import './styles.scss'
 
 interface VideoQuickTrimProps extends VideoFakeyouProps {
+  debug?: boolean
   onSelect: (values: QuickTrimData) => void;
   trimStartSeconds: number;
   trimEndSeconds: number;
 }
 
 export const VideoQuickTrim = memo(({
+  debug: propsDebug = false,
   onSelect,
   trimStartSeconds: propsTrimStartSeconds,
   trimEndSeconds : propsTrimEndSeconds,
   ...rest
 }: VideoQuickTrimProps) => {
+  const debug = true || propsDebug;
+
   const { t } = useLocalize("VideoPlayerQuickTrim");
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [compState, dispatchCompState] = useReducer(reducer, initialState);
@@ -72,10 +76,13 @@ export const VideoQuickTrim = memo(({
           compState.playbarWidth !== undefined){
           // reset current time when on repeat
           if(compState.isRepeatOn && 
-            (node.currentTime >= compState.trimEndSeconds || node.currentTime <= compState.trimStartSeconds)
+            (node.currentTime > compState.trimEndSeconds || node.currentTime < compState.trimStartSeconds)
           ){
-            node.currentTime = compState.trimStartSeconds;
-            console.log('play looped');
+            node.currentTime = compState.trimStartSeconds + ONE_MS;
+            // if (debug){
+            //   console.log(`Loop Playing trimStart@${compState.trimStartSeconds}`);
+            //   console.log(`Loop Playing currentTime@${node.currentTime}`);
+            // }
           }
 
           dispatchCompState({
@@ -92,6 +99,16 @@ export const VideoQuickTrim = memo(({
       node.onplay = ()=>setPlaypause(PLAYPUASE_STATES.PLAYING);
       node.onpause = ()=>setPlaypause(PLAYPUASE_STATES.PAUSED);
       node.onended = ()=>setPlaypause(PLAYPUASE_STATES.ENDED);
+
+      node.onprogress = ()=>{
+        console.log(node.buffered);
+        if(node.buffered.length > 0){
+          dispatchCompState({
+            type: ACTION_TYPES.SET_VIDEO_LOAD_PROGRESS,
+            payload: {videoLoadProgress: node.buffered}
+          });
+        }
+      }
     } // else{} DOM node referenced by ref has been unmounted 
   }, [
     compState.trimStartSeconds, 
@@ -130,11 +147,17 @@ export const VideoQuickTrim = memo(({
       console.log('Playpause is triggered while it is NOT_READY');
     }
   };
-
+  function disableRepeatOn(){
+    dispatchCompState({
+      type: ACTION_TYPES.TOGGLE_REPEAT,
+      payload: {isRepeatOn: false}
+    });
+  }
   return (
     <div className="fy-video-quicktrim">
       <div className="video-wrapper">
         <VideoFakeyou
+          debug={false}
           height={500}
           controls={false}
           muted={compState.isMuted}
@@ -167,23 +190,33 @@ export const VideoQuickTrim = memo(({
         }
       </div>{/* END of Video Wrapper */}
       <ProgressBar
+        debug={debug}
         readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}
         timeCursorOffset={compState.timeCursorOffset ||0}
         trimStartSeconds={compState.trimStartSeconds ||0}
         trimDuration={compState.trimDuration ||0}
         playbarWidth={compState.playbarWidth ||0}
         scrubberWidth={compState.scrubberWidth ||0}
-        videoBuffered={videoRef.current?.buffered}
+        videoBuffered={compState.videoLoadProgress || undefined}
         videoDuration={compState.videoDuration ||0}
         dispatchCompState={dispatchCompState}
         onPlayCursorChanged={(newPos: number)=>{
           if(videoRef.current !== null && videoRef.current.currentTime
             && compState.playbarWidth && compState.videoDuration){
-            videoRef.current.currentTime = newPos / compState.playbarWidth * compState.videoDuration;
+            const newTime = newPos / compState.playbarWidth * compState.videoDuration;
+            if(compState.trimStartSeconds
+              && compState.trimEndSeconds
+              && (newTime < compState.trimStartSeconds
+                || newTime > compState.trimEndSeconds
+              )){
+                disableRepeatOn();
+            }
+            videoRef.current.currentTime = newTime;
           }
         }}
       />
       <ControlBar
+        debug={debug}
         readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}
         videoCurrentTime={videoRef.current?.currentTime}
         videoDuration={videoRef.current?.duration}

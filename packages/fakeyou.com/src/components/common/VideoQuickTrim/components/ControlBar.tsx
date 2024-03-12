@@ -17,6 +17,7 @@ import {
 import { TRIM_OPTIONS, formatSecondsToHHMMSSCS } from "../utilities";
 
 export const ControlBar = memo(({
+  debug: propsDebug = false,
   readyToMount,
   videoCurrentTime,
   videoDuration,
@@ -26,6 +27,7 @@ export const ControlBar = memo(({
   handlePlaypause,
   dispatchCompState
 }:{
+  debug?:boolean;
   readyToMount: boolean;
   videoCurrentTime: number | undefined;
   videoDuration: number | undefined;
@@ -35,6 +37,9 @@ export const ControlBar = memo(({
   handlePlaypause: ()=>void;
   dispatchCompState: (action: Action) => void;
 })=>{
+  const debug = false || propsDebug;
+  if (debug) console.log("ControlBar reRENDERED!!");
+  
   function handleSetTrimDuration(selected: string){
     dispatchCompState({
       type: ACTION_TYPES.SET_TRIM_DURATION,
@@ -42,10 +47,6 @@ export const ControlBar = memo(({
         trimDurationString: selected
       }
     });
-      // onSelect({
-      //   trimStartSeconds: newTrimStart,
-      //   trimEndSeconds: newTrimEnd,
-      // });
   };
   if(readyToMount){
     return(

@@ -14,6 +14,7 @@ import './styles.scss';
 
 
 export interface VideoFakeyouProps{
+  debug?: boolean;
   width?: number|string;
   height?: number|string;
   hideIfNoMedia?: boolean;
@@ -30,6 +31,7 @@ export interface VideoFakeyouProps{
 type Ref = HTMLVideoElement;
 
 const VideoFakeyou = memo(forwardRef<Ref, VideoFakeyouProps>(({
+  debug: propsDebug = false,
   width,
   height,
   hideIfNoMedia = false,
@@ -44,11 +46,15 @@ const VideoFakeyou = memo(forwardRef<Ref, VideoFakeyouProps>(({
   ...rest
 }: VideoFakeyouProps, ref) => {
   //console.log(`Video Player rerender: ${mediaToken}`);
+  const debug = false;// || propsDebug;
+
+  if(debug) console.log("VideoFakeyou reRENDER!!");
 
   const [mediaFile, setMediaFile] = useState<MediaFileType|null>(null);
   useEffect(()=>{
     setMediaFile(null);
   },[mediaToken])
+
   useMedia({
     mediaToken: mediaToken,
     onSuccess: (res: any) => {

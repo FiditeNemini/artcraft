@@ -1,4 +1,9 @@
-import { MIN_VID_DURATION, TIME_CURSOR_WIDTH, TRIM_OPTIONS } from "./utilities";
+import {
+  MIN_VID_DURATION,
+  TIME_CURSOR_WIDTH,
+  TRIM_OPTIONS,
+  roundToMilliseconds
+} from "./utilities";
 
 export enum STATE_STATUSES {
   INIT = "init",
@@ -26,7 +31,7 @@ export type State = {
   trimDuration: number | undefined;
   trimStartSeconds: number | undefined;
   trimEndSeconds: number | undefined;
-  videoLoadProgress: number | undefined;
+  videoLoadProgress: TimeRanges | undefined;
   videoDuration: number | undefined;
 
 
@@ -71,7 +76,7 @@ export enum ACTION_TYPES {
 
 export type Action = 
   | {type: ACTION_TYPES.RESET}
-  | {type: ACTION_TYPES.TOGGLE_REPEAT}
+  | {type: ACTION_TYPES.TOGGLE_REPEAT, payload?:{isRepeatOn: boolean}}
   | {type: ACTION_TYPES.TOGGLE_MUTE}
   | {type: ACTION_TYPES.ON_LOADED_METADATA, payload: {videoDuration: number}}
   | {type: ACTION_TYPES.MOVE_TIMECURSOR, payload:{ timeCursorOffset: number}}
@@ -79,7 +84,7 @@ export type Action =
   | {type: ACTION_TYPES.SET_PLAYBAR_LAYOUT, payload:{ playbarWidth: number}}
   | {type: ACTION_TYPES.SET_TRIM_DURATION, payload:{ trimDurationString: string}}
   | {type: ACTION_TYPES.SET_VIDEO_LOAD_PROGRESS, payload: {
-      videoLoadProgress: number
+      videoLoadProgress: TimeRanges
     }}
   | {type: ACTION_TYPES.MOVE_TRIM, payload:{
     trimStartSeconds: number,
@@ -96,6 +101,9 @@ export function reducer(state: State, action: Action): State {
       return {...state, ...action.payload};
     }
     case ACTION_TYPES.TOGGLE_REPEAT:{
+      if(action.payload){
+        return {...state, isRepeatOn: action.payload.isRepeatOn}
+      }
       return {...state, isRepeatOn: !state.isRepeatOn}
     }
     case ACTION_TYPES.TOGGLE_MUTE:{
@@ -159,7 +167,7 @@ export function reducer(state: State, action: Action): State {
         if (newTrimEnd > state.videoDuration){
           newTrimEnd = state.videoDuration;
           if (state.videoDuration - TRIM_OPTIONS[selected] >=0) {
-            newTrimStart = state.videoDuration - TRIM_OPTIONS[selected];
+            newTrimStart = roundToMilliseconds(state.videoDuration - TRIM_OPTIONS[selected]);
           }else{
             newTrimStart = 0;
           }
@@ -182,8 +190,8 @@ export function reducer(state: State, action: Action): State {
     case ACTION_TYPES.MOVE_TRIM:{
       return{
         ...state,
-        trimStartSeconds: action.payload.trimStartSeconds,
-        trimEndSeconds: action.payload.trimEndSeconds,
+        trimStartSeconds: roundToMilliseconds(action.payload.trimStartSeconds),
+        trimEndSeconds: roundToMilliseconds(action.payload.trimEndSeconds),
       }
     }
     case ACTION_TYPES.MOVE_TIMECURSOR:{

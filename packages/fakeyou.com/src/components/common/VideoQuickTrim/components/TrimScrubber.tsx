@@ -14,12 +14,14 @@ interface TrimScrubberPropsI extends withScrubbingPropsI {
   onChange:(newPos:number)=>void
 }
 export const TrimScrubber = memo(({
+  debug: propsDebug = false,
   trimStartSeconds,
   trimDuration,
   videoDuration,
   onChange,
   ...rest
 }:TrimScrubberPropsI)=>{
+  const debug = false || propsDebug;
 
   const TrimScrubberWithScrubbing = withScrubbing<TrimScrubberPropsI>(() => {
     return(
@@ -31,6 +33,7 @@ export const TrimScrubber = memo(({
 
   return (
     <TrimScrubberWithScrubbing
+      debug={debug}
       styleOverride={{
         top: '-1rem',
       }}

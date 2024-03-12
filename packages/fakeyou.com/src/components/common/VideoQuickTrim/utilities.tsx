@@ -1,18 +1,17 @@
 //For integration into other components 
 export const TIME_CURSOR_WIDTH = 8;
 export const MIN_VID_DURATION = 3;
+export const ONE_MS = 0.001;
 
 export type QuickTrimData = {
   trimStartSeconds: number;
   trimEndSeconds: number;
 }
 
-export function roundTo2Dec(floaty:number){
-  return Math.round(floaty*100)/100;
+export function roundToMilliseconds(floaty:number){
+  return Math.round(floaty*1000)/1000;
 }
-export function fractionToPercentage(fraction:number){
-  return roundTo2Dec(fraction * 100);
-}
+
 export function formatSecondsToHHMMSSCS(seconds:number){
   //example of the ISO String: 1970-01-01T00:01:40.774Z
   const isoString = new Date(seconds * 1000).toISOString();
