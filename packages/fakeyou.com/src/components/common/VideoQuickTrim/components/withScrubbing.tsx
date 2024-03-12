@@ -7,6 +7,7 @@ import React,{
 } from 'react';
 
 export interface withScrubbingPropsI {
+  debug?: boolean
   boundingWidth: number;
   scrubberWidth: number;
   scrubPosition?: number; // scrubber location as px
@@ -22,6 +23,7 @@ type withSrcubbingStates = {
 }
 
 export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.ComponentType<P>) => memo(({
+  debug: propsDebug = false,
   boundingWidth,
   scrubberWidth,
   scrubPosition: propsLeftOffset = 0,
@@ -29,10 +31,11 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   onScrubChanged,
   ...rest
 }: withScrubbingPropsI) => {
-  console.log(`withSCRUBBING reRENDERING!! `);
+  const debug = false ;//|| propsDebug;
+  if (debug) console.log(`withSCRUBBING reRENDERING!! `);
+
   const refEl = useRef<HTMLDivElement| null>(null);
   const refListener = useRef<number>(Date.now());
-
 
   const [{
     currLeftOffset, pointerStartPos,
@@ -44,7 +47,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   });
 
   useLayoutEffect(() => {
-    console.log(`withSCRUBBING useLAYOUTeffect!! `);
+    // if (debug) console.log(`withSCRUBBING useLAYOUTeffect!! `);
     function handleScrubStart (e: MouseEvent) {
       if(refEl.current){
         if(refEl.current.contains(e.target as Node)){
@@ -102,7 +105,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   }, [scrubberWidth, boundingWidth]);
 
   useEffect(()=>{
-    console.log(`withSCRUBBING useEFFECT!! `);
+    // if (debug) console.log(`withSCRUBBING useEFFECT!! `);
     if(onScrubChanged && boundingWidth > 0 && prevLeftOffset >= 0 && propsLeftOffset !== prevLeftOffset){
       onScrubChanged(prevLeftOffset);
     }

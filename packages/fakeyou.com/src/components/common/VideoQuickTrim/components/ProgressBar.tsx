@@ -12,6 +12,7 @@ import { TrimScrubber } from './TrimScrubber';
 import { PlayCursor } from './PlayCursor';
 
 export const ProgressBar = memo(({
+  debug: propsDebug = false,
   readyToMount,
   timeCursorOffset,
   trimStartSeconds,
@@ -23,6 +24,7 @@ export const ProgressBar = memo(({
   onPlayCursorChanged,
   dispatchCompState
 }:{
+  debug?: boolean;
   readyToMount: boolean;
   timeCursorOffset: number;
   trimStartSeconds: number;
@@ -30,10 +32,12 @@ export const ProgressBar = memo(({
   playbarWidth: number;
   scrubberWidth: number;
   videoDuration: number;
-  videoBuffered:TimeRanges | undefined;
+  videoBuffered: TimeRanges | undefined;
   onPlayCursorChanged: (newPos: number) => void;
   dispatchCompState: (action: Action) => void;
 })=>{
+  const debug = false || propsDebug;
+
   const playbarRef = useRef<HTMLDivElement | null>(null);
 
   const playbarRefCallback = useCallback(node => {
@@ -78,6 +82,7 @@ export const ProgressBar = memo(({
           <span className="played" style={{width: timeCursorOffset+"px"}} />
         </div>
         <TrimScrubber
+          debug={debug}
           boundingWidth={playbarWidth}
           scrubberWidth={scrubberWidth}
           trimStartSeconds={trimStartSeconds}
