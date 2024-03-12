@@ -106,7 +106,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
     if(onScrubChanged && boundingWidth > 0 && prevLeftOffset >= 0 && propsLeftOffset !== prevLeftOffset){
       onScrubChanged(prevLeftOffset);
     }
-  },[prevLeftOffset, boundingWidth, onScrubChanged]);
+  },[propsLeftOffset, prevLeftOffset, boundingWidth, onScrubChanged]);
 
   useEffect(()=>{
     // this takes a forced reset on leftoffset

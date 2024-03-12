@@ -1,6 +1,7 @@
 import React, {
   memo,
   useCallback,
+  useEffect,
   useReducer,
   useRef,
 } from "react";
@@ -30,10 +31,14 @@ import './styles.scss'
 
 interface VideoQuickTrimProps extends VideoFakeyouProps {
   onSelect: (values: QuickTrimData) => void;
+  trimStartSeconds: number;
+  trimEndSeconds: number;
 }
 
 export const VideoQuickTrim = memo(({
   onSelect,
+  trimStartSeconds: propsTrimStartSeconds,
+  trimEndSeconds : propsTrimEndSeconds,
   ...rest
 }: VideoQuickTrimProps) => {
   const { t } = useLocalize("VideoPlayerQuickTrim");
@@ -59,12 +64,6 @@ export const VideoQuickTrim = memo(({
           type: ACTION_TYPES.ON_LOADED_METADATA,
           payload:{ videoDuration: node.duration,}
         });
-          //TODO: this sbould be set in USEEFFECT
-          //IFF USEEFFECT starts working again
-          // onSelect({
-          //   trimStartSeconds: 0,
-          //   trimEndSeconds: 3,
-          // })
       };
 
       node.ontimeupdate = ()=>{
@@ -100,6 +99,21 @@ export const VideoQuickTrim = memo(({
     compState.playbarWidth,
     compState.isRepeatOn
   ]); //END videoRefCallback\
+
+  useEffect(()=>{
+    if( compState.trimStartSeconds
+      && compState.trimEndSeconds
+      && (
+        compState.trimStartSeconds !== propsTrimStartSeconds
+        || compState.trimEndSeconds !== propsTrimEndSeconds
+      )
+    ){
+        onSelect({
+          trimStartSeconds: compState.trimStartSeconds,
+          trimEndSeconds: compState.trimEndSeconds,
+        });
+      }
+  }, [onSelect, compState.trimStartSeconds, compState.trimEndSeconds, propsTrimStartSeconds, propsTrimEndSeconds])
 
   function videoCanPlay(){
     return (compState.playpause === PLAYPUASE_STATES.PAUSED 
@@ -162,6 +176,12 @@ export const VideoQuickTrim = memo(({
         videoBuffered={videoRef.current?.buffered}
         videoDuration={compState.videoDuration ||0}
         dispatchCompState={dispatchCompState}
+        onPlayCursorChanged={(newPos: number)=>{
+          if(videoRef.current !== null && videoRef.current.currentTime
+            && compState.playbarWidth && compState.videoDuration){
+            videoRef.current.currentTime = newPos / compState.playbarWidth * compState.videoDuration;
+          }
+        }}
       />
       <ControlBar
         readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}

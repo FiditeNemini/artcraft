@@ -126,6 +126,8 @@ export default function PageVSTApp() {
           <div className="col-12 col-md-6">
             {job.isSuccessful && job.maybe_result ? (
               <VideoQuickTrim
+                trimStartSeconds={0}
+                trimEndSeconds={0}
                 mediaToken={job.maybe_result.entity_token}
                 onSelect={(val: QuickTrimData) =>
                   handleOnChange({

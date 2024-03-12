@@ -20,6 +20,7 @@ export const ProgressBar = memo(({
   scrubberWidth,
   videoDuration,
   videoBuffered,
+  onPlayCursorChanged,
   dispatchCompState
 }:{
   readyToMount: boolean;
@@ -30,6 +31,7 @@ export const ProgressBar = memo(({
   scrubberWidth: number;
   videoDuration: number;
   videoBuffered:TimeRanges | undefined;
+  onPlayCursorChanged: (newPos: number) => void;
   dispatchCompState: (action: Action) => void;
 })=>{
   const playbarRef = useRef<HTMLDivElement | null>(null);
@@ -94,7 +96,7 @@ export const ProgressBar = memo(({
         />
         <PlayCursor 
           scrubPosition={timeCursorOffset}
-          onChanged={(onChangedVal)=>{console.log(onChangedVal)}}
+          onChanged={onPlayCursorChanged}
           boundingWidth={playbarWidth}
           scrubberWidth={8}
         />
