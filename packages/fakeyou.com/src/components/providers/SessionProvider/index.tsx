@@ -1,1 +1,1 @@
-export { default } from "./SessionProvider";
+export { default, SessionContext } from "./SessionProvider";

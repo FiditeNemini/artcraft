@@ -4,7 +4,7 @@ import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/Infer
 import { TempSelect as Select } from "components/common";
 import { enumToKeyArr } from "resources";
 import ModalHeader from "../ModalHeader";
-import { useLocalize } from "hooks";
+import { useLocalize, useSession } from "hooks";
 
 interface Props {
   handleClose?: any;
@@ -18,6 +18,7 @@ export default function InferenceJobsModal({
   showModalHeader = true,
   ...rest
 }: Props) {
+  const { canAccessStudio } = useSession();
   const presetFilter = enumToKeyArr(FrontendInferenceJobType)[inJobType];
   const [jobType,jobTypeSet] = useState(inJobType > -1 ? presetFilter : "All");
   const typeObj = ["All", ...Object.values(FrontendInferenceJobType)];
@@ -38,7 +39,7 @@ export default function InferenceJobsModal({
   return (
     <>
       { showModalHeader && <ModalHeader {...{ handleClose, title: t("core.jobsTitle") }} /> }
-      {
+      { canAccessStudio() &&
         <Select {...{ onChange: ({ target }: { target: any }) => jobTypeSet(target.value), options, value: jobType }} />
       }
       <InferenceJobsList
