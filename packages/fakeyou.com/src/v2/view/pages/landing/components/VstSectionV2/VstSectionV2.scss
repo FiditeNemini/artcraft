@@ -1,5 +1,13 @@
 @import "scss/colours.scss";
 
+video::-webkit-media-controls {
+  display: none;
+}
+
+video::-webkit-media-controls-start-playback-button {
+  display: none;
+}
+
 .vst-section {
   padding-top: 5rem;
   padding-bottom: 5rem;

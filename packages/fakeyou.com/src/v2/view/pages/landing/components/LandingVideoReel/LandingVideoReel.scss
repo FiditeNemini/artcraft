@@ -1,5 +1,13 @@
 @import "scss/colours.scss";
 
+video::-webkit-media-controls {
+  display: none;
+}
+
+video::-webkit-media-controls-start-playback-button {
+  display: none;
+}
+
 .storyteller-landing-reel {
   display: flex;
   height: 74vh;

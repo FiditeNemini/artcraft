@@ -45,7 +45,7 @@ export default function LandingVideoReel(props: LandingVideoReelProps) {
 
   return (
     <div className="storyteller-landing-reel">
-      <video autoPlay muted loop>
+      <video autoPlay muted loop controls={false} playsInline>
         <source src="/videos/landing-reel.mp4" type="video/mp4" />
       </video>
       <div className="reel-overlay">
