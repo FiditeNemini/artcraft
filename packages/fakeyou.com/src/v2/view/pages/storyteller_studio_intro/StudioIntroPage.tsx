@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
-import { Button } from "components/common";
+import { Button, SegmentButtons } from "components/common";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { useParams, useHistory } from "react-router-dom";
 import { useInferenceJobs } from "hooks";
@@ -19,6 +19,7 @@ interface Props {
 }
 
 function StudioIntroPage(props: Props) {
+  const [camera,cameraSet] = useState("rotation");
   const { mediaToken } = useParams<{ mediaToken: string }>();
 
   const history = useHistory();
@@ -60,6 +61,7 @@ function StudioIntroPage(props: Props) {
     EnqueueEngineCompositing("", {
       uuid_idempotency_token: uuidv4(),
       media_file_token: savedMediaToken,
+      // maybe_camera_preset: camera // HERE IS THE CAMERA SELECT VALUE -V
     }).then((res: any) => {
       if (res && res.success) {
         inferenceJobs.enqueue(res.inference_job_token, true); // noModalPls = true
@@ -67,6 +69,20 @@ function StudioIntroPage(props: Props) {
       }
     });
   };
+
+  const cameraOpts = [{
+    label: "Rotation",
+    value: "rotation"
+  },{
+    label: "Zoom",
+    value: "zoom"
+  },{
+    label: "Pan",
+    value: "pan"
+  },{
+    label: "Static",
+    value: "static"
+  }];
 
   return (
     <div className="studio-intro-page">
@@ -77,8 +93,18 @@ function StudioIntroPage(props: Props) {
         className="flex-grow-1"
         onSceneSavedCallback={onSaveCallback}
       />
-      <div className="d-flex justify-content-center p-3">
-        <Button label="Create Movie from 3D Scene" onClick={onClick} />
+      <div {...{ className: "studio-intro-exporter" }}>
+        <div {...{ className: "exporter-title" }}>
+        <span>
+          Add camera motion to render
+        </span>
+        </div>
+        <div {...{ className: "exporter-controls" }}>
+          <SegmentButtons {...{ onChange: ({ target }: { target: any }) => {
+            cameraSet(target.value)
+          }, options: cameraOpts, value: camera }}/>
+          <Button label="Create Movie from 3D Scene" onClick={onClick} />
+        </div>
       </div>
     </div>
   );
