@@ -51,10 +51,10 @@ export default function LandingVideoReel(props: LandingVideoReelProps) {
       <div className="reel-overlay">
         <div className="container h-100">
           <div className="text-center text-white d-flex flex-column justify-content-center align-items-center zi-2 h-100">
-            <h1 className="display-3 fw-bold">
+            <h1 className="storyteller-landing-heading fw-bold">
               Enabling Anyone to Make Professional Film, Animation, and Music
             </h1>
-            <h5 className="fw-normal mb-2 mt-2 w-75 lh-base opacity-75">
+            <h5 className="fw-normal mb-2 mt-2 lh-base opacity-75 storyteller-landing-sub-text">
               StorytellerAI's powerful new engine combines Generative AI and
               User Generated Content to radically democratize both audio and
               video production.

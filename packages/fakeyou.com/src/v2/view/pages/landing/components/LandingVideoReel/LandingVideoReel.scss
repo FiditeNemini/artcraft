@@ -31,4 +31,34 @@
       z-index: 1;
     }
   }
+
+  .storyteller-landing-heading {
+    font-size: 52px;
+  }
+
+  .storyteller-landing-sub-text {
+    max-width: 900px;
+    font-size: 18px;
+  }
+
+  @media screen and (max-width: 992px) {
+    .storyteller-landing-heading {
+      font-size: 44px;
+    }
+
+    .storyteller-landing-sub-text {
+      max-width: 100%;
+      font-size: 16px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .storyteller-landing-heading {
+      font-size: 32px;
+    }
+
+    .storyteller-landing-sub-text {
+      font-size: 16px;
+    }
+  }
 }
