@@ -73,12 +73,12 @@ export default function PageVSTApp({
             trimStartSeconds={vstValues.trimStart}
             trimEndSeconds={vstValues.trimEnd}
             mediaToken={vstValues.fileToken}
-            onSelect={(val: QuickTrimData) =>
+            onSelect={(val: QuickTrimData) =>{
               handleOnChange({
                 trimStart: val.trimStartSeconds,
                 trimEnd: val.trimEndSeconds,
               })
-            }
+            }}
             onResponse={res => {
               dispatchPageState({
                 type: "loadFileSuccess",
