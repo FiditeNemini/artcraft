@@ -37,7 +37,7 @@ export const ControlBar = memo(({
   handlePlaypause: ()=>void;
   dispatchCompState: (action: Action) => void;
 })=>{
-  const debug = false || propsDebug;
+  const debug = false;// || propsDebug;
   if (debug) console.log("ControlBar reRENDERED!!");
   
   function handleSetTrimDuration(selected: string){

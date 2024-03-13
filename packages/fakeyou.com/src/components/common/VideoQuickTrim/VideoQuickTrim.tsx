@@ -132,21 +132,28 @@ export const VideoQuickTrim = memo(({
       }
   }, [onSelect, compState.trimStartSeconds, compState.trimEndSeconds, propsTrimStartSeconds, propsTrimEndSeconds])
 
-  function videoCanPlay(){
-    return (compState.playpause === PLAYPUASE_STATES.PAUSED 
-      || compState.playpause === PLAYPUASE_STATES.ENDED
-      || compState.playpause === PLAYPUASE_STATES.READY
-    );
-  }
-  function handlePlaypause(){
-    if (videoCanPlay()){
-      videoRef.current?.play();
-    }else if (compState.playpause === PLAYPUASE_STATES.PLAYING){
-      videoRef.current?.pause();
-    }else {
-      console.log('Playpause is triggered while it is NOT_READY');
+  const togglePlaypause = useCallback(()=>{
+    if (videoRef.current=== null){
+      console.log('Playpause is toggled while it is NOT_READY');
+    }else if(videoRef.current.paused){
+      videoRef.current.play();
+    }else{
+      videoRef.current.pause();
     }
-  };
+  }, []);
+
+  const handlePlaypause = useCallback((shouldPlay: boolean)=>{
+    if(videoRef.current){
+      if(shouldPlay){
+        videoRef.current.play();
+      }else {
+        videoRef.current.pause();
+      }
+    }else{
+      console.log('Playpause is handled while it is NOT_READY');
+    }
+  }, []);
+
   function disableRepeatOn(){
     dispatchCompState({
       type: ACTION_TYPES.TOGGLE_REPEAT,
@@ -165,8 +172,8 @@ export const VideoQuickTrim = memo(({
           {...rest}
         />
         {compState.playpause !== PLAYPUASE_STATES.NOT_READY &&
-          <div className="playpause-overlay" onClick={handlePlaypause}>
-            {videoCanPlay() && (
+          <div className="playpause-overlay" onClick={togglePlaypause}>
+            {videoRef.current !==null && videoRef.current.paused && (
               <FontAwesomeIcon
                 className="playpause-icon"
                 icon={faPlay}
@@ -199,6 +206,7 @@ export const VideoQuickTrim = memo(({
         scrubberWidth={compState.scrubberWidth ||0}
         videoBuffered={compState.videoLoadProgress || undefined}
         videoDuration={compState.videoDuration ||0}
+        handlePlaypause={handlePlaypause}
         dispatchCompState={dispatchCompState}
         onPlayCursorChanged={(newPos: number)=>{
           if(videoRef.current !== null && videoRef.current.currentTime
@@ -223,7 +231,7 @@ export const VideoQuickTrim = memo(({
         isMuted={compState.isMuted}
         isRepeatOn={compState.isRepeatOn}
         playpause={compState.playpause}
-        handlePlaypause={handlePlaypause}
+        handlePlaypause={togglePlaypause}
         dispatchCompState={dispatchCompState}
       />
     </div>

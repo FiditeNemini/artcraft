@@ -17,7 +17,7 @@ export const PlayCursor = ({
 
   return(
     <PlayCursorWithScrubbing
-      onScrubChanged={onChanged}
+      onScrubEnd={onChanged}
       {...rest}
     />
   );

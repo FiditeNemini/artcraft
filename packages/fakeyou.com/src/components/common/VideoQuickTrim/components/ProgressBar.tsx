@@ -22,6 +22,7 @@ export const ProgressBar = memo(({
   videoDuration,
   videoBuffered,
   onPlayCursorChanged,
+  handlePlaypause,
   dispatchCompState
 }:{
   debug?: boolean;
@@ -34,6 +35,7 @@ export const ProgressBar = memo(({
   videoDuration: number;
   videoBuffered: TimeRanges | undefined;
   onPlayCursorChanged: (newPos: number) => void;
+  handlePlaypause: (shouldPlay:boolean)=>void;
   dispatchCompState: (action: Action) => void;
 })=>{
   const debug = false || propsDebug;
@@ -88,6 +90,7 @@ export const ProgressBar = memo(({
           trimStartSeconds={trimStartSeconds}
           trimDuration={trimDuration}
           videoDuration={videoDuration}
+          handlePlaypause={()=>handlePlaypause(false)}
           onChange={(newPos: number)=>{
             const newTrimStartSeconds = newPos / (playbarWidth) * videoDuration;
             dispatchCompState({
@@ -97,6 +100,7 @@ export const ProgressBar = memo(({
                 trimEndSeconds: newTrimStartSeconds + trimDuration
               }
             });
+            handlePlaypause(true);
           }}
         />
         <PlayCursor 

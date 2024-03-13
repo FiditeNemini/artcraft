@@ -12,7 +12,9 @@ export interface withScrubbingPropsI {
   scrubberWidth: number;
   scrubPosition?: number; // scrubber location as px
   styleOverride?: {[key: string]: string|number };
-  onScrubChanged?: (newPos: number)=>void;
+  onScrubStart?: ()=>void;
+  //only deal with event side effecrts
+  onScrubEnd?: (newPos: number)=>void;
   //return scrubber location as px
 }
 
@@ -28,10 +30,11 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   scrubberWidth,
   scrubPosition: propsLeftOffset = 0,
   styleOverride = {},
-  onScrubChanged,
+  onScrubStart,
+  onScrubEnd,
   ...rest
 }: withScrubbingPropsI) => {
-  const debug = false ;//|| propsDebug;
+  const debug = true; //|| propsDebug;
   if (debug) console.log(`withSCRUBBING reRENDERING!! `);
 
   const refEl = useRef<HTMLDivElement| null>(null);
@@ -49,6 +52,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   useLayoutEffect(() => {
     // if (debug) console.log(`withSCRUBBING useLAYOUTeffect!! `);
     function handleScrubStart (e: MouseEvent) {
+      if (debug) console.log(`withSCRUBBING SCRUB_START!! `);
       if(refEl.current){
         if(refEl.current.contains(e.target as Node)){
           setStates((curr)=>({
@@ -60,6 +64,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
       }
     };
     function handleScrubEnd (e: MouseEvent){
+      if (debug) console.log(`withSCRUBBING SCRUB_END!! `);
       e.preventDefault();
       e.stopPropagation();
       setStates((curr)=>({
@@ -70,8 +75,10 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
       })); 
     };
     function handleScrubMove (e: MouseEvent){
+      if (debug) console.log(`withSCRUBBING SCRUB_MOVE!! `);
       e.preventDefault();
       e.stopPropagation();
+      
       setStates((curr)=>{
         if(curr.pointerStartPos >= 0 && curr.pointerStartPos!==null){
           let newLeftOffset = curr.prevLeftOffset + e.clientX - curr.pointerStartPos;
@@ -105,11 +112,18 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   }, [scrubberWidth, boundingWidth]);
 
   useEffect(()=>{
-    // if (debug) console.log(`withSCRUBBING useEFFECT!! `);
-    if(onScrubChanged && boundingWidth > 0 && prevLeftOffset >= 0 && propsLeftOffset !== prevLeftOffset){
-      onScrubChanged(prevLeftOffset);
+    if (debug) console.log(`withSCRUBBING useEFFECT for scrubStart!! `);
+    if(onScrubStart && pointerStartPos > 0){
+      onScrubStart();
     }
-  },[propsLeftOffset, prevLeftOffset, boundingWidth, onScrubChanged]);
+  },[pointerStartPos, onScrubStart]);
+
+  useEffect(()=>{
+    if (debug) console.log(`withSCRUBBING useEFFECT for scrubEend!! `);
+    if(onScrubEnd && boundingWidth > 0 && prevLeftOffset >= 0 && propsLeftOffset !== prevLeftOffset){
+      onScrubEnd(prevLeftOffset);
+    }
+  },[propsLeftOffset, prevLeftOffset, boundingWidth, onScrubEnd]);
 
   useEffect(()=>{
     // this takes a forced reset on leftoffset
