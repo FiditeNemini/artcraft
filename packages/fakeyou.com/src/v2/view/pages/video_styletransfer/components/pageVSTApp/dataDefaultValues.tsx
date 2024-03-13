@@ -1,7 +1,9 @@
-import { defaultPreset as defaultCN } from "./dataCnPresets";
+// import { defaultPreset as defaultCN } from "./dataCnPresets";
 import styleModels from "./dataStyleModels";
+import { VSTType } from "./helpers";
 export {initialValues, hiddenValues};
-const initialValues = {
+
+const initialValues: VSTType = {
   //files Settings
   fileToken: "",
   outputPath: "vid2vid/SparseUpscaleInterp_00001.mp4",
@@ -17,17 +19,33 @@ const initialValues = {
   workflowConfig: "weight_0a04e66y14t4e2bwxjfyg1mb2",
   sdModelToken: styleModels[0].weight_token,
   sdModelTitle: styleModels[0].title,
-  loraModelToken: "",
-  loraModelStrength: 0,
+  // loraModelToken: "",
+  // loraModelStrength: 0,
 
   //basics
   inputFps: 24,
-  posPrompt: "perfect anime illustration,(best-quality:0.8),",
-  negPrompt: "",
+  ...styleModels[0].defaultPrompts,
+  // positivePrompt:"",
+  // negativePrompt:"",
+  // positivePromptHidden:"",
+  // negativePromptHidden:"",
   visibility: "private",
 
   //Control Net
-  ...defaultCN
+  ...styleModels[0].defaultCN,
+  // cnCanny: 0,
+  // cnDepth: 0,
+  // cnLineArtAnime: 0,
+  // cnLineArtRealistic: 0,
+  // cnLipsStrength: 0,
+  // cnOpenPose: 0,
+  // cnPipeFace: 0,
+  // cnSparseScribble: 0,
+  // cnSoftEdge: 0,
+  // cnRegularSteps: 0,
+
+  defaultCN:styleModels[0].defaultCN,
+  defaultPrompts:styleModels[0].defaultPrompts,
 };
 
 const hiddenValues = {

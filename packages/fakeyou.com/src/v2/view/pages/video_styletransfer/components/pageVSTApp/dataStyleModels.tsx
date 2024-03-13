@@ -33,7 +33,25 @@ const styleModels = [
         "bookmark_count": 1
     },
     "created_at": "2024-02-28T21:00:43Z",
-    "updated_at": "2024-02-28T21:00:43Z"
+    "updated_at": "2024-02-28T21:00:43Z",
+    defaultCN:{
+        cnCanny: 0,
+        cnDepth: 0,
+        cnLineArtAnime: 0.7,
+        cnLineArtRealistic: 0,
+        cnLipsStrength: 0,
+        cnOpenPose: 1,
+        cnPipeFace: 0,
+        cnSparseScribble: 0,
+        cnSoftEdge: 1,
+        cnRegularSteps: 20,
+    },
+    defaultPrompts:{
+        positivePrompt:"perfect anime illustration,(best-quality:0.8),",
+        negativePrompt:"",
+        positivePromptHidden:"",
+        negativePromptHidden:"flare, lens flare, glare,naked, nsfw, text, logo, watermark:1.3, letterboxed,embedding:easynegative,  embedding:badhandv4,(worst quality, low quality:1.4), lowres, blurry, monochrome, ",
+    }
   },
 //   {
 //     "weight_token": "weight_vbz0wq7wkv80casj3vfptrrpg",

@@ -75,23 +75,23 @@ export default function PageVSTApp() {
 
   const styleOptions = [
     {
-      label: "Anime",
-      imageUrl: "/images/dummy-image.jpg",
+      label: "2D Anime",
+      imageUrl: "/images/landing/onboarding/styles/style-2d-anime.webp",
       token: "weight_yqexh77ntqyawzgh9fzash798",
     },
     {
-      label: "Pixel",
-      imageUrl: "/images/dummy-image-2.jpg",
+      label: "3D Cartoon",
+      imageUrl: "/images/landing/onboarding/styles/style-3d-cartoon.webp",
       token: "weight_yqexh77ntqyawzgh9fzash798",
     },
     {
-      label: "Painting",
-      imageUrl: "/images/dummy-image-3.jpg",
+      label: "Ink B&W",
+      imageUrl: "/images/landing/onboarding/styles/style-ink-bw.webp",
       token: "weight_yqexh77ntqyawzgh9fzash798",
     },
     {
-      label: "Ink",
-      imageUrl: "/images/dummy-image-4.jpg",
+      label: "Origami",
+      imageUrl: "/images/landing/onboarding/styles/style-origami.webp",
       token: "weight_yqexh77ntqyawzgh9fzash798",
     },
   ];

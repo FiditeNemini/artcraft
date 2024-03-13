@@ -10,31 +10,31 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
 
   const cards = [
     {
-      text: "Scene 1",
-      backgroundImage: "",
+      text: "Room Scene",
+      backgroundImage: "/images/landing/onboarding/room-scene-thumbnail.webp",
       onClick: () => {
-        history.push("/studio-intro/");
+        history.push("/studio-intro/m_ejhs95fc5aybp36h4a79k7523ds6an");
       },
     },
     {
       text: "Scene 2",
       backgroundImage: "",
       onClick: () => {
-        history.push("/studio-intro/");
+        history.push("/studio-intro");
       },
     },
     {
       text: "Scene 3",
       backgroundImage: "",
       onClick: () => {
-        history.push("/studio-intro/");
+        history.push("/studio-intro");
       },
     },
     {
       text: "Scene 4",
       backgroundImage: "",
       onClick: () => {
-        history.push("/studio-intro/");
+        history.push("/studio-intro");
       },
     },
   ];

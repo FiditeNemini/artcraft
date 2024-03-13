@@ -8,6 +8,7 @@ import { SelectModalV2 } from "components/common/SelectModal";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 
 import styleModels from './dataStyleModels';
+import { defaultPreset as noStyleCNPreset } from './dataCnPresets';
 
 export default function CompStyleModal({
   debug,
@@ -19,7 +20,8 @@ export default function CompStyleModal({
   t: Function;
   value: string;
   onChange: (val: {
-    [key: string]: number | string | boolean | undefined;
+    [key: string]: number | string | boolean | undefined 
+    | {[key: string]: number | string };
   }) => void;
 }){
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -34,6 +36,18 @@ export default function CompStyleModal({
       onClear={()=>onChange({
         sdModelToken: "",
         sdModelTitle: "",
+        defaultCN: noStyleCNPreset,
+        defaultPrompts:{
+          positivePrompt:"",
+          negativePrompt:"",
+          positivePromptHidden:"",
+          negativePromptHidden:"",
+        },
+        ...noStyleCNPreset,
+        positivePrompt:"",
+        negativePrompt:"",
+        positivePromptHidden:"",
+        negativePromptHidden:"",
       })}
     >
       <MasonryGrid
@@ -46,11 +60,20 @@ export default function CompStyleModal({
           type: "weights",
           inSelectModal: true,
           onResultSelect: (data: any)=>{
-            onChange({
-              sdModelToken:data.token,
-              sdModelTitle: data.title,
-            })
-            setOnSelectTimeStamp(new Date());
+            const selectedStyle = styleModels.find(
+              (styleItem)=>styleItem.weight_token = data.token
+            );
+            if(selectedStyle!==undefined){
+              onChange({
+                sdModelToken:data.token,
+                sdModelTitle: data.title,
+                defaultCN: selectedStyle.defaultCN,
+                defaultPrompts: selectedStyle.defaultPrompts,
+                ...selectedStyle.defaultCN,
+                ...selectedStyle.defaultPrompts
+              });
+              setOnSelectTimeStamp(new Date());
+            }
           }
         };
         //console.log(data);

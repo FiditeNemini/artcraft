@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from "uuid";
-import { hiddenValues } from "./dataDefaultValues";
 
 export type VSTType = {
   // File Settings
@@ -21,8 +20,10 @@ export type VSTType = {
 
   //basics
   inputFps: number;
-  posPrompt: string;
-  negPrompt: string;
+  positivePrompt: string;
+  negativePrompt: string;
+  positivePromptHidden:string,
+  negativePromptHidden:string,
   visibility: string;
 
   //advance
@@ -36,6 +37,25 @@ export type VSTType = {
   cnSparseScribble: number;
   cnSoftEdge: number;
   cnRegularSteps: number
+
+  defaultCN: {
+    cnCanny: number;
+    cnDepth: number;
+    cnLineArtAnime: number;
+    cnLineArtRealistic: number;
+    cnLipsStrength: number;
+    cnOpenPose: number;
+    cnPipeFace: number;
+    cnSparseScribble: number;
+    cnSoftEdge: number;
+    cnRegularSteps: number
+  },
+  defaultPrompts:{
+    positivePrompt:string,
+    negativePrompt:string,
+    positivePromptHidden:string,
+    negativePromptHidden:string,
+  }
 }
 
 export function isInputValid(keyValues: {[key:string]:number|string|boolean|undefined}){
@@ -61,9 +81,9 @@ export function mapRequest(vstValues: VSTType){
     "maybe_json_modifications": {
       "$.154.inputs.Value": vstValues.inputFps,
       "$.510.inputs.Text":
-        hiddenValues.posPrompt + vstValues.posPrompt,
+        vstValues.positivePromptHidden + vstValues.positivePrompt,
       "$.8.inputs.text": 
-        hiddenValues.negPrompt+ vstValues.negPrompt,
+        vstValues.negativePromptHidden+ vstValues.negativePrompt,
 
       "$.401.inputs.Value": 0.7, //Denoise First Pass
       "$.140.inputs.Value": 1,     // Every nth frame
