@@ -18,6 +18,7 @@ export function TableOfKeyValues(
   title: string;
   keyValues:{
     [key:string]:number|string|boolean|undefined
+      |{ [key:string]:number|string}
   };
   height?: number | string
 }){
@@ -33,7 +34,9 @@ export function TableOfKeyValues(
     <tr><th>{title}</th></tr>
     {
       Object.entries(keyValues).map(([key, val], index: number)=>{
-        return <tr key={index}><td>{`${key}`}</td><td>{`${val}`}</td></tr>
+        if(key!=="defaultCN" && key!=="defaultPrompts")
+          return <tr key={index}><td>{`${key}`}</td><td>{`${val}`}</td></tr>
+        else return null
       })
     }
   </tbody></table>);

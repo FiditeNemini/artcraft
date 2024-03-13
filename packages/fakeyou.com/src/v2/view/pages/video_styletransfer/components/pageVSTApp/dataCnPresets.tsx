@@ -10,13 +10,13 @@ type CNPreset =
 const defaultPreset = {
   cnCanny: 0,
   cnDepth: 0,
-  cnLineArtAnime: 0.7,
+  cnLineArtAnime: 0,
   cnLineArtRealistic: 0,
   cnLipsStrength: 0,
-  cnOpenPose: 1,
+  cnOpenPose: 0,
   cnPipeFace: 0,
   cnSparseScribble: 0,
-  cnSoftEdge: 1,
+  cnSoftEdge: 0,
   cnRegularSteps: 20,
 }
 
