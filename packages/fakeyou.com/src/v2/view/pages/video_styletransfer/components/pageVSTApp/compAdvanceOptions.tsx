@@ -25,18 +25,20 @@ import {
   fullbodyPreset,
   landscapePreset,
   typogPreset,
-  defaultPreset,
+  // defaultPreset,
 } from "./dataCnPresets";
 
 export default function CompAdvanceOptions({
-  debug,
+  debug: propsDebug = false,
   t,
   vstValues: vstVal,
   onChange: handleOnChange,
+  currDefaultCN: defaultPreset
 }: {
   debug?: boolean;
   t: Function;
   vstValues: VSTType;
+  currDefaultCN: {[key: string]: number};
   onChange: (val: {
     [key: string]: number | string | boolean | undefined;
   }) => void;

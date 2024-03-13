@@ -38,7 +38,13 @@ export default function PageVSTApp({
   });
 
   const handleOnChange = (val: {
-    [key: string]: number | string | boolean | undefined;
+    [key: string]:
+      number | 
+      string | 
+      boolean | 
+      undefined |
+      {[key: string]: number | string}
+      ;
   }) => {
     setVstValues(curr => ({ ...curr, ...val }));
   };
@@ -97,7 +103,7 @@ export default function PageVSTApp({
               placeholder: t("input.placeholder.prompt"),
               onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 handleOnChange({ posPrompt: e.target.value }),
-              value: vstValues.posPrompt,
+              value: vstValues.positivePrompt,
               required: false,
             }}
           />
@@ -107,7 +113,7 @@ export default function PageVSTApp({
               placeholder: t("input.placeholder.negPrompt"),
               onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 handleOnChange({ negPrompt: e.target.value }),
-              value: vstValues.negPrompt,
+              value: vstValues.negativePrompt,
               required: false,
             }}
           />
@@ -121,6 +127,7 @@ export default function PageVSTApp({
           <CompAdvanceOptions
             debug={debug}
             t={t}
+            currDefaultCN={vstValues.defaultCN}
             onChange={handleOnChange}
             vstValues={vstValues}
           />
