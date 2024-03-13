@@ -118,18 +118,19 @@ export const VideoQuickTrim = memo(({
   ]); //END videoRefCallback\
 
   useEffect(()=>{
-    if( compState.trimStartSeconds
-      && compState.trimEndSeconds
+    if( compState.trimStartSeconds !== undefined
+      && compState.trimEndSeconds !== undefined
       && (
         compState.trimStartSeconds !== propsTrimStartSeconds
         || compState.trimEndSeconds !== propsTrimEndSeconds
       )
     ){
-        onSelect({
-          trimStartSeconds: compState.trimStartSeconds,
-          trimEndSeconds: compState.trimEndSeconds,
-        });
-      }
+      console.log(`TRIM on useEFFECT: calling onSELECT`);
+      onSelect({
+        trimStartSeconds: compState.trimStartSeconds,
+        trimEndSeconds: compState.trimEndSeconds,
+      });
+    }
   }, [onSelect, compState.trimStartSeconds, compState.trimEndSeconds, propsTrimStartSeconds, propsTrimEndSeconds])
 
   const togglePlaypause = useCallback(()=>{
