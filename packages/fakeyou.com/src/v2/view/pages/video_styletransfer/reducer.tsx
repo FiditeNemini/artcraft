@@ -82,6 +82,5 @@ export function reducer (state: State, action: Action): State {
     case 'reset':
     default:
       return {status: states.NO_FILE};
-      
   }
 }
