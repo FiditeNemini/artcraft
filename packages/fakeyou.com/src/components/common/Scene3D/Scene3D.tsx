@@ -26,6 +26,12 @@ interface Scene3DProps {
   // CSS classes to apply to the engine
   className?: string;
 
+  // Callback when the scene is first loaded
+  // Not always 100% true. Sometimes it prematurely fires.
+  onSceneReadyCallback?: () => void;
+
+  // Callback called when the scene is saved.
+  // It will receive the argument of the new scene media token.
   onSceneSavedCallback?: (mediaToken: string) => void;
 }
 
@@ -35,6 +41,7 @@ export default function Scene3D({
   skybox,
   fullScreen = false,
   className,
+  onSceneReadyCallback,
   onSceneSavedCallback,
 }: Scene3DProps) {
 
@@ -54,6 +61,10 @@ export default function Scene3D({
 
       console.log("studio-ready message (2)");
 
+      if (onSceneReadyCallback !== undefined) { 
+        onSceneReadyCallback();
+      }
+
       // NB: Example of how to call the API in the other direction:
       //  studio.postMessage("save-scene", engineBaseUrl);
     } else if (
@@ -70,7 +81,7 @@ export default function Scene3D({
     } else if (event.data === "scene-save-failed") {
       console.error("Failed to save the scene!");
     }
-  }, [onSceneSavedCallback]);
+  }, [onSceneReadyCallback, onSceneSavedCallback]);
 
 
   useEffect(() => {

@@ -43,7 +43,6 @@ export default function FbxToGltfPage({
   const { inferenceJobs } = useInferenceJobs(
     FrontendInferenceJobType.ConvertFbxtoGltf
   );
-  const hasConversionJobs = inferenceJobs && inferenceJobs.length > 0;
 
   console.log("inferenceJobs", inferenceJobs);
 
@@ -151,11 +150,9 @@ export default function FbxToGltfPage({
         imageUrl="/images/header/fbx-to-gltf.png"
       />
 
-      {hasConversionJobs && (
         <div className="mb-4">
           <FbxToGltfJobList />
         </div>
-      )}
 
       <Panel padding={true}>
         <div className="d-flex flex-column gap-3">

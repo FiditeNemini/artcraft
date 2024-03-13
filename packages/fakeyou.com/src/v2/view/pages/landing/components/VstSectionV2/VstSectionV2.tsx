@@ -1,5 +1,5 @@
 import { Badge, Panel } from "components/common";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import "./VstSectionV2.scss";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -22,39 +22,40 @@ interface VstSectionV2Props {}
 export default function VstSectionV2(props: VstSectionV2Props) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
+  // const [isPlaying, setIsPlaying] = useState(true);
 
   // const togglePlayback = () => {
   //   setIsPlaying(!isPlaying);
   // };
 
-  const handleVideoPlay = () => {
-    if (!isPlaying) {
-      setIsPlaying(true);
-    }
-  };
+  // const handleVideoPlay = () => {
+  //   if (!isPlaying) {
+  //     setIsPlaying(true);
+  //   }
+  // };
 
-  const handleVideoPause = () => {
-    if (isPlaying) {
-      setIsPlaying(false);
-    }
-  };
+  // const handleVideoPause = () => {
+  //   if (isPlaying) {
+  //     setIsPlaying(false);
+  //   }
+  // };
 
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  // const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  useEffect(() => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.play();
-      } else {
-        videoRef.current.pause();
-      }
-    }
-  }, [isPlaying]);
+  // useEffect(() => {
+  //   if (videoRef.current) {
+  //     if (isPlaying) {
+  //       videoRef.current.play();
+  //     } else {
+  //       videoRef.current.pause();
+  //     }
+  //   }
+  // }, [isPlaying]);
 
   const videoSet = [
     {
       src: "/videos/landing/vst/1-original.mp4",
+      thumbnail: "/videos/landing/vst/1-original.jpg",
       styledVideos: [
         {
           src: "/videos/landing/vst/1-2d_flat_anime.mp4",
@@ -80,6 +81,7 @@ export default function VstSectionV2(props: VstSectionV2Props) {
     },
     {
       src: "/videos/landing/vst/2-original.mp4",
+      thumbnail: "/videos/landing/vst/2-original.jpg",
       styledVideos: [
         {
           src: "/videos/landing/vst/2-2d_flat_anime.mp4",
@@ -157,16 +159,17 @@ export default function VstSectionV2(props: VstSectionV2Props) {
                     muted
                     playsInline
                     controls={false}
+                    preload="auto"
                     key={`${index}-${activeIndex}`}
-                    onPlay={handleVideoPlay}
-                    onPause={handleVideoPause}
-                    ref={videoRef => {
-                      if (videoRef && isPlaying) {
-                        videoRef.play();
-                      } else if (videoRef) {
-                        videoRef.pause();
-                      }
-                    }}
+                    // onPlay={handleVideoPlay}
+                    // onPause={handleVideoPause}
+                    // ref={videoRef => {
+                    //   if (videoRef && isPlaying) {
+                    //     videoRef.play();
+                    //   } else if (videoRef) {
+                    //     videoRef.pause();
+                    //   }
+                    // }}
                   >
                     <source src={video.src} type="video/mp4" />
                     Your browser does not support the video tag.
@@ -186,10 +189,10 @@ export default function VstSectionV2(props: VstSectionV2Props) {
             {videoSet.map((video, index) => (
               <SwiperSlide key={index}>
                 <div className="ratio ratio-16x9 vst-carousel-panel">
-                  <video loop muted playsInline controls={false}>
-                    <source src={video.src} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
+                  <img
+                    src={video.thumbnail}
+                    alt="Demo Original Video Thumbnail"
+                  />
                 </div>
               </SwiperSlide>
             ))}
@@ -218,16 +221,17 @@ export default function VstSectionV2(props: VstSectionV2Props) {
                   muted
                   playsInline
                   controls={false}
+                  preload="auto"
                   key={styledVideo.src}
-                  onPlay={handleVideoPlay}
-                  onPause={handleVideoPause}
-                  ref={videoRef => {
-                    if (videoRef && isPlaying) {
-                      videoRef.play();
-                    } else if (videoRef) {
-                      videoRef.pause();
-                    }
-                  }}
+                  // onPlay={handleVideoPlay}
+                  // onPause={handleVideoPause}
+                  // ref={videoRef => {
+                  //   if (videoRef && isPlaying) {
+                  //     videoRef.play();
+                  //   } else if (videoRef) {
+                  //     videoRef.pause();
+                  //   }
+                  // }}
                 >
                   <source src={styledVideo.src} type="video/mp4" />
                   Your browser does not support the video tag.

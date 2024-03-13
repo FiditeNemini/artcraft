@@ -6,6 +6,5 @@ interface Props {
 
 export default function ServerStatusChecker({ value }: Props) {
   useStatusPoll();
-  console.log("🤬",);
   return null;
 };

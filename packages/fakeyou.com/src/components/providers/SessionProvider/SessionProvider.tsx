@@ -1,18 +1,69 @@
-import React, { useState } from "react";
-import { SessionContext } from "context";
+import React, { createContext, useState } from "react";
+// import { SessionContext } from "context";
 import { Modal } from "components/common";
 import AccountModal from "components/layout/AccountModal";
-import { ModalView } from "context/SessionContext";
+// import { ModalView } from "context/SessionContext";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
+import { StudioRolloutHostnameAllowed } from "@storyteller/components/src/utils/StudioRolloutHostnameAllowed";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
+
+export enum ModalView { // ignore this modal stuff for now -V
+  Closed,
+  Signup,
+  Login,
+}
+
+interface ModalProps { // this too
+  close: () => void;
+  open: () => void;
+  view: ModalView;
+}
+
+interface SessionContextType {
+  canAccessStudio: () => boolean;
+  canEditTtsModel: (token: string) => boolean;
+  canBanUsers: () => boolean;
+  check: () => boolean;
+  loggedIn: boolean;
+  modal: ModalProps;
+  querySession?: any;
+  querySubscriptions?: any;
+  sessionFetched: boolean;
+  sessionSubscriptions?: any;
+  studioAccessCheck: (x:any) => any,
+  user?: any;
+  userTokenMatch: (token: string) => boolean;
+}
 
 interface Props {
   children?: any;
-  querySession: any;
-  querySubscriptions: any;
+  querySession: () => void;
+  querySubscriptions: () => void;
   sessionFetched: boolean;
-  sessionSubscriptions: any;
-  sessionWrapper?: any;
+  sessionSubscriptions: SessionSubscriptionsWrapper;
+  sessionWrapper: SessionWrapper;
 }
+
+// Functions are initially No-ops/dummies so that they are never undefined and never have to be called conditionally.
+// These functions will never actually fire because they are immediately redefined in the provider below,
+// as they must be as they utilize the provider's state.
+
+export const SessionContext = createContext<SessionContextType>({
+  canAccessStudio: () => false,
+  canEditTtsModel: () => false,
+  canBanUsers: () => false,
+  check: () => false,
+  loggedIn: false,
+  sessionFetched: false,
+  studioAccessCheck: () => null,
+  modal: {
+    close: () => {},
+    open: () => {},
+    view: ModalView.Closed,
+  },
+  userTokenMatch: () => false,
+});
 
 export default function SessionProvider({
   children,
@@ -22,19 +73,12 @@ export default function SessionProvider({
   sessionSubscriptions,
   sessionWrapper,
 }: Props) {
-  const sessionResponse = sessionWrapper?.sessionStateResponse || {
-    logged_in: false,
-  };
+  const sessionResponse = sessionWrapper?.sessionStateResponse || { logged_in: false, user: null };
   const { logged_in: loggedIn, user } = sessionResponse;
   const [view, viewSet] = useState(ModalView.Closed);
   const open = () => viewSet(ModalView.Signup);
-  const close = () => {
-    viewSet(ModalView.Closed);
-  };
-  const viewSwitch = () =>
-    view === ModalView.Signup
-      ? viewSet(ModalView.Login)
-      : viewSet(ModalView.Signup);
+  const close = () => { viewSet(ModalView.Closed); };
+  const viewSwitch = () => viewSet(view === ModalView.Signup ? ModalView.Login : ModalView.Signup);
   const check = () => {
     if (user) {
       return true;
@@ -43,23 +87,31 @@ export default function SessionProvider({
       return false;
     }
   };
-
   const userTokenMatch = (otherUserToken: string) =>
     !otherUserToken || !user?.user_token ? false : user.user_token === otherUserToken;
   const canEditTtsModel = (userToken: string) =>
-    user?.canEditOtherUsersTtsModels || userTokenMatch(userToken);
+    user?.can_delete_other_users_tts_models || userTokenMatch(userToken);
   const canBanUsers = () => user?.can_ban_users || false;
-  const studioAccessCheck = (content: React.ElementType) => !sessionWrapper?.canAccessStudio() ? <StudioNotAvailable /> : content;
+  const canAccessStudio = () => {
+    const hostnameAllowed = StudioRolloutHostnameAllowed();
+    const userAllowed = !!user?.can_access_studio || !!user?.maybe_feature_flags.includes("studio");
+    return hostnameAllowed && userAllowed;
+  }
+
+  const studioAccessCheck = (content: React.ElementType) => canAccessStudio() ? content : <StudioNotAvailable />;
+
+  const modal = { close, open, view };
 
   return (
     <SessionContext.Provider
       {...{
         value: {
+          canAccessStudio,
           canEditTtsModel,
           canBanUsers,
           check,
           loggedIn,
-          modal: { close, open, view },
+          modal,
           querySession,
           querySubscriptions,
           sessionFetched,

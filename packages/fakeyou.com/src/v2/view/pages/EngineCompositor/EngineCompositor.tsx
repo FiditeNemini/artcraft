@@ -20,9 +20,7 @@ interface Props {
 export default function EngineCompositor({ value, sessionWrapper }: Props) {
   const [mediaToken, mediaTokenSet] = useState();
   const onChange = ({ target }: any) => mediaTokenSet(target.value);
-  const inferenceJobs = useInferenceJobs(
-    FrontendInferenceJobType.EngineComposition
-  );
+  const inferenceJobs = useInferenceJobs(FrontendInferenceJobType.EngineComposition);
 
   const onClick = () => {
     EnqueueEngineCompositing("", {

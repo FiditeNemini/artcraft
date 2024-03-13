@@ -3,7 +3,6 @@ import { FrontendInferenceJobType, InferenceJob } from "@storyteller/components/
 // import { useTransition } from "@react-spring/web";
 import JobItem from "./JobItem";
 import { useInferenceJobs,  useLocalize, useSession } from "hooks";
-import { JobListTypes } from "hooks/useInferenceJobs/useInferenceJobs";
 import "./InferenceJobsList.scss";
 import { Button, Panel, JobQueueTicker } from "components/common";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,7 +11,6 @@ import { faClipboardList } from "@fortawesome/pro-solid-svg-icons";
 interface JobsListProps {
   failures: (fail: string) => string;
   jobType?: FrontendInferenceJobType;
-  value?: JobListTypes;
   onSelect?: (e: any) => any;
   panel?: boolean;
   showJobQueue?: boolean;
@@ -34,21 +32,15 @@ const resultPaths = {
 export default function InferenceJobsList({
   failures,
   jobType,
-  value,
   onSelect,
   panel = true,
   showHeader = true,
   showJobQueue = false,
   showNoJobs = false
 }: JobsListProps) {
-  const jobValue = value !== undefined ? value : jobType !== undefined ? (jobType || 0) + 1 : 0;
-  // undefined specified here to allow 0.
-  // jobType + 1 because the difference between FrontendInferenceJobType and JobListTypes is an "all" option
-
   const { sessionSubscriptions } = useSession();
   const hasPaidFeatures = sessionSubscriptions?.hasPaidFeatures();
-  const { inferenceJobs = [], jobStatusDescription } = useInferenceJobs(jobValue);
-
+  const { inferenceJobs = [], jobStatusDescription } = useInferenceJobs(jobType);
   const { t } = useLocalize("InferenceJobs");
 
   const jobContent = (

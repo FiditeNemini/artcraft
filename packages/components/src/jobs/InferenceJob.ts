@@ -16,6 +16,10 @@ export enum FrontendInferenceJobType {
   VideoStyleTransfer,
 }
 
+export enum AllInferenceJobs { All }
+
+export type JobListOptions = FrontendInferenceJobType | AllInferenceJobs;
+
 // NB: Many of these fields are optional despite the response payload containing them
 // This is because we create temporary placeholder objects with just the token.
 export class InferenceJob {

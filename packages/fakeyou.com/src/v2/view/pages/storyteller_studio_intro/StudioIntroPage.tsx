@@ -19,7 +19,6 @@ interface Props {
 }
 
 function StudioIntroPage(props: Props) {
-  const [camera,cameraSet] = useState("rotation");
   const { mediaToken } = useParams<{ mediaToken: string }>();
 
   const history = useHistory();
@@ -32,11 +31,28 @@ function StudioIntroPage(props: Props) {
   // for subsequent steps of this flow.
   const [savedMediaToken, setSavedMediaToken] = useState(mediaToken);
 
+  // We don't show the "next step" buttons until the engine loads.
+  // Unfortunately the engine sometimes fires this twice, with one instance 
+  // being called before the scene loads. Until this is fixed, we'll count the 
+  // number of event fires and assume we must have two calls.
+  const [sceneIsLoadedCount, sceneIsLoadedCountSet] = useState(0);
+
+  // If the scene is saved, we know the user must have interacted. 
+  // This can serve as a second optional gate for enabling the next steps.
+  const [sceneIsSaved, sceneIsSavedSet] = useState(false);
+
+  const [camera, cameraSet] = useState("rotation");
+
   usePrefixedDocumentTitle("Storyteller Studio");
 
   const onSaveCallback = useCallback((sceneMediaToken: string) => {
     setSavedMediaToken(sceneMediaToken);
-  }, [setSavedMediaToken]);
+    sceneIsSavedSet(true); // Just in case we missed the "scene loaded" event.
+  }, [setSavedMediaToken, sceneIsSavedSet]);
+
+  const onSceneReadyCallback = useCallback(() => {
+    sceneIsLoadedCountSet(sceneIsLoadedCount + 1);
+  }, [sceneIsLoadedCount, sceneIsLoadedCountSet])
 
   if (!props.sessionWrapper.canAccessStudio()) {
     return <StudioNotAvailable />;
@@ -84,6 +100,30 @@ function StudioIntroPage(props: Props) {
     value: "static"
   }];
 
+  const sceneIsLoaded = sceneIsLoadedCount > 1 || sceneIsSaved;
+
+  let progressButtons = <></>;
+
+  if (sceneIsLoaded) {
+    progressButtons = (
+      <>
+        <div {...{ className: "studio-intro-exporter" }}>
+          <div {...{ className: "exporter-title" }}>
+          <span>
+            Add camera motion to render
+          </span>
+          </div>
+          <div {...{ className: "exporter-controls" }}>
+            <SegmentButtons {...{ onChange: ({ target }: { target: any }) => {
+              cameraSet(target.value)
+            }, options: cameraOpts, value: camera }}/>
+            <Button label="Create Movie from 3D Scene" onClick={onClick} />
+          </div>
+        </div>
+      </>
+    )
+  }
+
   return (
     <div className="studio-intro-page">
       <Scene3D
@@ -91,21 +131,11 @@ function StudioIntroPage(props: Props) {
         mode={EngineMode.Studio}
         asset={assetDescriptor}
         className="flex-grow-1"
+        onSceneReadyCallback={onSceneReadyCallback}
         onSceneSavedCallback={onSaveCallback}
       />
-      <div {...{ className: "studio-intro-exporter" }}>
-        <div {...{ className: "exporter-title" }}>
-        <span>
-          Add camera motion to render
-        </span>
-        </div>
-        <div {...{ className: "exporter-controls" }}>
-          <SegmentButtons {...{ onChange: ({ target }: { target: any }) => {
-            cameraSet(target.value)
-          }, options: cameraOpts, value: camera }}/>
-          <Button label="Create Movie from 3D Scene" onClick={onClick} />
-        </div>
-      </div>
+
+      {progressButtons}
     </div>
   );
 }
