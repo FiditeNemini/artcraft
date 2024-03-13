@@ -35,13 +35,12 @@ export default function EntityInputEmpty({ accept, open, inputMode, inputProps, 
 
   const mediaIcons = () => {
     switch (accepted[0]) {
-      case "audio": return faWaveform;
-      case "image": return faImage;
+      case "mp3": return faWaveform;
+      case "jpg": return faImage;
       case "bvh": return faPersonWalking;
       default: return faFile;
     }
   };
-
 
   const supported = `${ accepted.length ? accepted.join(", ") : accepted[0] } files supported`;
 

@@ -1,3 +1,5 @@
+import { enumToKeyArr } from "resources";
+
 export enum EntityInputMode {
   bookmarks,
   media,
@@ -10,10 +12,7 @@ export enum MediaFilters {
   audio,
   image,
   video,
-  bvh,
-  glb,
-  gltf,
-  fbx
+  engine_asset
 }
 
 export enum WeightsFilters {
@@ -36,18 +35,45 @@ export enum WeightsCategories {
   voiceConversion
 }
 
-export type EntityModeProp = keyof typeof EntityInputMode;
-export type MediaFilterProp = keyof typeof MediaFilters;
-export type WeightFilterProp = keyof typeof WeightsFilters;
-export type WeightCategoriesProp = keyof typeof WeightsCategories;
-export type AcceptTypes = MediaFilterProp | WeightFilterProp;
-export type JobSelection = WeightCategoriesProp | WeightFilterProp;
-
 export enum EntityType {
   unknown,
   media,
   weights
 }
+
+export enum EngineTypes {
+  bvh,
+  fbx,
+  glb,
+  gltf,
+  obj,
+  ron
+}
+
+export enum AudioTypes {
+  mp3,
+  wav
+}
+
+export enum ImageTypes {
+  jpg,
+  png
+}
+
+export enum VideoTypes {
+  mp4,
+}
+
+export type EntityModeProp = keyof typeof EntityInputMode;
+export type MediaFilterProp = keyof typeof MediaFilters;
+export type WeightFilterProp = keyof typeof WeightsFilters;
+export type EngineFilterProp = keyof typeof EngineTypes;
+export type AudioFilterProp = keyof typeof AudioTypes;
+export type ImageFilterProp = keyof typeof ImageTypes;
+export type VideoFilterProp = keyof typeof VideoTypes;
+export type WeightCategoriesProp = keyof typeof WeightsCategories;
+export type AcceptTypes = EngineFilterProp | AudioFilterProp | ImageFilterProp | VideoFilterProp | WeightFilterProp;
+export type JobSelection = WeightCategoriesProp | WeightFilterProp;
 
 export const ListEntityFilters = (mode?: number) => {
   const bookmarkFilters = Object.keys({ ...MediaFilters, ...WeightsFilters }).filter(val => isNaN(Number(val))).reduce((obj,current) => ({ ...obj, [current]: current  }),{});
@@ -63,3 +89,25 @@ export const EntityFilterOptions = (mode?: EntityInputMode, t = (v:string) => v)
     return { label: "all", value: "all" };
   });
 };
+
+export const isSelectedType = (mode: MediaFilters, fileExtension: string) => enumToKeyArr([
+  { ...AudioTypes, ...ImageTypes, ...VideoTypes, ...EngineTypes },
+  AudioTypes,
+  ImageTypes,
+  VideoTypes,
+  EngineTypes
+][mode]).includes(fileExtension);
+
+export const getMediaCategory = (fileExtension: string) => {
+  console.log("🍔",isSelectedType(MediaFilters.image,fileExtension));
+  isSelectedType(MediaFilters.image,fileExtension);
+  if (isSelectedType(MediaFilters.engine_asset, fileExtension)) return MediaFilters.engine_asset;
+  if (isSelectedType(MediaFilters.audio, fileExtension)) return MediaFilters.audio;
+  if (isSelectedType(MediaFilters.image, fileExtension)) return MediaFilters.image;
+  if (isSelectedType(MediaFilters.video, fileExtension)) return MediaFilters.video;
+  return MediaFilters.all; // will change to "unknown" eventually
+}
+
+
+
+
