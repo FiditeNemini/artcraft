@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from "uuid";
-import { hiddenValues } from "./dataDefaultValues";
 
 export type VSTType = {
   // File Settings
