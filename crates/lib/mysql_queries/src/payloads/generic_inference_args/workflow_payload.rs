@@ -25,10 +25,6 @@ impl NewValue {
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]
 pub struct WorkflowArgs {
-    #[serde(rename = "sd")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub maybe_sd_model: Option<ModelWeightToken>,
-
     #[serde(rename = "lora")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maybe_lora_model: Option<ModelWeightToken>,

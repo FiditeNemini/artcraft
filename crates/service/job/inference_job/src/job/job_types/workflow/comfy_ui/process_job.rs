@@ -113,58 +113,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
     };
 
-    async fn download_file(file_url: String, dep_path: PathBuf) -> Result<(), anyhow::Error> {
-        // Send a GET request to the file_url
-        let response = reqwest::get(&file_url).await?;
-
-        // Ensure the request was successful
-        if response.status().is_success() {
-            // Get the byte stream of the file
-            let bytes = response.bytes().await?;
-
-            // Ensure the parent directory exists
-            if let Some(parent) = dep_path.parent() {
-                // Skip errors (for example if the directory already exists)
-                let _ = tokio::fs::create_dir_all(&parent).await;
-            }
-
-            // Create or open the file at dep_path asynchronously
-            let mut file = tokio::fs::File::create(&dep_path).await?;
-
-            // Write the bytes to the file asynchronously
-            file.write_all(&bytes).await?;
-            println!("File downloaded successfully.");
-        } else {
-            println!("Failed to download the file.");
-        }
-
-        Ok(())
-    }
-
-    let _comfy_deps = match args.job_dependencies.job.job_specific_dependencies.maybe_comfy_ui_dependencies {
-        Some(ref deps) => deps,
-        None => return Err(ProcessSingleJobError::from(anyhow!("no comfy deps"))),
-    };
-
-    let all_models = &args.job_dependencies.job.job_specific_dependencies.maybe_comfy_ui_dependencies;
-    match all_models {
-        Some(models) => {
-            for model in &models.dependency_tokens.comfy {
-                let mut dep_path = model_dependencies.inference_command.mounts_directory.clone();
-                dep_path = dep_path.join(model.location.clone());
-                info!("Checking if path exists: {:?}", dep_path);
-                if !dep_path.exists() {
-                    warn!("Path does not exist: {:?}", dep_path);
-                    download_file(model.url.clone(), dep_path.clone()).await.map_err(|e| ProcessSingleJobError::Other(e.into()))?;
-                    info!("Downloaded model to {:?}", dep_path);
-                }
-            }
-        }
-        None => {
-            info!("No models specified to download")
-        }
-    }
-
     // Download workflow to ComfyRunner
     let workflow_dir = root_comfy_path.join("prompt");
     // make folder if not exist
@@ -238,45 +186,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     }
 
     // ==================== QUERY AND DOWNLOAD FILES ==================== //
-
-    // Download SD model if specified
-    let mut maybe_sd_path: Option<PathBuf> = None;
-
-    match job_args.maybe_sd_model {
-        Some(sd_model_weight_token) => {
-            let sd_dir = root_comfy_path.join("models").join("checkpoints");
-            // make if not exist
-            if !sd_dir.exists() {
-                std::fs::create_dir_all(&sd_dir)
-                    .map_err(|err| ProcessSingleJobError::IoError(err))?;
-            }
-
-            info!("Querying SD model by token: {:?} ...", &sd_model_weight_token);
-
-            let retrieved_sd_record =  get_weight_by_token(
-                sd_model_weight_token,
-                true,
-                &deps.db.mysql_pool
-            ).await?.ok_or_else(|| {
-                error!("SD model not found: {:?}", sd_model_weight_token);
-                ProcessSingleJobError::Other(anyhow!("SD model not found: {:?}", sd_model_weight_token))
-            })?;
-
-            let bucket_details = RemoteCloudBucketDetails {
-                object_hash: retrieved_sd_record.public_bucket_hash,
-                prefix: retrieved_sd_record.maybe_public_bucket_prefix.unwrap(),
-                suffix: retrieved_sd_record.maybe_public_bucket_extension.unwrap(),
-            };
-
-            let sd_filename = "model.safetensors";
-            let sd_path = sd_dir.join(sd_filename).to_str().unwrap().to_string();
-            remote_cloud_file_client.download_file(bucket_details, sd_path.clone()).await?;
-            maybe_sd_path = Some(sd_path.parse().unwrap());
-            info!("Downloaded SD model to {:?}", sd_path);
-            maybe_sd_path = Some(sd_path.parse().unwrap());
-        }
-        None => {}
-    }
 
     // Download Lora model if specified
     let mut maybe_lora_path: Option<PathBuf> = None;
@@ -453,7 +362,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     let mut comfy_output_video_file = root_comfy_path.join("output");
     comfy_output_video_file = comfy_output_video_file.join(job_args.output_path);
 
-    // check for "Prompt executed" in stdout (comfyui only outputs this for success)
     if let Err(err) = check_file_exists(&comfy_output_video_file) {
         error!("Output file does not  exist: {:?}", err);
 
@@ -468,9 +376,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         safe_delete_temp_directory(&work_temp_dir);
         safe_delete_temp_file(&workflow_path);
 
-        if let Some(sd_path) = maybe_sd_path {
-            safe_delete_temp_file(&sd_path);
-        }
         if let Some(lora_path) = maybe_lora_path {
             safe_delete_temp_file(&lora_path);
         }
@@ -630,9 +535,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     safe_delete_temp_file(&workflow_path);
 
-    if let Some(sd_path) = maybe_sd_path {
-        safe_delete_temp_file(&sd_path);
-    }
     if let Some(lora_path) = maybe_lora_path {
         safe_delete_temp_file(&lora_path);
     }

@@ -14,7 +14,6 @@ pub struct JobArgs<'a> {
     pub workflow_source: &'a ModelWeightToken,
     pub output_path: &'a String,
     pub maybe_json_modifications: &'a Option<HashMap<String, NewValue>>,
-    pub maybe_sd_model: &'a Option<ModelWeightToken>,
     pub maybe_lora_model: &'a Option<ModelWeightToken>,
     pub maybe_input_file: &'a Option<MediaFileToken>,
 }
@@ -72,7 +71,6 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
     Ok(JobArgs {
         workflow_source,
         output_path,
-        maybe_sd_model: &inference_args.maybe_sd_model,
         maybe_lora_model: &inference_args.maybe_lora_model,
         maybe_json_modifications: &inference_args.maybe_json_modifications,
         maybe_input_file: &inference_args.maybe_input_file,

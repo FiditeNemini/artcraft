@@ -45,7 +45,6 @@ const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 pub struct EnqueueComfyRequest {
     uuid_idempotency_token: String,
 
-    maybe_sd_model: Option<ModelWeightToken>,
     maybe_lora_model: Option<ModelWeightToken>,
     maybe_prompt: Option<String>,
     maybe_negative_prompt: Option<String>,
@@ -252,7 +251,6 @@ pub async fn enqueue_comfy_ui_handler(
     }
 
     let inference_args = WorkflowArgs {
-        maybe_sd_model: request.maybe_sd_model.clone(),
         maybe_lora_model: request.maybe_lora_model.clone(),
         maybe_json_modifications: request.maybe_json_modifications.clone(),
         maybe_workflow_config: request.maybe_workflow_config.clone(),

@@ -224,7 +224,6 @@ pub async fn enqueue_workflow_upload_request(
     let commit_hash = request.commit_hash.clone();
 
     let inference_args = WorkflowArgs {
-        maybe_sd_model: None,
         maybe_lora_model: None,
         maybe_json_modifications: None,
         maybe_workflow_config: None,
