@@ -97,7 +97,8 @@ export default function SessionProvider({
     const userAllowed = !!user?.can_access_studio || !!user?.maybe_feature_flags.includes("studio");
     return hostnameAllowed && userAllowed;
   }
-  const studioAccessCheck = (content: React.ElementType) => canAccessStudio() ? <StudioNotAvailable /> : content;
+
+  const studioAccessCheck = (content: React.ElementType) => canAccessStudio() ? content : <StudioNotAvailable />;
 
   const modal = { close, open, view };
 
