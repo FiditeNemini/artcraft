@@ -129,6 +129,7 @@
       bottom: 0;
       left: 0;
       font-size: 14px;
+      text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.5);
     }
 
     &::after {
@@ -140,14 +141,12 @@
       height: 50%;
       background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
       z-index: 2;
+      height: 35%;
     }
 
     &.selected::after {
-      background: linear-gradient(
-        to top,
-        rgba(desaturate(darken($primary, 20%), 30%), 70%),
-        transparent
-      );
+      background: linear-gradient(to top, rgba(#632323, 90%), transparent);
+      height: 35%;
     }
   }
 
