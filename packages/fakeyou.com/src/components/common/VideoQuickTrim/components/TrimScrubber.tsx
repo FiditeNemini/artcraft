@@ -24,7 +24,7 @@ export const TrimScrubber = memo(({
   ...rest
 }:TrimScrubberPropsI)=>{
   const debug = false || propsDebug;
-
+  console.log("trimScrubber reRENDERING");
   const TrimScrubberWithScrubbing = withScrubbing<TrimScrubberPropsI>(() => {
     return(
       <div className="trim-scrubber">

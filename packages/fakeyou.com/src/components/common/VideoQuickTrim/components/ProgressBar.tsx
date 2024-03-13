@@ -1,5 +1,6 @@
 import React, {
   memo,
+  useContext,
   useCallback,
   useLayoutEffect,
   useRef
@@ -14,8 +15,9 @@ import { PlayCursor } from './PlayCursor';
 export const ProgressBar = memo(({
   debug: propsDebug = false,
   readyToMount,
-  timeCursorOffset,
+  isRepeatOn,
   trimStartSeconds,
+  trimEndSeconds,
   trimDuration,
   playbarWidth,
   scrubberWidth,
@@ -27,8 +29,9 @@ export const ProgressBar = memo(({
 }:{
   debug?: boolean;
   readyToMount: boolean;
-  timeCursorOffset: number;
+  isRepeatOn: boolean;
   trimStartSeconds: number;
+  trimEndSeconds: number;
   trimDuration: number;
   playbarWidth: number;
   scrubberWidth: number;
@@ -38,6 +41,7 @@ export const ProgressBar = memo(({
   handlePlaypause: (shouldPlay:boolean)=>void;
   dispatchCompState: (action: Action) => void;
 })=>{
+  console.log(`ProgressBAR reRENDERING`)
   const debug = false || propsDebug;
 
   const playbarRef = useRef<HTMLDivElement | null>(null);
@@ -81,7 +85,7 @@ export const ProgressBar = memo(({
           {videoBuffered !== undefined && 
             <span className="loaded" style={{width: (videoBuffered.end(0) / videoDuration* 100) + "%"}} />
           }
-          <span className="played" style={{width: timeCursorOffset+"px"}} />
+          {/* <span className="played" style={{width: timeCursorOffset+"px"}} /> */}
         </div>
         <TrimScrubber
           debug={debug}
@@ -100,12 +104,14 @@ export const ProgressBar = memo(({
                 trimEndSeconds: newTrimStartSeconds + trimDuration
               }
             });
-            handlePlaypause(true);
+            // handlePlaypause(true);
           }}
         />
-        <PlayCursor 
-          scrubPosition={timeCursorOffset}
+        <PlayCursor
+          isRepeatOn={isRepeatOn}
           onChanged={onPlayCursorChanged}
+          playBoundStart={trimStartSeconds}
+          playBoundEnd={trimEndSeconds}
           boundingWidth={playbarWidth}
           scrubberWidth={8}
         />
