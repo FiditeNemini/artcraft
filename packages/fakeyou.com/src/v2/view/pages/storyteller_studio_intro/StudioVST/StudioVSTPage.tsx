@@ -1,9 +1,10 @@
 import React, { useRef, useState } from "react";
 import { NavLink, useParams, useHistory } from "react-router-dom";
 import { Button, Container, Panel, TextArea } from "components/common";
-import VideoQuickTrim, {
-  QuickTrimData,
-} from "components/common/VideoQuickTrim";
+// import VideoQuickTrim, {
+//   QuickTrimData,
+// } from "components/common/VideoQuickTrim";
+import { VideoFakeyou } from "components/common";
 import { useJobStatus } from "hooks";
 import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
 import { initialValues } from "./defaultValues";
@@ -125,16 +126,8 @@ export default function PageVSTApp() {
         <div className="row g-5">
           <div className="col-12 col-md-6">
             {job.isSuccessful && job.maybe_result ? (
-              <VideoQuickTrim
-                trimStartSeconds={0}
-                trimEndSeconds={0}
+              <VideoFakeyou
                 mediaToken={job.maybe_result.entity_token}
-                onSelect={(val: QuickTrimData) =>
-                  handleOnChange({
-                    trimStart: val.trimStartSeconds,
-                    trimEnd: val.trimEndSeconds,
-                  })
-                }
               />
             ) : (
               <div className="ratio ratio-4x3 panel-inner rounded">
