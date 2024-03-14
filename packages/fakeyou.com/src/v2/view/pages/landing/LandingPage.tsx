@@ -35,11 +35,13 @@ interface Props {
 }
 
 function LandingPage(props: Props) {
-  usePrefixedDocumentTitle("FakeYou Celebrity Voice Generator");
-
   PosthogClient.recordPageview();
 
   const domain: DomainConfig = useDomainConfig();
+
+  const webpageTitle = domain.website === Website.FakeYou ? "FakeYou Celebrity Voice Generator" : "";
+
+  usePrefixedDocumentTitle(webpageTitle);
 
   const isLoggedIn = props.sessionWrapper.isLoggedIn();
 
