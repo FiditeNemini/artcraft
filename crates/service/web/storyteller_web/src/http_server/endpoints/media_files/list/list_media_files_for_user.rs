@@ -60,6 +60,9 @@ pub struct MediaFileForUserListItem {
 
   pub media_type: MediaFileType,
 
+  /// The coarse-grained class of media file
+  pub media_class: MediaFileClass,
+
   /// Details where the media file came from.
   pub origin: MediaFileOriginDetails,
 
@@ -225,6 +228,7 @@ pub async fn list_media_files_for_user_handler(
       .map(|record| MediaFileForUserListItem {
         token: record.token,
         media_type: record.media_type,
+        media_class: record.media_class,
         origin: MediaFileOriginDetails::from_db_fields_str(
           record.origin_category,
           record.origin_product_category,
