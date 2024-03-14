@@ -1,7 +1,6 @@
 import React, {
   memo,
   useCallback,
-  // createContext,
   useEffect,
   useReducer,
   useRef,
@@ -25,7 +24,7 @@ import {
 } from "./reducer";
 import { VideoElementContext } from "./contexts";
 
-import { QuickTrimData, ONE_MS } from "./utilities";
+import { QuickTrimData } from "./utilities";
 
 import { ProgressBar } from "./components/ProgressBar";
 import { ControlBar } from "./components/ControlBar";
@@ -72,33 +71,6 @@ export const VideoQuickTrim = memo(({
         });
       };
 
-      // node.ontimeupdate = ()=>{
-      //   if(compState.trimStartSeconds !== undefined && 
-      //     compState.trimEndSeconds !== undefined && 
-      //     compState.playbarWidth !== undefined){
-      //     // reset current time when on repeat
-      //     if(compState.isRepeatOn && 
-      //       (node.currentTime > compState.trimEndSeconds || node.currentTime < compState.trimStartSeconds)
-      //     ){
-      //       node.currentTime = compState.trimStartSeconds + ONE_MS;
-      //       // if (debug){
-      //       //   console.log(`Loop Playing trimStart@${compState.trimStartSeconds}`);
-      //       //   console.log(`Loop Playing currentTime@${node.currentTime}`);
-      //       // }
-      //     }
-      //     // timeCursorOffset.current = node.currentTime;
-      //     // console.log(`setting ref ${timeCursorOffset.current}`)
-      //     // dispatchCompState({
-      //     //   type: ACTION_TYPES.MOVE_TIMECURSOR,
-      //     //   payload: {
-      //     //     timeCursorOffset: (node.currentTime / node.duration) * (compState.playbarWidth)
-      //     //   }
-      //     // });
-      //   }else{
-      //     console.log('ontimeupdate failed');
-      //   }
-      // };
-
       node.onplay = ()=>setPlaypause(PLAYPUASE_STATES.PLAYING);
       node.onpause = ()=>setPlaypause(PLAYPUASE_STATES.PAUSED);
       node.onended = ()=>setPlaypause(PLAYPUASE_STATES.ENDED);
@@ -114,10 +86,7 @@ export const VideoQuickTrim = memo(({
       }
     } // else{} DOM node referenced by ref has been unmounted 
   }, [
-    compState.trimStartSeconds, 
-    compState.trimEndSeconds,
-    compState.playbarWidth,
-    compState.isRepeatOn
+    // No Dependency !
   ]); //END videoRefCallback\
 
   useEffect(()=>{
@@ -137,7 +106,7 @@ export const VideoQuickTrim = memo(({
   }, [onSelect, compState.trimStartSeconds, compState.trimEndSeconds, propsTrimStartSeconds, propsTrimEndSeconds])
 
   const togglePlaypause = useCallback(()=>{
-    if (videoRef.current=== null){
+    if (videoRef.current === null){
       console.log('Playpause is toggled while it is NOT_READY');
     }else if(videoRef.current.paused){
       videoRef.current.play();
