@@ -6,6 +6,7 @@ import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadM
 import { UploadEngineAsset }from "@storyteller/components/src/api/media_files/UploadEngineAsset";
 import { MediaFileSubtype } from "@storyteller/components/src/api/enums/MediaFileSubtype";
 import { GetFileTypeByExtension as extension } from "@storyteller/components/src/utils/GetFileTypeByExtension";
+import { MediaFileClass } from "@storyteller/components/src/api/enums/MediaFileClass";
 
 interface Props {
   autoUpload?: boolean,
@@ -15,13 +16,14 @@ interface Props {
 const n = () => {};
 
 export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
+  const [mediaClass,mediaClassSet] = useState<MediaFileClass>(MediaFileClass.Unknown);
   const [engineSubtype,engineSubtypeSet] = useState<MediaFileSubtype | undefined>();
 
   const createUpload = (inputFile: File, todo = n ) => {
     const fileExtension = extension(inputFile.name || "");
     const isEngineAsset = isSelectedType(MediaFilters.engine_asset, fileExtension);
     const baseConfig = { uuid_idempotency_token: uuidv4(), file: inputFile };
-    const engineConfig = { ...baseConfig, media_file_subtype: engineSubtype };
+    const engineConfig = { ...baseConfig, media_file_subtype: engineSubtype, media_file_class: mediaClass };
     const mediaConfig = { ...baseConfig, source: "file" };
     const uploader = isEngineAsset ? UploadEngineAsset(engineConfig) : UploadMedia(mediaConfig);
 
@@ -44,10 +46,14 @@ export default function useMediaUploader({ autoUpload, onSuccess = n }: Props) {
 
   const engineSubtypeChange = ({ target }: { target: any }) => engineSubtypeSet(target.value);
 
+  const mediaClassChange = ({ target }: { target: any }) => mediaClassSet(target.value);
+
   return {
     clear,
     engineSubtype,
     engineSubtypeChange,
+    mediaClass,
+    mediaClassChange,
     file,
     inputProps,
     isAudio: isSelectedType(MediaFilters.audio, extension(file?.name || "")),
