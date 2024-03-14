@@ -10,6 +10,7 @@ use log::warn;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
@@ -46,6 +47,9 @@ pub struct MediaFileInfo {
   /// Type of media will dictate which fields are populated and what
   /// the frontend should display (eg. video player vs audio player).
   pub media_type: MediaFileType,
+
+  /// The coarse-grained class of media file
+  pub media_class: MediaFileClass,
 
   /// If the media file has a subtype, we'll report it.
   /// This is mostly used for Bevy engine files.
@@ -269,6 +273,7 @@ async fn modern_media_file_lookup(
     media_file: MediaFileInfo {
       token: result.token,
       media_type: result.media_type,
+      media_class: result.media_class,
       maybe_media_subtype: result.maybe_media_subtype,
       maybe_batch_token: result.maybe_batch_token,
       public_bucket_path,
@@ -357,6 +362,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
     media_file: MediaFileInfo {
       token,
       media_type: MediaFileType::Audio, // NB: Always audio
+      media_class: MediaFileClass::Audio, // NB: Always audio
       maybe_media_subtype: None,
       maybe_batch_token: None,
       public_bucket_path,
