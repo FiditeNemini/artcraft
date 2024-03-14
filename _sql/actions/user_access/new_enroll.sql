@@ -14,6 +14,7 @@ WHERE username IN (
     'crossproduct',
     'crossproduct1',
     'echelon',
+    'kasisnu',
     'olivicmic',
     'saltacc',
     'teddanson',

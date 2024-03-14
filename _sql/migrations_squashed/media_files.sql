@@ -73,18 +73,40 @@ CREATE TABLE media_files (
   -- Titles and even descriptions can go in another table(s): media_file_annotations, media_file_tags, media_file_descriptions, ...
   -- (Not everything would have a text transcript.)
 
+  -- Media files can have optional titles
+  maybe_title VARCHAR(255) DEFAULT NULL,
+
   -- ========== MEDIA DETAILS ==========
 
-  -- Type of media:
+  -- Type of media file:
+  --   * TODO(bt): 'audio'/'video'/'image' will eventually become "jpg", "wav", "mp4", etc.
+  --   * 'audio' for wav, mp3, etc. (TODO: Deprecate this.)
+  --   * 'image' for a variety of video types. (TODO: Deprecate this.)
+  --   * 'video' for a variety of video types. (TODO: Deprecate this.)
+  --   * 'mocap` for motion capture files (eg. BVH, FBX, etc.)  (TODO: Deprecate this)
+  --   * `bvh` for BVH files
+  --   * `fbx` for FBX files
+  --   * `glb` for GLB files
+  --   * `gltf` for GLTF files
+  --   * `scene_ron` for SCN.RON files
+  media_type VARCHAR(16) NOT NULL,
+
+  -- Broad class of media:
+  -- This is especially helpful with engine types that map to specific semantics.
+  --   * 'unknown' (TODO: This is the default until all records are backfilled.)
   --   * 'audio' for wav, mp3, etc.
   --   * 'image' for a variety of video types.
   --   * 'video' for a variety of video types.
-  media_type VARCHAR(16) NOT NULL,
+  --   * 'animation' for animations (engine)
+  --   * 'character' for characters (engine)
+  --   * 'prop' for props (engine)
+  --   * 'scene' for scenes (engine; internal and external scenes)
+  media_class VARCHAR(16) NOT NULL DEFAULT "unknown",
 
   -- A media file's possible subtype. Typically used for Storyteller Studio.
-  -- * 'mixamo' for mixamo animations (eg. for BVH, GLB, FBX, etc. files)
-  -- * 'mocap_net' for mocapnet animations (eg. for BVH files)
-  -- * 'scene' for generic scenes (eg. for BVH, GLB, FBX, etc. files)
+  --   * 'mixamo' for mixamo animations (eg. for BVH, GLB, FBX, etc. files)
+  --   * 'mocap_net' for mocapnet animations (eg. for BVH files)
+  --   * 'scene' for generic scenes (eg. for BVH, GLB, FBX, etc. files)
   maybe_media_subtype VARCHAR(32) DEFAULT NULL,
 
   -- The file's mime type.
@@ -230,6 +252,7 @@ CREATE TABLE media_files (
   KEY fk_maybe_origin_model_type_and_token (maybe_origin_model_type, maybe_origin_model_token),
   KEY index_maybe_batch_token (maybe_batch_token),
   KEY index_media_type (media_type),
+  KEY index_media_class (media_class),
   KEY fk_maybe_prompt_token (maybe_prompt_token),
   KEY index_checksum_sha2 (checksum_sha2),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
