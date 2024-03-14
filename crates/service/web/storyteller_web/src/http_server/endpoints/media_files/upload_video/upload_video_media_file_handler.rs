@@ -9,6 +9,7 @@ use once_cell::sync::Lazy;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
@@ -212,6 +213,7 @@ pub async fn upload_video_media_file_handler(
     creator_set_visibility,
     upload_type,
     maybe_media_subtype: None,
+    maybe_media_class: Some(MediaFileClass::Video),
     media_file_type: MediaFileType::Video,
     maybe_mime_type: Some(mimetype),
     file_size_bytes: file_size_bytes as u64,

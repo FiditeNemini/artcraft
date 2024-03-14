@@ -9,6 +9,7 @@ use once_cell::sync::Lazy;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
@@ -199,6 +200,7 @@ pub async fn create_scene_handler(
     creator_set_visibility: Visibility::Public,
     upload_type: UploadType::StorytellerEngine,
     media_file_type: MediaFileType::SceneRon,
+    maybe_media_class: Some(MediaFileClass::Scene),
     maybe_media_subtype: Some(MediaFileSubtype::StorytellerScene),
     maybe_mime_type: Some(mime_type),
     file_size_bytes: file_size_bytes as u64,

@@ -3,6 +3,7 @@ use sqlx;
 use sqlx::MySqlPool;
 
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
@@ -32,7 +33,9 @@ pub struct InsertMediaFileFromUploadArgs<'a> {
   pub upload_type: UploadType,
 
   pub media_file_type: MediaFileType,
+  pub maybe_media_class: Option<MediaFileClass>,
   pub maybe_media_subtype: Option<MediaFileSubtype>,
+
   pub maybe_mime_type: Option<&'a str>,
   pub file_size_bytes: u64,
   pub duration_millis: u64,
@@ -83,6 +86,8 @@ pub async fn insert_media_file_from_file_upload(
 
   const ORIGIN_PRODUCT_CATEGORY : MediaFileOriginProductCategory = MediaFileOriginProductCategory::Unknown;
 
+  let media_class = args.maybe_media_class.unwrap_or(MediaFileClass::Unknown);
+
   let record_id = {
     let query_result = sqlx::query!(
         r#"
@@ -97,6 +102,7 @@ SET
   maybe_origin_model_token = NULL,
 
   media_type = ?,
+  media_class = ?,
   maybe_media_subtype = ?,
   maybe_mime_type = ?,
   file_size_bytes = ?,
@@ -122,7 +128,9 @@ SET
       ORIGIN_PRODUCT_CATEGORY.to_str(),
 
       args.media_file_type.to_str(),
+      media_class.to_str(),
       args.maybe_media_subtype.map(|s| s.to_str()),
+      
       args.maybe_mime_type,
       args.file_size_bytes,
 

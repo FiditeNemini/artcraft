@@ -200,6 +200,7 @@ pub async fn upload_engine_asset_media_file_handler(
     creator_set_visibility,
     upload_type: UploadType::Filesystem,
     media_file_type,
+    maybe_media_class: upload_media_request.media_file_class,
     maybe_media_subtype: upload_media_request.media_file_subtype,
     maybe_mime_type: Some(mimetype),
     file_size_bytes: file_size_bytes as u64,
