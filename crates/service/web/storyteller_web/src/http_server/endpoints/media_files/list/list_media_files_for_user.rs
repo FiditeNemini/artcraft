@@ -10,6 +10,7 @@ use log::{info, warn};
 use utoipa::{IntoParams, ToSchema};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -40,6 +41,10 @@ pub struct ListMediaFilesForUserQueryParams {
   /// NB: This can be one (or more comma-separated values) from `MediaFileType`.
   /// ?filter_media_type=image or ?filter_media_type=image,video (etc.)
   pub filter_media_type: Option<String>,
+
+  /// NB: This can be one (or more comma-separated values) from `MediaFileClass`.
+  /// ?filter_media_type=animation or ?filter_media_type=animation,character (etc.)
+  pub filter_media_classes: Option<String>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -170,12 +175,14 @@ pub async fn list_media_files_for_user_handler(
   };
 
   let mut maybe_filter_media_types = get_scoped_media_types(&query);
+  let mut maybe_filter_media_classes  = get_scoped_media_classes(&query);
 
   info!("Querying media files for user: {:?} - {:?}", path.username, maybe_filter_media_types);
 
   let query_results = list_media_files_for_user(ListMediaFileForUserArgs {
     username: &path.username,
     maybe_filter_media_types: maybe_filter_media_types.as_ref(),
+    maybe_filter_media_classes: maybe_filter_media_classes.as_ref(),
     page_size,
     page_index,
     sort_ascending,
@@ -283,4 +290,26 @@ fn get_scoped_media_types(
   }
 
   Some(types)
+}
+
+fn get_scoped_media_classes(
+  query: &Query<ListMediaFilesForUserQueryParams>,
+) -> Option<HashSet<MediaFileClass>> {
+
+  let classes = match query.filter_media_classes.as_deref() {
+    None => return None,
+    Some(classes) => classes,
+  };
+
+  // NB: This silently fails on invalid values. Probably not the best tactic.
+  let classes = classes.split(",")
+      .map(|ty| MediaFileClass::from_str(ty))
+      .flatten()
+      .collect::<HashSet<_>>();
+
+  if classes.is_empty() {
+    return None;
+  }
+
+  Some(classes)
 }

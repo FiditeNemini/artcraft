@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
@@ -38,6 +39,8 @@ pub struct MediaFileListItem {
   pub maybe_origin_model_title: Option<String>,
 
   pub media_type: MediaFileType,
+  pub media_class: MediaFileClass,
+
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
   pub maybe_public_bucket_extension: Option<String>,
@@ -106,6 +109,7 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
           maybe_origin_model_token: record.maybe_origin_model_token,
           maybe_origin_model_title: record.maybe_origin_model_title,
           media_type: record.media_type,
+          media_class: record.media_class,
           public_bucket_directory_hash: record.public_bucket_directory_hash,
           maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
           maybe_public_bucket_extension: record.maybe_public_bucket_extension,
@@ -152,6 +156,7 @@ SELECT
   m.token,
 
   m.media_type,
+  m.media_class,
 
   m.origin_category,
   m.origin_product_category,
@@ -296,6 +301,8 @@ struct MediaFileListItemInternal {
   maybe_origin_model_title: Option<String>,
 
   media_type: MediaFileType,
+  media_class: MediaFileClass,
+
   public_bucket_directory_hash: String,
   maybe_public_bucket_prefix: Option<String>,
   maybe_public_bucket_extension: Option<String>,
@@ -346,6 +353,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_origin_model_token: row.try_get("maybe_origin_model_token")?,
       maybe_origin_model_title: row.try_get("maybe_origin_model_title")?,
       media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
+      media_class: MediaFileClass::try_from_mysql_row(row, "media_class")?,
       public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
       maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,

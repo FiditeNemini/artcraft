@@ -1,5 +1,6 @@
 use utoipa::OpenApi;
 
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -116,6 +117,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ZsVoiceDatasetToken,
 
     // Enums
+    MediaFileClass,
     MediaFileOriginCategory,
     MediaFileOriginModelType,
     MediaFileOriginProductCategory,

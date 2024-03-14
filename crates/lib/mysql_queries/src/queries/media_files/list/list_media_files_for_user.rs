@@ -1,8 +1,10 @@
 use std::collections::HashSet;
+
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
 
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -35,6 +37,8 @@ pub struct MediaFileListItem {
   pub maybe_origin_model_title: Option<String>,
 
   pub media_type: MediaFileType,
+  pub media_class: MediaFileClass,
+
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
   pub maybe_public_bucket_extension: Option<String>,
@@ -57,6 +61,7 @@ pub struct ListMediaFileForUserArgs<'a> {
   pub username: &'a str,
   //pub maybe_filter_media_type: Option<MediaFileType>,
   pub maybe_filter_media_types: Option<&'a HashSet<MediaFileType>>,
+  pub maybe_filter_media_classes: Option<&'a HashSet<MediaFileClass>>,
   pub page_size: usize,
   pub page_index: usize,
   pub sort_ascending: bool,
@@ -70,6 +75,7 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
   let mut count_query_builder = query_builder(
     //args.maybe_filter_media_type,
     args.maybe_filter_media_types,
+    args.maybe_filter_media_classes,
     args.username,
     false,
     0,
@@ -87,6 +93,7 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
   let mut query = query_builder(
     //args.maybe_filter_media_type,
     args.maybe_filter_media_types,
+    args.maybe_filter_media_classes,
     args.username,
     true,
     args.page_index,
@@ -110,6 +117,7 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
           maybe_origin_model_token: record.maybe_origin_model_token,
           maybe_origin_model_title: record.maybe_origin_model_title,
           media_type: record.media_type,
+          media_class: record.media_class,
           public_bucket_directory_hash: record.public_bucket_directory_hash,
           maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
           maybe_public_bucket_extension: record.maybe_public_bucket_extension,
@@ -139,6 +147,7 @@ fn select_result_fields() -> String {
     m.token,
 
     m.media_type,
+    m.media_class,
 
     m.origin_category,
     m.origin_product_category,
@@ -176,6 +185,7 @@ fn select_total_count_field() -> String {
 fn query_builder<'a>(
   //maybe_filter_media_type: Option<MediaFileType>,
   maybe_filter_media_types: Option<&HashSet<MediaFileType>>,
+  maybe_filter_media_classes: Option<&HashSet<MediaFileClass>>,
   username: &'a str,
   enforce_limits: bool,
   page_index: usize,
@@ -228,6 +238,22 @@ LEFT OUTER JOIN entity_stats
     }
   }
 
+  if let Some(media_classes) = maybe_filter_media_classes {
+    // NB: `WHERE IN` comma separated syntax will be wrong if list has zero length
+    // We'll skip the predicate if the list isn't empty.
+    if !media_classes.is_empty() {
+      query_builder.push(" AND m.media_class IN ( ");
+
+      let mut separated = query_builder.separated(", ");
+
+      for media_class in media_classes.iter() {
+        separated.push_bind(media_class.to_str());
+      }
+
+      separated.push_unseparated(") ");
+    }
+  }
+
   match view_as {
     ViewAs::Author | ViewAs::Moderator => {
       // NB(bt): Actually, mods don't want to see deleted files. We'll improve the moderator UI later.
@@ -271,6 +297,8 @@ struct MediaFileListItemInternal {
   maybe_origin_model_title: Option<String>,
 
   media_type: MediaFileType,
+  media_class: MediaFileClass,
+
   public_bucket_directory_hash: String,
   maybe_public_bucket_prefix: Option<String>,
   maybe_public_bucket_extension: Option<String>,
@@ -311,6 +339,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_origin_model_token: row.try_get("maybe_origin_model_token")?,
       maybe_origin_model_title: row.try_get("maybe_origin_model_title")?,
       media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
+      media_class: MediaFileClass::try_from_mysql_row(row, "media_class")?,
       public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
       maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
