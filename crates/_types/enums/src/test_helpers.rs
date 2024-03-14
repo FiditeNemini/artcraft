@@ -2,8 +2,14 @@
 
 use serde::Serialize;
 
-pub fn to_json<T: Serialize>(t: T) -> String {
-  toml::to_string(&t)
+pub fn to_toml<T: Serialize>(t: &T) -> String {
+  toml::to_string(t)
+      .expect("serialization error")
+      .replace("\"", "") // JSON values are quoted, so we remove quotes
+}
+
+pub fn to_json<T: Serialize>(t: &T) -> String {
+  serde_json::to_string(t)
       .expect("serialization error")
       .replace("\"", "") // JSON values are quoted, so we remove quotes
 }
@@ -12,5 +18,6 @@ pub fn to_json<T: Serialize>(t: T) -> String {
 /// This is useful for ensuring stability of serialization.
 pub fn assert_serialization<T: Serialize>(t: T, expected: &str) {
   // TODO: See if there's a way to check the sqlx serialization
-  assert_eq!(&to_json(t), expected);
+  assert_eq!(&to_toml(&t), expected);
+  assert_eq!(&to_json(&t), expected);
 }
