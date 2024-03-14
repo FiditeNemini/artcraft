@@ -1,23 +1,22 @@
+import React, { useState } from "react";
 import {
   faArrowRightArrowLeft,
-  faFile,
-  faTrashAlt,
+  // faFile,
+  // faTrashAlt,
 } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Container, Panel } from "components/common";
-import FileInput from "components/common/FileInput";
+// import FileInput from "components/common/FileInput";
 import PageHeader from "components/layout/PageHeader";
-import { useFile, useInferenceJobs, useMedia } from "hooks";
-import React, { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadMedia";
+// import { useHistory, useParams } from "react-router-dom";
+// import { v4 as uuidv4 } from "uuid";
+// import { UploadMedia } from "@storyteller/components/src/api/media_files/UploadMedia";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import FbxToGltfJobList from "./components/FbxToGltfJobList";
 import {
-  EnqueueFbxToGltf,
-  EnqueueFbxToGltfIsSuccess,
-  EnqueueFbxToGltfIsError,
+  // EnqueueFbxToGltf,
+  // EnqueueFbxToGltfIsSuccess,
+  // EnqueueFbxToGltfIsError,
 } from "@storyteller/components/src/api/file_conversion/EnqueueFbxToGltf";
 import { onChanger } from "resources";
 
@@ -36,36 +35,36 @@ export default function FbxToGltfPage({
   const [mediaToken,mediaTokenSet] = useState();
   const onChange = onChanger({ mediaTokenSet });
 
-  const EnqueueConvert = async ({ upload_token }: any) => {
-    if (!upload_token) return false;
+  // const EnqueueConvert = async ({ upload_token }: any) => {
+  //   if (!upload_token) return false;
 
-    try {
-      let request = {
-        uuid_idempotency_token: uuidv4(),
-        file_source: undefined,
-        media_file_token: upload_token,
-      };
+  //   try {
+  //     let request = {
+  //       uuid_idempotency_token: uuidv4(),
+  //       file_source: undefined,
+  //       media_file_token: upload_token,
+  //     };
 
-      const response = await EnqueueFbxToGltf(request);
+  //     const response = await EnqueueFbxToGltf(request);
 
-      if (EnqueueFbxToGltfIsSuccess(response)) {
-        console.log("Enqueue successful");
+  //     if (EnqueueFbxToGltfIsSuccess(response)) {
+  //       console.log("Enqueue successful");
 
-        if (response && response.inference_job_token) {
-          enqueueInferenceJob(
-            response.inference_job_token,
-            FrontendInferenceJobType.ConvertFbxtoGltf
-          );
-        }
-        return true;
-      } else if (EnqueueFbxToGltfIsError(response)) {
-        throw new Error("Enqueue failed");
-      }
-    } catch (error) {
-      console.error("Error in enqueueing conversion: ", error);
-      return false;
-    }
-  };
+  //       if (response && response.inference_job_token) {
+  //         enqueueInferenceJob(
+  //           response.inference_job_token,
+  //           FrontendInferenceJobType.ConvertFbxtoGltf
+  //         );
+  //       }
+  //       return true;
+  //     } else if (EnqueueFbxToGltfIsError(response)) {
+  //       throw new Error("Enqueue failed");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error in enqueueing conversion: ", error);
+  //     return false;
+  //   }
+  // };
 
   return (
     <Container type="panel">
@@ -84,10 +83,10 @@ export default function FbxToGltfPage({
           <EntityInput {...{
             accept: ["fbx"],
             aspectRatio: "landscape",
-            label: "Choose entity",
+            label: "Choose FBX file",
             name: "mediaToken",
             onChange,
-            owner: "echelon",
+            // owner: "echelon",
             type: "media"
           }}/>
           {

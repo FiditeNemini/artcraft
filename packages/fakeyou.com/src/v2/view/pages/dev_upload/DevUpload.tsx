@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PageHeader from "components/layout/PageHeader";
 import { useMediaUploader, useSession } from "hooks";
 import { Button, Container, Panel } from "components/common";
+import { UploaderResponse } from "components/entities/EntityTypes";
 import { faUpload } from "@fortawesome/pro-solid-svg-icons";
 import { MediaFileSubtype } from "@storyteller/components/src/api/enums/MediaFileSubtype";
 import { Link } from "react-router-dom";
@@ -11,7 +12,7 @@ interface DevUploadProps {}
 export default function DevUpload(props: DevUploadProps) {
   const [tokens, tokensSet] = useState<string[]>([]);
   const { engineSubtype, engineSubtypeChange, file, inputProps, isEngineAsset, isVideo, upload } = useMediaUploader({
-    onSuccess: (res: any) => tokensSet([res.media_file_token, ...tokens])
+    onSuccess: (res: UploaderResponse) => tokensSet([res.media_file_token, ...tokens])
   });
 
   const { onChange } = inputProps;

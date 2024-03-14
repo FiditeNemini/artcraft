@@ -1,4 +1,6 @@
 import { enumToKeyArr } from "resources";
+import { UploadMediaResponse } from "@storyteller/components/src/api/media_files/UploadMedia";
+import { UploadEngineAssetResponse }from "@storyteller/components/src/api/media_files/UploadEngineAsset";
 
 export enum EntityInputMode {
   bookmarks,
@@ -74,6 +76,7 @@ export type VideoFilterProp = keyof typeof VideoTypes;
 export type WeightCategoriesProp = keyof typeof WeightsCategories;
 export type AcceptTypes = EngineFilterProp | AudioFilterProp | ImageFilterProp | VideoFilterProp | WeightFilterProp;
 export type JobSelection = WeightCategoriesProp | WeightFilterProp;
+export type UploaderResponse = UploadEngineAssetResponse | UploadMediaResponse;
 
 export const ListEntityFilters = (mode?: number) => {
   const bookmarkFilters = Object.keys({ ...MediaFilters, ...WeightsFilters }).filter(val => isNaN(Number(val))).reduce((obj,current) => ({ ...obj, [current]: current  }),{});
@@ -99,7 +102,6 @@ export const isSelectedType = (mode: MediaFilters, fileExtension: string) => enu
 ][mode]).includes(fileExtension);
 
 export const getMediaCategory = (fileExtension: string) => {
-  console.log("🍔",isSelectedType(MediaFilters.image,fileExtension));
   isSelectedType(MediaFilters.image,fileExtension);
   if (isSelectedType(MediaFilters.engine_asset, fileExtension)) return MediaFilters.engine_asset;
   if (isSelectedType(MediaFilters.audio, fileExtension)) return MediaFilters.audio;

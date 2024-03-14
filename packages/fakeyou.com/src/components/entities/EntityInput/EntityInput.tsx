@@ -4,11 +4,9 @@ import { a, useTransition } from "@react-spring/web";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import Iframe from "react-iframe";
 import { Label, Spinner } from "components/common";
-import { AcceptTypes, EntityInputMode, EntityModeProp } from "components/entities/EntityTypes";
-import { useFile, useMedia, useModal, useSession } from "hooks";
+import { AcceptTypes, EntityInputMode, EntityModeProp, UploaderResponse } from "components/entities/EntityTypes";
+import { useMedia, useMediaUploader, useModal, useSession } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
-import { UploadMedia, UploadMediaResponse } from "@storyteller/components/src/api/media_files/UploadMedia";
-import { v4 as uuidv4 } from "uuid";
 import EntityInputEmpty from "./EntityInputEmpty";
 import "./EntityInput.scss";
 
@@ -77,22 +75,11 @@ export default function EntityInput({ accept: inAccept, aspectRatio = "square", 
     onChange({ target: { name, value: token } });
   };
 
-  const { clear, inputProps } = useFile({
-    onChange: (inputFile: any) => {
-      if (inputFile) UploadMedia({
-        uuid_idempotency_token: uuidv4(),
-        file: inputFile,
-        source: "file",
-      })
-      .then((res: UploadMediaResponse) => {
-        if ("media_file_token" in res) {
-          clear();
-          selectToken(res.media_file_token);
-        }
-      });
-      else console.log("🥺 no file");
-    }
+  const { inputProps } = useMediaUploader({
+    autoUpload: true,
+    onSuccess: (res: UploaderResponse) => selectToken(res.media_file_token)
   });
+
   const onSelect = (data: MediaFile) => {
     mediaSet(data);
     selectToken(data.token);
