@@ -177,7 +177,8 @@ use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_b
 use crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler;
 use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
-use crate::http_server::endpoints::workflows::enqueue_comfy_ui::enqueue_comfy_ui_handler;
+use crate::http_server::endpoints::workflows::enqueue_comfy_ui_handler::enqueue_comfy_ui_handler;
+use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler;
 use crate::http_server::endpoints::workflows::enqueue_workflow_upload_request::enqueue_workflow_upload_request;
 
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
@@ -1364,15 +1365,24 @@ fn add_workflow_routes<T,B> (app:App<T>)-> App<T>
             InitError = (),
         >,
 {
+
     app.service(
-        web::scope("/v1/workflow")
-            .service(
-                web::scope("/upload")              
-                    .route("/prompt", web::post().to(enqueue_workflow_upload_request))
-            )
-            .service(
-                web::scope("/comfy")
-                    .route("/create", web::post().to(enqueue_comfy_ui_handler))
+      // NB: We don't want this to live alongside the older endpoints for comfy and workflows -
+      // We don't want to give away that we're using Comfy or ComfyUI workflows as a technique.
+      web::scope("/v1/video")
+          .service(web::resource("/enqueue_vst")
+              .route(web::post().to(enqueue_video_style_transfer_handler))
+              .route(web::head().to(|| HttpResponse::Ok()))
+          )
+    ).service(
+      web::scope("/v1/workflow")
+          .service(
+              web::scope("/upload")
+                  .route("/prompt", web::post().to(enqueue_workflow_upload_request))
+          )
+          .service(
+              web::scope("/comfy")
+                  .route("/create", web::post().to(enqueue_comfy_ui_handler))
 
         )
     )

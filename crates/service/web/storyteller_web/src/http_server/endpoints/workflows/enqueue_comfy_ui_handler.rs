@@ -256,16 +256,22 @@ pub async fn enqueue_comfy_ui_handler(
         maybe_workflow_config: request.maybe_workflow_config.clone(),
         maybe_input_file: request.maybe_input_file.clone(),
         maybe_output_path: request.maybe_output_path.clone(),
-        maybe_google_drive_link: None,
-        maybe_title: None,
-        maybe_commit_hash:None,
-        maybe_description:None,
         creator_visibility:Some(set_visibility),
         trim_start_seconds: Some(trim_start_seconds),
         trim_end_seconds: Some(trim_end_seconds),
         target_fps:Some(target_fps),
-        // scale_width:Some(scale_width),
-        // scale_height:Some(scale_height)
+        // NB: The following are unused:
+        maybe_google_drive_link: None,
+        maybe_title: None,
+        maybe_commit_hash: None,
+        maybe_description: None,
+        // NB: The following do not matter for this endpoint; they're used in
+        // the newer, simpler enqueue endpoint:
+        style_name: None,
+        trim_start_milliseconds: None,
+        trim_end_milliseconds: None,
+        positive_prompt: None,
+        negative_prompt: None,
     };
 
     info!("Creating ComfyUI job record...");

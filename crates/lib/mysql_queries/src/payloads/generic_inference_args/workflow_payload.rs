@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use enums::common::visibility::Visibility;
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
@@ -79,11 +80,30 @@ pub struct WorkflowArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub target_fps: Option<u32>,
 
-    // #[serde(rename = "sw")]
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // pub scale_width: Option<u32>,
     //
-    // #[serde(rename = "sh")]
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // pub scale_height: Option<u32>
+    // New Style Jobs
+    //
+    // The following jobs simply communicate a "style name" and high level parameters
+    // and rely on the backend to set node parameters:
+    //
+
+    #[serde(rename = "sn")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub style_name: Option<StyleTransferName>,
+
+    #[serde(rename = "tsm")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trim_start_milliseconds: Option<u64>,
+
+    #[serde(rename = "tem")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub trim_end_milliseconds: Option<u64>,
+
+    #[serde(rename = "pp")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub positive_prompt: Option<String>,
+
+    #[serde(rename = "np")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub negative_prompt: Option<String>,
 }

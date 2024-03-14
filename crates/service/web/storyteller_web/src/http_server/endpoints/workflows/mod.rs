@@ -1,2 +1,3 @@
-pub(crate) mod enqueue_comfy_ui;
+pub(crate) mod enqueue_comfy_ui_handler;
 pub(crate) mod enqueue_workflow_upload_request;
+pub mod enqueue_video_style_transfer_handler;

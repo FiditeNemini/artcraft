@@ -224,21 +224,25 @@ pub async fn enqueue_workflow_upload_request(
     let commit_hash = request.commit_hash.clone();
 
     let inference_args = WorkflowArgs {
-        maybe_lora_model: None,
-        maybe_json_modifications: None,
-        maybe_workflow_config: None,
-        maybe_input_file: None,
-        maybe_output_path: None,
         maybe_google_drive_link: Some(google_drive_link),
         maybe_title: Some(title),
         maybe_description: Some(description),
         maybe_commit_hash: Some(commit_hash),
         creator_visibility: Some(visibility),
+        // NB: The following args are irrelevant for uploading workflows
+        maybe_lora_model: None,
+        maybe_json_modifications: None,
+        maybe_workflow_config: None,
+        maybe_input_file: None,
+        maybe_output_path: None,
         trim_start_seconds: None,
         trim_end_seconds: None,
         target_fps: None,
-        // scale_width: None,
-        // scale_height: None,
+        style_name: None,
+        trim_start_milliseconds: None,
+        trim_end_milliseconds: None,
+        positive_prompt: None,
+        negative_prompt: None,
     };
    
     // create the inference args here

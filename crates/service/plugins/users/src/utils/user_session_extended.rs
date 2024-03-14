@@ -1,12 +1,14 @@
 use chrono::{DateTime, Utc};
 
 use enums::common::visibility::Visibility;
+use tokens::tokens::users::UserToken;
 
 use crate::utils::user_session_feature_flags::UserSessionFeatureFlags;
 
 #[derive(Clone, Default)]
 pub struct UserSessionExtended {
     pub user_token: String,
+    pub user_token_typed: UserToken,
     pub user: UserSessionUserDetails,
     pub premium: UserSessionPremiumPlanInfo,
     pub preferences: UserSessionPreferences,
