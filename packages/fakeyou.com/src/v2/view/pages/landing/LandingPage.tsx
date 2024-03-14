@@ -35,20 +35,34 @@ interface Props {
 }
 
 function LandingPage(props: Props) {
-  usePrefixedDocumentTitle("FakeYou Celebrity Voice Generator");
-
   PosthogClient.recordPageview();
 
   const domain: DomainConfig = useDomainConfig();
 
+  const webpageTitle =
+    domain.website === Website.FakeYou
+      ? "FakeYou Celebrity Voice Generator"
+      : "";
+
+  usePrefixedDocumentTitle(webpageTitle);
+
   const isLoggedIn = props.sessionWrapper.isLoggedIn();
 
-  const canAccessStudio = props.sessionWrapper.canAccessStudio();
+  // DO NOT LEAK THIS YET!!
+  let protectedStudioOnboarding = <></>;
+
+  if (props.sessionWrapper.canAccessStudio()) {
+    protectedStudioOnboarding = (
+      <>
+        <OnboardingSelection />
+      </>
+    );
+  }
 
   return (
     <>
-      {domain.website === Website.StorytellerAi && !isLoggedIn && (
-        <LandingVideoReel />
+      {domain.website === Website.StorytellerAi && (
+        <LandingVideoReel sessionWrapper={props.sessionWrapper} />
       )}
       <Container type="panel">
         {domain.website === Website.FakeYou ? (
@@ -79,27 +93,22 @@ function LandingPage(props: Props) {
         ) : (
           <>
             {/* STORYTELLER,AI */}
-            {!isLoggedIn ? (
-              <>
-                {!canAccessStudio && <OnboardingSelection />}
-                <VstSectionV2 />
-                <TtsDemoSection
-                  sessionWrapper={props.sessionWrapper}
-                  sessionSubscriptionsWrapper={
-                    props.sessionSubscriptionsWrapper
-                  }
-                  inferenceJobs={props.inferenceJobs}
-                  ttsInferenceJobs={props.ttsInferenceJobs}
-                  enqueueInferenceJob={props.enqueueInferenceJob}
-                  inferenceJobsByCategory={props.inferenceJobsByCategory}
-                  enqueueTtsJob={props.enqueueTtsJob}
-                />
-                <Dashboard sessionWrapper={props.sessionWrapper} />
-                <FakeYouLandingBody />
-              </>
-            ) : (
-              <Dashboard sessionWrapper={props.sessionWrapper} />
-            )}
+
+            {protectedStudioOnboarding}
+            <VstSectionV2 />
+            <TtsDemoSection
+              sessionWrapper={props.sessionWrapper}
+              sessionSubscriptionsWrapper={props.sessionSubscriptionsWrapper}
+              inferenceJobs={props.inferenceJobs}
+              ttsInferenceJobs={props.ttsInferenceJobs}
+              enqueueInferenceJob={props.enqueueInferenceJob}
+              inferenceJobsByCategory={props.inferenceJobsByCategory}
+              enqueueTtsJob={props.enqueueTtsJob}
+            />
+
+            <Dashboard sessionWrapper={props.sessionWrapper} />
+
+            <FakeYouLandingBody />
           </>
         )}
       </Container>

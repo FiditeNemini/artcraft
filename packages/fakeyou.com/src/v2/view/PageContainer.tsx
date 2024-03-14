@@ -127,6 +127,7 @@ import DevTTS from "./pages/dev_tts/DevTTS";
 import { StudioIntroPage } from "./pages/storyteller_studio_intro/StudioIntroPage";
 import StudioVSTPage from "./pages/storyteller_studio_intro/StudioVST/StudioVSTPage";
 import { StudioIntroResultPage } from "./pages/storyteller_studio_intro/StudioIntroResultPage";
+import DashboardPage from "./pages/dashboard/DashboardPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -727,6 +728,10 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
+                  <Route path="/dashboard">
+                    <DashboardPage sessionWrapper={this.props.sessionWrapper} />
+                  </Route>
+
                   <Route path="/about">
                     <AboutPage />
                   </Route>
@@ -812,7 +817,7 @@ class PageContainer extends React.Component<
                   <Route path="/dev-tts">
                     <DevTTS />
                   </Route>
-                  
+
                   {/* Route for initial voice creation */}
                   <Route exact path="/voice-designer/create">
                     <VoiceDesignerFormPage

@@ -1,12 +1,26 @@
 import { faArrowRight } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "components/common";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./LandingVideoReel.scss";
+import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { useLocation } from "react-router-dom";
 
-interface LandingVideoReelProps {}
+interface LandingVideoReelProps {
+  sessionWrapper: SessionWrapper;
+}
 
-export default function LandingVideoReel(props: LandingVideoReelProps) {
-  const isOnLandingPage = window.location.pathname === "/";
+export default function LandingVideoReel({
+  sessionWrapper,
+}: LandingVideoReelProps) {
+  const location = useLocation();
+  const [isOnLandingPage, setIsOnLandingPage] = useState(
+    window.location.pathname === "/"
+  );
+  const isLoggedIn = sessionWrapper.isLoggedIn();
+
+  useEffect(() => {
+    setIsOnLandingPage(location.pathname === "/");
+  }, [location]);
 
   useEffect(() => {
     const contentWrapper = document.getElementById("page-content-wrapper");
@@ -41,7 +55,7 @@ export default function LandingVideoReel(props: LandingVideoReelProps) {
       searchBar?.classList.remove("landing-search");
       contentWrapper?.classList.remove("no-page-padding-top");
     };
-  }, [isOnLandingPage]);
+  }, [isOnLandingPage, isLoggedIn]);
 
   return (
     <div className="storyteller-landing-reel">
@@ -62,8 +76,8 @@ export default function LandingVideoReel(props: LandingVideoReelProps) {
             <Button
               icon={faArrowRight}
               iconFlip={true}
-              label="Sign Up Now"
-              to="/signup"
+              label={isLoggedIn ? "Explore AI Tools" : "Sign Up Now"}
+              to={isLoggedIn ? "/dashboard" : "/signup"}
               className="mt-4"
             />
           </div>

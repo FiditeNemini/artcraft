@@ -1,142 +1,68 @@
 import React, { useState } from "react";
-import Panel from "components/common/Panel";
-import Container from "components/common/Container";
 import PageHeader from "components/layout/PageHeader";
-import { useSession } from "hooks";
-import { Button } from "components/common";
+import { useMediaUploader, useSession } from "hooks";
+import { Button, Container, Panel } from "components/common";
+import { UploaderResponse } from "components/entities/EntityTypes";
 import { faUpload } from "@fortawesome/pro-solid-svg-icons";
-import { FileType, GetFileTypeByExtension } from "@storyteller/components/src/utils/GetFileTypeByExtension";
-import { UploadMedia,  UploadMediaResponse, } from "@storyteller/components/src/api/media_files/UploadMedia";
-import { UploadEngineAsset,  UploadEngineAssetResponse, } from "@storyteller/components/src/api/media_files/UploadEngineAsset";
 import { MediaFileSubtype } from "@storyteller/components/src/api/enums/MediaFileSubtype";
-import { v4 as uuidv4 } from "uuid";
+import { MediaFileClass } from "@storyteller/components/src/api/enums/MediaFileClass";
 import { Link } from "react-router-dom";
-
-enum UploadType {
-  EngineAsset = "engine_asset",
-  Image = "image",
-  Audio = "audio",
-  Video = "video",
-  Unknown = "unknown",
-}
 
 interface DevUploadProps {}
 
 export default function DevUpload(props: DevUploadProps) {
+  const [tokens, tokensSet] = useState<string[]>([]);
+  const { engineSubtype, engineSubtypeChange, mediaClass, mediaClassChange, file, inputProps, isEngineAsset, isVideo, upload } = useMediaUploader({
+    onSuccess: (res: UploaderResponse) => tokensSet([res.media_file_token, ...tokens])
+  });
+
+  const { onChange } = inputProps;
   const { studioAccessCheck } = useSession();
 
-  const [file, fileSet] = useState<File | null>(null);
-  const [maybeMediaFileSubtype, maybeMediaFileSubtypeSet] = useState<MediaFileSubtype | undefined>(undefined);
-  const [uploadType, uploadTypeSet] = useState<UploadType>(UploadType.Unknown);
-  const [tokens, tokensSet] = useState<string[]>([]);
-
-  const handleFileChange = (event: any) => {
-    const maybeFile = event.target.files[0];
-    const fileType = GetFileTypeByExtension(maybeFile?.name || "");
-
-    let uploadType = UploadType.Unknown;
-
-    switch (fileType) {
-      case FileType.Bvh:
-      case FileType.Fbx:
-      case FileType.Glb:
-      case FileType.Gltf:
-      case FileType.Obj:
-      case FileType.Ron:
-        uploadType = UploadType.EngineAsset;
-        break;
-      case FileType.Jpg:
-      case FileType.Png:
-        uploadType = UploadType.Image;
-        break;
-      case FileType.Mp3:
-      case FileType.Wav:
-        uploadType = UploadType.Audio;
-        break;
-      case FileType.Mp4:
-        uploadType = UploadType.Video;
-        break;
-      case FileType.Unknown:
-      default:
-        uploadType = UploadType.Unknown;
-        break;
-    }
-
-    fileSet(maybeFile);
-    uploadTypeSet(uploadType);
-  };
-
-  const handleSubtypeChange = (ev: React.FormEvent<HTMLSelectElement>) => {
-    const value = (ev.target as HTMLSelectElement).value;
-    const maybeSubtype = value as MediaFileSubtype;
-    maybeMediaFileSubtypeSet(maybeSubtype);
-  }
-
-  const handleUpload = () => {
-    if (!file) {
-      console.error("no file specified for upload");
-      return;
-    }
-
-    switch(uploadType) {
-      case UploadType.EngineAsset:
-        UploadEngineAsset({
-          uuid_idempotency_token: uuidv4(),
-          file,
-          media_file_subtype: maybeMediaFileSubtype,
-        })
-        .then((res: UploadEngineAssetResponse) => {
-          if ("media_file_token" in res) {
-            tokensSet([res.media_file_token, ...tokens]);
-            fileSet(null);
-          }
-        });
-        break;
-      default:
-        UploadMedia({
-          uuid_idempotency_token: uuidv4(),
-          file,
-          source: "file",
-        })
-        .then((res: UploadMediaResponse) => {
-          if ("media_file_token" in res) {
-            tokensSet([res.media_file_token, ...tokens]);
-            fileSet(null);
-          }
-        });
-    }
-  };
-
   let title = "Upload Generic File";
-  let mediaFileSubtypeForm = <></>;
+  let engineSubForm = <></>;
 
-  switch (uploadType) {
-    case UploadType.Video:
-      title = "Upload Video";
-      break;
-
-    case UploadType.EngineAsset:
-      title = "Upload Engine Asset";
-      mediaFileSubtypeForm = (
-        <>
-          <div className="mb-3">
-            <label htmlFor="fileSubtypeSelect" className="form-label">Engine Media File Subtype</label>
-            <select 
-              onChange={handleSubtypeChange}
-              className="form-select" 
-              aria-label="Default select example" 
-              id="fileSubtypeSelect"
-              value={maybeMediaFileSubtype}
-            >
-              <option value={MediaFileSubtype.SceneImport}>Scene Import (default)</option>
-              <option value={MediaFileSubtype.Mixamo}>Mixamo Animation</option>
-              <option value={MediaFileSubtype.StorytellerScene}>Storyteller Scene</option>
-              <option value={MediaFileSubtype.AnimationOnly}>Animation Only</option>
-            </select>
-          </div>
-        </>
-      );
-      break;
+  if (isVideo) { title = "Upload Video"; }
+  if (isEngineAsset) {
+    title = "Upload Engine Asset";
+    engineSubForm = (
+      <>
+        <div className="mb-3">
+          <label htmlFor="fileClassSelect" className="form-label">Media Class</label>
+          <select 
+            onChange={mediaClassChange}
+            className="form-select" 
+            aria-label="Default select example" 
+            id="fileClassSelect"
+            value={mediaClass}
+          >
+            <option value={MediaFileClass.Unknown}>Unknown</option>
+            <option value={MediaFileClass.Audio}>Audio</option>
+            <option value={MediaFileClass.Image}>Image</option>
+            <option value={MediaFileClass.Video}>Video</option>
+            <option value={MediaFileClass.Animation}>Animation</option>
+            <option value={MediaFileClass.Character}>Character</option>
+            <option value={MediaFileClass.Prop}>Prop</option>
+            <option value={MediaFileClass.Scene}>Scene</option>
+          </select>
+        </div>
+        <div className="mb-3">
+          <label htmlFor="fileSubtypeSelect" className="form-label">Engine Media File Subtype</label>
+          <select 
+            onChange={engineSubtypeChange}
+            className="form-select" 
+            aria-label="Default select example" 
+            id="fileSubtypeSelect"
+            value={engineSubtype}
+          >
+            <option value={MediaFileSubtype.SceneImport}>Scene Import (default)</option>
+            <option value={MediaFileSubtype.Mixamo}>Mixamo Animation</option>
+            <option value={MediaFileSubtype.StorytellerScene}>Storyteller Scene</option>
+            <option value={MediaFileSubtype.AnimationOnly}>Animation Only</option>
+          </select>
+        </div>
+      </>
+    );
   }
 
   return studioAccessCheck(
@@ -146,7 +72,7 @@ export default function DevUpload(props: DevUploadProps) {
         subText="Upload files to the server for testing."
       />
 
-      {maybeMediaFileSubtype}
+      {engineSubtype}
 
       <Panel padding={true}>
         <div className="d-flex flex-column gap-5">
@@ -154,22 +80,22 @@ export default function DevUpload(props: DevUploadProps) {
 
           <div className="mb-3">
             <label htmlFor="formFile" className="form-label">Select File for Upload</label>
-            <input
-              className="form-control form-control-lg"
-              id="formFile"
-              type="file"
-              onChange={handleFileChange}
-            />
+            <input {...{
+              onChange,
+              className: "form-control form-control-lg",
+              type: "file",
+              id: "formFile"
+            }}/>
           </div>
 
-          {mediaFileSubtypeForm}
+          {engineSubForm}
 
           <div className="d-flex gap-3 justify-content-end">
             <Button
               disabled={!file}
               icon={faUpload}
               label="Upload Media"
-              onClick={handleUpload}
+              onClick={upload}
             />
           </div>
 

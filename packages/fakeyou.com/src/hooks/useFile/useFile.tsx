@@ -19,7 +19,7 @@ export default function useFile({ debug, onChange = n, onClear = n }: Props) {
     blobSet(inputFile ? URL.createObjectURL(inputFile) : "");
   };
   const inputChange = ({ target = {} }: { target: any }) => {
-    fileChange(target.value);
+    fileChange(target.files ? target.files[0] : target.value);
   };
   const clear = () => {
     if (inputRef?.current?.value) inputRef.current.value = '';

@@ -30,6 +30,8 @@ import { useInferenceJobs, useLocalize } from "hooks";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Button } from "components/common";
 import { WebUrl } from "common/WebUrl";
+import { DomainConfig, Website } from "utils/domainConfig";
+import { useDomainConfig } from "context/DomainConfigContext";
 
 interface SideNavProps {
   sessionWrapper: SessionWrapper;
@@ -56,6 +58,7 @@ export default function SideNav({
   const isOnLoginPage = window.location.pathname.includes("/login");
   const isOnSignUpPage = window.location.pathname.includes("/signup");
   const isOnStudioPage = window.location.pathname.includes("/studio");
+  const domain: DomainConfig = useDomainConfig();
 
   let history = useHistory();
   const handleNavLinkClick = () => {
@@ -107,7 +110,8 @@ export default function SideNav({
 
   const shouldNotShowSidebar =
     (!isLoggedIn && (isOnLandingPage || isOnLoginPage || isOnSignUpPage)) ||
-    isOnStudioPage;
+    isOnStudioPage ||
+    (domain.website === Website.StorytellerAi && isOnLandingPage);
   const shouldShowSidebar = windowWidth >= 992 && !shouldNotShowSidebar;
   const sidebarClassName = `sidebar ${
     shouldShowSidebar ? "visible" : ""
@@ -333,7 +337,7 @@ export default function SideNav({
             <li>
               <NavLink
                 exact={true}
-                to="/"
+                to={domain.website === Website.FakeYou ? "/" : "/dashboard"}
                 activeClassName="active-link"
                 onClick={handleNavLinkClick}
               >
@@ -341,7 +345,7 @@ export default function SideNav({
                   icon={faHome}
                   className="sidebar-heading-icon"
                 />
-                Home
+                {domain.website === Website.FakeYou ? "Home" : "Dashboard"}
               </NavLink>
             </li>
             <li>

@@ -15,13 +15,15 @@ export default function GetApiHost() {
       return hostConfig("api.fakeyou.com");
     case "storyteller.ai":
     case "staging.storyteller.ai":
-      return hostConfig("api.storyteller.ai");
+      //return hostConfig("api.storyteller.ai");
+      return hostConfig("api.fakeyou.com");
     case "storyteller.stream": // Storyteller.stream is deprecated and will be decommissioned in the future.
       return hostConfig("api.storyteller.stream");
     case "devproxy.fakeyou.com":
       return hostConfig("api.fakeyou.com");
     case "devproxy.storyteller.ai":
-      return hostConfig("api.storyteller.ai");
+      //return hostConfig("api.storyteller.ai");
+      return hostConfig("api.fakeyou.com");
     case "dev.fakeyou.com":
       return hostConfig("api.dev.fakeyou.com:12345",false); // false disables SSL
     default:
