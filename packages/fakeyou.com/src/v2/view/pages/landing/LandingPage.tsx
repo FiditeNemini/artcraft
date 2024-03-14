@@ -45,7 +45,16 @@ function LandingPage(props: Props) {
 
   const isLoggedIn = props.sessionWrapper.isLoggedIn();
 
-  const canAccessStudio = props.sessionWrapper.canAccessStudio();
+  // DO NOT LEAK THIS YET!!
+  let protectedStudioOnboarding = <></>
+
+  if (props.sessionWrapper.canAccessStudio()) {
+    protectedStudioOnboarding = (
+      <>
+        <OnboardingSelection />
+      </>
+    );
+  }
 
   return (
     <>
@@ -83,7 +92,7 @@ function LandingPage(props: Props) {
             {/* STORYTELLER,AI */}
             {!isLoggedIn ? (
               <>
-                {!canAccessStudio && <OnboardingSelection />}
+                {protectedStudioOnboarding}
                 <VstSectionV2 />
                 <TtsDemoSection
                   sessionWrapper={props.sessionWrapper}
