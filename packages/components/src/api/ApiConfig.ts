@@ -46,7 +46,8 @@ class ApiConfig {
         break;
       case "storyteller.ai":
       case "staging.storyteller.ai":
-        apiHost = "api.storyteller.ai";
+        //apiHost = "api.storyteller.ai";
+        apiHost = "api.fakeyou.com";
         break;
       case "storyteller.stream":
         // Storyteller.stream is deprecated and will be decommissioned in the future.
@@ -61,7 +62,8 @@ class ApiConfig {
       case "devproxy.storyteller.ai":
       case "devproxy.storyteller.ai:7000":
       case "devproxy.storyteller.ai:7001":
-        apiHost = "api.storyteller.ai";
+        //apiHost = "api.storyteller.ai";
+        apiHost = "api.fakeyou.com";
         useSsl = true;
         break;
       case "dev.fakeyou.com":
