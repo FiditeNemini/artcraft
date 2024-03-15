@@ -260,7 +260,6 @@ pub async fn enqueue_video_style_transfer_handler(
         maybe_lora_model: None,
         maybe_json_modifications: None,
         maybe_workflow_config: None,
-        maybe_input_file: None,
         maybe_output_path: None,
         maybe_google_drive_link: None,
         maybe_title: None,
