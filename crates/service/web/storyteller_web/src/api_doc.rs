@@ -12,6 +12,7 @@ use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEnti
 use enums::by_table::user_ratings::entity_type::UserRatingEntityType;
 use enums::by_table::user_ratings::rating_value::UserRatingValue;
 use enums::common::visibility::Visibility;
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use tokens::tokens::batch_generations::*;
 use tokens::tokens::generic_inference_jobs::*;
 use tokens::tokens::media_files::*;
@@ -42,10 +43,10 @@ use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_
 use crate::http_server::endpoints::media_files::list::list_media_files_for_user::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_media_file_handler::*;
+use crate::http_server::endpoints::media_files::upload_engine_asset::upload_engine_asset_media_file_handler::*;
+use crate::http_server::endpoints::media_files::upload_engine_asset::upload_error::EngineAssetMediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload_video::upload_error::VideoMediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload_video::upload_video_media_file_handler::*;
-use crate::http_server::endpoints::media_files::upload_engine_asset::upload_error::EngineAssetMediaFileUploadError;
-use crate::http_server::endpoints::media_files::upload_engine_asset::upload_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::prompts::get_prompt::*;
 use crate::http_server::endpoints::service::status_alert_handler::*;
 use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::*;
@@ -65,6 +66,7 @@ use crate::http_server::endpoints::weights::list_weights_by_user::*;
 use crate::http_server::endpoints::weights::search_model_weights_handler::*;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image::*;
 use crate::http_server::endpoints::weights::update_weight::*;
+use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::*;
 use crate::http_server::web_utils::response_success_helpers::*;
 
 #[derive(OpenApi)]
@@ -102,6 +104,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler,
     crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler,
     crate::http_server::endpoints::weights::update_weight::update_weight_handler,
+    crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler,
     users_component::endpoints::get_profile_handler::get_profile_handler,
     users_component::endpoints::session_info_handler::session_info_handler,
   ),
@@ -124,6 +127,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileSubtype,
     MediaFileType,
     PromptType,
+    StyleTransferName,
     WeightsCategory,
     WeightsType,
 
@@ -170,6 +174,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     EnqueueTTSRequest,
     EnqueueTTSRequestError,
     EnqueueTTSRequestSuccessResponse,
+    EnqueueVideoStyleTransferError,
+    EnqueueVideoStyleTransferRequest,
+    EnqueueVideoStyleTransferSuccessResponse,
     FakeYouPlan,
     GetInferenceJobStatusError,
     GetInferenceJobStatusPathInfo,

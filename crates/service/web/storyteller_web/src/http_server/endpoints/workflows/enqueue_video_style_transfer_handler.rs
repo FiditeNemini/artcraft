@@ -66,13 +66,13 @@ pub struct EnqueueVideoStyleTransferRequest {
     creator_set_visibility: Option<Visibility>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct EnqueueVideoStyleTransferSuccessResponse {
     pub success: bool,
     pub inference_job_token: InferenceJobToken,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum EnqueueVideoStyleTransferError {
     BadInput(String),
     NotAuthorized,
@@ -109,6 +109,22 @@ impl std::fmt::Display for EnqueueVideoStyleTransferError {
     }
 }
 
+#[utoipa::path(
+    post,
+    path = "/v1/video/enqueue_vst",
+    responses(
+    (
+        status = 200,
+        description = "Enqueue Video Style Transfer",
+        body = EnqueueVideoStyleTransferSuccessResponse,
+    ),
+        (status = 400, description = "Bad input", body = EnqueueVideoStyleTransferError),
+        (status = 401, description = "Not authorized", body = EnqueueVideoStyleTransferError),
+        (status = 429, description = "Rate limited", body = EnqueueVideoStyleTransferError),
+        (status = 500, description = "Server error", body = EnqueueVideoStyleTransferError)
+    ),
+    params(("request" = EnqueueVideoStyleTransferRequest, description = "Payload for request"))
+)]
 pub async fn enqueue_video_style_transfer_handler(
     http_request: HttpRequest,
     request: web::Json<EnqueueVideoStyleTransferRequest>,
