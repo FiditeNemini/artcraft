@@ -105,7 +105,7 @@ impl StageTwoJsonLoader {
     })
   }
 
-  fn load_string_from_json(json: &Value, key_name: &str) -> AnyhowResult<&str> {
+  fn load_string_from_json<'a>(json: &'a Value, key_name: &'a str) -> AnyhowResult<&'a str> {
     Ok(json.get(key_name)
         .ok_or(anyhow!("{} not found in json", key_name))?
         .as_str()
