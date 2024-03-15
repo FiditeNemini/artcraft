@@ -26,7 +26,7 @@ use crate::http_server::endpoints::categories::tts::list_tts_model_assigned_cate
 use crate::http_server::endpoints::comments::create_comment_handler::create_comment_handler;
 use crate::http_server::endpoints::comments::delete_comment_handler::delete_comment_handler;
 use crate::http_server::endpoints::comments::list_comments_handler::list_comments_handler;
-use crate::http_server::endpoints::conversion::enqueue_bvh_to_workflow_handler::enqueue_bvh_to_workflow_handler;
+use crate::http_server::endpoints::conversion::enqueue_render_engine_scene_to_video_handler::enqueue_render_engine_scene_to_video_handler;
 use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::enqueue_fbx_to_gltf_handler;
 use crate::http_server::endpoints::download_job::enqueue_generic_download::enqueue_generic_download_handler;
 use crate::http_server::endpoints::download_job::get_generic_upload_job_status::get_generic_download_job_status_handler;
@@ -274,8 +274,10 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
 
   // =================== BVH from Workflow ====================
 
+  // TODO(bt,2024-03-15): Migrate from "bvh_to_workflow" to "render_engine_scene"
   let mut app = RouteBuilder::from_app(app)
-    .add_post("/v1/conversion/enqueue_bvh_to_workflow", enqueue_bvh_to_workflow_handler)
+    .add_post("/v1/conversion/enqueue_bvh_to_workflow", enqueue_render_engine_scene_to_video_handler)
+    .add_post("/v1/conversion/enqueue_render_engine_scene", enqueue_render_engine_scene_to_video_handler)
     .into_app();
 
   // ==================== Stats ====================

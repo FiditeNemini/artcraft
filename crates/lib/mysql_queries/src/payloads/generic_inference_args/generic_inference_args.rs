@@ -4,6 +4,7 @@ use errors::AnyhowResult;
 use crate::payloads::generic_inference_args::image_generation_payload::StableDiffusionArgs;
 use crate::payloads::generic_inference_args::lipsync_payload::LipsyncArgs;
 use crate::payloads::generic_inference_args::mocap_payload::MocapArgs;
+use crate::payloads::generic_inference_args::render_engine_scene_to_video_payload::RenderEngineSceneToVideoArgs;
 use crate::payloads::generic_inference_args::tts_payload::TTSArgs;
 use crate::payloads::generic_inference_args::videofilter_payload::RerenderArgs;
 use crate::payloads::generic_inference_args::workflow_payload::WorkflowArgs;
@@ -118,11 +119,14 @@ pub enum PolymorphicInferenceArgs {
   /// Image generation. (Short name to save space when serializing.)
   Ig(StableDiffusionArgs),
 
-  // Mocap (Short name to save space when serializing.)
+  /// Mocap (Short name to save space when serializing.)
   Mc(MocapArgs),
 
-  // ComfyUI (Short name to save space when serializing.)
-  Cu(WorkflowArgs)
+  /// ComfyUI (Short name to save space when serializing.)
+  Cu(WorkflowArgs),
+
+  /// Render engine scene to video args
+  Es(RenderEngineSceneToVideoArgs),
 }
 
 impl GenericInferenceArgs {

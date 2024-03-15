@@ -18,10 +18,8 @@ use enums::by_table::generic_inference_jobs::inference_model_type::InferenceMode
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::request::get_request_ip::get_request_ip;
-use mysql_queries::payloads::generic_inference_args::generic_inference_args::{
-  GenericInferenceArgs,
-  InferenceCategoryAbbreviated,
-};
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, InferenceCategoryAbbreviated, PolymorphicInferenceArgs};
+use mysql_queries::payloads::generic_inference_args::render_engine_scene_to_video_payload::RenderEngineSceneToVideoArgs;
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{
   insert_generic_inference_job,
   InsertGenericInferenceArgs,
@@ -46,10 +44,38 @@ const ROUTING_TAG_HEADER_NAME: &str = "routing-tag";
 
 #[derive(Deserialize, ToSchema)]
 pub struct EnqueueBvhToWorkflowRequest {
-  // Entropy for idempotency
+  /// Entropy for idempotency
   uuid_idempotency_token: String,
-  // The existing FBX media file token
+
+  /// The existing engine media file token (scene.ron, bvh, glb, etc.)
   media_file_token: MediaFileToken,
+
+  /// A pre-defined camera animation (optional)
+  camera: Option<CameraMotion>,
+
+  /// A camera speed (optional)
+  camera_speed: Option<f32>,
+}
+
+
+#[derive(Serialize, Deserialize, Clone, Copy, ToSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum CameraMotion {
+  Static,
+  Orbit,
+  Pan,
+  Zoom,
+}
+
+impl CameraMotion {
+  pub fn to_str(&self) -> &'static str {
+    match self {
+      CameraMotion::Static => "static",
+      CameraMotion::Orbit => "orbit",
+      CameraMotion::Pan => "pan",
+      CameraMotion::Zoom => "zoom",
+    }
+  }
 }
 
 #[derive(Serialize, ToSchema)]
@@ -96,11 +122,11 @@ impl std::fmt::Display for EnqueueBvhToWorkflowRequestError {
 
 #[utoipa::path(
   post,
-  path = "/v1/conversion/enqueue_fbx_to_gltf",
+  path = "/v1/conversion/enqueue_render_engine_scene",
   responses(
     (
       status = 200,
-      description = "Enqueue BVH To Workflow",
+      description = "Enqueue Render Engine Scene to Video",
       body = EnqueueBvhToWorkflowRequestSuccessResponse,
     ),
     (status = 400, description = "Bad input", body = EnqueueBvhToWorkflowRequestError),
@@ -108,9 +134,9 @@ impl std::fmt::Display for EnqueueBvhToWorkflowRequestError {
     (status = 429, description = "Rate limited", body = EnqueueBvhToWorkflowRequestError),
     (status = 500, description = "Server error", body = EnqueueBvhToWorkflowRequestError)
   ),
-  params(("request" = EnqueueBvhToWorkflowRequest, description = "Payload for BVH to Workflow Request"))
+  params(("request" = EnqueueBvhToWorkflowRequest, description = "Payload"))
 )]
-pub async fn enqueue_bvh_to_workflow_handler(
+pub async fn enqueue_render_engine_scene_to_video_handler(
     http_request: HttpRequest,
     request: web::Json<EnqueueBvhToWorkflowRequest>,
     server_state: web::Data<Arc<ServerState>>
@@ -192,12 +218,30 @@ pub async fn enqueue_bvh_to_workflow_handler(
         return Err(EnqueueBvhToWorkflowRequestError::BadInput("media_file_token is empty".to_string()));
     }
 
+    let mut maybe_args = None;
+
+    if let Some(camera) = request.camera {
+      let mut args = maybe_args
+          .unwrap_or(RenderEngineSceneToVideoArgs::default());
+      args.camera_animation = Some(camera.to_str().to_string());
+      maybe_args = Some(args);
+    }
+
+    if let Some(camera_speed) = request.camera_speed {
+      let mut args = maybe_args
+          .unwrap_or(RenderEngineSceneToVideoArgs::default());
+      args.camera_speed = Some(camera_speed);
+      maybe_args = Some(args);
+    }
+
+    let maybe_args = maybe_args.map(|args| PolymorphicInferenceArgs::Es(args));
+
     let query_result = insert_generic_inference_job(InsertGenericInferenceArgs {
         uuid_idempotency_token: &request.uuid_idempotency_token,
+        job_type: InferenceJobType::BevyToWorkflow,
         inference_category: InferenceCategory::ConvertBvhToWorkflow,
         maybe_model_type: Some(InferenceModelType::BvhToWorkflow),
         maybe_model_token: None,
-        job_type: InferenceJobType::BevyToWorkflow,
         maybe_input_source_token: Some(&request.media_file_token.as_str()),
         maybe_input_source_token_type: None,
         maybe_download_url: None,
@@ -206,7 +250,7 @@ pub async fn enqueue_bvh_to_workflow_handler(
         maybe_max_duration_seconds: None,
         maybe_inference_args: Some(GenericInferenceArgs {
             inference_category: Some(InferenceCategoryAbbreviated::ConvertBvhToWorkflow),
-            args: None
+            args: maybe_args,
         }),
         maybe_creator_user_token: maybe_user_token.as_ref(),
         maybe_avt_token: maybe_avt_token.as_ref(),
