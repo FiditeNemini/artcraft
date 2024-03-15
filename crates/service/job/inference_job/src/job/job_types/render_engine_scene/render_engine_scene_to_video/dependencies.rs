@@ -6,11 +6,11 @@ use subprocess_common::command_runner::env_var_policy::EnvVarPolicy;
 use subprocess_common::docker_options::{DockerFilesystemMount, DockerOptions};
 use subprocess_common::executable_or_command::ExecutableOrShellCommand;
 
-pub struct BvhToWorkflowDependencies {
+pub struct RenderEngineSceneToVideoDependencies {
     pub command_runner: CommandRunner,
 }
 
-impl BvhToWorkflowDependencies {
+impl RenderEngineSceneToVideoDependencies {
     pub fn setup() -> AnyhowResult<Self> {
         let maybe_execution_directory = easyenv::get_env_pathbuf_optional("BVH2WORKFLOW_DIRECTORY");
 

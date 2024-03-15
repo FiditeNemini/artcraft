@@ -13,6 +13,7 @@ use serde::Serialize;
 use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
@@ -243,7 +244,7 @@ pub async fn enqueue_render_engine_scene_to_video_handler(
         maybe_model_type: Some(InferenceModelType::BvhToWorkflow),
         maybe_model_token: None,
         maybe_input_source_token: Some(&request.media_file_token.as_str()),
-        maybe_input_source_token_type: None,
+        maybe_input_source_token_type: Some(InferenceInputSourceTokenType::MediaFile),
         maybe_download_url: None,
         maybe_cover_image_media_file_token: None,
         maybe_raw_inference_text: None,

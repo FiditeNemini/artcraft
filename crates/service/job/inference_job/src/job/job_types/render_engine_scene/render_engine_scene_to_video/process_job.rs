@@ -16,6 +16,8 @@ use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
+use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
 use mysql_queries::queries::media_files::get_media_file_for_inference::MediaFileForInference;
@@ -23,7 +25,7 @@ use subprocess_common::command_runner::command_runner_args::{FileOrCreate, RunAs
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::bevy_to_workflow::bvh_to_workflow::command_args::BvhToWorkflowCommandArgs;
+use crate::job::job_types::render_engine_scene::render_engine_scene_to_video::command_args::RenderEngineSceneToVideoCommandArgs;
 use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
 
@@ -101,11 +103,28 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
     original_media_file_fs_path
   };
 
-  // ==================== SETUP FOR CONVERSION ==================== //
+  // ==================== SETUP FOR CONVERSION / HANDLE ARGS ==================== //
 
   job_progress_reporter.log_status("running conversion")
       .map_err(|e| ProcessSingleJobError::Other(e))?;
 
+  let maybe_args = job.maybe_inference_args
+      .as_ref()
+      .map(|args| args.args.as_ref())
+      .flatten()
+      .map(|args| match args {
+        PolymorphicInferenceArgs::Es(args) => Some(args),
+        _ => None,
+      })
+      .flatten();
+
+  let mut maybe_camera = None;
+  let mut maybe_camera_speed = None;
+
+  if let Some(engine_args) = maybe_args {
+    maybe_camera = engine_args.camera_animation.clone();
+    maybe_camera_speed = engine_args.camera_speed.clone();
+  }
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
 
@@ -119,9 +138,11 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
     model_dependencies
         .command_runner
         .run_with_subprocess(RunAsSubprocessArgs {
-          args: Box::new(&BvhToWorkflowCommandArgs {
+          args: Box::new(&RenderEngineSceneToVideoCommandArgs {
             input_file: &original_media_upload_fs_path,
             output_directory: &output_directory,
+            maybe_camera: maybe_camera.as_deref(),
+            maybe_camera_speed,
           }),
           //maybe_stderr_output_file: Some(FileOrCreate::NewFileWithName(&stderr_output_file)),
           // NB(bt,2024-02-29): Bevy's stdout goes to stderr, so we can't capture the semantics we want

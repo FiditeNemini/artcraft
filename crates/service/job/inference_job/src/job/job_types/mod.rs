@@ -1,9 +1,9 @@
+pub mod format_conversion;
+pub mod image_generation;
 pub mod lipsync;
+pub mod mocap;
+pub mod render_engine_scene;
 pub mod tts;
 pub mod vc;
-pub(crate) mod videofilter;
-pub mod image_generation;
-pub(crate) mod mocap;
-pub(crate) mod workflow;
-pub mod format_conversion;
-pub mod bevy_to_workflow;
+pub mod videofilter;
+pub mod workflow;

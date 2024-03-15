@@ -1,11 +1,11 @@
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use errors::AnyhowResult;
-use crate::job::job_types::bevy_to_workflow::bvh_to_workflow::dependencies::BvhToWorkflowDependencies;
 
 use crate::job::job_types::format_conversion::fbx_to_gltf::dependencies::FbxToGltfDependencies;
 use crate::job::job_types::image_generation::sd::stable_diffusion_dependencies::StableDiffusionDependencies;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_dependencies::SadTalkerDependencies;
 use crate::job::job_types::mocap::mocap_net::mocapnet_dependencies::MocapNetDependencies;
+use crate::job::job_types::render_engine_scene::render_engine_scene_to_video::dependencies::RenderEngineSceneToVideoDependencies;
 use crate::job::job_types::tts::styletts2::styletts2_dependencies::StyleTTS2Dependencies;
 use crate::job::job_types::tts::tacotron2_v2_early_fakeyou::tacotron2_dependencies::Tacotron2Dependencies;
 use crate::job::job_types::tts::vall_e_x::vall_e_x_dependencies::VallExDependencies;
@@ -29,7 +29,7 @@ pub struct JobSpecificDependencies {
   pub maybe_styletts2_dependencies: Option<StyleTTS2Dependencies>,
   pub maybe_comfy_ui_dependencies: Option<ComfyDependencies>,
   pub maybe_convert_fbx_to_gltf_dependencies: Option<FbxToGltfDependencies>,
-  pub maybe_convert_bvh_to_workflow_dependencies: Option<BvhToWorkflowDependencies>,
+  pub maybe_convert_bvh_to_workflow_dependencies: Option<RenderEngineSceneToVideoDependencies>,
 }
 
 impl JobSpecificDependencies {
@@ -111,7 +111,7 @@ impl JobSpecificDependencies {
 
     if scoped_execution.can_run_job(InferenceModelType::BvhToWorkflow) {
       print_with_space("Setting ConvertBvhToWorkflow dependencies...");
-      maybe_convert_bvh_to_workflow_dependencies = Some(BvhToWorkflowDependencies::setup()?);
+      maybe_convert_bvh_to_workflow_dependencies = Some(RenderEngineSceneToVideoDependencies::setup()?);
     }
 
     Ok(JobSpecificDependencies {

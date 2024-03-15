@@ -7,12 +7,11 @@ use tokens::tokens::media_files::MediaFileToken;
 
 use crate::job::job_loop::job_success_result::JobSuccessResult;
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
-use crate::job::job_types::bevy_to_workflow::bvh_to_workflow;
-use crate::job::job_types::bevy_to_workflow::bvh_to_workflow::process_job::BvhToWorkflowJobArgs;
+use crate::job::job_types::render_engine_scene::{process_render_engine_scene, render_engine_scene_to_video};
+use crate::job::job_types::render_engine_scene::render_engine_scene_to_video::process_job::BvhToWorkflowJobArgs;
 use crate::job_dependencies::JobDependencies;
 
-
-pub async fn process_single_bevy_to_workflow_conversion_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
+pub async fn process_single_render_engine_scene_job(job_dependencies: &JobDependencies, job: &AvailableInferenceJob) -> Result<JobSuccessResult, ProcessSingleJobError> {
 
   let maybe_media_file_token = job.maybe_input_source_token
       .as_deref()
@@ -38,7 +37,7 @@ pub async fn process_single_bevy_to_workflow_conversion_job(job_dependencies: &J
     }
   };
 
-  let job_success_result = bvh_to_workflow::process_job::process_job(BvhToWorkflowJobArgs {
+  let job_success_result = render_engine_scene_to_video::process_job::process_job(BvhToWorkflowJobArgs {
         job_dependencies,
         job,
         media_file: &media_file,
