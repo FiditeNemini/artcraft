@@ -79,22 +79,22 @@ export default function PageVSTApp() {
     {
       label: "2D Anime",
       imageUrl: "/images/landing/onboarding/styles/style-2d-anime.webp",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "anime_2d",
     },
     {
       label: "3D Cartoon",
       imageUrl: "/images/landing/onboarding/styles/style-3d-cartoon.webp",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "cartoon_3d",
     },
     {
       label: "Ink B&W",
       imageUrl: "/images/landing/onboarding/styles/style-ink-bw.webp",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "ink",
     },
     {
       label: "Origami",
       imageUrl: "/images/landing/onboarding/styles/style-origami.webp",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "origami",
     },
   ];
 
