@@ -29,6 +29,8 @@ interface SelectModalProps {
   children: ReactNode
 }
 
+const SelectModalContent = ({ children }: { children: ReactNode }) => <>{ children }</>;
+
 export default memo(function SelectModal ({
   label,
   modalTitle = "Select",
@@ -81,11 +83,11 @@ export default memo(function SelectModal ({
           </div>
         </div>
 
-        <Modal
+        <Modal {...{ contentProps: { children } }}
           show={isModalOpen}
           handleClose={closeModal}
           title={modalTitle}
-          content={()=>{return(<>{children}</>)}}
+          content={SelectModalContent}
           showButtons={false}
           padding={false}
           large={true}
