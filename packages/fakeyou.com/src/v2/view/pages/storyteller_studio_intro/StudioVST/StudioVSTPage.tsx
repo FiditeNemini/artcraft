@@ -61,8 +61,6 @@ export default function PageVSTApp() {
     });
   };
 
-  console.log("🟦",job?.maybe_result?.entity_token || "",vstValues.sdModelToken);
-
   if (videoRef?.current) {
     const ve = videoRef.current;
     ve.onloadedmetadata = () => {

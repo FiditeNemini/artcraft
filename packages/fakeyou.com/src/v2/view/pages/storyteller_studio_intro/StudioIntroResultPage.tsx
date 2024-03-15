@@ -42,10 +42,7 @@ function StudioIntroResultPage(props: Props) {
 
   const [mediaFile, setMediaFile] = useState<MediaFileType>();
 
-  const mediaToken = job?.maybe_result?.entity_token || "";
-
-
-  console.log("🍔",job,mediaToken);
+  const mediaToken = job?.maybeResultToken|| "";
 
   useMedia({
     mediaToken,
