@@ -274,9 +274,21 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             // get params from comfy args
             // let vid_max_height = comfy_args.scale_width.unwrap_or(768);
             // let vid_max_width = comfy_args.scale_height.unwrap_or(768);
+
             let target_fps = comfy_args.target_fps.unwrap_or(24);
-            let trim_start_seconds = comfy_args.trim_start_seconds.unwrap_or(0);
-            let trim_end_seconds = comfy_args.trim_end_seconds.unwrap_or(3);
+
+            let trim_start_millis = comfy_args.trim_start_milliseconds
+                .or_else(|| comfy_args.trim_start_seconds.map(|s| s as u64 * 1_000))
+                .unwrap_or(0);
+
+            let trim_end_millis = comfy_args.trim_end_milliseconds
+                .or_else(|| comfy_args.trim_end_seconds.map(|s| s as u64 * 1_000))
+                .unwrap_or(3_000);
+
+            info!("trim start millis: {trim_start_millis}");
+            info!("trim end millis: {trim_end_millis}");
+            info!("target FPS: {target_fps}");
+
             let video_processing_script = model_dependencies.inference_command.processing_script.clone();
 
             // shell out to python script
@@ -284,8 +296,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 .arg(video_processing_script)
                 .arg(input_path.clone())
                 // .arg(format!("{:?}x{:?}", vid_max_width, vid_max_height))
-                .arg(format!("{:?}", trim_start_seconds * 1000))
-                .arg(format!("{:?}", trim_end_seconds * 1000))
+                .arg(format!("{:?}", trim_start_millis))
+                .arg(format!("{:?}", trim_end_millis))
                 .arg(format!("{:?}", target_fps))
                 .output()
                 .map_err(|e| {
