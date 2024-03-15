@@ -30,6 +30,8 @@ interface SelectModalProps {
   required?: boolean;
 }
 
+const SelectModalContent = ({ searchTabs }: { searchTabs: any }) => <NonRouteTabs tabs={searchTabs} />;
+
 const SelectModal = memo(
   ({
     label,
@@ -170,11 +172,11 @@ const SelectModal = memo(
           </div>
         </div>
 
-        <Modal
+        <Modal {...{ contentProps: { searchTabs } }}
           show={isModalOpen}
           handleClose={closeModal}
           title={modalTitle}
-          content={() => <NonRouteTabs tabs={searchTabs} />}
+          content={SelectModalContent}
           showButtons={false}
           padding={false}
           large={true}

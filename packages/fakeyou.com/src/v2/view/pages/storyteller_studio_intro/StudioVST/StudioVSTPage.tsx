@@ -39,7 +39,7 @@ export default function PageVSTApp() {
     EnqueueVST("",{
       creator_set_visibility: vstValues.visibility,
       enable_lipsync: true,
-      input_media_file_token: job?.maybe_result?.entity_token || "",
+      input_file: job?.maybe_result?.entity_token || "",
       negative_prompt: vstValues.negPrompt,
       prompt: vstValues.posPrompt,
       style: vstValues.sdModelToken,
@@ -79,7 +79,7 @@ export default function PageVSTApp() {
     {
       label: "2D Anime",
       imageUrl: "/images/landing/onboarding/styles/style-2d-anime.webp",
-      token: "anime_2d",
+      token: "anime_2d_flat",
     },
     {
       label: "3D Cartoon",
@@ -89,12 +89,12 @@ export default function PageVSTApp() {
     {
       label: "Ink B&W",
       imageUrl: "/images/landing/onboarding/styles/style-ink-bw.webp",
-      token: "ink",
+      token: "ink_bw_style",
     },
     {
       label: "Origami",
       imageUrl: "/images/landing/onboarding/styles/style-origami.webp",
-      token: "origami",
+      token: "paper_origami",
     },
   ];
 
