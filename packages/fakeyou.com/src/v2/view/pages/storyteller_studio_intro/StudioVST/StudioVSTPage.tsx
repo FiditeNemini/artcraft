@@ -46,8 +46,8 @@ export default function PageVSTApp() {
       negative_prompt: vstValues.negPrompt,
       prompt: vstValues.posPrompt,
       style: vstValues.sdModelToken,
-      trim_end_millis: vstValues.trimEnd,
-      trim_start_millis: vstValues.trimStart,
+      trim_end_millis: 3000,
+      trim_start_millis: 0,
       uuid_idempotency_token: uuidv4()
     })
     .then((res: EnqueueVSTResponse) => {
@@ -60,6 +60,8 @@ export default function PageVSTApp() {
       }
     });
   };
+
+  console.log("🟦",job?.maybe_result?.entity_token || "",vstValues.sdModelToken);
 
   if (videoRef?.current) {
     const ve = videoRef.current;
