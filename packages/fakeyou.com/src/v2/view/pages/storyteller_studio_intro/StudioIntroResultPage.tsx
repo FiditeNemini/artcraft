@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { Button, Container, Panel } from "components/common";
@@ -19,10 +19,19 @@ interface Props {
 // This page just needs to poll the job and show the video when it's done.
 
 function StudioIntroResultPage(props: Props) {
+  const [rething,rethingSet] = useState(false);
   const { jobToken } = useParams<{ jobToken: string }>();
   const history = useHistory();
-  const { inferenceJobs } = useInferenceJobs();
+  const { enqueue, inferenceJobs } = useInferenceJobs();
   const job = inferenceJobs.find((item: any) => item.jobToken === jobToken);
+
+  useEffect(() => {
+    if (!job && !rething) {
+      rethingSet(true);
+      enqueue(jobToken);
+    }
+  },[enqueue,job,jobToken,rething]);
+
 
   // const [mediaToken, setMediaToken] = useState(
   //   "m_f5kp3hm74qeq16eq7536jb73jkbvkh"
@@ -34,6 +43,9 @@ function StudioIntroResultPage(props: Props) {
   const [mediaFile, setMediaFile] = useState<MediaFileType>();
 
   const mediaToken = job?.maybe_result?.entity_token || "";
+
+
+  console.log("🍔",job,mediaToken);
 
   useMedia({
     mediaToken,
@@ -52,7 +64,7 @@ function StudioIntroResultPage(props: Props) {
   }
 
   const contentSwitch = () => {
-    switch (job.jobState) {
+    switch (job?.jobState) {
       case JobState.UNKNOWN:
       case JobState.PENDING:
       case JobState.STARTED: return <LoadingSpinner label="Generating your movie..." />;
@@ -62,6 +74,7 @@ function StudioIntroResultPage(props: Props) {
       case JobState.COMPLETE_SUCCESS: return <video src={mediaLink} controls />;
       case JobState.DEAD: return <h3>Job dead</h3>;
       case JobState.CANCELED_BY_USER: return <h3>Job canceled by user</h3>;
+      default: return;
     };
   }
 
