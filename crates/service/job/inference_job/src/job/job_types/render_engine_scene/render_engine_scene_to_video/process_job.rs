@@ -120,10 +120,12 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
 
   let mut maybe_camera = None;
   let mut maybe_camera_speed = None;
+  let mut maybe_skybox = None;
 
   if let Some(engine_args) = maybe_args {
     maybe_camera = engine_args.camera_animation.clone();
     maybe_camera_speed = engine_args.camera_speed.clone();
+    maybe_skybox = engine_args.skybox.clone();
   }
 
   // ==================== RUN INFERENCE SCRIPT ==================== //
@@ -143,6 +145,7 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
             output_directory: &output_directory,
             maybe_camera: maybe_camera.as_deref(),
             maybe_camera_speed,
+            maybe_skybox: maybe_skybox.as_deref(),
           }),
           //maybe_stderr_output_file: Some(FileOrCreate::NewFileWithName(&stderr_output_file)),
           // NB(bt,2024-02-29): Bevy's stdout goes to stderr, so we can't capture the semantics we want

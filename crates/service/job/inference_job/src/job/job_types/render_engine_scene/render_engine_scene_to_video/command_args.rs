@@ -8,6 +8,7 @@ pub struct RenderEngineSceneToVideoCommandArgs<'a> {
     pub output_directory: &'a Path,
     pub maybe_camera: Option<&'a str>,
     pub maybe_camera_speed: Option<f32>,
+    pub maybe_skybox: Option<&'a str>,
 }
 
 impl CommandArgs for RenderEngineSceneToVideoCommandArgs<'_> {
@@ -29,6 +30,12 @@ impl CommandArgs for RenderEngineSceneToVideoCommandArgs<'_> {
         if let Some(camera_speed) = self.maybe_camera_speed {
             command.push_str(" -s ");
             command.push_str(&camera_speed.to_string());
+            command.push_str(" ");
+        }
+
+        if let Some(skybox) = self.maybe_skybox {
+            command.push_str(" -b ");
+            command.push_str(skybox);
             command.push_str(" ");
         }
 

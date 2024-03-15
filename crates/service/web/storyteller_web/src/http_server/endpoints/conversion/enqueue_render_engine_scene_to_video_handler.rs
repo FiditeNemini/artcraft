@@ -56,6 +56,9 @@ pub struct EnqueueBvhToWorkflowRequest {
 
   /// A camera speed (optional)
   camera_speed: Option<f32>,
+
+  /// A skybox color or name (optional)
+  skybox: Option<String>,
 }
 
 
@@ -234,6 +237,13 @@ pub async fn enqueue_render_engine_scene_to_video_handler(
       args.camera_speed = Some(camera_speed);
       maybe_args = Some(args);
     }
+
+  if let Some(skybox) = request.skybox.as_deref() {
+    let mut args = maybe_args
+        .unwrap_or(RenderEngineSceneToVideoArgs::default());
+    args.skybox = Some(skybox.to_string());
+    maybe_args = Some(args);
+  }
 
     let maybe_args = maybe_args.map(|args| PolymorphicInferenceArgs::Es(args));
 
