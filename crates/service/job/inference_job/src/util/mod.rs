@@ -1,3 +1,4 @@
+pub mod comfy_workflows;
 pub mod common_commands;
 pub mod file_cache_dir;
 pub mod from_env;

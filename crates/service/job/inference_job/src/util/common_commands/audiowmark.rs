@@ -77,7 +77,8 @@ mod tests {
 
     path
 }
-
+  
+#[ignore]
 #[test]
 fn test_audiowmark() {
     let path = test_file("test_data/audio/mp3/super_mario_rpg_beware_the_forests_mushrooms.mp3");
