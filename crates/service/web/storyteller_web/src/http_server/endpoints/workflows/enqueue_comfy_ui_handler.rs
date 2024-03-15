@@ -272,6 +272,7 @@ pub async fn enqueue_comfy_ui_handler(
         trim_end_milliseconds: None,
         positive_prompt: None,
         negative_prompt: None,
+        enable_lipsync: None,
     };
 
     info!("Creating ComfyUI job record...");

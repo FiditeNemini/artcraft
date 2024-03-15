@@ -243,6 +243,7 @@ pub async fn enqueue_workflow_upload_request(
         trim_end_milliseconds: None,
         positive_prompt: None,
         negative_prompt: None,
+        enable_lipsync: None,
     };
    
     // create the inference args here

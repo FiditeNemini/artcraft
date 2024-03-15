@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::{File, read_to_string};
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -24,7 +25,7 @@ use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
-use mysql_queries::payloads::generic_inference_args::workflow_payload::NewValue;
+use mysql_queries::payloads::generic_inference_args::workflow_payload::{NewValue, WorkflowArgs};
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
@@ -156,33 +157,26 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     let mut maybe_positive_prompt = None;
     let mut maybe_negative_prompt = None;
 
-    // Apply modifications if they exist
-    if let Some(modifications) = comfy_args.maybe_json_modifications.as_ref() {
-        info!("Prompt modifications: #{:?}", modifications);
+    // ==================== EXTRACT TEXT PROMPTS ==================== //
 
-        // Save prompts for later (if they exist)
-        maybe_positive_prompt = modifications.get("$.510.inputs.Text")
-            .map(|v| v.to_string());
+    if let Some(prompt) = comfy_args.positive_prompt.as_deref() {
+        maybe_positive_prompt = Some(prompt.to_string());
+    }
 
-        maybe_negative_prompt = modifications.get("$.8.inputs.text")
-            .map(|v| v.to_string());
+    if let Some(prompt) = comfy_args.negative_prompt.as_deref() {
+        maybe_negative_prompt = Some(prompt.to_string());
+    }
 
-        // Load prompt.json
-        let prompt_file = File::open(&workflow_path).unwrap();
-        let mut prompt_json: Value = serde_json::from_reader(prompt_file).unwrap();
 
-        // Modify json
-        for (path, new_value) in modifications
-            .iter()
-            .map(|(k, v)| (k.as_str(), v))
-        {
-            prompt_json = replace_json_value(prompt_json, path, new_value)
-                .map_err(|e| ProcessSingleJobError::Other(anyhow!("error replacing prompt json: {:?}", e)))?;
-        }
+    // ==================== WRITE WORKFLOW PROMPT ==================== //
 
-        // Save prompt.json
-        let prompt_file = File::create(&workflow_path).unwrap();
-        serde_json::to_writer(prompt_file, &prompt_json).unwrap();
+    if comfy_args.maybe_json_modifications.is_some() {
+        // NB: Old-style prompt modifications method
+        apply_manual_modifications_from_override_map(&comfy_args, &workflow_path)
+            .map_err(|e| ProcessSingleJobError::Other(anyhow!("error writing manual prompt: {:?}", e)))?;
+    } else {
+        build_prompt_modifications_from_style_name(&comfy_args, &workflow_path)
+            .map_err(|e| ProcessSingleJobError::Other(anyhow!("error writing manual prompt: {:?}", e)))?;
     }
 
     // ==================== QUERY AND DOWNLOAD FILES ==================== //
@@ -620,6 +614,43 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         inference_duration,
     })
 }
+
+fn apply_manual_modifications_from_override_map(comfy_args: &WorkflowArgs, workflow_path: &str) -> AnyhowResult<()> {
+    let modifications = match comfy_args.maybe_json_modifications.as_ref() {
+        None => return Err(anyhow!("no modifications dictionary")),
+        Some(modifications) => modifications,
+    };
+
+    info!("Prompt modifications: #{:?}", modifications);
+
+    // Load prompt.json
+    info!("Loading prompt file: {:?}", workflow_path);
+    let prompt_file = File::open(workflow_path)?;
+    let mut prompt_json: Value = serde_json::from_reader(prompt_file)?;
+
+    // Modify json
+    for (path, new_value) in modifications
+        .iter()
+        .map(|(k, v)| (k.as_str(), v))
+    {
+        prompt_json = replace_json_value(prompt_json, path, new_value)
+            .map_err(|e| anyhow!("error replacing prompt json: {:?}", e))?;
+    }
+
+    // Save prompt.json
+    info!("Saving prompt file: {:?}", workflow_path);
+    let prompt_file = File::create(workflow_path)?;
+    serde_json::to_writer(prompt_file, &prompt_json)?;
+
+    Ok(())
+}
+
+
+fn build_prompt_modifications_from_style_name(comfy_args: &WorkflowArgs, workflow_path: &str) -> AnyhowResult<()> {
+    // TODO: New code
+    Ok(())
+}
+
 
 fn replace_json_value(json: Value, path: &str, new_value: &NewValue) -> AnyhowResult<Value> {
     // First, attempt to read the value at the specified path

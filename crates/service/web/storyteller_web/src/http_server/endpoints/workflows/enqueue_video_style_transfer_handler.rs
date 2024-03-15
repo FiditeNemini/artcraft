@@ -59,6 +59,9 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// Optional trim end in milliseconds
     trim_end_millis: Option<u64>,
 
+    /// Enable lipsyncing in the workflow
+    enable_lipsync: Option<bool>,
+
     /// Optional visibility setting override.
     creator_set_visibility: Option<Visibility>,
 }
@@ -226,11 +229,12 @@ pub async fn enqueue_video_style_transfer_handler(
 
     let inference_args = WorkflowArgs {
         style_name: Some(request.style),
-        creator_visibility:Some(set_visibility),
+        creator_visibility: Some(set_visibility),
         trim_start_milliseconds: Some(trim_start_millis),
         trim_end_milliseconds: Some(trim_end_millis),
         positive_prompt: request.prompt.clone(),
         negative_prompt: request.negative_prompt.clone(),
+        enable_lipsync: request.enable_lipsync.clone(),
         // The new, simplified enqueuing doesn't care about the following parameters:
         maybe_lora_model: None,
         maybe_json_modifications: None,

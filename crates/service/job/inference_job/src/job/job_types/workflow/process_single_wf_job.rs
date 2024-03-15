@@ -35,6 +35,7 @@ pub async fn get_workflow_args_from_job(
     };
     
     let args: WorkflowArgs = WorkflowArgs::from(some_args.clone());
+
     Ok(args)
 }
 

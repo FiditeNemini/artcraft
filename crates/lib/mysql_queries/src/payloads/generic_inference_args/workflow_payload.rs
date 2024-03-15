@@ -106,4 +106,8 @@ pub struct WorkflowArgs {
     #[serde(rename = "np")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub negative_prompt: Option<String>,
+
+    #[serde(rename = "el")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enable_lipsync: Option<bool>,
 }
