@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt::format;
 use std::fs::{File, read_to_string};
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -204,8 +205,9 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             |e| ProcessSingleJobError::Other(anyhow!("error copying workflow: {:?}", e)))?;
 
         let style_modifications = style_json.get("modifications").expect("Failed to get modifications from style.json");
-
-        json_modifications = Some(get_style_modifications(&style_modifications, &mapping_json));
+        let positive_prompt = maybe_positive_prompt.as_deref();
+        let maybe_negative_prompt = maybe_negative_prompt.as_deref();
+        json_modifications = Some(get_style_modifications(&style_modifications, &mapping_json, &positive_prompt, &maybe_negative_prompt));
     }
     else {
         return Err(ProcessSingleJobError::Other(anyhow!("No style nor json modifications provided")));
@@ -691,7 +693,7 @@ fn apply_jsonpath_modifications(modifications: HashMap<String, NewValue>, workfl
 }
 
 
-fn get_style_modifications(style_json: &Value, mapping_json: &Value) -> HashMap<String, NewValue> {
+fn get_style_modifications(style_json: &Value, mapping_json: &Value, pos_in: &Option<&str>, neg_in: &Option<&str>) -> HashMap<String, NewValue> {
     let mut modifications = HashMap::new();
     let mut new_style_json = style_json.clone();
 
@@ -707,6 +709,13 @@ fn get_style_modifications(style_json: &Value, mapping_json: &Value) -> HashMap<
                 new_style_json[format!("lora_{}_name", index + 1)] = name.clone();
             }
         }
+    }
+
+    if let Some(pos) = pos_in {
+        new_style_json["positive_prompt"] = Value::String(format!("{}, {}", style_json["positive_prompt"].as_str().unwrap(), pos));
+    }
+    if let Some(neg) = neg_in {
+        new_style_json["negative_prompt"] = Value::String(format!("{}, {}", style_json["negative_prompt"].as_str().unwrap(), neg));
     }
 
     for (key, value) in new_style_json.as_object().unwrap() {
