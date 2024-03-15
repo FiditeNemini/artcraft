@@ -3,6 +3,7 @@ import MakeRequest from "../MakeRequest";
 export interface EnqueueVSTRequest {
   creator_set_visibility: string,
   enable_lipsync: boolean,
+  input_media_file_token: string,
   negative_prompt: string,
   prompt: string,
   style: string,

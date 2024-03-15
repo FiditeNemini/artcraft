@@ -39,13 +39,13 @@ export default function PageVSTApp() {
     EnqueueVST("",{
       creator_set_visibility: vstValues.visibility,
       enable_lipsync: true,
+      input_media_file_token: job?.maybe_result?.entity_token || "",
       negative_prompt: vstValues.negPrompt,
       prompt: vstValues.posPrompt,
-      style: "",
+      style: vstValues.sdModelToken,
       trim_end_millis: vstValues.trimEnd,
       trim_start_millis: vstValues.trimStart,
-      uuid_idempotency_token: uuidv4(),
-      // do_i_need_a_media_token: job?.maybe_result?.entity_token || ""
+      uuid_idempotency_token: uuidv4()
     })
     .then((res: EnqueueVSTResponse) => {
       if (res.success && res.inference_job_token) {
