@@ -2,7 +2,9 @@ import MakeRequest from "../MakeRequest";
 
 export interface EnqueueEngineCompositingRequest {
   uuid_idempotency_token: string,
-  media_file_token: string
+  media_file_token: string,
+  camera?: string,
+  camera_speed?: number,
 }
 
 export interface EnqueueEngineCompositingResponse {
@@ -12,5 +14,5 @@ export interface EnqueueEngineCompositingResponse {
 
 export const EnqueueEngineCompositing = MakeRequest<string, EnqueueEngineCompositingRequest, EnqueueEngineCompositingResponse,{}>({
   method: "POST",
-  routingFunction: () => `/v1/conversion/enqueue_bvh_to_workflow`,
+  routingFunction: () => `/v1/conversion/enqueue_render_engine_scene`,
 });
