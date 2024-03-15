@@ -38,9 +38,9 @@ Our Rust monorepo, which serves both our API surface area and our downloadable c
           /      ,'      |               |,'    \-.._,.'/'
           .     /        .               .       \    .''
         .`.    |         `.             /         :_,'.'
-          \ `...\   _     ,'-.        .'         /_.-'                       S T O R Y T E L L E R
-           `-.__ `,  `'   .  _.>----''.  _  __  /                        Turning memes into dreams
-                .'        /"'          |  "'   '_                      One Rust Monorepo at a time
+          \ `...\   _     ,'-.        .'         /_.-'              S T O R Y T E L L E R
+           `-.__ `,  `'   .  _.>----''.  _  __  /                 Turning memes into dreams
+                .'        /"'          |  "'   '_                     
                /_|.-'\ ,".             '.'`__'-( \
                  / ,"'"\,'               `/  `-.|" 
 ```
