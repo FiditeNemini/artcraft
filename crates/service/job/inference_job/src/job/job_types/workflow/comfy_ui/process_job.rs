@@ -123,7 +123,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     let workflow_dir = root_comfy_path.join("prompt");
     // make folder if not exist
     if !workflow_dir.exists() {
-        std::fs::create_dir_all(&workflow_dir).unwrap();
+        std::fs::create_dir_all(&workflow_dir).map_err(|err| ProcessSingleJobError::IoError(err))?;
     }
 
     let mut workflow_path = workflow_dir.join("prompt.json").to_str().unwrap().to_string();
@@ -179,42 +179,37 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ==================== WRITE WORKFLOW PROMPT ==================== //
     let mut json_modifications = None;
-    if comfy_args.maybe_json_modifications.is_some() {
-        // NB: Old-style prompt modifications method
-        json_modifications = Some(comfy_args.maybe_json_modifications.clone().unwrap());
-    } else if comfy_args.style_name.is_some() {
-        // NB: New-style prompt modifications method
-        let root_styles_directory = model_dependencies.inference_command.styles_directory.clone();
-        let root_mappings_directory = model_dependencies.inference_command.mappings_directory.clone();
-        let root_workflows_directory = model_dependencies.inference_command.workflows_directory.clone();
-
-        let style_name = comfy_args.style_name.unwrap();
-        let style_path = root_styles_directory.join(style_name.to_filename());
+    if let Some(modifications) = comfy_args.maybe_json_modifications.clone() {
+        // Old-style prompt modifications method
+        json_modifications = Some(modifications);
+    } else if let Some(style_name) = &comfy_args.style_name {
+        // New-style prompt modifications method
+        let style_path = model_dependencies.inference_command.styles_directory.join(style_name.to_filename());
         info!("style_path: {:?}", style_path);
-        let style_json: Value = serde_json::from_str(&read_to_string(style_path).map_err(
-            |e| ProcessSingleJobError::Other(anyhow!("error reading style json: {:?}", e)))?
-        ).map_err(
-            |e| ProcessSingleJobError::Other(anyhow!("error reading style json: {:?}", e)))?;
-        let mapping_name = style_json.get("mapping_name").expect("Failed to get mapping_name from style.json").as_str().unwrap();
-        let mapping_path = root_mappings_directory.join(mapping_name);
-        let mapping_json: Value = serde_json::from_str(&read_to_string(mapping_path).unwrap()).map_err(
-            |e| ProcessSingleJobError::Other(anyhow!("error reading mapping json: {:?}", e)))?;
-        let workflow_name = style_json.get("workflow_api_name").expect("Failed to get workflow_name from style.json").as_str().unwrap();
-        let workflow_original_location = root_workflows_directory.join(workflow_name);
-        std::fs::copy(workflow_original_location, &workflow_path).map_err(
-            |e| ProcessSingleJobError::Other(anyhow!("error copying workflow: {:?}", e)))?;
 
-        let style_modifications = style_json.get("modifications").expect("Failed to get modifications from style.json");
+        let style_json_content = read_to_string(&style_path).map_err(|e| ProcessSingleJobError::Other(anyhow!("error reading style json: {:?}", e)))?;
+        let style_json: Value = serde_json::from_str(&style_json_content).map_err(|e| ProcessSingleJobError::Other(anyhow!("error parsing style json: {:?}", e)))?;
+
+        let mapping_name = style_json.get("mapping_name").and_then(|v| v.as_str())
+            .ok_or(ProcessSingleJobError::Other(anyhow!("Failed to get or convert mapping_name from style.json")))?;
+        let mapping_path = model_dependencies.inference_command.mappings_directory.join(mapping_name);
+        let mapping_json_content = read_to_string(&mapping_path).map_err(|e| ProcessSingleJobError::Other(anyhow!("error reading mapping json: {:?}", e)))?;
+        let mapping_json: Value = serde_json::from_str(&mapping_json_content).map_err(|e| ProcessSingleJobError::Other(anyhow!("error parsing mapping json: {:?}", e)))?;
+
+        let workflow_name = style_json.get("workflow_api_name").and_then(|v| v.as_str())
+            .ok_or(ProcessSingleJobError::Other(anyhow!("Failed to get or convert workflow_api_name from style.json")))?;
+        let workflow_original_location = model_dependencies.inference_command.workflows_directory.join(workflow_name);
+        std::fs::copy(&workflow_original_location, &workflow_path).map_err(|e| ProcessSingleJobError::Other(anyhow!("error copying workflow: {:?}", e)))?;
+
+        let style_modifications = style_json.get("modifications").ok_or(ProcessSingleJobError::Other(anyhow!("Failed to get modifications from style.json")))?;
         let positive_prompt = maybe_positive_prompt.as_deref();
         let maybe_negative_prompt = maybe_negative_prompt.as_deref();
-        json_modifications = Some(get_style_modifications(&style_modifications, &mapping_json, &positive_prompt, &maybe_negative_prompt));
-    }
-    else {
+        json_modifications = Some(get_style_modifications(style_modifications, &mapping_json, &positive_prompt, &maybe_negative_prompt));
+    } else {
         return Err(ProcessSingleJobError::Other(anyhow!("No style nor json modifications provided")));
     }
 
-    let output_path = apply_jsonpath_modifications(json_modifications.unwrap(), &workflow_path)?;
-    workflow_path = output_path;
+    workflow_path = apply_jsonpath_modifications(json_modifications.unwrap(), &workflow_path)?;
     // ==================== QUERY AND DOWNLOAD FILES ==================== //
 
     // Download Lora model if specified
@@ -287,17 +282,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
             info!("Input media file cloud bucket path: {:?}", media_file_bucket_path.get_full_object_path_str());
 
-            //let input_filename = format!("input.{}", retrieved_input_record.maybe_public_bucket_extension.unwrap());
             let input_filename = "video.mp4".to_string();
             let input_path = path_to_string(input_dir.join(input_filename));
-
-            //let bucket_details = RemoteCloudBucketDetails {
-            //    object_hash: retrieved_input_record.public_bucket_directory_hash,
-            //    prefix: retrieved_input_record.maybe_public_bucket_prefix.unwrap(),
-            //    suffix: retrieved_input_record.maybe_public_bucket_extension.clone().unwrap(),
-            //};
-            //// Download to "input.EXTENSION"
-            //remote_cloud_file_client.download_file(bucket_details, input_path.clone()).await?;
 
             remote_cloud_file_client.download_media_file(&media_file_bucket_path, input_path.clone()).await?;
 
@@ -306,10 +292,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             maybe_original_input_path = Some(input_path.parse().unwrap());
 
             // ========================= PROCESS VIDEO ======================== //
-
-            // get params from comfy args
-            // let vid_max_height = comfy_args.scale_width.unwrap_or(768);
-            // let vid_max_width = comfy_args.scale_height.unwrap_or(768);
 
             let target_fps = comfy_args.target_fps.unwrap_or(24);
 
@@ -331,7 +313,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             let output = Command::new("python3")
                 .arg(video_processing_script)
                 .arg(input_path.clone())
-                // .arg(format!("{:?}x{:?}", vid_max_width, vid_max_height))
                 .arg(format!("{:?}", trim_start_millis))
                 .arg(format!("{:?}", trim_end_millis))
                 .arg(format!("{:?}", target_fps))
