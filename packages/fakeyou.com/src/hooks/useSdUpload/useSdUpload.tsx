@@ -41,7 +41,7 @@ export default function useSdUpload() {
     })
       .then((res: any) => {
         writeStatusSet(FetchStatus.success);
-        enqueue(res.inference_job_token);
+        enqueue(res.inference_job_token,true);
       })
       .catch(err => {
         writeStatusSet(FetchStatus.error);

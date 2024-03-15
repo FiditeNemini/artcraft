@@ -11,13 +11,11 @@ export default function useInferenceJobs(jobType?: FrontendInferenceJobType, deb
   const openJobListModal = () => open({ component: InferenceJobsModal, props: { jobType } });
 
   return {
-    // enqueue,
-    enqueue: (jobToken: string, noModalPls = false) => {
-      if (!noModalPls) { openJobListModal(); }
+    enqueue: (jobToken: string, openModal = false) => {
+      if (openModal) { openJobListModal(); }
       enqueue(jobToken,jobType);
     },
     inferenceJobs: jobType === undefined ? inferenceJobs : (byCategory?.get(jobType) || []),
-    // inferenceJobs: jobType === AllInferenceJobs.All ? inferenceJobs : (byCategory?.get(jobType) || []),
     jobStatusDescription: (jobState: JobState) => Object.keys(JobState).filter(key => isNaN(Number(key)))[jobState],
     queueStats
   };

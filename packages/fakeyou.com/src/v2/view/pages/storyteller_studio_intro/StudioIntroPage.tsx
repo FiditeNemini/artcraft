@@ -82,7 +82,7 @@ function StudioIntroPage(props: Props) {
       skybox: "000000",
     }).then((res: any) => {
       if (res && res.success) {
-        inferenceJobs.enqueue(res.inference_job_token, true); // noModalPls = true
+        inferenceJobs.enqueue(res.inference_job_token);
         history.push(`/studio-intro/style/${res.inference_job_token}`);
       }
     });
