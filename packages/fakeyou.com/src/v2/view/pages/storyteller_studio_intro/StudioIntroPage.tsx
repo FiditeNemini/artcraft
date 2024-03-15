@@ -79,6 +79,7 @@ function StudioIntroPage(props: Props) {
       media_file_token: savedMediaToken,
       camera: camera,
       camera_speed: 1.0,
+      skybox: "000000",
     }).then((res: any) => {
       if (res && res.success) {
         inferenceJobs.enqueue(res.inference_job_token, true); // noModalPls = true

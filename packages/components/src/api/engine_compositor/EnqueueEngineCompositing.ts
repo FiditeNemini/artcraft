@@ -5,6 +5,7 @@ export interface EnqueueEngineCompositingRequest {
   media_file_token: string,
   camera?: string,
   camera_speed?: number,
+  skybox?: string,
 }
 
 export interface EnqueueEngineCompositingResponse {
