@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { NavLink, useParams, useHistory } from "react-router-dom";
 import { Button, Container, Panel, TextArea } from "components/common";
 // import VideoQuickTrim, {
@@ -6,9 +7,9 @@ import { Button, Container, Panel, TextArea } from "components/common";
 // } from "components/common/VideoQuickTrim";
 import { VideoFakeyou } from "components/common";
 import { useJobStatus } from "hooks";
-import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
+import { EnqueueVST, EnqueueVSTResponse } from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
 import { initialValues } from "./defaultValues";
-import { mapRequest, VSTType } from "./helpers";
+import { VSTType } from "./helpers";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import SelectionBubblesV2 from "components/common/SelectionBubblesV2";
 
@@ -35,18 +36,18 @@ export default function PageVSTApp() {
   };
 
   const handleGenerate = () => {
-    let updatedVSTValues = Object.assign({}, vstValues);
-    updatedVSTValues.fileToken = job?.maybe_result?.entity_token || "";
-    updatedVSTValues.trimStart = 0;
-    updatedVSTValues.trimEnd = 3;
-
-    const request = mapRequest(updatedVSTValues);
-
-    // request.maybe_input_file = job?.maybe_result?.entity_token || "";
-    // request.maybe_trim_start_seconds = 0;
-    // request.maybe_trim_end_seconds = 3;
-
-    EnqueueVideoStyleTransfer(request).then(res => {
+    EnqueueVST("",{
+      creator_set_visibility: vstValues.visibility,
+      enable_lipsync: true,
+      negative_prompt: vstValues.negPrompt,
+      prompt: vstValues.posPrompt,
+      style: "",
+      trim_end_millis: vstValues.trimEnd,
+      trim_start_millis: vstValues.trimStart,
+      uuid_idempotency_token: uuidv4(),
+      // do_i_need_a_media_token: job?.maybe_result?.entity_token || ""
+    })
+    .then((res: EnqueueVSTResponse) => {
       if (res.success && res.inference_job_token) {
         // console.log("Job enqueued successfully", res.inference_job_token);
         history.push(`/studio-intro/result/${res.inference_job_token}`);
