@@ -12,6 +12,7 @@ use log::{error, info, warn};
 use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
@@ -23,6 +24,7 @@ use mysql_queries::payloads::generic_inference_args::workflow_payload::WorkflowA
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::media_files::MediaFileToken;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::configs::plans::plan_category::PlanCategory;
@@ -44,9 +46,12 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// Entropy for request de-duplication (required)
     uuid_idempotency_token: String,
 
+    /// The video to use as input (required)
+    input_media_file_token: MediaFileToken,
+
     /// The name of the style to invoke (required)
     style: StyleTransferName,
-    
+
     /// The positive prompt (optional)
     prompt: Option<String>,
     
@@ -244,6 +249,7 @@ pub async fn enqueue_video_style_transfer_handler(
     }
 
     let inference_args = WorkflowArgs {
+        maybe_input_file: Some(request.input_media_file_token.clone()),
         style_name: Some(request.style),
         creator_visibility: Some(set_visibility),
         trim_start_milliseconds: Some(trim_start_millis),
@@ -255,7 +261,6 @@ pub async fn enqueue_video_style_transfer_handler(
         maybe_lora_model: None,
         maybe_json_modifications: None,
         maybe_workflow_config: None,
-        maybe_input_file: None,
         maybe_output_path: None,
         maybe_google_drive_link: None,
         maybe_title: None,
@@ -274,8 +279,8 @@ pub async fn enqueue_video_style_transfer_handler(
         inference_category: InferenceCategory::Workflow,
         maybe_model_type: Some(InferenceModelType::ComfyUi), // NB: Model is static during inference
         maybe_model_token: None, // NB: Model is static during inference
-        maybe_input_source_token: None, // TODO: Introduce a second foreign key ?
-        maybe_input_source_token_type: None, // TODO: Introduce a second foreign key ?
+        maybe_input_source_token: Some(request.input_media_file_token.as_str()),
+        maybe_input_source_token_type: Some(InferenceInputSourceTokenType::MediaFile),
         maybe_download_url: None,
         maybe_cover_image_media_file_token: None,
         maybe_raw_inference_text: None, // No text

@@ -11,6 +11,8 @@ use strum::EnumIter;
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
 pub enum InferenceInputSourceTokenType {
+  #[serde(rename = "media_file")]
+  MediaFile,
   #[serde(rename = "media_upload")]
   MediaUpload,
 }
@@ -23,12 +25,14 @@ impl_mysql_enum_coders!(InferenceInputSourceTokenType);
 impl InferenceInputSourceTokenType {
   pub fn to_str(&self) -> &'static str {
     match self {
+      Self::MediaFile => "media_file",
       Self::MediaUpload => "media_upload",
     }
   }
 
   pub fn from_str(value: &str) -> Result<Self, String> {
     match value {
+      "media_file" => Ok(Self::MediaFile),
       "media_upload" => Ok(Self::MediaUpload),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -38,6 +42,7 @@ impl InferenceInputSourceTokenType {
     // NB: BTreeSet is sorted
     // NB: BTreeSet::from() isn't const, but not worth using LazyStatic, etc.
     BTreeSet::from([
+      InferenceInputSourceTokenType::MediaFile,
       InferenceInputSourceTokenType::MediaUpload,
     ])
   }
@@ -50,16 +55,19 @@ mod tests {
 
   #[test]
   fn test_serialization() {
+    assert_serialization(InferenceInputSourceTokenType::MediaFile, "media_file");
     assert_serialization(InferenceInputSourceTokenType::MediaUpload, "media_upload");
   }
 
   #[test]
   fn to_str() {
+    assert_eq!(InferenceInputSourceTokenType::MediaFile.to_str(), "media_file");
     assert_eq!(InferenceInputSourceTokenType::MediaUpload.to_str(), "media_upload");
   }
 
   #[test]
   fn from_str() {
+    assert_eq!(InferenceInputSourceTokenType::from_str("media_file").unwrap(), InferenceInputSourceTokenType::MediaFile);
     assert_eq!(InferenceInputSourceTokenType::from_str("media_upload").unwrap(), InferenceInputSourceTokenType::MediaUpload);
   }
 
@@ -67,7 +75,8 @@ mod tests {
   fn all_variants() {
     // Static check
     let mut variants = InferenceInputSourceTokenType::all_variants();
-    assert_eq!(variants.len(), 1);
+    assert_eq!(variants.len(), 2);
+    assert_eq!(variants.pop_first(), Some(InferenceInputSourceTokenType::MediaFile));
     assert_eq!(variants.pop_first(), Some(InferenceInputSourceTokenType::MediaUpload));
     assert_eq!(variants.pop_first(), None);
 

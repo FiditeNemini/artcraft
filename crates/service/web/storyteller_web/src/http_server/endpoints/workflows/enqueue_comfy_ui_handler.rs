@@ -12,6 +12,7 @@ use actix_web::http::StatusCode;
 use log::{error, info, warn};
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::visibility::Visibility;
@@ -283,8 +284,8 @@ pub async fn enqueue_comfy_ui_handler(
         inference_category: InferenceCategory::Workflow,
         maybe_model_type: Some(InferenceModelType::ComfyUi), // NB: Model is static during inference
         maybe_model_token: None, // NB: Model is static during inference
-        maybe_input_source_token: None, // TODO: Introduce a second foreign key ?
-        maybe_input_source_token_type: None, // TODO: Introduce a second foreign key ?
+        maybe_input_source_token: request.maybe_input_file.as_ref().map(|f| f.as_str()),
+        maybe_input_source_token_type: Some(InferenceInputSourceTokenType::MediaFile),
         maybe_download_url: None,
         maybe_cover_image_media_file_token: None,
         maybe_raw_inference_text: None, // No text
