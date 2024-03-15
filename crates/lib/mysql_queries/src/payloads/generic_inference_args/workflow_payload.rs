@@ -22,6 +22,21 @@ impl NewValue {
             NewValue::Bool(s) => s.to_string(),
         }
     }
+
+    pub fn from_json(json: &serde_json::Value) -> Self {
+        match json {
+            serde_json::Value::String(s) => NewValue::String(s.to_string()),
+            serde_json::Value::Number(n) => {
+                if n.is_f64() {
+                    NewValue::Float(n.as_f64().unwrap() as f32)
+                } else {
+                    NewValue::Int(n.as_i64().unwrap() as i32)
+                }
+            },
+            serde_json::Value::Bool(b) => NewValue::Bool(*b),
+            _ => panic!("Invalid json type for NewValue"),
+        }
+    }
 }
 
 #[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq)]

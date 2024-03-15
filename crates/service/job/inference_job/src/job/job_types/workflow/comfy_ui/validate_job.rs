@@ -11,8 +11,8 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 
 #[derive(Serialize, Debug)]
 pub struct JobArgs<'a> {
-    pub workflow_source: &'a ModelWeightToken,
-    pub output_path: &'a String,
+    pub workflow_source: &'a Option<ModelWeightToken>,
+    pub output_path: &'a str,
     pub maybe_json_modifications: &'a Option<HashMap<String, NewValue>>,
     pub maybe_lora_model: &'a Option<ModelWeightToken>,
     pub maybe_input_file: &'a Option<MediaFileToken>,
@@ -53,23 +53,23 @@ pub fn validate_job(job: &AvailableInferenceJob) -> Result<JobArgs, ProcessSingl
         }
     };
 
-    let workflow_source = match &inference_args.maybe_workflow_config {
-        Some(args) => args,
-        None => {
-            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No workflow source provided!")));
-        }
-    };
 
-    let output_path = match &inference_args.maybe_output_path {
+    // check if job is legacy
+    let is_legacy = inference_args.maybe_json_modifications.is_some();
+
+    let output_path = match inference_args.maybe_output_path.as_deref() {
         Some(args) => args,
+        None if is_legacy => {
+            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No output path provided!")));
+        },
         None => {
-            return Err(ProcessSingleJobError::from_anyhow_error(anyhow!("No output file provided!")));
+            "vid2vid/SparseUpscaleInterp_00001.mp4"
         }
     };
 
 
     Ok(JobArgs {
-        workflow_source,
+        workflow_source: &inference_args.maybe_workflow_config,
         output_path,
         maybe_lora_model: &inference_args.maybe_lora_model,
         maybe_json_modifications: &inference_args.maybe_json_modifications,

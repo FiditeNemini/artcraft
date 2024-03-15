@@ -48,6 +48,12 @@ pub struct ComfyInferenceCommand {
 
     pub(crate) comfy_launch_command: PathBuf,
 
+    pub(crate) styles_directory: PathBuf,
+
+    pub(crate) workflows_directory: PathBuf,
+
+    pub(crate) mappings_directory: PathBuf,
+
     /// Config file to use
     config_path: Option<PathBuf>,
 
@@ -128,6 +134,15 @@ impl ComfyInferenceCommand {
         let processing_script = easyenv::get_env_pathbuf_required(
             "COMFY_VIDEO_PROCESSING_SCRIPT")?;
 
+        let styles_directory = easyenv::get_env_pathbuf_required(
+            "COMFY_STYLES_DIRECTORY")?;
+
+        let workflows_directory = easyenv::get_env_pathbuf_required(
+            "COMFY_WORKFLOWS_DIRECTORY")?;
+
+        let mappings_directory = easyenv::get_env_pathbuf_required(
+            "COMFY_MAPPINGS_DIRECTORY")?;
+
         Ok(Self {
             comfy_root_code_directory,
             executable_or_command,
@@ -139,6 +154,9 @@ impl ComfyInferenceCommand {
             maybe_virtual_env_activation_command,
             maybe_docker_options,
             maybe_execution_timeout,
+            styles_directory,
+            workflows_directory,
+            mappings_directory,
         })
     }
 

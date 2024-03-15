@@ -5,9 +5,12 @@ use std::process::Command;
 use std::time::Instant;
 
 use anyhow::{anyhow, Result};
+use hostname::get;
 use log::{debug, error, info, warn};
+use r2d2_redis::redis::Commands;
 use serde_json::Value;
 use tokio::io::AsyncWriteExt;
+use tokio::runtime::Handle;
 use walkdir::WalkDir;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
@@ -87,6 +90,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .ok_or_else(|| ProcessSingleJobError::JobSystemMisconfiguration(Some("Missing ComfyUI dependencies".to_string())))?;
 
     // ==================== UNPACK + VALIDATE INFERENCE ARGS ==================== //
+    // check for lack of maybe_json_modifications
 
     let job_args = validate_job(job)?;
 
@@ -121,23 +125,28 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         std::fs::create_dir_all(&workflow_dir).unwrap();
     }
 
-    let workflow_path = workflow_dir.join("prompt.json").to_str().unwrap().to_string();
+    let mut workflow_path = workflow_dir.join("prompt.json").to_str().unwrap().to_string();
 
-    let retrieved_workflow_record =  get_weight_by_token(
-       job_args.workflow_source,
-       false,
-       &deps.db.mysql_pool
-    ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Workflow not found")))?;
+    // download workflow if not none
+    match job_args.workflow_source {
+        Some(workflow_token) => {
+            let retrieved_workflow_record =  get_weight_by_token(
+                workflow_token,
+                false,
+                &deps.db.mysql_pool
+            ).await?.ok_or_else(|| ProcessSingleJobError::Other(anyhow!("Workflow not found")))?;
 
-    let bucket_details = RemoteCloudBucketDetails {
-       object_hash: retrieved_workflow_record.public_bucket_hash,
-       prefix: retrieved_workflow_record.maybe_public_bucket_prefix.unwrap(),
-       suffix: retrieved_workflow_record.maybe_public_bucket_extension.unwrap(),
-    };
-    remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
-    info!("Downloaded workflow to {:?}", workflow_path);
+            let bucket_details = RemoteCloudBucketDetails {
+                object_hash: retrieved_workflow_record.public_bucket_hash,
+                prefix: retrieved_workflow_record.maybe_public_bucket_prefix.unwrap(),
+                suffix: retrieved_workflow_record.maybe_public_bucket_extension.unwrap(),
+            };
+            remote_cloud_file_client.download_file(bucket_details, workflow_path.clone()).await?;
+            info!("Downloaded workflow to {:?}", workflow_path);
+        }
+        _ => { }
+    }
 
-    // download_file(comfy_deps.workflow_bucket_path.clone(), PathBuf::from(workflow_path.clone())).await.map_err(|e| ProcessSingleJobError::Other(e))?;
 
     let maybe_args = job.maybe_inference_args
         .as_ref()
@@ -167,18 +176,43 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         maybe_negative_prompt = Some(prompt.to_string());
     }
 
-
     // ==================== WRITE WORKFLOW PROMPT ==================== //
-
+    let mut json_modifications = None;
     if comfy_args.maybe_json_modifications.is_some() {
         // NB: Old-style prompt modifications method
-        apply_manual_modifications_from_override_map(&comfy_args, &workflow_path)
-            .map_err(|e| ProcessSingleJobError::Other(anyhow!("error writing manual prompt: {:?}", e)))?;
-    } else {
-        build_prompt_modifications_from_style_name(&comfy_args, &workflow_path)
-            .map_err(|e| ProcessSingleJobError::Other(anyhow!("error writing manual prompt: {:?}", e)))?;
+        json_modifications = Some(comfy_args.maybe_json_modifications.clone().unwrap());
+    } else if comfy_args.style_name.is_some() {
+        // NB: New-style prompt modifications method
+        let root_styles_directory = model_dependencies.inference_command.styles_directory.clone();
+        let root_mappings_directory = model_dependencies.inference_command.mappings_directory.clone();
+        let root_workflows_directory = model_dependencies.inference_command.workflows_directory.clone();
+
+        let style_name = comfy_args.style_name.unwrap();
+        let style_path = root_styles_directory.join(style_name.to_filename());
+        info!("style_path: {:?}", style_path);
+        let style_json: Value = serde_json::from_str(&read_to_string(style_path).map_err(
+            |e| ProcessSingleJobError::Other(anyhow!("error reading style json: {:?}", e)))?
+        ).map_err(
+            |e| ProcessSingleJobError::Other(anyhow!("error reading style json: {:?}", e)))?;
+        let mapping_name = style_json.get("mapping_name").expect("Failed to get mapping_name from style.json").as_str().unwrap();
+        let mapping_path = root_mappings_directory.join(mapping_name);
+        let mapping_json: Value = serde_json::from_str(&read_to_string(mapping_path).unwrap()).map_err(
+            |e| ProcessSingleJobError::Other(anyhow!("error reading mapping json: {:?}", e)))?;
+        let workflow_name = style_json.get("workflow_api_name").expect("Failed to get workflow_name from style.json").as_str().unwrap();
+        let workflow_original_location = root_workflows_directory.join(workflow_name);
+        std::fs::copy(workflow_original_location, &workflow_path).map_err(
+            |e| ProcessSingleJobError::Other(anyhow!("error copying workflow: {:?}", e)))?;
+
+        let style_modifications = style_json.get("modifications").expect("Failed to get modifications from style.json");
+
+        json_modifications = Some(get_style_modifications(&style_modifications, &mapping_json));
+    }
+    else {
+        return Err(ProcessSingleJobError::Other(anyhow!("No style nor json modifications provided")));
     }
 
+    let output_path = apply_jsonpath_modifications(json_modifications.unwrap(), &workflow_path)?;
+    workflow_path = output_path;
     // ==================== QUERY AND DOWNLOAD FILES ==================== //
 
     // Download Lora model if specified
@@ -627,11 +661,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     })
 }
 
-fn apply_manual_modifications_from_override_map(comfy_args: &WorkflowArgs, workflow_path: &str) -> AnyhowResult<()> {
-    let modifications = match comfy_args.maybe_json_modifications.as_ref() {
-        None => return Err(anyhow!("no modifications dictionary")),
-        Some(modifications) => modifications,
-    };
+fn apply_jsonpath_modifications(modifications: HashMap<String, NewValue>, workflow_path: &str) -> AnyhowResult<(String)> {
 
     info!("Prompt modifications: #{:?}", modifications);
 
@@ -650,17 +680,49 @@ fn apply_manual_modifications_from_override_map(comfy_args: &WorkflowArgs, workf
     }
 
     // Save prompt.json
-    info!("Saving prompt file: {:?}", workflow_path);
-    let prompt_file = File::create(workflow_path)?;
+    let workflow_parent_dir = Path::new(workflow_path).parent().unwrap();
+    let prompt_filepath = workflow_parent_dir.join("prompt.json");
+    let prompt_file = File::create(&prompt_filepath)
+        .map_err(|e| anyhow!("error creating prompt file: {:?}", e))?;
+    info!("Saving prompt file: {:?}", prompt_file);
     serde_json::to_writer(prompt_file, &prompt_json)?;
 
-    Ok(())
+    Ok(prompt_filepath.to_str().unwrap().to_string())
 }
 
 
-fn build_prompt_modifications_from_style_name(comfy_args: &WorkflowArgs, workflow_path: &str) -> AnyhowResult<()> {
-    // TODO: New code
-    Ok(())
+fn get_style_modifications(style_json: &Value, mapping_json: &Value) -> HashMap<String, NewValue> {
+    let mut modifications = HashMap::new();
+    let mut new_style_json = style_json.clone();
+
+    // Loras have to be processed differently
+    if let Some(loras) = style_json.get("loras").and_then(|l| l.as_array()) {
+        if loras.len() > 8 {
+            panic!("Too many loras, max is 8");
+        }
+
+        for (index, lora) in loras.iter().enumerate() {
+            if let (Some(name), Some(strength)) = (lora.get("name"), lora.get("strength")) {
+                new_style_json[format!("lora_{}_strength", index + 1)] = strength.clone();
+                new_style_json[format!("lora_{}_name", index + 1)] = name.clone();
+            }
+        }
+    }
+
+    for (key, value) in new_style_json.as_object().unwrap() {
+        if key == "loras" { continue; }
+
+        let mapping_key = format!("$.{}", key);
+        if let Ok(mapping_values) = jsonpath_lib::select(mapping_json, &mapping_key) {
+            if let Some(mapping_value) = mapping_values.get(0).and_then(|v| v.as_str()) {
+                modifications.insert(mapping_value.to_string(), NewValue::from_json(value));
+            } else {
+                println!("No mapping found for key '{}'", key);
+            }
+        }
+    }
+
+    modifications
 }
 
 
