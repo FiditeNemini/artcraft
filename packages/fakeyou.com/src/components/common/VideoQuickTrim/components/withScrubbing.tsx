@@ -34,7 +34,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   onScrubEnd,
   ...rest
 }: withScrubbingPropsI) => {
-  const debug = false; //|| propsDebug;
+  const debug = true; //|| propsDebug;
 
 
   const refEl = useRef<HTMLDivElement| null>(null);
@@ -63,8 +63,8 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
             ...curr,
             pointerStartPos: e.clientX
           }));
-          window.addEventListener("mouseup", handleScrubEnd);
-          window.addEventListener("mousemove", handleScrubMove);
+          
+          window.addEventListener("pointermove", handleScrubMove);
           return true;
         }
       }
@@ -73,8 +73,8 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
       if (debug) console.log(`${refListener.current} withSCRUBBING SCRUB_END!! `);
       e.preventDefault();
       e.stopPropagation();
-      window.removeEventListener("mouseup", handleScrubEnd);
-      window.removeEventListener("mousemove", handleScrubMove);
+
+      window.removeEventListener("pointermove", handleScrubMove);
       setStates((curr)=>({
         ...curr,
         pointerStartPos: -1,
@@ -108,12 +108,13 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
 
     if(!(window as any)[`listener-id-${refListener.current}`]){
       (window as any)[`listender-id-${refListener.current}`] = true;
-      window.addEventListener("mousedown", handleScrubStart);
+      window.addEventListener("pointerdown", handleScrubStart);
+      window.addEventListener("pointerup", handleScrubEnd);
       return () => {
         (window as any)[`listener-id-${refListener.current}`] = false;
-        window.removeEventListener("mousedown", handleScrubStart);
-        window.removeEventListener("mouseup", handleScrubEnd);
-        window.removeEventListener("mousemove", handleScrubMove);
+        window.removeEventListener("pointerdown", handleScrubStart);
+        window.removeEventListener("pointerup", handleScrubEnd);
+        window.removeEventListener("pointermove", handleScrubMove);
       };
     }
   }, [scrubberWidth, boundingWidth]);

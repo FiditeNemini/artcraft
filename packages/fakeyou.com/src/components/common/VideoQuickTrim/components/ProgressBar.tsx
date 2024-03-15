@@ -1,5 +1,6 @@
 import React, {
-  memo,
+  useState,
+  useEffect,
   useContext,
   useCallback,
   useLayoutEffect,
@@ -11,8 +12,9 @@ import {
 } from '../reducer';
 import { TrimScrubber } from './TrimScrubber';
 import { PlayCursor } from './PlayCursor';
+import { VideoElementContext } from '../contexts';
 
-export const ProgressBar = memo(({
+export const ProgressBar = ({
   debug: propsDebug = false,
   readyToMount,
   isRepeatOn,
@@ -22,7 +24,6 @@ export const ProgressBar = memo(({
   playbarWidth,
   scrubberWidth,
   videoDuration,
-  videoBuffered,
   onPlayCursorChanged,
   handlePlaypause,
   dispatchCompState
@@ -36,14 +37,13 @@ export const ProgressBar = memo(({
   playbarWidth: number;
   scrubberWidth: number;
   videoDuration: number;
-  videoBuffered: TimeRanges | undefined;
   onPlayCursorChanged: (newPos: number) => void;
   handlePlaypause: (shouldPlay:boolean)=>void;
   dispatchCompState: (action: Action) => void;
 })=>{
   console.log(`ProgressBAR reRENDERING`)
   const debug = false || propsDebug;
-
+  if(debug) console.log("reRENDERING --- Progress Bar");
   const playbarRef = useRef<HTMLDivElement | null>(null);
 
   const playbarRefCallback = useCallback(node => {
@@ -81,12 +81,7 @@ export const ProgressBar = memo(({
     // console.log('progress bar rendering');
     return(
       <div className="playbar" ref={playbarRefCallback}>
-        <div className="playbar-bg">
-          {videoBuffered !== undefined && 
-            <span className="loaded" style={{width: (videoBuffered.end(0) / videoDuration* 100) + "%"}} />
-          }
-          {/* <span className="played" style={{width: timeCursorOffset+"px"}} /> */}
-        </div>
+        <Progress />
         <TrimScrubber
           debug={debug}
           boundingWidth={playbarWidth}
@@ -121,4 +116,27 @@ export const ProgressBar = memo(({
     console.log('TODO: ProgressBar should rendering loading state instead of null');
     return null;
   }
-});
+};
+
+function Progress (){
+  const vidEl = useContext(VideoElementContext);
+  const [buffered, setBuffered] = useState<number>(0);
+  useEffect(()=>{
+    function handleBuffer(){
+      if(vidEl && vidEl.buffered.length > 0){
+        setBuffered(vidEl.buffered.end(0))
+      }
+    }
+    vidEl?.addEventListener("progress", handleBuffer);
+  },[vidEl]);
+
+  if(vidEl){
+    return(
+      <div className="playbar-bg">
+        <span className="loaded" style={{width: (buffered / vidEl.duration* 100) + "%"}} />
+        {/* <span className="played" style={{width: timeCursorOffset+"px"}} /> */}
+      </div>
+    );
+  }
+  else return null;
+}

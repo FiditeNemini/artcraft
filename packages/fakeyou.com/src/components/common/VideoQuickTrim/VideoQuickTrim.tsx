@@ -1,5 +1,5 @@
 import React, {
-  memo,
+  // memo,
   useCallback,
   useEffect,
   useReducer,
@@ -22,7 +22,10 @@ import {
   PLAYPUASE_STATES,
   STATE_STATUSES,
 } from "./reducer";
-import { VideoElementContext } from "./contexts";
+
+import {
+  VideoElementContext,
+} from "./contexts";
 
 import { QuickTrimData } from "./utilities";
 
@@ -37,7 +40,7 @@ interface VideoQuickTrimProps extends VideoFakeyouProps {
   trimEndSeconds: number;
 }
 
-export const VideoQuickTrim = memo(({
+export const VideoQuickTrim = ({
   debug: propsDebug = false,
   onSelect,
   trimStartSeconds: propsTrimStartSeconds,
@@ -46,13 +49,14 @@ export const VideoQuickTrim = memo(({
 }: VideoQuickTrimProps) => {
   const debug = true || propsDebug;
 
-  const { t } = useLocalize("VideoPlayerQuickTrim");
+  const { t } = useLocalize("vidEl");
   const [compState, dispatchCompState] = useReducer(reducer, initialState);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   if(compState.status === STATE_STATUSES.LOAD_ORDER_ERROR){
     console.log(`${compState.errorMessage[compState.errorMessage.length -1]}`);
   }
+  if(debug) console.log("reRENDERING - Video Quicktrim");
 
   const videoRefCallback = useCallback(node => {
     function setPlaypause(newState: PLAYPUASE_STATES){
@@ -61,30 +65,29 @@ export const VideoQuickTrim = memo(({
         payload: { playpause: newState}
       })
     }
+    function handleLoadedmetadata (){
+      dispatchCompState({
+        type: ACTION_TYPES.ON_LOADED_METADATA,
+        payload:{ videoDuration: node.duration,}
+      });
+    };
     if (node !== null) { 
       // DOM node referenced by ref has changed and exists
       videoRef.current = node;
-      node.onloadedmetadata = ()=>{
-        dispatchCompState({
-          type: ACTION_TYPES.ON_LOADED_METADATA,
-          payload:{ videoDuration: node.duration,}
-        });
-      };
+  
+      node.addEventListener("loadedmetadata", handleLoadedmetadata);
 
       node.onplay = ()=>setPlaypause(PLAYPUASE_STATES.PLAYING);
       node.onpause = ()=>setPlaypause(PLAYPUASE_STATES.PAUSED);
       node.onended = ()=>setPlaypause(PLAYPUASE_STATES.ENDED);
+    } // else{} DOM node referenced by ref has been unmounted
 
-      node.onprogress = ()=>{
-        console.log(node.buffered);
-        if(node.buffered.length > 0){
-          dispatchCompState({
-            type: ACTION_TYPES.SET_VIDEO_LOAD_PROGRESS,
-            payload: {videoLoadProgress: node.buffered}
-          });
-        }
-      }
-    } // else{} DOM node referenced by ref has been unmounted 
+    
+    return()=>{
+      if(node!==null)
+        node.removeEventListener("loadedmetadata",handleLoadedmetadata);
+    }
+
   }, [
     // No Dependency !
   ]); //END videoRefCallback\
@@ -172,47 +175,48 @@ export const VideoQuickTrim = memo(({
           </div>
         }
       </div>{/* END of Video Wrapper */}
-      <VideoElementContext.Provider value={videoRef.current}>
-        <ProgressBar
-          debug={debug}
-          readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}
-          isRepeatOn={compState.isRepeatOn}
-          trimStartSeconds={compState.trimStartSeconds ||0}
-          trimEndSeconds={compState.trimEndSeconds ||0}
-          trimDuration={compState.trimDuration ||0}
-          playbarWidth={compState.playbarWidth ||0}
-          scrubberWidth={compState.scrubberWidth ||0}
-          videoBuffered={compState.videoLoadProgress || undefined}
-          videoDuration={compState.videoDuration ||0}
-          handlePlaypause={handlePlaypause}
-          dispatchCompState={dispatchCompState}
-          onPlayCursorChanged={(newPos: number)=>{
-            if(videoRef.current !== null && videoRef.current.currentTime
-              && compState.playbarWidth && compState.videoDuration){
-              const newTime = newPos / compState.playbarWidth * compState.videoDuration;
-              if(compState.trimStartSeconds
-                && compState.trimEndSeconds
-                && (newTime < compState.trimStartSeconds
-                  || newTime > compState.trimEndSeconds
-                )){
-                  disableRepeatOn();
+      {videoRef.current &&
+        <VideoElementContext.Provider value={videoRef.current}>
+          <ProgressBar
+            debug={debug}
+            readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}
+            isRepeatOn={compState.isRepeatOn}
+            trimStartSeconds={compState.trimStartSeconds ||0}
+            trimEndSeconds={compState.trimEndSeconds ||0}
+            trimDuration={compState.trimDuration ||0}
+            playbarWidth={compState.playbarWidth ||0}
+            scrubberWidth={compState.scrubberWidth ||0}
+            videoDuration={compState.videoDuration ||0}
+            handlePlaypause={handlePlaypause}
+            dispatchCompState={dispatchCompState}
+            onPlayCursorChanged={(newPos: number)=>{
+              if(videoRef.current !== null && videoRef.current.currentTime
+                && compState.playbarWidth && compState.videoDuration){
+                const newTime = newPos / compState.playbarWidth * compState.videoDuration;
+                if(compState.trimStartSeconds
+                  && compState.trimEndSeconds
+                  && (newTime < compState.trimStartSeconds
+                    || newTime > compState.trimEndSeconds
+                  )){
+                    disableRepeatOn();
+                }
+                videoRef.current.currentTime = newTime;
               }
-              videoRef.current.currentTime = newTime;
-            }
-          }}
-        />
-      </VideoElementContext.Provider>
-      <ControlBar
-        debug={debug}
-        readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}
-        videoCurrentTime={videoRef.current?.currentTime}
-        videoDuration={videoRef.current?.duration}
-        isMuted={compState.isMuted}
-        isRepeatOn={compState.isRepeatOn}
-        playpause={compState.playpause}
-        handlePlaypause={togglePlaypause}
-        dispatchCompState={dispatchCompState}
-      />
+            }}
+          />
+        
+          <ControlBar
+            debug={debug}
+            readyToMount={(compState.status === STATE_STATUSES.VIDEO_METADATA_LOADED)}
+            isMuted={compState.isMuted}
+            isRepeatOn={compState.isRepeatOn}
+            playpause={compState.playpause}
+            handlePlaypause={togglePlaypause}
+            dispatchCompState={dispatchCompState}
+          />
+
+        </VideoElementContext.Provider>
+      }
     </div>
   );
-});
+};

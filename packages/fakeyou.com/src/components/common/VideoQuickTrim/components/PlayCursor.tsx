@@ -30,17 +30,21 @@ export const PlayCursor = ({
     );
   });
   useEffect(()=>{
-    if(videoElement!==null){
-      videoElement.ontimeupdate = ()=>{
-          if(isRepeatOn && (
-              videoElement.currentTime < playBoundStart ||
-              videoElement.currentTime > playBoundEnd
-          )){
-            videoElement.currentTime = playBoundStart + ONE_MS
-          }
-          const newOffset = (videoElement.currentTime / videoElement.duration) * (rest.boundingWidth);
-          setTimeCursorOffset(newOffset);
-      };
+    const handleTimeCursorPosition = ()=>{
+      if(videoElement!==null){
+        if(isRepeatOn && (
+            videoElement.currentTime < playBoundStart ||
+            videoElement.currentTime > playBoundEnd
+        )){
+          videoElement.currentTime = playBoundStart + ONE_MS
+        }
+        const newOffset = (videoElement.currentTime / videoElement.duration) * (rest.boundingWidth);
+        setTimeCursorOffset(newOffset);
+      }
+    };
+    videoElement?.addEventListener("timeupdate", handleTimeCursorPosition);
+    return()=>{
+      videoElement?.removeEventListener("timeupdate",handleTimeCursorPosition);
     }
   },[videoElement, isRepeatOn, playBoundStart, playBoundEnd, rest.boundingWidth]);
 

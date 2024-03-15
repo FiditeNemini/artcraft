@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import VideoQuickTrim from 'components/common/VideoQuickTrim';
+import VideoPlayer from 'components/common/VideoPlayer';
 import { NavLink } from 'react-router-dom';
 
 import {Container, Panel} from 'components/common';
@@ -21,10 +21,10 @@ export default function ComponentSandbox(
     <Panel>
       
       <div className="m-4">
-        <VideoQuickTrim 
-          trimStartSeconds={Number(state1 ||0)}
-          trimEndSeconds={Number(state2 || 0)}
-          onSelect={handleCallback}
+        <VideoPlayer 
+          // trimStartSeconds={Number(state1 ||0)}
+          // trimEndSeconds={Number(state2 || 0)}
+          // onSelectTrim={handleCallback}
           mediaToken='m_wdptbe5rfzpb1gzhva78gpw8qrkgs9'
         />
       </div>

@@ -1,4 +1,9 @@
-import React, { memo } from 'react'
+import React, { 
+  useState,
+  useContext,
+  useEffect,
+} from 'react';
+
 import {
   faArrowsRepeat,
   faPlay,
@@ -15,12 +20,11 @@ import {
   PLAYPUASE_STATES
 } from '../reducer';
 import { TRIM_OPTIONS, formatSecondsToHHMMSSCS } from "../utilities";
+import { VideoElementContext } from '../contexts';
 
-export const ControlBar = memo(({
+export const ControlBar = ({
   debug: propsDebug = false,
   readyToMount,
-  videoCurrentTime,
-  videoDuration,
   isRepeatOn,
   isMuted,
   playpause,
@@ -29,8 +33,6 @@ export const ControlBar = memo(({
 }:{
   debug?:boolean;
   readyToMount: boolean;
-  videoCurrentTime: number | undefined;
-  videoDuration: number | undefined;
   isMuted: boolean,
   isRepeatOn: boolean;
   playpause: string;
@@ -38,8 +40,8 @@ export const ControlBar = memo(({
   dispatchCompState: (action: Action) => void;
 })=>{
   const debug = false;// || propsDebug;
-  if (debug) console.log("ControlBar reRENDERED!!");
-  
+  if (debug) console.log("reRENDERING ------ ControlBar");
+
   function handleSetTrimDuration(selected: string){
     dispatchCompState({
       type: ACTION_TYPES.SET_TRIM_DURATION,
@@ -72,21 +74,7 @@ export const ControlBar = memo(({
             variant="secondary"
             onClick={()=>dispatchCompState({type:ACTION_TYPES.TOGGLE_MUTE})}
           />
-          <div className="playtime d-flex">
-            <span >
-              <p>
-                {`${formatSecondsToHHMMSSCS(
-                  videoCurrentTime || 0
-                )}`}
-              </p>
-            </span>
-            <div>/</div>
-            <span>
-              <p>
-                {`${formatSecondsToHHMMSSCS(videoDuration || 0)}`}
-              </p>
-            </span>
-          </div>
+          <TimeLabel />
         </div>
         <SelectionBubbles
           options={Object.keys(TRIM_OPTIONS)}
@@ -100,4 +88,40 @@ export const ControlBar = memo(({
     return null;
   }
 
-});
+};
+
+function TimeLabel(){
+  const vidEl = useContext(VideoElementContext);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
+
+  useEffect(()=>{
+    function handleTimeStamp(){
+      setCurrentTime(vidEl?.currentTime ||0);
+    };
+    function handleDuration(){
+      setDuration(vidEl?.duration ||0)
+    };
+    vidEl?.addEventListener("timeupdate", handleTimeStamp);
+    vidEl?.addEventListener("loadmetadata", handleDuration);
+    return()=>{
+      vidEl?.removeEventListener("timeupdate",handleTimeStamp);
+      vidEl?.addEventListener("loadmetadata", handleDuration);
+    }
+  },[vidEl]);
+  return(
+    <div className="playtime d-flex">
+      <span>
+        <p>
+          {`${formatSecondsToHHMMSSCS(currentTime)}`}
+        </p>
+      </span>
+      <div>/</div>
+      <span>
+        <p>
+          {`${formatSecondsToHHMMSSCS(duration)}`}
+        </p>
+      </span>
+    </div>
+  );
+}

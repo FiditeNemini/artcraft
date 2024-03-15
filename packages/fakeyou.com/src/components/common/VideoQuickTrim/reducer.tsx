@@ -1,6 +1,5 @@
 import {
   MIN_VID_DURATION,
-  TIME_CURSOR_WIDTH,
   TRIM_OPTIONS,
   roundToMilliseconds
 } from "./utilities";
