@@ -6,9 +6,10 @@ import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { useHistory, useParams } from "react-router-dom";
 import "./StudioIntro.scss";
 import LoadingSpinner from "components/common/LoadingSpinner";
-import { useMedia, useJobStatus } from "hooks";
+import { useMedia, useInferenceJobs } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import { MediaFileType } from "@storyteller/components/src/api/media_files";
+import { JobState } from "@storyteller/components/src/jobs/JobStates";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -20,14 +21,15 @@ interface Props {
 function StudioIntroResultPage(props: Props) {
   const { jobToken } = useParams<{ jobToken: string }>();
   const history = useHistory();
+  const { inferenceJobs } = useInferenceJobs();
+  const job = inferenceJobs.find((item: any) => item.jobToken === jobToken);
+
   // const [mediaToken, setMediaToken] = useState(
   //   "m_f5kp3hm74qeq16eq7536jb73jkbvkh"
   // ); // Set the media token after polling success
   // const [jobExists, setJobExists] = useState<boolean | null>(null);
 
-  const job = useJobStatus({ jobToken });
-
-  console.log("🩵",job);
+  // const job = useJobStatus({ jobToken });
 
   const [mediaFile, setMediaFile] = useState<MediaFileType>();
 
@@ -49,6 +51,20 @@ function StudioIntroResultPage(props: Props) {
     history.push("/");
   }
 
+  const contentSwitch = () => {
+    switch (job.jobState) {
+      case JobState.UNKNOWN:
+      case JobState.PENDING:
+      case JobState.STARTED: return <LoadingSpinner label="Generating your movie..." />;
+      case JobState.ATTEMPT_FAILED: return <div {...{ className: "d-flex justify-content-center align-items-center" }}>
+        <h3>{`Attempt failed, retrying (attempt ${ job.attemptCount } )`}</h3>
+      </div>;
+      case JobState.COMPLETE_SUCCESS: return <video src={mediaLink} controls />;
+      case JobState.DEAD: return <h3>Job dead</h3>;
+      case JobState.CANCELED_BY_USER: return <h3>Job canceled by user</h3>;
+    };
+  }
+
   // Should also check if job actually exists or not
   //
   // if (!jobExists) {
@@ -65,11 +81,9 @@ function StudioIntroResultPage(props: Props) {
       </Panel>
       <Panel className="overflow-hidden rounded result-video-wrapper">
         <div className="ratio ratio-16x9">
-          {mediaToken ? (
-            <video src={mediaLink} controls />
-          ) : (
-            <LoadingSpinner label="Generating your movie..." />
-          )}
+          { 
+            contentSwitch()
+          }
         </div>
       </Panel>
       {mediaToken ? (

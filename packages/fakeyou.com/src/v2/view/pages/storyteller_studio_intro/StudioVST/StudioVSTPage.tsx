@@ -6,12 +6,13 @@ import { Button, Container, Panel, TextArea } from "components/common";
 //   QuickTrimData,
 // } from "components/common/VideoQuickTrim";
 import { VideoFakeyou } from "components/common";
-import { useJobStatus } from "hooks";
+import { useJobStatus, useInferenceJobs } from "hooks";
 import { EnqueueVST, EnqueueVSTResponse } from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
 import { initialValues } from "./defaultValues";
 import { VSTType } from "./helpers";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import SelectionBubblesV2 from "components/common/SelectionBubblesV2";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
 export default function PageVSTApp() {
   const { jobToken } = useParams<{ jobToken: string }>();
@@ -19,6 +20,8 @@ export default function PageVSTApp() {
   const history = useHistory();
 
   const job = useJobStatus({ jobToken });
+
+  const { enqueue } = useInferenceJobs(FrontendInferenceJobType.VideoStyleTransfer);
 
   const [vstValues, setVstValues] = useState<VSTType>({
     ...initialValues,
@@ -49,6 +52,7 @@ export default function PageVSTApp() {
     })
     .then((res: EnqueueVSTResponse) => {
       if (res.success && res.inference_job_token) {
+        enqueue(res.inference_job_token);
         // console.log("Job enqueued successfully", res.inference_job_token);
         history.push(`/studio-intro/result/${res.inference_job_token}`);
       } else {
@@ -111,6 +115,20 @@ export default function PageVSTApp() {
   if (!jobToken) {
     history.push("/");
   }
+
+  // const contentSwitch = () => {
+  //   switch (job.jobState) {
+  //     case JobState.UNKNOWN:
+  //     case JobState.PENDING:
+  //     case JobState.STARTED: return <LoadingSpinner label="Loading Video" />;
+  //     case JobState.ATTEMPT_FAILED: return <div {...{ className: "d-flex justify-content-center align-items-center" }}>
+  //      { `Video compositor attempt failed, retrying (attempt ${ job.attemptCount } )` }
+  //     </div>;
+  //     case JobState.COMPLETE_SUCCESS: return <VideoFakeyou mediaToken={job.maybe_result.entity_token}/>;
+  //     case JobState.DEAD: return <div>Job dead</div>;
+  //     case JobState.CANCELED_BY_USER: return <div>Job canceled by user</div>;
+  //   };
+  // }
 
   // Should also check if job actually exists or not
   //
