@@ -1,17 +1,12 @@
 use std::collections::HashMap;
-use std::fmt::format;
 use std::fs::{File, read_to_string};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::Instant;
 
 use anyhow::{anyhow, Result};
-use hostname::get;
 use log::{debug, error, info, warn};
-use r2d2_redis::redis::Commands;
 use serde_json::Value;
-use tokio::io::AsyncWriteExt;
-use tokio::runtime::Handle;
 use walkdir::WalkDir;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
@@ -29,7 +24,7 @@ use filesys::safe_delete_temp_file::safe_delete_temp_file;
 use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
-use mysql_queries::payloads::generic_inference_args::workflow_payload::{NewValue, WorkflowArgs};
+use mysql_queries::payloads::generic_inference_args::workflow_payload::NewValue;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
@@ -644,7 +639,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     })
 }
 
-fn apply_jsonpath_modifications(modifications: HashMap<String, NewValue>, workflow_path: &str) -> AnyhowResult<(String)> {
+fn apply_jsonpath_modifications(modifications: HashMap<String, NewValue>, workflow_path: &str) -> AnyhowResult<String> {
 
     info!("Prompt modifications: #{:?}", modifications);
 

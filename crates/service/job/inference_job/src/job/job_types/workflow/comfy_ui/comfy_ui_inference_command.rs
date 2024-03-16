@@ -8,7 +8,7 @@ use std::time::Duration;
 use anyhow::anyhow;
 use log::info;
 use once_cell::sync::Lazy;
-use subprocess::{Popen, PopenConfig, Redirection};
+use subprocess::{Popen, PopenConfig};
 
 use errors::AnyhowResult;
 use filesys::path_to_string::path_to_string;

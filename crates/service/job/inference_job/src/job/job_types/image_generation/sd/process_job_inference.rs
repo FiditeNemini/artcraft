@@ -16,7 +16,6 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::prompts::prompt_type::PromptType;
 use filesys::path_to_string::path_to_string;
-use mysql_queries::queries::batch_generations::insert_batch_generation_records::{insert_batch_generation_records, InsertBatchArgs};
 use mysql_queries::queries::media_files::create::insert_media_file_generic::{insert_media_file_generic, InsertArgs};
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};

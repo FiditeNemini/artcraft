@@ -1,12 +1,13 @@
 use std::path::{Path, PathBuf};
+
 use anyhow::anyhow;
-use jsonpath_lib::JsonPathError;
 use log::{error, info};
 use serde_json::Value;
+
 use errors::AnyhowResult;
 use filesys::check_directory_exists::check_directory_exists;
 use filesys::check_file_exists::check_file_exists;
-use mysql_queries::payloads::generic_inference_args::workflow_payload::NewValue;
+
 use crate::util::comfy_workflows::load_json::load_json;
 
 pub struct ComfyWorkflowStyleBuilder {
@@ -191,6 +192,7 @@ impl StageThreeStyleMapper {
 #[cfg(test)]
 mod tests {
   use std::path::PathBuf;
+
   use crate::util::comfy_workflows::comfy_workflow_style_builder::{ComfyWorkflowStyleBuilder, StageOneJsonLoader, StageThreeStyleMapper, StageTwoJsonLoader};
 
   fn test_path(path_from_repo_root: &str) -> PathBuf {
