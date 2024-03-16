@@ -5,7 +5,7 @@ import React, {
 import { STATE_STATUSES } from "../../reducer";
 import { ButtonPlaypause } from './ButtonPlaypause';
 import { LabelTimeDuration } from  "./LabelTimeDuration"
-
+import { LoadingDots } from '../LoadingDots';
 export const ControlBar = ({
   debug: propsDebug = false,
   status
@@ -33,8 +33,8 @@ export const ControlBar = ({
             variant="secondary"
             onClick={()=>dispatchCompState({type:ACTION_TYPES.TOGGLE_MUTE})}
           /> */}
-          <LabelTimeDuration />
         </div>
+        <LabelTimeDuration />
         {/* <SelectionBubbles
           options={Object.keys(TRIM_OPTIONS)}
           onSelect={handleSetTrimDuration}
@@ -42,9 +42,11 @@ export const ControlBar = ({
         /> */}
       </div>
     );
-  }else{
-    console.log('TODO: ControlBar should rendering loading state instead of null');
-    return null;
   }
+  return(
+    <div className="d-flex w-100 justify-content-center mt-3 flex-wrap">
+      <LoadingDots />
+    </div>
+  );
 };
 

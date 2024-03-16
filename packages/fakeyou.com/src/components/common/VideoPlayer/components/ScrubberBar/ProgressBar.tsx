@@ -43,7 +43,7 @@ export const ProgressBar = ()=>{
 
   if(vidEl){
     return(
-      <div className="progress-bar">
+      <div className="progress-bar player-border-bottom">
         <span className="loaded" style={{width: (buffered / vidEl.duration* 100) + "%"}} />
         <span className="played" style={{width: portionPlayed + "%"}} />
       </div>

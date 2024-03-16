@@ -6,7 +6,7 @@ import React, {
 
 import { VideoFakeyou } from "components/common";
 import { VideoFakeyouProps } from "../VideoFakeyou/VideoFakeyou";
-import { QuickTrimData } from "./utilities";
+// import { QuickTrimData } from "./utilities";
 
 import {
   reducer,
@@ -68,7 +68,7 @@ export const VideoPlayer = ({
 
   return(
     <VideoElementContext.Provider value={videoRef.current}>
-      <div className="fy-video-quicktrim2">
+      <div className="fy-video-player">
         <div className="video-wrapper">
           <VideoFakeyou
             debug={false}
@@ -82,7 +82,7 @@ export const VideoPlayer = ({
           {/* components that takes over for spinner and warning message */}
           <VideoTakeover height={height} status={compState.status}/>
         </div>{/* END of Video Wrapper */}
-        <ScrubberBar />
+        <ScrubberBar status={compState.status}/>
         <ControlBar debug={debug} status={compState.status}/>
       </div>
     </VideoElementContext.Provider>
