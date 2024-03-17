@@ -51,6 +51,10 @@ function LandingPage(props: Props) {
   // DO NOT LEAK THIS YET!!
   let protectedStudioOnboarding = <></>;
 
+  console.log('sessionWrapper', props.sessionWrapper);
+  console.log('response', props.sessionWrapper.sessionStateResponse);
+  console.log('can access studio', props.sessionWrapper.canAccessStudio());
+
   if (props.sessionWrapper.canAccessStudio()) {
     protectedStudioOnboarding = (
       <>
@@ -95,6 +99,7 @@ function LandingPage(props: Props) {
             {/* STORYTELLER,AI */}
 
             {protectedStudioOnboarding}
+
             <VstSectionV2 />
             <TtsDemoSection
               sessionWrapper={props.sessionWrapper}

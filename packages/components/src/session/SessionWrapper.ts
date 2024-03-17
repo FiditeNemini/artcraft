@@ -54,12 +54,13 @@ export class SessionWrapper {
   // Feature flag rollout for Storyteller Studio
   // This depends on the domain name and the backend.
   public canAccessStudio(): boolean {
-    const hostnameAllowed = StudioRolloutHostnameAllowed();
+    //const hostnameAllowed = StudioRolloutHostnameAllowed();
     const userAllowed =
       this.sessionStateResponse?.user?.can_access_studio || 
       this.sessionStateResponse?.user?.maybe_feature_flags.includes("studio") ||
       false;
-    return hostnameAllowed && userAllowed;
+    //return hostnameAllowed && userAllowed;
+    return userAllowed;
   }
 
   // Feature flag rollout for Video Style Transfer

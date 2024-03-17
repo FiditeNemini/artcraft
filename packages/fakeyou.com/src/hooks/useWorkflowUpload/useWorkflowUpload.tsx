@@ -50,7 +50,7 @@ export default function useWorkflow() {
       .then((res: any) => {
         if (res.success && res.inference_job_token) {
           writeStatusSet(FetchStatus.success);
-          enqueue(res.inference_job_token);
+          enqueue(res.inference_job_token,true);
       }
       })
       .catch(err => {

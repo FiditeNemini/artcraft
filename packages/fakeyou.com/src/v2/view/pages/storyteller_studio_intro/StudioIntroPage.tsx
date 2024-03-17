@@ -41,7 +41,7 @@ function StudioIntroPage(props: Props) {
   // This can serve as a second optional gate for enabling the next steps.
   const [sceneIsSaved, sceneIsSavedSet] = useState(false);
 
-  const [camera, cameraSet] = useState("rotation");
+  const [camera, cameraSet] = useState("zoom");
 
   usePrefixedDocumentTitle("Storyteller Studio");
 
@@ -77,10 +77,12 @@ function StudioIntroPage(props: Props) {
     EnqueueEngineCompositing("", {
       uuid_idempotency_token: uuidv4(),
       media_file_token: savedMediaToken,
-      // maybe_camera_preset: camera // HERE IS THE CAMERA SELECT VALUE -V
+      camera: camera,
+      camera_speed: 1.0,
+      skybox: "000000",
     }).then((res: any) => {
       if (res && res.success) {
-        inferenceJobs.enqueue(res.inference_job_token, true); // noModalPls = true
+        inferenceJobs.enqueue(res.inference_job_token);
         history.push(`/studio-intro/style/${res.inference_job_token}`);
       }
     });
@@ -88,7 +90,7 @@ function StudioIntroPage(props: Props) {
 
   const cameraOpts = [{
     label: "Rotation",
-    value: "rotation"
+    value: "orbit"
   },{
     label: "Zoom",
     value: "zoom"

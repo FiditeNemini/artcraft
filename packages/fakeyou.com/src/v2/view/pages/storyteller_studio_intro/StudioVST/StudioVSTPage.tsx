@@ -1,15 +1,18 @@
 import React, { useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { NavLink, useParams, useHistory } from "react-router-dom";
 import { Button, Container, Panel, TextArea } from "components/common";
-import VideoQuickTrim, {
-  QuickTrimData,
-} from "components/common/VideoQuickTrim";
-import { useJobStatus } from "hooks";
-import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
+// import VideoQuickTrim, {
+//   QuickTrimData,
+// } from "components/common/VideoQuickTrim";
+import { VideoFakeyou } from "components/common";
+import { useJobStatus, useInferenceJobs } from "hooks";
+import { EnqueueVST, EnqueueVSTResponse } from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
 import { initialValues } from "./defaultValues";
-import { mapRequest, VSTType } from "./helpers";
+import { VSTType } from "./helpers";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import SelectionBubblesV2 from "components/common/SelectionBubblesV2";
+import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 
 export default function PageVSTApp() {
   const { jobToken } = useParams<{ jobToken: string }>();
@@ -17,6 +20,8 @@ export default function PageVSTApp() {
   const history = useHistory();
 
   const job = useJobStatus({ jobToken });
+
+  const { enqueue } = useInferenceJobs(FrontendInferenceJobType.VideoStyleTransfer);
 
   const [vstValues, setVstValues] = useState<VSTType>({
     ...initialValues,
@@ -34,19 +39,20 @@ export default function PageVSTApp() {
   };
 
   const handleGenerate = () => {
-    let updatedVSTValues = Object.assign({}, vstValues);
-    updatedVSTValues.fileToken = job?.maybe_result?.entity_token || "";
-    updatedVSTValues.trimStart = 0;
-    updatedVSTValues.trimEnd = 3;
-
-    const request = mapRequest(updatedVSTValues);
-
-    // request.maybe_input_file = job?.maybe_result?.entity_token || "";
-    // request.maybe_trim_start_seconds = 0;
-    // request.maybe_trim_end_seconds = 3;
-
-    EnqueueVideoStyleTransfer(request).then(res => {
+    EnqueueVST("",{
+      creator_set_visibility: vstValues.visibility,
+      enable_lipsync: true,
+      input_file: job?.maybe_result?.entity_token || "",
+      negative_prompt: vstValues.negPrompt,
+      prompt: vstValues.posPrompt,
+      style: vstValues.sdModelToken,
+      trim_end_millis: 3000,
+      trim_start_millis: 0,
+      uuid_idempotency_token: uuidv4()
+    })
+    .then((res: EnqueueVSTResponse) => {
       if (res.success && res.inference_job_token) {
+        enqueue(res.inference_job_token);
         // console.log("Job enqueued successfully", res.inference_job_token);
         history.push(`/studio-intro/result/${res.inference_job_token}`);
       } else {
@@ -77,22 +83,22 @@ export default function PageVSTApp() {
     {
       label: "2D Anime",
       imageUrl: "/images/landing/onboarding/styles/style-2d-anime.webp",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "anime_2d_flat",
     },
     {
       label: "3D Cartoon",
       imageUrl: "/images/landing/onboarding/styles/style-3d-cartoon.webp",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "cartoon_3d",
     },
     {
       label: "Ink B&W",
       imageUrl: "/images/landing/onboarding/styles/style-ink-bw.webp",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "ink_bw_style",
     },
     {
       label: "Origami",
       imageUrl: "/images/landing/onboarding/styles/style-origami.webp",
-      token: "weight_yqexh77ntqyawzgh9fzash798",
+      token: "paper_origami",
     },
   ];
 
@@ -110,6 +116,20 @@ export default function PageVSTApp() {
     history.push("/");
   }
 
+  // const contentSwitch = () => {
+  //   switch (job.jobState) {
+  //     case JobState.UNKNOWN:
+  //     case JobState.PENDING:
+  //     case JobState.STARTED: return <LoadingSpinner label="Loading Video" />;
+  //     case JobState.ATTEMPT_FAILED: return <div {...{ className: "d-flex justify-content-center align-items-center" }}>
+  //      { `Video compositor attempt failed, retrying (attempt ${ job.attemptCount } )` }
+  //     </div>;
+  //     case JobState.COMPLETE_SUCCESS: return <VideoFakeyou mediaToken={job.maybe_result.entity_token}/>;
+  //     case JobState.DEAD: return <div>Job dead</div>;
+  //     case JobState.CANCELED_BY_USER: return <div>Job canceled by user</div>;
+  //   };
+  // }
+
   // Should also check if job actually exists or not
   //
   // if (!jobExists) {
@@ -125,16 +145,8 @@ export default function PageVSTApp() {
         <div className="row g-5">
           <div className="col-12 col-md-6">
             {job.isSuccessful && job.maybe_result ? (
-              <VideoQuickTrim
-                trimStartSeconds={0}
-                trimEndSeconds={0}
+              <VideoFakeyou
                 mediaToken={job.maybe_result.entity_token}
-                onSelect={(val: QuickTrimData) =>
-                  handleOnChange({
-                    trimStart: val.trimStartSeconds,
-                    trimEnd: val.trimEndSeconds,
-                  })
-                }
               />
             ) : (
               <div className="ratio ratio-4x3 panel-inner rounded">

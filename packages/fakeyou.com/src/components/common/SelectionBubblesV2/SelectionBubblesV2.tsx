@@ -100,9 +100,9 @@ export default function SelectionBubblesV2({
       >
         {variant === "default" ? (
           <>
-            {options.map(({ label }) => (
+            {options.map(({ label }, key) => (
               <button
-                key={label}
+                key={key}
                 className={`bubble-button ${
                   selectedOption === label
                     ? `selected ${selectedStyle === "fill" ? "fill" : ""}`
@@ -121,10 +121,9 @@ export default function SelectionBubblesV2({
                 mobileSideScroll ? "mobile-flex-nowrap" : ""
               }`}
             >
-              {options.map(({ label, imageUrl }) => (
-                <div className="col-4 col-lg-3">
+              {options.map(({ label, imageUrl }, key) => (
+                <div className="col-4 col-lg-3" key={key}>
                   <button
-                    key={label}
                     className={`bubble-button ${
                       selectedOption === label
                         ? `selected ${selectedStyle === "fill" ? "fill" : ""}`

@@ -22,7 +22,6 @@ export default function useJobStatus({ jobToken }: Props) {
         .then((res: GetJobStatusResponse) => {
           let continuePolling = jobStateCanChange(jobStateFromString(res.state.status.status));
 
-          console.log("😎",res.state);
           jobSet(res.state);
           if (!continuePolling) stopSet(true);
         });
