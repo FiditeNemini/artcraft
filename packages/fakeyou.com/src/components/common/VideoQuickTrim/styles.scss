@@ -71,6 +71,7 @@ $playbar-height: 2rem;
     position: relative;
     height: $playbar-height;
     width: 100%;
+    margin-top: 7px;
   }
   .playbar-bg {
     position: absolute;
@@ -94,6 +95,7 @@ $playbar-height: 2rem;
     }
     .loaded{
       background-color: $gray-600;
+      transition: width 0.5s;
     }
   }
 

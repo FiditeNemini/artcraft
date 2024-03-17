@@ -1,6 +1,5 @@
 import {
   MIN_VID_DURATION,
-  TIME_CURSOR_WIDTH,
   TRIM_OPTIONS,
   roundToMilliseconds
 } from "./utilities";
@@ -27,17 +26,14 @@ export type State = {
   playpause: string;
 
   canNotTrim: boolean | undefined;
-  trimReset: number;
   trimDuration: number | undefined;
   trimStartSeconds: number | undefined;
   trimEndSeconds: number | undefined;
   videoLoadProgress: TimeRanges | undefined;
   videoDuration: number | undefined;
 
-
   playbarWidth: number | undefined;
   scrubberWidth: number | undefined;
-  timeCursorOffset: number | undefined;
 
   isMuted: boolean;
   isRepeatOn: boolean;
@@ -48,7 +44,6 @@ export const initialState = {
   errorMessage : [],
   playpause: PLAYPUASE_STATES.NOT_READY,
   canNotTrim: undefined,
-  trimReset: Date.now(),
   trimDuration: undefined,
   trimStartSeconds: undefined,
   trimEndSeconds: undefined,
@@ -136,14 +131,14 @@ export function reducer(state: State, action: Action): State {
     }
     case ACTION_TYPES.SET_PLAYBAR_LAYOUT:{
       const newWidth = action.payload.playbarWidth;
-      const prevOffset = state.timeCursorOffset || 0;
+      // const prevOffset = state.timeCursorOffset || 0;
       if(state.trimDuration && state.videoDuration){
         return {
           ...state,
           playpause: PLAYPUASE_STATES.READY,
           playbarWidth: newWidth,
           scrubberWidth: newWidth * (state.trimDuration / state.videoDuration),
-          timeCursorOffset: (newWidth-TIME_CURSOR_WIDTH)*(prevOffset/ state.videoDuration)
+          // timeCursorOffset: (newWidth-TIME_CURSOR_WIDTH)*(prevOffset/ state.videoDuration)
         };
       }else{
         return{
@@ -194,12 +189,12 @@ export function reducer(state: State, action: Action): State {
         trimEndSeconds: roundToMilliseconds(action.payload.trimEndSeconds),
       }
     }
-    case ACTION_TYPES.MOVE_TIMECURSOR:{
-      return {
-        ...state,
-        timeCursorOffset: action.payload.timeCursorOffset
-      }
-    }
+    // case ACTION_TYPES.MOVE_TIMECURSOR:{
+    //   return {
+    //     ...state,
+    //     timeCursorOffset: action.payload.timeCursorOffset
+    //   }
+    // }
     case ACTION_TYPES.RESET:{
       return initialState
     }

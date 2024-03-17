@@ -11,6 +11,7 @@ interface TrimScrubberPropsI extends withScrubbingPropsI {
   trimStartSeconds:number;
   trimDuration: number;
   videoDuration: number;
+  handlePlaypause: ()=> void;
   onChange:(newPos:number)=>void
 }
 export const TrimScrubber = memo(({
@@ -18,11 +19,12 @@ export const TrimScrubber = memo(({
   trimStartSeconds,
   trimDuration,
   videoDuration,
+  handlePlaypause,
   onChange,
   ...rest
 }:TrimScrubberPropsI)=>{
   const debug = false || propsDebug;
-
+  console.log("trimScrubber reRENDERING");
   const TrimScrubberWithScrubbing = withScrubbing<TrimScrubberPropsI>(() => {
     return(
       <div className="trim-scrubber">
@@ -38,7 +40,8 @@ export const TrimScrubber = memo(({
         top: '-1rem',
       }}
       scrubPosition={trimStartSeconds/videoDuration*(rest.boundingWidth)}
-      onScrubChanged={onChange}
+      onScrubStart={handlePlaypause}
+      onScrubEnd={onChange}
       {...rest}
     />
   );
