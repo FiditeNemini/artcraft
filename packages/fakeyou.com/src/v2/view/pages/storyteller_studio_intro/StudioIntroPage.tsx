@@ -78,8 +78,8 @@ function StudioIntroPage(props: Props) {
       uuid_idempotency_token: uuidv4(),
       media_file_token: savedMediaToken,
       camera: camera,
-      camera_speed: 1.0,
-      skybox: "000000",
+      camera_speed: 0.2,
+      skybox: "meadow_4k",
     }).then((res: any) => {
       if (res && res.success) {
         inferenceJobs.enqueue(res.inference_job_token);
