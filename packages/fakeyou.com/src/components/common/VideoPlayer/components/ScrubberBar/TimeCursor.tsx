@@ -60,7 +60,7 @@ export const TimeCursor = ({
     };
   }, [handleWindowResize])
 
-  const handleOnScrubStart = () => {
+  const handleOnScrubStart = useCallback(() => {
     isLockedForScrubbing.current = true;
     if(videoElement!==null) {
       if (videoElement.paused) wasPlaying.current = false;
@@ -69,7 +69,7 @@ export const TimeCursor = ({
         videoElement.pause();
       }
     }
-  }
+  }, [videoElement])
 
   const handleOnScrubEnd = useCallback( (newPos: number)=>{
     isLockedForScrubbing.current = false;

@@ -34,13 +34,13 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   onScrubEnd,
   ...rest
 }: withScrubbingPropsI) => {
-  const debug = true; //|| propsDebug;
+  // const debug = true; //|| propsDebug;
 
 
   const refEl = useRef<HTMLDivElement| null>(null);
-  const refListener = useRef<number>(Date.now());
+  // const refListener = useRef<number>(Date.now());
 
-  if (debug) console.log(`${refListener.current} withSCRUBBING reRENDERING!! `);
+  // if (debug) console.log(`${refListener.current} withSCRUBBING reRENDERING!! `);
 
   const [{
     currLeftOffset, pointerStartPos,
@@ -54,7 +54,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
   useLayoutEffect(() => {
     // if (debug) console.log(`withSCRUBBING useLAYOUTeffect!! `);
     function handleScrubStart (e: MouseEvent) {
-      if (debug) console.log(`${refListener.current} withSCRUBBING SCRUB_START!! `);
+      // if (debug) console.log(`${refListener.current} withSCRUBBING SCRUB_START!! `);
       e.preventDefault();
       e.stopPropagation();
       if(refEl.current){
@@ -70,7 +70,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
       }
     };
     function handleScrubEnd (e: MouseEvent){
-      if (debug) console.log(`${refListener.current} withSCRUBBING SCRUB_END!! `);
+      // if (debug) console.log(`${refListener.current} withSCRUBBING SCRUB_END!! `);
       e.preventDefault();
       e.stopPropagation();
 
@@ -83,7 +83,7 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
       })); 
     };
     function handleScrubMove (e: MouseEvent){
-      if (debug) console.log(`${refListener.current} withSCRUBBING SCRUB_MOVE!! `);
+      // if (debug) console.log(`${refListener.current} withSCRUBBING SCRUB_MOVE!! `);
       e.preventDefault();
       e.stopPropagation();
       
@@ -106,28 +106,28 @@ export const withScrubbing = <P extends withScrubbingPropsI>(Component: React.Co
       });
     };
 
-    if(!(window as any)[`listener-id-${refListener.current}`]){
-      (window as any)[`listender-id-${refListener.current}`] = true;
-      window.addEventListener("pointerdown", handleScrubStart);
-      window.addEventListener("pointerup", handleScrubEnd);
-      return () => {
-        (window as any)[`listener-id-${refListener.current}`] = false;
-        window.removeEventListener("pointerdown", handleScrubStart);
-        window.removeEventListener("pointerup", handleScrubEnd);
-        window.removeEventListener("pointermove", handleScrubMove);
-      };
-    }
+    // if(!(window as any)[`listener-id-${refListener.current}`]){
+    //   (window as any)[`listender-id-${refListener.current}`] = true;
+    window.addEventListener("pointerdown", handleScrubStart);
+    window.addEventListener("pointerup", handleScrubEnd);
+    return () => {
+      // (window as any)[`listener-id-${refListener.current}`] = false;
+      window.removeEventListener("pointerdown", handleScrubStart);
+      window.removeEventListener("pointerup", handleScrubEnd);
+      window.removeEventListener("pointermove", handleScrubMove);
+    };
+    // }
   }, [scrubberWidth, boundingWidth]);
 
   useEffect(()=>{
-    if (debug) console.log(`${refListener.current} withSCRUBBING useEFFECT for scrubStart!! `);
+    // if (debug) console.log(`${refListener.current} withSCRUBBING useEFFECT for scrubStart!! `);
     if(onScrubStart && pointerStartPos > 0){
       onScrubStart();
     }
   },[pointerStartPos, onScrubStart]);
 
   useEffect(()=>{
-    if (debug) console.log(`${refListener.current} withSCRUBBING useEFFECT for scrubEend!! `);
+    // if (debug) console.log(`${refListener.current} withSCRUBBING useEFFECT for scrubEend!! `);
     if(onScrubEnd && boundingWidth > 0 && prevLeftOffset >= 0 && propsLeftOffset !== prevLeftOffset){
       onScrubEnd(prevLeftOffset);
     }
