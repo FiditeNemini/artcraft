@@ -1,9 +1,9 @@
 import React, { 
 } from 'react';
 
-// import { SelectionBubbles } from "components/common";
 import { STATE_STATUSES } from "../../reducer";
 import { ButtonPlaypause } from './ButtonPlaypause';
+import { ButtonMute } from './ButtonMute';
 import { LabelTimeDuration } from  "./LabelTimeDuration"
 import { LoadingDots } from '../LoadingDots';
 export const ControlBar = ({
@@ -21,25 +21,9 @@ export const ControlBar = ({
       <div className="d-flex w-100 justify-content-between mt-3 flex-wrap">
         <div className="playpause-external d-flex align-items-center flex-wrap mb-2">
           <ButtonPlaypause />
-          {/* <Button
-            className="button-repeat"
-            icon={faArrowsRepeat}
-            variant={isRepeatOn ? "primary":"secondary"}
-            onClick={()=>dispatchCompState({type:ACTION_TYPES.TOGGLE_REPEAT})}
-          /> */}
-          {/* <Button
-            className="button-mute"
-            icon={isMuted ? faVolumeSlash : faVolume}
-            variant="secondary"
-            onClick={()=>dispatchCompState({type:ACTION_TYPES.TOGGLE_MUTE})}
-          /> */}
+          <ButtonMute />
         </div>
         <LabelTimeDuration />
-        {/* <SelectionBubbles
-          options={Object.keys(TRIM_OPTIONS)}
-          onSelect={handleSetTrimDuration}
-          selectedStyle="outline"
-        /> */}
       </div>
     );
   }
