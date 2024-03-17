@@ -1,13 +1,14 @@
 import React, {
-  useContext,
   useCallback,
-  useState,
+  useContext,
   useEffect,
   useLayoutEffect,
+  useState,
+  useRef,
 } from 'react';
-import { withScrubbing, withScrubbingPropsI } from './withScrubbing';
 
 import { VideoElementContext } from '../../contexts';
+import { withScrubbing, withScrubbingPropsI } from './withScrubbing';
 
 interface TimeCursorPropsI {
   debug?: boolean
@@ -23,6 +24,8 @@ export const TimeCursor = ({
   const videoElement = useContext(VideoElementContext);
   const [timeCursorOffset, setTimeCursorOffset] = useState(0);
   const [boundingWidth, setBoundingWidth] = useState(videoElement?.getBoundingClientRect().width || 0);
+  const isLockedForScrubbing = useRef<boolean>(false);
+  const wasPlaying = useRef<boolean>(false);
 
   const PlayCursorWithScrubbing = withScrubbing<withScrubbingPropsI>(()=>{
     return(
@@ -31,7 +34,7 @@ export const TimeCursor = ({
   });
   useEffect(()=>{
     const handleTimeCursorPosition = ()=>{
-      if(videoElement!==null){
+      if(videoElement!==null && !isLockedForScrubbing.current){
         const newOffset = (videoElement.currentTime / videoElement.duration) * (boundingWidth);
         
         setTimeCursorOffset(newOffset);
@@ -57,17 +60,34 @@ export const TimeCursor = ({
     };
   }, [handleWindowResize])
 
+  const handleOnScrubStart = () => {
+    isLockedForScrubbing.current = true;
+    if(videoElement!==null) {
+      if (videoElement.paused) wasPlaying.current = false;
+      else {
+        wasPlaying.current = true;
+        videoElement.pause();
+      }
+    }
+  }
+
   const handleOnScrubEnd = useCallback( (newPos: number)=>{
+    isLockedForScrubbing.current = false;
     if(videoElement !== null){
       const newTime = newPos / boundingWidth * videoElement.duration;
       videoElement.currentTime = newTime;
+      if(wasPlaying.current === true){
+        videoElement.play();
+      }
     }
   },[videoElement, boundingWidth]);
   
   return(
     <PlayCursorWithScrubbing
       boundingWidth={boundingWidth}
+      hitboxPadding={16}
       scrubberWidth={8}
+      onScrubStart={handleOnScrubStart}
       onScrubEnd={handleOnScrubEnd}
       scrubPosition={timeCursorOffset}
       {...rest}

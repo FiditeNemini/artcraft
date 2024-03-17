@@ -105,10 +105,10 @@ $scrubber-bar-height: 2rem;
   }
 
 
-  .with-scrubber-wrapper{
-    box-shadow: 1px 1px 4px 0px rgba(0,0,0,1);
-    // transition: 0.5s;
-  }
+  // .with-scrubber-wrapper{
+    
+  //   // transition: 0.5s;
+  // }
   .trim-scrubber{
     height: 3rem;
     background-color: #e66462;
@@ -116,6 +116,7 @@ $scrubber-bar-height: 2rem;
     outline: 0.125rem $white solid;
     border-top: 1rem $white solid;
     border-radius: 0.25rem 0.25rem 0.125rem 0.125rem;
+ 
     
 
     display: flex;
