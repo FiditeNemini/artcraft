@@ -3,9 +3,7 @@ import { NavLink } from "react-router-dom";
 import { useParams, useHistory } from "react-router-dom";
 
 import { Button, Panel, TextArea } from "components/common";
-import VideoQuickTrim, {
-  QuickTrimData,
-} from "components/common/VideoQuickTrim";
+import {VideoPlayerQuickTrim} from "components/common/VideoPlayerQuickTrim";
 import EnqueueVideoStyleTransfer from "@storyteller/components/src/api/video_styleTransfer";
 
 import { Action, State } from "../../reducer";
@@ -75,14 +73,17 @@ export default function PageVSTApp({
     <Panel padding={true}>
       <div className="row g-5 mb-4">
         <div className="col-12 col-md-6">
-          <VideoQuickTrim
-            trimStartSeconds={vstValues.trimStart}
-            trimEndSeconds={vstValues.trimEnd}
+          <VideoPlayerQuickTrim
+            trimStartMs={vstValues.trimStart}
+            trimEndMs={vstValues.trimEnd}
             mediaToken={vstValues.fileToken}
-            onSelect={(val: QuickTrimData) =>{
+            onSelectTrim={(val: {
+              trimStartMs: number;
+              trimEndMs: number;
+            }) =>{
               handleOnChange({
-                trimStart: val.trimStartSeconds,
-                trimEnd: val.trimEndSeconds,
+                trimStart: val.trimStartMs,
+                trimEnd: val.trimEndMs,
               })
             }}
             onResponse={res => {
