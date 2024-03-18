@@ -1,10 +1,10 @@
 import React, {
   useCallback,
   useContext,
-  useEffect,
+  // useEffect,
   useLayoutEffect,
   useState,
-  // useRef,
+  useRef,
 } from 'react';
 import {
   faGripDots
@@ -45,35 +45,20 @@ export const TrimScrubber = ({
     }
     return 0
   }, [videoElement, trimValues]);
-  const [{scrubberWidth, scrubberPosition}, setScrubberValues] = useState<{
-    scrubberWidth:number;
-    scrubberPosition: number;
-  }>({
-    scrubberWidth: calcScrubberWidth(),
-    scrubberPosition: calcScrubberPosition()
-  });
+  const [scrubberWidth, setScrubberWidth] = useState<number>(calcScrubberWidth());
+  const scrubberPosition = useRef(calcScrubberPosition());
+  
 
   const handleWindowResize = useCallback(()=> {
-    if (videoElement !== null){
-      setScrubberValues((curr)=>({
-        ...curr,
-        scrubberWidth:calcScrubberWidth()
-      }));
-    }
-  },[videoElement, calcScrubberWidth]);
+      setScrubberWidth(calcScrubberWidth());
+  },[calcScrubberWidth]);
+
   useLayoutEffect(()=>{
     window.addEventListener("resize", handleWindowResize);
     return () => {
       window.removeEventListener("resize", handleWindowResize);
     };
   }, [handleWindowResize])
-
-  useEffect(()=>{
-    setScrubberValues((curr)=>({
-      scrubberPosition:calcScrubberPosition(),
-      scrubberWidth:calcScrubberWidth()
-    }));
-  },[videoElement, calcScrubberPosition, calcScrubberWidth]);
 
   const TrimScrubberWithScrubbing = withScrubbing<withScrubbingPropsI>(() => {
     return(
@@ -84,16 +69,19 @@ export const TrimScrubber = ({
   });
 
   const handleOnScrubEnd = useCallback((newPos: number)=>{
-    // console.log("onScrubEnd");
+    scrubberPosition.current = newPos;
+
     if(videoElement !== null && trimValues !== null){
       const boundingWidth = videoElement.getBoundingClientRect().width
       const newStartTime = Math.round(newPos / boundingWidth * videoElement.duration * 1000);
-      trimValues.onChange({
-        trimStartMs: newStartTime,
-        trimEndMs: newStartTime + trimValues.trimDurationMs,
-      });
+      if(trimValues.trimStartMs !== newStartTime){
+        trimValues.onChange({
+          trimStartMs: newStartTime,
+          trimEndMs: newStartTime + trimValues.trimDurationMs,
+        });
+      }
     }
-  }, [videoElement, trimValues])
+  }, [])
 
   return (
     <TrimScrubberWithScrubbing
@@ -103,7 +91,7 @@ export const TrimScrubber = ({
       styleOverride={{
         top: '-1rem',
       }}
-      scrubPosition={scrubberPosition}
+      scrubPosition={scrubberPosition.current}
       onScrubEnd={handleOnScrubEnd}
       {...rest}
     />
