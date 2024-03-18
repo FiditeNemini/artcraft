@@ -59,7 +59,18 @@ export function GetEngineUrl(args: GetEngineUrlArgs) : string {
       // NB: Storyteller Engine makes the API call to load the scene.
       // We don't need to pass the bucket path.
       // The engine, does, however, need a `.scn.ron` file extension.
-      const sceneUrlRef = `remote://${args.asset.token}.scn.ron`;
+      let extension;
+
+      switch (args.asset.media_type) {
+        case MediaFileType.SceneRon:
+          extension = "scn.ron";
+          break;
+        case MediaFileType.GLB:
+        default:
+          extension = "glb";
+          break;
+      }
+      const sceneUrlRef = `remote://${args.asset.token}.${extension}`;
       engineUrl += `&scene=${sceneUrlRef}`;
     } else if (
       args.asset.maybe_media_subtype === MediaFileSubtype.Mixamo

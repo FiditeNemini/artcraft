@@ -5,6 +5,7 @@ import { WeightCategory } from "@storyteller/components/src/api/_common/enums/We
 import { WeightType } from "@storyteller/components/src/api/_common/enums/WeightType";
 import { MediaFileSubtype } from "@storyteller/components/src/api/enums/MediaFileSubtype";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import { MediaFileClass } from "@storyteller/components/src/api/enums/MediaFileClass";
 
 // These tests are important - constructing Storyteller Engine URLs is complicated, 
 // and we want to make sure we test the various cases that occur in production.
@@ -55,6 +56,7 @@ describe('media files', () => {
     mediaFile = {
       token: "MEDIA_FILE_TOKEN",
       media_type: MediaFileType.GLB,
+      media_class: MediaFileClass.Unknown,
       maybe_media_subtype: null,
       maybe_prompt_token: null,
       public_bucket_path: "path/to/file",
@@ -95,12 +97,20 @@ describe('media files', () => {
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&scene=remote://MEDIA_FILE_TOKEN.scn.ron");
     });
 
-    test('from media subtype', () => {
-      mediaFile.media_type = MediaFileType.Audio; // NB: Not the real time; forcing test to act on subtype.
+    test('from media subtype and media type (.scn.ron)', () => {
+      mediaFile.media_type = MediaFileType.SceneRon;
       mediaFile.maybe_media_subtype = MediaFileSubtype.StorytellerScene; 
 
       const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&scene=remote://MEDIA_FILE_TOKEN.scn.ron");
+    });
+
+    test('from media subtype and media type (.glb)', () => {
+      mediaFile.media_type = MediaFileType.GLB;
+      mediaFile.maybe_media_subtype = MediaFileSubtype.StorytellerScene; 
+
+      const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
+      expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&scene=remote://MEDIA_FILE_TOKEN.glb");
     });
   });
 
