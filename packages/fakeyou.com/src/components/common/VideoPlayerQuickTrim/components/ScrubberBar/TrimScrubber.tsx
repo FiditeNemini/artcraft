@@ -1,7 +1,7 @@
 import React, {
   useCallback,
   useContext,
-  // useEffect,
+  useEffect,
   useLayoutEffect,
   useState,
   useRef,
@@ -30,12 +30,6 @@ export const TrimScrubber = ({
   const videoElement = useContext(VideoElementContext);
   const trimValues = useContext(TrimContext);
 
-  const calcScrubberPosition = useCallback(()=>{
-    if (videoElement !== null && trimValues !== null){
-      return (trimValues.trimStartMs / (videoElement.duration * 1000) * videoElement.getBoundingClientRect().width);
-    }
-    return 0;
-  }, [videoElement, trimValues]);
   const calcScrubberWidth = useCallback(()=>{
     if (videoElement!==null && trimValues !==null){
       const bound = videoElement.getBoundingClientRect().width;
@@ -46,8 +40,16 @@ export const TrimScrubber = ({
     return 0
   }, [videoElement, trimValues]);
   const [scrubberWidth, setScrubberWidth] = useState<number>(calcScrubberWidth());
-  const scrubberPosition = useRef(calcScrubberPosition());
-  
+  useEffect(()=>{
+    if (trimValues !== null){
+      const newWidth = calcScrubberWidth();
+      if (newWidth !== scrubberWidth){
+        setScrubberWidth(newWidth);
+      }
+    }
+  },[trimValues]);
+
+
 
   const handleWindowResize = useCallback(()=> {
       setScrubberWidth(calcScrubberWidth());
@@ -68,6 +70,14 @@ export const TrimScrubber = ({
     );
   });
 
+
+  const calcScrubberPosition = useCallback(()=>{
+    if (videoElement !== null && trimValues !== null){
+      return (trimValues.trimStartMs / (videoElement.duration * 1000) * videoElement.getBoundingClientRect().width);
+    }
+    return 0;
+  }, [videoElement, trimValues]);
+  const scrubberPosition = useRef(calcScrubberPosition());
   const handleOnScrubEnd = useCallback((newPos: number)=>{
     scrubberPosition.current = newPos;
 
@@ -81,7 +91,7 @@ export const TrimScrubber = ({
         });
       }
     }
-  }, [])
+  }, [videoElement, trimValues])
 
   return (
     <TrimScrubberWithScrubbing

@@ -14,8 +14,8 @@ export default function ComponentSandbox(
   const [state1, setState1] = useState<number|string|boolean|undefined>(undefined);
   const [state2, setState2] = useState<number|string|boolean|undefined>(undefined);
   const handleCallback = (val:any)=>{
-    console.log('onChange is triggered')
-    console.log(val);
+    // console.log('onChange is triggered')
+    // console.log(val);
     setState1(val.trimStartMs);
     setState2(val.trimEndMs);
   }
