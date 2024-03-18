@@ -107,10 +107,11 @@ describe('media files', () => {
 
     test('from media subtype and media type (.glb)', () => {
       mediaFile.media_type = MediaFileType.GLB;
+      mediaFile.media_class = MediaFileClass.Scene;
       mediaFile.maybe_media_subtype = MediaFileSubtype.StorytellerScene; 
 
       const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
-      expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&scene=remote://MEDIA_FILE_TOKEN.glb");
+      expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&sceneImport=remote://MEDIA_FILE_TOKEN.glb");
     });
   });
 

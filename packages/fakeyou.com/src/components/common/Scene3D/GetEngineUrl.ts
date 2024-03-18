@@ -4,6 +4,7 @@ import { EngineMode } from "./EngineMode";
 import { MediaFileSubtype } from "@storyteller/components/src/api/enums/MediaFileSubtype";
 import { MediaFileType } from "@storyteller/components/src/api/_common/enums/MediaFileType";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
+import { MediaFileClass } from "@storyteller/components/src/api/enums/MediaFileClass";
 
 // Storyteller Engine parameters
 // These are documented here:
@@ -52,6 +53,15 @@ export function GetEngineUrl(args: GetEngineUrlArgs) : string {
     const bucketAssetUrl = new BucketConfig().getGcsUrl(args.asset.public_bucket_path);
 
     if (
+      args.asset.media_type === MediaFileType.GLB &&
+      args.asset.media_class === MediaFileClass.Scene &&
+      args.asset.maybe_media_subtype === MediaFileSubtype.StorytellerScene
+    ) {
+      // TODO: GLB docs
+      // NB: Not sure if `maybe_media_subtype` may or may not be required?
+      const sceneUrlRef = `remote://${args.asset.token}.glb`;
+      engineUrl += `&sceneImport=${sceneUrlRef}`;
+    } else if (
       args.asset.maybe_media_subtype === MediaFileSubtype.StorytellerScene || 
       args.asset.media_type === MediaFileType.SceneRon
     ) {
