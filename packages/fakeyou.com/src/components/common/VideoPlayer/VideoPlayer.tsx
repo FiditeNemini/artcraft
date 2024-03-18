@@ -6,7 +6,6 @@ import React, {
 
 import { VideoFakeyou } from "components/common";
 import { VideoFakeyouProps } from "../VideoFakeyou/VideoFakeyou";
-// import { QuickTrimData } from "./utilities";
 
 import {
   reducer,
@@ -27,21 +26,16 @@ import './styles.scss';
 interface VideoPlayerProps extends VideoFakeyouProps {
   debug?: boolean
   height?: number
-  // onSelectTrim: (values: QuickTrimData) => void;
-  // trimStartSeconds: number;
-  // trimEndSeconds: number;
 }
 
 export const VideoPlayer = ({
   debug: propsDebug = false,
   height=500,
-  // onSelectTrim,
-  // trimStartSeconds: propsTrimStartSeconds,
-  // trimEndSeconds : propsTrimEndSeconds,
   ...rest
 }: VideoPlayerProps) => {
   const debug = true || propsDebug;
   if(debug) console.log(`reRENDER VideoQuickTrim @${String(Date.now()).slice(-5)}`)
+
   const [compState, dispatchCompState] = useReducer(reducer, initialState);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);

@@ -2,10 +2,8 @@ import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { NavLink, useParams, useHistory } from "react-router-dom";
 import { Button, Container, Panel, TextArea } from "components/common";
-// import VideoQuickTrim, {
-//   QuickTrimData,
-// } from "components/common/VideoQuickTrim";
-import { VideoFakeyou } from "components/common";
+
+import { VideoPlayer } from "components/common";
 import { useJobStatus, useInferenceJobs } from "hooks";
 import { EnqueueVST, EnqueueVSTResponse } from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
 import { initialValues } from "./defaultValues";
@@ -145,7 +143,7 @@ export default function PageVSTApp() {
         <div className="row g-5">
           <div className="col-12 col-md-6">
             {job.isSuccessful && job.maybe_result ? (
-              <VideoFakeyou
+              <VideoPlayer
                 mediaToken={job.maybe_result.entity_token}
               />
             ) : (
