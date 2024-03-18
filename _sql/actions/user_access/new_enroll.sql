@@ -54,8 +54,19 @@ SET
     can_access_studio = false,
     maybe_feature_flags = 'studio,video_style_transfer'
 WHERE username IN (
-    'vagata',
+    'claraqueiros',
     'tammieteller',
+    'vagata',
+    'zzz_last_item'
+);
+
+-- Early access (other)
+UPDATE users
+SET
+    can_access_studio = false,
+    maybe_feature_flags = 'studio,video_style_transfer'
+WHERE username IN (
+    'printrman',
     'zzz_last_item'
 );
 
