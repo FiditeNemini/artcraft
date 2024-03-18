@@ -109,6 +109,7 @@ describe('media files', () => {
   // Production examples:
   //   [without subtype]       https://feature-mvp--fakeyou.netlify.app/media/m_tcj2zzncmvmn32f0yavmys5jdrc8cc (Majora's Mask GLB)
   //   [scene_import subtype]  https://feature-mvp--fakeyou.netlify.app/media/m_a504ma0n7vv3y80bw7bvgx7q2cecmb (Goron GLB)
+  //   [scene media_class]     https://feature-mvp--fakeyou.netlify.app/media/m_2yw1ytwec9wj8y74k3kc26grn4q341 (Joel's island GLB)
   describe('generic scene file (not storyteller studio scene)', () => {
     test('glb without subtype', () => {
       mediaFile.media_type = MediaFileType.GLB;
