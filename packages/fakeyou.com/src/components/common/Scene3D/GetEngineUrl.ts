@@ -57,8 +57,9 @@ export function GetEngineUrl(args: GetEngineUrlArgs) : string {
       args.asset.media_class === MediaFileClass.Scene &&
       args.asset.maybe_media_subtype === MediaFileSubtype.StorytellerScene
     ) {
-      // TODO: GLB docs
-      // NB: Not sure if `maybe_media_subtype` may or may not be required?
+      // GLB Scenes
+      // NB: Not sure if `maybe_media_subtype` is required to be "storyteller_scene".
+      // We'll require it in the file for now, but may loosen this restriction.
       const sceneUrlRef = `remote://${args.asset.token}.glb`;
       engineUrl += `&sceneImport=${sceneUrlRef}`;
     } else if (
@@ -69,18 +70,7 @@ export function GetEngineUrl(args: GetEngineUrlArgs) : string {
       // NB: Storyteller Engine makes the API call to load the scene.
       // We don't need to pass the bucket path.
       // The engine, does, however, need a `.scn.ron` file extension.
-      let extension;
-
-      switch (args.asset.media_type) {
-        case MediaFileType.SceneRon:
-          extension = "scn.ron";
-          break;
-        case MediaFileType.GLB:
-        default:
-          extension = "glb";
-          break;
-      }
-      const sceneUrlRef = `remote://${args.asset.token}.${extension}`;
+      const sceneUrlRef = `remote://${args.asset.token}.scn.ron`;
       engineUrl += `&scene=${sceneUrlRef}`;
     } else if (
       args.asset.maybe_media_subtype === MediaFileSubtype.Mixamo

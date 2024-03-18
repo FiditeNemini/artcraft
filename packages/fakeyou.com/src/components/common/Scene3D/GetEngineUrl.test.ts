@@ -104,15 +104,6 @@ describe('media files', () => {
       const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&scene=remote://MEDIA_FILE_TOKEN.scn.ron");
     });
-
-    test('from media subtype and media type (.glb)', () => {
-      mediaFile.media_type = MediaFileType.GLB;
-      mediaFile.media_class = MediaFileClass.Scene;
-      mediaFile.maybe_media_subtype = MediaFileSubtype.StorytellerScene; 
-
-      const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
-      expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&sceneImport=remote://MEDIA_FILE_TOKEN.glb");
-    });
   });
 
   // Production examples:
@@ -135,6 +126,15 @@ describe('media files', () => {
 
       const url = GetEngineUrl({mode: EngineMode.Viewer, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=viewer&sceneImport=https://storage.googleapis.com/dev-vocodes-public/path/to/file.gltf");
+    });
+
+    test('glb with scene media_class and storyteller_scene subtype', () => {
+      mediaFile.media_type = MediaFileType.GLB;
+      mediaFile.media_class = MediaFileClass.Scene;
+      mediaFile.maybe_media_subtype = MediaFileSubtype.StorytellerScene; 
+
+      const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
+      expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&sceneImport=remote://MEDIA_FILE_TOKEN.glb");
     });
   });
 
