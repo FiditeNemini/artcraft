@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { NavLink, useParams, useHistory } from "react-router-dom";
 import { Button, Container, Panel, TextArea } from "components/common";
 
-import { VideoPlayer } from "components/common";
+import { VideoPlayer } from "components/common/VideoPlayer";
 import { useJobStatus, useInferenceJobs } from "hooks";
 import { EnqueueVST, EnqueueVSTResponse } from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
 import { initialValues } from "./defaultValues";
