@@ -43,11 +43,12 @@ export const TrimScrubber = ({
   useEffect(()=>{
     if (trimValues !== null){
       const newWidth = calcScrubberWidth();
-      if (newWidth !== scrubberWidth){
-        setScrubberWidth(newWidth);
-      }
+      setScrubberWidth((currWidth)=>{
+        if (newWidth !== currWidth) return newWidth;
+        else return currWidth;
+      });
     }
-  },[trimValues]);
+  },[trimValues, calcScrubberWidth]);
 
 
 
