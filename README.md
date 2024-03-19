@@ -1,41 +1,70 @@
 # GottaGoFast-SS
 Fast Prototyping:
-this app is created using `npx create-remix`
+
 - [Remix Docs](https://remix.run/docs)
-this app uses tailwind for styoing
+- [Netlify Functions Overview](https://docs.netlify.com/functions/overview)
 - [Tailwind Docs](https://tailwindcss.com/docs)
+
+## Netlify Setup
+
+1. Install the [Netlify CLI](https://docs.netlify.com/cli/get-started/):
+
+```sh
+npm i -g netlify-cli
+```
+
+If you have previously installed the Netlify CLI, you should update it to the latest version:
+
+```sh
+npm i -g netlify-cli@latest
+```
+
+2. Sign up and log in to Netlify:
+
+```sh
+netlify login
+```
+
+3. Create a new site:
+
+```sh
+netlify init
+```
 
 ## Development
 
-From your terminal:
+Ensure all packages are installed by running:
 
 ```sh
-npm run dev
+npm install
 ```
 
-This starts your app in development mode, rebuilding assets on file changes.
+Run
+
+```sh
+netlify dev
+```
+
+Open up [http://localhost:8888](http://localhost:8888), and you're ready to go!
+
+### Serve your site locally
+
+To serve your site locally in a production-like environment, run
+
+```sh
+netlify serve
+```
+
+Your site will be available at [http://localhost:8888](http://localhost:8888). Note that it will not auto-reload when you make changes.
 
 ## Deployment
 
-First, build your app for production:
+There are two ways to deploy your app to Netlify, you can either link your app to your git repo and have it auto deploy changes to Netlify, or you can deploy your app manually. If you've followed the setup instructions already, all you need to do is run this:
 
 ```sh
-npm run build
+# preview deployment
+netlify deploy --build
+
+# production deployment
+netlify deploy --build --prod
 ```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `remix build`
-
-- `build/`
-- `public/build/`
