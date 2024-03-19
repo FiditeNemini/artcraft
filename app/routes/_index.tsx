@@ -3,7 +3,7 @@ import type {
   LinksFunction 
 } from "@remix-run/deno";
 import sonic from "./assets/sonic-the-hedgehog-classic-sonic.gif";
-import basecss from "./assets/base.css";
+// import basecss from "./assets/base.css";
 
 export const meta: MetaFunction = () => {
   return [
@@ -17,10 +17,10 @@ export const links: LinksFunction = () => {
       rel: "stylesheet",
       href: "https://rsms.me/inter/inter.css",
     },
-    {
-      rel: "stylesheet",
-      href: basecss,
-    },
+    // {
+    //   rel: "stylesheet",
+    //   href: basecss,
+    // },
   ];
 };
 
