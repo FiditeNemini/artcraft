@@ -1,2 +1,2 @@
-# BK-SS
+# GGF-SS
 Prototype
