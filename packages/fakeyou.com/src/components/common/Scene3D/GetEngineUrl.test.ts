@@ -5,6 +5,7 @@ import { WeightCategory } from "@storyteller/components/src/api/_common/enums/We
 import { WeightType } from "@storyteller/components/src/api/_common/enums/WeightType";
 import { MediaFileSubtype } from "@storyteller/components/src/api/enums/MediaFileSubtype";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import { MediaFileClass } from "@storyteller/components/src/api/enums/MediaFileClass";
 
 // These tests are important - constructing Storyteller Engine URLs is complicated, 
 // and we want to make sure we test the various cases that occur in production.
@@ -55,6 +56,7 @@ describe('media files', () => {
     mediaFile = {
       token: "MEDIA_FILE_TOKEN",
       media_type: MediaFileType.GLB,
+      media_class: MediaFileClass.Unknown,
       maybe_media_subtype: null,
       maybe_prompt_token: null,
       public_bucket_path: "path/to/file",
@@ -95,8 +97,8 @@ describe('media files', () => {
       expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&scene=remote://MEDIA_FILE_TOKEN.scn.ron");
     });
 
-    test('from media subtype', () => {
-      mediaFile.media_type = MediaFileType.Audio; // NB: Not the real time; forcing test to act on subtype.
+    test('from media subtype and media type (.scn.ron)', () => {
+      mediaFile.media_type = MediaFileType.SceneRon;
       mediaFile.maybe_media_subtype = MediaFileSubtype.StorytellerScene; 
 
       const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
@@ -107,6 +109,7 @@ describe('media files', () => {
   // Production examples:
   //   [without subtype]       https://feature-mvp--fakeyou.netlify.app/media/m_tcj2zzncmvmn32f0yavmys5jdrc8cc (Majora's Mask GLB)
   //   [scene_import subtype]  https://feature-mvp--fakeyou.netlify.app/media/m_a504ma0n7vv3y80bw7bvgx7q2cecmb (Goron GLB)
+  //   [scene media_class]     https://feature-mvp--fakeyou.netlify.app/media/m_2yw1ytwec9wj8y74k3kc26grn4q341 (Joel's island GLB)
   describe('generic scene file (not storyteller studio scene)', () => {
     test('glb without subtype', () => {
       mediaFile.media_type = MediaFileType.GLB;
@@ -124,6 +127,15 @@ describe('media files', () => {
 
       const url = GetEngineUrl({mode: EngineMode.Viewer, asset: mediaFile });
       expect(url).toEqual("https://engine.fakeyou.com/?mode=viewer&sceneImport=https://storage.googleapis.com/dev-vocodes-public/path/to/file.gltf");
+    });
+
+    test('glb with scene media_class and storyteller_scene subtype', () => {
+      mediaFile.media_type = MediaFileType.GLB;
+      mediaFile.media_class = MediaFileClass.Scene;
+      mediaFile.maybe_media_subtype = MediaFileSubtype.StorytellerScene; 
+
+      const url = GetEngineUrl({mode: EngineMode.Studio, asset: mediaFile });
+      expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&sceneImport=remote://MEDIA_FILE_TOKEN.glb");
     });
   });
 

@@ -51,7 +51,6 @@ import TintSpinner from "./TintSpinner";
 import VideoBasic from "./VideoBasic";
 import VideoFakeyou from "./VideoFakeyou";
 import VideoInput from "./VideoInput";
-// import VideoQuickTrim, {QuickTrimType} from "./VideoQuickTrim";
 import WeightCoverImage from "./WeightCoverImage";
 export type { SelectModalData };
 
@@ -115,5 +114,4 @@ export {
   VideoFakeyou,
   VideoInput,
   WeightCoverImage,
-  // VideoQuickTrim,
 };

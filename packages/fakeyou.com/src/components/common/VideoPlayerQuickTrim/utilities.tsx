@@ -3,11 +3,6 @@ export const TIME_CURSOR_WIDTH = 8;
 export const MIN_VID_DURATION = 3;
 export const ONE_MS = 0.001;
 
-export type QuickTrimData = {
-  trimStartSeconds: number;
-  trimEndSeconds: number;
-}
-
 export function roundToMilliseconds(floaty:number){
   return Math.round(floaty*1000)/1000;
 }
@@ -22,8 +17,8 @@ export function formatSecondsToHHMMSSCS(seconds:number){
 }
 
 export const TRIM_OPTIONS:{[key: string]: number } = {
-  "3s": 3,
-  "5s": 5,
-  "10s":10,
-  "15s":15
+  "3s": 3000,
+  "5s": 5000,
+  "10s":10000,
+  "15s":15000,
 };
