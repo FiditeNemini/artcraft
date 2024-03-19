@@ -5,7 +5,7 @@ import {
   useCallback,
 } from 'react';
 
-import { SceneWithCube } from './Cube';
+import { SceneWithCube } from './SceneWithCube';
 
 const PageCube = () => {
   const mountRef = useRef<HTMLDivElement | null>(null);
