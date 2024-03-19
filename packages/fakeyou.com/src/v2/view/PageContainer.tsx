@@ -128,6 +128,7 @@ import { StudioIntroPage } from "./pages/storyteller_studio_intro/StudioIntroPag
 import StudioVSTPage from "./pages/storyteller_studio_intro/StudioVST/StudioVSTPage";
 import { StudioIntroResultPage } from "./pages/storyteller_studio_intro/StudioIntroResultPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
+import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -810,6 +811,10 @@ class PageContainer extends React.Component<
                     <DevUpload />
                   </Route>
 
+                  <Route path="/dev-upload-alt">
+                    <DevUploadAlt />
+                  </Route>
+
                   <Route path="/dev-media-input">
                     <DevMediaInput />
                   </Route>
@@ -1366,6 +1371,10 @@ class PageContainer extends React.Component<
 
                   <Route path="/dev-upload">
                     <DevUpload />
+                  </Route>
+
+                  <Route path="/dev-upload-alt">
+                    <DevUploadAlt />
                   </Route>
 
                   {/* Route for initial voice creation */}

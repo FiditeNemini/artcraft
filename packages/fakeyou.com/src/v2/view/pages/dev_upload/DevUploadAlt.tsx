@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 
 interface DevUploadProps {}
 
-export default function DevUpload(props: DevUploadProps) {
+export default function DevUploadAlt(props: DevUploadProps) {
   const [tokens, tokensSet] = useState<string[]>([]);
   const { engineSubtype, engineSubtypeChange, mediaClass, mediaClassChange, file, inputProps, isEngineAsset, isVideo, upload } = useMediaUploader({
     onSuccess: (res: UploaderResponse) => tokensSet([res.media_file_token, ...tokens])
