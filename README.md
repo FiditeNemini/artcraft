@@ -1,5 +1,5 @@
 # GottaGoFast-SS
-Fast Prototyping:
+Fast Prototyping with Better Netlify Pipeline:
 
 - [Remix Docs](https://remix.run/docs)
 - [Netlify Functions Overview](https://docs.netlify.com/functions/overview)

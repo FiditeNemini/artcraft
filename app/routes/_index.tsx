@@ -1,4 +1,5 @@
 import type { MetaFunction } from "@remix-run/deno";
+import sonic from "./assets/sonic-the-hedgehog-classic-sonic.gif";
 
 export const meta: MetaFunction = () => {
   return [
@@ -10,7 +11,15 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
+      <img
+        alt="sonic"
+        src={sonic}
+        style={{
+          width: "100%"
+        }}
+      />
+
+      {/* <h1>Welcome to Remix</h1>
       <ul>
         <li>
           <a
@@ -35,7 +44,7 @@ export default function Index() {
             Remix Docs
           </a>
         </li>
-      </ul>
+      </ul> */}
     </div>
   );
 }
