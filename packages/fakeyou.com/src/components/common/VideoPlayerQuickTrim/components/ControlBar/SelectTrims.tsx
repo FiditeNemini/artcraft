@@ -11,7 +11,7 @@ export const SelectTrim = ()=>{
   const trimValues = useContext(TrimContext);
 
   const handleSetTrimDuration = useCallback((selected: string)=>{
-    console.log(`trimDurationString: ${selected}`);
+    // console.log(`trimDurationString: ${selected}`);
     if (trimValues!==null) {
       trimValues.onChange({
         trimStartMs: trimValues.trimStartMs,

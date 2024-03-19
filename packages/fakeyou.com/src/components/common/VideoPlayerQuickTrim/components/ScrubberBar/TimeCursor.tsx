@@ -10,16 +10,9 @@ import React, {
 import { VideoElementContext } from '../../contexts';
 import { withScrubbing, withScrubbingPropsI } from './withScrubbing';
 
-interface TimeCursorPropsI {
-  debug?: boolean
-}
 
-export const TimeCursor = ({
-  debug: propsDebug = false,
-  ...rest
-}:TimeCursorPropsI)=>{
-  const debug = false || propsDebug;
-  if (debug) console.log("reRENDERING ----- Time Cursor");
+export const TimeCursor = (props:{})=>{
+  // console.log("reRENDERING ----- Time Cursor");
 
   const videoElement = useContext(VideoElementContext);
   const [timeCursorOffset, setTimeCursorOffset] = useState(0);
@@ -90,7 +83,7 @@ export const TimeCursor = ({
       onScrubStart={handleOnScrubStart}
       onScrubEnd={handleOnScrubEnd}
       scrubPosition={timeCursorOffset}
-      {...rest}
+      {...props}
     />
   );
 };

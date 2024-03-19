@@ -7,7 +7,7 @@ import React, {
 import { VideoElementContext } from '../../contexts';
 
 export const ProgressBar = ()=>{
-    // console.log("reRENDERING -------- ScrubberBar");
+  // console.log("reRENDERING -------- ScrubberBar");
 
   const vidEl = useContext(VideoElementContext);
   const [buffered, setBuffered] = useState<number>(0);
