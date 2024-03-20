@@ -7,12 +7,14 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import tailwindCss from "./tailwind.css?url";
-import resetCss from "./tailwind.css?url";
+import tailwindCss from "./rootStyles/tailwind.css?url";
+import normalizeCss from "./rootStyles/normalize.css?url";
+
+import { TopBar } from "./template/TopBar";
 
 export const links : LinksFunction = () => [{ 
   rel: "stylesheet",
-  href: resetCss,
+  href: normalizeCss,
 },{ 
   rel: "stylesheet",
   href: tailwindCss,
@@ -27,7 +29,8 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body style={{margin:0}}>
+      <body>
+        <TopBar />
         <Outlet />
         <ScrollRestoration />
         <Scripts />

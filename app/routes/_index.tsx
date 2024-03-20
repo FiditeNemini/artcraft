@@ -15,7 +15,13 @@ export default function Index() {
       <img
         alt="sonic"
         src={sonic}
-        className="object-cover h-screen w-screen"
+        className="
+          fixed
+          h-screen w-screen
+          top-0 left-0
+          object-cover
+          -z-10
+        "
       />
     </div>
   );
