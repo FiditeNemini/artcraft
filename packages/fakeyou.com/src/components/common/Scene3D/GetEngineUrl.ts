@@ -55,7 +55,10 @@ export function GetEngineUrl(args: GetEngineUrlArgs) : string {
     if (
       args.asset.media_type === MediaFileType.GLB &&
       args.asset.media_class === MediaFileClass.Scene &&
-      args.asset.maybe_media_subtype === MediaFileSubtype.StorytellerScene
+      (
+        args.asset.maybe_media_subtype === MediaFileSubtype.StorytellerScene || 
+        args.asset.maybe_media_subtype === MediaFileSubtype.SceneImport
+      )
     ) {
       // GLB Scenes
       // NB: Not sure if `maybe_media_subtype` is required to be "storyteller_scene".
