@@ -72,7 +72,6 @@ class Character {
     }
 
     animate(clip) {
-        console.log(clip);
         this.currentAction = this.mixer.clipAction(clip);
         this.currentAction.play();
     }
@@ -90,10 +89,9 @@ class Character {
     }
 
     load_animation(filepath, callback = null) {
-        let fbxLoader = new FBXLoader();
-        fbxLoader.load(filepath,
+        let glbLoader = new GLTFLoader();
+        glbLoader.load(filepath,
             (object) => {
-                console.log("loaded " + filepath);
                 let animationAction = this.mixer.clipAction(object.animations[0]);
                 this.anims.push(animationAction);
                 if (callback != null) {

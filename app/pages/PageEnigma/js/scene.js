@@ -67,7 +67,7 @@ class Scene {
             this.scene.add(child);
             children_uuids.push(child.uuid);
         });
-        this.characters[character_name].load_animation("/resources/models/fox/hanashi_IdleAnim.fbx", this.play_anim_demo.bind(this));
+        this.characters[character_name].load_animation("/resources/models/fox/fox_idle.glb", this.play_anim_demo.bind(this));
     }
 
     play_anim_demo(character_name) {
@@ -183,7 +183,7 @@ class Scene {
 
     _create_base_lighting() {
         const color = 0xFCECE7;
-        const light = new THREE.AmbientLight(color, 0.8);
+        const light = new THREE.HemisphereLight(color, 0x8d8d8d, 3.5);
         this.scene.add(light);
 
         const directional_light = new THREE.DirectionalLight(color, 3.5);
