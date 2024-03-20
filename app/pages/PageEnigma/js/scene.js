@@ -183,7 +183,7 @@ class Scene {
 
     _create_base_lighting() {
         const color = 0xFCECE7;
-        const light = new THREE.AmbientLight(color, 0.8);
+        const light = new THREE.HemisphereLight(color, 0x8d8d8d, 3.5);
         this.scene.add(light);
 
         const directional_light = new THREE.DirectionalLight(color, 3.5);
