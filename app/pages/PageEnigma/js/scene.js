@@ -67,7 +67,7 @@ class Scene {
             this.scene.add(child);
             children_uuids.push(child.uuid);
         });
-        this.characters[character_name].load_animation("/resources/models/fox/hanashi_IdleAnim.fbx", this.play_anim_demo.bind(this));
+        this.characters[character_name].load_animation("/resources/models/fox/hanashi_idle.fbx", this.play_anim_demo.bind(this));
     }
 
     play_anim_demo(character_name) {
