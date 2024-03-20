@@ -606,7 +606,7 @@ export default function MediaPage() {
                         {...{
                           icon: faFilm,
                           label: "Open in onboarding",
-                          to: `/studio-intro/${mediaFile.token}`,
+                          to: `/studio-intro/${mediaFile.token}${mediaFile.maybe_engine_extension}`,
                           variant: "primary",
                         }}
                       />
@@ -616,7 +616,7 @@ export default function MediaPage() {
                         {...{
                           icon: faFaceViewfinder,
                           label: "Open in studio",
-                          to: `/studio/${mediaFile.token}`,
+                          to: `/studio/${mediaFile.token}${mediaFile.maybe_engine_extension}`,
                           variant: "secondary",
                         }}
                       />

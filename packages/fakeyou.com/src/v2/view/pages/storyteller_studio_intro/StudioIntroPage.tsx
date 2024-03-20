@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 import "./StudioIntro.scss";
 import Scene3D from "components/common/Scene3D/Scene3D";
 import { EngineMode } from "components/common/Scene3D/EngineMode";
+import { SplitFirstPeriod } from "utils/SplitFirstPeriod";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -19,7 +20,12 @@ interface Props {
 }
 
 function StudioIntroPage(props: Props) {
-  const { mediaToken } = useParams<{ mediaToken: string }>();
+  // NB: The URL parameter might be a raw media token (for .scn.ron files), or it might 
+  // have an appended suffix to assist the engine in loading the correct scene format. 
+  // For example, this is a valid "mediaTokenSpec": `m_zk0qkm1tgsdbh6e3c9kedy34vaympd.glb`
+  const { mediaToken : mediaTokenSpec } = useParams<{ mediaToken: string }>();
+
+  const { base: mediaToken, maybeRemainder: maybeExtension } = SplitFirstPeriod(mediaTokenSpec);
 
   const history = useHistory();
 
@@ -62,7 +68,12 @@ function StudioIntroPage(props: Props) {
 
   // We should prefer to start the onboarding flow with an existing scene, but if 
   // one is unavailable, we should show the sample room.
-  if (mediaToken) {
+  if (maybeExtension !== undefined) {
+    assetDescriptor = {
+      sceneImportToken: mediaToken,
+      extension: maybeExtension,
+    };
+  } else if (mediaToken) {
     assetDescriptor = {
       storytellerSceneMediaFileToken: mediaToken,
     };

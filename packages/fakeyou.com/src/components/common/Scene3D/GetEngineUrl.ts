@@ -36,7 +36,19 @@ interface StorytellerSceneMediaFileToken {
   storytellerSceneMediaFileToken: string;
 }
 
-export type LoadableAsset = MediaFile | EngineObject | StorytellerSceneMediaFileToken;
+// Used for loading media tokens of non-".scn.ron" files.
+// The extension must be provided to the engine, and the 
+// extension must include the leading period.
+interface SceneImportTokenAndExtension {
+  // Media file token for the asset
+  sceneImportToken: string;
+
+  // Extension, eg. ".glb", ".gltf", ".bvh". 
+  // The extension must have a leading period.
+  extension: string;
+}
+
+export type LoadableAsset = MediaFile | EngineObject | StorytellerSceneMediaFileToken | SceneImportTokenAndExtension;
 
 const ENGINE_BASE_URL = "https://engine.fakeyou.com";
 
@@ -104,6 +116,10 @@ export function GetEngineUrl(args: GetEngineUrlArgs) : string {
     const sceneUrlRef = `remote://${args.asset.storytellerSceneMediaFileToken}.scn.ron`;
     engineUrl += `&scene=${sceneUrlRef}`;
 
+  } else if (isSceneImportTokenAndExtension(args.asset)) {
+    const sceneUrlRef = `remote://${args.asset.sceneImportToken}${args.asset.extension}`;
+    engineUrl += `&sceneImport=${sceneUrlRef}`;
+
   } else if (isEngineObject(args.asset)) {
     // NB: This is an engine built-in, eg. `couch.gltf` or `sample-room.gltf`.
     engineUrl += `&objectId=${args.asset.objectId}`;
@@ -122,8 +138,13 @@ const isEngineObject = (loadable: LoadableAsset) : loadable is EngineObject => {
   return "objectId" in loadable;
 }
 
-// Type guard for engine objects
+// Type guard for .scn.ron media tokens
 const isStorytellerSceneMediaFileToken = (loadable: LoadableAsset) : loadable is StorytellerSceneMediaFileToken => {
   return "storytellerSceneMediaFileToken" in loadable;
+}
+
+// Type guard for loadable media tokens (not .scn.ron)
+const isSceneImportTokenAndExtension = (loadable: LoadableAsset) : loadable is SceneImportTokenAndExtension => {
+  return "sceneImportToken" in loadable;
 }
 

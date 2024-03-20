@@ -41,6 +41,13 @@ describe('storyteller scene media file tokens', () => {
   });
 });
 
+describe('scene import token and extension', () => {
+  test('scene token and extension', () => {
+    const url = GetEngineUrl({mode: EngineMode.Studio, asset: { sceneImportToken: "FOO", extension: ".glb" } });
+    expect(url).toEqual("https://engine.fakeyou.com/?mode=studio&sceneImport=remote://FOO.glb");
+  });
+});
+
 describe('object ids', () => {
   test('object id urls should work', () => {
     const url = GetEngineUrl({mode: EngineMode.Studio, asset: { objectId: "foo" } });
@@ -59,6 +66,7 @@ describe('media files', () => {
       media_class: MediaFileClass.Unknown,
       maybe_media_subtype: null,
       maybe_prompt_token: null,
+      maybe_engine_extension: null,
       public_bucket_path: "path/to/file",
       maybe_batch_token: "BATCH_TOKEN",
       created_at: new Date(),
