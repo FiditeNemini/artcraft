@@ -18,6 +18,7 @@ class Scene {
         this._createGrid();
         this._create_base_lighting();
         this._create_skybox();
+        this.render_mode();
     }
 
     instantiate(name) {
@@ -67,10 +68,26 @@ class Scene {
             this.scene.add(child);
             children_uuids.push(child.uuid);
         });
-        this.characters[character_name].load_animation("/resources/models/fox/fox_idle.glb", this.play_anim_demo.bind(this));
+        this.characters[character_name].load_animation("/resources/models/pose/walking.glb", this.play_anim_demo.bind(this));
+        //this.characters[character_name].load_animation("/resources/models/fox/fox_idle.glb", this.play_anim_demo.bind(this));
+    }
+
+    _disable_skybox() {
+        this.scene.background = null;
+    }
+
+    render_mode(enabled=true) {
+        if(enabled) {
+            this._disable_skybox();
+            this.scene.remove(this.gridHelper);
+        } else {
+            this.scene.add(this.gridHelper);
+            this._create_skybox();
+        }
     }
 
     play_anim_demo(character_name) {
+        console.log(this.characters[character_name].anims[0]._clip);
         this.characters[character_name].animate(this.characters[character_name].anims[0]._clip);
         this.characters[character_name].sync_lips("/resources/sound/2pac.wav");
         this.activeCharacter = character_name;

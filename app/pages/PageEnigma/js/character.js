@@ -16,7 +16,7 @@ class Character {
         this.currentAction;
 
         this.blink_timer = 0.0;
-        this.blink_every = 10.0;
+        this.blink_every = 3.0;
         this.blink_position = 0.0;
         this.blink_speed = 8.0;
         this.blinking = false;
@@ -77,15 +77,17 @@ class Character {
     }
 
     sync_lips(filepath) {
-        return fetch(filepath)
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error, status = ${response.status}`);
-                }
-                return response.arrayBuffer();
-            }).then((arrayBuffer) => {
-                this.lipsync_comp.startFromAudioFile(arrayBuffer);
-            });
+        if(this.lipsync_comp != null){
+            return fetch(filepath)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error, status = ${response.status}`);
+                    }
+                    return response.arrayBuffer();
+                }).then((arrayBuffer) => {
+                    this.lipsync_comp.startFromAudioFile(arrayBuffer);
+                });
+        }
     }
 
     load_animation(filepath, callback = null) {
@@ -118,13 +120,18 @@ class Character {
                             if (blendShapeIndexI != null && this.face == null) {
                                 this.face = c;
                                 this.lipsync_comp = new LipSync(this.face);
-                                this.mixer = new THREE.AnimationMixer(child);
                             }
                         }
                     }
                 });
                 child.frustrumCulled = false;
                 child.userData.name = "CHAR::"+child.name; // Will be used for loading the character later.
+                if(this.mixer == null) {
+                    this.mixer = new THREE.AnimationMixer(child);
+                }
+                if(this.face == null) {
+                    this.face = child;
+                }
             });
             if (callback != null) {
                 callback(this.name, glb.scene.children);
