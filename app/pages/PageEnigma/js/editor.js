@@ -47,6 +47,7 @@ class Editor {
         this.selected = null;
         this.last_selected = null;
         this.transform_interaction;
+        this.rendering = false;
 
         this.locked = false;
 
@@ -113,7 +114,7 @@ class Editor {
         window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
         window.addEventListener('click', this.onMouseClick.bind(this), false);
 
-        window.addEventListener("keydown", this._setup_keys.bind(this), false)
+        window.addEventListener("keyup", this._setup_keys.bind(this), false)
 
         //window.addEventListener('contextmenu', this.onContextMenu.bind(this), false);
         //window.addEventListener("mouseup", this.onMouseUp.bind(this), false);
@@ -176,13 +177,24 @@ class Editor {
             maxblur: 0.01
         });
 
-        //this.composer.addPass(this.saoPass);
-        //this.composer.addPass(this.bloomPass);
-        //this.composer.addPass(this.smaaPass);
-        //this.composer.addPass(this.bokehPass);
+        this._add_post_processing();
 
         this.outputPass = new OutputPass();
         this.composer.addPass(this.outputPass);
+    }
+
+    _add_post_processing() {
+        this.composer.addPass(this.saoPass);
+        this.composer.addPass(this.bloomPass);
+        this.composer.addPass(this.smaaPass);
+        this.composer.addPass(this.bokehPass);
+    }
+
+    _remove_post_processing() {
+        this.composer.removePass(this.saoPass);
+        this.composer.removePass(this.bloomPass);
+        this.composer.removePass(this.smaaPass);
+        this.composer.removePass(this.bokehPass);
     }
 
     _setup_keys(event) {
@@ -201,6 +213,9 @@ class Editor {
             case 'g':
                 console.log("Saving...")
                 this.save();
+                break;
+            case 'n':
+                this.render_mode();
                 break;
             case ' ':
                 //this.startPlayback();
@@ -236,6 +251,18 @@ class Editor {
         document.getElementById("render-btn").addEventListener("click", this.togglePlayback.bind(this));
     }
 
+    render_mode() {
+        this.rendering = !this.rendering;
+        console.log(this.rendering);
+        this.activeScene.render_mode(this.rendering);
+
+        if(this.rendering) {
+            this._remove_post_processing();
+        } else {
+            this._add_post_processing();
+        }
+    }
+
     togglePlay() {
         this.playback = !this.playback;
         this.playback_location = 0;
@@ -243,7 +270,7 @@ class Editor {
             this.stopPlayback();
         } else {
             // REMOVE THIS NEXT LINE IN PROD ONLY FOR TEST!!!!!
-            this.activeScene.play_anim_demo(this.activeScene.activeCharacter);
+            //this.activeScene.play_anim_demo(this.activeScene.activeCharacter);
         }
     }
 

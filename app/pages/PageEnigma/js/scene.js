@@ -18,7 +18,6 @@ class Scene {
         this._createGrid();
         this._create_base_lighting();
         this._create_skybox();
-        this.render_mode();
     }
 
     instantiate(name) {
