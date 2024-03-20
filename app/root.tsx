@@ -11,6 +11,7 @@ import tailwindCss from "./styles/tailwind.css?url";
 import normalizeCss from "./styles/normalize.css?url";
 
 import { TopBar } from "./template/TopBar";
+import { TopBarMidSection } from "./contexts/TopbarMidSection";
 
 export const links : LinksFunction = () => [{ 
   rel: "stylesheet",
