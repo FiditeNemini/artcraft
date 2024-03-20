@@ -117,7 +117,7 @@ class Editor {
 
         // Base control and debug stuff remove debug in prod.
         this._initialize_control();
-        //this._debug_stats(); // REMOVE IN PRODUCTION
+        this._debug_stats(); // REMOVE IN PRODUCTION
 
         // UI & UX stuff.
         // this._setup_buttons();
