@@ -40,6 +40,7 @@ WHERE username IN (
     'fyscott',
     'gateway',
     'jags111',
+    'lorbach',
     'justinjohn0306',
     'mrvintage',
     'rewin123',
