@@ -176,10 +176,10 @@ class Editor {
             maxblur: 0.01
         });
 
-        this.composer.addPass(this.saoPass);
-        this.composer.addPass(this.bloomPass);
-        this.composer.addPass(this.smaaPass);
-        this.composer.addPass(this.bokehPass);
+        //this.composer.addPass(this.saoPass);
+        //this.composer.addPass(this.bloomPass);
+        //this.composer.addPass(this.smaaPass);
+        //this.composer.addPass(this.bokehPass);
 
         this.outputPass = new OutputPass();
         this.composer.addPass(this.outputPass);
@@ -314,7 +314,8 @@ class Editor {
 
     // Initializes debug example scene.
     _initialize_example_scene() {
-        this.activeScene.create_character("./resources/models/fox/fox.glb", "Fox");
+        this.activeScene.create_character("./resources/models/pose/pose_new.glb", "Fox");
+        //this.activeScene.create_character("./resources/models/fox/fox.glb", "Fox");
     }
 
     // Example default size of object.
