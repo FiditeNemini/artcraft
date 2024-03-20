@@ -17,8 +17,8 @@ import {
   faLink,
   faFileCircleXmark,
   faArrowRightArrowLeft,
-  faVideoPlus,
   faCopy,
+  faFilm,
 } from "@fortawesome/pro-solid-svg-icons";
 import Accordion from "components/common/Accordion";
 import DataTable from "components/common/DataTable";
@@ -590,26 +590,62 @@ export default function MediaPage() {
                 {mediaFile?.media_type === MediaFileType.BVH ||
                 mediaFile?.media_type === MediaFileType.GLTF ||
                 mediaFile?.media_type === MediaFileType.GLB ? (
-                  <Button
-                    {...{
-                      icon: faVideoPlus,
-                      label: "Use in Engine Compositor",
-                      to: `/engine-compositor?preset_token=${mediaFile.token}`,
-                      variant: "primary",
-                      className: "flex-grow-1",
-                    }}
-                  />
+                  <>
+                    {/*<Button
+                      {...{
+                        icon: faVideoPlus,
+                        label: "Use in Engine Compositor",
+                        to: `/engine-compositor?preset_token=${mediaFile.token}`,
+                        variant: "primary",
+                        className: "flex-grow-1",
+                      }}
+                    />*/}
+                    {/* TODO: We need to send the extension to the next pages. */}
+                    <div className="w-100">
+                      <Button
+                        {...{
+                          icon: faFilm,
+                          label: "Open in onboarding",
+                          to: `/studio-intro/${mediaFile.token}`,
+                          variant: "primary",
+                        }}
+                      />
+                    </div>
+                    <div className="w-100">
+                      <Button
+                        {...{
+                          icon: faFaceViewfinder,
+                          label: "Open in studio",
+                          to: `/studio/${mediaFile.token}`,
+                          variant: "secondary",
+                        }}
+                      />
+                    </div>
+                  </>
                 ) : null}
                 {mediaFile?.media_type === MediaFileType.SceneRon ? (
-                  <Button
-                    {...{
-                      icon: faFaceViewfinder,
-                      label: "Open in studio",
-                      to: `/studio/${mediaFile.token}`,
-                      variant: "primary",
-                      className: "flex-grow-1",
-                    }}
-                  />
+                  <>
+                    <div className="w-100">
+                      <Button
+                        {...{
+                          icon: faFilm,
+                          label: "Open in onboarding",
+                          to: `/studio-intro/${mediaFile.token}`,
+                          variant: "primary",
+                        }}
+                      />
+                    </div>
+                    <div className="w-100">
+                      <Button
+                        {...{
+                          icon: faFaceViewfinder,
+                          label: "Open in studio",
+                          to: `/studio/${mediaFile.token}`,
+                          variant: "secondary",
+                        }}
+                      />
+                    </div>
+                  </>
                 ) : null}
 
                 {mediaFile?.media_type !== MediaFileType.Audio && (
