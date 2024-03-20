@@ -1,3 +1,4 @@
+import { LinksFunction } from "@remix-run/deno";
 import {
   Links,
   Meta,
@@ -6,11 +7,16 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-// import CSS from "./app.css"
+import tailwindCss from "./tailwind.css?url";
+import resetCss from "./tailwind.css?url";
 
-// export function links() {
-//   return [{ rel: "stylesheet", href: CSS }]
-// }
+export const links : LinksFunction = () => [{ 
+  rel: "stylesheet",
+  href: resetCss,
+},{ 
+  rel: "stylesheet",
+  href: tailwindCss,
+}];
 
 export default function App() {
   return (
