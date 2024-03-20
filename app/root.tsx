@@ -7,8 +7,8 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import tailwindCss from "./rootStyles/tailwind.css?url";
-import normalizeCss from "./rootStyles/normalize.css?url";
+import tailwindCss from "./styles/tailwind.css?url";
+import normalizeCss from "./styles/normalize.css?url";
 
 import { TopBar } from "./template/TopBar";
 
@@ -30,8 +30,8 @@ export default function App() {
         <Links />
       </head>
       <body className="bg-ui-background">
-        <TopBar />
         <Outlet />
+        <TopBar />
         <ScrollRestoration />
         <Scripts />
       </body>
