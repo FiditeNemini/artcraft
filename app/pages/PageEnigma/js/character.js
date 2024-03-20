@@ -6,7 +6,6 @@ import { LipSync } from './lipsync.js';
 class Character {
     constructor(name) {
         this.name = name;
-        this.objects = [];
         this.anims = [];
         this.audiodrive = null;
         this.lipsync_comp = null;
@@ -114,12 +113,11 @@ class Character {
                         c.material.specular = 0.25;
                         c.castShadow = true;
                         c.receiveShadow = false;
+                        c.frustrumCulled = false;
                         c.material.transparent = false;
                         if (c.morphTargetInfluences && c.morphTargetDictionary) {
                             const blendShapeIndexI = c.morphTargetDictionary["E"];
                             if (blendShapeIndexI != null && this.face == null) {
-                                //c.morphTargetInfluences[blendShapeIndexI] = 1.0;
-                                //this.blink_vrm = c.morphTargetDictionary["blink"];
                                 this.face = c;
                                 this.lipsync_comp = new LipSync(this.face);
                                 this.mixer = new THREE.AnimationMixer(child);
@@ -127,28 +125,14 @@ class Character {
                         }
                     }
                 });
-                if (child.name == "") {
-                    if (object_name == null) {
-                        child.name = filepath;
-                    } else {
-                        child.name = object_name;
-                    }
-
-                    child.type = "Mesh";
-                }
-                this.objects.push(child);
+                child.frustrumCulled = false;
+                child.userData.name = "CHAR::"+child.name; // Will be used for loading the character later.
             });
             if (callback != null) {
                 callback(this.name, glb.scene.children);
             }
         },
             (xhr) => {
-                // let loading_div = document.getElementById("loading-div");
-                // if (xhr.loaded / xhr.total < 1) {
-                //     loading_div.style.display = "block";
-                // } else {
-                //     loading_div.style.display = "none";
-                // }
             });
     }
 }

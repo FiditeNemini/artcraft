@@ -112,6 +112,9 @@ class Editor {
         // OnClick and MouseMove events.
         window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
         window.addEventListener('click', this.onMouseClick.bind(this), false);
+
+        window.addEventListener("keydown", this._setup_keys.bind(this), false)
+
         //window.addEventListener('contextmenu', this.onContextMenu.bind(this), false);
         //window.addEventListener("mouseup", this.onMouseUp.bind(this), false);
 
@@ -182,6 +185,29 @@ class Editor {
         this.composer.addPass(this.outputPass);
     }
 
+    _setup_keys(event) {
+        let boundTranlationMode = this.change_mode.bind(this);
+        console.log(event.key);
+        switch (event.key){
+            case 'e':
+                boundTranlationMode("scale");
+                break;
+            case 'r':
+                boundTranlationMode("rotate");
+                break;
+            case 't':
+                boundTranlationMode("translate");
+                break;
+            case 'g':
+                console.log("Saving...")
+                this.save();
+                break;
+            case ' ':
+                //this.startPlayback();
+                break;
+        }
+    }
+
     // Sets up the UI buttons
     _setup_buttons() {
         document.getElementById("playButton").addEventListener("click", this.togglePlay.bind(this));
@@ -214,11 +240,8 @@ class Editor {
         this.playback = !this.playback;
         this.playback_location = 0;
         if (this.playback == false) {
-            document.getElementById("playButton").innerHTML = '<i class="fa fa-play white-bt" aria-hidden="true"></i>';
             this.stopPlayback();
         } else {
-            document.getElementById("playButton").innerHTML = '<i class="fa fa-stop-circle-o white-bt" aria-hidden="true"></i>';
-
             // REMOVE THIS NEXT LINE IN PROD ONLY FOR TEST!!!!!
             this.activeScene.play_anim_demo(this.activeScene.activeCharacter);
         }
@@ -228,7 +251,7 @@ class Editor {
         this.control.detach(this.selected);
         this.activeScene.scene.remove(this.control);
         this.activeScene.scene.remove(this.activeScene.gridHelper);
-        this.save_manager.save(this.activeScene.scene, this.activeScene.sceneData["scene_properties"], this.activeScene.sceneData["characters"]);
+        this.save_manager.save(this.activeScene.scene);
         this.activeScene._createGrid();
     }
 
@@ -237,9 +260,8 @@ class Editor {
         this.save_manager.load(uploadedFile, this.load_callback.bind(this));
     }
 
-    load_callback(scene, scene_data, characters) {
+    load_callback(scene) {
         this.activeScene.scene = scene;
-        this.activeScene.load_data(scene_data, characters);
         this.activeScene._createGrid();
     }
 
@@ -255,7 +277,6 @@ class Editor {
     // Sets the fps to a specific number
     set_fps(fps_number) {
         this.cap_fps = fps_number;
-        document.getElementById("fps-dropdown").innerHTML = '<i class="fa fa-bolt white-bt" aria-hidden="true"></i> ' + fps_number;
     }
 
     // Toggles playback and recording.
@@ -280,10 +301,6 @@ class Editor {
         if (this.playback) {
             this.playback_location++;
             let max = this.cap_fps * this.max_length;
-
-            document.getElementById('st-cur').innerHTML = this.playback_location;
-            document.getElementById('st-max').innerHTML = max;
-
             if (this.playback_location >= max) {
                 this.togglePlayback();
             }
@@ -368,7 +385,6 @@ class Editor {
 
     update_properties() {
         let properties = this.activeScene.sceneData['scene_properties'][this.selected.uuid];
-        document.getElementById("properties-panel").innerHTML = '<div class="component"><a>' + this.selected.name + 's Properties</a></div>';
         if (properties != null) {
             properties.forEach(component => {
                 if (component.name == "Transform") {
@@ -381,28 +397,15 @@ class Editor {
                 }
                 let html_content = component.get_html();
                 if (html_content == null) { return; }
-                document.getElementById("properties-panel").innerHTML += html_content;
             });
         }
-        document.getElementById("properties-panel").innerHTML += `<br><div class="component" style="text-align: center;">
-            <a><i class="fa fa-plus-circle" style="font-size: xx-large;" aria-hidden="true"></i></a></div>`
     }
 
     // Automaticly resize scene.
     onWindowResize() {
-        // Desired aspect ratio
-        // const aspectRatio = 1920 / 1080;
-        // let aspect_adjust = 1.75
-
         // Calculate the maximum possible dimensions while maintaining the aspect ratio
         let width = window.innerWidth;// / aspect_adjust;
         let height = window.innerHeight;// / aspectRatio;
-
-        // Adjust dimensions if the calculated height is greater than half the screen height
-        // if (height > window.innerHeight / aspect_adjust) {
-        //     height = window.innerHeight / aspect_adjust;
-        //     width = height * aspectRatio;
-        // }
 
         // Set the camera aspect to the desired aspect ratio
         this.camera.aspect = width / height;
@@ -458,67 +461,6 @@ class Editor {
             this.transform_interaction = false;
         }
     }
-
-    onKeyDown(event) {
-
-        switch (event.code) {
-
-            case 'ArrowUp':
-            case 'KeyW':
-                this.moveForward = true;
-                break;
-
-            case 'ArrowLeft':
-            case 'KeyA':
-                this.moveLeft = true;
-                break;
-
-            case 'ArrowDown':
-            case 'KeyS':
-                this.moveBackward = true;
-                break;
-
-            case 'ArrowRight':
-            case 'KeyD':
-                this.moveRight = true;
-                break;
-
-            case 'Space':
-                velocity.y += 350;
-                break;
-
-        }
-
-    };
-
-    onKeyUp(event) {
-
-        switch (event.code) {
-
-            case 'ArrowUp':
-            case 'KeyW':
-                this.moveForward = false;
-                break;
-
-            case 'ArrowLeft':
-            case 'KeyA':
-                this.moveLeft = false;
-                break;
-
-            case 'ArrowDown':
-            case 'KeyS':
-                this.moveBackward = false;
-                break;
-
-            case 'ArrowRight':
-            case 'KeyD':
-                this.moveRight = false;
-                break;
-
-        }
-
-    };
-
 }
 
 export default Editor;
