@@ -30,15 +30,13 @@ export const PageCube = () => {
     setRotations({x:x, y:y})
   },[]);
 
-  useEffect(() => {
+  useEffect(() => { //componentDidMount
     sceneRef.current = new SceneWithCube(listeningXYRotation);
     mountRef.current?.appendChild(sceneRef.current.renderer.domElement);
-    
-    const animate = function () {
-      requestAnimationFrame(animate);
+  
+    sceneRef.current.renderer.setAnimationLoop(()=>{
       sceneRef.current?.update();
-    };
-    animate();
+    });
 
     // Clean up
     return () => {

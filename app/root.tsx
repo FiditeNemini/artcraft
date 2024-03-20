@@ -6,11 +6,11 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import CSS from "./app.css"
+// import CSS from "./app.css"
 
-export function links() {
-  return [{ rel: "stylesheet", href: CSS }]
-}
+// export function links() {
+//   return [{ rel: "stylesheet", href: CSS }]
+// }
 
 export default function App() {
   return (
@@ -21,7 +21,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body style={{margin:0}}>
         <Outlet />
         <ScrollRestoration />
         <Scripts />
