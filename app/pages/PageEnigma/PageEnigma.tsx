@@ -38,13 +38,13 @@ export const PageEnigma = () => {
   }, []);
 
   const handleButtonSave = ()=>{
-    //trigger editorRef here
+    editorRef.current?.save();
   }
   const handleButtonLoad = ()=>{
 
   }
   const handleButtonRender = ()=>{
-
+    editorRef.current?.togglePlayback();
   }
   const handleButtonPlay = ()=>{
 

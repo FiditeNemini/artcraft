@@ -16,6 +16,15 @@ import { SAOPass } from 'three/addons/postprocessing/SAOPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 
+if (typeof window !== 'undefined') {
+    import('ccapture.js').then(module => {
+        const CCapture = module.CCapture;
+        // You can use CCapture here
+    }).catch(error => {
+        console.error('Failed to load CCapture:', error);
+    });
+}
+
 // Main editor class that will call everything else all you need to call is " initialize(); ".
 class Editor {
 
@@ -57,7 +66,7 @@ class Editor {
 
         // Recording params.
         this.capturer = null;
-        this.cap_fps = 24;
+        this.cap_fps = 60;
 
         // Timeline settings.
         this.playback = false;
@@ -70,6 +79,7 @@ class Editor {
 
     // Initializes the main scene and ThreeJS essentials.
     initialize() {
+
         // Gets the canvas.
         this.canvReference = document.getElementById("video-scene");
 
@@ -96,7 +106,7 @@ class Editor {
         // Current scene for saving and loading.
         this.activeScene = new Scene();
 
-        this._configure_post_pro();
+        //this._configure_post_pro();
 
         this.activeScene.initialize();
 
@@ -177,7 +187,7 @@ class Editor {
             maxblur: 0.01
         });
 
-        this._add_post_processing();
+        //this._add_post_processing();
 
         this.outputPass = new OutputPass();
         this.composer.addPass(this.outputPass);
@@ -200,7 +210,7 @@ class Editor {
     _setup_keys(event) {
         let boundTranlationMode = this.change_mode.bind(this);
         console.log(event.key);
-        switch (event.key){
+        switch (event.key) {
             case 'e':
                 boundTranlationMode("scale");
                 break;
@@ -254,13 +264,13 @@ class Editor {
     render_mode() {
         this.rendering = !this.rendering;
         console.log(this.rendering);
-        this.activeScene.render_mode(this.rendering);
+        //this.activeScene.render_mode(this.rendering);
 
-        if(this.rendering) {
-            this._remove_post_processing();
-        } else {
-            this._add_post_processing();
-        }
+        //if (this.rendering) {
+        //    this._remove_post_processing();
+        //} else {
+        //    this._add_post_processing();
+        //}
     }
 
     togglePlay() {
@@ -311,8 +321,10 @@ class Editor {
         this.togglePlay();
         if (this.playback == false) {
             this.stopPlayback();
+            this.render_mode();
         } else {
             this.startPlayback();
+            this.render_mode();
         }
     }
 
@@ -321,7 +333,6 @@ class Editor {
             this.capturer.stop();
             this.capturer.save();
         }
-        this.activeScene.scene.add(this.activeScene.gridHelper);
     }
 
     frameCounter() {
@@ -370,17 +381,11 @@ class Editor {
             display: false,
             framerate: this.cap_fps,
             quality: 100,
-            format: 'webm',
+            format: 'webm-mediarecorder',
             frameLimit: 0,
             autoSaveTime: 0
         });
-        if (this.control != null && this.activeScene.gridHelper != null) {
-            this.activeScene.scene.remove(this.control);
-            this.activeScene.scene.remove(this.activeScene.gridHelper);
-            this.capturer.start();
-        } else {
-            console.error("Failed to start camera recording!");
-        }
+        this.capturer.start();
     }
 
     // Debug stats using ThreJS built in FPS and MS counter.
@@ -405,9 +410,11 @@ class Editor {
 
     // Render the scene to the camera.
     render_scene() {
-        if (this.composer != null) {
-            //this.renderer.render(this.activeScene.scene, this.camera);
+        if (this.composer != null && this.rendering == false) {
             this.composer.render();
+        }
+        else {
+            this.renderer.render(this.activeScene.scene, this.camera);
         }
     }
 
@@ -441,7 +448,9 @@ class Editor {
 
         // Set the renderer size to the calculated dimensions
         this.renderer.setSize(width, height);
-        this.composer.setSize(width, height);
+        if (this.composer != null) {
+            this.composer.setSize(width, height);
+        }
     }
 
     // Sets new mouse location usually used in raycasts.
