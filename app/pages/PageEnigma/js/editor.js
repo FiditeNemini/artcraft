@@ -113,7 +113,7 @@ class Editor {
         window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
         window.addEventListener('click', this.onMouseClick.bind(this), false);
 
-        window.addEventListener("keypress", this._setup_keys.bind(this), false)
+        window.addEventListener("keydown", this._setup_keys.bind(this), false)
 
         //window.addEventListener('contextmenu', this.onContextMenu.bind(this), false);
         //window.addEventListener("mouseup", this.onMouseUp.bind(this), false);
@@ -187,6 +187,7 @@ class Editor {
 
     _setup_keys(event) {
         let boundTranlationMode = this.change_mode.bind(this);
+        console.log(event.key);
         switch (event.key){
             case 'e':
                 boundTranlationMode("scale");
@@ -196,6 +197,10 @@ class Editor {
                 break;
             case 't':
                 boundTranlationMode("translate");
+                break;
+            case 'g':
+                console.log("Saving...")
+                this.save();
                 break;
             case ' ':
                 //this.startPlayback();
@@ -246,7 +251,7 @@ class Editor {
         this.control.detach(this.selected);
         this.activeScene.scene.remove(this.control);
         this.activeScene.scene.remove(this.activeScene.gridHelper);
-        this.save_manager.save(this.activeScene.scene, this.activeScene.sceneData["scene_properties"], this.activeScene.sceneData["characters"]);
+        this.save_manager.save(this.activeScene.scene);
         this.activeScene._createGrid();
     }
 

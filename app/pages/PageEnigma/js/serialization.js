@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 class SaveManager {
     constructor(version) {
@@ -6,33 +8,53 @@ class SaveManager {
         this.scene = null;
     }
 
-    save(scene, scene_data, characters) {
-        let json_data = scene.toJSON();
-        let json_string = JSON.stringify({ "scene": json_data, "scene_data": scene_data, "characters": characters});
+    save(scene, scene_data) {
+        let gltfExporter = new GLTFExporter();
+        gltfExporter.parse(
+            scene,
+            function (gltfJson) {
+                const jsonString = JSON.stringify(gltfJson);
+                console.log(scene);
+                let blob = new Blob([jsonString], {type: 'application/octet-stream'})
+                let blobUrl = URL.createObjectURL(blob);
 
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const randomNumber = Math.floor(Math.random() * 1000);
-        let save_name = `save_${randomNumber}_${year}${month}${day}_${hours}${minutes}${seconds}.json`;
+                let a = document.createElement('a');
 
-        download(json_string, save_name, "application/json");
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                const randomNumber = Math.floor(Math.random() * 1000);
+                let save_name = `save_${randomNumber}_${year}${month}${day}_${hours}${minutes}${seconds}.glb`;
+
+                a.href = blobUrl;
+                a.download = save_name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(blobUrl);
+            },
+            { 
+                trs: false,
+                onlyVisible: false,
+                binary: true
+            }
+    
+        );
     }
 
     load(uploadedFile, load_callback) {
-        let reader = new FileReader();
-        reader.readAsText(uploadedFile);
-        reader.onload = function (event) {
-            let jsonData = JSON.parse(event.target.result);
-            let scene = new THREE.ObjectLoader().parse(jsonData["scene"]);
-            let scene_data = jsonData["scene_data"];
-            let characters = jsonData["characters"];
-            load_callback(scene, scene_data, characters);
-        };
+        const loader = new GLTFLoader();
+			loader.load( 'models/gltf/ShaderBall.glb', function ( gltf ) {
+				model = gltf.scene;
+				model.scale.setScalar( 50 );
+				model.position.set( 200, - 40, - 200 );
+				scene1.add( model );
+
+		} );
     }
 
     download(data, filename, type) {

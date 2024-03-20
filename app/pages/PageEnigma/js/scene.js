@@ -10,7 +10,6 @@ class Scene {
         this.name = name;
         this.gridHelper = null;
         this.scene = new THREE.Scene();
-        this.sceneData = { "scene_properties": {}, "characters": {} }; // scene_properties might be removed in prod.
         this.characters = {};
         this.activeCharacter = null;
     }
@@ -46,7 +45,6 @@ class Scene {
         //obj.type = "Object3D";
         obj.name = name;
         this.scene.add(obj);
-        this.sceneData["scene_properties"][obj.uuid] = [new TransformObject(name)];
     }
 
     update(delta) {
@@ -59,7 +57,6 @@ class Scene {
         // Add check to make sure the character does not exist already HERE PLEASE!!
 
         let character = new Character(character_name);
-        this.sceneData["characters"][character_name] = { "name": character, "objects": [] };
         character.load(filepath, this.setup_character.bind(this))
         this.characters[character_name] = character;
     }
@@ -69,10 +66,7 @@ class Scene {
         children.forEach(child => {
             this.scene.add(child);
             children_uuids.push(child.uuid);
-            console.log("Child");
-            console.log(child);
         });
-        this.sceneData["characters"][character_name]["objects"] = children_uuids;
         this.characters[character_name].load_animation("/resources/models/fox/hanashi_IdleAnim.fbx", this.play_anim_demo.bind(this));
     }
 
@@ -80,22 +74,6 @@ class Scene {
         this.characters[character_name].animate(this.characters[character_name].anims[0]._clip);
         this.characters[character_name].sync_lips("/resources/sound/2pac.wav");
         this.activeCharacter = character_name;
-    }
-
-    load_data(json_data, characters) {
-        this.sceneData["characters"] = characters;
-        for (const [key, value] of Object.entries(json_data)) {
-            this.sceneData["scene_properties"][key] = [];
-            value.forEach(element => {
-                if (element.name == "Transform") {
-                    let trans = new TransformObject(element.uuid);
-                    trans.position = element.position;
-                    trans.rotation = element.rotation;
-                    trans.scale = element.scale;
-                    this.sceneData["scene_properties"][key].push(trans);
-                }
-            });
-        }
     }
 
     load_glb(filepath, object_name = null, callback = null) {
@@ -124,7 +102,6 @@ class Scene {
                 }
                 child.type = "Mesh";
                 this.scene.add(child);
-                this.sceneData["scene_properties"][child.uuid] = [new TransformObject(object_name)];
             });
             if (callback != null) {
                 callback();
@@ -160,7 +137,6 @@ class Scene {
             }
             fbx.type = "Mesh";
             this.scene.add(fbx);
-            this.sceneData["scene_properties"][fbx.uuid] = [new TransformObject(object_name)];
 
             if (callback != null) {
                 callback();
@@ -226,7 +202,6 @@ class Scene {
         const size = 25;
         const divisions = 50;
         this.gridHelper = new THREE.GridHelper(size, divisions, new THREE.Color("rgb(199,195,195)"), new THREE.Color("rgb(161,157,157)"));
-        this.gridHelper.position.y = -0.5
         this.scene.add(this.gridHelper);
     }
 }
