@@ -260,9 +260,8 @@ class Editor {
         this.save_manager.load(uploadedFile, this.load_callback.bind(this));
     }
 
-    load_callback(scene, scene_data, characters) {
+    load_callback(scene) {
         this.activeScene.scene = scene;
-        this.activeScene.load_data(scene_data, characters);
         this.activeScene._createGrid();
     }
 

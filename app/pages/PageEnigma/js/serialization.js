@@ -47,14 +47,12 @@ class SaveManager {
     }
 
     load(uploadedFile, load_callback) {
+        // I dont know if this works yet without a load file UI.
+        console.log(uploadedFile);
         const loader = new GLTFLoader();
-			loader.load( 'models/gltf/ShaderBall.glb', function ( gltf ) {
-				model = gltf.scene;
-				model.scale.setScalar( 50 );
-				model.position.set( 200, - 40, - 200 );
-				scene1.add( model );
-
-		} );
+        loader.load(uploadedFile, function ( gltf ) {
+            load_callback(gltf.scene);
+        });
     }
 
     download(data, filename, type) {
