@@ -7,7 +7,7 @@ import {
 
 import { SceneWithCube } from './SceneWithCube';
 
-const PageCube = () => {
+export const PageCube = () => {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const sceneRef = useRef<SceneWithCube | null>(null);
   const [{
@@ -57,5 +57,3 @@ const PageCube = () => {
   );
 
 };
-
-export default PageCube;

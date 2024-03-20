@@ -1,9 +1,5 @@
-import type {
-  MetaFunction,
-  LinksFunction 
-} from "@remix-run/deno";
-import sonic from "./assets/sonic-the-hedgehog-classic-sonic.gif";
-// import basecss from "./assets/base.css";
+import type { MetaFunction } from "@remix-run/deno";
+import sonic from "./_assets/sonic-the-hedgehog-classic-sonic.gif";
 
 export const meta: MetaFunction = () => {
   return [
@@ -11,28 +7,15 @@ export const meta: MetaFunction = () => {
     { name: "description", content: "Welcome to Remix!" },
   ];
 };
-export const links: LinksFunction = () => {
-  return [
-    {
-      rel: "stylesheet",
-      href: "https://rsms.me/inter/inter.css",
-    },
-    // {
-    //   rel: "stylesheet",
-    //   href: basecss,
-    // },
-  ];
-};
+
 
 export default function Index() {
   return (
-    <div>
+    <div className="size-full">
       <img
         alt="sonic"
         src={sonic}
-        style={{
-          width: "100%"
-        }}
+        className="object-cover h-screen w-screen"
       />
     </div>
   );

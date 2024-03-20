@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PageCube } from "../pages/PageCube";
+import { PageEnigma } from "../pages/PageEnigma";
 
 export default function Cube(){
   const [riddle, setRiddle] = useState<string>("");
@@ -15,7 +15,7 @@ export default function Cube(){
   }
 
   if(submitted){
-    return <PageCube />
+    return <PageEnigma />
   }else{
     return(
       <form onSubmit={handleSubmit}>
