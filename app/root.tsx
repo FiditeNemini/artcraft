@@ -29,7 +29,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="bg-ui-background">
         <TopBar />
         <Outlet />
         <ScrollRestoration />

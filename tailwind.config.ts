@@ -20,6 +20,7 @@ export default {
       'ui-panel': '#242433',
 
       gray: colors.gray,
+      white: colors.white
     }
   },
   plugins: [],

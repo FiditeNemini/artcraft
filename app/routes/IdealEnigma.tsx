@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { PageEnigma } from "../pages/PageEnigma";
 
-export default function Cube(){
+import { Button } from '~/components/Button';
+
+export default function IdealEnigma(){
   const [riddle, setRiddle] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
 
@@ -18,13 +20,20 @@ export default function Cube(){
     return <PageEnigma />
   }else{
     return(
-      <form onSubmit={handleSubmit}>
-        <label>
-          Name:
+      <div className="w-full flex justify-center content-center">
+        <form 
+          className="mt-20 flex flex-col content-center"
+          onSubmit={handleSubmit}
+        >
+          <label className='text-white'>
+            Riddle:
+          </label>
           <input type="text" value={riddle} onChange={handleInput} />
-        </label>
-        <input type="submit" value="Submit" />
-      </form>
+          <br/>
+          <Button type="submit" className='text-white'>Submit</Button>
+        </form>
+      </div>
+
     );
   }
   
