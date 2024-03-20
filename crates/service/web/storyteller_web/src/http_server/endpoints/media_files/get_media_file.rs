@@ -55,6 +55,9 @@ pub struct MediaFileInfo {
   /// This is mostly used for Bevy engine files.
   pub maybe_media_subtype: Option<MediaFileSubtype>,
 
+  /// Extension for the engine to load over remote:// URLs.
+  pub maybe_engine_extension: Option<String>,
+
   /// If the file was generated as part of a batch, this is the token for the batch.
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
@@ -268,6 +271,15 @@ async fn modern_media_file_lookup(
     )
   };
 
+  // NB: Some engine pages will need to know the engine extension to load the file.
+  let maybe_engine_extension = match result.media_type {
+    MediaFileType::Bvh => Some(".bvh".to_string()),
+    MediaFileType::Glb => Some(".glb".to_string()),
+    MediaFileType::Gltf => Some(".gltf".to_string()),
+    MediaFileType::SceneRon => Some(".scn.ron".to_string()),
+    _ => None,
+  };
+
   Ok(GetMediaFileSuccessResponse {
     success: true,
     media_file: MediaFileInfo {
@@ -275,6 +287,7 @@ async fn modern_media_file_lookup(
       media_type: result.media_type,
       media_class: result.media_class,
       maybe_media_subtype: result.maybe_media_subtype,
+      maybe_engine_extension,
       maybe_batch_token: result.maybe_batch_token,
       public_bucket_path,
       maybe_text_transcript: result.maybe_text_transcript,
@@ -364,6 +377,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
       media_type: MediaFileType::Audio, // NB: Always audio
       media_class: MediaFileClass::Audio, // NB: Always audio
       maybe_media_subtype: None,
+      maybe_engine_extension: None,
       maybe_batch_token: None,
       public_bucket_path,
       maybe_model_weight_info: Some(GetMediaFileModelInfo {
