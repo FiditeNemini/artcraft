@@ -9,3 +9,4 @@ node_modules
 # Local Netlify folder
 .netlify
 .DS_Store
+public/resources/movie/Big_Buck_Bunny_180_10s.webm
