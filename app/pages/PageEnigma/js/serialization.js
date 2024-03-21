@@ -15,7 +15,7 @@ class SaveManager {
             function (gltfJson) {
                 const jsonString = JSON.stringify(gltfJson);
                 console.log(scene);
-                let blob = new Blob([jsonString], {type: 'application/octet-stream'})
+                let blob = new Blob([jsonString], {type: 'application/json'})
                 let blobUrl = URL.createObjectURL(blob);
 
                 scene_callback(blob);

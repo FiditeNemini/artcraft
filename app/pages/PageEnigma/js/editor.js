@@ -368,6 +368,8 @@ class Editor {
         const blob = new Blob([output.buffer], { type: 'video/mp4' });
         const url = URL.createObjectURL(blob);
 
+        await this.api_manager.uploadMedia(blob, "output.mp4");
+
         // Create a link to download the file
         const downloadLink = document.createElement('a');
         downloadLink.href = url;

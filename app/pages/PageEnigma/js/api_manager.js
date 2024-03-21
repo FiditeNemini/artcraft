@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 class MediaUploadManager {
   constructor(sessionToken) {
     this.baseUrl = "https://api.fakeyou.com";
@@ -7,19 +9,19 @@ class MediaUploadManager {
   async uploadMedia(blob, fileName) {
     const url = `${this.baseUrl}/v1/media_uploads/upload`;
 
-    let uuid = crypto.randomUUID();
+    let uuid = uuidv4();
 
     const formData = new FormData();
     formData.append('uuid_idempotency_token', uuid);
     formData.append('file', blob, fileName);
     formData.append('source', 'file');
+    formData.append('type', 'video');
+    formData.append('source', 'file');
     const response = await fetch(url, {
       method: 'POST',
-      mode: "cors",
       credentials: "include",
       headers: {
         "accept": "application/json",
-        "content-type": "multipart/form-data"
       },
       body: formData,
     });
