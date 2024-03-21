@@ -61,14 +61,12 @@ class Editor {
         this.rendering = false;
 
         // API.
-        this.api_manager = new MediaUploadManager();
-
-
-        this.locked = false;
+        this.api_manager = new MediaUploadManager("eyJhbGciOiJIUzI1NiJ9.eyJjb29raWVfdmVyc2lvbiI6IjIiLCJzZXNzaW9uX3Rva2VuIjoic2Vzc2lvbl9kaDRuazE2OHI3OWI4emNjeWJiNGNzYnEiLCJ1c2VyX3Rva2VuIjoidXNlcl9uczg3MWt5OW56OXB3In0.xwgWhGQ6oHOd6irj-CzJZkZlmCirDwM8BGnBPHbs0UE");
 
         // Debug & Movement.
         this.stats = null;
         this.orbit = null;
+        this.locked = false;
 
         // Recording params.
         this.capturer = null;
@@ -302,8 +300,13 @@ class Editor {
         this.control.detach(this.selected);
         this.activeScene.scene.remove(this.control);
         this.activeScene.scene.remove(this.activeScene.gridHelper);
-        this.save_manager.save(this.activeScene.scene);
+        this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this));
         this.activeScene._createGrid();
+    }
+
+    _save_to_cloud(blob) {
+        console.log("Posting to cloud!");
+        this.api_manager.uploadMedia(blob, "test.bin");
     }
 
     load() {

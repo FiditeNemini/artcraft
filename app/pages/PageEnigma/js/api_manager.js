@@ -13,9 +13,7 @@ class MediaUploadManager {
       method: 'POST',
       mode: 'cors',
       headers: {
-        'Authorization': `Bearer ${this.sessionToken}`, // Assuming the session token is a Bearer token
-        'Access-Control-Allow-Origin': 'http://localhost:3000',
-        'Access-Control-Allow-Credentials': true
+        'Authorization': `Bearer ${this.sessionToken}`,
       },
       body: formData,
     });

@@ -8,7 +8,7 @@ class SaveManager {
         this.scene = null;
     }
 
-    save(scene, scene_data) {
+    save(scene, scene_callback) {
         let gltfExporter = new GLTFExporter();
         gltfExporter.parse(
             scene,
@@ -17,6 +17,8 @@ class SaveManager {
                 console.log(scene);
                 let blob = new Blob([jsonString], {type: 'application/octet-stream'})
                 let blobUrl = URL.createObjectURL(blob);
+
+                scene_callback(blob);
 
                 let a = document.createElement('a');
 
@@ -51,18 +53,13 @@ class SaveManager {
         reader.onload = function(e) {
             const contents = e.target.result;
     
-            const loader = new THREE.GLTFLoader();
+            const loader = new GLTFLoader();
             loader.parse(contents, '', function(gltf) {
-                scene.add(gltf.scene);
+                console.log(gltf);
+                load_callback(gltf.scene);
             });
         };
-        reader.readAsArrayBuffer(file);
-
-        //const loader = new GLTFLoader();
-        //loader.load(uploadedFile, function ( gltf ) {
-        //    console.log(gltf);
-        //    load_callback(gltf.scene);
-        //});
+        reader.readAsArrayBuffer(uploadedFile);
     }
 
     download(data, filename, type) {
