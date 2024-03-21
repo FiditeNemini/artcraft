@@ -9,7 +9,7 @@ interface Output {
 // break for filenames with periods before the extension. We want
 // this function to work for extensions such as ".scn.ron", which 
 // is why we don't split at the last period.
-export function SplitFirstPeriod(input: string) : Output {
+export function SplitFirstPeriod(input: string = "") : Output {
   const i = input.indexOf(".");
 
   if (i === -1) {
