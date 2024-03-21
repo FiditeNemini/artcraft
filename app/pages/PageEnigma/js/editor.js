@@ -15,6 +15,7 @@ import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { SAOPass } from 'three/addons/postprocessing/SAOPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+import { FFmpeg } from '@ffmpeg/ffmpeg';
 
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
@@ -66,7 +67,10 @@ class Editor {
 
         // Recording params.
         this.capturer = null;
+        this.frame_buffer = [];
+        this.render_timer = 0;
         this.cap_fps = 60;
+        this.ffmpeg = null;
 
         // Timeline settings.
         this.playback = false;
@@ -94,7 +98,7 @@ class Editor {
         this.camera.position.x = 2;
 
         // Base WebGL render and clock for delta time.
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, canvas: this.canvReference });
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, canvas: this.canvReference, preserveDrawingBuffer: true });
         this.renderer.shadowMap.enabled = true;
         this.clock = new THREE.Clock();
 
@@ -106,7 +110,7 @@ class Editor {
         // Current scene for saving and loading.
         this.activeScene = new Scene();
 
-        //this._configure_post_pro();
+        this._configure_post_pro();
 
         this.activeScene.initialize();
 
@@ -145,6 +149,8 @@ class Editor {
         this.renderer.setAnimationLoop(this.update_loop.bind(this));
 
         //this.create_geometry("Box");
+
+        this.ffmpeg = new FFmpeg();
     }
 
     // Configure post processing.
@@ -191,6 +197,11 @@ class Editor {
 
         this.outputPass = new OutputPass();
         this.composer.addPass(this.outputPass);
+
+
+
+
+        document.getElementById('load-upload').addEventListener('change', this.load.bind(this));
     }
 
     _add_post_processing() {
@@ -333,6 +344,9 @@ class Editor {
             this.capturer.stop();
             this.capturer.save();
         }
+        this.render_mode();
+        this.ffmpeg.writeFile('input.webm', fetchFile('https://raw.githubusercontent.com/ffmpegwasm/testdata/master/Big_Buck_Bunny_180_10s.webm'));
+        this.ffmpeg.exec(['-i', 'input.webm', 'output.mp4']);
     }
 
     frameCounter() {
@@ -376,16 +390,18 @@ class Editor {
 
     // Initializes CCapture for capturing the scene to send over to backend.
     _initialize_recording() {
-        this.capturer = new CCapture({
-            verbose: false,
-            display: false,
-            framerate: this.cap_fps,
-            quality: 100,
-            format: 'webm-mediarecorder',
-            frameLimit: 0,
-            autoSaveTime: 0
-        });
-        this.capturer.start();
+        this.frame_buffer = [];
+        this.render_timer = 0;
+        //this.capturer = new CCapture({
+        //    verbose: true,
+        //    display: true,
+        //    framerate: this.cap_fps,
+        //    quality: 100,
+        //    format: 'webm',
+        //    frameLimit: 0,
+        //    autoSaveTime: 0
+        //});
+        //this.capturer.start();
     }
 
     // Debug stats using ThreJS built in FPS and MS counter.
@@ -410,11 +426,42 @@ class Editor {
 
     // Render the scene to the camera.
     render_scene() {
-        if (this.composer != null && this.rendering == false) {
+        if (this.composer != null) {
             this.composer.render();
         }
         else {
             this.renderer.render(this.activeScene.scene, this.camera);
+        }
+
+        if (this.rendering) {
+            let imgData = this.renderer.domElement.toDataURL();
+            this.frame_buffer.push(imgData);
+            this.render_timer += this.clock.getDelta();
+
+            //const base64Data = imgData.split(',')[1];
+            //const contentType = imgData.split(',')[0].split(':')[1].split(';')[0];
+            //const byteCharacters = atob(base64Data);
+            //const byteArrays = [];
+            //for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
+            //    const slice = byteCharacters.slice(offset, offset + 1024);
+            //    const byteNumbers = new Array(slice.length);
+            //    for (let i = 0; i < slice.length; i++) {
+            //        byteNumbers[i] = slice.charCodeAt(i);
+            //    }
+            //    const byteArray = new Uint8Array(byteNumbers);
+            //    byteArrays.push(byteArray);
+            //}
+            //const blob = new Blob(byteArrays, {type: contentType});
+            //const link = document.createElement('a');
+            //link.href = URL.createObjectURL(blob);
+            //link.download = 'image.png'; // Set the file name for the download
+            //document.body.appendChild(link);
+            //link.click();
+            //document.body.removeChild(link);
+        }
+
+        if(this.render_timer >= this.fps_number) {
+            this.stopPlayback();
         }
     }
 

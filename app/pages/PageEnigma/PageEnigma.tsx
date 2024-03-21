@@ -41,7 +41,7 @@ export const PageEnigma = () => {
     editorRef.current?.save();
   }
   const handleButtonLoad = ()=>{
-
+    document.getElementById("load-upload")?.click();
   }
   const handleButtonRender = ()=>{
     editorRef.current?.togglePlayback();
@@ -58,6 +58,7 @@ export const PageEnigma = () => {
         <Button onClick={handleButtonLoad}>Load</Button>
         <Button onClick={handleButtonRender}>Render</Button>
         <Button onClick={handleButtonPlay}>Play</Button>
+        <input style={{ display: 'none' }} type="file" id="load-upload" name="load-upload"></input>
       </div>
       <div className="bg-ui-panel w-full h-screen">Timeline Panel</div>
     </div>

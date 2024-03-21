@@ -47,12 +47,22 @@ class SaveManager {
     }
 
     load(uploadedFile, load_callback) {
-        // I dont know if this works yet without a load file UI.
-        console.log(uploadedFile);
-        const loader = new GLTFLoader();
-        loader.load(uploadedFile, function ( gltf ) {
-            load_callback(gltf.scene);
-        });
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const contents = e.target.result;
+    
+            const loader = new THREE.GLTFLoader();
+            loader.parse(contents, '', function(gltf) {
+                scene.add(gltf.scene);
+            });
+        };
+        reader.readAsArrayBuffer(file);
+
+        //const loader = new GLTFLoader();
+        //loader.load(uploadedFile, function ( gltf ) {
+        //    console.log(gltf);
+        //    load_callback(gltf.scene);
+        //});
     }
 
     download(data, filename, type) {

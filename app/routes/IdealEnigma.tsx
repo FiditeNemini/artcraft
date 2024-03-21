@@ -4,18 +4,20 @@ import { PageEnigma } from "../pages/PageEnigma";
 import { Button } from '~/components/Button';
 
 export default function IdealEnigma(){
-  const [riddle, setRiddle] = useState<string>("");
-  const [submitted, setSubmitted] = useState<boolean>(false);
+  //const [riddle, setRiddle] = useState<string>("");
+  //const [submitted, setSubmitted] = useState<boolean>(false);
 
-  const handleInput = (event:React.ChangeEvent<HTMLInputElement>)=>{
-    setRiddle(event.target.value);
-  }
+  //const handleInput = (event:React.ChangeEvent<HTMLInputElement>)=>{
+  //  setRiddle(event.target.value);
+  //}
 
- const handleSubmit = () => {
-    const state = riddle.length > 5 && riddle[riddle.length-1] === "!";
-    setSubmitted(state);
-  }
+  //const handleSubmit = () => {
+  //  const state = riddle.length > 5 && riddle[riddle.length-1] === "!";
+  //  setSubmitted(state);
+  //}
 
+  
+  return <PageEnigma />
   if(submitted){
     return <PageEnigma />
   }else{
