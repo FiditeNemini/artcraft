@@ -10,31 +10,34 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
 
   const cards = [
     {
-      text: "Room Scene",
+      text: "Room",
       backgroundImage: "/images/landing/onboarding/room-scene-thumbnail.webp",
       onClick: () => {
         history.push("/studio-intro/m_ejhs95fc5aybp36h4a79k7523ds6an");
       },
     },
     {
-      text: "Scene 2",
-      backgroundImage: "",
+      text: "Pirate Island",
+      backgroundImage:
+        "/images/landing/onboarding/pirate-island-scene-thumbnail.webp",
       onClick: () => {
-        history.push("/studio-intro");
+        history.push("/studio-intro/m_0tmgwem7x4k47w4cq96ja8psnvnaw5");
       },
     },
     {
-      text: "Scene 3",
-      backgroundImage: "",
+      text: "Spaceship",
+      backgroundImage:
+        "/images/landing/onboarding/spaceship-scene-thumbnail.webp",
       onClick: () => {
-        history.push("/studio-intro");
+        history.push("/studio-intro/m_16cc8b0dtp5fmjgb3yh85hnxyd695c");
       },
     },
     {
-      text: "Scene 4",
-      backgroundImage: "",
+      text: "Hanashi",
+      backgroundImage:
+        "/images/landing/onboarding/hanashi-scene-thumbnail.webp",
       onClick: () => {
-        history.push("/studio-intro");
+        history.push("/studio-intro/m_r4025m9dq0hppqzh8t6tmpmxv47yyv");
       },
     },
   ];

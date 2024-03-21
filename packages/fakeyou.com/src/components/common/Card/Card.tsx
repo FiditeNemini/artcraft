@@ -41,9 +41,13 @@ export default function Card({
           textHovered ? "bottom-text-hover" : ""
         }`.trim()}
         style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          // ...(backgroundImage
+          //   ? {
+          //       backgroundImage: `url(${backgroundImage})`,
+          //       backgroundSize: "cover",
+          //       backgroundPosition: "center",
+          //     }
+          //   : {}),
           height: height || "auto",
           borderWidth: borderWidth || "1px",
           borderStyle: "solid",
@@ -54,6 +58,13 @@ export default function Card({
         onMouseLeave={onMouseLeave}
       >
         {children}
+        {backgroundImage && (
+          <img
+            src={backgroundImage}
+            alt="Thumbnail"
+            className={`card-bg ${textHovered ? "card-bg-hover" : ""}`}
+          />
+        )}
       </div>
       {bottomText && (
         <h6
