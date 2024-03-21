@@ -6,6 +6,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 import Scene from './scene.js';
 import SaveManager from './serialization.js';
 import MediaUploadManager from './api_manager.js';
+import AudioManager from './audio_manager.js';
 
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -79,9 +80,13 @@ class Editor {
         this.playback = false;
         this.playback_location = 0;
         this.max_length = 10;
+        this.timeline = null;
 
         // Save & Load.
         this.save_manager = new SaveManager(this.version);
+
+        // Audio Engine.
+        this.audio_manager = new AudioManager();
     }
 
     // Initializes the main scene and ThreeJS essentials.
@@ -300,7 +305,7 @@ class Editor {
         this.control.detach(this.selected);
         this.activeScene.scene.remove(this.control);
         this.activeScene.scene.remove(this.activeScene.gridHelper);
-        this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this));
+        this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this), this.audio_manager, this.timeline);
         this.activeScene._createGrid();
     }
 
