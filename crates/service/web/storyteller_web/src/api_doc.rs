@@ -41,6 +41,7 @@ use crate::http_server::endpoints::media_files::list::list_featured_media_files:
 use crate::http_server::endpoints::media_files::list::list_media_files::*;
 use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token::*;
 use crate::http_server::endpoints::media_files::list::list_media_files_for_user::*;
+use crate::http_server::endpoints::media_files::rename_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload_engine_asset::upload_engine_asset_media_file_handler::*;
@@ -82,6 +83,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::list::list_media_files::list_media_files_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token::list_media_files_by_batch_token_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_for_user::list_media_files_for_user_handler,
+    crate::http_server::endpoints::media_files::rename_media_file_handler::rename_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_media_file_handler::upload_media_file_handler,
     crate::http_server::endpoints::media_files::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload_video::upload_video_media_file_handler::upload_video_media_file_handler,
@@ -227,12 +229,15 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileForUserListItem,
     MediaFileInfo,
     MediaFileListItem,
-    MediaFilesByBatchListItem,
     MediaFileUploadError,
+    MediaFilesByBatchListItem,
     ModelWeightForList,
     ModelWeightSearchResult,
     ProfileError,
     RatingRow,
+    RenameMediaFileError,
+    RenameMediaFilePathInfo,
+    RenameMediaFileRequest,
     RequestDetailsResponse,
     ResultDetailsResponse,
     SearchModelWeightsError,

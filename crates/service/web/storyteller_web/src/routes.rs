@@ -50,6 +50,7 @@ use crate::http_server::endpoints::media_files::list::list_featured_media_files:
 use crate::http_server::endpoints::media_files::list::list_media_files::list_media_files_handler;
 use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token::list_media_files_by_batch_token_handler;
 use crate::http_server::endpoints::media_files::list::list_media_files_for_user::list_media_files_for_user_handler;
+use crate::http_server::endpoints::media_files::rename_media_file_handler::rename_media_file_handler;
 use crate::http_server::endpoints::media_files::update_media_file::update_media_file_handler;
 use crate::http_server::endpoints::media_files::upload::upload_media_file_handler::upload_media_file_handler;
 use crate::http_server::endpoints::media_files::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler;
@@ -1076,6 +1077,9 @@ fn add_media_file_routes<T, B> (app: App<T>) -> App<T>
           .route(web::get().to(get_media_file_handler))
           .route(web::delete().to(delete_media_file_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/rename/{token}")
+          .route(web::post().to(rename_media_file_handler))
       )
       .service(web::resource("/file/{token}/update")
           .route(web::post().to(update_media_file_handler))
