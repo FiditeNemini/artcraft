@@ -74,7 +74,7 @@ class Editor {
         this.capturer = null;
         this.frame_buffer = [];
         this.render_timer = 0;
-        this.fps_number = 3
+        this.fps_number = 60;
         this.cap_fps = 60;
 
         // Timeline settings.
@@ -278,7 +278,7 @@ class Editor {
     render_mode() {
         this.rendering = !this.rendering;
         console.log(this.rendering);
-        //this.activeScene.render_mode(this.rendering);
+        this.activeScene.render_mode(this.rendering);
 
         //if (this.rendering) {
         //    this._remove_post_processing();
@@ -334,10 +334,10 @@ class Editor {
     togglePlayback() {
         this.togglePlay();
         if (this.playback == false) {
-            this.stopPlayback();
+            //this.stopPlayback();
             this.render_mode();
         } else {
-            this.startPlayback();
+            //this.startPlayback();
             this.render_mode();
         }
     }
@@ -349,25 +349,34 @@ class Editor {
     }
 
     async stopPlayback() {
-        if (this.capturer != null) {
-            this.capturer.stop();
-            this.capturer.save();
-        }
         this.render_mode();
-        this.playback_location= 0;
 
-        let data = await this.loadWavAsBlob("/resources/sound/2pac.wav");
+        let ffmpeg = createFFmpeg({ log: true });
+        await ffmpeg.load();
+        for (let index = 0; index < this.frame_buffer.length; index++) {
+            const element = this.frame_buffer[index];
+            await ffmpeg.FS('writeFile', `image${index}.png`, await fetchFile(element));
+        }
+        await ffmpeg.run('-framerate', ''+this.cap_fps, '-i', 'image%d.png', 'output.mp4');
 
-        await this.api_manager.uploadMedia(data, "audio.wav");
+        let output = await ffmpeg.FS('readFile', 'output.mp4');
+        //await ffmpeg.FS('unlink', 'output.mp4')
+        // Create a Blob from the output file for downloading
+        const blob = new Blob([output.buffer], { type: 'video/mp4' });
+        const url = URL.createObjectURL(blob);
 
-        //let inputFile = '/resources/movie/Big_Buck_Bunny_180_10s.webm';
-
-        //const ffmpeg = createFFmpeg({ log: true });
-        //await ffmpeg.load();
-        //ffmpeg.FS('writeFile', 'input.webm', await fetchFile(inputFile));
-        //await ffmpeg.run('-i', 'input.webm', '-c:v', 'libx264', 'output.mp4');
-
-        this.rendering = false;
+        // Create a link to download the file
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = 'output.mp4';
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        // Clean up
+        URL.revokeObjectURL(url);
+        document.body.removeChild(downloadLink);
+        //await ffmpeg.FS('unlink', 'input.mp4');
+        //await ffmpeg.FS('unlink', 'output.mp4');
+        
     }
 
     startPlayback() {
@@ -449,31 +458,12 @@ class Editor {
             let imgData = this.renderer.domElement.toDataURL();
             this.frame_buffer.push(imgData);
             this.render_timer += this.clock.getDelta();
-
-            //const base64Data = imgData.split(',')[1];
-            //const contentType = imgData.split(',')[0].split(':')[1].split(';')[0];
-            //const byteCharacters = atob(base64Data);
-            //const byteArrays = [];
-            //for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
-            //    const slice = byteCharacters.slice(offset, offset + 1024);
-            //    const byteNumbers = new Array(slice.length);
-            //    for (let i = 0; i < slice.length; i++) {
-            //        byteNumbers[i] = slice.charCodeAt(i);
-            //    }
-            //    const byteArray = new Uint8Array(byteNumbers);
-            //    byteArrays.push(byteArray);
-            //}
-            //const blob = new Blob(byteArrays, {type: contentType});
-            //const link = document.createElement('a');
-            //link.href = URL.createObjectURL(blob);
-            //link.download = 'image.png'; // Set the file name for the download
-            //document.body.appendChild(link);
-            //link.click();
-            //document.body.removeChild(link);
-        }
-
-        if(this.playback_location >= this.fps_number) {
-            this.stopPlayback();
+            if(this.playback_location >= this.fps_number*3) {
+                this.stopPlayback();
+                console.log(this.playback_location);
+                this.playback_location = 0;
+                this.rendering = false;
+            }
         }
     }
 
