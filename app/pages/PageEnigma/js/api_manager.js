@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 class MediaUploadManager {
   constructor(sessionToken) {
     this.baseUrl = "https://api.fakeyou.com";
@@ -7,15 +9,19 @@ class MediaUploadManager {
   async uploadMedia(blob, fileName) {
     const url = `${this.baseUrl}/v1/media_uploads/upload`;
 
+    let uuid = uuidv4();
+
     const formData = new FormData();
+    formData.append('uuid_idempotency_token', uuid);
     formData.append('file', blob, fileName);
+    formData.append('source', 'file');
+    formData.append('type', 'video');
+    formData.append('source', 'file');
     const response = await fetch(url, {
       method: 'POST',
-      mode: 'cors',
+      credentials: "include",
       headers: {
-        'Authorization': `Bearer ${this.sessionToken}`, // Assuming the session token is a Bearer token
-        'Access-Control-Allow-Origin': 'http://localhost:3000',
-        'Access-Control-Allow-Credentials': true
+        "accept": "application/json",
       },
       body: formData,
     });

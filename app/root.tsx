@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { LinksFunction } from "@remix-run/deno";
 import {
   Links,
@@ -10,8 +11,9 @@ import {
 import tailwindCss from "./styles/tailwind.css?url";
 import normalizeCss from "./styles/normalize.css?url";
 
-import { TopBar } from "./template/TopBar";
-import { TopBarMidSection } from "./contexts/TopbarMidSection";
+import { TopBar } from "./templates/TopBar";
+import { TopBarInnerContext } from '~/contexts/TopBarInner';
+
 
 export const links : LinksFunction = () => [{ 
   rel: "stylesheet",
@@ -22,6 +24,8 @@ export const links : LinksFunction = () => [{
 }];
 
 export default function App() {
+  const [topBarInnerComponent, setTopBarInnerComponent] = useState<JSX.Element | null>(null);
+
   return (
     <html lang="en">
       <head>
@@ -31,8 +35,15 @@ export default function App() {
         <Links />
       </head>
       <body className="bg-ui-background">
-        <Outlet />
-        <TopBar />
+        <TopBarInnerContext.Provider value={{
+            TopBarInner: topBarInnerComponent,
+            setTopBarInner: setTopBarInnerComponent
+          }}>
+          
+          <div className="h-10 m-4 w-screen border-b"/>
+          <Outlet />
+          <TopBar />
+        </TopBarInnerContext.Provider>
         <ScrollRestoration />
         <Scripts />
       </body>
