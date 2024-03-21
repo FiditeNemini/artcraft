@@ -16,7 +16,7 @@ import {
 import { Button } from '~/components/Button';
 import { ButtonLink } from '~/components/ButtonLink';
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
-import { SidePanel } from './comp/SidePanel';
+import { SidePanel } from '~/templates/SidePanel';
 
 import Editor from './js/editor';
 

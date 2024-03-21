@@ -12,21 +12,18 @@ interface SidePanelPropsI{
 }
 
 export const SidePanel =(props:SidePanelPropsI)=>{
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const handleOpen = ()=>{
     setOpen(true);
   }
-  if(!open){
-    return(
-      <Button 
-        className='fixed right-0 top-20'
-        onClick={handleOpen}
-      >
-        <FontAwesomeIcon icon={faGears} />
-      </Button>
-    );
-  }
-  return (
+
+  return (<>
+    <Button 
+      className='fixed right-0 top-20 mt-2 mr-4'
+      onClick={handleOpen}
+    >
+      <FontAwesomeIcon icon={faGears} />
+    </Button>
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
         <div className="fixed inset-0" />
@@ -78,5 +75,5 @@ export const SidePanel =(props:SidePanelPropsI)=>{
         </div>
       </Dialog>
     </Transition.Root>
-  )
+  </>);
 }

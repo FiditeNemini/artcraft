@@ -11,7 +11,7 @@ import {
 import tailwindCss from "./styles/tailwind.css?url";
 import normalizeCss from "./styles/normalize.css?url";
 
-import { TopBar } from "./template/TopBar";
+import { TopBar } from "./templates/TopBar";
 import { TopBarInnerContext } from '~/contexts/TopBarInner';
 
 
@@ -40,7 +40,7 @@ export default function App() {
             setTopBarInner: setTopBarInnerComponent
           }}>
           
-          <div className="h-10 m-4 w-screen"/>
+          <div className="h-10 m-4 w-screen border-b"/>
           <Outlet />
           <TopBar />
         </TopBarInnerContext.Provider>

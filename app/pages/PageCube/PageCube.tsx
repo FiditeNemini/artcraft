@@ -15,7 +15,7 @@ import { Button } from '~/components/Button';
 import { ButtonLink } from '~/components/ButtonLink';
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
 
-import { SidePanel } from '../PageEnigma/comp/SidePanel';
+import { SidePanel } from '~/templates/SidePanel';
 
 import { SceneWithCube } from './SceneWithCube';
 
@@ -42,7 +42,10 @@ export const PageCube = () => {
   const listeningXYRotation = useCallback((
     {x,y}:{x:number;y:number}
   )=>{
-    setRotations({x:x, y:y})
+    setRotations({
+      x:Math.round(x*100)/100,
+      y:Math.round(y*100)/100,
+    })
   },[]);
 
   useEffect(() => { //componentDidMount
@@ -78,12 +81,12 @@ export const PageCube = () => {
   return (
     <div className="grid grid-cols-12 gap-2	">
       <div className="col-span-6	">
-        <div className="Cube" ref={mountRef} />
+        <div className="MountingPoint" ref={mountRef} />
       </div>
       <div className="col-span-6	">
         <Button onClick={toggleStopped}> STOP </Button>
-        <p className='text-white'>{rotationX ? rotationX : ""}</p>
-        <p className='text-white'>{rotationY ? rotationY : ""}</p>
+        <p className='text-white'>Ration X: {rotationX ? rotationX : ""}</p>
+        <p className='text-white'>Ration Y: {rotationY ? rotationY : ""}</p>
       </div>
       <SidePanel>
         <p>Side Panel Text</p>
