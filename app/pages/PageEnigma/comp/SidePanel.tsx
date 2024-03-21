@@ -1,15 +1,31 @@
 import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import {
+  faXmark,
+  faGears,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { Button } from '~/components/Button';
 interface SidePanelPropsI{
   children: React.ReactNode
 }
 
 export const SidePanel =(props:SidePanelPropsI)=>{
   const [open, setOpen] = useState(true)
-
+  const handleOpen = ()=>{
+    setOpen(true);
+  }
+  if(!open){
+    return(
+      <Button 
+        className='fixed right-0 top-20'
+        onClick={handleOpen}
+      >
+        <FontAwesomeIcon icon={faGears} />
+      </Button>
+    );
+  }
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setOpen}>

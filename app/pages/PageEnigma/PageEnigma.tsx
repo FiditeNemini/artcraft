@@ -92,7 +92,6 @@ export const PageEnigma = () => {
         <Button onClick={handleButtonLoad}>Load</Button>
         <Button onClick={handleButtonRender}>Render</Button>
         <Button onClick={handleButtonPlay}>Play</Button>
-        
       </SidePanel>
       <div className="bg-ui-panel w-full h-screen">
         <p className='text-white'>Timeline Panel</p>

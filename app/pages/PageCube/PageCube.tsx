@@ -15,6 +15,8 @@ import { Button } from '~/components/Button';
 import { ButtonLink } from '~/components/ButtonLink';
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
 
+import { SidePanel } from '../PageEnigma/comp/SidePanel';
+
 import { SceneWithCube } from './SceneWithCube';
 
 export const PageCube = () => {
@@ -74,12 +76,19 @@ export const PageCube = () => {
   },[setTopBarInner]);
 
   return (
-    <>
-      <div className="Cube" ref={mountRef} />
-      <Button onClick={toggleStopped}> STOP </Button>
-      <p>{rotationX ? rotationX : ""}</p>
-      <p>{rotationY ? rotationY : ""}</p>
-    </>
+    <div className="grid grid-cols-12 gap-2	">
+      <div className="col-span-6	">
+        <div className="Cube" ref={mountRef} />
+      </div>
+      <div className="col-span-6	">
+        <Button onClick={toggleStopped}> STOP </Button>
+        <p className='text-white'>{rotationX ? rotationX : ""}</p>
+        <p className='text-white'>{rotationY ? rotationY : ""}</p>
+      </div>
+      <SidePanel>
+        <p>Side Panel Text</p>
+      </SidePanel>
+    </div>
   );
 
 };
