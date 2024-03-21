@@ -1,16 +1,26 @@
-import { 
-  useRef,
-  useEffect,
-  // useState,
+import {
   useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  // useState,
 } from 'react';
+
+import {
+  faChevronLeft,
+  faWandSparkles,
+} from "@fortawesome/free-solid-svg-icons";
 
 
 import { Button } from '~/components/Button';
+import { ButtonLink } from '~/components/ButtonLink';
+import { TopBarInnerContext } from "~/contexts/TopBarInner";
 
 import Editor from './js/editor';
 
 export const PageEnigma = () => {
+  const { setTopBarInner } = useContext(TopBarInnerContext) || {};
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const editorRef = useRef<Editor | null>(null);
@@ -37,6 +47,29 @@ export const PageEnigma = () => {
     }
   }, []);
 
+  useLayoutEffect(()=>{
+    if(setTopBarInner){
+      const TopBarInnerButtons = (
+        <div className="flex grow justify-between">
+          <ButtonLink
+            to={"/"}
+            variant='secondary'
+            icon={faChevronLeft}
+          >
+            Back to Dashboard
+          </ButtonLink>
+          <Button
+            icon={faWandSparkles}
+          >
+              Generate Movie
+          </Button>
+          <span className="w-8"/>
+        </div>
+      );
+      setTopBarInner(TopBarInnerButtons);
+    }
+  },[setTopBarInner]);
+
   const handleButtonSave = ()=>{
     editorRef.current?.save();
   }
@@ -53,7 +86,7 @@ export const PageEnigma = () => {
   return(
     <div>
       <canvas ref={canvasRef} id="video-scene" width="1280px" height="720px" />
-      <div className="absolute top-0 right-0 bg-ui-panel h-screen w-1/5 pt-20">
+      <div className="absolute top-16 m-2 right-0 bg-ui-panel h-screen w-1/5 pt-20">
         <Button onClick={handleButtonSave}>Save</Button>
         <Button onClick={handleButtonLoad}>Load</Button>
         <Button onClick={handleButtonRender}>Render</Button>

@@ -18,22 +18,18 @@ interface LinkButtonProps extends LinkProps {
   function getVariantClassNames(variant: string){
     switch(variant){
       case "secondary":{
-        return "bg-brand-secondary hover:bg-brand-secondary-900 text-white focus-visible:outline-brand-secondary";
+        return " bg-brand-secondary hover:bg-brand-secondary-900 text-white focus-visible:outline-brand-secondary";
       }
       case "primary":
       default:{
-        return "bg-brand-primary hover:bg-brand-primary-400 text-white focus-visible:outline-brand-primary-600";
+        return " bg-brand-primary hover:bg-brand-primary-400 text-white focus-visible:outline-brand-primary-600";
       }
     }
   }; 
-  const className = `
-    text-sm font-semibold
-    rounded-md px-3.5 py-2.5 shadow-sm
-    focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
-  ` + getVariantClassNames(variant)
-  + (propsClassName ? ` ${propsClassName}` : null);
+  const className = "text-sm font-semibold rounded-md px-3.5 py-2.5 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" + getVariantClassNames(variant)
+  + (propsClassName ? ` ${propsClassName}` : "");
   // END TODO
-  
+
   return(
     <Link {...rest}>
       <button className={className}>

@@ -6,7 +6,10 @@ import { TopBarInnerContext } from '~/contexts/TopBarInner';
 
 export const TopBar = () => {
   return (
-    <header className="bg-ui-panel fixed top-0 left-0 w-full">
+    <header className="
+      fixed top-0 left-0 w-full
+      bg-ui-panel border-b border-ui-panel-border
+    ">
       <nav className="mx-auto flex max-w-full items-center justify-between p-4 lg:px-8" aria-label="Global">
         <div className="flex lg:flex-1">
           <a href="#" className="-m-1.5 p-1.5">
