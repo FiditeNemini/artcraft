@@ -1,8 +1,6 @@
 class MediaUploadManager {
-  constructor(baseUrl, sessionToken) {
-    const baseUrl = "https://api.fakeyou.com"
-    this.baseUrl = baseUrl;
-    const sessionToken = null;//
+  constructor(sessionToken) {
+    this.baseUrl = "https://api.fakeyou.com";
     this.sessionToken = sessionToken;
   }
 
@@ -11,11 +9,13 @@ class MediaUploadManager {
 
     const formData = new FormData();
     formData.append('file', blob, fileName);
-
     const response = await fetch(url, {
       method: 'POST',
+      mode: 'cors',
       headers: {
         'Authorization': `Bearer ${this.sessionToken}`, // Assuming the session token is a Bearer token
+        'Access-Control-Allow-Origin': 'http://localhost:3000',
+        'Access-Control-Allow-Credentials': true
       },
       body: formData,
     });
@@ -28,9 +28,4 @@ class MediaUploadManager {
   }
 }
 
-const manager = MediaUploadManager();
-await uploadMedia("haha","FileName!!!")
-
-
-
-
+export default MediaUploadManager;

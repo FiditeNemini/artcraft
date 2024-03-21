@@ -5,6 +5,7 @@ import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import Stats from 'three/addons/libs/stats.module.js';
 import Scene from './scene.js';
 import SaveManager from './serialization.js';
+import MediaUploadManager from './api_manager.js';
 
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -58,6 +59,10 @@ class Editor {
         this.last_selected = null;
         this.transform_interaction;
         this.rendering = false;
+
+        // API.
+        this.api_manager = new MediaUploadManager();
+
 
         this.locked = false;
 
@@ -337,6 +342,12 @@ class Editor {
         }
     }
 
+    async loadWavAsBlob(url) {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return blob;
+    }
+
     async stopPlayback() {
         if (this.capturer != null) {
             this.capturer.stop();
@@ -345,12 +356,16 @@ class Editor {
         this.render_mode();
         this.playback_location= 0;
 
-        let inputFile = '/resources/movie/Big_Buck_Bunny_180_10s.webm';
+        let data = await this.loadWavAsBlob("/resources/sound/2pac.wav");
 
-        const ffmpeg = createFFmpeg({ log: true });
-        await ffmpeg.load();
-        ffmpeg.FS('writeFile', 'input.webm', await fetchFile(inputFile));
-        await ffmpeg.run('-i', 'input.webm', '-c:v', 'libx264', 'output.mp4');
+        await this.api_manager.uploadMedia(data, "audio.wav");
+
+        //let inputFile = '/resources/movie/Big_Buck_Bunny_180_10s.webm';
+
+        //const ffmpeg = createFFmpeg({ log: true });
+        //await ffmpeg.load();
+        //ffmpeg.FS('writeFile', 'input.webm', await fetchFile(inputFile));
+        //await ffmpeg.run('-i', 'input.webm', '-c:v', 'libx264', 'output.mp4');
 
         this.rendering = false;
     }
