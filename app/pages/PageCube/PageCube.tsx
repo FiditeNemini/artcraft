@@ -1,13 +1,26 @@
 import { 
-  useRef,
-  useEffect,
-  useState,
   useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
 } from 'react';
+
+import {
+  faChevronLeft
+} from "@fortawesome/free-solid-svg-icons";
+
+import { Button } from '~/components/Button';
+import { ButtonLink } from '~/components/ButtonLink';
+import { TopBarInnerContext } from "~/contexts/TopBarInner";
 
 import { SceneWithCube } from './SceneWithCube';
 
 export const PageCube = () => {
+  
+  const { setTopBarInner } = useContext(TopBarInnerContext) || {};
+
   const mountRef = useRef<HTMLDivElement | null>(null);
   const sceneRef = useRef<SceneWithCube | null>(null);
   const [{
@@ -45,10 +58,25 @@ export const PageCube = () => {
     };
   }, []);
 
+  useLayoutEffect(()=>{
+    if(setTopBarInner){
+      const BackButton = (
+        <ButtonLink
+          to={"/"}
+          variant='secondary'
+          icon={faChevronLeft}
+        >
+          Back to Dashboard
+        </ButtonLink>
+      );
+      setTopBarInner(BackButton);
+    }
+  },[setTopBarInner]);
+
   return (
     <>
       <div className="Cube" ref={mountRef} />
-      <button onClick={toggleStopped}> STOP </button>
+      <Button onClick={toggleStopped}> STOP </Button>
       <p>{rotationX ? rotationX : ""}</p>
       <p>{rotationY ? rotationY : ""}</p>
     </>

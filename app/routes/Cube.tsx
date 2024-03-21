@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { PageCube } from "../pages/PageCube";
 import { Button } from '~/components/Button';
 export default function Cube(){
+  const pausedRiddle = true;
   const [riddle, setRiddle] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
 
@@ -17,7 +18,7 @@ export default function Cube(){
       alert("What is the price for your blind eye?")
   }
 
-  if(submitted){
+  if(submitted || pausedRiddle){
     return <PageCube />
   }else{
     return(

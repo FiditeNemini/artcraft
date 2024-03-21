@@ -1,18 +1,20 @@
+import { Link, LinkProps } from "@remix-run/react";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
- icon?: IconDefinition;
- variant?: "primary"|"secondary";
-}
+interface LinkButtonProps extends LinkProps {
+  icon?: IconDefinition;
+  variant?: "primary"|"secondary";
+ }
 
-export const Button = ({
+ export const ButtonLink = ({
   icon,
   children,
-  className : propsClassName,
-  variant = 'primary',
+  className: propsClassName,
+  variant = "primary",
   ...rest
-}:ButtonProps)=>{
+ }:LinkButtonProps)=>{
+  //TODO: Duplicated from Button.tsx
   function getVariantClassNames(variant: string){
     switch(variant){
       case "secondary":{
@@ -30,16 +32,14 @@ export const Button = ({
     focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
   ` + getVariantClassNames(variant)
   + (propsClassName ? ` ${propsClassName}` : null);
-
+  // END TODO
+  
   return(
-    <button
-      className={className}
-      {...rest}
-    >
-      {icon && 
-        <FontAwesomeIcon className="mr-2" icon={icon}/>
-      }
-      {children}
-    </button>
+    <Link {...rest}>
+      <button className={className}>
+        {icon && <FontAwesomeIcon className="mr-2" icon={icon}/>}
+        {children}
+      </button>
+    </Link>
   );
-}
+ }
