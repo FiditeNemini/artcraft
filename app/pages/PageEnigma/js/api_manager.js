@@ -7,13 +7,19 @@ class MediaUploadManager {
   async uploadMedia(blob, fileName) {
     const url = `${this.baseUrl}/v1/media_uploads/upload`;
 
+    let uuid = crypto.randomUUID();
+
     const formData = new FormData();
+    formData.append('uuid_idempotency_token', uuid);
     formData.append('file', blob, fileName);
+    formData.append('source', 'file');
     const response = await fetch(url, {
       method: 'POST',
-      mode: 'cors',
+      mode: "cors",
+      credentials: "include",
       headers: {
-        'Authorization': `Bearer ${this.sessionToken}`,
+        "accept": "application/json",
+        "content-type": "multipart/form-data"
       },
       body: formData,
     });

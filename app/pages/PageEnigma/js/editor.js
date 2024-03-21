@@ -61,7 +61,7 @@ class Editor {
         this.rendering = false;
 
         // API.
-        this.api_manager = new MediaUploadManager("eyJhbGciOiJIUzI1NiJ9.eyJjb29raWVfdmVyc2lvbiI6IjIiLCJzZXNzaW9uX3Rva2VuIjoic2Vzc2lvbl9kaDRuazE2OHI3OWI4emNjeWJiNGNzYnEiLCJ1c2VyX3Rva2VuIjoidXNlcl9uczg3MWt5OW56OXB3In0.xwgWhGQ6oHOd6irj-CzJZkZlmCirDwM8BGnBPHbs0UE");
+        this.api_manager = new MediaUploadManager();
 
         // Debug & Movement.
         this.stats = null;
