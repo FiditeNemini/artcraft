@@ -40,10 +40,11 @@ WHERE username IN (
     'fyscott',
     'gateway',
     'jags111',
-    'lorbach',
     'justinjohn0306',
+    'lorbach',
     'mrvintage',
     'rewin123',
+    'storyteller',
     'tropicalfun',
     'yae_ph',
     'zzz_last_item'
