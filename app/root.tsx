@@ -39,10 +39,10 @@ export default function App() {
             TopBarInner: topBarInnerComponent,
             setTopBarInner: setTopBarInnerComponent
           }}>
-          <TopBar />
+          
           <div className="h-10 m-4 w-screen"/>
           <Outlet />
-          
+          <TopBar />
         </TopBarInnerContext.Provider>
         <ScrollRestoration />
         <Scripts />

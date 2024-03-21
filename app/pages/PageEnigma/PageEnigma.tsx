@@ -16,6 +16,7 @@ import {
 import { Button } from '~/components/Button';
 import { ButtonLink } from '~/components/ButtonLink';
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
+import { SidePanel } from './comp/SidePanel';
 
 import Editor from './js/editor';
 
@@ -86,14 +87,17 @@ export const PageEnigma = () => {
   return(
     <div>
       <canvas ref={canvasRef} id="video-scene" width="1280px" height="720px" />
-      <div className="absolute top-16 m-2 right-0 bg-ui-panel h-screen w-1/5 pt-20">
+      <SidePanel>
         <Button onClick={handleButtonSave}>Save</Button>
         <Button onClick={handleButtonLoad}>Load</Button>
         <Button onClick={handleButtonRender}>Render</Button>
         <Button onClick={handleButtonPlay}>Play</Button>
+        
+      </SidePanel>
+      <div className="bg-ui-panel w-full h-screen">
+        <p className='text-white'>Timeline Panel</p>
         <input style={{ display: 'none' }} type="file" id="load-upload" name="load-upload"></input>
       </div>
-      <div className="bg-ui-panel w-full h-screen">Timeline Panel</div>
     </div>
   );
 }
