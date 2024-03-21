@@ -15,7 +15,7 @@ import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 import { SAOPass } from 'three/addons/postprocessing/SAOPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
-import { FFmpeg } from '@ffmpeg/ffmpeg';
+import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
@@ -69,8 +69,8 @@ class Editor {
         this.capturer = null;
         this.frame_buffer = [];
         this.render_timer = 0;
+        this.fps_number = 3
         this.cap_fps = 60;
-        this.ffmpeg = null;
 
         // Timeline settings.
         this.playback = false;
@@ -149,8 +149,6 @@ class Editor {
         this.renderer.setAnimationLoop(this.update_loop.bind(this));
 
         //this.create_geometry("Box");
-
-        this.ffmpeg = new FFmpeg();
     }
 
     // Configure post processing.
@@ -339,24 +337,22 @@ class Editor {
         }
     }
 
-    stopPlayback() {
+    async stopPlayback() {
         if (this.capturer != null) {
             this.capturer.stop();
             this.capturer.save();
         }
         this.render_mode();
-        this.ffmpeg.writeFile('input.webm', fetchFile('https://raw.githubusercontent.com/ffmpegwasm/testdata/master/Big_Buck_Bunny_180_10s.webm'));
-        this.ffmpeg.exec(['-i', 'input.webm', 'output.mp4']);
-    }
+        this.playback_location= 0;
 
-    frameCounter() {
-        if (this.playback) {
-            this.playback_location++;
-            let max = this.cap_fps * this.max_length;
-            if (this.playback_location >= max) {
-                this.togglePlayback();
-            }
-        }
+        let inputFile = '/resources/movie/Big_Buck_Bunny_180_10s.webm';
+
+        const ffmpeg = createFFmpeg({ log: true });
+        await ffmpeg.load();
+        ffmpeg.FS('writeFile', 'input.webm', await fetchFile(inputFile));
+        await ffmpeg.run('-i', 'input.webm', '-c:v', 'libx264', 'output.mp4');
+
+        this.rendering = false;
     }
 
     startPlayback() {
@@ -421,7 +417,7 @@ class Editor {
 
         this.render_scene();
         if (this.capturer != null) { this.capturer.capture(this.renderer.domElement); } // Record scene.
-        this.frameCounter();
+        
     }
 
     // Render the scene to the camera.
@@ -434,6 +430,7 @@ class Editor {
         }
 
         if (this.rendering) {
+            this.playback_location++;
             let imgData = this.renderer.domElement.toDataURL();
             this.frame_buffer.push(imgData);
             this.render_timer += this.clock.getDelta();
@@ -460,7 +457,7 @@ class Editor {
             //document.body.removeChild(link);
         }
 
-        if(this.render_timer >= this.fps_number) {
+        if(this.playback_location >= this.fps_number) {
             this.stopPlayback();
         }
     }
