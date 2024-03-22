@@ -19,6 +19,8 @@ interface Props {
   sessionSubscriptionsWrapper: SessionSubscriptionsWrapper;
 }
 
+const PAGE_TITLE = "Storyteller Studio";
+
 function StudioIntroPage(props: Props) {
   // NB: The URL parameter might be a raw media token (for .scn.ron files), or it might 
   // have an appended suffix to assist the engine in loading the correct scene format. 
@@ -49,11 +51,17 @@ function StudioIntroPage(props: Props) {
 
   const [camera, cameraSet] = useState("zoom");
 
-  usePrefixedDocumentTitle("Storyteller Studio");
+  usePrefixedDocumentTitle(PAGE_TITLE);
 
   const onSaveCallback = useCallback((sceneMediaToken: string) => {
+    console.log(`Saved scene, new media token: ${sceneMediaToken}`)
+
     setSavedMediaToken(sceneMediaToken);
     sceneIsSavedSet(true); // Just in case we missed the "scene loaded" event.
+
+    // Replace the history state without causing a React re-render
+    window.history.replaceState(null, PAGE_TITLE, `/studio-intro/${sceneMediaToken}`);
+
   }, [setSavedMediaToken, sceneIsSavedSet]);
 
   const onSceneReadyCallback = useCallback(() => {
