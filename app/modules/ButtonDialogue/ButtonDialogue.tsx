@@ -19,7 +19,7 @@ export const ButtonDialogue = ({
   title,
   children,
 }: ButtonDialoguePropsI) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const closeModal = () => setIsOpen(false);
   const openModal = () => setIsOpen(true);
