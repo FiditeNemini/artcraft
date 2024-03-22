@@ -21,7 +21,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
       backgroundImage:
         "/images/landing/onboarding/pirate-island-scene-thumbnail.webp",
       onClick: () => {
-        history.push("/studio-intro/m_0tmgwem7x4k47w4cq96ja8psnvnaw5");
+        history.push("/studio-intro/m_2k10f2sdhcj549rk00053e96mentn0");
       },
     },
     {
@@ -29,7 +29,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
       backgroundImage:
         "/images/landing/onboarding/spaceship-scene-thumbnail.webp",
       onClick: () => {
-        history.push("/studio-intro/m_16cc8b0dtp5fmjgb3yh85hnxyd695c");
+        history.push("/studio-intro/m_1mnebqs5twsqsbx4zkyq0ve7mk69ph");
       },
     },
     {
@@ -37,7 +37,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
       backgroundImage:
         "/images/landing/onboarding/hanashi-scene-thumbnail.webp",
       onClick: () => {
-        history.push("/studio-intro/m_r4025m9dq0hppqzh8t6tmpmxv47yyv");
+        history.push("/studio-intro/m_pjb8x09pve8f7dd8pqgjk4ezaryjxs");
       },
     },
   ];
