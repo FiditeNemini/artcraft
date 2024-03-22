@@ -1,5 +1,6 @@
 import React from "react";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Tab {
   icon?: IconDefinition,
@@ -10,7 +11,7 @@ interface Tab {
 interface Props {
   disabled?: boolean,
   name: string,
-  onChange: (e: { name: string, type: "select", value: any }) => any,
+  onChange: (e: any) => any,
   tabs: Tab[],
   value: any
 }
@@ -18,7 +19,7 @@ interface Props {
 export default function BasicTabs({ disabled, name = "", onChange, tabs, value: currentValue }: Props) {
   const onClick = () => {
     if (!disabled) {
-      onChange({ target: { name, type: "select", value } });
+      onChange({ target: { name, type: "select", value: currentValue } });
     }
   };
 
