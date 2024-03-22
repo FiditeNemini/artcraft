@@ -20,6 +20,7 @@ import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
 import {API2, Clip2} from './timeline.tsx';
+import { faL } from '@fortawesome/free-solid-svg-icons';
 
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
@@ -35,6 +36,15 @@ class Editor {
 
     // Default params.
     constructor() {
+
+        // For making sure the editor only gets created onece.
+        this.can_initailize = false;
+        let one_element = document.getElementById("created-one-element");
+        if(one_element != null) { return; }
+        let newElement = document.createElement("div");
+        newElement.id = "created-one-element";
+        document.body.appendChild(newElement);
+
         // Version and name.
         this.version = "v0.1";
 
@@ -90,11 +100,15 @@ class Editor {
         // Audio Engine.
         this.audio_manager = null;
 
+        this.can_initailize = true;
+
         console.log("Created Editor.");
     }
 
     // Initializes the main scene and ThreeJS essentials.
     initialize() {
+
+        if(this.can_initailize == false) { return; }
 
         // Gets the canvas.
         this.canvReference = document.getElementById("video-scene");
