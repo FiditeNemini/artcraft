@@ -143,13 +143,13 @@ class Editor {
 
         // Base control and debug stuff remove debug in prod.
         this._initialize_control();
-        this._debug_stats(); // REMOVE IN PRODUCTION
+        //this._debug_stats(); // REMOVE IN PRODUCTION
 
         // UI & UX stuff.
         // this._setup_buttons();
 
         // Example scene remove in prod.
-        this._initialize_example_scene();
+        // this._initialize_example_scene();
 
         // Resets canvas size.
         this.onWindowResize();
@@ -294,16 +294,12 @@ class Editor {
     }
 
     load_callback(scene, clips, timeline, animations) {
-        console.log("Loading...")
         this.timeline = timeline;
         this.audio_manager.clips = clips;
-
-        console.log(this.activeScene.scene);
-
-        this.activeScene.scene = scene;
-
-        console.log(this.activeScene.scene);
-
+        this.activeScene.scene.children = scene.children;
+        this.activeScene.scene.children.forEach(child => {
+            child.parent = this.activeScene.scene;
+        });
         this.activeScene.animations = animations;
         this.activeScene._createGrid();
     }

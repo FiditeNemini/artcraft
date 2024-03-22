@@ -9,7 +9,6 @@ class SaveManager {
     }
 
     save(scene, scene_callback, audio_manager, timeline, animations) {
-        console.log(scene);
         let gltfExporter = new GLTFExporter();
         gltfExporter.parse(
             scene,
@@ -61,11 +60,6 @@ class SaveManager {
             let animationData = data.animations;
     
             let loader = new GLTFLoader();
-
-            console.log(glb);
-            console.log(audio);
-            console.log(timelineData);
-            console.log(animationData);
             
             loader.parse(glb, '', function (gltf) {
                 let scene = gltf.scene;
