@@ -91,6 +91,7 @@ export const PageEnigma = () => {
       <canvas ref={canvasRef} id="video-scene" width="1280px" height="720px" />
       <div className='fixed top-20 left-4'>
         <div className="flex mt-2 gap-2">
+          <Button variant="secondary">Toggle Camera View</Button>
           <Button variant="secondary" onClick={handleButtonSave}>Save Scene</Button>
           <ButtonDialogue
             buttonProps={{
@@ -112,7 +113,7 @@ export const PageEnigma = () => {
         <Button onClick={handleButtonPlay}>Play</Button>
       </SidePanel>
       <LowerPanel>
-        <p className='text-white'>Timeline Panel</p>
+        <div className='h-10 w-full border-b border-ui-panel-border'></div>
         <input style={{ display: 'none' }} type="file" id="load-upload" name="load-upload"></input>
       </LowerPanel>
     </div>

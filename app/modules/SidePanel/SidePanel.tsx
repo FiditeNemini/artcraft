@@ -62,7 +62,7 @@ export const SidePanel =({
                 leaveFrom="translate-x-0"
                 leaveTo="translate-x-full"
               >
-                <Dialog.Panel className="pointer-events-auto w-screen max-w-2xl">
+                <Dialog.Panel className="pointer-events-auto w-screen lg:max-w-md">
                   <div
                     className="flex flex-col overflow-y-scroll bg-ui-panel py-6 shadow-xl border-y border-l border-ui-panel-border"
                     style={{height:height+'px'}}
