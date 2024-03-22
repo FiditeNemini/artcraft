@@ -87,6 +87,8 @@ class Editor {
 
         // Audio Engine.
         this.audio_manager = new AudioManager();
+
+        console.log("Created Editor.");
     }
 
     // Initializes the main scene and ThreeJS essentials.

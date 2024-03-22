@@ -174,12 +174,12 @@ class Scene {
     _create_skybox() {
         const loader = new THREE.CubeTextureLoader();
         const texture = loader.load([
-            '/resources/skybox/mystic_ft.jpg',
-            '/resources/skybox/mystic_bk.jpg',
-            '/resources/skybox/mystic_up.jpg',
-            '/resources/skybox/mystic_dn.jpg',
-            '/resources/skybox/mystic_rt.jpg',
-            '/resources/skybox/mystic_lf.jpg',
+            '/resources/skybox/night/Night_Moon_Burst_Cam_2_LeftX.png',
+            '/resources/skybox/night/Night_Moon_Burst_Cam_3_Right-X.png',
+            '/resources/skybox/night/Night_Moon_Burst_Cam_4_UpY.png',
+            '/resources/skybox/night/Night_Moon_Burst_Cam_5_Down-Y.png',
+            '/resources/skybox/night/Night_Moon_Burst_Cam_0_FrontZ.png',
+            '/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png',
         ]);
         this.scene.background = texture;
     }
@@ -208,7 +208,7 @@ class Scene {
         directional_light.shadow.mapSize.height = 2048;
         directional_light.shadow.map = null;
         directional_light.castShadow = true;
-        directional_light.shadow.bias = 0.00001;
+        directional_light.shadow.bias = 0.00004;
 
         this.scene.add(directional_light);
         this.scene.add(directional_light.target);
