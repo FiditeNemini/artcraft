@@ -19,6 +19,8 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
+import {API2, Clip2} from './timeline.tsx';
+
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
         const CCapture = module.CCapture;
@@ -127,11 +129,6 @@ class Editor {
 
         // Controls and movement.
         this.orbit = new OrbitControls(this.camera, this.renderer.domElement);
-        //this.orbit.movementSpeed = 1;
-        //this.orbit.rollSpeed = Math.PI / 24;
-        //this.orbit.autoForward = false;
-        //this.orbit.dragToLook = true;
-        //this.orbit.damping = 0.2;
 
         this.control = new TransformControls(this.camera, this.renderer.domElement);
 
@@ -146,7 +143,7 @@ class Editor {
 
         // Base control and debug stuff remove debug in prod.
         this._initialize_control();
-        //this._debug_stats(); // REMOVE IN PRODUCTION
+        this._debug_stats(); // REMOVE IN PRODUCTION
 
         // UI & UX stuff.
         // this._setup_buttons();
@@ -161,6 +158,8 @@ class Editor {
 
         this.audio_manager = new AudioManager();
         this.audio_manager.addCamera(this.camera);
+
+        this.timeline = new API2();
 
         //this.create_geometry("Box");
     }
@@ -251,34 +250,6 @@ class Editor {
                 //this.startPlayback();
                 break;
         }
-    }
-
-    // Sets up the UI buttons
-    _setup_buttons() {
-        document.getElementById("playButton").addEventListener("click", this.togglePlay.bind(this));
-        document.getElementById("fps-60").addEventListener("click", () => this.set_fps(60));
-        document.getElementById("fps-30").addEventListener("click", () => this.set_fps(30));
-        document.getElementById("fps-24").addEventListener("click", () => this.set_fps(24));
-
-        // Creation buttons.
-        let boundCreateGeometry = this.create_geometry.bind(this);
-        document.getElementById("C-Box").addEventListener("click", () => boundCreateGeometry("Box"));
-        document.getElementById("C-Cone").addEventListener("click", () => boundCreateGeometry("Cone"));
-        document.getElementById("C-Cylinder").addEventListener("click", () => boundCreateGeometry("Cylinder"));
-        document.getElementById("C-Sphere").addEventListener("click", () => boundCreateGeometry("Sphere"));
-        document.getElementById("C-Donut").addEventListener("click", () => boundCreateGeometry("Donut"));
-
-        let boundTranlationMode = this.change_mode.bind(this);
-        document.getElementById("mov-transform").addEventListener("click", () => boundTranlationMode("translate"));
-        document.getElementById("mov-scale").addEventListener("click", () => boundTranlationMode("scale"));
-        document.getElementById("mov-rotate").addEventListener("click", () => boundTranlationMode("rotate"));
-
-        document.getElementById("btn-save").addEventListener("click", this.save.bind(this));
-        document.getElementById("btn-load").addEventListener("click", () => document.getElementById("load-upload").click());
-        document.getElementById('load-upload').addEventListener('change', this.load.bind(this));
-
-        // Rendering buttons
-        document.getElementById("render-btn").addEventListener("click", this.togglePlayback.bind(this));
     }
 
     render_mode() {
