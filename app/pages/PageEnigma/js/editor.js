@@ -356,7 +356,6 @@ class Editor {
 
     async stopPlayback() {
         this.render_mode();
-
         let ffmpeg = createFFmpeg({ log: true });
         await ffmpeg.load();
         for (let index = 0; index < this.frame_buffer.length; index++) {
@@ -364,15 +363,11 @@ class Editor {
             await ffmpeg.FS('writeFile', `image${index}.png`, await fetchFile(element));
         }
         await ffmpeg.run('-framerate', ''+this.cap_fps, '-i', 'image%d.png', 'output.mp4');
-
         let output = await ffmpeg.FS('readFile', 'output.mp4');
-        //await ffmpeg.FS('unlink', 'output.mp4')
         // Create a Blob from the output file for downloading
         const blob = new Blob([output.buffer], { type: 'video/mp4' });
         const url = URL.createObjectURL(blob);
-
         await this.api_manager.uploadMedia(blob, "output.mp4");
-
         // Create a link to download the file
         const downloadLink = document.createElement('a');
         downloadLink.href = url;
@@ -382,9 +377,6 @@ class Editor {
         // Clean up
         URL.revokeObjectURL(url);
         document.body.removeChild(downloadLink);
-        //await ffmpeg.FS('unlink', 'input.mp4');
-        //await ffmpeg.FS('unlink', 'output.mp4');
-        
     }
 
     startPlayback() {
@@ -421,16 +413,6 @@ class Editor {
     _initialize_recording() {
         this.frame_buffer = [];
         this.render_timer = 0;
-        //this.capturer = new CCapture({
-        //    verbose: true,
-        //    display: true,
-        //    framerate: this.cap_fps,
-        //    quality: 100,
-        //    format: 'webm',
-        //    frameLimit: 0,
-        //    autoSaveTime: 0
-        //});
-        //this.capturer.start();
     }
 
     // Debug stats using ThreJS built in FPS and MS counter.
