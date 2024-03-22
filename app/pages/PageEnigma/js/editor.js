@@ -19,7 +19,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
-import {API2, Clip2} from './timeline.tsx';
+import { API2, Clip2 } from './timeline.tsx';
 import { faL } from '@fortawesome/free-solid-svg-icons';
 
 if (typeof window !== 'undefined') {
@@ -40,7 +40,7 @@ class Editor {
         // For making sure the editor only gets created onece.
         this.can_initailize = false;
         let one_element = document.getElementById("created-one-element");
-        if(one_element != null) { return; }
+        //if (one_element != null) { return; }
         let newElement = document.createElement("div");
         newElement.id = "created-one-element";
         document.body.appendChild(newElement);
@@ -108,7 +108,7 @@ class Editor {
     // Initializes the main scene and ThreeJS essentials.
     initialize() {
 
-        if(this.can_initailize == false) { return; }
+        //if (this.can_initailize == false) { return; }
 
         // Gets the canvas.
         this.canvReference = document.getElementById("video-scene");
@@ -163,7 +163,8 @@ class Editor {
         // this._setup_buttons();
 
         // Example scene remove in prod.
-        // this._initialize_example_scene();
+        this._initialize_example_scene();
+        //this.create_geometry("Box");
 
         // Resets canvas size.
         this.onWindowResize();
@@ -174,8 +175,6 @@ class Editor {
         this.audio_manager.addCamera(this.camera);
 
         this.timeline = new API2();
-
-        //this.create_geometry("Box");
     }
 
     // Configure post processing.
@@ -290,7 +289,8 @@ class Editor {
     }
 
     save() {
-        this.control.detach(this.selected);
+        console.log(this.control);
+        if(this.selected != null){ this.control.detach(this.selected); }
         this.activeScene.scene.remove(this.control);
         this.activeScene.scene.remove(this.activeScene.gridHelper);
         this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this), this.audio_manager, this.timeline, this.activeScene.animations);
@@ -311,8 +311,21 @@ class Editor {
         this.timeline = timeline;
         this.audio_manager.clips = clips;
         this.activeScene.scene.children = scene.children;
+        this.activeScene.animated_items = {};
         this.activeScene.scene.children.forEach(child => {
             child.parent = this.activeScene.scene;
+            if (child.userData.name != null) {
+                if (child.userData.name.startsWith("CHAR::")) {
+                    this.activeScene.create_fresh_animated_item(child.uuid);
+                    this.activeScene.animated_items[child.uuid].mixer = new THREE.AnimationMixer(child);
+                    this.activeScene.animated_items[child.uuid].face = child; // Might want to remove in prod and replace with better solution.
+                    this.activeScene.animated_items[child.uuid].child = child;
+                    animations.forEach(animation => {
+                        console.log(animation);
+                    });
+                    console.log(this.activeScene.animated_items)
+                }
+            }
         });
         this.activeScene.animations = animations;
         this.activeScene._createGrid();
@@ -358,7 +371,7 @@ class Editor {
             const element = this.frame_buffer[index];
             await ffmpeg.FS('writeFile', `image${index}.png`, await fetchFile(element));
         }
-        await ffmpeg.run('-framerate', ''+this.cap_fps, '-i', 'image%d.png', 'output.mp4');
+        await ffmpeg.run('-framerate', '' + this.cap_fps, '-i', 'image%d.png', 'output.mp4');
         let output = await ffmpeg.FS('readFile', 'output.mp4');
         // Create a Blob from the output file for downloading
         const blob = new Blob([output.buffer], { type: 'video/mp4' });
@@ -382,9 +395,9 @@ class Editor {
 
     // Initializes debug example scene.
     _initialize_example_scene() {
-        this.activeScene.create_character("./resources/models/pose/pose_new.glb", "Fox");
-        //this.activeScene.load_glb("./resources/models/room/room.glb", "Room");
-        //this.activeScene.create_character("./resources/models/fox/fox.glb", "Fox");
+        this.activeScene.create_character("./resources/models/pose/pose_new.glb");
+        //this.activeScene.load_glb("./resources/models/room/room.glb");
+        //this.activeScene.create_character("./resources/models/fox/fox.glb");
     }
 
     // Example default size of object.
@@ -428,7 +441,7 @@ class Editor {
 
         this.render_scene();
         if (this.capturer != null) { this.capturer.capture(this.renderer.domElement); } // Record scene.
-        
+
     }
 
     // Render the scene to the camera.
@@ -445,7 +458,7 @@ class Editor {
             let imgData = this.renderer.domElement.toDataURL();
             this.frame_buffer.push(imgData);
             this.render_timer += this.clock.getDelta();
-            if(this.playback_location >= this.fps_number*3) {
+            if (this.playback_location >= this.fps_number * 3) {
                 this.stopPlayback();
                 console.log(this.playback_location);
                 this.playback_location = 0;

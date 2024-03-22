@@ -4,8 +4,8 @@ import { FBXLoader } from 'three/addons/loaders/FBXLoader';
 import { LipSync } from './lipsync.js';
 
 class AnimatedItem {
-    constructor(name) {
-        this.name = name;
+    constructor(uuid) {
+        this.name = uuid;
         this.anims = [];
         this.audiodrive = null;
         this.lipsync_comp = null;
@@ -26,7 +26,7 @@ class AnimatedItem {
     }
 
     load(filepath, callback) {
-        this.load_glb(filepath, this.name, callback);
+        this.load_glb(filepath, callback);
     }
 
     blink(delta) {
@@ -95,17 +95,20 @@ class AnimatedItem {
         let glbLoader = new GLTFLoader();
         glbLoader.load(filepath,
             (object) => {
-                let animationAction = this.mixer.clipAction(object.animations[0]);
+                let anim = object.animations[0];
+                console.log(anim);
+                anim.name = this.name+'::'+anim.name;
+                let animationAction = this.mixer.clipAction(anim);
                 this.anims.push(animationAction);
                 if (callback != null) {
                     callback(this.name);
                 }
-                this.child.animations.push(object.animations[0]);
+                this.child.animations.push(anim);
             }
         );
     }
 
-    load_glb(filepath, object_name = null, callback = null) {
+    load_glb(filepath, callback = null) {
         let glbLoader = new GLTFLoader();
         glbLoader.load(filepath, (glb) => {
             glb.scene.children.forEach(child => {
@@ -136,8 +139,9 @@ class AnimatedItem {
                 }
                 this.child = child;
             });
+            this.name = this.child.uuid;
             if (callback != null) {
-                callback(this.name, glb.scene.children);
+                callback(this.name, glb.scene.children, this);
             }
         },
             (xhr) => {

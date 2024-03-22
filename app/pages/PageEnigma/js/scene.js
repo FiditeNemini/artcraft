@@ -54,21 +54,28 @@ class Scene {
         }
     }
 
-    create_character(filepath, character_name = "New Character") {
+    create_character(filepath) {
         // Add check to make sure the character does not exist already HERE PLEASE!!
 
-        let animated = new AnimatedItem(character_name);
+        let animated = new AnimatedItem();
         animated.load(filepath, this.setup_character.bind(this))
-        this.animated_items[character_name] = animated;
     }
 
-    setup_character(character_name, children) {
+    create_fresh_animated_item(uuid) {
+        // Add check to make sure the character does not exist already HERE PLEASE!!
+        let animated = new AnimatedItem(uuid);
+        this.animated_items[animated.name] = animated;
+    }
+
+    setup_character(character_uuid, children, animated) {
+        this.animated_items[character_uuid] = animated;
+        console.log(character_uuid)
         let children_uuids = [];
         children.forEach(child => {
             this.scene.add(child);
             children_uuids.push(child.uuid);
         });
-        this.animated_items[character_name].load_animation("/resources/models/pose/walking.glb", this.play_anim_demo.bind(this));
+        this.animated_items[character_uuid].load_animation("/resources/models/pose/walking.glb", this.play_anim_demo.bind(this));
         //this.animated_items[character_name].load_animation("/resources/models/fox/fox_idle.glb", this.play_anim_demo.bind(this));
     }
 
@@ -90,11 +97,11 @@ class Scene {
         this.animations.push(clip)
     }
 
-    play_anim_demo(character_name) {
-        this.animated_items[character_name].animate(this.animated_items[character_name].anims[0]._clip);
-        this.animated_items[character_name].sync_lips("/resources/sound/2pac.wav");
-        this.activeItem = character_name;
-        this.accept_animation_clip(this.animated_items[character_name].anims[0]._clip);
+    play_anim_demo(character_uuid) {
+        this.animated_items[character_uuid].animate(this.animated_items[character_uuid].anims[0]._clip);
+        this.animated_items[character_uuid].sync_lips("/resources/sound/2pac.wav");
+        this.activeItem = character_uuid;
+        this.accept_animation_clip(this.animated_items[character_uuid].anims[0]._clip);
     }
 
     load_glb(filepath, object_name = null, callback = null) {
