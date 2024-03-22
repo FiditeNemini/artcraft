@@ -40,6 +40,38 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         history.push("/studio-intro/m_pjb8x09pve8f7dd8pqgjk4ezaryjxs");
       },
     },
+    {
+      text: "Seldon",
+      backgroundImage:
+        "/images/landing/onboarding/seldon.png",
+      onClick: () => {
+        history.push("/studio-intro/m_aeda8feh6ezdftm4d1bhevehtdk8ek");
+      },
+    },
+    {
+      text: "Pop",
+      backgroundImage:
+        "/images/landing/onboarding/pop.png",
+      onClick: () => {
+        history.push("/studio-intro/m_4gsy6j9406ynmzx865267qry55stqm");
+      },
+    },
+    {
+      text: "Human Male",
+      backgroundImage:
+        "/images/landing/onboarding/human_male.png",
+      onClick: () => {
+        history.push("/studio-intro/m_jv7efyf4zg2sjhgyxdfqv5v7vrh8jj");
+      },
+    },
+    {
+      text: "Human Female",
+      backgroundImage:
+        "/images/landing/onboarding/human_female.png",
+      onClick: () => {
+        history.push("/studio-intro/m_r33zjfc65yd2nwtdm9p5m8k799c4q4");
+      },
+    }
   ];
 
   return (
