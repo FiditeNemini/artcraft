@@ -40,9 +40,10 @@ class MediaUploadManager {
 
     const formData = new FormData();
     formData.append('uuid_idempotency_token', uuid);
-    formData.append('file', blob, fileName);
-    formData.append('source', 'file');
-    formData.append('type', 'video');
+    formData.append('file_name', fileName);
+    formData.append('file_bytes', blob);
+    formData.append('media_file_subtype', 'sceneimport');
+    formData.append('media_file_class', 'scene');
     const response = await fetch(url, {
       method: 'POST',
       credentials: "include",
