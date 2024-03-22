@@ -3,15 +3,15 @@ import * as THREE from 'three';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import TransformObject from './components.js';
-import Character from './character.js';
+import AnimatedItem from './animated_item.js';
 
 class Scene {
     constructor(name) {
         this.name = name;
         this.gridHelper = null;
         this.scene = new THREE.Scene();
-        this.characters = {};
-        this.activeCharacter = null;
+        this.animated_items = {};
+        this.activeItem = null;
         this.animations = [];
     }
 
@@ -49,17 +49,17 @@ class Scene {
     }
 
     update(delta) {
-        for (let [key, value] of Object.entries(this.characters)) {
-            this.characters[key].update(delta);
+        for (let [key, value] of Object.entries(this.animated_items)) {
+            this.animated_items[key].update(delta);
         }
     }
 
     create_character(filepath, character_name = "New Character") {
         // Add check to make sure the character does not exist already HERE PLEASE!!
 
-        let character = new Character(character_name);
-        character.load(filepath, this.setup_character.bind(this))
-        this.characters[character_name] = character;
+        let animated = new AnimatedItem(character_name);
+        animated.load(filepath, this.setup_character.bind(this))
+        this.animated_items[character_name] = animated;
     }
 
     setup_character(character_name, children) {
@@ -68,8 +68,8 @@ class Scene {
             this.scene.add(child);
             children_uuids.push(child.uuid);
         });
-        //this.characters[character_name].load_animation("/resources/models/pose/walking.glb", this.play_anim_demo.bind(this));
-        this.characters[character_name].load_animation("/resources/models/fox/fox_idle.glb", this.play_anim_demo.bind(this));
+        this.animated_items[character_name].load_animation("/resources/models/pose/walking.glb", this.play_anim_demo.bind(this));
+        //this.animated_items[character_name].load_animation("/resources/models/fox/fox_idle.glb", this.play_anim_demo.bind(this));
     }
 
     _disable_skybox() {
@@ -91,10 +91,10 @@ class Scene {
     }
 
     play_anim_demo(character_name) {
-        this.characters[character_name].animate(this.characters[character_name].anims[0]._clip);
-        this.characters[character_name].sync_lips("/resources/sound/2pac.wav");
-        this.activeCharacter = character_name;
-        this.accept_animation_clip(this.characters[character_name].anims[0]._clip);
+        this.animated_items[character_name].animate(this.animated_items[character_name].anims[0]._clip);
+        this.animated_items[character_name].sync_lips("/resources/sound/2pac.wav");
+        this.activeItem = character_name;
+        this.accept_animation_clip(this.animated_items[character_name].anims[0]._clip);
     }
 
     load_glb(filepath, object_name = null, callback = null) {

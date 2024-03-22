@@ -293,8 +293,18 @@ class Editor {
         this.save_manager.load(uploadedFile, this.load_callback.bind(this));
     }
 
-    load_callback(scene) {
+    load_callback(scene, clips, timeline, animations) {
+        console.log("Loading...")
+        this.timeline = timeline;
+        this.audio_manager.clips = clips;
+
+        console.log(this.activeScene.scene);
+
         this.activeScene.scene = scene;
+
+        console.log(this.activeScene.scene);
+
+        this.activeScene.animations = animations;
         this.activeScene._createGrid();
     }
 

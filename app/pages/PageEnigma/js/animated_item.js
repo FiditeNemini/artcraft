@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader';
 import { LipSync } from './lipsync.js';
 
-class Character {
+class AnimatedItem {
     constructor(name) {
         this.name = name;
         this.anims = [];
@@ -11,6 +11,7 @@ class Character {
         this.lipsync_comp = null;
         this.face = null;
         this.mixer = null;
+        this.child = null;
 
         this.auto_blink = true;
         this.currentAction;
@@ -99,6 +100,7 @@ class Character {
                 if (callback != null) {
                     callback(this.name);
                 }
+                this.child.animations.push(object.animations[0]);
             }
         );
     }
@@ -132,6 +134,7 @@ class Character {
                 if(this.face == null) {
                     this.face = child;
                 }
+                this.child = child;
             });
             if (callback != null) {
                 callback(this.name, glb.scene.children);
@@ -142,4 +145,4 @@ class Character {
     }
 }
 
-export default Character;
+export default AnimatedItem;

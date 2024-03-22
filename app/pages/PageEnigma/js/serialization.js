@@ -9,18 +9,17 @@ class SaveManager {
     }
 
     save(scene, scene_callback, audio_manager, timeline, animations) {
+        console.log(scene);
         let gltfExporter = new GLTFExporter();
         gltfExporter.parse(
             scene,
             function (gltf) {
-                console.log(gltf);
-                console.log(scene);
-                let save_json = {"glb": gltf, "audio": audio_manager.clips, "timeline": timeline}
-                console.log(save_json);
-                let blob = new Blob([JSON.stringify(gltf)], {type: 'application/json'})
+                let save_json = {"glb": gltf, "audio": audio_manager.clips, "timeline": timeline, "animations": animations}
+            
+                let blob = new Blob([JSON.stringify(save_json)], {type: 'application/json'})
                 let blobUrl = URL.createObjectURL(blob);
 
-                scene_callback(blob);
+                //scene_callback(blob);
 
                 let a = document.createElement('a');
 
@@ -51,18 +50,33 @@ class SaveManager {
         );
     }
 
-    load(uploadedFile, load_callback) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const contents = e.target.result;
+    load(file, load_callback) {
+        let reader = new FileReader();
+
+        reader.onload = function (event) {
+            let data = JSON.parse(event.target.result);
+            let glb = data.glb;
+            let audio = data.audio;
+            let timelineData = data.timeline;
+            let animationData = data.animations;
     
-            const loader = new GLTFLoader();
-            loader.parse(contents, '', function(gltf) {
-                console.log(gltf);
-                load_callback(gltf.scene);
+            let loader = new GLTFLoader();
+
+            console.log(glb);
+            console.log(audio);
+            console.log(timelineData);
+            console.log(animationData);
+            
+            loader.parse(glb, '', function (gltf) {
+                let scene = gltf.scene;
+                let clips = audio;
+                let timeline = timelineData;
+                let animations = animationData;
+                load_callback(scene, clips, timeline, animations);
             });
         };
-        reader.readAsArrayBuffer(uploadedFile);
+    
+        reader.readAsText(file);
     }
 
     download(data, filename, type) {
