@@ -27,7 +27,7 @@ export const SidePanel =({
       className='fixed right-0 top-20 mt-2 mr-4'
       onClick={handleOpen}
     >
-      <FontAwesomeIcon className="h-6 w-6" icon={faGears} />
+      <FontAwesomeIcon className="fa-2xl -mx-2" icon={faGears} />
     </Button>
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
@@ -35,7 +35,7 @@ export const SidePanel =({
 
         <div className="fixed inset-0 overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
-            <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
+            <div className="pointer-events-none inset-y-0 fixed top-16 mt-2 right-0 flex max-w-full pl-10 sm:pl-16 border-t border-ui-panel-border">
               <Transition.Child
                 as={Fragment}
                 enter="transform transition ease-in-out duration-500 sm:duration-700"
@@ -49,6 +49,7 @@ export const SidePanel =({
                   <div className="flex h-full flex-col overflow-y-scroll bg-ui-panel py-6 shadow-xl">
                     <div className="px-4 sm:px-6">
                       <div className="flex items-start justify-between">
+                        {!title && <span/>}
                         {title &&
                           <Dialog.Title className="text-base font-semibold leading-6 text-white">
                             {title}
