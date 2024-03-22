@@ -17,10 +17,12 @@ class SaveManager {
                 console.log(scene);
                 let save_json = {"glb": gltf, "audio": audio_manager.clips, "timeline": timeline}
                 console.log(save_json);
-                let blob = new Blob([JSON.stringify(gltf)], {type: 'application/json'})
-                let blobUrl = URL.createObjectURL(blob);
 
-                scene_callback(blob);
+                // TODO: give the file name via a modal.
+                const file = new File([JSON.stringify(gltf)], "test.glb", {type: 'application/json'});
+                
+                let blobUrl = URL.createObjectURL(file);
+                scene_callback(file);
 
                 let a = document.createElement('a');
 

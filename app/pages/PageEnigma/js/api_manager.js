@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 
 class MediaUploadManager {
-  constructor(sessionToken) {
-    this.baseUrl = "https://api.fakeyou.com";
-    this.sessionToken = sessionToken;
+  constructor() {
+    //this.baseUrl = "https://api.fakeyou.com";
+    this.baseUrl = "http://localhost:12345"
   }
 
   async uploadMedia(blob, fileName) {
@@ -21,7 +21,7 @@ class MediaUploadManager {
       method: 'POST',
       credentials: "include",
       headers: {
-        "accept": "application/json",
+        "Accept": "application/json",
       },
       body: formData,
     });
@@ -33,22 +33,22 @@ class MediaUploadManager {
     return response.json(); // or handle the response as appropriate
   }
 
-  async uploadGLB(blob, fileName) {
-    const url = `${this.baseUrl}/v1/upload/engine_asset`;
+  async uploadGLB(blob) {
+    const url = `${this.baseUrl}/v1/media_files/upload/engine_asset`;
 
     let uuid = uuidv4();
 
     const formData = new FormData();
     formData.append('uuid_idempotency_token', uuid);
-    formData.append('file_name', fileName);
-    formData.append('file_bytes', blob);
-    formData.append('media_file_subtype', 'sceneimport');
+    formData.append('file', blob);
+    formData.append('source','file');
+    formData.append('media_file_subtype', 'scene_import');
     formData.append('media_file_class', 'scene');
     const response = await fetch(url, {
       method: 'POST',
       credentials: "include",
       headers: {
-        "accept": "application/json",
+        "Accept": "application/json",
       },
       body: formData,
     });

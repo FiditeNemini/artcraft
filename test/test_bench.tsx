@@ -1,6 +1,4 @@
 // Write unsubcribe and run the remainder of the clip tech.
-
-
 class Clip {
     name: string
     startOffset: number
@@ -8,7 +6,7 @@ class Clip {
     lengthOfClip: number
     scrubberEndingPosition: number
 
-    constructor(name: string, startOffset: number, lengthOfClip: number,unsubscribe) {
+    constructor(name: string, startOffset: number, lengthOfClip: number) {
         this.startOffset = startOffset
         this.lengthOfClip = lengthOfClip
         this.name = name
@@ -147,7 +145,7 @@ function CheckIfClipsPlayAllTogether() {
 }
 
 CheckIfBasicClipWorks()
-// CheckIfTwoClipsAtTheSameTimeWorks()
+CheckIfTwoClipsAtTheSameTimeWorks()
 // CheckIfTwoClipsOneAfterAnotherWorks()
 // CheckIfTimeLineStopBeforeClipPlays()
 // CheckIfTimeLineStartAfterClipPlays()

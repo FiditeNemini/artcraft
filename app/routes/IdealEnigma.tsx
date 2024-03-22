@@ -18,25 +18,25 @@ export default function IdealEnigma(){
 
   
   return <PageEnigma />
-  if(submitted){
-    return <PageEnigma />
-  }else{
-    return(
-      <div className="w-full flex justify-center content-center">
-        <form 
-          className="mt-20 flex flex-col content-center"
-          onSubmit={handleSubmit}
-        >
-          <label className='text-white'>
-            Riddle:
-          </label>
-          <input type="text" value={riddle} onChange={handleInput} />
-          <br/>
-          <Button type="submit" className='text-white'>Submit</Button>
-        </form>
-      </div>
+  // if(submitted){
+  //   return <PageEnigma />
+  // }else{
+  //   return(
+  //     <div className="w-full flex justify-center content-center">
+  //       <form 
+  //         className="mt-20 flex flex-col content-center"
+  //         onSubmit={handleSubmit}
+  //       >
+  //         <label className='text-white'>
+  //           Riddle:
+  //         </label>
+  //         <input type="text" value={riddle} onChange={handleInput} />
+  //         <br/>
+  //         <Button type="submit" className='text-white'>Submit</Button>
+  //       </form>
+  //     </div>
 
-    );
-  }
+  //   );
+  // }
   
 }
