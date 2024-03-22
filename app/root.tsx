@@ -8,8 +8,9 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import tailwindCss from "./styles/tailwind.css?url";
 import normalizeCss from "./styles/normalize.css?url";
+import tailwindCss from "./styles/tailwind.css?url";
+import baseCss from "./styles/base.css?url";
 
 import { TopBar } from "./modules/TopBar";
 import { TopBarInnerContext } from '~/contexts/TopBarInner';
@@ -21,6 +22,9 @@ export const links : LinksFunction = () => [{
 },{ 
   rel: "stylesheet",
   href: tailwindCss,
+},{ 
+  rel: "stylesheet",
+  href: baseCss,
 }];
 
 export default function App() {
@@ -40,7 +44,7 @@ export default function App() {
             setTopBarInner: setTopBarInnerComponent
           }}>
           
-          <div className="h-10 m-4 w-screen border-b"/>
+          <div className="topbar-spacer"/>
           <Outlet />
           <TopBar />
         </TopBarInnerContext.Provider>

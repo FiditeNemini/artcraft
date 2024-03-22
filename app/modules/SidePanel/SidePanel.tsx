@@ -1,4 +1,9 @@
-import { Fragment, useState } from 'react'
+import {
+  Fragment,
+  useCallback,
+  useLayoutEffect,
+  useState
+} from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import {
   faXmark,
@@ -7,6 +12,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Button } from '~/components/Button';
+import { TOP_BAR_HEIGHT } from '~/constants';
 
 interface SidePanelPropsI{
   title?: string;
@@ -17,10 +23,21 @@ export const SidePanel =({
   title,
   children,
 }:SidePanelPropsI)=>{
-  const [open, setOpen] = useState(false)
-  const handleOpen = ()=>{
-    setOpen(true);
-  }
+  const [height, setHeight] = useState<number>(0);
+  const [open, setOpen] = useState<boolean>(false);
+  const handleOpen = ()=> setOpen(true);
+
+  const handleWindowResize = useCallback(()=>{
+    setHeight((window.innerHeight * 3 / 4) - TOP_BAR_HEIGHT);
+  },[])
+
+  useLayoutEffect(()=>{
+    handleWindowResize();
+    window.addEventListener("resize", handleWindowResize);
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  }, [handleWindowResize])
 
   return (<>
     <Button 
@@ -35,7 +52,7 @@ export const SidePanel =({
 
         <div className="fixed inset-0 overflow-hidden">
           <div className="absolute inset-0 overflow-hidden">
-            <div className="pointer-events-none inset-y-0 fixed top-16 mt-2 right-0 flex max-w-full pl-10 sm:pl-16 border-t border-ui-panel-border">
+            <div className="pointer-events-none inset-y-0 fixed top-16 mt-2 right-0 flex max-w-full pl-10 sm:pl-16">
               <Transition.Child
                 as={Fragment}
                 enter="transform transition ease-in-out duration-500 sm:duration-700"
@@ -46,7 +63,10 @@ export const SidePanel =({
                 leaveTo="translate-x-full"
               >
                 <Dialog.Panel className="pointer-events-auto w-screen max-w-2xl">
-                  <div className="flex h-full flex-col overflow-y-scroll bg-ui-panel py-6 shadow-xl">
+                  <div
+                    className="flex flex-col overflow-y-scroll bg-ui-panel py-6 shadow-xl border-y border-l border-ui-panel-border"
+                    style={{height:height+'px'}}
+                  >
                     <div className="px-4 sm:px-6">
                       <div className="flex items-start justify-between">
                         {!title && <span/>}

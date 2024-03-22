@@ -18,6 +18,7 @@ import { ButtonLink } from '~/components/ButtonLink';
 import { ButtonDialogue } from '~/modules/ButtonDialogue';
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
 import { SidePanel } from '~/modules/SidePanel';
+import { LowerPanel } from '~/modules/LowerPanel';
 
 import Editor from './js/editor';
 
@@ -110,10 +111,10 @@ export const PageEnigma = () => {
         <Button onClick={handleButtonRender}>Render</Button>
         <Button onClick={handleButtonPlay}>Play</Button>
       </SidePanel>
-      <div className="bg-ui-panel w-full h-screen">
+      <LowerPanel>
         <p className='text-white'>Timeline Panel</p>
         <input style={{ display: 'none' }} type="file" id="load-upload" name="load-upload"></input>
-      </div>
+      </LowerPanel>
     </div>
   );
 }
