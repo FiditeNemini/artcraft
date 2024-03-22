@@ -168,7 +168,8 @@ export default function StudioTutorial(props: Props) {
   const sceneIsLoaded = sceneIsLoadedCount > 0 || sceneIsSaved;
 
   const workingText = () => {
-    if (compositing) return "Compositing"
+    if (compositing) return "Compositing";
+    else if (styling) return "Styling";
     return "";
   }
 
@@ -192,7 +193,7 @@ export default function StudioTutorial(props: Props) {
       EnqueueVST("",{
         creator_set_visibility: vstValues.visibility,
         enable_lipsync: true,
-        input_file: compositeJobStatus?.maybe_result?.entity_token || "",
+        input_file: compositeMediaToken || "",
         negative_prompt: vstValues.negPrompt,
         prompt: "A dog in a sunny field with lots of flowers",
         style: vstValues.sdModelToken,
