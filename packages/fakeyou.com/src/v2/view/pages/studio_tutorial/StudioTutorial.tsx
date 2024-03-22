@@ -5,7 +5,7 @@ import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
 import { BasicTabs, Spinner } from "components/common";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { useHistory, useParams, useLocation } from "react-router-dom";
-import { useInferenceJobs } from "hooks";
+import { useInferenceJobs, useMedia } from "hooks";
 import { EnqueueEngineCompositing } from "@storyteller/components/src/api/engine_compositor/EnqueueEngineCompositing";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { jobStateCanChange } from "@storyteller/components/src/jobs/JobStates";
@@ -13,6 +13,7 @@ import { v4 as uuidv4 } from "uuid";
 import Scene3D from "components/common/Scene3D/Scene3D";
 import { EngineMode } from "components/common/Scene3D/EngineMode";
 import { SplitFirstPeriod } from "utils/SplitFirstPeriod";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 import StyleEditor from "./StyleEditor";
 
@@ -76,6 +77,13 @@ export default function StudioTutorial(props: Props) {
   const styling = styleJobStatus && jobStateCanChange(styleJobStatus.jobState);
   const styleMediaToken = styleJobStatus?.maybeResultToken || "";
 
+
+  const { media: styleMedia } = useMedia({
+    mediaToken: styleMediaToken
+  });
+
+  const styleMediaLink = styleMediaToken && styleMedia && new BucketConfig().getGcsUrl(styleMedia?.public_bucket_path || "");
+
   console.log("🚒 tutorial overall state",{
     compositeJobStatus,
     compositing,
@@ -86,7 +94,8 @@ export default function StudioTutorial(props: Props) {
     styleEnqueued,
     styling,
     styleMediaToken,
-    urlQueries
+    urlQueries,
+    styleMediaLink
   });
 
   // If the user saves the scene in the engine, we'll need to use the new token 
@@ -181,7 +190,7 @@ export default function StudioTutorial(props: Props) {
       </div>
     </div>;
     else if (styleMediaToken) return <div>
-      <video controls {...{ src: styleMediaToken }} />
+      <video controls {...{ src: styleMediaLink }} />
     </div>;
     else if (sceneIsLoaded) return <StyleEditor {...{ compositorStart, setVstValues, vstValues }}/>;
     else return null;
