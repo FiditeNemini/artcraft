@@ -10,16 +10,16 @@ interface Tab {
 
 interface Props {
   disabled?: boolean,
-  name: string,
+  name?: string,
   onChange: (e: any) => any,
   tabs: Tab[],
   value: any
 }
 
 export default function BasicTabs({ disabled, name = "", onChange, tabs, value: currentValue }: Props) {
-  const onClick = () => {
+  const tabSelect = (value: any) => () => {
     if (!disabled) {
-      onChange({ target: { name, type: "select", value: currentValue } });
+      onChange({ target: { name, type: "select", value } });
     }
   };
 
@@ -27,7 +27,7 @@ export default function BasicTabs({ disabled, name = "", onChange, tabs, value: 
     { 
       tabs.map(({ icon, label, value },key) => <li {...{
         className: "nav-item",
-        onClick,
+        onClick: tabSelect(value),
       }}>
         <div {...{
           className: `nav-link fs-6 px-3 px-lg-4 ${ value === currentValue ? "active" : "" }`

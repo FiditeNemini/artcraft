@@ -2,6 +2,7 @@ import Accordion from "./Accordion";
 import AudioBlobPreview from "./AudioBlobPreview";
 import AudioInput from "./AudioInput";
 import Badge from "./Badge";
+import BasicTabs from "./BasicTabs";
 import Button from "./Button";
 import ButtonRevertToDefault from "./ButtonRevertToDefault";
 import Checkbox from "./Checkbox";
@@ -59,6 +60,7 @@ export {
   AudioBlobPreview,
   AudioInput,
   Badge,
+  BasicTabs,
   Button,
   //Cards
   MediaCards,

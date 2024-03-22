@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
-import { NonRouteTabs, Spinner } from "components/common";
+import { BasicTabs, Spinner } from "components/common";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams, useLocation } from "react-router-dom";
 import { useInferenceJobs } from "hooks";
 import { EnqueueEngineCompositing } from "@storyteller/components/src/api/engine_compositor/EnqueueEngineCompositing";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
@@ -45,22 +45,49 @@ export default function StudioTutorial(props: Props) {
 
   const { base: mediaToken, maybeRemainder: maybeExtension } = SplitFirstPeriod(mediaTokenSpec);
 
-  // const history = useHistory();
+  // for updating url state
+
+  const history = useHistory();
+  const { pathname, search: locSearch } = useLocation();
+  const urlQueries = new URLSearchParams(locSearch);
+  const queryCompositeJob = urlQueries.get("compositeJobToken");
+  const queryStyleJob = urlQueries.get("styleJobToken");
+
+  // side bar tab state
+
+  const [selectedTab,selectedTabSet] = useState("");
+
+  // for both jobs
 
   const { enqueue, inferenceJobs } = useInferenceJobs();
+
+  // engine compositor job state
 
   const [compositeJobToken,compositeJobTokenSet] = useState("");
   const compositeJobStatus = inferenceJobs.find((item: any) => item.jobToken === compositeJobToken);
   const compositing = compositeJobStatus && jobStateCanChange(compositeJobStatus.jobState);
-  const compositeMediaToken = compositeJobStatus?.maybe_result?.entity_token || "";
+  const compositeMediaToken = compositeJobStatus?.maybeResultToken || "";
+
+  // video style style transfer job state
 
   const [styleJobToken,styleJobTokenSet] = useState("");
   const [styleEnqueued,styleEnqueuedSet] = useState(false);
   const styleJobStatus = inferenceJobs.find((item: any) => item.jobToken === styleJobToken);
   const styling = styleJobStatus && jobStateCanChange(styleJobStatus.jobState);
-  const styleMediaToken = styleJobStatus?.maybe_result?.entity_token || "";
+  const styleMediaToken = styleJobStatus?.maybeResultToken || "";
 
-  console.log("🚒",compositeJobStatus,compositing,styling);
+  console.log("🚒 tutorial overall state",{
+    compositeJobStatus,
+    compositing,
+    compositeMediaToken,
+    queryCompositeJob,
+    queryStyleJob,
+    styleJobStatus,
+    styleEnqueued,
+    styling,
+    styleMediaToken,
+    urlQueries
+  });
 
   // If the user saves the scene in the engine, we'll need to use the new token 
   // for subsequent steps of this flow.
@@ -120,6 +147,11 @@ export default function StudioTutorial(props: Props) {
       skybox: "meadow_4k",
     }).then((res: any) => {
       if (res && res.success) {
+        let newURLQueries = new URLSearchParams({
+          compositeJobToken: res.inference_job_token
+        }).toString();
+
+        history.replace({ pathname, search: newURLQueries });
         enqueue(res.inference_job_token,false,FrontendInferenceJobType.EngineComposition);
         compositeJobTokenSet(res.inference_job_token)
       }
@@ -127,10 +159,10 @@ export default function StudioTutorial(props: Props) {
   };
 
   const tabs = [
-    { content: () => "", label: "Animation" },
-    { content: () => "", label: "Camera" },
-    { content: () => "", label: "Audio" },
-    { content: () => "", label: "Style" }
+    { value: "animation", label: "Animation" },
+    { value: "camera", label: "Camera" },
+    { value: "audio", label: "Audio" },
+    { value: "style", label: "Style" }
   ];
 
   const sceneIsLoaded = sceneIsLoadedCount > 0 || sceneIsSaved;
@@ -148,8 +180,7 @@ export default function StudioTutorial(props: Props) {
       </div>
     </div>;
     else if (styleMediaToken) return <div>
-      Video Preview here
-      { styleMediaToken }
+      <video controls {...{ src: styleMediaToken }} />
     </div>;
     else if (sceneIsLoaded) return <StyleEditor {...{ compositorStart, setVstValues, vstValues }}/>;
     else return null;
@@ -157,21 +188,28 @@ export default function StudioTutorial(props: Props) {
 
   useEffect(() => {
     const enqueueStyle = () => {
+      console.log("💜 style enqueue started",{ vstValues, styleEnqueued });
       EnqueueVST("",{
         creator_set_visibility: vstValues.visibility,
         enable_lipsync: true,
         input_file: compositeJobStatus?.maybe_result?.entity_token || "",
         negative_prompt: vstValues.negPrompt,
-        prompt: vstValues.posPrompt,
+        prompt: "A dog in a sunny field with lots of flowers",
         style: vstValues.sdModelToken,
         trim_end_millis: 3000,
         trim_start_millis: 0,
         uuid_idempotency_token: uuidv4()
       })
       .then((res: EnqueueVSTResponse) => {
+        console.log("✅",res);
         if (res.success && res.inference_job_token) {
+          let newURLQueries = new URLSearchParams({
+            compositeJobToken,
+            engineJobToken: res.inference_job_token
+          }).toString();
           enqueue(res.inference_job_token,false,FrontendInferenceJobType.VideoStyleTransfer);
           styleJobTokenSet(res.inference_job_token);
+          history.replace({ pathname, search: newURLQueries });
           // console.log("Job enqueued successfully", res.inference_job_token);
           // history.push(`/studio-intro/result/${res.inference_job_token}`);
         } else {
@@ -185,7 +223,22 @@ export default function StudioTutorial(props: Props) {
       enqueueStyle();
     }
 
-  },[enqueue,compositeJobStatus,compositeMediaToken,styleEnqueued,vstValues]);
+    if (sceneIsLoaded && !selectedTab) {
+      selectedTabSet("style")
+    }
+
+  },[
+    enqueue,
+    compositeJobToken,
+    compositeJobStatus,
+    compositeMediaToken,
+    history,
+    pathname,
+    selectedTab,
+    sceneIsLoaded,
+    styleEnqueued,
+    vstValues
+  ]);
 
 
   return !props.sessionWrapper.canAccessStudio() ?
@@ -199,7 +252,11 @@ export default function StudioTutorial(props: Props) {
         onSceneSavedCallback={onSaveCallback}
       />
       <div {...{ className: "studio-tutorial-style" }}>
-        <NonRouteTabs {...{ tabs }}/>
+        <BasicTabs {...{
+          onChange: ({ target }: { target: any }) => selectedTabSet(target.value),
+          tabs,
+          value: selectedTab
+        }}/>
         {
           tabContent()
         }
