@@ -15,7 +15,7 @@ import { Button } from '~/components/Button';
 import { ButtonLink } from '~/components/ButtonLink';
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
 
-import { SidePanel } from '~/templates/SidePanel';
+import { SidePanel } from '~/modules/SidePanel';
 
 import { SceneWithCube } from './SceneWithCube';
 
@@ -88,8 +88,10 @@ export const PageCube = () => {
         <p className='text-white'>Ration X: {rotationX ? rotationX : ""}</p>
         <p className='text-white'>Ration Y: {rotationY ? rotationY : ""}</p>
       </div>
-      <SidePanel>
-        <p>Side Panel Text</p>
+      <SidePanel
+        title="Side Panel Title"
+      >
+        <p className="text-white">Side Panel Context</p>
       </SidePanel>
     </div>
   );

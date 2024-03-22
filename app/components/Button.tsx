@@ -1,7 +1,7 @@
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonPropsI extends React.ButtonHTMLAttributes<HTMLButtonElement> {
  icon?: IconDefinition;
  variant?: "primary"|"secondary";
 }
@@ -12,7 +12,7 @@ export const Button = ({
   className : propsClassName,
   variant = 'primary',
   ...rest
-}:ButtonProps)=>{
+}:ButtonPropsI)=>{
   function getVariantClassNames(variant: string){
     switch(variant){
       case "secondary":{

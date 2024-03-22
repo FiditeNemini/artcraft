@@ -11,7 +11,7 @@ import {
 import tailwindCss from "./styles/tailwind.css?url";
 import normalizeCss from "./styles/normalize.css?url";
 
-import { TopBar } from "./templates/TopBar";
+import { TopBar } from "./modules/TopBar";
 import { TopBarInnerContext } from '~/contexts/TopBarInner';
 
 

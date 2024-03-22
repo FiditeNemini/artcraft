@@ -7,11 +7,16 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Button } from '~/components/Button';
+
 interface SidePanelPropsI{
-  children: React.ReactNode
+  title?: string;
+  children: React.ReactNode;
 }
 
-export const SidePanel =(props:SidePanelPropsI)=>{
+export const SidePanel =({
+  title,
+  children,
+}:SidePanelPropsI)=>{
   const [open, setOpen] = useState(false)
   const handleOpen = ()=>{
     setOpen(true);
@@ -22,7 +27,7 @@ export const SidePanel =(props:SidePanelPropsI)=>{
       className='fixed right-0 top-20 mt-2 mr-4'
       onClick={handleOpen}
     >
-      <FontAwesomeIcon icon={faGears} />
+      <FontAwesomeIcon className="h-6 w-6" icon={faGears} />
     </Button>
     <Transition.Root show={open} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={setOpen}>
@@ -44,19 +49,21 @@ export const SidePanel =(props:SidePanelPropsI)=>{
                   <div className="flex h-full flex-col overflow-y-scroll bg-ui-panel py-6 shadow-xl">
                     <div className="px-4 sm:px-6">
                       <div className="flex items-start justify-between">
-                        <Dialog.Title className="text-base font-semibold leading-6 text-white">
-                          Library
-                        </Dialog.Title>
+                        {title &&
+                          <Dialog.Title className="text-base font-semibold leading-6 text-white">
+                            {title}
+                          </Dialog.Title>
+                        }
                         <div className="ml-3 flex h-7 items-center">
                           <button
                             type="button"
                             className="relative rounded-md bg-brand-primary text-white hover:bg-brand-primary-400 focus:outline-none focus:ring-brand-primary-500"
                             onClick={() => setOpen(false)}
                           >
-                            <span className="absolute -inset-2.5" />
+                            {/* <span className="absolute -inset-2.5" /> */}
                             <span className="sr-only">Close panel</span>
                             <FontAwesomeIcon
-                              className="h-6 w-6"
+                              className="h-6 w-6 mt-1 mx-1"
                               aria-hidden="true"
                               icon={faXmark}
                             />
@@ -65,7 +72,7 @@ export const SidePanel =(props:SidePanelPropsI)=>{
                       </div>
                     </div>
                     <div className="relative mt-6 flex-1 px-4 sm:px-6">
-                      {props.children}
+                      {children}
                     </div>
                   </div>
                 </Dialog.Panel>

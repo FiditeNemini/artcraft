@@ -15,8 +15,9 @@ import {
 
 import { Button } from '~/components/Button';
 import { ButtonLink } from '~/components/ButtonLink';
+import { ButtonDialogue } from '~/modules/ButtonDialogue';
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
-import { SidePanel } from '~/templates/SidePanel';
+import { SidePanel } from '~/modules/SidePanel';
 
 import Editor from './js/editor';
 
@@ -87,8 +88,24 @@ export const PageEnigma = () => {
   return(
     <div>
       <canvas ref={canvasRef} id="video-scene" width="1280px" height="720px" />
+      <div className='fixed top-20 left-4'>
+        <div className="flex mt-2 gap-2">
+          <Button variant="secondary" onClick={handleButtonSave}>Save Scene</Button>
+          <ButtonDialogue
+            buttonProps={{
+              variant: 'secondary',
+              label: 'Help'
+            }}
+            title="Help"
+          >
+            <p>Do you need help?</p>
+            <p>Ask Michael about this project</p>
+            <p>Ask Miles about ThreeJS</p>
+            <p>Ask Wil about React</p>
+          </ButtonDialogue>
+        </div>
+      </div>
       <SidePanel>
-        <Button onClick={handleButtonSave}>Save</Button>
         <Button onClick={handleButtonLoad}>Load</Button>
         <Button onClick={handleButtonRender}>Render</Button>
         <Button onClick={handleButtonPlay}>Play</Button>
