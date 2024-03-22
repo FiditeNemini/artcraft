@@ -285,7 +285,7 @@ class Editor {
 
     _save_to_cloud(blob) {
         console.log("Posting to cloud!");
-        this.api_manager.uploadMedia(blob, "test.bin");
+        this.api_manager.uploadGLB(blob, "test.glb");
     }
 
     load() {
@@ -362,9 +362,9 @@ class Editor {
 
     // Initializes debug example scene.
     _initialize_example_scene() {
-        //this.activeScene.create_character("./resources/models/pose/pose_new.glb", "Fox");
-        this.activeScene.load_glb("./resources/models/room/room.glb", "Room");
-        this.activeScene.create_character("./resources/models/fox/fox.glb", "Fox");
+        this.activeScene.create_character("./resources/models/pose/pose_new.glb", "Fox");
+        //this.activeScene.load_glb("./resources/models/room/room.glb", "Room");
+        //this.activeScene.create_character("./resources/models/fox/fox.glb", "Fox");
     }
 
     // Example default size of object.

@@ -32,6 +32,32 @@ class MediaUploadManager {
 
     return response.json(); // or handle the response as appropriate
   }
+
+  async uploadGLB(blob, fileName) {
+    const url = `${this.baseUrl}/v1/upload/engine_asset`;
+
+    let uuid = uuidv4();
+
+    const formData = new FormData();
+    formData.append('uuid_idempotency_token', uuid);
+    formData.append('file', blob, fileName);
+    formData.append('source', 'file');
+    formData.append('type', 'video');
+    const response = await fetch(url, {
+      method: 'POST',
+      credentials: "include",
+      headers: {
+        "accept": "application/json",
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to Send Data');
+    }
+
+    return response.json(); // or handle the response as appropriate
+  }
 }
 
 export default MediaUploadManager;
