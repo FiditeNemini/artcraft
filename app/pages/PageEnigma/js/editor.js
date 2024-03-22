@@ -86,7 +86,7 @@ class Editor {
         this.save_manager = new SaveManager(this.version);
 
         // Audio Engine.
-        this.audio_manager = new AudioManager();
+        this.audio_manager = null;
 
         console.log("Created Editor.");
     }
@@ -158,6 +158,9 @@ class Editor {
         this.onWindowResize();
         // Creates the main update loop.
         this.renderer.setAnimationLoop(this.update_loop.bind(this));
+
+        this.audio_manager = new AudioManager();
+        this.audio_manager.addCamera(this.camera);
 
         //this.create_geometry("Box");
     }
