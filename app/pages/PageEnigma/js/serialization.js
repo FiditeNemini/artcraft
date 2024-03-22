@@ -53,18 +53,28 @@ class SaveManager {
         );
     }
 
-    load(uploadedFile, load_callback) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const contents = e.target.result;
+    load(file, load_callback) {
+        let reader = new FileReader();
+
+        reader.onload = function (event) {
+            let data = JSON.parse(event.target.result);
+            let glb = data.glb;
+            let audio = data.audio;
+            let timelineData = data.timeline;
+            let animationData = data.animations;
     
-            const loader = new GLTFLoader();
-            loader.parse(contents, '', function(gltf) {
-                console.log(gltf);
-                load_callback(gltf.scene);
+            let loader = new GLTFLoader();
+            
+            loader.parse(glb, '', function (gltf) {
+                let scene = gltf.scene;
+                let clips = audio;
+                let timeline = timelineData;
+                let animations = animationData;
+                load_callback(scene, clips, timeline, animations);
             });
         };
-        reader.readAsArrayBuffer(uploadedFile);
+    
+        reader.readAsText(file);
     }
 
     download(data, filename, type) {
