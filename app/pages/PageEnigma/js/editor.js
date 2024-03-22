@@ -100,14 +100,15 @@ class Editor {
         let height = this.canvReference.height;
 
         // Sets up camera and base position.
-        this.camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 100);
-        this.camera.position.z = 2;
-        this.camera.position.y = 2;
-        this.camera.position.x = 2;
+        this.camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 50);
+        this.camera.position.z = 3;
+        this.camera.position.y = 3;
+        this.camera.position.x = -3;
 
         // Base WebGL render and clock for delta time.
         this.renderer = new THREE.WebGLRenderer({ antialias: true, canvas: this.canvReference, preserveDrawingBuffer: true });
         this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMapSoft = true;
         this.clock = new THREE.Clock();
 
         // Resizes the renderer.
@@ -182,8 +183,8 @@ class Editor {
 
         this.saoPass = new SAOPass(this.activeScene.scene, this.camera);
 
-        this.saoPass.params.saoBias = 3.0;
-        this.saoPass.params.saoIntensity = 0.1;
+        this.saoPass.params.saoBias = 3.1;
+        this.saoPass.params.saoIntensity = 1.0;
         this.saoPass.params.saoScale = 6.0;
         this.saoPass.params.saoKernelRadius = 5.0;
         this.saoPass.params.saoMinResolution = 0.0;
@@ -199,13 +200,10 @@ class Editor {
             maxblur: 0.01
         });
 
-        //this._add_post_processing();
+        this._add_post_processing();
 
         this.outputPass = new OutputPass();
         this.composer.addPass(this.outputPass);
-
-
-
 
         document.getElementById('load-upload').addEventListener('change', this.load.bind(this));
     }
@@ -305,7 +303,7 @@ class Editor {
         this.control.detach(this.selected);
         this.activeScene.scene.remove(this.control);
         this.activeScene.scene.remove(this.activeScene.gridHelper);
-        this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this), this.audio_manager, this.timeline);
+        this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this), this.audio_manager, this.timeline, this.activeScene.animations);
         this.activeScene._createGrid();
     }
 
@@ -396,8 +394,9 @@ class Editor {
 
     // Initializes debug example scene.
     _initialize_example_scene() {
-        this.activeScene.create_character("./resources/models/pose/pose_new.glb", "Fox");
-        //this.activeScene.create_character("./resources/models/fox/fox.glb", "Fox");
+        //this.activeScene.create_character("./resources/models/pose/pose_new.glb", "Fox");
+        this.activeScene.load_glb("./resources/models/room/room.glb", "Room");
+        this.activeScene.create_character("./resources/models/fox/fox.glb", "Fox");
     }
 
     // Example default size of object.

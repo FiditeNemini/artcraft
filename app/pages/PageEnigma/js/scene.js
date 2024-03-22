@@ -12,6 +12,7 @@ class Scene {
         this.scene = new THREE.Scene();
         this.characters = {};
         this.activeCharacter = null;
+        this.animations = [];
     }
 
     initialize() {
@@ -67,8 +68,8 @@ class Scene {
             this.scene.add(child);
             children_uuids.push(child.uuid);
         });
-        this.characters[character_name].load_animation("/resources/models/pose/walking.glb", this.play_anim_demo.bind(this));
-        //this.characters[character_name].load_animation("/resources/models/fox/fox_idle.glb", this.play_anim_demo.bind(this));
+        //this.characters[character_name].load_animation("/resources/models/pose/walking.glb", this.play_anim_demo.bind(this));
+        this.characters[character_name].load_animation("/resources/models/fox/fox_idle.glb", this.play_anim_demo.bind(this));
     }
 
     _disable_skybox() {
@@ -85,10 +86,15 @@ class Scene {
         }
     }
 
+    accept_animation_clip(clip) {
+        this.animations.push(clip)
+    }
+
     play_anim_demo(character_name) {
         this.characters[character_name].animate(this.characters[character_name].anims[0]._clip);
         this.characters[character_name].sync_lips("/resources/sound/2pac.wav");
         this.activeCharacter = character_name;
+        this.accept_animation_clip(this.characters[character_name].anims[0]._clip);
     }
 
     load_glb(filepath, object_name = null, callback = null) {
@@ -98,9 +104,9 @@ class Scene {
                 child.traverse(c => {
                     if (c.isMesh) {
                         c.material.metalness = 0.0;
-                        c.material.specular = 0.25;
+                        c.material.specular = 0.5;
                         c.castShadow = true;
-                        c.receiveShadow = false;
+                        c.receiveShadow = true;
                         c.material.transparent = false;
                         //if (c.morphTargetInfluences && c.morphTargetDictionary) {
                         //    const blendShapeIndexI = c.morphTargetDictionary["vrc.v_e"];
@@ -123,12 +129,6 @@ class Scene {
             }
         },
             (xhr) => {
-                let loading_div = document.getElementById("loading-div");
-                if (xhr.loaded / xhr.total < 1) {
-                    loading_div.style.display = "block";
-                } else {
-                    loading_div.style.display = "none";
-                }
             },
             (error) => {
                 console.log(error)
@@ -198,16 +198,17 @@ class Scene {
 
     _create_base_lighting() {
         const color = 0xFCECE7;
-        const light = new THREE.HemisphereLight(color, 0x8d8d8d, 3.5);
+        const light = new THREE.HemisphereLight(color, 0x8d8d8d, 3.0);
         this.scene.add(light);
 
-        const directional_light = new THREE.DirectionalLight(color, 3.5);
+        const directional_light = new THREE.DirectionalLight(color, 2.0);
 
         directional_light.position.set(5, 10, 3);
-        directional_light.shadow.mapSize.width = 4096;
-        directional_light.shadow.mapSize.height = 4096;
+        directional_light.shadow.mapSize.width = 2048;
+        directional_light.shadow.mapSize.height = 2048;
         directional_light.shadow.map = null;
         directional_light.castShadow = true;
+        directional_light.shadow.bias = 0.00001;
 
         this.scene.add(directional_light);
         this.scene.add(directional_light.target);

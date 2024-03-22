@@ -10,3 +10,4 @@ node_modules
 .netlify
 .DS_Store
 public/resources/movie/Big_Buck_Bunny_180_10s.webm
+public/resources/models/room/room_with_girl.glb

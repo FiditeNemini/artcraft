@@ -110,9 +110,9 @@ class Character {
                 child.traverse(c => {
                     if (c.isMesh) {
                         c.material.metalness = 0.0;
-                        c.material.specular = 0.25;
+                        c.material.specular = 0.0;
                         c.castShadow = true;
-                        c.receiveShadow = false;
+                        c.receiveShadow = true;
                         c.frustrumCulled = false;
                         c.material.transparent = false;
                         if (c.morphTargetInfluences && c.morphTargetDictionary) {

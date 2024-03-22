@@ -8,14 +8,15 @@ class SaveManager {
         this.scene = null;
     }
 
-    save(scene, scene_callback, audio_manager, timeline) {
+    save(scene, scene_callback, audio_manager, timeline, animations) {
         let gltfExporter = new GLTFExporter();
         gltfExporter.parse(
             scene,
             function (gltf) {
+                console.log(gltf);
                 console.log(scene);
                 let save_json = {"glb": gltf, "audio": audio_manager.clips, "timeline": timeline}
-                let blob = new Blob([JSON.stringify(save_json)], {type: 'application/json'})
+                let blob = new Blob([JSON.stringify(gltf)], {type: 'application/json'})
                 let blobUrl = URL.createObjectURL(blob);
 
                 scene_callback(blob);
@@ -42,6 +43,7 @@ class SaveManager {
             { 
                 trs: false,
                 onlyVisible: false,
+                animations: animations,
                 binary: true
             }
     
