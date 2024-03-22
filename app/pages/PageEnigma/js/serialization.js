@@ -8,14 +8,14 @@ class SaveManager {
         this.scene = null;
     }
 
-    save(scene, scene_callback) {
+    save(scene, scene_callback, audio_manager, timeline) {
         let gltfExporter = new GLTFExporter();
         gltfExporter.parse(
             scene,
-            function (gltfJson) {
-                const jsonString = JSON.stringify(gltfJson);
+            function (gltf) {
                 console.log(scene);
-                let blob = new Blob([jsonString], {type: 'application/octet-stream'})
+                let save_json = {"glb": gltf, "audio": audio_manager.clips, "timeline": timeline}
+                let blob = new Blob([JSON.stringify(save_json)], {type: 'application/json'})
                 let blobUrl = URL.createObjectURL(blob);
 
                 scene_callback(blob);
@@ -30,7 +30,7 @@ class SaveManager {
                 const minutes = String(now.getMinutes()).padStart(2, '0');
                 const seconds = String(now.getSeconds()).padStart(2, '0');
                 const randomNumber = Math.floor(Math.random() * 1000);
-                let save_name = `save_${randomNumber}_${year}${month}${day}_${hours}${minutes}${seconds}.glb`;
+                let save_name = `save_${randomNumber}_${year}${month}${day}_${hours}${minutes}${seconds}.sav`;
 
                 a.href = blobUrl;
                 a.download = save_name;

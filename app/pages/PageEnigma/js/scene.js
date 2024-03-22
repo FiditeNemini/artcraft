@@ -86,7 +86,6 @@ class Scene {
     }
 
     play_anim_demo(character_name) {
-        console.log(this.characters[character_name].anims[0]._clip);
         this.characters[character_name].animate(this.characters[character_name].anims[0]._clip);
         this.characters[character_name].sync_lips("/resources/sound/2pac.wav");
         this.activeCharacter = character_name;
