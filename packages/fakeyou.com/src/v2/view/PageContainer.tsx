@@ -127,6 +127,7 @@ import DevTTS from "./pages/dev_tts/DevTTS";
 import { StudioIntroPage } from "./pages/storyteller_studio_intro/StudioIntroPage";
 import StudioVSTPage from "./pages/storyteller_studio_intro/StudioVST/StudioVSTPage";
 import { StudioIntroResultPage } from "./pages/storyteller_studio_intro/StudioIntroResultPage";
+import StudioTutorial from "./pages/studio_tutorial/StudioTutorial";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 
@@ -774,12 +775,23 @@ class PageContainer extends React.Component<
                     />
                   </Route>
 
+
+
                   <Route path="/studio-intro/style/:jobToken?">
                     <StudioVSTPage />
                   </Route>
 
                   <Route path="/studio-intro/:mediaToken?">
                     <StudioIntroPage
+                      sessionWrapper={this.props.sessionWrapper}
+                      sessionSubscriptionsWrapper={
+                        this.props.sessionSubscriptionsWrapper
+                      }
+                    />
+                  </Route>
+
+                  <Route path="/studio-tutorial/:mediaToken?">
+                    <StudioTutorial
                       sessionWrapper={this.props.sessionWrapper}
                       sessionSubscriptionsWrapper={
                         this.props.sessionSubscriptionsWrapper

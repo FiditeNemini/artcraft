@@ -11,9 +11,9 @@ export default function useInferenceJobs(jobType?: FrontendInferenceJobType, deb
   const openJobListModal = () => open({ component: InferenceJobsModal, props: { jobType } });
 
   return {
-    enqueue: (jobToken: string, openModal = false) => {
+    enqueue: (jobToken: string, openModal = false, jobTypeOverride?: FrontendInferenceJobType) => {
       if (openModal) { openJobListModal(); }
-      enqueue(jobToken,jobType);
+      enqueue(jobToken,jobTypeOverride || jobType);
     },
     inferenceJobs: jobType === undefined ? inferenceJobs : (byCategory?.get(jobType) || []),
     jobStatusDescription: (jobState: JobState) => Object.keys(JobState).filter(key => isNaN(Number(key)))[jobState],
