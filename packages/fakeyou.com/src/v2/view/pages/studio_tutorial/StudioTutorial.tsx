@@ -64,18 +64,20 @@ export default function StudioTutorial(props: Props) {
 
   // engine compositor job state
 
-  const [compositeJobToken,compositeJobTokenSet] = useState("");
+  const [compositeJobToken,compositeJobTokenSet] = useState(queryCompositeJob || "");
   const compositeJobStatus = inferenceJobs.find((item: any) => item.jobToken === compositeJobToken);
   const compositing = compositeJobStatus && jobStateCanChange(compositeJobStatus.jobState);
   const compositeMediaToken = compositeJobStatus?.maybeResultToken || "";
+  const [refreshedCompositor,refreshedCompositorSet] = useState(false);
 
   // video style style transfer job state
 
-  const [styleJobToken,styleJobTokenSet] = useState("");
+  const [styleJobToken,styleJobTokenSet] = useState(queryStyleJob || "");
   const [styleEnqueued,styleEnqueuedSet] = useState(false);
   const styleJobStatus = inferenceJobs.find((item: any) => item.jobToken === styleJobToken);
   const styling = styleJobStatus && jobStateCanChange(styleJobStatus.jobState);
   const styleMediaToken = styleJobStatus?.maybeResultToken || "";
+  const [refreshedStyle,refreshedStyleSet] = useState(false);
 
 
   const { media: styleMedia } = useMedia({
@@ -161,7 +163,7 @@ export default function StudioTutorial(props: Props) {
         }).toString();
 
         history.replace({ pathname, search: newURLQueries });
-        enqueue(res.inference_job_token,false,FrontendInferenceJobType.EngineComposition);
+        // enqueue(res.inference_job_token,false,FrontendInferenceJobType.EngineComposition);
         compositeJobTokenSet(res.inference_job_token)
       }
     });
@@ -177,8 +179,8 @@ export default function StudioTutorial(props: Props) {
   const sceneIsLoaded = sceneIsLoadedCount > 0 || sceneIsSaved;
 
   const workingText = () => {
-    if (compositing) return "Compositing";
-    else if (styling) return "Styling";
+    if (compositing && !styling) return "Compositing";
+    else if (styling && !compositing) return "Styling";
     return "";
   }
 
@@ -217,7 +219,7 @@ export default function StudioTutorial(props: Props) {
             compositeJobToken,
             engineJobToken: res.inference_job_token
           }).toString();
-          enqueue(res.inference_job_token,false,FrontendInferenceJobType.VideoStyleTransfer);
+          // enqueue(res.inference_job_token,false,FrontendInferenceJobType.VideoStyleTransfer);
           styleJobTokenSet(res.inference_job_token);
           history.replace({ pathname, search: newURLQueries });
           // console.log("Job enqueued successfully", res.inference_job_token);
@@ -237,16 +239,34 @@ export default function StudioTutorial(props: Props) {
       selectedTabSet("style")
     }
 
+    if (compositeJobToken && !compositeJobStatus && !refreshedCompositor) {
+      console.log("🧱","compositor refreshed");
+      refreshedCompositorSet(true);
+      enqueue(compositeJobToken,false,FrontendInferenceJobType.EngineComposition);
+    }
+
+    if (styleJobToken && !styleJobStatus && !refreshedStyle) {
+      console.log("🎨","styler refreshed");
+      refreshedStyleSet(true);
+      enqueue(styleJobToken,false,FrontendInferenceJobType.VideoStyleTransfer);
+    }
+
   },[
+    camera,
     enqueue,
-    compositeJobToken,
     compositeJobStatus,
+    compositeJobToken,
     compositeMediaToken,
     history,
     pathname,
+    refreshedCompositor,
+    refreshedStyle,
+    savedMediaToken,
     selectedTab,
     sceneIsLoaded,
     styleEnqueued,
+    styleJobStatus,
+    styleJobToken,
     vstValues
   ]);
 
