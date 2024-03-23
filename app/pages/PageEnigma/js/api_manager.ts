@@ -10,13 +10,11 @@ class MediaUploadManager {
     //this.baseUrl = "http://localhost:12345"
   }
   
-
-  async saveScene(scene:Scene) {
-
+  async saveScene(scene:Scene):Promise<string> {
+    return ""
   }
 
-
-  async uploadMedia(blob:any, fileName:string):Promise {
+  async uploadMedia(blob:any, fileName:string):Promise<string> {
     const url = `${this.baseUrl}/v1/media_uploads/upload`;
     let uuid = uuidv4();
     const formData = new FormData();
@@ -41,7 +39,7 @@ class MediaUploadManager {
     return response.json(); // or handle the response as appropriate
   }
 
-  async uploadGLB(file:File) {
+  async uploadGLB(file:File):Promise<string> {
     const url = `${this.baseUrl}/v1/media_files/upload/engine_asset`;
     let uuid = uuidv4();
     const formData = new FormData();

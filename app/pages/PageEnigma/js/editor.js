@@ -5,7 +5,7 @@ import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import Stats from 'three/addons/libs/stats.module.js';
 import Scene from './scene.js';
 import SaveManager from './serialization.js';
-import MediaUploadManager from './api_manager.js';
+import MediaUploadManager from './api_manager.ts';
 import AudioManager from './audio_manager.js';
 
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
