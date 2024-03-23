@@ -15,7 +15,8 @@ class MediaUploadManager {
 
   }
 
-  async uploadMedia(blob:any, fileName:string) {
+
+  async uploadMedia(blob:any, fileName:string):Promise {
     const url = `${this.baseUrl}/v1/media_uploads/upload`;
     let uuid = uuidv4();
     const formData = new FormData();
