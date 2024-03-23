@@ -1,10 +1,13 @@
 node_modules
-
+/~/
 /.cache
 /public/build
 /build
+/backup
 .env
 
 # Local Netlify folder
 .netlify
 .DS_Store
+public/resources/movie/Big_Buck_Bunny_180_10s.webm
+public/resources/models/room/room_with_girl.glb

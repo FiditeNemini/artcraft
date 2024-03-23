@@ -11,6 +11,13 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@ffmpeg/core": "0.11.0",
+    "@ffmpeg/ffmpeg": "0.11.6",
+    "@ffmpeg/util": "0.12.0",
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@headlessui/react": "^1.7.18",
     "@netlify/edge-functions": "^2.3.1",
     "@netlify/remix-edge-adapter": "^3.2.0",
     "@netlify/remix-runtime": "^2.2.0",
@@ -19,10 +26,13 @@
     "@remix-run/react": "^2.8.1",
     "@remix-run/router": "^1.15.3",
     "@remix-run/serve": "^2.8.1",
+    "ccapture.js": "github:aceslowman/ccapture.js#npm-fix",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "three": "^0.162.0"
+    "three": "^0.162.0",
+    "uuid": "^9.0.1",
+    "webm-writer": "^1.0.0"
   },
   "devDependencies": {
     "@remix-run/dev": "^2.8.1",
@@ -38,10 +48,12 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "node-sass": "^9.0.0",
     "postcss": "^8.4.37",
+    "postcss-import": "^16.0.1",
+    "postcss-nesting": "^12.1.0",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.12",
-    "sass": "^1.72.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.1.6",
     "vite": "^5.0.0",
