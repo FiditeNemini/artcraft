@@ -124,6 +124,7 @@ class Editor {
         this.onWindowResize();
         // Creates the main update loop.
         this.renderer.setAnimationLoop(this.update_loop.bind(this));
+        this.audio_engine.loadClip("awd");
     }
 
     // Configure post processing.
@@ -199,12 +200,13 @@ class Editor {
     }
 
     save() {
-        console.log(this.control);
-        if(this.selected != null){ this.control.detach(this.selected); }
-        this.activeScene.scene.remove(this.control);
-        this.activeScene.scene.remove(this.activeScene.gridHelper);
-        this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this), this.audio_manager, this.timeline, this.activeScene.animations);
-        this.activeScene._createGrid();
+        //console.log(this.control);
+        //if(this.selected != null){ this.control.detach(this.selected); }
+        //this.activeScene.scene.remove(this.control);
+        //this.activeScene.scene.remove(this.activeScene.gridHelper);
+        //this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this), this.audio_manager, this.timeline, this.activeScene.animations);
+        //this.activeScene._createGrid();
+        this.audio_engine.playClip("awd");
     }
 
     _save_to_cloud(blob) {

@@ -1,3 +1,19 @@
+interface AudioData {
+  audioContext: AudioContext;
+  audioBuffer: AudioBuffer;
+}
+
+class AudioData implements AudioData{
+  audioContext: AudioContext;
+  audioBuffer: AudioBuffer;
+  source: AudioBufferSourceNode | undefined
+
+  constructor (audioContext: AudioContext, audioBuffer: AudioBuffer) {
+    this.audioContext = audioContext;
+    this.audioBuffer = audioBuffer;
+  }
+}
+
 export interface AudioTrackClip {
   version: number;
   media_id: string;
@@ -10,7 +26,7 @@ export class AudioTrackClip implements AudioTrackClip {
   media_id: string;
   type: "audio" = "audio";
   volume: number;
-  buffer: AudioBufferSourceNode | undefined;
+  audio_data: AudioData | undefined;
 
   constructor(version: number, media_id: string, volume: number) {
     this.version = version;
@@ -18,7 +34,7 @@ export class AudioTrackClip implements AudioTrackClip {
     this.type = "audio";
     this.volume = volume;
     this.download_audio().then(data => {
-      this.buffer = data;
+      this.audio_data = data;
     });
   }
 
@@ -32,16 +48,15 @@ export class AudioTrackClip implements AudioTrackClip {
   }
 
   async download_audio() {
-    let new_audio_context = new AudioContext();
     let url = this.get_media_url();
     const audioContext = new AudioContext();
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    const source = audioContext.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(audioContext.destination);
-    return source;
+    // const source = audioContext.createBufferSource();
+    // source.buffer = audioBuffer;
+    // source.connect(audioContext.destination);
+    return new AudioData(audioContext, audioBuffer);
   }
 
   toJSON(): string {
