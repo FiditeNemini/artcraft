@@ -1,10 +1,7 @@
 import {
   useCallback,
-  useContext,
   useEffect,
-  useLayoutEffect,
   useRef,
-  // useState,
 } from 'react';
 
 import {
@@ -16,14 +13,14 @@ import {
 import { Button } from '~/components/Button';
 import { ButtonLink } from '~/components/ButtonLink';
 import { ButtonDialogue } from '~/modules/ButtonDialogue';
-import { TopBarInnerContext } from "~/contexts/TopBarInner";
+import { TopBarHelmet } from '~/modules/TopBarHelmet/TopBarHelmet';
 import { SidePanel } from '~/modules/SidePanel';
 import { LowerPanel } from '~/modules/LowerPanel';
 
 import Editor from './js/editor';
 
 export const PageEnigma = () => {
-  const { setTopBarInner } = useContext(TopBarInnerContext) || {};
+  // const { setTopBarInner } = useContext(TopBarInnerContext) || {};
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const editorRef = useRef<Editor | null>(null);
@@ -50,29 +47,6 @@ export const PageEnigma = () => {
     }
   }, []);
 
-  useLayoutEffect(()=>{
-    if(setTopBarInner){
-      const TopBarInnerButtons = (
-        <div className="flex grow justify-between">
-          <ButtonLink
-            to={"/"}
-            variant='secondary'
-            icon={faChevronLeft}
-          >
-            Back to Dashboard
-          </ButtonLink>
-          <Button
-            icon={faWandSparkles}
-          >
-              Generate Movie
-          </Button>
-          <span className="w-8"/>
-        </div>
-      );
-      setTopBarInner(TopBarInnerButtons);
-    }
-  },[setTopBarInner]);
-
   const handleButtonSave = ()=>{
     editorRef.current?.save();
   }
@@ -88,6 +62,23 @@ export const PageEnigma = () => {
 
   return(
     <div>
+      <TopBarHelmet>
+        <div className="flex grow justify-between">
+            <ButtonLink
+              to={"/"}
+              variant='secondary'
+              icon={faChevronLeft}
+            >
+              Back to Dashboard
+            </ButtonLink>
+            <Button
+              icon={faWandSparkles}
+            >
+                Generate Movie
+            </Button>
+            <span className="w-8"/>
+          </div>
+      </TopBarHelmet>
       <canvas ref={canvasRef} id="video-scene" width="1280px" height="720px" />
       <div className='fixed top-20 left-4'>
         <div className="flex mt-2 gap-2">

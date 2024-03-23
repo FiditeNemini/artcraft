@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PageCube } from "../pages/PageCube";
-import { Button } from '~/components/Button';
+import { Button } from '~/components';
+
 export default function Cube(){
   const pausedRiddle = true;
   const [riddle, setRiddle] = useState<string>("");
