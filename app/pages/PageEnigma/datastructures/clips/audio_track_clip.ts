@@ -38,24 +38,24 @@ export class AudioTrackClip implements AudioTrackClip {
     });
   }
 
-  get_media_url() {
-    // This is for prod when we have the proper info on the url.
-    // let baseUrl = "https://api.fakeyou.com";
-    // let url = `${baseUrl}/media/${this.media_id}`
-    // return url;
-
-    return "/resources/sound/2pac.wav";
+  async get_media_url() {
+    //This is for prod when we have the proper info on the url.
+    let api_base_url = "https://api.fakeyou.com";
+    let url = `${api_base_url}/v1/media_files/file/${this.media_id}`
+    let responce = await fetch(url);
+    let json = await JSON.parse(await responce.text());
+    let bucketPath = json["media_file"]["public_bucket_path"];
+    let media_base_url = "https://storage.googleapis.com/vocodes-public"
+    let media_url = `${media_base_url}${bucketPath}`
+    return media_url;
   }
 
   async download_audio() {
-    let url = this.get_media_url();
+    let url = await this.get_media_url();
     const audioContext = new AudioContext();
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    // const source = audioContext.createBufferSource();
-    // source.buffer = audioBuffer;
-    // source.connect(audioContext.destination);
     return new AudioData(audioContext, audioBuffer);
   }
 
