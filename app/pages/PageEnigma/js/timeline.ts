@@ -33,6 +33,10 @@ export class TimeLine {
         this.timelineState = new TimelineCurrentReactState()
     }
 
+    async createClipOffset(clip: ClipOffset): Promise<void> {
+
+    }
+
     async addPlayableClip(clip: ClipOffset): Promise<void> {
         this.timelineItems.push(clip)
     }
@@ -41,10 +45,10 @@ export class TimeLine {
 
     }
 
-    // this will update the state of the clips based off uuid
+    // this will update the state of the clips based off uuid easing?
     async modifyClip(clip_uuid: string, updates: AnyJson): Promise<void> {
 
-    }
+    }   
     
     async clipDidEnterDropZone() {
 
@@ -108,6 +112,17 @@ export class TimeLine {
                 // run async
                 // element.play()
                 // remove the element from the list
+                if (element.type == "transform") {
+                    
+                }
+                else if (element.type == "audio") {
+
+                }
+                else if (element.type == "animation") {
+
+                } else {
+                    throw "Error New Type"
+                }
                 this.timelineItems = this.timelineItems.filter(item => item !== element)
             }
             if (this.scrubberPosition == this.timeLineLimit) { // stops at where clips should // cannot throw clip
