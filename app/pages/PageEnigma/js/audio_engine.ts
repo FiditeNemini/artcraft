@@ -18,8 +18,11 @@ class AudioEngine {
 
     playClip(audio_media_id: string) {
         const clip = this.clips[audio_media_id];
-        if (clip.buffer) {
-            clip.buffer.start();
+        if (clip.audio_data?.audioContext) {
+            clip.audio_data.source = clip.audio_data.audioContext.createBufferSource();
+            clip.audio_data.source.buffer = clip.audio_data.audioBuffer;
+            clip.audio_data.source.connect(clip.audio_data.audioContext.destination);
+            clip.audio_data.source.start();
         } else {
             console.warn(`AudioManager: AudioClip buffer with id "${audio_media_id}" not found.`);
         }
@@ -27,8 +30,8 @@ class AudioEngine {
 
     stopClip(audio_media_id: string) {
         const clip = this.clips[audio_media_id];
-        if (clip.buffer) {
-            clip.buffer.stop();
+        if (clip.audio_data?.source) {
+            clip.audio_data.source.stop();
         } else {
             console.warn(`AudioManager: AudioClip with id "${audio_media_id}" not found.`);
         }
