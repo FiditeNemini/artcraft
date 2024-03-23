@@ -1,30 +1,30 @@
 // Write unsubcribe and run the remainder of the clip tech.
-class TrackClip {
-    name: string
-    startOffset: number // ms in the 0 100 | 10 second clip
-    timerID: NodeJS.Timeout | null
-    lengthOfClip: number
+// class TrackClip {
+//     name: string
+//     startOffset: number // ms in the 0 100 | 10 second clip
+//     timerID: NodeJS.Timeout | null
+//     lengthOfClip: number
 
-    constructor(name: string, startOffset: number, lengthOfClip: number) {
-        this.startOffset = startOffset
-        this.lengthOfClip = lengthOfClip
-        this.name = name
-        this.timerID = null
-    }
+//     constructor(name: string, startOffset: number, lengthOfClip: number) {
+//         this.startOffset = startOffset
+//         this.lengthOfClip = lengthOfClip
+//         this.name = name
+//         this.timerID = null
+//     }
 
-    async play(): Promise<void> {
-        console.log(`Playing ${this.name}`)
-        this.timerID = setInterval(async () => {
-            console.log(`Running async ${this.name}`)
-            this.stop()
-        }, this.lengthOfClip)
-    }
+//     async play(): Promise<void> {
+//         console.log(`Playing ${this.name}`)
+//         this.timerID = setInterval(async () => {
+//             console.log(`Running async ${this.name}`)
+//             this.stop()
+//         }, this.lengthOfClip)
+//     }
 
-    async stop(): Promise<void> {
-        clearInterval(this.timerID!)
-        console.log(`Stopping ${this.name}`)
-    }
-}
+//     async stop(): Promise<void> {
+//         clearInterval(this.timerID!)
+//         console.log(`Stopping ${this.name}`)
+//     }
+// }
 
 class TimeLine {
     timelineItems: TrackClip[]
