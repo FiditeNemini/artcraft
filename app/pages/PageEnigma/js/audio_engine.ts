@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-class AudioManager {
+class AudioEngine {
   constructor() {
       this.listener = new THREE.AudioListener();
       this.clips = {};

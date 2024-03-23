@@ -1,18 +1,15 @@
 // Write unsubcribe and run the remainder of the clip tech.
-class Clip {
+class TrackClip {
     name: string
-    startOffset: number
+    startOffset: number // ms in the 0 100 | 10 second clip
     timerID: NodeJS.Timeout | null
     lengthOfClip: number
-    scrubberEndingPosition: number
 
     constructor(name: string, startOffset: number, lengthOfClip: number) {
         this.startOffset = startOffset
         this.lengthOfClip = lengthOfClip
         this.name = name
         this.timerID = null
-
-        this.scrubberEndingPosition = 100
     }
 
     async play(): Promise<void> {
@@ -29,12 +26,12 @@ class Clip {
     }
 }
 
-class API {
-    timelineItems: Clip[]
+class TimeLine {
+    timelineItems: TrackClip[]
     timerID: NodeJS.Timeout | null
     timeLineLimit: number
     
-    runningClips: Clip[]
+    runningClips: TrackClip[]
 
     constructor() {
         this.timelineItems = []
@@ -43,11 +40,11 @@ class API {
         this.runningClips = []
     }
 
-    async addPlayableClip(clip: Clip): Promise<void> {
+    async addPlayableClip(clip: TrackClip): Promise<void> {
         this.timelineItems.push(clip)
     }
 
-    async start(): Promise<void> {
+    async play(): Promise<void> {
         let start = 0
         const updateInterval = 100
         const timerID = setInterval(async () => {
@@ -82,34 +79,34 @@ const percision = 100
 
 // Visual verification tests.
 function CheckIfBasicClipWorks() {
-    const api = new API()
-    api.addPlayableClip(new Clip("clip1", 0, 1000))
-    api.start()
+    const api = new TimeLine()
+    api.addPlayableClip(new TrackClip("clip1", 0, 1000))
+    api.play()
 }
 
 function CheckIfBasicClipWorks3SecondsAfterTimelineStops() {
-    const api = new API()
-    api.addPlayableClip(new Clip("clip1", 0, 10000))
-    api.start()
+    const api = new TimeLine()
+    api.addPlayableClip(new TrackClip("clip1", 0, 10000))
+    api.play()
 }
 
 function CheckIfTwoClipsAtTheSameTimeWorks() {
-    const api = new API()
-    api.addPlayableClip(new Clip("clip1", 0, 1000))
-    api.start()
+    const api = new TimeLine()
+    api.addPlayableClip(new TrackClip("clip1", 0, 1000))
+    api.play()
 }
 
 function CheckIfTwoClipsOneAfterAnotherWorks() {
-    const api = new API()
-    api.addPlayableClip(new Clip("clip1", 0, 1000))
-    api.addPlayableClip(new Clip("clip2", 0, 2000))
-    api.start()
+    const api = new TimeLine()
+    api.addPlayableClip(new TrackClip("clip1", 0, 1000))
+    api.addPlayableClip(new TrackClip("clip2", 0, 2000))
+    api.play()
 }
 
 function CheckIfTimeLineStopBeforeClipPlays() {
-    const api = new API()
-    api.addPlayableClip(new Clip("clip3",0,1000))
-    api.start()
+    const api = new TimeLine()
+    api.addPlayableClip(new TrackClip("clip3",0,1000))
+    api.play()
     setInterval(async ()=> {
         api.stop()
     },1100)
@@ -117,9 +114,9 @@ function CheckIfTimeLineStopBeforeClipPlays() {
 }
 
 function CheckIfTimeLineStartAfterClipPlays() {
-    const api = new API() 
-    api.addPlayableClip(new Clip("clip3",0,1000))
-    api.start()
+    const api = new TimeLine() 
+    api.addPlayableClip(new TrackClip("clip3",0,1000))
+    api.play()
     setInterval(async ()=> {
         api.stop()
     },500)
@@ -127,25 +124,25 @@ function CheckIfTimeLineStartAfterClipPlays() {
 }
 
 function CheckIfClipsPlayAllTogetherConcurrently() {
-    const api = new API() 
-    api.addPlayableClip(new Clip("clip1",0,1000))
-    api.addPlayableClip(new Clip("clip2",0,1000))
-    api.addPlayableClip(new Clip("clip3",0,1000))
-    api.addPlayableClip(new Clip("clip4",0,1000))
-    api.start()
+    const api = new TimeLine() 
+    api.addPlayableClip(new TrackClip("clip1",0,1000))
+    api.addPlayableClip(new TrackClip("clip2",0,1000))
+    api.addPlayableClip(new TrackClip("clip3",0,1000))
+    api.addPlayableClip(new TrackClip("clip4",0,1000))
+    api.play()
 }
 
 function CheckIfClipsPlayAllTogether() {
-    const api = new API() 
-    api.addPlayableClip(new Clip("clip1",0,1000))
-    api.addPlayableClip(new Clip("clip2",0,1000))
-    api.addPlayableClip(new Clip("clip3",0,1000))
-    api.addPlayableClip(new Clip("clip4",0,1000))
-    api.start()
+    const api = new TimeLine() 
+    api.addPlayableClip(new TrackClip("clip1",0,1000))
+    api.addPlayableClip(new TrackClip("clip2",0,1000))
+    api.addPlayableClip(new TrackClip("clip3",0,1000))
+    api.addPlayableClip(new TrackClip("clip4",0,1000))
+    api.play()
 }
 
 CheckIfBasicClipWorks()
-CheckIfTwoClipsAtTheSameTimeWorks()
+//CheckIfTwoClipsAtTheSameTimeWorks()
 // CheckIfTwoClipsOneAfterAnotherWorks()
 // CheckIfTimeLineStopBeforeClipPlays()
 // CheckIfTimeLineStartAfterClipPlays()

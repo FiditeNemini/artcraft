@@ -1,16 +1,25 @@
 import { v4 as uuidv4 } from 'uuid';
 
+import { Scene } from '../datastructures/scene/scene_object';
+
 class MediaUploadManager {
+  baseUrl:String
+
   constructor() {
-    //this.baseUrl = "https://api.fakeyou.com";
-    this.baseUrl = "http://localhost:12345"
+    this.baseUrl = "https://api.fakeyou.com";
+    //this.baseUrl = "http://localhost:12345"
+  }
+  
+  async saveScene(scene:Scene):Promise<string> {
+    return ""
   }
 
-  async uploadMedia(blob, fileName) {
+
+
+  // two core functions to upload things to the server and get id's
+  async uploadMedia(blob:any, fileName:string):Promise<string> {
     const url = `${this.baseUrl}/v1/media_uploads/upload`;
-
     let uuid = uuidv4();
-
     const formData = new FormData();
     formData.append('uuid_idempotency_token', uuid);
     formData.append('file', blob, fileName);
@@ -33,14 +42,12 @@ class MediaUploadManager {
     return response.json(); // or handle the response as appropriate
   }
 
-  async uploadGLB(blob) {
+  async uploadGLB(file:File):Promise<string> {
     const url = `${this.baseUrl}/v1/media_files/upload/engine_asset`;
-
     let uuid = uuidv4();
-
     const formData = new FormData();
     formData.append('uuid_idempotency_token', uuid);
-    formData.append('file', blob);
+    formData.append('file', file);
     formData.append('source','file');
     formData.append('media_file_subtype', 'scene_import');
     formData.append('media_file_class', 'scene');
@@ -56,7 +63,6 @@ class MediaUploadManager {
     if (!response.ok) {
       throw new Error('Failed to Send Data');
     }
-
     return response.json(); // or handle the response as appropriate
   }
 }

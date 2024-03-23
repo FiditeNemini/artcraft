@@ -1,16 +1,11 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { FlyControls } from 'three/addons/controls/FlyControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
-import Stats from 'three/addons/libs/stats.module.js';
 import Scene from './scene.js';
 import SaveManager from './serialization.js';
-import MediaUploadManager from './api_manager.js';
-import AudioManager from './audio_manager.js';
-
+import MediaUploadManager from './api_manager.ts';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
@@ -18,9 +13,6 @@ import { SAOPass } from 'three/addons/postprocessing/SAOPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
-
-import { API2, Clip2 } from './timeline.tsx';
-import { faL } from '@fortawesome/free-solid-svg-icons';
 
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
@@ -97,17 +89,11 @@ class Editor {
         // Save & Load.
         this.save_manager = new SaveManager(this.version);
 
-        // Audio Engine.
-        this.audio_manager = null;
-
-        this.can_initailize = true;
-
         console.log("Created Editor.");
     }
 
     // Initializes the main scene and ThreeJS essentials.
     initialize() {
-
         //if (this.can_initailize == false) { return; }
 
         // Gets the canvas.
@@ -116,65 +102,38 @@ class Editor {
         // Base width and height.
         let width = this.canvReference.width;
         let height = this.canvReference.height;
-
         // Sets up camera and base position.
         this.camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 50);
         this.camera.position.z = 3;
         this.camera.position.y = 3;
         this.camera.position.x = -3;
-
         // Base WebGL render and clock for delta time.
         this.renderer = new THREE.WebGLRenderer({ antialias: true, canvas: this.canvReference, preserveDrawingBuffer: true });
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMapSoft = true;
         this.clock = new THREE.Clock();
-
         // Resizes the renderer.
         this.renderer.setSize(width, height);
         //document.body.appendChild(this.renderer.domElement);
         window.addEventListener('resize', this.onWindowResize.bind(this));
-
         // Current scene for saving and loading.
         this.activeScene = new Scene();
-
         this._configure_post_pro();
-
         this.activeScene.initialize();
-
         // Controls and movement.
         this.orbit = new OrbitControls(this.camera, this.renderer.domElement);
-
         this.control = new TransformControls(this.camera, this.renderer.domElement);
-
         // OnClick and MouseMove events.
         window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
         window.addEventListener('click', this.onMouseClick.bind(this), false);
 
-        window.addEventListener("keyup", this._setup_keys.bind(this), false)
-
-        //window.addEventListener('contextmenu', this.onContextMenu.bind(this), false);
-        //window.addEventListener("mouseup", this.onMouseUp.bind(this), false);
-
         // Base control and debug stuff remove debug in prod.
         this._initialize_control();
-        //this._debug_stats(); // REMOVE IN PRODUCTION
-
-        // UI & UX stuff.
-        // this._setup_buttons();
-
-        // Example scene remove in prod.
-        this._initialize_example_scene();
-        //this.create_geometry("Box");
 
         // Resets canvas size.
         this.onWindowResize();
         // Creates the main update loop.
         this.renderer.setAnimationLoop(this.update_loop.bind(this));
-
-        this.audio_manager = new AudioManager();
-        this.audio_manager.addCamera(this.camera);
-
-        this.timeline = new API2();
     }
 
     // Configure post processing.
@@ -217,52 +176,13 @@ class Editor {
             maxblur: 0.01
         });
 
-        this._add_post_processing();
-
-        this.outputPass = new OutputPass();
-        this.composer.addPass(this.outputPass);
-
-        document.getElementById('load-upload').addEventListener('change', this.load.bind(this));
-    }
-
-    _add_post_processing() {
         this.composer.addPass(this.saoPass);
         this.composer.addPass(this.bloomPass);
         this.composer.addPass(this.smaaPass);
         this.composer.addPass(this.bokehPass);
-    }
 
-    _remove_post_processing() {
-        this.composer.removePass(this.saoPass);
-        this.composer.removePass(this.bloomPass);
-        this.composer.removePass(this.smaaPass);
-        this.composer.removePass(this.bokehPass);
-    }
-
-    _setup_keys(event) {
-        let boundTranlationMode = this.change_mode.bind(this);
-        console.log(event.key);
-        switch (event.key) {
-            case 'e':
-                boundTranlationMode("scale");
-                break;
-            case 'r':
-                boundTranlationMode("rotate");
-                break;
-            case 't':
-                boundTranlationMode("translate");
-                break;
-            case 'g':
-                console.log("Saving...")
-                this.save();
-                break;
-            case 'n':
-                this.render_mode();
-                break;
-            case ' ':
-                //this.startPlayback();
-                break;
-        }
+        this.outputPass = new OutputPass();
+        this.composer.addPass(this.outputPass);
     }
 
     render_mode() {
@@ -302,42 +222,9 @@ class Editor {
         this.api_manager.uploadGLB(blob, "test.glb");
     }
 
-    load() {
-        let uploadedFile = document.getElementById("load-upload").files[0];
-        this.save_manager.load(uploadedFile, this.load_callback.bind(this));
-    }
-
-    load_callback(scene, clips, timeline, animations) {
-        this.timeline = timeline;
-        this.audio_manager.clips = clips;
-        this.activeScene.scene.children = scene.children;
-        this.activeScene.animated_items = {};
-        this.activeScene.scene.children.forEach(child => {
-            child.parent = this.activeScene.scene;
-            if (child.userData.name != null) {
-                if (child.userData.name.startsWith("CHAR::")) {
-                    this.activeScene.create_fresh_animated_item(child.uuid);
-                    this.activeScene.animated_items[child.uuid].mixer = new THREE.AnimationMixer(child);
-                    this.activeScene.animated_items[child.uuid].face = child; // Might want to remove in prod and replace with better solution.
-                    this.activeScene.animated_items[child.uuid].child = child;
-                    animations.forEach(animation => {
-                        console.log(animation);
-                    });
-                    console.log(this.activeScene.animated_items)
-                }
-            }
-        });
-        this.activeScene.animations = animations;
-        this.activeScene._createGrid();
-    }
-
     change_mode(type) {
         this.control.mode = type;
         this.transform_interaction = true;
-    }
-
-    create_geometry(name) {
-        this.activeScene.instantiate(name);
     }
 
     // Sets the fps to a specific number
@@ -393,18 +280,6 @@ class Editor {
         this._initialize_recording();
     }
 
-    // Initializes debug example scene.
-    _initialize_example_scene() {
-        this.activeScene.create_character("./resources/models/pose/pose_new.glb");
-        //this.activeScene.load_glb("./resources/models/room/room.glb");
-        //this.activeScene.create_character("./resources/models/fox/fox.glb");
-    }
-
-    // Example default size of object.
-    _example_default_size() {
-        this.activeScene.scene.children[this.activeScene.scene.children.length - 1].scale.set(.01, .01, .01);
-    }
-
     // Initializes transform x y z changes.
     _initialize_control() {
         this.control.addEventListener('change', this.render_scene.bind(this));
@@ -422,12 +297,6 @@ class Editor {
     _initialize_recording() {
         this.frame_buffer = [];
         this.render_timer = 0;
-    }
-
-    // Debug stats using ThreJS built in FPS and MS counter.
-    _debug_stats() {
-        this.stats = new Stats();
-        document.body.appendChild(this.stats.dom);
     }
 
     // Basicly Unity 3D's update loop.
@@ -464,24 +333,6 @@ class Editor {
                 this.playback_location = 0;
                 this.rendering = false;
             }
-        }
-    }
-
-    update_properties() {
-        let properties = this.activeScene.sceneData['scene_properties'][this.selected.uuid];
-        if (properties != null) {
-            properties.forEach(component => {
-                if (component.name == "Transform") {
-                    let pos = this.selected.position;
-                    let rot = this.selected.rotation;
-                    let scale = this.selected.scale;
-                    component.position = new THREE.Vector3(Math.floor(pos.x), Math.floor(pos.y), Math.floor(pos.z));
-                    component.rotation = new THREE.Vector3(Math.floor(rot.x), Math.floor(rot.y), Math.floor(rot.z));
-                    component.scale = new THREE.Vector3(Math.floor(scale.x), Math.floor(scale.y), Math.floor(scale.z));
-                }
-                let html_content = component.get_html();
-                if (html_content == null) { return; }
-            });
         }
     }
 

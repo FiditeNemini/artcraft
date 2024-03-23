@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { FBXLoader } from 'three/addons/loaders/FBXLoader';
 import { LipSync } from './lipsync.js';
 
 class AnimatedItem {
@@ -67,16 +66,19 @@ class AnimatedItem {
         if (this.face != null && this.auto_blink) {
             this.blink(delta);
             if (this.mixer != null) {
-                this.mixer.update(delta);
+                this.mixer.update(delta); // add speed here later.
             }
         }
     }
 
+    // 3js clip
     animate(clip) {
         this.currentAction = this.mixer.clipAction(clip);
         this.currentAction.play();
     }
 
+    // talking and plays the audio
+    // takes audio clip from folder on the server .wav
     sync_lips(filepath) {
         if(this.lipsync_comp != null){
             return fetch(filepath)
@@ -91,6 +93,7 @@ class AnimatedItem {
         }
     }
 
+    // Takes a glb animation loads from the server  
     load_animation(filepath, callback = null) {
         let glbLoader = new GLTFLoader();
         glbLoader.load(filepath,
@@ -108,6 +111,7 @@ class AnimatedItem {
         );
     }
 
+    // loads the mesh of the character
     load_glb(filepath, callback = null) {
         let glbLoader = new GLTFLoader();
         glbLoader.load(filepath, (glb) => {
