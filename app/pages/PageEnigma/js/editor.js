@@ -32,7 +32,7 @@ class Editor {
         // For making sure the editor only gets created onece.
         this.can_initailize = false;
         let one_element = document.getElementById("created-one-element");
-        if (one_element != null) { return; }
+        //if (one_element != null) { return; }
         let newElement = document.createElement("div");
         newElement.id = "created-one-element";
         document.body.appendChild(newElement);
@@ -94,7 +94,7 @@ class Editor {
 
     // Initializes the main scene and ThreeJS essentials.
     initialize() {
-        if (this.can_initailize == false) { return; }
+        //if (this.can_initailize == false) { return; }
 
         // Gets the canvas.
         this.canvReference = document.getElementById("video-scene");
@@ -183,8 +183,6 @@ class Editor {
 
         this.outputPass = new OutputPass();
         this.composer.addPass(this.outputPass);
-
-        document.getElementById('load-upload').addEventListener('change', this.load.bind(this));
     }
 
     render_mode() {
