@@ -42,36 +42,63 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
     },
     {
       text: "Seldon",
-      backgroundImage:
-        "/images/landing/onboarding/seldon.png",
+      backgroundImage: "/images/landing/onboarding/seldon.png",
       onClick: () => {
         history.push("/studio-intro/m_aeda8feh6ezdftm4d1bhevehtdk8ek");
       },
     },
     {
       text: "Pop",
-      backgroundImage:
-        "/images/landing/onboarding/pop.png",
+      backgroundImage: "/images/landing/onboarding/pop.png",
       onClick: () => {
         history.push("/studio-intro/m_4gsy6j9406ynmzx865267qry55stqm");
       },
     },
     {
       text: "Human Male",
-      backgroundImage:
-        "/images/landing/onboarding/human_male.png",
+      backgroundImage: "/images/landing/onboarding/human_male.png",
       onClick: () => {
         history.push("/studio-intro/m_jv7efyf4zg2sjhgyxdfqv5v7vrh8jj");
       },
     },
     {
       text: "Human Female",
-      backgroundImage:
-        "/images/landing/onboarding/human_female.png",
+      backgroundImage: "/images/landing/onboarding/human_female.png",
       onClick: () => {
         history.push("/studio-intro/m_r33zjfc65yd2nwtdm9p5m8k799c4q4");
       },
-    }
+    },
+    {
+      text: "Castle",
+      backgroundImage: "/images/landing/onboarding/castle-scene-thumbnail.webp",
+      onClick: () => {
+        history.push("/studio-intro/m_3dejb87nmpee0k411hcncz0ew6zr81");
+      },
+    },
+    {
+      text: "Space War",
+      backgroundImage:
+        "/images/landing/onboarding/space-war-scene-thumbnail.webp",
+      onClick: () => {
+        history.push("/studio-intro/m_f320w1e8b93p5xj2fw19px5zzqh2zh");
+      },
+    },
+    {
+      text: "Simple Room",
+      backgroundImage:
+        "/images/landing/onboarding/simple-room-scene-thumbnail.webp",
+      onClick: () => {
+        history.push("/studio-intro/m_ectv9gkx33ccve3vhxbnccntn0dxa8");
+      },
+    },
+    {
+      text: "Alphabet",
+      backgroundImage:
+        "/images/landing/onboarding/alphabet-scene-thumbnail.webp",
+      onClick: () => {
+        history.push("/studio-intro/m_xtvacqsg5yyw7pv81ky7zz04w32vte");
+      },
+    },
   ];
 
   return (
