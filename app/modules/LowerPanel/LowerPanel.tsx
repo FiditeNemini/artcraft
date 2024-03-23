@@ -1,12 +1,4 @@
-import { Fragment, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-import {
-  faXmark,
-  faTimeline,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { Button } from '~/components/Button';
+import { useState } from 'react'
 
 interface LowerPanelPropsI{
   children: React.ReactNode;

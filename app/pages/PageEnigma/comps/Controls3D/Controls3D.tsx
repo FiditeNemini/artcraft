@@ -1,9 +1,16 @@
+
 import {
   faArrowsRotate,
   faArrowsUpDownLeftRight,
   faPlus,
   faUpRightAndDownLeftFromCenter,
-} from '@fortawesome/free-solid-svg-icons';
+} from '@fortawesome/pro-solid-svg-icons';
+import {
+  fa3dCylinder,
+  fa3dTorus,
+  fa3dSphere,
+} from '@awesome.me/kit-fde2be5eb0/icons/kit/custom';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export const Controls3D = ()=>{
@@ -15,9 +22,9 @@ export const Controls3D = ()=>{
       <div className='flex gap-4'>
         <FontAwesomeIcon icon={faPlus} />
         <span className="w-0 h-5 border-l border-ui-panel-border" />
-        <img className="w-5" src="/resources/svgs/torus.svg" alt="make torus" />
-        <img className="w-5" src="/resources/svgs/cylinder.svg" alt="make cynlinder" />
-        <img className="w-5" src="/resources/svgs/sphere.svg" alt="make sphere" />
+        <FontAwesomeIcon icon={fa3dCylinder} />
+        <FontAwesomeIcon icon={fa3dTorus} />
+        <FontAwesomeIcon icon={fa3dSphere} />
         <FontAwesomeIcon icon={faArrowsUpDownLeftRight} />
         <FontAwesomeIcon icon={faArrowsRotate} />
         <FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} />
