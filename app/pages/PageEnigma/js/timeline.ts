@@ -1,6 +1,7 @@
 import { AnyJson } from "three/examples/jsm/nodes/core/constants.js"
 import { ClipOffset } from "../datastructures/clips/clip_offset"
 
+// Every object uuid / entity has a track.
 export class TimelineCurrentReactState {
     isEditable:boolean
     constructor() {
@@ -29,11 +30,6 @@ export class TimeLine {
         this.timelineState = new TimelineCurrentReactState()
     }
 
-    // public streaming events into the timeline from
-    async setScrubberPosition(offset:number) {
-        this.scrubberPosition = offset // in ms
-    }
-        
     async addPlayableClip(clip: ClipOffset): Promise<void> {
         this.timelineItems.push(clip)
     }
@@ -41,15 +37,26 @@ export class TimeLine {
     async deleteClip(clip_uuid: string): Promise<void> {
 
     }
-
     // this will update the state of the clips based off uuid
     async modifyClip(clip_uuid: string, updates: AnyJson): Promise<void> {
 
     }
 
     // timeline controls this.
+    async scrubberDidStart(offset_in_ms:number) {
+        
+    }
+
     async scrub(offset_in_ms:number): Promise<void> {
         // only stream through to the position and rotation keyframes
+        // debounce not really 
+    }
+    async scrubberDidStop(offset_in_ms:number) {
+        
+    }
+    // public streaming events into the timeline from
+    async setScrubberPosition(offset:number) {
+        this.scrubberPosition = offset // in ms
     }
 
     // should play from the clip that is closest to the to scrubber
