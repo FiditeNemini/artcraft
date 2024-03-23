@@ -96,8 +96,6 @@ export class Timeline implements Timeline {
   toJSON(): string {
     return JSON.stringify(this);
   }
-
-
   // For testing purposes
   static generateMockJson(): string {
     const mock = {
