@@ -8,14 +8,16 @@
     "dev": "remix vite:dev",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "netlify serve",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "update:icons": "npm update @awesome.me/kit-fde2be5eb0"
   },
   "dependencies": {
+    "@awesome.me/kit-fde2be5eb0": "^1.0.7",
     "@ffmpeg/core": "0.11.0",
     "@ffmpeg/ffmpeg": "0.11.6",
     "@ffmpeg/util": "0.12.0",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
-    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/pro-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@headlessui/react": "^1.7.18",
     "@netlify/edge-functions": "^2.3.1",

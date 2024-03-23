@@ -5,7 +5,7 @@ import {
 import { Dialog, Transition } from '@headlessui/react'
 import {
   faGears,
-} from '@fortawesome/free-solid-svg-icons';
+} from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { Button } from '~/components/Button';

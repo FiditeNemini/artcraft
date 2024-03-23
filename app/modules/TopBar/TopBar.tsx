@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 
 import { Button } from '~/components/Button'
-import { faRightToBracket } from '@fortawesome/free-solid-svg-icons'
+import { faRightToBracket } from '@fortawesome/pro-solid-svg-icons'
 import { TopBarInnerContext } from '~/contexts/TopBarInner';
 
 export const TopBar = () => {

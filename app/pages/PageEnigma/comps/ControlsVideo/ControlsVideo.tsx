@@ -4,7 +4,7 @@ import {
   faForwardFast,
   faForwardStep,
   faPlay,
-} from '@fortawesome/free-solid-svg-icons';
+} from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export const ControlsVideo = ()=>{
