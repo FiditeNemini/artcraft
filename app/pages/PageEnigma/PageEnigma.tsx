@@ -17,6 +17,7 @@ import {
 import { ButtonDialogue } from '~/modules/ButtonDialogue';
 import { TopBarHelmet } from '~/modules/TopBarHelmet/TopBarHelmet';
 import { SidePanel } from '~/modules/SidePanel';
+import { Tabs } from '~/modules/Tabs';
 import { Controls3D } from './comps/Controls3D';
 import { ControlsVideo } from './comps/ControlsVideo';
 import { Timeline } from './comps/Timeline';
@@ -54,15 +55,7 @@ export const PageEnigma = () => {
   const handleButtonSave = ()=>{
     editorRef.current?.save();
   }
-  const handleButtonLoad = ()=>{
-    document.getElementById("load-upload")?.click();
-  }
-  const handleButtonRender = ()=>{
-    editorRef.current?.togglePlayback();
-  }
-  const handleButtonPlay = ()=>{
 
-  }
 
   return(
     <div>
@@ -105,11 +98,23 @@ export const PageEnigma = () => {
         </div>
       </div>
       <SidePanel>
-        <Button onClick={handleButtonLoad}>Load</Button>
-        <Button onClick={handleButtonRender}>Render</Button>
-        <Button onClick={handleButtonPlay}>Play</Button>
+        <Tabs tabs={[
+          {
+            header: 'Animation',
+            children: <p>Animation Tab</p>
+          },{
+            header: 'Camera',
+            children: <p>Camera Tab</p>
+          },{
+            header: 'Audio',
+            children: <p>Audio Tab</p>
+          },{
+            header: 'Styling',
+            children: <p>Styling Tab</p>
+          }
+        ]}/>
       </SidePanel>
-      <Timeline />
+      <Timeline editorCurrent={editorRef.current}/>
     </div>
   );
 }
