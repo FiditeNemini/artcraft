@@ -14,6 +14,8 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
+import AudioEngine from './audio_engine.ts';
+
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
         const CCapture = module.CCapture;
@@ -28,7 +30,6 @@ class Editor {
 
     // Default params.
     constructor() {
-
         // For making sure the editor only gets created onece.
         this.can_initailize = false;
         let one_element = document.getElementById("created-one-element");
@@ -36,10 +37,8 @@ class Editor {
         let newElement = document.createElement("div");
         newElement.id = "created-one-element";
         document.body.appendChild(newElement);
-
         // Version and name.
         this.version = "v0.1";
-
         // Clock, scene and camera essentials.
         this.activeScene = null;
         this.camera = null;
@@ -55,7 +54,6 @@ class Editor {
         this.bloomPass;
         this.smaaPass;
         this.bokehPass;
-
         // Transform control and selection.
         this.control = null;
         this.raycaster = null;
@@ -64,41 +62,35 @@ class Editor {
         this.last_selected = null;
         this.transform_interaction;
         this.rendering = false;
-
         // API.
         this.api_manager = new MediaUploadManager();
-
         // Debug & Movement.
         this.stats = null;
         this.orbit = null;
         this.locked = false;
-
         // Recording params.
         this.capturer = null;
         this.frame_buffer = [];
         this.render_timer = 0;
         this.fps_number = 60;
         this.cap_fps = 60;
-
         // Timeline settings.
         this.playback = false;
         this.playback_location = 0;
         this.max_length = 10;
         this.timeline = null;
-
         // Save & Load.
         this.save_manager = new SaveManager(this.version);
+        // Audio Engine Test.
 
-        console.log("Created Editor.");
+        this.audio_engine = new AudioEngine();
     }
 
     // Initializes the main scene and ThreeJS essentials.
     initialize() {
         //if (this.can_initailize == false) { return; }
-
         // Gets the canvas.
         this.canvReference = document.getElementById("video-scene");
-
         // Base width and height.
         let width = this.canvReference.width;
         let height = this.canvReference.height;
@@ -126,10 +118,8 @@ class Editor {
         // OnClick and MouseMove events.
         window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
         window.addEventListener('click', this.onMouseClick.bind(this), false);
-
         // Base control and debug stuff remove debug in prod.
         this._initialize_control();
-
         // Resets canvas size.
         this.onWindowResize();
         // Creates the main update loop.
