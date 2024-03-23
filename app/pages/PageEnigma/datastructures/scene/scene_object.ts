@@ -96,4 +96,28 @@ export class Timeline implements Timeline {
   toJSON(): string {
     return JSON.stringify(this);
   }
+
+
+  // For testing purposes
+  static generateMockJson(): string {
+    const mock = {
+      version: 1,
+      last_scrubber_position: 5000,
+      audio_track_clips: [
+        { version: 1, uuid: 0, media_id: 1, type: "audio", volume: 100 }
+      ],
+      transform_track_clips: [
+        { version: 1, uuid: 1, media_id: 2, type: "transform", position: [{ x: 0, y: 0, z: 0 }], rotation: [{ x: 0, y: 0, z: 0 }], scale: [{ x: 1, y: 1, z: 1 }] }
+      ],
+      animation_track_clips: [
+        { version: 1, uuid: 2, media_id: 3, type: "animation", speed: 1.0, length: 100, starting_offset: 0, clip_name: "some clip name" }
+      ],
+      entities: [
+        { object_uuid: 0, clip_offsets: [] } // Assuming more details would be filled as necessary
+      ],
+      globalAudio: { clip_offsets: [] }, // Assuming more details would be filled as necessary
+      camera: { clip_offsets: [] } // Assuming more details would be filled as necessary
+    };
+    return JSON.stringify(mock);
+  }
 }
