@@ -1,9 +1,6 @@
-import {
-  useContext,
-  useLayoutEffect,
-} from "react";
+
 import type { MetaFunction } from "@remix-run/deno";
-import { TopBarInnerContext } from "~/contexts/TopBarInner";
+import { TopBarHelmet } from "~/modules/TopBarHelmet";
 
 import sonic from "./_assets/sonic-the-hedgehog-classic-sonic.gif";
 
@@ -15,14 +12,9 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-  const { setTopBarInner } = useContext(TopBarInnerContext) || {};
-  useLayoutEffect(()=>{
-    if(setTopBarInner){
-      setTopBarInner(null);
-    }
-  },[setTopBarInner]);
   return (
     <div className="size-full">
+      <TopBarHelmet>{null}</TopBarHelmet>
       <img
         alt="sonic"
         src={sonic}

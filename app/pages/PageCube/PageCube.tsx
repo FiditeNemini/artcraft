@@ -2,7 +2,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -13,15 +12,13 @@ import {
 
 import { Button } from '~/components/Button';
 import { ButtonLink } from '~/components/ButtonLink';
-import { TopBarInnerContext } from "~/contexts/TopBarInner";
+import { TopBarHelmet } from '~/modules/TopBarHelmet';
 
 import { SidePanel } from '~/modules/SidePanel';
-
 import { SceneWithCube } from './SceneWithCube';
 
 export const PageCube = () => {
   
-  const { setTopBarInner } = useContext(TopBarInnerContext) || {};
 
   const mountRef = useRef<HTMLDivElement | null>(null);
   const sceneRef = useRef<SceneWithCube | null>(null);
@@ -63,9 +60,9 @@ export const PageCube = () => {
     };
   }, []);
 
-  useLayoutEffect(()=>{
-    if(setTopBarInner){
-      const BackButton = (
+  return (
+    <div className="grid grid-cols-12 gap-2	">
+      <TopBarHelmet>
         <ButtonLink
           to={"/"}
           variant='secondary'
@@ -73,13 +70,7 @@ export const PageCube = () => {
         >
           Back to Dashboard
         </ButtonLink>
-      );
-      setTopBarInner(BackButton);
-    }
-  },[setTopBarInner]);
-
-  return (
-    <div className="grid grid-cols-12 gap-2	">
+      </TopBarHelmet>
       <div className="col-span-6	">
         <div className="MountingPoint" ref={mountRef} />
       </div>

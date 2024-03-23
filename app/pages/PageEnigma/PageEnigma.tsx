@@ -1,10 +1,7 @@
 import {
   useCallback,
-  useContext,
   useEffect,
-  useLayoutEffect,
   useRef,
-  // useState,
 } from 'react';
 
 import {
@@ -13,17 +10,21 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 
-import { Button } from '~/components/Button';
-import { ButtonLink } from '~/components/ButtonLink';
+import {
+  Button,
+  ButtonLink,
+} from '~/components';
 import { ButtonDialogue } from '~/modules/ButtonDialogue';
-import { TopBarInnerContext } from "~/contexts/TopBarInner";
+import { TopBarHelmet } from '~/modules/TopBarHelmet/TopBarHelmet';
 import { SidePanel } from '~/modules/SidePanel';
-import { LowerPanel } from '~/modules/LowerPanel';
+import { Controls3D } from './comps/Controls3D';
+import { ControlsVideo } from './comps/ControlsVideo';
+import { Timeline } from './comps/Timeline';
 
 import Editor from './js/editor';
 
 export const PageEnigma = () => {
-  const { setTopBarInner } = useContext(TopBarInnerContext) || {};
+  // const { setTopBarInner } = useContext(TopBarInnerContext) || {};
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const editorRef = useRef<Editor | null>(null);
@@ -50,29 +51,6 @@ export const PageEnigma = () => {
     }
   }, []);
 
-  useLayoutEffect(()=>{
-    if(setTopBarInner){
-      const TopBarInnerButtons = (
-        <div className="flex grow justify-between">
-          <ButtonLink
-            to={"/"}
-            variant='secondary'
-            icon={faChevronLeft}
-          >
-            Back to Dashboard
-          </ButtonLink>
-          <Button
-            icon={faWandSparkles}
-          >
-              Generate Movie
-          </Button>
-          <span className="w-8"/>
-        </div>
-      );
-      setTopBarInner(TopBarInnerButtons);
-    }
-  },[setTopBarInner]);
-
   const handleButtonSave = ()=>{
     editorRef.current?.save();
   }
@@ -88,6 +66,23 @@ export const PageEnigma = () => {
 
   return(
     <div>
+      <TopBarHelmet>
+        <div className="flex grow justify-between">
+            <ButtonLink
+              to={"/"}
+              variant='secondary'
+              icon={faChevronLeft}
+            >
+              Back to Dashboard
+            </ButtonLink>
+            <Button
+              icon={faWandSparkles}
+            >
+                Generate Movie
+            </Button>
+            <span className="w-8"/>
+          </div>
+      </TopBarHelmet>
       <canvas ref={canvasRef} id="video-scene" width="1280px" height="720px" />
       <div className='fixed top-20 left-4'>
         <div className="flex mt-2 gap-2">
@@ -105,6 +100,8 @@ export const PageEnigma = () => {
             <p>Ask Miles about ThreeJS</p>
             <p>Ask Wil about React</p>
           </ButtonDialogue>
+          <Controls3D/>
+          <ControlsVideo/>
         </div>
       </div>
       <SidePanel>
@@ -112,10 +109,7 @@ export const PageEnigma = () => {
         <Button onClick={handleButtonRender}>Render</Button>
         <Button onClick={handleButtonPlay}>Play</Button>
       </SidePanel>
-      <LowerPanel>
-        <div className='h-10 w-full border-b border-ui-panel-border'></div>
-        <input style={{ display: 'none' }} type="file" id="load-upload" name="load-upload"></input>
-      </LowerPanel>
+      <Timeline />
     </div>
   );
 }
