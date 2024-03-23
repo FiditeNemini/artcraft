@@ -10,12 +10,16 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 
-import { Button } from '~/components/Button';
-import { ButtonLink } from '~/components/ButtonLink';
+import {
+  Button,
+  ButtonLink,
+} from '~/components';
 import { ButtonDialogue } from '~/modules/ButtonDialogue';
 import { TopBarHelmet } from '~/modules/TopBarHelmet/TopBarHelmet';
 import { SidePanel } from '~/modules/SidePanel';
-import { LowerPanel } from '~/modules/LowerPanel';
+import { Controls3D } from './comps/Controls3D';
+import { ControlsVideo } from './comps/ControlsVideo';
+import { Timeline } from './comps/Timeline';
 
 import Editor from './js/editor';
 
@@ -96,6 +100,8 @@ export const PageEnigma = () => {
             <p>Ask Miles about ThreeJS</p>
             <p>Ask Wil about React</p>
           </ButtonDialogue>
+          <Controls3D/>
+          <ControlsVideo/>
         </div>
       </div>
       <SidePanel>
@@ -103,10 +109,7 @@ export const PageEnigma = () => {
         <Button onClick={handleButtonRender}>Render</Button>
         <Button onClick={handleButtonPlay}>Play</Button>
       </SidePanel>
-      <LowerPanel>
-        <div className='h-10 w-full border-b border-ui-panel-border'></div>
-        <input style={{ display: 'none' }} type="file" id="load-upload" name="load-upload"></input>
-      </LowerPanel>
+      <Timeline />
     </div>
   );
 }

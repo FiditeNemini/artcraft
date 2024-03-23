@@ -1,0 +1,1 @@
+export { ControlsVideo } from './ControlsVideo';
