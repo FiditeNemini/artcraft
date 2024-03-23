@@ -7,7 +7,7 @@ import { Dialog } from '@headlessui/react'
 
 import {
   faXmark,
-} from '@-solid-svg-icons';
+} from '@fortawesome/pro-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { TOP_BAR_HEIGHT } from '~/constants';
