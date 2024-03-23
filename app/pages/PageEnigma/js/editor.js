@@ -124,7 +124,8 @@ class Editor {
         this.onWindowResize();
         // Creates the main update loop.
         this.renderer.setAnimationLoop(this.update_loop.bind(this));
-        this.audio_engine.loadClip("m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg");
+        
+        
     }
 
     // Configure post processing.
