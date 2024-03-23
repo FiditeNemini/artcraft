@@ -4,8 +4,11 @@ import { ClipOffset } from "../datastructures/clips/clip_offset"
 // Every object uuid / entity has a track.
 export class TimelineCurrentReactState {
     isEditable:boolean
+    selectedObjectID:number
+    
     constructor() {
         this.isEditable = true // can add clips to it
+        this.selectedObjectID = 0
     }
 }
 
@@ -37,8 +40,17 @@ export class TimeLine {
     async deleteClip(clip_uuid: string): Promise<void> {
 
     }
+
     // this will update the state of the clips based off uuid
     async modifyClip(clip_uuid: string, updates: AnyJson): Promise<void> {
+
+    }
+    
+    async clipDidEnterDropZone() {
+
+    }
+    
+    async clipDidExitDropZone() {
 
     }
 
