@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { Tab } from '@headlessui/react'
 
-function classNames(...classes:string[]) {
-  return classes.filter(Boolean).join(' ')
-}
+import { joinClassNames } from '~/helpers';
+
 export type Tab = {
   header: string;
   children: JSX.Element;
@@ -24,7 +23,7 @@ export const Tabs = ({
             <Tab
               key={idx}
               className={({ selected }) =>
-                classNames(
+                joinClassNames(
                   'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
                   'ring-white/60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
                   selected
@@ -41,7 +40,7 @@ export const Tabs = ({
           {tabs.map((tab, idx) => (
             <Tab.Panel
               key={idx}
-              className={classNames(
+              className={joinClassNames(
                 'rounded-xl bg-white p-3',
                 'ring-white/60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2'
               )}
