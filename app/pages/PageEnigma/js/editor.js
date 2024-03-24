@@ -90,7 +90,7 @@ class Editor {
 
         this.audio_engine = new AudioEngine();
         this.transform_engine = new TransformEngine();
-        this.timeline = new TimeLine(this.audio_engine, this.transform_engine);
+        this.timeline = new TimeLine(this.audio_engine, this.transform_engine, this.activeScene);
 
         this.test_box_uuid = null;
         this.current_frame = 0;
@@ -137,10 +137,11 @@ class Editor {
         this.renderer.setAnimationLoop(this.update_loop.bind(this));
         this.test_playback = false;
 
-        this.test_box_uuid = this.activeScene.instantiate("Box");
+        this.timeline.scene = this.activeScene;
 
+        this.test_box_uuid = this.activeScene.instantiate("Box");
         let object = this.transform_engine.loadObject(this.test_box_uuid);
-        this.timeline.addPlayableClip(new ClipOffset(1.0, "transform", object.object_uuid, object.media_id, 0, 0));
+        this.timeline.addPlayableClip(new ClipOffset(1.0, "transform", object.object_uuid, object.media_id, 0, 200));
     }
 
     // Configure post processing.

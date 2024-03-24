@@ -132,14 +132,16 @@ export class TimeLine {
         //2. allow stopping.
         //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
         for (const element of this.timelineItems) {
-            if (element.start_offset >= this.scrubberPosition) {
+            if (element.start_offset <= this.scrubberPosition && this.scrubberPosition <= element.ending_offset) {
                 // run async
                 // element.play()
                 // remove the element from the list
                 if (element.type == "transform") {
                     let object = this.scene.get_object_by_uuid(element.object_uuid);
+                    console.log(object);
                     if(object)
                     {
+                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset-element.start_offset)/60;
                         this.transformEngine.clips[element.object_uuid].step(object);
                     }
                 }
@@ -152,11 +154,11 @@ export class TimeLine {
                     this.stop()
                     throw "Error New Type of element in the timeline"
                 }
-                this.timelineItems = this.timelineItems.filter(item => item !== element)
+                //this.timelineItems = this.timelineItems.filter(item => item !== element)
             }
             
             // find the offset of the longest clip and play until that clip is done
-            if (this.scrubberPosition == this.timeLineLimit) { // stops at where clips should // cannot throw clip
+            if (this.scrubberPosition >= this.timeLineLimit) { // stops at where clips should // cannot throw clip
                 this.stop()
             }
         }
