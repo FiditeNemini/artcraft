@@ -11,12 +11,17 @@ export class AnimationEngine {
         this.length = length;
     }
 
-    load_clip(media_id: string, object_uuid: string, clip_name: string) {
-        this.clips[media_id] = new AnimationTrackClip(this.version, media_id, "glb", object_uuid, 1.0, 1.0, clip_name)
+    load_object(object_uuid: string, clip_name: string) {
+        this.clips[object_uuid] = new AnimationTrackClip(
+            this.version,
+            "glb", 
+            object_uuid, 
+            1.0, 1.0, 
+            clip_name);
     }
 
     play(media_id: string) {
-
+        this.clips[object_uuid].play(media_id);
     }
 
     stop(media_id: string) {

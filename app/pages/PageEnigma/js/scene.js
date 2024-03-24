@@ -1,9 +1,5 @@
 import * as THREE from 'three';
-
-import { FBXLoader } from 'three/addons/loaders/FBXLoader';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import TransformObject from './components.js';
-import AnimatedItem from './animated_item.js';
 
 class Scene {
     constructor(name) {
@@ -112,41 +108,6 @@ class Scene {
             }
         },
             (xhr) => {
-            },
-            (error) => {
-                console.log(error)
-            });
-    }
-
-    load_fbx(filepath, object_name = null, callback = null) {
-        let fbxLoader = new FBXLoader();
-        fbxLoader.load(filepath, (fbx) => {
-            fbx.traverse(c => {
-                c.castShadow = true;
-                c.receiveShadow = true;
-                if (c.isMesh) {
-                    c.material.transparent = false;
-                }
-            });
-            if (object_name == null) {
-                fbx.name = filepath;
-            } else {
-                fbx.name = object_name;
-            }
-            fbx.type = "Mesh";
-            this.scene.add(fbx);
-
-            if (callback != null) {
-                callback();
-            }
-        },
-            (xhr) => {
-                let loading_div = document.getElementById("loading-div");
-                if (xhr.loaded / xhr.total < 1) {
-                    loading_div.style.display = "block";
-                } else {
-                    loading_div.style.display = "none";
-                }
             },
             (error) => {
                 console.log(error)
