@@ -1,6 +1,7 @@
 //! This service is meant to help with debugging.
 
 use std::sync::Arc;
+
 use actix_http::body::MessageBody;
 use actix_service::ServiceFactory;
 use actix_web::{App, Error, HttpServer, web};
@@ -13,7 +14,9 @@ use actix_helpers::route_builder::RouteBuilder;
 use errors::AnyhowResult;
 
 use crate::endpoints::dummy_health_check_handler::dummy_health_check_handler;
-use crate::endpoints::simple_handler::simple_handler;
+use crate::endpoints::dummy_queue_stats_handler::dummy_queue_stats_handler;
+use crate::endpoints::root_handler::root_handler;
+use crate::endpoints::simple_pushback_handler::simple_pushback_handler;
 use crate::endpoints::status_alert_handler::status_alert_handler;
 use crate::env_args::env_args;
 use crate::server_state::ServerState;
@@ -29,21 +32,19 @@ pub const DEFAULT_RUST_LOG: &str = concat!(
   "http_server_common::request::get_request_ip=info," // Debug spams Rust logs
 );
 
+pub const LOG_FORMAT : &str =
+  "[dummy-service] [%{HOSTNAME}e] %{X-Forwarded-For}i \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
+
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {
   easyenv::init_all_with_default_logging(Some(DEFAULT_RUST_LOG));
 
   //let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
-  let log_format = "[dummy-service] [%{HOSTNAME}e] %{X-Forwarded-For}i \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
 
   let env_args = env_args()?;
 
-  let server_hostname = hostname::get()
-      .ok()
-      .and_then(|h| h.into_string().ok())
-      .unwrap_or("hostname-unknown".to_string());
-
   let server_state = ServerState::build(&env_args);
+  let server_hostname = server_state.hostname.clone();
 
   // NB(bt,2024-03-24): This type is supposed to be deprecated.
   let old_server_environment = env_args.server_environment.clone();
@@ -55,7 +56,7 @@ async fn main() -> AnyhowResult<()> {
       let app = App::new()
           .app_data(Data::new(Arc::new(server_state.clone())))
           .wrap(build_cors_config(old_server_environment))
-          .wrap(Logger::new(&log_format))
+          .wrap(Logger::new(LOG_FORMAT))
           .wrap(DefaultHeaders::new()
               .add(("X-Backend-Hostname", server_hostname.as_str())))
           .wrap(Compress::default());
@@ -71,7 +72,7 @@ async fn main() -> AnyhowResult<()> {
       let app = App::new()
           .app_data(Data::new(Arc::new(server_state.clone())))
           .wrap(build_cors_config(old_server_environment))
-          .wrap(Logger::new(&log_format))
+          .wrap(Logger::new(LOG_FORMAT))
           .wrap(DefaultHeaders::new()
               .add(("X-Backend-Hostname", server_hostname.as_str())));
 
@@ -98,9 +99,10 @@ fn build_routes<T, B> (app: App<T>) -> App<T>
       >,
 {
   RouteBuilder::from_app(app)
-      .add_get("/", simple_handler)
+      .add_get("/", root_handler)
       .add_get("/_status", dummy_health_check_handler)
+      .add_get("/v1/stats/queues", dummy_queue_stats_handler)
       .add_get("/v1/status_alert_check", status_alert_handler)
       .into_app()
-      .default_service(web::route().to(simple_handler))
+      .default_service(web::route().to(simple_pushback_handler))
 }
