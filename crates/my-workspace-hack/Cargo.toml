@@ -23,6 +23,7 @@ block-buffer = { version = "0.9.0", default-features = false, features = ["block
 bytemuck = { version = "1.14.0", default-features = false, features = ["extern_crate_alloc"] }
 byteorder = { version = "1.5.0" }
 chrono = { version = "0.4.31", features = ["alloc", "serde"] }
+clap = { version = "4.4.8", features = ["derive"] }
 combine = { version = "4.6.6", default-features = false, features = ["std", "tokio"] }
 crossbeam-utils = { version = "0.8.16" }
 deranged = { version = "0.3.9", default-features = false, features = ["powerfmt", "serde", "std"] }
@@ -36,14 +37,17 @@ futures-core = { version = "0.3.29" }
 futures-executor = { version = "0.3.29", features = ["thread-pool"] }
 futures-io = { version = "0.3.29" }
 futures-sink = { version = "0.3.29" }
+futures-task = { version = "0.3.29", default-features = false, features = ["std"] }
 futures-util = { version = "0.3.29", features = ["channel", "io", "sink"] }
 generic-array = { version = "0.14.7", default-features = false, features = ["more_lengths"] }
 getrandom-6f8ce4dd05d13bba = { package = "getrandom", version = "0.2.11", default-features = false, features = ["std"] }
 getrandom-c65f7effa3be6d31 = { package = "getrandom", version = "0.1.16", default-features = false, features = ["std"] }
-hashbrown = { version = "0.14.2", features = ["raw"] }
+hashbrown-582f2526e08bb6a0 = { package = "hashbrown", version = "0.14.2", features = ["raw"] }
+hashbrown-5ef9efb8ec2df382 = { package = "hashbrown", version = "0.12.3", features = ["raw"] }
 hmac = { version = "0.12.1", default-features = false, features = ["reset"] }
-hyper = { version = "0.14.27", features = ["client", "http1", "http2", "runtime", "server"] }
-indexmap = { version = "2.1.0", features = ["serde"] }
+hyper = { version = "0.14.27", features = ["full"] }
+indexmap = { version = "2.2.3", features = ["serde"] }
+itertools = { version = "0.10.5" }
 lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
 libc = { version = "0.2.150", features = ["extra_traits"] }
 log = { version = "0.4.20", default-features = false, features = ["std"] }
@@ -51,18 +55,23 @@ memchr = { version = "2.6.4", features = ["use_std"] }
 miniz_oxide = { version = "0.7.1", features = ["simd"] }
 mio = { version = "0.8.9", features = ["net", "os-ext"] }
 native-tls = { version = "0.2.11", default-features = false, features = ["vendored"] }
-num-integer = { version = "0.1.45", features = ["i128"] }
-num-iter = { version = "0.1.43" }
+num-bigint = { version = "0.4.4" }
+num-integer = { version = "0.1.45", default-features = false, features = ["i128", "std"] }
+num-iter = { version = "0.1.43", default-features = false, features = ["i128", "std"] }
+num-rational = { version = "0.4.1", features = ["serde"] }
 num-traits = { version = "0.2.17", features = ["i128", "libm"] }
 once_cell = { version = "1.18.0", features = ["unstable"] }
+proc-macro2 = { version = "1.0.78", features = ["span-locations"] }
+pulldown-cmark = { version = "0.9.3" }
+quote = { version = "1.0.35" }
 rand = { version = "0.8.5", features = ["small_rng"] }
 rand_core = { version = "0.6.4", default-features = false, features = ["std"] }
 regex = { version = "1.10.2" }
 regex-automata = { version = "0.4.3", default-features = false, features = ["dfa-onepass", "hybrid", "meta", "nfa-backtrack", "perf-inline", "perf-literal", "unicode"] }
 regex-syntax = { version = "0.8.2" }
-reqwest = { version = "0.11.22", features = ["gzip", "json", "native-tls", "stream"] }
-serde = { version = "1.0.193", features = ["alloc", "derive", "rc"] }
-serde_json = { version = "1.0.108", features = ["raw_value"] }
+reqwest = { version = "0.11.24", features = ["blocking", "gzip", "json", "native-tls", "stream"] }
+serde = { version = "1.0.196", features = ["alloc", "derive", "rc"] }
+serde_json = { version = "1.0.113", features = ["preserve_order", "raw_value"] }
 sha1 = { version = "0.10.6" }
 sha2 = { version = "0.10.8" }
 simd-adler32 = { version = "0.3.7" }
@@ -71,6 +80,7 @@ sqlx = { version = "0.7.3", features = ["chrono", "mysql", "runtime-tokio-native
 sqlx-core = { version = "0.7.3", features = ["_rt-tokio", "_tls-native-tls", "_tls-rustls", "any", "chrono", "json", "migrate", "offline"] }
 sqlx-mysql = { version = "0.7.3", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
 sqlx-sqlite = { version = "0.7.3", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
+syn-f595c2ba2a3f28df = { package = "syn", version = "2.0.49", features = ["extra-traits", "fold", "full", "visit", "visit-mut"] }
 time = { version = "0.3.30", features = ["macros", "serde-well-known"] }
 tokio = { version = "1.34.0", features = ["full"] }
 tokio-stream = { version = "0.1.14", features = ["fs"] }
@@ -92,7 +102,7 @@ cc = { version = "1.0.83", default-features = false, features = ["parallel"] }
 chrono = { version = "0.4.31", features = ["alloc", "serde"] }
 crossbeam-utils = { version = "0.8.16" }
 deranged = { version = "0.3.9", default-features = false, features = ["powerfmt", "serde", "std"] }
-derive_more = { version = "0.99.17" }
+derive_more = { version = "0.99.17", features = ["nightly"] }
 digest = { version = "0.10.7", features = ["mac", "oid", "std"] }
 either = { version = "1.9.0", features = ["serde"] }
 flate2 = { version = "1.0.28" }
@@ -102,13 +112,15 @@ futures-core = { version = "0.3.29" }
 futures-executor = { version = "0.3.29", features = ["thread-pool"] }
 futures-io = { version = "0.3.29" }
 futures-sink = { version = "0.3.29" }
+futures-task = { version = "0.3.29", default-features = false, features = ["std"] }
 futures-util = { version = "0.3.29", features = ["channel", "io", "sink"] }
 generic-array = { version = "0.14.7", default-features = false, features = ["more_lengths"] }
 getrandom-6f8ce4dd05d13bba = { package = "getrandom", version = "0.2.11", default-features = false, features = ["std"] }
-hashbrown = { version = "0.14.2", features = ["raw"] }
+hashbrown-582f2526e08bb6a0 = { package = "hashbrown", version = "0.14.2", features = ["raw"] }
 heck = { version = "0.4.1", features = ["unicode"] }
 hmac = { version = "0.12.1", default-features = false, features = ["reset"] }
-indexmap = { version = "2.1.0", features = ["serde"] }
+indexmap = { version = "2.2.3", features = ["serde"] }
+itertools = { version = "0.10.5" }
 lazy_static = { version = "1.4.0", default-features = false, features = ["spin_no_std"] }
 libc = { version = "0.2.150", features = ["extra_traits"] }
 log = { version = "0.4.20", default-features = false, features = ["std"] }
@@ -116,17 +128,19 @@ memchr = { version = "2.6.4", features = ["use_std"] }
 miniz_oxide = { version = "0.7.1", features = ["simd"] }
 mio = { version = "0.8.9", features = ["net", "os-ext"] }
 native-tls = { version = "0.2.11", default-features = false, features = ["vendored"] }
-num-integer = { version = "0.1.45", features = ["i128"] }
-num-iter = { version = "0.1.43" }
+num-integer = { version = "0.1.45", default-features = false, features = ["i128", "std"] }
+num-iter = { version = "0.1.43", default-features = false, features = ["i128", "std"] }
 num-traits = { version = "0.2.17", features = ["i128", "libm"] }
 once_cell = { version = "1.18.0", features = ["unstable"] }
+proc-macro2 = { version = "1.0.78", features = ["span-locations"] }
+quote = { version = "1.0.35" }
 rand = { version = "0.8.5", features = ["small_rng"] }
 rand_core = { version = "0.6.4", default-features = false, features = ["std"] }
 regex = { version = "1.10.2" }
 regex-automata = { version = "0.4.3", default-features = false, features = ["dfa-onepass", "hybrid", "meta", "nfa-backtrack", "perf-inline", "perf-literal", "unicode"] }
 regex-syntax = { version = "0.8.2" }
-serde = { version = "1.0.193", features = ["alloc", "derive", "rc"] }
-serde_json = { version = "1.0.108", features = ["raw_value"] }
+serde = { version = "1.0.196", features = ["alloc", "derive", "rc"] }
+serde_json = { version = "1.0.113", features = ["preserve_order", "raw_value"] }
 sha1 = { version = "0.10.6" }
 sha2 = { version = "0.10.8" }
 simd-adler32 = { version = "0.3.7" }
@@ -136,7 +150,7 @@ sqlx-macros-core = { version = "0.7.3", features = ["_rt-tokio", "_tls-native-tl
 sqlx-mysql = { version = "0.7.3", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
 sqlx-sqlite = { version = "0.7.3", default-features = false, features = ["any", "chrono", "json", "migrate", "offline"] }
 syn-dff4ba8e3ae991db = { package = "syn", version = "1.0.109", features = ["extra-traits", "fold", "full", "visit-mut"] }
-syn-f595c2ba2a3f28df = { package = "syn", version = "2.0.39", features = ["extra-traits", "fold", "full", "visit", "visit-mut"] }
+syn-f595c2ba2a3f28df = { package = "syn", version = "2.0.49", features = ["extra-traits", "fold", "full", "visit", "visit-mut"] }
 time = { version = "0.3.30", features = ["macros", "serde-well-known"] }
 time-macros = { version = "0.2.15", default-features = false, features = ["formatting", "parsing", "serde"] }
 tokio = { version = "1.34.0", features = ["full"] }

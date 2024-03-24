@@ -100,5 +100,6 @@ members = [
   #"crates/vendor/newrelic-telemetry-sdk-rust", 
 
   # cargo-hakari workspace hack (compilation speedup hack)
+  # see usage: https://crates.io/crates/cargo-hakari
   "crates/my-workspace-hack",
 ]
