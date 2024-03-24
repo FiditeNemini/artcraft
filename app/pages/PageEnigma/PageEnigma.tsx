@@ -107,7 +107,7 @@ export const PageEnigma = () => {
         />
       </SidePanel>
       <TrackProvider>
-        <Timeline editorCurrent={editorRef.current} />
+        <Timeline editorCurrent={editorRef.current} time={20} />
       </TrackProvider>
     </div>
   );

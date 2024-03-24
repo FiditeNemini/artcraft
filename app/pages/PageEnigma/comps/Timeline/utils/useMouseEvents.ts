@@ -20,7 +20,9 @@ export const useMouseEvents = (
         setIsActive(type);
       }
     },
-    onPointerUp: () => {
+    onPointerUp: (event: PointerEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      event.preventDefault();
       if (isActive) {
         updateClip(clip.id, offset, length);
         setIsActive("");

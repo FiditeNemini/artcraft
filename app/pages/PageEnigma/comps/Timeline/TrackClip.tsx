@@ -22,9 +22,6 @@ export const TrackClip = ({ clip, min, max, updateClip }: Props) => {
     length,
   } = useMouseEvents(clip, max, min, updateClip);
 
-  if (clip.selected) {
-    console.log("selected", clip);
-  }
   return (
     <>
       <div
