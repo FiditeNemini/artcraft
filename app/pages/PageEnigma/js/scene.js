@@ -10,9 +10,7 @@ class Scene {
         this.name = name;
         this.gridHelper = null;
         this.scene = new THREE.Scene();
-        this.animated_items = {};
         this.activeItem = null;
-        this.animations = [];
     }
 
     initialize() {
@@ -46,37 +44,15 @@ class Scene {
         //obj.type = "Object3D";
         obj.name = name;
         this.scene.add(obj);
+        return obj.uuid;
+    }
+
+    get_object_by_uuid(uuid) {
+        return this.scene.getObjectByProperty('uuid', uuid);
     }
 
     update(delta) {
-        for (let [key, value] of Object.entries(this.animated_items)) {
-            this.animated_items[key].update(delta);
-        }
-    }
-
-    create_character(filepath) {
-        // Add check to make sure the character does not exist already HERE PLEASE!!
-
-        let animated = new AnimatedItem();
-        animated.load(filepath, this.setup_character.bind(this))
-    }
-
-    create_fresh_animated_item(uuid) {
-        // Add check to make sure the character does not exist already HERE PLEASE!!
-        let animated = new AnimatedItem(uuid);
-        this.animated_items[animated.name] = animated;
-    }
-
-    setup_character(character_uuid, children, animated) {
-        this.animated_items[character_uuid] = animated;
-        console.log(character_uuid)
-        let children_uuids = [];
-        children.forEach(child => {
-            this.scene.add(child);
-            children_uuids.push(child.uuid);
-        });
-        this.animated_items[character_uuid].load_animation("/resources/models/pose/walking.glb", this.play_anim_demo.bind(this));
-        //this.animated_items[character_name].load_animation("/resources/models/fox/fox_idle.glb", this.play_anim_demo.bind(this));
+        
     }
 
     _disable_skybox() {
