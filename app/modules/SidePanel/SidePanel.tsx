@@ -38,7 +38,7 @@ export const SidePanel = ({ title, children }: SidePanelPropsI) => {
                   leaveFrom="translate-x-0"
                   leaveTo="translate-x-full"
                 >
-                  <Dialog.Panel className="pointer-events-auto lg:max-w-full">
+                  <Dialog.Panel className="pointer-events-auto w-screen lg:max-w-md">
                     <SidePanelInner title={title} closeCallback={handleClose}>
                       {children}
                     </SidePanelInner>
