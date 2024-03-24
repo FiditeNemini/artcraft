@@ -9,9 +9,9 @@ import AnimationEngine from "./animation_engine";
 
 // Every object uuid / entity has a track.
 export class TimelineCurrentReactState {
-    isEditable:boolean
-    selectedObjectID:number
-    
+    isEditable: boolean
+    selectedObjectID: number
+
     constructor() {
         this.isEditable = true // can add clips to it
         this.selectedObjectID = 0
@@ -40,11 +40,11 @@ export class TimeLine {
 
     scene: Scene
     // ensure that the elements are loaded first.
-    constructor(audioEngine:AudioEngine, 
-                transformEngine:TransformEngine, 
-                lipsyncEngine:LipSyncEngine,
-                animationEngine:AnimationEngine, 
-                scene:Scene) {
+    constructor(audioEngine: AudioEngine,
+        transformEngine: TransformEngine,
+        lipsyncEngine: LipSyncEngine,
+        animationEngine: AnimationEngine,
+        scene: Scene) {
         this.timelineItems = []
         this.timeLineLimit = 60 * 10 // 10 seconds
         this.runningClips = []
@@ -67,7 +67,7 @@ export class TimeLine {
 
     // when given a media id item it will create the clip. 
     // Then the clip will be loaded by the engines, if they come from outside of the loaded scene.
-    async createClipOffset(media_id: string,type: string): Promise<void> {
+    async createClipOffset(media_id: string, type: string): Promise<void> {
         // use engine to load based off media id and type animation | transform |  
     }
 
@@ -84,26 +84,26 @@ export class TimeLine {
     async clipDidEnterDropZone() {
 
     }
-    
+
     async clipDidExitDropZone() {
 
     }
 
     // timeline controls this.
-    async scrubberDidStart(offset_frame:number) {
-        
+    async scrubberDidStart(offset_frame: number) {
+
     }
 
-    async scrub(offset_frame:number): Promise<void> {
+    async scrub(offset_frame: number): Promise<void> {
         // only stream through to the position and rotation keyframes
         // debounce not really 
     }
 
-    async scrubberDidStop(offset_frame:number) {
-        
+    async scrubberDidStop(offset_frame: number) {
+
     }
     // public streaming events into the timeline from
-    async setScrubberPosition(offset:number) {
+    async setScrubberPosition(offset: number) {
         this.scrubberPosition = offset // in ms
     }
 
@@ -117,13 +117,13 @@ export class TimeLine {
         for (const element of this.timelineItems) {
             if (element.type == "transform") {
                 let object = this.scene.get_object_by_uuid(element.object_uuid);
-                if(object) { this.transformEngine.clips[element.object_uuid].reset(object); }
+                if (object) { this.transformEngine.clips[element.object_uuid].reset(object); }
             }
             else if (element.type == "audio") {
                 this.audioEngine.loadClip(element.media_id);
             }
             else if (element.type == "animation") {
-            } 
+            }
             else {
                 this.stop()
                 throw "Error New Type of element in the timeline"
@@ -135,12 +135,12 @@ export class TimeLine {
     async update() {
         if (this.isPlaying == false) return; // start and stop 
 
-        if(this.scrubberPosition <= 0) {
+        if (this.scrubberPosition <= 0) {
             await this.reset_scene();
         }
 
         this.scrubberPosition += 1;
-    
+
         //2. allow stopping.
         //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
 
@@ -151,32 +151,34 @@ export class TimeLine {
                 // remove the element from the list
                 let object = this.scene.get_object_by_uuid(element.object_uuid)
                 if (element.type == "transform") {
-                    if(object)
-                    {
-                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset-element.start_offset)
+                    if (object) {
+                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset - element.start_offset)
                         this.transformEngine.clips[element.object_uuid].step(object)
                     }
                 }
-                else if (element.type == "audio") { 
+                else if (element.type == "audio") {
                     // global audio track
                     this.audioEngine.playClip(element.media_id)
-                }   
-                else if (element.type == "lipsync") {
-                    // I think you just get the object verify it is a character ? then play the clip, but ... it needs 
-                    // need character face 
-                    this.lipSyncEngine.step()
                 }
-         
+                else if (element.type == "lipsync") {
+                    let face_object = this.scene.get_object_by_uuid(element.object_uuid);
+                    if (face_object) { 
+                        this.lipSyncEngine.clips[element.object_uuid].play(face_object);
+                        this.lipSyncEngine.clips[element.object_uuid].step();
+                    }
+                }
+
                 else if (element.type == "animation") {
-                    // use the media id to figure out which animation clip belongs to who 
-                } 
+                    let object = this.scene.get_object_by_uuid(element.object_uuid);
+                    if (object) { this.animationEngine.play(object); }
+                }
                 else {
                     this.stop()
                     throw "Error New Type of element in the timeline"
                 }
                 //this.timelineItems = this.timelineItems.filter(item => item !== element)
             }
-            
+
             // find the offset of the longest clip and play until that clip is done
             if (this.scrubberPosition >= this.timeLineLimit) { // stops at where clips should // cannot throw clip
                 this.stop()

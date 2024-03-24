@@ -1,3 +1,5 @@
+import { LipSync } from "../../js/lipsync";
+import * as THREE from 'three';
 interface AudioData {
     audioContext: AudioContext;
     audioBuffer: AudioBuffer;
@@ -27,6 +29,7 @@ interface AudioData {
     type: "lipsync" = "lipsync";
     volume: number;
     audio_data: AudioData | undefined;
+    lipsync: LipSync;
   
     constructor(version: number, media_id: string, volume: number) {
       this.version = version;
@@ -36,6 +39,9 @@ interface AudioData {
       this.download_audio().then(data => {
         this.audio_data = data;
       });
+
+      // we might need 3 of these one for each character ...
+      this.lipsync = new LipSync()
     }
     
     // lip sync will be generated through TTS 
@@ -58,6 +64,27 @@ interface AudioData {
       const arrayBuffer = await response.arrayBuffer();
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
       return new AudioData(audioContext, audioBuffer);
+    }
+
+    play(face: THREE.Object3D) {
+      if (this.audio_data?.audioBuffer == null) { this.download_audio(); }
+      this.lipsync = new LipSync()
+      this.lipsync.face = face;
+      this.lipsync.startLipSyncFromAudioBuffer(this.audio_data?.audioBuffer);
+    }
+
+    stop() {
+      if(this.lipsync == null) { return; }
+      this.lipsync.destroy();
+    }
+
+    step() {
+      if(this.lipsync == null) { return; }
+      this.lipsync.update();
+    }
+
+    reset() {
+      this.lipsync = new LipSync()
     }
   
     toJSON(): string {
