@@ -13,7 +13,8 @@ class TransformEngine {
     }
 
     loadObject(object_uuid: string, clip_length:number = 2) {
-        this.clips[object_uuid] = new TransformTrackClip(this.version, object_uuid, clip_length);
+        this.clips[object_uuid] = new TransformTrackClip(this.version, object_uuid, clip_length, object_uuid); // replace the last object_uuid with the media ID when its ready.
+        return this.clips[object_uuid]
     }
 
     addFrame(object: THREE.Object3D, clip_length:number = 2) {

@@ -1,6 +1,9 @@
 import { AnyJson } from "three/examples/jsm/nodes/core/constants.js"
 import { ClipOffset } from "../datastructures/clips/clip_offset"
 import AudioEngine from "./audio_engine"
+import TransformEngine from "./transform_engine"
+import Scene from "./scene.js"
+import * as THREE from 'three';
 
 // Every object uuid / entity has a track.
 export class TimelineCurrentReactState {
@@ -25,20 +28,24 @@ export class TimeLine {
     timelineState: TimelineCurrentReactState
 
     audioEngine: AudioEngine
+    transformEngine: TransformEngine
     // animation engine
     // lip sync engine
-    // transform engine
+
+    scene: Scene
     
-    constructor(audioEngine:AudioEngine) {
+    constructor(audioEngine:AudioEngine, transformEngine:TransformEngine, scene:Scene) {
         this.timelineItems = []
-        this.timeLineLimit = 1000 * 10 // 10 seconds
+        this.timeLineLimit = 60 * 5 // 10 seconds
         this.runningClips = []
         this.isPlaying = false
-        this.scrubberPosition = 0 // in ms into the tl
+        this.scrubberPosition = 0 // in frames into the tl
         this.timelineState = new TimelineCurrentReactState()
 
         // this will be used to play the audio clips
         this.audioEngine = audioEngine
+        this.transformEngine = transformEngine
+        this.scene = scene;
     }
 
     async addPlayableClip(clip: ClipOffset): Promise<void> {
@@ -118,6 +125,9 @@ export class TimeLine {
     // called by the editor update loop on each frame
     async update() {
         if (this.isPlaying == false) return; // start and stop 
+
+        this.scrubberPosition += 1;
+        console.log(this.scrubberPosition);
     
         //2. allow stopping.
         //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
@@ -127,7 +137,11 @@ export class TimeLine {
                 // element.play()
                 // remove the element from the list
                 if (element.type == "transform") {
-                    
+                    let object = this.scene.get_object_by_uuid(element.object_uuid);
+                    if(object)
+                    {
+                        this.transformEngine.clips[element.object_uuid].step(object);
+                    }
                 }
                 else if (element.type == "audio") {
 
@@ -155,32 +169,32 @@ export class TimeLine {
 }
 
 // How much timeline precision we have
-const percision = 100 // using a fake update loop mock
-
-class AudioEngineMock {
-    async play(media_id:string) {
-        console.log("Audio Playing {media_id}")
-    }
-}
-
-// Visual verification tests.
-function CheckIfBasicAudioClipWorks() {
-    const timeline = new TimeLine()
-    timeline.addPlayableClip(new ClipOffset(1.0,'audio',1,0))
-    timeline.play()
-}
-
-function CheckIfBasicTransformClipWorks() {
-    const timeline = new TimeLine()
-    timeline.addPlayableClip(new ClipOffset(1.0,'transform',2,0))
-    timeline.play()
-}
-
-function CheckIfBasicClipWorks() {
-    const timeline = new TimeLine()
-    timeline.addPlayableClip(new ClipOffset(1.0,'animation',3,0))
-    timeline.play()
-}
+//const percision = 100 // using a fake update loop mock
+//
+//class AudioEngineMock {
+//    async play(media_id:string) {
+//        console.log("Audio Playing {media_id}")
+//    }
+//}
+//
+//// Visual verification tests.
+//function CheckIfBasicAudioClipWorks() {
+//    const timeline = new TimeLine()
+//    timeline.addPlayableClip(new ClipOffset(1.0,'audio',1,0))
+//    timeline.play()
+//}
+//
+//function CheckIfBasicTransformClipWorks() {
+//    const timeline = new TimeLine()
+//    timeline.addPlayableClip(new ClipOffset(1.0,'transform',2,0))
+//    timeline.play()
+//}
+//
+//function CheckIfBasicClipWorks() {
+//    const timeline = new TimeLine()
+//    timeline.addPlayableClip(new ClipOffset(1.0,'animation',3,0))
+//    timeline.play()
+//}
 
 // function CheckIfBasicClipWorks3SecondsAfterTimelineStops() {
 //     const timeline = new TimeLine()
@@ -239,7 +253,7 @@ function CheckIfBasicClipWorks() {
 //     timeline.play()
 // }
 
-CheckIfBasicClipWorks()
+//CheckIfBasicClipWorks()
 //CheckIfTwoClipsAtTheSameTimeWorks()
 // CheckIfTwoClipsOneAfterAnotherWorks()
 // CheckIfTimeLineStopBeforeClipPlays()

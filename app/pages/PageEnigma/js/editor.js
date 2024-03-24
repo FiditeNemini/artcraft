@@ -16,6 +16,8 @@ import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
 import AudioEngine from './audio_engine.ts';
 import TransformEngine from './transform_engine.ts';
+import { TimeLine } from './timeline.ts';
+import { ClipOffset } from '../datastructures/clips/clip_offset.ts';
 
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
@@ -82,13 +84,13 @@ class Editor {
         this.playback = false;
         this.playback_location = 0;
         this.max_length = 10;
-        this.timeline = null;
         // Save & Load.
         this.save_manager = new SaveManager(this.version);
         // Audio Engine Test.
 
         this.audio_engine = new AudioEngine();
         this.transform_engine = new TransformEngine();
+        this.timeline = new TimeLine(this.audio_engine, this.transform_engine);
 
         this.test_box_uuid = null;
         this.current_frame = 0;
@@ -133,11 +135,12 @@ class Editor {
         this.onWindowResize();
         // Creates the main update loop.
         this.renderer.setAnimationLoop(this.update_loop.bind(this));
-        
-        this.test_box_uuid = this.activeScene.instantiate("Box");
-        this.transform_engine.loadObject(this.test_box_uuid);
-
         this.test_playback = false;
+
+        this.test_box_uuid = this.activeScene.instantiate("Box");
+
+        let object = this.transform_engine.loadObject(this.test_box_uuid);
+        this.timeline.addPlayableClip(new ClipOffset(1.0, "transform", object.object_uuid, object.media_id, 0, 0));
     }
 
     // Configure post processing.
@@ -233,7 +236,30 @@ class Editor {
         //console.log(this.transform_engine.clips[this.test_box_uuid].current_pos)
         //this.current_frame += 1;
         this.test_playback = !this.test_playback;
-        this.transform_engine.clips[this.test_box_uuid].reset(this.activeScene.get_object_by_uuid(this.test_box_uuid));
+        //this.transform_engine.clips[this.test_box_uuid].reset(this.activeScene.get_object_by_uuid(this.test_box_uuid));
+    }
+
+
+    // Basicly Unity 3D's update loop.
+    update_loop(time) {
+        // Updates debug stats.
+        if (this.stats != null) { this.stats.update(); }
+
+        // All calls that are not super important like timeline go here.
+        this.activeScene.update(this.clock.getDelta());
+        //this.orbit.update(0.1);
+
+        //console.log(this.transform_engine.clips[this.test_box_uuid]);
+
+        this.timeline.update();
+
+        this.render_scene();
+        if (this.capturer != null) { this.capturer.capture(this.renderer.domElement); } // Record scene.
+
+    }
+
+    start_playback() {
+        this.timeline.isPlaying = true;
     }
 
     _save_to_cloud(blob) {
@@ -316,26 +342,6 @@ class Editor {
     _initialize_recording() {
         this.frame_buffer = [];
         this.render_timer = 0;
-    }
-
-    // Basicly Unity 3D's update loop.
-    update_loop(time) {
-        // Updates debug stats.
-        if (this.stats != null) { this.stats.update(); }
-
-        // All calls that are not super important like timeline go here.
-        this.activeScene.update(this.clock.getDelta());
-        //this.orbit.update(0.1);
-
-        //console.log(this.transform_engine.clips[this.test_box_uuid]);
-
-        if (this.test_playback) {
-            this.transform_engine.clips[this.test_box_uuid].step(this.activeScene.get_object_by_uuid(this.test_box_uuid));
-        }
-
-        this.render_scene();
-        if (this.capturer != null) { this.capturer.capture(this.renderer.domElement); } // Record scene.
-
     }
 
     // Render the scene to the camera.

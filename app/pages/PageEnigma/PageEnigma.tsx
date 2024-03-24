@@ -51,6 +51,10 @@ export const PageEnigma = () => {
     editorRef.current?.change_camera_view();
   }
 
+  const handleButtonPlayBack = ()=> {
+    editorRef.current?.start_playback();
+  }
+
   return(
     <div>
       <TopBarHelmet>
@@ -73,7 +77,7 @@ export const PageEnigma = () => {
       <canvas ref={canvasRef} id="video-scene" width="1280px" height="720px" />
       <div className='fixed top-20 left-4'>
         <div className="flex mt-2 gap-2">
-          <Button variant="secondary" onClick={handleButtonCameraView}>Toggle Camera View</Button>
+          <Button variant="secondary" onClick={handleButtonPlayBack}>Toggle Camera View</Button>
           <Button variant="secondary" onClick={handleButtonSave}>Save Scene</Button>
           <ButtonDialogue
             buttonProps={{
