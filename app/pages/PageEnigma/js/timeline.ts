@@ -1,9 +1,11 @@
 import { AnyJson } from "three/examples/jsm/nodes/core/constants.js";
 import { ClipUI } from "../datastructures/clips/clip_offset";
+
+import Scene from "./scene.js";
 import AudioEngine from "./audio_engine";
 import TransformEngine from "./transform_engine";
-import Scene from "./scene.js";
-import * as THREE from 'three';
+import { LipSyncEngine } from "./lip_sync_engine";
+import { AnimationEngine } from "./animation_engine";
 
 // Every object uuid / entity has a track.
 export class TimelineCurrentReactState {
@@ -27,14 +29,22 @@ export class TimeLine {
 
     timelineState: TimelineCurrentReactState
 
+    // plays audio
     audioEngine: AudioEngine
+    // key framing
     transformEngine: TransformEngine
     // animation engine
+    animationEngine: AnimationEngine
     // lip sync engine
+    lipSyncEngine: LipSyncEngine
 
     scene: Scene
-    
-    constructor(audioEngine:AudioEngine, transformEngine:TransformEngine, scene:Scene) {
+    // ensure that the elements are loaded first.
+    constructor(audioEngine:AudioEngine, 
+                transformEngine:TransformEngine, 
+                lipsyncEngine:LipSyncEngine,
+                animationEngine:AnimationEngine, 
+                scene:Scene) {
         this.timelineItems = []
         this.timeLineLimit = 60 * 10 // 10 seconds
         this.runningClips = []
@@ -45,6 +55,9 @@ export class TimeLine {
         // this will be used to play the audio clips
         this.audioEngine = audioEngine
         this.transformEngine = transformEngine
+        this.lipSyncEngine = lipsyncEngine
+        this.animationEngine = animationEngine
+
         this.scene = scene;
     }
 
@@ -98,27 +111,6 @@ export class TimeLine {
     async play(): Promise<void> {
         console.log(`Starting Timeline`)
         this.isPlaying = true
-        // const updateInterval = 100
-        // const timerID = setInterval(async () => {
-        //     console.log(`Current Time:${start}`)
-            
-        //     // get last updated time when stopped
-        //     for (const element of this.timelineItems) {
-        //         if (element.start_offset >= start) {
-        //             // run async
-        //             // element.play()
-        //             // remove the element
-        //             this.timelineItems = this.timelineItems.filter(item => item !== element)
-        //         }
-        //     }
-        //     if (start == this.timeLineLimit || this.timelineItems.length == 0) {
-        //         this.stop()
-        //     }
-            
-        //     start += updateInterval
-        // }, updateInterval)
-        
-        // this.timerID = timerID
     }
 
     async reset_scene() {
@@ -131,7 +123,8 @@ export class TimeLine {
                 this.audioEngine.loadClip(element.media_id);
             }
             else if (element.type == "animation") {
-            } else {
+            } 
+            else {
                 this.stop()
                 throw "Error New Type of element in the timeline"
             }
@@ -155,20 +148,28 @@ export class TimeLine {
                 // run async
                 // element.play()
                 // remove the element from the list
+                let object = this.scene.get_object_by_uuid(element.object_uuid)
                 if (element.type == "transform") {
-                    let object = this.scene.get_object_by_uuid(element.object_uuid);
                     if(object)
                     {
-                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset-element.start_offset);
-                        this.transformEngine.clips[element.object_uuid].step(object);
+                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset-element.start_offset)
+                        this.transformEngine.clips[element.object_uuid].step(object)
                     }
                 }
-                else if (element.type == "audio") {
-                    this.audioEngine.playClip(element.media_id);
+                else if (element.type == "audio") { 
+                    // global audio track
+                    this.audioEngine.playClip(element.media_id)
+                }   
+                else if (element.type == "lipsync") {
+                    // I think you just get the object verify it is a character ? then play the clip, but ... it needs 
+                    // need character face 
+                    this.lipSyncEngine.playClip(object,element.media_id)
                 }
+         
                 else if (element.type == "animation") {
-
-                } else {
+                    // use the media id to figure out which animation clip belongs to who 
+                } 
+                else {
                     this.stop()
                     throw "Error New Type of element in the timeline"
                 }

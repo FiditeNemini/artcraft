@@ -1,6 +1,6 @@
 export interface ClipUI {
   version: number
-  type: "transform" | "audio" | "animation"
+  type: "transform" | "audio" | "animation" | "lipsync"
   media_id: string
   object_uuid: string
   start_offset: number // in frames so 60 frames per second on the timeline.
@@ -11,7 +11,7 @@ export interface ClipUI {
 // it is created from a media id.
 export class ClipUI implements ClipUI {
   version: number
-  type: "transform" | "audio" | "animation"
+  type: "transform" | "audio" | "animation" | "lipsync"
   media_id: string
   object_uuid: string
   start_offset: number // in frames
@@ -19,7 +19,7 @@ export class ClipUI implements ClipUI {
 
   constructor(
     version: number,
-    type: "transform" | "audio" | "animation",
+    type: "transform" | "audio" | "animation" | "lipsync",
     media_id: string,
     object_uuid: string,
     start_offset: number,
@@ -36,8 +36,8 @@ export class ClipUI implements ClipUI {
   toJSON(): string {
     return JSON.stringify({
       version: this.version,
-      object_uuid: this.object_uuid,
       type: this.type,
+      object_uuid: this.object_uuid,
       media_id: this.media_id,
       start_offset: this.start_offset,
       ending_offset: this.ending_offset

@@ -1,7 +1,6 @@
 import { faL } from "@fortawesome/pro-solid-svg-icons";
 import { AudioTrackClip } from "../datastructures/clips/audio_track_clip";
 
-
 class AudioEngine {
     clips: { [key: string]: AudioTrackClip } = {};
     audio_sources: { [key: string]: AudioBufferSourceNode } = {};
@@ -15,11 +14,13 @@ class AudioEngine {
         this.version = 1.0;
     }
 
+    // loads clips into the engine to cache
     loadClip(audio_media_id: string) {
         if(this.clips[audio_media_id] != null) { return; }
         this.clips[audio_media_id] = new AudioTrackClip(this.version, audio_media_id, 1.0);
     }
 
+    // plays from the timeline.
     playClip(audio_media_id: string) {
         if (this.clips[audio_media_id] == null) { this.loadClip(audio_media_id); }
         let clip = this.clips[audio_media_id];
@@ -39,6 +40,7 @@ class AudioEngine {
         }
     }
 
+    // stops the clips
     stopClip(audio_media_id: string) {
         const clip = this.clips[audio_media_id];
         if (clip.audio_data?.source) {
