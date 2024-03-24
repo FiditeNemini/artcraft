@@ -11,7 +11,7 @@ export const SidePanel = () => {
   const [isVisible, setIsVisible] = useState(true);
 
   return (
-    <div className="relative border-l border-l-ui-panel-border">
+    <div className="relative border-l border-l-ui-panel-border bg-ui-panel">
       <button
         onClick={() => setIsVisible(!isVisible)}
         className="hover:bg-ui-controls-button absolute left-[-25px] top-1/2 flex rounded-l-lg bg-ui-controls px-2 py-3 align-middle text-sm text-white transition duration-150 ease-in-out"
