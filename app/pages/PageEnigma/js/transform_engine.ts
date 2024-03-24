@@ -22,6 +22,8 @@ class TransformEngine {
             this.clips[object.uuid] = new TransformTrackClip(this.version, object.uuid, clip_length);
         }
         this.clips[object.uuid].add_position(object.position);
+        this.clips[object.uuid].add_rotation(new THREE.Vector3(object.rotation.x, object.rotation.y, object.rotation.z));
+        this.clips[object.uuid].add_scale(object.scale);
     }
 }
 
