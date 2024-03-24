@@ -1,5 +1,6 @@
 import { AnyJson } from "three/examples/jsm/nodes/core/constants.js"
 import { ClipOffset } from "../datastructures/clips/clip_offset"
+import AudioEngine from "./audio_engine"
 
 // Every object uuid / entity has a track.
 export class TimelineCurrentReactState {
@@ -22,34 +23,44 @@ export class TimeLine {
     isPlaying: boolean
 
     timelineState: TimelineCurrentReactState
+
+    audioEngine: AudioEngine
+    // animation engine
+    // lip sync engine
+    // transform engine
     
-    constructor() {
+    constructor(audioEngine:AudioEngine) {
         this.timelineItems = []
-        // this.timerID = null
         this.timeLineLimit = 1000 * 10 // 10 seconds
         this.runningClips = []
         this.isPlaying = false
         this.scrubberPosition = 0 // in ms into the tl
         this.timelineState = new TimelineCurrentReactState()
-    }
 
-    async createClipOffset(clip: ClipOffset): Promise<void> {
-
+        // this will be used to play the audio clips
+        this.audioEngine = audioEngine
     }
 
     async addPlayableClip(clip: ClipOffset): Promise<void> {
         this.timelineItems.push(clip)
     }
 
+    // when given a media id item it will create the clip. 
+    // Then the clip will be loaded by the engines, if they come from outside of the loaded scene.
+    async createClipOffset(media_id: string,type: string): Promise<void> {
+        // use engine to load based off media id and type animation | transform |  
+    }
+
+    // this will update the state of the clips based off uuid easing?
+    async updateClip(clip_uuid: string, updates: AnyJson): Promise<void> {
+
+    }
+
     async deleteClip(clip_uuid: string): Promise<void> {
 
     }
 
-    // this will update the state of the clips based off uuid easing?
-    async modifyClip(clip_uuid: string, updates: AnyJson): Promise<void> {
-
-    }   
-    
+    // Events that will trigger from react
     async clipDidEnterDropZone() {
 
     }
@@ -59,15 +70,16 @@ export class TimeLine {
     }
 
     // timeline controls this.
-    async scrubberDidStart(offset_in_ms:number) {
+    async scrubberDidStart(offset_frame:number) {
         
     }
 
-    async scrub(offset_in_ms:number): Promise<void> {
+    async scrub(offset_frame:number): Promise<void> {
         // only stream through to the position and rotation keyframes
         // debounce not really 
     }
-    async scrubberDidStop(offset_in_ms:number) {
+
+    async scrubberDidStop(offset_frame:number) {
         
     }
     // public streaming events into the timeline from
@@ -106,7 +118,9 @@ export class TimeLine {
     // called by the editor update loop on each frame
     async update() {
         if (this.isPlaying == false) return; // start and stop 
-
+    
+        //2. allow stopping.
+        //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
         for (const element of this.timelineItems) {
             if (element.start_offset >= this.scrubberPosition) {
                 // run async
@@ -121,10 +135,13 @@ export class TimeLine {
                 else if (element.type == "animation") {
 
                 } else {
-                    throw "Error New Type"
+                    this.stop()
+                    throw "Error New Type of element in the timeline"
                 }
                 this.timelineItems = this.timelineItems.filter(item => item !== element)
             }
+            
+            // find the offset of the longest clip and play until that clip is done
             if (this.scrubberPosition == this.timeLineLimit) { // stops at where clips should // cannot throw clip
                 this.stop()
             }
@@ -140,80 +157,86 @@ export class TimeLine {
 // How much timeline precision we have
 const percision = 100 // using a fake update loop mock
 
+class AudioEngineMock {
+    async play(media_id:string) {
+        console.log("Audio Playing {media_id}")
+    }
+}
+
 // Visual verification tests.
 function CheckIfBasicAudioClipWorks() {
-    const api = new TimeLine()
-    api.addPlayableClip(new ClipOffset(1.0,'audio',1,0))
-    api.play()
+    const timeline = new TimeLine()
+    timeline.addPlayableClip(new ClipOffset(1.0,'audio',1,0))
+    timeline.play()
 }
 
 function CheckIfBasicTransformClipWorks() {
-    const api = new TimeLine()
-    api.addPlayableClip(new ClipOffset(1.0,'transform',2,0))
-    api.play()
+    const timeline = new TimeLine()
+    timeline.addPlayableClip(new ClipOffset(1.0,'transform',2,0))
+    timeline.play()
 }
 
 function CheckIfBasicClipWorks() {
-    const api = new TimeLine()
-    api.addPlayableClip(new ClipOffset(1.0,'animation',3,0))
-    api.play()
+    const timeline = new TimeLine()
+    timeline.addPlayableClip(new ClipOffset(1.0,'animation',3,0))
+    timeline.play()
 }
 
 // function CheckIfBasicClipWorks3SecondsAfterTimelineStops() {
-//     const api = new TimeLine()
-//     api.addPlayableClip(new ClipOffset("clip1", 0, 10000))
-//     api.play()
+//     const timeline = new TimeLine()
+//     timeline.addPlayableClip(new ClipOffset("clip1", 0, 10000))
+//     timeline.play()
 // }
 
 // function CheckIfTwoClipsAtTheSameTimeWorks() {
-//     const api = new TimeLine()
-//     api.addPlayableClip(new ClipOffset("clip1", 0, 1000))
-//     api.play()
+//     const timeline = new TimeLine()
+//     timeline.addPlayableClip(new ClipOffset("clip1", 0, 1000))
+//     timeline.play()
 // }
 
 // function CheckIfTwoClipsOneAfterAnotherWorks() {
-//     const api = new TimeLine()
-//     api.addPlayableClip(new ClipOffset("clip1", 0, 1000))
-//     api.addPlayableClip(new ClipOffset("clip2", 0, 2000))
-//     api.play()
+//     const timeline = new TimeLine()
+//     timeline.addPlayableClip(new ClipOffset("clip1", 0, 1000))
+//     timeline.addPlayableClip(new ClipOffset("clip2", 0, 2000))
+//     timeline.play()
 // }
 
 // function CheckIfTimeLineStopBeforeClipPlays() {
-//     const api = new TimeLine()
-//     api.addPlayableClip(new ClipOffset("clip3",0,1000))
-//     api.play()
+//     const timeline = new TimeLine()
+//     timeline.addPlayableClip(new ClipOffset("clip3",0,1000))
+//     timeline.play()
 //     setInterval(async ()=> {
-//         api.stop()
+//         timeline.stop()
 //     },1100)
 //     console.log("Stopped")
 // }
 
 // function CheckIfTimeLineStartAfterClipPlays() {
-//     const api = new TimeLine() 
-//     api.addPlayableClip(new ClipOffset("clip3",0,1000))
-//     api.play()
+//     const timeline = new TimeLine() 
+//     timeline.addPlayableClip(new ClipOffset("clip3",0,1000))
+//     timeline.play()
 //     setInterval(async ()=> {
-//         api.stop()
+//         timeline.stop()
 //     },500)
 //     console.log("Stopped")
 // }
 
 // function CheckIfClipsPlayAllTogetherConcurrently() {
-//     const api = new TimeLine() 
-//     api.addPlayableClip(new ClipOffset("clip1",0,1000))
-//     api.addPlayableClip(new ClipOffset("clip2",0,1000))
-//     api.addPlayableClip(new ClipOffset("clip3",0,1000))
-//     api.addPlayableClip(new ClipOffset("clip4",0,1000))
-//     api.play()
+//     const timeline = new TimeLine() 
+//     timeline.addPlayableClip(new ClipOffset("clip1",0,1000))
+//     timeline.addPlayableClip(new ClipOffset("clip2",0,1000))
+//     timeline.addPlayableClip(new ClipOffset("clip3",0,1000))
+//     timeline.addPlayableClip(new ClipOffset("clip4",0,1000))
+//     timeline.play()
 // }
 
 // function CheckIfClipsPlayAllTogether() {
-//     const api = new TimeLine() 
-//     api.addPlayableClip(new TrackClip("clip1",0,1000))
-//     api.addPlayableClip(new TrackClip("clip2",0,1000))
-//     api.addPlayableClip(new TrackClip("clip3",0,1000))
-//     api.addPlayableClip(new TrackClip("clip4",0,1000))
-//     api.play()
+//     const timeline = new TimeLine() 
+//     timeline.addPlayableClip(new TrackClip("clip1",0,1000))
+//     timeline.addPlayableClip(new TrackClip("clip2",0,1000))
+//     timeline.addPlayableClip(new TrackClip("clip3",0,1000))
+//     timeline.addPlayableClip(new TrackClip("clip4",0,1000))
+//     timeline.play()
 // }
 
 CheckIfBasicClipWorks()
