@@ -49,12 +49,12 @@ export class TransformTrackClip implements TransformTrackClip {
     object.position.copy(point);
 
     let curve_rot = new THREE.CatmullRomCurve3(this.rotations);
-    let point_rot = curve.getPoint((this.step_frame/60)*this.length);
+    let point_rot = curve_rot.getPoint((this.step_frame/60)*this.length);
     object.rotation.set(point_rot.x, point_rot.y, point_rot.z);
 
     let curve_scale = new THREE.CatmullRomCurve3(this.scales);
-    let point_scale = curve.getPoint((this.step_frame/60)*this.length);
-    object.position.copy(point_scale);
+    let point_scale = curve_scale.getPoint((this.step_frame/60)*this.length);
+    object.scale.copy(point_scale);
   }
 
   reset(object: THREE.Object3D) {
