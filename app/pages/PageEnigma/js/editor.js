@@ -160,15 +160,16 @@ class Editor {
         this._test_demo()
     }
 
-    _test_demo() {
+    async _test_demo() {
         // Test code here
         // this.test_box_uuid = this.activeScene.instantiate("Box");
         // let object = this.transform_engine.loadObject(this.test_box_uuid);
         // this.timeline.addPlayableClip(new ClipUI(1.0, "transform", object.object_uuid, object.media_id, 50, 300));
         // this.timeline.addPlayableClip(new ClipUI(1.0, "audio", "m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg", null, 50, 50));
 
-        this.activeScene.load_glb("./resources/models/fox/fox.glb")
-
+        let object = await this.activeScene.load_glb("./resources/models/fox/fox.glb")
+        this.lipsync_engine.load_object(object.uuid, "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72");
+        this.timeline.addPlayableClip(new ClipUI(1.0, "lipsync", object.object_uuid, object.media_id, 0, 100));
     }
 
     // Configure post processing.

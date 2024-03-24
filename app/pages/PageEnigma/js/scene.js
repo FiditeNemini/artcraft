@@ -76,42 +76,25 @@ class Scene {
         this.accept_animation_clip(this.animated_items[character_uuid].anims[0]._clip);
     }
 
-    load_glb(filepath, object_name = null, callback = null) {
-        let glbLoader = new GLTFLoader();
-        glbLoader.load(filepath, (glb) => {
-            glb.scene.children.forEach(child => {
-                child.traverse(c => {
-                    if (c.isMesh) {
-                        c.material.metalness = 0.0;
-                        c.material.specular = 0.5;
-                        c.castShadow = true;
-                        c.receiveShadow = true;
-                        c.material.transparent = false;
-                        //if (c.morphTargetInfluences && c.morphTargetDictionary) {
-                        //    const blendShapeIndexI = c.morphTargetDictionary["vrc.v_e"];
-                        //    if (blendShapeIndexI != null){
-                        //        c.morphTargetInfluences[blendShapeIndexI] = 1.0;
-                        //    }
-                        //}
-                    }
+    async load_glb(filepath) { //: Promise<THREE.Object3D> {
+        return new Promise((resolve) => {
+            let glbLoader = new GLTFLoader();
+            glbLoader.load(filepath, (glb) => {
+                glb.scene.children.forEach(child => {
+                    child.traverse(c => {
+                        if (c.isMesh) {
+                            c.material.metalness = 0.0;
+                            c.material.specular = 0.5;
+                            c.castShadow = true;
+                            c.receiveShadow = true;
+                            c.material.transparent = false;
+                        }
+                    });
+                    this.scene.add(child);
+                    resolve(child);
                 });
-                if (object_name == null) {
-                    child.name = filepath;
-                } else {
-                    child.name = object_name;
-                }
-                child.type = "Mesh";
-                this.scene.add(child);
             });
-            if (callback != null) {
-                callback();
-            }
-        },
-            (xhr) => {
-            },
-            (error) => {
-                console.log(error)
-            });
+        });
     }
 
     // default skybox.
