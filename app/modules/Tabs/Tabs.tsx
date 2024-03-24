@@ -1,55 +1,44 @@
-import { useState } from 'react'
-import { Tab } from '@headlessui/react'
+import { useState } from "react";
+import { Tab } from "@headlessui/react";
+import { twMerge } from "tailwind-merge";
 
-import { joinClassNames } from '~/helpers';
-
-export type Tab = {
+export type TabType = {
   header: string;
   children: JSX.Element;
-}
+};
 
-export const Tabs = ({
-  tabs: tabProps
-}:{
-  tabs:Tab[]
-}) =>{
-  const [tabs, setTabs] = useState(tabProps);
+export const Tabs = ({ tabs: tabProps }: { tabs: TabType[] }) => {
+  const [tabs] = useState(tabProps);
+
+  const tabHeaderClassName = (selected: boolean) =>
+    twMerge(
+      "px-4 py-4 text-md font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-b-[3px] border-white/[.1]",
+      selected
+        ? "text-white border-brand-primary"
+        : "text-white/[0.5] hover:text-white hover:border-white/[.3]",
+    );
 
   return (
-    <div className="w-full max-w-md px-2 py-16 sm:px-0">
+    <div className="w-full max-w-md px-2 sm:px-0">
       <Tab.Group>
-        <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/20 p-1">
+        <Tab.List className="flex">
           {tabs.map((tab, idx) => (
             <Tab
               key={idx}
-              className={({ selected }) =>
-                joinClassNames(
-                  'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
-                  'ring-white/60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2',
-                  selected
-                    ? 'bg-white text-blue-700 shadow'
-                    : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
-                )
-              }
+              className={({ selected }) => tabHeaderClassName(selected)}
             >
               {tab.header}
             </Tab>
           ))}
         </Tab.List>
-        <Tab.Panels className="mt-2">
+        <Tab.Panels>
           {tabs.map((tab, idx) => (
-            <Tab.Panel
-              key={idx}
-              className={joinClassNames(
-                'rounded-xl bg-white p-3',
-                'ring-white/60 ring-offset-2 ring-offset-blue-400 focus:outline-none focus:ring-2'
-              )}
-            >
+            <Tab.Panel key={idx} className="p-4 text-white focus:outline-none">
               {tab.children}
             </Tab.Panel>
           ))}
         </Tab.Panels>
       </Tab.Group>
     </div>
-  )
-}
+  );
+};
