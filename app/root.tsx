@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import { LinksFunction } from "@remix-run/deno";
 import {
   Links,
@@ -13,22 +13,39 @@ import tailwindCss from "./styles/tailwind.css?url";
 import baseCss from "./styles/base.css?url";
 
 import { TopBar } from "./modules/TopBar";
-import { TopBarInnerContext } from '~/contexts/TopBarInner';
+import { TopBarInnerContext } from "~/contexts/TopBarInner";
 
-
-export const links : LinksFunction = () => [{ 
-  rel: "stylesheet",
-  href: normalizeCss,
-},{ 
-  rel: "stylesheet",
-  href: tailwindCss,
-},{ 
-  rel: "stylesheet",
-  href: baseCss,
-}];
+export const links: LinksFunction = () => [
+  {
+    rel: "stylesheet",
+    href: normalizeCss,
+  },
+  {
+    rel: "stylesheet",
+    href: tailwindCss,
+  },
+  {
+    rel: "stylesheet",
+    href: baseCss,
+  },
+  {
+    rel: "preconnect",
+    href: "https://fonts.googleapis.com",
+  },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap",
+  },
+];
 
 export default function App() {
-  const [topBarInnerComponent, setTopBarInnerComponent] = useState<JSX.Element | null>(null);
+  const [topBarInnerComponent, setTopBarInnerComponent] =
+    useState<JSX.Element | null>(null);
 
   return (
     <html lang="en">
@@ -39,12 +56,13 @@ export default function App() {
         <Links />
       </head>
       <body className="bg-ui-background">
-        <TopBarInnerContext.Provider value={{
+        <TopBarInnerContext.Provider
+          value={{
             TopBarInner: topBarInnerComponent,
-            setTopBarInner: setTopBarInnerComponent
-          }}>
-          
-          <div className="topbar-spacer"/>
+            setTopBarInner: setTopBarInnerComponent,
+          }}
+        >
+          <div className="topbar-spacer" />
           <Outlet />
           <TopBar />
         </TopBarInnerContext.Provider>
