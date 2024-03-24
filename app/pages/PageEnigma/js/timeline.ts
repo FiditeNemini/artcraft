@@ -120,7 +120,7 @@ export class TimeLine {
                 if(object) { this.transformEngine.clips[element.object_uuid].reset(object); }
             }
             else if (element.type == "audio") {
-                
+                this.audioEngine.loadClip(element.media_id);
             }
             else if (element.type == "animation") {
             } 
@@ -140,7 +140,6 @@ export class TimeLine {
         }
 
         this.scrubberPosition += 1;
-        console.log(this.scrubberPosition);
     
         //2. allow stopping.
         //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
@@ -166,6 +165,7 @@ export class TimeLine {
                     // need character face 
                     this.lipSyncEngine.playClip(object,element.media_id)
                 }
+         
                 else if (element.type == "animation") {
                     // use the media id to figure out which animation clip belongs to who 
                 } 
