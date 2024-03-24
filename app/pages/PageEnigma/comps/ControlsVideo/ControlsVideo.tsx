@@ -26,29 +26,13 @@ export const ControlsVideo = () => {
   return (
     <div>
       <div className="flex justify-center">
-        <div className="-mt-10 rounded-t-md border-x border-t border-ui-panel-border bg-ui-panel px-6 py-2 text-white">
+        <div className="bg-ui-controls -mt-10 rounded-t-md border-x border-t border-ui-panel-border px-6 py-2 text-white">
           <div className="flex content-center gap-6	">
-            <ButtonIcon
-              className="h-6"
-              icon={faBackwardFast}
-              onClick={handleBackwardFast}
-            />
-            <ButtonIcon
-              className="h-6"
-              icon={faBackwardStep}
-              onClick={handleBackwardStep}
-            />
+            <ButtonIcon icon={faBackwardFast} onClick={handleBackwardFast} />
+            <ButtonIcon icon={faBackwardStep} onClick={handleBackwardStep} />
             <ButtonIcon className="h-6" icon={faPlay} onClick={handlePlay} />
-            <ButtonIcon
-              className="h-6"
-              icon={faForwardStep}
-              onClick={handleForwardStep}
-            />
-            <ButtonIcon
-              className="h-6"
-              icon={faForwardFast}
-              onClick={handleForwardFast}
-            />
+            <ButtonIcon icon={faForwardStep} onClick={handleForwardStep} />
+            <ButtonIcon icon={faForwardFast} onClick={handleForwardFast} />
           </div>
         </div>
       </div>

@@ -14,8 +14,8 @@ export const Tabs = ({ tabs: tabProps }: { tabs: TabType[] }) => {
     twMerge(
       "px-4 py-4 text-md font-medium leading-5 focus:outline-none transition duration-150 ease-in-out border-b-[3px] border-white/[.1]",
       selected
-        ? "bg-ui-panel text-white border-brand-primary"
-        : "text-gray-400 hover:bg-ui-panel hover:text-white hover:border-white/[.2]",
+        ? "text-white border-brand-primary"
+        : "text-gray-400 hover:text-white hover:border-white/[.3]",
     );
 
   return (

@@ -37,13 +37,14 @@ export const Controls3D = () => {
   return (
     <div>
       <div className="flex justify-center">
-        <div className="rounded-b-md border-x border-b border-ui-panel-border bg-ui-panel px-4 py-2 text-white">
+        <div className="bg-ui-controls rounded-b-md border-x border-b border-ui-panel-border px-4 py-2 text-white">
           <div className="flex gap-4">
             <ButtonIcon icon={faPlus} onClick={handlePlus} />
-            <span className="h-5 w-0 border-l border-ui-panel-border" />
+            <span className="w-0 border-l border-white/[0.1]" />
             <ButtonIcon icon={fa3dCylinder} onClick={handleCylinder} />
             <ButtonIcon icon={fa3dTorus} onClick={handleTorus} />
             <ButtonIcon icon={fa3dSphere} onClick={handleSphere} />
+            <span className="w-0 border-l border-white/[0.1]" />
             <ButtonIcon
               icon={faArrowsUpDownLeftRight}
               onClick={handleMoveArrows}
