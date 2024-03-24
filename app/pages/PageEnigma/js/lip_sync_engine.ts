@@ -24,13 +24,16 @@ export class LipSyncEngine {
         this.clips[audio_media_id] = new LipSyncTrackClip(this.version, audio_media_id, 1.0);
     }
 
-    // needs to be called by the engine.
-    update() {
+    // needs to be called by the timeline.
+    step() {
+
         this.lipsync.update()
     }
 
     playClip(face: THREE.Object3D,audio_media_id: string) {
+
         // face movement here
+        
         this.lipsync.face = face
         const clip = this.clips[audio_media_id];
         // this is a buffer right?

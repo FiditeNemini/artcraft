@@ -154,11 +154,21 @@ class Editor {
         this.test_playback = false;
 
         this.timeline.scene = this.activeScene;
+        
 
-        this.test_box_uuid = this.activeScene.instantiate("Box");
-        let object = this.transform_engine.loadObject(this.test_box_uuid);
-        this.timeline.addPlayableClip(new ClipUI(1.0, "transform", object.object_uuid, object.media_id, 50, 300));
-        this.timeline.addPlayableClip(new ClipUI(1.0, "audio", "m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg", null, 50, 50));
+     
+        this._test_demo()
+    }
+
+    _test_demo() {
+        // Test code here
+        // this.test_box_uuid = this.activeScene.instantiate("Box");
+        // let object = this.transform_engine.loadObject(this.test_box_uuid);
+        // this.timeline.addPlayableClip(new ClipUI(1.0, "transform", object.object_uuid, object.media_id, 50, 300));
+        // this.timeline.addPlayableClip(new ClipUI(1.0, "audio", "m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg", null, 50, 50));
+
+        this.activeScene.load_glb("./resources/models/fox/fox.glb")
+
     }
 
     // Configure post processing.

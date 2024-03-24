@@ -4,8 +4,8 @@ import { ClipUI } from "../datastructures/clips/clip_offset";
 import Scene from "./scene.js";
 import AudioEngine from "./audio_engine";
 import TransformEngine from "./transform_engine";
-import { LipSyncEngine } from "./lip_sync_engine";
-import { AnimationEngine } from "./animation_engine";
+import LipSyncEngine from "./lip_sync_engine";
+import AnimationEngine from "./animation_engine";
 
 // Every object uuid / entity has a track.
 export class TimelineCurrentReactState {
@@ -143,6 +143,7 @@ export class TimeLine {
     
         //2. allow stopping.
         //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
+
         for (const element of this.timelineItems) {
             if (element.start_offset <= this.scrubberPosition && this.scrubberPosition <= element.ending_offset) {
                 // run async
@@ -163,7 +164,7 @@ export class TimeLine {
                 else if (element.type == "lipsync") {
                     // I think you just get the object verify it is a character ? then play the clip, but ... it needs 
                     // need character face 
-                    this.lipSyncEngine.playClip(object,element.media_id)
+                    this.lipSyncEngine.step()
                 }
          
                 else if (element.type == "animation") {
