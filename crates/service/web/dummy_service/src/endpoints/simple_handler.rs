@@ -6,4 +6,3 @@ pub async fn simple_handler() -> HttpResponse {
       .content_type("application/json; charset=utf-8")
       .body("{\"success\": true}")
 }
-

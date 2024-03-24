@@ -1,20 +1,25 @@
 //! This service is meant to help with debugging.
 
+use std::sync::Arc;
 use actix_http::body::MessageBody;
 use actix_service::ServiceFactory;
 use actix_web::{App, Error, HttpServer, web};
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::middleware::{Compress, DefaultHeaders, Logger};
+use actix_web::web::Data;
 
 use actix_helpers::route_builder::RouteBuilder;
 use errors::AnyhowResult;
 
 use crate::endpoints::dummy_health_check_handler::dummy_health_check_handler;
 use crate::endpoints::simple_handler::simple_handler;
+use crate::endpoints::status_alert_handler::status_alert_handler;
 use crate::env_args::env_args;
+use crate::server_state::ServerState;
 
 pub mod endpoints;
 pub mod env_args;
+pub mod server_state;
 
 pub const DEFAULT_RUST_LOG: &str = concat!(
   "debug,",
@@ -37,14 +42,17 @@ async fn main() -> AnyhowResult<()> {
       .and_then(|h| h.into_string().ok())
       .unwrap_or("hostname-unknown".to_string());
 
+  let server_state = ServerState::build(&env_args);
+
   // TODO: Fix duplication for gzip compression. This is stupid.
   //  I'm too tired to figure out the generic types though.
   if env_args.enable_gzip {
     HttpServer::new(move || {
       let app = App::new()
+          .app_data(Data::new(Arc::new(server_state.clone())))
           .wrap(Logger::new(&log_format))
           .wrap(DefaultHeaders::new()
-              .header("X-Backend-Hostname", &server_hostname))
+              .add(("X-Backend-Hostname", server_hostname.as_str())))
           .wrap(Compress::default());
 
       build_routes(app)
@@ -56,9 +64,10 @@ async fn main() -> AnyhowResult<()> {
   } else {
     HttpServer::new(move || {
       let app = App::new()
+          .app_data(Data::new(Arc::new(server_state.clone())))
           .wrap(Logger::new(&log_format))
           .wrap(DefaultHeaders::new()
-              .header("X-Backend-Hostname", &server_hostname));
+              .add(("X-Backend-Hostname", server_hostname.as_str())));
 
       build_routes(app)
     })
@@ -85,6 +94,7 @@ fn build_routes<T, B> (app: App<T>) -> App<T>
   RouteBuilder::from_app(app)
       .add_get("/", simple_handler)
       .add_get("/_status", dummy_health_check_handler)
+      .add_get("/v1/status_alert_check", status_alert_handler)
       .into_app()
       .default_service(web::route().to(simple_handler))
 }
