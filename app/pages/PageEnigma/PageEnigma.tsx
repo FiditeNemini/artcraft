@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-  faChevronLeft,
-  faWandSparkles,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faWandSparkles } from "@fortawesome/pro-solid-svg-icons";
 
-import { Button, ButtonLink } from "~/components";
+import { Button } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
 // import { SidePanel } from "~/modules/SidePanel";
@@ -55,6 +52,7 @@ export const PageEnigma = () => {
     }
   }, []);
 
+  //for updating timeline/engine div height (for resizing)
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
       for (let entry of entries) {
@@ -75,7 +73,7 @@ export const PageEnigma = () => {
         <Button icon={faWandSparkles}>Generate Movie</Button>
       </TopBarHelmet>
 
-      <div style={{ height: "calc(100vh - 64px)" }}>
+      <div style={{ height: "calc(100vh - 68px)" }}>
         {/* Engine section/side panel */}
         <div
           className="flex"

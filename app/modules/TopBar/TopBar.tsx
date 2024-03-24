@@ -15,7 +15,7 @@ export const TopBar = () => {
       border-b border-ui-panel-border bg-ui-panel"
     >
       <nav
-        className="mx-auto flex max-w-full items-center justify-between px-4 py-3"
+        className="mx-auto flex max-w-full items-center justify-between p-4"
         aria-label="Global"
       >
         <div className="grid w-full grid-cols-3 gap-2">
