@@ -31,6 +31,7 @@ class Editor {
 
     // Default params.
     constructor() {
+        console.log("If you see this message twice! then it rendered twice, if you see it once it's all good.")
         // For making sure the editor only gets created onece.
         this.can_initailize = false;
         let one_element = document.getElementById("created-one-element");

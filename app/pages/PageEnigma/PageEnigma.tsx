@@ -30,26 +30,17 @@ export const PageEnigma = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const editorRef = useRef<Editor | null>(null);
 
-
   const editorCallback = useCallback(() => {
     // handle editorCallback here
   },[]);
 
   useEffect(() => { //componentDidMount
-    editorRef.current = new Editor();
     
-    function init(){
-      if(editorRef.current!==null){
-        //TODO: init with editorRef.current.initialize(editorCallback);
-        editorRef.current.initialize();
-      }
+    if (editorRef.current == null) {
+      editorRef.current = new Editor();
+      editorRef.current.initialize();
     }
-    
-    if(canvasRef!==null){
-      init();
-    }else{
-      setTimeout(init, 500);
-    }
+
   }, []);
 
   const handleButtonSave = ()=>{
