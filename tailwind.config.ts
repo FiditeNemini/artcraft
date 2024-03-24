@@ -79,6 +79,13 @@ export default {
         "950": "#0c270f",
       },
 
+      character: {
+        unselected: "#46527C",
+        selected: "#6384F4",
+        clip: "#7E92DA",
+        groupBg: "#2B3448",
+      },
+
       "ui-background": "#1a1a27",
       "ui-panel": "#242433",
       "ui-panel-border": "#393948",
@@ -90,4 +97,5 @@ export default {
     },
   },
   plugins: [],
+  safelist: ["bg-character-selected", "bg-character-unselected"],
 } satisfies Config;

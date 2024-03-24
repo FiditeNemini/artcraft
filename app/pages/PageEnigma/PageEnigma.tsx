@@ -2,14 +2,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { faWandSparkles } from "@fortawesome/pro-solid-svg-icons";
 
-import { Button } from "~/components";
+import { Button, ButtonLink } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
+import { SidePanel } from "~/modules/SidePanel";
+import { Tabs } from "~/modules/Tabs";
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsVideo } from "./comps/ControlsVideo";
 import { Timeline } from "./comps/Timeline";
-import { SidePanel } from "~/modules/SidePanel";
+
 import Editor from "./js/editor";
+import { TrackContext } from "~/contexts/TrackContext";
+import { TrackProvider } from "~/contexts/TrackProvider";
 
 export const PageEnigma = () => {
   // const { setTopBarInner } = useContext(TopBarInnerContext) || {};
@@ -125,7 +129,9 @@ export const PageEnigma = () => {
 
         {/* Timeline */}
         <div className="min-h-[220px]" ref={timelineRef}>
-          <Timeline editorCurrent={editorRef.current} />
+          <TrackProvider>
+            <Timeline editorCurrent={editorRef.current} time={20} />
+          </TrackProvider>
         </div>
       </div>
     </div>
