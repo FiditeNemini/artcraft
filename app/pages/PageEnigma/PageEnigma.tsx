@@ -22,7 +22,6 @@ export const PageEnigma = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const editorRef = useRef<Editor | null>(null);
   const [timelineHeight, setTimelineHeight] = useState(0);
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const timelineRef = useRef<HTMLDivElement | null>(null);
 
   const editorCallback = useCallback(() => {
@@ -94,7 +93,6 @@ export const PageEnigma = () => {
               id="video-scene"
               width="1280px"
               height="720px"
-              className="hidden"
             />
 
             {/* Top controls */}
@@ -157,7 +155,7 @@ export const PageEnigma = () => {
         </div>
 
         {/* Timeline */}
-        <div ref={timelineRef}>
+        <div className="min-h-[220px]" ref={timelineRef}>
           <Timeline editorCurrent={editorRef.current} />
         </div>
       </div>

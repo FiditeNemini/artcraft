@@ -12,7 +12,7 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
 
   return (
     <>
-      <div className="absolute top-3/4 h-1/4 w-screen border-t border-ui-panel-border bg-ui-panel">
+      <div className="absolute bottom-0 min-h-[220px] w-screen border-t border-ui-panel-border bg-ui-panel">
         {children}
       </div>
     </>

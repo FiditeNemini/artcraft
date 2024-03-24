@@ -55,7 +55,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-ui-background">
+      <body className="overflow-hidden bg-ui-background">
         <TopBarInnerContext.Provider
           value={{
             TopBarInner: topBarInnerComponent,
