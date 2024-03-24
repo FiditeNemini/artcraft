@@ -11,10 +11,15 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
   };
 
   return (
-    <>
-      <div className="absolute bottom-0 min-h-[220px] w-screen border-t border-ui-panel-border bg-ui-panel">
-        {children}
-      </div>
-    </>
+    <div
+      className={[
+        "absolute bottom-0",
+        "h-[220px] w-screen overflow-y-auto",
+        "border-t border-ui-panel-border",
+        "bg-ui-panel",
+      ].join(" ")}
+    >
+      {children}
+    </div>
   );
 };
