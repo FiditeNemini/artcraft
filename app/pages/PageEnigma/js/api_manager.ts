@@ -14,8 +14,6 @@ class MediaUploadManager {
     return ""
   }
 
-
-
   // two core functions to upload things to the server and get id's
   async uploadMedia(blob:any, fileName:string):Promise<string> {
     const url = `${this.baseUrl}/v1/media_uploads/upload`;

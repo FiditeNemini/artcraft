@@ -141,7 +141,8 @@ class Editor {
 
         this.test_box_uuid = this.activeScene.instantiate("Box");
         let object = this.transform_engine.loadObject(this.test_box_uuid);
-        this.timeline.addPlayableClip(new ClipUI(1.0, "transform", object.object_uuid, object.media_id, 200, 300));
+        this.timeline.addPlayableClip(new ClipUI(1.0, "transform", object.object_uuid, object.media_id, 50, 300));
+        this.timeline.addPlayableClip(new ClipUI(1.0, "audio", "m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg", null, 50, 50));
     }
 
     // Configure post processing.
@@ -195,7 +196,6 @@ class Editor {
 
     render_mode() {
         this.rendering = !this.rendering;
-        console.log(this.rendering);
         this.activeScene.render_mode(this.rendering);
 
         //if (this.rendering) {
@@ -228,7 +228,6 @@ class Editor {
         
         if(this.selected == null) {return;}
         this.transform_engine.addFrame(this.selected)
-        console.log(this.transform_engine.clips);
     }
 
     change_camera_view() {
@@ -264,7 +263,6 @@ class Editor {
     }
 
     _save_to_cloud(blob) {
-        console.log("Posting to cloud!");
         this.api_manager.uploadGLB(blob, "test.glb");
     }
 
@@ -361,7 +359,6 @@ class Editor {
             this.render_timer += this.clock.getDelta();
             if (this.playback_location >= this.fps_number * 3) {
                 this.stopPlayback();
-                console.log(this.playback_location);
                 this.playback_location = 0;
                 this.rendering = false;
             }
