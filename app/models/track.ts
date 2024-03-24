@@ -1,3 +1,5 @@
+import {Base} from "postcss-selector-parser";
+
 export interface BaseClip {
   id: string;
   name: string;
@@ -18,3 +20,10 @@ export interface CharacterTrack {
   positionClips: PositionClip[];
   lipSyncClips: LipSyncClip[];
 }
+
+export interface CameraTrack {
+  id: string;
+  clips: CameraClip[];
+}
+
+export interface CameraClip extends BaseClip {}

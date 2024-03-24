@@ -33,10 +33,10 @@ export const Timeline = ({
   const width = 1500;
   return (
     <LowerPanel>
-      <div className="fixed" style={{top: 72, left: 1000}}>
-      <Button onClick={handleButtonLoad}>Load</Button>
-      <Button onClick={handleButtonRender}>Render</Button>
-      <Button onClick={handleButtonPlay}>Play</Button>
+      <div className="fixed" style={{ top: 72, left: "calc(100% - 600px)" }}>
+        <Button onClick={handleButtonLoad}>Load</Button>
+        <Button onClick={handleButtonRender}>Render</Button>
+        <Button onClick={handleButtonPlay}>Play</Button>
       </div>
       <div className="h-10 border-b border-ui-panel-border"></div>
       <input
@@ -70,7 +70,10 @@ export const Timeline = ({
             />
           ))}
         </div>
-          <div className="h-full absolute bg-brand-primary block" style={{left: time + 40, top: 0, width: 1}} />
+        <div
+          className="absolute block h-full bg-brand-primary"
+          style={{ left: time + 40, top: 0, width: 1 }}
+        />
       </div>
     </LowerPanel>
   );
