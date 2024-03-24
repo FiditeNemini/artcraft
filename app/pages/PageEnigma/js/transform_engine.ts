@@ -1,5 +1,5 @@
 import { TransformTrackClip } from "../datastructures/clips/transform_track_clip";
-
+import * as THREE from 'three';
 
 class TransformEngine {
     clips: { [key: string]: TransformTrackClip } = {};
@@ -12,26 +12,15 @@ class TransformEngine {
         this.clips = {};
     }
 
-    loadObject(object_uuid: string) {
-        this.clips[object_uuid] = new TransformTrackClip(this.version, object_uuid, length);
+    loadObject(object_uuid: string, clip_length:number = 2) {
+        this.clips[object_uuid] = new TransformTrackClip(this.version, object_uuid, clip_length);
     }
 
-    playClip(object_uuid: string) {
-        const clip = this.clips[object_uuid];
-        if (clip) {
-            clip
-        } else {
-            console.warn(`TransformEngine: TransformClip with id "${object_uuid}" not found.`);
+    addFrame(object: THREE.Object3D, clip_length:number = 2) {
+        if(this.clips[object.uuid] == null) {
+            this.clips[object.uuid] = new TransformTrackClip(this.version, object.uuid, clip_length);
         }
-    }
-
-    stopClip(object_uuid: string) {
-        const clip = this.clips[object_uuid];
-        if (clip) {
-            // Disable stepping and reset.
-        } else {
-            console.warn(`TransformEngine: TransformClip with id "${object_uuid}" not found.`);
-        }
+        this.clips[object.uuid].add_position(object.position);
     }
 }
 

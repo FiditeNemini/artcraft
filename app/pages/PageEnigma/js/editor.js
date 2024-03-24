@@ -15,6 +15,7 @@ import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
 import AudioEngine from './audio_engine.ts';
+import TransformEngine from './transform_engine.ts';
 
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
@@ -34,6 +35,7 @@ class Editor {
         this.can_initailize = false;
         let one_element = document.getElementById("created-one-element");
         //if (one_element != null) { return; }
+        this.can_initailize = true;
         let newElement = document.createElement("div");
         newElement.id = "created-one-element";
         document.body.appendChild(newElement);
@@ -84,11 +86,16 @@ class Editor {
         // Audio Engine Test.
 
         this.audio_engine = new AudioEngine();
+        this.transform_engine = new TransformEngine();
+
+        this.test_box_uuid = null;
+        this.current_frame = 0;
+        this.test_playback = false;
     }
 
     // Initializes the main scene and ThreeJS essentials.
     initialize() {
-        //if (this.can_initailize == false) { return; }
+        if (this.can_initailize == false) { return; }
         // Gets the canvas.
         this.canvReference = document.getElementById("video-scene");
         // Base width and height.
@@ -125,7 +132,10 @@ class Editor {
         // Creates the main update loop.
         this.renderer.setAnimationLoop(this.update_loop.bind(this));
         
-        
+        this.test_box_uuid = this.activeScene.instantiate("Box");
+        this.transform_engine.loadObject(this.test_box_uuid);
+
+        this.test_playback = false;
     }
 
     // Configure post processing.
@@ -207,7 +217,21 @@ class Editor {
         //this.activeScene.scene.remove(this.activeScene.gridHelper);
         //this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this), this.audio_manager, this.timeline, this.activeScene.animations);
         //this.activeScene._createGrid();
-        this.audio_engine.playClip("m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg");
+        //this.audio_engine.playClip("m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg");
+        //console.log(this.selected);
+        
+        if(this.selected == null) {return;}
+        this.transform_engine.addFrame(this.selected)
+        console.log(this.transform_engine.clips);
+    }
+
+    change_camera_view() {
+        //let obj = this.activeScene.get_object_by_uuid(this.test_box_uuid);
+        //this.transform_engine.clips[this.test_box_uuid].step(obj);
+        //console.log(this.transform_engine.clips[this.test_box_uuid].current_pos)
+        //this.current_frame += 1;
+        this.test_playback = !this.test_playback;
+        this.transform_engine.clips[this.test_box_uuid].reset(this.activeScene.get_object_by_uuid(this.test_box_uuid));
     }
 
     _save_to_cloud(blob) {
@@ -300,6 +324,12 @@ class Editor {
         // All calls that are not super important like timeline go here.
         this.activeScene.update(this.clock.getDelta());
         //this.orbit.update(0.1);
+
+        //console.log(this.transform_engine.clips[this.test_box_uuid]);
+
+        if (this.test_playback) {
+            this.transform_engine.clips[this.test_box_uuid].step(this.activeScene.get_object_by_uuid(this.test_box_uuid));
+        }
 
         this.render_scene();
         if (this.capturer != null) { this.capturer.capture(this.renderer.domElement); } // Record scene.

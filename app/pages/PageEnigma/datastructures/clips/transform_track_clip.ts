@@ -1,5 +1,5 @@
+import { faL } from '@fortawesome/pro-solid-svg-icons';
 import * as THREE from 'three';
-import TWEEN from '@tweenjs/tween.js';
 
 export interface TransformTrackClip {
   version: number;
@@ -20,9 +20,8 @@ export class TransformTrackClip implements TransformTrackClip {
   scales: THREE.Vector3[];
   length: number;
 
-  current_pos: THREE.Vector3;
-
-  playing: boolean;
+  step_frame: number;
+  looping: boolean;
 
   constructor(version: number, media_id: string, length: number) {
     this.version = version;
@@ -35,46 +34,35 @@ export class TransformTrackClip implements TransformTrackClip {
     this.rotations = [];
     this.scales = [];
 
-    this.playing = false;
-
-    this.current_pos = new THREE.Vector3(0, 0, 0);
+    this.step_frame = 0;
+    this.looping = false;
   }
 
-  update(object: THREE.Object3D) {
-    if (this.playing) {
-      this.tweenPositions();
-      object.position.set(this.current_pos.x, this.current_pos.y, this.current_pos.z);
-    }
+  step(object: THREE.Object3D) {
+    if (this.step_frame >= 60/this.length && this.looping == false) { return; } // Reached max frames.
+    if(this.positions.length < 2) { return; } // If there are enough points in the scene.
+    this.step_frame += 1;
+    const curve = new THREE.CatmullRomCurve3(this.positions);
+    const point = curve.getPoint((this.step_frame/60)*this.length);
+    object.position.copy(point);
   }
 
   reset(object: THREE.Object3D) {
     if (this.positions.length > 0) {
       let first_pos = this.positions[0];
-      object.position.set(first_pos.x, first_pos.y, first_pos.z);
+      object.position.copy(first_pos);
+      this.step_frame = 0;
     }
   }
 
   add_position(position: THREE.Vector3) {
-    this.positions.push(position);
+    this.positions.push(new THREE.Vector3(position.x, position.y, position.z));
   }
 
   remove_position(position: THREE.Vector3) {
     this.positions = this.positions.filter(positions => {
       return !position.equals(position);
     });
-  }
-
-  tweenPositions() {
-    const tweenDuration = this.length / this.positions.length;
-
-    this.positions.reduce((prevPosition, currentPosition, index) => {
-      const tween = new TWEEN.Tween(prevPosition)
-        .to({ x: currentPosition.x, y: currentPosition.y, z: currentPosition.z }, tweenDuration)
-        .onUpdate(() => {
-          this.current_pos = new THREE.Vector3(prevPosition.x, prevPosition.y, prevPosition.z);
-        });
-      return currentPosition;
-    }, this.current_pos.clone());
   }
 
   toJSON(): string {
