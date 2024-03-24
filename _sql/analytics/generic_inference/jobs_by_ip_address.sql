@@ -3,7 +3,8 @@
 -- noinspection SqlResolveForFile
 
 -- Test table for write contention
-select count(*) from generic_inference_jobs where created_at > now() - interval 1 minute;
+-- NB: Nevermind, there's no index on `created_at`
+-- select count(*) from generic_inference_jobs where created_at > now() - interval 1 minute;
 
 -- When the database is under contention, use this form to reduce the number of rows scanned
 SELECT
