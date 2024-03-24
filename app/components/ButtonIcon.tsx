@@ -1,4 +1,3 @@
-import React from "react";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
@@ -9,11 +8,11 @@ interface ButtonIconProps {
   onClick: () => void;
 }
 
-const ButtonIcon: React.FC<ButtonIconProps> = ({
+export const ButtonIcon = ({
   icon,
   onClick,
   fill = false,
-}) => {
+}: ButtonIconProps) => {
   const className = twMerge(
     "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150",
     fill
@@ -27,5 +26,3 @@ const ButtonIcon: React.FC<ButtonIconProps> = ({
     </button>
   );
 };
-
-export { ButtonIcon };
