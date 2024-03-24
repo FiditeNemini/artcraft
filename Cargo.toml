@@ -22,6 +22,7 @@ members = [
   "crates/cli/production/migration-tool",
 
   # Shared libraries
+  "crates/lib/actix_cors_configs",
   "crates/lib/actix_helpers",
   "crates/lib/api_clients/cloud_storage",
   "crates/lib/api_clients/google_drive_common",

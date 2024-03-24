@@ -351,6 +351,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix_cors_configs"
+version = "0.0.1"
+dependencies = [
+ "actix-cors",
+ "actix-http",
+ "actix-rt",
+ "actix-web",
+ "errors",
+ "log",
+ "my-workspace-hack",
+ "reusable_types",
+ "speculoos",
+]
+
+[[package]]
 name = "actix_derive"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2101,6 +2116,7 @@ dependencies = [
  "actix-service",
  "actix-utils",
  "actix-web",
+ "actix_cors_configs",
  "actix_helpers",
  "chrono",
  "dotenv",
@@ -2970,7 +2986,6 @@ dependencies = [
 name = "http_server_common"
 version = "0.0.1"
 dependencies = [
- "actix-cors",
  "actix-http",
  "actix-rt",
  "actix-web",
@@ -6302,6 +6317,7 @@ dependencies = [
  "actix-utils",
  "actix-web",
  "actix-web-lab",
+ "actix_cors_configs",
  "actix_helpers",
  "anyhow",
  "async-stripe",

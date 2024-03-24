@@ -8,6 +8,7 @@ use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::middleware::{Compress, DefaultHeaders, Logger};
 use actix_web::web::Data;
 
+use actix_cors_configs::cors::build_cors_config;
 use actix_helpers::route_builder::RouteBuilder;
 use errors::AnyhowResult;
 
@@ -44,12 +45,16 @@ async fn main() -> AnyhowResult<()> {
 
   let server_state = ServerState::build(&env_args);
 
+  // NB(bt,2024-03-24): This type is supposed to be deprecated.
+  let old_server_environment = env_args.server_environment.clone();
+
   // TODO: Fix duplication for gzip compression. This is stupid.
   //  I'm too tired to figure out the generic types though.
   if env_args.enable_gzip {
     HttpServer::new(move || {
       let app = App::new()
           .app_data(Data::new(Arc::new(server_state.clone())))
+          .wrap(build_cors_config(old_server_environment))
           .wrap(Logger::new(&log_format))
           .wrap(DefaultHeaders::new()
               .add(("X-Backend-Hostname", server_hostname.as_str())))
@@ -65,6 +70,7 @@ async fn main() -> AnyhowResult<()> {
     HttpServer::new(move || {
       let app = App::new()
           .app_data(Data::new(Arc::new(server_state.clone())))
+          .wrap(build_cors_config(old_server_environment))
           .wrap(Logger::new(&log_format))
           .wrap(DefaultHeaders::new()
               .add(("X-Backend-Hostname", server_hostname.as_str())));

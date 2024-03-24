@@ -10,7 +10,6 @@
 // I don't think this will be too hard to maintain. AFAICT, the only major differences are which
 // package "HttpResponseBuilder" is located in.
 
-pub mod cors;
 pub mod endpoints;
 pub mod error;
 pub mod request;
