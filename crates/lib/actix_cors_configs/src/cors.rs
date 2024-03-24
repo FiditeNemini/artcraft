@@ -145,13 +145,13 @@ pub fn add_legacy_storyteller_stream(cors: Cors, is_production: bool) -> Cors {
         .allowed_origin("http://staging.storyteller.stream")
         .allowed_origin("https://staging.obs.storyteller.stream")
         .allowed_origin("https://staging.storyteller.stream")
-        // Legacy "create.storyteller.io" (Production)
-        .allowed_origin("http://create.storyteller.io")
-        .allowed_origin("http://obs.storyteller.io")
-        .allowed_origin("http://ws.storyteller.io")
-        .allowed_origin("https://create.storyteller.io")
-        .allowed_origin("https://obs.storyteller.io")
-        .allowed_origin("https://ws.storyteller.io")
+        // Legacy "create.storyteller.ai" (Production)
+        .allowed_origin("http://create.storyteller.ai")
+        .allowed_origin("http://obs.storyteller.ai")
+        .allowed_origin("http://ws.storyteller.ai")
+        .allowed_origin("https://create.storyteller.ai")
+        .allowed_origin("https://obs.storyteller.ai")
+        .allowed_origin("https://ws.storyteller.ai")
   } else {
     cors // NB: None!
   }
@@ -292,13 +292,13 @@ mod tests {
     let production_cors = build_cors_config(ServerEnvironment::Production);
 
     // Valid Origin
-    assert_origin_ok(&production_cors, "https://storyteller.io").await;
-    assert_origin_ok(&production_cors, "https://api.storyteller.io").await;
-    assert_origin_ok(&production_cors, "https://staging.storyteller.io").await;
+    assert_origin_ok(&production_cors, "https://storyteller.ai").await;
+    assert_origin_ok(&production_cors, "https://api.storyteller.ai").await;
+    assert_origin_ok(&production_cors, "https://staging.storyteller.ai").await;
 
     // Invalid Origin
-    assert_origin_invalid(&production_cors, "https://dev.storyteller.io").await;
-    assert_origin_invalid(&production_cors, "http://dev.storyteller.io").await;
+    assert_origin_invalid(&production_cors, "https://dev.storyteller.ai").await;
+    assert_origin_invalid(&production_cors, "http://dev.storyteller.ai").await;
   }
 
   #[actix_rt::test]
@@ -306,11 +306,11 @@ mod tests {
     let development_cors = build_cors_config(ServerEnvironment::Development);
 
     // Valid Origin
-    assert_origin_ok(&development_cors, "https://dev.storyteller.io").await;
+    assert_origin_ok(&development_cors, "https://dev.storyteller.ai").await;
     assert_origin_ok(&development_cors, "http://localhost:54321").await;
 
     // Invalid Origin
-    assert_origin_invalid(&development_cors, "https://storyteller.io").await;
-    assert_origin_invalid(&development_cors, "https://staging.storyteller.io").await;
+    assert_origin_invalid(&development_cors, "https://storyteller.ai").await;
+    assert_origin_invalid(&development_cors, "https://staging.storyteller.ai").await;
   }
 }

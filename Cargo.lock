@@ -6824,6 +6824,7 @@ version = "0.1.0"
 dependencies = [
  "easyenv",
  "log",
+ "my-workspace-hack",
  "reqwest",
  "serde_json",
 ]
@@ -8018,6 +8019,7 @@ dependencies = [
  "actix-utils",
  "actix-web",
  "actix-web-actors",
+ "actix_cors_configs",
  "anyhow",
  "base64 0.21.5",
  "chrono",

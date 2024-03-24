@@ -204,29 +204,29 @@ mod tests {
                     {
                       "fuzzy": {
                         "title": {
-                          "fuzziness": 2,
-                          "value": "FOO_BAR_BAZ"
+                          "value": "FOO_BAR_BAZ",
+                          "fuzziness": 2
                         }
                       }
                     },
                     {
                       "match": {
                         "title": {
-                          "boost": 1,
-                          "query": "FOO_BAR_BAZ"
+                          "query": "FOO_BAR_BAZ",
+                          "boost": 1
                         }
                       }
                     },
                     {
                       "multi_match": {
-                        "boost": 50,
+                        "query": "FOO_BAR_BAZ",
+                        "type": "bool_prefix",
                         "fields": [
                           "title",
                           "title._2gram",
                           "title._3gram"
                         ],
-                        "query": "FOO_BAR_BAZ",
-                        "type": "bool_prefix"
+                        "boost": 50
                       }
                     }
                   ]
@@ -266,29 +266,29 @@ mod tests {
                     {
                       "fuzzy": {
                         "title": {
-                          "fuzziness": 2,
-                          "value": "FOO_BAR_BAZ"
+                          "value": "FOO_BAR_BAZ",
+                          "fuzziness": 2
                         }
                       }
                     },
                     {
                       "match": {
                         "title": {
-                          "boost": 1,
-                          "query": "FOO_BAR_BAZ"
+                          "query": "FOO_BAR_BAZ",
+                          "boost": 1
                         }
                       }
                     },
                     {
                       "multi_match": {
-                        "boost": 50,
+                        "query": "FOO_BAR_BAZ",
+                        "type": "bool_prefix",
                         "fields": [
                           "title",
                           "title._2gram",
                           "title._3gram"
                         ],
-                        "query": "FOO_BAR_BAZ",
-                        "type": "bool_prefix"
+                        "boost": 50
                       }
                     }
                   ]
