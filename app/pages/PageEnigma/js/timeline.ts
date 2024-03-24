@@ -1,8 +1,8 @@
-import { AnyJson } from "three/examples/jsm/nodes/core/constants.js"
-import { ClipUI } from "../datastructures/clips/clip_offset"
-import AudioEngine from "./audio_engine"
-import TransformEngine from "./transform_engine"
-import Scene from "./scene.js"
+import { AnyJson } from "three/examples/jsm/nodes/core/constants.js";
+import { ClipUI } from "../datastructures/clips/clip_offset";
+import AudioEngine from "./audio_engine";
+import TransformEngine from "./transform_engine";
+import Scene from "./scene.js";
 import * as THREE from 'three';
 
 // Every object uuid / entity has a track.
