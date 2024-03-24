@@ -1,16 +1,20 @@
 //! This service is meant to help with debugging.
 
-use actix_http::StatusCode;
-use actix_web::{App, HttpResponse, HttpServer, web};
+use actix_http::body::MessageBody;
+use actix_service::ServiceFactory;
+use actix_web::{App, Error, HttpServer, web};
+use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::middleware::{Compress, DefaultHeaders, Logger};
 
 use actix_helpers::route_builder::RouteBuilder;
 use errors::AnyhowResult;
 
+use crate::endpoints::dummy_health_check_handler::dummy_health_check_handler;
+use crate::endpoints::simple_handler::simple_handler;
 use crate::env_args::env_args;
 
+pub mod endpoints;
 pub mod env_args;
-pub mod handlers;
 
 pub const DEFAULT_RUST_LOG: &str = concat!(
   "debug,",
@@ -43,11 +47,7 @@ async fn main() -> AnyhowResult<()> {
               .header("X-Backend-Hostname", &server_hostname))
           .wrap(Compress::default());
 
-      RouteBuilder::from_app(app)
-          .add_get("/", simple_handler)
-          .add_get("/_status", simple_handler)
-          .into_app()
-          .default_service(web::route().to(simple_handler))
+      build_routes(app)
     })
         .bind(&env_args.bind_address)?
         .workers(env_args.num_workers)
@@ -60,11 +60,7 @@ async fn main() -> AnyhowResult<()> {
           .wrap(DefaultHeaders::new()
               .header("X-Backend-Hostname", &server_hostname));
 
-      RouteBuilder::from_app(app)
-          .add_get("/", simple_handler)
-          .add_get("/_status", simple_handler)
-          .into_app()
-          .default_service(web::route().to(simple_handler))
+      build_routes(app)
     })
         .bind(&env_args.bind_address)?
         .workers(env_args.num_workers)
@@ -75,9 +71,20 @@ async fn main() -> AnyhowResult<()> {
   Ok(())
 }
 
-pub async fn simple_handler() -> HttpResponse {
-  HttpResponse::build(StatusCode::OK)
-      .content_type("application/json; charset=utf-8")
-      .body("{\"success\": true}")
+fn build_routes<T, B> (app: App<T>) -> App<T>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  RouteBuilder::from_app(app)
+      .add_get("/", simple_handler)
+      .add_get("/_status", dummy_health_check_handler)
+      .into_app()
+      .default_service(web::route().to(simple_handler))
 }
-
