@@ -14,7 +14,7 @@ export const SidePanel = () => {
     <div className="relative border-l border-l-ui-panel-border">
       <button
         onClick={() => setIsVisible(!isVisible)}
-        className="absolute left-[-25px] top-1/2 rounded-l-lg bg-ui-controls p-2 text-sm text-white transition duration-150 ease-in-out"
+        className="absolute left-[-25px] top-1/2 flex rounded-l-lg bg-ui-controls p-2 align-middle text-sm text-white transition duration-150 ease-in-out"
       >
         <FontAwesomeIcon icon={isVisible ? faChevronRight : faChevronLeft} />
       </button>
