@@ -39,6 +39,7 @@ class Editor {
         let newElement = document.createElement("div");
         newElement.id = "created-one-element";
         document.body.appendChild(newElement);
+        
         // Version and name.
         this.version = "v0.1";
         // Clock, scene and camera essentials.

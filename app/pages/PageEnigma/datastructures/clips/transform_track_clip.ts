@@ -14,6 +14,7 @@ export interface TransformTrackClip {
 export class TransformTrackClip implements TransformTrackClip {
   version: number;
   media_id: string;
+  object_uuid: string;
   type: "transform";
   positions: THREE.Vector3[];
   rotations: THREE.Vector3[];
@@ -23,9 +24,10 @@ export class TransformTrackClip implements TransformTrackClip {
   step_frame: number;
   looping: boolean;
 
-  constructor(version: number, media_id: string, length: number) {
+  constructor(version: number, object_uuid: string, length: number, media_id: string = "") {
     this.version = version;
     this.media_id = media_id;
+    this.object_uuid = object_uuid;
     this.type = "transform";
 
     this.length = length;
@@ -69,6 +71,8 @@ export class TransformTrackClip implements TransformTrackClip {
     return JSON.stringify({
       version: this.version,
       media_id: this.media_id,
+      object_uuid: this.object_uuid,
+      length: this.length,
       type: this.type,
       position: this.positions,
       rotation: this.rotations,
