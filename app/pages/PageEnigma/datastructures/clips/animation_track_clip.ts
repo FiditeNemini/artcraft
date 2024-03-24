@@ -1,7 +1,7 @@
 export interface AnimationTrackClip {
   version: number
-  media_id: number
-  object_uuid: number
+  media_id: string
+  object_uuid: string
   type: "animation"
   location: "glb" | "remote"
   speed: number
@@ -11,8 +11,8 @@ export interface AnimationTrackClip {
 
 export class AnimationTrackClip implements AnimationTrackClip {
   version: number
-  media_id: number // comes from the server
-  object_uuid: number
+  media_id: string // comes from the server
+  object_uuid: string
   type: "animation"
   location: "glb" | "remote"
   speed: number
@@ -21,9 +21,9 @@ export class AnimationTrackClip implements AnimationTrackClip {
 
   constructor(
     version: number,
-    media_id: number,
+    media_id: string,
     location: "glb" | "remote",
-    object_uuid: number,
+    object_uuid: string,
     speed: number,
     length: number,
     clip_name: string,
