@@ -1,5 +1,5 @@
+import { faL } from '@fortawesome/pro-solid-svg-icons';
 import * as THREE from 'three';
-import TWEEN from '@tweenjs/tween.js';
 
 export interface TransformTrackClip {
   version: number;
@@ -14,19 +14,20 @@ export interface TransformTrackClip {
 export class TransformTrackClip implements TransformTrackClip {
   version: number;
   media_id: string;
+  object_uuid: string;
   type: "transform";
   positions: THREE.Vector3[];
   rotations: THREE.Vector3[];
   scales: THREE.Vector3[];
   length: number;
 
-  current_pos: THREE.Vector3;
+  step_frame: number;
+  looping: boolean;
 
-  playing: boolean;
-
-  constructor(version: number, media_id: string, length: number) {
+  constructor(version: number, object_uuid: string, length: number, media_id: string = "") {
     this.version = version;
     this.media_id = media_id;
+    this.object_uuid = object_uuid;
     this.type = "transform";
 
     this.length = length;
@@ -35,27 +36,45 @@ export class TransformTrackClip implements TransformTrackClip {
     this.rotations = [];
     this.scales = [];
 
-    this.playing = false;
-
-    this.current_pos = new THREE.Vector3(0, 0, 0);
+    this.step_frame = 0;
+    this.looping = false;
   }
 
-  update(object: THREE.Object3D) {
-    if (this.playing) {
-      this.tweenPositions();
-      object.position.set(this.current_pos.x, this.current_pos.y, this.current_pos.z);
-    }
+  step(object: THREE.Object3D) {
+    //if (this.step_frame >= 60/this.length && this.looping == false) { return; } // Reached max frames.
+    if(this.positions.length < 2) { return; } // If there are enough points in the scene.
+    this.step_frame += 1;
+
+    let time_frame = (this.step_frame/this.length);
+
+    let curve = new THREE.CatmullRomCurve3(this.positions);
+    let point = curve.getPoint(time_frame);
+    object.position.copy(point);
+
+    let curve_rot = new THREE.CatmullRomCurve3(this.rotations);
+    let point_rot = curve_rot.getPoint(time_frame);
+    object.rotation.set(point_rot.x, point_rot.y, point_rot.z);
+
+    let curve_scale = new THREE.CatmullRomCurve3(this.scales);
+    let point_scale = curve_scale.getPoint(time_frame);
+    object.scale.copy(point_scale);
   }
 
   reset(object: THREE.Object3D) {
     if (this.positions.length > 0) {
       let first_pos = this.positions[0];
-      object.position.set(first_pos.x, first_pos.y, first_pos.z);
+      let first_rot = this.rotations[0];
+      let first_scl = this.scales[0];
+      object.position.copy(first_pos);
+      object.rotation.set(first_rot.x, first_rot.y, first_rot.z);
+      object.scale.copy(first_scl);
+      
+      this.step_frame = 0;
     }
   }
 
   add_position(position: THREE.Vector3) {
-    this.positions.push(position);
+    this.positions.push(new THREE.Vector3(position.x, position.y, position.z));
   }
 
   remove_position(position: THREE.Vector3) {
@@ -64,23 +83,32 @@ export class TransformTrackClip implements TransformTrackClip {
     });
   }
 
-  tweenPositions() {
-    const tweenDuration = this.length / this.positions.length;
+  add_rotation(rotation: THREE.Vector3) {
+    this.rotations.push(new THREE.Vector3(rotation.x, rotation.y, rotation.z));
+  }
 
-    this.positions.reduce((prevPosition, currentPosition, index) => {
-      const tween = new TWEEN.Tween(prevPosition)
-        .to({ x: currentPosition.x, y: currentPosition.y, z: currentPosition.z }, tweenDuration)
-        .onUpdate(() => {
-          this.current_pos = new THREE.Vector3(prevPosition.x, prevPosition.y, prevPosition.z);
-        });
-      return currentPosition;
-    }, this.current_pos.clone());
+  remove_rotation(rotation: THREE.Vector3) {
+    this.rotations = this.rotations.filter(rotations => {
+      return !rotation.equals(rotation);
+    });
+  }
+
+  add_scale(scale: THREE.Vector3) {
+    this.scales.push(new THREE.Vector3(scale.x, scale.y, scale.z));
+  }
+
+  remove_scale(scale: THREE.Vector3) {
+    this.scales = this.scales.filter(scales => {
+      return !scale.equals(scale);
+    });
   }
 
   toJSON(): string {
     return JSON.stringify({
       version: this.version,
       media_id: this.media_id,
+      object_uuid: this.object_uuid,
+      length: this.length,
       type: this.type,
       position: this.positions,
       rotation: this.rotations,

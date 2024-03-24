@@ -1,18 +1,12 @@
 import * as THREE from 'three';
-
-import { FBXLoader } from 'three/addons/loaders/FBXLoader';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import TransformObject from './components.js';
-import AnimatedItem from './animated_item.js';
 
 class Scene {
     constructor(name) {
         this.name = name;
         this.gridHelper = null;
         this.scene = new THREE.Scene();
-        this.animated_items = {};
         this.activeItem = null;
-        this.animations = [];
     }
 
     initialize() {
@@ -46,37 +40,15 @@ class Scene {
         //obj.type = "Object3D";
         obj.name = name;
         this.scene.add(obj);
+        return obj.uuid;
+    }
+
+    get_object_by_uuid(uuid) {
+        return this.scene.getObjectByProperty('uuid', uuid);
     }
 
     update(delta) {
-        for (let [key, value] of Object.entries(this.animated_items)) {
-            this.animated_items[key].update(delta);
-        }
-    }
-
-    create_character(filepath) {
-        // Add check to make sure the character does not exist already HERE PLEASE!!
-
-        let animated = new AnimatedItem();
-        animated.load(filepath, this.setup_character.bind(this))
-    }
-
-    create_fresh_animated_item(uuid) {
-        // Add check to make sure the character does not exist already HERE PLEASE!!
-        let animated = new AnimatedItem(uuid);
-        this.animated_items[animated.name] = animated;
-    }
-
-    setup_character(character_uuid, children, animated) {
-        this.animated_items[character_uuid] = animated;
-        console.log(character_uuid)
-        let children_uuids = [];
-        children.forEach(child => {
-            this.scene.add(child);
-            children_uuids.push(child.uuid);
-        });
-        this.animated_items[character_uuid].load_animation("/resources/models/pose/walking.glb", this.play_anim_demo.bind(this));
-        //this.animated_items[character_name].load_animation("/resources/models/fox/fox_idle.glb", this.play_anim_demo.bind(this));
+        
     }
 
     _disable_skybox() {
@@ -104,77 +76,25 @@ class Scene {
         this.accept_animation_clip(this.animated_items[character_uuid].anims[0]._clip);
     }
 
-    load_glb(filepath, object_name = null, callback = null) {
-        let glbLoader = new GLTFLoader();
-        glbLoader.load(filepath, (glb) => {
-            glb.scene.children.forEach(child => {
-                child.traverse(c => {
-                    if (c.isMesh) {
-                        c.material.metalness = 0.0;
-                        c.material.specular = 0.5;
-                        c.castShadow = true;
-                        c.receiveShadow = true;
-                        c.material.transparent = false;
-                        //if (c.morphTargetInfluences && c.morphTargetDictionary) {
-                        //    const blendShapeIndexI = c.morphTargetDictionary["vrc.v_e"];
-                        //    if (blendShapeIndexI != null){
-                        //        c.morphTargetInfluences[blendShapeIndexI] = 1.0;
-                        //    }
-                        //}
-                    }
+    async load_glb(filepath) { //: Promise<THREE.Object3D> {
+        return new Promise((resolve) => {
+            let glbLoader = new GLTFLoader();
+            glbLoader.load(filepath, (glb) => {
+                glb.scene.children.forEach(child => {
+                    child.traverse(c => {
+                        if (c.isMesh) {
+                            c.material.metalness = 0.0;
+                            c.material.specular = 0.5;
+                            c.castShadow = true;
+                            c.receiveShadow = true;
+                            c.material.transparent = false;
+                        }
+                    });
+                    this.scene.add(child);
+                    resolve(child);
                 });
-                if (object_name == null) {
-                    child.name = filepath;
-                } else {
-                    child.name = object_name;
-                }
-                child.type = "Mesh";
-                this.scene.add(child);
             });
-            if (callback != null) {
-                callback();
-            }
-        },
-            (xhr) => {
-            },
-            (error) => {
-                console.log(error)
-            });
-    }
-
-    load_fbx(filepath, object_name = null, callback = null) {
-        let fbxLoader = new FBXLoader();
-        fbxLoader.load(filepath, (fbx) => {
-            fbx.traverse(c => {
-                c.castShadow = true;
-                c.receiveShadow = true;
-                if (c.isMesh) {
-                    c.material.transparent = false;
-                }
-            });
-            if (object_name == null) {
-                fbx.name = filepath;
-            } else {
-                fbx.name = object_name;
-            }
-            fbx.type = "Mesh";
-            this.scene.add(fbx);
-
-            if (callback != null) {
-                callback();
-            }
-        },
-            (xhr) => {
-                let loading_div = document.getElementById("loading-div");
-                if (xhr.loaded / xhr.total < 1) {
-                    loading_div.style.display = "block";
-                } else {
-                    loading_div.style.display = "none";
-                }
-            },
-            (error) => {
-                console.log(error)
-            });
+        });
     }
 
     // default skybox.

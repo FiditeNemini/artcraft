@@ -8,7 +8,11 @@ export default {
     "./app/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    // extend: {},
+    extend: {
+      fontFamily: {
+        "custom-font": ["Fira Sans", "sans-serif"],
+      },
+    },
     colors: {
       transparent: "transparent",
       current: "currentColor",
@@ -84,7 +88,9 @@ export default {
 
       "ui-background": "#1a1a27",
       "ui-panel": "#242433",
-      "ui-panel-border": "#5e6097",
+      "ui-panel-border": "#393948",
+      "ui-controls": "#39394D",
+      "ui-controls-button": "#676781",
 
       gray: colors.gray,
       white: colors.white,

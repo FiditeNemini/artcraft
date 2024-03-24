@@ -1,4 +1,9 @@
-.topbar-spacer{
-  height: 73px;
+body {
+  font-family: "Fira Sans", sans-serif;
+}
+
+.topbar-spacer {
+  height: 68px;
+
   width: 100vw;
 }

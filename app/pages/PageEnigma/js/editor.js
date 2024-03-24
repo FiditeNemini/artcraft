@@ -15,7 +15,14 @@ import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
 import AudioEngine from './audio_engine.ts';
+import TransformEngine from './transform_engine.ts';
+import { TimeLine } from './timeline.ts';
+import { ClipUI } from '../datastructures/clips/clip_offset.ts';
 
+import { LipSync } from './lipsync.js';
+import { LipSyncEngine } from "./lip_sync_engine.ts";
+import { AnimationEngine} from "./animation_engine.ts";
+import { faL } from '@fortawesome/pro-solid-svg-icons';
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
         const CCapture = module.CCapture;
@@ -25,18 +32,27 @@ if (typeof window !== 'undefined') {
     });
 }
 
+class EditorState {
+    constructor() {
+        this.selected_object = null
+        this.is_loading = false 
+    }
+}
 // Main editor class that will call everything else all you need to call is " initialize(); ".
 class Editor {
 
     // Default params.
     constructor() {
+        console.log("If you see this message twice! then it rendered twice, if you see it once it's all good.")
         // For making sure the editor only gets created onece.
         this.can_initailize = false;
         let one_element = document.getElementById("created-one-element");
         //if (one_element != null) { return; }
+        this.can_initailize = true;
         let newElement = document.createElement("div");
         newElement.id = "created-one-element";
         document.body.appendChild(newElement);
+        
         // Version and name.
         this.version = "v0.1";
         // Clock, scene and camera essentials.
@@ -78,17 +94,28 @@ class Editor {
         this.playback = false;
         this.playback_location = 0;
         this.max_length = 10;
-        this.timeline = null;
         // Save & Load.
         this.save_manager = new SaveManager(this.version);
         // Audio Engine Test.
 
         this.audio_engine = new AudioEngine();
+        this.transform_engine = new TransformEngine();
+        this.lipsync_engine = new LipSyncEngine();
+        this.animation_engine = new AnimationEngine();
+        this.timeline = new TimeLine(this.audio_engine,
+                                     this.transform_engine, 
+                                     this.lipsync_engine,
+                                     this.animation_engine, 
+                                     this.activeScene);
+
+        this.test_box_uuid = null;
+        this.current_frame = 0;
+        this.test_playback = false;
     }
 
     // Initializes the main scene and ThreeJS essentials.
     initialize() {
-        //if (this.can_initailize == false) { return; }
+        if (this.can_initailize == false) { return; }
         // Gets the canvas.
         this.canvReference = document.getElementById("video-scene");
         // Base width and height.
@@ -124,8 +151,25 @@ class Editor {
         this.onWindowResize();
         // Creates the main update loop.
         this.renderer.setAnimationLoop(this.update_loop.bind(this));
+        this.test_playback = false;
+
+        this.timeline.scene = this.activeScene;
         
-        
+
+     
+        this._test_demo()
+    }
+
+    async _test_demo() {
+        // Test code here
+        // this.test_box_uuid = this.activeScene.instantiate("Box");
+        // let object = this.transform_engine.loadObject(this.test_box_uuid);
+        // this.timeline.addPlayableClip(new ClipUI(1.0, "transform", object.object_uuid, object.media_id, 50, 300));
+        // this.timeline.addPlayableClip(new ClipUI(1.0, "audio", "m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg", null, 50, 50));
+
+        let object = await this.activeScene.load_glb("./resources/models/fox/fox.glb")
+        this.lipsync_engine.load_object(object.uuid, "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72");
+        this.timeline.addPlayableClip(new ClipUI(1.0, "lipsync", object.object_uuid, object.media_id, 0, 100));
     }
 
     // Configure post processing.
@@ -179,7 +223,6 @@ class Editor {
 
     render_mode() {
         this.rendering = !this.rendering;
-        console.log(this.rendering);
         this.activeScene.render_mode(this.rendering);
 
         //if (this.rendering) {
@@ -207,11 +250,46 @@ class Editor {
         //this.activeScene.scene.remove(this.activeScene.gridHelper);
         //this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this), this.audio_manager, this.timeline, this.activeScene.animations);
         //this.activeScene._createGrid();
-        this.audio_engine.playClip("m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg");
+        //this.audio_engine.playClip("m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg");
+        //console.log(this.selected);
+        
+        if(this.selected == null) {return;}
+        this.transform_engine.addFrame(this.selected)
+    }
+
+    change_camera_view() {
+        //let obj = this.activeScene.get_object_by_uuid(this.test_box_uuid);
+        //this.transform_engine.clips[this.test_box_uuid].step(obj);
+        //console.log(this.transform_engine.clips[this.test_box_uuid].current_pos)
+        //this.current_frame += 1;
+        this.test_playback = !this.test_playback;
+        //this.transform_engine.clips[this.test_box_uuid].reset(this.activeScene.get_object_by_uuid(this.test_box_uuid));
+    }
+
+
+    // Basicly Unity 3D's update loop.
+    update_loop(time) {
+        // Updates debug stats.
+        if (this.stats != null) { this.stats.update(); }
+
+        // All calls that are not super important like timeline go here.
+        this.activeScene.update(this.clock.getDelta());
+        //this.orbit.update(0.1);
+
+        //console.log(this.transform_engine.clips[this.test_box_uuid]);
+
+        this.timeline.update();
+
+        this.render_scene();
+        if (this.capturer != null) { this.capturer.capture(this.renderer.domElement); } // Record scene.
+
+    }
+
+    start_playback() {
+        this.timeline.isPlaying = true;
     }
 
     _save_to_cloud(blob) {
-        console.log("Posting to cloud!");
         this.api_manager.uploadGLB(blob, "test.glb");
     }
 
@@ -292,20 +370,6 @@ class Editor {
         this.render_timer = 0;
     }
 
-    // Basicly Unity 3D's update loop.
-    update_loop(time) {
-        // Updates debug stats.
-        if (this.stats != null) { this.stats.update(); }
-
-        // All calls that are not super important like timeline go here.
-        this.activeScene.update(this.clock.getDelta());
-        //this.orbit.update(0.1);
-
-        this.render_scene();
-        if (this.capturer != null) { this.capturer.capture(this.renderer.domElement); } // Record scene.
-
-    }
-
     // Render the scene to the camera.
     render_scene() {
         if (this.composer != null) {
@@ -322,7 +386,6 @@ class Editor {
             this.render_timer += this.clock.getDelta();
             if (this.playback_location >= this.fps_number * 3) {
                 this.stopPlayback();
-                console.log(this.playback_location);
                 this.playback_location = 0;
                 this.rendering = false;
             }

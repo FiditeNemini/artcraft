@@ -1,9 +1,6 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-  faChevronLeft,
-  faWandSparkles,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faWandSparkles } from "@fortawesome/pro-solid-svg-icons";
 
 import { Button, ButtonLink } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
@@ -23,6 +20,8 @@ export const PageEnigma = () => {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const editorRef = useRef<Editor | null>(null);
+  const [timelineHeight, setTimelineHeight] = useState(0);
+  const timelineRef = useRef<HTMLDivElement | null>(null);
 
   const editorCallback = useCallback(() => {
     // handle editorCallback here
@@ -30,19 +29,10 @@ export const PageEnigma = () => {
 
   useEffect(() => {
     //componentDidMount
-    editorRef.current = new Editor();
 
-    function init() {
-      if (editorRef.current !== null) {
-        //TODO: init with editorRef.current.initialize(editorCallback);
-        editorRef.current.initialize();
-      }
-    }
-
-    if (canvasRef !== null) {
-      init();
-    } else {
-      setTimeout(init, 500);
+    if (editorRef.current == null) {
+      editorRef.current = new Editor();
+      editorRef.current.initialize();
     }
   }, []);
 
@@ -50,65 +40,100 @@ export const PageEnigma = () => {
     editorRef.current?.save();
   };
 
+  const handleButtonCameraView = () => {
+    editorRef.current?.change_camera_view();
+  };
+
+  const handleButtonPlayBack = () => {
+    editorRef.current?.start_playback();
+  };
+
+  const updateTimelineHeight = useCallback(() => {
+    if (timelineRef.current) {
+      setTimelineHeight(timelineRef.current.offsetHeight);
+    }
+  }, []);
+
+  //for updating timeline/engine div height (for resizing)
+  useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        updateTimelineHeight();
+      }
+    });
+
+    if (timelineRef.current) {
+      observer.observe(timelineRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [updateTimelineHeight]);
+
   return (
     <div>
       <TopBarHelmet>
-        <div className="flex grow justify-between">
-          <ButtonLink to={"/"} variant="secondary" icon={faChevronLeft}>
-            Back to Dashboard
-          </ButtonLink>
-          <Button icon={faWandSparkles}>Generate Movie</Button>
-          <span className="w-8" />
-        </div>
+        <Button icon={faWandSparkles}>Generate Movie</Button>
       </TopBarHelmet>
-      <canvas ref={canvasRef} id="video-scene" width="1280px" height="720px" />
-      <div className="fixed left-4 top-20">
-        <div className="mt-2 flex gap-2">
-          <Button variant="secondary">Toggle Camera View</Button>
-          <Button variant="secondary" onClick={handleButtonSave}>
-            Save Scene
-          </Button>
-          <ButtonDialogue
-            buttonProps={{
-              variant: "secondary",
-              label: "Help",
-            }}
-            title="Help"
-          >
-            <p>Do you need help?</p>
-            <p>Ask Michael about this project</p>
-            <p>Ask Miles about ThreeJS</p>
-            <p>Ask Wil about React</p>
-          </ButtonDialogue>
-          <Controls3D />
-          <ControlsVideo />
+
+      <div style={{ height: "calc(100vh - 68px)" }}>
+        {/* Engine section/side panel */}
+        <div
+          className="flex"
+          style={{ height: `calc(100% - ${timelineHeight}px)` }}
+        >
+          <div className="relative w-full overflow-hidden bg-gray-400">
+            <canvas
+              ref={canvasRef}
+              id="video-scene"
+              width="1280px"
+              height="720px"
+            />
+
+            {/* Top controls */}
+            <div className="absolute left-0 top-0 w-full">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="flex gap-2 pl-3 pt-3">
+                  <Button variant="secondary" onClick={handleButtonPlayBack}>
+                    Toggle Camera View
+                  </Button>
+                  <Button variant="secondary" onClick={handleButtonSave}>
+                    Save Scene
+                  </Button>
+                  <ButtonDialogue
+                    buttonProps={{
+                      variant: "secondary",
+                      label: "Help",
+                    }}
+                    title="Help"
+                  >
+                    <p>Do you need help?</p>
+                    <p>Ask Michael about this project</p>
+                    <p>Ask Miles about ThreeJS</p>
+                    <p>Ask Wil about React</p>
+                  </ButtonDialogue>
+                </div>
+
+                <Controls3D />
+              </div>
+            </div>
+
+            {/* Bottom controls */}
+            <div className="absolute bottom-0 left-0 w-full">
+              <ControlsVideo />
+            </div>
+          </div>
+
+          {/* Side panel */}
+          <SidePanel />
+        </div>
+
+        {/* Timeline */}
+        <div className="min-h-[220px]" ref={timelineRef}>
+          <TrackProvider>
+            <Timeline editorCurrent={editorRef.current} time={20} />
+          </TrackProvider>
         </div>
       </div>
-      <SidePanel>
-        <Tabs
-          tabs={[
-            {
-              header: "Animation",
-              children: <p>Animation Tab</p>,
-            },
-            {
-              header: "Camera",
-              children: <p>Camera Tab</p>,
-            },
-            {
-              header: "Audio",
-              children: <p>Audio Tab</p>,
-            },
-            {
-              header: "Styling",
-              children: <p>Styling Tab</p>,
-            },
-          ]}
-        />
-      </SidePanel>
-      <TrackProvider>
-        <Timeline editorCurrent={editorRef.current} time={20} />
-      </TrackProvider>
     </div>
   );
 };

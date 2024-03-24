@@ -99,7 +99,6 @@ class AnimatedItem {
         glbLoader.load(filepath,
             (object) => {
                 let anim = object.animations[0];
-                console.log(anim);
                 anim.name = this.name+'::'+anim.name;
                 let animationAction = this.mixer.clipAction(anim);
                 this.anims.push(animationAction);
