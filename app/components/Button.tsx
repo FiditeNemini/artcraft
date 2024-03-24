@@ -1,5 +1,6 @@
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { twMerge } from "tailwind-merge";
 
 export interface ButtonPropsI
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -25,10 +26,11 @@ export const Button = ({
       }
     }
   }
-  const className =
-    "text-sm font-semibold rounded-md px-3 py-2 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all duration-150" +
-    getVariantClassNames(variant) +
-    (propsClassName ? ` ${propsClassName}` : "");
+  const className = twMerge(
+    "text-sm font-semibold rounded-md px-3 py-2 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all duration-150",
+    getVariantClassNames(variant),
+    propsClassName,
+  );
 
   return (
     <button className={className} {...rest}>
