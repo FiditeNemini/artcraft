@@ -35,8 +35,9 @@ use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::*;
 use crate::http_server::endpoints::engine::create_scene_handler::*;
 use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
-use crate::http_server::endpoints::media_files::delete_media_file::*;
+use crate::http_server::endpoints::media_files::batch_get_media_files_handler::*;
 use crate::http_server::endpoints::media_files::change_media_file_visibility_handler::*;
+use crate::http_server::endpoints::media_files::delete_media_file::*;
 use crate::http_server::endpoints::media_files::get_media_file::*;
 use crate::http_server::endpoints::media_files::list::list_featured_media_files::*;
 use crate::http_server::endpoints::media_files::list::list_media_files::*;
@@ -78,6 +79,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::engine::create_scene_handler::create_scene_handler,
     crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler,
     crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler,
+    crate::http_server::endpoints::media_files::batch_get_media_files_handler::batch_get_media_files_handler,
     crate::http_server::endpoints::media_files::change_media_file_visibility_handler::change_media_file_visibility_handler,
     crate::http_server::endpoints::media_files::delete_media_file::delete_media_file_handler,
     crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler,
@@ -150,12 +152,17 @@ use crate::http_server::web_utils::response_success_helpers::*;
     Visibility,
 
     // Endpoint API types
+    BatchGetMediaFilesError,
+    BatchGetMediaFilesModelInfo,
+    BatchGetMediaFilesQueryParams,
+    BatchGetMediaFilesSuccessResponse,
     BatchGetUserBookmarksError,
     BatchGetUserBookmarksQueryParams,
     BatchGetUserBookmarksResponse,
     BatchGetUserRatingError,
     BatchGetUserRatingQueryParams,
     BatchGetUserRatingResponse,
+    BatchMediaFileInfo,
     BookmarkRow,
     ChangeMediaFileVisibilityError,
     ChangeMediaFileVisibilityPathInfo,
