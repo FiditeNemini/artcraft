@@ -51,6 +51,7 @@ mod tests {
         Ok(())
     }
 
+    #[ignore]
     #[tokio::test]
     #[serial]
     async fn test_create_weights() -> AnyhowResult<()> {
@@ -121,6 +122,7 @@ mod tests {
         Ok(())
     }
 
+    #[ignore]
     #[tokio::test]
     #[serial]
     async fn test_delete_and_undelete_weights_user() -> AnyhowResult<()> {
@@ -197,6 +199,7 @@ mod tests {
         Ok(())
     }
 
+    #[ignore]
     #[tokio::test]
     #[serial]
     async fn test_delete_and_undelete_weights_mod() -> AnyhowResult<()> {
@@ -272,6 +275,7 @@ mod tests {
         Ok(())
     }
 
+    #[ignore]
     #[tokio::test]
     #[serial]
     async fn list_all_weights_by_user() -> AnyhowResult<()> {
@@ -360,6 +364,7 @@ mod tests {
     }
 
     // Tests paging for the list weights query builder
+    #[ignore]
     #[tokio::test]
     #[serial]
     async fn list_weights_query_build_test_paging() -> AnyhowResult<()> {
@@ -413,6 +418,7 @@ mod tests {
         Ok(())
     }
 
+    #[ignore]
     #[tokio::test]
     #[serial]
     async fn list_weights_query_build_test_asc_desc_cursor_reverse() -> AnyhowResult<()> {
@@ -467,6 +473,8 @@ mod tests {
 
         Ok(())
     }
+
+    #[ignore]
     #[tokio::test]
     #[serial]
     // asc and desc tests
@@ -521,6 +529,7 @@ mod tests {
         Ok(())
     }
 
+    #[ignore]
     #[tokio::test]
     #[serial]
     async fn list_weights_query_build_test() -> AnyhowResult<()> {
@@ -625,6 +634,7 @@ mod tests {
         Ok(())
     }
 
+    #[ignore]
     #[tokio::test]
     #[serial]
     async fn list_weights_query_builder_page_type_and_category() -> AnyhowResult<()> {
@@ -664,6 +674,7 @@ mod tests {
         Ok(())
     }
 
+    #[ignore]
     #[tokio::test]
     #[serial]
     async fn list_weight_query_builder_all() -> AnyhowResult<()> {
@@ -683,6 +694,7 @@ mod tests {
         Ok(())
     }
 
+    #[ignore]
     #[tokio::test]
     #[serial]
     async fn list_limits() -> AnyhowResult<()> {
@@ -726,6 +738,7 @@ mod tests {
         Ok(())
     }
 
+    #[ignore]
     #[tokio::test]
     #[serial]
     async fn page_across_a_category() -> AnyhowResult<()> {

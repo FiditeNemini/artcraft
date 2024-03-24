@@ -11,5 +11,6 @@ use crate::prefixes::TokenPrefix;
 #[sqlx(transparent)]
 pub struct PromptToken(pub String);
 
-impl_string_token!(PromptToken);
 impl_crockford_generator!(PromptToken, 32usize, TokenPrefix::Prompt, CrockfordLower);
+impl_mysql_token_from_row!(PromptToken);
+impl_string_token!(PromptToken);

@@ -11,5 +11,6 @@ use utoipa::ToSchema;
 #[sqlx(transparent)]
 pub struct ModelWeightToken(pub String);
 
-impl_string_token!(ModelWeightToken);
 impl_crockford_generator!(ModelWeightToken, 32usize, TokenPrefix::ModelWeight, CrockfordLower);
+impl_mysql_token_from_row!(ModelWeightToken);
+impl_string_token!(ModelWeightToken);

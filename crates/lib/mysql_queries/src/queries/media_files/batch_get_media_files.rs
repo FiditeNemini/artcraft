@@ -21,6 +21,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
+use tokens::traits::mysql_token_from_row::MySqlTokenFromRow;
 
 #[derive(Serialize, Debug)]
 pub struct MediaFile {
@@ -307,23 +308,19 @@ impl FromRow<'_, MySqlRow> for MediaFileRaw {
       media_class: MediaFileClass::try_from_mysql_row(row, "media_class")?,
       maybe_media_subtype: MediaFileSubtype::try_from_mysql_row_nullable(row, "maybe_media_subtype")?,
 
-      maybe_batch_token: row.try_get::<Option<String>, _>("maybe_batch_token")?
-          .and_then(|token| Some(BatchGenerationToken::new_from_str(&token))),
+      maybe_batch_token: BatchGenerationToken::try_from_mysql_row_nullable(row, "maybe_batch_token")?,
 
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       maybe_origin_filename: row.try_get("maybe_origin_filename")?,
-      maybe_creator_user_token: row.try_get::<Option<String>, _>("maybe_creator_user_token")?
-          .and_then(|token| Some(UserToken::new_from_str(&token))),
+      maybe_creator_user_token: UserToken::try_from_mysql_row_nullable(row, "maybe_creator_user_token")?,
       maybe_creator_username: row.try_get("maybe_creator_username")?,
       maybe_creator_display_name: row.try_get("maybe_creator_display_name")?,
       maybe_creator_gravatar_hash: row.try_get("maybe_creator_gravatar_hash")?,
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
 
-      maybe_prompt_token: row.try_get::<Option<String>, _>("maybe_prompt_token")?
-          .and_then(|token| Some(PromptToken::new_from_str(&token))),
+      maybe_prompt_token: PromptToken::try_from_mysql_row_nullable(row, "maybe_prompt_token")?,
 
-      maybe_model_weights_token: row.try_get::<Option<String>, _>("maybe_model_weights_token")?
-          .and_then(|token| Some(ModelWeightToken::new_from_str(&token))),
+      maybe_model_weights_token: ModelWeightToken::try_from_mysql_row_nullable(row, "maybe_model_weights_token")?,
       maybe_model_weights_title: row.try_get("maybe_model_weights_title")?,
       maybe_model_weights_type: WeightsType::try_from_mysql_row_nullable(row, "maybe_model_weights_type")?,
       maybe_model_weights_category: WeightsCategory::try_from_mysql_row_nullable(row, "maybe_model_weights_category")?,
@@ -332,8 +329,7 @@ impl FromRow<'_, MySqlRow> for MediaFileRaw {
       maybe_model_cover_image_public_bucket_prefix: row.try_get("maybe_model_cover_image_public_bucket_prefix")?,
       maybe_model_cover_image_public_bucket_extension: row.try_get("maybe_model_cover_image_public_bucket_extension")?,
 
-      maybe_model_weight_creator_user_token:  row.try_get::<Option<String>, _>("maybe_model_weight_creator_user_token")?
-          .and_then(|token| Some(UserToken::new_from_str(&token))),
+      maybe_model_weight_creator_user_token: UserToken::try_from_mysql_row_nullable(row, "maybe_model_weight_creator_user_token")?,
       maybe_model_weight_creator_username: row.try_get("maybe_model_weight_creator_username")?,
       maybe_model_weight_creator_display_name: row.try_get("maybe_model_weight_creator_display_name")?,
       maybe_model_weight_creator_gravatar_hash: row.try_get("maybe_model_weight_creator_gravatar_hash")?,

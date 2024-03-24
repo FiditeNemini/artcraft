@@ -11,5 +11,6 @@ use crate::prefixes::TokenPrefix;
 #[sqlx(transparent)]
 pub struct BatchGenerationToken(pub String);
 
-impl_string_token!(BatchGenerationToken);
 impl_crockford_generator!(BatchGenerationToken, 32usize, TokenPrefix::BatchGeneration, CrockfordLower);
+impl_mysql_token_from_row!(BatchGenerationToken);
+impl_string_token!(BatchGenerationToken);

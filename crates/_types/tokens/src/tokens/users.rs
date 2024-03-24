@@ -10,6 +10,7 @@ use utoipa::ToSchema;
 #[sqlx(transparent)]
 pub struct UserToken(pub String);
 
+impl_mysql_token_from_row!(UserToken);
 impl_string_token!(UserToken);
 // NB: Older user tokens were under this regime: 15 characters, "U:" prefix, Crockford Upper.
 impl_crockford_generator!(UserToken, 18usize, TokenPrefix::User, CrockfordLower);
