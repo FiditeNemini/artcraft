@@ -25,8 +25,8 @@ export class LipSyncEngine {
     }
 
     // needs to be called by the engine.
-    update(delta_time: number) {
-        this.lipsync.update(delta_time)
+    update() {
+        this.lipsync.update()
     }
 
     playClip(face: THREE.Object3D,audio_media_id: string) {

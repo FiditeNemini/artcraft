@@ -18,12 +18,15 @@ for (let m = 0; m < BoundingFrequencyFem.length; m++) {
 }
 
 export class LipSync {
-  constructor(face) {
+  constructor(face=null) {
+
     this.face = face;
+
+    // WE NEED THIS TO be run at RUNTIME
     // we have to modify this for our
-    this.ee = this.face.morphTargetDictionary["E"];
-    this.oh = this.face.morphTargetDictionary["O"];
-    this.ah = this.face.morphTargetDictionary["aa"];
+    // this.ee = this.face.morphTargetDictionary["E"];
+    // this.oh = this.face.morphTargetDictionary["O"];
+    // this.ah = this.face.morphTargetDictionary["aa"];
   }
 
   // for streaming sound?

@@ -19,6 +19,10 @@ import TransformEngine from './transform_engine.ts';
 import { TimeLine } from './timeline.ts';
 import { ClipUI } from '../datastructures/clips/clip_offset.ts';
 
+import { LipSync } from './lipsync.js';
+import { LipSyncEngine } from "./lip_sync_engine.ts";
+import { AnimationEngine} from "./animation_engine.ts";
+import { faL } from '@fortawesome/pro-solid-svg-icons';
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
         const CCapture = module.CCapture;
@@ -28,6 +32,12 @@ if (typeof window !== 'undefined') {
     });
 }
 
+class EditorState {
+    constructor() {
+        this.selected_object = null
+        this.is_loading = false 
+    }
+}
 // Main editor class that will call everything else all you need to call is " initialize(); ".
 class Editor {
 
@@ -90,7 +100,13 @@ class Editor {
 
         this.audio_engine = new AudioEngine();
         this.transform_engine = new TransformEngine();
-        this.timeline = new TimeLine(this.audio_engine, this.transform_engine, this.activeScene);
+        this.lipsync_engine = new LipSyncEngine();
+        this.animation_engine = new AnimationEngine();
+        this.timeline = new TimeLine(this.audio_engine,
+                                     this.transform_engine, 
+                                     this.lipsync_engine,
+                                     this.animation_engine, 
+                                     this.activeScene);
 
         this.test_box_uuid = null;
         this.current_frame = 0;
