@@ -83,6 +83,7 @@ export default {
       "ui-panel": "#242433",
       "ui-panel-border": "#393948",
       "ui-controls": "#39394D",
+      "ui-controls-button": "#676781",
 
       gray: colors.gray,
       white: colors.white,

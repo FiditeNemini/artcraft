@@ -130,7 +130,7 @@ export const PageEnigma = () => {
           </div>
 
           {/* Side panel */}
-          <div>
+          <div className="border-l border-l-ui-panel-border">
             <Tabs
               tabs={[
                 {

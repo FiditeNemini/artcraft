@@ -1,28 +1,27 @@
+// ButtonIcon.tsx
+import React from "react";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import {
-  FontAwesomeIcon,
-  FontAwesomeIconProps,
-} from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export interface ButtonIconPropsI
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonIconProps {
   icon: IconDefinition;
-  iconClass?: string;
-  iconProps?: FontAwesomeIconProps;
+  fill?: boolean;
+  onClick: () => void;
 }
 
-export const ButtonIcon = ({
+const ButtonIcon: React.FC<ButtonIconProps> = ({
   icon,
-  iconClass,
-  iconProps,
-  className: propsClassName,
-  ...rest
-}: ButtonIconPropsI) => {
+  onClick,
+  fill = false,
+}) => {
   return (
-    <button className={propsClassName} {...rest}>
-      {icon && (
-        <FontAwesomeIcon {...iconProps} className={iconClass} icon={icon} />
-      )}
+    <button
+      className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150 hover:bg-ui-panel/[0.4] ${fill ? "bg-ui-controls-button hover:bg-ui-controls-button/[0.75]" : "bg-transparent"}`}
+      onClick={onClick}
+    >
+      <FontAwesomeIcon icon={icon} />
     </button>
   );
 };
+
+export { ButtonIcon };
