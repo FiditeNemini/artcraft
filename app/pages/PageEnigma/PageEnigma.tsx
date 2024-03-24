@@ -72,16 +72,10 @@ export const PageEnigma = () => {
   return (
     <div>
       <TopBarHelmet>
-        <div className="flex grow justify-between">
-          <ButtonLink to={"/"} variant="secondary" icon={faChevronLeft}>
-            Back to Dashboard
-          </ButtonLink>
-          <Button icon={faWandSparkles}>Generate Movie</Button>
-          <span className="w-8" />
-        </div>
+        <Button icon={faWandSparkles}>Generate Movie</Button>
       </TopBarHelmet>
 
-      <div style={{ height: "calc(100vh - 73px)" }}>
+      <div style={{ height: "calc(100vh - 64px)" }}>
         {/* Engine section/side panel */}
         <div
           className="flex"
