@@ -1,35 +1,29 @@
-import {
-  useCallback,
-  useLayoutEffect,
-  useState
-} from 'react';
-import { Dialog } from '@headlessui/react'
+import { useCallback, useLayoutEffect, useState } from "react";
+import { Dialog } from "@headlessui/react";
 
-import {
-  faXmark,
-} from '@fortawesome/pro-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { TOP_BAR_HEIGHT } from '~/constants';
+import { TOP_BAR_HEIGHT } from "~/constants";
 
 export const SidePanelInner = ({
   title,
   children,
-  closeCallback
-}:{
+  closeCallback,
+}: {
   title?: string;
   children: React.ReactNode;
-  closeCallback: ()=>void;
-})=>{
+  closeCallback: () => void;
+}) => {
   const [height, setHeight] = useState(0);
-  const handleWindowResize = useCallback(()=>{
-    if(window){
-      setHeight (Math.ceil(window.innerHeight * 3 / 4) - TOP_BAR_HEIGHT);
+  const handleWindowResize = useCallback(() => {
+    if (window) {
+      setHeight(Math.ceil((window.innerHeight * 3) / 4) - TOP_BAR_HEIGHT);
     }
     return 0;
-  },[])
+  }, []);
 
-  useLayoutEffect(()=>{
+  useLayoutEffect(() => {
     handleWindowResize();
     window.addEventListener("resize", handleWindowResize);
     return () => {
@@ -37,19 +31,19 @@ export const SidePanelInner = ({
     };
   }, [handleWindowResize]);
 
-  return(
+  return (
     <div
-      className="flex flex-col overflow-y-scroll bg-ui-panel py-6 shadow-xl border-y border-l border-ui-panel-border"
-      style={{height:height+'px'}}
+      className="flex flex-col overflow-y-scroll border-y border-l border-ui-panel-border bg-ui-panel py-6 shadow-xl"
+      style={{ height: height + "px" }}
     >
       <div className="px-4 sm:px-6">
         <div className="flex items-start justify-between">
-          {!title && <span/>}
-          {title &&
+          {!title && <span />}
+          {title && (
             <Dialog.Title className="text-base font-semibold leading-6 text-white">
               {title}
             </Dialog.Title>
-          }
+          )}
           <div className="ml-3 flex h-7 items-center">
             <button
               type="button"
@@ -59,7 +53,7 @@ export const SidePanelInner = ({
               {/* <span className="absolute -inset-2.5" /> */}
               <span className="sr-only">Close panel</span>
               <FontAwesomeIcon
-                className="h-6 w-6 mt-1 mx-1"
+                className="mx-1 mt-1 h-6 w-6"
                 aria-hidden="true"
                 icon={faXmark}
               />
@@ -67,9 +61,7 @@ export const SidePanelInner = ({
           </div>
         </div>
       </div>
-      <div className="relative mt-6 flex-1 px-4 sm:px-6">
-        {children}
-      </div>
+      <div className="relative mt-6 flex-1">{children}</div>
     </div>
   );
-}
+};
