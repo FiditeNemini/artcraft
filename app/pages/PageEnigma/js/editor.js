@@ -278,7 +278,7 @@ class Editor {
 
         //console.log(this.transform_engine.clips[this.test_box_uuid]);
 
-        this.timeline.update();
+        this.timeline.update(this.clock.getDelta());
 
         this.render_scene();
         if (this.capturer != null) { this.capturer.capture(this.renderer.domElement); } // Record scene.

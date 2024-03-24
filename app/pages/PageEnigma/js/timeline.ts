@@ -132,7 +132,7 @@ export class TimeLine {
     }
 
     // called by the editor update loop on each frame
-    async update() {
+    async update(deltatime:number) {
         if (this.isPlaying == false) return; // start and stop 
 
         if (this.scrubberPosition <= 0) {
@@ -170,7 +170,10 @@ export class TimeLine {
 
                 else if (element.type == "animation") {
                     let object = this.scene.get_object_by_uuid(element.object_uuid);
-                    if (object) { this.animationEngine.play(object); }
+                    if (object) { 
+                        await this.animationEngine.clips[object.uuid].play(object); 
+                        this.animationEngine.clips[object.uuid].step(deltatime);
+                    }
                 }
                 else {
                     this.stop()

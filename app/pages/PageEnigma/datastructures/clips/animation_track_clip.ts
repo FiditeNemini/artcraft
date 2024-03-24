@@ -1,3 +1,4 @@
+import { faL } from '@fortawesome/pro-solid-svg-icons';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -13,16 +14,17 @@ export interface AnimationTrackClip {
 }
 
 export class AnimationTrackClip implements AnimationTrackClip {
-  version: number
-  media_id: string // comes from the server
-  object_uuid: string
-  type: "animation"
-  location: "glb" | "remote"
-  speed: number
-  length: number
-  clip_name: string
-  mixer: THREE.AnimationMixer | undefined
+  version: number;
+  media_id: string; // comes from the server
+  object_uuid: string;
+  type: "animation";
+  location: "glb" | "remote";
+  speed: number;
+  length: number;
+  clip_name: string;
+  mixer: THREE.AnimationMixer | undefined;
   animation_clip: THREE.AnimationClip | undefined;
+  clip_action: THREE.AnimationAction | undefined;
 
   constructor(
     version: number,
@@ -43,13 +45,14 @@ export class AnimationTrackClip implements AnimationTrackClip {
     this.clip_name = clip_name;
     this.animation_clip;
     this.mixer;
+    this.clip_action;
   }
 
   // Takes a glb animation loads from the server  
   _load_animation(url: string): Promise<THREE.AnimationClip> {
     return new Promise((resolve) => {
       const glbLoader = new GLTFLoader();
-  
+
       glbLoader.load(
         url,
         (gltf) => {
@@ -60,7 +63,6 @@ export class AnimationTrackClip implements AnimationTrackClip {
       );
     });
   }
-
 
   _create_mixer(object: THREE.Object3D) {
     this.mixer = new THREE.AnimationMixer(object);
@@ -75,13 +77,24 @@ export class AnimationTrackClip implements AnimationTrackClip {
 
   async play(object: THREE.Object3D) {
     if (this.mixer == null) { this._create_mixer(object) }
+
     let anim_clip = await this._get_clip();
-    this.mixer?.clipAction(anim_clip);
+    this.clip_action = this.mixer?.clipAction(anim_clip);
+    if (this.clip_action) {
+      if (this.clip_action?.isRunning() == false) {
+        this.clip_action.play();
+      }
+    }
+
   }
 
   step(deltatime: number) {
     if (this.mixer == null) { return; }
     this.mixer?.update(deltatime);
+  }
+
+  stop() {
+    this.mixer?.stopAllAction();
   }
 
   toJSON(): string {

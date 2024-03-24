@@ -21,14 +21,6 @@ export class AnimationEngine {
             1.0, 1.0, 
             clip_name);
     }
-
-    play(object: THREE.Object3D) {
-        this.clips[object.uuid].play(object);
-    }
-
-    stop(media_id: string) {
-
-    }
 }
 
 export default AnimationEngine;
