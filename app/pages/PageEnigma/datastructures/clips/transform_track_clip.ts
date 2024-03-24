@@ -41,19 +41,22 @@ export class TransformTrackClip implements TransformTrackClip {
   }
 
   step(object: THREE.Object3D) {
-    if (this.step_frame >= 60/this.length && this.looping == false) { return; } // Reached max frames.
+    //if (this.step_frame >= 60/this.length && this.looping == false) { return; } // Reached max frames.
     if(this.positions.length < 2) { return; } // If there are enough points in the scene.
     this.step_frame += 1;
+
+    let time_frame = (this.step_frame/this.length);
+
     let curve = new THREE.CatmullRomCurve3(this.positions);
-    let point = curve.getPoint((this.step_frame/60)*this.length);
+    let point = curve.getPoint(time_frame);
     object.position.copy(point);
 
     let curve_rot = new THREE.CatmullRomCurve3(this.rotations);
-    let point_rot = curve_rot.getPoint((this.step_frame/60)*this.length);
+    let point_rot = curve_rot.getPoint(time_frame);
     object.rotation.set(point_rot.x, point_rot.y, point_rot.z);
 
     let curve_scale = new THREE.CatmullRomCurve3(this.scales);
-    let point_scale = curve_scale.getPoint((this.step_frame/60)*this.length);
+    let point_scale = curve_scale.getPoint(time_frame);
     object.scale.copy(point_scale);
   }
 

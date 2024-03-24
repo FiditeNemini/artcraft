@@ -1,5 +1,5 @@
 import { AnyJson } from "three/examples/jsm/nodes/core/constants.js"
-import { ClipOffset } from "../datastructures/clips/clip_offset"
+import { ClipUI } from "../datastructures/clips/clip_offset"
 import AudioEngine from "./audio_engine"
 import TransformEngine from "./transform_engine"
 import Scene from "./scene.js"
@@ -17,8 +17,8 @@ export class TimelineCurrentReactState {
 }
 
 export class TimeLine {
-    timelineItems: ClipOffset[]
-    runningClips: ClipOffset[]
+    timelineItems: ClipUI[]
+    runningClips: ClipUI[]
 
     //timerID: NodeJS.Timeout | null
     timeLineLimit: number
@@ -36,7 +36,7 @@ export class TimeLine {
     
     constructor(audioEngine:AudioEngine, transformEngine:TransformEngine, scene:Scene) {
         this.timelineItems = []
-        this.timeLineLimit = 60 * 5 // 10 seconds
+        this.timeLineLimit = 60 * 10 // 10 seconds
         this.runningClips = []
         this.isPlaying = false
         this.scrubberPosition = 0 // in frames into the tl
@@ -48,7 +48,7 @@ export class TimeLine {
         this.scene = scene;
     }
 
-    async addPlayableClip(clip: ClipOffset): Promise<void> {
+    async addPlayableClip(clip: ClipUI): Promise<void> {
         this.timelineItems.push(clip)
     }
 
@@ -121,10 +121,30 @@ export class TimeLine {
         // this.timerID = timerID
     }
 
+    async reset_scene() {
+        for (const element of this.timelineItems) {
+            if (element.type == "transform") {
+                let object = this.scene.get_object_by_uuid(element.object_uuid);
+                if(object) { this.transformEngine.clips[element.object_uuid].reset(object); }
+            }
+            else if (element.type == "audio") {
+
+            }
+            else if (element.type == "animation") {
+            } else {
+                this.stop()
+                throw "Error New Type of element in the timeline"
+            }
+        }
+    }
 
     // called by the editor update loop on each frame
     async update() {
         if (this.isPlaying == false) return; // start and stop 
+
+        if(this.scrubberPosition <= 0) {
+            await this.reset_scene();
+        }
 
         this.scrubberPosition += 1;
         console.log(this.scrubberPosition);
@@ -138,10 +158,9 @@ export class TimeLine {
                 // remove the element from the list
                 if (element.type == "transform") {
                     let object = this.scene.get_object_by_uuid(element.object_uuid);
-                    console.log(object);
                     if(object)
                     {
-                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset-element.start_offset)/60;
+                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset-element.start_offset);
                         this.transformEngine.clips[element.object_uuid].step(object);
                     }
                 }
@@ -182,44 +201,44 @@ export class TimeLine {
 //// Visual verification tests.
 //function CheckIfBasicAudioClipWorks() {
 //    const timeline = new TimeLine()
-//    timeline.addPlayableClip(new ClipOffset(1.0,'audio',1,0))
+//    timeline.addPlayableClip(new ClipUI(1.0,'audio',1,0))
 //    timeline.play()
 //}
 //
 //function CheckIfBasicTransformClipWorks() {
 //    const timeline = new TimeLine()
-//    timeline.addPlayableClip(new ClipOffset(1.0,'transform',2,0))
+//    timeline.addPlayableClip(new ClipUI(1.0,'transform',2,0))
 //    timeline.play()
 //}
 //
 //function CheckIfBasicClipWorks() {
 //    const timeline = new TimeLine()
-//    timeline.addPlayableClip(new ClipOffset(1.0,'animation',3,0))
+//    timeline.addPlayableClip(new ClipUI(1.0,'animation',3,0))
 //    timeline.play()
 //}
 
 // function CheckIfBasicClipWorks3SecondsAfterTimelineStops() {
 //     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipOffset("clip1", 0, 10000))
+//     timeline.addPlayableClip(new ClipUI("clip1", 0, 10000))
 //     timeline.play()
 // }
 
 // function CheckIfTwoClipsAtTheSameTimeWorks() {
 //     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipOffset("clip1", 0, 1000))
+//     timeline.addPlayableClip(new ClipUI("clip1", 0, 1000))
 //     timeline.play()
 // }
 
 // function CheckIfTwoClipsOneAfterAnotherWorks() {
 //     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipOffset("clip1", 0, 1000))
-//     timeline.addPlayableClip(new ClipOffset("clip2", 0, 2000))
+//     timeline.addPlayableClip(new ClipUI("clip1", 0, 1000))
+//     timeline.addPlayableClip(new ClipUI("clip2", 0, 2000))
 //     timeline.play()
 // }
 
 // function CheckIfTimeLineStopBeforeClipPlays() {
 //     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipOffset("clip3",0,1000))
+//     timeline.addPlayableClip(new ClipUI("clip3",0,1000))
 //     timeline.play()
 //     setInterval(async ()=> {
 //         timeline.stop()
@@ -229,7 +248,7 @@ export class TimeLine {
 
 // function CheckIfTimeLineStartAfterClipPlays() {
 //     const timeline = new TimeLine() 
-//     timeline.addPlayableClip(new ClipOffset("clip3",0,1000))
+//     timeline.addPlayableClip(new ClipUI("clip3",0,1000))
 //     timeline.play()
 //     setInterval(async ()=> {
 //         timeline.stop()
@@ -239,10 +258,10 @@ export class TimeLine {
 
 // function CheckIfClipsPlayAllTogetherConcurrently() {
 //     const timeline = new TimeLine() 
-//     timeline.addPlayableClip(new ClipOffset("clip1",0,1000))
-//     timeline.addPlayableClip(new ClipOffset("clip2",0,1000))
-//     timeline.addPlayableClip(new ClipOffset("clip3",0,1000))
-//     timeline.addPlayableClip(new ClipOffset("clip4",0,1000))
+//     timeline.addPlayableClip(new ClipUI("clip1",0,1000))
+//     timeline.addPlayableClip(new ClipUI("clip2",0,1000))
+//     timeline.addPlayableClip(new ClipUI("clip3",0,1000))
+//     timeline.addPlayableClip(new ClipUI("clip4",0,1000))
 //     timeline.play()
 // }
 

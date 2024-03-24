@@ -17,7 +17,7 @@ import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 import AudioEngine from './audio_engine.ts';
 import TransformEngine from './transform_engine.ts';
 import { TimeLine } from './timeline.ts';
-import { ClipOffset } from '../datastructures/clips/clip_offset.ts';
+import { ClipUI } from '../datastructures/clips/clip_offset.ts';
 
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
@@ -141,7 +141,7 @@ class Editor {
 
         this.test_box_uuid = this.activeScene.instantiate("Box");
         let object = this.transform_engine.loadObject(this.test_box_uuid);
-        this.timeline.addPlayableClip(new ClipOffset(1.0, "transform", object.object_uuid, object.media_id, 0, 200));
+        this.timeline.addPlayableClip(new ClipUI(1.0, "transform", object.object_uuid, object.media_id, 200, 300));
     }
 
     // Configure post processing.

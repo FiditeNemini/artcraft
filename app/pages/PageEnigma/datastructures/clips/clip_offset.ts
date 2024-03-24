@@ -1,4 +1,4 @@
-export interface ClipOffset {
+export interface ClipUI {
   version: number
   type: "transform" | "audio" | "animation"
   media_id: number
@@ -9,7 +9,7 @@ export interface ClipOffset {
 
 // Clip offsets represent the state of the clip on the timeline as well as what type of clip it is.
 // it is created from a media id.
-export class ClipOffset implements ClipOffset {
+export class ClipUI implements ClipUI {
   version: number
   type: "transform" | "audio" | "animation"
   media_id: number
