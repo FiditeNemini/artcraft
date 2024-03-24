@@ -33,7 +33,7 @@ export function ButtonIconSelect({
       {options.map(({ value, icon }) => (
         <button
           key={value}
-          className={`flex h-8 w-8 items-center justify-center transition-all duration-150 hover:bg-ui-panel/[0.4] ${selectedOption === value ? "border-2 border-brand-primary bg-ui-panel/[0.2]" : "border-2 border-transparent"} rounded-lg`}
+          className={`flex h-8 w-8 items-center justify-center transition-all duration-150  ${selectedOption === value ? "border-2 border-brand-primary bg-ui-panel/[0.2]" : "border-2 border-transparent hover:bg-ui-panel/[0.4]"} rounded-lg`}
           onClick={() => handleOptionChange(value)}
         >
           <FontAwesomeIcon icon={icon} />

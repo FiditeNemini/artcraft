@@ -16,7 +16,7 @@ const ButtonIcon: React.FC<ButtonIconProps> = ({
 }) => {
   return (
     <button
-      className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150 hover:bg-ui-panel/[0.4] ${fill ? "bg-ui-controls-button hover:bg-ui-controls-button/[0.75]" : "bg-transparent"}`}
+      className={`flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150  ${fill ? "bg-ui-controls-button hover:bg-ui-controls-button/[0.75]" : "bg-transparent hover:bg-ui-panel/[0.4]"}`}
       onClick={onClick}
     >
       <FontAwesomeIcon icon={icon} />

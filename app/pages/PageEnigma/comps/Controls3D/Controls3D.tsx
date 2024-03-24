@@ -1,6 +1,7 @@
 import {
   faArrowsRotate,
   faArrowsUpDownLeftRight,
+  faCube,
   faPlus,
   faUpRightAndDownLeftFromCenter,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -14,6 +15,9 @@ import { ButtonIcon, ButtonIconSelect } from "~/components";
 export const Controls3D = () => {
   const handlePlus = () => {
     console.log("Controls 3D: Plus button clicked");
+  };
+  const handleCube = () => {
+    console.log("Controls 3D: Cube button clicked");
   };
   const handleCylinder = () => {
     console.log("Controls 3D: Cylinder button clicked");
@@ -66,6 +70,7 @@ export const Controls3D = () => {
             <span className="h-4 w-0 border-l border-white/[0.15]" />
 
             <div className="flex gap-1">
+              <ButtonIcon icon={faCube} onClick={handleCube} />
               <ButtonIcon icon={fa3dCylinder} onClick={handleCylinder} />
               <ButtonIcon icon={fa3dTorus} onClick={handleTorus} />
               <ButtonIcon icon={fa3dSphere} onClick={handleSphere} />

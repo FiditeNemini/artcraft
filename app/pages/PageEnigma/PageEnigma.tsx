@@ -5,12 +5,10 @@ import { faWandSparkles } from "@fortawesome/pro-solid-svg-icons";
 import { Button } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
-// import { SidePanel } from "~/modules/SidePanel";
-import { Tabs } from "~/modules/Tabs";
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsVideo } from "./comps/ControlsVideo";
 import { Timeline } from "./comps/Timeline";
-
+import { SidePanel } from "~/modules/SidePanel";
 import Editor from "./js/editor";
 
 export const PageEnigma = () => {
@@ -122,28 +120,7 @@ export const PageEnigma = () => {
           </div>
 
           {/* Side panel */}
-          <div className="border-l border-l-ui-panel-border">
-            <Tabs
-              tabs={[
-                {
-                  header: "Animation",
-                  children: <p>Animation Tab</p>,
-                },
-                {
-                  header: "Camera",
-                  children: <p>Camera Tab</p>,
-                },
-                {
-                  header: "Audio",
-                  children: <p>Audio Tab</p>,
-                },
-                {
-                  header: "Styling",
-                  children: <p>Styling Tab</p>,
-                },
-              ]}
-            />
-          </div>
+          <SidePanel />
         </div>
 
         {/* Timeline */}
