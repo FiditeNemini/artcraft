@@ -27,7 +27,9 @@ export const ControlsTopButtons = () => {
     document.getElementById("load-upload")?.click();
   };
   const handleButtonRender = () => {
-    editorEngine?.togglePlayback();
+    console.log("Saving GLB to server for reference")
+    editorEngine._upload_for_testing()
+    //editorEngine?.togglePlayback();
   };
   const handleButtonPlay = () => {};
 
