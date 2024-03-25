@@ -1,16 +1,6 @@
-export interface ClipUI {
-  version: number
-  name: string
-  type: "transform" | "audio" | "animation" | "lipsync"
-  media_id: string
-  object_uuid: string
-  start_offset: number // in frames so 60 frames per second on the timeline.
-  ending_offset: number // ending offset
-}
-
 // Clip offsets represent the state of the clip on the timeline as well as what type of clip it is.
 // it is created from a media id.
-export class ClipUI implements ClipUI {
+export class ClipUI {
   version: number
   type: "transform" | "audio" | "animation" | "lipsync"
   name: string
@@ -21,8 +11,8 @@ export class ClipUI implements ClipUI {
 
   constructor(
     version: number,
-    name: string,
     type: "transform" | "audio" | "animation" | "lipsync",
+    name: string,
     media_id: string,
     object_uuid: string,
     start_offset: number,

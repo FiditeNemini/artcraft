@@ -155,8 +155,6 @@ class Editor {
 
         this.timeline.scene = this.activeScene;
         
-
-     
         this._test_demo()
     }
 
@@ -169,7 +167,7 @@ class Editor {
 
         let object = await this.activeScene.load_glb("./resources/models/fox/fox.glb")
         this.lipsync_engine.load_object(object.uuid, "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72");
-        this.timeline.addPlayableClip(new ClipUI(1.0, "lipsync", object.object_uuid, object.media_id, 0, 100));
+        this.timeline.addPlayableClip(new ClipUI(1.0, "lipsync", "clip1", "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72", object.uuid, 10, 200));
     }
 
     // Configure post processing.
@@ -278,11 +276,12 @@ class Editor {
 
         //console.log(this.transform_engine.clips[this.test_box_uuid]);
 
-        this.timeline.update(this.clock.getDelta());
+        this.timeline.update(this.clock.getDelta()).catch(data => {
+            console.log(data);
+        });
 
         this.render_scene();
         if (this.capturer != null) { this.capturer.capture(this.renderer.domElement); } // Record scene.
-
     }
 
     start_playback() {

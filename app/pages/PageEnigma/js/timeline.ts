@@ -124,6 +124,9 @@ export class TimeLine {
             }
             else if (element.type == "animation") {
             }
+            else if (element.type == "lipsync") {
+                
+            }
             else {
                 this.stop()
                 throw "Error New Type of element in the timeline"
@@ -140,10 +143,8 @@ export class TimeLine {
         }
 
         this.scrubberPosition += 1;
-
         //2. allow stopping.
         //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
-
         for (const element of this.timelineItems) {
             if (element.start_offset <= this.scrubberPosition && this.scrubberPosition <= element.ending_offset) {
                 // run async
@@ -161,15 +162,15 @@ export class TimeLine {
                     this.audioEngine.playClip(element.media_id)
                 }
                 else if (element.type == "lipsync") {
-                    let face_object = this.scene.get_object_by_uuid(element.object_uuid);
-                    if (face_object) { 
-                        this.lipSyncEngine.clips[element.object_uuid].play(face_object);
+                    if(this.scrubberPosition+1 >= element.ending_offset){
+                        this.lipSyncEngine.clips[element.object_uuid].stop();
+                    }
+                    else if (object) {
+                        await this.lipSyncEngine.clips[element.object_uuid].play(object);
                         this.lipSyncEngine.clips[element.object_uuid].step();
                     }
                 }
-
                 else if (element.type == "animation") {
-                    let object = this.scene.get_object_by_uuid(element.object_uuid);
                     if (object) { 
                         await this.animationEngine.clips[object.uuid].play(object); 
                         this.animationEngine.clips[object.uuid].step(deltatime);

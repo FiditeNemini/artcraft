@@ -18,7 +18,7 @@ for (let m = 0; m < BoundingFrequencyFem.length; m++) {
 }
 
 export class LipSync {
-  constructor(face=null) {
+  constructor(face) {
 
     this.face = face;
 
@@ -90,19 +90,15 @@ export class LipSync {
   update() {
     if (this.meter) {
       const { volume } = this.meter;
+      let { ah, oh, ee } = this.update2();
       if (volume < 0.01) {
-        // get the shape keys from the face avatar
-
-        this.face.morphTargetInfluences[this.ee] = 0;
-        this.face.morphTargetInfluences[this.ah] = 0;
-        this.face.morphTargetInfluences[this.oh] = 0;
-      } else {
-        const { ah, oh, ee } = this.update2();
-        this.face.morphTargetInfluences[this.ee] = ee;
-        this.face.morphTargetInfluences[this.ah] = ah;
-        this.face.morphTargetInfluences[this.oh] = oh;
+        ah = 0;
+        oh = 0;
+        ee = 0;
       }
+      return { "ah": ah, "oh": oh, "ee": ee };
     }
+    return { "ah": 0, "oh": 0, "ee": 0 };
   }
 
   update2() {
