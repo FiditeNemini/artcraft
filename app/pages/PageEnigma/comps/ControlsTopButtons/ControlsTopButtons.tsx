@@ -23,6 +23,14 @@ export const ControlsTopButtons = () => {
   const handleButtonPlayBack = () => {
     editorEngine?.start_playback();
   };
+  const handleButtonLoad = () => {
+    document.getElementById("load-upload")?.click();
+  };
+  const handleButtonRender = () => {
+    editorEngine?.togglePlayback();
+  };
+  const handleButtonPlay = () => {};
+
   return(
     <div className="flex gap-2 pl-3 pt-3">
       <Button variant="secondary" onClick={handleButtonPlayBack}>
@@ -59,6 +67,12 @@ export const ControlsTopButtons = () => {
         <p>Ask Miles about ThreeJS</p>
         <p>Ask Wil about React</p>
       </ButtonDialogue>
+
+      <div className="fixed flex gap-2" style={{ top: 124, left: 12}}>
+        <Button onClick={handleButtonLoad}>Load</Button>
+        <Button onClick={handleButtonRender}>Render</Button>
+        <Button onClick={handleButtonPlay}>Play</Button>
+      </div>
     </div>
   );
 };

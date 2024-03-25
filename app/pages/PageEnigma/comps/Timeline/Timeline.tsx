@@ -33,25 +33,12 @@ export const Timeline = ({
   const { characters, objects, scale, length } = useContext(TrackContext);
   const { onPointerDown, time } = useMouseEventsAnimation();
 
-  const handleButtonLoad = () => {
-    document.getElementById("load-upload")?.click();
-  };
-  const handleButtonRender = () => {
-    editorEngine?.togglePlayback();
-  };
-  const handleButtonPlay = () => {};
-
   const sectionWidth = 60 * 4 * scale;
   const fullHeight =
     characters.length * 200 + objects.objects.length * 80 + 248 + 96;
 
   return (
     <>
-      <div className="fixed" style={{ top: 72, left: "calc(100% - 600px)" }}>
-        <Button onClick={handleButtonLoad}>Load</Button>
-        <Button onClick={handleButtonRender}>Render</Button>
-        <Button onClick={handleButtonPlay}>Play</Button>
-      </div>
       <LowerPanel>
         <div className="mt-4 flex h-3 text-sm text-white">
           {Array(length)

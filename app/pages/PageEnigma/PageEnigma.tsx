@@ -55,7 +55,8 @@ export const PageEnigma = () => {
           <div
             id="CanvasUiWrapper"
             className="flex"
-            style={{ height: `calc(100% - ${timelineHeight}px)` }}
+            // style={{ height: `calc(100% - ${timelineHeight}px)` }}
+            style={{ height: `calc(100% - 260px` }}
           >
             <div className="relative w-full overflow-hidden bg-gray-400">
               <canvas
