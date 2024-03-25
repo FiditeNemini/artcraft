@@ -22,8 +22,6 @@ export const PageEnigma = () => {
   const timelineRef = useRef<HTMLDivElement | null>(null);
 
 
-
-
   const updateTimelineHeight = useCallback(() => {
     if (timelineRef.current) {
       setTimelineHeight(timelineRef.current.offsetHeight);

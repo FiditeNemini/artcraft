@@ -1,4 +1,7 @@
-import { useContext } from "react";
+import { 
+  useContext,
+  useState
+} from "react";
 import { Button } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { EngineContext } from "~/contexts/EngineContext";
@@ -6,9 +9,11 @@ import { EngineContext } from "~/contexts/EngineContext";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
+  const [sceneName, setSceneName] = useState<string>("");
 
   const handleButtonSave = () => {
-    editorEngine?.save();
+    console.log(`SceneName is ${sceneName}`)
+    // editorEngine?.save();
   };
 
   const handleButtonCameraView = () => {
@@ -23,9 +28,25 @@ export const ControlsTopButtons = () => {
       <Button variant="secondary" onClick={handleButtonPlayBack}>
         Toggle Camera View
       </Button>
-      <Button variant="secondary" onClick={handleButtonSave}>
-        Save Scene
-      </Button>
+
+      <ButtonDialogue
+        buttonProps={{
+          variant: "secondary",
+          label: "Save Scene",
+        }}
+        title="Save Scene"
+        confirmButtonProps={{
+          label: "Save",
+          disabled:(sceneName === "" ? true : false),
+          onClick:(handleButtonSave)
+        }}
+      >
+        <p>Please Enter a name for your scene</p>
+        <input type="text" onChange={(e)=>{
+          setSceneName(e.target.value)
+        }}/>
+      </ButtonDialogue>
+
       <ButtonDialogue
         buttonProps={{
           variant: "secondary",

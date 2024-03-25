@@ -8,6 +8,7 @@ type UnionedButtonProps =  {label?:string } & ButtonPropsI;
 
 interface ButtonDialoguePropsI  {
   buttonProps?: UnionedButtonProps;
+  confirmButtonProps?: UnionedButtonProps;
   closeButtonProps?: UnionedButtonProps;
   title?: string;
   children: React.ReactNode;
@@ -15,6 +16,7 @@ interface ButtonDialoguePropsI  {
 
 export const ButtonDialogue = ({
   buttonProps : unionedButtonProps,
+  confirmButtonProps,
   closeButtonProps : unionedCloseButtonProps,
   title,
   children,
@@ -80,14 +82,30 @@ export const ButtonDialogue = ({
                     {children}
                   </div>
 
-                  <div className="mt-4 flex justify-end	">
-                  <Button
-                    type="button"
-                    onClick={closeModal}
-                    {...closeButtonProps}
-                  >
-                    {closeButtonLabel}
-                  </Button>
+                  <div className="mt-4 flex justify-between ">
+                    {confirmButtonProps &&
+                      <Button
+                        type="button"
+                        {...confirmButtonProps}
+                        onClick={(e)=>{
+                          if(confirmButtonProps.onClick){
+                            confirmButtonProps.onClick(e);
+                          }
+                          closeModal();
+                        }}
+                        
+                      >
+                        {confirmButtonProps.label ? confirmButtonProps.label : "Confirm" }
+                      </Button>
+                    }
+                    <span />
+                    <Button
+                      type="button"
+                      onClick={closeModal}
+                      {...closeButtonProps}
+                    >
+                      {closeButtonLabel}
+                    </Button>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
