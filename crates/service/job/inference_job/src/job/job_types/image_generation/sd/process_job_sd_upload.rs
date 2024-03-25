@@ -46,16 +46,11 @@ pub async fn process_job_sd_upload(
   };
 
   let creator_ip_address = &job.creator_ip_address;
-  let creator_user_token: UserToken;
 
-  match &job.maybe_creator_user_token {
-    Some(token) => {
-      creator_user_token = UserToken::new_from_str(token);
-    }
-    None => {
-      return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")));
-    }
-  }
+  let creator_user_token = match &job.maybe_creator_user_token {
+    Some(token) => UserToken::new_from_str(token),
+    None => return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token"))),
+  };
 
   // The parameters will be updated on another screen perhaps?
   // so right now it will fill with the availible  values.

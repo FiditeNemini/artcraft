@@ -88,15 +88,14 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     let model_object_path = vc_model.get_model_cloud_bucket_path(&args.job_dependencies.buckets.bucket_path_unifier);
 
-    let bucket_client;
-
-    if vc_model.get_model_token().starts_with(ModelWeightToken::token_prefix()) {
-      info!("Using public bucket client to download (model_weights table)");
-      bucket_client = &args.job_dependencies.buckets.public_bucket_client;
-    } else {
-      info!("Using private bucket client to download (legacy table)");
-      bucket_client = &args.job_dependencies.buckets.private_bucket_client;
-    }
+    let bucket_client =
+        if vc_model.get_model_token().starts_with(ModelWeightToken::token_prefix()) {
+          info!("Using public bucket client to download (model_weights table)");
+          &args.job_dependencies.buckets.public_bucket_client
+        } else {
+          info!("Using private bucket client to download (legacy table)");
+          &args.job_dependencies.buckets.private_bucket_client
+        };
 
     maybe_download_file_from_bucket(MaybeDownloadArgs {
       name_or_description_of_file: "rvc (v2) model",
@@ -154,15 +153,14 @@ pub async fn process_job(args: RvcV2ProcessJobArgs<'_>) -> Result<JobSuccessResu
       let model_index_object_path = vc_model.get_index_file_cloud_bucket_path(&args.job_dependencies.buckets.bucket_path_unifier)
           .ok_or_else(|| ProcessSingleJobError::from_anyhow_error(anyhow!("Index file path couldn't be determined.")))?;
 
-      let bucket_client;
-
-      if vc_model.get_model_token().starts_with(ModelWeightToken::token_prefix()) {
-        info!("Using public bucket client to download (model_weights table)");
-        bucket_client = &args.job_dependencies.buckets.public_bucket_client;
-      } else {
-        info!("Using private bucket client to download (legacy table)");
-        bucket_client = &args.job_dependencies.buckets.private_bucket_client;
-      }
+      let bucket_client=
+          if vc_model.get_model_token().starts_with(ModelWeightToken::token_prefix()) {
+            info!("Using public bucket client to download (model_weights table)");
+            &args.job_dependencies.buckets.public_bucket_client
+          } else {
+            info!("Using private bucket client to download (legacy table)");
+            &args.job_dependencies.buckets.private_bucket_client
+          };
 
       maybe_download_file_from_bucket(MaybeDownloadArgs {
         name_or_description_of_file: "rvc (v2) model index",

@@ -36,16 +36,15 @@ pub struct DownloadImageFileArgs<'a> {
 
 pub async fn download_image_file(args: DownloadImageFileArgs<'_>) -> Result<ImageFile, ProcessSingleJobError> {
 
-  let bucket_object_path;
-
-  match args.image_source {
-    LipsyncAnimationImageSource::F(media_file_token) => {
-      bucket_object_path = from_media_file(media_file_token, &args).await?;
-    }
-    LipsyncAnimationImageSource::U(media_upload_token) => {
-      bucket_object_path = from_media_upload(media_upload_token, &args).await?;
-    }
-  }
+  let bucket_object_path =
+      match args.image_source {
+        LipsyncAnimationImageSource::F(media_file_token) => {
+          from_media_file(media_file_token, &args).await?
+        }
+        LipsyncAnimationImageSource::U(media_upload_token) => {
+          from_media_upload(media_upload_token, &args).await?
+        }
+      };
 
   let downloaded_filesystem_path = args.work_temp_dir.path().join("image.bin");
 

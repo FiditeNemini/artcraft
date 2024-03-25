@@ -38,7 +38,7 @@ impl BucketOrchestrationCore for BucketOrchestration {
         filesystem_path: String,
         is_public: bool,
     ) -> AnyhowResult<()> {
-        let bucket_client = self.get_bucket_with_visbility(is_public).await?;
+        let bucket_client = self.get_bucket_with_visibility(is_public).await?;
         bucket_client.download_file_to_disk(object_path, filesystem_path).await
     }
 
@@ -46,7 +46,7 @@ impl BucketOrchestrationCore for BucketOrchestration {
                                                    bytes: &[u8],
                                                    content_type: &str,
                                                    is_public: bool) -> AnyhowResult<()> {
-        let bucket_client = self.get_bucket_with_visbility(is_public).await?;
+        let bucket_client = self.get_bucket_with_visibility(is_public).await?;
         bucket_client.upload_file_with_content_type_process(
             object_name,
             bytes,
@@ -92,32 +92,31 @@ impl BucketOrchestration {
     }
 
 
-    async fn get_bucket_with_visbility(&self, public: bool) -> AnyhowResult<BucketClient> {
+    async fn get_bucket_with_visibility(&self, public: bool) -> AnyhowResult<BucketClient> {
         let bucket_timeout = easyenv::get_env_duration_seconds_or_default(
             "BUCKET_TIMEOUT_SECONDS", Duration::from_secs(60 * 10));
-        let bucket_client: BucketClient;
-        if public {
+        let bucket_client = if public {
             // use public bucket client
             info!("Configuring public GCS bucket...");
-            bucket_client = BucketClient::create(
+            BucketClient::create(
                 &self.access_key,
                 &self.secret_key,
                 &self.region_name,
                 &self.public_bucket_name,
                 None,
                 Some(bucket_timeout),
-            )?;
+            )?
         } else {
             info!("Configuring private GCS bucket...");
-            bucket_client = BucketClient::create(
+            BucketClient::create(
                 &self.access_key,
                 &self.secret_key,
                 &self.region_name,
                 &self.private_bucket_name,
                 None,
                 Some(bucket_timeout),
-            )?;
-        }
+            )?
+        };
         Ok(bucket_client)
     }
 }

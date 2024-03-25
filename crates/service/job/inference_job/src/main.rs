@@ -175,9 +175,9 @@ async fn main() -> AnyhowResult<()> {
 
   // Optionally report job progress to the user via Redis (for now)
   // We want to turn this off in the on-premises workers since we're not tunneling to the production Redis.
-  let job_progress_reporter : Box<dyn JobProgressReporterBuilder>;
-
-  job_progress_reporter = match easyenv::get_env_string_optional("REDIS_FOR_JOB_PROGRESS").as_deref() {
+  let job_progress_reporter : Box<dyn JobProgressReporterBuilder>
+      = match easyenv::get_env_string_optional("REDIS_FOR_JOB_PROGRESS").as_deref()
+  {
     None | Some("") => {
       warn!("Redis for job progress status reports is DISABLED! Users will not see in-flight details of inference progress.");
       Box::new(NoOpJobProgressReporterBuilder {})

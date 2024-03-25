@@ -65,16 +65,11 @@ pub async fn upload_prompt(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessRe
     );
 
     let creator_ip_address = &job.creator_ip_address;
-    let creator_user_token: UserToken;
-  
-    match &job.maybe_creator_user_token {
-      Some(token) => {
-        creator_user_token = UserToken::new_from_str(token);
-      }
-      None => {
-        return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token")));
-      }
-    }
+
+    let creator_user_token = match &job.maybe_creator_user_token {
+      Some(token) => UserToken::new_from_str(token),
+      None => return Err(ProcessSingleJobError::InvalidJob(anyhow!("Missing Creator User Token"))),
+    };
     
     let download_url = match wf_args.maybe_google_drive_link {
         Some(val) => val,
