@@ -68,7 +68,6 @@ export class TransformTrackClip implements TransformTrackClip {
       object.position.copy(first_pos);
       object.rotation.set(first_rot.x, first_rot.y, first_rot.z);
       object.scale.copy(first_scl);
-      
       this.step_frame = 0;
     }
   }

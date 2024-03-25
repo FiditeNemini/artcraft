@@ -160,14 +160,12 @@ class Editor {
 
     async _test_demo() {
         // Test code here
-        // this.test_box_uuid = this.activeScene.instantiate("Box");
-        // let object = this.transform_engine.loadObject(this.test_box_uuid);
-        // this.timeline.addPlayableClip(new ClipUI(1.0, "audio", "m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg", null, 50, 50));
-
         let object = await this.activeScene.load_glb("./resources/models/fox/fox.glb")
         this.lipsync_engine.load_object(object.uuid, "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72");
         this.timeline.addPlayableClip(new ClipUI(1.0, "lipsync", "clip1", "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72", object.uuid, 150, 400));
         this.timeline.addPlayableClip(new ClipUI(1.0, "transform", "clip2", object.uuid, object.uuid, 0, 150));
+        this.animation_engine.load_object(object.uuid, "/resources/models/fox/fox_idle.glb", "clip3");
+        this.timeline.addPlayableClip(new ClipUI(1.0, "animation", "clip3", "/resources/models/fox/fox_idle.glb", object.uuid, 0, 400));
     }
 
     // Configure post processing.
@@ -271,15 +269,15 @@ class Editor {
         // Updates debug stats.
         if (this.stats != null) { this.stats.update(); }
 
+        let delta_time = this.clock.getDelta()
+
         // All calls that are not super important like timeline go here.
-        this.activeScene.update(this.clock.getDelta());
+        this.activeScene.update(delta_time);
         //this.orbit.update(0.1);
 
         //console.log(this.transform_engine.clips[this.test_box_uuid]);
 
-        this.timeline.update(this.clock.getDelta()).catch(data => {
-            console.log(data);
-        });
+        this.timeline.update(delta_time);
 
         this.render_scene();
         if (this.capturer != null) { this.capturer.capture(this.renderer.domElement); } // Record scene.
