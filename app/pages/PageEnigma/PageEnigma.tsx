@@ -52,6 +52,7 @@ export const PageEnigma = () => {
         <div style={{ height: "calc(100vh - 68px)" }}>
           {/* Engine section/side panel */}
           <div
+            id="CanvasUiWrapper"
             className="flex"
             style={{ height: `calc(100% - ${timelineHeight}px)` }}
           >

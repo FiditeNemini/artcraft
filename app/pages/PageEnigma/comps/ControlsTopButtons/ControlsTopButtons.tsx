@@ -2,7 +2,7 @@ import {
   useContext,
   useState
 } from "react";
-import { Button } from "~/components";
+import { Button, H4 } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { EngineContext } from "~/contexts/EngineContext";
 
@@ -41,7 +41,7 @@ export const ControlsTopButtons = () => {
           onClick:(handleButtonSave)
         }}
       >
-        <p>Please Enter a name for your scene</p>
+        <H4 className="text-black">Please Enter a name for your scene</H4>
         <input type="text" onChange={(e)=>{
           setSceneName(e.target.value)
         }}/>
