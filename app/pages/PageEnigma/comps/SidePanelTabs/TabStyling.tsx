@@ -40,7 +40,7 @@ export const TabStyling = ()=>{
       <div className="flex gap-2 my-2">
         <Textarea className="w-full" />
       </div>
-      <H4>Nagtive Prompt</H4>
+      <H4>Negative Prompt</H4>
       <div className="flex gap-2 my-2">
         <Textarea
           className="w-full"
