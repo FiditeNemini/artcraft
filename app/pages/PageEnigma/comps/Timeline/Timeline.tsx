@@ -1,19 +1,35 @@
-import { LowerPanel } from "~/modules/LowerPanel";
-import Editor from "../../js/editor";
-import { Character } from "./Character";
-import { Fragment, useContext } from "react";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { 
+  Fragment,
+  // useCallback,
+  useContext
+} from "react";
+
 import { Button } from "~/components";
+
+// import Editor from "../../js/editor";
+import { EngineContext } from "~/contexts/EngineContext";
+import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+
+import { LowerPanel } from "~/modules/LowerPanel";
+import { Character } from "./Character";
+
+
+
 import { Camera } from "./Camera";
 import { Audio } from "./Audio";
 import { Objects } from "./Objects";
 import { useMouseEventsAnimation } from "./utils/useMouseEventsAnimation";
 
 export const Timeline = ({
-  editorCurrent,
+  // editorCurrent,
+  // time,
 }: {
-  editorCurrent: Editor | null;
+  // editorCurrent: Editor | null;
+  // time: number;
 }) => {
+  const editorEngine = useContext(EngineContext);
+  // editorEngine replaced the engineRef.current passed as a prop
+  // const { characters, updateCharacters } = useContext(TrackContext);
   const { characters, objects, scale, length } = useContext(TrackContext);
   const { onPointerDown, time } = useMouseEventsAnimation();
 
@@ -21,7 +37,7 @@ export const Timeline = ({
     document.getElementById("load-upload")?.click();
   };
   const handleButtonRender = () => {
-    editorCurrent?.togglePlayback();
+    editorEngine?.togglePlayback();
   };
   const handleButtonPlay = () => {};
 
