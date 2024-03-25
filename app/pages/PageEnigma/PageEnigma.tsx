@@ -6,11 +6,11 @@ import { Button, ButtonLink } from "~/components";
 // import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
 import { SidePanel } from "~/modules/SidePanel";
-// import { Tabs } from "~/modules/Tabs";
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsTopButtons } from "./comps/ControlsTopButtons";
 import { ControlsVideo } from "./comps/ControlsVideo";
 import { Timeline } from "./comps/Timeline";
+import { SidePanelTabs } from "./comps/SidePanelTabs";
 
 import { TrackProvider } from "~/contexts/TrackContext/TrackProvider";
 import { EngineProvider } from "~/contexts/EngineProvider";
@@ -80,7 +80,9 @@ export const PageEnigma = () => {
             </div>
 
             {/* Side panel */}
-            <SidePanel />
+            <SidePanel>
+              <SidePanelTabs />
+            </SidePanel>
           </div>
 
           {/* Timeline */}
