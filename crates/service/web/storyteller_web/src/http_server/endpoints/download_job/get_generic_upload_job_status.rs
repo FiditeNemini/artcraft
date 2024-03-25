@@ -133,8 +133,8 @@ pub async fn get_generic_download_job_status_handler(
     attempt_count: job_status.attempt_count as u8,
     maybe_downloaded_entity_token: job_status.maybe_downloaded_entity_token,
     maybe_downloaded_entity_type: job_status.maybe_downloaded_entity_type,
-    created_at: job_status.created_at.clone(),
-    updated_at: job_status.updated_at.clone(),
+    created_at: job_status.created_at,
+    updated_at: job_status.updated_at,
   };
 
   let response = GetGenericDownloadJobStatusSuccessResponse {

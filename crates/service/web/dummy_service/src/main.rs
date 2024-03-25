@@ -47,7 +47,7 @@ async fn main() -> AnyhowResult<()> {
   let server_hostname = server_state.hostname.clone();
 
   // NB(bt,2024-03-24): This type is supposed to be deprecated.
-  let old_server_environment = env_args.server_environment.clone();
+  let old_server_environment = env_args.server_environment;
 
   // TODO: Fix duplication for gzip compression. This is stupid.
   //  I'm too tired to figure out the generic types though.

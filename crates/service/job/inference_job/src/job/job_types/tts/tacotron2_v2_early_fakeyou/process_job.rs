@@ -224,7 +224,7 @@ async fn process_job_with_cleanup(
       .as_deref()
       // NB: If there's an error deserializing, turn it to None.
       .and_then(|pipeline_type| TextPipelineType::from_str(pipeline_type).ok())
-      .unwrap_or_else(|| guess_text_pipeline_heuristic(Some(tts_model.created_at().clone())));
+      .unwrap_or_else(|| guess_text_pipeline_heuristic(Some(*tts_model.created_at())));
 
   info!("With text pipeline type `{:?} ` (or guess: {:?})",
     &tts_model.text_pipeline_type(),

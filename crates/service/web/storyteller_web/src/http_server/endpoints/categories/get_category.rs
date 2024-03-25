@@ -141,10 +141,10 @@ pub async fn get_category_handler(
     creator_username: category.creator_username.clone(),
     creator_display_name: category.creator_display_name.clone(),
     creator_gravatar_hash: category.creator_gravatar_hash.clone(),
-    is_mod_approved: category.is_mod_approved.clone(),
-    created_at: category.created_at.clone(),
-    updated_at: category.updated_at.clone(),
-    deleted_at: category.deleted_at.clone(),
+    is_mod_approved: category.is_mod_approved,
+    created_at: category.created_at,
+    updated_at: category.updated_at,
+    deleted_at: category.deleted_at,
     // Moderator fields
     // Clear out fields for non-mods
     maybe_mod_comments: if is_mod { category.maybe_mod_comments.clone() } else { None },

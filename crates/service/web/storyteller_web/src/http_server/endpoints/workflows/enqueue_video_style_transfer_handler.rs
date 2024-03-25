@@ -254,7 +254,7 @@ pub async fn enqueue_video_style_transfer_handler(
         trim_end_milliseconds: Some(trim_end_millis),
         positive_prompt: request.prompt.clone(),
         negative_prompt: request.negative_prompt.clone(),
-        enable_lipsync: request.enable_lipsync.clone(),
+        enable_lipsync: request.enable_lipsync,
         maybe_input_file: Some(request.input_file.clone()),
         // The new, simplified enqueuing doesn't care about the following parameters:
         maybe_lora_model: None,

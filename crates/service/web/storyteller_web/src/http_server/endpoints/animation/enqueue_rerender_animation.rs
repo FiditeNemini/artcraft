@@ -192,7 +192,7 @@ pub async fn enqueue_rerender_animation_handler(
         maybe_prompt: request.prompt.clone(),
         maybe_a_prompt: request.a_prompt.clone(),
         maybe_n_prompt: request.n_prompt.clone(),
-        maybe_seed: request.seed.clone(),
+        maybe_seed: request.seed,
     };
 
     info!("Creating rerender animation job record...");

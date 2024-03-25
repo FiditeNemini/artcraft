@@ -239,8 +239,8 @@ async fn get_all_models(mysql_connection: &mut PoolConnection<MySql>, use_weight
           creator_set_visibility: model.creator_set_visibility(),
           ietf_language_tag: model.ietf_language_tag().to_string(),
           ietf_primary_language_subtag: model.ietf_primary_language_subtag().to_string(),
-          created_at: model.created_at().clone(),
-          updated_at: model.updated_at().clone(),
+          created_at: *model.created_at(),
+          updated_at: *model.updated_at(),
         }
       })
       .collect::<Vec<VoiceConversionModel>>();

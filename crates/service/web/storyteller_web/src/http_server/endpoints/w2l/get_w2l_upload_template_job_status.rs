@@ -109,9 +109,7 @@ pub async fn get_w2l_upload_template_job_status_handler(
 
   let extra_status_key = RedisKeys::w2l_download_extra_status_info(&path.token);
   let maybe_extra_status_description : Option<String> = match redis.get(&extra_status_key) {
-    Ok(Some(status)) => {
-      Some(status)
-    },
+    Ok(Some(status)) => Some(status),
     Ok(None) => None,
     Err(e) => {
       warn!("redis error: {:?}", e);
@@ -126,8 +124,8 @@ pub async fn get_w2l_upload_template_job_status_handler(
     maybe_failure_reason: record.maybe_failure_reason.clone(),
     attempt_count: record.attempt_count as u8,
     maybe_template_token: record.maybe_template_token.clone(),
-    created_at: record.created_at.clone(),
-    updated_at: record.updated_at.clone(),
+    created_at: record.created_at,
+    updated_at: record.updated_at,
   };
 
   let response = GetW2lUploadTemplateStatusSuccessResponse {

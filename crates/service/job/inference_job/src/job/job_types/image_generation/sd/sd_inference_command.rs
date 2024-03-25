@@ -294,7 +294,7 @@ impl StableDiffusionInferenceCommand {
       }
       Some(timeout) => {
         info!("Executing with timeout: {:?}", &timeout);
-        let exit_status = p.wait_timeout(timeout.clone())?;
+        let exit_status = p.wait_timeout(timeout)?;
 
         match exit_status {
           None => {

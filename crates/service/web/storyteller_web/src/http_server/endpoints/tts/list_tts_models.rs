@@ -249,8 +249,8 @@ async fn get_all_models(mysql_connection: &mut PoolConnection<MySql>, use_weight
           category_tokens: model_categories_map.model_to_category_tokens.get(&model_token)
               .map(|hash| hash.clone())
               .unwrap_or(HashSet::new()),
-          created_at: model.created_at().clone(),
-          updated_at: model.updated_at().clone(),
+          created_at: *model.created_at(),
+          updated_at: *model.updated_at(),
         }
       })
       .collect::<Vec<TtsModelRecordForResponse>>();

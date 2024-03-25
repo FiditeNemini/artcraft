@@ -109,8 +109,8 @@ pub async fn get_tts_upload_model_job_status_handler(
     maybe_extra_status_description,
     attempt_count: record.attempt_count as u8,
     maybe_model_token: record.maybe_model_token.clone(),
-    created_at: record.created_at.clone(),
-    updated_at: record.updated_at.clone(),
+    created_at: record.created_at,
+    updated_at: record.updated_at,
   };
 
   let response = GetTtsUploadModelStatusSuccessResponse {

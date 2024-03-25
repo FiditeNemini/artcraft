@@ -125,9 +125,7 @@ pub async fn get_w2l_inference_job_status_handler(
 
   let extra_status_key = RedisKeys::w2l_inference_extra_status_info(&path.token);
   let maybe_extra_status_description : Option<String> = match redis.get(&extra_status_key) {
-    Ok(Some(status)) => {
-      Some(status)
-    },
+    Ok(Some(status)) => Some(status),
     Ok(None) => None,
     Err(e) => {
       warn!("redis error: {:?}", e);
@@ -145,8 +143,8 @@ pub async fn get_w2l_inference_job_status_handler(
     maybe_w2l_template_token: record.maybe_w2l_template_token.clone(),
     w2l_template_type: record.w2l_template_type.clone(),
     title: record.title.clone(),
-    created_at: record.created_at.clone(),
-    updated_at: record.updated_at.clone(),
+    created_at: record.created_at,
+    updated_at: record.updated_at,
   };
 
   let response = GetW2lInferenceStatusSuccessResponse {

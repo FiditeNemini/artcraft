@@ -91,7 +91,7 @@ impl Plan {
         Self {
             plan_slug: builder.plan_slug.clone(),
             plan_category: builder.plan_category,
-            cost_per_month_dollars: builder.cost_per_month_dollars.clone(),
+            cost_per_month_dollars: builder.cost_per_month_dollars,
             stripe_product_id: builder.stripe_product_id.clone(),
             stripe_price_id: builder.stripe_price_id.clone(),
             is_development_plan: builder.is_development_plan,

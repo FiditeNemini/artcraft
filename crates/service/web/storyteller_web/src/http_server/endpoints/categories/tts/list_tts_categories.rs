@@ -129,9 +129,9 @@ pub async fn list_tts_categories_handler(
               .clone()
               .unwrap_or(c.name.clone()),
           should_be_sorted: true,
-          created_at: c.created_at.clone(),
-          updated_at: c.updated_at.clone(),
-          deleted_at: c.deleted_at.clone(),
+          created_at: c.created_at,
+          updated_at: c.updated_at,
+          deleted_at: c.deleted_at,
         }
       })
       .collect::<Vec<DisplayCategory>>();
@@ -143,7 +143,7 @@ pub async fn list_tts_categories_handler(
           category_token: ModelCategoryToken::new_from_str(category.category_token),
           maybe_super_category_token: category.maybe_super_category_token
               .map(|token| ModelCategoryToken::new_from_str(token)),
-          model_type: category.model_type.clone(),
+          model_type: category.model_type,
           name: category.name.to_string(),
           name_for_dropdown: category.name_for_dropdown.to_string(),
           can_directly_have_models: category.can_directly_have_models,
@@ -152,8 +152,8 @@ pub async fn list_tts_categories_handler(
           is_mod_approved: None,
           is_synthetic: true,
           should_be_sorted: category.should_be_sorted,
-          created_at: CHRONO_DATETIME_UNIX_EPOCH.clone(),
-          updated_at: CHRONO_DATETIME_UNIX_EPOCH.clone(),
+          created_at: *CHRONO_DATETIME_UNIX_EPOCH,
+          updated_at: *CHRONO_DATETIME_UNIX_EPOCH,
           deleted_at: None,
         });
       });

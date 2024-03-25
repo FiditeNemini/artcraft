@@ -278,7 +278,7 @@ pub async fn get_tts_model_handler(
 
   // TODO: Use language to infer as well.
   let text_pipeline_type_guess =
-      guess_text_pipeline_heuristic(Some(model.created_at().clone()));
+      guess_text_pipeline_heuristic(Some(*model.created_at()));
 
   // Map to public response type.
   let response = GetTtsModelSuccessResponse {
@@ -325,8 +325,8 @@ pub async fn get_tts_model_handler(
       creator_set_visibility: model.creator_set_visibility(),
       is_locked_from_use: model.is_locked_from_use(),
       is_locked_from_user_modification: model.is_locked_from_user_modification(),
-      created_at: model.created_at().clone(),
-      updated_at: model.updated_at().clone(),
+      created_at: *model.created_at(),
+      updated_at: *model.updated_at(),
       maybe_moderator_fields: None,
       // NB(bt, 2024-01-20): We won't be needing these much longer.
       //maybe_moderator_fields: model.maybe_moderator_fields.map(|mod_fields| {

@@ -123,7 +123,7 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
 
   if let Some(engine_args) = maybe_args {
     maybe_camera = engine_args.camera_animation.clone();
-    maybe_camera_speed = engine_args.camera_speed.clone();
+    maybe_camera_speed = engine_args.camera_speed;
     maybe_skybox = engine_args.skybox.clone();
   }
 

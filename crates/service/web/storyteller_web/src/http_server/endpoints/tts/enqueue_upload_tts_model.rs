@@ -160,7 +160,6 @@ pub async fn upload_tts_model_handler(
   }
 
   let supported_tts_model_type = request.tts_model_type
-      .clone()
       .unwrap_or(SupportedTtsModelType::Tacotron2);
 
   let job_token ;

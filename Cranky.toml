@@ -30,6 +30,7 @@ deny = [
   #"clippy::vec_init_then_push",
 
   # Clippy - "ergonomic" / "usage" lints
+  "clippy::clone_on_copy", # Don't use clone() on Copy types
   "clippy::option_option", # Lint: Don't ever Option<Option<T>>! Enums instead.
   "clippy::zero_sized_map_values", # Lint: use a HashSet instead of HashMap<T, ()>.
 
@@ -43,15 +44,15 @@ deny = [
   "clippy::redundant_static_lifetimes", # Lint: feels more modern to elide static lifetimes
 
   # Rust
+  "non_fmt_panics", # panic!(format!(...)) will be unsupported soon
   "unused_imports", # These are easy to automatically cull
+  "unused_mut", # Be strict about mutability
   "unused_parens", # Unused parens are ugly
   "unused_variables", # Don't leave cruft
-  "unused_mut", # Be strict about mutability
 
   # Possible:
   # "clippy::ptr_arg",
   # "clippy::too_many_lines" (note: this is configurable)
-  #  "clippy::clone_on_copy", # Don't use clone() on Copy types
 ]
 
 warn = [

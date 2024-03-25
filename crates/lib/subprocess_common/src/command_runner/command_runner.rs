@@ -121,7 +121,7 @@ impl CommandRunner {
       }
       Some(timeout) => {
         info!("Executing with timeout: {:?}", &timeout);
-        popen_handle.wait_timeout(timeout.clone())?
+        popen_handle.wait_timeout(timeout)?
       }
     };
 

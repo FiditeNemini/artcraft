@@ -156,7 +156,7 @@ async fn main() -> AnyhowResult<()> {
 pub async fn serve(server_state: ObsGatewayServerState) -> AnyhowResult<()>
 {
   let bind_address = server_state.env_config.bind_address.clone();
-  let num_workers = server_state.env_config.num_workers.clone();
+  let num_workers = server_state.env_config.num_workers;
   let hostname = server_state.hostname.clone();
 
   let server_state_arc = web::Data::new(Arc::new(server_state));

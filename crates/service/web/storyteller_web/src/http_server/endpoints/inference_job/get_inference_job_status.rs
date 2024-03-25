@@ -239,7 +239,7 @@ fn record_to_payload(
   record: GenericInferenceJobStatus,
   maybe_extra_status_description: Option<String>,
 ) -> InferenceJobStatusResponsePayload {
-  let inference_category = record.request_details.inference_category.clone();
+  let inference_category = record.request_details.inference_category;
 
   InferenceJobStatusResponsePayload {
     job_token: record.job_token,

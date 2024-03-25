@@ -174,11 +174,11 @@ pub async fn list_tts_categories_for_moderation_handler(
           creator_username: c.creator_username.clone(),
           creator_display_name: c.creator_display_name.clone(),
           creator_gravatar_hash: c.creator_gravatar_hash.clone(),
-          is_mod_approved: c.is_mod_approved.clone(),
+          is_mod_approved: c.is_mod_approved,
           maybe_mod_comments: c.maybe_mod_comments.clone(),
-          created_at: c.created_at.clone(),
-          updated_at: c.updated_at.clone(),
-          deleted_at: c.deleted_at.clone()
+          created_at: c.created_at,
+          updated_at: c.updated_at,
+          deleted_at: c.deleted_at,
         }
       })
       .collect::<Vec<CategoryForModeration>>();

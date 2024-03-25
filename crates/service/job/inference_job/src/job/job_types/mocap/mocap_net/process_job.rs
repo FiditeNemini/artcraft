@@ -111,8 +111,8 @@ pub async fn process_job(args: MocapNetProcessJobArgs<'_>) -> Result<JobSuccessR
     // TODO(bt): better check for video file type
     let video_read_result = try_get_video_info(&video_path.filesystem_path);
 
-    let mut maybe_width = mc_args.maybe_size1.clone();
-    let mut maybe_height = mc_args.maybe_size2.clone();
+    let mut maybe_width = mc_args.maybe_size1;
+    let mut maybe_height = mc_args.maybe_size2;
 
     // NB: Fail open. In the event this fails, we want to continue processing.
     if let Some(video_info) = video_read_result {

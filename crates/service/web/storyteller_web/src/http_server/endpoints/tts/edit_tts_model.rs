@@ -210,8 +210,7 @@ pub async fn edit_tts_model_handler(
 
   let mut creator_set_visibility = Visibility::Public;
   let mut maybe_default_pretrained_vocoder =
-      model_record.maybe_default_pretrained_vocoder
-          .clone();
+      model_record.maybe_default_pretrained_vocoder;
 
   if let Some(payload) = request.title.as_deref() {
     if contains_slurs(payload) {

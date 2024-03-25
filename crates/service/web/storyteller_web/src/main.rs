@@ -118,6 +118,10 @@ const ENV_PUBLIC_BUCKET_NAME : &str = "W2L_PUBLIC_DOWNLOAD_BUCKET_NAME";
 // Various bucket roots
 const ENV_AUDIO_UPLOADS_BUCKET_ROOT : &str = "AUDIO_UPLOADS_BUCKET_ROOT";
 
+// "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
+const LOG_FORMAT : &str =
+  "[%{HOSTNAME}e] IP=[%{X-Forwarded-For}i] \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
+
 #[actix_web::main]
 async fn main() -> AnyhowResult<()> {
 
@@ -556,11 +560,11 @@ fn load_ip_address_troll_bans() -> IpBanList {
 pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
 {
   let bind_address = server_state.env_config.bind_address.clone();
-  let num_workers = server_state.env_config.num_workers.clone();
+  let num_workers = server_state.env_config.num_workers;
   let hostname = server_state.hostname.clone();
 
   // TODO(bt,2023-11-12): Remove the old type.
-  let old_server_environment = server_state.server_environment.clone();
+  let old_server_environment = server_state.server_environment;
   let new_server_environment = match old_server_environment {
     ServerEnvironment::Development => server_environment::ServerEnvironment::Development,
     ServerEnvironment::Production => server_environment::ServerEnvironment::Production,
@@ -571,9 +575,6 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
   let disabled_endpoints = read_disabled_endpoints();
 
   info!("Starting HTTP service.");
-
-  //let log_format = "[%{HOSTNAME}e] %a \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
-  let log_format = "[%{HOSTNAME}e] IP=[%{X-Forwarded-For}i] \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T";
 
   HttpServer::new(move || {
     // NB: Safe to clone due to internal arc
@@ -603,7 +604,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::new(server_state_arc.session_cookie_manager.clone()))
       .app_data(web::Data::new(server_state_arc.stripe.clone().config.clone()))
       .app_data(web::Data::new(server_state_arc.stripe.clone().client.clone()))
-      .app_data(web::Data::new(server_state_arc.third_party_url_redirector.clone()))
+      .app_data(web::Data::new(server_state_arc.third_party_url_redirector))
       .app_data(web::Data::new(server_state_arc.email_sender.clone()))
       .app_data(web::Data::new(old_server_environment))
       .app_data(web::Data::new(new_server_environment))
@@ -620,7 +621,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .wrap(DisabledEndpointFilter::new(disabled_endpoints.clone()))
       .wrap(BannedIpFilter::new(ip_ban_list))
       .wrap(BannedCidrFilter::new(cidr_ban_set))
-      .wrap(Logger::new(&log_format)
+      .wrap(Logger::new(LOG_FORMAT)
         .exclude("/liveness")
         .exclude("/readiness"))
       .wrap(middleware::Compress::default());

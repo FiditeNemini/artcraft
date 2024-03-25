@@ -38,7 +38,7 @@ pub async fn with_database_main_loop(updated_at_cursor: &mut DateTime<Utc>, job_
 
   let mut mysql_connection = job_state.mysql_pool.acquire().await?;
 
-  let mut last_successful_update_at = updated_at_cursor.clone();
+  let mut last_successful_update_at = *updated_at_cursor;
 
   loop {
     info!("Querying tokens updated since: {:?}", &updated_at_cursor);
@@ -54,7 +54,7 @@ pub async fn with_database_main_loop(updated_at_cursor: &mut DateTime<Utc>, job_
 
     info!("Found {} updated records", maybe_tokens.len());
 
-    let mut last_observed_updated_at = updated_at_cursor.clone();
+    let mut last_observed_updated_at = *updated_at_cursor;
 
     while !maybe_tokens.is_empty() {
       // NB: This list might be very large if we query from (1) the epoch, or (2) there was a large series of updates
@@ -68,7 +68,7 @@ pub async fn with_database_main_loop(updated_at_cursor: &mut DateTime<Utc>, job_
           = batch_get_model_weights_for_elastic_search_backfill(&mut *mysql_connection, &drained_tokens).await?;
 
       for record in records {
-        let updated_at = record.updated_at.clone();
+        let updated_at = record.updated_at;
 
         create_document_from_record(&job_state.elasticsearch, record).await?;
 
