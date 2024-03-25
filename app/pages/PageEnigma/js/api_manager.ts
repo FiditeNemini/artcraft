@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { Scene } from '../datastructures/scene/scene_object';
 
+// Basically the data will exist on the database 
 class MediaUploadManager {
   baseUrl:String
 
@@ -11,6 +12,17 @@ class MediaUploadManager {
   }
   
   async saveScene(scene:Scene):Promise<string> {
+    // we want to upload the glb first then use the engine asset idea from there 
+    return ""
+  }
+
+  async loadScene(scene_token:[]):Promise<string> {
+    
+    return ""
+  }
+
+  async batchMedia(media_tokens:[]):Promise<string> {
+
     return ""
   }
 
