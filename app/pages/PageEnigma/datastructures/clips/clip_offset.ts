@@ -1,5 +1,6 @@
 export interface ClipUI {
   version: number
+  name: string
   type: "transform" | "audio" | "animation" | "lipsync"
   media_id: string
   object_uuid: string
@@ -12,6 +13,7 @@ export interface ClipUI {
 export class ClipUI implements ClipUI {
   version: number
   type: "transform" | "audio" | "animation" | "lipsync"
+  name: string
   media_id: string
   object_uuid: string
   start_offset: number // in frames
@@ -19,6 +21,7 @@ export class ClipUI implements ClipUI {
 
   constructor(
     version: number,
+    name: string,
     type: "transform" | "audio" | "animation" | "lipsync",
     media_id: string,
     object_uuid: string,
@@ -26,6 +29,7 @@ export class ClipUI implements ClipUI {
     ending_offset: number,
   ) {
     this.version = version
+    this.name = name
     this.type = type
     this.object_uuid = object_uuid
     this.media_id = media_id
@@ -36,6 +40,7 @@ export class ClipUI implements ClipUI {
   toJSON(): string {
     return JSON.stringify({
       version: this.version,
+      name: this.name,
       type: this.type,
       object_uuid: this.object_uuid,
       media_id: this.media_id,
