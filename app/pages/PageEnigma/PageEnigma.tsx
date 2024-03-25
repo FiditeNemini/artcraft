@@ -9,6 +9,7 @@ import { SidePanel } from "~/modules/SidePanel";
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsTopButtons } from "./comps/ControlsTopButtons";
 import { ControlsVideo } from "./comps/ControlsVideo";
+import { PreviewWindow } from "./comps/PreviewWindow";
 import { Timeline } from "./comps/Timeline";
 import { SidePanelTabs } from "./comps/SidePanelTabs";
 
@@ -74,6 +75,7 @@ export const PageEnigma = () => {
 
               {/* Bottom controls */}
               <div className="absolute bottom-0 left-0 w-full">
+                <PreviewWindow />
                 <ControlsVideo />
               </div>
             </div>
