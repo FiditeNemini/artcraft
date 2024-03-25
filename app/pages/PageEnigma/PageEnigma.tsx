@@ -6,13 +6,14 @@ import { Button, ButtonLink } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
 import { SidePanel } from "~/modules/SidePanel";
-import { Tabs } from "~/modules/Tabs";
+
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsVideo } from "./comps/ControlsVideo";
 import { Timeline } from "./comps/Timeline";
+import { SidePanelTabs } from "./comps/SidePanelTabs";
 
 import Editor from "./js/editor";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+
 import { TrackProvider } from "~/contexts/TrackContext/TrackProvider";
 
 export const PageEnigma = () => {
@@ -124,13 +125,15 @@ export const PageEnigma = () => {
           </div>
 
           {/* Side panel */}
-          <SidePanel />
+          <SidePanel>
+            <SidePanelTabs />
+          </SidePanel>
         </div>
 
         {/* Timeline */}
         <div className="min-h-[260px]" ref={timelineRef}>
           <TrackProvider>
-            <Timeline editorCurrent={editorRef.current} length={12} />
+            <Timeline editorCurrent={editorRef.current} />
           </TrackProvider>
         </div>
       </div>

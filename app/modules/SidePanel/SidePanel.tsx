@@ -7,7 +7,11 @@ import {
   faChevronRight,
 } from "@fortawesome/pro-solid-svg-icons";
 
-export const SidePanel = () => {
+interface Props {
+  children: React.ReactNode;
+}
+
+export const SidePanel = ({children}:Props) => {
   const [isVisible, setIsVisible] = useState(true);
 
   return (
@@ -27,27 +31,11 @@ export const SidePanel = () => {
         leaveFrom="translate-x-0"
         leaveTo="translate-x-full"
       >
-        <Tabs
-          tabs={[
-            {
-              header: "Animation",
-              children: <p>Animation Tab</p>,
-            },
-            {
-              header: "Camera",
-              children: <p>Camera Tab</p>,
-            },
-            {
-              header: "Audio",
-              children: <p>Audio Tab</p>,
-            },
-            {
-              header: "Styling",
-              children: <p>Styling Tab</p>,
-            },
-          ]}
-        />
+
+          {children}
+
       </Transition>
     </div>
+
   );
 };
