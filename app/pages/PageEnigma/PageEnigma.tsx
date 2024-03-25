@@ -14,7 +14,7 @@ import { SidePanelTabs } from "./comps/SidePanelTabs";
 
 import Editor from "./js/editor";
 
-import { TrackProvider } from "~/contexts/TrackProvider";
+import { TrackProvider } from "~/contexts/TrackContext/TrackProvider";
 
 export const PageEnigma = () => {
   // const { setTopBarInner } = useContext(TopBarInnerContext) || {};
@@ -131,9 +131,9 @@ export const PageEnigma = () => {
         </div>
 
         {/* Timeline */}
-        <div className="min-h-[220px]" ref={timelineRef}>
+        <div className="min-h-[260px]" ref={timelineRef}>
           <TrackProvider>
-            <Timeline editorCurrent={editorRef.current} time={20} />
+            <Timeline editorCurrent={editorRef.current} />
           </TrackProvider>
         </div>
       </div>
