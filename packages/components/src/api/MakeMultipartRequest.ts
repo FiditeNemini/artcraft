@@ -9,8 +9,6 @@ const MakeMultipartRequest = (endpoint = "", body: any) => {
 
   formData.append('source', "file");
 
-  console.log("✅", Object.keys(body));
-
   return fetch(formatUrl(endpoint), {
       method: 'POST',
       credentials: 'include',
