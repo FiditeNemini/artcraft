@@ -1,24 +1,28 @@
 import { LowerPanel } from "~/modules/LowerPanel";
-import Editor from "../../js/editor";
+// import Editor from "../../js/editor";
 import { Character } from "./Character";
 import { useCallback, useContext } from "react";
+import { EngineContext } from "~/contexts/EngineContext";
 import { TrackContext } from "~/contexts/TrackContext";
 import { Button } from "~/components";
 
 export const Timeline = ({
-  editorCurrent,
+  // editorCurrent,
   time,
 }: {
-  editorCurrent: Editor | null;
+  // editorCurrent: Editor | null;
   time: number;
 }) => {
+  const editorEngine = useContext(EngineContext);
+  // editorEngine replaced the engineRef.current passed as a prop
+  
   const { characters, updateCharacters } = useContext(TrackContext);
 
   const handleButtonLoad = () => {
     document.getElementById("load-upload")?.click();
   };
   const handleButtonRender = () => {
-    editorCurrent?.togglePlayback();
+    editorEngine?.togglePlayback();
   };
   const handleButtonPlay = () => {};
 
