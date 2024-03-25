@@ -3,15 +3,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
 import { Button, ButtonLink } from "~/components";
-import { ButtonDialogue } from "~/modules/ButtonDialogue";
+// import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
 import { SidePanel } from "~/modules/SidePanel";
-import { Tabs } from "~/modules/Tabs";
+// import { Tabs } from "~/modules/Tabs";
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsTopButtons } from "./comps/ControlsTopButtons";
 import { ControlsVideo } from "./comps/ControlsVideo";
 import { Timeline } from "./comps/Timeline";
-import { TrackProvider } from "~/contexts/TrackProvider";
+
+import { TrackProvider } from "~/contexts/TrackContext/TrackProvider";
 import { EngineProvider } from "~/contexts/EngineProvider";
 
 export const PageEnigma = () => {
@@ -87,7 +88,8 @@ export const PageEnigma = () => {
             <TrackProvider>
               <Timeline
                 // editorCurrent={editorRef.current}
-                time={20}
+                // time={20}
+                // length={12}
               />
             </TrackProvider>
           </div>

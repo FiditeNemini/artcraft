@@ -1,61 +1,85 @@
-import { useMouseEvents } from "./utils/useMouseEvents";
+import { useMouseEventsClip } from "./utils/useMouseEventsClip";
 import { BaseClip } from "~/models/track";
-import { TrackContext } from "~/contexts/TrackContext";
+import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 import { useContext } from "react";
 
 interface Props {
   min: number;
   max: number;
+  style: "character" | "camera" | "audio" | "objects";
   clip: BaseClip;
-  updateClip: (id: string, offset: number, length: number) => void;
-  selected?: boolean;
+  updateClip: (options: { id: string; offset: number; length: number }) => void;
 }
 
-export const TrackClip = ({ clip, min, max, updateClip }: Props) => {
-  const { selectClip } = useContext(TrackContext);
-  const {
-    onPointerDown,
-    onPointerUp,
-    onMouseLeave,
-    onMouseMove,
-    offset,
-    length,
-  } = useMouseEvents(clip, max, min, updateClip);
+export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
+  const { selectClip, selectedClip, scale } = useContext(TrackContext);
+  const { onPointerDown, offset, length } = useMouseEventsClip(
+    clip,
+    max,
+    min,
+    updateClip,
+  );
+
+  const classes = [
+    "absolute",
+    clip.id === selectedClip ? `bg-${style}-selected` : `bg-${style}-clip`,
+  ];
 
   return (
     <>
       <div
-        className="absolute text-sm text-white"
-        style={{ top: -20, left: offset }}
+        className={[...classes, "px-1", "rounded", "text-sm text-white"].join(
+          " ",
+        )}
+        style={{ top: -21, left: offset * 4 * scale + 2 }}
       >
         {clip.name}
       </div>
       <button
-        className={`bg-character-${clip.selected ? "selected" : "unselected"} absolute block h-full rounded-l`}
-        style={{ width: 15, left: offset, cursor: "w-resize" }}
+        className={[
+          ...classes,
+          "rounded-l",
+          "block h-full",
+          clip.id === selectedClip
+            ? "border-b-1 border-t-1 border-l-1 border border-r-0 border-white"
+            : "",
+        ].join(" ")}
+        style={{ width: 15, left: offset * 4 * scale, cursor: "w-resize" }}
         onPointerDown={(event) => onPointerDown(event, "left")}
-        onPointerUp={onPointerUp}
-        onMouseLeave={onMouseLeave}
-        onMouseMove={onMouseMove}
-        onClick={() => selectClip({ type: "animations", id: clip.id })}
+        onClick={() => selectClip(clip.id)}
       />
       <button
-        className={`bg-character-${clip.selected ? "selected" : "unselected"} absolute block h-full`}
-        style={{ width: length - 30, left: offset + 15, cursor: "move" }}
+        className={[
+          ...classes,
+          "block h-full",
+          clip.id === selectedClip
+            ? "border-b-1 border-t-1 border border-l-0 border-r-0 border-white"
+            : "",
+        ].join(" ")}
+        style={{
+          width: length * 4 * scale - 30,
+          left: offset * 4 * scale + 15,
+          cursor: "move",
+        }}
         onPointerDown={(event) => onPointerDown(event, "drag")}
-        onPointerUp={onPointerUp}
-        onMouseLeave={onMouseLeave}
-        onMouseMove={onMouseMove}
-        onClick={() => selectClip({ type: "animations", id: clip.id })}
+        onClick={() => selectClip(clip.id)}
       />
       <button
-        className={`bg-character-${clip.selected ? "selected" : "unselected"} absolute block h-full rounded-r`}
-        style={{ width: 15, left: offset + length - 15, cursor: "e-resize" }}
+        className={[
+          ...classes,
+          "rounded-r",
+          "block h-full",
+          clip.id === selectedClip
+            ? "border-b-1 border-t-1 border-r-1 border border-l-0 border-white"
+            : "",
+        ].join(" ")}
+        style={{
+          width: 15,
+          left: offset * 4 * scale + length * 4 * scale - 15,
+          cursor: "e-resize",
+        }}
         onPointerDown={(event) => onPointerDown(event, "right")}
-        onPointerUp={onPointerUp}
-        onMouseLeave={onMouseLeave}
-        onMouseMove={onMouseMove}
-        onClick={() => selectClip({ type: "animations", id: clip.id })}
+        onClick={() => selectClip(clip.id)}
       />
     </>
   );
