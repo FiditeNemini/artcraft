@@ -120,7 +120,7 @@ export default function useUpdateCharacters() {
     [],
   );
 
-  const toggleAudioMute = useCallback((characterId: string) => {
+  const toggleLipSyncMute = useCallback((characterId: string) => {
     setCharacters((oldCharacters) => {
       return oldCharacters.map((character) => ({
         ...character,
@@ -133,6 +133,6 @@ export default function useUpdateCharacters() {
   return {
     characters,
     updateCharacters,
-    toggleAudioMute,
+    toggleLipSyncMute,
   };
 }

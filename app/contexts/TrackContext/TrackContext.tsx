@@ -38,6 +38,8 @@ export const TrackContext = createContext<{
   }) => void;
   selectClip: (clipId: string) => void;
   updateCurrentTime: (time: number) => void;
+  toggleLipSyncMute: (characterId: string) => void;
+  toggleAudioMute: () => void;
 }>({
   characters: [],
   camera: null,
@@ -53,4 +55,6 @@ export const TrackContext = createContext<{
   updateObject: () => {},
   selectClip: () => {},
   updateCurrentTime: () => {},
+  toggleLipSyncMute: () => {},
+  toggleAudioMute: () => {},
 });

@@ -10,9 +10,10 @@ interface Props {
 }
 
 export const TrackProvider = ({ children }: Props) => {
-  const { characters, updateCharacters } = useUpdateCharacters();
+  const { characters, updateCharacters, toggleLipSyncMute } =
+    useUpdateCharacters();
   const { camera, updateCamera } = useUpdateCamera();
-  const { audio, updateAudio } = useUpdateAudio();
+  const { audio, updateAudio, toggleAudioMute } = useUpdateAudio();
   const { objects, updateObject } = useUpdateObject();
   const [selectedClip, setSelectedClip] = useState<string | null>(null);
   const [time, setTime] = useState(0);
@@ -41,6 +42,8 @@ export const TrackProvider = ({ children }: Props) => {
       selectClip,
       selectedClip,
       updateCurrentTime,
+      toggleLipSyncMute,
+      toggleAudioMute,
     };
   }, [
     characters,
@@ -55,6 +58,8 @@ export const TrackProvider = ({ children }: Props) => {
     updateObject,
     time,
     updateCurrentTime,
+    toggleLipSyncMute,
+    toggleAudioMute,
   ]);
   return (
     <TrackContext.Provider value={values}>{children}</TrackContext.Provider>

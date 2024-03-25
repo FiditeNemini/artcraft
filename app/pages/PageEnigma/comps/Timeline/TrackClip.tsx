@@ -9,7 +9,6 @@ interface Props {
   style: "character" | "camera" | "audio" | "objects";
   clip: BaseClip;
   updateClip: (options: { id: string; offset: number; length: number }) => void;
-  selected?: boolean;
 }
 
 export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {

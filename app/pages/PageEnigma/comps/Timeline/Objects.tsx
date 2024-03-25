@@ -8,7 +8,7 @@ export const Objects = () => {
 
   return (
     <div
-      className="block rounded-lg bg-character-groupBg pl-2 pr-4"
+      className="bg-objects-groupBg block rounded-lg pl-2 pr-4"
       style={{ width: fullWidth + 90 }}
     >
       <div className="mb-2 text-sm text-white">Objects</div>

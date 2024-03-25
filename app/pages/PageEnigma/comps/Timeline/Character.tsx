@@ -114,6 +114,12 @@ export const Character = ({ characterId }: Props) => {
             >
               Lipsync Audio Track
             </div>
+            <button
+              className="absolute text-xs text-white"
+              style={{ top: 6, left: -20 }}
+            >
+              <i className="fas fa-volume-mute"></i>
+            </button>
           </div>
         </div>
       </div>
