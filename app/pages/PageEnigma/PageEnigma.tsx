@@ -12,8 +12,8 @@ import { ControlsVideo } from "./comps/ControlsVideo";
 import { Timeline } from "./comps/Timeline";
 
 import Editor from "./js/editor";
-import { TrackContext } from "~/contexts/TrackContext";
-import { TrackProvider } from "~/contexts/TrackProvider";
+import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { TrackProvider } from "~/contexts/TrackContext/TrackProvider";
 
 export const PageEnigma = () => {
   // const { setTopBarInner } = useContext(TopBarInnerContext) || {};
@@ -128,9 +128,9 @@ export const PageEnigma = () => {
         </div>
 
         {/* Timeline */}
-        <div className="min-h-[220px]" ref={timelineRef}>
+        <div className="min-h-[260px]" ref={timelineRef}>
           <TrackProvider>
-            <Timeline editorCurrent={editorRef.current} time={20} />
+            <Timeline editorCurrent={editorRef.current} length={12} />
           </TrackProvider>
         </div>
       </div>
