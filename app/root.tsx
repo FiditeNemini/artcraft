@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { LinksFunction } from "@remix-run/deno";
 import {
   Links,
@@ -12,6 +12,7 @@ import normalizeCss from "./styles/normalize.css?url";
 import tailwindCss from "./styles/tailwind.css?url";
 import baseCss from "./styles/base.css?url";
 
+import { LoadingDotsBricks } from "~/components";
 import { TopBar } from "./modules/TopBar";
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
 
@@ -45,7 +46,13 @@ export const links: LinksFunction = () => [
 
 export default function App() {
   const [topBarInnerComponent, setTopBarInnerComponent] =
-    useState<JSX.Element | null>(null);
+  useState<JSX.Element | null>(null);
+  const [isLoaded, setIsLoaded] = useState<'loading'|'loaded'|'completed'>('loading');
+  useEffect(()=>{
+    setIsLoaded('loaded');
+    setTimeout(()=>setIsLoaded('completed'), 2000);
+  },[]);
+
 
   return (
     <html lang="en">
@@ -56,6 +63,15 @@ export default function App() {
         <Links />
       </head>
       <body className="overflow-hidden bg-ui-background">
+        {isLoaded !== 'completed' && 
+          <CompleteTakeoverLoadingScreen 
+            className={
+              isLoaded === 'loading'
+                ? "transition-opacity duration-1000 opacity-100"
+                : "transition-opacity duration-1000 opacity-0"
+            }
+          />
+        }
         <TopBarInnerContext.Provider
           value={{
             TopBarInner: topBarInnerComponent,
@@ -72,3 +88,26 @@ export default function App() {
     </html>
   );
 }
+
+function CompleteTakeoverLoadingScreen({className}:{className:string}){
+  return(
+    <div
+      id='complete-takeover-loading-screen'
+      className={className}
+      style={{
+        backgroundColor: '#1a1a27',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 9999,
+      }}
+    >
+        <LoadingDotsBricks />
+    </div>
+  );
+};
