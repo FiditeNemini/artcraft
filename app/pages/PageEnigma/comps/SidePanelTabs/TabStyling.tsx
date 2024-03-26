@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 import {
   Button,
@@ -7,14 +7,29 @@ import {
   Textarea
 } from "~/components"
 
+import { AppUiContext } from '../../contexts/AppUiContext';
+import { ACTION_TYPES } from '../../reducer';
+import { VIEW_MODES } from '../../reducer/types';
 
 export const TabStyling = ()=>{
+  const [pageState, dispatchPageState] = useContext(AppUiContext);
   const [ selection, setSelection ] = useState<string>("Anime");
   const handlePickingStyle = (picked:string)=>{
     console.log(`Picked style: ${picked}`);
     setSelection(picked);
   }
 
+
+  const handleChangeViewMode = ()=>{
+    if(dispatchPageState!==null)
+      dispatchPageState({
+        type: ACTION_TYPES.ON_CHANGE_VIEW_MODE,
+        payload: {
+          viewMode: pageState?.viewMode === VIEW_MODES.SIDE_BY_SIDE
+            ? VIEW_MODES.EDITOR : VIEW_MODES.SIDE_BY_SIDE,
+        }
+      })
+  }
   return(
     <>
       <H4>Select Base Style</H4>
@@ -56,9 +71,13 @@ export const TabStyling = ()=>{
         "/>
       </div>
       <div className="flex gap-2 mt-6 justify-center">
-        <Button>Preview Side by Side</Button>
+        <Button onClick={handleChangeViewMode}>
+          { 
+            pageState?.viewMode ===  VIEW_MODES.SIDE_BY_SIDE 
+            ? "Back to Scene" : "Preview Side by Side"
+          }
+        </Button>
       </div>
     </>
   );
-
 }
