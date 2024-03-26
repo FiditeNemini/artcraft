@@ -9,7 +9,7 @@ import AnimationEngine from "./animation_engine";
 
 // Every object uuid / entity has a track.
 export class TimelineCurrentReactState {
-    isEditable: boolean
+isEditable: boolean
     selectedObjectID: number
 
     constructor() {
@@ -19,6 +19,8 @@ export class TimelineCurrentReactState {
 }
 
 export class TimeLine {
+
+    
     timelineItems: ClipUI[]
     runningClips: ClipUI[]
 
@@ -45,6 +47,7 @@ export class TimeLine {
         lipsyncEngine: LipSyncEngine,
         animationEngine: AnimationEngine,
         scene: Scene) {
+        
         this.timelineItems = []
         this.timeLineLimit = 60 * 10 // 10 seconds
         this.runningClips = []
@@ -67,8 +70,9 @@ export class TimeLine {
 
     // when given a media id item it will create the clip. 
     // Then the clip will be loaded by the engines, if they come from outside of the loaded scene.
-    async createClipOffset(media_id: string, type: string): Promise<void> {
+    async createClipOffset(media_id: string, object_uuid:string, type: string): Promise<void> {
         // use engine to load based off media id and type animation | transform |  
+   
     }
 
     // this will update the state of the clips based off uuid easing?
