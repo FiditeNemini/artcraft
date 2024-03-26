@@ -1,13 +1,14 @@
 import { Tabs } from "~/modules/Tabs";
 import { TabStyling } from "./TabStyling";
+import { ClipElements } from "./ClipElements";
 
-export const SidePanelTabs = ()=>{
-  return(
+export const SidePanelTabs = () => {
+  return (
     <Tabs
       tabs={[
         {
           header: "Animation",
-          children: <p>Animation Tab</p>,
+          children: <ClipElements />,
         },
         {
           header: "Camera",
@@ -24,5 +25,4 @@ export const SidePanelTabs = ()=>{
       ]}
     />
   );
-
-}
+};

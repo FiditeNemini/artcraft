@@ -1,15 +1,5 @@
-import {
-  Fragment,
-  // useCallback,
-  useContext,
-} from "react";
-
-import { Button } from "~/components";
-
-// import Editor from "../../js/editor";
-import { EngineContext } from "~/contexts/EngineContext";
+import { Fragment, useContext } from "react";
 import { TrackContext } from "~/contexts/TrackContext/TrackContext";
-
 import { LowerPanel } from "~/modules/LowerPanel";
 import { Character } from "./Character";
 
@@ -17,22 +7,17 @@ import { Camera } from "./Camera";
 import { Audio } from "./Audio";
 import { Objects } from "./Objects";
 import { useMouseEventsAnimation } from "./utils/useMouseEventsAnimation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ClipContext } from "~/contexts/ClipContext/ClipContext";
 
-export const Timeline = (
-  {
-    // editorCurrent,
-    // time,
-  }: {
-    // editorCurrent: Editor | null;
-    // time: number;
-  },
-) => {
-  const editorEngine = useContext(EngineContext);
-  // editorEngine replaced the engineRef.current passed as a prop
-  // const { characters, updateCharacters } = useContext(TrackContext);
-  const { characters, objects, scale, length } = useContext(TrackContext);
+interface Props {
+  timelineHeight: number;
+}
+
+export const Timeline = ({ timelineHeight }: Props) => {
+  const { characters, objects } = useContext(TrackContext);
+  const { scale, length } = useContext(ClipContext);
   const { onPointerDown, time } = useMouseEventsAnimation();
 
   const sectionWidth = 60 * 4 * scale;
@@ -41,8 +26,15 @@ export const Timeline = (
 
   return (
     <>
-      <LowerPanel>
-        <div className="prevent-select mt-4 flex h-3 border-t border-t-ui-panel-border text-xs text-white opacity-75">
+      <LowerPanel timelineHeight={timelineHeight}>
+        <div
+          className={[
+            "prevent-select mt-4",
+            "flex h-3",
+            "border-t border-t-ui-panel-border",
+            "text-xs text-white opacity-75",
+          ].join(" ")}
+        >
           {Array(length)
             .fill(0)
             .map((_, index) => (
@@ -54,7 +46,7 @@ export const Timeline = (
                   00:{index < 10 ? "0" + index.toString() : index.toString()}
                 </div>
                 <div
-                  className="absolute block h-full bg-ui-divider"
+                  className="bg-ui-divider absolute block h-full"
                   style={{
                     width: 1,
                     left: index * sectionWidth + 88,
@@ -70,7 +62,7 @@ export const Timeline = (
             00:{length < 10 ? "0" + length.toString() : length.toString()}
           </div>
           <div
-            className="absolute block h-full bg-ui-divider"
+            className="bg-ui-divider absolute block h-full"
             style={{
               width: 1,
               left: length * sectionWidth + 88,
@@ -93,7 +85,7 @@ export const Timeline = (
           <Objects />
         </div>
         <div
-          className="absolute"
+          className="absolute text-brand-primary"
           style={{ top: 8, left: time * 4 * scale + 88 }}
           onPointerDown={onPointerDown}
         >

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { CharacterGroup } from "~/models/track";
 
 export default function useUpdateCharacters() {

@@ -1,10 +1,11 @@
 import { useState } from "react";
 
 interface LowerPanelPropsI {
+  timelineHeight: number;
   children: React.ReactNode;
 }
 
-export const LowerPanel = ({ children }: LowerPanelPropsI) => {
+export const LowerPanel = ({ children, timelineHeight }: LowerPanelPropsI) => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     setOpen(true);
@@ -14,10 +15,11 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
     <div
       className={[
         "absolute bottom-0",
-        "h-[280px] w-screen overflow-auto",
+        "w-screen overflow-auto",
         "border-t border-ui-panel-border",
         "bg-ui-panel",
       ].join(" ")}
+      style={{ height: timelineHeight }}
     >
       {children}
     </div>

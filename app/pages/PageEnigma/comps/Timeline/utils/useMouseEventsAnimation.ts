@@ -1,14 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { ClipContext } from "~/contexts/ClipContext/ClipContext";
 
 export const useMouseEventsAnimation = () => {
   const { currentTime, updateCurrentTime, length, scale } =
-    useContext(TrackContext);
+    useContext(ClipContext);
   const [isActive, setIsActive] = useState("");
   const [clientX, setClientX] = useState(0);
 
   const [time, setTime] = useState(currentTime);
-  console.log("use", currentTime, time);
 
   useEffect(() => {
     const max = length * 60 * 4 * scale;

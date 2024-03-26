@@ -1,16 +1,56 @@
-import { TrackClip } from "./TrackClip";
-import { useContext } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { Track } from "~/pages/PageEnigma/comps/Timeline/Track";
+import { ClipContext } from "~/contexts/ClipContext/ClipContext";
 
+function buildUpdaters(
+  updateCharacters: (options: {
+    type: "animations" | "positions" | "lipSync";
+    id: string;
+    length: number;
+    offset: number;
+  }) => void,
+) {
+  function updateClipAnimations(options: {
+    id: string;
+    length: number;
+    offset: number;
+  }) {
+    updateCharacters({ ...options, type: "animations" });
+  }
+  function updateClipPosition(options: {
+    id: string;
+    length: number;
+    offset: number;
+  }) {
+    updateCharacters({ ...options, type: "positions" });
+  }
+  function updateClipLipSync(options: {
+    id: string;
+    length: number;
+    offset: number;
+  }) {
+    updateCharacters({ ...options, type: "lipSync" });
+  }
+  return { updateClipLipSync, updateClipPosition, updateClipAnimations };
+}
 interface Props {
   characterId: string;
 }
 
 export const Character = ({ characterId }: Props) => {
-  const { characters, updateCharacters, length, scale } =
+  const { characters, updateCharacters, toggleLipSyncMute } =
     useContext(TrackContext);
+  const { length, scale } = useContext(ClipContext);
   const fullWidth = length * 60 * 4 * scale;
   const character = characters.find((row) => (row.id = characterId));
+
+  const { updateClipLipSync, updateClipPosition, updateClipAnimations } =
+    useMemo(() => buildUpdaters(updateCharacters), [updateCharacters]);
+  const toggleCharacterLipSyncMute = useCallback(() => {
+    toggleLipSyncMute(character?.id ?? "");
+  }, []);
+
   if (!character) {
     return false;
   }
@@ -24,97 +64,30 @@ export const Character = ({ characterId }: Props) => {
       <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
         Character
       </div>
-      <div className="flex flex-col gap-5">
-        <div className="pl-16">
-          <div className="relative mt-4 block h-9 rounded-lg bg-character-unselected">
-            {animationClips.map((clip, index) => (
-              <TrackClip
-                key={clip.id}
-                min={
-                  index > 0
-                    ? animationClips[index - 1].offset +
-                      animationClips[index - 1].length
-                    : 0
-                }
-                max={
-                  index < animationClips.length - 1
-                    ? animationClips[index + 1].offset
-                    : length * 60 * 4 * scale
-                }
-                style="character"
-                updateClip={(options) =>
-                  updateCharacters({ ...options, type: "animations" })
-                }
-                clip={clip}
-              />
-            ))}
-            <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
-              Animation
-            </div>
-          </div>
-        </div>
-        <div className="pl-16">
-          <div className="relative mt-4 block h-9 w-full rounded-lg bg-character-unselected">
-            {positionClips.map((clip, index) => (
-              <TrackClip
-                key={clip.id}
-                min={
-                  index > 0
-                    ? animationClips[index - 1].offset +
-                      animationClips[index - 1].length
-                    : 0
-                }
-                max={
-                  index < animationClips.length - 1
-                    ? animationClips[index + 1].offset
-                    : length * 60 * 4 * scale
-                }
-                style="character"
-                updateClip={(options) =>
-                  updateCharacters({ ...options, type: "positions" })
-                }
-                clip={clip}
-              />
-            ))}
-            <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
-              Character Position/Rotation
-            </div>
-          </div>
-        </div>
-        <div className="pl-16">
-          <div className="relative mt-4 block h-9 w-full rounded-lg bg-character-unselected">
-            {lipSyncClips.map((clip, index) => (
-              <TrackClip
-                key={clip.id}
-                min={
-                  index > 0
-                    ? animationClips[index - 1].offset +
-                      animationClips[index - 1].length
-                    : 0
-                }
-                max={
-                  index < animationClips.length - 1
-                    ? animationClips[index + 1].offset
-                    : length * 60 * 4 * scale
-                }
-                style="character"
-                updateClip={(options) =>
-                  updateCharacters({ ...options, type: "lipSync" })
-                }
-                clip={clip}
-              />
-            ))}
-            <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
-              Lipsync Audio Track
-            </div>
-            <button
-              className="absolute text-xs text-white"
-              style={{ top: 6, left: -20 }}
-            >
-              <i className="fas fa-volume-mute"></i>
-            </button>
-          </div>
-        </div>
+      <div className="flex flex-col gap-2">
+        <Track
+          clips={animationClips}
+          title="Animation"
+          updateClip={updateClipAnimations}
+          style="character"
+          type="animations"
+        />
+        <Track
+          clips={positionClips}
+          title="Character Position/Rotation"
+          updateClip={updateClipPosition}
+          style="character"
+          type="positions"
+        />
+        <Track
+          clips={lipSyncClips}
+          title="Lipsync Audio Track"
+          updateClip={updateClipLipSync}
+          muted={character.muted}
+          toggleMute={toggleCharacterLipSyncMute}
+          style="character"
+          type="lipSync"
+        />
       </div>
     </div>
   );
