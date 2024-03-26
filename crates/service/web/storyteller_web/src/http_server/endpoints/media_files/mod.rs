@@ -6,3 +6,4 @@ pub mod list;
 pub mod rename_media_file_handler;
 pub mod update_media_file;
 pub mod upload;
+pub mod upsert_write;
