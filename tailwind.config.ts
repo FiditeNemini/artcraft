@@ -109,7 +109,7 @@ export default {
       "ui-panel-border": "#393948",
       "ui-controls": "#39394D",
       "ui-controls-button": "#676781",
-      "ui-divider": "#D3D3D3",
+      "ui-divider": "#515168",
 
       gray: colors.gray,
       black: colors.black,

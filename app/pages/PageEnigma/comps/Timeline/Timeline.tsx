@@ -1,7 +1,7 @@
-import { 
+import {
   Fragment,
   // useCallback,
-  useContext
+  useContext,
 } from "react";
 
 import { Button } from "~/components";
@@ -13,20 +13,22 @@ import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 import { LowerPanel } from "~/modules/LowerPanel";
 import { Character } from "./Character";
 
-
-
 import { Camera } from "./Camera";
 import { Audio } from "./Audio";
 import { Objects } from "./Objects";
 import { useMouseEventsAnimation } from "./utils/useMouseEventsAnimation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
 
-export const Timeline = ({
-  // editorCurrent,
-  // time,
-}: {
-  // editorCurrent: Editor | null;
-  // time: number;
-}) => {
+export const Timeline = (
+  {
+    // editorCurrent,
+    // time,
+  }: {
+    // editorCurrent: Editor | null;
+    // time: number;
+  },
+) => {
   const editorEngine = useContext(EngineContext);
   // editorEngine replaced the engineRef.current passed as a prop
   // const { characters, updateCharacters } = useContext(TrackContext);
@@ -40,19 +42,19 @@ export const Timeline = ({
   return (
     <>
       <LowerPanel>
-        <div className="mt-4 flex h-3 text-sm text-white">
+        <div className="mt-4 flex h-3 text-xs text-white opacity-75">
           {Array(length)
             .fill(0)
             .map((_, index) => (
               <Fragment key={index}>
                 <div
-                  className="absolute"
+                  className="absolute ps-1"
                   style={{ left: index * sectionWidth + 92 }}
                 >
                   00:{index < 10 ? "0" + index.toString() : index.toString()}
                 </div>
                 <div
-                  className="bg-ui-divider absolute block h-full"
+                  className="absolute block h-full bg-ui-divider"
                   style={{
                     width: 1,
                     left: index * sectionWidth + 88,
@@ -68,7 +70,7 @@ export const Timeline = ({
             00:{length < 10 ? "0" + length.toString() : length.toString()}
           </div>
           <div
-            className="bg-ui-divider absolute block h-full"
+            className="absolute block h-full bg-ui-divider"
             style={{
               width: 1,
               left: length * sectionWidth + 88,
@@ -95,16 +97,17 @@ export const Timeline = ({
           style={{ top: 8, left: time * 4 * scale + 88 }}
           onPointerDown={onPointerDown}
         >
-          <i
-            className="fa-solid fa-sort-down font-brand-primary absolute"
-            style={{ top: 0, left: 0 }}
-          ></i>
+          <FontAwesomeIcon
+            icon={faSortDown}
+            style={{ top: 0, left: -2 }}
+            className="text-brand-primary"
+          />
           <div
             className="absolute block bg-brand-primary"
             style={{
               left: 0,
               top: 8,
-              width: 3,
+              width: 2,
               height: fullHeight,
             }}
           />

@@ -28,20 +28,23 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
   return (
     <>
       <div
-        className={[...classes, "px-1", "rounded", "text-sm text-white"].join(
-          " ",
-        )}
-        style={{ top: -21, left: offset * 4 * scale + 2 }}
+        className={[
+          ...classes,
+          "px-[6px] py-[3px]",
+          "rounded",
+          "text-xs font-medium text-white",
+        ].join(" ")}
+        style={{ top: -28, left: offset * 4 * scale + 2 }}
       >
         {clip.name}
       </div>
       <button
         className={[
           ...classes,
-          "rounded-l",
+          "rounded-l-lg",
           "block h-full",
           clip.id === selectedClip
-            ? "border-b-1 border-t-1 border-l-1 border border-r-0 border-white"
+            ? "border border-b-2 border-l-2 border-r-0 border-t-2 border-white"
             : "",
         ].join(" ")}
         style={{ width: 15, left: offset * 4 * scale, cursor: "w-resize" }}
@@ -53,7 +56,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           ...classes,
           "block h-full",
           clip.id === selectedClip
-            ? "border-b-1 border-t-1 border border-l-0 border-r-0 border-white"
+            ? "border border-b-2 border-l-0 border-r-0 border-t-2 border-white"
             : "",
         ].join(" ")}
         style={{
@@ -67,10 +70,10 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
       <button
         className={[
           ...classes,
-          "rounded-r",
+          "rounded-r-lg",
           "block h-full",
           clip.id === selectedClip
-            ? "border-b-1 border-t-1 border-r-1 border border-l-0 border-white"
+            ? "border border-b-2 border-l-0 border-r-2 border-t-2 border-white"
             : "",
         ].join(" ")}
         style={{
