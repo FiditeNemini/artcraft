@@ -2,11 +2,14 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 class Scene {
-    constructor(name) {
+    name: string;
+    gridHelper: THREE.GridHelper | undefined;
+    scene: THREE.Scene;
+
+    constructor(name: string) {
         this.name = name;
-        this.gridHelper = null;
+        this.gridHelper;
         this.scene = new THREE.Scene();
-        this.activeItem = null;
     }
 
     initialize() {
@@ -15,7 +18,7 @@ class Scene {
         this._create_skybox();
     }
 
-    instantiate(name) {
+    instantiate(name: string) {
         let material = new THREE.MeshPhongMaterial({ color: 0xffffff });
         let geometry;
         if (name == "Box") {
@@ -43,19 +46,16 @@ class Scene {
         return obj.uuid;
     }
 
-    get_object_by_uuid(uuid) {
+    get_object_by_uuid(uuid: string) {
         return this.scene.getObjectByProperty('uuid', uuid);
-    }
-
-    update(delta) {
-        
     }
 
     _disable_skybox() {
         this.scene.background = null;
     }
 
-    render_mode(enabled=true) {
+    render_mode(enabled:boolean=true) {
+        if(this.gridHelper == undefined) { return; }
         if(enabled) {
             this._disable_skybox();
             this.scene.remove(this.gridHelper);
@@ -65,24 +65,13 @@ class Scene {
         }
     }
 
-    accept_animation_clip(clip) {
-        this.animations.push(clip)
-    }
-
-    play_anim_demo(character_uuid) {
-        this.animated_items[character_uuid].animate(this.animated_items[character_uuid].anims[0]._clip);
-        this.animated_items[character_uuid].sync_lips("/resources/sound/2pac.wav");
-        this.activeItem = character_uuid;
-        this.accept_animation_clip(this.animated_items[character_uuid].anims[0]._clip);
-    }
-
-    async load_glb(filepath) { //: Promise<THREE.Object3D> {
+    async load_glb(filepath: string) { //: Promise<THREE.Object3D> {
         return new Promise((resolve) => {
             let glbLoader = new GLTFLoader();
             glbLoader.load(filepath, (glb) => {
                 glb.scene.children.forEach(child => {
-                    child.traverse(c => {
-                        if (c.isMesh) {
+                    child.traverse((c: THREE.Object3D) => {
+                        if (c instanceof THREE.Mesh) {
                             c.material.metalness = 0.0;
                             c.material.specular = 0.5;
                             c.castShadow = true;
