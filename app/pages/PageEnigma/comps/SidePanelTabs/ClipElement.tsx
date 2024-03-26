@@ -4,11 +4,12 @@ import { ClipContext } from "~/contexts/ClipContext/ClipContext";
 
 interface Props {
   clip: BaseClip;
-  type: "animation" | "audio";
+  type: "animations" | "lipSync";
 }
 
 export const ClipElement = ({ clip, type }: Props) => {
-  const { startDrag, dragId, endDrag } = useContext(ClipContext);
+  const { startDrag, dragId, endDrag, scale, canDrop, setCanDrop } =
+    useContext(ClipContext);
   const [initPosition, setInitPosition] = useState<{
     initX: number;
     initY: number;
@@ -49,7 +50,7 @@ export const ClipElement = ({ clip, type }: Props) => {
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointermove", onMouseMove);
     };
-  }, []);
+  }, [dragId, startDrag, endDrag, initX, initY]);
 
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
@@ -60,17 +61,38 @@ export const ClipElement = ({ clip, type }: Props) => {
           y: 0,
         });
         setInitPosition({ initY: event.clientY, initX: event.clientX });
+        setCanDrop(false);
       }
     },
-    [type, clip.id, startDrag],
+    [type, clip.id, startDrag, setCanDrop],
   );
+
+  // console.log("clip", canDrop);
 
   return (
     <div key={clip.id} className="relative h-16 w-16">
       <div
         id={`ani-clip-${clip.id}`}
         className="absolute block h-16 w-16 bg-brand-secondary-700"
-        style={{ top: y, left: x }}
+        style={{ top: 0, left: 0 }}
+        onPointerDown={onPointerDown}
+      >
+        {clip.name}
+      </div>
+      <div
+        id={`ani-dnd-${clip.id}`}
+        className={[
+          "absolute h-8 p-2",
+          "rounded-lg",
+          !canDrop ? "bg-brand-primary" : "bg-brand-secondary-700",
+          dragId ? "block" : "hidden",
+        ].join(" ")}
+        style={{
+          top: y,
+          left: x,
+          zIndex: 5000,
+          width: clip.length * 4 * scale,
+        }}
         onPointerDown={onPointerDown}
       >
         {clip.name}

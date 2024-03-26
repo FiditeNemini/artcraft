@@ -8,7 +8,7 @@ interface Props {
 
 export const ClipProvider = ({ children }: Props) => {
   const [state, setState] = useState<{
-    dragType: "animation" | "audio" | null;
+    dragType: "animations" | "lipSync" | null;
     dragId: string | null;
   }>({ dragType: null, dragId: null });
   const [animationClips, setAnimationClips] = useState<AnimationClip[]>([]);
@@ -27,13 +27,23 @@ export const ClipProvider = ({ children }: Props) => {
     setAudioClips([]);
   }, []);
 
-  const startDrag = useCallback((type: "animation" | "audio", id: string) => {
-    setState({ dragId: id, dragType: type });
-  }, []);
+  const startDrag = useCallback(
+    (type: "animations" | "lipSync", id: string) => {
+      setState({ dragId: id, dragType: type });
+    },
+    [],
+  );
 
   const endDrag = useCallback(() => {
     setState({ dragId: null, dragType: null });
   }, []);
+
+  const [time, setTime] = useState(0);
+  const updateCurrentTime = useCallback((newTime: number) => {
+    setTime(newTime);
+  }, []);
+
+  const [canDrop, setCanDrop] = useState(false);
 
   const values = useMemo(() => {
     return {
@@ -43,8 +53,25 @@ export const ClipProvider = ({ children }: Props) => {
       audioClips,
       startDrag,
       endDrag,
+      scale: 1,
+      currentTime: time,
+      length: 12,
+      updateCurrentTime,
+      canDrop,
+      setCanDrop,
     };
-  }, [state, animationClips, audioClips, startDrag, endDrag]);
+  }, [
+    state.dragId,
+    state.dragType,
+    animationClips,
+    audioClips,
+    startDrag,
+    endDrag,
+    canDrop,
+    updateCurrentTime,
+    setCanDrop,
+    time,
+  ]);
 
   return <ClipContext.Provider value={values}>{children}</ClipContext.Provider>;
 };

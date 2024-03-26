@@ -16,14 +16,9 @@ export const TrackProvider = ({ children }: Props) => {
   const { audio, updateAudio, toggleAudioMute } = useUpdateAudio();
   const { objects, updateObject } = useUpdateObject();
   const [selectedClip, setSelectedClip] = useState<string | null>(null);
-  const [time, setTime] = useState(0);
 
   const selectClip = useCallback((clipId: string | null) => {
     setSelectedClip(clipId);
-  }, []);
-
-  const updateCurrentTime = useCallback((newTime: number) => {
-    setTime(newTime);
   }, []);
 
   const values = useMemo(() => {
@@ -32,16 +27,12 @@ export const TrackProvider = ({ children }: Props) => {
       camera,
       audio,
       objects,
-      scale: 1,
-      currentTime: time,
-      length: 12,
       updateCharacters,
       updateCamera,
       updateAudio,
       updateObject,
       selectClip,
       selectedClip,
-      updateCurrentTime,
       toggleLipSyncMute,
       toggleAudioMute,
     };
@@ -56,8 +47,6 @@ export const TrackProvider = ({ children }: Props) => {
     updateAudio,
     objects,
     updateObject,
-    time,
-    updateCurrentTime,
     toggleLipSyncMute,
     toggleAudioMute,
   ]);

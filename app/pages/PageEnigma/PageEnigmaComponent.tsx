@@ -86,11 +86,9 @@ export const PageEnigmaComponent = () => {
           </div>
 
           {/* Timeline */}
-          <div className="min-h-[220px]" ref={timelineRef}>
-            <TrackProvider>
-              <Timeline timelineHeight={timelineHeight} />
-            </TrackProvider>
-          </div>
+          <TrackProvider>
+            <Timeline timelineHeight={timelineHeight} />
+          </TrackProvider>
         </div>
       </EngineProvider>
     </div>

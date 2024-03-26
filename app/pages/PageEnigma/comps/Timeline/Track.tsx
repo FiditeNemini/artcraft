@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
 import { BaseClip } from "~/models/track";
 import { useContext } from "react";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 import { ClipContext } from "~/contexts/ClipContext/ClipContext";
 
 interface Props {
@@ -25,16 +24,29 @@ export const Track = ({
   style,
   type,
 }: Props) => {
-  const { length } = useContext(TrackContext);
+  const { length, setCanDrop } = useContext(ClipContext);
   const { dragType } = useContext(ClipContext);
   const trackType = type ?? style;
 
-  const className = dragType === trackType ? "highlight" : "";
+  function onPointerOver() {
+    if (dragType !== trackType) {
+      return;
+    }
+    setCanDrop(true);
+  }
+  function onPointerLeave() {
+    if (dragType !== trackType) {
+      return;
+    }
+    setCanDrop(false);
+  }
 
   return (
     <div className="pl-16">
       <div
         className={`rounded=lg relative mt-4 block h-9 w-full bg-${style}-unselected`}
+        onPointerOver={onPointerOver}
+        onPointerLeave={onPointerLeave}
       >
         {clips.map((clip, index) => (
           <TrackClip

@@ -6,7 +6,7 @@ import React, {
   useRef,
 } from "react";
 import { BaseClip } from "~/models/track";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { ClipContext } from "~/contexts/ClipContext/ClipContext";
 
 export const useMouseEventsClip = (
   clip: BaseClip,
@@ -22,7 +22,7 @@ export const useMouseEventsClip = (
   const isActive = useRef("");
   const clientX = useRef(0);
 
-  const { scale } = useContext(TrackContext);
+  const { scale } = useContext(ClipContext);
 
   const onPointerUp = useCallback(() => {
     if (isActive.current) {

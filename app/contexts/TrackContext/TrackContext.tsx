@@ -12,9 +12,6 @@ export const TrackContext = createContext<{
   audio: AudioGroup | null;
   objects: ObjectGroup;
   selectedClip: string | null;
-  scale: number;
-  currentTime: number;
-  length: number;
   updateCharacters: (options: {
     type: "animations" | "positions" | "lipSync";
     id: string;
@@ -37,7 +34,6 @@ export const TrackContext = createContext<{
     offset: number;
   }) => void;
   selectClip: (clipId: string) => void;
-  updateCurrentTime: (time: number) => void;
   toggleLipSyncMute: (characterId: string) => void;
   toggleAudioMute: () => void;
 }>({
@@ -46,15 +42,11 @@ export const TrackContext = createContext<{
   audio: null,
   objects: { id: "", objects: [] },
   selectedClip: null,
-  scale: 1,
-  currentTime: 0,
-  length: 12,
   updateCharacters: () => {},
   updateCamera: () => {},
   updateAudio: () => {},
   updateObject: () => {},
   selectClip: () => {},
-  updateCurrentTime: () => {},
   toggleLipSyncMute: () => {},
   toggleAudioMute: () => {},
 });

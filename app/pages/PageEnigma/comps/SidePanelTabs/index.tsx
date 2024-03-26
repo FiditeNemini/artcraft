@@ -1,24 +1,14 @@
 import { Tabs } from "~/modules/Tabs";
 import { TabStyling } from "./TabStyling";
-import { useCallback, useContext, useState } from "react";
-import { ClipContext } from "~/contexts/ClipContext/ClipContext";
-import { ClipElement } from "~/pages/PageEnigma/comps/SidePanelTabs/ClipElement";
+import { ClipElements } from "./ClipElements";
 
 export const SidePanelTabs = () => {
-  const { animationClips } = useContext(ClipContext);
-
   return (
     <Tabs
       tabs={[
         {
           header: "Animation",
-          children: (
-            <div className="flex flex-wrap">
-              {animationClips.map((clip) => (
-                <ClipElement key={clip.id} clip={clip} type="animation" />
-              ))}
-            </div>
-          ),
+          children: <ClipElements />,
         },
         {
           header: "Camera",
