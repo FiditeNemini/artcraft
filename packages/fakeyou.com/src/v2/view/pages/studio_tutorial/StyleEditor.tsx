@@ -73,7 +73,7 @@ export default function StyleEditor({ compositorStart, setVstValues, vstValues }
     <TextArea
       label="Negative prompt"
       placeholder="Enter your description..."
-      onChange={e => handleOnChange({ posPrompt: e.target.value })}
+      onChange={e => handleOnChange({ negPrompt: e.target.value })}
       value={vstValues.negPrompt}
       required={false}
       rows={5}
