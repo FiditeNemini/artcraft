@@ -1,20 +1,7 @@
-import { 
-  Fragment,
-  // useCallback,
-  useContext
-} from "react";
-
-import { Button } from "~/components";
-
-// import Editor from "../../js/editor";
-import { EngineContext } from "~/contexts/EngineContext";
+import { Fragment, useContext } from "react";
 import { TrackContext } from "~/contexts/TrackContext/TrackContext";
-
 import { LowerPanel } from "~/modules/LowerPanel";
 import { Character } from "./Character";
-
-
-
 import { Camera } from "./Camera";
 import { Audio } from "./Audio";
 import { Objects } from "./Objects";
@@ -22,16 +9,11 @@ import { useMouseEventsAnimation } from "./utils/useMouseEventsAnimation";
 import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export const Timeline = ({
-  // editorCurrent,
-  // time,
-}: {
-  // editorCurrent: Editor | null;
-  // time: number;
-}) => {
-  const editorEngine = useContext(EngineContext);
-  // editorEngine replaced the engineRef.current passed as a prop
-  // const { characters, updateCharacters } = useContext(TrackContext);
+interface Props {
+  timelineHeight: number;
+}
+
+export const Timeline = ({ timelineHeight }: Props) => {
   const { characters, objects, scale, length } = useContext(TrackContext);
   const { onPointerDown, time } = useMouseEventsAnimation();
 
@@ -41,7 +23,7 @@ export const Timeline = ({
 
   return (
     <>
-      <LowerPanel>
+      <LowerPanel timelineHeight={timelineHeight}>
         <div className="mt-4 flex h-3 text-sm text-white">
           {Array(length)
             .fill(0)

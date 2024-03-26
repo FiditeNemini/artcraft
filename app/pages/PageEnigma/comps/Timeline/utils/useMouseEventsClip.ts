@@ -59,7 +59,7 @@ export const useMouseEventsClip = (
         ) {
           return;
         }
-        currLength.current = initLength.current - delta;
+        currLength.current = initLength.current + delta;
       }
       setState({ length: currLength.current, offset: currOffset.current });
     },
