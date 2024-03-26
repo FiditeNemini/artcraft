@@ -23,7 +23,7 @@ use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_fo
 
 use crate::http_server::endpoints::media_files::upload::upload_video::drain_multipart_request::MediaFileUploadSource;
 use crate::http_server::endpoints::media_files::upload::upload_video::drain_multipart_request::drain_multipart_request;
-use crate::http_server::endpoints::media_files::upload::upload_video::upload_error::VideoMediaFileUploadError;
+use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::server_state::ServerState;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
@@ -58,14 +58,14 @@ pub async fn upload_video_media_file_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
   mut multipart_payload: Multipart,
-) -> Result<HttpResponse, VideoMediaFileUploadError> {
+) -> Result<HttpResponse, MediaFileUploadError> {
 
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
       .await
       .map_err(|err| {
         error!("MySql pool error: {:?}", err);
-        VideoMediaFileUploadError::ServerError
+        MediaFileUploadError::ServerError
       })?;
 
   // ==================== READ SESSION ==================== //
@@ -76,7 +76,7 @@ pub async fn upload_video_media_file_handler(
       .await
       .map_err(|e| {
         error!("Session checker error: {:?}", e);
-        VideoMediaFileUploadError::ServerError
+        MediaFileUploadError::ServerError
       })?;
 
   let maybe_avt_token = server_state
@@ -87,7 +87,7 @@ pub async fn upload_video_media_file_handler(
 
   if let Some(ref user) = maybe_user_session {
     if user.is_banned {
-      return Err(VideoMediaFileUploadError::NotAuthorized);
+      return Err(MediaFileUploadError::NotAuthorized);
     }
   }
 
@@ -99,7 +99,7 @@ pub async fn upload_video_media_file_handler(
   };
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-    return Err(VideoMediaFileUploadError::RateLimited);
+    return Err(MediaFileUploadError::RateLimited);
   }
 
   // ==================== READ MULTIPART REQUEST ==================== //
@@ -108,24 +108,24 @@ pub async fn upload_video_media_file_handler(
       .await
       .map_err(|e| {
         // TODO: Error handling could be nicer.
-        VideoMediaFileUploadError::BadInput("bad request".to_string())
+        MediaFileUploadError::BadInput("bad request".to_string())
       })?;
 
   // TODO(bt, 2024-02-26): This should be a transaction.
   let uuid_idempotency_token = upload_media_request.uuid_idempotency_token
-      .ok_or(VideoMediaFileUploadError::BadInput("no uuid".to_string()))?;
+      .ok_or(MediaFileUploadError::BadInput("no uuid".to_string()))?;
 
   // ==================== HANDLE IDEMPOTENCY ==================== //
 
   if let Err(reason) = validate_idempotency_token_format(&uuid_idempotency_token) {
-    return Err(VideoMediaFileUploadError::BadInput(reason));
+    return Err(MediaFileUploadError::BadInput(reason));
   }
 
   insert_idempotency_token(&uuid_idempotency_token, &mut *mysql_connection)
       .await
       .map_err(|err| {
         error!("Error inserting idempotency token: {:?}", err);
-        VideoMediaFileUploadError::BadInput("invalid idempotency token".to_string())
+        MediaFileUploadError::BadInput("invalid idempotency token".to_string())
       })?;
 
   // ==================== UPLOAD METADATA ==================== //
@@ -151,18 +151,18 @@ pub async fn upload_video_media_file_handler(
   // ==================== FILE DATA ==================== //
 
   let file_bytes = match upload_media_request.file_bytes {
-    None => return Err(VideoMediaFileUploadError::BadInput("missing file contents".to_string())),
+    None => return Err(MediaFileUploadError::BadInput("missing file contents".to_string())),
     Some(bytes) => bytes,
   };
 
   let mut maybe_mimetype = get_mimetype_for_bytes(&file_bytes);
 
   let mimetype = match maybe_mimetype {
-    None => return Err(VideoMediaFileUploadError::BadInput("unknown mimetype".to_string())),
+    None => return Err(MediaFileUploadError::BadInput("unknown mimetype".to_string())),
     Some(mimetype) => if ALLOWED_MIME_TYPES.contains(mimetype) {
       mimetype
     } else {
-      return Err(VideoMediaFileUploadError::BadInput("unsupported mimetype".to_string()));
+      return Err(MediaFileUploadError::BadInput("unsupported mimetype".to_string()));
     }
   };
 
@@ -171,7 +171,7 @@ pub async fn upload_video_media_file_handler(
   let hash = sha256_hash_bytes(&file_bytes)
       .map_err(|io_error| {
         error!("Problem hashing bytes: {:?}", io_error);
-        VideoMediaFileUploadError::ServerError
+        MediaFileUploadError::ServerError
       })?;
 
   // ==================== FRAME RATE ==================== //
@@ -179,7 +179,7 @@ pub async fn upload_video_media_file_handler(
   let mp4_info = get_mp4_info_for_bytes(file_bytes.as_ref())
       .map_err(|err| {
         warn!("Error reading mp4 info: {:?}", err);
-        VideoMediaFileUploadError::ServerError
+        MediaFileUploadError::ServerError
       })?;
 
   // ==================== UPLOAD AND SAVE ==================== //
@@ -202,7 +202,7 @@ pub async fn upload_video_media_file_handler(
       .await
       .map_err(|e| {
         warn!("Upload media bytes to bucket error: {:?}", e);
-        VideoMediaFileUploadError::ServerError
+        MediaFileUploadError::ServerError
       })?;
 
   // TODO(bt, 2024-02-22): This should be a transaction.
@@ -227,7 +227,7 @@ pub async fn upload_video_media_file_handler(
       .await
       .map_err(|err| {
         warn!("New file creation DB error: {:?}", err);
-        VideoMediaFileUploadError::ServerError
+        MediaFileUploadError::ServerError
       })?;
 
   info!("new media file id: {} token: {:?}", record_id, &token);
@@ -238,7 +238,7 @@ pub async fn upload_video_media_file_handler(
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| VideoMediaFileUploadError::ServerError)?;
+      .map_err(|e| MediaFileUploadError::ServerError)?;
 
   return Ok(HttpResponse::Ok()
       .content_type("application/json")

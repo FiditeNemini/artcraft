@@ -22,7 +22,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::drain_multipart_request::drain_multipart_request;
-use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_error::EngineAssetMediaFileUploadError;
+use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::server_state::ServerState;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
@@ -50,14 +50,14 @@ pub async fn upload_engine_asset_media_file_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
   mut multipart_payload: Multipart,
-) -> Result<HttpResponse, EngineAssetMediaFileUploadError > {
+) -> Result<HttpResponse, MediaFileUploadError> {
 
   let mut mysql_connection = server_state.mysql_pool
       .acquire()
       .await
       .map_err(|err| {
         error!("MySql pool error: {:?}", err);
-        EngineAssetMediaFileUploadError ::ServerError
+        MediaFileUploadError::ServerError
       })?;
 
   // ==================== READ SESSION ==================== //
@@ -68,7 +68,7 @@ pub async fn upload_engine_asset_media_file_handler(
       .await
       .map_err(|e| {
         error!("Session checker error: {:?}", e);
-        EngineAssetMediaFileUploadError ::ServerError
+        MediaFileUploadError::ServerError
       })?;
 
   let maybe_avt_token = server_state
@@ -79,7 +79,7 @@ pub async fn upload_engine_asset_media_file_handler(
 
   if let Some(ref user) = maybe_user_session {
     if user.is_banned {
-      return Err(EngineAssetMediaFileUploadError ::NotAuthorized);
+      return Err(MediaFileUploadError::NotAuthorized);
     }
   }
 
@@ -91,7 +91,7 @@ pub async fn upload_engine_asset_media_file_handler(
   };
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
-    return Err(EngineAssetMediaFileUploadError ::RateLimited);
+    return Err(MediaFileUploadError::RateLimited);
   }
 
   // ==================== READ MULTIPART REQUEST ==================== //
@@ -100,24 +100,24 @@ pub async fn upload_engine_asset_media_file_handler(
       .await
       .map_err(|e| {
         // TODO: Error handling could be nicer.
-        EngineAssetMediaFileUploadError ::BadInput("bad request".to_string())
+        MediaFileUploadError::BadInput("bad request".to_string())
       })?;
 
   // TODO(bt, 2024-02-26): This should be a transaction.
   let uuid_idempotency_token = upload_media_request.uuid_idempotency_token
-      .ok_or(EngineAssetMediaFileUploadError ::BadInput("no uuid".to_string()))?;
+      .ok_or(MediaFileUploadError::BadInput("no uuid".to_string()))?;
 
   // ==================== HANDLE IDEMPOTENCY ==================== //
 
   if let Err(reason) = validate_idempotency_token_format(&uuid_idempotency_token) {
-    return Err(EngineAssetMediaFileUploadError ::BadInput(reason));
+    return Err(MediaFileUploadError::BadInput(reason));
   }
 
   insert_idempotency_token(&uuid_idempotency_token, &mut *mysql_connection)
       .await
       .map_err(|err| {
         error!("Error inserting idempotency token: {:?}", err);
-        EngineAssetMediaFileUploadError ::BadInput("invalid idempotency token".to_string())
+        MediaFileUploadError::BadInput("invalid idempotency token".to_string())
       })?;
 
   // ==================== UPLOAD METADATA ==================== //
@@ -137,7 +137,7 @@ pub async fn upload_engine_asset_media_file_handler(
   // ==================== FILE DATA ==================== //
 
   let file_bytes = match upload_media_request.file_bytes {
-    None => return Err(EngineAssetMediaFileUploadError::BadInput("missing file contents".to_string())),
+    None => return Err(MediaFileUploadError::BadInput("missing file contents".to_string())),
     Some(bytes) => bytes,
   };
 
@@ -152,7 +152,7 @@ pub async fn upload_engine_asset_media_file_handler(
 
   let (suffix, media_file_type, mimetype) = match maybe_file_extension {
     None => {
-      return Err(EngineAssetMediaFileUploadError::BadInput("no file extension".to_string()));
+      return Err(MediaFileUploadError::BadInput("no file extension".to_string()));
     }
     Some("bvh") => (".bvh", MediaFileType::Bvh, "application/octet-stream"),
     Some("fbx") => (".fbx", MediaFileType::Fbx, "application/octet-stream"),
@@ -160,7 +160,7 @@ pub async fn upload_engine_asset_media_file_handler(
     Some("gltf") => (".gltf", MediaFileType::Gltf, "application/octet-stream"),
     Some("ron") => (".scn.ron", MediaFileType::SceneRon, "application/octet-stream"),
     _ => {
-      return Err(EngineAssetMediaFileUploadError::BadInput(
+      return Err(MediaFileUploadError::BadInput(
         "unsupported file extension. Must be bvh, glb, gltf, or fbx.".to_string()));
     }
   };
@@ -170,7 +170,7 @@ pub async fn upload_engine_asset_media_file_handler(
   let hash = sha256_hash_bytes(&file_bytes)
       .map_err(|io_error| {
         error!("Problem hashing bytes: {:?}", io_error);
-        EngineAssetMediaFileUploadError::ServerError
+        MediaFileUploadError::ServerError
       })?;
 
   // ==================== UPLOAD AND SAVE ==================== //
@@ -188,7 +188,7 @@ pub async fn upload_engine_asset_media_file_handler(
       .await
       .map_err(|e| {
         warn!("Upload media bytes to bucket error: {:?}", e);
-        EngineAssetMediaFileUploadError ::ServerError
+        MediaFileUploadError::ServerError
       })?;
 
   // TODO(bt, 2024-02-22): This should be a transaction.
@@ -213,7 +213,7 @@ pub async fn upload_engine_asset_media_file_handler(
       .await
       .map_err(|err| {
         warn!("New file creation DB error: {:?}", err);
-        EngineAssetMediaFileUploadError ::ServerError
+        MediaFileUploadError::ServerError
       })?;
 
   info!("new media file id: {} token: {:?}", record_id, &token);
@@ -224,7 +224,7 @@ pub async fn upload_engine_asset_media_file_handler(
   };
 
   let body = serde_json::to_string(&response)
-      .map_err(|e| EngineAssetMediaFileUploadError ::ServerError)?;
+      .map_err(|e| MediaFileUploadError::ServerError)?;
 
   return Ok(HttpResponse::Ok()
       .content_type("application/json")
