@@ -1,10 +1,12 @@
 import { TrackClip } from "./TrackClip";
-import { AudioGroup } from "~/models/track";
 import { useContext } from "react";
 import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
 
 export const Audio = () => {
-  const { audio, updateAudio, length, scale } = useContext(TrackContext);
+  const { audio, updateAudio, length, scale, toggleAudioMute } =
+    useContext(TrackContext);
   const fullWidth = length * 60 * 4 * scale;
   const { clips } = audio!;
 
@@ -41,6 +43,20 @@ export const Audio = () => {
             >
               Global Audio Track
             </div>
+            <button
+              className="absolute text-xl text-white"
+              style={{ top: 2, left: -36 }}
+              onClick={() => toggleAudioMute()}
+            >
+              {audio?.muted ? (
+                <FontAwesomeIcon
+                  icon={faVolumeSlash}
+                  className="text-brand-primary"
+                />
+              ) : (
+                <FontAwesomeIcon icon={faVolume} />
+              )}
+            </button>
           </div>
         </div>
       </div>

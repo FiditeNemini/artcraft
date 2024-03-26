@@ -1,8 +1,17 @@
 import { TrackClip } from "./TrackClip";
-import { useContext, useMemo, useRef } from "react";
+import { useContext, useMemo } from "react";
 import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faVolumeSlash, faVolume } from "@fortawesome/pro-solid-svg-icons";
 
-function buildUpdaters(updateCharacters: any) {
+function buildUpdaters(
+  updateCharacters: (options: {
+    type: "animations" | "positions" | "lipSync";
+    id: string;
+    length: number;
+    offset: number;
+  }) => void,
+) {
   function updateClipAnimations(options: {
     id: string;
     length: number;
@@ -31,7 +40,7 @@ interface Props {
 }
 
 export const Character = ({ characterId }: Props) => {
-  const { characters, updateCharacters, length, scale } =
+  const { characters, updateCharacters, length, scale, toggleLipSyncMute } =
     useContext(TrackContext);
   const fullWidth = length * 60 * 4 * scale;
   const character = characters.find((row) => (row.id = characterId));
@@ -137,10 +146,18 @@ export const Character = ({ characterId }: Props) => {
               Lipsync Audio Track
             </div>
             <button
-              className="absolute text-xs text-white"
-              style={{ top: 6, left: -20 }}
+              className="absolute text-xl text-white"
+              style={{ top: 2, left: -36 }}
+              onClick={() => toggleLipSyncMute(character?.id)}
             >
-              <i className="fas fa-volume-mute"></i>
+              {character.muted ? (
+                <FontAwesomeIcon
+                  icon={faVolumeSlash}
+                  className="text-brand-primary"
+                />
+              ) : (
+                <FontAwesomeIcon icon={faVolume} />
+              )}
             </button>
           </div>
         </div>

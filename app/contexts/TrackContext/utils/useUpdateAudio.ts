@@ -53,7 +53,7 @@ export default function useUpdateAudio() {
     setAudio((oldAudio) => {
       return {
         ...oldAudio,
-        mute: !oldAudio,
+        muted: !oldAudio.muted,
       };
     });
   }, []);

@@ -8,6 +8,8 @@ import { Camera } from "./Camera";
 import { Audio } from "./Audio";
 import { Objects } from "./Objects";
 import { useMouseEventsAnimation } from "./utils/useMouseEventsAnimation";
+import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const Timeline = ({
   editorCurrent,
@@ -88,14 +90,15 @@ export const Timeline = ({
           <Objects />
         </div>
         <div
-          className="absolute"
+          className="absolute text-brand-primary"
           style={{ top: 8, left: time * 4 * scale + 88 }}
           onPointerDown={onPointerDown}
         >
-          <i
-            className="fa-solid fa-sort-down font-brand-primary absolute"
-            style={{ top: 0, left: 0 }}
-          ></i>
+          <FontAwesomeIcon
+            icon={faSortDown}
+            className="absolute text-2xl"
+            style={{ left: -6, top: -14 }}
+          />
           <div
             className="absolute block bg-brand-primary"
             style={{
