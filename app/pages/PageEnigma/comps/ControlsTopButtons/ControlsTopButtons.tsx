@@ -1,18 +1,14 @@
-import { 
-  useContext,
-  useState
-} from "react";
-import { Button, H4 } from "~/components";
+import { useContext, useState } from "react";
+import { Button, H4, Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { EngineContext } from "~/contexts/EngineContext";
-
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
   const [sceneName, setSceneName] = useState<string>("");
 
   const handleButtonSave = () => {
-    console.log(`SceneName is ${sceneName}`)
+    console.log(`SceneName is ${sceneName}`);
     // editorEngine?.save();
   };
 
@@ -27,13 +23,13 @@ export const ControlsTopButtons = () => {
     document.getElementById("load-upload")?.click();
   };
   const handleButtonRender = () => {
-    console.log("Saving GLB to server for reference")
-    editorEngine._upload_for_testing()
+    console.log("Saving GLB to server for reference");
+    editorEngine._upload_for_testing();
     //editorEngine?.togglePlayback();
   };
   const handleButtonPlay = () => {};
 
-  return(
+  return (
     <div className="flex gap-2 pl-3 pt-3">
       <Button variant="secondary" onClick={handleButtonPlayBack}>
         Toggle Camera View
@@ -47,14 +43,11 @@ export const ControlsTopButtons = () => {
         title="Save Scene"
         confirmButtonProps={{
           label: "Save",
-          disabled:(sceneName === "" ? true : false),
-          onClick:(handleButtonSave)
+          disabled: sceneName === "" ? true : false,
+          onClick: handleButtonSave,
         }}
       >
-        <H4 className="text-black">Please Enter a name for your scene</H4>
-        <input type="text" onChange={(e)=>{
-          setSceneName(e.target.value)
-        }}/>
+        <Input label="Please Enter a name for your scene" />
       </ButtonDialogue>
 
       <ButtonDialogue
@@ -70,7 +63,7 @@ export const ControlsTopButtons = () => {
         <p>Ask Wil about React</p>
       </ButtonDialogue>
 
-      <div className="fixed flex gap-2" style={{ top: 124, left: 12}}>
+      <div className="fixed flex gap-2" style={{ top: 124, left: 12 }}>
         <Button onClick={handleButtonLoad}>Load</Button>
         <Button onClick={handleButtonRender}>Render</Button>
         <Button onClick={handleButtonPlay}>Play</Button>

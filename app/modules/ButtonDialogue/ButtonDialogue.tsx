@@ -1,12 +1,11 @@
-import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment, useState } from "react";
 
-import { Button, ButtonPropsI } from '~/components/Button';
+import { Button, ButtonPropsI } from "~/components/Button";
 
+type UnionedButtonProps = { label?: string } & ButtonPropsI;
 
-type UnionedButtonProps =  {label?:string } & ButtonPropsI;
-
-interface ButtonDialoguePropsI  {
+interface ButtonDialoguePropsI {
   buttonProps?: UnionedButtonProps;
   confirmButtonProps?: UnionedButtonProps;
   closeButtonProps?: UnionedButtonProps;
@@ -15,9 +14,9 @@ interface ButtonDialoguePropsI  {
 }
 
 export const ButtonDialogue = ({
-  buttonProps : unionedButtonProps,
+  buttonProps: unionedButtonProps,
   confirmButtonProps,
-  closeButtonProps : unionedCloseButtonProps,
+  closeButtonProps: unionedCloseButtonProps,
   title,
   children,
 }: ButtonDialoguePropsI) => {
@@ -26,26 +25,19 @@ export const ButtonDialogue = ({
   const closeModal = () => setIsOpen(false);
   const openModal = () => setIsOpen(true);
 
-  const {
-    label: buttonLabel,
-    ...buttonProps
-  } = unionedButtonProps || {label:"Open"};
-  const {
-    label: closeButtonLabel,
-    ...closeButtonProps
-  } = unionedCloseButtonProps || {label:"Close"};
+  const { label: buttonLabel, ...buttonProps } = unionedButtonProps || {
+    label: "Open",
+  };
+  const { label: closeButtonLabel, ...closeButtonProps } =
+    unionedCloseButtonProps || { label: "Close" };
   return (
     <>
-      <Button
-        type="button"
-        onClick={openModal}
-        {...buttonProps}
-      >
+      <Button type="button" onClick={openModal} {...buttonProps}>
         {buttonLabel}
       </Button>
 
       <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+        <Dialog as="div" className="relative z-10 " onClose={closeModal}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -55,7 +47,7 @@ export const ButtonDialogue = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black/25" />
+            <div className="fixed inset-0 bg-black/40" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
@@ -69,43 +61,42 @@ export const ButtonDialogue = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  {title && 
+                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-xl border border-ui-panel-border bg-ui-panel p-5 text-left align-middle shadow-xl transition-all">
+                  {title && (
                     <Dialog.Title
-                      as="h3"
-                      className="text-lg font-medium leading-6 text-gray-900"
+                      as="h4"
+                      className="mb-4 text-xl font-bold text-white"
                     >
                       {title}
                     </Dialog.Title>
-                  }
-                  <div className="mt-2">
-                    {children}
-                  </div>
+                  )}
+                  <div className="mt-2">{children}</div>
 
-                  <div className="mt-4 flex justify-between ">
-                    {confirmButtonProps &&
-                      <Button
-                        type="button"
-                        {...confirmButtonProps}
-                        onClick={(e)=>{
-                          if(confirmButtonProps.onClick){
-                            confirmButtonProps.onClick(e);
-                          }
-                          closeModal();
-                        }}
-                        
-                      >
-                        {confirmButtonProps.label ? confirmButtonProps.label : "Confirm" }
-                      </Button>
-                    }
-                    <span />
+                  <div className="mt-6 flex justify-end gap-2">
                     <Button
                       type="button"
                       onClick={closeModal}
                       {...closeButtonProps}
+                      variant="secondary"
                     >
                       {closeButtonLabel}
                     </Button>
+                    {confirmButtonProps && (
+                      <Button
+                        type="button"
+                        {...confirmButtonProps}
+                        onClick={(e) => {
+                          if (confirmButtonProps.onClick) {
+                            confirmButtonProps.onClick(e);
+                          }
+                          closeModal();
+                        }}
+                      >
+                        {confirmButtonProps.label
+                          ? confirmButtonProps.label
+                          : "Confirm"}
+                      </Button>
+                    )}
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
@@ -114,6 +105,5 @@ export const ButtonDialogue = ({
         </Dialog>
       </Transition>
     </>
-  )
-}
-
+  );
+};
