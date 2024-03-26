@@ -16,6 +16,7 @@ import { EngineProvider } from "./contexts/EngineProvider";
 import { AppUIProvider } from "./contexts/AppUiContext";
 import { reducer, initialState, ACTION_TYPES } from "./reducer";
 import { VIEW_MODES } from "./reducer/types";
+import { ViewSideBySide } from "./comps/ViewSideBySide";
 
 export const PageEnigmaComponent = () => {
   const [pageState, dispatchPageState] = useReducer(reducer, initialState);
@@ -67,33 +68,35 @@ export const PageEnigmaComponent = () => {
               style={{ height: `calc(100% - ${pageState.timelineHeight}px)` }}
               // style={{ height: `calc(100% - 260px` }}
             >
-              <div className="relative w-full overflow-hidden bg-gray-400">
-                <canvas
-                  ref={canvasRef}
-                  id="video-scene"
-                  width="1280px"
-                  height="720px"
-                  className={(
-                    pageState.viewMode !== VIEW_MODES.EDITOR)
-                    ? 'invisible' : ''
-                  }
-                />
+              <div className="relative w-full overflow-hidden bg-transparent">
+                <div className={(pageState.viewMode === VIEW_MODES.SIDE_BY_SIDE) ? 'invisible' : ''}>
+                  <canvas
+                    ref={canvasRef}
+                    id="video-scene"
+                    width="1280px"
+                    height="720px"
+                  />
 
-                {/* Top controls */}
-                <div className="absolute left-0 top-0 w-full">
-                  <div className="grid grid-cols-3 gap-4">
-                    <ControlsTopButtons />
-                    <Controls3D />
+                  {/* Top controls */}
+                  <div className="absolute left-0 top-0 w-full">
+                    <div className="grid grid-cols-3 gap-4">
+                      <ControlsTopButtons />
+                      <Controls3D />
+                    </div>
+                  </div>
+
+                  {/* Bottom controls */}
+                  <div className="absolute bottom-0 left-0 w-full">
+                    <PreviewEngineCamera />
+                    <ControlsVideo />
                   </div>
                 </div>
-
-                {/* Bottom controls */}
-                <div className="absolute bottom-0 left-0 w-full">
-                  <PreviewEngineCamera />
-                  <ControlsVideo />
-                </div>
+                {
+                  pageState.viewMode === VIEW_MODES.SIDE_BY_SIDE &&
+                  <ViewSideBySide />
+                }
               </div>
-
+              
               {/* Side panel */}
               <SidePanel>
                 <SidePanelTabs />
