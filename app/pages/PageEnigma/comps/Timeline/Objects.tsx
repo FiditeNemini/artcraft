@@ -11,7 +11,9 @@ export const Objects = () => {
       className="block rounded-lg bg-objects-groupBg pb-5 pl-2 pr-4"
       style={{ width: fullWidth + 90 }}
     >
-      <div className="mb-5 pt-2 text-xs font-medium text-white">Objects</div>
+      <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
+        Objects
+      </div>
       {objects.objects.map((object) => (
         <div key={object.id} className="flex flex-col gap-2">
           <div className="pl-16">
@@ -35,7 +37,7 @@ export const Objects = () => {
                   clip={clip}
                 />
               ))}
-              <div className="absolute ps-2 pt-1 text-xs font-medium text-white">
+              <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
                 Mask Position/Rotation
               </div>
             </div>

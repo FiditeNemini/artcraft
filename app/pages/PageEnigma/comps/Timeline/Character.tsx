@@ -104,7 +104,7 @@ export const Character = ({ characterId }: Props) => {
                 clip={clip}
               />
             ))}
-            <div className="prevent-select prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
+            <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
               Lipsync Audio Track
             </div>
             <button
