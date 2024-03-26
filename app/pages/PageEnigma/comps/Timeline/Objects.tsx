@@ -8,10 +8,12 @@ export const Objects = () => {
 
   return (
     <div
-      className="bg-objects-groupBg block rounded-lg pl-2 pr-4"
+      className="bg-objects-groupBg block rounded-lg pb-5 pl-2 pr-4"
       style={{ width: fullWidth + 90 }}
     >
-      <div className="mb-2 text-sm text-white">Objects</div>
+      <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
+        Objects
+      </div>
       {objects.objects.map((object) => (
         <div key={object.id} className="flex flex-col gap-2">
           <Track

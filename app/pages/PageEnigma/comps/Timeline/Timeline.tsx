@@ -2,6 +2,7 @@ import { Fragment, useContext } from "react";
 import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 import { LowerPanel } from "~/modules/LowerPanel";
 import { Character } from "./Character";
+
 import { Camera } from "./Camera";
 import { Audio } from "./Audio";
 import { Objects } from "./Objects";
@@ -24,13 +25,20 @@ export const Timeline = ({ timelineHeight }: Props) => {
   return (
     <>
       <LowerPanel timelineHeight={timelineHeight}>
-        <div className="mt-4 flex h-3 text-sm text-white">
+        <div
+          className={[
+            "prevent-select mt-4",
+            "flex h-3",
+            "border-t border-t-ui-panel-border",
+            "text-xs text-white opacity-75",
+          ].join(" ")}
+        >
           {Array(length)
             .fill(0)
             .map((_, index) => (
               <Fragment key={index}>
                 <div
-                  className="absolute"
+                  className="absolute ps-1 pt-1"
                   style={{ left: index * sectionWidth + 92 }}
                 >
                   00:{index < 10 ? "0" + index.toString() : index.toString()}
@@ -81,15 +89,14 @@ export const Timeline = ({ timelineHeight }: Props) => {
         >
           <FontAwesomeIcon
             icon={faSortDown}
-            className="absolute text-2xl"
-            style={{ left: -6, top: -14 }}
+            className="absolute ml-[-5px] mt-[-10px] h-5 text-brand-primary"
           />
           <div
             className="absolute block bg-brand-primary"
             style={{
               left: 0,
               top: 8,
-              width: 3,
+              width: 2,
               height: fullHeight,
             }}
           />

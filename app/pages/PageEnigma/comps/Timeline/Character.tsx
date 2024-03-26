@@ -56,10 +56,12 @@ export const Character = ({ characterId }: Props) => {
 
   return (
     <div
-      className="block rounded-lg bg-character-groupBg pl-2 pr-4"
+      className="block rounded-lg bg-character-groupBg pb-5 pl-2 pr-4"
       style={{ width: fullWidth + 90 }}
     >
-      <div className="mb-2 text-xs text-white">Character</div>
+      <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
+        Character
+      </div>
       <div className="flex flex-col gap-2">
         <Track
           clips={animationClips}

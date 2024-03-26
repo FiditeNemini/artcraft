@@ -1,3 +1,23 @@
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #676781 #39394d;
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #39394d;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #39394d;
+  border-radius: 30px;
+  border: 3px solid gray;
+}
+
 body {
   font-family: "Fira Sans", sans-serif;
 }
@@ -6,4 +26,11 @@ body {
   height: 68px;
 
   width: 100vw;
+}
+
+.prevent-select {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+  pointer-events: none;
 }

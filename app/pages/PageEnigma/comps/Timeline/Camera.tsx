@@ -9,10 +9,10 @@ export const Camera = () => {
 
   return (
     <div
-      className="bg-camera-groupBg block rounded-lg pl-2 pr-4"
+      className="bg-camera-groupBg block rounded-lg pb-5 pl-2 pr-4"
       style={{ width: fullWidth + 90 }}
     >
-      <div className="mb-2 text-sm text-white">Camera</div>
+      <div className="mb-5 pt-2 text-xs font-medium text-white">Camera</div>
       <div className="flex flex-col gap-2">
         <Track
           clips={clips}

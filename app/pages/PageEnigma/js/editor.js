@@ -1,8 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
-import Scene from './scene.js';
-import SaveManager from './serialization.js';
+import Scene from './scene.ts';
 import APIManager from './api_manager.ts';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -95,8 +94,6 @@ class Editor {
         this.playback = false;
         this.playback_location = 0;
         this.max_length = 10;
-        // Save & Load.
-        this.save_manager = new SaveManager(this.version);
         // Audio Engine Test.
 
         this.audio_engine = new AudioEngine();
@@ -165,8 +162,28 @@ class Editor {
 
         // This is the default scene.
         // "m_189p8hj0eyypbg74kkhcpehwpjhnkz" scene with the fox.
-        let result = await this.api_manager.saveSceneState(this.activeScene.scene)
+        //let result = await this.api_manager.saveSceneState(this.activeScene.scene)
+        let result = await this.api_manager.getMediaFile("m_189p8hj0eyypbg74kkhcpehwpjhnkz")
         console.log(result)
+    }
+
+    async _serialize_timeline() {
+        // note the database from the server is the source of truth for all the data.
+        // Test code here
+        let object = await this.activeScene.load_glb("./resources/models/fox/fox.glb")
+
+        // load object into the engine for lip syncing
+        this.lipsync_engine.load_object(object.uuid, "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72");
+
+        // create the clip with the same id for a reference to the media
+        this.timeline.addPlayableClip(new ClipUI(1.0, "lipsync", "clip1", "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72", object.uuid, 150, 400));
+        
+        // media id for this is up in the air but when a path is created you should be able to store and delete it
+        this.timeline.addPlayableClip(new ClipUI(1.0, "transform", "clip2", object.uuid, object.uuid, 0, 150));
+
+        // media id for this as well it can be downloaded
+        this.timeline.addPlayableClip(new ClipUI(1.0, "animation", "clip3", "/resources/models/fox/fox_idle.glb", object.uuid, 0, 400));
+        this.animation_engine.load_object(object.uuid, "/resources/models/fox/fox_idle.glb", "clip3");
     }
 
     async _test_demo() {
@@ -237,6 +254,10 @@ class Editor {
         this.composer.addPass(this.outputPass);
     }
 
+    create_parim(name) {
+        let uuid = this.activeScene.instantiate(name);
+    }
+
     render_mode() {
         this.rendering = !this.rendering;
         this.activeScene.render_mode(this.rendering);
@@ -283,7 +304,6 @@ class Editor {
         //this.transform_engine.clips[this.test_box_uuid].reset(this.activeScene.get_object_by_uuid(this.test_box_uuid));
     }
 
-
     // Basicly Unity 3D's update loop.
     update_loop(time) {
         // Updates debug stats.
@@ -292,7 +312,7 @@ class Editor {
         let delta_time = this.clock.getDelta()
 
         // All calls that are not super important like timeline go here.
-        this.activeScene.update(delta_time);
+        //this.activeScene.update(delta_time);
         //this.orbit.update(0.1);
 
         //console.log(this.transform_engine.clips[this.test_box_uuid]);
@@ -306,10 +326,6 @@ class Editor {
     start_playback() {
         this.timeline.isPlaying = true;
     }
-
-    // _save_to_cloud(blob) {
-    //     this.api_manager.uploadGLB(blob, "test.glb");
-    // }
 
     change_mode(type) {
         this.control.mode = type;
