@@ -1,12 +1,9 @@
 import { useContext } from "react";
 import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 import { Track } from "~/pages/PageEnigma/comps/Timeline/Track";
-import { ClipContext } from "~/contexts/ClipContext/ClipContext";
 
 export const Camera = () => {
-  const { camera, updateCamera } = useContext(TrackContext);
-  const { length, scale } = useContext(ClipContext);
-  const fullWidth = length * 60 * 4 * scale;
+  const { camera, fullWidth, updateCamera } = useContext(TrackContext);
   const { clips } = camera!;
 
   return (

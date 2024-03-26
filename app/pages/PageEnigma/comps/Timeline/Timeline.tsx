@@ -9,15 +9,13 @@ import { Objects } from "./Objects";
 import { useMouseEventsAnimation } from "./utils/useMouseEventsAnimation";
 import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ClipContext } from "~/contexts/ClipContext/ClipContext";
 
 interface Props {
   timelineHeight: number;
 }
 
 export const Timeline = ({ timelineHeight }: Props) => {
-  const { characters, objects } = useContext(TrackContext);
-  const { scale, length } = useContext(ClipContext);
+  const { characters, objects, scale, length } = useContext(TrackContext);
   const { onPointerDown, time } = useMouseEventsAnimation();
 
   const sectionWidth = 60 * 4 * scale;

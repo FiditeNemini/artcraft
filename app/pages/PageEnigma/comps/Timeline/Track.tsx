@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
 import { BaseClip } from "~/models/track";
 import { useContext } from "react";
-import { ClipContext } from "~/contexts/ClipContext/ClipContext";
+import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 
 interface Props {
   clips: BaseClip[];
@@ -24,8 +24,7 @@ export const Track = ({
   style,
   type,
 }: Props) => {
-  const { length, setCanDrop } = useContext(ClipContext);
-  const { dragType } = useContext(ClipContext);
+  const { length, setCanDrop, dragType } = useContext(TrackContext);
   const trackType = type ?? style;
 
   function onPointerOver() {

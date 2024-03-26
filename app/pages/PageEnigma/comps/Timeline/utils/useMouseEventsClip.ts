@@ -6,7 +6,7 @@ import React, {
   useRef,
 } from "react";
 import { BaseClip } from "~/models/track";
-import { ClipContext } from "~/contexts/ClipContext/ClipContext";
+import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 
 export const useMouseEventsClip = (
   clip: BaseClip,
@@ -22,7 +22,7 @@ export const useMouseEventsClip = (
   const isActive = useRef("");
   const clientX = useRef(0);
 
-  const { scale } = useContext(ClipContext);
+  const { scale } = useContext(TrackContext);
 
   const onPointerUp = useCallback(() => {
     if (isActive.current) {
@@ -46,7 +46,7 @@ export const useMouseEventsClip = (
         currOffset.current = deltaOffset;
       }
       if (isActive.current === "left") {
-        if (deltaOffset < min) {
+        if (initLength.current - delta < 30 || deltaOffset < min) {
           return;
         }
         currOffset.current = deltaOffset;

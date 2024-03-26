@@ -12,7 +12,6 @@ import { PreviewWindow } from "./comps/PreviewWindow";
 import { Timeline } from "./comps/Timeline";
 import { SidePanelTabs } from "./comps/SidePanelTabs";
 
-import { TrackProvider } from "~/contexts/TrackContext/TrackProvider";
 import { EngineProvider } from "~/contexts/EngineProvider";
 
 export const PageEnigmaComponent = () => {
@@ -86,9 +85,7 @@ export const PageEnigmaComponent = () => {
           </div>
 
           {/* Timeline */}
-          <TrackProvider>
-            <Timeline timelineHeight={timelineHeight} />
-          </TrackProvider>
+          <Timeline timelineHeight={timelineHeight} />
         </div>
       </EngineProvider>
     </div>
