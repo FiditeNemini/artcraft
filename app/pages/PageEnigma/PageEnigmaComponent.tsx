@@ -43,10 +43,10 @@ export const PageEnigmaComponent = () => {
 
   return (
     <div>
-      <TopBarHelmet>
-        <Button icon={faSparkles}>Generate Movie</Button>
-      </TopBarHelmet>
       <EngineProvider>
+        <TopBarHelmet>
+          <Button icon={faSparkles}>Generate Movie</Button>
+        </TopBarHelmet>
         <div style={{ height: "calc(100vh - 68px)" }}>
           {/* Engine section/side panel */}
           <div

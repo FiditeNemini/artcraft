@@ -4,7 +4,6 @@ import {
   faCube,
   faPlus,
   faUpRightAndDownLeftFromCenter,
-
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   fa3dCylinder,
@@ -13,42 +12,54 @@ import {
 } from "@awesome.me/kit-fde2be5eb0/icons/kit/custom";
 import { ButtonIcon, ButtonIconSelect } from "~/components";
 import { EngineContext } from "~/contexts/EngineContext";
-import { 
-  useContext,
-} from "react";
+import { useContext } from "react";
+
 export const Controls3D = () => {
-  
   const editorEngine = useContext(EngineContext);
 
   const handlePlus = () => {
     console.log("Controls 3D: Plus button clicked");
   };
   const handleCube = () => {
-    if(editorEngine == null || editorEngine == undefined){ return; }
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
     editorEngine.create_parim("Box");
   };
   const handleCylinder = () => {
-    if(editorEngine == null || editorEngine == undefined){ return; }
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
     editorEngine.create_parim("Cylinder");
   };
   const handleTorus = () => {
-    if(editorEngine == null || editorEngine == undefined){ return; }
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
     editorEngine.create_parim("Donut");
   };
   const handleSphere = () => {
-    if(editorEngine == null || editorEngine == undefined){ return; }
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
     editorEngine.create_parim("Sphere");
   };
   const handleMoveArrows = () => {
-    if(!editorEngine){ return; }
+    if (!editorEngine) {
+      return;
+    }
     editorEngine.change_mode("transform");
   };
   const handleRotateArrows = () => {
-    if(!editorEngine){ return; }
+    if (!editorEngine) {
+      return;
+    }
     editorEngine.change_mode("rotate");
   };
   const handleZoomArrows = () => {
-    if(!editorEngine){ return; }
+    if (!editorEngine) {
+      return;
+    }
     editorEngine.change_mode("scale");
   };
 
