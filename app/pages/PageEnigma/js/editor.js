@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
 import Scene from './scene.js';
 import SaveManager from './serialization.js';
-import MediaUploadManager from './api_manager.ts';
+import APIManager from './api_manager.ts';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
@@ -23,6 +23,7 @@ import { LipSync } from './lipsync.js';
 import { LipSyncEngine } from "./lip_sync_engine.ts";
 import { AnimationEngine} from "./animation_engine.ts";
 import { faL } from '@fortawesome/pro-solid-svg-icons';
+
 if (typeof window !== 'undefined') {
     import('ccapture.js').then(module => {
         const CCapture = module.CCapture;
@@ -79,7 +80,7 @@ class Editor {
         this.transform_interaction;
         this.rendering = false;
         // API.
-        this.api_manager = new MediaUploadManager();
+        this.api_manager = new APIManager();
         // Debug & Movement.
         this.stats = null;
         this.orbit = null;
@@ -155,21 +156,36 @@ class Editor {
 
         this.timeline.scene = this.activeScene;
         
-
-     
         this._test_demo()
     }
 
-    async _test_demo() {
-        // Test code here
-        // this.test_box_uuid = this.activeScene.instantiate("Box");
-        // let object = this.transform_engine.loadObject(this.test_box_uuid);
-        // this.timeline.addPlayableClip(new ClipUI(1.0, "transform", object.object_uuid, object.media_id, 50, 300));
-        // this.timeline.addPlayableClip(new ClipUI(1.0, "audio", "m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg", null, 50, 50));
+    // uploading some objects for testing to get their media ids from my account.
+    async _upload_for_testing() {
+        // have to upload as a file first
 
+        // This is the default scene.
+        // "m_189p8hj0eyypbg74kkhcpehwpjhnkz" scene with the fox.
+        let result = await this.api_manager.saveSceneState(this.activeScene.scene)
+        console.log(result)
+    }
+
+    async _test_demo() {
+        // note the database from the server is the source of truth for all the data.
+        // Test code here
         let object = await this.activeScene.load_glb("./resources/models/fox/fox.glb")
+
+        // load object into the engine for lip syncing
         this.lipsync_engine.load_object(object.uuid, "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72");
-        this.timeline.addPlayableClip(new ClipUI(1.0, "lipsync", object.object_uuid, object.media_id, 0, 100));
+
+        // create the clip with the same id for a reference to the media
+        this.timeline.addPlayableClip(new ClipUI(1.0, "lipsync", "clip1", "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72", object.uuid, 150, 400));
+        
+        // media id for this is up in the air but when a path is created you should be able to store and delete it
+        this.timeline.addPlayableClip(new ClipUI(1.0, "transform", "clip2", object.uuid, object.uuid, 0, 150));
+
+        // media id for this as well it can be downloaded
+        this.timeline.addPlayableClip(new ClipUI(1.0, "animation", "clip3", "/resources/models/fox/fox_idle.glb", object.uuid, 0, 400));
+        this.animation_engine.load_object(object.uuid, "/resources/models/fox/fox_idle.glb", "clip3");
     }
 
     // Configure post processing.
@@ -255,6 +271,7 @@ class Editor {
         
         if(this.selected == null) {return;}
         this.transform_engine.addFrame(this.selected)
+        console.log("Frame taken.")
     }
 
     change_camera_view() {
@@ -272,26 +289,27 @@ class Editor {
         // Updates debug stats.
         if (this.stats != null) { this.stats.update(); }
 
+        let delta_time = this.clock.getDelta()
+
         // All calls that are not super important like timeline go here.
-        this.activeScene.update(this.clock.getDelta());
+        this.activeScene.update(delta_time);
         //this.orbit.update(0.1);
 
         //console.log(this.transform_engine.clips[this.test_box_uuid]);
 
-        this.timeline.update(this.clock.getDelta());
+        this.timeline.update(delta_time);
 
         this.render_scene();
         if (this.capturer != null) { this.capturer.capture(this.renderer.domElement); } // Record scene.
-
     }
 
     start_playback() {
         this.timeline.isPlaying = true;
     }
 
-    _save_to_cloud(blob) {
-        this.api_manager.uploadGLB(blob, "test.glb");
-    }
+    // _save_to_cloud(blob) {
+    //     this.api_manager.uploadGLB(blob, "test.glb");
+    // }
 
     change_mode(type) {
         this.control.mode = type;

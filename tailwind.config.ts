@@ -112,6 +112,7 @@ export default {
       "ui-divider": "#D3D3D3",
 
       gray: colors.gray,
+      black: colors.black,
       white: colors.white,
     },
   },

@@ -66,35 +66,39 @@ export class AnimationTrackClip implements AnimationTrackClip {
 
   _create_mixer(object: THREE.Object3D) {
     this.mixer = new THREE.AnimationMixer(object);
+    return this.mixer;
   }
 
   async _get_clip() {
     if (this.animation_clip == null) {
-      this.animation_clip = await this._load_animation(this.clip_name);
+      this.animation_clip = await this._load_animation(this.media_id);
     }
     return this.animation_clip;
   }
 
   async play(object: THREE.Object3D) {
-    if (this.mixer == null) { this._create_mixer(object) }
-
-    let anim_clip = await this._get_clip();
-    this.clip_action = this.mixer?.clipAction(anim_clip);
-    if (this.clip_action) {
-      if (this.clip_action?.isRunning() == false) {
-        this.clip_action.play();
+    if (this.mixer == null) {
+      this.mixer = this._create_mixer(object);
+      let anim_clip = await this._get_clip();
+      this.clip_action = this.mixer?.clipAction(anim_clip);
+      if (this.clip_action) {
+        if (this.clip_action?.isRunning() == false) {
+          this.clip_action.play();
+        }
       }
+      console.log("Play")
     }
-
   }
 
   step(deltatime: number) {
     if (this.mixer == null) { return; }
     this.mixer?.update(deltatime);
+    console.log("Update")
   }
 
   stop() {
     this.mixer?.stopAllAction();
+    console.log("stop.")
   }
 
   toJSON(): string {

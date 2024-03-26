@@ -1,9 +1,20 @@
-import { LowerPanel } from "~/modules/LowerPanel";
-import Editor from "../../js/editor";
-import { Character } from "./Character";
-import { Fragment, useContext } from "react";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { 
+  Fragment,
+  // useCallback,
+  useContext
+} from "react";
+
 import { Button } from "~/components";
+
+// import Editor from "../../js/editor";
+import { EngineContext } from "~/contexts/EngineContext";
+import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+
+import { LowerPanel } from "~/modules/LowerPanel";
+import { Character } from "./Character";
+
+
+
 import { Camera } from "./Camera";
 import { Audio } from "./Audio";
 import { Objects } from "./Objects";
@@ -12,20 +23,17 @@ import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const Timeline = ({
-  editorCurrent,
+  // editorCurrent,
+  // time,
 }: {
-  editorCurrent: Editor | null;
+  // editorCurrent: Editor | null;
+  // time: number;
 }) => {
+  const editorEngine = useContext(EngineContext);
+  // editorEngine replaced the engineRef.current passed as a prop
+  // const { characters, updateCharacters } = useContext(TrackContext);
   const { characters, objects, scale, length } = useContext(TrackContext);
   const { onPointerDown, time } = useMouseEventsAnimation();
-
-  const handleButtonLoad = () => {
-    document.getElementById("load-upload")?.click();
-  };
-  const handleButtonRender = () => {
-    editorCurrent?.togglePlayback();
-  };
-  const handleButtonPlay = () => {};
 
   const sectionWidth = 60 * 4 * scale;
   const fullHeight =
@@ -33,11 +41,6 @@ export const Timeline = ({
 
   return (
     <>
-      <div className="fixed" style={{ top: 72, left: "calc(100% - 600px)" }}>
-        <Button onClick={handleButtonLoad}>Load</Button>
-        <Button onClick={handleButtonRender}>Render</Button>
-        <Button onClick={handleButtonPlay}>Play</Button>
-      </div>
       <LowerPanel>
         <div className="mt-4 flex h-3 text-sm text-white">
           {Array(length)
