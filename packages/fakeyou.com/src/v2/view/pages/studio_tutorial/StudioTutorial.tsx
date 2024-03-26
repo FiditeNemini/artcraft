@@ -86,20 +86,6 @@ export default function StudioTutorial(props: Props) {
 
   const styleMediaLink = styleMediaToken && styleMedia && new BucketConfig().getGcsUrl(styleMedia?.public_bucket_path || "");
 
-  console.log("🚒 tutorial overall state",{
-    compositeJobStatus,
-    compositing,
-    compositeMediaToken,
-    queryCompositeJob,
-    queryStyleJob,
-    styleJobStatus,
-    styleEnqueued,
-    styling,
-    styleMediaToken,
-    urlQueries,
-    styleMediaLink
-  });
-
   // If the user saves the scene in the engine, we'll need to use the new token 
   // for subsequent steps of this flow.
   const [savedMediaToken, setSavedMediaToken] = useState(mediaToken);
@@ -270,17 +256,31 @@ export default function StudioTutorial(props: Props) {
     vstValues
   ]);
 
+  console.log("🚒 tutorial overall state",{
+    compositeJobStatus,
+    compositing,
+    compositeMediaToken,
+    queryCompositeJob,
+    queryStyleJob,
+    sceneIsLoadedCount,
+    styleJobStatus,
+    styleEnqueued,
+    styling,
+    styleMediaToken,
+    urlQueries,
+    styleMediaLink
+  });
 
   return !props.sessionWrapper.canAccessStudio() ?
     <StudioNotAvailable /> :
     <div className="studio-tutorial-page">
-      <Scene3D
-        // fullScreen={true}
-        mode={EngineMode.Studio}
-        asset={assetDescriptor}
-        onSceneReadyCallback={onSceneReadyCallback}
-        onSceneSavedCallback={onSaveCallback}
-      />
+      <Scene3D {...{
+        asset: assetDescriptor,
+        mode: EngineMode.Studio,
+        onSaveCallback,
+        onSceneReadyCallback,
+        // overrideURL: "http://127.0.0.1:4200", // COMMENT OUT BEFORE PUSHING
+      }}/>
       <div {...{ className: "studio-tutorial-style" }}>
         <BasicTabs {...{
           onChange: ({ target }: { target: any }) => selectedTabSet(target.value),

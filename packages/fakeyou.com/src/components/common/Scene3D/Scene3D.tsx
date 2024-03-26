@@ -13,6 +13,9 @@ interface Scene3DProps {
   // The mode to open the engine in.
   mode: EngineMode;
 
+  // for local dev
+  overrideURL?: string, 
+
   // A polymorphic asset type.
   // See `GetEngineUrl()` for usage.
   asset: LoadableAsset,
@@ -43,14 +46,15 @@ export default function Scene3D({
   className,
   onSceneReadyCallback,
   onSceneSavedCallback,
+  overrideURL,
 }: Scene3DProps) {
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const onMessage = useCallback((event: MessageEvent) => {
-    console.log("engine message received", event.data, event);
+    console.log("🟢 engine message received", event.data, event, onSceneReadyCallback !== undefined);
 
-    if (event.origin !== CHECK_FRAME_URL)
+    if (!overrideURL && event.origin !== CHECK_FRAME_URL)
       return;
 
     if (event.data === "studio-ready") {
@@ -81,7 +85,7 @@ export default function Scene3D({
     } else if (event.data === "scene-save-failed") {
       console.error("Failed to save the scene!");
     }
-  }, [onSceneReadyCallback, onSceneSavedCallback]);
+  }, [onSceneReadyCallback, onSceneSavedCallback, overrideURL]);
 
 
   useEffect(() => {
@@ -91,8 +95,12 @@ export default function Scene3D({
     }
   }, [onMessage]);
 
-
-  let engineUrl = GetEngineUrl({mode: mode, asset: asset, skybox: skybox})
+  let engineUrl = GetEngineUrl({
+    mode: mode,
+    overrideURL,
+    asset: asset,
+    skybox: skybox
+  });
 
   return (
     <div

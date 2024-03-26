@@ -13,6 +13,9 @@ import { MediaFileClass } from "@storyteller/components/src/api/enums/MediaFileC
 interface GetEngineUrlArgs {
   mode: EngineMode,
 
+  // override the URL for local development
+  overrideURL?: string,
+
   // Polymorphic type of asset we're loading into the engine.
   asset: LoadableAsset
 
@@ -53,7 +56,7 @@ export type LoadableAsset = MediaFile | EngineObject | StorytellerSceneMediaFile
 const ENGINE_BASE_URL = "https://engine.fakeyou.com";
 
 export function GetEngineUrl(args: GetEngineUrlArgs) : string {
-  let engineUrl = `${ENGINE_BASE_URL}/?mode=${args.mode}`;
+  let engineUrl = `${args.overrideURL || ENGINE_BASE_URL}/?mode=${args.mode}`;
 
   
   if (args.skybox) {
