@@ -28,7 +28,7 @@ export const Objects = () => {
                   max={
                     index < object.clips.length - 1
                       ? object.clips[index + 1].offset
-                      : 0
+                      : length * 60
                   }
                   style="objects"
                   updateClip={updateObject}

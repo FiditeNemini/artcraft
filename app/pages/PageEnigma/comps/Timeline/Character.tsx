@@ -1,7 +1,31 @@
 import { TrackClip } from "./TrackClip";
-import { useContext } from "react";
+import { useContext, useMemo, useRef } from "react";
 import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 
+function buildUpdaters(updateCharacters: any) {
+  function updateClipAnimations(options: {
+    id: string;
+    length: number;
+    offset: number;
+  }) {
+    updateCharacters({ ...options, type: "animations" });
+  }
+  function updateClipPosition(options: {
+    id: string;
+    length: number;
+    offset: number;
+  }) {
+    updateCharacters({ ...options, type: "positions" });
+  }
+  function updateClipLipSync(options: {
+    id: string;
+    length: number;
+    offset: number;
+  }) {
+    updateCharacters({ ...options, type: "lipSync" });
+  }
+  return { updateClipLipSync, updateClipPosition, updateClipAnimations };
+}
 interface Props {
   characterId: string;
 }
@@ -11,6 +35,10 @@ export const Character = ({ characterId }: Props) => {
     useContext(TrackContext);
   const fullWidth = length * 60 * 4 * scale;
   const character = characters.find((row) => (row.id = characterId));
+
+  const { updateClipLipSync, updateClipPosition, updateClipAnimations } =
+    useMemo(() => buildUpdaters(updateCharacters), [updateCharacters]);
+
   if (!character) {
     return false;
   }
@@ -37,12 +65,10 @@ export const Character = ({ characterId }: Props) => {
                 max={
                   index < animationClips.length - 1
                     ? animationClips[index + 1].offset
-                    : length * 60 * 4 * scale
+                    : length * 60
                 }
                 style="character"
-                updateClip={(options) =>
-                  updateCharacters({ ...options, type: "animations" })
-                }
+                updateClip={updateClipAnimations}
                 clip={clip}
               />
             ))}
@@ -61,19 +87,17 @@ export const Character = ({ characterId }: Props) => {
                 key={clip.id}
                 min={
                   index > 0
-                    ? animationClips[index - 1].offset +
-                      animationClips[index - 1].length
+                    ? positionClips[index - 1].offset +
+                      positionClips[index - 1].length
                     : 0
                 }
                 max={
-                  index < animationClips.length - 1
-                    ? animationClips[index + 1].offset
-                    : length * 60 * 4 * scale
+                  index < positionClips.length - 1
+                    ? positionClips[index + 1].offset
+                    : length * 60
                 }
                 style="character"
-                updateClip={(options) =>
-                  updateCharacters({ ...options, type: "positions" })
-                }
+                updateClip={updateClipPosition}
                 clip={clip}
               />
             ))}
@@ -92,19 +116,17 @@ export const Character = ({ characterId }: Props) => {
                 key={clip.id}
                 min={
                   index > 0
-                    ? animationClips[index - 1].offset +
-                      animationClips[index - 1].length
+                    ? lipSyncClips[index - 1].offset +
+                      lipSyncClips[index - 1].length
                     : 0
                 }
                 max={
-                  index < animationClips.length - 1
-                    ? animationClips[index + 1].offset
-                    : length * 60 * 4 * scale
+                  index < lipSyncClips.length - 1
+                    ? lipSyncClips[index + 1].offset
+                    : length * 60
                 }
                 style="character"
-                updateClip={(options) =>
-                  updateCharacters({ ...options, type: "lipSync" })
-                }
+                updateClip={updateClipLipSync}
                 clip={clip}
               />
             ))}

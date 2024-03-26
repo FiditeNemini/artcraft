@@ -1,7 +1,7 @@
 import { useMouseEventsClip } from "./utils/useMouseEventsClip";
 import { BaseClip } from "~/models/track";
 import { TrackContext } from "~/contexts/TrackContext/TrackContext";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 interface Props {
   min: number;
@@ -13,12 +13,19 @@ interface Props {
 
 export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
   const { selectClip, selectedClip, scale } = useContext(TrackContext);
-  const { onPointerDown, offset, length } = useMouseEventsClip(
+  const [state, setState] = useState({
+    length: clip.length,
+    offset: clip.offset,
+  });
+  const { onPointerDown } = useMouseEventsClip(
     clip,
     max,
     min,
     updateClip,
+    setState,
   );
+
+  const { length, offset } = state;
 
   const classes = [
     "absolute",

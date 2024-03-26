@@ -8,7 +8,6 @@ export const useMouseEventsAnimation = () => {
   const [clientX, setClientX] = useState(0);
 
   const [time, setTime] = useState(currentTime);
-  console.log("use", currentTime, time);
 
   useEffect(() => {
     const max = length * 60 * 4 * scale;

@@ -24,7 +24,11 @@ export const Camera = () => {
                     ? clips[index - 1].offset + clips[index - 1].length
                     : 0
                 }
-                max={index < clips.length - 1 ? clips[index + 1].offset : 1000}
+                max={
+                  index < clips.length - 1
+                    ? clips[index + 1].offset
+                    : length * 60
+                }
                 style="camera"
                 updateClip={updateCamera}
                 clip={clip}
