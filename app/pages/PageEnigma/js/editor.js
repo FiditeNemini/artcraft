@@ -173,11 +173,15 @@ class Editor {
 
     // This is the default scene.
     // "m_189p8hj0eyypbg74kkhcpehwpjhnkz" scene with the fox.
+    
     //let result = await this.api_manager.saveSceneState(this.activeScene.scene)
-    let result = await this.api_manager.getMediaFile(
-      "m_189p8hj0eyypbg74kkhcpehwpjhnkz",
-    );
-    console.log(result);
+    
+    // let result = await this.api_manager.getMediaFile(
+    //   "m_189p8hj0eyypbg74kkhcpehwpjhnkz",
+    // );
+
+    //const result = this.api_manager.saveSceneState(this.activeScene.scene)
+    this.api_manager.loadScene("m_n3k7nc0r5scr5zf92febh52h39g721")
   }
 
   async _serialize_timeline() {
