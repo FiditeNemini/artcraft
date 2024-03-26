@@ -39,24 +39,10 @@ use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_ref
 use crate::http_server::endpoints::image_gen::enqueue_image_generation::enqueue_image_generation_request;
 use crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler;
 use crate::http_server::endpoints::inference_job::get_pending_inference_job_count::get_pending_inference_job_count_handler;
-use crate::http_server::endpoints::inference_job::kill_inference_jobs::kill_generic_inference_jobs_handler;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler;
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
-use crate::http_server::endpoints::media_files::batch_get_media_files_handler::batch_get_media_files_handler;
-use crate::http_server::endpoints::media_files::change_media_file_visibility_handler::change_media_file_visibility_handler;
-use crate::http_server::endpoints::media_files::delete_media_file::delete_media_file_handler;
-use crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler;
-use crate::http_server::endpoints::media_files::list::list_featured_media_files::list_featured_media_files_handler;
-use crate::http_server::endpoints::media_files::list::list_media_files::list_media_files_handler;
-use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token::list_media_files_by_batch_token_handler;
-use crate::http_server::endpoints::media_files::list::list_media_files_for_user::list_media_files_for_user_handler;
-use crate::http_server::endpoints::media_files::rename_media_file_handler::rename_media_file_handler;
-use crate::http_server::endpoints::media_files::update_media_file::update_media_file_handler;
-use crate::http_server::endpoints::media_files::upload::upload_media_file_handler::upload_media_file_handler;
-use crate::http_server::endpoints::media_files::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler;
-use crate::http_server::endpoints::media_files::upload_video::upload_video_media_file_handler::upload_video_media_file_handler;
 use crate::http_server::endpoints::media_uploads::list_user_media_uploads_of_type::list_user_media_uploads_of_type_handler;
 use crate::http_server::endpoints::media_uploads::upload_audio::upload_audio_handler;
 use crate::http_server::endpoints::media_uploads::upload_image::upload_image_handler;
@@ -67,25 +53,6 @@ use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha
 use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
 use crate::http_server::endpoints::misc::root_index::get_root_index;
 use crate::http_server::endpoints::mocap::enqueue_mocapnet::enqueue_mocapnet_handler;
-use crate::http_server::endpoints::moderation::approval::pending_w2l_templates::get_pending_w2l_templates_handler;
-use crate::http_server::endpoints::moderation::categories::delete_category::delete_category_handler;
-use crate::http_server::endpoints::moderation::categories::edit_category::edit_category_handler;
-use crate::http_server::endpoints::moderation::categories::list_tts_categories_for_moderation::list_tts_categories_for_moderation_handler;
-use crate::http_server::endpoints::moderation::ip_bans::add_ip_ban::add_ip_ban_handler;
-use crate::http_server::endpoints::moderation::ip_bans::delete_ip_ban::delete_ip_ban_handler;
-use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_handler;
-use crate::http_server::endpoints::moderation::ip_bans::list_ip_bans::list_ip_bans_handler;
-use crate::http_server::endpoints::moderation::jobs::get_tts_inference_queue_count::get_tts_inference_queue_count_handler;
-use crate::http_server::endpoints::moderation::jobs::get_w2l_inference_queue_count::get_w2l_inference_queue_count_handler;
-use crate::http_server::endpoints::moderation::jobs::kill_tts_inference_jobs::kill_tts_inference_jobs_handler;
-use crate::http_server::endpoints::moderation::stats::get_on_prem_worker_stats::get_on_prem_worker_stats_handler;
-use crate::http_server::endpoints::moderation::stats::get_voice_count_stats::get_voice_count_stats_handler;
-use crate::http_server::endpoints::moderation::user_bans::ban_user::ban_user_handler;
-use crate::http_server::endpoints::moderation::user_bans::list_banned_users::list_banned_users_handler;
-use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
-use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
-use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
-use crate::http_server::endpoints::moderation::users::list_users::list_users_handler;
 use crate::http_server::endpoints::prompts::get_prompt::get_prompt_handler;
 use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
 use crate::http_server::endpoints::service::public_info_handler::get_public_info_handler;
@@ -172,17 +139,12 @@ use crate::http_server::endpoints::w2l::list_user_w2l_inference_results::list_us
 use crate::http_server::endpoints::w2l::list_user_w2l_templates::list_user_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::list_w2l_templates::list_w2l_templates_handler;
 use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_template_mod_approval_handler;
-use crate::http_server::endpoints::weights::delete_weight::delete_weight_handler;
-use crate::http_server::endpoints::weights::get_weight::get_weight_handler;
-use crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler;
-use crate::http_server::endpoints::weights::list_featured_weights::list_featured_weights_handler;
-use crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler;
-use crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler;
-use crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler;
-use crate::http_server::endpoints::weights::update_weight::update_weight_handler;
 use crate::http_server::endpoints::workflows::enqueue_comfy_ui_handler::enqueue_comfy_ui_handler;
 use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler;
 use crate::http_server::endpoints::workflows::enqueue_workflow_upload_request::enqueue_workflow_upload_request;
+use crate::routes::media_files_routes::add_media_file_routes;
+use crate::routes::moderation_routes::add_moderator_routes;
+use crate::routes::weights_routes::add_weights_routes;
 
 pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> App<T>
   where
@@ -336,152 +298,6 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   .default_service( web::route().to(default_route_404))
 }
 
-// ==================== MODERATOR ROUTES ====================
-
-fn add_moderator_routes<T, B> (app: App<T>) -> App<T>
-  where
-      B: MessageBody,
-      T: ServiceFactory<
-        ServiceRequest,
-        Config = (),
-        Response = ServiceResponse<B>,
-        Error = Error,
-        InitError = (),
-      >,
-{
-  app.service(
-  web::scope("/moderation")
-      .service(
-        web::resource("/staff")
-            .route(web::get().to(list_staff_handler))
-            .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(
-        web::scope("/ip_bans")
-            .service(
-              web::resource("/list")
-                  .route(web::get().to(list_ip_bans_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/add")
-                  .route(web::post().to(add_ip_ban_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/{ip_address}")
-                  .route(web::get().to(get_ip_ban_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/{ip_address}/delete")
-                  .route(web::post().to(delete_ip_ban_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-      )
-      .service(
-        web::scope("/user")
-            .service(
-              web::resource("/list")
-                  .route(web::get().to(list_users_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-      )
-      .service(
-        web::scope("/user_bans")
-            .service(
-              web::resource("/list")
-                  .route(web::get().to(list_banned_users_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/manage_ban")
-                  .route(web::post().to(ban_user_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-      )
-      .service(
-        web::scope("/roles")
-            .service(
-              web::resource("/list")
-                  .route(web::get().to(list_user_roles_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/{username}/edit")
-                  .route(web::post().to(set_user_role_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-      )
-      .service(
-        web::scope("/jobs")
-            .service(
-              web::resource("/tts_inference_queue_stats")
-                  .route(web::get().to(get_tts_inference_queue_count_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/kill_tts_inference_jobs")
-                  .route(web::post().to(kill_tts_inference_jobs_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/w2l_inference_queue_stats")
-                  .route(web::get().to(get_w2l_inference_queue_count_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/kill_generic")
-                  .route(web::post().to(kill_generic_inference_jobs_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-      )
-      .service(
-        web::scope("/pending")
-            .service(
-              web::resource("/w2l_templates")
-                  .route(web::get().to(get_pending_w2l_templates_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/w2l_inference_queue_stats")
-                  .route(web::get().to(get_w2l_inference_queue_count_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-      )
-      .service(
-        web::scope("/stats")
-            .service(
-              web::resource("/tts_voices")
-                  .route(web::get().to(get_voice_count_stats_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/on_prem_workers")
-                  .route(web::get().to(get_on_prem_worker_stats_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-      )
-      .service(
-        web::scope("/categories")
-            .service(
-              web::resource("/{token}/edit")
-                  .route(web::post().to(edit_category_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/{token}/delete")
-                  .route(web::post().to(delete_category_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(
-              web::resource("/tts/list")
-                  .route(web::get().to(list_tts_categories_for_moderation_handler))
-                  .route(web::head().to(|| HttpResponse::Ok()))
-            )
-      )
-  )
-}
 
 // ==================== TTS ROUTES ====================
 
@@ -679,61 +495,6 @@ fn add_web_vc_routes<T, B> (app: App<T>) -> App<T>
               .route(web::get().to(list_voice_conversion_models_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
         )
-        //.service(
-        //  web::resource("/upload")
-        //      .route(web::post().to(upload_w2l_template_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/template/{token}")
-        //      .route(web::get().to(get_w2l_template_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/template/{template_token}/count")
-        //      .route(web::get().to(get_w2l_template_use_count_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/template/{template_token}/edit")
-        //      .route(web::post().to(edit_w2l_template_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/template/{token}/moderate")
-        //      .route(web::post().to(set_w2l_template_mod_approval_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/template/{token}/delete")
-        //      .route(web::post().to(delete_w2l_template_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/result/{token}")
-        //      .route(web::get().to(get_w2l_inference_result_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/result/{token}/edit")
-        //      .route(web::post().to(edit_w2l_inference_result_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/result/{token}/delete")
-        //      .route(web::post().to(delete_w2l_inference_result_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/job/{token}")
-        //      .route(web::get().to(get_w2l_inference_job_status_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/upload_template_job/{token}")
-        //      .route(web::get().to(get_w2l_upload_template_job_status_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
   )
 }
 
@@ -763,16 +524,6 @@ fn add_vocoder_routes<T, B> (app: App<T>) -> App<T>
               .route(web::get().to(get_vocoder_handler))
               .route(web::head().to(|| HttpResponse::Ok()))
         )
-        //.service(
-        //  web::resource("/model/{token}/edit")
-        //      .route(web::post().to(edit_w2l_template_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
-        //.service(
-        //  web::resource("/model/{token}/delete")
-        //      .route(web::post().to(delete_w2l_template_handler))
-        //      .route(web::head().to(|| HttpResponse::Ok()))
-        //)
   )
 }
 
@@ -1061,69 +812,6 @@ fn add_desktop_app_routes<T, B> (app: App<T>) -> App<T>
     )
 }
 
-// ==================== MEDIA FILE ROUTES ====================
-
-fn add_media_file_routes<T, B> (app: App<T>) -> App<T>
-  where
-      B: MessageBody,
-      T: ServiceFactory<
-        ServiceRequest,
-        Config = (),
-        Response = ServiceResponse<B>,
-        Error = Error,
-        InitError = (),
-      >,
-{
-  app.service(web::scope("/v1/media_files")
-      .service(web::resource("/file/{token}")
-          .route(web::get().to(get_media_file_handler))
-          .route(web::delete().to(delete_media_file_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(web::resource("/rename/{token}")
-          .route(web::post().to(rename_media_file_handler))
-      )
-      .service(web::resource("/visibility/{token}")
-          .route(web::post().to(change_media_file_visibility_handler))
-      )
-      .service(web::resource("/file/{token}/update")
-          .route(web::post().to(update_media_file_handler))
-      )
-      .service(web::resource("/batch")
-          .route(web::get().to(batch_get_media_files_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(web::resource("/list")
-          .route(web::get().to(list_media_files_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(web::resource("/batch/{token}")
-          .route(web::get().to(list_media_files_by_batch_token_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(web::resource("/list_featured")
-          .route(web::get().to(list_featured_media_files_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(web::resource("/list/user/{username}")
-          .route(web::get().to(list_media_files_for_user_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(web::resource("/upload")
-          .route(web::post().to(upload_media_file_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(web::resource("/upload/video")
-          .route(web::post().to(upload_video_media_file_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
-      .service(web::resource("/upload/engine_asset")
-          .route(web::post().to(upload_engine_asset_media_file_handler))
-          .route(web::head().to(|| HttpResponse::Ok()))
-      )
-  )
-}
-
 // ==================== MEDIA UPLOAD ROUTES ====================
 
 fn add_media_upload_routes<T, B> (app: App<T>) -> App<T>
@@ -1400,40 +1088,6 @@ fn add_workflow_routes<T,B> (app:App<T>)-> App<T>
                   .route("/create", web::post().to(enqueue_comfy_ui_handler))
 
         )
-    )
-}
-
-// ==================== Weights ROUTES ====================
-fn add_weights_routes<T, B>(app: App<T>) -> App<T>
-    where
-        B: MessageBody,
-        T: ServiceFactory<
-            ServiceRequest,
-            Config = (),
-            Response = ServiceResponse<B>,
-            Error = Error,
-            InitError = ()
-        >
-{
-    app.service(
-        web
-            ::scope("/v1/weights")
-            //.route("/upload", web::post().to(upload_weights_handler))
-            .service(web::resource("/weight/{weight_token}")
-                .route(web::get().to(get_weight_handler))
-                .route(web::post().to(update_weight_handler))
-                .route(web::delete().to(delete_weight_handler))
-            )
-            .service(web::resource("/search")
-                .route(web::post().to(search_model_weights_handler))
-                .route(web::head().to(|| HttpResponse::Ok()))
-            )
-            .service(web::resource("/weight/{token}/cover_image")
-                .route(web::post().to(set_model_weight_cover_image_handler))
-            )
-            .route("/by_user/{username}", web::get().to(list_weights_by_user_handler))
-            .route("/list", web::get().to(list_available_weights_handler))
-            .route("/list_featured", web::get().to(list_featured_weights_handler))
     )
 }
 

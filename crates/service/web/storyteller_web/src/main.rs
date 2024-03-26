@@ -77,7 +77,7 @@ use crate::configs::app_startup::redis_rate_limiters::configure_redis_rate_limit
 use crate::configs::static_api_tokens::StaticApiTokenSet;
 use crate::http_server::middleware::pushback_filter_middleware::PushbackFilter;
 use crate::memory_cache::model_token_to_info_cache::ModelTokenToInfoCache;
-use crate::routes::add_routes;
+use crate::routes::add_routes::add_routes;
 use crate::server_state::{DurableInMemoryCaches, EnvConfig, EphemeralInMemoryCaches, InMemoryCaches, ServerInfo, ServerState, StaticFeatureFlags, StripeSettings, TrollBans, TwitchOauth, TwitchOauthSecrets};
 use crate::threads::db_health_checker_thread::db_health_check_status::HealthCheckStatus;
 use crate::threads::db_health_checker_thread::db_health_checker_thread::db_health_checker_thread;
