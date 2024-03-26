@@ -32,7 +32,7 @@ use crate::validations::validate_idempotency_token_format::validate_idempotency_
 
 // Unlike the "upload" endpoints, which are pure inserts, these endpoints are *upserts*.
 #[derive(Serialize, ToSchema)]
-pub struct WriteEngineAssetMediaSuccessResponse {
+pub struct WriteSceneFileMediaSuccessResponse {
   pub success: bool,
   pub media_file_token: MediaFileToken,
 }
@@ -41,7 +41,7 @@ pub struct WriteEngineAssetMediaSuccessResponse {
   post,
   path = "/v1/media_files/write/scene_file",
   responses(
-    (status = 200, description = "Success Update", body = WriteEngineAssetMediaSuccessResponse),
+    (status = 200, description = "Success Update", body = WriteSceneFileMediaSuccessResponse),
     (status = 400, description = "Bad input", body = MediaFileWriteError),
     (status = 401, description = "Not authorized", body = MediaFileWriteError),
     (status = 429, description = "Too many requests", body = MediaFileWriteError),
@@ -257,7 +257,7 @@ pub async fn write_scene_file_media_file_handler(
 
   info!("new media file id: {} token: {:?}", record_id, &token);
 
-  let response = WriteEngineAssetMediaSuccessResponse {
+  let response = WriteSceneFileMediaSuccessResponse {
     success: true,
     media_file_token: token,
   };
