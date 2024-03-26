@@ -1,9 +1,15 @@
 import {
   useEffect,
   useState,
-} from "react"
+} from "react";
+
+import { LoadingDotsBricks } from "~/components";
 
 export const ViewSideBySide = ()=>{
+  const [showLoader, setShowLoader] = useState(true);
+  useEffect(()=>{
+    setTimeout(()=>setShowLoader(false), 1000);
+  },[ ]);
 
   return (
     <div
@@ -34,6 +40,9 @@ export const ViewSideBySide = ()=>{
             src="/resources/uiAssets/video_player_placeholder.gif"
           />
         </div>
+      </div>
+      <div className="absolute top-0 left-0 w-full h-full">
+        <LoadingDotsBricks show={showLoader} transition/>
       </div>
     </div>
   )

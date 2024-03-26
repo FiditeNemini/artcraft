@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useReducer } from "react";
 
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
-import { Button } from "~/components";
+import { Button, LoadingDotsBricks } from "~/components";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
 import { SidePanel } from "~/modules/SidePanel";
 import { Controls3D } from "./comps/Controls3D";
@@ -19,16 +19,14 @@ import { VIEW_MODES } from "./reducer/types";
 import { ViewSideBySide } from "./comps/ViewSideBySide";
 
 export const PageEnigmaComponent = () => {
-  const [pageState, dispatchPageState] = useReducer(reducer, initialState);
+  const [appUiState, dispatchAppUiState] = useReducer(reducer, initialState);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  // const [timelineHeight, setTimelineHeight] = useState(260);
   const timelineRef = useRef<HTMLDivElement | null>(null);
 
   const updateTimelineHeight = useCallback(() => {
     if (timelineRef.current) {
-      dispatchPageState({
+      dispatchAppUiState({
         type: ACTION_TYPES.ON_TIMELINE_RESIZE,
         payload: {
           timelineHeight: timelineRef.current.offsetHeight
@@ -59,17 +57,17 @@ export const PageEnigmaComponent = () => {
       </TopBarHelmet>
       
       <EngineProvider>
-        <AppUIProvider value={[pageState, dispatchPageState]} >
+        <AppUIProvider value={[appUiState, dispatchAppUiState]} >
           <div style={{ height: "calc(100vh - 68px)" }}>
             {/* Engine section/side panel */}
             <div
               id="CanvasUiWrapper"
               className="flex"
-              style={{ height: `calc(100% - ${pageState.timelineHeight}px)` }}
+              style={{ height: `calc(100% - ${appUiState.timelineHeight}px)` }}
               // style={{ height: `calc(100% - 260px` }}
             >
               <div className="relative w-full overflow-hidden bg-transparent">
-                <div className={(pageState.viewMode === VIEW_MODES.SIDE_BY_SIDE) ? 'invisible' : ''}>
+                <div className={(appUiState.viewMode === VIEW_MODES.SIDE_BY_SIDE) ? 'invisible' : ''}>
                   <canvas
                     ref={canvasRef}
                     id="video-scene"
@@ -92,7 +90,7 @@ export const PageEnigmaComponent = () => {
                   </div>
                 </div>
                 {
-                  pageState.viewMode === VIEW_MODES.SIDE_BY_SIDE &&
+                  appUiState.viewMode === VIEW_MODES.SIDE_BY_SIDE &&
                   <ViewSideBySide />
                 }
               </div>
@@ -104,7 +102,7 @@ export const PageEnigmaComponent = () => {
             </div>
 
             {/* Timeline */}
-            <Timeline timelineHeight={pageState.timelineHeight} />
+            <Timeline timelineHeight={appUiState.timelineHeight} />
           </div>
         </AppUIProvider>
       </EngineProvider>
