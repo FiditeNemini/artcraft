@@ -51,7 +51,9 @@ class APIManager {
     return "";
   }
 
+  // media_file_token that describes the scene
   async loadScene(media_file_token: string): Promise<string> { 
+    // grab the json file from media files
     let json_response = `{
       
     }`

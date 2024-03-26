@@ -12,8 +12,14 @@ import {
   fa3dSphere,
 } from "@awesome.me/kit-fde2be5eb0/icons/kit/custom";
 import { ButtonIcon, ButtonIconSelect } from "~/components";
-
+import { EngineContext } from "~/contexts/EngineContext";
+import { 
+  useContext,
+} from "react";
 export const Controls3D = () => {
+  
+  const editorEngine = useContext(EngineContext);
+
   const handlePlus = () => {
     console.log("Controls 3D: Plus button clicked");
   };
