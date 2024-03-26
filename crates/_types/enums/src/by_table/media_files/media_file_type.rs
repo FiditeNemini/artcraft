@@ -43,6 +43,9 @@ pub enum MediaFileType {
   /// Bevy's scene files (in RON; Rusty Object Notation)
   /// This will be replaced with another format in future versions of Bevy
   SceneRon,
+
+  /// Alternate scene files.
+  SceneJson,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -63,6 +66,7 @@ impl MediaFileType {
       Self::Glb => "glb",
       Self::Gltf => "gltf",
       Self::SceneRon => "scene_ron",
+      Self::SceneJson => "scene_json",
     }
   }
 
@@ -77,6 +81,7 @@ impl MediaFileType {
       "glb" => Ok(Self::Glb),
       "gltf" => Ok(Self::Gltf),
       "scene_ron" => Ok(Self::SceneRon),
+      "scene_json" => Ok(Self::SceneJson),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -94,6 +99,7 @@ impl MediaFileType {
       Self::Glb,
       Self::Gltf,
       Self::SceneRon,
+      Self::SceneJson,
     ])
   }
 }
@@ -117,6 +123,7 @@ mod tests {
       assert_serialization(MediaFileType::Glb, "glb");
       assert_serialization(MediaFileType::Gltf, "gltf");
       assert_serialization(MediaFileType::SceneRon, "scene_ron");
+      assert_serialization(MediaFileType::SceneJson, "scene_json");
     }
   }
 
@@ -134,6 +141,7 @@ mod tests {
       assert_eq!(MediaFileType::Glb.to_str(), "glb");
       assert_eq!(MediaFileType::Gltf.to_str(), "gltf");
       assert_eq!(MediaFileType::SceneRon.to_str(), "scene_ron");
+      assert_eq!(MediaFileType::SceneJson.to_str(), "scene_json");
     }
 
     #[test]
@@ -147,6 +155,7 @@ mod tests {
       assert_eq!(MediaFileType::from_str("glb").unwrap(), MediaFileType::Glb);
       assert_eq!(MediaFileType::from_str("gltf").unwrap(), MediaFileType::Gltf);
       assert_eq!(MediaFileType::from_str("scene_ron").unwrap(), MediaFileType::SceneRon);
+      assert_eq!(MediaFileType::from_str("scene_json").unwrap(), MediaFileType::SceneJson);
       assert!(MediaFileType::from_str("foo").is_err());
     }
   }
@@ -167,6 +176,7 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileType::Glb));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Gltf));
       assert_eq!(variants.pop_first(), Some(MediaFileType::SceneRon));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::SceneJson));
       assert_eq!(variants.pop_first(), None);
     }
   }

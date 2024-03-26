@@ -1,0 +1,271 @@
+use std::collections::HashSet;
+use std::io::{BufReader, Cursor};
+use std::path::PathBuf;
+use std::sync::Arc;
+
+use actix_multipart::Multipart;
+use actix_web::{HttpRequest, HttpResponse, web};
+use log::{error, info, warn};
+use once_cell::sync::Lazy;
+use stripe::CreatePaymentLinkShippingAddressCollectionAllowedCountries::Mf;
+use utoipa::ToSchema;
+
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
+use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::common::visibility::Visibility;
+use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
+use http_server_common::request::get_request_ip::get_request_ip;
+use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
+use mimetypes::mimetype_to_extension::mimetype_to_extension;
+use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
+use mysql_queries::queries::media_files::get_media_file::get_media_file;
+use mysql_queries::queries::media_files::upsert::upsert_media_file_from_file_upload::{upsert_media_file_from_file_upload, UpsertMediaFileFromUploadArgs, UploadType};
+use tokens::tokens::media_files::MediaFileToken;
+use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
+
+use crate::http_server::endpoints::media_files::upsert_write::write_scene_file::drain_multipart_request::drain_multipart_request;
+use crate::http_server::endpoints::media_files::upsert_write::write_error::MediaFileWriteError;
+use crate::server_state::ServerState;
+use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
+
+// Unlike the "upload" endpoints, which are pure inserts, these endpoints are *upserts*.
+#[derive(Serialize, ToSchema)]
+pub struct WriteEngineAssetMediaSuccessResponse {
+  pub success: bool,
+  pub media_file_token: MediaFileToken,
+}
+
+#[utoipa::path(
+  post,
+  path = "/v1/media_files/write/scene_file",
+  responses(
+    (status = 200, description = "Success Update", body = WriteEngineAssetMediaSuccessResponse),
+    (status = 400, description = "Bad input", body = MediaFileWriteError),
+    (status = 401, description = "Not authorized", body = MediaFileWriteError),
+    (status = 429, description = "Too many requests", body = MediaFileWriteError),
+    (status = 500, description = "Server error", body = MediaFileWriteError),
+  ),
+  params(
+    ("request" = (), description = "Ask Brandon. This is form-multipart."),
+  )
+)]
+pub async fn write_scene_file_media_file_handler(
+  http_request: HttpRequest,
+  server_state: web::Data<Arc<ServerState>>,
+  mut multipart_payload: Multipart,
+) -> Result<HttpResponse, MediaFileWriteError> {
+
+  let mut mysql_connection = server_state.mysql_pool
+      .acquire()
+      .await
+      .map_err(|err| {
+        error!("MySql pool error: {:?}", err);
+        MediaFileWriteError::ServerError
+      })?;
+
+  // ==================== READ SESSION ==================== //
+
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session_from_connection(&http_request, &mut mysql_connection)
+      .await
+      .map_err(|e| {
+        error!("Session checker error: {:?}", e);
+        MediaFileWriteError::ServerError
+      })?;
+
+  let maybe_user_token = maybe_user_session
+      .as_ref()
+      .map(|session| session.get_strongly_typed_user_token());
+
+  let maybe_avt_token = server_state
+      .avt_cookie_manager
+      .get_avt_token_from_request(&http_request);
+
+  // ==================== BANNED USERS ==================== //
+
+  if let Some(ref user) = maybe_user_session {
+    if user.is_banned {
+      return Err(MediaFileWriteError::NotAuthorized);
+    }
+  }
+
+  // ==================== RATE LIMIT ==================== //
+
+  let rate_limiter = match maybe_user_session {
+    None => &server_state.redis_rate_limiters.file_upload_logged_out,
+    Some(ref _session) => &server_state.redis_rate_limiters.file_upload_logged_in,
+  };
+
+  if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
+    return Err(MediaFileWriteError::RateLimited);
+  }
+
+  // ==================== READ MULTIPART REQUEST ==================== //
+
+  let upload_media_request = drain_multipart_request(multipart_payload)
+      .await
+      .map_err(|e| {
+        // TODO: Error handling could be nicer.
+        MediaFileWriteError::BadInput("bad request".to_string())
+      })?;
+
+  // ==================== MAKE SURE USER OWNS FILE ==================== //
+
+  if let Some(media_file_token) = upload_media_request.media_file_token.as_ref() {
+    // TODO(bt,2024-03-26): Don't use the mysql_pool, use the mysql_connection.
+    let media_file =
+        get_media_file(media_file_token, false, &server_state.mysql_pool)
+        .await
+        .map_err(|err| {
+          error!("Error getting media file: {:?}", err);
+          MediaFileWriteError::ServerError
+        })?
+        .ok_or(MediaFileWriteError::NotFound)?;
+
+    let maybe_user_tokens = (
+      maybe_user_token.as_ref(),
+      media_file.maybe_creator_user_token.as_ref()
+    );
+
+    let must_check_avt = match maybe_user_tokens {
+      (None, None) => true, // Since there's no user, we must check the AnonymousVisitorTokens.
+      (Some(token_a), Some(token_b)) => {
+        if token_a != token_b {
+          // User tokens do not match.
+          return Err(MediaFileWriteError::NotAuthorized);
+        }
+        false
+      },
+      _ => {
+        // User tokens do not match.
+        return Err(MediaFileWriteError::NotAuthorized);
+      },
+    };
+
+    if must_check_avt {
+      // TODO(bt,2024-03-26): For now anonymous users can't upload over their own files
+      return Err(MediaFileWriteError::NotAuthorized);
+    }
+  }
+
+  // ==================== HANDLE IDEMPOTENCY ==================== //
+
+  // TODO(bt, 2024-02-26): This should be a transaction.
+  let uuid_idempotency_token = upload_media_request.uuid_idempotency_token
+      .ok_or(MediaFileWriteError::BadInput("no uuid".to_string()))?;
+
+  if let Err(reason) = validate_idempotency_token_format(&uuid_idempotency_token) {
+    return Err(MediaFileWriteError::BadInput(reason));
+  }
+
+  insert_idempotency_token(&uuid_idempotency_token, &mut *mysql_connection)
+      .await
+      .map_err(|err| {
+        error!("Error inserting idempotency token: {:?}", err);
+        MediaFileWriteError::BadInput("invalid idempotency token".to_string())
+      })?;
+
+  // ==================== UPLOAD METADATA ==================== //
+
+  let creator_set_visibility = maybe_user_session
+      .as_ref()
+      .map(|user_session| user_session.preferred_tts_result_visibility) // TODO: We need a new type of visibility control.
+      .unwrap_or(Visibility::default());
+
+  // ==================== USER DATA ==================== //
+
+  let ip_address = get_request_ip(&http_request);
+
+  // ==================== FILE DATA ==================== //
+
+  let file_bytes = match upload_media_request.file_bytes {
+    None => return Err(MediaFileWriteError::BadInput("missing file contents".to_string())),
+    Some(bytes) => bytes,
+  };
+
+  let maybe_filename = upload_media_request.file_name
+      .as_deref()
+      .map(|filename| PathBuf::from(filename));
+
+  let maybe_file_extension = maybe_filename
+      .as_ref()
+      .and_then(|filename| filename.extension())
+      .and_then(|ext| ext.to_str());
+
+  let file_size_bytes = file_bytes.len();
+
+  let hash = sha256_hash_bytes(&file_bytes)
+      .map_err(|io_error| {
+        error!("Problem hashing bytes: {:?}", io_error);
+        MediaFileWriteError::ServerError
+      })?;
+
+  // ==================== UPLOAD AND SAVE ==================== //
+
+  // TODO(bt,2024-03-26): At first I thought we should map these to the existing file paths on upsert,
+  //  but now I'm thinking we can just lead cruft in the bucket and clean it later. We don't have the
+  //  benefit of restoring old versions (if we mapped to existing paths but had a versioning scheme),
+  //  but we can move fast.
+
+  const MEDIA_FILE_TYPE: MediaFileType = MediaFileType::SceneJson;
+  const MIMETYPE: &str = "application/json";
+  const PREFIX : Option<&str> = Some("upload_");
+  const SUFFIX: &str = ".json";
+
+  let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, Some(SUFFIX));
+
+  info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
+
+  server_state.public_bucket_client.upload_file_with_content_type(
+    public_upload_path.get_full_object_path_str(),
+    file_bytes.as_ref(),
+    MIMETYPE)
+      .await
+      .map_err(|e| {
+        warn!("Upload media bytes to bucket error: {:?}", e);
+        MediaFileWriteError::ServerError
+      })?;
+
+  // TODO(bt, 2024-02-22): This should be a transaction.
+  let (token, record_id) = upsert_media_file_from_file_upload(UpsertMediaFileFromUploadArgs {
+    maybe_media_file_token: upload_media_request.media_file_token.as_ref(),
+    maybe_creator_user_token: maybe_user_token.as_ref(),
+    maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
+    creator_ip_address: &ip_address,
+    creator_set_visibility,
+    upload_type: UploadType::Filesystem,
+    media_file_type: MEDIA_FILE_TYPE,
+    maybe_media_class: Some(MediaFileClass::Unknown),
+    maybe_media_subtype: None,
+    maybe_mime_type: Some(MIMETYPE),
+    file_size_bytes: file_size_bytes as u64,
+    duration_millis: 0,
+    sha256_checksum: &hash,
+    public_bucket_directory_hash: public_upload_path.get_object_hash(),
+    maybe_public_bucket_prefix: PREFIX,
+    maybe_public_bucket_extension: Some(SUFFIX),
+    pool: &server_state.mysql_pool,
+  })
+      .await
+      .map_err(|err| {
+        warn!("New file creation DB error: {:?}", err);
+        MediaFileWriteError::ServerError
+      })?;
+
+  info!("new media file id: {} token: {:?}", record_id, &token);
+
+  let response = WriteEngineAssetMediaSuccessResponse {
+    success: true,
+    media_file_token: token,
+  };
+
+  let body = serde_json::to_string(&response)
+      .map_err(|e| MediaFileWriteError::ServerError)?;
+
+  return Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body));
+}
