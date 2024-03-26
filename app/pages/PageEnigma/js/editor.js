@@ -164,7 +164,7 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
-    // this._test_demo()
+    this._test_demo()
   }
 
   // uploading some objects for testing to get their media ids from my account.
