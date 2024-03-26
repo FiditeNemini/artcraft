@@ -15,7 +15,15 @@ export const ClipProvider = ({ children }: Props) => {
   const [audioClips, setAudioClips] = useState<AudioClip[]>([]);
 
   useEffect(() => {
-    setAnimationClips([]);
+    console.log("eff");
+    setAnimationClips([
+      {
+        id: "ani-id1",
+        offset: 0,
+        length: 124,
+        name: "ani 11",
+      },
+    ]);
     setAudioClips([]);
   }, []);
 
