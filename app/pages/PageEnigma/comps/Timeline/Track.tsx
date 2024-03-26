@@ -34,7 +34,7 @@ export const Track = ({
   return (
     <div className="pl-16">
       <div
-        className={`relative mt-4 block h-8 w-full rounded bg-${style}-unselected`}
+        className={`rounded=lg relative mt-4 block h-9 w-full bg-${style}-unselected`}
       >
         {clips.map((clip, index) => (
           <TrackClip
@@ -50,16 +50,13 @@ export const Track = ({
             clip={clip}
           />
         ))}
-        <div
-          className="absolute text-xs text-white"
-          style={{ top: 6, left: 4 }}
-        >
+        <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
           {title}
         </div>
         {!!toggleMute && (
           <button
-            className="absolute text-xl text-white"
-            style={{ top: 2, left: -36 }}
+            className="absolute text-xs text-white"
+            style={{ top: 6, left: -20 }}
             onClick={toggleMute}
           >
             {muted ? (
