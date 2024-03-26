@@ -8,14 +8,16 @@ export const Objects = () => {
 
   return (
     <div
-      className="bg-objects-groupBg block rounded-lg pl-2 pr-4"
+      className="block rounded-lg bg-objects-groupBg pb-5 pl-2 pr-4"
       style={{ width: fullWidth + 90 }}
     >
-      <div className="mb-2 text-sm text-white">Objects</div>
+      <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
+        Objects
+      </div>
       {objects.objects.map((object) => (
         <div key={object.id} className="flex flex-col gap-2">
           <div className="pl-16">
-            <div className="bg-objects-unselected relative mt-4 block h-8 w-full rounded">
+            <div className="relative mt-4 block h-9 w-full rounded-lg bg-objects-unselected">
               {object.clips.map((clip, index) => (
                 <TrackClip
                   key={clip.id}
@@ -35,10 +37,7 @@ export const Objects = () => {
                   clip={clip}
                 />
               ))}
-              <div
-                className="absolute text-xs text-white"
-                style={{ top: 6, left: 4 }}
-              >
+              <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
                 Mask Position/Rotation
               </div>
             </div>

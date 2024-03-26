@@ -14,7 +14,7 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
     <div
       className={[
         "absolute bottom-0",
-        "h-[260px] w-screen overflow-auto",
+        "h-[280px] w-screen overflow-auto",
         "border-t border-ui-panel-border",
         "bg-ui-panel",
       ].join(" ")}

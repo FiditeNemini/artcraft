@@ -9,13 +9,13 @@ export const Camera = () => {
 
   return (
     <div
-      className="bg-camera-groupBg block rounded-lg pl-2 pr-4"
+      className="block rounded-lg bg-camera-groupBg pb-5 pl-2 pr-4"
       style={{ width: fullWidth + 90 }}
     >
-      <div className="mb-2 text-sm text-white">Camera</div>
+      <div className="mb-5 pt-2 text-xs font-medium text-white">Camera</div>
       <div className="flex flex-col gap-2">
         <div className="pl-16">
-          <div className="bg-camera-unselected relative mt-4 block h-8 w-full rounded">
+          <div className="relative mt-4 block h-9 w-full rounded-lg bg-camera-unselected">
             {clips.map((clip, index) => (
               <TrackClip
                 key={clip.id}
@@ -30,10 +30,7 @@ export const Camera = () => {
                 clip={clip}
               />
             ))}
-            <div
-              className="absolute text-xs text-white"
-              style={{ top: 6, left: 4 }}
-            >
+            <div className="absolute ps-2 pt-1 text-xs font-medium text-white">
               Camera Position/Rotation
             </div>
           </div>

@@ -18,10 +18,9 @@ import { EngineProvider } from "~/contexts/EngineProvider";
 
 export const PageEnigma = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
- 
+
   const [timelineHeight, setTimelineHeight] = useState(0);
   const timelineRef = useRef<HTMLDivElement | null>(null);
-
 
   const updateTimelineHeight = useCallback(() => {
     if (timelineRef.current) {
@@ -55,8 +54,7 @@ export const PageEnigma = () => {
           <div
             id="CanvasUiWrapper"
             className="flex"
-            // style={{ height: `calc(100% - ${timelineHeight}px)` }}
-            style={{ height: `calc(100% - 260px` }}
+            style={{ height: `calc(100% - ${timelineHeight}px)` }}
           >
             <div className="relative w-full overflow-hidden bg-gray-400">
               <canvas
@@ -88,12 +86,12 @@ export const PageEnigma = () => {
           </div>
 
           {/* Timeline */}
-          <div className="min-h-[220px]" ref={timelineRef}>
+          <div className="min-h-[280px]" ref={timelineRef}>
             <TrackProvider>
               <Timeline
-                // editorCurrent={editorRef.current}
-                // time={20}
-                // length={12}
+              // editorCurrent={editorRef.current}
+              // time={20}
+              // length={12}
               />
             </TrackProvider>
           </div>
