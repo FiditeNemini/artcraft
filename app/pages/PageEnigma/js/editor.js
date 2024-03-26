@@ -1,8 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
-import Scene from './scene.js';
-import SaveManager from './serialization.js';
+import Scene from './scene.ts';
 import APIManager from './api_manager.ts';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -95,8 +94,6 @@ class Editor {
         this.playback = false;
         this.playback_location = 0;
         this.max_length = 10;
-        // Save & Load.
-        this.save_manager = new SaveManager(this.version);
         // Audio Engine Test.
 
         this.audio_engine = new AudioEngine();
@@ -311,7 +308,7 @@ class Editor {
         let delta_time = this.clock.getDelta()
 
         // All calls that are not super important like timeline go here.
-        this.activeScene.update(delta_time);
+        //this.activeScene.update(delta_time);
         //this.orbit.update(0.1);
 
         //console.log(this.transform_engine.clips[this.test_box_uuid]);
