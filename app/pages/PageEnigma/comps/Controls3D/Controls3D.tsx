@@ -24,25 +24,32 @@ export const Controls3D = () => {
     console.log("Controls 3D: Plus button clicked");
   };
   const handleCube = () => {
-    console.log("Controls 3D: Cube button clicked");
+    if(editorEngine == null || editorEngine == undefined){ return; }
+    editorEngine.create_parim("Box");
   };
   const handleCylinder = () => {
-    console.log("Controls 3D: Cylinder button clicked");
+    if(editorEngine == null || editorEngine == undefined){ return; }
+    editorEngine.create_parim("Cylinder");
   };
   const handleTorus = () => {
-    console.log("Controls 3D: Torus Button clicked");
+    if(editorEngine == null || editorEngine == undefined){ return; }
+    editorEngine.create_parim("Donut");
   };
   const handleSphere = () => {
-    console.log("Controls 3D: Sphere Button clicked");
+    if(editorEngine == null || editorEngine == undefined){ return; }
+    editorEngine.create_parim("Sphere");
   };
   const handleMoveArrows = () => {
-    console.log("Controls 3D: Move Arrows clicked");
+    if(!editorEngine){ return; }
+    editorEngine.change_mode("transform");
   };
   const handleRotateArrows = () => {
-    console.log("Controls 3D: Rotate Arrows clicked");
+    if(!editorEngine){ return; }
+    editorEngine.change_mode("rotate");
   };
   const handleZoomArrows = () => {
-    console.log("Controls 3D: Zoom Arrows clicked");
+    if(!editorEngine){ return; }
+    editorEngine.change_mode("scale");
   };
 
   const handleModeChange = (value: string) => {

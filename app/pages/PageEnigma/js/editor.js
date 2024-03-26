@@ -254,6 +254,10 @@ class Editor {
         this.composer.addPass(this.outputPass);
     }
 
+    create_parim(name) {
+        let uuid = this.activeScene.instantiate(name);
+    }
+
     render_mode() {
         this.rendering = !this.rendering;
         this.activeScene.render_mode(this.rendering);
