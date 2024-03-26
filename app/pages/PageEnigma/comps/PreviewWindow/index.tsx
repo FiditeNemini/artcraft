@@ -1,10 +1,15 @@
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { EngineContext } from "~/contexts/EngineContext"
 
+import { LoadingDotsTyping } from "~/components";
 export const PreviewWindow = ()=>{
   const editorEngine = useContext(EngineContext);
   //take data from egine context
 
+  const [showLoader, setShowLoader] = useState<boolean>(true);
+  useEffect(()=>{
+    setTimeout(()=>setShowLoader(false), 5000);
+  },[]);
   return (
     <div
       id="preview-window"
@@ -17,12 +22,16 @@ export const PreviewWindow = ()=>{
         >
           <p>Camera View</p>
         </div>
-        <div className="rounded-lg border border-white box overflow-hidden">
+        <div className="relative rounded-lg border border-white box overflow-hidden">
+          
           <img
             //shoot that datat from engine context to this image
             className="aspect-video max-h-40" 
             src="/resources/uiAssets/video_player_placeholder.gif"
           />
+          <div className="absolute w-full h-full top-0 left-0">
+            <LoadingDotsTyping show={showLoader} transition/>
+          </div>
         </div>
       </div>
     </div>
