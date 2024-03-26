@@ -21,7 +21,9 @@ export const Character = ({ characterId }: Props) => {
       className="block rounded-lg bg-character-groupBg pb-5 pl-2 pr-4"
       style={{ width: fullWidth + 90 }}
     >
-      <div className="mb-5 pt-2 text-xs font-medium text-white">Character</div>
+      <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
+        Character
+      </div>
       <div className="flex flex-col gap-5">
         <div className="pl-16">
           <div className="relative mt-4 block h-9 rounded-lg bg-character-unselected">
@@ -46,7 +48,7 @@ export const Character = ({ characterId }: Props) => {
                 clip={clip}
               />
             ))}
-            <div className="absolute ps-2 pt-1 text-xs font-medium text-white">
+            <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
               Animation
             </div>
           </div>
@@ -74,7 +76,7 @@ export const Character = ({ characterId }: Props) => {
                 clip={clip}
               />
             ))}
-            <div className="absolute ps-2 pt-1 text-xs font-medium text-white">
+            <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
               Character Position/Rotation
             </div>
           </div>
@@ -102,7 +104,7 @@ export const Character = ({ characterId }: Props) => {
                 clip={clip}
               />
             ))}
-            <div className="absolute ps-2 pt-1 text-xs font-medium text-white">
+            <div className="prevent-select prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
               Lipsync Audio Track
             </div>
             <button

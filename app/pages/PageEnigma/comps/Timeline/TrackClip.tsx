@@ -32,7 +32,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           ...classes,
           "px-[6px] py-[3px]",
           "rounded",
-          "text-xs font-medium text-white",
+          "prevent-select text-xs font-medium text-white",
         ].join(" ")}
         style={{ top: -28, left: offset * 4 * scale + 2 }}
       >

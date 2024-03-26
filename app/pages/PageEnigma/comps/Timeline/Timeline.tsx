@@ -42,13 +42,13 @@ export const Timeline = (
   return (
     <>
       <LowerPanel>
-        <div className="mt-4 flex h-3 text-xs text-white opacity-75">
+        <div className="prevent-select mt-4 flex h-3 border-t border-t-ui-panel-border text-xs text-white opacity-75">
           {Array(length)
             .fill(0)
             .map((_, index) => (
               <Fragment key={index}>
                 <div
-                  className="absolute ps-1"
+                  className="absolute ps-1 pt-1"
                   style={{ left: index * sectionWidth + 92 }}
                 >
                   00:{index < 10 ? "0" + index.toString() : index.toString()}
@@ -99,8 +99,7 @@ export const Timeline = (
         >
           <FontAwesomeIcon
             icon={faSortDown}
-            style={{ top: 0, left: -2 }}
-            className="text-brand-primary"
+            className="absolute ml-[-5px] mt-[-10px] h-5 text-brand-primary"
           />
           <div
             className="absolute block bg-brand-primary"
