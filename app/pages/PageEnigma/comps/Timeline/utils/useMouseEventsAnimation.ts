@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
-import { ClipContext } from "~/contexts/ClipContext/ClipContext";
+import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 
 export const useMouseEventsAnimation = () => {
   const { currentTime, updateCurrentTime, length, scale } =
-    useContext(ClipContext);
+    useContext(TrackContext);
   const [isActive, setIsActive] = useState("");
   const [clientX, setClientX] = useState(0);
 

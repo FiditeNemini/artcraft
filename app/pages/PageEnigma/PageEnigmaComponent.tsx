@@ -12,7 +12,6 @@ import { PreviewWindow } from "./comps/PreviewWindow";
 import { Timeline } from "./comps/Timeline";
 import { SidePanelTabs } from "./comps/SidePanelTabs";
 
-import { TrackProvider } from "~/contexts/TrackContext/TrackProvider";
 import { EngineProvider } from "~/contexts/EngineProvider";
 
 export const PageEnigmaComponent = () => {
@@ -44,10 +43,10 @@ export const PageEnigmaComponent = () => {
 
   return (
     <div>
-      <TopBarHelmet>
-        <Button icon={faSparkles}>Generate Movie</Button>
-      </TopBarHelmet>
       <EngineProvider>
+        <TopBarHelmet>
+          <Button icon={faSparkles}>Generate Movie</Button>
+        </TopBarHelmet>
         <div style={{ height: "calc(100vh - 68px)" }}>
           {/* Engine section/side panel */}
           <div
@@ -86,9 +85,7 @@ export const PageEnigmaComponent = () => {
           </div>
 
           {/* Timeline */}
-          <TrackProvider>
-            <Timeline timelineHeight={timelineHeight} />
-          </TrackProvider>
+          <Timeline timelineHeight={timelineHeight} />
         </div>
       </EngineProvider>
     </div>

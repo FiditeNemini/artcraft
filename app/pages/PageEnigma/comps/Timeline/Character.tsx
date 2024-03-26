@@ -1,7 +1,6 @@
 import { useCallback, useContext, useMemo } from "react";
 import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 import { Track } from "~/pages/PageEnigma/comps/Timeline/Track";
-import { ClipContext } from "~/contexts/ClipContext/ClipContext";
 
 function buildUpdaters(
   updateCharacters: (options: {
@@ -39,10 +38,8 @@ interface Props {
 }
 
 export const Character = ({ characterId }: Props) => {
-  const { characters, updateCharacters, toggleLipSyncMute } =
+  const { characters, updateCharacters, toggleLipSyncMute, fullWidth } =
     useContext(TrackContext);
-  const { length, scale } = useContext(ClipContext);
-  const fullWidth = length * 60 * 4 * scale;
   const character = characters.find((row) => (row.id = characterId));
 
   const { updateClipLipSync, updateClipPosition, updateClipAnimations } =

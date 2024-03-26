@@ -1,6 +1,6 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { BaseClip } from "~/models/track";
-import { ClipContext } from "~/contexts/ClipContext/ClipContext";
+import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 
 interface Props {
   clip: BaseClip;
@@ -9,7 +9,7 @@ interface Props {
 
 export const ClipElement = ({ clip, type }: Props) => {
   const { startDrag, dragId, endDrag, scale, canDrop, setCanDrop } =
-    useContext(ClipContext);
+    useContext(TrackContext);
   const [initPosition, setInitPosition] = useState<{
     initX: number;
     initY: number;

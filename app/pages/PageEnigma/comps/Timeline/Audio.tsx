@@ -1,12 +1,10 @@
 import { useContext } from "react";
 import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 import { Track } from "~/pages/PageEnigma/comps/Timeline/Track";
-import { ClipContext } from "~/contexts/ClipContext/ClipContext";
 
 export const Audio = () => {
-  const { audio, updateAudio, toggleAudioMute } = useContext(TrackContext);
-  const { length, scale } = useContext(ClipContext);
-  const fullWidth = length * 60 * 4 * scale;
+  const { audio, updateAudio, toggleAudioMute, fullWidth } =
+    useContext(TrackContext);
   const { clips } = audio!;
 
   return (

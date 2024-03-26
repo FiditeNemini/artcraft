@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import { ClipContext } from "~/contexts/ClipContext/ClipContext";
 import { ClipElement } from "./ClipElement";
+import { TrackContext } from "~/contexts/TrackContext/TrackContext";
 
 export const ClipElements = () => {
-  const { animationClips } = useContext(ClipContext);
+  const { animationClips } = useContext(TrackContext);
 
   return (
     <div className="flex flex-wrap">
