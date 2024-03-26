@@ -7,6 +7,7 @@ use actix_multipart::Multipart;
 use actix_web::{HttpRequest, HttpResponse, web};
 use log::{error, info, warn};
 use once_cell::sync::Lazy;
+use stripe::CreatePaymentLinkShippingAddressCollectionAllowedCountries::Mf;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
@@ -17,6 +18,7 @@ use http_server_common::request::get_request_ip::get_request_ip;
 use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mimetypes::mimetype_to_extension::mimetype_to_extension;
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
+use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::media_files::upsert::upsert_media_file_from_file_upload::{upsert_media_file_from_file_upload, UpsertMediaFileFromUploadArgs, UploadType};
 use tokens::tokens::media_files::MediaFileToken;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
@@ -72,6 +74,10 @@ pub async fn write_engine_asset_media_file_handler(
         MediaFileWriteError::ServerError
       })?;
 
+  let maybe_user_token = maybe_user_session
+      .as_ref()
+      .map(|session| session.get_strongly_typed_user_token());
+
   let maybe_avt_token = server_state
       .avt_cookie_manager
       .get_avt_token_from_request(&http_request);
@@ -104,11 +110,50 @@ pub async fn write_engine_asset_media_file_handler(
         MediaFileWriteError::BadInput("bad request".to_string())
       })?;
 
+  // ==================== MAKE SURE USER OWNS FILE ==================== //
+
+  if let Some(media_file_token) = upload_media_request.media_file_token.as_ref() {
+    // TODO(bt,2024-03-26): Don't use the mysql_pool, use the mysql_connection.
+    let media_file =
+        get_media_file(media_file_token, false, &server_state.mysql_pool)
+        .await
+        .map_err(|err| {
+          error!("Error getting media file: {:?}", err);
+          MediaFileWriteError::ServerError
+        })?
+        .ok_or(MediaFileWriteError::NotFound)?;
+
+    let maybe_user_tokens = (
+      maybe_user_token.as_ref(),
+      media_file.maybe_creator_user_token.as_ref()
+    );
+
+    let must_check_avt = match maybe_user_tokens {
+      (None, None) => true, // Since there's no user, we must check the AnonymousVisitorTokens.
+      (Some(token_a), Some(token_b)) => {
+        if token_a != token_b {
+          // User tokens do not match.
+          return Err(MediaFileWriteError::NotAuthorized);
+        }
+        false
+      },
+      _ => {
+        // User tokens do not match.
+        return Err(MediaFileWriteError::NotAuthorized);
+      },
+    };
+
+    if must_check_avt {
+      // TODO(bt,2024-03-26): For now anonymous users can't upload over their own files
+      return Err(MediaFileWriteError::NotAuthorized);
+    }
+  }
+
+  // ==================== HANDLE IDEMPOTENCY ==================== //
+
   // TODO(bt, 2024-02-26): This should be a transaction.
   let uuid_idempotency_token = upload_media_request.uuid_idempotency_token
       .ok_or(MediaFileWriteError::BadInput("no uuid".to_string()))?;
-
-  // ==================== HANDLE IDEMPOTENCY ==================== //
 
   if let Err(reason) = validate_idempotency_token_format(&uuid_idempotency_token) {
     return Err(MediaFileWriteError::BadInput(reason));
@@ -131,9 +176,6 @@ pub async fn write_engine_asset_media_file_handler(
   // ==================== USER DATA ==================== //
 
   let ip_address = get_request_ip(&http_request);
-
-  let maybe_user_token = maybe_user_session
-      .map(|session| session.get_strongly_typed_user_token());
 
   // ==================== FILE DATA ==================== //
 

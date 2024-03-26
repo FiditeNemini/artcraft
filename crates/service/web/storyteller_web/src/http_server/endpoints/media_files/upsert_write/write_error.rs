@@ -9,6 +9,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 pub enum MediaFileWriteError {
   BadInput(String),
   NotAuthorized,
+  NotFound,
   MustBeLoggedIn,
   ServerError,
   RateLimited,
@@ -19,6 +20,7 @@ impl ResponseError for MediaFileWriteError {
     match *self {
       MediaFileWriteError::BadInput(_) => StatusCode::BAD_REQUEST,
       MediaFileWriteError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      MediaFileWriteError::NotFound => StatusCode::NOT_FOUND,
       MediaFileWriteError::MustBeLoggedIn => StatusCode::UNAUTHORIZED,
       MediaFileWriteError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
       MediaFileWriteError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
