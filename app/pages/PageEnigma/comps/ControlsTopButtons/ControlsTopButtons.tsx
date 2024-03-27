@@ -10,12 +10,12 @@ export const ControlsTopButtons = () => {
 
   const handleButtonSave = () => {
     console.log(`SceneName is ${sceneName}`);
-    // editorEngine?.save();
+    editorEngine?.save();
   };
 
   const handleButtonLoadScene = () => {
     console.log(`Scene Token is ${sceneToken}`);
-    // editorEngine?.save();
+    // editorEngine?.dosomething();
   };
 
   // const handleButtonCameraView = () => {
@@ -50,23 +50,29 @@ export const ControlsTopButtons = () => {
               onClick: handleButtonLoadScene,
             }}
           >
-          <Input label="Please Enter a name for your scene" />
+          <Input
+            label="Please provide the Token of the scene you wished to load:"
+            onChange={(e)=>{setSceneToken(e.target.value)}}
+          />
         </ButtonDialogue>
 
-        <ButtonDialogue
-          buttonProps={{
-            variant: "secondary",
-            label: "Save Scene",
-          }}
-          title="Save Scene"
-          confirmButtonProps={{
-            label: "Save",
-            disabled: sceneName === "" ? true : false,
-            onClick: handleButtonSave,
-          }}
-        >
-          <Input label="Please Enter a name for your scene" />
-        </ButtonDialogue>
+      <ButtonDialogue
+        buttonProps={{
+          variant: "secondary",
+          label: "Save Scene",
+        }}
+        title="Save Scene"
+        confirmButtonProps={{
+          label: "Save",
+          disabled: sceneName === "" ? true : false,
+          onClick: handleButtonSave,
+        }}
+      >
+        <Input
+          label="Please Enter a name for your scene"
+          onChange={(e)=>{setSceneName(e.target.value)}}
+        />
+      </ButtonDialogue>
 
         <ButtonDialogue
           buttonProps={{

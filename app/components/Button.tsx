@@ -12,11 +12,16 @@ export const Button = ({
   icon,
   children,
   className: propsClassName,
-  variant = "primary",
+  variant: propsVariant = "primary",
+  disabled,
   ...rest
 }: ButtonPropsI) => {
+  const variant = disabled ? 'disabled' : propsVariant;
   function getVariantClassNames(variant: string) {
     switch (variant) {
+      case "disabled":{
+        return "bg-brand-secondary-500 text-brand-secondary-300"
+      }
       case "secondary": {
         return " bg-brand-secondary hover:bg-brand-secondary-900 text-white focus-visible:outline-brand-secondary";
       }
@@ -34,7 +39,7 @@ export const Button = ({
   );
 
   return (
-    <button className={className} {...rest}>
+    <button className={className} disabled={disabled} {...rest}>
       {icon && <FontAwesomeIcon className="mr-2" icon={icon} />}
       {children}
     </button>
