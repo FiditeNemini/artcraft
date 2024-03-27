@@ -5,17 +5,17 @@ interface LoadingBarProps{
   label?: string;
   progress?: number;
   variant?: string;
-  pulsing?: boolean;
   message?: string;
   wrapperClassName?: string;
+  useFakeTimer?: number; 
 }
 export const LoadingBar = ({
   label,
-  progress = 50,
+  progress = 0,
   variant = 'primary',
-  pulsing = false,
   message,
   wrapperClassName : propsWrapperClassName,
+  useFakeTimer = (1000 * 60) //defaults to 1min
 }: LoadingBarProps) => {
 
   function getVariantClassNames(variant: string) {

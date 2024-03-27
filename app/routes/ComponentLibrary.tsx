@@ -3,7 +3,9 @@ import {
   Button,
   ButtonLink,
   H4, 
-  LoadingBar
+  LoadingBar,
+  LoadingDotsTyping,
+  LoadingDotsBricks,
 } from "~/components";
 
 
@@ -39,6 +41,18 @@ export default function ComponentLibrary () {
       <div className="flex flex-col gap-2 mb-4">
         <H4>ButtonLink</H4>
         <ButtonLink to="/">Back to /</ButtonLink>
+      </div>
+
+      <div className="flex flex-col gap-2 mb-4">
+        <H4>Loading Dots</H4>
+        <div className="flex gap-2">
+          <div className="w-60 h-40 rounded-lg overflow-hidden">
+            <LoadingDotsTyping />
+          </div>
+          <div className="w-60 h-40 rounded-lg overflow-hidden">
+            <LoadingDotsBricks />
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col gap-2 mb-4">
