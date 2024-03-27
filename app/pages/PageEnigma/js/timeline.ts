@@ -6,15 +6,43 @@ import AudioEngine from "./audio_engine";
 import TransformEngine from "./transform_engine";
 import LipSyncEngine from "./lip_sync_engine";
 import AnimationEngine from "./animation_engine";
+import { AudioClip } from "../models/track";
+import { AnimationClip } from "three";
+import { LipSyncClip } from "../datastructures/clips/lipsync_clip";
+import { TransformClip } from "../datastructures/clips/transform_clip";
 
 // Every object uuid / entity has a track.
-export class TimelineCurrentReactState {
-isEditable: boolean
+export class TimelineCurrentState {
+    isEditable: boolean
     selectedObjectID: number
-
     constructor() {
         this.isEditable = true // can add clips to it
         this.selectedObjectID = 0
+    }
+}
+
+export class TimelineDataState {
+    timelineItems: ClipUI[]
+    scrubberPosition: number
+
+    // Data to serialize with the scene, used to load into each engine.
+    audioClips:AudioClip[]
+    animationClips:AnimationClip[]
+    lipSyncClips:LipSyncClip[]
+    transformClips:TransformClip[]
+
+    constructor(timelineItems: ClipUI[] = [],
+                audioClips: AudioClip[] = [],
+                animationClips: AnimationClip[] = [],
+                transformClips: TransformClip[] = [],
+                lipSyncClips: LipSyncClip[] = [],
+                scrubberPosition:number = 0) {
+        this.timelineItems = timelineItems
+        this.scrubberPosition = scrubberPosition
+        this.audioClips = audioClips
+        this.animationClips = animationClips
+        this.lipSyncClips = lipSyncClips
+        this.transformClips = transformClips
     }
 }
 
@@ -25,8 +53,6 @@ export class TimeLine {
     timeLineLimit: number
     scrubberPosition: number
     isPlaying: boolean
-
-    timelineState: TimelineCurrentReactState
 
     // plays audio
     audioEngine: AudioEngine
@@ -50,7 +76,6 @@ export class TimeLine {
      
         this.isPlaying = false
         this.scrubberPosition = 0 // in frames into the tl
-        this.timelineState = new TimelineCurrentReactState()
 
         // this will be used to play the audio clips
         this.audioEngine = audioEngine
@@ -61,60 +86,60 @@ export class TimeLine {
         this.scene = scene;
     }
 
-    async addPlayableClip(clip: ClipUI): Promise<void> {
+    public async addPlayableClip(clip: ClipUI): Promise<void> {
         this.timelineItems.push(clip)
     }
 
     // when given a media id item it will create the clip. 
     // Then the clip will be loaded by the engines, if they come from outside of the loaded scene.
-    async createClipOffset(media_id: string, object_uuid:string, type: string): Promise<void> {
+    public async createClipOffset(media_id: string, object_uuid:string, type: string): Promise<void> {
         // use engine to load based off media id and type animation | transform |  
    
     }
 
     // this will update the state of the clips based off uuid easing?
-    async updateClip(clip_uuid: string, updates: AnyJson): Promise<void> {
+    public async updateClip(clip_uuid: string, updates: AnyJson): Promise<void> {
 
     }
 
-    async deleteClip(clip_uuid: string): Promise<void> {
+    public async deleteClip(clip_uuid: string): Promise<void> {
 
     }
 
     // Events that will trigger from react
-    async clipDidEnterDropZone() {
+    public async clipDidEnterDropZone() {
 
     }
 
-    async clipDidExitDropZone() {
+    public async clipDidExitDropZone() {
 
     }
 
     // timeline controls this.
-    async scrubberDidStart(offset_frame: number) {
+    public async scrubberDidStart(offset_frame: number) {
 
     }
 
-    async scrub(offset_frame: number): Promise<void> {
+    public async scrub(offset_frame: number): Promise<void> {
         // only stream through to the position and rotation keyframes
         // debounce not really 
     }
 
-    async scrubberDidStop(offset_frame: number) {
+    public async scrubberDidStop(offset_frame: number) {
 
     }
     // public streaming events into the timeline from
-    async setScrubberPosition(offset: number) {
+    public async setScrubberPosition(offset: number) {
         this.scrubberPosition = offset // in ms
     }
 
     // should play from the clip that is closest to the to scrubber
-    async play(): Promise<void> {
+    public async play(): Promise<void> {
         console.log(`Starting Timeline`)
         this.isPlaying = true
     }
 
-    async reset_scene() {
+    private async reset_scene() {
         for (const element of this.timelineItems) {
             if (element.type == "transform") {
                 let object = this.scene.get_object_by_uuid(element.object_uuid);
@@ -136,7 +161,7 @@ export class TimeLine {
     }
 
     // called by the editor update loop on each frame
-    async update(deltatime:number) {
+    public async update(deltatime:number) {
         if (this.isPlaying == false) return; // start and stop 
 
         if (this.scrubberPosition <= 0) {
@@ -191,7 +216,7 @@ export class TimeLine {
         }
     }
 
-    async stop(): Promise<void> {
+    private async stop(): Promise<void> {
         this.isPlaying = false
         console.log(`Stopping Timeline`)
     }

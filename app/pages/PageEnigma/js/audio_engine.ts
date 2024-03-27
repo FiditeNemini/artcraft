@@ -1,8 +1,8 @@
 import { faL } from "@fortawesome/pro-solid-svg-icons";
-import { AudioTrackClip } from "../datastructures/clips/audio_track_clip";
+import { AudioClip } from "../datastructures/clips/audio_clip";
 
 class AudioEngine {
-    clips: { [key: string]: AudioTrackClip } = {};
+    clips: { [key: string]: AudioClip } = {};
     audio_sources: { [key: string]: AudioBufferSourceNode } = {};
     version: number;
     playing: string[];
@@ -17,7 +17,7 @@ class AudioEngine {
     // loads clips into the engine to cache
     loadClip(audio_media_id: string) {
         if(this.clips[audio_media_id] != null) { return; }
-        this.clips[audio_media_id] = new AudioTrackClip(this.version, audio_media_id, 1.0);
+        this.clips[audio_media_id] = new AudioClip(this.version, audio_media_id, 1.0);
     }
 
     // plays from the timeline.

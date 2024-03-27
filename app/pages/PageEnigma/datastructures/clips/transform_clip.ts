@@ -1,17 +1,6 @@
-import { faL } from '@fortawesome/pro-solid-svg-icons';
 import * as THREE from 'three';
 
-export interface TransformTrackClip {
-  version: number;
-  media_id: string;
-  type: "transform";
-  positions: THREE.Vector3[];
-  rotations: THREE.Vector3[];
-  scales: THREE.Vector3[];
-  length: number;
-}
-
-export class TransformTrackClip implements TransformTrackClip {
+export class TransformClip {
   version: number;
   media_id: string;
   object_uuid: string;

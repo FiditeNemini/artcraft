@@ -16,7 +16,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 import AudioEngine from "./audio_engine.ts";
 import TransformEngine from "./transform_engine.ts";
-import { TimeLine } from "./timeline.ts";
+import { TimeLine, TimelineDataState } from "./timeline.ts";
 import { ClipUI } from "../datastructures/clips/clip_offset.ts";
 
 import { LipSync } from "./lipsync.js";
@@ -36,6 +36,13 @@ if (typeof window !== "undefined") {
 }
 
 class EditorState {
+
+  // {
+  //   action: "ShowLoadingIndicator"
+  //   source: "Editor" 
+  //   data: { "message" : "saving scene" }
+  // }
+
   constructor() {
     this.selected_object = null;
     this.is_loading = false;
@@ -104,6 +111,7 @@ class Editor {
     this.transform_engine = new TransformEngine();
     this.lipsync_engine = new LipSyncEngine();
     this.animation_engine = new AnimationEngine();
+
     this.timeline = new TimeLine(
       this.audio_engine,
       this.transform_engine,
@@ -168,19 +176,39 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
-    this._test_demo()
-
+    //this._test_demo()
 
     // saving state of the scene 
     this.scene_file_token = null
   }
 
+  // Token comes in from the front end to load the scene from the site.
+  async loadScene() {
+
+    const scene = await this.api_manager.loadSceneState(this.test_scene_load_media_id);
+    this.activeScene.scene.children = scene.children;
+
+    this.activeScene.scene.children.forEach(child => {
+
+    child.parent = this.activeScene.scene;
+
+    if(child.type == "DirectionalLight") {
+      let pos = child.position;
+      let rot = child.rotation;
+      let light = this.activeScene._create_base_lighting();
+      light.position.set(pos.x, pos.y, pos.z);
+      light.rotation.set(rot.x, rot.y, rot.z);
+      this.activeScene.scene.remove(child);
+      }
+    })
+    
+  }
 
   async saveScene(name) {
-    // check if I already have the scene token.
-    console.log("Saving...");
-    const result = await this.api_manager.saveSceneState(this.activeScene.scene,this.scene_file_token);
-    console.log("Saved!");
+    const result = await this.api_manager.saveSceneState(this.activeScene.scene,name,
+                                                         this.scene_file_token,
+                                                         new TimelineDataState());
+    // dispatch call wil's engine.
   }
 
   // uploading some objects for testing to get their media ids from my account.
