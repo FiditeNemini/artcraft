@@ -268,12 +268,20 @@ class Editor {
       "./resources/models/fox/fox.glb",
     );
 
+    // Load timeline creates the the clips from the datastructure and loads them in here.
     // load object into the engine for lip syncing
     this.lipsync_engine.load_object(
       object.uuid,
       "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
     );
-
+    this.animation_engine.load_object(
+      object.uuid,
+      "/resources/models/fox/fox_idle.glb",
+      "clip3",
+    );
+     // then it creates clip ui to load the playable clips 
+     // then refreshes the timeline.
+     
     // create the clip with the same id for a reference to the media
     this.timeline.addPlayableClip(
       new ClipUI(
@@ -304,11 +312,7 @@ class Editor {
         400,
       ),
     );
-    this.animation_engine.load_object(
-      object.uuid,
-      "/resources/models/fox/fox_idle.glb",
-      "clip3",
-    );
+  
   }
 
   // Configure post processing.
