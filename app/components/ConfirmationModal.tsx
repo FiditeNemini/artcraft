@@ -1,4 +1,5 @@
 import { Dialog } from "@headlessui/react";
+import { Button } from "~/components/Button";
 
 interface Props {
   text: string;
@@ -34,17 +35,23 @@ export const ConfirmationModal = ({
 
           <div className="flex justify-end gap-4">
             {!!onCancel && (
-              <button onClick={onCancel} className="rounded-lg px-3 py-2">
+              <Button
+                type="button"
+                onClick={onCancel}
+                className="rounded-lg px-3 py-2"
+                variant="secondary"
+              >
                 {cancelText}
-              </button>
+              </Button>
             )}
             {!!onOk && (
-              <button
+              <Button
+                type="button"
                 onClick={onOk}
                 className={[okColor, "rounded-lg px-3 py-2"].join(" ")}
               >
                 {okText}
-              </button>
+              </Button>
             )}
           </div>
         </Dialog.Panel>

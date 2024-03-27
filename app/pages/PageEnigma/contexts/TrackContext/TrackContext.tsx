@@ -52,7 +52,11 @@ export const TrackContext = createContext<{
     offset: number;
   }) => void;
   toggleAudioMute: () => void;
-  addGlobalAudio: (clipId: string, animationClips: BaseClip[]) => void;
+  addGlobalAudio: (
+    clipId: string,
+    animationClips: BaseClip[],
+    offset: number,
+  ) => void;
   selectAudioClip: (clipId: string) => void;
   deleteAudioClip: (clipId: string) => void;
 

@@ -32,6 +32,11 @@ export const TrackProvider = ({ children }: Props) => {
   const [time, setTime] = useState(0);
   const updateCurrentTime = useCallback((newTime: number) => {
     setTime(newTime);
+    console.log("message", {
+      action: "UpdateCurrentTime",
+      id: "",
+      data: { currentTime: newTime },
+    });
   }, []);
 
   // cross group functions
@@ -86,8 +91,8 @@ export const TrackProvider = ({ children }: Props) => {
 
       scale,
       currentTime: time,
-      length,
       updateCurrentTime,
+      length,
       fullWidth,
     };
   }, [

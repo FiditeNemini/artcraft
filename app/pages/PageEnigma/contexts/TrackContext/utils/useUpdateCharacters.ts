@@ -7,20 +7,7 @@ export default function useUpdateCharacters() {
       id: "CH1",
       muted: false,
       animationClips: [],
-      positionClips: [
-        {
-          id: "CH1-P1",
-          length: 200,
-          offset: 100,
-          name: "pos 1",
-        },
-        {
-          id: "CH1-P2",
-          length: 180,
-          offset: 500,
-          name: "pos 2",
-        },
-      ],
+      positionClips: [],
       lipSyncClips: [
         {
           id: "CH1-L1",
@@ -62,6 +49,11 @@ export default function useUpdateCharacters() {
             };
           });
         });
+        console.log("message", {
+          action: "UpdateAnimation",
+          id,
+          data: { offset, length },
+        });
         return;
       }
       if (type === "positions") {
@@ -102,6 +94,11 @@ export default function useUpdateCharacters() {
             };
           });
         });
+        console.log("message", {
+          action: "UpdateLipSync",
+          id,
+          data: { offset, length },
+        });
       }
     },
     [],
@@ -135,6 +132,11 @@ export default function useUpdateCharacters() {
           };
         });
       });
+      console.log("message", {
+        action: "AddAnimation",
+        id: clipId,
+        data: { offset },
+      });
     },
     [],
   );
@@ -167,6 +169,11 @@ export default function useUpdateCharacters() {
           };
         });
       });
+      console.log("message", {
+        action: "AddLipSync",
+        id: clipId,
+        data: { offset },
+      });
     },
     [],
   );
@@ -178,6 +185,10 @@ export default function useUpdateCharacters() {
         muted:
           character.id === characterId ? !character.muted : character.muted,
       }));
+    });
+    console.log("message", {
+      action: "ToggleLipSync",
+      id: characterId,
     });
   }, []);
 
@@ -219,6 +230,10 @@ export default function useUpdateCharacters() {
           ),
         })),
       ];
+    });
+    console.log("message", {
+      action: "DeleteCharacterClip",
+      id: clipId,
     });
   }, []);
 

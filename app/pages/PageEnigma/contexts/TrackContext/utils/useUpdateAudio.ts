@@ -45,12 +45,17 @@ export default function useUpdateAudio() {
           clips: newClips,
         };
       });
+      console.log("message", {
+        action: "UpdateGlobalAudio",
+        id,
+        data: { offset, length },
+      });
     },
     [],
   );
 
   const addGlobalAudio = useCallback(
-    (dragId: string, audioClips: BaseClip[]) => {
+    (dragId: string, audioClips: BaseClip[], offset: number) => {
       const clip = audioClips.find((row) => row.id === dragId);
       if (!clip) {
         return;
@@ -59,8 +64,13 @@ export default function useUpdateAudio() {
       setAudio((oldAudio) => {
         return {
           ...oldAudio,
-          clips: [...oldAudio.clips, clip],
+          clips: [...oldAudio.clips, { ...clip, offset }],
         };
+      });
+      console.log("message", {
+        action: "UpdateGlobalAudio",
+        id: dragId,
+        data: { offset },
       });
     },
     [],
@@ -72,6 +82,10 @@ export default function useUpdateAudio() {
         ...oldAudio,
         muted: !oldAudio.muted,
       };
+    });
+    console.log("message", {
+      action: "ToggleGlobalAudioMute",
+      id: "",
     });
   }, []);
 
@@ -97,6 +111,10 @@ export default function useUpdateAudio() {
         ...oldAudio,
         clips: [...oldAudio.clips.filter((clip) => clip.id !== clipId)],
       };
+    });
+    console.log("message", {
+      action: "UpdateGlobalAudio",
+      id: clipId,
     });
   }, []);
 
