@@ -4,7 +4,10 @@ import {reducer} from './reducer';
 const initialState:State = {
   timelineHeight: 260,
   viewMode: VIEW_MODES.EDITOR,
-  showEditorLoader: true
+  showEditorLoader: {
+    isShow:true,
+    message: 'loading Editor Engine 🦊'
+  }
 }
 
 export type {State, Action};

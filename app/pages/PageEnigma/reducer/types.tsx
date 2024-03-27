@@ -8,7 +8,10 @@ type ViewModes = VIEW_MODES.EDITOR | VIEW_MODES.SIDE_BY_SIDE;
 export type State = {
   viewMode: ViewModes;
   timelineHeight: number;
-  showEditorLoader: boolean;
+  showEditorLoader: {
+    isShow:boolean
+    message:string|undefined;
+  };
 };
 
 
@@ -20,8 +23,15 @@ export enum ACTION_TYPES {
 };
 
 export type Action = 
-  | {type: ACTION_TYPES.SHOW_EDITOR_LOADER,}
   | {type: ACTION_TYPES.HIDE_EDITOR_LOADER,}
+  | {
+      type: ACTION_TYPES.SHOW_EDITOR_LOADER,
+      payload?:{
+        showEditorLoader: {
+          message:string|undefined;
+        }
+      }
+    }
   | {
       type: ACTION_TYPES.ON_TIMELINE_RESIZE, 
       payload: {
