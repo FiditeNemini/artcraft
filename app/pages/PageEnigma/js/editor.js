@@ -164,7 +164,7 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
-    this._test_demo()
+    //this._test_demo()
   }
 
   // uploading some objects for testing to get their media ids from my account.
@@ -179,9 +179,16 @@ class Editor {
     // let result = await this.api_manager.getMediaFile(
     //   "m_189p8hj0eyypbg74kkhcpehwpjhnkz",
     // );
+    console.log("Saveing");
+    const result = await this.api_manager.saveSceneState(this.activeScene.scene);
+    console.log("Saved!");
+    console.log(result);
+    //this.api_manager.loadScene("m_n3k7nc0r5scr5zf92febh52h39g721")
+  }
 
-    //const result = this.api_manager.saveSceneState(this.activeScene.scene)
-    this.api_manager.loadScene("m_n3k7nc0r5scr5zf92febh52h39g721")
+  async _load_for_testing() {
+    const result = await this.api_manager.loadScene("m_6zgwx3aybyq086mwqhxw3me84rdgpt")
+    console.log(result);
   }
 
   async _serialize_timeline() {
