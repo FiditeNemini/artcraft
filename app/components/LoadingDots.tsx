@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
+import { twMerge } from 'tailwind-merge';
 
 interface LoadingDotsProps {
+  className?: string;
   show?: boolean;
   transition?: boolean;
   transitionDuration?: number;
 };
 
 interface LoadingDotsInnerProps {
+  className?: string;
   show?: boolean;
   transition?: boolean;
   transitionDuration?: number;
@@ -29,6 +32,7 @@ export const LoadingDotsBricks = (props: LoadingDotsProps)=>{
 }
 
 function LoadingDots({
+  className,
   show=true,
   transition = false,
   transitionDuration = 1000,
@@ -39,7 +43,7 @@ function LoadingDots({
     (transition ? `transition-opacity duration-${transitionDuration} `: "")
     + (state === 'loading' ? 'opacity-100' : 'opacity-0');
 
-  const classNames = "w-full h-full flex justify-center items-center bg-ui-background " + transitionClasses;
+  const classNames = twMerge("w-full h-full flex justify-center items-center bg-ui-background ",transitionClasses, className);
   useEffect(()=>{
     if(!show){
       if(transition){

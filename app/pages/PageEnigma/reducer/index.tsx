@@ -3,7 +3,8 @@ import {reducer} from './reducer';
 
 const initialState:State = {
   timelineHeight: 260,
-  viewMode: VIEW_MODES.EDITOR
+  viewMode: VIEW_MODES.EDITOR,
+  showEditorLoader: true
 }
 
 export type {State, Action};
