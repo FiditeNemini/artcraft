@@ -166,7 +166,7 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
-    //this._test_demo()
+    this._test_demo()
   }
 
   // uploading some objects for testing to get their media ids from my account.
@@ -184,12 +184,11 @@ class Editor {
     console.log("Saving...");
     const result = await this.api_manager.saveSceneState(this.activeScene.scene);
     console.log("Saved!");
-    console.log(result);
     //this.api_manager.loadScene("m_n3k7nc0r5scr5zf92febh52h39g721")
   }
 
   async _load_for_testing() {
-    const result = await this.api_manager.loadScene("m_gc7n4z3p82keydyaxtb0s5qt4yys54")
+    const result = await this.api_manager.loadScene("m_7f3k4qysab4aja96vpc7b31tmq8y3k");
     let bucket_path = await this.api_manager.getMediaFile(result["glb_media_file_id"]);
     let glbLoader = new GLTFLoader();
     glbLoader.load(bucket_path, (glb) => {
