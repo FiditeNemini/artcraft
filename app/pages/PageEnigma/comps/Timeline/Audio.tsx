@@ -15,7 +15,7 @@ export const Audio = () => {
       <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
         Global Audio
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <Track
           clips={clips}
           title="Global Audio Track"

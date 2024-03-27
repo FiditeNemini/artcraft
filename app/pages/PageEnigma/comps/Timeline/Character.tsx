@@ -61,7 +61,7 @@ export const Character = ({ characterId }: Props) => {
       <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
         Character
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <Track
           clips={animationClips}
           title="Animation"

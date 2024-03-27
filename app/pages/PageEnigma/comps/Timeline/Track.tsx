@@ -43,7 +43,7 @@ export const Track = ({
   return (
     <div className="pl-16">
       <div
-        className={`rounded=lg relative mt-4 block h-9 w-full bg-${style}-unselected`}
+        className={`relative mt-4 block h-9 w-full rounded-lg bg-${style}-unselected`}
         onPointerOver={onPointerOver}
         onPointerLeave={onPointerLeave}
       >
@@ -66,14 +66,14 @@ export const Track = ({
         </div>
         {!!toggleMute && (
           <button
-            className="absolute text-xs text-white"
-            style={{ top: 6, left: -20 }}
+            className="text-md absolute text-white transition-colors duration-100 hover:text-white/80"
+            style={{ top: 6, left: -28 }}
             onClick={toggleMute}
           >
             {muted ? (
               <FontAwesomeIcon
                 icon={faVolumeSlash}
-                className="text-brand-primary"
+                className="text-brand-primary transition-colors duration-100 hover:text-brand-primary/80"
               />
             ) : (
               <FontAwesomeIcon icon={faVolume} />
