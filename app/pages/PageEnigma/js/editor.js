@@ -193,6 +193,7 @@ class Editor {
 
     // saving state of the scene 
     this.scene_file_token = null
+
   }
 
   // Token comes in from the front end to load the scene from the site.
@@ -218,9 +219,18 @@ class Editor {
   }
 
   async saveScene(name) {
-    const result = await this.api_manager.saveSceneState(this.activeScene.scene,name,
-                                                         this.scene_file_token,
-                                                         new TimelineDataState());
+    this.dispatchAppUiState({
+      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+    });
+    setInterval(()=> {
+      this.dispatchAppUiState({
+        type: ACTION_TYPES.HIDE_EDITOR_LOADER
+      });
+    },4000)
+    // const result = await this.api_manager.saveSceneState(this.activeScene.scene,name,
+    //                                                      this.scene_file_token,
+    //                                                      new TimelineDataState());
+    
     // dispatch call wil's engine.
   }
 
