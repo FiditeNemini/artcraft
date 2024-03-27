@@ -187,8 +187,10 @@ class Editor {
   }
 
   async _load_for_testing() {
-    const result = await this.api_manager.loadScene("m_6zgwx3aybyq086mwqhxw3me84rdgpt")
+    const result = await this.api_manager.loadScene("m_3nwr2kejyrrd4mmvbpmn032gea60p0")
     console.log(result);
+    let bucket_path = await this.api_manager.getMediaFile("m_3nwr2kejyrrd4mmvbpmn032gea60p0");
+    console.log(bucket_path);
   }
 
   async _serialize_timeline() {
