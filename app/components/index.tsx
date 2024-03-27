@@ -6,7 +6,7 @@ import { Input } from "./Input";
 import { H4 } from "./H4";
 import { ItemPicker } from "./ItemPicker";
 import { Textarea } from "./Textarea";
-import { LoadingDotsBricks, LoadingDotsTyping } from "./LoadingDots";
+import { LoadingDots, LoadingDotsBricks, LoadingDotsTyping } from "./LoadingDots";
 
 export {
   Button,
@@ -17,6 +17,7 @@ export {
   ItemPicker,
   Textarea,
   Input,
+  LoadingDots,
   LoadingDotsBricks,
   LoadingDotsTyping,
 };

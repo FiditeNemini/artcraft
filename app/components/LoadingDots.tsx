@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { twMerge } from 'tailwind-merge';
 
+import { H4 } from '.';
+
 interface LoadingDotsProps {
   className?: string;
   show?: boolean;
@@ -11,39 +13,37 @@ interface LoadingDotsProps {
 interface LoadingDotsInnerProps {
   className?: string;
   show?: boolean;
+  type?: 'typing'|'bricks';
+  message?: string;
   transition?: boolean;
   transitionDuration?: number;
-  children: React.ReactNode;
 };
 
 export const LoadingDotsTyping = (props: LoadingDotsProps)=>{
   return (
-    <LoadingDots {...props}>
-      <div className="dot-typing"></div>
-    </LoadingDots>
+    <LoadingDots {...props} />
   )
 }
 export const LoadingDotsBricks = (props: LoadingDotsProps)=>{
   return (
-    <LoadingDots {...props}>
-      <div className="dot-bricks"></div>
-    </LoadingDots>
+    <LoadingDots {...props} />
   )
 }
 
-function LoadingDots({
+export function LoadingDots({
   className,
   show=true,
   transition = false,
+  type = 'typing',
+  message,
   transitionDuration = 1000,
-  children,
 }: LoadingDotsInnerProps){
   const [state, setState] = useState<'loading'|'loaded'|'completed'>('loading');
   const transitionClasses =
     (transition ? `transition-opacity duration-${transitionDuration} `: "")
     + (state === 'loading' ? 'opacity-100' : 'opacity-0');
 
-  const classNames = twMerge("w-full h-full flex justify-center items-center bg-ui-background ",transitionClasses, className);
+  const classNames = twMerge("w-full h-full flex flex-col justify-center items-center bg-ui-background gap-6",transitionClasses, className);
   useEffect(()=>{
     if(!show){
       if(transition){
@@ -61,7 +61,16 @@ function LoadingDots({
   if(state!== 'completed'){
     return(
       <div className={classNames}>
-        {children}
+        { type==='typing' &&
+          <div className="dot-typing"></div>
+        }
+        { type==='bricks' &&
+          <div className="dot-bricks"></div>
+        }
+        {
+          message &&
+          <H4>{message}</H4>
+        }
       </div>
     );
   }else{
