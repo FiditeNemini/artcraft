@@ -14,7 +14,7 @@ export const Objects = () => {
         Objects
       </div>
       {objects.objects.map((object) => (
-        <div key={object.id} className="flex flex-col gap-2">
+        <div key={object.id} className="flex flex-col gap-4">
           <Track
             id={object.id}
             clips={object.clips}

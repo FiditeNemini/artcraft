@@ -12,7 +12,7 @@ export const Camera = () => {
       style={{ width: fullWidth + 90 }}
     >
       <div className="mb-5 pt-2 text-xs font-medium text-white">Camera</div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <Track
           id={camera!.id}
           clips={clips}
