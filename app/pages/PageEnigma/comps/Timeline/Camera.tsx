@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { Track } from "~/pages/PageEnigma/comps/Timeline/Track";
 
 export const Camera = () => {
@@ -8,12 +8,13 @@ export const Camera = () => {
 
   return (
     <div
-      className="bg-camera-groupBg block rounded-lg pb-5 pl-2 pr-4"
+      className="block rounded-lg bg-camera-groupBg pb-5 pl-2 pr-4"
       style={{ width: fullWidth + 90 }}
     >
       <div className="mb-5 pt-2 text-xs font-medium text-white">Camera</div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <Track
+          id={camera!.id}
           clips={clips}
           title="Camera Position/Rotation"
           style="camera"

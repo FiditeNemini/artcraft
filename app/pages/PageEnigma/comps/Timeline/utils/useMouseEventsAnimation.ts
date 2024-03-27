@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 
 export const useMouseEventsAnimation = () => {
   const { currentTime, updateCurrentTime, length, scale } =
@@ -7,7 +7,7 @@ export const useMouseEventsAnimation = () => {
   const [isActive, setIsActive] = useState("");
   const [clientX, setClientX] = useState(0);
 
-  const [time, setTime] = useState(currentTime);
+  const [time, setTime] = useState(-1);
 
   useEffect(() => {
     const max = length * 60 * 4 * scale;
@@ -16,12 +16,15 @@ export const useMouseEventsAnimation = () => {
       if (isActive) {
         updateCurrentTime(Math.round(time));
         setIsActive("");
+        setTime(-1);
       }
     };
 
     const onMouseMove = (event: MouseEvent) => {
       const delta = (event.clientX - clientX) / 4 / scale + currentTime;
       if (isActive === "drag") {
+        event.stopPropagation();
+        event.preventDefault();
         if (delta < 0 || delta > max) {
           return;
         }
@@ -37,15 +40,16 @@ export const useMouseEventsAnimation = () => {
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointermove", onMouseMove);
     };
-  }, [clientX, isActive, length, updateCurrentTime, scale, time]);
+  }, [clientX, isActive, length, updateCurrentTime, scale, time, currentTime]);
 
   return {
-    onPointerDown: (event: React.PointerEvent<HTMLDivElement>) => {
+    onPointerDown: useCallback((event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
         setClientX(event.clientX);
         setIsActive("drag");
+        setTime(currentTime);
       }
-    },
+    }, []),
     time,
   };
 };

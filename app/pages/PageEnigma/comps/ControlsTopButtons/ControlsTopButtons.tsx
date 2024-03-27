@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { Button, H4, Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
-import { EngineContext } from "~/contexts/EngineContext";
+import { EngineContext } from "../../contexts/EngineContext";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);

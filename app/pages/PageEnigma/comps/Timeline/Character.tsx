@@ -1,5 +1,5 @@
 import { useCallback, useContext, useMemo } from "react";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { Track } from "~/pages/PageEnigma/comps/Timeline/Track";
 
 function buildUpdaters(
@@ -61,8 +61,9 @@ export const Character = ({ characterId }: Props) => {
       <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
         Character
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <Track
+          id={character.id}
           clips={animationClips}
           title="Animation"
           updateClip={updateClipAnimations}
@@ -70,6 +71,7 @@ export const Character = ({ characterId }: Props) => {
           type="animations"
         />
         <Track
+          id={character.id}
           clips={positionClips}
           title="Character Position/Rotation"
           updateClip={updateClipPosition}
@@ -77,6 +79,7 @@ export const Character = ({ characterId }: Props) => {
           type="positions"
         />
         <Track
+          id={character.id}
           clips={lipSyncClips}
           title="Lipsync Audio Track"
           updateClip={updateClipLipSync}

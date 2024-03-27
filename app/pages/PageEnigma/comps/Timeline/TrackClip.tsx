@@ -1,6 +1,6 @@
 import { useMouseEventsClip } from "./utils/useMouseEventsClip";
-import { BaseClip } from "~/models/track";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { BaseClip } from "~/pages/PageEnigma/models/track";
+import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { useContext, useState } from "react";
 
 interface Props {
@@ -51,7 +51,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           "rounded-l-lg",
           "block h-full",
           clip.id === selectedClip
-            ? "border border-b-2 border-l-2 border-r-0 border-t-2 border-white"
+            ? "border border-b-2 border-l-2 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
         style={{ width: 15, left: offset * 4 * scale, cursor: "w-resize" }}
@@ -63,7 +63,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           ...classes,
           "block h-full",
           clip.id === selectedClip
-            ? "border border-b-2 border-l-0 border-r-0 border-t-2 border-white"
+            ? "border border-b-2 border-l-0 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
         style={{
@@ -80,7 +80,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           "rounded-r-lg",
           "block h-full",
           clip.id === selectedClip
-            ? "border border-b-2 border-l-0 border-r-2 border-t-2 border-white"
+            ? "border border-b-2 border-l-0 border-r-2 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
         style={{
