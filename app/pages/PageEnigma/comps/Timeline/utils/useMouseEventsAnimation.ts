@@ -22,6 +22,8 @@ export const useMouseEventsAnimation = () => {
     const onMouseMove = (event: MouseEvent) => {
       const delta = (event.clientX - clientX) / 4 / scale + currentTime;
       if (isActive === "drag") {
+        event.stopPropagation();
+        event.preventDefault();
         if (delta < 0 || delta > max) {
           return;
         }

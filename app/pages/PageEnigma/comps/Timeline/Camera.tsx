@@ -14,6 +14,7 @@ export const Camera = () => {
       <div className="mb-5 pt-2 text-xs font-medium text-white">Camera</div>
       <div className="flex flex-col gap-2">
         <Track
+          id={camera!.id}
           clips={clips}
           title="Camera Position/Rotation"
           style="camera"

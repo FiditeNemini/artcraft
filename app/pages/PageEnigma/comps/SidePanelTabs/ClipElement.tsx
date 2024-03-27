@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { BaseClip } from "~/models/track";
+import { BaseClip } from "~/pages/PageEnigma/models/track";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 
 interface Props {
@@ -8,8 +8,16 @@ interface Props {
 }
 
 export const ClipElement = ({ clip, type }: Props) => {
-  const { startDrag, dragId, endDrag, scale, canDrop, setCanDrop } =
-    useContext(TrackContext);
+  const {
+    startDrag,
+    dragId,
+    endDrag,
+    scale,
+    canDrop,
+    setCanDrop,
+    overTimeline,
+    dropId,
+  } = useContext(TrackContext);
   const [initPosition, setInitPosition] = useState<{
     initX: number;
     initY: number;
@@ -36,6 +44,8 @@ export const ClipElement = ({ clip, type }: Props) => {
 
     const onMouseMove = (event: MouseEvent) => {
       if (dragId) {
+        event.stopPropagation();
+        event.preventDefault();
         const deltaX = event.clientX - initX;
         const deltaY = event.clientY - initY;
         setCurrPosition({ x: deltaX, y: deltaY });
@@ -55,19 +65,23 @@ export const ClipElement = ({ clip, type }: Props) => {
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
+        const box = document.getElementById(`ani-clip-${clip.id}`);
+        const position = box!.getBoundingClientRect();
+
         startDrag(type, clip.id);
         setCurrPosition({
-          x: 0,
-          y: 0,
+          x: position.x,
+          y: position.y + position.height + 1,
         });
-        setInitPosition({ initY: event.clientY, initX: event.clientX });
+        setInitPosition({
+          initX: position.x,
+          initY: position.y + position.height + 1,
+        });
         setCanDrop(false);
       }
     },
     [type, clip.id, startDrag, setCanDrop],
   );
-
-  // console.log("clip", canDrop);
 
   return (
     <div key={clip.id} className="relative h-16 w-16">
@@ -82,16 +96,17 @@ export const ClipElement = ({ clip, type }: Props) => {
       <div
         id={`ani-dnd-${clip.id}`}
         className={[
-          "absolute h-8 p-2",
+          "absolute p-2",
           "rounded-lg",
           !canDrop ? "bg-brand-primary" : "bg-brand-secondary-700",
           dragId ? "block" : "hidden",
         ].join(" ")}
         style={{
-          top: y,
-          left: x,
+          top: overTimeline ? y + 24 : y,
+          left: overTimeline ? x : x,
           zIndex: 5000,
-          width: clip.length * 4 * scale,
+          width: overTimeline ? clip.length * 4 * scale : 64,
+          height: overTimeline ? 32 : 64,
         }}
         onPointerDown={onPointerDown}
       >

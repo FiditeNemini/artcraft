@@ -1,25 +1,12 @@
 import { useCallback, useRef, useState } from "react";
-import { CharacterGroup } from "~/models/track";
+import { BaseClip, CharacterGroup } from "~/pages/PageEnigma/models/track";
 
 export default function useUpdateCharacters() {
   const [characters, setCharacters] = useState<CharacterGroup[]>([
     {
       id: "CH1",
       muted: false,
-      animationClips: [
-        {
-          id: "CH1-A1",
-          length: 200,
-          offset: 0,
-          name: "ani 1",
-        },
-        {
-          id: "CH1-A2",
-          length: 180,
-          offset: 300,
-          name: "ani 2",
-        },
-      ],
+      animationClips: [],
       positionClips: [
         {
           id: "CH1-P1",
@@ -120,6 +107,70 @@ export default function useUpdateCharacters() {
     [],
   );
 
+  const addCharacterAnimation = useCallback(
+    ({
+      clipId,
+      characterId,
+      animationClips,
+      offset,
+    }: {
+      clipId: string;
+      characterId: string;
+      animationClips: BaseClip[];
+      offset: number;
+    }) => {
+      const clip = animationClips.find((row) => row.id === clipId);
+      if (!clip) {
+        return;
+      }
+
+      setCharacters((oldCharacters) => {
+        return oldCharacters.map((character) => {
+          if (character.id !== characterId) {
+            return { ...character };
+          }
+          return {
+            ...character,
+            animationClips: [...character.animationClips, { ...clip, offset }],
+          };
+        });
+      });
+    },
+    [],
+  );
+
+  const addCharacterAudio = useCallback(
+    ({
+      clipId,
+      characterId,
+      audioClips,
+      offset,
+    }: {
+      clipId: string;
+      characterId: string;
+      audioClips: BaseClip[];
+      offset: number;
+    }) => {
+      const clip = audioClips.find((row) => row.id === clipId);
+      if (!clip) {
+        return;
+      }
+
+      setCharacters((oldCharacters) => {
+        return oldCharacters.map((character) => {
+          if (character.id !== characterId) {
+            return { ...character };
+          }
+          return {
+            ...character,
+            lipSyncClips: [...character.lipSyncClips, { ...clip, offset }],
+          };
+        });
+      });
+    },
+    [],
+  );
+
   const toggleLipSyncMute = useCallback((characterId: string) => {
     setCharacters((oldCharacters) => {
       return oldCharacters.map((character) => ({
@@ -130,9 +181,34 @@ export default function useUpdateCharacters() {
     });
   }, []);
 
+  const selectCharacterClip = useCallback((clipId: string) => {
+    setCharacters((oldCharacters) => {
+      return [
+        ...oldCharacters.map((character) => ({
+          ...character,
+          animationClips: character.animationClips.map((clip) => ({
+            ...clip,
+            selected: clip.id === clipId ? !clip.selected : clip.selected,
+          })),
+          positionClips: character.positionClips.map((clip) => ({
+            ...clip,
+            selected: clip.id === clipId ? !clip.selected : clip.selected,
+          })),
+          lipSyncClips: character.lipSyncClips.map((clip) => ({
+            ...clip,
+            selected: clip.id === clipId ? !clip.selected : clip.selected,
+          })),
+        })),
+      ];
+    });
+  }, []);
+
   return {
     characters,
     updateCharacters,
     toggleLipSyncMute,
+    addCharacterAnimation,
+    addCharacterAudio,
+    selectCharacterClip,
   };
 }

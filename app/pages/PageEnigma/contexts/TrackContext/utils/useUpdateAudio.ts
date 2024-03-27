@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { AudioGroup } from "~/models/track";
+import { AudioGroup, BaseClip } from "~/pages/PageEnigma/models/track";
 
 export default function useUpdateAudio() {
   const [audio, setAudio] = useState<AudioGroup>({
@@ -49,6 +49,23 @@ export default function useUpdateAudio() {
     [],
   );
 
+  const addGlobalAudio = useCallback(
+    (dragId: string, audioClips: BaseClip[]) => {
+      const clip = audioClips.find((row) => row.id === dragId);
+      if (!clip) {
+        return;
+      }
+
+      setAudio((oldAudio) => {
+        return {
+          ...oldAudio,
+          clips: [...oldAudio.clips, clip],
+        };
+      });
+    },
+    [],
+  );
+
   const toggleAudioMute = useCallback(() => {
     setAudio((oldAudio) => {
       return {
@@ -58,9 +75,27 @@ export default function useUpdateAudio() {
     });
   }, []);
 
+  const selectAudioClip = useCallback((clipId: string) => {
+    setAudio((oldAudio) => {
+      return {
+        ...oldAudio,
+        clips: [
+          ...oldAudio.clips.map((clip) => {
+            return {
+              ...clip,
+              selected: clip.id === clipId ? !clip.selected : clip.selected,
+            };
+          }),
+        ],
+      };
+    });
+  }, []);
+
   return {
     audio,
     updateAudio,
     toggleAudioMute,
+    selectAudioClip,
+    addGlobalAudio,
   };
 }

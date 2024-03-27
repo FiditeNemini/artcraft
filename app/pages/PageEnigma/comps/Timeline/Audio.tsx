@@ -17,11 +17,12 @@ export const Audio = () => {
       </div>
       <div className="flex flex-col gap-2">
         <Track
+          id={audio!.id}
           clips={clips}
           title="Global Audio Track"
           updateClip={updateAudio}
           style="audio"
-          muted={audio?.muted}
+          muted={audio!.muted}
           toggleMute={toggleAudioMute}
         />
       </div>

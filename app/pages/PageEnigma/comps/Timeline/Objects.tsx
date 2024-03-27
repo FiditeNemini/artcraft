@@ -16,6 +16,7 @@ export const Objects = () => {
       {objects.objects.map((object) => (
         <div key={object.id} className="flex flex-col gap-2">
           <Track
+            id={object.id}
             clips={object.clips}
             title="Mask Position/Rotation"
             updateClip={updateObject}

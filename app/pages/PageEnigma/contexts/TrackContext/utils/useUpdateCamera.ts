@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { CameraGroup } from "~/models/track";
+import { CameraGroup } from "~/pages/PageEnigma/models/track";
 
 export default function useUpdateCamera() {
   const [camera, setCamera] = useState<CameraGroup>({
@@ -48,8 +48,25 @@ export default function useUpdateCamera() {
     [],
   );
 
+  const selectCameraClip = useCallback((clipId: string) => {
+    setCamera((oldCamera) => {
+      return {
+        ...oldCamera,
+        clips: [
+          ...oldCamera.clips.map((clip) => {
+            return {
+              ...clip,
+              selected: clip.id === clipId ? !clip.selected : clip.selected,
+            };
+          }),
+        ],
+      };
+    });
+  }, []);
+
   return {
     camera,
     updateCamera,
+    selectCameraClip,
   };
 }
