@@ -1,6 +1,10 @@
-import { ReactNode, useEffect, useRef, useState } from "react";
-import { EngineContext } from "./EngineContext";
+import { ReactNode, useContext, useEffect, useState } from "react";
+
 import Editor from "~/pages/PageEnigma/js/editor";
+
+import { EngineContext } from "./EngineContext";
+import { AppUiContext } from "./AppUiContext";
+
 
 interface Props {
   children: ReactNode;
@@ -8,23 +12,38 @@ interface Props {
 
 export const EngineProvider = ({ children }: Props) => {
   const [editor, setEditor] = useState<Editor | null>(null);
+  const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
 
   useEffect(() => {
     //componentDidMount
-    if (editor !== null) {
-      console.warn("Editor Engine already exist");
-    } else if (document.getElementById("video-scene") === null) {
+    if (document.getElementById("video-scene") === null) {
       console.error(
-        'Editor Engine need a target cavas with the id "video-scene"',
+        'Editor Engine need a target canvas with the id "video-scene"',
       );
-    } else {
-      const editor = new Editor();
-      editor.initialize();
-      setEditor(editor);
+    } else { 
+      setEditor((curr)=>{
+        if(curr!==null){
+          console.warn("Editor Engine already exist");
+          return curr;
+        }else{
+          return new Editor();
+        }
+      });
     }
   }, []);
 
+  useEffect(()=>{
+    if (editor && editor.can_initailize && dispatchAppUiState!==null){
+      console.log("initializing Editor");
+      editor.initialize({
+        dispatchAppUiState
+      });
+    }
+  }, [editor, dispatchAppUiState]);
+
   return (
-    <EngineContext.Provider value={editor}>{children}</EngineContext.Provider>
+    <EngineContext.Provider value={editor}>
+      {children}
+    </EngineContext.Provider>
   );
 };
