@@ -20,7 +20,7 @@ export const Tabs = ({ tabs: tabProps }: { tabs: TabType[] }) => {
 
   return (
     <div className="w-full max-w-md px-2 sm:px-0">
-      <Tab.Group>
+      <Tab.Group defaultIndex={3}>
         <Tab.List className="flex">
           {tabs.map((tab, idx) => (
             <Tab
