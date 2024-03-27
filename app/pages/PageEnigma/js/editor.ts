@@ -12,17 +12,16 @@ import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
 import { TimeLine, TimelineDataState } from "./timeline.js";
 import { ClipUI } from "../datastructures/clips/clip_offset.js";
 
-import { LipSync } from "./lipsync.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
-import { faL } from "@fortawesome/pro-solid-svg-icons";
+import { Context } from "react";
+
 
 class EditorState {
   // {
@@ -87,6 +86,8 @@ class Editor {
 
   current_scene_token: string | null;
   can_initialize: boolean;
+
+  dispatchAppUiState: any; // todo figure out the type
   // Default params.
   constructor() {
     console.log(
@@ -165,6 +166,9 @@ class Editor {
     this.test_scene_load_media_id = ""; // Test media id for saving and loading.
 
     this.current_scene_token = null;
+
+
+    this.dispatchAppUiState = null;
   }
 
   // Initializes the main scene and ThreeJS essentials.
@@ -221,6 +225,9 @@ class Editor {
 
     // saving state of the scene
     this.current_scene_token = null;
+    
+    //setup reactland Callbacks
+    this.dispatchAppUiState = config.dispatchAppUiState
   }
 
   // Token comes in from the front end to load the scene from the site.
@@ -254,6 +261,16 @@ class Editor {
       this.scene_file_token,
       new TimelineDataState(),
     );
+
+    this.dispatchAppUiState({
+      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+    });
+    setInterval(()=> {
+      this.dispatchAppUiState({
+        type: ACTION_TYPES.HIDE_EDITOR_LOADER
+      });
+    },4000)
+
     // dispatch call wil's engine.
   }
 
