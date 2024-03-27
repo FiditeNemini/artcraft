@@ -9,7 +9,7 @@ export const ControlsTopButtons = () => {
 
   const handleButtonSave = () => {
     console.log(`SceneName is ${sceneName}`);
-    // editorEngine?.save();
+    editorEngine?.save();
   };
 
   const handleButtonCameraView = () => {
@@ -24,7 +24,7 @@ export const ControlsTopButtons = () => {
   };
   const handleButtonRender = () => {
     console.log("Saving GLB to server for reference");
-    editorEngine._upload_for_testing();
+    editorEngine?._upload_for_testing();
     //editorEngine?.togglePlayback();
   };
   const handleButtonPlay = () => {};

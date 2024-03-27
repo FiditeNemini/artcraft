@@ -22,6 +22,7 @@ import { LipSync } from "./lipsync.js";
 import { LipSyncEngine } from "./lip_sync_engine.ts";
 import { AnimationEngine } from "./animation_engine.ts";
 import { faL } from "@fortawesome/pro-solid-svg-icons";
+import { ACTION_TYPES } from "../reducer/types.js";
 
 if (typeof window !== "undefined") {
   import("ccapture.js")
@@ -117,7 +118,12 @@ class Editor {
   }
 
   // Initializes the main scene and ThreeJS essentials.
-  initialize() {
+  /*
+    config :{
+      appUiDispatcher: dispatch function to react app
+    }
+  */
+  initialize(config) {
     if (this.can_initailize == false) {
       return;
     }
@@ -164,6 +170,8 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
+    // setup Callbacks to ReactLand
+    this.appUiDispatcher = config.appUiDispatcher;
     this._test_demo()
   }
 
@@ -377,6 +385,9 @@ class Editor {
     //this.audio_engine.playClip("m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg");
     //console.log(this.selected);
 
+    this.appUiDispatcher({
+      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+    });
     if (this.selected == null) {
       return;
     }
