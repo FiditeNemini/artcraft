@@ -7,16 +7,21 @@ type ViewModes = VIEW_MODES.EDITOR | VIEW_MODES.SIDE_BY_SIDE;
 
 export type State = {
   viewMode: ViewModes;
-  timelineHeight: number
+  timelineHeight: number;
+  showEditorLoader: boolean;
 };
 
 
 export enum ACTION_TYPES {
   ON_TIMELINE_RESIZE = "on_timeline_resize",
-  ON_CHANGE_VIEW_MODE = "on_change_view_mode"
+  ON_CHANGE_VIEW_MODE = "on_change_view_mode",
+  SHOW_EDITOR_LOADER = "show_editor_loader",
+  HIDE_EDITOR_LOADER = "hide_editor_loader",
 };
 
 export type Action = 
+  | {type: ACTION_TYPES.SHOW_EDITOR_LOADER,}
+  | {type: ACTION_TYPES.HIDE_EDITOR_LOADER,}
   | {
       type: ACTION_TYPES.ON_TIMELINE_RESIZE, 
       payload: {
@@ -28,4 +33,5 @@ export type Action =
     payload: {
       viewMode: ViewModes
     }
-  };
+  }
+  ;

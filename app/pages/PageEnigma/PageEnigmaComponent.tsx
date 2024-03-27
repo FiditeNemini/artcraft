@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useReducer } from "react";
+import { useEffect, useRef, useReducer } from "react";
 
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
@@ -22,34 +22,11 @@ export const PageEnigmaComponent = () => {
   const [appUiState, dispatchAppUiState] = useReducer(reducer, initialState);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const timelineRef = useRef<HTMLDivElement | null>(null);
-
-  const updateTimelineHeight = useCallback(() => {
-    if (timelineRef.current) {
-      dispatchAppUiState({
-        type: ACTION_TYPES.ON_TIMELINE_RESIZE,
-        payload: {
-          timelineHeight: timelineRef.current.offsetHeight
-        }
-      })
-    }
-  }, []);
-
-  //for updating timeline/engine div height (for resizing)
-  useEffect(() => {
-    const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        updateTimelineHeight();
-      }
-    });
-
-    if (timelineRef.current) {
-      observer.observe(timelineRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [updateTimelineHeight]);
-
+  useEffect(()=>{
+    setTimeout(()=>dispatchAppUiState({
+      type: ACTION_TYPES.HIDE_EDITOR_LOADER
+    }), 3000);
+  },[]);
   return (
     <div>
       <TopBarHelmet>
@@ -93,6 +70,11 @@ export const PageEnigmaComponent = () => {
                   appUiState.viewMode === VIEW_MODES.SIDE_BY_SIDE &&
                   <ViewSideBySide />
                 }
+                <LoadingDotsBricks
+                  className="absolute top-0 left-0"
+                  show={appUiState.showEditorLoader}
+                  transition
+                />
               </div>
               
               {/* Side panel */}
