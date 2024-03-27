@@ -53,7 +53,7 @@ class APIManager {
     let uuid = uuidv4();
 
     // turn json into a blob
-    const file_test = {"glb_media_file_id":uuid,"entities":[], "timeline":""}
+    const file_test = {"glb_media_file_id":media_file_token,"entities":[], "timeline":""}
     const json = JSON.stringify(file_test);
     const blob = new Blob([json], {type: 'application/json'});
     const fileName = `${uuid}.json`;
