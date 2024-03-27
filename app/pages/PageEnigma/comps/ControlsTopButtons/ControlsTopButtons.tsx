@@ -20,7 +20,9 @@ export const ControlsTopButtons = () => {
     editorEngine?.start_playback();
   };
   const handleButtonLoad = () => {
-    document.getElementById("load-upload")?.click();
+    //document.getElementById("load-upload")?.click();
+    if(editorEngine == null) {return;}
+    editorEngine._load_for_testing();
   };
   const handleButtonRender = () => {
     console.log("Saving GLB to server for reference");

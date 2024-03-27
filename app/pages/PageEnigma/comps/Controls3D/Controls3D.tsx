@@ -48,7 +48,7 @@ export const Controls3D = () => {
     if (!editorEngine) {
       return;
     }
-    editorEngine.change_mode("transform");
+    editorEngine.change_mode("translate");
   };
   const handleRotateArrows = () => {
     if (!editorEngine) {
