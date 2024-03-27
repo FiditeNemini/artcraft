@@ -5,13 +5,19 @@ export function reducer(state: State, action: Action): State {
     case ACTION_TYPES.SHOW_EDITOR_LOADER:{
       return{
         ...state,
-        showEditorLoader: true,
+        showEditorLoader: {
+          isShow: true,
+          message: action.payload?.showEditorLoader.message || undefined,
+        },
       }
     }
     case ACTION_TYPES.HIDE_EDITOR_LOADER:{
       return{
         ...state,
-        showEditorLoader: false,
+        showEditorLoader: {
+          isShow: false,
+          message: state.showEditorLoader.message
+        },
       }
     }
     case ACTION_TYPES.ON_TIMELINE_RESIZE:{
