@@ -73,6 +73,9 @@ pub struct MediaFilesByBatchListItem {
 
   pub creator_set_visibility: Visibility,
 
+  /// The name or title of the media file (optional)
+  pub maybe_title: Option<String>,
+
   /// Text transcripts for TTS, etc.
   pub maybe_text_transcript: Option<String>,
 
@@ -211,6 +214,7 @@ pub async fn list_media_files_by_batch_token_handler(
             .get_full_object_path_str()
             .to_string(),
         creator_set_visibility: record.creator_set_visibility,
+        maybe_title: record.maybe_title,
         maybe_text_transcript: record.maybe_text_transcript,
         stats: SimpleEntityStats {
           positive_rating_count: record.maybe_ratings_positive_count.unwrap_or(0),

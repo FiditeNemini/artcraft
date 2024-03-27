@@ -93,6 +93,9 @@ pub struct BatchMediaFileInfo {
 
   pub creator_set_visibility: Visibility,
 
+  /// The name or title of the media file (optional)
+  pub maybe_title: Option<String>,
+
   /// Text transcripts for TTS, etc.
   pub maybe_text_transcript: Option<String>,
 
@@ -274,6 +277,7 @@ pub async fn batch_get_media_files_handler(
           maybe_engine_extension,
           maybe_batch_token: result.maybe_batch_token,
           public_bucket_path,
+          maybe_title: result.maybe_title,
           maybe_text_transcript: result.maybe_text_transcript,
           maybe_model_weight_info: match result.maybe_model_weights_token {
             None => None,

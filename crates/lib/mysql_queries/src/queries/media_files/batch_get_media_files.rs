@@ -38,6 +38,7 @@ pub struct MediaFile {
 
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
+  pub maybe_title: Option<String>,
   pub maybe_text_transcript: Option<String>,
 
   pub maybe_origin_filename: Option<String>,
@@ -103,6 +104,7 @@ pub struct MediaFileRaw {
 
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
+  pub maybe_title: Option<String>,
   pub maybe_text_transcript: Option<String>,
 
   pub maybe_origin_filename: Option<String>,
@@ -193,6 +195,7 @@ pub async fn batch_get_media_files(
         media_class: record.media_class,
         maybe_media_subtype: record.maybe_media_subtype,
         maybe_batch_token: record.maybe_batch_token,
+        maybe_title: record.maybe_title,
         maybe_text_transcript: record.maybe_text_transcript,
         maybe_origin_filename: record.maybe_origin_filename,
         maybe_creator_user_token: record.maybe_creator_user_token,
@@ -240,6 +243,7 @@ SELECT
 
     m.maybe_batch_token,
 
+    m.maybe_title,
     m.maybe_text_transcript,
 
     m.maybe_origin_filename,
@@ -310,6 +314,7 @@ impl FromRow<'_, MySqlRow> for MediaFileRaw {
 
       maybe_batch_token: BatchGenerationToken::try_from_mysql_row_nullable(row, "maybe_batch_token")?,
 
+      maybe_title: row.try_get("maybe_title")?,
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       maybe_origin_filename: row.try_get("maybe_origin_filename")?,
       maybe_creator_user_token: UserToken::try_from_mysql_row_nullable(row, "maybe_creator_user_token")?,
