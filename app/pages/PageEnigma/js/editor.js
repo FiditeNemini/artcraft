@@ -22,7 +22,7 @@ import { LipSync } from "./lipsync.js";
 import { LipSyncEngine } from "./lip_sync_engine.ts";
 import { AnimationEngine } from "./animation_engine.ts";
 import { faL } from "@fortawesome/pro-solid-svg-icons";
-import { ACTION_TYPES } from "../reducer/types.js";
+import { ACTION_TYPES } from "../reducer";
 
 if (typeof window !== "undefined") {
   import("ccapture.js")
@@ -115,18 +115,22 @@ class Editor {
     this.test_box_uuid = null;
     this.current_frame = 0;
     this.test_playback = false;
+
+    //Reactland Callbacks
+    this.dispatchAppUiState = null;
   }
 
   // Initializes the main scene and ThreeJS essentials.
   /*
     config :{
-      appUiDispatcher: dispatch function to react app
+      dispatchAppUiState: dispatch function to react app
     }
   */
   initialize(config) {
     if (this.can_initailize == false) {
       return;
     }
+    this.can_initailize == false;
     // Gets the canvas.
     this.canvReference = document.getElementById("video-scene");
     // Base width and height.
@@ -170,8 +174,8 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
-    // setup Callbacks to ReactLand
-    this.appUiDispatcher = config.appUiDispatcher;
+    //setup reactland Callbacks
+    this.dispatchAppUiState = config.dispatchAppUiState
     this._test_demo()
   }
 
@@ -385,9 +389,10 @@ class Editor {
     //this.audio_engine.playClip("m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg");
     //console.log(this.selected);
 
-    this.appUiDispatcher({
+    this.dispatchAppUiState({
       type: ACTION_TYPES.SHOW_EDITOR_LOADER
     });
+
     if (this.selected == null) {
       return;
     }

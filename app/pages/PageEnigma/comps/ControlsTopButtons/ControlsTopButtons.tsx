@@ -47,7 +47,10 @@ export const ControlsTopButtons = () => {
           onClick: handleButtonSave,
         }}
       >
-        <Input label="Please Enter a name for your scene" />
+        <Input
+          label="Please Enter a name for your scene"
+          onChange={(e)=>{setSceneName(e.target.value)}}
+        />
       </ButtonDialogue>
 
       <ButtonDialogue
