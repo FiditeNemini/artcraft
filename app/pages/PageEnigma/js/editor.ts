@@ -12,16 +12,13 @@ import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
-
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
 import { TimeLine, TimelineDataState } from "./timeline.js";
 import { ClipUI } from "../datastructures/clips/clip_offset.js";
-
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
-import { Context } from "react";
-
+import { ACTION_TYPES } from "../reducer";
 
 class EditorState {
   // {
@@ -80,24 +77,23 @@ class Editor {
   animation_engine: AnimationEngine;
   timeline: TimeLine;
   current_frame: number;
-  test_scene_load_media_id: string;
-  scene_file_token: any;
+
+
   renderPass: RenderPass | undefined;
 
-  current_scene_token: string | null;
+  current_scene_media_token_id: string | null;
   can_initialize: boolean;
-
   dispatchAppUiState: any; // todo figure out the type
   // Default params.
   constructor() {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
     );
-    // Special fix
+
+    // Special async react lifecycle fix
     // For making sure the editor only gets created onece.
     this.can_initialize = false;
     let one_element = document.getElementById("created-one-element");
-    //if (one_element != null) { return; }
     this.can_initialize = true;
     let newElement = document.createElement("div");
     newElement.id = "created-one-element";
@@ -105,7 +101,7 @@ class Editor {
     // life cycle fix
 
     // Version and name.
-    this.version = 0.1;
+    this.version = 1.0;
     // Clock, scene and camera essentials.
     this.activeScene = new Scene("" + this.version);
     this.activeScene.initialize();
@@ -162,16 +158,9 @@ class Editor {
     );
 
     this.current_frame = 0;
-
-    this.test_scene_load_media_id = ""; // Test media id for saving and loading.
-
-    this.current_scene_token = null;
-
-
+    this.current_scene_media_token_id = null;
     this.dispatchAppUiState = null;
   }
-
-  // Initializes the main scene and ThreeJS essentials.
 
   initialize(config:any) {
     if (this.can_initialize == false) {
@@ -224,20 +213,21 @@ class Editor {
     this._test_demo();
 
     // saving state of the scene
-    this.current_scene_token = null;
-    
+    this.current_scene_media_token_id = null;
     //setup reactland Callbacks
     this.dispatchAppUiState = config.dispatchAppUiState
   }
 
   // Token comes in from the front end to load the scene from the site.
   public async loadScene(scene_token: string) {
+
     if (scene_token != null) {
-      this.current_scene_token = scene_token;
+      this.current_scene_media_token_id = scene_token;
     }
     const scene = await this.api_manager.loadSceneState(
-      this.current_scene_token,
+      this.current_scene_media_token_id,
     );
+
     this.activeScene.scene.children = scene.children;
 
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
@@ -255,23 +245,25 @@ class Editor {
   }
 
   public async saveScene(name: string) {
-    const result = await this.api_manager.saveSceneState(
-      this.activeScene.scene,
-      name,
-      this.scene_file_token,
-      new TimelineDataState(),
-    );
-
     this.dispatchAppUiState({
       type: ACTION_TYPES.SHOW_EDITOR_LOADER
     });
-    setInterval(()=> {
-      this.dispatchAppUiState({
-        type: ACTION_TYPES.HIDE_EDITOR_LOADER
-      });
-    },4000)
 
-    // dispatch call wil's engine.
+    const result = await this.api_manager.saveSceneState(
+      this.activeScene.scene,
+      name,
+      this.current_scene_media_token_id,
+      new TimelineDataState(),
+    )
+
+    const scene_media_token_id = result.data["scene_media_token_id"]
+    if (scene_media_token_id != null) {
+      this.current_scene_media_token_id = scene_media_token_id
+    }
+
+    this.dispatchAppUiState({
+        type: ACTION_TYPES.HIDE_EDITOR_LOADER
+    });
   }
 
   // uploading some objects for testing to get their media ids from my account.

@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from "uuid";
-import { Scene } from "../datastructures/scene/scene_object";
 import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
@@ -13,11 +12,11 @@ import { TimelineDataState } from "./timeline";
 /**
  * This is designed to surface user customer facing messages as errors.
  */
-type Tokens = { [key: string]: string };
+type Data = { [key: string]: string };
 class APIManagerResponseSuccess {
   public user_message:String
-  public data:Tokens | null
-  constructor(user_message:String = "", data:Tokens | null = null) {
+  public data:Data | null
+  constructor(user_message:String = "", data:Data | null = null) {
     this.data = data 
     this.user_message = user_message
   }
