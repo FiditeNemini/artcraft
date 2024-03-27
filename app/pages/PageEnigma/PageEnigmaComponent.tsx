@@ -1,8 +1,8 @@
-import { useEffect, useRef, useReducer } from "react";
+import { useEffect, useReducer } from "react";
 
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
-import { Button, LoadingDotsBricks } from "~/components";
+import { Button, LoadingDots } from "~/components";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
 import { SidePanel } from "~/modules/SidePanel";
 import { Controls3D } from "./comps/Controls3D";
@@ -20,21 +20,21 @@ import { ViewSideBySide } from "./comps/ViewSideBySide";
 
 export const PageEnigmaComponent = () => {
   const [appUiState, dispatchAppUiState] = useReducer(reducer, initialState);
-
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  
   useEffect(()=>{
     setTimeout(()=>dispatchAppUiState({
       type: ACTION_TYPES.HIDE_EDITOR_LOADER
     }), 500);
   },[]);
+
   return (
     <div>
       <TopBarHelmet>
         <Button icon={faSparkles}>Generate Movie</Button>
       </TopBarHelmet>
       
-      <EngineProvider>
-        <AppUIProvider value={[appUiState, dispatchAppUiState]} >
+      <AppUIProvider value={[appUiState, dispatchAppUiState]} >
+        <EngineProvider>
           <div style={{ height: "calc(100vh - 68px)" }}>
             {/* Engine section/side panel */}
             <div
@@ -46,7 +46,6 @@ export const PageEnigmaComponent = () => {
               <div className="relative w-full overflow-hidden bg-transparent">
                 <div className={(appUiState.viewMode === VIEW_MODES.SIDE_BY_SIDE) ? 'invisible' : ''}>
                   <canvas
-                    ref={canvasRef}
                     id="video-scene"
                     width="1280px"
                     height="720px"
@@ -70,9 +69,11 @@ export const PageEnigmaComponent = () => {
                   appUiState.viewMode === VIEW_MODES.SIDE_BY_SIDE &&
                   <ViewSideBySide />
                 }
-                <LoadingDotsBricks
+                <LoadingDots
                   className="absolute top-0 left-0"
-                  show={appUiState.showEditorLoader}
+                  show={appUiState.showEditorLoader.isShow}
+                  type="bricks"
+                  message={appUiState.showEditorLoader.message}
                   transition
                 />
               </div>
@@ -86,8 +87,8 @@ export const PageEnigmaComponent = () => {
             {/* Timeline */}
             <Timeline timelineHeight={appUiState.timelineHeight} />
           </div>
-        </AppUIProvider>
-      </EngineProvider>
+        </EngineProvider>
+      </AppUIProvider>
     </div>
   );
 };
