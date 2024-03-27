@@ -6,6 +6,7 @@ import { Input } from "./Input";
 import { H4 } from "./H4";
 import { ItemPicker } from "./ItemPicker";
 import { Textarea } from "./Textarea";
+import { LoadingBar } from "./LoadingBar";
 import { LoadingDots, LoadingDotsBricks, LoadingDotsTyping } from "./LoadingDots";
 
 export {
@@ -17,6 +18,7 @@ export {
   ItemPicker,
   Textarea,
   Input,
+  LoadingBar,
   LoadingDots,
   LoadingDotsBricks,
   LoadingDotsTyping,

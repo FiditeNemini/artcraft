@@ -26,7 +26,7 @@ export const LoadingDotsTyping = (props: LoadingDotsProps)=>{
 }
 export const LoadingDotsBricks = (props: LoadingDotsProps)=>{
   return (
-    <LoadingDots {...props} />
+    <LoadingDots {...props} type="bricks"/>
   )
 }
 
