@@ -1,28 +1,28 @@
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { TransformControls } from "three/addons/controls/TransformControls.js";
-import Scene from "./scene.js";
-import APIManager from "./api_manager.js";
-import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
-import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
-import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
-import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
-import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
-import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
-import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
-import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import * as THREE from "three"
+import { OrbitControls } from "three/addons/controls/OrbitControls.js"
+import { TransformControls } from "three/addons/controls/TransformControls.js"
+import Scene from "./scene.js"
+import APIManager from "./api_manager.js"
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js"
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js"
+import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js"
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js"
+import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js"
+import { SAOPass } from "three/addons/postprocessing/SAOPass.js"
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js"
+import { BokehPass } from "three/addons/postprocessing/BokehPass.js"
+import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg"
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
-import AudioEngine from "./audio_engine.js";
-import TransformEngine from "./transform_engine.js";
-import { TimeLine, TimelineDataState } from "./timeline.js";
-import { ClipUI } from "../datastructures/clips/clip_offset.js";
+import AudioEngine from "./audio_engine.js"
+import TransformEngine from "./transform_engine.js"
+import { TimeLine, TimelineDataState } from "./timeline.js"
+import { ClipUI } from "../datastructures/clips/clip_offset.js"
 
-import { LipSync } from "./lipsync.js";
-import { LipSyncEngine } from "./lip_sync_engine.js";
-import { AnimationEngine } from "./animation_engine.js";
-import { faL } from "@fortawesome/pro-solid-svg-icons";
+import { LipSync } from "./lipsync.js"
+import { LipSyncEngine } from "./lip_sync_engine.js"
+import { AnimationEngine } from "./animation_engine.js"
+import { faL } from "@fortawesome/pro-solid-svg-icons"
 
 class EditorState {
 
@@ -32,115 +32,116 @@ class EditorState {
   //   data: { "message" : "saving scene" }
   // }
 
-  selected_object: THREE.Object3D | undefined;
-  is_loading: boolean;
+  selected_object: THREE.Object3D | undefined
+  is_loading: boolean
 
   constructor() {
-    this.selected_object;
-    this.is_loading = false;
+    this.selected_object
+    this.is_loading = false
   }
 }
-// Main editor class that will call everything else all you need to call is " initialize(); ".
+// Main editor class that will call everything else all you need to call is " initialize() ".
 class Editor {
-  version: number;
-  activeScene: Scene;
-  camera: any;
-  renderer: THREE.WebGLRenderer | undefined;
-  clock: THREE.Clock | undefined;
-  canvReference: any;
-  composer: EffectComposer | undefined;
-  effectFXAA: EffectComposer | undefined;
-  outlinePass: OutlinePass | undefined;
-  last_cam_pos: THREE.Vector3 | undefined;
-  saoPass: SAOPass | undefined;
-  outputPass: OutlinePass | undefined;
-  bloomPass: UnrealBloomPass | undefined;
-  smaaPass: SMAAPass | undefined;
-  bokehPass: BokehPass | undefined;
-  control: TransformControls | undefined;
-  raycaster: THREE.Raycaster | undefined;
-  mouse: THREE.Vector2 | undefined;
-  selected: THREE.Object3D | undefined;
-  last_selected: THREE.Object3D | undefined;
-  transform_interaction: any;
-  rendering: boolean;
-  api_manager: APIManager;
-  stats: any;
-  orbit: OrbitControls | undefined;
-  locked: boolean;
-  capturer: any;
-  frame_buffer: any;
-  render_timer: number;
-  fps_number: number;
-  cap_fps: number;
-  playback: boolean;
-  playback_location: number;
-  max_length: number;
-  audio_engine: AudioEngine;
-  transform_engine: TransformEngine;
-  lipsync_engine: LipSyncEngine;
-  animation_engine: AnimationEngine;
-  timeline: TimeLine;
-  current_frame: number;
-  test_scene_load_media_id: string;
-  scene_file_token: any;
-  renderPass: RenderPass | undefined;
+  version: number
+  activeScene: Scene
+  camera: any
+  renderer: THREE.WebGLRenderer | undefined
+  clock: THREE.Clock | undefined
+  canvReference: any
+  composer: EffectComposer | undefined
+  effectFXAA: EffectComposer | undefined
+  outlinePass: OutlinePass | undefined
+  last_cam_pos: THREE.Vector3 | undefined
+  saoPass: SAOPass | undefined
+  outputPass: OutlinePass | undefined
+  bloomPass: UnrealBloomPass | undefined
+  smaaPass: SMAAPass | undefined
+  bokehPass: BokehPass | undefined
+  control: TransformControls | undefined
+  raycaster: THREE.Raycaster | undefined
+  mouse: THREE.Vector2 | undefined
+  selected: THREE.Object3D | undefined
+  last_selected: THREE.Object3D | undefined
+  transform_interaction: any
+  rendering: boolean
+  api_manager: APIManager
+  stats: any
+  orbit: OrbitControls | undefined
+  locked: boolean
+  capturer: any
+  frame_buffer: any
+  render_timer: number
+  fps_number: number
+  cap_fps: number
+  playback: boolean
+  playback_location: number
+  max_length: number
+  audio_engine: AudioEngine
+  transform_engine: TransformEngine
+  lipsync_engine: LipSyncEngine
+  animation_engine: AnimationEngine
+  timeline: TimeLine
+  current_frame: number
+  test_scene_load_media_id: string
+  scene_file_token: any
+  renderPass: RenderPass | undefined
 
+  current_scene_token: string | null
 
   // Default params.
   constructor() {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
-    );
+    )
 
     // Version and name.
-    this.version = 0.1;
+    this.version = 0.1
     // Clock, scene and camera essentials.
-    this.activeScene = new Scene("" + this.version);
-    this.activeScene.initialize();
-    this.camera;
-    this.renderer;
-    this.clock;
-    this.canvReference = null;
-    this.composer;
-    this.effectFXAA;
-    this.outlinePass;
-    this.last_cam_pos;
-    this.saoPass;
-    this.outputPass;
-    this.bloomPass;
-    this.smaaPass;
-    this.bokehPass;
+    this.activeScene = new Scene("" + this.version)
+    this.activeScene.initialize()
+    this.camera
+    this.renderer
+    this.clock
+    this.canvReference = null
+    this.composer
+    this.effectFXAA
+    this.outlinePass
+    this.last_cam_pos
+    this.saoPass
+    this.outputPass
+    this.bloomPass
+    this.smaaPass
+    this.bokehPass
     // Transform control and selection.
-    this.control;
-    this.raycaster;
-    this.mouse;
-    this.selected;
-    this.last_selected;
-    this.transform_interaction;
-    this.rendering = false;
+    this.control
+    this.raycaster
+    this.mouse
+    this.selected
+    this.last_selected
+    this.transform_interaction
+    this.rendering = false
     // API.
-    this.api_manager = new APIManager();
+    this.api_manager = new APIManager()
     // Debug & Movement.
-    this.stats = null;
-    this.orbit;
-    this.locked = false;
+    this.stats = null
+    this.orbit
+    this.locked = false
     // Recording params.
-    this.capturer = null;
-    this.frame_buffer = [];
-    this.render_timer = 0;
-    this.fps_number = 60;
-    this.cap_fps = 60;
+    this.capturer = null
+    this.frame_buffer = []
+    this.render_timer = 0
+    this.fps_number = 60
+    this.cap_fps = 60
     // Timeline settings.
-    this.playback = false;
-    this.playback_location = 0;
-    this.max_length = 10;
+    this.playback = false
+    this.playback_location = 0
+    this.max_length = 10
     // Audio Engine Test.
 
-    this.audio_engine = new AudioEngine();
-    this.transform_engine = new TransformEngine(this.version);
-    this.lipsync_engine = new LipSyncEngine();
-    this.animation_engine = new AnimationEngine(this.version);
+    this.audio_engine = new AudioEngine()
+    this.transform_engine = new TransformEngine(this.version)
+    this.lipsync_engine = new LipSyncEngine()
+    this.animation_engine = new AnimationEngine(this.version)
 
     this.timeline = new TimeLine(
       this.audio_engine,
@@ -148,85 +149,89 @@ class Editor {
       this.lipsync_engine,
       this.animation_engine,
       this.activeScene,
-    );
+    )
 
-    this.current_frame = 0;
+    this.current_frame = 0
 
-    this.test_scene_load_media_id = ""; // Test media id for saving and loading.
+    this.test_scene_load_media_id = "" // Test media id for saving and loading.
+
+    this.current_scene_token = null
   }
 
   // Initializes the main scene and ThreeJS essentials.
   initialize() {
     // Gets the canvas.
-    this.canvReference = document.getElementById("video-scene");
+    this.canvReference = document.getElementById("video-scene")
     // Base width and height.
-    let width = this.canvReference.width;
-    let height = this.canvReference.height;
+    let width = this.canvReference.width
+    let height = this.canvReference.height
     // Sets up camera and base position.
-    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 50);
-    this.camera.position.z = 3;
-    this.camera.position.y = 3;
-    this.camera.position.x = -3;
+    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 50)
+    this.camera.position.z = 3
+    this.camera.position.y = 3
+    this.camera.position.x = -3
     // Base WebGL render and clock for delta time.
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       canvas: this.canvReference,
       preserveDrawingBuffer: true,
-    });
-    this.renderer.shadowMap.enabled = true;
-    this.clock = new THREE.Clock();
+    })
+    this.renderer.shadowMap.enabled = true
+    this.clock = new THREE.Clock()
     // Resizes the renderer.
-    this.renderer.setSize(width, height);
-    //document.body.appendChild(this.renderer.domElement);
-    window.addEventListener("resize", this.onWindowResize.bind(this));
-    this._configure_post_pro();
+    this.renderer.setSize(width, height)
+    //document.body.appendChild(this.renderer.domElement)
+    window.addEventListener("resize", this.onWindowResize.bind(this))
+    this._configure_post_pro()
     // Controls and movement.
-    this.orbit = new OrbitControls(this.camera, this.renderer.domElement);
-    this.control = new TransformControls(this.camera, this.renderer.domElement);
+    this.orbit = new OrbitControls(this.camera, this.renderer.domElement)
+    this.control = new TransformControls(this.camera, this.renderer.domElement)
     // OnClick and MouseMove events.
-    window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
-    window.addEventListener("click", this.onMouseClick.bind(this), false);
+    window.addEventListener("mousemove", this.onMouseMove.bind(this), false)
+    window.addEventListener("click", this.onMouseClick.bind(this), false)
     // Base control and debug stuff remove debug in prod.
-    this._initialize_control();
+    this._initialize_control()
     // Resets canvas size.
-    this.onWindowResize();
+    this.onWindowResize()
     // Creates the main update loop.
-    this.renderer.setAnimationLoop(this.update_loop.bind(this));
+    this.renderer.setAnimationLoop(this.update_loop.bind(this))
 
-    this.timeline.scene = this.activeScene;
+    this.timeline.scene = this.activeScene
 
-    //this._test_demo()
+    this._test_demo()
 
-    // saving state of the scene 
-    this.scene_file_token = null
+      // saving state of the scene 
+    this.current_scene_token = null
   }
 
   // Token comes in from the front end to load the scene from the site.
-  async loadScene() {
-
-    const scene = await this.api_manager.loadSceneState(this.test_scene_load_media_id);
-    this.activeScene.scene.children = scene.children;
+  public async loadScene(scene_token:string) {
+    if (scene_token != null) {
+      this.current_scene_token = scene_token
+    } 
+    const scene = await this.api_manager.loadSceneState(this.current_scene_token)
+    this.activeScene.scene.children = scene.children
 
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
 
-      child.parent = this.activeScene.scene;
+      child.parent = this.activeScene.scene
 
       if (child.type == "DirectionalLight") {
-        let pos = child.position;
-        let rot = child.rotation;
-        let light = this.activeScene._create_base_lighting();
-        light.position.set(pos.x, pos.y, pos.z);
-        light.rotation.set(rot.x, rot.y, rot.z);
-        this.activeScene.scene.remove(child);
+        let pos = child.position
+        let rot = child.rotation
+        let light = this.activeScene._create_base_lighting()
+        light.position.set(pos.x, pos.y, pos.z)
+        light.rotation.set(rot.x, rot.y, rot.z)
+        this.activeScene.scene.remove(child)
       }
     })
 
   }
 
-  async saveScene(name: string) {
+  public async saveScene(name: string) {
     const result = await this.api_manager.saveSceneState(this.activeScene.scene, name,
       this.scene_file_token,
-      new TimelineDataState());
+      new TimelineDataState())
     // dispatch call wil's engine.
   }
 
@@ -241,34 +246,34 @@ class Editor {
 
     // let result = await this.api_manager.getMediaFile(
     //   "m_189p8hj0eyypbg74kkhcpehwpjhnkz",
-    // );
-    console.log("Saving...");
-    const result = await this.api_manager.saveSceneState(this.activeScene.scene, "", null, null);
-    console.log("Saved!");
-    console.log("Media ID is:", result);
+    // )
+    console.log("Saving...")
+    const result = await this.api_manager.saveSceneState(this.activeScene.scene, "", null, null)
+    console.log("Saved!")
+    console.log("Media ID is:", result)
     if (result.data) {
-      this.test_scene_load_media_id = result.data["media_file_token"];
+      this.test_scene_load_media_id = result.data["media_file_token"]
     }
   }
 
   //async _load_for_testing() {
-  //  const result = await this.api_manager.loadScene(this.test_scene_load_media_id);
-  //  let bucket_path = await this.api_manager.getMediaFile(result["glb_media_file_id"]);
-  //  let glbLoader = new GLTFLoader();
+  //  const result = await this.api_manager.loadScene(this.test_scene_load_media_id)
+  //  let bucket_path = await this.api_manager.getMediaFile(result["glb_media_file_id"])
+  //  let glbLoader = new GLTFLoader()
   //  glbLoader.load(bucket_path, (glb) => {
-  //    this.activeScene.scene.children = glb.scene.children;
+  //    this.activeScene.scene.children = glb.scene.children
   //    this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
-  //      child.parent = this.activeScene.scene;
+  //      child.parent = this.activeScene.scene
   //      if (child.type == "DirectionalLight") {
-  //        let pos = child.position;
-  //        let rot = child.rotation;
-  //        let light = this.activeScene._create_base_lighting();
-  //        light.position.set(pos.x, pos.y, pos.z);
-  //        light.rotation.set(rot.x, rot.y, rot.z);
-  //        this.activeScene.scene.remove(child);
+  //        let pos = child.position
+  //        let rot = child.rotation
+  //        let light = this.activeScene._create_base_lighting()
+  //        light.position.set(pos.x, pos.y, pos.z)
+  //        light.rotation.set(rot.x, rot.y, rot.z)
+  //        this.activeScene.scene.remove(child)
   //      }
-  //    });
-  //  });
+  //    })
+  //  })
   //}
 
   async _serialize_timeline() {
@@ -276,13 +281,13 @@ class Editor {
     // Test code here
     let object: any = await this.activeScene.load_glb(
       "./resources/models/fox/fox.glb",
-    );
+    )
 
     // load object into the engine for lip syncing
     this.lipsync_engine.load_object(
       object.uuid,
       "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
-    );
+    )
 
     // create the clip with the same id for a reference to the media
     this.timeline.addPlayableClip(
@@ -295,12 +300,12 @@ class Editor {
         150,
         400,
       ),
-    );
+    )
 
     // media id for this is up in the air but when a path is created you should be able to store and delete it
     this.timeline.addPlayableClip(
       new ClipUI(1.0, "transform", "clip2", object.uuid, object.uuid, 0, 150),
-    );
+    )
 
     // media id for this as well it can be downloaded
     this.timeline.addPlayableClip(
@@ -313,12 +318,12 @@ class Editor {
         0,
         400,
       ),
-    );
+    )
     this.animation_engine.load_object(
       object.uuid,
       "/resources/models/fox/fox_idle.glb",
       "clip3",
-    );
+    )
   }
 
   async _test_demo() {
@@ -326,19 +331,19 @@ class Editor {
     // Test code here
     let object: any = await this.activeScene.load_glb(
       "./resources/models/fox/fox.glb",
-    );
+    )
 
     // Load timeline creates the the clips from the datastructure and loads them in here.
     // load object into the engine for lip syncing
     this.lipsync_engine.load_object(
       object.uuid,
       "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
-    );
+    )
     this.animation_engine.load_object(
       object.uuid,
       "/resources/models/fox/fox_idle.glb",
       "clip3",
-    );
+    )
     // then it creates clip ui to load the playable clips 
     // then refreshes the timeline.
 
@@ -353,12 +358,12 @@ class Editor {
         150,
         400,
       ),
-    );
+    )
 
     // media id for this is up in the air but when a path is created you should be able to store and delete it
     this.timeline.addPlayableClip(
       new ClipUI(1.0, "transform", "clip2", object.uuid, object.uuid, 0, 150),
-    );
+    )
 
     // media id for this as well it can be downloaded
     this.timeline.addPlayableClip(
@@ -371,194 +376,194 @@ class Editor {
         0,
         400,
       ),
-    );
+    )
 
   }
 
   // Configure post processing.
   _configure_post_pro() {
-    let width = this.canvReference.width;
-    let height = this.canvReference.height;
+    let width = this.canvReference.width
+    let height = this.canvReference.height
 
     if(this.renderer == undefined || this.camera == undefined) {
-      return;
+      return
     }
 
-    this.composer = new EffectComposer(this.renderer);
-    this.renderPass = new RenderPass(this.activeScene.scene, this.camera);
-    this.composer.addPass(this.renderPass);
+    this.composer = new EffectComposer(this.renderer)
+    this.renderPass = new RenderPass(this.activeScene.scene, this.camera)
+    this.composer.addPass(this.renderPass)
 
     this.outlinePass = new OutlinePass(
       new THREE.Vector2(width, height),
       this.activeScene.scene,
       this.camera,
-    );
+    )
 
-    this.outlinePass.edgeStrength = 6.0;
-    this.outlinePass.edgeGlow = 0.2;
-    this.outlinePass.edgeThickness = 1.0;
-    this.outlinePass.pulsePeriod = 3;
-    this.outlinePass.usePatternTexture = false;
-    this.outlinePass.visibleEdgeColor.set(0xe66462);
+    this.outlinePass.edgeStrength = 6.0
+    this.outlinePass.edgeGlow = 0.2
+    this.outlinePass.edgeThickness = 1.0
+    this.outlinePass.pulsePeriod = 3
+    this.outlinePass.usePatternTexture = false
+    this.outlinePass.visibleEdgeColor.set(0xe66462)
 
-    this.composer.addPass(this.outlinePass);
+    this.composer.addPass(this.outlinePass)
 
-    this.saoPass = new SAOPass(this.activeScene.scene, this.camera);
+    this.saoPass = new SAOPass(this.activeScene.scene, this.camera)
 
-    this.saoPass.params.saoBias = 3.1;
-    this.saoPass.params.saoIntensity = 1.0;
-    this.saoPass.params.saoScale = 6.0;
-    this.saoPass.params.saoKernelRadius = 5.0;
-    this.saoPass.params.saoMinResolution = 0.0;
+    this.saoPass.params.saoBias = 3.1
+    this.saoPass.params.saoIntensity = 1.0
+    this.saoPass.params.saoScale = 6.0
+    this.saoPass.params.saoKernelRadius = 5.0
+    this.saoPass.params.saoMinResolution = 0.0
 
     this.bloomPass = new UnrealBloomPass(
       new THREE.Vector2(width, height),
       1.5,
       0.4,
       0.85,
-    );
-    this.bloomPass.strength = 0.25;
+    )
+    this.bloomPass.strength = 0.25
 
     this.smaaPass = new SMAAPass(
       width * this.renderer.getPixelRatio(),
       height * this.renderer.getPixelRatio(),
-    );
+    )
 
     this.bokehPass = new BokehPass(this.activeScene.scene, this.camera, {
       focus: 3.0,
       aperture: 0.00001,
       maxblur: 0.01,
-    });
+    })
 
-    this.composer.addPass(this.saoPass);
-    this.composer.addPass(this.bloomPass);
-    this.composer.addPass(this.smaaPass);
-    this.composer.addPass(this.bokehPass);
+    this.composer.addPass(this.saoPass)
+    this.composer.addPass(this.bloomPass)
+    this.composer.addPass(this.smaaPass)
+    this.composer.addPass(this.bokehPass)
 
-    //this.outputPass = new OutputPass();
-    //this.composer.addPass(this.outputPass);
+    //this.outputPass = new OutputPass()
+    //this.composer.addPass(this.outputPass)
   }
 
   create_parim(name: string) {
-    let uuid = this.activeScene.instantiate(name);
+    let uuid = this.activeScene.instantiate(name)
   }
 
   render_mode() {
-    this.rendering = !this.rendering;
-    this.activeScene.render_mode(this.rendering);
+    this.rendering = !this.rendering
+    this.activeScene.render_mode(this.rendering)
 
     //if (this.rendering) {
-    //    this._remove_post_processing();
+    //    this._remove_post_processing()
     //} else {
-    //    this._add_post_processing();
+    //    this._add_post_processing()
     //}
   }
 
   togglePlay() {
-    this.playback = !this.playback;
-    this.playback_location = 0;
+    this.playback = !this.playback
+    this.playback_location = 0
     if (this.playback == false) {
-      this.stopPlayback();
+      this.stopPlayback()
     } else {
       // REMOVE THIS NEXT LINE IN PROD ONLY FOR TEST!!!!!
-      //this.activeScene.play_anim_demo(this.activeScene.activeCharacter);
+      //this.activeScene.play_anim_demo(this.activeScene.activeCharacter)
     }
   }
 
   save() {
-    //console.log(this.control);
-    //if(this.selected != null){ this.control.detach(this.selected); }
-    //this.activeScene.scene.remove(this.control);
-    //this.activeScene.scene.remove(this.activeScene.gridHelper);
-    //this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this), this.audio_manager, this.timeline, this.activeScene.animations);
-    //this.activeScene._createGrid();
-    //this.audio_engine.playClip("m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg");
-    //console.log(this.selected);
+    //console.log(this.control)
+    //if(this.selected != null){ this.control.detach(this.selected) }
+    //this.activeScene.scene.remove(this.control)
+    //this.activeScene.scene.remove(this.activeScene.gridHelper)
+    //this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this), this.audio_manager, this.timeline, this.activeScene.animations)
+    //this.activeScene._createGrid()
+    //this.audio_engine.playClip("m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg")
+    //console.log(this.selected)
 
     if (this.selected == null) {
-      return;
+      return
     }
-    this.transform_engine.addFrame(this.selected);
-    console.log("Frame taken.");
+    this.transform_engine.addFrame(this.selected)
+    console.log("Frame taken.")
   }
 
   change_camera_view() {
-    //let obj = this.activeScene.get_object_by_uuid(this.test_box_uuid);
-    //this.transform_engine.clips[this.test_box_uuid].step(obj);
+    //let obj = this.activeScene.get_object_by_uuid(this.test_box_uuid)
+    //this.transform_engine.clips[this.test_box_uuid].step(obj)
     //console.log(this.transform_engine.clips[this.test_box_uuid].current_pos)
-    //this.current_frame += 1;
-    //this.transform_engine.clips[this.test_box_uuid].reset(this.activeScene.get_object_by_uuid(this.test_box_uuid));
+    //this.current_frame += 1
+    //this.transform_engine.clips[this.test_box_uuid].reset(this.activeScene.get_object_by_uuid(this.test_box_uuid))
   }
 
   // Basicly Unity 3D's update loop.
   update_loop(time: number) {
     // Updates debug stats.
     if (this.stats != null) {
-      this.stats.update();
+      this.stats.update()
     }
 
-    if(this.clock == undefined || this.renderer == undefined) {return;}
+    if(this.clock == undefined || this.renderer == undefined) {return}
 
-    let delta_time = this.clock.getDelta();
+    let delta_time = this.clock.getDelta()
 
     // All calls that are not super important like timeline go here.
-    //this.activeScene.update(delta_time);
-    //this.orbit.update(0.1);
+    //this.activeScene.update(delta_time)
+    //this.orbit.update(0.1)
 
-    //console.log(this.transform_engine.clips[this.test_box_uuid]);
+    //console.log(this.transform_engine.clips[this.test_box_uuid])
 
-    this.timeline.update(delta_time);
+    this.timeline.update(delta_time)
 
-    this.render_scene();
+    this.render_scene()
     if (this.capturer != null) {
-      this.capturer.capture(this.renderer.domElement);
+      this.capturer.capture(this.renderer.domElement)
     } // Record scene.
   }
 
   start_playback() {
-    this.timeline.isPlaying = true;
+    this.timeline.isPlaying = true
   }
 
   change_mode(type: any) {
-    if(this.control == undefined) {return;}
-    this.control.mode = type;
-    this.transform_interaction = true;
+    if(this.control == undefined) {return}
+    this.control.mode = type
+    this.transform_interaction = true
   }
 
   // Sets the fps to a specific number
   set_fps(fps_number: number) {
-    this.cap_fps = fps_number;
+    this.cap_fps = fps_number
   }
 
   // Toggles playback and recording.
   togglePlayback() {
-    this.togglePlay();
+    this.togglePlay()
     if (this.playback == false) {
-      //this.stopPlayback();
-      this.render_mode();
+      //this.stopPlayback()
+      this.render_mode()
     } else {
-      //this.startPlayback();
-      this.render_mode();
+      //this.startPlayback()
+      this.render_mode()
     }
   }
 
   async loadWavAsBlob(url: string) {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    return blob;
+    const response = await fetch(url)
+    const blob = await response.blob()
+    return blob
   }
 
   async stopPlayback() {
-    this.render_mode();
-    let ffmpeg = createFFmpeg({ log: true });
-    await ffmpeg.load();
-    for (let index = 0; index < this.frame_buffer.length; index++) {
-      const element = this.frame_buffer[index];
+    this.render_mode()
+    let ffmpeg = createFFmpeg({ log: true })
+    await ffmpeg.load()
+    for (let index = 0 index < this.frame_buffer.length index++) {
+      const element = this.frame_buffer[index]
       await ffmpeg.FS(
         "writeFile",
         `image${index}.png`,
         await fetchFile(element),
-      );
+      )
     }
     await ffmpeg.run(
       "-framerate",
@@ -566,72 +571,72 @@ class Editor {
       "-i",
       "image%d.png",
       "output.mp4",
-    );
-    let output = await ffmpeg.FS("readFile", "output.mp4");
+    )
+    let output = await ffmpeg.FS("readFile", "output.mp4")
     // Create a Blob from the output file for downloading
-    const blob = new Blob([output.buffer], { type: "video/mp4" });
-    const url = URL.createObjectURL(blob);
-    await this.api_manager.uploadMedia(blob, "output.mp4");
+    const blob = new Blob([output.buffer], { type: "video/mp4" })
+    const url = URL.createObjectURL(blob)
+    await this.api_manager.uploadMedia(blob, "output.mp4")
     // Create a link to download the file
-    const downloadLink = document.createElement("a");
-    downloadLink.href = url;
-    downloadLink.download = "output.mp4";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
+    const downloadLink = document.createElement("a")
+    downloadLink.href = url
+    downloadLink.download = "output.mp4"
+    document.body.appendChild(downloadLink)
+    downloadLink.click()
     // Clean up
-    URL.revokeObjectURL(url);
-    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(url)
+    document.body.removeChild(downloadLink)
   }
 
   startPlayback() {
-    this.playback_location = 0;
-    this._initialize_recording();
+    this.playback_location = 0
+    this._initialize_recording()
   }
 
   // Initializes transform x y z changes.
   _initialize_control() {
-    if(this.control == undefined) {return;}
-    this.control.addEventListener("change", this.render_scene.bind(this));
+    if(this.control == undefined) {return}
+    this.control.addEventListener("change", this.render_scene.bind(this))
     this.control.addEventListener(
       "dragging-changed",
       (event: any) => {
-        if(this.orbit == undefined) { return; }
-        this.orbit.enabled = !event.value;
-        // this.update_properties();
+        if(this.orbit == undefined) { return }
+        this.orbit.enabled = !event.value
+        // this.update_properties()
       }
-    );
-    this.control.setSize(0.5); // Good default value for visuals.
-    this.raycaster = new THREE.Raycaster();
-    this.mouse = new THREE.Vector2();
-    this.activeScene.scene.add(this.control);
+    )
+    this.control.setSize(0.5) // Good default value for visuals.
+    this.raycaster = new THREE.Raycaster()
+    this.mouse = new THREE.Vector2()
+    this.activeScene.scene.add(this.control)
   }
 
   // Initializes CCapture for capturing the scene to send over to backend.
   _initialize_recording() {
-    this.frame_buffer = [];
-    this.render_timer = 0;
+    this.frame_buffer = []
+    this.render_timer = 0
   }
 
   // Render the scene to the camera.
   render_scene() {
     
     if (this.composer != null) {
-      this.composer.render();
+      this.composer.render()
     } else if (this.renderer && this.camera) {
-      this.renderer.render(this.activeScene.scene, this.camera);
+      this.renderer.render(this.activeScene.scene, this.camera)
     } else {
-      console.error("Could not render to canvas no render or composer!");
+      console.error("Could not render to canvas no render or composer!")
     }
 
     if (this.rendering && this.renderer && this.clock) {
-      this.playback_location++;
-      let imgData = this.renderer.domElement.toDataURL();
-      this.frame_buffer.push(imgData);
-      this.render_timer += this.clock.getDelta();
+      this.playback_location++
+      let imgData = this.renderer.domElement.toDataURL()
+      this.frame_buffer.push(imgData)
+      this.render_timer += this.clock.getDelta()
       if (this.playback_location >= this.fps_number * 3) {
-        this.stopPlayback();
-        this.playback_location = 0;
-        this.rendering = false;
+        this.stopPlayback()
+        this.playback_location = 0
+        this.rendering = false
       }
     }
   }
@@ -639,68 +644,68 @@ class Editor {
   // Automaticly resize scene.
   onWindowResize() {
     // Calculate the maximum possible dimensions while maintaining the aspect ratio
-    let width = window.innerWidth; // / aspect_adjust;
-    let height = window.innerHeight; // / aspectRatio;
+    let width = window.innerWidth // / aspect_adjust
+    let height = window.innerHeight // / aspectRatio
 
-    if(this.camera == undefined || this.renderer == undefined) { return; }
+    if(this.camera == undefined || this.renderer == undefined) { return }
     // Set the camera aspect to the desired aspect ratio
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
+    this.camera.aspect = width / height
+    this.camera.updateProjectionMatrix()
 
     // Set the renderer size to the calculated dimensions
-    this.renderer.setSize(width, height);
+    this.renderer.setSize(width, height)
     if (this.composer != null) {
-      this.composer.setSize(width, height);
+      this.composer.setSize(width, height)
     }
   }
 
   // Sets new mouse location usually used in raycasts.
   onMouseMove(event: any) {
-    const rect = this.canvReference.getBoundingClientRect();
-    if(this.mouse == undefined) { return; }
-    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const rect = this.canvReference.getBoundingClientRect()
+    if(this.mouse == undefined) { return }
+    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
   }
 
   // When the mouse clicks the screen.
   onMouseClick() {
-    if(this.raycaster == undefined || this.mouse == undefined || this.control == undefined || this.outlinePass == undefined) { return; }
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-    let interactable: any[] = [];
+    if(this.raycaster == undefined || this.mouse == undefined || this.control == undefined || this.outlinePass == undefined) { return }
+    this.raycaster.setFromCamera(this.mouse, this.camera)
+    let interactable: any[] = []
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
       if (child.name != "") {
         if (child.type == "Mesh" || child.type == "Object3D") {
-          interactable.push(child);
+          interactable.push(child)
         }
       }
-    });
-    let intersects = this.raycaster.intersectObjects(interactable, true);
+    })
+    let intersects = this.raycaster.intersectObjects(interactable, true)
 
     if (intersects.length > 0) {
       if (intersects[0].object.type != "GridHelper") {
-        let currentObject = intersects[0].object;
+        let currentObject = intersects[0].object
         while (currentObject.parent && currentObject.parent.type !== "Scene") {
-          currentObject = currentObject.parent;
+          currentObject = currentObject.parent
       }
-        this.selected = currentObject;
+        this.selected = currentObject
         if (this.selected.type == "Scene") {
-          this.selected = intersects[0].object;
+          this.selected = intersects[0].object
         }
-        // this.update_properties();
-        this.activeScene.scene.add(this.control);
-        this.control.attach(this.selected);
-        this.outlinePass.selectedObjects = [this.selected];
-        this.transform_interaction = true;
+        // this.update_properties()
+        this.activeScene.scene.add(this.control)
+        this.control.attach(this.selected)
+        this.outlinePass.selectedObjects = [this.selected]
+        this.transform_interaction = true
       }
     } else if (this.transform_interaction == false) {
-      this.last_selected = this.selected;
-      this.control.detach();
-      this.activeScene.scene.remove(this.control);
-      this.outlinePass.selectedObjects = [];
+      this.last_selected = this.selected
+      this.control.detach()
+      this.activeScene.scene.remove(this.control)
+      this.outlinePass.selectedObjects = []
     } else {
-      this.transform_interaction = false;
+      this.transform_interaction = false
     }
   }
 }
 
-export default Editor;
+export default Editor
