@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useRef,
 } from "react";
-import { BaseClip } from "~/models/track";
+import { BaseClip } from "~/pages/PageEnigma/models/track";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 
 export const useMouseEventsClip = (
@@ -89,6 +89,8 @@ export const useMouseEventsClip = (
       type: string,
     ) => {
       if (event.button === 0) {
+        event.stopPropagation();
+        event.preventDefault();
         clientX.current = event.clientX;
         isActive.current = type;
       }

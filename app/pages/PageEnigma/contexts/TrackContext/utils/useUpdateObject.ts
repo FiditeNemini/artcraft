@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { ObjectGroup } from "~/models/track";
+import { ObjectGroup } from "~/pages/PageEnigma/models/track";
 
 export default function useUpdateObject() {
   const [objects, setObjects] = useState<ObjectGroup>({
@@ -46,8 +46,37 @@ export default function useUpdateObject() {
     [],
   );
 
+  const selectObjectClip = useCallback((clipId: string) => {
+    setObjects((oldObjectGroup) => {
+      return {
+        ...oldObjectGroup,
+        objects: oldObjectGroup.objects.map((object) => ({
+          ...object,
+          clips: object.clips.map((clip) => ({
+            ...clip,
+            selected: clip.id === clipId ? !clip.selected : clip.selected,
+          })),
+        })),
+      };
+    });
+  }, []);
+
+  const deleteObjectClip = useCallback((clipId: string) => {
+    setObjects((oldObjectGroup) => {
+      return {
+        ...oldObjectGroup,
+        objects: oldObjectGroup.objects.map((object) => ({
+          ...object,
+          clips: object.clips.filter((clip) => clip.id !== clipId),
+        })),
+      };
+    });
+  }, []);
+
   return {
     objects,
     updateObject,
+    selectObjectClip,
+    deleteObjectClip,
   };
 }

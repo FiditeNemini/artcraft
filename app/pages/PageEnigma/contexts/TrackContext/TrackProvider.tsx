@@ -4,50 +4,56 @@ import useUpdateCharacters from "~/pages/PageEnigma/contexts/TrackContext/utils/
 import useUpdateCamera from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateCamera";
 import useUpdateAudio from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateAudio";
 import useUpdateObject from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateObject";
-import { AnimationClip, AudioClip } from "~/models/track";
+import { AnimationClip, AudioClip } from "~/pages/PageEnigma/models/track";
+import useUpdateDragDrop from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateDragDrop";
 
 interface Props {
   children: ReactNode;
 }
 
 export const TrackProvider = ({ children }: Props) => {
-  const { characters, updateCharacters, toggleLipSyncMute } =
-    useUpdateCharacters();
-  const { camera, updateCamera } = useUpdateCamera();
-  const { audio, updateAudio, toggleAudioMute } = useUpdateAudio();
-  const { objects, updateObject } = useUpdateObject();
-  const [selectedClip, setSelectedClip] = useState<string | null>(null);
+  const characters = useUpdateCharacters();
+  const camera = useUpdateCamera();
+  const audio = useUpdateAudio();
+  const objects = useUpdateObject();
 
+  const { endDrag, ...dragDrop } = useUpdateDragDrop();
+
+  const [selectedClip, setSelectedClip] = useState<string | null>(null);
   const selectClip = useCallback((clipId: string | null) => {
     setSelectedClip(clipId);
   }, []);
 
-  const [state, setState] = useState<{
-    dragType: "animations" | "lipSync" | null;
-    dragId: string | null;
-  }>({ dragType: null, dragId: null });
   const [animationClips, setAnimationClips] = useState<AnimationClip[]>([]);
   const [audioClips, setAudioClips] = useState<AudioClip[]>([]);
 
-  const startDrag = useCallback(
-    (type: "animations" | "lipSync", id: string) => {
-      setState({ dragId: id, dragType: type });
-    },
-    [],
-  );
-
-  const endDrag = useCallback(() => {
-    setState({ dragId: null, dragType: null });
-  }, []);
-
+  const [scale, setScale] = useState(1);
+  const [length, setLength] = useState(1);
   const [time, setTime] = useState(0);
   const updateCurrentTime = useCallback((newTime: number) => {
     setTime(newTime);
+    console.log("message", {
+      action: "UpdateCurrentTime",
+      id: "",
+      data: { currentTime: newTime },
+    });
   }, []);
 
-  const [canDrop, setCanDrop] = useState(false);
-  const [scale, setScale] = useState(1);
-  const [length, setLength] = useState(1);
+  // cross group functions
+  const dropClip = useCallback(() => {
+    const { canDrop, dragType, dropId, dragId, dropOffset } = dragDrop;
+    if (canDrop) {
+      if (dragType === "animations") {
+        characters.addCharacterAnimation({
+          clipId: dragId!,
+          characterId: dropId,
+          animationClips,
+          offset: dropOffset,
+        });
+      }
+    }
+    endDrag();
+  }, [dragDrop, animationClips, characters, endDrag]);
 
   const fullWidth = useMemo(() => {
     return length * 60 * 4 * scale;
@@ -69,54 +75,42 @@ export const TrackProvider = ({ children }: Props) => {
 
   const values = useMemo(() => {
     return {
-      characters,
-      camera,
-      audio,
-      objects,
-      updateCharacters,
-      updateCamera,
-      updateAudio,
-      updateObject,
+      ...characters,
+      ...camera,
+      ...audio,
+      ...objects,
+
       selectClip,
       selectedClip,
-      toggleLipSyncMute,
-      toggleAudioMute,
-      dragType: state.dragType,
-      dragId: state.dragId,
+
+      ...dragDrop,
+      endDrag: dropClip,
+
       animationClips,
       audioClips,
-      startDrag,
-      endDrag,
+
       scale,
       currentTime: time,
-      length,
       updateCurrentTime,
-      canDrop,
-      setCanDrop,
+      length,
       fullWidth,
     };
   }, [
     characters,
-    updateCharacters,
+    camera,
+    audio,
+    objects,
+
     selectClip,
     selectedClip,
-    camera,
-    updateCamera,
-    audio,
-    updateAudio,
-    objects,
-    updateObject,
-    toggleLipSyncMute,
-    toggleAudioMute,
-    state.dragId,
-    state.dragType,
+
+    dragDrop,
+    dropClip,
+
     animationClips,
     audioClips,
-    startDrag,
-    endDrag,
-    canDrop,
+
     updateCurrentTime,
-    setCanDrop,
     time,
     fullWidth,
     length,

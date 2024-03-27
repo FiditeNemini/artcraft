@@ -3,6 +3,7 @@ export interface BaseClip {
   name: string;
   offset: number;
   length: number;
+  selected?: boolean;
 }
 
 export interface AnimationClip extends BaseClip {}

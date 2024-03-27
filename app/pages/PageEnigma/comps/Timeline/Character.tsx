@@ -63,6 +63,7 @@ export const Character = ({ characterId }: Props) => {
       </div>
       <div className="flex flex-col gap-4">
         <Track
+          id={character.id}
           clips={animationClips}
           title="Animation"
           updateClip={updateClipAnimations}
@@ -70,6 +71,7 @@ export const Character = ({ characterId }: Props) => {
           type="animations"
         />
         <Track
+          id={character.id}
           clips={positionClips}
           title="Character Position/Rotation"
           updateClip={updateClipPosition}
@@ -77,6 +79,7 @@ export const Character = ({ characterId }: Props) => {
           type="positions"
         />
         <Track
+          id={character.id}
           clips={lipSyncClips}
           title="Lipsync Audio Track"
           updateClip={updateClipLipSync}

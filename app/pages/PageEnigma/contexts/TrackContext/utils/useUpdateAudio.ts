@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { AudioGroup } from "~/models/track";
+import { AudioGroup, BaseClip } from "~/pages/PageEnigma/models/track";
 
 export default function useUpdateAudio() {
   const [audio, setAudio] = useState<AudioGroup>({
@@ -45,6 +45,33 @@ export default function useUpdateAudio() {
           clips: newClips,
         };
       });
+      console.log("message", {
+        action: "UpdateGlobalAudio",
+        id,
+        data: { offset, length },
+      });
+    },
+    [],
+  );
+
+  const addGlobalAudio = useCallback(
+    (dragId: string, audioClips: BaseClip[], offset: number) => {
+      const clip = audioClips.find((row) => row.id === dragId);
+      if (!clip) {
+        return;
+      }
+
+      setAudio((oldAudio) => {
+        return {
+          ...oldAudio,
+          clips: [...oldAudio.clips, { ...clip, offset }],
+        };
+      });
+      console.log("message", {
+        action: "UpdateGlobalAudio",
+        id: dragId,
+        data: { offset },
+      });
     },
     [],
   );
@@ -56,11 +83,47 @@ export default function useUpdateAudio() {
         muted: !oldAudio.muted,
       };
     });
+    console.log("message", {
+      action: "ToggleGlobalAudioMute",
+      id: "",
+    });
+  }, []);
+
+  const selectAudioClip = useCallback((clipId: string) => {
+    setAudio((oldAudio) => {
+      return {
+        ...oldAudio,
+        clips: [
+          ...oldAudio.clips.map((clip) => {
+            return {
+              ...clip,
+              selected: clip.id === clipId ? !clip.selected : clip.selected,
+            };
+          }),
+        ],
+      };
+    });
+  }, []);
+
+  const deleteAudioClip = useCallback((clipId: string) => {
+    setAudio((oldAudio) => {
+      return {
+        ...oldAudio,
+        clips: [...oldAudio.clips.filter((clip) => clip.id !== clipId)],
+      };
+    });
+    console.log("message", {
+      action: "UpdateGlobalAudio",
+      id: clipId,
+    });
   }, []);
 
   return {
     audio,
     updateAudio,
     toggleAudioMute,
+    selectAudioClip,
+    addGlobalAudio,
+    deleteAudioClip,
   };
 }
