@@ -131,6 +131,7 @@ class Editor {
       return;
     }
     this.can_initailize == false;
+
     // Gets the canvas.
     this.canvReference = document.getElementById("video-scene");
     // Base width and height.
@@ -392,6 +393,11 @@ class Editor {
     this.dispatchAppUiState({
       type: ACTION_TYPES.SHOW_EDITOR_LOADER
     });
+
+
+    // this.dispatchAppUiState({
+    //   type: ACTION_TYPES.HIDE_EDITOR_LOADER
+    // });
 
     if (this.selected == null) {
       return;
