@@ -13,6 +13,7 @@ class Scene {
     }
 
     initialize() {
+        this.scene = new THREE.Scene();
         this._createGrid();
         this._create_base_lighting();
         this._create_skybox();
@@ -128,6 +129,7 @@ class Scene {
 
         this.scene.add(directional_light);
         this.scene.add(directional_light.target);
+        return directional_light;
     }
 
     _createGrid() {

@@ -12,6 +12,7 @@ import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 import AudioEngine from "./audio_engine.ts";
 import TransformEngine from "./transform_engine.ts";
@@ -146,8 +147,9 @@ class Editor {
     window.addEventListener("resize", this.onWindowResize.bind(this));
     // Current scene for saving and loading.
     this.activeScene = new Scene();
-    this._configure_post_pro();
     this.activeScene.initialize();
+
+    this._configure_post_pro();
     // Controls and movement.
     this.orbit = new OrbitControls(this.camera, this.renderer.domElement);
     this.control = new TransformControls(this.camera, this.renderer.domElement);
@@ -179,7 +181,7 @@ class Editor {
     // let result = await this.api_manager.getMediaFile(
     //   "m_189p8hj0eyypbg74kkhcpehwpjhnkz",
     // );
-    console.log("Saveing");
+    console.log("Saving...");
     const result = await this.api_manager.saveSceneState(this.activeScene.scene);
     console.log("Saved!");
     console.log(result);
@@ -187,10 +189,26 @@ class Editor {
   }
 
   async _load_for_testing() {
-    const result = await this.api_manager.loadScene("m_3nwr2kejyrrd4mmvbpmn032gea60p0")
-    console.log(result);
-    let bucket_path = await this.api_manager.getMediaFile("m_3nwr2kejyrrd4mmvbpmn032gea60p0");
-    console.log(bucket_path);
+    const result = await this.api_manager.loadScene("m_gc7n4z3p82keydyaxtb0s5qt4yys54")
+    let bucket_path = await this.api_manager.getMediaFile(result["glb_media_file_id"]);
+    let glbLoader = new GLTFLoader();
+    glbLoader.load(bucket_path, (glb) => {
+      this.activeScene.scene.children = glb.scene.children;
+      this.activeScene.scene.children.forEach(child => {
+        child.parent = this.activeScene.scene;
+        if(child.type == "DirectionalLight") {
+          let pos = child.position;
+          let rot = child.rotation;
+
+          let light = this.activeScene._create_base_lighting();
+          light.position.set(pos.x, pos.y, pos.z);
+          light.rotation.set(rot.x, rot.y, rot.z);
+          
+          this.activeScene.scene.remove(child);
+        }
+      });
+    });
+
   }
 
   async _serialize_timeline() {

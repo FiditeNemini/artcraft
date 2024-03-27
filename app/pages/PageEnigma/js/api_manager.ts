@@ -99,10 +99,8 @@ class APIManager {
     if (!fileResponse.ok) {
       throw new Error("Failed to download file");
     }
-  
     // Convert the response to a Blob
     let blob = await fileResponse.blob();
-
     const json_value:string = await new Promise((resolve, reject) => {
       let reader = new FileReader();
       reader.onloadend = () => resolve(JSON.parse(reader.result as string));
