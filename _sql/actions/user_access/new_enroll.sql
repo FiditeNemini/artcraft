@@ -62,6 +62,16 @@ WHERE username IN (
     'zzz_last_item'
 );
 
+-- Early access (film)
+UPDATE users
+SET
+    can_access_studio = false,
+    maybe_feature_flags = 'studio,video_style_transfer'
+WHERE username IN (
+    'dakrid',
+    'zzz_last_item'
+);
+
 -- Early access (other)
 UPDATE users
 SET
