@@ -22,20 +22,21 @@ class APIManager {
   async saveSceneState(
     scene: THREE.Scene,
     timeline: TimelineCurrentReactState,
-    media_file_token: string | null = null,
+    scene_name: string,
+    scene_media_file_token: string | null = null,
   ): Promise<string> {
-      // create new scene.
+      // create new scene
+   
       let file = await this.gltfExport(scene);
       let response = await this.uploadGLB(file);
       let success = response["success"];
       if (success) {
-        let media_file_token = response["media_file_token"];
-        
-        console.log(`media file token: ${media_file_token}`)
-
-        const result = await this._saveSceneAndTimelineToJSONSpec(media_file_token, timeline);
-        return result
-      } 
+          let media_file_token = response["media_file_token"];
+          console.log(`media file token: ${media_file_token}`)
+          const result = await this._saveSceneAndTimelineToJSONSpec(media_file_token,scene_name, timeline);
+          return result
+       } 
+      
       
       throw Error("Saving the Scene Resulted in an Error Success False");
   }
@@ -47,16 +48,18 @@ class APIManager {
   // media_file_token (optional; the file to replace if present)
   async _saveSceneAndTimelineToJSONSpec(
     media_file_token: string,
+    scene_file_name: string,
     timeline: TimelineCurrentReactState,
   ): Promise<string> {
     const url = `${this.baseUrl}/v1/media_files/write/scene_file`;
     let uuid = uuidv4();
 
     // turn json into a blob
-    const file_test = {"glb_media_file_id":media_file_token,"entities":[], "timeline":""}
+    const file_test = {"glb_media_file_id":media_file_token,"name":scene_file_name,"entities":[], "timeline":""}
+
     const json = JSON.stringify(file_test);
     const blob = new Blob([json], {type: 'application/json'});
-    const fileName = `${uuid}.json`;
+    const fileName = `${uuid}-${scene_file_name}.json`;
 
     const formData = new FormData();
 
@@ -176,11 +179,17 @@ class APIManager {
   media_file_subtype (optional; mixamo, mocap_net, scene_import, animation_only)
   media_file_class (audio, image, video, animation, character, prop, scene, unknown)
   **/
-  async uploadGLB(file: File): Promise<string> {
+  async uploadGLB(file: File, scene_media_file_token:string | null): Promise<string> {
     const url = `${this.baseUrl}/v1/media_files/write/engine_asset`;
     let uuid = uuidv4();
     const formData = new FormData();
     formData.append("uuid_idempotency_token", uuid);
+
+    // update existing scene otherwise create new scene and use it's media_file_id
+    if (scene_media_file_token != null) {
+      formData.append("media_file_token", scene_media_file_token);
+    }
+
     formData.append("file", file);
     formData.append("source", "file");
     formData.append("media_file_subtype", "scene_import");

@@ -169,6 +169,18 @@ class Editor {
     this.timeline.scene = this.activeScene;
 
     this._test_demo()
+
+
+    // saving state of the scene 
+    this.scene_file_token = null
+  }
+
+
+  async saveScene(name) {
+    // check if I already have the scene token.
+    console.log("Saving...");
+    const result = await this.api_manager.saveSceneState(this.activeScene.scene,this.scene_file_token);
+    console.log("Saved!");
   }
 
   // uploading some objects for testing to get their media ids from my account.
@@ -281,7 +293,7 @@ class Editor {
     );
      // then it creates clip ui to load the playable clips 
      // then refreshes the timeline.
-     
+
     // create the clip with the same id for a reference to the media
     this.timeline.addPlayableClip(
       new ClipUI(

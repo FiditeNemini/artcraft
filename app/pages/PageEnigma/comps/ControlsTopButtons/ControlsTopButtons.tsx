@@ -10,6 +10,7 @@ export const ControlsTopButtons = () => {
   const handleButtonSave = () => {
     console.log(`SceneName is ${sceneName}`);
     // editorEngine?.save();
+    
   };
 
   const handleButtonCameraView = () => {
