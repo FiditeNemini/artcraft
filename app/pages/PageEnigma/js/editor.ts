@@ -52,7 +52,7 @@ class Editor {
   outlinePass: OutlinePass | undefined;
   last_cam_pos: THREE.Vector3 | undefined;
   saoPass: SAOPass | undefined;
-  outputPass: OutlinePass | undefined;
+  outputPass: OutputPass | undefined;
   bloomPass: UnrealBloomPass | undefined;
   smaaPass: SMAAPass | undefined;
   bokehPass: BokehPass | undefined;
@@ -170,10 +170,10 @@ class Editor {
   // Initializes the main scene and ThreeJS essentials.
 
   initialize(config:any) {
-    console.log(
-      "Calling Initialize",
-    );
     if (this.can_initialize == false) {
+      console.log(
+        "Editor Already Initialized",
+      );
       return;
     }
     this.can_initialize = false;
@@ -194,6 +194,7 @@ class Editor {
       canvas: this.canvReference,
       preserveDrawingBuffer: true,
     });
+    
     this.renderer.shadowMap.enabled = true;
     this.clock = new THREE.Clock();
     // Resizes the renderer.
@@ -465,8 +466,8 @@ class Editor {
     this.composer.addPass(this.smaaPass);
     this.composer.addPass(this.bokehPass);
 
-    //this.outputPass = new OutputPass()
-    //this.composer.addPass(this.outputPass)
+    this.outputPass = new OutputPass()
+    this.composer.addPass(this.outputPass)
   }
 
   create_parim(name: string) {

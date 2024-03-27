@@ -61,7 +61,7 @@ class APIManager {
     return new APIManagerResponseSuccess("Scene Saved")
   }
 
-  public async loadSceneState(scene_media_file_token: string): Promise<THREE.Scene> { 
+  public async loadSceneState(scene_media_file_token: string | null): Promise<THREE.Scene> { 
     const api_base_url = "https://api.fakeyou.com"
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`
     const response = await fetch(url)
