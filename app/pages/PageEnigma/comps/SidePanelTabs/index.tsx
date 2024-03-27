@@ -1,5 +1,5 @@
 import { Tabs } from "~/modules/Tabs";
-import { TabStyling } from "./TabStyling";
+import { TabStylization} from "./TabStylization";
 import { ClipElements } from "./ClipElements";
 
 export const SidePanelTabs = () => {
@@ -19,8 +19,8 @@ export const SidePanelTabs = () => {
           children: <p>Audio Tab</p>,
         },
         {
-          header: "Styling",
-          children: <TabStyling />,
+          header: "Stylization",
+          children: <TabStylization />,
         },
       ]}
     />

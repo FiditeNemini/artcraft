@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react"
-import { EngineContext } from "~/contexts/EngineContext"
+import { EngineContext } from "../../contexts/EngineContext"
 
 import { LoadingDotsTyping } from "~/components";
-export const PreviewWindow = ()=>{
+export const PreviewEngineCamera = ()=>{
   const editorEngine = useContext(EngineContext);
   //take data from egine context
 
@@ -12,12 +12,11 @@ export const PreviewWindow = ()=>{
   },[]);
   return (
     <div
-      id="preview-window"
+      id="preview-engine-camera"
       className="absolute bottom-0 w-30 m-4"
     >
       <div className="relative">
         <div
-          id="preview-window-label"
           className="text-white bg-ui-panel pt-1 px-2 pb-3 -z-10 rounded-t-lg -mb-2 w-fit"
         >
           <p>Camera View</p>

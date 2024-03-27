@@ -1,92 +1,92 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useReducer } from "react";
 
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
-import { Button } from "~/components";
+import { Button, LoadingDotsBricks } from "~/components";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
 import { SidePanel } from "~/modules/SidePanel";
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsTopButtons } from "./comps/ControlsTopButtons";
 import { ControlsVideo } from "./comps/ControlsVideo";
-import { PreviewWindow } from "./comps/PreviewWindow";
+import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { Timeline } from "./comps/Timeline";
 import { SidePanelTabs } from "./comps/SidePanelTabs";
 
-import { EngineProvider } from "~/contexts/EngineProvider";
+import { EngineProvider } from "./contexts/EngineProvider";
+import { AppUIProvider } from "./contexts/AppUiContext";
+import { reducer, initialState, ACTION_TYPES } from "./reducer";
+import { VIEW_MODES } from "./reducer/types";
+import { ViewSideBySide } from "./comps/ViewSideBySide";
 
 export const PageEnigmaComponent = () => {
+  const [appUiState, dispatchAppUiState] = useReducer(reducer, initialState);
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  const [timelineHeight, setTimelineHeight] = useState(260);
-  const timelineRef = useRef<HTMLDivElement | null>(null);
-
-  const updateTimelineHeight = useCallback(() => {
-    if (timelineRef.current) {
-      setTimelineHeight(timelineRef.current.offsetHeight);
-    }
-  }, []);
-
-  //for updating timeline/engine div height (for resizing)
-  useEffect(() => {
-    const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        updateTimelineHeight();
-      }
-    });
-
-    if (timelineRef.current) {
-      observer.observe(timelineRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [updateTimelineHeight]);
-
+  useEffect(()=>{
+    setTimeout(()=>dispatchAppUiState({
+      type: ACTION_TYPES.HIDE_EDITOR_LOADER
+    }), 3000);
+  },[]);
   return (
     <div>
+      <TopBarHelmet>
+        <Button icon={faSparkles}>Generate Movie</Button>
+      </TopBarHelmet>
+      
       <EngineProvider>
-        <TopBarHelmet>
-          <Button icon={faSparkles}>Generate Movie</Button>
-        </TopBarHelmet>
-        <div style={{ height: "calc(100vh - 68px)" }}>
-          {/* Engine section/side panel */}
-          <div
-            id="CanvasUiWrapper"
-            className="flex"
-            // style={{ height: `calc(100% - ${timelineHeight}px)` }}
-            style={{ height: `calc(100% - 260px` }}
-          >
-            <div className="relative w-full overflow-hidden bg-gray-400">
-              <canvas
-                ref={canvasRef}
-                id="video-scene"
-                width="1280px"
-                height="720px"
-              />
+        <AppUIProvider value={[appUiState, dispatchAppUiState]} >
+          <div style={{ height: "calc(100vh - 68px)" }}>
+            {/* Engine section/side panel */}
+            <div
+              id="CanvasUiWrapper"
+              className="flex"
+              style={{ height: `calc(100% - ${appUiState.timelineHeight}px)` }}
+              // style={{ height: `calc(100% - 260px` }}
+            >
+              <div className="relative w-full overflow-hidden bg-transparent">
+                <div className={(appUiState.viewMode === VIEW_MODES.SIDE_BY_SIDE) ? 'invisible' : ''}>
+                  <canvas
+                    ref={canvasRef}
+                    id="video-scene"
+                    width="1280px"
+                    height="720px"
+                  />
 
-              {/* Top controls */}
-              <div className="absolute left-0 top-0 w-full">
-                <div className="grid grid-cols-3 gap-4">
-                  <ControlsTopButtons />
-                  <Controls3D />
+                  {/* Top controls */}
+                  <div className="absolute left-0 top-0 w-full">
+                    <div className="grid grid-cols-3 gap-4">
+                      <ControlsTopButtons />
+                      <Controls3D />
+                    </div>
+                  </div>
+
+                  {/* Bottom controls */}
+                  <div className="absolute bottom-0 left-0 w-full">
+                    <PreviewEngineCamera />
+                    <ControlsVideo />
+                  </div>
                 </div>
+                {
+                  appUiState.viewMode === VIEW_MODES.SIDE_BY_SIDE &&
+                  <ViewSideBySide />
+                }
+                <LoadingDotsBricks
+                  className="absolute top-0 left-0"
+                  show={appUiState.showEditorLoader}
+                  transition
+                />
               </div>
-
-              {/* Bottom controls */}
-              <div className="absolute bottom-0 left-0 w-full">
-                <PreviewWindow />
-                <ControlsVideo />
-              </div>
+              
+              {/* Side panel */}
+              <SidePanel>
+                <SidePanelTabs />
+              </SidePanel>
             </div>
 
-            {/* Side panel */}
-            <SidePanel>
-              <SidePanelTabs />
-            </SidePanel>
+            {/* Timeline */}
+            <Timeline timelineHeight={appUiState.timelineHeight} />
           </div>
-
-          {/* Timeline */}
-          <Timeline timelineHeight={timelineHeight} />
-        </div>
+        </AppUIProvider>
       </EngineProvider>
     </div>
   );
