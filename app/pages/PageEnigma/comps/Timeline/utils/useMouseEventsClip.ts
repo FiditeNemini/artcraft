@@ -89,6 +89,8 @@ export const useMouseEventsClip = (
       type: string,
     ) => {
       if (event.button === 0) {
+        event.stopPropagation();
+        event.preventDefault();
         clientX.current = event.clientX;
         isActive.current = type;
       }

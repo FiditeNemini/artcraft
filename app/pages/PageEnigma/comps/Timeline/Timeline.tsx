@@ -22,6 +22,7 @@ export const Timeline = ({ timelineHeight }: Props) => {
     scale,
     length,
     selectedClip,
+    currentTime,
     deleteCharacterClip,
     deleteAudioClip,
     deleteCameraClip,
@@ -32,7 +33,7 @@ export const Timeline = ({ timelineHeight }: Props) => {
 
   const sectionWidth = 60 * 4 * scale;
   const fullHeight =
-    characters.length * 200 + objects.objects.length * 80 + 248 + 96;
+    characters.length * 268 + objects.objects.length * 60 + 300 + 96;
 
   const onDeleteAsk = useCallback(
     (event: KeyboardEvent) => {
@@ -42,6 +43,8 @@ export const Timeline = ({ timelineHeight }: Props) => {
     },
     [selectedClip],
   );
+
+  const displayTime = time === -1 ? currentTime : time;
 
   const onDelete = useCallback(() => {
     deleteCharacterClip(selectedClip!);
@@ -126,7 +129,7 @@ export const Timeline = ({ timelineHeight }: Props) => {
         </div>
         <div
           className="absolute text-brand-primary"
-          style={{ top: 8, left: time * 4 * scale + 88 }}
+          style={{ top: 8, left: displayTime * 4 * scale + 88 }}
           onPointerDown={onPointerDown}
         >
           <FontAwesomeIcon
