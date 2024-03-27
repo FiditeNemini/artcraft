@@ -53,17 +53,19 @@ class APIManager {
     let uuid = uuidv4();
 
     // turn json into a blob
-    const file_test = {"scene_media_file_id":uuid}
+    const file_test = {"glb_media_file_id":uuid,"entities":[], "timeline":""}
     const json = JSON.stringify(file_test);
     const blob = new Blob([json], {type: 'application/json'});
     const fileName = `${uuid}.json`;
 
     const formData = new FormData();
+
     formData.append("uuid_idempotency_token", uuid);
     formData.append("file", blob, fileName);
     formData.append("source", "file");
     formData.append("type", "scene_json");
     formData.append("source", "file");
+
     const response = await fetch(url, {
       method: "POST",
       credentials: "include",
@@ -77,7 +79,7 @@ class APIManager {
       throw new Error("Failed to Send Data");
     }
 
-    console.log(`RESPONSE ${response}`)
+    console.log(`saveSceneAndTimelineToJSONSpecResponse: ${response}`)
 
     return response.json(); // or handle the response as appropriate
   }
@@ -107,7 +109,7 @@ class APIManager {
       reader.onerror = reject;
       reader.readAsText(blob);
     });
-      //console.log(json_value)
+    console.log(json_value)
     return json_value
   } 
 
@@ -125,7 +127,6 @@ class APIManager {
   }
   
   async batchGetMedia(media_tokens: []): Promise<string> {
-
     return "";
   }
 
@@ -161,23 +162,23 @@ class APIManager {
     if (!response.ok) {
       throw new Error("Failed to Send Data");
     }
-
-    return response.json(); // or handle the response as appropriate
+    return response.json(); 
   }
 
-  // To save to a file then upload the scene.
-  // /v1/media_files/write/engine_asset
-  // An upsert for files. 
-  // If the file exists, it'll check ownership prior to overwriting.
-  // For GLB, GLTF, BVH, FBX, etc. game engine-type files.
-  // Form-multipart POST with parameters:
-  // uuid_idempotency_token 
-  // file
-  // media_file_token (optional; the file to replace if present)
-  // media_file_subtype (optional; mixamo, mocap_net, scene_import, animation_only)
-  // media_file_class (audio, image, video, animation, character, prop, scene, unknown)
+  /**
+  To save the scene as a file get the id back to serialize
+  /v1/media_files/write/engine_asset
+  An upsert for files. 
+  If the file exists, it'll check ownership prior to overwriting.
+  For GLB, GLTF, BVH, FBX, etc. game engine-type files.
+  Form-multipart POST with parameters:
+  uuid_idempotency_token 
+  file
+  media_file_token (optional; the file to replace if present)
+  media_file_subtype (optional; mixamo, mocap_net, scene_import, animation_only)
+  media_file_class (audio, image, video, animation, character, prop, scene, unknown)
+  **/
   async uploadGLB(file: File): Promise<string> {
-    // /v1/media_files/write/engine_asset REPLACE with this api endpoint
     const url = `${this.baseUrl}/v1/media_files/write/engine_asset`;
     let uuid = uuidv4();
     const formData = new FormData();

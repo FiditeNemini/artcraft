@@ -20,11 +20,8 @@ isEditable: boolean
 
 export class TimeLine {
 
-    
     timelineItems: ClipUI[]
-    runningClips: ClipUI[]
 
-    //timerID: NodeJS.Timeout | null
     timeLineLimit: number
     scrubberPosition: number
     isPlaying: boolean
@@ -50,7 +47,7 @@ export class TimeLine {
         
         this.timelineItems = []
         this.timeLineLimit = 60 * 10 // 10 seconds
-        this.runningClips = []
+     
         this.isPlaying = false
         this.scrubberPosition = 0 // in frames into the tl
         this.timelineState = new TimelineCurrentReactState()
