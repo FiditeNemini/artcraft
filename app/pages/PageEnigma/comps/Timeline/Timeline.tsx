@@ -1,5 +1,5 @@
 import { Fragment, useContext } from "react";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { LowerPanel } from "~/modules/LowerPanel";
 import { Character } from "./Character";
 
@@ -44,7 +44,7 @@ export const Timeline = ({ timelineHeight }: Props) => {
                   00:{index < 10 ? "0" + index.toString() : index.toString()}
                 </div>
                 <div
-                  className="bg-ui-divider absolute block h-full"
+                  className="absolute block h-full bg-ui-divider"
                   style={{
                     width: 1,
                     left: index * sectionWidth + 88,
@@ -60,7 +60,7 @@ export const Timeline = ({ timelineHeight }: Props) => {
             00:{length < 10 ? "0" + length.toString() : length.toString()}
           </div>
           <div
-            className="bg-ui-divider absolute block h-full"
+            className="absolute block h-full bg-ui-divider"
             style={{
               width: 1,
               left: length * sectionWidth + 88,

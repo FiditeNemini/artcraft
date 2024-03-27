@@ -6,7 +6,7 @@ import React, {
   useRef,
 } from "react";
 import { BaseClip } from "~/models/track";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 
 export const useMouseEventsClip = (
   clip: BaseClip,
