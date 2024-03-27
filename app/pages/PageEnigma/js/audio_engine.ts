@@ -1,43 +1,54 @@
-import * as THREE from "three";
+import { faL } from "@fortawesome/pro-solid-svg-icons";
+import { AudioTrackClip } from "../datastructures/clips/audio_track_clip";
 
 class AudioEngine {
-  constructor() {
-      this.listener = new THREE.AudioListener();
-      this.clips = {};
-  }
+    clips: { [key: string]: AudioTrackClip } = {};
+    audio_sources: { [key: string]: AudioBufferSourceNode } = {};
+    version: number;
+    playing: string[];
 
-  addCamera(camera) {
-      // Assuming you have a camera and you want to add the listener to it
-      camera.add(this.listener);
-  }
+    constructor() {
+        this.clips = {};
+        this.playing = [];
+        this.audio_sources = {};
+        this.version = 1.0;
+    }
 
-  loadClip(id, audioURL) {
-      if (this.clips[id]) {
-          console.warn(`AudioManager: AudioClip already exists with id "${id}".`);
-          return;
-      }
+    // loads clips into the engine to cache
+    loadClip(audio_media_id: string) {
+        if(this.clips[audio_media_id] != null) { return; }
+        this.clips[audio_media_id] = new AudioTrackClip(this.version, audio_media_id, 1.0);
+    }
 
-      const clip = new AudioClip(this.listener, audioURL);
-      this.clips[id] = clip;
-  }
+    // plays from the timeline.
+    playClip(audio_media_id: string) {
+        if (this.clips[audio_media_id] == null) { this.loadClip(audio_media_id); }
+        let clip = this.clips[audio_media_id];
+        if (clip.audio_data?.audioContext) {
+            if (this.playing.includes(audio_media_id)) { return; }
+            this.playing.push(audio_media_id);
+            clip.audio_data.source = clip.audio_data.audioContext.createBufferSource();
+            clip.audio_data.source.buffer = clip.audio_data.audioBuffer;
+            clip.audio_data.source.connect(clip.audio_data.audioContext.destination);
+            clip.audio_data.source.start();
+            clip.audio_data.source.onended = () => {
+                this.playing = this.playing.filter(id => id !== audio_media_id);
+            };
+            
+        } else {
+            console.warn(`AudioManager: AudioClip buffer with id "${audio_media_id}" not found.`);
+        }
+    }
 
-  playClip(id) {
-      const clip = this.clips[id];
-      if (clip) {
-          clip.play();
-      } else {
-          console.warn(`AudioManager: AudioClip with id "${id}" not found.`);
-      }
-  }
-
-  stopClip(id) {
-      const clip = this.clips[id];
-      if (clip) {
-          clip.stop();
-      } else {
-          console.warn(`AudioManager: AudioClip with id "${id}" not found.`);
-      }
-  }
+    // stops the clips
+    stopClip(audio_media_id: string) {
+        const clip = this.clips[audio_media_id];
+        if (clip.audio_data?.source) {
+            clip.audio_data.source.stop();
+        } else {
+            console.warn(`AudioManager: AudioClip with id "${audio_media_id}" not found.`);
+        }
+    }
 }
 
-export default AudioManager;
+export default AudioEngine;

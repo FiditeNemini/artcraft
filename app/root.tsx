@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 import { LinksFunction } from "@remix-run/deno";
 import {
   Links,
@@ -12,23 +12,47 @@ import normalizeCss from "./styles/normalize.css?url";
 import tailwindCss from "./styles/tailwind.css?url";
 import baseCss from "./styles/base.css?url";
 
+import { LoadingDotsBricks } from "~/components";
 import { TopBar } from "./modules/TopBar";
-import { TopBarInnerContext } from '~/contexts/TopBarInner';
+import { TopBarInnerContext } from "~/contexts/TopBarInner";
 
-
-export const links : LinksFunction = () => [{ 
-  rel: "stylesheet",
-  href: normalizeCss,
-},{ 
-  rel: "stylesheet",
-  href: tailwindCss,
-},{ 
-  rel: "stylesheet",
-  href: baseCss,
-}];
+export const links: LinksFunction = () => [
+  {
+    rel: "stylesheet",
+    href: normalizeCss,
+  },
+  {
+    rel: "stylesheet",
+    href: tailwindCss,
+  },
+  {
+    rel: "stylesheet",
+    href: baseCss,
+  },
+  {
+    rel: "preconnect",
+    href: "https://fonts.googleapis.com",
+  },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
+  },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap",
+  },
+];
 
 export default function App() {
-  const [topBarInnerComponent, setTopBarInnerComponent] = useState<JSX.Element | null>(null);
+  const [topBarInnerComponent, setTopBarInnerComponent] =
+  useState<JSX.Element | null>(null);
+  const [isLoaded, setIsLoaded] = useState<'loading'|'loaded'|'completed'>('loading');
+  useEffect(()=>{
+    setIsLoaded('loaded');
+    setTimeout(()=>setIsLoaded('completed'), 2000);
+  },[]);
+
 
   return (
     <html lang="en">
@@ -38,13 +62,23 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-ui-background">
-        <TopBarInnerContext.Provider value={{
+      <body className="overflow-hidden bg-ui-background">
+        {isLoaded !== 'completed' && 
+          <CompleteTakeoverLoadingScreen 
+            className={
+              isLoaded === 'loading'
+                ? "transition-opacity duration-1000 opacity-100"
+                : "transition-opacity duration-1000 opacity-0"
+            }
+          />
+        }
+        <TopBarInnerContext.Provider
+          value={{
             TopBarInner: topBarInnerComponent,
-            setTopBarInner: setTopBarInnerComponent
-          }}>
-          
-          <div className="topbar-spacer"/>
+            setTopBarInner: setTopBarInnerComponent,
+          }}
+        >
+          <div className="topbar-spacer" />
           <Outlet />
           <TopBar />
         </TopBarInnerContext.Provider>
@@ -54,3 +88,26 @@ export default function App() {
     </html>
   );
 }
+
+function CompleteTakeoverLoadingScreen({className}:{className:string}){
+  return(
+    <div
+      id='complete-takeover-loading-screen'
+      className={className}
+      style={{
+        backgroundColor: '#1a1a27',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 9999,
+      }}
+    >
+        <LoadingDotsBricks />
+    </div>
+  );
+};

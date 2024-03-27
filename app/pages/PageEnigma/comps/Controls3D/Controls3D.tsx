@@ -1,34 +1,114 @@
 import {
   faArrowsRotate,
   faArrowsUpDownLeftRight,
+  faCube,
   faPlus,
   faUpRightAndDownLeftFromCenter,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+} from "@fortawesome/pro-solid-svg-icons";
+import {
+  fa3dCylinder,
+  fa3dTorus,
+  fa3dSphere,
+} from "@awesome.me/kit-fde2be5eb0/icons/kit/custom";
+import { ButtonIcon, ButtonIconSelect } from "~/components";
+import { EngineContext } from "../../contexts/EngineContext";
+import { useContext } from "react";
 
 export const Controls3D = () => {
+  const editorEngine = useContext(EngineContext);
+
+  const handlePlus = () => {
+    console.log("Controls 3D: Plus button clicked");
+  };
+  const handleCube = () => {
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
+    editorEngine.create_parim("Box");
+  };
+  const handleCylinder = () => {
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
+    editorEngine.create_parim("Cylinder");
+  };
+  const handleTorus = () => {
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
+    editorEngine.create_parim("Donut");
+  };
+  const handleSphere = () => {
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
+    editorEngine.create_parim("Sphere");
+  };
+  const handleMoveArrows = () => {
+    if (!editorEngine) {
+      return;
+    }
+    editorEngine.change_mode("translate");
+  };
+  const handleRotateArrows = () => {
+    if (!editorEngine) {
+      return;
+    }
+    editorEngine.change_mode("rotate");
+  };
+  const handleZoomArrows = () => {
+    if (!editorEngine) {
+      return;
+    }
+    editorEngine.change_mode("scale");
+  };
+
+  const handleModeChange = (value: string) => {
+    switch (value) {
+      case "move":
+        handleMoveArrows();
+        break;
+      case "rotate":
+        handleRotateArrows();
+        break;
+      case "scale":
+        handleZoomArrows();
+        break;
+      default:
+        console.log("Unknown option");
+    }
+  };
+
+  const modes = [
+    { value: "move", icon: faArrowsUpDownLeftRight },
+    { value: "rotate", icon: faArrowsRotate },
+    { value: "scale", icon: faUpRightAndDownLeftFromCenter },
+  ];
+
   return (
-    <div
-      className="fixed left-1/2 -translate-x-1/2 rounded-b-md border-x border-b border-ui-panel-border bg-ui-panel px-4 py-2 text-white"
-      style={{ top: "64px" }}
-    >
-      <div className="flex gap-4">
-        <FontAwesomeIcon icon={faPlus} />
-        <span className="h-5 w-0 border-l border-ui-panel-border" />
-        <img className="w-5" src="/resources/svgs/torus.svg" alt="make torus" />
-        <img
-          className="w-5"
-          src="/resources/svgs/cylinder.svg"
-          alt="make cynlinder"
-        />
-        <img
-          className="w-5"
-          src="/resources/svgs/sphere.svg"
-          alt="make sphere"
-        />
-        <FontAwesomeIcon icon={faArrowsUpDownLeftRight} />
-        <FontAwesomeIcon icon={faArrowsRotate} />
-        <FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} />
+    <div>
+      <div className="flex justify-center">
+        <div className="rounded-b-lg border-x border-b border-ui-panel-border bg-ui-controls p-2 text-white">
+          <div className="flex items-center justify-center gap-2">
+            <ButtonIcon icon={faPlus} onClick={handlePlus} fill={true} />
+
+            <span className="h-4 w-0 border-l border-white/[0.15]" />
+
+            <div className="flex gap-1">
+              <ButtonIcon icon={faCube} onClick={handleCube} />
+              <ButtonIcon icon={fa3dCylinder} onClick={handleCylinder} />
+              <ButtonIcon icon={fa3dTorus} onClick={handleTorus} />
+              <ButtonIcon icon={fa3dSphere} onClick={handleSphere} />
+            </div>
+
+            <span className="h-4 w-0 border-l border-white/[0.15]" />
+
+            <ButtonIconSelect
+              options={modes}
+              onOptionChange={handleModeChange}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );

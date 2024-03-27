@@ -1,7 +1,22 @@
 import { Button } from "./Button";
+import { ButtonIcon } from "./ButtonIcon";
 import { ButtonLink } from "./ButtonLink";
+import { ButtonIconSelect } from "./ButtonIconSelect";
+import { Input } from "./Input";
+import { H4 } from "./H4";
+import { ItemPicker } from "./ItemPicker";
+import { Textarea } from "./Textarea";
+import { LoadingDotsBricks, LoadingDotsTyping } from "./LoadingDots";
 
 export {
   Button,
-  ButtonLink
+  ButtonIcon,
+  ButtonLink,
+  ButtonIconSelect,
+  H4,
+  ItemPicker,
+  Textarea,
+  Input,
+  LoadingDotsBricks,
+  LoadingDotsTyping,
 };

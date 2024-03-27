@@ -7,32 +7,29 @@ const samplingFrequency = 44100;
 
 for (let m = 0; m < BoundingFrequencyMasc.length; m++) {
   IndicesFrequencyMale[m] = Math.round(
-    ((2 * FFT_SIZE) / samplingFrequency) * BoundingFrequencyMasc[m]
+    ((2 * FFT_SIZE) / samplingFrequency) * BoundingFrequencyMasc[m],
   );
 }
 
 for (let m = 0; m < BoundingFrequencyFem.length; m++) {
   IndicesFrequencyFemale[m] = Math.round(
-    ((2 * FFT_SIZE) / samplingFrequency) * BoundingFrequencyFem[m]
+    ((2 * FFT_SIZE) / samplingFrequency) * BoundingFrequencyFem[m],
   );
 }
 
 export class LipSync {
-  constructor(vrm) {
-    this.vrm = vrm;
+  constructor(face) {
 
-    this.ee = this.vrm.morphTargetDictionary["E"];
-    this.oh = this.vrm.morphTargetDictionary["O"];
-    this.ah = this.vrm.morphTargetDictionary["aa"];
+    this.face = face;
 
-    const update = (deltaTime, elapsedTime) => {
-      requestAnimationFrame(update);
-      this.update(deltaTime, elapsedTime);
-    };
-
-    update();
+    // WE NEED THIS TO be run at RUNTIME
+    // we have to modify this for our
+    // this.ee = this.face.morphTargetDictionary["E"];
+    // this.oh = this.face.morphTargetDictionary["O"];
+    // this.ah = this.face.morphTargetDictionary["aa"];
   }
 
+  // for streaming sound?
   start(stream) {
     this.audioContext = new AudioContext();
     this.mediaStreamSource = this.audioContext.createMediaStreamSource(stream);
@@ -40,6 +37,7 @@ export class LipSync {
     this.mediaStreamSource.connect(this.meter);
   }
 
+  // testing only
   startFromAudioFile(file) {
     if (!this.audioContext) this.audioContext = new AudioContext();
 
@@ -63,6 +61,25 @@ export class LipSync {
     });
   }
 
+  startLipSyncFromAudioBuffer(buffer) {
+    if (!this.audioContext) this.audioContext = new AudioContext();
+    if (!this.userSpeechAnalyzer)
+      this.userSpeechAnalyzer = this.audioContext.createAnalyser();
+    this.userSpeechAnalyzer.smoothingTimeConstant = 0.5;
+    this.userSpeechAnalyzer.fftSize = FFT_SIZE;
+
+    if (this.mediaStreamSource) this.mediaStreamSource.stop();
+
+    this.mediaStreamSource = this.audioContext.createBufferSource();
+    this.mediaStreamSource.buffer = buffer;
+    this.meter = LipSync.createAudioMeter(this.audioContext);
+    this.mediaStreamSource.connect(this.meter);
+    this.mediaStreamSource.connect(this.audioContext.destination);
+    this.mediaStreamSource.start();
+    // connect the output of mediaStreamSource to the input of userSpeechAnalyzer
+    this.mediaStreamSource.connect(this.userSpeechAnalyzer);
+  }
+
   destroy() {
     this.meter?.shutdown();
     this.meter = null;
@@ -70,25 +87,18 @@ export class LipSync {
     return this.audioContext?.close().catch(() => {}) || Promise.resolve();
   }
 
-  update(deltaTime) {
+  update() {
     if (this.meter) {
       const { volume } = this.meter;
+      let { ah, oh, ee } = this.update2();
       if (volume < 0.01) {
-        // get the shape keys from the VRM avatar
-
-        this.vrm.morphTargetInfluences[this.ee] = 0;
-        this.vrm.morphTargetInfluences[this.ah] = 0;
-        this.vrm.morphTargetInfluences[this.oh] = 0;
-      } else {
-        const { ah, oh, ee } = this.update2();
-        this.vrm.morphTargetInfluences[this.ee] = ee;
-        this.vrm.morphTargetInfluences[this.ah] = ah;
-        this.vrm.morphTargetInfluences[this.oh] = oh;
-
-        // update the shape keys
-        //this.vrm.expressionManager.update(deltaTime);
+        ah = 0;
+        oh = 0;
+        ee = 0;
       }
+      return { "ah": ah, "oh": oh, "ee": ee };
     }
+    return { "ah": 0, "oh": 0, "ee": 0 };
   }
 
   update2() {
@@ -102,7 +112,7 @@ export class LipSync {
     }
 
     const spectrum = new Float32Array(
-      this.userSpeechAnalyzer.frequencyBinCount
+      this.userSpeechAnalyzer.frequencyBinCount,
     );
     // Populate frequency data for computing frequency intensities
     this.userSpeechAnalyzer.getFloatFrequencyData(spectrum); // getByteTimeDomainData gets volumes over the sample time

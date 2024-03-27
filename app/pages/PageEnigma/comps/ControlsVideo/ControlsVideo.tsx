@@ -4,18 +4,35 @@ import {
   faForwardFast,
   faForwardStep,
   faPlay,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+} from "@fortawesome/pro-solid-svg-icons";
+import { ButtonIcon } from "~/components";
 
-export const ControlsVideo = ()=>{
-  return(
-    <div className="fixed top-3/4 left-1/2 -translate-x-1/2 -mt-10 bg-ui-panel border-t border-x border-ui-panel-border rounded-t-md px-6 py-2 text-white">
-      <div className='flex gap-6 content-center	'>
-        <FontAwesomeIcon className="h-6" icon={faBackwardFast} />
-        <FontAwesomeIcon className="h-6" icon={faBackwardStep} />
-        <FontAwesomeIcon className="h-6" icon={faPlay} />
-        <FontAwesomeIcon className="h-6" icon={faForwardStep} />
-        <FontAwesomeIcon className="h-6"icon={faForwardFast} />
+export const ControlsVideo = () => {
+  const handleBackwardFast = () => {
+    console.log("Controls Video: Backward-Fast clicked");
+  };
+  const handleBackwardStep = () => {
+    console.log("Controls Video: Backward-Step clicked");
+  };
+  const handlePlay = () => {
+    console.log("Controls Video: Play clicked");
+  };
+  const handleForwardStep = () => {
+    console.log("Controls Video: Forward-Step clicked");
+  };
+  const handleForwardFast = () => {
+    console.log("Controls Video: Forward-Fast clicked");
+  };
+  return (
+    <div className="flex justify-center">
+      <div className="rounded-t-lg border-x border-t border-ui-panel-border bg-ui-controls p-2 text-white">
+        <div className="flex content-center gap-2">
+          <ButtonIcon icon={faBackwardFast} onClick={handleBackwardFast} />
+          <ButtonIcon icon={faBackwardStep} onClick={handleBackwardStep} />
+          <ButtonIcon icon={faPlay} onClick={handlePlay} />
+          <ButtonIcon icon={faForwardStep} onClick={handleForwardStep} />
+          <ButtonIcon icon={faForwardFast} onClick={handleForwardFast} />
+        </div>
       </div>
     </div>
   );

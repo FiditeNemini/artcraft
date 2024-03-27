@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState } from "react";
 import { PageEnigma } from "../pages/PageEnigma";
 
-import { Button } from '~/components/Button';
+import { Button } from "~/components/Button";
 
-export default function IdealEnigma(){
+export default function IdealEnigma() {
   //const [riddle, setRiddle] = useState<string>("");
   //const [submitted, setSubmitted] = useState<boolean>(false);
 
@@ -16,14 +16,13 @@ export default function IdealEnigma(){
   //  setSubmitted(state);
   //}
 
-  
-  return <PageEnigma />
+  return <PageEnigma />;
   // if(submitted){
-  //   return <PageEnigma />
+  //   return <PageEnigmaComponent />
   // }else{
   //   return(
   //     <div className="w-full flex justify-center content-center">
-  //       <form 
+  //       <form
   //         className="mt-20 flex flex-col content-center"
   //         onSubmit={handleSubmit}
   //       >
@@ -38,5 +37,4 @@ export default function IdealEnigma(){
 
   //   );
   // }
-  
 }
