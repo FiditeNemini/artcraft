@@ -115,6 +115,8 @@ class Editor {
     this.test_box_uuid = null;
     this.current_frame = 0;
     this.test_playback = false;
+
+    this.test_scene_load_media_id = ""; // Test media id for saving and loading.
   }
 
   // Initializes the main scene and ThreeJS essentials.
@@ -184,11 +186,12 @@ class Editor {
     console.log("Saving...");
     const result = await this.api_manager.saveSceneState(this.activeScene.scene);
     console.log("Saved!");
-    //this.api_manager.loadScene("m_n3k7nc0r5scr5zf92febh52h39g721")
+    console.log("Media ID is:", result);
+    this.test_scene_load_media_id = result["media_file_token"];
   }
 
   async _load_for_testing() {
-    const result = await this.api_manager.loadScene("m_7f3k4qysab4aja96vpc7b31tmq8y3k");
+    const result = await this.api_manager.loadScene(this.test_scene_load_media_id);
     let bucket_path = await this.api_manager.getMediaFile(result["glb_media_file_id"]);
     let glbLoader = new GLTFLoader();
     glbLoader.load(bucket_path, (glb) => {
@@ -198,11 +201,9 @@ class Editor {
         if(child.type == "DirectionalLight") {
           let pos = child.position;
           let rot = child.rotation;
-
           let light = this.activeScene._create_base_lighting();
           light.position.set(pos.x, pos.y, pos.z);
           light.rotation.set(rot.x, rot.y, rot.z);
-          
           this.activeScene.scene.remove(child);
         }
       });
