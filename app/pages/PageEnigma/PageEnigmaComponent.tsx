@@ -1,4 +1,4 @@
-import { useEffect, useRef, useReducer } from "react";
+import { useEffect, useReducer } from "react";
 
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
@@ -20,13 +20,13 @@ import { ViewSideBySide } from "./comps/ViewSideBySide";
 
 export const PageEnigmaComponent = () => {
   const [appUiState, dispatchAppUiState] = useReducer(reducer, initialState);
-
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  
   useEffect(()=>{
     setTimeout(()=>dispatchAppUiState({
       type: ACTION_TYPES.HIDE_EDITOR_LOADER
     }), 3000);
   },[]);
+
   return (
     <div>
       <TopBarHelmet>
@@ -46,7 +46,6 @@ export const PageEnigmaComponent = () => {
               <div className="relative w-full overflow-hidden bg-transparent">
                 <div className={(appUiState.viewMode === VIEW_MODES.SIDE_BY_SIDE) ? 'invisible' : ''}>
                   <canvas
-                    ref={canvasRef}
                     id="video-scene"
                     width="1280px"
                     height="720px"
