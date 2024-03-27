@@ -7,6 +7,7 @@ interface LoadingBarProps{
   variant?: string;
   pulsing?: boolean;
   message?: string;
+  wrapperClassName?: string;
 }
 export const LoadingBar = ({
   label,
@@ -14,6 +15,7 @@ export const LoadingBar = ({
   variant = 'primary',
   pulsing = false,
   message,
+  wrapperClassName : propsWrapperClassName,
 }: LoadingBarProps) => {
 
   function getVariantClassNames(variant: string) {
@@ -27,15 +29,20 @@ export const LoadingBar = ({
       }
     }
   }
+
+  const wrapperClassName = twMerge(
+    "w-full h-full flex flex-col justify-center items-center bg-ui-background p-4 gap-4",
+    propsWrapperClassName,
+  )
   const progressClassName = twMerge(
-    "h-2.5 rounded-full",
+    "h-2.5 rounded-full transition-all duration-1000",
     getVariantClassNames(variant),
   );
 
   return (
-    <div className="w-full h-full flex flex-row justify-center items-center bg-ui-background ">
+    <div className={wrapperClassName}>
       {label && <label>{label}</label>}
-      <div className="w-full bg-gray-200 rounded-full h-2.5">
+      <div className="w-full bg-gray-500 rounded-full h-2.5">
         <div 
           className={progressClassName} 
           style={{width: progress + '%'}}
