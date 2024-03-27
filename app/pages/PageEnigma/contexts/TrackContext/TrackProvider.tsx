@@ -1,9 +1,9 @@
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import useUpdateCharacters from "~/contexts/TrackContext/utils/useUpdateCharacters";
-import useUpdateCamera from "~/contexts/TrackContext/utils/useUpdateCamera";
-import useUpdateAudio from "~/contexts/TrackContext/utils/useUpdateAudio";
-import useUpdateObject from "~/contexts/TrackContext/utils/useUpdateObject";
+import useUpdateCharacters from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateCharacters";
+import useUpdateCamera from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateCamera";
+import useUpdateAudio from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateAudio";
+import useUpdateObject from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateObject";
 import { AnimationClip, AudioClip } from "~/models/track";
 
 interface Props {

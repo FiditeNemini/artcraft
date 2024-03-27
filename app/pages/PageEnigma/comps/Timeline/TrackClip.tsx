@@ -1,6 +1,6 @@
 import { useMouseEventsClip } from "./utils/useMouseEventsClip";
 import { BaseClip } from "~/models/track";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { useContext, useState } from "react";
 
 interface Props {

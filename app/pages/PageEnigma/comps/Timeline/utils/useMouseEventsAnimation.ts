@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 
 export const useMouseEventsAnimation = () => {
   const { currentTime, updateCurrentTime, length, scale } =

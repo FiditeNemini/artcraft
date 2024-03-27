@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { ClipElement } from "./ClipElement";
-import { TrackContext } from "~/contexts/TrackContext/TrackContext";
+import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 
 export const ClipElements = () => {
   const { animationClips } = useContext(TrackContext);
