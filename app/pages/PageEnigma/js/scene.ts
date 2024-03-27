@@ -99,6 +99,7 @@ class Scene {
             '/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png',
         ]);
         this.scene.background = texture;
+        console.log("Backround creation..")
     }
 
     // deafult image skybox.

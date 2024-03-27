@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
-import Scene from "./scene.ts";
-import APIManager from "./api_manager.ts";
+import Scene from "./scene.js";
+import APIManager from "./api_manager.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
@@ -14,27 +14,15 @@ import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-import AudioEngine from "./audio_engine.ts";
-import TransformEngine from "./transform_engine.ts";
-import { TimeLine, TimelineDataState } from "./timeline.ts";
-import { ClipUI } from "../datastructures/clips/clip_offset.ts";
+import AudioEngine from "./audio_engine.js";
+import TransformEngine from "./transform_engine.js";
+import { TimeLine, TimelineDataState } from "./timeline.js";
+import { ClipUI } from "../datastructures/clips/clip_offset.js";
 
 import { LipSync } from "./lipsync.js";
-import { LipSyncEngine } from "./lip_sync_engine.ts";
-import { AnimationEngine } from "./animation_engine.ts";
+import { LipSyncEngine } from "./lip_sync_engine.js";
+import { AnimationEngine } from "./animation_engine.js";
 import { faL } from "@fortawesome/pro-solid-svg-icons";
-import { ACTION_TYPES } from "../reducer";
-
-if (typeof window !== "undefined") {
-  import("ccapture.js")
-    .then((module) => {
-      const CCapture = module.CCapture;
-      // You can use CCapture here
-    })
-    .catch((error) => {
-      console.error("Failed to load CCapture:", error);
-    });
-}
 
 class EditorState {
 
@@ -44,34 +32,75 @@ class EditorState {
   //   data: { "message" : "saving scene" }
   // }
 
+  selected_object: THREE.Object3D | undefined;
+  is_loading: boolean;
+
   constructor() {
-    this.selected_object = null;
+    this.selected_object;
     this.is_loading = false;
   }
 }
 // Main editor class that will call everything else all you need to call is " initialize(); ".
 class Editor {
+  version: number;
+  activeScene: Scene;
+  camera: any;
+  renderer: THREE.WebGLRenderer | undefined;
+  clock: THREE.Clock | undefined;
+  canvReference: any;
+  composer: EffectComposer | undefined;
+  effectFXAA: EffectComposer | undefined;
+  outlinePass: OutlinePass | undefined;
+  last_cam_pos: THREE.Vector3 | undefined;
+  saoPass: SAOPass | undefined;
+  outputPass: OutlinePass | undefined;
+  bloomPass: UnrealBloomPass | undefined;
+  smaaPass: SMAAPass | undefined;
+  bokehPass: BokehPass | undefined;
+  control: TransformControls | undefined;
+  raycaster: THREE.Raycaster | undefined;
+  mouse: THREE.Vector2 | undefined;
+  selected: THREE.Object3D | undefined;
+  last_selected: THREE.Object3D | undefined;
+  transform_interaction: any;
+  rendering: boolean;
+  api_manager: APIManager;
+  stats: any;
+  orbit: OrbitControls | undefined;
+  locked: boolean;
+  capturer: any;
+  frame_buffer: any;
+  render_timer: number;
+  fps_number: number;
+  cap_fps: number;
+  playback: boolean;
+  playback_location: number;
+  max_length: number;
+  audio_engine: AudioEngine;
+  transform_engine: TransformEngine;
+  lipsync_engine: LipSyncEngine;
+  animation_engine: AnimationEngine;
+  timeline: TimeLine;
+  current_frame: number;
+  test_scene_load_media_id: string;
+  scene_file_token: any;
+  renderPass: RenderPass | undefined;
+
+
   // Default params.
   constructor() {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
     );
-    // For making sure the editor only gets created onece.
-    this.can_initailize = false;
-    let one_element = document.getElementById("created-one-element");
-    //if (one_element != null) { return; }
-    this.can_initailize = true;
-    let newElement = document.createElement("div");
-    newElement.id = "created-one-element";
-    document.body.appendChild(newElement);
 
     // Version and name.
-    this.version = "v0.1";
+    this.version = 0.1;
     // Clock, scene and camera essentials.
-    this.activeScene = null;
-    this.camera = null;
-    this.renderer = null;
-    this.clock = null;
+    this.activeScene = new Scene("" + this.version);
+    this.activeScene.initialize();
+    this.camera;
+    this.renderer;
+    this.clock;
     this.canvReference = null;
     this.composer;
     this.effectFXAA;
@@ -83,18 +112,18 @@ class Editor {
     this.smaaPass;
     this.bokehPass;
     // Transform control and selection.
-    this.control = null;
-    this.raycaster = null;
-    this.mouse = null;
-    this.selected = null;
-    this.last_selected = null;
+    this.control;
+    this.raycaster;
+    this.mouse;
+    this.selected;
+    this.last_selected;
     this.transform_interaction;
     this.rendering = false;
     // API.
     this.api_manager = new APIManager();
     // Debug & Movement.
     this.stats = null;
-    this.orbit = null;
+    this.orbit;
     this.locked = false;
     // Recording params.
     this.capturer = null;
@@ -109,9 +138,9 @@ class Editor {
     // Audio Engine Test.
 
     this.audio_engine = new AudioEngine();
-    this.transform_engine = new TransformEngine();
+    this.transform_engine = new TransformEngine(this.version);
     this.lipsync_engine = new LipSyncEngine();
-    this.animation_engine = new AnimationEngine();
+    this.animation_engine = new AnimationEngine(this.version);
 
     this.timeline = new TimeLine(
       this.audio_engine,
@@ -121,28 +150,13 @@ class Editor {
       this.activeScene,
     );
 
-    this.test_box_uuid = null;
     this.current_frame = 0;
-    this.test_playback = false;
 
     this.test_scene_load_media_id = ""; // Test media id for saving and loading.
-
-    //Reactland Callbacks
-    this.dispatchAppUiState = null;
   }
 
   // Initializes the main scene and ThreeJS essentials.
-  /*
-    config :{
-      dispatchAppUiState: dispatch function to react app
-    }
-  */
-  initialize(config) {
-    if (this.can_initailize == false) {
-      return;
-    }
-    this.can_initailize == false;
-
+  initialize() {
     // Gets the canvas.
     this.canvReference = document.getElementById("video-scene");
     // Base width and height.
@@ -160,16 +174,11 @@ class Editor {
       preserveDrawingBuffer: true,
     });
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMapSoft = true;
     this.clock = new THREE.Clock();
     // Resizes the renderer.
     this.renderer.setSize(width, height);
     //document.body.appendChild(this.renderer.domElement);
     window.addEventListener("resize", this.onWindowResize.bind(this));
-    // Current scene for saving and loading.
-    this.activeScene = new Scene();
-    this.activeScene.initialize();
-
     this._configure_post_pro();
     // Controls and movement.
     this.orbit = new OrbitControls(this.camera, this.renderer.domElement);
@@ -183,17 +192,13 @@ class Editor {
     this.onWindowResize();
     // Creates the main update loop.
     this.renderer.setAnimationLoop(this.update_loop.bind(this));
-    this.test_playback = false;
 
     this.timeline.scene = this.activeScene;
 
-    //setup reactland Callbacks
-    this.dispatchAppUiState = config.dispatchAppUiState
     //this._test_demo()
 
     // saving state of the scene 
     this.scene_file_token = null
-
   }
 
   // Token comes in from the front end to load the scene from the site.
@@ -202,35 +207,26 @@ class Editor {
     const scene = await this.api_manager.loadSceneState(this.test_scene_load_media_id);
     this.activeScene.scene.children = scene.children;
 
-    this.activeScene.scene.children.forEach(child => {
+    this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
 
-    child.parent = this.activeScene.scene;
+      child.parent = this.activeScene.scene;
 
-    if(child.type == "DirectionalLight") {
-      let pos = child.position;
-      let rot = child.rotation;
-      let light = this.activeScene._create_base_lighting();
-      light.position.set(pos.x, pos.y, pos.z);
-      light.rotation.set(rot.x, rot.y, rot.z);
-      this.activeScene.scene.remove(child);
+      if (child.type == "DirectionalLight") {
+        let pos = child.position;
+        let rot = child.rotation;
+        let light = this.activeScene._create_base_lighting();
+        light.position.set(pos.x, pos.y, pos.z);
+        light.rotation.set(rot.x, rot.y, rot.z);
+        this.activeScene.scene.remove(child);
       }
     })
-    
+
   }
 
-  async saveScene(name) {
-    this.dispatchAppUiState({
-      type: ACTION_TYPES.SHOW_EDITOR_LOADER
-    });
-    setInterval(()=> {
-      this.dispatchAppUiState({
-        type: ACTION_TYPES.HIDE_EDITOR_LOADER
-      });
-    },4000)
-    // const result = await this.api_manager.saveSceneState(this.activeScene.scene,name,
-    //                                                      this.scene_file_token,
-    //                                                      new TimelineDataState());
-    
+  async saveScene(name: string) {
+    const result = await this.api_manager.saveSceneState(this.activeScene.scene, name,
+      this.scene_file_token,
+      new TimelineDataState());
     // dispatch call wil's engine.
   }
 
@@ -240,44 +236,45 @@ class Editor {
 
     // This is the default scene.
     // "m_189p8hj0eyypbg74kkhcpehwpjhnkz" scene with the fox.
-    
+
     //let result = await this.api_manager.saveSceneState(this.activeScene.scene)
-    
+
     // let result = await this.api_manager.getMediaFile(
     //   "m_189p8hj0eyypbg74kkhcpehwpjhnkz",
     // );
     console.log("Saving...");
-    const result = await this.api_manager.saveSceneState(this.activeScene.scene);
+    const result = await this.api_manager.saveSceneState(this.activeScene.scene, "", null, null);
     console.log("Saved!");
     console.log("Media ID is:", result);
-    this.test_scene_load_media_id = result["media_file_token"];
+    if (result.data) {
+      this.test_scene_load_media_id = result.data["media_file_token"];
+    }
   }
 
-  async _load_for_testing() {
-    const result = await this.api_manager.loadScene(this.test_scene_load_media_id);
-    let bucket_path = await this.api_manager.getMediaFile(result["glb_media_file_id"]);
-    let glbLoader = new GLTFLoader();
-    glbLoader.load(bucket_path, (glb) => {
-      this.activeScene.scene.children = glb.scene.children;
-      this.activeScene.scene.children.forEach(child => {
-        child.parent = this.activeScene.scene;
-        if(child.type == "DirectionalLight") {
-          let pos = child.position;
-          let rot = child.rotation;
-          let light = this.activeScene._create_base_lighting();
-          light.position.set(pos.x, pos.y, pos.z);
-          light.rotation.set(rot.x, rot.y, rot.z);
-          this.activeScene.scene.remove(child);
-        }
-      });
-    });
-
-  }
+  //async _load_for_testing() {
+  //  const result = await this.api_manager.loadScene(this.test_scene_load_media_id);
+  //  let bucket_path = await this.api_manager.getMediaFile(result["glb_media_file_id"]);
+  //  let glbLoader = new GLTFLoader();
+  //  glbLoader.load(bucket_path, (glb) => {
+  //    this.activeScene.scene.children = glb.scene.children;
+  //    this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
+  //      child.parent = this.activeScene.scene;
+  //      if (child.type == "DirectionalLight") {
+  //        let pos = child.position;
+  //        let rot = child.rotation;
+  //        let light = this.activeScene._create_base_lighting();
+  //        light.position.set(pos.x, pos.y, pos.z);
+  //        light.rotation.set(rot.x, rot.y, rot.z);
+  //        this.activeScene.scene.remove(child);
+  //      }
+  //    });
+  //  });
+  //}
 
   async _serialize_timeline() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
-    let object = await this.activeScene.load_glb(
+    let object: any = await this.activeScene.load_glb(
       "./resources/models/fox/fox.glb",
     );
 
@@ -327,7 +324,7 @@ class Editor {
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
-    let object = await this.activeScene.load_glb(
+    let object: any = await this.activeScene.load_glb(
       "./resources/models/fox/fox.glb",
     );
 
@@ -342,8 +339,8 @@ class Editor {
       "/resources/models/fox/fox_idle.glb",
       "clip3",
     );
-     // then it creates clip ui to load the playable clips 
-     // then refreshes the timeline.
+    // then it creates clip ui to load the playable clips 
+    // then refreshes the timeline.
 
     // create the clip with the same id for a reference to the media
     this.timeline.addPlayableClip(
@@ -375,13 +372,17 @@ class Editor {
         400,
       ),
     );
-  
+
   }
 
   // Configure post processing.
   _configure_post_pro() {
     let width = this.canvReference.width;
     let height = this.canvReference.height;
+
+    if(this.renderer == undefined || this.camera == undefined) {
+      return;
+    }
 
     this.composer = new EffectComposer(this.renderer);
     this.renderPass = new RenderPass(this.activeScene.scene, this.camera);
@@ -397,7 +398,6 @@ class Editor {
     this.outlinePass.edgeGlow = 0.2;
     this.outlinePass.edgeThickness = 1.0;
     this.outlinePass.pulsePeriod = 3;
-    this.outlinePass.rotate = false;
     this.outlinePass.usePatternTexture = false;
     this.outlinePass.visibleEdgeColor.set(0xe66462);
 
@@ -435,11 +435,11 @@ class Editor {
     this.composer.addPass(this.smaaPass);
     this.composer.addPass(this.bokehPass);
 
-    this.outputPass = new OutputPass();
-    this.composer.addPass(this.outputPass);
+    //this.outputPass = new OutputPass();
+    //this.composer.addPass(this.outputPass);
   }
 
-  create_parim(name) {
+  create_parim(name: string) {
     let uuid = this.activeScene.instantiate(name);
   }
 
@@ -475,15 +475,6 @@ class Editor {
     //this.audio_engine.playClip("m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg");
     //console.log(this.selected);
 
-    this.dispatchAppUiState({
-      type: ACTION_TYPES.SHOW_EDITOR_LOADER
-    });
-
-
-    // this.dispatchAppUiState({
-    //   type: ACTION_TYPES.HIDE_EDITOR_LOADER
-    // });
-
     if (this.selected == null) {
       return;
     }
@@ -496,16 +487,17 @@ class Editor {
     //this.transform_engine.clips[this.test_box_uuid].step(obj);
     //console.log(this.transform_engine.clips[this.test_box_uuid].current_pos)
     //this.current_frame += 1;
-    this.test_playback = !this.test_playback;
     //this.transform_engine.clips[this.test_box_uuid].reset(this.activeScene.get_object_by_uuid(this.test_box_uuid));
   }
 
   // Basicly Unity 3D's update loop.
-  update_loop(time) {
+  update_loop(time: number) {
     // Updates debug stats.
     if (this.stats != null) {
       this.stats.update();
     }
+
+    if(this.clock == undefined || this.renderer == undefined) {return;}
 
     let delta_time = this.clock.getDelta();
 
@@ -527,13 +519,14 @@ class Editor {
     this.timeline.isPlaying = true;
   }
 
-  change_mode(type) {
+  change_mode(type: any) {
+    if(this.control == undefined) {return;}
     this.control.mode = type;
     this.transform_interaction = true;
   }
 
   // Sets the fps to a specific number
-  set_fps(fps_number) {
+  set_fps(fps_number: number) {
     this.cap_fps = fps_number;
   }
 
@@ -549,7 +542,7 @@ class Editor {
     }
   }
 
-  async loadWavAsBlob(url) {
+  async loadWavAsBlob(url: string) {
     const response = await fetch(url);
     const blob = await response.blob();
     return blob;
@@ -597,13 +590,15 @@ class Editor {
 
   // Initializes transform x y z changes.
   _initialize_control() {
+    if(this.control == undefined) {return;}
     this.control.addEventListener("change", this.render_scene.bind(this));
     this.control.addEventListener(
       "dragging-changed",
-      function (event) {
+      (event: any) => {
+        if(this.orbit == undefined) { return; }
         this.orbit.enabled = !event.value;
         // this.update_properties();
-      }.bind(this),
+      }
     );
     this.control.setSize(0.5); // Good default value for visuals.
     this.raycaster = new THREE.Raycaster();
@@ -619,13 +614,16 @@ class Editor {
 
   // Render the scene to the camera.
   render_scene() {
+    
     if (this.composer != null) {
       this.composer.render();
-    } else {
+    } else if (this.renderer && this.camera) {
       this.renderer.render(this.activeScene.scene, this.camera);
+    } else {
+      console.error("Could not render to canvas no render or composer!");
     }
 
-    if (this.rendering) {
+    if (this.rendering && this.renderer && this.clock) {
       this.playback_location++;
       let imgData = this.renderer.domElement.toDataURL();
       this.frame_buffer.push(imgData);
@@ -644,6 +642,7 @@ class Editor {
     let width = window.innerWidth; // / aspect_adjust;
     let height = window.innerHeight; // / aspectRatio;
 
+    if(this.camera == undefined || this.renderer == undefined) { return; }
     // Set the camera aspect to the desired aspect ratio
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
@@ -656,17 +655,19 @@ class Editor {
   }
 
   // Sets new mouse location usually used in raycasts.
-  onMouseMove(event) {
+  onMouseMove(event: any) {
     const rect = this.canvReference.getBoundingClientRect();
+    if(this.mouse == undefined) { return; }
     this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
   }
 
   // When the mouse clicks the screen.
   onMouseClick() {
+    if(this.raycaster == undefined || this.mouse == undefined || this.control == undefined || this.outlinePass == undefined) { return; }
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    let interactable = [];
-    this.activeScene.scene.children.forEach((child) => {
+    let interactable: any[] = [];
+    this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
       if (child.name != "") {
         if (child.type == "Mesh" || child.type == "Object3D") {
           interactable.push(child);
@@ -678,9 +679,9 @@ class Editor {
     if (intersects.length > 0) {
       if (intersects[0].object.type != "GridHelper") {
         let currentObject = intersects[0].object;
-        while (currentObject.parent.type !== "Scene") {
+        while (currentObject.parent && currentObject.parent.type !== "Scene") {
           currentObject = currentObject.parent;
-        }
+      }
         this.selected = currentObject;
         if (this.selected.type == "Scene") {
           this.selected = intersects[0].object;
@@ -693,7 +694,7 @@ class Editor {
       }
     } else if (this.transform_interaction == false) {
       this.last_selected = this.selected;
-      this.control.detach(this.selected);
+      this.control.detach();
       this.activeScene.scene.remove(this.control);
       this.outlinePass.selectedObjects = [];
     } else {
