@@ -557,7 +557,7 @@ class Editor {
     this.render_mode()
     let ffmpeg = createFFmpeg({ log: true })
     await ffmpeg.load()
-    for (let index = 0 index < this.frame_buffer.length index++) {
+    for (let index = 0 ; index < this.frame_buffer.length; index++) {
       const element = this.frame_buffer[index]
       await ffmpeg.FS(
         "writeFile",
