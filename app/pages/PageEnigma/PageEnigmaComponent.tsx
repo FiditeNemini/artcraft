@@ -33,8 +33,8 @@ export const PageEnigmaComponent = () => {
         <Button icon={faSparkles}>Generate Movie</Button>
       </TopBarHelmet>
       
-      <EngineProvider>
-        <AppUIProvider value={[appUiState, dispatchAppUiState]} >
+      <AppUIProvider value={[appUiState, dispatchAppUiState]} >
+        <EngineProvider>
           <div style={{ height: "calc(100vh - 68px)" }}>
             {/* Engine section/side panel */}
             <div
@@ -85,8 +85,8 @@ export const PageEnigmaComponent = () => {
             {/* Timeline */}
             <Timeline timelineHeight={appUiState.timelineHeight} />
           </div>
-        </AppUIProvider>
-      </EngineProvider>
+        </EngineProvider>
+      </AppUIProvider>
     </div>
   );
 };

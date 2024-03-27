@@ -9,7 +9,7 @@ export const ControlsTopButtons = () => {
 
   const handleButtonSave = () => {
     console.log(`SceneName is ${sceneName}`);
-    // editorEngine?.save();
+    editorEngine?.save();
   };
 
   const handleButtonCameraView = () => {
@@ -24,7 +24,7 @@ export const ControlsTopButtons = () => {
   };
   const handleButtonRender = () => {
     console.log("Saving GLB to server for reference");
-    editorEngine._upload_for_testing();
+    editorEngine?._upload_for_testing();
     //editorEngine?.togglePlayback();
   };
   const handleButtonPlay = () => {};
@@ -47,7 +47,10 @@ export const ControlsTopButtons = () => {
           onClick: handleButtonSave,
         }}
       >
-        <Input label="Please Enter a name for your scene" />
+        <Input
+          label="Please Enter a name for your scene"
+          onChange={(e)=>{setSceneName(e.target.value)}}
+        />
       </ButtonDialogue>
 
       <ButtonDialogue

@@ -1,6 +1,10 @@
-import { ReactNode, useEffect, useState } from "react";
-import { EngineContext } from "./EngineContext";
+import { ReactNode, useContext, useEffect, useState } from "react";
+
 import Editor from "~/pages/PageEnigma/js/editor";
+
+import { EngineContext } from "./EngineContext";
+import { AppUiContext } from "./AppUiContext";
+
 
 interface Props {
   children: ReactNode;
@@ -8,6 +12,7 @@ interface Props {
 
 export const EngineProvider = ({ children }: Props) => {
   const [editor, setEditor] = useState<Editor | null>(null);
+  const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
 
   useEffect(() => {
     //componentDidMount
@@ -28,9 +33,13 @@ export const EngineProvider = ({ children }: Props) => {
   }, []);
 
   useEffect(()=>{
-    if (editor && editor.can_initailize)
-      editor.initialize();
-  }, [editor]);
+    if (editor && editor.can_initailize && dispatchAppUiState!==null){
+      console.log("initializing Editor");
+      editor.initialize({
+        dispatchAppUiState
+      });
+    }
+  }, [editor, dispatchAppUiState]);
 
   return (
     <EngineContext.Provider value={editor}>

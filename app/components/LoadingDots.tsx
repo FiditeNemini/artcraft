@@ -55,6 +55,11 @@ function LoadingDots({
       } else {
         setState('completed');
       }
+    }else{
+      setState((curr) => {
+        if (curr!=='loading') return 'loading';
+        else return curr;
+      });
     }
   }, [show, transition]);
 
