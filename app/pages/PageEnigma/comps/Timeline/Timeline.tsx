@@ -1,4 +1,4 @@
-import { Fragment, useContext } from "react";
+import { Fragment, useCallback, useContext, useEffect, useState } from "react";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { LowerPanel } from "~/modules/LowerPanel";
 import { Character } from "./Character";
@@ -9,18 +9,60 @@ import { Objects } from "./Objects";
 import { useMouseEventsAnimation } from "./utils/useMouseEventsAnimation";
 import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { ConfirmationModal } from "~/components/ConfirmationModal";
 
 interface Props {
   timelineHeight: number;
 }
 
 export const Timeline = ({ timelineHeight }: Props) => {
-  const { characters, objects, scale, length } = useContext(TrackContext);
+  const {
+    characters,
+    objects,
+    scale,
+    length,
+    selectedClip,
+    deleteCharacterClip,
+    deleteAudioClip,
+    deleteCameraClip,
+    deleteObjectClip,
+  } = useContext(TrackContext);
   const { onPointerDown, time } = useMouseEventsAnimation();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const sectionWidth = 60 * 4 * scale;
   const fullHeight =
     characters.length * 200 + objects.objects.length * 80 + 248 + 96;
+
+  const onDeleteAsk = useCallback(
+    (event: KeyboardEvent) => {
+      if (["Backspace", "Delete"].indexOf(event.key) > -1 && selectedClip) {
+        setDialogOpen(true);
+      }
+    },
+    [selectedClip],
+  );
+
+  const onDelete = useCallback(() => {
+    deleteCharacterClip(selectedClip!);
+    deleteCameraClip(selectedClip!);
+    deleteAudioClip(selectedClip!);
+    deleteObjectClip(selectedClip!);
+  }, [
+    selectedClip,
+    deleteAudioClip,
+    deleteCharacterClip,
+    deleteCameraClip,
+    deleteObjectClip,
+  ]);
+
+  useEffect(() => {
+    document.addEventListener("keydown", onDeleteAsk);
+
+    return () => {
+      document.addEventListener("keydown", onDeleteAsk);
+    };
+  }, [onDeleteAsk]);
 
   return (
     <>
@@ -102,6 +144,19 @@ export const Timeline = ({ timelineHeight }: Props) => {
           />
         </div>
       </LowerPanel>
+      <ConfirmationModal
+        title="Delete Clip"
+        text="Are you sure you want to delete the selected clip?"
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onOk={() => {
+          onDelete();
+          setDialogOpen(false);
+        }}
+        okText="Delete"
+        okColor="bg-brand-primary"
+        onCancel={() => setDialogOpen(false)}
+      />
     </>
   );
 };

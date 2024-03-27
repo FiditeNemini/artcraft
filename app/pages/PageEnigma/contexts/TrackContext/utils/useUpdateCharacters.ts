@@ -203,6 +203,25 @@ export default function useUpdateCharacters() {
     });
   }, []);
 
+  const deleteCharacterClip = useCallback((clipId: string) => {
+    setCharacters((oldCharacters) => {
+      return [
+        ...oldCharacters.map((character) => ({
+          ...character,
+          animationClips: character.animationClips.filter(
+            (clip) => clip.id !== clipId,
+          ),
+          positionClips: character.positionClips.filter(
+            (clip) => clip.id !== clipId,
+          ),
+          lipSyncClips: character.lipSyncClips.filter(
+            (clip) => clip.id !== clipId,
+          ),
+        })),
+      ];
+    });
+  }, []);
+
   return {
     characters,
     updateCharacters,
@@ -210,5 +229,6 @@ export default function useUpdateCharacters() {
     addCharacterAnimation,
     addCharacterAudio,
     selectCharacterClip,
+    deleteCharacterClip,
   };
 }

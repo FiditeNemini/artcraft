@@ -61,9 +61,22 @@ export default function useUpdateObject() {
     });
   }, []);
 
+  const deleteObjectClip = useCallback((clipId: string) => {
+    setObjects((oldObjectGroup) => {
+      return {
+        ...oldObjectGroup,
+        objects: oldObjectGroup.objects.map((object) => ({
+          ...object,
+          clips: object.clips.filter((clip) => clip.id !== clipId),
+        })),
+      };
+    });
+  }, []);
+
   return {
     objects,
     updateObject,
     selectObjectClip,
+    deleteObjectClip,
   };
 }

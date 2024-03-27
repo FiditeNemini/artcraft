@@ -23,7 +23,6 @@ export const LowerPanel = ({ children, timelineHeight }: LowerPanelPropsI) => {
       ].join(" ")}
       style={{ height: timelineHeight }}
       onPointerOver={() => {
-        console.log("over");
         setOverTimeline(true);
       }}
       onPointerLeave={() => setOverTimeline(false)}

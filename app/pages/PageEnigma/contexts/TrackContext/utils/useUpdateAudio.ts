@@ -91,11 +91,21 @@ export default function useUpdateAudio() {
     });
   }, []);
 
+  const deleteAudioClip = useCallback((clipId: string) => {
+    setAudio((oldAudio) => {
+      return {
+        ...oldAudio,
+        clips: [...oldAudio.clips.filter((clip) => clip.id !== clipId)],
+      };
+    });
+  }, []);
+
   return {
     audio,
     updateAudio,
     toggleAudioMute,
     selectAudioClip,
     addGlobalAudio,
+    deleteAudioClip,
   };
 }

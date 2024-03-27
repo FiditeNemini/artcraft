@@ -32,6 +32,7 @@ export const TrackContext = createContext<{
     offset: number;
   }) => void;
   selectCharacterClip: (clipId: string) => void;
+  deleteCharacterClip: (clipId: string) => void;
 
   // timeline camera group
   camera: CameraGroup | null;
@@ -41,6 +42,7 @@ export const TrackContext = createContext<{
     offset: number;
   }) => void;
   selectCameraClip: (clipId: string) => void;
+  deleteCameraClip: (clipId: string) => void;
 
   // timeline global audio group
   audio: AudioGroup | null;
@@ -52,6 +54,7 @@ export const TrackContext = createContext<{
   toggleAudioMute: () => void;
   addGlobalAudio: (clipId: string, animationClips: BaseClip[]) => void;
   selectAudioClip: (clipId: string) => void;
+  deleteAudioClip: (clipId: string) => void;
 
   // timeline objects group
   objects: ObjectGroup;
@@ -61,6 +64,7 @@ export const TrackContext = createContext<{
     offset: number;
   }) => void;
   selectObjectClip: (clipId: string) => void;
+  deleteObjectClip: (clipId: string) => void;
 
   // current - only select one item - will be replaced
   selectedClip: string | null;
@@ -103,20 +107,24 @@ export const TrackContext = createContext<{
   addCharacterAnimation: () => {},
   addCharacterAudio: () => {},
   selectCharacterClip: () => {},
+  deleteCharacterClip: () => {},
 
   camera: null,
   updateCamera: () => {},
   selectCameraClip: () => {},
+  deleteCameraClip: () => {},
 
   audio: null,
   updateAudio: () => {},
   toggleAudioMute: () => {},
   selectAudioClip: () => {},
   addGlobalAudio: () => {},
+  deleteAudioClip: () => {},
 
   objects: { id: "", objects: [] },
   updateObject: () => {},
   selectObjectClip: () => {},
+  deleteObjectClip: () => {},
 
   selectedClip: null,
   selectClip: () => {},

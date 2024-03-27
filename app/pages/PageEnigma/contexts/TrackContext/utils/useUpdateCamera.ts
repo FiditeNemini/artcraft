@@ -64,9 +64,19 @@ export default function useUpdateCamera() {
     });
   }, []);
 
+  const deleteCameraClip = useCallback((clipId: string) => {
+    setCamera((oldCamera) => {
+      return {
+        ...oldCamera,
+        clips: [...oldCamera.clips.filter((clip) => clip.id !== clipId)],
+      };
+    });
+  }, []);
+
   return {
     camera,
     updateCamera,
     selectCameraClip,
+    deleteCameraClip,
   };
 }
