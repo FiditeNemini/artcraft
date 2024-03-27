@@ -4,12 +4,10 @@ import * as THREE from 'three';
 export class AnimationEngine {
     clips: { [key: string]: AnimationClip } = {};
     version: number;
-    length: number;
 
-    constructor(version: number, length: number) {
+    constructor(version: number) {
         this.clips = {};
         this.version = version;
-        this.length = length;
     }
 
     load_object(object_uuid: string, media_id:string, clip_name: string) {

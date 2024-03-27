@@ -51,7 +51,7 @@ class APIManager {
   public async saveSceneState(scene: THREE.Scene,
                               scene_name:string,
                               scene_media_file_token:string | null = null,
-                              timeline_state:TimelineDataState):Promise<APIManagerResponseSuccess> {
+                              timeline_state:TimelineDataState | null):Promise<APIManagerResponseSuccess> {
 
     const file = await this.gltfExport(scene)
     console.log(`FILE: ${file}`)
@@ -213,7 +213,7 @@ class APIManager {
     return json_data // or handle the response as appropriate
   }
 
-  private async uploadMedia(blob:any,fileName:string):Promise<APIManagerResponseSuccess> {
+  public async uploadMedia(blob:any,fileName:string):Promise<APIManagerResponseSuccess> {
     const url = `${this.baseUrl}/v1/media_uploads/upload`;
     let uuid = uuidv4();
     

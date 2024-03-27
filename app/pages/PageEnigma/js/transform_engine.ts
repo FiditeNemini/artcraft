@@ -4,11 +4,9 @@ import * as THREE from 'three';
 class TransformEngine {
     clips: { [key: string]: TransformClip } = {};
     version: number;
-    length: number;
 
-    constructor(version: number, length: number) {
+    constructor(version: number) {
         this.version = version;
-        this.length = length;
         this.clips = {};
     }
 
