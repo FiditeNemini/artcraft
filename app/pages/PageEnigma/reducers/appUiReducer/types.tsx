@@ -28,6 +28,7 @@ export enum ACTION_TYPES {
   SHOW_EDITOR_LOADER = "show_editor_loader",
   HIDE_EDITOR_LOADER = "hide_editor_loader",
   SHOW_EDITOR_LOADINGBAR = "show_editor_loadingbar",
+  UPDATE_EDITOR_LOADINGBAR = "update_editor_loadingbar",
   HIDE_EDITOR_LOADINGBAR = "hide_editor_loadingbar",
 };
 
@@ -49,7 +50,17 @@ export type Action =
           label?: string;
           message?: string;
           progress?: number;
-          useFake?: boolean;
+          useFakeTimer?: number;
+        }
+      }
+    }
+  | {
+      type: ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
+      payload:{
+        showEditorLoadingBar: {
+          label?: string;
+          message?: string;
+          progress?: number;
         }
       }
     }

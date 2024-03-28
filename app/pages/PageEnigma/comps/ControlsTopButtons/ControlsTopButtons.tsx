@@ -27,15 +27,38 @@ export const ControlsTopButtons = () => {
 
   const handleButtonTest = () => {
     if(appUiState?.showEditorLoadingBar.isShowing){
+      //TO GO TO A HUNDRED AND DISAPPER
       dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADINGBAR,
+        type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
+        payload:{
+          showEditorLoadingBar: {
+            progress: 100,
+          }
+        }
       });
+      setTimeout(() => {
+        dispatchAppUiState({
+          type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADINGBAR,
+        });
+      }, 1000);
+       //END :TO GO TO A HUNDRED AND DISAPPER
+
+       //EAMPLE OF CHANING LOADING MESSAGE
+      //  dispatchAppUiState({
+      //   type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
+      //   payload:{
+      //     showEditorLoadingBar: {
+      //       message: "new message",
+      //     }
+      //   }
+      // });
     }else{
       dispatchAppUiState({
         type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADINGBAR,
         payload:{
           showEditorLoadingBar: {
-            message: 'display of LoadingBar triggered by Test Button'
+            message: 'display of LoadingBar triggered by Test Button',
+            progress: 10,
           }
         }
         
