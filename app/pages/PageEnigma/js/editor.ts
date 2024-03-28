@@ -220,15 +220,21 @@ class Editor {
 
   // Token comes in from the front end to load the scene from the site.
   public async loadScene(scene_token: string) {
+    this.dispatchAppUiState({
+      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+    });
 
     if (scene_token != null) {
       this.current_scene_media_token_id = scene_token;
     }
-    const scene = await this.api_manager.loadSceneState(
+
+    const load_scene_state_response = await this.api_manager.loadSceneState(
       this.current_scene_media_token_id,
     );
-
-    this.activeScene.scene.children = scene.children;
+    
+    const loaded_scene = load_scene_state_response.data["scene"]
+    this.current_scene_media_token_id = load_scene_state_response.data["media_file_token"]
+    this.activeScene.scene.children = loaded_scene.children;
 
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
       child.parent = this.activeScene.scene;
@@ -241,6 +247,10 @@ class Editor {
         light.rotation.set(rot.x, rot.y, rot.z);
         this.activeScene.scene.remove(child);
       }
+    });
+
+    this.dispatchAppUiState({
+      type: ACTION_TYPES.HIDE_EDITOR_LOADER
     });
   }
 
@@ -287,9 +297,9 @@ class Editor {
     );
     console.log("Saved!");
     console.log("Media ID is:", result);
-    if (result.data) {
-      this.test_scene_load_media_id = result.data["media_file_token"];
-    }
+    // if (result.data) {
+    //   this.test_scene_load_media_id = result.data["media_file_token"];
+    // }
   }
 
   //async _load_for_testing() {
