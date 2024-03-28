@@ -103,12 +103,7 @@ pub async fn write_engine_asset_media_file_handler(
 
   // ==================== READ MULTIPART REQUEST ==================== //
 
-  let upload_media_request = drain_multipart_request(multipart_payload)
-      .await
-      .map_err(|e| {
-        // TODO: Error handling could be nicer.
-        MediaFileWriteError::BadInput("bad request".to_string())
-      })?;
+  let upload_media_request = drain_multipart_request(multipart_payload).await?;
 
   // ==================== MAKE SURE USER OWNS FILE ==================== //
 

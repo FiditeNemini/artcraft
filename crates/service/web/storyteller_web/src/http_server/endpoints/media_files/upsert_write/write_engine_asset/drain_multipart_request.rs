@@ -9,6 +9,7 @@ use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
+use crate::http_server::endpoints::media_files::upsert_write::write_error::MediaFileWriteError;
 
 use crate::http_server::web_utils::read_multipart_field_bytes::{checked_read_multipart_bytes, read_multipart_field_as_text};
 
@@ -22,7 +23,7 @@ pub struct MediaFileUploadData {
 }
 
 /// Pull common parts out of multipart media HTTP requests, typically for handling file uploads.
-pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> AnyhowResult<MediaFileUploadData> {
+pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Result<MediaFileUploadData, MediaFileWriteError> {
   let mut uuid_idempotency_token = None;
   let mut file_bytes = None;
   let mut file_name = None;
@@ -46,7 +47,7 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
         uuid_idempotency_token = read_multipart_field_as_text(&mut field).await
             .map_err(|err| {
               warn!("Error reading idempotency token: {:?}", &err);
-              err
+              MediaFileWriteError::BadInput("Error reading idempotency token".to_string())
             })?;
       },
       Some("file") => {
@@ -54,14 +55,14 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
         file_bytes = checked_read_multipart_bytes(&mut field).await
             .map_err(|err| {
               warn!("Error reading audio upload: {:?}", &err);
-              err
+              MediaFileWriteError::BadInput("Error reading file bytes".to_string())
             })?;
       },
       Some("media_file_token") => {
         media_file_token = read_multipart_field_as_text(&mut field).await
             .map_err(|err| {
               warn!("Error reading source: {:?}", &err);
-              err
+              MediaFileWriteError::BadInput("Error reading media_file_token".to_string())
             })?
             .map(|field| MediaFileToken::new_from_str(&field));
       },
@@ -69,26 +70,26 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
         media_file_subtype = read_multipart_field_as_text(&mut field).await
             .map_err(|err| {
               warn!("Error reading source: {:?}", &err);
-              err
+              MediaFileWriteError::BadInput("Error reading media_file_subtype".to_string())
             })?
             .map(|field| MediaFileSubtype::from_str(&field))
             .transpose()
             .map_err(|err| {
               warn!("Wrong MediaFileSubtype: {:?}", &err);
-              anyhow!("Wrong MediaFileSubtype: {:?}", &err)
+              MediaFileWriteError::BadInput("Wrong MediaFileSubtype variant".to_string())
             })?;
       },
       Some("media_file_class") => {
         media_file_class = read_multipart_field_as_text(&mut field).await
             .map_err(|err| {
               warn!("Error reading source: {:?}", &err);
-              err
+              MediaFileWriteError::BadInput("Error reading media_file_class".to_string())
             })?
             .map(|field| MediaFileClass::from_str(&field))
             .transpose()
             .map_err(|err| {
               warn!("Wrong MediaFileClass: {:?}", &err);
-              anyhow!("Wrong MediaFileClass: {:?}", &err)
+              MediaFileWriteError::BadInput("Wrong MediaFileClass variant".to_string())
             })?;
       },
       _ => continue,
