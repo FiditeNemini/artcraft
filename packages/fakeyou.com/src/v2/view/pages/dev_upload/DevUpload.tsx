@@ -32,7 +32,6 @@ export default function DevUpload(props: DevUploadProps) {
 
   const handleFileChange = (event: any) => {
     const maybeFile = event.target.files[0];
-    console.log("😈",maybeFile);
     const fileType = GetFileTypeByExtension(maybeFile?.name || "");
 
     let uploadType = UploadType.Unknown;
