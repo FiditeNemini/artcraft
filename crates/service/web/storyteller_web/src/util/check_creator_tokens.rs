@@ -188,7 +188,6 @@ mod tests {
       assert_eq!(result, CheckCreatorTokenResult::NoUserAnonymousVisitorTokenMismatch);
     }
 
-
     #[test]
     fn test_no_creator_anonymous_session_user() {
       let anonymous = Some(AnonymousVisitorTrackingToken::new_from_str("anonymous"));

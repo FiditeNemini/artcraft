@@ -14,6 +14,7 @@ use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use errors::AnyhowResult;
+use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
@@ -44,6 +45,9 @@ pub struct MediaFile {
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
   pub maybe_creator_gravatar_hash: Option<String>,
+
+  /// This should not be exposed for GET endpoints, but is useful for permission checking.
+  pub maybe_creator_anonymous_visitor_token: Option<AnonymousVisitorTrackingToken>,
 
   pub creator_set_visibility: Visibility,
 
@@ -110,6 +114,9 @@ pub struct MediaFileRaw {
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
   pub maybe_creator_gravatar_hash: Option<String>,
+
+  /// This should not be exposed for GET endpoints, but is useful for permission checking.
+  pub maybe_creator_anonymous_visitor_token: Option<AnonymousVisitorTrackingToken>,
 
   pub creator_set_visibility: Visibility,
 
@@ -179,6 +186,7 @@ pub async fn get_media_file(
     maybe_creator_username: record.maybe_creator_username,
     maybe_creator_display_name: record.maybe_creator_display_name,
     maybe_creator_gravatar_hash: record.maybe_creator_gravatar_hash,
+    maybe_creator_anonymous_visitor_token: record.maybe_creator_anonymous_visitor_token,
     creator_set_visibility: record.creator_set_visibility,
     maybe_prompt_token: record.maybe_prompt_token,
     maybe_model_weights_token: record.maybe_model_weights_token,
@@ -221,6 +229,8 @@ SELECT
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
+
+    m.maybe_creator_anonymous_visitor_token as `maybe_creator_anonymous_visitor_token: tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken`,
 
     m.maybe_batch_token as `maybe_batch_token: tokens::tokens::batch_generations::BatchGenerationToken`,
 
@@ -297,6 +307,8 @@ SELECT
     users.username as maybe_creator_username,
     users.display_name as maybe_creator_display_name,
     users.email_gravatar_hash as maybe_creator_gravatar_hash,
+
+    m.maybe_creator_anonymous_visitor_token as `maybe_creator_anonymous_visitor_token: tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken`,
 
     m.maybe_batch_token as `maybe_batch_token: tokens::tokens::batch_generations::BatchGenerationToken`,
 

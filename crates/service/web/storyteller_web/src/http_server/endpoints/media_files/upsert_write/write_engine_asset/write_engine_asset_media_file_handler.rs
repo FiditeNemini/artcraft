@@ -26,6 +26,7 @@ use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_fo
 use crate::http_server::endpoints::media_files::upsert_write::write_engine_asset::drain_multipart_request::drain_multipart_request;
 use crate::http_server::endpoints::media_files::upsert_write::write_error::MediaFileWriteError;
 use crate::server_state::ServerState;
+use crate::util::check_creator_tokens::{check_creator_tokens, CheckCreatorTokenArgs, CheckCreatorTokenResult};
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 // Unlike the "upload" endpoints, which are pure inserts, these endpoints are *upserts*.
@@ -118,32 +119,21 @@ pub async fn write_engine_asset_media_file_handler(
         })?
         .ok_or_else(|| MediaFileWriteError::NotFoundVerbose("media file not found with that token".to_string()))?;
 
-    let maybe_user_tokens = (
-      maybe_user_token.as_ref(),
-      media_file.maybe_creator_user_token.as_ref()
-    );
+    let creator_check = check_creator_tokens(CheckCreatorTokenArgs {
+      maybe_creator_user_token: media_file.maybe_creator_user_token.as_ref(),
+      maybe_current_request_user_token: maybe_user_token.as_ref(),
+      maybe_creator_anonymous_visitor_token: media_file.maybe_creator_anonymous_visitor_token.as_ref(),
+      maybe_current_request_anonymous_visitor_token: maybe_avt_token.as_ref(),
+    });
 
-    let must_check_avt = match maybe_user_tokens {
-      (None, None) => true, // Since there's no user, we must check the AnonymousVisitorTokens.
-      (Some(token_a), Some(token_b)) => {
-        if token_a != token_b {
-          // User tokens do not match.
-          return Err(MediaFileWriteError::NotAuthorizedVerbose(
-            "user tokens do not match (both are present)".to_string()));
-        }
-        false
-      },
-      _ => {
-        // User tokens do not match.
-        return Err(MediaFileWriteError::NotAuthorizedVerbose(
-          "user tokens do not match (only one is present)".to_string()));
-      },
-    };
-
-    if must_check_avt {
-      // TODO(bt,2024-03-26): For now anonymous users can't upload over their own files
-      return Err(MediaFileWriteError::NotAuthorizedVerbose(
-        "AVT check not yet implemented".to_string()));
+    match creator_check {
+      CheckCreatorTokenResult::UserTokenMatch => {} // Allowed
+      CheckCreatorTokenResult::NoUserAnonymousVisitorTokenMatch => {} // Allowed
+      CheckCreatorTokenResult::InsufficientInformation => {} // TODO(bt,2024-03-28): Temporary fallthrough. This should be a 401.
+      CheckCreatorTokenResult::UserTokenMismatch => return Err(MediaFileWriteError::NotAuthorizedVerbose(
+        "user tokens do not match".to_string())),
+      CheckCreatorTokenResult::NoUserAnonymousVisitorTokenMismatch => return Err(MediaFileWriteError::NotAuthorizedVerbose(
+        "anonymous visitor tokens do not match".to_string())),
     }
   }
 
