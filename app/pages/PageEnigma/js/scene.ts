@@ -5,11 +5,13 @@ class Scene {
     name: string;
     gridHelper: THREE.GridHelper | undefined;
     scene: THREE.Scene;
+    hot_items: THREE.Object3D[] | undefined;
 
     constructor(name: string) {
         this.name = name;
         this.gridHelper;
         this.scene = new THREE.Scene();
+        this.hot_items = [];
     }
 
     initialize() {
@@ -54,6 +56,18 @@ class Scene {
 
     get_object_by_name(name: string) {
         return this.scene.getObjectByName(name);
+    }
+
+    createPoint(pos: THREE.Vector3, visable: boolean = true) {
+        let geometry = new THREE.SphereGeometry(0.1, 18, 12);
+        let material = new THREE.MeshBasicMaterial({ color: 0x05C3DD });
+        let obj = new THREE.Mesh(geometry, material);
+        obj.position.copy(pos);
+        obj.receiveShadow = visable;
+        if(this.hot_items != undefined){
+            this.hot_items.push(obj);
+        }
+        this.scene.add(obj);
     }
 
     _disable_skybox() {

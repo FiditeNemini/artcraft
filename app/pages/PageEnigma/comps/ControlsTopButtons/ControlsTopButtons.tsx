@@ -18,9 +18,9 @@ export const ControlsTopButtons = () => {
     editorEngine?.loadScene(sceneToken);
   };
 
-  // const handleButtonCameraView = () => {
-  //   editorEngine?.change_camera_view();
-  // };
+  const handleButtonCameraView = () => {
+    editorEngine?.switchCameraView();
+  };
 
   const handleButtonPlayBack = () => {
     editorEngine?.start_playback();
@@ -30,9 +30,11 @@ export const ControlsTopButtons = () => {
 
   };
   const handleButtonRender = () => {
-   
+    editorEngine?.take_timeline_cam_clip();
   };
-  const handleButtonPlay = () => {};
+  const handleButtonPlay = () => {
+    editorEngine?.start_playback();
+  };
 
   return (
     <div className="flex flex-col gap-2 pl-3 pt-3">
@@ -88,13 +90,13 @@ export const ControlsTopButtons = () => {
       </div>
 
       <div className="flex gap-2">
-        <Button variant="secondary" onClick={handleButtonPlayBack}>
+        <Button variant="secondary" onClick={handleButtonCameraView}>
           Toggle Camera View
         </Button>
       </div>
       <div className="flex gap-2">
         <Button onClick={handleButtonLoad}>Load</Button>
-        <Button onClick={handleButtonRender}>Render</Button>
+        <Button onClick={handleButtonRender}>Take Frame</Button>
         <Button onClick={handleButtonPlay}>Play</Button>
       </div>
     </div>

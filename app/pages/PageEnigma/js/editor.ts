@@ -1,5 +1,5 @@
 import * as THREE from "three";
-//import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { FreeCam } from "./free_cam"
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import Scene from "./scene.js";
@@ -21,6 +21,7 @@ import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
 import { ACTION_TYPES } from "../reducer";
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+
 class EditorState {
   // {
   //   action: "ShowLoadingIndicator"
@@ -47,7 +48,8 @@ class Editor {
   composer: EffectComposer | undefined;
   effectFXAA: EffectComposer | undefined;
   outlinePass: OutlinePass | undefined;
-  last_cam_pos: THREE.Vector3 | undefined;
+  last_cam_pos: THREE.Vector3;
+  last_cam_rot: THREE.Euler;
   saoPass: SAOPass | undefined;
   outputPass: OutputPass | undefined;
   bloomPass: UnrealBloomPass | undefined;
@@ -62,7 +64,8 @@ class Editor {
   rendering: boolean;
   api_manager: APIManager;
   stats: any;
-  orbit: FreeCam | undefined;
+  cameraViewControls: FreeCam | undefined;
+  orbitControls: OrbitControls | undefined;
   locked: boolean;
   capturer: any;
   frame_buffer: any;
@@ -84,6 +87,7 @@ class Editor {
   current_scene_media_token_id: string | null;
   can_initialize: boolean;
   dispatchAppUiState: any; // todo figure out the type
+  camera_person_mode: boolean;
 
   // Default params.
   constructor() {
@@ -114,7 +118,8 @@ class Editor {
     this.composer;
     this.effectFXAA;
     this.outlinePass;
-    this.last_cam_pos;
+    this.last_cam_pos = new THREE.Vector3(0, 0, 0);
+    this.last_cam_rot = new THREE.Euler(0, 0, 0);
     this.lockControls;
     this.saoPass;
     this.outputPass;
@@ -133,7 +138,9 @@ class Editor {
     this.api_manager = new APIManager();
     // Debug & Movement.
     this.stats = null;
-    this.orbit;
+    this.cameraViewControls;
+    this.orbitControls;
+    this.camera_person_mode = false;
     this.locked = false;
     // Recording params.
     this.capturer = null;
@@ -201,13 +208,15 @@ class Editor {
     // Controls and movement.
 
     this.lockControls = new PointerLockControls(this.camera, this.renderer.domElement);
-    
-    this.orbit = new FreeCam(this.camera, this.renderer.domElement);
-    this.orbit.movementSpeed = 1;
-    this.orbit.domElement = this.renderer.domElement;
-    this.orbit.rollSpeed = Math.PI / 24;
-    this.orbit.autoForward = false;
-    this.orbit.dragToLook = true;
+    this.cameraViewControls = new FreeCam(this.camera, this.renderer.domElement);
+    this.cameraViewControls.movementSpeed = 1;
+    this.cameraViewControls.domElement = this.renderer.domElement;
+    this.cameraViewControls.rollSpeed = Math.PI / 24;
+    this.cameraViewControls.autoForward = false;
+    this.cameraViewControls.dragToLook = true;
+    this.cameraViewControls.enabled = false;
+
+    this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
 
     this.control = new TransformControls(this.camera, this.renderer.domElement);
     // OnClick and MouseMove events.
@@ -228,8 +237,6 @@ class Editor {
     this.current_scene_media_token_id = null;
     //setup reactland Callbacks
     this.dispatchAppUiState = config.dispatchAppUiState;
-
-    this.activeScene.scene.add(this.lockControls.getObject());
 
     this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this), false);
     this.renderer.domElement.addEventListener("mouseup", this.onMouseUp.bind(this), false);
@@ -370,6 +377,39 @@ class Editor {
       "/resources/models/fox/fox_idle.glb",
       "clip3",
     );
+  }
+
+  switchCameraView() {
+    this.camera_person_mode = !this.camera_person_mode;
+    if (this.cam_obj) {
+      if(this.camera_person_mode) {
+        this.last_cam_pos.copy(this.camera.position);
+        this.last_cam_rot.copy(this.camera.rotation);
+
+        this.camera.position.copy(this.cam_obj.position);
+        this.camera.rotation.copy(this.cam_obj.rotation);
+        if(this.orbitControls) { this.orbitControls.enabled = false; }
+        if(this.lockControls) { this.activeScene.scene.add(this.lockControls.getObject()); }
+        if(this.cameraViewControls) { this.cameraViewControls.enabled = true; }
+
+        if(this.activeScene.hot_items){
+          this.activeScene.hot_items.forEach(element => {
+            element.visible = false;
+          });
+        }
+      } else {
+        this.camera.position.copy(this.last_cam_pos);
+        this.camera.rotation.copy(this.last_cam_rot);
+        if(this.orbitControls) { this.orbitControls.enabled = true; }
+        if(this.lockControls) { this.activeScene.scene.remove(this.lockControls.getObject()); }
+        if(this.cameraViewControls) { this.cameraViewControls.enabled = false; }
+        if(this.activeScene.hot_items){
+          this.activeScene.hot_items.forEach(element => {
+            element.visible = true;
+          });
+        }
+      }
+    }
   }
 
   async add_transform_clip_base(name: string = "New Clip", object: THREE.Object3D, start_offset:number, end_offset:number) {
@@ -547,6 +587,14 @@ class Editor {
     //this.transform_engine.clips[this.test_box_uuid].reset(this.activeScene.get_object_by_uuid(this.test_box_uuid))
   }
 
+  take_timeline_cam_clip() {
+    if(this.cam_obj == null) { return; }
+    if(!this.camera_person_mode) { return; }
+    this.transform_engine.addFrame(this.cam_obj, this.transform_engine.clips[this.cam_obj.uuid].length);
+    console.log("Camera frame taken.");
+    this.activeScene.createPoint(this.cam_obj.position, false);
+  }
+
   // Basicly Unity 3D's update loop.
   update_loop(time: number) {
     // Updates debug stats.
@@ -560,8 +608,8 @@ class Editor {
 
     let delta_time = this.clock.getDelta();
 
-    if (this.orbit) {
-      this.orbit.update(5 * delta_time)
+    if (this.cameraViewControls && this.camera_person_mode) {
+      this.cameraViewControls.update(5 * delta_time)
       if (this.cam_obj) {
         if (this.timeline.isPlaying == false) {
           this.cam_obj.position.copy(this.camera.position);
@@ -570,7 +618,6 @@ class Editor {
           this.camera.position.copy(this.cam_obj.position);
           this.camera.rotation.copy(this.cam_obj.rotation);
         }
-        console.log(this.cam_obj.position);
       }
     }
 
@@ -584,6 +631,9 @@ class Editor {
 
   start_playback() {
     this.timeline.isPlaying = true;
+    if(!this.camera_person_mode) {
+      this.switchCameraView();
+    }
   }
 
   change_mode(type: any) {
@@ -664,10 +714,10 @@ class Editor {
     }
     this.control.addEventListener("change", this.render_scene.bind(this));
     this.control.addEventListener("dragging-changed", (event: any) => {
-      if (this.orbit == undefined) {
+      if (this.orbitControls == undefined) {
         return;
       }
-      this.orbit.enabled = !event.value;
+      this.orbitControls.enabled = !event.value;
       // this.update_properties()
     });
     this.control.setSize(0.5); // Good default value for visuals.
@@ -730,7 +780,7 @@ class Editor {
   }
 
   onMouseDown(event: any) {
-    if (event.button === 1) {
+    if (event.button === 1 && this.camera_person_mode) {
       this.lockControls?.lock();
     }
   }

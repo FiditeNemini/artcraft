@@ -45,7 +45,7 @@ class FreeCam extends EventDispatcher {
 		this.rotationVector = new Vector3( 0, 0, 0 );
 
 		this.keydown = function ( event ) {
-
+			if ( this.enabled === false ) return;
 			if ( event.altKey || this.enabled === false ) {
 
 				return;
@@ -79,7 +79,7 @@ class FreeCam extends EventDispatcher {
 		};
 
 		this.keyup = function ( event ) {
-
+			if ( this.enabled === false ) return;
 			if ( this.enabled === false ) return;
 
 			switch ( event.code ) {
