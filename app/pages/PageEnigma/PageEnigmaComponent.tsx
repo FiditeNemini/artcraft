@@ -77,7 +77,6 @@ export const PageEnigmaComponent = () => {
                   message={appUiState.showEditorLoadingBar.message}
                   label={appUiState.showEditorLoadingBar.label}
                   progress={appUiState.showEditorLoadingBar.progress}
-                  useFakeTimer={30000}
                 />
               </div>
               

@@ -29,6 +29,15 @@ export function reducer(state: State, action: Action): State {
         },
       }
     }
+    case ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR:{
+      return{
+        ...state,
+        showEditorLoadingBar: {
+          ...state.showEditorLoadingBar,
+          ...action.payload?.showEditorLoadingBar,
+        },
+      }
+    }
     case ACTION_TYPES.HIDE_EDITOR_LOADINGBAR:{
       return{
         ...state,
