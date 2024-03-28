@@ -678,9 +678,6 @@ class Editor {
     this.timeline.update(delta_time);
 
     this.renderScene();
-    if (this.capturer != null) {
-      this.capturer.capture(this.renderer.domElement);
-    } // Record scene.
   }
 
   change_mode(type: any) {
