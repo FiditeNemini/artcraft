@@ -21,15 +21,6 @@ export const ControlsTopButtons = () => {
     editorEngine?.loadScene(sceneToken);
   };
 
-
-  const handleButtonCameraView = () => {
-    editorEngine?.switchCameraView();
-  };
-
-  const handleButtonPlayBack = () => {
-    editorEngine?.start_playback();
-  };
-
   const handleButtonTest = () => {
     if(appUiState?.showEditorLoadingBar.isShowing){
       //TO GO TO A HUNDRED AND DISAPPER
@@ -71,6 +62,16 @@ export const ControlsTopButtons = () => {
     }
   };
 
+  const handleObjectPanelTest = () => {
+    
+  }
+
+  const handleButtonCameraView = () => {
+    editorEngine?.switchCameraView();
+  };
+  const handleButtonPlayBack = () => {
+    editorEngine?.start_playback();
+  };
   const handleButtonRender = () => {
     editorEngine?.take_timeline_cam_clip();
   };
@@ -79,12 +80,7 @@ export const ControlsTopButtons = () => {
   };
 
 
-  // const handleButtonCameraView = () => {
-  //   editorEngine?.change_camera_view();
-  // };
-
   const handleButtonLoad = () => {};
-  // const handleButtonRender = () => {};
 
   return (
     <div className="flex flex-col gap-2 pl-3 pt-3">
@@ -143,14 +139,18 @@ export const ControlsTopButtons = () => {
         <Button variant="secondary" onClick={handleButtonCameraView}>
           Toggle Camera View
         </Button>
+        <Button
+          onClick={handleObjectPanelTest}
+          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
+        >
+          Show Object Panel
+        </Button>
       </div>
       <div className="flex gap-2">
 
         <Button onClick={handleButtonLoad}>Load</Button>
         <Button onClick={handleButtonRender}>Take Frame</Button>
         <Button onClick={handleButtonPlay}>Play</Button>
-        {/* <Button onClick={handleButtonLoad}>Load</Button>
-        <Button onClick={handleButtonRender}>Render</Button> */}
         <Button
           onClick={handleButtonTest}
           className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"

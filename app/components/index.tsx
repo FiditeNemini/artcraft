@@ -3,6 +3,7 @@ import { ButtonIcon } from "./ButtonIcon";
 import { ButtonLink } from "./ButtonLink";
 import { ButtonIconSelect } from "./ButtonIconSelect";
 import { Input } from "./Input";
+import { InputVector } from "./InputVector";
 import { H4 } from "./H4";
 import { ItemPicker } from "./ItemPicker";
 import { Textarea } from "./Textarea";
@@ -18,6 +19,7 @@ export {
   ItemPicker,
   Textarea,
   Input,
+  InputVector,
   LoadingBar,
   LoadingDots,
   LoadingDotsBricks,
