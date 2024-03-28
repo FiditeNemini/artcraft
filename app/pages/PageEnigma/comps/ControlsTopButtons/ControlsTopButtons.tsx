@@ -153,7 +153,7 @@ export const ControlsTopButtons = () => {
         <Button onClick={handleButtonRender}>Render</Button> */}
         <Button
           onClick={handleButtonTest}
-          className="bg-brand-tertiary hover:bg-brand-tertiary-400"
+          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
           style={{zIndex:9001}}
         >
           Test
