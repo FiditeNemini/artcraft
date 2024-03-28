@@ -1,6 +1,6 @@
 import { useCallback, useContext, useMemo } from "react";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-import { Track } from "~/pages/PageEnigma/comps/Timeline/Track";
+import { TrackClips } from "~/pages/PageEnigma/comps/Timeline/TrackClips";
 import { fullWidth } from "~/pages/PageEnigma/store";
 
 function buildUpdaters(
@@ -63,7 +63,7 @@ export const Character = ({ characterId }: Props) => {
         Character
       </div>
       <div className="flex flex-col gap-4">
-        <Track
+        <TrackClips
           id={character.id}
           clips={animationClips}
           title="Animation"
@@ -71,7 +71,7 @@ export const Character = ({ characterId }: Props) => {
           style="character"
           type="animations"
         />
-        <Track
+        <TrackClips
           id={character.id}
           clips={positionClips}
           title="Character Position/Rotation"
@@ -79,10 +79,10 @@ export const Character = ({ characterId }: Props) => {
           style="character"
           type="positions"
         />
-        <Track
+        <TrackClips
           id={character.id}
           clips={lipSyncClips}
-          title="Lipsync Audio Track"
+          title="Lipsync Audio TrackClips"
           updateClip={updateClipLipSync}
           muted={character.muted}
           toggleMute={toggleCharacterLipSyncMute}

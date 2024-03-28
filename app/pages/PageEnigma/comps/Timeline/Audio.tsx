@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-import { Track } from "~/pages/PageEnigma/comps/Timeline/Track";
+import { TrackClips } from "~/pages/PageEnigma/comps/Timeline/TrackClips";
 import { fullWidth } from "~/pages/PageEnigma/store";
 
 export const Audio = () => {
@@ -16,10 +16,10 @@ export const Audio = () => {
         Global Audio
       </div>
       <div className="flex flex-col gap-4">
-        <Track
+        <TrackClips
           id={audio!.id}
           clips={clips}
-          title="Global Audio Track"
+          title="Global Audio TrackClips"
           updateClip={updateAudio}
           style="audio"
           muted={audio!.muted}

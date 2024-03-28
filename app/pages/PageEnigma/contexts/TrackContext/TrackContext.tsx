@@ -7,6 +7,7 @@ import {
   CameraGroup,
   CharacterGroup,
   ObjectGroup,
+  ObjectTrack,
 } from "~/pages/PageEnigma/models/track";
 
 export const TrackContext = createContext<{
@@ -62,13 +63,8 @@ export const TrackContext = createContext<{
 
   // timeline objects group
   objects: ObjectGroup;
-  updateObject: (options: {
-    id: string;
-    length: number;
-    offset: number;
-  }) => void;
-  selectObjectClip: (clipId: string) => void;
-  deleteObjectClip: (clipId: string) => void;
+  updateObject: (options: { id: string; offset: number }) => void;
+  addObject: (options: ObjectTrack) => void;
 
   // current - only select one item - will be replaced
   selectedClip: string | null;
@@ -108,8 +104,7 @@ export const TrackContext = createContext<{
 
   objects: { id: "", objects: [] },
   updateObject: () => {},
-  selectObjectClip: () => {},
-  deleteObjectClip: () => {},
+  addObject: () => {},
 
   selectedClip: null,
   selectClip: () => {},

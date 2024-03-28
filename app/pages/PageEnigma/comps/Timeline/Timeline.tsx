@@ -16,6 +16,7 @@ import {
   filmLength,
   timelineHeight,
 } from "~/pages/PageEnigma/store";
+import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 
 export const Timeline = () => {
   const {
@@ -25,10 +26,12 @@ export const Timeline = () => {
     deleteCharacterClip,
     deleteAudioClip,
     deleteCameraClip,
-    deleteObjectClip,
   } = useContext(TrackContext);
   const { onPointerDown, time } = useMouseEventsAnimation();
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  // implement the code to handle incoming messages from the Engine
+  useQueueHandler();
 
   const sectionWidth = 60 * 4 * scale.value;
   const fullHeight =
@@ -53,14 +56,7 @@ export const Timeline = () => {
     deleteCharacterClip(selectedClip!);
     deleteCameraClip(selectedClip!);
     deleteAudioClip(selectedClip!);
-    deleteObjectClip(selectedClip!);
-  }, [
-    selectedClip,
-    deleteAudioClip,
-    deleteCharacterClip,
-    deleteCameraClip,
-    deleteObjectClip,
-  ]);
+  }, [selectedClip, deleteAudioClip, deleteCharacterClip, deleteCameraClip]);
 
   useEffect(() => {
     document.addEventListener("keydown", onDeleteAsk);
@@ -130,9 +126,11 @@ export const Timeline = () => {
         <div className="p-4">
           <Audio />
         </div>
-        <div className="p-4">
-          <Objects />
-        </div>
+        {objects.objects.length > 0 && (
+          <div className="p-4">
+            <Objects />
+          </div>
+        )}
         <div
           className="absolute text-brand-primary"
           style={{ top: 8, left: displayTime * 4 * scale.value + 88 }}

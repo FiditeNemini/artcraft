@@ -1,6 +1,9 @@
 import { useCallback, useState } from "react";
 import { BaseClip, CharacterGroup } from "~/pages/PageEnigma/models/track";
 import * as uuid from "uuid";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 export default function useUpdateCharacters() {
   const [characters, setCharacters] = useState<CharacterGroup[]>([
@@ -136,10 +139,13 @@ export default function useUpdateCharacters() {
           };
         });
       });
-      console.log("message", {
-        action: "AddAnimation",
-        id: clipId,
-        data: { offset },
+      Queue.publish({
+        queueName: QueueNames.TO_ENGINE,
+        action: toEngineActions.ADD_ANIMATION,
+        data: {
+          clipId,
+          offset,
+        },
       });
     },
     [],

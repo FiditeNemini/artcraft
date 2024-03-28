@@ -1,5 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { currentTime, scale } from "~/pages/PageEnigma/store";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 export const useMouseEventsAnimation = () => {
   const [isActive, setIsActive] = useState("");
@@ -15,6 +18,11 @@ export const useMouseEventsAnimation = () => {
         currentTime.value = Math.round(time);
         setIsActive("");
         setTime(-1);
+        Queue.publish({
+          queueName: QueueNames.TO_ENGINE,
+          action: toEngineActions.SCRUBBER_TIME,
+          data: { currentTime: Math.round(time) },
+        });
       }
     };
 
