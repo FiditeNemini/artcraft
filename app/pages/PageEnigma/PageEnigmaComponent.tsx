@@ -2,7 +2,7 @@ import { useEffect, useReducer } from "react";
 
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
-import { Button, LoadingDotsBricks } from "~/components";
+import { Button, LoadingDots } from "~/components";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
 import { SidePanel } from "~/modules/SidePanel";
 import { Controls3D } from "./comps/Controls3D";
@@ -24,7 +24,7 @@ export const PageEnigmaComponent = () => {
   useEffect(()=>{
     setTimeout(()=>dispatchAppUiState({
       type: ACTION_TYPES.HIDE_EDITOR_LOADER
-    }), 3000);
+    }), 500);
   },[]);
 
   return (
@@ -69,9 +69,11 @@ export const PageEnigmaComponent = () => {
                   appUiState.viewMode === VIEW_MODES.SIDE_BY_SIDE &&
                   <ViewSideBySide />
                 }
-                <LoadingDotsBricks
+                <LoadingDots
                   className="absolute top-0 left-0"
-                  show={appUiState.showEditorLoader}
+                  show={appUiState.showEditorLoader.isShow}
+                  type="bricks"
+                  message={appUiState.showEditorLoader.message}
                   transition
                 />
               </div>

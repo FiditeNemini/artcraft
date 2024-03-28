@@ -16,13 +16,6 @@ class AudioData implements AudioData {
   }
 }
 
-export interface LipSyncTrackClip {
-  version: number;
-  media_id: string;
-  type: "lipsync";
-  volume: number;
-}
-
 class BlendShapeHelper {
   ah: number;
   ee: number;
@@ -34,7 +27,7 @@ class BlendShapeHelper {
   }
 }
 
-export class LipSyncTrackClip implements LipSyncTrackClip {
+export class LipSyncClip {
   version: number;
   media_id: string;
   type: "lipsync" = "lipsync";
@@ -98,7 +91,7 @@ export class LipSyncTrackClip implements LipSyncTrackClip {
   }
 
 
-  async play(object: THREE.Object3D) {
+async play(object: THREE.Object3D) {
   if (this.audio_data?.audioBuffer == null) { await this.download_audio(); }
   if (this.lipsync.face == null) {
     this.lipsync = new LipSync(await this._detect_face(object));

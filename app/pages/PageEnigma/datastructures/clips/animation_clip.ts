@@ -1,19 +1,7 @@
-import { faL } from '@fortawesome/pro-solid-svg-icons';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-export interface AnimationTrackClip {
-  version: number
-  media_id: string
-  object_uuid: string
-  type: "animation"
-  location: "glb" | "remote"
-  speed: number
-  length: number
-  clip_name: string
-}
-
-export class AnimationTrackClip implements AnimationTrackClip {
+export class AnimationClip  {
   version: number;
   media_id: string; // comes from the server
   object_uuid: string;

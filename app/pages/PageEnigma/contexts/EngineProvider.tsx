@@ -33,7 +33,7 @@ export const EngineProvider = ({ children }: Props) => {
   }, []);
 
   useEffect(()=>{
-    if (editor && editor.can_initailize && dispatchAppUiState!==null){
+    if (editor && editor.can_initialize && dispatchAppUiState!==null){
       console.log("initializing Editor");
       editor.initialize({
         dispatchAppUiState
