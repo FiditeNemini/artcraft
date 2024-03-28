@@ -7,6 +7,7 @@ import {
   CameraGroup,
   CharacterGroup,
   ObjectGroup,
+  ObjectTrack,
 } from "~/pages/PageEnigma/models/track";
 
 export const TrackContext = createContext<{
@@ -62,13 +63,8 @@ export const TrackContext = createContext<{
 
   // timeline objects group
   objects: ObjectGroup;
-  updateObject: (options: {
-    id: string;
-    length: number;
-    offset: number;
-  }) => void;
-  selectObjectClip: (clipId: string) => void;
-  deleteObjectClip: (clipId: string) => void;
+  updateObject: (options: { id: string; offset: number }) => void;
+  addObject: (options: ObjectTrack) => void;
 
   // current - only select one item - will be replaced
   selectedClip: string | null;
@@ -79,31 +75,12 @@ export const TrackContext = createContext<{
   audioClips: AudioClip[];
 
   // drag and drop
-  dragType: "animations" | "lipSync" | null;
-  dragId: string | null;
-  startDrag: (type: "animations" | "lipSync", id: string) => void;
+  startDrag: (
+    type: "animations" | "lipSync",
+    id: string,
+    length: number,
+  ) => void;
   endDrag: () => void;
-  canDrop: boolean;
-  setCanDrop: (can: boolean) => void;
-  overTimeline: boolean;
-  setOverTimeline: (over: boolean) => void;
-  dropId: string;
-  setDropId: (id: string) => void;
-  dropOffset: number;
-  setDropOffset: (offset: number) => void;
-
-  // scale of timeline displa
-  scale: number;
-
-  // current time position
-  currentTime: number;
-  updateCurrentTime: (time: number) => void;
-
-  // total length of the film clip
-  length: number;
-
-  // computed width length * 60 * 4 * scale
-  fullWidth: number;
 }>({
   characters: [],
   updateCharacters: () => {},
@@ -127,8 +104,7 @@ export const TrackContext = createContext<{
 
   objects: { id: "", objects: [] },
   updateObject: () => {},
-  selectObjectClip: () => {},
-  deleteObjectClip: () => {},
+  addObject: () => {},
 
   selectedClip: null,
   selectClip: () => {},
@@ -136,22 +112,6 @@ export const TrackContext = createContext<{
   animationClips: [],
   audioClips: [],
 
-  dragType: null,
-  dragId: null,
   startDrag: () => {},
   endDrag: () => {},
-  dropId: "",
-  setDropId: () => {},
-  canDrop: false,
-  setCanDrop: () => {},
-  overTimeline: false,
-  setOverTimeline: () => {},
-  dropOffset: 0,
-  setDropOffset: () => {},
-
-  scale: 1,
-  currentTime: 0,
-  updateCurrentTime: () => {},
-  length: 12,
-  fullWidth: 0,
 });

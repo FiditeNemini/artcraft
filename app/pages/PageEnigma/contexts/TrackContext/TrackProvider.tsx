@@ -6,6 +6,13 @@ import useUpdateAudio from "~/pages/PageEnigma/contexts/TrackContext/utils/useUp
 import useUpdateObject from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateObject";
 import { AnimationClip, AudioClip } from "~/pages/PageEnigma/models/track";
 import useUpdateDragDrop from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateDragDrop";
+import {
+  canDrop,
+  dragId,
+  dragType,
+  dropId,
+  dropOffset,
+} from "~/pages/PageEnigma/store";
 
 interface Props {
   children: ReactNode;
@@ -39,21 +46,26 @@ export const TrackProvider = ({ children }: Props) => {
     });
   }, []);
 
+  const [timelineHeight, setTimelineHeight] = useState(0);
+  useEffect(() => {
+    const windowHeight = window.outerHeight;
+    setTimelineHeight(windowHeight * 0.25);
+  }, []);
+
   // cross group functions
   const dropClip = useCallback(() => {
-    const { canDrop, dragType, dropId, dragId, dropOffset } = dragDrop;
-    if (canDrop) {
-      if (dragType === "animations") {
+    if (canDrop.value) {
+      if (dragType.value === "animations") {
         characters.addCharacterAnimation({
-          clipId: dragId!,
-          characterId: dropId,
+          clipId: dragId.value!,
+          characterId: dropId.value,
           animationClips,
-          offset: dropOffset,
+          offset: dropOffset.value,
         });
       }
     }
     endDrag();
-  }, [dragDrop, animationClips, characters, endDrag]);
+  }, [animationClips, characters, endDrag]);
 
   const fullWidth = useMemo(() => {
     return length * 60 * 4 * scale;
@@ -94,6 +106,8 @@ export const TrackProvider = ({ children }: Props) => {
       updateCurrentTime,
       length,
       fullWidth,
+      timelineHeight,
+      setTimelineHeight,
     };
   }, [
     characters,
@@ -115,6 +129,7 @@ export const TrackProvider = ({ children }: Props) => {
     fullWidth,
     length,
     scale,
+    timelineHeight,
   ]);
   return (
     <TrackContext.Provider value={values}>{children}</TrackContext.Provider>

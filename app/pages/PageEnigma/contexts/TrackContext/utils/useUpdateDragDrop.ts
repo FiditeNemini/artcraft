@@ -1,38 +1,29 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
+import {
+  canDrop,
+  clipLength,
+  dragId,
+  dragType,
+} from "~/pages/PageEnigma/store";
 
 export default function useUpdateDragDrop() {
-  const [state, setState] = useState<{
-    dragType: "animations" | "lipSync" | null;
-    dragId: string | null;
-  }>({ dragType: null, dragId: null });
   const startDrag = useCallback(
-    (type: "animations" | "lipSync", id: string) => {
-      setState({ dragId: id, dragType: type });
+    (type: "animations" | "lipSync", id: string, length: number) => {
+      dragId.value = id;
+      dragType.value = type;
+      clipLength.value = length;
     },
     [],
   );
-  const [canDrop, setCanDrop] = useState(false);
-  const [overTimeline, setOverTimeline] = useState(false);
 
   const endDrag = useCallback(() => {
-    setState({ dragId: null, dragType: null });
+    dragId.value = null;
+    dragType.value = null;
+    canDrop.value = false;
   }, []);
 
-  const [dropId, setDropId] = useState("");
-  const [dropOffset, setDropOffset] = useState(0);
-
   return {
-    dragId: state.dragId,
-    dragType: state.dragType,
     startDrag,
     endDrag,
-    canDrop,
-    setCanDrop,
-    overTimeline,
-    setOverTimeline,
-    dropId,
-    setDropId,
-    dropOffset,
-    setDropOffset,
   };
 }

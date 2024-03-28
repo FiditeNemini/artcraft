@@ -6,6 +6,13 @@ export interface BaseClip {
   selected?: boolean;
 }
 
+export interface BaseKeyFrame {
+  id: string;
+  name: string;
+  offset: number;
+  selected?: boolean;
+}
+
 export interface AnimationClip extends BaseClip {}
 
 export interface PositionClip extends BaseClip {}
@@ -42,7 +49,7 @@ export interface ObjectGroup {
 
 export interface ObjectTrack {
   id: string;
-  clips: ObjectClip[];
+  keyFrames: ObjectKeyFrame[];
 }
 
-export interface ObjectClip extends BaseClip {}
+export interface ObjectKeyFrame extends BaseKeyFrame {}

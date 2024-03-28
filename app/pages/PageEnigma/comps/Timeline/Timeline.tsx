@@ -10,30 +10,36 @@ import { useMouseEventsAnimation } from "./utils/useMouseEventsAnimation";
 import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ConfirmationModal } from "~/components/ConfirmationModal";
+import {
+  scale,
+  currentTime,
+  filmLength,
+  timelineHeight,
+} from "~/pages/PageEnigma/store";
+import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 
-interface Props {
-  timelineHeight: number;
-}
-
-export const Timeline = ({ timelineHeight }: Props) => {
+export const Timeline = () => {
   const {
     characters,
     objects,
-    scale,
-    length,
     selectedClip,
-    currentTime,
     deleteCharacterClip,
     deleteAudioClip,
     deleteCameraClip,
-    deleteObjectClip,
   } = useContext(TrackContext);
   const { onPointerDown, time } = useMouseEventsAnimation();
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const sectionWidth = 60 * 4 * scale;
+  // implement the code to handle incoming messages from the Engine
+  useQueueHandler();
+
+  const sectionWidth = 60 * 4 * scale.value;
   const fullHeight =
     characters.length * 268 + objects.objects.length * 60 + 300 + 96;
+
+  useEffect(() => {
+    timelineHeight.value = window.outerHeight * 0.25;
+  }, []);
 
   const onDeleteAsk = useCallback(
     (event: KeyboardEvent) => {
@@ -44,20 +50,13 @@ export const Timeline = ({ timelineHeight }: Props) => {
     [selectedClip],
   );
 
-  const displayTime = time === -1 ? currentTime : time;
+  const displayTime = time === -1 ? currentTime.value : time;
 
   const onDelete = useCallback(() => {
     deleteCharacterClip(selectedClip!);
     deleteCameraClip(selectedClip!);
     deleteAudioClip(selectedClip!);
-    deleteObjectClip(selectedClip!);
-  }, [
-    selectedClip,
-    deleteAudioClip,
-    deleteCharacterClip,
-    deleteCameraClip,
-    deleteObjectClip,
-  ]);
+  }, [selectedClip, deleteAudioClip, deleteCharacterClip, deleteCameraClip]);
 
   useEffect(() => {
     document.addEventListener("keydown", onDeleteAsk);
@@ -69,7 +68,7 @@ export const Timeline = ({ timelineHeight }: Props) => {
 
   return (
     <>
-      <LowerPanel timelineHeight={timelineHeight}>
+      <LowerPanel>
         <div
           className={[
             "prevent-select mt-4",
@@ -78,7 +77,7 @@ export const Timeline = ({ timelineHeight }: Props) => {
             "text-xs text-white opacity-75",
           ].join(" ")}
         >
-          {Array(length)
+          {Array(filmLength.value)
             .fill(0)
             .map((_, index) => (
               <Fragment key={index}>
@@ -100,15 +99,18 @@ export const Timeline = ({ timelineHeight }: Props) => {
             ))}
           <div
             className="absolute"
-            style={{ left: length * sectionWidth + 92 }}
+            style={{ left: filmLength.value * sectionWidth + 92 }}
           >
-            00:{length < 10 ? "0" + length.toString() : length.toString()}
+            00:
+            {filmLength.value < 10
+              ? "0" + filmLength.value.toString()
+              : filmLength.value.toString()}
           </div>
           <div
             className="absolute block h-full bg-ui-divider"
             style={{
               width: 1,
-              left: length * sectionWidth + 88,
+              left: filmLength.value * sectionWidth + 88,
               height: fullHeight,
             }}
           />
@@ -124,12 +126,14 @@ export const Timeline = ({ timelineHeight }: Props) => {
         <div className="p-4">
           <Audio />
         </div>
-        <div className="p-4">
-          <Objects />
-        </div>
+        {objects.objects.length > 0 && (
+          <div className="p-4">
+            <Objects />
+          </div>
+        )}
         <div
           className="absolute text-brand-primary"
-          style={{ top: 8, left: displayTime * 4 * scale + 88 }}
+          style={{ top: 8, left: displayTime * 4 * scale.value + 88 }}
           onPointerDown={onPointerDown}
         >
           <FontAwesomeIcon

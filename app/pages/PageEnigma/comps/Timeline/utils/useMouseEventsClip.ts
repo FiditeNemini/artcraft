@@ -1,12 +1,7 @@
-import React, {
-  Dispatch,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-} from "react";
+import React, { Dispatch, useCallback, useEffect, useRef } from "react";
 import { BaseClip } from "~/pages/PageEnigma/models/track";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import { canDrop, scale } from "~/pages/PageEnigma/store";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export const useMouseEventsClip = (
   clip: BaseClip,
@@ -15,14 +10,13 @@ export const useMouseEventsClip = (
   updateClip: (args: { id: string; offset: number; length: number }) => void,
   setState: Dispatch<{ length: number; offset: number }>,
 ) => {
+  useSignals();
   const currLength = useRef(clip.length);
   const currOffset = useRef(clip.offset);
   const initLength = useRef(clip.length);
   const initOffset = useRef(clip.offset);
   const isActive = useRef("");
   const clientX = useRef(0);
-
-  const { scale } = useContext(TrackContext);
 
   const onPointerUp = useCallback(() => {
     if (isActive.current) {
@@ -32,12 +26,13 @@ export const useMouseEventsClip = (
         length: Math.round(currLength.current),
       });
       isActive.current = "";
+      canDrop.value = false;
     }
   }, [updateClip, clip.id]);
 
   const onMouseMove = useCallback(
     (event: MouseEvent) => {
-      const delta = (event.clientX - clientX.current) / 4 / scale;
+      const delta = (event.clientX - clientX.current) / 4 / scale.value;
       const deltaOffset = delta + initOffset.current;
       if (isActive.current === "drag") {
         if (deltaOffset < min || deltaOffset + currLength.current > max) {
@@ -63,7 +58,7 @@ export const useMouseEventsClip = (
       }
       setState({ length: currLength.current, offset: currOffset.current });
     },
-    [max, min, scale, setState],
+    [max, min, setState],
   );
 
   useEffect(() => {
