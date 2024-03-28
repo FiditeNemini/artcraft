@@ -231,7 +231,9 @@ class Editor {
     const load_scene_state_response = await this.api_manager.loadSceneState(
       this.current_scene_media_token_id,
     );
-    
+
+    console.log(load_scene_state_response)
+
     const loaded_scene = load_scene_state_response.data["scene"]
     this.current_scene_media_token_id = load_scene_state_response.data["media_file_token"]
     this.activeScene.scene.children = loaded_scene.children;
@@ -254,7 +256,20 @@ class Editor {
     });
   }
 
+  public removeTransformControls() {
+    if (this.control == undefined) { return };
+    if (this.outlinePass == undefined) { return };
+
+    this.last_selected = this.selected;
+    this.control.detach();
+    this.activeScene.scene.remove(this.control);
+    this.outlinePass.selectedObjects = [];
+  }
+
   public async saveScene(name: string) {
+    // remove controls when saving scene.
+    this.removeTransformControls();
+
     this.dispatchAppUiState({
       type: ACTION_TYPES.SHOW_EDITOR_LOADER
     });
@@ -758,10 +773,7 @@ class Editor {
         this.transform_interaction = true;
       }
     } else if (this.transform_interaction == false) {
-      this.last_selected = this.selected;
-      this.control.detach();
-      this.activeScene.scene.remove(this.control);
-      this.outlinePass.selectedObjects = [];
+      this.removeTransformControls();
     } else {
       this.transform_interaction = false;
     }

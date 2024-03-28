@@ -75,9 +75,8 @@ class APIManager {
     return new APIManagerResponseSuccess("Scene Saved", data);
   }
 
-  public async loadSceneState(
-    scene_media_file_token: string | null,
-  ): Promise<APIManagerResponseSuccess> {
+  
+  public async loadSceneState(scene_media_file_token: string | null): Promise<APIManagerResponseSuccess> {
     const api_base_url = "https://api.fakeyou.com";
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
     const response = await fetch(url);
@@ -100,28 +99,30 @@ class APIManager {
       reader.readAsText(blob);
     });
 
-    console.log(`loadSceneState : ${json_result}`);
+    console.log(`loadSceneState: ${JSON.stringify(json_result)}`);
 
     const scene_glb_media_file_id: string = json_result["glb_media_file_id"];
     
     const media_bucket_path = await this.getMediaFile(scene_glb_media_file_id);
+    console.log(`GLB ${media_bucket_path}`)
     let glbLoader = new GLTFLoader();
     // promisify this
-    const loadGlb = (bucket_path: string): Promise<THREE.Scene> => {
+    const loadGlb = (bucket_path: string): Promise<APIManagerResponseSuccess> => {
       return new Promise((resolve, reject) => {
         glbLoader.load(bucket_path, (glb) => {
           if (glb) {
             const scene: THREE.Scene = glb.scene;
-            const data = { "media_file_token": scene_glb_media_file_id , scene: scene };
+            const data = { "media_file_token": scene_glb_media_file_id , "scene": scene };
+            console.log(`Data: ${data}`)
             resolve(new APIManagerResponseSuccess("Success Loaded", data));
           } else {
-            reject(new APIManagerResponseError("Failed to Load GLB Scene"));
+            throw new APIManagerResponseError("Failed to Load GLB Scene");
           }
         });
       });
     };
 
-    loadGlb(media_bucket_path);
+    return await loadGlb(media_bucket_path);
   }
 
   /**
