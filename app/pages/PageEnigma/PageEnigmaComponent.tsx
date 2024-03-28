@@ -1,4 +1,4 @@
-import { useContext, useEffect, useReducer } from "react";
+import { useEffect, useReducer } from "react";
 
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
@@ -17,11 +17,12 @@ import { AppUIProvider } from "./contexts/AppUiContext";
 import { reducer, initialState, ACTION_TYPES } from "./reducer";
 import { VIEW_MODES } from "./reducer/types";
 import { ViewSideBySide } from "./comps/ViewSideBySide";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import { timelineHeight } from "~/pages/PageEnigma/store";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export const PageEnigmaComponent = () => {
   const [appUiState, dispatchAppUiState] = useReducer(reducer, initialState);
-  const { timelineHeight } = useContext(TrackContext);
+  useSignals();
 
   useEffect(() => {
     setTimeout(
@@ -33,6 +34,8 @@ export const PageEnigmaComponent = () => {
     );
   }, []);
 
+  const lowerHeight = timelineHeight.value;
+  console.log("main", timelineHeight.value);
   return (
     <div>
       <TopBarHelmet>
@@ -46,8 +49,7 @@ export const PageEnigmaComponent = () => {
             <div
               id="CanvasUiWrapper"
               className="flex"
-              style={{ height: `calc(100% - ${timelineHeight}px)` }}
-              // style={{ height: `calc(100% - 260px` }}
+              style={{ height: `calc(100% - ${lowerHeight}px)` }}
             >
               <div className="relative w-full overflow-hidden bg-transparent">
                 <div

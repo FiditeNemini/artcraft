@@ -1,8 +1,7 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import React, { useCallback, useEffect, useState } from "react";
+import { timelineHeight } from "~/pages/PageEnigma/store";
 
 export const useMouseEventsHeight = () => {
-  const { timelineHeight, setTimelineHeight } = useContext(TrackContext);
   const [isActive, setIsActive] = useState(false);
   const [clientY, setClientY] = useState(0);
 
@@ -11,7 +10,8 @@ export const useMouseEventsHeight = () => {
   useEffect(() => {
     const onPointerUp = () => {
       if (isActive) {
-        setTimelineHeight(height);
+        console.log("up", height);
+        timelineHeight.value = Math.round(height);
         setIsActive(false);
         setHeight(-1);
       }
@@ -22,10 +22,10 @@ export const useMouseEventsHeight = () => {
         const delta = event.clientY - clientY;
         event.stopPropagation();
         event.preventDefault();
-        if (timelineHeight - delta < 30) {
+        if (timelineHeight.value - delta < 30) {
           return;
         }
-        setHeight(timelineHeight - delta);
+        setHeight(timelineHeight.value - delta);
         return;
       }
     };
@@ -37,20 +37,17 @@ export const useMouseEventsHeight = () => {
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointermove", onMouseMove);
     };
-  }, [clientY, isActive, height, timelineHeight, setTimelineHeight]);
+  }, [clientY, isActive, height]);
 
   return {
-    onPointerDown: useCallback(
-      (event: React.PointerEvent<HTMLDivElement>) => {
-        if (event.button === 0) {
-          event.stopPropagation();
-          setClientY(event.clientY);
-          setIsActive(true);
-          setHeight(timelineHeight);
-        }
-      },
-      [timelineHeight],
-    ),
+    onPointerDown: useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.button === 0) {
+        event.stopPropagation();
+        setClientY(event.clientY);
+        setIsActive(true);
+        setHeight(timelineHeight.value);
+      }
+    }, []),
     height,
   };
 };

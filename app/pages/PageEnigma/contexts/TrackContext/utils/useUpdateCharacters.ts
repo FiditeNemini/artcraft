@@ -1,5 +1,6 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { BaseClip, CharacterGroup } from "~/pages/PageEnigma/models/track";
+import * as uuid from "uuid";
 
 export default function useUpdateCharacters() {
   const [characters, setCharacters] = useState<CharacterGroup[]>([
@@ -128,7 +129,10 @@ export default function useUpdateCharacters() {
           }
           return {
             ...character,
-            animationClips: [...character.animationClips, { ...clip, offset }],
+            animationClips: [
+              ...character.animationClips,
+              { ...clip, id: uuid.v4(), offset },
+            ],
           };
         });
       });

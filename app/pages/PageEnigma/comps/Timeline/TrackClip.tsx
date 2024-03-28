@@ -2,6 +2,7 @@ import { useMouseEventsClip } from "./utils/useMouseEventsClip";
 import { BaseClip } from "~/pages/PageEnigma/models/track";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { useContext, useState } from "react";
+import { scale } from "~/pages/PageEnigma/store";
 
 interface Props {
   min: number;
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
-  const { selectClip, selectedClip, scale } = useContext(TrackContext);
+  const { selectClip, selectedClip } = useContext(TrackContext);
   const [state, setState] = useState({
     length: clip.length,
     offset: clip.offset,
@@ -41,7 +42,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           "rounded",
           "prevent-select text-xs font-medium text-white",
         ].join(" ")}
-        style={{ top: -28, left: offset * 4 * scale + 2 }}
+        style={{ top: -28, left: offset * 4 * scale.value + 2 }}
       >
         {clip.name}
       </div>
@@ -54,7 +55,11 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
             ? "border border-b-2 border-l-2 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
-        style={{ width: 15, left: offset * 4 * scale, cursor: "w-resize" }}
+        style={{
+          width: 15,
+          left: offset * 4 * scale.value,
+          cursor: "w-resize",
+        }}
         onPointerDown={(event) => onPointerDown(event, "left")}
         onClick={() => selectClip(clip.id)}
       />
@@ -67,8 +72,8 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
             : "",
         ].join(" ")}
         style={{
-          width: length * 4 * scale - 30,
-          left: offset * 4 * scale + 15,
+          width: length * 4 * scale.value - 30,
+          left: offset * 4 * scale.value + 15,
           cursor: "move",
         }}
         onPointerDown={(event) => onPointerDown(event, "drag")}
@@ -85,7 +90,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
         ].join(" ")}
         style={{
           width: 15,
-          left: offset * 4 * scale + length * 4 * scale - 15,
+          left: offset * 4 * scale.value + length * 4 * scale.value - 15,
           cursor: "e-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "right")}

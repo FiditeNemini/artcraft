@@ -2,8 +2,15 @@ import { TrackClip } from "~/pages/PageEnigma/comps/Timeline/TrackClip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
 import { BaseClip } from "~/pages/PageEnigma/models/track";
-import { PointerEvent, useContext } from "react";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import { PointerEvent } from "react";
+import {
+  canDrop,
+  dragType,
+  dropId,
+  dropOffset,
+  filmLength,
+  scale,
+} from "~/pages/PageEnigma/store";
 
 interface Props {
   id: string;
@@ -26,20 +33,18 @@ export const Track = ({
   style,
   type,
 }: Props) => {
-  const { length, scale, setCanDrop, dragType, setDropId, setDropOffset } =
-    useContext(TrackContext);
   const trackType = type ?? style;
 
   function onPointerOver() {
-    if (dragType !== trackType) {
+    if (dragType.value !== trackType) {
       return;
     }
-    setCanDrop(true);
-    setDropId(id);
+    canDrop.value = true;
+    dropId.value = id;
   }
 
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
-    if (dragType !== trackType) {
+    if (dragType.value !== trackType) {
       return;
     }
     const track = document.getElementById(`track-${trackType}-${id}`);
@@ -47,13 +52,13 @@ export const Track = ({
       return;
     }
     const position = track.getBoundingClientRect();
-    setDropOffset((event.clientX - position.x) / 4 / scale);
+    dropOffset.value = (event.clientX - position.x) / 4 / scale.value;
   }
   function onPointerLeave() {
-    if (dragType !== trackType) {
+    if (dragType.value !== trackType) {
       return;
     }
-    setCanDrop(false);
+    canDrop.value = false;
   }
 
   return (
@@ -72,7 +77,9 @@ export const Track = ({
               index > 0 ? clips[index - 1].offset + clips[index - 1].length : 0
             }
             max={
-              index < clips.length - 1 ? clips[index + 1].offset : length * 60
+              index < clips.length - 1
+                ? clips[index + 1].offset
+                : filmLength.value * 60
             }
             style={style}
             updateClip={updateClip}

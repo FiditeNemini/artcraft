@@ -1,6 +1,7 @@
 import { useCallback, useContext, useMemo } from "react";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { Track } from "~/pages/PageEnigma/comps/Timeline/Track";
+import { fullWidth } from "~/pages/PageEnigma/store";
 
 function buildUpdaters(
   updateCharacters: (options: {
@@ -38,7 +39,7 @@ interface Props {
 }
 
 export const Character = ({ characterId }: Props) => {
-  const { characters, updateCharacters, toggleLipSyncMute, fullWidth } =
+  const { characters, updateCharacters, toggleLipSyncMute } =
     useContext(TrackContext);
   const character = characters.find((row) => (row.id = characterId));
 
@@ -56,7 +57,7 @@ export const Character = ({ characterId }: Props) => {
   return (
     <div
       className="block rounded-lg bg-character-groupBg pb-5 pl-2 pr-4"
-      style={{ width: fullWidth + 90 }}
+      style={{ width: fullWidth.value + 90 }}
     >
       <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
         Character

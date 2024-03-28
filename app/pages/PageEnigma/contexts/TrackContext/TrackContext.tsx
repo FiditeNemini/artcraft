@@ -79,35 +79,8 @@ export const TrackContext = createContext<{
   audioClips: AudioClip[];
 
   // drag and drop
-  dragType: "animations" | "lipSync" | null;
-  dragId: string | null;
   startDrag: (type: "animations" | "lipSync", id: string) => void;
   endDrag: () => void;
-  canDrop: boolean;
-  setCanDrop: (can: boolean) => void;
-  overTimeline: boolean;
-  setOverTimeline: (over: boolean) => void;
-  dropId: string;
-  setDropId: (id: string) => void;
-  dropOffset: number;
-  setDropOffset: (offset: number) => void;
-
-  // scale of timeline displa
-  scale: number;
-
-  // current time position
-  currentTime: number;
-  updateCurrentTime: (time: number) => void;
-
-  // total length of the film clip
-  length: number;
-
-  // height of the timeline section
-  timelineHeight: number;
-  setTimelineHeight: (height: number) => void;
-
-  // computed width length * 60 * 4 * scale
-  fullWidth: number;
 }>({
   characters: [],
   updateCharacters: () => {},
@@ -140,24 +113,6 @@ export const TrackContext = createContext<{
   animationClips: [],
   audioClips: [],
 
-  dragType: null,
-  dragId: null,
   startDrag: () => {},
   endDrag: () => {},
-  dropId: "",
-  setDropId: () => {},
-  canDrop: false,
-  setCanDrop: () => {},
-  overTimeline: false,
-  setOverTimeline: () => {},
-  dropOffset: 0,
-  setDropOffset: () => {},
-
-  scale: 1,
-  currentTime: 0,
-  updateCurrentTime: () => {},
-  length: 12,
-  fullWidth: 0,
-  timelineHeight: 0,
-  setTimelineHeight: () => {},
 });

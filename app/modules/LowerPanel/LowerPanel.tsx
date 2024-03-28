@@ -1,25 +1,28 @@
-import React, { useCallback, useContext } from "react";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import React, { useCallback } from "react";
 import { useMouseEventsHeight } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsHeight";
+import {
+  currentTime,
+  overTimeline,
+  scale,
+  timelineHeight,
+} from "~/pages/PageEnigma/store";
 
 interface LowerPanelPropsI {
   children: React.ReactNode;
 }
 
 export const LowerPanel = ({ children }: LowerPanelPropsI) => {
-  const { setOverTimeline, updateCurrentTime, scale, timelineHeight } =
-    useContext(TrackContext);
   const { onPointerDown, height } = useMouseEventsHeight();
 
-  const displayHeight = height > -1 ? height : timelineHeight;
+  const displayHeight = height > -1 ? height : timelineHeight.value;
 
   const onTimelineClick = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
-        updateCurrentTime((Math.round(event.clientX) - 92) / 4 / scale);
+        currentTime.value = (Math.round(event.clientX) - 92) / 4 / scale.value;
       }
     },
-    [updateCurrentTime, scale],
+    [],
   );
 
   return (
@@ -31,9 +34,9 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
       ].join(" ")}
       style={{ height: displayHeight }}
       onPointerOver={() => {
-        setOverTimeline(true);
+        overTimeline.value = true;
       }}
-      onPointerLeave={() => setOverTimeline(false)}
+      onPointerLeave={() => (overTimeline.value = false)}
       onPointerDown={onTimelineClick}
     >
       <div
