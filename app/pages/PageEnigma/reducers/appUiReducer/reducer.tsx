@@ -6,8 +6,8 @@ export function reducer(state: State, action: Action): State {
       return{
         ...state,
         showEditorLoader: {
-          isShow: true,
-          message: action.payload?.showEditorLoader.message || undefined,
+          isShowing: true,
+          message: action.payload?.showEditorLoader.message,
         },
       }
     }
@@ -15,8 +15,26 @@ export function reducer(state: State, action: Action): State {
       return{
         ...state,
         showEditorLoader: {
-          isShow: false,
+          isShowing: false,
           message: state.showEditorLoader.message
+        },
+      }
+    }
+    case ACTION_TYPES.SHOW_EDITOR_LOADINGBAR:{
+      return{
+        ...state,
+        showEditorLoadingBar: {
+          ...action.payload?.showEditorLoadingBar,
+          isShowing: true,
+        },
+      }
+    }
+    case ACTION_TYPES.HIDE_EDITOR_LOADINGBAR:{
+      return{
+        ...state,
+        showEditorLoadingBar: {
+          ...state.showEditorLoadingBar,
+          isShowing: false,
         },
       }
     }

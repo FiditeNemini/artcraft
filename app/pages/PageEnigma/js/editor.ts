@@ -18,7 +18,7 @@ import { TimeLine, TimelineDataState } from "./timeline.js";
 import { ClipUI } from "../datastructures/clips/clip_offset.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
-import { ACTION_TYPES } from "../reducer";
+import { APPUI_ACTION_TYPES } from "../reducers";
 
 class EditorState {
   // {
@@ -176,7 +176,7 @@ class Editor {
 
     // Show Loader
     this.dispatchAppUiState({
-      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
     });
 
     if (this.can_initialize == false) {
@@ -234,14 +234,14 @@ class Editor {
 
     // hide loader
     this.dispatchAppUiState({
-      type: ACTION_TYPES.HIDE_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER
     });
   }
 
   // Token comes in from the front end to load the scene from the site.
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
-      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
     });
 
     if (scene_media_token != null) {
@@ -275,7 +275,7 @@ class Editor {
     });
 
     this.dispatchAppUiState({
-      type: ACTION_TYPES.HIDE_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER
     });
   }
 
@@ -283,7 +283,7 @@ class Editor {
     // remove controls when saving scene.
     this.removeTransformControls();
     this.dispatchAppUiState({
-      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
     });
     console.log(`saveScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
     
@@ -305,7 +305,7 @@ class Editor {
     } 
 
     this.dispatchAppUiState({
-        type: ACTION_TYPES.HIDE_EDITOR_LOADER
+        type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER
     });
   }
 
