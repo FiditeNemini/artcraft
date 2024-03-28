@@ -50,30 +50,32 @@ class APIManager {
   public async saveSceneState(
     scene: THREE.Scene,
     scene_name: string,
+    scene_glb_media_file_token: string | null = null,
     scene_media_file_token: string | null = null,
     timeline_state: TimelineDataState | null = null,
-    glb_scene_media_file_token: string | null = null
   ): Promise<APIManagerResponseSuccess> {
     const file = await this.gltfExport(scene);
 
     // will overwrite the scene on db if token exists
     const upload_glb_response = await this.uploadGLB(
       file,
-      glb_scene_media_file_token,
+      scene_glb_media_file_token,
     );
-    const glb_media_file_token = upload_glb_response["media_file_token"];
+    const result_scene_glb_media_file_token = upload_glb_response["media_file_token"];
 
     // now write the scene
     const save_scene_timeline_response = await this.saveSceneAndTimeLineState(
+      result_scene_glb_media_file_token,
       scene_media_file_token,
-      glb_media_file_token,
       scene_name,
       timeline_state,
     );
+
     const result_scene_media_file_token =
       save_scene_timeline_response["media_file_token"];
-      // "scene_glb_media_file_token": scene_glb_media_file_token , "scene_media_file_token":scene_media_file_token, 
-    const data = { "glb_media_file_token": result_scene_media_file_token,"scene_media_file_token": result_scene_media_file_token };
+
+    const data = { "scene_glb_media_file_token":result_scene_glb_media_file_token,
+                    "scene_media_file_token": result_scene_media_file_token };
     return new APIManagerResponseSuccess("Scene Saved", data);
   }
 
@@ -159,7 +161,7 @@ class APIManager {
 
   private async uploadGLB(
     file: File,
-    glb_scene_media_file_token: string | null,
+    scene_glb_media_file_token: string | null,
   ): Promise<string> {
     const url = `${this.baseUrl}/v1/media_files/write/engine_asset`;
     let uuid = uuidv4();
@@ -167,8 +169,8 @@ class APIManager {
     form_data.append("uuid_idempotency_token", uuid);
 
     // update existing scene otherwise create new glb scene and use it's media_file_id
-    if (glb_scene_media_file_token != null) {
-      form_data.append("media_file_token", glb_scene_media_file_token);
+    if (scene_glb_media_file_token != null) {
+      form_data.append("media_file_token", scene_glb_media_file_token);
     }
 
     form_data.append("file", file);
@@ -195,7 +197,7 @@ class APIManager {
   }
 
   private async saveSceneAndTimeLineState(
-    glb_media_file_token: string | null,
+    scene_glb_media_file_token: string | null,
     scene_media_file_token: string | null,
     scene_file_name: string,
     timeline_state: TimelineDataState | null, // only for now.
@@ -203,11 +205,12 @@ class APIManager {
     const url = `${this.baseUrl}/v1/media_files/write/scene_file`;
     let uuid = uuidv4();
 
+    console.log(`Saving Scene scene_media_file_token:${scene_media_file_token} | scene_glb_media_file_token:${scene_glb_media_file_token}`)
     // turn json into a blob
     const scene_schema = {
-      scene_glb_media_file_token: glb_media_file_token,
-      scene_name: scene_file_name,
-      timeline: { objects: [] },
+      'scene_glb_media_file_token': scene_glb_media_file_token,
+      'scene_name': scene_file_name,
+      'timeline': { 'objects': [] },
     };
     const json = JSON.stringify(scene_schema);
     const blob = new Blob([json], { type: "application/json" });
@@ -237,7 +240,7 @@ class APIManager {
     });
 
     if (!response.ok) {
-      throw new APIManagerResponseError("Failed to Send GLB Data");
+      throw new APIManagerResponseError("Failed to Save Scene.");
     } else {
       const json_data = await response.json();
       // example response {"success":true,"media_file_token":"m_r1ztnn501g2rn0vv2np08nd6zy2fvt"}

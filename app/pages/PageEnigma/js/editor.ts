@@ -289,14 +289,19 @@ class Editor {
     const result = await this.api_manager.saveSceneState(
       this.activeScene.scene,
       name,
+      this.current_glb_scene_media_token,
       this.current_scene_media_token,
-      new TimelineDataState(),
+      new TimelineDataState()
     )
 
-    const scene_media_token_id = result.data["scene_media_token_id"]
-    if (scene_media_token_id != null) {
-      this.current_scene_media_token = scene_media_token_id
+    const scene_media_token = result.data["scene_media_file_token"]
+    if (scene_media_token != null) {
+      this.current_scene_media_token = scene_media_token
     }
+    const scene_glb_media_token =  result.data["scene_glb_media_file_token"]
+    if (scene_glb_media_token != null) {
+      this.current_glb_scene_media_token = scene_glb_media_token
+    } 
 
     this.dispatchAppUiState({
         type: ACTION_TYPES.HIDE_EDITOR_LOADER
