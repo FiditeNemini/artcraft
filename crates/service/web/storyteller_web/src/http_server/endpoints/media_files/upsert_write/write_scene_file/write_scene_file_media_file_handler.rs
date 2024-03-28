@@ -88,7 +88,7 @@ pub async fn write_scene_file_media_file_handler(
 
   if let Some(ref user) = maybe_user_session {
     if user.is_banned {
-      return Err(MediaFileWriteError::NotAuthorized);
+      return Err(MediaFileWriteError::NotAuthorizedVerbose("user is banned".to_string()));
     }
   }
 
@@ -105,12 +105,7 @@ pub async fn write_scene_file_media_file_handler(
 
   // ==================== READ MULTIPART REQUEST ==================== //
 
-  let upload_media_request = drain_multipart_request(multipart_payload)
-      .await
-      .map_err(|e| {
-        // TODO: Error handling could be nicer.
-        MediaFileWriteError::BadInput("bad request".to_string())
-      })?;
+  let upload_media_request = drain_multipart_request(multipart_payload).await?;
 
   // ==================== MAKE SURE USER OWNS FILE ==================== //
 
@@ -123,7 +118,7 @@ pub async fn write_scene_file_media_file_handler(
           error!("Error getting media file: {:?}", err);
           MediaFileWriteError::ServerError
         })?
-        .ok_or(MediaFileWriteError::NotFound)?;
+        .ok_or_else(|| MediaFileWriteError::NotFoundVerbose("media file not found with that token".to_string()))?;
 
     let maybe_user_tokens = (
       maybe_user_token.as_ref(),
@@ -135,19 +130,22 @@ pub async fn write_scene_file_media_file_handler(
       (Some(token_a), Some(token_b)) => {
         if token_a != token_b {
           // User tokens do not match.
-          return Err(MediaFileWriteError::NotAuthorized);
+          return Err(MediaFileWriteError::NotAuthorizedVerbose(
+            "user tokens do not match (both are present)".to_string()));
         }
         false
       },
       _ => {
         // User tokens do not match.
-        return Err(MediaFileWriteError::NotAuthorized);
+        return Err(MediaFileWriteError::NotAuthorizedVerbose(
+          "user tokens do not match (only one is present)".to_string()));
       },
     };
 
     if must_check_avt {
       // TODO(bt,2024-03-26): For now anonymous users can't upload over their own files
-      return Err(MediaFileWriteError::NotAuthorized);
+      return Err(MediaFileWriteError::NotAuthorizedVerbose(
+        "AVT check not yet implemented".to_string()));
     }
   }
 
