@@ -9,7 +9,7 @@ export type State = {
   viewMode: ViewModes;
   timelineHeight: number;
   showEditorLoader: {
-    isShow:boolean
+    isShowing:boolean;
     message:string|undefined;
   };
 };

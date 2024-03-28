@@ -5,7 +5,7 @@ const initialState:State = {
   timelineHeight: 260,
   viewMode: VIEW_MODES.EDITOR,
   showEditorLoader: {
-    isShow:true,
+    isShowing:true,
     message: 'loading Editor Engine 🦊'
   }
 }
