@@ -257,7 +257,7 @@ class Editor {
     this.current_scene_media_token = load_scene_state_response.data["scene_media_file_token"]
     this.current_scene_glb_media_token = load_scene_state_response.data["scene_glb_media_file_token"]
 
-    console.log(`SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
+    console.log(`loadScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
     
     this.activeScene.scene.children = loaded_scene.children;
 
@@ -285,7 +285,8 @@ class Editor {
     this.dispatchAppUiState({
       type: ACTION_TYPES.SHOW_EDITOR_LOADER
     });
-
+    console.log(`saveScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
+    
     const result = await this.api_manager.saveSceneState(
       this.activeScene.scene,
       name,
