@@ -11,6 +11,7 @@ import { ControlsVideo } from "./comps/ControlsVideo";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { Timeline } from "./comps/Timeline";
 import { SidePanelTabs } from "./comps/SidePanelTabs";
+import { HelmetInner } from "./comps/HelmetInnter";
 
 import { EngineProvider } from "./contexts/EngineProvider";
 import { AppUIProvider } from "./contexts/AppUiContext";
@@ -19,23 +20,23 @@ import { ViewSideBySide } from "./comps/ViewSideBySide";
 
 export const PageEnigmaComponent = () => {
   const [appUiState, dispatchAppUiState] = useReducer(appUiReducer, appUiInitialStateValues);
-  
+
 
   return (
     <div>
-      <TopBarHelmet>
-        <Button icon={faSparkles}>Generate Movie</Button>
-      </TopBarHelmet>
-      
       <AppUIProvider value={[appUiState, dispatchAppUiState]} >
         <EngineProvider>
+          <TopBarHelmet>
+            <HelmetInner/>
+          </TopBarHelmet>
+
           <div style={{ height: "calc(100vh - 68px)" }}>
             {/* Engine section/side panel */}
             <div
               id="CanvasUiWrapper"
               className="flex"
               style={{ height: `calc(100% - ${appUiState.timelineHeight}px)` }}
-              // style={{ height: `calc(100% - 260px` }}
+            // style={{ height: `calc(100% - 260px` }}
             >
               <div className="relative w-full overflow-hidden bg-transparent">
                 <div className={(appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE) ? 'invisible' : ''}>
@@ -79,7 +80,7 @@ export const PageEnigmaComponent = () => {
                   progress={appUiState.showEditorLoadingBar.progress}
                 />
               </div>
-              
+
               {/* Side panel */}
               <SidePanel>
                 <SidePanelTabs />

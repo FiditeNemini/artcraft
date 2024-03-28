@@ -21,10 +21,6 @@ export const ControlsTopButtons = () => {
     editorEngine?.loadScene(sceneToken);
   };
 
-  const handleButtonPlayBack = () => {
-    editorEngine?.start_playback();
-  };
-
   const handleButtonTest = () => {
     if(appUiState?.showEditorLoadingBar.isShowing){
       //TO GO TO A HUNDRED AND DISAPPER
@@ -72,13 +68,11 @@ export const ControlsTopButtons = () => {
   };
 
   const handleButtonLoad = () => {
-    editorEngine?.renderVideo();
-  };
-  const handleButtonRender = () => {
     editorEngine?.take_timeline_cam_clip();
   };
-  const handleButtonPlay = () => {
-    editorEngine?.start_playback();
+
+  const handleButtonRender = () => {
+    editorEngine?.generateVideo();
   };
 
   // const handleButtonCameraView = () => {
@@ -147,8 +141,8 @@ export const ControlsTopButtons = () => {
         </Button>
       </div>
       <div className="flex gap-2">
-        {/* <Button onClick={handleButtonLoad}>Render Video</Button>
-        <Button onClick={handleButtonRender}>Take Frame</Button> */}
+        <Button onClick={handleButtonRender}>Render Video</Button>
+        <Button onClick={handleButtonLoad}>Take Frame</Button>
         <Button
           onClick={handleButtonTest}
           className="bg-brand-tertiary hover:bg-brand-tertiary-400"

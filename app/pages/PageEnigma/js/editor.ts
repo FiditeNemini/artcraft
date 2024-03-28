@@ -250,7 +250,7 @@ class Editor {
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
     window.addEventListener("click", this.onMouseClick.bind(this), false);
     // Base control and debug stuff remove debug in prod.
-    this._initialize_control();
+    this._initializeControl();
     // Resets canvas size.
     this.onWindowResize();
     // Creates the main update loop.
@@ -295,14 +295,14 @@ class Editor {
     const load_scene_state_response = await this.api_manager.loadSceneState(
       this.current_scene_media_token,
     );
-    const loaded_scene = load_scene_state_response.data["scene"]
 
+
+
+    if(load_scene_state_response.data == null) { return; }
     // Load these so you can rewrite the scene glb using it's token.
     this.current_scene_media_token = load_scene_state_response.data["scene_media_file_token"]
     this.current_scene_glb_media_token = load_scene_state_response.data["scene_glb_media_file_token"]
 
-
-    if(load_scene_state_response.data == null) { return; }
     const loaded_scene = load_scene_state_response.data["scene"]
     this.current_scene_media_token_id = load_scene_state_response.data["media_file_token"]
     console.log(`loadScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
@@ -600,12 +600,6 @@ class Editor {
     //}
   }
 
-  renderVideo() {
-    this.rendering = true;
-    this.activeScene.render_mode(this.rendering);
-    console.log("Rendering...");
-  }
-
   togglePlay() {
     this.playback = !this.playback;
     this.playback_location = 0;
@@ -683,17 +677,10 @@ class Editor {
 
     this.timeline.update(delta_time);
 
-    this.render_scene();
+    this.renderScene();
     if (this.capturer != null) {
       this.capturer.capture(this.renderer.domElement);
     } // Record scene.
-  }
-
-  start_playback() {
-    this.timeline.isPlaying = true;
-    if(!this.camera_person_mode) {
-      this.switchCameraView();
-    }
   }
 
   change_mode(type: any) {
@@ -762,17 +749,27 @@ class Editor {
     document.body.removeChild(downloadLink);
   }
 
+  generateVideo() {
+    console.log("Generating video...");
+    this.startPlayback();
+    this._initializeRecording();
+    this.rendering = true;
+    this.activeScene.render_mode(this.rendering);
+  }
+
   startPlayback() {
-    this.playback_location = 0;
-    this._initialize_recording();
+    this.timeline.isPlaying = true;
+    if(!this.camera_person_mode) {
+      this.switchCameraView();
+    }
   }
 
   // Initializes transform x y z changes.
-  _initialize_control() {
+  _initializeControl() {
     if (this.control == undefined) {
       return;
     }
-    this.control.addEventListener("change", this.render_scene.bind(this));
+    this.control.addEventListener("change", this.renderScene.bind(this));
     this.control.addEventListener("dragging-changed", (event: any) => {
       if (this.orbitControls == undefined) {
         return;
@@ -786,17 +783,17 @@ class Editor {
     this.activeScene.scene.add(this.control);
   }
 
-  // Initializes CCapture for capturing the scene to send over to backend.
-  _initialize_recording() {
+  _initializeRecording() {
     this.frame_buffer = [];
     this.render_timer = 0;
   }
 
   // Render the scene to the camera.
-  render_scene() {
-    if (this.composer != null && !this.timeline.isPlaying) {
+  renderScene() {
+    if (this.composer != null && !this.rendering) {
       this.composer.render();
     } else if (this.renderer && this.render_camera) {
+      this.renderer.setSize(this.render_width, this.render_height);
       this.renderer.render(this.activeScene.scene, this.render_camera);
     } else {
       console.error("Could not render to canvas no render or composer!");
@@ -807,10 +804,11 @@ class Editor {
       let imgData = this.renderer.domElement.toDataURL();
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
-      if (this.playback_location >= this.fps_number * 3) {
+      if (this.timeline.isPlaying == false) {
         this.stopPlayback();
         this.playback_location = 0;
         this.rendering = false;
+        this.onWindowResize();
       }
     }
   }
