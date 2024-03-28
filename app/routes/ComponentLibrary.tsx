@@ -42,6 +42,9 @@ export default function ComponentLibrary () {
         <div className="flex gap-2">
           <Button>Primary</Button>
           <Button variant="secondary">Secondary</Button>
+          <Button className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary">
+            Prelim Tertiary
+          </Button>
           <Button disabled>Disabled</Button>
         </div>
       </div>
