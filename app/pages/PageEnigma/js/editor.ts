@@ -84,10 +84,14 @@ class Editor {
   lockControls: PointerLockControls | undefined;
   cam_obj: THREE.Object3D | undefined;
   renderPass: RenderPass | undefined;
-  current_scene_media_token_id: string | null;
+
+  camera_person_mode: boolean;
+  current_scene_media_token: string | null;
+  current_scene_glb_media_token: string | null;
+
   can_initialize: boolean;
   dispatchAppUiState: any; // todo figure out the type
-  camera_person_mode: boolean;
+  
 
   // Default params.
   constructor() {
@@ -168,11 +172,25 @@ class Editor {
     );
 
     this.current_frame = 0;
-    this.current_scene_media_token_id = null;
+
+    // Dispatcher 
     this.dispatchAppUiState = null;
+
+    // Scene State
+    this.current_scene_media_token = null;
+    this.current_scene_glb_media_token = null;
   }
 
-  initialize(config: any) {
+
+  initialize(config:any) {
+    //setup reactland Callbacks
+    this.dispatchAppUiState = config.dispatchAppUiState
+
+    // Show Loader
+    this.dispatchAppUiState({
+      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+    });
+
     if (this.can_initialize == false) {
       console.log(
         "Editor Already Initialized",
@@ -233,10 +251,6 @@ class Editor {
 
     this._test_demo();
 
-    // saving state of the scene
-    this.current_scene_media_token_id = null;
-    //setup reactland Callbacks
-    this.dispatchAppUiState = config.dispatchAppUiState;
 
     this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this), false);
     this.renderer.domElement.addEventListener("mouseup", this.onMouseUp.bind(this), false);
@@ -247,28 +261,44 @@ class Editor {
     {
       this.add_transform_clip_base("Camera Object", this.cam_obj, 0, 150)
     }
+
+    // saving state of the scene
+    this.current_scene_media_token = null;
+    this.current_scene_glb_media_token = null;
+
+    // hide loader
+    this.dispatchAppUiState({
+      type: ACTION_TYPES.HIDE_EDITOR_LOADER
+    });
+
   }
 
   // Token comes in from the front end to load the scene from the site.
-  public async loadScene(scene_token: string) {
+  public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
       type: ACTION_TYPES.SHOW_EDITOR_LOADER
     });
 
-    if (scene_token != null) {
-      this.current_scene_media_token_id = scene_token;
+    if (scene_media_token != null) {
+      this.current_scene_media_token = scene_media_token;
     }
 
     const load_scene_state_response = await this.api_manager.loadSceneState(
-      this.current_scene_media_token_id,
+      this.current_scene_media_token,
     );
+    const loaded_scene = load_scene_state_response.data["scene"]
 
-    console.log(load_scene_state_response)
+    // Load these so you can rewrite the scene glb using it's token.
+    this.current_scene_media_token = load_scene_state_response.data["scene_media_file_token"]
+    this.current_scene_glb_media_token = load_scene_state_response.data["scene_glb_media_file_token"]
+
 
     if(load_scene_state_response.data == null) { return; }
-
     const loaded_scene = load_scene_state_response.data["scene"]
     this.current_scene_media_token_id = load_scene_state_response.data["media_file_token"]
+    console.log(`loadScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
+    
+
     this.activeScene.scene.children = loaded_scene.children;
 
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
@@ -291,43 +321,52 @@ class Editor {
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
   }
 
-  public removeTransformControls() {
-    if (this.control == undefined) { return };
-    if (this.outlinePass == undefined) { return };
-
-    this.last_selected = this.selected;
-    this.control.detach();
-    this.activeScene.scene.remove(this.control);
-    this.outlinePass.selectedObjects = [];
-  }
-
   public async saveScene(name: string) {
     // remove controls when saving scene.
     this.removeTransformControls();
-
     this.dispatchAppUiState({
       type: ACTION_TYPES.SHOW_EDITOR_LOADER
     });
-
+    console.log(`saveScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
+    
     const result = await this.api_manager.saveSceneState(
       this.activeScene.scene,
       name,
-      this.current_scene_media_token_id,
-      new TimelineDataState(),
+      this.current_scene_glb_media_token,
+      this.current_scene_media_token,
+      new TimelineDataState()
     )
 
-    if(result.data == null) { return; }
 
-    const scene_media_token_id = result.data["scene_media_token_id"]
-    if (scene_media_token_id != null) {
-      this.current_scene_media_token_id = scene_media_token_id
+    const scene_media_token = result.data["scene_media_file_token"]
+    if (scene_media_token != null) {
+      this.current_scene_media_token = scene_media_token
     }
+    
+    const scene_glb_media_token =  result.data["scene_glb_media_file_token"]
+    if (scene_glb_media_token != null) {
+      this.current_scene_glb_media_token = scene_glb_media_token
+    } 
 
     this.dispatchAppUiState({
       type: ACTION_TYPES.HIDE_EDITOR_LOADER
     });
   }
 
+  /**
+   * This cleans up the transform controls 
+   * During saving it 
+   * Doesn't retain those controls.
+   * @returns 
+   */
+  private removeTransformControls() {
+    if (this.control == undefined) { return };
+    if (this.outlinePass == undefined) { return };
+    this.last_selected = this.selected;
+    this.control.detach();
+    this.activeScene.scene.remove(this.control);
+    this.outlinePass.selectedObjects = [];
+  }
 
   async _serialize_timeline() {
     // note the database from the server is the source of truth for all the data.
