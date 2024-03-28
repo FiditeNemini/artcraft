@@ -188,7 +188,7 @@ class Editor {
   }
 
 
-  initialize(config:any) {
+  initialize(config: any) {
     //setup reactland Callbacks
     this.dispatchAppUiState = config.dispatchAppUiState
 
@@ -264,10 +264,9 @@ class Editor {
     this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this), false);
     this.renderer.domElement.addEventListener("mouseup", this.onMouseUp.bind(this), false);
     this.renderer.domElement.addEventListener("onContextMenu", this.onContextMenu.bind(this), false);
-  
+
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
-    if(this.cam_obj)
-    {
+    if (this.cam_obj) {
       this.add_transform_clip_base("Camera Object", this.cam_obj, 0, 150)
     }
 
@@ -298,7 +297,7 @@ class Editor {
 
 
 
-    if(load_scene_state_response.data == null) { return; }
+    if (load_scene_state_response.data == null) { return; }
     // Load these so you can rewrite the scene glb using it's token.
     this.current_scene_media_token = load_scene_state_response.data["scene_media_file_token"]
     this.current_scene_glb_media_token = load_scene_state_response.data["scene_glb_media_file_token"]
@@ -306,7 +305,7 @@ class Editor {
     const loaded_scene = load_scene_state_response.data["scene"]
     this.current_scene_media_token_id = load_scene_state_response.data["media_file_token"]
     console.log(`loadScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
-    
+
 
     this.activeScene.scene.children = loaded_scene.children;
 
@@ -337,7 +336,7 @@ class Editor {
       type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
     });
     console.log(`saveScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
-    
+
     const result = await this.api_manager.saveSceneState(
       this.activeScene.scene,
       name,
@@ -351,14 +350,14 @@ class Editor {
     if (scene_media_token != null) {
       this.current_scene_media_token = scene_media_token
     }
-    
-    const scene_glb_media_token =  result.data["scene_glb_media_file_token"]
+
+    const scene_glb_media_token = result.data["scene_glb_media_file_token"]
     if (scene_glb_media_token != null) {
       this.current_scene_glb_media_token = scene_glb_media_token
-    } 
+    }
 
     this.dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER
     });
   }
 
@@ -430,17 +429,17 @@ class Editor {
   switchCameraView() {
     this.camera_person_mode = !this.camera_person_mode;
     if (this.cam_obj) {
-      if(this.camera_person_mode) {
+      if (this.camera_person_mode) {
         this.last_cam_pos.copy(this.camera.position);
         this.last_cam_rot.copy(this.camera.rotation);
 
         this.camera.position.copy(this.cam_obj.position);
         this.camera.rotation.copy(this.cam_obj.rotation);
-        if(this.orbitControls) { this.orbitControls.enabled = false; }
-        if(this.lockControls) { this.activeScene.scene.add(this.lockControls.getObject()); }
-        if(this.cameraViewControls) { this.cameraViewControls.enabled = true; }
+        if (this.orbitControls) { this.orbitControls.enabled = false; }
+        if (this.lockControls) { this.activeScene.scene.add(this.lockControls.getObject()); }
+        if (this.cameraViewControls) { this.cameraViewControls.enabled = true; }
 
-        if(this.activeScene.hot_items){
+        if (this.activeScene.hot_items) {
           this.activeScene.hot_items.forEach(element => {
             element.visible = false;
           });
@@ -448,10 +447,10 @@ class Editor {
       } else {
         this.camera.position.copy(this.last_cam_pos);
         this.camera.rotation.copy(this.last_cam_rot);
-        if(this.orbitControls) { this.orbitControls.enabled = true; }
-        if(this.lockControls) { this.activeScene.scene.remove(this.lockControls.getObject()); }
-        if(this.cameraViewControls) { this.cameraViewControls.enabled = false; }
-        if(this.activeScene.hot_items){
+        if (this.orbitControls) { this.orbitControls.enabled = true; }
+        if (this.lockControls) { this.activeScene.scene.remove(this.lockControls.getObject()); }
+        if (this.cameraViewControls) { this.cameraViewControls.enabled = false; }
+        if (this.activeScene.hot_items) {
           this.activeScene.hot_items.forEach(element => {
             element.visible = true;
           });
@@ -460,7 +459,7 @@ class Editor {
     }
   }
 
-  async add_transform_clip_base(name: string = "New Clip", object: THREE.Object3D, start_offset:number, end_offset:number) {
+  async add_transform_clip_base(name: string = "New Clip", object: THREE.Object3D, start_offset: number, end_offset: number) {
     this.timeline.addPlayableClip(
       new ClipUI(1.0, "transform", "clip2", object.uuid, object.uuid, start_offset, end_offset),
     );
@@ -637,8 +636,8 @@ class Editor {
   }
 
   take_timeline_cam_clip() {
-    if(this.cam_obj == null) { return; }
-    if(!this.camera_person_mode) { return; }
+    if (this.cam_obj == null) { return; }
+    if (!this.camera_person_mode) { return; }
     this.transform_engine.addFrame(this.cam_obj, this.transform_engine.clips[this.cam_obj.uuid].length);
     console.log("Camera frame taken.");
     this.activeScene.createPoint(this.cam_obj.position, false);
@@ -670,7 +669,7 @@ class Editor {
       }
     }
 
-    if(this.render_camera && this.cam_obj) {
+    if (this.render_camera && this.cam_obj) {
       this.render_camera.position.copy(this.cam_obj.position);
       this.render_camera.rotation.copy(this.cam_obj.rotation);
     }
@@ -737,21 +736,21 @@ class Editor {
       if (clip.type == "lipsync") {
         console.log(clip.media_id)
         for (const [key, value] of Object.entries(this.lipsync_engine.clips)) {
-          if(clip.object_uuid == key && clip.media_id == value.media_id) {
-            await ffmpeg.FS('writeFile', itteration+"tmp.wav", await fetchFile(await this.api_manager.getMediaFile(value.media_id)));
-            let video_og = itteration+'tmp.mp4';
-            let wav_name = itteration+'tmp.wav';
-            let new_video =  (itteration+1)+'tmp.mp4';
+          if (clip.object_uuid == key && clip.media_id == value.media_id) {
+            await ffmpeg.FS('writeFile', itteration + "tmp.wav", await fetchFile(await this.api_manager.getMediaFile(value.media_id)));
+            let video_og = itteration + 'tmp.mp4';
+            let wav_name = itteration + 'tmp.wav';
+            let new_video = (itteration + 1) + 'tmp.mp4';
             let startFrame = clip.start_offset;
             let endFrame = clip.ending_offset;
 
             const startTime = startFrame / this.cap_fps;
             const endTime = endFrame / this.cap_fps;
-            let end = endTime-startTime;
+            let end = endTime - startTime;
 
-            let audioSegment = "new_"+wav_name;
+            let audioSegment = "new_" + wav_name;
 
-            await ffmpeg.run('-i', wav_name, '-ss', '0', '-to', ''+end, audioSegment);
+            await ffmpeg.run('-i', wav_name, '-ss', '0', '-to', '' + end, audioSegment);
             await ffmpeg.run(
               '-i', video_og,
               '-itsoffset', `${startTime}`,
@@ -760,13 +759,13 @@ class Editor {
               '-c:a', 'aac',
               '-strict', 'experimental',
               new_video
-          );
+            );
             itteration += 1
           }
         }
       }
     };
-    
+
     for (const [key, value] of Object.entries(this.lipsync_engine.clips)) {
       console.log(key, value);
       if (value.audio_data) {
@@ -783,7 +782,7 @@ class Editor {
       }
     }
 
-    let output = await ffmpeg.FS("readFile", itteration+"tmp.mp4");
+    let output = await ffmpeg.FS("readFile", itteration + "tmp.mp4");
     // Create a Blob from the output file for downloading
     const blob = new Blob([output.buffer], { type: "video/mp4" });
     const url = URL.createObjectURL(blob);
@@ -812,7 +811,7 @@ class Editor {
 
   startPlayback() {
     this.timeline.isPlaying = true;
-    if(!this.camera_person_mode) {
+    if (!this.camera_person_mode) {
       this.switchCameraView();
     }
   }
