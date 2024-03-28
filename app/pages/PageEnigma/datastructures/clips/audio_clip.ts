@@ -14,14 +14,7 @@ class AudioData implements AudioData{
   }
 }
 
-export interface AudioTrackClip {
-  version: number;
-  media_id: string;
-  type: "audio";
-  volume: number;
-}
-
-export class AudioTrackClip implements AudioTrackClip {
+export class AudioClip  {
   version: number;
   media_id: string;
   type: "audio" = "audio";

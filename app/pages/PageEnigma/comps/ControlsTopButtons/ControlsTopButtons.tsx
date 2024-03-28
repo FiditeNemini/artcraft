@@ -10,12 +10,12 @@ export const ControlsTopButtons = () => {
 
   const handleButtonSave = () => {
     console.log(`SceneName is ${sceneName}`);
-    editorEngine?.save();
+    editorEngine?.saveScene(sceneName);
   };
 
   const handleButtonLoadScene = () => {
     console.log(`Scene Token is ${sceneToken}`);
-    // editorEngine?.dosomething();
+    editorEngine?.loadScene(sceneToken);
   };
 
   // const handleButtonCameraView = () => {
@@ -26,12 +26,11 @@ export const ControlsTopButtons = () => {
     editorEngine?.start_playback();
   };
   const handleButtonLoad = () => {
-    document.getElementById("load-upload")?.click();
+
+
   };
   const handleButtonRender = () => {
-    console.log("Saving GLB to server for reference");
-    editorEngine?._upload_for_testing();
-    //editorEngine?.togglePlayback();
+   
   };
   const handleButtonPlay = () => {};
 

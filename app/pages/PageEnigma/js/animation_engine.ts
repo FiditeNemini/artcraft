@@ -1,19 +1,17 @@
-import { AnimationTrackClip } from "../datastructures/clips/animation_track_clip";
+import { AnimationClip } from "../datastructures/clips/animation_clip";
 import * as THREE from 'three';
 
 export class AnimationEngine {
-    clips: { [key: string]: AnimationTrackClip } = {};
+    clips: { [key: string]: AnimationClip } = {};
     version: number;
-    length: number;
 
-    constructor(version: number, length: number) {
+    constructor(version: number) {
         this.clips = {};
         this.version = version;
-        this.length = length;
     }
 
     load_object(object_uuid: string, media_id:string, clip_name: string) {
-        this.clips[object_uuid] = new AnimationTrackClip(
+        this.clips[object_uuid] = new AnimationClip(
             this.version,
             media_id,
             "glb", 

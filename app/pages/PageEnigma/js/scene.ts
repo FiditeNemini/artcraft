@@ -13,6 +13,7 @@ class Scene {
     }
 
     initialize() {
+        this.scene = new THREE.Scene();
         this._createGrid();
         this._create_base_lighting();
         this._create_skybox();
@@ -98,6 +99,7 @@ class Scene {
             '/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png',
         ]);
         this.scene.background = texture;
+        console.log("Backround creation..")
     }
 
     // deafult image skybox.
@@ -128,6 +130,7 @@ class Scene {
 
         this.scene.add(directional_light);
         this.scene.add(directional_light.target);
+        return directional_light;
     }
 
     _createGrid() {
