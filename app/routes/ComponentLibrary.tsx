@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { 
   Button,
   ButtonLink,
@@ -11,20 +11,28 @@ import {
 
 export default function ComponentLibrary () {
   const [progress, setProgress] = useState(0);
+  const loopRef = useRef<NodeJS.Timeout | null>(null);
+
+  const pushProgressBar: ()=>void = useCallback(()=>{
+    loopRef.current = setInterval(function timer(){
+      setProgress((curr)=>{
+        if (curr < 100){
+          return curr+10;
+        }else{
+          if(loopRef.current)
+            clearInterval(loopRef.current);
+          return curr;
+        }
+      })}
+    , 3000);
+  }, []);
   useEffect(()=>{
-    if(progress === 0){
-      const loop = setInterval(function timer(){
-        setProgress((curr)=>{
-          if (curr < 100){
-            return curr+10;
-          }else{
-            clearTimeout(loop);
-            return curr;
-          }
-        })}
-      , 3000);
+    pushProgressBar();
+    return ()=>{
+      if(loopRef.current)
+        clearInterval(loopRef.current)
     }
-  }, [progress]);
+  },[progress]);
 
   return(
     <div className='bg-ui-panel w-10/12 max-w-7xl h-full min-h-96 mx-auto my-6 rounded-lg p-6'>
@@ -57,14 +65,31 @@ export default function ComponentLibrary () {
 
       <div className="flex flex-col gap-2 mb-4">
         <H4>Loading Bar</H4>
-        <div className="flex gap-2">
-          <LoadingBar progress={progress} wrapperClassName="rounded-lg"/>
-          <Button onClick={()=>setProgress(0)}>Reset</Button>
+        <div className="flex gap-2 items-center">
+          <LoadingBar
+            progress={progress}
+            isShowing={progress !== 100}
+            wrapperClassName="rounded-lg"
+            message="this takes progress from parent"
+          />
+          <Button
+            className="h-fit"
+            onClick={()=>setProgress(0)}
+          >
+            Reset
+          </Button>
         </div>
         <LoadingBar
           label="labeling the bar"
           message="displaying a message"
-          pulsing
+        />
+        <LoadingBar
+          label="useFakeTimer = 30000 (30secs)"
+          useFakeTimer={30000}
+        />
+        <LoadingBar
+          label="useFakeTimer = 3000 (3secs)"
+          useFakeTimer={3000}
         />
       </div>
     </div>
