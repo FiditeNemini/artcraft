@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 
@@ -6,7 +6,7 @@ import { Button } from "~/components/Button";
 import { ButtonLink } from "~/components/ButtonLink";
 import { TopBarHelmet } from "~/modules/TopBarHelmet";
 
-import { SidePanel } from "~/modules/SidePanelOld";
+import { SidePanel } from "~/modules/SidePanel";
 import { SceneWithCube } from "./SceneWithCube";
 
 export const PageCube = () => {
@@ -64,7 +64,7 @@ export const PageCube = () => {
         <p className="text-white">Ration X: {rotationX ? rotationX : ""}</p>
         <p className="text-white">Ration Y: {rotationY ? rotationY : ""}</p>
       </div>
-      <SidePanel title="Side Panel Title">
+      <SidePanel>
         <p className="text-white">Side Panel Context</p>
       </SidePanel>
     </div>

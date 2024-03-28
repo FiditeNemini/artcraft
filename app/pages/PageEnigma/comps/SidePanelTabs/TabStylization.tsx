@@ -32,7 +32,7 @@ export const TabStylization = ()=>{
     }
   }
   return(
-    <>
+    <div className="gap-2">
       <H4>Select Base Stylizer</H4>
       <div className="flex gap-2 my-2">
         <ItemPicker
@@ -82,6 +82,6 @@ export const TabStylization = ()=>{
           }
         </Button>
       </div>
-    </>
+    </div>
   );
 }
