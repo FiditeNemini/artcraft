@@ -82,7 +82,7 @@ class Editor {
   renderPass: RenderPass | undefined;
 
   current_scene_media_token: string | null;
-  current_glb_scene_media_token: string | null;
+  current_scene_glb_media_token: string | null;
 
   can_initialize: boolean;
   dispatchAppUiState: any; // todo figure out the type
@@ -167,7 +167,7 @@ class Editor {
 
     // Scene State
     this.current_scene_media_token = null;
-    this.current_glb_scene_media_token = null;
+    this.current_scene_glb_media_token = null;
   }
 
   initialize(config:any) {
@@ -230,7 +230,7 @@ class Editor {
 
     // saving state of the scene
     this.current_scene_media_token = null;
-    this.current_glb_scene_media_token = null;
+    this.current_scene_glb_media_token = null;
 
     // hide loader
     this.dispatchAppUiState({
@@ -255,9 +255,9 @@ class Editor {
 
     // Load these so you can rewrite the scene glb using it's token.
     this.current_scene_media_token = load_scene_state_response.data["scene_media_file_token"]
-    this.current_glb_scene_media_token = load_scene_state_response.data["scene_glb_media_file_token"]
+    this.current_scene_glb_media_token = load_scene_state_response.data["scene_glb_media_file_token"]
 
-    console.log(`SceneMediaToken:${this.current_scene_media_token} GLBSceneMediaToken${this.current_glb_scene_media_token}`);
+    console.log(`SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
     
     this.activeScene.scene.children = loaded_scene.children;
 
@@ -289,7 +289,7 @@ class Editor {
     const result = await this.api_manager.saveSceneState(
       this.activeScene.scene,
       name,
-      this.current_glb_scene_media_token,
+      this.current_scene_glb_media_token,
       this.current_scene_media_token,
       new TimelineDataState()
     )
@@ -300,7 +300,7 @@ class Editor {
     }
     const scene_glb_media_token =  result.data["scene_glb_media_file_token"]
     if (scene_glb_media_token != null) {
-      this.current_glb_scene_media_token = scene_glb_media_token
+      this.current_scene_glb_media_token = scene_glb_media_token
     } 
 
     this.dispatchAppUiState({
