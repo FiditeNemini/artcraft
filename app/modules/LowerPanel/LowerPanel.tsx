@@ -1,15 +1,17 @@
 import React, { useCallback, useContext } from "react";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import { useMouseEventsHeight } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsHeight";
 
 interface LowerPanelPropsI {
-  timelineHeight: number;
   children: React.ReactNode;
 }
 
-export const LowerPanel = ({ children, timelineHeight }: LowerPanelPropsI) => {
-  // const [open, setOpen] = useState(false);
-  const { setOverTimeline, updateCurrentTime, scale } =
+export const LowerPanel = ({ children }: LowerPanelPropsI) => {
+  const { setOverTimeline, updateCurrentTime, scale, timelineHeight } =
     useContext(TrackContext);
+  const { onPointerDown, height } = useMouseEventsHeight();
+
+  const displayHeight = height > -1 ? height : timelineHeight;
 
   const onTimelineClick = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
@@ -20,25 +22,25 @@ export const LowerPanel = ({ children, timelineHeight }: LowerPanelPropsI) => {
     [updateCurrentTime, scale],
   );
 
-  // const handleOpen = () => {
-  //   setOpen(true);
-  // };
-
   return (
     <div
       className={[
         "absolute bottom-0",
         "w-screen overflow-auto",
-        "border-t border-ui-panel-border",
         "bg-ui-panel",
       ].join(" ")}
-      style={{ height: timelineHeight }}
+      style={{ height: displayHeight }}
       onPointerOver={() => {
         setOverTimeline(true);
       }}
       onPointerLeave={() => setOverTimeline(false)}
       onPointerDown={onTimelineClick}
     >
+      <div
+        className="w-full cursor-ns-resize bg-ui-panel-border"
+        style={{ height: 3, zIndex: 1000 }}
+        onPointerDown={onPointerDown}
+      />
       {children}
     </div>
   );

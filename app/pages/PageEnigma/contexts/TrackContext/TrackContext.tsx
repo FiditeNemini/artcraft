@@ -102,6 +102,10 @@ export const TrackContext = createContext<{
   // total length of the film clip
   length: number;
 
+  // height of the timeline section
+  timelineHeight: number;
+  setTimelineHeight: (height: number) => void;
+
   // computed width length * 60 * 4 * scale
   fullWidth: number;
 }>({
@@ -154,4 +158,6 @@ export const TrackContext = createContext<{
   updateCurrentTime: () => {},
   length: 12,
   fullWidth: 0,
+  timelineHeight: 0,
+  setTimelineHeight: () => {},
 });

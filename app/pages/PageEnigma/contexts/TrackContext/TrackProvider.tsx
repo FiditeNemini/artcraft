@@ -39,6 +39,12 @@ export const TrackProvider = ({ children }: Props) => {
     });
   }, []);
 
+  const [timelineHeight, setTimelineHeight] = useState(0);
+  useEffect(() => {
+    const windowHeight = window.outerHeight;
+    setTimelineHeight(windowHeight * 0.25);
+  }, []);
+
   // cross group functions
   const dropClip = useCallback(() => {
     const { canDrop, dragType, dropId, dragId, dropOffset } = dragDrop;
@@ -94,6 +100,8 @@ export const TrackProvider = ({ children }: Props) => {
       updateCurrentTime,
       length,
       fullWidth,
+      timelineHeight,
+      setTimelineHeight,
     };
   }, [
     characters,
@@ -115,6 +123,7 @@ export const TrackProvider = ({ children }: Props) => {
     fullWidth,
     length,
     scale,
+    timelineHeight,
   ]);
   return (
     <TrackContext.Provider value={values}>{children}</TrackContext.Provider>

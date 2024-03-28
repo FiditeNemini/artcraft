@@ -11,11 +11,7 @@ import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ConfirmationModal } from "~/components/ConfirmationModal";
 
-interface Props {
-  timelineHeight: number;
-}
-
-export const Timeline = ({ timelineHeight }: Props) => {
+export const Timeline = () => {
   const {
     characters,
     objects,
@@ -69,7 +65,7 @@ export const Timeline = ({ timelineHeight }: Props) => {
 
   return (
     <>
-      <LowerPanel timelineHeight={timelineHeight}>
+      <LowerPanel>
         <div
           className={[
             "prevent-select mt-4",
