@@ -291,51 +291,6 @@ class Editor {
     });
   }
 
-  // uploading some objects for testing to get their media ids from my account.
-  async _upload_for_testing() {
-    // have to upload as a file first
-
-    // This is the default scene.
-    // "m_189p8hj0eyypbg74kkhcpehwpjhnkz" scene with the fox.
-
-    //let result = await this.api_manager.saveSceneState(this.activeScene.scene)
-
-    // let result = await this.api_manager.getMediaFile(
-    //   "m_189p8hj0eyypbg74kkhcpehwpjhnkz",
-    // )
-    console.log("Saving...");
-    const result = await this.api_manager.saveSceneState(
-      this.activeScene.scene,
-      "",
-      null,
-      null,
-    );
-    console.log("Saved!");
-    console.log("Media ID is:", result);
-    // if (result.data) {
-    //   this.test_scene_load_media_id = result.data["media_file_token"];
-    // }
-  }
-
-  //async _load_for_testing() {
-  //  const result = await this.api_manager.loadScene(this.test_scene_load_media_id)
-  //  let bucket_path = await this.api_manager.getMediaFile(result["glb_media_file_id"])
-  //  let glbLoader = new GLTFLoader()
-  //  glbLoader.load(bucket_path, (glb) => {
-  //    this.activeScene.scene.children = glb.scene.children
-  //    this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
-  //      child.parent = this.activeScene.scene
-  //      if (child.type == "DirectionalLight") {
-  //        let pos = child.position
-  //        let rot = child.rotation
-  //        let light = this.activeScene._create_base_lighting()
-  //        light.position.set(pos.x, pos.y, pos.z)
-  //        light.rotation.set(rot.x, rot.y, rot.z)
-  //        this.activeScene.scene.remove(child)
-  //      }
-  //    })
-  //  })
-  //}
 
   async _serialize_timeline() {
     // note the database from the server is the source of truth for all the data.
