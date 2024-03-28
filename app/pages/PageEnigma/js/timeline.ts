@@ -72,7 +72,7 @@ export class TimeLine {
         scene: Scene) {
         
         this.timelineItems = []
-        this.timeLineLimit = 60 * 10 // 10 seconds
+        this.timeLineLimit = 60 * 5 // 10 seconds
      
         this.isPlaying = false
         this.scrubberPosition = 0 // in frames into the tl
