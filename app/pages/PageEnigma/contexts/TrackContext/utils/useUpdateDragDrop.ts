@@ -1,11 +1,17 @@
 import { useCallback } from "react";
-import { canDrop, dragId, dragType } from "~/pages/PageEnigma/store";
+import {
+  canDrop,
+  clipLength,
+  dragId,
+  dragType,
+} from "~/pages/PageEnigma/store";
 
 export default function useUpdateDragDrop() {
   const startDrag = useCallback(
-    (type: "animations" | "lipSync", id: string) => {
+    (type: "animations" | "lipSync", id: string, length: number) => {
       dragId.value = id;
       dragType.value = type;
+      clipLength.value = length;
     },
     [],
   );

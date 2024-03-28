@@ -5,6 +5,7 @@ import { BaseClip } from "~/pages/PageEnigma/models/track";
 import { PointerEvent } from "react";
 import {
   canDrop,
+  clipLength,
   dragType,
   dropId,
   dropOffset,
@@ -39,7 +40,6 @@ export const Track = ({
     if (dragType.value !== trackType) {
       return;
     }
-    canDrop.value = true;
     dropId.value = id;
   }
 
@@ -51,8 +51,30 @@ export const Track = ({
     if (!track) {
       return;
     }
+
+    // Now check the the clip fits
     const position = track.getBoundingClientRect();
-    dropOffset.value = (event.clientX - position.x) / 4 / scale.value;
+    const clipOffset = (event.clientX - position.x) / 4 / scale.value;
+
+    if (clipOffset + clipLength.value > filmLength.value * 60) {
+      canDrop.value = false;
+      return;
+    }
+
+    const overlap = clips.some((clip) => {
+      if (clipOffset === clip.offset) {
+        return true;
+      }
+      if (clipOffset > clip.offset && clipOffset <= clip.offset + clip.length) {
+        return true;
+      }
+      return (
+        clipOffset < clip.offset && clipOffset + clipLength.value >= clip.offset
+      );
+    });
+
+    canDrop.value = !overlap;
+    dropOffset.value = clipOffset;
   }
   function onPointerLeave() {
     if (dragType.value !== trackType) {

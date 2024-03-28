@@ -6,3 +6,4 @@ export const canDrop = signal(false);
 export const overTimeline = signal(false);
 export const dropId = signal("");
 export const dropOffset = signal(0);
+export const clipLength = signal(0);

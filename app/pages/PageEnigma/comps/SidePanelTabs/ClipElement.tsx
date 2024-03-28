@@ -62,7 +62,7 @@ export const ClipElement = ({ clip, type }: Props) => {
         const box = document.getElementById(`ani-clip-${clip.id}`);
         const position = box!.getBoundingClientRect();
 
-        startDrag(type, clip.id);
+        startDrag(type, clip.id, clip.length);
         setCurrPosition({
           x: position.x,
           y: position.y + position.height + 1,

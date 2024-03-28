@@ -10,7 +10,6 @@ export const useMouseEventsHeight = () => {
   useEffect(() => {
     const onPointerUp = () => {
       if (isActive) {
-        console.log("up", height);
         timelineHeight.value = Math.round(height);
         setIsActive(false);
         setHeight(-1);

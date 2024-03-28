@@ -79,7 +79,11 @@ export const TrackContext = createContext<{
   audioClips: AudioClip[];
 
   // drag and drop
-  startDrag: (type: "animations" | "lipSync", id: string) => void;
+  startDrag: (
+    type: "animations" | "lipSync",
+    id: string,
+    length: number,
+  ) => void;
   endDrag: () => void;
 }>({
   characters: [],
