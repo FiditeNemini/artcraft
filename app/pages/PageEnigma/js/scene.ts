@@ -17,6 +17,7 @@ class Scene {
         this._createGrid();
         this._create_base_lighting();
         this._create_skybox();
+        this._create_camera_obj();
     }
 
     instantiate(name: string) {
@@ -51,8 +52,19 @@ class Scene {
         return this.scene.getObjectByProperty('uuid', uuid);
     }
 
+    get_object_by_name(name: string) {
+        return this.scene.getObjectByName(name);
+    }
+
     _disable_skybox() {
         this.scene.background = null;
+    }
+
+    _create_camera_obj() {
+        let cam_obj: THREE.Object3D = new THREE.Object3D();
+        cam_obj.userData["name"] = "::CAM::";
+        cam_obj.name = "::CAM::";
+        this.scene.add(cam_obj);
     }
 
     render_mode(enabled:boolean=true) {

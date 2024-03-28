@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+//import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { FreeCam } from "./free_cam"
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import Scene from "./scene.js";
 import APIManager from "./api_manager.js";
@@ -19,7 +20,7 @@ import { ClipUI } from "../datastructures/clips/clip_offset.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
 import { ACTION_TYPES } from "../reducer";
-
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 class EditorState {
   // {
   //   action: "ShowLoadingIndicator"
@@ -61,7 +62,7 @@ class Editor {
   rendering: boolean;
   api_manager: APIManager;
   stats: any;
-  orbit: OrbitControls | undefined;
+  orbit: FreeCam | undefined;
   locked: boolean;
   capturer: any;
   frame_buffer: any;
@@ -77,13 +78,13 @@ class Editor {
   animation_engine: AnimationEngine;
   timeline: TimeLine;
   current_frame: number;
-
-
+  lockControls: PointerLockControls | undefined;
+  cam_obj: THREE.Object3D | undefined;
   renderPass: RenderPass | undefined;
-
   current_scene_media_token_id: string | null;
   can_initialize: boolean;
   dispatchAppUiState: any; // todo figure out the type
+
   // Default params.
   constructor() {
     console.log(
@@ -109,10 +110,12 @@ class Editor {
     this.renderer;
     this.clock;
     this.canvReference = null;
+    this.cam_obj;
     this.composer;
     this.effectFXAA;
     this.outlinePass;
     this.last_cam_pos;
+    this.lockControls;
     this.saoPass;
     this.outputPass;
     this.bloomPass;
@@ -162,7 +165,7 @@ class Editor {
     this.dispatchAppUiState = null;
   }
 
-  initialize(config:any) {
+  initialize(config: any) {
     if (this.can_initialize == false) {
       console.log(
         "Editor Already Initialized",
@@ -187,7 +190,7 @@ class Editor {
       canvas: this.canvReference,
       preserveDrawingBuffer: true,
     });
-    
+
     this.renderer.shadowMap.enabled = true;
     this.clock = new THREE.Clock();
     // Resizes the renderer.
@@ -196,7 +199,16 @@ class Editor {
     window.addEventListener("resize", this.onWindowResize.bind(this));
     this._configure_post_pro();
     // Controls and movement.
-    this.orbit = new OrbitControls(this.camera, this.renderer.domElement);
+
+    this.lockControls = new PointerLockControls(this.camera, this.renderer.domElement);
+    
+    this.orbit = new FreeCam(this.camera, this.renderer.domElement);
+    this.orbit.movementSpeed = 1;
+    this.orbit.domElement = this.renderer.domElement;
+    this.orbit.rollSpeed = Math.PI / 24;
+    this.orbit.autoForward = false;
+    this.orbit.dragToLook = true;
+
     this.control = new TransformControls(this.camera, this.renderer.domElement);
     // OnClick and MouseMove events.
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
@@ -215,7 +227,19 @@ class Editor {
     // saving state of the scene
     this.current_scene_media_token_id = null;
     //setup reactland Callbacks
-    this.dispatchAppUiState = config.dispatchAppUiState
+    this.dispatchAppUiState = config.dispatchAppUiState;
+
+    this.activeScene.scene.add(this.lockControls.getObject());
+
+    this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this), false);
+    this.renderer.domElement.addEventListener("mouseup", this.onMouseUp.bind(this), false);
+    this.renderer.domElement.addEventListener("onContextMenu", this.onContextMenu.bind(this), false);
+  
+    this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
+    if(this.cam_obj)
+    {
+      this.add_transform_clip_base("Camera Object", this.cam_obj, 0, 150)
+    }
   }
 
   // Token comes in from the front end to load the scene from the site.
@@ -233,6 +257,8 @@ class Editor {
     );
 
     console.log(load_scene_state_response)
+
+    if(load_scene_state_response.data == null) { return; }
 
     const loaded_scene = load_scene_state_response.data["scene"]
     this.current_scene_media_token_id = load_scene_state_response.data["media_file_token"]
@@ -254,6 +280,8 @@ class Editor {
     this.dispatchAppUiState({
       type: ACTION_TYPES.HIDE_EDITOR_LOADER
     });
+
+    this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
   }
 
   public removeTransformControls() {
@@ -281,13 +309,15 @@ class Editor {
       new TimelineDataState(),
     )
 
+    if(result.data == null) { return; }
+
     const scene_media_token_id = result.data["scene_media_token_id"]
     if (scene_media_token_id != null) {
       this.current_scene_media_token_id = scene_media_token_id
     }
 
     this.dispatchAppUiState({
-        type: ACTION_TYPES.HIDE_EDITOR_LOADER
+      type: ACTION_TYPES.HIDE_EDITOR_LOADER
     });
   }
 
@@ -340,6 +370,13 @@ class Editor {
       "/resources/models/fox/fox_idle.glb",
       "clip3",
     );
+  }
+
+  async add_transform_clip_base(name: string = "New Clip", object: THREE.Object3D, start_offset:number, end_offset:number) {
+    this.timeline.addPlayableClip(
+      new ClipUI(1.0, "transform", "clip2", object.uuid, object.uuid, start_offset, end_offset),
+    );
+    this.transform_engine.loadObject(object.uuid, end_offset);
   }
 
   async _test_demo() {
@@ -523,11 +560,19 @@ class Editor {
 
     let delta_time = this.clock.getDelta();
 
-    // All calls that are not super important like timeline go here.
-    //this.activeScene.update(delta_time)
-    //this.orbit.update(0.1)
-
-    //console.log(this.transform_engine.clips[this.test_box_uuid])
+    if (this.orbit) {
+      this.orbit.update(5 * delta_time)
+      if (this.cam_obj) {
+        if (this.timeline.isPlaying == false) {
+          this.cam_obj.position.copy(this.camera.position);
+          this.cam_obj.rotation.copy(this.camera.rotation);
+        } else {
+          this.camera.position.copy(this.cam_obj.position);
+          this.camera.rotation.copy(this.cam_obj.rotation);
+        }
+        console.log(this.cam_obj.position);
+      }
+    }
 
     this.timeline.update(delta_time);
 
@@ -680,6 +725,22 @@ class Editor {
     }
   }
 
+  onContextMenu(event: any) {
+    return false;
+  }
+
+  onMouseDown(event: any) {
+    if (event.button === 1) {
+      this.lockControls?.lock();
+    }
+  }
+
+  onMouseUp(event: any) {
+    if (event.button === 1) {
+      this.lockControls?.unlock();
+    }
+  }
+
   // Sets new mouse location usually used in raycasts.
   onMouseMove(event: any) {
     const rect = this.canvReference.getBoundingClientRect();
@@ -700,6 +761,7 @@ class Editor {
     ) {
       return;
     }
+
     this.raycaster.setFromCamera(this.mouse, this.camera);
     let interactable: any[] = [];
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
