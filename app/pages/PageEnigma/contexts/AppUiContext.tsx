@@ -1,13 +1,16 @@
 import { createContext, Dispatch, ReactNode } from "react";
-import { State, Action } from "../reducer";
+import { AppUiState, AppUiAction } from "../reducers";
 
-export const AppUiContext = createContext<[State|null, Dispatch<Action>|null]>([null,null]);
+export const AppUiContext = createContext<[
+  AppUiState | null,
+  Dispatch<AppUiAction>
+]>([ null ,()=>{}]);
 
 export const AppUIProvider = ({
   value,
   children,
 }:{
-  value:[State, Dispatch<Action>],
+  value:[AppUiState, Dispatch<AppUiAction>],
   children: ReactNode
 })=>{
   return (

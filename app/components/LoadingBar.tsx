@@ -4,22 +4,30 @@ import { twMerge } from 'tailwind-merge';
 
 
 interface LoadingBarProps{
+  id?: string;
+  wrapperClassName?:string;
+  innerWrapperClassName?: string;
+  progressBackgroundClassName?: string;
+  progressClassName?: string;
   label?: string;
   progress?: number;
   isShowing?: boolean;
   variant?: string;
   message?: string;
-  wrapperClassName?: string;
   useFakeTimer?: number; 
 }
 export const LoadingBar = ({
+  wrapperClassName : propsWrapperClassName,
+  innerWrapperClassName: propsInnerWrapperClassName,
+  progressBackgroundClassName: propsProgressBackgroundClassName,
+  progressClassName : propsProgressClassName,
   label,
   progress: propsProgress = 0,
   isShowing = true,
   variant = 'primary',
   message,
-  wrapperClassName : propsWrapperClassName,
-  useFakeTimer
+  useFakeTimer,
+  ...rest
 }: LoadingBarProps) => {
   const [progress, setProgress] = useState<number>(propsProgress);
 
@@ -79,12 +87,21 @@ export const LoadingBar = ({
   }
 
   const wrapperClassName = twMerge(
-    "w-full h-full flex flex-col justify-center items-center bg-ui-background p-4 gap-4",
+    "w-full h-full relative bg-ui-background",
     propsWrapperClassName,
   )
+  const innerWrapperClassName = twMerge(
+    "w-full h-full p-4 gap-4 m-auto flex flex-col justify-center items-center",
+    propsInnerWrapperClassName,
+  );
+  const progressBackgroundClassName = twMerge(
+    "w-full bg-gray-500 rounded-full h-2.5",
+    propsProgressBackgroundClassName
+  );
   const progressClassName = twMerge(
     "h-2.5 rounded-full transition-all duration-1000",
     getVariantClassNames(variant),
+    propsProgressClassName
   );
 
   return (
@@ -97,15 +114,18 @@ export const LoadingBar = ({
       leave="transition-opacity duration-1000"
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
+      {...rest}
     >
-      {label && <label>{label}</label>}
-      <div className="w-full bg-gray-500 rounded-full h-2.5">
-        <div 
-          className={progressClassName} 
-          style={{width: progress + '%'}}
-        />
+      <div className={innerWrapperClassName}>
+        {label && <label>{label}</label>}
+        <div className={progressBackgroundClassName}>
+          <div 
+            className={progressClassName} 
+            style={{width: progress + '%'}}
+          />
+        </div>
+        {message && <p>{message}</p>}
       </div>
-      {message && <p>{message}</p>}
     </Transition>
   );
 }

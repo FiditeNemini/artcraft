@@ -1,10 +1,13 @@
 import { useContext, useState } from "react";
-import { Button, H4, Input } from "~/components";
+import { Button, Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
+import { AppUiContext } from "../../contexts/AppUiContext";
 import { EngineContext } from "../../contexts/EngineContext";
+import { APPUI_ACTION_TYPES } from "../../reducers";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
+  const [ appUiState, dispatchAppUiState ] = useContext(AppUiContext);
   const [sceneName, setSceneName] = useState<string>("");
   const [sceneToken, setSceneToken] = useState<string>("");
 
@@ -18,13 +21,33 @@ export const ControlsTopButtons = () => {
     editorEngine?.loadScene(sceneToken);
   };
 
+  const handleButtonPlayBack = () => {
+    editorEngine?.start_playback();
+  };
+
+  const handleButtonTest = () => {
+    if(appUiState?.showEditorLoadingBar.isShowing){
+      dispatchAppUiState({
+        type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADINGBAR,
+      });
+    }else{
+      dispatchAppUiState({
+        type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADINGBAR,
+        payload:{
+          showEditorLoadingBar: {
+            message: 'display of LoadingBar triggered by Test Button'
+          }
+        }
+        
+      });
+    }
+  };
+
+
   const handleButtonCameraView = () => {
     editorEngine?.switchCameraView();
   };
 
-  const handleButtonPlayBack = () => {
-    editorEngine?.start_playback();
-  };
   const handleButtonLoad = () => {
     editorEngine?.renderVideo();
   };
@@ -34,6 +57,13 @@ export const ControlsTopButtons = () => {
   const handleButtonPlay = () => {
     editorEngine?.start_playback();
   };
+
+  // const handleButtonCameraView = () => {
+  //   editorEngine?.change_camera_view();
+  // };
+
+  // const handleButtonLoad = () => {};
+  // const handleButtonRender = () => {};
 
   return (
     <div className="flex flex-col gap-2 pl-3 pt-3">
@@ -94,9 +124,15 @@ export const ControlsTopButtons = () => {
         </Button>
       </div>
       <div className="flex gap-2">
-        <Button onClick={handleButtonLoad}>Render Video</Button>
-        <Button onClick={handleButtonRender}>Take Frame</Button>
-        <Button onClick={handleButtonPlay}>Play</Button>
+        {/* <Button onClick={handleButtonLoad}>Render Video</Button>
+        <Button onClick={handleButtonRender}>Take Frame</Button> */}
+        <Button
+          onClick={handleButtonTest}
+          className="bg-brand-tertiary hover:bg-brand-tertiary-400"
+          style={{zIndex:9001}}
+        >
+          Test
+        </Button>
       </div>
     </div>
   );

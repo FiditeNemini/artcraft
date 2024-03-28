@@ -1,8 +1,8 @@
-import { useEffect, useReducer } from "react";
+import { useReducer } from "react";
 
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
-import { Button, LoadingDots } from "~/components";
+import { Button, LoadingBar, LoadingDots } from "~/components";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
 import { SidePanel } from "~/modules/SidePanel";
 import { Controls3D } from "./comps/Controls3D";
@@ -14,12 +14,11 @@ import { SidePanelTabs } from "./comps/SidePanelTabs";
 
 import { EngineProvider } from "./contexts/EngineProvider";
 import { AppUIProvider } from "./contexts/AppUiContext";
-import { reducer, initialState, ACTION_TYPES } from "./reducer";
-import { VIEW_MODES } from "./reducer/types";
+import { appUiReducer, appUiInitialStateValues, APPUI_ACTION_TYPES, APPUI_VIEW_MODES } from "./reducers";
 import { ViewSideBySide } from "./comps/ViewSideBySide";
 
 export const PageEnigmaComponent = () => {
-  const [appUiState, dispatchAppUiState] = useReducer(reducer, initialState);
+  const [appUiState, dispatchAppUiState] = useReducer(appUiReducer, appUiInitialStateValues);
   
 
   return (
@@ -39,7 +38,7 @@ export const PageEnigmaComponent = () => {
               // style={{ height: `calc(100% - 260px` }}
             >
               <div className="relative w-full overflow-hidden bg-transparent">
-                <div className={(appUiState.viewMode === VIEW_MODES.SIDE_BY_SIDE) ? 'invisible' : ''}>
+                <div className={(appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE) ? 'invisible' : ''}>
                   <canvas
                     id="video-scene"
                     width="1280px"
@@ -61,14 +60,24 @@ export const PageEnigmaComponent = () => {
                   </div>
                 </div>
                 {
-                  appUiState.viewMode === VIEW_MODES.SIDE_BY_SIDE &&
+                  appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE &&
                   <ViewSideBySide />
                 }
                 <LoadingDots
                   className="absolute top-0 left-0"
-                  isShowing={appUiState.showEditorLoader.isShow}
+                  isShowing={appUiState.showEditorLoader.isShowing}
                   type="bricks"
                   message={appUiState.showEditorLoader.message}
+                />
+                <LoadingBar
+                  id="editor-loading-bar"
+                  wrapperClassName="absolute top-0 left-0"
+                  innerWrapperClassName="max-w-screen-sm"
+                  isShowing={appUiState.showEditorLoadingBar.isShowing}
+                  message={appUiState.showEditorLoadingBar.message}
+                  label={appUiState.showEditorLoadingBar.label}
+                  progress={appUiState.showEditorLoadingBar.progress}
+                  useFakeTimer={30000}
                 />
               </div>
               

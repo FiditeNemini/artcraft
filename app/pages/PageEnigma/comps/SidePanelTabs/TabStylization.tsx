@@ -8,8 +8,8 @@ import {
 } from "~/components"
 
 import { AppUiContext } from '../../contexts/AppUiContext';
-import { ACTION_TYPES } from '../../reducer';
-import { VIEW_MODES } from '../../reducer/types';
+import { APPUI_ACTION_TYPES } from '../../reducers';
+import { APPUI_VIEW_MODES } from '../../reducers';
 
 export const TabStylization = ()=>{
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
@@ -23,10 +23,10 @@ export const TabStylization = ()=>{
   const handleChangeViewMode = ()=>{
     if(dispatchAppUiState!==null){
       dispatchAppUiState({
-        type: ACTION_TYPES.ON_CHANGE_VIEW_MODE,
+        type: APPUI_ACTION_TYPES.ON_CHANGE_VIEW_MODE,
         payload: {
-          viewMode: appUiState?.viewMode === VIEW_MODES.SIDE_BY_SIDE
-            ? VIEW_MODES.EDITOR : VIEW_MODES.SIDE_BY_SIDE,
+          viewMode: appUiState?.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE
+            ? APPUI_VIEW_MODES.EDITOR : APPUI_VIEW_MODES.SIDE_BY_SIDE,
         }
       })
     }
@@ -77,7 +77,7 @@ export const TabStylization = ()=>{
       <div className="flex gap-2 mt-6 justify-center">
         <Button onClick={handleChangeViewMode}>
           { 
-            appUiState?.viewMode ===  VIEW_MODES.SIDE_BY_SIDE 
+            appUiState?.viewMode ===  APPUI_VIEW_MODES.SIDE_BY_SIDE 
             ? "Back to Scene" : "Preview Side by Side"
           }
         </Button>
