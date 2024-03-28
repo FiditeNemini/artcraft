@@ -21,11 +21,6 @@ import { ViewSideBySide } from "./comps/ViewSideBySide";
 export const PageEnigmaComponent = () => {
   const [appUiState, dispatchAppUiState] = useReducer(reducer, initialState);
   
-  useEffect(()=>{
-    setTimeout(()=>dispatchAppUiState({
-      type: ACTION_TYPES.HIDE_EDITOR_LOADER
-    }), 500);
-  },[]);
 
   return (
     <div>
@@ -71,10 +66,9 @@ export const PageEnigmaComponent = () => {
                 }
                 <LoadingDots
                   className="absolute top-0 left-0"
-                  show={appUiState.showEditorLoader.isShow}
+                  isShowing={appUiState.showEditorLoader.isShow}
                   type="bricks"
                   message={appUiState.showEditorLoader.message}
-                  transition
                 />
               </div>
               

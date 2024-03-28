@@ -29,7 +29,7 @@ export const PreviewEngineCamera = ()=>{
             src="/resources/uiAssets/video_player_placeholder.gif"
           />
           <div className="absolute w-full h-full top-0 left-0">
-            <LoadingDotsTyping show={showLoader} transition/>
+            <LoadingDotsTyping isShowing={showLoader}/>
           </div>
         </div>
       </div>
