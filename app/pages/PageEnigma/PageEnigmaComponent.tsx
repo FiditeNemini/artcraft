@@ -24,7 +24,7 @@ export const PageEnigmaComponent = () => {
   useEffect(()=>{
     setTimeout(()=>dispatchAppUiState({
       type: ACTION_TYPES.HIDE_EDITOR_LOADER
-    }), 3000);
+    }), 500);
   },[]);
 
   return (
