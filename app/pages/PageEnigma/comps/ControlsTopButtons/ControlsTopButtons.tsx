@@ -26,8 +26,7 @@ export const ControlsTopButtons = () => {
     editorEngine?.start_playback();
   };
   const handleButtonLoad = () => {
-
-
+    editorEngine?.renderVideo();
   };
   const handleButtonRender = () => {
     editorEngine?.take_timeline_cam_clip();
@@ -95,7 +94,7 @@ export const ControlsTopButtons = () => {
         </Button>
       </div>
       <div className="flex gap-2">
-        <Button onClick={handleButtonLoad}>Load</Button>
+        <Button onClick={handleButtonLoad}>Render Video</Button>
         <Button onClick={handleButtonRender}>Take Frame</Button>
         <Button onClick={handleButtonPlay}>Play</Button>
       </div>

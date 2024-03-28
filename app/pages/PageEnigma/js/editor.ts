@@ -42,6 +42,7 @@ class Editor {
   version: number;
   activeScene: Scene;
   camera: any;
+  render_camera: any;
   renderer: THREE.WebGLRenderer | undefined;
   clock: THREE.Clock | undefined;
   canvReference: any;
@@ -91,7 +92,9 @@ class Editor {
 
   can_initialize: boolean;
   dispatchAppUiState: any; // todo figure out the type
-  
+  camera_person_mode: boolean;
+  render_width: number;
+  render_height: number;
 
   // Default params.
   constructor() {
@@ -115,6 +118,7 @@ class Editor {
     this.activeScene = new Scene("" + this.version);
     this.activeScene.initialize();
     this.camera;
+    this.render_camera;
     this.renderer;
     this.clock;
     this.canvReference = null;
@@ -157,6 +161,9 @@ class Editor {
     this.playback_location = 0;
     this.max_length = 10;
     // Audio Engine Test.
+
+    this.render_width = 1280;
+    this.render_height = 720;
 
     this.audio_engine = new AudioEngine();
     this.transform_engine = new TransformEngine(this.version);
@@ -209,6 +216,9 @@ class Editor {
     this.camera.position.z = 3;
     this.camera.position.y = 3;
     this.camera.position.x = -3;
+
+    this.render_camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 50);
+
     // Base WebGL render and clock for delta time.
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -582,12 +592,19 @@ class Editor {
   render_mode() {
     this.rendering = !this.rendering;
     this.activeScene.render_mode(this.rendering);
+    console.log("works.")
 
     //if (this.rendering) {
     //    this._remove_post_processing()
     //} else {
     //    this._add_post_processing()
     //}
+  }
+
+  renderVideo() {
+    this.rendering = true;
+    this.activeScene.render_mode(this.rendering);
+    console.log("Rendering...");
   }
 
   togglePlay() {
@@ -658,6 +675,11 @@ class Editor {
           this.camera.rotation.copy(this.cam_obj.rotation);
         }
       }
+    }
+
+    if(this.render_camera && this.cam_obj) {
+      this.render_camera.position.copy(this.cam_obj.position);
+      this.render_camera.rotation.copy(this.cam_obj.rotation);
     }
 
     this.timeline.update(delta_time);
@@ -773,10 +795,10 @@ class Editor {
 
   // Render the scene to the camera.
   render_scene() {
-    if (this.composer != null) {
+    if (this.composer != null && !this.timeline.isPlaying) {
       this.composer.render();
-    } else if (this.renderer && this.camera) {
-      this.renderer.render(this.activeScene.scene, this.camera);
+    } else if (this.renderer && this.render_camera) {
+      this.renderer.render(this.activeScene.scene, this.render_camera);
     } else {
       console.error("Could not render to canvas no render or composer!");
     }
@@ -812,6 +834,12 @@ class Editor {
     if (this.composer != null) {
       this.composer.setSize(width, height);
     }
+
+    if (this.render_camera == undefined) { return; }
+
+    //this.renderer.setSize(this.render_width, this.render_height);
+    this.render_camera.aspect = this.render_width / this.render_height;
+    this.render_camera.updateProjectionMatrix();
   }
 
   onContextMenu(event: any) {
