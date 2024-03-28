@@ -66,10 +66,9 @@ export const PageEnigmaComponent = () => {
                 }
                 <LoadingDots
                   className="absolute top-0 left-0"
-                  show={appUiState.showEditorLoader.isShow}
+                  isShowing={appUiState.showEditorLoader.isShow}
                   type="bricks"
                   message={appUiState.showEditorLoader.message}
-                  transition
                 />
               </div>
               
