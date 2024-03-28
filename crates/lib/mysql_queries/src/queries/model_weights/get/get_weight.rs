@@ -14,6 +14,8 @@ use tokens::tokens::{model_weights::ModelWeightToken, users::UserToken};
 //  'weights_type: enums::by_table::model_weights::weights_types::WeightsType' use this to map
 // Retrieved Model Weight can be constrained to the fields that are needed
 
+// NB: Serialize is only for internal moderator endpoints
+#[derive(Serialize)]
 pub struct RetrievedModelWeight {
     pub token: ModelWeightToken,
     pub title: String,

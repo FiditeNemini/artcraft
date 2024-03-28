@@ -1,5 +1,6 @@
 pub mod approval;
 pub mod categories;
+pub mod info;
 pub mod ip_bans;
 pub mod jobs;
 pub mod stats;

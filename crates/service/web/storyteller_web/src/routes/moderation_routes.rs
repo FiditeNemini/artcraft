@@ -8,6 +8,7 @@ use crate::http_server::endpoints::moderation::approval::pending_w2l_templates::
 use crate::http_server::endpoints::moderation::categories::delete_category::delete_category_handler;
 use crate::http_server::endpoints::moderation::categories::edit_category::edit_category_handler;
 use crate::http_server::endpoints::moderation::categories::list_tts_categories_for_moderation::list_tts_categories_for_moderation_handler;
+use crate::http_server::endpoints::moderation::info::moderator_token_info_handler::moderator_get_token_info_handler;
 use crate::http_server::endpoints::moderation::ip_bans::add_ip_ban::add_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::delete_ip_ban::delete_ip_ban_handler;
 use crate::http_server::endpoints::moderation::ip_bans::get_ip_ban::get_ip_ban_handler;
@@ -37,10 +38,13 @@ pub fn add_moderator_routes<T, B> (app: App<T>) -> App<T>
 {
   app.service(
     web::scope("/moderation")
-        .service(
-          web::resource("/staff")
-              .route(web::get().to(list_staff_handler))
-              .route(web::head().to(|| HttpResponse::Ok()))
+        .service(web::resource("/staff")
+            .route(web::get().to(list_staff_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+        .service(web::resource("/token_info/{token}")
+            .route(web::get().to(moderator_get_token_info_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
         )
         .service(
           web::scope("/ip_bans")

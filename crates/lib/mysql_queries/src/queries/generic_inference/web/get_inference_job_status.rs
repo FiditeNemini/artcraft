@@ -15,7 +15,8 @@ use tokens::tokens::users::UserToken;
 
 use crate::helpers::boolean_converters::i8_to_bool;
 
-#[derive(Debug, Default)]
+// NB: Serialization is for internal endpoints, not for returning to end-users.
+#[derive(Debug, Default, Serialize)]
 pub struct GenericInferenceJobStatus {
   pub job_token: InferenceJobToken,
 
@@ -39,9 +40,10 @@ pub struct GenericInferenceJobStatus {
   pub updated_at: DateTime<Utc>,
 }
 
+/// NB: Serialize is for internal moderator-only endpoints
 /// Details about the user's original inference request
 /// (We may want to present it in the "pending" UI.)
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize)]
 pub struct RequestDetails {
   pub inference_category: InferenceCategory,
   pub maybe_model_type: Option<String>, // TODO: Strongly type
@@ -52,8 +54,9 @@ pub struct RequestDetails {
   pub maybe_raw_inference_text: Option<String>,
 }
 
+/// NB: Serialize is for internal moderator-only endpoints
 /// Details about the generated result
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize)]
 pub struct ResultDetails {
   pub entity_type: String,
   pub entity_token: String,
@@ -71,8 +74,9 @@ pub struct ResultDetails {
 }
 
 /// NB: DO NOT EXPOSE TO FRONTEND.
+/// NB: Serialize is for internal moderator-only endpoints
 /// This is used to gate access to job termination
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize)]
 pub struct UserDetails {
   pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_anonymous_visitor_token: Option<AnonymousVisitorTrackingToken>,
