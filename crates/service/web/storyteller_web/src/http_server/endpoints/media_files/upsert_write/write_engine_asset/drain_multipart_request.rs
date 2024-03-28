@@ -2,7 +2,7 @@ use actix_multipart::Multipart;
 use actix_web::web::BytesMut;
 use anyhow::anyhow;
 use futures::TryStreamExt;
-use log::warn;
+use log::{info, warn};
 use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 

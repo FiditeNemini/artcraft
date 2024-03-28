@@ -3,7 +3,7 @@ use actix_multipart::Field;
 use actix_web::web::BytesMut;
 use anyhow::anyhow;
 use futures::{StreamExt, TryStreamExt};
-use log::warn;
+use log::{info, warn};
 
 const MIN_BYTES : usize = 10;
 //const MAX_BYTES : usize = 1024 * 1024 * 20; // 20 Mb
@@ -46,11 +46,13 @@ pub async fn read_multipart_field_as_text(field: &mut Field) -> anyhow::Result<O
   let bytes = read_multipart_field_bytes(field).await?;
   let value = String::from_utf8(bytes.to_vec())?;
 
-  if value.is_empty() || value == "none" {
-    return Ok(None);
+  match value.as_str() {
+    ""
+      | "none"
+      | "undefined" // Javascript can send the string "undefined" for undefined payload values.
+    => Ok(None),
+    _ => Ok(Some(value)),
   }
-
-  Ok(Some(value))
 }
 
 /// Read a html form boolean (eg. input type=checkbox); assumes default is false.
