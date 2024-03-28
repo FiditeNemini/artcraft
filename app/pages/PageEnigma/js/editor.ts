@@ -19,8 +19,10 @@ import { TimeLine, TimelineDataState } from "./timeline.js";
 import { ClipUI } from "../datastructures/clips/clip_offset.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
-import { ACTION_TYPES } from "../reducer";
+
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { APPUI_ACTION_TYPES } from "../reducers";
+
 
 class EditorState {
   // {
@@ -186,7 +188,7 @@ class Editor {
 
     // Show Loader
     this.dispatchAppUiState({
-      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
     });
 
     if (this.can_initialize == false) {
@@ -253,7 +255,6 @@ class Editor {
     this.current_scene_media_token = null;
     this.current_scene_glb_media_token = null;
 
- 
 
     this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this), false);
     this.renderer.domElement.addEventListener("mouseup", this.onMouseUp.bind(this), false);
@@ -265,16 +266,17 @@ class Editor {
       this.add_transform_clip_base("Camera Object", this.cam_obj, 0, 150)
     }
 
-       // hide loader
-       this.dispatchAppUiState({
-        type: ACTION_TYPES.HIDE_EDITOR_LOADER
-      });;
+    // hide loader
+    this.dispatchAppUiState({
+      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER
+    });
+
   }
 
   // Token comes in from the front end to load the scene from the site.
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
-      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
     });
 
     if (scene_media_token != null) {
@@ -314,25 +316,17 @@ class Editor {
     });
 
     this.dispatchAppUiState({
-      type: ACTION_TYPES.HIDE_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER
     });
   }
 
-  public removeTransformControls() {
-    if (this.control == undefined) { return };
-    if (this.outlinePass == undefined) { return };
 
-    this.last_selected = this.selected;
-    this.control.detach();
-    this.activeScene.scene.remove(this.control);
-    this.outlinePass.selectedObjects = [];
-  }
 
   public async saveScene(name: string) {
     // remove controls when saving scene.
     this.removeTransformControls();
     this.dispatchAppUiState({
-      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
     });
     console.log(`saveScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
     
@@ -356,7 +350,7 @@ class Editor {
     } 
 
     this.dispatchAppUiState({
-      type: ACTION_TYPES.HIDE_EDITOR_LOADER
+        type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER
     });
   }
 

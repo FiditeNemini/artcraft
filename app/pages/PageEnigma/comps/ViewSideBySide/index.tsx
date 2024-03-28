@@ -1,7 +1,4 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState, } from "react";
 
 import { LoadingDotsBricks } from "~/components";
 
@@ -42,7 +39,7 @@ export const ViewSideBySide = ()=>{
         </div>
       </div>
       <div className="absolute top-0 left-0 w-full h-full">
-        <LoadingDotsBricks show={showLoader} transition/>
+        <LoadingDotsBricks isShowing={showLoader}/>
       </div>
     </div>
   )
