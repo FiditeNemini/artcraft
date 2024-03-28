@@ -51,12 +51,29 @@ WHERE username IN (
 );
 
 -- Early access (investors)
+-- dreambig : hanashi
+-- fanfiction : hanashi
+-- fantasyworlds : hanashi
+-- hollywoodstar : hanashi
+-- postproduction : hanashi
+-- show_dont_tell : hanashi
+-- tellstories : hanashi
+-- thedirector : hanashi
+
 UPDATE users
 SET
     can_access_studio = false,
     maybe_feature_flags = 'studio,video_style_transfer'
 WHERE username IN (
     'claraqueiros',
+    'dreambig',
+    'fanfiction',
+    'fantasyworlds',
+    'hollywoodstar',
+    'postproduction',
+    'show_dont_tell',
+    'tellstories',
+    'thedirector',
     'tammieteller',
     'vagata',
     'zzz_last_item'
