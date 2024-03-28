@@ -31,7 +31,7 @@ export const Tabs = ({ tabs: tabProps }: { tabs: TabType[] }) => {
             </Tab>
           ))}
         </Tab.List>
-        <Tab.Panels className="grow overflow-scroll p-4">
+        <Tab.Panels className="grow p-4">
           {tabs.map((tab, idx) => (
             <Tab.Panel key={idx}>
               {tab.children}

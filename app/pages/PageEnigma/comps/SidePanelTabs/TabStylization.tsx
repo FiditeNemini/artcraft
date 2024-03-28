@@ -32,7 +32,7 @@ export const TabStylization = ()=>{
     }
   }
   return(
-    <div className="gap-2">
+    <div className="gap-2 w-full h-full overflow-scroll">
       <H4>Select Base Stylizer</H4>
       <div className="flex gap-2 my-2">
         <ItemPicker

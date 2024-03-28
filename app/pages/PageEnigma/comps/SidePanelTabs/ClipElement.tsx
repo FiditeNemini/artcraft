@@ -96,7 +96,7 @@ export const ClipElement = ({ clip, type }: Props) => {
       <div
         id={`ani-dnd-${clip.id}`}
         className={[
-          "fixed p-2",
+          "absolute p-2",
           "rounded-lg",
           !canDrop ? "bg-brand-primary" : "bg-brand-secondary-700",
           dragId ? "block" : "hidden",
