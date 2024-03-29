@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { FreeCam } from "./free_cam";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import Scene from "./scene.js";
 import APIManager from "./api_manager.js";
@@ -18,7 +19,9 @@ import { TimeLine, TimelineDataState } from "./timeline.js";
 import { ClipUI } from "../datastructures/clips/clip_offset.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
-import { ACTION_TYPES } from "../reducer";
+
+import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
+import { APPUI_ACTION_TYPES } from "../reducers";
 
 class EditorState {
   // {
@@ -46,7 +49,8 @@ class Editor {
   composer: EffectComposer | undefined;
   effectFXAA: EffectComposer | undefined;
   outlinePass: OutlinePass | undefined;
-  last_cam_pos: THREE.Vector3 | undefined;
+  last_cam_pos: THREE.Vector3;
+  last_cam_rot: THREE.Euler;
   saoPass: SAOPass | undefined;
   outputPass: OutputPass | undefined;
   bloomPass: UnrealBloomPass | undefined;
@@ -61,7 +65,8 @@ class Editor {
   rendering: boolean;
   api_manager: APIManager;
   stats: any;
-  orbit: OrbitControls | undefined;
+  cameraViewControls: FreeCam | undefined;
+  orbitControls: OrbitControls | undefined;
   locked: boolean;
   capturer: any;
   frame_buffer: any;
@@ -77,8 +82,8 @@ class Editor {
   animation_engine: AnimationEngine;
   timeline: TimeLine;
   current_frame: number;
-
-
+  lockControls: PointerLockControls | undefined;
+  cam_obj: THREE.Object3D | undefined;
   renderPass: RenderPass | undefined;
 
   current_scene_media_token: string | null;
@@ -86,7 +91,8 @@ class Editor {
 
   can_initialize: boolean;
   dispatchAppUiState: any; // todo figure out the type
-  
+  camera_person_mode: boolean;
+
   // Default params.
   constructor() {
     console.log(
@@ -112,10 +118,13 @@ class Editor {
     this.renderer;
     this.clock;
     this.canvReference = null;
+    this.cam_obj;
     this.composer;
     this.effectFXAA;
     this.outlinePass;
-    this.last_cam_pos;
+    this.last_cam_pos = new THREE.Vector3(0, 0, 0);
+    this.last_cam_rot = new THREE.Euler(0, 0, 0);
+    this.lockControls;
     this.saoPass;
     this.outputPass;
     this.bloomPass;
@@ -133,7 +142,9 @@ class Editor {
     this.api_manager = new APIManager();
     // Debug & Movement.
     this.stats = null;
-    this.orbit;
+    this.cameraViewControls;
+    this.orbitControls;
+    this.camera_person_mode = false;
     this.locked = false;
     // Recording params.
     this.capturer = null;
@@ -162,7 +173,7 @@ class Editor {
 
     this.current_frame = 0;
 
-    // Dispatcher 
+    // Dispatcher
     this.dispatchAppUiState = null;
 
     // Scene State
@@ -170,19 +181,17 @@ class Editor {
     this.current_scene_glb_media_token = null;
   }
 
-  initialize(config:any) {
+  initialize(config: any) {
     //setup reactland Callbacks
-    this.dispatchAppUiState = config.dispatchAppUiState
+    this.dispatchAppUiState = config.dispatchAppUiState;
 
-    // Show Loader
-    this.dispatchAppUiState({
-      type: ACTION_TYPES.SHOW_EDITOR_LOADER
-    });
+    // this is called by the parent for some reason
+    // this.dispatchAppUiState({
+    //   type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
+    // });
 
     if (this.can_initialize == false) {
-      console.log(
-        "Editor Already Initialized",
-      );
+      console.log("Editor Already Initialized");
       return;
     }
     this.can_initialize = false;
@@ -203,7 +212,7 @@ class Editor {
       canvas: this.canvReference,
       preserveDrawingBuffer: true,
     });
-    
+
     this.renderer.shadowMap.enabled = true;
     this.clock = new THREE.Clock();
     // Resizes the renderer.
@@ -212,7 +221,27 @@ class Editor {
     window.addEventListener("resize", this.onWindowResize.bind(this));
     this._configure_post_pro();
     // Controls and movement.
-    this.orbit = new OrbitControls(this.camera, this.renderer.domElement);
+
+    this.lockControls = new PointerLockControls(
+      this.camera,
+      this.renderer.domElement,
+    );
+    this.cameraViewControls = new FreeCam(
+      this.camera,
+      this.renderer.domElement,
+    );
+    this.cameraViewControls.movementSpeed = 1;
+    this.cameraViewControls.domElement = this.renderer.domElement;
+    this.cameraViewControls.rollSpeed = Math.PI / 24;
+    this.cameraViewControls.autoForward = false;
+    this.cameraViewControls.dragToLook = true;
+    this.cameraViewControls.enabled = false;
+
+    this.orbitControls = new OrbitControls(
+      this.camera,
+      this.renderer.domElement,
+    );
+
     this.control = new TransformControls(this.camera, this.renderer.domElement);
     // OnClick and MouseMove events.
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
@@ -232,16 +261,49 @@ class Editor {
     this.current_scene_media_token = null;
     this.current_scene_glb_media_token = null;
 
-    // hide loader
+    this.renderer.domElement.addEventListener(
+      "mousedown",
+      this.onMouseDown.bind(this),
+      false,
+    );
+    this.renderer.domElement.addEventListener(
+      "mouseup",
+      this.onMouseUp.bind(this),
+      false,
+    );
+    this.renderer.domElement.addEventListener(
+      "onContextMenu",
+      this.onContextMenu.bind(this),
+      false,
+    );
+
+    this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
+    if (this.cam_obj) {
+      this.add_transform_clip_base("Camera Object", this.cam_obj, 0, 150);
+    }
+
     this.dispatchAppUiState({
-      type: ACTION_TYPES.HIDE_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
+      payload: {
+        showEditorLoadingBar: {
+          progress: 100,
+        },
+      },
+    });
+
+    this.dispatchAppUiState({
+      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADINGBAR,
     });
   }
 
   // Token comes in from the front end to load the scene from the site.
+  public async testBatchRequest() {
+    const result = await this.api_manager.getMediaBatch(["m_8fmp9hrvsqcryzka1fra597kg42s50","m_z4jzbst3xfh64h0qn4bqh4afenfps9"]);
+    console.log(result);
+  }
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
-      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER,
     });
 
     if (scene_media_token != null) {
@@ -251,14 +313,25 @@ class Editor {
     const load_scene_state_response = await this.api_manager.loadSceneState(
       this.current_scene_media_token,
     );
-    const loaded_scene = load_scene_state_response.data["scene"]
+
+    console.log(load_scene_state_response);
+    if (load_scene_state_response.data == null) {
+      console.log("load_scene_state_response Missing Data");
+      return;
+    }
+
+    const loaded_scene = load_scene_state_response.data["scene"];
 
     // Load these so you can rewrite the scene glb using it's token.
-    this.current_scene_media_token = load_scene_state_response.data["scene_media_file_token"]
-    this.current_scene_glb_media_token = load_scene_state_response.data["scene_glb_media_file_token"]
+    this.current_scene_media_token =
+      load_scene_state_response.data["scene_media_file_token"];
+    this.current_scene_glb_media_token =
+      load_scene_state_response.data["scene_glb_media_file_token"];
 
-    console.log(`loadScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
-    
+    console.log(
+      `loadScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`,
+    );
+
     this.activeScene.scene.children = loaded_scene.children;
 
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
@@ -275,7 +348,7 @@ class Editor {
     });
 
     this.dispatchAppUiState({
-      type: ACTION_TYPES.HIDE_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
     });
   }
 
@@ -283,41 +356,51 @@ class Editor {
     // remove controls when saving scene.
     this.removeTransformControls();
     this.dispatchAppUiState({
-      type: ACTION_TYPES.SHOW_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER,
     });
-    console.log(`saveScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`);
-    
+    console.log(
+      `saveScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`,
+    );
+
     const result = await this.api_manager.saveSceneState(
       this.activeScene.scene,
       name,
       this.current_scene_glb_media_token,
       this.current_scene_media_token,
-      new TimelineDataState()
-    )
+      new TimelineDataState(),
+    );
 
-    const scene_media_token = result.data["scene_media_file_token"]
-    if (scene_media_token != null) {
-      this.current_scene_media_token = scene_media_token
+    if (result.data == null) {
+      return;
     }
-    const scene_glb_media_token =  result.data["scene_glb_media_file_token"]
+
+    const scene_media_token = result.data["scene_media_file_token"];
+    if (scene_media_token != null) {
+      this.current_scene_media_token = scene_media_token;
+    }
+    const scene_glb_media_token = result.data["scene_glb_media_file_token"];
     if (scene_glb_media_token != null) {
-      this.current_scene_glb_media_token = scene_glb_media_token
-    } 
+      this.current_scene_glb_media_token = scene_glb_media_token;
+    }
 
     this.dispatchAppUiState({
-        type: ACTION_TYPES.HIDE_EDITOR_LOADER
+      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
     });
   }
 
   /**
-   * This cleans up the transform controls 
-   * During saving it 
+   * This cleans up the transform controls
+   * During saving it
    * Doesn't retain those controls.
-   * @returns 
+   * @returns
    */
   private removeTransformControls() {
-    if (this.control == undefined) { return };
-    if (this.outlinePass == undefined) { return };
+    if (this.control == undefined) {
+      return;
+    }
+    if (this.outlinePass == undefined) {
+      return;
+    }
     this.last_selected = this.selected;
     this.control.detach();
     this.activeScene.scene.remove(this.control);
@@ -372,6 +455,71 @@ class Editor {
       "/resources/models/fox/fox_idle.glb",
       "clip3",
     );
+  }
+
+  switchCameraView() {
+    this.camera_person_mode = !this.camera_person_mode;
+    if (this.cam_obj) {
+      if (this.camera_person_mode) {
+        this.last_cam_pos.copy(this.camera.position);
+        this.last_cam_rot.copy(this.camera.rotation);
+
+        this.camera.position.copy(this.cam_obj.position);
+        this.camera.rotation.copy(this.cam_obj.rotation);
+        if (this.orbitControls) {
+          this.orbitControls.enabled = false;
+        }
+        if (this.lockControls) {
+          this.activeScene.scene.add(this.lockControls.getObject());
+        }
+        if (this.cameraViewControls) {
+          this.cameraViewControls.enabled = true;
+        }
+
+        if (this.activeScene.hot_items) {
+          this.activeScene.hot_items.forEach((element) => {
+            element.visible = false;
+          });
+        }
+      } else {
+        this.camera.position.copy(this.last_cam_pos);
+        this.camera.rotation.copy(this.last_cam_rot);
+        if (this.orbitControls) {
+          this.orbitControls.enabled = true;
+        }
+        if (this.lockControls) {
+          this.activeScene.scene.remove(this.lockControls.getObject());
+        }
+        if (this.cameraViewControls) {
+          this.cameraViewControls.enabled = false;
+        }
+        if (this.activeScene.hot_items) {
+          this.activeScene.hot_items.forEach((element) => {
+            element.visible = true;
+          });
+        }
+      }
+    }
+  }
+
+  async add_transform_clip_base(
+    name: string = "New Clip",
+    object: THREE.Object3D,
+    start_offset: number,
+    end_offset: number,
+  ) {
+    this.timeline.addPlayableClip(
+      new ClipUI(
+        1.0,
+        "transform",
+        "clip2",
+        object.uuid,
+        object.uuid,
+        start_offset,
+        end_offset,
+      ),
+    );
+    this.transform_engine.loadObject(object.uuid, end_offset);
   }
 
   async _test_demo() {
@@ -487,8 +635,8 @@ class Editor {
     this.composer.addPass(this.smaaPass);
     this.composer.addPass(this.bokehPass);
 
-    this.outputPass = new OutputPass()
-    this.composer.addPass(this.outputPass)
+    this.outputPass = new OutputPass();
+    this.composer.addPass(this.outputPass);
   }
 
   create_parim(name: string) {
@@ -542,6 +690,21 @@ class Editor {
     //this.transform_engine.clips[this.test_box_uuid].reset(this.activeScene.get_object_by_uuid(this.test_box_uuid))
   }
 
+  take_timeline_cam_clip() {
+    if (this.cam_obj == null) {
+      return;
+    }
+    if (!this.camera_person_mode) {
+      return;
+    }
+    this.transform_engine.addFrame(
+      this.cam_obj,
+      this.transform_engine.clips[this.cam_obj.uuid].length,
+    );
+    console.log("Camera frame taken.");
+    this.activeScene.createPoint(this.cam_obj.position, false);
+  }
+
   // Basicly Unity 3D's update loop.
   update_loop(time: number) {
     // Updates debug stats.
@@ -555,11 +718,18 @@ class Editor {
 
     let delta_time = this.clock.getDelta();
 
-    // All calls that are not super important like timeline go here.
-    //this.activeScene.update(delta_time)
-    //this.orbit.update(0.1)
-
-    //console.log(this.transform_engine.clips[this.test_box_uuid])
+    if (this.cameraViewControls && this.camera_person_mode) {
+      this.cameraViewControls.update(5 * delta_time);
+      if (this.cam_obj) {
+        if (this.timeline.isPlaying == false) {
+          this.cam_obj.position.copy(this.camera.position);
+          this.cam_obj.rotation.copy(this.camera.rotation);
+        } else {
+          this.camera.position.copy(this.cam_obj.position);
+          this.camera.rotation.copy(this.cam_obj.rotation);
+        }
+      }
+    }
 
     this.timeline.update(delta_time);
 
@@ -571,6 +741,9 @@ class Editor {
 
   start_playback() {
     this.timeline.isPlaying = true;
+    if (!this.camera_person_mode) {
+      this.switchCameraView();
+    }
   }
 
   change_mode(type: any) {
@@ -651,10 +824,10 @@ class Editor {
     }
     this.control.addEventListener("change", this.render_scene.bind(this));
     this.control.addEventListener("dragging-changed", (event: any) => {
-      if (this.orbit == undefined) {
+      if (this.orbitControls == undefined) {
         return;
       }
-      this.orbit.enabled = !event.value;
+      this.orbitControls.enabled = !event.value;
       // this.update_properties()
     });
     this.control.setSize(0.5); // Good default value for visuals.
@@ -712,6 +885,22 @@ class Editor {
     }
   }
 
+  onContextMenu(event: any) {
+    return false;
+  }
+
+  onMouseDown(event: any) {
+    if (event.button === 1 && this.camera_person_mode) {
+      this.lockControls?.lock();
+    }
+  }
+
+  onMouseUp(event: any) {
+    if (event.button === 1) {
+      this.lockControls?.unlock();
+    }
+  }
+
   // Sets new mouse location usually used in raycasts.
   onMouseMove(event: any) {
     const rect = this.canvReference.getBoundingClientRect();
@@ -732,6 +921,7 @@ class Editor {
     ) {
       return;
     }
+
     this.raycaster.setFromCamera(this.mouse, this.camera);
     let interactable: any[] = [];
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {

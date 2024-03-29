@@ -19,7 +19,7 @@ export const Tabs = ({ tabs: tabProps }: { tabs: TabType[] }) => {
     );
 
   return (
-    <div className="w-full max-w-md px-2 sm:px-0">
+    <div className="w-full h-full px-2 sm:px-0 flex flex-col">
       <Tab.Group defaultIndex={3}>
         <Tab.List className="flex">
           {tabs.map((tab, idx) => (
@@ -31,9 +31,9 @@ export const Tabs = ({ tabs: tabProps }: { tabs: TabType[] }) => {
             </Tab>
           ))}
         </Tab.List>
-        <Tab.Panels>
+        <Tab.Panels className="grow p-4">
           {tabs.map((tab, idx) => (
-            <Tab.Panel key={idx} className="p-4 text-white focus:outline-none">
+            <Tab.Panel key={idx}>
               {tab.children}
             </Tab.Panel>
           ))}

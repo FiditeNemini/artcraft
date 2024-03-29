@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { Tabs } from "../Tabs";
-import { Transition } from "@headlessui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
@@ -11,31 +9,25 @@ interface Props {
   children: React.ReactNode;
 }
 
-export const SidePanel = ({children}:Props) => {
+export const SidePanel = ({ children }: Props) => {
   const [isVisible, setIsVisible] = useState(true);
 
   return (
-    <div className="relative border-l border-l-ui-panel-border bg-ui-panel">
+    <div className={
+      "relative border-l border-l-ui-panel-border bg-ui-panel transition-all duration-300 ease-in-out"
+      + (isVisible ? " w-[23.5rem]" : " w-0")
+      }
+    >
       <button
         onClick={() => setIsVisible(!isVisible)}
-        className="hover:bg-ui-controls-button absolute left-[-25px] top-1/2 flex rounded-l-lg bg-ui-controls px-2 py-3 align-middle text-sm text-white transition duration-150 ease-in-out"
+        className="hover:bg-ui-controls-button absolute left-[-25px] top-1/2 flex rounded-l-lg bg-ui-controls px-2 py-3 align-middle text-sm text-white"
       >
         <FontAwesomeIcon icon={isVisible ? faChevronRight : faChevronLeft} />
       </button>
-      <Transition
-        show={isVisible}
-        enter="transition-transform duration-300"
-        enterFrom="translate-x-full"
-        enterTo="translate-x-0"
-        leave="transition-transform duration-300"
-        leaveFrom="translate-x-0"
-        leaveTo="translate-x-full"
-      >
+      <div className="relative w-[23.5rem] h-full">
+        {children}
+      </div>
 
-          {children}
-
-      </Transition>
     </div>
-
   );
 };

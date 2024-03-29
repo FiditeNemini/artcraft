@@ -4,7 +4,7 @@ import Editor from "~/pages/PageEnigma/js/editor";
 
 import { EngineContext } from "./EngineContext";
 import { AppUiContext } from "./AppUiContext";
-
+import { TrackContext } from "./TrackContext/TrackContext";
 
 interface Props {
   children: ReactNode;
@@ -13,6 +13,8 @@ interface Props {
 export const EngineProvider = ({ children }: Props) => {
   const [editor, setEditor] = useState<Editor | null>(null);
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
+  // To talk to react land.
+  const trackContext = useContext(TrackContext)
 
   useEffect(() => {
     //componentDidMount

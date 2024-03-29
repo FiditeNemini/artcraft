@@ -1,6 +1,8 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { BaseClip } from "~/pages/PageEnigma/models/track";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import { canDrop, dragId, overTimeline, scale } from "~/pages/PageEnigma/store";
+import { useSignals } from "@preact/signals-react/runtime";
 
 interface Props {
   clip: BaseClip;
@@ -8,16 +10,8 @@ interface Props {
 }
 
 export const ClipElement = ({ clip, type }: Props) => {
-  const {
-    startDrag,
-    dragId,
-    endDrag,
-    scale,
-    canDrop,
-    setCanDrop,
-    overTimeline,
-    dropId,
-  } = useContext(TrackContext);
+  useSignals();
+  const { startDrag, endDrag } = useContext(TrackContext);
   const [initPosition, setInitPosition] = useState<{
     initX: number;
     initY: number;
@@ -37,7 +31,7 @@ export const ClipElement = ({ clip, type }: Props) => {
 
   useEffect(() => {
     const onPointerUp = () => {
-      if (dragId) {
+      if (dragId.value) {
         endDrag();
       }
     };
@@ -60,7 +54,7 @@ export const ClipElement = ({ clip, type }: Props) => {
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointermove", onMouseMove);
     };
-  }, [dragId, startDrag, endDrag, initX, initY]);
+  }, [startDrag, endDrag, initX, initY]);
 
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
@@ -68,7 +62,7 @@ export const ClipElement = ({ clip, type }: Props) => {
         const box = document.getElementById(`ani-clip-${clip.id}`);
         const position = box!.getBoundingClientRect();
 
-        startDrag(type, clip.id);
+        startDrag(type, clip.id, clip.length);
         setCurrPosition({
           x: position.x,
           y: position.y + position.height + 1,
@@ -77,10 +71,10 @@ export const ClipElement = ({ clip, type }: Props) => {
           initX: position.x,
           initY: position.y + position.height + 1,
         });
-        setCanDrop(false);
+        canDrop.value = false;
       }
     },
-    [type, clip.id, startDrag, setCanDrop],
+    [type, clip.id, startDrag],
   );
 
   return (
@@ -98,15 +92,15 @@ export const ClipElement = ({ clip, type }: Props) => {
         className={[
           "absolute p-2",
           "rounded-lg",
-          !canDrop ? "bg-brand-primary" : "bg-brand-secondary-700",
-          dragId ? "block" : "hidden",
+          !canDrop.value ? "bg-brand-primary" : "bg-brand-secondary-700",
+          dragId.value ? "block" : "hidden",
         ].join(" ")}
         style={{
-          top: overTimeline ? y + 24 : y,
-          left: overTimeline ? x : x,
+          top: overTimeline.value ? y + 24 : y,
+          left: overTimeline.value ? x : x,
           zIndex: 5000,
-          width: overTimeline ? clip.length * 4 * scale : 64,
-          height: overTimeline ? 32 : 64,
+          width: overTimeline.value ? clip.length * 4 * scale.value : 64,
+          height: overTimeline.value ? 32 : 64,
         }}
         onPointerDown={onPointerDown}
       >
