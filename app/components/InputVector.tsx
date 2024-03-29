@@ -20,7 +20,7 @@ export const InputVector = ({
   const yRef = useRef<HTMLInputElement>(null);
   const zRef = useRef<HTMLInputElement>(null);
 
-  const className="h-10 rounded-md bg-brand-secondary p-3 text-white transition-all duration-150 ease-in-out outline-none outline-offset-0 focus:outline-brand-primary";
+  const className="relative w-14 h-8 rounded-r-md bg-brand-secondary p-3 text-white transition-all duration-150 ease-in-out outline-none outline-offset-0 focus:outline-brand-primary";
 
   function handleOnChange(){
     const newVector = {
@@ -31,7 +31,7 @@ export const InputVector = ({
     onChange(newVector);
   }
   return(
-    <div className="w-full flex gap-2">
+    <div className="w-full flex justify-between gap-2">
       <input
         className={className}
         onChange={handleOnChange}

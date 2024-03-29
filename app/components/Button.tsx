@@ -33,14 +33,14 @@ export const Button = ({
   }
 
   const className = twMerge(
-    "text-sm font-semibold rounded-md px-3 py-2 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all duration-150",
+    "text-sm font-semibold rounded-md px-3 py-2 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all duration-150 flex gap-2 items-center",
     getVariantClassNames(variant),
     propsClassName,
   );
 
   return (
     <button className={className} disabled={disabled} {...rest}>
-      {icon && <FontAwesomeIcon className="mr-2" icon={icon} />}
+      {icon && <FontAwesomeIcon icon={icon} />}
       {children}
     </button>
   );

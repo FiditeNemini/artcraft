@@ -67,7 +67,7 @@ export const PageEnigmaComponent = () => {
                   <div className="absolute bottom-0 left-0 w-full">
                     <PreviewEngineCamera />
                     <ControlsVideo />
-                    <ControlPanelSceneObject />
+                    <ControlPanelSceneObject isShowing={true}/>
                   </div>
                 </div>
                 {

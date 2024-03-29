@@ -16,7 +16,7 @@ export const ControlPanelSceneObject = ({
   isShowing,
 }: ControlPanelSceneObjectProps) => {
   const [position, setPosition] = useState<XYZ>({x:0,y:0,z:0});
-  const [ratation, setRotation] = useState<XYZ>({x:0,y:0,z:0});
+  const [rotation, setRotation] = useState<XYZ>({x:0,y:0,z:0});
   const [scalar, setScalar] = useState<XYZ>({x:0,y:0,z:0});
 
   const handlePositionChange = (xyz:XYZ)=>{
@@ -33,7 +33,7 @@ export const ControlPanelSceneObject = ({
   }
   return(
     <Transition
-      show={true}
+      show={isShowing}
       className="absolute bottom-0 right-0 w-fit h-fit m-4 p-2 bg-ui-panel border border-ui-panel-border text-white rounded-lg flex flex-col gap-2"
       enter="transition-opacity duration-150"
       enterFrom="opacity-0"
@@ -42,10 +42,10 @@ export const ControlPanelSceneObject = ({
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
     >
-      <div className="flex justify-between gap-2">
+      <div className="flex justify-between gap-6">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube}/>
-          <p>Scene Object Name</p>
+          <p>Object Name</p>
         </div>
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faArrowRightArrowLeft}/>
@@ -62,20 +62,20 @@ export const ControlPanelSceneObject = ({
       />
       <H4>Rotation</H4>
       <InputVector
-        x={position.x}
-        y={position.y}
-        z={position.z}
+        x={rotation.x}
+        y={rotation.y}
+        z={rotation.z}
         onChange={handleRotationChange}
       />
       <H4>Scale</H4>
       <InputVector
-        x={position.x}
-        y={position.y}
-        z={position.z}
+        x={scalar.x}
+        y={scalar.y}
+        z={scalar.z}
         onChange={handleScalarChange}
       />
       <span className='h-2'/>
-      <div className="flex justity-between gap-2">
+      <div className="flex justify-between gap-2">
         <Button variant="secondary">Add Keyframe (K)</Button>
         <Button variant="secondary" icon={faTrash} />
       </div>
