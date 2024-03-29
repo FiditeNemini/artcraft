@@ -41,7 +41,7 @@ import { mediaTypeLabels } from "utils/mediaTypeLabels";
 import { EngineMediaPanel } from "./components/EngineMediaPanel/EngineMediaPanel";
 
 export default function MediaPage() {
-  const { canEditTtsModel, user } = useSession();
+  const { canEditMediaFile, user } = useSession();
   const { token } = useParams<{ token: string }>();
   const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -811,15 +811,26 @@ export default function MediaPage() {
                 </div>
               </Panel>
 
-              {canEditTtsModel(user?.user_token || "") && (
-                <div className="d-flex gap-2">
-                  <Button
-                    full={true}
-                    variant="danger"
-                    label="Delete Media"
-                    onClick={openDeleteModal}
-                  />
-                </div>
+              {canEditMediaFile(mediaFile?.maybe_creator_user?.user_token || "") && (
+                <>
+                  <div className="d-flex gap-2">
+                    <Button
+                      full={true}
+                      variant="danger"
+                      label="Delete Media"
+                      onClick={openDeleteModal}
+                    />
+                  </div>
+                  <div className="d-flex gap-2">
+                    <Button
+                      full={true}
+                      variant="secondary"
+                      label="Rename File"
+                      onClick={openDeleteModal}
+                      to={`/media/rename/${mediaFile?.token || ""}`}
+                    />
+                  </div>
+                </>
               )}
             </div>
           </div>

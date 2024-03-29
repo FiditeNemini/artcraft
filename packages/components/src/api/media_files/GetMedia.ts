@@ -14,6 +14,7 @@ export interface MediaFile {
   public_bucket_path: string;
   maybe_engine_extension: string | null;
   maybe_batch_token: string;
+  maybe_title: string | null;
   maybe_creator_user: UserDetailsLight | null;
   maybe_prompt_token: string | null;
   creator_set_visibility: string;
