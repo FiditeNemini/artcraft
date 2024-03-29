@@ -17,12 +17,21 @@ import { AppUIProvider } from "./contexts/AppUiContext";
 import { reducer, initialState, ACTION_TYPES } from "./reducer";
 import { VIEW_MODES } from "./reducer/types";
 import { ViewSideBySide } from "./comps/ViewSideBySide";
-import { timelineHeight } from "~/pages/PageEnigma/store";
+import {
+  canDrop,
+  clipLength,
+  currPosition,
+  dragId,
+  overTimeline,
+  scale,
+  timelineHeight,
+} from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
 export const PageEnigmaComponent = () => {
   const [appUiState, dispatchAppUiState] = useReducer(reducer, initialState);
   useSignals();
+  const { currX, currY } = currPosition.value;
 
   useEffect(() => {
     setTimeout(
@@ -35,7 +44,6 @@ export const PageEnigmaComponent = () => {
   }, []);
 
   const lowerHeight = timelineHeight.value;
-  console.log("main", timelineHeight.value);
   return (
     <div>
       <TopBarHelmet>
@@ -98,6 +106,22 @@ export const PageEnigmaComponent = () => {
           </div>
         </EngineProvider>
       </AppUIProvider>
+      <div
+        id={`ani-dnd-${dragId.value}`}
+        className={[
+          "absolute p-2",
+          "rounded-lg",
+          !canDrop.value ? "bg-brand-primary" : "bg-brand-secondary-700",
+          dragId.value ? "block" : "hidden",
+        ].join(" ")}
+        style={{
+          top: overTimeline.value ? currY - 16 : currY - 32,
+          left: currX + 1,
+          zIndex: 10000,
+          width: overTimeline.value ? clipLength.value * 4 * scale.value : 64,
+          height: overTimeline.value ? 32 : 64,
+        }}
+      />
     </div>
   );
 };
