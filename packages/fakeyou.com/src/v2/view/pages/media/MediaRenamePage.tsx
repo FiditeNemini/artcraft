@@ -42,8 +42,10 @@ export default function MediaRenamePage() {
   },[setMediaFile, media_file_token]);
 
   const performRename = async () => {
+    const newTitle = mediaTitle.trim();
+
     RenameMedia(media_file_token, {
-      name: mediaTitle,
+      name: newTitle,
     }).then((res: any) => {
       history.replace(`/media/${media_file_token}`);
     });
@@ -52,7 +54,7 @@ export default function MediaRenamePage() {
   const onChange = (
     ev: React.FormEvent<HTMLInputElement>
   ) => {
-    const value = (ev.target as HTMLInputElement).value.trim();
+    const value = (ev.target as HTMLInputElement).value;
     setMediaTitle(value);
   }
 

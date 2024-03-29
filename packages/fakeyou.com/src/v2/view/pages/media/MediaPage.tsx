@@ -453,6 +453,18 @@ export default function MediaPage() {
     );
   }
 
+  let title = "";
+
+  if (!!mediaFile?.maybe_title) {
+    title = `${mediaFile?.maybe_title} (${mediaType} file)`;
+  } else if (!!mediaFile?.maybe_original_filename) {
+    title = `${mediaFile?.maybe_original_filename} (${mediaType} file)`;
+  } else if (!!mediaFile?.maybe_model_weight_info?.title) {
+    title = mediaFile?.maybe_model_weight_info?.title;
+  } else {
+    title = `Untitled ${mediaType} file`;
+  }
+
   return (
     <div>
       <Container type="panel" className="mb-5">
@@ -461,8 +473,7 @@ export default function MediaPage() {
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
                 <h1 className="fw-bold mb-2">
-                  {mediaFile?.maybe_model_weight_info?.title ||
-                    `Media ${mediaType}`}
+                  {title}
                 </h1>
               </div>
               <div className="d-flex gap-3 flex-wrap align-items-center">
