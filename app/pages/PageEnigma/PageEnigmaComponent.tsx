@@ -1,4 +1,4 @@
-import { useReducer, useEffect } from "react";
+import { useReducer } from "react";
 
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
@@ -14,18 +14,33 @@ import { SidePanelTabs } from "./comps/SidePanelTabs";
 
 import { EngineProvider } from "./contexts/EngineProvider";
 import { AppUIProvider } from "./contexts/AppUiContext";
-import { appUiReducer, appUiInitialStateValues, APPUI_ACTION_TYPES, APPUI_VIEW_MODES } from "./reducers";
+import {
+  appUiReducer,
+  appUiInitialStateValues,
+  APPUI_VIEW_MODES,
+} from "./reducers";
 import { ViewSideBySide } from "./comps/ViewSideBySide";
-import { timelineHeight } from "~/pages/PageEnigma/store";
+import {
+  canDrop,
+  clipLength,
+  currPosition,
+  dragId,
+  overTimeline,
+  scale,
+  timelineHeight,
+} from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
 export const PageEnigmaComponent = () => {
-
-  const [appUiState, dispatchAppUiState] = useReducer(appUiReducer, appUiInitialStateValues);
   useSignals();
+  const { currX, currY } = currPosition.value;
+
+  const [appUiState, dispatchAppUiState] = useReducer(
+    appUiReducer,
+    appUiInitialStateValues,
+  );
 
   const lowerHeight = timelineHeight.value;
-  console.log("main", timelineHeight.value);
   return (
     <div>
       <TopBarHelmet>
@@ -42,14 +57,14 @@ export const PageEnigmaComponent = () => {
               style={{ height: `calc(100% - ${lowerHeight}px)` }}
             >
               <div className="relative w-full overflow-hidden bg-transparent">
-
-                <div className={(appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE) ? 'invisible' : ''}>
-                  <canvas
-                    id="video-scene"
-                    width="1280px"
-                    height="720px"
-                  />
-
+                <div
+                  className={
+                    appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE
+                      ? "invisible"
+                      : ""
+                  }
+                >
+                  <canvas id="video-scene" width="1280px" height="720px" />
 
                   {/* Top controls */}
                   <div className="absolute left-0 top-0 w-full">
@@ -65,12 +80,11 @@ export const PageEnigmaComponent = () => {
                     <ControlsVideo />
                   </div>
                 </div>
-                {
-                  appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE &&
+                {appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE && (
                   <ViewSideBySide />
-                }
+                )}
                 <LoadingDots
-                  className="absolute top-0 left-0"
+                  className="absolute left-0 top-0"
                   isShowing={appUiState.showEditorLoader.isShowing}
                   type="bricks"
                   message={appUiState.showEditorLoader.message}
@@ -97,6 +111,22 @@ export const PageEnigmaComponent = () => {
           </div>
         </EngineProvider>
       </AppUIProvider>
+      <div
+        id={`ani-dnd-${dragId.value}`}
+        className={[
+          "absolute p-2",
+          "rounded-lg",
+          !canDrop.value ? "bg-brand-primary" : "bg-brand-secondary-700",
+          dragId.value ? "block" : "hidden",
+        ].join(" ")}
+        style={{
+          top: overTimeline.value ? currY - 16 : currY - 32,
+          left: currX + 1,
+          zIndex: 10000,
+          width: overTimeline.value ? clipLength.value * 4 * scale.value : 64,
+          height: overTimeline.value ? 32 : 64,
+        }}
+      />
     </div>
   );
 };
