@@ -20,7 +20,7 @@ export const useMouseEventsAnimation = () => {
         setTime(-1);
         Queue.publish({
           queueName: QueueNames.TO_ENGINE,
-          action: toEngineActions.SCRUBBER_TIME,
+          action: toEngineActions.UPDATE_TIME,
           data: { currentTime: Math.round(time) },
         });
       }

@@ -4,7 +4,7 @@ import useUpdateCharacters from "~/pages/PageEnigma/contexts/TrackContext/utils/
 import useUpdateCamera from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateCamera";
 import useUpdateAudio from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateAudio";
 import useUpdateObject from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateObject";
-import { AnimationClip, AudioClip } from "~/pages/PageEnigma/models/track";
+import { ClipType, MediaClip } from "~/pages/PageEnigma/models/track";
 import useUpdateDragDrop from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateDragDrop";
 import {
   canDrop,
@@ -13,6 +13,7 @@ import {
   dropId,
   dropOffset,
 } from "~/pages/PageEnigma/store";
+import * as uuid from "uuid";
 
 interface Props {
   children: ReactNode;
@@ -31,8 +32,8 @@ export const TrackProvider = ({ children }: Props) => {
     setSelectedClip(clipId);
   }, []);
 
-  const [animationClips, setAnimationClips] = useState<AnimationClip[]>([]);
-  const [audioClips, setAudioClips] = useState<AudioClip[]>([]);
+  const [animationClips, setAnimationClips] = useState<MediaClip[]>([]);
+  const [audioClips, setAudioClips] = useState<MediaClip[]>([]);
 
   const [scale, setScale] = useState(1);
   const [length, setLength] = useState(1);
@@ -74,26 +75,30 @@ export const TrackProvider = ({ children }: Props) => {
   useEffect(() => {
     setAnimationClips([
       {
-        id: "ani-id1",
-        offset: 0,
+        version: 1,
+        media_id: uuid.v4(),
+        type: ClipType.ANIMATION,
         length: 25,
         name: "Sit",
       },
       {
-        id: "ani-id2",
-        offset: 0,
+        version: 1,
+        media_id: uuid.v4(),
+        type: ClipType.ANIMATION,
         length: 25,
         name: "Idle",
       },
       {
-        id: "ani-id3",
-        offset: 0,
+        version: 1,
+        media_id: uuid.v4(),
+        type: ClipType.ANIMATION,
         length: 25,
         name: "Stand",
       },
       {
-        id: "ani-id4",
-        offset: 0,
+        version: 1,
+        media_id: uuid.v4(),
+        type: ClipType.ANIMATION,
         length: 25,
         name: "Walk",
       },

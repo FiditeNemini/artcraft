@@ -14,9 +14,11 @@ export const ClipElements = () => {
   }, []);
 
   return (
-    <div className="flex flex-wrap overflow-y-auto" style={{ height }}>
+    <div className="flex flex-wrap gap-3 overflow-y-auto" style={{ height }}>
       {animationClips.map((clip) => {
-        return <ClipElement key={clip.id} clip={clip} type="animations" />;
+        return (
+          <ClipElement key={clip.media_id} clip={clip} type="animations" />
+        );
       })}
     </div>
   );

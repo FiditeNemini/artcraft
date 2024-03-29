@@ -1,4 +1,4 @@
-import { useReducer, useEffect } from "react";
+import { useReducer } from "react";
 
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
@@ -17,7 +17,6 @@ import { AppUIProvider } from "./contexts/AppUiContext";
 import {
   appUiReducer,
   appUiInitialStateValues,
-  APPUI_ACTION_TYPES,
   APPUI_VIEW_MODES,
 } from "./reducers";
 import { ViewSideBySide } from "./comps/ViewSideBySide";

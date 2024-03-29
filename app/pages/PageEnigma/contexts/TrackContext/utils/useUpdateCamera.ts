@@ -1,23 +1,13 @@
 import { useCallback, useState } from "react";
 import { CameraGroup } from "~/pages/PageEnigma/models/track";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 export default function useUpdateCamera() {
   const [camera, setCamera] = useState<CameraGroup>({
     id: "CA1",
-    clips: [
-      {
-        id: "CA1-1",
-        length: 200,
-        offset: 0,
-        name: "cam 1",
-      },
-      {
-        id: "CA1-2",
-        length: 180,
-        offset: 300,
-        name: "cam 2",
-      },
-    ],
+    clips: [],
   });
 
   const updateCamera = useCallback(
@@ -32,13 +22,20 @@ export default function useUpdateCamera() {
     }) => {
       setCamera((oldCamera) => {
         const newClips = [...oldCamera.clips];
-        const clipIndex = newClips.findIndex((row) => row.id === id);
+        const clipIndex = newClips.findIndex((row) => row.clip_uuid === id);
         if (clipIndex === -1) {
           return { ...oldCamera };
         }
         const clip = newClips[clipIndex];
         clip.offset = offset;
         clip.length = length;
+
+        Queue.publish({
+          queueName: QueueNames.TO_ENGINE,
+          action: toEngineActions.UPDATE_CLIP,
+          data: clip,
+        });
+
         return {
           ...oldCamera,
           clips: newClips,
@@ -56,7 +53,8 @@ export default function useUpdateCamera() {
           ...oldCamera.clips.map((clip) => {
             return {
               ...clip,
-              selected: clip.id === clipId ? !clip.selected : clip.selected,
+              selected:
+                clip.clip_uuid === clipId ? !clip.selected : clip.selected,
             };
           }),
         ],
@@ -68,7 +66,19 @@ export default function useUpdateCamera() {
     setCamera((oldCamera) => {
       return {
         ...oldCamera,
-        clips: [...oldCamera.clips.filter((clip) => clip.id !== clipId)],
+        clips: [
+          ...oldCamera.clips.filter((clip) => {
+            if (clip.clip_uuid === clipId) {
+              Queue.publish({
+                queueName: QueueNames.TO_ENGINE,
+                action: toEngineActions.DELETE_CLIP,
+                data: clip!,
+              });
+              return false;
+            }
+            return true;
+          }),
+        ],
       };
     });
   }, []);

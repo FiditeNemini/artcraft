@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect } from "react";
-import { BaseClip } from "~/pages/PageEnigma/models/track";
+import { MediaClip } from "~/pages/PageEnigma/models/track";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import {
   canDrop,
@@ -10,7 +10,7 @@ import {
 import { useSignals } from "@preact/signals-react/runtime";
 
 interface Props {
-  clip: BaseClip;
+  clip: MediaClip;
   type: "animations" | "lipSync";
 }
 
@@ -50,7 +50,7 @@ export const ClipElement = ({ clip, type }: Props) => {
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
         console.log("X", event.clientX);
-        startDrag(type, clip.id, clip.length);
+        startDrag(type, clip.media_id, clip.length);
         currPosition.value = {
           currX: event.pageX,
           currY: event.pageY,
@@ -62,14 +62,14 @@ export const ClipElement = ({ clip, type }: Props) => {
         canDrop.value = false;
       }
     },
-    [type, clip.id, startDrag, clip.length],
+    [type, clip.media_id, startDrag, clip.length],
   );
 
   return (
-    <div key={clip.id} className="relative h-16 w-16">
+    <div className="relative h-16 w-16">
       <div
-        id={`ani-clip-${clip.id}`}
-        className="absolute block h-16 w-16 bg-brand-secondary-700"
+        id={`ani-clip-${clip.media_id}`}
+        className="absolute block h-16 w-16 rounded-lg bg-brand-secondary-700 p-2"
         style={{ top: 0, left: 0 }}
         onPointerDown={onPointerDown}
       >

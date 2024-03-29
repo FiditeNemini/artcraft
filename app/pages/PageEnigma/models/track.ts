@@ -1,9 +1,48 @@
-export interface BaseClip {
-  id: string;
+export interface QueueClip {
+  version: number;
+  type: ClipType;
+  group: ClipGroup;
+  object_uuid?: string;
+  clip_uuid?: string;
+  media_id?: string;
+  name?: string;
+  offset?: number;
+  length?: number;
+  selected?: boolean;
+}
+
+export interface MediaClip {
+  version: number;
+  type: ClipType;
+  media_id: string;
+  name: string;
+  length: number;
+}
+
+export interface Clip {
+  version: number;
+  clip_uuid: string;
+  type: ClipType;
+  group: ClipGroup;
+  media_id: string;
+  object_uuid?: string;
   name: string;
   offset: number;
   length: number;
   selected?: boolean;
+}
+
+export enum ClipType {
+  TRANSFORM = "transform",
+  AUDIO = "audio",
+  ANIMATION = "animation",
+}
+
+export enum ClipGroup {
+  CHARACTER = "character",
+  CAMERA = "camera",
+  GLOBAL_AUDIO = "global_audio",
+  OBJECT = "object",
 }
 
 export interface BaseKeyFrame {
@@ -13,34 +52,24 @@ export interface BaseKeyFrame {
   selected?: boolean;
 }
 
-export interface AnimationClip extends BaseClip {}
-
-export interface PositionClip extends BaseClip {}
-
-export interface LipSyncClip extends BaseClip {}
-
 export interface CharacterGroup {
   id: string;
   muted: boolean;
-  animationClips: AnimationClip[];
-  positionClips: PositionClip[];
-  lipSyncClips: LipSyncClip[];
+  animationClips: Clip[];
+  positionClips: Clip[];
+  lipSyncClips: Clip[];
 }
 
 export interface CameraGroup {
   id: string;
-  clips: CameraClip[];
+  clips: Clip[];
 }
-
-export interface CameraClip extends BaseClip {}
 
 export interface AudioGroup {
   id: string;
   muted: boolean;
-  clips: AudioClip[];
+  clips: Clip[];
 }
-
-export interface AudioClip extends BaseClip {}
 
 export interface ObjectGroup {
   id: string;

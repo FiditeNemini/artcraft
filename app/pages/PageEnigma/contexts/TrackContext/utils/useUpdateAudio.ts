@@ -1,24 +1,21 @@
 import { useCallback, useState } from "react";
-import { AudioGroup, BaseClip } from "~/pages/PageEnigma/models/track";
+import {
+  AudioGroup,
+  Clip,
+  ClipGroup,
+  ClipType,
+  MediaClip,
+} from "~/pages/PageEnigma/models/track";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import * as uuid from "uuid";
 
 export default function useUpdateAudio() {
   const [audio, setAudio] = useState<AudioGroup>({
     id: "AU1",
     muted: false,
-    clips: [
-      {
-        id: "AU1-1",
-        length: 200,
-        offset: 0,
-        name: "audio 1",
-      },
-      {
-        id: "AU1-2",
-        length: 180,
-        offset: 300,
-        name: "audio 2",
-      },
-    ],
+    clips: [],
   });
 
   const updateAudio = useCallback(
@@ -33,44 +30,56 @@ export default function useUpdateAudio() {
     }) => {
       setAudio((oldAudio) => {
         const newClips = [...oldAudio.clips];
-        const clipIndex = newClips.findIndex((row) => row.id === id);
+        const clipIndex = newClips.findIndex((row) => row.clip_uuid === id);
         if (clipIndex === -1) {
           return { ...oldAudio };
         }
         const clip = newClips[clipIndex];
         clip.offset = offset;
         clip.length = length;
+
+        Queue.publish({
+          queueName: QueueNames.TO_ENGINE,
+          action: toEngineActions.UPDATE_CLIP,
+          data: clip,
+        });
+
         return {
           ...oldAudio,
           clips: newClips,
         };
-      });
-      console.log("message", {
-        action: "UpdateGlobalAudio",
-        id,
-        data: { offset, length },
       });
     },
     [],
   );
 
   const addGlobalAudio = useCallback(
-    (dragId: string, audioClips: BaseClip[], offset: number) => {
-      const clip = audioClips.find((row) => row.id === dragId);
+    (dragId: string, audioClips: MediaClip[], offset: number) => {
+      const clip = audioClips.find((row) => row.media_id === dragId);
       if (!clip) {
         return;
       }
 
+      const clip_uuid = uuid.v4();
+      const newClip = {
+        ...clip,
+        type: ClipType.AUDIO,
+        group: ClipGroup.GLOBAL_AUDIO,
+        offset,
+        clip_uuid,
+      } as Clip;
+
       setAudio((oldAudio) => {
         return {
           ...oldAudio,
-          clips: [...oldAudio.clips, { ...clip, offset }],
+          clips: [...oldAudio.clips, newClip],
         };
       });
-      console.log("message", {
-        action: "UpdateGlobalAudio",
-        id: dragId,
-        data: { offset },
+
+      Queue.publish({
+        queueName: QueueNames.TO_ENGINE,
+        action: toEngineActions.ADD_CLIP,
+        data: newClip,
       });
     },
     [],
@@ -78,14 +87,20 @@ export default function useUpdateAudio() {
 
   const toggleAudioMute = useCallback(() => {
     setAudio((oldAudio) => {
+      Queue.publish({
+        queueName: QueueNames.TO_ENGINE,
+        action: oldAudio?.muted ? toEngineActions.UNMUTE : toEngineActions.MUTE,
+        data: {
+          version: 1,
+          type: ClipType.AUDIO,
+          group: ClipGroup.GLOBAL_AUDIO,
+        },
+      });
+
       return {
         ...oldAudio,
         muted: !oldAudio.muted,
       };
-    });
-    console.log("message", {
-      action: "ToggleGlobalAudioMute",
-      id: "",
     });
   }, []);
 
@@ -97,7 +112,8 @@ export default function useUpdateAudio() {
           ...oldAudio.clips.map((clip) => {
             return {
               ...clip,
-              selected: clip.id === clipId ? !clip.selected : clip.selected,
+              selected:
+                clip.clip_uuid === clipId ? !clip.selected : clip.selected,
             };
           }),
         ],
@@ -109,12 +125,20 @@ export default function useUpdateAudio() {
     setAudio((oldAudio) => {
       return {
         ...oldAudio,
-        clips: [...oldAudio.clips.filter((clip) => clip.id !== clipId)],
+        clips: [
+          ...oldAudio.clips.filter((clip) => {
+            if (clip.clip_uuid === clipId) {
+              Queue.publish({
+                queueName: QueueNames.TO_ENGINE,
+                action: toEngineActions.DELETE_CLIP,
+                data: clip!,
+              });
+              return false;
+            }
+            return true;
+          }),
+        ],
       };
-    });
-    console.log("message", {
-      action: "UpdateGlobalAudio",
-      id: clipId,
     });
   }, []);
 

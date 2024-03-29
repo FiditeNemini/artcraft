@@ -1,10 +1,10 @@
 import React, { Dispatch, useCallback, useEffect, useRef } from "react";
-import { BaseClip } from "~/pages/PageEnigma/models/track";
+import { Clip } from "~/pages/PageEnigma/models/track";
 import { canDrop, scale } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
 export const useMouseEventsClip = (
-  clip: BaseClip,
+  clip: Clip,
   max: number,
   min: number,
   updateClip: (args: { id: string; offset: number; length: number }) => void,
@@ -21,14 +21,14 @@ export const useMouseEventsClip = (
   const onPointerUp = useCallback(() => {
     if (isActive.current) {
       updateClip({
-        id: clip.id,
+        id: clip.clip_uuid,
         offset: Math.round(currOffset.current),
         length: Math.round(currLength.current),
       });
       isActive.current = "";
       canDrop.value = false;
     }
-  }, [updateClip, clip.id]);
+  }, [updateClip, clip.clip_uuid]);
 
   const onMouseMove = useCallback(
     (event: MouseEvent) => {

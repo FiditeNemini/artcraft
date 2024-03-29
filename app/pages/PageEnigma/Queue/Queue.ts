@@ -1,14 +1,21 @@
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { QueueClip } from "~/pages/PageEnigma/models/track";
 
 class Queue {
   private _queue: Record<
     string,
-    { action: fromEngineActions | toEngineActions; data: any }[]
+    {
+      action: fromEngineActions | toEngineActions;
+      data: QueueClip | { currentTime: number };
+    }[]
   > = {};
   private _subscribers: Record<
     string,
-    (entry: { action: fromEngineActions | toEngineActions; data: any }) => void
+    (entry: {
+      action: fromEngineActions | toEngineActions;
+      data: QueueClip | { currentTime: number };
+    }) => void
   > = {};
 
   public publish({
@@ -18,12 +25,13 @@ class Queue {
   }: {
     queueName: string;
     action: fromEngineActions | toEngineActions;
-    data: any;
+    data: QueueClip | { currentTime: number };
   }) {
     if (!this._queue[queueName]) {
       this._queue[queueName] = [];
     }
     this._queue[queueName].push({ action, data });
+    console.log("Queued", queueName, action, data);
 
     if (this._subscribers[queueName]) {
       this._subscribers[queueName](this._queue[queueName].splice(0, 1)[0]);
@@ -34,7 +42,7 @@ class Queue {
     queueName: string,
     onMessage: (entry: {
       action: fromEngineActions | toEngineActions;
-      data: any;
+      data: QueueClip | { currentTime: number };
     }) => void,
   ) {
     this._subscribers[queueName] = onMessage;
