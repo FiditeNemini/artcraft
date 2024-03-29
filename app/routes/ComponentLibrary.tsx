@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { 
   Button,
   ButtonLink,
-  H4, 
+  H1,H2,H3,H4,H5,H6,P,Label,
   LoadingBar,
   LoadingDotsTyping,
   LoadingDotsBricks,
@@ -38,6 +38,17 @@ export default function ComponentLibrary () {
     <div className='bg-ui-panel w-10/12 max-w-7xl h-full min-h-96 mx-auto my-6 rounded-lg p-6'>
 
       <div className="flex flex-col gap-2 mb-4">
+        <H1>Typography</H1>
+        <H1>H1. This is an H1 Heading</H1>
+        <H2>H2. This is an H2 Heading</H2>
+        <H3>H3. This is an H3 Heading</H3>
+        <H4>H4. This is an H4 Heading</H4>
+        <Label>Label. Is essentially same as H4</Label>
+        <P>P. Is an normal Paragraph</P>
+        <H5>H5. This is an H5 Heading</H5>
+        <H6>H6. This is an H6 Heading</H6>
+  
+        <hr />
         <H4>Buttons</H4>
         <div className="flex gap-2">
           <Button>Primary</Button>

@@ -3,7 +3,7 @@ import { ButtonIcon } from "./ButtonIcon";
 import { ButtonLink } from "./ButtonLink";
 import { ButtonIconSelect } from "./ButtonIconSelect";
 import { Input } from "./Input";
-import { H4 } from "./H4";
+import { H1, H2, H3, H4, H5, H6, P, Label} from "./Typography";
 import { ItemPicker } from "./ItemPicker";
 import { Textarea } from "./Textarea";
 import { LoadingBar } from "./LoadingBar";
@@ -14,7 +14,7 @@ export {
   ButtonIcon,
   ButtonLink,
   ButtonIconSelect,
-  H4,
+  H1,H2,H3,H4,H5,H6,P,Label,
   ItemPicker,
   Textarea,
   Input,
