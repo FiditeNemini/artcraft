@@ -54,7 +54,8 @@ export default function MediaTab() {
     { value: "image", label: "Images" },
     { value: "audio", label: "Audio" },
     { value: "video", label: "Video" },
-    { value: "3dFile", label: "3D Files" },
+    { value: "scene_ron", label: "3D Scenes" },
+    { value: "3dFile", label: "3D Assets" },
   ];
 
   const sortOptions = [

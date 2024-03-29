@@ -30,7 +30,7 @@ export default function MediaTab({ username }: { username: string }) {
   const media = useListContent({
     addQueries: {
       page_size: urlQueries.get("page_size") || "24",
-      ...prepFilter(mediaType, "filter_media_type",mediaType === "3dFile" ? "bvh,glb,gltf,scene_ron" : "" ),
+      ...prepFilter(mediaType, "filter_media_type",mediaType === "3dFile" ? "bvh,glb,gltf" : "" ),
     },
     addSetters: { mediaTypeSet },
     // debug: "profile media",
@@ -62,7 +62,8 @@ export default function MediaTab({ username }: { username: string }) {
     { value: "image", label: "Images" },
     { value: "audio", label: "Audio" },
     { value: "video", label: "Video" },
-    { value: "3dFile", label: "3D Files" },
+    { value: "scene_ron", label: "3D Scenes" },
+    { value: "3dFile", label: "3D Assets" },
   ];
 
   const sortOptions = [

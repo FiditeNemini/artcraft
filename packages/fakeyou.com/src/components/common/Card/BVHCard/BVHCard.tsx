@@ -7,6 +7,7 @@ import { CardFooter } from "components/entities";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
 import getCardUrl from "../getCardUrl";
+import { GetMediaFileTitle } from "common/GetMediaFileTitle";
 
 interface BVHCardProps {
   bookmarks: any;
@@ -30,6 +31,8 @@ export default function BVHCard({
   const linkUrl = getCardUrl(data, source, type);
   const timeAgo = useTimeAgo(data.created_at);
 
+  const title = GetMediaFileTitle(data);
+
   const Wrapper = ({ children }: { children: any }) => inClick ? <div {...{ onClick: () => { inClick(data) } }}>{ children }</div> : <Link {...{ to: linkUrl  }}>{ children }</Link>;
 
   // const bucketConfig = new BucketConfig();
@@ -49,6 +52,10 @@ export default function BVHCard({
               <Badge  {...{ className: "fy-entity-type-bvh", label: "BVH", overlay: true }}/>
             </div>
           </div>
+
+          <h6 className="fw-semibold text-white mb-1 mt-3">
+            {title}
+          </h6>
 
           <div className="card-img-overlay-text">
             <div>

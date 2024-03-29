@@ -7,6 +7,7 @@ import Badge from "components/common/Badge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCube } from "@fortawesome/pro-solid-svg-icons";
 import getCardUrl from "../getCardUrl";
+import { GetMediaFileTitle } from "common/GetMediaFileTitle";
 
 interface GLTFCardProps {
   bookmarks: any;
@@ -29,6 +30,8 @@ export default function GLTFCard({
 
   const timeAgo = useTimeAgo(data.created_at);
 
+  const title = GetMediaFileTitle(data);
+
   return (
     <Link
       {...{
@@ -48,6 +51,10 @@ export default function GLTFCard({
               <Badge {...{ className: "fy-entity-type-gltf", label: "GLTF", overlay: true }}/>
             </div>
           </div>
+          
+          <h6 className="fw-semibold text-white mb-1 mt-3">
+            {title}
+          </h6>
 
           <div className="card-img-overlay-text">
             <div>
