@@ -37,9 +37,11 @@ export const useMouseEventsClip = (
       if (isActive.current === "drag") {
         if (deltaOffset < min) {
           currOffset.current = min;
+          return;
         }
         if (deltaOffset + currLength.current > max) {
           currOffset.current = max - currLength.current;
+          return;
         }
         currOffset.current = deltaOffset;
       }
