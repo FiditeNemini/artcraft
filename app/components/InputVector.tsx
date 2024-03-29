@@ -20,6 +20,8 @@ export const InputVector = ({
   const yRef = useRef<HTMLInputElement>(null);
   const zRef = useRef<HTMLInputElement>(null);
 
+  const className="h-10 rounded-md bg-brand-secondary p-3 text-white transition-all duration-150 ease-in-out outline-none outline-offset-0 focus:outline-brand-primary";
+
   function handleOnChange(){
     const newVector = {
       x: Number(xRef.current?.value),
@@ -30,9 +32,24 @@ export const InputVector = ({
   }
   return(
     <div className="w-full flex gap-2">
-      <input type="number" ref={xRef} onChange={handleOnChange} value={x} />
-      <input type="number" ref={yRef} onChange={handleOnChange} value={y} />
-      <input type="number" ref={zRef} onChange={handleOnChange} value={z} />
+      <input
+        className={className}
+        onChange={handleOnChange}
+        ref={xRef}
+        value={x}
+      />
+      <input
+        className={className}
+        onChange={handleOnChange}
+        ref={yRef}
+        value={y}
+      />
+      <input
+        className={className}
+        onChange={handleOnChange}
+        ref={zRef}
+        value={z}
+      />
     </div>
   );
 }
