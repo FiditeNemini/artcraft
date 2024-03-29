@@ -1,17 +1,17 @@
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { Transition } from "@headlessui/react";
 import { faArrowRightArrowLeft, faCube, faTrash} from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { AppUiContext } from '../../contexts/AppUiContext';
-import { Button, H4, InputVector } from "~/components";
+import { Button, H4, H6, InputVector } from "~/components";
 
 import { XYZ } from '../../datastructures/common';
 
 
 
 export const ControlPanelSceneObject = () => {
-  const [appUiState,dispatchAppUiState ] = useContext(AppUiContext);
+  const [appUiState, dispatchAppUiState ] = useContext(AppUiContext);
 
   const position = appUiState?.currentSceneObject.objectVectors.position;
   const rotation = appUiState?.currentSceneObject.objectVectors.rotation;
@@ -29,9 +29,6 @@ export const ControlPanelSceneObject = () => {
     console.log(xyz);
     // setScalar(xyz);
   }
-  // useEffect(()=>{
-    
-  // },[position,rotation,scalar]);
 
   return(
     <Transition
@@ -50,8 +47,8 @@ export const ControlPanelSceneObject = () => {
           <p>Object Name</p>
         </div>
         <div className="flex items-center gap-2">
-          <FontAwesomeIcon icon={faArrowRightArrowLeft}/>
-          <p>Swap Object</p>
+          <FontAwesomeIcon icon={faArrowRightArrowLeft} size="xs" />
+          <H6>Swap Object</H6>
         </div>
       </div>
       <span className='h-1'/>

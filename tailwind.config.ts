@@ -126,9 +126,16 @@ export default {
       "ui-controls-button": "#676781",
       "ui-divider": "#515168",
 
+      "axis-x" :"#D33242",
+      "axis-y" :"#308752",
+      "axis-z" :"#2E70FF",
+      red:  "#D33242",
+      green:"#308752",
+      blue: "#2E70FF",
+
+      white: colors.white,
       gray: colors.gray,
       black: colors.black,
-      white: colors.white,
     },
   },
   plugins: [],

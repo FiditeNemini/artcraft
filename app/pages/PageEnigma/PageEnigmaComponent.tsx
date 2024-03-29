@@ -81,10 +81,7 @@ export const PageEnigmaComponent = () => {
                   <div className="absolute bottom-0 left-0 w-full">
                     <PreviewEngineCamera />
                     <ControlsVideo />
-                    <ControlPanelSceneObject
-                      isShowing={appUiState.currentSceneObject.isShowing}
-                      {...appUiState.currentSceneObject.objectVectors}
-                    />
+                    <ControlPanelSceneObject/>
                   </div>
                 </div>
                 {appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE && (
