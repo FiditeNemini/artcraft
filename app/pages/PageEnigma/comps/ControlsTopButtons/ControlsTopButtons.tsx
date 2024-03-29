@@ -21,6 +21,15 @@ export const ControlsTopButtons = () => {
     editorEngine?.loadScene(sceneToken);
   };
 
+
+  const handleButtonCameraView = () => {
+    editorEngine?.switchCameraView();
+  };
+
+  const handleButtonPlayBack = () => {
+    editorEngine?.startPlayback();
+  };
+
   const handleButtonTest = () => {
     if(appUiState?.showEditorLoadingBar.isShowing){
       //TO GO TO A HUNDRED AND DISAPPER
@@ -62,14 +71,9 @@ export const ControlsTopButtons = () => {
     }
   };
 
-
-  const handleButtonCameraView = () => {
-    editorEngine?.switchCameraView();
-  };
-
-  const handleButtonLoad = () => {
-    editorEngine?.take_timeline_cam_clip();
-  };
+  //const handleButtonRender = () => {
+  //  editorEngine?.take_timeline_cam_clip();
+  //};
 
   const handleButtonRender = () => {
     editorEngine?.generateVideo();
@@ -79,7 +83,7 @@ export const ControlsTopButtons = () => {
   //   editorEngine?.change_camera_view();
   // };
 
-  // const handleButtonLoad = () => {};
+  const handleButtonLoad = () => {};
   // const handleButtonRender = () => {};
 
   return (
@@ -141,11 +145,15 @@ export const ControlsTopButtons = () => {
         </Button>
       </div>
       <div className="flex gap-2">
-        <Button onClick={handleButtonRender}>Render Video</Button>
-        <Button onClick={handleButtonLoad}>Take Frame</Button>
+
+        <Button onClick={handleButtonLoad}>Load</Button>
+        <Button onClick={handleButtonRender}>Take Frame</Button>
+        <Button onClick={handleButtonPlayBack}>Play</Button>
+        {/* <Button onClick={handleButtonLoad}>Load</Button>
+        <Button onClick={handleButtonRender}>Render</Button> */}
         <Button
           onClick={handleButtonTest}
-          className="bg-brand-tertiary hover:bg-brand-tertiary-400"
+          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
           style={{zIndex:9001}}
         >
           Test

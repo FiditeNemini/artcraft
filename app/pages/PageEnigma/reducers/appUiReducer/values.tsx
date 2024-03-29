@@ -4,11 +4,12 @@ export const initialStateValues : State = {
   timelineHeight: 260,
   viewMode: VIEW_MODES.EDITOR,
   showEditorLoader: {
-    isShowing:true,
-    message: 'loading Editor Engine 🦊'
+    isShowing:false,
+    message: 'Loading Editor Engine 🦊'
   },
   showEditorLoadingBar: {
-    isShowing:false,
-    progress:0,
+    isShowing:true,
+    progress:5,
+    message: 'Loading Editor Engine 🦊'
   }
 }
