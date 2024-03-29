@@ -840,6 +840,11 @@ class Editor {
     this._initializeRecording();
     this.rendering = true;
     this.activeScene.render_mode(this.rendering);
+    if (this.activeScene.hot_items) {
+      this.activeScene.hot_items.forEach(element => {
+        element.visible = false;
+      });
+    }
   }
 
   startPlayback() {
