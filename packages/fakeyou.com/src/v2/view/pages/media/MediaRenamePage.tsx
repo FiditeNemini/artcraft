@@ -31,9 +31,12 @@ export default function MediaRenamePage() {
     GetMedia(media_file_token,{})
     .then((res) => {
       if (res.success && res.media_file) {
+        let currentTitle = 
+          res.media_file.maybe_title || 
+          res.media_file.maybe_original_filename || 
+          "";
         setMediaFile(res.media_file);
-        setMediaTitle(res.media_file.maybe_title || "");
-
+        setMediaTitle(currentTitle);
       }
     })
   },[setMediaFile, media_file_token]);

@@ -34,7 +34,6 @@ import BookmarkButton from "components/common/BookmarkButton";
 import LikeButton from "components/common/LikeButton";
 import { useBookmarks, useMedia, useRatings, useSession } from "hooks";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
-//import Iframe from "react-iframe";
 import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
 import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
 import { mediaTypeLabels } from "utils/mediaTypeLabels";
@@ -232,52 +231,6 @@ export default function MediaPage() {
             <EngineMediaPanel mediaFile={mediaFile} />
           </>
         )
-      /*
-      case MediaFileType.BVH:
-        const bvhUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
-        return (
-          <Iframe
-            {...{
-              url: `https://engine.fakeyou.com?mode=viewer&bvh=${bvhUrl}&skybox=${SKYBOX}`,
-              className: "fy-studio-frame",
-            }}
-          />
-        );
-      case MediaFileType.GLB:
-        const glbUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
-        return (
-          <Iframe
-            {...{
-              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${glbUrl}&skybox=${SKYBOX}`,
-              className: "fy-studio-frame",
-            }}
-          />
-        );
-      case MediaFileType.GLTF:
-        const gltfUrl = bucketConfig.getGcsUrl(mediaFile.public_bucket_path);
-        return (
-          <Iframe
-            {...{
-              url: `https://engine.fakeyou.com?mode=viewer&mixamo=${gltfUrl}&skybox=${SKYBOX}`,
-              className: "fy-studio-frame",
-            }}
-          />
-        );
-      case MediaFileType.SceneRon:
-        // NB: Storyteller Engine makes the API call to load the scene.
-        // We don't need to pass the bucket path.
-        // The engine, does, however, need a `.scn.ron` file extension.
-        const sceneRonUrl = `remote://${mediaFile.token}.scn.ron`;
-        // NB: Skybox param doesn't work with scenes. Scenes will bake in a skybox in the future.
-        return (
-          <Iframe
-            {...{
-              url: `https://engine.fakeyou.com?mode=viewer&scene=${sceneRonUrl}`,
-              className: "fy-studio-frame",
-            }}
-          />
-        );
-      */
       case MediaFileType.FBX:
         return (
           <Panel padding={true}>
