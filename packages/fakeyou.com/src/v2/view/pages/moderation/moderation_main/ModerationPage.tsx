@@ -11,12 +11,13 @@ import {
   faTags,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   sessionWrapper: SessionWrapper;
 }
 
-function ModerationFc(props: Props) {
+function ModerationPage(props: Props) {
   if (!props.sessionWrapper.canBanUsers()) {
     return <h1>Unauthorized</h1>;
   }
@@ -49,7 +50,7 @@ function ModerationFc(props: Props) {
 
               <Link
                 to="/moderation/job_stats"
-                className="btn btn-primary w-100"
+                className="btn btn-secondary w-100"
               >
                 <FontAwesomeIcon icon={faListCheck} className="me-2" />
                 Job Stats (Old TTS + W2L)
@@ -64,6 +65,14 @@ function ModerationFc(props: Props) {
           <h2 className="panel-title fw-bold">Lookup, Stats, and Editing</h2>
           <div className="py-6">
             <div className="d-flex flex-column gap-3">
+              <Link
+                to="/moderation/token_info"
+                className="btn btn-success w-100"
+              >
+                <FontAwesomeIcon icon={faMagnifyingGlass} className="me-2" />
+                Token Info Lookup
+              </Link>
+
               <Link
                 to="/moderation/user/list"
                 className="btn btn-secondary w-100"
@@ -110,4 +119,4 @@ function ModerationFc(props: Props) {
   );
 }
 
-export { ModerationFc };
+export { ModerationPage };

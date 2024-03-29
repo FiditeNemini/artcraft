@@ -4,7 +4,7 @@ import { AboutPage } from "./pages/about/about_page/AboutPage";
 import { GuidePage } from "./pages/about/guide_page/GuidePage";
 import { FirehoseEventListPage } from "./pages/firehose/FirehoseEventListPage";
 import { LoginPage } from "./pages/login/LoginPage";
-import { ModerationFc } from "./pages/moderation/moderation_main/ModerationFc";
+import { ModerationPage } from "./pages/moderation/moderation_main/ModerationPage";
 import { ModerationIpBanListFc } from "./pages/moderation/moderation_ip_ban_list/ModerationIpBanListFc";
 import { ModerationViewIpBanFc } from "./pages/moderation/moderation_view_ip_ban/ModerationViewIpBanFc";
 import FaceAnimator from "./pages/face_animator";
@@ -130,6 +130,7 @@ import { StudioIntroResultPage } from "./pages/storyteller_studio_intro/StudioIn
 import StudioTutorial from "./pages/studio_tutorial/StudioTutorial";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
+import { ModerationTokenInfoPage } from "./pages/moderation/ModerationTokenInfoPage";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -636,6 +637,11 @@ class PageContainer extends React.Component<
                       sessionWrapper={this.props.sessionWrapper}
                     />
                   </Route>
+                  <Route path="/moderation/token_info">
+                    <ModerationTokenInfoPage
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
+                  </Route>
 
                   <Route path="/moderation/tts_category/list">
                     <ModerationTtsCategoryListPage
@@ -662,7 +668,7 @@ class PageContainer extends React.Component<
                   </Route>
 
                   <Route path="/moderation">
-                    <ModerationFc sessionWrapper={this.props.sessionWrapper} />
+                    <ModerationPage sessionWrapper={this.props.sessionWrapper} />
                   </Route>
 
                   <Route exact={true} path="/clone">
@@ -1250,6 +1256,11 @@ class PageContainer extends React.Component<
                       sessionWrapper={this.props.sessionWrapper}
                     />
                   </Route>
+                  <Route path="/moderation/token_info">
+                    <ModerationTokenInfoPage
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
+                  </Route>
 
                   <Route path="/moderation/tts_category/list">
                     <ModerationTtsCategoryListPage
@@ -1276,7 +1287,7 @@ class PageContainer extends React.Component<
                   </Route>
 
                   <Route path="/moderation">
-                    <ModerationFc sessionWrapper={this.props.sessionWrapper} />
+                    <ModerationPage sessionWrapper={this.props.sessionWrapper} />
                   </Route>
 
                   <Route exact={true} path="/clone">
