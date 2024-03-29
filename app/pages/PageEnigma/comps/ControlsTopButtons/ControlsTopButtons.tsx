@@ -79,6 +79,10 @@ export const ControlsTopButtons = () => {
     editorEngine?.generateVideo();
   };
 
+  const handleButtonTakeFrame = () => {
+    editorEngine?.take_timeline_cam_clip();
+  };
+
   // const handleButtonCameraView = () => {
   //   editorEngine?.change_camera_view();
   // };
@@ -146,9 +150,9 @@ export const ControlsTopButtons = () => {
       </div>
       <div className="flex gap-2">
 
-        <Button onClick={handleButtonLoad}>Load</Button>
-        <Button onClick={handleButtonRender}>Take Frame</Button>
-        <Button onClick={handleButtonPlayBack}>Play</Button>
+        <Button onClick={handleButtonLoad}>Test Button</Button>
+        <Button onClick={handleButtonTakeFrame}>Take Frame</Button>
+        <Button onClick={handleButtonRender}>Render</Button>
         {/* <Button onClick={handleButtonLoad}>Load</Button>
         <Button onClick={handleButtonRender}>Render</Button> */}
         <Button
