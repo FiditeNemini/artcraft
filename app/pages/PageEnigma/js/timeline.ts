@@ -6,88 +6,69 @@ import AudioEngine from "./audio_engine";
 import TransformEngine from "./transform_engine";
 import LipSyncEngine from "./lip_sync_engine";
 import AnimationEngine from "./animation_engine";
-import { AudioClip } from "../models/track";
-import { AnimationClip } from "three";
-import { LipSyncClip } from "../datastructures/clips/lipsync_clip";
-import { TransformClip } from "../datastructures/clips/transform_clip";
 
 // Every object uuid / entity has a track.
 export class TimelineCurrentState {
-    isEditable: boolean
-    selectedObjectID: number
+    is_editable: boolean
+    selected_object_ID: number
     constructor() {
-        this.isEditable = true // can add clips to it
-        this.selectedObjectID = 0
+        this.is_editable = true // can add clips to it
+        this.selected_object_ID = 0
     }
 }
 
 export class TimelineDataState {
-    timelineItems: ClipUI[]
-    scrubberPosition: number
-
-    // Data to serialize with the scene, used to load into each engine.
-    audioClips:AudioClip[]
-    animationClips:AnimationClip[]
-    lipSyncClips:LipSyncClip[]
-    transformClips:TransformClip[]
-
-    constructor(timelineItems: ClipUI[] = [],
-                audioClips: AudioClip[] = [],
-                animationClips: AnimationClip[] = [],
-                transformClips: TransformClip[] = [],
-                lipSyncClips: LipSyncClip[] = [],
-                scrubberPosition:number = 0) {
-        this.timelineItems = timelineItems
-        this.scrubberPosition = scrubberPosition
-        this.audioClips = audioClips
-        this.animationClips = animationClips
-        this.lipSyncClips = lipSyncClips
-        this.transformClips = transformClips
+    timeline_items: ClipUI[]
+    scrubber_frame_position: number
+    constructor(timeline_items: ClipUI[] = [],
+                scrubber_frame_position: number = 0) {
+        this.timeline_items = timeline_items
+        this.scrubber_frame_position = scrubber_frame_position
     }
 }
 
 export class TimeLine {
 
-    timelineItems: ClipUI[]
+    timeline_items: ClipUI[]
 
-    timeLineLimit: number
-    scrubberPosition: number
-    isPlaying: boolean
+    timeline_limit: number
+    scrubber_frame_position: number
+    is_playing: boolean
 
     // plays audio
-    audioEngine: AudioEngine
+    audio_engine: AudioEngine
     // key framing
-    transformEngine: TransformEngine
+    transform_engine: TransformEngine
     // animation engine
-    animationEngine: AnimationEngine
+    animation_engine: AnimationEngine
     // lip sync engine
-    lipSyncEngine: LipSyncEngine
+    lipSync_engine: LipSyncEngine
 
     scene: Scene
     // ensure that the elements are loaded first.
-    constructor(audioEngine: AudioEngine,
-        transformEngine: TransformEngine,
-        lipsyncEngine: LipSyncEngine,
-        animationEngine: AnimationEngine,
+    constructor(audio_engine: AudioEngine,
+        transform_engine: TransformEngine,
+        lipsync_engine: LipSyncEngine,
+        animation_engine: AnimationEngine,
         scene: Scene) {
         
-        this.timelineItems = []
-        this.timeLineLimit = 60 * 5 // 5 seconds
+        this.timeline_items = []
+        this.timeline_limit = 60 * 5 // 5 seconds
      
-        this.isPlaying = false
-        this.scrubberPosition = 0 // in frames into the tl
+        this.is_playing = false
+        this.scrubber_frame_position = 0 // in frames into the tl
 
         // this will be used to play the audio clips
-        this.audioEngine = audioEngine
-        this.transformEngine = transformEngine
-        this.lipSyncEngine = lipsyncEngine
-        this.animationEngine = animationEngine
+        this.audio_engine = audio_engine
+        this.transform_engine = transform_engine
+        this.lipSync_engine = lipsync_engine
+        this.animation_engine = animation_engine
 
         this.scene = scene;
     }
 
     public async addPlayableClip(clip: ClipUI): Promise<void> {
-        this.timelineItems.push(clip)
+        this.timeline_items.push(clip)
     }
 
     // when given a media id item it will create the clip. 
@@ -130,28 +111,28 @@ export class TimeLine {
     }
     // public streaming events into the timeline from
     public async setScrubberPosition(offset: number) {
-        this.scrubberPosition = offset // in ms
+        this.scrubber_frame_position = offset // in ms
     }
 
     // should play from the clip that is closest to the to scrubber
     public async play(): Promise<void> {
         console.log(`Starting Timeline`)
-        this.isPlaying = true
+        this.is_playing = true
     }
 
-    private async reset_scene() {
-        for (const element of this.timelineItems) {
+    private async resetScene() {
+        for (const element of this.timeline_items) {
             if (element.type == "transform") {
                 let object = this.scene.get_object_by_uuid(element.object_uuid);
-                if (object && this.transformEngine.clips[element.object_uuid]) { this.transformEngine.clips[element.object_uuid].reset(object); }
+                if (object && this.transform_engine.clips[element.object_uuid]) { this.transform_engine.clips[element.object_uuid].reset(object); }
             }
             else if (element.type == "audio") {
-                this.audioEngine.loadClip(element.media_id);
+                this.audio_engine.loadClip(element.media_id);
             }
             else if (element.type == "animation") {
             }
             else if (element.type == "lipsync") {
-                this.lipSyncEngine.clips[element.object_uuid].reset();
+                this.lipSync_engine.clips[element.object_uuid].reset();
             }
             else {
                 this.stop()
@@ -162,48 +143,48 @@ export class TimeLine {
 
     // called by the editor update loop on each frame
     public async update(deltatime:number) {
-        if (this.isPlaying == false) return; // start and stop 
+        if (this.is_playing == false) return; // start and stop 
 
-        if (this.scrubberPosition <= 0) {
-            await this.reset_scene();
+        if (this.scrubber_frame_position <= 0) {
+            await this.resetScene();
         }
 
-        this.scrubberPosition += 1;
+        this.scrubber_frame_position += 1;
         //2. allow stopping.
         //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
-        for (const element of this.timelineItems) {
-            if (element.offset <= this.scrubberPosition && this.scrubberPosition <= element.length) {
+        for (const element of this.timeline_items) {
+            if (element.offset <= this.scrubber_frame_position && this.scrubber_frame_position <= element.length) {
                 // run async
                 // element.play()
                 // remove the element from the list
                 let object = this.scene.get_object_by_uuid(element.object_uuid)
                 if (element.type == "transform") {
-                    if (object && this.transformEngine.clips[element.object_uuid]) {
-                        this.transformEngine.clips[element.object_uuid].length = (element.length - element.offset);
-                        this.transformEngine.clips[element.object_uuid].step(object, element.offset, this.scrubberPosition);
+                    if (object && this.transform_engine.clips[element.object_uuid]) {
+                        this.transform_engine.clips[element.object_uuid].length = (element.length - element.offset);
+                        this.transform_engine.clips[element.object_uuid].step(object, element.offset, this.scrubber_frame_position);
                     }
                 }
                 else if (element.type == "audio") {
-                    if(this.scrubberPosition+1 >= element.length){
-                        this.audioEngine.stopClip(element.media_id);
+                    if(this.scrubber_frame_position+1 >= element.length){
+                        this.audio_engine.stopClip(element.media_id);
                     }
                     else {
-                        this.audioEngine.playClip(element.media_id);
+                        this.audio_engine.playClip(element.media_id);
                     }
                 }
                 else if (element.type == "lipsync") {
-                    if(this.scrubberPosition+1 >= element.length){
-                        this.lipSyncEngine.clips[element.object_uuid].stop();
+                    if(this.scrubber_frame_position+1 >= element.length){
+                        this.lipSync_engine.clips[element.object_uuid].stop();
                     }
                     else if (object) {
-                        await this.lipSyncEngine.clips[element.object_uuid].play(object);
-                        this.lipSyncEngine.clips[element.object_uuid].step();
+                        await this.lipSync_engine.clips[element.object_uuid].play(object);
+                        this.lipSync_engine.clips[element.object_uuid].step();
                     }
                 }
                 else if (element.type == "animation") {
                     if (object) { 
-                        await this.animationEngine.clips[object.uuid].play(object); 
-                        this.animationEngine.clips[object.uuid].step(deltatime);
+                        await this.animation_engine.clips[object.uuid].play(object); 
+                        this.animation_engine.clips[object.uuid].step(deltatime);
                     }
                 }
                 else {
@@ -214,14 +195,14 @@ export class TimeLine {
             }
 
             // find the offset of the longest clip and play until that clip is done
-            if (this.scrubberPosition >= this.timeLineLimit) { // stops at where clips should // cannot throw clip
+            if (this.scrubber_frame_position >= this.timeline_limit) { // stops at where clips should // cannot throw clip
                 this.stop()
             }
         }
     }
 
     private async stop(): Promise<void> {
-        this.isPlaying = false
+        this.is_playing = false
         console.log(`Stopping Timeline`)
     }
 }

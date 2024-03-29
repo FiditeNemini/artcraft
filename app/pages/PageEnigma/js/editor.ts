@@ -267,7 +267,6 @@ class Editor {
 
     this._test_demo();
 
-
     this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this), false);
     this.renderer.domElement.addEventListener("mouseup", this.onMouseUp.bind(this), false);
     this.renderer.domElement.addEventListener("onContextMenu", this.onContextMenu.bind(this), false);
@@ -321,6 +320,7 @@ class Editor {
     const result = await this.api_manager.getMediaBatch(["m_8fmp9hrvsqcryzka1fra597kg42s50","m_z4jzbst3xfh64h0qn4bqh4afenfps9"]);
     console.log(result);
   }
+
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER,
@@ -383,6 +383,7 @@ class Editor {
       `saveScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`,
     );
 
+    // TODO turn scene information into and object ...
     const result = await this.api_manager.saveSceneState(
       this.activeScene.scene,
       name,
@@ -390,7 +391,7 @@ class Editor {
       this.current_scene_media_token,
       new TimelineDataState(),
     );
-
+    
     if (result.data == null) {
       return;
     }
@@ -755,7 +756,7 @@ class Editor {
     if (this.cameraViewControls && this.camera_person_mode) {
       this.cameraViewControls.update(5 * delta_time);
       if (this.cam_obj) {
-        if (this.timeline.isPlaying == false) {
+        if (this.timeline.is_playing == false) {
           this.cam_obj.position.copy(this.camera.position);
           this.cam_obj.rotation.copy(this.camera.rotation);
         } else {
@@ -890,7 +891,7 @@ class Editor {
 
     let itteration = 0;
 
-    for (const clip of this.timeline.timelineItems) {
+    for (const clip of this.timeline.timeline_items) {
       if (clip.type == "lipsync" || clip.type == "audio") {
         await this.convertAudioClip(itteration, ffmpeg, clip);
         itteration += 1;
@@ -932,7 +933,7 @@ class Editor {
   }
 
   startPlayback() {
-    this.timeline.isPlaying = true;
+    this.timeline.is_playing = true;
     this.timeline.scrubberPosition = 0;
     if (!this.camera_person_mode) {
       this.switchCameraView();
@@ -979,7 +980,7 @@ class Editor {
       let imgData = this.renderer.domElement.toDataURL();
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
-      if (this.timeline.isPlaying == false) {
+      if (this.timeline.is_playing == false) {
         this.stopPlayback();
         this.playback_location = 0;
         this.rendering = false;
