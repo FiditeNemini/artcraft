@@ -179,8 +179,8 @@ export class TimeLine {
                 let object = this.scene.get_object_by_uuid(element.object_uuid)
                 if (element.type == "transform") {
                     if (object && this.transformEngine.clips[element.object_uuid]) {
-                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset - element.start_offset)
-                        this.transformEngine.clips[element.object_uuid].step(object)
+                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset - element.start_offset);
+                        this.transformEngine.clips[element.object_uuid].step(object, element.start_offset, this.scrubberPosition);
                     }
                 }
                 else if (element.type == "audio") {
