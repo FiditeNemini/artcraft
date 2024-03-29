@@ -67,7 +67,10 @@ export const PageEnigmaComponent = () => {
                   <div className="absolute bottom-0 left-0 w-full">
                     <PreviewEngineCamera />
                     <ControlsVideo />
-                    <ControlPanelSceneObject isShowing={true}/>
+                    <ControlPanelSceneObject
+                      isShowing={appUiState.currentSceneObject.isShowing}
+                      {...appUiState.currentSceneObject.objectVectors}
+                    />
                   </div>
                 </div>
                 {

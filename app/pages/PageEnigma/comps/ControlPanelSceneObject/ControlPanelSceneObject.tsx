@@ -4,20 +4,25 @@ import { faArrowRightArrowLeft, faCube, faTrash} from "@fortawesome/pro-solid-sv
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, H4, InputVector } from "~/components";
 
+import { XYZ } from '../../datastructures/common';
+
 interface ControlPanelSceneObjectProps {
+  position?: XYZ;
+  rotation?: XYZ;
+  scalar?: XYZ;
   isShowing:boolean;
 }
-type XYZ = {
-  x: number;
-  y: number;
-  z: number;
-}
+
+
 export const ControlPanelSceneObject = ({
+  position: propsPosition = {x:0,y:0,z:0},
+  rotation: propsRotation = {x:0,y:0,z:0},
+  scalar: propsScalar = {x:0,y:0,z:0},
   isShowing,
 }: ControlPanelSceneObjectProps) => {
-  const [position, setPosition] = useState<XYZ>({x:0,y:0,z:0});
-  const [rotation, setRotation] = useState<XYZ>({x:0,y:0,z:0});
-  const [scalar, setScalar] = useState<XYZ>({x:0,y:0,z:0});
+  const [position, setPosition] = useState<XYZ>(propsPosition);
+  const [rotation, setRotation] = useState<XYZ>(propsRotation);
+  const [scalar, setScalar] = useState<XYZ>(propsScalar);
 
   const handlePositionChange = (xyz:XYZ)=>{
     console.log(xyz);

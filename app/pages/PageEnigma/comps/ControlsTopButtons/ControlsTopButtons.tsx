@@ -63,7 +63,24 @@ export const ControlsTopButtons = () => {
   };
 
   const handleObjectPanelTest = () => {
-    
+    if (appUiState?.currentSceneObject.isShowing) {
+      dispatchAppUiState({
+        type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT
+      });
+    }else{
+      dispatchAppUiState({
+        type:APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
+        payload:{
+          currentSceneObject:{
+            objectVectors: {
+              position: {x:1,y:2,z:3},
+              rotation: {x:4,y:5,z:6},
+              scalar: {x:7,y:8,z:9},
+            }
+          }
+        }
+      });
+    }
   }
 
   const handleButtonCameraView = () => {

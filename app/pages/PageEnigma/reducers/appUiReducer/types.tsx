@@ -1,3 +1,4 @@
+import { XYZ } from "../../datastructures/common";
 export enum VIEW_MODES {
   EDITOR = 'editor',
   SIDE_BY_SIDE = 'side-by-side'
@@ -19,6 +20,14 @@ export type State = {
     progress?: number;
     useFakeTimer?: number;
   }
+  currentSceneObject:{
+    isShowing: boolean;
+    objectVectors: {
+      position:XYZ;
+      rotation:XYZ;
+      scalar: XYZ;
+    };
+  }
 };
 
 
@@ -30,9 +39,24 @@ export enum ACTION_TYPES {
   SHOW_EDITOR_LOADINGBAR = "show_editor_loadingbar",
   UPDATE_EDITOR_LOADINGBAR = "update_editor_loadingbar",
   HIDE_EDITOR_LOADINGBAR = "hide_editor_loadingbar",
+  SHOW_CONTROLPANELS_SCENEOBJECT = "show_controlpanels_sceneobject",
+  HIDE_CONTROLPANELS_SCENEOBJECT = "hide_controlpanels_sceneobject",
 };
 
-export type Action = 
+export type Action =
+  | {type: ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT}
+  | {
+      type: ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
+      payload:{
+        currentSceneObject: {
+          objectVectors: {
+            position:XYZ;
+            rotation:XYZ;
+            scalar: XYZ;
+          };
+        };
+      }
+    }
   | {type: ACTION_TYPES.HIDE_EDITOR_LOADER,}
   | {
       type: ACTION_TYPES.SHOW_EDITOR_LOADER,
