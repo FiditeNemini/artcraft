@@ -1,13 +1,11 @@
 import { createContext } from "react";
 import {
-  AnimationClip,
-  AudioClip,
   AudioGroup,
-  BaseClip,
   CameraGroup,
   CharacterGroup,
   ObjectGroup,
   ObjectTrack,
+  MediaClip,
 } from "~/pages/PageEnigma/models/track";
 
 export const TrackContext = createContext<{
@@ -23,13 +21,13 @@ export const TrackContext = createContext<{
   addCharacterAnimation: (options: {
     clipId: string;
     characterId: string;
-    animationClips: BaseClip[];
+    animationClips: MediaClip[];
     offset: number;
   }) => void;
   addCharacterAudio: (options: {
     clipId: string;
     characterId: string;
-    audioClips: BaseClip[];
+    audioClips: MediaClip[];
     offset: number;
   }) => void;
   selectCharacterClip: (clipId: string) => void;
@@ -55,7 +53,7 @@ export const TrackContext = createContext<{
   toggleAudioMute: () => void;
   addGlobalAudio: (
     clipId: string,
-    animationClips: BaseClip[],
+    animationClips: MediaClip[],
     offset: number,
   ) => void;
   selectAudioClip: (clipId: string) => void;
@@ -71,8 +69,8 @@ export const TrackContext = createContext<{
   selectClip: (clipId: string) => void;
 
   // sidebar clips
-  animationClips: AnimationClip[];
-  audioClips: AudioClip[];
+  animationClips: MediaClip[];
+  audioClips: MediaClip[];
 
   // drag and drop
   startDrag: (

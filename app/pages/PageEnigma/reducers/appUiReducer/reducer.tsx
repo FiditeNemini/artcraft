@@ -2,6 +2,33 @@ import { State, Action, ACTION_TYPES} from './types';
 
 export function reducer(state: State, action: Action): State {
   switch(action.type){
+    case ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT:{
+      return{
+        ...state,
+        currentSceneObject: {
+          isShowing: true,
+          objectVectors: {...action.payload.currentSceneObject.objectVectors},
+        },
+      }
+    }
+    case ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT:{
+      return{
+        ...state,
+        currentSceneObject: {
+          isShowing: state.currentSceneObject.isShowing,
+          objectVectors: {...action.payload.currentSceneObject.objectVectors},
+        },
+      }
+    }
+    case ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT:{
+      return{
+        ...state,
+        currentSceneObject: {
+          isShowing: false,
+          objectVectors: state.currentSceneObject.objectVectors,
+        },
+      }
+    }
     case ACTION_TYPES.SHOW_EDITOR_LOADER:{
       return{
         ...state,

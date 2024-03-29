@@ -21,15 +21,6 @@ export const ControlsTopButtons = () => {
     editorEngine?.loadScene(sceneToken);
   };
 
-
-  const handleButtonCameraView = () => {
-    editorEngine?.switchCameraView();
-  };
-
-  const handleButtonPlayBack = () => {
-    editorEngine?.start_playback();
-  };
-
   const handleButtonTest = () => {
     if(appUiState?.showEditorLoadingBar.isShowing){
       //TO GO TO A HUNDRED AND DISAPPER
@@ -71,20 +62,42 @@ export const ControlsTopButtons = () => {
     }
   };
 
+  const handleObjectPanelTest = () => {
+    if (appUiState?.currentSceneObject.isShowing) {
+      dispatchAppUiState({
+        type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT
+      });
+    }else{
+      dispatchAppUiState({
+        type:APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
+        payload:{
+          currentSceneObject:{
+            objectVectors: {
+              position: {x:1,y:2,z:3},
+              rotation: {x:4,y:5,z:6},
+              scalar: {x:7,y:8,z:9},
+            }
+          }
+        }
+      });
+    }
+  }
+
+  const handleButtonCameraView = () => {
+    editorEngine?.switchCameraView();
+  };
+  const handleButtonPlayBack = () => {
+    editorEngine?.startPlayback();
+  };
   const handleButtonRender = () => {
+    editorEngine?.generateVideo();
+  };
+
+  const handleButtonTakeFrame = () => {
     editorEngine?.take_timeline_cam_clip();
   };
-  const handleButtonPlay = () => {
-    editorEngine?.start_playback();
-  };
-
-
-  // const handleButtonCameraView = () => {
-  //   editorEngine?.change_camera_view();
-  // };
 
   const handleButtonLoad = () => {};
-  // const handleButtonRender = () => {};
 
   return (
     <div className="flex flex-col gap-2 pl-3 pt-3">
@@ -143,12 +156,18 @@ export const ControlsTopButtons = () => {
         <Button variant="secondary" onClick={handleButtonCameraView}>
           Toggle Camera View
         </Button>
+        <Button
+          onClick={handleObjectPanelTest}
+          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
+        >
+          Show Object Panel
+        </Button>
       </div>
       <div className="flex gap-2">
 
-        <Button onClick={handleButtonLoad}>Load</Button>
-        <Button onClick={handleButtonRender}>Take Frame</Button>
-        <Button onClick={handleButtonPlay}>Play</Button>
+        <Button onClick={handleButtonLoad}>Test Button</Button>
+        <Button onClick={handleButtonTakeFrame}>Take Frame</Button>
+        <Button onClick={handleButtonRender}>Render</Button>
         {/* <Button onClick={handleButtonLoad}>Load</Button>
         <Button onClick={handleButtonRender}>Render</Button> */}
         <Button

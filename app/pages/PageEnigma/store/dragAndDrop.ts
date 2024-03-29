@@ -7,3 +7,11 @@ export const overTimeline = signal(false);
 export const dropId = signal("");
 export const dropOffset = signal(0);
 export const clipLength = signal(0);
+export const initPosition = signal<{ initX: number; initY: number }>({
+  initX: 0,
+  initY: 0,
+});
+export const currPosition = signal<{ currX: number; currY: number }>({
+  currX: 0,
+  currY: 0,
+});

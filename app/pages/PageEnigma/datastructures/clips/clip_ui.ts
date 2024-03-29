@@ -3,39 +3,45 @@
 export class ClipUI {
   version: number
   type: "transform" | "audio" | "animation" | "lipsync"
+  group: "character" | "object" | "camera" | "global_audio"
   name: string
   media_id: string
   object_uuid: string
-  start_offset: number // in frames
-  ending_offset: number  // in frames
+  offset: number // in frames
+  length: number  // in frames
 
   constructor(
     version: number,
     type: "transform" | "audio" | "animation" | "lipsync",
+    group: "character" | "object" | "camera" | "global_audio",
     name: string,
     media_id: string,
     object_uuid: string,
-    start_offset: number,
-    ending_offset: number,
+    offset: number,
+    length: number,
   ) {
     this.version = version
-    this.name = name
-    this.type = type
-    this.object_uuid = object_uuid
-    this.media_id = media_id
-    this.start_offset = start_offset
-    this.ending_offset = ending_offset
+    this.group = group // Only needed for UI
+
+    this.name = name // UI
+    this.type = type // UI and Animation / Audio / Lipsync /  : Engine
+
+    this.object_uuid = object_uuid // Animation / Audio / Lipsync /  : Engine
+    this.media_id = media_id //  Animation / Audio / Lipsync /  : Engine
+    this.offset = offset
+    this.length = length
   }
 
   toJSON(): string {
     return JSON.stringify({
       version: this.version,
+      group:this.group,
       name: this.name,
       type: this.type,
       object_uuid: this.object_uuid,
       media_id: this.media_id,
-      start_offset: this.start_offset,
-      ending_offset: this.ending_offset
+      start_offset: this.offset,
+      ending_offset: this.length
     })
   }
 }

@@ -1,7 +1,7 @@
 import { TrackClip } from "~/pages/PageEnigma/comps/Timeline/TrackClip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
-import { BaseClip } from "~/pages/PageEnigma/models/track";
+import { Clip } from "~/pages/PageEnigma/models/track";
 import { PointerEvent } from "react";
 import {
   canDrop,
@@ -15,7 +15,7 @@ import {
 
 interface Props {
   id: string;
-  clips: BaseClip[];
+  clips: Clip[];
   title: string;
   style: "character" | "audio" | "camera" | "objects";
   type?: "animations" | "positions" | "lipSync";
@@ -94,7 +94,7 @@ export const TrackClips = ({
       >
         {clips.map((clip, index) => (
           <TrackClip
-            key={clip.id}
+            key={clip.clip_uuid}
             min={
               index > 0 ? clips[index - 1].offset + clips[index - 1].length : 0
             }

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { 
   Button,
   ButtonLink,
-  H4, 
+  H1,H2,H3,H4,H5,H6,P,Label,
   LoadingBar,
   LoadingDotsTyping,
   LoadingDotsBricks,
@@ -35,65 +35,84 @@ export default function ComponentLibrary () {
   },[progress]);
 
   return(
-    <div className='bg-ui-panel w-10/12 max-w-7xl h-full min-h-96 mx-auto my-6 rounded-lg p-6'>
+    <div
+      className="fixed w-full overflow-scroll"
+      style={{height: "calc(100% - 72px)"}}
+    >
+      <div
+        className='bg-ui-panel w-10/12 max-w-7xl mx-auto my-6 rounded-lg p-6'
+      >
 
-      <div className="flex flex-col gap-2 mb-4">
-        <H4>Buttons</H4>
-        <div className="flex gap-2">
-          <Button>Primary</Button>
-          <Button variant="secondary">Secondary</Button>
-          <Button className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary">
-            Prelim Tertiary
-          </Button>
-          <Button disabled>Disabled</Button>
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-2 mb-4">
-        <H4>ButtonLink</H4>
-        <ButtonLink to="/">Back to /</ButtonLink>
-      </div>
-
-      <div className="flex flex-col gap-2 mb-4">
-        <H4>Loading Dots</H4>
-        <div className="flex gap-2">
-          <div className="w-60 h-40 rounded-lg overflow-hidden">
-            <LoadingDotsTyping />
+        <div className="flex flex-col gap-2 mb-4">
+          <H1>Typography</H1>
+          <H1>H1. This is an H1 Heading</H1>
+          <H2>H2. This is an H2 Heading</H2>
+          <H3>H3. This is an H3 Heading</H3>
+          <H4>H4. This is an H4 Heading</H4>
+          <Label>Label. Is essentially same as H4</Label>
+          <P>P. Is an normal Paragraph</P>
+          <H5>H5. This is an H5 Heading</H5>
+          <H6>H6. This is an H6 Heading</H6>
+    
+          <hr className="mt-2 mb-4"/>
+          <H1>Components</H1>
+          <H4>Buttons</H4>
+          <div className="flex gap-2">
+            <Button>Primary</Button>
+            <Button variant="secondary">Secondary</Button>
+            <Button className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary">
+              Prelim Tertiary
+            </Button>
+            <Button disabled>Disabled</Button>
           </div>
-          <div className="w-60 h-40 rounded-lg overflow-hidden">
-            <LoadingDotsBricks />
+        </div>
+
+        <div className="flex flex-col gap-2 mb-4">
+          <H4>ButtonLink</H4>
+          <ButtonLink to="/">Back to /</ButtonLink>
+        </div>
+
+        <div className="flex flex-col gap-2 mb-4">
+          <H4>Loading Dots</H4>
+          <div className="flex gap-2">
+            <div className="w-60 h-40 rounded-lg overflow-hidden">
+              <LoadingDotsTyping />
+            </div>
+            <div className="w-60 h-40 rounded-lg overflow-hidden">
+              <LoadingDotsBricks />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="flex flex-col gap-2 mb-4">
-        <H4>Loading Bar</H4>
-        <div className="flex gap-2 items-center">
+        <div className="flex flex-col gap-2 mb-4">
+          <H4>Loading Bar</H4>
+          <div className="flex gap-2 items-center">
+            <LoadingBar
+              progress={progress}
+              isShowing={progress !== 100}
+              wrapperClassName="rounded-lg"
+              message="this takes progress from parent"
+            />
+            <Button
+              className="h-fit"
+              onClick={()=>setProgress(0)}
+            >
+              Reset
+            </Button>
+          </div>
           <LoadingBar
-            progress={progress}
-            isShowing={progress !== 100}
-            wrapperClassName="rounded-lg"
-            message="this takes progress from parent"
+            label="labeling the bar"
+            message="displaying a message"
           />
-          <Button
-            className="h-fit"
-            onClick={()=>setProgress(0)}
-          >
-            Reset
-          </Button>
+          <LoadingBar
+            label="useFakeTimer = 30000 (30secs)"
+            useFakeTimer={30000}
+          />
+          <LoadingBar
+            label="useFakeTimer = 3000 (3secs)"
+            useFakeTimer={3000}
+          />
         </div>
-        <LoadingBar
-          label="labeling the bar"
-          message="displaying a message"
-        />
-        <LoadingBar
-          label="useFakeTimer = 30000 (30secs)"
-          useFakeTimer={30000}
-        />
-        <LoadingBar
-          label="useFakeTimer = 3000 (3secs)"
-          useFakeTimer={3000}
-        />
       </div>
     </div>
   );
