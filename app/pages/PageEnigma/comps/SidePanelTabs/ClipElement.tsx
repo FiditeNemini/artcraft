@@ -49,7 +49,6 @@ export const ClipElement = ({ clip, type }: Props) => {
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
-        console.log("X", event.clientX);
         startDrag(type, clip.media_id, clip.length);
         currPosition.value = {
           currX: event.pageX,
