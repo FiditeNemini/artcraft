@@ -11,5 +11,13 @@ export const initialStateValues : State = {
     isShowing:true,
     progress:5,
     message: 'Loading Editor Engine 🦊'
+  },
+  currentSceneObject:{
+    isShowing:false,
+    objectVectors:{
+      position:{x:0,y:0,z:0},
+      rotation:{x:0,y:0,z:0},
+      scalar:{x:0,y:0,z:0},
+    }
   }
 }

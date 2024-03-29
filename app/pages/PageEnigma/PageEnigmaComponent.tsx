@@ -5,12 +5,16 @@ import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 import { Button, LoadingBar, LoadingDots } from "~/components";
 import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
 import { SidePanel } from "~/modules/SidePanel";
+
 import { Controls3D } from "./comps/Controls3D";
 import { ControlsTopButtons } from "./comps/ControlsTopButtons";
 import { ControlsVideo } from "./comps/ControlsVideo";
+import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
-import { Timeline } from "./comps/Timeline";
+import { ViewSideBySide } from "./comps/ViewSideBySide";
 import { SidePanelTabs } from "./comps/SidePanelTabs";
+import { Timeline } from "./comps/Timeline";
+
 
 import { EngineProvider } from "./contexts/EngineProvider";
 import { AppUIProvider } from "./contexts/AppUiContext";
@@ -19,7 +23,6 @@ import {
   appUiInitialStateValues,
   APPUI_VIEW_MODES,
 } from "./reducers";
-import { ViewSideBySide } from "./comps/ViewSideBySide";
 import {
   canDrop,
   clipLength,
@@ -52,7 +55,7 @@ export const PageEnigmaComponent = () => {
           <div style={{ height: "calc(100vh - 68px)" }}>
             {/* Engine section/side panel */}
             <div
-              id="CanvasUiWrapper"
+              id="engine-n-panels-wrapper"
               className="flex"
               style={{ height: `calc(100% - ${lowerHeight}px)` }}
             >
@@ -78,6 +81,7 @@ export const PageEnigmaComponent = () => {
                   <div className="absolute bottom-0 left-0 w-full">
                     <PreviewEngineCamera />
                     <ControlsVideo />
+                    <ControlPanelSceneObject/>
                   </div>
                 </div>
                 {appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE && (

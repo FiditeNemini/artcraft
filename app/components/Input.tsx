@@ -13,13 +13,7 @@ export function Input({ label, className, ...rest }: InputProps) {
       )}
 
       <input
-        className="h-10 rounded-md bg-brand-secondary p-3 text-white"
-        style={{
-          outline: "2px solid transparent",
-          transition: "outline-color 0.15s ease-in-out",
-        }}
-        onFocus={(e) => (e.currentTarget.style.outlineColor = "#e66462")}
-        onBlur={(e) => (e.currentTarget.style.outlineColor = "transparent")}
+        className="h-10 rounded-md bg-brand-secondary p-3 text-white transition-all duration-150 ease-in-out outline-none outline-offset-0 focus:outline-brand-primary"
         {...rest}
       />
     </div>
