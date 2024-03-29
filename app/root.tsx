@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Transition } from "@headlessui/react";
 import { LinksFunction } from "@remix-run/deno";
 import {
   Links,
@@ -47,12 +48,10 @@ export const links: LinksFunction = () => [
 export default function App() {
   const [topBarInnerComponent, setTopBarInnerComponent] =
   useState<JSX.Element | null>(null);
-  const [isLoaded, setIsLoaded] = useState<'loading'|'loaded'|'completed'>('loading');
+  const [showLoader, setShowLoader] = useState<boolean>(true);
   useEffect(()=>{
-    setIsLoaded('loaded');
-    setTimeout(()=>setIsLoaded('completed'), 2000);
+    setTimeout(()=>setShowLoader(false), 2500);
   },[]);
-
 
   return (
     <html lang="en">
@@ -63,15 +62,7 @@ export default function App() {
         <Links />
       </head>
       <body className="overflow-hidden bg-ui-background">
-        {isLoaded !== 'completed' && 
-          <CompleteTakeoverLoadingScreen 
-            className={
-              isLoaded === 'loading'
-                ? "transition-opacity duration-1000 opacity-100"
-                : "transition-opacity duration-1000 opacity-0"
-            }
-          />
-        }
+        <CompleteTakeoverLoadingScreen isShowing={showLoader}/>
         <TopBarInnerContext.Provider
           value={{
             TopBarInner: topBarInnerComponent,
@@ -89,11 +80,17 @@ export default function App() {
   );
 }
 
-function CompleteTakeoverLoadingScreen({className}:{className:string}){
+function CompleteTakeoverLoadingScreen({isShowing}:{isShowing:boolean}){
   return(
-    <div
+    <Transition
       id='complete-takeover-loading-screen'
-      className={className}
+      show={isShowing}
+      enter="transition-opacity duration-150"
+      enterFrom="opacity-0"
+      enterTo="opacity-100"
+      leave="transition-opacity duration-1000"
+      leaveFrom="opacity-100"
+      leaveTo="opacity-0"
       style={{
         backgroundColor: '#1a1a27',
         position: 'fixed',
@@ -107,7 +104,7 @@ function CompleteTakeoverLoadingScreen({className}:{className:string}){
         zIndex: 9999,
       }}
     >
-        <LoadingDotsBricks />
-    </div>
+      <LoadingDotsBricks />
+    </Transition>
   );
 };

@@ -72,7 +72,7 @@ export class TimeLine {
         scene: Scene) {
         
         this.timelineItems = []
-        this.timeLineLimit = 60 * 10 // 10 seconds
+        this.timeLineLimit = 60 * 5 // 5 seconds
      
         this.isPlaying = false
         this.scrubberPosition = 0 // in frames into the tl
@@ -151,7 +151,7 @@ export class TimeLine {
             else if (element.type == "animation") {
             }
             else if (element.type == "lipsync") {
-                
+                this.lipSyncEngine.clips[element.object_uuid].reset();
             }
             else {
                 this.stop()
@@ -179,13 +179,17 @@ export class TimeLine {
                 let object = this.scene.get_object_by_uuid(element.object_uuid)
                 if (element.type == "transform") {
                     if (object && this.transformEngine.clips[element.object_uuid]) {
-                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset - element.start_offset)
-                        this.transformEngine.clips[element.object_uuid].step(object)
+                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset - element.start_offset);
+                        this.transformEngine.clips[element.object_uuid].step(object, element.start_offset, this.scrubberPosition);
                     }
                 }
                 else if (element.type == "audio") {
-                    // global audio track
-                    this.audioEngine.playClip(element.media_id)
+                    if(this.scrubberPosition+1 >= element.ending_offset){
+                        this.audioEngine.stopClip(element.media_id);
+                    }
+                    else {
+                        this.audioEngine.playClip(element.media_id);
+                    }
                 }
                 else if (element.type == "lipsync") {
                     if(this.scrubberPosition+1 >= element.ending_offset){

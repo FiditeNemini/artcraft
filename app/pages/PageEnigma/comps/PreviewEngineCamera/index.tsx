@@ -8,7 +8,7 @@ export const PreviewEngineCamera = ()=>{
 
   const [showLoader, setShowLoader] = useState<boolean>(true);
   useEffect(()=>{
-    setTimeout(()=>setShowLoader(false), 5000);
+    setTimeout(()=>setShowLoader(false), 500);
   },[]);
   return (
     <div
@@ -29,7 +29,7 @@ export const PreviewEngineCamera = ()=>{
             src="/resources/uiAssets/video_player_placeholder.gif"
           />
           <div className="absolute w-full h-full top-0 left-0">
-            <LoadingDotsTyping show={showLoader} transition/>
+            <LoadingDotsTyping isShowing={showLoader}/>
           </div>
         </div>
       </div>
