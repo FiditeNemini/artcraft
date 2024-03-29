@@ -7,25 +7,34 @@ import { Button, H4, InputVector } from "~/components";
 interface ControlPanelSceneObjectProps {
   isShowing:boolean;
 }
-
+type XYZ = {
+  x: number;
+  y: number;
+  z: number;
+}
 export const ControlPanelSceneObject = ({
   isShowing,
 }: ControlPanelSceneObjectProps) => {
-  const [position, setPosition] = useState<{x:number;y:number;z:number}>({
-    x:0,y:0,z:0
-  });
-  const handlePositionChange = (v:{
-    x: number;
-    y: number;
-    z: number;
-  })=>{
-    console.log(v);
-    setPosition(v);
+  const [position, setPosition] = useState<XYZ>({x:0,y:0,z:0});
+  const [ratation, setRotation] = useState<XYZ>({x:0,y:0,z:0});
+  const [scalar, setScalar] = useState<XYZ>({x:0,y:0,z:0});
+
+  const handlePositionChange = (xyz:XYZ)=>{
+    console.log(xyz);
+    setPosition(xyz);
+  }
+  const handleRotationChange = (xyz:XYZ)=>{
+    console.log(xyz);
+    setRotation(xyz);
+  }
+  const handleScalarChange = (xyz:XYZ)=>{
+    console.log(xyz);
+    setScalar(xyz);
   }
   return(
     <Transition
       show={true}
-      className="absolute bottom-0 right-0 w-fit h-60 m-4 p-2 bg-ui-panel border border-ui-panel-border text-white rounded-lg flex flex-col"
+      className="absolute bottom-0 right-0 w-fit h-fit m-4 p-2 bg-ui-panel border border-ui-panel-border text-white rounded-lg flex flex-col gap-2"
       enter="transition-opacity duration-150"
       enterFrom="opacity-0"
       enterTo="opacity-100"
@@ -33,7 +42,7 @@ export const ControlPanelSceneObject = ({
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
     >
-      <div className="flex  justity-between gap-2">
+      <div className="flex justify-between gap-2">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube}/>
           <p>Scene Object Name</p>
@@ -43,6 +52,7 @@ export const ControlPanelSceneObject = ({
           <p>Swap Object</p>
         </div>
       </div>
+      <span className='h-1'/>
       <H4>Position</H4>
       <InputVector
         x={position.x}
@@ -51,8 +61,21 @@ export const ControlPanelSceneObject = ({
         onChange={handlePositionChange}
       />
       <H4>Rotation</H4>
+      <InputVector
+        x={position.x}
+        y={position.y}
+        z={position.z}
+        onChange={handleRotationChange}
+      />
       <H4>Scale</H4>
-      <div className="flex  justity-between gap-2">
+      <InputVector
+        x={position.x}
+        y={position.y}
+        z={position.z}
+        onChange={handleScalarChange}
+      />
+      <span className='h-2'/>
+      <div className="flex justity-between gap-2">
         <Button variant="secondary">Add Keyframe (K)</Button>
         <Button variant="secondary" icon={faTrash} />
       </div>
