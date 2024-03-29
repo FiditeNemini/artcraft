@@ -273,7 +273,7 @@ class Editor {
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
     if (this.cam_obj) {
-      this.add_transform_clip_base("Camera Object", this.cam_obj, 0, 150)
+      this.addTransformClipBase("Camera Object", "camera",this.cam_obj, 0, 150)
     }
 
     // saving state of the scene
@@ -298,7 +298,7 @@ class Editor {
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
     if (this.cam_obj) {
-      this.add_transform_clip_base("Camera Object", this.cam_obj, 0, 150);
+      this.addTransformClipBase("Camera Object","camera", this.cam_obj, 0, 150);
     }
 
     this.dispatchAppUiState({
@@ -447,6 +447,7 @@ class Editor {
       new ClipUI(
         1.0,
         "lipsync",
+        "character",
         "clip1",
         "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
         object.uuid,
@@ -457,7 +458,7 @@ class Editor {
 
     // media id for this is up in the air but when a path is created you should be able to store and delete it
     this.timeline.addPlayableClip(
-      new ClipUI(1.0, "transform", "clip2", object.uuid, object.uuid, 0, 150),
+      new ClipUI(1.0, "transform","character", "clip2", object.uuid, object.uuid, 0, 150),
     );
 
     // media id for this as well it can be downloaded
@@ -465,6 +466,7 @@ class Editor {
       new ClipUI(
         1.0,
         "animation",
+        "character",
         "clip3",
         "/resources/models/fox/fox_idle.glb",
         object.uuid,
@@ -524,24 +526,26 @@ class Editor {
     }
   }
 
-  async add_transform_clip_base(
+  async addTransformClipBase(
     name: string = "New Clip",
+    group: "object" | "character" | "camera" | "global_audio",
     object: THREE.Object3D,
-    start_offset: number,
-    end_offset: number,
+    offset: number,
+    length: number,
   ) {
     this.timeline.addPlayableClip(
       new ClipUI(
         1.0,
         "transform",
-        "clip2",
-        object.uuid,
-        object.uuid,
-        start_offset,
-        end_offset,
+        group,
+        name,
+        object.uuid, // object id here ...
+        object.uuid,// Need to change to media id ....
+        offset,
+        length,
       ),
     );
-    this.transform_engine.loadObject(object.uuid, end_offset);
+    this.transform_engine.loadObject(object.uuid, length);
   }
 
   async _test_demo() {
@@ -570,6 +574,7 @@ class Editor {
       new ClipUI(
         1.0,
         "lipsync",
+        "character",
         "clip1",
         "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
         object.uuid,
@@ -580,7 +585,7 @@ class Editor {
 
     // media id for this is up in the air but when a path is created you should be able to store and delete it
     this.timeline.addPlayableClip(
-      new ClipUI(1.0, "transform", "clip2", object.uuid, object.uuid, 0, 150),
+      new ClipUI(1.0, "transform","character", "clip2", object.uuid, object.uuid, 0, 150),
     );
 
     // media id for this as well it can be downloaded
@@ -588,6 +593,7 @@ class Editor {
       new ClipUI(
         1.0,
         "animation",
+        "character",
         "clip3",
         "/resources/models/fox/fox_idle.glb",
         object.uuid,
@@ -602,6 +608,7 @@ class Editor {
     await this.timeline.addPlayableClip(new ClipUI(
       1.0,
       "audio",
+      "global_audio",
       "AudioClip",
       "m_h33vytxs5eqqqf07nsy14qzrf9ww4v",
       "",
@@ -815,18 +822,18 @@ class Editor {
     let endFrame = clip.length;
 
 
-    if (endFrame > this.timeline.timeLineLimit) {
-      endFrame = this.timeline.timeLineLimit;
+    if (endFrame > this.timeline.timeline_limit) {
+      endFrame = this.timeline.timeline_limit;
     }
-    if (startFrame > this.timeline.timeLineLimit) {
-      startFrame = this.timeline.timeLineLimit-1;
+    if (startFrame > this.timeline.timeline_limit) {
+      startFrame = this.timeline.timeline_limit-1;
     }
 
     const startTime = startFrame / this.cap_fps;
     const endTime = endFrame / this.cap_fps;
     let end = endTime - startTime;
 
-    let duration = this.timeline.timeLineLimit / this.cap_fps;
+    let duration = this.timeline.timeline_limit / this.cap_fps;
 
     let audioSegment = "as_" + wav_name;
     await ffmpeg.FS('writeFile', wav_name, await fetchFile(await this.api_manager.getMediaFile(clip.media_id)));
@@ -934,7 +941,7 @@ class Editor {
 
   startPlayback() {
     this.timeline.is_playing = true;
-    this.timeline.scrubberPosition = 0;
+    this.timeline.scrubber_frame_position = 0;
     if (!this.camera_person_mode) {
       this.switchCameraView();
     }
