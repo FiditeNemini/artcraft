@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import PageHeader from 'components/layout/PageHeader';
-import { Button, Container, Input, Panel, TextAreaV2 } from "components/common";
+import { Button, Container, Input, Panel } from "components/common";
 import { WebUrl } from "../../../../common/WebUrl";
 import {
   ModerationTokenInfo,
@@ -16,12 +16,18 @@ function ModerationTokenInfoPage(props: Props) {
   const [token, setToken] = useState<string>("");
   const [payload, setPayload] = useState<string>("");
 
-  const doLookup = async () => {
+  const doLookup = async (
+    ev: any
+  ) => {
+    ev.preventDefault();
+
     let response = await ModerationTokenInfo(token, {});
 
     if (!!response.maybe_payload) {
       setPayload(response.maybe_payload);
     }
+
+    return false;
   };
 
   const onChange = (
@@ -38,8 +44,10 @@ function ModerationTokenInfoPage(props: Props) {
   let textareaContents = "";
 
   if (!!payload) {
-    textareaContents = JSON.parse(JSON.stringify(payload, null, "\t"));
+    textareaContents = JSON.stringify(JSON.parse(payload), null, 4);
   }
+
+  console.log(textareaContents);
 
   return (
     <Container type="panel" className="mb-5">
@@ -50,30 +58,50 @@ function ModerationTokenInfoPage(props: Props) {
       }}/>
       <Panel {...{ padding: true }}>
 
-        <Input 
-          label="Token"
-          icon={faDatabase}
-          onChange={onChange}
-          value={token}
-        />
+        <form
+          onSubmit={doLookup}
+        >
+          <div className="container">
+            <div className="row">
+              <div className="col-sm-8">
+                <Input 
+                  icon={faDatabase}
+                  onChange={onChange}
+                  placeholder="any token or username"
+                  value={token}
+                />
+              </div>
+
+              <div className="col-sm-4">
+                <Button
+                  label="Do Lookup"
+                  onClick={doLookup}
+                />
+              </div>
+            </div>
+          </div>
+        </form>
 
         <br />
         <br />
 
-        <Button
-          label="Do Lookup"
-          onClick={doLookup}
-        />
+        <pre 
+          className="px-md-5"
+          style={{
+            whiteSpace: "pre-wrap",
+            wordWrap: "break-word",
+          }}
+        >
+          {textareaContents}
+        </pre>
 
         <br />
+        <hr />
         <br />
 
-        <TextAreaV2 
-          label="Search Result"
-          value={textareaContents}
-        />
+        <p>The above results are not raw database columns, but rather the output of lookup 
+          endpoints. Several or more columns may be missing from the records.</p>
 
-        <pre>{textareaContents}</pre>
 
       </Panel>
     </Container>
