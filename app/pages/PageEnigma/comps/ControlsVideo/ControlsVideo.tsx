@@ -1,3 +1,5 @@
+import { useContext } from "react";
+
 import {
   faBackwardFast,
   faBackwardStep,
@@ -5,9 +7,12 @@ import {
   faForwardStep,
   faPlay,
 } from "@fortawesome/pro-solid-svg-icons";
+import { EngineContext } from "../../contexts/EngineContext";
 import { ButtonIcon } from "~/components";
 
 export const ControlsVideo = () => {
+  const editorEngine = useContext(EngineContext);
+  
   const handleBackwardFast = () => {
     console.log("Controls Video: Backward-Fast clicked");
   };
@@ -16,6 +21,8 @@ export const ControlsVideo = () => {
   };
   const handlePlay = () => {
     console.log("Controls Video: Play clicked");
+    editorEngine?.startPlayback();
+    
   };
   const handleForwardStep = () => {
     console.log("Controls Video: Forward-Step clicked");

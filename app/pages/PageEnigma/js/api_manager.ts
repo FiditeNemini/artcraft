@@ -162,7 +162,7 @@ class APIManager {
    * @param media_file_token
    * @returns
    */
-  private async getMediaFile(media_file_token: string): Promise<string> {
+  public async getMediaFile(media_file_token: string): Promise<string> {
     let api_base_url = "https://api.fakeyou.com";
     let url = `${api_base_url}/v1/media_files/file/${media_file_token}`;
     let response = await fetch(url);
