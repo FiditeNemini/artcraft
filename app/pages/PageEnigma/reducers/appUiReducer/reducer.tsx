@@ -11,6 +11,15 @@ export function reducer(state: State, action: Action): State {
         },
       }
     }
+    case ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT:{
+      return{
+        ...state,
+        currentSceneObject: {
+          isShowing: state.currentSceneObject.isShowing,
+          objectVectors: {...action.payload.currentSceneObject.objectVectors},
+        },
+      }
+    }
     case ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT:{
       return{
         ...state,

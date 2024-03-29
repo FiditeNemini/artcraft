@@ -36,11 +36,20 @@ export enum ACTION_TYPES {
   UPDATE_EDITOR_LOADINGBAR = "update_editor_loadingbar",
   HIDE_EDITOR_LOADINGBAR = "hide_editor_loadingbar",
   SHOW_CONTROLPANELS_SCENEOBJECT = "show_controlpanels_sceneobject",
+  UPDATE_CONTROLPANELS_SCENEOBJECT = "update_controlpanels_sceneobject",
   HIDE_CONTROLPANELS_SCENEOBJECT = "hide_controlpanels_sceneobject",
 };
 
 export type Action =
   | {type: ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT}
+  | {
+      type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
+      payload:{
+        currentSceneObject: {
+          objectVectors: Simple3DVector;
+        };
+      }
+    }
   | {
       type: ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
       payload:{

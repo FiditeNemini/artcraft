@@ -7,6 +7,7 @@ import { AppUiContext } from '../../contexts/AppUiContext';
 import { Button, H4, H6, InputVector } from "~/components";
 
 import { XYZ } from '../../datastructures/common';
+import { ACTION_TYPES } from '../../reducers/appUiReducer/types';
 
 
 
@@ -18,16 +19,49 @@ export const ControlPanelSceneObject = () => {
   const scalar = appUiState?.currentSceneObject.objectVectors.scalar;
 
   const handlePositionChange = (xyz:XYZ)=>{
-    console.log(xyz);
-    // setPosition(xyz);
+    if(appUiState)
+      dispatchAppUiState({
+        type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
+        payload:{
+          currentSceneObject:{
+            objectVectors:{
+              position: {...xyz},
+              rotation: appUiState.currentSceneObject.objectVectors.rotation,
+              scalar:appUiState.currentSceneObject.objectVectors.scalar,
+            }
+          }
+        }
+      });
   }
   const handleRotationChange = (xyz:XYZ)=>{
-    console.log(xyz);
-    // setRotation(xyz);
+    if(appUiState)
+      dispatchAppUiState({
+        type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
+        payload:{
+          currentSceneObject:{
+            objectVectors:{
+              position: appUiState.currentSceneObject.objectVectors.position,
+              rotation: {...xyz},
+              scalar:appUiState.currentSceneObject.objectVectors.scalar,
+            }
+          }
+        }
+      });
   }
   const handleScalarChange = (xyz:XYZ)=>{
-    console.log(xyz);
-    // setScalar(xyz);
+    if(appUiState)
+      dispatchAppUiState({
+        type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
+        payload:{
+          currentSceneObject:{
+            objectVectors:{
+              position: appUiState.currentSceneObject.objectVectors.position,
+              rotation: appUiState.currentSceneObject.objectVectors.rotation,
+              scalar:{...xyz},
+            }
+          }
+        }
+      });
   }
 
   return(
