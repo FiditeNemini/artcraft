@@ -12,7 +12,7 @@ import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
 import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
-import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+import { FFmpeg, createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
 import { TimeLine, TimelineDataState } from "./timeline.js";
@@ -517,6 +517,18 @@ class Editor {
         400,
       ),
     );
+
+
+    this.audio_engine.loadClip("m_h33vytxs5eqqqf07nsy14qzrf9ww4v");
+
+    await this.timeline.addPlayableClip(new ClipUI(
+      1.0,
+      "audio",
+      "AudioClip",
+      "m_h33vytxs5eqqqf07nsy14qzrf9ww4v",
+      "",
+      0,
+      50));
   }
 
   // Configure post processing.
@@ -710,6 +722,56 @@ class Editor {
     return blob;
   }
 
+  async convertAudioClip(itteration: number, ffmpeg: FFmpeg, clip: ClipUI) {
+    let video_og = itteration + 'tmp.mp4';
+    let wav_name = itteration + 'tmp.wav';
+    let new_video = (itteration + 1) + 'tmp.mp4';
+    let startFrame = clip.start_offset;
+    let endFrame = clip.ending_offset;
+
+
+    if (endFrame > this.timeline.timeLineLimit) {
+      endFrame = this.timeline.timeLineLimit;
+    }
+    if (startFrame > this.timeline.timeLineLimit) {
+      startFrame = this.timeline.timeLineLimit-1;
+    }
+
+    const startTime = startFrame / this.cap_fps;
+    const endTime = endFrame / this.cap_fps;
+    let end = endTime - startTime;
+
+    let duration = this.timeline.timeLineLimit / this.cap_fps;
+
+    let audioSegment = "as_" + wav_name;
+    await ffmpeg.FS('writeFile', wav_name, await fetchFile(await this.api_manager.getMediaFile(clip.media_id)));
+    await ffmpeg.run('-i',
+      wav_name,
+      '-ss', '0',
+      '-to', '' + end,
+      "-max_muxing_queue_size", "999999",
+      audioSegment);
+
+    await ffmpeg.run('-i', video_og,"-max_muxing_queue_size", "999999", `${itteration}empty_tmp.wav`);
+
+    await ffmpeg.run(
+      '-i', `${itteration}empty_tmp.wav`, 
+      '-i', audioSegment, 
+      '-filter_complex', "[1:a]adelay="+startTime*1000+"|"+startTime*1000+"[a1];[0:a][a1]amix=inputs=2[a]",
+      "-map", "[a]",
+      `${itteration}final_tmp.wav`)
+
+    await ffmpeg.run(
+      '-i', video_og, 
+      '-i', `${itteration}final_tmp.wav`, 
+      '-c:v', 'copy',
+      '-c:a', 'aac',
+      '-map', '0:v:0',
+      '-map', '1:a:0',
+      '-strict', 'experimental',
+      new_video)
+  }
+
   async stopPlayback() {
     this.render_mode();
     let ffmpeg = createFFmpeg({ log: true });
@@ -727,82 +789,53 @@ class Editor {
       "" + this.cap_fps,
       "-i",
       "image%d.png",
-      "0tmp.mp4",
+      "-f",
+      "lavfi",
+      "-i",
+      "anullsrc", // This adds a silent audio track
+      "-max_muxing_queue_size",
+      "999999",
+      "-c:v",
+      "libx264", // Specify video codec (optional, but recommended for MP4)
+      "-c:a",
+      "aac", // Specify audio codec (optional, but recommended for MP4)
+      "-shortest", // Ensure output duration matches the shortest stream (video or audio)
+      "0tmp.mp4"
     );
+
 
     let itteration = 0;
 
     for (const clip of this.timeline.timelineItems) {
-      if (clip.type == "lipsync") {
-        console.log(clip.media_id)
-        for (const [key, value] of Object.entries(this.lipsync_engine.clips)) {
-          if (clip.object_uuid == key && clip.media_id == value.media_id) {
-            await ffmpeg.FS('writeFile', itteration + "tmp.wav", await fetchFile(await this.api_manager.getMediaFile(value.media_id)));
-            let video_og = itteration + 'tmp.mp4';
-            let wav_name = itteration + 'tmp.wav';
-            let new_video = (itteration + 1) + 'tmp.mp4';
-            let startFrame = clip.start_offset;
-            let endFrame = clip.ending_offset;
-
-            const startTime = startFrame / this.cap_fps;
-            const endTime = endFrame / this.cap_fps;
-            let end = endTime - startTime;
-
-            let audioSegment = "new_" + wav_name;
-
-            await ffmpeg.run('-i', wav_name, '-ss', '0', '-to', '' + end, audioSegment);
-            await ffmpeg.run(
-              '-i', video_og,
-              '-itsoffset', `${startTime}`,
-              '-i', audioSegment,
-              '-c:v', 'copy',
-              '-c:a', 'aac',
-              '-strict', 'experimental',
-              new_video
-            );
-            itteration += 1
-          }
-        }
+      if (clip.type == "lipsync" || clip.type == "audio") {
+        await this.convertAudioClip(itteration, ffmpeg, clip);
+        itteration += 1;
       }
     };
-
-    for (const [key, value] of Object.entries(this.lipsync_engine.clips)) {
-      console.log(key, value);
-      if (value.audio_data) {
-        //await ffmpeg.FS('writeFile', itteration+"tmp.wav", await fetchFile(await this.api_manager.getMediaFile(value.media_id)));
-        //let mp4_og = itteration+'tmp.mp4';
-        //let wav_name = itteration+'tmp.wav';
-        //let new_wav =  (itteration+1)+'tmp.mp4';
-        //let startFrame = 0;
-        //let endFrame = 60;
-        //let startTime = startFrame / this.cap_fps;
-        //let endTime = endFrame / this.cap_fps;
-        //await ffmpeg.run('-i', mp4_og, '-ss', startTime.toString(), '-i', wav_name, '-to', endTime.toString(), '-c:v', 'copy', '-c:a', 'aac', new_wav);
-        //itteration += 1
-      }
-    }
 
     let output = await ffmpeg.FS("readFile", itteration + "tmp.mp4");
     // Create a Blob from the output file for downloading
     const blob = new Blob([output.buffer], { type: "video/mp4" });
     const url = URL.createObjectURL(blob);
-
-    //let data = await this.api_manager.uploadMedia(blob, "tmp.wav");
-    //console.log(data);
-    // Create a link to download the file
-
     const downloadLink = document.createElement("a");
     downloadLink.href = url;
-    downloadLink.download = "tmp.mp4";
+    downloadLink.download = "render.mp4";
     document.body.appendChild(downloadLink);
     downloadLink.click();
     // Clean up
     URL.revokeObjectURL(url);
     document.body.removeChild(downloadLink);
+  
+  
+    let data = await this.api_manager.uploadMedia(blob, "tmp.wav");
+    console.log(data);
+    // Create a link to download the file
+
   }
 
   generateVideo() {
     console.log("Generating video...");
+    if (this.rendering) { return; }
     this.startPlayback();
     this._initializeRecording();
     this.rendering = true;
@@ -811,6 +844,7 @@ class Editor {
 
   startPlayback() {
     this.timeline.isPlaying = true;
+    this.timeline.scrubberPosition = 0;
     if (!this.camera_person_mode) {
       this.switchCameraView();
     }
