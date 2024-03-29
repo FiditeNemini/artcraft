@@ -9,7 +9,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-export const SidePanel = ({children}:Props) => {
+export const SidePanel = ({ children }: Props) => {
   const [isVisible, setIsVisible] = useState(true);
 
   return (
@@ -27,7 +27,7 @@ export const SidePanel = ({children}:Props) => {
       <div className="relative w-[23.5rem] h-full">
         {children}
       </div>
-    </div>
 
+    </div>
   );
 };

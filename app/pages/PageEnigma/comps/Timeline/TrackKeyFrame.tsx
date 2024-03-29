@@ -1,5 +1,4 @@
-import { useMouseEventsClip } from "./utils/useMouseEventsClip";
-import { BaseClip } from "~/pages/PageEnigma/models/track";
+import { BaseKeyFrame } from "~/pages/PageEnigma/models/track";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { useContext, useState } from "react";
 import { scale } from "~/pages/PageEnigma/store";
@@ -8,29 +7,35 @@ interface Props {
   min: number;
   max: number;
   style: "character" | "camera" | "audio" | "objects";
-  clip: BaseClip;
+  keyFrame: BaseKeyFrame;
   updateClip: (options: { id: string; offset: number; length: number }) => void;
 }
 
-export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
-  const { selectClip, selectedClip } = useContext(TrackContext);
+export const TrackKeyFrame = ({
+  keyFrame,
+  // min,
+  // max,
+  style,
+  // updateClip,
+}: Props) => {
+  const { selectedClip } = useContext(TrackContext);
+  // const { selectClip, selectedClip } = useContext(TrackContext);
   const [state, setState] = useState({
-    length: clip.length,
-    offset: clip.offset,
+    offset: keyFrame.offset,
   });
-  const { onPointerDown } = useMouseEventsClip(
-    clip,
-    max,
-    min,
-    updateClip,
-    setState,
-  );
+  // const { onPointerDown } = useMouseEventsClip(
+  //   keyFrame,
+  //   max,
+  //   min,
+  //   updateClip,
+  //   setState,
+  // );
 
-  const { length, offset } = state;
+  const { offset } = state;
 
   const classes = [
     "absolute",
-    clip.id === selectedClip ? `bg-${style}-selected` : `bg-${style}-clip`,
+    keyFrame.id === selectedClip ? `bg-${style}-selected` : `bg-${style}-clip`,
   ];
 
   return (
@@ -44,14 +49,14 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
         ].join(" ")}
         style={{ top: -28, left: offset * 4 * scale.value + 2 }}
       >
-        {clip.name}
+        {keyFrame.name}
       </div>
       <button
         className={[
           ...classes,
           "rounded-l-lg",
           "block h-full",
-          clip.id === selectedClip
+          keyFrame.id === selectedClip
             ? "border border-b-2 border-l-2 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -60,14 +65,14 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           left: offset * 4 * scale.value,
           cursor: "w-resize",
         }}
-        onPointerDown={(event) => onPointerDown(event, "left")}
-        onClick={() => selectClip(clip.id)}
+        // onPointerDown={(event) => onPointerDown(event, "left")}
+        // onClick={() => selectClip(clip.id)}
       />
       <button
         className={[
           ...classes,
           "block h-full",
-          clip.id === selectedClip
+          keyFrame.id === selectedClip
             ? "border border-b-2 border-l-0 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -76,15 +81,15 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           left: offset * 4 * scale.value + 15,
           cursor: "move",
         }}
-        onPointerDown={(event) => onPointerDown(event, "drag")}
-        onClick={() => selectClip(clip.id)}
+        // onPointerDown={(event) => onPointerDown(event, "drag")}
+        // onClick={() => selectClip(clip.id)}
       />
       <button
         className={[
           ...classes,
           "rounded-r-lg",
           "block h-full",
-          clip.id === selectedClip
+          keyFrame.id === selectedClip
             ? "border border-b-2 border-l-0 border-r-2 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -93,8 +98,8 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           left: offset * 4 * scale.value + length * 4 * scale.value - 15,
           cursor: "e-resize",
         }}
-        onPointerDown={(event) => onPointerDown(event, "right")}
-        onClick={() => selectClip(clip.id)}
+        // onPointerDown={(event) => onPointerDown(event, "right")}
+        // onClick={() => selectClip(clip.id)}
       />
     </>
   );

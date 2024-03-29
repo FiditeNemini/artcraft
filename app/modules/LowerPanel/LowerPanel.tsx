@@ -1,44 +1,49 @@
-import React, { useCallback, useContext } from "react";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import React, { useCallback } from "react";
+import { useMouseEventsHeight } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsHeight";
+import {
+  currentTime,
+  overTimeline,
+  scale,
+  timelineHeight,
+} from "~/pages/PageEnigma/store";
 
 interface LowerPanelPropsI {
-  timelineHeight: number;
   children: React.ReactNode;
 }
 
-export const LowerPanel = ({ children, timelineHeight }: LowerPanelPropsI) => {
-  // const [open, setOpen] = useState(false);
-  const { setOverTimeline, updateCurrentTime, scale } =
-    useContext(TrackContext);
+export const LowerPanel = ({ children }: LowerPanelPropsI) => {
+  const { onPointerDown, height } = useMouseEventsHeight();
+
+  const displayHeight = height > -1 ? height : timelineHeight.value;
 
   const onTimelineClick = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
-        updateCurrentTime((Math.round(event.clientX) - 92) / 4 / scale);
+        currentTime.value = (Math.round(event.clientX) - 92) / 4 / scale.value;
       }
     },
-    [updateCurrentTime, scale],
+    [],
   );
-
-  // const handleOpen = () => {
-  //   setOpen(true);
-  // };
 
   return (
     <div
       className={[
         "absolute bottom-0",
         "w-screen overflow-auto",
-        "border-t border-ui-panel-border",
         "bg-ui-panel",
       ].join(" ")}
-      style={{ height: timelineHeight }}
+      style={{ height: displayHeight }}
       onPointerOver={() => {
-        setOverTimeline(true);
+        overTimeline.value = true;
       }}
-      onPointerLeave={() => setOverTimeline(false)}
+      onPointerLeave={() => (overTimeline.value = false)}
       onPointerDown={onTimelineClick}
     >
+      <div
+        className="w-full cursor-ns-resize bg-ui-panel-border"
+        style={{ height: 3, zIndex: 1000 }}
+        onPointerDown={onPointerDown}
+      />
       {children}
     </div>
   );
