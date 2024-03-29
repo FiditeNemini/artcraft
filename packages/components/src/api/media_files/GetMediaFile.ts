@@ -15,6 +15,8 @@ export interface MediaFile {
   public_bucket_path: string;
   maybe_creator_user: UserDetailsLight | null;
   creator_set_visibility: string;
+  maybe_title: string | null;
+  maybe_original_filename: string | null;
   created_at: Date;
   updated_at: Date;
   maybe_model_weight_info: {

@@ -38,6 +38,7 @@ import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel"
 import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
 import { mediaTypeLabels } from "utils/mediaTypeLabels";
 import { EngineMediaPanel } from "./components/EngineMediaPanel/EngineMediaPanel";
+import { GetMediaFileTitle } from "common/GetMediaFileTitle";
 
 export default function MediaPage() {
   const { canEditMediaFile, user } = useSession();
@@ -453,17 +454,7 @@ export default function MediaPage() {
     );
   }
 
-  let title = "";
-
-  if (!!mediaFile?.maybe_title) {
-    title = `${mediaFile?.maybe_title} (${mediaType} file)`;
-  } else if (!!mediaFile?.maybe_original_filename) {
-    title = `${mediaFile?.maybe_original_filename} (${mediaType} file)`;
-  } else if (!!mediaFile?.maybe_model_weight_info?.title) {
-    title = mediaFile?.maybe_model_weight_info?.title;
-  } else {
-    title = `Untitled ${mediaType} file`;
-  }
+  const title = GetMediaFileTitle(mediaFile);
 
   return (
     <div>
