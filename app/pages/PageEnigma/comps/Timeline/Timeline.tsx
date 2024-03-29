@@ -21,7 +21,7 @@ import { EngineContext } from "../../contexts/EngineContext";
 
 export const Timeline = () => {
   const editorEngine = useContext(EngineContext);
-    
+
   const {
     characters,
     objects,
@@ -148,7 +148,7 @@ export const Timeline = () => {
             style={{
               left: 0,
               top: 8,
-              width: 2,
+              width: 4,
               height: fullHeight,
             }}
           />

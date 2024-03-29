@@ -1,4 +1,4 @@
-import { XYZ } from "../../datastructures/common";
+import { Simple3DVector } from "../../datastructures/common";
 export enum VIEW_MODES {
   EDITOR = 'editor',
   SIDE_BY_SIDE = 'side-by-side'
@@ -22,11 +22,7 @@ export type State = {
   }
   currentSceneObject:{
     isShowing: boolean;
-    objectVectors: {
-      position:XYZ;
-      rotation:XYZ;
-      scalar: XYZ;
-    };
+    objectVectors: Simple3DVector;
   }
 };
 
@@ -49,11 +45,7 @@ export type Action =
       type: ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
       payload:{
         currentSceneObject: {
-          objectVectors: {
-            position:XYZ;
-            rotation:XYZ;
-            scalar: XYZ;
-          };
+          objectVectors: Simple3DVector;
         };
       }
     }

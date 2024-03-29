@@ -1,44 +1,41 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Transition } from "@headlessui/react";
 import { faArrowRightArrowLeft, faCube, faTrash} from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import { AppUiContext } from '../../contexts/AppUiContext';
 import { Button, H4, InputVector } from "~/components";
 
 import { XYZ } from '../../datastructures/common';
 
-interface ControlPanelSceneObjectProps {
-  position?: XYZ;
-  rotation?: XYZ;
-  scalar?: XYZ;
-  isShowing:boolean;
-}
 
 
-export const ControlPanelSceneObject = ({
-  position: propsPosition = {x:0,y:0,z:0},
-  rotation: propsRotation = {x:0,y:0,z:0},
-  scalar: propsScalar = {x:0,y:0,z:0},
-  isShowing,
-}: ControlPanelSceneObjectProps) => {
-  const [position, setPosition] = useState<XYZ>(propsPosition);
-  const [rotation, setRotation] = useState<XYZ>(propsRotation);
-  const [scalar, setScalar] = useState<XYZ>(propsScalar);
+export const ControlPanelSceneObject = () => {
+  const [appUiState,dispatchAppUiState ] = useContext(AppUiContext);
+
+  const position = appUiState?.currentSceneObject.objectVectors.position;
+  const rotation = appUiState?.currentSceneObject.objectVectors.rotation;
+  const scalar = appUiState?.currentSceneObject.objectVectors.scalar;
 
   const handlePositionChange = (xyz:XYZ)=>{
     console.log(xyz);
-    setPosition(xyz);
+    // setPosition(xyz);
   }
   const handleRotationChange = (xyz:XYZ)=>{
     console.log(xyz);
-    setRotation(xyz);
+    // setRotation(xyz);
   }
   const handleScalarChange = (xyz:XYZ)=>{
     console.log(xyz);
-    setScalar(xyz);
+    // setScalar(xyz);
   }
+  // useEffect(()=>{
+    
+  // },[position,rotation,scalar]);
+
   return(
     <Transition
-      show={isShowing}
+      show={appUiState?.currentSceneObject.isShowing}
       className="absolute bottom-0 right-0 w-fit h-fit m-4 p-2 bg-ui-panel border border-ui-panel-border text-white rounded-lg flex flex-col gap-2"
       enter="transition-opacity duration-150"
       enterFrom="opacity-0"
@@ -60,23 +57,23 @@ export const ControlPanelSceneObject = ({
       <span className='h-1'/>
       <H4>Position</H4>
       <InputVector
-        x={position.x}
-        y={position.y}
-        z={position.z}
+        x={position?.x || 0}
+        y={position?.y || 0}
+        z={position?.z || 0}
         onChange={handlePositionChange}
       />
       <H4>Rotation</H4>
       <InputVector
-        x={rotation.x}
-        y={rotation.y}
-        z={rotation.z}
+        x={rotation?.x || 0}
+        y={rotation?.y || 0}
+        z={rotation?.z || 0}
         onChange={handleRotationChange}
       />
       <H4>Scale</H4>
       <InputVector
-        x={scalar.x}
-        y={scalar.y}
-        z={scalar.z}
+        x={scalar?.x || 0}
+        y={scalar?.y || 0}
+        z={scalar?.z || 0}
         onChange={handleScalarChange}
       />
       <span className='h-2'/>
