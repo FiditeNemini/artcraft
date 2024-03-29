@@ -17,8 +17,11 @@ import {
   timelineHeight,
 } from "~/pages/PageEnigma/store";
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
+import { EngineContext } from "../../contexts/EngineContext";
 
 export const Timeline = () => {
+  const editorEngine = useContext(EngineContext);
+    
   const {
     characters,
     objects,

@@ -76,8 +76,26 @@ export const TrackProvider = ({ children }: Props) => {
       {
         id: "ani-id1",
         offset: 0,
-        length: 124,
-        name: "ani 11",
+        length: 25,
+        name: "Sit",
+      },
+      {
+        id: "ani-id2",
+        offset: 0,
+        length: 25,
+        name: "Idle",
+      },
+      {
+        id: "ani-id3",
+        offset: 0,
+        length: 25,
+        name: "Stand",
+      },
+      {
+        id: "ani-id4",
+        offset: 0,
+        length: 25,
+        name: "Walk",
       },
     ]);
     setAudioClips([]);
