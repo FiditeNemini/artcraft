@@ -1,5 +1,5 @@
 import { AnyJson } from "three/examples/jsm/nodes/core/constants.js";
-import { ClipUI } from "../datastructures/clips/clip_offset";
+import { ClipUI } from "../datastructures/clips/clip_ui";
 
 import Scene from "./scene.js";
 import AudioEngine from "./audio_engine";
@@ -172,19 +172,19 @@ export class TimeLine {
         //2. allow stopping.
         //3. smallest unit is a frame and it is set by the scene and is in fps, our videos will be 60fps but we can reprocess them using the pipeline.
         for (const element of this.timelineItems) {
-            if (element.start_offset <= this.scrubberPosition && this.scrubberPosition <= element.ending_offset) {
+            if (element.offset <= this.scrubberPosition && this.scrubberPosition <= element.length) {
                 // run async
                 // element.play()
                 // remove the element from the list
                 let object = this.scene.get_object_by_uuid(element.object_uuid)
                 if (element.type == "transform") {
                     if (object && this.transformEngine.clips[element.object_uuid]) {
-                        this.transformEngine.clips[element.object_uuid].length = (element.ending_offset - element.start_offset);
-                        this.transformEngine.clips[element.object_uuid].step(object, element.start_offset, this.scrubberPosition);
+                        this.transformEngine.clips[element.object_uuid].length = (element.length - element.offset);
+                        this.transformEngine.clips[element.object_uuid].step(object, element.offset, this.scrubberPosition);
                     }
                 }
                 else if (element.type == "audio") {
-                    if(this.scrubberPosition+1 >= element.ending_offset){
+                    if(this.scrubberPosition+1 >= element.length){
                         this.audioEngine.stopClip(element.media_id);
                     }
                     else {
@@ -192,7 +192,7 @@ export class TimeLine {
                     }
                 }
                 else if (element.type == "lipsync") {
-                    if(this.scrubberPosition+1 >= element.ending_offset){
+                    if(this.scrubberPosition+1 >= element.length){
                         this.lipSyncEngine.clips[element.object_uuid].stop();
                     }
                     else if (object) {

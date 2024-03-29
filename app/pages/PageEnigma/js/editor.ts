@@ -16,7 +16,7 @@ import { FFmpeg, createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
 import { TimeLine, TimelineDataState } from "./timeline.js";
-import { ClipUI } from "../datastructures/clips/clip_offset.js";
+import { ClipUI } from "../datastructures/clips/clip_ui.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
 
@@ -810,8 +810,8 @@ class Editor {
     let video_og = itteration + 'tmp.mp4';
     let wav_name = itteration + 'tmp.wav';
     let new_video = (itteration + 1) + 'tmp.mp4';
-    let startFrame = clip.start_offset;
-    let endFrame = clip.ending_offset;
+    let startFrame = clip.offset;
+    let endFrame = clip.length;
 
 
     if (endFrame > this.timeline.timeLineLimit) {
