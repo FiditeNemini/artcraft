@@ -135,7 +135,7 @@ export default function useUpdateCharacters() {
             animationClips: [
               ...character.animationClips,
               { ...clip, id: uuid.v4(), offset },
-            ],
+            ].sort((clipA, clipB) => clipA.offset - clipB.offset),
           };
         });
       });
@@ -175,7 +175,10 @@ export default function useUpdateCharacters() {
           }
           return {
             ...character,
-            lipSyncClips: [...character.lipSyncClips, { ...clip, offset }],
+            lipSyncClips: [
+              ...character.lipSyncClips,
+              { ...clip, id: uuid.v4(), offset },
+            ].sort((clipA, clipB) => clipA.offset - clipB.offset),
           };
         });
       });
