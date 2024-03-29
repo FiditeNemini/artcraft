@@ -12,7 +12,7 @@ import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
 import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
-import { FFmpeg, createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
 import { TimeLine, TimelineDataState } from "./timeline.js";
@@ -43,7 +43,6 @@ class Editor {
   version: number;
   activeScene: Scene;
   camera: any;
-  render_camera: any;
   renderer: THREE.WebGLRenderer | undefined;
   clock: THREE.Clock | undefined;
   canvReference: any;
@@ -87,14 +86,12 @@ class Editor {
   cam_obj: THREE.Object3D | undefined;
   renderPass: RenderPass | undefined;
 
-  camera_person_mode: boolean;
   current_scene_media_token: string | null;
   current_scene_glb_media_token: string | null;
 
   can_initialize: boolean;
   dispatchAppUiState: any; // todo figure out the type
-  render_width: number;
-  render_height: number;
+  camera_person_mode: boolean;
 
   // Default params.
   constructor() {
@@ -118,7 +115,6 @@ class Editor {
     this.activeScene = new Scene("" + this.version);
     this.activeScene.initialize();
     this.camera;
-    this.render_camera;
     this.renderer;
     this.clock;
     this.canvReference = null;
@@ -161,9 +157,6 @@ class Editor {
     this.playback_location = 0;
     this.max_length = 10;
     // Audio Engine Test.
-
-    this.render_width = 1280;
-    this.render_height = 720;
 
     this.audio_engine = new AudioEngine();
     this.transform_engine = new TransformEngine(this.version);
@@ -213,9 +206,6 @@ class Editor {
     this.camera.position.z = 3;
     this.camera.position.y = 3;
     this.camera.position.x = -3;
-
-    this.render_camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 50);
-
     // Base WebGL render and clock for delta time.
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -257,7 +247,7 @@ class Editor {
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
     window.addEventListener("click", this.onMouseClick.bind(this), false);
     // Base control and debug stuff remove debug in prod.
-    this._initializeControl();
+    this._initialize_control();
     // Resets canvas size.
     this.onWindowResize();
     // Creates the main update loop.
@@ -266,16 +256,6 @@ class Editor {
     this.timeline.scene = this.activeScene;
 
     this._test_demo();
-
-
-    this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this), false);
-    this.renderer.domElement.addEventListener("mouseup", this.onMouseUp.bind(this), false);
-    this.renderer.domElement.addEventListener("onContextMenu", this.onContextMenu.bind(this), false);
-
-    this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
-    if (this.cam_obj) {
-      this.add_transform_clip_base("Camera Object", this.cam_obj, 0, 150)
-    }
 
     // saving state of the scene
     this.current_scene_media_token = null;
@@ -342,7 +322,6 @@ class Editor {
 
     const loaded_scene = load_scene_state_response.data["scene"];
 
-    if (load_scene_state_response.data == null) { return; }
     // Load these so you can rewrite the scene glb using it's token.
     this.current_scene_media_token =
       load_scene_state_response.data["scene_media_file_token"];
@@ -594,18 +573,6 @@ class Editor {
         400,
       ),
     );
-
-
-    this.audio_engine.loadClip("m_h33vytxs5eqqqf07nsy14qzrf9ww4v");
-
-    await this.timeline.addPlayableClip(new ClipUI(
-      1.0,
-      "audio",
-      "AudioClip",
-      "m_h33vytxs5eqqqf07nsy14qzrf9ww4v",
-      "",
-      0,
-      50));
   }
 
   // Configure post processing.
@@ -679,7 +646,6 @@ class Editor {
   render_mode() {
     this.rendering = !this.rendering;
     this.activeScene.render_mode(this.rendering);
-    console.log("works.")
 
     //if (this.rendering) {
     //    this._remove_post_processing()
@@ -765,14 +731,19 @@ class Editor {
       }
     }
 
-    if (this.render_camera && this.cam_obj) {
-      this.render_camera.position.copy(this.cam_obj.position);
-      this.render_camera.rotation.copy(this.cam_obj.rotation);
-    }
-
     this.timeline.update(delta_time);
 
-    this.renderScene();
+    this.render_scene();
+    if (this.capturer != null) {
+      this.capturer.capture(this.renderer.domElement);
+    } // Record scene.
+  }
+
+  start_playback() {
+    this.timeline.isPlaying = true;
+    if (!this.camera_person_mode) {
+      this.switchCameraView();
+    }
   }
 
   change_mode(type: any) {
@@ -806,56 +777,6 @@ class Editor {
     return blob;
   }
 
-  async convertAudioClip(itteration: number, ffmpeg: FFmpeg, clip: ClipUI) {
-    let video_og = itteration + 'tmp.mp4';
-    let wav_name = itteration + 'tmp.wav';
-    let new_video = (itteration + 1) + 'tmp.mp4';
-    let startFrame = clip.start_offset;
-    let endFrame = clip.ending_offset;
-
-
-    if (endFrame > this.timeline.timeLineLimit) {
-      endFrame = this.timeline.timeLineLimit;
-    }
-    if (startFrame > this.timeline.timeLineLimit) {
-      startFrame = this.timeline.timeLineLimit-1;
-    }
-
-    const startTime = startFrame / this.cap_fps;
-    const endTime = endFrame / this.cap_fps;
-    let end = endTime - startTime;
-
-    let duration = this.timeline.timeLineLimit / this.cap_fps;
-
-    let audioSegment = "as_" + wav_name;
-    await ffmpeg.FS('writeFile', wav_name, await fetchFile(await this.api_manager.getMediaFile(clip.media_id)));
-    await ffmpeg.run('-i',
-      wav_name,
-      '-ss', '0',
-      '-to', '' + end,
-      "-max_muxing_queue_size", "999999",
-      audioSegment);
-
-    await ffmpeg.run('-i', video_og,"-max_muxing_queue_size", "999999", `${itteration}empty_tmp.wav`);
-
-    await ffmpeg.run(
-      '-i', `${itteration}empty_tmp.wav`, 
-      '-i', audioSegment, 
-      '-filter_complex', "[1:a]adelay="+startTime*1000+"|"+startTime*1000+"[a1];[0:a][a1]amix=inputs=2[a]",
-      "-map", "[a]",
-      `${itteration}final_tmp.wav`)
-
-    await ffmpeg.run(
-      '-i', video_og, 
-      '-i', `${itteration}final_tmp.wav`, 
-      '-c:v', 'copy',
-      '-c:a', 'aac',
-      '-map', '0:v:0',
-      '-map', '1:a:0',
-      '-strict', 'experimental',
-      new_video)
-  }
-
   async stopPlayback() {
     this.render_mode();
     let ffmpeg = createFFmpeg({ log: true });
@@ -873,78 +794,35 @@ class Editor {
       "" + this.cap_fps,
       "-i",
       "image%d.png",
-      "-f",
-      "lavfi",
-      "-i",
-      "anullsrc", // This adds a silent audio track
-      "-max_muxing_queue_size",
-      "999999",
-      "-c:v",
-      "libx264", // Specify video codec (optional, but recommended for MP4)
-      "-c:a",
-      "aac", // Specify audio codec (optional, but recommended for MP4)
-      "-shortest", // Ensure output duration matches the shortest stream (video or audio)
-      "0tmp.mp4"
+      "output.mp4",
     );
-
-
-    let itteration = 0;
-
-    for (const clip of this.timeline.timelineItems) {
-      if (clip.type == "lipsync" || clip.type == "audio") {
-        await this.convertAudioClip(itteration, ffmpeg, clip);
-        itteration += 1;
-      }
-    };
-
-    let output = await ffmpeg.FS("readFile", itteration + "tmp.mp4");
+    let output = await ffmpeg.FS("readFile", "output.mp4");
     // Create a Blob from the output file for downloading
     const blob = new Blob([output.buffer], { type: "video/mp4" });
     const url = URL.createObjectURL(blob);
+    await this.api_manager.uploadMedia(blob, "output.mp4");
+    // Create a link to download the file
     const downloadLink = document.createElement("a");
     downloadLink.href = url;
-    downloadLink.download = "render.mp4";
+    downloadLink.download = "output.mp4";
     document.body.appendChild(downloadLink);
     downloadLink.click();
     // Clean up
     URL.revokeObjectURL(url);
     document.body.removeChild(downloadLink);
-  
-  
-    let data = await this.api_manager.uploadMedia(blob, "tmp.wav");
-    console.log(data);
-    // Create a link to download the file
-
-  }
-
-  generateVideo() {
-    console.log("Generating video...");
-    if (this.rendering) { return; }
-    this.startPlayback();
-    this._initializeRecording();
-    this.rendering = true;
-    this.activeScene.render_mode(this.rendering);
-    if (this.activeScene.hot_items) {
-      this.activeScene.hot_items.forEach(element => {
-        element.visible = false;
-      });
-    }
   }
 
   startPlayback() {
-    this.timeline.isPlaying = true;
-    this.timeline.scrubberPosition = 0;
-    if (!this.camera_person_mode) {
-      this.switchCameraView();
-    }
+    this.playback_location = 0;
+    this._initialize_recording();
   }
 
   // Initializes transform x y z changes.
-  _initializeControl() {
+  _initialize_control() {
     if (this.control == undefined) {
       return;
     }
-    this.control.addEventListener("change", this.renderScene.bind(this));
+    this.control.addEventListener("change", this.render_scene.bind(this));
     this.control.addEventListener("dragging-changed", (event: any) => {
       if (this.orbitControls == undefined) {
         return;
@@ -958,18 +836,18 @@ class Editor {
     this.activeScene.scene.add(this.control);
   }
 
-  _initializeRecording() {
+  // Initializes CCapture for capturing the scene to send over to backend.
+  _initialize_recording() {
     this.frame_buffer = [];
     this.render_timer = 0;
   }
 
   // Render the scene to the camera.
-  renderScene() {
-    if (this.composer != null && !this.rendering) {
+  render_scene() {
+    if (this.composer != null) {
       this.composer.render();
-    } else if (this.renderer && this.render_camera) {
-      this.renderer.setSize(this.render_width, this.render_height);
-      this.renderer.render(this.activeScene.scene, this.render_camera);
+    } else if (this.renderer && this.camera) {
+      this.renderer.render(this.activeScene.scene, this.camera);
     } else {
       console.error("Could not render to canvas no render or composer!");
     }
@@ -979,11 +857,10 @@ class Editor {
       let imgData = this.renderer.domElement.toDataURL();
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
-      if (this.timeline.isPlaying == false) {
+      if (this.playback_location >= this.fps_number * 3) {
         this.stopPlayback();
         this.playback_location = 0;
         this.rendering = false;
-        this.onWindowResize();
       }
     }
   }
@@ -1006,12 +883,6 @@ class Editor {
     if (this.composer != null) {
       this.composer.setSize(width, height);
     }
-
-    if (this.render_camera == undefined) { return; }
-
-    //this.renderer.setSize(this.render_width, this.render_height);
-    this.render_camera.aspect = this.render_width / this.render_height;
-    this.render_camera.updateProjectionMatrix();
   }
 
   onContextMenu(event: any) {
