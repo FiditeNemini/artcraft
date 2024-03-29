@@ -8,7 +8,7 @@ export const PreviewEngineCamera = ()=>{
 
   const [showLoader, setShowLoader] = useState<boolean>(true);
   useEffect(()=>{
-    setTimeout(()=>setShowLoader(false), 500);
+    setTimeout(()=>setShowLoader(false), 5000);
   },[]);
   return (
     <div

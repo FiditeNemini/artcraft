@@ -74,16 +74,19 @@ export class AnimationClip  {
           this.clip_action.play();
         }
       }
+      console.log("Play")
     }
   }
 
   step(deltatime: number) {
     if (this.mixer == null) { return; }
     this.mixer?.update(deltatime);
+    console.log("Update")
   }
 
   stop() {
     this.mixer?.stopAllAction();
+    console.log("stop.")
   }
 
   toJSON(): string {
