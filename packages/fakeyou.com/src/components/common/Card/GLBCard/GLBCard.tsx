@@ -48,26 +48,33 @@ export default function GLBCard({
 
           <div className="d-flex align-items-center">
             <div className="d-flex flex-grow-1">
-              <Badge {...{ className: "fy-entity-type-glb", label: "GLB", overlay: true }}/>
+              <Badge
+                {...{
+                  className: "fy-entity-type-glb",
+                  label: "GLB",
+                  overlay: true,
+                }}
+              />
             </div>
           </div>
-          
-          <h6 className="fw-semibold text-white mb-1 mt-3">
-            {title}
-          </h6>
 
           <div className="card-img-overlay-text">
             <div>
+              <h6 className="fw-semibold text-white mb-1 mt-3">{title}</h6>
               <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
             </div>
-            <CardFooter {...{
-              creator: data?.maybe_creator || data.details?.maybe_media_file_data?.maybe_creator,
-              entityToken: data.details?.entity_token || data.token,
-              entityType: "media_file",
-              makeBookmarksProps: bookmarks?.makeProps,
-              makeRatingsProps: ratings?.makeProps,
-              showCreator
-            }}/>
+            <CardFooter
+              {...{
+                creator:
+                  data?.maybe_creator ||
+                  data.details?.maybe_media_file_data?.maybe_creator,
+                entityToken: data.details?.entity_token || data.token,
+                entityType: "media_file",
+                makeBookmarksProps: bookmarks?.makeProps,
+                makeRatingsProps: ratings?.makeProps,
+                showCreator,
+              }}
+            />
           </div>
         </div>
       </Card>

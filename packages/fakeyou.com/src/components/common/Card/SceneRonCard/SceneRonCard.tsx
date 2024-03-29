@@ -57,13 +57,10 @@ export default function SceneRonCard({
               />
             </div>
           </div>
-          
-          <h6 className="fw-semibold text-white mb-1 mt-3">
-            {title}
-          </h6>
 
           <div className="card-img-overlay-text">
             <div>
+              <h6 className="fw-semibold text-white mb-1 mt-3">{title}</h6>
               <p className="fs-7 opacity-75 mb-0">{timeAgo}</p>
             </div>
             <CardFooter

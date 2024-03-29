@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import {
-  faCircleExclamation,
-  faEdit,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faCircleExclamation, faEdit } from "@fortawesome/pro-solid-svg-icons";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import PageHeader from "components/layout/PageHeader";
-import {
-  Button,
-  Container,
-  SplitPanel,
-  TempInput,
-} from "components/common";
+import { Button, Container, SplitPanel, TempInput } from "components/common";
 import { useSession } from "hooks";
-import { GetMedia, MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
+import {
+  GetMedia,
+  MediaFile,
+} from "@storyteller/components/src/api/media_files/GetMedia";
 import { RenameMedia } from "@storyteller/components/src/api/media_files/RenameMedia";
 
 export default function MediaRenamePage() {
@@ -21,25 +16,24 @@ export default function MediaRenamePage() {
   const history = useHistory();
 
   const { canEditMediaFile } = useSession();
-  const [ mediaFile, setMediaFile ] = useState<MediaFile|undefined>(undefined);
+  const [mediaFile, setMediaFile] = useState<MediaFile | undefined>(undefined);
 
-  const [ mediaTitle,  setMediaTitle ] = useState("");
+  const [mediaTitle, setMediaTitle] = useState("");
 
   usePrefixedDocumentTitle("Rename Media");
 
   useEffect(() => {
-    GetMedia(media_file_token,{})
-    .then((res) => {
+    GetMedia(media_file_token, {}).then(res => {
       if (res.success && res.media_file) {
-        let currentTitle = 
-          res.media_file.maybe_title || 
-          res.media_file.maybe_original_filename || 
+        let currentTitle =
+          res.media_file.maybe_title ||
+          res.media_file.maybe_original_filename ||
           "";
         setMediaFile(res.media_file);
         setMediaTitle(currentTitle);
       }
-    })
-  },[setMediaFile, media_file_token]);
+    });
+  }, [setMediaFile, media_file_token]);
 
   const performRename = async () => {
     const newTitle = mediaTitle.trim();
@@ -49,14 +43,12 @@ export default function MediaRenamePage() {
     }).then((res: any) => {
       history.replace(`/media/${media_file_token}`);
     });
-  }
+  };
 
-  const onChange = (
-    ev: React.FormEvent<HTMLInputElement>
-  ) => {
+  const onChange = (ev: React.FormEvent<HTMLInputElement>) => {
     const value = (ev.target as HTMLInputElement).value;
     setMediaTitle(value);
-  }
+  };
 
   if (!canEditMediaFile(mediaFile?.maybe_creator_user?.user_token || "")) {
     return (
@@ -91,36 +83,36 @@ export default function MediaRenamePage() {
         backbuttonLabel="Back"
         backbuttonTo={`/media/${media_file_token}`}
       />
-        <SplitPanel {...{ busy: false, dividerFooter: true }}>
-          <SplitPanel.Body padding={true}>
-              <TempInput
-                {...{
-                  label: "New Name",
-                  name: "title",
-                  onChange: onChange,
-                  placeholder: "File name",
-                  value: mediaTitle,
-                }}
-              />
-          </SplitPanel.Body>
-          <SplitPanel.Footer padding={true}>
-            <div className="d-flex gap-2 justify-content-end">
-              <Button
-                {...{
-                  label: "Cancel",
-                  to: `/media/${media_file_token}`,
-                  variant: "secondary",
-                }}
-              />
-              <Button
-                {...{
-                  label: "Rename File",
-                  onClick: performRename,
-                }}
-              />
-            </div>
-          </SplitPanel.Footer>
-        </SplitPanel>
+      <SplitPanel {...{ busy: false }}>
+        <SplitPanel.Body padding={true}>
+          <TempInput
+            {...{
+              label: "New Name",
+              name: "title",
+              onChange: onChange,
+              placeholder: "File name",
+              value: mediaTitle,
+            }}
+          />
+        </SplitPanel.Body>
+        <SplitPanel.Footer padding={true}>
+          <div className="d-flex gap-2 justify-content-end">
+            <Button
+              {...{
+                label: "Cancel",
+                to: `/media/${media_file_token}`,
+                variant: "secondary",
+              }}
+            />
+            <Button
+              {...{
+                label: "Rename File",
+                onClick: performRename,
+              }}
+            />
+          </div>
+        </SplitPanel.Footer>
+      </SplitPanel>
     </Container>
   );
   //}

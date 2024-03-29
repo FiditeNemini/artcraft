@@ -231,7 +231,7 @@ export default function MediaPage() {
           <>
             <EngineMediaPanel mediaFile={mediaFile} />
           </>
-        )
+        );
       case MediaFileType.FBX:
         return (
           <Panel padding={true}>
@@ -463,9 +463,7 @@ export default function MediaPage() {
           <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
-                <h1 className="fw-bold mb-2">
-                  {title}
-                </h1>
+                <h1 className="fw-bold mb-2">{title}</h1>
               </div>
               <div className="d-flex gap-3 flex-wrap align-items-center">
                 <div className="d-flex gap-2 align-items-center flex-wrap">
@@ -766,7 +764,9 @@ export default function MediaPage() {
                 </div>
               </Panel>
 
-              {canEditMediaFile(mediaFile?.maybe_creator_user?.user_token || "") && (
+              {canEditMediaFile(
+                mediaFile?.maybe_creator_user?.user_token || ""
+              ) && (
                 <>
                   <div className="d-flex gap-2">
                     <Button
@@ -775,8 +775,6 @@ export default function MediaPage() {
                       label="Delete Media"
                       onClick={openDeleteModal}
                     />
-                  </div>
-                  <div className="d-flex gap-2">
                     <Button
                       full={true}
                       variant="secondary"
