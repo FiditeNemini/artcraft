@@ -70,15 +70,15 @@ export const ControlsTopButtons = () => {
     editorEngine?.switchCameraView();
   };
   const handleButtonPlayBack = () => {
-    editorEngine?.start_playback();
+    editorEngine?.startPlayback();
   };
   const handleButtonRender = () => {
-    editorEngine?.take_timeline_cam_clip();
-  };
-  const handleButtonPlay = () => {
-    editorEngine?.start_playback();
+    editorEngine?.generateVideo();
   };
 
+  const handleButtonTakeFrame = () => {
+    editorEngine?.take_timeline_cam_clip();
+  };
 
   const handleButtonLoad = () => {};
 
@@ -148,9 +148,11 @@ export const ControlsTopButtons = () => {
       </div>
       <div className="flex gap-2">
 
-        <Button onClick={handleButtonLoad}>Load</Button>
-        <Button onClick={handleButtonRender}>Take Frame</Button>
-        <Button onClick={handleButtonPlay}>Play</Button>
+        <Button onClick={handleButtonLoad}>Test Button</Button>
+        <Button onClick={handleButtonTakeFrame}>Take Frame</Button>
+        <Button onClick={handleButtonRender}>Render</Button>
+        {/* <Button onClick={handleButtonLoad}>Load</Button>
+        <Button onClick={handleButtonRender}>Render</Button> */}
         <Button
           onClick={handleButtonTest}
           className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"

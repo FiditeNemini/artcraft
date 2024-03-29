@@ -8,6 +8,21 @@ import { TimelineDataState } from "./timeline";
  * Storyteller Studio API Manager
  * The source of truth of all these media items is the database in the cloud
  */
+class MediaFile {
+  public_bucket_path: string;
+  media_type: string;
+  media_token: string;
+
+  constructor(
+    public_bucket_path: string,
+    media_type: string,
+    media_token: string,
+  ) {
+    this.media_token = media_token;
+    this.public_bucket_path = public_bucket_path;
+    this.media_type = media_type;
+  }
+}
 
 /**
  * This is designed to surface user customer facing messages as errors.
@@ -61,7 +76,8 @@ class APIManager {
       file,
       scene_glb_media_file_token,
     );
-    const result_scene_glb_media_file_token = upload_glb_response["media_file_token"];
+    const result_scene_glb_media_file_token =
+      upload_glb_response["media_file_token"];
 
     // now write the scene
     const save_scene_timeline_response = await this.saveSceneAndTimeLineState(
@@ -74,12 +90,16 @@ class APIManager {
     const result_scene_media_file_token =
       save_scene_timeline_response["media_file_token"];
 
-    const data = { "scene_glb_media_file_token":result_scene_glb_media_file_token,
-                    "scene_media_file_token": result_scene_media_file_token };
+    const data = {
+      scene_glb_media_file_token: result_scene_glb_media_file_token,
+      scene_media_file_token: result_scene_media_file_token,
+    };
     return new APIManagerResponseSuccess("Scene Saved", data);
   }
 
-  public async loadSceneState(scene_media_file_token: string | null): Promise<APIManagerResponseSuccess> {
+  public async loadSceneState(
+    scene_media_file_token: string | null,
+  ): Promise<APIManagerResponseSuccess> {
     const api_base_url = "https://api.fakeyou.com";
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
     const response = await fetch(url);
@@ -104,19 +124,28 @@ class APIManager {
 
     console.log(`loadSceneState: ${JSON.stringify(json_result)}`);
 
-    const scene_glb_media_file_token: string = json_result["scene_glb_media_file_token"];
-    
-    const media_bucket_path = await this.getMediaFile(scene_glb_media_file_token);
-    console.log(`GLB ${media_bucket_path}`)
+    const scene_glb_media_file_token: string =
+      json_result["scene_glb_media_file_token"];
+
+    const media_bucket_path = await this.getMediaFile(
+      scene_glb_media_file_token,
+    );
+    console.log(`GLB ${media_bucket_path}`);
     let glbLoader = new GLTFLoader();
     // promisify this
-    const loadGlb = (bucket_path: string): Promise<APIManagerResponseSuccess> => {
+    const loadGlb = (
+      bucket_path: string,
+    ): Promise<APIManagerResponseSuccess> => {
       return new Promise((resolve, reject) => {
         glbLoader.load(bucket_path, (glb) => {
           if (glb) {
             const scene: THREE.Scene = glb.scene;
-            const data = { "scene_glb_media_file_token": scene_glb_media_file_token , "scene_media_file_token":scene_media_file_token, "scene": scene };
-            console.log(`Data: ${data}`)
+            const data = {
+              scene_glb_media_file_token: scene_glb_media_file_token,
+              scene_media_file_token: scene_media_file_token,
+              scene: scene,
+            };
+            console.log(`Data: ${data}`);
             resolve(new APIManagerResponseSuccess("Success Loaded", data));
           } else {
             throw new APIManagerResponseError("Failed to Load GLB Scene");
@@ -133,7 +162,7 @@ class APIManager {
    * @param media_file_token
    * @returns
    */
-  private async getMediaFile(media_file_token: string): Promise<string> {
+  public async getMediaFile(media_file_token: string): Promise<string> {
     let api_base_url = "https://api.fakeyou.com";
     let url = `${api_base_url}/v1/media_files/file/${media_file_token}`;
     let response = await fetch(url);
@@ -205,12 +234,14 @@ class APIManager {
     const url = `${this.baseUrl}/v1/media_files/write/scene_file`;
     let uuid = uuidv4();
 
-    console.log(`Saving Scene scene_media_file_token:${scene_media_file_token} | scene_glb_media_file_token:${scene_glb_media_file_token}`)
+    console.log(
+      `Saving Scene scene_media_file_token:${scene_media_file_token} | scene_glb_media_file_token:${scene_glb_media_file_token}`,
+    );
     // turn json into a blob
     const scene_schema = {
-      'scene_glb_media_file_token': scene_glb_media_file_token,
-      'scene_name': scene_file_name,
-      'timeline': { 'objects': [] },
+      scene_glb_media_file_token: scene_glb_media_file_token,
+      scene_name: scene_file_name,
+      timeline: { objects: [] },
     };
     const json = JSON.stringify(scene_schema);
     const blob = new Blob([json], { type: "application/json" });
@@ -282,10 +313,25 @@ class APIManager {
     }
   }
 
-  public async batchGetMedia(media_tokens: []): Promise<string> {
-    return "";
+  public async getMediaBatch(media_tokens: string[]): Promise<MediaFile[]> {
+    const tokens = media_tokens;
+    const url = new URL(`${this.baseUrl}/v1/media_files/batch`);
+    tokens.forEach((token) => url.searchParams.append("tokens", token));
+    const result = await fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        const result = data["media_files"].map((element) => {
+          return new MediaFile(
+            element["public_bucket_path"],
+            element["media_type"],
+            element["token"],
+          );
+        });
+        return result;
+      })
+      .catch((error) => console.error("Error:", error));
+    return result;
   }
-
 }
 
 export default APIManager;

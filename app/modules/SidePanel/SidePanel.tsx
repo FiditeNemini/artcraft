@@ -27,7 +27,6 @@ export const SidePanel = ({ children }: Props) => {
       <div className="relative w-[23.5rem] h-full">
         {children}
       </div>
-
     </div>
   );
 };

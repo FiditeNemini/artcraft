@@ -29,10 +29,11 @@ export class TransformClip {
     this.looping = false;
   }
 
-  step(object: THREE.Object3D) {
-    //if (this.step_frame >= 60/this.length && this.looping == false) { return; } // Reached max frames.
+  step(object: THREE.Object3D, offset: number, frame: number) {
+    this.step_frame = frame-offset;
+    if (this.step_frame < 0) { this.step_frame = 0; }
+    if (this.step_frame >= this.length) { return; } // Reached max frames.
     if(this.positions.length < 2) { return; } // If there are enough points in the scene.
-    this.step_frame += 1;
 
     let time_frame = (this.step_frame/this.length);
 
