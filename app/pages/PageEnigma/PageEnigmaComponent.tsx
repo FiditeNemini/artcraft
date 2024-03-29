@@ -39,7 +39,6 @@ export const PageEnigmaComponent = () => {
     appUiReducer,
     appUiInitialStateValues,
   );
-  useSignals();
 
   const lowerHeight = timelineHeight.value;
   return (
