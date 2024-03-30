@@ -956,20 +956,21 @@ class Editor {
     let pos = this.selected.position;
     let rot = this.selected.rotation;
     let scale = this.selected.scale;
-
+  
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
       payload: {
         currentSceneObject: {
           objectVectors: {
-            position: { x: pos.x, y: pos.y, z: pos.z },
-            rotation: { x: rot.x, y: rot.y, z: rot.z },
-            scalar: { x: scale.x, y: scale.y, z: scale.z },
+            position: { x: parseFloat(pos.x.toFixed(2)), y: parseFloat(pos.y.toFixed(2)), z: parseFloat(pos.z.toFixed(2)) },
+            rotation: { x: parseFloat(rot.x.toFixed(2)), y: parseFloat(rot.y.toFixed(2)), z: parseFloat(rot.z.toFixed(2)) },
+            scalar: { x: parseFloat(scale.x.toFixed(2)), y: parseFloat(scale.y.toFixed(2)), z: parseFloat(scale.z.toFixed(2)) },
           }
         }
       }
     });
   }
+  
 
   // Automaticly resize scene.
   onWindowResize() {
