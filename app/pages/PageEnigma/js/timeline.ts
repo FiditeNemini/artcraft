@@ -74,10 +74,10 @@ export class TimeLine {
 
         this.scene = scene;
 
+
         Queue.subscribe(QueueNames.TO_ENGINE, this.handleTimelineActions);
         
         this.current_time = 0
-
         // TODO: How to move the timeline should put in update.
         // setInterval(()=> {
         //     this.current_time +=1
@@ -90,7 +90,7 @@ export class TimeLine {
         Queue.publish({
             queueName: QueueNames.FROM_ENGINE,
             action: fromEngineActions.UPDATE_TIME,
-            data: data ,
+            data: data,
         });
     }
 
@@ -98,19 +98,43 @@ export class TimeLine {
         const action = data["action"]
         switch (action) {
             case toEngineActions.ADD_CLIP:
+                await this.addClip(data)
                 break
             case toEngineActions.DELETE_CLIP:
+                await this.deleteClip(data)
                 break
             case toEngineActions.UPDATE_CLIP:
-                break
-            case toEngineActions.PLAY_CLIP:
+                await this.updateClip(data)
                 break
             case toEngineActions.UPDATE_TIME:
+                await this.scrubberUpdate(data)
                 break
             case toEngineActions.MUTE:
+                await this.mute(data)
+                break
             default:
                 console.log("Action Not Wired")
         }
+       
+    }
+    
+    public async addClip(data:any) {
+        // map to clip ui 
+        console.log(data)
+    }
+    public async updateClip(data:any) {
+        // only length and offset changes here.
+        console.log(data)
+    }
+    public async deleteClip(data:any) {
+        console.log(data)
+    }
+
+    public async scrubberUpdate(data:any) {
+        console.log(data)
+    }
+
+    public async mute(data:any) {
         console.log(data)
     }
 
@@ -122,33 +146,19 @@ export class TimeLine {
     // Then the clip will be loaded by the engines, if they come from outside of the loaded scene.
     public async createClipOffset(media_id: string, object_uuid:string, type: string): Promise<void> {
         // use engine to load based off media id and type animation | transform |  
-   
     }
 
     // this will update the state of the clips based off uuid easing?
-    public async updateClip(clip_uuid: string, updates: AnyJson): Promise<void> {
+    public async updatePlayableClip(clip_uuid: string, updates: AnyJson): Promise<void> {
 
     }
 
-    public async deleteClip(clip_uuid: string): Promise<void> {
-
-    }
-
-    // Events that will trigger from react
-    public async clipDidEnterDropZone() {
-
-    }
-
-    public async clipDidExitDropZone() {
-
-    }
-
-    // timeline controls this.
-    public async scrubberDidStart(offset_frame: number) {
+    public async deletePlayableClip(clip_uuid: string): Promise<void> {
 
     }
 
     public async scrub(offset_frame: number): Promise<void> {
+        if (this.is_playing) { return }
         // only stream through to the position and rotation keyframes
         // debounce not really 
     }
