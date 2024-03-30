@@ -78,6 +78,7 @@ class Scene {
         this.load_glb("/resources/models/camera/camera.glb", false).then((cam_obj) => {
             cam_obj.userData["name"] = "::CAM::";
             cam_obj.name = "::CAM::";
+            cam_obj.position.set(0, 0.6, 1.5);
             this.scene.add(cam_obj);
         });
     }
