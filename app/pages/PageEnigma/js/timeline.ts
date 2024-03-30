@@ -154,7 +154,7 @@ export class TimeLine {
     }
 
     public async deletePlayableClip(clip_uuid: string): Promise<void> {
-
+        
     }
 
     public async scrub(offset_frame: number): Promise<void> {
