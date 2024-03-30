@@ -313,6 +313,41 @@ class APIManager {
     }
   }
 
+  public async uploadMediaFrameGeneration(
+    blob: any,
+    fileName: string,
+    style: string = "comic_book",
+    positive_prompt: string,
+    negative_prompt: string,
+  ): Promise<string> {
+    const url = `https://funnel.tailce84f.ts.net/preview/`;
+    
+    const payload = {
+      style: style,
+      positive_prompt: positive_prompt,
+      negative_prompt: negative_prompt
+    };
+
+    const formData = new FormData();
+    formData.append("video", blob, fileName);
+    formData.append("request", JSON.stringify(payload));
+
+    const response = await fetch(url, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new APIManagerResponseError("Upload Media Failed to send file");
+    } else {
+      return URL.createObjectURL(await response.blob());
+    }
+  }
+
   public async getMediaBatch(media_tokens: string[]): Promise<MediaFile[]> {
     const tokens = media_tokens;
     const url = new URL(`${this.baseUrl}/v1/media_files/batch`);
