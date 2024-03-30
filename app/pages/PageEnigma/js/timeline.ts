@@ -7,6 +7,12 @@ import TransformEngine from "./transform_engine";
 import LipSyncEngine from "./lip_sync_engine";
 import AnimationEngine from "./animation_engine";
 
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "../Queue/QueueNames";
+import { toEngineActions } from "../Queue/toEngineActions";
+import { Action } from "@remix-run/router";
+import { fromEngineActions } from "../Queue/fromEngineActions";
+import { currentTime } from "../store";
 // Every object uuid / entity has a track.
 export class TimelineCurrentState {
     is_editable: boolean
@@ -45,6 +51,8 @@ export class TimeLine {
     lipSync_engine: LipSyncEngine
 
     scene: Scene
+
+    current_time:number
     // ensure that the elements are loaded first.
     constructor(audio_engine: AudioEngine,
         transform_engine: TransformEngine,
@@ -65,6 +73,45 @@ export class TimeLine {
         this.animation_engine = animation_engine
 
         this.scene = scene;
+
+        Queue.subscribe(QueueNames.TO_ENGINE, this.handleTimelineActions);
+        
+        this.current_time = 0
+
+        // TODO: How to move the timeline should put in update.
+        // setInterval(()=> {
+        //     this.current_time +=1
+        //     this.pushEvent(fromEngineActions.UPDATE_TIME, { currentTime: this.current_time })
+        // },50)
+    }
+
+    public async pushEvent(action:fromEngineActions, data:any) {
+        this.current_time += 1
+        Queue.publish({
+            queueName: QueueNames.FROM_ENGINE,
+            action: fromEngineActions.UPDATE_TIME,
+            data: data ,
+        });
+    }
+
+    public async handleTimelineActions(data:any) {
+        const action = data["action"]
+        switch (action) {
+            case toEngineActions.ADD_CLIP:
+                break
+            case toEngineActions.DELETE_CLIP:
+                break
+            case toEngineActions.UPDATE_CLIP:
+                break
+            case toEngineActions.PLAY_CLIP:
+                break
+            case toEngineActions.UPDATE_TIME:
+                break
+            case toEngineActions.MUTE:
+            default:
+                console.log("Action Not Wired")
+        }
+        console.log(data)
     }
 
     public async addPlayableClip(clip: ClipUI): Promise<void> {

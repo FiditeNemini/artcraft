@@ -19,6 +19,7 @@ interface Arguments {
 export function useQueueHandler() {
   useSignals();
   const handleActions = useCallback(({ action, data }: Arguments) => {
+    console.log(`FROM ENGINE:${action} ${data}`)
     switch (action) {
       case fromEngineActions.UPDATE_TIME:
         currentTime.value = (data as UpdateTime).currentTime;
