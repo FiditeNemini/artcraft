@@ -10,16 +10,32 @@ import {
 import { AppUiContext } from '../../contexts/AppUiContext';
 import { APPUI_ACTION_TYPES } from '../../reducers';
 import { APPUI_VIEW_MODES } from '../../reducers';
-
+import { EngineContext } from '../../contexts/EngineContext';
+import { ArtStyle } from '../../js/api_manager';
 export const TabStylization = ()=>{
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
   const [ selection, setSelection ] = useState<string>("Anime");
-  const handlePickingStylizer = (picked:string)=>{
+
+  const editorEngine = useContext(EngineContext);
+
+  const handlePickingStylizer = (picked:ArtStyle)=>{
     console.log(`Picked style: ${picked}`);
+    if (editorEngine == null) { console.log("Editor is null"); return;}
+    editorEngine.art_style = picked
     setSelection(picked);
   }
 
+  const onChangeHandlerNegative = (e:React.ChangeEvent<HTMLInputElement>) => {
+    if (editorEngine == null) { console.log("Editor is null"); return;}
+    editorEngine.negative_prompt = e.target.value
+    console.log(e.target.value)
+  }
 
+  const onChangeHandlerPositive = (e:React.ChangeEvent<HTMLInputElement>) => {
+    if (editorEngine == null) { console.log("Editor is null"); return;}
+    editorEngine.positive_prompt = e.target.value
+    console.log(e.target.value)
+  }
   const handleChangeViewMode = ()=>{
     if(dispatchAppUiState!==null){
       dispatchAppUiState({
@@ -37,25 +53,25 @@ export const TabStylization = ()=>{
       <div className="flex gap-2 my-2">
         <ItemPicker
           label="Anime"
-          selected={(selection === "Anime")}
+          selected={(selection === ArtStyle.Anime2DFlat)}
           onSelected={handlePickingStylizer}
           src="/resources/avatars/0.webp"
         />
         <ItemPicker
           label="Pixel"
-          selected={selection === "Pixel"}
+          selected={selection === ArtStyle.PixelArt}
           onSelected={handlePickingStylizer}
           src="/resources/avatars/1.webp"
         />
         <ItemPicker
           label="Pixar"
-          selected={selection === "Pixar"}
+          selected={selection === ArtStyle.Cartoon3D}
           onSelected={handlePickingStylizer}
           src="/resources/avatars/2.webp"
         />
         <ItemPicker
           label="Stylized"
-          selected={selection === "Stylized"}
+          selected={selection === ArtStyle.ComicBook}
           onSelected={handlePickingStylizer}
           src="/resources/avatars/3.webp"
         />
@@ -65,14 +81,16 @@ export const TabStylization = ()=>{
         <Textarea
           className="w-full h-32"
           placeholder="Type here to describe your scene"
+          onChange={onChangeHandlerPositive}
         />
       </div>
       <H4>Negative Prompt</H4>
       <div className="flex gap-2 my-2">
         <Textarea
           className="w-full h-32"
-          placeholder="Type here to filter out the things you don't want in the scene
-        "/>
+          placeholder="Type here to filter out the things you don't want in the scene"
+          onChange={onChangeHandlerNegative}
+        />
       </div>
       <div className="flex gap-2 mt-6 justify-center">
         <Button onClick={handleChangeViewMode}>

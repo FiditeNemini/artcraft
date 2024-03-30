@@ -3,7 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { FreeCam } from "./free_cam";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import Scene from "./scene.js";
-import APIManager from "./api_manager.js";
+import { APIManager, ArtStyle, Visibility }  from "./api_manager.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
@@ -96,6 +96,9 @@ class Editor {
   render_width: number;
   render_height: number;
 
+  positive_prompt: string;
+  negative_prompt: string;
+  art_style:ArtStyle;
   // Default params.
   constructor() {
     console.log(
@@ -186,6 +189,11 @@ class Editor {
     // Scene State
     this.current_scene_media_token = null;
     this.current_scene_glb_media_token = null;
+
+    // stylization parameters
+    this.positive_prompt = "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around."
+    this.negative_prompt = ""
+    this.art_style = ArtStyle.Anime2DFlat
   }
 
   initialize(config: any) {
@@ -196,6 +204,8 @@ class Editor {
     // this.dispatchAppUiState({
     //   type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
     // });
+
+    
 
     if (this.can_initialize == false) {
       console.log("Editor Already Initialized");
@@ -318,6 +328,18 @@ class Editor {
   // Token comes in from the front end to load the scene from the site.
   public async testBatchRequest() {
     const result = await this.api_manager.getMediaBatch(["m_8fmp9hrvsqcryzka1fra597kg42s50", "m_z4jzbst3xfh64h0qn4bqh4afenfps9"]);
+    console.log(result);
+  }
+
+  public async testStylizeRequest() {
+    const result = await this.api_manager.stylizeVideo(
+    "mu_6wy1570a0c3c0tpkkncf4tsvb5234",
+    this.art_style,
+    this.positive_prompt,
+    this.negative_prompt,
+    Visibility.Public).catch(error=> {
+      console.log(error);
+    });
     console.log(result);
   }
 
