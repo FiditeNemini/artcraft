@@ -88,6 +88,7 @@ class Editor {
   lockControls: PointerLockControls | undefined;
   cam_obj: THREE.Object3D | undefined;
   renderPass: RenderPass | undefined;
+  generating_preview: boolean;
 
   camera_person_mode: boolean;
   current_scene_media_token: string | null;
@@ -119,6 +120,7 @@ class Editor {
     // Clock, scene and camera essentials.
     this.activeScene = new Scene("" + this.version);
     this.activeScene.initialize();
+    this.generating_preview = false;
     this.camera;
     this.render_camera;
     this.renderer;
@@ -904,7 +906,8 @@ class Editor {
   }
 
   async generateFrame() {
-    if (this.renderer) {
+    if (this.renderer && !this.generating_preview) {
+      this.generating_preview = true;
       this.activeScene.renderMode(true);
       if (this.activeScene.hot_items) {
         this.activeScene.hot_items.forEach(element => {
@@ -922,6 +925,15 @@ class Editor {
       let imgData = this.renderer.domElement.toDataURL();
       this.activeScene.renderMode(false);
       this.onWindowResize();
+
+      const rawPreview: HTMLVideoElement | null = document.getElementById("raw-preview") as HTMLVideoElement;
+      if(rawPreview){
+        rawPreview.src = imgData;
+      }
+      else {
+        console.log("No raw preview window.")
+      }
+
       let ffmpeg = createFFmpeg({ log: false });
       await ffmpeg.load();
       await ffmpeg.FS(
@@ -935,15 +947,17 @@ class Editor {
 
       //const blob = new Blob([imgData], { type: "image/png" });
       let url = await this.api_manager.uploadMediaFrameGeneration(blob, "render.mp4", "anime_ghibli", "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.", "");
+      console.log(url);
 
-      const downloadLink = document.createElement("a");
-      downloadLink.href = url;
-      downloadLink.download = "render.mp4";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      // Clean up
-      URL.revokeObjectURL(url);
-      document.body.removeChild(downloadLink);
+      const stylePreview: HTMLVideoElement | null = document.getElementById("stylized-preview") as HTMLVideoElement;
+      if(stylePreview){
+        stylePreview.src = url;
+      }
+      else {
+        console.log("No style preview window.")
+      }
+
+      this.generating_preview = false;
       
       return new Promise((resolve, reject) => {
         resolve(url);
@@ -1108,7 +1122,6 @@ class Editor {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     let interactable: any[] = [];
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
-      console.log(child);
       if (child.name != "") {
         if (child.type == "Mesh" || child.type == "Object3D") {
           interactable.push(child);

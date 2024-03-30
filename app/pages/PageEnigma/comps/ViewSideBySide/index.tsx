@@ -1,11 +1,15 @@
-import { useEffect, useState, } from "react";
+import { useEffect, useState, useContext } from "react";
 
 import { LoadingDotsBricks } from "~/components";
+import { EngineContext } from "../../contexts/EngineContext";
 
 export const ViewSideBySide = ()=>{
   const [showLoader, setShowLoader] = useState(true);
+  const editorEngine = useContext(EngineContext);
+
   useEffect(()=>{
-    setTimeout(()=>setShowLoader(false), 1000);
+    editorEngine?.generateFrame();
+    setTimeout(()=>setShowLoader(false), 200);
   },[ ]);
 
   return (
@@ -18,7 +22,7 @@ export const ViewSideBySide = ()=>{
           <label>Raw Preview</label>
         </div>
         <div className="relative">
-        <video className="aspect-video max-h-150 border" id="raw-preview"></video>
+        <img className="aspect-video max-h-150 border" id="raw-preview"></img>
         </div>
       </div>
 
@@ -27,7 +31,7 @@ export const ViewSideBySide = ()=>{
           <label>Stylized Preview</label>
         </div>
         <div className="relative">
-        <video className="aspect-video max-h-150 border" id="stylized-preview"></video>
+        <img className="aspect-video max-h-150 border" id="stylized-preview"></img>
         </div>
       </div>
       <div className="absolute top-0 left-0 w-full h-full">
