@@ -23,11 +23,7 @@ export const PreviewEngineCamera = ()=>{
         </div>
         <div className="relative rounded-lg border border-white box overflow-hidden">
           
-          <img
-            //shoot that datat from engine context to this image
-            className="aspect-video max-h-40" 
-            src="/resources/uiAssets/video_player_placeholder.gif"
-          />
+          <canvas className="aspect-video max-h-40" id="camera-view"></canvas>
           <div className="absolute w-full h-full top-0 left-0">
             <LoadingDotsTyping isShowing={showLoader}/>
           </div>

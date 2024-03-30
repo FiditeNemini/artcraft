@@ -64,7 +64,7 @@ class Scene {
         let obj = new THREE.Mesh(geometry, material);
         obj.position.copy(pos);
         obj.receiveShadow = visable;
-        if(this.hot_items != undefined){
+        if (this.hot_items != undefined) {
             this.hot_items.push(obj);
         }
         this.scene.add(obj);
@@ -75,15 +75,18 @@ class Scene {
     }
 
     _create_camera_obj() {
-        let cam_obj: THREE.Object3D = new THREE.Object3D();
-        cam_obj.userData["name"] = "::CAM::";
-        cam_obj.name = "::CAM::";
-        this.scene.add(cam_obj);
+        this.load_glb("/resources/models/camera/camera.glb", false).then((cam_obj) => {
+            cam_obj.userData["name"] = "::CAM::";
+            cam_obj.name = "::CAM::";
+            cam_obj.position.set(0, 0.6, 1.5);
+            this.scene.add(cam_obj);
+        });
     }
 
-    renderMode(enabled:boolean=true) {
-        if(this.gridHelper == undefined) { return; }
-        if(enabled) {
+
+    renderMode(enabled: boolean = true) {
+        if (this.gridHelper == undefined) { return; }
+        if (enabled) {
             this._disable_skybox();
             this.scene.remove(this.gridHelper);
         } else {
@@ -92,7 +95,7 @@ class Scene {
         }
     }
 
-    async load_glb(filepath: string) { //: Promise<THREE.Object3D> {
+    async load_glb(filepath: string, auto_add: boolean = true): Promise<THREE.Object3D> { //: Promise<THREE.Object3D> {
         return new Promise((resolve) => {
             let glbLoader = new GLTFLoader();
             glbLoader.load(filepath, (glb) => {
@@ -106,7 +109,12 @@ class Scene {
                             c.material.transparent = false;
                         }
                     });
-                    this.scene.add(child);
+                    if (child.type == "Group") {
+                        if (auto_add) { this.scene.add(child.children[0]); }
+                        resolve(child.children[0]);
+                        return;
+                    }
+                    if (auto_add) { this.scene.add(child); }
                     resolve(child);
                 });
             });

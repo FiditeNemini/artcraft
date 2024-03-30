@@ -45,8 +45,10 @@ class Editor {
   camera: any;
   render_camera: any;
   renderer: THREE.WebGLRenderer | undefined;
+  rawRenderer: THREE.WebGLRenderer | undefined;
   clock: THREE.Clock | undefined;
   canvReference: any;
+  canvasRenderCamReference: any;
   composer: EffectComposer | undefined;
   effectFXAA: EffectComposer | undefined;
   outlinePass: OutlinePass | undefined;
@@ -86,6 +88,7 @@ class Editor {
   lockControls: PointerLockControls | undefined;
   cam_obj: THREE.Object3D | undefined;
   renderPass: RenderPass | undefined;
+  generating_preview: boolean;
 
   camera_person_mode: boolean;
   current_scene_media_token: string | null;
@@ -120,9 +123,11 @@ class Editor {
     // Clock, scene and camera essentials.
     this.activeScene = new Scene("" + this.version);
     this.activeScene.initialize();
+    this.generating_preview = false;
     this.camera;
     this.render_camera;
     this.renderer;
+    this.rawRenderer;
     this.clock;
     this.canvReference = null;
     this.cam_obj;
@@ -167,6 +172,8 @@ class Editor {
 
     this.render_width = 1280;
     this.render_height = 720;
+
+    this.canvasRenderCamReference;
 
     this.audio_engine = new AudioEngine();
     this.transform_engine = new TransformEngine(this.version);
@@ -214,21 +221,29 @@ class Editor {
 
     // Gets the canvas.
     this.canvReference = document.getElementById("video-scene");
+    this.canvasRenderCamReference = document.getElementById("camera-view");
+
     // Base width and height.
     let width = this.canvReference.width;
     let height = this.canvReference.height;
     // Sets up camera and base position.
-    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 50);
+    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.15, 30);
     this.camera.position.z = 3;
     this.camera.position.y = 3;
     this.camera.position.x = -3;
 
-    this.render_camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 50);
+    this.render_camera = new THREE.PerspectiveCamera(70, width / height, 0.15, 30);
 
     // Base WebGL render and clock for delta time.
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       canvas: this.canvReference,
+      preserveDrawingBuffer: true,
+    });
+
+    this.rawRenderer = new THREE.WebGLRenderer({
+      antialias: false,
+      canvas: this.canvasRenderCamReference,
       preserveDrawingBuffer: true,
     });
 
@@ -280,11 +295,6 @@ class Editor {
     this.renderer.domElement.addEventListener("mouseup", this.onMouseUp.bind(this), false);
     this.renderer.domElement.addEventListener("onContextMenu", this.onContextMenu.bind(this), false);
 
-    this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
-    if (this.cam_obj) {
-      this.addTransformClipBase("Camera Object", "camera", this.cam_obj, 0, 150)
-    }
-
     // saving state of the scene
     this.current_scene_media_token = null;
     this.current_scene_glb_media_token = null;
@@ -309,6 +319,8 @@ class Editor {
     if (this.cam_obj) {
       this.addTransformClipBase("Camera Object", "camera", this.cam_obj, 0, 150);
     }
+
+    console.log(this.cam_obj);
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
@@ -508,6 +520,7 @@ class Editor {
 
   switchCameraView() {
     this.camera_person_mode = !this.camera_person_mode;
+    console.log("camera")
     if (this.cam_obj) {
       if (this.camera_person_mode) {
         this.last_cam_pos.copy(this.camera.position);
@@ -524,11 +537,12 @@ class Editor {
         if (this.cameraViewControls) {
           this.cameraViewControls.enabled = true;
         }
-
+        this.cam_obj.scale.set(0,0,0);
         if (this.activeScene.hot_items) {
           this.activeScene.hot_items.forEach((element) => {
             element.visible = false;
           });
+        
         }
       } else {
         this.camera.position.copy(this.last_cam_pos);
@@ -542,6 +556,7 @@ class Editor {
         if (this.cameraViewControls) {
           this.cameraViewControls.enabled = false;
         }
+        this.cam_obj.scale.set(1,1,1);
         if (this.activeScene.hot_items) {
           this.activeScene.hot_items.forEach((element) => {
             element.visible = true;
@@ -748,6 +763,14 @@ class Editor {
 
   // Basicly Unity 3D's update loop.
   updateLoop(time: number) {
+
+    if (this.cam_obj == undefined) {
+      this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
+      if (this.cam_obj) {
+        this.addTransformClipBase("Camera Object", "camera", this.cam_obj, 0, 150)
+      }
+    }
+
     // Updates debug stats.
     if (this.stats != null) {
       this.stats.update();
@@ -910,7 +933,9 @@ class Editor {
   }
 
   async generateFrame() {
-    if (this.renderer) {
+    if (this.renderer && !this.generating_preview) {
+      this.removeTransformControls();
+      this.generating_preview = true;
       this.activeScene.renderMode(true);
       if (this.activeScene.hot_items) {
         this.activeScene.hot_items.forEach(element => {
@@ -928,32 +953,46 @@ class Editor {
       let imgData = this.renderer.domElement.toDataURL();
       this.activeScene.renderMode(false);
       this.onWindowResize();
-      let ffmpeg = createFFmpeg({ log: false });
-      await ffmpeg.load();
-      await ffmpeg.FS(
-        "writeFile",
-        `render.png`,
-        await fetchFile(imgData),
-      );
-      await ffmpeg.run('-i', `render.png`, 'render.mp4');
-      let output = await ffmpeg.FS("readFile", 'render.mp4');
-      const blob = new Blob([output.buffer], { type: "video/mp4" });
 
-      //const blob = new Blob([imgData], { type: "image/png" });
-      let url = await this.api_manager.uploadMediaFrameGeneration(blob, "render.mp4", "anime_ghibli", "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.", "");
+      const rawPreview: HTMLVideoElement | null = document.getElementById("raw-preview") as HTMLVideoElement;
+      if (rawPreview) {
+        rawPreview.src = imgData;
 
-      const downloadLink = document.createElement("a");
-      downloadLink.href = url;
-      downloadLink.download = "render.mp4";
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      // Clean up
-      URL.revokeObjectURL(url);
-      document.body.removeChild(downloadLink);
-      
-      return new Promise((resolve, reject) => {
-        resolve(url);
-      });
+
+        let ffmpeg = createFFmpeg({ log: false });
+        await ffmpeg.load();
+        await ffmpeg.FS(
+          "writeFile",
+          `render.png`,
+          await fetchFile(imgData),
+        );
+        await ffmpeg.run('-i', `render.png`, 'render.mp4');
+        let output = await ffmpeg.FS("readFile", 'render.mp4');
+        const blob = new Blob([output.buffer], { type: "video/mp4" });
+
+        let url = await this.api_manager.uploadMediaFrameGeneration(blob, "render.mp4", "anime_ghibli", "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.", "");
+        console.log(url);
+
+        const stylePreview: HTMLVideoElement | null = document.getElementById("stylized-preview") as HTMLVideoElement;
+        if (stylePreview) {
+          stylePreview.src = url;
+          stylePreview.width = rawPreview.width;
+          stylePreview.height = rawPreview.height;
+        }
+        else {
+          console.log("No style preview window.")
+        }
+
+        this.generating_preview = false;
+
+        return new Promise((resolve, reject) => {
+          resolve(url);
+        });
+      }
+      else {
+        console.log("No raw preview window.")
+      }
+      this.generating_preview = false;
     }
   }
 
@@ -1002,8 +1041,9 @@ class Editor {
 
   // Render the scene to the camera.
   renderScene() {
-    if (this.composer != null && !this.rendering) {
+    if (this.composer != null && !this.rendering && this.rawRenderer) {
       this.composer.render();
+      this.rawRenderer.render(this.activeScene.scene, this.render_camera);
     } else if (this.renderer && this.render_camera) {
       this.renderer.setSize(this.render_width, this.render_height);
       this.renderer.render(this.activeScene.scene, this.render_camera);
