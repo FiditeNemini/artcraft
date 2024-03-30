@@ -16,11 +16,11 @@ export const Button = ({
   disabled,
   ...rest
 }: ButtonPropsI) => {
-  const variant = disabled ? 'disabled' : propsVariant;
+  const variant = disabled ? "disabled" : propsVariant;
   function getVariantClassNames(variant: string) {
     switch (variant) {
-      case "disabled":{
-        return "bg-brand-secondary-500 text-brand-secondary-300"
+      case "disabled": {
+        return "bg-brand-secondary-500 text-brand-secondary-300";
       }
       case "secondary": {
         return " bg-brand-secondary hover:bg-brand-secondary-900 text-white focus-visible:outline-brand-secondary";
@@ -33,7 +33,7 @@ export const Button = ({
   }
 
   const className = twMerge(
-    "text-sm font-semibold rounded-md px-3 py-2 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all duration-150 flex gap-2 items-center",
+    "text-sm font-medium rounded-lg px-3 py-2 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all duration-150 flex gap-2 items-center justify-center",
     getVariantClassNames(variant),
     propsClassName,
   );
