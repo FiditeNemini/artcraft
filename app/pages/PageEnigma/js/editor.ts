@@ -191,7 +191,7 @@ class Editor {
     this.current_scene_glb_media_token = null;
 
     // stylization parameters
-    this.positive_prompt = ""
+    this.positive_prompt = "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around."
     this.negative_prompt = ""
     this.art_style = ArtStyle.Anime2DFlat
   }
@@ -204,6 +204,8 @@ class Editor {
     // this.dispatchAppUiState({
     //   type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
     // });
+
+    
 
     if (this.can_initialize == false) {
       console.log("Editor Already Initialized");
@@ -332,9 +334,9 @@ class Editor {
   public async testStylizeRequest() {
     const result = await this.api_manager.stylizeVideo(
     "mu_6wy1570a0c3c0tpkkncf4tsvb5234",
-    ArtStyle.Anime2_5D,
-    "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.",
-    "",
+    this.art_style,
+    this.positive_prompt,
+    this.negative_prompt,
     Visibility.Public).catch(error=> {
       console.log(error);
     });
