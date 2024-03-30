@@ -99,6 +99,10 @@ export const ControlsTopButtons = () => {
 
   const handleButtonLoad = () => {};
 
+  const handleButtonSingleFrame = () => {
+    editorEngine?.generateFrame();
+  };
+
   return (
     <div className="flex flex-col gap-2 pl-3 pt-3">
       <div className="flex gap-2">
@@ -165,7 +169,7 @@ export const ControlsTopButtons = () => {
       </div>
       <div className="flex gap-2">
 
-        <Button onClick={handleButtonLoad}>Test Button</Button>
+        <Button onClick={handleButtonSingleFrame}>Render Single Frame</Button>
         <Button onClick={handleButtonTakeFrame}>Take Frame</Button>
         <Button onClick={handleButtonRender}>Render</Button>
         {/* <Button onClick={handleButtonLoad}>Load</Button>
