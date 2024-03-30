@@ -737,7 +737,7 @@ class Editor {
   // Basicly Unity 3D's update loop.
   updateLoop(time: number) {
 
-    if(this.cam_obj == undefined){
+    if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
       if (this.cam_obj) {
         this.addTransformClipBase("Camera Object", "camera", this.cam_obj, 0, 150)
@@ -907,6 +907,7 @@ class Editor {
 
   async generateFrame() {
     if (this.renderer && !this.generating_preview) {
+      this.removeTransformControls();
       this.generating_preview = true;
       this.activeScene.renderMode(true);
       if (this.activeScene.hot_items) {
@@ -927,41 +928,44 @@ class Editor {
       this.onWindowResize();
 
       const rawPreview: HTMLVideoElement | null = document.getElementById("raw-preview") as HTMLVideoElement;
-      if(rawPreview){
+      if (rawPreview) {
         rawPreview.src = imgData;
+
+
+        let ffmpeg = createFFmpeg({ log: false });
+        await ffmpeg.load();
+        await ffmpeg.FS(
+          "writeFile",
+          `render.png`,
+          await fetchFile(imgData),
+        );
+        await ffmpeg.run('-i', `render.png`, 'render.mp4');
+        let output = await ffmpeg.FS("readFile", 'render.mp4');
+        const blob = new Blob([output.buffer], { type: "video/mp4" });
+
+        let url = await this.api_manager.uploadMediaFrameGeneration(blob, "render.mp4", "anime_ghibli", "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.", "");
+        console.log(url);
+
+        const stylePreview: HTMLVideoElement | null = document.getElementById("stylized-preview") as HTMLVideoElement;
+        if (stylePreview) {
+          stylePreview.src = url;
+          stylePreview.width = rawPreview.width;
+          stylePreview.height = rawPreview.height;
+        }
+        else {
+          console.log("No style preview window.")
+        }
+
+        this.generating_preview = false;
+
+        return new Promise((resolve, reject) => {
+          resolve(url);
+        });
       }
       else {
         console.log("No raw preview window.")
       }
-
-      let ffmpeg = createFFmpeg({ log: false });
-      await ffmpeg.load();
-      await ffmpeg.FS(
-        "writeFile",
-        `render.png`,
-        await fetchFile(imgData),
-      );
-      await ffmpeg.run('-i', `render.png`, 'render.mp4');
-      let output = await ffmpeg.FS("readFile", 'render.mp4');
-      const blob = new Blob([output.buffer], { type: "video/mp4" });
-
-      //const blob = new Blob([imgData], { type: "image/png" });
-      let url = await this.api_manager.uploadMediaFrameGeneration(blob, "render.mp4", "anime_ghibli", "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.", "");
-      console.log(url);
-
-      const stylePreview: HTMLVideoElement | null = document.getElementById("stylized-preview") as HTMLVideoElement;
-      if(stylePreview){
-        stylePreview.src = url;
-      }
-      else {
-        console.log("No style preview window.")
-      }
-
       this.generating_preview = false;
-      
-      return new Promise((resolve, reject) => {
-        resolve(url);
-      });
     }
   }
 
