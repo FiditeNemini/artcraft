@@ -512,11 +512,12 @@ class Editor {
         if (this.cameraViewControls) {
           this.cameraViewControls.enabled = true;
         }
-
+        this.cam_obj.scale.set(0,0,0);
         if (this.activeScene.hot_items) {
           this.activeScene.hot_items.forEach((element) => {
             element.visible = false;
           });
+        
         }
       } else {
         this.camera.position.copy(this.last_cam_pos);
@@ -530,6 +531,7 @@ class Editor {
         if (this.cameraViewControls) {
           this.cameraViewControls.enabled = false;
         }
+        this.cam_obj.scale.set(1,1,1);
         if (this.activeScene.hot_items) {
           this.activeScene.hot_items.forEach((element) => {
             element.visible = true;

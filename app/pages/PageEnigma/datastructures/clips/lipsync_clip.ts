@@ -113,6 +113,11 @@ step() {
 }
 
 reset() {
+  if (this.lipsync.face != undefined) {
+    this.lipsync.face.morphTargetInfluences[this.blendshape_helper.ee] = 0;
+    this.lipsync.face.morphTargetInfluences[this.blendshape_helper.ah] = 0
+    this.lipsync.face.morphTargetInfluences[this.blendshape_helper.oh] = 0;
+  }
   this.lipsync = new LipSync();
 }
 

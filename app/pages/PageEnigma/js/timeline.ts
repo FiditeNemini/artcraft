@@ -130,6 +130,7 @@ export class TimeLine {
                 this.audio_engine.loadClip(element.media_id);
             }
             else if (element.type == "animation") {
+                this.animation_engine.clips[element.object_uuid].stop();
             }
             else if (element.type == "lipsync") {
                 this.lipSync_engine.clips[element.object_uuid].reset();
@@ -198,6 +199,10 @@ export class TimeLine {
             if (this.scrubber_frame_position >= this.timeline_limit) { // stops at where clips should // cannot throw clip
                 this.stop()
             }
+        }
+
+        if (this.scrubber_frame_position >= this.timeline_limit) {
+            await this.resetScene();
         }
     }
 
