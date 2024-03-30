@@ -81,7 +81,7 @@ class Scene {
         this.scene.add(cam_obj);
     }
 
-    render_mode(enabled:boolean=true) {
+    renderMode(enabled:boolean=true) {
         if(this.gridHelper == undefined) { return; }
         if(enabled) {
             this._disable_skybox();
