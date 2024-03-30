@@ -213,7 +213,6 @@ class Editor {
     // });
 
     
-
     if (this.can_initialize == false) {
       console.log("Editor Already Initialized");
       return;
@@ -341,6 +340,10 @@ class Editor {
   public async testBatchRequest() {
     const result = await this.api_manager.getMediaBatch(["m_8fmp9hrvsqcryzka1fra597kg42s50", "m_z4jzbst3xfh64h0qn4bqh4afenfps9"]);
     console.log(result);
+  }
+
+  public async testTestTimelineEvents() {
+  
   }
 
   public async testStylizeRequest() {
