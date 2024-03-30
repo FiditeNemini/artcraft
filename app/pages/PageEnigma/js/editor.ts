@@ -903,7 +903,6 @@ class Editor {
       let imgData = this.renderer.domElement.toDataURL();
       this.activeScene.renderMode(false);
       this.onWindowResize();
-
       let ffmpeg = createFFmpeg({ log: false });
       await ffmpeg.load();
       await ffmpeg.FS(
@@ -914,10 +913,21 @@ class Editor {
       await ffmpeg.run('-i', `render.png`, 'render.mp4');
       let output = await ffmpeg.FS("readFile", 'render.mp4');
       const blob = new Blob([output.buffer], { type: "video/mp4" });
-      let data = await this.api_manager.uploadMedia(blob, "render.wav");
+
+      //const blob = new Blob([imgData], { type: "image/png" });
+      let url = await this.api_manager.uploadMediaFrameGeneration(blob, "render.mp4", "anime_ghibli", "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.", "");
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = url;
+      downloadLink.download = "render.mp4";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      // Clean up
+      URL.revokeObjectURL(url);
+      document.body.removeChild(downloadLink);
       
       return new Promise((resolve, reject) => {
-        resolve(data);
+        resolve(url);
       });
     }
   }
