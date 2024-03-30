@@ -45,8 +45,10 @@ class Editor {
   camera: any;
   render_camera: any;
   renderer: THREE.WebGLRenderer | undefined;
+  rawRenderer: THREE.WebGLRenderer | undefined;
   clock: THREE.Clock | undefined;
   canvReference: any;
+  canvasRenderCamReference: any;
   composer: EffectComposer | undefined;
   effectFXAA: EffectComposer | undefined;
   outlinePass: OutlinePass | undefined;
@@ -120,6 +122,7 @@ class Editor {
     this.camera;
     this.render_camera;
     this.renderer;
+    this.rawRenderer;
     this.clock;
     this.canvReference = null;
     this.cam_obj;
@@ -165,6 +168,8 @@ class Editor {
     this.render_width = 1280;
     this.render_height = 720;
 
+    this.canvasRenderCamReference;
+
     this.audio_engine = new AudioEngine();
     this.transform_engine = new TransformEngine(this.version);
     this.lipsync_engine = new LipSyncEngine();
@@ -205,21 +210,29 @@ class Editor {
 
     // Gets the canvas.
     this.canvReference = document.getElementById("video-scene");
+    this.canvasRenderCamReference = document.getElementById("camera-view");
+
     // Base width and height.
     let width = this.canvReference.width;
     let height = this.canvReference.height;
     // Sets up camera and base position.
-    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 50);
+    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.15, 30);
     this.camera.position.z = 3;
     this.camera.position.y = 3;
     this.camera.position.x = -3;
 
-    this.render_camera = new THREE.PerspectiveCamera(70, width / height, 0.1, 50);
+    this.render_camera = new THREE.PerspectiveCamera(70, width / height, 0.15, 30);
 
     // Base WebGL render and clock for delta time.
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       canvas: this.canvReference,
+      preserveDrawingBuffer: true,
+    });
+
+    this.rawRenderer = new THREE.WebGLRenderer({
+      antialias: false,
+      canvas: this.canvasRenderCamReference,
       preserveDrawingBuffer: true,
     });
 
@@ -271,11 +284,6 @@ class Editor {
     this.renderer.domElement.addEventListener("mouseup", this.onMouseUp.bind(this), false);
     this.renderer.domElement.addEventListener("onContextMenu", this.onContextMenu.bind(this), false);
 
-    this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
-    if (this.cam_obj) {
-      this.addTransformClipBase("Camera Object", "camera", this.cam_obj, 0, 150)
-    }
-
     // saving state of the scene
     this.current_scene_media_token = null;
     this.current_scene_glb_media_token = null;
@@ -300,6 +308,8 @@ class Editor {
     if (this.cam_obj) {
       this.addTransformClipBase("Camera Object", "camera", this.cam_obj, 0, 150);
     }
+
+    console.log(this.cam_obj);
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
@@ -483,6 +493,7 @@ class Editor {
 
   switchCameraView() {
     this.camera_person_mode = !this.camera_person_mode;
+    console.log("camera")
     if (this.cam_obj) {
       if (this.camera_person_mode) {
         this.last_cam_pos.copy(this.camera.position);
@@ -723,6 +734,14 @@ class Editor {
 
   // Basicly Unity 3D's update loop.
   updateLoop(time: number) {
+
+    if(this.cam_obj == undefined){
+      this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
+      if (this.cam_obj) {
+        this.addTransformClipBase("Camera Object", "camera", this.cam_obj, 0, 150)
+      }
+    }
+
     // Updates debug stats.
     if (this.stats != null) {
       this.stats.update();
@@ -977,8 +996,9 @@ class Editor {
 
   // Render the scene to the camera.
   renderScene() {
-    if (this.composer != null && !this.rendering) {
+    if (this.composer != null && !this.rendering && this.rawRenderer) {
       this.composer.render();
+      this.rawRenderer.render(this.activeScene.scene, this.render_camera);
     } else if (this.renderer && this.render_camera) {
       this.renderer.setSize(this.render_width, this.render_height);
       this.renderer.render(this.activeScene.scene, this.render_camera);
@@ -1088,6 +1108,7 @@ class Editor {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     let interactable: any[] = [];
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
+      console.log(child);
       if (child.name != "") {
         if (child.type == "Mesh" || child.type == "Object3D") {
           interactable.push(child);

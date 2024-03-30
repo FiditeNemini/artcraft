@@ -18,11 +18,7 @@ export const ViewSideBySide = ()=>{
           <label>Raw Preview</label>
         </div>
         <div className="relative">
-          <img
-            //shoot that datat from engine context to this image
-            className="aspect-video max-h-150" 
-            src="/resources/uiAssets/video_player_placeholder.gif"
-          />
+        <video className="aspect-video max-h-150 border" id="raw-preview"></video>
         </div>
       </div>
 
@@ -31,11 +27,7 @@ export const ViewSideBySide = ()=>{
           <label>Stylized Preview</label>
         </div>
         <div className="relative">
-          <img
-            //shoot that datat from engine context to this image
-            className="aspect-video max-h-150" 
-            src="/resources/uiAssets/video_player_placeholder.gif"
-          />
+        <video className="aspect-video max-h-150 border" id="stylized-preview"></video>
         </div>
       </div>
       <div className="absolute top-0 left-0 w-full h-full">
