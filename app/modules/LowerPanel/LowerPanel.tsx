@@ -6,6 +6,9 @@ import {
   scale,
   timelineHeight,
 } from "~/pages/PageEnigma/store";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 interface LowerPanelPropsI {
   children: React.ReactNode;
@@ -19,7 +22,13 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
   const onTimelineClick = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
-        currentTime.value = (Math.round(event.clientX) - 92) / 4 / scale.value;
+        const newTime = Math.round((event.clientX - 92) / 4 / scale.value);
+        currentTime.value = newTime;
+        Queue.publish({
+          queueName: QueueNames.TO_ENGINE,
+          action: toEngineActions.UPDATE_TIME,
+          data: { currentTime: Math.round(newTime) },
+        });
       }
     },
     [],

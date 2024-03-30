@@ -13,21 +13,19 @@ export const SidePanel = ({ children }: Props) => {
   const [isVisible, setIsVisible] = useState(true);
 
   return (
-    <div className={
-      "relative border-l border-l-ui-panel-border bg-ui-panel transition-all duration-300 ease-in-out"
-      + (isVisible ? " w-[23.5rem]" : " w-0")
+    <div
+      className={
+        "relative border-l border-l-ui-panel-border bg-ui-panel transition-all duration-300 ease-in-out" +
+        (isVisible ? " w-[23.5rem]" : " w-0")
       }
     >
       <button
         onClick={() => setIsVisible(!isVisible)}
-        className="hover:bg-ui-controls-button absolute left-[-25px] top-1/2 flex rounded-l-lg bg-ui-controls px-2 py-3 align-middle text-sm text-white"
+        className="absolute left-[-25px] top-1/2 flex rounded-l-lg bg-ui-controls px-2 py-3 align-middle text-sm text-white hover:bg-ui-controls-button"
       >
         <FontAwesomeIcon icon={isVisible ? faChevronRight : faChevronLeft} />
       </button>
-      <div className="relative w-[23.5rem] h-full">
-        {children}
-      </div>
-
+      <div className="relative h-full w-[23.5rem]">{children}</div>
     </div>
   );
 };

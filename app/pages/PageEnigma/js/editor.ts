@@ -843,7 +843,7 @@ class Editor {
       new_video)
   }
 
-  async stopPlayback() {
+  async stopPlayback(compile_audio: boolean = true) {
     this.renderMode();
     let ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
@@ -877,12 +877,14 @@ class Editor {
 
     let itteration = 0;
 
-    for (const clip of this.timeline.timeline_items) {
-      if (clip.type == "lipsync" || clip.type == "audio") {
-        await this.convertAudioClip(itteration, ffmpeg, clip);
-        itteration += 1;
-      }
-    };
+    if (compile_audio) {
+      for (const clip of this.timeline.timeline_items) {
+        if (clip.type == "lipsync" || clip.type == "audio") {
+          await this.convertAudioClip(itteration, ffmpeg, clip);
+          itteration += 1;
+        }
+      };
+    }
 
     let output = await ffmpeg.FS("readFile", itteration + "tmp.mp4");
     // Create a Blob from the output file for downloading
@@ -902,6 +904,54 @@ class Editor {
     console.log(data);
     // Create a link to download the file
 
+  }
+
+  async generateFrame() {
+    if (this.renderer) {
+      this.activeScene.renderMode(true);
+      if (this.activeScene.hot_items) {
+        this.activeScene.hot_items.forEach(element => {
+          element.visible = false;
+        });
+      }
+
+      if (this.render_camera && this.cam_obj) {
+        this.render_camera.position.copy(this.cam_obj.position);
+        this.render_camera.rotation.copy(this.cam_obj.rotation);
+      }
+
+      this.renderer.setSize(this.render_width, this.render_height);
+      this.renderer.render(this.activeScene.scene, this.render_camera);
+      let imgData = this.renderer.domElement.toDataURL();
+      this.activeScene.renderMode(false);
+      this.onWindowResize();
+      let ffmpeg = createFFmpeg({ log: false });
+      await ffmpeg.load();
+      await ffmpeg.FS(
+        "writeFile",
+        `render.png`,
+        await fetchFile(imgData),
+      );
+      await ffmpeg.run('-i', `render.png`, 'render.mp4');
+      let output = await ffmpeg.FS("readFile", 'render.mp4');
+      const blob = new Blob([output.buffer], { type: "video/mp4" });
+
+      //const blob = new Blob([imgData], { type: "image/png" });
+      let url = await this.api_manager.uploadMediaFrameGeneration(blob, "render.mp4", "anime_ghibli", "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.", "");
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = url;
+      downloadLink.download = "render.mp4";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      // Clean up
+      URL.revokeObjectURL(url);
+      document.body.removeChild(downloadLink);
+      
+      return new Promise((resolve, reject) => {
+        resolve(url);
+      });
+    }
   }
 
   generateVideo() {
@@ -974,11 +1024,11 @@ class Editor {
   }
 
   updateSelectedUI() {
-    if(this.selected == undefined) { return; }
+    if (this.selected == undefined) { return; }
     let pos = this.selected.position;
     let rot = this.selected.rotation;
     let scale = this.selected.scale;
-  
+
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
       payload: {
@@ -992,7 +1042,7 @@ class Editor {
       }
     });
   }
-  
+
 
   // Automaticly resize scene.
   onWindowResize() {
