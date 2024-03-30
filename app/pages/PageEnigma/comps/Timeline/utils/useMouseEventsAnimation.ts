@@ -1,22 +1,22 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { currentTime, scale } from "~/pages/PageEnigma/store";
+import { currentTime, filmLength, scale } from "~/pages/PageEnigma/store";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 export const useMouseEventsAnimation = () => {
-  const [isActive, setIsActive] = useState("");
+  const [isActive, setIsActive] = useState(false);
   const [clientX, setClientX] = useState(0);
 
   const [time, setTime] = useState(-1);
 
   useEffect(() => {
-    const max = length * 60 * 4 * scale.value;
+    const max = filmLength.value * 60 * 4 * scale.value;
 
     const onPointerUp = () => {
       if (isActive) {
         currentTime.value = Math.round(time);
-        setIsActive("");
+        setIsActive(false);
         setTime(-1);
         Queue.publish({
           queueName: QueueNames.TO_ENGINE,
@@ -29,7 +29,7 @@ export const useMouseEventsAnimation = () => {
     const onMouseMove = (event: MouseEvent) => {
       const delta =
         (event.clientX - clientX) / 4 / scale.value + currentTime.value;
-      if (isActive === "drag") {
+      if (isActive) {
         event.stopPropagation();
         event.preventDefault();
         if (delta < 0 || delta > max) {
@@ -53,7 +53,7 @@ export const useMouseEventsAnimation = () => {
     onPointerDown: useCallback((event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
         setClientX(event.clientX);
-        setIsActive("drag");
+        setIsActive(true);
         setTime(currentTime.value);
       }
     }, []),

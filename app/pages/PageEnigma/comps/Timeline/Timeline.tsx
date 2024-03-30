@@ -135,7 +135,7 @@ export const Timeline = () => {
           </div>
         )}
         <div
-          className="absolute text-brand-primary"
+          className="absolute cursor-ew-resize text-brand-primary"
           style={{ top: 8, left: displayTime * 4 * scale.value + 88 }}
           onPointerDown={onPointerDown}
         >
