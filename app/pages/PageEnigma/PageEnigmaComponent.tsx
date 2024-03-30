@@ -15,7 +15,6 @@ import { ViewSideBySide } from "./comps/ViewSideBySide";
 import { SidePanelTabs } from "./comps/SidePanelTabs";
 import { Timeline } from "./comps/Timeline";
 
-
 import { EngineProvider } from "./contexts/EngineProvider";
 import { AppUIProvider } from "./contexts/AppUiContext";
 import {
@@ -42,6 +41,11 @@ export const PageEnigmaComponent = () => {
     appUiReducer,
     appUiInitialStateValues,
   );
+
+  //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
+  const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+  };
 
   const lowerHeight = timelineHeight.value;
   return (
@@ -70,7 +74,10 @@ export const PageEnigmaComponent = () => {
                   <canvas id="video-scene" width="1280px" height="720px" />
 
                   {/* Top controls */}
-                  <div className="absolute left-0 top-0 w-full">
+                  <div
+                    className="absolute left-0 top-0 w-full"
+                    onClick={handleOverlayClick}
+                  >
                     <div className="grid grid-cols-3 gap-4">
                       <ControlsTopButtons />
                       <Controls3D />
@@ -78,10 +85,13 @@ export const PageEnigmaComponent = () => {
                   </div>
 
                   {/* Bottom controls */}
-                  <div className="absolute bottom-0 left-0 w-full">
+                  <div
+                    className="absolute bottom-0 left-0 w-full"
+                    onClick={handleOverlayClick}
+                  >
                     <PreviewEngineCamera />
                     <ControlsVideo />
-                    <ControlPanelSceneObject/>
+                    <ControlPanelSceneObject />
                   </div>
                 </div>
                 {appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE && (
@@ -105,13 +115,17 @@ export const PageEnigmaComponent = () => {
               </div>
 
               {/* Side panel */}
-              <SidePanel>
-                <SidePanelTabs />
-              </SidePanel>
+              <div onClick={handleOverlayClick}>
+                <SidePanel>
+                  <SidePanelTabs />
+                </SidePanel>
+              </div>
             </div>
 
             {/* Timeline */}
-            <Timeline />
+            <div onClick={handleOverlayClick}>
+              <Timeline />
+            </div>
           </div>
         </EngineProvider>
       </AppUIProvider>

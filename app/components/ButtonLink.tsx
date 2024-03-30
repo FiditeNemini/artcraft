@@ -28,7 +28,7 @@ export const ButtonLink = ({
     }
   }
   const baseClassName =
-    "text-sm font-semibold rounded-md px-3 py-2 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all duration-150";
+    "text-sm font-medium rounded-lg px-3 py-2 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all duration-150";
   const variantClassNames = getVariantClassNames(variant);
   const className = twMerge(baseClassName, variantClassNames, propsClassName);
   // END TODO

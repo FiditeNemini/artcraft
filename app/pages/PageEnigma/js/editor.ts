@@ -3,7 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { FreeCam } from "./free_cam";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import Scene from "./scene.js";
-import APIManager from "./api_manager.js";
+import { APIManager, ArtStyle, Visibility }  from "./api_manager.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
@@ -96,6 +96,9 @@ class Editor {
   render_width: number;
   render_height: number;
 
+  positive_prompt: string;
+  negative_prompt: string;
+  art_style:ArtStyle;
   // Default params.
   constructor() {
     console.log(
@@ -186,6 +189,11 @@ class Editor {
     // Scene State
     this.current_scene_media_token = null;
     this.current_scene_glb_media_token = null;
+
+    // stylization parameters
+    this.positive_prompt = "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around."
+    this.negative_prompt = ""
+    this.art_style = ArtStyle.Anime2DFlat
   }
 
   initialize(config: any) {
@@ -196,6 +204,8 @@ class Editor {
     // this.dispatchAppUiState({
     //   type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
     // });
+
+    
 
     if (this.can_initialize == false) {
       console.log("Editor Already Initialized");
@@ -229,7 +239,7 @@ class Editor {
     this.renderer.setSize(width, height);
     //document.body.appendChild(this.renderer.domElement)
     window.addEventListener("resize", this.onWindowResize.bind(this));
-    this._configure_post_pro();
+    this._configurePostProcessing();
     // Controls and movement.
 
     this.lockControls = new PointerLockControls(
@@ -261,7 +271,7 @@ class Editor {
     // Resets canvas size.
     this.onWindowResize();
     // Creates the main update loop.
-    this.renderer.setAnimationLoop(this.update_loop.bind(this));
+    this.renderer.setAnimationLoop(this.updateLoop.bind(this));
 
     this.timeline.scene = this.activeScene;
 
@@ -273,7 +283,7 @@ class Editor {
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
     if (this.cam_obj) {
-      this.addTransformClipBase("Camera Object", "camera",this.cam_obj, 0, 150)
+      this.addTransformClipBase("Camera Object", "camera", this.cam_obj, 0, 150)
     }
 
     // saving state of the scene
@@ -298,7 +308,7 @@ class Editor {
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
     if (this.cam_obj) {
-      this.addTransformClipBase("Camera Object","camera", this.cam_obj, 0, 150);
+      this.addTransformClipBase("Camera Object", "camera", this.cam_obj, 0, 150);
     }
 
     this.dispatchAppUiState({
@@ -317,7 +327,19 @@ class Editor {
 
   // Token comes in from the front end to load the scene from the site.
   public async testBatchRequest() {
-    const result = await this.api_manager.getMediaBatch(["m_8fmp9hrvsqcryzka1fra597kg42s50","m_z4jzbst3xfh64h0qn4bqh4afenfps9"]);
+    const result = await this.api_manager.getMediaBatch(["m_8fmp9hrvsqcryzka1fra597kg42s50", "m_z4jzbst3xfh64h0qn4bqh4afenfps9"]);
+    console.log(result);
+  }
+
+  public async testStylizeRequest() {
+    const result = await this.api_manager.stylizeVideo(
+    "mu_6wy1570a0c3c0tpkkncf4tsvb5234",
+    this.art_style,
+    this.positive_prompt,
+    this.negative_prompt,
+    Visibility.Public).catch(error=> {
+      console.log(error);
+    });
     console.log(result);
   }
 
@@ -391,7 +413,7 @@ class Editor {
       this.current_scene_media_token,
       new TimelineDataState(),
     );
-    
+
     if (result.data == null) {
       return;
     }
@@ -458,7 +480,7 @@ class Editor {
 
     // media id for this is up in the air but when a path is created you should be able to store and delete it
     this.timeline.addPlayableClip(
-      new ClipUI(1.0, "transform","character", "clip2", object.uuid, object.uuid, 0, 150),
+      new ClipUI(1.0, "transform", "character", "clip2", object.uuid, object.uuid, 0, 150),
     );
 
     // media id for this as well it can be downloaded
@@ -585,7 +607,7 @@ class Editor {
 
     // media id for this is up in the air but when a path is created you should be able to store and delete it
     this.timeline.addPlayableClip(
-      new ClipUI(1.0, "transform","character", "clip2", object.uuid, object.uuid, 0, 150),
+      new ClipUI(1.0, "transform", "character", "clip2", object.uuid, object.uuid, 0, 150),
     );
 
     // media id for this as well it can be downloaded
@@ -617,7 +639,7 @@ class Editor {
   }
 
   // Configure post processing.
-  _configure_post_pro() {
+  _configurePostProcessing() {
     let width = this.canvReference.width;
     let height = this.canvReference.height;
 
@@ -684,27 +706,9 @@ class Editor {
     let uuid = this.activeScene.instantiate(name);
   }
 
-  render_mode() {
+  renderMode() {
     this.rendering = !this.rendering;
-    this.activeScene.render_mode(this.rendering);
-    console.log("works.")
-
-    //if (this.rendering) {
-    //    this._remove_post_processing()
-    //} else {
-    //    this._add_post_processing()
-    //}
-  }
-
-  togglePlay() {
-    this.playback = !this.playback;
-    this.playback_location = 0;
-    if (this.playback == false) {
-      this.stopPlayback();
-    } else {
-      // REMOVE THIS NEXT LINE IN PROD ONLY FOR TEST!!!!!
-      //this.activeScene.play_anim_demo(this.activeScene.activeCharacter)
-    }
+    this.activeScene.renderMode(this.rendering);
   }
 
   save() {
@@ -724,14 +728,6 @@ class Editor {
     console.log("Frame taken.");
   }
 
-  change_camera_view() {
-    //let obj = this.activeScene.get_object_by_uuid(this.test_box_uuid)
-    //this.transform_engine.clips[this.test_box_uuid].step(obj)
-    //console.log(this.transform_engine.clips[this.test_box_uuid].current_pos)
-    //this.current_frame += 1
-    //this.transform_engine.clips[this.test_box_uuid].reset(this.activeScene.get_object_by_uuid(this.test_box_uuid))
-  }
-
   take_timeline_cam_clip() {
     if (this.cam_obj == null) {
       return;
@@ -748,7 +744,7 @@ class Editor {
   }
 
   // Basicly Unity 3D's update loop.
-  update_loop(time: number) {
+  updateLoop(time: number) {
     // Updates debug stats.
     if (this.stats != null) {
       this.stats.update();
@@ -791,23 +787,6 @@ class Editor {
     this.transform_interaction = true;
   }
 
-  // Sets the fps to a specific number
-  set_fps(fps_number: number) {
-    this.cap_fps = fps_number;
-  }
-
-  // Toggles playback and recording.
-  togglePlayback() {
-    this.togglePlay();
-    if (this.playback == false) {
-      //this.stopPlayback()
-      this.render_mode();
-    } else {
-      //this.startPlayback()
-      this.render_mode();
-    }
-  }
-
   async loadWavAsBlob(url: string) {
     const response = await fetch(url);
     const blob = await response.blob();
@@ -826,7 +805,7 @@ class Editor {
       endFrame = this.timeline.timeline_limit;
     }
     if (startFrame > this.timeline.timeline_limit) {
-      startFrame = this.timeline.timeline_limit-1;
+      startFrame = this.timeline.timeline_limit - 1;
     }
 
     const startTime = startFrame / this.cap_fps;
@@ -844,18 +823,18 @@ class Editor {
       "-max_muxing_queue_size", "999999",
       audioSegment);
 
-    await ffmpeg.run('-i', video_og,"-max_muxing_queue_size", "999999", `${itteration}empty_tmp.wav`);
+    await ffmpeg.run('-i', video_og, "-max_muxing_queue_size", "999999", `${itteration}empty_tmp.wav`);
 
     await ffmpeg.run(
-      '-i', `${itteration}empty_tmp.wav`, 
-      '-i', audioSegment, 
-      '-filter_complex', "[1:a]adelay="+startTime*1000+"|"+startTime*1000+"[a1];[0:a][a1]amix=inputs=2[a]",
+      '-i', `${itteration}empty_tmp.wav`,
+      '-i', audioSegment,
+      '-filter_complex', "[1:a]adelay=" + startTime * 1000 + "|" + startTime * 1000 + "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map", "[a]",
       `${itteration}final_tmp.wav`)
 
     await ffmpeg.run(
-      '-i', video_og, 
-      '-i', `${itteration}final_tmp.wav`, 
+      '-i', video_og,
+      '-i', `${itteration}final_tmp.wav`,
       '-c:v', 'copy',
       '-c:a', 'aac',
       '-map', '0:v:0',
@@ -864,8 +843,8 @@ class Editor {
       new_video)
   }
 
-  async stopPlayback() {
-    this.render_mode();
+  async stopPlayback(compile_audio: boolean = true) {
+    this.renderMode();
     let ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
     for (let index = 0; index < this.frame_buffer.length; index++) {
@@ -898,12 +877,14 @@ class Editor {
 
     let itteration = 0;
 
-    for (const clip of this.timeline.timeline_items) {
-      if (clip.type == "lipsync" || clip.type == "audio") {
-        await this.convertAudioClip(itteration, ffmpeg, clip);
-        itteration += 1;
-      }
-    };
+    if (compile_audio) {
+      for (const clip of this.timeline.timeline_items) {
+        if (clip.type == "lipsync" || clip.type == "audio") {
+          await this.convertAudioClip(itteration, ffmpeg, clip);
+          itteration += 1;
+        }
+      };
+    }
 
     let output = await ffmpeg.FS("readFile", itteration + "tmp.mp4");
     // Create a Blob from the output file for downloading
@@ -917,21 +898,70 @@ class Editor {
     // Clean up
     URL.revokeObjectURL(url);
     document.body.removeChild(downloadLink);
-  
-  
+
+
     let data = await this.api_manager.uploadMedia(blob, "tmp.wav");
     console.log(data);
     // Create a link to download the file
 
   }
 
+  async generateFrame() {
+    if (this.renderer) {
+      this.activeScene.renderMode(true);
+      if (this.activeScene.hot_items) {
+        this.activeScene.hot_items.forEach(element => {
+          element.visible = false;
+        });
+      }
+
+      if (this.render_camera && this.cam_obj) {
+        this.render_camera.position.copy(this.cam_obj.position);
+        this.render_camera.rotation.copy(this.cam_obj.rotation);
+      }
+
+      this.renderer.setSize(this.render_width, this.render_height);
+      this.renderer.render(this.activeScene.scene, this.render_camera);
+      let imgData = this.renderer.domElement.toDataURL();
+      this.activeScene.renderMode(false);
+      this.onWindowResize();
+      let ffmpeg = createFFmpeg({ log: false });
+      await ffmpeg.load();
+      await ffmpeg.FS(
+        "writeFile",
+        `render.png`,
+        await fetchFile(imgData),
+      );
+      await ffmpeg.run('-i', `render.png`, 'render.mp4');
+      let output = await ffmpeg.FS("readFile", 'render.mp4');
+      const blob = new Blob([output.buffer], { type: "video/mp4" });
+
+      //const blob = new Blob([imgData], { type: "image/png" });
+      let url = await this.api_manager.uploadMediaFrameGeneration(blob, "render.mp4", "anime_ghibli", "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.", "");
+
+      const downloadLink = document.createElement("a");
+      downloadLink.href = url;
+      downloadLink.download = "render.mp4";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      // Clean up
+      URL.revokeObjectURL(url);
+      document.body.removeChild(downloadLink);
+      
+      return new Promise((resolve, reject) => {
+        resolve(url);
+      });
+    }
+  }
+
   generateVideo() {
     console.log("Generating video...");
     if (this.rendering) { return; }
     this.startPlayback();
-    this._initializeRecording();
+    this.frame_buffer = [];
+    this.render_timer = 0;
     this.rendering = true;
-    this.activeScene.render_mode(this.rendering);
+    this.activeScene.renderMode(this.rendering);
     if (this.activeScene.hot_items) {
       this.activeScene.hot_items.forEach(element => {
         element.visible = false;
@@ -958,17 +988,13 @@ class Editor {
         return;
       }
       this.orbitControls.enabled = !event.value;
+      this.updateSelectedUI();
       // this.update_properties()
     });
     this.control.setSize(0.5); // Good default value for visuals.
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
     this.activeScene.scene.add(this.control);
-  }
-
-  _initializeRecording() {
-    this.frame_buffer = [];
-    this.render_timer = 0;
   }
 
   // Render the scene to the camera.
@@ -991,10 +1017,32 @@ class Editor {
         this.stopPlayback();
         this.playback_location = 0;
         this.rendering = false;
+        this.switchCameraView();
         this.onWindowResize();
       }
     }
   }
+
+  updateSelectedUI() {
+    if (this.selected == undefined) { return; }
+    let pos = this.selected.position;
+    let rot = this.selected.rotation;
+    let scale = this.selected.scale;
+
+    this.dispatchAppUiState({
+      type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
+      payload: {
+        currentSceneObject: {
+          objectVectors: {
+            position: { x: parseFloat(pos.x.toFixed(2)), y: parseFloat(pos.y.toFixed(2)), z: parseFloat(pos.z.toFixed(2)) },
+            rotation: { x: parseFloat(rot.x.toFixed(2)), y: parseFloat(rot.y.toFixed(2)), z: parseFloat(rot.z.toFixed(2)) },
+            scalar: { x: parseFloat(scale.x.toFixed(2)), y: parseFloat(scale.y.toFixed(2)), z: parseFloat(scale.z.toFixed(2)) },
+          }
+        }
+      }
+    });
+  }
+
 
   // Automaticly resize scene.
   onWindowResize() {
@@ -1080,6 +1128,8 @@ class Editor {
         if (this.selected.type == "Scene") {
           this.selected = intersects[0].object;
         }
+
+        this.updateSelectedUI();
         // this.update_properties()
         this.activeScene.scene.add(this.control);
         this.control.attach(this.selected);
@@ -1088,6 +1138,9 @@ class Editor {
       }
     } else if (this.transform_interaction == false) {
       this.removeTransformControls();
+      this.dispatchAppUiState({
+        type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT
+      });
     } else {
       this.transform_interaction = false;
     }

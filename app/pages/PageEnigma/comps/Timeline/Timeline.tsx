@@ -17,11 +17,8 @@ import {
   timelineHeight,
 } from "~/pages/PageEnigma/store";
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
-import { EngineContext } from "../../contexts/EngineContext";
 
 export const Timeline = () => {
-  const editorEngine = useContext(EngineContext);
-
   const {
     characters,
     objects,
@@ -135,20 +132,21 @@ export const Timeline = () => {
           </div>
         )}
         <div
-          className="absolute text-brand-primary"
-          style={{ top: 8, left: displayTime * 4 * scale.value + 88 }}
+          className="absolute flex cursor-ew-resize flex-col items-center text-brand-primary"
+          style={{ top: 8, left: displayTime * 4 * scale.value + 84 }}
           onPointerDown={onPointerDown}
         >
-          <FontAwesomeIcon
-            icon={faSortDown}
-            className="absolute ml-[-5px] mt-[-10px] h-5 text-brand-primary"
-          />
+          <div>
+            <FontAwesomeIcon
+              icon={faSortDown}
+              className="h-5 text-brand-primary"
+            />
+          </div>
           <div
-            className="absolute block bg-brand-primary"
+            className="block bg-brand-primary"
             style={{
-              left: 0,
-              top: 8,
-              width: 4,
+              width: 2,
+              marginTop: -5,
               height: fullHeight,
             }}
           />

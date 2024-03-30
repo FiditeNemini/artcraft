@@ -8,7 +8,7 @@ import { TimelineDataState } from "./timeline";
  * Storyteller Studio API Manager
  * The source of truth of all these media items is the database in the cloud
  */
-class MediaFile {
+export class MediaFile {
   public_bucket_path: string;
   media_type: string;
   media_token: string;
@@ -22,6 +22,31 @@ class MediaFile {
     this.public_bucket_path = public_bucket_path;
     this.media_type = media_type;
   }
+}
+
+export enum ArtStyle {
+  Anime2_5D = "anime_2_5d",
+  Anime2DFlat = "anime_2d_flat",
+  Cartoon3D = "cartoon_3d",
+  ComicBook = "comic_book",
+  AnimeGhibli = "anime_ghibli",
+  InkPunk = "ink_punk",
+  InkSplash = "ink_splash",
+  InkBWStyle = "ink_bw_style",
+  JojoStyle = "jojo_style",
+  PaperOrigami = "paper_origami",
+  PixelArt = "pixel_art",
+  PopArt = "pop_art",
+  Realistic1 = "realistic_1",
+  Realistic2 = "realistic_2",
+  AnimeRetroNeon = "anime_retro_neon",
+  AnimeStandard = "anime_standard",
+}
+
+export enum Visibility {
+  Public = "public",
+  Hidden = "hidden",
+  Private = "private",
 }
 
 /**
@@ -48,7 +73,7 @@ class APIManagerResponseError extends Error {
   }
 }
 
-class APIManager {
+export class APIManager {
   baseUrl: String;
 
   constructor() {
@@ -313,6 +338,41 @@ class APIManager {
     }
   }
 
+  public async uploadMediaFrameGeneration(
+    blob: any,
+    fileName: string,
+    style: string = "comic_book",
+    positive_prompt: string,
+    negative_prompt: string,
+  ): Promise<string> {
+    const url = `https://funnel.tailce84f.ts.net/preview/`;
+    
+    const payload = {
+      style: style,
+      positive_prompt: positive_prompt,
+      negative_prompt: negative_prompt
+    };
+
+    const formData = new FormData();
+    formData.append("video", blob, fileName);
+    formData.append("request", JSON.stringify(payload));
+
+    const response = await fetch(url, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new APIManagerResponseError("Upload Media Failed to send file");
+    } else {
+      return URL.createObjectURL(await response.blob());
+    }
+  }
+
   public async getMediaBatch(media_tokens: string[]): Promise<MediaFile[]> {
     const tokens = media_tokens;
     const url = new URL(`${this.baseUrl}/v1/media_files/batch`);
@@ -332,6 +392,47 @@ class APIManager {
       .catch((error) => console.error("Error:", error));
     return result;
   }
+
+  
+  public async stylizeVideo(media_token: string, 
+    style: ArtStyle, 
+    positive_prompt:string, 
+    negative_prompt:string,
+    visibility:Visibility) {
+    let uuid = uuidv4();
+    
+    const data = {
+      uuid_idempotency_token: uuid,
+      style: style,
+      input_file: media_token,
+      prompt: positive_prompt,
+      negative_prompt: negative_prompt,
+      trim_start_millis: 0,
+      trim_end_millis: 3000,
+      enable_lipsync: true,
+      creator_set_visibility: visibility
+    }
+
+    const json_data = JSON.stringify(data)
+
+    const response = await fetch(`${this.baseUrl}/v1/video/enqueue_vst`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: json_data,
+    });
+
+    if (!response.ok) {
+      // Handle HTTP error responses
+      const errorData = await response.json();
+      throw new Error(`API Error: ${response.status} ${errorData.message}`);
+    }
+
+    // Assuming the response is JSON and matches the EnqueueVideoStyleTransferSuccessResponse interface
+    return await response.json();
+  }
 }
 
-export default APIManager;
