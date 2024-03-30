@@ -33,6 +33,7 @@ SET
     can_access_studio = false,
     maybe_feature_flags = 'studio,video_style_transfer'
 WHERE username IN (
+    'candyfoxxx',
     'dannymcgee',
     'devdude123',
     'el_cid_93',
