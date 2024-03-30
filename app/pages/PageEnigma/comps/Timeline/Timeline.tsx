@@ -133,7 +133,7 @@ export const Timeline = () => {
         )}
         <div
           className="absolute flex cursor-ew-resize flex-col items-center text-brand-primary"
-          style={{ top: 8, left: displayTime * 4 * scale.value + 88 }}
+          style={{ top: 8, left: displayTime * 4 * scale.value + 84 }}
           onPointerDown={onPointerDown}
         >
           <div>
