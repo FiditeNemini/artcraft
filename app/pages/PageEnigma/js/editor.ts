@@ -3,7 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { FreeCam } from "./free_cam";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import Scene from "./scene.js";
-import APIManager from "./api_manager.js";
+import { APIManager, ArtStyle, Visibility }  from "./api_manager.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
@@ -318,6 +318,11 @@ class Editor {
   // Token comes in from the front end to load the scene from the site.
   public async testBatchRequest() {
     const result = await this.api_manager.getMediaBatch(["m_8fmp9hrvsqcryzka1fra597kg42s50", "m_z4jzbst3xfh64h0qn4bqh4afenfps9"]);
+    console.log(result);
+  }
+
+  public async testStylizeRequest() {
+    const result = await this.api_manager.stylizeVideo("mu_6wy1570a0c3c0tpkkncf4tsvb5234",ArtStyle.Anime2_5D," ((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.","",Visibility.Public)
     console.log(result);
   }
 
