@@ -369,6 +369,7 @@ export class APIManager {
     const data = {
       uuid_idempotency_token: uuid,
       style: style,
+      input_file: media_token,
       prompt: positive_prompt,
       negative_prompt: negative_prompt,
       trim_start_millis: 0,
@@ -376,14 +377,17 @@ export class APIManager {
       enable_lipsync: true,
       creator_set_visibility: visibility
     }
-    console.log(JSON.stringify(data))
+
+    const json_data = JSON.stringify(data)
+
     const response = await fetch(`${this.baseUrl}/v1/video/enqueue_vst`, {
       method: "POST",
       credentials: "include",
       headers: {
         Accept: "application/json",
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: json_data,
     });
 
     if (!response.ok) {

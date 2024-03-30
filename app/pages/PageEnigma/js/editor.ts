@@ -327,7 +327,9 @@ class Editor {
     ArtStyle.Anime2_5D,
     "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.",
     "",
-    Visibility.Public)
+    Visibility.Public).catch(error=> {
+      console.log(error);
+    });
     console.log(result);
   }
 
