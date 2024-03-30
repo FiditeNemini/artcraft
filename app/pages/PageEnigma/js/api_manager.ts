@@ -376,7 +376,7 @@ export class APIManager {
       enable_lipsync: true,
       creator_set_visibility: visibility
     }
-
+    console.log(JSON.stringify(data))
     const response = await fetch(`${this.baseUrl}/v1/video/enqueue_vst`, {
       method: "POST",
       credentials: "include",
