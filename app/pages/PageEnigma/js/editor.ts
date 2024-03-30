@@ -96,6 +96,9 @@ class Editor {
   render_width: number;
   render_height: number;
 
+  positive_prompt: string;
+  negative_prompt: string;
+  art_style:ArtStyle;
   // Default params.
   constructor() {
     console.log(
@@ -186,6 +189,11 @@ class Editor {
     // Scene State
     this.current_scene_media_token = null;
     this.current_scene_glb_media_token = null;
+
+    // stylization parameters
+    this.positive_prompt = ""
+    this.negative_prompt = ""
+    this.art_style = ArtStyle.Anime2DFlat
   }
 
   initialize(config: any) {
