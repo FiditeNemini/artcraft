@@ -3,7 +3,7 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
-use std::collections::HashSet;
+use std::collections::BTreeSet;
 use std::fmt;
 
 use actix_web::{HttpRequest, HttpResponse, web};
@@ -48,9 +48,12 @@ pub struct SessionUserInfo {
   pub display_name: String,
   pub email_gravatar_hash: String,
 
-  // Feature / rollout flags:
+  // TODO(bt,2024-03-30): Remove legacy feature flag
   pub can_access_studio: bool,
-  pub maybe_feature_flags: HashSet<UserFeatureFlag>,
+
+  // Collection of feature / rollout flags
+  // NB: The BTreeSet maintains order so React doesn't introduce re-render state bugs when order changes
+  pub maybe_feature_flags: BTreeSet<UserFeatureFlag>,
 
   // Premium plans:
   pub fakeyou_plan: FakeYouPlan,

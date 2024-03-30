@@ -1,5 +1,5 @@
+use std::collections::BTreeSet;
 
-use std::collections::HashSet;
 use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 
 #[derive(Default, Clone)]
@@ -16,9 +16,11 @@ impl UserSessionFeatureFlags {
     }
   }
 
-  pub fn get_flags(&self) -> HashSet<UserFeatureFlag> {
+  // NB: The BTreeSet maintains order so frontend React code doesn't introduce re-render
+  // bugs when order changes and makes React think there has been a state change.
+  pub fn get_flags(&self) -> BTreeSet<UserFeatureFlag> {
     match self.maybe_feature_flags.as_deref() {
-      None => HashSet::new(),
+      None => BTreeSet::new(),
       Some(feature_flags) => {
         feature_flags
             .split(",")
@@ -38,6 +40,7 @@ impl UserSessionFeatureFlags {
 #[cfg(test)]
 mod tests {
   use enums::by_table::users::user_feature_flag::UserFeatureFlag;
+
   use crate::utils::user_session_feature_flags::UserSessionFeatureFlags;
 
   #[test]
