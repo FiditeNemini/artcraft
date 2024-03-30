@@ -322,7 +322,12 @@ class Editor {
   }
 
   public async testStylizeRequest() {
-    const result = await this.api_manager.stylizeVideo("mu_6wy1570a0c3c0tpkkncf4tsvb5234",ArtStyle.Anime2_5D," ((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.","",Visibility.Public)
+    const result = await this.api_manager.stylizeVideo(
+    "mu_6wy1570a0c3c0tpkkncf4tsvb5234",
+    ArtStyle.Anime2_5D,
+    "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.",
+    "",
+    Visibility.Public)
     console.log(result);
   }
 
