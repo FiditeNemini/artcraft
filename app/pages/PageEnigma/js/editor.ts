@@ -343,7 +343,6 @@ class Editor {
   }
 
   public async testTestTimelineEvents() {
-  
   }
 
   public async testStylizeRequest() {
