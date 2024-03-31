@@ -96,6 +96,9 @@ export class TimeLine {
     public async handleTimelineActions(data: any) {
         const action = data["action"]
         switch (action) {
+            case toEngineActions.ADD_KEYFRAME:
+                await this.addKeyFrame(data)
+                break
             case toEngineActions.ADD_CLIP:
                 await this.addClip(data)
                 break
@@ -115,6 +118,20 @@ export class TimeLine {
                 console.log("Action Not Wired")
         }
 
+    }
+
+    public async addKeyFrame(data: any) {
+        // KeyFrame Object
+        // version: number;
+        // clip_uuid: string;
+        // group: ClipGroup;
+        // object_uuid?: string;
+        // offset: number;
+        // position: XYZ
+        // rotation: XYZ;
+        // scale: XYZ;
+        // selected?: boolean;
+        
     }
 
     public async addClip(data: any) {
