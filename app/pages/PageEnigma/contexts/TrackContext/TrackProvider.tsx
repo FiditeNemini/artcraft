@@ -76,7 +76,7 @@ export const TrackProvider = ({ children }: Props) => {
     setAnimationClips([
       {
         version: 1,
-        media_id: uuid.v4(),
+        media_id: "m_5q9s6esz8ymjqz0bheh8nf4crtj2kx",
         type: ClipType.ANIMATION,
         length: 25,
         name: "Sit",

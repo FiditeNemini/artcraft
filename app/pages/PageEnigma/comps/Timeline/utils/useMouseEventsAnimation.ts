@@ -27,15 +27,25 @@ export const useMouseEventsAnimation = () => {
     };
 
     const onMouseMove = (event: MouseEvent) => {
-      const delta =
-        (event.clientX - clientX) / 4 / scale.value + currentTime.value;
+      const delta = Math.round(
+        (event.clientX - clientX) / 4 / scale.value + currentTime.value,
+      );
       if (isActive) {
         event.stopPropagation();
         event.preventDefault();
         if (delta < 0 || delta > max) {
           return;
         }
-        setTime(delta);
+        setTime((oldTime) => {
+          if (oldTime !== delta) {
+            Queue.publish({
+              queueName: QueueNames.TO_ENGINE,
+              action: toEngineActions.UPDATE_TIME,
+              data: { currentTime: delta },
+            });
+          }
+          return delta;
+        });
         return;
       }
     };
