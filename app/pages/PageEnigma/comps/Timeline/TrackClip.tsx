@@ -1,14 +1,19 @@
 import { useMouseEventsClip } from "./utils/useMouseEventsClip";
-import { BaseClip } from "~/pages/PageEnigma/models/track";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { scale } from "~/pages/PageEnigma/store";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlay } from "@fortawesome/pro-solid-svg-icons";
+import { Clip } from "~/pages/PageEnigma/models/track";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 interface Props {
   min: number;
   max: number;
   style: "character" | "camera" | "audio" | "objects";
-  clip: BaseClip;
+  clip: Clip;
   updateClip: (options: { id: string; offset: number; length: number }) => void;
 }
 
@@ -28,9 +33,24 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
 
   const { length, offset } = state;
 
+  const onPlayClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
+      event.preventDefault();
+      Queue.publish({
+        queueName: QueueNames.TO_ENGINE,
+        action: toEngineActions.PLAY_CLIP,
+        data: clip,
+      });
+    },
+    [clip],
+  );
+
   const classes = [
     "absolute",
-    clip.id === selectedClip ? `bg-${style}-selected` : `bg-${style}-clip`,
+    clip.clip_uuid === selectedClip
+      ? `bg-${style}-selected`
+      : `bg-${style}-clip`,
   ];
 
   return (
@@ -51,7 +71,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           ...classes,
           "rounded-l-lg",
           "block h-full",
-          clip.id === selectedClip
+          clip.clip_uuid === selectedClip
             ? "border border-b-2 border-l-2 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -61,13 +81,13 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "w-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "left")}
-        onClick={() => selectClip(clip.id)}
+        onClick={() => selectClip(clip.clip_uuid)}
       />
       <button
         className={[
           ...classes,
           "block h-full",
-          clip.id === selectedClip
+          clip.clip_uuid === selectedClip
             ? "border border-b-2 border-l-0 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -77,14 +97,14 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "move",
         }}
         onPointerDown={(event) => onPointerDown(event, "drag")}
-        onClick={() => selectClip(clip.id)}
+        onClick={() => selectClip(clip.clip_uuid)}
       />
       <button
         className={[
           ...classes,
           "rounded-r-lg",
           "block h-full",
-          clip.id === selectedClip
+          clip.clip_uuid === selectedClip
             ? "border border-b-2 border-l-0 border-r-2 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -94,8 +114,21 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "e-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "right")}
-        onClick={() => selectClip(clip.id)}
+        onClick={() => selectClip(clip.clip_uuid)}
       />
+      {selectedClip === clip.clip_uuid && (
+        <button
+          className="absolute flex h-full items-center justify-center"
+          style={{
+            width: length * 4 * scale.value,
+            left: offset * 4 * scale.value,
+            zIndex: 2000,
+          }}
+          onPointerDown={onPlayClick}
+        >
+          <FontAwesomeIcon icon={faPlay} />
+        </button>
+      )}
     </>
   );
 };
