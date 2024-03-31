@@ -1,20 +1,22 @@
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import { QueueClip } from "~/pages/PageEnigma/models/track";
+import { XYZ } from "../datastructures/common";
+import { toTimelineActions } from "./toTimelineActions";
 
 class Queue {
   private _queue: Record<
     string,
     {
-      action: fromEngineActions | toEngineActions;
-      data: QueueClip | { currentTime: number };
+      action: fromEngineActions | toEngineActions | toTimelineActions;
+      data: QueueClip | { currentTime: number } | { position: XYZ, rotation: XYZ, scale: XYZ };
     }[]
   > = {};
   private _subscribers: Record<
     string,
     (entry: {
-      action: fromEngineActions | toEngineActions;
-      data: QueueClip | { currentTime: number };
+      action: fromEngineActions | toEngineActions | toTimelineActions;
+      data: QueueClip | { currentTime: number } | { position: XYZ, rotation: XYZ, scale: XYZ };
     }) => void
   > = {};
 
@@ -24,8 +26,8 @@ class Queue {
     data,
   }: {
     queueName: string;
-    action: fromEngineActions | toEngineActions;
-    data: QueueClip | { currentTime: number };
+    action: fromEngineActions | toEngineActions | toTimelineActions ;
+    data: QueueClip | { currentTime: number } | { position: XYZ, rotation: XYZ, scale: XYZ };
   }) {
     if (!this._queue[queueName]) {
       this._queue[queueName] = [];
@@ -41,8 +43,8 @@ class Queue {
   public subscribe(
     queueName: string,
     onMessage: (entry: {
-      action: fromEngineActions | toEngineActions;
-      data: QueueClip | { currentTime: number };
+      action: fromEngineActions | toEngineActions | toTimelineActions;
+      data: QueueClip | { currentTime: number } | { position: XYZ, rotation: XYZ, scale: XYZ };
     }) => void,
   ) {
     this._subscribers[queueName] = onMessage;

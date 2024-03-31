@@ -7,5 +7,5 @@ export type XYZ = {
 export type Simple3DVector = {
   position: XYZ;
   rotation: XYZ;
-  scalar: XYZ;
+  scale: XYZ;
 }
