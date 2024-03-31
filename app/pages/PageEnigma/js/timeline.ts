@@ -248,9 +248,9 @@ export class TimeLine {
             this.scrubber_frame_position = this.current_time;
         }
 
-        //if (this.scrubber_frame_position <= 0) {
-        //    await this.resetScene();
-        //}
+        if (this.scrubber_frame_position <= 0) {
+            await this.resetScene();
+        }
 
         //this.scrubber_frame_position += 1;
         //2. allow stopping.
@@ -296,14 +296,9 @@ export class TimeLine {
                 }
                 //this.timelineItems = this.timelineItems.filter(item => item !== element)
             }
-
-            // find the offset of the longest clip and play until that clip is done
-            if (this.scrubber_frame_position >= this.timeline_limit) { // stops at where clips should // cannot throw clip
-                this.stop()
-            }
         }
 
-        if (this.scrubber_frame_position >= this.timeline_limit) {
+        if (this.scrubber_frame_position >= this.timeline_limit && this.is_playing) {
             await this.stop();
         }
     }
