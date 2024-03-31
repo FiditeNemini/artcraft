@@ -114,17 +114,17 @@ export const ControlPanelSceneObject = () => {
         currentSceneObject == null) 
         { return; }
 
-        console.log(`Position ${position.x}`)
-        console.log(`Position ${position.y}`)
-        console.log(`Position ${position.z}`)
+        // console.log(`Position ${position.x}`)
+        // console.log(`Position ${position.y}`)
+        // console.log(`Position ${position.z}`)
 
-        console.log(`Rotation ${rotation.x}`)
-        console.log(`Rotation ${rotation.y}`)
-        console.log(`Rotation ${rotation.z}`)
+        // console.log(`Rotation ${rotation.x}`)
+        // console.log(`Rotation ${rotation.y}`)
+        // console.log(`Rotation ${rotation.z}`)
       
-        console.log(`Scale ${scale.x}`)
-        console.log(`Scale ${scale.y}`)
-        console.log(`Scale ${scale.z}`)
+        // console.log(`Scale ${scale.x}`)
+        // console.log(`Scale ${scale.y}`)
+        // console.log(`Scale ${scale.z}`)
 
         console.log(`Group ${currentSceneObject.group}`)
         console.log(`Object UUID ${currentSceneObject.object_uuid}`)
@@ -137,7 +137,7 @@ export const ControlPanelSceneObject = () => {
             object_uuid:currentSceneObject.object_uuid,
             object_name:currentSceneObject.object_name,
             version:currentSceneObject.version,
-            
+
             position: currentSceneObject.objectVectors.position,
             rotation: currentSceneObject.objectVectors.rotation,
             scale:currentSceneObject.objectVectors.scale
