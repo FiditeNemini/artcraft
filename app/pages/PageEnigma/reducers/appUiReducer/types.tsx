@@ -1,4 +1,5 @@
 import { Simple3DVector } from "../../datastructures/common";
+import { ClipGroup } from "../../models/track";
 export enum VIEW_MODES {
   EDITOR = 'editor',
   SIDE_BY_SIDE = 'side-by-side'
@@ -21,6 +22,10 @@ export type State = {
     useFakeTimer?: number;
   }
   currentSceneObject:{
+    group: ClipGroup, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
+    object_uuid: string,
+    object_name: string,
+    version: string
     isShowing: boolean;
     objectVectors: Simple3DVector;
   }
@@ -41,11 +46,26 @@ export enum ACTION_TYPES {
 };
 
 export type Action =
-  | {type: ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT}
+  | { // Not sure why we need this but type script won't stop complaning fix wil.
+    type: ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
+    payload:{
+      currentSceneObject: {
+        group: ClipGroup, 
+        object_uuid: string,
+        object_name: string,
+        version: string,
+        objectVectors: Simple3DVector;
+      };
+    }
+  }
   | {
       type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
       payload:{
         currentSceneObject: {
+          group: ClipGroup, 
+          object_uuid: string,
+          object_name: string,
+          version: string,
           objectVectors: Simple3DVector;
         };
       }
@@ -54,6 +74,10 @@ export type Action =
       type: ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
       payload:{
         currentSceneObject: {
+          group: ClipGroup, 
+          object_uuid: string,
+          object_name: string,
+          version: string,
           objectVectors: Simple3DVector;
         };
       }

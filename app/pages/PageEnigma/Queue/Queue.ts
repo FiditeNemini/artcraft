@@ -1,6 +1,6 @@
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
-import { QueueClip } from "~/pages/PageEnigma/models/track";
+import { ClipGroup, QueueClip } from "~/pages/PageEnigma/models/track";
 import { XYZ } from "../datastructures/common";
 import { toTimelineActions } from "./toTimelineActions";
 
@@ -27,7 +27,7 @@ class Queue {
   }: {
     queueName: string;
     action: fromEngineActions | toEngineActions | toTimelineActions ;
-    data: QueueClip | { currentTime: number } | { position: XYZ, rotation: XYZ, scale: XYZ };
+    data: QueueClip | { currentTime: number } | { group:ClipGroup, object_uuid:string, object_name:string, version:string,position: XYZ, rotation: XYZ, scale: XYZ };
   }) {
     if (!this._queue[queueName]) {
       this._queue[queueName] = [];
