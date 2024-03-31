@@ -13,12 +13,15 @@ import { Button, H4, H5, H6, InputVector } from "~/components";
 import { XYZ } from "../../datastructures/common";
 import { ACTION_TYPES } from "../../reducers/appUiReducer/types";
 
+import { QueueNames } from "../../Queue/QueueNames";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { toTimelineActions } from "../../Queue/toTimelineActions";
 export const ControlPanelSceneObject = () => {
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
 
   const position = appUiState?.currentSceneObject.objectVectors.position;
   const rotation = appUiState?.currentSceneObject.objectVectors.rotation;
-  const scalar = appUiState?.currentSceneObject.objectVectors.scalar;
+  const scalar = appUiState?.currentSceneObject.objectVectors.scale;
 
   const handlePositionChange = (xyz: XYZ) => {
     if (appUiState)
@@ -29,7 +32,7 @@ export const ControlPanelSceneObject = () => {
             objectVectors: {
               position: { ...xyz },
               rotation: appUiState.currentSceneObject.objectVectors.rotation,
-              scalar: appUiState.currentSceneObject.objectVectors.scalar,
+              scale: appUiState.currentSceneObject.objectVectors.scale,
             },
           },
         },
@@ -44,7 +47,7 @@ export const ControlPanelSceneObject = () => {
             objectVectors: {
               position: appUiState.currentSceneObject.objectVectors.position,
               rotation: { ...xyz },
-              scalar: appUiState.currentSceneObject.objectVectors.scalar,
+              scale: appUiState.currentSceneObject.objectVectors.scale,
             },
           },
         },
@@ -59,12 +62,36 @@ export const ControlPanelSceneObject = () => {
             objectVectors: {
               position: appUiState.currentSceneObject.objectVectors.position,
               rotation: appUiState.currentSceneObject.objectVectors.rotation,
-              scalar: { ...xyz },
+              scale: { ...xyz },
             },
           },
         },
       });
   };
+
+  const handleOnAddKeyFrame = () => {
+    if (appUiState) {
+        console.log(`${appUiState.currentSceneObject.objectVectors.position.x}`)
+        console.log(`${appUiState.currentSceneObject.objectVectors.position.y}`)
+        console.log(`${appUiState.currentSceneObject.objectVectors.position.z}`)
+
+        console.log(`${appUiState.currentSceneObject.objectVectors.rotation.x}`)
+        console.log(`${appUiState.currentSceneObject.objectVectors.rotation.y}`)
+        console.log(`${appUiState.currentSceneObject.objectVectors.rotation.z}`)
+
+        console.log(`${appUiState.currentSceneObject.objectVectors.scale.x}`)
+        console.log(`${appUiState.currentSceneObject.objectVectors.scale.y}`)
+        console.log(`${appUiState.currentSceneObject.objectVectors.scale.z}`)
+
+        Queue.publish({queueName:QueueNames.TO_TIMELINE, action: toTimelineActions.ADD_KEYFRAME, 
+          data: {  
+            position: appUiState.currentSceneObject.objectVectors.position,
+            rotation: appUiState.currentSceneObject.objectVectors.rotation,
+            scale:appUiState.currentSceneObject.objectVectors.scale
+          }
+        })
+    }
+  }
 
   return (
     <Transition
@@ -121,7 +148,9 @@ export const ControlPanelSceneObject = () => {
 
       <span className="h-2" />
       <div className="flex gap-2">
-        <Button variant="secondary" className="grow">
+        <Button variant="secondary" 
+        className="grow"
+        onClick={handleOnAddKeyFrame}>
           Add Keyframe (K)
         </Button>
         <Button variant="secondary" icon={faTrash} />

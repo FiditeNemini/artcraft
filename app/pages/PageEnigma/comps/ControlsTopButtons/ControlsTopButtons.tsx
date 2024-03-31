@@ -77,7 +77,7 @@ export const ControlsTopButtons = () => {
             objectVectors: {
               position: {x:1,y:2,z:3},
               rotation: {x:4,y:5,z:6},
-              scalar: {x:7,y:8,z:9},
+              scale: {x:7,y:8,z:9},
             }
           }
         }
