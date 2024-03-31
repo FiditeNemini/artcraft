@@ -255,7 +255,7 @@ export class TimeLine {
     }
 
     // called by the editor update loop on each frame
-    public async update(deltatime: number) {
+    public async update() {
         //if (this.is_playing == false) return; // start and stop 
 
 
