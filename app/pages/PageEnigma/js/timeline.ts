@@ -164,7 +164,7 @@ export class TimeLine {
     }
 
     public async scrubberDidStop(offset_frame: number) {
-
+        
     }
     // public streaming events into the timeline from
     public async setScrubberPosition(offset: number) {
