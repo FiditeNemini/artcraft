@@ -4,8 +4,8 @@ import {
   CameraGroup,
   CharacterGroup,
   ObjectGroup,
-  ObjectTrack,
   MediaClip,
+  KeyFrame,
 } from "~/pages/PageEnigma/models/track";
 
 export const TrackContext = createContext<{
@@ -62,11 +62,14 @@ export const TrackContext = createContext<{
   // timeline objects group
   objects: ObjectGroup;
   updateObject: (options: { id: string; offset: number }) => void;
-  addObject: (options: ObjectTrack) => void;
 
   // current - only select one item - will be replaced
-  selectedClip: string | null;
-  selectClip: (clipId: string) => void;
+  selectedItem: string | null;
+  selectItem: (itemId: string) => void;
+
+  // keyframes
+  addKeyframe: (options: { object_uuid: string }) => void;
+  deleteKeyframe: (options: KeyFrame) => void;
 
   // sidebar clips
   animationClips: MediaClip[];
@@ -102,10 +105,12 @@ export const TrackContext = createContext<{
 
   objects: { id: "", objects: [] },
   updateObject: () => {},
-  addObject: () => {},
 
-  selectedClip: null,
-  selectClip: () => {},
+  addKeyframe: () => {},
+  deleteKeyframe: () => {},
+
+  selectedItem: null,
+  selectItem: () => {},
 
   animationClips: [],
   audioClips: [],

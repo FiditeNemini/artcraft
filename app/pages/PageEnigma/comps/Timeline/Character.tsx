@@ -2,6 +2,7 @@ import { useCallback, useContext, useMemo } from "react";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { TrackClips } from "~/pages/PageEnigma/comps/Timeline/TrackClips";
 import { fullWidth } from "~/pages/PageEnigma/store";
+import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 
 function buildUpdaters(
   updateCharacters: (options: {
@@ -52,7 +53,7 @@ export const Character = ({ characterId }: Props) => {
   if (!character) {
     return false;
   }
-  const { animationClips, positionClips, lipSyncClips } = character;
+  const { animationClips, positionKeyframes, lipSyncClips } = character;
 
   return (
     <div
@@ -71,9 +72,9 @@ export const Character = ({ characterId }: Props) => {
           style="character"
           type="animations"
         />
-        <TrackClips
+        <TrackKeyFrames
           id={character.id}
-          clips={positionClips}
+          keyFrames={positionKeyframes}
           title="Character Position/Rotation"
           updateClip={updateClipPosition}
           style="character"

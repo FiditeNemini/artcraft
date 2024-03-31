@@ -1,3 +1,5 @@
+import { XYZ } from "../datastructures/common";
+
 export interface QueueClip {
   version: number;
   type: ClipType;
@@ -45,10 +47,15 @@ export enum ClipGroup {
   OBJECT = "object",
 }
 
-export interface BaseKeyFrame {
-  id: string;
-  name: string;
+export interface KeyFrame {
+  version: number;
+  keyframe_uuid: string;
+  group: ClipGroup;
+  object_uuid?: string;
   offset: number;
+  position: XYZ;
+  rotation: XYZ;
+  scale: XYZ;
   selected?: boolean;
 }
 
@@ -56,13 +63,13 @@ export interface CharacterGroup {
   id: string;
   muted: boolean;
   animationClips: Clip[];
-  positionClips: Clip[];
+  positionKeyframes: KeyFrame[];
   lipSyncClips: Clip[];
 }
 
 export interface CameraGroup {
   id: string;
-  clips: Clip[];
+  clips: KeyFrame[];
 }
 
 export interface AudioGroup {
@@ -78,7 +85,5 @@ export interface ObjectGroup {
 
 export interface ObjectTrack {
   id: string;
-  keyFrames: ObjectKeyFrame[];
+  keyFrames: KeyFrame[];
 }
-
-export interface ObjectKeyFrame extends BaseKeyFrame {}

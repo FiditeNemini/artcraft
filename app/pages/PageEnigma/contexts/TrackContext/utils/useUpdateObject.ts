@@ -1,21 +1,11 @@
 import { useCallback, useState } from "react";
 import { ObjectGroup, ObjectTrack } from "~/pages/PageEnigma/models/track";
+import * as uuid from "uuid";
 
 export default function useUpdateObject() {
   const [objects, setObjects] = useState<ObjectGroup>({
     id: "OB1",
-    objects: [
-      // {
-      //   id: "OB1-O1",
-      //   keyFrames: [
-      //     {
-      //       id: "OB1-O1-1",
-      //       offset: 0,
-      //       name: "obj 1",
-      //     },
-      //   ],
-      // },
-    ],
+    objects: [],
   });
 
   const updateObject = useCallback(
@@ -27,7 +17,7 @@ export default function useUpdateObject() {
             id: object.id,
             keyFrames: object.keyFrames.map((keyFrame) => ({
               ...keyFrame,
-              offset: keyFrame.id === id ? offset : keyFrame.offset,
+              offset: keyFrame.keyframe_uuid === id ? offset : keyFrame.offset,
             })),
           })),
         };
@@ -35,6 +25,18 @@ export default function useUpdateObject() {
     },
     [],
   );
+
+  const addObject = useCallback((name: string) => {
+    setObjects((oldObjectGroup) => {
+      return {
+        ...oldObjectGroup,
+        objects: [
+          ...oldObjectGroup.objects,
+          { object_uuid: uuid.v4(), name: name, keyframes: [] },
+        ],
+      };
+    });
+  }, []);
 
   const addObject = useCallback((obj: ObjectTrack) => {
     setObjects((oldObjectGroup) => {
@@ -49,5 +51,6 @@ export default function useUpdateObject() {
     objects,
     updateObject,
     addObject,
+    addKeyframe,
   };
 }

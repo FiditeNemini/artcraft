@@ -27,8 +27,8 @@ export const TrackProvider = ({ children }: Props) => {
 
   const { endDrag, ...dragDrop } = useUpdateDragDrop();
 
-  const [selectedClip, setSelectedClip] = useState<string | null>(null);
-  const selectClip = useCallback((clipId: string | null) => {
+  const [selectedItem, setSelectedClip] = useState<string | null>(null);
+  const selectItem = useCallback((clipId: string | null) => {
     setSelectedClip(clipId);
   }, []);
 
@@ -115,8 +115,8 @@ export const TrackProvider = ({ children }: Props) => {
       ...audio,
       ...objects,
 
-      selectClip,
-      selectedClip,
+      selectItem,
+      selectedItem,
 
       ...dragDrop,
       endDrag: dropClip,
@@ -138,8 +138,8 @@ export const TrackProvider = ({ children }: Props) => {
     audio,
     objects,
 
-    selectClip,
-    selectedClip,
+    selectItem,
+    selectedItem,
 
     dragDrop,
     dropClip,

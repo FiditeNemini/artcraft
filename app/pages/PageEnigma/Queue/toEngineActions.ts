@@ -15,4 +15,6 @@ export enum toEngineActions {
   // data=QueueClip
   UPDATE_TIME = "update_time",
   // data={currentTime: number}
+  ADD_KEYFRAME = "add_keyframe",
+  // data= QueueKeyframe
 }

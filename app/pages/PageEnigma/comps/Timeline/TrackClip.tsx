@@ -18,7 +18,7 @@ interface Props {
 }
 
 export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
-  const { selectClip, selectedClip } = useContext(TrackContext);
+  const { selectItem, selectedItem } = useContext(TrackContext);
   const [state, setState] = useState({
     length: clip.length,
     offset: clip.offset,
@@ -48,7 +48,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
 
   const classes = [
     "absolute",
-    clip.clip_uuid === selectedClip
+    clip.clip_uuid === selectedItem
       ? `bg-${style}-selected`
       : `bg-${style}-clip`,
   ];
@@ -71,7 +71,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           ...classes,
           "rounded-l-lg",
           "block h-full",
-          clip.clip_uuid === selectedClip
+          clip.clip_uuid === selectedItem
             ? "border border-b-2 border-l-2 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -81,13 +81,13 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "w-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "left")}
-        onClick={() => selectClip(clip.clip_uuid)}
+        onClick={() => selectItem(clip.clip_uuid)}
       />
       <button
         className={[
           ...classes,
           "block h-full",
-          clip.clip_uuid === selectedClip
+          clip.clip_uuid === selectedItem
             ? "border border-b-2 border-l-0 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -97,14 +97,14 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "move",
         }}
         onPointerDown={(event) => onPointerDown(event, "drag")}
-        onClick={() => selectClip(clip.clip_uuid)}
+        onClick={() => selectItem(clip.clip_uuid)}
       />
       <button
         className={[
           ...classes,
           "rounded-r-lg",
           "block h-full",
-          clip.clip_uuid === selectedClip
+          clip.clip_uuid === selectedItem
             ? "border border-b-2 border-l-0 border-r-2 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -114,9 +114,9 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "e-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "right")}
-        onClick={() => selectClip(clip.clip_uuid)}
+        onClick={() => selectItem(clip.clip_uuid)}
       />
-      {selectedClip === clip.clip_uuid && (
+      {selectedItem === clip.clip_uuid && (
         <button
           className="absolute flex h-full items-center justify-center"
           style={{

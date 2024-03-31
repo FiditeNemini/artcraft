@@ -22,7 +22,7 @@ export const Timeline = () => {
   const {
     characters,
     objects,
-    selectedClip,
+    selectedItem,
     deleteCharacterClip,
     deleteAudioClip,
     deleteCameraClip,
@@ -43,20 +43,20 @@ export const Timeline = () => {
 
   const onDeleteAsk = useCallback(
     (event: KeyboardEvent) => {
-      if (["Backspace", "Delete"].indexOf(event.key) > -1 && selectedClip) {
+      if (["Backspace", "Delete"].indexOf(event.key) > -1 && selectedItem) {
         setDialogOpen(true);
       }
     },
-    [selectedClip],
+    [selectedItem],
   );
 
   const displayTime = time === -1 ? currentTime.value : time;
 
   const onDelete = useCallback(() => {
-    deleteCharacterClip(selectedClip!);
-    deleteCameraClip(selectedClip!);
-    deleteAudioClip(selectedClip!);
-  }, [selectedClip, deleteAudioClip, deleteCharacterClip, deleteCameraClip]);
+    deleteCharacterClip(selectedItem!);
+    deleteCameraClip(selectedItem!);
+    deleteAudioClip(selectedItem!);
+  }, [selectedItem, deleteAudioClip, deleteCharacterClip, deleteCameraClip]);
 
   useEffect(() => {
     document.addEventListener("keydown", onDeleteAsk);
