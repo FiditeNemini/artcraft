@@ -18,10 +18,28 @@ export const TabStylization = ()=>{
 
   const editorEngine = useContext(EngineContext);
 
-  const handlePickingStylizer = (picked:ArtStyle)=>{
+  const handlePickingStylizer = (picked:string)=>{
     console.log(`Picked style: ${picked}`);
+
+    let selected = ArtStyle.Anime2DFlat
+    switch (picked) {
+      case "Anime":
+        selected = ArtStyle.Anime2DFlat
+        break;
+      case "Pixel":
+        selected = ArtStyle.PixelArt
+        break;
+      case "Pixar":
+        selected = ArtStyle.Cartoon3D
+        break;
+      case "Stylized":
+        selected =  ArtStyle.ComicBook
+        break;
+    }
+
     if (editorEngine == null) { console.log("Editor is null"); return;}
-    editorEngine.art_style = picked
+    editorEngine.art_style = selected
+    console.log(`actual style: ${selected}`);
     setSelection(picked);
   }
 
@@ -53,25 +71,25 @@ export const TabStylization = ()=>{
       <div className="flex gap-2 my-2">
         <ItemPicker
           label="Anime"
-          selected={(selection === ArtStyle.Anime2DFlat)}
+          selected={(selection === "Anime")}
           onSelected={handlePickingStylizer}
           src="/resources/avatars/0.webp"
         />
         <ItemPicker
           label="Pixel"
-          selected={selection === ArtStyle.PixelArt}
+          selected={selection === "Pixel"}
           onSelected={handlePickingStylizer}
           src="/resources/avatars/1.webp"
         />
         <ItemPicker
           label="Pixar"
-          selected={selection === ArtStyle.Cartoon3D}
+          selected={selection === "Pixar"}
           onSelected={handlePickingStylizer}
           src="/resources/avatars/2.webp"
         />
         <ItemPicker
           label="Stylized"
-          selected={selection === ArtStyle.ComicBook}
+          selected={selection === "Stylized"}
           onSelected={handlePickingStylizer}
           src="/resources/avatars/3.webp"
         />
