@@ -1,60 +1,89 @@
 import { useCallback, useState } from "react";
-import { CameraGroup } from "~/pages/PageEnigma/models/track";
+import {
+  CameraGroup,
+  Keyframe,
+  QueueKeyframe,
+} from "~/pages/PageEnigma/models/track";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import * as uuid from "uuid";
 
 export default function useUpdateCamera() {
   const [camera, setCamera] = useState<CameraGroup>({
     id: "CA1",
-    clips: [],
+    keyframes: [],
   });
 
   const updateCamera = useCallback(
-    ({
-      id,
-      offset,
-      length,
-    }: {
-      id: string;
-      length: number;
-      offset: number;
-    }) => {
+    ({ id, offset }: { id: string; offset: number }) => {
       setCamera((oldCamera) => {
-        const newClips = [...oldCamera.clips];
-        const clipIndex = newClips.findIndex((row) => row.clip_uuid === id);
-        if (clipIndex === -1) {
+        const newKeyframes = [...oldCamera.keyframes];
+        const keyframe = newKeyframes.find((row) => row.keyframe_uuid === id);
+        if (!keyframe) {
           return { ...oldCamera };
         }
-        const clip = newClips[clipIndex];
-        clip.offset = offset;
-        clip.length = length;
+        keyframe.offset = offset;
 
         Queue.publish({
           queueName: QueueNames.TO_ENGINE,
-          action: toEngineActions.UPDATE_CLIP,
-          data: clip,
+          action: toEngineActions.UPDATE_KEYFRAME,
+          data: keyframe,
         });
 
         return {
           ...oldCamera,
-          clips: newClips,
+          clips: newKeyframes,
         };
       });
     },
     [],
   );
 
-  const selectCameraClip = useCallback((clipId: string) => {
+  const addCameraKeyframe = useCallback(
+    (keyframe: QueueKeyframe, offset: number) => {
+      const newKeyframe = {
+        version: keyframe.version,
+        keyframe_uuid: uuid.v4(),
+        group: keyframe.group,
+        object_uuid: keyframe.object_uuid,
+        offset,
+        position: keyframe.position,
+        rotation: keyframe.rotation,
+        scale: keyframe.scale,
+        selected: false,
+      } as Keyframe;
+
+      setCamera((oldCamera) => {
+        return {
+          ...oldCamera,
+          keyframes: [...oldCamera.keyframes, newKeyframe].sort(
+            (keyFrameA, keyframeB) => keyFrameA.offset - keyframeB.offset,
+          ),
+        };
+      });
+
+      Queue.publish({
+        queueName: QueueNames.TO_ENGINE,
+        action: toEngineActions.ADD_KEYFRAME,
+        data: newKeyframe,
+      });
+    },
+    [],
+  );
+
+  const selectCameraKeyframe = useCallback((keyframeId: string) => {
     setCamera((oldCamera) => {
       return {
         ...oldCamera,
         clips: [
-          ...oldCamera.clips.map((clip) => {
+          ...oldCamera.keyframes.map((keyframe) => {
             return {
-              ...clip,
+              ...keyframe,
               selected:
-                clip.clip_uuid === clipId ? !clip.selected : clip.selected,
+                keyframe.keyframe_uuid === keyframeId
+                  ? !keyframe.selected
+                  : keyframe.selected,
             };
           }),
         ],
@@ -62,17 +91,17 @@ export default function useUpdateCamera() {
     });
   }, []);
 
-  const deleteCameraClip = useCallback((clipId: string) => {
+  const deleteCameraKeyframe = useCallback((keyframeId: string) => {
     setCamera((oldCamera) => {
       return {
         ...oldCamera,
-        clips: [
-          ...oldCamera.clips.filter((clip) => {
-            if (clip.clip_uuid === clipId) {
+        keyframes: [
+          ...oldCamera.keyframes.filter((keyframe) => {
+            if (keyframe.keyframe_uuid === keyframeId) {
               Queue.publish({
                 queueName: QueueNames.TO_ENGINE,
-                action: toEngineActions.DELETE_CLIP,
-                data: clip!,
+                action: toEngineActions.DELETE_KEYFRAME,
+                data: keyframe,
               });
               return false;
             }
@@ -86,7 +115,8 @@ export default function useUpdateCamera() {
   return {
     camera,
     updateCamera,
-    selectCameraClip,
-    deleteCameraClip,
+    selectCameraKeyframe,
+    addCameraKeyframe,
+    deleteCameraKeyframe,
   };
 }

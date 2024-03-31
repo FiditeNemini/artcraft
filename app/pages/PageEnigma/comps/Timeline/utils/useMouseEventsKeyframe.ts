@@ -1,5 +1,5 @@
 import React, { Dispatch, useCallback, useEffect, useRef } from "react";
-import { KeyFrame } from "~/pages/PageEnigma/models/track";
+import { Keyframe } from "~/pages/PageEnigma/models/track";
 import { canDrop, scale } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
@@ -10,7 +10,7 @@ export const useMouseEventsKeyframe = ({
   updateKeyframe,
   setOffset,
 }: {
-  keyframe: KeyFrame;
+  keyframe: Keyframe;
   max: number;
   min: number;
   updateKeyframe: (args: { id: string; offset: number }) => void;

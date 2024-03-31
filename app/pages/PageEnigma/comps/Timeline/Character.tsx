@@ -19,12 +19,8 @@ function buildUpdaters(
   }) {
     updateCharacters({ ...options, type: "animations" });
   }
-  function updateClipPosition(options: {
-    id: string;
-    length: number;
-    offset: number;
-  }) {
-    updateCharacters({ ...options, type: "positions" });
+  function updateClipPosition(options: { id: string; offset: number }) {
+    updateCharacters({ ...options, length: 0, type: "positions" });
   }
   function updateClipLipSync(options: {
     id: string;
@@ -46,9 +42,10 @@ export const Character = ({ characterId }: Props) => {
 
   const { updateClipLipSync, updateClipPosition, updateClipAnimations } =
     useMemo(() => buildUpdaters(updateCharacters), [updateCharacters]);
+
   const toggleCharacterLipSyncMute = useCallback(() => {
     toggleLipSyncMute(character?.id ?? "");
-  }, []);
+  }, [character?.id, toggleLipSyncMute]);
 
   if (!character) {
     return false;
@@ -74,11 +71,10 @@ export const Character = ({ characterId }: Props) => {
         />
         <TrackKeyFrames
           id={character.id}
-          keyFrames={positionKeyframes}
+          keyframes={positionKeyframes}
           title="Character Position/Rotation"
-          updateClip={updateClipPosition}
+          updateKeyframe={updateClipPosition}
           style="character"
-          type="positions"
         />
         <TrackClips
           id={character.id}

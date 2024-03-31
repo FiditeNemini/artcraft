@@ -47,12 +47,25 @@ export enum ClipGroup {
   OBJECT = "object",
 }
 
-export interface KeyFrame {
+export interface Keyframe {
   version: number;
   keyframe_uuid: string;
   group: ClipGroup;
-  object_uuid?: string;
+  object_uuid: string;
   offset: number;
+  position: XYZ;
+  rotation: XYZ;
+  scale: XYZ;
+  selected?: boolean;
+}
+
+export interface QueueKeyframe {
+  version: number;
+  keyframe_uuid?: string;
+  group: ClipGroup;
+  object_uuid: string;
+  object_name?: string;
+  offset?: number;
   position: XYZ;
   rotation: XYZ;
   scale: XYZ;
@@ -63,13 +76,13 @@ export interface CharacterGroup {
   id: string;
   muted: boolean;
   animationClips: Clip[];
-  positionKeyframes: KeyFrame[];
+  positionKeyframes: Keyframe[];
   lipSyncClips: Clip[];
 }
 
 export interface CameraGroup {
   id: string;
-  clips: KeyFrame[];
+  keyframes: Keyframe[];
 }
 
 export interface AudioGroup {
@@ -84,6 +97,11 @@ export interface ObjectGroup {
 }
 
 export interface ObjectTrack {
-  id: string;
-  keyFrames: KeyFrame[];
+  object_uuid: string;
+  name: string;
+  keyframes: Keyframe[];
+}
+
+export interface UpdateTime {
+  currentTime: number;
 }

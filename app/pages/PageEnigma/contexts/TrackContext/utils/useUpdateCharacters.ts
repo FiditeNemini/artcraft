@@ -5,6 +5,8 @@ import {
   ClipGroup,
   ClipType,
   MediaClip,
+  QueueKeyframe,
+  Keyframe,
 } from "~/pages/PageEnigma/models/track";
 import * as uuid from "uuid";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
@@ -17,7 +19,7 @@ export default function useUpdateCharacters() {
       id: "CH1",
       muted: false,
       animationClips: [],
-      positionClips: [],
+      positionKeyframes: [],
       lipSyncClips: [],
     },
   ]);
@@ -66,26 +68,25 @@ export default function useUpdateCharacters() {
       if (type === "positions") {
         setCharacters((oldCharacters) => {
           return oldCharacters.map((character) => {
-            const newPositionClips = [...character.positionClips];
-            const clipIndex = newPositionClips.findIndex(
-              (row) => row.clip_uuid === id,
+            const newPositionKeyframes = [...character.positionKeyframes];
+            const keyframeIndex = newPositionKeyframes.findIndex(
+              (row) => row.keyframe_uuid === id,
             );
-            if (clipIndex === -1) {
+            if (keyframeIndex === -1) {
               return { ...character };
             }
-            const clip = newPositionClips[clipIndex];
-            clip.offset = offset;
-            clip.length = length;
+            const keyframe = newPositionKeyframes[keyframeIndex];
+            keyframe.offset = offset;
 
             Queue.publish({
               queueName: QueueNames.TO_ENGINE,
               action: toEngineActions.UPDATE_CLIP,
-              data: clip,
+              data: keyframe,
             });
 
             return {
               ...character,
-              positionClips: newPositionClips,
+              positionClips: newPositionKeyframes,
             };
           });
         });
@@ -221,6 +222,46 @@ export default function useUpdateCharacters() {
     [],
   );
 
+  const addCharacterKeyframe = useCallback(
+    (keyframe: QueueKeyframe, offset: number) => {
+      const newKeyframe = {
+        version: keyframe.version,
+        keyframe_uuid: uuid.v4(),
+        group: keyframe.group,
+        object_uuid: keyframe.object_uuid,
+        offset,
+        position: keyframe.position,
+        rotation: keyframe.rotation,
+        scale: keyframe.scale,
+        selected: false,
+      } as Keyframe;
+
+      setCharacters((oldCharacters) => {
+        return oldCharacters.map((character) => {
+          if (character.id !== keyframe.object_uuid) {
+            return { ...character };
+          }
+          return {
+            ...character,
+            positionKeyframes: [
+              ...character.positionKeyframes,
+              newKeyframe,
+            ].sort(
+              (keyFrameA, keyframeB) => keyFrameA.offset - keyframeB.offset,
+            ),
+          };
+        });
+      });
+
+      Queue.publish({
+        queueName: QueueNames.TO_ENGINE,
+        action: toEngineActions.ADD_KEYFRAME,
+        data: newKeyframe,
+      });
+    },
+    [],
+  );
+
   const toggleLipSyncMute = useCallback((characterId: string) => {
     setCharacters((oldCharacters) => {
       return oldCharacters.map((character) => {
@@ -258,10 +299,12 @@ export default function useUpdateCharacters() {
             selected:
               clip.clip_uuid === clipId ? !clip.selected : clip.selected,
           })),
-          positionClips: character.positionClips.map((clip) => ({
-            ...clip,
+          positionClips: character.positionKeyframes.map((keyframe) => ({
+            ...keyframe,
             selected:
-              clip.clip_uuid === clipId ? !clip.selected : clip.selected,
+              keyframe.keyframe_uuid === clipId
+                ? !keyframe.selected
+                : keyframe.selected,
           })),
           lipSyncClips: character.lipSyncClips.map((clip) => ({
             ...clip,
@@ -289,7 +332,7 @@ export default function useUpdateCharacters() {
             }
             return true;
           }),
-          positionClips: character.positionClips.filter((clip) => {
+          lipSyncClips: character.lipSyncClips.filter((clip) => {
             if (clip.clip_uuid === clipId) {
               Queue.publish({
                 queueName: QueueNames.TO_ENGINE,
@@ -300,12 +343,22 @@ export default function useUpdateCharacters() {
             }
             return true;
           }),
-          lipSyncClips: character.lipSyncClips.filter((clip) => {
-            if (clip.clip_uuid === clipId) {
+        })),
+      ];
+    });
+  }, []);
+
+  const deleteCharacterKeyframe = useCallback((keyframe: Keyframe) => {
+    setCharacters((oldCharacters) => {
+      return [
+        ...oldCharacters.map((character) => ({
+          ...character,
+          positionClips: character.positionKeyframes.filter((row) => {
+            if (row.keyframe_uuid === keyframe.keyframe_uuid) {
               Queue.publish({
                 queueName: QueueNames.TO_ENGINE,
-                action: toEngineActions.DELETE_CLIP,
-                data: clip!,
+                action: toEngineActions.DELETE_KEYFRAME,
+                data: row,
               });
               return false;
             }
@@ -324,5 +377,7 @@ export default function useUpdateCharacters() {
     addCharacterAudio,
     selectCharacterClip,
     deleteCharacterClip,
+    addCharacterKeyframe,
+    deleteCharacterKeyframe,
   };
 }

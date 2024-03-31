@@ -5,16 +5,17 @@ import { currentTime } from "~/pages/PageEnigma/store";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
-import { QueueClip } from "~/pages/PageEnigma/models/track";
+import {
+  QueueClip,
+  QueueKeyframe,
+  UpdateTime,
+} from "~/pages/PageEnigma/models/track";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-
-interface UpdateTime {
-  currentTime: number;
-}
+import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
 
 interface Arguments {
-  action: fromEngineActions | toEngineActions;
-  data: QueueClip | UpdateTime;
+  action: fromEngineActions | toEngineActions | toTimelineActions;
+  data: QueueClip | UpdateTime | QueueKeyframe;
 }
 
 export function useQueueHandler() {
@@ -36,7 +37,7 @@ export function useQueueHandler() {
     console.log(`FROM ENGINE:${action} ${data}`);
     switch (action) {
       case toTimelineActions.ADD_KEYFRAME:
-        addKeyframe(data);
+        addKeyframe(data as QueueKeyframe);
         break;
       default:
         throw new Error(`Unknown action ${action}`);

@@ -15,12 +15,12 @@ export const Objects = () => {
         Objects
       </div>
       {objects.objects.map((object) => (
-        <div key={object.id} className="flex flex-col gap-4">
+        <div key={object.object_uuid} className="flex flex-col gap-4">
           <TrackKeyFrames
-            id={object.id}
-            keyFrames={object.keyFrames}
+            id={object.object_uuid}
+            keyframes={object.keyframes}
             title="Mask Position/Rotation"
-            updateClip={updateObject}
+            updateKeyframe={updateObject}
             style="objects"
           />
         </div>

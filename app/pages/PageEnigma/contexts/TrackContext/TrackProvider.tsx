@@ -14,16 +14,24 @@ import {
   dropOffset,
 } from "~/pages/PageEnigma/store";
 import * as uuid from "uuid";
+import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 
 interface Props {
   children: ReactNode;
 }
 
 export const TrackProvider = ({ children }: Props) => {
-  const characters = useUpdateCharacters();
-  const camera = useUpdateCamera();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { addCharacterKeyframe, deleteCharacterKeyframe, ...characters } =
+    useUpdateCharacters();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { addCameraKeyframe, deleteCameraKeyframe, ...camera } =
+    useUpdateCamera();
   const audio = useUpdateAudio();
-  const objects = useUpdateObject();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { addObjectKeyframe, deleteObjectKeyframe, ...objects } =
+    useUpdateObject();
+  const keyframes = useUpdateKeyframe();
 
   const { endDrag, ...dragDrop } = useUpdateDragDrop();
 
@@ -115,6 +123,8 @@ export const TrackProvider = ({ children }: Props) => {
       ...audio,
       ...objects,
 
+      ...keyframes,
+
       selectItem,
       selectedItem,
 
@@ -137,6 +147,8 @@ export const TrackProvider = ({ children }: Props) => {
     camera,
     audio,
     objects,
+
+    keyframes,
 
     selectItem,
     selectedItem,

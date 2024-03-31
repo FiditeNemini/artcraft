@@ -1,4 +1,4 @@
-import { KeyFrame } from "~/pages/PageEnigma/models/track";
+import { Keyframe } from "~/pages/PageEnigma/models/track";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { useContext, useState } from "react";
 import { scale } from "~/pages/PageEnigma/store";
@@ -10,7 +10,7 @@ interface Props {
   min: number;
   max: number;
   style: "character" | "camera" | "audio" | "objects";
-  keyframe: KeyFrame;
+  keyframe: Keyframe;
   updateKeyframe: (options: { id: string; offset: number }) => void;
 }
 

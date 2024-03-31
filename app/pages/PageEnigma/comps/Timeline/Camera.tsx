@@ -1,11 +1,11 @@
 import { useContext } from "react";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-import { TrackClips } from "~/pages/PageEnigma/comps/Timeline/TrackClips";
 import { fullWidth } from "~/pages/PageEnigma/store";
+import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 
 export const Camera = () => {
   const { camera, updateCamera } = useContext(TrackContext);
-  const { clips } = camera!;
+  const { keyframes } = camera!;
 
   return (
     <div
@@ -14,12 +14,12 @@ export const Camera = () => {
     >
       <div className="mb-5 pt-2 text-xs font-medium text-white">Camera</div>
       <div className="flex flex-col gap-4">
-        <TrackClips
+        <TrackKeyFrames
           id={camera!.id}
-          clips={clips}
+          keyframes={keyframes}
           title="Camera Position/Rotation"
           style="camera"
-          updateClip={updateCamera}
+          updateKeyframe={updateCamera}
         />
       </div>
     </div>
