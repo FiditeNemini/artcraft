@@ -118,9 +118,6 @@ export class TimeLine {
     }
 
     public async addClip(data: any) {
-        // map to clip ui 
-        console.log("Add Clip:", data);
-
         let object_uuid = data['data']['object_uuid'];
 
         if (object_uuid.length < 6){
@@ -147,6 +144,9 @@ export class TimeLine {
         switch(type) {
             case "animation":
                 this.animation_engine.load_object(object_uuid, media_id, name);
+                break
+            case "transform":
+                this.transform_engine.loadObject(object_uuid, data['data']['length']);
                 break
         }
     }
@@ -205,6 +205,7 @@ export class TimeLine {
     }
 
     private async resetScene() {
+        this.timeline_limit = this.getEndPoint();
         for (const element of this.timeline_items) {
             if (element.type == "transform") {
                 let object = this.scene.get_object_by_uuid(element.object_uuid);
@@ -226,13 +227,30 @@ export class TimeLine {
         }
     }
 
+    private getEndPoint(): number {
+        let longest = 0;
+        for (const element of this.timeline_items) {
+            if(longest < element.length) {
+                longest = element.length;
+            }
+        }
+        return longest;
+    }
+
     // called by the editor update loop on each frame
     public async update(deltatime: number) {
         //if (this.is_playing == false) return; // start and stop 
 
-        if (this.scrubber_frame_position <= 0) {
-            await this.resetScene();
+
+        if(this.is_playing) {
+            this.current_time += 1;
+            this.pushEvent(fromEngineActions.UPDATE_TIME, { currentTime: this.current_time })
+            this.scrubber_frame_position = this.current_time;
         }
+
+        //if (this.scrubber_frame_position <= 0) {
+        //    await this.resetScene();
+        //}
 
         //this.scrubber_frame_position += 1;
         //2. allow stopping.
@@ -286,13 +304,16 @@ export class TimeLine {
         }
 
         if (this.scrubber_frame_position >= this.timeline_limit) {
-            await this.resetScene();
+            await this.stop();
         }
     }
 
     private async stop(): Promise<void> {
+        await this.resetScene();
         this.is_playing = false
         console.log(`Stopping Timeline`)
+        this.current_time = 0;
+        this.pushEvent(fromEngineActions.UPDATE_TIME, { currentTime: this.current_time })
     }
 }
 

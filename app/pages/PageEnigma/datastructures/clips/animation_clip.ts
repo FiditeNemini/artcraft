@@ -98,7 +98,7 @@ export class AnimationClip  {
   }
 
   stop() {
-    this.mixer?.stopAllAction();
+    this.mixer?.setTime(0);
   }
 
   toJSON(): string {
