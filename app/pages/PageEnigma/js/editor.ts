@@ -597,63 +597,57 @@ class Editor {
 
     // Load timeline creates the the clips from the datastructure and loads them in here.
     // load object into the engine for lip syncing
-    this.lipsync_engine.load_object(
-      object.uuid,
-      "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
-    );
-    this.animation_engine.load_object(
-      object.uuid,
-      "/resources/models/fox/fox_idle.glb",
-      "clip3",
-    );
+    //this.lipsync_engine.load_object(
+    //  object.uuid,
+    //  "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
+    //);
+    //this.animation_engine.load_object(
+    //  object.uuid,
+    //  "/resources/models/fox/fox_idle.glb",
+    //  "clip3",
+    //);
     // then it creates clip ui to load the playable clips
     // then refreshes the timeline.
-
     // create the clip with the same id for a reference to the media
-    this.timeline.addPlayableClip(
-      new ClipUI(
-        1.0,
-        "lipsync",
-        "character",
-        "clip1",
-        "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
-        object.uuid,
-        150,
-        400,
-      ),
-    );
-
-    // media id for this is up in the air but when a path is created you should be able to store and delete it
-    this.timeline.addPlayableClip(
-      new ClipUI(1.0, "transform", "character", "clip2", object.uuid, object.uuid, 0, 150),
-    );
-
+    //this.timeline.addPlayableClip(
+    //  new ClipUI(
+    //    1.0,
+    //    "lipsync",
+    //    "character",
+    //    "clip1",
+    //    "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
+    //    object.uuid,
+    //    150,
+    //    400,
+    //  ),
+    //);
+    //// media id for this is up in the air but when a path is created you should be able to store and delete it
+    //this.timeline.addPlayableClip(
+    //  new ClipUI(1.0, "transform", "character", "clip2", object.uuid, object.uuid, 0, 150),
+    //);
     // media id for this as well it can be downloaded
-    this.timeline.addPlayableClip(
-      new ClipUI(
-        1.0,
-        "animation",
-        "character",
-        "clip3",
-        "/resources/models/fox/fox_idle.glb",
-        object.uuid,
-        0,
-        400,
-      ),
-    );
-
-
-    this.audio_engine.loadClip("m_h33vytxs5eqqqf07nsy14qzrf9ww4v");
-
-    await this.timeline.addPlayableClip(new ClipUI(
-      1.0,
-      "audio",
-      "global_audio",
-      "AudioClip",
-      "m_h33vytxs5eqqqf07nsy14qzrf9ww4v",
-      "",
-      0,
-      50));
+    //this.timeline.addPlayableClip(
+    //  new ClipUI(
+    //    1.0,
+    //    "animation",
+    //    "character",
+    //    "clip3",
+    //    "/resources/models/fox/fox_idle.glb",
+    //    object.uuid,
+    //    0,
+    //    400,
+    //  ),
+    //);
+    //this.audio_engine.loadClip("m_h33vytxs5eqqqf07nsy14qzrf9ww4v");
+    //await this.timeline.addPlayableClip(new ClipUI(
+    //  1.0,
+    //  "audio",
+    //  "global_audio",
+    //  "AudioClip",
+    //  "m_h33vytxs5eqqqf07nsy14qzrf9ww4v",
+    //  "",
+    //  0,
+    //  50));
   }
 
   // Configure post processing.
@@ -800,7 +794,7 @@ class Editor {
       this.render_camera.rotation.copy(this.cam_obj.rotation);
     }
 
-    this.timeline.update(delta_time);
+    this.timeline.update();
 
     this.renderScene();
   }
@@ -1171,6 +1165,7 @@ class Editor {
         if (this.selected.type == "Scene") {
           this.selected = intersects[0].object;
         }
+        this.activeScene.selected = this.selected;
 
         this.updateSelectedUI();
         // this.update_properties()

@@ -6,12 +6,14 @@ class Scene {
     gridHelper: THREE.GridHelper | undefined;
     scene: THREE.Scene;
     hot_items: THREE.Object3D[] | undefined;
+    selected: THREE.Object3D | undefined;
 
     constructor(name: string) {
         this.name = name;
         this.gridHelper;
         this.scene = new THREE.Scene();
         this.hot_items = [];
+        this.selected = undefined;
     }
 
     initialize() {
