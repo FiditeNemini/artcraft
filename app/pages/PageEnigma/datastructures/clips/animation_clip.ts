@@ -36,21 +36,36 @@ export class AnimationClip  {
     this.clip_action;
   }
 
-  // Takes a glb animation loads from the server  
-  _load_animation(url: string): Promise<THREE.AnimationClip> {
-    return new Promise((resolve) => {
-      const glbLoader = new GLTFLoader();
-
-      glbLoader.load(
-        url,
-        (gltf) => {
-          // Assuming the animation is the first one in the animations array
-          const animationClip = gltf.animations[0];
-          resolve(animationClip);
-        },
-      );
-    });
+  async get_media_url() {
+    //This is for prod when we have the proper info on the url.
+    let api_base_url = "https://api.fakeyou.com";
+    let url = `${api_base_url}/v1/media_files/file/${this.media_id}`
+    let responce = await fetch(url);
+    let json = await JSON.parse(await responce.text());
+    let bucketPath = json["media_file"]["public_bucket_path"];
+    let media_base_url = "https://storage.googleapis.com/vocodes-public"
+    let media_url = `${media_base_url}${bucketPath}`
+    return media_url;
   }
+
+  _load_animation(): Promise<THREE.AnimationClip> {
+    // Return the promise chain starting from `this.get_media_url()`
+    return this.get_media_url().then(url => {
+      // Return a new Promise that resolves with the animation clip
+      return new Promise((resolve) => {
+        const glbLoader = new GLTFLoader();
+  
+        glbLoader.load(
+          url,
+          (gltf) => {
+            // Assuming the animation is the first one in the animations array
+            const animationClip = gltf.animations[0];
+            resolve(animationClip);
+          },
+        );
+      });
+    });
+  }  
 
   _create_mixer(object: THREE.Object3D) {
     this.mixer = new THREE.AnimationMixer(object);
@@ -59,7 +74,7 @@ export class AnimationClip  {
 
   async _get_clip() {
     if (this.animation_clip == null) {
-      this.animation_clip = await this._load_animation(this.media_id);
+      this.animation_clip = await this._load_animation();
     }
     return this.animation_clip;
   }
@@ -74,19 +89,16 @@ export class AnimationClip  {
           this.clip_action.play();
         }
       }
-      console.log("Play")
     }
   }
 
   step(deltatime: number) {
     if (this.mixer == null) { return; }
-    this.mixer?.update(deltatime);
-    console.log("Update")
+    this.mixer?.setTime(deltatime);
   }
 
   stop() {
-    this.mixer?.stopAllAction();
-    console.log("stop.")
+    this.mixer?.setTime(0);
   }
 
   toJSON(): string {
