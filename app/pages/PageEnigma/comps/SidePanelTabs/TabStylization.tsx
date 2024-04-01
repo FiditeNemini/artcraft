@@ -8,8 +8,7 @@ import {
 } from "~/components"
 
 import { AppUiContext } from '../../contexts/AppUiContext';
-import { APPUI_ACTION_TYPES } from '../../reducers';
-import { APPUI_VIEW_MODES } from '../../reducers';
+import { APPUI_ACTION_TYPES, APPUI_VIEW_MODES } from '../../reducers';
 import { EngineContext } from '../../contexts/EngineContext';
 import { ArtStyle } from '../../js/api_manager';
 export const TabStylization = ()=>{

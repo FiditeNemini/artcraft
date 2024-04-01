@@ -1,3 +1,4 @@
+import { NavLink, NavLinkProps } from "@remix-run/react";
 import { twMerge } from "tailwind-merge";
 
 interface TypogProps  {
@@ -26,6 +27,15 @@ export const H5 = ({className,children,}:TypogProps)=>
 
 export const H6 = ({className,children,}:TypogProps)=>
   <h6 className={twMerge(baseTypo, "font-light text-sm",className)}> {children} </h6>;
+
+export const Link = ({className, ...rest}:NavLinkProps)=>
+  <NavLink
+    className={twMerge(
+      "text-brand-primary hover:text-brand-primary-400",
+      className as string,
+    )}
+    {...rest}
+  />
 
 export const P = ({className,children,}:TypogProps)=>
   <p className={twMerge(baseTypo, className)}> {children} </p>;
