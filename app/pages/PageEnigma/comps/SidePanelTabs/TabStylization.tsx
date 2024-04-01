@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 
-import { Button, H4, ItemPicker, Label, Textarea } from "~/components";
+import { Button, ItemPicker, Label, Textarea } from "~/components";
 
 import { AppUiContext } from "../../contexts/AppUiContext";
 import { APPUI_ACTION_TYPES, APPUI_VIEW_MODES } from "../../reducers";
@@ -44,6 +44,7 @@ export const TabStylization = () => {
     editorEngine.positive_prompt = e.target.value;
     console.log(e.target.value);
   };
+
   const handleChangeViewMode = () => {
     if (dispatchAppUiState !== null) {
       dispatchAppUiState({
@@ -57,6 +58,7 @@ export const TabStylization = () => {
       });
     }
   };
+
   return (
     <div className="flex h-full w-full flex-col gap-3">
       <div className="flex flex-col">
