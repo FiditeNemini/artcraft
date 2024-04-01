@@ -10,6 +10,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::warn;
 use sqlx::MySqlPool;
+use utoipa::ToSchema;
 
 use http_server_common::response::response_error_helpers::to_simple_json_error;
 use mysql_queries::queries::users::user_sessions::delete_user_session::delete_user_session;
@@ -17,12 +18,12 @@ use user_traits_component::traits::internal_session_cache_purge::InternalSession
 
 use crate::cookies::session::session_cookie_manager::SessionCookieManager;
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct LogoutSuccessResponse {
   pub success: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum LogoutError {
   ServerError,
 }
@@ -50,6 +51,14 @@ impl fmt::Display for LogoutError {
   }
 }
 
+#[utoipa::path(
+  post,
+  path = "/v1/logout",
+  responses(
+    (status = 200, description = "Found", body = LogoutSuccessResponse),
+    (status = 500, description = "Server error", body = LogoutError),
+  ),
+)]
 pub async fn logout_handler(
   http_request: HttpRequest,
   session_cookie_manager: web::Data<SessionCookieManager>,
