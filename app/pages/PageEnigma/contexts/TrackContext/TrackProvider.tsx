@@ -27,14 +27,6 @@ export const TrackProvider = ({ children }: Props) => {
 
   const { endDrag, ...dragDrop } = useUpdateDragDrop();
 
-  const [selectedItem, setSelectedItem] = useState<Clip | Keyframe | null>(
-    null,
-  );
-  const selectItem = useCallback((item: Clip | Keyframe) => {
-    console.log("item", item);
-    setSelectedItem(item);
-  }, []);
-
   const [animationClips, setAnimationClips] = useState<MediaClip[]>([]);
   const [audioClips, setAudioClips] = useState<MediaClip[]>([]);
 
@@ -144,9 +136,6 @@ export const TrackProvider = ({ children }: Props) => {
     return {
       ...keyframes,
 
-      selectItem,
-      selectedItem,
-
       ...dragDrop,
       endDrag: dropClip,
 
@@ -163,9 +152,6 @@ export const TrackProvider = ({ children }: Props) => {
     };
   }, [
     keyframes,
-
-    selectItem,
-    selectedItem,
 
     dragDrop,
     dropClip,

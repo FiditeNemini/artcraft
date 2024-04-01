@@ -1,8 +1,8 @@
 import { useMouseEventsClip } from "./utils/useMouseEventsClip";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { scale } from "~/pages/PageEnigma/store";
 import { Clip } from "~/pages/PageEnigma/models/track";
+import { selectedItem } from "~/pages/PageEnigma/store/selectedItem";
 
 interface Props {
   min: number;
@@ -13,7 +13,6 @@ interface Props {
 }
 
 export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
-  const { selectItem, selectedItem } = useContext(TrackContext);
   const [state, setState] = useState({
     length: clip.length,
     offset: clip.offset,
@@ -26,22 +25,9 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
     setState,
   );
 
-  const selectedClipId = (selectedItem as Clip | null)?.clip_uuid ?? "";
+  const selectedClipId = (selectedItem.value as Clip | null)?.clip_uuid ?? "";
 
   const { length, offset } = state;
-
-  // const onPlayClick = useCallback(
-  //   (event: React.MouseEvent<HTMLButtonElement>) => {
-  //     event.stopPropagation();
-  //     event.preventDefault();
-  //     Queue.publish({
-  //       queueName: QueueNames.TO_ENGINE,
-  //       action: toEngineActions.PLAY_CLIP,
-  //       data: clip,
-  //     });
-  //   },
-  //   [clip],
-  // );
 
   const classes = [
     "absolute",
@@ -78,7 +64,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "w-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "left")}
-        onClick={() => selectItem(clip)}
+        onClick={() => (selectedItem.value = clip)}
       />
       <button
         className={[
@@ -94,7 +80,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "move",
         }}
         onPointerDown={(event) => onPointerDown(event, "drag")}
-        onClick={() => selectItem(clip)}
+        onClick={() => (selectedItem.value = clip)}
       />
       <button
         className={[
@@ -111,21 +97,8 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "e-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "right")}
-        onClick={() => selectItem(clip)}
+        onClick={() => (selectedItem.value = clip)}
       />
-      {/*{selectedItem === clip.clip_uuid && (*/}
-      {/*  <button*/}
-      {/*    className="absolute flex h-full items-center justify-center"*/}
-      {/*    style={{*/}
-      {/*      width: length * 4 * scale.value,*/}
-      {/*      left: offset * 4 * scale.value,*/}
-      {/*      zIndex: 2000,*/}
-      {/*    }}*/}
-      {/*    onPointerDown={onPlayClick}*/}
-      {/*  >*/}
-      {/*    <FontAwesomeIcon icon={faPlay} />*/}
-      {/*  </button>*/}
-      {/*)}*/}
     </>
   );
 };

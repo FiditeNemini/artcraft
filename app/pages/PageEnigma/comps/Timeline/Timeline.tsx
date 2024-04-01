@@ -1,5 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import { useCallback, useEffect, useState } from "react";
 import { LowerPanel } from "~/modules/LowerPanel";
 
 import { Camera } from "./Camera";
@@ -18,6 +17,7 @@ import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
 import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 import { Clip, Keyframe } from "~/pages/PageEnigma/models/track";
+import { selectedItem } from "~/pages/PageEnigma/store/selectedItem";
 
 function getItemType(item: Clip | Keyframe | null) {
   if (!item) {
@@ -28,7 +28,6 @@ function getItemType(item: Clip | Keyframe | null) {
 
 export const Timeline = () => {
   useSignals();
-  const { selectedItem } = useContext(TrackContext);
   const [dialogOpen, setDialogOpen] = useState(false);
   const { deleteKeyframe } = useUpdateKeyframe();
 
@@ -39,22 +38,23 @@ export const Timeline = () => {
     timelineHeight.value = window.outerHeight * 0.25;
   }, []);
 
-  const onDeleteAsk = useCallback(
-    (event: KeyboardEvent) => {
-      if (["Backspace", "Delete"].indexOf(event.key) > -1 && selectedItem) {
-        event.stopPropagation();
-        event.preventDefault();
-        setDialogOpen(true);
-      }
-    },
-    [selectedItem],
-  );
+  const onDeleteAsk = useCallback((event: KeyboardEvent) => {
+    if (
+      ["Backspace", "Delete"].indexOf(event.key) > -1 &&
+      selectedItem.value !== null
+    ) {
+      event.stopPropagation();
+      event.preventDefault();
+      setDialogOpen(true);
+    }
+  }, []);
 
   const onDelete = useCallback(() => {
-    deleteCharacterClip(selectedItem as Clip);
-    deleteAudioClip(selectedItem as Clip);
-    deleteKeyframe(selectedItem as Keyframe);
-  }, [selectedItem, deleteKeyframe]);
+    deleteCharacterClip(selectedItem.value as Clip);
+    deleteAudioClip(selectedItem.value as Clip);
+    deleteKeyframe(selectedItem.value as Keyframe);
+    selectedItem.value = null;
+  }, [deleteKeyframe]);
 
   useEffect(() => {
     document.addEventListener("keydown", onDeleteAsk);
@@ -82,7 +82,7 @@ export const Timeline = () => {
       </LowerPanel>
       <ConfirmationModal
         title="Delete Clip"
-        text={`Are you sure you want to delete the selected ${getItemType(selectedItem)}?`}
+        text={`Are you sure you want to delete the selected ${getItemType(selectedItem.value)}?`}
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onOk={() => {
