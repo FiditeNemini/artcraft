@@ -1,7 +1,7 @@
 // Currently supported styles.
 // These are the API names.
 export type VstStyle
-	= "anime_2d"
+	= "anime_2_5d"
 	| "anime_2d_flat"
 	| "anime_ghibli"
 	| "anime_retro_neon"
@@ -35,7 +35,7 @@ export interface StyleOption {
 export const STYLE_OPTIONS: readonly StyleOption[] = [
 	{
 		label: "2D Anime",
-		value: "anime_2d",
+		value: "anime_2_5d",
 	},
 	{
 		label: "2D Anime (Flat)",
