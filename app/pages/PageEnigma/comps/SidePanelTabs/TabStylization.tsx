@@ -58,9 +58,9 @@ export const TabStylization = () => {
     }
   };
   return (
-    <div className="h-full w-full gap-2 overflow-scroll">
+    <div className="flex h-full w-full flex-col gap-2">
       <H4>Select Base Stylizer</H4>
-      <div className="my-2 flex gap-2">
+      <div className="grid grid-cols-4 gap-2">
         <ItemPicker
           label={ArtStyle.Anime2_5D}
           selected={selection === ArtStyle.Anime2DFlat}
@@ -86,23 +86,21 @@ export const TabStylization = () => {
           src="/resources/avatars/3.webp"
         />
       </div>
-      <H4>Enter a Prompt</H4>
-      <div className="my-2 flex gap-2">
-        <Textarea
-          className="h-32 w-full"
-          placeholder="Type here to describe your scene"
-          onChange={onChangeHandlerPositive}
-        />
-      </div>
-      <H4>Negative Prompt</H4>
-      <div className="my-2 flex gap-2">
-        <Textarea
-          className="h-32 w-full"
-          placeholder="Type here to filter out the things you don't want in the scene"
-          onChange={onChangeHandlerNegative}
-        />
-      </div>
-      <div className="mt-6 flex justify-center gap-2">
+      <Textarea
+        label="Positive Prompt"
+        className="h-32 w-full"
+        placeholder="Type here to describe your scene"
+        onChange={onChangeHandlerPositive}
+        resize="none"
+      />
+      <Textarea
+        label="Negative Prompt"
+        className="h-32 w-full"
+        placeholder="Type here to filter out the things you don't want in the scene"
+        onChange={onChangeHandlerNegative}
+        resize="none"
+      />
+      <div className="mt-3 flex justify-center gap-2">
         <Button onClick={handleChangeViewMode}>
           {appUiState?.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE
             ? "Back to Scene"
