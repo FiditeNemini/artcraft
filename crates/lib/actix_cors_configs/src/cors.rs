@@ -25,6 +25,7 @@ fn do_build_cors_config(is_production: bool) -> Cors {
 
   cors = add_fakeyou(cors, is_production);
   cors = add_storyteller(cors, is_production);
+  cors = add_gotta_go_fast_test_branches(cors, is_production);
   cors = add_power_stream(cors, is_production);
   cors = add_legacy_storyteller_stream(cors, is_production);
   cors = add_legacy_vocodes(cors, is_production);
@@ -78,21 +79,6 @@ pub fn add_fakeyou(cors: Cors, is_production: bool) -> Cors {
   }
 }
 
-pub fn add_power_stream(cors: Cors, is_production: bool) -> Cors {
-  // TODO: Remove non-SSL "http://" from production in safe rollout
-  if is_production {
-    cors
-        .allowed_origin("https://dash.power.stream")
-        .allowed_origin("https://power.stream")
-  } else {
-    cors
-        .allowed_origin("http://dev.dash.power.stream")
-        .allowed_origin("http://dev.power.stream")
-        .allowed_origin("https://dev.dash.power.stream")
-        .allowed_origin("https://dev.power.stream")
-  }
-}
-
 pub fn add_storyteller(cors: Cors, is_production: bool) -> Cors {
   // TODO: Remove non-SSL "http://" from production in safe rollout
   if is_production {
@@ -124,6 +110,27 @@ pub fn add_storyteller(cors: Cors, is_production: bool) -> Cors {
         .allowed_origin("https://dev.storyteller.ai:7000") // Yarn default port
         .allowed_origin("https://dev.storyteller.ai:7001") // NB: Mac frontend
         .allowed_origin("https://dev.storyteller.ai:7002") // NB: Mac frontend
+  }
+}
+
+pub fn add_gotta_go_fast_test_branches(cors: Cors, _is_production: bool) -> Cors {
+  cors.allowed_origin("http://localhost:5173")
+      .allowed_origin("https://pipeline-gottagofast.netlify.app")
+      .allowed_origin("https://test--pipeline-gottagofast.netlify.app")
+}
+
+pub fn add_power_stream(cors: Cors, is_production: bool) -> Cors {
+  // TODO: Remove non-SSL "http://" from production in safe rollout
+  if is_production {
+    cors
+        .allowed_origin("https://dash.power.stream")
+        .allowed_origin("https://power.stream")
+  } else {
+    cors
+        .allowed_origin("http://dev.dash.power.stream")
+        .allowed_origin("http://dev.power.stream")
+        .allowed_origin("https://dev.dash.power.stream")
+        .allowed_origin("https://dev.power.stream")
   }
 }
 
