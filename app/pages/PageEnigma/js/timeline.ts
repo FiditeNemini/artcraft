@@ -10,9 +10,8 @@ import AnimationEngine from "./animation_engine";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
-import { Action } from "@remix-run/router";
 import { fromEngineActions } from "../Queue/fromEngineActions";
-import { currentTime } from "../store";
+
 // Every object uuid / entity has a track.
 export class TimelineCurrentState {
   is_editable: boolean;
@@ -125,7 +124,7 @@ export class TimeLine {
   }
 
   public async addKeyFrame(data: any) {
-    // Keyframe Object
+    // KeyFrame Object
     // version: number;
     // clip_uuid: string;
     // group: ClipGroup;
@@ -147,13 +146,13 @@ export class TimeLine {
       }
     }
 
-    let media_id = data["data"]["media_id"];
-    let name = data["data"]["name"];
-    let group = data["data"]["group"];
-    let version = data["data"]["group"];
-    let type = data["data"]["type"];
-    let offset = data["data"]["offset"];
-    let end_offset = data["data"]["length"] + offset;
+    const media_id = data["data"]["media_id"];
+    const name = data["data"]["name"];
+    const group = data["data"]["group"];
+    const version = data["data"]["group"];
+    const type = data["data"]["type"];
+    const offset = data["data"]["offset"];
+    const end_offset = data["data"]["length"] + offset;
 
     // media id for this as well it can be downloaded
     this.addPlayableClip(
@@ -239,7 +238,7 @@ export class TimeLine {
     this.timeline_limit = this.getEndPoint();
     for (const element of this.timeline_items) {
       if (element.type == "transform") {
-        let object = this.scene.get_object_by_uuid(element.object_uuid);
+        const object = this.scene.get_object_by_uuid(element.object_uuid);
         if (object && this.transform_engine.clips[element.object_uuid]) {
           this.transform_engine.clips[element.object_uuid].reset(object);
         }
@@ -267,7 +266,7 @@ export class TimeLine {
   }
 
   // called by the editor update loop on each frame
-  public async update(deltatime: number) {
+  public async update() {
     //if (this.is_playing == false) return; // start and stop
 
     if (this.is_playing) {
@@ -293,7 +292,7 @@ export class TimeLine {
         // run async
         // element.play()
         // remove the element from the list
-        let object = this.scene.get_object_by_uuid(element.object_uuid);
+        const object = this.scene.get_object_by_uuid(element.object_uuid);
         if (element.type == "transform") {
           if (object && this.transform_engine.clips[element.object_uuid]) {
             this.transform_engine.clips[element.object_uuid].length =

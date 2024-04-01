@@ -1061,24 +1061,28 @@ class Editor {
 
   updateSelectedUI() {
     if (this.selected == undefined) { return; }
+
     let pos = this.selected.position;
     let rot = this.selected.rotation;
     let scale = this.selected.scale;
-
+    
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
       payload: {
         currentSceneObject: {
+          group: "object", // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
+          object_uuid: this.selected.uuid,
+          object_name: this.selected.name,
+          version: this.version,
           objectVectors: {
             position: { x: parseFloat(pos.x.toFixed(2)), y: parseFloat(pos.y.toFixed(2)), z: parseFloat(pos.z.toFixed(2)) },
             rotation: { x: parseFloat(rot.x.toFixed(2)), y: parseFloat(rot.y.toFixed(2)), z: parseFloat(rot.z.toFixed(2)) },
-            scalar: { x: parseFloat(scale.x.toFixed(2)), y: parseFloat(scale.y.toFixed(2)), z: parseFloat(scale.z.toFixed(2)) },
+            scale: { x: parseFloat(scale.x.toFixed(2)), y: parseFloat(scale.y.toFixed(2)), z: parseFloat(scale.z.toFixed(2)) },
           }
         }
       }
     });
   }
-
 
   // Automaticly resize scene.
   onWindowResize() {

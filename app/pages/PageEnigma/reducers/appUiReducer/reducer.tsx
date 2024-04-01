@@ -2,10 +2,15 @@ import { State, Action, ACTION_TYPES} from './types';
 
 export function reducer(state: State, action: Action): State {
   switch(action.type){
+
     case ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT:{
       return{
         ...state,
         currentSceneObject: {
+          group:action.payload.currentSceneObject.group,
+          object_name:action.payload.currentSceneObject.object_name,
+          object_uuid:action.payload.currentSceneObject.object_uuid,
+          version:action.payload.currentSceneObject.version,
           isShowing: true,
           objectVectors: {...action.payload.currentSceneObject.objectVectors},
         },
@@ -15,6 +20,10 @@ export function reducer(state: State, action: Action): State {
       return{
         ...state,
         currentSceneObject: {
+          group:action.payload.currentSceneObject.group,
+          object_name:action.payload.currentSceneObject.object_name,
+          object_uuid:action.payload.currentSceneObject.object_uuid,
+          version:action.payload.currentSceneObject.version,
           isShowing: state.currentSceneObject.isShowing,
           objectVectors: {...action.payload.currentSceneObject.objectVectors},
         },
@@ -24,6 +33,10 @@ export function reducer(state: State, action: Action): State {
       return{
         ...state,
         currentSceneObject: {
+          group:action.payload.currentSceneObject.group,
+          object_name:action.payload.currentSceneObject.object_name,
+          object_uuid:action.payload.currentSceneObject.object_uuid,
+          version:action.payload.currentSceneObject.version,
           isShowing: false,
           objectVectors: state.currentSceneObject.objectVectors,
         },
