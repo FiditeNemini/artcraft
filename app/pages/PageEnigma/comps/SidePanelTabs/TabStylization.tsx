@@ -58,7 +58,7 @@ export const TabStylization = () => {
     }
   };
   return (
-    <div className="flex h-full w-full flex-col gap-2">
+    <div className="flex h-full w-full flex-col gap-3">
       <div className="flex flex-col">
         <Label>Select Base Style</Label>
         <div className="grid grid-cols-4 gap-2">
