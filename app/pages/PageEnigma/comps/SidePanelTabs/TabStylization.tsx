@@ -9,7 +9,7 @@ import { ArtStyle } from "../../js/api_manager";
 
 export const TabStylization = () => {
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
-  const [selection, setSelection] = useState<string>("Anime");
+  const [selection, setSelection] = useState<ArtStyle>(ArtStyle.Anime2DFlat);
 
   const editorEngine = useContext(EngineContext);
 
@@ -65,25 +65,29 @@ export const TabStylization = () => {
         <Label>Select Base Style</Label>
         <div className="grid grid-cols-4 gap-2">
           <ItemPicker
-            label={ArtStyle.Anime2DFlat}
+            label="Anime"
+            type={ArtStyle.Anime2DFlat}
             selected={selection === ArtStyle.Anime2DFlat}
             onSelected={handlePickingStylizer}
             src="/resources/avatars/0.webp"
           />
           <ItemPicker
-            label={ArtStyle.PixelArt}
+            label="Pixel"
+            type={ArtStyle.PixelArt}
             selected={selection === ArtStyle.PixelArt}
             onSelected={handlePickingStylizer}
             src="/resources/avatars/1.webp"
           />
           <ItemPicker
-            label={ArtStyle.Cartoon3D}
+            label="Pixar"
+            type={ArtStyle.Cartoon3D}
             selected={selection === ArtStyle.Cartoon3D}
             onSelected={handlePickingStylizer}
             src="/resources/avatars/2.webp"
           />
           <ItemPicker
-            label={ArtStyle.ComicBook}
+            label="Stylized"
+            type={ArtStyle.ComicBook}
             selected={selection === ArtStyle.ComicBook}
             onSelected={handlePickingStylizer}
             src="/resources/avatars/3.webp"
