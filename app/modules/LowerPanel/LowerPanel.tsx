@@ -23,6 +23,9 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
         const newTime = Math.round((event.clientX - 92) / 4 / scale.value);
+        if (newTime < 0) {
+          return;
+        }
         currentTime.value = newTime;
         Queue.publish({
           queueName: QueueNames.TO_ENGINE,
