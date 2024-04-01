@@ -11,6 +11,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::{info, warn};
 use sqlx::MySqlPool;
+use utoipa::ToSchema;
 
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -22,25 +23,25 @@ use password::bcrypt_confirm_password::bcrypt_confirm_password;
 
 use crate::cookies::session::session_cookie_manager::SessionCookieManager;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct LoginRequest {
   pub username_or_email: String,
   pub password: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct LoginSuccessResponse {
   pub success: bool,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, ToSchema)]
 pub struct LoginErrorResponse {
   pub success: bool,
   pub error_type: LoginErrorType,
   pub error_message: String,
 }
 
-#[derive(Copy, Clone, Debug, Serialize)]
+#[derive(Copy, Clone, Debug, Serialize, ToSchema)]
 pub enum LoginErrorType {
   InvalidCredentials,
   ServerError,
@@ -83,6 +84,18 @@ impl ResponseError for LoginErrorResponse {
   }
 }
 
+#[utoipa::path(
+  post,
+  path = "/v1/login",
+  responses(
+    (status = 200, description = "Found", body = LoginSuccessResponse),
+    (status = 401, description = "Invalid credentials", body = LoginErrorResponse),
+    (status = 500, description = "Server error", body = LoginErrorResponse),
+  ),
+  params(
+    ("request" = LoginRequest, description = "Payload for Request"),
+  )
+)]
 pub async fn login_handler(
   http_request: HttpRequest,
   request: web::Json<LoginRequest>,

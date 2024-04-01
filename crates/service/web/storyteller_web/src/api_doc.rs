@@ -23,6 +23,7 @@ use tokens::tokens::users::*;
 use tokens::tokens::zs_voice_datasets::*;
 use users_component::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
 use users_component::endpoints::get_profile_handler::*;
+use users_component::endpoints::login_handler::*;
 use users_component::endpoints::session_info_handler::*;
 
 use crate::http_server::common_responses::cover_image_details::*;
@@ -115,6 +116,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::weights::update_weight::update_weight_handler,
     crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler,
     users_component::endpoints::get_profile_handler::get_profile_handler,
+    users_component::endpoints::login_handler::login_handler,
     users_component::endpoints::session_info_handler::session_info_handler,
   ),
   components(schemas(
@@ -240,6 +242,10 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListWeightsByUserError,
     ListWeightsByUserPathInfo,
     ListWeightsByUserSuccessResponse,
+    LoginErrorResponse,
+    LoginErrorType,
+    LoginRequest,
+    LoginSuccessResponse,
     MediaFile,
     MediaFileData,
     MediaFileForUserListItem,
