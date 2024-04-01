@@ -1,6 +1,11 @@
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import { ClipType, MediaClip } from "~/pages/PageEnigma/models/track";
+import {
+  ClipType,
+  Keyframe,
+  Clip,
+  MediaClip,
+} from "~/pages/PageEnigma/models/track";
 import useUpdateDragDrop from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateDragDrop";
 import {
   addCharacterAnimation,
@@ -22,9 +27,12 @@ export const TrackProvider = ({ children }: Props) => {
 
   const { endDrag, ...dragDrop } = useUpdateDragDrop();
 
-  const [selectedItem, setSelectedClip] = useState<string | null>(null);
-  const selectItem = useCallback((clipId: string | null) => {
-    setSelectedClip(clipId);
+  const [selectedItem, setSelectedItem] = useState<Clip | Keyframe | null>(
+    null,
+  );
+  const selectItem = useCallback((item: Clip | Keyframe) => {
+    console.log("item", item);
+    setSelectedItem(item);
   }, []);
 
   const [animationClips, setAnimationClips] = useState<MediaClip[]>([]);
@@ -98,7 +106,36 @@ export const TrackProvider = ({ children }: Props) => {
         name: "Walk",
       },
     ]);
-    setAudioClips([]);
+    setAudioClips([
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        type: ClipType.ANIMATION,
+        length: 25,
+        name: "Sing",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        type: ClipType.AUDIO,
+        length: 25,
+        name: "Chatter",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        type: ClipType.AUDIO,
+        length: 25,
+        name: "Talk",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        type: ClipType.AUDIO,
+        length: 25,
+        name: "Yell",
+      },
+    ]);
     setScale(1);
     setLength(12);
   }, []);

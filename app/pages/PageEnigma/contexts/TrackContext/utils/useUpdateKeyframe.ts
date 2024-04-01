@@ -36,6 +36,7 @@ export default function useUpdateKeyframe() {
   }, []);
 
   const deleteKeyframe = useCallback((keyframe: Keyframe) => {
+    console.log("del", keyframe);
     DELETE_KEYFRAME[keyframe.group](keyframe);
   }, []);
 

@@ -4,7 +4,6 @@ import {
   ObjectGroup,
   QueueKeyframe,
 } from "~/pages/PageEnigma/models/track";
-import { useCallback } from "react";
 import * as uuid from "uuid";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
@@ -31,7 +30,6 @@ export function updateObject({ id, offset }: { id: string; offset: number }) {
 }
 
 export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
-  console.log(keyframe, offset);
   const oldObjectGroup = objectGroup.value;
   const obj = oldObjectGroup.objects.find(
     (row) => row.object_uuid === keyframe.object_uuid,
@@ -80,14 +78,23 @@ export function deleteObjectKeyframe(keyframe: Keyframe) {
   const obj = oldObjectGroup.objects.find(
     (row) => row.object_uuid === keyframe.object_uuid,
   );
+  console.log("delete", obj);
   if (!obj) {
     return oldObjectGroup;
   }
 
   const newKeyframes = [
-    ...obj.keyframes.filter(
-      (row) => row.keyframe_uuid !== keyframe.keyframe_uuid,
-    ),
+    ...obj.keyframes.filter((row) => {
+      if (row.keyframe_uuid === keyframe.keyframe_uuid) {
+        Queue.publish({
+          queueName: QueueNames.TO_ENGINE,
+          action: toEngineActions.DELETE_KEYFRAME,
+          data: row,
+        });
+        return false;
+      }
+      return true;
+    }),
   ];
 
   if (newKeyframes.length) {

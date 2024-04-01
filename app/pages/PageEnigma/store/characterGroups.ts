@@ -283,27 +283,27 @@ export function selectCharacterClip(clipId: string) {
   }));
 }
 
-export function deleteCharacterClip(clipId: string) {
+export function deleteCharacterClip(clip: Clip) {
   const oldCharacterGroups = characterGroups.value;
   characterGroups.value = oldCharacterGroups.map((character) => ({
     ...character,
-    animationClips: character.animationClips.filter((clip) => {
-      if (clip.clip_uuid === clipId) {
+    animationClips: character.animationClips.filter((row) => {
+      if (row.clip_uuid === clip.clip_uuid) {
         Queue.publish({
           queueName: QueueNames.TO_ENGINE,
           action: toEngineActions.DELETE_CLIP,
-          data: clip!,
+          data: row,
         });
         return false;
       }
       return true;
     }),
-    lipSyncClips: character.lipSyncClips.filter((clip) => {
-      if (clip.clip_uuid === clipId) {
+    lipSyncClips: character.lipSyncClips.filter((row) => {
+      if (row.clip_uuid === clip.clip_uuid) {
         Queue.publish({
           queueName: QueueNames.TO_ENGINE,
           action: toEngineActions.DELETE_CLIP,
-          data: clip!,
+          data: row,
         });
         return false;
       }

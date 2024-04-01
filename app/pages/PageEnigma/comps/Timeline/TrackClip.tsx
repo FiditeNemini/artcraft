@@ -1,13 +1,8 @@
 import { useMouseEventsClip } from "./utils/useMouseEventsClip";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-import { useCallback, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { scale } from "~/pages/PageEnigma/store";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay } from "@fortawesome/pro-solid-svg-icons";
 import { Clip } from "~/pages/PageEnigma/models/track";
-import Queue from "~/pages/PageEnigma/Queue/Queue";
-import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
-import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 interface Props {
   min: number;
@@ -31,24 +26,26 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
     setState,
   );
 
+  const selectedClipId = (selectedItem as Clip | null)?.clip_uuid ?? "";
+
   const { length, offset } = state;
 
-  const onPlayClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.stopPropagation();
-      event.preventDefault();
-      Queue.publish({
-        queueName: QueueNames.TO_ENGINE,
-        action: toEngineActions.PLAY_CLIP,
-        data: clip,
-      });
-    },
-    [clip],
-  );
+  // const onPlayClick = useCallback(
+  //   (event: React.MouseEvent<HTMLButtonElement>) => {
+  //     event.stopPropagation();
+  //     event.preventDefault();
+  //     Queue.publish({
+  //       queueName: QueueNames.TO_ENGINE,
+  //       action: toEngineActions.PLAY_CLIP,
+  //       data: clip,
+  //     });
+  //   },
+  //   [clip],
+  // );
 
   const classes = [
     "absolute",
-    clip.clip_uuid === selectedItem
+    clip.clip_uuid === selectedClipId
       ? `bg-${style}-selected`
       : `bg-${style}-clip`,
   ];
@@ -71,7 +68,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           ...classes,
           "rounded-l-lg",
           "block h-full",
-          clip.clip_uuid === selectedItem
+          clip.clip_uuid === selectedClipId
             ? "border border-b-2 border-l-2 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -81,13 +78,13 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "w-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "left")}
-        onClick={() => selectItem(clip.clip_uuid)}
+        onClick={() => selectItem(clip)}
       />
       <button
         className={[
           ...classes,
           "block h-full",
-          clip.clip_uuid === selectedItem
+          clip.clip_uuid === selectedClipId
             ? "border border-b-2 border-l-0 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -97,14 +94,14 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "move",
         }}
         onPointerDown={(event) => onPointerDown(event, "drag")}
-        onClick={() => selectItem(clip.clip_uuid)}
+        onClick={() => selectItem(clip)}
       />
       <button
         className={[
           ...classes,
           "rounded-r-lg",
           "block h-full",
-          clip.clip_uuid === selectedItem
+          clip.clip_uuid === selectedClipId
             ? "border border-b-2 border-l-0 border-r-2 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -114,7 +111,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "e-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "right")}
-        onClick={() => selectItem(clip.clip_uuid)}
+        onClick={() => selectItem(clip)}
       />
       {/*{selectedItem === clip.clip_uuid && (*/}
       {/*  <button*/}

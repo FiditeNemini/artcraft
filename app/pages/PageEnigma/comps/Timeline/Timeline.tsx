@@ -16,11 +16,21 @@ import { TimerGrid } from "~/pages/PageEnigma/comps/TimerGrid/TimerGrid";
 import { Scrubber } from "~/pages/PageEnigma/comps/Scrubber/Scrubber";
 import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
 import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
+import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
+import { Clip, Keyframe } from "~/pages/PageEnigma/models/track";
+
+function getItemType(item: Clip | Keyframe | null) {
+  if (!item) {
+    return "";
+  }
+  return (item as Clip).clip_uuid ? "clip" : "keyframe";
+}
 
 export const Timeline = () => {
   useSignals();
   const { selectedItem } = useContext(TrackContext);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { deleteKeyframe } = useUpdateKeyframe();
 
   // implement the code to handle incoming messages from the Engine
   useQueueHandler();
@@ -32,6 +42,8 @@ export const Timeline = () => {
   const onDeleteAsk = useCallback(
     (event: KeyboardEvent) => {
       if (["Backspace", "Delete"].indexOf(event.key) > -1 && selectedItem) {
+        event.stopPropagation();
+        event.preventDefault();
         setDialogOpen(true);
       }
     },
@@ -39,9 +51,10 @@ export const Timeline = () => {
   );
 
   const onDelete = useCallback(() => {
-    deleteCharacterClip(selectedItem!);
-    deleteAudioClip(selectedItem!);
-  }, [selectedItem]);
+    deleteCharacterClip(selectedItem as Clip);
+    deleteAudioClip(selectedItem as Clip);
+    deleteKeyframe(selectedItem as Keyframe);
+  }, [selectedItem, deleteKeyframe]);
 
   useEffect(() => {
     document.addEventListener("keydown", onDeleteAsk);
@@ -69,7 +82,7 @@ export const Timeline = () => {
       </LowerPanel>
       <ConfirmationModal
         title="Delete Clip"
-        text="Are you sure you want to delete the selected clip?"
+        text={`Are you sure you want to delete the selected ${getItemType(selectedItem)}?`}
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onOk={() => {

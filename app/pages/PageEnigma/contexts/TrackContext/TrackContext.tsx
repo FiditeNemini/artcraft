@@ -1,12 +1,9 @@
 import { createContext } from "react";
 import {
-  AudioGroup,
-  CameraGroup,
-  CharacterGroup,
-  ObjectGroup,
   MediaClip,
   Keyframe,
   QueueKeyframe,
+  Clip,
 } from "~/pages/PageEnigma/models/track";
 
 export const TrackContext = createContext<{
@@ -15,8 +12,8 @@ export const TrackContext = createContext<{
   deleteKeyframe: (keyframe: Keyframe) => void;
 
   // current - only select one item - will be replaced
-  selectedItem: string | null;
-  selectItem: (itemId: string) => void;
+  selectedItem: Clip | Keyframe | null;
+  selectItem: (item: Clip | Keyframe) => void;
 
   // sidebar clips
   animationClips: MediaClip[];

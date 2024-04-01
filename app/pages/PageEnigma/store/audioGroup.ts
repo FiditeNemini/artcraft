@@ -115,17 +115,17 @@ export function selectAudioClip(clipId: string) {
   };
 }
 
-export function deleteAudioClip(clipId: string) {
+export function deleteAudioClip(clip: Clip) {
   const oldAudioGroup = audioGroup.value;
   audioGroup.value = {
     ...oldAudioGroup,
     clips: [
-      ...oldAudioGroup.clips.filter((clip) => {
-        if (clip.clip_uuid === clipId) {
+      ...oldAudioGroup.clips.filter((row) => {
+        if (row.clip_uuid === clip.clip_uuid) {
           Queue.publish({
             queueName: QueueNames.TO_ENGINE,
             action: toEngineActions.DELETE_CLIP,
-            data: clip!,
+            data: row,
           });
           return false;
         }

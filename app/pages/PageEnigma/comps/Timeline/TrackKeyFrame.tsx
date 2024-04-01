@@ -32,9 +32,12 @@ export const TrackKeyFrame = ({
     setOffset,
   });
 
+  const selectedKeyframeId =
+    (selectedItem as Keyframe | null)?.keyframe_uuid ?? "";
+
   const classes = [
     "absolute",
-    keyframe.keyframe_uuid === selectedItem
+    keyframe.keyframe_uuid === selectedKeyframeId
       ? `bg-${style}-selected`
       : `bg-${style}-clip`,
   ];
@@ -46,7 +49,7 @@ export const TrackKeyFrame = ({
           ...classes,
           "rounded-l-lg",
           "block h-full",
-          keyframe.keyframe_uuid === selectedItem
+          keyframe.keyframe_uuid === selectedKeyframeId
             ? "border border-b-2 border-l-2 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -56,7 +59,7 @@ export const TrackKeyFrame = ({
           cursor: "w-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "left")}
-        onClick={() => selectItem(keyframe.keyframe_uuid)}
+        onClick={() => selectItem(keyframe)}
       >
         <FontAwesomeIcon icon={faSortUpDown} />
       </button>
