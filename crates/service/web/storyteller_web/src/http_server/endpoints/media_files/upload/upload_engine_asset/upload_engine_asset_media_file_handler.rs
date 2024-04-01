@@ -205,6 +205,7 @@ pub async fn upload_engine_asset_media_file_handler(
     file_size_bytes: file_size_bytes as u64,
     duration_millis: 0,
     sha256_checksum: &hash,
+    maybe_title: upload_media_request.title.as_deref(),
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
     maybe_public_bucket_extension: Some(suffix),

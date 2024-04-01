@@ -9,9 +9,15 @@ use tokens::tokens::zs_voice_datasets::ZsVoiceDatasetToken;
 use crate::http_server::web_utils::read_multipart_field_bytes::{checked_read_multipart_bytes, read_multipart_field_as_text};
 
 pub struct MediaFileUploadData {
+  // Required
   pub uuid_idempotency_token: Option<String>,
-  pub file_name: Option<String>,
   pub file_bytes: Option<BytesMut>,
+
+  // Optional: name of the file in the File() object
+  pub file_name: Option<String>,
+
+  // Optional: title of the scene (media_files' maybe_title)
+  pub title: Option<String>,
 }
 
 /// Pull common parts out of multipart media HTTP requests, typically for handling file uploads.
@@ -19,6 +25,7 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
   let mut uuid_idempotency_token = None;
   let mut file_bytes = None;
   let mut file_name = None;
+  let mut title = None;
 
   while let Ok(Some(mut field)) = multipart_payload.try_next().await {
     let mut field_name = None;
@@ -47,6 +54,13 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
               e
             })?;
       },
+      Some("title") => {
+        title = read_multipart_field_as_text(&mut field).await
+            .map_err(|e| {
+              warn!("Error reading title: {:}", &e);
+              e
+            })?;
+      },
       _ => continue,
     }
   }
@@ -55,5 +69,6 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
     uuid_idempotency_token,
     file_name,
     file_bytes,
+    title,
   })
 }
