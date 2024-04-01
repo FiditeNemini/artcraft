@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 
-import { Button, H4, ItemPicker, Textarea } from "~/components";
+import { Button, H4, ItemPicker, Label, Textarea } from "~/components";
 
 import { AppUiContext } from "../../contexts/AppUiContext";
 import { APPUI_ACTION_TYPES, APPUI_VIEW_MODES } from "../../reducers";
@@ -59,33 +59,36 @@ export const TabStylization = () => {
   };
   return (
     <div className="flex h-full w-full flex-col gap-2">
-      <H4>Select Base Stylizer</H4>
-      <div className="grid grid-cols-4 gap-2">
-        <ItemPicker
-          label={ArtStyle.Anime2DFlat}
-          selected={selection === ArtStyle.Anime2DFlat}
-          onSelected={handlePickingStylizer}
-          src="/resources/avatars/0.webp"
-        />
-        <ItemPicker
-          label={ArtStyle.PixelArt}
-          selected={selection === ArtStyle.PixelArt}
-          onSelected={handlePickingStylizer}
-          src="/resources/avatars/1.webp"
-        />
-        <ItemPicker
-          label={ArtStyle.Cartoon3D}
-          selected={selection === ArtStyle.Cartoon3D}
-          onSelected={handlePickingStylizer}
-          src="/resources/avatars/2.webp"
-        />
-        <ItemPicker
-          label={ArtStyle.ComicBook}
-          selected={selection === ArtStyle.ComicBook}
-          onSelected={handlePickingStylizer}
-          src="/resources/avatars/3.webp"
-        />
+      <div className="flex flex-col">
+        <Label>Select Base Style</Label>
+        <div className="grid grid-cols-4 gap-2">
+          <ItemPicker
+            label={ArtStyle.Anime2DFlat}
+            selected={selection === ArtStyle.Anime2DFlat}
+            onSelected={handlePickingStylizer}
+            src="/resources/avatars/0.webp"
+          />
+          <ItemPicker
+            label={ArtStyle.PixelArt}
+            selected={selection === ArtStyle.PixelArt}
+            onSelected={handlePickingStylizer}
+            src="/resources/avatars/1.webp"
+          />
+          <ItemPicker
+            label={ArtStyle.Cartoon3D}
+            selected={selection === ArtStyle.Cartoon3D}
+            onSelected={handlePickingStylizer}
+            src="/resources/avatars/2.webp"
+          />
+          <ItemPicker
+            label={ArtStyle.ComicBook}
+            selected={selection === ArtStyle.ComicBook}
+            onSelected={handlePickingStylizer}
+            src="/resources/avatars/3.webp"
+          />
+        </div>
       </div>
+
       <Textarea
         label="Positive Prompt"
         className="h-32 w-full"
