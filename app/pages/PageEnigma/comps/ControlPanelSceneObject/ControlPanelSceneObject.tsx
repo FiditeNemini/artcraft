@@ -106,23 +106,6 @@ export const ControlPanelSceneObject = () => {
         return;
       }
 
-      // console.log(`Position ${position.x}`)
-      // console.log(`Position ${position.y}`)
-      // console.log(`Position ${position.z}`)
-
-      // console.log(`Rotation ${rotation.x}`)
-      // console.log(`Rotation ${rotation.y}`)
-      // console.log(`Rotation ${rotation.z}`)
-
-      // console.log(`Scale ${scale.x}`)
-      // console.log(`Scale ${scale.y}`)
-      // console.log(`Scale ${scale.z}`)
-
-      console.log(`Group ${currentSceneObject.group}`);
-      console.log(`Object UUID ${currentSceneObject.object_uuid}`);
-      console.log(`Object Name ${currentSceneObject.object_name}`);
-      console.log(`Object Version ${currentSceneObject.version}`);
-
       Queue.publish({
         queueName: QueueNames.TO_TIMELINE,
         action: toTimelineActions.ADD_KEYFRAME,
@@ -140,6 +123,10 @@ export const ControlPanelSceneObject = () => {
     }
   };
 
+  const handleDeleteObject = () =>{
+    console.log("TELL EDITOR TO DELETE HERE");
+  }
+  
   if (!appUiState.controlPanel.currentSceneObject) {
     return null;
   }
@@ -164,7 +151,7 @@ export const ControlPanelSceneObject = () => {
       <div className="flex justify-between">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube} />
-          <p className="font-semibold">Object Name</p>
+          <p className="font-semibold">{appUiState.controlPanel.currentSceneObject.object_name}</p>
         </div>
         <div className="flex items-center gap-2 text-xs font-medium opacity-60">
           <FontAwesomeIcon icon={faArrowRightArrowLeft} />
@@ -212,7 +199,11 @@ export const ControlPanelSceneObject = () => {
         >
           Add Keyframe (K)
         </Button>
-        <Button variant="secondary" icon={faTrash} />
+        <Button
+          variant="secondary"
+          icon={faTrash}
+          onClick={handleDeleteObject}
+        />
       </div>
     </Transition>
   );
