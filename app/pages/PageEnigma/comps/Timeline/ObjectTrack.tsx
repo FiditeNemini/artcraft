@@ -1,11 +1,7 @@
-import { useContext } from "react";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-import { fullWidth } from "~/pages/PageEnigma/store";
+import { fullWidth, objectGroup, updateObject } from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 
-export const Objects = () => {
-  const { objects, updateObject } = useContext(TrackContext);
-
+export const ObjectTrack = () => {
   return (
     <div
       className="block rounded-lg bg-objects-groupBg pb-5 pl-2 pr-4"
@@ -14,7 +10,7 @@ export const Objects = () => {
       <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
         Objects
       </div>
-      {objects.objects.map((object) => (
+      {objectGroup.value.objects.map((object) => (
         <div key={object.object_uuid} className="flex flex-col gap-4">
           <TrackKeyFrames
             id={object.object_uuid}

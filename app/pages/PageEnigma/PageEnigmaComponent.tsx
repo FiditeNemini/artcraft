@@ -22,21 +22,12 @@ import {
   appUiInitialStateValues,
   APPUI_VIEW_MODES,
 } from "./reducers";
-import {
-  canDrop,
-  clipLength,
-  currPosition,
-  dragId,
-  overTimeline,
-  scale,
-  timelineHeight,
-} from "~/pages/PageEnigma/store";
+import { timelineHeight } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
+import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
 
 export const PageEnigmaComponent = () => {
   useSignals();
-  const { currX, currY } = currPosition.value;
-
   const [appUiState, dispatchAppUiState] = useReducer(
     appUiReducer,
     appUiInitialStateValues,
@@ -129,22 +120,7 @@ export const PageEnigmaComponent = () => {
           </div>
         </EngineProvider>
       </AppUIProvider>
-      <div
-        id={`ani-dnd-${dragId.value}`}
-        className={[
-          "absolute p-2",
-          "rounded-lg",
-          !canDrop.value ? "bg-brand-primary" : "bg-brand-secondary-700",
-          dragId.value ? "block" : "hidden",
-        ].join(" ")}
-        style={{
-          top: overTimeline.value ? currY - 16 : currY - 32,
-          left: currX + 1,
-          zIndex: 10000,
-          width: overTimeline.value ? clipLength.value * 4 * scale.value : 64,
-          height: overTimeline.value ? 32 : 64,
-        }}
-      />
+      <DragComponent />
     </div>
   );
 };

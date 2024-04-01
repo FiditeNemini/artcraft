@@ -1,11 +1,13 @@
-import { useContext } from "react";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { TrackClips } from "~/pages/PageEnigma/comps/Timeline/TrackClips";
-import { fullWidth } from "~/pages/PageEnigma/store";
+import {
+  audioGroup,
+  fullWidth,
+  toggleAudioMute,
+  updateAudio,
+} from "~/pages/PageEnigma/store";
 
 export const Audio = () => {
-  const { audio, updateAudio, toggleAudioMute } = useContext(TrackContext);
-  const { clips } = audio!;
+  const { clips } = audioGroup.value;
 
   return (
     <div
@@ -17,12 +19,12 @@ export const Audio = () => {
       </div>
       <div className="flex flex-col gap-4">
         <TrackClips
-          id={audio!.id}
+          id={audioGroup.value.id}
           clips={clips}
           title="Global Audio TrackClips"
           updateClip={updateAudio}
           style="audio"
-          muted={audio!.muted}
+          muted={audioGroup.value.muted}
           toggleMute={toggleAudioMute}
         />
       </div>

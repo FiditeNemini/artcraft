@@ -1,7 +1,11 @@
-import { useCallback, useContext, useMemo } from "react";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import { useCallback, useMemo } from "react";
 import { TrackClips } from "~/pages/PageEnigma/comps/Timeline/TrackClips";
-import { fullWidth } from "~/pages/PageEnigma/store";
+import {
+  characterGroups,
+  fullWidth,
+  toggleLipSyncMute,
+  updateCharacters,
+} from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 
 function buildUpdaters(
@@ -36,16 +40,14 @@ interface Props {
 }
 
 export const Character = ({ characterId }: Props) => {
-  const { characters, updateCharacters, toggleLipSyncMute } =
-    useContext(TrackContext);
-  const character = characters.find((row) => (row.id = characterId));
+  const character = characterGroups.value.find((row) => (row.id = characterId));
 
   const { updateClipLipSync, updateClipPosition, updateClipAnimations } =
-    useMemo(() => buildUpdaters(updateCharacters), [updateCharacters]);
+    useMemo(() => buildUpdaters(updateCharacters), []);
 
   const toggleCharacterLipSyncMute = useCallback(() => {
     toggleLipSyncMute(character?.id ?? "");
-  }, [character?.id, toggleLipSyncMute]);
+  }, [character?.id]);
 
   if (!character) {
     return false;

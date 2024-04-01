@@ -8,7 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { AppUiContext } from "../../contexts/AppUiContext";
-import { Button, H4, H5, H6, InputVector } from "~/components";
+import { Button, H5, InputVector } from "~/components";
 
 import { XYZ } from "../../datastructures/common";
 import { ACTION_TYPES } from "../../reducers/appUiReducer/types";
@@ -16,6 +16,7 @@ import { ACTION_TYPES } from "../../reducers/appUiReducer/types";
 import { QueueNames } from "../../Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { toTimelineActions } from "../../Queue/toTimelineActions";
+import { QueueKeyframe } from "~/pages/PageEnigma/models/track";
 export const ControlPanelSceneObject = () => {
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
 
@@ -24,24 +25,21 @@ export const ControlPanelSceneObject = () => {
   const scale = appUiState?.currentSceneObject.objectVectors.scale;
   const currentSceneObject = appUiState?.currentSceneObject;
 
-  
   const handlePositionChange = (xyz: XYZ) => {
     if (appUiState) {
-      
-      
       if (currentSceneObject == null) {
-         console.log("Missing Scene Object Position"); 
-         return; 
+        console.log("Missing Scene Object Position");
+        return;
       }
 
       dispatchAppUiState({
         type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
         payload: {
           currentSceneObject: {
-            group:currentSceneObject.group,
-            object_uuid:currentSceneObject.object_uuid,
-            object_name:currentSceneObject.object_name,
-            version:currentSceneObject.version,
+            group: currentSceneObject.group,
+            object_uuid: currentSceneObject.object_uuid,
+            object_name: currentSceneObject.object_name,
+            version: currentSceneObject.version,
             objectVectors: {
               position: { ...xyz },
               rotation: appUiState.currentSceneObject.objectVectors.rotation,
@@ -54,20 +52,19 @@ export const ControlPanelSceneObject = () => {
   };
   const handleRotationChange = (xyz: XYZ) => {
     if (appUiState) {
-
-    if (currentSceneObject == null) {
-      console.log("Missing Scene Object Rotation"); 
-      return; 
-   }
+      if (currentSceneObject == null) {
+        console.log("Missing Scene Object Rotation");
+        return;
+      }
 
       dispatchAppUiState({
         type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
         payload: {
           currentSceneObject: {
-            group:currentSceneObject.group,
-            object_uuid:currentSceneObject.object_uuid,
-            object_name:currentSceneObject.object_name,
-            version:currentSceneObject.version,
+            group: currentSceneObject.group,
+            object_uuid: currentSceneObject.object_uuid,
+            object_name: currentSceneObject.object_name,
+            version: currentSceneObject.version,
             objectVectors: {
               position: appUiState.currentSceneObject.objectVectors.position,
               rotation: { ...xyz },
@@ -80,19 +77,18 @@ export const ControlPanelSceneObject = () => {
   };
   const handleScaleChange = (xyz: XYZ) => {
     if (appUiState) {
-
       if (currentSceneObject == null) {
-        console.log("Missing Scene Object Scale"); 
-        return; 
+        console.log("Missing Scene Object Scale");
+        return;
       }
       dispatchAppUiState({
         type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
         payload: {
           currentSceneObject: {
-            group:currentSceneObject.group,
-            object_uuid:currentSceneObject.object_uuid,
-            object_name:currentSceneObject.object_name,
-            version:currentSceneObject.version,
+            group: currentSceneObject.group,
+            object_uuid: currentSceneObject.object_uuid,
+            object_name: currentSceneObject.object_name,
+            version: currentSceneObject.version,
             objectVectors: {
               position: appUiState.currentSceneObject.objectVectors.position,
               rotation: appUiState.currentSceneObject.objectVectors.rotation,
@@ -101,52 +97,53 @@ export const ControlPanelSceneObject = () => {
           },
         },
       });
-
-      }
+    }
   };
 
   const handleOnAddKeyFrame = () => {
     if (appUiState) {
+      if (
+        position == null ||
+        rotation == null ||
+        scale == null ||
+        currentSceneObject == null
+      ) {
+        return;
+      }
 
-      if (position == null || 
-        rotation == null || 
-        scale == null || 
-        currentSceneObject == null) 
-        { return; }
+      // console.log(`Position ${position.x}`)
+      // console.log(`Position ${position.y}`)
+      // console.log(`Position ${position.z}`)
 
-        // console.log(`Position ${position.x}`)
-        // console.log(`Position ${position.y}`)
-        // console.log(`Position ${position.z}`)
+      // console.log(`Rotation ${rotation.x}`)
+      // console.log(`Rotation ${rotation.y}`)
+      // console.log(`Rotation ${rotation.z}`)
 
-        // console.log(`Rotation ${rotation.x}`)
-        // console.log(`Rotation ${rotation.y}`)
-        // console.log(`Rotation ${rotation.z}`)
-      
-        // console.log(`Scale ${scale.x}`)
-        // console.log(`Scale ${scale.y}`)
-        // console.log(`Scale ${scale.z}`)
+      // console.log(`Scale ${scale.x}`)
+      // console.log(`Scale ${scale.y}`)
+      // console.log(`Scale ${scale.z}`)
 
-        console.log(`Group ${currentSceneObject.group}`)
-        console.log(`Object UUID ${currentSceneObject.object_uuid}`)
-        console.log(`Object Name ${currentSceneObject.object_name}`)
-        console.log(`Object Version ${currentSceneObject.version}`)
+      console.log(`Group ${currentSceneObject.group}`);
+      console.log(`Object UUID ${currentSceneObject.object_uuid}`);
+      console.log(`Object Name ${currentSceneObject.object_name}`);
+      console.log(`Object Version ${currentSceneObject.version}`);
 
-        Queue.publish({queueName:QueueNames.TO_TIMELINE, action: toTimelineActions.ADD_KEYFRAME, 
-          data: {  
-            group:currentSceneObject.group,
-            object_uuid:currentSceneObject.object_uuid,
-            object_name:currentSceneObject.object_name,
-            version:currentSceneObject.version,
+      Queue.publish({
+        queueName: QueueNames.TO_TIMELINE,
+        action: toTimelineActions.ADD_KEYFRAME,
+        data: {
+          group: currentSceneObject.group,
+          object_uuid: currentSceneObject.object_uuid,
+          object_name: currentSceneObject.object_name,
+          version: 1,
 
-            position: currentSceneObject.objectVectors.position,
-            rotation: currentSceneObject.objectVectors.rotation,
-            scale:currentSceneObject.objectVectors.scale
-          }
-        })
-
-      
+          position: currentSceneObject.objectVectors.position,
+          rotation: currentSceneObject.objectVectors.rotation,
+          scale: currentSceneObject.objectVectors.scale,
+        } as QueueKeyframe,
+      });
     }
-  }
+  };
 
   return (
     <Transition
@@ -203,9 +200,11 @@ export const ControlPanelSceneObject = () => {
 
       <span className="h-2" />
       <div className="flex gap-2">
-        <Button variant="secondary" 
-        className="grow"
-        onClick={handleOnAddKeyFrame}>
+        <Button
+          variant="secondary"
+          className="grow"
+          onClick={handleOnAddKeyFrame}
+        >
           Add Keyframe (K)
         </Button>
         <Button variant="secondary" icon={faTrash} />

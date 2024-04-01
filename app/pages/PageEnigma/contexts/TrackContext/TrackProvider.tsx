@@ -1,12 +1,9 @@
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import useUpdateCharacters from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateCharacters";
-import useUpdateCamera from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateCamera";
-import useUpdateAudio from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateAudio";
-import useUpdateObject from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateObject";
 import { ClipType, MediaClip } from "~/pages/PageEnigma/models/track";
 import useUpdateDragDrop from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateDragDrop";
 import {
+  addCharacterAnimation,
   canDrop,
   dragId,
   dragType,
@@ -21,16 +18,6 @@ interface Props {
 }
 
 export const TrackProvider = ({ children }: Props) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { addCharacterKeyframe, deleteCharacterKeyframe, ...characters } =
-    useUpdateCharacters();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { addCameraKeyframe, deleteCameraKeyframe, ...camera } =
-    useUpdateCamera();
-  const audio = useUpdateAudio();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { addObjectKeyframe, deleteObjectKeyframe, ...objects } =
-    useUpdateObject();
   const keyframes = useUpdateKeyframe();
 
   const { endDrag, ...dragDrop } = useUpdateDragDrop();
@@ -65,7 +52,7 @@ export const TrackProvider = ({ children }: Props) => {
   const dropClip = useCallback(() => {
     if (canDrop.value) {
       if (dragType.value === "animations") {
-        characters.addCharacterAnimation({
+        addCharacterAnimation({
           clipId: dragId.value!,
           characterId: dropId.value,
           animationClips,
@@ -74,7 +61,7 @@ export const TrackProvider = ({ children }: Props) => {
       }
     }
     endDrag();
-  }, [animationClips, characters, endDrag]);
+  }, [animationClips, endDrag]);
 
   const fullWidth = useMemo(() => {
     return length * 60 * 4 * scale;
@@ -118,11 +105,6 @@ export const TrackProvider = ({ children }: Props) => {
 
   const values = useMemo(() => {
     return {
-      ...characters,
-      ...camera,
-      ...audio,
-      ...objects,
-
       ...keyframes,
 
       selectItem,
@@ -143,11 +125,6 @@ export const TrackProvider = ({ children }: Props) => {
       setTimelineHeight,
     };
   }, [
-    characters,
-    camera,
-    audio,
-    objects,
-
     keyframes,
 
     selectItem,

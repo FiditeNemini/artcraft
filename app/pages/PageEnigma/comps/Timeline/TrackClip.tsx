@@ -116,19 +116,19 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
         onPointerDown={(event) => onPointerDown(event, "right")}
         onClick={() => selectItem(clip.clip_uuid)}
       />
-      {selectedItem === clip.clip_uuid && (
-        <button
-          className="absolute flex h-full items-center justify-center"
-          style={{
-            width: length * 4 * scale.value,
-            left: offset * 4 * scale.value,
-            zIndex: 2000,
-          }}
-          onPointerDown={onPlayClick}
-        >
-          <FontAwesomeIcon icon={faPlay} />
-        </button>
-      )}
+      {/*{selectedItem === clip.clip_uuid && (*/}
+      {/*  <button*/}
+      {/*    className="absolute flex h-full items-center justify-center"*/}
+      {/*    style={{*/}
+      {/*      width: length * 4 * scale.value,*/}
+      {/*      left: offset * 4 * scale.value,*/}
+      {/*      zIndex: 2000,*/}
+      {/*    }}*/}
+      {/*    onPointerDown={onPlayClick}*/}
+      {/*  >*/}
+      {/*    <FontAwesomeIcon icon={faPlay} />*/}
+      {/*  </button>*/}
+      {/*)}*/}
     </>
   );
 };

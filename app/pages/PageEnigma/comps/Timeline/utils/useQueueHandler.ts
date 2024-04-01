@@ -23,7 +23,7 @@ export function useQueueHandler() {
   const { addKeyframe } = useContext(TrackContext);
 
   const handleFromEngineActions = useCallback(({ action, data }: Arguments) => {
-    console.log(`FROM ENGINE:${action} ${data}`);
+    console.log("FROM ENGINE", action, data);
     switch (action) {
       case fromEngineActions.UPDATE_TIME:
         currentTime.value = (data as UpdateTime).currentTime;
@@ -34,10 +34,11 @@ export function useQueueHandler() {
   }, []);
 
   const handleToTimelineActions = useCallback(({ action, data }: Arguments) => {
-    console.log(`FROM ENGINE:${action} ${data}`);
+    console.log("TO TIMELINE", action, data);
     switch (action) {
       case toTimelineActions.ADD_KEYFRAME:
-        addKeyframe(data as QueueKeyframe);
+        console.log(1);
+        addKeyframe(data as QueueKeyframe, currentTime.value);
         break;
       default:
         throw new Error(`Unknown action ${action}`);
