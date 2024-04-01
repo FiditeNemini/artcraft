@@ -26,7 +26,7 @@ export const ItemPicker = ({
       )}
       onClick={handleSelected}
     >
-      <img className="aspect-square min-w-20" {...imgProps} />
+      <img className="aspect-square" {...imgProps} />
       <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-gray-700" />
       <H4 className="absolute bottom-0 left-2 drop-shadow-md">{label}</H4>
     </div>
