@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import {
   faArrowRightArrowLeft,
@@ -8,6 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { AppUiContext } from "../../contexts/AppUiContext";
+import { EngineContext } from "../../contexts/EngineContext";
 import { Button, H5, InputVector } from "~/components";
 
 import { XYZ } from "../../datastructures/common";
@@ -17,8 +18,28 @@ import { QueueNames } from "../../Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { toTimelineActions } from "../../Queue/toTimelineActions";
 import { QueueKeyframe } from "~/pages/PageEnigma/models/track";
+
 export const ControlPanelSceneObject = () => {
+  const editorEngine = useContext(EngineContext);
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
+
+  if (!appUiState.controlPanel.currentSceneObject) {
+    return null;
+  }
+  const position =
+    appUiState.controlPanel.currentSceneObject.objectVectors.position;
+  const rotation =
+    appUiState.controlPanel.currentSceneObject.objectVectors.rotation;
+  const scale = appUiState.controlPanel.currentSceneObject.objectVectors.scale;
+  const currentSceneObject = appUiState.controlPanel.currentSceneObject;
+
+  useEffect(()=>{
+    console.log("when you see this, control panel experienced changes");
+    console.log("use the editorengine context to propagate changes into editorengine");
+    console.log("1. create update callback in engine");
+    console.log("2. call the callback with values in appUiState.controlPanel")
+
+  }, [appUiState.controlPanel.currentSceneObject]);
 
   const handlePositionChange = (xyz: XYZ) => {
     if (!currentSceneObject) {
@@ -126,16 +147,6 @@ export const ControlPanelSceneObject = () => {
   const handleDeleteObject = () =>{
     console.log("TELL EDITOR TO DELETE HERE");
   }
-  
-  if (!appUiState.controlPanel.currentSceneObject) {
-    return null;
-  }
-  const position =
-    appUiState.controlPanel.currentSceneObject.objectVectors.position;
-  const rotation =
-    appUiState.controlPanel.currentSceneObject.objectVectors.rotation;
-  const scale = appUiState.controlPanel.currentSceneObject.objectVectors.scale;
-  const currentSceneObject = appUiState.controlPanel.currentSceneObject;
 
   return (
     <Transition
