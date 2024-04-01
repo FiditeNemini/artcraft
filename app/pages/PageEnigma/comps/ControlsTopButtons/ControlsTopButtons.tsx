@@ -4,10 +4,11 @@ import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { AppUiContext } from "../../contexts/AppUiContext";
 import { EngineContext } from "../../contexts/EngineContext";
 import { APPUI_ACTION_TYPES } from "../../reducers";
+import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
-  const [ appUiState, dispatchAppUiState ] = useContext(AppUiContext);
+  const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
   const [sceneName, setSceneName] = useState<string>("");
   const [sceneToken, setSceneToken] = useState<string>("");
 
@@ -22,8 +23,8 @@ export const ControlsTopButtons = () => {
   };
 
   const handleButtonTest = () => {
-    editorEngine?.testStylizeRequest()
-    
+    editorEngine?.testStylizeRequest();
+
     // if(appUiState?.showEditorLoadingBar.isShowing){
     //TO GO TO A HUNDRED AND DISAPPER
     // dispatchAppUiState({
@@ -41,15 +42,15 @@ export const ControlsTopButtons = () => {
     // }, 1000);
     //END :TO GO TO A HUNDRED AND DISAPPER
 
-      //EAMPLE OF CHANING LOADING MESSAGE
-      //  dispatchAppUiState({
-      //   type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
-      //   payload:{
-      //     showEditorLoadingBar: {
-      //       message: "new message",
-      //     }
-      //   }
-      // });
+    //EAMPLE OF CHANING LOADING MESSAGE
+    //  dispatchAppUiState({
+    //   type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
+    //   payload:{
+    //     showEditorLoadingBar: {
+    //       message: "new message",
+    //     }
+    //   }
+    // });
     // }else{
     //   dispatchAppUiState({
     //     type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADINGBAR,
@@ -59,31 +60,33 @@ export const ControlsTopButtons = () => {
     //         progress: 10,
     //       }
     //     }
-        
+
     //   });
     //}
   };
 
   const handleObjectPanelTest = () => {
-    if (appUiState?.currentSceneObject.isShowing) {
+    if (appUiState?.controlPanel.isShowing) {
       dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT
+        type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
       });
-    }else{
+    } else {
       dispatchAppUiState({
-        type:APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
-        payload:{
-          currentSceneObject:{
-            objectVectors: {
-              position: {x:1,y:2,z:3},
-              rotation: {x:4,y:5,z:6},
-              scale: {x:7,y:8,z:9},
-            }
-          }
-        }
+        type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
+        payload: {
+          group: ClipGroup.OBJECT,
+          object_name: "",
+          object_uuid: "",
+          version: "1",
+          objectVectors: {
+            position: { x: 1, y: 2, z: 3 },
+            rotation: { x: 4, y: 5, z: 6 },
+            scale: { x: 7, y: 8, z: 9 },
+          },
+        },
       });
     }
-  }
+  };
 
   const handleButtonCameraView = () => {
     editorEngine?.switchCameraView();
@@ -111,40 +114,44 @@ export const ControlsTopButtons = () => {
     <div className="flex flex-col gap-2 pl-3 pt-3">
       <div className="flex gap-2">
         <ButtonDialogue
-            buttonProps={{
-              variant: "secondary",
-              label: "Load Scene",
-            }}
-            title="Load Scene"
-            confirmButtonProps={{
-              label: "Load",
-              disabled: sceneToken === "" ? true : false,
-              onClick: handleButtonLoadScene,
-            }}
-          >
+          buttonProps={{
+            variant: "secondary",
+            label: "Load Scene",
+          }}
+          title="Load Scene"
+          confirmButtonProps={{
+            label: "Load",
+            disabled: sceneToken === "",
+            onClick: handleButtonLoadScene,
+          }}
+        >
           <Input
             label="Please provide the Token of the scene you wished to load:"
-            onChange={(e)=>{setSceneToken(e.target.value)}}
+            onChange={(e) => {
+              setSceneToken(e.target.value);
+            }}
           />
         </ButtonDialogue>
 
-      <ButtonDialogue
-        buttonProps={{
-          variant: "secondary",
-          label: "Save Scene",
-        }}
-        title="Save Scene"
-        confirmButtonProps={{
-          label: "Save",
-          disabled: sceneName === "" ? true : false,
-          onClick: handleButtonSave,
-        }}
-      >
-        <Input
-          label="Please Enter a name for your scene"
-          onChange={(e)=>{setSceneName(e.target.value)}}
-        />
-      </ButtonDialogue>
+        <ButtonDialogue
+          buttonProps={{
+            variant: "secondary",
+            label: "Save Scene",
+          }}
+          title="Save Scene"
+          confirmButtonProps={{
+            label: "Save",
+            disabled: sceneName === "",
+            onClick: handleButtonSave,
+          }}
+        >
+          <Input
+            label="Please Enter a name for your scene"
+            onChange={(e) => {
+              setSceneName(e.target.value);
+            }}
+          />
+        </ButtonDialogue>
 
         <ButtonDialogue
           buttonProps={{
@@ -172,7 +179,6 @@ export const ControlsTopButtons = () => {
         </Button>
       </div>
       <div className="flex gap-2">
-
         <Button onClick={handleButtonSingleFrame}>Render Single Frame</Button>
         <Button onClick={handleButtonTakeFrame}>Take Frame</Button>
         <Button onClick={handleButtonRender}>Render</Button>
@@ -181,7 +187,7 @@ export const ControlsTopButtons = () => {
         <Button
           onClick={handleButtonTest}
           className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
-          style={{zIndex:9001}}
+          style={{ zIndex: 9001 }}
         >
           Test
         </Button>

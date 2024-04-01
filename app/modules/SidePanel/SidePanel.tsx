@@ -15,7 +15,7 @@ export const SidePanel = ({ children }: Props) => {
   return (
     <div
       className={
-        "relative border-l border-l-ui-panel-border bg-ui-panel transition-all duration-300 ease-in-out" +
+        "relative h-full border-l border-l-ui-panel-border bg-ui-panel transition-all duration-300 ease-in-out" +
         (isVisible ? " w-[23.5rem]" : " w-0")
       }
     >
