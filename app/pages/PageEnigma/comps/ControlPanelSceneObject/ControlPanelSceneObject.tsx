@@ -20,36 +20,30 @@ import { QueueKeyframe } from "~/pages/PageEnigma/models/track";
 export const ControlPanelSceneObject = () => {
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
 
-  const position = appUiState?.currentSceneObject.objectVectors.position;
-  const rotation = appUiState?.currentSceneObject.objectVectors.rotation;
-  const scale = appUiState?.currentSceneObject.objectVectors.scale;
-  const currentSceneObject = appUiState?.currentSceneObject;
-
   const handlePositionChange = (xyz: XYZ) => {
-    if (appUiState) {
-      if (currentSceneObject == null) {
-        console.log("Missing Scene Object Position");
-        return;
-      }
-
-      dispatchAppUiState({
-        type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
-        payload: {
-          currentSceneObject: {
-            group: currentSceneObject.group,
-            object_uuid: currentSceneObject.object_uuid,
-            object_name: currentSceneObject.object_name,
-            version: currentSceneObject.version,
-            objectVectors: {
-              position: { ...xyz },
-              rotation: appUiState.currentSceneObject.objectVectors.rotation,
-              scale: appUiState.currentSceneObject.objectVectors.scale,
-            },
-          },
-        },
-      });
+    if (!currentSceneObject) {
+      console.log("Missing Scene Object Position");
+      return;
     }
+
+    dispatchAppUiState({
+      type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
+      payload: {
+        group: currentSceneObject.group,
+        object_uuid: currentSceneObject.object_uuid,
+        object_name: currentSceneObject.object_name,
+        version: currentSceneObject.version,
+        objectVectors: {
+          position: { ...xyz },
+          rotation: appUiState?.controlPanel.currentSceneObject?.objectVectors
+            ?.rotation ?? { x: 0, y: 0, z: 0 },
+          scale: appUiState?.controlPanel.currentSceneObject?.objectVectors
+            ?.scale ?? { x: 0, y: 0, z: 0 },
+        },
+      },
+    });
   };
+
   const handleRotationChange = (xyz: XYZ) => {
     if (appUiState) {
       if (currentSceneObject == null) {
@@ -60,21 +54,22 @@ export const ControlPanelSceneObject = () => {
       dispatchAppUiState({
         type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
         payload: {
-          currentSceneObject: {
-            group: currentSceneObject.group,
-            object_uuid: currentSceneObject.object_uuid,
-            object_name: currentSceneObject.object_name,
-            version: currentSceneObject.version,
-            objectVectors: {
-              position: appUiState.currentSceneObject.objectVectors.position,
-              rotation: { ...xyz },
-              scale: appUiState.currentSceneObject.objectVectors.scale,
-            },
+          group: currentSceneObject.group,
+          object_uuid: currentSceneObject.object_uuid,
+          object_name: currentSceneObject.object_name,
+          version: currentSceneObject.version,
+          objectVectors: {
+            position:
+              appUiState.controlPanel.currentSceneObject.objectVectors.position,
+            rotation: { ...xyz },
+            scale:
+              appUiState.controlPanel.currentSceneObject.objectVectors.scale,
           },
         },
       });
     }
   };
+
   const handleScaleChange = (xyz: XYZ) => {
     if (appUiState) {
       if (currentSceneObject == null) {
@@ -84,16 +79,16 @@ export const ControlPanelSceneObject = () => {
       dispatchAppUiState({
         type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
         payload: {
-          currentSceneObject: {
-            group: currentSceneObject.group,
-            object_uuid: currentSceneObject.object_uuid,
-            object_name: currentSceneObject.object_name,
-            version: currentSceneObject.version,
-            objectVectors: {
-              position: appUiState.currentSceneObject.objectVectors.position,
-              rotation: appUiState.currentSceneObject.objectVectors.rotation,
-              scale: { ...xyz },
-            },
+          group: currentSceneObject.group,
+          object_uuid: currentSceneObject.object_uuid,
+          object_name: currentSceneObject.object_name,
+          version: currentSceneObject.version,
+          objectVectors: {
+            position:
+              appUiState.controlPanel.currentSceneObject.objectVectors.position,
+            rotation:
+              appUiState.controlPanel.currentSceneObject.objectVectors.rotation,
+            scale: { ...xyz },
           },
         },
       });
@@ -145,9 +140,19 @@ export const ControlPanelSceneObject = () => {
     }
   };
 
+  if (!appUiState.controlPanel.currentSceneObject) {
+    return null;
+  }
+  const position =
+    appUiState.controlPanel.currentSceneObject.objectVectors.position;
+  const rotation =
+    appUiState.controlPanel.currentSceneObject.objectVectors.rotation;
+  const scale = appUiState.controlPanel.currentSceneObject.objectVectors.scale;
+  const currentSceneObject = appUiState.controlPanel.currentSceneObject;
+
   return (
     <Transition
-      show={appUiState?.currentSceneObject.isShowing}
+      show={appUiState?.controlPanel.isShowing}
       className="absolute bottom-0 right-0 m-4 flex h-fit w-fit flex-col gap-2 rounded-lg border border-ui-panel-border bg-ui-panel p-4 text-white"
       enter="transition-opacity duration-100"
       enterFrom="opacity-0"

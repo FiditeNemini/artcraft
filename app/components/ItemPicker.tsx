@@ -1,11 +1,11 @@
 import { twMerge } from "tailwind-merge";
 import { H4 } from ".";
-
+import { ArtStyle } from "~/pages/PageEnigma/js/api_manager";
 
 interface ItemPickerProps extends React.ImgHTMLAttributes<HTMLImageElement> {
-  label: string
+  label: ArtStyle;
   selected: boolean;
-  onSelected : (val:string)=>void;
+  onSelected: (picked: ArtStyle) => void;
 }
 
 export const ItemPicker = ({
@@ -13,20 +13,22 @@ export const ItemPicker = ({
   selected = false,
   onSelected,
   ...imgProps
-}:ItemPickerProps) => {
-
-  const handleSelected = ()=>{
+}: ItemPickerProps) => {
+  const handleSelected = () => {
     onSelected(label);
   };
 
   return (
     <div
-      className={twMerge("relative border-2 rounded-lg overflow-hidden cursor-pointer transition-colors ease-in-out", selected ? "border-brand-primary" : "border-ui-border")}
+      className={twMerge(
+        "relative cursor-pointer overflow-hidden rounded-lg border-2 transition-colors ease-in-out",
+        selected ? "border-brand-primary" : "border-ui-border",
+      )}
       onClick={handleSelected}
     >
       <img className="aspect-square min-w-20" {...imgProps} />
-      <div className="bg-gradient-to-t from-gray-700 absolute top-0 left-0 w-full h-full"/>
+      <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-gray-700" />
       <H4 className="absolute bottom-0 left-2 drop-shadow-md">{label}</H4>
     </div>
-  )
-}
+  );
+};

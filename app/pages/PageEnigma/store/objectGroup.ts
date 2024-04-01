@@ -6,6 +6,9 @@ import {
 } from "~/pages/PageEnigma/models/track";
 import { useCallback } from "react";
 import * as uuid from "uuid";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 export const objectGroup = signal<ObjectGroup>({
   id: "OB1",
@@ -39,7 +42,7 @@ export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
     name: keyframe.object_name ?? "unknown",
     keyframes: [] as Keyframe[],
   };
-  newObject.keyframes.push({
+  const newKeyframe = {
     version: keyframe.version,
     keyframe_uuid: uuid.v4(),
     group: keyframe.group,
@@ -49,13 +52,13 @@ export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
     rotation: keyframe.rotation,
     scale: keyframe.scale,
     selected: false,
-  } as Keyframe);
+  } as Keyframe;
+  newObject.keyframes.push(newKeyframe);
   console.log(newObject);
   newObject.keyframes.sort(
     (keyframeA, keyframeB) => keyframeA.offset - keyframeB.offset,
   );
 
-  console.log(4);
   objectGroup.value = {
     ...oldObjectGroup,
     objects: [
@@ -65,7 +68,11 @@ export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
       newObject,
     ].sort((objA, objB) => (objA.object_uuid < objB.object_uuid ? -1 : 1)),
   };
-  console.log("T", objectGroup.value);
+  Queue.publish({
+    queueName: QueueNames.TO_ENGINE,
+    action: toEngineActions.ADD_KEYFRAME,
+    data: newKeyframe,
+  });
 }
 
 export function deleteObjectKeyframe(keyframe: Keyframe) {

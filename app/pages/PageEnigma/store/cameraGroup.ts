@@ -78,13 +78,13 @@ export function selectCameraKeyframe(keyframeId: string) {
   };
 }
 
-export function deleteCameraKeyframe(keyframeId: string) {
+export function deleteCameraKeyframe(deleteKeyframe: Keyframe) {
   const oldCameraGroup = cameraGroup.value;
   cameraGroup.value = {
     ...oldCameraGroup,
     keyframes: [
       ...oldCameraGroup.keyframes.filter((keyframe) => {
-        if (keyframe.keyframe_uuid === keyframeId) {
+        if (keyframe.keyframe_uuid === deleteKeyframe.keyframe_uuid) {
           Queue.publish({
             queueName: QueueNames.TO_ENGINE,
             action: toEngineActions.DELETE_KEYFRAME,

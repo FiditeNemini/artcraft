@@ -37,7 +37,6 @@ export function useQueueHandler() {
     console.log("TO TIMELINE", action, data);
     switch (action) {
       case toTimelineActions.ADD_KEYFRAME:
-        console.log(1);
         addKeyframe(data as QueueKeyframe, currentTime.value);
         break;
       default:

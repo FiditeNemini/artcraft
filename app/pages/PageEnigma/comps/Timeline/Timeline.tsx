@@ -51,7 +51,6 @@ export const Timeline = () => {
     };
   }, [onDeleteAsk]);
 
-  console.log("timeline");
   return (
     <>
       <LowerPanel>

@@ -3,7 +3,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { FreeCam } from "./free_cam";
 import { TransformControls } from "three/addons/controls/TransformControls.js";
 import Scene from "./scene.js";
-import { APIManager, ArtStyle, Visibility }  from "./api_manager.js";
+import { APIManager, ArtStyle, Visibility } from "./api_manager.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
@@ -101,7 +101,7 @@ class Editor {
 
   positive_prompt: string;
   negative_prompt: string;
-  art_style:ArtStyle;
+  art_style: ArtStyle;
   // Default params.
   constructor() {
     console.log(
@@ -111,9 +111,8 @@ class Editor {
     // Special async react lifecycle fix
     // For making sure the editor only gets created onece.
     this.can_initialize = false;
-    let one_element = document.getElementById("created-one-element");
     this.can_initialize = true;
-    let newElement = document.createElement("div");
+    const newElement = document.createElement("div");
     newElement.id = "created-one-element";
     document.body.appendChild(newElement);
     // life cycle fix
@@ -198,9 +197,10 @@ class Editor {
     this.current_scene_glb_media_token = null;
 
     // stylization parameters
-    this.positive_prompt = "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around."
-    this.negative_prompt = ""
-    this.art_style = ArtStyle.Anime2DFlat
+    this.positive_prompt =
+      "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.";
+    this.negative_prompt = "";
+    this.art_style = ArtStyle.Anime2DFlat;
   }
 
   initialize(config: any) {
@@ -212,7 +212,6 @@ class Editor {
     //   type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
     // });
 
-    
     if (this.can_initialize == false) {
       console.log("Editor Already Initialized");
       return;
@@ -224,15 +223,20 @@ class Editor {
     this.canvasRenderCamReference = document.getElementById("camera-view");
 
     // Base width and height.
-    let width = this.canvReference.width;
-    let height = this.canvReference.height;
+    const width = this.canvReference.width;
+    const height = this.canvReference.height;
     // Sets up camera and base position.
     this.camera = new THREE.PerspectiveCamera(70, width / height, 0.15, 30);
     this.camera.position.z = 3;
     this.camera.position.y = 3;
     this.camera.position.x = -3;
 
-    this.render_camera = new THREE.PerspectiveCamera(70, width / height, 0.15, 30);
+    this.render_camera = new THREE.PerspectiveCamera(
+      70,
+      width / height,
+      0.15,
+      30,
+    );
 
     // Base WebGL render and clock for delta time.
     this.renderer = new THREE.WebGLRenderer({
@@ -291,9 +295,21 @@ class Editor {
 
     this._test_demo();
 
-    this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this), false);
-    this.renderer.domElement.addEventListener("mouseup", this.onMouseUp.bind(this), false);
-    this.renderer.domElement.addEventListener("onContextMenu", this.onContextMenu.bind(this), false);
+    this.renderer.domElement.addEventListener(
+      "mousedown",
+      this.onMouseDown.bind(this),
+      false,
+    );
+    this.renderer.domElement.addEventListener(
+      "mouseup",
+      this.onMouseUp.bind(this),
+      false,
+    );
+    this.renderer.domElement.addEventListener(
+      "onContextMenu",
+      this.onContextMenu.bind(this),
+      false,
+    );
 
     // saving state of the scene
     this.current_scene_media_token = null;
@@ -317,7 +333,13 @@ class Editor {
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
     if (this.cam_obj) {
-      this.addTransformClipBase("Camera Object", "camera", this.cam_obj, 0, 150);
+      this.addTransformClipBase(
+        "Camera Object",
+        "camera",
+        this.cam_obj,
+        0,
+        150,
+      );
     }
 
     console.log(this.cam_obj);
@@ -338,22 +360,27 @@ class Editor {
 
   // Token comes in from the front end to load the scene from the site.
   public async testBatchRequest() {
-    const result = await this.api_manager.getMediaBatch(["m_8fmp9hrvsqcryzka1fra597kg42s50", "m_z4jzbst3xfh64h0qn4bqh4afenfps9"]);
+    const result = await this.api_manager.getMediaBatch([
+      "m_8fmp9hrvsqcryzka1fra597kg42s50",
+      "m_z4jzbst3xfh64h0qn4bqh4afenfps9",
+    ]);
     console.log(result);
   }
 
-  public async testTestTimelineEvents() {
-  }
+  public async testTestTimelineEvents() {}
 
   public async testStylizeRequest() {
-    const result = await this.api_manager.stylizeVideo(
-    "mu_6wy1570a0c3c0tpkkncf4tsvb5234",
-    this.art_style,
-    this.positive_prompt,
-    this.negative_prompt,
-    Visibility.Public).catch(error=> {
-      console.log(error);
-    });
+    const result = await this.api_manager
+      .stylizeVideo(
+        "mu_6wy1570a0c3c0tpkkncf4tsvb5234",
+        this.art_style,
+        this.positive_prompt,
+        this.negative_prompt,
+        Visibility.Public,
+      )
+      .catch((error) => {
+        console.log(error);
+      });
     console.log(result);
   }
 
@@ -378,7 +405,9 @@ class Editor {
 
     const loaded_scene = load_scene_state_response.data["scene"];
 
-    if (load_scene_state_response.data == null) { return; }
+    if (load_scene_state_response.data == null) {
+      return;
+    }
     // Load these so you can rewrite the scene glb using it's token.
     this.current_scene_media_token =
       load_scene_state_response.data["scene_media_file_token"];
@@ -395,9 +424,9 @@ class Editor {
       child.parent = this.activeScene.scene;
 
       if (child.type == "DirectionalLight") {
-        let pos = child.position;
-        let rot = child.rotation;
-        let light = this.activeScene._create_base_lighting();
+        const pos = child.position;
+        const rot = child.rotation;
+        const light = this.activeScene._create_base_lighting();
         light.position.set(pos.x, pos.y, pos.z);
         light.rotation.set(rot.x, rot.y, rot.z);
         this.activeScene.scene.remove(child);
@@ -468,7 +497,7 @@ class Editor {
   async _serialize_timeline() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
-    let object: any = await this.activeScene.load_glb(
+    const object: any = await this.activeScene.load_glb(
       "./resources/models/fox/fox.glb",
     );
 
@@ -494,7 +523,16 @@ class Editor {
 
     // media id for this is up in the air but when a path is created you should be able to store and delete it
     this.timeline.addPlayableClip(
-      new ClipUI(1.0, "transform", "character", "clip2", object.uuid, object.uuid, 0, 150),
+      new ClipUI(
+        1.0,
+        "transform",
+        "character",
+        "clip2",
+        object.uuid,
+        object.uuid,
+        0,
+        150,
+      ),
     );
 
     // media id for this as well it can be downloaded
@@ -519,7 +557,7 @@ class Editor {
 
   switchCameraView() {
     this.camera_person_mode = !this.camera_person_mode;
-    console.log("camera")
+    console.log("camera");
     if (this.cam_obj) {
       if (this.camera_person_mode) {
         this.last_cam_pos.copy(this.camera.position);
@@ -536,12 +574,11 @@ class Editor {
         if (this.cameraViewControls) {
           this.cameraViewControls.enabled = true;
         }
-        this.cam_obj.scale.set(0,0,0);
+        this.cam_obj.scale.set(0, 0, 0);
         if (this.activeScene.hot_items) {
           this.activeScene.hot_items.forEach((element) => {
             element.visible = false;
           });
-        
         }
       } else {
         this.camera.position.copy(this.last_cam_pos);
@@ -555,7 +592,7 @@ class Editor {
         if (this.cameraViewControls) {
           this.cameraViewControls.enabled = false;
         }
-        this.cam_obj.scale.set(1,1,1);
+        this.cam_obj.scale.set(1, 1, 1);
         if (this.activeScene.hot_items) {
           this.activeScene.hot_items.forEach((element) => {
             element.visible = true;
@@ -579,7 +616,7 @@ class Editor {
         group,
         name,
         object.uuid, // object id here ...
-        object.uuid,// Need to change to media id ....
+        object.uuid, // Need to change to media id ....
         offset,
         length,
       ),
@@ -590,7 +627,7 @@ class Editor {
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
-    let object: any = await this.activeScene.load_glb(
+    const object: any = await this.activeScene.load_glb(
       "./resources/models/fox/fox.glb",
     );
 
@@ -651,8 +688,8 @@ class Editor {
 
   // Configure post processing.
   _configurePostProcessing() {
-    let width = this.canvReference.width;
-    let height = this.canvReference.height;
+    const width = this.canvReference.width;
+    const height = this.canvReference.height;
 
     if (this.renderer == undefined || this.camera == undefined) {
       return;
@@ -714,7 +751,7 @@ class Editor {
   }
 
   create_parim(name: string) {
-    let uuid = this.activeScene.instantiate(name);
+    const uuid = this.activeScene.instantiate(name);
   }
 
   renderMode() {
@@ -756,11 +793,16 @@ class Editor {
 
   // Basicly Unity 3D's update loop.
   updateLoop(time: number) {
-
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
       if (this.cam_obj) {
-        this.addTransformClipBase("Camera Object", "camera", this.cam_obj, 0, 150)
+        this.addTransformClipBase(
+          "Camera Object",
+          "camera",
+          this.cam_obj,
+          0,
+          150,
+        );
       }
     }
 
@@ -773,7 +815,7 @@ class Editor {
       return;
     }
 
-    let delta_time = this.clock.getDelta();
+    const delta_time = this.clock.getDelta();
 
     if (this.cameraViewControls && this.camera_person_mode) {
       this.cameraViewControls.update(5 * delta_time);
@@ -813,12 +855,11 @@ class Editor {
   }
 
   async convertAudioClip(itteration: number, ffmpeg: FFmpeg, clip: ClipUI) {
-    let video_og = itteration + 'tmp.mp4';
-    let wav_name = itteration + 'tmp.wav';
-    let new_video = (itteration + 1) + 'tmp.mp4';
+    const video_og = itteration + "tmp.mp4";
+    const wav_name = itteration + "tmp.wav";
+    const new_video = itteration + 1 + "tmp.mp4";
     let startFrame = clip.offset;
     let endFrame = clip.length;
-
 
     if (endFrame > this.timeline.timeline_limit) {
       endFrame = this.timeline.timeline_limit;
@@ -829,42 +870,72 @@ class Editor {
 
     const startTime = startFrame / this.cap_fps;
     const endTime = endFrame / this.cap_fps;
-    let end = endTime - startTime;
+    const end = endTime - startTime;
 
-    let duration = this.timeline.timeline_limit / this.cap_fps;
-
-    let audioSegment = "as_" + wav_name;
-    await ffmpeg.FS('writeFile', wav_name, await fetchFile(await this.api_manager.getMediaFile(clip.media_id)));
-    await ffmpeg.run('-i',
+    const audioSegment = "as_" + wav_name;
+    await ffmpeg.FS(
+      "writeFile",
       wav_name,
-      '-ss', '0',
-      '-to', '' + end,
-      "-max_muxing_queue_size", "999999",
-      audioSegment);
-
-    await ffmpeg.run('-i', video_og, "-max_muxing_queue_size", "999999", `${itteration}empty_tmp.wav`);
+      await fetchFile(await this.api_manager.getMediaFile(clip.media_id)),
+    );
+    await ffmpeg.run(
+      "-i",
+      wav_name,
+      "-ss",
+      "0",
+      "-to",
+      "" + end,
+      "-max_muxing_queue_size",
+      "999999",
+      audioSegment,
+    );
 
     await ffmpeg.run(
-      '-i', `${itteration}empty_tmp.wav`,
-      '-i', audioSegment,
-      '-filter_complex', "[1:a]adelay=" + startTime * 1000 + "|" + startTime * 1000 + "[a1];[0:a][a1]amix=inputs=2[a]",
-      "-map", "[a]",
-      `${itteration}final_tmp.wav`)
+      "-i",
+      video_og,
+      "-max_muxing_queue_size",
+      "999999",
+      `${itteration}empty_tmp.wav`,
+    );
 
     await ffmpeg.run(
-      '-i', video_og,
-      '-i', `${itteration}final_tmp.wav`,
-      '-c:v', 'copy',
-      '-c:a', 'aac',
-      '-map', '0:v:0',
-      '-map', '1:a:0',
-      '-strict', 'experimental',
-      new_video)
+      "-i",
+      `${itteration}empty_tmp.wav`,
+      "-i",
+      audioSegment,
+      "-filter_complex",
+      "[1:a]adelay=" +
+        startTime * 1000 +
+        "|" +
+        startTime * 1000 +
+        "[a1];[0:a][a1]amix=inputs=2[a]",
+      "-map",
+      "[a]",
+      `${itteration}final_tmp.wav`,
+    );
+
+    await ffmpeg.run(
+      "-i",
+      video_og,
+      "-i",
+      `${itteration}final_tmp.wav`,
+      "-c:v",
+      "copy",
+      "-c:a",
+      "aac",
+      "-map",
+      "0:v:0",
+      "-map",
+      "1:a:0",
+      "-strict",
+      "experimental",
+      new_video,
+    );
   }
 
   async stopPlayback(compile_audio: boolean = true) {
     this.renderMode();
-    let ffmpeg = createFFmpeg({ log: true });
+    const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
     for (let index = 0; index < this.frame_buffer.length; index++) {
       const element = this.frame_buffer[index];
@@ -890,9 +961,8 @@ class Editor {
       "-c:a",
       "aac", // Specify audio codec (optional, but recommended for MP4)
       "-shortest", // Ensure output duration matches the shortest stream (video or audio)
-      "0tmp.mp4"
+      "0tmp.mp4",
     );
-
 
     let itteration = 0;
 
@@ -902,10 +972,10 @@ class Editor {
           await this.convertAudioClip(itteration, ffmpeg, clip);
           itteration += 1;
         }
-      };
+      }
     }
 
-    let output = await ffmpeg.FS("readFile", itteration + "tmp.mp4");
+    const output = await ffmpeg.FS("readFile", itteration + "tmp.mp4");
     // Create a Blob from the output file for downloading
     const blob = new Blob([output.buffer], { type: "video/mp4" });
     const url = URL.createObjectURL(blob);
@@ -918,11 +988,9 @@ class Editor {
     URL.revokeObjectURL(url);
     document.body.removeChild(downloadLink);
 
-
-    let data = await this.api_manager.uploadMedia(blob, "tmp.wav");
+    const data = await this.api_manager.uploadMedia(blob, "tmp.wav");
     console.log(data);
     // Create a link to download the file
-
   }
 
   async generateFrame() {
@@ -931,7 +999,7 @@ class Editor {
       this.generating_preview = true;
       this.activeScene.renderMode(true);
       if (this.activeScene.hot_items) {
-        this.activeScene.hot_items.forEach(element => {
+        this.activeScene.hot_items.forEach((element) => {
           element.visible = false;
         });
       }
@@ -943,37 +1011,41 @@ class Editor {
 
       this.renderer.setSize(this.render_width, this.render_height);
       this.renderer.render(this.activeScene.scene, this.render_camera);
-      let imgData = this.renderer.domElement.toDataURL();
+      const imgData = this.renderer.domElement.toDataURL();
       this.activeScene.renderMode(false);
       this.onWindowResize();
 
-      const rawPreview: HTMLVideoElement | null = document.getElementById("raw-preview") as HTMLVideoElement;
+      const rawPreview: HTMLVideoElement | null = document.getElementById(
+        "raw-preview",
+      ) as HTMLVideoElement;
       if (rawPreview) {
         rawPreview.src = imgData;
 
-
-        let ffmpeg = createFFmpeg({ log: false });
+        const ffmpeg = createFFmpeg({ log: false });
         await ffmpeg.load();
-        await ffmpeg.FS(
-          "writeFile",
-          `render.png`,
-          await fetchFile(imgData),
-        );
-        await ffmpeg.run('-i', `render.png`, 'render.mp4');
-        let output = await ffmpeg.FS("readFile", 'render.mp4');
+        await ffmpeg.FS("writeFile", `render.png`, await fetchFile(imgData));
+        await ffmpeg.run("-i", `render.png`, "render.mp4");
+        const output = await ffmpeg.FS("readFile", "render.mp4");
         const blob = new Blob([output.buffer], { type: "video/mp4" });
 
-        let url = await this.api_manager.uploadMediaFrameGeneration(blob, "render.mp4", "anime_ghibli", "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.", "");
+        const url = await this.api_manager.uploadMediaFrameGeneration(
+          blob,
+          "render.mp4",
+          "anime_ghibli",
+          "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.",
+          "",
+        );
         console.log(url);
 
-        const stylePreview: HTMLVideoElement | null = document.getElementById("stylized-preview") as HTMLVideoElement;
+        const stylePreview: HTMLVideoElement | null = document.getElementById(
+          "stylized-preview",
+        ) as HTMLVideoElement;
         if (stylePreview) {
           stylePreview.src = url;
           stylePreview.width = rawPreview.width;
           stylePreview.height = rawPreview.height;
-        }
-        else {
-          console.log("No style preview window.")
+        } else {
+          console.log("No style preview window.");
         }
 
         this.generating_preview = false;
@@ -981,9 +1053,8 @@ class Editor {
         return new Promise((resolve, reject) => {
           resolve(url);
         });
-      }
-      else {
-        console.log("No raw preview window.")
+      } else {
+        console.log("No raw preview window.");
       }
       this.generating_preview = false;
     }
@@ -991,14 +1062,16 @@ class Editor {
 
   generateVideo() {
     console.log("Generating video...");
-    if (this.rendering) { return; }
+    if (this.rendering) {
+      return;
+    }
     this.startPlayback();
     this.frame_buffer = [];
     this.render_timer = 0;
     this.rendering = true;
     this.activeScene.renderMode(this.rendering);
     if (this.activeScene.hot_items) {
-      this.activeScene.hot_items.forEach(element => {
+      this.activeScene.hot_items.forEach((element) => {
         element.visible = false;
       });
     }
@@ -1046,7 +1119,7 @@ class Editor {
 
     if (this.rendering && this.renderer && this.clock) {
       this.playback_location++;
-      let imgData = this.renderer.domElement.toDataURL();
+      const imgData = this.renderer.domElement.toDataURL();
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
       if (this.timeline.is_playing == false) {
@@ -1060,35 +1133,47 @@ class Editor {
   }
 
   updateSelectedUI() {
-    if (this.selected == undefined) { return; }
+    if (this.selected == undefined) {
+      return;
+    }
 
-    let pos = this.selected.position;
-    let rot = this.selected.rotation;
-    let scale = this.selected.scale;
-    
+    const pos = this.selected.position;
+    const rot = this.selected.rotation;
+    const scale = this.selected.scale;
+
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
       payload: {
-        currentSceneObject: {
-          group: "object", // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
-          object_uuid: this.selected.uuid,
-          object_name: this.selected.name,
-          version: this.version,
-          objectVectors: {
-            position: { x: parseFloat(pos.x.toFixed(2)), y: parseFloat(pos.y.toFixed(2)), z: parseFloat(pos.z.toFixed(2)) },
-            rotation: { x: parseFloat(rot.x.toFixed(2)), y: parseFloat(rot.y.toFixed(2)), z: parseFloat(rot.z.toFixed(2)) },
-            scale: { x: parseFloat(scale.x.toFixed(2)), y: parseFloat(scale.y.toFixed(2)), z: parseFloat(scale.z.toFixed(2)) },
-          }
-        }
-      }
+        group: "object", // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
+        object_uuid: this.selected.uuid,
+        object_name: this.selected.name,
+        version: this.version,
+        objectVectors: {
+          position: {
+            x: parseFloat(pos.x.toFixed(2)),
+            y: parseFloat(pos.y.toFixed(2)),
+            z: parseFloat(pos.z.toFixed(2)),
+          },
+          rotation: {
+            x: parseFloat(rot.x.toFixed(2)),
+            y: parseFloat(rot.y.toFixed(2)),
+            z: parseFloat(rot.z.toFixed(2)),
+          },
+          scale: {
+            x: parseFloat(scale.x.toFixed(2)),
+            y: parseFloat(scale.y.toFixed(2)),
+            z: parseFloat(scale.z.toFixed(2)),
+          },
+        },
+      },
     });
   }
 
   // Automaticly resize scene.
   onWindowResize() {
     // Calculate the maximum possible dimensions while maintaining the aspect ratio
-    let width = window.innerWidth; // / aspect_adjust
-    let height = window.innerHeight; // / aspectRatio
+    const width = window.innerWidth; // / aspect_adjust
+    const height = window.innerHeight; // / aspectRatio
 
     if (this.camera == undefined || this.renderer == undefined) {
       return;
@@ -1103,7 +1188,9 @@ class Editor {
       this.composer.setSize(width, height);
     }
 
-    if (this.render_camera == undefined) { return; }
+    if (this.render_camera == undefined) {
+      return;
+    }
 
     //this.renderer.setSize(this.render_width, this.render_height);
     this.render_camera.aspect = this.render_width / this.render_height;
@@ -1148,7 +1235,7 @@ class Editor {
     }
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    let interactable: any[] = [];
+    const interactable: any[] = [];
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
       if (child.name != "") {
         if (child.type == "Mesh" || child.type == "Object3D") {
@@ -1156,7 +1243,7 @@ class Editor {
         }
       }
     });
-    let intersects = this.raycaster.intersectObjects(interactable, true);
+    const intersects = this.raycaster.intersectObjects(interactable, true);
 
     if (intersects.length > 0) {
       if (intersects[0].object.type != "GridHelper") {
@@ -1180,7 +1267,7 @@ class Editor {
     } else if (this.transform_interaction == false) {
       this.removeTransformControls();
       this.dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT
+        type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
       });
     } else {
       this.transform_interaction = false;
