@@ -62,7 +62,7 @@ export const TabStylization = () => {
       <H4>Select Base Stylizer</H4>
       <div className="grid grid-cols-4 gap-2">
         <ItemPicker
-          label={ArtStyle.Anime2_5D}
+          label={ArtStyle.Anime2DFlat}
           selected={selection === ArtStyle.Anime2DFlat}
           onSelected={handlePickingStylizer}
           src="/resources/avatars/0.webp"
