@@ -38,25 +38,27 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
   );
 
   return (
-    <div
-      className={[
-        "absolute bottom-0",
-        "w-screen overflow-auto",
-        "bg-ui-panel",
-      ].join(" ")}
-      style={{ height: displayHeight }}
-      onPointerOver={() => {
-        overTimeline.value = true;
-      }}
-      onPointerLeave={() => (overTimeline.value = false)}
-      onPointerDown={onTimelineClick}
-    >
+    <>
       <div
         className="w-full cursor-ns-resize bg-ui-panel-border"
         style={{ height: 3, zIndex: 1000 }}
         onPointerDown={onPointerDown}
       />
-      {children}
-    </div>
+      <div
+        className={[
+          "absolute bottom-0",
+          "w-screen overflow-auto",
+          "bg-ui-panel",
+        ].join(" ")}
+        style={{ height: displayHeight - 3 }}
+        onPointerOver={() => {
+          overTimeline.value = true;
+        }}
+        onPointerLeave={() => (overTimeline.value = false)}
+        onPointerDown={onTimelineClick}
+      >
+        {children}
+      </div>
+    </>
   );
 };
