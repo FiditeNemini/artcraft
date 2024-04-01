@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { NavLink, useParams, useHistory } from "react-router-dom";
-import { Button, Container, Panel, TextArea } from "components/common";
+import { Button, Container, Panel, Select, TextArea } from "components/common";
 
 import { VideoPlayer } from "components/common/VideoPlayer";
 import { useJobStatus, useInferenceJobs } from "hooks";
@@ -9,8 +9,8 @@ import { EnqueueVST, EnqueueVSTResponse } from "@storyteller/components/src/api/
 import { initialValues } from "./defaultValues";
 import { VSTType } from "./helpers";
 import LoadingSpinner from "components/common/LoadingSpinner";
-import SelectionBubblesV2 from "components/common/SelectionBubblesV2";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
+import { STYLE_OPTIONS, StyleOption } from "common/StyleOptions";
 
 export default function PageVSTApp() {
   const { jobToken } = useParams<{ jobToken: string }>();
@@ -39,7 +39,7 @@ export default function PageVSTApp() {
   const handleGenerate = () => {
     EnqueueVST("",{
       creator_set_visibility: vstValues.visibility,
-      enable_lipsync: true,
+      enable_lipsync: false,
       input_file: job?.maybe_result?.entity_token || "",
       negative_prompt: vstValues.negPrompt,
       prompt: vstValues.posPrompt,
@@ -77,34 +77,9 @@ export default function PageVSTApp() {
     };
   }
 
-  const styleOptions = [
-    {
-      label: "2D Anime",
-      imageUrl: "/images/landing/onboarding/styles/style-2d-anime.webp",
-      token: "anime_2d_flat",
-    },
-    {
-      label: "3D Cartoon",
-      imageUrl: "/images/landing/onboarding/styles/style-3d-cartoon.webp",
-      token: "cartoon_3d",
-    },
-    {
-      label: "Ink B&W",
-      imageUrl: "/images/landing/onboarding/styles/style-ink-bw.webp",
-      token: "ink_bw_style",
-    },
-    {
-      label: "Origami",
-      imageUrl: "/images/landing/onboarding/styles/style-origami.webp",
-      token: "paper_origami",
-    },
-  ];
-
-  const handleStyleSelection = (selectedLabel: any) => {
-    const selectedOption = styleOptions.find(
-      option => option.label === selectedLabel
-    );
-    const selectedSdModelToken = selectedOption ? selectedOption.token : null;
+  const handleStyleSelection = (selectedOption: StyleOption) => {
+    console.log('option', selectedOption);
+    const selectedSdModelToken = selectedOption ? selectedOption.value : null;
     if (selectedSdModelToken) {
       setVstValues(curr => ({ ...curr, sdModelToken: selectedSdModelToken }));
     }
@@ -155,13 +130,11 @@ export default function PageVSTApp() {
           <div className="col-12 col-md-6 d-flex flex-column gap-3 justify-content-center">
             <div>
               <label className="sub-title">Select a Style</label>
-              <SelectionBubblesV2
-                options={Object.values(styleOptions)}
-                onSelect={handleStyleSelection}
-                selectedStyle="outline"
-                variant="card"
-                mobileSideScroll={true}
-              />
+              <Select
+                label="Label"
+                options={STYLE_OPTIONS}
+                onChange={handleStyleSelection}
+                />
             </div>
 
             <TextArea

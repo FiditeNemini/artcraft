@@ -28,6 +28,7 @@ export interface StyleOption {
 	imageUrl?: string;
 
     // The API name of the style
+    // NB: Named "value" so it's compatible with react-select
 	value: VstStyle;
 }
 
