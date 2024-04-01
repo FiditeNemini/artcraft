@@ -1,7 +1,10 @@
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
-import { QueueClip } from "~/pages/PageEnigma/models/track";
-import { XYZ } from "../datastructures/common";
+import {
+  QueueClip,
+  QueueKeyframe,
+  UpdateTime,
+} from "~/pages/PageEnigma/models/track";
 import { toTimelineActions } from "./toTimelineActions";
 
 class Queue {
@@ -9,14 +12,14 @@ class Queue {
     string,
     {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | { currentTime: number } | { position: XYZ, rotation: XYZ, scale: XYZ };
+      data: QueueClip | UpdateTime | QueueKeyframe;
     }[]
   > = {};
   private _subscribers: Record<
     string,
     (entry: {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | { currentTime: number } | { position: XYZ, rotation: XYZ, scale: XYZ };
+      data: QueueClip | UpdateTime | QueueKeyframe;
     }) => void
   > = {};
 
@@ -26,8 +29,8 @@ class Queue {
     data,
   }: {
     queueName: string;
-    action: fromEngineActions | toEngineActions | toTimelineActions ;
-    data: QueueClip | { currentTime: number } | { position: XYZ, rotation: XYZ, scale: XYZ };
+    action: fromEngineActions | toEngineActions | toTimelineActions;
+    data: QueueClip | UpdateTime | QueueKeyframe;
   }) {
     if (!this._queue[queueName]) {
       this._queue[queueName] = [];
@@ -44,7 +47,7 @@ class Queue {
     queueName: string,
     onMessage: (entry: {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | { currentTime: number } | { position: XYZ, rotation: XYZ, scale: XYZ };
+      data: QueueClip | UpdateTime | QueueKeyframe;
     }) => void,
   ) {
     this._subscribers[queueName] = onMessage;

@@ -1,19 +1,20 @@
-import { createContext, Dispatch, ReactNode } from "react";
-import { AppUiState, AppUiAction } from "../reducers";
+import { createContext, Dispatch, ReactNode, useReducer } from "react";
+import {
+  AppUiState,
+  AppUiAction,
+  appUiReducer,
+  appUiInitialStateValues,
+} from "../reducers";
 
-export const AppUiContext = createContext<[
-  AppUiState | null,
-  Dispatch<AppUiAction>
-]>([ null ,()=>{}]);
+export const AppUiContext = createContext<[AppUiState, Dispatch<AppUiAction>]>([
+  appUiInitialStateValues,
+  () => {},
+]);
 
-export const AppUIProvider = ({
-  value,
-  children,
-}:{
-  value:[AppUiState, Dispatch<AppUiAction>],
-  children: ReactNode
-})=>{
+export const AppUIProvider = ({ children }: { children: ReactNode }) => {
+  const value = useReducer(appUiReducer, appUiInitialStateValues);
+
   return (
     <AppUiContext.Provider value={value}>{children}</AppUiContext.Provider>
   );
-}
+};

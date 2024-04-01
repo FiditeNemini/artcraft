@@ -1,19 +1,18 @@
 import { useMouseEventsClip } from "./utils/useMouseEventsClip";
-import { BaseClip } from "~/pages/PageEnigma/models/track";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { scale } from "~/pages/PageEnigma/store";
+import { Clip } from "~/pages/PageEnigma/models/track";
+import { selectedItem } from "~/pages/PageEnigma/store/selectedItem";
 
 interface Props {
   min: number;
   max: number;
   style: "character" | "camera" | "audio" | "objects";
-  clip: BaseClip;
+  clip: Clip;
   updateClip: (options: { id: string; offset: number; length: number }) => void;
 }
 
 export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
-  const { selectClip, selectedClip } = useContext(TrackContext);
   const [state, setState] = useState({
     length: clip.length,
     offset: clip.offset,
@@ -26,11 +25,15 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
     setState,
   );
 
+  const selectedClipId = (selectedItem.value as Clip | null)?.clip_uuid ?? "";
+
   const { length, offset } = state;
 
   const classes = [
     "absolute",
-    clip.id === selectedClip ? `bg-${style}-selected` : `bg-${style}-clip`,
+    clip.clip_uuid === selectedClipId
+      ? `bg-${style}-selected`
+      : `bg-${style}-clip`,
   ];
 
   return (
@@ -51,7 +54,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           ...classes,
           "rounded-l-lg",
           "block h-full",
-          clip.id === selectedClip
+          clip.clip_uuid === selectedClipId
             ? "border border-b-2 border-l-2 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -61,13 +64,13 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "w-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "left")}
-        onClick={() => selectClip(clip.id)}
+        onClick={() => (selectedItem.value = clip)}
       />
       <button
         className={[
           ...classes,
           "block h-full",
-          clip.id === selectedClip
+          clip.clip_uuid === selectedClipId
             ? "border border-b-2 border-l-0 border-r-0 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -77,14 +80,14 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "move",
         }}
         onPointerDown={(event) => onPointerDown(event, "drag")}
-        onClick={() => selectClip(clip.id)}
+        onClick={() => (selectedItem.value = clip)}
       />
       <button
         className={[
           ...classes,
           "rounded-r-lg",
           "block h-full",
-          clip.id === selectedClip
+          clip.clip_uuid === selectedClipId
             ? "border border-b-2 border-l-0 border-r-2 border-t-2 border-white focus-visible:outline-0"
             : "",
         ].join(" ")}
@@ -94,7 +97,7 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
           cursor: "e-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "right")}
-        onClick={() => selectClip(clip.id)}
+        onClick={() => (selectedItem.value = clip)}
       />
     </>
   );

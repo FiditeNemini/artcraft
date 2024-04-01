@@ -1,8 +1,7 @@
 import { twMerge } from "tailwind-merge";
 import { IconDefinition } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import { Label } from ".";
+import { Label } from "./Typography";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;

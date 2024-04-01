@@ -1,7 +1,12 @@
-import { useCallback, useContext, useMemo } from "react";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import { useCallback, useMemo } from "react";
 import { TrackClips } from "~/pages/PageEnigma/comps/Timeline/TrackClips";
-import { fullWidth } from "~/pages/PageEnigma/store";
+import {
+  characterGroups,
+  fullWidth,
+  toggleLipSyncMute,
+  updateCharacters,
+} from "~/pages/PageEnigma/store";
+import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 
 function buildUpdaters(
   updateCharacters: (options: {
@@ -18,12 +23,8 @@ function buildUpdaters(
   }) {
     updateCharacters({ ...options, type: "animations" });
   }
-  function updateClipPosition(options: {
-    id: string;
-    length: number;
-    offset: number;
-  }) {
-    updateCharacters({ ...options, type: "positions" });
+  function updateClipPosition(options: { id: string; offset: number }) {
+    updateCharacters({ ...options, length: 0, type: "positions" });
   }
   function updateClipLipSync(options: {
     id: string;
@@ -39,20 +40,19 @@ interface Props {
 }
 
 export const Character = ({ characterId }: Props) => {
-  const { characters, updateCharacters, toggleLipSyncMute } =
-    useContext(TrackContext);
-  const character = characters.find((row) => (row.id = characterId));
+  const character = characterGroups.value.find((row) => (row.id = characterId));
 
   const { updateClipLipSync, updateClipPosition, updateClipAnimations } =
-    useMemo(() => buildUpdaters(updateCharacters), [updateCharacters]);
+    useMemo(() => buildUpdaters(updateCharacters), []);
+
   const toggleCharacterLipSyncMute = useCallback(() => {
     toggleLipSyncMute(character?.id ?? "");
-  }, []);
+  }, [character?.id]);
 
   if (!character) {
     return false;
   }
-  const { animationClips, positionClips, lipSyncClips } = character;
+  const { animationClips, positionKeyframes, lipSyncClips } = character;
 
   return (
     <div
@@ -71,13 +71,12 @@ export const Character = ({ characterId }: Props) => {
           style="character"
           type="animations"
         />
-        <TrackClips
+        <TrackKeyFrames
           id={character.id}
-          clips={positionClips}
+          keyframes={positionKeyframes}
           title="Character Position/Rotation"
-          updateClip={updateClipPosition}
+          updateKeyframe={updateClipPosition}
           style="character"
-          type="positions"
         />
         <TrackClips
           id={character.id}
