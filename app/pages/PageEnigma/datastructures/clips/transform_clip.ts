@@ -1,13 +1,25 @@
 import * as THREE from 'three';
 
+export class TransformFrame {
+  position: THREE.Vector3
+  rotation: THREE.Vector3
+  scale: THREE.Vector3
+  offset: number
+
+  constructor(position: THREE.Vector3, rotation: THREE.Vector3, scale: THREE.Vector3, offset: number) {
+    this.position = position;
+    this.rotation = rotation;
+    this.scale = scale;
+    this.offset = offset;
+  }
+}
+
 export class TransformClip {
   version: number;
   media_id: string;
   object_uuid: string;
   type: "transform";
-  positions: THREE.Vector3[];
-  rotations: THREE.Vector3[];
-  scales: THREE.Vector3[];
+  keyframes: TransformFrame[];
   length: number;
 
   step_frame: number;
@@ -21,40 +33,72 @@ export class TransformClip {
 
     this.length = length;
 
-    this.positions = [];
-    this.rotations = [];
-    this.scales = [];
+    this.keyframes = [];
 
     this.step_frame = 0;
     this.looping = false;
   }
 
+  private findNextNumber(location: number) {
+    // Sort the transform frames based on their offset in ascending order
+    this.keyframes.sort((a, b) => a.offset - b.offset);
+
+    let currentKeyframe: TransformFrame | undefined;
+    let nextKeyframe: TransformFrame | undefined;
+
+    for (let frame of this.keyframes) {
+      if (frame.offset <= location) {
+        currentKeyframe = frame;
+      } else if (frame.offset > location) {
+        nextKeyframe = frame;
+        break;
+      }
+    }
+
+    return { currentKeyframe, nextKeyframe };
+  }
+
   step(object: THREE.Object3D, offset: number, frame: number) {
-    this.step_frame = frame-offset;
-    if (this.step_frame < 0) { this.step_frame = 0; }
-    if (this.step_frame >= this.length) { return; } // Reached max frames.
-    if(this.positions.length < 2) { return; } // If there are enough points in the scene.
+    this.step_frame = frame - offset;
+    //if (this.step_frame < 0) { this.step_frame = 0; }
+    //if (this.step_frame >= this.length) { return; } // Reached max frames.
+    if (this.keyframes.length < 2) { return; } // If there are enough points in the scene.
 
-    let time_frame = (this.step_frame/this.length);
+    // Find the current and next keyframes based on time_frame
+    let { currentKeyframe, nextKeyframe } = this.findNextNumber(this.step_frame);
 
-    let curve = new THREE.CatmullRomCurve3(this.positions);
-    let point = curve.getPoint(time_frame);
-    object.position.copy(point);
+    if (nextKeyframe != undefined && currentKeyframe != undefined) {
 
-    let curve_rot = new THREE.CatmullRomCurve3(this.rotations);
-    let point_rot = curve_rot.getPoint(time_frame);
-    object.rotation.set(point_rot.x, point_rot.y, point_rot.z);
+      let small_step_frame = this.step_frame-currentKeyframe.offset;
+      console.log(frame, currentKeyframe?.offset, nextKeyframe?.offset);
+      //console.log(currentKeyframe?.position, nextKeyframe?.position);
+      let location = (small_step_frame / (nextKeyframe.offset - currentKeyframe.offset));
+      if (location < 0) {
+        location = 0;
+      }
+      let pos_s = currentKeyframe?.position;
+      let pos_e = nextKeyframe?.position;
+      let points = [new THREE.Vector3(pos_s.x, pos_s.y, pos_s.z), new THREE.Vector3(pos_e.x, pos_e.y, pos_e.z)]
+      let curve = new THREE.CatmullRomCurve3(points);
+      let point = curve.getPoint(location);
+      if (location < 1) {
+        object.position.copy(point);
+      }
+    }
 
-    let curve_scale = new THREE.CatmullRomCurve3(this.scales);
-    let point_scale = curve_scale.getPoint(time_frame);
-    object.scale.copy(point_scale);
+    //let curve_rot = new THREE.CatmullRomCurve3(this.rotations);
+    //let point_rot = curve_rot.getPoint(time_frame);
+    //object.rotation.set(point_rot.x, point_rot.y, point_rot.z);
+    //let curve_scale = new THREE.CatmullRomCurve3(this.scales);
+    //let point_scale = curve_scale.getPoint(time_frame);
+    //object.scale.copy(point_scale);
   }
 
   reset(object: THREE.Object3D) {
-    if (this.positions.length > 0) {
-      let first_pos = this.positions[0];
-      let first_rot = this.rotations[0];
-      let first_scl = this.scales[0];
+    if (this.keyframes.length > 0) {
+      let first_pos = this.keyframes[0].position;
+      let first_rot = this.keyframes[0].rotation;
+      let first_scl = this.keyframes[0].scale;
       object.position.copy(first_pos);
       object.rotation.set(first_rot.x, first_rot.y, first_rot.z);
       object.scale.copy(first_scl);
@@ -62,34 +106,12 @@ export class TransformClip {
     }
   }
 
-  add_position(position: THREE.Vector3) {
-    this.positions.push(new THREE.Vector3(position.x, position.y, position.z));
-  }
-
-  remove_position(position: THREE.Vector3) {
-    this.positions = this.positions.filter(positions => {
-      return !position.equals(position);
-    });
-  }
-
-  add_rotation(rotation: THREE.Vector3) {
-    this.rotations.push(new THREE.Vector3(rotation.x, rotation.y, rotation.z));
-  }
-
-  remove_rotation(rotation: THREE.Vector3) {
-    this.rotations = this.rotations.filter(rotations => {
-      return !rotation.equals(rotation);
-    });
-  }
-
-  add_scale(scale: THREE.Vector3) {
-    this.scales.push(new THREE.Vector3(scale.x, scale.y, scale.z));
-  }
-
-  remove_scale(scale: THREE.Vector3) {
-    this.scales = this.scales.filter(scales => {
-      return !scale.equals(scale);
-    });
+  add_frame(position: THREE.Vector3, rotation: THREE.Vector3, scale: THREE.Vector3, offset: number) {
+    this.keyframes.push(new TransformFrame(
+      position,
+      rotation,
+      scale,
+      offset));
   }
 
   toJSON(): string {
@@ -99,9 +121,7 @@ export class TransformClip {
       object_uuid: this.object_uuid,
       length: this.length,
       type: this.type,
-      position: this.positions,
-      rotation: this.rotations,
-      scale: this.scales,
+      keyframes: this.keyframes,
     });
   }
 }
