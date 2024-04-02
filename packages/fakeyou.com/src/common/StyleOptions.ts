@@ -85,10 +85,11 @@ export const STYLE_OPTIONS: readonly StyleOption[] = [
 		imageUrl: "https://fakeyou.com/images/landing/onboarding/styles/style-origami.webp",
 		value: "paper_origami",
 	},
-	{
-		label: "Pixel Art",
-		value: "pixel_art",
-	},
+	// NB(bt,2024-04-02): Broken style for now
+	//{
+	//	label: "Pixel Art",
+	//	value: "pixel_art",
+	//},
 	{
 		label: "Pop Art",
 		value: "pop_art",
