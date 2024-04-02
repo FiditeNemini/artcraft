@@ -11,13 +11,13 @@ export interface DomainConfig {
 }
 
 const domainConfigs: Record<string, DomainConfig> = {
-  storyteller: {
+  fakeyou: {
     website: Website.StorytellerAi,
     logo: "/fakeyou/Storyteller-Logo-1.png",
     title: "Storyteller AI",
     link: "https://storyteller.ai",
   },
-  fakeyou: {
+  storyteller: {
     website: Website.FakeYou,
     logo: "/fakeyou/FakeYou-Logo-2.png",
     title: "FakeYou",

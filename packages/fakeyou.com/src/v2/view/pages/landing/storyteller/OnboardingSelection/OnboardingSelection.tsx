@@ -1,14 +1,92 @@
-import { Panel } from "components/common";
+import { Button, Panel } from "components/common";
 import Card from "components/common/Card";
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import { useSpring, animated } from "@react-spring/web";
+import { faChevronDown, faChevronUp } from "@fortawesome/pro-solid-svg-icons";
 
 interface OnboardingSelectionProps {}
 
 export default function OnboardingSelection(props: OnboardingSelectionProps) {
   const history = useHistory();
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const { maxHeight, opacity, transform } = useSpring({
+    maxHeight: isExpanded ? "1000px" : "0px",
+    opacity: isExpanded ? 1 : 0,
+    transform: isExpanded ? "scale(1)" : "scale(0.9)",
+    config: { tension: 170, friction: 26 },
+  });
+
+  const toggleVisibility = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   const cards = [
+    {
+      text: "Dragon Plays Concert",
+      defaultVideo:
+        "https://storage.googleapis.com/vocodes-public/media/v/3/v/a/c/v3vacb5910g6vfhjc2aemjghshpq2fs8/videov3vacb5910g6vfhjc2aemjghshpq2fs8mp4",
+      hoverVideo:
+        "https://storage.googleapis.com/vocodes-public/media/a/0/p/5/a/a0p5a0dc021qam59e0pxjtg9sk59mcg2/a0p5a0dc021qam59e0pxjtg9sk59mcg2.mp4",
+      onClick: () => {
+        history.push("/studio-intro/m_qsjwkd8ap8mnvskm0dqbf9ewk8dg4m");
+      },
+    },
+    {
+      text: "Home Office",
+      defaultVideo:
+        "https://storage.googleapis.com/vocodes-public/media/f/g/s/d/m/fgsdm4v1mv2nqd5y1y6an46zmj4sx5vt/videofgsdm4v1mv2nqd5y1y6an46zmj4sx5vtmp4",
+      hoverVideo:
+        "https://storage.googleapis.com/vocodes-public/media/2/1/t/v/e/21tvezwdmevrqdmd3zttspykenktepx4/21tvezwdmevrqdmd3zttspykenktepx4.mp4",
+      onClick: () => {
+        history.push("/studio-intro/m_7m8qvhmr55w4d7c31a7f4yjdtm22ww");
+      },
+    },
+    {
+      text: "Desert Fox",
+      defaultVideo:
+        "https://storage.googleapis.com/vocodes-public/media/a/p/j/b/q/apjbqp06we4xf51aaqt4rhb7bpvdg90p/videoapjbqp06we4xf51aaqt4rhb7bpvdg90pmp4",
+      hoverVideo:
+        "https://storage.googleapis.com/vocodes-public/media/w/n/5/7/4/wn574b0qqy64xymthbk0y806czmmn0jx/wn574b0qqy64xymthbk0y806czmmn0jx.mp4",
+      onClick: () => {
+        history.push("/studio-intro/m_dzsxjjjyx18k3x2rsys5zkm94x73kt");
+      },
+    },
+    {
+      text: "Castle Airship",
+      defaultVideo:
+        "https://storage.googleapis.com/vocodes-public/media/v/e/c/3/c/vec3cwk00xvrafv7rgvhfvbhqtm72pr7/videovec3cwk00xvrafv7rgvhfvbhqtm72pr7mp4",
+      hoverVideo:
+        "https://storage.googleapis.com/vocodes-public/media/q/h/h/r/f/qhhrf4tddye8jpfrz030ja425nkxymr3/qhhrf4tddye8jpfrz030ja425nkxymr3.mp4",
+      onClick: () => {
+        history.push("/studio-intro/m_n6rxmbn7abz29vmcecrkrgytxw55kr");
+      },
+    },
+    {
+      text: "Forest Friends",
+      defaultVideo:
+        "https://storage.googleapis.com/vocodes-public/media/k/v/r/0/w/kvr0wsw87gmkx6psfp73v34behs2vd34/videokvr0wsw87gmkx6psfp73v34behs2vd34mp4",
+      hoverVideo:
+        "https://storage.googleapis.com/vocodes-public/media/g/1/s/n/d/g1snde1192qbe3nctpa3p0f2xhgrdjkm/g1snde1192qbe3nctpa3p0f2xhgrdjkm.mp4",
+      onClick: () => {
+        history.push("/studio-intro/m_qnvcv073za8b5y23fra4vbt8cea2c3");
+      },
+    },
+    {
+      text: "Pirate Island",
+      defaultVideo:
+        "https://storage.googleapis.com/vocodes-public/media/4/d/a/q/1/4daq1tz77rahrr5kt8wa45y6z93hy6fd/video4daq1tz77rahrr5kt8wa45y6z93hy6fdmp4",
+      hoverVideo:
+        "https://storage.googleapis.com/vocodes-public/media/9/9/g/c/f/99gcfq21cafy6frtp1afdff11f45sm1w/99gcfq21cafy6frtp1afdff11f45sm1w.mp4",
+      onClick: () => {
+        history.push("/studio-intro/m_m5vgpxd99dak30t1cw4dsaj4jarhvt");
+      },
+    },
+  ];
+
+  // DEV CARDS
+  const devCards = [
     {
       text: "Room",
       backgroundImage: "/images/landing/onboarding/room-scene-thumbnail.webp",
@@ -108,11 +186,12 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         <p className="opacity-75">
           Try generating a movie by clicking a scene below
         </p>
-        <div className="row g-3 g-lg-4 mt-3 centered-row">
-          {cards.map((card, index) => (
+        <div className="row gy-3 gx-3 gx-lg-4 mt-3 centered-row">
+          {cards.slice(0, 4).map((card, index) => (
             <div className="col-6 col-lg-3" key={index}>
               <Card
-                backgroundImage={card.backgroundImage}
+                backgroundVideo={card.defaultVideo}
+                backgroundVideoHover={card.hoverVideo}
                 aspectRatio="16/9"
                 canHover={true}
                 borderWidth="2px"
@@ -122,6 +201,54 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
               />
             </div>
           ))}
+        </div>
+        <animated.div
+          style={{ overflow: "hidden", maxHeight, opacity, transform }}
+        >
+          <div className="row gy-3 gx-3 gx-lg-4 mt-0 centered-row">
+            {cards.slice(4).map((card, index) => (
+              <div className="col-6 col-lg-3" key={index}>
+                <Card
+                  backgroundVideo={card.defaultVideo}
+                  backgroundVideoHover={card.hoverVideo}
+                  aspectRatio="16/9"
+                  canHover={true}
+                  borderWidth="2px"
+                  hoverPrimaryColor={true}
+                  onClick={card.onClick}
+                  bottomText={card.text}
+                />
+              </div>
+            ))}
+          </div>
+          <hr className="my-5" />
+          <h4>Dev Scenes</h4>
+          <div className="row gy-3 gx-3 gx-lg-4 mt-0 centered-row">
+            {devCards.map((card, index) => (
+              <div className="col-6 col-lg-3" key={index}>
+                <Card
+                  backgroundImage={card.backgroundImage}
+                  aspectRatio="16/9"
+                  canHover={true}
+                  borderWidth="2px"
+                  hoverPrimaryColor={true}
+                  onClick={card.onClick}
+                  bottomText={card.text}
+                />
+              </div>
+            ))}
+          </div>
+        </animated.div>
+        <div className="d-flex justify-content-center mt-4">
+          <Button
+            onClick={toggleVisibility}
+            label={isExpanded ? "Show less examples" : "Show more examples"}
+            small={true}
+            icon={isExpanded ? faChevronUp : faChevronDown}
+            iconFlip={true}
+            variant="secondary"
+            className="opacity-50"
+          />
         </div>
       </div>
     </Panel>
