@@ -222,7 +222,6 @@ export class TimeLine {
         let keyframe_uuid = data['data']["keyframe_uuid"];
         let keyframe_offset = data['data']["offset"];
         let object_uuid = data['data']['object_uuid'];
-        console.log("UUID", keyframe_uuid);
         this.transform_engine.clips[object_uuid].setOffset(keyframe_uuid, keyframe_offset);
     }
 
