@@ -3,5 +3,6 @@ export * from "./cameraGroup";
 export * from "./characterGroups";
 export * from "./dragAndDrop";
 export * from "./objectGroup";
+export * from "./selectedItem";
 export * from "./sizing";
 export * from "./timing";

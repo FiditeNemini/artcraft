@@ -1,14 +1,11 @@
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ClipType,
-  Keyframe,
-  Clip,
-  MediaClip,
-} from "~/pages/PageEnigma/models/track";
+import { ClipType, MediaClip } from "~/pages/PageEnigma/models/track";
 import useUpdateDragDrop from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateDragDrop";
 import {
   addCharacterAnimation,
+  addCharacterAudio,
+  addGlobalAudio,
   canDrop,
   dragId,
   dragType,
@@ -56,6 +53,20 @@ export const TrackProvider = ({ children }: Props) => {
           clipId: dragId.value!,
           characterId: dropId.value,
           animationClips,
+          offset: dropOffset.value,
+        });
+      }
+      if (dragType.value === "audio") {
+        addCharacterAudio({
+          clipId: dragId.value!,
+          characterId: dropId.value,
+          audioClips,
+          offset: dropOffset.value,
+        });
+        addGlobalAudio({
+          clipId: dragId.value!,
+          audioId: dropId.value,
+          audioClips,
           offset: dropOffset.value,
         });
       }

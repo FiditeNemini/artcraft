@@ -33,6 +33,7 @@ export function updateCamera({ id, offset }: { id: string; offset: number }) {
 }
 
 export function addCameraKeyframe(keyframe: QueueKeyframe, offset: number) {
+  console.log("cam", keyframe);
   const newKeyframe = {
     version: keyframe.version,
     keyframe_uuid: uuid.v4(),

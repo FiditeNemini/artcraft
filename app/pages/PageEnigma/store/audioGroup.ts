@@ -48,12 +48,22 @@ export function updateAudio({
   };
 }
 
-export function addGlobalAudio(
-  dragId: string,
-  audioClips: MediaClip[],
-  offset: number,
-) {
-  const clip = audioClips.find((row) => row.media_id === dragId);
+export function addGlobalAudio({
+  clipId,
+  audioId,
+  audioClips,
+  offset,
+}: {
+  clipId: string;
+  audioId: string;
+  audioClips: MediaClip[];
+  offset: number;
+}) {
+  if (audioGroup.value.id !== audioId) {
+    return;
+  }
+
+  const clip = audioClips.find((row) => row.media_id === clipId);
   if (!clip) {
     return;
   }

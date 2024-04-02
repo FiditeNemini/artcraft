@@ -21,10 +21,27 @@ export function updateObject({ id, offset }: { id: string; offset: number }) {
     objects: oldObject.objects.map((object) => ({
       object_uuid: object.object_uuid,
       name: object.name,
-      keyframes: object.keyframes.map((keyFrame) => ({
-        ...keyFrame,
-        offset: keyFrame.keyframe_uuid === id ? offset : keyFrame.offset,
-      })),
+      keyframes: object.keyframes.map((keyFrame) => {
+        if (keyFrame.keyframe_uuid !== id) {
+          return {
+            ...keyFrame,
+          };
+        }
+
+        Queue.publish({
+          queueName: QueueNames.TO_ENGINE,
+          action: toEngineActions.UPDATE_KEYFRAME,
+          data: {
+            ...keyFrame,
+            offset,
+          },
+        });
+
+        return {
+          ...keyFrame,
+          offset,
+        };
+      }),
     })),
   };
 }
@@ -78,7 +95,7 @@ export function deleteObjectKeyframe(keyframe: Keyframe) {
   const obj = oldObjectGroup.objects.find(
     (row) => row.object_uuid === keyframe.object_uuid,
   );
-  console.log("delete", obj);
+  console.log("delete", obj, keyframe.keyframe_uuid);
   if (!obj) {
     return oldObjectGroup;
   }
@@ -98,7 +115,7 @@ export function deleteObjectKeyframe(keyframe: Keyframe) {
   ];
 
   if (newKeyframes.length) {
-    return {
+    objectGroup.value = {
       ...oldObjectGroup,
       objects: [
         ...oldObjectGroup.objects.map((object) => ({
@@ -109,6 +126,7 @@ export function deleteObjectKeyframe(keyframe: Keyframe) {
         })),
       ],
     };
+    return;
   }
   objectGroup.value = {
     ...oldObjectGroup,

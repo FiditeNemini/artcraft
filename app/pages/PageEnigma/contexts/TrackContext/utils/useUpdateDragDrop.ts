@@ -8,7 +8,7 @@ import {
 
 export default function useUpdateDragDrop() {
   const startDrag = useCallback(
-    (type: "animations" | "lipSync", id: string, length: number) => {
+    (type: "animations" | "audio", id: string, length: number) => {
       dragId.value = id;
       dragType.value = type;
       clipLength.value = length;

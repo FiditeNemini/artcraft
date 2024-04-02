@@ -81,7 +81,7 @@ export function updateCharacters({
 
       return {
         ...character,
-        positionClips: newPositionKeyframes,
+        positionKeyframes: newPositionKeyframes,
       };
     });
   }
