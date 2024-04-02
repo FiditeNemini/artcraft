@@ -1,7 +1,9 @@
 import { cameraGroup, fullWidth, updateCamera } from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export const Camera = () => {
+  useSignals();
   const { keyframes } = cameraGroup.value!;
 
   return (

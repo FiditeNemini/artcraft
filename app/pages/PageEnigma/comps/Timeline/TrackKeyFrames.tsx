@@ -34,7 +34,6 @@ export const TrackKeyFrames = ({
                 ? keyframes[index + 1].offset
                 : filmLength.value * 60
             }
-            style={style}
             updateKeyframe={updateKeyframe}
             keyframe={keyframe}
           />

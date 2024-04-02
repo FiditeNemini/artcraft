@@ -12,7 +12,7 @@ import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
 import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
-import { FFmpeg, createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
 import { TimeLine, TimelineDataState } from "./timeline.js";
@@ -22,6 +22,7 @@ import { AnimationEngine } from "./animation_engine.js";
 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { APPUI_ACTION_TYPES } from "../reducers";
+import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 class EditorState {
   // {
@@ -1144,7 +1145,10 @@ class Editor {
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
       payload: {
-        group: "object", // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
+        group:
+          this.selected.name === "::CAM::"
+            ? ClipGroup.CAMERA
+            : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
         object_uuid: this.selected.uuid,
         object_name: this.selected.name,
         version: this.version,
