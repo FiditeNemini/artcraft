@@ -66,12 +66,12 @@ export default function LandingVideoReel({
         <div className="container h-100">
           <div className="text-center text-white d-flex flex-column justify-content-center align-items-center zi-2 h-100">
             <h1 className="storyteller-landing-heading fw-bold">
-              Enabling Anyone to Make Professional Film, Animation, and Music
+              Be Your Own Hollywood
             </h1>
             <h5 className="fw-normal mb-2 mt-2 lh-base opacity-75 storyteller-landing-sub-text">
-              StorytellerAI's powerful new engine combines Generative AI and
-              User Generated Content to radically democratize both audio and
-              video production.
+              Directors know that you can't simply prompt a movie, which is why we've built something that 
+              uniquely captures your intentions. We've built something simple and reusable, where filmmaking
+              can be fun again.
             </h5>
             <Button
               icon={faArrowRight}
