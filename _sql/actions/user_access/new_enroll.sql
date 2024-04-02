@@ -81,12 +81,15 @@ WHERE username IN (
 );
 
 -- Early access (film)
+-- dakrid: David, Brandon's filmmaker friend
+-- omega7321: vegito / ishaan
 UPDATE users
 SET
     can_access_studio = false,
     maybe_feature_flags = 'studio,video_style_transfer'
 WHERE username IN (
     'dakrid',
+    'omega7321',
     'zzz_last_item'
 );
 
