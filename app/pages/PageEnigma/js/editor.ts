@@ -12,7 +12,7 @@ import { SMAAPass } from "three/addons/postprocessing/SMAAPass.js";
 import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
-import { FFmpeg, createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
 import { TimeLine, TimelineDataState } from "./timeline.js";
@@ -22,7 +22,9 @@ import { AnimationEngine } from "./animation_engine.js";
 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { APPUI_ACTION_TYPES } from "../reducers";
+import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
+import { XYZ } from "../../datastructures/common";
 class EditorState {
   // {
   //   action: "ShowLoadingIndicator"
@@ -437,6 +439,26 @@ class Editor {
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
     });
   }
+
+  // TO UPDATE selected objects in the scene might want to add to the scene ...
+  async setSelectedObject(position:XYZ,rotation:XYZ,scale:XYZ) {
+    if (this.selected !=null) {
+
+      this.selected.position.x = position.x
+      this.selected.position.y = position.y
+      this.selected.position.z = position.z
+
+      this.selected.rotation.x = rotation.x
+      this.selected.rotation.y = rotation.y
+      this.selected.rotation.z = rotation.z
+
+      this.selected.scale.x = scale.x
+      this.selected.scale.y = scale.y
+      this.selected.scale.z = scale.z
+
+    }
+  } 
+
 
   public async saveScene(name: string) {
     // remove controls when saving scene.
@@ -1144,7 +1166,10 @@ class Editor {
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
       payload: {
-        group: "object", // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
+        group:
+          this.selected.name === "::CAM::"
+            ? ClipGroup.CAMERA
+            : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
         object_uuid: this.selected.uuid,
         object_name: this.selected.name,
         version: this.version,
