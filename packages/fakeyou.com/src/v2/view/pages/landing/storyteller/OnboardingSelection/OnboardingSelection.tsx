@@ -202,9 +202,9 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
   return (
     <Panel clear={true}>
       <div className="text-center my-5 pb-5">
-        <h1 className="fw-bold">Explore scene examples</h1>
+        <h1 className="fw-bold">Make Your Movie</h1>
         <p className="opacity-75">
-          Try generating a movie by clicking a scene below
+          It's easy! We've already built some scenes for you to try.
         </p>
         <div className="row gy-3 gx-3 gx-lg-4 mt-3 centered-row">
           {cards.slice(0, 4).map((card, index) => (
@@ -242,7 +242,8 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
             ))}
           </div>
           <hr className="my-5" />
-          <h4>Dev Scenes</h4>
+          <h4>Developer Scenes</h4>
+          <p>These scenes work, but you'll have to build your own animation timeline.</p>
           <div className="row gy-3 gx-3 gx-lg-4 mt-0 centered-row">
             {devCards.map((card, index) => (
               <div className="col-6 col-lg-3" key={index}>
