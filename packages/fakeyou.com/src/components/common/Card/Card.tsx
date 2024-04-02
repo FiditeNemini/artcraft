@@ -58,6 +58,7 @@ export default function Card({
         };
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoHovered]);
 
   return (
