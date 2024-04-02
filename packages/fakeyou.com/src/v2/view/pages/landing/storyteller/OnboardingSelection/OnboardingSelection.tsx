@@ -93,6 +93,16 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         history.push("/studio-intro/m_t0x2avjrv11zkrcbp0tjmqbg9dpk0k");
       },
     },
+    {
+      text: "Best Friends",
+      defaultVideo:
+        "https://storage.googleapis.com/vocodes-public/media/3/n/m/9/c/3nm9car0x6af035663ervxq2qagdw8rk/video3nm9car0x6af035663ervxq2qagdw8rkmp4",
+      hoverVideo:
+        "https://storage.googleapis.com/vocodes-public/media/e/t/3/d/6/et3d68wkewppwmgw5kadmes8yr8whe2z/et3d68wkewppwmgw5kadmes8yr8whe2z.mp4",
+      onClick: () => {
+        history.push("/studio-intro/m_th523rg3tvax5rceys7s97jgrbbm11");
+      },
+    },
   ];
 
   // DEV CARDS
