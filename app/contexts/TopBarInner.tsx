@@ -1,6 +1,12 @@
 import { createContext } from "react";
 
 export const TopBarInnerContext = createContext<{
-  TopBarInner: JSX.Element | null;
-  setTopBarInner: (el: JSX.Element | null)=>void;
+  TopBarInner: {
+    location: string,
+    node: React.ReactNode,
+  } | null;
+  setTopBarInner: (el: {
+    location: string,
+    node: React.ReactNode,
+  } | null)=>void;
 } | null>(null);

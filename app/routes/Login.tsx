@@ -1,3 +1,4 @@
+import { TopBarHelmet } from "~/modules/TopBarHelmet";
 import { Form } from "@remix-run/react";
 import { faKey, faUser } from "@fortawesome/pro-solid-svg-icons";
 import {
@@ -14,6 +15,7 @@ export default function LoginScreen() {
       className="fixed w-full overflow-scroll"
       style={{height: "calc(100% - 72px)"}}
     >
+      <TopBarHelmet children={null}/>
       <div className="w-10/12 max-w-2xl mx-auto my-6">
         <H1 className="text-center">Login to FakeYou</H1>
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import { LinksFunction } from "@remix-run/deno";
 import {
@@ -47,7 +47,10 @@ export const links: LinksFunction = () => [
 
 export default function App() {
   const [topBarInnerComponent, setTopBarInnerComponent] =
-  useState<JSX.Element | null>(null);
+  useState<{
+    location: string,
+    node: React.ReactNode,
+  } | null>(null);
   const [showLoader, setShowLoader] = useState<boolean>(true);
   useEffect(()=>{
     setTimeout(()=>setShowLoader(false), 2500);

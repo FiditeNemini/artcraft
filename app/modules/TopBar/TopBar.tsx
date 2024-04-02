@@ -1,13 +1,14 @@
-import { useContext } from "react";
-import { Button } from "~/components/Button";
+import { useContext, } from "react";
+import { useLocation } from "@remix-run/react";
 import {
   faChevronLeft,
-  faRightToBracket,
 } from "@fortawesome/pro-solid-svg-icons";
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
 import { ButtonLink } from "~/components";
 
 export const TopBar = () => {
+  const currentLocation = useLocation().pathname;
+
   return (
     <header
       className="fixed left-0 top-0 w-full
@@ -27,17 +28,20 @@ export const TopBar = () => {
                 alt="Logo FakeYou StoryTeller.ai"
               />
             </a>
-            <ButtonLink to={"/"} variant="secondary" icon={faChevronLeft}>
-              Back to Dashboard
-            </ButtonLink>
+            {currentLocation !== "/" &&
+              <ButtonLink to={"/"} variant="secondary" icon={faChevronLeft}>
+                Back to Dashboard
+              </ButtonLink>
+            }
           </div>
 
           <div className="flex justify-center">
-            <TopBarInner />
+            <TopBarInner currentLocation={currentLocation}/>
           </div>
 
-          <div className="flex justify-end">
-            <Button icon={faRightToBracket}>Login</Button>
+          <div className="flex justify-end gap-2">
+            <ButtonLink variant="secondary" to='/login'>Login</ButtonLink>
+            <ButtonLink to='/signup'>Sign Up</ButtonLink>
           </div>
         </div>
       </nav>
@@ -45,7 +49,10 @@ export const TopBar = () => {
   );
 };
 
-const TopBarInner = () => {
+const TopBarInner = ({currentLocation}:{currentLocation:string}) => {
   const { TopBarInner } = useContext(TopBarInnerContext) || {};
-  return TopBarInner;
+  if(!TopBarInner || TopBarInner.location !== currentLocation){
+    return null;
+  }
+  return TopBarInner.node;
 };
