@@ -8,6 +8,7 @@ import {
   timelineHeight,
   deleteAudioClip,
   deleteCharacterClip,
+  selectedItem,
 } from "~/pages/PageEnigma/store";
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -17,7 +18,6 @@ import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
 import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 import { Clip, Keyframe } from "~/pages/PageEnigma/models/track";
-import { selectedItem } from "~/pages/PageEnigma/store/selectedItem";
 
 function getItemType(item: Clip | Keyframe | null) {
   if (!item) {
@@ -50,9 +50,12 @@ export const Timeline = () => {
   }, []);
 
   const onDelete = useCallback(() => {
-    deleteCharacterClip(selectedItem.value as Clip);
-    deleteAudioClip(selectedItem.value as Clip);
-    deleteKeyframe(selectedItem.value as Keyframe);
+    if ((selectedItem.value as Clip).clip_uuid) {
+      deleteCharacterClip(selectedItem.value as Clip);
+      deleteAudioClip(selectedItem.value as Clip);
+    } else {
+      deleteKeyframe(selectedItem.value as Keyframe);
+    }
     selectedItem.value = null;
   }, [deleteKeyframe]);
 

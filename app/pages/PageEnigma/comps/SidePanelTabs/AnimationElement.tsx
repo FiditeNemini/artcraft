@@ -11,10 +11,10 @@ import { useSignals } from "@preact/signals-react/runtime";
 
 interface Props {
   clip: MediaClip;
-  type: "animations" | "lipSync";
+  type: "animations" | "audio";
 }
 
-export const ClipElement = ({ clip, type }: Props) => {
+export const AnimationElement = ({ clip, type }: Props) => {
   useSignals();
   const { startDrag, endDrag } = useContext(TrackContext);
   const { initX, initY } = initPosition.value;
@@ -33,7 +33,6 @@ export const ClipElement = ({ clip, type }: Props) => {
         const deltaX = event.pageX - initX;
         const deltaY = event.pageY - initY;
         currPosition.value = { currX: initX + deltaX, currY: initY + deltaY };
-        return;
       }
     };
 
