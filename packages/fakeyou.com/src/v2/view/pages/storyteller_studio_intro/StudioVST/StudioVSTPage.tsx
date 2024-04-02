@@ -3,14 +3,15 @@ import { v4 as uuidv4 } from "uuid";
 import { NavLink, useParams, useHistory } from "react-router-dom";
 import { Button, Container, Panel, Select, TextArea } from "components/common";
 
-import { VideoPlayer } from "components/common/VideoPlayer";
-import { useJobStatus, useInferenceJobs } from "hooks";
+// import { VideoPlayer } from "components/common/VideoPlayer";
+import { useJobStatus, useInferenceJobs, useMedia } from "hooks";
 import { EnqueueVST, EnqueueVSTResponse } from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
 import { initialValues } from "./defaultValues";
 import { VSTType } from "./helpers";
 import LoadingSpinner from "components/common/LoadingSpinner";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { STYLE_OPTIONS, StyleOption } from "common/StyleOptions";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 export default function PageVSTApp() {
   const { jobToken } = useParams<{ jobToken: string }>();
@@ -109,6 +110,13 @@ export default function PageVSTApp() {
   //   history.push("/");
   // }
 
+  const { media } = useMedia({
+    mediaToken: job?.maybe_result?.entity_token
+  });
+
+  const mediaLink =
+    media?.public_bucket_path && new BucketConfig().getGcsUrl(media?.public_bucket_path || "");
+
   return (
     <Container type="panel" className="mt-5">
       <Panel clear={true}>
@@ -118,9 +126,12 @@ export default function PageVSTApp() {
         <div className="row g-5">
           <div className="col-12 col-md-6">
             {job.isSuccessful && job.maybe_result ? (
-              <VideoPlayer
-                mediaToken={job.maybe_result.entity_token}
-              />
+              <div className="ratio ratio-4x3 panel-inner rounded">
+                <video
+                  src={mediaLink}
+                  controls
+                />
+              </div>
             ) : (
               <div className="ratio ratio-4x3 panel-inner rounded">
                 <LoadingSpinner label="Loading Video" />
