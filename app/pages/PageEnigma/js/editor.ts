@@ -857,7 +857,9 @@ class Editor {
       this.render_camera.rotation.copy(this.cam_obj.rotation);
     }
 
-    this.timeline.update();
+    if(this.timeline.is_playing){
+      this.timeline.update();
+    }
 
     this.renderScene();
   }

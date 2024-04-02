@@ -105,6 +105,12 @@ export class TimeLine {
             case toEngineActions.ADD_KEYFRAME:
                 await this.addKeyFrame(data);
                 break;
+            case toEngineActions.UPDATE_KEYFRAME:
+                await this.updateKeyFrame(data);
+                break;
+            case toEngineActions.DELETE_KEYFRAME:
+                await this.deleteKeyFrame(data);
+                break;
             case toEngineActions.ADD_CLIP:
                 await this.addClip(data);
                 break;
@@ -140,18 +146,18 @@ export class TimeLine {
         let uuid = data_json['object_uuid'];
 
         let object_name = this.scene.get_object_by_uuid(uuid)?.name;
-        if(object_name == undefined){
+        if (object_name == undefined) {
             object_name = "undefined"
         }
 
-        let new_item = this.transform_engine.addFrame(uuid, 
-            this.absolute_end, 
-            data_json['position'], 
-            data_json['rotation'], 
-            data_json['scale'], 
+        let new_item = this.transform_engine.addFrame(uuid,
+            this.absolute_end,
+            data_json['position'],
+            data_json['rotation'],
+            data_json['scale'],
             data_json['offset'],
             data_json['keyframe_uuid']);
-        if(new_item) {
+        if (new_item) {
             await this.addPlayableClip(new ClipUI(
                 data_json['version'],
                 "transform",
@@ -205,6 +211,18 @@ export class TimeLine {
                 break;
         }
     }
+
+    public async deleteKeyFrame(data: any) {
+        console.log(data)
+    }
+    public async updateKeyFrame(data: any) {
+        let keyframe_uuid = data['data']["keyframe_uuid"];
+        let keyframe_offset = data['data']["offset"];
+        let object_uuid = data['data']['object_uuid'];
+        console.log("UUID", keyframe_uuid);
+        this.transform_engine.clips[object_uuid].setOffset(keyframe_uuid, keyframe_offset);
+    }
+
     public async updateClip(data: any) {
         // only length and offset changes here.
         console.log(data);
@@ -247,6 +265,7 @@ export class TimeLine {
         if (this.is_playing) {
             return;
         }
+        this.update();
         this.setScrubberPosition(data["data"]["currentTime"]);
     }
 

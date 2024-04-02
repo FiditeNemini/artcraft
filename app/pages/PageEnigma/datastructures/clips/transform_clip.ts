@@ -66,6 +66,16 @@ export class TransformClip {
     return { currentKeyframe, nextKeyframe };
   }
 
+  public setOffset(keyframe_uuid: string, keyframe_offset: number) {
+    this.keyframes.forEach(item => {
+      if (item.keyframe_uuid === keyframe_uuid) {
+          item.offset = keyframe_offset;
+          console.log("Set keyframe!!");
+          return;
+      }
+    });
+  }
+
   step(object: THREE.Object3D, offset: number, frame: number) {
     this.offset = offset;
     this.step_frame = frame - offset;
