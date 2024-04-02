@@ -34,11 +34,8 @@ export const ControlPanelSceneObject = () => {
   const currentSceneObject = appUiState.controlPanel.currentSceneObject;
 
   useEffect(()=>{
-    console.log("when you see this, control panel experienced changes");
-    console.log("use the editorengine context to propagate changes into editorengine");
-    console.log("1. create update callback in engine");
-    console.log("2. call the callback with values in appUiState.controlPanel")
-
+    const vectors = appUiState.controlPanel.currentSceneObject.objectVectors
+    editorEngine?.setSelectedObject(vectors.position, vectors.rotation, vectors.scale)
   }, [appUiState.controlPanel.currentSceneObject]);
 
   const handlePositionChange = (xyz: XYZ) => {

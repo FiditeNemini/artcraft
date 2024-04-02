@@ -23,6 +23,7 @@ import { AnimationEngine } from "./animation_engine.js";
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { APPUI_ACTION_TYPES } from "../reducers";
 
+import { XYZ } from "../../datastructures/common";
 class EditorState {
   // {
   //   action: "ShowLoadingIndicator"
@@ -437,6 +438,26 @@ class Editor {
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
     });
   }
+
+  // TO UPDATE selected objects in the scene might want to add to the scene ...
+  async setSelectedObject(position:XYZ,rotation:XYZ,scale:XYZ) {
+    if (this.selected !=null) {
+
+      this.selected.position.x = position.x
+      this.selected.position.y = position.y
+      this.selected.position.z = position.z
+
+      this.selected.rotation.x = rotation.x
+      this.selected.rotation.y = rotation.y
+      this.selected.rotation.z = rotation.z
+
+      this.selected.scale.x = scale.x
+      this.selected.scale.y = scale.y
+      this.selected.scale.z = scale.z
+
+    }
+  } 
+
 
   public async saveScene(name: string) {
     // remove controls when saving scene.
