@@ -15,13 +15,13 @@ class TransformEngine {
         return this.clips[object_uuid]
     }
 
-    addFrame(object_uuid: string, clip_length:number = 2, position: THREE.Vector3, rotation: THREE.Vector3, scale: THREE.Vector3, offset: number): boolean{
+    addFrame(object_uuid: string, clip_length:number = 2, position: THREE.Vector3, rotation: THREE.Vector3, scale: THREE.Vector3, offset: number, keyframe_uuid: string): boolean{
         if(this.clips[object_uuid] == null) {
             this.clips[object_uuid] = new TransformClip(this.version, object_uuid, clip_length);
-            this.clips[object_uuid].add_frame(position, rotation, scale, offset);
+            this.clips[object_uuid].add_frame(position, rotation, scale, offset, keyframe_uuid);
             return false;
         }
-        this.clips[object_uuid].add_frame(position, rotation, scale, offset);
+        this.clips[object_uuid].add_frame(position, rotation, scale, offset, keyframe_uuid);
         return true;
     }
 }

@@ -38,6 +38,7 @@ export class TimeLine {
     timeline_items: ClipUI[];
 
     timeline_limit: number;
+    absolute_end: number;
     scrubber_frame_position: number;
     is_playing: boolean;
 
@@ -62,7 +63,8 @@ export class TimeLine {
         scene: Scene,
     ) {
         this.timeline_items = [];
-        this.timeline_limit = 60 * 5; // 5 seconds
+        this.absolute_end = 60 * 12;
+        this.timeline_limit = this.absolute_end; // 5 seconds
 
         this.is_playing = false;
         this.scrubber_frame_position = 0; // in frames into the tl
@@ -142,14 +144,13 @@ export class TimeLine {
             object_name = "undefined"
         }
 
-        console.log("uuid", uuid)
-
         let new_item = this.transform_engine.addFrame(uuid, 
-            this.timeline_limit, 
+            this.absolute_end, 
             data_json['position'], 
             data_json['rotation'], 
             data_json['scale'], 
-            data_json['offset']);
+            data_json['offset'],
+            data_json['keyframe_uuid']);
         if(new_item) {
             await this.addPlayableClip(new ClipUI(
                 data_json['version'],
@@ -159,7 +160,7 @@ export class TimeLine {
                 "",
                 uuid,
                 0,
-                this.timeline_limit))
+                this.absolute_end))
         }
     }
 
@@ -322,13 +323,12 @@ export class TimeLine {
                 const object = this.scene.get_object_by_uuid(element.object_uuid);
                 if (element.type == "transform") {
                     if (object && this.transform_engine.clips[element.object_uuid]) {
-                        this.transform_engine.clips[element.object_uuid].length =
-                            element.length - element.offset;
                         this.transform_engine.clips[element.object_uuid].step(
                             object,
                             element.offset,
                             this.scrubber_frame_position,
                         );
+                        element.length = this.transform_engine.clips[element.object_uuid].length;
                     }
                 } else if (element.type == "audio") {
                     if (this.scrubber_frame_position + 1 >= element.length) {
@@ -358,10 +358,7 @@ export class TimeLine {
             }
         }
 
-        if (
-            this.scrubber_frame_position >= this.timeline_limit &&
-            this.is_playing
-        ) {
+        if (this.scrubber_frame_position >= this.timeline_limit && this.is_playing) {
             await this.stop();
         }
     }
