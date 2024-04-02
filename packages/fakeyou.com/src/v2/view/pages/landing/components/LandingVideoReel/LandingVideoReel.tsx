@@ -66,7 +66,7 @@ export default function LandingVideoReel({
         <div className="container h-100">
           <div className="text-center text-white d-flex flex-column justify-content-center align-items-center zi-2 h-100">
             <h1 className="storyteller-landing-heading fw-bold">
-              Be Your Own Hollywood
+              Your Own Hollywood
             </h1>
             <h5 className="fw-normal mb-2 mt-2 lh-base opacity-75 storyteller-landing-sub-text">
               Directors know that you can't simply prompt a movie, which is why we've built something that 
