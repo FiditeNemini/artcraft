@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
 import { SessionSubscriptionsWrapper } from "@storyteller/components/src/session/SessionSubscriptionsWrapper";
 import { StudioNotAvailable } from "v2/view/_common/StudioNotAvailable";
-import { Button, SegmentButtons } from "components/common";
+import { Button } from "components/common";
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { useParams, useHistory } from "react-router-dom";
 import { useInferenceJobs } from "hooks";
@@ -49,8 +49,6 @@ function StudioIntroPage(props: Props) {
   // This can serve as a second optional gate for enabling the next steps.
   const [sceneIsSaved, sceneIsSavedSet] = useState(false);
 
-  const [camera, cameraSet] = useState("zoom");
-
   usePrefixedDocumentTitle(PAGE_TITLE);
 
   const onSaveCallback = useCallback((sceneMediaToken: string) => {
@@ -96,8 +94,6 @@ function StudioIntroPage(props: Props) {
     EnqueueEngineCompositing("", {
       uuid_idempotency_token: uuidv4(),
       media_file_token: savedMediaToken,
-      camera: camera,
-      camera_speed: 0.2,
       skybox: "meadow_4k",
     }).then((res: any) => {
       if (res && res.success) {
@@ -107,41 +103,15 @@ function StudioIntroPage(props: Props) {
     });
   };
 
-  const cameraOpts = [{
-    label: "Rotation",
-    value: "orbit"
-  },{
-    label: "Zoom",
-    value: "zoom"
-  },{
-    label: "Pan",
-    value: "pan"
-  },{
-    label: "Static",
-    value: "static"
-  }];
-
   const sceneIsLoaded = sceneIsLoadedCount > 1 || sceneIsSaved;
 
   let progressButtons = <></>;
 
   if (sceneIsLoaded) {
     progressButtons = (
-      <>
-        <div {...{ className: "studio-intro-exporter" }}>
-          <div {...{ className: "exporter-title" }}>
-          <span>
-            Add camera motion to render
-          </span>
-          </div>
-          <div {...{ className: "exporter-controls" }}>
-            <SegmentButtons {...{ onChange: ({ target }: { target: any }) => {
-              cameraSet(target.value)
-            }, options: cameraOpts, value: camera }}/>
-            <Button label="Create Movie from 3D Scene" onClick={onClick} />
-          </div>
-        </div>
-      </>
+      <div {...{ className: "p-3 d-flex justify-content-center" }}>
+        <Button label="Create Movie from 3D Scene" onClick={onClick} />
+      </div>
     )
   }
 
