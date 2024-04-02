@@ -70,8 +70,8 @@ export default function LandingVideoReel({
             </h1>
             <h5 className="fw-normal mb-2 mt-1 lh-base opacity-75 storyteller-landing-sub-text">
               Directors know that you can't simply prompt a movie, which is why
-              we've built something that uniquely captures your intentions.
-              We've built something simple and reusable, where filmmaking can be
+              we've built something that uniquely captures the filmmaker's intent.
+              Our platform is simple and reusable, a place where filmmaking can be
               fun again.
             </h5>
             <Button
