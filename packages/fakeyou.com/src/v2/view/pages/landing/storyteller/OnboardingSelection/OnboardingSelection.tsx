@@ -24,16 +24,6 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
 
   const cards = [
     {
-      text: "Dragon Plays Concert",
-      defaultVideo:
-        "https://storage.googleapis.com/vocodes-public/media/v/3/v/a/c/v3vacb5910g6vfhjc2aemjghshpq2fs8/videov3vacb5910g6vfhjc2aemjghshpq2fs8mp4",
-      hoverVideo:
-        "https://storage.googleapis.com/vocodes-public/media/a/0/p/5/a/a0p5a0dc021qam59e0pxjtg9sk59mcg2/a0p5a0dc021qam59e0pxjtg9sk59mcg2.mp4",
-      onClick: () => {
-        history.push("/studio-intro/m_qsjwkd8ap8mnvskm0dqbf9ewk8dg4m");
-      },
-    },
-    {
       text: "Home Office",
       defaultVideo:
         "https://storage.googleapis.com/vocodes-public/media/f/g/s/d/m/fgsdm4v1mv2nqd5y1y6an46zmj4sx5vt/videofgsdm4v1mv2nqd5y1y6an46zmj4sx5vtmp4",
@@ -41,6 +31,16 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         "https://storage.googleapis.com/vocodes-public/media/2/1/t/v/e/21tvezwdmevrqdmd3zttspykenktepx4/21tvezwdmevrqdmd3zttspykenktepx4.mp4",
       onClick: () => {
         history.push("/studio-intro/m_7m8qvhmr55w4d7c31a7f4yjdtm22ww");
+      },
+    },
+    {
+      text: "Best Friends",
+      defaultVideo:
+        "https://storage.googleapis.com/vocodes-public/media/3/n/m/9/c/3nm9car0x6af035663ervxq2qagdw8rk/video3nm9car0x6af035663ervxq2qagdw8rkmp4",
+      hoverVideo:
+        "https://storage.googleapis.com/vocodes-public/media/e/t/3/d/6/et3d68wkewppwmgw5kadmes8yr8whe2z/et3d68wkewppwmgw5kadmes8yr8whe2z.mp4",
+      onClick: () => {
+        history.push("/studio-intro/m_th523rg3tvax5rceys7s97jgrbbm11");
       },
     },
     {
@@ -94,13 +94,13 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
       },
     },
     {
-      text: "Best Friends",
+      text: "Dragon Concert",
       defaultVideo:
-        "https://storage.googleapis.com/vocodes-public/media/3/n/m/9/c/3nm9car0x6af035663ervxq2qagdw8rk/video3nm9car0x6af035663ervxq2qagdw8rkmp4",
+        "https://storage.googleapis.com/vocodes-public/media/v/3/v/a/c/v3vacb5910g6vfhjc2aemjghshpq2fs8/videov3vacb5910g6vfhjc2aemjghshpq2fs8mp4",
       hoverVideo:
-        "https://storage.googleapis.com/vocodes-public/media/e/t/3/d/6/et3d68wkewppwmgw5kadmes8yr8whe2z/et3d68wkewppwmgw5kadmes8yr8whe2z.mp4",
+        "https://storage.googleapis.com/vocodes-public/media/a/0/p/5/a/a0p5a0dc021qam59e0pxjtg9sk59mcg2/a0p5a0dc021qam59e0pxjtg9sk59mcg2.mp4",
       onClick: () => {
-        history.push("/studio-intro/m_th523rg3tvax5rceys7s97jgrbbm11");
+        history.push("/studio-intro/m_qsjwkd8ap8mnvskm0dqbf9ewk8dg4m");
       },
     },
   ];
