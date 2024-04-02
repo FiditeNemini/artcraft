@@ -83,6 +83,16 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         history.push("/studio-intro/m_m5vgpxd99dak30t1cw4dsaj4jarhvt");
       },
     },
+    {
+      text: "Forest Fox",
+      defaultVideo:
+        "https://storage.googleapis.com/vocodes-public/media/8/w/5/w/0/8w5w0hs5pfxqbyqpqrzkn93wyqkszb27/video8w5w0hs5pfxqbyqpqrzkn93wyqkszb27mp4",
+      hoverVideo:
+        "https://storage.googleapis.com/vocodes-public/media/k/4/y/w/k/k4ywk99n773aj1s2y2p6f74mqy6j4p9m/k4ywk99n773aj1s2y2p6f74mqy6j4p9m.mp4",
+      onClick: () => {
+        history.push("/studio-intro/m_t0x2avjrv11zkrcbp0tjmqbg9dpk0k");
+      },
+    },
   ];
 
   // DEV CARDS
