@@ -213,8 +213,11 @@ export class TimeLine {
     }
 
     public async deleteKeyFrame(data: any) {
-        console.log(data)
+        let keyframe_uuid = data['data']["keyframe_uuid"];
+        let object_uuid = data['data']['object_uuid'];
+        this.transform_engine.clips[object_uuid].removeKeyframe(keyframe_uuid);
     }
+
     public async updateKeyFrame(data: any) {
         let keyframe_uuid = data['data']["keyframe_uuid"];
         let keyframe_offset = data['data']["offset"];

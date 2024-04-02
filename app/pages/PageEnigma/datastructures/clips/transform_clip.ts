@@ -76,6 +76,10 @@ export class TransformClip {
     });
   }
 
+  public removeKeyframe(keyframe_uuid: string) {
+    this.keyframes = this.keyframes.filter(item => item.keyframe_uuid !== keyframe_uuid);
+  }
+
   step(object: THREE.Object3D, offset: number, frame: number) {
     this.offset = offset;
     this.step_frame = frame - offset;
