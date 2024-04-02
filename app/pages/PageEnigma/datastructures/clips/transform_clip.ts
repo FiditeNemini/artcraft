@@ -100,12 +100,11 @@ export class TransformClip {
 
       let rot_s = currentKeyframe?.rotation;
       let rot_e = nextKeyframe?.rotation;
-      let points_rot = [new THREE.Vector3(rot_s.x, rot_s.y, rot_s.z), new THREE.Vector3(rot_e.x, rot_e.y, rot_e.z)]
-      let curve_rot = new THREE.CatmullRomCurve3(points_rot);
-      let point_rot = curve_rot.getPoint(location);
-      object.rotation.x = point_rot.x;
-      object.rotation.y = point_rot.y;
-      object.rotation.z = point_rot.z;
+      let quat_s = new THREE.Quaternion().setFromEuler(new THREE.Euler(rot_s.x, rot_s.y, rot_s.z));
+      let quat_e = new THREE.Quaternion().setFromEuler(new THREE.Euler(rot_e.x, rot_e.y, rot_e.z));
+      let quaternion = new THREE.Quaternion();
+      quaternion.slerpQuaternions(quat_s, quat_e, location);
+      object.quaternion.copy(quaternion);
 
       let scale_s = currentKeyframe?.scale;
       let scale_e = nextKeyframe?.scale;
