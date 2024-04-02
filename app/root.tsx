@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { CookiesProvider } from "react-cookie";
 import { Transition } from "@headlessui/react";
 import { LinksFunction } from "@remix-run/deno";
 import {
@@ -16,6 +17,7 @@ import baseCss from "./styles/base.css?url";
 import { LoadingDotsBricks } from "~/components";
 import { TopBar } from "./modules/TopBar";
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
+import { AuthenticationProvider, UserInfo } from "./contexts/Authentication";
 
 export const links: LinksFunction = () => [
   {
@@ -66,16 +68,20 @@ export default function App() {
       </head>
       <body className="overflow-hidden bg-ui-background">
         <CompleteTakeoverLoadingScreen isShowing={showLoader}/>
-        <TopBarInnerContext.Provider
-          value={{
-            TopBarInner: topBarInnerComponent,
-            setTopBarInner: setTopBarInnerComponent,
-          }}
-        >
-          <div className="topbar-spacer" />
-          <Outlet />
-          <TopBar />
-        </TopBarInnerContext.Provider>
+        <CookiesProvider defaultSetOptions={{ path: '/' }}>
+          <AuthenticationProvider>
+            <TopBarInnerContext.Provider
+              value={{
+                TopBarInner: topBarInnerComponent,
+                setTopBarInner: setTopBarInnerComponent,
+              }}
+            >
+              <div className="topbar-spacer" />
+              <Outlet />
+              <TopBar />
+            </TopBarInnerContext.Provider>
+          </AuthenticationProvider>
+        </CookiesProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

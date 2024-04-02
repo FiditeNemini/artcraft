@@ -1,10 +1,12 @@
 import { useContext, } from "react";
 import { useLocation } from "@remix-run/react";
-import {
-  faChevronLeft,
-} from "@fortawesome/pro-solid-svg-icons";
+
+import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
+
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
 import { ButtonLink } from "~/components";
+
+import { AuthButtons } from "./AuthButtons";
 
 export const TopBar = () => {
   const currentLocation = useLocation().pathname;
@@ -40,8 +42,7 @@ export const TopBar = () => {
           </div>
 
           <div className="flex justify-end gap-2">
-            <ButtonLink variant="secondary" to='/login'>Login</ButtonLink>
-            <ButtonLink to='/signup'>Sign Up</ButtonLink>
+            <AuthButtons />
           </div>
         </div>
       </nav>
@@ -56,3 +57,4 @@ const TopBarInner = ({currentLocation}:{currentLocation:string}) => {
   }
   return TopBarInner.node;
 };
+
