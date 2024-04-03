@@ -27,13 +27,13 @@ export const ListDropdown = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-brand-secondary py-1 text-base shadow-lg focus:outline-none sm:text-sm">
+          <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-brand-secondary py-1 text-base shadow-lg focus:outline-none sm:text-sm z-10">
             {list.map((item, itemIdx) => (
               <Listbox.Option
                 key={itemIdx}
                 className={({ active }) =>
                   `relative cursor-pointer select-none py-2 pl-10 pr-4  text-white ${
-                    active ? 'bg-brand-secondary-400' : ''
+                    active ? 'text-white' : 'text-gray-400'
                   }`
                 }
                 value={item}
@@ -48,7 +48,7 @@ export const ListDropdown = ({
                       {Object.values(item)[0]}
                     </span>
                     {selected ? (
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-600">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                         <FontAwesomeIcon icon={faCheck} aria-hidden="true"/>
                       </span>
                     ) : null}

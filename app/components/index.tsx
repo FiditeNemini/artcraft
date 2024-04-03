@@ -9,6 +9,7 @@ import { ItemPicker } from "./ItemPicker";
 import { Textarea } from "./Textarea";
 import { TransitionDialogue } from "./TransitionDialogue";
 import { ListDropdown } from "./ListDropdown"
+import { ListSearchDropdown } from "./ListSearchDropdown"
 import { LoadingBar } from "./LoadingBar";
 import { LoadingDots, LoadingDotsBricks, LoadingDotsTyping } from "./LoadingDots";
 
@@ -24,6 +25,7 @@ export {
   Input,
   InputVector,
   ListDropdown,
+  ListSearchDropdown,
   LoadingBar,
   LoadingDots,
   LoadingDotsBricks,

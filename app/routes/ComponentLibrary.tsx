@@ -3,6 +3,8 @@ import {
   Button,
   ButtonLink,
   H1,H2,H3,H4,H5,H6,P,Label,
+  ListDropdown,
+  ListSearchDropdown,
   LoadingBar,
   LoadingDotsTyping,
   LoadingDotsBricks,
@@ -12,6 +14,15 @@ import {
 export default function ComponentLibrary () {
   const [progress, setProgress] = useState(0);
   const loopRef = useRef<NodeJS.Timeout | null>(null);
+
+  const testdata = [
+    { name: 'Wade Cooper' },
+    { name: 'Arlene Mccoy' },
+    { name: 'Devon Webb' },
+    { name: 'Tom Cook' },
+    { name: 'Tanya Fox' },
+    { name: 'Hellen Schmidt' },
+  ]
 
   const pushProgressBar: ()=>void = useCallback(()=>{
     loopRef.current = setInterval(function timer(){
@@ -72,6 +83,12 @@ export default function ComponentLibrary () {
           <ButtonLink to="/">Back to /</ButtonLink>
         </div>
 
+        <div className="flex flex-col gap-2 mb-4 max-w-2xl">
+          <H4>List Dropdowns</H4>
+          <ListDropdown list={testdata}/>
+          <ListSearchDropdown list={testdata}/>
+        </div>
+
         <div className="flex flex-col gap-2 mb-4">
           <H4>Loading Dots</H4>
           <div className="flex gap-2">
@@ -84,7 +101,7 @@ export default function ComponentLibrary () {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 mb-4">
+        <div className="flex flex-col gap-2 mb-4  max-w-2xl">
           <H4>Loading Bar</H4>
           <div className="flex gap-2 items-center">
             <LoadingBar

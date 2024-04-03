@@ -8,6 +8,7 @@ import {
   H5,
   Label,
   ListDropdown,
+  ListSearchDropdown,
   TransitionDialogue,
   Textarea
 } from "~/components";
@@ -43,7 +44,7 @@ export const DialogueTTS = ()=>{
     >
       <div className="flex flex-col">
         <Label className="mb-1">Select a Voice</Label>
-        <ListDropdown list={testdata}/>
+        <ListSearchDropdown  list={testdata}/>
 
         <div className="flex w-full justify-between mt-4">
           <Label>What would you like to say?</Label>
