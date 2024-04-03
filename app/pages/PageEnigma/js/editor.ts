@@ -104,6 +104,8 @@ class Editor {
   positive_prompt: string;
   negative_prompt: string;
   art_style: ArtStyle;
+
+  last_scrub: number;
   // Default params.
   constructor() {
     console.log(
@@ -169,6 +171,7 @@ class Editor {
     this.playback = false;
     this.playback_location = 0;
     this.max_length = 10;
+    this.last_scrub = 0;
     // Audio Engine Test.
 
     this.render_width = 1280;
@@ -509,6 +512,7 @@ class Editor {
       return;
     }
     this.last_selected = this.selected;
+    this.selected = undefined;
     this.control.detach();
     this.activeScene.scene.remove(this.control);
     this.outlinePass.selectedObjects = [];
@@ -840,13 +844,13 @@ class Editor {
 
     if (this.cameraViewControls && this.camera_person_mode) {
       this.cameraViewControls.update(5 * delta_time);
-      if (this.cam_obj) {
-        if (this.timeline.is_playing == false) {
-          this.cam_obj.position.copy(this.camera.position);
-          this.cam_obj.rotation.copy(this.camera.rotation);
-        } else {
+      if(this.cam_obj){
+        if (this.last_scrub != this.timeline.scrubber_frame_position) {
           this.camera.position.copy(this.cam_obj.position);
           this.camera.rotation.copy(this.cam_obj.rotation);
+        } else if(this.timeline.is_playing == false) {
+          this.cam_obj.position.copy(this.camera.position);
+          this.cam_obj.rotation.copy(this.camera.rotation);
         }
       }
     }
@@ -856,9 +860,13 @@ class Editor {
       this.render_camera.rotation.copy(this.cam_obj.rotation);
     }
 
+    this.updateSelectedUI();
+
     if(this.timeline.is_playing){
       this.timeline.update();
     }
+
+    this.last_scrub = this.timeline.scrubber_frame_position;
 
     this.renderScene();
   }
@@ -1283,7 +1291,6 @@ class Editor {
         }
         this.activeScene.selected = this.selected;
 
-        this.updateSelectedUI();
         // this.update_properties()
         this.activeScene.scene.add(this.control);
         this.control.attach(this.selected);
