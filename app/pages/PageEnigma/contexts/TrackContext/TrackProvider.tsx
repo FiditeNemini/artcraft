@@ -126,7 +126,7 @@ export const TrackProvider = ({ children }: Props) => {
       },
       {
         version: 1,
-        media_id: uuid.v4(),
+        media_id: "m_403phjvjkbbaxxbz8y7r6qjay07mfd",
         type: ClipType.AUDIO,
         length: 25,
         name: "Talk",
