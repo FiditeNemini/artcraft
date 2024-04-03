@@ -5,10 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface ListDropdownProps {
   list: {[key: string] : string}[];
+  listDisplayKey?: string;
   onSelect: (val:string)=>void
 }
 export const ListSearchDropdown = ({
-  list, onSelect
+  list, listDisplayKey, onSelect
 }:ListDropdownProps) => {
   const [selected, setSelected] = useState(list[0])
   const [query, setQuery] = useState('')
@@ -26,13 +27,17 @@ export const ListSearchDropdown = ({
   useEffect(()=>{
     onSelect(Object.values(selected)[0]);
   }, [selected]);
+
   return (
     <Combobox value={selected} onChange={setSelected}>
       <div className="relative mt-1">
-        <div className="relative w-full cursor-default overflow-hidden rounded-md text-left shadow-md sm:text-sm">
+        <div className="relative w-full cursor-default rounded-md text-left shadow-md sm:text-sm">
           <Combobox.Input
-            className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 bg-brand-secondary text-white outline-none outline-offset-0 transition-all duration-150 ease-in-out focus:outline-brand-primary"
-            displayValue={(item: {[key: string] : string}) => Object.values(item)[0]}
+            className="w-full border-none rounded-md py-2 pl-3 pr-10 text-sm leading-5 bg-brand-secondary text-white outline-none outline-offset-0 transition-all duration-150 ease-in-out focus:outline-brand-primary"
+            displayValue={(item: {[key: string] : string}) => {
+              if(listDisplayKey) return item[listDisplayKey];
+              else return Object.values(item)[0]
+            }}
             onChange={(event) => setQuery(event.target.value)}
           />
           <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
@@ -52,38 +57,43 @@ export const ListSearchDropdown = ({
                 Nothing found.
               </div>
             ) : (
-              filteredList.map((item, itemIdx) => (
-                <Combobox.Option
-                  key={itemIdx}
-                  className={({ active }) =>
-                    `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
-                      active ? 'text-white' : 'text-gray-400'
-                    }`
-                  }
-                  value={item}
-                >
-                  {({ selected, active }) => (
-                    <>
-                      <span
-                        className={`block truncate ${
-                          selected ? 'font-medium' : 'font-normal'
-                        }`}
-                      >
-                        {Object.values(item)[0]}
-                      </span>
-                      {selected ? (
-                        <span
-                          className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
-                            active ? 'text-white' : 'text-teal-600'
-                          }`}
-                        >
-                          <FontAwesomeIcon icon={faCheck} aria-hidden="true"/>
-                        </span>
-                      ) : null}
-                    </>
-                  )}
-                </Combobox.Option>
-              ))
+              filteredList.map((item, itemIdx) => {
+                if(itemIdx <= 10)
+                  return (
+                    <Combobox.Option
+                      key={itemIdx}
+                      className={({ active }) =>
+                        `relative cursor-pointer select-none py-2 pl-10 pr-4 ${
+                          active ? 'text-white' : 'text-gray-400'
+                        }`
+                      }
+                      value={item}
+                    >
+                      {({ selected, active }) => (
+                        <>
+                          <span
+                            className={`block truncate ${
+                              selected ? 'font-medium' : 'font-normal'
+                            }`}
+                          >
+                            {!listDisplayKey && Object.values(item)[0]}
+                            {listDisplayKey && item[listDisplayKey]}
+                          </span>
+                          {selected ? (
+                            <span
+                              className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
+                                active ? 'text-white' : 'text-teal-600'
+                              }`}
+                            >
+                              <FontAwesomeIcon icon={faCheck} aria-hidden="true"/>
+                            </span>
+                          ) : null}
+                        </>
+                      )}
+                    </Combobox.Option>
+                  );
+                return null;
+              })
             )}
           </Combobox.Options>
         </Transition>

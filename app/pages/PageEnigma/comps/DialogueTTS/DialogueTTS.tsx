@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { faVolume, faShuffle, faPlay } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AppUiContext } from "../../contexts/AppUiContext";
@@ -11,6 +11,7 @@ import {
   TransitionDialogue,
   Textarea
 } from "~/components";
+import { ListTtsModels, TtsModelListItem } from "./utilities";
 
 const testdata = [
   { name: 'Wade Cooper' },
@@ -32,6 +33,28 @@ export const DialogueTTS = ()=>{
     text:"",
     hasAudio:false
   });
+
+  const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
+ 
+
+  const listModels = useCallback(async () => {
+    const ttsModelsLoaded = ttsModels.length > 0;
+    if (ttsModelsLoaded) {
+      return; // Already queried.
+    }
+    const models = await ListTtsModels();
+    if (models) {
+      setTtsModels(models);
+    }
+  }, []);
+
+  useEffect(() => {
+    listModels();
+  }, [listModels]);
+
+  // useEffect(() => {
+  //   console.log(ttsModels);
+  // }, [ttsModels]);
 
   const handleClose = ()=> {
     dispatchAppUiState({
@@ -69,8 +92,12 @@ export const DialogueTTS = ()=>{
     >
       <div className="flex flex-col">
         <Label className="mb-1">Select a Voice</Label>
-        <ListSearchDropdown list={testdata} onSelect={handleOnSelect}/>
-
+        {/* <ListSearchDropdown list={testdata} onSelect={handleOnSelect}/> */}
+        <ListSearchDropdown
+          list={ttsModels}
+          listDisplayKey="title"
+          onSelect={handleOnSelect}
+        />
         <div className="flex w-full justify-between mt-4">
           <Label>What would you like to say?</Label>
           <div className="flex gap-2 items-center">
