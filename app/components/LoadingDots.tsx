@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { Transition } from '@headlessui/react';
 import { twMerge } from 'tailwind-merge';
 

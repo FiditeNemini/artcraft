@@ -37,15 +37,29 @@ export const TrackClips = ({
   const trackType = type ?? style;
 
   function onPointerOver() {
-    if (dragType.value !== trackType) {
-      return;
+    if (dragType.value === "animations") {
+      if (dragType.value !== trackType) {
+        return;
+      }
+    }
+    if (dragType.value === "audio") {
+      if (["lipSync", "audio"].indexOf(trackType) === -1) {
+        return;
+      }
     }
     dropId.value = id;
   }
 
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
-    if (dragType.value !== trackType) {
-      return;
+    if (dragType.value === "animations") {
+      if (dragType.value !== trackType) {
+        return;
+      }
+    }
+    if (dragType.value === "audio") {
+      if (["lipSync", "audio"].indexOf(trackType) === -1) {
+        return;
+      }
     }
     const track = document.getElementById(`track-${trackType}-${id}`);
     if (!track) {

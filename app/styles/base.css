@@ -21,11 +21,11 @@
 body {
   font-family: "Fira Sans", sans-serif;
   color: #fff;
+  color-scheme: dark;
 }
 
 .topbar-spacer {
   height: 68px;
-
   width: 100vw;
 }
 

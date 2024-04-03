@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import {
   faArrowRightArrowLeft,
@@ -8,7 +8,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { AppUiContext } from "../../contexts/AppUiContext";
-import { Button, H4, H5, H6, InputVector } from "~/components";
+import { EngineContext } from "../../contexts/EngineContext";
+import { Button, H5, InputVector } from "~/components";
 
 import { XYZ } from "../../datastructures/common";
 import { ACTION_TYPES } from "../../reducers/appUiReducer/types";
@@ -16,86 +17,137 @@ import { ACTION_TYPES } from "../../reducers/appUiReducer/types";
 import { QueueNames } from "../../Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { toTimelineActions } from "../../Queue/toTimelineActions";
+import { QueueKeyframe } from "~/pages/PageEnigma/models/track";
+
 export const ControlPanelSceneObject = () => {
+  const editorEngine = useContext(EngineContext);
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
 
-  const position = appUiState?.currentSceneObject.objectVectors.position;
-  const rotation = appUiState?.currentSceneObject.objectVectors.rotation;
-  const scalar = appUiState?.currentSceneObject.objectVectors.scale;
+  if (!appUiState.controlPanel.currentSceneObject) {
+    return null;
+  }
+  const position =
+    appUiState.controlPanel.currentSceneObject.objectVectors.position;
+  const rotation =
+    appUiState.controlPanel.currentSceneObject.objectVectors.rotation;
+  const scale = appUiState.controlPanel.currentSceneObject.objectVectors.scale;
+  const currentSceneObject = appUiState.controlPanel.currentSceneObject;
+
+  useEffect(()=>{
+    const vectors = appUiState.controlPanel.currentSceneObject.objectVectors
+    editorEngine?.setSelectedObject(vectors.position, vectors.rotation, vectors.scale)
+  }, [appUiState.controlPanel.currentSceneObject]);
 
   const handlePositionChange = (xyz: XYZ) => {
-    if (appUiState)
-      dispatchAppUiState({
-        type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
-        payload: {
-          currentSceneObject: {
-            objectVectors: {
-              position: { ...xyz },
-              rotation: appUiState.currentSceneObject.objectVectors.rotation,
-              scale: appUiState.currentSceneObject.objectVectors.scale,
-            },
-          },
+    if (!currentSceneObject) {
+      console.log("Missing Scene Object Position");
+      return;
+    }
+
+    dispatchAppUiState({
+      type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
+      payload: {
+        group: currentSceneObject.group,
+        object_uuid: currentSceneObject.object_uuid,
+        object_name: currentSceneObject.object_name,
+        version: currentSceneObject.version,
+        objectVectors: {
+          position: { ...xyz },
+          rotation: appUiState?.controlPanel.currentSceneObject?.objectVectors
+            ?.rotation ?? { x: 0, y: 0, z: 0 },
+          scale: appUiState?.controlPanel.currentSceneObject?.objectVectors
+            ?.scale ?? { x: 0, y: 0, z: 0 },
         },
-      });
+      },
+    });
   };
+
   const handleRotationChange = (xyz: XYZ) => {
-    if (appUiState)
+    if (appUiState) {
+      if (currentSceneObject == null) {
+        console.log("Missing Scene Object Rotation");
+        return;
+      }
+
       dispatchAppUiState({
         type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
         payload: {
-          currentSceneObject: {
-            objectVectors: {
-              position: appUiState.currentSceneObject.objectVectors.position,
-              rotation: { ...xyz },
-              scale: appUiState.currentSceneObject.objectVectors.scale,
-            },
+          group: currentSceneObject.group,
+          object_uuid: currentSceneObject.object_uuid,
+          object_name: currentSceneObject.object_name,
+          version: currentSceneObject.version,
+          objectVectors: {
+            position:
+              appUiState.controlPanel.currentSceneObject.objectVectors.position,
+            rotation: { ...xyz },
+            scale:
+              appUiState.controlPanel.currentSceneObject.objectVectors.scale,
           },
         },
       });
+    }
   };
-  const handleScalarChange = (xyz: XYZ) => {
-    if (appUiState)
+
+  const handleScaleChange = (xyz: XYZ) => {
+    if (appUiState) {
+      if (currentSceneObject == null) {
+        console.log("Missing Scene Object Scale");
+        return;
+      }
       dispatchAppUiState({
         type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
         payload: {
-          currentSceneObject: {
-            objectVectors: {
-              position: appUiState.currentSceneObject.objectVectors.position,
-              rotation: appUiState.currentSceneObject.objectVectors.rotation,
-              scale: { ...xyz },
-            },
+          group: currentSceneObject.group,
+          object_uuid: currentSceneObject.object_uuid,
+          object_name: currentSceneObject.object_name,
+          version: currentSceneObject.version,
+          objectVectors: {
+            position:
+              appUiState.controlPanel.currentSceneObject.objectVectors.position,
+            rotation:
+              appUiState.controlPanel.currentSceneObject.objectVectors.rotation,
+            scale: { ...xyz },
           },
         },
       });
+    }
   };
 
   const handleOnAddKeyFrame = () => {
     if (appUiState) {
-        console.log(`${appUiState.currentSceneObject.objectVectors.position.x}`)
-        console.log(`${appUiState.currentSceneObject.objectVectors.position.y}`)
-        console.log(`${appUiState.currentSceneObject.objectVectors.position.z}`)
+      if (
+        position == null ||
+        rotation == null ||
+        scale == null ||
+        currentSceneObject == null
+      ) {
+        return;
+      }
 
-        console.log(`${appUiState.currentSceneObject.objectVectors.rotation.x}`)
-        console.log(`${appUiState.currentSceneObject.objectVectors.rotation.y}`)
-        console.log(`${appUiState.currentSceneObject.objectVectors.rotation.z}`)
+      Queue.publish({
+        queueName: QueueNames.TO_TIMELINE,
+        action: toTimelineActions.ADD_KEYFRAME,
+        data: {
+          group: currentSceneObject.group,
+          object_uuid: currentSceneObject.object_uuid,
+          object_name: currentSceneObject.object_name,
+          version: 1,
 
-        console.log(`${appUiState.currentSceneObject.objectVectors.scale.x}`)
-        console.log(`${appUiState.currentSceneObject.objectVectors.scale.y}`)
-        console.log(`${appUiState.currentSceneObject.objectVectors.scale.z}`)
-
-        Queue.publish({queueName:QueueNames.TO_TIMELINE, action: toTimelineActions.ADD_KEYFRAME, 
-          data: {  
-            position: appUiState.currentSceneObject.objectVectors.position,
-            rotation: appUiState.currentSceneObject.objectVectors.rotation,
-            scale:appUiState.currentSceneObject.objectVectors.scale
-          }
-        })
+          position: currentSceneObject.objectVectors.position,
+          rotation: currentSceneObject.objectVectors.rotation,
+          scale: currentSceneObject.objectVectors.scale,
+        } as QueueKeyframe,
+      });
     }
+  };
+
+  const handleDeleteObject = () =>{
+    console.log("TELL EDITOR TO DELETE HERE");
   }
 
   return (
     <Transition
-      show={appUiState?.currentSceneObject.isShowing}
+      show={appUiState?.controlPanel.isShowing}
       className="absolute bottom-0 right-0 m-4 flex h-fit w-fit flex-col gap-2 rounded-lg border border-ui-panel-border bg-ui-panel p-4 text-white"
       enter="transition-opacity duration-100"
       enterFrom="opacity-0"
@@ -107,7 +159,7 @@ export const ControlPanelSceneObject = () => {
       <div className="flex justify-between">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube} />
-          <p className="font-semibold">Object Name</p>
+          <p className="font-semibold">{appUiState.controlPanel.currentSceneObject.object_name}</p>
         </div>
         <div className="flex items-center gap-2 text-xs font-medium opacity-60">
           <FontAwesomeIcon icon={faArrowRightArrowLeft} />
@@ -139,21 +191,27 @@ export const ControlPanelSceneObject = () => {
       <div className="flex flex-col gap-1">
         <H5>Scale</H5>
         <InputVector
-          x={scalar?.x || 0}
-          y={scalar?.y || 0}
-          z={scalar?.z || 0}
-          onChange={handleScalarChange}
+          x={scale?.x || 0}
+          y={scale?.y || 0}
+          z={scale?.z || 0}
+          onChange={handleScaleChange}
         />
       </div>
 
       <span className="h-2" />
       <div className="flex gap-2">
-        <Button variant="secondary" 
-        className="grow"
-        onClick={handleOnAddKeyFrame}>
+        <Button
+          variant="secondary"
+          className="grow"
+          onClick={handleOnAddKeyFrame}
+        >
           Add Keyframe (K)
         </Button>
-        <Button variant="secondary" icon={faTrash} />
+        <Button
+          variant="secondary"
+          icon={faTrash}
+          onClick={handleDeleteObject}
+        />
       </div>
     </Transition>
   );

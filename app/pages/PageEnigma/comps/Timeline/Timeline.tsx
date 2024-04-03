@@ -1,62 +1,63 @@
-import { Fragment, useCallback, useContext, useEffect, useState } from "react";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
+import { useCallback, useEffect, useState } from "react";
 import { LowerPanel } from "~/modules/LowerPanel";
-import { Character } from "./Character";
 
 import { Camera } from "./Camera";
 import { Audio } from "./Audio";
-import { Objects } from "./Objects";
-import { useMouseEventsAnimation } from "./utils/useMouseEventsAnimation";
-import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ConfirmationModal } from "~/components/ConfirmationModal";
 import {
-  scale,
-  currentTime,
-  filmLength,
   timelineHeight,
+  deleteAudioClip,
+  deleteCharacterClip,
+  selectedItem,
 } from "~/pages/PageEnigma/store";
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
+import { useSignals } from "@preact/signals-react/runtime";
+import { TimerGrid } from "~/pages/PageEnigma/comps/TimerGrid/TimerGrid";
+import { Scrubber } from "~/pages/PageEnigma/comps/Scrubber/Scrubber";
+import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
+import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
+import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
+import { Clip, Keyframe } from "~/pages/PageEnigma/models/track";
+
+function getItemType(item: Clip | Keyframe | null) {
+  if (!item) {
+    return "";
+  }
+  return (item as Clip).clip_uuid ? "clip" : "keyframe";
+}
 
 export const Timeline = () => {
-  const {
-    characters,
-    objects,
-    selectedClip,
-    deleteCharacterClip,
-    deleteAudioClip,
-    deleteCameraClip,
-  } = useContext(TrackContext);
-  const { onPointerDown, time } = useMouseEventsAnimation();
+  useSignals();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const { deleteKeyframe } = useUpdateKeyframe();
 
   // implement the code to handle incoming messages from the Engine
   useQueueHandler();
-
-  const sectionWidth = 60 * 4 * scale.value;
-  const fullHeight =
-    characters.length * 268 + objects.objects.length * 60 + 300 + 96;
 
   useEffect(() => {
     timelineHeight.value = window.outerHeight * 0.25;
   }, []);
 
-  const onDeleteAsk = useCallback(
-    (event: KeyboardEvent) => {
-      if (["Backspace", "Delete"].indexOf(event.key) > -1 && selectedClip) {
-        setDialogOpen(true);
-      }
-    },
-    [selectedClip],
-  );
-
-  const displayTime = time === -1 ? currentTime.value : time;
+  const onDeleteAsk = useCallback((event: KeyboardEvent) => {
+    if (
+      ["Backspace", "Delete"].indexOf(event.key) > -1 &&
+      selectedItem.value !== null
+    ) {
+      event.stopPropagation();
+      event.preventDefault();
+      setDialogOpen(true);
+    }
+  }, []);
 
   const onDelete = useCallback(() => {
-    deleteCharacterClip(selectedClip!);
-    deleteCameraClip(selectedClip!);
-    deleteAudioClip(selectedClip!);
-  }, [selectedClip, deleteAudioClip, deleteCharacterClip, deleteCameraClip]);
+    if ((selectedItem.value as Clip).clip_uuid) {
+      deleteCharacterClip(selectedItem.value as Clip);
+      deleteAudioClip(selectedItem.value as Clip);
+    } else {
+      deleteKeyframe(selectedItem.value as Keyframe);
+    }
+    selectedItem.value = null;
+  }, [deleteKeyframe]);
 
   useEffect(() => {
     document.addEventListener("keydown", onDeleteAsk);
@@ -69,56 +70,9 @@ export const Timeline = () => {
   return (
     <>
       <LowerPanel>
-        <div
-          className={[
-            "prevent-select mt-4",
-            "flex h-3",
-            "border-t border-t-ui-panel-border",
-            "text-xs text-white opacity-75",
-          ].join(" ")}
-        >
-          {Array(filmLength.value)
-            .fill(0)
-            .map((_, index) => (
-              <Fragment key={index}>
-                <div
-                  className="absolute ps-1 pt-1"
-                  style={{ left: index * sectionWidth + 92 }}
-                >
-                  00:{index < 10 ? "0" + index.toString() : index.toString()}
-                </div>
-                <div
-                  className="absolute block h-full bg-ui-divider"
-                  style={{
-                    width: 1,
-                    left: index * sectionWidth + 88,
-                    height: fullHeight,
-                  }}
-                />
-              </Fragment>
-            ))}
-          <div
-            className="absolute"
-            style={{ left: filmLength.value * sectionWidth + 92 }}
-          >
-            00:
-            {filmLength.value < 10
-              ? "0" + filmLength.value.toString()
-              : filmLength.value.toString()}
-          </div>
-          <div
-            className="absolute block h-full bg-ui-divider"
-            style={{
-              width: 1,
-              left: filmLength.value * sectionWidth + 88,
-              height: fullHeight,
-            }}
-          />
-        </div>
+        <TimerGrid />
         <div className="p-4">
-          {characters.map((character) => (
-            <Character key={character.id} characterId={character.id} />
-          ))}
+          <Characters />
         </div>
         <div className="p-4">
           <Camera />
@@ -126,35 +80,12 @@ export const Timeline = () => {
         <div className="p-4">
           <Audio />
         </div>
-        {objects.objects.length > 0 && (
-          <div className="p-4">
-            <Objects />
-          </div>
-        )}
-        <div
-          className="absolute flex cursor-ew-resize flex-col items-center text-brand-primary"
-          style={{ top: 8, left: displayTime * 4 * scale.value + 84 }}
-          onPointerDown={onPointerDown}
-        >
-          <div>
-            <FontAwesomeIcon
-              icon={faSortDown}
-              className="h-5 text-brand-primary"
-            />
-          </div>
-          <div
-            className="block bg-brand-primary"
-            style={{
-              width: 2,
-              marginTop: -5,
-              height: fullHeight,
-            }}
-          />
-        </div>
+        <ObjectGroups />
+        <Scrubber />
       </LowerPanel>
       <ConfirmationModal
         title="Delete Clip"
-        text="Are you sure you want to delete the selected clip?"
+        text={`Are you sure you want to delete the selected ${getItemType(selectedItem.value)}?`}
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onOk={() => {
