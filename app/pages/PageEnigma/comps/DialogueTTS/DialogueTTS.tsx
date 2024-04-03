@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { faVolume, faShuffle } from "@fortawesome/pro-solid-svg-icons";
+import { faVolume, faShuffle, faPlay } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AppUiContext } from "../../contexts/AppUiContext";
 import { APPUI_ACTION_TYPES } from "../../reducers";
@@ -7,7 +7,6 @@ import {
   Button,
   H5,
   Label,
-  ListDropdown,
   ListSearchDropdown,
   TransitionDialogue,
   Textarea
@@ -21,14 +20,40 @@ const testdata = [
   { name: 'Tanya Fox' },
   { name: 'Hellen Schmidt' },
 ]
-
+type TtsState = {
+  voice: string;
+  text: string;
+  hasAudio: boolean;
+}
 export const DialogueTTS = ()=>{
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
+  const [ttsState, setTtsState] = useState<TtsState>({
+    voice:"",
+    text:"",
+    hasAudio:false
+  });
+
   const handleClose = ()=> {
     dispatchAppUiState({
       type: APPUI_ACTION_TYPES.CLOSE_DIALOGUE_TTS
     })
   };
+
+  const handleTextInput = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  )=>{
+    setTtsState((curr)=>({
+      ...curr,
+      text: e.target.value,
+    }));
+  };
+
+  const handleOnSelect = (val:string)=>{
+    setTtsState((curr)=>({
+      ...curr,
+      voices: val,
+    }));
+  }
 
   return(
     <TransitionDialogue
@@ -44,7 +69,7 @@ export const DialogueTTS = ()=>{
     >
       <div className="flex flex-col">
         <Label className="mb-1">Select a Voice</Label>
-        <ListSearchDropdown  list={testdata}/>
+        <ListSearchDropdown list={testdata} onSelect={handleOnSelect}/>
 
         <div className="flex w-full justify-between mt-4">
           <Label>What would you like to say?</Label>
@@ -55,8 +80,19 @@ export const DialogueTTS = ()=>{
         </div>
         <Textarea
           placeholder="Enter what you want the voice to say here."
+          value={ttsState.text}
+          onChange={handleTextInput}
         />
-
+        <div className="mt-6 flex gap-2">
+          <Button
+            variant={ttsState.hasAudio ? "secondary" : "primary" }
+            disabled={ttsState.text === ""}
+            icon={faPlay}
+            // className="px-6 py-3.5"
+          >
+            Speak
+          </Button>
+        </div>
         <div className="mt-6 flex justify-end gap-2">
           <Button
             type="button"
@@ -68,6 +104,7 @@ export const DialogueTTS = ()=>{
           <Button
             type="button"
             variant="primary"
+            disabled={!ttsState.hasAudio}
             onClick={(e) => {
               console.log("Add to Lip Sync Track Triggered")
             }}

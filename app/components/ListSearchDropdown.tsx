@@ -1,13 +1,14 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { Combobox, Transition } from '@headlessui/react'
 import { faCheck, faChevronDown } from '@fortawesome/pro-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface ListDropdownProps {
   list: {[key: string] : string}[];
+  onSelect: (val:string)=>void
 }
 export const ListSearchDropdown = ({
-  list
+  list, onSelect
 }:ListDropdownProps) => {
   const [selected, setSelected] = useState(list[0])
   const [query, setQuery] = useState('')
@@ -22,6 +23,9 @@ export const ListSearchDropdown = ({
             .includes(query.toLowerCase().replace(/\s+/g, ''))
         )
 
+  useEffect(()=>{
+    onSelect(Object.values(selected)[0]);
+  }, [selected]);
   return (
     <Combobox value={selected} onChange={setSelected}>
       <div className="relative mt-1">

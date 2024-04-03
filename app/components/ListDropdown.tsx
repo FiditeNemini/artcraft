@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { faCheck, faChevronDown } from '@fortawesome/pro-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -6,11 +6,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface ListDropdownProps {
   list: {[key: string] : string}[];
+  onSelect: (val:string)=>void;
 }
 export const ListDropdown = ({
-  list
+  list, onSelect
 }:ListDropdownProps) => {
-  const [selected, setSelected] = useState(list[0])
+  const [selected, setSelected] = useState(list[0]);
+  
+  useEffect(()=>{
+    onSelect(Object.values(selected)[0]);
+  }, [selected]);
 
   return (
     <Listbox value={selected} onChange={setSelected}>
