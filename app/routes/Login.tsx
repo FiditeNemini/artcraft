@@ -4,10 +4,6 @@ import { useCookies } from 'react-cookie';
 import { faKey, faUser } from "@fortawesome/pro-solid-svg-icons";
 
 import { AuthenticationContext } from "~/contexts/Authentication";
-import { CreateSession, GetSession } from '~/contexts/Authentication/utilities'
-import {
-  SessionResponse,
-} from "~/contexts/Authentication/types";
 
 import {
   Button,
@@ -25,7 +21,7 @@ export default function LoginScreen() {
   const [showLoader, setShowLoader] = useState<string|undefined>(undefined);
   const formRef = useRef<HTMLFormElement | null>(null);
   const [authCookies, setAuthCookie, removeAuthCookie] = useCookies(['userInfo']);
-  const [authState, setAuthState] = useContext(AuthenticationContext);
+  const {authState, loginAndGetUserInfo} = useContext(AuthenticationContext);
 
 
   const handleOnSumbit = (ev: React.FormEvent<HTMLFormElement>)=>{
@@ -34,23 +30,9 @@ export default function LoginScreen() {
       const form = new FormData(formRef.current);
       const usernameOrEmail =  form.get("usernameOrEmail")?.toString();
       const password = form.get("password")?.toString();
-      if( usernameOrEmail && password){
+      if( usernameOrEmail && password && loginAndGetUserInfo){
         setShowLoader("Authenticating");
-        CreateSession({usernameOrEmail, password})
-        .then((respond)=>{
-          setShowLoader("Retreiving User Information");
-          GetSession().then((
-            res: SessionResponse
-          )=>{
-            if(res.success && res.user && setAuthState){
-              setAuthCookie('userInfo', res.user);
-              setAuthState({
-                isLoggedIn: true,
-                userInfo: res.user
-              });
-            }
-          });
-        });
+        loginAndGetUserInfo(usernameOrEmail, password);
       }
     }
   }// end handleOnSubmit

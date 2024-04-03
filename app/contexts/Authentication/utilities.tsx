@@ -59,7 +59,7 @@ export const GetSession = async () => {
     };
   });
 }
-export async function DestorySession() : Promise<boolean> {
+export async function DestroySession() : Promise<boolean> {
   return await fetch(logout, {
     method: 'POST',
     headers: {
