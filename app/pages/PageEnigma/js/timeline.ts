@@ -173,12 +173,13 @@ export class TimeLine {
     public async addClip(data: any) {
         let object_uuid = data["data"]["object_uuid"];
 
-        if (object_uuid.length < 6) {
-            object_uuid = this.scene.selected?.uuid; //data['data']['object_uuid'];
-            if (object_uuid == undefined) {
-                return;
-            }
-        }
+        // This is for testing for selected object instead of actual object given by timeline.
+        //if (object_uuid.length < 6) {
+        //    object_uuid = this.scene.selected?.uuid; //data['data']['object_uuid'];
+        //    if (object_uuid == undefined) {
+        //        return;
+        //    }
+        //}
 
         const media_id = data["data"]["media_id"];
         const name = data["data"]["name"];
@@ -209,6 +210,12 @@ export class TimeLine {
             case "transform":
                 this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
                 break;
+            case "audio":
+                this.audio_engine.loadClip(media_id);
+                break;
+            case "lipsync":
+                this.lipSync_engine.load_object(object_uuid, media_id);
+                break;
         }
     }
 
@@ -228,6 +235,33 @@ export class TimeLine {
     public async updateClip(data: any) {
         // only length and offset changes here.
         console.log(data);
+
+        return;
+
+        let object_uuid = data["data"]["object_uuid"];
+
+        const media_id = data["data"]["media_id"];
+        const name = data["data"]["name"];
+        const group = data["data"]["group"];
+        const version = data["data"]["group"];
+        const type = data["data"]["type"];
+        const offset = data["data"]["offset"];
+        const end_offset = data["data"]["length"] + offset;
+
+        switch (type) {
+            case "animation":
+                this.animation_engine.clips[object_uuid]
+                break;
+            //case "transform":
+            //    this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
+            //    break;
+            //case "audio":
+            //    this.audio_engine.loadClip(media_id);
+            //    break;
+            //case "lipsync":
+            //    this.lipSync_engine.load_object(object_uuid, media_id);
+            //    break;
+        }
     }
     public async deleteClip(data: any) {
         console.log(data);
