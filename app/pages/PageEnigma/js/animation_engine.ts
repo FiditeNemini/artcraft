@@ -18,6 +18,8 @@ export class AnimationEngine {
             object_uuid, 
             1.0, 1.0, 
             clip_name);
+        this.clips[object_uuid]._load_animation();
+        
     }
 }
 
