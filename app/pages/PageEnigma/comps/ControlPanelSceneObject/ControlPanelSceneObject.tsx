@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import {
   faArrowRightArrowLeft,
@@ -8,6 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { AppUiContext } from "../../contexts/AppUiContext";
+import { EngineContext } from "../../contexts/EngineContext";
 import { Button, H5, InputVector } from "~/components";
 
 import { XYZ } from "../../datastructures/common";
@@ -17,8 +18,25 @@ import { QueueNames } from "../../Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { toTimelineActions } from "../../Queue/toTimelineActions";
 import { QueueKeyframe } from "~/pages/PageEnigma/models/track";
+
 export const ControlPanelSceneObject = () => {
+  const editorEngine = useContext(EngineContext);
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
+
+  if (!appUiState.controlPanel.currentSceneObject) {
+    return null;
+  }
+  const position =
+    appUiState.controlPanel.currentSceneObject.objectVectors.position;
+  const rotation =
+    appUiState.controlPanel.currentSceneObject.objectVectors.rotation;
+  const scale = appUiState.controlPanel.currentSceneObject.objectVectors.scale;
+  const currentSceneObject = appUiState.controlPanel.currentSceneObject;
+
+  useEffect(()=>{
+    const vectors = appUiState.controlPanel.currentSceneObject.objectVectors
+    editorEngine?.setSelectedObject(vectors.position, vectors.rotation, vectors.scale)
+  }, [appUiState.controlPanel.currentSceneObject]);
 
   const handlePositionChange = (xyz: XYZ) => {
     if (!currentSceneObject) {
@@ -106,23 +124,6 @@ export const ControlPanelSceneObject = () => {
         return;
       }
 
-      // console.log(`Position ${position.x}`)
-      // console.log(`Position ${position.y}`)
-      // console.log(`Position ${position.z}`)
-
-      // console.log(`Rotation ${rotation.x}`)
-      // console.log(`Rotation ${rotation.y}`)
-      // console.log(`Rotation ${rotation.z}`)
-
-      // console.log(`Scale ${scale.x}`)
-      // console.log(`Scale ${scale.y}`)
-      // console.log(`Scale ${scale.z}`)
-
-      console.log(`Group ${currentSceneObject.group}`);
-      console.log(`Object UUID ${currentSceneObject.object_uuid}`);
-      console.log(`Object Name ${currentSceneObject.object_name}`);
-      console.log(`Object Version ${currentSceneObject.version}`);
-
       Queue.publish({
         queueName: QueueNames.TO_TIMELINE,
         action: toTimelineActions.ADD_KEYFRAME,
@@ -140,15 +141,9 @@ export const ControlPanelSceneObject = () => {
     }
   };
 
-  if (!appUiState.controlPanel.currentSceneObject) {
-    return null;
+  const handleDeleteObject = () =>{
+    console.log("TELL EDITOR TO DELETE HERE");
   }
-  const position =
-    appUiState.controlPanel.currentSceneObject.objectVectors.position;
-  const rotation =
-    appUiState.controlPanel.currentSceneObject.objectVectors.rotation;
-  const scale = appUiState.controlPanel.currentSceneObject.objectVectors.scale;
-  const currentSceneObject = appUiState.controlPanel.currentSceneObject;
 
   return (
     <Transition
@@ -164,7 +159,7 @@ export const ControlPanelSceneObject = () => {
       <div className="flex justify-between">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube} />
-          <p className="font-semibold">Object Name</p>
+          <p className="font-semibold">{appUiState.controlPanel.currentSceneObject.object_name}</p>
         </div>
         <div className="flex items-center gap-2 text-xs font-medium opacity-60">
           <FontAwesomeIcon icon={faArrowRightArrowLeft} />
@@ -212,7 +207,11 @@ export const ControlPanelSceneObject = () => {
         >
           Add Keyframe (K)
         </Button>
-        <Button variant="secondary" icon={faTrash} />
+        <Button
+          variant="secondary"
+          icon={faTrash}
+          onClick={handleDeleteObject}
+        />
       </div>
     </Transition>
   );

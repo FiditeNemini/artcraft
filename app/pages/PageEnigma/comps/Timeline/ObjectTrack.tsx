@@ -15,7 +15,7 @@ export const ObjectTrack = () => {
           <TrackKeyFrames
             id={object.object_uuid}
             keyframes={object.keyframes}
-            title="Mask Position/Rotation"
+            title={`${object.name} Position/Rotation`}
             updateKeyframe={updateObject}
             style="objects"
           />

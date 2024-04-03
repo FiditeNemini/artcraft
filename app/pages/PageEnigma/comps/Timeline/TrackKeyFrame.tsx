@@ -1,15 +1,13 @@
 import { Keyframe } from "~/pages/PageEnigma/models/track";
 import { useState } from "react";
-import { scale } from "~/pages/PageEnigma/store";
+import { scale, selectedItem } from "~/pages/PageEnigma/store";
 import { useMouseEventsKeyframe } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsKeyframe";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSortUpDown } from "@fortawesome/pro-solid-svg-icons";
-import { selectedItem } from "~/pages/PageEnigma/store/selectedItem";
 
 interface Props {
   min: number;
   max: number;
-  style: "character" | "camera" | "audio" | "objects";
   keyframe: Keyframe;
   updateKeyframe: (options: { id: string; offset: number }) => void;
 }
@@ -18,7 +16,6 @@ export const TrackKeyFrame = ({
   keyframe,
   min,
   max,
-  style,
   updateKeyframe,
 }: Props) => {
   const [offset, setOffset] = useState(keyframe.offset);
@@ -33,32 +30,19 @@ export const TrackKeyFrame = ({
   const selectedKeyframeId =
     (selectedItem.value as Keyframe | null)?.keyframe_uuid ?? "";
 
-  const classes = [
-    "absolute",
-    keyframe.keyframe_uuid === selectedKeyframeId
-      ? `bg-${style}-selected`
-      : `bg-${style}-clip`,
-  ];
-
   return (
     <button
-      className={[
-        ...classes,
-        "rounded-l-lg",
-        "block h-full",
-        keyframe.keyframe_uuid === selectedKeyframeId
-          ? "border-2 border-white focus-visible:outline-0"
-          : "",
-      ].join(" ")}
+      className={["block rotate-45 cursor-ew-resize", "absolute"].join(" ")}
       style={{
-        width: 15,
-        left: offset * 4 * scale.value,
-        cursor: "w-resize",
+        width: 18,
+        height: 18,
+        backgroundColor:
+          keyframe.keyframe_uuid === selectedKeyframeId ? "#FFDE67" : "#EEEEEE",
+        left: offset * 4 * scale.value - 6,
+        top: 8,
       }}
-      onPointerDown={(event) => onPointerDown(event, "left")}
+      onPointerDown={(event) => onPointerDown(event, "drag")}
       onClick={() => (selectedItem.value = keyframe)}
-    >
-      <FontAwesomeIcon icon={faSortUpDown} />
-    </button>
+    />
   );
 };
