@@ -17,12 +17,18 @@ export const ListSearchDropdown = ({
   const filteredList =
     query === ''
       ? list
-      : list.filter((item) =>
-          Object.values(item)[0]
+      : list.filter((item) =>{
+        if(listDisplayKey)
+          return item[listDisplayKey]
             .toLowerCase()
             .replace(/\s+/g, '')
-            .includes(query.toLowerCase().replace(/\s+/g, ''))
-        )
+            .includes(query.toLowerCase().replace(/\s+/g, ''));
+        
+        return Object.values(item)[0]
+          .toLowerCase()
+          .replace(/\s+/g, '')
+          .includes(query.toLowerCase().replace(/\s+/g, ''));
+        })
 
   useEffect(()=>{
     onSelect(Object.values(selected)[0]);
