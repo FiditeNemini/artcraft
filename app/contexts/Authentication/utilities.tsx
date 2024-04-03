@@ -26,7 +26,6 @@ export const CreateSession = async ({
     headers: {
       "Accept": "application/json",
       "Content-Type": "application/json",
-      'Access-Control-Allow-Origin': '*',
     },
     credentials: 'include',
     body: JSON.stringify(request)
@@ -45,7 +44,6 @@ export const GetSession = async () => {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
-      'Access-Control-Allow-Origin': '*',
     },
     credentials: 'include',
   })
@@ -66,7 +64,6 @@ export async function DestroySession() : Promise<boolean> {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
-      'Access-Control-Allow-Origin': '*',
     },
     credentials: 'include',
   })
