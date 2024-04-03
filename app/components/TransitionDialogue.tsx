@@ -1,12 +1,13 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, ReactNode } from "react";
-
+import { twMerge } from "tailwind-merge";
 export const TransitionDialogue = ({
-  isOpen, title, onClose, children,
+  isOpen, title, onClose, className, children,
 }:{
   isOpen: boolean;
-  title?: string;
+  title?: ReactNode;
   onClose:()=>void;
+  className: string;
   children: ReactNode;
   
 })=>{
@@ -36,7 +37,7 @@ export const TransitionDialogue = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-xl border border-ui-panel-border bg-ui-panel p-5 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className={twMerge("w-full max-w-md transform overflow-hidden rounded-xl border border-ui-panel-border bg-ui-panel p-5 text-left align-middle shadow-xl transition-all", className)}>
                   {title && (
                     <Dialog.Title
                       as="h4"
