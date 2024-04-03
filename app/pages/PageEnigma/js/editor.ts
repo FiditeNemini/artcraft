@@ -344,8 +344,6 @@ class Editor {
       );
     }
 
-    console.log(this.cam_obj);
-
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
       payload: {
@@ -519,7 +517,7 @@ class Editor {
   async _serialize_timeline() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
-    const object: any = await this.activeScene.load_glb(
+    const object: THREE.Object3D = await this.activeScene.load_glb(
       "./resources/models/fox/fox.glb",
     );
 
@@ -649,9 +647,10 @@ class Editor {
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
-    const object: any = await this.activeScene.load_glb(
+    const object: THREE.Object3D = await this.activeScene.load_glb(
       "./resources/models/fox/fox.glb",
     );
+    object.uuid = "CH1";
 
     // Load timeline creates the the clips from the datastructure and loads them in here.
     // load object into the engine for lip syncing

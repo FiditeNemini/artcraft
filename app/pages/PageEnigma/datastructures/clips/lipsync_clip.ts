@@ -47,6 +47,9 @@ export class LipSyncClip {
     this.blendshape_helper = new BlendShapeHelper(0, 0, 0);
     // we might need 3 of these one for each character ...
     this.lipsync = new LipSync();
+
+
+    console.log("Lip!")
   }
 
   // lip sync will be generated through TTS 
@@ -95,6 +98,7 @@ async play(object: THREE.Object3D) {
   if (this.audio_data?.audioBuffer == null) { await this.download_audio(); }
   if (this.lipsync.face == null) {
     this.lipsync = new LipSync(await this._detect_face(object));
+    console.log("Face", this.lipsync.face);
     this.lipsync.startLipSyncFromAudioBuffer(this.audio_data?.audioBuffer);
   }
 }
@@ -107,6 +111,7 @@ stop() {
 step() {
   if (this.lipsync == null) { return; }
   const positions = this.lipsync.update();
+  console.log("Face", this.lipsync.face);
   this.lipsync.face.morphTargetInfluences[this.blendshape_helper.ee] = positions["ee"];
   this.lipsync.face.morphTargetInfluences[this.blendshape_helper.ah] = positions["ah"];
   this.lipsync.face.morphTargetInfluences[this.blendshape_helper.oh] = positions["oh"];

@@ -173,12 +173,13 @@ export class TimeLine {
     public async addClip(data: any) {
         let object_uuid = data["data"]["object_uuid"];
 
-        if (object_uuid.length < 6) {
-            object_uuid = this.scene.selected?.uuid; //data['data']['object_uuid'];
-            if (object_uuid == undefined) {
-                return;
-            }
-        }
+        // This is for testing for selected object instead of actual object given by timeline.
+        //if (object_uuid.length < 6) {
+        //    object_uuid = this.scene.selected?.uuid; //data['data']['object_uuid'];
+        //    if (object_uuid == undefined) {
+        //        return;
+        //    }
+        //}
 
         const media_id = data["data"]["media_id"];
         const name = data["data"]["name"];
@@ -187,6 +188,35 @@ export class TimeLine {
         const type = data["data"]["type"];
         const offset = data["data"]["offset"];
         const end_offset = data["data"]["length"] + offset;
+
+        switch (type) {
+            case "animation":
+                this.animation_engine.load_object(object_uuid, media_id, name);
+                break;
+            case "transform":
+                this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
+                break;
+            case "audio":
+                if (group == "character") {
+                    this.lipSync_engine.load_object(object_uuid, media_id);
+                    // media id for this as well it can be downloaded
+                    this.addPlayableClip(
+                        new ClipUI(
+                            version,
+                            "lipsync",
+                            group,
+                            name,
+                            media_id,
+                            object_uuid,
+                            offset,
+                            end_offset));
+                    return;
+                } else {
+                    console.log("Audio!")
+                    this.audio_engine.loadClip(media_id);
+                }
+                break;
+        }
 
         // media id for this as well it can be downloaded
         this.addPlayableClip(
@@ -201,15 +231,6 @@ export class TimeLine {
                 end_offset,
             ),
         );
-
-        switch (type) {
-            case "animation":
-                this.animation_engine.load_object(object_uuid, media_id, name);
-                break;
-            case "transform":
-                this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
-                break;
-        }
     }
 
     public async deleteKeyFrame(data: any) {
@@ -228,6 +249,18 @@ export class TimeLine {
     public async updateClip(data: any) {
         // only length and offset changes here.
         console.log(data);
+
+        let object_uuid = data["data"]["object_uuid"];
+        const media_id = data["data"]["media_id"];
+        const offset = data["data"]["offset"];
+        const length = data["data"]["length"] + offset;
+
+        for (const element of this.timeline_items) {
+            if (element.media_id == media_id && element.object_uuid == object_uuid) {
+                element.length = length;
+                element.offset = offset;
+            }
+        }
     }
     public async deleteClip(data: any) {
         console.log(data);
