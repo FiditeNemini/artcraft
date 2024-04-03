@@ -1,3 +1,13 @@
+export enum AUTH_STATUS {
+  LOGGED_IN = "logged_in",
+  LOGGING = "logging",
+  LOGGED_OUT = "logged_out",
+}
+
+export type AuthState = {
+  isLoggedIn: boolean;
+  userInfo?: UserInfo;
+}
 export interface UserInfo {
   user_token: string,
   username: string,
@@ -35,7 +45,7 @@ export interface UserInfo {
 }
 
 // Responses from the `/session` endpoint.
-export interface SessionInfoResponse {
+export interface SessionResponse {
   // API call was successful
   success: boolean,
   // Whether the user is logged in

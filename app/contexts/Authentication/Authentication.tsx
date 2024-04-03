@@ -9,38 +9,46 @@ import {
 import { useCookies } from 'react-cookie';
 
 import {
-  SessionInfoResponse,
-  UserInfo,
+  SessionResponse,
+  AuthState,
+  UserInfo
 } from "./types";
 
 import { GetSession } from "./utilities";
 
 export const AuthenticationContext = createContext<[
-  UserInfo | undefined,
-  Dispatch<SetStateAction<UserInfo | undefined>> | undefined
+  AuthState | undefined,
+  Dispatch<SetStateAction<AuthState | undefined>> | undefined
 ]>([
   undefined, undefined
 ]);
 
 export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
   const [authCookies, setAuthCookie, removeAuthCookie] = useCookies(['userInfo']);
-  const [userInfo, setUserInfo] = useState<UserInfo|undefined>(undefined);
+  const [authState, setAuthState] = useState<AuthState | undefined>(undefined);
 
   useEffect(()=>{
-    if(authCookies.userInfo === undefined || authCookies.userInfo === null){
+    console.log(authCookies);
+    console.log(authState);
+    if (authCookies !== undefined && authState===undefined){
       GetSession().then((
-        res: SessionInfoResponse
+        res: SessionResponse
       )=>{
         if(res.success && res.user){ 
           setAuthCookie('userInfo', res.user);
-          setUserInfo(res.user);
+          setAuthState({
+            isLoggedIn: true,
+            userInfo: res.user
+          });
+        }else{
+          removeAuthCookie('userInfo');
         }
       });
     }
   },[]);
 
   return(
-    <AuthenticationContext.Provider value={[userInfo, setUserInfo]}>
+    <AuthenticationContext.Provider value={[authState, setAuthState]}>
       {children}
     </AuthenticationContext.Provider>
   )

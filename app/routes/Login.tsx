@@ -1,10 +1,14 @@
-import { useContext, useRef } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
+import { useNavigate } from "@remix-run/react";
 import { useCookies } from 'react-cookie';
 import { faKey, faUser } from "@fortawesome/pro-solid-svg-icons";
+
+import { AuthenticationContext } from "~/contexts/Authentication";
 import { CreateSession, GetSession } from '~/contexts/Authentication/utilities'
 import {
-  SessionInfoResponse,
+  SessionResponse,
 } from "~/contexts/Authentication/types";
+
 import {
   Button,
   H1,
@@ -12,12 +16,16 @@ import {
   Link,
   P,
 } from '~/components';
-import { AuthenticationContext } from "~/contexts/Authentication";
+
+import { LoadingDots } from "~/components";
 
 export default function LoginScreen() {
+  const navigate = useNavigate();
+
+  const [showLoader, setShowLoader] = useState<string|undefined>(undefined);
   const formRef = useRef<HTMLFormElement | null>(null);
   const [authCookies, setAuthCookie, removeAuthCookie] = useCookies(['userInfo']);
-  const [userInfo, setUserInfo] = useContext(AuthenticationContext);
+  const [authState, setAuthState] = useContext(AuthenticationContext);
 
 
   const handleOnSumbit = (ev: React.FormEvent<HTMLFormElement>)=>{
@@ -27,21 +35,31 @@ export default function LoginScreen() {
       const usernameOrEmail =  form.get("usernameOrEmail")?.toString();
       const password = form.get("password")?.toString();
       if( usernameOrEmail && password){
+        setShowLoader("Authenticating");
         CreateSession({usernameOrEmail, password})
         .then((respond)=>{
+          setShowLoader("Retreiving User Information");
           GetSession().then((
-            res: SessionInfoResponse
+            res: SessionResponse
           )=>{
-            if(res.success && res.user && setUserInfo){
-              console.log(res);
+            if(res.success && res.user && setAuthState){
               setAuthCookie('userInfo', res.user);
-              setUserInfo(res.user);
+              setAuthState({
+                isLoggedIn: true,
+                userInfo: res.user
+              });
             }
           });
         });
       }
     }
-  }
+  }// end handleOnSubmit
+
+  useEffect(()=>{
+    if(authState && authState.isLoggedIn)
+      navigate("/");
+  },[authState]);
+
   return (
     <div
       className="fixed w-full overflow-scroll"
@@ -51,7 +69,7 @@ export default function LoginScreen() {
         <H1 className="text-center">Login to FakeYou</H1>
       </div>
       <div
-        className='bg-ui-panel w-10/12 max-w-2xl mx-auto my-6 rounded-lg p-6 border border-ui-panel-border'
+        className='relative bg-ui-panel w-10/12 max-w-2xl mx-auto my-6 rounded-lg p-6 border border-ui-panel-border overflow-hidden'
       >
         <form ref={formRef} onSubmit={handleOnSumbit}>
           <Input
@@ -78,25 +96,13 @@ export default function LoginScreen() {
           </div>
           <Button>Login</Button>
         </form>
+        <LoadingDots
+          className="absolute top-0 left-0 w-full h-full"
+          isShowing={showLoader !== undefined}
+          message={showLoader}
+          type="bricks"
+        />
       </div>
     </div>
   );
 }
-
-
-// export const action = async ({ request }: ActionFunctionArgs) => {
-//   await auth.authenticate("form", request, {
-//     successRedirect: "/idealenigma",
-//     failureRedirect: "/login",
-//   });
-// };
-
-// type LoaderError = { message: string } | null;
-// export const loader = async ({ request }: LoaderFunctionArgs) => {
-//   await auth.isAuthenticated(request, { successRedirect: "/idealenigma" });
-//   const session = await sessionStorage.getSession(
-//     request.headers.get("Cookie"),
-//   );
-//   const error = session.get(auth.sessionErrorKey) as LoaderError;
-//   return json({ error });
-// };

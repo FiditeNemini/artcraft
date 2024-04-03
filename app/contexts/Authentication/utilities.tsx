@@ -1,35 +1,13 @@
 
 import {
-  SessionInfoResponse,
-  UserInfo,
+  SessionResponse,
 } from "./types";
 
 const apiHost = "https://api.fakeyou.com";
-const createAccount = `${apiHost}}/create_account`;
+// const createAccount = `${apiHost}}/create_account`;
 const login = `${apiHost}/v1/login`;
 const getSession = `${apiHost}/v1/session`;
 const logout = `${apiHost}/v1/logout`;
-
-export const GetSession = async () => {
-  return await fetch(getSession, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-    },
-    credentials: 'include',
-  })
-  .then(res => res.json())
-  .then(res => {
-    const response : SessionInfoResponse = res;
-    return response;
-  })
-  .catch(e => {
-    return {
-      success: false,
-      error_reason: "frontend_error",
-    };
-  });
-}
 
 export const CreateSession = async ({
   usernameOrEmail, password
@@ -59,5 +37,42 @@ export const CreateSession = async ({
       success: false,
       error_reason: "frontend_error",
     };
-  });;
+  });
+}
+export const GetSession = async () => {
+  return await fetch(getSession, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+    },
+    credentials: 'include',
+  })
+  .then(res => res.json())
+  .then(res => {
+    const response : SessionResponse = res;
+    return response;
+  })
+  .catch(e => {
+    return {
+      success: false,
+      error_reason: "frontend_error",
+    };
+  });
+}
+export async function DestorySession() : Promise<boolean> {
+  return await fetch(logout, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+    },
+    credentials: 'include',
+  })
+  .then(res => res.json())
+  .then(res => {
+    const response : SessionResponse = res;
+    return response.success;
+  })
+  .catch(e => {
+    return false;
+  });
 }

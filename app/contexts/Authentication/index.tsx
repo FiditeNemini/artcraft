@@ -1,5 +1,6 @@
 import { AuthenticationContext, AuthenticationProvider } from "./Authentication";
-import { UserInfo } from "./types";
+import { UserInfo, AUTH_STATUS } from "./types";
+
 
 export type { UserInfo };
-export { AuthenticationContext, AuthenticationProvider };
+export { AUTH_STATUS, AuthenticationContext, AuthenticationProvider };
