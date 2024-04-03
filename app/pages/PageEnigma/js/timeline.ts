@@ -236,31 +236,16 @@ export class TimeLine {
         // only length and offset changes here.
         console.log(data);
 
-        return;
-
         let object_uuid = data["data"]["object_uuid"];
-
         const media_id = data["data"]["media_id"];
-        const name = data["data"]["name"];
-        const group = data["data"]["group"];
-        const version = data["data"]["group"];
-        const type = data["data"]["type"];
         const offset = data["data"]["offset"];
-        const end_offset = data["data"]["length"] + offset;
+        const length = data["data"]["length"]+offset;
 
-        switch (type) {
-            case "animation":
-                this.animation_engine.clips[object_uuid]
-                break;
-            //case "transform":
-            //    this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
-            //    break;
-            //case "audio":
-            //    this.audio_engine.loadClip(media_id);
-            //    break;
-            //case "lipsync":
-            //    this.lipSync_engine.load_object(object_uuid, media_id);
-            //    break;
+        for (const element of this.timeline_items) {
+            if (element.media_id == media_id && element.object_uuid == object_uuid) {
+                element.length = length;
+                element.offset = offset;
+            }
         }
     }
     public async deleteClip(data: any) {
