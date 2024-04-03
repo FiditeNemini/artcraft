@@ -1,7 +1,7 @@
 import { Tabs } from "~/modules/Tabs";
 import { TabStylization } from "./TabStylization";
 import { AnimationElements } from "./AnimationElements";
-import { AudioElements } from "~/pages/PageEnigma/comps/SidePanelTabs/AudioElements";
+import { TabAudio } from "~/pages/PageEnigma/comps/SidePanelTabs/TabAudio";
 
 export const SidePanelTabs = () => {
   return (
@@ -17,7 +17,7 @@ export const SidePanelTabs = () => {
         },
         {
           header: "Audio",
-          children: <AudioElements />,
+          children: <TabAudio />,
         },
         {
           header: "Stylization",
