@@ -37,6 +37,7 @@ export const InputVector = ({ x, y, z, onChange }: InputVectorProps) => {
       >
         <input
           className={twMerge(inputCommonClasses, "focus:outline-axis-x")}
+          type="number"
           onChange={handleOnChange}
           ref={xRef}
           value={x}
@@ -50,6 +51,7 @@ export const InputVector = ({ x, y, z, onChange }: InputVectorProps) => {
       >
         <input
           className={twMerge(inputCommonClasses, "focus:outline-axis-y")}
+          type="number"
           onChange={handleOnChange}
           ref={yRef}
           value={y}
@@ -63,6 +65,7 @@ export const InputVector = ({ x, y, z, onChange }: InputVectorProps) => {
       >
         <input
           className={twMerge(inputCommonClasses, "focus:outline-axis-z")}
+          type="number"
           onChange={handleOnChange}
           ref={zRef}
           value={z}

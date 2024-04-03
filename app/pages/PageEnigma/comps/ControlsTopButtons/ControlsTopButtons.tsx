@@ -75,7 +75,7 @@ export const ControlsTopButtons = () => {
         type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
         payload: {
           group: ClipGroup.OBJECT,
-          object_name: "",
+          object_name: "TEST BUTTON",
           object_uuid: "",
           version: "1",
           objectVectors: {
