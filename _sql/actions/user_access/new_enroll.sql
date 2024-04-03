@@ -40,6 +40,7 @@ WHERE username IN (
     'endtimes',
     'fyscott',
     'gateway',
+    'heart_ribbon',
     'jags111',
     'justinjohn0306',
     'lorbach',
