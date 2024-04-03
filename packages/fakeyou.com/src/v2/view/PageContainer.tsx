@@ -94,7 +94,7 @@ import { GenerateSpeechPage } from "./pages/generate_speech/GenerateSpeechPage";
 import VcModelViewPage from "./pages/vc/vc_model_view/VcModelViewPage";
 import VcModelEditPage from "./pages/vc/vc_model_edit/VcModelEditPage";
 import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
-import { StorytellerStudioListPage } from "./pages/storyteller_studio/StorytellerStudioPage";
+// import { StorytellerStudioListPage } from "./pages/storyteller_studio/StorytellerStudioPage";
 import TopNav from "components/layout/TopNav/TopNav";
 import SideNav from "components/layout/SideNav/SideNav";
 import MediaPage from "./pages/media/MediaPage";
@@ -105,7 +105,7 @@ import { VoiceDesignerVoiceEditPage } from "./pages/voice_designer/VoiceDesigner
 import VoiceDesignerUseVoicePage from "./pages/voice_designer/VoiceDesignerUseVoicePage";
 import { PasswordResetEmailPage } from "./pages/password_reset/PasswordResetEmailPage";
 import { PasswordResetVerificationPage } from "./pages/password_reset/PasswordResetVerificationPage";
-import EngineCompositor from "./pages/EngineCompositor/EngineCompositor";
+// import EngineCompositor from "./pages/EngineCompositor/EngineCompositor";
 import InferenceJobsPage from "./pages/inference_jobs_page/InferenceJobsPage";
 import { NewProfilePage } from "./pages/profile/profile_view/NewProfilePage";
 import { ModerationJobControlPage } from "./pages/moderation/job_control/ModerationJobControlPage";
@@ -768,16 +768,16 @@ class PageContainer extends React.Component<
                       enqueueInferenceJob={this.props.enqueueInferenceJob}
                     />
                   </Route>
-
-                  <Route path="/studio/:mediaToken?">
-                    <StorytellerStudioListPage
-                      sessionWrapper={this.props.sessionWrapper}
-                      sessionSubscriptionsWrapper={
-                        this.props.sessionSubscriptionsWrapper
-                      }
-                    />
-                  </Route>
-
+{
+                  // <Route path="/studio/:mediaToken?">
+                  //   <StorytellerStudioListPage
+                  //     sessionWrapper={this.props.sessionWrapper}
+                  //     sessionSubscriptionsWrapper={
+                  //       this.props.sessionSubscriptionsWrapper
+                  //     }
+                  //   />
+                  // </Route>
+}
                   <Route path="/studio-intro/result/:jobToken?">
                     <StudioIntroResultPage
                       sessionWrapper={this.props.sessionWrapper}
@@ -1466,13 +1466,13 @@ class PageContainer extends React.Component<
                       ttsInferenceJobs={this.props.ttsInferenceJobs}
                     />
                   </Route>
-
-                  <Route path="/engine-compositor">
-                    <EngineCompositor
-                      sessionWrapper={this.props.sessionWrapper}
-                    />
-                  </Route>
-
+{
+                  // <Route path="/engine-compositor">
+                  //   <EngineCompositor
+                  //     sessionWrapper={this.props.sessionWrapper}
+                  //   />
+                  // </Route>
+}
                   <Route path="/voice-designer">
                     <VoiceDesignerMainPage />
                   </Route>

@@ -5,7 +5,7 @@ import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import {
   faArrowsTurnToDots,
   faBookOpen,
-  faCameraMovie,
+  // faCameraMovie,
   faCompass,
   faCloudUpload,
   faFilms,
@@ -20,7 +20,7 @@ import {
   faUser,
   faWandMagicSparkles,
   faWaveformLines,
-  faTransporter,
+  // faTransporter,
   faClipboardList,
   faFilm,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -276,35 +276,37 @@ export default function SideNav({
             {t("videoWorkflow")}
           </NavLink>
         </li>
+{
+        // <li>
+        //   <NavLink
+        //     to="/studio"
+        //     activeClassName="active-link"
+        //     onClick={handleNavLinkClick}
+        //   >
+        //     <FontAwesomeIcon
+        //       icon={faCameraMovie}
+        //       className="sidebar-heading-icon"
+        //     />
+        //     Storyteller Studio
+        //     {/* {t("videoStorytellerStudio")} */}
+        //   </NavLink>
+        // </li>
 
-        <li>
-          <NavLink
-            to="/studio"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon
-              icon={faCameraMovie}
-              className="sidebar-heading-icon"
-            />
-            Storyteller Studio
-            {/* {t("videoStorytellerStudio")} */}
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/engine-compositor"
-            activeClassName="active-link"
-            onClick={handleNavLinkClick}
-          >
-            <FontAwesomeIcon
-              icon={faTransporter}
-              className="sidebar-heading-icon"
-            />
-            Engine Compositor
-            {/* {t("videoStorytellerStudio")} */}
-          </NavLink>
-        </li>
+        // <li>
+        //   <NavLink
+        //     to="/engine-compositor"
+        //     activeClassName="active-link"
+        //     onClick={handleNavLinkClick}
+        //   >
+        //     <FontAwesomeIcon
+        //       icon={faTransporter}
+        //       className="sidebar-heading-icon"
+        //     />
+        //     Engine Compositor
+        //     {/* {t("videoStorytellerStudio")} */}
+        //   </NavLink>
+        // </li>
+        }
       </>
     );
   }
