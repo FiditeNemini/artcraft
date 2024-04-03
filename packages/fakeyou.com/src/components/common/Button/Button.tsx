@@ -23,12 +23,13 @@ export default function Button({
   disabled,
   isLoading = false,
   isActive,
+  type = "button",
   ...rest
 }: ButtonProps) {
   let variant = variantProps;
-  if(isActive !== undefined){
-    if(isActive) variant = "primary"
-    else variant = "secondary"
+  if (isActive !== undefined) {
+    if (isActive) variant = "primary";
+    else variant = "secondary";
   }
   let iconMarginClass = !square && label ? (iconFlip ? "ms-2" : "me-2") : "";
   let IconComponent = icon ? (
@@ -90,7 +91,7 @@ export default function Button({
       {ButtonContent}
     </a>
   ) : (
-    <button {...{ ...commonProps, ...rest, type: "button", ref: buttonRef }}>
+    <button {...{ ...commonProps, ...rest, type: type, ref: buttonRef }}>
       {ButtonContent}
     </button>
   );

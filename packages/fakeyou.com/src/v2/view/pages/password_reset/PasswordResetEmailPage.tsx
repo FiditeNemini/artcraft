@@ -9,7 +9,8 @@ import { Button } from "components/common";
 import Panel from "components/common/Panel";
 import { faEnvelope } from "@fortawesome/pro-solid-svg-icons";
 import {
-  RequestResetPassword, RequestResetPasswordIsSuccess,
+  RequestResetPassword,
+  RequestResetPasswordIsSuccess,
 } from "@storyteller/components/src/api/user/RequestResetPassword";
 import { useSession } from "hooks";
 
@@ -26,16 +27,18 @@ function PasswordResetEmailPage(props: Props) {
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [isSent, setIsSent] = useState(false);
 
-  if (user) { history.push("/"); }
-
-  const handleChange = (
-    ev: React.FormEvent<HTMLInputElement>
-  ) => {
-    const value = (ev.target as HTMLInputElement).value;
-    setEmailOrUsername(value);
+  if (user) {
+    history.push("/");
   }
 
-  const onSubmit = async ( ev: any ) : Promise<boolean> => {
+  const handleChange = (ev: React.FormEvent<HTMLInputElement>) => {
+    const value = (ev.target as HTMLInputElement).value;
+    setEmailOrUsername(value);
+  };
+
+  const onSubmit = async (
+    ev: React.FormEvent<HTMLFormElement>
+  ): Promise<boolean> => {
     ev.preventDefault();
 
     const value = emailOrUsername.trim();
@@ -45,7 +48,7 @@ function PasswordResetEmailPage(props: Props) {
     }
 
     const request = {
-      username_or_email: value 
+      username_or_email: value,
     };
 
     RequestResetPassword(request).then((res: any) => {
@@ -55,21 +58,21 @@ function PasswordResetEmailPage(props: Props) {
     });
 
     return false;
-  }
+  };
 
   if (isSent) {
     return (
-    <Container type="panel" className="login-panel">
-      <PageHeader
-        title="Password Reset Sent"
-        subText="If you entered a valid email or username, an email with instructions to reset your password has been sent your way. "
-        panel={false}
-        showBackButton={true}
-      />
-      <Link to={"/password-reset/verify"}>
-        Click here once you have the code.
-      </Link>
-    </Container>
+      <Container type="panel" className="login-panel">
+        <PageHeader
+          title="Password Reset Sent"
+          subText="If you entered a valid email or username, an email with instructions to reset your password has been sent your way. "
+          panel={false}
+          showBackButton={true}
+        />
+        <Link to={"/password-reset/verify"}>
+          Click here once you have the code.
+        </Link>
+      </Container>
     );
   }
 
