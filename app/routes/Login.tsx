@@ -32,7 +32,12 @@ export default function LoginScreen() {
       const password = form.get("password")?.toString();
       if( usernameOrEmail && password && loginAndGetUserInfo){
         setShowLoader("Authenticating");
-        loginAndGetUserInfo(usernameOrEmail, password);
+        loginAndGetUserInfo(
+          usernameOrEmail,
+          password,
+          ()=>{
+            setShowLoader(undefined);
+        });
       }
     }
   }// end handleOnSubmit

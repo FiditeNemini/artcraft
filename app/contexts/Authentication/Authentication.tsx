@@ -20,7 +20,11 @@ export const AuthenticationContext = createContext<{
   authState?: AuthState,
   setAuthState?: Dispatch<SetStateAction<AuthState | undefined>>,
   persistLoginOrOut?: ()=>void,
-  loginAndGetUserInfo?: (usernameOrEmail: string, password:string)=>void;
+  loginAndGetUserInfo?: (
+    usernameOrEmail: string,
+    password:string,
+    failureCallback?:()=>void
+  )=>void;
   logout?: ()=>void;
 }>({});
 
@@ -44,7 +48,7 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
     });
   }, []);
 
-  const loginAndGetUserInfo = (usernameOrEmail: string, password:string)=>{
+  const loginAndGetUserInfo = (usernameOrEmail: string, password:string, failureCallback?:()=>void)=>{
     CreateSession({usernameOrEmail, password})
       .then((respond)=>{
         GetSession().then((
@@ -56,6 +60,8 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
               isLoggedIn: true,
               userInfo: res.user
             });
+          }else{
+            if(failureCallback) failureCallback();
           }
         });
       });
