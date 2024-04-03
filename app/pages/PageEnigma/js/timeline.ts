@@ -172,15 +172,6 @@ export class TimeLine {
 
     public async addClip(data: any) {
         let object_uuid = data["data"]["object_uuid"];
-
-        // This is for testing for selected object instead of actual object given by timeline.
-        //if (object_uuid.length < 6) {
-        //    object_uuid = this.scene.selected?.uuid; //data['data']['object_uuid'];
-        //    if (object_uuid == undefined) {
-        //        return;
-        //    }
-        //}
-
         const media_id = data["data"]["media_id"];
         const name = data["data"]["name"];
         const group = data["data"]["group"];
