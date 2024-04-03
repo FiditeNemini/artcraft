@@ -189,6 +189,35 @@ export class TimeLine {
         const offset = data["data"]["offset"];
         const end_offset = data["data"]["length"] + offset;
 
+        switch (type) {
+            case "animation":
+                this.animation_engine.load_object(object_uuid, media_id, name);
+                break;
+            case "transform":
+                this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
+                break;
+            case "audio":
+                if (group == "character") {
+                    this.lipSync_engine.load_object(object_uuid, media_id);
+                    // media id for this as well it can be downloaded
+                    this.addPlayableClip(
+                        new ClipUI(
+                            version,
+                            "lipsync",
+                            group,
+                            name,
+                            media_id,
+                            object_uuid,
+                            offset,
+                            end_offset));
+                    return;
+                } else {
+                    console.log("Audio!")
+                    this.audio_engine.loadClip(media_id);
+                }
+                break;
+        }
+
         // media id for this as well it can be downloaded
         this.addPlayableClip(
             new ClipUI(
@@ -202,21 +231,6 @@ export class TimeLine {
                 end_offset,
             ),
         );
-
-        switch (type) {
-            case "animation":
-                this.animation_engine.load_object(object_uuid, media_id, name);
-                break;
-            case "transform":
-                this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
-                break;
-            case "audio":
-                this.audio_engine.loadClip(media_id);
-                break;
-            case "lipsync":
-                this.lipSync_engine.load_object(object_uuid, media_id);
-                break;
-        }
     }
 
     public async deleteKeyFrame(data: any) {
@@ -239,7 +253,7 @@ export class TimeLine {
         let object_uuid = data["data"]["object_uuid"];
         const media_id = data["data"]["media_id"];
         const offset = data["data"]["offset"];
-        const length = data["data"]["length"]+offset;
+        const length = data["data"]["length"] + offset;
 
         for (const element of this.timeline_items) {
             if (element.media_id == media_id && element.object_uuid == object_uuid) {
