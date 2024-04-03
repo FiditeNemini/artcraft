@@ -10,6 +10,7 @@ import { Controls3D } from "./comps/Controls3D";
 import { ControlsTopButtons } from "./comps/ControlsTopButtons";
 import { ControlsVideo } from "./comps/ControlsVideo";
 import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
+import { DialogueTTS } from "./comps/DialogueTTS/DialogueTTS";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { ViewSideBySide } from "./comps/ViewSideBySide";
 import { SidePanelTabs } from "./comps/SidePanelTabs";
@@ -72,6 +73,7 @@ export const PageEnigmaComponent = () => {
                 <PreviewEngineCamera />
                 <ControlsVideo />
                 <ControlPanelSceneObject />
+                <DialogueTTS />
               </div>
             </div>
             {appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE && (

@@ -1,113 +1,22 @@
 import { useContext, useState } from "react";
-import { Button, Input } from "~/components";
+import { Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
-import { AppUiContext } from "../../contexts/AppUiContext";
 import { EngineContext } from "../../contexts/EngineContext";
-import { APPUI_ACTION_TYPES } from "../../reducers";
-import { ClipGroup } from "~/pages/PageEnigma/models/track";
+
+import { TestFeaturesButtons } from "./TestFeaturesButtons";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
-  const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
+
   const [sceneName, setSceneName] = useState<string>("");
   const [sceneToken, setSceneToken] = useState<string>("");
 
   const handleButtonSave = () => {
-    console.log(`SceneName is ${sceneName}`);
     editorEngine?.saveScene(sceneName);
   };
 
   const handleButtonLoadScene = () => {
-    console.log(`Scene Token is ${sceneToken}`);
     editorEngine?.loadScene(sceneToken);
-  };
-
-  const handleButtonTest = () => {
-    editorEngine?.testStylizeRequest();
-
-    // if(appUiState?.showEditorLoadingBar.isShowing){
-    //TO GO TO A HUNDRED AND DISAPPER
-    // dispatchAppUiState({
-    //   type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
-    //   payload:{
-    //     showEditorLoadingBar: {
-    //       progress: 100,
-    //     }
-    //   }
-    // });
-    // setTimeout(() => {
-    //   dispatchAppUiState({
-    //     type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADINGBAR,
-    //   });
-    // }, 1000);
-    //END :TO GO TO A HUNDRED AND DISAPPER
-
-    //EAMPLE OF CHANING LOADING MESSAGE
-    //  dispatchAppUiState({
-    //   type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
-    //   payload:{
-    //     showEditorLoadingBar: {
-    //       message: "new message",
-    //     }
-    //   }
-    // });
-    // }else{
-    //   dispatchAppUiState({
-    //     type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADINGBAR,
-    //     payload:{
-    //       showEditorLoadingBar: {
-    //         message: 'display of LoadingBar triggered by Test Button',
-    //         progress: 10,
-    //       }
-    //     }
-
-    //   });
-    //}
-  };
-
-  const handleObjectPanelTest = () => {
-    if (appUiState?.controlPanel.isShowing) {
-      dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
-      });
-    } else {
-      dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
-        payload: {
-          group: ClipGroup.OBJECT,
-          object_name: "TEST BUTTON",
-          object_uuid: "",
-          version: "1",
-          objectVectors: {
-            position: { x: 1, y: 2, z: 3 },
-            rotation: { x: 4, y: 5, z: 6 },
-            scale: { x: 7, y: 8, z: 9 },
-          },
-        },
-      });
-    }
-  };
-
-  const handleButtonCameraView = () => {
-    editorEngine?.switchCameraView();
-  };
-  const handleButtonPlayBack = () => {
-    editorEngine?.startPlayback();
-  };
-  const handleButtonRender = () => {
-    editorEngine?.generateVideo();
-  };
-
-  const handleButtonTakeFrame = () => {
-    editorEngine?.take_timeline_cam_clip();
-  };
-
-  const handleButtonLoad = () => {
-    console.log("LOADING");
-  };
-
-  const handleButtonSingleFrame = () => {
-    editorEngine?.generateFrame();
   };
 
   return (
@@ -166,32 +75,7 @@ export const ControlsTopButtons = () => {
           <p>Ask Wil about React</p>
         </ButtonDialogue>
       </div>
-
-      <div className="flex gap-2">
-        <Button variant="secondary" onClick={handleButtonCameraView}>
-          Toggle Camera View
-        </Button>
-        <Button
-          onClick={handleObjectPanelTest}
-          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
-        >
-          Show Object Panel
-        </Button>
-      </div>
-      <div className="flex gap-2">
-        <Button onClick={handleButtonSingleFrame}>Render Single Frame</Button>
-        <Button onClick={handleButtonTakeFrame}>Take Frame</Button>
-        <Button onClick={handleButtonRender}>Render</Button>
-        {/* <Button onClick={handleButtonLoad}>Load</Button>
-        <Button onClick={handleButtonRender}>Render</Button> */}
-        <Button
-          onClick={handleButtonTest}
-          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
-          style={{ zIndex: 9001 }}
-        >
-          Test
-        </Button>
-      </div>
+      <TestFeaturesButtons />
     </div>
   );
 };
