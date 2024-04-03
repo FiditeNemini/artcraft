@@ -7,9 +7,19 @@ import {
   Button,
   H5,
   Label,
+  ListDropdown,
   TransitionDialogue,
   Textarea
 } from "~/components";
+
+const testdata = [
+  { name: 'Wade Cooper' },
+  { name: 'Arlene Mccoy' },
+  { name: 'Devon Webb' },
+  { name: 'Tom Cook' },
+  { name: 'Tanya Fox' },
+  { name: 'Hellen Schmidt' },
+]
 
 export const DialogueTTS = ()=>{
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
@@ -31,9 +41,11 @@ export const DialogueTTS = ()=>{
       isOpen={appUiState.diagloueTts.isOpen}
       onClose={handleClose}
     >
-      <>
-        <Label>Select a Voice</Label>
-        <div className="flex w-full justify-between">
+      <div className="flex flex-col">
+        <Label className="mb-1">Select a Voice</Label>
+        <ListDropdown list={testdata}/>
+
+        <div className="flex w-full justify-between mt-4">
           <Label>What would you like to say?</Label>
           <div className="flex gap-2 items-center">
             <FontAwesomeIcon className="text-brand-primary" icon={faShuffle}/>
@@ -41,6 +53,7 @@ export const DialogueTTS = ()=>{
           </div>
         </div>
         <Textarea
+          placeholder="Enter what you want the voice to say here."
         />
 
         <div className="mt-6 flex justify-end gap-2">
@@ -61,7 +74,7 @@ export const DialogueTTS = ()=>{
             Add to Lip Sync Track
           </Button>
         </div>
-      </>
+      </div>
     </TransitionDialogue>
   );
 };
