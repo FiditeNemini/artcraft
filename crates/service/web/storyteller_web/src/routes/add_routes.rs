@@ -8,6 +8,7 @@ use actix_helpers::route_builder::RouteBuilder;
 use billing_component::default_routes::add_suggested_stripe_billing_routes;
 use reusable_types::server_environment::ServerEnvironment;
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
+use users_component::endpoints::create_account_handler::create_account_handler;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
 
@@ -312,8 +313,14 @@ fn add_tts_routes<T, B> (app: App<T>) -> App<T>
         InitError = (),
       >,
 {
-  app.service(
-  web::scope("/tts")
+  // NB(bt,2024-04-03): Newer /v1/tts/* routes don't have public use, but we'll start using it
+  app.service(web::resource("/v1/tts/inference")
+      .route(web::post().to(enqueue_infer_tts_handler))
+      .route(web::head().to(|| HttpResponse::Ok()))
+  )
+  // NB(bt,2024-04-03): Older root /tts/* routes should be drained of traffic. They are used in the Twitch Streamer API though.
+  .service(
+    web::scope("/tts")
       .service(
         web::resource("/upload")
             .route(web::post().to(upload_tts_model_handler))

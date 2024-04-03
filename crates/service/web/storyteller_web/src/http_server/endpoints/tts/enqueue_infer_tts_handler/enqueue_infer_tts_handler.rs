@@ -13,6 +13,7 @@ use log::{info, warn};
 use r2d2_redis::redis::Commands;
 use rand::Rng;
 use rand::seq::SliceRandom;
+use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_job_type::InferenceJobType;
@@ -64,7 +65,7 @@ const USER_NEWS_STORY_USER_TOKEN : &str = "U:XAWRARC1N89X6";
 /// Safety guard against plans supporting too lengthy TTS inference text.
 const MAX_TTS_LENGTH : usize = 10_000;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct InferTtsRequest {
   uuid_idempotency_token: String,
   tts_model_token: String,
@@ -73,7 +74,7 @@ pub struct InferTtsRequest {
   is_storyteller_demo: Option<bool>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct InferTtsSuccessResponse {
   pub success: bool,
   pub inference_job_token: String,
@@ -82,7 +83,7 @@ pub struct InferTtsSuccessResponse {
 }
 
 /// Tell the frontend how to deal with the tts queue.
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub enum InferenceJobTokenType {
   /// Legacy TTS inference job
   #[serde(rename = "legacy_tts")]
@@ -94,7 +95,7 @@ pub enum InferenceJobTokenType {
   Generic,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum InferTtsError {
   BadInput(String),
   NotAuthorized,
@@ -134,6 +135,22 @@ impl fmt::Display for InferTtsError {
   }
 }
 
+#[utoipa::path(
+  post,
+  path = "/v1/tts/inference",
+  responses(
+  (
+    status = 200,
+    description = "Success response",
+    body = InferTtsSuccessResponse,
+  ),
+    (status = 400, description = "Bad input", body = InferTtsError),
+    (status = 401, description = "Not authorized", body = InferTtsError),
+    (status = 429, description = "Rate limited", body = InferTtsError),
+    (status = 500, description = "Server error", body = InferTtsError)
+  ),
+  params(("request" = InferTtsRequest, description = "Payload for Request"))
+)]
 pub async fn enqueue_infer_tts_handler(
   http_request: HttpRequest,
   request: web::Json<InferTtsRequest>,

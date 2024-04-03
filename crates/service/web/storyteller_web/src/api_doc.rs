@@ -39,6 +39,7 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
 use crate::http_server::endpoints::media_files::batch_get_media_files_handler::*;
 use crate::http_server::endpoints::media_files::change_media_file_visibility_handler::*;
+use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::*;
 use crate::http_server::endpoints::media_files::delete_media_file::*;
 use crate::http_server::endpoints::media_files::get_media_file::*;
 use crate::http_server::endpoints::media_files::list::list_featured_media_files::*;
@@ -93,6 +94,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::rename_media_file_handler::rename_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::upload_media_file_handler,
+    crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler,
     crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::upload_video_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_write::write_engine_asset::write_engine_asset_media_file_handler::write_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_write::write_scene_file::write_scene_file_media_file_handler::write_scene_file_media_file_handler,
@@ -168,6 +170,10 @@ use crate::http_server::web_utils::response_success_helpers::*;
     BatchGetUserBookmarksError,
     BatchGetUserBookmarksQueryParams,
     BatchGetUserBookmarksResponse,
+    InferTtsSuccessResponse,
+    InferTtsRequest,
+    InferenceJobTokenType,
+    InferTtsError,
     BatchGetUserRatingError,
     BatchGetUserRatingQueryParams,
     BatchGetUserRatingResponse,
