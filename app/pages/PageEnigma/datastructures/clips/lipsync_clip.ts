@@ -89,10 +89,6 @@ export class LipSyncClip {
           }
         }
       });
-      console.log("")
-      console.log("")
-      console.log("")
-
     });
   }
 
@@ -101,7 +97,6 @@ export class LipSyncClip {
     if (this.audio_data?.audioBuffer == null) { await this.download_audio(); }
     if (this.lipsync.face == null) {
       this.lipsync = new LipSync(await this._detect_face(object));
-      console.log("Face", this.lipsync.face);
       this.lipsync.startLipSyncFromAudioBuffer(this.audio_data?.audioBuffer);
     }
   }
@@ -112,7 +107,6 @@ export class LipSyncClip {
   }
 
   setBlends(ah: number, ee: number, oh: number) {
-    console.log("ElementS")
     this.faces.forEach((element: THREE.Mesh) => {
       if (element.morphTargetInfluences) {
         element.morphTargetInfluences[this.blendshape_helper.ee] = ee;
@@ -125,7 +119,6 @@ export class LipSyncClip {
   step() {
     if (this.lipsync == null) { return; }
     const positions = this.lipsync.update();
-    console.log("Face", this.lipsync.face);
     this.setBlends(positions["ee"], positions["ah"], positions["oh"]);
   }
 
