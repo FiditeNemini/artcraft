@@ -3,6 +3,7 @@ import { AnimationElement } from "./AnimationElement";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { useSignals } from "@preact/signals-react/runtime";
 import { timelineHeight } from "~/pages/PageEnigma/store";
+import { ClipType } from "~/pages/PageEnigma/models/track";
 
 export const AnimationElements = () => {
   const { animationClips } = useContext(TrackContext);
@@ -17,7 +18,11 @@ export const AnimationElements = () => {
     <div className="flex flex-wrap gap-3 overflow-y-auto" style={{ height }}>
       {animationClips.map((clip) => {
         return (
-          <AnimationElement key={clip.media_id} clip={clip} type="animations" />
+          <AnimationElement
+            key={clip.media_id}
+            clip={clip}
+            type={ClipType.ANIMATION}
+          />
         );
       })}
     </div>

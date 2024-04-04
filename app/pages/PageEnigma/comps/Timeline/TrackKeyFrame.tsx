@@ -1,28 +1,21 @@
 import { Keyframe } from "~/pages/PageEnigma/models/track";
 import { useState } from "react";
-import { scale, selectedItem } from "~/pages/PageEnigma/store";
+import { filmLength, scale, selectedItem } from "~/pages/PageEnigma/store";
 import { useMouseEventsKeyframe } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsKeyframe";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSortUpDown } from "@fortawesome/pro-solid-svg-icons";
+import { useSignals } from "@preact/signals-react/runtime";
 
 interface Props {
-  min: number;
-  max: number;
   keyframe: Keyframe;
   updateKeyframe: (options: { id: string; offset: number }) => void;
 }
 
-export const TrackKeyFrame = ({
-  keyframe,
-  min,
-  max,
-  updateKeyframe,
-}: Props) => {
+export const TrackKeyFrame = ({ keyframe, updateKeyframe }: Props) => {
+  useSignals();
   const [offset, setOffset] = useState(keyframe.offset);
   const { onPointerDown } = useMouseEventsKeyframe({
     keyframe,
-    max,
-    min,
+    max: filmLength.value * 60,
+    min: 0,
     updateKeyframe,
     setOffset,
   });

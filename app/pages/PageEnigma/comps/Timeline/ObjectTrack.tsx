@@ -1,5 +1,6 @@
 import { fullWidth, objectGroup, updateObject } from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
+import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 export const ObjectTrack = () => {
   return (
@@ -17,7 +18,7 @@ export const ObjectTrack = () => {
             keyframes={object.keyframes}
             title={`${object.name} Position/Rotation`}
             updateKeyframe={updateObject}
-            style="objects"
+            group={ClipGroup.OBJECT}
           />
         </div>
       ))}

@@ -15,16 +15,24 @@ export const objectGroup = signal<ObjectGroup>({
 });
 
 export function updateObject({ id, offset }: { id: string; offset: number }) {
-  const oldObject = objectGroup.value;
+  const oldObjectGroup = objectGroup.value;
+  const obj = oldObjectGroup.objects.find((objectTrack) =>
+    objectTrack.keyframes.some((row) => row.keyframe_uuid === id),
+  );
+
+  if (obj && obj.keyframes.some((row) => row.offset === offset)) {
+    return;
+  }
+
   objectGroup.value = {
-    id: oldObject.id,
-    objects: oldObject.objects.map((object) => ({
+    id: oldObjectGroup.id,
+    objects: oldObjectGroup.objects.map((object) => ({
       object_uuid: object.object_uuid,
       name: object.name,
-      keyframes: object.keyframes.map((keyFrame) => {
-        if (keyFrame.keyframe_uuid !== id) {
+      keyframes: object.keyframes.map((keyframe) => {
+        if (keyframe.keyframe_uuid !== id) {
           return {
-            ...keyFrame,
+            ...keyframe,
           };
         }
 
@@ -32,13 +40,13 @@ export function updateObject({ id, offset }: { id: string; offset: number }) {
           queueName: QueueNames.TO_ENGINE,
           action: toEngineActions.UPDATE_KEYFRAME,
           data: {
-            ...keyFrame,
+            ...keyframe,
             offset,
           },
         });
 
         return {
-          ...keyFrame,
+          ...keyframe,
           offset,
         };
       }),
@@ -51,6 +59,10 @@ export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
   const obj = oldObjectGroup.objects.find(
     (row) => row.object_uuid === keyframe.object_uuid,
   );
+
+  if (obj && obj.keyframes.some((row) => row.offset === offset)) {
+    return;
+  }
 
   const newObject = obj ?? {
     object_uuid: keyframe.object_uuid,
@@ -69,19 +81,16 @@ export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
     selected: false,
   } as Keyframe;
   newObject.keyframes.push(newKeyframe);
-  console.log(newObject);
+
   newObject.keyframes.sort(
     (keyframeA, keyframeB) => keyframeA.offset - keyframeB.offset,
   );
 
   objectGroup.value = {
     ...oldObjectGroup,
-    objects: [
-      ...oldObjectGroup.objects.filter(
-        (object) => object.object_uuid !== keyframe.object_uuid,
-      ),
-      newObject,
-    ].sort((objA, objB) => (objA.object_uuid < objB.object_uuid ? -1 : 1)),
+    objects: [...oldObjectGroup.objects, newObject].sort((objA, objB) =>
+      objA.object_uuid < objB.object_uuid ? -1 : 1,
+    ),
   };
   Queue.publish({
     queueName: QueueNames.TO_ENGINE,

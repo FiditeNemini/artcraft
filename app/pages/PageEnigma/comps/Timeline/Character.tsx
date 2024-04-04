@@ -7,10 +7,11 @@ import {
   updateCharacters,
 } from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 
 function buildUpdaters(
   updateCharacters: (options: {
-    type: "animations" | "positions" | "lipSync";
+    type: ClipType;
     id: string;
     length: number;
     offset: number;
@@ -21,17 +22,17 @@ function buildUpdaters(
     length: number;
     offset: number;
   }) {
-    updateCharacters({ ...options, type: "animations" });
+    updateCharacters({ ...options, type: ClipType.ANIMATION });
   }
   function updateClipPosition(options: { id: string; offset: number }) {
-    updateCharacters({ ...options, length: 0, type: "positions" });
+    updateCharacters({ ...options, length: 0, type: ClipType.TRANSFORM });
   }
   function updateClipLipSync(options: {
     id: string;
     length: number;
     offset: number;
   }) {
-    updateCharacters({ ...options, type: "lipSync" });
+    updateCharacters({ ...options, type: ClipType.AUDIO });
   }
   return { updateClipLipSync, updateClipPosition, updateClipAnimations };
 }
@@ -68,15 +69,15 @@ export const Character = ({ characterId }: Props) => {
           clips={animationClips}
           title="Animation"
           updateClip={updateClipAnimations}
-          style="character"
-          type="animations"
+          group={ClipGroup.CHARACTER}
+          type={ClipType.ANIMATION}
         />
         <TrackKeyFrames
           id={character.id}
           keyframes={positionKeyframes}
           title="Character Position/Rotation"
           updateKeyframe={updateClipPosition}
-          style="character"
+          group={ClipGroup.CHARACTER}
         />
         <TrackClips
           id={character.id}
@@ -85,8 +86,8 @@ export const Character = ({ characterId }: Props) => {
           updateClip={updateClipLipSync}
           muted={character.muted}
           toggleMute={toggleCharacterLipSyncMute}
-          style="character"
-          type="lipSync"
+          group={ClipGroup.CHARACTER}
+          type={ClipType.AUDIO}
         />
       </div>
     </div>

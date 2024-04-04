@@ -1,7 +1,7 @@
 import { TrackClip } from "~/pages/PageEnigma/comps/Timeline/TrackClip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
-import { Clip } from "~/pages/PageEnigma/models/track";
+import { Clip, ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 import { PointerEvent } from "react";
 import {
   canDrop,
@@ -17,11 +17,36 @@ interface Props {
   id: string;
   clips: Clip[];
   title: string;
-  style: "character" | "audio" | "camera" | "objects";
-  type?: "animations" | "positions" | "lipSync";
+  group: ClipGroup;
+  type?: ClipType;
   toggleMute?: () => void;
   muted?: boolean;
   updateClip: (options: { id: string; length: number; offset: number }) => void;
+}
+
+function getCanBuild({
+  dragType,
+  type,
+  group,
+}: {
+  dragType: ClipType | null;
+  type?: ClipType;
+  group: ClipGroup;
+}) {
+  if (dragType === ClipType.ANIMATION) {
+    if (dragType === type) {
+      return true;
+    }
+  }
+  if (dragType === ClipType.AUDIO) {
+    if (group === ClipGroup.CHARACTER && type === ClipType.AUDIO) {
+      return true;
+    }
+    if (group === ClipGroup.GLOBAL_AUDIO) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export const TrackClips = ({
@@ -31,36 +56,22 @@ export const TrackClips = ({
   updateClip,
   muted,
   title,
-  style,
+  group,
   type,
 }: Props) => {
-  const trackType = type ?? style;
+  const trackType = (type ?? group) as ClipType;
 
   function onPointerOver() {
-    if (dragType.value === "animations") {
-      if (dragType.value !== trackType) {
-        return;
-      }
+    if (getCanBuild({ dragType: dragType.value, type, group })) {
+      dropId.value = id;
     }
-    if (dragType.value === "audio") {
-      if (["lipSync", "audio"].indexOf(trackType) === -1) {
-        return;
-      }
-    }
-    dropId.value = id;
   }
 
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
-    if (dragType.value === "animations") {
-      if (dragType.value !== trackType) {
-        return;
-      }
+    if (!getCanBuild({ dragType: dragType.value, type, group })) {
+      return;
     }
-    if (dragType.value === "audio") {
-      if (["lipSync", "audio"].indexOf(trackType) === -1) {
-        return;
-      }
-    }
+
     const track = document.getElementById(`track-${trackType}-${id}`);
     if (!track) {
       return;
@@ -101,7 +112,7 @@ export const TrackClips = ({
     <div className="pl-16">
       <div
         id={`track-${trackType}-${id}`}
-        className={`relative mt-4 block h-9 w-full rounded-lg bg-${style}-unselected`}
+        className={`relative mt-4 block h-9 w-full rounded-lg bg-${group}-unselected`}
         onPointerOver={onPointerOver}
         onPointerLeave={onPointerLeave}
         onPointerMove={onPointerMove}
@@ -117,7 +128,7 @@ export const TrackClips = ({
                 ? clips[index + 1].offset
                 : filmLength.value * 60
             }
-            style={style}
+            group={group}
             updateClip={updateClip}
             clip={clip}
           />

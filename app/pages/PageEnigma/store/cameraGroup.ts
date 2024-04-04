@@ -13,6 +13,11 @@ export const cameraGroup = signal<CameraGroup>({ id: "CG1", keyframes: [] });
 
 export function updateCamera({ id, offset }: { id: string; offset: number }) {
   const oldCameraGroup = cameraGroup.value;
+
+  if (oldCameraGroup.keyframes.some((row) => row.offset === offset)) {
+    return;
+  }
+
   const newKeyframes = [...oldCameraGroup.keyframes];
   const keyframe = newKeyframes.find((row) => row.keyframe_uuid === id);
   if (!keyframe) {
@@ -33,7 +38,10 @@ export function updateCamera({ id, offset }: { id: string; offset: number }) {
 }
 
 export function addCameraKeyframe(keyframe: QueueKeyframe, offset: number) {
-  console.log("cam", keyframe);
+  const oldCameraGroup = cameraGroup.value;
+  if (oldCameraGroup.keyframes.some((row) => row.offset === offset)) {
+    return;
+  }
   const newKeyframe = {
     version: keyframe.version,
     keyframe_uuid: uuid.v4(),
@@ -46,7 +54,6 @@ export function addCameraKeyframe(keyframe: QueueKeyframe, offset: number) {
     selected: false,
   } as Keyframe;
 
-  const oldCameraGroup = cameraGroup.value;
   cameraGroup.value = {
     ...oldCameraGroup,
     keyframes: [...oldCameraGroup.keyframes, newKeyframe].sort(

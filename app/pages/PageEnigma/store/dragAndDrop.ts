@@ -1,6 +1,7 @@
 import { signal } from "@preact/signals-core";
+import { ClipType } from "~/pages/PageEnigma/models/track";
 
-export const dragType = signal<"animations" | "audio" | null>(null);
+export const dragType = signal<ClipType | null>(null);
 export const dragId = signal<string | null>(null);
 export const canDrop = signal(false);
 export const overTimeline = signal(false);

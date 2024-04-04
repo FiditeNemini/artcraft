@@ -11,6 +11,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
+import { ClipType } from "~/pages/PageEnigma/models/track";
 
 // Every object uuid / entity has a track.
 export class TimelineCurrentState {
@@ -169,10 +170,10 @@ export class TimeLine {
     );
 
     switch (type) {
-      case "animation":
+      case ClipType.ANIMATION:
         this.animation_engine.load_object(object_uuid, media_id, name);
         break;
-      case "transform":
+      case ClipType.TRANSFORM:
         this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
         break;
     }

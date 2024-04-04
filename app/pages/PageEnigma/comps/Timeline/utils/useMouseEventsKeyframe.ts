@@ -1,6 +1,10 @@
 import React, { Dispatch, useCallback, useEffect, useRef } from "react";
 import { Keyframe } from "~/pages/PageEnigma/models/track";
-import { canDrop, scale } from "~/pages/PageEnigma/store";
+import {
+  canDrop,
+  scale,
+  showDuplicateOffsetWarning,
+} from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
 export const useMouseEventsKeyframe = ({
@@ -40,15 +44,13 @@ export const useMouseEventsKeyframe = ({
       if (isActive.current === "drag") {
         if (deltaOffset < min) {
           currOffset.current = min;
-          return;
-        }
-        if (deltaOffset > max) {
+        } else if (deltaOffset > max) {
           currOffset.current = max;
-          return;
+        } else {
+          currOffset.current = deltaOffset;
         }
-        currOffset.current = deltaOffset;
+        setOffset(currOffset.current);
       }
-      setOffset(currOffset.current);
     },
     [max, min, setOffset],
   );
