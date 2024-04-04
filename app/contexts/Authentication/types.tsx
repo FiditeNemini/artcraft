@@ -1,3 +1,6 @@
+export enum STORAGE_KEYS{
+  USER_INFO = "user_info",
+}
 export enum AUTH_STATUS {
   LOGGED_IN = "logged_in",
   LOGGING = "logging",
@@ -5,7 +8,8 @@ export enum AUTH_STATUS {
 }
 
 export type AuthState = {
-  isLoggedIn: boolean;
+  isLoggedIn?: boolean;
+  sessionData?: string | null;
   userInfo?: UserInfo;
 }
 export interface UserInfo {
