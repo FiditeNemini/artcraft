@@ -1023,7 +1023,6 @@ class Editor {
     document.body.removeChild(downloadLink);
 
     const data = await this.api_manager.uploadMedia(blob, "render.mp4");
-    console.log(data);
     // Create a link to download the file
 
   }
