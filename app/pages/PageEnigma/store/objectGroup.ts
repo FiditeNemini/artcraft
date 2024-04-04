@@ -32,19 +32,11 @@ export function updateObject({
   }
 
   const existingKeyframe = obj.keyframes.some((row) => {
-    console.log(
-      "upd",
-      row.keyframe_uuid,
-      row.offset,
-      offset,
-      id,
-      row.offset === offset && row.keyframe_uuid !== id,
-    );
     return row.offset === offset && row.keyframe_uuid !== id;
   });
 
   if (existingKeyframe) {
-    toast("There can only be one keyframe at an offset.");
+    toast.error("There can only be one keyframe at this offset.");
     return;
   }
 

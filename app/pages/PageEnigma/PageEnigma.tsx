@@ -5,7 +5,10 @@ import { EngineProvider } from "~/pages/PageEnigma/contexts/EngineProvider";
 import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
 import { toast, ToastBar, Toaster } from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTriangleExclamation } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faTriangleExclamation,
+  faXmark,
+} from "@fortawesome/pro-solid-svg-icons";
 
 export const PageEnigma = () => {
   return (
@@ -13,13 +16,17 @@ export const PageEnigma = () => {
       <AppUIProvider>
         <EngineProvider>
           <Toaster
-            position="top-center"
+            position="top-right"
             toastOptions={{
               style: {
                 border: "1px solid #39394D",
                 backgroundColor: "#39394D",
               },
               duration: 99999,
+            }}
+            containerStyle={{
+              top: 84,
+              right: 20,
             }}
           >
             {(thisToast) => (
@@ -29,7 +36,7 @@ export const PageEnigma = () => {
                     <div className="mr-3 flex justify-between rounded-lg">
                       <div>
                         {thisToast.type === "error" && (
-                          <div className="ml-3 flex gap-4">
+                          <div className="ml-3 flex items-center gap-4">
                             <FontAwesomeIcon
                               icon={faTriangleExclamation}
                               className="text-keyframe-selected"
@@ -47,7 +54,7 @@ export const PageEnigma = () => {
                         onClick={() => toast.dismiss(thisToast.id)}
                         className="text-sm font-bold text-white opacity-50"
                       >
-                        X
+                        <FontAwesomeIcon icon={faXmark} />
                       </button>
                     </div>
                   );

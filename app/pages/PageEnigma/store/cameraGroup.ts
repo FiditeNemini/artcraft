@@ -8,13 +8,19 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 import { signal } from "@preact/signals-core";
+import { toast } from "react-hot-toast";
 
 export const cameraGroup = signal<CameraGroup>({ id: "CG1", keyframes: [] });
 
 export function updateCamera({ id, offset }: { id: string; offset: number }) {
   const oldCameraGroup = cameraGroup.value;
 
-  if (oldCameraGroup.keyframes.some((row) => row.offset === offset)) {
+  const existingKeyframe = oldCameraGroup.keyframes.some((row) => {
+    return row.offset === offset && row.keyframe_uuid !== id;
+  });
+
+  if (existingKeyframe) {
+    toast.error("There can only be one keyframe at this offset.");
     return;
   }
 
@@ -40,6 +46,7 @@ export function updateCamera({ id, offset }: { id: string; offset: number }) {
 export function addCameraKeyframe(keyframe: QueueKeyframe, offset: number) {
   const oldCameraGroup = cameraGroup.value;
   if (oldCameraGroup.keyframes.some((row) => row.offset === offset)) {
+    toast.error("There can only be one keyframe at this offset.");
     return;
   }
   const newKeyframe = {
