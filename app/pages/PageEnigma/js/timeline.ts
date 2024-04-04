@@ -11,7 +11,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
-import { ClipType } from "~/pages/PageEnigma/models/track";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 
 // Every object uuid / entity has a track.
 export class TimelineCurrentState {
@@ -39,6 +39,7 @@ export class TimeLine {
   timeline_items: ClipUI[];
 
   timeline_limit: number;
+  absolute_end: number;
   scrubber_frame_position: number;
   is_playing: boolean;
 
@@ -63,7 +64,8 @@ export class TimeLine {
     scene: Scene,
   ) {
     this.timeline_items = [];
-    this.timeline_limit = 60 * 5; // 5 seconds
+    this.absolute_end = 60 * 12;
+    this.timeline_limit = this.absolute_end; // 5 seconds
 
     this.is_playing = false;
     this.scrubber_frame_position = 0; // in frames into the tl
@@ -104,6 +106,12 @@ export class TimeLine {
       case toEngineActions.ADD_KEYFRAME:
         await this.addKeyFrame(data);
         break;
+      case toEngineActions.UPDATE_KEYFRAME:
+        await this.updateKeyFrame(data);
+        break;
+      case toEngineActions.DELETE_KEYFRAME:
+        await this.deleteKeyFrame(data);
+        break;
       case toEngineActions.ADD_CLIP:
         await this.addClip(data);
         break;
@@ -135,18 +143,41 @@ export class TimeLine {
     // rotation: XYZ;
     // scale: XYZ;
     // selected?: boolean;
+    const data_json = data["data"];
+    const uuid = data_json["object_uuid"];
+
+    let object_name = this.scene.get_object_by_uuid(uuid)?.name;
+    if (object_name == undefined) {
+      object_name = "undefined";
+    }
+
+    const new_item = this.transform_engine.addFrame(
+      uuid,
+      this.absolute_end,
+      data_json["position"],
+      data_json["rotation"],
+      data_json["scale"],
+      data_json["offset"],
+      data_json["keyframe_uuid"],
+    );
+    if (new_item) {
+      await this.addPlayableClip(
+        new ClipUI(
+          data_json["version"],
+          ClipType.TRANSFORM,
+          data_json["group"],
+          object_name,
+          "",
+          uuid,
+          0,
+          this.absolute_end,
+        ),
+      );
+    }
   }
 
   public async addClip(data: any) {
-    let object_uuid = data["data"]["object_uuid"];
-
-    if (object_uuid.length < 6) {
-      object_uuid = this.scene.selected?.uuid; //data['data']['object_uuid'];
-      if (object_uuid == undefined) {
-        return;
-      }
-    }
-
+    const object_uuid = data["data"]["object_uuid"];
     const media_id = data["data"]["media_id"];
     const name = data["data"]["name"];
     const group = data["data"]["group"];
@@ -154,6 +185,37 @@ export class TimeLine {
     const type = data["data"]["type"];
     const offset = data["data"]["offset"];
     const end_offset = data["data"]["length"] + offset;
+
+    switch (type) {
+      case "animation":
+        this.animation_engine.load_object(object_uuid, media_id, name);
+        break;
+      case "transform":
+        this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
+        break;
+      case "audio":
+        if (group == "character") {
+          this.lipSync_engine.load_object(object_uuid, media_id);
+          // media id for this as well it can be downloaded
+          this.addPlayableClip(
+            new ClipUI(
+              version,
+              ClipType.AUDIO,
+              group,
+              name,
+              media_id,
+              object_uuid,
+              offset,
+              end_offset,
+            ),
+          );
+          return;
+        } else {
+          console.log("Audio!");
+          this.audio_engine.loadClip(media_id);
+        }
+        break;
+    }
 
     // media id for this as well it can be downloaded
     this.addPlayableClip(
@@ -168,19 +230,39 @@ export class TimeLine {
         end_offset,
       ),
     );
-
-    switch (type) {
-      case ClipType.ANIMATION:
-        this.animation_engine.load_object(object_uuid, media_id, name);
-        break;
-      case ClipType.TRANSFORM:
-        this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
-        break;
-    }
   }
+
+  public async deleteKeyFrame(data: any) {
+    const keyframe_uuid = data["data"]["keyframe_uuid"];
+    const object_uuid = data["data"]["object_uuid"];
+    this.transform_engine.clips[object_uuid].removeKeyframe(keyframe_uuid);
+  }
+
+  public async updateKeyFrame(data: any) {
+    const keyframe_uuid = data["data"]["keyframe_uuid"];
+    const keyframe_offset = data["data"]["offset"];
+    const object_uuid = data["data"]["object_uuid"];
+    this.transform_engine.clips[object_uuid].setOffset(
+      keyframe_uuid,
+      keyframe_offset,
+    );
+  }
+
   public async updateClip(data: any) {
     // only length and offset changes here.
     console.log(data);
+
+    const object_uuid = data["data"]["object_uuid"];
+    const media_id = data["data"]["media_id"];
+    const offset = data["data"]["offset"];
+    const length = data["data"]["length"] + offset;
+
+    for (const element of this.timeline_items) {
+      if (element.media_id == media_id && element.object_uuid == object_uuid) {
+        element.length = length;
+        element.offset = offset;
+      }
+    }
   }
   public async deleteClip(data: any) {
     console.log(data);
@@ -220,6 +302,7 @@ export class TimeLine {
     if (this.is_playing) {
       return;
     }
+    this.update();
     this.setScrubberPosition(data["data"]["currentTime"]);
   }
 
@@ -294,34 +377,40 @@ export class TimeLine {
         // element.play()
         // remove the element from the list
         const object = this.scene.get_object_by_uuid(element.object_uuid);
-        if (element.type == "transform") {
+        if (element.type === ClipType.TRANSFORM) {
           if (object && this.transform_engine.clips[element.object_uuid]) {
-            this.transform_engine.clips[element.object_uuid].length =
-              element.length - element.offset;
             this.transform_engine.clips[element.object_uuid].step(
               object,
               element.offset,
               this.scrubber_frame_position,
             );
+            element.length =
+              this.transform_engine.clips[element.object_uuid].length;
           }
-        } else if (element.type == "audio") {
+        } else if (
+          element.group !== ClipGroup.CHARACTER &&
+          element.type === ClipType.AUDIO
+        ) {
           if (this.scrubber_frame_position + 1 >= element.length) {
             this.audio_engine.stopClip(element.media_id);
           } else {
             this.audio_engine.playClip(element.media_id);
           }
-        } else if (element.type == "lipsync") {
+        } else if (
+          element.group === ClipGroup.CHARACTER &&
+          element.type === ClipType.AUDIO
+        ) {
           if (this.scrubber_frame_position + 1 >= element.length) {
             this.lipSync_engine.clips[element.object_uuid].stop();
           } else if (object) {
             await this.lipSync_engine.clips[element.object_uuid].play(object);
             this.lipSync_engine.clips[element.object_uuid].step();
           }
-        } else if (element.type == "animation") {
+        } else if (element.type === ClipType.ANIMATION) {
           if (object) {
             await this.animation_engine.clips[object.uuid].play(object);
             this.animation_engine.clips[object.uuid].step(
-              this.scrubber_frame_position / 60,
+              this.scrubber_frame_position / 120, // Double FPS for best result.
             );
           }
         } else {
