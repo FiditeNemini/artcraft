@@ -24,7 +24,7 @@ import { PointerLockControls } from "three/addons/controls/PointerLockControls.j
 import { APPUI_ACTION_TYPES } from "../reducers";
 import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
-import { XYZ } from "../../datastructures/common";
+import { XYZ } from "../datastructures/common";
 class EditorState {
   // {
   //   action: "ShowLoadingIndicator"
@@ -150,7 +150,7 @@ class Editor {
     this.raycaster;
     this.mouse;
     this.selected;
-    this.selectedState = false
+
     this.last_selected;
     this.transform_interaction;
     this.rendering = false;
@@ -444,8 +444,8 @@ class Editor {
 
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position:XYZ,rotation:XYZ,scale:XYZ) {
-    if (this.selected !=null) {
-
+    if (this.selected !=undefined || this.selected !=null) {
+      //console.log(`triggering setSelectedObject`) 
       this.selected.position.x = position.x
       this.selected.position.y = position.y
       this.selected.position.z = position.z
