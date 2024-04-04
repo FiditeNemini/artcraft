@@ -35,7 +35,6 @@ export class LipSyncClip {
   audio_data: AudioData | undefined;
   lipsync: LipSync;
   blendshape_helper: BlendShapeHelper;
-  faces: THREE.Mesh[]
 
   constructor(version: number, media_id: string, volume: number) {
     this.version = version;
@@ -48,7 +47,9 @@ export class LipSyncClip {
     this.blendshape_helper = new BlendShapeHelper(0, 0, 0);
     // we might need 3 of these one for each character ...
     this.lipsync = new LipSync();
-    this.faces = [];
+
+
+    console.log("Lip!")
   }
 
   // lip sync will be generated through TTS 
@@ -83,8 +84,8 @@ export class LipSyncClip {
             const blendShapeIndexA = c.morphTargetDictionary["aa"];
             if (blendShapeIndexE != null) {
               this.blendshape_helper = new BlendShapeHelper(blendShapeIndexA, blendShapeIndexE, blendShapeIndexO);
-              this.faces.push(c);
               resolve(c);
+              return;
             }
           }
         }
@@ -93,48 +94,44 @@ export class LipSyncClip {
   }
 
 
-  async play(object: THREE.Object3D) {
-    if (this.audio_data?.audioBuffer == null) { await this.download_audio(); }
-    if (this.lipsync.face == null) {
-      this.lipsync = new LipSync(await this._detect_face(object));
-      this.lipsync.startLipSyncFromAudioBuffer(this.audio_data?.audioBuffer);
-    }
+async play(object: THREE.Object3D) {
+  if (this.audio_data?.audioBuffer == null) { await this.download_audio(); }
+  if (this.lipsync.face == null) {
+    this.lipsync = new LipSync(await this._detect_face(object));
+    console.log("Face", this.lipsync.face);
+    this.lipsync.startLipSyncFromAudioBuffer(this.audio_data?.audioBuffer);
   }
+}
 
-  stop() {
-    if (this.lipsync == null) { return; }
-    this.lipsync.destroy();
-  }
+stop() {
+  if (this.lipsync == null) { return; }
+  this.lipsync.destroy();
+}
 
-  setBlends(ah: number, ee: number, oh: number) {
-    this.faces.forEach((element: THREE.Mesh) => {
-      if (element.morphTargetInfluences) {
-        element.morphTargetInfluences[this.blendshape_helper.ee] = ee;
-        element.morphTargetInfluences[this.blendshape_helper.ah] = ah;
-        element.morphTargetInfluences[this.blendshape_helper.oh] = oh;
-      }
-    });
-  }
+step() {
+  if (this.lipsync == null) { return; }
+  const positions = this.lipsync.update();
+  console.log("Face", this.lipsync.face);
+  this.lipsync.face.morphTargetInfluences[this.blendshape_helper.ee] = positions["ee"];
+  this.lipsync.face.morphTargetInfluences[this.blendshape_helper.ah] = positions["ah"];
+  this.lipsync.face.morphTargetInfluences[this.blendshape_helper.oh] = positions["oh"];
+}
 
-  step() {
-    if (this.lipsync == null) { return; }
-    const positions = this.lipsync.update();
-    this.setBlends(positions["ee"], positions["ah"], positions["oh"]);
+reset() {
+  if (this.lipsync.face != undefined) {
+    this.lipsync.face.morphTargetInfluences[this.blendshape_helper.ee] = 0;
+    this.lipsync.face.morphTargetInfluences[this.blendshape_helper.ah] = 0
+    this.lipsync.face.morphTargetInfluences[this.blendshape_helper.oh] = 0;
   }
+  this.lipsync = new LipSync();
+}
 
-  reset() {
-    if (this.lipsync.face != undefined) {
-      this.setBlends(0,0,0);
-    }
-    this.lipsync = new LipSync();
-  }
-
-  toJSON(): string {
-    return JSON.stringify({
-      version: this.version,
-      media_id: this.media_id,
-      type: this.type,
-      volume: this.volume,
-    });
-  }
+toJSON(): string {
+  return JSON.stringify({
+    version: this.version,
+    media_id: this.media_id,
+    type: this.type,
+    volume: this.volume,
+  });
+}
 }

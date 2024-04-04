@@ -77,7 +77,7 @@ class Scene {
     }
 
     _create_camera_obj() {
-        this.load_glb("m_cxh4asqhapdz10j880755dg4yevshb", false).then((cam_obj) => {
+        this.load_glb("/resources/models/camera/camera.glb", false).then((cam_obj) => {
             cam_obj.userData["name"] = "::CAM::";
             cam_obj.name = "::CAM::";
             cam_obj.position.set(0, 0.6, 1.5);
@@ -97,45 +97,7 @@ class Scene {
         }
     }
 
-    async getMediaURL(media_id: string) {
-        //This is for prod when we have the proper info on the url.
-        let api_base_url = "https://api.fakeyou.com";
-        let url = `${api_base_url}/v1/media_files/file/${media_id}`
-        let responce = await fetch(url);
-        let json = await JSON.parse(await responce.text());
-        let bucketPath = json["media_file"]["public_bucket_path"];
-        let media_base_url = "https://storage.googleapis.com/vocodes-public"
-        let media_url = `${media_base_url}${bucketPath}`
-        return media_url;
-    }
-
-    async load_glb(media_id: string, auto_add: boolean = true): Promise<THREE.Object3D> { //: Promise<THREE.Object3D> {
-        return new Promise(async (resolve) => {
-            let glbLoader = new GLTFLoader();
-            glbLoader.load(await this.getMediaURL(media_id), (glb) => {
-                glb.scene.children.forEach(child => {
-                    child.traverse((c: THREE.Object3D) => {
-                        if (c instanceof THREE.Mesh) {
-                            c.material.metalness = 0.0;
-                            c.material.specular = 0.5;
-                            c.castShadow = true;
-                            c.receiveShadow = true;
-                            c.material.transparent = false;
-                        }
-                    });
-                    if (child.type == "Group") {
-                        if (auto_add) { this.scene.add(child.children[0]); }
-                        resolve(child.children[0]);
-                        return;
-                    }
-                    if (auto_add) { this.scene.add(child); }
-                    resolve(child);
-                });
-            });
-        });
-    }
-
-    async load_glb_absolute(filepath: string, auto_add: boolean = true): Promise<THREE.Object3D> { //: Promise<THREE.Object3D> {
+    async load_glb(filepath: string, auto_add: boolean = true): Promise<THREE.Object3D> { //: Promise<THREE.Object3D> {
         return new Promise((resolve) => {
             let glbLoader = new GLTFLoader();
             glbLoader.load(filepath, (glb) => {

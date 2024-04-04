@@ -103,7 +103,7 @@ export const TrackProvider = ({ children }: Props) => {
       },
       {
         version: 1,
-        media_id: "m_w5t517krrf63f3tj2288vsffmj87zw",
+        media_id: uuid.v4(),
         type: ClipType.ANIMATION,
         length: 25,
         name: "Walk",
