@@ -1,4 +1,5 @@
 import { NavLink, NavLinkProps } from "@remix-run/react";
+import { LabelHTMLAttributes } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface TypoProps {
@@ -23,8 +24,15 @@ export const H4 = ({ className, children }: TypoProps) => (
   <h4 className={twMerge(baseTypo, "text-base font-medium", className)}>{children}</h4>
 );
 
-export const Label = ({ className, children }: TypoProps) => (
-  <label className={twMerge(baseTypo, "mb-2 text-base font-medium", className)}>{children}</label>
+export const Label = ({ 
+  className, children, ...rest
+}: LabelHTMLAttributes<HTMLLabelElement>) => (
+  <label
+    className={twMerge(baseTypo, "mb-2 text-base font-medium", className)}
+    {...rest}
+  >
+      {children}
+  </label>
 );
 
 export const H5 = ({ className, children }: TypoProps) => (
