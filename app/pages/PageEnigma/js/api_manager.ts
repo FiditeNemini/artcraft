@@ -54,9 +54,9 @@ export enum Visibility {
  */
 type Data = { [key: string]: any };
 class APIManagerResponseSuccess {
-  public user_message: String;
+  public user_message: string;
   public data: Data | null;
-  constructor(user_message: String = "", data: Data | null = null) {
+  constructor(user_message: string = "", data: Data | null = null) {
     this.data = data;
     this.user_message = user_message;
   }
@@ -74,7 +74,7 @@ class APIManagerResponseError extends Error {
 }
 
 export class APIManager {
-  baseUrl: String;
+  baseUrl: string;
 
   constructor() {
     this.baseUrl = "https://api.fakeyou.com";
@@ -139,9 +139,9 @@ export class APIManager {
       throw new APIManagerResponseError("Failed to download file");
     }
     // Convert the response from a blob to json text
-    let blob = await file_response.blob();
+    const blob = await file_response.blob();
     const json_result: string = await new Promise((resolve, reject) => {
-      let reader = new FileReader();
+      const reader = new FileReader();
       reader.onloadend = () => resolve(JSON.parse(reader.result as string));
       reader.onerror = reject;
       reader.readAsText(blob);
@@ -156,7 +156,7 @@ export class APIManager {
       scene_glb_media_file_token,
     );
     console.log(`GLB ${media_bucket_path}`);
-    let glbLoader = new GLTFLoader();
+    const glbLoader = new GLTFLoader();
     // promisify this
     const loadGlb = (
       bucket_path: string,
@@ -188,13 +188,13 @@ export class APIManager {
    * @returns
    */
   private async getMediaFile(media_file_token: string): Promise<string> {
-    let api_base_url = "https://api.fakeyou.com";
-    let url = `${api_base_url}/v1/media_files/file/${media_file_token}`;
-    let response = await fetch(url);
-    let json = await JSON.parse(await response.text());
-    let bucketPath = json["media_file"]["public_bucket_path"];
-    let media_base_url = "https://storage.googleapis.com/vocodes-public";
-    let media_url = `${media_base_url}${bucketPath}`; // gets you a bucket path
+    const api_base_url = "https://api.fakeyou.com";
+    const url = `${api_base_url}/v1/media_files/file/${media_file_token}`;
+    const response = await fetch(url);
+    const json = await JSON.parse(await response.text());
+    const bucketPath = json["media_file"]["public_bucket_path"];
+    const media_base_url = "https://storage.googleapis.com/vocodes-public";
+    const media_url = `${media_base_url}${bucketPath}`; // gets you a bucket path
     return media_url;
   }
 
@@ -218,7 +218,7 @@ export class APIManager {
     scene_glb_media_file_token: string | null,
   ): Promise<string> {
     const url = `${this.baseUrl}/v1/media_files/write/engine_asset`;
-    let uuid = uuidv4();
+    const uuid = uuidv4();
     const form_data = new FormData();
     form_data.append("uuid_idempotency_token", uuid);
 
@@ -257,7 +257,7 @@ export class APIManager {
     timeline_state: TimelineDataState | null, // only for now.
   ): Promise<string> {
     const url = `${this.baseUrl}/v1/media_files/write/scene_file`;
-    let uuid = uuidv4();
+    const uuid = uuidv4();
 
     console.log(
       `Saving Scene scene_media_file_token:${scene_media_file_token} | scene_glb_media_file_token:${scene_glb_media_file_token}`,
@@ -311,7 +311,7 @@ export class APIManager {
     fileName: string,
   ): Promise<APIManagerResponseSuccess> {
     const url = `${this.baseUrl}/v1/media_uploads/upload`;
-    let uuid = uuidv4();
+    const uuid = uuidv4();
 
     const formData = new FormData();
     formData.append("uuid_idempotency_token", uuid);
@@ -346,11 +346,11 @@ export class APIManager {
     negative_prompt: string,
   ): Promise<string> {
     const url = `https://funnel.tailce84f.ts.net/preview/`;
-    
+
     const payload = {
       style: style,
       positive_prompt: positive_prompt,
-      negative_prompt: negative_prompt
+      negative_prompt: negative_prompt,
     };
 
     const formData = new FormData();
@@ -393,14 +393,15 @@ export class APIManager {
     return result;
   }
 
-  
-  public async stylizeVideo(media_token: string, 
-    style: ArtStyle, 
-    positive_prompt:string, 
-    negative_prompt:string,
-    visibility:Visibility) {
-    let uuid = uuidv4();
-    
+  public async stylizeVideo(
+    media_token: string,
+    style: ArtStyle,
+    positive_prompt: string,
+    negative_prompt: string,
+    visibility: Visibility,
+  ) {
+    const uuid = uuidv4();
+
     const data = {
       uuid_idempotency_token: uuid,
       style: style,
@@ -410,10 +411,10 @@ export class APIManager {
       trim_start_millis: 0,
       trim_end_millis: 3000,
       enable_lipsync: true,
-      creator_set_visibility: visibility
-    }
+      creator_set_visibility: visibility,
+    };
 
-    const json_data = JSON.stringify(data)
+    const json_data = JSON.stringify(data);
 
     const response = await fetch(`${this.baseUrl}/v1/video/enqueue_vst`, {
       method: "POST",
@@ -435,4 +436,3 @@ export class APIManager {
     return await response.json();
   }
 }
-

@@ -3,6 +3,7 @@ import {
   MediaClip,
   Keyframe,
   QueueKeyframe,
+  ClipType,
 } from "~/pages/PageEnigma/models/track";
 
 export const TrackContext = createContext<{
@@ -15,7 +16,7 @@ export const TrackContext = createContext<{
   audioClips: MediaClip[];
 
   // drag and drop
-  startDrag: (type: "animations" | "audio", id: string, length: number) => void;
+  startDrag: (type: ClipType, id: string, length: number) => void;
   endDrag: () => void;
 }>({
   addKeyframe: () => {},

@@ -1,5 +1,4 @@
 import { useContext } from "react";
-
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
 import { Button, LoadingBar, LoadingDots } from "~/components";
@@ -19,9 +18,12 @@ import { APPUI_VIEW_MODES } from "./reducers";
 import { timelineHeight } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/pages/PageEnigma/contexts/AppUiContext";
+import { EngineContext } from "./contexts/EngineContext";
 
 export const PageEnigmaComponent = () => {
   useSignals();
+
+  const editorEngine = useContext(EngineContext);
   const [appUiState] = useContext(AppUiContext);
 
   //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
@@ -29,13 +31,20 @@ export const PageEnigmaComponent = () => {
     event.stopPropagation();
   };
 
+  const handleGenerateMovieClick=()=> {
+    if ( editorEngine != null) {
+      editorEngine?.generateVideo()
+    } else {
+      console.log("Tried to generate movie but editor was null")
+    }
+  };
+
   const lowerHeight = timelineHeight.value;
   return (
     <div>
       <TopBarHelmet>
-        <Button icon={faSparkles}>Generate Movie</Button>
+        <Button icon={faSparkles} onClick={handleGenerateMovieClick}>Generate Movie</Button>
       </TopBarHelmet>
-
       <div style={{ height: "calc(100vh - 68px)" }}>
         {/* Engine section/side panel */}
         <div

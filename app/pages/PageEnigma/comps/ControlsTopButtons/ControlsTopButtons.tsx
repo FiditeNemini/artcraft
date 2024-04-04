@@ -24,68 +24,10 @@ export const ControlsTopButtons = () => {
 
   const handleButtonTest = () => {
     editorEngine?.testStylizeRequest();
-
-    // if(appUiState?.showEditorLoadingBar.isShowing){
-    //TO GO TO A HUNDRED AND DISAPPER
-    // dispatchAppUiState({
-    //   type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
-    //   payload:{
-    //     showEditorLoadingBar: {
-    //       progress: 100,
-    //     }
-    //   }
-    // });
-    // setTimeout(() => {
-    //   dispatchAppUiState({
-    //     type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADINGBAR,
-    //   });
-    // }, 1000);
-    //END :TO GO TO A HUNDRED AND DISAPPER
-
-    //EAMPLE OF CHANING LOADING MESSAGE
-    //  dispatchAppUiState({
-    //   type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
-    //   payload:{
-    //     showEditorLoadingBar: {
-    //       message: "new message",
-    //     }
-    //   }
-    // });
-    // }else{
-    //   dispatchAppUiState({
-    //     type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADINGBAR,
-    //     payload:{
-    //       showEditorLoadingBar: {
-    //         message: 'display of LoadingBar triggered by Test Button',
-    //         progress: 10,
-    //       }
-    //     }
-
-    //   });
-    //}
   };
 
-  const handleObjectPanelTest = () => {
-    if (appUiState?.controlPanel.isShowing) {
-      dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
-      });
-    } else {
-      dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
-        payload: {
-          group: ClipGroup.OBJECT,
-          object_name: "TEST BUTTON",
-          object_uuid: "",
-          version: "1",
-          objectVectors: {
-            position: { x: 1, y: 2, z: 3 },
-            rotation: { x: 4, y: 5, z: 6 },
-            scale: { x: 7, y: 8, z: 9 },
-          },
-        },
-      });
-    }
+  const handleTestButton2 = () => {
+   console.log("Test Button 2")
   };
 
   const handleButtonCameraView = () => {
@@ -94,18 +36,9 @@ export const ControlsTopButtons = () => {
   const handleButtonPlayBack = () => {
     editorEngine?.startPlayback();
   };
-  const handleButtonRender = () => {
-    editorEngine?.generateVideo();
-  };
-
   const handleButtonTakeFrame = () => {
     editorEngine?.take_timeline_cam_clip();
   };
-
-  const handleButtonLoad = () => {
-    console.log("LOADING");
-  };
-
   const handleButtonSingleFrame = () => {
     editorEngine?.generateFrame();
   };
@@ -172,18 +105,15 @@ export const ControlsTopButtons = () => {
           Toggle Camera View
         </Button>
         <Button
-          onClick={handleObjectPanelTest}
+          onClick={handleTestButton2}
           className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
         >
-          Show Object Panel
+          Test Button 2
         </Button>
       </div>
       <div className="flex gap-2">
         <Button onClick={handleButtonSingleFrame}>Render Single Frame</Button>
         <Button onClick={handleButtonTakeFrame}>Take Frame</Button>
-        <Button onClick={handleButtonRender}>Render</Button>
-        {/* <Button onClick={handleButtonLoad}>Load</Button>
-        <Button onClick={handleButtonRender}>Render</Button> */}
         <Button
           onClick={handleButtonTest}
           className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"

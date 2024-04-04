@@ -11,7 +11,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
-
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 // Every object uuid / entity has a track.
 export class TimelineCurrentState {
     is_editable: boolean;
@@ -160,7 +160,7 @@ export class TimeLine {
         if (new_item) {
             await this.addPlayableClip(new ClipUI(
                 data_json['version'],
-                "transform",
+                ClipType.TRANSFORM,
                 data_json['group'],
                 object_name,
                 "",
@@ -171,7 +171,7 @@ export class TimeLine {
     }
 
     public async addClip(data: any) {
-        let object_uuid = data["data"]["object_uuid"];
+        const object_uuid = data["data"]["object_uuid"];
         const media_id = data["data"]["media_id"];
         const name = data["data"]["name"];
         const group = data["data"]["group"];
@@ -194,7 +194,7 @@ export class TimeLine {
                     this.addPlayableClip(
                         new ClipUI(
                             version,
-                            "lipsync",
+                            "lipsync",// TODO potiential bug ..
                             group,
                             name,
                             media_id,
@@ -366,7 +366,7 @@ export class TimeLine {
                 // element.play()
                 // remove the element from the list
                 const object = this.scene.get_object_by_uuid(element.object_uuid);
-                if (element.type == "transform") {
+                if (element.type === ClipType.TRANSFORM) {
                     if (object && this.transform_engine.clips[element.object_uuid]) {
                         this.transform_engine.clips[element.object_uuid].step(
                             object,
@@ -381,14 +381,14 @@ export class TimeLine {
                     } else {
                         this.audio_engine.playClip(element.media_id);
                     }
-                } else if (element.type == "lipsync") {
+                } else if (element.type == "lipsync") { // we will remove this when we know which group it will come from character + audio == lip sync audio.
                     if (this.scrubber_frame_position + 1 >= element.length) {
                         this.lipSync_engine.clips[element.object_uuid].stop();
                     } else if (object) {
                         await this.lipSync_engine.clips[element.object_uuid].play(object);
                         this.lipSync_engine.clips[element.object_uuid].step();
                     }
-                } else if (element.type == "animation") {
+                } else if (element.type  === ClipType.ANIMATION) {
                     if (object) {
                         await this.animation_engine.clips[object.uuid].play(object);
                         this.animation_engine.clips[object.uuid].step(

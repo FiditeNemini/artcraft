@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect } from "react";
-import { MediaClip } from "~/pages/PageEnigma/models/track";
+import { ClipType, MediaClip } from "~/pages/PageEnigma/models/track";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import {
   canDrop,
@@ -11,7 +11,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 
 interface Props {
   clip: MediaClip;
-  type: "animations" | "audio";
+  type: ClipType;
 }
 
 export const AnimationElement = ({ clip, type }: Props) => {
