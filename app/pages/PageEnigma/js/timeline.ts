@@ -366,7 +366,7 @@ export class TimeLine {
                 // element.play()
                 // remove the element from the list
                 const object = this.scene.get_object_by_uuid(element.object_uuid);
-                if (element.type == "transform") {
+                if (element.type === ClipType.TRANSFORM) {
                     if (object && this.transform_engine.clips[element.object_uuid]) {
                         this.transform_engine.clips[element.object_uuid].step(
                             object,
@@ -388,7 +388,7 @@ export class TimeLine {
                         await this.lipSync_engine.clips[element.object_uuid].play(object);
                         this.lipSync_engine.clips[element.object_uuid].step();
                     }
-                } else if (element.type == "animation") {
+                } else if (element.type  === ClipType.ANIMATION) {
                     if (object) {
                         await this.animation_engine.clips[object.uuid].play(object);
                         this.animation_engine.clips[object.uuid].step(

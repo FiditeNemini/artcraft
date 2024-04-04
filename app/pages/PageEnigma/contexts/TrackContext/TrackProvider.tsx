@@ -79,29 +79,7 @@ export const TrackProvider = ({ children }: Props) => {
   }, [length, scale]);
 
   useEffect(() => {
-    setAnimationClips([
-      {
-        version: 1,
-        media_id: "m_5q9s6esz8ymjqz0bheh8nf4crtj2kx",
-        type: ClipType.ANIMATION,
-        length: 25,
-        name: "Sit",
-      },
-      {
-        version: 1,
-        media_id: uuid.v4(),
-        type: ClipType.ANIMATION,
-        length: 25,
-        name: "Idle",
-      },
-      {
-        version: 1,
-        media_id: uuid.v4(),
-        type: ClipType.ANIMATION,
-        length: 25,
-        name: "Stand",
-      },
-      {
+    setAnimationClips([{
         version: 1,
         media_id: "m_w5t517krrf63f3tj2288vsffmj87zw",
         type: ClipType.ANIMATION,
@@ -112,32 +90,11 @@ export const TrackProvider = ({ children }: Props) => {
     setAudioClips([
       {
         version: 1,
-        media_id: uuid.v4(),
-        type: ClipType.ANIMATION,
-        length: 25,
-        name: "Sing",
-      },
-      {
-        version: 1,
-        media_id: uuid.v4(),
-        type: ClipType.AUDIO,
-        length: 25,
-        name: "Chatter",
-      },
-      {
-        version: 1,
         media_id: "m_403phjvjkbbaxxbz8y7r6qjay07mfd",
         type: ClipType.AUDIO,
         length: 25,
         name: "Talk",
-      },
-      {
-        version: 1,
-        media_id: uuid.v4(),
-        type: ClipType.AUDIO,
-        length: 25,
-        name: "Yell",
-      },
+      }
     ]);
     setScale(1);
     setLength(12);
