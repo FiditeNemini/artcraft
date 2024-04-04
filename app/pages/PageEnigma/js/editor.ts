@@ -652,7 +652,7 @@ class Editor {
     // note the database from the server is the source of truth for all the data.
     // Test code here
     const object: THREE.Object3D = await this.activeScene.load_glb(
-      "./resources/models/fox/fox.glb",
+      "m_9f3d3z94kk6m25zywyz6an3p43fjtw",
     );
     object.uuid = "CH1";
 
@@ -851,6 +851,9 @@ class Editor {
         } else if(this.timeline.is_playing == false) {
           this.cam_obj.position.copy(this.camera.position);
           this.cam_obj.rotation.copy(this.camera.rotation);
+        } else {
+          this.camera.position.copy(this.cam_obj.position);
+          this.camera.rotation.copy(this.cam_obj.rotation);
         }
       }
     }
@@ -1019,9 +1022,9 @@ class Editor {
     URL.revokeObjectURL(url);
     document.body.removeChild(downloadLink);
 
-    const data = await this.api_manager.uploadMedia(blob, "tmp.wav");
-    console.log(data);
+    const data = await this.api_manager.uploadMedia(blob, "render.mp4");
     // Create a link to download the file
+
   }
 
   async generateFrame() {

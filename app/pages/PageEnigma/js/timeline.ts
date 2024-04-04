@@ -392,7 +392,7 @@ export class TimeLine {
                     if (object) {
                         await this.animation_engine.clips[object.uuid].play(object);
                         this.animation_engine.clips[object.uuid].step(
-                            this.scrubber_frame_position / 60,
+                            this.scrubber_frame_position / 120, // Double FPS for best result.
                         );
                     }
                 } else {
