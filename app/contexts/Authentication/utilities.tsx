@@ -1,13 +1,7 @@
-
+import { login, getSession, logout } from '~/api';
 import {
   SessionResponse,
 } from "./types";
-
-const apiHost = "https://api.fakeyou.com";
-// const createAccount = `${apiHost}}/create_account`;
-const login = `${apiHost}/v1/login`;
-const getSession = `${apiHost}/v1/session`;
-const logout = `${apiHost}/v1/logout`;
 
 export const CreateSession = async ({
   usernameOrEmail, password

@@ -11,16 +11,17 @@ import {
   TransitionDialogue,
   Textarea
 } from "~/components";
-import { ListTtsModels, TtsModelListItem } from "./utilities";
+import { ListTtsModels } from "./utilities";
+import { TtsModelListItem } from "./types";
 
-const testdata = [
-  { name: 'Wade Cooper' },
-  { name: 'Arlene Mccoy' },
-  { name: 'Devon Webb' },
-  { name: 'Tom Cook' },
-  { name: 'Tanya Fox' },
-  { name: 'Hellen Schmidt' },
-]
+// const testdata = [
+//   { name: 'Wade Cooper' },
+//   { name: 'Arlene Mccoy' },
+//   { name: 'Devon Webb' },
+//   { name: 'Tom Cook' },
+//   { name: 'Tanya Fox' },
+//   { name: 'Hellen Schmidt' },
+// ]
 type TtsState = {
   voice: string;
   text: string;
@@ -52,9 +53,17 @@ export const DialogueTTS = ()=>{
     listModels();
   }, [listModels]);
 
-  // useEffect(() => {
-  //   console.log(ttsModels);
-  // }, [ttsModels]);
+  const requestTts = useCallback(()=>{
+    // const modelToken = props.maybeSelectedTtsModel!.model_token;
+
+    // const request = {
+    //   uuid_idempotency_token: uuidv4(),
+    //   tts_model_token: modelToken,
+    //   inference_text: props.textBuffer,
+    // };
+
+    // const response = await GenerateTtsAudio(request);
+  },[]);
 
   const handleClose = ()=> {
     dispatchAppUiState({
