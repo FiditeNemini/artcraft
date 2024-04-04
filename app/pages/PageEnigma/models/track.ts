@@ -38,6 +38,7 @@ export enum ClipType {
   TRANSFORM = "transform",
   AUDIO = "audio",
   ANIMATION = "animation",
+  LIPSYNC = "lipsync"
 }
 
 export enum ClipGroup {
