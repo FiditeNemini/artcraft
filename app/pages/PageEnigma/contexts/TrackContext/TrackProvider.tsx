@@ -48,7 +48,7 @@ export const TrackProvider = ({ children }: Props) => {
   // cross group functions
   const dropClip = useCallback(() => {
     if (canDrop.value) {
-      if (dragType.value === "animations") {
+      if (dragType.value === ClipType.ANIMATION) {
         addCharacterAnimation({
           clipId: dragId.value!,
           characterId: dropId.value,
@@ -56,7 +56,7 @@ export const TrackProvider = ({ children }: Props) => {
           offset: dropOffset.value,
         });
       }
-      if (dragType.value === "audio") {
+      if (dragType.value === ClipType.AUDIO) {
         addCharacterAudio({
           clipId: dragId.value!,
           characterId: dropId.value,
@@ -72,7 +72,7 @@ export const TrackProvider = ({ children }: Props) => {
       }
     }
     endDrag();
-  }, [animationClips, endDrag]);
+  }, [animationClips, endDrag, audioClips]);
 
   const fullWidth = useMemo(() => {
     return length * 60 * 4 * scale;

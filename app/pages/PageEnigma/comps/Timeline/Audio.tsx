@@ -5,13 +5,14 @@ import {
   toggleAudioMute,
   updateAudio,
 } from "~/pages/PageEnigma/store";
+import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 export const Audio = () => {
   const { clips } = audioGroup.value;
 
   return (
     <div
-      className="block rounded-lg bg-audio-groupBg pb-5 pl-2 pr-4"
+      className="bg-global_audio-groupBg block rounded-lg pb-5 pl-2 pr-4"
       style={{ width: fullWidth.value + 90 }}
     >
       <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
@@ -23,7 +24,7 @@ export const Audio = () => {
           clips={clips}
           title="Global Audio TrackClips"
           updateClip={updateAudio}
-          style="audio"
+          group={ClipGroup.GLOBAL_AUDIO}
           muted={audioGroup.value.muted}
           toggleMute={toggleAudioMute}
         />

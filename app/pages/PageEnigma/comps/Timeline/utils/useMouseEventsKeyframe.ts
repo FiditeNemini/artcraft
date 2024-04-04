@@ -1,10 +1,6 @@
-import React, { Dispatch, useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Keyframe } from "~/pages/PageEnigma/models/track";
-import {
-  canDrop,
-  scale,
-  showDuplicateOffsetWarning,
-} from "~/pages/PageEnigma/store";
+import { canDrop, scale } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
 export const useMouseEventsKeyframe = ({
@@ -12,15 +8,14 @@ export const useMouseEventsKeyframe = ({
   max,
   min,
   updateKeyframe,
-  setOffset,
 }: {
   keyframe: Keyframe;
   max: number;
   min: number;
   updateKeyframe: (args: { id: string; offset: number }) => void;
-  setOffset: Dispatch<number>;
 }) => {
   useSignals();
+  const [offset, setOffset] = useState(-1);
   const currOffset = useRef(keyframe.offset);
   const initOffset = useRef(keyframe.offset);
   const isActive = useRef("");
@@ -34,8 +29,9 @@ export const useMouseEventsKeyframe = ({
       });
       isActive.current = "";
       canDrop.value = false;
+      setOffset(-1);
     }
-  }, [updateKeyframe, keyframe.keyframe_uuid]);
+  }, [updateKeyframe, keyframe.keyframe_uuid, setOffset]);
 
   const onMouseMove = useCallback(
     (event: MouseEvent) => {
@@ -80,7 +76,9 @@ export const useMouseEventsKeyframe = ({
         event.preventDefault();
         clientX.current = event.clientX;
         isActive.current = type;
+        setOffset(keyframe.offset);
       }
     },
+    offset,
   };
 };

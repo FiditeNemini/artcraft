@@ -8,19 +8,43 @@ import * as uuid from "uuid";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { toast } from "react-hot-toast";
 
 export const objectGroup = signal<ObjectGroup>({
   id: "OB1",
   objects: [],
 });
 
-export function updateObject({ id, offset }: { id: string; offset: number }) {
+export function updateObject({
+  id,
+  offset,
+}: {
+  id: string;
+  offset: number;
+}): void {
   const oldObjectGroup = objectGroup.value;
   const obj = oldObjectGroup.objects.find((objectTrack) =>
     objectTrack.keyframes.some((row) => row.keyframe_uuid === id),
   );
 
-  if (obj && obj.keyframes.some((row) => row.offset === offset)) {
+  if (!obj) {
+    return;
+  }
+
+  const existingKeyframe = obj.keyframes.some((row) => {
+    console.log(
+      "upd",
+      row.keyframe_uuid,
+      row.offset,
+      offset,
+      id,
+      row.offset === offset && row.keyframe_uuid !== id,
+    );
+    return row.offset === offset && row.keyframe_uuid !== id;
+  });
+
+  if (existingKeyframe) {
+    toast("There can only be one keyframe at an offset.");
     return;
   }
 
@@ -61,6 +85,7 @@ export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
   );
 
   if (obj && obj.keyframes.some((row) => row.offset === offset)) {
+    toast.error("There can only be one keyframe at this offset.");
     return;
   }
 
@@ -88,9 +113,12 @@ export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
 
   objectGroup.value = {
     ...oldObjectGroup,
-    objects: [...oldObjectGroup.objects, newObject].sort((objA, objB) =>
-      objA.object_uuid < objB.object_uuid ? -1 : 1,
-    ),
+    objects: [
+      ...oldObjectGroup.objects.filter(
+        (row) => row.object_uuid !== obj?.object_uuid,
+      ),
+      newObject,
+    ].sort((objA, objB) => (objA.object_uuid < objB.object_uuid ? -1 : 1)),
   };
   Queue.publish({
     queueName: QueueNames.TO_ENGINE,

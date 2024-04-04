@@ -5,7 +5,7 @@ import { ClipGroup } from "~/pages/PageEnigma/models/track";
 export const ObjectTrack = () => {
   return (
     <div
-      className="block rounded-lg bg-objects-groupBg pb-5 pl-2 pr-4"
+      className="bg-object-groupBg block rounded-lg pb-5 pl-2 pr-4"
       style={{ width: fullWidth.value + 90 }}
     >
       <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
