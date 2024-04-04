@@ -1,15 +1,18 @@
-import { Keyframe } from "~/pages/PageEnigma/models/track";
-import { filmLength } from "~/pages/PageEnigma/store";
+import { ClipGroup, Keyframe } from "~/pages/PageEnigma/models/track";
 import { TrackKeyFrame } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrame";
 
 interface Props {
   id: string;
   keyframes: Keyframe[];
   title: string;
-  style: "character" | "audio" | "camera" | "objects";
+  group: ClipGroup;
   toggleMute?: () => void;
   muted?: boolean;
-  updateKeyframe: (options: { id: string; offset: number }) => void;
+  updateKeyframe: (options: {
+    id: string;
+    offset: number;
+    force?: boolean;
+  }) => void;
 }
 
 export const TrackKeyFrames = ({
@@ -17,23 +20,17 @@ export const TrackKeyFrames = ({
   keyframes,
   updateKeyframe,
   title,
-  style,
+  group,
 }: Props) => {
   return (
     <div className="pl-16">
       <div
-        id={`track-${style}-${id}`}
-        className={`relative mt-4 block h-9 w-full rounded-lg bg-${style}-unselected`}
+        id={`track-${group}-${id}`}
+        className={`relative mt-4 block h-9 w-full rounded-lg bg-${group}-unselected`}
       >
-        {keyframes.map((keyframe, index) => (
+        {keyframes.map((keyframe) => (
           <TrackKeyFrame
             key={keyframe.keyframe_uuid}
-            min={index > 0 ? keyframes[index - 1].offset + 1 : 0}
-            max={
-              index < keyframes.length - 1
-                ? keyframes[index + 1].offset
-                : filmLength.value * 60
-            }
             updateKeyframe={updateKeyframe}
             keyframe={keyframe}
           />

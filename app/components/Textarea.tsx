@@ -1,6 +1,7 @@
 import { TextareaHTMLAttributes } from "react";
 import { twMerge } from "tailwind-merge";
 import { Label } from "./Typography";
+import { kebabCase } from "~/utilities";
 
 type ResizeType =
   | "none"
@@ -15,6 +16,7 @@ export const Textarea = ({
   className,
   label,
   resize = "vertical",
+  id,
   ...rest
 }: TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label?: string;
@@ -22,8 +24,14 @@ export const Textarea = ({
 }) => {
   return (
     <div className="flex flex-col">
-      {label && <Label>{label}</Label>}
+      {label && 
+        <Label htmlFor={id ? id : kebabCase(label)}>
+          {label}
+        </Label>
+      }
+      
       <textarea
+        id={id ? id : (label ? kebabCase(label) : undefined)}
         className={twMerge(
           "rounded-lg border border-ui-panel-border bg-ui-controls p-3",
           className,

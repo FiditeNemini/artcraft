@@ -28,14 +28,16 @@ export function updateCharacters({
   id,
   offset,
   length,
+  force,
 }: {
-  type: "animations" | "positions" | "lipSync";
+  type: ClipType;
   id: string;
-  length: number;
+  length?: number;
   offset: number;
+  force?: boolean;
 }) {
   const oldCharacterGroups = characterGroups.value;
-  if (type === "animations") {
+  if (type === ClipType.ANIMATION) {
     characterGroups.value = oldCharacterGroups.map((character) => {
       const newAnimationClips = [...character.animationClips];
       const clipIndex = newAnimationClips.findIndex(
@@ -46,7 +48,7 @@ export function updateCharacters({
       }
       const clip = newAnimationClips[clipIndex];
       clip.offset = offset;
-      clip.length = length;
+      clip.length = length!;
 
       Queue.publish({
         queueName: QueueNames.TO_ENGINE,
@@ -61,7 +63,7 @@ export function updateCharacters({
     });
   }
 
-  if (type === "positions") {
+  if (type === ClipType.TRANSFORM) {
     characterGroups.value = oldCharacterGroups.map((character) => {
       const newPositionKeyframes = [...character.positionKeyframes];
       const keyframeIndex = newPositionKeyframes.findIndex(
@@ -85,7 +87,7 @@ export function updateCharacters({
       };
     });
   }
-  if (type === "lipSync") {
+  if (type === ClipType.AUDIO) {
     characterGroups.value = oldCharacterGroups.map((character) => {
       const newLipSyncClips = [...character.lipSyncClips];
       const clipIndex = newLipSyncClips.findIndex(
@@ -96,7 +98,7 @@ export function updateCharacters({
       }
       const clip = newLipSyncClips[clipIndex];
       clip.offset = offset;
-      clip.length = length;
+      clip.length = length!;
 
       Queue.publish({
         queueName: QueueNames.TO_ENGINE,
@@ -204,6 +206,18 @@ export function addCharacterAudio({
 }
 
 export function addCharacterKeyframe(keyframe: QueueKeyframe, offset: number) {
+  const oldCharacterGroups = characterGroups.value;
+
+  if (
+    oldCharacterGroups.some((characterGroup) => {
+      return characterGroup.positionKeyframes.some(
+        (row) => row.offset === offset,
+      );
+    })
+  ) {
+    return;
+  }
+
   const newKeyframe = {
     version: keyframe.version,
     keyframe_uuid: uuid.v4(),
@@ -216,7 +230,6 @@ export function addCharacterKeyframe(keyframe: QueueKeyframe, offset: number) {
     selected: false,
   } as Keyframe;
 
-  const oldCharacterGroups = characterGroups.value;
   characterGroups.value = oldCharacterGroups.map((character) => {
     if (character.id !== keyframe.object_uuid) {
       return { ...character };

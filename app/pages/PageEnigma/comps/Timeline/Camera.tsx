@@ -1,6 +1,7 @@
 import { cameraGroup, fullWidth, updateCamera } from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 import { useSignals } from "@preact/signals-react/runtime";
+import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 export const Camera = () => {
   useSignals();
@@ -17,7 +18,7 @@ export const Camera = () => {
           id={cameraGroup.value.id}
           keyframes={keyframes}
           title="Camera Position/Rotation"
-          style="camera"
+          group={ClipGroup.CAMERA}
           updateKeyframe={updateCamera}
         />
       </div>
