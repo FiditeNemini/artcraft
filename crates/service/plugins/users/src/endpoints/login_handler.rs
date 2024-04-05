@@ -21,7 +21,7 @@ use mysql_queries::queries::users::user::lookup_user_for_login_by_username::look
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_confirm_password::bcrypt_confirm_password;
 
-use crate::cookies::session::session_cookie_manager::SessionCookieManager;
+use crate::session::http::session_cookie_manager::SessionCookieManager;
 
 #[derive(Deserialize, ToSchema)]
 pub struct LoginRequest {

@@ -24,7 +24,7 @@ use redis_common::redis_cache_keys::RedisCacheKeys;
 use user_input_common::check_for_slurs::contains_slurs;
 use user_input_common::markdown_to_html::markdown_to_html;
 
-use crate::utils::session_checker::SessionChecker;
+use crate::session::session_checker::SessionChecker;
 use crate::validations::validate_profile_cashapp_username::{normalize_cashapp_username_for_storage, validate_profile_cashapp_username};
 use crate::validations::validate_profile_discord_username::validate_profile_discord_username;
 use crate::validations::validate_profile_github_username::validate_profile_github_username;

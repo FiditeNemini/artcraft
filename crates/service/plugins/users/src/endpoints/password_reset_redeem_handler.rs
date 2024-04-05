@@ -14,7 +14,7 @@ use mysql_queries::queries::users::user_password_resets::lookup_password_reset_r
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_hash_password::bcrypt_hash_password;
 
-use crate::cookies::session::session_cookie_manager::SessionCookieManager;
+use crate::session::http::session_cookie_manager::SessionCookieManager;
 
 #[derive(Deserialize)]
 pub struct PasswordResetRedemptionRequest {

@@ -18,8 +18,8 @@ use redis_caching::redis_ttl_cache::RedisTtlCache;
 use reusable_types::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
-use users_component::cookies::session::session_cookie_manager::SessionCookieManager;
-use users_component::utils::session_checker::SessionChecker;
+use users_component::session::http::session_cookie_manager::SessionCookieManager;
+use users_component::session::session_checker::SessionChecker;
 use crate::configs::app_startup::username_set::UsernameSet;
 
 use crate::http_server::endpoints::categories::tts::list_fully_computed_assigned_tts_categories::list_fully_computed_assigned_tts_categories::ModelTokensByCategoryToken;

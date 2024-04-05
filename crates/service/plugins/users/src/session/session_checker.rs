@@ -16,9 +16,9 @@ use redis_caching::redis_ttl_cache::{RedisTtlCache, RedisTtlCacheConnection};
 use redis_common::redis_cache_keys::RedisCacheKeys;
 use tokens::tokens::users::UserToken;
 
-use crate::cookies::session::session_cookie_manager::SessionCookieManager;
-use crate::utils::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
-use crate::utils::user_session_feature_flags::UserSessionFeatureFlags;
+use crate::session::http::session_cookie_manager::SessionCookieManager;
+use crate::session::lookup::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
+use crate::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 
 #[derive(Clone)]
 pub struct SessionChecker {

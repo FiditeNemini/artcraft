@@ -16,7 +16,7 @@ use http_server_common::response::response_error_helpers::to_simple_json_error;
 use mysql_queries::queries::users::user_sessions::delete_user_session::delete_user_session;
 use user_traits_component::traits::internal_session_cache_purge::InternalSessionCachePurge;
 
-use crate::cookies::session::session_cookie_manager::SessionCookieManager;
+use crate::session::http::session_cookie_manager::SessionCookieManager;
 
 #[derive(Serialize, ToSchema)]
 pub struct LogoutSuccessResponse {

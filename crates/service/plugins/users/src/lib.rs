@@ -8,5 +8,6 @@ pub mod common_responses;
 pub mod cookies;
 pub mod default_routes;
 pub mod endpoints;
+pub mod session;
 pub mod utils;
 pub mod validations;

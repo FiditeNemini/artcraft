@@ -39,9 +39,8 @@ impl UserSessionFeatureFlags {
 
 #[cfg(test)]
 mod tests {
+  use crate::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
   use enums::by_table::users::user_feature_flag::UserFeatureFlag;
-
-  use crate::utils::user_session_feature_flags::UserSessionFeatureFlags;
 
   #[test]
   fn test_no_flags() {

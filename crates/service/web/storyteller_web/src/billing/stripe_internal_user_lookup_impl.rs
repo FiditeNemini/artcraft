@@ -4,7 +4,7 @@ use chrono::Utc;
 use log::warn;
 
 use billing_component::stripe::traits::internal_user_lookup::{InternalUserLookup, InternalUserLookupError, SubscriptionKey, UserMetadata};
-use users_component::utils::session_checker::SessionChecker;
+use users_component::session::session_checker::SessionChecker;
 
 use crate::MySqlPool;
 

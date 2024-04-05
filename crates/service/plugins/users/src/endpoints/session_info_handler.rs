@@ -18,8 +18,8 @@ use http_server_common::response::response_error_helpers::to_simple_json_error;
 
 use crate::common_responses::user_details_lite::UserDetailsLight;
 use crate::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
-use crate::utils::session_checker::SessionChecker;
-use crate::utils::user_session_feature_flags::UserSessionFeatureFlags;
+use crate::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
+use crate::session::session_checker::SessionChecker;
 
 #[derive(Serialize, Copy, Clone, ToSchema)]
 #[serde(rename_all = "snake_case")]

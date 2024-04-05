@@ -29,7 +29,7 @@ use tokens::tokens::users::UserToken;
 use crate::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use crate::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
 use crate::common_responses::user_details_lite::UserDetailsLight;
-use crate::utils::session_checker::SessionChecker;
+use crate::session::session_checker::SessionChecker;
 
 // TODO: This is duplicated in query_user_profile
 

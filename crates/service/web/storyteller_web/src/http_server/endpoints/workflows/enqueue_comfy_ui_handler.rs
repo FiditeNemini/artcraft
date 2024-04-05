@@ -26,6 +26,7 @@ use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::users::UserToken;
+use users_component::session::lookup::user_session_extended::UserSessionExtended;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::configs::plans::plan_category::PlanCategory;
@@ -206,7 +207,7 @@ pub async fn enqueue_comfy_ui_handler(
 
     let maybe_user_preferred_visibility : Option<Visibility> = maybe_user_session
         .as_ref()
-        .map(|user_session: &users_component::utils::user_session_extended::UserSessionExtended| user_session.preferences.preferred_tts_result_visibility); // TODO: New setting for web-vc
+        .map(|user_session: &UserSessionExtended| user_session.preferences.preferred_tts_result_visibility); // TODO: New setting for web-vc
 
     let set_visibility = request.creator_set_visibility
         .or(maybe_user_preferred_visibility)

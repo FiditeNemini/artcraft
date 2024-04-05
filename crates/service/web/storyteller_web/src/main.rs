@@ -66,8 +66,8 @@ use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use user_traits_component::traits::internal_session_cache_purge::InternalSessionCachePurge;
 use users_component::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
-use users_component::cookies::session::session_cookie_manager::SessionCookieManager;
-use users_component::utils::session_checker::SessionChecker;
+use users_component::session::http::session_cookie_manager::SessionCookieManager;
+use users_component::session::session_checker::SessionChecker;
 
 use crate::billing::internal_product_to_stripe_lookup_impl::InternalProductToStripeLookupImpl;
 use crate::billing::internal_session_cache_purge_impl::InternalSessionCachePurgeImpl;

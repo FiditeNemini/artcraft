@@ -24,6 +24,7 @@ use mysql_queries::queries::generic_inference::web::insert_generic_inference_job
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
 use tokens::tokens::media_files::MediaFileToken;
+use users_component::session::lookup::user_session_extended::UserSessionExtended;
 
 use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
 use crate::configs::plans::plan_category::PlanCategory;
@@ -224,7 +225,7 @@ pub async fn enqueue_video_style_transfer_handler(
 
     let maybe_user_preferred_visibility : Option<Visibility> = maybe_user_session
         .as_ref()
-        .map(|user_session: &users_component::utils::user_session_extended::UserSessionExtended| user_session.preferences.preferred_tts_result_visibility); // TODO: New setting for web-vc
+        .map(|user_session: &UserSessionExtended| user_session.preferences.preferred_tts_result_visibility); // TODO: New setting for web-vc
 
     let set_visibility = request.creator_set_visibility
         .or(maybe_user_preferred_visibility)
