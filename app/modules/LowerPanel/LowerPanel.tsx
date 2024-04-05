@@ -1,6 +1,7 @@
-import React, { useCallback } from "react";
+import React, { UIEvent, UIEventHandler, useCallback } from "react";
 import { useMouseEventsHeight } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsHeight";
 import {
+  currentScroll,
   currentTime,
   overTimeline,
   scale,
@@ -22,7 +23,10 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
   const onTimelineClick = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
-        const newTime = Math.round((event.clientX - 92) / 4 / scale.value);
+        console.log("??", event.clientX, event.pageX, currentScroll.value);
+        const newTime = Math.round(
+          (event.clientX + currentScroll.value - 92) / 4 / scale.value,
+        );
         if (newTime < 0) {
           return;
         }
@@ -36,6 +40,10 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
     },
     [],
   );
+
+  const onScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
+    currentScroll.value = event.currentTarget.scrollLeft;
+  }, []);
 
   return (
     <>
@@ -56,6 +64,7 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
         }}
         onPointerLeave={() => (overTimeline.value = false)}
         onPointerDown={onTimelineClick}
+        onScroll={onScroll}
       >
         {children}
       </div>

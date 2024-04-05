@@ -38,7 +38,7 @@ export const useMouseEventsClip = (
         if (deltaOffset < min) {
           currOffset.current = min;
         } else if (deltaOffset + currLength.current > max) {
-          currOffset.current = max;
+          currOffset.current = max - currLength.current;
         } else {
           currOffset.current = deltaOffset;
         }
