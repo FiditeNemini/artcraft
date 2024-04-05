@@ -253,12 +253,23 @@ export class TimeLine {
             }
         }
     }
+
     public async deleteClip(data: any) {
         console.log(data);
         let json_data = data['data'];
-        let clip_uuid = json_data['clip_uuid'];
-    }
+        let object_uuid = data["data"]["object_uuid"];
+        let media_id = data["data"]["media_id"];
+        let type = data['type']
 
+        for (let i = 0; i < this.timeline_items.length; i++) {
+            const element = this.timeline_items[i];
+            if (element.media_id == media_id && element.object_uuid == object_uuid) {
+                this.timeline_items.splice(i, 1);
+                break;
+            }
+        }
+    }
+    
     public async scrubberUpdate(data: any) {
         console.log(data);
     }
