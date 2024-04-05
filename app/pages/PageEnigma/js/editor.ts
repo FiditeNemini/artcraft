@@ -24,7 +24,7 @@ import { PointerLockControls } from "three/addons/controls/PointerLockControls.j
 import { APPUI_ACTION_TYPES } from "../reducers";
 import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
-import { XYZ } from "../../datastructures/common";
+import { XYZ } from "../datastructures/common";
 class EditorState {
   // {
   //   action: "ShowLoadingIndicator"
@@ -150,6 +150,7 @@ class Editor {
     this.raycaster;
     this.mouse;
     this.selected;
+
     this.last_selected;
     this.transform_interaction;
     this.rendering = false;
@@ -443,8 +444,8 @@ class Editor {
 
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position:XYZ,rotation:XYZ,scale:XYZ) {
-    if (this.selected !=null) {
-
+    if (this.selected !=undefined || this.selected !=null) {
+      //console.log(`triggering setSelectedObject`) 
       this.selected.position.x = position.x
       this.selected.position.y = position.y
       this.selected.position.z = position.z
@@ -652,9 +653,14 @@ class Editor {
     // note the database from the server is the source of truth for all the data.
     // Test code here
     const object: THREE.Object3D = await this.activeScene.load_glb(
-      "m_9f3d3z94kk6m25zywyz6an3p43fjtw",
+      "m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d",
     );
+
     object.uuid = "CH1";
+
+    // Stick Open Pose Man: m_9f3d3z94kk6m25zywyz6an3p43fjtw
+    // XBot: m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d 
+    // YBot: m_9sqg0evpr23587jnr8z3zsvav1x077
 
     // Load timeline creates the the clips from the datastructure and loads them in here.
     // load object into the engine for lip syncing
@@ -1023,7 +1029,8 @@ class Editor {
     document.body.removeChild(downloadLink);
 
     const data = await this.api_manager.uploadMedia(blob, "render.mp4");
-    // Create a link to download the file
+    // Create a link to download the file stylize video using api ..
+    //{"success":true,"upload_token":"mu_x9kr5cfafn512pjbygdszvbdpktrr"} payload
 
   }
 
@@ -1094,15 +1101,16 @@ class Editor {
     }
   }
 
+  // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
     console.log("Generating video...");
     if (this.rendering) {
       return;
     }
+    this.rendering = true; // has to go first to debounce
     this.startPlayback();
     this.frame_buffer = [];
     this.render_timer = 0;
-    this.rendering = true;
     this.activeScene.renderMode(this.rendering);
     if (this.activeScene.hot_items) {
       this.activeScene.hot_items.forEach((element) => {
@@ -1139,7 +1147,7 @@ class Editor {
     this.activeScene.scene.add(this.control);
   }
 
-  // Render the scene to the camera.
+  // Render the scene to the camera, this is called in the update.
   renderScene() {
     if (this.composer != null && !this.rendering && this.rawRenderer) {
       this.composer.render();
@@ -1167,43 +1175,45 @@ class Editor {
   }
 
   updateSelectedUI() {
+
     if (this.selected == undefined) {
       return;
     }
-
-    const pos = this.selected.position;
-    const rot = this.selected.rotation;
-    const scale = this.selected.scale;
-
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
-      payload: {
-        group:
-          this.selected.name === "::CAM::"
-            ? ClipGroup.CAMERA
-            : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
-        object_uuid: this.selected.uuid,
-        object_name: this.selected.name,
-        version: this.version,
-        objectVectors: {
-          position: {
-            x: parseFloat(pos.x.toFixed(2)),
-            y: parseFloat(pos.y.toFixed(2)),
-            z: parseFloat(pos.z.toFixed(2)),
-          },
-          rotation: {
-            x: parseFloat(rot.x.toFixed(2)),
-            y: parseFloat(rot.y.toFixed(2)),
-            z: parseFloat(rot.z.toFixed(2)),
-          },
-          scale: {
-            x: parseFloat(scale.x.toFixed(2)),
-            y: parseFloat(scale.y.toFixed(2)),
-            z: parseFloat(scale.z.toFixed(2)),
+     const pos = this.selected.position;
+      const rot = this.selected.rotation;
+      const scale = this.selected.scale;
+  
+      // TODO this is a bug we need to only show when clicked on and use UPDATE when updating.
+      this.dispatchAppUiState({
+        type: APPUI_ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
+        payload: {
+          group:
+            this.selected.name === "::CAM::"
+              ? ClipGroup.CAMERA
+              : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
+          object_uuid: this.selected.uuid,
+          object_name: this.selected.name,
+          version: this.version,
+          objectVectors: {
+            position: {
+              x: parseFloat(pos.x.toFixed(2)),
+              y: parseFloat(pos.y.toFixed(2)),
+              z: parseFloat(pos.z.toFixed(2)),
+            },
+            rotation: {
+              x: parseFloat(rot.x.toFixed(2)),
+              y: parseFloat(rot.y.toFixed(2)),
+              z: parseFloat(rot.z.toFixed(2)),
+            },
+            scale: {
+              x: parseFloat(scale.x.toFixed(2)),
+              y: parseFloat(scale.y.toFixed(2)),
+              z: parseFloat(scale.z.toFixed(2)),
+            },
           },
         },
-      },
-    });
+      });
+  
   }
 
   // Automaticly resize scene.
@@ -1289,6 +1299,8 @@ class Editor {
           currentObject = currentObject.parent;
         }
         this.selected = currentObject;
+        // Show panel here 
+
         if (this.selected.type == "Scene") {
           this.selected = intersects[0].object;
         }
@@ -1299,6 +1311,40 @@ class Editor {
         this.control.attach(this.selected);
         this.outlinePass.selectedObjects = [this.selected];
         this.transform_interaction = true;
+
+        // Contact react land 
+        const pos = this.selected.position;
+        const rot = this.selected.rotation;
+        const scale = this.selected.scale;
+        this.dispatchAppUiState({
+          type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
+          payload: {
+            group:
+              this.selected.name === "::CAM::"
+                ? ClipGroup.CAMERA
+                : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
+            object_uuid: this.selected.uuid,
+            object_name: this.selected.name,
+            version: this.version,
+            objectVectors: {
+              position: {
+                x: parseFloat(pos.x.toFixed(2)),
+                y: parseFloat(pos.y.toFixed(2)),
+                z: parseFloat(pos.z.toFixed(2)),
+              },
+              rotation: {
+                x: parseFloat(rot.x.toFixed(2)),
+                y: parseFloat(rot.y.toFixed(2)),
+                z: parseFloat(rot.z.toFixed(2)),
+              },
+              scale: {
+                x: parseFloat(scale.x.toFixed(2)),
+                y: parseFloat(scale.y.toFixed(2)),
+                z: parseFloat(scale.z.toFixed(2)),
+              },
+            },
+          },
+        });
       }
     } else if (this.transform_interaction == false) {
       this.removeTransformControls();
