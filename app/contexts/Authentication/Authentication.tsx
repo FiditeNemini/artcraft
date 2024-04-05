@@ -84,17 +84,17 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
         GetSession().then((
           res: SessionResponse
         )=>{
-          console.log('Session Returned');
-          console.log(res);
+          // console.log('Session Returned');
+          // console.log(res);
           if(res.success && res.user){
-            console.log('Setting Auth State');
+            // console.log('Setting Auth State');
             setAuthState({
               isLoggedIn: true,
               sessionData: JSON.stringify(res.user),
               userInfo: res.user
             });
           }else{
-            console.log('Session expired, setting State');
+            // console.log('Session expired, setting State');
             setLogoutState(); 
           }
         });
