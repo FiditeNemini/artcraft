@@ -59,7 +59,7 @@ group by maybe_creator_user_token, maybe_creator_username
 order by attempts desc;
 
 
--- Bin histogram by IP (logged in and non-logged in
+-- Bin histogram by IP (logged in and non-logged in)
 -- NB: no index on ip, hence subquery
 SELECT
     creator_ip_address,
@@ -81,7 +81,6 @@ FROM (
 group by creator_ip_address
 order by attempts desc;
 
-
 -- Bin histogram by non-logged in IP
 -- NB: no index on ip, hence subquery
 SELECT
@@ -102,5 +101,28 @@ FROM (
      WHERE j.created_at > NOW() - INTERVAL 30 MINUTE
      AND j.maybe_creator_user_token IS NULL
  ) as jobs
+group by creator_ip_address
+order by attempts desc;
+
+-- Exact IP
+-- NB: no index on ip, hence subquery
+SELECT
+    creator_ip_address,
+    count(*) as attempts
+FROM (
+         SELECT
+             maybe_creator_user_token,
+             creator_ip_address
+         FROM (
+                  SELECT maybe_creator_user_token,
+                         creator_ip_address,
+                         created_at
+                  FROM generic_inference_jobs
+                  ORDER BY id DESC
+                      LIMIT 10000
+              ) as j
+         WHERE j.created_at > NOW() - INTERVAL 30 MINUTE
+           AND creator_ip_address = '34.199.224.8'
+     ) as jobs
 group by creator_ip_address
 order by attempts desc;

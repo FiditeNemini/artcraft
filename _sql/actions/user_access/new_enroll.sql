@@ -82,15 +82,21 @@ WHERE username IN (
 );
 
 -- Early access (film)
+-- Chechisauri0: Messaged Brandon on Discord; uses Premiere and Blender
 -- dakrid: David, Brandon's filmmaker friend
 -- omega7321: vegito / ishaan
+-- thenadamgoes: Adam (/r/aivideo)
+-- twirble: (/r/aivideo)
 UPDATE users
 SET
     can_access_studio = false,
     maybe_feature_flags = 'studio,video_style_transfer'
 WHERE username IN (
+    'chechisauri0',
     'dakrid',
     'omega7321',
+    'thenadamgoes',
+    'twirble',
     'zzz_last_item'
 );
 
