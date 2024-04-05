@@ -203,7 +203,6 @@ export class TimeLine {
                             end_offset));
                     return;
                 } else {
-                    console.log("Audio!")
                     this.audio_engine.loadClip(media_id);
                 }
                 break;
@@ -239,8 +238,6 @@ export class TimeLine {
 
     public async updateClip(data: any) {
         // only length and offset changes here.
-        console.log(data);
-
         let object_uuid = data["data"]["object_uuid"];
         const media_id = data["data"]["media_id"];
         const offset = data["data"]["offset"];
@@ -255,7 +252,6 @@ export class TimeLine {
     }
 
     public async deleteClip(data: any) {
-        console.log(data);
         let json_data = data['data'];
         let object_uuid = data["data"]["object_uuid"];
         let media_id = data["data"]["media_id"];
@@ -343,7 +339,6 @@ export class TimeLine {
     private getEndPoint(): number {
         let longest = 0;
         for (const element of this.timeline_items) {
-            console.log(element);
             if (longest < element.length) {
                 longest = element.length;
             }
