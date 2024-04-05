@@ -3,7 +3,7 @@ import { AnimationElement } from "./AnimationElement";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { useSignals } from "@preact/signals-react/runtime";
 import { timelineHeight } from "~/pages/PageEnigma/store";
-import { ClipType } from "~/pages/PageEnigma/models/track";
+import { AssetType } from "~/pages/PageEnigma/models";
 
 export const AudioElements = () => {
   const { audioClips } = useContext(TrackContext);
@@ -21,7 +21,7 @@ export const AudioElements = () => {
           <AnimationElement
             key={clip.media_id}
             clip={clip}
-            type={ClipType.AUDIO}
+            type={AssetType.AUDIO}
           />
         );
       })}

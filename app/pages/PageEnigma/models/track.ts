@@ -1,26 +1,5 @@
 import { XYZ } from "../datastructures/common";
 
-export interface QueueClip {
-  version: number;
-  type: ClipType;
-  group: ClipGroup;
-  object_uuid?: string;
-  clip_uuid?: string;
-  media_id?: string;
-  name?: string;
-  offset?: number;
-  length?: number;
-  selected?: boolean;
-}
-
-export interface MediaClip {
-  version: number;
-  type: ClipType;
-  media_id: string;
-  name: string;
-  length: number;
-}
-
 export interface Clip {
   version: number;
   clip_uuid: string;
@@ -53,19 +32,6 @@ export interface Keyframe {
   group: ClipGroup;
   object_uuid: string;
   offset: number;
-  position: XYZ;
-  rotation: XYZ;
-  scale: XYZ;
-  selected?: boolean;
-}
-
-export interface QueueKeyframe {
-  version: number;
-  keyframe_uuid?: string;
-  group: ClipGroup;
-  object_uuid: string;
-  object_name?: string;
-  offset?: number;
   position: XYZ;
   rotation: XYZ;
   scale: XYZ;

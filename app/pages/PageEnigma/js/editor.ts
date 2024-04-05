@@ -22,9 +22,9 @@ import { AnimationEngine } from "./animation_engine.js";
 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { APPUI_ACTION_TYPES } from "../reducers";
-import { ClipGroup } from "~/pages/PageEnigma/models/track";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models";
+import { XYZ } from "~/pages/PageEnigma/datastructures/common";
 
-import { XYZ } from "../../datastructures/common";
 class EditorState {
   // {
   //   action: "ShowLoadingIndicator"
@@ -340,7 +340,7 @@ class Editor {
     if (this.cam_obj) {
       this.addTransformClipBase(
         "Camera Object",
-        "camera",
+        ClipGroup.CAMERA,
         this.cam_obj,
         0,
         150,
@@ -442,24 +442,21 @@ class Editor {
   }
 
   // TO UPDATE selected objects in the scene might want to add to the scene ...
-  async setSelectedObject(position:XYZ,rotation:XYZ,scale:XYZ) {
-    if (this.selected !=null) {
+  async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
+    if (this.selected != null) {
+      this.selected.position.x = position.x;
+      this.selected.position.y = position.y;
+      this.selected.position.z = position.z;
 
-      this.selected.position.x = position.x
-      this.selected.position.y = position.y
-      this.selected.position.z = position.z
+      this.selected.rotation.x = rotation.x;
+      this.selected.rotation.y = rotation.y;
+      this.selected.rotation.z = rotation.z;
 
-      this.selected.rotation.x = rotation.x
-      this.selected.rotation.y = rotation.y
-      this.selected.rotation.z = rotation.z
-
-      this.selected.scale.x = scale.x
-      this.selected.scale.y = scale.y
-      this.selected.scale.z = scale.z
-
+      this.selected.scale.x = scale.x;
+      this.selected.scale.y = scale.y;
+      this.selected.scale.z = scale.z;
     }
-  } 
-
+  }
 
   public async saveScene(name: string) {
     // remove controls when saving scene.
@@ -535,8 +532,8 @@ class Editor {
     this.timeline.addPlayableClip(
       new ClipUI(
         1.0,
-        "lipsync",
-        "character",
+        ClipType.AUDIO,
+        ClipGroup.CHARACTER,
         "clip1",
         "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
         object.uuid,
@@ -549,8 +546,8 @@ class Editor {
     this.timeline.addPlayableClip(
       new ClipUI(
         1.0,
-        "transform",
-        "character",
+        ClipType.TRANSFORM,
+        ClipGroup.CHARACTER,
         "clip2",
         object.uuid,
         object.uuid,
@@ -563,8 +560,8 @@ class Editor {
     this.timeline.addPlayableClip(
       new ClipUI(
         1.0,
-        "animation",
-        "character",
+        ClipType.ANIMATION,
+        ClipGroup.CHARACTER,
         "clip3",
         "/resources/models/fox/fox_idle.glb",
         object.uuid,
@@ -628,7 +625,7 @@ class Editor {
 
   async addTransformClipBase(
     name: string = "New Clip",
-    group: "object" | "character" | "camera" | "global_audio",
+    group: ClipGroup,
     object: THREE.Object3D,
     offset: number,
     length: number,
@@ -636,7 +633,7 @@ class Editor {
     this.timeline.addPlayableClip(
       new ClipUI(
         1.0,
-        "transform",
+        ClipType.TRANSFORM,
         group,
         name,
         object.uuid, // object id here ...
@@ -823,7 +820,7 @@ class Editor {
       if (this.cam_obj) {
         this.addTransformClipBase(
           "Camera Object",
-          "camera",
+          ClipGroup.CAMERA,
           this.cam_obj,
           0,
           150,
@@ -844,11 +841,11 @@ class Editor {
 
     if (this.cameraViewControls && this.camera_person_mode) {
       this.cameraViewControls.update(5 * delta_time);
-      if(this.cam_obj){
+      if (this.cam_obj) {
         if (this.last_scrub != this.timeline.scrubber_frame_position) {
           this.camera.position.copy(this.cam_obj.position);
           this.camera.rotation.copy(this.cam_obj.rotation);
-        } else if(this.timeline.is_playing == false) {
+        } else if (this.timeline.is_playing == false) {
           this.cam_obj.position.copy(this.camera.position);
           this.cam_obj.rotation.copy(this.camera.rotation);
         } else {
@@ -865,7 +862,7 @@ class Editor {
 
     this.updateSelectedUI();
 
-    if(this.timeline.is_playing){
+    if (this.timeline.is_playing) {
       this.timeline.update();
     }
 
@@ -1002,7 +999,7 @@ class Editor {
 
     if (compile_audio) {
       for (const clip of this.timeline.timeline_items) {
-        if (clip.type == "lipsync" || clip.type == "audio") {
+        if (clip.type === ClipType.AUDIO) {
           await this.convertAudioClip(itteration, ffmpeg, clip);
           itteration += 1;
         }
@@ -1024,7 +1021,6 @@ class Editor {
 
     const data = await this.api_manager.uploadMedia(blob, "render.mp4");
     // Create a link to download the file
-
   }
 
   async generateFrame() {

@@ -4,7 +4,9 @@ import {
   Keyframe,
   QueueKeyframe,
   ClipType,
-} from "~/pages/PageEnigma/models/track";
+  ObjectItem,
+  AssetType,
+} from "~/pages/PageEnigma/models";
 
 export const TrackContext = createContext<{
   // keyframes
@@ -14,9 +16,10 @@ export const TrackContext = createContext<{
   // sidebar clips
   animationClips: MediaClip[];
   audioClips: MediaClip[];
+  characterItems: ObjectItem[];
 
   // drag and drop
-  startDrag: (type: ClipType, id: string, length: number) => void;
+  startDrag: (type: AssetType, id: string, length: number) => void;
   endDrag: () => void;
 }>({
   addKeyframe: () => {},
@@ -24,6 +27,7 @@ export const TrackContext = createContext<{
 
   animationClips: [],
   audioClips: [],
+  characterItems: [],
 
   startDrag: () => {},
   endDrag: () => {},

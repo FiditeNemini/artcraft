@@ -1,9 +1,5 @@
 import { useCallback } from "react";
-import {
-  ClipGroup,
-  QueueKeyframe,
-  Keyframe,
-} from "~/pages/PageEnigma/models/track";
+import { ClipGroup, QueueKeyframe, Keyframe } from "~/pages/PageEnigma/models";
 import {
   addCameraKeyframe,
   addCharacterKeyframe,

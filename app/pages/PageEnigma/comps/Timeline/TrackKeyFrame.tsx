@@ -1,4 +1,4 @@
-import { Keyframe } from "~/pages/PageEnigma/models/track";
+import { Keyframe } from "~/pages/PageEnigma/models";
 import { filmLength, scale, selectedItem } from "~/pages/PageEnigma/store";
 import { useMouseEventsKeyframe } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsKeyframe";
 import { useSignals } from "@preact/signals-react/runtime";

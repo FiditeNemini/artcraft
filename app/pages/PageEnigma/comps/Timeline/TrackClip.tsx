@@ -1,7 +1,7 @@
 import { useMouseEventsClip } from "./utils/useMouseEventsClip";
 import { useState } from "react";
 import { scale, selectedItem } from "~/pages/PageEnigma/store";
-import { Clip, ClipGroup } from "~/pages/PageEnigma/models/track";
+import { Clip, ClipGroup } from "~/pages/PageEnigma/models";
 
 interface Props {
   min: number;

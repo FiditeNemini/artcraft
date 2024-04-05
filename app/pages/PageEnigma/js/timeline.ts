@@ -11,7 +11,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
-import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models";
 
 // Every object uuid / entity has a track.
 export class TimelineCurrentState {

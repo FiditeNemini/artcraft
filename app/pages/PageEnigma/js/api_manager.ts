@@ -161,7 +161,7 @@ export class APIManager {
     const loadGlb = (
       bucket_path: string,
     ): Promise<APIManagerResponseSuccess> => {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         glbLoader.load(bucket_path, (glb) => {
           if (glb) {
             const scene: THREE.Scene = glb.scene;

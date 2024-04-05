@@ -1,6 +1,11 @@
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import { ClipType, MediaClip } from "~/pages/PageEnigma/models/track";
+import {
+  AssetType,
+  ClipType,
+  MediaClip,
+  ObjectItem,
+} from "~/pages/PageEnigma/models";
 import useUpdateDragDrop from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateDragDrop";
 import {
   addCharacterAnimation,
@@ -26,6 +31,7 @@ export const TrackProvider = ({ children }: Props) => {
 
   const [animationClips, setAnimationClips] = useState<MediaClip[]>([]);
   const [audioClips, setAudioClips] = useState<MediaClip[]>([]);
+  const [characterItems, setCharacterItems] = useState<ObjectItem[]>([]);
 
   const [scale, setScale] = useState(1);
   const [length, setLength] = useState(1);
@@ -48,7 +54,7 @@ export const TrackProvider = ({ children }: Props) => {
   // cross group functions
   const dropClip = useCallback(() => {
     if (canDrop.value) {
-      if (dragType.value === ClipType.ANIMATION) {
+      if (dragType.value === AssetType.ANIMATION) {
         addCharacterAnimation({
           clipId: dragId.value!,
           characterId: dropId.value,
@@ -56,7 +62,7 @@ export const TrackProvider = ({ children }: Props) => {
           offset: dropOffset.value,
         });
       }
-      if (dragType.value === ClipType.AUDIO) {
+      if (dragType.value === AssetType.AUDIO) {
         addCharacterAudio({
           clipId: dragId.value!,
           characterId: dropId.value,
@@ -139,6 +145,80 @@ export const TrackProvider = ({ children }: Props) => {
         name: "Yell",
       },
     ]);
+    setCharacterItems([
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "Block Stance",
+        thumbnail: "resources/characters/img01.png",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "Elbow",
+        thumbnail: "resources/characters/img02.png",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "Stand Up",
+        thumbnail: "resources/characters/img03.png",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "Wave Sitting",
+        thumbnail: "resources/characters/img04.png",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "Idle",
+        thumbnail: "resources/characters/img05.png",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "Dancing",
+        thumbnail: "resources/characters/img06.png",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "Start Walking",
+        thumbnail: "resources/characters/img07.png",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "Start Fight",
+        thumbnail: "resources/characters/img08.png",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "",
+        thumbnail: "resources/characters/img09.png",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "Dancing 2",
+        thumbnail: "resources/characters/img10.png",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "Start Fight 2",
+        thumbnail: "resources/characters/img11.png",
+      },
+      {
+        version: 1,
+        media_id: uuid.v4(),
+        name: "Dancing 3",
+        thumbnail: "resources/characters/img12.png",
+      },
+    ]);
     setScale(1);
     setLength(12);
   }, []);
@@ -152,6 +232,7 @@ export const TrackProvider = ({ children }: Props) => {
 
       animationClips,
       audioClips,
+      characterItems,
 
       scale,
       currentTime: time,
@@ -169,6 +250,7 @@ export const TrackProvider = ({ children }: Props) => {
 
     animationClips,
     audioClips,
+    characterItems,
 
     updateCurrentTime,
     time,

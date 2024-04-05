@@ -1,7 +1,7 @@
 import { TrackClip } from "~/pages/PageEnigma/comps/Timeline/TrackClip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
-import { Clip, ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
+import { Clip, ClipGroup, ClipType } from "~/pages/PageEnigma/models";
 import { PointerEvent } from "react";
 import {
   canDrop,

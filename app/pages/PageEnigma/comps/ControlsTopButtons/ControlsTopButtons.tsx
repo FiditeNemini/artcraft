@@ -4,7 +4,7 @@ import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { AppUiContext } from "../../contexts/AppUiContext";
 import { EngineContext } from "../../contexts/EngineContext";
 import { APPUI_ACTION_TYPES } from "../../reducers";
-import { ClipGroup } from "~/pages/PageEnigma/models/track";
+import { ClipGroup } from "~/pages/PageEnigma/models";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
@@ -173,9 +173,9 @@ export const ControlsTopButtons = () => {
         </Button>
         <Button
           onClick={handleObjectPanelTest}
-          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
+          className="hover:bg-brand-teriary-400 bg-brand-tertiary focus-visible:outline-brand-tertiary"
         >
-          Show Object Panel
+          Test Button 2
         </Button>
       </div>
       <div className="flex gap-2">
@@ -186,7 +186,7 @@ export const ControlsTopButtons = () => {
         <Button onClick={handleButtonRender}>Render</Button> */}
         <Button
           onClick={handleButtonTest}
-          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
+          className="hover:bg-brand-teriary-400 bg-brand-tertiary focus-visible:outline-brand-tertiary"
           style={{ zIndex: 9001 }}
         >
           Test

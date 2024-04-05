@@ -6,7 +6,7 @@ import {
   Keyframe,
   MediaClip,
   QueueKeyframe,
-} from "~/pages/PageEnigma/models/track";
+} from "~/pages/PageEnigma/models";
 import { signal } from "@preact/signals-core";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";

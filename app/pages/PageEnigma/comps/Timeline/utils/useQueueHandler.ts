@@ -9,7 +9,7 @@ import {
   QueueClip,
   QueueKeyframe,
   UpdateTime,
-} from "~/pages/PageEnigma/models/track";
+} from "~/pages/PageEnigma/models";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
 

@@ -5,11 +5,11 @@ import {
   dragId,
   dragType,
 } from "~/pages/PageEnigma/store";
-import { ClipType } from "~/pages/PageEnigma/models/track";
+import { AssetType } from "~/pages/PageEnigma/models";
 
 export default function useUpdateDragDrop() {
   const startDrag = useCallback(
-    (type: ClipType, id: string, length: number) => {
+    (type: AssetType, id: string, length: number) => {
       dragId.value = id;
       dragType.value = type;
       clipLength.value = length;

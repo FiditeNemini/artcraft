@@ -17,7 +17,7 @@ import { ACTION_TYPES } from "../../reducers/appUiReducer/types";
 import { QueueNames } from "../../Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { toTimelineActions } from "../../Queue/toTimelineActions";
-import { QueueKeyframe } from "~/pages/PageEnigma/models/track";
+import { QueueKeyframe } from "~/pages/PageEnigma/models";
 
 export const ControlPanelSceneObject = () => {
   const editorEngine = useContext(EngineContext);
@@ -33,9 +33,13 @@ export const ControlPanelSceneObject = () => {
   const scale = appUiState.controlPanel.currentSceneObject.objectVectors.scale;
   const currentSceneObject = appUiState.controlPanel.currentSceneObject;
 
-  useEffect(()=>{
-    const vectors = appUiState.controlPanel.currentSceneObject.objectVectors
-    editorEngine?.setSelectedObject(vectors.position, vectors.rotation, vectors.scale)
+  useEffect(() => {
+    const vectors = appUiState.controlPanel.currentSceneObject.objectVectors;
+    editorEngine?.setSelectedObject(
+      vectors.position,
+      vectors.rotation,
+      vectors.scale,
+    );
   }, [appUiState.controlPanel.currentSceneObject]);
 
   const handlePositionChange = (xyz: XYZ) => {
@@ -141,9 +145,9 @@ export const ControlPanelSceneObject = () => {
     }
   };
 
-  const handleDeleteObject = () =>{
+  const handleDeleteObject = () => {
     console.log("TELL EDITOR TO DELETE HERE");
-  }
+  };
 
   return (
     <Transition
@@ -159,7 +163,9 @@ export const ControlPanelSceneObject = () => {
       <div className="flex justify-between">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube} />
-          <p className="font-semibold">{appUiState.controlPanel.currentSceneObject.object_name}</p>
+          <p className="font-semibold">
+            {appUiState.controlPanel.currentSceneObject.object_name}
+          </p>
         </div>
         <div className="flex items-center gap-2 text-xs font-medium opacity-60">
           <FontAwesomeIcon icon={faArrowRightArrowLeft} />

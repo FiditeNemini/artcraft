@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Keyframe } from "~/pages/PageEnigma/models/track";
+import { Keyframe } from "~/pages/PageEnigma/models";
 import { canDrop, scale } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
