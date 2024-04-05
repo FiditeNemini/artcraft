@@ -337,15 +337,6 @@ class Editor {
     );
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
-    if (this.cam_obj) {
-      this.addTransformClipBase(
-        "Camera Object",
-        "camera",
-        this.cam_obj,
-        0,
-        150,
-      );
-    }
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
@@ -825,15 +816,6 @@ class Editor {
   updateLoop(time: number) {
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
-      if (this.cam_obj) {
-        this.addTransformClipBase(
-          "Camera Object",
-          "camera",
-          this.cam_obj,
-          0,
-          150,
-        );
-      }
     }
 
     // Updates debug stats.

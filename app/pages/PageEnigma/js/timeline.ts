@@ -64,7 +64,7 @@ export class TimeLine {
     ) {
         this.timeline_items = [];
         this.absolute_end = 60 * 12;
-        this.timeline_limit = this.absolute_end; // 5 seconds
+        this.timeline_limit = 0; // 5 seconds
 
         this.is_playing = false;
         this.scrubber_frame_position = 0; // in frames into the tl
@@ -343,6 +343,7 @@ export class TimeLine {
     private getEndPoint(): number {
         let longest = 0;
         for (const element of this.timeline_items) {
+            console.log(element);
             if (longest < element.length) {
                 longest = element.length;
             }
