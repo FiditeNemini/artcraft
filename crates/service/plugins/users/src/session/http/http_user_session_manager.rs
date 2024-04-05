@@ -39,6 +39,10 @@ impl HttpUserSessionManager {
     })
   }
 
+  pub fn encode_session_payload(&self, session_token: &UserSessionToken, user_token: &UserToken) -> AnyhowResult<String> {
+    self.payload_signer.encode(session_token, user_token)
+  }
+
   pub fn create_cookie(&self, session_token: &UserSessionToken, user_token: &UserToken) -> AnyhowResult<Cookie> {
     let jwt_string = self.payload_signer.encode(session_token, user_token)?;
 

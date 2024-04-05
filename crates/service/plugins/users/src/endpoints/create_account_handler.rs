@@ -39,6 +39,11 @@ pub struct CreateAccountRequest {
 #[derive(Serialize)]
 pub struct CreateAccountSuccessResponse {
   pub success: bool,
+
+  /// A signed session that can be sent as a header, bypassing cookies.
+  /// This is useful for API clients that don't support cookies or Google
+  /// browsers killing cross-domain cookies.
+  pub signed_session: String,
 }
 
 #[derive(Serialize, Debug)]
@@ -225,8 +230,14 @@ pub async fn create_account_handler(
     Err(_) => return Err(CreateAccountErrorResponse::server_error()),
   };
 
+  let signed_session = match session_cookie_manager.encode_session_payload(&session_token, &new_user_data.user_token) {
+    Ok(payload) => payload,
+    Err(_) => return Err(CreateAccountErrorResponse::server_error()),
+  };
+
   let response = CreateAccountSuccessResponse {
     success: true,
+    signed_session,
   };
 
   let body = serde_json::to_string(&response)

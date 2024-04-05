@@ -14,6 +14,7 @@ use mysql_queries::queries::users::user_password_resets::lookup_password_reset_r
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_hash_password::bcrypt_hash_password;
 use tokens::tokens::user_sessions::UserSessionToken;
+use crate::endpoints::login_handler::LoginErrorResponse;
 
 use crate::session::http::http_user_session_manager::HttpUserSessionManager;
 
@@ -27,6 +28,11 @@ pub struct PasswordResetRedemptionRequest {
 #[derive(Serialize)]
 pub struct PasswordResetRedemptionResponse {
     success: bool,
+
+    /// A signed session that can be sent as a header, bypassing cookies.
+    /// This is useful for API clients that don't support cookies or Google
+    /// browsers killing cross-domain cookies.
+    pub signed_session: String,
 }
 
 #[derive(Serialize, Debug, Display)]
@@ -167,8 +173,20 @@ pub async fn password_reset_redeem_handler(
         },
     };
 
+    let signed_session = match session_cookie_manager.encode_session_payload(&session_token, &transaction_and_state.reset_state.user_token) {
+        Ok(payload) => payload,
+        Err(err) => {
+            error!("error creating session payload: {err}");
+            return Err(PasswordResetRedemptionErrorResponse {
+                kind: PasswordResetRedemptionError::Internal,
+                success: false,
+            });
+        },
+    };
+
     let response = PasswordResetRedemptionResponse {
         success: true,
+        signed_session,
     };
 
     let body = serde_json::to_string(&response)

@@ -33,6 +33,11 @@ pub struct LoginRequest {
 #[derive(Serialize, ToSchema)]
 pub struct LoginSuccessResponse {
   pub success: bool,
+
+  /// A signed session that can be sent as a header, bypassing cookies.
+  /// This is useful for API clients that don't support cookies or Google
+  /// browsers killing cross-domain cookies.
+  pub signed_session: String,
 }
 
 #[derive(Serialize, Debug, ToSchema)]
@@ -176,8 +181,14 @@ pub async fn login_handler(
     Err(_) => return Err(LoginErrorResponse::server_error()),
   };
 
+  let signed_session = match session_cookie_manager.encode_session_payload(&session_token, &user.token) {
+    Ok(payload) => payload,
+    Err(_) => return Err(LoginErrorResponse::server_error()),
+  };
+
   let response = LoginSuccessResponse {
     success: true,
+    signed_session,
   };
 
   let body = serde_json::to_string(&response)
