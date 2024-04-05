@@ -82,25 +82,10 @@ impl HttpUserSessionManager {
     cookie
   }
 
-  fn decode_session_cookie_payload(&self, session_cookie: &Cookie)
-    -> AnyhowResult<HttpUserSessionPayload>
-  {
-    let cookie_contents = session_cookie.value().to_string();
-
-    let claims = self.jwt_signer.jwt_to_claims(&cookie_contents)?;
-
-    let session_token = claims["session_token"].clone();
-    let maybe_user_token = claims.get("user_token")
-        .map(|t| t.to_string());
-
-    Ok(HttpUserSessionPayload {
-      session_token,
-      maybe_user_token,
-    })
-  }
-
-  pub fn decode_session_payload_from_request(&self, request: &HttpRequest)
-    -> AnyhowResult<Option<HttpUserSessionPayload>>
+  pub fn decode_session_payload_from_request(
+    &self,
+    request: &HttpRequest
+  ) -> AnyhowResult<Option<HttpUserSessionPayload>>
   {
     let cookie = match request.cookie(SESSION_COOKIE_NAME) {
       None => return Ok(None),
@@ -116,27 +101,21 @@ impl HttpUserSessionManager {
     }
   }
 
-  pub fn decode_session_token(&self, session_cookie: &Cookie) -> AnyhowResult<String> {
-    let cookie_payload =
-        self.decode_session_cookie_payload(session_cookie)?;
-    Ok(cookie_payload.session_token)
-  }
-
-  pub fn decode_session_token_from_request(&self, request: &HttpRequest)
-    -> AnyhowResult<Option<String>>
+  fn decode_session_cookie_payload(&self, session_cookie: &Cookie)
+    -> AnyhowResult<HttpUserSessionPayload>
   {
-    let cookie = match request.cookie(SESSION_COOKIE_NAME) {
-      None => return Ok(None),
-      Some(cookie) => cookie,
-    };
+    let cookie_contents = session_cookie.value().to_string();
 
-    match self.decode_session_token(&cookie) {
-      Err(e) => {
-        warn!("Session cookie decode error: {:?}", e);
-        Err(anyhow!("Could not decode session cookie: {:?}", e))
-      },
-      Ok(session_token) => Ok(Some(session_token)),
-    }
+    let claims = self.jwt_signer.jwt_to_claims(&cookie_contents)?;
+
+    let session_token = claims["session_token"].clone();
+    let maybe_user_token = claims.get("user_token")
+        .map(|t| t.to_string());
+
+    Ok(HttpUserSessionPayload {
+      session_token,
+      maybe_user_token,
+    })
   }
 }
 

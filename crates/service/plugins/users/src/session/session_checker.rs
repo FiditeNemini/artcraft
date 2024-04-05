@@ -43,7 +43,8 @@ impl SessionChecker {
   }
 
   pub fn get_session_token(&self, request: &HttpRequest) -> AnyhowResult<Option<String>> {
-    self.cookie_manager.decode_session_token_from_request(request)
+    Ok(self.cookie_manager.decode_session_payload_from_request(request)?
+        .map(|payload| payload.session_token))
   }
 
   pub fn forgiving_get_session_token(&self, request: &HttpRequest) -> Option<String> {
@@ -80,9 +81,12 @@ impl SessionChecker {
   ) -> AnyhowResult<Option<SessionRecord>>
     where E: 'e + Executor<'c, Database = MySql>
   {
-    let session_token = match self.cookie_manager.decode_session_token_from_request(request)? {
+    let maybe_session_token = self.cookie_manager.decode_session_payload_from_request(request)?
+        .map(|payload| payload.session_token);
+
+    let session_token = match maybe_session_token {
+      Some(token) => token,
       None => return Ok(None),
-      Some(session_token) => session_token,
     };
 
     self.do_session_light_lookup(mysql_executor, &session_token).await
@@ -140,7 +144,7 @@ impl SessionChecker {
   ) -> AnyhowResult<Option<SessionUserRecord>>
     where E: 'e + Executor<'c, Database = MySql>
   {
-    let session_token = match self.cookie_manager.decode_session_token_from_request(request)? {
+    let session_token = match self.get_session_token(request)? {
       None => return Ok(None),
       Some(session_token) => session_token,
     };

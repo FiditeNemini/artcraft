@@ -69,17 +69,19 @@ pub async fn logout_handler(
   // Best effort to delete Redis session cache
   internal_session_cache_purge.best_effort_purge_session_cache(&http_request);
 
+  let maybe_session = session_cookie_manager
+      .decode_session_payload_from_request(&http_request)
+      .map_err(|e| {
+        warn!("Session cookie decode error: {:?}", e);
+        LogoutError::ServerError
+      })?;
+
+  if let Some(session) = maybe_session {
+    let _r = delete_user_session(&session.session_token, &mysql_pool).await;
+  }
+
   let mut delete_cookie = match http_request.cookie("session") {
     Some(cookie) => {
-      match session_cookie_manager.decode_session_token(&cookie) {
-        Err(e) => {
-          warn!("Session cookie decode error: {:?}", e);
-        },
-        Ok(session_token) => {
-          let _r = delete_user_session(&session_token, &mysql_pool).await;
-        }
-      }
-
       cookie // delete this cookie
     },
     None => {
