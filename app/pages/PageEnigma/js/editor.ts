@@ -91,6 +91,7 @@ class Editor {
   cam_obj: THREE.Object3D | undefined;
   renderPass: RenderPass | undefined;
   generating_preview: boolean;
+  frames: number;
 
   camera_person_mode: boolean;
   current_scene_media_token: string | null;
@@ -172,6 +173,7 @@ class Editor {
     this.playback_location = 0;
     this.max_length = 10;
     this.last_scrub = 0;
+    this.frames = 0;
     // Audio Engine Test.
 
     this.render_width = 1280;
@@ -361,7 +363,7 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() {}
+  public async testTestTimelineEvents() { }
 
   public async testStylizeRequest() {
     const result = await this.api_manager
@@ -433,8 +435,8 @@ class Editor {
   }
 
   // TO UPDATE selected objects in the scene might want to add to the scene ...
-  async setSelectedObject(position:XYZ,rotation:XYZ,scale:XYZ) {
-    if (this.selected !=undefined || this.selected !=null) {
+  async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
+    if (this.selected != undefined || this.selected != null) {
       //console.log(`triggering setSelectedObject`) 
       this.selected.position.x = position.x
       this.selected.position.y = position.y
@@ -449,7 +451,7 @@ class Editor {
       this.selected.scale.z = scale.z
 
     }
-  } 
+  }
 
 
   public async saveScene(name: string) {
@@ -813,7 +815,7 @@ class Editor {
   }
 
   // Basicly Unity 3D's update loop.
-  updateLoop(time: number) {
+  async updateLoop(time: number) {
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
     }
@@ -831,11 +833,11 @@ class Editor {
 
     if (this.cameraViewControls && this.camera_person_mode) {
       this.cameraViewControls.update(5 * delta_time);
-      if(this.cam_obj){
+      if (this.cam_obj) {
         if (this.last_scrub != this.timeline.scrubber_frame_position) {
           this.camera.position.copy(this.cam_obj.position);
           this.camera.rotation.copy(this.cam_obj.rotation);
-        } else if(this.timeline.is_playing == false) {
+        } else if (this.timeline.is_playing == false) {
           this.cam_obj.position.copy(this.camera.position);
           this.cam_obj.rotation.copy(this.camera.rotation);
         } else {
@@ -846,25 +848,24 @@ class Editor {
         this.cam_obj.visible = false;
       }
     }
-    else if (this.cam_obj){
+    else if (this.cam_obj) {
       this.cam_obj.visible = true;
     }
 
     if (this.render_camera && this.cam_obj) {
       this.render_camera.position.copy(this.cam_obj.position);
       this.render_camera.rotation.copy(this.cam_obj.rotation);
-      this.cam_obj.scale.copy(new THREE.Vector3(1,1,1));
+      this.cam_obj.scale.copy(new THREE.Vector3(1, 1, 1));
     }
-    
-    if(this.timeline.is_playing){
-      this.timeline.update();
-    } 
-    else if (this.last_scrub == this.timeline.scrubber_frame_position){
+
+    if (this.timeline.is_playing) {
+      await this.timeline.update(this.rendering);
+    }
+    else if (this.last_scrub == this.timeline.scrubber_frame_position) {
       this.updateSelectedUI();
     }
 
     this.last_scrub = this.timeline.scrubber_frame_position;
-
     this.renderScene();
   }
 
@@ -933,10 +934,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-        startTime * 1000 +
-        "|" +
-        startTime * 1000 +
-        "[a1];[0:a][a1]amix=inputs=2[a]",
+      startTime * 1000 +
+      "|" +
+      startTime * 1000 +
+      "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -962,6 +963,8 @@ class Editor {
   }
 
   async stopPlayback(compile_audio: boolean = true) {
+    console.log(this.frames, this.frame_buffer.length);
+
     this.renderMode();
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
@@ -975,7 +978,7 @@ class Editor {
     }
     await ffmpeg.run(
       "-framerate",
-      "" + this.cap_fps,
+      "" + this.cap_fps/2,
       "-i",
       "image%d.png",
       "-f",
@@ -1020,22 +1023,24 @@ class Editor {
     console.log("data", data)
 
     if (data == null) { return; }
-    let upload_token = data['upload_token'];
+    let upload_token = data['media_file_token'];
     console.log(upload_token);
     // Create a link to download the file stylize video using api ..
     //{"success":true,"upload_token":"mu_x9kr5cfafn512pjbygdszvbdpktrr"} payload
 
     const result = await this.api_manager
-    .stylizeVideo(
-      upload_token,
-      this.art_style,
-      this.positive_prompt,
-      this.negative_prompt,
-      Visibility.Public,
-    )
-    .catch((error) => {
-      console.log(error);
-    });
+      .stylizeVideo(
+        upload_token,
+        this.art_style,
+        this.positive_prompt,
+        this.negative_prompt,
+        Visibility.Public,
+      )
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // {"success":true,"inference_job_token":"jinf_j3nbqbd15wqxb0xcks13qh3f3bz"}
 
     console.log(result);
 
@@ -1167,6 +1172,7 @@ class Editor {
     }
 
     if (this.rendering && this.renderer && this.clock) {
+      this.frames += 1;
       this.playback_location++;
       const imgData = this.renderer.domElement.toDataURL();
       this.frame_buffer.push(imgData);
@@ -1186,41 +1192,41 @@ class Editor {
     if (this.selected == undefined) {
       return;
     }
-     const pos = this.selected.position;
-      const rot = this.selected.rotation;
-      const scale = this.selected.scale;
-  
-      // TODO this is a bug we need to only show when clicked on and use UPDATE when updating.
-      this.dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
-        payload: {
-          group:
-            this.selected.name === "::CAM::"
-              ? ClipGroup.CAMERA
-              : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
-          object_uuid: this.selected.uuid,
-          object_name: this.selected.name,
-          version: this.version,
-          objectVectors: {
-            position: {
-              x: parseFloat(pos.x.toFixed(2)),
-              y: parseFloat(pos.y.toFixed(2)),
-              z: parseFloat(pos.z.toFixed(2)),
-            },
-            rotation: {
-              x: parseFloat(rot.x.toFixed(2)),
-              y: parseFloat(rot.y.toFixed(2)),
-              z: parseFloat(rot.z.toFixed(2)),
-            },
-            scale: {
-              x: parseFloat(scale.x.toFixed(2)),
-              y: parseFloat(scale.y.toFixed(2)),
-              z: parseFloat(scale.z.toFixed(2)),
-            },
+    const pos = this.selected.position;
+    const rot = this.selected.rotation;
+    const scale = this.selected.scale;
+
+    // TODO this is a bug we need to only show when clicked on and use UPDATE when updating.
+    this.dispatchAppUiState({
+      type: APPUI_ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
+      payload: {
+        group:
+          this.selected.name === "::CAM::"
+            ? ClipGroup.CAMERA
+            : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
+        object_uuid: this.selected.uuid,
+        object_name: this.selected.name,
+        version: this.version,
+        objectVectors: {
+          position: {
+            x: parseFloat(pos.x.toFixed(2)),
+            y: parseFloat(pos.y.toFixed(2)),
+            z: parseFloat(pos.z.toFixed(2)),
+          },
+          rotation: {
+            x: parseFloat(rot.x.toFixed(2)),
+            y: parseFloat(rot.y.toFixed(2)),
+            z: parseFloat(rot.z.toFixed(2)),
+          },
+          scale: {
+            x: parseFloat(scale.x.toFixed(2)),
+            y: parseFloat(scale.y.toFixed(2)),
+            z: parseFloat(scale.z.toFixed(2)),
           },
         },
-      });
-  
+      },
+    });
+
   }
 
   // Automaticly resize scene.
