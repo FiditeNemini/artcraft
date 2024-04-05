@@ -1,9 +1,0 @@
-*~
-.idea/
-input/
-output/
-run_cargo.sh
-run_docker.sh
-secret.yaml
-secrets.yaml
-target/
