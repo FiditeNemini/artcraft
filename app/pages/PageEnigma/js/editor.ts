@@ -24,7 +24,7 @@ import { PointerLockControls } from "three/addons/controls/PointerLockControls.j
 import { APPUI_ACTION_TYPES } from "../reducers";
 import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
-import { XYZ } from "../../datastructures/common";
+import { XYZ } from "../datastructures/common";
 class EditorState {
   // {
   //   action: "ShowLoadingIndicator"
@@ -150,7 +150,6 @@ class Editor {
     this.raycaster;
     this.mouse;
     this.selected;
-    this.selectedState = false
     this.last_selected;
     this.transform_interaction;
     this.rendering = false;
