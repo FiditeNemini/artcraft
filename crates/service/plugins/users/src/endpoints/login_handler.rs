@@ -21,7 +21,7 @@ use mysql_queries::queries::users::user::lookup_user_for_login_by_username::look
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_confirm_password::bcrypt_confirm_password;
 
-use crate::session::http::session_cookie_manager::SessionCookieManager;
+use crate::session::http::http_user_session_manager::HttpUserSessionManager;
 
 #[derive(Deserialize, ToSchema)]
 pub struct LoginRequest {
@@ -99,7 +99,7 @@ impl ResponseError for LoginErrorResponse {
 pub async fn login_handler(
   http_request: HttpRequest,
   request: web::Json<LoginRequest>,
-  session_cookie_manager: web::Data<SessionCookieManager>,
+  session_cookie_manager: web::Data<HttpUserSessionManager>,
   mysql_pool: web::Data<MySqlPool>,
 ) -> Result<HttpResponse, LoginErrorResponse>
 {

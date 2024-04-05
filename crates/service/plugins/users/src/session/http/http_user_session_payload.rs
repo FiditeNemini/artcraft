@@ -1,6 +1,6 @@
 
 #[derive(Clone)]
-pub struct SessionCookiePayload {
+pub struct HttpUserSessionPayload {
   /// The database primary key for the session instance.
   pub session_token: String,
 

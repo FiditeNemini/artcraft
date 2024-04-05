@@ -16,26 +16,26 @@ use redis_caching::redis_ttl_cache::{RedisTtlCache, RedisTtlCacheConnection};
 use redis_common::redis_cache_keys::RedisCacheKeys;
 use tokens::tokens::users::UserToken;
 
-use crate::session::http::session_cookie_manager::SessionCookieManager;
+use crate::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::session::lookup::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
 use crate::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 
 #[derive(Clone)]
 pub struct SessionChecker {
-  cookie_manager: SessionCookieManager,
+  cookie_manager: HttpUserSessionManager,
   maybe_redis_ttl_cache: Option<RedisTtlCache>,
 }
 
 impl SessionChecker {
 
-  pub fn new(cookie_manager: &SessionCookieManager) -> Self {
+  pub fn new(cookie_manager: &HttpUserSessionManager) -> Self {
     Self {
       cookie_manager: cookie_manager.clone(),
       maybe_redis_ttl_cache: None,
     }
   }
 
-  pub fn new_with_cache(cookie_manager: &SessionCookieManager, redis_ttl_cache: RedisTtlCache) -> Self {
+  pub fn new_with_cache(cookie_manager: &HttpUserSessionManager, redis_ttl_cache: RedisTtlCache) -> Self {
     Self {
       cookie_manager: cookie_manager.clone(),
       maybe_redis_ttl_cache: Some(redis_ttl_cache),

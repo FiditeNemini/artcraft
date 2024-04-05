@@ -66,7 +66,7 @@ use twitch_common::twitch_secrets::TwitchSecrets;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use user_traits_component::traits::internal_session_cache_purge::InternalSessionCachePurge;
 use users_component::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
-use users_component::session::http::session_cookie_manager::SessionCookieManager;
+use users_component::session::http::http_user_session_manager::HttpUserSessionManager;
 use users_component::session::session_checker::SessionChecker;
 
 use crate::billing::internal_product_to_stripe_lookup_impl::InternalProductToStripeLookupImpl;
@@ -190,7 +190,7 @@ async fn main() -> AnyhowResult<()> {
   let website_homepage_redirect =
       easyenv::get_env_string_or_default("WEBSITE_HOMEPAGE_REDIRECT", "https://vo.codes/");
 
-  let session_cookie_manager = SessionCookieManager::new(&cookie_domain, &hmac_secret)?;
+  let session_cookie_manager = HttpUserSessionManager::new(&cookie_domain, &hmac_secret)?;
   let avt_cookie_manager = AvtCookieManager::new(&cookie_domain, &hmac_secret)?;
 
   let session_checker = SessionChecker::new_with_cache(

@@ -18,7 +18,7 @@ use redis_caching::redis_ttl_cache::RedisTtlCache;
 use reusable_types::server_environment::ServerEnvironment;
 use url_config::third_party_url_redirector::ThirdPartyUrlRedirector;
 use users_component::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
-use users_component::session::http::session_cookie_manager::SessionCookieManager;
+use users_component::session::http::http_user_session_manager::HttpUserSessionManager;
 use users_component::session::session_checker::SessionChecker;
 use crate::configs::app_startup::username_set::UsernameSet;
 
@@ -64,7 +64,7 @@ pub struct ServerState {
 
   pub redis_rate_limiters: RedisRateLimiters,
 
-  pub session_cookie_manager: SessionCookieManager,
+  pub session_cookie_manager: HttpUserSessionManager,
   pub avt_cookie_manager: AvtCookieManager,
 
   pub session_checker: SessionChecker,

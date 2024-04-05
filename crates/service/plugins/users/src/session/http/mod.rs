@@ -1,2 +1,2 @@
-pub mod session_cookie_manager;
-pub mod session_cookie_payload;
+pub mod http_user_session_manager;
+pub mod http_user_session_payload;

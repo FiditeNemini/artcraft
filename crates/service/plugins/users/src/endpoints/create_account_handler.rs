@@ -21,7 +21,7 @@ use mysql_queries::queries::users::user_sessions::create_user_session::create_us
 use password::bcrypt_hash_password::bcrypt_hash_password;
 use user_input_common::check_for_slurs::contains_slurs;
 
-use crate::session::http::session_cookie_manager::SessionCookieManager;
+use crate::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::utils::email_to_gravatar::email_to_gravatar;
 use crate::validations::is_reserved_username::is_reserved_username;
 use crate::validations::validate_passwords::validate_passwords;
@@ -93,7 +93,7 @@ pub async fn create_account_handler(
   http_request: HttpRequest,
   request: web::Json<CreateAccountRequest>,
   mysql_pool: web::Data<MySqlPool>,
-  session_cookie_manager: web::Data<SessionCookieManager>,
+  session_cookie_manager: web::Data<HttpUserSessionManager>,
   firehose_publisher: web::Data<FirehosePublisher>,
 ) -> Result<HttpResponse, CreateAccountErrorResponse>
 {

@@ -14,7 +14,7 @@ use mysql_queries::queries::users::user_password_resets::lookup_password_reset_r
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_hash_password::bcrypt_hash_password;
 
-use crate::session::http::session_cookie_manager::SessionCookieManager;
+use crate::session::http::http_user_session_manager::HttpUserSessionManager;
 
 #[derive(Deserialize)]
 pub struct PasswordResetRedemptionRequest {
@@ -73,7 +73,7 @@ impl ResponseError for PasswordResetRedemptionErrorResponse {
 pub async fn password_reset_redeem_handler(
     http_request: HttpRequest,
     request: web::Json<PasswordResetRedemptionRequest>,
-    session_cookie_manager: web::Data<SessionCookieManager>,
+    session_cookie_manager: web::Data<HttpUserSessionManager>,
     mysql_pool: web::Data<MySqlPool>,
 ) -> Result<HttpResponse, PasswordResetRedemptionErrorResponse> {
 

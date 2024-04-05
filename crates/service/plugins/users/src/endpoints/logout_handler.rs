@@ -16,7 +16,7 @@ use http_server_common::response::response_error_helpers::to_simple_json_error;
 use mysql_queries::queries::users::user_sessions::delete_user_session::delete_user_session;
 use user_traits_component::traits::internal_session_cache_purge::InternalSessionCachePurge;
 
-use crate::session::http::session_cookie_manager::SessionCookieManager;
+use crate::session::http::http_user_session_manager::HttpUserSessionManager;
 
 #[derive(Serialize, ToSchema)]
 pub struct LogoutSuccessResponse {
@@ -61,7 +61,7 @@ impl fmt::Display for LogoutError {
 )]
 pub async fn logout_handler(
   http_request: HttpRequest,
-  session_cookie_manager: web::Data<SessionCookieManager>,
+  session_cookie_manager: web::Data<HttpUserSessionManager>,
   mysql_pool: web::Data<MySqlPool>,
   internal_session_cache_purge: web::Data<dyn InternalSessionCachePurge>,
 ) -> Result<HttpResponse, LogoutError>
