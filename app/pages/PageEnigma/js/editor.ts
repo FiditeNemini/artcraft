@@ -150,7 +150,6 @@ class Editor {
     this.raycaster;
     this.mouse;
     this.selected;
-    this.selectedState = false
     this.last_selected;
     this.transform_interaction;
     this.rendering = false;
@@ -856,18 +855,25 @@ class Editor {
           this.camera.position.copy(this.cam_obj.position);
           this.camera.rotation.copy(this.cam_obj.rotation);
         }
+
+        this.cam_obj.visible = false;
       }
+    }
+    else if (this.cam_obj){
+      this.cam_obj.visible = true;
     }
 
     if (this.render_camera && this.cam_obj) {
       this.render_camera.position.copy(this.cam_obj.position);
       this.render_camera.rotation.copy(this.cam_obj.rotation);
+      this.cam_obj.scale.copy(new THREE.Vector3(1,1,1));
     }
-
-    this.updateSelectedUI();
-
+    
     if(this.timeline.is_playing){
       this.timeline.update();
+    } 
+    else if (this.last_scrub == this.timeline.scrubber_frame_position){
+      this.updateSelectedUI();
     }
 
     this.last_scrub = this.timeline.scrubber_frame_position;
