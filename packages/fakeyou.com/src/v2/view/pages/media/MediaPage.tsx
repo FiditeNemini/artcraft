@@ -564,7 +564,7 @@ export default function MediaPage() {
                         }}
                       />
                     </div>
-                    <div className="w-100">
+                    {/*<div className="w-100">
                       <Button
                         {...{
                           icon: faFaceViewfinder,
@@ -573,7 +573,7 @@ export default function MediaPage() {
                           variant: "secondary",
                         }}
                       />
-                    </div>
+                      </div>*/}
                   </>
                 ) : null}
                 {mediaFile?.media_type === MediaFileType.SceneRon ? (
@@ -588,7 +588,7 @@ export default function MediaPage() {
                         }}
                       />
                     </div>
-                    <div className="w-100">
+                    {/*<div className="w-100">
                       <Button
                         {...{
                           icon: faFaceViewfinder,
@@ -597,7 +597,7 @@ export default function MediaPage() {
                           variant: "secondary",
                         }}
                       />
-                    </div>
+                      </div>*/}
                   </>
                 ) : null}
 
