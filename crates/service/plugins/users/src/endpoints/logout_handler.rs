@@ -53,6 +53,7 @@ impl fmt::Display for LogoutError {
 
 #[utoipa::path(
   post,
+  tag = "Users",
   path = "/v1/logout",
   responses(
     (status = 200, description = "Found", body = LogoutSuccessResponse),

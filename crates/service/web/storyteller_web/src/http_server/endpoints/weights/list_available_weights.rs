@@ -108,6 +108,7 @@ impl ResponseError for ListWeightError {
 
 #[utoipa::path(
     get,
+    tag = "Model Weights",
     path = "/v1/weights/list",
     responses(
         (status = 200, description = "List Weights", body = ListAvailableWeightsSuccessResponse),

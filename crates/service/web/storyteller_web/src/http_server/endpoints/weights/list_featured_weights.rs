@@ -79,6 +79,7 @@ impl ResponseError for ListFeaturedWeightsError {
 
 #[utoipa::path(
   get,
+  tag = "Model Weights",
   path = "/v1/weights/list_featured",
   responses(
     (status = 200, description = "List Weights", body = ListFeaturedWeightsSuccessResponse),

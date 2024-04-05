@@ -92,6 +92,7 @@ impl ResponseError for LoginErrorResponse {
 
 #[utoipa::path(
   post,
+  tag = "Users",
   path = "/v1/login",
   responses(
     (status = 200, description = "Found", body = LoginSuccessResponse),

@@ -122,6 +122,7 @@ impl fmt::Display for SessionInfoError {
 
 #[utoipa::path(
   get,
+  tag = "Users",
   path = "/v1/session",
   responses(
     (status = 200, description = "Get profile", body = SessionInfoSuccessResponse),

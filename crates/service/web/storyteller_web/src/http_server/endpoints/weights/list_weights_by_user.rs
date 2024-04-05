@@ -107,6 +107,7 @@ impl ResponseError for ListWeightsByUserError {
 
 #[utoipa::path(
   get,
+  tag = "Model Weights",
   path = "/v1/weights/by_user/{username}",
   responses(
       (status = 200, description = "List Weights by user", body = ListWeightsByUserSuccessResponse),

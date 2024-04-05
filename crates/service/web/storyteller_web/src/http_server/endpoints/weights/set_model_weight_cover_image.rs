@@ -73,6 +73,7 @@ impl fmt::Display for SetModelWeightCoverImageError {
 
 #[utoipa::path(
   post,
+  tag = "Model Weights",
   path = "/v1/weights/weight/{weight_token}/cover_image",
   responses(
     (status = 200, description = "Success Update", body = SetModelWeightCoverImageResponse),

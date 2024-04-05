@@ -99,6 +99,7 @@ impl fmt::Display for SearchModelWeightsError {
 
 #[utoipa::path(
   post,
+  tag = "Model Weights",
   path = "/v1/weights/search",
   responses(
     (status = 200, description = "Successful search", body = SearchModelWeightsSuccessResponse),

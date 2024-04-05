@@ -118,6 +118,7 @@ impl fmt::Display for ProfileError {
 
 #[utoipa::path(
   get,
+  tag = "Users",
   path = "/user/{username}/profile",
   responses(
     (status = 200, description = "Get profile", body = UserProfileRecordForResponse),
