@@ -31,7 +31,8 @@ export const ListSearchDropdown = ({
         })
 
   useEffect(()=>{
-    onSelect(Object.values(selected)[0]);
+    if (listDisplayKey) onSelect(selected[listDisplayKey]);
+    else onSelect(Object.values(selected)[0]);
   }, [selected]);
 
   return (

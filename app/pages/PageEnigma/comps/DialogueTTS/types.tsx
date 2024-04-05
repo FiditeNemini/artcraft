@@ -63,3 +63,21 @@ export enum GenerateTtsAudioErrorType {
   UnknownError,
 }
 export type GenerateTtsAudioResponse = GenerateTtsAudioSuccess | GenerateTtsAudioError; 
+
+
+
+export interface EndpointSuccessResponse {
+  success: boolean,
+  inference_job_token: string,
+  inference_job_token_type?: string,
+}
+
+export interface EndpointErrorResponse {
+  success: boolean,
+}
+
+export type EndpointResponse = EndpointSuccessResponse | EndpointErrorResponse;
+
+export interface StatusLike {
+  status: number,
+}

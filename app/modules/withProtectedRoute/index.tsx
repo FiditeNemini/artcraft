@@ -4,7 +4,7 @@ import { AuthenticationContext } from "~/contexts/Authentication";
 
 export const withProtectionRoute = <P extends {}>(Component: ComponentType<P>) => (rest:P) => {
   const { authState } = useContext(AuthenticationContext);
-  console.log(authState);
+
   if (authState.isLoggedIn === undefined ) {
     return <>waiting</>;
   }

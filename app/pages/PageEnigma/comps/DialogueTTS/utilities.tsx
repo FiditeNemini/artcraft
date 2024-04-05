@@ -1,7 +1,9 @@
 import { listTts } from '~/api';
 import {
   TtsModelListItem,
-  TtsModelListResponsePayload
+  TtsModelListResponsePayload,
+  GenerateTtsAudioErrorType,
+  StatusLike
 } from './types';
 
 export async function ListTtsModels() : Promise<Array<TtsModelListItem>| undefined> {  
@@ -23,4 +25,17 @@ export async function ListTtsModels() : Promise<Array<TtsModelListItem>| undefin
   .catch(e => {
     return undefined;
   });
+}
+
+export function maybeMapError(statuslike: StatusLike) : GenerateTtsAudioErrorType | undefined {
+  switch (statuslike.status) {
+    case 400:
+      return GenerateTtsAudioErrorType.BadRequest;
+    case 404:
+      return GenerateTtsAudioErrorType.NotFound;
+    case 429:
+      return GenerateTtsAudioErrorType.TooManyRequests;
+    case 500:
+      return GenerateTtsAudioErrorType.ServerError;
+  }
 }

@@ -1,4 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { faVolume, faShuffle, faPlay } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AppUiContext } from "../../contexts/AppUiContext";
@@ -13,30 +14,23 @@ import {
 } from "~/components";
 import { ListTtsModels } from "./utilities";
 import { TtsModelListItem } from "./types";
+import { GenerateTtsAudio } from "./generate";
 
-// const testdata = [
-//   { name: 'Wade Cooper' },
-//   { name: 'Arlene Mccoy' },
-//   { name: 'Devon Webb' },
-//   { name: 'Tom Cook' },
-//   { name: 'Tanya Fox' },
-//   { name: 'Hellen Schmidt' },
-// ]
 type TtsState = {
-  voice: string;
+  voice: TtsModelListItem | undefined;
   text: string;
   hasAudio: boolean;
 }
+
 export const DialogueTTS = ()=>{
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
   const [ttsState, setTtsState] = useState<TtsState>({
-    voice:"",
+    voice:undefined,
     text:"",
     hasAudio:false
   });
 
   const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
- 
 
   const listModels = useCallback(async () => {
     const ttsModelsLoaded = ttsModels.length > 0;
@@ -53,17 +47,22 @@ export const DialogueTTS = ()=>{
     listModels();
   }, [listModels]);
 
-  const requestTts = useCallback(()=>{
-    // const modelToken = props.maybeSelectedTtsModel!.model_token;
+  const requestTts = useCallback(async ()=>{
 
-    // const request = {
-    //   uuid_idempotency_token: uuidv4(),
-    //   tts_model_token: modelToken,
-    //   inference_text: props.textBuffer,
-    // };
+    const modelToken = ttsState.voice ? ttsState.voice.model_token : undefined;
 
-    // const response = await GenerateTtsAudio(request);
-  },[]);
+    if(modelToken){
+      const request = {
+        uuid_idempotency_token: uuidv4(),
+        tts_model_token: modelToken,
+        inference_text: ttsState.text,
+      };
+      console.log(request);
+      const response = await GenerateTtsAudio(request);
+    }else{
+      console.log("no voice model selected");
+    }
+  },[ttsState]);
 
   const handleClose = ()=> {
     dispatchAppUiState({
@@ -81,9 +80,14 @@ export const DialogueTTS = ()=>{
   };
 
   const handleOnSelect = (val:string)=>{
+    const voiceModel = ttsModels.find((item)=>{
+      if (item.title === val) return item
+    })
+    console.log(val);
+    console.log(voiceModel);
     setTtsState((curr)=>({
       ...curr,
-      voices: val,
+      voice: voiceModel,
     }));
   }
 
@@ -101,7 +105,6 @@ export const DialogueTTS = ()=>{
     >
       <div className="flex flex-col">
         <Label className="mb-1">Select a Voice</Label>
-        {/* <ListSearchDropdown list={testdata} onSelect={handleOnSelect}/> */}
         <ListSearchDropdown
           list={ttsModels}
           listDisplayKey="title"
@@ -124,7 +127,7 @@ export const DialogueTTS = ()=>{
             variant={ttsState.hasAudio ? "secondary" : "primary" }
             disabled={ttsState.text === ""}
             icon={faPlay}
-            // className="px-6 py-3.5"
+            onClick={requestTts}
           >
             Speak
           </Button>
