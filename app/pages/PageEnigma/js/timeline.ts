@@ -64,7 +64,7 @@ export class TimeLine {
     ) {
         this.timeline_items = [];
         this.absolute_end = 60 * 12;
-        this.timeline_limit = this.absolute_end; // 5 seconds
+        this.timeline_limit = 0; // 5 seconds
 
         this.is_playing = false;
         this.scrubber_frame_position = 0; // in frames into the tl
@@ -203,7 +203,6 @@ export class TimeLine {
                             end_offset));
                     return;
                 } else {
-                    console.log("Audio!")
                     this.audio_engine.loadClip(media_id);
                 }
                 break;
@@ -239,8 +238,6 @@ export class TimeLine {
 
     public async updateClip(data: any) {
         // only length and offset changes here.
-        console.log(data);
-
         let object_uuid = data["data"]["object_uuid"];
         const media_id = data["data"]["media_id"];
         const offset = data["data"]["offset"];
@@ -253,10 +250,22 @@ export class TimeLine {
             }
         }
     }
-    public async deleteClip(data: any) {
-        console.log(data);
-    }
 
+    public async deleteClip(data: any) {
+        let json_data = data['data'];
+        let object_uuid = data["data"]["object_uuid"];
+        let media_id = data["data"]["media_id"];
+        let type = data['type']
+
+        for (let i = 0; i < this.timeline_items.length; i++) {
+            const element = this.timeline_items[i];
+            if (element.media_id == media_id && element.object_uuid == object_uuid) {
+                this.timeline_items.splice(i, 1);
+                break;
+            }
+        }
+    }
+    
     public async scrubberUpdate(data: any) {
         console.log(data);
     }
@@ -308,7 +317,6 @@ export class TimeLine {
     }
 
     private async resetScene() {
-        this.timeline_limit = this.getEndPoint();
         for (const element of this.timeline_items) {
             if (element.type == "transform") {
                 const object = this.scene.get_object_by_uuid(element.object_uuid);
@@ -318,7 +326,7 @@ export class TimeLine {
             } else if (element.type == "audio") {
                 this.audio_engine.loadClip(element.media_id);
             } else if (element.type == "animation") {
-                this.animation_engine.clips[element.object_uuid].stop();
+                this.animation_engine.clips[element.object_uuid+element.media_id].stop();
             } else if (element.type == "lipsync") {
                 this.lipSync_engine.clips[element.object_uuid].reset();
             } else {
@@ -341,7 +349,7 @@ export class TimeLine {
     // called by the editor update loop on each frame
     public async update() {
         //if (this.is_playing == false) return; // start and stop
-
+        this.timeline_limit = this.getEndPoint();
         if (this.is_playing) {
             this.current_time += 1;
             this.pushEvent(fromEngineActions.UPDATE_TIME, {
@@ -390,8 +398,8 @@ export class TimeLine {
                     }
                 } else if (element.type  === ClipType.ANIMATION) {
                     if (object) {
-                        await this.animation_engine.clips[object.uuid].play(object);
-                        this.animation_engine.clips[object.uuid].step(
+                        await this.animation_engine.clips[object.uuid+element.media_id].play(object);
+                        this.animation_engine.clips[object.uuid+element.media_id].step(
                             this.scrubber_frame_position / 120, // Double FPS for best result.
                         );
                     }
