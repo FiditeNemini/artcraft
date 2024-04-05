@@ -24,7 +24,11 @@ use crate::session::http::http_user_session_payload::HttpUserSessionPayload;
  */
 const COOKIE_VERSION : u32 = 2;
 
+/// Name of the HTTP cookie that carries the session payload
 const SESSION_COOKIE_NAME : &str = "session";
+
+/// Name of the HTTP header that carries the session payload
+const SESSION_HEADER_NAME : &str = "session";
 
 // TODO(echelon,2022-08-29): Make a CryptedCookieManager that this uses.
 // TODO(echelon,2022-08-29): Fix how domains and "secure" cookies are handled
@@ -87,12 +91,22 @@ impl HttpUserSessionManager {
     request: &HttpRequest
   ) -> AnyhowResult<Option<HttpUserSessionPayload>>
   {
-    let cookie = match request.cookie(SESSION_COOKIE_NAME) {
+    let mut signed_session_payload= request.cookie(SESSION_COOKIE_NAME)
+        .map(|cookie| cookie.value().to_string());
+
+    if signed_session_payload.is_none() {
+      signed_session_payload = request.headers().get(SESSION_HEADER_NAME)
+          .map(|header| header.to_str())
+          .transpose()?
+          .map(|payload| payload.to_string());
+    }
+
+    let signed_session_payload = match signed_session_payload {
+      Some(payload) => payload,
       None => return Ok(None),
-      Some(cookie) => cookie,
     };
 
-    match self.decode_session_cookie_payload(&cookie) {
+    match self.decode_session_cookie_payload(&signed_session_payload) {
       Err(e) => {
         warn!("Session cookie decode error: {:?}", e);
         Err(anyhow!("Could not decode session cookie: {:?}", e))
@@ -101,12 +115,10 @@ impl HttpUserSessionManager {
     }
   }
 
-  fn decode_session_cookie_payload(&self, session_cookie: &Cookie)
+  fn decode_session_cookie_payload(&self, session_payload_contents: &str)
     -> AnyhowResult<HttpUserSessionPayload>
   {
-    let cookie_contents = session_cookie.value().to_string();
-
-    let claims = self.jwt_signer.jwt_to_claims(&cookie_contents)?;
+    let claims = self.jwt_signer.jwt_to_claims(&session_payload_contents)?;
 
     let session_token = claims["session_token"].clone();
     let maybe_user_token = claims.get("user_token")
@@ -140,7 +152,7 @@ mod tests {
     let manager = HttpUserSessionManager::new("fakeyou.com", "secret").unwrap();
     let cookie = manager.create_cookie("ex_session_token", "ex_user_token").unwrap();
 
-    let decoded = manager.decode_session_cookie_payload(&cookie).unwrap();
+    let decoded = manager.decode_session_cookie_payload(cookie.value()).unwrap();
 
     assert_eq!(decoded.session_token, "ex_session_token".to_string());
     assert_eq!(decoded.maybe_user_token, Some("ex_user_token".to_string()));
