@@ -11,7 +11,7 @@ rustup show
 
 mkdir -p ./build
 
-cargo run --bin docs-cli
+SQLX_OFFLINE=true cargo run --bin docs-cli
 
 mv api.json ./build
 cp api_docs.html ./build/index.html
