@@ -75,6 +75,7 @@ impl fmt::Display for DeleteUserBookmarkError {
 
 #[utoipa::path(
   delete,
+  tag = "User Bookmarks",
   path = "/v1/user_bookmarks/delete/{user_bookmark_token}",
   params(
   ("user_bookmark_token", description = "UserBookmarkToken"),

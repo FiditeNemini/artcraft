@@ -77,6 +77,7 @@ impl fmt::Display for ListUserBookmarksForEntityError {
 
 #[utoipa::path(
   get,
+  tag = "User Bookmarks",
   path = "/v1/user_bookmarks/list/{entity_type}/{entity_token}",
   params(
     ("entity_type", description="The type of entity to list bookmarks for"),

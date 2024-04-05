@@ -94,6 +94,7 @@ impl std::fmt::Display for BatchGetUserBookmarksError {
 
 #[utoipa::path(
   get,
+  tag = "User Bookmarks",
   path = "/v1/user_bookmarks/batch",
   params(
     BatchGetUserBookmarksQueryParams,

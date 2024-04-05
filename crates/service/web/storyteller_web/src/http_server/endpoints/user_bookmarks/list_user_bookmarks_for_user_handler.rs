@@ -154,6 +154,7 @@ impl fmt::Display for ListUserBookmarksForUserError {
 
 #[utoipa::path(
   get,
+  tag = "User Bookmarks",
   path = "/v1/user_bookmarks/list/user/{username}",
   params(
   ("username", description = "The username of the user whose bookmarks to list."),

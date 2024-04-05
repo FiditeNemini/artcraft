@@ -85,6 +85,7 @@ impl fmt::Display for CreateUserBookmarkError {
 
 #[utoipa::path(
   post,
+  tag = "User Bookmarks",
   path = "/v1/user_bookmarks/create",
   request_body = CreateUserBookmarkRequest,
   responses(
