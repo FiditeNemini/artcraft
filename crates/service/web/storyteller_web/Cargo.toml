@@ -17,6 +17,10 @@ path = "src/main.rs"
 name = "docs"
 path = "src/api_doc_server.rs"
 
+[[bin]]
+name = "docs-cli"
+path = "src/api_doc_cli.rs"
+
 [dependencies]
 
 # Internal
