@@ -9,10 +9,11 @@ rustup default stable
 # Emit versions
 rustup show
 
-mkdir ./build
+mkdir -p ./build
 
 cargo run --bin docs-cli
 
 mv api.json ./build
+cp api_docs.html ./build/index.html
 
 
