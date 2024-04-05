@@ -651,8 +651,8 @@ class Editor {
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
-    const object: THREE.Object3D = await this.activeScene.load_glb_absolute(
-      "./resources/R_XBot.glb",
+    const object: THREE.Object3D = await this.activeScene.load_glb(
+      "m_77z28zfaxc3sdtt5cc68vpz2n40qed",
     );
 
     object.uuid = "CH1";

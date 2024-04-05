@@ -255,6 +255,8 @@ export class TimeLine {
     }
     public async deleteClip(data: any) {
         console.log(data);
+        let json_data = data['data'];
+        let clip_uuid = json_data['clip_uuid'];
     }
 
     public async scrubberUpdate(data: any) {
@@ -390,8 +392,8 @@ export class TimeLine {
                     }
                 } else if (element.type  === ClipType.ANIMATION) {
                     if (object) {
-                        await this.animation_engine.clips[object.uuid].play(object);
-                        this.animation_engine.clips[object.uuid].step(
+                        await this.animation_engine.clips[object.uuid+element.media_id].play(object);
+                        this.animation_engine.clips[object.uuid+element.media_id].step(
                             this.scrubber_frame_position / 120, // Double FPS for best result.
                         );
                     }
