@@ -81,10 +81,45 @@ export const TrackProvider = ({ children }: Props) => {
   useEffect(() => {
     setAnimationClips([{
         version: 1,
-        media_id: "m_w5t517krrf63f3tj2288vsffmj87zw",
+        media_id: "m_s7d4ems68sb2vqj4pdje1rc15q3ycp",
         type: ClipType.ANIMATION,
         length: 25,
         name: "Walk",
+      },
+      {
+        version: 1,
+        media_id: "m_yzreg1494d08aepezj74607d2ascep",
+        type: ClipType.ANIMATION,
+        length: 100,
+        name: "Sitting",
+      },
+      {
+        version: 1,
+        media_id: "m_qepzjytd4ahd5askdt2ngrwzj2aa3f",
+        type: ClipType.ANIMATION,
+        length: 100,
+        name: "Idle",
+      },
+      {
+        version: 1,
+        media_id: "m_v06h821hj4dvst0mzm575jdka31f41",
+        type: ClipType.ANIMATION,
+        length: 100,
+        name: "Punch",
+      },
+      {
+        version: 1,
+        media_id: "m_q92keqa05gds69zyd8mkep7z9338t8",
+        type: ClipType.ANIMATION,
+        length: 100,
+        name: "Jump",
+      },
+      {
+        version: 1,
+        media_id: "m_0qmgsyxh5ng9c9ac3m0snzdqqs5q60",
+        type: ClipType.ANIMATION,
+        length: 100,
+        name: "Dance",
       },
     ]);
     setAudioClips([

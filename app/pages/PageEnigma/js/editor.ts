@@ -651,8 +651,8 @@ class Editor {
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
-    const object: THREE.Object3D = await this.activeScene.load_glb(
-      "m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d",
+    const object: THREE.Object3D = await this.activeScene.load_glb_absolute(
+      "./resources/R_XBot.glb",
     );
 
     object.uuid = "CH1";
@@ -1034,9 +1034,28 @@ class Editor {
     URL.revokeObjectURL(url);
     document.body.removeChild(downloadLink);
 
-    const data = await this.api_manager.uploadMedia(blob, "render.mp4");
+    const data: any = await this.api_manager.uploadMedia(blob, "render.mp4");
+    console.log("data", data)
+
+    if (data == null) { return; }
+    let upload_token = data['upload_token'];
+    console.log(upload_token);
     // Create a link to download the file stylize video using api ..
     //{"success":true,"upload_token":"mu_x9kr5cfafn512pjbygdszvbdpktrr"} payload
+
+    const result = await this.api_manager
+    .stylizeVideo(
+      upload_token,
+      this.art_style,
+      this.positive_prompt,
+      this.negative_prompt,
+      Visibility.Public,
+    )
+    .catch((error) => {
+      console.log(error);
+    });
+
+    console.log(result);
 
   }
 
