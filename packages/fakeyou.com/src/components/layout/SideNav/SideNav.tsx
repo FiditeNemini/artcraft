@@ -245,7 +245,7 @@ export default function SideNav({
             onClick={handleNavLinkClick}
           >
             <FontAwesomeIcon icon={faFilm} className="sidebar-heading-icon" />
-            Storyteller Onboarding
+            Storyteller Studio
             {/* {t("videoStorytellerStudio")} */}
           </NavLink>
         </li>

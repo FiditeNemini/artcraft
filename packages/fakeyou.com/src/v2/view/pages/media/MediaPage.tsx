@@ -558,7 +558,7 @@ export default function MediaPage() {
                       <Button
                         {...{
                           icon: faFilm,
-                          label: "Open in onboarding",
+                          label: "Open in Studio",
                           to: `/studio-intro/${mediaFile.token}${mediaFile.maybe_engine_extension}`,
                           variant: "primary",
                         }}
@@ -582,7 +582,7 @@ export default function MediaPage() {
                       <Button
                         {...{
                           icon: faFilm,
-                          label: "Open in onboarding",
+                          label: "Open in Studio",
                           to: `/studio-intro/${mediaFile.token}`,
                           variant: "primary",
                         }}
