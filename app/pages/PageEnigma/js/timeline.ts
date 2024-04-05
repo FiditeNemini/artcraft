@@ -330,7 +330,7 @@ export class TimeLine {
             } else if (element.type == "audio") {
                 this.audio_engine.loadClip(element.media_id);
             } else if (element.type == "animation") {
-                this.animation_engine.clips[element.object_uuid].stop();
+                this.animation_engine.clips[element.object_uuid+element.media_id].stop();
             } else if (element.type == "lipsync") {
                 this.lipSync_engine.clips[element.object_uuid].reset();
             } else {
@@ -380,12 +380,12 @@ export class TimeLine {
                 const object = this.scene.get_object_by_uuid(element.object_uuid);
                 if (element.type === ClipType.TRANSFORM) {
                     if (object && this.transform_engine.clips[element.object_uuid]) {
-                        this.transform_engine.clips[element.object_uuid+element.media_id].step(
+                        this.transform_engine.clips[element.object_uuid].step(
                             object,
                             element.offset,
                             this.scrubber_frame_position,
                         );
-                        element.length = this.transform_engine.clips[element.object_uuid+element.media_id].length;
+                        element.length = this.transform_engine.clips[element.object_uuid].length;
                     }
                 } else if (element.type == "audio") {
                     if (this.scrubber_frame_position + 1 >= element.length) {
