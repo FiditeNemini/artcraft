@@ -966,6 +966,9 @@ class Editor {
     console.log(this.frames, this.frame_buffer.length);
 
     this.renderMode();
+
+    if(this.generating_preview){return;}
+    this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
     for (let index = 0; index < this.frame_buffer.length; index++) {
@@ -1006,18 +1009,13 @@ class Editor {
       }
     }
 
-    const output = await ffmpeg.FS("readFile", itteration + "tmp.mp4");
+    const output = ffmpeg.FS("readFile", itteration + "tmp.mp4");
+
+    ffmpeg.exit();
+    this.generating_preview = false;
+
     // Create a Blob from the output file for downloading
     const blob = new Blob([output.buffer], { type: "video/mp4" });
-    const url = URL.createObjectURL(blob);
-    const downloadLink = document.createElement("a");
-    downloadLink.href = url;
-    downloadLink.download = "render.mp4";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    // Clean up
-    URL.revokeObjectURL(url);
-    document.body.removeChild(downloadLink);
 
     const data: any = await this.api_manager.uploadMedia(blob, "render.mp4");
     console.log("data", data)
@@ -1116,7 +1114,7 @@ class Editor {
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
     console.log("Generating video...");
-    if (this.rendering) {
+    if (this.rendering || this.generating_preview) {
       return;
     }
     this.rendering = true; // has to go first to debounce
