@@ -321,7 +321,6 @@ export class TimeLine {
     }
 
     private async resetScene() {
-        this.timeline_limit = this.getEndPoint();
         for (const element of this.timeline_items) {
             if (element.type == "transform") {
                 const object = this.scene.get_object_by_uuid(element.object_uuid);
@@ -354,7 +353,7 @@ export class TimeLine {
     // called by the editor update loop on each frame
     public async update() {
         //if (this.is_playing == false) return; // start and stop
-
+        this.timeline_limit = this.getEndPoint();
         if (this.is_playing) {
             this.current_time += 1;
             this.pushEvent(fromEngineActions.UPDATE_TIME, {
@@ -381,12 +380,12 @@ export class TimeLine {
                 const object = this.scene.get_object_by_uuid(element.object_uuid);
                 if (element.type === ClipType.TRANSFORM) {
                     if (object && this.transform_engine.clips[element.object_uuid]) {
-                        this.transform_engine.clips[element.object_uuid].step(
+                        this.transform_engine.clips[element.object_uuid+element.media_id].step(
                             object,
                             element.offset,
                             this.scrubber_frame_position,
                         );
-                        element.length = this.transform_engine.clips[element.object_uuid].length;
+                        element.length = this.transform_engine.clips[element.object_uuid+element.media_id].length;
                     }
                 } else if (element.type == "audio") {
                     if (this.scrubber_frame_position + 1 >= element.length) {
