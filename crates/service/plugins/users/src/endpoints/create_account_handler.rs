@@ -19,6 +19,7 @@ use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
 use mysql_queries::queries::users::user::create_account::{create_account, CreateAccountArgs, CreateAccountError};
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_hash_password::bcrypt_hash_password;
+use tokens::tokens::user_sessions::UserSessionToken;
 use user_input_common::check_for_slurs::contains_slurs;
 
 use crate::session::http::http_user_session_manager::HttpUserSessionManager;
@@ -217,7 +218,9 @@ pub async fn create_account_handler(
       CreateAccountErrorResponse::server_error()
     })?;
 
-  let session_cookie = match session_cookie_manager.create_cookie(&session_token, new_user_data.user_token.as_str()) {
+  let session_token = UserSessionToken::new_from_str(&session_token);
+
+  let session_cookie = match session_cookie_manager.create_cookie(&session_token, &new_user_data.user_token) {
     Ok(cookie) => cookie,
     Err(_) => return Err(CreateAccountErrorResponse::server_error()),
   };

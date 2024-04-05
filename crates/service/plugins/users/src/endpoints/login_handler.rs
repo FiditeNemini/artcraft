@@ -20,6 +20,7 @@ use mysql_queries::queries::users::user::lookup_user_for_login_by_email::lookup_
 use mysql_queries::queries::users::user::lookup_user_for_login_by_username::lookup_user_for_login_by_username;
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_confirm_password::bcrypt_confirm_password;
+use tokens::tokens::user_sessions::UserSessionToken;
 
 use crate::session::http::http_user_session_manager::HttpUserSessionManager;
 
@@ -168,7 +169,9 @@ pub async fn login_handler(
 
   info!("login session created for user: {} / {:?}", &user.token, &user.token);
 
-  let session_cookie = match session_cookie_manager.create_cookie(&session_token, &user.token.0) {
+  let session_token = UserSessionToken::new_from_str(&session_token);
+
+  let session_cookie = match session_cookie_manager.create_cookie(&session_token, &user.token) {
     Ok(cookie) => cookie,
     Err(_) => return Err(LoginErrorResponse::server_error()),
   };

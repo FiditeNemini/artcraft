@@ -13,6 +13,7 @@ use mysql_queries::queries::users::user_password_resets::change_password_from_pa
 use mysql_queries::queries::users::user_password_resets::lookup_password_reset_request::lookup_password_reset_request;
 use mysql_queries::queries::users::user_sessions::create_user_session::create_user_session;
 use password::bcrypt_hash_password::bcrypt_hash_password;
+use tokens::tokens::user_sessions::UserSessionToken;
 
 use crate::session::http::http_user_session_manager::HttpUserSessionManager;
 
@@ -153,7 +154,9 @@ pub async fn password_reset_redeem_handler(
         }
     };
 
-    let session_cookie = match session_cookie_manager.create_cookie(&session_token, &transaction_and_state.reset_state.user_token.0) {
+    let session_token = UserSessionToken::new_from_str(&session_token);
+
+    let session_cookie = match session_cookie_manager.create_cookie(&session_token, &transaction_and_state.reset_state.user_token) {
         Ok(cookie) => cookie,
         Err(err) => {
             error!("error creating session cookie: {err}");
