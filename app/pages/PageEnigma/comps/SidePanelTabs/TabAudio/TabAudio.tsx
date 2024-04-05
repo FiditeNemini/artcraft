@@ -5,7 +5,7 @@ import { APPUI_ACTION_TYPES } from "../../../reducers";
 import { AppUiContext } from "../../../contexts/AppUiContext";
 import { AuthenticationContext } from "~/contexts/Authentication";
 import { useSignals } from "@preact/signals-react/runtime";
-import { timelineHeight } from "~/pages/PageEnigma/store";
+// import { timelineHeight } from "~/pages/PageEnigma/store";
 
 import { Button, Label, P } from "~/components";
 import { ClipType } from "../../../models/track";
@@ -19,10 +19,9 @@ export const TabAudio = () => {
   const [ userAudioClips, setUserAudioClips] = useState<MediaFile[]>([]);
 
   useSignals();
-  const [height, setHeight] = useState(0);
 
   useEffect(() => {
-    setHeight(window.outerHeight - timelineHeight.value);
+
     if(authState.userInfo && authState.userInfo.username)
       ListAudioByUser(authState.userInfo.username)
         .then(res=>{
@@ -82,14 +81,14 @@ export const TabAudio = () => {
         { userAudioClips.length >= 0 &&
           <div>
             {userAudioClips.map(item =>
-              <>
+              <div key={item.token}>
                 <P>{item.origin['maybe_model'].title || "No Name"}</P>
                 <AudioElement 
                   key={item.token}
                   clip={item}
                   type={ClipType.AUDIO}
                 />
-              </>
+              </div>
             )}
           </div>
         }
