@@ -31,8 +31,8 @@ export const AuthenticationContext = createContext<{
 });
 
 export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
-  console.log('auth provider rerender');
-  const [authCookies, setAuthCookie, removeAuthCookie] = useCookies([STORAGE_KEYS.USER_INFO]);
+  // console.log('auth provider rerender');
+  const [, setAuthCookie, removeAuthCookie] = useCookies([STORAGE_KEYS.USER_INFO]);
   const [authState, setAuthState] = useState<AuthState>({});
 
   const loginAndGetUserInfo = useCallback((
@@ -78,9 +78,9 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
     if(authState.isLoggedIn === undefined){
       //Persist Login if Session Data exist
       const sessionData = localStorage.getItem(STORAGE_KEYS.USER_INFO);
-      console.log(`Session Data: ${sessionData?.substring(0, 30)}${sessionData ? '...':''}`);
+      // console.log(`Session Data: ${sessionData?.substring(0, 30)}${sessionData ? '...':''}`);
       if (sessionData !== null){
-        console.log('Getting session to persist login');
+        // console.log('Getting session to persist login');
         GetSession().then((
           res: SessionResponse
         )=>{
