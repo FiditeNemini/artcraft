@@ -115,6 +115,7 @@ impl std::fmt::Display for ListMediaFilesByBatchError {
 
 #[utoipa::path(
   get,
+  tag = "Media Files",
   path = "/v1/media_files/batch/{token}",
   params(
     ListMediaFilesByBatchQueryParams,

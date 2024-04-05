@@ -182,6 +182,7 @@ impl fmt::Display for BatchGetMediaFilesError {
 
 #[utoipa::path(
   get,
+  tag = "Media Files",
   path = "/v1/media_files/batch",
   responses(
     (status = 200, description = "Found", body = BatchGetMediaFilesSuccessResponse),

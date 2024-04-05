@@ -38,6 +38,7 @@ pub struct WriteEngineAssetMediaSuccessResponse {
 
 #[utoipa::path(
   post,
+  tag = "Media Files",
   path = "/v1/media_files/write/engine_asset",
   responses(
     (status = 200, description = "Success Update", body = WriteEngineAssetMediaSuccessResponse),

@@ -65,6 +65,7 @@ impl fmt::Display for ChangeMediaFileVisibilityError {
 
 #[utoipa::path(
     post,
+    tag = "Media Files",
     path = "/v1/media_files/visibility/{token}",
     responses(
         (status = 200, description = "Success Delete", body = SimpleGenericJsonSuccess),

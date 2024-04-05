@@ -42,6 +42,7 @@ static ALLOWED_MIME_TYPES : Lazy<HashSet<&'static str>> = Lazy::new(|| {
 
 #[utoipa::path(
   post,
+  tag = "Media Files",
   path = "/v1/media_files/upload/video",
   responses(
     (status = 200, description = "Success Update", body = UploadVideoMediaSuccessResponse),

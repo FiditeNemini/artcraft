@@ -94,6 +94,7 @@ impl ResponseError for ListFeaturedMediaFilesError {
 
 #[utoipa::path(
   get,
+  tag = "Media Files",
   path = "/v1/media_files/list_featured",
   responses(
     (status = 200, description = "List Featured Media Files", body = ListFeaturedMediaFilesSuccessResponse),

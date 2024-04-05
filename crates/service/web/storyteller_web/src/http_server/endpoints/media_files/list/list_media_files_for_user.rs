@@ -125,6 +125,7 @@ impl std::fmt::Display for ListMediaFilesForUserError {
 
 #[utoipa::path(
   get,
+  tag = "Media Files",
   path = "/v1/media_files/list/user/{username}",
   params(
      ListMediaFilesForUserQueryParams,

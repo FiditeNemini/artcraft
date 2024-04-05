@@ -66,6 +66,7 @@ impl fmt::Display for DeleteMediaFileError {
 
 #[utoipa::path(
     delete,
+    tag = "Media Files",
     path = "/v1/media_files/file/{token}",
     responses(
         (status = 200, description = "Success Delete", body = SimpleGenericJsonSuccess),

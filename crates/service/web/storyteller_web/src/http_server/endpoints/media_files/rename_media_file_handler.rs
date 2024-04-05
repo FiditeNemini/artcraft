@@ -67,6 +67,7 @@ impl fmt::Display for RenameMediaFileError {
 
 #[utoipa::path(
   post,
+  tag = "Media Files",
   path = "/v1/media_files/rename/{token}",
   responses(
     (status = 200, description = "Success Delete", body = SimpleGenericJsonSuccess),

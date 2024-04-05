@@ -164,6 +164,7 @@ impl fmt::Display for GetMediaFileError {
 
 #[utoipa::path(
   get,
+  tag = "Media Files",
   path = "/v1/media_files/file/{token}",
   responses(
     (status = 200, description = "Found", body = GetMediaFileSuccessResponse),
