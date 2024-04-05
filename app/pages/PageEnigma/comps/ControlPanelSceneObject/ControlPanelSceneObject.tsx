@@ -34,7 +34,9 @@ export const ControlPanelSceneObject = () => {
   const currentSceneObject = appUiState.controlPanel.currentSceneObject;
 
   useEffect(()=>{
+    // TODO this causes a subtle bug because it renders way too many times.
     const vectors = appUiState.controlPanel.currentSceneObject.objectVectors
+    
     editorEngine?.setSelectedObject(vectors.position, vectors.rotation, vectors.scale)
   }, [appUiState.controlPanel.currentSceneObject]);
 
