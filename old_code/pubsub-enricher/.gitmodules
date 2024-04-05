@@ -1,3 +1,0 @@
-[submodule "protos/storyteller-protos"]
-	path = old_code/pubsub-enricher/protos/storyteller-protos
-	url = git@github.com:storytold/storyteller-protos.git

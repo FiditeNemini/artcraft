@@ -1,3 +1,0 @@
-[submodule "protos/storyteller-protos"]
-	path = protos/storyteller-protos
-	url = git@github.com:storytold/storyteller-protos.git
