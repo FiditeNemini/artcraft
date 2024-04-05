@@ -4,7 +4,7 @@ import { StoryTellerProxy3DObject } from "./storyteller_proxy_3d_object"
 
 interface LookUpDictionary {
     [key: string]: StoryTellerProxy3DObject;
-  }
+}
   
 export class StoryTellerProxyScene {
     sceneItemProxy: StoryTellerProxy3DObject[];
@@ -21,7 +21,8 @@ export class StoryTellerProxyScene {
       this.lookUpDictionary = {}
       this.sceneItemProxy = []
     }
-  
+    
+    // TODO: refactor this and dependency inject api manager.
     private async get_media_url(media_file_token: string): Promise<string> {
       //This is for prod when we have the proper info on the url.
       let api_base_url = "https://api.fakeyou.com";
@@ -149,7 +150,22 @@ export class StoryTellerProxyScene {
     }
 
     public async deleteWithUUID(uuid:String) {
-      
-    }
+        if (this.scene != null) {
+          const object = this.scene.getObjectByProperty('uuid', uuid);
+          if (object) {
+            this.scene.remove(object);
+            // Remove from sceneItemProxy and lookUpDictionary
+            const index = this.sceneItemProxy.findIndex(item => uuid === uuid);
+            if (index !== -1) {
+              this.sceneItemProxy.splice(index, 1);
+            }
+            delete this.lookUpDictionary[uuid];
+          } else {
+            console.log(`Object with UUID ${uuid} not found in the scene`);
+          }
+        } else {
+          console.log("Scene doesn't exist needs to be assigned");
+        }
+      }
   };
   

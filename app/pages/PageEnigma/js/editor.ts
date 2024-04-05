@@ -25,6 +25,8 @@ import { APPUI_ACTION_TYPES } from "../reducers";
 import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 import { XYZ } from "../datastructures/common";
+import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
+import { StoryTellerProxy3DObject } from "../proxy/storyteller_proxy_3d_object";
 class EditorState {
   // {
   //   action: "ShowLoadingIndicator"
@@ -107,6 +109,10 @@ class Editor {
 
   last_scrub: number;
   // Default params.
+
+  // scene proxy for serialization
+  storyteller_proxy_scene:StoryTellerProxyScene;
+
   constructor() {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
@@ -206,6 +212,9 @@ class Editor {
       "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.";
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
+
+
+    this.storyteller_proxy_scene = new StoryTellerProxyScene(this.version,this.activeScene.scene)
   }
 
   initialize(config: any) {
@@ -372,19 +381,8 @@ class Editor {
 
   public async testTestTimelineEvents() {}
 
-  public async testStylizeRequest() {
-    const result = await this.api_manager
-      .stylizeVideo(
-        "mu_6wy1570a0c3c0tpkkncf4tsvb5234",
-        this.art_style,
-        this.positive_prompt,
-        this.negative_prompt,
-        Visibility.Public,
-      )
-      .catch((error) => {
-        console.log(error);
-      });
-    console.log(result);
+  public async testLoadTokenAssets() {
+    await this.storyteller_proxy_scene.loadFromMediaFileToken("m_z4jzbst3xfh64h0qn4bqh4afenfps9")
   }
 
   public async loadScene(scene_media_token: string) {
