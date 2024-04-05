@@ -1078,9 +1078,9 @@ class Editor {
         const url = await this.api_manager.uploadMediaFrameGeneration(
           blob,
           "render.mp4",
-          "anime_ghibli",
-          "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.",
-          "",
+          this.art_style,
+          this.positive_prompt,
+          this.negative_prompt,
         );
         console.log(url);
 
