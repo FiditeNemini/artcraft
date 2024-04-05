@@ -11,14 +11,14 @@ export class AnimationEngine {
     }
 
     load_object(object_uuid: string, media_id:string, clip_name: string) {
-        this.clips[object_uuid] = new AnimationClip(
+        this.clips[object_uuid+media_id] = new AnimationClip(
             this.version,
             media_id,
             "glb", 
             object_uuid, 
             1.0, 1.0, 
             clip_name);
-        this.clips[object_uuid]._load_animation();
+        this.clips[object_uuid+media_id]._load_animation();
         
     }
 }
