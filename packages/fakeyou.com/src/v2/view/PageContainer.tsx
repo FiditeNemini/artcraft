@@ -132,6 +132,7 @@ import StudioTutorial from "./pages/studio_tutorial/StudioTutorial";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import DevUploadAlt from "./pages/dev_upload/DevUploadAlt";
 import { ModerationTokenInfoPage } from "./pages/moderation/ModerationTokenInfoPage";
+import StyleVideo from "./pages/style-video";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -908,6 +909,10 @@ class PageContainer extends React.Component<
 
                   <Route path="/voice-designer">
                     <VoiceDesignerMainPage />
+                  </Route>
+
+                  <Route path="/style-video">
+                    <StyleVideo />
                   </Route>
 
                   <Route path="/generate-speech">

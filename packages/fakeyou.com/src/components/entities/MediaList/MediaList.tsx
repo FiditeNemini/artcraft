@@ -16,7 +16,7 @@ interface Props {
   success?: boolean
 }
 
-const MediaCards = ({ props, type }: MediaCardsProps) => {
+const Cards = ({ props, type }: MediaCardsProps) => {
   switch (type) {
     case "audio":
       return <CardWrapper {...{ ...props, card: AudioCard, padding: true }}/>;
@@ -24,42 +24,39 @@ const MediaCards = ({ props, type }: MediaCardsProps) => {
       return <CardWrapper {...{ ...props, card: OverlayCard, preview: ImagePreview }}/>;
     case "video":
       return <CardWrapper {...{ ...props, card: OverlayCard, preview: VideoPreview }}/>;
-    case "bvh": case "glb": case "gltf":
+    case "bvh": case "glb": case "gltf": case "scene_ron":
       return <CardWrapper {...{ ...props, card: OverlayCard, preview: MocapPreview }}/>;
-    default:
-      return <div>Unsupported media type</div>;
-  }
-};
-
-const WeightsCards = ({ props, type }: MediaCardsProps) => {
-  switch (type) {
     case "rvc_v2":
       return <CardWrapper {...{ ...props, card: WeightCard, padding: true }}/>;
     case "tt2":
       return <CardWrapper {...{ ...props, card: WeightCard, padding: true }}/>;
     default:
-      return <div>Unsupported media type</div>;
+      return <div>Unsupported type</div>;
   }
 };
 
 export default function MediaList({ entityType, list, success, ...rest }: Props) {
   const gridRef = useRef<HTMLDivElement | null>(null);
 
+  // console.log("🪼",{ entityType, list, success, rest });
+
   return list.length === 0 && success ?
     <div className="text-center mt-4 opacity-75">
       No media created yet.
     </div> : <MasonryGrid {...{ gridRef }}>
       { list.map((data: any, key: number) => {
-        let props = { data, type: "media", ...rest };
+        console.log("🐡",data);
+        let props = { data, type: data.media_type ? "media" : "weight", ...rest };
         return <div {...{
           className: "col-12 col-sm-6 col-xl-4 grid-item",
           key,
         }}>
+        <Cards {...{ type: data.media_type || data.weight_type, props,  }}/>
           {
-            [ null,
-              <MediaCards {...{ type: data.media_type, props }} />,
-              <WeightsCards {...{ type: data.weight_type, props }} />
-            ][entityType]
+            // [ null,
+            //   <MediaCards {...{ type: data.media_type, props }} />,
+            //   <WeightsCards {...{ type: data.weight_type, props }} />
+            // ][entityType]
           }
         </div>;
       }) }

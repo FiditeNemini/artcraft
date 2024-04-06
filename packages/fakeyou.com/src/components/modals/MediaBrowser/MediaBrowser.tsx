@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { MediaList } from "components/entities";
-import { AcceptTypes, EntityInputMode, EntityFilterOptions, } from "components/entities/EntityTypes";
+import { AcceptTypes, EntityInputMode, EntityFilterOptions } from "components/entities/EntityTypes";
 import { Pagination, TempSelect } from "components/common";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
@@ -43,6 +43,12 @@ export default function MediaBrowser({
   search,
   username
 }: Props) {
+
+  console.log(
+    "🐢",
+    inputMode,
+    // getMediaTypesByCategory(inputMode)
+  );
   // const ratings = useRatings();
   const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [filterType, filterTypeSet] = useState(accept ? accept[0] : "all");

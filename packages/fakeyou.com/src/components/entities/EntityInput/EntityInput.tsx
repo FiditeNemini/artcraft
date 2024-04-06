@@ -3,8 +3,8 @@ import { useLocation } from "react-router-dom";
 import { a, useTransition } from "@react-spring/web";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import Iframe from "react-iframe";
-import { Label, Spinner } from "components/common";
-import { AcceptTypes, EntityInputMode, EntityModeProp, UploaderResponse } from "components/entities/EntityTypes";
+import { Button, Label, Spinner } from "components/common";
+import { AcceptTypes, EntityInputMode, EntityModeProp, getMediaTypesByCategory, mediaCategoryfromString, MediaFilters, UploaderResponse } from "components/entities/EntityTypes";
 import { useMedia, useMediaUploader, useModal, useSession } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import EntityInputEmpty from "./EntityInputEmpty";
@@ -21,7 +21,8 @@ interface Props {
 }
 
 export interface SlideProps {
-  media?: MediaFile
+  media?: MediaFile,
+  clear: () => void
 };
 
 interface AniProps {
@@ -36,21 +37,36 @@ const MediaBusy = () => {
   return <Spinner/>;
 };
 
-const MocapInputFull = ({ media }: SlideProps) => {
+const MocapInputFull = ({ media, clear, ...rest }: SlideProps) => {
+  console.log("🟦",media,rest);
   const bucketConfig = new BucketConfig();
   const mediaUrl = media?.public_bucket_path ? bucketConfig.getGcsUrl(media.public_bucket_path) : "";
+  const mediaType = mediaCategoryfromString(media?.media_type || "");
+  // const yada = ListEntityFilters(EntityInputMode.media).indexOf(media.media_type);
 
-  return <>
-    <Iframe
-        {...{
-          url: `https://engine.fakeyou.com?mode=viewer&${media?.media_type}=${mediaUrl}`,
-          className: "fy-entity-input-mocap-preview",
-        }}
-      />
-    <div {...{ className: "fy-entity-input-full-controls" }}>
-      Your file
-    </div>
-  </>;
+  console.log("🧖🏿‍♂️",mediaType);
+
+  switch (mediaType) {
+    case MediaFilters.video: return <>
+      <video controls {...{ src: mediaUrl }}/>
+      <div {...{ className: "fy-entity-input-full-controls" }}>
+        Your file
+        <Button {...{ label: "Clear", variant: "secondary", onClick: () => clear() }}/>
+      </div>
+    </>;
+    case MediaFilters.engine_asset: return <>
+      <Iframe
+          {...{
+            url: `https://engine.fakeyou.com?mode=viewer&${media?.media_type}=${mediaUrl}`,
+            className: "fy-entity-input-mocap-preview",
+          }}
+        />
+      <div {...{ className: "fy-entity-input-full-controls" }}>
+        Your file
+      </div>
+    </>;
+    default: return <div>Unknown media type</div>;
+  }
 };
 
 const AniMod = ({ animating, className, isLeaving, render: Render, style, ...rest }: AniProps) => <a.div {...{
@@ -63,12 +79,20 @@ const AniMod = ({ animating, className, isLeaving, render: Render, style, ...res
 export default function EntityInput({ accept: inAccept, aspectRatio = "square", label, name = "", onChange, type, value, ...rest }: Props) {
   const accept = Array.isArray(inAccept) ? inAccept : [inAccept];
   const inputMode = EntityInputMode[type];
+  const isMedia = inputMode === EntityInputMode.media;
+  const fileTypes = isMedia ? accept.map((mediaCategory,i) => {
+    return mediaCategory ? getMediaTypesByCategory(mediaCategoryfromString(mediaCategory)) : [];
+  }).flat() : [];
   const { search } = useLocation();
   const presetToken = search ? new URLSearchParams(search).get("preset_token") : "";
   const [mediaToken,mediaTokenSet] = useState(presetToken || value || "");
   const { media, mediaSet } = useMedia({ mediaToken });
   const { user } = useSession();
   const { open } = useModal();
+  const clear = () => {
+    mediaSet(undefined);
+    mediaTokenSet("");
+  };
 
   const selectToken = (token: string) => {
     mediaTokenSet(token);
@@ -98,6 +122,9 @@ export default function EntityInput({ accept: inAccept, aspectRatio = "square", 
     onStart: () => animatingSet(true)
   });
 
+
+  console.log("🧤",fileTypes);
+
   useEffect(() => {
     if (presetToken && value !== presetToken) onChange({ target: { name, value: presetToken } });
   },[presetToken, name, onChange, value]);
@@ -112,8 +139,8 @@ export default function EntityInput({ accept: inAccept, aspectRatio = "square", 
 
           return [
             <AniMod {...{ render: MediaBusy, className: "fy-entity-input-busy", ...sharedProps }}/>,
-            <AniMod {...{ render: MocapInputFull, className: "fy-entity-input-full", ...sharedProps }}/>,
-            <AniMod {...{ render: EntityInputEmpty, className: "fy-entity-input-empty", accept, inputMode, inputProps, onSelect, open, user, ...sharedProps, ...rest }}/>
+            <AniMod {...{ render: MocapInputFull, className: "fy-entity-input-full", accept, clear, ...sharedProps }}/>,
+            <AniMod {...{ render: EntityInputEmpty, className: "fy-entity-input-empty", accept, fileTypes, inputMode, inputProps, onSelect, open, user, ...sharedProps, ...rest }}/>
           ][i];
         })
       }

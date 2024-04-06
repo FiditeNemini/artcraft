@@ -62,8 +62,20 @@
   margin: 0;
 }
 
+.fy-entity-input-full {
+  display: flex;
+
+  video {
+    width: 100%;
+  }
+}
+
 .fy-entity-input-full-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   position: absolute;
+  // background-color: red;
   background-color: rgba(#000, .5);
   padding: 1rem;
   // backdrop-filter: blur(2px);

@@ -1,0 +1,19 @@
+.fy-style-video-page {
+	.fy-entity-input {
+		max-height: 33vh;
+		margin-bottom: 1rem;
+	}
+
+	.prompt-row {
+		display: flex;
+		gap: 1rem;
+
+		.fy-textarea {
+			flex: 1;
+		}
+	}
+
+	.button {
+		width: 33%;
+	}
+}

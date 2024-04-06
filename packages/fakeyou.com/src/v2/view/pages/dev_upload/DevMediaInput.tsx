@@ -51,7 +51,7 @@ export default function DevMediaInput({ value }: Props) {
   const options = EntityFilterOptions();
   const filterOptions = EntityFilterOptions(inputMode);
 
-  console.log("❌", mode, inputMode, filterOptions);
+  console.log("❌", mode, inputMode, filterOptions, filters[mode]);
 
   const changeFilter = ({ target }: { target: any }) => filtersSet({ ...filters, [mode]: target.value });
   const openModal = () => open({ component: InferenceJobsModal });
@@ -94,15 +94,15 @@ export default function DevMediaInput({ value }: Props) {
         onChange: changeFilter
       }}/>
      <EntityInput {...{
-        accept: ["bvh","glb","gltf"],
+        accept: filters[mode],
         aspectRatio: "landscape",
         label: "Choose entity",
         name: "mediaToken",
         // label: `Choose ${ ["","media file","weight"][entityType] }`,
         onChange,
         owner,
-        search: "Dream",
-        type: "media"
+        // search: "Dream",
+        type: mode
       }}/>
       <Button {...{ label: "Open modal", onClick: openModal, variant: "primary" }}/>
      <div>

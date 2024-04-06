@@ -1,5 +1,5 @@
 import React from "react";
-import { AcceptTypes, EntityInputMode, isSelectedType, MediaFilters } from "components/entities/EntityTypes";
+import { AcceptTypes, EntityInputMode, getMediaTypesByCategory, isSelectedType, mediaCategoryfromString, MediaFilters } from "components/entities/EntityTypes";
 import { SlideProps } from "./EntityInput";
 import { MediaBrowser } from "components/modals";
 import { FileWrapper } from "components/common";
@@ -25,7 +25,10 @@ interface EmptySlideProps extends SlideProps {
 
 export default function EntityInputEmpty({ accept, open, inputMode, inputProps, user, ...rest }: EmptySlideProps) {
   const accepted = accept ? accept : [];
-  const isMedia = isSelectedType(MediaFilters.all,accepted[0]);
+  const isMedia = inputMode === EntityInputMode.media;
+  const fileTypes = isMedia ? accepted.map((mediaCategory,i) => {
+    return mediaCategory ? getMediaTypesByCategory(mediaCategoryfromString(mediaCategory)) : [];
+  }).flat() : [];
 
   const browserClick = () => open({
     component: MediaBrowser,
@@ -40,13 +43,13 @@ export default function EntityInputEmpty({ accept, open, inputMode, inputProps, 
     return faFile;
   };
 
-  const supported = `${ accepted.length ? accepted.join(", ") : accepted[0] } files supported`;
+  const supported = `${ fileTypes.length ? fileTypes.join(", ") : fileTypes[0] } files supported`;
 
   return <>
     <Icon {...{ className: "fy-entity-input-icon", icon: [faFile,mediaIcons(),faDiagramSankey,mediaIcons()][inputMode] }}/>
     <div {...{ className: "fy-entity-input-empty-controls" }}>
      { isMedia &&
-        <FileWrapper {...{ containerClass: "fy-entity-input-row", fileTypes: accepted, panelClass: "fy-entity-input-button", noStyle: true, ...inputProps }}>
+        <FileWrapper {...{ containerClass: "fy-entity-input-row", fileTypes, panelClass: "fy-entity-input-button", noStyle: true, ...inputProps }}>
            <>
              <Icon {...{ className: "fy-entity-input-label-icon", icon: faFileArrowUp }}/>
              <div {...{ className: "fy-entity-input-upload-detail" }}>

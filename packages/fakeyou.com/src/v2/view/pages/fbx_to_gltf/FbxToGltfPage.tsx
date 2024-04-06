@@ -81,7 +81,7 @@ export default function FbxToGltfPage({
       <Panel padding={true}>
         <div className="d-flex flex-column gap-3">
           <EntityInput {...{
-            accept: ["fbx"],
+            accept: ["engine_asset"],
             aspectRatio: "landscape",
             label: "Choose FBX file",
             name: "mediaToken",

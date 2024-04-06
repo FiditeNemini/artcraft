@@ -58,7 +58,7 @@ export default function EngineCompositor({ value, sessionWrapper }: Props) {
             </header>
             <EntityInput
               {...{
-                accept: ["bvh","glb","gltf"],
+                accept: ["engine_asset"],
                 aspectRatio: "landscape",
                 label: "Choose 3D data",
                 onChange,
