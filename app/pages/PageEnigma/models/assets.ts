@@ -15,4 +15,5 @@ export enum AssetType {
   AUDIO = "audio",
   ANIMATION = "animation",
   CAMERA = "camera",
+  SHAPE = "shape",
 }

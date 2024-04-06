@@ -18,7 +18,7 @@ export const SidePanelMenu = () => {
       className={["bg-assets-background", "px-2 py-4", "overflow-y-auto"].join(
         " ",
       )}
-      style={{ height: sidePanelHeight.value, width: 84 }}
+      style={{ height: sidePanelHeight.value, minWidth: 84, maxWidth: 84 }}
     >
       <div className="flex w-full flex-col gap-2">
         {tabList.map((tab) => (

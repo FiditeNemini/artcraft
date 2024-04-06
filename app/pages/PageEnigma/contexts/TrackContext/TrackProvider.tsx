@@ -27,6 +27,8 @@ export const TrackProvider = ({ children }: Props) => {
   const [audioClips, setAudioClips] = useState<MediaItem[]>([]);
   const [characterItems, setCharacterItems] = useState<MediaItem[]>([]);
   const [objectItems, setObjectItems] = useState<MediaItem[]>([]);
+  const [cameraItems, setCameraItems] = useState<MediaItem[]>([]);
+  const [shapeItems, setShapeItems] = useState<MediaItem[]>([]);
 
   const [scale, setScale] = useState(1);
   const [length, setLength] = useState(1);
@@ -206,7 +208,7 @@ export const TrackProvider = ({ children }: Props) => {
         version: 1,
         media_id: uuid.v4(),
         type: AssetType.CHARACTER,
-        name: "",
+        name: "Some Char",
         thumbnail: "resources/characters/img09.png",
       },
       {
@@ -240,6 +242,24 @@ export const TrackProvider = ({ children }: Props) => {
         thumbnail: "resources/characters/img01.png",
       },
     ]);
+    setCameraItems([
+      {
+        version: 1,
+        media_id: "m_w5nn3kjh1fbkmjrdac5b2qaba0pmyt",
+        type: AssetType.CAMERA,
+        name: "Block Stance",
+        thumbnail: "resources/characters/img01.png",
+      },
+    ]);
+    setShapeItems([
+      {
+        version: 1,
+        media_id: "m_w5nn3kjh1fbkmjrdac5b2qaba0pmyt",
+        type: AssetType.CAMERA,
+        name: "Block Stance",
+        thumbnail: "resources/characters/img01.png",
+      },
+    ]);
     setScale(1);
     setLength(12);
   }, []);
@@ -255,6 +275,8 @@ export const TrackProvider = ({ children }: Props) => {
       audioClips,
       characterItems,
       objectItems,
+      cameraItems,
+      shapeItems,
 
       scale,
       currentTime: time,
@@ -274,6 +296,8 @@ export const TrackProvider = ({ children }: Props) => {
     audioClips,
     characterItems,
     objectItems,
+    cameraItems,
+    shapeItems,
 
     updateCurrentTime,
     time,

@@ -12,9 +12,5 @@ export const fullWidth = computed(() => {
   return filmLength.value * 60 * 4 * scale.value;
 });
 
-export const fullHeight = computed(() => {
-  return timelineHeight.value - 8;
-});
-
 // side panel
 export const sidePanelWidth = signal(0);

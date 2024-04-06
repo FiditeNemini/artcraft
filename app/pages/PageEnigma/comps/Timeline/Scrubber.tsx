@@ -1,4 +1,9 @@
-import { currentTime, fullHeight, scale } from "~/pages/PageEnigma/store";
+import {
+  characterGroups,
+  currentTime,
+  objectGroup,
+  scale,
+} from "~/pages/PageEnigma/store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
 import { useMouseEventsScrubber } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsScrubber";
@@ -8,6 +13,11 @@ export const Scrubber = () => {
   useSignals();
   const { onPointerDown, time } = useMouseEventsScrubber();
   const displayTime = time === -1 ? currentTime.value : time;
+  const fullHeight =
+    characterGroups.value.length * 268 +
+    objectGroup.value.objects.length * 60 +
+    300 +
+    96;
 
   return (
     <div
@@ -23,7 +33,7 @@ export const Scrubber = () => {
         style={{
           width: 2,
           marginTop: -5,
-          height: fullHeight.value,
+          height: fullHeight,
         }}
       />
     </div>

@@ -31,9 +31,11 @@ export const SidePanel = () => {
       >
         <FontAwesomeIcon icon={isVisible ? faChevronRight : faChevronLeft} />
       </button>
-      <div className="relative h-full w-full transition-all duration-300 ease-in-out">
-        {isVisible && <SidePanelTabs />}
-      </div>
+      {isVisible && (
+        <div className="relative h-full w-full transition-all duration-300 ease-in-out">
+          <SidePanelTabs />
+        </div>
+      )}
       <SidePanelMenu />
     </div>
   );

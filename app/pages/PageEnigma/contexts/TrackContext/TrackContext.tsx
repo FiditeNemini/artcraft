@@ -11,6 +11,8 @@ export const TrackContext = createContext<{
   audioClips: MediaItem[];
   characterItems: MediaItem[];
   objectItems: MediaItem[];
+  cameraItems: MediaItem[];
+  shapeItems: MediaItem[];
 
   // drag and drop
   startDrag: (item: MediaItem) => void;
@@ -23,6 +25,8 @@ export const TrackContext = createContext<{
   audioClips: [],
   characterItems: [],
   objectItems: [],
+  cameraItems: [],
+  shapeItems: [],
 
   startDrag: () => {},
   endDrag: () => {},
