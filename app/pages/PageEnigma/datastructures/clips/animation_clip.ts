@@ -101,8 +101,8 @@ export class AnimationClip  {
     this.mixer?.setTime(0);
   }
 
-  toJSON(): string {
-    return JSON.stringify({
+  toJSON(): any {
+    return {
       version: this.version,
       media_id: this.media_id,
       object_uuid: this.object_uuid,
@@ -110,6 +110,6 @@ export class AnimationClip  {
       speed: this.speed,
       length: this.length,
       clip_name: this.clip_name,
-    })
+    };
   }
 }

@@ -88,43 +88,43 @@ export class APIManager {
    * @returns APIManagerResponseMessage
    */
   public async saveSceneState(
-    scene: THREE.Scene,
+    save_json: string,
     scene_name: string,
     scene_glb_media_file_token: string | null = null,
     scene_media_file_token: string | null = null,
-    timeline_state: TimelineDataState | null = null,
-  ): Promise<APIManagerResponseSuccess> {
-    const file = await this.gltfExport(scene);
+  ): Promise<string> {
+    const file = new File([save_json], `${scene_name}.glb`, {
+      type: "application/json",
+    });
 
     // will overwrite the scene on db if token exists
-    const upload_glb_response = await this.uploadGLB(
+    const upload_glb_response = await this.uploadEngineAsset(
       file,
       scene_glb_media_file_token,
     );
-    const result_scene_glb_media_file_token =
-      upload_glb_response["media_file_token"];
 
-    // now write the scene
-    const save_scene_timeline_response = await this.saveSceneAndTimeLineState(
-      result_scene_glb_media_file_token,
-      scene_media_file_token,
-      scene_name,
-      timeline_state,
-    );
+    //const result_scene_glb_media_file_token =
+    //  upload_glb_response["media_file_token"];
+    //// now write the scene
+    //const save_scene_timeline_response = await this.saveSceneAndTimeLineState(
+    //  result_scene_glb_media_file_token,
+    //  scene_media_file_token,
+    //  scene_name,
+    //  timeline_state,
+    //);
+    //const result_scene_media_file_token =
+    //  save_scene_timeline_response["media_file_token"];
+    //const data = {
+    //  scene_glb_media_file_token: result_scene_glb_media_file_token,
+    //  scene_media_file_token: result_scene_media_file_token,
+    //};
 
-    const result_scene_media_file_token =
-      save_scene_timeline_response["media_file_token"];
-
-    const data = {
-      scene_glb_media_file_token: result_scene_glb_media_file_token,
-      scene_media_file_token: result_scene_media_file_token,
-    };
-    return new APIManagerResponseSuccess("Scene Saved", data);
+    return upload_glb_response["media_file_token"];
   }
 
   public async loadSceneState(
     scene_media_file_token: string | null,
-  ): Promise<APIManagerResponseSuccess> {
+  ): Promise<any> {
     const api_base_url = "https://api.fakeyou.com";
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
     const response = await fetch(url);
@@ -148,38 +148,38 @@ export class APIManager {
     });
 
     console.log(`loadSceneState: ${JSON.stringify(json_result)}`);
+    return json_result;
 
-    const scene_glb_media_file_token: string =
-      json_result["scene_glb_media_file_token"];
+    // const scene_glb_media_file_token: string =
+    //   json_result["scene_glb_media_file_token"];
+    // const media_bucket_path = await this.getMediaFile(
+    //   scene_glb_media_file_token,
+    // );
+    // console.log(`GLB ${media_bucket_path}`);
+    // const glbLoader = new GLTFLoader();
+    // // promisify this
+    // const loadGlb = (
+    //   bucket_path: string,
+    // ): Promise<APIManagerResponseSuccess> => {
+    //   return new Promise((resolve, reject) => {
+    //     glbLoader.load(bucket_path, (glb) => {
+    //       if (glb) {
+    //         const scene: THREE.Scene = glb.scene;
+    //         const data = {
+    //           scene_glb_media_file_token: scene_glb_media_file_token,
+    //           scene_media_file_token: scene_media_file_token,
+    //           scene: scene,
+    //         };
+    //         console.log(`Data: ${data}`);
+    //         resolve(new APIManagerResponseSuccess("Success Loaded", data));
+    //       } else {
+    //         throw new APIManagerResponseError("Failed to Load GLB Scene");
+    //       }
+    //     });
+    //   });
+    // };
 
-    const media_bucket_path = await this.getMediaFile(
-      scene_glb_media_file_token,
-    );
-    console.log(`GLB ${media_bucket_path}`);
-    const glbLoader = new GLTFLoader();
-    // promisify this
-    const loadGlb = (
-      bucket_path: string,
-    ): Promise<APIManagerResponseSuccess> => {
-      return new Promise((resolve) => {
-        glbLoader.load(bucket_path, (glb) => {
-          if (glb) {
-            const scene: THREE.Scene = glb.scene;
-            const data = {
-              scene_glb_media_file_token: scene_glb_media_file_token,
-              scene_media_file_token: scene_media_file_token,
-              scene: scene,
-            };
-            console.log(`Data: ${data}`);
-            resolve(new APIManagerResponseSuccess("Success Loaded", data));
-          } else {
-            throw new APIManagerResponseError("Failed to Load GLB Scene");
-          }
-        });
-      });
-    };
-
-    return await loadGlb(media_bucket_path);
+    //return await loadGlb(media_bucket_path);
   }
 
   /**
@@ -213,18 +213,18 @@ export class APIManager {
     return file;
   }
 
-  private async uploadGLB(
+  private async uploadEngineAsset(
     file: File,
-    scene_glb_media_file_token: string | null,
-  ): Promise<string> {
+    media_file_token: string | null,
+  ): Promise<any> {
     const url = `${this.baseUrl}/v1/media_files/write/engine_asset`;
     const uuid = uuidv4();
     const form_data = new FormData();
     form_data.append("uuid_idempotency_token", uuid);
 
     // update existing scene otherwise create new glb scene and use it's media_file_id
-    if (scene_glb_media_file_token != null) {
-      form_data.append("media_file_token", scene_glb_media_file_token);
+    if (media_file_token != null) {
+      form_data.append("media_file_token", media_file_token);
     }
 
     form_data.append("file", file);
@@ -245,7 +245,6 @@ export class APIManager {
       throw new Error("Failed to Send Data");
     } else {
       const json_data = await response.json();
-      console.log(`uploadGLB: ${JSON.stringify(json_data)}`);
       return json_data; // or handle the response as appropriate
     }
   }
@@ -310,7 +309,7 @@ export class APIManager {
     blob: any,
     fileName: string,
   ): Promise<APIManagerResponseSuccess> {
-    const url = `${this.baseUrl}/v1/media_uploads/upload`;
+    const url = `${this.baseUrl}/v1/media_files/upload`;
     const uuid = uuidv4();
 
     const formData = new FormData();

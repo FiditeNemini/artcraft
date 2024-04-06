@@ -53,7 +53,6 @@ export const TrackProvider = ({ children }: Props) => {
         addCharacterAnimation({
           dragItem: dragItem.value!,
           characterId: dropId.value,
-          animationClips,
           offset: dropOffset.value,
         });
       }
@@ -61,13 +60,11 @@ export const TrackProvider = ({ children }: Props) => {
         addCharacterAudio({
           dragItem: dragItem.value!,
           characterId: dropId.value,
-          audioClips,
           offset: dropOffset.value,
         });
         addGlobalAudio({
           dragItem: dragItem.value!,
           audioId: dropId.value,
-          audioClips,
           offset: dropOffset.value,
         });
       }
@@ -237,7 +234,7 @@ export const TrackProvider = ({ children }: Props) => {
     setObjectItems([
       {
         version: 1,
-        media_id: uuid.v4(),
+        media_id: "m_w5nn3kjh1fbkmjrdac5b2qaba0pmyt",
         type: AssetType.OBJECT,
         name: "Block Stance",
         thumbnail: "resources/characters/img01.png",

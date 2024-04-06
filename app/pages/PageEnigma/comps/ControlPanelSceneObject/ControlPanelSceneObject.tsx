@@ -23,24 +23,28 @@ export const ControlPanelSceneObject = () => {
   const editorEngine = useContext(EngineContext);
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
 
-  if (!appUiState.controlPanel.currentSceneObject) {
-    return null;
-  }
   const position =
-    appUiState.controlPanel.currentSceneObject.objectVectors.position;
+    appUiState.controlPanel.currentSceneObject?.objectVectors?.position;
   const rotation =
-    appUiState.controlPanel.currentSceneObject.objectVectors.rotation;
-  const scale = appUiState.controlPanel.currentSceneObject.objectVectors.scale;
+    appUiState.controlPanel.currentSceneObject?.objectVectors?.rotation;
+  const scale =
+    appUiState.controlPanel.currentSceneObject?.objectVectors?.scale;
   const currentSceneObject = appUiState.controlPanel.currentSceneObject;
 
   useEffect(() => {
+    // TODO this causes a subtle bug because it renders way too many times.
     const vectors = appUiState.controlPanel.currentSceneObject.objectVectors;
+
     editorEngine?.setSelectedObject(
       vectors.position,
       vectors.rotation,
       vectors.scale,
     );
   }, [appUiState.controlPanel.currentSceneObject]);
+
+  if (!appUiState.controlPanel.currentSceneObject) {
+    return null;
+  }
 
   const handlePositionChange = (xyz: XYZ) => {
     if (!currentSceneObject) {

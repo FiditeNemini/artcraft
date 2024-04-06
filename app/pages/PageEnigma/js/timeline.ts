@@ -11,8 +11,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
-import { ClipGroup, ClipType } from "~/pages/PageEnigma/models";
-
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 // Every object uuid / entity has a track.
 export class TimelineCurrentState {
   is_editable: boolean;
@@ -65,7 +64,7 @@ export class TimeLine {
   ) {
     this.timeline_items = [];
     this.absolute_end = 60 * 12;
-    this.timeline_limit = this.absolute_end; // 5 seconds
+    this.timeline_limit = 0; // 5 seconds
 
     this.is_playing = false;
     this.scrubber_frame_position = 0; // in frames into the tl
@@ -143,15 +142,15 @@ export class TimeLine {
     // rotation: XYZ;
     // scale: XYZ;
     // selected?: boolean;
-    const data_json = data["data"];
-    const uuid = data_json["object_uuid"];
+    let data_json = data["data"];
+    let uuid = data_json["object_uuid"];
 
     let object_name = this.scene.get_object_by_uuid(uuid)?.name;
     if (object_name == undefined) {
       object_name = "undefined";
     }
 
-    const new_item = this.transform_engine.addFrame(
+    let new_item = this.transform_engine.addFrame(
       uuid,
       this.absolute_end,
       data_json["position"],
@@ -200,7 +199,7 @@ export class TimeLine {
           this.addPlayableClip(
             new ClipUI(
               version,
-              ClipType.AUDIO,
+              "lipsync", // TODO potiential bug ..
               group,
               name,
               media_id,
@@ -211,7 +210,6 @@ export class TimeLine {
           );
           return;
         } else {
-          console.log("Audio!");
           this.audio_engine.loadClip(media_id);
         }
         break;
@@ -233,15 +231,15 @@ export class TimeLine {
   }
 
   public async deleteKeyFrame(data: any) {
-    const keyframe_uuid = data["data"]["keyframe_uuid"];
-    const object_uuid = data["data"]["object_uuid"];
+    let keyframe_uuid = data["data"]["keyframe_uuid"];
+    let object_uuid = data["data"]["object_uuid"];
     this.transform_engine.clips[object_uuid].removeKeyframe(keyframe_uuid);
   }
 
   public async updateKeyFrame(data: any) {
-    const keyframe_uuid = data["data"]["keyframe_uuid"];
-    const keyframe_offset = data["data"]["offset"];
-    const object_uuid = data["data"]["object_uuid"];
+    let keyframe_uuid = data["data"]["keyframe_uuid"];
+    let keyframe_offset = data["data"]["offset"];
+    let object_uuid = data["data"]["object_uuid"];
     this.transform_engine.clips[object_uuid].setOffset(
       keyframe_uuid,
       keyframe_offset,
@@ -250,9 +248,7 @@ export class TimeLine {
 
   public async updateClip(data: any) {
     // only length and offset changes here.
-    console.log(data);
-
-    const object_uuid = data["data"]["object_uuid"];
+    let object_uuid = data["data"]["object_uuid"];
     const media_id = data["data"]["media_id"];
     const offset = data["data"]["offset"];
     const length = data["data"]["length"] + offset;
@@ -264,8 +260,20 @@ export class TimeLine {
       }
     }
   }
+
   public async deleteClip(data: any) {
-    console.log(data);
+    let json_data = data["data"];
+    let object_uuid = data["data"]["object_uuid"];
+    let media_id = data["data"]["media_id"];
+    let type = data["type"];
+
+    for (let i = 0; i < this.timeline_items.length; i++) {
+      const element = this.timeline_items[i];
+      if (element.media_id == media_id && element.object_uuid == object_uuid) {
+        this.timeline_items.splice(i, 1);
+        break;
+      }
+    }
   }
 
   public async scrubberUpdate(data: any) {
@@ -319,7 +327,6 @@ export class TimeLine {
   }
 
   private async resetScene() {
-    this.timeline_limit = this.getEndPoint();
     for (const element of this.timeline_items) {
       if (element.type == "transform") {
         const object = this.scene.get_object_by_uuid(element.object_uuid);
@@ -329,7 +336,9 @@ export class TimeLine {
       } else if (element.type == "audio") {
         this.audio_engine.loadClip(element.media_id);
       } else if (element.type == "animation") {
-        this.animation_engine.clips[element.object_uuid].stop();
+        this.animation_engine.clips[
+          element.object_uuid + element.media_id
+        ].stop();
       } else if (element.type == "lipsync") {
         this.lipSync_engine.clips[element.object_uuid].reset();
       } else {
@@ -350,9 +359,9 @@ export class TimeLine {
   }
 
   // called by the editor update loop on each frame
-  public async update() {
+  public async update(isRendering = false) {
     //if (this.is_playing == false) return; // start and stop
-
+    this.timeline_limit = this.getEndPoint();
     if (this.is_playing) {
       this.current_time += 1;
       this.pushEvent(fromEngineActions.UPDATE_TIME, {
@@ -387,19 +396,14 @@ export class TimeLine {
             element.length =
               this.transform_engine.clips[element.object_uuid].length;
           }
-        } else if (
-          element.group !== ClipGroup.CHARACTER &&
-          element.type === ClipType.AUDIO
-        ) {
+        } else if (element.type == "audio") {
           if (this.scrubber_frame_position + 1 >= element.length) {
             this.audio_engine.stopClip(element.media_id);
           } else {
             this.audio_engine.playClip(element.media_id);
           }
-        } else if (
-          element.group === ClipGroup.CHARACTER &&
-          element.type === ClipType.AUDIO
-        ) {
+        } else if (element.type == "lipsync") {
+          // we will remove this when we know which group it will come from character + audio == lip sync audio.
           if (this.scrubber_frame_position + 1 >= element.length) {
             this.lipSync_engine.clips[element.object_uuid].stop();
           } else if (object) {
@@ -408,9 +412,15 @@ export class TimeLine {
           }
         } else if (element.type === ClipType.ANIMATION) {
           if (object) {
-            await this.animation_engine.clips[object.uuid].play(object);
-            this.animation_engine.clips[object.uuid].step(
-              this.scrubber_frame_position / 120, // Double FPS for best result.
+            await this.animation_engine.clips[
+              object.uuid + element.media_id
+            ].play(object);
+            let fps = 120;
+            if (isRendering) {
+              fps = 60;
+            }
+            this.animation_engine.clips[object.uuid + element.media_id].step(
+              this.scrubber_frame_position / fps, // Double FPS for best result.
             );
           }
         } else {
