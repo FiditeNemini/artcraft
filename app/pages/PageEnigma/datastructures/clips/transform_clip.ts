@@ -140,14 +140,14 @@ export class TransformClip {
       keyframe_uuid));
   }
 
-  toJSON(): string {
-    return JSON.stringify({
+  toJSON(): any {
+    return {
       version: this.version,
       media_id: this.media_id,
       object_uuid: this.object_uuid,
       length: this.length,
       type: this.type,
       keyframes: this.keyframes,
-    });
+    };
   }
 }
