@@ -68,7 +68,7 @@ pub mod tests {
   use chrono::{Duration, Utc};
 
   use reusable_types::server_environment::ServerEnvironment;
-  use users_component::utils::user_session_extended::{UserSessionExtended, UserSessionSubscriptionPlan};
+  use users_component::session::lookup::user_session_extended::{UserSessionExtended, UserSessionSubscriptionPlan};
 
   use crate::configs::plans::get_correct_plan_for_session::get_correct_plan_for_session;
   use crate::configs::plans::plan_list::{ALL_PLANS_BY_SLUG, FREE_LOGGED_IN_PLAN, FREE_LOGGED_OUT_PLAN};
