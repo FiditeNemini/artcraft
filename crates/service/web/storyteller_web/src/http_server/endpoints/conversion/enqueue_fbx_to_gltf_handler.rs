@@ -95,6 +95,7 @@ impl std::fmt::Display for EnqueueFbxToGltfRequestError {
 
 #[utoipa::path(
   post,
+  tag = "Engine",
   path = "/v1/conversion/enqueue_fbx_to_gltf",
   responses(
     (

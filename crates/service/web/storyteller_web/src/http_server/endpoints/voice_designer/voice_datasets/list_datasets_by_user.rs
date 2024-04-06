@@ -67,6 +67,7 @@ impl ResponseError for ListDatasetsByUserError {
 
 #[utoipa::path(
   get,
+  tag = "Voice Designer",
   path = "/v1/voice_designer/user/{username}/list",
   responses(
     (status = 200, description = "Found", body = ListDatasetsByUserSuccessResponse),

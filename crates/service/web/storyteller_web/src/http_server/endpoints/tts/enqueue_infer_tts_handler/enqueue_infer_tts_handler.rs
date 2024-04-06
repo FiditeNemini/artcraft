@@ -137,6 +137,7 @@ impl fmt::Display for InferTtsError {
 
 #[utoipa::path(
   post,
+  tag = "TTS",
   path = "/v1/tts/inference",
   responses(
   (

@@ -75,6 +75,7 @@ impl std::fmt::Display for GetUserRatingError {
 
 #[utoipa::path(
   get,
+  tag = "User Ratings",
   path = "/v1/user_rating/view/{entity_type}/{entity_token}",
   params(
     ("entity_type", description = "The type of the entity being rated."),

@@ -89,6 +89,7 @@ impl std::fmt::Display for BatchGetUserRatingError {
 
 #[utoipa::path(
   get,
+  tag = "User Ratings",
   path = "/v1/user_rating/batch",
   params(
     BatchGetUserRatingQueryParams,

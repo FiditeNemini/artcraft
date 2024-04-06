@@ -77,6 +77,7 @@ impl std::fmt::Display for StatusAlertError {
 
 #[utoipa::path(
   get,
+  tag = "Misc",
   path = "/v1/status_alert_check",
   responses(
     (

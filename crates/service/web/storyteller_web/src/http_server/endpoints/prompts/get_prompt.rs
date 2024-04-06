@@ -92,6 +92,7 @@ impl fmt::Display for GetPromptError {
 
 #[utoipa::path(
   get,
+  tag = "Prompts",
   path = "/v1/prompts/{token}",
   responses(
     (status = 200, description = "Found", body = GetPromptSuccessResponse),

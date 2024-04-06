@@ -116,6 +116,7 @@ impl std::fmt::Display for EnqueueVideoStyleTransferError {
 
 #[utoipa::path(
     post,
+    tag = "Video Style Transfer",
     path = "/v1/video/enqueue_vst",
     responses(
     (

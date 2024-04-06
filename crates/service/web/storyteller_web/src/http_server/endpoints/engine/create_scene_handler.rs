@@ -64,6 +64,7 @@ pub struct CreateSceneSuccessResponse {
 
 #[utoipa::path(
   post,
+  tag = "Engine",
   path = "/v1/engine/create_scene",
   responses(
     (status = 200, description = "Found", body = CreateSceneSuccessResponse),

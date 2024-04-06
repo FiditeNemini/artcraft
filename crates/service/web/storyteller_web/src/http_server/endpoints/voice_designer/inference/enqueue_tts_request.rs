@@ -100,7 +100,8 @@ impl std::fmt::Display for EnqueueTTSRequestError {
 // Need to convert it to generic inference job.
 #[utoipa::path(
     post,
-    path = "/inference/enqueue_tts/",
+    tag = "Voice Designer",
+    path = "/inference/enqueue_tts",
     responses(
         (status = 200, description = "Enqueue TTS generically", body = EnqueueTTSRequestSuccessResponse),
         (status = 400, description = "Bad input", body = EnqueueTTSRequestError),
