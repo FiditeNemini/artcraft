@@ -1,25 +1,14 @@
 import { useCallback } from "react";
-import {
-  canDrop,
-  clipLength,
-  dragId,
-  dragType,
-} from "~/pages/PageEnigma/store";
-import { AssetType } from "~/pages/PageEnigma/models";
+import { canDrop, dragItem } from "~/pages/PageEnigma/store";
+import { MediaItem } from "~/pages/PageEnigma/models";
 
 export default function useUpdateDragDrop() {
-  const startDrag = useCallback(
-    (type: AssetType, id: string, length: number) => {
-      dragId.value = id;
-      dragType.value = type;
-      clipLength.value = length;
-    },
-    [],
-  );
+  const startDrag = useCallback((item: MediaItem) => {
+    dragItem.value = item;
+  }, []);
 
   const endDrag = useCallback(() => {
-    dragId.value = null;
-    dragType.value = null;
+    dragItem.value = null;
     canDrop.value = false;
   }, []);
 

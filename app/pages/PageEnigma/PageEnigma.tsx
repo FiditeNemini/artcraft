@@ -9,8 +9,34 @@ import {
   faTriangleExclamation,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
+import { useEffect } from "react";
+import { useSignals } from "@preact/signals-react/runtime";
+import {
+  pageHeight,
+  pageWidth,
+  sidePanelWidth,
+  timelineHeight,
+} from "~/pages/PageEnigma/store";
 
 export const PageEnigma = () => {
+  useSignals();
+  useEffect(() => {
+    function setPage() {
+      pageHeight.value = window.innerHeight;
+      pageWidth.value = window.innerHeight;
+    }
+    timelineHeight.value = window.innerHeight * 0.25;
+    sidePanelWidth.value = 443;
+
+    setPage();
+
+    window.addEventListener("resize", setPage);
+
+    return () => {
+      window.removeEventListener("resize", setPage);
+    };
+  }, []);
+
   return (
     <TrackProvider>
       <AppUIProvider>
@@ -22,7 +48,6 @@ export const PageEnigma = () => {
                 border: "1px solid #39394D",
                 backgroundColor: "#39394D",
               },
-              duration: 99999,
             }}
             containerStyle={{
               top: 84,

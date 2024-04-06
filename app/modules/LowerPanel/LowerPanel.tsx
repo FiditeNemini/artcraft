@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { useMouseEventsHeight } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsHeight";
+import { useMouseEventsTimeline } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsTimeline";
 import {
   currentTime,
   overTimeline,
@@ -15,7 +15,7 @@ interface LowerPanelPropsI {
 }
 
 export const LowerPanel = ({ children }: LowerPanelPropsI) => {
-  const { onPointerDown, height } = useMouseEventsHeight();
+  const { onPointerDown, height } = useMouseEventsTimeline();
 
   const displayHeight = height > -1 ? height : timelineHeight.value;
 

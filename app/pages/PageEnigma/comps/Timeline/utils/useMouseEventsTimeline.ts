@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { timelineHeight } from "~/pages/PageEnigma/store";
+import { pageHeight, timelineHeight } from "~/pages/PageEnigma/store";
 
-export const useMouseEventsHeight = () => {
+export const useMouseEventsTimeline = () => {
   const [isActive, setIsActive] = useState(false);
   const [clientY, setClientY] = useState(0);
 
@@ -22,6 +22,9 @@ export const useMouseEventsHeight = () => {
         event.stopPropagation();
         event.preventDefault();
         if (timelineHeight.value - delta < 30) {
+          return;
+        }
+        if (timelineHeight.value - delta > pageHeight.value * 0.5) {
           return;
         }
         setHeight(timelineHeight.value - delta);

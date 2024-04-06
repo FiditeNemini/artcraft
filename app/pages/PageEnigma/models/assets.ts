@@ -1,17 +1,11 @@
 import { ClipType } from "~/pages/PageEnigma/models";
 
-export interface MediaClip {
+export interface MediaItem {
   version: number;
-  type: ClipType;
+  type: AssetType;
   media_id: string;
   name: string;
-  length: number;
-}
-
-export interface ObjectItem {
-  version: number;
-  media_id: string;
-  name: string;
+  length?: number;
   thumbnail: string;
 }
 

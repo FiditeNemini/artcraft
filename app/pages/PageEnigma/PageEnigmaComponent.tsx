@@ -12,7 +12,6 @@ import { ControlsVideo } from "./comps/ControlsVideo";
 import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { ViewSideBySide } from "./comps/ViewSideBySide";
-import { SidePanelTabs } from "./comps/SidePanelTabs";
 import { Timeline } from "./comps/Timeline";
 
 import { APPUI_VIEW_MODES } from "./reducers";
@@ -96,9 +95,7 @@ export const PageEnigmaComponent = () => {
 
           {/* Side panel */}
           <div onClick={handleOverlayClick}>
-            <SidePanel>
-              <SidePanelTabs />
-            </SidePanel>
+            <SidePanel />
           </div>
         </div>
 

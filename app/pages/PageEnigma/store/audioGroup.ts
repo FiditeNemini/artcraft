@@ -3,7 +3,7 @@ import {
   Clip,
   ClipGroup,
   ClipType,
-  MediaClip,
+  MediaItem,
 } from "~/pages/PageEnigma/models";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
@@ -49,31 +49,27 @@ export function updateAudio({
 }
 
 export function addGlobalAudio({
-  clipId,
+  dragItem,
   audioId,
-  audioClips,
   offset,
 }: {
-  clipId: string;
+  dragItem: MediaItem;
   audioId: string;
-  audioClips: MediaClip[];
   offset: number;
 }) {
   if (audioGroup.value.id !== audioId) {
     return;
   }
 
-  const clip = audioClips.find((row) => row.media_id === clipId);
-  if (!clip) {
-    return;
-  }
-
   const clip_uuid = uuid.v4();
   const newClip = {
-    ...clip,
+    version: 1,
+    media_id: dragItem.media_id,
     type: ClipType.AUDIO,
     group: ClipGroup.GLOBAL_AUDIO,
     offset,
+    length: dragItem.length,
+    name: dragItem.name,
     clip_uuid,
   } as Clip;
 

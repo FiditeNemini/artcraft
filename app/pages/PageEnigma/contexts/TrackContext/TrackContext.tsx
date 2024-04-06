@@ -1,12 +1,5 @@
 import { createContext } from "react";
-import {
-  MediaClip,
-  Keyframe,
-  QueueKeyframe,
-  ClipType,
-  ObjectItem,
-  AssetType,
-} from "~/pages/PageEnigma/models";
+import { MediaItem, Keyframe, QueueKeyframe } from "~/pages/PageEnigma/models";
 
 export const TrackContext = createContext<{
   // keyframes
@@ -14,12 +7,13 @@ export const TrackContext = createContext<{
   deleteKeyframe: (keyframe: Keyframe) => void;
 
   // sidebar clips
-  animationClips: MediaClip[];
-  audioClips: MediaClip[];
-  characterItems: ObjectItem[];
+  animationClips: MediaItem[];
+  audioClips: MediaItem[];
+  characterItems: MediaItem[];
+  objectItems: MediaItem[];
 
   // drag and drop
-  startDrag: (type: AssetType, id: string, length: number) => void;
+  startDrag: (item: MediaItem) => void;
   endDrag: () => void;
 }>({
   addKeyframe: () => {},
@@ -28,6 +22,7 @@ export const TrackContext = createContext<{
   animationClips: [],
   audioClips: [],
   characterItems: [],
+  objectItems: [],
 
   startDrag: () => {},
   endDrag: () => {},

@@ -1,33 +1,33 @@
 import { useCallback, useContext, useEffect } from "react";
-import { AssetType, ObjectItem } from "~/pages/PageEnigma/models";
+import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import {
   canDrop,
   currPosition,
-  dragId,
+  dragItem,
   initPosition,
 } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
 interface Props {
-  item: ObjectItem;
+  item: MediaItem;
   type: AssetType;
 }
 
-export const ObjectElement = ({ item, type }: Props) => {
+export const AnimationElement = ({ item, type }: Props) => {
   useSignals();
   const { startDrag, endDrag } = useContext(TrackContext);
   const { initX, initY } = initPosition.value;
 
   useEffect(() => {
     const onPointerUp = () => {
-      if (dragId.value) {
+      if (dragItem.value) {
         endDrag();
       }
     };
 
     const onMouseMove = (event: MouseEvent) => {
-      if (dragId) {
+      if (dragItem.value) {
         event.stopPropagation();
         event.preventDefault();
         const deltaX = event.pageX - initX;
@@ -48,7 +48,7 @@ export const ObjectElement = ({ item, type }: Props) => {
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
-        startDrag(type, item.media_id, 0);
+        startDrag(item);
         currPosition.value = {
           currX: event.pageX,
           currY: event.pageY,
@@ -60,11 +60,15 @@ export const ObjectElement = ({ item, type }: Props) => {
         canDrop.value = false;
       }
     },
-    [type, item.media_id, startDrag, 0],
+    [item, startDrag],
   );
 
   return (
-    <div className="relative rounded-lg" style={{ width: 91, height: 114 }}>
+    <div
+      className="relative rounded-lg"
+      style={{ width: 91, height: 114 }}
+      onPointerDown={onPointerDown}
+    >
       <img src={item.thumbnail} alt={item.name} className="rounded-t-lg" />
       <div
         className="w-full rounded-b-lg py-1 text-center text-sm"

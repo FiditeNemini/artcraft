@@ -4,7 +4,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
-export const useMouseEventsAnimation = () => {
+export const useMouseEventsScrubber = () => {
   const [isActive, setIsActive] = useState(false);
   const [clientX, setClientX] = useState(0);
 

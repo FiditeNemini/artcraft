@@ -4,7 +4,7 @@ import {
   ClipGroup,
   ClipType,
   Keyframe,
-  MediaClip,
+  MediaItem,
   QueueKeyframe,
 } from "~/pages/PageEnigma/models";
 import { signal } from "@preact/signals-core";
@@ -28,13 +28,11 @@ export function updateCharacters({
   id,
   offset,
   length,
-  force,
 }: {
   type: ClipType;
   id: string;
   length?: number;
   offset: number;
-  force?: boolean;
 }) {
   const oldCharacterGroups = characterGroups.value;
   if (type === ClipType.ANIMATION) {
@@ -115,27 +113,25 @@ export function updateCharacters({
 }
 
 export function addCharacterAnimation({
-  clipId,
+  dragItem,
   characterId,
-  animationClips,
   offset,
 }: {
-  clipId: string;
+  dragItem: MediaItem;
   characterId: string;
-  animationClips: MediaClip[];
+  animationClips: MediaItem[];
   offset: number;
 }) {
-  const clip = animationClips.find((row) => row.media_id === clipId);
-  if (!clip) {
-    return;
-  }
-
   const clip_uuid = uuid.v4();
   const newClip = {
-    ...clip,
+    version: 1,
+    media_id: dragItem.media_id,
     group: ClipGroup.CHARACTER,
+    type: ClipType.ANIMATION,
     offset,
+    length: dragItem.length,
     clip_uuid,
+    name: dragItem.name,
     object_uuid: characterId,
   } as Clip;
 
@@ -160,29 +156,26 @@ export function addCharacterAnimation({
 }
 
 export function addCharacterAudio({
-  clipId,
+  dragItem,
   characterId,
-  audioClips,
   offset,
 }: {
-  clipId: string;
+  dragItem: MediaItem;
   characterId: string;
-  audioClips: MediaClip[];
+  audioClips: MediaItem[];
   offset: number;
 }) {
-  const clip = audioClips.find((row) => row.media_id === clipId);
-  if (!clip) {
-    return;
-  }
-
   const clip_uuid = uuid.v4();
   const newClip = {
-    ...clip,
-    type: ClipType.AUDIO,
+    version: 1,
+    media_id: dragItem.media_id,
     group: ClipGroup.CHARACTER,
+    type: ClipType.AUDIO,
     offset,
+    length: dragItem.length,
     clip_uuid,
     object_uuid: characterId,
+    name: dragItem.name,
   } as Clip;
 
   const oldCharacterGroups = characterGroups.value;

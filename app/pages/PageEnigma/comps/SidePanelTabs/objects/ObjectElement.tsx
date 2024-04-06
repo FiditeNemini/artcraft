@@ -1,33 +1,33 @@
 import { useCallback, useContext, useEffect } from "react";
-import { AssetType, MediaClip } from "~/pages/PageEnigma/models";
+import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import {
   canDrop,
   currPosition,
-  dragId,
+  dragItem,
   initPosition,
 } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
 interface Props {
-  clip: MediaClip;
+  item: MediaItem;
   type: AssetType;
 }
 
-export const AudioElement = ({ clip, type }: Props) => {
+export const ObjectElement = ({ item, type }: Props) => {
   useSignals();
   const { startDrag, endDrag } = useContext(TrackContext);
   const { initX, initY } = initPosition.value;
 
   useEffect(() => {
     const onPointerUp = () => {
-      if (dragId.value) {
+      if (dragItem.value) {
         endDrag();
       }
     };
 
     const onMouseMove = (event: MouseEvent) => {
-      if (dragId) {
+      if (dragItem.value) {
         event.stopPropagation();
         event.preventDefault();
         const deltaX = event.pageX - initX;
@@ -48,7 +48,7 @@ export const AudioElement = ({ clip, type }: Props) => {
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
-        startDrag(type, clip.media_id, clip.length);
+        startDrag(item);
         currPosition.value = {
           currX: event.pageX,
           currY: event.pageY,
@@ -60,18 +60,17 @@ export const AudioElement = ({ clip, type }: Props) => {
         canDrop.value = false;
       }
     },
-    [type, clip.media_id, startDrag, clip.length],
+    [startDrag, item],
   );
 
   return (
-    <div className="relative h-16 w-16">
+    <div className="relative rounded-lg" style={{ width: 91, height: 114 }}>
+      <img src={item.thumbnail} alt={item.name} className="rounded-t-lg" />
       <div
-        id={`ani-clip-${clip.media_id}`}
-        className="absolute block h-16 w-16 rounded-lg bg-brand-secondary-700 p-2"
-        style={{ top: 0, left: 0 }}
-        onPointerDown={onPointerDown}
+        className="w-full rounded-b-lg py-1 text-center text-sm"
+        style={{ backgroundColor: "#39394D" }}
       >
-        {clip.name}
+        {item.name}
       </div>
     </div>
   );

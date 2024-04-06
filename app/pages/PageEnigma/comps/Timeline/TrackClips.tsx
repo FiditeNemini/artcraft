@@ -1,12 +1,16 @@
 import { TrackClip } from "~/pages/PageEnigma/comps/Timeline/TrackClip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
-import { Clip, ClipGroup, ClipType } from "~/pages/PageEnigma/models";
+import {
+  AssetType,
+  Clip,
+  ClipGroup,
+  ClipType,
+} from "~/pages/PageEnigma/models";
 import { PointerEvent } from "react";
 import {
   canDrop,
-  clipLength,
-  dragType,
+  dragItem,
   dropId,
   dropOffset,
   filmLength,
@@ -29,16 +33,16 @@ function getCanBuild({
   type,
   group,
 }: {
-  dragType: ClipType | null;
+  dragType?: AssetType;
   type?: ClipType;
   group: ClipGroup;
 }) {
-  if (dragType === ClipType.ANIMATION) {
-    if (dragType === type) {
+  if (dragType === AssetType.ANIMATION) {
+    if (type === ClipType.ANIMATION) {
       return true;
     }
   }
-  if (dragType === ClipType.AUDIO) {
+  if (dragType === AssetType.AUDIO) {
     if (group === ClipGroup.CHARACTER && type === ClipType.AUDIO) {
       return true;
     }
@@ -62,13 +66,13 @@ export const TrackClips = ({
   const trackType = (type ?? group) as ClipType;
 
   function onPointerOver() {
-    if (getCanBuild({ dragType: dragType.value, type, group })) {
+    if (getCanBuild({ dragType: dragItem.value?.type, type, group })) {
       dropId.value = id;
     }
   }
 
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
-    if (!getCanBuild({ dragType: dragType.value, type, group })) {
+    if (!getCanBuild({ dragType: dragItem.value?.type, type, group })) {
       return;
     }
 
@@ -81,7 +85,7 @@ export const TrackClips = ({
     const position = track.getBoundingClientRect();
     const clipOffset = (event.clientX - position.x) / 4 / scale.value;
 
-    if (clipOffset + clipLength.value > filmLength.value * 60) {
+    if (clipOffset + (dragItem.value!.length ?? 0) > filmLength.value * 60) {
       canDrop.value = false;
       return;
     }
@@ -94,7 +98,8 @@ export const TrackClips = ({
         return true;
       }
       return (
-        clipOffset < clip.offset && clipOffset + clipLength.value >= clip.offset
+        clipOffset < clip.offset &&
+        clipOffset + (dragItem.value!.length ?? 0) >= clip.offset
       );
     });
 
@@ -102,7 +107,7 @@ export const TrackClips = ({
     dropOffset.value = clipOffset;
   }
   function onPointerLeave() {
-    if (dragType.value !== trackType) {
+    if (canDrop.value) {
       return;
     }
     canDrop.value = false;

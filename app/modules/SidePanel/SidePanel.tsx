@@ -4,20 +4,26 @@ import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/pro-solid-svg-icons";
+import { dndWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
+import { SidePanelTabs } from "~/pages/PageEnigma/comps/SidePanelTabs";
+import { SidePanelMenu } from "~/pages/PageEnigma/comps/SidePanelTabs/SidePanelMenu";
+import { useSignals } from "@preact/signals-react/runtime";
 
-interface Props {
-  children: React.ReactNode;
-}
-
-export const SidePanel = ({ children }: Props) => {
+export const SidePanel = () => {
+  useSignals();
   const [isVisible, setIsVisible] = useState(true);
+
+  const displayWidth =
+    dndWidth.value > -1 ? dndWidth.value : sidePanelWidth.value;
 
   return (
     <div
-      className={
-        "relative h-full border-l border-l-ui-panel-border bg-ui-panel transition-all duration-300 ease-in-out" +
-        (isVisible ? " w-[23.5rem]" : " w-0")
-      }
+      className={[
+        "relative h-full",
+        "border-l border-l-ui-panel-border bg-ui-panel",
+        "flex",
+      ].join(" ")}
+      style={{ width: isVisible ? displayWidth + 84 : 84 }}
     >
       <button
         onClick={() => setIsVisible(!isVisible)}
@@ -25,7 +31,10 @@ export const SidePanel = ({ children }: Props) => {
       >
         <FontAwesomeIcon icon={isVisible ? faChevronRight : faChevronLeft} />
       </button>
-      <div className="relative h-full w-[23.5rem]">{children}</div>
+      <div className="relative h-full w-full transition-all duration-300 ease-in-out">
+        {isVisible && <SidePanelTabs />}
+      </div>
+      <SidePanelMenu />
     </div>
   );
 };
