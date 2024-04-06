@@ -430,7 +430,7 @@ class Editor {
   }
 
   public async test_loadMediaToken(media_file_token: string) {
-    // 
+    this.activeScene.load_glb(media_file_token);
   }
 
   public async saveScene(name: string) {
@@ -624,7 +624,7 @@ class Editor {
     // note the database from the server is the source of truth for all the data.
     // Test code here
     const object: THREE.Object3D = await this.activeScene.load_glb(
-      "m_77z28zfaxc3sdtt5cc68vpz2n40qed",
+      "m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp",
     );
 
     object.uuid = "CH1";
