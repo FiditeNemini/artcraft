@@ -3,7 +3,7 @@
 -- noinspection SqlResolveForFile
 
 -- Staff (1)
---  * teddanson is victor's alt
+--  * teddanson - victor's alt
 UPDATE users
 SET
     can_access_studio = false,
@@ -24,10 +24,11 @@ WHERE username IN (
 );
 
 -- Staff (2)
---  * devdude123 is Joel
---  * el_cid_93 is for testing (who is this??)
---  * endtimes is @sugarbro (testing)
---  * tammieteller is Tammie (Pebblebed)
+--  * devdude123 - Joel
+--  * el_cid_93 - for testing (who is this??)
+--  * endtimes - @sugarbro (testing)
+--  * printrman - miles
+--  * tammieteller - Tammie (Pebblebed)
 UPDATE users
 SET
     can_access_studio = false,
@@ -45,6 +46,7 @@ WHERE username IN (
     'justinjohn0306',
     'lorbach',
     'mrvintage',
+    'printrman',
     'rewin123',
     'storyteller',
     'tropicalfun',
@@ -106,7 +108,6 @@ SET
     can_access_studio = false,
     maybe_feature_flags = 'studio,video_style_transfer'
 WHERE username IN (
-    'printrman',
     'zzz_last_item'
 );
 
