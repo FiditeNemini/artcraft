@@ -119,7 +119,6 @@ export function addCharacterAnimation({
 }: {
   dragItem: MediaItem;
   characterId: string;
-  animationClips: MediaItem[];
   offset: number;
 }) {
   const clip_uuid = uuid.v4();
@@ -162,7 +161,6 @@ export function addCharacterAudio({
 }: {
   dragItem: MediaItem;
   characterId: string;
-  audioClips: MediaItem[];
   offset: number;
 }) {
   const clip_uuid = uuid.v4();
