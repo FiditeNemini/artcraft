@@ -574,9 +574,10 @@ class Editor {
 
   switchCameraView() {
     this.camera_person_mode = !this.camera_person_mode;
-    console.log("camera");
+    console.log(this.camera_person_mode);
     if (this.cam_obj) {
       if (this.camera_person_mode) {
+
         this.last_cam_pos.copy(this.camera.position);
         this.last_cam_rot.copy(this.camera.rotation);
 
@@ -597,6 +598,11 @@ class Editor {
             element.visible = false;
           });
         }
+
+        this.removeTransformControls();
+        this.selected = this.cam_obj;
+        this.dispatchAppUiState({type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT});
+        this.updateSelectedUI();
       } else {
         this.camera.position.copy(this.last_cam_pos);
         this.camera.rotation.copy(this.last_cam_rot);
@@ -615,6 +621,10 @@ class Editor {
             element.visible = true;
           });
         }
+
+        this.dispatchAppUiState({
+          type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
+        });
       }
     }
   }
@@ -780,38 +790,6 @@ class Editor {
   renderMode() {
     this.rendering = !this.rendering;
     this.activeScene.renderMode(this.rendering);
-  }
-
-  save() {
-    //console.log(this.control)
-    //if(this.selected != null){ this.control.detach(this.selected) }
-    //this.activeScene.scene.remove(this.control)
-    //this.activeScene.scene.remove(this.activeScene.gridHelper)
-    //this.save_manager.save(this.activeScene.scene, this._save_to_cloud.bind(this), this.audio_manager, this.timeline, this.activeScene.animations)
-    //this.activeScene._createGrid()
-    //this.audio_engine.playClip("m_f7jnwt3d1ddchatdk5vaqt0n4mb1hg")
-    //console.log(this.selected)
-
-    if (this.selected == null) {
-      return;
-    }
-    this.transform_engine.addFrame(this.selected);
-    console.log("Frame taken.");
-  }
-
-  take_timeline_cam_clip() {
-    if (this.cam_obj == null) {
-      return;
-    }
-    if (!this.camera_person_mode) {
-      return;
-    }
-    this.transform_engine.addFrame(
-      this.cam_obj,
-      this.transform_engine.clips[this.cam_obj.uuid].length,
-    );
-    console.log("Camera frame taken.");
-    this.activeScene.createPoint(this.cam_obj.position, false);
   }
 
   // Basicly Unity 3D's update loop.
@@ -1327,39 +1305,9 @@ class Editor {
         this.outlinePass.selectedObjects = [this.selected];
         this.transform_interaction = true;
 
-        // Contact react land 
-        const pos = this.selected.position;
-        const rot = this.selected.rotation;
-        const scale = this.selected.scale;
-        this.dispatchAppUiState({
-          type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
-          payload: {
-            group:
-              this.selected.name === "::CAM::"
-                ? ClipGroup.CAMERA
-                : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
-            object_uuid: this.selected.uuid,
-            object_name: this.selected.name,
-            version: this.version,
-            objectVectors: {
-              position: {
-                x: parseFloat(pos.x.toFixed(2)),
-                y: parseFloat(pos.y.toFixed(2)),
-                z: parseFloat(pos.z.toFixed(2)),
-              },
-              rotation: {
-                x: parseFloat(rot.x.toFixed(2)),
-                y: parseFloat(rot.y.toFixed(2)),
-                z: parseFloat(rot.z.toFixed(2)),
-              },
-              scale: {
-                x: parseFloat(scale.x.toFixed(2)),
-                y: parseFloat(scale.y.toFixed(2)),
-                z: parseFloat(scale.z.toFixed(2)),
-              },
-            },
-          },
-        });
+        // Contact react land
+        this.dispatchAppUiState({type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT});
+        this.updateSelectedUI();
       }
     } else if (this.transform_interaction == false) {
       this.removeTransformControls();
