@@ -124,10 +124,13 @@ export class TimeLine {
                 await this.scrub(data);
                 break;
             case toEngineActions.MUTE:
-                await this.mute(data);
+                await this.mute(data, false);
+                break;
+            case toEngineActions.UNMUTE:
+                await this.mute(data, true);
                 break;
             default:
-                console.log("Action Not Wired");
+                console.log("Action Not Wired", action);
         }
     }
 
@@ -270,8 +273,13 @@ export class TimeLine {
         console.log(data);
     }
 
-    public async mute(data: any) {
-        console.log(data);
+    public async mute(data: any, isMute:boolean) {
+        this.timeline_items.forEach(element => {
+            if (element.group == data.data['group']) {
+                element.should_play = isMute;
+                console.log(element);
+            }
+        });
     }
 
     public async addPlayableClip(clip: ClipUI): Promise<void> {
@@ -368,7 +376,8 @@ export class TimeLine {
         for (const element of this.timeline_items) {
             if (
                 element.offset <= this.scrubber_frame_position &&
-                this.scrubber_frame_position <= element.length
+                this.scrubber_frame_position <= element.length && 
+                element.should_play == true
             ) {
                 // run async
                 // element.play()
