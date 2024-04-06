@@ -292,7 +292,22 @@ class Editor {
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
     window.addEventListener("click", this.onMouseClick.bind(this), false);
     // Base control and debug stuff remove debug in prod.
-    this._initializeControl();
+    if (this.control == undefined) {
+      return;
+    }
+    this.control.addEventListener("change", this.renderScene.bind(this));
+    this.control.addEventListener("dragging-changed", (event: any) => {
+      if (this.orbitControls == undefined) {
+        return;
+      }
+      this.orbitControls.enabled = !event.value;
+      this.updateSelectedUI();
+      // this.update_properties()
+    });
+    this.control.setSize(0.5); // Good default value for visuals.
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2();
+    this.activeScene.scene.add(this.control);
     // Resets canvas size.
     this.onWindowResize();
     // Creates the main update loop.
@@ -312,31 +327,10 @@ class Editor {
       this.onMouseUp.bind(this),
       false,
     );
-    this.renderer.domElement.addEventListener(
-      "onContextMenu",
-      this.onContextMenu.bind(this),
-      false,
-    );
 
     // saving state of the scene
     this.current_scene_media_token = null;
     this.current_scene_glb_media_token = null;
-
-    this.renderer.domElement.addEventListener(
-      "mousedown",
-      this.onMouseDown.bind(this),
-      false,
-    );
-    this.renderer.domElement.addEventListener(
-      "mouseup",
-      this.onMouseUp.bind(this),
-      false,
-    );
-    this.renderer.domElement.addEventListener(
-      "onContextMenu",
-      this.onContextMenu.bind(this),
-      false,
-    );
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
 
@@ -364,21 +358,6 @@ class Editor {
   }
 
   public async testTestTimelineEvents() { }
-
-  public async testStylizeRequest() {
-    const result = await this.api_manager
-      .stylizeVideo(
-        "mu_6wy1570a0c3c0tpkkncf4tsvb5234",
-        this.art_style,
-        this.positive_prompt,
-        this.negative_prompt,
-        Visibility.Public,
-      )
-      .catch((error) => {
-        console.log(error);
-      });
-    console.log(result);
-  }
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -452,7 +431,6 @@ class Editor {
 
     }
   }
-
 
   public async saveScene(name: string) {
     // remove controls when saving scene.
@@ -714,6 +692,34 @@ class Editor {
   renderMode() {
     this.rendering = !this.rendering;
     this.activeScene.renderMode(this.rendering);
+  }
+
+  // Render the scene to the camera, this is called in the update.
+  renderScene() {
+    if (this.composer != null && !this.rendering && this.rawRenderer) {
+      this.composer.render();
+      this.rawRenderer.render(this.activeScene.scene, this.render_camera);
+    } else if (this.renderer && this.render_camera) {
+      this.renderer.setSize(this.render_width, this.render_height);
+      this.renderer.render(this.activeScene.scene, this.render_camera);
+    } else {
+      console.error("Could not render to canvas no render or composer!");
+    }
+
+    if (this.rendering && this.renderer && this.clock) {
+      this.frames += 1;
+      this.playback_location++;
+      const imgData = this.renderer.domElement.toDataURL();
+      this.frame_buffer.push(imgData);
+      this.render_timer += this.clock.getDelta();
+      if (this.timeline.is_playing == false) {
+        this.stopPlayback();
+        this.playback_location = 0;
+        this.rendering = false;
+        this.switchCameraView();
+        this.onWindowResize();
+      }
+    }
   }
 
   // Basicly Unity 3D's update loop.
@@ -1043,54 +1049,6 @@ class Editor {
     }
   }
 
-  // Initializes transform x y z changes.
-  _initializeControl() {
-    if (this.control == undefined) {
-      return;
-    }
-    this.control.addEventListener("change", this.renderScene.bind(this));
-    this.control.addEventListener("dragging-changed", (event: any) => {
-      if (this.orbitControls == undefined) {
-        return;
-      }
-      this.orbitControls.enabled = !event.value;
-      this.updateSelectedUI();
-      // this.update_properties()
-    });
-    this.control.setSize(0.5); // Good default value for visuals.
-    this.raycaster = new THREE.Raycaster();
-    this.mouse = new THREE.Vector2();
-    this.activeScene.scene.add(this.control);
-  }
-
-  // Render the scene to the camera, this is called in the update.
-  renderScene() {
-    if (this.composer != null && !this.rendering && this.rawRenderer) {
-      this.composer.render();
-      this.rawRenderer.render(this.activeScene.scene, this.render_camera);
-    } else if (this.renderer && this.render_camera) {
-      this.renderer.setSize(this.render_width, this.render_height);
-      this.renderer.render(this.activeScene.scene, this.render_camera);
-    } else {
-      console.error("Could not render to canvas no render or composer!");
-    }
-
-    if (this.rendering && this.renderer && this.clock) {
-      this.frames += 1;
-      this.playback_location++;
-      const imgData = this.renderer.domElement.toDataURL();
-      this.frame_buffer.push(imgData);
-      this.render_timer += this.clock.getDelta();
-      if (this.timeline.is_playing == false) {
-        this.stopPlayback();
-        this.playback_location = 0;
-        this.rendering = false;
-        this.switchCameraView();
-        this.onWindowResize();
-      }
-    }
-  }
-
   updateSelectedUI() {
 
     if (this.selected == undefined) {
@@ -1159,10 +1117,6 @@ class Editor {
     //this.renderer.setSize(this.render_width, this.render_height);
     this.render_camera.aspect = this.render_width / this.render_height;
     this.render_camera.updateProjectionMatrix();
-  }
-
-  onContextMenu(event: any) {
-    return false;
   }
 
   onMouseDown(event: any) {
