@@ -451,6 +451,9 @@ class Editor {
     }
   }
 
+  public async test_loadMediaToken(media_file_token: string) {
+    // 
+  }
 
   public async saveScene(name: string) {
     // remove controls when saving scene.
