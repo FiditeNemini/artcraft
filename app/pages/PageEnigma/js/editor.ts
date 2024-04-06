@@ -383,49 +383,27 @@ class Editor {
       type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER,
     });
 
-    if (scene_media_token != null) {
-      this.current_scene_media_token = scene_media_token;
-    }
+    this.current_scene_media_token = scene_media_token;
 
-    const load_scene_state_response = await this.api_manager.loadSceneState(
+    const scene_json = await this.api_manager.loadSceneState(
       this.current_scene_media_token,
     );
 
-    console.log(load_scene_state_response);
-    if (load_scene_state_response.data == null) {
-      console.log("load_scene_state_response Missing Data");
-      return;
-    }
+    let proxyScene = new StoryTellerProxyScene(this.version, this.activeScene);
+    await proxyScene.loadFromSceneJson(scene_json);
+    this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
 
-    const loaded_scene = load_scene_state_response.data["scene"];
-
-    if (load_scene_state_response.data == null) {
-      return;
-    }
-    // Load these so you can rewrite the scene glb using it's token.
-    this.current_scene_media_token =
-      load_scene_state_response.data["scene_media_file_token"];
-    this.current_scene_glb_media_token =
-      load_scene_state_response.data["scene_glb_media_file_token"];
-
-    console.log(
-      `loadScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`,
-    );
-
-    this.activeScene.scene.children = loaded_scene.children;
-
-    this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
-      child.parent = this.activeScene.scene;
-
-      if (child.type == "DirectionalLight") {
-        const pos = child.position;
-        const rot = child.rotation;
-        const light = this.activeScene._create_base_lighting();
-        light.position.set(pos.x, pos.y, pos.z);
-        light.rotation.set(rot.x, rot.y, rot.z);
-        this.activeScene.scene.remove(child);
-      }
-    });
+    // this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
+    //   child.parent = this.activeScene.scene;
+    //   if (child.type == "DirectionalLight") {
+    //     const pos = child.position;
+    //     const rot = child.rotation;
+    //     const light = this.activeScene._create_base_lighting();
+    //     light.position.set(pos.x, pos.y, pos.z);
+    //     light.rotation.set(rot.x, rot.y, rot.z);
+    //     this.activeScene.scene.remove(child);
+    //   }
+    // });
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
@@ -458,31 +436,31 @@ class Editor {
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER,
     });
-    console.log(
-      `saveScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`,
-    );
 
+    let proxyScene = new StoryTellerProxyScene(this.version, this.activeScene);
+    let scene_json = await proxyScene.saveToScene();
     // TODO turn scene information into and object ...
     const result = await this.api_manager.saveSceneState(
-      this.activeScene.scene,
+      scene_json,
       name,
       this.current_scene_glb_media_token,
       this.current_scene_media_token,
       new TimelineDataState(),
     );
 
-    if (result.data == null) {
-      return;
-    }
+    console.log(result)
 
-    const scene_media_token = result.data["scene_media_file_token"];
-    if (scene_media_token != null) {
-      this.current_scene_media_token = scene_media_token;
-    }
-    const scene_glb_media_token = result.data["scene_glb_media_file_token"];
-    if (scene_glb_media_token != null) {
-      this.current_scene_glb_media_token = scene_glb_media_token;
-    }
+    //if (result.data == null) {
+    //  return;
+    //}
+    //const scene_media_token = result.data["scene_media_file_token"];
+    //if (scene_media_token != null) {
+    //  this.current_scene_media_token = scene_media_token;
+    //}
+    //const scene_glb_media_token = result.data["scene_glb_media_file_token"];
+    //if (scene_glb_media_token != null) {
+    //  this.current_scene_glb_media_token = scene_glb_media_token;
+    //}
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,

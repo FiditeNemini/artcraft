@@ -1,5 +1,28 @@
 import * as THREE from "three";
 
+export interface ObjectJSON {
+  version: number;
+  position: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  rotation: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  scale: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  object_name: string;
+  object_uuid: string;
+  object_user_data_name: string;
+  media_file_token: string;
+}
+
 export class StoryTellerProxy3DObject {
   version: number;
 
@@ -38,8 +61,8 @@ export class StoryTellerProxy3DObject {
     this.object_uuid = object.uuid;
   }
 
-  public async toJSON(): Promise<string> {
-    const json = {
+  public async toJSON(): Promise<ObjectJSON> {
+    const json:ObjectJSON = {
       version: this.version,
       position: {
         x: this.position.x,
@@ -61,7 +84,6 @@ export class StoryTellerProxy3DObject {
       object_user_data_name: this.object_user_data_name,
       media_file_token: this.media_file_token,
     };
-    const json_string = JSON.stringify(json);
-    return json_string;
+    return json;
   }
 }
