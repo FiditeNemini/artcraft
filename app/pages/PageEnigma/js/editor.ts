@@ -694,6 +694,10 @@ class Editor {
     this.activeScene.renderMode(this.rendering);
   }
 
+  stepFrame(frames:number) {
+    this.timeline.stepFrame(frames);
+  }
+
   // Render the scene to the camera, this is called in the update.
   renderScene() {
     if (this.composer != null && !this.rendering && this.rawRenderer) {
