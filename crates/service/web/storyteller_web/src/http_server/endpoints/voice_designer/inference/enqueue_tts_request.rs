@@ -101,7 +101,7 @@ impl std::fmt::Display for EnqueueTTSRequestError {
 #[utoipa::path(
     post,
     tag = "Voice Designer",
-    path = "/inference/enqueue_tts",
+    path = "/v1/voice_designer/inference/enqueue_tts",
     responses(
         (status = 200, description = "Enqueue TTS generically", body = EnqueueTTSRequestSuccessResponse),
         (status = 400, description = "Bad input", body = EnqueueTTSRequestError),

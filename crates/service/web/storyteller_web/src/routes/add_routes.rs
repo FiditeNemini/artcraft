@@ -641,8 +641,20 @@ fn add_user_profile_routes<T, B> (app: App<T>) -> App<T>
         InitError = (),
       >,
 {
-  app.service(
-  web::scope("/user")
+  // NB(bt): Modern routes
+  app.service(web::scope("/v1/user")
+      .service(web::resource("/{username}/profile")
+          .route(web::get().to(get_profile_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(
+        web::resource("/{username}/edit_profile")
+            .route(web::post().to(edit_profile_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+      )
+  )
+  // NB(bt): Legacy routes
+  .service(web::scope("/user")
       .service(
         web::resource("/{username}/profile")
             .route(web::get().to(get_profile_handler))
