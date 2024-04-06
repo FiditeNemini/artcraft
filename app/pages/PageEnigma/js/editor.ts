@@ -785,12 +785,6 @@ class Editor {
     this.transform_interaction = true;
   }
 
-  async loadWavAsBlob(url: string) {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    return blob;
-  }
-
   async convertAudioClip(itteration: number, ffmpeg: FFmpeg, clip: ClipUI) {
     const video_og = itteration + "tmp.mp4";
     const wav_name = itteration + "tmp.wav";
