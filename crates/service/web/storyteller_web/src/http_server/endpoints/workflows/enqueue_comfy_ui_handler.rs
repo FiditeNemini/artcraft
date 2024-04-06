@@ -262,6 +262,7 @@ pub async fn enqueue_comfy_ui_handler(
         trim_start_seconds: Some(trim_start_seconds),
         trim_end_seconds: Some(trim_end_seconds),
         target_fps:Some(target_fps),
+        remove_watermark: None,
         // NB: The following are unused:
         maybe_google_drive_link: None,
         maybe_title: None,

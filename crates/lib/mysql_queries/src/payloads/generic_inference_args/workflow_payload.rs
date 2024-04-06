@@ -125,4 +125,8 @@ pub struct WorkflowArgs {
     #[serde(rename = "el")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enable_lipsync: Option<bool>,
+
+    #[serde(rename = "rm")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub remove_watermark: Option<bool>,
 }

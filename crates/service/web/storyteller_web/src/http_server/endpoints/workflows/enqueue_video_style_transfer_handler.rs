@@ -67,6 +67,10 @@ pub struct EnqueueVideoStyleTransferRequest {
     /// Enable lipsyncing in the workflow
     enable_lipsync: Option<bool>,
 
+    /// Remove watermark from the output
+    /// Only for premium accounts
+    remove_watermark: Option<bool>,
+
     /// Optional visibility setting override.
     creator_set_visibility: Option<Visibility>,
 }
@@ -236,9 +240,11 @@ pub async fn enqueue_video_style_transfer_handler(
     let mut trim_start_millis = request.trim_start_millis.unwrap_or(0);
     let mut trim_end_millis = request.trim_end_millis.unwrap_or(3_000);
 
+    let has_paid_plan = plan.plan_slug() == "fakeyou_contributor" || plan.plan_category() == PlanCategory::Paid;
+
     // block trim too much
-    if plan.plan_slug() == "fakeyou_contributor" || plan.plan_category() == PlanCategory::Paid {
-        if trim_end_millis - trim_start_millis > 20_000 {
+    if has_paid_plan {
+        if trim_end_millis - trim_start_millis > 10_000 {
             trim_start_millis = 0;
             trim_end_millis = 3_000;
         }
@@ -249,6 +255,10 @@ pub async fn enqueue_video_style_transfer_handler(
         }
     }
 
+    // Must have paid plan to remove watermark
+    let remove_watermark = request.remove_watermark
+        .map(|remove_watermark| remove_watermark && has_paid_plan);
+
     let inference_args = WorkflowArgs {
         style_name: Some(request.style),
         creator_visibility: Some(set_visibility),
@@ -258,6 +268,7 @@ pub async fn enqueue_video_style_transfer_handler(
         negative_prompt: request.negative_prompt.clone(),
         enable_lipsync: request.enable_lipsync,
         maybe_input_file: Some(request.input_file.clone()),
+        remove_watermark,
         // The new, simplified enqueuing doesn't care about the following parameters:
         maybe_lora_model: None,
         maybe_json_modifications: None,

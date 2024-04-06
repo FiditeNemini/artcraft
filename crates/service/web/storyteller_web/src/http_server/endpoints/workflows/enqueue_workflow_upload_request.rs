@@ -229,6 +229,7 @@ pub async fn enqueue_workflow_upload_request(
         maybe_description: Some(description),
         maybe_commit_hash: Some(commit_hash),
         creator_visibility: Some(visibility),
+        remove_watermark: None,
         // NB: The following args are irrelevant for uploading workflows
         maybe_lora_model: None,
         maybe_json_modifications: None,
