@@ -100,7 +100,7 @@ export const ControlsTopButtons = () => {
           }}
           confirmButtonProps={{
             label: "Save",
-            disabled: sceneName === "",
+            disabled: mediaToken === "",
             onClick: handleMediaToken,
           }}
           title="Add Scene Object via Media Token"
