@@ -995,6 +995,10 @@ class Editor {
       "-c:a",
       "aac", // Specify audio codec (optional, but recommended for MP4)
       "-shortest", // Ensure output duration matches the shortest stream (video or audio)
+      "-pix_fmt" ,
+      "yuv420p",
+      "-f", 
+      "mp4",
       "0tmp.mp4",
     );
 
