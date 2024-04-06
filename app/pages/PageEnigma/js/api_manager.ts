@@ -88,13 +88,12 @@ export class APIManager {
    * @returns APIManagerResponseMessage
    */
   public async saveSceneState(
-    scene_json: string,
+    save_json: string,
     scene_name: string,
     scene_glb_media_file_token: string | null = null,
     scene_media_file_token: string | null = null,
-    timeline_state: TimelineDataState | null = null,
   ): Promise<string> {
-    const file = new File([scene_json], `${scene_name}.glb`, {
+    const file = new File([save_json], `${scene_name}.glb`, {
       type: "application/json",
     });
 

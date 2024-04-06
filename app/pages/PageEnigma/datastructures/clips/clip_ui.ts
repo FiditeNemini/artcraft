@@ -34,8 +34,8 @@ export class ClipUI {
     this.length = length;
   }
 
-  toJSON(): string {
-    return JSON.stringify({
+  toJSON(): any {
+    return {
       version: this.version,
       group: this.group,
       name: this.name,
@@ -44,6 +44,6 @@ export class ClipUI {
       media_id: this.media_id,
       start_offset: this.offset,
       ending_offset: this.length,
-    });
+    };
   }
 }

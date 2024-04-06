@@ -26,7 +26,8 @@ import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 import { XYZ } from "../datastructures/common";
 import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
-import { StoryTellerProxy3DObject } from "../proxy/storyteller_proxy_3d_object";
+import { StoryTellerProxyTimeline } from "../proxy/storyteller_proxy_timeline";
+
 class EditorState {
   // {
   //   action: "ShowLoadingIndicator"
@@ -390,8 +391,11 @@ class Editor {
     );
 
     let proxyScene = new StoryTellerProxyScene(this.version, this.activeScene);
-    await proxyScene.loadFromSceneJson(scene_json);
+    await proxyScene.loadFromSceneJson(scene_json['scene']);
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
+
+    let proxyTimeline = new StoryTellerProxyTimeline(this.version, this.timeline, this.transform_engine, this.animation_engine, this.audio_engine, this.lipsync_engine);
+    await proxyTimeline.loadFromJson(scene_json['timeline']);
 
     // this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
     //   child.parent = this.activeScene.scene;
@@ -442,28 +446,19 @@ class Editor {
 
     let proxyScene = new StoryTellerProxyScene(this.version, this.activeScene);
     let scene_json = await proxyScene.saveToScene();
+
+    let proxyTimeline = new StoryTellerProxyTimeline(this.version, this.timeline, this.transform_engine, this.animation_engine, this.audio_engine, this.lipsync_engine);
+    let timeline_json = await proxyTimeline.saveToJson();
+
+    let save_data = {scene: scene_json, timeline: timeline_json};
+
     // TODO turn scene information into and object ...
     const result = await this.api_manager.saveSceneState(
-      scene_json,
+      JSON.stringify(save_data),
       name,
       this.current_scene_glb_media_token,
       this.current_scene_media_token,
-      new TimelineDataState(),
     );
-
-    console.log(result)
-
-    //if (result.data == null) {
-    //  return;
-    //}
-    //const scene_media_token = result.data["scene_media_file_token"];
-    //if (scene_media_token != null) {
-    //  this.current_scene_media_token = scene_media_token;
-    //}
-    //const scene_glb_media_token = result.data["scene_glb_media_file_token"];
-    //if (scene_glb_media_token != null) {
-    //  this.current_scene_glb_media_token = scene_glb_media_token;
-    //}
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,

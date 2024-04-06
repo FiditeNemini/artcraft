@@ -23,7 +23,7 @@ export class StoryTellerProxyScene {
     this.sceneItemProxy = []
   }
 
-  public async saveToScene(): Promise<string> {
+  public async saveToScene(): Promise<any> {
     let results: ObjectJSON[] = [];
     if (this.scene.scene != null) {
       for (const child of this.scene.scene.children) {
@@ -45,8 +45,7 @@ export class StoryTellerProxyScene {
     } else {
       console.log("Scene doesn't exist needs to be assigned");
     }
-    const json_string = JSON.stringify(results);
-    return json_string;
+    return results;
   }
 
   public async loadFromSceneJson(scene_json: ObjectJSON[]) {
