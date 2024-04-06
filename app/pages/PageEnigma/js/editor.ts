@@ -1211,19 +1211,19 @@ class Editor {
         version: this.version,
         objectVectors: {
           position: {
-            x: parseFloat(pos.x.toFixed(2)),
-            y: parseFloat(pos.y.toFixed(2)),
-            z: parseFloat(pos.z.toFixed(2)),
+            x: parseFloat(pos.x.toFixed(6)),
+            y: parseFloat(pos.y.toFixed(6)),
+            z: parseFloat(pos.z.toFixed(6)),
           },
           rotation: {
-            x: parseFloat(rot.x.toFixed(2)),
-            y: parseFloat(rot.y.toFixed(2)),
-            z: parseFloat(rot.z.toFixed(2)),
+            x: parseFloat(rot.x.toFixed(6)),
+            y: parseFloat(rot.y.toFixed(6)),
+            z: parseFloat(rot.z.toFixed(6)),
           },
           scale: {
-            x: parseFloat(scale.x.toFixed(2)),
-            y: parseFloat(scale.y.toFixed(2)),
-            z: parseFloat(scale.z.toFixed(2)),
+            x: parseFloat(scale.x.toFixed(6)),
+            y: parseFloat(scale.y.toFixed(6)),
+            z: parseFloat(scale.z.toFixed(6)),
           },
         },
       },
