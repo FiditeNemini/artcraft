@@ -310,7 +310,7 @@ export class APIManager {
     blob: any,
     fileName: string,
   ): Promise<APIManagerResponseSuccess> {
-    const url = `${this.baseUrl}/v1/media_uploads/upload`;
+    const url = `${this.baseUrl}/v1/media_files/upload`;
     const uuid = uuidv4();
 
     const formData = new FormData();

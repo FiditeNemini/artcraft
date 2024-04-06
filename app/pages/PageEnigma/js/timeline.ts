@@ -347,7 +347,7 @@ export class TimeLine {
     }
 
     // called by the editor update loop on each frame
-    public async update() {
+    public async update(isRendering=false) {
         //if (this.is_playing == false) return; // start and stop
         this.timeline_limit = this.getEndPoint();
         if (this.is_playing) {
@@ -399,8 +399,10 @@ export class TimeLine {
                 } else if (element.type  === ClipType.ANIMATION) {
                     if (object) {
                         await this.animation_engine.clips[object.uuid+element.media_id].play(object);
+                        let fps = 120;
+                        if(isRendering) { fps = 60; }
                         this.animation_engine.clips[object.uuid+element.media_id].step(
-                            this.scrubber_frame_position / 120, // Double FPS for best result.
+                            this.scrubber_frame_position / fps, // Double FPS for best result.
                         );
                     }
                 } else {
