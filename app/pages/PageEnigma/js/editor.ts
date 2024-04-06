@@ -629,28 +629,6 @@ class Editor {
     }
   }
 
-  async addTransformClipBase(
-    name: string = "New Clip",
-    group: "object" | "character" | "camera" | "global_audio",
-    object: THREE.Object3D,
-    offset: number,
-    length: number,
-  ) {
-    this.timeline.addPlayableClip(
-      new ClipUI(
-        1.0,
-        "transform",
-        group,
-        name,
-        object.uuid, // object id here ...
-        object.uuid, // Need to change to media id ....
-        offset,
-        length,
-      ),
-    );
-    this.transform_engine.loadObject(object.uuid, length);
-  }
-
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
@@ -663,60 +641,6 @@ class Editor {
     // Stick Open Pose Man: m_9f3d3z94kk6m25zywyz6an3p43fjtw
     // XBot: m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d 
     // YBot: m_9sqg0evpr23587jnr8z3zsvav1x077
-
-    // Load timeline creates the the clips from the datastructure and loads them in here.
-    // load object into the engine for lip syncing
-    //this.lipsync_engine.load_object(
-    //  object.uuid,
-    //  "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
-    //);
-    //this.animation_engine.load_object(
-    //  object.uuid,
-    //  "/resources/models/fox/fox_idle.glb",
-    //  "clip3",
-    //);
-    // then it creates clip ui to load the playable clips
-    // then refreshes the timeline.
-    // create the clip with the same id for a reference to the media
-    //this.timeline.addPlayableClip(
-    //  new ClipUI(
-    //    1.0,
-    //    "lipsync",
-    //    "character",
-    //    "clip1",
-    //    "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
-    //    object.uuid,
-    //    150,
-    //    400,
-    //  ),
-    //);
-    //// media id for this is up in the air but when a path is created you should be able to store and delete it
-    //this.timeline.addPlayableClip(
-    //  new ClipUI(1.0, "transform", "character", "clip2", object.uuid, object.uuid, 0, 150),
-    //);
-    // media id for this as well it can be downloaded
-    //this.timeline.addPlayableClip(
-    //  new ClipUI(
-    //    1.0,
-    //    "animation",
-    //    "character",
-    //    "clip3",
-    //    "/resources/models/fox/fox_idle.glb",
-    //    object.uuid,
-    //    0,
-    //    400,
-    //  ),
-    //);
-    //this.audio_engine.loadClip("m_h33vytxs5eqqqf07nsy14qzrf9ww4v");
-    //await this.timeline.addPlayableClip(new ClipUI(
-    //  1.0,
-    //  "audio",
-    //  "global_audio",
-    //  "AudioClip",
-    //  "m_h33vytxs5eqqqf07nsy14qzrf9ww4v",
-    //  "",
-    //  0,
-    //  50));
   }
 
   // Configure post processing.
@@ -1269,7 +1193,8 @@ class Editor {
       this.raycaster == undefined ||
       this.mouse == undefined ||
       this.control == undefined ||
-      this.outlinePass == undefined
+      this.outlinePass == undefined ||
+      this.camera_person_mode
     ) {
       return;
     }
