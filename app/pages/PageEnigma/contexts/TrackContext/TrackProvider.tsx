@@ -129,6 +129,13 @@ export const TrackProvider = ({ children }: Props) => {
         type: ClipType.AUDIO,
         length: 25,
         name: "Talk",
+      },
+      {
+        version: 1,
+        media_id: "m_w5nn3kjh1fbkmjrdac5b2qaba0pmyt",
+        type: ClipType.AUDIO,
+        length: 25,
+        name: "NCS Song",
       }
     ]);
     setScale(1);

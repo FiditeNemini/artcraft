@@ -25,6 +25,9 @@ import { APPUI_ACTION_TYPES } from "../reducers";
 import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 import { XYZ } from "../datastructures/common";
+import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
+import { StoryTellerProxyTimeline } from "../proxy/storyteller_proxy_timeline";
+
 class EditorState {
   // {
   //   action: "ShowLoadingIndicator"
@@ -91,6 +94,7 @@ class Editor {
   cam_obj: THREE.Object3D | undefined;
   renderPass: RenderPass | undefined;
   generating_preview: boolean;
+  frames: number;
 
   camera_person_mode: boolean;
   current_scene_media_token: string | null;
@@ -107,6 +111,10 @@ class Editor {
 
   last_scrub: number;
   // Default params.
+
+  // scene proxy for serialization
+  storyteller_proxy_scene:StoryTellerProxyScene;
+
   constructor() {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
@@ -172,6 +180,7 @@ class Editor {
     this.playback_location = 0;
     this.max_length = 10;
     this.last_scrub = 0;
+    this.frames = 0;
     // Audio Engine Test.
 
     this.render_width = 1280;
@@ -206,6 +215,9 @@ class Editor {
       "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.";
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
+
+
+    this.storyteller_proxy_scene = new StoryTellerProxyScene(this.version,this.activeScene.scene)
   }
 
   initialize(config: any) {
@@ -361,21 +373,10 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() {}
+  public async testTestTimelineEvents() { }
 
-  public async testStylizeRequest() {
-    const result = await this.api_manager
-      .stylizeVideo(
-        "mu_6wy1570a0c3c0tpkkncf4tsvb5234",
-        this.art_style,
-        this.positive_prompt,
-        this.negative_prompt,
-        Visibility.Public,
-      )
-      .catch((error) => {
-        console.log(error);
-      });
-    console.log(result);
+  public async testLoadTokenAssets() {
+    await this.storyteller_proxy_scene.loadFromMediaFileToken("m_z4jzbst3xfh64h0qn4bqh4afenfps9")
   }
 
   public async loadScene(scene_media_token: string) {
@@ -383,49 +384,30 @@ class Editor {
       type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER,
     });
 
-    if (scene_media_token != null) {
-      this.current_scene_media_token = scene_media_token;
-    }
+    this.current_scene_media_token = scene_media_token;
 
-    const load_scene_state_response = await this.api_manager.loadSceneState(
+    const scene_json = await this.api_manager.loadSceneState(
       this.current_scene_media_token,
     );
 
-    console.log(load_scene_state_response);
-    if (load_scene_state_response.data == null) {
-      console.log("load_scene_state_response Missing Data");
-      return;
-    }
+    let proxyScene = new StoryTellerProxyScene(this.version, this.activeScene);
+    await proxyScene.loadFromSceneJson(scene_json['scene']);
+    this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
 
-    const loaded_scene = load_scene_state_response.data["scene"];
+    let proxyTimeline = new StoryTellerProxyTimeline(this.version, this.timeline, this.transform_engine, this.animation_engine, this.audio_engine, this.lipsync_engine);
+    await proxyTimeline.loadFromJson(scene_json['timeline']);
 
-    if (load_scene_state_response.data == null) {
-      return;
-    }
-    // Load these so you can rewrite the scene glb using it's token.
-    this.current_scene_media_token =
-      load_scene_state_response.data["scene_media_file_token"];
-    this.current_scene_glb_media_token =
-      load_scene_state_response.data["scene_glb_media_file_token"];
-
-    console.log(
-      `loadScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`,
-    );
-
-    this.activeScene.scene.children = loaded_scene.children;
-
-    this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
-      child.parent = this.activeScene.scene;
-
-      if (child.type == "DirectionalLight") {
-        const pos = child.position;
-        const rot = child.rotation;
-        const light = this.activeScene._create_base_lighting();
-        light.position.set(pos.x, pos.y, pos.z);
-        light.rotation.set(rot.x, rot.y, rot.z);
-        this.activeScene.scene.remove(child);
-      }
-    });
+    // this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
+    //   child.parent = this.activeScene.scene;
+    //   if (child.type == "DirectionalLight") {
+    //     const pos = child.position;
+    //     const rot = child.rotation;
+    //     const light = this.activeScene._create_base_lighting();
+    //     light.position.set(pos.x, pos.y, pos.z);
+    //     light.rotation.set(rot.x, rot.y, rot.z);
+    //     this.activeScene.scene.remove(child);
+    //   }
+    // });
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
@@ -433,8 +415,8 @@ class Editor {
   }
 
   // TO UPDATE selected objects in the scene might want to add to the scene ...
-  async setSelectedObject(position:XYZ,rotation:XYZ,scale:XYZ) {
-    if (this.selected !=undefined || this.selected !=null) {
+  async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
+    if (this.selected != undefined || this.selected != null) {
       //console.log(`triggering setSelectedObject`) 
       this.selected.position.x = position.x
       this.selected.position.y = position.y
@@ -449,8 +431,11 @@ class Editor {
       this.selected.scale.z = scale.z
 
     }
-  } 
+  }
 
+  public async test_loadMediaToken(media_file_token: string) {
+    this.activeScene.load_glb(media_file_token);
+  }
 
   public async saveScene(name: string) {
     // remove controls when saving scene.
@@ -458,31 +443,22 @@ class Editor {
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER,
     });
-    console.log(
-      `saveScene => SceneMediaToken:${this.current_scene_media_token} SceneGLBMediaToken:${this.current_scene_glb_media_token}`,
-    );
+
+    let proxyScene = new StoryTellerProxyScene(this.version, this.activeScene);
+    let scene_json = await proxyScene.saveToScene();
+
+    let proxyTimeline = new StoryTellerProxyTimeline(this.version, this.timeline, this.transform_engine, this.animation_engine, this.audio_engine, this.lipsync_engine);
+    let timeline_json = await proxyTimeline.saveToJson();
+
+    let save_data = {scene: scene_json, timeline: timeline_json};
 
     // TODO turn scene information into and object ...
     const result = await this.api_manager.saveSceneState(
-      this.activeScene.scene,
+      JSON.stringify(save_data),
       name,
       this.current_scene_glb_media_token,
       this.current_scene_media_token,
-      new TimelineDataState(),
     );
-
-    if (result.data == null) {
-      return;
-    }
-
-    const scene_media_token = result.data["scene_media_file_token"];
-    if (scene_media_token != null) {
-      this.current_scene_media_token = scene_media_token;
-    }
-    const scene_glb_media_token = result.data["scene_glb_media_file_token"];
-    if (scene_glb_media_token != null) {
-      this.current_scene_glb_media_token = scene_glb_media_token;
-    }
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
@@ -643,7 +619,7 @@ class Editor {
     // note the database from the server is the source of truth for all the data.
     // Test code here
     const object: THREE.Object3D = await this.activeScene.load_glb(
-      "m_77z28zfaxc3sdtt5cc68vpz2n40qed",
+      "m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp",
     );
 
     object.uuid = "CH1";
@@ -813,7 +789,7 @@ class Editor {
   }
 
   // Basicly Unity 3D's update loop.
-  updateLoop(time: number) {
+  async updateLoop(time: number) {
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
     }
@@ -831,11 +807,11 @@ class Editor {
 
     if (this.cameraViewControls && this.camera_person_mode) {
       this.cameraViewControls.update(5 * delta_time);
-      if(this.cam_obj){
+      if (this.cam_obj) {
         if (this.last_scrub != this.timeline.scrubber_frame_position) {
           this.camera.position.copy(this.cam_obj.position);
           this.camera.rotation.copy(this.cam_obj.rotation);
-        } else if(this.timeline.is_playing == false) {
+        } else if (this.timeline.is_playing == false) {
           this.cam_obj.position.copy(this.camera.position);
           this.cam_obj.rotation.copy(this.camera.rotation);
         } else {
@@ -846,25 +822,24 @@ class Editor {
         this.cam_obj.visible = false;
       }
     }
-    else if (this.cam_obj){
+    else if (this.cam_obj) {
       this.cam_obj.visible = true;
     }
 
     if (this.render_camera && this.cam_obj) {
       this.render_camera.position.copy(this.cam_obj.position);
       this.render_camera.rotation.copy(this.cam_obj.rotation);
-      this.cam_obj.scale.copy(new THREE.Vector3(1,1,1));
+      this.cam_obj.scale.copy(new THREE.Vector3(1, 1, 1));
     }
-    
-    if(this.timeline.is_playing){
-      this.timeline.update();
-    } 
-    else if (this.last_scrub == this.timeline.scrubber_frame_position){
+
+    if (this.timeline.is_playing) {
+      await this.timeline.update(this.rendering);
+    }
+    else if (this.last_scrub == this.timeline.scrubber_frame_position) {
       this.updateSelectedUI();
     }
 
     this.last_scrub = this.timeline.scrubber_frame_position;
-
     this.renderScene();
   }
 
@@ -933,10 +908,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-        startTime * 1000 +
-        "|" +
-        startTime * 1000 +
-        "[a1];[0:a][a1]amix=inputs=2[a]",
+      startTime * 1000 +
+      "|" +
+      startTime * 1000 +
+      "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -962,7 +937,12 @@ class Editor {
   }
 
   async stopPlayback(compile_audio: boolean = true) {
+    console.log(this.frames, this.frame_buffer.length);
+
     this.renderMode();
+
+    if(this.generating_preview){return;}
+    this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
     for (let index = 0; index < this.frame_buffer.length; index++) {
@@ -975,7 +955,7 @@ class Editor {
     }
     await ffmpeg.run(
       "-framerate",
-      "" + this.cap_fps,
+      "" + this.cap_fps/2,
       "-i",
       "image%d.png",
       "-f",
@@ -989,6 +969,10 @@ class Editor {
       "-c:a",
       "aac", // Specify audio codec (optional, but recommended for MP4)
       "-shortest", // Ensure output duration matches the shortest stream (video or audio)
+      "-pix_fmt" ,
+      "yuv420p",
+      "-f", 
+      "mp4",
       "0tmp.mp4",
     );
 
@@ -1003,39 +987,36 @@ class Editor {
       }
     }
 
-    const output = await ffmpeg.FS("readFile", itteration + "tmp.mp4");
+    const output = ffmpeg.FS("readFile", itteration + "tmp.mp4");
+
+    ffmpeg.exit();
+    this.generating_preview = false;
+
     // Create a Blob from the output file for downloading
     const blob = new Blob([output.buffer], { type: "video/mp4" });
-    const url = URL.createObjectURL(blob);
-    const downloadLink = document.createElement("a");
-    downloadLink.href = url;
-    downloadLink.download = "render.mp4";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    // Clean up
-    URL.revokeObjectURL(url);
-    document.body.removeChild(downloadLink);
 
     const data: any = await this.api_manager.uploadMedia(blob, "render.mp4");
     console.log("data", data)
 
     if (data == null) { return; }
-    let upload_token = data['upload_token'];
+    let upload_token = data['media_file_token'];
     console.log(upload_token);
     // Create a link to download the file stylize video using api ..
     //{"success":true,"upload_token":"mu_x9kr5cfafn512pjbygdszvbdpktrr"} payload
 
     const result = await this.api_manager
-    .stylizeVideo(
-      upload_token,
-      this.art_style,
-      this.positive_prompt,
-      this.negative_prompt,
-      Visibility.Public,
-    )
-    .catch((error) => {
-      console.log(error);
-    });
+      .stylizeVideo(
+        upload_token,
+        this.art_style,
+        this.positive_prompt,
+        this.negative_prompt,
+        Visibility.Public,
+      )
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // {"success":true,"inference_job_token":"jinf_j3nbqbd15wqxb0xcks13qh3f3bz"}
 
     console.log(result);
 
@@ -1111,7 +1092,7 @@ class Editor {
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
     console.log("Generating video...");
-    if (this.rendering) {
+    if (this.rendering || this.generating_preview) {
       return;
     }
     this.rendering = true; // has to go first to debounce
@@ -1167,6 +1148,7 @@ class Editor {
     }
 
     if (this.rendering && this.renderer && this.clock) {
+      this.frames += 1;
       this.playback_location++;
       const imgData = this.renderer.domElement.toDataURL();
       this.frame_buffer.push(imgData);
@@ -1186,41 +1168,41 @@ class Editor {
     if (this.selected == undefined) {
       return;
     }
-     const pos = this.selected.position;
-      const rot = this.selected.rotation;
-      const scale = this.selected.scale;
-  
-      // TODO this is a bug we need to only show when clicked on and use UPDATE when updating.
-      this.dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
-        payload: {
-          group:
-            this.selected.name === "::CAM::"
-              ? ClipGroup.CAMERA
-              : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
-          object_uuid: this.selected.uuid,
-          object_name: this.selected.name,
-          version: this.version,
-          objectVectors: {
-            position: {
-              x: parseFloat(pos.x.toFixed(2)),
-              y: parseFloat(pos.y.toFixed(2)),
-              z: parseFloat(pos.z.toFixed(2)),
-            },
-            rotation: {
-              x: parseFloat(rot.x.toFixed(2)),
-              y: parseFloat(rot.y.toFixed(2)),
-              z: parseFloat(rot.z.toFixed(2)),
-            },
-            scale: {
-              x: parseFloat(scale.x.toFixed(2)),
-              y: parseFloat(scale.y.toFixed(2)),
-              z: parseFloat(scale.z.toFixed(2)),
-            },
+    const pos = this.selected.position;
+    const rot = this.selected.rotation;
+    const scale = this.selected.scale;
+
+    // TODO this is a bug we need to only show when clicked on and use UPDATE when updating.
+    this.dispatchAppUiState({
+      type: APPUI_ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
+      payload: {
+        group:
+          this.selected.name === "::CAM::"
+            ? ClipGroup.CAMERA
+            : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
+        object_uuid: this.selected.uuid,
+        object_name: this.selected.name,
+        version: this.version,
+        objectVectors: {
+          position: {
+            x: parseFloat(pos.x.toFixed(2)),
+            y: parseFloat(pos.y.toFixed(2)),
+            z: parseFloat(pos.z.toFixed(2)),
+          },
+          rotation: {
+            x: parseFloat(rot.x.toFixed(2)),
+            y: parseFloat(rot.y.toFixed(2)),
+            z: parseFloat(rot.z.toFixed(2)),
+          },
+          scale: {
+            x: parseFloat(scale.x.toFixed(2)),
+            y: parseFloat(scale.y.toFixed(2)),
+            z: parseFloat(scale.z.toFixed(2)),
           },
         },
-      });
-  
+      },
+    });
+
   }
 
   // Automaticly resize scene.

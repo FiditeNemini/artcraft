@@ -46,6 +46,7 @@ class Scene {
         let obj = new THREE.Mesh(geometry, material);
         obj.receiveShadow = true;
         obj.castShadow = true;
+        obj.userData["media_id"] = "Parim";
         //obj.type = "Object3D";
         obj.name = name;
         this.scene.add(obj);
@@ -128,6 +129,7 @@ class Scene {
                         resolve(child.children[0]);
                         return;
                     }
+                    child.userData["media_id"] = media_id;
                     if (auto_add) { this.scene.add(child); }
                     resolve(child);
                 });
@@ -201,6 +203,7 @@ class Scene {
         directional_light.shadow.map = null;
         directional_light.castShadow = true;
         directional_light.shadow.bias = 0.00004;
+        directional_light.userData["media_id"] = "DirectionalLight";
 
         this.scene.add(directional_light);
         this.scene.add(directional_light.target);
