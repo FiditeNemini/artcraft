@@ -20,7 +20,7 @@ use mysql_queries::queries::media_files::list::list_media_files_for_user::{list_
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
 
-use crate::http_server::common_responses::media_file_default_cover::{MediaFileCoverImageDetails, MediaFileDefaultCover};
+use crate::http_server::common_responses::media_file_cover_image_details::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;

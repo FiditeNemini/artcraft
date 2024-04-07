@@ -82,7 +82,7 @@ fn hash(token: &str, max_number: u64, salt: u8) -> u8 {
 mod tests {
   use tokens::tokens::media_files::MediaFileToken;
 
-  use crate::http_server::common_responses::media_file_default_cover::MediaFileDefaultCover;
+  use crate::http_server::common_responses::media_file_cover_image_details::MediaFileDefaultCover;
 
   #[test]
   fn test() {

@@ -27,8 +27,8 @@ use users_component::endpoints::login_handler::*;
 use users_component::endpoints::logout_handler::*;
 use users_component::endpoints::session_info_handler::*;
 
-use crate::http_server::common_responses::media_file_default_cover::MediaFileCoverImageDetails;
-use crate::http_server::common_responses::media_file_default_cover::MediaFileDefaultCover;
+use crate::http_server::common_responses::media_file_cover_image_details::MediaFileCoverImageDetails;
+use crate::http_server::common_responses::media_file_cover_image_details::MediaFileDefaultCover;
 use crate::http_server::common_responses::media_file_origin_details::*;
 use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
