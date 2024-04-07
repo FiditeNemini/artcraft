@@ -64,7 +64,7 @@ export const AudioElement = ({ clip, type }: Props) => {
   );
 
   return (
-    <div className="relative h-16 w-16">
+    <div className="relative h-16 w-16 overflow-hidden">
       <div
         id={`ani-clip-${clip.media_id}`}
         className="absolute block h-16 w-16 rounded-lg bg-brand-secondary-700 p-2"

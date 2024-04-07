@@ -90,16 +90,19 @@ export const TabAudio = () => {
           </div>
         }
         { userAudioClips.length >= 0 &&
-          <div>
+          <div className="flex flex-wrap gap-1">
             {userAudioClips.map(item =>
-              <div key={item.token}>
-                <P>{item.origin['maybe_model'].title || "No Name"}</P>
                 <AudioElement 
                   key={item.token}
-                  clip={item}
+                  clip={{
+                    version: 0,
+                    type: ClipType.AUDIO,
+                    media_id: item.token,
+                    name: item.origin['maybe_model'].title || "Unknown",
+                    length: 0,
+                  }}
                   type={ClipType.AUDIO}
                 />
-              </div>
             )}
           </div>
         }
@@ -109,3 +112,4 @@ export const TabAudio = () => {
     </div>
   );
 };
+
