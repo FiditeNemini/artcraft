@@ -113,7 +113,7 @@ class Editor {
   // Default params.
 
   // scene proxy for serialization
-  storyteller_proxy_scene:StoryTellerProxyScene;
+  storyteller_proxy_scene: StoryTellerProxyScene;
 
   constructor() {
     console.log(
@@ -217,7 +217,7 @@ class Editor {
     this.art_style = ArtStyle.Anime2DFlat;
 
 
-    this.storyteller_proxy_scene = new StoryTellerProxyScene(this.version,this.activeScene.scene)
+    this.storyteller_proxy_scene = new StoryTellerProxyScene(this.version, this.activeScene.scene)
   }
 
   initialize(config: any) {
@@ -437,7 +437,7 @@ class Editor {
     let proxyTimeline = new StoryTellerProxyTimeline(this.version, this.timeline, this.transform_engine, this.animation_engine, this.audio_engine, this.lipsync_engine);
     let timeline_json = await proxyTimeline.saveToJson();
 
-    let save_data = {scene: scene_json, timeline: timeline_json};
+    let save_data = { scene: scene_json, timeline: timeline_json };
 
     // TODO turn scene information into and object ...
     const result = await this.api_manager.saveSceneState(
@@ -559,7 +559,7 @@ class Editor {
 
         this.removeTransformControls();
         this.selected = this.cam_obj;
-        this.dispatchAppUiState({type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT});
+        this.dispatchAppUiState({ type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT });
         this.updateSelectedUI();
       } else {
         this.camera.position.copy(this.last_cam_pos);
@@ -665,6 +665,17 @@ class Editor {
     this.composer.addPass(this.outputPass);
   }
 
+  deleteObject(uuid: string) {
+    let obj = this.activeScene.get_object_by_uuid(uuid);
+    if (obj) {
+      this.activeScene.scene.remove(obj);
+    }
+    this.removeTransformControls();
+    this.selected = undefined;
+    this.dispatchAppUiState({type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT});
+    this.timeline.deleteObject(uuid)
+  }
+
   create_parim(name: string) {
     const uuid = this.activeScene.instantiate(name);
   }
@@ -674,7 +685,7 @@ class Editor {
     this.activeScene.renderMode(this.rendering);
   }
 
-  stepFrame(frames:number) {
+  stepFrame(frames: number) {
     this.timeline.stepFrame(frames);
   }
 
@@ -853,7 +864,7 @@ class Editor {
 
     this.renderMode();
 
-    if(this.generating_preview){return;}
+    if (this.generating_preview) { return; }
     this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
@@ -867,7 +878,7 @@ class Editor {
     }
     await ffmpeg.run(
       "-framerate",
-      "" + this.cap_fps/2,
+      "" + this.cap_fps / 2,
       "-i",
       "image%d.png",
       "-f",
@@ -881,9 +892,9 @@ class Editor {
       "-c:a",
       "aac", // Specify audio codec (optional, but recommended for MP4)
       "-shortest", // Ensure output duration matches the shortest stream (video or audio)
-      "-pix_fmt" ,
+      "-pix_fmt",
       "yuv420p",
-      "-f", 
+      "-f",
       "mp4",
       "0tmp.mp4",
     );
@@ -1169,7 +1180,7 @@ class Editor {
         this.transform_interaction = true;
 
         // Contact react land
-        this.dispatchAppUiState({type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT});
+        this.dispatchAppUiState({ type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT });
         this.updateSelectedUI();
       }
     } else if (this.transform_interaction == false) {

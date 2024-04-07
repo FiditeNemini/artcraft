@@ -175,6 +175,11 @@ export class TimeLine {
         this.scene.createPoint(data_json['position'], data_json['keyframe_uuid']);
     }
 
+    public deleteObject(object_uuid: string) {
+        this.timeline_items = this.timeline_items.filter(element => element.object_uuid !== object_uuid);
+        // Update react land here.
+    }
+
     public async addClip(data: any) {
         const object_uuid = data["data"]["object_uuid"];
         const media_id = data["data"]["media_id"];
