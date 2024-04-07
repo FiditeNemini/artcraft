@@ -30,12 +30,12 @@ export const tabList = [
     value: AssetType.CHARACTER,
     component: <ObjectsTab type={AssetType.CHARACTER} />,
   },
-  {
-    icon: "resources/icons/camera.png",
-    title: "Camera",
-    value: AssetType.CAMERA,
-    component: <CameraTab />,
-  },
+  // {
+  //   icon: "resources/icons/camera.png",
+  //   title: "Camera",
+  //   value: AssetType.CAMERA,
+  //   component: <CameraTab />,
+  // },
   {
     icon: "resources/icons/audios.png",
     title: "Audio",
