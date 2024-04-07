@@ -120,6 +120,13 @@ export const characterItems = signal<MediaItem[]>([
     name: "Male Doll",
     thumbnail: "resources/characters/img03.png",
   },
+  {
+    version: 1,
+    media_id: "m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp ",
+    type: AssetType.CHARACTER,
+    name: "Story Girl",
+    thumbnail: "resources/characters/img13.png",
+  },
 ]);
 
 export const objectItems = signal<MediaItem[]>([
