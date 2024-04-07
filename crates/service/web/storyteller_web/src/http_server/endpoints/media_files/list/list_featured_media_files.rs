@@ -17,7 +17,7 @@ use mysql_queries::queries::media_files::list::list_media_files_by_tokens::list_
 use tokens::tokens::media_files::MediaFileToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
-use crate::http_server::common_responses::media_file_default_cover::MediaFileDefaultCover;
+use crate::http_server::common_responses::media_file_default_cover::{MediaFileCoverImageDetails, MediaFileDefaultCover};
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::server_state::ServerState;
@@ -39,8 +39,10 @@ pub struct MediaFile {
   /// URL to the media file
   pub public_bucket_path: String,
 
-  // Default cover image if there is nothing else we can use as a cover and thumbnail.
-  pub default_cover: MediaFileDefaultCover,
+  /// Information about the cover image. Many media files do not require a cover image,
+  /// e.g. image files, video files with thumbnails, audio files, etc.
+  /// 3D files require them.
+  pub cover_image: MediaFileCoverImageDetails,
 
   #[deprecated(note="Use MediaFileOriginDetails instead")]
   pub origin_category: MediaFileOriginCategory,
@@ -164,7 +166,7 @@ pub async fn list_featured_media_files_handler(
             token: m.token.clone(),
             media_type: m.media_type,
             public_bucket_path,
-            default_cover: MediaFileDefaultCover::from_token(&m.token),
+            cover_image: MediaFileCoverImageDetails::from_token(&m.token),
             origin: MediaFileOriginDetails::from_db_fields_str(
               m.origin_category,
               m.origin_product_category,

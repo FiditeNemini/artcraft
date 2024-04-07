@@ -3,6 +3,7 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 use utoipa::ToSchema;
 
 use tokens::tokens::media_files::MediaFileToken;
+use crate::http_server::common_responses::weights_cover_image_details::WeightsDefaultCoverInfo;
 
 /// There are currently 25 cover images numbered 0 to 24 (0-indexed).
 /// The original dataset was numbered 1 - 25, but I renamed 25 to 0.
@@ -12,10 +13,42 @@ const NUMBER_OF_IMAGES_SALT_OFFSET : u8 = 5;
 const NUMBER_OF_COLORS : u64 = 8;
 const NUMBER_OF_COLORS_SALT_OFFSET : u8 = 1;
 
+
+/// Everything we need to create a cover image.
+/// Cover images are small descriptive images that can be set for any media file.
+/// If a cover image is set, this is the path to the asset.
+#[derive(Clone, Serialize, ToSchema)]
+pub struct MediaFileCoverImageDetails {
+  // TODO(bt,2024-04-07): Add column to schema to support + CRUD to add.
+  /// If a cover image is set, this is the path to the asset.
+  pub maybe_cover_image_public_bucket_path: Option<String>,
+
+  /// For items without a cover image, we can use one of our own.
+  pub default_cover: MediaFileDefaultCover,
+}
+
+/// The default cover is composed of an image and color pair that are
+/// predefined by the frontend.
 #[derive(Clone, Serialize,ToSchema)]
 pub struct MediaFileDefaultCover {
   pub image_index: u8,
   pub color_index: u8,
+}
+
+impl MediaFileCoverImageDetails {
+  /// Typical constructor
+  pub fn from_token(token: &MediaFileToken) -> Self {
+    Self::from_token_str(token.as_str())
+  }
+
+  /// For non-media file tokens (eg. emulated TTS results)
+  pub fn from_token_str(token: &str) -> Self {
+    Self {
+      // TODO(bt,2024-04-07): Add column to schema to support + CRUD to add.
+      maybe_cover_image_public_bucket_path: None,
+      default_cover: MediaFileDefaultCover::from_token_str(token),
+    }
+  }
 }
 
 impl MediaFileDefaultCover {
