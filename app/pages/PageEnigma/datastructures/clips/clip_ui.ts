@@ -11,6 +11,7 @@ export class ClipUI {
   object_uuid: string;
   offset: number; // in frames
   length: number; // in frames
+  should_play: boolean;
 
   constructor(
     version: number,
@@ -32,6 +33,7 @@ export class ClipUI {
     this.media_id = media_id; //  Animation / Audio / Lipsync /  : Engine
     this.offset = offset;
     this.length = length;
+    this.should_play = true;
   }
 
   toJSON(): any {

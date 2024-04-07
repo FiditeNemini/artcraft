@@ -26,7 +26,7 @@ export const ControlsTopButtons = () => {
   };
 
   const handleButtonTest = () => {
-    //editorEngine?.testStylizeRequest();
+
   };
 
   const handleTestButton2 = () => {
@@ -40,7 +40,7 @@ export const ControlsTopButtons = () => {
   //   editorEngine?.startPlayback();
   // };
   const handleButtonTakeFrame = () => {
-    editorEngine?.take_timeline_cam_clip();
+    // editorEngine?.take_timeline_cam_clip();
   };
   const handleButtonSingleFrame = () => {
     editorEngine?.generateFrame();
@@ -135,8 +135,8 @@ export const ControlsTopButtons = () => {
         </Button>
       </div>
       <div className="flex gap-2">
-        <Button onClick={handleButtonSingleFrame}>Render Single Frame</Button>
-        <Button onClick={handleButtonTakeFrame}>Take Frame</Button>
+        {/* <Button onClick={handleButtonSingleFrame}>Render Single Frame</Button>
+        <Button onClick={handleButtonTakeFrame}>Take Frame</Button> */}
         <Button
           onClick={handleButtonTest}
           className="hover:bg-brand-teriary-400 bg-brand-tertiary focus-visible:outline-brand-tertiary"
