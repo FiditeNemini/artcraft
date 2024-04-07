@@ -14,7 +14,15 @@ import { ViewSideBySide } from "./comps/ViewSideBySide";
 import { Timeline } from "./comps/Timeline";
 
 import { APPUI_VIEW_MODES } from "./reducers";
-import { timelineHeight } from "~/pages/PageEnigma/store";
+import {
+  timelineHeight,
+  sidePanelWidth,
+  pageWidth,
+  sidePanelVisible,
+  pageHeight,
+  dndSidePanelWidth,
+  dndTimelineHeight,
+} from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/pages/PageEnigma/contexts/AppUiContext";
 import { EngineContext } from "./contexts/EngineContext";
@@ -30,26 +38,44 @@ export const PageEnigmaComponent = () => {
     event.stopPropagation();
   };
 
-  const handleGenerateMovieClick=()=> {
-    if ( editorEngine != null) {
-      editorEngine?.generateVideo()
+  const handleGenerateMovieClick = () => {
+    if (editorEngine != null) {
+      editorEngine?.generateVideo();
     } else {
-      console.log("Tried to generate movie but editor was null")
+      console.log("Tried to generate movie but editor was null");
     }
   };
 
-  const lowerHeight = timelineHeight.value;
+  let width = pageWidth.value - sidePanelWidth.value - 84;
+  if (!sidePanelVisible.value) {
+    width = pageWidth.value - 84;
+  }
+  if (dndSidePanelWidth.value > -1) {
+    width = pageWidth.value - dndSidePanelWidth.value - 84;
+  }
+
+  console.log(dndTimelineHeight.value);
+  let height = pageHeight.value - timelineHeight.value - 68;
+  if (dndTimelineHeight.value > -1) {
+    height = pageHeight.value - dndTimelineHeight.value - 68;
+  }
+
   return (
     <div>
       <TopBarHelmet>
-        <Button icon={faSparkles} onClick={handleGenerateMovieClick}>Generate Movie</Button>
+        <Button icon={faSparkles} onClick={handleGenerateMovieClick}>
+          Generate Movie
+        </Button>
       </TopBarHelmet>
-      <div style={{ height: "calc(100vh - 68px)" }}>
+      <div className="flex" style={{ height: "calc(100vh - 68px)" }}>
         {/* Engine section/side panel */}
         <div
           id="engine-n-panels-wrapper"
           className="flex"
-          style={{ height: `calc(100% - ${lowerHeight}px)` }}
+          style={{
+            height,
+            width,
+          }}
         >
           <div className="relative w-full overflow-hidden bg-transparent">
             <div
@@ -101,17 +127,16 @@ export const PageEnigmaComponent = () => {
               progress={appUiState.showEditorLoadingBar.progress}
             />
           </div>
-
-          {/* Side panel */}
-          <div onClick={handleOverlayClick}>
-            <SidePanel />
-          </div>
         </div>
-
-        {/* Timeline */}
+        {/* Side panel */}
         <div onClick={handleOverlayClick}>
-          <Timeline />
+          <SidePanel />
         </div>
+      </div>
+
+      {/* Timeline */}
+      <div onClick={handleOverlayClick}>
+        <Timeline />
       </div>
     </div>
   );

@@ -2,7 +2,9 @@ import { computed, signal } from "@preact/signals-core";
 import { Tab } from "~/pages/PageEnigma/models";
 import { pageHeight, timelineHeight } from "~/pages/PageEnigma/store/sizing";
 
-export const dndWidth = signal(-1);
+export const sidePanelVisible = signal(true);
+
+export const dndSidePanelWidth = signal(-1);
 
 export const selectedTab = signal<Tab | null>(null);
 

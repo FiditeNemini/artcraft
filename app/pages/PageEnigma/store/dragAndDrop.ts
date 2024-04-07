@@ -6,6 +6,9 @@ export const canDrop = signal(false);
 export const overTimeline = signal(false);
 export const dropId = signal("");
 export const dropOffset = signal(0);
+
+export const dndTimelineHeight = signal(-1);
+
 export const initPosition = signal<{ initX: number; initY: number }>({
   initX: 0,
   initY: 0,

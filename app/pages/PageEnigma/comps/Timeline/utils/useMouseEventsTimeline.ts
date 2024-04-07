@@ -1,18 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { pageHeight, timelineHeight } from "~/pages/PageEnigma/store";
+import {
+  dndTimelineHeight,
+  pageHeight,
+  timelineHeight,
+} from "~/pages/PageEnigma/store";
 
 export const useMouseEventsTimeline = () => {
   const [isActive, setIsActive] = useState(false);
   const [clientY, setClientY] = useState(0);
 
-  const [height, setHeight] = useState(-1);
-
   useEffect(() => {
     const onPointerUp = () => {
       if (isActive) {
-        timelineHeight.value = Math.round(height);
+        timelineHeight.value = Math.round(dndTimelineHeight.value);
         setIsActive(false);
-        setHeight(-1);
+        dndTimelineHeight.value = -1;
       }
     };
 
@@ -27,7 +29,7 @@ export const useMouseEventsTimeline = () => {
         if (timelineHeight.value - delta > pageHeight.value * 0.5) {
           return;
         }
-        setHeight(timelineHeight.value - delta);
+        dndTimelineHeight.value = timelineHeight.value - delta;
         return;
       }
     };
@@ -39,17 +41,16 @@ export const useMouseEventsTimeline = () => {
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointermove", onMouseMove);
     };
-  }, [clientY, isActive, height]);
+  }, [clientY, isActive]);
 
   return {
     onPointerDown: useCallback((event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
         event.stopPropagation();
+        dndTimelineHeight.value = timelineHeight.value;
         setClientY(event.clientY);
         setIsActive(true);
-        setHeight(timelineHeight.value);
       }
     }, []),
-    height,
   };
 };

@@ -2,6 +2,7 @@ export * from "./audioGroup";
 export * from "./cameraGroup";
 export * from "./characterGroups";
 export * from "./dragAndDrop";
+export * from "./media";
 export * from "./objectGroup";
 export * from "./selectedItem";
 export * from "./sidePanel";

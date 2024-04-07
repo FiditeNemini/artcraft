@@ -23,7 +23,7 @@ export const PageEnigma = () => {
   useEffect(() => {
     function setPage() {
       pageHeight.value = window.innerHeight;
-      pageWidth.value = window.innerHeight;
+      pageWidth.value = window.outerWidth;
     }
     timelineHeight.value = window.innerHeight * 0.25;
     sidePanelWidth.value = 443;

@@ -1,6 +1,6 @@
 import { useSignals } from "@preact/signals-react/runtime";
 import {
-  dndWidth,
+  dndSidePanelWidth,
   selectedTab,
   sidePanelHeight,
   sidePanelWidth,
@@ -13,7 +13,9 @@ export const SidePanelTabs = () => {
   const { onPointerDown } = useMouseEventsSidePanel();
 
   const displayWidth =
-    dndWidth.value > -1 ? dndWidth.value : sidePanelWidth.value;
+    dndSidePanelWidth.value > -1
+      ? dndSidePanelWidth.value
+      : sidePanelWidth.value;
 
   return (
     <>

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { dndWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
+import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
 
 export const useMouseEventsSidePanel = () => {
   const [isActive, setIsActive] = useState(false);
@@ -8,9 +8,9 @@ export const useMouseEventsSidePanel = () => {
   useEffect(() => {
     const onPointerUp = () => {
       if (isActive) {
-        sidePanelWidth.value = Math.round(dndWidth.value);
+        sidePanelWidth.value = Math.round(dndSidePanelWidth.value);
         setIsActive(false);
-        dndWidth.value = -1;
+        dndSidePanelWidth.value = -1;
       }
     };
 
@@ -25,7 +25,7 @@ export const useMouseEventsSidePanel = () => {
         if (sidePanelWidth.value - delta > 443) {
           return;
         }
-        dndWidth.value = sidePanelWidth.value - delta;
+        dndSidePanelWidth.value = sidePanelWidth.value - delta;
         return;
       }
     };
@@ -45,7 +45,7 @@ export const useMouseEventsSidePanel = () => {
         event.stopPropagation();
         setClientX(event.clientX);
         setIsActive(true);
-        dndWidth.value = sidePanelWidth.value;
+        dndSidePanelWidth.value = sidePanelWidth.value;
       }
     }, []),
   };

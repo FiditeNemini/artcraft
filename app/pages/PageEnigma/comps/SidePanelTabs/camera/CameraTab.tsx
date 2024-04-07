@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { AssetType } from "~/pages/PageEnigma/models";
-import { ObjectElements } from "~/pages/PageEnigma/comps/SidePanelTabs/objects/ObjectElements";
 import {
-  dndWidth,
+  dndSidePanelWidth,
   pageHeight,
   sidePanelWidth,
   timelineHeight,
@@ -16,7 +14,9 @@ export const CameraTab = () => {
   const [selectedButton, setSelectedButton] = useState("all");
 
   const displayWidth =
-    dndWidth.value > -1 ? dndWidth.value : sidePanelWidth.value;
+    dndSidePanelWidth.value > -1
+      ? dndSidePanelWidth.value
+      : sidePanelWidth.value;
 
   return (
     <>

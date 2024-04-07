@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AudioElements } from "~/pages/PageEnigma/comps/SidePanelTabs/audio/AudioElements";
-import { dndWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
+import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
 export const AudioTab = () => {
@@ -8,7 +8,9 @@ export const AudioTab = () => {
   const [selectedButton, setSelectedButton] = useState("all");
 
   const displayWidth =
-    dndWidth.value > -1 ? dndWidth.value : sidePanelWidth.value;
+    dndSidePanelWidth.value > -1
+      ? dndSidePanelWidth.value
+      : sidePanelWidth.value;
 
   return (
     <>
