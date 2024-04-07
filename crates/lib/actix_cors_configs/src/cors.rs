@@ -95,7 +95,15 @@ pub fn add_storyteller(cors: Cors, is_production: bool) -> Cors {
         .allowed_origin("https://staging.storyteller.ai")
         // Storyteller.ai (Development Proxy)
         .allowed_origin("http://devproxy.storyteller.ai")
+        .allowed_origin("http://devproxy.storyteller.ai:5173")
+        .allowed_origin("http://devproxy.storyteller.ai:7000")
+        .allowed_origin("http://devproxy.storyteller.ai:7001")
+        .allowed_origin("http://devproxy.storyteller.ai:7002")
         .allowed_origin("https://devproxy.storyteller.ai")
+        .allowed_origin("https://devproxy.storyteller.ai:5173")
+        .allowed_origin("https://devproxy.storyteller.ai:7000")
+        .allowed_origin("https://devproxy.storyteller.ai:7001")
+        .allowed_origin("https://devproxy.storyteller.ai:7002")
         // Storyteller.ai (Netlify Staging / Production)
         .allowed_origin("https://feature-marketing--storyteller-ai.netlify.app")
         .allowed_origin("https://feature-mvp--storyteller-ai.netlify.app")
@@ -103,10 +111,12 @@ pub fn add_storyteller(cors: Cors, is_production: bool) -> Cors {
     cors
         // Storyteller.ai (Development)
         .allowed_origin("http://dev.storyteller.ai")
+        .allowed_origin("http://dev.storyteller.ai:5173") // NB: Wil's port
         .allowed_origin("http://dev.storyteller.ai:7000") // Yarn default port
         .allowed_origin("http://dev.storyteller.ai:7001") // NB: Mac frontend
         .allowed_origin("http://dev.storyteller.ai:7002") // NB: Mac frontend
         .allowed_origin("https://dev.storyteller.ai")
+        .allowed_origin("https://dev.storyteller.ai:5173") // NB: Wil's port
         .allowed_origin("https://dev.storyteller.ai:7000") // Yarn default port
         .allowed_origin("https://dev.storyteller.ai:7001") // NB: Mac frontend
         .allowed_origin("https://dev.storyteller.ai:7002") // NB: Mac frontend
