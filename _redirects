@@ -39,6 +39,7 @@
 /signup*   /index.html   200
 /stream*   /index.html   200
 /studio*   /index.html   200
+/style-video*   /index.html   200
 /terms*   /index.html   200
 /testing*   /index.html   200
 /text-to-image*   /index.html   200
@@ -47,6 +48,7 @@
 /twitch*   /index.html   200
 /upload*   /index.html   200
 /video*   /index.html   200
+/video-style*   /index.html   200
 /voice-conversion*   /index.html   200
 /voice-designer*   /index.html   200
 /w2l*   /index.html   200
