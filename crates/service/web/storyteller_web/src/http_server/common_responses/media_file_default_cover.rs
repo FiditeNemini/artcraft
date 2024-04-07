@@ -4,8 +4,9 @@ use utoipa::ToSchema;
 
 use tokens::tokens::media_files::MediaFileToken;
 
-// TODO: Check the model cover number of images
-const NUMBER_OF_IMAGES : u64 = 8;
+/// There are currently 25 cover images numbered 0 to 24 (0-indexed).
+/// The original dataset was numbered 1 - 25, but I renamed 25 to 0.
+const NUMBER_OF_IMAGES : u64 = 25;
 const NUMBER_OF_IMAGES_SALT_OFFSET : u8 = 5;
 
 const NUMBER_OF_COLORS : u64 = 8;
@@ -55,16 +56,16 @@ mod tests {
     let token = MediaFileToken::new_from_str("foo");
     let cover = MediaFileDefaultCover::from_token(&token);
     assert_eq!(cover.color_index, 5);
-    assert_eq!(cover.image_index, 4);
+    assert_eq!(cover.image_index, 2);
 
     let token = MediaFileToken::new_from_str("bar");
     let cover = MediaFileDefaultCover::from_token(&token);
     assert_eq!(cover.color_index, 5);
-    assert_eq!(cover.image_index, 2);
+    assert_eq!(cover.image_index, 3);
 
     let token = MediaFileToken::new_from_str("asdf");
     let cover = MediaFileDefaultCover::from_token(&token);
     assert_eq!(cover.color_index, 0);
-    assert_eq!(cover.image_index, 0);
+    assert_eq!(cover.image_index, 23);
   }
 }
