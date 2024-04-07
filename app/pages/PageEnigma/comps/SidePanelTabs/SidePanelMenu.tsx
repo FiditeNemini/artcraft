@@ -3,6 +3,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 import {
   selectedTab,
   sidePanelHeight,
+  sidePanelVisible,
 } from "~/pages/PageEnigma/store/sidePanel";
 import { tabList } from "./tabList";
 
@@ -38,7 +39,10 @@ export const SidePanelMenu = () => {
                 ? "bg-assets-selectedTab"
                 : "",
             ].join(" ")}
-            onClick={() => (selectedTab.value = tab)}
+            onClick={() => {
+              selectedTab.value = tab;
+              sidePanelVisible.value = true;
+            }}
           >
             <div>
               <img src={tab.icon} alt={tab.title} width={20} height={20} />
