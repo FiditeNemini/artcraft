@@ -3,7 +3,7 @@ import { TrackProvider } from "~/pages/PageEnigma/contexts/TrackContext/TrackPro
 import { AppUIProvider } from "~/pages/PageEnigma/contexts/AppUiContext";
 import { EngineProvider } from "~/pages/PageEnigma/contexts/EngineProvider";
 import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
-import { toast, ToastBar, Toaster } from "react-hot-toast";
+// import { toast, ToastBar, Toaster } from "react-hot-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTriangleExclamation,
@@ -41,7 +41,7 @@ export const PageEnigma = () => {
     <TrackProvider>
       <AppUIProvider>
         <EngineProvider>
-          <Toaster
+          {/* <Toaster
             position="top-right"
             toastOptions={{
               style: {
@@ -86,7 +86,7 @@ export const PageEnigma = () => {
                 }}
               </ToastBar>
             )}
-          </Toaster>
+          </Toaster> */}
           <PageEnigmaComponent />
         </EngineProvider>
       </AppUIProvider>

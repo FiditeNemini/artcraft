@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
 import { Button, LoadingBar, LoadingDots } from "~/components";

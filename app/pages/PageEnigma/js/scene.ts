@@ -61,16 +61,33 @@ class Scene {
         return this.scene.getObjectByName(name);
     }
 
-    createPoint(pos: THREE.Vector3, visable: boolean = true) {
+    createPoint(pos: THREE.Vector3, keyframe_uuid: string): THREE.Object3D {
         let geometry = new THREE.SphereGeometry(0.1, 18, 12);
         let material = new THREE.MeshBasicMaterial({ color: 0x05C3DD });
         let obj = new THREE.Mesh(geometry, material);
         obj.position.copy(pos);
-        obj.receiveShadow = visable;
+        obj.receiveShadow = false;
+        obj.castShadow = false;
+        obj.userData['media_id'] = "Point::" + keyframe_uuid;
         if (this.hot_items != undefined) {
             this.hot_items.push(obj);
         }
         this.scene.add(obj);
+        return obj;
+    }
+
+    deletePoint(keyframe_uuid: string) {
+        this.scene.traverse((object) => {
+            if (object.userData.media_id) {
+                let obj_keyframe_uuid = object.userData.media_id.replace("Point::", "");
+                console.log(obj_keyframe_uuid);
+                if (obj_keyframe_uuid === keyframe_uuid) {
+                    console.log("Found!", object);
+                    this.scene.remove(object);
+                    return;
+                }
+            }
+        });
     }
 
     _disable_skybox() {
@@ -201,7 +218,7 @@ class Scene {
         directional_light.shadow.mapSize.width = 2048;
         directional_light.shadow.mapSize.height = 2048;
         directional_light.shadow.map = null;
-        directional_light.castShadow = true;
+        directional_light.castShadow = false;
         directional_light.shadow.bias = 0.00004;
         directional_light.userData["media_id"] = "DirectionalLight";
 

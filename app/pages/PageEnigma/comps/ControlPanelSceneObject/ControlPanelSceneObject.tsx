@@ -40,7 +40,7 @@ export const ControlPanelSceneObject = () => {
       vectors.rotation,
       vectors.scale,
     );
-  }, [appUiState.controlPanel.currentSceneObject]);
+  }, [appUiState.controlPanel.currentSceneObject, editorEngine]);
 
   if (!appUiState.controlPanel.currentSceneObject) {
     return null;
@@ -150,7 +150,7 @@ export const ControlPanelSceneObject = () => {
   };
 
   const handleDeleteObject = () => {
-    console.log("TELL EDITOR TO DELETE HERE");
+    editorEngine?.deleteObject(currentSceneObject.object_uuid);
   };
 
   return (

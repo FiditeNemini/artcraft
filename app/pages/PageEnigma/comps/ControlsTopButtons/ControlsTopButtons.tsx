@@ -17,7 +17,7 @@ export const ControlsTopButtons = () => {
   };
 
   const handleMediaToken = async () => {
-    // await editorEngine?.test_loadMediaToken(mediaToken)
+    await editorEngine?.loadMediaToken(mediaToken);
   };
 
   const handleButtonLoadScene = () => {
@@ -25,9 +25,7 @@ export const ControlsTopButtons = () => {
     editorEngine?.loadScene(sceneToken);
   };
 
-  const handleButtonTest = () => {
-
-  };
+  const handleButtonTest = () => {};
 
   const handleTestButton2 = () => {
     console.log("Test Button 2");
