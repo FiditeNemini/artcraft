@@ -19,7 +19,8 @@ export const ControlsTopButtons = () => {
   };
 
   const handleMediaToken = async () => {
-    await editorEngine?.test_loadMediaToken(mediaToken)
+    // await editorEngine?.test_loadMediaToken(mediaToken)
+    console.log('editorEnging does not have test_loadMediaToken')
   };
 
   const handleButtonLoadScene = () => {

@@ -16,13 +16,13 @@ export const ControlsVideo = () => {
     console.log("Controls Video: Backward-Fast clicked");
   };
   const handleBackwardStep = () => {
-    console.log("Controls Video: Backward-Step clicked");
+    editorEngine?.stepFrame(-1);
   };
   const handlePlay = () => {
     editorEngine?.startPlayback();
   };
   const handleForwardStep = () => {
-    console.log("Controls Video: Forward-Step clicked");
+    editorEngine?.stepFrame(1);
   };
   const handleForwardFast = () => {
     console.log("Controls Video: Forward-Fast clicked");

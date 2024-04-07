@@ -42,14 +42,16 @@ export const TestFeaturesButtons = ()=>{
     editorEngine?.switchCameraView();
   };
   const testStylizeRequest = () => {
-    editorEngine?.testStylizeRequest();
+    // editorEngine?.testStylizeRequest();
+    console.log('editorEnging does not have testStylizeRequest')
   };
   const handleButtonRender = () => {
     editorEngine?.generateVideo();
   };
 
   const handleButtonTakeFrame = () => {
-    editorEngine?.take_timeline_cam_clip();
+    // editorEngine?.take_timeline_cam_clip();
+    console.log('editorEnging does not have take_timeline_cam_clip')
   };
 
   const handleButtonSingleFrame = () => {
