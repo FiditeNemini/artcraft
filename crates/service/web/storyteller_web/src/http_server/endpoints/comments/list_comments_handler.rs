@@ -20,7 +20,7 @@ use tokens::tokens::comments::CommentToken;
 use tokens::tokens::users::UserToken;
 use users_component::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use users_component::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
-use users_component::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
+use users_component::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -141,7 +141,7 @@ pub async fn list_comments_handler(
             username: comment.username.to_string(), // NB: Cloned because of ref use for avatar below
             display_name: comment.user_display_name.clone(),
             gravatar_hash: comment.user_gravatar_hash.clone(),
-            default_avatar: DefaultAvatarInfo::from_username(&comment.username),
+            default_avatar: UserDefaultAvatarInfo::from_username(&comment.username),
           },
           user_token: comment.user_token,
           username: comment.username.to_string(), // NB: Cloned because of ref use for avatar below

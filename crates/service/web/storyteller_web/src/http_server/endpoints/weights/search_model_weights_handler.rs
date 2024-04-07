@@ -22,7 +22,7 @@ use enums::common::visibility::Visibility;
 use tokens::tokens::model_weights::ModelWeightToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
-use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
+use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -49,7 +49,7 @@ pub struct ModelWeightSearchResult {
   pub creator: UserDetailsLight,
 
   /// Information about the cover image.
-  pub cover_image: CoverImageDetails,
+  pub cover_image: WeightsCoverImageDetails,
 
   #[deprecated(note="switch to CoverImageDetails")]
   pub maybe_cover_image_public_bucket_path: Option<String>,
@@ -128,7 +128,7 @@ pub async fn search_model_weights_handler(
 
   let results = results.into_iter()
       .map(|result| {
-        let cover_image_details = CoverImageDetails::from_optional_db_fields(
+        let cover_image_details = WeightsCoverImageDetails::from_optional_db_fields(
           &result.token,
           result.maybe_cover_image_public_bucket_hash.as_deref(),
           result.maybe_cover_image_public_bucket_prefix.as_deref(),

@@ -17,7 +17,7 @@ use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::model_weights::ModelWeightToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
-use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
+use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::server_state::ServerState;
 
@@ -42,7 +42,7 @@ pub struct GetWeightResponse {
     file_checksum_sha2: String,
 
     /// Information about the cover image.
-    cover_image: CoverImageDetails,
+    cover_image: WeightsCoverImageDetails,
 
     /// Cover images are small descriptive images that can be set for any model.
     /// If a cover image is set, this is the path to the asset.
@@ -155,7 +155,7 @@ pub async fn get_weight_handler(
         }
     }
 
-    let cover_image_details = CoverImageDetails::from_optional_db_fields(
+    let cover_image_details = WeightsCoverImageDetails::from_optional_db_fields(
         &weight.token,
         weight.maybe_cover_image_public_bucket_hash.as_deref(),
         weight.maybe_cover_image_public_bucket_prefix.as_deref(),

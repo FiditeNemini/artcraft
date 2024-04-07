@@ -18,7 +18,7 @@ use mysql_queries::queries::model_weights::list::list_weights_query_builder::Lis
 use tokens::tokens::model_weights::ModelWeightToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
-use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
+use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::server_state::ServerState;
@@ -61,7 +61,7 @@ pub struct ModelWeightForList {
     pub maybe_cover_image_public_bucket_path: Option<String>,
 
     /// Information about the cover image.
-    pub cover_image: CoverImageDetails,
+    pub cover_image: WeightsCoverImageDetails,
 
     pub creator: UserDetailsLight,
     pub creator_set_visibility: Visibility,
@@ -210,7 +210,7 @@ pub async fn list_available_weights_handler(
         success: true,
         results: weights_page.weights.into_iter()
             .map(|weight| {
-                let cover_image_details = CoverImageDetails::from_optional_db_fields(
+                let cover_image_details = WeightsCoverImageDetails::from_optional_db_fields(
                     &weight.token,
                     weight.maybe_cover_image_public_bucket_hash.as_deref(),
                     weight.maybe_cover_image_public_bucket_prefix.as_deref(),

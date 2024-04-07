@@ -10,24 +10,24 @@ use crate::util::placeholder_images::cover_images::default_cover_image_from_toke
 /// Cover images are small descriptive images that can be set for any model.
 /// If a cover image is set, this is the path to the asset.
 #[derive(Clone, Serialize, ToSchema)]
-pub struct CoverImageDetails {
+pub struct WeightsCoverImageDetails {
   /// If a cover image is set, this is the path to the asset.
   pub maybe_cover_image_public_bucket_path: Option<String>,
 
   /// For items without a cover image, we can use one of our own.
-  pub default_cover: DefaultCoverInfo,
+  pub default_cover: WeightsDefaultCoverInfo,
 }
 
 
 #[derive(Clone, Serialize,ToSchema)]
-pub struct DefaultCoverInfo {
+pub struct WeightsDefaultCoverInfo {
   /// Which image to show.
   pub image_index: u8,
   /// Which color to use.
   pub color_index: u8,
 }
 
-impl CoverImageDetails {
+impl WeightsCoverImageDetails {
 
   pub fn from_optional_db_fields(
     model_weight_token: &ModelWeightToken,
@@ -51,12 +51,12 @@ impl CoverImageDetails {
 
     Self {
       maybe_cover_image_public_bucket_path,
-      default_cover: DefaultCoverInfo::from_token(model_weight_token),
+      default_cover: WeightsDefaultCoverInfo::from_token(model_weight_token),
     }
   }
 }
 
-impl DefaultCoverInfo {
+impl WeightsDefaultCoverInfo {
   pub fn from_token(model_weight_token: &ModelWeightToken) -> Self {
     Self {
       image_index: default_cover_image_from_token(model_weight_token),
@@ -69,7 +69,7 @@ impl DefaultCoverInfo {
 mod tests {
   use tokens::tokens::model_weights::ModelWeightToken;
 
-  use crate::http_server::common_responses::cover_image_details::CoverImageDetails;
+  use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
 
   #[test]
   fn test_from_optional_db_fields() {
@@ -78,7 +78,7 @@ mod tests {
     let maybe_prefix = Some("image_");
     let maybe_extension= Some(".png");
 
-    let cover_image = CoverImageDetails::from_optional_db_fields(
+    let cover_image = WeightsCoverImageDetails::from_optional_db_fields(
       &token,
       maybe_public_bucket_hash,
       maybe_prefix,

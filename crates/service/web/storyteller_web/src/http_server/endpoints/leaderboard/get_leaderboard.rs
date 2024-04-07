@@ -18,7 +18,7 @@ use mysql_queries::queries::w2l::stats::calculate_w2l_template_leaderboard::calc
 use tokens::tokens::users::UserToken;
 use users_component::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use users_component::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
-use users_component::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
+use users_component::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 
 use crate::http_server::web_utils::serialize_as_json_error::serialize_as_json_error;
 use crate::server_state::ServerState;
@@ -201,7 +201,7 @@ async fn query_leaderboard(mysql_pool: &MySqlPool) -> AnyhowResult<LeaderboardIn
           username: record.username.to_string(), // NB: Cloned because of ref use for avatar below
           display_name: record.display_name,
           gravatar_hash: record.gravatar_hash,
-          default_avatar: DefaultAvatarInfo::from_username(&record.username),
+          default_avatar: UserDefaultAvatarInfo::from_username(&record.username),
         },
         uploaded_count: record.uploaded_count,
       })
@@ -222,7 +222,7 @@ async fn query_leaderboard(mysql_pool: &MySqlPool) -> AnyhowResult<LeaderboardIn
           username: record.username.to_string(), // NB: Cloned because of ref use for avatar below
           display_name: record.display_name,
           gravatar_hash: record.gravatar_hash,
-          default_avatar: DefaultAvatarInfo::from_username(&record.username),
+          default_avatar: UserDefaultAvatarInfo::from_username(&record.username),
         },
         uploaded_count: record.uploaded_count,
       })

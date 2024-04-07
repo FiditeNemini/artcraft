@@ -18,8 +18,8 @@ use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_files::list::list_media_files::{list_media_files, ListMediaFilesArgs};
 use tokens::tokens::media_files::MediaFileToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
-use crate::http_server::common_responses::media_file_default_cover::MediaFileDefaultCover;
 
+use crate::http_server::common_responses::media_file_default_cover::MediaFileDefaultCover;
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;

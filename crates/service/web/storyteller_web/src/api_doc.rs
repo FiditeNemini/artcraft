@@ -21,19 +21,19 @@ use tokens::tokens::prompts::*;
 use tokens::tokens::user_bookmarks::*;
 use tokens::tokens::users::*;
 use tokens::tokens::zs_voice_datasets::*;
-use users_component::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
+use users_component::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 use users_component::endpoints::get_profile_handler::*;
 use users_component::endpoints::login_handler::*;
 use users_component::endpoints::logout_handler::*;
 use users_component::endpoints::session_info_handler::*;
 
-use crate::http_server::common_responses::cover_image_details::*;
 use crate::http_server::common_responses::media_file_default_cover::MediaFileDefaultCover;
 use crate::http_server::common_responses::media_file_origin_details::*;
 use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::http_server::common_responses::weights_cover_image_details::*;
 use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::*;
 use crate::http_server::endpoints::engine::create_scene_handler::*;
 use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
@@ -148,10 +148,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     WeightsType,
 
     // Common response structs
-    CoverImageDetails,
-    DefaultAvatarInfo,
-    DefaultCoverInfo,
-    MediaFileDefaultCover,
     MediaFileModelDetails,
     MediaFileOriginDetails,
     MediaFileSocialMetaLight,
@@ -163,6 +159,12 @@ use crate::http_server::web_utils::response_success_helpers::*;
     SimpleGenericJsonSuccess,
     UserDetailsLight,
     Visibility,
+
+    // Common cover image types
+    MediaFileDefaultCover,
+    UserDefaultAvatarInfo,
+    WeightsCoverImageDetails,
+    WeightsDefaultCoverInfo,
 
     // Endpoint API types
     BatchGetMediaFilesError,

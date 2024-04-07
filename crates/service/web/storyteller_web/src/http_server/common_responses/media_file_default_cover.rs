@@ -1,8 +1,8 @@
 use std::hash::{DefaultHasher, Hash, Hasher};
-use utoipa::ToSchema;
-use tokens::tokens::media_files::MediaFileToken;
 
-use tokens::tokens::users::UserToken;
+use utoipa::ToSchema;
+
+use tokens::tokens::media_files::MediaFileToken;
 
 // TODO: Check the model cover number of images
 const NUMBER_OF_IMAGES : u64 = 8;
@@ -47,6 +47,7 @@ fn hash(token: &str, max_number: u64, salt: u8) -> u8 {
 #[cfg(test)]
 mod tests {
   use tokens::tokens::media_files::MediaFileToken;
+
   use crate::http_server::common_responses::media_file_default_cover::MediaFileDefaultCover;
 
   #[test]

@@ -1,4 +1,4 @@
-pub mod cover_image_details;
+pub mod weights_cover_image_details;
 pub mod media_file_default_cover;
 pub mod media_file_origin_details;
 pub mod media_file_social_meta_lite;

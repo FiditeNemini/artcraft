@@ -25,7 +25,7 @@ pub struct UserDetailsLight {
   pub gravatar_hash: String,
 
   /// For users without a gravatar, we show one of our own avatars.
-  pub default_avatar: DefaultAvatarInfo,
+  pub default_avatar: UserDefaultAvatarInfo,
 
   // In the future, we'll also support user-uploaded avatars that we store on our servers.
 }
@@ -39,7 +39,7 @@ impl UserDetailsLight {
     gravatar_hash: &str,
   ) -> Self {
     Self {
-      default_avatar: DefaultAvatarInfo::from_username(&username),
+      default_avatar: UserDefaultAvatarInfo::from_username(&username),
       user_token: user_token.clone(),
       username: username.to_string(),
       display_name: display_name.to_string(),
@@ -70,7 +70,7 @@ impl UserDetailsLight {
     match (maybe_user_token, maybe_username, maybe_display_name, maybe_gravatar_hash) {
       (Some(user_token), Some(username), Some(display_name), Some(gravatar_hash)) => {
         Some(Self {
-          default_avatar: DefaultAvatarInfo::from_username(&username),
+          default_avatar: UserDefaultAvatarInfo::from_username(&username),
           user_token,
           username,
           display_name,
@@ -86,12 +86,12 @@ impl UserDetailsLight {
 
 
 #[derive(Clone, Serialize,ToSchema)]
-pub struct DefaultAvatarInfo {
+pub struct UserDefaultAvatarInfo {
   pub image_index: u8,
   pub color_index: u8,
 }
 
-impl DefaultAvatarInfo {
+impl UserDefaultAvatarInfo {
   /// Default avatars are based on username, not user token.
   /// NB(bt,2023-08-23): I think the thinking here was that we'd always have the
   /// username on hand and that it was more entropic.

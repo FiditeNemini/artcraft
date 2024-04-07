@@ -18,7 +18,7 @@ use enums::by_table::user_bookmarks::user_bookmark_entity_type::UserBookmarkEnti
 use mysql_queries::queries::users::user_bookmarks::list_user_bookmarks_for_entity::list_user_bookmarks_for_entity;
 use mysql_queries::queries::users::user_bookmarks::user_bookmark_entity_token::UserBookmarkEntityToken;
 use tokens::tokens::user_bookmarks::UserBookmarkToken;
-use users_component::common_responses::user_details_lite::{DefaultAvatarInfo, UserDetailsLight};
+use users_component::common_responses::user_details_lite::{UserDefaultAvatarInfo, UserDetailsLight};
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::server_state::ServerState;
@@ -120,7 +120,7 @@ pub async fn list_user_bookmarks_for_entity_handler(
             username: user_bookmark.username.to_string(), // NB: Cloned because of ref use for avatar below
             display_name: user_bookmark.user_display_name.clone(),
             gravatar_hash: user_bookmark.user_gravatar_hash.clone(),
-            default_avatar: DefaultAvatarInfo::from_username(&user_bookmark.username),
+            default_avatar: UserDefaultAvatarInfo::from_username(&user_bookmark.username),
           },
           created_at: user_bookmark.created_at,
           updated_at: user_bookmark.updated_at,
