@@ -46,19 +46,18 @@ export const PageEnigmaComponent = () => {
     }
   };
 
-  let width = pageWidth.value - sidePanelWidth.value - 84;
-  if (!sidePanelVisible.value) {
-    width = pageWidth.value - 84;
-  }
-  if (dndSidePanelWidth.value > -1) {
-    width = pageWidth.value - dndSidePanelWidth.value - 84;
-  }
+  const dndWidth =
+    dndSidePanelWidth.value > -1
+      ? dndSidePanelWidth.value
+      : sidePanelWidth.value;
+  const width = sidePanelVisible.value
+    ? pageWidth.value - dndWidth - 84
+    : pageWidth.value - 84;
 
-  console.log(dndTimelineHeight.value);
-  let height = pageHeight.value - timelineHeight.value - 68;
-  if (dndTimelineHeight.value > -1) {
-    height = pageHeight.value - dndTimelineHeight.value - 68;
-  }
+  const height =
+    dndTimelineHeight.value > -1
+      ? pageHeight.value - dndTimelineHeight.value - 68
+      : pageHeight.value - timelineHeight.value - 68;
 
   return (
     <div>
