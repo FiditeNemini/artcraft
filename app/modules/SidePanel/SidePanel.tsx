@@ -5,6 +5,7 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import {
   dndSidePanelWidth,
+  lastSelectedTab,
   selectedTab,
   sidePanelHeight,
   sidePanelVisible,
@@ -39,8 +40,14 @@ export const SidePanel = () => {
       >
         <button
           onClick={() => {
-            selectedTab.value = null;
-            sidePanelVisible.value = !sidePanelVisible.value;
+            if (sidePanelVisible.value) {
+              lastSelectedTab.value = selectedTab.value;
+              selectedTab.value = null;
+              sidePanelVisible.value = false;
+            } else {
+              selectedTab.value = lastSelectedTab.value;
+              sidePanelVisible.value = true;
+            }
           }}
           className="absolute left-[-25px] flex rounded-l-lg bg-ui-controls px-2 py-3 align-middle text-sm text-white hover:bg-ui-controls-button"
           style={{ top: sidePanelHeight.value / 2 - 10 }}

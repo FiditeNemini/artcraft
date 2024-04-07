@@ -24,22 +24,26 @@ export const AudioTab = () => {
           <button
             className={[
               "bg-assets-background text-nowrap rounded-lg px-3 py-1 text-sm",
+              "disabled:text-gray-500",
               audioFilter.value === AssetFilterOption.MINE
                 ? "border-2 border-brand-primary"
                 : "",
             ].join(" ")}
             onClick={() => (audioFilter.value = AssetFilterOption.MINE)}
+            disabled={!audioItems.value.some((item) => item.isMine)}
           >
             My Audios
           </button>
           <button
             className={[
               "bg-assets-background rounded-lg px-3 py-1 text-sm",
+              "disabled:text-gray-500",
               audioFilter.value === AssetFilterOption.BOOKMARKED
                 ? "border-2 border-brand-primary"
                 : "",
             ].join(" ")}
             onClick={() => (audioFilter.value = AssetFilterOption.BOOKMARKED)}
+            disabled={!audioItems.value.some((item) => item.isBookmarked)}
           >
             Bookmarked
           </button>

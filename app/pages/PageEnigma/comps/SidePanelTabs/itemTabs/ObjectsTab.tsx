@@ -17,6 +17,7 @@ export const ObjectsTab = ({ type }: Props) => {
 
   const assetFilter =
     type === AssetType.CHARACTER ? characterFilter : objectFilter;
+  const items = type === AssetType.CHARACTER ? characterItems : objectItems;
 
   return (
     <>
@@ -36,22 +37,26 @@ export const ObjectsTab = ({ type }: Props) => {
           <button
             className={[
               "bg-assets-background text-nowrap rounded-lg px-3 py-1 text-sm",
+              "disabled:text-gray-500",
               assetFilter.value === AssetFilterOption.MINE
                 ? "border-2 border-brand-primary"
                 : "",
             ].join(" ")}
             onClick={() => (assetFilter.value = AssetFilterOption.MINE)}
+            disabled={!items.value.some((item) => item.isMine)}
           >
             My {type === AssetType.CHARACTER ? "Characters" : "Objects"}
           </button>
           <button
             className={[
               "bg-assets-background rounded-lg px-3 py-1 text-sm",
+              "disabled:text-gray-500",
               assetFilter.value === AssetFilterOption.BOOKMARKED
                 ? "border-2 border-brand-primary"
                 : "",
             ].join(" ")}
             onClick={() => (assetFilter.value = AssetFilterOption.BOOKMARKED)}
+            disabled={!items.value.some((item) => item.isBookmarked)}
           >
             Bookmarked
           </button>
@@ -63,18 +68,7 @@ export const ObjectsTab = ({ type }: Props) => {
         </button>
       </div>
       <div className="mt-2 overflow-y-auto px-2 pt-2">
-        <ItemElements
-          items={
-            type === AssetType.CHARACTER
-              ? characterItems.value
-              : objectItems.value
-          }
-          assetFilter={
-            type === AssetType.CHARACTER
-              ? characterFilter.value
-              : objectFilter.value
-          }
-        />
+        <ItemElements items={items.value} assetFilter={assetFilter.value} />
       </div>
     </>
   );

@@ -7,6 +7,7 @@ export const sidePanelVisible = signal(true);
 export const dndSidePanelWidth = signal(-1);
 
 export const selectedTab = signal<Tab | null>(null);
+export const lastSelectedTab = signal<Tab | null>(null);
 
 export const animationFilter = signal<AssetFilterOption>(AssetFilterOption.ALL);
 export const audioFilter = signal<AssetFilterOption>(AssetFilterOption.ALL);

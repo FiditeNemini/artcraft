@@ -24,22 +24,26 @@ export const CameraTab = () => {
           <button
             className={[
               "bg-assets-background text-nowrap rounded-lg px-3 py-1 text-sm",
+              "disabled:text-gray-500",
               cameraFilter.value === AssetFilterOption.MINE
                 ? "border-2 border-brand-primary"
                 : "",
             ].join(" ")}
             onClick={() => (cameraFilter.value = AssetFilterOption.MINE)}
+            disabled={!cameraItems.value.some((item) => item.isMine)}
           >
             My Cameras
           </button>
           <button
             className={[
               "bg-assets-background rounded-lg px-3 py-1 text-sm",
+              "disabled:text-gray-500",
               cameraFilter.value === AssetFilterOption.BOOKMARKED
                 ? "border-2 border-brand-primary"
                 : "",
             ].join(" ")}
             onClick={() => (cameraFilter.value = AssetFilterOption.BOOKMARKED)}
+            disabled={!cameraItems.value.some((item) => item.isBookmarked)}
           >
             Bookmarked
           </button>

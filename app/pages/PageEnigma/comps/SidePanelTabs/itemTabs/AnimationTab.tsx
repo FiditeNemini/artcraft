@@ -24,17 +24,20 @@ export const AnimationTab = () => {
           <button
             className={[
               "bg-assets-background text-nowrap rounded-lg px-3 py-1 text-sm",
+              "disabled:text-gray-500",
               animationFilter.value === AssetFilterOption.MINE
                 ? "border-2 border-brand-primary"
                 : "",
             ].join(" ")}
             onClick={() => (animationFilter.value = AssetFilterOption.MINE)}
+            disabled={!animationItems.value.some((item) => item.isMine)}
           >
             My Animations
           </button>
           <button
             className={[
               "bg-assets-background rounded-lg px-3 py-1 text-sm",
+              "disabled:text-gray-500",
               animationFilter.value === AssetFilterOption.BOOKMARKED
                 ? "border-2 border-brand-primary"
                 : "",
@@ -42,6 +45,7 @@ export const AnimationTab = () => {
             onClick={() =>
               (animationFilter.value = AssetFilterOption.BOOKMARKED)
             }
+            disabled={!animationItems.value.some((item) => item.isBookmarked)}
           >
             Bookmarked
           </button>

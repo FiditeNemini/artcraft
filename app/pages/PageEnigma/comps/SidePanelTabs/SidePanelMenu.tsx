@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
+  lastSelectedTab,
   selectedTab,
   sidePanelHeight,
   sidePanelVisible,
@@ -36,12 +37,14 @@ export const SidePanelMenu = () => {
             className={[
               "flex flex-col items-center rounded-lg px-2 py-3",
               tab.value === selectedTab?.value?.value
-                ? "bg-assets-selectedTab"
-                : "",
+                ? "bg-assets-selectedTab opacity-100"
+                : "opacity-50",
             ].join(" ")}
             onClick={() => {
               selectedTab.value = tab;
-              sidePanelVisible.value = true;
+              if (!sidePanelVisible.value) {
+                sidePanelVisible.value = true;
+              }
             }}
           >
             <div>
