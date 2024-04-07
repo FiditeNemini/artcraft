@@ -1,4 +1,7 @@
 import { useContext, useEffect, useState } from "react";
+
+import { faArrowsRotate } from "@fortawesome/pro-solid-svg-icons";
+
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 
 import { APPUI_ACTION_TYPES } from "../../../reducers";
@@ -7,7 +10,7 @@ import { AuthenticationContext } from "~/contexts/Authentication";
 import { useSignals } from "@preact/signals-react/runtime";
 // import { timelineHeight } from "~/pages/PageEnigma/store";
 
-import { Button, Label, P } from "~/components";
+import { Button, ButtonIcon, Label, P } from "~/components";
 import { ClipType } from "../../../models/track";
 import { AudioElement } from "./AudioElement";
 import { ListAudioByUser, MediaFile } from "./listAudioByUser";
@@ -21,20 +24,25 @@ export const TabAudio = () => {
   useSignals();
 
   useEffect(() => {
-
-    if(authState.userInfo && authState.userInfo.username)
+    if(authState.userInfo && authState.userInfo.username && userAudioClips.length === 0)
       ListAudioByUser(authState.userInfo.username)
         .then(res=>{
           setUserAudioClips([...res]);
         });
-  }, []);
+  }, [authState]);
 
   const openTTSPanel = () =>{
     dispatchAppUiState({
       type: APPUI_ACTION_TYPES.OPEN_DIALOGUE_TTS
     })
   };
-
+  const handleRefreshUserMedia = ()=>{
+    if(authState.userInfo && authState.userInfo.username)
+      ListAudioByUser(authState.userInfo.username)
+        .then(res=>{
+          setUserAudioClips([...res]);
+        });
+  }
   return (
     <div 
       className="flex flex-col gap-3"
@@ -72,7 +80,10 @@ export const TabAudio = () => {
       </div>
 
       <div className="flex flex-col mt-1">
-        <Label>My Dialogues</Label>
+        <div className="flex justify-between">
+          <Label>My Dialogues</Label>
+          <ButtonIcon icon={faArrowsRotate} onClick={handleRefreshUserMedia}/>
+        </div>
         {userAudioClips.length === 0 && 
           <div className="flex justify-center items-center text-center w-full h-40">
             <P className="text-brand-secondary-300"> No audio generated yet</P>

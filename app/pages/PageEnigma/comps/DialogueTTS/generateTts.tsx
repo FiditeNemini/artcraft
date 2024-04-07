@@ -29,8 +29,15 @@ export async function GenerateTtsAudio(request: GenerateTtsAudioRequest) : Promi
   })
   .then(res =>  res.json())
   .then(res => {
-    console.log(res);
-    return;
+    if (!('inference_job_token' in res)) {
+      return { error: GenerateTtsAudioErrorType.UnknownError };
+    }
+    const ret:GenerateTtsAudioSuccess = {
+      success: true,
+      inference_job_token: res.inference_job_token,
+      inference_job_token_type: res.inference_job_token_type,
+    }
+    return ret;
   })
   .catch(e => {
     let maybeError = maybeMapError(e);

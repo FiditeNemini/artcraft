@@ -1,6 +1,11 @@
 import { useCallback, useContext, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { faVolume, faShuffle, faPlay } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faVolume,
+  faShuffle,
+  faPlay,
+  faBrainCircuit,
+} from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AppUiContext } from "../../contexts/AppUiContext";
 import { APPUI_ACTION_TYPES } from "../../reducers";
@@ -8,17 +13,21 @@ import {
   Button,
   H5,
   Label,
+  LoadingDotsTyping,
   ListSearchDropdown,
   TransitionDialogue,
   Textarea
 } from "~/components";
 import { ListTtsModels } from "./utilities";
 import { TtsModelListItem } from "./types";
-import { GenerateTtsAudio } from "./generate";
+import { GenerateTtsAudio } from "./generateTts";
+
 
 type TtsState = {
   voice: TtsModelListItem | undefined;
   text: string;
+  hasEnqueued :boolean;
+  inferenceToken?: string;
   hasAudio: boolean;
 }
 
@@ -27,7 +36,8 @@ export const DialogueTTS = ()=>{
   const [ttsState, setTtsState] = useState<TtsState>({
     voice:undefined,
     text:"",
-    hasAudio:false
+    hasEnqueued:false,
+    hasAudio:false,
   });
 
   const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
@@ -47,8 +57,7 @@ export const DialogueTTS = ()=>{
     listModels();
   }, [listModels]);
 
-  const requestTts = useCallback(async ()=>{
-
+  const requestTts = useCallback( ()=>{
     const modelToken = ttsState.voice ? ttsState.voice.model_token : undefined;
 
     if(modelToken){
@@ -57,8 +66,16 @@ export const DialogueTTS = ()=>{
         tts_model_token: modelToken,
         inference_text: ttsState.text,
       };
-      console.log(request);
-      const response = await GenerateTtsAudio(request);
+      // console.log(request);
+      GenerateTtsAudio(request).then(res=>{
+        if(res.inference_job_token){
+          setTtsState((curr)=>({
+            ...curr,
+            hasEnqueued: true,
+            inferenceToken: res.inference_job_token
+          }));
+        }
+      });
     }else{
       console.log("no voice model selected");
     }
@@ -83,8 +100,8 @@ export const DialogueTTS = ()=>{
     const voiceModel = ttsModels.find((item)=>{
       if (item.title === val) return item
     })
-    console.log(val);
-    console.log(voiceModel);
+    // console.log(val);
+    // console.log(voiceModel);
     setTtsState((curr)=>({
       ...curr,
       voice: voiceModel,
@@ -123,32 +140,42 @@ export const DialogueTTS = ()=>{
           onChange={handleTextInput}
         />
         <div className="mt-6 flex gap-2">
-          <Button
-            variant={ttsState.hasAudio ? "secondary" : "primary" }
-            disabled={ttsState.text === ""}
-            icon={faPlay}
-            onClick={requestTts}
-          >
-            Speak
-          </Button>
+          <div className="w-40 h-12">
+            {!ttsState.hasAudio && !ttsState.hasEnqueued &&
+              <Button
+                className="w-full h-full text-xl "
+                variant={ttsState.hasAudio ? "secondary" : "primary" }
+                disabled={ttsState.text === ""}
+                icon={faBrainCircuit}
+                onClick={requestTts}
+              >
+                Generate
+              </Button>
+            }
+            {!ttsState.hasAudio && ttsState.hasEnqueued &&
+              <LoadingDotsTyping className="bg-brand-secondary-500 rounded-lg"/>
+            }
+            {ttsState.hasAudio &&
+              <Button
+                className="w-full h-full text-xl"
+                variant={ttsState.hasAudio ? "secondary" : "primary" }
+                disabled={ttsState.text === ""}
+                icon={faPlay}
+                // onClick={requestTts}
+              >
+                Speak
+              </Button>
+            }
+          </div>
         </div>
+
         <div className="mt-6 flex justify-end gap-2">
           <Button
             type="button"
             onClick={handleClose}
             variant="secondary"
           >
-            Cancel
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            disabled={!ttsState.hasAudio}
-            onClick={(e) => {
-              console.log("Add to Lip Sync Track Triggered")
-            }}
-          >
-            Add to Lip Sync Track
+            {ttsState.hasEnqueued ? 'Close':'Cancel'}
           </Button>
         </div>
       </div>
