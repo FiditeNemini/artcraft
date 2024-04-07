@@ -218,7 +218,7 @@ class Scene {
         directional_light.shadow.mapSize.width = 2048;
         directional_light.shadow.mapSize.height = 2048;
         directional_light.shadow.map = null;
-        directional_light.castShadow = true;
+        directional_light.castShadow = false;
         directional_light.shadow.bias = 0.00004;
         directional_light.userData["media_id"] = "DirectionalLight";
 
