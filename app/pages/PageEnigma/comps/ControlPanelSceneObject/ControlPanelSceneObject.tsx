@@ -144,7 +144,7 @@ export const ControlPanelSceneObject = () => {
   };
 
   const handleDeleteObject = () =>{
-    console.log("TELL EDITOR TO DELETE HERE");
+    editorEngine?.deleteObject(currentSceneObject.object_uuid);
   }
 
   return (
