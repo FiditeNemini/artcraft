@@ -587,6 +587,10 @@ class Editor {
     }
   }
 
+  public async loadMediaToken(media_file_token: string) {
+    this.activeScene.load_glb(media_file_token);
+  }
+
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
