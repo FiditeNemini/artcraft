@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect } from "react";
-import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
+import { MediaItem } from "~/pages/PageEnigma/models";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import {
   canDrop,
@@ -11,10 +11,9 @@ import { useSignals } from "@preact/signals-react/runtime";
 
 interface Props {
   item: MediaItem;
-  type: AssetType;
 }
 
-export const AnimationElement = ({ item, type }: Props) => {
+export const ItemElement = ({ item }: Props) => {
   useSignals();
   const { startDrag, endDrag } = useContext(TrackContext);
   const { initX, initY } = initPosition.value;

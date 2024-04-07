@@ -10,6 +10,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 25,
     name: "Sit",
     thumbnail: "resources/characters/img01.png",
+    isMine: true,
   },
   {
     version: 1,
@@ -18,6 +19,7 @@ export const animationItems = signal<MediaItem[]>([
     length: 25,
     name: "Idle",
     thumbnail: "resources/characters/img01.png",
+    isBookmarked: true,
   },
   {
     version: 1,
@@ -26,6 +28,8 @@ export const animationItems = signal<MediaItem[]>([
     length: 25,
     name: "Stand",
     thumbnail: "resources/characters/img01.png",
+    isMine: true,
+    isBookmarked: true,
   },
   {
     version: 1,

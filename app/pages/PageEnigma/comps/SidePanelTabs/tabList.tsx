@@ -1,9 +1,8 @@
 import { AssetType } from "~/pages/PageEnigma/models";
-import { AnimationTab } from "~/pages/PageEnigma/comps/SidePanelTabs/animation/AnimationTab";
-import { ObjectsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/objects/ObjectsTab";
-import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/audio/AudioTab";
-import { CameraTab } from "~/pages/PageEnigma/comps/SidePanelTabs/camera/CameraTab";
-import { ShapeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/shapes/ShapeTab";
+import { ObjectsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ObjectsTab";
+import { ShapeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ShapeTab";
+import { AnimationTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AnimationTab";
+import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AudioTab";
 
 export const tabList = [
   {

@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { pageHeight, timelineHeight } from "~/pages/PageEnigma/store";
-import { CameraElements } from "~/pages/PageEnigma/comps/SidePanelTabs/camera/CameraElements";
+import { cameraFilter, cameraItems } from "~/pages/PageEnigma/store";
+import { AssetFilterOption } from "~/pages/PageEnigma/models";
+import { useSignals } from "@preact/signals-react/runtime";
+import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 
 export const CameraTab = () => {
-  const height = pageHeight.value - timelineHeight.value;
-  const [selectedButton, setSelectedButton] = useState("all");
+  useSignals();
 
   return (
     <>
@@ -13,29 +13,33 @@ export const CameraTab = () => {
           <button
             className={[
               "bg-assets-background rounded-lg px-3 py-1 text-sm",
-              selectedButton === "all" ? "border-2 border-brand-primary" : "",
+              cameraFilter.value === AssetFilterOption.ALL
+                ? "border-2 border-brand-primary"
+                : "",
             ].join(" ")}
-            onClick={() => setSelectedButton("all")}
+            onClick={() => (cameraFilter.value = AssetFilterOption.ALL)}
           >
             All
           </button>
           <button
             className={[
               "bg-assets-background text-nowrap rounded-lg px-3 py-1 text-sm",
-              selectedButton === "mine" ? "border-2 border-brand-primary" : "",
+              cameraFilter.value === AssetFilterOption.MINE
+                ? "border-2 border-brand-primary"
+                : "",
             ].join(" ")}
-            onClick={() => setSelectedButton("mine")}
+            onClick={() => (cameraFilter.value = AssetFilterOption.MINE)}
           >
             My Cameras
           </button>
           <button
             className={[
               "bg-assets-background rounded-lg px-3 py-1 text-sm",
-              selectedButton === "bookmarked"
+              cameraFilter.value === AssetFilterOption.BOOKMARKED
                 ? "border-2 border-brand-primary"
                 : "",
             ].join(" ")}
-            onClick={() => setSelectedButton("bookmarked")}
+            onClick={() => (cameraFilter.value = AssetFilterOption.BOOKMARKED)}
           >
             Bookmarked
           </button>
@@ -46,11 +50,11 @@ export const CameraTab = () => {
           Create Camera
         </button>
       </div>
-      <div
-        className="mt-2 overflow-y-auto px-2 pt-2"
-        style={{ height: height - 140 }}
-      >
-        <CameraElements />
+      <div className="mt-2 overflow-y-auto px-2 pt-2">
+        <ItemElements
+          items={cameraItems.value}
+          assetFilter={cameraFilter.value}
+        />
       </div>
     </>
   );

@@ -1,8 +1,10 @@
-import { useState } from "react";
-import { AnimationElements } from "~/pages/PageEnigma/comps/SidePanelTabs/animation/AnimationElements";
+import { animationFilter, animationItems } from "~/pages/PageEnigma/store";
+import { AssetFilterOption } from "~/pages/PageEnigma/models";
+import { useSignals } from "@preact/signals-react/runtime";
+import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 
 export const AnimationTab = () => {
-  const [selectedButton, setSelectedButton] = useState("all");
+  useSignals();
 
   return (
     <>
@@ -11,29 +13,35 @@ export const AnimationTab = () => {
           <button
             className={[
               "bg-assets-background rounded-lg px-3 py-1 text-sm",
-              selectedButton === "all" ? "border-2 border-brand-primary" : "",
+              animationFilter.value === AssetFilterOption.ALL
+                ? "border-2 border-brand-primary"
+                : "",
             ].join(" ")}
-            onClick={() => setSelectedButton("all")}
+            onClick={() => (animationFilter.value = AssetFilterOption.ALL)}
           >
             All
           </button>
           <button
             className={[
               "bg-assets-background text-nowrap rounded-lg px-3 py-1 text-sm",
-              selectedButton === "mine" ? "border-2 border-brand-primary" : "",
+              animationFilter.value === AssetFilterOption.MINE
+                ? "border-2 border-brand-primary"
+                : "",
             ].join(" ")}
-            onClick={() => setSelectedButton("mine")}
+            onClick={() => (animationFilter.value = AssetFilterOption.MINE)}
           >
             My Animations
           </button>
           <button
             className={[
               "bg-assets-background rounded-lg px-3 py-1 text-sm",
-              selectedButton === "bookmarked"
+              animationFilter.value === AssetFilterOption.BOOKMARKED
                 ? "border-2 border-brand-primary"
                 : "",
             ].join(" ")}
-            onClick={() => setSelectedButton("bookmarked")}
+            onClick={() =>
+              (animationFilter.value = AssetFilterOption.BOOKMARKED)
+            }
           >
             Bookmarked
           </button>
@@ -45,7 +53,10 @@ export const AnimationTab = () => {
         </button>
       </div>
       <div className="w-full overflow-y-auto px-2 pt-2">
-        <AnimationElements />
+        <ItemElements
+          items={animationItems.value}
+          assetFilter={animationFilter.value}
+        />
       </div>
     </>
   );

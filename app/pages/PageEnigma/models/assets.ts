@@ -1,5 +1,3 @@
-import { ClipType } from "~/pages/PageEnigma/models";
-
 export interface MediaItem {
   version: number;
   type: AssetType;
@@ -7,6 +5,8 @@ export interface MediaItem {
   name: string;
   length?: number;
   thumbnail: string;
+  isMine?: boolean;
+  isBookmarked?: boolean;
 }
 
 export enum AssetType {
@@ -16,4 +16,10 @@ export enum AssetType {
   ANIMATION = "animation",
   CAMERA = "camera",
   SHAPE = "shape",
+}
+
+export enum AssetFilterOption {
+  ALL,
+  MINE,
+  BOOKMARKED,
 }
