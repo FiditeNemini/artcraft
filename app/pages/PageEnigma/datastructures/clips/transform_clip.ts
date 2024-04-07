@@ -85,7 +85,7 @@ export class TransformClip {
     this.step_frame = frame - offset;
     //if (this.step_frame < 0) { this.step_frame = 0; }
     //if (this.step_frame >= this.length) { return; } // Reached max frames.
-    if (this.keyframes.length < 2) { return; } // If there are enough points in the scene.
+    if (this.keyframes.length < 1) { return; } // If there are enough points in the scene.
 
     // Find the current and next keyframes based on time_frame
     let { currentKeyframe, nextKeyframe } = this.findNextNumber(this.step_frame);

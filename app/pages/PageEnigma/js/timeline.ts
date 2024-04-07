@@ -171,6 +171,8 @@ export class TimeLine {
                 0,
                 this.absolute_end))
         }
+
+        this.scene.createPoint(data_json['position'], data_json['keyframe_uuid']);
     }
 
     public async addClip(data: any) {
@@ -230,6 +232,7 @@ export class TimeLine {
         let keyframe_uuid = data['data']["keyframe_uuid"];
         let object_uuid = data['data']['object_uuid'];
         this.transform_engine.clips[object_uuid].removeKeyframe(keyframe_uuid);
+        this.scene.deletePoint(keyframe_uuid);
     }
 
     public async updateKeyFrame(data: any) {

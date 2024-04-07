@@ -67,6 +67,9 @@ export class StoryTellerProxyScene {
           default:
             if(token.includes('m_')){
               obj = await this.scene.load_glb(token);
+            } else if(token.includes('Point::')){
+              let keyframe_uuid = token.replace("Point::", "");
+              obj = this.scene.createPoint(new THREE.Vector3(0,0,0), keyframe_uuid);
             }
             break;
         }

@@ -447,6 +447,8 @@ class Editor {
       this.current_scene_media_token,
     );
 
+    console.log(result);
+
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
     });
@@ -554,11 +556,6 @@ class Editor {
           this.cameraViewControls.enabled = true;
         }
         this.cam_obj.scale.set(0, 0, 0);
-        if (this.activeScene.hot_items) {
-          this.activeScene.hot_items.forEach((element) => {
-            element.visible = false;
-          });
-        }
 
         this.removeTransformControls();
         this.selected = this.cam_obj;
@@ -1025,6 +1022,11 @@ class Editor {
   startPlayback() {
     this.timeline.is_playing = true;
     this.timeline.scrubber_frame_position = 0;
+    if (this.activeScene.hot_items) {
+      this.activeScene.hot_items.forEach((element) => {
+        element.visible = false;
+      });
+    }
     if (!this.camera_person_mode) {
       this.switchCameraView();
     }
@@ -1137,6 +1139,7 @@ class Editor {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const interactable: any[] = [];
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
+      console.log(child);
       if (child.name != "") {
         if (child.type == "Mesh" || child.type == "Object3D") {
           interactable.push(child);
