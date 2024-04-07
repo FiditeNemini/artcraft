@@ -18,6 +18,7 @@ use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_files::list::list_media_files::{list_media_files, ListMediaFilesArgs};
 use tokens::tokens::media_files::MediaFileToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::media_file_default_cover::MediaFileDefaultCover;
 
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
@@ -66,6 +67,9 @@ pub struct MediaFileListItem {
 
   /// URL to the media file.
   pub public_bucket_path: String,
+
+  // Default cover image if there is nothing else we can use as a cover and thumbnail.
+  pub default_cover: MediaFileDefaultCover,
 
   pub maybe_creator: Option<UserDetailsLight>,
 
@@ -239,6 +243,7 @@ pub async fn list_media_files_handler(
           record.maybe_public_bucket_extension.as_deref())
             .get_full_object_path_str()
             .to_string(),
+        default_cover: MediaFileDefaultCover::from_token(&record.token),
         maybe_creator: UserDetailsLight::from_optional_db_fields_owned(
           record.maybe_creator_user_token,
           record.maybe_creator_username,

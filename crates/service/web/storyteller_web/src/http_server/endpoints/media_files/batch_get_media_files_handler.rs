@@ -26,6 +26,7 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
+use crate::http_server::common_responses::media_file_default_cover::MediaFileDefaultCover;
 
 use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
@@ -77,6 +78,9 @@ pub struct BatchMediaFileInfo {
 
   /// URL to the media file
   pub public_bucket_path: String,
+
+  // Default cover image if there is nothing else we can use as a cover and thumbnail.
+  pub default_cover: MediaFileDefaultCover,
 
   //// Provenance Data
   //pub origin_product: MediaFileOriginProductCategory,
@@ -271,13 +275,14 @@ pub async fn batch_get_media_files_handler(
         };
 
         BatchMediaFileInfo {
-          token: result.token,
+          token: result.token.clone(),
           media_type: result.media_type,
           media_class: result.media_class,
           maybe_media_subtype: result.maybe_media_subtype,
           maybe_engine_extension,
           maybe_batch_token: result.maybe_batch_token,
           public_bucket_path,
+          default_cover: MediaFileDefaultCover::from_token(&result.token),
           maybe_title: result.maybe_title,
           maybe_text_transcript: result.maybe_text_transcript,
           maybe_model_weight_info: match result.maybe_model_weights_token {

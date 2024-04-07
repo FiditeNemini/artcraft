@@ -4,10 +4,11 @@ use tokens::tokens::media_files::MediaFileToken;
 
 use tokens::tokens::users::UserToken;
 
-const NUMBER_OF_IMAGES : u64 = 10;
+// TODO: Check the model cover number of images
+const NUMBER_OF_IMAGES : u64 = 8;
 const NUMBER_OF_IMAGES_SALT_OFFSET : u8 = 5;
 
-const NUMBER_OF_COLORS : u64 = 5;
+const NUMBER_OF_COLORS : u64 = 8;
 const NUMBER_OF_COLORS_SALT_OFFSET : u8 = 1;
 
 #[derive(Clone, Serialize,ToSchema)]
@@ -17,10 +18,16 @@ pub struct MediaFileDefaultCover {
 }
 
 impl MediaFileDefaultCover {
+  /// Typical constructor
   pub fn from_token(token: &MediaFileToken) -> Self {
+    Self::from_token_str(token.as_str())
+  }
+
+  /// For non-media file tokens (eg. emulated TTS results)
+  pub fn from_token_str(token: &str) -> Self {
     Self {
-      image_index: hash(token.as_str(), NUMBER_OF_IMAGES, NUMBER_OF_IMAGES_SALT_OFFSET),
-      color_index: hash(token.as_str(), NUMBER_OF_COLORS, NUMBER_OF_COLORS_SALT_OFFSET),
+      image_index: hash(token, NUMBER_OF_IMAGES, NUMBER_OF_IMAGES_SALT_OFFSET),
+      color_index: hash(token, NUMBER_OF_COLORS, NUMBER_OF_COLORS_SALT_OFFSET),
     }
   }
 }
@@ -44,10 +51,19 @@ mod tests {
 
   #[test]
   fn test() {
+    let token = MediaFileToken::new_from_str("foo");
+    let cover = MediaFileDefaultCover::from_token(&token);
+    assert_eq!(cover.color_index, 5);
+    assert_eq!(cover.image_index, 4);
+
+    let token = MediaFileToken::new_from_str("bar");
+    let cover = MediaFileDefaultCover::from_token(&token);
+    assert_eq!(cover.color_index, 5);
+    assert_eq!(cover.image_index, 2);
+
     let token = MediaFileToken::new_from_str("asdf");
     let cover = MediaFileDefaultCover::from_token(&token);
-
-    assert_eq!(cover.color_index, 3);
-    assert_eq!(cover.image_index, 16);
+    assert_eq!(cover.color_index, 0);
+    assert_eq!(cover.image_index, 0);
   }
 }

@@ -28,6 +28,7 @@ use users_component::endpoints::logout_handler::*;
 use users_component::endpoints::session_info_handler::*;
 
 use crate::http_server::common_responses::cover_image_details::*;
+use crate::http_server::common_responses::media_file_default_cover::MediaFileDefaultCover;
 use crate::http_server::common_responses::media_file_origin_details::*;
 use crate::http_server::common_responses::media_file_social_meta_lite::MediaFileSocialMetaLight;
 use crate::http_server::common_responses::pagination_cursors::PaginationCursors;
@@ -39,7 +40,6 @@ use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
 use crate::http_server::endpoints::media_files::batch_get_media_files_handler::*;
 use crate::http_server::endpoints::media_files::change_media_file_visibility_handler::*;
-use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::*;
 use crate::http_server::endpoints::media_files::delete_media_file::*;
 use crate::http_server::endpoints::media_files::get_media_file::*;
 use crate::http_server::endpoints::media_files::list::list_featured_media_files::*;
@@ -50,6 +50,7 @@ use crate::http_server::endpoints::media_files::rename_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::*;
+use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_write::write_engine_asset::write_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_write::write_error::MediaFileWriteError;
@@ -150,6 +151,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     CoverImageDetails,
     DefaultAvatarInfo,
     DefaultCoverInfo,
+    MediaFileDefaultCover,
     MediaFileModelDetails,
     MediaFileOriginDetails,
     MediaFileSocialMetaLight,

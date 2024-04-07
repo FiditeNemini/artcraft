@@ -19,6 +19,7 @@ use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
 use mysql_queries::queries::media_files::list::list_media_files_for_user::{list_media_files_for_user, ListMediaFileForUserArgs};
 use tokens::tokens::media_files::MediaFileToken;
+use crate::http_server::common_responses::media_file_default_cover::MediaFileDefaultCover;
 
 use crate::http_server::common_responses::media_file_origin_details::MediaFileOriginDetails;
 use crate::http_server::common_responses::pagination_page::PaginationPage;
@@ -80,6 +81,9 @@ pub struct MediaFileForUserListItem {
 
   /// URL to the media file.
   pub public_bucket_path: String,
+
+  // Default cover image if there is nothing else we can use as a cover and thumbnail.
+  pub default_cover: MediaFileDefaultCover,
 
   pub creator_set_visibility: Visibility,
 
@@ -230,7 +234,7 @@ pub async fn list_media_files_for_user_handler(
         true
       })
       .map(|record| MediaFileForUserListItem {
-        token: record.token,
+        token: record.token.clone(),
         media_type: record.media_type,
         media_class: record.media_class,
         origin: MediaFileOriginDetails::from_db_fields_str(
@@ -249,6 +253,7 @@ pub async fn list_media_files_for_user_handler(
           record.maybe_public_bucket_extension.as_deref())
             .get_full_object_path_str()
             .to_string(),
+        default_cover: MediaFileDefaultCover::from_token(&record.token),
         creator_set_visibility: record.creator_set_visibility,
         maybe_title: record.maybe_title,
         maybe_text_transcript: record.maybe_text_transcript,
