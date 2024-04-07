@@ -51,8 +51,8 @@ export const PageEnigmaComponent = () => {
       ? dndSidePanelWidth.value
       : sidePanelWidth.value;
   const width = sidePanelVisible.value
-    ? pageWidth.value - dndWidth - 84
-    : pageWidth.value - 84;
+    ? pageWidth.value - dndWidth - 66
+    : pageWidth.value - 66;
 
   const height =
     dndTimelineHeight.value > -1
@@ -60,13 +60,16 @@ export const PageEnigmaComponent = () => {
       : pageHeight.value - timelineHeight.value - 68;
 
   return (
-    <div>
+    <div className="w-screen">
       <TopBarHelmet>
         <Button icon={faSparkles} onClick={handleGenerateMovieClick}>
           Generate Movie
         </Button>
       </TopBarHelmet>
-      <div className="flex" style={{ height: "calc(100vh - 68px)" }}>
+      <div
+        className="relative flex w-screen"
+        style={{ height: "calc(100vh - 68px)" }}
+      >
         {/* Engine section/side panel */}
         <div
           id="engine-n-panels-wrapper"

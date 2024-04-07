@@ -1,20 +1,12 @@
 import { useState } from "react";
 import { AnimationElements } from "~/pages/PageEnigma/comps/SidePanelTabs/animation/AnimationElements";
-import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
-import { useSignals } from "@preact/signals-react/runtime";
 
 export const AnimationTab = () => {
-  useSignals();
   const [selectedButton, setSelectedButton] = useState("all");
-
-  const displayWidth =
-    dndSidePanelWidth.value > -1
-      ? dndSidePanelWidth.value
-      : sidePanelWidth.value;
 
   return (
     <>
-      <div className="overflow-x-auto" style={{ width: displayWidth }}>
+      <div className="w-full overflow-x-auto">
         <div className="mb-4 mt-2 flex justify-start gap-2 px-2">
           <button
             className={[
@@ -47,12 +39,12 @@ export const AnimationTab = () => {
           </button>
         </div>
       </div>
-      <div className="px-2">
+      <div className="w-full px-2">
         <button className="bg-assets-background w-full rounded-lg py-2">
           Upload Animation
         </button>
       </div>
-      <div className="overflow-y-auto px-2 pt-2">
+      <div className="w-full overflow-y-auto px-2 pt-2">
         <AnimationElements />
       </div>
     </>

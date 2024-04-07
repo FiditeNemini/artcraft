@@ -4,11 +4,11 @@ import { AppUIProvider } from "~/pages/PageEnigma/contexts/AppUiContext";
 import { EngineProvider } from "~/pages/PageEnigma/contexts/EngineProvider";
 import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
 // import { toast, ToastBar, Toaster } from "react-hot-toast";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faTriangleExclamation,
-  faXmark,
-} from "@fortawesome/pro-solid-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import {
+//   faTriangleExclamation,
+//   faXmark,
+// } from "@fortawesome/pro-solid-svg-icons";
 import { useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
@@ -22,8 +22,12 @@ export const PageEnigma = () => {
   useSignals();
   useEffect(() => {
     function setPage() {
-      pageHeight.value = window.innerHeight;
-      pageWidth.value = window.outerWidth;
+      const pxRatioWidth =
+        window.screen.availWidth / document.documentElement.clientWidth;
+      const pxRatioHeight =
+        window.screen.availHeight / document.documentElement.clientHeight;
+      pageHeight.value = window.outerHeight / pxRatioHeight;
+      pageWidth.value = window.outerWidth / pxRatioWidth;
     }
     timelineHeight.value = window.innerHeight * 0.25;
     sidePanelWidth.value = 443;

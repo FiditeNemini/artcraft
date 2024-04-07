@@ -10,17 +10,13 @@ import { ShapeElements } from "~/pages/PageEnigma/comps/SidePanelTabs/shapes/Sha
 export const ShapeTab = () => {
   useSignals();
   const height = pageHeight.value - timelineHeight.value;
-  const displayWidth =
-    dndSidePanelWidth.value > -1
-      ? dndSidePanelWidth.value
-      : sidePanelWidth.value;
 
   return (
     <>
       <div className="p-2 text-base font-bold">Shapes</div>
       <div
-        className="mt-2 overflow-y-auto px-2 pt-2"
-        style={{ height: height - 140, width: displayWidth }}
+        className="mt-2 w-full overflow-y-auto px-2 pt-2"
+        style={{ height: height - 140 }}
       >
         <ShapeElements />
       </div>

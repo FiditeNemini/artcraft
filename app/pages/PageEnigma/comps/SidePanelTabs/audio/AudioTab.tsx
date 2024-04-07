@@ -1,20 +1,12 @@
 import { useState } from "react";
 import { AudioElements } from "~/pages/PageEnigma/comps/SidePanelTabs/audio/AudioElements";
-import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
-import { useSignals } from "@preact/signals-react/runtime";
 
 export const AudioTab = () => {
-  useSignals();
   const [selectedButton, setSelectedButton] = useState("all");
-
-  const displayWidth =
-    dndSidePanelWidth.value > -1
-      ? dndSidePanelWidth.value
-      : sidePanelWidth.value;
 
   return (
     <>
-      <div className="overflow-x-auto" style={{ width: displayWidth }}>
+      <div className="w-full overflow-x-auto">
         <div className="mb-4 mt-2 flex justify-start gap-2 px-2">
           <button
             className={[

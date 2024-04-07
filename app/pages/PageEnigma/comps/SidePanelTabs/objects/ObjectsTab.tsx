@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { AssetType } from "~/pages/PageEnigma/models";
 import { ObjectElements } from "~/pages/PageEnigma/comps/SidePanelTabs/objects/ObjectElements";
-import {
-  dndSidePanelWidth,
-  pageHeight,
-  sidePanelWidth,
-  timelineHeight,
-} from "~/pages/PageEnigma/store";
+import { pageHeight, timelineHeight } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
 interface Props {
@@ -18,14 +13,9 @@ export const ObjectsTab = ({ type }: Props) => {
   const height = pageHeight.value - timelineHeight.value;
   const [selectedButton, setSelectedButton] = useState("all");
 
-  const displayWidth =
-    dndSidePanelWidth.value > -1
-      ? dndSidePanelWidth.value
-      : sidePanelWidth.value;
-
   return (
     <>
-      <div className="overflow-x-auto" style={{ width: displayWidth }}>
+      <div className="w-full overflow-x-auto">
         <div className="mb-4 mt-2 flex justify-start gap-2 px-2">
           <button
             className={[

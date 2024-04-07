@@ -12,14 +12,9 @@ export const SidePanelTabs = () => {
   useSignals();
   const { onPointerDown } = useMouseEventsSidePanel();
 
-  const displayWidth =
-    dndSidePanelWidth.value > -1
-      ? dndSidePanelWidth.value
-      : sidePanelWidth.value;
-
   return (
     <>
-      <div style={{ height: sidePanelHeight.value, width: displayWidth }}>
+      <div style={{ height: sidePanelHeight.value, width: "100%" }}>
         {tabList.map((tab) => (
           <div
             key={tab.value}
