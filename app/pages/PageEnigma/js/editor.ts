@@ -474,67 +474,6 @@ class Editor {
     this.outlinePass.selectedObjects = [];
   }
 
-  async _serialize_timeline() {
-    // note the database from the server is the source of truth for all the data.
-    // Test code here
-    const object: THREE.Object3D = await this.activeScene.load_glb(
-      "./resources/models/fox/fox.glb",
-    );
-
-    // load object into the engine for lip syncing
-    this.lipsync_engine.load_object(
-      object.uuid,
-      "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
-    );
-
-    // create the clip with the same id for a reference to the media
-    this.timeline.addPlayableClip(
-      new ClipUI(
-        1.0,
-        "lipsync",
-        "character",
-        "clip1",
-        "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
-        object.uuid,
-        150,
-        400,
-      ),
-    );
-
-    // media id for this is up in the air but when a path is created you should be able to store and delete it
-    this.timeline.addPlayableClip(
-      new ClipUI(
-        1.0,
-        "transform",
-        "character",
-        "clip2",
-        object.uuid,
-        object.uuid,
-        0,
-        150,
-      ),
-    );
-
-    // media id for this as well it can be downloaded
-    this.timeline.addPlayableClip(
-      new ClipUI(
-        1.0,
-        "animation",
-        "character",
-        "clip3",
-        "/resources/models/fox/fox_idle.glb",
-        object.uuid,
-        0,
-        400,
-      ),
-    );
-    this.animation_engine.load_object(
-      object.uuid,
-      "/resources/models/fox/fox_idle.glb",
-      "clip3",
-    );
-  }
-
   switchCameraView() {
     this.camera_person_mode = !this.camera_person_mode;
     console.log(this.camera_person_mode);
@@ -546,6 +485,7 @@ class Editor {
 
         this.camera.position.copy(this.cam_obj.position);
         this.camera.rotation.copy(this.cam_obj.rotation);
+
         if (this.orbitControls) {
           this.orbitControls.enabled = false;
         }
@@ -603,6 +543,7 @@ class Editor {
     // Stick Open Pose Man: m_9f3d3z94kk6m25zywyz6an3p43fjtw
     // XBot: m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d 
     // YBot: m_9sqg0evpr23587jnr8z3zsvav1x077
+    // Shrek: m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp
   }
 
   // Configure post processing.
@@ -676,7 +617,7 @@ class Editor {
     }
     this.removeTransformControls();
     this.selected = undefined;
-    this.dispatchAppUiState({type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT});
+    this.dispatchAppUiState({ type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT });
     this.timeline.deleteObject(uuid)
   }
 
@@ -753,6 +694,11 @@ class Editor {
         }
 
         this.cam_obj.visible = false;
+
+        const min = new THREE.Vector3(-12, -1, -12);
+        const max = new THREE.Vector3(12, 24, 12);
+        this.camera.position.copy(this.camera.position.clamp(min, max));
+
       }
     }
     else if (this.cam_obj) {
