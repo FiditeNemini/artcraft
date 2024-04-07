@@ -1,14 +1,10 @@
 import { useContext, useState } from "react";
 import { Button, Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
-import { AppUiContext } from "../../contexts/AppUiContext";
 import { EngineContext } from "../../contexts/EngineContext";
-import { APPUI_ACTION_TYPES } from "../../reducers";
-import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
-  const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
   const [sceneName, setSceneName] = useState<string>("");
   const [sceneToken, setSceneToken] = useState<string>("");
 
@@ -21,7 +17,7 @@ export const ControlsTopButtons = () => {
   };
 
   const handleMediaToken = async () => {
-    await editorEngine?.loadMediaToken(mediaToken)
+    await editorEngine?.loadMediaToken(mediaToken);
   };
 
   const handleButtonLoadScene = () => {
@@ -29,20 +25,18 @@ export const ControlsTopButtons = () => {
     editorEngine?.loadScene(sceneToken);
   };
 
-  const handleButtonTest = () => {
-
-  };
+  const handleButtonTest = () => {};
 
   const handleTestButton2 = () => {
-   console.log("Test Button 2")
+    console.log("Test Button 2");
   };
 
   const handleButtonCameraView = () => {
     editorEngine?.switchCameraView();
   };
-  const handleButtonPlayBack = () => {
-    editorEngine?.startPlayback();
-  };
+  // const handleButtonPlayBack = () => {
+  //   editorEngine?.startPlayback();
+  // };
   const handleButtonTakeFrame = () => {
     // editorEngine?.take_timeline_cam_clip();
   };
@@ -105,12 +99,12 @@ export const ControlsTopButtons = () => {
           }}
           title="Add Scene Object via Media Token"
         >
-         <Input
+          <Input
             label="Please Enter a Media Token"
             onChange={(e) => {
               setMediaToken(e.target.value);
             }}
-            />
+          />
         </ButtonDialogue>
 
         <ButtonDialogue
@@ -133,7 +127,7 @@ export const ControlsTopButtons = () => {
         </Button>
         <Button
           onClick={handleTestButton2}
-          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
+          className="hover:bg-brand-teriary-400 bg-brand-tertiary focus-visible:outline-brand-tertiary"
         >
           Test Button 2
         </Button>
@@ -143,7 +137,7 @@ export const ControlsTopButtons = () => {
         <Button onClick={handleButtonTakeFrame}>Take Frame</Button> */}
         <Button
           onClick={handleButtonTest}
-          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
+          className="hover:bg-brand-teriary-400 bg-brand-tertiary focus-visible:outline-brand-tertiary"
           style={{ zIndex: 9001 }}
         >
           Test

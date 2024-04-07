@@ -4,7 +4,7 @@ import {
   QueueClip,
   QueueKeyframe,
   UpdateTime,
-} from "~/pages/PageEnigma/models/track";
+} from "~/pages/PageEnigma/models";
 import { toTimelineActions } from "./toTimelineActions";
 
 class Queue {

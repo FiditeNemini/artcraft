@@ -1,6 +1,6 @@
 // Clip offsets represent the state of the clip on the timeline as well as what type of clip it is.
 // it is created from a media id.
-import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models";
 
 export class ClipUI {
   version: number;

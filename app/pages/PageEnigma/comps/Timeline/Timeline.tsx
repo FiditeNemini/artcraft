@@ -17,7 +17,7 @@ import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
 import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
 import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
-import { Clip, Keyframe } from "~/pages/PageEnigma/models/track";
+import { Clip, Keyframe } from "~/pages/PageEnigma/models";
 
 function getItemType(item: Clip | Keyframe | null) {
   if (!item) {

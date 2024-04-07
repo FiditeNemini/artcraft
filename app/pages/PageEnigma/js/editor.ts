@@ -15,7 +15,7 @@ import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
-import { TimeLine, TimelineDataState } from "./timeline.js";
+import { TimeLine } from "./timeline.js";
 import { ClipUI } from "../datastructures/clips/clip_ui.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
@@ -28,21 +28,7 @@ import { XYZ } from "../datastructures/common";
 import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
 import { StoryTellerProxyTimeline } from "../proxy/storyteller_proxy_timeline";
 
-class EditorState {
-  // {
-  //   action: "ShowLoadingIndicator"
-  //   source: "Editor"
-  //   data: { "message" : "saving scene" }
-  // }
 
-  selected_object: THREE.Object3D | undefined;
-  is_loading: boolean;
-
-  constructor() {
-    this.selected_object;
-    this.is_loading = false;
-  }
-}
 // Main editor class that will call everything else all you need to call is " initialize() ".
 class Editor {
   version: number;
@@ -1100,7 +1086,7 @@ class Editor {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const interactable: any[] = [];
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
-      console.log(child);
+      // console.log(child);
       if (child.name != "") {
         if (child.type == "Mesh" || child.type == "Object3D") {
           interactable.push(child);

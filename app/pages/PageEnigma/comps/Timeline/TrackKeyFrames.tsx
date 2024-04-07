@@ -1,4 +1,4 @@
-import { ClipGroup, Keyframe } from "~/pages/PageEnigma/models/track";
+import { ClipGroup, Keyframe } from "~/pages/PageEnigma/models";
 import { TrackKeyFrame } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrame";
 
 interface Props {

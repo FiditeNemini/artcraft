@@ -122,6 +122,10 @@ export default {
         unselected: "#EEEEEE",
         selected: "#FFDE67",
       },
+      assets: {
+        background: "#39394D",
+        selectedTab: "#55556B",
+      },
 
       "ui-background": "#1a1a27",
       "ui-panel": "#242433",
