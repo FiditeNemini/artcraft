@@ -3,7 +3,7 @@ import { ObjectsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/Obje
 import { ShapeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ShapeTab";
 import { AnimationTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AnimationTab";
 import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AudioTab";
-
+import { TabStylization } from "~/pages/PageEnigma/comps/SidePanelTabs/TabStylization";
 export const tabList = [
   {
     icon: "resources/icons/animations.png",
@@ -41,4 +41,10 @@ export const tabList = [
     value: AssetType.AUDIO,
     component: <AudioTab />,
   },
+  {
+    icon: "resources/icons/characters.png",
+    title: "Style",
+    value: AssetType.AUDIO,
+    component: <TabStylization/>,
+  }
 ];
