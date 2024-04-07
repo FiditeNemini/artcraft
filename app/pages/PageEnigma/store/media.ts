@@ -77,14 +77,14 @@ export const audioItems = signal<MediaItem[]>([
 export const cameraItems = signal<MediaItem[]>([
   {
     version: 1,
-    media_id: "m_w5nn3kjh1fbkmjrdac5b2qaba0pmyt",
+    media_id: uuid.v4(),
     type: AssetType.CAMERA,
     name: "Portrait Zoom Out",
     thumbnail: "resources/placeholders/placeholder.png",
   },
   {
     version: 1,
-    media_id: "m_w5nn3kjh1fbkmjrdac5b2qaba0pmyt",
+    media_id: uuid.v4(),
     type: AssetType.CAMERA,
     name: "Pan Left and Right",
     thumbnail: "resources/placeholders/placeholder.png",
