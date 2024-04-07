@@ -138,14 +138,18 @@ class Scene {
                             c.material.specular = 0.5;
                             c.castShadow = true;
                             c.receiveShadow = true;
+                            c.frustumCulled = false;
                             c.material.transparent = false;
                         }
                     });
-                    if (child.type == "Group") {
-                        if (auto_add) { this.scene.add(child.children[0]); }
-                        resolve(child.children[0]);
-                        return;
-                    }
+                    //console.log(child);
+                    //if (child.type == "Group") {
+                    //    if (auto_add) { child.children.forEach(element => {
+                    //        this.scene.add(element);
+                    //    }); }
+                    //    resolve(child);
+                    //}
+                    child.frustumCulled = false;
                     child.userData["media_id"] = media_id;
                     if (auto_add) { this.scene.add(child); }
                     resolve(child);
