@@ -12,9 +12,16 @@ export const ControlsTopButtons = () => {
   const [sceneName, setSceneName] = useState<string>("");
   const [sceneToken, setSceneToken] = useState<string>("");
 
+  // for testing
+  const [mediaToken, setMediaToken] = useState<string>("");
+
   const handleButtonSave = () => {
     console.log(`SceneName is ${sceneName}`);
     editorEngine?.saveScene(sceneName);
+  };
+
+  const handleMediaToken = async () => {
+    await editorEngine?.test_loadMediaToken(mediaToken)
   };
 
   const handleButtonLoadScene = () => {
@@ -23,7 +30,7 @@ export const ControlsTopButtons = () => {
   };
 
   const handleButtonTest = () => {
-    // editorEngine?.testStylizeRequest();
+
   };
 
   const handleTestButton2 = () => {
@@ -84,6 +91,26 @@ export const ControlsTopButtons = () => {
               setSceneName(e.target.value);
             }}
           />
+        </ButtonDialogue>
+
+        <ButtonDialogue
+          buttonProps={{
+            variant: "secondary",
+            label: "Add Scene Object (Test)",
+          }}
+          confirmButtonProps={{
+            label: "Save",
+            disabled: mediaToken === "",
+            onClick: handleMediaToken,
+          }}
+          title="Add Scene Object via Media Token"
+        >
+         <Input
+            label="Please Enter a Media Token"
+            onChange={(e) => {
+              setMediaToken(e.target.value);
+            }}
+            />
         </ButtonDialogue>
 
         <ButtonDialogue

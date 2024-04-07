@@ -129,12 +129,12 @@ export class LipSyncClip {
     this.lipsync = new LipSync();
   }
 
-  toJSON(): string {
-    return JSON.stringify({
+  toJSON(): any {
+    return {
       version: this.version,
       media_id: this.media_id,
       type: this.type,
       volume: this.volume,
-    });
+    };
   }
 }
