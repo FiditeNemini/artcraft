@@ -4,6 +4,7 @@ import { ShapeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ShapeT
 import { AnimationTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AnimationTab";
 import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AudioTab";
 import { TabStylization } from "~/pages/PageEnigma/comps/SidePanelTabs/TabStylization";
+import { CameraTab } from "./itemTabs/CameraTab";
 export const tabList = [
   {
     icon: "resources/icons/animations.png",
@@ -29,12 +30,12 @@ export const tabList = [
     value: AssetType.CHARACTER,
     component: <ObjectsTab type={AssetType.CHARACTER} />,
   },
-  // {
-  //   icon: "resources/icons/camera.png",
-  //   title: "Camera",
-  //   value: AssetType.CAMERA,
-  //   component: <CameraTab />,
-  // },
+  {
+    icon: "resources/icons/camera.png",
+    title: "Camera",
+    value: AssetType.CAMERA,
+    component: <CameraTab />,
+  },
   {
     icon: "resources/icons/audios.png",
     title: "Audio",
@@ -43,8 +44,8 @@ export const tabList = [
   },
   {
     icon: "resources/icons/characters.png",
-    title: "Style",
-    value: AssetType.AUDIO,
+    title: "Style (Temporary being moved)",
+    value: AssetType.STYLE,
     component: <TabStylization/>,
   }
 ];
