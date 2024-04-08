@@ -28,6 +28,7 @@ const DELETE_KEYFRAME: Record<ClipGroup, (keyframe: Keyframe) => void> = {
 
 export default function useUpdateKeyframe() {
   const addKeyframe = useCallback((keyframe: QueueKeyframe, offset: number) => {
+    console.log("k", keyframe);
     ADD_KEYFRAME[keyframe.group](keyframe, offset);
   }, []);
 
