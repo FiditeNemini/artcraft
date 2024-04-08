@@ -18,7 +18,7 @@ export const SidePanelMenu = () => {
   return (
     <div
       className={[
-        "bg-assets-background fixed",
+        "fixed bg-assets-background",
         "px-2 py-4",
         "overflow-y-auto",
       ].join(" ")}
@@ -35,7 +35,7 @@ export const SidePanelMenu = () => {
           <button
             key={tab.value}
             className={[
-              "flex flex-col items-center rounded-lg px-2 py-3",
+              "flex flex-col items-center gap-2 rounded-lg px-2 py-2.5",
               tab.value === selectedTab?.value?.value
                 ? "bg-assets-selectedTab opacity-100"
                 : "opacity-50",

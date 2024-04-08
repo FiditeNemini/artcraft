@@ -2,6 +2,14 @@ import { animationFilter, animationItems } from "~/pages/PageEnigma/store";
 import { AssetFilterOption } from "~/pages/PageEnigma/models";
 import { useSignals } from "@preact/signals-react/runtime";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
+import { Button } from "~/components";
+import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
+import { twMerge } from "tailwind-merge";
+import {
+  filterTabBase,
+  filterTabActive,
+  filterTabDisabled,
+} from "./filterTabsClasses";
 
 export const AnimationTab = () => {
   useSignals();
@@ -9,39 +17,40 @@ export const AnimationTab = () => {
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="mb-4 mt-2 flex justify-start gap-2 px-2">
+        <div className="mb-4 mt-4 flex justify-start gap-2 px-4">
           <button
-            className={[
-              "bg-assets-background rounded-lg px-3 py-1 text-sm",
+            className={twMerge(
+              filterTabBase,
               animationFilter.value === AssetFilterOption.ALL
-                ? "border-2 border-brand-primary"
+                ? filterTabActive
                 : "",
-            ].join(" ")}
+              filterTabDisabled,
+            )}
             onClick={() => (animationFilter.value = AssetFilterOption.ALL)}
           >
             All
           </button>
           <button
-            className={[
-              "bg-assets-background text-nowrap rounded-lg px-3 py-1 text-sm",
-              "disabled:text-gray-500",
+            className={twMerge(
+              filterTabBase,
               animationFilter.value === AssetFilterOption.MINE
-                ? "border-2 border-brand-primary"
+                ? filterTabActive
                 : "",
-            ].join(" ")}
+              filterTabDisabled,
+            )}
             onClick={() => (animationFilter.value = AssetFilterOption.MINE)}
             disabled={!animationItems.value.some((item) => item.isMine)}
           >
             My Animations
           </button>
           <button
-            className={[
-              "bg-assets-background rounded-lg px-3 py-1 text-sm",
-              "disabled:text-gray-500",
+            className={twMerge(
+              filterTabBase,
               animationFilter.value === AssetFilterOption.BOOKMARKED
-                ? "border-2 border-brand-primary"
+                ? filterTabActive
                 : "",
-            ].join(" ")}
+              filterTabDisabled,
+            )}
             onClick={() =>
               (animationFilter.value = AssetFilterOption.BOOKMARKED)
             }
@@ -51,12 +60,16 @@ export const AnimationTab = () => {
           </button>
         </div>
       </div>
-      <div className="w-full px-2">
-        <button className="bg-assets-background w-full rounded-lg py-2">
+      <div className="w-full px-4">
+        <Button
+          icon={faCirclePlus}
+          variant="action"
+          className="w-full py-3 text-sm font-medium"
+        >
           Upload Animation
-        </button>
+        </Button>
       </div>
-      <div className="w-full overflow-y-auto px-2 pt-2">
+      <div className="h-full w-full overflow-y-auto px-4 pt-4">
         <ItemElements
           items={animationItems.value}
           assetFilter={animationFilter.value}

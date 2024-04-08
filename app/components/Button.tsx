@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 export interface ButtonPropsI
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: IconDefinition;
-  variant?: "primary" | "secondary";
+  variant?: "primary" | "secondary" | "action";
 }
 
 export const Button = ({
@@ -24,6 +24,9 @@ export const Button = ({
       }
       case "secondary": {
         return " bg-brand-secondary hover:bg-brand-secondary-900 text-white focus-visible:outline-brand-secondary";
+      }
+      case "action": {
+        return " bg-action hover:bg-action-700 text-white focus-visible:outline-action";
       }
       case "primary":
       default: {
