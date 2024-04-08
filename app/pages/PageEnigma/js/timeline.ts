@@ -11,17 +11,9 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
-import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
-// Every object uuid / entity has a track.
-export class TimelineCurrentState {
-    is_editable: boolean;
-    selected_object_ID: number;
-    constructor() {
-        this.is_editable = true; // can add clips to it
-        this.selected_object_ID = 0;
-    }
-}
+import { ClipType } from "~/pages/PageEnigma/models/track";
 
+// Every object uuid / entity has a track.
 export class TimelineDataState {
     timeline_items: ClipUI[];
     scrubber_frame_position: number;
@@ -83,11 +75,14 @@ export class TimeLine {
         );
 
         this.current_time = 0;
-        // TODO: How to move the timeline should put in update.
-        // setInterval(()=> {
-        //     this.current_time +=1
-        //     this.pushEvent(fromEngineActions.UPDATE_TIME, { currentTime: this.current_time })
-        // },50)
+    }
+
+    public async updateUI() {
+        Queue.publish({
+            queueName: QueueNames.FROM_ENGINE,
+            action: fromEngineActions.UPDATE_TIME_LINE,
+            data: this.timeline_items,
+        });
     }
 
     public async pushEvent(action: fromEngineActions, data: any) {

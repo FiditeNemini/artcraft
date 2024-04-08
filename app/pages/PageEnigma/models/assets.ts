@@ -16,7 +16,7 @@ export enum AssetType {
   ANIMATION = "animation",
   CAMERA = "camera",
   SHAPE = "shape",
-  STYLE = "style"
+  STYLE = "style" // TODO Remove 
 }
 
 export enum AssetFilterOption {

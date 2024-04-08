@@ -28,6 +28,8 @@ export function useQueueHandler() {
       case fromEngineActions.UPDATE_TIME:
         currentTime.value = (data as UpdateTime).currentTime;
         break;
+      case fromEngineActions.UPDATE_TIME_LINE:
+        console.log(action)
       default:
         throw new Error(`Unknown action ${action}`);
     }

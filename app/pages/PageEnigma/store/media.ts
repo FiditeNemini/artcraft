@@ -9,7 +9,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Sit",
-    thumbnail: "resources/characters/img01.png",
+    thumbnail: "resources/characters/img04.png",
     isMine: true,
   },
   {
@@ -18,7 +18,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Idle",
-    thumbnail: "resources/characters/img01.png",
+    thumbnail: "resources/characters/img07.png",
     isBookmarked: true,
   },
   {
@@ -27,7 +27,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Walk",
-    thumbnail: "resources/characters/img01.png",
+    thumbnail: "resources/characters/img07.png",
   },
   {
     version: 1,

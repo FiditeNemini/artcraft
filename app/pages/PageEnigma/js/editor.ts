@@ -373,17 +373,7 @@ class Editor {
     let proxyTimeline = new StoryTellerProxyTimeline(this.version, this.timeline, this.transform_engine, this.animation_engine, this.audio_engine, this.lipsync_engine);
     await proxyTimeline.loadFromJson(scene_json['timeline']);
 
-    // this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
-    //   child.parent = this.activeScene.scene;
-    //   if (child.type == "DirectionalLight") {
-    //     const pos = child.position;
-    //     const rot = child.rotation;
-    //     const light = this.activeScene._create_base_lighting();
-    //     light.position.set(pos.x, pos.y, pos.z);
-    //     light.rotation.set(rot.x, rot.y, rot.z);
-    //     this.activeScene.scene.remove(child);
-    //   }
-    // });
+  
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,

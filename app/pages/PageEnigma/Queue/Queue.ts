@@ -6,20 +6,20 @@ import {
   UpdateTime,
 } from "~/pages/PageEnigma/models";
 import { toTimelineActions } from "./toTimelineActions";
-
+import { ClipUI } from "../datastructures/clips/clip_ui";
 class Queue {
   private _queue: Record<
     string,
     {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe;
+      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
     }[]
   > = {};
   private _subscribers: Record<
     string,
     (entry: {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe;
+      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
     }) => void
   > = {};
 
@@ -30,7 +30,7 @@ class Queue {
   }: {
     queueName: string;
     action: fromEngineActions | toEngineActions | toTimelineActions;
-    data: QueueClip | UpdateTime | QueueKeyframe;
+    data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] ;
   }) {
     if (!this._queue[queueName]) {
       this._queue[queueName] = [];
@@ -47,7 +47,7 @@ class Queue {
     queueName: string,
     onMessage: (entry: {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe;
+      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
     }) => void,
   ) {
     this._subscribers[queueName] = onMessage;
