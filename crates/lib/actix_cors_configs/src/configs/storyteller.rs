@@ -82,28 +82,32 @@ mod tests {
   use crate::testing::assert_origin_invalid;
   use crate::testing::assert_origin_ok;
 
-  #[actix_rt::test]
-  async fn main_deploy() {
-    let production_cors = build_cors_config(ServerEnvironment::Production);
-    assert_origin_ok(&production_cors, "https://storyteller-ai.netlify.app").await;
-  }
+  mod netlify {
+    use super::*;
 
-  #[actix_rt::test]
-  async fn branch_deploy() {
-    let production_cors = build_cors_config(ServerEnvironment::Production);
-    assert_origin_ok(&production_cors, "https://feature-mvp--storyteller-ai.netlify.app").await;
-  }
+    #[actix_rt::test]
+    async fn main_deploy() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_ok(&production_cors, "https://storyteller-ai.netlify.app").await;
+    }
 
-  #[actix_rt::test]
-  async fn deploy_preview() {
-    let production_cors = build_cors_config(ServerEnvironment::Production);
-    assert_origin_ok(&production_cors, "https://deploy-preview-86--storyteller-ai.netlify.app").await;
-  }
+    #[actix_rt::test]
+    async fn branch_deploy() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_ok(&production_cors, "https://feature-mvp--storyteller-ai.netlify.app").await;
+    }
 
-  #[actix_rt::test]
-  async fn invalid_netlify_preview_deploy() {
-    let production_cors = build_cors_config(ServerEnvironment::Production);
-    assert_origin_invalid(&production_cors, "https://foo.netlify.app").await;
-    assert_origin_invalid(&production_cors, "https://deploy-preview-86--foo.netlify.app").await;
+    #[actix_rt::test]
+    async fn deploy_preview() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_ok(&production_cors, "https://deploy-preview-86--storyteller-ai.netlify.app").await;
+    }
+
+    #[actix_rt::test]
+    async fn invalid_netlify_preview_deploy() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_invalid(&production_cors, "https://foo.netlify.app").await;
+      assert_origin_invalid(&production_cors, "https://deploy-preview-86--foo.netlify.app").await;
+    }
   }
 }
