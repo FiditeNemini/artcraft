@@ -195,6 +195,7 @@ export class TimeLine {
                 object_name,
                 "",
                 uuid,
+                object_name,
                 0,
                 this.absolute_end))
         }
@@ -216,6 +217,7 @@ export class TimeLine {
         const type = data["data"]["type"];
         const offset = data["data"]["offset"];
         const end_offset = data["data"]["length"] + offset;
+        const object_name = data["data"]["object_name"];
 
         switch (type) {
             case "animation":
@@ -236,6 +238,7 @@ export class TimeLine {
                             name,
                             media_id,
                             object_uuid,
+                            object_name,
                             offset,
                             end_offset));
                     return;
@@ -254,6 +257,7 @@ export class TimeLine {
                 name,
                 media_id,
                 object_uuid,
+                object_name,
                 offset,
                 end_offset,
             ),
@@ -481,96 +485,3 @@ export class TimeLine {
     }
 }
 
-// How much timeline precision we have
-//const percision = 100 // using a fake update loop mock
-//
-//class AudioEngineMock {
-//    async play(media_id:string) {
-//        console.log("Audio Playing {media_id}")
-//    }
-//}
-//
-//// Visual verification tests.
-//function CheckIfBasicAudioClipWorks() {
-//    const timeline = new TimeLine()
-//    timeline.addPlayableClip(new ClipUI(1.0,'audio',1,0))
-//    timeline.play()
-//}
-//
-//function CheckIfBasicTransformClipWorks() {
-//    const timeline = new TimeLine()
-//    timeline.addPlayableClip(new ClipUI(1.0,'transform',2,0))
-//    timeline.play()
-//}
-//
-//function CheckIfBasicClipWorks() {
-//    const timeline = new TimeLine()
-//    timeline.addPlayableClip(new ClipUI(1.0,'animation',3,0))
-//    timeline.play()
-//}
-
-// function CheckIfBasicClipWorks3SecondsAfterTimelineStops() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip1", 0, 10000))
-//     timeline.play()
-// }
-
-// function CheckIfTwoClipsAtTheSameTimeWorks() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip1", 0, 1000))
-//     timeline.play()
-// }
-
-// function CheckIfTwoClipsOneAfterAnotherWorks() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip1", 0, 1000))
-//     timeline.addPlayableClip(new ClipUI("clip2", 0, 2000))
-//     timeline.play()
-// }
-
-// function CheckIfTimeLineStopBeforeClipPlays() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip3",0,1000))
-//     timeline.play()
-//     setInterval(async ()=> {
-//         timeline.stop()
-//     },1100)
-//     console.log("Stopped")
-// }
-
-// function CheckIfTimeLineStartAfterClipPlays() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip3",0,1000))
-//     timeline.play()
-//     setInterval(async ()=> {
-//         timeline.stop()
-//     },500)
-//     console.log("Stopped")
-// }
-
-// function CheckIfClipsPlayAllTogetherConcurrently() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip1",0,1000))
-//     timeline.addPlayableClip(new ClipUI("clip2",0,1000))
-//     timeline.addPlayableClip(new ClipUI("clip3",0,1000))
-//     timeline.addPlayableClip(new ClipUI("clip4",0,1000))
-//     timeline.play()
-// }
-
-// function CheckIfClipsPlayAllTogether() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new TrackClip("clip1",0,1000))
-//     timeline.addPlayableClip(new TrackClip("clip2",0,1000))
-//     timeline.addPlayableClip(new TrackClip("clip3",0,1000))
-//     timeline.addPlayableClip(new TrackClip("clip4",0,1000))
-//     timeline.play()
-// }
-
-//CheckIfBasicClipWorks()
-//CheckIfTwoClipsAtTheSameTimeWorks()
-// CheckIfTwoClipsOneAfterAnotherWorks()
-// CheckIfTimeLineStopBeforeClipPlays()
-// CheckIfTimeLineStartAfterClipPlays()
-// CheckIfClipsPlayAllTogetherConcurrently()
-
-// CheckIfClipsPlayAllTogether()

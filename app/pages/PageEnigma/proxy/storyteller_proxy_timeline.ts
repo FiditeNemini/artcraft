@@ -65,6 +65,7 @@ export class StoryTellerProxyTimeline {
                     element.version, element.type, 
                     element.group, element.name, 
                     element.media_id, element.object_uuid, 
+                    element.object_name,
                     element.start_offset, element.ending_offset);
                 new_clips.push(clip);
             }
