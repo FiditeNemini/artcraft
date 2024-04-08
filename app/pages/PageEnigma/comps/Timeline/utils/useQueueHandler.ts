@@ -1,11 +1,7 @@
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useCallback, useContext, useEffect } from "react";
-import {
-  addCharacterAnimation,
-  characterGroups,
-  currentTime,
-} from "~/pages/PageEnigma/store";
+import { characterGroups, currentTime } from "~/pages/PageEnigma/store";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
@@ -14,6 +10,7 @@ import {
   Clip,
   ClipGroup,
   ClipType,
+  Keyframe,
   MediaItem,
   QueueClip,
   QueueKeyframe,
@@ -35,7 +32,7 @@ function addCharacter(item: ClipUI) {
   );
 
   if (existingCharacter) {
-    return;
+    return existingCharacter;
   }
 
   const newCharacter = {
@@ -53,6 +50,10 @@ function addCharacter(item: ClipUI) {
     ),
     newCharacter,
   ].sort((charA, charB) => (charA.id < charB.id ? -1 : 1));
+
+  return characterGroups.value.find(
+    (character) => character.id === item.object_uuid,
+  ) as CharacterGroup;
 }
 
 export function useQueueHandler() {
@@ -68,12 +69,12 @@ export function useQueueHandler() {
       case fromEngineActions.UPDATE_TIME_LINE:
         console.log(data);
         (data as ClipUI[]).forEach((item) => {
-          addCharacter(item);
           if (item.group === ClipGroup.CHARACTER) {
+            const existingCharacter = addCharacter(item);
             if (item.type === ClipType.ANIMATION) {
               const newItem = {
                 version: item.version,
-                clip_uuid: uuid.v4(),
+                clip_uuid: item.clip_uuid,
                 type: item.type,
                 group: item.group,
                 object_uuid: item.object_uuid,
@@ -82,14 +83,24 @@ export function useQueueHandler() {
                 offset: item.offset,
                 length: item.length,
               } as Clip;
+              existingCharacter.animationClips.push(newItem);
+              existingCharacter.animationClips.sort((clipA, clipB) =>
+                clipA.clip_uuid < clipB.clip_uuid ? -1 : 1,
+              );
             }
             if (item.type === ClipType.TRANSFORM) {
-              // newItem.length = item.length;
-              // addCharacterKeyframe({
-              //   dragItem: newItem,
-              //   characterId: item.object_uuid,
-              //   offset: item.offset,
-              // });
+              const newKeyframe = {
+                version: item.version,
+                keyframe_uuid: item.keyframe_uuid,
+                group: item.group,
+                object_uuid: item.object_uuid,
+                offset: item.offset,
+              } as Keyframe;
+              existingCharacter.positionKeyframes.push(newKeyframe);
+              existingCharacter.positionKeyframes.sort(
+                (keyframeA, keyframeB) =>
+                  keyframeA.keyframe_uuid < keyframeB.keyframe_uuid ? -1 : 1,
+              );
             }
           }
         });
