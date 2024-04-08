@@ -311,7 +311,7 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
-    this._test_demo();
+    //this._test_demo();
 
     this.renderer.domElement.addEventListener(
       "mousedown",

@@ -29,7 +29,9 @@ export function useQueueHandler() {
         currentTime.value = (data as UpdateTime).currentTime;
         break;
       case fromEngineActions.UPDATE_TIME_LINE:
-        console.log(action)
+        console.log(action);
+      case fromEngineActions.UPDATE_CHARACTER_ID:
+        console.log(action);
       default:
         throw new Error(`Unknown action ${action}`);
     }

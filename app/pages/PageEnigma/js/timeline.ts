@@ -125,14 +125,40 @@ export class TimeLine {
                 await this.mute(data, true);
                 break;
             case toEngineActions.ADD_CHARACTER:
-                // TODO ADD
+                await this.addCharacter(data);
                 break;
             case toEngineActions.ADD_OBJECT:
-                 // TODO ADD
+                await this.addObject(data);
                 break;
             default:
                 console.log("Action Not Wired", action);
         }
+    }
+
+    public async addCharacter(data: any) {
+        let media_id = data.data['media_id'];
+        let name = data.data['name'];
+        let type = data.data['type'];
+
+        let obj = await this.scene.load_glb(media_id);
+        obj.userData['name'] = name;
+        obj.name = name;
+        let object_uuid = obj.uuid;
+
+        data.data['object_uuid'] = object_uuid;
+        Queue.publish({
+            queueName: QueueNames.FROM_ENGINE,
+            action: fromEngineActions.UPDATE_CHARACTER_ID,
+            data: data.data,
+        });
+    }
+
+    public async addObject(data: any) {
+        let media_id = data.data['media_id'];
+        let name = data.data['name'];
+        let obj = await this.scene.load_glb(media_id);
+        obj.userData['name'] = name;
+        obj.name = name;
     }
 
     public async addKeyFrame(data: any) {
