@@ -1,5 +1,5 @@
 import { State, VIEW_MODES } from "./types";
-import { ClipGroup } from "~/pages/PageEnigma/models/track";
+import { ClipGroup } from "~/pages/PageEnigma/models";
 
 export const initialStateValues: State = {
   timelineHeight: 260,

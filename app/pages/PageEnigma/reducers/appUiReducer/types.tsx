@@ -1,5 +1,5 @@
 import { Simple3DVector } from "../../datastructures/common";
-import { ClipGroup } from "../../models/track";
+import { AssetType, ClipGroup } from "../../models";
 export enum VIEW_MODES {
   EDITOR = "editor",
   SIDE_BY_SIDE = "side-by-side",

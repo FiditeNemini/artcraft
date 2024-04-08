@@ -19,8 +19,7 @@ export const ControlsTopButtons = () => {
   };
 
   const handleMediaToken = async () => {
-    // await editorEngine?.test_loadMediaToken(mediaToken)
-    console.log('editorEnging does not have test_loadMediaToken')
+    await editorEngine?.loadMediaToken(mediaToken);
   };
 
   const handleButtonLoadScene = () => {
@@ -82,12 +81,12 @@ export const ControlsTopButtons = () => {
           }}
           title="Add Scene Object via Media Token"
         >
-         <Input
+          <Input
             label="Please Enter a Media Token"
             onChange={(e) => {
               setMediaToken(e.target.value);
             }}
-            />
+          />
         </ButtonDialogue>
 
         <ButtonDialogue

@@ -15,7 +15,7 @@ import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
-import { TimeLine, TimelineDataState } from "./timeline.js";
+import { TimeLine } from "./timeline.js";
 import { ClipUI } from "../datastructures/clips/clip_ui.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
@@ -28,21 +28,7 @@ import { XYZ } from "../datastructures/common";
 import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
 import { StoryTellerProxyTimeline } from "../proxy/storyteller_proxy_timeline";
 
-class EditorState {
-  // {
-  //   action: "ShowLoadingIndicator"
-  //   source: "Editor"
-  //   data: { "message" : "saving scene" }
-  // }
 
-  selected_object: THREE.Object3D | undefined;
-  is_loading: boolean;
-
-  constructor() {
-    this.selected_object;
-    this.is_loading = false;
-  }
-}
 // Main editor class that will call everything else all you need to call is " initialize() ".
 class Editor {
   version: number;
@@ -387,17 +373,7 @@ class Editor {
     let proxyTimeline = new StoryTellerProxyTimeline(this.version, this.timeline, this.transform_engine, this.animation_engine, this.audio_engine, this.lipsync_engine);
     await proxyTimeline.loadFromJson(scene_json['timeline']);
 
-    // this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
-    //   child.parent = this.activeScene.scene;
-    //   if (child.type == "DirectionalLight") {
-    //     const pos = child.position;
-    //     const rot = child.rotation;
-    //     const light = this.activeScene._create_base_lighting();
-    //     light.position.set(pos.x, pos.y, pos.z);
-    //     light.rotation.set(rot.x, rot.y, rot.z);
-    //     this.activeScene.scene.remove(child);
-    //   }
-    // });
+  
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
@@ -474,67 +450,6 @@ class Editor {
     this.outlinePass.selectedObjects = [];
   }
 
-  async _serialize_timeline() {
-    // note the database from the server is the source of truth for all the data.
-    // Test code here
-    const object: THREE.Object3D = await this.activeScene.load_glb(
-      "./resources/models/fox/fox.glb",
-    );
-
-    // load object into the engine for lip syncing
-    this.lipsync_engine.load_object(
-      object.uuid,
-      "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
-    );
-
-    // create the clip with the same id for a reference to the media
-    this.timeline.addPlayableClip(
-      new ClipUI(
-        1.0,
-        "lipsync",
-        "character",
-        "clip1",
-        "m_f1jxx4zwy4da2zn0cvdqhha7kqkj72",
-        object.uuid,
-        150,
-        400,
-      ),
-    );
-
-    // media id for this is up in the air but when a path is created you should be able to store and delete it
-    this.timeline.addPlayableClip(
-      new ClipUI(
-        1.0,
-        "transform",
-        "character",
-        "clip2",
-        object.uuid,
-        object.uuid,
-        0,
-        150,
-      ),
-    );
-
-    // media id for this as well it can be downloaded
-    this.timeline.addPlayableClip(
-      new ClipUI(
-        1.0,
-        "animation",
-        "character",
-        "clip3",
-        "/resources/models/fox/fox_idle.glb",
-        object.uuid,
-        0,
-        400,
-      ),
-    );
-    this.animation_engine.load_object(
-      object.uuid,
-      "/resources/models/fox/fox_idle.glb",
-      "clip3",
-    );
-  }
-
   switchCameraView() {
     this.camera_person_mode = !this.camera_person_mode;
     console.log(this.camera_person_mode);
@@ -546,6 +461,7 @@ class Editor {
 
         this.camera.position.copy(this.cam_obj.position);
         this.camera.rotation.copy(this.cam_obj.rotation);
+
         if (this.orbitControls) {
           this.orbitControls.enabled = false;
         }
@@ -587,11 +503,15 @@ class Editor {
     }
   }
 
+  public async loadMediaToken(media_file_token: string) {
+    this.activeScene.load_glb(media_file_token);
+  }
+
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
     const object: THREE.Object3D = await this.activeScene.load_glb(
-      "m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp",
+      "m_4wva09qznapzk5rcvbxy671d1qx2pr",
     );
 
     object.uuid = "CH1";
@@ -599,6 +519,7 @@ class Editor {
     // Stick Open Pose Man: m_9f3d3z94kk6m25zywyz6an3p43fjtw
     // XBot: m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d 
     // YBot: m_9sqg0evpr23587jnr8z3zsvav1x077
+    // Shrek: m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp
   }
 
   // Configure post processing.
@@ -672,7 +593,7 @@ class Editor {
     }
     this.removeTransformControls();
     this.selected = undefined;
-    this.dispatchAppUiState({type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT});
+    this.dispatchAppUiState({ type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT });
     this.timeline.deleteObject(uuid)
   }
 
@@ -749,6 +670,11 @@ class Editor {
         }
 
         this.cam_obj.visible = false;
+
+        const min = new THREE.Vector3(-12, -1, -12);
+        const max = new THREE.Vector3(12, 24, 12);
+        this.camera.position.copy(this.camera.position.clamp(min, max));
+
       }
     }
     else if (this.cam_obj) {
@@ -1150,9 +1076,9 @@ class Editor {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const interactable: any[] = [];
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
-      console.log(child);
+      // console.log(child);
       if (child.name != "") {
-        if (child.type == "Mesh" || child.type == "Object3D") {
+        if (child.type == "Mesh" || child.type == "Object3D" || child.type == "Group") {
           interactable.push(child);
         }
       }

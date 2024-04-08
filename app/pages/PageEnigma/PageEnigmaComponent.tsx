@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
 import { Button, LoadingBar, LoadingDots } from "~/components";
@@ -12,11 +12,18 @@ import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
 import { DialogueTTS } from "./comps/DialogueTTS/DialogueTTS";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { ViewSideBySide } from "./comps/ViewSideBySide";
-import { SidePanelTabs } from "./comps/SidePanelTabs";
 import { Timeline } from "./comps/Timeline";
 
 import { APPUI_VIEW_MODES } from "./reducers";
-import { timelineHeight } from "~/pages/PageEnigma/store";
+import {
+  timelineHeight,
+  sidePanelWidth,
+  pageWidth,
+  sidePanelVisible,
+  pageHeight,
+  dndSidePanelWidth,
+  dndTimelineHeight,
+} from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/pages/PageEnigma/contexts/AppUiContext";
 import { EngineContext } from "./contexts/EngineContext";
@@ -32,26 +39,46 @@ export const PageEnigmaComponent = () => {
     event.stopPropagation();
   };
 
-  const handleGenerateMovieClick=()=> {
-    if ( editorEngine != null) {
-      editorEngine?.generateVideo()
+  const handleGenerateMovieClick = () => {
+    if (editorEngine != null) {
+      editorEngine?.generateVideo();
     } else {
-      console.log("Tried to generate movie but editor was null")
+      console.log("Tried to generate movie but editor was null");
     }
   };
 
-  const lowerHeight = timelineHeight.value;
+  const dndWidth =
+    dndSidePanelWidth.value > -1
+      ? dndSidePanelWidth.value
+      : sidePanelWidth.value;
+  const width = sidePanelVisible.value
+    ? pageWidth.value - dndWidth - 66
+    : pageWidth.value - 66;
+
+  const height =
+    dndTimelineHeight.value > -1
+      ? pageHeight.value - dndTimelineHeight.value - 68
+      : pageHeight.value - timelineHeight.value - 68;
+
   return (
-    <div>
+    <div className="w-screen">
       <TopBarHelmet>
-        <Button icon={faSparkles} onClick={handleGenerateMovieClick}>Generate Movie</Button>
+        <Button icon={faSparkles} onClick={handleGenerateMovieClick}>
+          Generate Movie
+        </Button>
       </TopBarHelmet>
-      <div style={{ height: "calc(100vh - 68px)" }}>
+      <div
+        className="relative flex w-screen"
+        style={{ height: "calc(100vh - 68px)" }}
+      >
         {/* Engine section/side panel */}
         <div
           id="engine-n-panels-wrapper"
           className="flex"
-          style={{ height: `calc(100% - ${lowerHeight}px)` }}
+          style={{
+            height,
+            width,
+          }}
         >
           <div className="relative w-full overflow-hidden bg-transparent">
             <div
@@ -104,19 +131,16 @@ export const PageEnigmaComponent = () => {
               progress={appUiState.showEditorLoadingBar.progress}
             />
           </div>
-
-          {/* Side panel */}
-          <div onClick={handleOverlayClick}>
-            <SidePanel>
-              <SidePanelTabs />
-            </SidePanel>
-          </div>
         </div>
-
-        {/* Timeline */}
+        {/* Side panel */}
         <div onClick={handleOverlayClick}>
-          <Timeline />
+          <SidePanel />
         </div>
+      </div>
+
+      {/* Timeline */}
+      <div onClick={handleOverlayClick}>
+        <Timeline />
       </div>
     </div>
   );

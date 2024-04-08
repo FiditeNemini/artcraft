@@ -1,30 +1,31 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { timelineHeight } from "~/pages/PageEnigma/store";
+import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
 
-export const useMouseEventsHeight = () => {
+export const useMouseEventsSidePanel = () => {
   const [isActive, setIsActive] = useState(false);
-  const [clientY, setClientY] = useState(0);
-
-  const [height, setHeight] = useState(-1);
+  const [clientX, setClientX] = useState(0);
 
   useEffect(() => {
     const onPointerUp = () => {
       if (isActive) {
-        timelineHeight.value = Math.round(height);
+        sidePanelWidth.value = Math.round(dndSidePanelWidth.value);
         setIsActive(false);
-        setHeight(-1);
+        dndSidePanelWidth.value = -1;
       }
     };
 
     const onMouseMove = (event: MouseEvent) => {
       if (isActive) {
-        const delta = event.clientY - clientY;
+        const delta = event.clientX - clientX;
         event.stopPropagation();
         event.preventDefault();
-        if (timelineHeight.value - delta < 30) {
+        if (sidePanelWidth.value - delta < 0) {
           return;
         }
-        setHeight(timelineHeight.value - delta);
+        if (sidePanelWidth.value - delta > 443) {
+          return;
+        }
+        dndSidePanelWidth.value = sidePanelWidth.value - delta;
         return;
       }
     };
@@ -36,17 +37,16 @@ export const useMouseEventsHeight = () => {
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointermove", onMouseMove);
     };
-  }, [clientY, isActive, height]);
+  }, [clientX, isActive]);
 
   return {
     onPointerDown: useCallback((event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
         event.stopPropagation();
-        setClientY(event.clientY);
+        setClientX(event.clientX);
         setIsActive(true);
-        setHeight(timelineHeight.value);
+        dndSidePanelWidth.value = sidePanelWidth.value;
       }
     }, []),
-    height,
   };
 };

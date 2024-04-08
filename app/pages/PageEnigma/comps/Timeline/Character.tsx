@@ -7,7 +7,7 @@ import {
   updateCharacters,
 } from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
-import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models";
 
 function buildUpdaters(
   updateCharacters: (options: {

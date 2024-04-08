@@ -5,7 +5,7 @@ import {
   toggleAudioMute,
   updateAudio,
 } from "~/pages/PageEnigma/store";
-import { ClipGroup } from "~/pages/PageEnigma/models/track";
+import { ClipGroup } from "~/pages/PageEnigma/models";
 
 export const Audio = () => {
   const { clips } = audioGroup.value;

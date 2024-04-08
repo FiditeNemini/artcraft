@@ -3,12 +3,12 @@ import {
   Keyframe,
   ObjectGroup,
   QueueKeyframe,
-} from "~/pages/PageEnigma/models/track";
+} from "~/pages/PageEnigma/models";
 import * as uuid from "uuid";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
-import { toast } from "react-hot-toast";
+// import { toast } from "react-hot-toast";
 
 export const objectGroup = signal<ObjectGroup>({
   id: "OB1",
@@ -36,7 +36,7 @@ export function updateObject({
   });
 
   if (existingKeyframe) {
-    toast.error("There can only be one keyframe at this offset.");
+    //toast.error("There can only be one keyframe at this offset.");
     return;
   }
 
@@ -77,7 +77,7 @@ export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
   );
 
   if (obj && obj.keyframes.some((row) => row.offset === offset)) {
-    toast.error("There can only be one keyframe at this offset.");
+    //toast.error("There can only be one keyframe at this offset.");
     return;
   }
 

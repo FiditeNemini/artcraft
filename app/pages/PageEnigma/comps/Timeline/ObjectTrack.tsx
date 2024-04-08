@@ -1,6 +1,6 @@
 import { fullWidth, objectGroup, updateObject } from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
-import { ClipGroup } from "~/pages/PageEnigma/models/track";
+import { ClipGroup } from "~/pages/PageEnigma/models";
 
 export const ObjectTrack = () => {
   return (

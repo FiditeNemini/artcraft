@@ -9,7 +9,7 @@ import {
   QueueClip,
   QueueKeyframe,
   UpdateTime,
-} from "~/pages/PageEnigma/models/track";
+} from "~/pages/PageEnigma/models";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
 
@@ -28,6 +28,8 @@ export function useQueueHandler() {
       case fromEngineActions.UPDATE_TIME:
         currentTime.value = (data as UpdateTime).currentTime;
         break;
+      case fromEngineActions.UPDATE_TIME_LINE:
+        console.log(action)
       default:
         throw new Error(`Unknown action ${action}`);
     }
