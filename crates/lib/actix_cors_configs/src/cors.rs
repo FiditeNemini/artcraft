@@ -2,6 +2,12 @@ use actix_cors::Cors;
 use log::info;
 
 use reusable_types::server_environment::ServerEnvironment;
+use crate::configs::development_only::add_development_only;
+
+use crate::configs::fakeyou::{add_fakeyou, add_fakeyou_dev_proxy};
+use crate::configs::gottagofast::add_gotta_go_fast_test_branches;
+use crate::configs::legacy::{add_legacy_storyteller_stream, add_legacy_trumped, add_legacy_vocodes, add_power_stream};
+use crate::configs::storyteller::{add_storyteller, add_storyteller_dev_proxy};
 
 /// Return cors config for FakeYou / Vocodes / OBS / local development
 pub fn build_cors_config(server_environment: ServerEnvironment) -> Cors {
@@ -23,14 +29,20 @@ fn do_build_cors_config(is_production: bool) -> Cors {
 
   info!("Building CORS for production: {}", is_production);
 
+  // Current product
   cors = add_fakeyou(cors, is_production);
+  cors = add_fakeyou_dev_proxy(cors, is_production);
   cors = add_storyteller(cors, is_production);
+  cors = add_storyteller_dev_proxy(cors, is_production);
   cors = add_gotta_go_fast_test_branches(cors, is_production);
+
+  // Legacy
+  cors = add_legacy_trumped(cors, is_production);
   cors = add_power_stream(cors, is_production);
   cors = add_legacy_storyteller_stream(cors, is_production);
   cors = add_legacy_vocodes(cors, is_production);
-  cors = add_legacy_trumped(cors, is_production);
 
+  // Development
   if !is_production {
     cors = add_development_only(cors);
   }
@@ -48,205 +60,18 @@ fn do_build_cors_config(is_production: bool) -> Cors {
       .max_age(3600)
 }
 
-pub fn add_fakeyou(cors: Cors, is_production: bool) -> Cors {
-  // TODO: Remove non-SSL "http://" from production in safe rollout
-  if is_production {
-    cors
-        // Storyteller Engine (Production)
-        .allowed_origin("https://engine.fakeyou.com")
-        // FakeYou (Production)
-        .allowed_origin("http://api.fakeyou.com")
-        .allowed_origin("http://fakeyou.com")
-        .allowed_origin("https://api.fakeyou.com")
-        .allowed_origin("https://fakeyou.com")
-        // FakeYou (Staging)
-        .allowed_origin("http://staging.fakeyou.com")
-        .allowed_origin("https://staging.fakeyou.com")
-        // FakeYou (Netlify Staging / Production)
-        .allowed_origin("https://feature-mvp--fakeyou.netlify.app")
-        .allowed_origin("https://feature-marketing--fakeyou.netlify.app")
-  } else {
-    cors
-        // FakeYou (Development)
-        .allowed_origin("http://dev.fakeyou.com")
-        .allowed_origin("http://dev.fakeyou.com:7000") // Yarn default port
-        .allowed_origin("http://dev.fakeyou.com:7001") // NB: Mac frontend
-        .allowed_origin("https://dev.fakeyou.com")
-        .allowed_origin("https://dev.fakeyou.com:7000") // Yarn default port
-        .allowed_origin("https://dev.fakeyou.com:7001") // NB: Mac frontend
-        // Storyteller Engine (Development)
-        .allowed_origin("https://engine.fakeyou.com") // NB: We use prod for integration testing
-  }
-}
-
-pub fn add_storyteller(cors: Cors, is_production: bool) -> Cors {
-  // TODO: Remove non-SSL "http://" from production in safe rollout
-  if is_production {
-    cors
-        // Storyteller Engine (Production)
-        .allowed_origin("https://engine.storyteller.ai")
-        // Storyteller.ai (Production)
-        .allowed_origin("http://api.storyteller.ai")
-        .allowed_origin("http://storyteller.ai")
-        .allowed_origin("https://api.storyteller.ai")
-        .allowed_origin("https://storyteller.ai")
-        // Storyteller.ai (Staging)
-        .allowed_origin("http://staging.storyteller.ai")
-        .allowed_origin("https://staging.storyteller.ai")
-        // Storyteller.ai (Development Proxy)
-        .allowed_origin("http://devproxy.storyteller.ai")
-        .allowed_origin("http://devproxy.storyteller.ai:5173")
-        .allowed_origin("http://devproxy.storyteller.ai:7000")
-        .allowed_origin("http://devproxy.storyteller.ai:7001")
-        .allowed_origin("http://devproxy.storyteller.ai:7002")
-        .allowed_origin("https://devproxy.storyteller.ai")
-        .allowed_origin("https://devproxy.storyteller.ai:5173")
-        .allowed_origin("https://devproxy.storyteller.ai:7000")
-        .allowed_origin("https://devproxy.storyteller.ai:7001")
-        .allowed_origin("https://devproxy.storyteller.ai:7002")
-        // Storyteller.ai (Netlify Staging / Production)
-        .allowed_origin("https://feature-marketing--storyteller-ai.netlify.app")
-        .allowed_origin("https://feature-mvp--storyteller-ai.netlify.app")
-  } else {
-    cors
-        // Storyteller.ai (Development)
-        .allowed_origin("http://dev.storyteller.ai")
-        .allowed_origin("http://dev.storyteller.ai:5173") // NB: Wil's port
-        .allowed_origin("http://dev.storyteller.ai:7000") // Yarn default port
-        .allowed_origin("http://dev.storyteller.ai:7001") // NB: Mac frontend
-        .allowed_origin("http://dev.storyteller.ai:7002") // NB: Mac frontend
-        .allowed_origin("https://dev.storyteller.ai")
-        .allowed_origin("https://dev.storyteller.ai:5173") // NB: Wil's port
-        .allowed_origin("https://dev.storyteller.ai:7000") // Yarn default port
-        .allowed_origin("https://dev.storyteller.ai:7001") // NB: Mac frontend
-        .allowed_origin("https://dev.storyteller.ai:7002") // NB: Mac frontend
-  }
-}
-
-pub fn add_gotta_go_fast_test_branches(cors: Cors, _is_production: bool) -> Cors {
-  cors.allowed_origin("http://localhost:5173")
-      .allowed_origin("https://pipeline-gottagofast.netlify.app")
-      .allowed_origin("https://test--pipeline-gottagofast.netlify.app")
-}
-
-pub fn add_power_stream(cors: Cors, is_production: bool) -> Cors {
-  // TODO: Remove non-SSL "http://" from production in safe rollout
-  if is_production {
-    cors
-        .allowed_origin("https://dash.power.stream")
-        .allowed_origin("https://power.stream")
-  } else {
-    cors
-        .allowed_origin("http://dev.dash.power.stream")
-        .allowed_origin("http://dev.power.stream")
-        .allowed_origin("https://dev.dash.power.stream")
-        .allowed_origin("https://dev.power.stream")
-  }
-}
-
-pub fn add_legacy_storyteller_stream(cors: Cors, is_production: bool) -> Cors {
-  // TODO: Remove non-SSL "http://" from production in safe rollout
-  if is_production {
-    cors
-        // Storyteller.stream (Production)
-        .allowed_origin("http://api.storyteller.stream")
-        .allowed_origin("http://obs.storyteller.stream")
-        .allowed_origin("http://storyteller.stream")
-        .allowed_origin("http://ws.storyteller.stream")
-        .allowed_origin("https://api.storyteller.stream")
-        .allowed_origin("https://obs.storyteller.stream")
-        .allowed_origin("https://storyteller.stream")
-        .allowed_origin("https://ws.storyteller.stream")
-        // Storyteller.stream (Staging)
-        .allowed_origin("http://staging.obs.storyteller.stream")
-        .allowed_origin("http://staging.storyteller.stream")
-        .allowed_origin("https://staging.obs.storyteller.stream")
-        .allowed_origin("https://staging.storyteller.stream")
-        // Legacy "create.storyteller.ai" (Production)
-        .allowed_origin("http://create.storyteller.ai")
-        .allowed_origin("http://obs.storyteller.ai")
-        .allowed_origin("http://ws.storyteller.ai")
-        .allowed_origin("https://create.storyteller.ai")
-        .allowed_origin("https://obs.storyteller.ai")
-        .allowed_origin("https://ws.storyteller.ai")
-  } else {
-    cors // NB: None!
-  }
-}
-
-pub fn add_legacy_vocodes(cors: Cors, is_production: bool) -> Cors {
-  if is_production {
-    cors
-        // Vocodes (Production)
-        .allowed_origin("https://api.vo.codes")
-        .allowed_origin("https://vo.codes")
-        .allowed_origin("https://vocodes.com")
-  } else {
-    cors
-        // Vocodes (Development)
-        .allowed_origin("http://dev.api.vo.codes")
-        .allowed_origin("http://dev.vo.codes")
-        .allowed_origin("https://dev.api.vo.codes")
-        .allowed_origin("https://dev.vo.codes")
-  }
-}
-
-pub fn add_legacy_trumped(cors: Cors, is_production: bool) -> Cors {
-  if is_production {
-    cors
-        // Trumped (Production)
-        .allowed_origin("https://trumped.com")
-  } else {
-    cors
-        // Trumped (Development)
-        .allowed_origin("http://dev.trumped.com")
-        .allowed_origin("https://dev.trumped.com")
-  }
-}
-
-pub fn add_development_only(cors: Cors) -> Cors {
-  cors
-      // Local Development (Localhost)
-      .allowed_origin("http://localhost:3000")
-      .allowed_origin("http://localhost:4200")
-      .allowed_origin("http://localhost:5555")
-      .allowed_origin("http://localhost:7000")
-      .allowed_origin("http://localhost:7001")
-      .allowed_origin("http://localhost:7002")
-      .allowed_origin("http://localhost:7003")
-      .allowed_origin("http://localhost:7004")
-      .allowed_origin("http://localhost:7005")
-      .allowed_origin("http://localhost:7006")
-      .allowed_origin("http://localhost:7007")
-      .allowed_origin("http://localhost:7008")
-      .allowed_origin("http://localhost:7009")
-      .allowed_origin("http://localhost:8000")
-      .allowed_origin("http://localhost:8080")
-      .allowed_origin("http://localhost:12345")
-      .allowed_origin("http://localhost:54321")
-      // Local Development (JungleHorse)
-      .allowed_origin("http://api.jungle.horse")
-      .allowed_origin("http://jungle.horse")
-      .allowed_origin("http://jungle.horse:12345")
-      .allowed_origin("http://jungle.horse:7000")
-      .allowed_origin("http://obs.jungle.horse")
-      .allowed_origin("http://ws.jungle.horse")
-      .allowed_origin("https://api.jungle.horse")
-      .allowed_origin("https://jungle.horse")
-      .allowed_origin("https://obs.jungle.horse")
-      .allowed_origin("https://ws.jungle.horse")
-}
-
 #[cfg(test)]
 mod tests {
   use actix_cors::Cors;
   use actix_http::body::{BoxBody, EitherBody};
   use actix_web::dev::{ServiceResponse, Transform};
   use actix_web::http::StatusCode;
-  use actix_web::test::TestRequest;
   use actix_web::test;
-  use reusable_types::server_environment::ServerEnvironment;
+  use actix_web::test::TestRequest;
   use speculoos::asserting;
+
+  use reusable_types::server_environment::ServerEnvironment;
+
   use super::build_cors_config;
 
   async fn make_test_request(cors: &Cors, hostname: &str) -> ServiceResponse<EitherBody<BoxBody>> {

@@ -20,3 +20,5 @@
 #![allow(non_snake_case)]
 
 pub mod cors;
+
+pub (crate) mod configs;
