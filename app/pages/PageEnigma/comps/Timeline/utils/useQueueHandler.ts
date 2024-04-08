@@ -3,7 +3,6 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { useCallback, useContext, useEffect } from "react";
 import {
   addCharacterAnimation,
-  addCharacterKeyframe,
   characterGroups,
   currentTime,
 } from "~/pages/PageEnigma/store";
@@ -11,8 +10,8 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import {
-  AssetType,
   CharacterGroup,
+  Clip,
   ClipGroup,
   ClipType,
   MediaItem,
@@ -23,10 +22,11 @@ import {
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+import * as uuid from "uuid";
 
 interface Arguments {
   action: fromEngineActions | toEngineActions | toTimelineActions;
-  data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
+  data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem;
 }
 
 function addCharacter(item: ClipUI) {
@@ -73,18 +73,15 @@ export function useQueueHandler() {
             if (item.type === ClipType.ANIMATION) {
               const newItem = {
                 version: item.version,
-                type: item.type as string as AssetType,
+                clip_uuid: uuid.v4(),
+                type: item.type,
                 group: item.group,
                 object_uuid: item.object_uuid,
                 media_id: item.media_id,
                 name: item.name,
-                length: item.length,
-              } as MediaItem;
-              addCharacterAnimation({
-                dragItem: newItem,
-                characterId: item.object_uuid,
                 offset: item.offset,
-              });
+                length: item.length,
+              } as Clip;
             }
             if (item.type === ClipType.TRANSFORM) {
               // newItem.length = item.length;
