@@ -6,6 +6,7 @@ import {
   addCharacterAnimation,
   addCharacterAudio,
   addGlobalAudio,
+  addCharacter,
   canDrop,
   dragItem,
   dropId,
@@ -25,7 +26,8 @@ export const TrackProvider = ({ children }: Props) => {
   // cross group functions
   const dropClip = useCallback(() => {
 
-    console.log(`${canDrop.value} ${dragItem.value} ${dragItem.value.type}`)
+   
+    console.log(`${JSON.stringify(dragItem)}`)
     if (canDrop.value && dragItem.value) {
       if (dragItem.value.type === AssetType.ANIMATION) {
         addCharacterAnimation({
@@ -47,7 +49,7 @@ export const TrackProvider = ({ children }: Props) => {
         });
       }
       if (dragItem.value.type === AssetType.CHARACTER) {
-        console.log("Dragged In Character Type")
+        addCharacter(dragItem)
       }
       if (dragItem.value.type === AssetType.CAMERA) {
         console.log("Dragged In Camera Type")

@@ -12,14 +12,14 @@ class Queue {
     string,
     {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
+      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | string;
     }[]
   > = {};
   private _subscribers: Record<
     string,
     (entry: {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
+      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | string;
     }) => void
   > = {};
 
@@ -30,7 +30,7 @@ class Queue {
   }: {
     queueName: string;
     action: fromEngineActions | toEngineActions | toTimelineActions;
-    data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] ;
+    data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | string ;
   }) {
     if (!this._queue[queueName]) {
       this._queue[queueName] = [];
@@ -47,7 +47,7 @@ class Queue {
     queueName: string,
     onMessage: (entry: {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
+      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | string;
     }) => void,
   ) {
     this._subscribers[queueName] = onMessage;

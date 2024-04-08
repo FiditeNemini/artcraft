@@ -333,3 +333,25 @@ export function deleteCharacterKeyframe(keyframe: Keyframe) {
     }),
   }));
 }
+
+// probably not to much to send imo
+export function addCharacter(character:string) {
+  //{"version":1,"media_id":"m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
+  // "type":"character","name":"Female Doll",
+  // "thumbnail":"resources/characters/img03.png"}
+  Queue.publish({
+    queueName: QueueNames.TO_ENGINE,
+    action: toEngineActions.ADD_CHARACTER,
+    data: character,
+  });
+}
+export function addObject(object:string) {
+   //{"version":1,"media_id":"m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
+  // "type":"character","name":"Female Doll",
+  // "thumbnail":"resources/characters/img03.png"}
+  Queue.publish({
+    queueName: QueueNames.TO_ENGINE,
+    action: toEngineActions.ADD_OBJECT,
+    data: object,
+  });
+}

@@ -124,6 +124,12 @@ export class TimeLine {
             case toEngineActions.UNMUTE:
                 await this.mute(data, true);
                 break;
+            case toEngineActions.ADD_CHARACTER:
+                // TODO ADD
+                break;
+            case toEngineActions.ADD_OBJECT:
+                 // TODO ADD
+                break;
             default:
                 console.log("Action Not Wired", action);
         }
