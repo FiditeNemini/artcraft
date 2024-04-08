@@ -91,7 +91,7 @@ export function useQueueHandler() {
             if (item.type === ClipType.TRANSFORM) {
               const newKeyframe = {
                 version: item.version,
-                keyframe_uuid: item.keyframe_uuid,
+                keyframe_uuid: item.clip_uuid,
                 group: item.group,
                 object_uuid: item.object_uuid,
                 offset: item.offset,
