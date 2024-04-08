@@ -1,7 +1,13 @@
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useCallback, useContext, useEffect } from "react";
-import { characterGroups, currentTime } from "~/pages/PageEnigma/store";
+import {
+  audioGroup,
+  cameraGroup,
+  characterGroups,
+  currentTime,
+  objectGroup,
+} from "~/pages/PageEnigma/store";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
@@ -12,6 +18,7 @@ import {
   ClipType,
   Keyframe,
   MediaItem,
+  ObjectTrack,
   QueueClip,
   QueueKeyframe,
   UpdateTime,
@@ -57,33 +64,33 @@ function addCharacter(item: ClipUI) {
 }
 
 function addObject(item: ClipUI) {
-  const existingCharacter = characterGroups.value.find(
-    (character) => character.id === item.object_uuid,
+  const existingObject = objectGroup.value.objects.find(
+    (obj) => obj.object_uuid === item.object_uuid,
   );
 
-  if (existingCharacter) {
-    return existingCharacter;
+  if (existingObject) {
+    return existingObject;
   }
 
-  const newCharacter = {
-    id: item.object_uuid,
+  const newObject = {
+    object_uuid: item.object_uuid,
     name: item.object_name,
-    muted: false,
-    animationClips: [],
-    positionKeyframes: [],
-    lipSyncClips: [],
-  } as CharacterGroup;
+    keyframes: [] as Keyframe[],
+  } as ObjectTrack;
 
-  characterGroups.value = [
-    ...characterGroups.value.filter(
-      (character) => character.id !== item.object_uuid,
-    ),
-    newCharacter,
-  ].sort((charA, charB) => (charA.id < charB.id ? -1 : 1));
+  objectGroup.value = {
+    id: "OB1",
+    objects: [
+      ...objectGroup.value.objects.filter(
+        (obj) => obj.object_uuid !== item.object_uuid,
+      ),
+      newObject,
+    ].sort((objA, objB) => (objA.object_uuid < objB.object_uuid ? -1 : 1)),
+  };
 
-  return characterGroups.value.find(
-    (character) => character.id === item.object_uuid,
-  ) as CharacterGroup;
+  return objectGroup.value.objects.find(
+    (obj) => obj.object_uuid === item.object_uuid,
+  ) as ObjectTrack;
 }
 
 export function useQueueHandler() {
@@ -114,8 +121,8 @@ export function useQueueHandler() {
                 length: item.length,
               } as Clip;
               existingCharacter.animationClips.push(newItem);
-              existingCharacter.animationClips.sort((clipA, clipB) =>
-                clipA.clip_uuid < clipB.clip_uuid ? -1 : 1,
+              existingCharacter.animationClips.sort(
+                (clipA, clipB) => clipA.offset - clipB.offset,
               );
             }
             if (item.type === ClipType.TRANSFORM) {
@@ -128,8 +135,7 @@ export function useQueueHandler() {
               } as Keyframe;
               existingCharacter.positionKeyframes.push(newKeyframe);
               existingCharacter.positionKeyframes.sort(
-                (keyframeA, keyframeB) =>
-                  keyframeA.keyframe_uuid < keyframeB.keyframe_uuid ? -1 : 1,
+                (keyframeA, keyframeB) => keyframeA.offset - keyframeB.offset,
               );
             }
             if (item.type === ClipType.AUDIO) {
@@ -145,30 +151,57 @@ export function useQueueHandler() {
                 length: item.length,
               } as Clip;
               existingCharacter.lipSyncClips.push(newItem);
-              existingCharacter.lipSyncClips.sort((clipA, clipB) =>
-                clipA.clip_uuid < clipB.clip_uuid ? -1 : 1,
+              existingCharacter.lipSyncClips.sort(
+                (clipA, clipB) => clipA.offset - clipB.offset,
               );
             }
           }
           if (item.group === ClipGroup.OBJECT) {
             const existingObject = addObject(item);
-            if (item.type === ClipType.ANIMATION) {
-              const newItem = {
-                version: item.version,
-                clip_uuid: item.clip_uuid,
-                type: item.type,
-                group: item.group,
-                object_uuid: item.object_uuid,
-                media_id: item.media_id,
-                name: item.name,
-                offset: item.offset,
-                length: item.length,
-              } as Clip;
-              existingObject.clips.push(newItem);
-              existingObject.clips.sort((clipA, clipB) =>
-                clipA.clip_uuid < clipB.clip_uuid ? -1 : 1,
-              );
-            }
+            const newKeyframe = {
+              version: item.version,
+              keyframe_uuid: item.clip_uuid,
+              group: item.group,
+              object_uuid: item.object_uuid,
+              offset: item.offset,
+            } as Keyframe;
+            existingObject.keyframes.push(newKeyframe);
+            existingObject.keyframes.sort(
+              (keyframeA, keyframeB) => keyframeA.offset - keyframeB.offset,
+            );
+          }
+          if (item.group === ClipGroup.CAMERA) {
+            const existingCamera = cameraGroup.value;
+            const newKeyframe = {
+              version: item.version,
+              keyframe_uuid: item.clip_uuid,
+              group: item.group,
+              object_uuid: item.object_uuid,
+              offset: item.offset,
+            } as Keyframe;
+            existingCamera.keyframes.push(newKeyframe);
+            existingCamera.keyframes.sort(
+              (keyframeA, keyframeB) => keyframeA.offset - keyframeB.offset,
+            );
+            // cameraGroup.value = { ...cameraGroup.value };
+          }
+          if (item.group === ClipGroup.GLOBAL_AUDIO) {
+            const existingAudio = audioGroup.value;
+            const newItem = {
+              version: item.version,
+              clip_uuid: item.clip_uuid,
+              type: item.type,
+              group: item.group,
+              object_uuid: item.object_uuid,
+              media_id: item.media_id,
+              name: item.name,
+              offset: item.offset,
+              length: item.length,
+            } as Clip;
+            existingAudio.clips.push(newItem);
+            existingAudio.clips.sort(
+              (clipA, clipB) => clipA.offset - clipB.offset,
+            );
           }
         });
         break;
