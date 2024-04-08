@@ -189,7 +189,11 @@ export function addCharacterAudio({
   });
 }
 
-export function addCharacterKeyframe(keyframe: QueueKeyframe, offset: number) {
+export function addCharacterKeyframe(
+  keyframe: QueueKeyframe,
+  offset: number,
+  addToast: (type: "error" | "warning" | "success", message: string) => void,
+) {
   const oldCharacterGroups = characterGroups.value;
 
   if (
@@ -199,6 +203,7 @@ export function addCharacterKeyframe(keyframe: QueueKeyframe, offset: number) {
       );
     })
   ) {
+    addToast("warning", "There can only be one keyframe at this offset.");
     return;
   }
 

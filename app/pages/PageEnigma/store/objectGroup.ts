@@ -18,9 +18,11 @@ export const objectGroup = signal<ObjectGroup>({
 export function updateObject({
   id,
   offset,
+  addToast,
 }: {
   id: string;
   offset: number;
+  addToast: (type: "error" | "warning" | "success", message: string) => void;
 }): void {
   const oldObjectGroup = objectGroup.value;
   const obj = oldObjectGroup.objects.find((objectTrack) =>
@@ -36,7 +38,7 @@ export function updateObject({
   });
 
   if (existingKeyframe) {
-    //toast.error("There can only be one keyframe at this offset.");
+    addToast("warning", "There can only be one keyframe at this offset.");
     return;
   }
 
@@ -70,14 +72,18 @@ export function updateObject({
   };
 }
 
-export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
+export function addObjectKeyframe(
+  keyframe: QueueKeyframe,
+  offset: number,
+  addToast: (type: "error" | "warning" | "success", message: string) => void,
+) {
   const oldObjectGroup = objectGroup.value;
   const obj = oldObjectGroup.objects.find(
     (row) => row.object_uuid === keyframe.object_uuid,
   );
 
   if (obj && obj.keyframes.some((row) => row.offset === offset)) {
-    //toast.error("There can only be one keyframe at this offset.");
+    addToast("warning", "There can only be one keyframe at this offset.");
     return;
   }
 
