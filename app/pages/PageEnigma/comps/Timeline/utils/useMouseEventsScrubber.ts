@@ -1,10 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { currentTime, filmLength, scale } from "~/pages/PageEnigma/store";
+import {
+  currentScroll,
+  currentTime,
+  filmLength,
+  scale,
+} from "~/pages/PageEnigma/store";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
-export const useMouseEventsAnimation = () => {
+export const useMouseEventsScrubber = () => {
   const [isActive, setIsActive] = useState(false);
   const [clientX, setClientX] = useState(0);
 
@@ -21,10 +26,12 @@ export const useMouseEventsAnimation = () => {
         Queue.publish({
           queueName: QueueNames.TO_ENGINE,
           action: toEngineActions.UPDATE_TIME,
-          data: { currentTime: Math.round(time) },
+          data: { currentTime: Math.round(time) + currentScroll.value },
         });
       }
     };
+
+    console.log("scroll", currentScroll.value);
 
     const onMouseMove = (event: MouseEvent) => {
       const delta = Math.round(
@@ -41,7 +48,7 @@ export const useMouseEventsAnimation = () => {
             Queue.publish({
               queueName: QueueNames.TO_ENGINE,
               action: toEngineActions.UPDATE_TIME,
-              data: { currentTime: delta },
+              data: { currentTime: delta + currentScroll.value },
             });
           }
           return delta;

@@ -1,12 +1,16 @@
 import { TrackClip } from "~/pages/PageEnigma/comps/Timeline/TrackClip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
-import { Clip } from "~/pages/PageEnigma/models/track";
+import {
+  AssetType,
+  Clip,
+  ClipGroup,
+  ClipType,
+} from "~/pages/PageEnigma/models";
 import { PointerEvent } from "react";
 import {
   canDrop,
-  clipLength,
-  dragType,
+  dragItem,
   dropId,
   dropOffset,
   filmLength,
@@ -17,11 +21,36 @@ interface Props {
   id: string;
   clips: Clip[];
   title: string;
-  style: "character" | "audio" | "camera" | "objects";
-  type?: "animations" | "positions" | "lipSync";
+  group: ClipGroup;
+  type?: ClipType;
   toggleMute?: () => void;
   muted?: boolean;
   updateClip: (options: { id: string; length: number; offset: number }) => void;
+}
+
+function getCanBuild({
+  dragType,
+  type,
+  group,
+}: {
+  dragType?: AssetType;
+  type?: ClipType;
+  group: ClipGroup;
+}) {
+  if (dragType === AssetType.ANIMATION) {
+    if (type === ClipType.ANIMATION) {
+      return true;
+    }
+  }
+  if (dragType === AssetType.AUDIO) {
+    if (group === ClipGroup.CHARACTER && type === ClipType.AUDIO) {
+      return true;
+    }
+    if (group === ClipGroup.GLOBAL_AUDIO) {
+      return true;
+    }
+  }
+  return false;
 }
 
 export const TrackClips = ({
@@ -31,36 +60,22 @@ export const TrackClips = ({
   updateClip,
   muted,
   title,
-  style,
+  group,
   type,
 }: Props) => {
-  const trackType = type ?? style;
+  const trackType = (type ?? group) as ClipType;
 
   function onPointerOver() {
-    if (dragType.value === "animations") {
-      if (dragType.value !== trackType) {
-        return;
-      }
+    if (getCanBuild({ dragType: dragItem.value?.type, type, group })) {
+      dropId.value = id;
     }
-    if (dragType.value === "audio") {
-      if (["lipSync", "audio"].indexOf(trackType) === -1) {
-        return;
-      }
-    }
-    dropId.value = id;
   }
 
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
-    if (dragType.value === "animations") {
-      if (dragType.value !== trackType) {
-        return;
-      }
+    if (!getCanBuild({ dragType: dragItem.value?.type, type, group })) {
+      return;
     }
-    if (dragType.value === "audio") {
-      if (["lipSync", "audio"].indexOf(trackType) === -1) {
-        return;
-      }
-    }
+
     const track = document.getElementById(`track-${trackType}-${id}`);
     if (!track) {
       return;
@@ -70,7 +85,7 @@ export const TrackClips = ({
     const position = track.getBoundingClientRect();
     const clipOffset = (event.clientX - position.x) / 4 / scale.value;
 
-    if (clipOffset + clipLength.value > filmLength.value * 60) {
+    if (clipOffset + (dragItem.value!.length ?? 0) > filmLength.value * 60) {
       canDrop.value = false;
       return;
     }
@@ -83,7 +98,8 @@ export const TrackClips = ({
         return true;
       }
       return (
-        clipOffset < clip.offset && clipOffset + clipLength.value >= clip.offset
+        clipOffset < clip.offset &&
+        clipOffset + (dragItem.value!.length ?? 0) >= clip.offset
       );
     });
 
@@ -91,7 +107,7 @@ export const TrackClips = ({
     dropOffset.value = clipOffset;
   }
   function onPointerLeave() {
-    if (dragType.value !== trackType) {
+    if (canDrop.value) {
       return;
     }
     canDrop.value = false;
@@ -101,7 +117,7 @@ export const TrackClips = ({
     <div className="pl-16">
       <div
         id={`track-${trackType}-${id}`}
-        className={`relative mt-4 block h-9 w-full rounded-lg bg-${style}-unselected`}
+        className={`relative mt-4 block h-9 w-full rounded-lg bg-${group}-unselected`}
         onPointerOver={onPointerOver}
         onPointerLeave={onPointerLeave}
         onPointerMove={onPointerMove}
@@ -117,7 +133,7 @@ export const TrackClips = ({
                 ? clips[index + 1].offset
                 : filmLength.value * 60
             }
-            style={style}
+            group={group}
             updateClip={updateClip}
             clip={clip}
           />

@@ -50,17 +50,17 @@ export default {
       "brand-tertiary": {
         //Aquamarine Blue
         DEFAULT: "#1cb6be", //=300
-        '50': '#eefdfc',
-        '100': '#d4f9f8',
-        '200': '#aef3f3',
-        '300': '#62e4e6',
-        '400': '#38d3d8',
-        '500': '#1cb6be',
-        '600': '#1a94a0',
-        '700': '#1c7682',
-        '800': '#1f616b',
-        '900': '#1e505b',
-        '950': '#0e353e',
+        "50": "#eefdfc",
+        "100": "#d4f9f8",
+        "200": "#aef3f3",
+        "300": "#62e4e6",
+        "400": "#38d3d8",
+        "500": "#1cb6be",
+        "600": "#1a94a0",
+        "700": "#1c7682",
+        "800": "#1f616b",
+        "900": "#1e505b",
+        "950": "#0e353e",
       },
       danger: {
         //copper rust
@@ -94,6 +94,22 @@ export default {
         "950": "#0c270f",
       },
 
+      action: {
+        //comet
+        DEFAULT: "#55556b", //600
+        "50": "#f7f7f8",
+        "100": "#eeedf1",
+        "200": "#d8d8df",
+        "300": "#b5b5c4",
+        "400": "#8d8da3",
+        "500": "#6f7088",
+        "600": "#55556b",
+        "700": "#49495b",
+        "800": "#3f3f4d",
+        "900": "#373743",
+        "950": "#26252c",
+      },
+
       character: {
         unselected: "#46527C",
         selected: "#6384F4",
@@ -106,17 +122,25 @@ export default {
         clip: "#5F949F",
         groupBg: "#2B393E",
       },
-      audio: {
+      global_audio: {
         unselected: "#864C68",
         selected: "#D460A6",
         clip: "#E37BAD",
         groupBg: "#382940",
       },
-      objects: {
+      object: {
         unselected: "#7C5646",
         selected: "#EA8E5A",
         clip: "#D49D75",
         groupBg: "#372E32",
+      },
+      keyframe: {
+        unselected: "#EEEEEE",
+        selected: "#FFDE67",
+      },
+      assets: {
+        background: "#39394D",
+        selectedTab: "#55556B",
       },
 
       "ui-background": "#1a1a27",
@@ -126,11 +150,11 @@ export default {
       "ui-controls-button": "#676781",
       "ui-divider": "#515168",
 
-      "axis-x" :"#D33242",
-      "axis-y" :"#308752",
-      "axis-z" :"#2E70FF",
-      red:  "#D33242",
-      green:"#308752",
+      "axis-x": "#D33242",
+      "axis-y": "#308752",
+      "axis-z": "#2E70FF",
+      red: "#D33242",
+      green: "#308752",
       blue: "#2E70FF",
 
       white: colors.white,
@@ -146,11 +170,11 @@ export default {
     "bg-camera-selected",
     "bg-camera-unselected",
     "bg-camera-clip",
-    "bg-audio-selected",
-    "bg-audio-unselected",
-    "bg-audio-clip",
-    "bg-objects-selected",
-    "bg-objects-unselected",
-    "bg-objects-clip",
+    "bg-global_audio-selected",
+    "bg-global_audio-unselected",
+    "bg-global_audio-clip",
+    "bg-object-selected",
+    "bg-object-unselected",
+    "bg-object-clip",
   ],
 } satisfies Config;

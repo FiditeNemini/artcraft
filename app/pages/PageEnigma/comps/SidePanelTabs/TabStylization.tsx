@@ -60,7 +60,7 @@ export const TabStylization = () => {
   };
 
   return (
-    <div className="flex h-full w-full flex-col gap-3">
+    <div className="flex h-full w-full flex-col gap-3 p-4">
       <div className="flex flex-col">
         <Label>Select Base Style</Label>
         <div className="grid grid-cols-4 gap-2">
@@ -98,6 +98,7 @@ export const TabStylization = () => {
       <Textarea
         label="Positive Prompt"
         className="h-32 w-full"
+        name="positive-prompt"
         placeholder="Type here to describe your scene"
         onChange={onChangeHandlerPositive}
         resize="none"
@@ -105,6 +106,7 @@ export const TabStylization = () => {
       <Textarea
         label="Negative Prompt"
         className="h-32 w-full"
+        name="negative-prompt"
         placeholder="Type here to filter out the things you don't want in the scene"
         onChange={onChangeHandlerNegative}
         resize="none"

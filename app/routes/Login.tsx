@@ -1,28 +1,18 @@
 import { useContext, useEffect, useState, useRef } from "react";
-import { useNavigate } from "@remix-run/react";
-import { useCookies } from 'react-cookie';
+import { useNavigate, useSearchParams } from "@remix-run/react";
 import { faKey, faUser } from "@fortawesome/pro-solid-svg-icons";
-
 import { AuthenticationContext } from "~/contexts/Authentication";
 
-import {
-  Button,
-  H1,
-  Input,
-  Link,
-  P,
-} from '~/components';
-
+import { Button,H1,Input,Link,P } from '~/components';
 import { LoadingDots } from "~/components";
 
 export default function LoginScreen() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [showLoader, setShowLoader] = useState<string|undefined>(undefined);
   const formRef = useRef<HTMLFormElement | null>(null);
-  const [authCookies, setAuthCookie, removeAuthCookie] = useCookies(['userInfo']);
   const {authState, loginAndGetUserInfo} = useContext(AuthenticationContext);
-
 
   const handleOnSumbit = (ev: React.FormEvent<HTMLFormElement>)=>{
     ev.preventDefault();
@@ -43,8 +33,9 @@ export default function LoginScreen() {
   }// end handleOnSubmit
 
   useEffect(()=>{
+    const redirectPath = searchParams.get('redirect');
     if(authState && authState.isLoggedIn)
-      navigate("/");
+      navigate(redirectPath ? redirectPath:'/');
   },[authState]);
 
   return (
@@ -64,6 +55,7 @@ export default function LoginScreen() {
             icon={faUser}
             name="usernameOrEmail"
             placeholder="Username or Email"
+            autoComplete="username"
             required
           />
           <br />

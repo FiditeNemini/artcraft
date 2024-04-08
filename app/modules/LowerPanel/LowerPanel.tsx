@@ -1,7 +1,9 @@
-import React, { useCallback } from "react";
-import { useMouseEventsHeight } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsHeight";
+import React, { useCallback, UIEvent } from "react";
+import { useMouseEventsTimeline } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsTimeline";
 import {
+  currentScroll,
   currentTime,
+  dndTimelineHeight,
   overTimeline,
   scale,
   timelineHeight,
@@ -15,14 +17,19 @@ interface LowerPanelPropsI {
 }
 
 export const LowerPanel = ({ children }: LowerPanelPropsI) => {
-  const { onPointerDown, height } = useMouseEventsHeight();
+  const { onPointerDown } = useMouseEventsTimeline();
 
-  const displayHeight = height > -1 ? height : timelineHeight.value;
+  const displayHeight =
+    dndTimelineHeight.value > -1
+      ? dndTimelineHeight.value
+      : timelineHeight.value;
 
   const onTimelineClick = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
-        const newTime = Math.round((event.clientX - 92) / 4 / scale.value);
+        const newTime = Math.round(
+          (event.clientX + currentScroll.value - 92) / 4 / scale.value,
+        );
         if (newTime < 0) {
           return;
         }
@@ -37,11 +44,15 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
     [],
   );
 
+  const onScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
+    currentScroll.value = event.currentTarget.scrollLeft;
+  }, []);
+
   return (
     <>
       <div
-        className="w-full cursor-ns-resize bg-ui-panel-border"
-        style={{ height: 3, zIndex: 1000 }}
+        className="absolute w-full cursor-ns-resize bg-ui-panel-border"
+        style={{ height: 3, zIndex: 1000, bottom: displayHeight }}
         onPointerDown={onPointerDown}
       />
       <div
@@ -50,12 +61,13 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
           "w-screen overflow-auto",
           "bg-ui-panel",
         ].join(" ")}
-        style={{ height: displayHeight - 3 }}
+        style={{ height: displayHeight }}
         onPointerOver={() => {
           overTimeline.value = true;
         }}
         onPointerLeave={() => (overTimeline.value = false)}
         onPointerDown={onTimelineClick}
+        onScroll={onScroll}
       >
         {children}
       </div>

@@ -13,11 +13,11 @@ import {
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 import { useSignals } from "@preact/signals-react/runtime";
 import { TimerGrid } from "~/pages/PageEnigma/comps/TimerGrid/TimerGrid";
-import { Scrubber } from "~/pages/PageEnigma/comps/Scrubber/Scrubber";
+import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
 import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
 import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
-import { Clip, Keyframe } from "~/pages/PageEnigma/models/track";
+import { Clip, Keyframe } from "~/pages/PageEnigma/models";
 
 function getItemType(item: Clip | Keyframe | null) {
   if (!item) {

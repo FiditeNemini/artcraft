@@ -1,56 +1,33 @@
 import { signal } from "@preact/signals-core";
 import {
   Keyframe,
+  MediaItem,
   ObjectGroup,
+  ObjectTrack,
   QueueKeyframe,
-} from "~/pages/PageEnigma/models/track";
+} from "~/pages/PageEnigma/models";
 import * as uuid from "uuid";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+// import { toast } from "react-hot-toast";
 
 export const objectGroup = signal<ObjectGroup>({
   id: "OB1",
   objects: [],
 });
 
-export function updateObject({ id, offset }: { id: string; offset: number }) {
-  const oldObject = objectGroup.value;
-  objectGroup.value = {
-    id: oldObject.id,
-    objects: oldObject.objects.map((object) => ({
-      object_uuid: object.object_uuid,
-      name: object.name,
-      keyframes: object.keyframes.map((keyFrame) => {
-        if (keyFrame.keyframe_uuid !== id) {
-          return {
-            ...keyFrame,
-          };
-        }
-
-        Queue.publish({
-          queueName: QueueNames.TO_ENGINE,
-          action: toEngineActions.UPDATE_KEYFRAME,
-          data: {
-            ...keyFrame,
-            offset,
-          },
-        });
-
-        return {
-          ...keyFrame,
-          offset,
-        };
-      }),
-    })),
-  };
-}
-
 export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
   const oldObjectGroup = objectGroup.value;
   const obj = oldObjectGroup.objects.find(
     (row) => row.object_uuid === keyframe.object_uuid,
   );
+
+  if (obj && obj.keyframes.some((row) => row.offset === offset)) {
+    //toast.error("There can only be one keyframe at this offset.");
+    return;
+  }
 
   const newObject = obj ?? {
     object_uuid: keyframe.object_uuid,
@@ -69,7 +46,7 @@ export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
     selected: false,
   } as Keyframe;
   newObject.keyframes.push(newKeyframe);
-  console.log(newObject);
+
   newObject.keyframes.sort(
     (keyframeA, keyframeB) => keyframeA.offset - keyframeB.offset,
   );
@@ -78,7 +55,7 @@ export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
     ...oldObjectGroup,
     objects: [
       ...oldObjectGroup.objects.filter(
-        (object) => object.object_uuid !== keyframe.object_uuid,
+        (row) => row.object_uuid !== obj?.object_uuid,
       ),
       newObject,
     ].sort((objA, objB) => (objA.object_uuid < objB.object_uuid ? -1 : 1)),
@@ -136,4 +113,12 @@ export function deleteObjectKeyframe(keyframe: Keyframe) {
       ),
     ],
   };
+}
+
+export function addObject(object: MediaItem) {
+  Queue.publish({
+    queueName: QueueNames.TO_ENGINE,
+    action: toEngineActions.ADD_OBJECT,
+    data: object,
+  });
 }

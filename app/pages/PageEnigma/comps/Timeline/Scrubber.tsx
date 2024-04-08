@@ -1,12 +1,12 @@
 import { currentTime, fullHeight, scale } from "~/pages/PageEnigma/store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
-import { useMouseEventsAnimation } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsAnimation";
+import { useMouseEventsScrubber } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsScrubber";
 import { useSignals } from "@preact/signals-react/runtime";
 
 export const Scrubber = () => {
   useSignals();
-  const { onPointerDown, time } = useMouseEventsAnimation();
+  const { onPointerDown, time } = useMouseEventsScrubber();
   const displayTime = time === -1 ? currentTime.value : time;
 
   return (

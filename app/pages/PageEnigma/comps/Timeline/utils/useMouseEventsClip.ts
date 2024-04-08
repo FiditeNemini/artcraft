@@ -1,5 +1,5 @@
 import React, { Dispatch, useCallback, useEffect, useRef } from "react";
-import { Clip } from "~/pages/PageEnigma/models/track";
+import { Clip } from "~/pages/PageEnigma/models";
 import { canDrop, scale } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
@@ -37,13 +37,11 @@ export const useMouseEventsClip = (
       if (isActive.current === "drag") {
         if (deltaOffset < min) {
           currOffset.current = min;
-          return;
-        }
-        if (deltaOffset + currLength.current > max) {
+        } else if (deltaOffset + currLength.current > max) {
           currOffset.current = max - currLength.current;
-          return;
+        } else {
+          currOffset.current = deltaOffset;
         }
-        currOffset.current = deltaOffset;
       }
       if (isActive.current === "left") {
         if (initLength.current - delta < 30 || deltaOffset < min) {

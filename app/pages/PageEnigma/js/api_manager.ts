@@ -54,9 +54,9 @@ export enum Visibility {
  */
 type Data = { [key: string]: any };
 class APIManagerResponseSuccess {
-  public user_message: String;
+  public user_message: string;
   public data: Data | null;
-  constructor(user_message: String = "", data: Data | null = null) {
+  constructor(user_message: string = "", data: Data | null = null) {
     this.data = data;
     this.user_message = user_message;
   }
@@ -74,7 +74,7 @@ class APIManagerResponseError extends Error {
 }
 
 export class APIManager {
-  baseUrl: String;
+  baseUrl: string;
 
   constructor() {
     this.baseUrl = "https://api.fakeyou.com";
@@ -88,43 +88,43 @@ export class APIManager {
    * @returns APIManagerResponseMessage
    */
   public async saveSceneState(
-    scene: THREE.Scene,
+    save_json: string,
     scene_name: string,
     scene_glb_media_file_token: string | null = null,
     scene_media_file_token: string | null = null,
-    timeline_state: TimelineDataState | null = null,
-  ): Promise<APIManagerResponseSuccess> {
-    const file = await this.gltfExport(scene);
+  ): Promise<string> {
+    const file = new File([save_json], `${scene_name}.glb`, {
+      type: "application/json",
+    });
 
     // will overwrite the scene on db if token exists
-    const upload_glb_response = await this.uploadGLB(
+    const upload_glb_response = await this.uploadEngineAsset(
       file,
       scene_glb_media_file_token,
     );
-    const result_scene_glb_media_file_token =
-      upload_glb_response["media_file_token"];
 
-    // now write the scene
-    const save_scene_timeline_response = await this.saveSceneAndTimeLineState(
-      result_scene_glb_media_file_token,
-      scene_media_file_token,
-      scene_name,
-      timeline_state,
-    );
+    //const result_scene_glb_media_file_token =
+    //  upload_glb_response["media_file_token"];
+    //// now write the scene
+    //const save_scene_timeline_response = await this.saveSceneAndTimeLineState(
+    //  result_scene_glb_media_file_token,
+    //  scene_media_file_token,
+    //  scene_name,
+    //  timeline_state,
+    //);
+    //const result_scene_media_file_token =
+    //  save_scene_timeline_response["media_file_token"];
+    //const data = {
+    //  scene_glb_media_file_token: result_scene_glb_media_file_token,
+    //  scene_media_file_token: result_scene_media_file_token,
+    //};
 
-    const result_scene_media_file_token =
-      save_scene_timeline_response["media_file_token"];
-
-    const data = {
-      scene_glb_media_file_token: result_scene_glb_media_file_token,
-      scene_media_file_token: result_scene_media_file_token,
-    };
-    return new APIManagerResponseSuccess("Scene Saved", data);
+    return upload_glb_response['media_file_token'];
   }
 
   public async loadSceneState(
     scene_media_file_token: string | null,
-  ): Promise<APIManagerResponseSuccess> {
+  ): Promise<any> {
     const api_base_url = "https://api.fakeyou.com";
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
     const response = await fetch(url);
@@ -139,47 +139,47 @@ export class APIManager {
       throw new APIManagerResponseError("Failed to download file");
     }
     // Convert the response from a blob to json text
-    let blob = await file_response.blob();
+    const blob = await file_response.blob();
     const json_result: string = await new Promise((resolve, reject) => {
-      let reader = new FileReader();
+      const reader = new FileReader();
       reader.onloadend = () => resolve(JSON.parse(reader.result as string));
       reader.onerror = reject;
       reader.readAsText(blob);
     });
 
     console.log(`loadSceneState: ${JSON.stringify(json_result)}`);
+    return json_result;
 
-    const scene_glb_media_file_token: string =
-      json_result["scene_glb_media_file_token"];
+    // const scene_glb_media_file_token: string =
+    //   json_result["scene_glb_media_file_token"];
+    // const media_bucket_path = await this.getMediaFile(
+    //   scene_glb_media_file_token,
+    // );
+    // console.log(`GLB ${media_bucket_path}`);
+    // const glbLoader = new GLTFLoader();
+    // // promisify this
+    // const loadGlb = (
+    //   bucket_path: string,
+    // ): Promise<APIManagerResponseSuccess> => {
+    //   return new Promise((resolve, reject) => {
+    //     glbLoader.load(bucket_path, (glb) => {
+    //       if (glb) {
+    //         const scene: THREE.Scene = glb.scene;
+    //         const data = {
+    //           scene_glb_media_file_token: scene_glb_media_file_token,
+    //           scene_media_file_token: scene_media_file_token,
+    //           scene: scene,
+    //         };
+    //         console.log(`Data: ${data}`);
+    //         resolve(new APIManagerResponseSuccess("Success Loaded", data));
+    //       } else {
+    //         throw new APIManagerResponseError("Failed to Load GLB Scene");
+    //       }
+    //     });
+    //   });
+    // };
 
-    const media_bucket_path = await this.getMediaFile(
-      scene_glb_media_file_token,
-    );
-    console.log(`GLB ${media_bucket_path}`);
-    let glbLoader = new GLTFLoader();
-    // promisify this
-    const loadGlb = (
-      bucket_path: string,
-    ): Promise<APIManagerResponseSuccess> => {
-      return new Promise((resolve, reject) => {
-        glbLoader.load(bucket_path, (glb) => {
-          if (glb) {
-            const scene: THREE.Scene = glb.scene;
-            const data = {
-              scene_glb_media_file_token: scene_glb_media_file_token,
-              scene_media_file_token: scene_media_file_token,
-              scene: scene,
-            };
-            console.log(`Data: ${data}`);
-            resolve(new APIManagerResponseSuccess("Success Loaded", data));
-          } else {
-            throw new APIManagerResponseError("Failed to Load GLB Scene");
-          }
-        });
-      });
-    };
-
-    return await loadGlb(media_bucket_path);
+    //return await loadGlb(media_bucket_path);
   }
 
   /**
@@ -188,13 +188,13 @@ export class APIManager {
    * @returns
    */
   private async getMediaFile(media_file_token: string): Promise<string> {
-    let api_base_url = "https://api.fakeyou.com";
-    let url = `${api_base_url}/v1/media_files/file/${media_file_token}`;
-    let response = await fetch(url);
-    let json = await JSON.parse(await response.text());
-    let bucketPath = json["media_file"]["public_bucket_path"];
-    let media_base_url = "https://storage.googleapis.com/vocodes-public";
-    let media_url = `${media_base_url}${bucketPath}`; // gets you a bucket path
+    const api_base_url = "https://api.fakeyou.com";
+    const url = `${api_base_url}/v1/media_files/file/${media_file_token}`;
+    const response = await fetch(url);
+    const json = await JSON.parse(await response.text());
+    const bucketPath = json["media_file"]["public_bucket_path"];
+    const media_base_url = "https://storage.googleapis.com/vocodes-public";
+    const media_url = `${media_base_url}${bucketPath}`; // gets you a bucket path
     return media_url;
   }
 
@@ -213,18 +213,18 @@ export class APIManager {
     return file;
   }
 
-  private async uploadGLB(
+  private async uploadEngineAsset(
     file: File,
-    scene_glb_media_file_token: string | null,
-  ): Promise<string> {
+    media_file_token: string | null,
+  ): Promise<any> {
     const url = `${this.baseUrl}/v1/media_files/write/engine_asset`;
-    let uuid = uuidv4();
+    const uuid = uuidv4();
     const form_data = new FormData();
     form_data.append("uuid_idempotency_token", uuid);
 
     // update existing scene otherwise create new glb scene and use it's media_file_id
-    if (scene_glb_media_file_token != null) {
-      form_data.append("media_file_token", scene_glb_media_file_token);
+    if (media_file_token != null) {
+      form_data.append("media_file_token", media_file_token);
     }
 
     form_data.append("file", file);
@@ -245,7 +245,6 @@ export class APIManager {
       throw new Error("Failed to Send Data");
     } else {
       const json_data = await response.json();
-      console.log(`uploadGLB: ${JSON.stringify(json_data)}`);
       return json_data; // or handle the response as appropriate
     }
   }
@@ -257,7 +256,7 @@ export class APIManager {
     timeline_state: TimelineDataState | null, // only for now.
   ): Promise<string> {
     const url = `${this.baseUrl}/v1/media_files/write/scene_file`;
-    let uuid = uuidv4();
+    const uuid = uuidv4();
 
     console.log(
       `Saving Scene scene_media_file_token:${scene_media_file_token} | scene_glb_media_file_token:${scene_glb_media_file_token}`,
@@ -310,8 +309,8 @@ export class APIManager {
     blob: any,
     fileName: string,
   ): Promise<APIManagerResponseSuccess> {
-    const url = `${this.baseUrl}/v1/media_uploads/upload`;
-    let uuid = uuidv4();
+    const url = `${this.baseUrl}/v1/media_files/upload`;
+    const uuid = uuidv4();
 
     const formData = new FormData();
     formData.append("uuid_idempotency_token", uuid);
@@ -346,11 +345,11 @@ export class APIManager {
     negative_prompt: string,
   ): Promise<string> {
     const url = `https://funnel.tailce84f.ts.net/preview/`;
-    
+
     const payload = {
       style: style,
       positive_prompt: positive_prompt,
-      negative_prompt: negative_prompt
+      negative_prompt: negative_prompt,
     };
 
     const formData = new FormData();
@@ -393,14 +392,15 @@ export class APIManager {
     return result;
   }
 
-  
-  public async stylizeVideo(media_token: string, 
-    style: ArtStyle, 
-    positive_prompt:string, 
-    negative_prompt:string,
-    visibility:Visibility) {
-    let uuid = uuidv4();
-    
+  public async stylizeVideo(
+    media_token: string,
+    style: ArtStyle,
+    positive_prompt: string,
+    negative_prompt: string,
+    visibility: Visibility,
+  ) {
+    const uuid = uuidv4();
+
     const data = {
       uuid_idempotency_token: uuid,
       style: style,
@@ -410,10 +410,10 @@ export class APIManager {
       trim_start_millis: 0,
       trim_end_millis: 3000,
       enable_lipsync: true,
-      creator_set_visibility: visibility
-    }
+      creator_set_visibility: visibility,
+    };
 
-    const json_data = JSON.stringify(data)
+    const json_data = JSON.stringify(data);
 
     const response = await fetch(`${this.baseUrl}/v1/video/enqueue_vst`, {
       method: "POST",
@@ -435,4 +435,3 @@ export class APIManager {
     return await response.json();
   }
 }
-

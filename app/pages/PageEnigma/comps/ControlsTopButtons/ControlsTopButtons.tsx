@@ -1,20 +1,23 @@
 import { useContext, useState } from "react";
 import { Button, Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
-import { AppUiContext } from "../../contexts/AppUiContext";
 import { EngineContext } from "../../contexts/EngineContext";
-import { APPUI_ACTION_TYPES } from "../../reducers";
-import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
-  const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
   const [sceneName, setSceneName] = useState<string>("");
   const [sceneToken, setSceneToken] = useState<string>("");
+
+  // for testing
+  const [mediaToken, setMediaToken] = useState<string>("");
 
   const handleButtonSave = () => {
     console.log(`SceneName is ${sceneName}`);
     editorEngine?.saveScene(sceneName);
+  };
+
+  const handleMediaToken = async () => {
+    await editorEngine?.loadMediaToken(mediaToken);
   };
 
   const handleButtonLoadScene = () => {
@@ -22,90 +25,21 @@ export const ControlsTopButtons = () => {
     editorEngine?.loadScene(sceneToken);
   };
 
-  const handleButtonTest = () => {
-    editorEngine?.testStylizeRequest();
+  const handleButtonTest = () => {};
 
-    // if(appUiState?.showEditorLoadingBar.isShowing){
-    //TO GO TO A HUNDRED AND DISAPPER
-    // dispatchAppUiState({
-    //   type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
-    //   payload:{
-    //     showEditorLoadingBar: {
-    //       progress: 100,
-    //     }
-    //   }
-    // });
-    // setTimeout(() => {
-    //   dispatchAppUiState({
-    //     type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADINGBAR,
-    //   });
-    // }, 1000);
-    //END :TO GO TO A HUNDRED AND DISAPPER
-
-    //EAMPLE OF CHANING LOADING MESSAGE
-    //  dispatchAppUiState({
-    //   type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
-    //   payload:{
-    //     showEditorLoadingBar: {
-    //       message: "new message",
-    //     }
-    //   }
-    // });
-    // }else{
-    //   dispatchAppUiState({
-    //     type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADINGBAR,
-    //     payload:{
-    //       showEditorLoadingBar: {
-    //         message: 'display of LoadingBar triggered by Test Button',
-    //         progress: 10,
-    //       }
-    //     }
-
-    //   });
-    //}
-  };
-
-  const handleObjectPanelTest = () => {
-    if (appUiState?.controlPanel.isShowing) {
-      dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
-      });
-    } else {
-      dispatchAppUiState({
-        type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
-        payload: {
-          group: ClipGroup.OBJECT,
-          object_name: "TEST BUTTON",
-          object_uuid: "",
-          version: "1",
-          objectVectors: {
-            position: { x: 1, y: 2, z: 3 },
-            rotation: { x: 4, y: 5, z: 6 },
-            scale: { x: 7, y: 8, z: 9 },
-          },
-        },
-      });
-    }
+  const handleTestButton2 = () => {
+    console.log("Test Button 2");
   };
 
   const handleButtonCameraView = () => {
     editorEngine?.switchCameraView();
   };
-  const handleButtonPlayBack = () => {
-    editorEngine?.startPlayback();
-  };
-  const handleButtonRender = () => {
-    editorEngine?.generateVideo();
-  };
-
+  // const handleButtonPlayBack = () => {
+  //   editorEngine?.startPlayback();
+  // };
   const handleButtonTakeFrame = () => {
-    editorEngine?.take_timeline_cam_clip();
+    // editorEngine?.take_timeline_cam_clip();
   };
-
-  const handleButtonLoad = () => {
-    console.log("LOADING");
-  };
-
   const handleButtonSingleFrame = () => {
     editorEngine?.generateFrame();
   };
@@ -156,6 +90,26 @@ export const ControlsTopButtons = () => {
         <ButtonDialogue
           buttonProps={{
             variant: "secondary",
+            label: "Add Scene Object (Test)",
+          }}
+          confirmButtonProps={{
+            label: "Save",
+            disabled: mediaToken === "",
+            onClick: handleMediaToken,
+          }}
+          title="Add Scene Object via Media Token"
+        >
+          <Input
+            label="Please Enter a Media Token"
+            onChange={(e) => {
+              setMediaToken(e.target.value);
+            }}
+          />
+        </ButtonDialogue>
+
+        <ButtonDialogue
+          buttonProps={{
+            variant: "secondary",
             label: "Help",
           }}
           title="Help"
@@ -172,21 +126,18 @@ export const ControlsTopButtons = () => {
           Toggle Camera View
         </Button>
         <Button
-          onClick={handleObjectPanelTest}
-          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
+          onClick={handleTestButton2}
+          className="hover:bg-brand-teriary-400 bg-brand-tertiary focus-visible:outline-brand-tertiary"
         >
-          Show Object Panel
+          Test Button 2
         </Button>
       </div>
       <div className="flex gap-2">
-        <Button onClick={handleButtonSingleFrame}>Render Single Frame</Button>
-        <Button onClick={handleButtonTakeFrame}>Take Frame</Button>
-        <Button onClick={handleButtonRender}>Render</Button>
-        {/* <Button onClick={handleButtonLoad}>Load</Button>
-        <Button onClick={handleButtonRender}>Render</Button> */}
+        {/* <Button onClick={handleButtonSingleFrame}>Render Single Frame</Button>
+        <Button onClick={handleButtonTakeFrame}>Take Frame</Button> */}
         <Button
           onClick={handleButtonTest}
-          className="bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary"
+          className="hover:bg-brand-teriary-400 bg-brand-tertiary focus-visible:outline-brand-tertiary"
           style={{ zIndex: 9001 }}
         >
           Test

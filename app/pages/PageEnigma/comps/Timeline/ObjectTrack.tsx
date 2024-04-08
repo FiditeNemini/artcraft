@@ -1,10 +1,11 @@
 import { fullWidth, objectGroup, updateObject } from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
+import { ClipGroup } from "~/pages/PageEnigma/models";
 
 export const ObjectTrack = () => {
   return (
     <div
-      className="block rounded-lg bg-objects-groupBg pb-5 pl-2 pr-4"
+      className="bg-object-groupBg block rounded-lg pb-5 pl-2 pr-4"
       style={{ width: fullWidth.value + 90 }}
     >
       <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
@@ -17,7 +18,7 @@ export const ObjectTrack = () => {
             keyframes={object.keyframes}
             title={`${object.name} Position/Rotation`}
             updateKeyframe={updateObject}
-            style="objects"
+            group={ClipGroup.OBJECT}
           />
         </div>
       ))}

@@ -1,17 +1,17 @@
 import { useMouseEventsClip } from "./utils/useMouseEventsClip";
 import { useState } from "react";
 import { scale, selectedItem } from "~/pages/PageEnigma/store";
-import { Clip } from "~/pages/PageEnigma/models/track";
+import { Clip, ClipGroup } from "~/pages/PageEnigma/models";
 
 interface Props {
   min: number;
   max: number;
-  style: "character" | "camera" | "audio" | "objects";
+  group: ClipGroup;
   clip: Clip;
   updateClip: (options: { id: string; offset: number; length: number }) => void;
 }
 
-export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
+export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
   const [state, setState] = useState({
     length: clip.length,
     offset: clip.offset,
@@ -31,8 +31,8 @@ export const TrackClip = ({ clip, min, max, style, updateClip }: Props) => {
   const classes = [
     "absolute",
     clip.clip_uuid === selectedClipId
-      ? `bg-${style}-selected`
-      : `bg-${style}-clip`,
+      ? `bg-${group}-selected`
+      : `bg-${group}-clip`,
   ];
 
   return (

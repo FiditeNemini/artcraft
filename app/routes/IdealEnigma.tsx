@@ -1,5 +1,5 @@
-import { PageEnigma } from "../pages/PageEnigma";
+import { withProtectionRoute } from "~/modules/withProtectedRoute";
+import { PageEnigma } from "~/pages/PageEnigma";
 
-export default function IdealEnigma() {
-  return <PageEnigma />;
-}
+const IdealEnigma = withProtectionRoute(()=><PageEnigma />);
+export default IdealEnigma;

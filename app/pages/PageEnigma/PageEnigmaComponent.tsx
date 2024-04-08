@@ -1,5 +1,4 @@
-import { useContext } from "react";
-
+import { useContext, useState } from "react";
 import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
 
 import { Button, LoadingBar, LoadingDots } from "~/components";
@@ -12,16 +11,26 @@ import { ControlsVideo } from "./comps/ControlsVideo";
 import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
 import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { ViewSideBySide } from "./comps/ViewSideBySide";
-import { SidePanelTabs } from "./comps/SidePanelTabs";
 import { Timeline } from "./comps/Timeline";
 
 import { APPUI_VIEW_MODES } from "./reducers";
-import { timelineHeight } from "~/pages/PageEnigma/store";
+import {
+  timelineHeight,
+  sidePanelWidth,
+  pageWidth,
+  sidePanelVisible,
+  pageHeight,
+  dndSidePanelWidth,
+  dndTimelineHeight,
+} from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/pages/PageEnigma/contexts/AppUiContext";
+import { EngineContext } from "./contexts/EngineContext";
 
 export const PageEnigmaComponent = () => {
   useSignals();
+
+  const editorEngine = useContext(EngineContext);
   const [appUiState] = useContext(AppUiContext);
 
   //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
@@ -29,19 +38,45 @@ export const PageEnigmaComponent = () => {
     event.stopPropagation();
   };
 
-  const lowerHeight = timelineHeight.value;
-  return (
-    <div>
-      <TopBarHelmet>
-        <Button icon={faSparkles}>Generate Movie</Button>
-      </TopBarHelmet>
+  const handleGenerateMovieClick = () => {
+    if (editorEngine != null) {
+      editorEngine?.generateVideo();
+    } else {
+      console.log("Tried to generate movie but editor was null");
+    }
+  };
 
-      <div style={{ height: "calc(100vh - 68px)" }}>
+  const dndWidth =
+    dndSidePanelWidth.value > -1
+      ? dndSidePanelWidth.value
+      : sidePanelWidth.value;
+  const width = sidePanelVisible.value
+    ? pageWidth.value - dndWidth - 66
+    : pageWidth.value - 66;
+  const height =
+    dndTimelineHeight.value > -1
+      ? pageHeight.value - dndTimelineHeight.value - 68
+      : pageHeight.value - timelineHeight.value - 68;
+
+  return (
+    <div className="w-screen">
+      <TopBarHelmet>
+        <Button icon={faSparkles} onClick={handleGenerateMovieClick}>
+          Generate Movie
+        </Button>
+      </TopBarHelmet>
+      <div
+        className="relative flex w-screen"
+        style={{ height: "calc(100vh - 68px)" }}
+      >
         {/* Engine section/side panel */}
         <div
           id="engine-n-panels-wrapper"
           className="flex"
-          style={{ height: `calc(100% - ${lowerHeight}px)` }}
+          style={{
+            height,
+            width,
+          }}
         >
           <div className="relative w-full overflow-hidden bg-transparent">
             <div
@@ -93,19 +128,16 @@ export const PageEnigmaComponent = () => {
               progress={appUiState.showEditorLoadingBar.progress}
             />
           </div>
-
-          {/* Side panel */}
-          <div onClick={handleOverlayClick}>
-            <SidePanel>
-              <SidePanelTabs />
-            </SidePanel>
-          </div>
         </div>
-
-        {/* Timeline */}
+        {/* Side panel */}
         <div onClick={handleOverlayClick}>
-          <Timeline />
+          <SidePanel />
         </div>
+      </div>
+
+      {/* Timeline */}
+      <div onClick={handleOverlayClick}>
+        <Timeline />
       </div>
     </div>
   );

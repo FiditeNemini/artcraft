@@ -1,9 +1,5 @@
 import { useCallback } from "react";
-import {
-  ClipGroup,
-  QueueKeyframe,
-  Keyframe,
-} from "~/pages/PageEnigma/models/track";
+import { ClipGroup, QueueKeyframe, Keyframe } from "~/pages/PageEnigma/models";
 import {
   addCameraKeyframe,
   addCharacterKeyframe,
@@ -32,11 +28,11 @@ const DELETE_KEYFRAME: Record<ClipGroup, (keyframe: Keyframe) => void> = {
 
 export default function useUpdateKeyframe() {
   const addKeyframe = useCallback((keyframe: QueueKeyframe, offset: number) => {
+    console.log("k", keyframe);
     ADD_KEYFRAME[keyframe.group](keyframe, offset);
   }, []);
 
   const deleteKeyframe = useCallback((keyframe: Keyframe) => {
-    console.log("del", keyframe);
     DELETE_KEYFRAME[keyframe.group](keyframe);
   }, []);
 

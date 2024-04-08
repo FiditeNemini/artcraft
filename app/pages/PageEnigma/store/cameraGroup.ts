@@ -2,17 +2,29 @@ import {
   CameraGroup,
   Keyframe,
   QueueKeyframe,
-} from "~/pages/PageEnigma/models/track";
+} from "~/pages/PageEnigma/models";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 import { signal } from "@preact/signals-core";
+import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+// import { toast } from "react-hot-toast";
 
 export const cameraGroup = signal<CameraGroup>({ id: "CG1", keyframes: [] });
 
 export function updateCamera({ id, offset }: { id: string; offset: number }) {
   const oldCameraGroup = cameraGroup.value;
+
+  const existingKeyframe = oldCameraGroup.keyframes.some((row) => {
+    return row.offset === offset && row.keyframe_uuid !== id;
+  });
+
+  if (existingKeyframe) {
+    //toast.error("There can only be one keyframe at this offset.");
+    return;
+  }
+
   const newKeyframes = [...oldCameraGroup.keyframes];
   const keyframe = newKeyframes.find((row) => row.keyframe_uuid === id);
   if (!keyframe) {
@@ -33,7 +45,11 @@ export function updateCamera({ id, offset }: { id: string; offset: number }) {
 }
 
 export function addCameraKeyframe(keyframe: QueueKeyframe, offset: number) {
-  console.log("cam", keyframe);
+  const oldCameraGroup = cameraGroup.value;
+  if (oldCameraGroup.keyframes.some((row) => row.offset === offset)) {
+    //toast.error("There can only be one keyframe at this offset.");
+    return;
+  }
   const newKeyframe = {
     version: keyframe.version,
     keyframe_uuid: uuid.v4(),
@@ -46,7 +62,6 @@ export function addCameraKeyframe(keyframe: QueueKeyframe, offset: number) {
     selected: false,
   } as Keyframe;
 
-  const oldCameraGroup = cameraGroup.value;
   cameraGroup.value = {
     ...oldCameraGroup,
     keyframes: [...oldCameraGroup.keyframes, newKeyframe].sort(
@@ -97,4 +112,19 @@ export function deleteCameraKeyframe(deleteKeyframe: Keyframe) {
       }),
     ],
   };
+}
+
+export function loadCameraData(item: ClipUI) {
+  const existingCamera = cameraGroup.value;
+  const newKeyframe = {
+    version: item.version,
+    keyframe_uuid: item.clip_uuid,
+    group: item.group,
+    object_uuid: item.object_uuid,
+    offset: item.keyframe_offset,
+  } as Keyframe;
+  existingCamera.keyframes.push(newKeyframe);
+  existingCamera.keyframes.sort(
+    (keyframeA, keyframeB) => keyframeA.offset - keyframeB.offset,
+  );
 }

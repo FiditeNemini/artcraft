@@ -3,13 +3,14 @@ import {
   Clip,
   ClipGroup,
   ClipType,
-  MediaClip,
-} from "~/pages/PageEnigma/models/track";
+  MediaItem,
+} from "~/pages/PageEnigma/models";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 import { signal } from "@preact/signals-core";
+import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
 
 export const audioGroup = signal<AudioGroup>({
   id: "AG-1",
@@ -49,31 +50,27 @@ export function updateAudio({
 }
 
 export function addGlobalAudio({
-  clipId,
+  dragItem,
   audioId,
-  audioClips,
   offset,
 }: {
-  clipId: string;
+  dragItem: MediaItem;
   audioId: string;
-  audioClips: MediaClip[];
   offset: number;
 }) {
   if (audioGroup.value.id !== audioId) {
     return;
   }
 
-  const clip = audioClips.find((row) => row.media_id === clipId);
-  if (!clip) {
-    return;
-  }
-
   const clip_uuid = uuid.v4();
   const newClip = {
-    ...clip,
+    version: 1,
+    media_id: dragItem.media_id,
     type: ClipType.AUDIO,
     group: ClipGroup.GLOBAL_AUDIO,
     offset,
+    length: dragItem.length,
+    name: dragItem.name,
     clip_uuid,
   } as Clip;
 
@@ -143,4 +140,21 @@ export function deleteAudioClip(clip: Clip) {
       }),
     ],
   };
+}
+
+export function loadAudioData(item: ClipUI) {
+  const existingAudio = audioGroup.value;
+  const newItem = {
+    version: item.version,
+    clip_uuid: item.clip_uuid,
+    type: item.type,
+    group: item.group,
+    object_uuid: item.object_uuid,
+    media_id: item.media_id,
+    name: item.name,
+    offset: item.offset,
+    length: item.length,
+  } as Clip;
+  existingAudio.clips.push(newItem);
+  existingAudio.clips.sort((clipA, clipB) => clipA.offset - clipB.offset);
 }

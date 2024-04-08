@@ -4,6 +4,7 @@ import { ObjectTrack } from "~/pages/PageEnigma/comps/Timeline/ObjectTrack";
 
 export const ObjectGroups = () => {
   useSignals();
+
   return (
     <>
       {objectGroup.value.objects.length > 0 && (

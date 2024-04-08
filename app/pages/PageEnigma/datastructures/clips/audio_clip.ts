@@ -52,12 +52,12 @@ export class AudioClip  {
     return new AudioData(audioContext, audioBuffer);
   }
 
-  toJSON(): string {
-    return JSON.stringify({
+  toJSON(): any {
+    return {
       version: this.version,
       media_id: this.media_id,
       type: this.type,
       volume: this.volume,
-    });
+    };
   }
 }

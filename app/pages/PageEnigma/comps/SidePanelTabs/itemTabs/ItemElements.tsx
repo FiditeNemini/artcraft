@@ -1,0 +1,47 @@
+import { ItemElement } from "./ItemElement";
+import { AssetFilterOption, MediaItem } from "~/pages/PageEnigma/models";
+import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
+
+interface Props {
+  items: MediaItem[];
+  assetFilter: AssetFilterOption;
+}
+
+export const ItemElements = ({ items, assetFilter }: Props) => {
+  const displayWidth =
+    dndSidePanelWidth.value > -1
+      ? dndSidePanelWidth.value
+      : sidePanelWidth.value;
+
+  const displayItems = items.filter((item) => {
+    if (assetFilter === AssetFilterOption.ALL) {
+      return true;
+    }
+    if (assetFilter === AssetFilterOption.MINE) {
+      return item.isMine;
+    }
+    return item.isBookmarked;
+  });
+
+  function getGridColumnsClass(displayWidth: number): string {
+    if (displayWidth <= 280) {
+      return "grid-cols-2";
+    } else if (displayWidth <= 360) {
+      return "grid-cols-3";
+    } else if (displayWidth <= 440) {
+      return "grid-cols-4";
+    } else {
+      return "grid-cols-4";
+    }
+  }
+
+  const gridColumnsClass = getGridColumnsClass(displayWidth);
+
+  return (
+    <div className={`grid ${gridColumnsClass} gap-3`}>
+      {displayItems.map((item) => (
+        <ItemElement key={item.media_id} item={item} />
+      ))}
+    </div>
+  );
+};

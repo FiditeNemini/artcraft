@@ -1,18 +1,22 @@
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import { ClipType, MediaClip } from "~/pages/PageEnigma/models/track";
+import { ReactNode, useCallback, useMemo } from "react";
+import { AssetType } from "~/pages/PageEnigma/models";
 import useUpdateDragDrop from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateDragDrop";
 import {
   addCharacterAnimation,
   addCharacterAudio,
   addGlobalAudio,
+  addCharacter,
   canDrop,
-  dragId,
-  dragType,
+  dragItem,
   dropId,
   dropOffset,
+  addObject,
+  characterGroups,
+  cameraGroup,
+  audioGroup,
+  objectGroup,
 } from "~/pages/PageEnigma/store";
-import * as uuid from "uuid";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 
 interface Props {
@@ -24,159 +28,77 @@ export const TrackProvider = ({ children }: Props) => {
 
   const { endDrag, ...dragDrop } = useUpdateDragDrop();
 
-  const [animationClips, setAnimationClips] = useState<MediaClip[]>([]);
-  const [audioClips, setAudioClips] = useState<MediaClip[]>([]);
-
-  const [scale, setScale] = useState(1);
-  const [length, setLength] = useState(1);
-  const [time, setTime] = useState(0);
-  const updateCurrentTime = useCallback((newTime: number) => {
-    setTime(newTime);
-    console.log("message", {
-      action: "UpdateCurrentTime",
-      id: "",
-      data: { currentTime: newTime },
-    });
-  }, []);
-
-  const [timelineHeight, setTimelineHeight] = useState(0);
-  useEffect(() => {
-    const windowHeight = window.outerHeight;
-    setTimelineHeight(windowHeight * 0.25);
-  }, []);
-
   // cross group functions
   const dropClip = useCallback(() => {
-    if (canDrop.value) {
-      if (dragType.value === "animations") {
+    if (dragItem.value) {
+      const mediaItem = dragItem.value;
+      if (mediaItem.type === AssetType.CHARACTER) {
+        addCharacter(dragItem.value);
+      }
+      // if (dragItem.value.type === AssetType.CAMERA) {
+      //   console.log("Dragged In Camera Type")
+      // }
+      if (dragItem.value.type === AssetType.OBJECT) {
+        addObject(dragItem.value);
+      }
+    }
+    // if (dragItem.value.type === AssetType.SHAPE) {
+    //   console.log("Dragged In Shape Type")
+    // }
+
+    if (canDrop.value && dragItem.value) {
+      if (dragItem.value.type === AssetType.ANIMATION) {
         addCharacterAnimation({
-          clipId: dragId.value!,
+          dragItem: dragItem.value,
           characterId: dropId.value,
-          animationClips,
           offset: dropOffset.value,
         });
       }
-      if (dragType.value === "audio") {
+      if (dragItem.value.type === AssetType.AUDIO) {
+        console.log("add audio", dropId.value);
         addCharacterAudio({
-          clipId: dragId.value!,
+          dragItem: dragItem.value,
           characterId: dropId.value,
-          audioClips,
           offset: dropOffset.value,
         });
         addGlobalAudio({
-          clipId: dragId.value!,
+          dragItem: dragItem.value,
           audioId: dropId.value,
-          audioClips,
           offset: dropOffset.value,
         });
       }
     }
     endDrag();
-  }, [animationClips, endDrag]);
+  }, [endDrag]);
 
-  const fullWidth = useMemo(() => {
-    return length * 60 * 4 * scale;
-  }, [length, scale]);
-
-  useEffect(() => {
-    setAnimationClips([
-      {
-        version: 1,
-        media_id: "m_5q9s6esz8ymjqz0bheh8nf4crtj2kx",
-        type: ClipType.ANIMATION,
-        length: 25,
-        name: "Sit",
-      },
-      {
-        version: 1,
-        media_id: uuid.v4(),
-        type: ClipType.ANIMATION,
-        length: 25,
-        name: "Idle",
-      },
-      {
-        version: 1,
-        media_id: uuid.v4(),
-        type: ClipType.ANIMATION,
-        length: 25,
-        name: "Stand",
-      },
-      {
-        version: 1,
-        media_id: uuid.v4(),
-        type: ClipType.ANIMATION,
-        length: 25,
-        name: "Walk",
-      },
-    ]);
-    setAudioClips([
-      {
-        version: 1,
-        media_id: uuid.v4(),
-        type: ClipType.ANIMATION,
-        length: 25,
-        name: "Sing",
-      },
-      {
-        version: 1,
-        media_id: uuid.v4(),
-        type: ClipType.AUDIO,
-        length: 25,
-        name: "Chatter",
-      },
-      {
-        version: 1,
-        media_id: "m_403phjvjkbbaxxbz8y7r6qjay07mfd",
-        type: ClipType.AUDIO,
-        length: 25,
-        name: "Talk",
-      },
-      {
-        version: 1,
-        media_id: uuid.v4(),
-        type: ClipType.AUDIO,
-        length: 25,
-        name: "Yell",
-      },
-    ]);
-    setScale(1);
-    setLength(12);
+  const clearExistingData = useCallback(() => {
+    characterGroups.value = [];
+    cameraGroup.value = {
+      id: "CG1",
+      keyframes: [],
+    };
+    audioGroup.value = {
+      id: "AG-1",
+      clips: [],
+      muted: false,
+    };
+    objectGroup.value = {
+      id: "OG1",
+      objects: [],
+    };
   }, []);
 
   const values = useMemo(() => {
     return {
       ...keyframes,
 
+      clearExistingData,
+
       ...dragDrop,
       endDrag: dropClip,
-
-      animationClips,
-      audioClips,
-
-      scale,
-      currentTime: time,
-      updateCurrentTime,
-      length,
-      fullWidth,
-      timelineHeight,
-      setTimelineHeight,
     };
-  }, [
-    keyframes,
+  }, [keyframes, dragDrop, dropClip, clearExistingData]);
 
-    dragDrop,
-    dropClip,
-
-    animationClips,
-    audioClips,
-
-    updateCurrentTime,
-    time,
-    fullWidth,
-    length,
-    scale,
-    timelineHeight,
-  ]);
   return (
     <TrackContext.Provider value={values}>{children}</TrackContext.Provider>
   );
