@@ -311,7 +311,7 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
-    //this._test_demo();
+    this._test_demo();
 
     this.renderer.domElement.addEventListener(
       "mousedown",
@@ -1076,6 +1076,7 @@ class Editor {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const interactable: any[] = [];
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
+      // console.log(child);
       if (child.name != "") {
         if (child.type == "Mesh" || child.type == "Object3D" || child.type == "Group") {
           interactable.push(child);
