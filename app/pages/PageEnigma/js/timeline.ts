@@ -200,7 +200,8 @@ export class TimeLine {
                 uuid,
                 object_name,
                 0,
-                this.absolute_end))
+                this.absolute_end,
+                data_json['offset']))
         }
 
         this.scene.createPoint(data_json['position'], data_json['keyframe_uuid']);

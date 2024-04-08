@@ -14,6 +14,7 @@ export class ClipUI {
   length: number; // in frames
   should_play: boolean;
   clip_uuid: string;
+  keyframe_offset: number;
 
   constructor(
     version: number,
@@ -26,6 +27,7 @@ export class ClipUI {
     object_name: string,
     offset: number,
     length: number,
+    keyframe_offset: number = 0,
   ) {
     this.version = version;
     this.group = group; // Only needed for UI
@@ -41,6 +43,7 @@ export class ClipUI {
     this.offset = offset;
     this.length = length;
     this.should_play = true;
+    this.keyframe_offset = keyframe_offset;
   }
 
   toJSON(): any {
@@ -55,6 +58,7 @@ export class ClipUI {
       media_id: this.media_id,
       start_offset: this.offset,
       ending_offset: this.length,
+      keyframe_offset: this.keyframe_offset,
     };
   }
 }
