@@ -31,8 +31,6 @@ pub fn add_gotta_go_fast_test_branches(cors: Cors, _is_production: bool) -> Cors
       })
 }
 
-//
-
 #[cfg(test)]
 mod tests {
   use reusable_types::server_environment::ServerEnvironment;
