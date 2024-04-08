@@ -6,6 +6,7 @@
   "scripts": {
     "build": "remix vite:build",
     "dev": "remix vite:dev",
+    "staging-build": "remix vite:build",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "start": "netlify serve",
     "typecheck": "tsc",
@@ -36,6 +37,7 @@
     "react-cookie": "^7.1.4",
     "react-dom": "^18.2.0",
     "tailwind-merge": "^2.2.2",
+    "terser": "^5.30.3",
     "three": "^0.162.0",
     "uuid": "^9.0.1",
     "webm-writer": "^1.0.0"
