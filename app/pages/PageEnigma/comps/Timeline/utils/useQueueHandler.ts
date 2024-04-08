@@ -56,6 +56,36 @@ function addCharacter(item: ClipUI) {
   ) as CharacterGroup;
 }
 
+function addObject(item: ClipUI) {
+  const existingCharacter = characterGroups.value.find(
+    (character) => character.id === item.object_uuid,
+  );
+
+  if (existingCharacter) {
+    return existingCharacter;
+  }
+
+  const newCharacter = {
+    id: item.object_uuid,
+    name: item.object_name,
+    muted: false,
+    animationClips: [],
+    positionKeyframes: [],
+    lipSyncClips: [],
+  } as CharacterGroup;
+
+  characterGroups.value = [
+    ...characterGroups.value.filter(
+      (character) => character.id !== item.object_uuid,
+    ),
+    newCharacter,
+  ].sort((charA, charB) => (charA.id < charB.id ? -1 : 1));
+
+  return characterGroups.value.find(
+    (character) => character.id === item.object_uuid,
+  ) as CharacterGroup;
+}
+
 export function useQueueHandler() {
   useSignals();
   const { addKeyframe } = useContext(TrackContext);
@@ -100,6 +130,43 @@ export function useQueueHandler() {
               existingCharacter.positionKeyframes.sort(
                 (keyframeA, keyframeB) =>
                   keyframeA.keyframe_uuid < keyframeB.keyframe_uuid ? -1 : 1,
+              );
+            }
+            if (item.type === ClipType.AUDIO) {
+              const newItem = {
+                version: item.version,
+                clip_uuid: item.clip_uuid,
+                type: item.type,
+                group: item.group,
+                object_uuid: item.object_uuid,
+                media_id: item.media_id,
+                name: item.name,
+                offset: item.offset,
+                length: item.length,
+              } as Clip;
+              existingCharacter.lipSyncClips.push(newItem);
+              existingCharacter.lipSyncClips.sort((clipA, clipB) =>
+                clipA.clip_uuid < clipB.clip_uuid ? -1 : 1,
+              );
+            }
+          }
+          if (item.group === ClipGroup.OBJECT) {
+            const existingObject = addObject(item);
+            if (item.type === ClipType.ANIMATION) {
+              const newItem = {
+                version: item.version,
+                clip_uuid: item.clip_uuid,
+                type: item.type,
+                group: item.group,
+                object_uuid: item.object_uuid,
+                media_id: item.media_id,
+                name: item.name,
+                offset: item.offset,
+                length: item.length,
+              } as Clip;
+              existingObject.clips.push(newItem);
+              existingObject.clips.sort((clipA, clipB) =>
+                clipA.clip_uuid < clipB.clip_uuid ? -1 : 1,
               );
             }
           }
