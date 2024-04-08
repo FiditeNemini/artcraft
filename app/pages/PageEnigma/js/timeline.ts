@@ -42,6 +42,7 @@ export class TimeLine {
     animation_engine: AnimationEngine;
     // lip sync engine
     lipSync_engine: LipSyncEngine;
+    characters: {[key: string]: string};
 
     scene: Scene;
 
@@ -55,6 +56,7 @@ export class TimeLine {
         scene: Scene,
     ) {
         this.timeline_items = [];
+        this.characters = {};
         this.absolute_end = 60 * 12;
         this.timeline_limit = 0; // 5 seconds
 
@@ -145,6 +147,10 @@ export class TimeLine {
         obj.name = name;
         let object_uuid = obj.uuid;
 
+        console.log("data.data", data.data)
+
+        this.characters[object_uuid] = type;
+
         data.data['object_uuid'] = object_uuid;
         Queue.publish({
             queueName: QueueNames.FROM_ENGINE,
@@ -175,11 +181,18 @@ export class TimeLine {
         let data_json = data['data'];
         let uuid = data_json['object_uuid'];
         let keyframe_uuid = data_json['keyframe_uuid'];
-        console.log(keyframe_uuid);
 
         let object_name = this.scene.get_object_by_uuid(uuid)?.name;
         if (object_name == undefined) {
             object_name = "undefined"
+        }
+
+        for (let key in this.characters) {
+            let element = this.characters[key];
+            if (key == uuid) {
+                data_json['group'] = element;
+                break;
+            }
         }
 
         let new_item = this.transform_engine.addFrame(uuid,
@@ -243,7 +256,7 @@ export class TimeLine {
                     this.addPlayableClip(
                         new ClipUI(
                             version,
-                            "lipsync",// TODO potiential bug ..
+                            "lipsync", // TODO potiential bug ..
                             group,
                             name,
                             media_id,
