@@ -22,3 +22,6 @@
 pub mod cors;
 
 pub (crate) mod configs;
+
+#[cfg(test)]
+pub (crate) mod testing;

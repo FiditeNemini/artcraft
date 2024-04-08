@@ -2,8 +2,8 @@ use actix_cors::Cors;
 use log::info;
 
 use reusable_types::server_environment::ServerEnvironment;
-use crate::configs::development_only::add_development_only;
 
+use crate::configs::development_only::add_development_only;
 use crate::configs::fakeyou::{add_fakeyou, add_fakeyou_dev_proxy};
 use crate::configs::gottagofast::add_gotta_go_fast_test_branches;
 use crate::configs::legacy::{add_legacy_storyteller_stream, add_legacy_trumped, add_legacy_vocodes, add_power_stream};
@@ -62,43 +62,12 @@ fn do_build_cors_config(is_production: bool) -> Cors {
 
 #[cfg(test)]
 mod tests {
-  use actix_cors::Cors;
-  use actix_http::body::{BoxBody, EitherBody};
-  use actix_web::dev::{ServiceResponse, Transform};
-  use actix_web::http::StatusCode;
-  use actix_web::test;
-  use actix_web::test::TestRequest;
-  use speculoos::asserting;
-
   use reusable_types::server_environment::ServerEnvironment;
 
+  use crate::testing::assert_origin_invalid;
+  use crate::testing::assert_origin_ok;
+
   use super::build_cors_config;
-
-  async fn make_test_request(cors: &Cors, hostname: &str) -> ServiceResponse<EitherBody<BoxBody>> {
-    let cors= cors.new_transform(test::ok_service())
-        .await
-        .unwrap();
-
-    let request = TestRequest::default()
-        .insert_header(("Origin", hostname))
-        .to_srv_request();
-
-    test::call_service(&cors, request).await
-  }
-
-  async fn assert_origin_ok(cors: &Cors, hostname: &str) {
-    let response = make_test_request(cors, hostname).await;
-    asserting(&format!("Hostname {} is valid", hostname))
-        .that(&response.status())
-        .is_equal_to(StatusCode::OK);
-  }
-
-  async fn assert_origin_invalid(cors: &Cors, hostname: &str) {
-    let response = make_test_request(cors, hostname).await;
-    asserting(&format!("Hostname {} is invalid", hostname))
-        .that(&response.status())
-        .is_equal_to(StatusCode::BAD_REQUEST);
-  }
 
   #[actix_rt::test]
   async fn test_fakeyou_production() {
