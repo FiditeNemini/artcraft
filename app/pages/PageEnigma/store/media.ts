@@ -94,7 +94,7 @@ export const cameraItems = signal<MediaItem[]>([
 export const characterItems = signal<MediaItem[]>([
   {
     version: 1,
-    media_id: "",
+    media_id: "m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp",
     type: AssetType.CHARACTER,
     name: "Shrek",
     thumbnail: "resources/placeholders/placeholder.png",
@@ -122,7 +122,7 @@ export const characterItems = signal<MediaItem[]>([
   },
   {
     version: 1,
-    media_id: "m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp ",
+    media_id: "m_4wva09qznapzk5rcvbxy671d1qx2pr ",
     type: AssetType.CHARACTER,
     name: "Story Girl",
     thumbnail: "resources/characters/img13.png",
