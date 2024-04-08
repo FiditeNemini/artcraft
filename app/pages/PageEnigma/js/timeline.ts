@@ -256,7 +256,7 @@ export class TimeLine {
                     this.addPlayableClip(
                         new ClipUI(
                             version,
-                            type, // TODO potiential bug ..
+                            "lipsync", // TODO potiential bug ..
                             group,
                             name,
                             media_id,
