@@ -13,15 +13,7 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 
-export const characterGroups = signal<CharacterGroup[]>([
-  {
-    id: "CH1",
-    muted: false,
-    animationClips: [],
-    positionKeyframes: [],
-    lipSyncClips: [],
-  },
-]);
+export const characterGroups = signal<CharacterGroup[]>([]);
 
 export function updateCharacters({
   type,

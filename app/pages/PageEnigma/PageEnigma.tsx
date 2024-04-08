@@ -22,12 +22,8 @@ export const PageEnigma = () => {
   useSignals();
   useEffect(() => {
     function setPage() {
-      const pxRatioWidth =
-        window.screen.availWidth / document.documentElement.clientWidth;
-      const pxRatioHeight =
-        window.screen.availHeight / document.documentElement.clientHeight;
-      pageHeight.value = window.outerHeight / pxRatioHeight;
-      pageWidth.value = window.outerWidth / pxRatioWidth;
+      pageHeight.value = window.innerHeight / window.devicePixelRatio;
+      pageWidth.value = window.outerWidth / window.devicePixelRatio;
     }
     timelineHeight.value = window.innerHeight * 0.25;
     sidePanelWidth.value = 443;
