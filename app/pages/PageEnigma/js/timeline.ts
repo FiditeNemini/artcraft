@@ -199,7 +199,7 @@ export class TimeLine {
                 keyframe_uuid,
                 uuid,
                 object_name,
-                0,
+                data_json['offset'],
                 this.absolute_end))
         }
 
