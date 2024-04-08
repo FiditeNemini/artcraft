@@ -64,6 +64,7 @@ export class StoryTellerProxyTimeline {
                 let clip = new ClipUI(
                     element.version, element.type, 
                     element.group, element.name, 
+                    element.clip_uuid,
                     element.media_id, element.object_uuid, 
                     element.object_name,
                     element.start_offset, element.ending_offset);

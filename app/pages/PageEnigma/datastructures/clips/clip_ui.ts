@@ -13,6 +13,7 @@ export class ClipUI {
   offset: number; // in frames
   length: number; // in frames
   should_play: boolean;
+  clip_uuid: string;
 
   constructor(
     version: number,
@@ -20,6 +21,7 @@ export class ClipUI {
     group: ClipGroup,
     name: string,
     media_id: string,
+    clip_uuid: string,
     object_uuid: string,
     object_name: string,
     offset: number,
@@ -27,6 +29,8 @@ export class ClipUI {
   ) {
     this.version = version;
     this.group = group; // Only needed for UI
+
+    this.clip_uuid = clip_uuid;
 
     this.name = name; // UI
     this.type = type; // UI and Animation / Audio / Lipsync /  : Engine
@@ -45,6 +49,7 @@ export class ClipUI {
       group: this.group,
       name: this.name,
       type: this.type,
+      clip_uuid: this.clip_uuid,
       object_uuid: this.object_uuid,
       object_name: this.object_name,
       media_id: this.media_id,
