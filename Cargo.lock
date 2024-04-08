@@ -363,6 +363,7 @@ dependencies = [
  "my-workspace-hack",
  "reusable_types",
  "speculoos",
+ "url",
 ]
 
 [[package]]
