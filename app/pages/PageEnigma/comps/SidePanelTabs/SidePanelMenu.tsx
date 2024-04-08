@@ -7,6 +7,7 @@ import {
   sidePanelVisible,
 } from "~/pages/PageEnigma/store/sidePanel";
 import { tabList } from "./tabList";
+import { twMerge } from "tailwind-merge";
 
 export const SidePanelMenu = () => {
   useSignals();
@@ -34,12 +35,12 @@ export const SidePanelMenu = () => {
         {tabList.map((tab) => (
           <button
             key={tab.value}
-            className={[
-              "flex flex-col items-center gap-2 rounded-lg px-2 py-2.5",
+            className={twMerge(
+              "flex flex-col items-center gap-2 rounded-lg px-2 py-2.5 transition-all duration-150 hover:bg-assets-selectedTab/80",
               tab.value === selectedTab?.value?.value
-                ? "bg-assets-selectedTab opacity-100"
+                ? "bg-assets-selectedTab opacity-100 hover:bg-assets-selectedTab"
                 : "opacity-50",
-            ].join(" ")}
+            )}
             onClick={() => {
               selectedTab.value = tab;
               if (!sidePanelVisible.value) {
