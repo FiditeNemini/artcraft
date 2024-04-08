@@ -521,7 +521,7 @@ class Editor {
     // note the database from the server is the source of truth for all the data.
     // Test code here
     const object: THREE.Object3D = await this.activeScene.load_glb(
-      "m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp",
+      "m_4wva09qznapzk5rcvbxy671d1qx2pr",
     );
 
     object.uuid = "CH1";
@@ -1088,7 +1088,7 @@ class Editor {
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
       // console.log(child);
       if (child.name != "") {
-        if (child.type == "Mesh" || child.type == "Object3D") {
+        if (child.type == "Mesh" || child.type == "Object3D" || child.type == "Group") {
           interactable.push(child);
         }
       }
