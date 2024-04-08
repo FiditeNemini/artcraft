@@ -26,7 +26,6 @@ import {
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { toTimelineActions } from "~/pages/PageEnigma/Queue/toTimelineActions";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
-import * as uuid from "uuid";
 
 interface Arguments {
   action: fromEngineActions | toEngineActions | toTimelineActions;
@@ -131,7 +130,7 @@ export function useQueueHandler() {
                 keyframe_uuid: item.clip_uuid,
                 group: item.group,
                 object_uuid: item.object_uuid,
-                offset: item.offset,
+                offset: item.keyframe_offset,
               } as Keyframe;
               existingCharacter.positionKeyframes.push(newKeyframe);
               existingCharacter.positionKeyframes.sort(
@@ -163,7 +162,7 @@ export function useQueueHandler() {
               keyframe_uuid: item.clip_uuid,
               group: item.group,
               object_uuid: item.object_uuid,
-              offset: item.offset,
+              offset: item.keyframe_offset,
             } as Keyframe;
             existingObject.keyframes.push(newKeyframe);
             existingObject.keyframes.sort(
@@ -177,7 +176,7 @@ export function useQueueHandler() {
               keyframe_uuid: item.clip_uuid,
               group: item.group,
               object_uuid: item.object_uuid,
-              offset: item.offset,
+              offset: item.keyframe_offset,
             } as Keyframe;
             existingCamera.keyframes.push(newKeyframe);
             existingCamera.keyframes.sort(
@@ -205,9 +204,21 @@ export function useQueueHandler() {
           }
         });
         break;
-      case fromEngineActions.UPDATE_CHARACTER_ID:
-        console.log(action);
+      case fromEngineActions.UPDATE_CHARACTER_ID: {
+        const newCharacter = {
+          id: (data as MediaItem).object_uuid,
+          name: (data as MediaItem).name,
+          muted: false,
+          animationClips: [],
+          positionKeyframes: [],
+          lipSyncClips: [],
+        } as CharacterGroup;
+
+        characterGroups.value = [...characterGroups.value, newCharacter].sort(
+          (charA, charB) => (charA.id < charB.id ? -1 : 1),
+        );
         break;
+      }
       default:
         throw new Error(`Unknown action ${action}`);
     }

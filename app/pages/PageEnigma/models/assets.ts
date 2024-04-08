@@ -2,6 +2,7 @@ export interface MediaItem {
   version: number;
   type: AssetType;
   media_id: string;
+  object_uuid?: string;
   name: string;
   length?: number;
   thumbnail?: string;
