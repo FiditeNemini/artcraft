@@ -38,13 +38,10 @@ const MediaBusy = () => {
 };
 
 const MocapInputFull = ({ media, clear, ...rest }: SlideProps) => {
-  console.log("🟦",media,rest);
   const bucketConfig = new BucketConfig();
   const mediaUrl = media?.public_bucket_path ? bucketConfig.getGcsUrl(media.public_bucket_path) : "";
   const mediaType = mediaCategoryfromString(media?.media_type || "");
   // const yada = ListEntityFilters(EntityInputMode.media).indexOf(media.media_type);
-
-  console.log("🧖🏿‍♂️",mediaType);
 
   switch (mediaType) {
     case MediaFilters.video: return <>
@@ -122,8 +119,6 @@ export default function EntityInput({ accept: inAccept, aspectRatio = "square", 
     onStart: () => animatingSet(true)
   });
 
-
-  console.log("🧤",fileTypes);
 
   useEffect(() => {
     if (presetToken && value !== presetToken) onChange({ target: { name, value: presetToken } });

@@ -540,6 +540,17 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
+                {mediaFile?.media_type === MediaFileType.Video ? (
+                  <Button
+                    {...{
+                      icon: faArrowRightArrowLeft,
+                      label: "Style Transfer",
+                      to: `/style-video/${mediaFile.token}`,
+                      variant: "primary",
+                      className: "flex-grow-1",
+                    }}
+                  />
+                ) : null}
                 {mediaFile?.media_type === MediaFileType.BVH ||
                 mediaFile?.media_type === MediaFileType.GLTF ||
                 mediaFile?.media_type === MediaFileType.GLB ? (

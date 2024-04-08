@@ -911,7 +911,7 @@ class PageContainer extends React.Component<
                     <VoiceDesignerMainPage />
                   </Route>
 
-                  <Route path="/style-video">
+                  <Route path="/style-video/:mediaToken?">
                     <StyleVideo />
                   </Route>
 

@@ -9,12 +9,16 @@ import {
   EnqueueVSTResponse
 } from "@storyteller/components/src/api/video_styleTransfer/Enqueue_VST";
 import "./StyleVideo.scss";
+import { useParams } from "react-router-dom";
+import { STYLE_OPTIONS } from "common/StyleOptions";
 
 export default function StyleVideo() {
-  const [style,styleSet] = useState("anime_2d_flat");
-  const [mediaToken,mediaTokenSet] = useState("");
-  const [prompt,promptSet] = useState("");
-  const [negativePrompt,negativePromptSet] = useState("");
+  const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
+
+  const [style, styleSet] = useState("anime_2d_flat");
+  const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
+  const [prompt, promptSet] = useState("");
+  const [negativePrompt, negativePromptSet] = useState("");
   const { enqueue } = useInferenceJobs();
 
   const onClick = () => {
@@ -31,9 +35,7 @@ export default function StyleVideo() {
         uuid_idempotency_token: uuidv4()
       })
       .then((res: EnqueueVSTResponse) => {
-        console.log("✅",res);
         if (res.success && res.inference_job_token) {
-          console.log("🧑🏻‍🎤",res);
           enqueue(res.inference_job_token,true,FrontendInferenceJobType.VideoStyleTransfer);
         } else {
           console.log("Failed to enqueue job", res);
@@ -42,28 +44,12 @@ export default function StyleVideo() {
     }
   };
 
-  const options = [
-    {
-      label: "2D Anime",
-      // imageUrl: "/images/landing/onboarding/styles/style-2d-anime.webp",
-      value: "anime_2d_flat",
-    },
-    {
-      label: "3D Cartoon",
-      // imageUrl: "/images/landing/onboarding/styles/style-3d-cartoon.webp",
-      value: "cartoon_3d",
-    },
-    {
-      label: "Ink B&W",
-      // imageUrl: "/images/landing/onboarding/styles/style-ink-bw.webp",
-      value: "ink_bw_style",
-    },
-    {
-      label: "Origami",
-      // imageUrl: "/images/landing/onboarding/styles/style-origami.webp",
-      value: "paper_origami",
-    },
-  ];
+  const options = STYLE_OPTIONS.map((option) => {
+    return {
+      label: option.label, 
+      value: option.value,
+    }
+  });
 
   return <Container {...{ className: "fy-style-video-page mt-5", type: "panel" }}>
       <Panel {...{ padding: true }}>
@@ -77,6 +63,7 @@ export default function StyleVideo() {
           aspectRatio: "landscape",
           label: "Choose a video",
           name: "mediaToken",
+          value: pageMediaToken,
           onChange: ({ target }: { target: any }) => { mediaTokenSet(target.value) },
           type: "media"
         }}/>
@@ -89,10 +76,12 @@ export default function StyleVideo() {
         <div {...{ className: "prompt-row" }}>
           <TextArea {...{
             label: "Positive prompt",
+            rows: 5,
             onChange: ({ target }: { target: any }) => { promptSet(target.value) },
           }}/>
           <TextArea {...{
             label: "Negative prompt",
+            rows: 5,
             onChange: ({ target }: { target: any }) => { negativePromptSet(target.value) },
           }}/>
         </div>
