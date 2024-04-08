@@ -1,13 +1,21 @@
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useCallback, useContext, useEffect } from "react";
-import { characterGroups, currentTime } from "~/pages/PageEnigma/store";
+import {
+  addCharacterAnimation,
+  addCharacterKeyframe,
+  characterGroups,
+  currentTime,
+} from "~/pages/PageEnigma/store";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import {
+  AssetType,
   CharacterGroup,
   ClipGroup,
+  ClipType,
+  MediaItem,
   QueueClip,
   QueueKeyframe,
   UpdateTime,
@@ -32,6 +40,7 @@ function addCharacter(item: ClipUI) {
 
   const newCharacter = {
     id: item.object_uuid,
+    name: item.object_name,
     muted: false,
     animationClips: [],
     positionKeyframes: [],
@@ -58,11 +67,38 @@ export function useQueueHandler() {
         break;
       case fromEngineActions.UPDATE_TIME_LINE:
         console.log(data);
-        // (data as ClipUI[]).forEach((item) => {
-        //   addCharacter(item);
-        //   if (item.group === ClipGroup.CHARACTER) {
-        //   }
-        // });
+        (data as ClipUI[]).forEach((item) => {
+          addCharacter(item);
+          if (item.group === ClipGroup.CHARACTER) {
+            if (item.type === ClipType.ANIMATION) {
+              const newItem = {
+                version: item.version,
+                type: item.type as string as AssetType,
+                group: item.group,
+                object_uuid: item.object_uuid,
+                media_id: item.media_id,
+                name: item.name,
+                length: item.length,
+              } as MediaItem;
+              addCharacterAnimation({
+                dragItem: newItem,
+                characterId: item.object_uuid,
+                offset: item.offset,
+              });
+            }
+            if (item.type === ClipType.TRANSFORM) {
+              // newItem.length = item.length;
+              // addCharacterKeyframe({
+              //   dragItem: newItem,
+              //   characterId: item.object_uuid,
+              //   offset: item.offset,
+              // });
+            }
+          }
+        });
+        break;
+      case fromEngineActions.UPDATE_CHARACTER_ID:
+        console.log(action);
         break;
       default:
         throw new Error(`Unknown action ${action}`);

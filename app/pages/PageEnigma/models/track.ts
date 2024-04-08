@@ -17,7 +17,7 @@ export enum ClipType {
   TRANSFORM = "transform",
   AUDIO = "audio",
   ANIMATION = "animation",
-  LIPSYNC = "lipsync"
+  LIPSYNC = "lipsync",
 }
 
 export enum ClipGroup {
@@ -41,6 +41,7 @@ export interface Keyframe {
 
 export interface CharacterGroup {
   id: string;
+  name: string;
   muted: boolean;
   animationClips: Clip[];
   positionKeyframes: Keyframe[];

@@ -9,6 +9,7 @@ export class ClipUI {
   name: string;
   media_id: string;
   object_uuid: string;
+  object_name: string;
   offset: number; // in frames
   length: number; // in frames
   should_play: boolean;
@@ -20,6 +21,7 @@ export class ClipUI {
     name: string,
     media_id: string,
     object_uuid: string,
+    object_name: string,
     offset: number,
     length: number,
   ) {
@@ -30,6 +32,7 @@ export class ClipUI {
     this.type = type; // UI and Animation / Audio / Lipsync /  : Engine
 
     this.object_uuid = object_uuid; // Animation / Audio / Lipsync /  : Engine
+    this.object_name = object_name;
     this.media_id = media_id; //  Animation / Audio / Lipsync /  : Engine
     this.offset = offset;
     this.length = length;
@@ -43,6 +46,7 @@ export class ClipUI {
       name: this.name,
       type: this.type,
       object_uuid: this.object_uuid,
+      object_name: this.object_name,
       media_id: this.media_id,
       start_offset: this.offset,
       ending_offset: this.length,

@@ -4,7 +4,7 @@ export interface MediaItem {
   media_id: string;
   name: string;
   length?: number;
-  thumbnail: string;
+  thumbnail?: string;
   isMine?: boolean;
   isBookmarked?: boolean;
 }
@@ -16,7 +16,7 @@ export enum AssetType {
   ANIMATION = "animation",
   CAMERA = "camera",
   SHAPE = "shape",
-  STYLE = "style" // TODO Remove 
+  STYLE = "style", // TODO Remove
 }
 
 export enum AssetFilterOption {

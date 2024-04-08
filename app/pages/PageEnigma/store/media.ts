@@ -132,9 +132,9 @@ export const characterItems = signal<MediaItem[]>([
 export const objectItems = signal<MediaItem[]>([
   {
     version: 1,
-    media_id: "m_w5nn3kjh1fbkmjrdac5b2qaba0pmyt",
+    media_id: "m_0xfrmekc56satjxn66wt6c9dkw7dxe",
     type: AssetType.OBJECT,
-    name: "Item ( Place Holder D.N.W )",
+    name: "Pikachu Statue",
     thumbnail: "resources/placeholders/placeholder.png",
   },
 ]);
