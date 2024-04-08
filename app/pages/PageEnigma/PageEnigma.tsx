@@ -22,6 +22,7 @@ export const PageEnigma = () => {
   useSignals();
   useEffect(() => {
     function setPage() {
+      // TODO address this issue with zooming
       pageHeight.value = window.innerHeight;
       pageWidth.value = window.outerWidth;
     }

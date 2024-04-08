@@ -7,19 +7,20 @@ import {
 } from "~/pages/PageEnigma/models";
 import { toTimelineActions } from "./toTimelineActions";
 import { ClipUI } from "../datastructures/clips/clip_ui";
+import { MediaItem } from "~/pages/PageEnigma/models";
 class Queue {
   private _queue: Record<
     string,
     {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
+      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem;
     }[]
   > = {};
   private _subscribers: Record<
     string,
     (entry: {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
+      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem;
     }) => void
   > = {};
 
@@ -30,7 +31,7 @@ class Queue {
   }: {
     queueName: string;
     action: fromEngineActions | toEngineActions | toTimelineActions;
-    data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] ;
+    data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem ;
   }) {
     if (!this._queue[queueName]) {
       this._queue[queueName] = [];
@@ -47,7 +48,7 @@ class Queue {
     queueName: string,
     onMessage: (entry: {
       action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
+      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem;
     }) => void,
   ) {
     this._subscribers[queueName] = onMessage;
