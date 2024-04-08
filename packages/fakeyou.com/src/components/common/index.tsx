@@ -22,7 +22,7 @@ import Label from "./Label";
 import LikeButton from "./LikeButton";
 import MocapInput from "./MocapInput";
 import MasonryGrid from "./MasonryGrid/MasonryGrid";
-import Modal from "./Modal";
+import Modal, { ModalUtilities } from "./Modal";
 import Notification from "./Notification";
 import NumberSlider from "./NumberSlider";
 import NumberSliderV2 from "./NumberSliderV2";
@@ -53,7 +53,6 @@ import VideoBasic from "./VideoBasic";
 import VideoFakeyou from "./VideoFakeyou";
 import VideoInput from "./VideoInput";
 import WeightCoverImage from "./WeightCoverImage";
-export type { SelectModalData };
 
 export {
   Accordion,
@@ -116,4 +115,9 @@ export {
   VideoFakeyou,
   VideoInput,
   WeightCoverImage,
+};
+
+export type {
+  ModalUtilities,
+  SelectModalData
 };

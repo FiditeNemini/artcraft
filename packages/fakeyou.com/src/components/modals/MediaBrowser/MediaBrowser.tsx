@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MediaList } from "components/entities";
-import { AcceptTypes, EntityInputMode, EntityFilterOptions } from "components/entities/EntityTypes";
-import { Pagination, TempSelect } from "components/common";
+import { AcceptTypes, EntityInputMode, EntityFilterOptions, } from "components/entities/EntityTypes";
+import { ModalUtilities, Pagination, TempSelect } from "components/common";
 import AudioPlayerProvider from "components/common/AudioPlayer/AudioPlayerContext";
 import SkeletonCard from "components/common/Card/SkeletonCard";
 import { GetBookmarksByUser } from "@storyteller/components/src/api/bookmarks/GetBookmarksByUser";
@@ -20,11 +20,9 @@ import "./MediaBrowser.scss";
 
 const n = () => {};
 
-interface Props {
+export interface MediaBrowserProps {
   accept?: AcceptTypes[],
-  handleClose: any;
   inputMode: EntityInputMode;
-  mediaToken: string;
   onSearchChange?: (e: any) => void;
   onSelect?: any;
   owner?: string;
@@ -32,9 +30,10 @@ interface Props {
   username: string;
 }
 
+interface MediaBrowserInternal extends ModalUtilities, MediaBrowserProps {}
+
 export default function MediaBrowser({
   accept,
-  mediaToken,
   handleClose = n,
   inputMode,
   onSearchChange = n,
@@ -42,7 +41,7 @@ export default function MediaBrowser({
   owner,
   search,
   username
-}: Props) {
+}: MediaBrowserInternal) {
 
   console.log(
     "🐢",

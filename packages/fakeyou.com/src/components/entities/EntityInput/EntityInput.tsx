@@ -4,8 +4,8 @@ import { a, useTransition } from "@react-spring/web";
 import { MediaFile } from "@storyteller/components/src/api/media_files/GetMedia";
 import Iframe from "react-iframe";
 import { Button, Label, Spinner } from "components/common";
-import { AcceptTypes, EntityInputMode, EntityModeProp, getMediaTypesByCategory, mediaCategoryfromString, MediaFilters, UploaderResponse } from "components/entities/EntityTypes";
-import { useMedia, useMediaUploader, useModal, useSession } from "hooks";
+import { AcceptTypes, EntityModeProp, mediaCategoryfromString, MediaFilters, UploaderResponse } from "components/entities/EntityTypes";
+import { useMedia, useMediaUploader } from "hooks";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import EntityInputEmpty from "./EntityInputEmpty";
 import "./EntityInput.scss";
@@ -37,11 +37,10 @@ const MediaBusy = () => {
   return <Spinner/>;
 };
 
-const MocapInputFull = ({ media, clear, ...rest }: SlideProps) => {
+const EntityInputFull = ({ media, clear }: SlideProps) => {
   const bucketConfig = new BucketConfig();
   const mediaUrl = media?.public_bucket_path ? bucketConfig.getGcsUrl(media.public_bucket_path) : "";
   const mediaType = mediaCategoryfromString(media?.media_type || "");
-  // const yada = ListEntityFilters(EntityInputMode.media).indexOf(media.media_type);
 
   switch (mediaType) {
     case MediaFilters.video: return <>
@@ -66,26 +65,20 @@ const MocapInputFull = ({ media, clear, ...rest }: SlideProps) => {
   }
 };
 
-const AniMod = ({ animating, className, isLeaving, render: Render, style, ...rest }: AniProps) => <a.div {...{
+const AnimatedSlide = ({ animating, className, isLeaving, render: Render, style, ...rest }: AniProps) => <a.div {...{
   className: `fy-slide-frame${ className ?  " " + className : "" }`,
   style
 }}>
     <Render {...{ ...rest, animating }} />
   </a.div>;
 
-export default function EntityInput({ accept: inAccept, aspectRatio = "square", label, name = "", onChange, type, value, ...rest }: Props) {
-  const accept = Array.isArray(inAccept) ? inAccept : [inAccept];
-  const inputMode = EntityInputMode[type];
-  const isMedia = inputMode === EntityInputMode.media;
-  const fileTypes = isMedia ? accept.map((mediaCategory,i) => {
-    return mediaCategory ? getMediaTypesByCategory(mediaCategoryfromString(mediaCategory)) : [];
-  }).flat() : [];
+export default function EntityInput({ accept, aspectRatio = "square", label, name = "", onChange, type, value, ...rest }: Props) {
   const { search } = useLocation();
-  const presetToken = search ? new URLSearchParams(search).get("preset_token") : "";
+  const urlSearch = new URLSearchParams(search);
+  const presetToken = search ? urlSearch.get("preset_token") : "";
+  const queryUser = search ? urlSearch.get("query_user") : "";
   const [mediaToken,mediaTokenSet] = useState(presetToken || value || "");
   const { media, mediaSet } = useMedia({ mediaToken });
-  const { user } = useSession();
-  const { open } = useModal();
   const clear = () => {
     mediaSet(undefined);
     mediaTokenSet("");
@@ -130,12 +123,32 @@ export default function EntityInput({ accept: inAccept, aspectRatio = "square", 
       { 
         transitions((style: any, i: number, state: any) => {
           let isLeaving = state.phase === "leave";
-          let sharedProps = { animating, isLeaving, media, style };
+          let sharedProps = { animating, isLeaving, style };
 
           return [
-            <AniMod {...{ render: MediaBusy, className: "fy-entity-input-busy", ...sharedProps }}/>,
-            <AniMod {...{ render: MocapInputFull, className: "fy-entity-input-full", accept, clear, ...sharedProps }}/>,
-            <AniMod {...{ render: EntityInputEmpty, className: "fy-entity-input-empty", accept, fileTypes, inputMode, inputProps, onSelect, open, user, ...sharedProps, ...rest }}/>
+            <AnimatedSlide {...{
+              className: "fy-entity-input-busy",
+              render: MediaBusy,
+              ...sharedProps
+            }}/>,
+            <AnimatedSlide {...{
+              className: "fy-entity-input-full",
+              clear,
+              media,
+              render: EntityInputFull,
+              ...sharedProps
+            }}/>,
+            <AnimatedSlide {...{
+              accept,
+              className: "fy-entity-input-empty",
+              inputProps,
+              onSelect,
+              queryUser,
+              render: EntityInputEmpty,
+              type,
+              ...sharedProps,
+              ...rest
+            }}/>
           ][i];
         })
       }

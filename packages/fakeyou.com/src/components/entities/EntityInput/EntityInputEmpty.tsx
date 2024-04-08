@@ -1,8 +1,21 @@
 import React from "react";
-import { AcceptTypes, EntityInputMode, getMediaTypesByCategory, isSelectedType, mediaCategoryfromString, MediaFilters } from "components/entities/EntityTypes";
 import { SlideProps } from "./EntityInput";
-import { MediaBrowser } from "components/modals";
+import {
+  // useMediaUploader,
+  useModal,
+  useSession
+} from "hooks";
+import MediaBrowser, { MediaBrowserProps } from "components/modals/MediaBrowser";
 import { FileWrapper } from "components/common";
+import {
+  AcceptTypes,
+  EntityInputMode,
+  EntityModeProp,
+  getMediaTypesByCategory,
+  isSelectedType,
+  mediaCategoryfromString,
+  MediaFilters
+} from "components/entities/EntityTypes";
 import { FontAwesomeIcon as Icon } from "@fortawesome/react-fontawesome";
 import {
   faDiagramSankey,
@@ -16,23 +29,32 @@ import {
 
 
 interface EmptySlideProps extends SlideProps {
-  accept?: AcceptTypes[],
-  inputMode: EntityInputMode,
+  accept: AcceptTypes | AcceptTypes[],
   inputProps?: any,
-  open: any,
-  user: any
+  queryUser?: string,
+  type: EntityModeProp,
 };
 
-export default function EntityInputEmpty({ accept, open, inputMode, inputProps, user, ...rest }: EmptySlideProps) {
-  const accepted = accept ? accept : [];
+export default function EntityInputEmpty({ accept, inputProps, queryUser, type, ...rest }: EmptySlideProps) {
+  const { open } = useModal();
+  const { user } = useSession();
+  const accepted = Array.isArray(accept) ? accept : [accept];
+  const inputMode = EntityInputMode[type];
   const isMedia = inputMode === EntityInputMode.media;
   const fileTypes = isMedia ? accepted.map((mediaCategory,i) => {
     return mediaCategory ? getMediaTypesByCategory(mediaCategoryfromString(mediaCategory)) : [];
   }).flat() : [];
 
+  const props: MediaBrowserProps = {
+    accept: accepted,
+    inputMode,
+    username: queryUser || user?.username || "",
+    ...rest
+  };
+
   const browserClick = () => open({
     component: MediaBrowser,
-    props: { accept, inputMode, username: user?.username || "", ...rest }
+    props
   });
 
   const mediaIcons = () => {

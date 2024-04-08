@@ -5,12 +5,14 @@ import { useSpring, a } from "@react-spring/web";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import "./Modal.scss";
 
+type HandleClose = () => void;
+
 interface ModalProps {
   className?: string;
   content?: React.ElementType | null;
   contentProps?: any;
   show: boolean;
-  handleClose: () => void;
+  handleClose: HandleClose;
   noHeader?: boolean;
   omitBody?: boolean;
   onCancel?: (e: React.MouseEvent<HTMLElement>) => any;
@@ -23,6 +25,10 @@ interface ModalProps {
   large?: boolean;
   position?: "center" | "top";
   mobileFullscreen?: boolean;
+}
+
+export interface ModalUtilities {
+  handleClose: HandleClose;
 }
 
 const ModalBody = ({ children, omitBody, padding }: { children: any, omitBody?: boolean, padding?: boolean }) => omitBody ? children : <div {...{ className: `modal-body ${padding ? "p-3" : ""}` }}>
@@ -85,6 +91,8 @@ const Modal: React.FC<ModalProps> = ({
     handleClose();
   };
 
+  const modalUtilities: ModalUtilities = { handleClose };
+
   if (!show) {
     return null;
   }
@@ -115,7 +123,7 @@ const Modal: React.FC<ModalProps> = ({
               </header>
             )}
             <ModalBody {...{ omitBody, padding }}>
-              {Content && <Content {...{ ...contentProps, handleClose }} />}
+              {Content && <Content {...{ ...contentProps, ...modalUtilities }} />}
             </ModalBody>
             {showButtons && (
               <div className="modal-footer">
