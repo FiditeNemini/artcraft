@@ -5,11 +5,6 @@ import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/It
 import { Button } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
-import {
-  filterTabBase,
-  filterTabActive,
-  filterTabDisabled,
-} from "./filterTabsClasses";
 
 export const CameraTab = () => {
   useSignals();
@@ -20,11 +15,9 @@ export const CameraTab = () => {
         <div className="mb-4 mt-4 flex justify-start gap-2 px-4">
           <button
             className={twMerge(
-              filterTabBase,
-              cameraFilter.value === AssetFilterOption.ALL
-                ? filterTabActive
-                : "",
-              filterTabDisabled,
+              "filter-tab",
+              cameraFilter.value === AssetFilterOption.ALL ? "active" : "",
+              "disabled",
             )}
             onClick={() => (cameraFilter.value = AssetFilterOption.ALL)}
           >
@@ -32,11 +25,9 @@ export const CameraTab = () => {
           </button>
           <button
             className={twMerge(
-              filterTabBase,
-              cameraFilter.value === AssetFilterOption.MINE
-                ? filterTabActive
-                : "",
-              filterTabDisabled,
+              "filter-tab",
+              cameraFilter.value === AssetFilterOption.MINE ? "active" : "",
+              "disabled",
             )}
             onClick={() => (cameraFilter.value = AssetFilterOption.MINE)}
             disabled={!cameraItems.value.some((item) => item.isMine)}
@@ -45,11 +36,11 @@ export const CameraTab = () => {
           </button>
           <button
             className={twMerge(
-              filterTabBase,
+              "filter-tab",
               cameraFilter.value === AssetFilterOption.BOOKMARKED
-                ? filterTabActive
+                ? "active"
                 : "",
-              filterTabDisabled,
+              "disabled",
             )}
             onClick={() => (cameraFilter.value = AssetFilterOption.BOOKMARKED)}
             disabled={!cameraItems.value.some((item) => item.isBookmarked)}

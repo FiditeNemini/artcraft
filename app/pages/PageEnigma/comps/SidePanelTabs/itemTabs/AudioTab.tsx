@@ -5,11 +5,6 @@ import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/It
 import { Button } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
-import {
-  filterTabBase,
-  filterTabActive,
-  filterTabDisabled,
-} from "./filterTabsClasses";
 
 export const AudioTab = () => {
   useSignals();
@@ -20,11 +15,9 @@ export const AudioTab = () => {
         <div className="mb-4 mt-4 flex justify-start gap-2 px-4">
           <button
             className={twMerge(
-              filterTabBase,
-              audioFilter.value === AssetFilterOption.ALL
-                ? filterTabActive
-                : "",
-              filterTabDisabled,
+              "filter-tab",
+              audioFilter.value === AssetFilterOption.ALL ? "active" : "",
+              "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.ALL)}
           >
@@ -32,11 +25,9 @@ export const AudioTab = () => {
           </button>
           <button
             className={twMerge(
-              filterTabBase,
-              audioFilter.value === AssetFilterOption.MINE
-                ? filterTabActive
-                : "",
-              filterTabDisabled,
+              "filter-tab",
+              audioFilter.value === AssetFilterOption.MINE ? "active" : "",
+              "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.MINE)}
             disabled={!audioItems.value.some((item) => item.isMine)}
@@ -45,11 +36,11 @@ export const AudioTab = () => {
           </button>
           <button
             className={twMerge(
-              filterTabBase,
+              "filter-tab",
               audioFilter.value === AssetFilterOption.BOOKMARKED
-                ? filterTabActive
+                ? "active"
                 : "",
-              filterTabDisabled,
+              "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.BOOKMARKED)}
             disabled={!audioItems.value.some((item) => item.isBookmarked)}

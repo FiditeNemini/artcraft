@@ -10,11 +10,6 @@ import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/It
 import { Button } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
-import {
-  filterTabBase,
-  filterTabActive,
-  filterTabDisabled,
-} from "./filterTabsClasses";
 
 interface Props {
   type: AssetType;
@@ -33,11 +28,9 @@ export const ObjectsTab = ({ type }: Props) => {
         <div className="mb-4 mt-4 flex justify-start gap-2 px-4">
           <button
             className={twMerge(
-              filterTabBase,
-              assetFilter.value === AssetFilterOption.ALL
-                ? filterTabActive
-                : "",
-              filterTabDisabled,
+              "filter-tab",
+              assetFilter.value === AssetFilterOption.ALL ? "active" : "",
+              "disabled",
             )}
             onClick={() => (assetFilter.value = AssetFilterOption.ALL)}
           >
@@ -45,11 +38,9 @@ export const ObjectsTab = ({ type }: Props) => {
           </button>
           <button
             className={twMerge(
-              filterTabBase,
-              assetFilter.value === AssetFilterOption.MINE
-                ? filterTabActive
-                : "",
-              filterTabDisabled,
+              "filter-tab",
+              assetFilter.value === AssetFilterOption.MINE ? "active" : "",
+              "disabled",
             )}
             onClick={() => (assetFilter.value = AssetFilterOption.MINE)}
             disabled={!items.value.some((item) => item.isMine)}
@@ -58,11 +49,11 @@ export const ObjectsTab = ({ type }: Props) => {
           </button>
           <button
             className={twMerge(
-              filterTabBase,
+              "filter-tab",
               assetFilter.value === AssetFilterOption.BOOKMARKED
-                ? filterTabActive
+                ? "active"
                 : "",
-              filterTabDisabled,
+              "disabled",
             )}
             onClick={() => (assetFilter.value = AssetFilterOption.BOOKMARKED)}
             disabled={!items.value.some((item) => item.isBookmarked)}

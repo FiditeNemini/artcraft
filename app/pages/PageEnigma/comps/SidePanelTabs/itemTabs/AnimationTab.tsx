@@ -5,11 +5,6 @@ import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/It
 import { Button } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
-import {
-  filterTabBase,
-  filterTabActive,
-  filterTabDisabled,
-} from "./filterTabsClasses";
 
 export const AnimationTab = () => {
   useSignals();
@@ -20,11 +15,9 @@ export const AnimationTab = () => {
         <div className="mb-4 mt-4 flex justify-start gap-2 px-4">
           <button
             className={twMerge(
-              filterTabBase,
-              animationFilter.value === AssetFilterOption.ALL
-                ? filterTabActive
-                : "",
-              filterTabDisabled,
+              "filter-tab",
+              animationFilter.value === AssetFilterOption.ALL ? "active" : "",
+              "disabled",
             )}
             onClick={() => (animationFilter.value = AssetFilterOption.ALL)}
           >
@@ -32,11 +25,9 @@ export const AnimationTab = () => {
           </button>
           <button
             className={twMerge(
-              filterTabBase,
-              animationFilter.value === AssetFilterOption.MINE
-                ? filterTabActive
-                : "",
-              filterTabDisabled,
+              "filter-tab",
+              animationFilter.value === AssetFilterOption.MINE ? "active" : "",
+              "disabled",
             )}
             onClick={() => (animationFilter.value = AssetFilterOption.MINE)}
             disabled={!animationItems.value.some((item) => item.isMine)}
@@ -45,11 +36,11 @@ export const AnimationTab = () => {
           </button>
           <button
             className={twMerge(
-              filterTabBase,
+              "filter-tab",
               animationFilter.value === AssetFilterOption.BOOKMARKED
-                ? filterTabActive
+                ? "active"
                 : "",
-              filterTabDisabled,
+              "disabled",
             )}
             onClick={() =>
               (animationFilter.value = AssetFilterOption.BOOKMARKED)
