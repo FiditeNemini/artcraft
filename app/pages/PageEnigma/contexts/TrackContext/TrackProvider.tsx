@@ -11,6 +11,7 @@ import {
   dragItem,
   dropId,
   dropOffset,
+  addObject,
 } from "~/pages/PageEnigma/store";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 
@@ -28,6 +29,22 @@ export const TrackProvider = ({ children }: Props) => {
 
    
     console.log(`${JSON.stringify(dragItem)}`)
+    // should be able to drag into the timeline ... TODO FIX?
+
+    if (dragItem.value.type === AssetType.CHARACTER) {
+      addCharacter(dragItem)
+    }
+    // if (dragItem.value.type === AssetType.CAMERA) {
+    //   console.log("Dragged In Camera Type")
+    // }
+    if (dragItem.value.type === AssetType.OBJECT) {
+      addObject(dragItem)
+      console.log("Dragged In Object Type")
+    }
+    // if (dragItem.value.type === AssetType.SHAPE) {
+    //   console.log("Dragged In Shape Type")
+    // }
+
     if (canDrop.value && dragItem.value) {
       if (dragItem.value.type === AssetType.ANIMATION) {
         addCharacterAnimation({
@@ -47,18 +64,6 @@ export const TrackProvider = ({ children }: Props) => {
           audioId: dropId.value,
           offset: dropOffset.value,
         });
-      }
-      if (dragItem.value.type === AssetType.CHARACTER) {
-        addCharacter(dragItem)
-      }
-      if (dragItem.value.type === AssetType.CAMERA) {
-        console.log("Dragged In Camera Type")
-      }
-      if (dragItem.value.type === AssetType.OBJECT) {
-        console.log("Dragged In Object Type")
-      }
-      if (dragItem.value.type === AssetType.SHAPE) {
-        console.log("Dragged In Shape Type")
       }
     }
     endDrag();

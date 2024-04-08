@@ -335,7 +335,7 @@ export function deleteCharacterKeyframe(keyframe: Keyframe) {
 }
 
 // probably not to much to send imo
-export function addCharacter(character:string) {
+export function addCharacter(character:MediaItem) {
   //{"version":1,"media_id":"m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
   // "type":"character","name":"Female Doll",
   // "thumbnail":"resources/characters/img03.png"}
@@ -345,7 +345,7 @@ export function addCharacter(character:string) {
     data: character,
   });
 }
-export function addObject(object:string) {
+export function addObject(object:MediaItem) {
    //{"version":1,"media_id":"m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
   // "type":"character","name":"Female Doll",
   // "thumbnail":"resources/characters/img03.png"}
