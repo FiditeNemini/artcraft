@@ -22,8 +22,9 @@ export const PageEnigma = () => {
   useSignals();
   useEffect(() => {
     function setPage() {
-      pageHeight.value = window.innerHeight / window.devicePixelRatio;
-      pageWidth.value = window.outerWidth / window.devicePixelRatio;
+      // TODO address this issue with zooming
+      pageHeight.value = window.innerHeight;
+      pageWidth.value = window.outerWidth;
     }
     timelineHeight.value = window.innerHeight * 0.25;
     sidePanelWidth.value = 443;
