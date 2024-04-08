@@ -37,7 +37,7 @@ const LOADING_FUNCTIONS: Record<ClipGroup, (item: ClipUI) => void> = {
 
 export function useQueueHandler() {
   useSignals();
-  const { addKeyframe } = useContext(TrackContext);
+  const { addKeyframe, clearExistingData } = useContext(TrackContext);
 
   const handleFromEngineActions = useCallback(({ action, data }: Arguments) => {
     console.log("FROM ENGINE", action, data);
@@ -46,6 +46,7 @@ export function useQueueHandler() {
         currentTime.value = (data as UpdateTime).currentTime;
         break;
       case fromEngineActions.UPDATE_TIME_LINE:
+        clearExistingData();
         (data as ClipUI[]).forEach((item) => {
           LOADING_FUNCTIONS[item.group](item);
         });

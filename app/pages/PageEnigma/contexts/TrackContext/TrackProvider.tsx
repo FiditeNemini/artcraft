@@ -12,6 +12,10 @@ import {
   dropId,
   dropOffset,
   addObject,
+  characterGroups,
+  cameraGroup,
+  audioGroup,
+  objectGroup,
 } from "~/pages/PageEnigma/store";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 
@@ -67,14 +71,34 @@ export const TrackProvider = ({ children }: Props) => {
     endDrag();
   }, [endDrag]);
 
+  const clearExistingData = useCallback(() => {
+    characterGroups.value = [];
+    cameraGroup.value = {
+      id: "CG1",
+      keyframes: [],
+    };
+    audioGroup.value = {
+      id: "AG-1",
+      clips: [],
+      muted: false,
+    };
+    objectGroup.value = {
+      id: "OG1",
+      objects: [],
+    };
+  }, []);
+
   const values = useMemo(() => {
     return {
       ...keyframes,
 
+      clearExistingData,
+
       ...dragDrop,
       endDrag: dropClip,
     };
-  }, [keyframes, dragDrop, dropClip]);
+  }, [keyframes, dragDrop, dropClip, clearExistingData]);
+
   return (
     <TrackContext.Provider value={values}>{children}</TrackContext.Provider>
   );
