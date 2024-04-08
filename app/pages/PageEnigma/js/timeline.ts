@@ -217,7 +217,7 @@ export class TimeLine {
         const type = data["data"]["type"];
         const offset = data["data"]["offset"];
         const end_offset = data["data"]["length"] + offset;
-        const object_name = data["data"]["object_name"];
+        const object_name = this.scene.get_object_by_uuid(object_uuid)?.name;
 
         switch (type) {
             case "animation":
@@ -322,6 +322,7 @@ export class TimeLine {
     }
 
     public async addPlayableClip(clip: ClipUI): Promise<void> {
+        console.log("clip", clip)
         this.timeline_items.push(clip);
     }
 
