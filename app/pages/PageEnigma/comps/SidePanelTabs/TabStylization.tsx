@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 
-import { Button, ItemPicker, Label, H4, Textarea } from "~/components";
+import { Button, ItemPicker, Label, Textarea } from "~/components";
 
 import { AppUiContext } from "../../contexts/AppUiContext";
 import { APPUI_ACTION_TYPES, APPUI_VIEW_MODES } from "../../reducers";
@@ -60,9 +60,9 @@ export const TabStylization = () => {
   };
 
   return (
-    <div className="flex h-full w-full flex-col gap-3">
+    <div className="flex h-full w-full flex-col gap-3 p-4">
       <div className="flex flex-col">
-        <H4>Select Base Style</H4>
+        <Label>Select Base Style</Label>
         <div className="grid grid-cols-4 gap-2">
           <ItemPicker
             label="Anime"

@@ -7,8 +7,8 @@ export const ShapeTab = () => {
 
   return (
     <>
-      <div className="p-2 text-base font-bold">Shapes</div>
-      <div className="mt-2 w-full overflow-y-auto px-2 pt-2">
+      <div className="px-4 pt-4 text-base font-bold">Shapes</div>
+      <div className="w-full overflow-y-auto px-4 pt-4">
         <ItemElements
           items={shapeItems.value}
           assetFilter={shapeFilter.value}
