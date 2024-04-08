@@ -1,9 +1,9 @@
-use std::hash::{DefaultHasher, Hash, Hasher};
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
 use utoipa::ToSchema;
 
 use tokens::tokens::media_files::MediaFileToken;
-use crate::http_server::common_responses::weights_cover_image_details::WeightsDefaultCoverInfo;
 
 /// There are currently 25 cover images numbered 0 to 24 (0-indexed).
 /// The original dataset was numbered 1 - 25, but I renamed 25 to 0.
