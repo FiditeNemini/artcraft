@@ -175,6 +175,7 @@ export class TimeLine {
         let data_json = data['data'];
         let uuid = data_json['object_uuid'];
         let keyframe_uuid = data_json['keyframe_uuid'];
+        console.log(keyframe_uuid);
 
         let object_name = this.scene.get_object_by_uuid(uuid)?.name;
         if (object_name == undefined) {
@@ -194,8 +195,8 @@ export class TimeLine {
                 ClipType.TRANSFORM,
                 data_json['group'],
                 object_name,
-                keyframe_uuid,
                 "",
+                keyframe_uuid,
                 uuid,
                 object_name,
                 0,
