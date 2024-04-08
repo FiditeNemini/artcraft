@@ -124,4 +124,5 @@ export class StoryTellerProxyTimeline {
         this.lipsync_engine.clips = await this.loadLipsyncClips(timeline['lipsync']);
         this.animation_engine.clips = await this.loadAnimationClips(timeline['animation']);
     }
+
 }
