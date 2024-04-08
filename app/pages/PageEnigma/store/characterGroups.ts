@@ -173,18 +173,19 @@ export function addCharacterAudio({
     if (character.id !== characterId) {
       return { ...character };
     }
+
+    Queue.publish({
+      queueName: QueueNames.TO_ENGINE,
+      action: toEngineActions.ADD_CLIP,
+      data: newClip,
+    });
+
     return {
       ...character,
       lipSyncClips: [...character.lipSyncClips, newClip].sort(
         (clipA, clipB) => clipA.offset - clipB.offset,
       ),
     };
-  });
-
-  Queue.publish({
-    queueName: QueueNames.TO_ENGINE,
-    action: toEngineActions.ADD_CLIP,
-    data: newClip,
   });
 }
 
@@ -327,7 +328,7 @@ export function deleteCharacterKeyframe(keyframe: Keyframe) {
 }
 
 // probably not to much to send imo
-export function addCharacter(character:MediaItem) {
+export function addCharacter(character: MediaItem) {
   //{"version":1,"media_id":"m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
   // "type":"character","name":"Female Doll",
   // "thumbnail":"resources/characters/img03.png"}
@@ -337,8 +338,8 @@ export function addCharacter(character:MediaItem) {
     data: character,
   });
 }
-export function addObject(object:MediaItem) {
-   //{"version":1,"media_id":"m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
+export function addObject(object: MediaItem) {
+  //{"version":1,"media_id":"m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
   // "type":"character","name":"Female Doll",
   // "thumbnail":"resources/characters/img03.png"}
   Queue.publish({

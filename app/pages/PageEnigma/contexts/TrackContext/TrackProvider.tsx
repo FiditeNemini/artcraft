@@ -26,21 +26,19 @@ export const TrackProvider = ({ children }: Props) => {
 
   // cross group functions
   const dropClip = useCallback(() => {
-
-
-    console.log(`${JSON.stringify(dragItem)}`)
+    console.log(`${JSON.stringify(dragItem)}`);
 
     if (dragItem.value != null && dragItem != null) {
       // should be able to drag into the timeline ... TODO FIX?
 
       if (dragItem.value.type === AssetType.CHARACTER) {
-        addCharacter(dragItem.value)
+        addCharacter(dragItem.value);
       }
       // if (dragItem.value.type === AssetType.CAMERA) {
       //   console.log("Dragged In Camera Type")
       // }
       if (dragItem.value.type === AssetType.OBJECT) {
-        addObject(dragItem.value)
+        addObject(dragItem.value);
       }
     }
     // if (dragItem.value.type === AssetType.SHAPE) {
@@ -56,6 +54,7 @@ export const TrackProvider = ({ children }: Props) => {
         });
       }
       if (dragItem.value.type === AssetType.AUDIO) {
+        console.log("add audio", dropId.value);
         addCharacterAudio({
           dragItem: dragItem.value!,
           characterId: dropId.value,
