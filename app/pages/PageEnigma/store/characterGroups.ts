@@ -13,15 +13,7 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 
-export const characterGroups = signal<CharacterGroup[]>([
-  {
-    id: "CH1",
-    muted: false,
-    animationClips: [],
-    positionKeyframes: [],
-    lipSyncClips: [],
-  },
-]);
+export const characterGroups = signal<CharacterGroup[]>([]);
 
 export function updateCharacters({
   type,
@@ -181,18 +173,19 @@ export function addCharacterAudio({
     if (character.id !== characterId) {
       return { ...character };
     }
+
+    Queue.publish({
+      queueName: QueueNames.TO_ENGINE,
+      action: toEngineActions.ADD_CLIP,
+      data: newClip,
+    });
+
     return {
       ...character,
       lipSyncClips: [...character.lipSyncClips, newClip].sort(
         (clipA, clipB) => clipA.offset - clipB.offset,
       ),
     };
-  });
-
-  Queue.publish({
-    queueName: QueueNames.TO_ENGINE,
-    action: toEngineActions.ADD_CLIP,
-    data: newClip,
   });
 }
 
@@ -332,4 +325,26 @@ export function deleteCharacterKeyframe(keyframe: Keyframe) {
       return true;
     }),
   }));
+}
+
+// probably not to much to send imo
+export function addCharacter(character: MediaItem) {
+  //{"version":1,"media_id":"m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
+  // "type":"character","name":"Female Doll",
+  // "thumbnail":"resources/characters/img03.png"}
+  Queue.publish({
+    queueName: QueueNames.TO_ENGINE,
+    action: toEngineActions.ADD_CHARACTER,
+    data: character,
+  });
+}
+export function addObject(object: MediaItem) {
+  //{"version":1,"media_id":"m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
+  // "type":"character","name":"Female Doll",
+  // "thumbnail":"resources/characters/img03.png"}
+  Queue.publish({
+    queueName: QueueNames.TO_ENGINE,
+    action: toEngineActions.ADD_OBJECT,
+    data: object,
+  });
 }

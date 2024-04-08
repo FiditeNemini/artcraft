@@ -6,10 +6,12 @@ import {
   addCharacterAnimation,
   addCharacterAudio,
   addGlobalAudio,
+  addCharacter,
   canDrop,
   dragItem,
   dropId,
   dropOffset,
+  addObject,
 } from "~/pages/PageEnigma/store";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 
@@ -24,8 +26,25 @@ export const TrackProvider = ({ children }: Props) => {
 
   // cross group functions
   const dropClip = useCallback(() => {
+    console.log(`${JSON.stringify(dragItem)}`);
 
-    console.log(`${canDrop.value} ${dragItem.value} ${dragItem.value.type}`)
+    if (dragItem.value != null && dragItem != null) {
+      // should be able to drag into the timeline ... TODO FIX?
+
+      if (dragItem.value.type === AssetType.CHARACTER) {
+        addCharacter(dragItem.value);
+      }
+      // if (dragItem.value.type === AssetType.CAMERA) {
+      //   console.log("Dragged In Camera Type")
+      // }
+      if (dragItem.value.type === AssetType.OBJECT) {
+        addObject(dragItem.value);
+      }
+    }
+    // if (dragItem.value.type === AssetType.SHAPE) {
+    //   console.log("Dragged In Shape Type")
+    // }
+
     if (canDrop.value && dragItem.value) {
       if (dragItem.value.type === AssetType.ANIMATION) {
         addCharacterAnimation({
@@ -35,6 +54,7 @@ export const TrackProvider = ({ children }: Props) => {
         });
       }
       if (dragItem.value.type === AssetType.AUDIO) {
+        console.log("add audio", dropId.value);
         addCharacterAudio({
           dragItem: dragItem.value!,
           characterId: dropId.value,
@@ -45,18 +65,6 @@ export const TrackProvider = ({ children }: Props) => {
           audioId: dropId.value,
           offset: dropOffset.value,
         });
-      }
-      if (dragItem.value.type === AssetType.CHARACTER) {
-        console.log("Dragged In Character Type")
-      }
-      if (dragItem.value.type === AssetType.CAMERA) {
-        console.log("Dragged In Camera Type")
-      }
-      if (dragItem.value.type === AssetType.OBJECT) {
-        console.log("Dragged In Object Type")
-      }
-      if (dragItem.value.type === AssetType.SHAPE) {
-        console.log("Dragged In Shape Type")
       }
     }
     endDrag();

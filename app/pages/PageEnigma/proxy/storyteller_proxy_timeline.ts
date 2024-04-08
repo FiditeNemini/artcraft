@@ -53,6 +53,8 @@ export class StoryTellerProxyTimeline {
             audio: await this.getItemsDict(this.audio_engine.clips),
             lipsync: await this.getItemsDict(this.lipsync_engine.clips),
         }
+        console.log(timeline_json)
+
         return timeline_json;
     }
 
@@ -64,8 +66,11 @@ export class StoryTellerProxyTimeline {
                 let clip = new ClipUI(
                     element.version, element.type, 
                     element.group, element.name, 
-                    element.media_id, element.object_uuid, 
-                    element.start_offset, element.ending_offset);
+                    element.media_id, element.clip_uuid,
+                    element.object_uuid, 
+                    element.object_name,
+                    element.start_offset, element.ending_offset,
+                    element.keyframe_offset);
                 new_clips.push(clip);
             }
         }
@@ -124,6 +129,7 @@ export class StoryTellerProxyTimeline {
         this.lipsync_engine.clips = await this.loadLipsyncClips(timeline['lipsync']);
         this.animation_engine.clips = await this.loadAnimationClips(timeline['animation']);
 
+        console.log(this.timeline.timeline_items)
 
         this.timeline.updateUI()
     }
