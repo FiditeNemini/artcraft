@@ -26,7 +26,7 @@ export const Button = ({
         return " bg-brand-secondary hover:bg-brand-secondary-900 text-white focus-visible:outline-brand-secondary";
       }
       case "action": {
-        return " bg-action hover:bg-action-700 text-white focus-visible:outline-action";
+        return " bg-action hover:bg-action-500 text-white focus-visible:outline-action";
       }
       case "primary":
       default: {
