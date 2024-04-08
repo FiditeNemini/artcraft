@@ -174,6 +174,7 @@ export class TimeLine {
         // selected?: boolean;
         let data_json = data['data'];
         let uuid = data_json['object_uuid'];
+        let keyframe_uuid = data_json['keyframe_uuid'];
 
         let object_name = this.scene.get_object_by_uuid(uuid)?.name;
         if (object_name == undefined) {
@@ -193,6 +194,7 @@ export class TimeLine {
                 ClipType.TRANSFORM,
                 data_json['group'],
                 object_name,
+                keyframe_uuid,
                 "",
                 uuid,
                 object_name,
@@ -217,7 +219,13 @@ export class TimeLine {
         const type = data["data"]["type"];
         const offset = data["data"]["offset"];
         const end_offset = data["data"]["length"] + offset;
-        const object_name = this.scene.get_object_by_uuid(object_uuid)?.name;
+        let object_name = this.scene.get_object_by_uuid(object_uuid)?.name;
+        const clip_uuid = data["data"]['clip_uuid'];
+        console.log(data);
+
+        if(object_name == undefined) {
+            object_name = "Undefined."
+        }
 
         switch (type) {
             case "animation":
@@ -237,6 +245,7 @@ export class TimeLine {
                             group,
                             name,
                             media_id,
+                            clip_uuid,
                             object_uuid,
                             object_name,
                             offset,
@@ -256,6 +265,7 @@ export class TimeLine {
                 group,
                 name,
                 media_id,
+                clip_uuid,
                 object_uuid,
                 object_name,
                 offset,
