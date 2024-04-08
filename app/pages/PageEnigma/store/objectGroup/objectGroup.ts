@@ -1,74 +1,22 @@
 import { signal } from "@preact/signals-core";
 import {
   Keyframe,
+  MediaItem,
   ObjectGroup,
+  ObjectTrack,
   QueueKeyframe,
 } from "~/pages/PageEnigma/models";
 import * as uuid from "uuid";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
 // import { toast } from "react-hot-toast";
 
 export const objectGroup = signal<ObjectGroup>({
   id: "OB1",
   objects: [],
 });
-
-export function updateObject({
-  id,
-  offset,
-}: {
-  id: string;
-  offset: number;
-}): void {
-  const oldObjectGroup = objectGroup.value;
-  const obj = oldObjectGroup.objects.find((objectTrack) =>
-    objectTrack.keyframes.some((row) => row.keyframe_uuid === id),
-  );
-
-  if (!obj) {
-    return;
-  }
-
-  const existingKeyframe = obj.keyframes.some((row) => {
-    return row.offset === offset && row.keyframe_uuid !== id;
-  });
-
-  if (existingKeyframe) {
-    //toast.error("There can only be one keyframe at this offset.");
-    return;
-  }
-
-  objectGroup.value = {
-    id: oldObjectGroup.id,
-    objects: oldObjectGroup.objects.map((object) => ({
-      object_uuid: object.object_uuid,
-      name: object.name,
-      keyframes: object.keyframes.map((keyframe) => {
-        if (keyframe.keyframe_uuid !== id) {
-          return {
-            ...keyframe,
-          };
-        }
-
-        Queue.publish({
-          queueName: QueueNames.TO_ENGINE,
-          action: toEngineActions.UPDATE_KEYFRAME,
-          data: {
-            ...keyframe,
-            offset,
-          },
-        });
-
-        return {
-          ...keyframe,
-          offset,
-        };
-      }),
-    })),
-  };
-}
 
 export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
   const oldObjectGroup = objectGroup.value;
@@ -165,4 +113,12 @@ export function deleteObjectKeyframe(keyframe: Keyframe) {
       ),
     ],
   };
+}
+
+export function addObject(object: MediaItem) {
+  Queue.publish({
+    queueName: QueueNames.TO_ENGINE,
+    action: toEngineActions.ADD_OBJECT,
+    data: object,
+  });
 }
