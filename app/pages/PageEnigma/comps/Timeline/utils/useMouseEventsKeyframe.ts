@@ -8,11 +8,17 @@ export const useMouseEventsKeyframe = ({
   max,
   min,
   updateKeyframe,
+  addToast,
 }: {
   keyframe: Keyframe;
   max: number;
   min: number;
-  updateKeyframe: (args: { id: string; offset: number }) => void;
+  updateKeyframe: (args: {
+    id: string;
+    offset: number;
+    addToast: (type: "error" | "warning" | "success", message: string) => void;
+  }) => void;
+  addToast: (type: "error" | "warning" | "success", message: string) => void;
 }) => {
   useSignals();
   const [offset, setOffset] = useState(-1);
@@ -26,6 +32,7 @@ export const useMouseEventsKeyframe = ({
       updateKeyframe({
         id: keyframe.keyframe_uuid,
         offset: Math.round(currOffset.current),
+        addToast,
       });
       isActive.current = "";
       canDrop.value = false;
