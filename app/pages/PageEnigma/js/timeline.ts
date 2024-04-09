@@ -47,6 +47,7 @@ export class TimeLine {
     scene: Scene;
 
     current_time: number;
+
     // ensure that the elements are loaded first.
     constructor(
         audio_engine: AudioEngine,
@@ -147,8 +148,6 @@ export class TimeLine {
         obj.name = name;
         let object_uuid = obj.uuid;
 
-        console.log("data.data", data.data)
-
         this.characters[object_uuid] = ClipGroup.CHARACTER;
 
         data.data['object_uuid'] = object_uuid;
@@ -157,6 +156,8 @@ export class TimeLine {
             action: fromEngineActions.UPDATE_CHARACTER_ID,
             data: data.data,
         });
+
+        this.addPlayableClip(new ClipUI(data.data['version'], ClipType.FAKE, ClipGroup.CHARACTER, "Default", media_id, obj.uuid, obj.uuid, name, 0, 0, 0));
     }
 
     public async addObject(data: any) {
@@ -181,8 +182,6 @@ export class TimeLine {
         let data_json = data['data'];
         let uuid = data_json['object_uuid'];
         let keyframe_uuid = data_json['keyframe_uuid'];
-
-        console.log(data_json);
 
         let object_name = this.scene.get_object_by_uuid(uuid)?.name;
         if (object_name === undefined) {
@@ -228,7 +227,6 @@ export class TimeLine {
         const end_offset = data["data"]["length"] + offset;
         let object_name = this.scene.get_object_by_uuid(object_uuid)?.name;
         const clip_uuid = data["data"]['clip_uuid'];
-        console.log(data);
 
         if (object_name === undefined) {
             object_name = "Undefined."
@@ -333,13 +331,11 @@ export class TimeLine {
         this.timeline_items.forEach(element => {
             if (element.group === data.data['group']) {
                 element.should_play = isMute;
-                console.log(element);
             }
         });
     }
 
     public async addPlayableClip(clip: ClipUI): Promise<void> {
-        console.log("clip", clip)
         this.timeline_items.push(clip);
     }
 
@@ -391,20 +387,17 @@ export class TimeLine {
 
     private async resetScene() {
         for (const element of this.timeline_items) {
-            if (element.type === "transform") {
+            if (element.type === ClipType.TRANSFORM) {
                 const object = this.scene.get_object_by_uuid(element.object_uuid);
                 if (object && this.transform_engine.clips[element.object_uuid]) {
                     this.transform_engine.clips[element.object_uuid].reset(object);
                 }
-            } else if (element.type === "audio") {
+            } else if (element.type === ClipType.AUDIO  && element.group !== ClipGroup.CHARACTER) {
                 this.audio_engine.loadClip(element.media_id);
-            } else if (element.type === "animation") {
+            } else if (element.type === ClipType.ANIMATION) {
                 this.animation_engine.clips[element.object_uuid + element.media_id].stop();
-            } else if (element.type === "lipsync") {
+            } else if (element.type === ClipType.AUDIO  && element.group === ClipGroup.CHARACTER) {
                 this.lipSync_engine.clips[element.object_uuid].reset();
-            } else {
-                this.stop();
-                throw "Error New Type of element in the timeline";
             }
         }
     }
@@ -479,9 +472,6 @@ export class TimeLine {
                             this.scrubber_frame_position / fps, // Double FPS for best result.
                         );
                     }
-                } else {
-                    this.stop();
-                    throw "Error New Type of element in the timeline";
                 }
                 //this.timelineItems = this.timelineItems.filter(item => item !== element)
             }
