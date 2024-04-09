@@ -2,13 +2,17 @@ import { audioFilter, audioItems } from "~/pages/PageEnigma/store";
 import { AssetFilterOption } from "~/pages/PageEnigma/models";
 import { useSignals } from "@preact/signals-react/runtime";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
-import { Button } from "~/components";
+import { Button, H4 } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
+import { inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
+
 
 export const AudioTabComponent = () => {
-  useSignals();
-
+  const singals = useSignals();
+  console.log('Audio Tab Component > Singals >>>')
+  console.log(inferenceJobs);
+  console.log('<<<');
   return (
     <>
       <div className="w-full overflow-x-auto">
@@ -63,6 +67,19 @@ export const AudioTabComponent = () => {
           items={audioItems.value}
           assetFilter={audioFilter.value}
         />
+      
+      <H4 className="mt-10">inference jobs</H4>
+      {inferenceJobs.value.length > 0 &&
+        <ul>
+          {inferenceJobs.value.map(job=>
+            <li key={job.job_id}>{job.jobt_type}:{job.job_id}</li>
+          )}
+        </ul>
+      }
+      {
+        inferenceJobs.value.length === 0 && 
+        <p>no inference jobs</p>
+      }
       </div>
     </>
   );
