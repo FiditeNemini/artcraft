@@ -2,11 +2,14 @@ import { useContext, useState } from "react";
 import { Button, Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { EngineContext } from "../../contexts/EngineContext";
+import { ToasterContext } from "~/pages/PageEnigma/contexts/ToasterContext";
+import { APPUI_ACTION_TYPES } from "~/pages/PageEnigma/reducers";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
   const [sceneName, setSceneName] = useState<string>("");
   const [sceneToken, setSceneToken] = useState<string>("");
+  const { addToast } = useContext(ToasterContext);
 
   // for testing
   const [mediaToken, setMediaToken] = useState<string>("");
@@ -22,7 +25,9 @@ export const ControlsTopButtons = () => {
 
   const handleButtonLoadScene = () => {
     console.log(`Scene Token is ${sceneToken}`);
-    editorEngine?.loadScene(sceneToken);
+    editorEngine?.loadScene(sceneToken).catch((err) => {
+      addToast("error", err.message);
+    });
   };
 
   const handleButtonTest = () => {};

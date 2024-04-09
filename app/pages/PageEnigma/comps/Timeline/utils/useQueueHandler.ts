@@ -37,7 +37,8 @@ const LOADING_FUNCTIONS: Record<ClipGroup, (item: ClipUI) => void> = {
 
 export function useQueueHandler() {
   useSignals();
-  const { addKeyframe, clearExistingData } = useContext(TrackContext);
+  const { addKeyframe, clearExistingData, deleteObjectOrCharacter } =
+    useContext(TrackContext);
 
   const handleFromEngineActions = useCallback(({ action, data }: Arguments) => {
     console.log("FROM ENGINE", action, data);
@@ -53,6 +54,11 @@ export function useQueueHandler() {
         break;
       case fromEngineActions.UPDATE_CHARACTER_ID: {
         addNewCharacter(data as MediaItem);
+        break;
+      }
+      case fromEngineActions.DELETE_OBJECT: {
+        // this could be an object or character
+        deleteObjectOrCharacter(data as MediaItem);
         break;
       }
       default:

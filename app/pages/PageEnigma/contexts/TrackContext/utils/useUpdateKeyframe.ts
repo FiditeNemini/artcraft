@@ -1,5 +1,10 @@
 import { useCallback, useContext } from "react";
-import { ClipGroup, QueueKeyframe, Keyframe } from "~/pages/PageEnigma/models";
+import {
+  ClipGroup,
+  QueueKeyframe,
+  Keyframe,
+  MediaItem,
+} from "~/pages/PageEnigma/models";
 import {
   addCameraKeyframe,
   addCharacterKeyframe,

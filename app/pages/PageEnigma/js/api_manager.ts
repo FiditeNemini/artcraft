@@ -119,7 +119,7 @@ export class APIManager {
     //  scene_media_file_token: result_scene_media_file_token,
     //};
 
-    return upload_glb_response['media_file_token'];
+    return upload_glb_response["media_file_token"];
   }
 
   public async loadSceneState(
@@ -128,6 +128,10 @@ export class APIManager {
     const api_base_url = "https://api.fakeyou.com";
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
     const response = await fetch(url);
+    if (response.status > 200) {
+      throw new APIManagerResponseError("Failed to load scene");
+    }
+
     const json = await JSON.parse(await response.text());
     const bucket_path = json["media_file"]["public_bucket_path"];
     const media_base_url = "https://storage.googleapis.com/vocodes-public";
@@ -198,7 +202,7 @@ export class APIManager {
     return media_url;
   }
 
-  /** 
+  /**
     This will save the scene to keep ids positions.
     It will also give the file a name which will be a uuidv4()
     @param scene The 3JS Scene we want to make a file to be uploaded as multipart form.
