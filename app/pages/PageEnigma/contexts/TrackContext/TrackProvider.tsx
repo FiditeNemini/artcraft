@@ -17,7 +17,6 @@ import {
   audioGroup,
   objectGroup,
   deleteCharacter,
-  currPosition,
 } from "~/pages/PageEnigma/store";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 import { deleteObject } from "~/pages/PageEnigma/store/objectGroup/deleteObject";
