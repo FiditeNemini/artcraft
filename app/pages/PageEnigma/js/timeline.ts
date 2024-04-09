@@ -185,7 +185,7 @@ export class TimeLine {
         console.log(data_json);
 
         let object_name = this.scene.get_object_by_uuid(uuid)?.name;
-        if (object_name == undefined) {
+        if (object_name === undefined) {
             object_name = "undefined"
         }
 
@@ -230,7 +230,7 @@ export class TimeLine {
         const clip_uuid = data["data"]['clip_uuid'];
         console.log(data);
 
-        if (object_name == undefined) {
+        if (object_name === undefined) {
             object_name = "Undefined."
         }
 
@@ -242,14 +242,14 @@ export class TimeLine {
                 this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
                 break;
             case "audio":
-                if (group == "character") {
+                if (group === "character") {
                     this.lipSync_engine.load_object(object_uuid, media_id);
                     // media id for this as well it can be downloaded
                     this.addPlayableClip(
                         new ClipUI(
                             version,
-                            "lipsync", // TODO potiential bug ..
-                            group,
+                            ClipType.AUDIO,
+                            ClipGroup.CHARACTER,
                             name,
                             media_id,
                             clip_uuid,
@@ -303,7 +303,7 @@ export class TimeLine {
         const length = data["data"]["length"] + offset;
 
         for (const element of this.timeline_items) {
-            if (element.media_id == media_id && element.object_uuid == object_uuid) {
+            if (element.media_id === media_id && element.object_uuid === object_uuid) {
                 element.length = length;
                 element.offset = offset;
             }
@@ -318,7 +318,7 @@ export class TimeLine {
 
         for (let i = 0; i < this.timeline_items.length; i++) {
             const element = this.timeline_items[i];
-            if (element.media_id == media_id && element.object_uuid == object_uuid) {
+            if (element.media_id === media_id && element.object_uuid ===object_uuid) {
                 this.timeline_items.splice(i, 1);
                 break;
             }
@@ -331,7 +331,7 @@ export class TimeLine {
 
     public async mute(data: any, isMute: boolean) {
         this.timeline_items.forEach(element => {
-            if (element.group == data.data['group']) {
+            if (element.group === data.data['group']) {
                 element.should_play = isMute;
                 console.log(element);
             }
@@ -391,16 +391,16 @@ export class TimeLine {
 
     private async resetScene() {
         for (const element of this.timeline_items) {
-            if (element.type == "transform") {
+            if (element.type === "transform") {
                 const object = this.scene.get_object_by_uuid(element.object_uuid);
                 if (object && this.transform_engine.clips[element.object_uuid]) {
                     this.transform_engine.clips[element.object_uuid].reset(object);
                 }
-            } else if (element.type == "audio") {
+            } else if (element.type === "audio") {
                 this.audio_engine.loadClip(element.media_id);
-            } else if (element.type == "animation") {
+            } else if (element.type === "animation") {
                 this.animation_engine.clips[element.object_uuid + element.media_id].stop();
-            } else if (element.type == "lipsync") {
+            } else if (element.type === "lipsync") {
                 this.lipSync_engine.clips[element.object_uuid].reset();
             } else {
                 this.stop();
@@ -421,7 +421,7 @@ export class TimeLine {
 
     // called by the editor update loop on each frame
     public async update(isRendering = false) {
-        //if (this.is_playing == false) return; // start and stop
+        //if (this.is_playing === false) return; // start and stop
         this.timeline_limit = this.getEndPoint();
         if (this.is_playing) {
             this.current_time += 1;
@@ -442,7 +442,7 @@ export class TimeLine {
             if (
                 element.offset <= this.scrubber_frame_position &&
                 this.scrubber_frame_position <= element.length &&
-                element.should_play == true
+                element.should_play === true
             ) {
                 // run async
                 // element.play()
@@ -457,13 +457,13 @@ export class TimeLine {
                         );
                         element.length = this.transform_engine.clips[element.object_uuid].length;
                     }
-                } else if (element.type == "audio") {
+                } else if (element.type === ClipType.AUDIO && element.group !== ClipGroup.CHARACTER) {
                     if (this.scrubber_frame_position + 1 >= element.length) {
                         this.audio_engine.stopClip(element.media_id);
                     } else {
                         this.audio_engine.playClip(element.media_id);
                     }
-                } else if (element.type == "lipsync") { // we will remove this when we know which group it will come from character + audio == lip sync audio.
+                } else if (element.type === ClipType.AUDIO  && element.group === ClipGroup.CHARACTER) { // we will remove this when we know which group it will come from character + audio === lip sync audio.
                     if (this.scrubber_frame_position + 1 >= element.length) {
                         this.lipSync_engine.clips[element.object_uuid].stop();
                     } else if (object) {
