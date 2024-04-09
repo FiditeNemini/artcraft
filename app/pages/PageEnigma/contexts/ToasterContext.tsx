@@ -7,6 +7,8 @@ import {
 } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCircleExclamation,
+  faSquareCheck,
   faTriangleExclamation,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -28,7 +30,7 @@ export interface ToastProps {
 const ICONS: Record<string, ReactNode> = {
   error: (
     <FontAwesomeIcon
-      icon={faTriangleExclamation}
+      icon={faCircleExclamation}
       className="text-brand-primary-700"
     />
   ),
@@ -39,10 +41,7 @@ const ICONS: Record<string, ReactNode> = {
     />
   ),
   success: (
-    <FontAwesomeIcon
-      icon={faTriangleExclamation}
-      className="text-success-700"
-    />
+    <FontAwesomeIcon icon={faSquareCheck} className="text-success-700" />
   ),
 };
 
