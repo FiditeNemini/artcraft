@@ -36,6 +36,7 @@ use sqlx::MySqlPool;
 use tokio::runtime::Runtime;
 
 use actix_cors_configs::cors::build_cors_config;
+use actix_cors_configs::shared_array_buffer_cors::shared_array_buffer_cors;
 use actix_helpers::middleware::banned_cidr_filter::banned_cidr_filter::BannedCidrFilter;
 use actix_helpers::middleware::banned_cidr_filter::banned_cidr_set::BannedCidrSet;
 use actix_helpers::middleware::banned_cidr_filter::load_cidr_ban_set_from_file::load_cidr_ban_set_from_file;
@@ -614,6 +615,7 @@ pub async fn serve(server_state: ServerState) -> AnyhowResult<()>
       .app_data(web::Data::from(session_cache_purge)) // NB: Data::from(Arc<T>) for dynamic dispatch
       .app_data(server_state_arc.clone())
       .wrap(build_cors_config(old_server_environment))
+      .wrap(shared_array_buffer_cors())
       .wrap(DefaultHeaders::new()
         .header("X-Backend-Hostname", &hostname)
         .header("X-Build-Sha", server_state_arc.server_info.build_sha.clone()))
