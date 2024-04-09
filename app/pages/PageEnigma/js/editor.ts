@@ -284,6 +284,9 @@ class Editor {
     );
 
     this.control = new TransformControls(this.camera, this.renderer.domElement);
+    //this.control.space = 'local'; // Local transformation mode
+    // .space = 'world'; // Global mode
+
     // OnClick and MouseMove events.
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
     window.addEventListener("click", this.onMouseClick.bind(this), false);
@@ -388,9 +391,9 @@ class Editor {
       this.selected.position.y = position.y
       this.selected.position.z = position.z
 
-      this.selected.rotation.x = rotation.x
-      this.selected.rotation.y = rotation.y
-      this.selected.rotation.z = rotation.z
+      this.selected.rotation.x = THREE.MathUtils.degToRad(rotation.x)
+      this.selected.rotation.y = THREE.MathUtils.degToRad(rotation.y)
+      this.selected.rotation.z = THREE.MathUtils.degToRad(rotation.z)
 
       this.selected.scale.x = scale.x
       this.selected.scale.y = scale.y
@@ -991,14 +994,14 @@ class Editor {
         version: this.version,
         objectVectors: {
           position: {
-            x: parseFloat(pos.x.toFixed(6)),
-            y: parseFloat(pos.y.toFixed(6)),
-            z: parseFloat(pos.z.toFixed(6)),
+            x: parseFloat(pos.x.toFixed(2)),
+            y: parseFloat(pos.y.toFixed(2)),
+            z: parseFloat(pos.z.toFixed(2)),
           },
           rotation: {
-            x: parseFloat(rot.x.toFixed(6)),
-            y: parseFloat(rot.y.toFixed(6)),
-            z: parseFloat(rot.z.toFixed(6)),
+            x: parseFloat(THREE.MathUtils.radToDeg(rot.x).toFixed(2)),
+            y: parseFloat(THREE.MathUtils.radToDeg(rot.y).toFixed(2)),
+            z: parseFloat(THREE.MathUtils.radToDeg(rot.z).toFixed(2)),
           },
           scale: {
             x: parseFloat(scale.x.toFixed(6)),
