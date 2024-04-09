@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/InferenceJob";
 import { v4 as uuidv4 } from "uuid";
-import { useInferenceJobs } from "hooks";
+import { useInferenceJobs, useSession } from "hooks";
 import { Button, Container, Panel, TextArea, TempSelect as Select } from "components/common";
 import { EntityInput } from "components/entities";
 import {
@@ -14,7 +14,7 @@ import { STYLE_OPTIONS } from "common/StyleOptions";
 
 export default function StyleVideo() {
   const { mediaToken: pageMediaToken } = useParams<{ mediaToken: string }>();
-
+  const { studioAccessCheck } = useSession();
   const [style, styleSet] = useState("anime_2d_flat");
   const [mediaToken, mediaTokenSet] = useState(pageMediaToken || "");
   const [prompt, promptSet] = useState("");
@@ -51,7 +51,7 @@ export default function StyleVideo() {
     }
   });
 
-  return <Container {...{ className: "fy-style-video-page mt-5", type: "panel" }}>
+  return studioAccessCheck(<Container {...{ className: "fy-style-video-page mt-5", type: "panel" }}>
       <Panel {...{ padding: true }}>
         <header className="d-flex gap-3 flex-wrap">
           <h1 className="fw-semibold">
@@ -94,5 +94,5 @@ export default function StyleVideo() {
           }} />
         </div>
       </Panel>
-   </Container>;
+   </Container>);
 };

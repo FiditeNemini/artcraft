@@ -41,7 +41,7 @@ import { EngineMediaPanel } from "./components/EngineMediaPanel/EngineMediaPanel
 import { GetMediaFileTitle } from "common/GetMediaFileTitle";
 
 export default function MediaPage() {
-  const { canEditMediaFile, user } = useSession();
+  const { canAccessStudio, canEditMediaFile, user } = useSession();
   const { token } = useParams<{ token: string }>();
   const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -540,7 +540,7 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
-                {mediaFile?.media_type === MediaFileType.Video ? (
+                { canAccessStudio && mediaFile?.media_type === MediaFileType.Video ? (
                   <Button
                     {...{
                       icon: faArrowRightArrowLeft,
