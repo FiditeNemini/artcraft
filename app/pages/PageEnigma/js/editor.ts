@@ -202,7 +202,6 @@ class Editor {
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
 
-
     this.storyteller_proxy_scene = new StoryTellerProxyScene(this.version, this.activeScene.scene)
   }
 
@@ -510,11 +509,11 @@ class Editor {
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
-    const object: THREE.Object3D = await this.activeScene.load_glb(
-      "m_4wva09qznapzk5rcvbxy671d1qx2pr",
-    );
+    // const object: THREE.Object3D = await this.activeScene.load_glb(
+    //   "m_4wva09qznapzk5rcvbxy671d1qx2pr",
+    // );
 
-    object.uuid = "CH1";
+    // object.uuid = "CH1";
 
     // Stick Open Pose Man: m_9f3d3z94kk6m25zywyz6an3p43fjtw
     // XBot: m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d 
