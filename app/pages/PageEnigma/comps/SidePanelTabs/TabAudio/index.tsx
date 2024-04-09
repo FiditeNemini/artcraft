@@ -1,1 +1,0 @@
-export { TabAudio } from "./TabAudio";

@@ -21,13 +21,14 @@ import {
 import { ListTtsModels } from "./utilities";
 import { TtsModelListItem } from "./types";
 import { GenerateTtsAudio } from "./generateTts";
-
+import { addInferenceJob } from "../../store/inferenceJobs";
 
 type TtsState = {
   voice: TtsModelListItem | undefined;
   text: string;
   hasEnqueued :boolean;
   inferenceToken?: string;
+  inferenceJobType?: string;
   hasAudio: boolean;
 }
 
@@ -57,6 +58,17 @@ export const DialogueTTS = ()=>{
     listModels();
   }, [listModels]);
 
+  useEffect(()=> {
+    if(ttsState.hasEnqueued && ttsState.inferenceToken && ttsState.inferenceJobType){
+      console.log(`tts has Enqueued`);
+      addInferenceJob({
+        version:1,
+        job_id: ttsState.inferenceToken,
+        jobt_type: ttsState.inferenceJobType,
+      })
+    }
+  },[ttsState.hasEnqueued]);
+
   const requestTts = useCallback( ()=>{
     const modelToken = ttsState.voice ? ttsState.voice.model_token : undefined;
 
@@ -68,11 +80,16 @@ export const DialogueTTS = ()=>{
       };
       // console.log(request);
       GenerateTtsAudio(request).then(res=>{
+        console.log('inference job returned >>>')
+        console.log(res);
+        console.log('<<<');
+
         if(res.inference_job_token){
           setTtsState((curr)=>({
             ...curr,
             hasEnqueued: true,
-            inferenceToken: res.inference_job_token
+            inferenceToken: res.inference_job_token,
+            inferenceJobType: res.inference_job_token_type
           }));
         }
       });

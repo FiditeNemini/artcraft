@@ -63,16 +63,12 @@ export const ItemElement = ({ item }: Props) => {
   );
 
   return (
-<<<<<<<< HEAD:app/pages/PageEnigma/comps/SidePanelTabs/TabAudio/AudioElement.tsx
-    <div className="relative h-16 w-16 overflow-hidden">
-========
     <div
       className="relative rounded-lg"
       style={{ width: 91, height: 114 }}
       onPointerDown={onPointerDown}
     >
       <img src={item.thumbnail} alt={item.name} className="rounded-t-lg" />
->>>>>>>> test:app/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElement.tsx
       <div
         className="w-full rounded-b-lg py-1 text-center text-sm"
         style={{ backgroundColor: "#39394D" }}

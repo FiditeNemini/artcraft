@@ -1,25 +1,33 @@
+import { toInferenceActions } from './toInferenceActions';
+
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+
 import {
   QueueClip,
   QueueKeyframe,
+  InferenceJob,
   UpdateTime,
 } from "~/pages/PageEnigma/models";
 import { toTimelineActions } from "./toTimelineActions";
+
+type UnionedActionTypes = fromEngineActions | toEngineActions | toTimelineActions | toInferenceActions;
+type UnionedDataTypes = QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | InferenceJob;
+
 import { ClipUI } from "../datastructures/clips/clip_ui";
 class Queue {
   private _queue: Record<
     string,
     {
-      action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
+      action: UnionedActionTypes;
+      data: UnionedDataTypes;
     }[]
   > = {};
   private _subscribers: Record<
     string,
     (entry: {
-      action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
+      action: UnionedActionTypes;
+      data: UnionedDataTypes;
     }) => void
   > = {};
 
@@ -29,8 +37,8 @@ class Queue {
     data,
   }: {
     queueName: string;
-    action: fromEngineActions | toEngineActions | toTimelineActions;
-    data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] ;
+    action: UnionedActionTypes;
+    data: UnionedDataTypes ;
   }) {
     if (!this._queue[queueName]) {
       this._queue[queueName] = [];
@@ -46,8 +54,8 @@ class Queue {
   public subscribe(
     queueName: string,
     onMessage: (entry: {
-      action: fromEngineActions | toEngineActions | toTimelineActions;
-      data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[];
+      action: UnionedActionTypes;
+      data: UnionedDataTypes;
     }) => void,
   ) {
     this._subscribers[queueName] = onMessage;
