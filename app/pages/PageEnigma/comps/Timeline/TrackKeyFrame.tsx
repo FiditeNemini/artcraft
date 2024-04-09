@@ -2,19 +2,27 @@ import { Keyframe } from "~/pages/PageEnigma/models";
 import { filmLength, scale, selectedItem } from "~/pages/PageEnigma/store";
 import { useMouseEventsKeyframe } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsKeyframe";
 import { useSignals } from "@preact/signals-react/runtime";
+import { useContext } from "react";
+import { ToasterContext } from "~/pages/PageEnigma/contexts/ToasterContext";
 
 interface Props {
   keyframe: Keyframe;
-  updateKeyframe: (options: { id: string; offset: number }) => void;
+  updateKeyframe: (options: {
+    id: string;
+    offset: number;
+    addToast: (type: "error" | "warning" | "success", message: string) => void;
+  }) => void;
 }
 
 export const TrackKeyFrame = ({ keyframe, updateKeyframe }: Props) => {
   useSignals();
+  const { addToast } = useContext(ToasterContext);
   const { onPointerDown, offset } = useMouseEventsKeyframe({
     keyframe,
     max: filmLength.value * 60,
     min: 0,
     updateKeyframe,
+    addToast,
   });
 
   const displayOffset = offset > -1 ? offset : keyframe.offset;
