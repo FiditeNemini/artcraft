@@ -7,7 +7,7 @@ export const TransitionDialogue = ({
   isOpen: boolean;
   title?: ReactNode;
   onClose:()=>void;
-  className: string;
+  className?: string;
   children: ReactNode;
   
 })=>{

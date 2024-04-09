@@ -15,9 +15,10 @@ export function addInferenceJob(
   const existingInferenceJobs = inferenceJobs.value;
   
   existingInferenceJobs.push(inferenceJob);
-  // Queue.publish({
-  //   queueName: QueueNames.TO_INFERENCE,
-  //   action: toInferenceActions.ADD_TTS_JOB,
-  //   data: inferenceJob,
-  // });
+
+  Queue.publish({
+    queueName: QueueNames.TO_INFERENCE,
+    action: toInferenceActions.ADD_TTS_JOB,
+    data: inferenceJob,
+  });
 }

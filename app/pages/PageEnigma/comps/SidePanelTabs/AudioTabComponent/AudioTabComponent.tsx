@@ -10,9 +10,9 @@ import { inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
 
 export const AudioTabComponent = () => {
   const singals = useSignals();
-  console.log('Audio Tab Component > Singals >>>')
-  console.log(inferenceJobs);
-  console.log('<<<');
+  // console.log('Audio Tab Component > Singals >>>')
+  // console.log(inferenceJobs);
+  // console.log('<<<');
   return (
     <>
       <div className="w-full overflow-x-auto">
@@ -72,7 +72,7 @@ export const AudioTabComponent = () => {
       {inferenceJobs.value.length > 0 &&
         <ul>
           {inferenceJobs.value.map(job=>
-            <li key={job.job_id}>{job.jobt_type}:{job.job_id}</li>
+            <li key={job.job_id}>{job.jobt_type} : {job.job_id}</li>
           )}
         </ul>
       }

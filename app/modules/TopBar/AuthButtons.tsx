@@ -2,6 +2,7 @@ import { useContext, } from "react";
 
 import { AuthenticationContext } from "~/contexts/Authentication";
 import { Button, ButtonLink } from "~/components";
+import { DialogueInference } from "../DialogueInference";
 
 export const AuthButtons = ()=>{
   const {authState, logout} = useContext(AuthenticationContext);
@@ -10,7 +11,10 @@ export const AuthButtons = ()=>{
   }
   if ( authState && authState.isLoggedIn ) {
     return(
-      <Button onClick={handleLogout}>Log Out</Button>
+      <>
+        <DialogueInference />
+        <Button onClick={handleLogout}>Log Out</Button>
+      </>
     );
   }else{
     return(
