@@ -416,7 +416,7 @@ class Editor {
     }
   }
 
-  public async saveScene(name: string) {
+  public async saveScene(name: string): Promise<string> {
     // remove controls when saving scene.
     this.removeTransformControls();
     this.dispatchAppUiState({
@@ -454,6 +454,8 @@ class Editor {
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
     });
+
+    return result;
   }
 
   /**

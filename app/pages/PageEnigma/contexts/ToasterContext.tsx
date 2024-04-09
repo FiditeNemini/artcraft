@@ -7,6 +7,8 @@ import {
 } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faCircleExclamation,
+  faSquareCheck,
   faTriangleExclamation,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -29,7 +31,7 @@ export interface ToastProps {
 const ICONS: Record<string, IconDefinition> = {
   error: faTriangleExclamation,
   warning: faTriangleExclamation,
-  success: faTriangleExclamation,
+  success: faSquareCheck,
 };
 
 const TITLES = {
@@ -63,7 +65,7 @@ export const ToasterProvider = ({ children }: { children: ReactNode }) => {
         setToasts((oldToasts) =>
           oldToasts.filter((row) => row.id !== toast.id),
         );
-      }, 3000);
+      }, type === "success" ? 20000 : 3000);
     },
     [],
   );
