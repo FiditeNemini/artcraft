@@ -626,7 +626,7 @@ class Editor {
         version: 1,
         type: AssetType.OBJECT,
         media_id: "",
-        object_uuid: this.selected?.uuid,
+        object_uuid: uuid,
         name: "",
       } as MediaItem,
     });
