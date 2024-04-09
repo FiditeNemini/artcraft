@@ -132,6 +132,15 @@ export const ControlPanelSceneObject = () => {
         return;
       }
 
+      for (let key in editorEngine?.timeline.characters) {
+        let element = editorEngine?.timeline.characters[key];
+        if (key == currentSceneObject.object_uuid) {
+            currentSceneObject.group = element;
+            break;
+        }
+      }
+
+
       Queue.publish({
         queueName: QueueNames.TO_TIMELINE,
         action: toTimelineActions.ADD_KEYFRAME,

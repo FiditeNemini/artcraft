@@ -11,7 +11,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
-import { ClipType } from "~/pages/PageEnigma/models/track";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 
 // Every object uuid / entity has a track.
 export class TimelineDataState {
@@ -42,7 +42,7 @@ export class TimeLine {
     animation_engine: AnimationEngine;
     // lip sync engine
     lipSync_engine: LipSyncEngine;
-    characters: {[key: string]: string};
+    characters: { [key: string]: ClipGroup };
 
     scene: Scene;
 
@@ -149,7 +149,7 @@ export class TimeLine {
 
         console.log("data.data", data.data)
 
-        this.characters[object_uuid] = type;
+        this.characters[object_uuid] = ClipGroup.CHARACTER;
 
         data.data['object_uuid'] = object_uuid;
         Queue.publish({
@@ -182,17 +182,11 @@ export class TimeLine {
         let uuid = data_json['object_uuid'];
         let keyframe_uuid = data_json['keyframe_uuid'];
 
+        console.log(data_json);
+
         let object_name = this.scene.get_object_by_uuid(uuid)?.name;
         if (object_name == undefined) {
             object_name = "undefined"
-        }
-
-        for (let key in this.characters) {
-            let element = this.characters[key];
-            if (key == uuid) {
-                data_json['group'] = element;
-                break;
-            }
         }
 
         let new_item = this.transform_engine.addFrame(uuid,
@@ -202,20 +196,18 @@ export class TimeLine {
             data_json['scale'],
             data_json['offset'],
             data_json['keyframe_uuid']);
-        if (new_item) {
-            await this.addPlayableClip(new ClipUI(
-                data_json['version'],
-                ClipType.TRANSFORM,
-                data_json['group'],
-                object_name,
-                "",
-                keyframe_uuid,
-                uuid,
-                object_name,
-                0,
-                this.absolute_end,
-                data_json['offset']))
-        }
+        await this.addPlayableClip(new ClipUI(
+            data_json['version'],
+            ClipType.TRANSFORM,
+            data_json['group'],
+            object_name,
+            "",
+            keyframe_uuid,
+            uuid,
+            object_name,
+            0,
+            this.absolute_end,
+            data_json['offset']))
 
         this.scene.createPoint(data_json['position'], data_json['keyframe_uuid']);
     }
@@ -238,7 +230,7 @@ export class TimeLine {
         const clip_uuid = data["data"]['clip_uuid'];
         console.log(data);
 
-        if(object_name == undefined) {
+        if (object_name == undefined) {
             object_name = "Undefined."
         }
 
