@@ -11,12 +11,11 @@ import {
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
 import * as uuid from "uuid";
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 export interface Toast {
   id: string;
   type: "success" | "warning" | "error";
-  icon: IconDefinition;
+  icon: ReactNode;
   title: string;
   message: string;
 }
@@ -26,10 +25,25 @@ export interface ToastProps {
   addToast: (type: "success" | "warning" | "error", message: string) => void;
 }
 
-const ICONS: Record<string, IconDefinition> = {
-  error: faTriangleExclamation,
-  warning: faTriangleExclamation,
-  success: faTriangleExclamation,
+const ICONS: Record<string, ReactNode> = {
+  error: (
+    <FontAwesomeIcon
+      icon={faTriangleExclamation}
+      className="text-brand-primary-700"
+    />
+  ),
+  warning: (
+    <FontAwesomeIcon
+      icon={faTriangleExclamation}
+      className="text-keyframe-selected"
+    />
+  ),
+  success: (
+    <FontAwesomeIcon
+      icon={faTriangleExclamation}
+      className="text-success-700"
+    />
+  ),
 };
 
 const TITLES = {
@@ -59,11 +73,14 @@ export const ToasterProvider = ({ children }: { children: ReactNode }) => {
         return [toast, ...oldToasts];
       });
 
-      setTimeout(() => {
-        setToasts((oldToasts) =>
-          oldToasts.filter((row) => row.id !== toast.id),
-        );
-      }, 3000);
+      setTimeout(
+        () => {
+          setToasts((oldToasts) =>
+            oldToasts.filter((row) => row.id !== toast.id),
+          );
+        },
+        type === "success" ? 20000 : 3000,
+      );
     },
     [],
   );
@@ -86,10 +103,7 @@ export const ToasterProvider = ({ children }: { children: ReactNode }) => {
           <div className="mr-3 flex justify-between rounded-lg">
             <div>
               <div className="ml-3 flex items-center gap-4">
-                <FontAwesomeIcon
-                  icon={toast.icon}
-                  className="text-keyframe-selected"
-                />
+                {toast.icon}
                 <div className="text-base font-bold text-white">
                   {toast.title}
                 </div>
