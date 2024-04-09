@@ -12,9 +12,10 @@ import {
 import { toTimelineActions } from "./toTimelineActions";
 
 type UnionedActionTypes = fromEngineActions | toEngineActions | toTimelineActions | toInferenceActions;
-type UnionedDataTypes = QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | InferenceJob;
+type UnionedDataTypes = QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem | InferenceJob;
 
 import { ClipUI } from "../datastructures/clips/clip_ui";
+import { MediaItem } from "~/pages/PageEnigma/models";
 class Queue {
   private _queue: Record<
     string,

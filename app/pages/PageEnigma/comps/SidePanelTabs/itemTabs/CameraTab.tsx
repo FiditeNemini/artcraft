@@ -2,6 +2,9 @@ import { cameraFilter, cameraItems } from "~/pages/PageEnigma/store";
 import { AssetFilterOption } from "~/pages/PageEnigma/models";
 import { useSignals } from "@preact/signals-react/runtime";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
+import { Button } from "~/components";
+import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
+import { twMerge } from "tailwind-merge";
 
 export const CameraTab = () => {
   useSignals();
@@ -9,39 +12,36 @@ export const CameraTab = () => {
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="mb-4 mt-2 flex justify-start gap-2 px-2">
+        <div className="mb-4 mt-4 flex justify-start gap-2 px-4">
           <button
-            className={[
-              "bg-assets-background rounded-lg px-3 py-1 text-sm",
-              cameraFilter.value === AssetFilterOption.ALL
-                ? "border-2 border-brand-primary"
-                : "",
-            ].join(" ")}
+            className={twMerge(
+              "filter-tab",
+              cameraFilter.value === AssetFilterOption.ALL ? "active" : "",
+              "disabled",
+            )}
             onClick={() => (cameraFilter.value = AssetFilterOption.ALL)}
           >
             All
           </button>
           <button
-            className={[
-              "bg-assets-background text-nowrap rounded-lg px-3 py-1 text-sm",
-              "disabled:text-gray-500",
-              cameraFilter.value === AssetFilterOption.MINE
-                ? "border-2 border-brand-primary"
-                : "",
-            ].join(" ")}
+            className={twMerge(
+              "filter-tab",
+              cameraFilter.value === AssetFilterOption.MINE ? "active" : "",
+              "disabled",
+            )}
             onClick={() => (cameraFilter.value = AssetFilterOption.MINE)}
             disabled={!cameraItems.value.some((item) => item.isMine)}
           >
             My Cameras
           </button>
           <button
-            className={[
-              "bg-assets-background rounded-lg px-3 py-1 text-sm",
-              "disabled:text-gray-500",
+            className={twMerge(
+              "filter-tab",
               cameraFilter.value === AssetFilterOption.BOOKMARKED
-                ? "border-2 border-brand-primary"
+                ? "active"
                 : "",
-            ].join(" ")}
+              "disabled",
+            )}
             onClick={() => (cameraFilter.value = AssetFilterOption.BOOKMARKED)}
             disabled={!cameraItems.value.some((item) => item.isBookmarked)}
           >
@@ -49,12 +49,16 @@ export const CameraTab = () => {
           </button>
         </div>
       </div>
-      <div className="px-2">
-        <button className="bg-assets-background w-full rounded-lg py-2">
-          Create Camera
-        </button>
+      <div className="w-full px-4">
+        <Button
+          icon={faCirclePlus}
+          variant="action"
+          className="w-full py-3 text-sm font-medium"
+        >
+          Create Camera Movement
+        </Button>
       </div>
-      <div className="mt-2 overflow-y-auto px-2 pt-2">
+      <div className="h-full w-full overflow-y-auto px-4 pt-4">
         <ItemElements
           items={cameraItems.value}
           assetFilter={cameraFilter.value}

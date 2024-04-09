@@ -42,6 +42,7 @@ export class TimeLine {
     animation_engine: AnimationEngine;
     // lip sync engine
     lipSync_engine: LipSyncEngine;
+    characters: {[key: string]: string};
 
     scene: Scene;
 
@@ -55,6 +56,7 @@ export class TimeLine {
         scene: Scene,
     ) {
         this.timeline_items = [];
+        this.characters = {};
         this.absolute_end = 60 * 12;
         this.timeline_limit = 0; // 5 seconds
 
@@ -124,9 +126,45 @@ export class TimeLine {
             case toEngineActions.UNMUTE:
                 await this.mute(data, true);
                 break;
+            case toEngineActions.ADD_CHARACTER:
+                await this.addCharacter(data);
+                break;
+            case toEngineActions.ADD_OBJECT:
+                await this.addObject(data);
+                break;
             default:
                 console.log("Action Not Wired", action);
         }
+    }
+
+    public async addCharacter(data: any) {
+        let media_id = data.data['media_id'];
+        let name = data.data['name'];
+        let type = data.data['type'];
+
+        let obj = await this.scene.load_glb(media_id);
+        obj.userData['name'] = name;
+        obj.name = name;
+        let object_uuid = obj.uuid;
+
+        console.log("data.data", data.data)
+
+        this.characters[object_uuid] = type;
+
+        data.data['object_uuid'] = object_uuid;
+        Queue.publish({
+            queueName: QueueNames.FROM_ENGINE,
+            action: fromEngineActions.UPDATE_CHARACTER_ID,
+            data: data.data,
+        });
+    }
+
+    public async addObject(data: any) {
+        let media_id = data.data['media_id'];
+        let name = data.data['name'];
+        let obj = await this.scene.load_glb(media_id);
+        obj.userData['name'] = name;
+        obj.name = name;
     }
 
     public async addKeyFrame(data: any) {
@@ -142,10 +180,19 @@ export class TimeLine {
         // selected?: boolean;
         let data_json = data['data'];
         let uuid = data_json['object_uuid'];
+        let keyframe_uuid = data_json['keyframe_uuid'];
 
         let object_name = this.scene.get_object_by_uuid(uuid)?.name;
         if (object_name == undefined) {
             object_name = "undefined"
+        }
+
+        for (let key in this.characters) {
+            let element = this.characters[key];
+            if (key == uuid) {
+                data_json['group'] = element;
+                break;
+            }
         }
 
         let new_item = this.transform_engine.addFrame(uuid,
@@ -162,9 +209,12 @@ export class TimeLine {
                 data_json['group'],
                 object_name,
                 "",
+                keyframe_uuid,
                 uuid,
+                object_name,
                 0,
-                this.absolute_end))
+                this.absolute_end,
+                data_json['offset']))
         }
 
         this.scene.createPoint(data_json['position'], data_json['keyframe_uuid']);
@@ -184,6 +234,13 @@ export class TimeLine {
         const type = data["data"]["type"];
         const offset = data["data"]["offset"];
         const end_offset = data["data"]["length"] + offset;
+        let object_name = this.scene.get_object_by_uuid(object_uuid)?.name;
+        const clip_uuid = data["data"]['clip_uuid'];
+        console.log(data);
+
+        if(object_name == undefined) {
+            object_name = "Undefined."
+        }
 
         switch (type) {
             case "animation":
@@ -199,11 +256,13 @@ export class TimeLine {
                     this.addPlayableClip(
                         new ClipUI(
                             version,
-                            "lipsync",// TODO potiential bug ..
+                            "lipsync", // TODO potiential bug ..
                             group,
                             name,
                             media_id,
+                            clip_uuid,
                             object_uuid,
+                            object_name,
                             offset,
                             end_offset));
                     return;
@@ -221,7 +280,9 @@ export class TimeLine {
                 group,
                 name,
                 media_id,
+                clip_uuid,
                 object_uuid,
+                object_name,
                 offset,
                 end_offset,
             ),
@@ -286,6 +347,7 @@ export class TimeLine {
     }
 
     public async addPlayableClip(clip: ClipUI): Promise<void> {
+        console.log("clip", clip)
         this.timeline_items.push(clip);
     }
 
@@ -449,96 +511,3 @@ export class TimeLine {
     }
 }
 
-// How much timeline precision we have
-//const percision = 100 // using a fake update loop mock
-//
-//class AudioEngineMock {
-//    async play(media_id:string) {
-//        console.log("Audio Playing {media_id}")
-//    }
-//}
-//
-//// Visual verification tests.
-//function CheckIfBasicAudioClipWorks() {
-//    const timeline = new TimeLine()
-//    timeline.addPlayableClip(new ClipUI(1.0,'audio',1,0))
-//    timeline.play()
-//}
-//
-//function CheckIfBasicTransformClipWorks() {
-//    const timeline = new TimeLine()
-//    timeline.addPlayableClip(new ClipUI(1.0,'transform',2,0))
-//    timeline.play()
-//}
-//
-//function CheckIfBasicClipWorks() {
-//    const timeline = new TimeLine()
-//    timeline.addPlayableClip(new ClipUI(1.0,'animation',3,0))
-//    timeline.play()
-//}
-
-// function CheckIfBasicClipWorks3SecondsAfterTimelineStops() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip1", 0, 10000))
-//     timeline.play()
-// }
-
-// function CheckIfTwoClipsAtTheSameTimeWorks() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip1", 0, 1000))
-//     timeline.play()
-// }
-
-// function CheckIfTwoClipsOneAfterAnotherWorks() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip1", 0, 1000))
-//     timeline.addPlayableClip(new ClipUI("clip2", 0, 2000))
-//     timeline.play()
-// }
-
-// function CheckIfTimeLineStopBeforeClipPlays() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip3",0,1000))
-//     timeline.play()
-//     setInterval(async ()=> {
-//         timeline.stop()
-//     },1100)
-//     console.log("Stopped")
-// }
-
-// function CheckIfTimeLineStartAfterClipPlays() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip3",0,1000))
-//     timeline.play()
-//     setInterval(async ()=> {
-//         timeline.stop()
-//     },500)
-//     console.log("Stopped")
-// }
-
-// function CheckIfClipsPlayAllTogetherConcurrently() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new ClipUI("clip1",0,1000))
-//     timeline.addPlayableClip(new ClipUI("clip2",0,1000))
-//     timeline.addPlayableClip(new ClipUI("clip3",0,1000))
-//     timeline.addPlayableClip(new ClipUI("clip4",0,1000))
-//     timeline.play()
-// }
-
-// function CheckIfClipsPlayAllTogether() {
-//     const timeline = new TimeLine()
-//     timeline.addPlayableClip(new TrackClip("clip1",0,1000))
-//     timeline.addPlayableClip(new TrackClip("clip2",0,1000))
-//     timeline.addPlayableClip(new TrackClip("clip3",0,1000))
-//     timeline.addPlayableClip(new TrackClip("clip4",0,1000))
-//     timeline.play()
-// }
-
-//CheckIfBasicClipWorks()
-//CheckIfTwoClipsAtTheSameTimeWorks()
-// CheckIfTwoClipsOneAfterAnotherWorks()
-// CheckIfTimeLineStopBeforeClipPlays()
-// CheckIfTimeLineStartAfterClipPlays()
-// CheckIfClipsPlayAllTogetherConcurrently()
-
-// CheckIfClipsPlayAllTogether()

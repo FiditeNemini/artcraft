@@ -54,7 +54,6 @@ export const PageEnigmaComponent = () => {
   const width = sidePanelVisible.value
     ? pageWidth.value - dndWidth - 66
     : pageWidth.value - 66;
-
   const height =
     dndTimelineHeight.value > -1
       ? pageHeight.value - dndTimelineHeight.value - 68

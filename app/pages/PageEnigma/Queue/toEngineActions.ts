@@ -2,6 +2,11 @@ export enum toEngineActions {
   ADD_CLIP = "add_clip",
   // data=QueueClip
   ADD_KEYFRAME = "add_keyframe",
+
+  ADD_CHARACTER = "add_character",
+
+  ADD_OBJECT = "add_object",
+
   // data= QueueKeyframe
   DELETE_CLIP = "delete_clip",
   // data=QueueClip

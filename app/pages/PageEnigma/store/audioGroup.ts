@@ -10,6 +10,7 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 import { signal } from "@preact/signals-core";
+import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
 
 export const audioGroup = signal<AudioGroup>({
   id: "AG-1",
@@ -139,4 +140,21 @@ export function deleteAudioClip(clip: Clip) {
       }),
     ],
   };
+}
+
+export function loadAudioData(item: ClipUI) {
+  const existingAudio = audioGroup.value;
+  const newItem = {
+    version: item.version,
+    clip_uuid: item.clip_uuid,
+    type: item.type,
+    group: item.group,
+    object_uuid: item.object_uuid,
+    media_id: item.media_id,
+    name: item.name,
+    offset: item.offset,
+    length: item.length,
+  } as Clip;
+  existingAudio.clips.push(newItem);
+  existingAudio.clips.sort((clipA, clipB) => clipA.offset - clipB.offset);
 }

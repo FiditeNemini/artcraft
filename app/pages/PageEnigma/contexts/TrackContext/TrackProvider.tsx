@@ -6,10 +6,16 @@ import {
   addCharacterAnimation,
   addCharacterAudio,
   addGlobalAudio,
+  addCharacter,
   canDrop,
   dragItem,
   dropId,
   dropOffset,
+  addObject,
+  characterGroups,
+  cameraGroup,
+  audioGroup,
+  objectGroup,
 } from "~/pages/PageEnigma/store";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 
@@ -24,52 +30,75 @@ export const TrackProvider = ({ children }: Props) => {
 
   // cross group functions
   const dropClip = useCallback(() => {
+    if (dragItem.value) {
+      const mediaItem = dragItem.value;
+      if (mediaItem.type === AssetType.CHARACTER) {
+        addCharacter(dragItem.value);
+      }
+      // if (dragItem.value.type === AssetType.CAMERA) {
+      //   console.log("Dragged In Camera Type")
+      // }
+      if (dragItem.value.type === AssetType.OBJECT) {
+        addObject(dragItem.value);
+      }
+    }
+    // if (dragItem.value.type === AssetType.SHAPE) {
+    //   console.log("Dragged In Shape Type")
+    // }
 
-    console.log(`${canDrop.value} ${dragItem.value} ${dragItem.value.type}`)
     if (canDrop.value && dragItem.value) {
       if (dragItem.value.type === AssetType.ANIMATION) {
         addCharacterAnimation({
-          dragItem: dragItem.value!,
+          dragItem: dragItem.value,
           characterId: dropId.value,
           offset: dropOffset.value,
         });
       }
       if (dragItem.value.type === AssetType.AUDIO) {
+        console.log("add audio", dropId.value);
         addCharacterAudio({
-          dragItem: dragItem.value!,
+          dragItem: dragItem.value,
           characterId: dropId.value,
           offset: dropOffset.value,
         });
         addGlobalAudio({
-          dragItem: dragItem.value!,
+          dragItem: dragItem.value,
           audioId: dropId.value,
           offset: dropOffset.value,
         });
-      }
-      if (dragItem.value.type === AssetType.CHARACTER) {
-        console.log("Dragged In Character Type")
-      }
-      if (dragItem.value.type === AssetType.CAMERA) {
-        console.log("Dragged In Camera Type")
-      }
-      if (dragItem.value.type === AssetType.OBJECT) {
-        console.log("Dragged In Object Type")
-      }
-      if (dragItem.value.type === AssetType.SHAPE) {
-        console.log("Dragged In Shape Type")
       }
     }
     endDrag();
   }, [endDrag]);
 
+  const clearExistingData = useCallback(() => {
+    characterGroups.value = [];
+    cameraGroup.value = {
+      id: "CG1",
+      keyframes: [],
+    };
+    audioGroup.value = {
+      id: "AG-1",
+      clips: [],
+      muted: false,
+    };
+    objectGroup.value = {
+      id: "OG1",
+      objects: [],
+    };
+  }, []);
+
   const values = useMemo(() => {
     return {
       ...keyframes,
 
+      clearExistingData,
+
       ...dragDrop,
       endDrag: dropClip,
     };
-  }, [keyframes, dragDrop, dropClip]);
+  }, [keyframes, dragDrop, dropClip, clearExistingData]);
+
   return (
     <TrackContext.Provider value={values}>{children}</TrackContext.Provider>
   );

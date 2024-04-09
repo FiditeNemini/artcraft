@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
-  lastSelectedTab,
   selectedTab,
   sidePanelHeight,
   sidePanelVisible,
@@ -18,7 +17,7 @@ export const SidePanelMenu = () => {
   return (
     <div
       className={[
-        "bg-assets-background fixed",
+        "fixed bg-assets-background",
         "px-2 py-4",
         "overflow-y-auto",
       ].join(" ")}

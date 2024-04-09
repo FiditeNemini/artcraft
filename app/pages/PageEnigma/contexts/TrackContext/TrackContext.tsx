@@ -6,12 +6,17 @@ export const TrackContext = createContext<{
   addKeyframe: (keyframe: QueueKeyframe, offset: number) => void;
   deleteKeyframe: (keyframe: Keyframe) => void;
 
+  // misc
+  clearExistingData: () => void;
+
   // drag and drop
   startDrag: (item: MediaItem) => void;
   endDrag: () => void;
 }>({
   addKeyframe: () => {},
   deleteKeyframe: () => {},
+
+  clearExistingData: () => {},
 
   startDrag: () => {},
   endDrag: () => {},
