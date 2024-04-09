@@ -104,8 +104,8 @@ export class TransformClip {
 
       let rot_s = currentKeyframe?.rotation;
       let rot_e = nextKeyframe?.rotation;
-      let quat_s = new THREE.Quaternion().setFromEuler(new THREE.Euler(rot_s.x, rot_s.y, rot_s.z));
-      let quat_e = new THREE.Quaternion().setFromEuler(new THREE.Euler(rot_e.x, rot_e.y, rot_e.z));
+      let quat_s = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.MathUtils.degToRad(rot_s.x), THREE.MathUtils.degToRad(rot_s.y), THREE.MathUtils.degToRad(rot_s.z)));
+      let quat_e = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.MathUtils.degToRad(rot_e.x), THREE.MathUtils.degToRad(rot_e.y), THREE.MathUtils.degToRad(rot_e.z)));
       let quaternion = new THREE.Quaternion();
       quaternion.slerpQuaternions(quat_s, quat_e, location);
       object.quaternion.copy(quaternion);
