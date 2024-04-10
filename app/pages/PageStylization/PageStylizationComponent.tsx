@@ -8,9 +8,24 @@ import { TimerGrid } from "~/pages/PageEnigma/comps/TimerGrid/TimerGrid";
 import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
 import { PreviewImages } from "~/pages/PageStylization/comps/PreviewImages";
 import { TopBar } from "~/modules/TopBar";
+import { useContext, useEffect } from "react";
+import { AppUiContext } from "~/contexts/AppUiContext";
+import { EngineContext } from "~/contexts/EngineContext";
 
 export const PageStylizationComponent = () => {
   useSignals();
+
+  const [, dispatchAppUiState] = useContext(AppUiContext);
+  const editor = useContext(EngineContext);
+
+  useEffect(() => {
+    if (editor && editor.can_initialize && dispatchAppUiState !== null) {
+      console.log("initializing Editor");
+      editor.initialize({
+        dispatchAppUiState,
+      });
+    }
+  }, [editor, dispatchAppUiState]);
 
   return (
     <div className="w-screen">

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 
 import { LoadingBar, LoadingDots } from "~/components";
 import { SidePanel } from "~/modules/SidePanel";
@@ -23,11 +23,22 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/contexts/AppUiContext";
 import { pageHeight, pageWidth } from "~/store";
 import { TopBar } from "~/modules/TopBar";
+import { EngineContext } from "~/contexts/EngineContext";
 
 export const PageEnigmaComponent = () => {
   useSignals();
 
-  const [appUiState] = useContext(AppUiContext);
+  const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
+  const editor = useContext(EngineContext);
+
+  useEffect(() => {
+    if (editor && editor.can_initialize && dispatchAppUiState !== null) {
+      console.log("initializing Editor");
+      editor.initialize({
+        dispatchAppUiState,
+      });
+    }
+  }, [editor, dispatchAppUiState]);
 
   //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {

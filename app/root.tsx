@@ -15,8 +15,6 @@ import tailwindCss from "./styles/tailwind.css?url";
 import baseCss from "./styles/base.css?url";
 
 import { LoadingDotsBricks } from "~/components";
-import { TopBar } from "./modules/TopBar";
-import { TopBarInnerContext } from "~/contexts/TopBarInner";
 import { AuthenticationProvider } from "./contexts/Authentication";
 import { ToasterProvider } from "~/contexts/ToasterContext";
 
@@ -28,7 +26,6 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import { useSignals } from "@preact/signals-react/runtime";
 import { pageHeight, pageWidth } from "~/store";
 import { sidePanelWidth, timelineHeight } from "~/pages/PageEnigma/store";
-import { EngineProvider } from "~/contexts/EngineProvider";
 import { AppUIProvider } from "~/contexts/AppUiContext";
 config.autoAddCss = false; /* eslint-disable import/first */
 
@@ -103,10 +100,8 @@ export default function App() {
           <AuthenticationProvider>
             <ToasterProvider>
               <AppUIProvider>
-                <EngineProvider>
-                  <div className="topbar-spacer" />
-                  <Outlet />
-                </EngineProvider>
+                <div className="topbar-spacer" />
+                <Outlet />
               </AppUIProvider>
             </ToasterProvider>
           </AuthenticationProvider>

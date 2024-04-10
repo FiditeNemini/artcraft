@@ -1,27 +1,15 @@
 import { PageEnigmaComponent } from "./PageEnigmaComponent";
 import { TrackProvider } from "~/pages/PageEnigma/contexts/TrackContext/TrackProvider";
 import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
-import { useContext, useEffect } from "react";
-import { AppUiContext } from "~/contexts/AppUiContext";
-import { EngineContext } from "~/contexts/EngineContext";
+import { EngineProvider } from "~/contexts/EngineProvider";
 
 export const PageEnigma = () => {
-  const [_, dispatchAppUiState] = useContext(AppUiContext);
-  const editor = useContext(EngineContext);
-
-  useEffect(() => {
-    if (editor && editor.can_initialize && dispatchAppUiState !== null) {
-      console.log("initializing Editor");
-      editor.initialize({
-        dispatchAppUiState,
-      });
-    }
-  }, [editor, dispatchAppUiState]);
-
   return (
     <TrackProvider>
-      <PageEnigmaComponent />
-      <DragComponent />
+      <EngineProvider>
+        <PageEnigmaComponent />
+        <DragComponent />
+      </EngineProvider>
     </TrackProvider>
   );
 };

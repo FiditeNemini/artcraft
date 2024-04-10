@@ -28,11 +28,7 @@ export const PreviewImages = () => {
           className="block w-full rounded-b-lg"
           style={{ height: imageHeight }}
         >
-          <canvas
-            id="preview-cancvas"
-            width={imageWidth}
-            height={imageHeight}
-          />
+          <canvas id="video-scene" width={imageWidth} height={imageHeight} />
         </div>
       </div>
       <div className="flex w-[40px] flex-col justify-center">
