@@ -3,29 +3,30 @@ import {
   Keyframe,
   MediaItem,
   ObjectGroup,
-  ObjectTrack,
   QueueKeyframe,
 } from "~/pages/PageEnigma/models";
 import * as uuid from "uuid";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
-import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
-// import { toast } from "react-hot-toast";
 
 export const objectGroup = signal<ObjectGroup>({
   id: "OB1",
   objects: [],
 });
 
-export function addObjectKeyframe(keyframe: QueueKeyframe, offset: number) {
+export function addObjectKeyframe(
+  keyframe: QueueKeyframe,
+  offset: number,
+  addToast: (type: "error" | "warning" | "success", message: string) => void,
+) {
   const oldObjectGroup = objectGroup.value;
   const obj = oldObjectGroup.objects.find(
     (row) => row.object_uuid === keyframe.object_uuid,
   );
 
   if (obj && obj.keyframes.some((row) => row.offset === offset)) {
-    //toast.error("There can only be one keyframe at this offset.");
+    addToast("warning", "There can only be one keyframe at this offset.");
     return;
   }
 

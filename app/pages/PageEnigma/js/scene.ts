@@ -25,7 +25,8 @@ class Scene {
     }
 
     instantiate(name: string) {
-        let material = new THREE.MeshPhongMaterial({ color: 0xffffff });
+        let material = new THREE.MeshPhongMaterial({ color: 0xDACBCE });
+        material.shininess = 0.0;
         let geometry;
         if (name == "Box") {
             geometry = new THREE.BoxGeometry(1, 1, 1);

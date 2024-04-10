@@ -17,7 +17,9 @@ import baseCss from "./styles/base.css?url";
 import { LoadingDotsBricks } from "~/components";
 import { TopBar } from "./modules/TopBar";
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
-import { AuthenticationProvider, UserInfo } from "./contexts/Authentication";
+import { AuthenticationProvider } from "./contexts/Authentication";
+import { ToasterProvider } from "~/pages/PageEnigma/contexts/ToasterContext";
+
 // The following import prevents a Font Awesome icon server-side rendering bug,
 // where the icons flash from a very large icon down to a properly sized one:
 import '@fortawesome/fontawesome-svg-core/styles.css';
@@ -54,15 +56,14 @@ export const links: LinksFunction = () => [
 ];
 
 export default function App() {
-  const [topBarInnerComponent, setTopBarInnerComponent] =
-  useState<{
-    location: string,
-    node: React.ReactNode,
+  const [topBarInnerComponent, setTopBarInnerComponent] = useState<{
+    location: string;
+    node: React.ReactNode;
   } | null>(null);
   const [showLoader, setShowLoader] = useState<boolean>(true);
-  useEffect(()=>{
-    setTimeout(()=>setShowLoader(false), 2500);
-  },[]);
+  useEffect(() => {
+    setTimeout(() => setShowLoader(false), 2500);
+  }, []);
 
   return (
     <html lang="en">
@@ -73,19 +74,21 @@ export default function App() {
         <Links />
       </head>
       <body className="overflow-hidden bg-ui-background">
-        <CompleteTakeoverLoadingScreen isShowing={showLoader}/>
-        <CookiesProvider defaultSetOptions={{ path: '/' }}>
+        <CompleteTakeoverLoadingScreen isShowing={showLoader} />
+        <CookiesProvider defaultSetOptions={{ path: "/" }}>
           <AuthenticationProvider>
-            <TopBarInnerContext.Provider
-              value={{
-                TopBarInner: topBarInnerComponent,
-                setTopBarInner: setTopBarInnerComponent,
-              }}
-            >
-              <div className="topbar-spacer" />
-              <Outlet />
-              <TopBar />
-            </TopBarInnerContext.Provider>
+            <ToasterProvider>
+              <TopBarInnerContext.Provider
+                value={{
+                  TopBarInner: topBarInnerComponent,
+                  setTopBarInner: setTopBarInnerComponent,
+                }}
+              >
+                <div className="topbar-spacer" />
+                <Outlet />
+                <TopBar />
+              </TopBarInnerContext.Provider>
+            </ToasterProvider>
           </AuthenticationProvider>
         </CookiesProvider>
         <ScrollRestoration />
@@ -95,10 +98,10 @@ export default function App() {
   );
 }
 
-function CompleteTakeoverLoadingScreen({isShowing}:{isShowing:boolean}){
-  return(
+function CompleteTakeoverLoadingScreen({ isShowing }: { isShowing: boolean }) {
+  return (
     <Transition
-      id='complete-takeover-loading-screen'
+      id="complete-takeover-loading-screen"
       show={isShowing}
       enter="transition-opacity duration-150"
       enterFrom="opacity-0"
@@ -107,19 +110,19 @@ function CompleteTakeoverLoadingScreen({isShowing}:{isShowing:boolean}){
       leaveFrom="opacity-100"
       leaveTo="opacity-0"
       style={{
-        backgroundColor: '#1a1a27',
-        position: 'fixed',
+        backgroundColor: "#1a1a27",
+        position: "fixed",
         top: 0,
         left: 0,
-        width: '100vw',
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         zIndex: 9999,
       }}
     >
       <LoadingDotsBricks />
     </Transition>
   );
-};
+}

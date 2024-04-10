@@ -9,11 +9,18 @@ import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 import { signal } from "@preact/signals-core";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
-// import { toast } from "react-hot-toast";
 
 export const cameraGroup = signal<CameraGroup>({ id: "CG1", keyframes: [] });
 
-export function updateCamera({ id, offset }: { id: string; offset: number }) {
+export function updateCamera({
+  id,
+  offset,
+  addToast,
+}: {
+  id: string;
+  offset: number;
+  addToast: (type: "error" | "warning" | "success", message: string) => void;
+}) {
   const oldCameraGroup = cameraGroup.value;
 
   const existingKeyframe = oldCameraGroup.keyframes.some((row) => {
@@ -21,7 +28,7 @@ export function updateCamera({ id, offset }: { id: string; offset: number }) {
   });
 
   if (existingKeyframe) {
-    //toast.error("There can only be one keyframe at this offset.");
+    addToast("warning", "There can only be one keyframe at this offset.");
     return;
   }
 
@@ -44,10 +51,14 @@ export function updateCamera({ id, offset }: { id: string; offset: number }) {
   };
 }
 
-export function addCameraKeyframe(keyframe: QueueKeyframe, offset: number) {
+export function addCameraKeyframe(
+  keyframe: QueueKeyframe,
+  offset: number,
+  addToast: (type: "error" | "warning" | "success", message: string) => void,
+) {
   const oldCameraGroup = cameraGroup.value;
   if (oldCameraGroup.keyframes.some((row) => row.offset === offset)) {
-    //toast.error("There can only be one keyframe at this offset.");
+    addToast("warning", "There can only be one keyframe at this offset.");
     return;
   }
   const newKeyframe = {

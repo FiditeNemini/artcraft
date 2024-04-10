@@ -12,6 +12,7 @@ interface Props {
     id: string;
     offset: number;
     force?: boolean;
+    addToast: (type: "error" | "warning" | "success", message: string) => void;
   }) => void;
 }
 

@@ -2,6 +2,8 @@ import { useContext, useState } from "react";
 import { Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { EngineContext } from "../../contexts/EngineContext";
+import { ToasterContext } from "~/pages/PageEnigma/contexts/ToasterContext";
+import { APPUI_ACTION_TYPES } from "~/pages/PageEnigma/reducers";
 
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
 
@@ -10,12 +12,17 @@ export const ControlsTopButtons = () => {
 
   const [sceneName, setSceneName] = useState<string>("");
   const [sceneToken, setSceneToken] = useState<string>("");
+  const { addToast } = useContext(ToasterContext);
 
   // for testing
   const [mediaToken, setMediaToken] = useState<string>("");
 
-  const handleButtonSave = () => {
-    editorEngine?.saveScene(sceneName);
+  const handleButtonSave = async () => {
+    console.log(`SceneName is ${sceneName}`);
+    const sceneMediaToken = await editorEngine?.saveScene(sceneName);
+    if(sceneMediaToken){
+      addToast("success", sceneMediaToken);
+    }
   };
 
   const handleMediaToken = async () => {
@@ -23,7 +30,10 @@ export const ControlsTopButtons = () => {
   };
 
   const handleButtonLoadScene = () => {
-    editorEngine?.loadScene(sceneToken);
+    console.log(`Scene Token is ${sceneToken}`);
+    editorEngine?.loadScene(sceneToken).catch((err) => {
+      addToast("error", err.message);
+    });
   };
 
   return (

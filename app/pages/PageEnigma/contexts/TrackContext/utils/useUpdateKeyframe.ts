@@ -1,5 +1,10 @@
-import { useCallback } from "react";
-import { ClipGroup, QueueKeyframe, Keyframe } from "~/pages/PageEnigma/models";
+import { useCallback, useContext } from "react";
+import {
+  ClipGroup,
+  QueueKeyframe,
+  Keyframe,
+  MediaItem,
+} from "~/pages/PageEnigma/models";
 import {
   addCameraKeyframe,
   addCharacterKeyframe,
@@ -8,10 +13,15 @@ import {
   deleteCharacterKeyframe,
   deleteObjectKeyframe,
 } from "~/pages/PageEnigma/store";
+import { ToasterContext } from "~/pages/PageEnigma/contexts/ToasterContext";
 
 const ADD_KEYFRAME: Record<
   ClipGroup,
-  (keyframe: QueueKeyframe, offset: number) => void
+  (
+    keyframe: QueueKeyframe,
+    offset: number,
+    addToast: (type: "error" | "warning" | "success", message: string) => void,
+  ) => void
 > = {
   [ClipGroup.CAMERA]: addCameraKeyframe,
   [ClipGroup.CHARACTER]: addCharacterKeyframe,
@@ -27,9 +37,9 @@ const DELETE_KEYFRAME: Record<ClipGroup, (keyframe: Keyframe) => void> = {
 };
 
 export default function useUpdateKeyframe() {
+  const { addToast } = useContext(ToasterContext);
   const addKeyframe = useCallback((keyframe: QueueKeyframe, offset: number) => {
-    console.log("k", keyframe);
-    ADD_KEYFRAME[keyframe.group](keyframe, offset);
+    ADD_KEYFRAME[keyframe.group](keyframe, offset, addToast);
   }, []);
 
   const deleteKeyframe = useCallback((keyframe: Keyframe) => {
