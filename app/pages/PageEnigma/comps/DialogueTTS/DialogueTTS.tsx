@@ -1,4 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from "react";
+import { useSignalEffect } from "@preact/signals-react/runtime";
 import { v4 as uuidv4 } from "uuid";
 import {
   faVolume,
@@ -11,6 +12,7 @@ import { AppUiContext } from "../../contexts/AppUiContext";
 import { APPUI_ACTION_TYPES } from "../../reducers";
 import { 
   Button,
+  H2,
   H5,
   Label,
   LoadingDotsTyping,
@@ -21,7 +23,8 @@ import {
 import { ListTtsModels } from "./utilities";
 import { TtsModelListItem } from "./types";
 import { GenerateTtsAudio } from "./generateTts";
-import { addInferenceJob } from "../../store/inferenceJobs";
+import { addInferenceJob, inferenceJobs} from "../../store/inferenceJobs";
+import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
 
 type TtsState = {
   voice: TtsModelListItem | undefined;
@@ -30,15 +33,33 @@ type TtsState = {
   inferenceToken?: string;
   inferenceJobType?: string;
   hasAudio: boolean;
+  audioFile?: any;
 }
 
 export const DialogueTTS = ()=>{
+
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
   const [ttsState, setTtsState] = useState<TtsState>({
     voice:undefined,
     text:"",
     hasEnqueued:false,
     hasAudio:false,
+  });
+
+  useSignalEffect(()=>{
+    console.log(inferenceJobs.value);
+    if(ttsState.hasEnqueued && ttsState.inferenceToken){
+      const found = inferenceJobs.value.find((job)=>job.job_id===ttsState.inferenceToken);
+      console.log(`finding: ${ttsState.inferenceToken}`);
+      console.log(found);
+      if(found?.job_status === JobState.COMPLETE_SUCCESS){
+        setTtsState((curr)=>({
+          ...curr,
+          hasAudio: true,
+          audioFile: found.result
+        }))
+      }
+    }
   });
 
   const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
@@ -74,21 +95,25 @@ export const DialogueTTS = ()=>{
     const modelToken = ttsState.voice ? ttsState.voice.model_token : undefined;
 
     if(modelToken){
+      setTtsState((curr)=>({
+        ...curr,
+        hasEnqueued: true,
+        inferenceToken: undefined,
+        inferenceJobType: undefined,
+        hasAudio: false,
+        result: undefined,
+      }));
+
       const request = {
         uuid_idempotency_token: uuidv4(),
         tts_model_token: modelToken,
         inference_text: ttsState.text,
       };
-      // console.log(request);
-      GenerateTtsAudio(request).then(res=>{
-        console.log('inference job returned >>>')
-        console.log(res);
-        console.log('<<<');
 
+      GenerateTtsAudio(request).then(res=>{
         if(res.inference_job_token){
           setTtsState((curr)=>({
             ...curr,
-            hasEnqueued: true,
             inferenceToken: res.inference_job_token,
             inferenceJobType: res.inference_job_token_type
           }));
@@ -100,6 +125,16 @@ export const DialogueTTS = ()=>{
   },[ttsState]);
 
   const handleClose = ()=> {
+    if(ttsState.hasAudio){
+      setTtsState((curr)=>({
+        ...curr,
+        hasEnqueued: false,
+        inferenceToken: undefined,
+        inferenceJobType: undefined,
+        hasAudio: false,
+        result: undefined,
+      }));
+    }
     dispatchAppUiState({
       type: APPUI_ACTION_TYPES.CLOSE_DIALOGUE_TTS
     })
@@ -158,10 +193,10 @@ export const DialogueTTS = ()=>{
           onChange={handleTextInput}
         />
         <div className="mt-6 flex gap-2">
-          <div className="w-36 h-12">
+          <div className="w-full h-12">
             {!ttsState.hasAudio && !ttsState.hasEnqueued &&
               <Button
-                className="w-full h-full text-xl "
+                className="w-36 h-full text-xl "
                 variant={ttsState.hasAudio ? "secondary" : "primary" }
                 disabled={ttsState.text === ""}
                 icon={faBrainCircuit}
@@ -173,26 +208,22 @@ export const DialogueTTS = ()=>{
             {!ttsState.hasAudio && ttsState.hasEnqueued &&
               <LoadingDotsTyping className="bg-brand-secondary-500 rounded-lg"/>
             }
-            {ttsState.hasAudio &&
-              <Button
-                className="w-full h-full text-xl"
-                variant={ttsState.hasAudio ? "secondary" : "primary" }
-                disabled={ttsState.text === ""}
-                icon={faPlay}
-                // onClick={requestTts}
-              >
-                Speak
-              </Button>
+            { ttsState.hasAudio &&
+              <div className="bg-success w-full h-full rounded-lg flex items-center justify-center">
+                <H2>Success!! Please Check "My Audio" in the Audio Panel.</H2>
+              </div>
             }
           </div>
+          
         </div>
 
         <div className="mt-6 flex justify-between gap-2">
           { ttsState.hasEnqueued &&
             <Button
               type="button"
-              className="w-36"
-              // onClick={}
+              disabled={!ttsState.hasAudio}
+              onClick={requestTts}
+              icon={faBrainCircuit}
             >
               Generate Another
             </Button>

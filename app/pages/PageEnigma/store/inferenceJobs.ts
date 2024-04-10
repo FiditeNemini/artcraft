@@ -5,18 +5,24 @@ import { InferenceJob } from "../models";
 export const inferenceJobs = signal<InferenceJob[]>([]);
 
 export function addInferenceJob(
-  inferenceJob: InferenceJob){
+  newJob: InferenceJob){
   const existingInferenceJobs = inferenceJobs.value;
-  existingInferenceJobs.push(inferenceJob);
-  inferenceJobs.value = [...existingInferenceJobs];
+  const jobExist = existingInferenceJobs.find(job=>job.job_id==newJob.job_id)
+  if(!jobExist){
+    inferenceJobs.value = [...existingInferenceJobs, newJob]
+  };
+  // else do nothing
 }
 
 export function updateInferenceJob(
-  inferenceJob: InferenceJob){
+  updatableJob: InferenceJob){
   const existingInferenceJobs = inferenceJobs.value;
   existingInferenceJobs.forEach(job=>{
-    if(job.job_id === inferenceJob.job_id){
-      job.job_status = inferenceJob.job_status
+    if(job.job_id === updatableJob.job_id){
+      job.job_status = updatableJob.job_status
+    }
+    if(updatableJob.result){
+      job.result = updatableJob.result;
     }
   })
   inferenceJobs.value = [...existingInferenceJobs];

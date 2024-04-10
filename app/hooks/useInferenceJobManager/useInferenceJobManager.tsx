@@ -91,11 +91,17 @@ export const useInferenceJobManager = () => {
                 console.log(`${res.state.job_token} has new state: ${res.state.status.status}`)
                 if(res.state.status.status === JobState.COMPLETE_SUCCESS){
                   console.log(res.state);
+                  updateInferenceJob({
+                    ...job,
+                    job_status: res.state.status.status,
+                    result: res.state.maybe_result
+                  });
+                }else{
+                  updateInferenceJob({
+                    ...job,
+                    job_status: res.state.status.status
+                  });
                 }
-                updateInferenceJob({
-                  ...job,
-                  job_status: res.state.status.status
-                })
               }
             }
           });
