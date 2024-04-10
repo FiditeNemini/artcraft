@@ -63,10 +63,17 @@ export const ItemElement = ({ item }: Props) => {
   );
 
   return (
-    <div className="relative w-full rounded-lg" onPointerDown={onPointerDown}>
-      <img src={item.thumbnail} alt={item.name} className="rounded-t-lg" />
+    <div
+      className="relative w-full cursor-pointer rounded-lg transition-all duration-200"
+      onPointerDown={onPointerDown}
+    >
+      <img
+        src={item.thumbnail}
+        alt={item.name}
+        className="aspect-[4.5/5] w-full rounded-t-lg object-cover object-center"
+      />
       <div
-        className="w-full rounded-b-lg py-1 text-center text-sm"
+        className="text-overflow-ellipsis text- w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
         style={{ backgroundColor: "#39394D" }}
       >
         {item.name}

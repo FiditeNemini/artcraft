@@ -49,7 +49,7 @@ export const AudioTab = () => {
           </button>
         </div>
       </div>
-      <div className="w-full px-4">
+      <div className="w-full px-4 pb-4">
         <Button
           icon={faCirclePlus}
           variant="action"
@@ -58,7 +58,7 @@ export const AudioTab = () => {
           Generate Audio
         </Button>
       </div>
-      <div className="h-full w-full overflow-y-auto px-4 pt-4">
+      <div className="h-full w-full overflow-y-auto px-4">
         <ItemElements
           items={audioItems.value}
           assetFilter={audioFilter.value}
