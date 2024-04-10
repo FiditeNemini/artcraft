@@ -229,7 +229,8 @@ export function deleteCharacterKeyframe(keyframe: Keyframe) {
   const oldCharacterGroups = characterGroups.value;
   characterGroups.value = oldCharacterGroups.map((character) => ({
     ...character,
-    positionClips: character.positionKeyframes.filter((row) => {
+    positionKeyframes: character.positionKeyframes.filter((row) => {
+
       if (row.keyframe_uuid === keyframe.keyframe_uuid) {
         Queue.publish({
           queueName: QueueNames.TO_ENGINE,
