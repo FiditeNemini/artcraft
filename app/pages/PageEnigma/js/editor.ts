@@ -839,6 +839,9 @@ class Editor {
     if (this.generating_preview) {
       return;
     }
+
+    this.rendering = false;
+
     this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
@@ -1013,7 +1016,7 @@ class Editor {
 
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
-    console.log("Generating video...");
+    console.log("Generating video...", this.frame_buffer);
     if (this.rendering || this.generating_preview) {
       return;
     }
