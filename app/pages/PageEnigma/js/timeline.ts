@@ -402,6 +402,7 @@ export class TimeLine {
   public async deletePlayableClip(clip_uuid: string): Promise<void> {}
 
   public async scrub(data: any): Promise<void> {
+    console.log('Scrubby Scrubby');
     if (this.is_playing) {
       return;
     }

@@ -29,7 +29,7 @@ export const PreviewImages = () => {
           style={{ height: imageHeight }}
         >
           <canvas
-            id="preview-cancvas"
+            id="raw-preview"
             width={imageWidth}
             height={imageHeight}
           />
@@ -44,7 +44,7 @@ export const PreviewImages = () => {
           className="block w-full rounded-b-lg"
           style={{ height: imageHeight }}
         >
-          <canvas id="styled-cancvas" width={imageWidth} height={imageHeight} />
+          <img id="styled-preview" width={imageWidth} height={imageHeight} />
         </div>
       </div>
     </div>

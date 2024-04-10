@@ -8,6 +8,8 @@ import { TimerGrid } from "~/pages/PageEnigma/comps/TimerGrid/TimerGrid";
 import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
 import { PreviewImages } from "~/pages/PageEnigma/comps/PreviewImages";
 import { TopBar } from "~/modules/TopBar";
+import { useContext } from "react";
+import { EngineContext } from "~/contexts/EngineContext";
 
 interface Props {
   setPage: (page: string) => void;
@@ -15,6 +17,15 @@ interface Props {
 
 export const PageStyling = ({ setPage }: Props) => {
   useSignals();
+  const editorEngine = useContext(EngineContext);
+
+  const generateFrame = async () => {
+    await editorEngine?.generateFrame();
+  };
+
+  const generateMovie = async () => {
+    await editorEngine?.generateVideo();
+  };
 
   return (
     <div className="w-screen">
@@ -34,10 +45,10 @@ export const PageStyling = ({ setPage }: Props) => {
       <div className="fixed bottom-0 left-0 w-full">
         <div className="flex h-[62px] w-full items-center justify-center gap-5 bg-ui-panel">
           <div>
-            <Button variant="action">Update Preview</Button>
+            <Button variant="action" onClick={generateFrame}>Update Preview</Button>
           </div>
           <div>
-            <Button variant="primary">Generate Movie</Button>
+            <Button variant="primary" onClick={generateMovie}>Generate Movie</Button>
           </div>
         </div>
         <div className="relative flex h-[80px] w-full gap-5 border-t border-t-action-600 bg-ui-panel">
