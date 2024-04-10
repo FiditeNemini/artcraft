@@ -195,6 +195,7 @@ export class TimeLine {
             data_json['scale'],
             data_json['offset'],
             data_json['keyframe_uuid']);
+        
         await this.addPlayableClip(new ClipUI(
             data_json['version'],
             ClipType.TRANSFORM,
@@ -460,7 +461,7 @@ export class TimeLine {
                     if (this.scrubber_frame_position + 1 >= element.length) {
                         this.lipSync_engine.clips[element.object_uuid + element.media_id].stop();
                     } else if (object) {
-                        await this.lipSync_engine.clips[element.object_uuid].play(object);
+                        await this.lipSync_engine.clips[element.object_uuid + element.media_id].play(object);
                         this.lipSync_engine.clips[element.object_uuid + element.media_id].step();
                     }
                 } else if (element.type === ClipType.ANIMATION) {
