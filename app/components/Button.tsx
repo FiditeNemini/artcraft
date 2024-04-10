@@ -43,7 +43,7 @@ export const Button = ({
 
   return (
     <button className={className} disabled={disabled} {...rest}>
-      {icon && <FontAwesomeIcon icon={icon} />}
+      {icon && <FontAwesomeIcon icon={icon} size="sm"/>}
       {children}
     </button>
   );

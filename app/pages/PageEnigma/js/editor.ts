@@ -205,10 +205,12 @@ class Editor {
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
 
+
     this.storyteller_proxy_scene = new StoryTellerProxyScene(
       this.version,
       this.activeScene.scene,
     );
+
   }
 
   initialize(config: any) {
@@ -289,6 +291,9 @@ class Editor {
     );
 
     this.control = new TransformControls(this.camera, this.renderer.domElement);
+    //this.control.space = 'local'; // Local transformation mode
+    // .space = 'world'; // Global mode
+
     // OnClick and MouseMove events.
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
     window.addEventListener("click", this.onMouseClick.bind(this), false);
@@ -401,18 +406,19 @@ class Editor {
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
     if (this.selected != undefined || this.selected != null) {
-      //console.log(`triggering setSelectedObject`)
-      this.selected.position.x = position.x;
-      this.selected.position.y = position.y;
-      this.selected.position.z = position.z;
 
-      this.selected.rotation.x = rotation.x;
-      this.selected.rotation.y = rotation.y;
-      this.selected.rotation.z = rotation.z;
+      //console.log(`triggering setSelectedObject`) 
+      this.selected.position.x = position.x
+      this.selected.position.y = position.y
+      this.selected.position.z = position.z
 
-      this.selected.scale.x = scale.x;
-      this.selected.scale.y = scale.y;
-      this.selected.scale.z = scale.z;
+      this.selected.rotation.x = THREE.MathUtils.degToRad(rotation.x)
+      this.selected.rotation.y = THREE.MathUtils.degToRad(rotation.y)
+      this.selected.rotation.z = THREE.MathUtils.degToRad(rotation.z)
+
+      this.selected.scale.x = scale.x
+      this.selected.scale.y = scale.y
+      this.selected.scale.z = scale.z
     }
   }
 
@@ -539,11 +545,11 @@ class Editor {
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
-    const object: THREE.Object3D = await this.activeScene.load_glb(
-      "m_4wva09qznapzk5rcvbxy671d1qx2pr",
-    );
+    // const object: THREE.Object3D = await this.activeScene.load_glb(
+    //   "m_4wva09qznapzk5rcvbxy671d1qx2pr",
+    // );
 
-    object.uuid = "CH1";
+    // object.uuid = "CH1";
 
     // Stick Open Pose Man: m_9f3d3z94kk6m25zywyz6an3p43fjtw
     // XBot: m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d
@@ -1032,14 +1038,14 @@ class Editor {
         version: this.version,
         objectVectors: {
           position: {
-            x: parseFloat(pos.x.toFixed(6)),
-            y: parseFloat(pos.y.toFixed(6)),
-            z: parseFloat(pos.z.toFixed(6)),
+            x: parseFloat(pos.x.toFixed(2)),
+            y: parseFloat(pos.y.toFixed(2)),
+            z: parseFloat(pos.z.toFixed(2)),
           },
           rotation: {
-            x: parseFloat(rot.x.toFixed(6)),
-            y: parseFloat(rot.y.toFixed(6)),
-            z: parseFloat(rot.z.toFixed(6)),
+            x: parseFloat(THREE.MathUtils.radToDeg(rot.x).toFixed(2)),
+            y: parseFloat(THREE.MathUtils.radToDeg(rot.y).toFixed(2)),
+            z: parseFloat(THREE.MathUtils.radToDeg(rot.z).toFixed(2)),
           },
           scale: {
             x: parseFloat(scale.x.toFixed(6)),
