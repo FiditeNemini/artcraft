@@ -2,11 +2,11 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleLeft } from "@fortawesome/pro-solid-svg-icons";
 import { Button, Link } from "~/components";
-import { StyleSelection } from "~/pages/PageStylization/comps/StyleSelection";
+import { StyleSelection } from "~/pages/PageEnigma/comps/StyleSelection";
 import { LowerPanel } from "~/modules/LowerPanel";
 import { TimerGrid } from "~/pages/PageEnigma/comps/TimerGrid/TimerGrid";
 import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
-import { PreviewImages } from "~/pages/PageStylization/comps/PreviewImages";
+import { PreviewImages } from "~/pages/PageEnigma/comps/PreviewImages";
 import { TopBar } from "~/modules/TopBar";
 
 interface Props {

@@ -5,7 +5,7 @@ import { ButtonIcon, ItemPicker, Label, Textarea } from "~/components";
 import { EngineContext } from "~/contexts/EngineContext";
 import { ArtStyle } from "~/pages/PageEnigma/js/api_manager";
 import { faAngleLeft, faAngleRight } from "@fortawesome/pro-solid-svg-icons";
-import { styleList } from "~/pages/PageStylization/styleList";
+import { styleList } from "~/pages/PageEnigma/styleList";
 
 export const StyleSelection = () => {
   const [selection, setSelection] = useState<ArtStyle>(styleList[0].type);
