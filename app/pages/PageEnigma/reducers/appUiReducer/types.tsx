@@ -34,6 +34,9 @@ export type State = {
     useFakeTimer?: number;
   };
   controlPanel: ControlPanel;
+  diagloueTts: {
+    isOpen: boolean;
+  }
 };
 
 export enum ACTION_TYPES {
@@ -47,13 +50,14 @@ export enum ACTION_TYPES {
   SHOW_CONTROLPANELS_SCENEOBJECT = "show_controlpanels_sceneobject",
   UPDATE_CONTROLPANELS_SCENEOBJECT = "update_controlpanels_sceneobject",
   HIDE_CONTROLPANELS_SCENEOBJECT = "hide_controlpanels_sceneobject",
+  OPEN_DIALOGUE_TTS = "open_dialogue_tts",
+  CLOSE_DIALOGUE_TTS = "close_dialogue_tts",
 }
 
 export type Action =
-  | {
-      // Not sure why we need this but type script won't stop complaning fix wil.
-      type: ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT;
-    }
+  | { type: ACTION_TYPES.OPEN_DIALOGUE_TTS }
+  | { type: ACTION_TYPES.CLOSE_DIALOGUE_TTS }
+  | { type: ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT }
   | {
       type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT;
       payload: SceneObject;

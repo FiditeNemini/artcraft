@@ -27,4 +27,5 @@ export const initialStateValues: State = {
       },
     },
   },
+  diagloueTts:{isOpen:false}
 };

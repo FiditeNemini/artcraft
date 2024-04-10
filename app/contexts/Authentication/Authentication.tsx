@@ -32,7 +32,7 @@ export const AuthenticationContext = createContext<{
 
 export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
   // console.log('auth provider rerender');
-  const [authCookies, setAuthCookie, removeAuthCookie] = useCookies([STORAGE_KEYS.USER_INFO]);
+  const [, setAuthCookie, removeAuthCookie] = useCookies([STORAGE_KEYS.USER_INFO]);
   const [authState, setAuthState] = useState<AuthState>({});
 
   const loginAndGetUserInfo = useCallback((

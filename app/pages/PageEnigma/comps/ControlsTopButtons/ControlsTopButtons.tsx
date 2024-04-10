@@ -1,12 +1,15 @@
 import { useContext, useState } from "react";
-import { Button, Input } from "~/components";
+import { Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { EngineContext } from "../../contexts/EngineContext";
 import { ToasterContext } from "~/pages/PageEnigma/contexts/ToasterContext";
-import { APPUI_ACTION_TYPES } from "~/pages/PageEnigma/reducers";
+// import { APPUI_ACTION_TYPES } from "~/pages/PageEnigma/reducers";
+
+import { TestFeaturesButtons } from "./TestFeaturesButtons";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
+
   const [sceneName, setSceneName] = useState<string>("");
   const [sceneToken, setSceneToken] = useState<string>("");
   const { addToast } = useContext(ToasterContext);
@@ -31,25 +34,6 @@ export const ControlsTopButtons = () => {
     editorEngine?.loadScene(sceneToken).catch((err) => {
       addToast("error", err.message);
     });
-  };
-
-  const handleButtonTest = () => {};
-
-  const handleTestButton2 = () => {
-    console.log("Test Button 2");
-  };
-
-  const handleButtonCameraView = () => {
-    editorEngine?.switchCameraView();
-  };
-  // const handleButtonPlayBack = () => {
-  //   editorEngine?.startPlayback();
-  // };
-  const handleButtonTakeFrame = () => {
-    // editorEngine?.take_timeline_cam_clip();
-  };
-  const handleButtonSingleFrame = () => {
-    editorEngine?.generateFrame();
   };
 
   return (
@@ -128,14 +112,7 @@ export const ControlsTopButtons = () => {
           <p>Ask Wil about React</p>
         </ButtonDialogue>
       </div>
-
-      <div className="flex gap-2">
-    
-      </div>
-      <div className="flex gap-2">
-        {/* <Button onClick={handleButtonSingleFrame}>Render Single Frame</Button>
-        <Button onClick={handleButtonTakeFrame}>Take Frame</Button> */}
-      </div>
+      <TestFeaturesButtons debug={false}/>
     </div>
   );
 };
