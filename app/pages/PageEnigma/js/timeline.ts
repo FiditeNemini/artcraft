@@ -397,7 +397,7 @@ export class TimeLine {
             } else if (element.type === ClipType.ANIMATION) {
                 this.animation_engine.clips[element.object_uuid + element.media_id].stop();
             } else if (element.type === ClipType.AUDIO  && element.group === ClipGroup.CHARACTER) {
-                this.lipSync_engine.clips[element.object_uuid].reset();
+                this.lipSync_engine.clips[element.object_uuid + element.media_id].reset();
             }
         }
     }
@@ -458,10 +458,10 @@ export class TimeLine {
                     }
                 } else if (element.type === ClipType.AUDIO  && element.group === ClipGroup.CHARACTER) { // we will remove this when we know which group it will come from character + audio === lip sync audio.
                     if (this.scrubber_frame_position + 1 >= element.length) {
-                        this.lipSync_engine.clips[element.object_uuid].stop();
+                        this.lipSync_engine.clips[element.object_uuid + element.media_id].stop();
                     } else if (object) {
                         await this.lipSync_engine.clips[element.object_uuid].play(object);
-                        this.lipSync_engine.clips[element.object_uuid].step();
+                        this.lipSync_engine.clips[element.object_uuid + element.media_id].step();
                     }
                 } else if (element.type === ClipType.ANIMATION) {
                     if (object) {

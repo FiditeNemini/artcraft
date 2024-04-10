@@ -16,7 +16,7 @@ export class LipSyncEngine {
     }
 
     load_object(object_uuid: string, audio_media_id: string) {
-        this.clips[object_uuid] = new LipSyncClip(this.version, audio_media_id, 1.0);
+        this.clips[object_uuid+audio_media_id] = new LipSyncClip(this.version, audio_media_id, 1.0);
     }
 }
 
