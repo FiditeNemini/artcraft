@@ -17,6 +17,7 @@ export enum ClipType {
   TRANSFORM = "transform",
   AUDIO = "audio",
   ANIMATION = "animation",
+  FAKE = "fake",
 }
 
 export enum ClipGroup {

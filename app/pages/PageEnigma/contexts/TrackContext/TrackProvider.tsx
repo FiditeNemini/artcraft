@@ -1,6 +1,6 @@
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import { ReactNode, useCallback, useMemo } from "react";
-import { AssetType } from "~/pages/PageEnigma/models";
+import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
 import useUpdateDragDrop from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateDragDrop";
 import {
   addCharacterAnimation,
@@ -16,8 +16,10 @@ import {
   cameraGroup,
   audioGroup,
   objectGroup,
+  deleteCharacter,
 } from "~/pages/PageEnigma/store";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
+import { deleteObject } from "~/pages/PageEnigma/store/objectGroup/deleteObject";
 
 interface Props {
   children: ReactNode;
@@ -88,16 +90,28 @@ export const TrackProvider = ({ children }: Props) => {
     };
   }, []);
 
+  const deleteObjectOrCharacter = useCallback((item: MediaItem) => {
+    deleteCharacter(item);
+    deleteObject(item);
+  }, []);
+
   const values = useMemo(() => {
     return {
       ...keyframes,
 
       clearExistingData,
+      deleteObjectOrCharacter,
 
       ...dragDrop,
       endDrag: dropClip,
     };
-  }, [keyframes, dragDrop, dropClip, clearExistingData]);
+  }, [
+    keyframes,
+    dragDrop,
+    dropClip,
+    clearExistingData,
+    deleteObjectOrCharacter,
+  ]);
 
   return (
     <TrackContext.Provider value={values}>{children}</TrackContext.Provider>

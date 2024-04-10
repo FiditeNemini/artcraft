@@ -27,7 +27,10 @@ import { ClipGroup } from "~/pages/PageEnigma/models/track";
 import { XYZ } from "../datastructures/common";
 import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
 import { StoryTellerProxyTimeline } from "../proxy/storyteller_proxy_timeline";
-
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
+import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 class Editor {
@@ -202,7 +205,12 @@ class Editor {
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
 
-    this.storyteller_proxy_scene = new StoryTellerProxyScene(this.version, this.activeScene.scene)
+
+    this.storyteller_proxy_scene = new StoryTellerProxyScene(
+      this.version,
+      this.activeScene.scene,
+    );
+
   }
 
   initialize(config: any) {
@@ -313,7 +321,7 @@ class Editor {
 
     this.timeline.scene = this.activeScene;
 
-    this._test_demo();
+    //this._test_demo();
 
     this.renderer.domElement.addEventListener(
       "mousedown",
@@ -355,7 +363,7 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() { }
+  public async testTestTimelineEvents() {}
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -364,18 +372,31 @@ class Editor {
 
     this.current_scene_media_token = scene_media_token;
 
-    const scene_json = await this.api_manager.loadSceneState(
-      this.current_scene_media_token,
-    );
+    const scene_json = await this.api_manager
+      .loadSceneState(this.current_scene_media_token)
+      .catch((err) => {
+        this.dispatchAppUiState({
+          type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
+        });
+        throw err;
+      });
 
-    let proxyScene = new StoryTellerProxyScene(this.version, this.activeScene);
-    await proxyScene.loadFromSceneJson(scene_json['scene']);
+    const proxyScene = new StoryTellerProxyScene(
+      this.version,
+      this.activeScene,
+    );
+    await proxyScene.loadFromSceneJson(scene_json["scene"]);
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
 
-    let proxyTimeline = new StoryTellerProxyTimeline(this.version, this.timeline, this.transform_engine, this.animation_engine, this.audio_engine, this.lipsync_engine);
-    await proxyTimeline.loadFromJson(scene_json['timeline']);
-
-  
+    const proxyTimeline = new StoryTellerProxyTimeline(
+      this.version,
+      this.timeline,
+      this.transform_engine,
+      this.animation_engine,
+      this.audio_engine,
+      this.lipsync_engine,
+    );
+    await proxyTimeline.loadFromJson(scene_json["timeline"]);
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
@@ -385,6 +406,7 @@ class Editor {
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
     if (this.selected != undefined || this.selected != null) {
+
       //console.log(`triggering setSelectedObject`) 
       this.selected.position.x = position.x
       this.selected.position.y = position.y
@@ -397,25 +419,33 @@ class Editor {
       this.selected.scale.x = scale.x
       this.selected.scale.y = scale.y
       this.selected.scale.z = scale.z
-
     }
   }
 
-
-  public async saveScene(name: string) {
+  public async saveScene(name: string): Promise<string> {
     // remove controls when saving scene.
     this.removeTransformControls();
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER,
     });
 
-    let proxyScene = new StoryTellerProxyScene(this.version, this.activeScene);
-    let scene_json = await proxyScene.saveToScene();
+    const proxyScene = new StoryTellerProxyScene(
+      this.version,
+      this.activeScene,
+    );
+    const scene_json = await proxyScene.saveToScene();
 
-    let proxyTimeline = new StoryTellerProxyTimeline(this.version, this.timeline, this.transform_engine, this.animation_engine, this.audio_engine, this.lipsync_engine);
-    let timeline_json = await proxyTimeline.saveToJson();
+    const proxyTimeline = new StoryTellerProxyTimeline(
+      this.version,
+      this.timeline,
+      this.transform_engine,
+      this.animation_engine,
+      this.audio_engine,
+      this.lipsync_engine,
+    );
+    const timeline_json = await proxyTimeline.saveToJson();
 
-    let save_data = { scene: scene_json, timeline: timeline_json };
+    const save_data = { scene: scene_json, timeline: timeline_json };
 
     // TODO turn scene information into and object ...
     const result = await this.api_manager.saveSceneState(
@@ -430,6 +460,8 @@ class Editor {
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
     });
+
+    return result;
   }
 
   /**
@@ -457,7 +489,6 @@ class Editor {
     console.log(this.camera_person_mode);
     if (this.cam_obj) {
       if (this.camera_person_mode) {
-
         this.last_cam_pos.copy(this.camera.position);
         this.last_cam_rot.copy(this.camera.rotation);
 
@@ -477,7 +508,9 @@ class Editor {
 
         this.removeTransformControls();
         this.selected = this.cam_obj;
-        this.dispatchAppUiState({ type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT });
+        this.dispatchAppUiState({
+          type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
+        });
         this.updateSelectedUI();
       } else {
         this.camera.position.copy(this.last_cam_pos);
@@ -519,7 +552,7 @@ class Editor {
     // object.uuid = "CH1";
 
     // Stick Open Pose Man: m_9f3d3z94kk6m25zywyz6an3p43fjtw
-    // XBot: m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d 
+    // XBot: m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d
     // YBot: m_9sqg0evpr23587jnr8z3zsvav1x077
     // Shrek: m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp
   }
@@ -589,14 +622,27 @@ class Editor {
   }
 
   deleteObject(uuid: string) {
-    let obj = this.activeScene.get_object_by_uuid(uuid);
+    const obj = this.activeScene.get_object_by_uuid(uuid);
     if (obj) {
       this.activeScene.scene.remove(obj);
     }
     this.removeTransformControls();
+    Queue.publish({
+      queueName: QueueNames.FROM_ENGINE,
+      action: fromEngineActions.DELETE_OBJECT,
+      data: {
+        version: 1,
+        type: AssetType.OBJECT,
+        media_id: "",
+        object_uuid: uuid,
+        name: "",
+      } as MediaItem,
+    });
     this.selected = undefined;
-    this.dispatchAppUiState({ type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT });
-    this.timeline.deleteObject(uuid)
+    this.dispatchAppUiState({
+      type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
+    });
+    this.timeline.deleteObject(uuid);
   }
 
   create_parim(name: string) {
@@ -676,10 +722,8 @@ class Editor {
         const min = new THREE.Vector3(-12, -1, -12);
         const max = new THREE.Vector3(12, 24, 12);
         this.camera.position.copy(this.camera.position.clamp(min, max));
-
       }
-    }
-    else if (this.cam_obj) {
+    } else if (this.cam_obj) {
       this.cam_obj.visible = true;
     }
 
@@ -691,8 +735,7 @@ class Editor {
 
     if (this.timeline.is_playing) {
       await this.timeline.update(this.rendering);
-    }
-    else if (this.last_scrub == this.timeline.scrubber_frame_position) {
+    } else if (this.last_scrub == this.timeline.scrubber_frame_position) {
       this.updateSelectedUI();
     }
 
@@ -759,10 +802,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-      startTime * 1000 +
-      "|" +
-      startTime * 1000 +
-      "[a1];[0:a][a1]amix=inputs=2[a]",
+        startTime * 1000 +
+        "|" +
+        startTime * 1000 +
+        "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -792,7 +835,9 @@ class Editor {
 
     this.renderMode();
 
-    if (this.generating_preview) { return; }
+    if (this.generating_preview) {
+      return;
+    }
     this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
@@ -847,10 +892,12 @@ class Editor {
     const blob = new Blob([output.buffer], { type: "video/mp4" });
 
     const data: any = await this.api_manager.uploadMedia(blob, "render.mp4");
-    console.log("data", data)
+    console.log("data", data);
 
-    if (data == null) { return; }
-    let upload_token = data['media_file_token'];
+    if (data == null) {
+      return;
+    }
+    const upload_token = data["media_file_token"];
     console.log(upload_token);
     // Create a link to download the file stylize video using api ..
     //{"success":true,"upload_token":"mu_x9kr5cfafn512pjbygdszvbdpktrr"} payload
@@ -870,7 +917,6 @@ class Editor {
     // {"success":true,"inference_job_token":"jinf_j3nbqbd15wqxb0xcks13qh3f3bz"}
 
     console.log(result);
-
   }
 
   async generateFrame() {
@@ -972,7 +1018,6 @@ class Editor {
   }
 
   updateSelectedUI() {
-
     if (this.selected == undefined) {
       return;
     }
@@ -1010,7 +1055,6 @@ class Editor {
         },
       },
     });
-
   }
 
   // Automaticly resize scene.
@@ -1080,7 +1124,11 @@ class Editor {
     this.activeScene.scene.children.forEach((child: THREE.Object3D) => {
       // console.log(child);
       if (child.name != "") {
-        if (child.type == "Mesh" || child.type == "Object3D" || child.type == "Group") {
+        if (
+          child.type == "Mesh" ||
+          child.type == "Object3D" ||
+          child.type == "Group"
+        ) {
           interactable.push(child);
         }
       }
@@ -1094,7 +1142,7 @@ class Editor {
           currentObject = currentObject.parent;
         }
         this.selected = currentObject;
-        // Show panel here 
+        // Show panel here
 
         if (this.selected.type == "Scene") {
           this.selected = intersects[0].object;
@@ -1108,7 +1156,9 @@ class Editor {
         this.transform_interaction = true;
 
         // Contact react land
-        this.dispatchAppUiState({ type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT });
+        this.dispatchAppUiState({
+          type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
+        });
         this.updateSelectedUI();
       }
     } else if (this.transform_interaction == false) {
