@@ -4,13 +4,15 @@ import { twMerge } from "tailwind-merge";
 
 interface ButtonIconProps {
   icon: IconDefinition;
-  fill?: boolean;
   onClick: () => void;
+  className?: string;
+  fill?: boolean;
 }
 
 export const ButtonIcon = ({
   icon,
   onClick,
+  className : propsClassName,
   fill = false,
 }: ButtonIconProps) => {
   const className = twMerge(
@@ -18,6 +20,7 @@ export const ButtonIcon = ({
     fill
       ? "bg-ui-controls-button hover:bg-ui-controls-button/[0.75]"
       : "bg-transparent hover:bg-ui-panel/[0.4]",
+    propsClassName,
   );
 
   return (
