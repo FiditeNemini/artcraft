@@ -56,7 +56,7 @@ export function updateCharacters({
 
       Queue.publish({
         queueName: QueueNames.TO_ENGINE,
-        action: toEngineActions.UPDATE_CLIP,
+        action: toEngineActions.UPDATE_KEYFRAME,
         data: keyframe,
       });
 

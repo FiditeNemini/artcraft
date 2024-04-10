@@ -62,7 +62,7 @@ export const ObjectsTab = ({ type }: Props) => {
           </button>
         </div>
       </div>
-      <div className="w-full px-4">
+      <div className="w-full px-4 pb-4">
         <Button
           icon={faCirclePlus}
           variant="action"
@@ -71,7 +71,7 @@ export const ObjectsTab = ({ type }: Props) => {
           Upload {type === AssetType.CHARACTER ? "Character" : "Object"}
         </Button>
       </div>
-      <div className="h-full w-full overflow-y-auto px-4 pt-4">
+      <div className="h-full w-full overflow-y-auto px-4">
         <ItemElements items={items.value} assetFilter={assetFilter.value} />
       </div>
     </>

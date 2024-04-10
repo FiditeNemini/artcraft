@@ -195,6 +195,7 @@ export class TimeLine {
             data_json['scale'],
             data_json['offset'],
             data_json['keyframe_uuid']);
+        
         await this.addPlayableClip(new ClipUI(
             data_json['version'],
             ClipType.TRANSFORM,
@@ -394,6 +395,7 @@ export class TimeLine {
                 }
             } else if (element.type === ClipType.AUDIO  && element.group !== ClipGroup.CHARACTER) {
                 this.audio_engine.loadClip(element.media_id);
+                this.audio_engine.stopClip(element.media_id);
             } else if (element.type === ClipType.ANIMATION) {
                 this.animation_engine.clips[element.object_uuid + element.media_id].stop();
             } else if (element.type === ClipType.AUDIO  && element.group === ClipGroup.CHARACTER) {
@@ -413,7 +415,7 @@ export class TimeLine {
     }
 
     // called by the editor update loop on each frame
-    public async update(isRendering = false) {
+    public async update(isRendering = false): Promise<boolean> {
         //if (this.is_playing === false) return; // start and stop
         this.timeline_limit = this.getEndPoint();
         if (this.is_playing) {
@@ -460,7 +462,7 @@ export class TimeLine {
                     if (this.scrubber_frame_position + 1 >= element.length) {
                         this.lipSync_engine.clips[element.object_uuid + element.media_id].stop();
                     } else if (object) {
-                        await this.lipSync_engine.clips[element.object_uuid].play(object);
+                        await this.lipSync_engine.clips[element.object_uuid + element.media_id].play(object);
                         this.lipSync_engine.clips[element.object_uuid + element.media_id].step();
                     }
                 } else if (element.type === ClipType.ANIMATION) {
@@ -479,7 +481,10 @@ export class TimeLine {
 
         if (this.scrubber_frame_position >= this.timeline_limit && this.is_playing) {
             await this.stop();
+            return true;
         }
+
+        return false;
     }
 
     private async stop(): Promise<void> {
