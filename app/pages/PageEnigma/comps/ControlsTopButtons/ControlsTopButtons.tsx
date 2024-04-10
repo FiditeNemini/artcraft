@@ -112,7 +112,7 @@ export const ControlsTopButtons = () => {
           <p>Ask Wil about React</p>
         </ButtonDialogue>
       </div>
-      <TestFeaturesButtons />
+      <TestFeaturesButtons debug={false}/>
     </div>
   );
 };

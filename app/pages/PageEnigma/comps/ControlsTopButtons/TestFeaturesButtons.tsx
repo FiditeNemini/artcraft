@@ -5,7 +5,7 @@ import { APPUI_ACTION_TYPES } from "../../reducers";
 import { AppUiContext } from "../../contexts/AppUiContext";
 import { EngineContext } from "../../contexts/EngineContext";
 
-export const TestFeaturesButtons = (debug:boolean)=>{
+export const TestFeaturesButtons = ({debug}:{debug:boolean})=>{
   if (!debug) return null;
   
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
