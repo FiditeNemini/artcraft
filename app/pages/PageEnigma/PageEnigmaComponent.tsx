@@ -101,13 +101,7 @@ export const PageEnigmaComponent = () => {
 
               {/* Bottom controls */}
               <div
-                className="absolute bottom-0 left-0"
-                style={{
-                  width:
-                    pageWidth.value -
-                    (sidePanelVisible.value ? sidePanelWidth.value : 0) -
-                    84,
-                }}
+                className="absolute bottom-0 left-0 w-full"
                 onClick={handleOverlayClick}
               >
                 <PreviewEngineCamera />

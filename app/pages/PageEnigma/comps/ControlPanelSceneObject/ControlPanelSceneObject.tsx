@@ -132,13 +132,14 @@ export const ControlPanelSceneObject = () => {
         return;
       }
 
-      for (const key in editorEngine?.timeline.characters) {
-        const element = editorEngine?.timeline.characters[key];
+      for (let key in editorEngine?.timeline.characters) {
+        let element = editorEngine?.timeline.characters[key];
         if (key == currentSceneObject.object_uuid) {
-          currentSceneObject.group = element;
-          break;
+            currentSceneObject.group = element;
+            break;
         }
       }
+
 
       Queue.publish({
         queueName: QueueNames.TO_TIMELINE,
@@ -164,13 +165,7 @@ export const ControlPanelSceneObject = () => {
   return (
     <Transition
       show={appUiState?.controlPanel.isShowing}
-      className={[
-        "absolute bottom-0 right-0",
-        "m-4 flex h-fit w-fit flex-col gap-2",
-        "rounded-lg",
-        "border border-ui-panel-border",
-        "bg-ui-panel p-4 text-white",
-      ].join(" ")}
+      className="absolute bottom-0 right-0 m-4 flex h-fit w-fit flex-col gap-2 rounded-lg border border-ui-panel-border bg-ui-panel p-4 text-white"
       enter="transition-opacity duration-100"
       enterFrom="opacity-0"
       enterTo="opacity-100"

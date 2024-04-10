@@ -454,7 +454,7 @@ export const audioItems = signal<MediaItem[]>([
     type: AssetType.AUDIO,
     length: 25,
     name: "Talk (Demo Sounds)",
-    thumbnail: "resources/placeholders/audio_placeholder.png",
+    thumbnail: "resources/placeholders/audio_placeholder.png"
   },
   {
     version: 1,
@@ -462,8 +462,8 @@ export const audioItems = signal<MediaItem[]>([
     type: AssetType.AUDIO,
     length: 25,
     name: "NCS Song",
-    thumbnail: "resources/placeholders/audio_placeholder.png",
-  },
+    thumbnail: "resources/placeholders/audio_placeholder.png"
+  }
 ]);
 
 export const cameraItems = signal<MediaItem[]>([
@@ -530,35 +530,13 @@ export const objectItems = signal<MediaItem[]>([
     thumbnail: "resources/placeholders/placeholder.png",
   },
 ]);
-
 // In the future these will have shape id's
 export const shapeItems = signal<MediaItem[]>([
   {
     version: 1,
-    media_id: "Box",
+    media_id: "",
     type: AssetType.SHAPE,
     name: "Cube",
-    thumbnail: "resources/shapes/cube.png",
-  },
-  {
-    version: 1,
-    media_id: "Cylinder",
-    type: AssetType.SHAPE,
-    name: "Cylinder",
-    thumbnail: "resources/shapes/cylinder.png",
-  },
-  {
-    version: 1,
-    media_id: "Donut",
-    type: AssetType.SHAPE,
-    name: "Donut",
-    thumbnail: "resources/shapes/donut.png",
-  },
-  {
-    version: 1,
-    media_id: "Sphere",
-    type: AssetType.SHAPE,
-    name: "Sphere",
-    thumbnail: "resources/shapes/sphere.png",
+    thumbnail: "resources/placeholders/placeholder.png",
   },
 ]);
