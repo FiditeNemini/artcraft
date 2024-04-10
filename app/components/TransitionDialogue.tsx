@@ -37,7 +37,7 @@ export const TransitionDialogue = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className={twMerge("w-full max-w-md transform rounded-xl border border-ui-panel-border bg-ui-panel p-5 text-left align-middle shadow-xl transition-all", className)}>
+                <Dialog.Panel className={twMerge("w-full max-w-lg transform rounded-xl border border-ui-panel-border bg-ui-panel p-5 text-left align-middle shadow-xl transition-all", className)}>
                   {title && (
                     <Dialog.Title
                       as="h4"

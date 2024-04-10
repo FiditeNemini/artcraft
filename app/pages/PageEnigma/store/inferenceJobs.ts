@@ -27,3 +27,19 @@ export function updateInferenceJob(
   })
   inferenceJobs.value = [...existingInferenceJobs];
 }
+
+export function deleteInferenceJob(
+  deletableJob: InferenceJob){
+  console.log('delete')
+  let newList:InferenceJob[] = []
+  inferenceJobs.value.forEach(job=>{
+    if(job.job_id !== deletableJob.job_id) {
+      newList.push(job);
+    } else {
+      // do nothing
+    }
+  });
+  console.log(newList);
+  inferenceJobs.value = [...newList];
+
+}

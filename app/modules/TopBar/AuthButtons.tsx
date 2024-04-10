@@ -1,10 +1,14 @@
 import { useContext, } from "react";
+import { useSignals } from "@preact/signals-react/runtime";
 
 import { AuthenticationContext } from "~/contexts/Authentication";
 import { Button, ButtonLink } from "~/components";
 import { DialogueInference } from "../DialogueInference";
+import { inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
 
 export const AuthButtons = ()=>{
+  useSignals();
+
   const {authState, logout} = useContext(AuthenticationContext);
   const handleLogout = ()=>{
     if(logout)logout();

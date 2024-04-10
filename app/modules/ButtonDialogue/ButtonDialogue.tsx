@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { TransitionDialogue } from "~/components/TransitionDialogue";
 import { Button, ButtonPropsI } from "~/components/Button";
 
@@ -8,11 +8,15 @@ interface ButtonDialoguePropsI {
   buttonProps?: UnionedButtonProps;
   confirmButtonProps?: UnionedButtonProps;
   closeButtonProps?: UnionedButtonProps;
+  dialogProps?:{
+    className?: string;
+  };
   title?: string;
   children: React.ReactNode;
 }
 
 export const ButtonDialogue = ({
+  dialogProps = {},
   buttonProps: unionedButtonProps,
   confirmButtonProps,
   closeButtonProps: unionedCloseButtonProps,
@@ -39,6 +43,7 @@ export const ButtonDialogue = ({
         title={title}
         isOpen={isOpen}
         onClose={closeModal}
+        className={dialogProps.className}
       >
         <div className="mt-2">{children}</div>
 
