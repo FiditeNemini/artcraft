@@ -86,10 +86,10 @@ export const DialogueTTS = ()=>{
         version:1,
         job_id: ttsState.inferenceToken,
         job_type: ttsState.inferenceJobType,
-        job_status: "pending",
+        job_status: JobState.PENDING,
       })
     }
-  },[ttsState.hasEnqueued]);
+  },[ttsState]);
 
   const requestTts = useCallback( ()=>{
     const modelToken = ttsState.voice ? ttsState.voice.model_token : undefined;
