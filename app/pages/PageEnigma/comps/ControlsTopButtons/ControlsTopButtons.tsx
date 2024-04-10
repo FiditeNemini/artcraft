@@ -130,26 +130,11 @@ export const ControlsTopButtons = () => {
       </div>
 
       <div className="flex gap-2">
-        <Button variant="secondary" onClick={handleButtonCameraView}>
-          Toggle Camera View
-        </Button>
-        <Button
-          onClick={handleTestButton2}
-          className="hover:bg-brand-teriary-400 bg-brand-tertiary focus-visible:outline-brand-tertiary"
-        >
-          Test Button 2
-        </Button>
+    
       </div>
       <div className="flex gap-2">
         {/* <Button onClick={handleButtonSingleFrame}>Render Single Frame</Button>
         <Button onClick={handleButtonTakeFrame}>Take Frame</Button> */}
-        <Button
-          onClick={handleButtonTest}
-          className="hover:bg-brand-teriary-400 bg-brand-tertiary focus-visible:outline-brand-tertiary"
-          style={{ zIndex: 9001 }}
-        >
-          Test
-        </Button>
       </div>
     </div>
   );
