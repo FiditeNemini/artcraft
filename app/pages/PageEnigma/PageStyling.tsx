@@ -27,12 +27,17 @@ export const PageStyling = ({ setPage }: Props) => {
     await editorEngine?.generateVideo();
   };
 
+  const switchEdit = () => {
+    editorEngine?.switchEdit();
+    setPage("edit");
+  }
+
   return (
     <div className="w-screen">
       <TopBar pageName="Stylization" />
       <div className="flex w-full justify-center">
         <div className="bg-ui-controls p-2">
-          <Button variant="action" onClick={() => setPage("edit")}>
+          <Button variant="action" onClick={() => switchEdit()}>
             <FontAwesomeIcon icon={faAngleLeft} />
             Back to Scene
           </Button>

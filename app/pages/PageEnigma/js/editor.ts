@@ -927,6 +927,22 @@ class Editor {
     }
   }
 
+  switchEdit() {
+    if(this.switchPreviewToggle == true) {
+      this.switchPreviewToggle = false;
+      this.canvasRenderCamReference = document.getElementById("camera-view");
+      this.rawRenderer = new THREE.WebGLRenderer({
+        antialias: false,
+        canvas: this.canvasRenderCamReference,
+        preserveDrawingBuffer: true,
+      });
+      if (this.camera_person_mode == true) {
+        this.switchCameraView();
+      }
+      this.activeScene.renderMode(false);
+    }
+  }
+
   async generateFrame() {
     if (this.renderer && !this.generating_preview) {
       this.removeTransformControls();

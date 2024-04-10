@@ -58,6 +58,11 @@ export const Controls3D = ({ setPage }: Props) => {
     }
   };
 
+  const changeStylize = () => {
+    editorEngine?.switchPreview(); 
+    setPage("style");
+  }
+
   const modes = [
     { value: "move", icon: faArrowsUpDownLeftRight },
     { value: "rotate", icon: faArrowsRotate },
@@ -76,7 +81,7 @@ export const Controls3D = ({ setPage }: Props) => {
 
             <span className="h-4 w-0 border-l border-white/[0.15]" />
 
-            <Button variant="primary" onClick={() => setPage("style")}>
+            <Button variant="primary" onClick={() => changeStylize()}>
               Stylize <FontAwesomeIcon icon={faAngleRight} />
             </Button>
           </div>
