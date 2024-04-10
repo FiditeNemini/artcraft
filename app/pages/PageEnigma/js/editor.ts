@@ -924,14 +924,17 @@ class Editor {
   }
 
   switchPreview() {
-    if(this.switchPreviewToggle == false) {
+    if (this.switchPreviewToggle == false) {
       this.switchPreviewToggle = true;
       this.generateFrame();
+      if (this.cameraViewControls) {
+        this.cameraViewControls.enabled = false;
+      }
     }
   }
 
   switchEdit() {
-    if(this.switchPreviewToggle == true) {
+    if (this.switchPreviewToggle == true) {
       this.switchPreviewToggle = false;
       this.canvasRenderCamReference = document.getElementById("camera-view");
       this.rawRenderer = new THREE.WebGLRenderer({
