@@ -3,12 +3,16 @@ import { TrackProvider } from "~/pages/PageEnigma/contexts/TrackContext/TrackPro
 import { AppUIProvider } from "~/pages/PageEnigma/contexts/AppUiContext";
 import { EngineProvider } from "~/pages/PageEnigma/contexts/EngineProvider";
 import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
+
+import { useInferenceJobManager } from "~/hooks";
+
 // import { toast, ToastBar, Toaster } from "react-hot-toast";
 // import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 // import {
 //   faTriangleExclamation,
 //   faXmark,
 // } from "@fortawesome/pro-solid-svg-icons";
+
 import { useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
@@ -20,6 +24,7 @@ import {
 
 export const PageEnigma = () => {
   useSignals();
+  useInferenceJobManager();
   useEffect(() => {
     function setPage() {
       // TODO address this issue with zooming

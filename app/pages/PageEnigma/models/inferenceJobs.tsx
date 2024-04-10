@@ -1,5 +1,6 @@
 export interface InferenceJob {
   version: number;
   job_id: string;
-  jobt_type: string;
+  job_type: string;
+  job_status: string;
 }

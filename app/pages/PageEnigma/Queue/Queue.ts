@@ -1,19 +1,20 @@
-import { toInferenceActions } from './toInferenceActions';
-
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 import {
   QueueClip,
   QueueKeyframe,
-  InferenceJob,
   UpdateTime,
 } from "~/pages/PageEnigma/models";
 import { toTimelineActions } from "./toTimelineActions";
 
-type UnionedActionTypes = fromEngineActions | toEngineActions | toTimelineActions | toInferenceActions;
-type UnionedDataTypes = QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem | InferenceJob;
+type UnionedActionTypes = fromEngineActions | toEngineActions | toTimelineActions;
+type UnionedDataTypes = QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem;
 
+export type QueueSubscribeType = {
+    action: UnionedActionTypes;
+    data: UnionedDataTypes;
+}
 import { ClipUI } from "../datastructures/clips/clip_ui";
 import { MediaItem } from "~/pages/PageEnigma/models";
 class Queue {
@@ -54,10 +55,7 @@ class Queue {
 
   public subscribe(
     queueName: string,
-    onMessage: (entry: {
-      action: UnionedActionTypes;
-      data: UnionedDataTypes;
-    }) => void,
+    onMessage: (entry: QueueSubscribeType) => void,
   ) {
     this._subscribers[queueName] = onMessage;
     while (this._queue[queueName]?.length) {

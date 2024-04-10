@@ -64,7 +64,8 @@ export const DialogueTTS = ()=>{
       addInferenceJob({
         version:1,
         job_id: ttsState.inferenceToken,
-        jobt_type: ttsState.inferenceJobType,
+        job_type: ttsState.inferenceJobType,
+        job_status: "pending",
       })
     }
   },[ttsState.hasEnqueued]);
@@ -157,7 +158,7 @@ export const DialogueTTS = ()=>{
           onChange={handleTextInput}
         />
         <div className="mt-6 flex gap-2">
-          <div className="w-40 h-12">
+          <div className="w-36 h-12">
             {!ttsState.hasAudio && !ttsState.hasEnqueued &&
               <Button
                 className="w-full h-full text-xl "
@@ -186,7 +187,17 @@ export const DialogueTTS = ()=>{
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end gap-2">
+        <div className="mt-6 flex justify-between gap-2">
+          { ttsState.hasEnqueued &&
+            <Button
+              type="button"
+              className="w-36"
+              // onClick={}
+            >
+              Generate Another
+            </Button>
+          }
+          <span />
           <Button
             type="button"
             onClick={handleClose}
