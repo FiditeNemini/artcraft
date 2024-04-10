@@ -34,7 +34,7 @@ export const AudioTabComponent = () => {
     if ( authState.userInfo ){
       if(state.firstLoad === false && audioItemsFromServer.value.length === 0){
         ListAudioByUser(authState.userInfo.username).then((res:any[])=>{
-          // console.log(res)
+          console.log(res)
           audioItemsFromServer.value = res.map(item=>{
             const morphedItem:MediaItem = {
               version: 1,
@@ -42,7 +42,7 @@ export const AudioTabComponent = () => {
               media_id: item.token,
               object_uuid: item.token,
               name: item.maybe_title || item.origin.maybe_model.title,
-              // length?: number;
+              length: 25,
               thumbnail: "resources/placeholders/audio_placeholder.png",
               isMine: true,
               // isBookmarked?: boolean;
