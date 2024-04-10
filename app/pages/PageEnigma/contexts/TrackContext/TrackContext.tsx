@@ -5,6 +5,7 @@ export const TrackContext = createContext<{
   // keyframes
   addKeyframe: (keyframe: QueueKeyframe, offset: number) => void;
   deleteKeyframe: (keyframe: Keyframe) => void;
+  deleteObjectOrCharacter: (item: MediaItem) => void;
 
   // misc
   clearExistingData: () => void;
@@ -15,6 +16,7 @@ export const TrackContext = createContext<{
 }>({
   addKeyframe: () => {},
   deleteKeyframe: () => {},
+  deleteObjectOrCharacter: () => {},
 
   clearExistingData: () => {},
 

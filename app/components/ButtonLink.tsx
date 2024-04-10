@@ -36,7 +36,7 @@ export const ButtonLink = ({
   return (
     <Link {...rest}>
       <button className={className}>
-        {icon && <FontAwesomeIcon className="mr-2" icon={icon} />}
+        {icon && <FontAwesomeIcon className="mr-2" icon={icon} size="sm"/>}
         {children}
       </button>
     </Link>

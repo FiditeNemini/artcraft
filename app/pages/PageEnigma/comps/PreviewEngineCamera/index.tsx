@@ -1,28 +1,38 @@
 import { useContext, useEffect, useState } from "react"
 import { EngineContext } from "../../contexts/EngineContext"
-
+import { Button, Input } from "~/components";
 import { LoadingDotsTyping } from "~/components";
+
 export const PreviewEngineCamera = ()=>{
   const editorEngine = useContext(EngineContext);
   //take data from egine context
-
+  
   const [showLoader, setShowLoader] = useState<boolean>(true);
+  const [currentMessage,setCurrentMessage] = useState<string>("Enter Camera View");
   useEffect(()=>{
-    setTimeout(()=>setShowLoader(false), 5000);
+    setTimeout(()=>setShowLoader(false), 1000);
   },[]);
+  
+  const handleButtonCameraView = () => {
+    editorEngine?.switchCameraView();
+    if (currentMessage === "Enter Camera View") {
+      setCurrentMessage("Exit Camera View")
+    } else {
+      setCurrentMessage("Enter Camera View")
+    }
+  };
+
   return (
-    <div
-      id="preview-engine-camera"
-      className="absolute bottom-0 w-30 m-4"
-    >
+    <div id="preview-engine-camera"
+      className="absolute bottom-0 w-30 m-4">
       <div className="relative">
-        <div
-          className="text-white bg-ui-panel pt-1 px-2 pb-3 -z-10 rounded-t-lg -mb-2 w-fit"
-        >
+        <div className="text-white bg-ui-panel pt-1 px-2 pb-3 -z-10 rounded-t-lg -mb-2 w-fit">
           <p>Camera View</p>
+          <Button variant="secondary" onClick={handleButtonCameraView}>
+            {currentMessage}
+          </Button>
         </div>
         <div className="relative rounded-lg border border-white box overflow-hidden">
-          
           <canvas className="aspect-video max-h-40" id="camera-view"></canvas>
           <div className="absolute w-full h-full top-0 left-0">
             <LoadingDotsTyping isShowing={showLoader}/>
