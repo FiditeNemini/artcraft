@@ -13,7 +13,7 @@ import {
   deleteCharacterKeyframe,
   deleteObjectKeyframe,
 } from "~/pages/PageEnigma/store";
-import { ToasterContext } from "~/pages/PageEnigma/contexts/ToasterContext";
+import { ToasterContext } from "~/contexts/ToasterContext";
 
 const ADD_KEYFRAME: Record<
   ClipGroup,

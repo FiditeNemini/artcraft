@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import { Button, Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
-import { EngineContext } from "../../contexts/EngineContext";
-import { ToasterContext } from "~/pages/PageEnigma/contexts/ToasterContext";
-import { APPUI_ACTION_TYPES } from "~/pages/PageEnigma/reducers";
+import { EngineContext } from "../../../../contexts/EngineContext";
+import { ToasterContext } from "~/contexts/ToasterContext";
+import { APPUI_ACTION_TYPES } from "app/reducers";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
@@ -17,7 +17,7 @@ export const ControlsTopButtons = () => {
   const handleButtonSave = async () => {
     console.log(`SceneName is ${sceneName}`);
     const sceneMediaToken = await editorEngine?.saveScene(sceneName);
-    if(sceneMediaToken){
+    if (sceneMediaToken) {
       addToast("success", sceneMediaToken);
     }
   };
@@ -129,9 +129,7 @@ export const ControlsTopButtons = () => {
         </ButtonDialogue>
       </div>
 
-      <div className="flex gap-2">
-    
-      </div>
+      <div className="flex gap-2"></div>
       <div className="flex gap-2">
         {/* <Button onClick={handleButtonSingleFrame}>Render Single Frame</Button>
         <Button onClick={handleButtonTakeFrame}>Take Frame</Button> */}

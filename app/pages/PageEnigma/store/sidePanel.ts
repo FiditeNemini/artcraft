@@ -1,6 +1,7 @@
 import { computed, signal } from "@preact/signals-core";
 import { AssetFilterOption, Tab } from "~/pages/PageEnigma/models";
-import { pageHeight, timelineHeight } from "~/pages/PageEnigma/store/sizing";
+import { timelineHeight } from "~/pages/PageEnigma/store/sizing";
+import { pageHeight } from "~/store";
 
 export const sidePanelVisible = signal(true);
 

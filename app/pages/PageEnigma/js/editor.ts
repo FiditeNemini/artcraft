@@ -21,7 +21,7 @@ import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
-import { APPUI_ACTION_TYPES } from "../reducers";
+import { APPUI_ACTION_TYPES } from "../../../reducers";
 import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 import { XYZ } from "../datastructures/common";

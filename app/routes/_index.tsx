@@ -1,8 +1,11 @@
-
 import type { MetaFunction } from "@remix-run/deno";
 import { TopBarHelmet } from "~/modules/TopBarHelmet";
 
 import sonic from "./_assets/sonic-the-hedgehog-classic-sonic.gif";
+import { useSignals } from "@preact/signals-react/runtime";
+import { useEffect } from "react";
+import { pageHeight, pageWidth } from "~/store";
+import { sidePanelWidth, timelineHeight } from "~/pages/PageEnigma/store";
 
 export const meta: MetaFunction = () => {
   return [
@@ -20,10 +23,10 @@ export default function Index() {
         src={sonic}
         className="
           fixed
-          h-screen w-screen
-          top-0 left-0
+          left-0 top-0
+          -z-10 h-screen
+          w-screen
           object-cover
-          -z-10
         "
       />
     </div>

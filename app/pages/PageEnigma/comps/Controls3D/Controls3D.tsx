@@ -1,4 +1,5 @@
 import {
+  faAngleRight,
   faArrowsRotate,
   faArrowsUpDownLeftRight,
   faCube,
@@ -10,9 +11,10 @@ import {
   fa3dTorus,
   fa3dSphere,
 } from "@awesome.me/kit-fde2be5eb0/icons/kit/custom";
-import { ButtonIcon, ButtonIconSelect } from "~/components";
-import { EngineContext } from "../../contexts/EngineContext";
+import { Button, ButtonIcon, ButtonIconSelect, Link } from "~/components";
+import { EngineContext } from "../../../../contexts/EngineContext";
 import { useContext } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export const Controls3D = () => {
   const editorEngine = useContext(EngineContext);
@@ -66,14 +68,18 @@ export const Controls3D = () => {
       <div className="flex justify-center">
         <div className="rounded-b-lg border-x border-b border-ui-panel-border bg-ui-controls p-2 text-white">
           <div className="flex items-center justify-center gap-2">
-            <ButtonIcon icon={faPlus} onClick={handlePlus} fill={true} />
-
-            <span className="h-4 w-0 border-l border-white/[0.15]" />
-
             <ButtonIconSelect
               options={modes}
               onOptionChange={handleModeChange}
             />
+
+            <span className="h-4 w-0 border-l border-white/[0.15]" />
+
+            <Link to="/stylization">
+              <Button variant="primary">
+                Stylize <FontAwesomeIcon icon={faAngleRight} />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

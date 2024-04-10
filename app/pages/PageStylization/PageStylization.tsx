@@ -1,12 +1,13 @@
-import { PageEnigmaComponent } from "./PageEnigmaComponent";
-import { TrackProvider } from "~/pages/PageEnigma/contexts/TrackContext/TrackProvider";
-import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
+import { useSignals } from "@preact/signals-react/runtime";
+import { PageStylizationComponent } from "~/pages/PageStylization/PageStylizationComponent";
 import { useContext, useEffect } from "react";
 import { AppUiContext } from "~/contexts/AppUiContext";
 import { EngineContext } from "~/contexts/EngineContext";
 
-export const PageEnigma = () => {
-  const [_, dispatchAppUiState] = useContext(AppUiContext);
+export const PageStylization = () => {
+  useSignals();
+
+  const [, dispatchAppUiState] = useContext(AppUiContext);
   const editor = useContext(EngineContext);
 
   useEffect(() => {
@@ -18,10 +19,5 @@ export const PageEnigma = () => {
     }
   }, [editor, dispatchAppUiState]);
 
-  return (
-    <TrackProvider>
-      <PageEnigmaComponent />
-      <DragComponent />
-    </TrackProvider>
-  );
+  return <PageStylizationComponent />;
 };

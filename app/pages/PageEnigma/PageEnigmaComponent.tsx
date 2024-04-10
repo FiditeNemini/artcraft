@@ -1,8 +1,6 @@
-import { useContext, useState } from "react";
-import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
+import React, { useContext } from "react";
 
-import { Button, LoadingBar, LoadingDots } from "~/components";
-import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
+import { LoadingBar, LoadingDots } from "~/components";
 import { SidePanel } from "~/modules/SidePanel";
 
 import { Controls3D } from "./comps/Controls3D";
@@ -13,37 +11,27 @@ import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
 import { ViewSideBySide } from "./comps/ViewSideBySide";
 import { Timeline } from "./comps/Timeline";
 
-import { APPUI_VIEW_MODES } from "./reducers";
+import { APPUI_VIEW_MODES } from "../../reducers";
 import {
   timelineHeight,
   sidePanelWidth,
-  pageWidth,
   sidePanelVisible,
-  pageHeight,
   dndSidePanelWidth,
   dndTimelineHeight,
 } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
-import { AppUiContext } from "~/pages/PageEnigma/contexts/AppUiContext";
-import { EngineContext } from "./contexts/EngineContext";
+import { AppUiContext } from "~/contexts/AppUiContext";
+import { pageHeight, pageWidth } from "~/store";
+import { TopBar } from "~/modules/TopBar";
 
 export const PageEnigmaComponent = () => {
   useSignals();
 
-  const editorEngine = useContext(EngineContext);
   const [appUiState] = useContext(AppUiContext);
 
   //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
-  };
-
-  const handleGenerateMovieClick = () => {
-    if (editorEngine != null) {
-      editorEngine?.generateVideo();
-    } else {
-      console.log("Tried to generate movie but editor was null");
-    }
   };
 
   const dndWidth =
@@ -60,11 +48,7 @@ export const PageEnigmaComponent = () => {
 
   return (
     <div className="w-screen">
-      <TopBarHelmet>
-        <Button icon={faSparkles} onClick={handleGenerateMovieClick}>
-          Generate Movie
-        </Button>
-      </TopBarHelmet>
+      <TopBar pageName="Edit Scene" />
       <div
         className="relative flex w-screen"
         style={{ height: "calc(100vh - 68px)" }}

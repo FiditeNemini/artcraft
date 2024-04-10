@@ -1,9 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  dndTimelineHeight,
-  pageHeight,
-  timelineHeight,
-} from "~/pages/PageEnigma/store";
+import { dndTimelineHeight, timelineHeight } from "~/pages/PageEnigma/store";
+import { pageHeight } from "~/store";
 
 export const useMouseEventsTimeline = () => {
   const [isActive, setIsActive] = useState(false);
