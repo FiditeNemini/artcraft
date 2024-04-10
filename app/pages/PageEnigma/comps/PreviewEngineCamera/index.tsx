@@ -1,34 +1,54 @@
-import { useContext, useEffect, useState } from "react"
-import { EngineContext } from "../../contexts/EngineContext"
-
+import { useContext, useEffect, useState } from "react";
+import { EngineContext } from "../../contexts/EngineContext";
+import { Button, Input } from "~/components";
 import { LoadingDotsTyping } from "~/components";
-export const PreviewEngineCamera = ()=>{
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCameraViewfinder } from "@fortawesome/pro-solid-svg-icons";
+
+export const PreviewEngineCamera = () => {
   const editorEngine = useContext(EngineContext);
   //take data from egine context
 
   const [showLoader, setShowLoader] = useState<boolean>(true);
-  useEffect(()=>{
-    setTimeout(()=>setShowLoader(false), 5000);
-  },[]);
+  const [currentMessage, setCurrentMessage] =
+    useState<string>("Enter Camera View");
+  useEffect(() => {
+    setTimeout(() => setShowLoader(false), 1000);
+  }, []);
+
+  const handleButtonCameraView = () => {
+    editorEngine?.switchCameraView();
+    if (currentMessage === "Enter Camera View") {
+      setCurrentMessage("Exit Camera View");
+    } else {
+      setCurrentMessage("Enter Camera View");
+    }
+  };
+
   return (
-    <div
-      id="preview-engine-camera"
-      className="absolute bottom-0 w-30 m-4"
-    >
+    <div id="preview-engine-camera" className="w-30 absolute bottom-0 m-4">
       <div className="relative">
-        <div
-          className="text-white bg-ui-panel pt-1 px-2 pb-3 -z-10 rounded-t-lg -mb-2 w-fit"
-        >
-          <p>Camera View</p>
+        <div className="-z-10 flex w-full items-center justify-between rounded-t-lg bg-ui-controls p-2 text-white">
+          <div className="ms-1 flex items-center gap-2">
+            <FontAwesomeIcon icon={faCameraViewfinder} />
+            <p className="mt-[2px] text-sm font-medium">Camera View</p>
+          </div>
+
+          <Button
+            variant="action"
+            onClick={handleButtonCameraView}
+            className="px-2.5 py-1 text-sm"
+          >
+            {currentMessage}
+          </Button>
         </div>
-        <div className="relative rounded-lg border border-white box overflow-hidden">
-          
+        <div className="box relative overflow-hidden rounded-b-lg border border-gray-600">
           <canvas className="aspect-video max-h-40" id="camera-view"></canvas>
-          <div className="absolute w-full h-full top-0 left-0">
-            <LoadingDotsTyping isShowing={showLoader}/>
+          <div className="absolute left-0 top-0 h-full w-full">
+            <LoadingDotsTyping isShowing={showLoader} />
           </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

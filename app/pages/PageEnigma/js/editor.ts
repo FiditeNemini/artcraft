@@ -291,8 +291,12 @@ class Editor {
     );
 
     this.control = new TransformControls(this.camera, this.renderer.domElement);
-    //this.control.space = 'local'; // Local transformation mode
+    this.control.space = 'local'; // Local transformation mode
     // .space = 'world'; // Global mode
+
+    this.control.setScaleSnap(0.1);
+    this.control.setTranslationSnap(0.1);
+    this.control.setRotationSnap(0.1);
 
     // OnClick and MouseMove events.
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
