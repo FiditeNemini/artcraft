@@ -6,7 +6,6 @@ import { AppUiContext } from "../../contexts/AppUiContext";
 import { APPUI_ACTION_TYPES, APPUI_VIEW_MODES } from "../../reducers";
 import { EngineContext } from "../../contexts/EngineContext";
 import { ArtStyle } from "../../js/api_manager";
-import { ignoreDelete } from "~/pages/PageEnigma/store";
 
 export const TabStylization = () => {
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
