@@ -9,6 +9,7 @@ import {
   deleteAudioClip,
   deleteCharacterClip,
   selectedItem,
+  ignoreDelete,
 } from "~/pages/PageEnigma/store";
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -39,6 +40,9 @@ export const Timeline = () => {
   }, []);
 
   const onDeleteAsk = useCallback((event: KeyboardEvent) => {
+    if (ignoreDelete.value) {
+      return;
+    }
     if (
       ["Backspace", "Delete"].indexOf(event.key) > -1 &&
       selectedItem.value !== null
