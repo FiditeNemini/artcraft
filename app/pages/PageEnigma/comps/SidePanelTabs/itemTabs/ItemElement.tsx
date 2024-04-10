@@ -73,7 +73,7 @@ export const ItemElement = ({ item }: Props) => {
         className="aspect-[4.5/5] w-full rounded-t-lg object-cover object-center"
       />
       <div
-        className="text-overflow-ellipsis text- w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
+        className="text-overflow-ellipsis w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
         style={{ backgroundColor: "#39394D" }}
       >
         {item.name}
