@@ -25,9 +25,15 @@ export const PreviewImages = () => {
       <div className="flex flex-col" style={{ width: imageWidth }}>
         <div className={textClasses}>Raw Preview</div>
         <div
-          className="block w-full rounded-b-lg bg-gray-300"
+          className="block w-full rounded-b-lg"
           style={{ height: imageHeight }}
-        />
+        >
+          <canvas
+            id="preview-cancvas"
+            width={imageWidth}
+            height={imageHeight}
+          />
+        </div>
       </div>
       <div className="flex w-[40px] flex-col justify-center">
         <FontAwesomeIcon icon={faArrowRight} className="text-3xl opacity-60" />
@@ -35,9 +41,11 @@ export const PreviewImages = () => {
       <div className="flex flex-col" style={{ width: imageWidth }}>
         <div className={textClasses}>Styled Preview</div>
         <div
-          className="block w-full rounded-b-lg bg-gray-300"
+          className="block w-full rounded-b-lg"
           style={{ height: imageHeight }}
-        />
+        >
+          <canvas id="styled-cancvas" width={imageWidth} height={imageHeight} />
+        </div>
       </div>
     </div>
   );
