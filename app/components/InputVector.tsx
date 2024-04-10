@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { twMerge } from "tailwind-merge";
+import { ignoreDelete } from "~/pages/PageEnigma/store";
 
 interface InputVectorProps {
   x: number;
@@ -41,6 +42,8 @@ export const InputVector = ({ x, y, z, onChange }: InputVectorProps) => {
           onChange={handleOnChange}
           ref={xRef}
           value={x}
+          onFocus={() => (ignoreDelete.value = true)}
+          onBlur={() => (ignoreDelete.value = false)}
         />
       </span>
       <span
@@ -55,6 +58,8 @@ export const InputVector = ({ x, y, z, onChange }: InputVectorProps) => {
           onChange={handleOnChange}
           ref={yRef}
           value={y}
+          onFocus={() => (ignoreDelete.value = true)}
+          onBlur={() => (ignoreDelete.value = false)}
         />
       </span>
       <span
@@ -69,6 +74,8 @@ export const InputVector = ({ x, y, z, onChange }: InputVectorProps) => {
           onChange={handleOnChange}
           ref={zRef}
           value={z}
+          onFocus={() => (ignoreDelete.value = true)}
+          onBlur={() => (ignoreDelete.value = false)}
         />
       </span>
     </div>
