@@ -5,7 +5,9 @@ import { APPUI_ACTION_TYPES } from "../../reducers";
 import { AppUiContext } from "../../contexts/AppUiContext";
 import { EngineContext } from "../../contexts/EngineContext";
 
-export const TestFeaturesButtons = ()=>{
+export const TestFeaturesButtons = (debug:boolean)=>{
+  if (!debug) return null;
+  
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
   const editorEngine = useContext(EngineContext);
 
@@ -63,6 +65,7 @@ export const TestFeaturesButtons = ()=>{
 
   const smallButtons = "text-xs p-2 h-6 ";
   const tertiaryColor = "bg-brand-tertiary hover:bg-brand-teriary-400 focus-visible:outline-brand-tertiary ";
+  
   return(
     <>
       <div className="flex gap-1">

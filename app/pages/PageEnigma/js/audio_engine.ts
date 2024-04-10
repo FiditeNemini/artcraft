@@ -45,6 +45,7 @@ class AudioEngine {
         const clip = this.clips[audio_media_id];
         if (clip.audio_data?.source) {
             clip.audio_data.source.stop();
+            clip.audio_data.source.disconnect();
         } else {
             console.warn(`AudioManager: AudioClip with id "${audio_media_id}" not found.`);
         }

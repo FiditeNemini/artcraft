@@ -395,6 +395,7 @@ export class TimeLine {
                 }
             } else if (element.type === ClipType.AUDIO  && element.group !== ClipGroup.CHARACTER) {
                 this.audio_engine.loadClip(element.media_id);
+                this.audio_engine.stopClip(element.media_id);
             } else if (element.type === ClipType.ANIMATION) {
                 this.animation_engine.clips[element.object_uuid + element.media_id].stop();
             } else if (element.type === ClipType.AUDIO  && element.group === ClipGroup.CHARACTER) {
@@ -414,7 +415,7 @@ export class TimeLine {
     }
 
     // called by the editor update loop on each frame
-    public async update(isRendering = false) {
+    public async update(isRendering = false): Promise<boolean> {
         //if (this.is_playing === false) return; // start and stop
         this.timeline_limit = this.getEndPoint();
         if (this.is_playing) {
@@ -480,7 +481,10 @@ export class TimeLine {
 
         if (this.scrubber_frame_position >= this.timeline_limit && this.is_playing) {
             await this.stop();
+            return true;
         }
+
+        return false;
     }
 
     private async stop(): Promise<void> {

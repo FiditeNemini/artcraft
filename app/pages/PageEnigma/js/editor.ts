@@ -738,7 +738,10 @@ class Editor {
     }
 
     if (this.timeline.is_playing) {
-      await this.timeline.update(this.rendering);
+      const changeView = await this.timeline.update(this.rendering);
+      if(changeView) {
+        this.switchCameraView();
+      }
     } else if (this.last_scrub == this.timeline.scrubber_frame_position) {
       this.updateSelectedUI();
     }

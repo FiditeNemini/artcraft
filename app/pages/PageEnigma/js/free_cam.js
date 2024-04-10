@@ -59,8 +59,11 @@ class FreeCam extends EventDispatcher {
 				case 'KeyA': this.moveState.left = 1; break;
 				case 'KeyD': this.moveState.right = 1; break;
 
-				case 'Space': this.moveState.up = 1; break;
-				case 'ShiftLeft': this.moveState.down = 1; break;
+				// case 'Space': this.moveState.up = 1; break;
+				// case 'ShiftLeft': this.moveState.down = 1; break;
+
+				case 'KeyQ': this.moveState.down = 1; break;
+				case 'KeyE': this.moveState.up = 1; break;
 
 				case 'ArrowUp': this.moveState.pitchUp = 1; break;
 				case 'ArrowDown': this.moveState.pitchDown = 1; break;
@@ -68,8 +71,8 @@ class FreeCam extends EventDispatcher {
 				case 'ArrowLeft': this.moveState.yawLeft = 1; break;
 				case 'ArrowRight': this.moveState.yawRight = 1; break;
 
-				case 'KeyQ': this.moveState.rollLeft = 1; break;
-				case 'KeyE': this.moveState.rollRight = 1; break;
+				// case 'KeyQ': this.moveState.rollLeft = 1; break;
+				// case 'KeyE': this.moveState.rollRight = 1; break;
 
 
 			}
@@ -98,8 +101,8 @@ class FreeCam extends EventDispatcher {
 				case 'ArrowLeft': this.moveState.yawLeft = 0; break;
 				case 'ArrowRight': this.moveState.yawRight = 0; break;
 
-				case 'KeyQ': this.moveState.up = 0; break;
-				case 'KeyE': this.moveState.down = 0; break;
+				case 'KeyQ': this.moveState.down = 0; break;
+				case 'KeyE': this.moveState.up = 0; break;
 
 				// case 'KeyQ': this.moveState.rollLeft = 0; break;
 				// case 'KeyE': this.moveState.rollRight = 0; break;

@@ -12,9 +12,6 @@ import { Button } from "~/components";
 
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 
-
-
-
 export const AudioTabComponent = () => {
   useSignals();
   const [, dispatchAppUiState] = useContext(AppUiContext);
