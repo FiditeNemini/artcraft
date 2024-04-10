@@ -18,7 +18,7 @@ export const PageEnigma = () => {
     function setPage() {
       // TODO address this issue with zooming
       pageHeight.value = window.innerHeight;
-      pageWidth.value = window.innerWidth;
+      pageWidth.value = window.outerWidth;
     }
     timelineHeight.value = window.innerHeight * 0.25;
     sidePanelWidth.value = 443;

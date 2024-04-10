@@ -12,7 +12,7 @@ import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
 import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
-import { MediaItem } from "~/pages/PageEnigma/models";
+
 // Every object uuid / entity has a track.
 export class TimelineDataState {
     timeline_items: ClipUI[];
@@ -133,17 +133,10 @@ export class TimeLine {
             case toEngineActions.ADD_OBJECT:
                 await this.addObject(data);
                 break;
-            case toEngineActions.ADD_SHAPE:
-                    await this.addShape(data);
-                    break;
             default:
                 console.log("Action Not Wired", action);
         }
     }
-
-    public async addShape({ data }: { data: MediaItem }) {
-        this.scene.instantiate(data.media_id);
-      }
 
     public async addCharacter(data: any) {
         let media_id = data.data['media_id'];
@@ -504,3 +497,4 @@ export class TimeLine {
         });
     }
 }
+
