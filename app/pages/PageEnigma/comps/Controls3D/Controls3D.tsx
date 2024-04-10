@@ -16,12 +16,13 @@ import { EngineContext } from "../../../../contexts/EngineContext";
 import { useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export const Controls3D = () => {
+interface Props {
+  setPage: (page: string) => void;
+}
+
+export const Controls3D = ({ setPage }: Props) => {
   const editorEngine = useContext(EngineContext);
 
-  const handlePlus = () => {
-    console.log("Controls 3D: Plus button clicked");
-  };
   const handleMoveArrows = () => {
     if (!editorEngine) {
       return;
@@ -75,11 +76,9 @@ export const Controls3D = () => {
 
             <span className="h-4 w-0 border-l border-white/[0.15]" />
 
-            <Link to="/stylization">
-              <Button variant="primary">
-                Stylize <FontAwesomeIcon icon={faAngleRight} />
-              </Button>
-            </Link>
+            <Button variant="primary" onClick={() => setPage("style")}>
+              Stylize <FontAwesomeIcon icon={faAngleRight} />
+            </Button>
           </div>
         </div>
       </div>
