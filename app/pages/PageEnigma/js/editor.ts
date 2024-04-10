@@ -183,6 +183,7 @@ class Editor {
     this.animation_engine = new AnimationEngine(this.version);
 
     this.timeline = new TimeLine(
+      this,
       this.audio_engine,
       this.transform_engine,
       this.lipsync_engine,
@@ -205,12 +206,10 @@ class Editor {
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
 
-
     this.storyteller_proxy_scene = new StoryTellerProxyScene(
       this.version,
       this.activeScene.scene,
     );
-
   }
 
   initialize(config: any) {
@@ -291,7 +290,7 @@ class Editor {
     );
 
     this.control = new TransformControls(this.camera, this.renderer.domElement);
-    this.control.space = 'local'; // Local transformation mode
+    this.control.space = "local"; // Local transformation mode
     // .space = 'world'; // Global mode
 
     this.control.setScaleSnap(0.1);
@@ -410,19 +409,18 @@ class Editor {
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
     if (this.selected != undefined || this.selected != null) {
+      //console.log(`triggering setSelectedObject`)
+      this.selected.position.x = position.x;
+      this.selected.position.y = position.y;
+      this.selected.position.z = position.z;
 
-      //console.log(`triggering setSelectedObject`) 
-      this.selected.position.x = position.x
-      this.selected.position.y = position.y
-      this.selected.position.z = position.z
+      this.selected.rotation.x = THREE.MathUtils.degToRad(rotation.x);
+      this.selected.rotation.y = THREE.MathUtils.degToRad(rotation.y);
+      this.selected.rotation.z = THREE.MathUtils.degToRad(rotation.z);
 
-      this.selected.rotation.x = THREE.MathUtils.degToRad(rotation.x)
-      this.selected.rotation.y = THREE.MathUtils.degToRad(rotation.y)
-      this.selected.rotation.z = THREE.MathUtils.degToRad(rotation.z)
-
-      this.selected.scale.x = scale.x
-      this.selected.scale.y = scale.y
-      this.selected.scale.z = scale.z
+      this.selected.scale.x = scale.x;
+      this.selected.scale.y = scale.y;
+      this.selected.scale.z = scale.z;
     }
   }
 
@@ -552,9 +550,7 @@ class Editor {
     // const object: THREE.Object3D = await this.activeScene.load_glb(
     //   "m_4wva09qznapzk5rcvbxy671d1qx2pr",
     // );
-
     // object.uuid = "CH1";
-
     // Stick Open Pose Man: m_9f3d3z94kk6m25zywyz6an3p43fjtw
     // XBot: m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d
     // YBot: m_9sqg0evpr23587jnr8z3zsvav1x077
@@ -739,7 +735,7 @@ class Editor {
 
     if (this.timeline.is_playing) {
       const changeView = await this.timeline.update(this.rendering);
-      if(changeView) {
+      if (changeView) {
         this.switchCameraView();
       }
     } else if (this.last_scrub == this.timeline.scrubber_frame_position) {

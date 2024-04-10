@@ -2,6 +2,7 @@ import { TextareaHTMLAttributes } from "react";
 import { twMerge } from "tailwind-merge";
 import { Label } from "./Typography";
 import { kebabCase } from "~/utilities";
+import { ignoreDelete } from "~/pages/PageEnigma/store";
 
 type ResizeType =
   | "none"
@@ -24,14 +25,10 @@ export const Textarea = ({
 }) => {
   return (
     <div className="flex flex-col">
-      {label && 
-        <Label htmlFor={id ? id : kebabCase(label)}>
-          {label}
-        </Label>
-      }
-      
+      {label && <Label htmlFor={id ? id : kebabCase(label)}>{label}</Label>}
+
       <textarea
-        id={id ? id : (label ? kebabCase(label) : undefined)}
+        id={id ? id : label ? kebabCase(label) : undefined}
         className={twMerge(
           "rounded-lg border border-ui-panel-border bg-ui-controls p-3",
           className,
@@ -41,8 +38,14 @@ export const Textarea = ({
           transition: "outline-color 0.15s ease-in-out",
           resize: resize,
         }}
-        onFocus={(e) => (e.currentTarget.style.outlineColor = "#e66462")}
-        onBlur={(e) => (e.currentTarget.style.outlineColor = "transparent")}
+        onFocus={(e) => {
+          ignoreDelete.value = true;
+          e.currentTarget.style.outlineColor = "#e66462";
+        }}
+        onBlur={(e) => {
+          ignoreDelete.value = false;
+          e.currentTarget.style.outlineColor = "transparent";
+        }}
         {...rest}
       />
     </div>
