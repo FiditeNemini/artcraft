@@ -42,10 +42,4 @@ export const tabList = [
     value: AssetType.AUDIO,
     component: <AudioTab />,
   },
-  {
-    icon: "resources/icons/objects.png",
-    title: "Style (Temporary being moved)",
-    value: AssetType.STYLE,
-    component: <TabStylization />,
-  },
 ];
