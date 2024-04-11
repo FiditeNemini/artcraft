@@ -76,6 +76,11 @@ CREATE TABLE media_files (
   -- Media files can have optional titles
   maybe_title VARCHAR(255) DEFAULT NULL,
 
+  -- The "cover" image is a media file of type image that severs as a small
+  -- example of the media file. Like album art or a user profile picture / avatar.
+  -- This is particularly useful for 3D assets and scenes.
+  maybe_cover_image_media_file_token VARCHAR(32) DEFAULT NULL,
+
   -- ========== MEDIA DETAILS ==========
 
   -- Type of media file:
