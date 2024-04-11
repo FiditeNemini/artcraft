@@ -22,7 +22,7 @@ import { AnimationEngine } from "./animation_engine.js";
 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { APPUI_ACTION_TYPES } from "../../../reducers";
-import { ClipGroup } from "~/pages/PageEnigma/models/track";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 
 import { XYZ } from "../datastructures/common";
 import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
@@ -836,7 +836,7 @@ class Editor {
 
   async stopPlayback(compile_audio: boolean = true) {
 
-    console.log(this.frames*(this.timeline.timeline_limit/this.cap_fps))
+    let video_fps = this.frames*(this.cap_fps/this.timeline.timeline_limit)
 
     //if (this.generating_preview) {
     //  return;
@@ -857,7 +857,7 @@ class Editor {
     }
     await ffmpeg.run(
       "-framerate",
-      "" + this.cap_fps / 2,
+      "" + video_fps,
       "-i",
       "image%d.png",
       "-f",
@@ -882,7 +882,7 @@ class Editor {
 
     if (compile_audio) {
       for (const clip of this.timeline.timeline_items) {
-        if (clip.type == "lipsync" || clip.type == "audio") {
+        if (clip.type == ClipType.AUDIO) {
           await this.convertAudioClip(itteration, ffmpeg, clip);
           itteration += 1;
         }
