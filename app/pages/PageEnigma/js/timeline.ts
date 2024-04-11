@@ -150,6 +150,8 @@ export class TimeLine {
     const media_id = data.data.media_id;
     const name = data.data.name;
 
+    let new_data = {...data.data};
+
     const obj = await this.scene.load_glb(media_id);
     obj.userData["name"] = name;
     obj.name = name;
@@ -158,11 +160,11 @@ export class TimeLine {
 
     this.characters[object_uuid] = ClipGroup.CHARACTER;
 
-    data.data["object_uuid"] = object_uuid;
+    new_data["object_uuid"] = object_uuid;
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,
       action: fromEngineActions.UPDATE_CHARACTER_ID,
-      data: data.data,
+      data: new_data,
     });
 
     this.addPlayableClip(
