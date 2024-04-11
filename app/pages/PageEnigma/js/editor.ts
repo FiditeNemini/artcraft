@@ -352,11 +352,9 @@ class Editor {
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
 
     if (this.isEmpty(sceneToken) == false) {
-      console.log(`${sceneToken}`)
       this.loadScene(sceneToken)
-    } else {
-      console.log("No Scene Token")
     }
+    
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
       payload: {

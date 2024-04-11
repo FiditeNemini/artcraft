@@ -21,8 +21,6 @@ export const PageEnigmaComponent = () => {
     if (editor && editor.can_initialize && dispatchAppUiState !== null) {
       console.log("initializing Editor");
       
-  // get scene token for editor is it is provided
-     console.log(`params?!?!: ${params["sceneToken"]}`);
      const sceneToken = params["sceneToken"]
       console.log(sceneToken)
       editor.initialize({
