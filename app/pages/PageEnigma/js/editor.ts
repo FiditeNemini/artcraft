@@ -836,9 +836,11 @@ class Editor {
 
   async stopPlayback(compile_audio: boolean = true) {
 
-    if (this.generating_preview) {
-      return;
-    }
+    console.log(this.frames*(this.timeline.timeline_limit/this.cap_fps))
+
+    //if (this.generating_preview) {
+    //  return;
+    //}
 
     this.rendering = false;
 

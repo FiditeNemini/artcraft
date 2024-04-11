@@ -154,6 +154,7 @@ export class TimeLine {
     obj.userData["name"] = name;
     obj.name = name;
     const object_uuid = obj.uuid;
+    console.log(object_uuid);
 
     this.characters[object_uuid] = ClipGroup.CHARACTER;
 
@@ -538,10 +539,7 @@ export class TimeLine {
             await this.animation_engine.clips[
               object.uuid + element.media_id
             ].play(object);
-            let fps = 60;
-            //if (isRendering) {
-            //  fps = 60;
-            //}
+            let fps = 120;
             this.animation_engine.clips[object.uuid + element.media_id].step(
               this.scrubber_frame_position / fps, // Double FPS for best result.
             );
