@@ -40,8 +40,9 @@ export const TopBar = ({ pageName }: Props) => {
             )}
           </div>
 
-          <div className="flex justify-center">
-            <span className="opacity-60">{pageName}&nbsp;/</span>&nbsp;
+          <div className="flex items-center justify-center font-medium">
+            <span className="opacity-60">{pageName}&nbsp;&nbsp;/</span>
+            &nbsp;&nbsp;
             {sceneTitle.value}
           </div>
 

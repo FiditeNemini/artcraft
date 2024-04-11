@@ -1,6 +1,10 @@
 import { useSignals } from "@preact/signals-react/runtime";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleLeft } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faAngleLeft,
+  faArrowsRotate,
+  faFilm,
+} from "@fortawesome/pro-solid-svg-icons";
 import { Button, Link } from "~/components";
 import { StyleSelection } from "~/pages/PageEnigma/comps/StyleSelection";
 import { LowerPanel } from "~/modules/LowerPanel";
@@ -30,32 +34,38 @@ export const PageStyling = ({ setPage }: Props) => {
   const switchEdit = () => {
     editorEngine?.switchEdit();
     setPage("edit");
-  }
+  };
 
   return (
     <div className="w-screen">
       <TopBar pageName="Stylization" />
       <div className="flex w-full justify-center">
-        <div className="bg-ui-controls p-2">
+        <div className="rounded-b-lg bg-ui-controls p-2">
           <Button variant="action" onClick={() => switchEdit()}>
             <FontAwesomeIcon icon={faAngleLeft} />
             Back to Scene
           </Button>
         </div>
       </div>
-      <div className="mt-4 flex flex-col items-center gap-4">
+      <div className="mt-5 flex flex-col items-center gap-6">
         <PreviewImages />
-        <StyleSelection />
-      </div>
-      <div className="fixed bottom-0 left-0 w-full">
-        <div className="flex h-[62px] w-full items-center justify-center gap-5 bg-ui-panel">
-          <div>
-            <Button variant="action" onClick={generateFrame}>Update Preview</Button>
-          </div>
-          <div>
-            <Button variant="primary" onClick={generateMovie}>Generate Movie</Button>
+        <div className="flex flex-col items-center">
+          <StyleSelection />
+          <div className="flex w-full justify-center gap-4 rounded-b-lg bg-ui-panel pb-5">
+            <Button
+              icon={faArrowsRotate}
+              variant="action"
+              onClick={generateFrame}
+            >
+              Update Preview
+            </Button>
+            <Button icon={faFilm} variant="primary" onClick={generateMovie}>
+              Generate Movie
+            </Button>
           </div>
         </div>
+      </div>
+      <div className="fixed bottom-0 left-0 w-full">
         <div className="relative flex h-[80px] w-full gap-5 border-t border-t-action-600 bg-ui-panel">
           <LowerPanel onStyle>
             <TimerGrid />
