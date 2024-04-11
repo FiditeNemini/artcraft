@@ -7,7 +7,6 @@ import {
   Dispatch,
   SetStateAction
 } from "react";
-import { useCookies } from 'react-cookie';
 
 import {
   SessionResponse,
@@ -32,7 +31,7 @@ export const AuthenticationContext = createContext<{
 
 export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
   // console.log('auth provider rerender');
-  const [, setAuthCookie, removeAuthCookie] = useCookies([STORAGE_KEYS.USER_INFO]);
+  // const [, setAuthCookie, removeAuthCookie] = useCookies([STORAGE_KEYS.USER_INFO]);
   const [authState, setAuthState] = useState<AuthState>({});
 
   const loginAndGetUserInfo = useCallback((
@@ -106,12 +105,12 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
     // Propagate session data to localstorage
     if(authState.sessionData !== null && authState.sessionData !== undefined){
       localStorage.setItem(STORAGE_KEYS.USER_INFO, authState.sessionData);
-      setAuthCookie(STORAGE_KEYS.USER_INFO, authState.userInfo);
+      // setAuthCookie(STORAGE_KEYS.USER_INFO, authState.userInfo);
     }
     // Propagate Logout
     else if (authState.sessionData === null){
       localStorage.removeItem(STORAGE_KEYS.USER_INFO);
-      removeAuthCookie(STORAGE_KEYS.USER_INFO);
+      // removeAuthCookie(STORAGE_KEYS.USER_INFO);
     }
   },[authState]);
 

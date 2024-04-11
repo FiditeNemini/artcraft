@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { CookiesProvider } from "react-cookie";
 import { Transition } from "@headlessui/react";
 import { LinksFunction } from "@remix-run/deno";
 import {
@@ -96,16 +95,14 @@ export default function App() {
       </head>
       <body className="overflow-hidden bg-ui-background">
         <CompleteTakeoverLoadingScreen isShowing={showLoader} />
-        <CookiesProvider defaultSetOptions={{ path: "/" }}>
-          <AuthenticationProvider>
-            <ToasterProvider>
-              <AppUIProvider>
-                <div className="topbar-spacer" />
-                <Outlet />
-              </AppUIProvider>
-            </ToasterProvider>
-          </AuthenticationProvider>
-        </CookiesProvider>
+        <AuthenticationProvider>
+          <ToasterProvider>
+            <AppUIProvider>
+              <div className="topbar-spacer" />
+              <Outlet />
+            </AppUIProvider>
+          </ToasterProvider>
+        </AuthenticationProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
