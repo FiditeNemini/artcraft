@@ -52,7 +52,7 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
     CreateSession({usernameOrEmail, password})
       .then((loginResponse)=>{
         updateLoggingState(loginResponse.signed_session);
-        GetSession().then((
+        GetSession(loginResponse.signed_session).then((
           sessionResponse: SessionResponse
         )=>{
           if(sessionResponse.success && sessionResponse.user && sessionResponse.user !== null){
@@ -66,9 +66,12 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
   },[]);
 
   const logout = useCallback(()=>{
-    DestroySession().then((res)=>{
-      if (res) setLogoutState(); 
-    });
+    const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
+    if (sessionToken !== null){
+    DestroySession(sessionToken).then((res)=>{
+      //TODO: error handling maybe necessary
+    });}
+    setLogoutState(); 
   },[]);
 
   //Set Session upon Auth State Changes
@@ -76,12 +79,12 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
     //On First Load
     if(authState.authStatus === AUTH_STATUS.INIT){
       //Persist Login if Session Data exist
-      const sessionData = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
-      console.log(`Session Data: ${sessionData?.substring(0, 30)}${sessionData ? '...':''}`);
-      if (sessionData !== null){
+      const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
+      console.log(`Session Data: ${sessionToken?.substring(0, 30)}${sessionToken ? '...':''}`);
+      if (sessionToken !== null){
         console.log('Getting session to persist login');
-        updateLoggingState(sessionData);
-        GetSession().then((
+        updateLoggingState(sessionToken);
+        GetSession(sessionToken).then((
           sessionResponse: SessionResponse
         )=>{
           console.log('Session Returned');
