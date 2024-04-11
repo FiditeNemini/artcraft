@@ -33,10 +33,6 @@ interface Props {
 export const PageEditor = ({ setPage }: Props) => {
   useSignals();
 
-  // get scene token for editor is it is provided
-  const params = useParams();
-  console.log(params);
-
   const [appUiState] = useContext(AppUiContext);
 
   //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
