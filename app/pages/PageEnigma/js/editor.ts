@@ -666,17 +666,19 @@ class Editor {
     if (this.composer != null && !this.rendering && this.rawRenderer) {
       this.composer.render();
       this.rawRenderer.render(this.activeScene.scene, this.render_camera);
-    } else if (this.renderer && this.render_camera) {
+    } else if (this.renderer && this.render_camera && !this.rendering) {
       this.renderer.setSize(this.render_width, this.render_height);
       this.renderer.render(this.activeScene.scene, this.render_camera);
+    } else if (this.rendering && this.rawRenderer) {
+      this.rawRenderer.render(this.activeScene.scene, this.render_camera);
     } else {
       console.error("Could not render to canvas no render or composer!");
     }
 
-    if (this.rendering && this.renderer && this.clock) {
+    if (this.rendering && this.rawRenderer && this.clock) {
       this.frames += 1;
       this.playback_location++;
-      const imgData = this.renderer.domElement.toDataURL();
+      const imgData = this.rawRenderer.domElement.toDataURL();
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
       if (this.timeline.is_playing == false) {
@@ -835,15 +837,8 @@ class Editor {
   }
 
   async stopPlayback(compile_audio: boolean = true) {
-
-    let video_fps = this.frames*(this.cap_fps/this.timeline.timeline_limit)
-
-    //if (this.generating_preview) {
-    //  return;
-    //}
-
+    let video_fps = Math.floor(this.frames * (this.cap_fps / this.timeline.timeline_limit));
     this.rendering = false;
-
     this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
@@ -898,15 +893,12 @@ class Editor {
     const blob = new Blob([output.buffer], { type: "video/mp4" });
 
     const data: any = await this.api_manager.uploadMedia(blob, "render.mp4");
-    console.log("data", data);
 
     if (data == null) {
       return;
     }
     const upload_token = data["media_file_token"];
     console.log(upload_token);
-    // Create a link to download the file stylize video using api ..
-    //{"success":true,"upload_token":"mu_x9kr5cfafn512pjbygdszvbdpktrr"} payload
 
     const result = await this.api_manager
       .stylizeVideo(
@@ -1022,7 +1014,7 @@ class Editor {
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
     console.log("Generating video...", this.frame_buffer);
-    if (this.rendering || this.generating_preview) {
+    if (this.rendering) {
       return;
     }
     this.rendering = true; // has to go first to debounce

@@ -156,7 +156,6 @@ export class TimeLine {
     obj.userData["name"] = name;
     obj.name = name;
     const object_uuid = obj.uuid;
-    console.log(object_uuid);
 
     this.characters[object_uuid] = ClipGroup.CHARACTER;
 
