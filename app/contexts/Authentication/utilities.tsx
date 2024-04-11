@@ -33,11 +33,12 @@ export const CreateSession = async ({
     };
   });
 }
-export const GetSession = async () => {
+export const GetSession = async (sessionToken:string) => {
   return await fetch(getSession, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
+      'session': sessionToken,
     },
     // credentials: 'include',
   })
@@ -53,11 +54,12 @@ export const GetSession = async () => {
     };
   });
 }
-export async function DestroySession() : Promise<boolean> {
+export async function DestroySession(sessionToken:string) : Promise<boolean> {
   return await fetch(logout, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
+      'session': sessionToken,
     },
     // credentials: 'include',
   })
