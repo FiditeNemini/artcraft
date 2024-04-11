@@ -7,6 +7,12 @@ import { TabStylization } from "~/pages/PageEnigma/comps/SidePanelTabs/TabStyliz
 import { CameraTab } from "./itemTabs/CameraTab";
 export const tabList = [
   {
+    icon: "resources/icons/characters.png",
+    title: "Characters",
+    value: AssetType.CHARACTER,
+    component: <ObjectsTab type={AssetType.CHARACTER} />,
+  },
+  {
     icon: "resources/icons/animations.png",
     title: "Animation",
     value: AssetType.ANIMATION,
@@ -23,12 +29,6 @@ export const tabList = [
     title: "Shapes",
     value: AssetType.SHAPE,
     component: <ShapeTab />,
-  },
-  {
-    icon: "resources/icons/characters.png",
-    title: "Characters",
-    value: AssetType.CHARACTER,
-    component: <ObjectsTab type={AssetType.CHARACTER} />,
   },
   {
     icon: "resources/icons/camera.png",
