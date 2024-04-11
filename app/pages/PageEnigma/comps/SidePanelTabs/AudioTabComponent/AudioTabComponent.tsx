@@ -36,7 +36,6 @@ export const AudioTabComponent = () => {
   const handleListAudioByUser = useCallback((username:string)=>{
     setState((curr)=>({...curr, fetchingUserAudio:true}));
     ListAudioByUser(username).then((res:any[])=>{
-      console.log(res)
       setState((curr)=>({...curr, fetchingUserAudio:false}));
       audioItemsFromServer.value = res.map(item=>{
         const morphedItem:MediaItem = {
@@ -59,6 +58,7 @@ export const AudioTabComponent = () => {
     if ( authState.userInfo ){
       if(state.firstLoad === false && audioItemsFromServer.value.length === 0){
         handleListAudioByUser(authState.userInfo.username);
+        setState((curr)=>({...curr, firstLoad:true}));
       }
     }
   }, [authState, state, handleListAudioByUser]);
