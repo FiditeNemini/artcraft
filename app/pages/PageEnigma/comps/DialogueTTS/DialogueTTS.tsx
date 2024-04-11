@@ -4,12 +4,12 @@ import { v4 as uuidv4 } from "uuid";
 import {
   faVolume,
   faShuffle,
-  faPlay,
+  // faPlay,
   faBrainCircuit,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AppUiContext } from "../../contexts/AppUiContext";
-import { APPUI_ACTION_TYPES } from "../../reducers";
+import { AppUiContext } from "~/contexts/AppUiContext";
+import { APPUI_ACTION_TYPES } from "~/reducers";
 import { 
   Button,
   H2,

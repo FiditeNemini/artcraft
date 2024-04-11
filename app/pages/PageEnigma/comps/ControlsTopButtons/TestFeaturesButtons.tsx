@@ -1,9 +1,9 @@
 import { useContext } from "react";
 import { Button, } from "~/components";
 import { ClipGroup } from "~/pages/PageEnigma/models/track";
-import { APPUI_ACTION_TYPES } from "../../reducers";
-import { AppUiContext } from "../../contexts/AppUiContext";
-import { EngineContext } from "../../contexts/EngineContext";
+import { APPUI_ACTION_TYPES } from "~/reducers";
+import { AppUiContext } from "~/contexts/AppUiContext";
+import { EngineContext } from "~/contexts/EngineContext";
 
 export const TestFeaturesButtons = ({debug}:{debug:boolean})=>{
   if (!debug) return null;

@@ -14,9 +14,10 @@ import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 interface LowerPanelPropsI {
   children: React.ReactNode;
+  onStyle?: boolean;
 }
 
-export const LowerPanel = ({ children }: LowerPanelPropsI) => {
+export const LowerPanel = ({ children, onStyle }: LowerPanelPropsI) => {
   const { onPointerDown } = useMouseEventsTimeline();
 
   const displayHeight =
@@ -50,18 +51,21 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
 
   return (
     <>
-      <div
-        className="absolute w-full cursor-ns-resize bg-ui-panel-border"
-        style={{ height: 3, zIndex: 1000, bottom: displayHeight }}
-        onPointerDown={onPointerDown}
-      />
+      {!onStyle && (
+        <div
+          className="absolute w-full cursor-ns-resize bg-ui-panel-border"
+          style={{ height: 3, zIndex: 1000, bottom: displayHeight }}
+          onPointerDown={onPointerDown}
+        />
+      )}
       <div
         className={[
           "absolute bottom-0",
-          "w-screen overflow-auto",
+          "w-screen",
+          onStyle ? "overflow-x-auto overflow-y-hidden" : "overflow-auto",
           "bg-ui-panel",
         ].join(" ")}
-        style={{ height: displayHeight }}
+        style={{ height: onStyle ? 80 : displayHeight }}
         onPointerOver={() => {
           overTimeline.value = true;
         }}

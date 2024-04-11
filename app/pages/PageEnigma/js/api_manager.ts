@@ -348,7 +348,7 @@ export class APIManager {
     positive_prompt: string,
     negative_prompt: string,
   ): Promise<string> {
-    const url = `https://funnel.tailce84f.ts.net/preview/`;
+    const url = 'http://207.189.112.61:31605/preview';
 
     const payload = {
       style: style,
@@ -357,7 +357,7 @@ export class APIManager {
     };
 
     const formData = new FormData();
-    formData.append("video", blob, fileName);
+    formData.append("input_file", blob, fileName);
     formData.append("request", JSON.stringify(payload));
 
     const response = await fetch(url, {

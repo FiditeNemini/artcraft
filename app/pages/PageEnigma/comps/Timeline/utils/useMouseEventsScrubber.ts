@@ -31,8 +31,6 @@ export const useMouseEventsScrubber = () => {
       }
     };
 
-    console.log("scroll", currentScroll.value);
-
     const onMouseMove = (event: MouseEvent) => {
       const delta = Math.round(
         (event.clientX - clientX) / 4 / scale.value + currentTime.value,

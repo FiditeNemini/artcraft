@@ -402,6 +402,7 @@ export class TimeLine {
   public async deletePlayableClip(clip_uuid: string): Promise<void> {}
 
   public async scrub(data: any): Promise<void> {
+    console.log('Scrubby Scrubby');
     if (this.is_playing) {
       return;
     }
@@ -537,10 +538,10 @@ export class TimeLine {
             await this.animation_engine.clips[
               object.uuid + element.media_id
             ].play(object);
-            let fps = 120;
-            if (isRendering) {
-              fps = 60;
-            }
+            let fps = 60;
+            //if (isRendering) {
+            //  fps = 60;
+            //}
             this.animation_engine.clips[object.uuid + element.media_id].step(
               this.scrubber_frame_position / fps, // Double FPS for best result.
             );

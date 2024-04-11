@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import { Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
-import { EngineContext } from "../../contexts/EngineContext";
-import { ToasterContext } from "~/pages/PageEnigma/contexts/ToasterContext";
-// import { APPUI_ACTION_TYPES } from "~/pages/PageEnigma/reducers";
+import { EngineContext } from "../../../../contexts/EngineContext";
+import { ToasterContext } from "~/contexts/ToasterContext";
+// import { APPUI_ACTION_TYPES } from "app/reducers";
 
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
 
@@ -20,7 +20,7 @@ export const ControlsTopButtons = () => {
   const handleButtonSave = async () => {
     console.log(`SceneName is ${sceneName}`);
     const sceneMediaToken = await editorEngine?.saveScene(sceneName);
-    if(sceneMediaToken){
+    if (sceneMediaToken) {
       addToast("success", sceneMediaToken);
     }
   };

@@ -15,16 +15,18 @@ import tailwindCss from "./styles/tailwind.css?url";
 import baseCss from "./styles/base.css?url";
 
 import { LoadingDotsBricks } from "~/components";
-import { TopBar } from "./modules/TopBar";
-import { TopBarInnerContext } from "~/contexts/TopBarInner";
 import { AuthenticationProvider } from "./contexts/Authentication";
-import { ToasterProvider } from "~/pages/PageEnigma/contexts/ToasterContext";
+import { ToasterProvider } from "~/contexts/ToasterContext";
 
 // The following import prevents a Font Awesome icon server-side rendering bug,
 // where the icons flash from a very large icon down to a properly sized one:
-import '@fortawesome/fontawesome-svg-core/styles.css';
+import "@fortawesome/fontawesome-svg-core/styles.css";
 // Prevent fontawesome from adding its CSS since we did it manually above:
-import { config } from '@fortawesome/fontawesome-svg-core';
+import { config } from "@fortawesome/fontawesome-svg-core";
+import { useSignals } from "@preact/signals-react/runtime";
+import { pageHeight, pageWidth } from "~/store";
+import { sidePanelWidth, timelineHeight } from "~/pages/PageEnigma/store";
+import { AppUIProvider } from "~/contexts/AppUiContext";
 config.autoAddCss = false; /* eslint-disable import/first */
 
 export const links: LinksFunction = () => [
@@ -65,6 +67,25 @@ export default function App() {
     setTimeout(() => setShowLoader(false), 2500);
   }, []);
 
+  useSignals();
+  useEffect(() => {
+    function setPage() {
+      // TODO address this issue with zooming
+      pageHeight.value = window.innerHeight;
+      pageWidth.value = window.innerWidth;
+    }
+    timelineHeight.value = window.innerHeight * 0.25;
+    sidePanelWidth.value = 443;
+
+    setPage();
+
+    window.addEventListener("resize", setPage);
+
+    return () => {
+      window.removeEventListener("resize", setPage);
+    };
+  }, []);
+
   return (
     <html lang="en">
       <head>
@@ -78,16 +99,10 @@ export default function App() {
         <CookiesProvider defaultSetOptions={{ path: "/" }}>
           <AuthenticationProvider>
             <ToasterProvider>
-              <TopBarInnerContext.Provider
-                value={{
-                  TopBarInner: topBarInnerComponent,
-                  setTopBarInner: setTopBarInnerComponent,
-                }}
-              >
+              <AppUIProvider>
                 <div className="topbar-spacer" />
                 <Outlet />
-                <TopBar />
-              </TopBarInnerContext.Provider>
+              </AppUIProvider>
             </ToasterProvider>
           </AuthenticationProvider>
         </CookiesProvider>

@@ -1,152 +1,35 @@
-import { useContext, useState } from "react";
-import { faSparkles } from "@fortawesome/pro-solid-svg-icons";
+import { useContext, useEffect, useState } from "react";
 
-import { Button, LoadingBar, LoadingDots } from "~/components";
-import { TopBarHelmet } from "~/modules/TopBarHelmet/TopBarHelmet";
-import { SidePanel } from "~/modules/SidePanel";
-
-import { Controls3D } from "./comps/Controls3D";
-import { ControlsTopButtons } from "./comps/ControlsTopButtons";
-import { ControlsVideo } from "./comps/ControlsVideo";
-import { ControlPanelSceneObject } from "./comps/ControlPanelSceneObject";
-import { DialogueTTS } from "./comps/DialogueTTS/DialogueTTS";
-import { PreviewEngineCamera } from "./comps/PreviewEngineCamera";
-import { ViewSideBySide } from "./comps/ViewSideBySide";
-import { Timeline } from "./comps/Timeline";
-
-import { APPUI_VIEW_MODES } from "./reducers";
-import {
-  timelineHeight,
-  sidePanelWidth,
-  pageWidth,
-  sidePanelVisible,
-  pageHeight,
-  dndSidePanelWidth,
-  dndTimelineHeight,
-} from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
-import { AppUiContext } from "~/pages/PageEnigma/contexts/AppUiContext";
-import { EngineContext } from "./contexts/EngineContext";
+import { AppUiContext } from "~/contexts/AppUiContext";
+import { EngineContext } from "~/contexts/EngineContext";
+import { PageEditor } from "~/pages/PageEnigma/PageEditor";
+import { PageStyling } from "~/pages/PageEnigma/PageStyling";
 
 export const PageEnigmaComponent = () => {
   useSignals();
 
-  const editorEngine = useContext(EngineContext);
-  const [appUiState] = useContext(AppUiContext);
+  const [, dispatchAppUiState] = useContext(AppUiContext);
+  const editor = useContext(EngineContext);
+  const [page, setPage] = useState("edit");
 
-  //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
-  const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-  };
-
-  const handleGenerateMovieClick = () => {
-    if (editorEngine != null) {
-      editorEngine?.generateVideo();
-    } else {
-      console.log("Tried to generate movie but editor was null");
+  useEffect(() => {
+    if (editor && editor.can_initialize && dispatchAppUiState !== null) {
+      console.log("initializing Editor");
+      editor.initialize({
+        dispatchAppUiState,
+      });
     }
-  };
-
-  const dndWidth =
-    dndSidePanelWidth.value > -1
-      ? dndSidePanelWidth.value
-      : sidePanelWidth.value;
-  const width = sidePanelVisible.value
-    ? pageWidth.value - dndWidth - 66
-    : pageWidth.value - 66;
-  const height =
-    dndTimelineHeight.value > -1
-      ? pageHeight.value - dndTimelineHeight.value - 68
-      : pageHeight.value - timelineHeight.value - 68;
+  }, [editor, dispatchAppUiState]);
 
   return (
-    <div className="w-screen">
-      <TopBarHelmet>
-        <Button icon={faSparkles} onClick={handleGenerateMovieClick}>
-          Generate Movie
-        </Button>
-      </TopBarHelmet>
-      <div
-        className="relative flex w-screen"
-        style={{ height: "calc(100vh - 68px)" }}
-      >
-        {/* Engine section/side panel */}
-        <div
-          id="engine-n-panels-wrapper"
-          className="flex"
-          style={{
-            height,
-            width,
-          }}
-        >
-          <div className="relative w-full overflow-hidden bg-transparent">
-            <div
-              className={
-                appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE
-                  ? "invisible"
-                  : ""
-              }
-            >
-              <canvas id="video-scene" width="1280px" height="720px" />
-
-              {/* Top controls */}
-              <div
-                className="absolute left-0 top-0 w-full"
-                onClick={handleOverlayClick}
-              >
-                <div className="grid grid-cols-3 gap-4">
-                  <ControlsTopButtons />
-                  <Controls3D />
-                </div>
-              </div>
-
-              {/* Bottom controls */}
-              <div
-                className="absolute bottom-0 left-0"
-                style={{
-                  width:
-                    pageWidth.value -
-                    (sidePanelVisible.value ? sidePanelWidth.value : 0) -
-                    84,
-                }}
-                onClick={handleOverlayClick}
-              >
-                <PreviewEngineCamera />
-                <ControlsVideo />
-                <ControlPanelSceneObject />
-                <DialogueTTS />
-              </div>
-            </div>
-            {appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE && (
-              <ViewSideBySide />
-            )}
-            <LoadingDots
-              className="absolute left-0 top-0"
-              isShowing={appUiState.showEditorLoader.isShowing}
-              type="bricks"
-              message={appUiState.showEditorLoader.message}
-            />
-            <LoadingBar
-              id="editor-loading-bar"
-              wrapperClassName="absolute top-0 left-0"
-              innerWrapperClassName="max-w-screen-sm"
-              isShowing={appUiState.showEditorLoadingBar.isShowing}
-              message={appUiState.showEditorLoadingBar.message}
-              label={appUiState.showEditorLoadingBar.label}
-              progress={appUiState.showEditorLoadingBar.progress}
-            />
-          </div>
-        </div>
-        {/* Side panel */}
-        <div onClick={handleOverlayClick}>
-          <SidePanel />
-        </div>
+    <>
+      <div className={page === "edit" ? "visible" : "hidden"}>
+        <PageEditor setPage={setPage} />
       </div>
-
-      {/* Timeline */}
-      <div onClick={handleOverlayClick}>
-        <Timeline />
+      <div className={page === "style" ? "visible" : "hidden"}>
+        <PageStyling setPage={setPage} />
       </div>
-    </div>
+    </>
   );
 };

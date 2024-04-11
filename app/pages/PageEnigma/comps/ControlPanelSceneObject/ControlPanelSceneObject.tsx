@@ -7,12 +7,12 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { AppUiContext } from "../../contexts/AppUiContext";
-import { EngineContext } from "../../contexts/EngineContext";
+import { AppUiContext } from "../../../../contexts/AppUiContext";
+import { EngineContext } from "../../../../contexts/EngineContext";
 import { Button, H5, InputVector } from "~/components";
 
 import { XYZ } from "../../datastructures/common";
-import { ACTION_TYPES } from "../../reducers/appUiReducer/types";
+import { ACTION_TYPES } from "~/reducers/appUiReducer/types";
 
 import { QueueNames } from "../../Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";

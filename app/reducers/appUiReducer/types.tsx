@@ -1,5 +1,5 @@
-import { Simple3DVector } from "../../datastructures/common";
-import { AssetType, ClipGroup } from "../../models";
+import { Simple3DVector } from "../../pages/PageEnigma/datastructures/common";
+import { AssetType, ClipGroup } from "../../pages/PageEnigma/models";
 export enum VIEW_MODES {
   EDITOR = "editor",
   SIDE_BY_SIDE = "side-by-side",

@@ -3,9 +3,9 @@ import { twMerge } from "tailwind-merge";
 import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 import { faCirclePlus, faArrowsRotate } from "@fortawesome/pro-solid-svg-icons";
 
-import { AppUiContext } from "~/pages/PageEnigma/contexts/AppUiContext";
+import { AppUiContext } from "~/contexts/AppUiContext";
 import { AuthenticationContext } from "~/contexts/Authentication";
-import { APPUI_ACTION_TYPES } from "~/pages/PageEnigma/reducers";
+import { APPUI_ACTION_TYPES } from "~/reducers";
 import { audioFilter, audioItems } from "~/pages/PageEnigma/store";
 import { AssetFilterOption } from "~/pages/PageEnigma/models";
 

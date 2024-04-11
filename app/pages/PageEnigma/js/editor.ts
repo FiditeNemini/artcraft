@@ -21,7 +21,7 @@ import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
-import { APPUI_ACTION_TYPES } from "../reducers";
+import { APPUI_ACTION_TYPES } from "../../../reducers";
 import { ClipGroup } from "~/pages/PageEnigma/models/track";
 
 import { XYZ } from "../datastructures/common";
@@ -90,6 +90,8 @@ class Editor {
   current_scene_glb_media_token: string | null;
 
   can_initialize: boolean;
+  switchPreviewToggle: boolean;
+
   dispatchAppUiState: any; // todo figure out the type
   render_width: number;
   render_height: number;
@@ -150,6 +152,7 @@ class Editor {
     this.last_selected;
     this.transform_interaction;
     this.rendering = false;
+    this.switchPreviewToggle = false;
     // API.
     this.api_manager = new APIManager();
     // Debug & Movement.
@@ -366,7 +369,7 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() {}
+  public async testTestTimelineEvents() { }
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -679,8 +682,6 @@ class Editor {
       if (this.timeline.is_playing == false) {
         this.stopPlayback();
         this.playback_location = 0;
-        this.rendering = false;
-        this.switchCameraView();
         this.onWindowResize();
       }
     }
@@ -805,10 +806,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-        startTime * 1000 +
-        "|" +
-        startTime * 1000 +
-        "[a1];[0:a][a1]amix=inputs=2[a]",
+      startTime * 1000 +
+      "|" +
+      startTime * 1000 +
+      "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -834,13 +835,13 @@ class Editor {
   }
 
   async stopPlayback(compile_audio: boolean = true) {
-    console.log(this.frames, this.frame_buffer.length);
-
-    this.renderMode();
 
     if (this.generating_preview) {
       return;
     }
+
+    this.rendering = false;
+
     this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
@@ -922,6 +923,32 @@ class Editor {
     console.log(result);
   }
 
+  switchPreview() {
+    if (this.switchPreviewToggle == false) {
+      this.switchPreviewToggle = true;
+      this.generateFrame();
+      if (this.cameraViewControls) {
+        this.cameraViewControls.enabled = false;
+      }
+    }
+  }
+
+  switchEdit() {
+    if (this.switchPreviewToggle == true) {
+      this.switchPreviewToggle = false;
+      this.canvasRenderCamReference = document.getElementById("camera-view");
+      this.rawRenderer = new THREE.WebGLRenderer({
+        antialias: false,
+        canvas: this.canvasRenderCamReference,
+        preserveDrawingBuffer: true,
+      });
+      if (this.camera_person_mode == true) {
+        this.switchCameraView();
+      }
+      this.activeScene.renderMode(false);
+    }
+  }
+
   async generateFrame() {
     if (this.renderer && !this.generating_preview) {
       this.removeTransformControls();
@@ -944,54 +971,55 @@ class Editor {
       this.activeScene.renderMode(false);
       this.onWindowResize();
 
-      const rawPreview: HTMLVideoElement | null = document.getElementById(
-        "raw-preview",
-      ) as HTMLVideoElement;
-      if (rawPreview) {
-        rawPreview.src = imgData;
-
-        const ffmpeg = createFFmpeg({ log: false });
-        await ffmpeg.load();
-        await ffmpeg.FS("writeFile", `render.png`, await fetchFile(imgData));
-        await ffmpeg.run("-i", `render.png`, "render.mp4");
-        const output = await ffmpeg.FS("readFile", "render.mp4");
-        const blob = new Blob([output.buffer], { type: "video/mp4" });
-
-        const url = await this.api_manager.uploadMediaFrameGeneration(
-          blob,
-          "render.mp4",
-          this.art_style,
-          this.positive_prompt,
-          this.negative_prompt,
-        );
-        console.log(url);
-
-        const stylePreview: HTMLVideoElement | null = document.getElementById(
-          "stylized-preview",
-        ) as HTMLVideoElement;
-        if (stylePreview) {
-          stylePreview.src = url;
-          stylePreview.width = rawPreview.width;
-          stylePreview.height = rawPreview.height;
-        } else {
-          console.log("No style preview window.");
-        }
-
-        this.generating_preview = false;
-
-        return new Promise((resolve, reject) => {
-          resolve(url);
-        });
-      } else {
-        console.log("No raw preview window.");
+      this.canvasRenderCamReference = document.getElementById("raw-preview");
+      this.rawRenderer = new THREE.WebGLRenderer({
+        antialias: false,
+        canvas: this.canvasRenderCamReference,
+        preserveDrawingBuffer: true,
+      });
+      if (this.camera_person_mode == false) {
+        this.switchCameraView();
       }
+      this.activeScene.renderMode(true);
+
+      const ffmpeg = createFFmpeg({ log: false });
+      await ffmpeg.load();
+      await ffmpeg.FS("writeFile", `render.png`, await fetchFile(imgData));
+      await ffmpeg.run("-i", `render.png`, "render.mp4");
+      const output = await ffmpeg.FS("readFile", "render.mp4");
+      const blob = new Blob([output.buffer], { type: "video/mp4" });
+
+      const url = await this.api_manager.uploadMediaFrameGeneration(
+        blob,
+        "render.mp4",
+        this.art_style,
+        this.positive_prompt,
+        this.negative_prompt,
+      );
+      console.log(url);
+
+      const stylePreview: HTMLVideoElement | null = document.getElementById(
+        "styled-preview",
+      ) as HTMLVideoElement;
+      if (stylePreview) {
+        stylePreview.src = url;
+      } else {
+        console.log("No style preview window.");
+      }
+
+      this.generating_preview = false;
+
+      return new Promise((resolve, reject) => {
+        resolve(url);
+      });
+
       this.generating_preview = false;
     }
   }
 
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
-    console.log("Generating video...");
+    console.log("Generating video...", this.frame_buffer);
     if (this.rendering || this.generating_preview) {
       return;
     }

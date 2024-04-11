@@ -2,9 +2,6 @@ import { signal, computed } from "@preact/signals-core";
 import { characterGroups } from "~/pages/PageEnigma/store/characterGroups";
 import { objectGroup } from "~/pages/PageEnigma/store/objectGroup";
 
-export const pageHeight = signal(0);
-export const pageWidth = signal(0);
-
 // timeline
 export const scale = signal(1);
 export const filmLength = signal(12);
