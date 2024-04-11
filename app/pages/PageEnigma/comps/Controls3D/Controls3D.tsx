@@ -20,6 +20,30 @@ export const Controls3D = () => {
   const handlePlus = () => {
     console.log("Controls 3D: Plus button clicked");
   };
+  const handleCube = () => {
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
+    editorEngine.create_parim("Box");
+  };
+  const handleCylinder = () => {
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
+    editorEngine.create_parim("Cylinder");
+  };
+  const handleTorus = () => {
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
+    editorEngine.create_parim("Donut");
+  };
+  const handleSphere = () => {
+    if (editorEngine == null || editorEngine == undefined) {
+      return;
+    }
+    editorEngine.create_parim("Sphere");
+  };
   const handleMoveArrows = () => {
     if (!editorEngine) {
       return;
@@ -67,6 +91,15 @@ export const Controls3D = () => {
         <div className="rounded-b-lg border-x border-b border-ui-panel-border bg-ui-controls p-2 text-white">
           <div className="flex items-center justify-center gap-2">
             <ButtonIcon icon={faPlus} onClick={handlePlus} hoverFill={true} />
+
+            <span className="h-4 w-0 border-l border-white/[0.15]" />
+
+            <div className="flex gap-1">
+              <ButtonIcon icon={faCube} onClick={handleCube} />
+              <ButtonIcon icon={fa3dCylinder} onClick={handleCylinder} />
+              <ButtonIcon icon={fa3dTorus} onClick={handleTorus} />
+              <ButtonIcon icon={fa3dSphere} onClick={handleSphere} />
+            </div>
 
             <span className="h-4 w-0 border-l border-white/[0.15]" />
 
