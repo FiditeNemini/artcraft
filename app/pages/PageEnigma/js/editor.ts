@@ -215,7 +215,12 @@ class Editor {
     );
   }
 
-  initialize(config: any) {
+  isEmpty(value:string) {
+    return (value == null || (typeof value === "string" && value.trim().length === 0));
+  }
+  
+  initialize(config: any,sceneToken) {
+
     //setup reactland Callbacks
     this.dispatchAppUiState = config.dispatchAppUiState;
 
@@ -346,6 +351,10 @@ class Editor {
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
 
+    if (this.isEmpty(sceneToken) == false) {
+      this.loadScene(sceneToken)
+    }
+    
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
       payload: {
