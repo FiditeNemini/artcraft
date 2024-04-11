@@ -30,7 +30,7 @@ export const Textarea = ({
       <textarea
         id={id ? id : label ? kebabCase(label) : undefined}
         className={twMerge(
-          "rounded-lg border border-ui-panel-border bg-ui-controls p-3",
+          "rounded-lg border border-ui-panel-border bg-ui-controls px-3 py-2",
           className,
         )}
         style={{
