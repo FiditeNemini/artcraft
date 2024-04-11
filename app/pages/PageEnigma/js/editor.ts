@@ -101,6 +101,8 @@ class Editor {
   art_style: ArtStyle;
 
   last_scrub: number;
+  record_stream: any | undefined;
+  recorder: MediaRecorder | undefined;
   // Default params.
 
   // scene proxy for serialization
@@ -676,15 +678,26 @@ class Editor {
     }
 
     if (this.rendering && this.rawRenderer && this.clock) {
-      this.frames += 1;
-      this.playback_location++;
-      const imgData = this.rawRenderer.domElement.toDataURL();
-      this.frame_buffer.push(imgData);
+      if (this.recorder == undefined) {
+        this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 30 FPS
+        this.recorder = new MediaRecorder(this.record_stream, { mimeType: 'video/webm' });
+        this.recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            this.frame_buffer.push(event.data);
+            this.frames += 1;
+            this.playback_location++;
+          }
+        };
+        this.recorder.onstop = () => {
+          this.stopPlayback();
+        }
+        this.recorder.start();
+      }
+
       this.render_timer += this.clock.getDelta();
       if (this.timeline.is_playing == false) {
-        this.stopPlayback();
+        this.recorder.stop();
         this.playback_location = 0;
-        this.onWindowResize();
       }
     }
   }
@@ -737,7 +750,7 @@ class Editor {
     }
 
     if (this.timeline.is_playing) {
-      const changeView = await this.timeline.update(this.rendering);
+      const changeView = await this.timeline.update(delta_time, this.rendering);
       if (changeView) {
         this.switchCameraView();
       }
@@ -837,24 +850,46 @@ class Editor {
   }
 
   async stopPlayback(compile_audio: boolean = true) {
-    let video_fps = Math.floor(this.frames * (this.cap_fps / this.timeline.timeline_limit));
+    //let video_fps = Math.floor(this.frames * (this.cap_fps / this.timeline.timeline_limit));
+    //console.log("Video FPS:", video_fps)
     this.rendering = false;
+
+    console.log(this.frame_buffer);
+
+
+    const videoBlob = new Blob(this.frame_buffer, { type: 'video/webm' });
+    const videoURL = URL.createObjectURL(videoBlob);
+    //const arrayBuffer = await videoBlob.arrayBuffer();
+    //const uint8Array = new Uint8Array(arrayBuffer);
+  
+    // Create an anchor element
+    let a = document.createElement('a');
+    a.href = videoURL;
+    a.download = 'video.mp4'; // Name of the downloaded file
+    document.body.appendChild(a);
+    a.click(); // Trigger the download
+
+
     this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
-    for (let index = 0; index < this.frame_buffer.length; index++) {
-      const element = this.frame_buffer[index];
-      await ffmpeg.FS(
-        "writeFile",
-        `image${index}.png`,
-        await fetchFile(element),
-      );
-    }
+
+    //for (let index = 0; index < this.frame_buffer.length; index++) {
+    //  const element = this.frame_buffer[index];
+    //  await ffmpeg.FS(
+    //    "writeFile",
+    //    `image${index}.jpg`,
+    //    await fetchFile(element),
+    //  );
+    //}
+
+
+    // Write the Uint8Array to the FFmpeg file system
+    ffmpeg.FS('writeFile', 'input.webm', await fetchFile(videoURL));
+
     await ffmpeg.run(
-      "-framerate",
-      "" + video_fps,
       "-i",
-      "image%d.png",
+      "input.webm",
       "-f",
       "lavfi",
       "-i",
@@ -915,6 +950,7 @@ class Editor {
     // {"success":true,"inference_job_token":"jinf_j3nbqbd15wqxb0xcks13qh3f3bz"}
 
     console.log(result);
+    this.recorder = undefined;
   }
 
   switchPreview() {
@@ -1006,8 +1042,6 @@ class Editor {
       return new Promise((resolve, reject) => {
         resolve(url);
       });
-
-      this.generating_preview = false;
     }
   }
 
@@ -1032,13 +1066,13 @@ class Editor {
   startPlayback() {
     this.timeline.is_playing = true;
     this.timeline.scrubber_frame_position = 0;
+    if (!this.camera_person_mode) {
+      this.switchCameraView();
+    }
     if (this.activeScene.hot_items) {
       this.activeScene.hot_items.forEach((element) => {
         element.visible = false;
       });
-    }
-    if (!this.camera_person_mode) {
-      this.switchCameraView();
     }
   }
 

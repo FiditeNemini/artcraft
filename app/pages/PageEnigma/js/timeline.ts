@@ -471,7 +471,7 @@ export class TimeLine {
   }
 
   // called by the editor update loop on each frame
-  public async update(isRendering = false): Promise<boolean> {
+  public async update(delta: number, isRendering = false): Promise<boolean> {
     //if (this.is_playing === false) return; // start and stop
     this.timeline_limit = this.getEndPoint();
     if (this.is_playing) {
