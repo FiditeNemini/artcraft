@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { useParams } from "@remix-run/react";
 
 import { LoadingBar, LoadingDots } from "~/components";
 import { SidePanel } from "~/modules/SidePanel";
@@ -31,6 +32,10 @@ interface Props {
 
 export const PageEditor = ({ setPage }: Props) => {
   useSignals();
+
+  // get scene token for editor is it is provided
+  const params = useParams();
+  console.log(params);
 
   const [appUiState] = useContext(AppUiContext);
 
