@@ -90,7 +90,7 @@ export const Controls3D = () => {
       <div className="flex justify-center">
         <div className="rounded-b-lg border-x border-b border-ui-panel-border bg-ui-controls p-2 text-white">
           <div className="flex items-center justify-center gap-2">
-            <ButtonIcon icon={faPlus} onClick={handlePlus} fill={true} />
+            <ButtonIcon icon={faPlus} onClick={handlePlus} hoverFill={true} />
 
             <span className="h-4 w-0 border-l border-white/[0.15]" />
 
