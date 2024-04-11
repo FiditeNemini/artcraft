@@ -40,7 +40,7 @@ export const ListAudioByUser = async(username:string) => {
     headers: {
       "Accept": "application/json",
     },
-    credentials: 'include'
+    // credentials: 'include'
   })
   .then(res => res.json())
   .then(res => { 

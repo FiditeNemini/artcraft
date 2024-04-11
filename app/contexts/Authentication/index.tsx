@@ -1,4 +1,5 @@
-import { AuthenticationContext, AuthenticationProvider } from "./Authentication";
+import { AuthenticationContext, } from "./AuthenticationContext";
+import { AuthenticationProvider } from "./AuthenticationProvider";
 import { UserInfo, AUTH_STATUS } from "./types";
 
 

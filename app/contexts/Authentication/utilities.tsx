@@ -21,7 +21,7 @@ export const CreateSession = async ({
       "Accept": "application/json",
       "Content-Type": "application/json",
     },
-    credentials: 'include',
+    // credentials: 'include',
     body: JSON.stringify(request)
   })
   .then(res => res.json())
@@ -39,7 +39,7 @@ export const GetSession = async () => {
     headers: {
       'Accept': 'application/json',
     },
-    credentials: 'include',
+    // credentials: 'include',
   })
   .then(res => res.json())
   .then(res => {
@@ -59,7 +59,7 @@ export async function DestroySession() : Promise<boolean> {
     headers: {
       'Accept': 'application/json',
     },
-    credentials: 'include',
+    // credentials: 'include',
   })
   .then(res => res.json())
   .then(res => {
