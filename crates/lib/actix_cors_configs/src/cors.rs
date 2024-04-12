@@ -55,7 +55,8 @@ fn do_build_cors_config(is_production: bool) -> Cors {
         actix_http::header::ACCESS_CONTROL_ALLOW_ORIGIN, // Tabulator Ajax
         actix_http::header::CONTENT_TYPE,
         actix_http::header::ACCESS_CONTROL_ALLOW_CREDENTIALS, // https://stackoverflow.com/a/46412839
-        actix_http::header::HeaderName::from_static("x-requested-with") // Tabulator Ajax sends
+        actix_http::header::HeaderName::from_static("x-requested-with"), // Tabulator Ajax sends
+        actix_http::header::HeaderName::from_static("session"), // Custom header sent by Three.js Storyteller Studio
       ])
       .max_age(3600)
 }
