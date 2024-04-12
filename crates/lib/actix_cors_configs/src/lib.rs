@@ -23,6 +23,7 @@ pub mod cors;
 pub mod shared_array_buffer_cors;
 
 pub (crate) mod configs;
+pub (crate) mod util;
 
 #[cfg(test)]
 pub (crate) mod testing;

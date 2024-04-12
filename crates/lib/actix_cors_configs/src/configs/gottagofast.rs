@@ -1,33 +1,13 @@
 use actix_cors::Cors;
-use log::warn;
-use url::{Host, Url};
+use crate::util::netlify_branch_domain_matches::netlify_branch_domain_matches;
 
 pub fn add_gotta_go_fast_test_branches(cors: Cors, _is_production: bool) -> Cors {
   cors.allowed_origin("http://localhost:5173")
-      .allowed_origin("https://pipeline-gottagofast.netlify.app")
-      .allowed_origin("https://test--pipeline-gottagofast.netlify.app")
-      // Allow Netlify domains within "gottagofast" project.
       .allowed_origin_fn(|origin, _req_head| {
-        let maybe_url = origin.to_str()
-            .map(|origin| Url::parse(origin));
-
-        let url = match maybe_url {
-          Ok(Ok(url)) => url,
-          _ => {
-            warn!("Invalid origin: {:?}", origin);
-            return false
-          },
-        };
-
-        match url.host() {
-          Some(Host::Domain(domain)) => {
-            let is_netlify_domain = domain == "pipeline-gottagofast.netlify.app";
-            let is_netlify_branch_deploy = domain.ends_with("--pipeline-gottagofast.netlify.app");
-
-            is_netlify_domain || is_netlify_branch_deploy
-          },
-          _ => false,
-        }
+        netlify_branch_domain_matches(origin, "pipeline-gottagofast.netlify.app")
+      })
+      .allowed_origin_fn(|origin, _req_head| {
+        netlify_branch_domain_matches(origin, "storytellerstudio.netlify.app")
       })
 }
 
@@ -39,27 +19,60 @@ mod tests {
   use crate::testing::assert_origin_invalid;
   use crate::testing::assert_origin_ok;
 
-  #[actix_rt::test]
-  async fn gotta_go_fast_main() {
-    let production_cors = build_cors_config(ServerEnvironment::Production);
-    assert_origin_ok(&production_cors, "https://pipeline-gottagofast.netlify.app").await;
+  mod gotta_go_fast {
+    use super::*;
+
+    #[actix_rt::test]
+    async fn gotta_go_fast_main() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_ok(&production_cors, "https://pipeline-gottagofast.netlify.app").await;
+    }
+
+    #[actix_rt::test]
+    async fn gotta_go_fast_branch_deploy() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_ok(&production_cors, "https://test--pipeline-gottagofast.netlify.app").await;
+    }
+
+    #[actix_rt::test]
+    async fn gotta_go_fast_deploy_preview() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_ok(&production_cors, "https://deploy-preview-86--pipeline-gottagofast.netlify.app").await;
+    }
+
+    #[actix_rt::test]
+    async fn invalid_netlify_preview_deploy() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_invalid(&production_cors, "https://deploy-preview-86--unrelated-project.netlify.app").await;
+    }
   }
 
-  #[actix_rt::test]
-  async fn gotta_go_fast_branch_deploy() {
-    let production_cors = build_cors_config(ServerEnvironment::Production);
-    assert_origin_ok(&production_cors, "https://test--pipeline-gottagofast.netlify.app").await;
-  }
+  mod studio {
+    use super::*;
 
-  #[actix_rt::test]
-  async fn gotta_go_fast_deploy_preview() {
-    let production_cors = build_cors_config(ServerEnvironment::Production);
-    assert_origin_ok(&production_cors, "https://deploy-preview-86--pipeline-gottagofast.netlify.app").await;
-  }
+    #[actix_rt::test]
+    async fn studio_main() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_ok(&production_cors, "https://storytellerstudio.netlify.app").await;
+    }
 
-  #[actix_rt::test]
-  async fn invalid_netlify_preview_deploy() {
-    let production_cors = build_cors_config(ServerEnvironment::Production);
-    assert_origin_invalid(&production_cors, "https://deploy-preview-86--unrelated-project.netlify.app").await;
+    #[actix_rt::test]
+    async fn studio_branch_deploy() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_ok(&production_cors, "https://foo--storytellerstudio.netlify.app").await;
+    }
+
+    #[actix_rt::test]
+    async fn studio_deploy_preview() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_ok(&production_cors, "https://deploy-preview-123--storytellerstudio.netlify.app").await;
+    }
+
+    #[actix_rt::test]
+    async fn invalid_netlify_preview_deploy() {
+      let production_cors = build_cors_config(ServerEnvironment::Production);
+      assert_origin_invalid(&production_cors, "https://fakestorytellerstudio.netlify.app").await;
+      assert_origin_invalid(&production_cors, "https://deploy-preview-86--fakestorytellerstudio.netlify.app").await;
+    }
   }
 }
