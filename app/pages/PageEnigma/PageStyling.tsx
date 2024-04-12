@@ -5,7 +5,7 @@ import {
   faArrowsRotate,
   faFilm,
 } from "@fortawesome/pro-solid-svg-icons";
-import { Button, Link } from "~/components";
+import { Button,LoadingBar } from "~/components";
 import { StyleSelection } from "~/pages/PageEnigma/comps/StyleSelection";
 import { LowerPanel } from "~/modules/LowerPanel";
 import { TimerGrid } from "~/pages/PageEnigma/comps/TimerGrid/TimerGrid";
@@ -18,10 +18,11 @@ import { EngineContext } from "~/contexts/EngineContext";
 interface Props {
   setPage: (page: string) => void;
 }
-
+import { AppUiContext } from "~/contexts/AppUiContext";
 export const PageStyling = ({ setPage }: Props) => {
   useSignals();
   const editorEngine = useContext(EngineContext);
+  const [appUiState] = useContext(AppUiContext);
 
   const generateFrame = async () => {
     await editorEngine?.generateFrame();
@@ -73,6 +74,15 @@ export const PageStyling = ({ setPage }: Props) => {
           </LowerPanel>
         </div>
       </div>
+      <LoadingBar
+              id="editor-loading-bar"
+              wrapperClassName="absolute top-0 left-0"
+              innerWrapperClassName="max-w-screen-sm"
+              isShowing={appUiState.showEditorLoadingBar.isShowing}
+              message={appUiState.showEditorLoadingBar.message}
+              label={appUiState.showEditorLoadingBar.label}
+              progress={appUiState.showEditorLoadingBar.progress}
+          />
     </div>
   );
 };
