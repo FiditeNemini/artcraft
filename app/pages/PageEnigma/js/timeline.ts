@@ -473,7 +473,6 @@ export class TimeLine {
   public async update(isRendering = false): Promise<boolean> {
     //if (this.is_playing === false) return; // start and stop
     this.timeline_limit = this.getEndPoint();
-    console.log(this.is_playing);
     if (this.is_playing) {
       this.current_time += 1; // This fixes fps issues at 60.
       this.pushEvent(fromEngineActions.UPDATE_TIME, {
