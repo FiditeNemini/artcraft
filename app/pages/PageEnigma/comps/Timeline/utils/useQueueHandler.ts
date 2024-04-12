@@ -40,31 +40,34 @@ export function useQueueHandler() {
   const { addKeyframe, clearExistingData, deleteObjectOrCharacter } =
     useContext(TrackContext);
 
-  const handleFromEngineActions = useCallback(({ action, data }: Arguments) => {
-    console.log("FROM ENGINE", action, data);
-    switch (action) {
-      case fromEngineActions.UPDATE_TIME:
-        currentTime.value = (data as UpdateTime).currentTime;
-        break;
-      case fromEngineActions.UPDATE_TIME_LINE:
-        clearExistingData();
-        (data as ClipUI[]).forEach((item) => {
-          LOADING_FUNCTIONS[item.group](item);
-        });
-        break;
-      case fromEngineActions.UPDATE_CHARACTER_ID: {
-        addNewCharacter(data as MediaItem);
-        break;
+  const handleFromEngineActions = useCallback(
+    ({ action, data }: Arguments) => {
+      console.log("FROM ENGINE", action, data);
+      switch (action) {
+        case fromEngineActions.UPDATE_TIME:
+          currentTime.value = (data as UpdateTime).currentTime;
+          break;
+        case fromEngineActions.UPDATE_TIME_LINE:
+          clearExistingData();
+          (data as ClipUI[]).forEach((item) => {
+            LOADING_FUNCTIONS[item.group](item);
+          });
+          break;
+        case fromEngineActions.UPDATE_CHARACTER_ID: {
+          addNewCharacter(data as MediaItem);
+          break;
+        }
+        case fromEngineActions.DELETE_OBJECT: {
+          // this could be an object or character
+          deleteObjectOrCharacter(data as MediaItem);
+          break;
+        }
+        default:
+          throw new Error(`Unknown action ${action}`);
       }
-      case fromEngineActions.DELETE_OBJECT: {
-        // this could be an object or character
-        deleteObjectOrCharacter(data as MediaItem);
-        break;
-      }
-      default:
-        throw new Error(`Unknown action ${action}`);
-    }
-  }, []);
+    },
+    [clearExistingData, deleteObjectOrCharacter],
+  );
 
   const handleToTimelineActions = useCallback(
     ({ action, data }: Arguments) => {
