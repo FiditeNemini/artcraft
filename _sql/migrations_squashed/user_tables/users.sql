@@ -155,6 +155,13 @@ CREATE TABLE users (
   -- cached_tts_rendered_counter INT(10) NOT NULL DEFAULT 0,
   -- cached_w2l_rendered_counter INT(10) NOT NULL DEFAULT 0,
 
+  -- ========== TRACKING ==========
+
+  -- Where the user signed up from
+  -- For now this will be "fakeyou" and "storyteller", but we may extend
+  -- or overload this to handle other cases or metadata.
+  maybe_source VARCHAR(255) DEFAULT NULL,
+
   -- ========== MODERATION DETAILS ==========
 
   -- Different than deleted.
