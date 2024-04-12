@@ -40,10 +40,10 @@ export const TrackKeyFrame = ({ keyframe, updateKeyframe }: Props) => {
           : "bg-keyframe-unselected",
       ].join(" ")}
       style={{
-        width: 18,
-        height: 18,
+        width: 14,
+        height: 14,
         left: displayOffset * 4 * scale.value - 6,
-        top: 8,
+        top: 11,
       }}
       onPointerDown={(event) => onPointerDown(event, "drag")}
       onClick={() => (selectedItem.value = keyframe)}

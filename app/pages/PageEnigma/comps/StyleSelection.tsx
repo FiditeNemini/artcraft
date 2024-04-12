@@ -46,55 +46,62 @@ export const StyleSelection = () => {
   };
 
   return (
-    <div className="flex h-[280px] w-[800px] flex-col gap-3 rounded-lg bg-ui-panel p-4">
+    <div className="flex flex-col gap-4 rounded-t-lg bg-ui-panel p-5">
       <div className="flex w-full flex-col">
         <Label>Select Base Style</Label>
-        <div
-          className="relative overflow-x-hidden"
-          style={{ width: 768, height: 80 }}
-        >
+        <div className="relative">
           <div
-            className="absolute flex gap-2"
-            style={{
-              width: styleList.length * 84 + 26,
-              left: scrollPosition * -86,
-              top: 0,
-            }}
+            className="relative overflow-x-hidden"
+            style={{ width: 768, height: 80 }}
           >
-            {styleList.map((style) => (
-              <ItemPicker
-                key={style.type}
-                label={style.label}
-                type={style.type}
-                selected={selection === style.type}
-                onSelected={handlePickingStylizer}
-                src={style.image}
-                width={80}
-                height={80}
-              />
-            ))}
+            <div
+              className="absolute flex gap-2 transition-all duration-300 ease-in-out"
+              style={{
+                width: styleList.length * 84 + 26,
+                left: scrollPosition * -86,
+                top: 0,
+              }}
+            >
+              {styleList.map((style) => (
+                <ItemPicker
+                  key={style.type}
+                  label={style.label}
+                  type={style.type}
+                  selected={selection === style.type}
+                  onSelected={handlePickingStylizer}
+                  src={style.image}
+                  width={80}
+                  height={80}
+                />
+              ))}
+            </div>
           </div>
           {scrollPosition > 0 && (
-            <div className="absolute left-3 top-5">
-              <ButtonIcon
-                icon={faAngleLeft}
-                onClick={() =>
-                  setScrollPosition(Math.max(scrollPosition - 6, 0))
-                }
-              />
+            <div className="pointer-events-none absolute left-[-10px] top-0 h-full w-12 bg-gradient-to-r from-ui-panel to-transparent">
+              <div className="flex h-full w-full items-center justify-start">
+                <ButtonIcon
+                  icon={faAngleLeft}
+                  onClick={() =>
+                    setScrollPosition(Math.max(scrollPosition - 6, 0))
+                  }
+                  className="pointer-events-auto h-6 w-6 rounded-full bg-white/80 text-gray-800/75 hover:bg-white/100 hover:text-gray-800"
+                />
+              </div>
             </div>
           )}
           {scrollPosition < styleList.length - 9 && (
-            <div className="absolute right-3 top-5">
-              <ButtonIcon
-                icon={faAngleRight}
-                onClick={() =>
-                  setScrollPosition(
-                    Math.min(scrollPosition + 6, styleList.length - 9),
-                  )
-                }
-                fill
-              />
+            <div className="pointer-events-none absolute right-[-10px] top-0 h-full w-12 bg-gradient-to-l from-ui-panel to-transparent">
+              <div className="flex h-full w-full items-center justify-end">
+                <ButtonIcon
+                  icon={faAngleRight}
+                  onClick={() =>
+                    setScrollPosition(
+                      Math.min(scrollPosition + 6, styleList.length - 9),
+                    )
+                  }
+                  className="pointer-events-auto h-6 w-6 rounded-full bg-white/80 text-gray-800/75 hover:bg-white/100 hover:text-gray-800"
+                />
+              </div>
             </div>
           )}
         </div>

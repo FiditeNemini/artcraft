@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { useParams } from "@remix-run/react";
 
 import { LoadingBar, LoadingDots } from "~/components";
 import { SidePanel } from "~/modules/SidePanel";

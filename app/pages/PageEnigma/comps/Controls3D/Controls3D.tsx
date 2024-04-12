@@ -59,9 +59,9 @@ export const Controls3D = ({ setPage }: Props) => {
   };
 
   const changeStylize = () => {
-    editorEngine?.switchPreview(); 
+    editorEngine?.switchPreview();
     setPage("style");
-  }
+  };
 
   const modes = [
     { value: "move", icon: faArrowsUpDownLeftRight },
@@ -73,13 +73,13 @@ export const Controls3D = ({ setPage }: Props) => {
     <div>
       <div className="flex justify-center">
         <div className="rounded-b-lg border-x border-b border-ui-panel-border bg-ui-controls p-2 text-white">
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-3">
             <ButtonIconSelect
               options={modes}
               onOptionChange={handleModeChange}
             />
 
-            <span className="h-4 w-0 border-l border-white/[0.15]" />
+            <span className="h-6 w-0 border-l border-white/[0.2]" />
 
             <Button variant="primary" onClick={() => changeStylize()}>
               Stylize <FontAwesomeIcon icon={faAngleRight} />
