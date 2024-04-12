@@ -970,17 +970,6 @@ class Editor {
     // Create a Blob from the output file for downloading
     const blob = new Blob([output.buffer], { type: "video/mp4" });
 
-    // Create a URL for the blob
-    const url = URL.createObjectURL(blob);
-
-    // Create an anchor element (<a>) and trigger the download
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "render.mp4"; // Set the file name for the download
-    document.body.appendChild(a); // Append the anchor to the document
-    a.click(); // Simulate a click on the anchor to trigger the download
-
-
     const data: any = await this.api_manager.uploadMedia(blob, "render.mp4");
 
     if (data == null) {
