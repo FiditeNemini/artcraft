@@ -931,9 +931,28 @@ class Editor {
     // Write the Uint8Array to the FFmpeg file system
     ffmpeg.FS('writeFile', 'input.webm', await fetchFile(videoURL));
 
+
     await ffmpeg.run(
       "-i",
       "input.webm",
+      "-vf",
+      "scale=516:290",
+      "-c:v",
+      "libx264",
+      "-preset",
+      "fast",
+      "-crf", 
+      "23",
+      "-c:a",
+      "aac",
+      "-b:a",
+      "192k",
+      "input.mp4",
+    );
+
+    await ffmpeg.run(
+      "-i",
+      "input.mp4",
       "-f",
       "lavfi",
       "-i",

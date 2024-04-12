@@ -94,7 +94,7 @@ export class TimeLine {
   }
 
   public async pushEvent(action: fromEngineActions, data: any) {
-    this.current_time += 1;
+    //this.current_time += 0.75;
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,
       action: fromEngineActions.UPDATE_TIME,
@@ -473,12 +473,14 @@ export class TimeLine {
   public async update(isRendering = false): Promise<boolean> {
     //if (this.is_playing === false) return; // start and stop
     this.timeline_limit = this.getEndPoint();
+    console.log(this.is_playing);
     if (this.is_playing) {
-      this.current_time += 60/this.timeline_limit; // This fixes fps issues at 60.
+      this.current_time += 1; // This fixes fps issues at 60.
       this.pushEvent(fromEngineActions.UPDATE_TIME, {
         currentTime: this.current_time,
       });
       this.scrubber_frame_position = this.current_time;
+      console.log(this.current_time, (120/this.timeline_limit)/4)
     }
 
     if (this.scrubber_frame_position <= 0) {
