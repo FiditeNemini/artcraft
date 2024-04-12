@@ -324,8 +324,6 @@ class Editor {
     this.activeScene.scene.add(this.control);
     // Resets canvas size.
     this.onWindowResize();
-    // Creates the main update loop.
-    this.renderer.setAnimationLoop(this.updateLoop.bind(this));
 
     this.timeline.scene = this.activeScene;
 
@@ -347,6 +345,11 @@ class Editor {
     this.current_scene_glb_media_token = null;
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
+
+    // Creates the main update loop.
+    //this.renderer.setAnimationLoop(this.updateLoop.bind(this));
+
+    this.updateLoop();
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
@@ -703,7 +706,11 @@ class Editor {
   }
 
   // Basicly Unity 3D's update loop.
-  async updateLoop(time: number) {
+  async updateLoop() {
+    setTimeout( () => {
+      requestAnimationFrame( this.updateLoop.bind(this) );
+    }, 1000 / this.cap_fps );
+
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
     }
@@ -750,7 +757,7 @@ class Editor {
     }
 
     if (this.timeline.is_playing) {
-      const changeView = await this.timeline.update(delta_time, this.rendering);
+      const changeView = await this.timeline.update(this.rendering);
       if (changeView) {
         this.switchCameraView();
       }
@@ -853,9 +860,6 @@ class Editor {
     //let video_fps = Math.floor(this.frames * (this.cap_fps / this.timeline.timeline_limit));
     //console.log("Video FPS:", video_fps)
     this.rendering = false;
-
-    console.log(this.frame_buffer);
-
 
     const videoBlob = new Blob(this.frame_buffer, { type: 'video/webm' });
     const videoURL = URL.createObjectURL(videoBlob);
