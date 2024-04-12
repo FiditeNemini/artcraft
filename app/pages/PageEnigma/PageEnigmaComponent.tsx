@@ -20,7 +20,7 @@ export const PageEnigmaComponent = () => {
         dispatchAppUiState,
       });
     }
-  }, [editor, dispatchAppUiState]);
+  }, []);
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { UIEvent, useCallback, useEffect, useState } from "react";
 import { LowerPanel } from "~/modules/LowerPanel";
 
 import { Camera } from "./Camera";
@@ -10,15 +10,21 @@ import {
   deleteCharacterClip,
   selectedItem,
   ignoreDelete,
+  timelineScrollX,
+  timelineScrollY,
+  filmLength,
+  scale,
 } from "~/pages/PageEnigma/store";
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 import { useSignals } from "@preact/signals-react/runtime";
-import { TimerGrid } from "~/pages/PageEnigma/comps/TimerGrid/TimerGrid";
+import { TimerGrid } from "~/pages/PageEnigma/comps/Timeline/TimerGrid";
 import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
 import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
 import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 import { Clip, Keyframe } from "~/pages/PageEnigma/models";
+import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders";
+import { pageWidth } from "~/store";
 
 function getItemType(item: Clip | Keyframe | null) {
   if (!item) {
@@ -31,6 +37,11 @@ export const Timeline = () => {
   useSignals();
   const [dialogOpen, setDialogOpen] = useState(false);
   const { deleteKeyframe } = useUpdateKeyframe();
+
+  const onScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
+    timelineScrollX.value = event.currentTarget.scrollLeft;
+    timelineScrollY.value = event.currentTarget.scrollTop;
+  }, []);
 
   // implement the code to handle incoming messages from the Engine
   useQueueHandler();
@@ -75,17 +86,39 @@ export const Timeline = () => {
     <>
       <LowerPanel>
         <TimerGrid />
-        <div className="p-4">
-          <Characters />
+        <div className="flex">
+          <div
+            className="mt-2 overflow-hidden"
+            style={{
+              width: 88,
+              height: timelineHeight.value - 54,
+            }}
+          >
+            <RowHeaders />
+          </div>
+          <div
+            className="mt-2 overflow-auto"
+            onScroll={onScroll}
+            style={{
+              width: pageWidth.value - 90,
+              height: timelineHeight.value - 54,
+            }}
+          >
+            <div
+              style={{ width: filmLength.value * 60 * 4 * scale.value + 32 }}
+            >
+              <Characters />
+              <div className="pb-4 pr-8">
+                <Camera />
+              </div>
+              <div className="pb-4 pr-8">
+                <Audio />
+              </div>
+              <ObjectGroups />
+            </div>
+          </div>
+          <Scrubber />
         </div>
-        <div className="p-4">
-          <Camera />
-        </div>
-        <div className="p-4">
-          <Audio />
-        </div>
-        <ObjectGroups />
-        <Scrubber />
       </LowerPanel>
       <ConfirmationModal
         title="Delete Clip"

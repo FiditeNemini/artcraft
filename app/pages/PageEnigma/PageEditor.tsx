@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 
 import { LoadingBar, LoadingDots } from "~/components";
 import { SidePanel } from "~/modules/SidePanel";
@@ -33,6 +33,11 @@ export const PageEditor = ({ setPage }: Props) => {
   useSignals();
 
   const [appUiState] = useContext(AppUiContext);
+  const r1 = useRef(appUiState);
+  if (r1.current !== appUiState) {
+    console.log("app");
+    r1.current = appUiState;
+  }
 
   //To prevent the click event from propagating to the canvas: TODO: HANDLE THIS BETTER?
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -51,6 +56,7 @@ export const PageEditor = ({ setPage }: Props) => {
       ? pageHeight.value - dndTimelineHeight.value - 68
       : pageHeight.value - timelineHeight.value - 68;
 
+  console.log("page");
   return (
     <div className="w-screen">
       <TopBar pageName="Edit Scene" />

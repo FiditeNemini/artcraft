@@ -9,7 +9,7 @@ export const timelineHeight = signal(0);
 
 export const fullHeight = computed(() => {
   return (
-    characterGroup.value.length * 268 +
+    characterGroup.value.characters.length * 268 +
     objectGroup.value.objects.length * 60 +
     300 +
     96

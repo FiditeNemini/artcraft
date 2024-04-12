@@ -1,7 +1,7 @@
-import React, { useCallback, UIEvent } from "react";
+import React, { useCallback } from "react";
 import { useMouseEventsTimeline } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsTimeline";
 import {
-  currentScroll,
+  timelineScrollX,
   currentTime,
   dndTimelineHeight,
   overTimeline,
@@ -29,7 +29,7 @@ export const LowerPanel = ({ children, onStyle }: LowerPanelPropsI) => {
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
         const newTime = Math.round(
-          (event.clientX + currentScroll.value - 92) / 4 / scale.value,
+          (event.clientX + timelineScrollX.value - 92) / 4 / scale.value,
         );
         if (newTime < 0) {
           return;
@@ -45,10 +45,6 @@ export const LowerPanel = ({ children, onStyle }: LowerPanelPropsI) => {
     [],
   );
 
-  const onScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
-    currentScroll.value = event.currentTarget.scrollLeft;
-  }, []);
-
   return (
     <>
       {!onStyle && (
@@ -59,19 +55,13 @@ export const LowerPanel = ({ children, onStyle }: LowerPanelPropsI) => {
         />
       )}
       <div
-        className={[
-          "absolute bottom-0",
-          "w-screen",
-          onStyle ? "overflow-x-auto overflow-y-hidden" : "overflow-auto",
-          "bg-ui-panel",
-        ].join(" ")}
+        className={["absolute bottom-0", "w-screen", "bg-ui-panel"].join(" ")}
         style={{ height: onStyle ? 80 : displayHeight }}
         onPointerOver={() => {
           overTimeline.value = true;
         }}
         onPointerLeave={() => (overTimeline.value = false)}
         onPointerDown={onTimelineClick}
-        onScroll={onScroll}
       >
         {children}
       </div>

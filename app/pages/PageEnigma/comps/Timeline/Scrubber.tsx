@@ -1,4 +1,9 @@
-import { currentTime, fullHeight, scale } from "~/pages/PageEnigma/store";
+import {
+  timelineScrollX,
+  currentTime,
+  fullHeight,
+  scale,
+} from "~/pages/PageEnigma/store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
 import { useMouseEventsScrubber } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsScrubber";
@@ -9,10 +14,16 @@ export const Scrubber = () => {
   const { onPointerDown, time } = useMouseEventsScrubber();
   const displayTime = time === -1 ? currentTime.value : time;
 
+  if (displayTime * 4 * scale.value + 84 - timelineScrollX.value < 84) {
+    return null;
+  }
   return (
     <div
       className="absolute flex cursor-ew-resize flex-col items-center text-brand-primary"
-      style={{ top: 8, left: displayTime * 4 * scale.value + 84 }}
+      style={{
+        top: 8,
+        left: displayTime * 4 * scale.value + 84 - timelineScrollX.value,
+      }}
       onPointerDown={onPointerDown}
     >
       <div>

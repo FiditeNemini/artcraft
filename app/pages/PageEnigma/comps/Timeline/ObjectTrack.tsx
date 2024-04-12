@@ -1,27 +1,26 @@
-import { fullWidth, objectGroup, updateObject } from "~/pages/PageEnigma/store";
+import { fullWidth, updateObject } from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
-import { ClipGroup } from "~/pages/PageEnigma/models";
+import { ClipGroup, ObjectTrack } from "~/pages/PageEnigma/models";
 
-export const ObjectTrack = () => {
+interface Props {
+  object: ObjectTrack;
+}
+
+export const ObjectTrackComponent = ({ object }: Props) => {
   return (
     <div
-      className="bg-object-groupBg block rounded-lg pb-5 pl-2 pr-4"
-      style={{ width: fullWidth.value + 90 }}
+      className="mr-4 block rounded-r-lg bg-object-groupBg pb-5 pr-4"
+      style={{ width: fullWidth.value + 32 }}
     >
-      <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
-        Objects
+      <div key={object.object_uuid} className="pt-4">
+        <TrackKeyFrames
+          id={object.object_uuid}
+          keyframes={object.keyframes}
+          title={`${object.name} Position/Rotation`}
+          updateKeyframe={updateObject}
+          group={ClipGroup.OBJECT}
+        />
       </div>
-      {objectGroup.value.objects.map((object) => (
-        <div key={object.object_uuid} className="flex flex-col gap-4">
-          <TrackKeyFrames
-            id={object.object_uuid}
-            keyframes={object.keyframes}
-            title={`${object.name} Position/Rotation`}
-            updateKeyframe={updateObject}
-            group={ClipGroup.OBJECT}
-          />
-        </div>
-      ))}
     </div>
   );
 };

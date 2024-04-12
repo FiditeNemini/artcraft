@@ -9,11 +9,10 @@ export const Camera = () => {
 
   return (
     <div
-      className="block rounded-lg bg-camera-groupBg pb-5 pl-2 pr-4"
-      style={{ width: fullWidth.value + 90 }}
+      className="block rounded-r-lg bg-camera-groupBg pb-5 pr-4"
+      style={{ width: fullWidth.value + 16 }}
     >
-      <div className="mb-5 pt-2 text-xs font-medium text-white">Camera</div>
-      <div className="flex flex-col gap-4">
+      <div className="pt-4">
         <TrackKeyFrames
           id={cameraGroup.value.id}
           keyframes={keyframes}
