@@ -1,12 +1,14 @@
 use actix_cors::Cors;
-use log::warn;
-use url::{Host, Url};
+
+use crate::util::netlify_branch_domain_matches::netlify_branch_domain_matches;
 
 pub fn add_storyteller(cors: Cors, is_production: bool) -> Cors {
   if is_production {
     cors
         // Storyteller Engine (Production)
         .allowed_origin("https://engine.storyteller.ai")
+        // Storyteller Studio (Production)
+        .allowed_origin("https://studio.storyteller.ai")
         // Storyteller.ai (Production)
         .allowed_origin("https://api.storyteller.ai")
         .allowed_origin("https://storyteller.ai")
@@ -14,26 +16,7 @@ pub fn add_storyteller(cors: Cors, is_production: bool) -> Cors {
         .allowed_origin("https://staging.storyteller.ai")
         // Allow Netlify domains within "storyteller-ai" project.
         .allowed_origin_fn(|origin, _req_head| {
-          let maybe_url = origin.to_str()
-              .map(|origin| Url::parse(origin));
-
-          let url = match maybe_url {
-            Ok(Ok(url)) => url,
-            _ => {
-              warn!("Invalid origin: {:?}", origin);
-              return false
-            },
-          };
-
-          match url.host() {
-            Some(Host::Domain(domain)) => {
-              let is_netlify_domain = domain == "storyteller-ai.netlify.app";
-              let is_netlify_branch_deploy = domain.ends_with("--storyteller-ai.netlify.app");
-
-              is_netlify_domain || is_netlify_branch_deploy
-            },
-            _ => false,
-          }
+          netlify_branch_domain_matches(origin, "storyteller-ai.netlify.app")
         })
 
         // NB(bt,2024-04-07): We shouldn't allow HTTP from non-dev hosts
