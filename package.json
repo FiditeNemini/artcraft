@@ -34,7 +34,6 @@
     "ccapture.js": "github:aceslowman/ccapture.js#npm-fix",
     "isbot": "^4.1.0",
     "react": "^18.2.0",
-    "react-cookie": "^7.1.4",
     "react-dom": "^18.2.0",
     "tailwind-merge": "^2.2.2",
     "terser": "^5.30.3",

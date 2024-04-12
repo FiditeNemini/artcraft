@@ -238,7 +238,7 @@ export class APIManager {
 
     const response = await fetch(url, {
       method: "POST",
-      credentials: "include",
+      // credentials: "include",
       headers: {
         Accept: "application/json",
       },
@@ -291,7 +291,7 @@ export class APIManager {
 
     const response = await fetch(url, {
       method: "POST",
-      credentials: "include",
+      // credentials: "include",
       headers: {
         Accept: "application/json",
       },
@@ -325,7 +325,7 @@ export class APIManager {
 
     const response = await fetch(url, {
       method: "POST",
-      credentials: "include",
+      // credentials: "include",
       headers: {
         Accept: "application/json",
       },
@@ -362,7 +362,7 @@ export class APIManager {
 
     const response = await fetch(url, {
       method: "POST",
-      credentials: "include",
+      // credentials: "include",
       headers: {
         Accept: "application/json",
       },
@@ -421,7 +421,7 @@ export class APIManager {
 
     const response = await fetch(`${this.baseUrl}/v1/video/enqueue_vst`, {
       method: "POST",
-      credentials: "include",
+      // credentials: "include",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

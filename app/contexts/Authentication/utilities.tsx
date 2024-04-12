@@ -21,7 +21,7 @@ export const CreateSession = async ({
       "Accept": "application/json",
       "Content-Type": "application/json",
     },
-    credentials: 'include',
+    // credentials: 'include',
     body: JSON.stringify(request)
   })
   .then(res => res.json())
@@ -33,13 +33,14 @@ export const CreateSession = async ({
     };
   });
 }
-export const GetSession = async () => {
+export const GetSession = async (sessionToken:string) => {
   return await fetch(getSession, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
+      'session': sessionToken,
     },
-    credentials: 'include',
+    // credentials: 'include',
   })
   .then(res => res.json())
   .then(res => {
@@ -53,13 +54,14 @@ export const GetSession = async () => {
     };
   });
 }
-export async function DestroySession() : Promise<boolean> {
+export async function DestroySession(sessionToken:string) : Promise<boolean> {
   return await fetch(logout, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
+      'session': sessionToken,
     },
-    credentials: 'include',
+    // credentials: 'include',
   })
   .then(res => res.json())
   .then(res => {

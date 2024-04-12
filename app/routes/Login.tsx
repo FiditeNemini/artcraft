@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "@remix-run/react";
 import { faKey, faUser } from "@fortawesome/pro-solid-svg-icons";
-import { AuthenticationContext } from "~/contexts/Authentication";
+import { AUTH_STATUS, AuthenticationContext } from "~/contexts/Authentication";
 
 import { Button,H1,Input,Link,P } from '~/components';
 import { LoadingDots } from "~/components";
@@ -12,7 +12,7 @@ export default function LoginScreen() {
 
   const [showLoader, setShowLoader] = useState<string|undefined>(undefined);
   const formRef = useRef<HTMLFormElement | null>(null);
-  const {authState, loginAndGetUserInfo} = useContext(AuthenticationContext);
+  const {authState, login} = useContext(AuthenticationContext);
 
   const handleOnSumbit = (ev: React.FormEvent<HTMLFormElement>)=>{
     ev.preventDefault();
@@ -20,9 +20,9 @@ export default function LoginScreen() {
       const form = new FormData(formRef.current);
       const usernameOrEmail =  form.get("usernameOrEmail")?.toString();
       const password = form.get("password")?.toString();
-      if( usernameOrEmail && password && loginAndGetUserInfo){
+      if( usernameOrEmail && password && login){
         setShowLoader("Authenticating");
-        loginAndGetUserInfo(
+        login(
           usernameOrEmail,
           password,
           ()=>{
@@ -34,7 +34,7 @@ export default function LoginScreen() {
 
   useEffect(()=>{
     const redirectPath = searchParams.get('redirect');
-    if(authState && authState.isLoggedIn)
+    if(authState && authState.authStatus === AUTH_STATUS.LOGGED_IN)
       navigate(redirectPath ? redirectPath:'/');
   },[authState]);
 
