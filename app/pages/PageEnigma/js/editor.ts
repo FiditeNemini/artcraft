@@ -218,11 +218,11 @@ class Editor {
     );
   }
 
-  isEmpty(value:string) {
+  isEmpty(value: string) {
     return (value == null || (typeof value === "string" && value.trim().length === 0));
   }
-  
-  initialize(config: any,sceneToken) {
+
+  initialize(config: any, sceneToken) {
 
     //setup reactland Callbacks
     this.dispatchAppUiState = config.dispatchAppUiState;
@@ -360,7 +360,7 @@ class Editor {
     if (this.isEmpty(sceneToken) == false) {
       this.loadScene(sceneToken)
     }
-    
+
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
       payload: {
@@ -568,7 +568,7 @@ class Editor {
     });
   }
 
-  async updateLoad(progress:number,message:string) {
+  async updateLoad(progress: number, message: string) {
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
       payload: {
@@ -890,14 +890,14 @@ class Editor {
     );
   }
 
-  async _debugDownloadVideo(videoURL:string) {
-      // DEBUG ONLY to download the video
+  async _debugDownloadVideo(videoURL: string) {
+    // DEBUG ONLY to download the video
 
-      let a = document.createElement('a');
-      a.href = videoURL;
-      a.download = 'video.mp4'; // Name of the downloaded file
-      document.body.appendChild(a);
-      a.click(); // Trigger the download
+    let a = document.createElement('a');
+    a.href = videoURL;
+    a.download = 'video.mp4'; // Name of the downloaded file
+    document.body.appendChild(a);
+    a.click(); // Trigger the download
   }
 
   async stopPlayback(compile_audio: boolean = true) {
@@ -906,27 +906,12 @@ class Editor {
     this.rendering = false;
     const videoBlob = new Blob(this.frame_buffer, { type: 'video/webm' });
     const videoURL = URL.createObjectURL(videoBlob);
-    //const arrayBuffer = await videoBlob.arrayBuffer();
-    //const uint8Array = new Uint8Array(arrayBuffer);
-  
-    // Create an anchor element
-    // DEBUG ONLY to download the video
-    //this._debugDownloadVideo(videoURL)
 
     this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
 
-    //for (let index = 0; index < this.frame_buffer.length; index++) {
-    //  const element = this.frame_buffer[index];
-    //  await ffmpeg.FS(
-    //    "writeFile",
-    //    `image${index}.jpg`,
-    //    await fetchFile(element),
-    //  );
-    //}
-
-    this.updateLoad(50,"Processing ...")
+    this.updateLoad(50, "Processing ...")
 
     // Write the Uint8Array to the FFmpeg file system
     ffmpeg.FS('writeFile', 'input.webm', await fetchFile(videoURL));
@@ -1011,8 +996,8 @@ class Editor {
       });
 
     // {"success":true,"inference_job_token":"jinf_j3nbqbd15wqxb0xcks13qh3f3bz"}
-    this.updateLoad(100,"Done Check Your Media Tab On Profile.")
-    this.endLoading()
+    this.updateLoad(100, "Done Check Your Media Tab On Profile.");
+    this.endLoading();
 
     console.log(result);
     this.recorder = undefined;
@@ -1076,7 +1061,7 @@ class Editor {
         this.switchCameraView();
       }
       this.activeScene.renderMode(true);
-  
+
       const ffmpeg = createFFmpeg({ log: false });
       await ffmpeg.load();
       await ffmpeg.FS("writeFile", `render.png`, await fetchFile(imgData));
@@ -1112,7 +1097,7 @@ class Editor {
 
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
-    
+
     console.log("Generating video...", this.frame_buffer);
     if (this.rendering) {
       return;
@@ -1134,8 +1119,8 @@ class Editor {
 
   startPlayback() {
 
-    this.updateLoad(25,"Starting Processing")
-  
+    this.updateLoad(25, "Starting Processing")
+
     this.timeline.is_playing = true;
     this.timeline.scrubber_frame_position = 0;
     if (!this.camera_person_mode) {
