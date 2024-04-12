@@ -480,7 +480,6 @@ export class TimeLine {
         currentTime: this.current_time,
       });
       this.scrubber_frame_position = this.current_time;
-      console.log(this.current_time, (120/this.timeline_limit)/4)
     }
 
     if (this.scrubber_frame_position <= 0) {
