@@ -330,8 +330,6 @@ class Editor {
     this.activeScene.scene.add(this.control);
     // Resets canvas size.
     this.onWindowResize();
-    // Creates the main update loop.
-    this.renderer.setAnimationLoop(this.updateLoop.bind(this));
 
     this.timeline.scene = this.activeScene;
 
@@ -353,6 +351,11 @@ class Editor {
     this.current_scene_glb_media_token = null;
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
+
+    // Creates the main update loop.
+    //this.renderer.setAnimationLoop(this.updateLoop.bind(this));
+
+    this.updateLoop();
 
     if (this.isEmpty(sceneToken) == false) {
       this.loadScene(sceneToken)
@@ -711,9 +714,11 @@ class Editor {
       console.error("Could not render to canvas no render or composer!");
     }
 
-    if (this.rendering && this.rawRenderer && this.clock) {
+    if (this.rendering && this.rawRenderer && this.clock && this.renderer) {
       if (this.recorder == undefined) {
-        this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 30 FPS
+        this.rawRenderer.setSize(1024, 576);
+        this.render_camera.aspect = 1024 / 576;
+        this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 60 FPS
         this.recorder = new MediaRecorder(this.record_stream, { mimeType: 'video/webm' });
         this.recorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
@@ -737,7 +742,11 @@ class Editor {
   }
 
   // Basicly Unity 3D's update loop.
-  async updateLoop(time: number) {
+  async updateLoop() {
+    setTimeout(() => {
+      requestAnimationFrame(this.updateLoop.bind(this));
+    }, 1000 / this.cap_fps);
+
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
     }
@@ -784,7 +793,7 @@ class Editor {
     }
 
     if (this.timeline.is_playing) {
-      const changeView = await this.timeline.update(delta_time, this.rendering);
+      const changeView = await this.timeline.update(this.rendering);
       if (changeView) {
         this.switchCameraView();
       }
@@ -897,9 +906,6 @@ class Editor {
     //let video_fps = Math.floor(this.frames * (this.cap_fps / this.timeline.timeline_limit));
     //console.log("Video FPS:", video_fps)
     this.rendering = false;
-
-    console.log(this.frame_buffer);
-
     const videoBlob = new Blob(this.frame_buffer, { type: 'video/webm' });
     const videoURL = URL.createObjectURL(videoBlob);
 
@@ -912,16 +918,17 @@ class Editor {
     // Write the Uint8Array to the FFmpeg file system
     ffmpeg.FS('writeFile', 'input.webm', await fetchFile(videoURL));
 
+
     await ffmpeg.run(
       "-i",
       "input.webm",
       "-vf",
-      "scale=516:290",
+      "scale=1024:576",
       "-c:v",
       "libx264",
       "-preset",
       "fast",
-      "-crf", 
+      "-crf",
       "23",
       "-c:a",
       "aac",
@@ -996,6 +1003,13 @@ class Editor {
 
     console.log(result);
     this.recorder = undefined;
+    if (this.rawRenderer) {
+      const stylePreview: HTMLVideoElement | null = document.getElementById(
+        "styled-preview",
+      ) as HTMLVideoElement;
+      this.rawRenderer.setSize(stylePreview.width, stylePreview.height);
+      this.render_camera.aspect = stylePreview.width / stylePreview.height;
+    }
   }
 
   switchPreview() {
