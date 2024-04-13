@@ -12,9 +12,8 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::{info, warn};
 use sqlx::MySqlPool;
-use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
-use errors::AnyhowResult;
 
+use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::mediators::firehose_publisher::FirehosePublisher;
@@ -183,10 +182,10 @@ pub async fn create_account_handler(
         }
       }
     }
-    Ok(None) => {} // Fail open for now.
+    // Fail open for now.
+    Ok(None) => {}
     Err(err) => {
       warn!("Origin header error: {:?}", err);
-      return Err(CreateAccountErrorResponse::bad_request());
     }
   }
 
