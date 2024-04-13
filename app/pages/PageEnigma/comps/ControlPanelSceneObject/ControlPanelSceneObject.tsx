@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import {
   faArrowRightArrowLeft,
@@ -7,8 +7,8 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { AppUiContext } from "../../../../contexts/AppUiContext";
-import { EngineContext } from "../../../../contexts/EngineContext";
+import { AppUiContext } from "~/contexts/AppUiContext";
+import { EngineContext } from "~/contexts/EngineContext";
 import { Button, H5, InputVector } from "~/components";
 
 import { XYZ } from "../../datastructures/common";
@@ -31,11 +31,6 @@ export const ControlPanelSceneObject = () => {
     appUiState.controlPanel.currentSceneObject?.objectVectors?.scale;
   const currentSceneObject = appUiState.controlPanel.currentSceneObject;
 
-  const r1 = useRef(appUiState.controlPanel.currentSceneObject);
-  if (r1.current !== appUiState.controlPanel.currentSceneObject) {
-    console.log("current");
-    r1.current = appUiState.controlPanel.currentSceneObject;
-  }
   useEffect(() => {
     // TODO this causes a subtle bug because it renders way too many times.
     if (!appUiState.controlPanel.currentSceneObject) {
@@ -60,7 +55,6 @@ export const ControlPanelSceneObject = () => {
       return;
     }
 
-    console.log(1);
     dispatchAppUiState({
       type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
       payload: {
@@ -86,7 +80,6 @@ export const ControlPanelSceneObject = () => {
         return;
       }
 
-      console.log(3);
       dispatchAppUiState({
         type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
         payload: {
@@ -112,7 +105,6 @@ export const ControlPanelSceneObject = () => {
         console.log("Missing Scene Object Scale");
         return;
       }
-      console.log(4);
       dispatchAppUiState({
         type: ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
         payload: {

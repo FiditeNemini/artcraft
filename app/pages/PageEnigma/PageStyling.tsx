@@ -32,8 +32,6 @@ export const PageStyling = ({ setPage }: Props) => {
   const editorEngine = useContext(EngineContext);
   const [appUiState] = useContext(AppUiContext);
 
-  console.log(timelineScrollX.value);
-
   const generateFrame = async () => {
     await editorEngine?.generateFrame();
   };

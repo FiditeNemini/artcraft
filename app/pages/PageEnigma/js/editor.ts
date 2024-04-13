@@ -529,7 +529,7 @@ class Editor {
 
         this.removeTransformControls();
         this.selected = this.cam_obj;
-        console.log(7);
+
         this.dispatchAppUiState({
           type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
         });
@@ -552,8 +552,6 @@ class Editor {
             element.visible = true;
           });
         }
-
-        console.log(8);
 
         this.dispatchAppUiState({
           type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
@@ -685,7 +683,6 @@ class Editor {
       } as MediaItem,
     });
     this.selected = undefined;
-    console.log(9);
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
     });
@@ -1155,7 +1152,6 @@ class Editor {
     const scale = this.selected.scale;
 
     // TODO this is a bug we need to only show when clicked on and use UPDATE when updating.
-    console.log(10);
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
       payload: {
@@ -1286,7 +1282,6 @@ class Editor {
         this.transform_interaction = true;
 
         // Contact react land
-        console.log(11);
         this.dispatchAppUiState({
           type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
         });
@@ -1294,7 +1289,6 @@ class Editor {
       }
     } else if (this.transform_interaction == false) {
       this.removeTransformControls();
-      console.log(12);
       this.dispatchAppUiState({
         type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
       });

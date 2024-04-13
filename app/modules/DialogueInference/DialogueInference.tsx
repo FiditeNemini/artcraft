@@ -81,7 +81,6 @@ const JobStatusIcon = ({jobStatus} : {jobStatus:string})=>{
 };
 
 const InferenceItem = ({job}:{job:InferenceJob}) => {
-  // console.log(job);
   return(
     <li
       className="grid grid-cols-12 gap-2 items-center bg-brand-secondary rounded-md py-2 px-4"
@@ -109,7 +108,7 @@ const InferenceItem = ({job}:{job:InferenceJob}) => {
 export const DialogueInference = () =>{
   useSignals();
 
-  const buttonIcon = inferenceJobs.value.length > 0 
+  const buttonIcon = inferenceJobs.value.length > 0
     ? faClipboardList : faClipboard;
   return(
     <ButtonDialogue
@@ -132,7 +131,7 @@ export const DialogueInference = () =>{
         </ul>
       }
       {
-        inferenceJobs.value.length === 0 && 
+        inferenceJobs.value.length === 0 &&
         <P>You currently have no running proccesses.</P>
       }
     </ButtonDialogue>

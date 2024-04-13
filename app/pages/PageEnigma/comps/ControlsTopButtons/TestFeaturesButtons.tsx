@@ -17,7 +17,6 @@ export const TestFeaturesButtons = ({ debug }: { debug: boolean }) => {
         type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
       });
     } else {
-      console.log(5);
       dispatchAppUiState({
         type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
         payload: {
