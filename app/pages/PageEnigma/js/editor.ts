@@ -718,7 +718,7 @@ class Editor {
       if (this.recorder == undefined) {
         this.rawRenderer.setSize(1024, 576);
         this.render_camera.aspect = 1024 / 576;
-        this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 30 FPS
+        this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 60 FPS
         this.recorder = new MediaRecorder(this.record_stream, { mimeType: 'video/webm' });
         this.recorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
@@ -743,9 +743,9 @@ class Editor {
 
   // Basicly Unity 3D's update loop.
   async updateLoop() {
-    setTimeout( () => {
-      requestAnimationFrame( this.updateLoop.bind(this) );
-    }, 1000 / this.cap_fps );
+    setTimeout(() => {
+      requestAnimationFrame(this.updateLoop.bind(this));
+    }, 1000 / this.cap_fps);
 
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
@@ -928,7 +928,7 @@ class Editor {
       "libx264",
       "-preset",
       "fast",
-      "-crf", 
+      "-crf",
       "23",
       "-c:a",
       "aac",
@@ -1003,7 +1003,13 @@ class Editor {
 
     console.log(result);
     this.recorder = undefined;
-    this.onWindowResize();
+    if (this.rawRenderer) {
+      const stylePreview: HTMLVideoElement | null = document.getElementById(
+        "styled-preview",
+      ) as HTMLVideoElement;
+      this.rawRenderer.setSize(stylePreview.width, stylePreview.height);
+      this.render_camera.aspect = stylePreview.width / stylePreview.height;
+    }
   }
 
   switchPreview() {
