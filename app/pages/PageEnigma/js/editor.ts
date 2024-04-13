@@ -714,8 +714,10 @@ class Editor {
       console.error("Could not render to canvas no render or composer!");
     }
 
-    if (this.rendering && this.rawRenderer && this.clock) {
+    if (this.rendering && this.rawRenderer && this.clock && this.renderer) {
       if (this.recorder == undefined) {
+        this.rawRenderer.setSize(1024, 576);
+        this.render_camera.aspect = 1024 / 576;
         this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 30 FPS
         this.recorder = new MediaRecorder(this.record_stream, { mimeType: 'video/webm' });
         this.recorder.ondataavailable = (event) => {
@@ -921,7 +923,7 @@ class Editor {
       "-i",
       "input.webm",
       "-vf",
-      "scale=516:290",
+      "scale=1024:576",
       "-c:v",
       "libx264",
       "-preset",
@@ -1001,6 +1003,7 @@ class Editor {
 
     console.log(result);
     this.recorder = undefined;
+    this.onWindowResize();
   }
 
   switchPreview() {
