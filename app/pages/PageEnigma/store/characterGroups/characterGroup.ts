@@ -152,7 +152,7 @@ export function addCharacterKeyframe(
 
       Queue.publish({
         queueName: QueueNames.TO_ENGINE,
-        action: toEngineActions.ADD_CLIP,
+        action: toEngineActions.ADD_KEYFRAME,
         data: newKeyframe,
       });
 

@@ -407,8 +407,9 @@ export class TimeLine {
     if (this.is_playing) {
       return;
     }
+    const value = Math.floor(data["data"]["currentTime"])
+    this.setScrubberPosition(value);
     this.update();
-    this.setScrubberPosition(data["data"]["currentTime"]);
   }
 
   public async stepFrame(frames: number) {
