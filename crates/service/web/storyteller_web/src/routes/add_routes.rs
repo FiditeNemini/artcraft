@@ -665,21 +665,25 @@ fn add_user_profile_routes<T, B> (app: App<T>) -> App<T>
             .route(web::post().to(edit_profile_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
+      // NB: Removed endpoint
       .service(
         web::resource("/{username}/tts_models")
             .route(web::get().to(list_user_tts_models_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
+      // NB: Removed endpoint
       .service(
         web::resource("/{username}/tts_results")
             .route(web::get().to(list_user_tts_inference_results_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
+      // NB: Removed endpoint
       .service(
         web::resource("/{username}/w2l_templates")
             .route(web::get().to(list_user_w2l_templates_handler))
             .route(web::head().to(|| HttpResponse::Ok()))
       )
+      // NB: Removed endpoint
       .service(
         web::resource("/{username}/w2l_results")
             .route(web::get().to(list_user_w2l_inference_results_handler))

@@ -3,9 +3,11 @@ use std::sync::Arc;
 
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
+use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Query};
 use log::{info, log, warn};
+use http_server_common::error::simple_json_error_response::simple_json_error_response;
 
 use mysql_queries::queries::tts::tts_results::list_tts_results_query_builder::{ListTtsResultsQueryBuilder, TtsInferenceRecordForList};
 
@@ -69,9 +71,19 @@ pub async fn list_user_tts_inference_results_handler(
   server_state: web::Data<Arc<ServerState>>
 ) -> Result<HttpResponse, ListTtsInferenceResultsForUserError>
 {
-  info!("Fetching inference results for user: {}", &path.username);
+  return Ok(HttpResponse::Gone()
+      .content_type(ContentType::plaintext())
+      .body("This endpoint has been removed."))
+}
 
-  let maybe_user_session = server_state
+  pub async fn _original_list_user_tts_inference_results_handler(
+    http_request: HttpRequest,
+    path: Path<ListTtsInferenceResultsForUserPathInfo>,
+    query: Query<ListTtsInferenceResultsForUserQuery>,
+    server_state: web::Data<Arc<ServerState>>
+  ) -> Result<HttpResponse, ListTtsInferenceResultsForUserError>
+  {
+    let maybe_user_session = server_state
       .session_checker
       .maybe_get_user_session(&http_request, &server_state.mysql_pool)
       .await

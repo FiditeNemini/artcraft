@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
+use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use log::{info, log, warn};
@@ -53,6 +54,17 @@ impl fmt::Display for ListTtsModelsForUserError {
 }
 
 pub async fn list_user_tts_models_handler(
+  http_request: HttpRequest,
+  path: Path<GetProfilePathInfo>,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<HttpResponse, ListTtsModelsForUserError>
+{
+  return Ok(HttpResponse::Gone()
+      .content_type(ContentType::plaintext())
+      .body("This endpoint has been removed."))
+}
+
+pub async fn original_list_user_tts_models_handler(
   http_request: HttpRequest,
   path: Path<GetProfilePathInfo>,
   server_state: web::Data<Arc<ServerState>>

@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
+use actix_web::http::header::ContentType;
 use actix_web::http::StatusCode;
 use actix_web::web::{Path, Query};
 use log::{info, log, warn};
@@ -64,6 +65,18 @@ impl fmt::Display for ListW2lInferenceResultsForUserError {
 }
 
 pub async fn list_user_w2l_inference_results_handler(
+  http_request: HttpRequest,
+  path: Path<ListW2lInferenceResultsForUserPathInfo>,
+  query: Query<ListW2lInferenceResultsForUserQuery>,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<HttpResponse, ListW2lInferenceResultsForUserError>
+{
+  return Ok(HttpResponse::Gone()
+      .content_type(ContentType::plaintext())
+      .body("This endpoint has been removed."))
+}
+
+pub async fn original_list_user_w2l_inference_results_handler(
   http_request: HttpRequest,
   path: Path<ListW2lInferenceResultsForUserPathInfo>,
   query: Query<ListW2lInferenceResultsForUserQuery>,
