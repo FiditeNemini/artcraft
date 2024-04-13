@@ -26,7 +26,7 @@ export const useMouseEventsScrubber = () => {
         Queue.publish({
           queueName: QueueNames.TO_ENGINE,
           action: toEngineActions.UPDATE_TIME,
-          data: { currentTime: Math.round(time) + timelineScrollX.value },
+          data: { currentTime: Math.round(time) },
         });
       }
     };
@@ -42,16 +42,23 @@ export const useMouseEventsScrubber = () => {
           return;
         }
         setTime((oldTime) => {
+          console.log(
+            oldTime,
+            delta,
+            delta + timelineScrollX.value,
+            delta + timelineScrollX.value / 4 / scale.value,
+          );
           if (oldTime !== delta) {
             Queue.publish({
               queueName: QueueNames.TO_ENGINE,
               action: toEngineActions.UPDATE_TIME,
-              data: { currentTime: delta + timelineScrollX.value },
+              data: {
+                currentTime: delta,
+              },
             });
           }
           return delta;
         });
-        return;
       }
     };
 
