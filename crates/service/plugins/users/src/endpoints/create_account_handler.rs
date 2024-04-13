@@ -12,6 +12,8 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use log::{info, warn};
 use sqlx::MySqlPool;
+use actix_helpers::extractors::get_request_origin_uri::get_request_origin_uri;
+use errors::AnyhowResult;
 
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -55,6 +57,7 @@ pub struct CreateAccountErrorResponse {
 
 #[derive(Copy, Clone, Debug, Serialize)]
 pub enum CreateAccountErrorType {
+  BadRequest, // Other request malformed errors, eg. bad Origin header
   BadInput,
   EmailTaken,
   ServerError,
@@ -70,6 +73,14 @@ impl CreateAccountErrorResponse {
       error_fields: HashMap::new(),
     }
   }
+
+  fn bad_request() -> Self {
+    Self {
+      success: false,
+      error_type: CreateAccountErrorType::BadRequest,
+      error_fields: HashMap::new(),
+    }
+  }
 }
 
 // NB: Not using DeriveMore since Clion doesn't understand it.
@@ -82,6 +93,7 @@ impl fmt::Display for CreateAccountErrorResponse {
 impl ResponseError for CreateAccountErrorResponse {
   fn status_code(&self) -> StatusCode {
     match self.error_type {
+      CreateAccountErrorType::BadRequest => StatusCode::BAD_REQUEST,
       CreateAccountErrorType::BadInput => StatusCode::BAD_REQUEST,
       CreateAccountErrorType::EmailTaken => StatusCode::BAD_REQUEST,
       CreateAccountErrorType::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
@@ -157,6 +169,27 @@ pub async fn create_account_handler(
 
   let ip_address = get_request_ip(&http_request);
 
+  let maybe_origin = get_request_origin_uri(&http_request);
+
+  let mut maybe_source = None;
+
+  match maybe_origin {
+    Ok(Some(uri)) => {
+      if let Some(host) = uri.host() {
+        if host.contains("storyteller") {
+          maybe_source = Some("storyteller");
+        } else if host.contains("fakeyou") {
+          maybe_source = Some("fakeyou");
+        }
+      }
+    }
+    Ok(None) => {} // Fail open for now.
+    Err(err) => {
+      warn!("Origin header error: {:?}", err);
+      return Err(CreateAccountErrorResponse::bad_request());
+    }
+  }
+
   let create_account_result = create_account(
     &mysql_pool,
     CreateAccountArgs {
@@ -166,6 +199,7 @@ pub async fn create_account_handler(
       email_gravatar_hash: &email_gravatar_hash,
       password_hash: &password_hash,
       ip_address: &ip_address,
+      maybe_source,
       maybe_user_token: None, // NB: This parameter is for internal testing only
     }
   ).await;

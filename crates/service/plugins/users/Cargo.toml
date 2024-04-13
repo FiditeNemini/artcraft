@@ -15,6 +15,7 @@ path = "src/lib.rs"
 [dependencies]
 
 # Internal
+actix_helpers = { path = "../../../lib/actix_helpers" }
 container_common = { path = "../../../lib/deprecated/container_common" }
 cookies = { path = "../../../lib/cookies" }
 crockford = { path = "../../../lib/crockford" }

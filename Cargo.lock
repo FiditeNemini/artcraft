@@ -7615,6 +7615,7 @@ name = "users_component"
 version = "0.0.1"
 dependencies = [
  "actix-web",
+ "actix_helpers",
  "anyhow",
  "base64 0.21.5",
  "byteorder",

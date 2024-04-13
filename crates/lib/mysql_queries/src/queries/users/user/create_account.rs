@@ -16,6 +16,7 @@ pub struct CreateAccountArgs<'a> {
   pub email_gravatar_hash: &'a str,
   pub password_hash: &'a str,
   pub ip_address: &'a str,
+  pub maybe_source: Option<&'a str>,
 
   /// In production code, send this as `None`.
   /// Only provide an external user token for db integration tests and db seeding tools.
@@ -64,9 +65,10 @@ INSERT INTO users (
   password_hash,
   ip_address_creation,
   ip_address_last_login,
-  ip_address_last_update
+  ip_address_last_update,
+  maybe_source
 )
-VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
         "#,
         &user_token,
         args.username,
@@ -80,6 +82,7 @@ VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
         args.ip_address,
         args.ip_address,
         args.ip_address,
+        args.maybe_source,
     )
       .execute(mysql_pool)
       .await;

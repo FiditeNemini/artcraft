@@ -61,6 +61,7 @@ async fn seed_user(
     email_gravatar_hash: &email_gravatar_hash,
     password_hash: &password_hash,
     ip_address: "127.0.0.1",
+    maybe_source: None,
     maybe_user_token: maybe_user_token.as_ref(),
   }).await.map_err(|err| anyhow!("err: {:?}", err))?;
 
