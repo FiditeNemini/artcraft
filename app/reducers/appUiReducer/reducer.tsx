@@ -1,22 +1,23 @@
 import { State, Action, ACTION_TYPES } from "./types";
 
 export function reducer(state: State, action: Action): State {
+  console.log(action.type);
   switch (action.type) {
-    case ACTION_TYPES.OPEN_DIALOGUE_TTS:{
-      return{
+    case ACTION_TYPES.OPEN_DIALOGUE_TTS: {
+      return {
         ...state,
-        diagloueTts:{
+        diagloueTts: {
           isOpen: true,
-        }
-      }
+        },
+      };
     }
-    case ACTION_TYPES.CLOSE_DIALOGUE_TTS:{
-      return{
+    case ACTION_TYPES.CLOSE_DIALOGUE_TTS: {
+      return {
         ...state,
-        diagloueTts:{
+        diagloueTts: {
           isOpen: false,
-        }
-      }
+        },
+      };
     }
     case ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT: {
       // console.log("pay", action.payload);
