@@ -1,3 +1,5 @@
+use errors::AnyhowResult;
+
 use crate::payloads::prompt_args::encoded_style_transfer_name::EncodedStyleTransferName;
 
 // TODO(bt,2024-04-13): Once this gets big enough, design a PromptInnerPayloadBuilder that returns None if no fields were set.
@@ -11,4 +13,14 @@ pub struct PromptInnerPayload {
   #[serde(alias = "style_name")]
   #[serde(skip_serializing_if = "Option::is_none")]
   pub style_name: Option<EncodedStyleTransferName>,
+}
+
+impl PromptInnerPayload{
+  pub fn from_json(json: &str) -> AnyhowResult<Self> {
+    Ok(serde_json::from_str(json)?)
+  }
+
+  pub fn to_json(&self) -> AnyhowResult<String> {
+    Ok(serde_json::to_string(self)?)
+  }
 }

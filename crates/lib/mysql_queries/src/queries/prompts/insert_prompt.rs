@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
-use anyhow::anyhow;
 
+use anyhow::anyhow;
 use sqlx;
 use sqlx::{Executor, MySql};
 
@@ -8,6 +8,7 @@ use enums::by_table::prompts::prompt_type::PromptType;
 use errors::AnyhowResult;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
+
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 pub struct InsertPromptArgs<'e, 'c,  E>
@@ -47,7 +48,7 @@ pub async fn insert_prompt<'e, 'c : 'e, E>(args: InsertPromptArgs<'e, 'c, E>)
   let maybe_other_args = match args.maybe_other_args {
     None => None,
     Some(inner_payload) => {
-      let encoded = serde_json::ser::to_string(inner_payload)
+      let encoded = inner_payload.to_json()
           .map_err(|_e| anyhow!("could not encode inner payload"))?;
       Some(encoded)
     },

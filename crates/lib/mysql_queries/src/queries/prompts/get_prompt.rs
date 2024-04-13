@@ -12,6 +12,8 @@ use errors::AnyhowResult;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 
+use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
+
 #[derive(Serialize, Debug)]
 pub struct Prompt {
   pub token: PromptToken,
@@ -23,8 +25,7 @@ pub struct Prompt {
   pub maybe_positive_prompt: Option<String>,
   pub maybe_negative_prompt: Option<String>,
 
-  // TODO(bt,2024-02-22): Expose this as structured fields.
-  pub maybe_other_args: Option<String>,
+  pub maybe_other_args: Option<PromptInnerPayload>,
 
   /// For moderators only
   pub creator_ip_address: Option<String>,
@@ -43,7 +44,6 @@ pub struct PromptRaw {
   pub maybe_positive_prompt: Option<String>,
   pub maybe_negative_prompt: Option<String>,
 
-  // TODO(bt,2024-02-22): Expose this as structured fields.
   pub maybe_other_args: Option<String>,
 
   /// For moderators only
@@ -75,7 +75,10 @@ pub async fn get_prompt(
     maybe_creator_user_token: record.maybe_creator_user_token,
     maybe_positive_prompt: record.maybe_positive_prompt,
     maybe_negative_prompt: record.maybe_negative_prompt,
-    maybe_other_args: record.maybe_other_args,
+    maybe_other_args: record.maybe_other_args
+        .as_deref()
+        .map(|args| PromptInnerPayload::from_json(args))
+        .transpose()?,
     creator_ip_address: record.creator_ip_address,
     created_at: record.created_at,
   }))

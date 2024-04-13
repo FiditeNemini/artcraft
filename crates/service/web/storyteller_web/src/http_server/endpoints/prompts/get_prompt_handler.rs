@@ -130,12 +130,21 @@ pub async fn get_prompt_handler(
     Ok(Some(result)) => result,
   };
 
+  let mut maybe_style_name = None;
+
+  if let Some(inner_payload) = &result.maybe_other_args {
+    if let Some(encoded_style_name) = &inner_payload.style_name {
+      maybe_style_name = encoded_style_name.to_style_name();
+    }
+  }
+
   let response = GetPromptSuccessResponse {
     success: true,
     prompt: PromptInfo {
       token: result.token,
       maybe_positive_prompt: result.maybe_positive_prompt,
       maybe_negative_prompt: result.maybe_negative_prompt,
+      maybe_style_name,
       prompt_type: result.prompt_type,
       created_at: result.created_at,
     },
