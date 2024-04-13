@@ -12,7 +12,7 @@ import {
   dropId,
   dropOffset,
   addObject,
-  characterGroups,
+  characterGroup,
   cameraGroup,
   audioGroup,
   objectGroup,
@@ -75,7 +75,10 @@ export const TrackProvider = ({ children }: Props) => {
   }, [endDrag]);
 
   const clearExistingData = useCallback(() => {
-    characterGroups.value = [];
+    characterGroup.value = {
+      id: "ChG1",
+      characters: [],
+    };
     cameraGroup.value = {
       id: "CG1",
       keyframes: [],

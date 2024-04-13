@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  currentScroll,
+  timelineScrollX,
   currentTime,
   filmLength,
   scale,
@@ -26,7 +26,7 @@ export const useMouseEventsScrubber = () => {
         Queue.publish({
           queueName: QueueNames.TO_ENGINE,
           action: toEngineActions.UPDATE_TIME,
-          data: { currentTime: Math.round(time) + currentScroll.value },
+          data: { currentTime: Math.round(time) + timelineScrollX.value },
         });
       }
     };
@@ -46,7 +46,7 @@ export const useMouseEventsScrubber = () => {
             Queue.publish({
               queueName: QueueNames.TO_ENGINE,
               action: toEngineActions.UPDATE_TIME,
-              data: { currentTime: delta + currentScroll.value },
+              data: { currentTime: delta + timelineScrollX.value },
             });
           }
           return delta;

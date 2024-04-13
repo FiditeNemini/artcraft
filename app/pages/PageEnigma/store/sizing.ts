@@ -1,5 +1,5 @@
 import { signal, computed } from "@preact/signals-core";
-import { characterGroups } from "~/pages/PageEnigma/store/characterGroups";
+import { characterGroup } from "~/pages/PageEnigma/store/characterGroups";
 import { objectGroup } from "~/pages/PageEnigma/store/objectGroup";
 
 // timeline
@@ -9,7 +9,7 @@ export const timelineHeight = signal(0);
 
 export const fullHeight = computed(() => {
   return (
-    characterGroups.value.length * 268 +
+    characterGroup.value.characters.length * 268 +
     objectGroup.value.objects.length * 60 +
     300 +
     96

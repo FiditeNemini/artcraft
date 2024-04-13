@@ -24,7 +24,7 @@ export const TrackKeyFrames = ({
   group,
 }: Props) => {
   return (
-    <div className="pl-16">
+    <div>
       <div
         id={`track-${group}-${id}`}
         className={`relative mt-4 block h-9 w-full rounded-lg bg-${group}-unselected`}

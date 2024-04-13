@@ -219,11 +219,12 @@ class Editor {
   }
 
   isEmpty(value: string) {
-    return (value == null || (typeof value === "string" && value.trim().length === 0));
+    return (
+      value == null || (typeof value === "string" && value.trim().length === 0)
+    );
   }
 
   initialize(config: any, sceneToken) {
-
     //setup reactland Callbacks
     this.dispatchAppUiState = config.dispatchAppUiState;
 
@@ -358,7 +359,7 @@ class Editor {
     this.updateLoop();
 
     if (this.isEmpty(sceneToken) == false) {
-      this.loadScene(sceneToken)
+      this.loadScene(sceneToken);
     }
 
     this.dispatchAppUiState({
@@ -384,7 +385,7 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() { }
+  public async testTestTimelineEvents() {}
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -427,7 +428,7 @@ class Editor {
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
     if (this.selected != undefined || this.selected != null) {
-      //console.log(`triggering setSelectedObject`)
+      console.log(`triggering setSelectedObject`);
       this.selected.position.x = position.x;
       this.selected.position.y = position.y;
       this.selected.position.z = position.z;
@@ -528,6 +529,7 @@ class Editor {
 
         this.removeTransformControls();
         this.selected = this.cam_obj;
+
         this.dispatchAppUiState({
           type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
         });
@@ -574,7 +576,7 @@ class Editor {
       payload: {
         showEditorLoadingBar: {
           progress: progress,
-          message: message
+          message: message,
         },
       },
     });
@@ -719,7 +721,9 @@ class Editor {
         this.rawRenderer.setSize(1024, 576);
         this.render_camera.aspect = 1024 / 576;
         this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 60 FPS
-        this.recorder = new MediaRecorder(this.record_stream, { mimeType: 'video/webm' });
+        this.recorder = new MediaRecorder(this.record_stream, {
+          mimeType: "video/webm",
+        });
         this.recorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
             this.frame_buffer.push(event.data);
@@ -729,7 +733,7 @@ class Editor {
         };
         this.recorder.onstop = () => {
           this.stopPlayback();
-        }
+        };
         this.recorder.start();
       }
 
@@ -797,7 +801,7 @@ class Editor {
       if (changeView) {
         this.switchCameraView();
       }
-    } else if (this.last_scrub == this.timeline.scrubber_frame_position) {
+    } else if (this.last_scrub !== this.timeline.scrubber_frame_position) {
       this.updateSelectedUI();
     }
 
@@ -864,10 +868,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-      startTime * 1000 +
-      "|" +
-      startTime * 1000 +
-      "[a1];[0:a][a1]amix=inputs=2[a]",
+        startTime * 1000 +
+        "|" +
+        startTime * 1000 +
+        "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -895,9 +899,9 @@ class Editor {
   async _debugDownloadVideo(videoURL: string) {
     // DEBUG ONLY to download the video
 
-    let a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = videoURL;
-    a.download = 'video.mp4'; // Name of the downloaded file
+    a.download = "video.mp4"; // Name of the downloaded file
     document.body.appendChild(a);
     a.click(); // Trigger the download
   }
@@ -906,18 +910,17 @@ class Editor {
     //let video_fps = Math.floor(this.frames * (this.cap_fps / this.timeline.timeline_limit));
     //console.log("Video FPS:", video_fps)
     this.rendering = false;
-    const videoBlob = new Blob(this.frame_buffer, { type: 'video/webm' });
+    const videoBlob = new Blob(this.frame_buffer, { type: "video/webm" });
     const videoURL = URL.createObjectURL(videoBlob);
 
     this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
 
-    this.updateLoad(50, "Processing ...")
+    this.updateLoad(50, "Processing ...");
 
     // Write the Uint8Array to the FFmpeg file system
-    ffmpeg.FS('writeFile', 'input.webm', await fetchFile(videoURL));
-
+    ffmpeg.FS("writeFile", "input.webm", await fetchFile(videoURL));
 
     await ffmpeg.run(
       "-i",
@@ -1106,13 +1109,12 @@ class Editor {
 
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
-
     console.log("Generating video...", this.frame_buffer);
     if (this.rendering) {
       return;
     }
 
-    this.showLoading()
+    this.showLoading();
 
     this.rendering = true; // has to go first to debounce
     this.startPlayback();
@@ -1127,8 +1129,7 @@ class Editor {
   }
 
   startPlayback() {
-
-    this.updateLoad(25, "Starting Processing")
+    this.updateLoad(25, "Starting Processing");
 
     this.timeline.is_playing = true;
     this.timeline.scrubber_frame_position = 0;
@@ -1143,7 +1144,7 @@ class Editor {
   }
 
   updateSelectedUI() {
-    if (this.selected == undefined) {
+    if (this.selected === undefined || this.timeline.is_playing) {
       return;
     }
     const pos = this.selected.position;

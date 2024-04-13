@@ -23,8 +23,6 @@ interface Props {
   title: string;
   group: ClipGroup;
   type?: ClipType;
-  toggleMute?: () => void;
-  muted?: boolean;
   updateClip: (options: { id: string; length: number; offset: number }) => void;
 }
 
@@ -56,9 +54,7 @@ function getCanBuild({
 export const TrackClips = ({
   id,
   clips,
-  toggleMute,
   updateClip,
-  muted,
   title,
   group,
   type,
@@ -81,7 +77,7 @@ export const TrackClips = ({
       return;
     }
 
-    // Now check the the clip fits
+    // Now check if the clip fits
     const position = track.getBoundingClientRect();
     const clipOffset = (event.clientX - position.x) / 4 / scale.value;
 
@@ -114,49 +110,31 @@ export const TrackClips = ({
   }
 
   return (
-    <div className="pl-16">
-      <div
-        id={`track-${trackType}-${id}`}
-        className={`relative mt-4 block h-9 w-full rounded-lg bg-${group}-unselected`}
-        onPointerOver={onPointerOver}
-        onPointerLeave={onPointerLeave}
-        onPointerMove={onPointerMove}
-      >
-        {clips.map((clip, index) => (
-          <TrackClip
-            key={clip.clip_uuid}
-            min={
-              index > 0 ? clips[index - 1].offset + clips[index - 1].length : 0
-            }
-            max={
-              index < clips.length - 1
-                ? clips[index + 1].offset
-                : filmLength.value * 60
-            }
-            group={group}
-            updateClip={updateClip}
-            clip={clip}
-          />
-        ))}
-        <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
-          {title}
-        </div>
-        {!!toggleMute && (
-          <button
-            className="text-md absolute text-white transition-colors duration-100 hover:text-white/80"
-            style={{ top: 6, left: -28 }}
-            onClick={toggleMute}
-          >
-            {muted ? (
-              <FontAwesomeIcon
-                icon={faVolumeSlash}
-                className="text-brand-primary transition-colors duration-100 hover:text-brand-primary/80"
-              />
-            ) : (
-              <FontAwesomeIcon icon={faVolume} />
-            )}
-          </button>
-        )}
+    <div
+      id={`track-${trackType}-${id}`}
+      className={`relative mt-4 block h-9 w-full rounded-lg bg-${group}-unselected`}
+      onPointerOver={onPointerOver}
+      onPointerLeave={onPointerLeave}
+      onPointerMove={onPointerMove}
+    >
+      {clips.map((clip, index) => (
+        <TrackClip
+          key={clip.clip_uuid}
+          min={
+            index > 0 ? clips[index - 1].offset + clips[index - 1].length : 0
+          }
+          max={
+            index < clips.length - 1
+              ? clips[index + 1].offset
+              : filmLength.value * 60
+          }
+          group={group}
+          updateClip={updateClip}
+          clip={clip}
+        />
+      ))}
+      <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
+        {title}
       </div>
     </div>
   );

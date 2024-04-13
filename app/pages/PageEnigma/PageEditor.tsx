@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import { useParams } from "@remix-run/react";
 
 import { LoadingBar, LoadingDots } from "~/components";
 import { SidePanel } from "~/modules/SidePanel";
@@ -57,8 +56,7 @@ export const PageEditor = ({ setPage }: Props) => {
       <TopBar pageName="Edit Scene" />
       <div
         className="relative flex w-screen"
-        style={{ height: "calc(100vh - 68px)" }}
-      >
+        style={{ height: "calc(100vh - 68px)" }}>
         {/* Engine section/side panel */}
         <div
           id="engine-n-panels-wrapper"
@@ -66,23 +64,20 @@ export const PageEditor = ({ setPage }: Props) => {
           style={{
             height,
             width,
-          }}
-        >
+          }}>
           <div className="relative w-full overflow-hidden bg-transparent">
             <div
               className={
                 appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE
                   ? "invisible"
                   : ""
-              }
-            >
+              }>
               <canvas id="video-scene" width="1280px" height="720px" />
 
               {/* Top controls */}
               <div
                 className="absolute left-0 top-0 w-full"
-                onClick={handleOverlayClick}
-              >
+                onClick={handleOverlayClick}>
                 <div className="grid grid-cols-3 gap-4">
                   <ControlsTopButtons />
                   <Controls3D setPage={setPage} />
@@ -98,8 +93,7 @@ export const PageEditor = ({ setPage }: Props) => {
                     (sidePanelVisible.value ? sidePanelWidth.value : 0) -
                     84,
                 }}
-                onClick={handleOverlayClick}
-              >
+                onClick={handleOverlayClick}>
                 <PreviewEngineCamera />
                 <ControlsVideo />
                 <ControlPanelSceneObject />

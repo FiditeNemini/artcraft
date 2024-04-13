@@ -7,8 +7,8 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { AppUiContext } from "../../../../contexts/AppUiContext";
-import { EngineContext } from "../../../../contexts/EngineContext";
+import { AppUiContext } from "~/contexts/AppUiContext";
+import { EngineContext } from "~/contexts/EngineContext";
 import { Button, H5, InputVector } from "~/components";
 
 import { XYZ } from "../../datastructures/common";
@@ -33,6 +33,9 @@ export const ControlPanelSceneObject = () => {
 
   useEffect(() => {
     // TODO this causes a subtle bug because it renders way too many times.
+    if (!appUiState.controlPanel.currentSceneObject) {
+      return;
+    }
     const vectors = appUiState.controlPanel.currentSceneObject.objectVectors;
 
     editorEngine?.setSelectedObject(
@@ -176,8 +179,7 @@ export const ControlPanelSceneObject = () => {
       enterTo="opacity-100"
       leave="transition-opacity duration-100"
       leaveFrom="opacity-100"
-      leaveTo="opacity-0"
-    >
+      leaveTo="opacity-0">
       <div className="flex justify-between">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube} />
@@ -227,8 +229,7 @@ export const ControlPanelSceneObject = () => {
         <Button
           variant="secondary"
           className="grow"
-          onClick={handleOnAddKeyFrame}
-        >
+          onClick={handleOnAddKeyFrame}>
           Add Keyframe (K)
         </Button>
         <Button

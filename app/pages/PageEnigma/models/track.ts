@@ -41,6 +41,12 @@ export interface Keyframe {
 
 export interface CharacterGroup {
   id: string;
+  characters: CharacterTrack[];
+}
+
+export interface CharacterTrack {
+  object_uuid: string;
+  media_id: string;
   name: string;
   muted: boolean;
   animationClips: Clip[];
