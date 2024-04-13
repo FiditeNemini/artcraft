@@ -7,7 +7,6 @@ import { PageEditor } from "~/pages/PageEnigma/PageEditor";
 import { PageStyling } from "~/pages/PageEnigma/PageStyling";
 import { useParams } from "@remix-run/react";
 
-
 export const PageEnigmaComponent = () => {
   useSignals();
 
@@ -15,18 +14,21 @@ export const PageEnigmaComponent = () => {
   const editor = useContext(EngineContext);
   const [page, setPage] = useState("edit");
   const params = useParams();
-  
+
   useEffect(() => {
     if (editor && editor.can_initialize && dispatchAppUiState !== null) {
       console.log("initializing Editor");
-      
-     const sceneToken = params["sceneToken"]
-  
-      editor.initialize({
-        dispatchAppUiState
-      },sceneToken);
+
+      const sceneToken = params["sceneToken"];
+
+      editor.initialize(
+        {
+          dispatchAppUiState,
+        },
+        sceneToken,
+      );
     }
-  }, []);
+  }, [editor, dispatchAppUiState]);
 
   return (
     <>
