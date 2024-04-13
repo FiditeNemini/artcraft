@@ -1,7 +1,6 @@
 import { State, Action, ACTION_TYPES } from "./types";
 
 export function reducer(state: State, action: Action): State {
-  console.log(action.type);
   switch (action.type) {
     case ACTION_TYPES.OPEN_DIALOGUE_TTS: {
       return {
