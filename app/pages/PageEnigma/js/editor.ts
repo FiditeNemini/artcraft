@@ -218,11 +218,11 @@ class Editor {
     );
   }
 
-  isEmpty(value:string) {
+  isEmpty(value: string) {
     return (value == null || (typeof value === "string" && value.trim().length === 0));
   }
-  
-  initialize(config: any,sceneToken) {
+
+  initialize(config: any, sceneToken) {
 
     //setup reactland Callbacks
     this.dispatchAppUiState = config.dispatchAppUiState;
@@ -330,8 +330,6 @@ class Editor {
     this.activeScene.scene.add(this.control);
     // Resets canvas size.
     this.onWindowResize();
-    // Creates the main update loop.
-    this.renderer.setAnimationLoop(this.updateLoop.bind(this));
 
     this.timeline.scene = this.activeScene;
 
@@ -354,10 +352,15 @@ class Editor {
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
 
+    // Creates the main update loop.
+    //this.renderer.setAnimationLoop(this.updateLoop.bind(this));
+
+    this.updateLoop();
+
     if (this.isEmpty(sceneToken) == false) {
       this.loadScene(sceneToken)
     }
-    
+
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
       payload: {
@@ -565,7 +568,7 @@ class Editor {
     });
   }
 
-  async updateLoad(progress:number,message:string) {
+  async updateLoad(progress: number, message: string) {
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
       payload: {
@@ -711,9 +714,11 @@ class Editor {
       console.error("Could not render to canvas no render or composer!");
     }
 
-    if (this.rendering && this.rawRenderer && this.clock) {
+    if (this.rendering && this.rawRenderer && this.clock && this.renderer) {
       if (this.recorder == undefined) {
-        this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 30 FPS
+        this.rawRenderer.setSize(1024, 576);
+        this.render_camera.aspect = 1024 / 576;
+        this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 60 FPS
         this.recorder = new MediaRecorder(this.record_stream, { mimeType: 'video/webm' });
         this.recorder.ondataavailable = (event) => {
           if (event.data.size > 0) {
@@ -737,7 +742,11 @@ class Editor {
   }
 
   // Basicly Unity 3D's update loop.
-  async updateLoop(time: number) {
+  async updateLoop() {
+    setTimeout(() => {
+      requestAnimationFrame(this.updateLoop.bind(this));
+    }, 1000 / this.cap_fps);
+
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
     }
@@ -784,7 +793,7 @@ class Editor {
     }
 
     if (this.timeline.is_playing) {
-      const changeView = await this.timeline.update(delta_time, this.rendering);
+      const changeView = await this.timeline.update(this.rendering);
       if (changeView) {
         this.switchCameraView();
       }
@@ -883,53 +892,54 @@ class Editor {
     );
   }
 
-  async _debugDownloadVideo(videoURL:string) {
-      // DEBUG ONLY to download the video
+  async _debugDownloadVideo(videoURL: string) {
+    // DEBUG ONLY to download the video
 
-      let a = document.createElement('a');
-      a.href = videoURL;
-      a.download = 'video.mp4'; // Name of the downloaded file
-      document.body.appendChild(a);
-      a.click(); // Trigger the download
+    let a = document.createElement('a');
+    a.href = videoURL;
+    a.download = 'video.mp4'; // Name of the downloaded file
+    document.body.appendChild(a);
+    a.click(); // Trigger the download
   }
 
   async stopPlayback(compile_audio: boolean = true) {
     //let video_fps = Math.floor(this.frames * (this.cap_fps / this.timeline.timeline_limit));
     //console.log("Video FPS:", video_fps)
     this.rendering = false;
-
-    console.log(this.frame_buffer);
-
     const videoBlob = new Blob(this.frame_buffer, { type: 'video/webm' });
     const videoURL = URL.createObjectURL(videoBlob);
-    //const arrayBuffer = await videoBlob.arrayBuffer();
-    //const uint8Array = new Uint8Array(arrayBuffer);
-  
-    // Create an anchor element
-    // DEBUG ONLY to download the video
-    //this._debugDownloadVideo(videoURL)
 
     this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
 
-    //for (let index = 0; index < this.frame_buffer.length; index++) {
-    //  const element = this.frame_buffer[index];
-    //  await ffmpeg.FS(
-    //    "writeFile",
-    //    `image${index}.jpg`,
-    //    await fetchFile(element),
-    //  );
-    //}
-
-    this.updateLoad(50,"Processing ...")
+    this.updateLoad(50, "Processing ...")
 
     // Write the Uint8Array to the FFmpeg file system
     ffmpeg.FS('writeFile', 'input.webm', await fetchFile(videoURL));
 
+
     await ffmpeg.run(
       "-i",
       "input.webm",
+      "-vf",
+      "scale=1024:576",
+      "-c:v",
+      "libx264",
+      "-preset",
+      "fast",
+      "-crf",
+      "23",
+      "-c:a",
+      "aac",
+      "-b:a",
+      "192k",
+      "input.mp4",
+    );
+
+    await ffmpeg.run(
+      "-i",
+      "input.mp4",
       "-f",
       "lavfi",
       "-i",
@@ -988,11 +998,18 @@ class Editor {
       });
 
     // {"success":true,"inference_job_token":"jinf_j3nbqbd15wqxb0xcks13qh3f3bz"}
-    this.updateLoad(100,"Done Check Your Media Tab On Profile.")
-    this.endLoading()
+    this.updateLoad(100, "Done Check Your Media Tab On Profile.");
+    this.endLoading();
 
     console.log(result);
     this.recorder = undefined;
+    if (this.rawRenderer) {
+      const stylePreview: HTMLVideoElement | null = document.getElementById(
+        "styled-preview",
+      ) as HTMLVideoElement;
+      this.rawRenderer.setSize(stylePreview.width, stylePreview.height);
+      this.render_camera.aspect = stylePreview.width / stylePreview.height;
+    }
   }
 
   switchPreview() {
@@ -1053,7 +1070,7 @@ class Editor {
         this.switchCameraView();
       }
       this.activeScene.renderMode(true);
-  
+
       const ffmpeg = createFFmpeg({ log: false });
       await ffmpeg.load();
       await ffmpeg.FS("writeFile", `render.png`, await fetchFile(imgData));
@@ -1089,7 +1106,7 @@ class Editor {
 
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
-    
+
     console.log("Generating video...", this.frame_buffer);
     if (this.rendering) {
       return;
@@ -1111,8 +1128,8 @@ class Editor {
 
   startPlayback() {
 
-    this.updateLoad(25,"Starting Processing")
-  
+    this.updateLoad(25, "Starting Processing")
+
     this.timeline.is_playing = true;
     this.timeline.scrubber_frame_position = 0;
     if (!this.camera_person_mode) {
