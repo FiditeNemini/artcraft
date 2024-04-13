@@ -54,7 +54,7 @@ use crate::http_server::endpoints::misc::enable_alpha_easy_handler::enable_alpha
 use crate::http_server::endpoints::misc::enable_alpha_handler::enable_alpha_handler;
 use crate::http_server::endpoints::misc::root_index::get_root_index;
 use crate::http_server::endpoints::mocap::enqueue_mocapnet::enqueue_mocapnet_handler;
-use crate::http_server::endpoints::prompts::get_prompt::get_prompt_handler;
+use crate::http_server::endpoints::prompts::get_prompt_handler::get_prompt_handler;
 use crate::http_server::endpoints::service::health_check_handler::get_health_check_handler;
 use crate::http_server::endpoints::service::public_info_handler::get_public_info_handler;
 use crate::http_server::endpoints::service::status_alert_handler::status_alert_handler;

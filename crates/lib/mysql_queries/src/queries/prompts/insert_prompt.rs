@@ -1,4 +1,5 @@
 use std::marker::PhantomData;
+use anyhow::anyhow;
 
 use sqlx;
 use sqlx::{Executor, MySql};
@@ -7,6 +8,7 @@ use enums::by_table::prompts::prompt_type::PromptType;
 use errors::AnyhowResult;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
+use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 pub struct InsertPromptArgs<'e, 'c,  E>
   where E: 'e + Executor<'c, Database = MySql>
@@ -22,8 +24,7 @@ pub struct InsertPromptArgs<'e, 'c,  E>
 
   pub maybe_negative_prompt: Option<&'e str>,
 
-  // TODO(bt,2024-02-22): This needs to be its own JSON serializable type.
-  pub maybe_other_args: Option<&'e str>,
+  pub maybe_other_args: Option<&'e PromptInnerPayload>,
 
   pub creator_ip_address: &'e str,
 
@@ -41,6 +42,15 @@ pub async fn insert_prompt<'e, 'c : 'e, E>(args: InsertPromptArgs<'e, 'c, E>)
   let prompt_token = match args.maybe_apriori_prompt_token {
     Some(token) => token.clone(),
     None => PromptToken::generate(),
+  };
+
+  let maybe_other_args = match args.maybe_other_args {
+    None => None,
+    Some(inner_payload) => {
+      let encoded = serde_json::ser::to_string(inner_payload)
+          .map_err(|_e| anyhow!("could not encode inner payload"))?;
+      Some(encoded)
+    },
   };
 
   let query = sqlx::query!(
@@ -63,7 +73,7 @@ SET
     args.maybe_creator_user_token.map(|t| t.as_str()),
     args.maybe_positive_prompt,
     args.maybe_negative_prompt,
-    args.maybe_other_args,
+    maybe_other_args,
     args.creator_ip_address,
   );
 

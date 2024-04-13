@@ -25,6 +25,8 @@ use hashing::sha256::sha256_hash_file::sha256_hash_file;
 use mimetypes::mimetype_for_file::get_mimetype_for_file;
 use mysql_queries::payloads::generic_inference_args::generic_inference_args::PolymorphicInferenceArgs::Cu;
 use mysql_queries::payloads::generic_inference_args::workflow_payload::NewValue;
+use mysql_queries::payloads::prompt_args::encoded_style_transfer_name::EncodedStyleTransferName;
+use mysql_queries::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
 use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui::{insert_media_file_from_comfy_ui, InsertArgs};
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
@@ -159,16 +161,25 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         _ => return Err(ProcessSingleJobError::Other(anyhow!("ComfyUi args not found"))),
     };
 
+    let mut should_insert_prompt_record = false;
+    let mut maybe_style_name = None;
     let mut maybe_positive_prompt = None;
     let mut maybe_negative_prompt = None;
 
     // ==================== EXTRACT TEXT PROMPTS ==================== //
 
+    if let Some(style_name) = comfy_args.style_name {
+        should_insert_prompt_record = true;
+        maybe_style_name = Some(style_name);
+    }
+
     if let Some(prompt) = comfy_args.positive_prompt.as_deref() {
+        should_insert_prompt_record = true;
         maybe_positive_prompt = Some(prompt.to_string());
     }
 
     if let Some(prompt) = comfy_args.negative_prompt.as_deref() {
+        should_insert_prompt_record = true;
         maybe_negative_prompt = Some(prompt.to_string());
     }
 
@@ -601,8 +612,16 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             ProcessSingleJobError::Other(e)
         })?;
 
-    if maybe_positive_prompt.is_some() {
-        info!("Logging prompt record");
+    if should_insert_prompt_record {
+        info!("Saving prompt record");
+
+        let mut maybe_other_args = None;
+
+        if let Some(style_name) = maybe_style_name {
+            maybe_other_args = Some(PromptInnerPayload {
+                style_name: Some(EncodedStyleTransferName::from_style_name(style_name)),
+            });
+        }
 
         // NB: Don't fail the job if the query fails.
         let prompt_result = insert_prompt(InsertPromptArgs {
@@ -611,7 +630,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             maybe_creator_user_token: job.maybe_creator_user_token_typed.as_ref(),
             maybe_positive_prompt: maybe_positive_prompt.as_deref(),
             maybe_negative_prompt: maybe_negative_prompt.as_deref(),
-            maybe_other_args: None, // TODO(bt,2024-02-22): Support other arguments
+            maybe_other_args: maybe_other_args.as_ref(),
             creator_ip_address: &job.creator_ip_address,
             mysql_executor: &args.job_dependencies.db.mysql_pool,
             phantom: Default::default(),

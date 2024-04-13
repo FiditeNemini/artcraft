@@ -56,7 +56,7 @@ use crate::http_server::endpoints::media_files::upload::upload_video::upload_vid
 use crate::http_server::endpoints::media_files::upsert_write::write_engine_asset::write_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_write::write_error::MediaFileWriteError;
 use crate::http_server::endpoints::media_files::upsert_write::write_scene_file::write_scene_file_media_file_handler::*;
-use crate::http_server::endpoints::prompts::get_prompt::*;
+use crate::http_server::endpoints::prompts::get_prompt_handler::*;
 use crate::http_server::endpoints::service::status_alert_handler::*;
 use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::*;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::*;

@@ -15,6 +15,7 @@ use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::prompts::prompt_type::PromptType;
 use enums::common::visibility::Visibility;
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::prompts::get_prompt::get_prompt;
 use mysql_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
@@ -53,6 +54,11 @@ pub struct PromptInfo {
 
   /// Negative prompt
   pub maybe_negative_prompt: Option<String>,
+
+  /// If a "style" was used, this is the name of it.
+  /// This might not be present for all types of inference
+  /// and typically only applies to video style transfer.
+  pub maybe_style_name: Option<StyleTransferName>,
 
   // TODO: Author of prompt info
 
