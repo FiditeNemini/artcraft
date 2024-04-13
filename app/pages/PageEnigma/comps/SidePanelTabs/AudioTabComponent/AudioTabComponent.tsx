@@ -45,7 +45,7 @@ export const AudioTabComponent = () => {
           object_uuid: item.token,
           name: item.maybe_title || item.origin.maybe_model.title,
           length: 25,
-          thumbnail: "resources/placeholders/audio_placeholder.png",
+          thumbnail: "/resources/placeholders/audio_placeholder.png",
           isMine: true,
           // isBookmarked?: boolean;
         }

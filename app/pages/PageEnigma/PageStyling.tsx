@@ -1,7 +1,11 @@
 import { useSignals } from "@preact/signals-react/runtime";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleLeft } from "@fortawesome/pro-solid-svg-icons";
-import { Button } from "~/components";
+import {
+  faAngleLeft,
+  faArrowsRotate,
+  faFilm,
+} from "@fortawesome/pro-solid-svg-icons";
+import { Button, LoadingBar } from "~/components";
 import { StyleSelection } from "~/pages/PageEnigma/comps/StyleSelection";
 import { TimerGrid } from "~/pages/PageEnigma/comps/Timeline/TimerGrid";
 import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
@@ -22,10 +26,11 @@ import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 interface Props {
   setPage: (page: string) => void;
 }
-
+import { AppUiContext } from "~/contexts/AppUiContext";
 export const PageStyling = ({ setPage }: Props) => {
   useSignals();
   const editorEngine = useContext(EngineContext);
+  const [appUiState] = useContext(AppUiContext);
 
   console.log(timelineScrollX.value);
 
@@ -70,30 +75,31 @@ export const PageStyling = ({ setPage }: Props) => {
     <div className="w-screen">
       <TopBar pageName="Stylization" />
       <div className="flex w-full justify-center">
-        <div className="bg-ui-controls p-2">
+        <div className="rounded-b-lg bg-ui-controls p-2">
           <Button variant="action" onClick={() => switchEdit()}>
             <FontAwesomeIcon icon={faAngleLeft} />
             Back to Scene
           </Button>
         </div>
       </div>
-      <div className="mt-4 flex flex-col items-center gap-4">
+      <div className="mt-5 flex flex-col items-center gap-6">
         <PreviewImages />
-        <StyleSelection />
-      </div>
-      <div className="fixed bottom-0 left-0 w-full">
-        <div className="flex h-[62px] w-full items-center justify-center gap-5 bg-ui-panel">
-          <div>
-            <Button variant="action" onClick={generateFrame}>
+        <div className="flex flex-col items-center">
+          <StyleSelection />
+          <div className="flex w-full justify-center gap-4 rounded-b-lg bg-ui-panel pb-5">
+            <Button
+              icon={faArrowsRotate}
+              variant="action"
+              onClick={generateFrame}>
               Update Preview
             </Button>
-          </div>
-          <div>
-            <Button variant="primary" onClick={generateMovie}>
+            <Button icon={faFilm} variant="primary" onClick={generateMovie}>
               Generate Movie
             </Button>
           </div>
         </div>
+      </div>
+      <div className="fixed bottom-0 left-0 w-full">
         <div className="relative flex h-[80px] w-full gap-5 border-t border-t-action-600 bg-ui-panel">
           <div className="w-screen overflow-x-auto" onScroll={onScroll}>
             <div
@@ -101,14 +107,22 @@ export const PageStyling = ({ setPage }: Props) => {
                 width: filmLength.value * 60 * 4 * scale.value,
                 height: 60,
               }}
-              onClick={onTimelineClick}
-            >
+              onClick={onTimelineClick}>
               <TimerGrid />
               <Scrubber />
             </div>
           </div>
         </div>
       </div>
+      <LoadingBar
+        id="editor-loading-bar"
+        wrapperClassName="absolute top-0 left-0"
+        innerWrapperClassName="max-w-screen-sm"
+        isShowing={appUiState.showEditorLoadingBar.isShowing}
+        message={appUiState.showEditorLoadingBar.message}
+        label={appUiState.showEditorLoadingBar.label}
+        progress={appUiState.showEditorLoadingBar.progress}
+      />
     </div>
   );
 };

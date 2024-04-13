@@ -8,7 +8,7 @@ export const PreviewImages = () => {
 
   const imageWidth1 = pageWidth.value > 1340 ? 630 : (pageWidth.value - 80) / 2;
   const imageHeight1 = imageWidth1 * 0.56;
-  const imageHeight2 = pageHeight.value > 1138 ? 354 : pageHeight.value - 620;
+  const imageHeight2 = pageHeight.value > 1138 ? 354 : pageHeight.value - 650;
   const imageWidth2 = imageHeight2 / 0.56;
 
   const imageWidth = imageHeight1 < imageHeight2 ? imageWidth1 : imageWidth2;
@@ -21,18 +21,14 @@ export const PreviewImages = () => {
   ].join(" ");
 
   return (
-    <div className="flex justify-center gap-2">
+    <div className="flex justify-center gap-1">
       <div className="flex flex-col" style={{ width: imageWidth }}>
         <div className={textClasses}>Raw Preview</div>
         <div
-          className="block w-full rounded-b-lg"
+          className="block w-full overflow-hidden rounded-b-lg"
           style={{ height: imageHeight }}
         >
-          <canvas
-            id="raw-preview"
-            width={imageWidth}
-            height={imageHeight}
-          />
+          <canvas id="raw-preview" width={imageWidth} height={imageHeight} />
         </div>
       </div>
       <div className="flex w-[40px] flex-col justify-center">
@@ -41,7 +37,7 @@ export const PreviewImages = () => {
       <div className="flex flex-col" style={{ width: imageWidth }}>
         <div className={textClasses}>Styled Preview</div>
         <div
-          className="block w-full rounded-b-lg"
+          className="block w-full overflow-hidden rounded-b-lg"
           style={{ height: imageHeight }}
         >
           <img id="styled-preview" width={imageWidth} height={imageHeight} />

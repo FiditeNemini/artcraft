@@ -156,7 +156,6 @@ export class TimeLine {
     obj.userData["name"] = name;
     obj.name = name;
     const object_uuid = obj.uuid;
-    console.log(object_uuid);
 
     this.characters[object_uuid] = ClipGroup.CHARACTER;
 
@@ -472,7 +471,7 @@ export class TimeLine {
   }
 
   // called by the editor update loop on each frame
-  public async update(isRendering = false): Promise<boolean> {
+  public async update(delta: number, isRendering = false): Promise<boolean> {
     //if (this.is_playing === false) return; // start and stop
     this.timeline_limit = this.getEndPoint();
     if (this.is_playing) {

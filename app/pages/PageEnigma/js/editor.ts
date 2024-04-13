@@ -22,7 +22,7 @@ import { AnimationEngine } from "./animation_engine.js";
 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
 import { APPUI_ACTION_TYPES } from "../../../reducers";
-import { ClipGroup } from "~/pages/PageEnigma/models/track";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 
 import { XYZ } from "../datastructures/common";
 import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
@@ -31,6 +31,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
+import { LoadingBar } from "~/components";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 class Editor {
@@ -101,6 +102,8 @@ class Editor {
   art_style: ArtStyle;
 
   last_scrub: number;
+  record_stream: any | undefined;
+  recorder: MediaRecorder | undefined;
   // Default params.
 
   // scene proxy for serialization
@@ -215,7 +218,12 @@ class Editor {
     );
   }
 
-  initialize(config: any) {
+  isEmpty(value:string) {
+    return (value == null || (typeof value === "string" && value.trim().length === 0));
+  }
+  
+  initialize(config: any,sceneToken) {
+
     //setup reactland Callbacks
     this.dispatchAppUiState = config.dispatchAppUiState;
 
@@ -346,6 +354,10 @@ class Editor {
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
 
+    if (this.isEmpty(sceneToken) == false) {
+      this.loadScene(sceneToken)
+    }
+    
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
       payload: {
@@ -547,6 +559,30 @@ class Editor {
     this.activeScene.load_glb(media_file_token);
   }
 
+  async showLoading() {
+    this.dispatchAppUiState({
+      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADINGBAR,
+    });
+  }
+
+  async updateLoad(progress:number,message:string) {
+    this.dispatchAppUiState({
+      type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
+      payload: {
+        showEditorLoadingBar: {
+          progress: progress,
+          message: message
+        },
+      },
+    });
+  }
+
+  async endLoading() {
+    this.dispatchAppUiState({
+      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADINGBAR,
+    });
+  }
+
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
@@ -666,23 +702,36 @@ class Editor {
     if (this.composer != null && !this.rendering && this.rawRenderer) {
       this.composer.render();
       this.rawRenderer.render(this.activeScene.scene, this.render_camera);
-    } else if (this.renderer && this.render_camera) {
+    } else if (this.renderer && this.render_camera && !this.rendering) {
       this.renderer.setSize(this.render_width, this.render_height);
       this.renderer.render(this.activeScene.scene, this.render_camera);
+    } else if (this.rendering && this.rawRenderer) {
+      this.rawRenderer.render(this.activeScene.scene, this.render_camera);
     } else {
       console.error("Could not render to canvas no render or composer!");
     }
 
-    if (this.rendering && this.renderer && this.clock) {
-      this.frames += 1;
-      this.playback_location++;
-      const imgData = this.renderer.domElement.toDataURL();
-      this.frame_buffer.push(imgData);
+    if (this.rendering && this.rawRenderer && this.clock) {
+      if (this.recorder == undefined) {
+        this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 30 FPS
+        this.recorder = new MediaRecorder(this.record_stream, { mimeType: 'video/webm' });
+        this.recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            this.frame_buffer.push(event.data);
+            this.frames += 1;
+            this.playback_location++;
+          }
+        };
+        this.recorder.onstop = () => {
+          this.stopPlayback();
+        }
+        this.recorder.start();
+      }
+
       this.render_timer += this.clock.getDelta();
       if (this.timeline.is_playing == false) {
-        this.stopPlayback();
+        this.recorder.stop();
         this.playback_location = 0;
-        this.onWindowResize();
       }
     }
   }
@@ -735,7 +784,7 @@ class Editor {
     }
 
     if (this.timeline.is_playing) {
-      const changeView = await this.timeline.update(this.rendering);
+      const changeView = await this.timeline.update(delta_time, this.rendering);
       if (changeView) {
         this.switchCameraView();
       }
@@ -834,32 +883,53 @@ class Editor {
     );
   }
 
+  async _debugDownloadVideo(videoURL:string) {
+      // DEBUG ONLY to download the video
+
+      let a = document.createElement('a');
+      a.href = videoURL;
+      a.download = 'video.mp4'; // Name of the downloaded file
+      document.body.appendChild(a);
+      a.click(); // Trigger the download
+  }
+
   async stopPlayback(compile_audio: boolean = true) {
-
-    console.log(this.frames*(this.timeline.timeline_limit/this.cap_fps))
-
-    //if (this.generating_preview) {
-    //  return;
-    //}
-
+    //let video_fps = Math.floor(this.frames * (this.cap_fps / this.timeline.timeline_limit));
+    //console.log("Video FPS:", video_fps)
     this.rendering = false;
+
+    console.log(this.frame_buffer);
+
+    const videoBlob = new Blob(this.frame_buffer, { type: 'video/webm' });
+    const videoURL = URL.createObjectURL(videoBlob);
+    //const arrayBuffer = await videoBlob.arrayBuffer();
+    //const uint8Array = new Uint8Array(arrayBuffer);
+  
+    // Create an anchor element
+    // DEBUG ONLY to download the video
+    //this._debugDownloadVideo(videoURL)
 
     this.generating_preview = true;
     const ffmpeg = createFFmpeg({ log: true });
     await ffmpeg.load();
-    for (let index = 0; index < this.frame_buffer.length; index++) {
-      const element = this.frame_buffer[index];
-      await ffmpeg.FS(
-        "writeFile",
-        `image${index}.png`,
-        await fetchFile(element),
-      );
-    }
+
+    //for (let index = 0; index < this.frame_buffer.length; index++) {
+    //  const element = this.frame_buffer[index];
+    //  await ffmpeg.FS(
+    //    "writeFile",
+    //    `image${index}.jpg`,
+    //    await fetchFile(element),
+    //  );
+    //}
+
+    this.updateLoad(50,"Processing ...")
+
+    // Write the Uint8Array to the FFmpeg file system
+    ffmpeg.FS('writeFile', 'input.webm', await fetchFile(videoURL));
+
     await ffmpeg.run(
-      "-framerate",
-      "" + this.cap_fps / 2,
       "-i",
-      "image%d.png",
+      "input.webm",
       "-f",
       "lavfi",
       "-i",
@@ -882,7 +952,7 @@ class Editor {
 
     if (compile_audio) {
       for (const clip of this.timeline.timeline_items) {
-        if (clip.type == "lipsync" || clip.type == "audio") {
+        if (clip.type == ClipType.AUDIO) {
           await this.convertAudioClip(itteration, ffmpeg, clip);
           itteration += 1;
         }
@@ -898,15 +968,12 @@ class Editor {
     const blob = new Blob([output.buffer], { type: "video/mp4" });
 
     const data: any = await this.api_manager.uploadMedia(blob, "render.mp4");
-    console.log("data", data);
 
     if (data == null) {
       return;
     }
     const upload_token = data["media_file_token"];
     console.log(upload_token);
-    // Create a link to download the file stylize video using api ..
-    //{"success":true,"upload_token":"mu_x9kr5cfafn512pjbygdszvbdpktrr"} payload
 
     const result = await this.api_manager
       .stylizeVideo(
@@ -921,8 +988,11 @@ class Editor {
       });
 
     // {"success":true,"inference_job_token":"jinf_j3nbqbd15wqxb0xcks13qh3f3bz"}
+    this.updateLoad(100,"Done Check Your Media Tab On Profile.")
+    this.endLoading()
 
     console.log(result);
+    this.recorder = undefined;
   }
 
   switchPreview() {
@@ -983,7 +1053,7 @@ class Editor {
         this.switchCameraView();
       }
       this.activeScene.renderMode(true);
-
+  
       const ffmpeg = createFFmpeg({ log: false });
       await ffmpeg.load();
       await ffmpeg.FS("writeFile", `render.png`, await fetchFile(imgData));
@@ -1014,17 +1084,19 @@ class Editor {
       return new Promise((resolve, reject) => {
         resolve(url);
       });
-
-      this.generating_preview = false;
     }
   }
 
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
+    
     console.log("Generating video...", this.frame_buffer);
-    if (this.rendering || this.generating_preview) {
+    if (this.rendering) {
       return;
     }
+
+    this.showLoading()
+
     this.rendering = true; // has to go first to debounce
     this.startPlayback();
     this.frame_buffer = [];
@@ -1038,15 +1110,18 @@ class Editor {
   }
 
   startPlayback() {
+
+    this.updateLoad(25,"Starting Processing")
+  
     this.timeline.is_playing = true;
     this.timeline.scrubber_frame_position = 0;
+    if (!this.camera_person_mode) {
+      this.switchCameraView();
+    }
     if (this.activeScene.hot_items) {
       this.activeScene.hot_items.forEach((element) => {
         element.visible = false;
       });
-    }
-    if (!this.camera_person_mode) {
-      this.switchCameraView();
     }
   }
 
