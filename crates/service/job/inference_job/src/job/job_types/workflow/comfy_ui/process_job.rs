@@ -618,10 +618,14 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         let mut maybe_other_args = None;
 
         if let Some(style_name) = maybe_style_name {
+            info!("building PromptInnerPayload with style_name = {:?}", style_name);
+
             maybe_other_args = Some(PromptInnerPayload {
                 style_name: Some(EncodedStyleTransferName::from_style_name(style_name)),
             });
         }
+
+        info!("maybe other prompt args: {:?}", maybe_other_args);
 
         // NB: Don't fail the job if the query fails.
         let prompt_result = insert_prompt(InsertPromptArgs {

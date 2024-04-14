@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 
 use anyhow::anyhow;
+use log::info;
 use sqlx;
 use sqlx::{Executor, MySql};
 
@@ -53,6 +54,8 @@ pub async fn insert_prompt<'e, 'c : 'e, E>(args: InsertPromptArgs<'e, 'c, E>)
       Some(encoded)
     },
   };
+
+  info!("maybe other prompt args (json): {:?}", maybe_other_args);
 
   let query = sqlx::query!(
       r#"
