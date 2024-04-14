@@ -11,6 +11,7 @@ use errors::AnyhowResult;
 use filesys::check_file_exists::check_file_exists;
 use filesys::safe_delete_temp_directory::safe_delete_temp_directory;
 use filesys::safe_delete_temp_file::safe_delete_temp_file;
+use media::decode_basic_audio_info::decode_basic_audio_file_info;
 use migration::text_to_speech::get_tts_model_for_run_inference_migration::TtsModelForRunInferenceMigrationWrapper;
 use mysql_queries::column_types::vocoder_type::VocoderType;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
@@ -309,6 +310,17 @@ async fn process_job_with_cleanup(
 
   safe_delete_temp_file(&output_metadata_fs_path);
 
+  info!("Decoding audio info...");
+
+  // NB: The metadata file emitted by tacotron2 hasn't been recording the audio duration recently. (Perhaps it never worked?)
+  let mut maybe_audio_duration_millis = file_metadata.duration_millis.clone();
+  let mut maybe_audio_codec_name = None;
+
+  if let Ok(audio_info) = decode_basic_audio_file_info(&output_audio_fs_path, Some("audio/wav"), None) {
+    maybe_audio_duration_millis = audio_info.duration_millis;
+    maybe_audio_codec_name = audio_info.codec_name;
+  }
+
   // ==================== UPLOAD FILES AND SAVE RECORD ==================== //
 
   let inference_result = upload_results(UploadResultArgs {
@@ -319,6 +331,8 @@ async fn process_job_with_cleanup(
     work_temp_dir,
     pretrained_vocoder,
     file_metadata: &file_metadata,
+    maybe_audio_duration_millis,
+    maybe_audio_codec_name: maybe_audio_codec_name.as_deref(),
     output_audio_fs_path: &output_audio_fs_path,
     output_spectrogram_fs_path: &output_spectrogram_fs_path,
     upload_as_media_file: model_dependencies.upload_as_media_file,

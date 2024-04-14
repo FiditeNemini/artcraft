@@ -38,6 +38,8 @@ pub struct UploadResultArgs<'a> {
 
   // Outputs
   pub file_metadata: &'a FileMetadata,
+  pub maybe_audio_duration_millis: Option<u64>,
+  pub maybe_audio_codec_name: Option<&'a str>,
   pub output_audio_fs_path: &'a Path,
   pub output_spectrogram_fs_path: &'a Path,
 
@@ -107,7 +109,8 @@ async fn upload_as_media_file(args: UploadResultArgs<'_>) -> Result<ResultDetail
     job: &args.job,
     maybe_mime_type: Some(&MIME_TYPE),
     file_size_bytes: args.file_metadata.file_size_bytes,
-    duration_millis: args.file_metadata.duration_millis.unwrap_or(0),
+    maybe_duration_millis: args.maybe_audio_duration_millis,
+    maybe_audio_codec_name: args.maybe_audio_codec_name,
     sha256_checksum: &file_checksum,
     public_bucket_directory_hash: result_bucket_location.get_object_hash(),
     maybe_public_bucket_prefix: Some(BUCKET_FILE_PREFIX),
