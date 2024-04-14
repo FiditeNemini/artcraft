@@ -6,7 +6,7 @@ use actix_web::dev::{ServiceRequest, ServiceResponse};
 use crate::http_server::endpoints::media_files::batch_get_media_files_handler::batch_get_media_files_handler;
 use crate::http_server::endpoints::media_files::change_media_file_visibility_handler::change_media_file_visibility_handler;
 use crate::http_server::endpoints::media_files::delete_media_file::delete_media_file_handler;
-use crate::http_server::endpoints::media_files::get_media_file::get_media_file_handler;
+use crate::http_server::endpoints::media_files::get_media_file_handler::get_media_file_handler;
 use crate::http_server::endpoints::media_files::list::list_featured_media_files::list_featured_media_files_handler;
 use crate::http_server::endpoints::media_files::list::list_media_files::list_media_files_handler;
 use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token::list_media_files_by_batch_token_handler;

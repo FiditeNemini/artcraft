@@ -43,6 +43,8 @@ pub struct MediaFile {
 
   pub maybe_origin_filename: Option<String>,
 
+  pub maybe_duration_millis : Option<u64>,
+
   pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
@@ -108,6 +110,8 @@ pub struct MediaFileRaw {
   pub maybe_text_transcript: Option<String>,
 
   pub maybe_origin_filename: Option<String>,
+
+  pub maybe_duration_millis : Option<i32>,
 
   pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_username: Option<String>,
@@ -198,6 +202,7 @@ pub async fn batch_get_media_files(
         maybe_title: record.maybe_title,
         maybe_text_transcript: record.maybe_text_transcript,
         maybe_origin_filename: record.maybe_origin_filename,
+        maybe_duration_millis: record.maybe_duration_millis.map(|d| d as u64),
         maybe_creator_user_token: record.maybe_creator_user_token,
         maybe_creator_username: record.maybe_creator_username,
         maybe_creator_display_name: record.maybe_creator_display_name,
@@ -247,6 +252,8 @@ SELECT
     m.maybe_text_transcript,
 
     m.maybe_origin_filename,
+
+    m.maybe_duration_millis,
 
     m.maybe_prompt_token,
 
@@ -317,6 +324,7 @@ impl FromRow<'_, MySqlRow> for MediaFileRaw {
       maybe_title: row.try_get("maybe_title")?,
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       maybe_origin_filename: row.try_get("maybe_origin_filename")?,
+      maybe_duration_millis: row.try_get("maybe_duration_millis")?,
       maybe_creator_user_token: UserToken::try_from_mysql_row_nullable(row, "maybe_creator_user_token")?,
       maybe_creator_username: row.try_get("maybe_creator_username")?,
       maybe_creator_display_name: row.try_get("maybe_creator_display_name")?,

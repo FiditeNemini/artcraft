@@ -112,6 +112,10 @@ pub struct BatchMediaFileInfo {
   /// In the future we'll provide our own internal optional filenames.
   pub maybe_original_filename: Option<String>,
 
+  /// Duration for audio and video files, if available.
+  /// Measured in milliseconds.
+  pub maybe_duration_millis: Option<u64>,
+
   /// We can simulate media files for "tts_results" records.
   /// If this is set as true, this informs the frontend and API callers not to treat
   /// the token as a media file and improperly assume it can be used with the rest of
@@ -314,6 +318,7 @@ pub async fn batch_get_media_files_handler(
           creator_set_visibility: result.creator_set_visibility,
           maybe_prompt_token: result.maybe_prompt_token,
           maybe_original_filename: result.maybe_origin_filename,
+          maybe_duration_millis: result.maybe_duration_millis,
           is_emulated_media_file: false,
           stats: SimpleEntityStats {
             positive_rating_count: result.maybe_ratings_positive_count.unwrap_or(0),

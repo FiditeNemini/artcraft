@@ -41,6 +41,8 @@ pub struct MediaFile {
 
   pub maybe_origin_filename: Option<String>,
 
+  pub maybe_duration_millis: Option<u64>,
+
   pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_username: Option<String>,
   pub maybe_creator_display_name: Option<String>,
@@ -109,6 +111,8 @@ pub struct MediaFileRaw {
   pub maybe_text_transcript: Option<String>,
 
   pub maybe_origin_filename: Option<String>,
+
+  pub maybe_duration_millis: Option<i32>,
 
   pub maybe_creator_user_token: Option<UserToken>,
   pub maybe_creator_username: Option<String>,
@@ -182,6 +186,7 @@ pub async fn get_media_file(
     maybe_title: record.maybe_title,
     maybe_text_transcript: record.maybe_text_transcript,
     maybe_origin_filename: record.maybe_origin_filename,
+    maybe_duration_millis: record.maybe_duration_millis.map(|d| d as u64),
     maybe_creator_user_token: record.maybe_creator_user_token,
     maybe_creator_username: record.maybe_creator_username,
     maybe_creator_display_name: record.maybe_creator_display_name,
@@ -238,6 +243,8 @@ SELECT
     m.maybe_text_transcript,
 
     m.maybe_origin_filename,
+
+    m.maybe_duration_millis,
 
     m.maybe_prompt_token as `maybe_prompt_token: tokens::tokens::prompts::PromptToken`,
 
@@ -316,6 +323,8 @@ SELECT
     m.maybe_text_transcript,
 
     m.maybe_origin_filename,
+
+    m.maybe_duration_millis,
 
     m.maybe_prompt_token as `maybe_prompt_token: tokens::tokens::prompts::PromptToken`,
 
