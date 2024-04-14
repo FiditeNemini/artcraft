@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 
-import { LoadingBar, LoadingDots } from "~/components";
+import { LoadingDots } from "~/components";
 import { SidePanel } from "~/modules/SidePanel";
 
 import { Controls3D } from "./comps/Controls3D";
@@ -108,15 +108,6 @@ export const PageEditor = ({ setPage }: Props) => {
               isShowing={appUiState.showEditorLoader.isShowing}
               type="bricks"
               message={appUiState.showEditorLoader.message}
-            />
-            <LoadingBar
-              id="editor-loading-bar"
-              wrapperClassName="absolute top-0 left-0"
-              innerWrapperClassName="max-w-screen-sm"
-              isShowing={appUiState.showEditorLoadingBar.isShowing}
-              message={appUiState.showEditorLoadingBar.message}
-              label={appUiState.showEditorLoadingBar.label}
-              progress={appUiState.showEditorLoadingBar.progress}
             />
           </div>
         </div>

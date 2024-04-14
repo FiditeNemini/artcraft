@@ -31,7 +31,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
-import { LoadingBar } from "~/components";
+import { loadingBarData, loadingBarIsShowing } from "~/store/loadingBar";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 class Editor {
@@ -362,18 +362,11 @@ class Editor {
       this.loadScene(sceneToken);
     }
 
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
-      payload: {
-        showEditorLoadingBar: {
-          progress: 100,
-        },
-      },
-    });
-
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADINGBAR,
-    });
+    loadingBarData.value = {
+      ...loadingBarData.value,
+      progress: 100,
+    };
+    loadingBarIsShowing.value = false;
   }
 
   // Token comes in from the front end to load the scene from the site.
@@ -565,27 +558,20 @@ class Editor {
   }
 
   async showLoading() {
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADINGBAR,
-    });
+    loadingBarIsShowing.value = true;
   }
 
   async updateLoad(progress: number, message: string) {
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
-      payload: {
-        showEditorLoadingBar: {
-          progress: progress,
-          message: message,
-        },
-      },
-    });
+    loadingBarData.value = {
+      ...loadingBarData.value,
+      progress: progress,
+      message: message,
+    };
   }
 
   async endLoading() {
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADINGBAR,
-    });
+    console.log("stop loading");
+    loadingBarIsShowing.value = false;
   }
 
   async _test_demo() {

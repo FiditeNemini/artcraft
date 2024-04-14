@@ -92,8 +92,7 @@ export const Timeline = () => {
             style={{
               width: 88,
               height: timelineHeight.value - 54,
-            }}
-          >
+            }}>
             <RowHeaders />
           </div>
           <div
@@ -102,11 +101,9 @@ export const Timeline = () => {
             style={{
               width: pageWidth.value - 90,
               height: timelineHeight.value - 54,
-            }}
-          >
+            }}>
             <div
-              style={{ width: filmLength.value * 60 * 4 * scale.value + 32 }}
-            >
+              style={{ width: filmLength.value * 60 * 4 * scale.value + 32 }}>
               <Characters />
               <div className="pb-4 pr-8">
                 <Camera />

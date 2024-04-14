@@ -26,17 +26,10 @@ export type State = {
     isShowing: boolean;
     message?: string;
   };
-  showEditorLoadingBar: {
-    isShowing: boolean;
-    label?: string;
-    message?: string;
-    progress?: number;
-    useFakeTimer?: number;
-  };
   controlPanel: ControlPanel;
   diagloueTts: {
     isOpen: boolean;
-  }
+  };
 };
 
 export enum ACTION_TYPES {
@@ -44,9 +37,6 @@ export enum ACTION_TYPES {
   ON_CHANGE_VIEW_MODE = "on_change_view_mode",
   SHOW_EDITOR_LOADER = "show_editor_loader",
   HIDE_EDITOR_LOADER = "hide_editor_loader",
-  SHOW_EDITOR_LOADINGBAR = "show_editor_loadingbar",
-  UPDATE_EDITOR_LOADINGBAR = "update_editor_loadingbar",
-  HIDE_EDITOR_LOADINGBAR = "hide_editor_loadingbar",
   SHOW_CONTROLPANELS_SCENEOBJECT = "show_controlpanels_sceneobject",
   UPDATE_CONTROLPANELS_SCENEOBJECT = "update_controlpanels_sceneobject",
   HIDE_CONTROLPANELS_SCENEOBJECT = "hide_controlpanels_sceneobject",
@@ -72,28 +62,6 @@ export type Action =
       payload?: {
         showEditorLoader: {
           message: string | undefined;
-        };
-      };
-    }
-  | { type: ACTION_TYPES.HIDE_EDITOR_LOADINGBAR }
-  | {
-      type: ACTION_TYPES.SHOW_EDITOR_LOADINGBAR;
-      payload?: {
-        showEditorLoadingBar: {
-          label?: string;
-          message?: string;
-          progress?: number;
-          useFakeTimer?: number;
-        };
-      };
-    }
-  | {
-      type: ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR;
-      payload: {
-        showEditorLoadingBar: {
-          label?: string;
-          message?: string;
-          progress?: number;
         };
       };
     }

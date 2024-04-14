@@ -14,11 +14,10 @@ export const Scrubber = () => {
   const { onPointerDown, time } = useMouseEventsScrubber();
   const displayTime = time === -1 ? currentTime.value : time;
 
-  if (displayTime * 4 * scale.value + 84 - timelineScrollX.value < 84) {
+  if (displayTime * 4 * scale.value - timelineScrollX.value < 0) {
     return null;
   }
 
-  console.log(currentTime.value, displayTime, timelineScrollX.value);
   return (
     <div
       className="absolute flex cursor-ew-resize flex-col items-center text-brand-primary"

@@ -5,7 +5,7 @@ import {
   faArrowsRotate,
   faFilm,
 } from "@fortawesome/pro-solid-svg-icons";
-import { Button, LoadingBar } from "~/components";
+import { Button } from "~/components";
 import { StyleSelection } from "~/pages/PageEnigma/comps/StyleSelection";
 import { TimerGrid } from "~/pages/PageEnigma/comps/Timeline/TimerGrid";
 import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
@@ -17,20 +17,22 @@ import {
   currentTime,
   filmLength,
   scale,
+  timelineHeight,
   timelineScrollX,
 } from "~/pages/PageEnigma/store";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { pageWidth } from "~/store";
+import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders";
 
 interface Props {
   setPage: (page: string) => void;
 }
-import { AppUiContext } from "~/contexts/AppUiContext";
+
 export const PageStyling = ({ setPage }: Props) => {
   useSignals();
   const editorEngine = useContext(EngineContext);
-  const [appUiState] = useContext(AppUiContext);
 
   const generateFrame = async () => {
     await editorEngine?.generateFrame();
@@ -52,6 +54,7 @@ export const PageStyling = ({ setPage }: Props) => {
   const onTimelineClick = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
+        console.log("click", event.clientX, event.pageX, timelineScrollX.value);
         const newTime = Math.round(
           (event.clientX + timelineScrollX.value - 92) / 4 / scale.value,
         );
@@ -62,7 +65,7 @@ export const PageStyling = ({ setPage }: Props) => {
         Queue.publish({
           queueName: QueueNames.TO_ENGINE,
           action: toEngineActions.UPDATE_TIME,
-          data: { currentTime: Math.round(newTime) },
+          data: { currentTime: newTime },
         });
       }
     },
@@ -97,30 +100,28 @@ export const PageStyling = ({ setPage }: Props) => {
           </div>
         </div>
       </div>
-      <div className="fixed bottom-0 left-0 w-full">
-        <div className="relative flex h-[80px] w-full gap-5 border-t border-t-action-600 bg-ui-panel">
-          <div className="w-screen overflow-x-auto" onScroll={onScroll}>
+      <div
+        className="fixed bottom-0 left-0 w-full border-t border-t-action-600 bg-ui-panel"
+        onClick={onTimelineClick}>
+        <TimerGrid />
+        <div className="flex w-full ">
+          <div className="block h-[30px] w-[88px]" />
+          <div
+            className="h-[30px] overflow-x-auto overflow-y-hidden"
+            onScroll={onScroll}
+            style={{
+              width: pageWidth.value,
+            }}>
             <div
               style={{
-                width: filmLength.value * 60 * 4 * scale.value,
+                width: filmLength.value * 60 * 4 * scale.value + 90,
                 height: 60,
-              }}
-              onClick={onTimelineClick}>
-              <TimerGrid />
+              }}>
               <Scrubber />
             </div>
           </div>
         </div>
       </div>
-      <LoadingBar
-        id="editor-loading-bar"
-        wrapperClassName="absolute top-0 left-0"
-        innerWrapperClassName="max-w-screen-sm"
-        isShowing={appUiState.showEditorLoadingBar.isShowing}
-        message={appUiState.showEditorLoadingBar.message}
-        label={appUiState.showEditorLoadingBar.label}
-        progress={appUiState.showEditorLoadingBar.progress}
-      />
     </div>
   );
 };

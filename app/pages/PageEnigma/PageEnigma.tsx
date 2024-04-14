@@ -3,6 +3,8 @@ import { TrackProvider } from "~/pages/PageEnigma/contexts/TrackContext/TrackPro
 import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragComponent";
 import { EngineProvider } from "~/contexts/EngineProvider";
 import { useInferenceJobManager } from "~/hooks";
+import { LoadingBar } from "~/components";
+
 export const PageEnigma = () => {
   useInferenceJobManager();
   return (
@@ -11,6 +13,11 @@ export const PageEnigma = () => {
         <PageEnigmaComponent />
         <DragComponent />
       </EngineProvider>
+      <LoadingBar
+        id="editor-loading-bar"
+        wrapperClassName="absolute top-0 left-0"
+        innerWrapperClassName="max-w-screen-sm"
+      />
     </TrackProvider>
   );
 };
