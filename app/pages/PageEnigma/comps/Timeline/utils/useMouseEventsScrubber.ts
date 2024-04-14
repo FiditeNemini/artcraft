@@ -36,7 +36,6 @@ export const useMouseEventsScrubber = () => {
         (event.clientX - clientX) / 4 / scale.value + currentTime.value,
       );
       if (isActive) {
-        console.log("1111");
         event.stopPropagation();
         event.preventDefault();
         if (delta < 0 || delta > max) {

@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 
-import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/contexts/AppUiContext";
 import { EngineContext } from "~/contexts/EngineContext";
 import { PageEditor } from "~/pages/PageEnigma/PageEditor";
@@ -8,8 +7,6 @@ import { PageStyling } from "~/pages/PageEnigma/PageStyling";
 import { useParams } from "@remix-run/react";
 
 export const PageEnigmaComponent = () => {
-  useSignals();
-
   const [, dispatchAppUiState] = useContext(AppUiContext);
   const editor = useContext(EngineContext);
   const [page, setPage] = useState("edit");
@@ -17,8 +14,6 @@ export const PageEnigmaComponent = () => {
 
   useEffect(() => {
     if (editor && editor.can_initialize && dispatchAppUiState !== null) {
-      console.log("initializing Editor");
-
       const sceneToken = params["sceneToken"];
 
       editor.initialize(
@@ -28,7 +23,7 @@ export const PageEnigmaComponent = () => {
         sceneToken,
       );
     }
-  }, [editor, dispatchAppUiState]);
+  }, [editor, dispatchAppUiState, params]);
 
   return (
     <>
