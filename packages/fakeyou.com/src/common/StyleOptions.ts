@@ -103,3 +103,5 @@ export const STYLE_OPTIONS: readonly StyleOption[] = [
 		value: "realistic_2",
 	},
 ];
+
+export const STYLES_BY_KEY : Map<string, StyleOption> = new Map(STYLE_OPTIONS.map((opt) => [opt.value, opt]));

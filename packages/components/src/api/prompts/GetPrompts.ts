@@ -6,6 +6,7 @@ export interface Prompt {
   created_at: Date,
   maybe_positive_prompt?: string,
   maybe_negative_prompt?: string,
+  maybe_style_name?: string,
   promptType: string
 }
 

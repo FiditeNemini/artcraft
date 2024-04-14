@@ -39,6 +39,7 @@ import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files
 import { mediaTypeLabels } from "utils/mediaTypeLabels";
 import { EngineMediaPanel } from "./components/EngineMediaPanel/EngineMediaPanel";
 import { GetMediaFileTitle } from "common/GetMediaFileTitle";
+import { STYLES_BY_KEY } from "common/StyleOptions";
 
 export default function MediaPage() {
   const { canAccessStudio, canEditMediaFile, user } = useSession();
@@ -159,6 +160,20 @@ export default function MediaPage() {
               </div>
             </>
           )}
+
+          {prompt?.maybe_style_name && (
+            <>
+              <div className="d-flex gap-3 align-items-center mb-2 mt-3">
+                <h6 className="fw-semibold mb-0 flex-grow-1">
+                  Style Name
+                </h6>
+              </div>
+              <div className="panel-inner p-2 rounded">
+                <p className="fs-7">{STYLES_BY_KEY.get(prompt.maybe_style_name)?.label}</p>
+              </div>
+            </>
+          )}
+
         </Panel>
       )}
     </>
