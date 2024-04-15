@@ -555,7 +555,7 @@ export default function MediaPage() {
                     }}
                   />
                 ) : null}
-                { canAccessStudio && mediaFile?.media_type === MediaFileType.Video ? (
+                { canAccessStudio() && mediaFile?.media_type === MediaFileType.Video ? (
                   <Button
                     {...{
                       icon: faArrowRightArrowLeft,
