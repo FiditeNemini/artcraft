@@ -68,9 +68,13 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
   const logout = useCallback(()=>{
     const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
     if (sessionToken !== null){
-    DestroySession(sessionToken).then((res)=>{
-      //TODO: error handling maybe necessary
-    });}
+      console.log('destroying the session');
+      DestroySession(sessionToken).then((res)=>{
+        if (res) console.log('Logout Success'); // do nothing
+        else console.log(res); //TODO: error handling maybe necessary
+      })
+    ;}
+    // regarldess, clear the state and useeffect will rid of the localstorage
     setLogoutState(); 
   },[]);
 

@@ -27,7 +27,7 @@ const RedirectToLogin = ()=>{
   },[]);
   return  (
     <div className="fixed w-full h-full flex flex-col  justify-center items-center">
-      <LoadingDots type="bricks" message="Failed, redirecting..."/>
+      <LoadingDots type="bricks" message="Redirecting..."/>
     </div>
   );
 }
