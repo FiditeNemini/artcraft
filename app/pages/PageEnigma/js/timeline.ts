@@ -511,7 +511,8 @@ export class TimeLine {
           }
         } else if (
           element.type === ClipType.AUDIO &&
-          element.group !== ClipGroup.CHARACTER
+          element.group !== ClipGroup.CHARACTER &&
+          this.is_playing
         ) {
           if (this.scrubber_frame_position + 1 >= element.length) {
             this.audio_engine.stopClip(element.media_id);
@@ -520,7 +521,8 @@ export class TimeLine {
           }
         } else if (
           element.type === ClipType.AUDIO &&
-          element.group === ClipGroup.CHARACTER
+          element.group === ClipGroup.CHARACTER &&
+          this.is_playing
         ) {
           // we will remove this when we know which group it will come from character + audio === lip sync audio.
           if (this.scrubber_frame_position + 1 >= element.length) {
