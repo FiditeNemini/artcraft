@@ -47,7 +47,7 @@ pub enum ExecutableOrCommand {
   Command(String),
 }
 
-pub struct InferenceArgs<P: AsRef<Path>> {
+pub struct WatermarkArgs<P: AsRef<Path>> {
   /// -i: video path
   pub video_path: P,
 
@@ -56,6 +56,9 @@ pub struct InferenceArgs<P: AsRef<Path>> {
 
   /// transparency
   pub alpha: f32,
+
+  /// scale
+  pub scale: f32,
 
   /// --output_audio_filename: output path of wav file.
   pub output_path: P,
@@ -107,7 +110,7 @@ impl FfmpegLogoWatermarkCommand {
 
   pub fn execute_inference<P: AsRef<Path>>(
     &self,
-    args: InferenceArgs<P>,
+    args: WatermarkArgs<P>,
   ) -> CommandExitStatus {
     match self.do_execute_inference(args) {
       Ok(exit_status) => exit_status,
@@ -117,7 +120,7 @@ impl FfmpegLogoWatermarkCommand {
 
   fn do_execute_inference<P: AsRef<Path>>(
     &self,
-    args: InferenceArgs<P>,
+    args: WatermarkArgs<P>,
   ) -> AnyhowResult<CommandExitStatus> {
 
     let mut command = String::new();
@@ -150,7 +153,7 @@ impl FfmpegLogoWatermarkCommand {
     // ffmpeg filter
     command.push_str(" -filter_complex ");
     command.push_str(&format!("\"[1]format=rgba,colorchannelmixer=aa={}[logo];", args.alpha));
-    command.push_str("[logo][0]scale2ref=oh*mdar:ih*0.2[logo][video];");
+    command.push_str(&format!("[logo][0]scale2ref=oh*mdar:ih*{}[logo][video];", args.scale));
     command.push_str("[video][logo]overlay=(main_w-overlay_w)-10:(main_h-overlay_h)-10\"");
     command.push_str(" ");
 

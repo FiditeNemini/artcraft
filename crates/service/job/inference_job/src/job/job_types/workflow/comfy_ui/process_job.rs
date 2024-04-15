@@ -40,7 +40,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
-use crate::util::common_commands::ffmpeg_logo_watermark_command;
+use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
 
 fn get_file_extension(mimetype: &str) -> Result<&'static str> {
     let ext = match mimetype {
@@ -436,10 +436,11 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
         let command_exit_status = model_dependencies
             .ffmpeg_watermark_command
-            .execute_inference(ffmpeg_logo_watermark_command::InferenceArgs {
+            .execute_inference(WatermarkArgs {
                 video_path: &comfy_output_video_file,
                 maybe_override_logo_path: None,
                 alpha: 0.6,
+                scale: 0.1, // NB: 0.1 is good for the Storyteller logo @ 2653x512 placed on 1024x576 output.
                 output_path: &output_video_fs_path_watermark,
             });
 

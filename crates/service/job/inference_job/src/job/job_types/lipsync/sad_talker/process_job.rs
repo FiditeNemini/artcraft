@@ -27,7 +27,7 @@ use crate::job::job_types::lipsync::sad_talker::resize_image::resize_image;
 use crate::job::job_types::lipsync::sad_talker::sad_talker_inference_command::InferenceArgs;
 use crate::job::job_types::lipsync::sad_talker::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
-use crate::util::common_commands::ffmpeg_logo_watermark_command;
+use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
 
 /// The maximum that either width or height can be
 const MAX_DIMENSION : u32 = 1500;
@@ -254,10 +254,11 @@ pub async fn process_job(args: SadTalkerProcessJobArgs<'_>) -> Result<JobSuccess
 
     let command_exit_status = model_dependencies
         .ffmpeg_watermark_command
-        .execute_inference(ffmpeg_logo_watermark_command::InferenceArgs {
+        .execute_inference(WatermarkArgs {
           video_path: &output_video_fs_path,
           maybe_override_logo_path: None,
           alpha: 0.6,
+          scale: 0.1, // NB: 0.1 is good for the Storyteller logo @ 2653x512 placed on 1024x576 output.
           output_path: &output_video_fs_path_watermark,
         });
 
