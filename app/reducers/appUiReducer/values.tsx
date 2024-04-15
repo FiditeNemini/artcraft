@@ -8,11 +8,6 @@ export const initialStateValues: State = {
     isShowing: false,
     message: "Loading Editor Engine 🦊",
   },
-  showEditorLoadingBar: {
-    isShowing: true,
-    progress: 5,
-    message: "Loading Editor Engine 🦊",
-  },
   controlPanel: {
     isShowing: false,
     currentSceneObject: {
@@ -27,5 +22,5 @@ export const initialStateValues: State = {
       },
     },
   },
-  diagloueTts:{isOpen:false}
+  diagloueTts: { isOpen: false },
 };

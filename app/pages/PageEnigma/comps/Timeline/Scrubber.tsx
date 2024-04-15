@@ -14,9 +14,10 @@ export const Scrubber = () => {
   const { onPointerDown, time } = useMouseEventsScrubber();
   const displayTime = time === -1 ? currentTime.value : time;
 
-  if (displayTime * 4 * scale.value + 84 - timelineScrollX.value < 84) {
+  if (displayTime * 4 * scale.value - timelineScrollX.value < 0) {
     return null;
   }
+
   return (
     <div
       className="absolute flex cursor-ew-resize flex-col items-center text-brand-primary"
@@ -24,8 +25,7 @@ export const Scrubber = () => {
         top: 8,
         left: displayTime * 4 * scale.value + 84 - timelineScrollX.value,
       }}
-      onPointerDown={onPointerDown}
-    >
+      onPointerDown={onPointerDown}>
       <div>
         <FontAwesomeIcon icon={faSortDown} className="h-5 text-brand-primary" />
       </div>
