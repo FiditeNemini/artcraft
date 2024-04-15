@@ -378,7 +378,7 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() {}
+  public async testTestTimelineEvents() { }
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -854,10 +854,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-        startTime * 1000 +
-        "|" +
-        startTime * 1000 +
-        "[a1];[0:a][a1]amix=inputs=2[a]",
+      startTime * 1000 +
+      "|" +
+      startTime * 1000 +
+      "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -1107,6 +1107,7 @@ class Editor {
     this.frame_buffer = [];
     this.render_timer = 0;
     this.activeScene.renderMode(this.rendering);
+    this.timeline.scrubber_frame_position = 0;
     if (this.activeScene.hot_items) {
       this.activeScene.hot_items.forEach((element) => {
         element.visible = false;
@@ -1117,15 +1118,23 @@ class Editor {
   startPlayback() {
     this.updateLoad(25, "Starting Processing");
 
-    this.timeline.is_playing = true;
-    this.timeline.scrubber_frame_position = 0;
-    if (!this.camera_person_mode) {
-      this.switchCameraView();
+    if (!this.rendering && this.timeline.is_playing) {
+      this.timeline.is_playing = false;
+      this.timeline.scrubber_frame_position = 0;
+      this.timeline.resetScene();
     }
-    if (this.activeScene.hot_items) {
-      this.activeScene.hot_items.forEach((element) => {
-        element.visible = false;
-      });
+    else {
+
+      this.timeline.is_playing = true;
+      this.timeline.scrubber_frame_position = 0;
+      if (!this.camera_person_mode) {
+        this.switchCameraView();
+      }
+      if (this.activeScene.hot_items) {
+        this.activeScene.hot_items.forEach((element) => {
+          element.visible = false;
+        });
+      }
     }
   }
 

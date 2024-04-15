@@ -432,7 +432,7 @@ export class TimeLine {
     this.is_playing = true;
   }
 
-  private async resetScene() {
+  public async resetScene() {
     for (const element of this.timeline_items) {
       if (element.type === ClipType.TRANSFORM) {
         const object = this.scene.get_object_by_uuid(element.object_uuid);
