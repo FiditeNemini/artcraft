@@ -188,14 +188,23 @@ class Scene {
     // default skybox.
     _create_skybox() {
         const loader = new THREE.CubeTextureLoader();
+        // const texture = loader.load([
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_2_LeftX.png',
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_3_Right-X.png',
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_4_UpY.png',
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_5_Down-Y.png',
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_0_FrontZ.png',
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png',
+        // ]);
         const texture = loader.load([
-            '/resources/skybox/night/Night_Moon_Burst_Cam_2_LeftX.png',
-            '/resources/skybox/night/Night_Moon_Burst_Cam_3_Right-X.png',
-            '/resources/skybox/night/Night_Moon_Burst_Cam_4_UpY.png',
-            '/resources/skybox/night/Night_Moon_Burst_Cam_5_Down-Y.png',
-            '/resources/skybox/night/Night_Moon_Burst_Cam_0_FrontZ.png',
-            '/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png',
+            '/resources/skybox/day/px.png',
+            '/resources/skybox/day/nx.png',
+            '/resources/skybox/day/py.png',
+            '/resources/skybox/day/ny.png',
+            '/resources/skybox/day/pz.png',
+            '/resources/skybox/day/nz.png',
         ]);
+
         this.scene.background = texture;
         console.log("Backround creation..")
     }
