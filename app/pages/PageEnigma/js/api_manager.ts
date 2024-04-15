@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { TimelineDataState } from "./timeline";
+import { STORAGE_KEYS } from "~/contexts/Authentication/types";
 
 /**
  * Storyteller Studio API Manager
@@ -75,9 +76,11 @@ class APIManagerResponseError extends Error {
 
 export class APIManager {
   baseUrl: string;
+  sessionToken: string;
 
   constructor() {
     this.baseUrl = "https://api.fakeyou.com";
+    this.sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN) || "";
     //this.baseUrl = "http://localhost:12345"
   }
 
@@ -240,7 +243,8 @@ export class APIManager {
       method: "POST",
       // credentials: "include",
       headers: {
-        Accept: "application/json",
+        'Accept': "application/json",
+        'session': this.sessionToken,
       },
       body: form_data,
     });
@@ -293,7 +297,8 @@ export class APIManager {
       method: "POST",
       // credentials: "include",
       headers: {
-        Accept: "application/json",
+        'Accept': "application/json",
+        'session': this.sessionToken,
       },
       body: form_data,
     });
@@ -327,7 +332,8 @@ export class APIManager {
       method: "POST",
       // credentials: "include",
       headers: {
-        Accept: "application/json",
+        'Accept': "application/json",
+        'session': this.sessionToken,
       },
       body: formData,
     });
@@ -364,7 +370,8 @@ export class APIManager {
       method: "POST",
       // credentials: "include",
       headers: {
-        Accept: "application/json",
+        'Accept': "application/json",
+        'session': this.sessionToken,
       },
       body: formData,
     });
@@ -423,8 +430,9 @@ export class APIManager {
       method: "POST",
       // credentials: "include",
       headers: {
-        Accept: "application/json",
+        'Accept': "application/json",
         "Content-Type": "application/json",
+        'session': this.sessionToken,
       },
       body: json_data,
     });
