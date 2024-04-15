@@ -192,7 +192,7 @@ export default function TopNav({
     <div
       id="topbar-wrapper"
       className={`position-fixed ${
-        domain.title !== "FakeYou"
+        domain.titlePart !== "FakeYou"
           ? "topbar-bg-transparent"
           : !loggedIn && isOnLandingPage && !isScrolled
             ? "topbar-bg-dark"
@@ -205,13 +205,13 @@ export default function TopNav({
             <Link to="/">
               <img
                 src={domain.logo}
-                alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
+                alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
                 height="36"
                 className="mb-1 d-none d-lg-block"
               />
               <img
                 src="/fakeyou/FakeYou-Logo-Mobile.png"
-                alt={`${domain.title}: Cartoon and Celebrity Text to Speech`}
+                alt={`${domain.titlePart}: Cartoon and Celebrity Text to Speech`}
                 height="36"
                 className="mb-0 d-block d-lg-none"
               />

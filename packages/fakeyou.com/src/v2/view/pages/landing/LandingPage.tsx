@@ -17,7 +17,7 @@ import "./LandingPage.scss";
 // import VstSectionV1 from "./components/VstSectionV1";
 import VstSectionV2 from "./components/VstSectionV2";
 import FakeYouLandingBody from "./fakeyou/FakeYouLandingBody";
-import { DomainConfig, Website } from "utils/domainConfig";
+import { WebsiteConfig, Website } from "@storyteller/components/src/env/GetWebsite";
 import OnboardingSelection from "./storyteller/OnboardingSelection";
 import TtsDemoSection from "./components/TtsDemoSection/TtsDemoSection";
 
@@ -37,7 +37,7 @@ interface Props {
 function LandingPage(props: Props) {
   PosthogClient.recordPageview();
 
-  const domain: DomainConfig = useDomainConfig();
+  const domain: WebsiteConfig = useDomainConfig();
 
   const webpageTitle =
     domain.website === Website.FakeYou

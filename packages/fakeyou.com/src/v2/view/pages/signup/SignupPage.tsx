@@ -354,7 +354,7 @@ function SignupPage(props: Props) {
       type="panel"
       className="login-panel d-flex flex-column align-items-center"
     >
-      <h2 className="fw-bold mb-0 mt-5 mb-4">Sign Up for {domain.title}</h2>
+      <h2 className="fw-bold mb-0 mt-5 mb-4">Sign Up for {domain.titlePart}</h2>
 
       <Panel padding={true}>
         <form onSubmit={handleFormSubmit}>

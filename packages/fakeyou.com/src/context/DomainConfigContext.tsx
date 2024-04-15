@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode } from "react";
-import { getCurrentDomainConfig } from "../utils/domainConfig";
+import { GetWebsite } from "@storyteller/components/src/env/GetWebsite";
 
-const DomainConfigContext = createContext(getCurrentDomainConfig());
+const DomainConfigContext = createContext(GetWebsite());
 
 export const useDomainConfig = () => useContext(DomainConfigContext);
 
@@ -12,7 +12,7 @@ interface DomainConfigProviderProps {
 export default function DomainConfigProvider({
   children,
 }: DomainConfigProviderProps) {
-  const domainConfig = getCurrentDomainConfig();
+  const domainConfig = GetWebsite();
 
   return (
     <DomainConfigContext.Provider value={domainConfig}>

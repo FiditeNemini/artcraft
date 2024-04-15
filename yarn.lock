@@ -4375,35 +4375,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@storyteller/dashboard.power.stream@workspace:packages/dashboard.power.stream":
-  version: 0.0.0-use.local
-  resolution: "@storyteller/dashboard.power.stream@workspace:packages/dashboard.power.stream"
-  dependencies:
-    "@craco/craco": ^6.4.3
-    "@fortawesome/fontawesome-svg-core": ^6.2.1
-    "@fortawesome/free-brands-svg-icons": ^6.2.1
-    "@fortawesome/free-solid-svg-icons": ^6.2.1
-    "@fortawesome/react-fontawesome": ^0.2.0
-    "@storyteller/components": 0.1.0
-    "@testing-library/jest-dom": ^5.16.1
-    "@testing-library/react": ^9.5.0
-    "@testing-library/user-event": ^13.5.0
-    "@types/jest": ^27.4.0
-    "@types/node": ^16.11.21
-    "@types/react": ^16.9.36
-    "@types/react-dom": ^16.9.8
-    bulma: ^0.9.0
-    craco: ^0.0.3
-    react: ^16.13.1
-    react-autocomplete: ^1.8.1
-    react-dom: ^16.13.1
-    react-router-dom: ^5.2.0
-    react-scripts: 5.0.0
-    typescript: ^4.5.5
-    web-vitals: ^2.1.4
-  languageName: unknown
-  linkType: soft
-
 "@storyteller/fakeyou.com@workspace:packages/fakeyou.com":
   version: 0.0.0-use.local
   resolution: "@storyteller/fakeyou.com@workspace:packages/fakeyou.com"
@@ -4493,97 +4464,6 @@ __metadata:
     uuid: ^8.3.2
     wavesurfer.js: ^6.4.0
     zustand: ^4.3.9
-  languageName: unknown
-  linkType: soft
-
-"@storyteller/power.stream-dashboard@workspace:packages/power.stream-dashboard":
-  version: 0.0.0-use.local
-  resolution: "@storyteller/power.stream-dashboard@workspace:packages/power.stream-dashboard"
-  dependencies:
-    "@craco/craco": ^6.4.3
-    "@fortawesome/fontawesome-svg-core": ^6.2.1
-    "@fortawesome/free-brands-svg-icons": ^6.2.1
-    "@fortawesome/free-solid-svg-icons": ^6.2.1
-    "@fortawesome/react-fontawesome": ^0.2.0
-    "@storyteller/components": 0.1.0
-    "@testing-library/jest-dom": ^5.16.1
-    "@testing-library/react": ^9.5.0
-    "@testing-library/user-event": ^13.5.0
-    "@types/jest": ^27.4.0
-    "@types/node": ^16.11.21
-    "@types/react": ^16.9.36
-    "@types/react-dom": ^16.9.8
-    bulma: ^0.9.0
-    craco: ^0.0.3
-    react: ^16.13.1
-    react-autocomplete: ^1.8.1
-    react-dom: ^16.13.1
-    react-router-dom: ^5.2.0
-    react-scripts: 5.0.0
-    react-wavesurfer.js: ^0.0.5
-    typescript: ^4.5.5
-    wavesurfer.js: ^6.2.0
-    web-vitals: ^2.1.4
-  languageName: unknown
-  linkType: soft
-
-"@storyteller/power.stream-obs@workspace:packages/power.stream-obs":
-  version: 0.0.0-use.local
-  resolution: "@storyteller/power.stream-obs@workspace:packages/power.stream-obs"
-  dependencies:
-    "@craco/craco": ^6.4.3
-    "@fortawesome/fontawesome-svg-core": ^6.2.1
-    "@fortawesome/free-brands-svg-icons": ^6.2.1
-    "@fortawesome/free-solid-svg-icons": ^6.2.1
-    "@fortawesome/react-fontawesome": ^0.2.0
-    "@storyteller/components": 0.1.0
-    "@testing-library/jest-dom": ^5.16.1
-    "@testing-library/react": ^9.5.0
-    "@testing-library/user-event": ^13.5.0
-    "@types/jest": ^27.4.0
-    "@types/node": ^16.11.21
-    "@types/react": ^16.9.36
-    "@types/react-dom": ^16.9.8
-    bulma: ^0.9.0
-    craco: ^0.0.3
-    react: ^16.13.1
-    react-autocomplete: ^1.8.1
-    react-dom: ^16.13.1
-    react-router-dom: ^5.2.0
-    react-scripts: 5.0.0
-    typescript: ^4.5.5
-    web-vitals: ^2.1.4
-  languageName: unknown
-  linkType: soft
-
-"@storyteller/power.stream@workspace:packages/power.stream":
-  version: 0.0.0-use.local
-  resolution: "@storyteller/power.stream@workspace:packages/power.stream"
-  dependencies:
-    "@craco/craco": ^6.4.3
-    "@fortawesome/fontawesome-svg-core": ^6.2.1
-    "@fortawesome/free-brands-svg-icons": ^6.2.1
-    "@fortawesome/free-solid-svg-icons": ^6.2.1
-    "@fortawesome/react-fontawesome": ^0.2.0
-    "@storyteller/components": 0.1.0
-    "@testing-library/jest-dom": ^5.16.1
-    "@testing-library/react": ^9.5.0
-    "@testing-library/user-event": ^13.5.0
-    "@types/jest": ^27.4.0
-    "@types/node": ^16.11.21
-    "@types/react": ^16.9.36
-    "@types/react-dom": ^16.9.8
-    bulma: ^0.9.0
-    craco: ^0.0.3
-    react: ^16.13.1
-    react-autocomplete: ^1.8.1
-    react-dom: ^16.13.1
-    react-router-dom: ^5.2.0
-    react-scripts: 5.0.0
-    react-wavesurfer.js: ^0.0.8
-    typescript: ^4.5.5
-    wavesurfer.js: ^6.2.0
-    web-vitals: ^2.1.4
   languageName: unknown
   linkType: soft
 
@@ -18226,17 +18106,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-wavesurfer.js@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "react-wavesurfer.js@npm:0.0.5"
-  peerDependencies:
-    react: ^17.0.2
-    react-dom: ^17.0.2
-    wavesurfer.js: ^5.2.0
-  checksum: b7a7672c9a94b8f14287e852404f389bf3fa5af3fb4b833c1818d60a17b76308d980977cf4e3ceb4405c1fae8ceccc4bd26fce49307b7b5625e0621955e0dcae
-  languageName: node
-  linkType: hard
-
 "react-wavesurfer.js@npm:^0.0.8":
   version: 0.0.8
   resolution: "react-wavesurfer.js@npm:0.0.8"
@@ -21537,7 +21406,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wavesurfer.js@npm:^6.2.0, wavesurfer.js@npm:^6.4.0":
+"wavesurfer.js@npm:^6.4.0":
   version: 6.4.0
   resolution: "wavesurfer.js@npm:6.4.0"
   checksum: 637df6c5c10b5026bbb0c388941775f05f8b1322ab582577dde45ff359bfa09ce94f7c53dc8d2a4040a45cdf6a435f3af3dea39b283d4fb1153216aee7115c46

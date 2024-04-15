@@ -30,7 +30,7 @@ import { useInferenceJobs, useLocalize } from "hooks";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
 import { Button } from "components/common";
 import { WebUrl } from "common/WebUrl";
-import { DomainConfig, Website } from "utils/domainConfig";
+import { WebsiteConfig, Website } from "@storyteller/components/src/env/GetWebsite";
 import { useDomainConfig } from "context/DomainConfigContext";
 
 interface SideNavProps {
@@ -58,7 +58,7 @@ export default function SideNav({
   const isOnLoginPage = window.location.pathname.includes("/login");
   const isOnSignUpPage = window.location.pathname.includes("/signup");
   const isOnStudioPage = window.location.pathname.includes("/studio");
-  const domain: DomainConfig = useDomainConfig();
+  const domain: WebsiteConfig = useDomainConfig();
 
   let history = useHistory();
   const handleNavLinkClick = () => {

@@ -1,5 +1,5 @@
 import { useDocumentTitle } from "@storyteller/components/src/hooks/UseDocumentTitle"
-import { DomainConfig, Website, getCurrentDomainConfig } from "utils/domainConfig";
+import { WebsiteConfig, Website, GetWebsite } from "@storyteller/components/src/env/GetWebsite";
 
 const FAKEYOU_DEFAULT_TITLE = "FakeYou. Deep Fake Text to Speech.";
 const FAKEYOU_SUFFIX = "FakeYou";
@@ -8,7 +8,7 @@ const STORYTELLER_DEFAULT_TITLE = "Storyteller.ai - AI Film and Movie Tools";
 const STORYTELLER_SUFFIX = "Storyteller.ai";
 
 export function usePrefixedDocumentTitle(title?: string) {
-  const domainConfig : DomainConfig = getCurrentDomainConfig();
+  const domainConfig : WebsiteConfig = GetWebsite();
 
   const fixed = title === undefined ? "" : title.trim();
 

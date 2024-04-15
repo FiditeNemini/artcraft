@@ -2,6 +2,9 @@
  * Define links to third party sources here so we can update them in one place.
  */
 class ThirdPartyLinks {
+    // Storyteller Discord
+    public static readonly STORYTELLER_DISCORD = "https://discord.gg/storyteller";
+
     // This should only need to change if our Nitro expires.
     // Old FakeYou Discord invite link: https://discord.gg/H72KFXm
     public static readonly FAKEYOU_DISCORD = "https://discord.gg/fakeyou";
