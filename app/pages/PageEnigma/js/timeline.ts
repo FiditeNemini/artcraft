@@ -455,6 +455,9 @@ export class TimeLine {
       ) {
         this.lipSync_engine.clips[
           element.object_uuid + element.media_id
+        ].stop();
+        this.lipSync_engine.clips[
+          element.object_uuid + element.media_id
         ].reset();
       }
     }

@@ -1121,7 +1121,15 @@ class Editor {
     if (!this.rendering && this.timeline.is_playing) {
       this.timeline.is_playing = false;
       this.timeline.scrubber_frame_position = 0;
+      this.timeline.current_time = 0;
+      this.timeline.stepFrame(0);
       this.timeline.resetScene();
+      this.switchCameraView();
+      if (this.activeScene.hot_items) {
+        this.activeScene.hot_items.forEach((element) => {
+          element.visible = true;
+        });
+      }
     }
     else {
 
