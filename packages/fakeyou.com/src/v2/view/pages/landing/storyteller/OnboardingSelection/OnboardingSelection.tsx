@@ -22,6 +22,14 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
     setIsExpanded(!isExpanded);
   };
 
+  const visitUrl = (url: string) => {
+    if (url.startsWith("https://")) {
+      document.location = url;
+    } else {
+      history.push(url);
+    }
+  }
+
   const cards = [
     {
       text: "Inked Dragon",
@@ -216,7 +224,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
                 canHover={true}
                 borderWidth="2px"
                 hoverPrimaryColor={true}
-                onClick={() => { history.push(card.url) }}
+                onClick={() => { visitUrl(card.url) }}
                 bottomText={card.text}
               />
             </div>
@@ -235,7 +243,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
                   canHover={true}
                   borderWidth="2px"
                   hoverPrimaryColor={true}
-                  onClick={() => { history.push(card.url) }}
+                  onClick={() => { visitUrl(card.url) }}
                   bottomText={card.text}
                 />
               </div>
