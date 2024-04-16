@@ -653,6 +653,7 @@ class Editor {
 
   deleteObject(uuid: string) {
     const obj = this.activeScene.get_object_by_uuid(uuid);
+    if(obj?.name === "::CAM::") { return; }
     if (obj) {
       this.activeScene.scene.remove(obj);
     }
