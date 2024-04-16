@@ -92,7 +92,7 @@ class Scene {
     }
 
     _disable_skybox() {
-        this.scene.background = null;
+        //this.scene.background = null;
     }
 
     _create_camera_obj() {
@@ -188,6 +188,7 @@ class Scene {
     // default skybox.
     _create_skybox() {
         const loader = new THREE.CubeTextureLoader();
+
         // const texture = loader.load([
         //     '/resources/skybox/night/Night_Moon_Burst_Cam_2_LeftX.png',
         //     '/resources/skybox/night/Night_Moon_Burst_Cam_3_Right-X.png',
@@ -196,6 +197,7 @@ class Scene {
         //     '/resources/skybox/night/Night_Moon_Burst_Cam_0_FrontZ.png',
         //     '/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png',
         // ]);
+        
         const texture = loader.load([
             '/resources/skybox/day/px.png',
             '/resources/skybox/day/nx.png',
