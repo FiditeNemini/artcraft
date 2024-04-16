@@ -52,7 +52,7 @@ export const Timeline = () => {
   }, []);
 
   const onDeleteAsk = useCallback((event: KeyboardEvent) => {
-    if (ignoreKeyDelete.value || !isHotkeysDisabled()) {
+    if (ignoreKeyDelete.value || isHotkeysDisabled()) {
       return;
     }
     if (

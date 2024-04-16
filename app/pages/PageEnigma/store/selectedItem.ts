@@ -24,7 +24,7 @@ export const isHotkeysDisabled = ()=>{
   return hotkeysStatus.value.disabled;
 }
 export const disableHotkeyInput = (level: number)=>{
-  if(hotkeysStatus.value.disabled){
+  if(hotkeysStatus.value.disabled === true){
     if (level > hotkeysStatus.value.disabledBy){
       hotkeysStatus.value.disabledBy === level;
     }
@@ -36,7 +36,7 @@ export const disableHotkeyInput = (level: number)=>{
   }
 }
 export const enableHotkeyInput = (level: number)=>{
-  if(hotkeysStatus.value.disabled){
+  if(hotkeysStatus.value.disabled === true){
     if (level >= hotkeysStatus.value.disabledBy){
       hotkeysStatus.value = {
         disabled: false,
