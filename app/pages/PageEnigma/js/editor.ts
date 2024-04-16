@@ -364,6 +364,26 @@ class Editor {
       this.loadScene(sceneToken);
     }
 
+    document.addEventListener('mouseover', (event) => {
+      if (this.orbitControls && this.cameraViewControls) {
+        if (event.target instanceof HTMLCanvasElement) {
+          if (this.camera_person_mode) {
+            this.orbitControls.enabled = false;
+            this.cameraViewControls.enabled = true;
+          }
+          else {
+            this.orbitControls.enabled = true;
+            this.cameraViewControls.enabled = false;
+          }
+        }
+        else {
+          this.orbitControls.enabled = false;
+          this.cameraViewControls.enabled = false;
+        }
+      }
+    });
+
+
     loadingBarData.value = {
       ...loadingBarData.value,
       progress: 100,
@@ -654,7 +674,7 @@ class Editor {
 
   deleteObject(uuid: string) {
     const obj = this.activeScene.get_object_by_uuid(uuid);
-    if(obj?.name === "::CAM::") { return; }
+    if (obj?.name === "::CAM::") { return; }
     if (obj) {
       this.activeScene.scene.remove(obj);
     }
@@ -734,7 +754,7 @@ class Editor {
   }
 
   getselectedSum() {
-    if(this.selected === undefined) { return 0; }
+    if (this.selected === undefined) { return 0; }
     let posCombo = this.selected.position.x + this.selected.position.y + this.selected.position.z;
     let rotCombo = this.selected.rotation.x + this.selected.rotation.y + this.selected.rotation.z;
     let sclCombo = this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
@@ -797,7 +817,7 @@ class Editor {
       if (changeView) {
         this.switchCameraView();
       }
-    } 
+    }
     else if (this.last_scrub === this.timeline.scrubber_frame_position && this.getselectedSum() !== this.last_selected_sum) {
       this.updateSelectedUI();
     }
@@ -1041,8 +1061,8 @@ class Editor {
 
   async generateFrame() {
     if (this.renderer && !this.generating_preview) {
-      this.removeTransformControls();
       this.generating_preview = true;
+      this.removeTransformControls();
       this.activeScene.renderMode(true);
       if (this.activeScene.hot_items) {
         this.activeScene.hot_items.forEach((element) => {
@@ -1108,7 +1128,7 @@ class Editor {
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
     console.log("Generating video...", this.frame_buffer);
-    if (this.rendering) {
+    if (this.rendering || this.generating_preview) {
       return;
     }
 
