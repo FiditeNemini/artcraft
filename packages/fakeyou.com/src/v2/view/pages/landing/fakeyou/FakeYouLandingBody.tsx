@@ -1,5 +1,6 @@
 import { faDiscord, faTwitter } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 // import { Panel } from "components/common";
 import { useLocalize } from "hooks";
 import React from "react";
@@ -57,7 +58,7 @@ export default function FakeYouLandingBody(props: FakeYouLandingBodyProps) {
             <p className="opacity-75">{t("communityText")}</p>
             <div className="d-flex mt-4 gap-3">
               <a
-                href="https://discord.gg/fakeyou"
+                href={GetDiscordLink()}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-discord"

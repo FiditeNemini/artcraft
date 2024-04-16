@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWaveformLines } from "@fortawesome/pro-solid-svg-icons";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { PosthogClient } from "@storyteller/components/src/analytics/PosthogClient";
+import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 
 interface Props {}
 
@@ -51,7 +52,7 @@ function CommunityCommissionsPage(props: Props) {
                     Upload Voice Model
                   </Link>
                   <a
-                    href="https://discord.gg/fakeyou"
+                    href={GetDiscordLink()}
                     className="btn btn-discord text-white"
                     target="_blank"
                     rel="noreferrer"

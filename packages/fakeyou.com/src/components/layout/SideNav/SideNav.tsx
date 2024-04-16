@@ -25,6 +25,7 @@ import {
   faFilm,
 } from "@fortawesome/pro-solid-svg-icons";
 import { SessionWrapper } from "@storyteller/components/src/session/SessionWrapper";
+import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 import { FakeYouFrontendEnvironment } from "@storyteller/components/src/env/FakeYouFrontendEnvironment";
 import { useInferenceJobs, useLocalize } from "hooks";
 import { Logout } from "@storyteller/components/src/api/session/Logout";
@@ -479,7 +480,7 @@ export default function SideNav({
             </li>
             <li className="mb-3">
               <a
-                href="https://discord.gg/fakeyou"
+                href={GetDiscordLink()}
                 target="_blank"
                 rel="noreferrer"
               >

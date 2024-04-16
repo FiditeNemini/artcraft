@@ -7,6 +7,7 @@ import {
   faTwitch,
   faTwitter,
 } from "@fortawesome/free-brands-svg-icons";
+import { GetDiscordLink } from "@storyteller/components/src/env/GetDiscordLink";
 
 interface Props {}
 
@@ -18,7 +19,7 @@ function Footer(props: Props) {
           <div className="container footer-top text-center">
             <div className="d-flex gap-4 justify-content-center p-4 pb-5">
               <a
-                href="https://discord.gg/fakeyou"
+                href={GetDiscordLink()}
                 className="footer-social-icon"
                 rel="noreferrer"
                 target="_blank"
