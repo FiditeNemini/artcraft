@@ -365,8 +365,22 @@ class Editor {
     }
 
     document.addEventListener('mouseover', (event) => {
-      if(event.target instanceof HTMLCanvasElement)
-      console.log(event.target instanceof HTMLCanvasElement);
+      if (this.orbitControls && this.cameraViewControls) {
+        if (event.target instanceof HTMLCanvasElement) {
+          if (this.camera_person_mode) {
+            this.orbitControls.enabled = false;
+            this.cameraViewControls.enabled = true;
+          }
+          else {
+            this.orbitControls.enabled = true;
+            this.cameraViewControls.enabled = false;
+          }
+        }
+        else {
+          this.orbitControls.enabled = false;
+          this.cameraViewControls.enabled = false;
+        }
+      }
     });
 
 
