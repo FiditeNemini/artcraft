@@ -383,7 +383,6 @@ class Editor {
       }
     });
 
-
     loadingBarData.value = {
       ...loadingBarData.value,
       progress: 100,
@@ -1098,6 +1097,7 @@ class Editor {
       await ffmpeg.run("-i", `render.png`, "render.mp4");
       const output = await ffmpeg.FS("readFile", "render.mp4");
       const blob = new Blob([output.buffer], { type: "video/mp4" });
+      this.generating_preview = false;
 
       const url = await this.api_manager.uploadMediaFrameGeneration(
         blob,
@@ -1116,8 +1116,6 @@ class Editor {
       } else {
         console.log("No style preview window.");
       }
-
-      this.generating_preview = false;
 
       return new Promise((resolve, reject) => {
         resolve(url);
