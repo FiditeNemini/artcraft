@@ -29,9 +29,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         "https://storage.googleapis.com/vocodes-public/media/f/g/s/d/m/fgsdm4v1mv2nqd5y1y6an46zmj4sx5vt/videofgsdm4v1mv2nqd5y1y6an46zmj4sx5vtmp4",
       hoverVideo:
         "https://storage.googleapis.com/vocodes-public/media/2/1/t/v/e/21tvezwdmevrqdmd3zttspykenktepx4/21tvezwdmevrqdmd3zttspykenktepx4.mp4",
-      onClick: () => {
-        history.push("/studio-intro/m_7m8qvhmr55w4d7c31a7f4yjdtm22ww");
-      },
+      url: "/studio-intro/m_7m8qvhmr55w4d7c31a7f4yjdtm22ww",
     },
     {
       text: "Best Friends",
@@ -39,9 +37,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         "https://storage.googleapis.com/vocodes-public/media/3/n/m/9/c/3nm9car0x6af035663ervxq2qagdw8rk/video3nm9car0x6af035663ervxq2qagdw8rkmp4",
       hoverVideo:
         "https://storage.googleapis.com/vocodes-public/media/e/t/3/d/6/et3d68wkewppwmgw5kadmes8yr8whe2z/et3d68wkewppwmgw5kadmes8yr8whe2z.mp4",
-      onClick: () => {
-        history.push("/studio-intro/m_th523rg3tvax5rceys7s97jgrbbm11");
-      },
+      url: "/studio-intro/m_th523rg3tvax5rceys7s97jgrbbm11",
     },
     {
       text: "Desert Fox",
@@ -49,9 +45,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         "https://storage.googleapis.com/vocodes-public/media/a/p/j/b/q/apjbqp06we4xf51aaqt4rhb7bpvdg90p/videoapjbqp06we4xf51aaqt4rhb7bpvdg90pmp4",
       hoverVideo:
         "https://storage.googleapis.com/vocodes-public/media/w/n/5/7/4/wn574b0qqy64xymthbk0y806czmmn0jx/wn574b0qqy64xymthbk0y806czmmn0jx.mp4",
-      onClick: () => {
-        history.push("/studio-intro/m_dzsxjjjyx18k3x2rsys5zkm94x73kt");
-      },
+      url: "/studio-intro/m_dzsxjjjyx18k3x2rsys5zkm94x73kt",
     },
     {
       text: "Castle Airship",
@@ -59,9 +53,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         "https://storage.googleapis.com/vocodes-public/media/v/e/c/3/c/vec3cwk00xvrafv7rgvhfvbhqtm72pr7/videovec3cwk00xvrafv7rgvhfvbhqtm72pr7mp4",
       hoverVideo:
         "https://storage.googleapis.com/vocodes-public/media/q/h/h/r/f/qhhrf4tddye8jpfrz030ja425nkxymr3/qhhrf4tddye8jpfrz030ja425nkxymr3.mp4",
-      onClick: () => {
-        history.push("/studio-intro/m_n6rxmbn7abz29vmcecrkrgytxw55kr");
-      },
+      url: "/studio-intro/m_n6rxmbn7abz29vmcecrkrgytxw55kr",
     },
     {
       text: "Forest Friends",
@@ -69,9 +61,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         "https://storage.googleapis.com/vocodes-public/media/k/v/r/0/w/kvr0wsw87gmkx6psfp73v34behs2vd34/videokvr0wsw87gmkx6psfp73v34behs2vd34mp4",
       hoverVideo:
         "https://storage.googleapis.com/vocodes-public/media/g/1/s/n/d/g1snde1192qbe3nctpa3p0f2xhgrdjkm/g1snde1192qbe3nctpa3p0f2xhgrdjkm.mp4",
-      onClick: () => {
-        history.push("/studio-intro/m_qnvcv073za8b5y23fra4vbt8cea2c3");
-      },
+      url: "/studio-intro/m_qnvcv073za8b5y23fra4vbt8cea2c3",
     },
     {
       text: "Pirate Island",
@@ -79,9 +69,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         "https://storage.googleapis.com/vocodes-public/media/4/d/a/q/1/4daq1tz77rahrr5kt8wa45y6z93hy6fd/video4daq1tz77rahrr5kt8wa45y6z93hy6fdmp4",
       hoverVideo:
         "https://storage.googleapis.com/vocodes-public/media/9/9/g/c/f/99gcfq21cafy6frtp1afdff11f45sm1w/99gcfq21cafy6frtp1afdff11f45sm1w.mp4",
-      onClick: () => {
-        history.push("/studio-intro/m_m5vgpxd99dak30t1cw4dsaj4jarhvt");
-      },
+      url: "/studio-intro/m_m5vgpxd99dak30t1cw4dsaj4jarhvt",
     },
     {
       text: "Forest Fox",
@@ -89,9 +77,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         "https://storage.googleapis.com/vocodes-public/media/8/w/5/w/0/8w5w0hs5pfxqbyqpqrzkn93wyqkszb27/video8w5w0hs5pfxqbyqpqrzkn93wyqkszb27mp4",
       hoverVideo:
         "https://storage.googleapis.com/vocodes-public/media/k/4/y/w/k/k4ywk99n773aj1s2y2p6f74mqy6j4p9m/k4ywk99n773aj1s2y2p6f74mqy6j4p9m.mp4",
-      onClick: () => {
-        history.push("/studio-intro/m_t0x2avjrv11zkrcbp0tjmqbg9dpk0k");
-      },
+      url: "/studio-intro/m_t0x2avjrv11zkrcbp0tjmqbg9dpk0k",
     },
     {
       text: "Dragon Concert",
@@ -99,9 +85,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
         "https://storage.googleapis.com/vocodes-public/media/v/3/v/a/c/v3vacb5910g6vfhjc2aemjghshpq2fs8/videov3vacb5910g6vfhjc2aemjghshpq2fs8mp4",
       hoverVideo:
         "https://storage.googleapis.com/vocodes-public/media/a/0/p/5/a/a0p5a0dc021qam59e0pxjtg9sk59mcg2/a0p5a0dc021qam59e0pxjtg9sk59mcg2.mp4",
-      onClick: () => {
-        history.push("/studio-intro/m_qsjwkd8ap8mnvskm0dqbf9ewk8dg4m");
-      },
+      url: "/studio-intro/m_qsjwkd8ap8mnvskm0dqbf9ewk8dg4m",
     },
   ];
 
@@ -216,7 +200,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
                 canHover={true}
                 borderWidth="2px"
                 hoverPrimaryColor={true}
-                onClick={card.onClick}
+                onClick={() => { history.push(card.url) }}
                 bottomText={card.text}
               />
             </div>
@@ -235,7 +219,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
                   canHover={true}
                   borderWidth="2px"
                   hoverPrimaryColor={true}
-                  onClick={card.onClick}
+                  onClick={() => { history.push(card.url) }}
                   bottomText={card.text}
                 />
               </div>
