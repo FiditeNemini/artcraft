@@ -16,7 +16,7 @@ export default function useTimelineClick(page: Pages) {
     const scrollX =
       page === Pages.EDIT ? timelineScrollX.value : stylizeScrollX.value;
     const newTime = Math.round(
-      (event.clientX + scrollX - 228) / 4 / scale.value,
+      (event.clientX + scrollX - 204) / 4 / scale.value,
     );
     if (newTime < 0) {
       return;

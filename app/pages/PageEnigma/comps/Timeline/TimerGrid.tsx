@@ -21,7 +21,7 @@ export const TimerGrid = ({ page }: Props) => {
   return (
     <div
       className={[
-        "prevent-select ml-[228px] mt-4",
+        "prevent-select ml-[204px] mt-4",
         "relative flex h-7 overflow-hidden",
         "border-t border-t-ui-panel-border",
         "text-xs text-white opacity-75",

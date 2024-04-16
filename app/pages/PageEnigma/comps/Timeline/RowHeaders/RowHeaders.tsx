@@ -12,9 +12,18 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
 import { useSignals } from "@preact/signals-react/runtime";
+import { GlobalAudioHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/GlobalAudioHeader";
+import { CameraHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/CameraHeader";
+import { ObjectsHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/ObjectsHeader";
+import { CharacterHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/CharacterHeader";
 
 export const RowHeaders = () => {
   useSignals();
+
+  const compressedHeaderClasses =
+    "flex h-[35px] items-center gap-2 pl-2 text-xs font-medium text-white";
+  const uncompressedHeaderClasses =
+    "flex h-[35px] items-center gap-2 rounded-br-lg pl-2 text-xs font-medium text-white";
 
   return (
     <div className="relative">
@@ -27,8 +36,12 @@ export const RowHeaders = () => {
               <div
                 key={character.object_uuid}
                 className="mb-4 h-[35px] w-full rounded-l-lg bg-character-groupBg">
-                <div className="flex h-[35px] flex-col justify-center pl-2 text-xs font-medium text-white">
-                  {character.name}
+                <div
+                  className={[
+                    compressedHeaderClasses,
+                    "bg-character-titleBg",
+                  ].join(" ")}>
+                  <CharacterHeader name={character.name} />
                 </div>
               </div>
             );
@@ -37,8 +50,14 @@ export const RowHeaders = () => {
             <div
               key={character.object_uuid}
               className="mb-4 h-[199px] w-full rounded-l-lg bg-character-groupBg">
-              <div className="h-[47px] pl-2 pt-2 text-xs font-medium text-white">
-                {character.name}
+              <div className="h-[47px] text-xs font-medium text-white">
+                <div
+                  className={[
+                    uncompressedHeaderClasses,
+                    "bg-character-titleBg",
+                  ].join(" ")}>
+                  <CharacterHeader name={character.name} />
+                </div>
               </div>
               <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                 Animation
@@ -69,14 +88,23 @@ export const RowHeaders = () => {
 
         {cameraMinimized.value ? (
           <div className="mb-4 h-[35px] w-full rounded-l-lg bg-camera-groupBg">
-            <div className="flex h-[35px] flex-col justify-center pl-2 text-xs font-medium text-white">
-              Camera
+            <div
+              className={[compressedHeaderClasses, "bg-camera-titleBg"].join(
+                " ",
+              )}>
+              <CameraHeader />
             </div>
           </div>
         ) : (
           <div className="mb-4 h-[103px] w-full rounded-l-lg bg-camera-groupBg">
-            <div className="h-[47px] pl-2 pt-2 text-xs font-medium text-white">
-              Camera
+            <div className="h-[47px] text-xs font-medium text-white">
+              <div
+                className={[
+                  uncompressedHeaderClasses,
+                  "bg-camera-titleBg",
+                ].join(" ")}>
+                <CameraHeader />
+              </div>
             </div>
             <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
               Movement
@@ -86,14 +114,24 @@ export const RowHeaders = () => {
 
         {audioMinimized.value ? (
           <div className="mb-4 h-[35px] w-full rounded-l-lg bg-global_audio-groupBg">
-            <div className="flex h-[35px] flex-col justify-center pl-2 text-xs font-medium text-white">
-              Global Audio
+            <div
+              className={[
+                compressedHeaderClasses,
+                "bg-global_audio-titleBg",
+              ].join(" ")}>
+              <GlobalAudioHeader />
             </div>
           </div>
         ) : (
           <div className="mb-4 h-[103px] w-full rounded-l-lg bg-global_audio-groupBg">
-            <div className="h-[47px] pl-2 pt-2 text-xs font-medium text-white">
-              Global Audio
+            <div className="h-[47px] text-xs font-medium text-white">
+              <div
+                className={[
+                  uncompressedHeaderClasses,
+                  "bg-global_audio-titleBg",
+                ].join(" ")}>
+                <GlobalAudioHeader />
+              </div>
             </div>
             <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
               <div className="flex gap-3">
@@ -118,16 +156,26 @@ export const RowHeaders = () => {
           <>
             {objectsMinimized.value ? (
               <div className="mb-4 h-[35px] w-full rounded-l-lg bg-object-groupBg">
-                <div className="flex h-[35px] flex-col justify-center pl-2 text-xs font-medium text-white">
-                  Objects
+                <div
+                  className={[
+                    compressedHeaderClasses,
+                    "bg-object-titleBg",
+                  ].join(" ")}>
+                  <ObjectsHeader />
                 </div>
               </div>
             ) : (
               <div
                 className="mb-4 h-[103px] w-full rounded-l-lg bg-object-groupBg"
                 style={{ height: 55 + objectGroup.value.objects.length * 48 }}>
-                <div className="h-[47px] pl-2 pt-2 text-xs font-medium text-white">
-                  Objects
+                <div className="h-[47px] text-xs font-medium text-white">
+                  <div
+                    className={[
+                      uncompressedHeaderClasses,
+                      "bg-object-titleBg",
+                    ].join(" ")}>
+                    <ObjectsHeader />
+                  </div>
                 </div>
                 {objectGroup.value.objects.map((obj) => (
                   <div

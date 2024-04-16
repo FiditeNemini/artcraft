@@ -78,7 +78,11 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
           event.preventDefault();
           selectedItem.value = clip;
         }}>
-        <div className="ml-2 text-left text-xs text-white">{clip.name}</div>
+        <div
+          className="ml-2 w-full overflow-hidden text-ellipsis whitespace-nowrap text-left text-xs text-white"
+          style={{ width: length * 4 * scale.value - 46 }}>
+          {clip.name}
+        </div>
       </button>
       <button
         className={[

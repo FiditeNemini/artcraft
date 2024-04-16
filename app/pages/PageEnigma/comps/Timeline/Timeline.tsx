@@ -23,7 +23,7 @@ import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
 import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 import { Clip, Keyframe } from "~/pages/PageEnigma/models";
-import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders";
+import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/RowHeaders";
 import { pageWidth } from "~/store";
 import { Pages } from "~/pages/PageEnigma/constants/page";
 import { DoNotShow } from "~/pages/PageEnigma/constants/misc";
@@ -98,7 +98,7 @@ export const Timeline = () => {
         <TimerGrid page={Pages.EDIT} />
         <div className="flex">
           <div
-            className="ml-[82px] mt-2 w-[146px] overflow-hidden"
+            className="ml-[60px] mt-2 w-[144px] overflow-hidden"
             style={{
               height: timelineHeight.value - 54,
             }}>
@@ -108,11 +108,11 @@ export const Timeline = () => {
             className="mb-20 mt-2 overflow-auto"
             onScroll={onScroll}
             style={{
-              width: pageWidth.value - 228,
+              width: pageWidth.value - 204,
               height: timelineHeight.value - 54,
             }}>
             <div
-              style={{ width: filmLength.value * 60 * 4 * scale.value + 32 }}>
+              style={{ width: filmLength.value * 60 * 4 * scale.value + 72 }}>
               <Characters />
               <div className="pb-4 pr-8">
                 <Camera />

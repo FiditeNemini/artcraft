@@ -78,12 +78,12 @@ export const PageStyling = ({ setPage }: Props) => {
         onClick={onTimelineClick}>
         <TimerGrid page={Pages.STYLE} />
         <div className="flex w-full ">
-          <div className="block h-[30px] w-[228px]" />
+          <div className="block h-[30px] w-[204px]" />
           <div
             className="h-[30px] overflow-x-auto overflow-y-hidden"
             onScroll={onScroll}
             style={{
-              width: pageWidth.value - 228,
+              width: pageWidth.value - 264,
             }}>
             <div
               style={{
