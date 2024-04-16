@@ -21,6 +21,7 @@ function getAddCharacter(item: ClipUI) {
     name: item.object_name,
     media_id: item.media_id,
     muted: false,
+    minimized: false,
     animationClips: [],
     positionKeyframes: [],
     lipSyncClips: [],

@@ -4,7 +4,7 @@ import { TrackKeyFrame } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrame";
 interface Props {
   id: string;
   keyframes: Keyframe[];
-  title: string;
+  title?: string;
   group: ClipGroup;
   toggleMute?: () => void;
   muted?: boolean;
@@ -24,22 +24,21 @@ export const TrackKeyFrames = ({
   group,
 }: Props) => {
   return (
-    <div>
-      <div
-        id={`track-${group}-${id}`}
-        className={`relative mt-4 block h-9 w-full rounded-lg bg-${group}-unselected`}
-      >
-        {keyframes.map((keyframe) => (
-          <TrackKeyFrame
-            key={keyframe.keyframe_uuid}
-            updateKeyframe={updateKeyframe}
-            keyframe={keyframe}
-          />
-        ))}
+    <div
+      id={`track-${group}-${id}`}
+      className={`relative block h-9 w-full rounded-lg bg-${group}-unselected`}>
+      {keyframes.map((keyframe) => (
+        <TrackKeyFrame
+          key={keyframe.keyframe_uuid}
+          updateKeyframe={updateKeyframe}
+          keyframe={keyframe}
+        />
+      ))}
+      {!!title && (
         <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
           {title}
         </div>
-      </div>
+      )}
     </div>
   );
 };

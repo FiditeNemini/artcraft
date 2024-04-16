@@ -24,9 +24,10 @@ import { AppUiContext } from "~/contexts/AppUiContext";
 import { pageHeight, pageWidth } from "~/store";
 import { TopBar } from "~/modules/TopBar";
 import { DialogueTTS } from "./comps/DialogueTTS/DialogueTTS";
+import { Pages } from "~/pages/PageEnigma/constants/page";
 
 interface Props {
-  setPage: (page: string) => void;
+  setPage: (page: Pages) => void;
 }
 
 export const PageEditor = ({ setPage }: Props) => {

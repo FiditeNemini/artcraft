@@ -1,10 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  timelineScrollX,
-  currentTime,
-  filmLength,
-  scale,
-} from "~/pages/PageEnigma/store";
+import { currentTime, filmLength, scale } from "~/pages/PageEnigma/store";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
@@ -16,7 +11,7 @@ export const useMouseEventsScrubber = () => {
   const [time, setTime] = useState(-1);
 
   useEffect(() => {
-    const max = filmLength.value * 60 * 4 * scale.value;
+    const max = filmLength.value * 60;
 
     const onPointerUp = () => {
       if (isActive) {
@@ -38,16 +33,11 @@ export const useMouseEventsScrubber = () => {
       if (isActive) {
         event.stopPropagation();
         event.preventDefault();
+        console.log(delta, max);
         if (delta < 0 || delta > max) {
           return;
         }
         setTime((oldTime) => {
-          console.log(
-            oldTime,
-            delta,
-            delta + timelineScrollX.value,
-            delta + timelineScrollX.value / 4 / scale.value,
-          );
           if (oldTime !== delta) {
             Queue.publish({
               queueName: QueueNames.TO_ENGINE,

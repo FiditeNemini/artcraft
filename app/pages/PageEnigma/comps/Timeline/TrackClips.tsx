@@ -1,6 +1,4 @@
 import { TrackClip } from "~/pages/PageEnigma/comps/Timeline/TrackClip";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faVolume, faVolumeSlash } from "@fortawesome/pro-solid-svg-icons";
 import {
   AssetType,
   Clip,
@@ -20,7 +18,7 @@ import {
 interface Props {
   id: string;
   clips: Clip[];
-  title: string;
+  title?: string;
   group: ClipGroup;
   type?: ClipType;
   updateClip: (options: { id: string; length: number; offset: number }) => void;
@@ -79,7 +77,9 @@ export const TrackClips = ({
 
     // Now check if the clip fits
     const position = track.getBoundingClientRect();
-    const clipOffset = (event.clientX - position.x) / 4 / scale.value;
+    const clipOffset = Math.round(
+      (event.clientX - position.x) / 4 / scale.value,
+    );
 
     if (clipOffset + (dragItem.value!.length ?? 0) > filmLength.value * 60) {
       canDrop.value = false;
@@ -112,11 +112,10 @@ export const TrackClips = ({
   return (
     <div
       id={`track-${trackType}-${id}`}
-      className={`relative mt-4 block h-9 w-full rounded-lg bg-${group}-unselected`}
+      className={`relative block h-9 w-full rounded-lg bg-${group}-unselected`}
       onPointerOver={onPointerOver}
       onPointerLeave={onPointerLeave}
-      onPointerMove={onPointerMove}
-    >
+      onPointerMove={onPointerMove}>
       {clips.map((clip, index) => (
         <TrackClip
           key={clip.clip_uuid}
@@ -133,9 +132,11 @@ export const TrackClips = ({
           clip={clip}
         />
       ))}
-      <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
-        {title}
-      </div>
+      {!!title && (
+        <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
+          {title}
+        </div>
+      )}
     </div>
   );
 };

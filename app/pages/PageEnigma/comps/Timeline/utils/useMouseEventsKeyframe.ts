@@ -27,24 +27,31 @@ export const useMouseEventsKeyframe = ({
   const isActive = useRef("");
   const clientX = useRef(0);
 
-  const onPointerUp = useCallback(() => {
-    if (isActive.current) {
-      updateKeyframe({
-        id: keyframe.keyframe_uuid,
-        offset: Math.round(currOffset.current),
-        addToast,
-      });
-      isActive.current = "";
-      canDrop.value = false;
-      setOffset(-1);
-    }
-  }, [updateKeyframe, keyframe.keyframe_uuid, setOffset]);
+  const onPointerUp = useCallback(
+    (event: PointerEvent) => {
+      if (isActive.current) {
+        event.stopPropagation();
+        event.preventDefault();
+        updateKeyframe({
+          id: keyframe.keyframe_uuid,
+          offset: Math.round(currOffset.current),
+          addToast,
+        });
+        isActive.current = "";
+        canDrop.value = false;
+        setOffset(-1);
+      }
+    },
+    [updateKeyframe, keyframe.keyframe_uuid, setOffset, addToast],
+  );
 
   const onMouseMove = useCallback(
     (event: MouseEvent) => {
       const delta = (event.clientX - clientX.current) / 4 / scale.value;
       const deltaOffset = delta + initOffset.current;
       if (isActive.current === "drag") {
+        event.stopPropagation();
+        event.preventDefault();
         if (deltaOffset < min) {
           currOffset.current = min;
         } else if (deltaOffset > max) {
