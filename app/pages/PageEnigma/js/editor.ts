@@ -59,6 +59,7 @@ class Editor {
   mouse: THREE.Vector2 | undefined;
   selected: THREE.Object3D | undefined;
   last_selected: THREE.Object3D | undefined;
+  last_selected_sum: number | undefined;
   transform_interaction: any;
   rendering: boolean;
   api_manager: APIManager;
@@ -176,6 +177,7 @@ class Editor {
     this.max_length = 10;
     this.last_scrub = 0;
     this.frames = 0;
+    this.last_selected_sum = 0;
     // Audio Engine Test.
 
     this.render_width = 1280;
@@ -421,7 +423,6 @@ class Editor {
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
     if (this.selected != undefined || this.selected != null) {
-      console.log(`triggering setSelectedObject`);
       this.selected.position.x = position.x;
       this.selected.position.y = position.y;
       this.selected.position.z = position.z;
@@ -732,6 +733,14 @@ class Editor {
     }
   }
 
+  getselectedSum() {
+    if(this.selected === undefined) { return 0; }
+    let posCombo = this.selected.position.x + this.selected.position.y + this.selected.position.z;
+    let rotCombo = this.selected.rotation.x + this.selected.rotation.y + this.selected.rotation.z;
+    let sclCombo = this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
+    return posCombo + rotCombo + sclCombo;
+  }
+
   // Basicly Unity 3D's update loop.
   async updateLoop() {
     setTimeout(() => {
@@ -788,9 +797,11 @@ class Editor {
       if (changeView) {
         this.switchCameraView();
       }
-    } else if (this.last_scrub !== this.timeline.scrubber_frame_position) {
+    } 
+    else if (this.last_scrub === this.timeline.scrubber_frame_position && this.getselectedSum() !== this.last_selected_sum) {
       this.updateSelectedUI();
     }
+    this.last_selected_sum = this.getselectedSum();
 
     this.last_scrub = this.timeline.scrubber_frame_position;
     this.renderScene();
