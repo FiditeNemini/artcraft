@@ -14,7 +14,7 @@ import {
   timelineScrollY,
   filmLength,
   scale,
-  isHotkeysDisabled,
+  isHotkeyDisabled,
 } from "~/pages/PageEnigma/store";
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -52,7 +52,7 @@ export const Timeline = () => {
   }, []);
 
   const onDeleteAsk = useCallback((event: KeyboardEvent) => {
-    if (ignoreKeyDelete.value || isHotkeysDisabled()) {
+    if (ignoreKeyDelete.value || isHotkeyDisabled()) {
       return;
     }
     if (

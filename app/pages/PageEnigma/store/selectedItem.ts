@@ -20,7 +20,7 @@ export const hotkeysStatus = signal<HotkeysStatusType>({
   disabledBy:DomLevels.NONE,
 });
 
-export const isHotkeysDisabled = ()=>{
+export const isHotkeyDisabled = ()=>{
   return hotkeysStatus.value.disabled;
 }
 export const disableHotkeyInput = (level: number)=>{
