@@ -21,9 +21,9 @@ export const RowHeaders = () => {
   useSignals();
 
   const compressedHeaderClasses =
-    "flex h-[35px] items-center gap-2 pl-2 text-xs font-medium text-white";
+    "flex h-[35px] items-center gap-2 pl-2 text-xs rounded-tl-lg font-medium text-white";
   const uncompressedHeaderClasses =
-    "flex h-[35px] items-center gap-2 rounded-br-lg pl-2 text-xs font-medium text-white";
+    "flex h-[35px] items-center gap-2 rounded-br-lg rounded-tl-lg pl-2 text-xs font-medium text-white";
 
   return (
     <div className="relative">
@@ -63,7 +63,7 @@ export const RowHeaders = () => {
                 Animation
               </div>
               <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
-                Transition
+                Movement
               </div>
               <div className="flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                 <div className="flex gap-3">

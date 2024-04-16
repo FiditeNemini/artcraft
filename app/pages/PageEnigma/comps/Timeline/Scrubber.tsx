@@ -1,13 +1,10 @@
 import {
   currentTime,
-  fullHeight,
   scale,
   stylizeScrollX,
   timelineHeight,
   timelineScrollX,
 } from "~/pages/PageEnigma/store";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSortDown } from "@fortawesome/pro-solid-svg-icons";
 import { useMouseEventsScrubber } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsScrubber";
 import { useSignals } from "@preact/signals-react/runtime";
 import { Pages } from "~/pages/PageEnigma/constants/page";
@@ -32,7 +29,7 @@ export const Scrubber = ({ page }: Props) => {
       className="absolute flex cursor-ew-resize flex-col items-center text-brand-primary"
       style={{
         top: 16,
-        left: displayTime * 4 * scale.value + 201 - scrollX,
+        left: displayTime * 4 * scale.value + 199 - scrollX,
       }}
       onPointerDown={onPointerDown}>
       <div>

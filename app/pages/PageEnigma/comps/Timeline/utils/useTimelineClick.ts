@@ -3,6 +3,7 @@ import {
   currentTime,
   filmLength,
   scale,
+  selectedItem,
   stylizeScrollX,
   timelineScrollX,
 } from "~/pages/PageEnigma/store";
@@ -25,6 +26,7 @@ export default function useTimelineClick(page: Pages) {
     if (newTime > max) {
       return;
     }
+    selectedItem.value = null;
     currentTime.value = newTime;
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,

@@ -40,7 +40,7 @@ export const TrackKeyFrame = ({ keyframe, updateKeyframe }: Props) => {
           : "bg-keyframe-unselected",
       ].join(" ")}
       style={{
-        left: displayOffset * 4 * scale.value - 2,
+        left: displayOffset * 4 * scale.value - 5,
       }}
       onPointerDown={(event) => onPointerDown(event, "drag")}
       onClick={(event) => {

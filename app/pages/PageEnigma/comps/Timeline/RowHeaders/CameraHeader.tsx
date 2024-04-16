@@ -12,7 +12,7 @@ export function CameraHeader() {
           fill="white"
         />
       </svg>
-      Global Audio
+      Camera
     </>
   );
 }
