@@ -24,7 +24,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
 
   const visitUrl = (url: string) => {
     if (url.startsWith("https://")) {
-      document.location = url;
+      document.location.href = url;
     } else {
       history.push(url);
     }
