@@ -5,11 +5,12 @@ import { EngineContext } from "~/contexts/EngineContext";
 import { PageEditor } from "~/pages/PageEnigma/PageEditor";
 import { PageStyling } from "~/pages/PageEnigma/PageStyling";
 import { useParams } from "@remix-run/react";
+import { Pages } from "~/pages/PageEnigma/constants/page";
 
 export const PageEnigmaComponent = () => {
   const [, dispatchAppUiState] = useContext(AppUiContext);
   const editor = useContext(EngineContext);
-  const [page, setPage] = useState("edit");
+  const [page, setPage] = useState<Pages>(Pages.EDIT);
   const params = useParams();
 
   useEffect(() => {
@@ -27,10 +28,10 @@ export const PageEnigmaComponent = () => {
 
   return (
     <>
-      <div className={page === "edit" ? "visible" : "hidden"}>
+      <div className={page === Pages.EDIT ? "visible" : "hidden"}>
         <PageEditor setPage={setPage} />
       </div>
-      <div className={page === "style" ? "visible" : "hidden"}>
+      <div className={page === Pages.STYLE ? "visible" : "hidden"}>
         <PageStyling setPage={setPage} />
       </div>
     </>

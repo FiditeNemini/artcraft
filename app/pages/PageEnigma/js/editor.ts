@@ -364,6 +364,25 @@ class Editor {
       this.loadScene(sceneToken);
     }
 
+    document.addEventListener('mouseover', (event) => {
+      if (this.orbitControls && this.cameraViewControls) {
+        if (event.target instanceof HTMLCanvasElement) {
+          if (this.camera_person_mode) {
+            this.orbitControls.enabled = false;
+            this.cameraViewControls.enabled = true;
+          }
+          else {
+            this.orbitControls.enabled = true;
+            this.cameraViewControls.enabled = false;
+          }
+        }
+        else {
+          this.orbitControls.enabled = false;
+          this.cameraViewControls.enabled = false;
+        }
+      }
+    });
+
     loadingBarData.value = {
       ...loadingBarData.value,
       progress: 100,

@@ -1,18 +1,53 @@
 import { signal, computed } from "@preact/signals-core";
 import { characterGroup } from "~/pages/PageEnigma/store/characterGroups";
 import { objectGroup } from "~/pages/PageEnigma/store/objectGroup";
+import { pageWidth } from "~/store";
+import { timelineScrollX } from "~/pages/PageEnigma/store/timing";
 
 // timeline
 export const scale = signal(1);
 export const filmLength = signal(12);
 export const timelineHeight = signal(0);
 
+export const cameraMinimized = signal(false);
+export const audioMinimized = signal(false);
+export const objectsMinimized = signal(false);
+
+export const characterHeight = computed(() => {
+  if (!characterGroup.value.characters.length) {
+    return 0;
+  }
+  return (
+    characterGroup.value.characters.reduce((totalHeight, character) => {
+      return totalHeight + (character.minimized ? 47 : 211);
+    }, 0) + 8
+  );
+});
+
+export const objectHeight = computed(() => {
+  if (!objectGroup.value.objects.length) {
+    return 0;
+  }
+  if (objectsMinimized.value) {
+    return 55;
+  }
+  return 47 + objectGroup.value.objects.length * 47 + 8;
+});
+
 export const fullHeight = computed(() => {
   return (
-    characterGroup.value.characters.length * 268 +
-    objectGroup.value.objects.length * 60 +
-    300 +
-    96
+    characterHeight.value +
+    objectHeight.value +
+    (cameraMinimized.value ? 47 : 103) +
+    (audioMinimized.value ? 47 : 103) +
+    24
+  );
+});
+
+export const minimizeIconPosition = computed(() => {
+  return Math.min(
+    pageWidth.value - 270 + timelineScrollX.value,
+    fullWidth.value - 24,
   );
 });
 

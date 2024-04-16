@@ -11,23 +11,15 @@ import { TimerGrid } from "~/pages/PageEnigma/comps/Timeline/TimerGrid";
 import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
 import { PreviewImages } from "~/pages/PageEnigma/comps/PreviewImages";
 import { TopBar } from "~/modules/TopBar";
-import React, { UIEvent, useCallback, useContext } from "react";
+import { UIEvent, useCallback, useContext } from "react";
 import { EngineContext } from "~/contexts/EngineContext";
-import {
-  currentTime,
-  filmLength,
-  scale,
-  timelineHeight,
-  timelineScrollX,
-} from "~/pages/PageEnigma/store";
-import Queue from "~/pages/PageEnigma/Queue/Queue";
-import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
-import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { filmLength, scale, stylizeScrollX } from "~/pages/PageEnigma/store";
 import { pageWidth } from "~/store";
-import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders";
+import useTimelineClick from "~/pages/PageEnigma/comps/Timeline/utils/useTimelineClick";
+import { Pages } from "~/pages/PageEnigma/constants/page";
 
 interface Props {
-  setPage: (page: string) => void;
+  setPage: (page: Pages) => void;
 }
 
 export const PageStyling = ({ setPage }: Props) => {
@@ -44,33 +36,14 @@ export const PageStyling = ({ setPage }: Props) => {
 
   const switchEdit = () => {
     editorEngine?.switchEdit();
-    setPage("edit");
+    setPage(Pages.EDIT);
   };
 
   const onScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
-    timelineScrollX.value = event.currentTarget.scrollLeft;
+    stylizeScrollX.value = event.currentTarget.scrollLeft;
   }, []);
 
-  const onTimelineClick = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
-      if (event.button === 0) {
-        console.log("click", event.clientX, event.pageX, timelineScrollX.value);
-        const newTime = Math.round(
-          (event.clientX + timelineScrollX.value - 92) / 4 / scale.value,
-        );
-        if (newTime < 0) {
-          return;
-        }
-        currentTime.value = newTime;
-        Queue.publish({
-          queueName: QueueNames.TO_ENGINE,
-          action: toEngineActions.UPDATE_TIME,
-          data: { currentTime: newTime },
-        });
-      }
-    },
-    [],
-  );
+  const onTimelineClick = useTimelineClick(Pages.STYLE);
 
   return (
     <div className="w-screen">
@@ -103,21 +76,21 @@ export const PageStyling = ({ setPage }: Props) => {
       <div
         className="fixed bottom-0 left-0 w-full border-t border-t-action-600 bg-ui-panel"
         onClick={onTimelineClick}>
-        <TimerGrid />
+        <TimerGrid page={Pages.STYLE} />
         <div className="flex w-full ">
-          <div className="block h-[30px] w-[88px]" />
+          <div className="block h-[30px] w-[204px]" />
           <div
             className="h-[30px] overflow-x-auto overflow-y-hidden"
             onScroll={onScroll}
             style={{
-              width: pageWidth.value,
+              width: pageWidth.value - 264,
             }}>
             <div
               style={{
-                width: filmLength.value * 60 * 4 * scale.value + 90,
+                width: filmLength.value * 60 * 4 * scale.value + 42,
                 height: 60,
               }}>
-              <Scrubber />
+              <Scrubber page={Pages.STYLE} />
             </div>
           </div>
         </div>

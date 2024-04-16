@@ -197,6 +197,22 @@ export function toggleLipSyncMute(characterId: string) {
   };
 }
 
+export function toggleCharacterMinimized(characterId: string) {
+  const oldCharacterGroup = characterGroup.value;
+  characterGroup.value = {
+    ...oldCharacterGroup,
+    characters: oldCharacterGroup.characters.map((character) => {
+      return {
+        ...character,
+        minimized:
+          character.object_uuid === characterId
+            ? !character.minimized
+            : character.minimized,
+      };
+    }),
+  };
+}
+
 export function selectCharacterClip(clipId: string) {
   const oldCharacterGroup = characterGroup.value;
   characterGroup.value = {
