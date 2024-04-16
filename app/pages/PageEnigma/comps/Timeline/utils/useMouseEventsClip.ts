@@ -18,20 +18,29 @@ export const useMouseEventsClip = (
   const isActive = useRef("");
   const clientX = useRef(0);
 
-  const onPointerUp = useCallback(() => {
-    if (isActive.current) {
-      updateClip({
-        id: clip.clip_uuid,
-        offset: Math.round(currOffset.current),
-        length: Math.round(currLength.current),
-      });
-      isActive.current = "";
-      canDrop.value = false;
-    }
-  }, [updateClip, clip.clip_uuid]);
+  const onPointerUp = useCallback(
+    (event: PointerEvent) => {
+      if (isActive.current) {
+        event.stopPropagation();
+        event.preventDefault();
+        updateClip({
+          id: clip.clip_uuid,
+          offset: Math.round(currOffset.current),
+          length: Math.round(currLength.current),
+        });
+        isActive.current = "";
+        canDrop.value = false;
+      }
+    },
+    [updateClip, clip.clip_uuid],
+  );
 
   const onMouseMove = useCallback(
     (event: MouseEvent) => {
+      if (isActive.current) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
       const delta = (event.clientX - clientX.current) / 4 / scale.value;
       const deltaOffset = delta + initOffset.current;
       if (isActive.current === "drag") {

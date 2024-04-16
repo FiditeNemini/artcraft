@@ -1,34 +1,39 @@
 import {
-  timelineScrollX,
   filmLength,
   fullHeight,
   scale,
+  stylizeScrollX,
+  timelineScrollX,
 } from "~/pages/PageEnigma/store";
 import { Fragment } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
+import { Pages } from "~/pages/PageEnigma/constants/page";
 
-export const TimerGrid = () => {
+interface Props {
+  page: Pages;
+}
+export const TimerGrid = ({ page }: Props) => {
   useSignals();
   const sectionWidth = 60 * 4 * scale.value;
+  const scrollX =
+    page === Pages.EDIT ? timelineScrollX.value : stylizeScrollX.value;
 
   return (
     <div
       className={[
-        "prevent-select ml-[88px] mt-4",
+        "prevent-select ml-[228px] mt-4",
         "relative flex h-7 overflow-hidden",
         "border-t border-t-ui-panel-border",
         "text-xs text-white opacity-75",
-      ].join(" ")}
-    >
-      <div className="absolute" style={{ left: timelineScrollX.value * -1 }}>
+      ].join(" ")}>
+      <div className="absolute" style={{ left: scrollX * -1 }}>
         {Array(filmLength.value)
           .fill(0)
           .map((_, index) => (
             <Fragment key={index}>
               <div
                 className="absolute ps-1 pt-2"
-                style={{ left: index * sectionWidth + 4 }}
-              >
+                style={{ left: index * sectionWidth + 4 }}>
                 00:{index < 10 ? "0" + index.toString() : index.toString()}
               </div>
               <div
@@ -57,8 +62,7 @@ export const TimerGrid = () => {
           ))}
         <div
           className="absolute pt-2"
-          style={{ left: filmLength.value * sectionWidth + 4 }}
-        >
+          style={{ left: filmLength.value * sectionWidth + 4 }}>
           00:
           {filmLength.value < 10
             ? "0" + filmLength.value.toString()

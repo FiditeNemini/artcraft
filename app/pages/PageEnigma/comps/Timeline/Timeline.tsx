@@ -5,15 +5,15 @@ import { Camera } from "./Camera";
 import { Audio } from "./Audio";
 import { ConfirmationModal } from "~/components/ConfirmationModal";
 import {
-  timelineHeight,
   deleteAudioClip,
   deleteCharacterClip,
-  selectedItem,
+  filmLength,
   ignoreDelete,
+  scale,
+  selectedItem,
+  timelineHeight,
   timelineScrollX,
   timelineScrollY,
-  filmLength,
-  scale,
 } from "~/pages/PageEnigma/store";
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -25,6 +25,8 @@ import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/us
 import { Clip, Keyframe } from "~/pages/PageEnigma/models";
 import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders";
 import { pageWidth } from "~/store";
+import { Pages } from "~/pages/PageEnigma/constants/page";
+import { DoNotShow } from "~/pages/PageEnigma/constants/misc";
 
 function getItemType(item: Clip | Keyframe | null) {
   if (!item) {
@@ -50,20 +52,6 @@ export const Timeline = () => {
     timelineHeight.value = window.outerHeight * 0.25;
   }, []);
 
-  const onDeleteAsk = useCallback((event: KeyboardEvent) => {
-    if (ignoreDelete.value) {
-      return;
-    }
-    if (
-      ["Backspace", "Delete"].indexOf(event.key) > -1 &&
-      selectedItem.value !== null
-    ) {
-      event.stopPropagation();
-      event.preventDefault();
-      setDialogOpen(true);
-    }
-  }, []);
-
   const onDelete = useCallback(() => {
     if ((selectedItem.value as Clip).clip_uuid) {
       deleteCharacterClip(selectedItem.value as Clip);
@@ -73,6 +61,28 @@ export const Timeline = () => {
     }
     selectedItem.value = null;
   }, [deleteKeyframe]);
+
+  const onDeleteAsk = useCallback(
+    (event: KeyboardEvent) => {
+      if (ignoreDelete.value) {
+        return;
+      }
+      if (
+        ["Backspace", "Delete"].indexOf(event.key) > -1 &&
+        selectedItem.value !== null
+      ) {
+        event.stopPropagation();
+        event.preventDefault();
+        const show = localStorage.getItem("Delete-Clip");
+        if (show === DoNotShow) {
+          onDelete();
+          return;
+        }
+        setDialogOpen(true);
+      }
+    },
+    [onDelete],
+  );
 
   useEffect(() => {
     document.addEventListener("keydown", onDeleteAsk);
@@ -85,21 +95,20 @@ export const Timeline = () => {
   return (
     <>
       <LowerPanel>
-        <TimerGrid />
+        <TimerGrid page={Pages.EDIT} />
         <div className="flex">
           <div
-            className="mt-2 overflow-hidden"
+            className="ml-[82px] mt-2 w-[146px] overflow-hidden"
             style={{
-              width: 88,
               height: timelineHeight.value - 54,
             }}>
             <RowHeaders />
           </div>
           <div
-            className="mt-2 overflow-auto"
+            className="mb-20 mt-2 overflow-auto"
             onScroll={onScroll}
             style={{
-              width: pageWidth.value - 90,
+              width: pageWidth.value - 228,
               height: timelineHeight.value - 54,
             }}>
             <div
@@ -114,7 +123,7 @@ export const Timeline = () => {
               <ObjectGroups />
             </div>
           </div>
-          <Scrubber />
+          <Scrubber page={Pages.EDIT} />
         </div>
       </LowerPanel>
       <ConfirmationModal
@@ -129,6 +138,7 @@ export const Timeline = () => {
         okText="Delete"
         okColor="bg-brand-primary"
         onCancel={() => setDialogOpen(false)}
+        canHide
       />
     </>
   );

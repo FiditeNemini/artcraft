@@ -31,46 +31,40 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
   const classes = [
     "absolute",
     clip.clip_uuid === selectedClipId
-      ? `bg-${group}-selected`
+      ? `bg-${group}-selected border-white focus-visible:outline-0`
       : `bg-${group}-clip`,
   ];
 
   return (
     <>
-      <div
-        className={[
-          ...classes,
-          "px-[6px] py-[3px]",
-          "rounded",
-          "prevent-select text-xs font-medium text-white",
-        ].join(" ")}
-        style={{ top: -28, left: offset * 4 * scale.value + 2 }}
-      >
-        {clip.name}
-      </div>
       <button
         className={[
           ...classes,
-          "rounded-l-lg",
-          "block h-full",
+          "w-[15px] rounded-l-lg",
+          "block h-full cursor-ew-resize",
           clip.clip_uuid === selectedClipId
-            ? "border border-b-2 border-l-2 border-r-0 border-t-2 border-white focus-visible:outline-0"
+            ? "border border-b-2 border-l-2 border-r-0 border-t-2"
             : "",
         ].join(" ")}
         style={{
-          width: 15,
           left: offset * 4 * scale.value,
-          cursor: "w-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "left")}
-        onClick={() => (selectedItem.value = clip)}
-      />
+        onClick={(event) => {
+          event.stopPropagation();
+          event.preventDefault();
+          selectedItem.value = clip;
+        }}>
+        <div className="flex h-full items-center justify-end">
+          <div className="block h-[10px] w-[2px] bg-white opacity-60" />
+        </div>
+      </button>
       <button
         className={[
           ...classes,
           "block h-full",
           clip.clip_uuid === selectedClipId
-            ? "border border-b-2 border-l-0 border-r-0 border-t-2 border-white focus-visible:outline-0"
+            ? "border border-b-2 border-l-0 border-r-0 border-t-2"
             : "",
         ].join(" ")}
         style={{
@@ -79,25 +73,35 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
           cursor: "move",
         }}
         onPointerDown={(event) => onPointerDown(event, "drag")}
-        onClick={() => (selectedItem.value = clip)}
-      />
+        onClick={(event) => {
+          event.stopPropagation();
+          event.preventDefault();
+          selectedItem.value = clip;
+        }}>
+        <div className="ml-2 text-left text-xs text-white">{clip.name}</div>
+      </button>
       <button
         className={[
           ...classes,
-          "rounded-r-lg",
-          "block h-full",
+          "w-[15px] rounded-r-lg",
+          "block h-full cursor-ew-resize",
           clip.clip_uuid === selectedClipId
-            ? "border border-b-2 border-l-0 border-r-2 border-t-2 border-white focus-visible:outline-0"
+            ? "border border-b-2 border-l-0 border-r-2 border-t-2"
             : "",
         ].join(" ")}
         style={{
-          width: 15,
           left: offset * 4 * scale.value + length * 4 * scale.value - 15,
-          cursor: "e-resize",
         }}
         onPointerDown={(event) => onPointerDown(event, "right")}
-        onClick={() => (selectedItem.value = clip)}
-      />
+        onClick={(event) => {
+          event.stopPropagation();
+          event.preventDefault();
+          selectedItem.value = clip;
+        }}>
+        <div className="flex h-full items-center">
+          <div className="block h-[10px] w-[2px] bg-white opacity-60" />
+        </div>
+      </button>
     </>
   );
 };

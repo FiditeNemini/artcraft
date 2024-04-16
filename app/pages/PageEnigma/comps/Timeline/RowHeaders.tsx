@@ -1,7 +1,10 @@
 import {
   audioGroup,
+  audioMinimized,
+  cameraMinimized,
   characterGroup,
   objectGroup,
+  objectsMinimized,
   timelineScrollY,
   toggleAudioMute,
   toggleLipSyncMute,
@@ -16,22 +19,89 @@ export const RowHeaders = () => {
   return (
     <div className="relative">
       <div
-        className="absolute mt-2"
-        style={{ top: timelineScrollY.value * -1 - 8 }}
-      >
-        {characterGroup.value.characters.map((character) => (
-          <div className="mb-4 ml-6" key={character.object_uuid}>
-            <div className="relative block h-[224px] w-[64px] overflow-x-hidden rounded-l-lg bg-character-groupBg">
-              <div className="absolute left-2 top-2 text-xs font-medium text-white">
-                Character
+        className="absolute mt-2 w-[146px]"
+        style={{ top: timelineScrollY.value * -1 - 8 }}>
+        {characterGroup.value.characters.map((character) => {
+          if (character.minimized) {
+            return (
+              <div
+                key={character.object_uuid}
+                className="mb-4 h-[35px] w-full rounded-l-lg bg-character-groupBg">
+                <div className="flex h-[35px] flex-col justify-center pl-2 text-xs font-medium text-white">
+                  {character.name}
+                </div>
               </div>
-              <div className="absolute">
+            );
+          }
+          return (
+            <div
+              key={character.object_uuid}
+              className="mb-4 h-[199px] w-full rounded-l-lg bg-character-groupBg">
+              <div className="h-[47px] pl-2 pt-2 text-xs font-medium text-white">
+                {character.name}
+              </div>
+              <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+                Animation
+              </div>
+              <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+                Transition
+              </div>
+              <div className="flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+                <div className="flex gap-3">
+                  Lip Sync
+                  <button
+                    className="text-md text-white transition-colors duration-100 hover:text-white/80"
+                    onClick={() => toggleLipSyncMute(character.object_uuid)}>
+                    {character.muted ? (
+                      <FontAwesomeIcon
+                        icon={faVolumeSlash}
+                        className="text-brand-primary transition-colors duration-100 hover:text-brand-primary/80"
+                      />
+                    ) : (
+                      <FontAwesomeIcon icon={faVolume} />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {cameraMinimized.value ? (
+          <div className="mb-4 h-[35px] w-full rounded-l-lg bg-camera-groupBg">
+            <div className="flex h-[35px] flex-col justify-center pl-2 text-xs font-medium text-white">
+              Camera
+            </div>
+          </div>
+        ) : (
+          <div className="mb-4 h-[103px] w-full rounded-l-lg bg-camera-groupBg">
+            <div className="h-[47px] pl-2 pt-2 text-xs font-medium text-white">
+              Camera
+            </div>
+            <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+              Movement
+            </div>
+          </div>
+        )}
+
+        {audioMinimized.value ? (
+          <div className="mb-4 h-[35px] w-full rounded-l-lg bg-global_audio-groupBg">
+            <div className="flex h-[35px] flex-col justify-center pl-2 text-xs font-medium text-white">
+              Global Audio
+            </div>
+          </div>
+        ) : (
+          <div className="mb-4 h-[103px] w-full rounded-l-lg bg-global_audio-groupBg">
+            <div className="h-[47px] pl-2 pt-2 text-xs font-medium text-white">
+              Global Audio
+            </div>
+            <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+              <div className="flex gap-3">
+                Track 1
                 <button
-                  className="text-md absolute text-white transition-colors duration-100 hover:text-white/80"
-                  style={{ top: 174, left: 34 }}
-                  onClick={() => toggleLipSyncMute(character.object_uuid)}
-                >
-                  {character.muted ? (
+                  className="text-md text-white transition-colors duration-100 hover:text-white/80"
+                  onClick={() => toggleAudioMute()}>
+                  {audioGroup.value.muted ? (
                     <FontAwesomeIcon
                       icon={faVolumeSlash}
                       className="text-brand-primary transition-colors duration-100 hover:text-brand-primary/80"
@@ -43,46 +113,33 @@ export const RowHeaders = () => {
               </div>
             </div>
           </div>
-        ))}
-        <div className="mb-4 ml-6">
-          <div className="relative block h-[88px] w-[64px] rounded-l-lg bg-camera-groupBg">
-            <div className="absolute left-2 top-2 text-xs font-medium text-white">
-              Camera
-            </div>
-          </div>
-        </div>
-        <div className="mb-4 ml-6">
-          <div className="relative block h-[88px] w-[64px] rounded-l-lg bg-global_audio-groupBg">
-            <div className="absolute left-2 top-2 text-xs font-medium text-white">
-              Global Audio
-            </div>
-            <div className="absolute">
-              <button
-                className="text-md absolute text-white transition-colors duration-100 hover:text-white/80"
-                style={{ top: 40, left: 34 }}
-                onClick={() => toggleAudioMute()}
-              >
-                {audioGroup.value.muted ? (
-                  <FontAwesomeIcon
-                    icon={faVolumeSlash}
-                    className="text-brand-primary transition-colors duration-100 hover:text-brand-primary/80"
-                  />
-                ) : (
-                  <FontAwesomeIcon icon={faVolume} />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-        {objectGroup.value.objects.map((obj) => (
-          <div key={obj.object_uuid} className="mb-4 ml-6">
-            <div className="relative block h-[88px] w-[64px] rounded-l-lg bg-object-groupBg">
-              <div className="absolute left-2 top-2 text-xs font-medium text-white">
-                Object
+        )}
+        {objectGroup.value.objects.length > 0 && (
+          <>
+            {objectsMinimized.value ? (
+              <div className="mb-4 h-[35px] w-full rounded-l-lg bg-object-groupBg">
+                <div className="flex h-[35px] flex-col justify-center pl-2 text-xs font-medium text-white">
+                  Objects
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
+            ) : (
+              <div
+                className="mb-4 h-[103px] w-full rounded-l-lg bg-object-groupBg"
+                style={{ height: 55 + objectGroup.value.objects.length * 48 }}>
+                <div className="h-[47px] pl-2 pt-2 text-xs font-medium text-white">
+                  Objects
+                </div>
+                {objectGroup.value.objects.map((obj) => (
+                  <div
+                    key={obj.object_uuid}
+                    className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+                    {obj.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

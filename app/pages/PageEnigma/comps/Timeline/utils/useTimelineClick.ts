@@ -1,0 +1,35 @@
+import React, { useCallback } from "react";
+import {
+  currentTime,
+  filmLength,
+  scale,
+  stylizeScrollX,
+  timelineScrollX,
+} from "~/pages/PageEnigma/store";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { Pages } from "~/pages/PageEnigma/constants/page";
+
+export default function useTimelineClick(page: Pages) {
+  return useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    const scrollX =
+      page === Pages.EDIT ? timelineScrollX.value : stylizeScrollX.value;
+    const newTime = Math.round(
+      (event.clientX + scrollX - 228) / 4 / scale.value,
+    );
+    if (newTime < 0) {
+      return;
+    }
+    const max = filmLength.value * 60;
+    if (newTime > max) {
+      return;
+    }
+    currentTime.value = newTime;
+    Queue.publish({
+      queueName: QueueNames.TO_ENGINE,
+      action: toEngineActions.UPDATE_TIME,
+      data: { currentTime: newTime },
+    });
+  }, []);
+}
