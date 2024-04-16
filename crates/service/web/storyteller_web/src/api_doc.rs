@@ -48,16 +48,17 @@ use crate::http_server::endpoints::media_files::list::list_media_files::*;
 use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token::*;
 use crate::http_server::endpoints::media_files::list::list_media_files_for_user::*;
 use crate::http_server::endpoints::media_files::rename_media_file_handler::*;
+use crate::http_server::endpoints::media_files::set_media_file_cover_image_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::*;
-use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_write::write_engine_asset::write_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_write::write_error::MediaFileWriteError;
 use crate::http_server::endpoints::media_files::upsert_write::write_scene_file::write_scene_file_media_file_handler::*;
 use crate::http_server::endpoints::prompts::get_prompt_handler::*;
 use crate::http_server::endpoints::service::status_alert_handler::*;
+use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::*;
 use crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::*;
 use crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::*;
 use crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::*;
@@ -94,14 +95,15 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token::list_media_files_by_batch_token_handler,
     crate::http_server::endpoints::media_files::list::list_media_files_for_user::list_media_files_for_user_handler,
     crate::http_server::endpoints::media_files::rename_media_file_handler::rename_media_file_handler,
+    crate::http_server::endpoints::media_files::set_media_file_cover_image_handler::set_media_file_cover_image_handler,
     crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::upload_media_file_handler,
-    crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler,
     crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::upload_video_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_write::write_engine_asset::write_engine_asset_media_file_handler::write_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_write::write_scene_file::write_scene_file_media_file_handler::write_scene_file_media_file_handler,
     crate::http_server::endpoints::prompts::get_prompt_handler::get_prompt_handler,
     crate::http_server::endpoints::service::status_alert_handler::status_alert_handler,
+    crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler,
     crate::http_server::endpoints::user_bookmarks::batch_get_user_bookmarks_handler::batch_get_user_bookmarks_handler,
     crate::http_server::endpoints::user_bookmarks::create_user_bookmark_handler::create_user_bookmark_handler,
     crate::http_server::endpoints::user_bookmarks::delete_user_bookmark_handler::delete_user_bookmark_handler,
@@ -176,10 +178,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     BatchGetUserBookmarksError,
     BatchGetUserBookmarksQueryParams,
     BatchGetUserBookmarksResponse,
-    InferTtsSuccessResponse,
-    InferTtsRequest,
-    InferenceJobTokenType,
-    InferTtsError,
     BatchGetUserRatingError,
     BatchGetUserRatingQueryParams,
     BatchGetUserRatingResponse,
@@ -228,7 +226,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     GetWeightError,
     GetWeightPathInfo,
     GetWeightResponse,
+    InferTtsError,
+    InferTtsRequest,
+    InferTtsSuccessResponse,
     InferenceJobStatusResponsePayload,
+    InferenceJobTokenType,
     ListAvailableWeightsQuery,
     ListAvailableWeightsSuccessResponse,
     ListDatasetsByUserError,
@@ -284,6 +286,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     SessionInfoError,
     SessionInfoSuccessResponse,
     SessionUserInfo,
+    SetMediaFileCoverImageError,
+    SetMediaFileCoverImagePathInfo,
+    SetMediaFileCoverImageRequest,
     SetModelWeightCoverImageError,
     SetModelWeightCoverImagePathInfo,
     SetModelWeightCoverImageRequest,

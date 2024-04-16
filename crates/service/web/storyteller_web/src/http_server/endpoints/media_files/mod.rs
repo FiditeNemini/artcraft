@@ -4,6 +4,7 @@ pub mod delete_media_file;
 pub mod get_media_file_handler;
 pub mod list;
 pub mod rename_media_file_handler;
+pub mod set_media_file_cover_image_handler;
 pub mod update_media_file;
 pub mod upload;
 pub mod upsert_write;

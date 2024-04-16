@@ -12,6 +12,7 @@ use crate::http_server::endpoints::media_files::list::list_media_files::list_med
 use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token::list_media_files_by_batch_token_handler;
 use crate::http_server::endpoints::media_files::list::list_media_files_for_user::list_media_files_for_user_handler;
 use crate::http_server::endpoints::media_files::rename_media_file_handler::rename_media_file_handler;
+use crate::http_server::endpoints::media_files::set_media_file_cover_image_handler::set_media_file_cover_image_handler;
 use crate::http_server::endpoints::media_files::update_media_file::update_media_file_handler;
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler;
 use crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::upload_media_file_handler;
@@ -38,12 +39,18 @@ pub fn add_media_file_routes<T, B> (app: App<T>) -> App<T>
       )
       .service(web::resource("/rename/{token}")
           .route(web::post().to(rename_media_file_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/cover_image/{token}")
+          .route(web::post().to(set_media_file_cover_image_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(web::resource("/visibility/{token}")
           .route(web::post().to(change_media_file_visibility_handler))
       )
       .service(web::resource("/file/{token}/update")
           .route(web::post().to(update_media_file_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(web::resource("/batch")
           .route(web::get().to(batch_get_media_files_handler))

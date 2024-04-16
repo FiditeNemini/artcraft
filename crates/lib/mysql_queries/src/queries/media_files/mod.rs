@@ -1,6 +1,7 @@
 pub mod batch_get_media_files;
 pub mod create;
 pub mod delete_media_file;
+pub mod edit;
 pub mod get_media_file;
 pub mod get_media_file_for_inference;
 pub mod list;

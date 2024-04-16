@@ -154,7 +154,7 @@ pub async fn set_model_weight_cover_image_handler(
       ).await;
 
       let media_file = match media_file_lookup_result {
-        Ok(Some(model_weight)) => model_weight,
+        Ok(Some(media_file)) => media_file,
         Ok(None) => {
           warn!("Media file not found: {:?}", media_file_token);
           return Err(SetModelWeightCoverImageError::NotFound);
@@ -165,8 +165,12 @@ pub async fn set_model_weight_cover_image_handler(
         }
       };
 
-      if media_file.creator_set_visibility != Visibility::Public
-          || media_file.media_type != MediaFileType::Image {
+      //let can_use_image = media_file.creator_set_visibility == Visibility::Public
+      //    && media_file.media_type == MediaFileType::Image;
+
+      let can_use_image = media_file.media_type == MediaFileType::Image;
+
+      if  !can_use_image {
         return Err(SetModelWeightCoverImageError::BadInput("Invalid media file token.".to_string()));
       }
 
