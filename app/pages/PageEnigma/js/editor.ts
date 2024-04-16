@@ -365,7 +365,8 @@ class Editor {
     }
 
     document.addEventListener('mouseover', (event) => {
-      console.log(event.target?.tagName);
+      if(event.target instanceof HTMLCanvasElement)
+      console.log(event.target instanceof HTMLCanvasElement);
     });
 
 
