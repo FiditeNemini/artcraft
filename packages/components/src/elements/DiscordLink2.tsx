@@ -2,8 +2,8 @@ import React from "react";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ThirdPartyLinks } from "../constants/ThirdPartyLinks";
 import { GetWebsite, Website } from "../env/GetWebsite";
+import { GetDiscordLink } from "../env/GetDiscordLink";
 
 interface Props {
   hideIcon?: boolean;
@@ -19,11 +19,8 @@ function DiscordLink2(props: Props) {
   const showIcon = !(props.hideIcon ? true : false);
   const iconBeforeText = props.iconBeforeText ? true : false;
 
+  const discordLink = GetDiscordLink();
   const website = GetWebsite();
-  const discordLink = 
-    website.website === Website.FakeYou ? 
-      ThirdPartyLinks.FAKEYOU_DISCORD : 
-      ThirdPartyLinks.STORYTELLER_DISCORD;
 
   const defaultTitle = 
     website.website === Website.FakeYou ? 

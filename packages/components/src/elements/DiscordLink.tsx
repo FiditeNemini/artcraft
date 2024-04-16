@@ -2,8 +2,7 @@ import React from "react";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ThirdPartyLinks } from "../constants/ThirdPartyLinks";
-import { GetWebsite, Website } from "../env/GetWebsite";
+import { GetDiscordLink } from "../env/GetDiscordLink";
 
 interface Props {
   text?: string;
@@ -11,11 +10,7 @@ interface Props {
 }
 
 function DiscordLink(props: Props) {
-  const website = GetWebsite();
-  const discordLink = 
-    website.website === Website.FakeYou ? 
-      ThirdPartyLinks.FAKEYOU_DISCORD : 
-      ThirdPartyLinks.STORYTELLER_DISCORD;
+  const discordLink = GetDiscordLink();
 
   const linkText = props.text === undefined ? "Discord" : props.text;
   const iconAfterText = props.iconAfterText ? true : false;
