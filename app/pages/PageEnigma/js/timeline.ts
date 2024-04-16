@@ -245,6 +245,8 @@ export class TimeLine {
   }
 
   public deleteObject(object_uuid: string) {
+    let object = this.scene.get_object_by_uuid(object_uuid);
+    if(object?.name === "::CAM::") { return; }
     this.timeline_items = this.timeline_items.filter(
       (element) => element.object_uuid !== object_uuid,
     );
