@@ -432,7 +432,7 @@ export class TimeLine {
     this.is_playing = true;
   }
 
-  private async resetScene() {
+  public async resetScene() {
     for (const element of this.timeline_items) {
       if (element.type === ClipType.TRANSFORM) {
         const object = this.scene.get_object_by_uuid(element.object_uuid);
@@ -453,6 +453,9 @@ export class TimeLine {
         element.type === ClipType.AUDIO &&
         element.group === ClipGroup.CHARACTER
       ) {
+        this.lipSync_engine.clips[
+          element.object_uuid + element.media_id
+        ].stop();
         this.lipSync_engine.clips[
           element.object_uuid + element.media_id
         ].reset();
@@ -511,7 +514,8 @@ export class TimeLine {
           }
         } else if (
           element.type === ClipType.AUDIO &&
-          element.group !== ClipGroup.CHARACTER
+          element.group !== ClipGroup.CHARACTER &&
+          this.is_playing
         ) {
           if (this.scrubber_frame_position + 1 >= element.length) {
             this.audio_engine.stopClip(element.media_id);
@@ -520,7 +524,8 @@ export class TimeLine {
           }
         } else if (
           element.type === ClipType.AUDIO &&
-          element.group === ClipGroup.CHARACTER
+          element.group === ClipGroup.CHARACTER &&
+          this.is_playing
         ) {
           // we will remove this when we know which group it will come from character + audio === lip sync audio.
           if (this.scrubber_frame_position + 1 >= element.length) {
