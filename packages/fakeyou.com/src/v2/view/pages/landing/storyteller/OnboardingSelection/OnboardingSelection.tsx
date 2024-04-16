@@ -24,6 +24,22 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
 
   const cards = [
     {
+      text: "Inked Dragon",
+      defaultVideo:
+        "https://storage.googleapis.com/vocodes-public/media/n/j/n/a/s/njnasfa5cyvg5kf8vq17pmc5c4gpyj7z/videonjnasfa5cyvg5kf8vq17pmc5c4gpyj7zmp4",
+      hoverVideo:
+        "https://storage.googleapis.com/vocodes-public/media/q/a/q/m/h/qaqmhyqv203a5e8kep2nat2yft57ghdg/upload_qaqmhyqv203a5e8kep2nat2yft57ghdg.mp4",
+      url: "https://studio.storyteller.ai/m_9pf7a7v0138zx58f4x6ejsehjcvfq6",
+    },
+    {
+      text: "Dancing Girl",
+      defaultVideo:
+        "https://storage.googleapis.com/vocodes-public/media/k/h/3/7/b/kh37b0v1jcsg800rmh52vh1k8xcgkr2x/videokh37b0v1jcsg800rmh52vh1k8xcgkr2xmp4",
+      hoverVideo:
+        "https://storage.googleapis.com/vocodes-public/media/9/1/m/g/s/91mgssbfngm5y5bdr8kfex228b7dmxc4/upload_91mgssbfngm5y5bdr8kfex228b7dmxc4.mp4",
+      url: "https://studio.storyteller.ai/m_nmzvdqr6kr8eqpmxqdzkqj0yknrjwv",
+    },
+    {
       text: "Home Office",
       defaultVideo:
         "https://storage.googleapis.com/vocodes-public/media/f/g/s/d/m/fgsdm4v1mv2nqd5y1y6an46zmj4sx5vt/videofgsdm4v1mv2nqd5y1y6an46zmj4sx5vtmp4",
