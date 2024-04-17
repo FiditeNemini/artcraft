@@ -5,7 +5,7 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use log::warn;
+use log::{info, warn};
 use utoipa::ToSchema;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
@@ -140,6 +140,8 @@ pub async fn set_media_file_cover_image_handler(
       .as_ref()
       .map(|token| token.as_str().trim().is_empty())
       .unwrap_or(true);
+
+  info!("Delete media file cover image? : {delete_cover_image}");
 
   if !delete_cover_image {
     if let Some(media_file_token) = &request.cover_image_media_file_token {

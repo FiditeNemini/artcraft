@@ -2,7 +2,6 @@ use sqlx::MySqlPool;
 
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
-use tokens::tokens::model_weights::ModelWeightToken;
 
 pub struct UpdateArgs<'a> {
   pub media_file_token: &'a MediaFileToken,
