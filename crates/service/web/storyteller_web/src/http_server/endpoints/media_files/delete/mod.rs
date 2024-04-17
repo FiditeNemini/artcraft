@@ -1,1 +1,1 @@
-pub mod delete_media_file;
+pub mod delete_media_file_handler;
