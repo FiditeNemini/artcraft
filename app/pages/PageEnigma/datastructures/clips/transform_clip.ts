@@ -86,7 +86,7 @@ export class TransformClip {
     //if (this.step_frame < 0) { this.step_frame = 0; }
     //if (this.step_frame >= this.length) { return; } // Reached max frames.
     if (this.keyframes.length < 1) { return; } // If there are enough points in the scene.
-
+    
     // Find the current and next keyframes based on time_frame
     let { currentKeyframe, nextKeyframe } = this.findNextNumber(this.step_frame);
     if (nextKeyframe != undefined && currentKeyframe != undefined) {
@@ -123,9 +123,10 @@ export class TransformClip {
     if (this.keyframes.length > 0) {
       let first_pos = this.keyframes[0].position;
       let first_rot = this.keyframes[0].rotation;
+      let first_quat = new THREE.Quaternion().setFromEuler(new THREE.Euler(THREE.MathUtils.degToRad(first_rot.x), THREE.MathUtils.degToRad(first_rot.y), THREE.MathUtils.degToRad(first_rot.z)));
       let first_scl = this.keyframes[0].scale;
       object.position.copy(first_pos);
-      object.rotation.set(first_rot.x, first_rot.y, first_rot.z);
+      object.rotation.set(first_quat.x, first_quat.y, first_quat.z);
       object.scale.copy(first_scl);
       this.step_frame = 0;
     }
