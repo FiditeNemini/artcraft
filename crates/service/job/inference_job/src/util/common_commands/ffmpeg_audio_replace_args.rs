@@ -22,6 +22,7 @@ impl CommandArgs for FfmpegAudioReplaceArgs<'_> {
     command.push_str(" -c copy ");
     command.push_str(" -map 0:v ");
     command.push_str(" -map 1:a ");
+
     // NB: Reading on the "shortest" flag:
     //  - https://stackoverflow.com/a/55804507
     //  - https://stackoverflow.com/a/64927381

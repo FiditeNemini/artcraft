@@ -6,11 +6,13 @@ use errors::AnyhowResult;
 use tokio::time::sleep;
 
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::ComfyInferenceCommand;
+use crate::util::common_commands::ffmpeg_command_runner::FfmpegCommandRunner;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::FfmpegLogoWatermarkCommand;
 
 pub struct ComfyDependencies {
     pub inference_command: ComfyInferenceCommand,
     pub ffmpeg_watermark_command: FfmpegLogoWatermarkCommand,
+    pub ffmpeg_command_runner: FfmpegCommandRunner,
 }
 
 impl ComfyDependencies {
@@ -65,6 +67,7 @@ impl ComfyDependencies {
         Ok(Self {
             inference_command,
             ffmpeg_watermark_command: FfmpegLogoWatermarkCommand::from_env()?,
+            ffmpeg_command_runner: FfmpegCommandRunner::from_env()?,
         })
     }
 }

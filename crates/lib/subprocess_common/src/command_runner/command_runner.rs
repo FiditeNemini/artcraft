@@ -41,7 +41,6 @@ pub struct CommandRunner {
   pub maybe_execution_timeout: Option<Duration>,
 }
 
-
 impl CommandRunner {
 
   /// Run the command with the `subprocess` crate utilities
