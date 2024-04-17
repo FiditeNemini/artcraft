@@ -1,3 +1,5 @@
+import * as THREE from "three";
+
 import { AnyJson } from "three/examples/jsm/nodes/core/constants.js";
 import { ClipUI } from "../datastructures/clips/clip_ui";
 
@@ -48,6 +50,8 @@ export class TimeLine {
   characters: { [key: string]: ClipGroup };
 
   scene: Scene;
+  camera: THREE.Camera;
+  mouse: THREE.Vector2 | undefined;
 
   current_time: number;
 
@@ -59,12 +63,16 @@ export class TimeLine {
     lipsync_engine: LipSyncEngine,
     animation_engine: AnimationEngine,
     scene: Scene,
+    camera: THREE.Camera,
+    mouse: THREE.Vector2 | undefined
   ) {
     this.editorEngine = editor;
     this.timeline_items = [];
     this.characters = {};
     this.absolute_end = 60 * 12;
     this.timeline_limit = 0; // 5 seconds
+    this.camera = camera;
+    this.mouse = mouse;
 
     this.is_playing = false;
     this.scrubber_frame_position = 0; // in frames into the tl
@@ -149,12 +157,13 @@ export class TimeLine {
   public async addCharacter(data: { data: MediaItem }) {
     const media_id = data.data.media_id;
     const name = data.data.name;
-
-    let new_data = {...data.data};
+    let pos = this.getPos();
+    let new_data = { ...data.data };
 
     const obj = await this.scene.load_glb(media_id);
     obj.userData["name"] = name;
     obj.name = name;
+    obj.position.copy(pos);
     const object_uuid = obj.uuid;
 
     this.characters[object_uuid] = ClipGroup.CHARACTER;
@@ -183,16 +192,32 @@ export class TimeLine {
     );
   }
 
+  public getPos() {
+    let raycaster = new THREE.Raycaster();
+    if (this.mouse && this.camera) {
+      raycaster.setFromCamera(this.mouse, this.camera);
+      const intersects = raycaster.intersectObjects(this.scene.scene.children, true);
+      console.log(intersects);
+      if (intersects.length > 0) {
+        return intersects[0].point;
+      }
+    }
+    return new THREE.Vector3(0, 0, 0);
+  }
+
   public async addObject(data: { data: MediaItem }) {
+    let pos = this.getPos();
     const media_id = data.data.media_id;
     const name = data.data.name;
     const obj = await this.scene.load_glb(media_id);
     obj.userData["name"] = name;
     obj.name = name;
+    obj.position.copy(pos);
   }
 
   public async addShape({ data }: { data: MediaItem }) {
-    this.editorEngine.create_parim(data.media_id);
+    let pos = this.getPos();
+    this.editorEngine.create_parim(data.media_id, pos);
   }
 
   public async addKeyFrame(data: any) {
@@ -246,7 +271,7 @@ export class TimeLine {
 
   public deleteObject(object_uuid: string) {
     let object = this.scene.get_object_by_uuid(object_uuid);
-    if(object?.name === "::CAM::") { return; }
+    if (object?.name === "::CAM::") { return; }
     this.timeline_items = this.timeline_items.filter(
       (element) => element.object_uuid !== object_uuid,
     );
@@ -401,9 +426,9 @@ export class TimeLine {
   public async updatePlayableClip(
     clip_uuid: string,
     updates: AnyJson,
-  ): Promise<void> {}
+  ): Promise<void> { }
 
-  public async deletePlayableClip(clip_uuid: string): Promise<void> {}
+  public async deletePlayableClip(clip_uuid: string): Promise<void> { }
 
   public async scrub(data: any): Promise<void> {
     if (this.is_playing) {
@@ -422,7 +447,7 @@ export class TimeLine {
     });
   }
 
-  public async scrubberDidStop(offset_frame: number) {}
+  public async scrubberDidStop(offset_frame: number) { }
   // public streaming events into the timeline from
   public async setScrubberPosition(offset: number) {
     this.scrubber_frame_position = offset; // in ms

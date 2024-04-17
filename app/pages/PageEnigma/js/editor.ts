@@ -197,6 +197,8 @@ class Editor {
       this.lipsync_engine,
       this.animation_engine,
       this.activeScene,
+      this.camera,
+      this.mouse
     );
 
     this.current_frame = 0;
@@ -253,6 +255,8 @@ class Editor {
     this.camera.position.z = 3;
     this.camera.position.y = 3;
     this.camera.position.x = -3;
+
+    this.timeline.camera = this.camera;
 
     this.render_camera = new THREE.PerspectiveCamera(
       70,
@@ -696,8 +700,8 @@ class Editor {
     this.timeline.deleteObject(uuid);
   }
 
-  create_parim(name: string) {
-    const uuid = this.activeScene.instantiate(name);
+  create_parim(name: string, pos: THREE.Vector3) {
+    const uuid = this.activeScene.instantiate(name, pos);
   }
 
   renderMode() {
@@ -1271,6 +1275,7 @@ class Editor {
     }
     this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    this.timeline.mouse = this.mouse;
   }
 
   // When the mouse clicks the screen.

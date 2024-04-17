@@ -24,7 +24,7 @@ class Scene {
         this._create_camera_obj();
     }
 
-    instantiate(name: string) {
+    instantiate(name: string, pos: THREE.Vector3 = new THREE.Vector3(0,0,0)) {
         let material = new THREE.MeshPhongMaterial({ color: 0xDACBCE });
         material.shininess = 0.0;
         let geometry;
@@ -50,6 +50,7 @@ class Scene {
         obj.userData["media_id"] = "Parim";
         //obj.type = "Object3D";
         obj.name = name;
+        obj.position.copy(pos);
         this.scene.add(obj);
         return obj.uuid;
     }
