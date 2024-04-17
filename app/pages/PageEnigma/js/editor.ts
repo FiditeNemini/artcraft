@@ -748,7 +748,7 @@ class Editor {
       this.render_timer += this.clock.getDelta();
       this.frames += 1;
       this.playback_location++;
-      const imgData = this.rawRenderer.domElement.toDataURL('image/png', 0.8); // Medium quality png for speed & size.
+      const imgData = this.rawRenderer.domElement.toDataURL('image/png', 1.0); // Medium quality png for speed & size.
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
       if (this.timeline.is_playing == false) {
