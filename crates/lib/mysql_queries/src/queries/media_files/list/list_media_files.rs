@@ -1,8 +1,8 @@
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
-use enums::by_table::media_files::media_file_class::MediaFileClass;
 
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -54,6 +54,10 @@ pub struct MediaFileListItem {
   pub maybe_text_transcript: Option<String>,
 
   pub creator_set_visibility: Visibility,
+
+  pub maybe_file_cover_image_public_bucket_hash: Option<String>,
+  pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
+  pub maybe_file_cover_image_public_bucket_extension: Option<String>,
 
   #[deprecated(note = "more expensive to query")]
   pub comment_count: u64,
@@ -121,6 +125,9 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
           maybe_title: record.maybe_title,
           maybe_text_transcript: record.maybe_text_transcript,
           creator_set_visibility: record.creator_set_visibility,
+          maybe_file_cover_image_public_bucket_hash: record.maybe_file_cover_image_public_bucket_hash,
+          maybe_file_cover_image_public_bucket_prefix: record.maybe_file_cover_image_public_bucket_prefix,
+          maybe_file_cover_image_public_bucket_extension: record.maybe_file_cover_image_public_bucket_extension,
           comment_count: record.comment_count as u64,
           favorite_count: record.favorite_count as u64,
           maybe_ratings_positive_count: record.maybe_ratings_positive_count,
@@ -177,12 +184,15 @@ SELECT
   u.display_name as maybe_creator_display_name,
   u.email_gravatar_hash as maybe_creator_gravatar_hash,
 
-
   entity_stats.ratings_positive_count as maybe_ratings_positive_count,
   entity_stats.ratings_negative_count as maybe_ratings_negative_count,
   entity_stats.bookmark_count as maybe_bookmark_count,
 
   m.creator_set_visibility,
+
+  media_file_cover_image.public_bucket_directory_hash as maybe_file_cover_image_public_bucket_hash,
+  media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
+  media_file_cover_image.maybe_public_bucket_extension as maybe_file_cover_image_public_bucket_extension,
 
   m.maybe_title,
   m.maybe_text_transcript,
@@ -197,6 +207,8 @@ FROM media_files AS m
 
 LEFT OUTER JOIN users AS u
     ON m.maybe_creator_user_token = u.token
+LEFT OUTER JOIN media_files as media_file_cover_image
+    ON media_file_cover_image.token = m.maybe_cover_image_media_file_token
 LEFT OUTER JOIN model_weights as w
      ON m.maybe_origin_model_token = w.token
 LEFT OUTER JOIN favorites as f
@@ -317,6 +329,10 @@ struct MediaFileListItemInternal {
 
   creator_set_visibility: Visibility,
 
+  maybe_file_cover_image_public_bucket_hash: Option<String>,
+  maybe_file_cover_image_public_bucket_prefix: Option<String>,
+  maybe_file_cover_image_public_bucket_extension: Option<String>,
+
   comment_count: i64,
   favorite_count: i64,
 
@@ -366,6 +382,9 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_creator_display_name: row.try_get("maybe_creator_display_name")?,
       maybe_creator_gravatar_hash: row.try_get("maybe_creator_gravatar_hash")?,
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
+      maybe_file_cover_image_public_bucket_hash: row.try_get("maybe_file_cover_image_public_bucket_hash")?,
+      maybe_file_cover_image_public_bucket_prefix: row.try_get("maybe_file_cover_image_public_bucket_prefix")?,
+      maybe_file_cover_image_public_bucket_extension: row.try_get("maybe_file_cover_image_public_bucket_extension")?,
       maybe_title: row.try_get("maybe_title")?,
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       created_at: row.try_get("created_at")?,

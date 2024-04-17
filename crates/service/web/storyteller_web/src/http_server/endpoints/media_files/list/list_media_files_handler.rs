@@ -245,7 +245,12 @@ pub async fn list_media_files_handler(
           record.maybe_public_bucket_extension.as_deref())
             .get_full_object_path_str()
             .to_string(),
-        cover_image: MediaFileCoverImageDetails::from_token(&record.token),
+        cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
+          &record.token,
+          record.maybe_file_cover_image_public_bucket_hash.as_deref(),
+          record.maybe_file_cover_image_public_bucket_prefix.as_deref(),
+          record.maybe_file_cover_image_public_bucket_extension.as_deref(),
+        ),
         maybe_creator: UserDetailsLight::from_optional_db_fields_owned(
           record.maybe_creator_user_token,
           record.maybe_creator_username,

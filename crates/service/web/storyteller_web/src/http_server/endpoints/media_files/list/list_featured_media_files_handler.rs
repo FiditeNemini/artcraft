@@ -166,7 +166,12 @@ pub async fn list_featured_media_files_handler(
             token: m.token.clone(),
             media_type: m.media_type,
             public_bucket_path,
-            cover_image: MediaFileCoverImageDetails::from_token(&m.token),
+            cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
+              &m.token,
+              m.maybe_file_cover_image_public_bucket_hash.as_deref(),
+              m.maybe_file_cover_image_public_bucket_prefix.as_deref(),
+              m.maybe_file_cover_image_public_bucket_extension.as_deref(),
+            ),
             origin: MediaFileOriginDetails::from_db_fields_str(
               m.origin_category,
               m.origin_product_category,
