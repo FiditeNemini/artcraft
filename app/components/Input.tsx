@@ -12,10 +12,6 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export function Input({ label, icon, className, id, ...rest }: InputProps) {
-  // const captureAllEvents = (e:React.FormEvent<HTMLInputElement>)=>{
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  // };
   return (
     <div className={twMerge("flex flex-col gap-2", className)}>
       {label && <Label htmlFor={id ? id : kebabCase(label)}>{label}</Label>}
