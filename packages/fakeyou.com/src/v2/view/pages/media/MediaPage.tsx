@@ -66,6 +66,9 @@ export default function MediaPage() {
   const [copyPositiveButtonText, setCopyPositiveButtonText] = useState("Copy");
   const [copyNegativeButtonText, setCopyNegativeButtonText] = useState("Copy");
   const [activeSlide, setActiveSlide] = useState({ url: "", token: "" });
+  const viewerCanEdit = canEditMediaFile(
+    mediaFile?.maybe_creator_user?.user_token || ""
+  );
 
   // Inside MediaPage.tsx
 
@@ -471,11 +474,31 @@ export default function MediaPage() {
 
   const title = GetMediaFileTitle(mediaFile);
 
+  const showEngineCover = () => {
+    const coverMediaPath = mediaFile?.cover_image?.maybe_cover_image_public_bucket_path || "";
+    if (mediaFile) {
+      switch (mediaFile.media_type) {
+         case MediaFileType.BVH:
+         case MediaFileType.GLB:
+         case MediaFileType.GLTF:
+         case MediaFileType.SceneRon: return <WeightCoverImage {...{
+          ...coverMediaPath ? { src: bucketConfig.getGcsUrl(coverMediaPath) } : {},
+          ...viewerCanEdit ? { to: `/edit-cover-image/${ token }` } : {},
+          coverIndex: mediaFile.cover_image.default_cover.image_index,
+         }}/>;
+         default: return null;
+      }
+    }
+  }
+
   return (
     <div>
       <Container type="panel" className="mb-5">
         <Panel clear={true} className="py-4">
           <div className="d-flex flex-column flex-lg-row gap-3 gap-lg-2">
+            {
+              showEngineCover()
+            }
             <div>
               <div className="d-flex gap-2 align-items-center flex-wrap">
                 <h1 className="fw-bold mb-2">{title}</h1>
@@ -790,9 +813,7 @@ export default function MediaPage() {
                 </div>
               </Panel>
 
-              {canEditMediaFile(
-                mediaFile?.maybe_creator_user?.user_token || ""
-              ) && (
+              { viewerCanEdit && (
                 <>
                   <div className="d-flex gap-2">
                     <Button

@@ -1,9 +1,15 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen } from "@fortawesome/pro-solid-svg-icons";
 import "./WeightCoverImage.scss";
+
 interface WeightCoverImageProps {
   src?: string;
   alt?: string;
   height?: number;
+  onClick?: (e: any) => any;
+  to?: string,
   width?: number;
   coverIndex?: number;
 }
@@ -12,9 +18,12 @@ export default function WeightCoverImage({
   src,
   alt,
   height = 100,
+  onClick,
+  to,
   width = 100,
   coverIndex,
 }: WeightCoverImageProps) {
+  console.log("👕",onClick);
   const containerStyle = {
     height: `${height}px`,
     width: `${width}px`,
@@ -27,8 +36,15 @@ export default function WeightCoverImage({
   }
 
   return (
-    <div className="cover-img" style={containerStyle}>
+    <div {...{
+      className: "cover-img",
+      style: containerStyle
+    }}>
       <img src={image} alt={alt || "Model Weight Cover"} />
+      { to ? <Link {...{ className: "cover-img-edit", to }}>
+        <span>Edit cover image</span>
+        <FontAwesomeIcon icon={faPen}/>
+      </Link> : null } 
     </div>
   );
 }

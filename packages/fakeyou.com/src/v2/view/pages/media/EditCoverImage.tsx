@@ -5,17 +5,16 @@ import { EntityInput } from "components/entities";
 import { EditCoverImage, EditCoverImageResponse } from "@storyteller/components/src/api/media_files/EditCoverImage";
 import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 import "./EditCoverImage.scss";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 export default function EditCoverImagePage() {
   const { token: targetToken } = useParams<{ token: string }>();
   const { studioAccessCheck } = useSession();
+  const history = useHistory();
   const [coverToken, coverTokenSet] = useState("");
   const { media } = useMedia({ mediaToken: targetToken });
   const bucketConfig = new BucketConfig();
   const currentSrc = bucketConfig.getGcsUrl(media?.cover_image?.maybe_cover_image_public_bucket_path || "");
-
-  console.log("😎 loaded target media",media);
 
   const onClick = () => {
     if (coverToken) {
@@ -23,7 +22,7 @@ export default function EditCoverImagePage() {
         cover_image_media_file_token: coverToken,
       })
       .then((res: EditCoverImageResponse) => {
-
+        history.push(`/media/${targetToken}`);
       });
     }
   };
@@ -50,14 +49,18 @@ export default function EditCoverImagePage() {
             Current cover image
             {
               media?.cover_image?.maybe_cover_image_public_bucket_path ?
-              <img {...{ alt: "cover art", src: currentSrc }}/> :
+              <img {...{
+                alt: "cover art",
+                className: "cover-image-current",
+                src: currentSrc
+              }}/> :
               <div {...{ className: "cover-image-empty" }}>No cover image</div>
             }
           </div>
           <div>
               <EntityInput {...{
                 accept: ["image"],
-                aspectRatio: "landscape",
+                aspectRatio: "square",
                 label: "Choose a cover image",
                 name: "coverToken",
                 value: coverToken,
