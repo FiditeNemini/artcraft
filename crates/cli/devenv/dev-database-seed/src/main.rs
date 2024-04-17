@@ -1,11 +1,13 @@
 use elasticsearch::Elasticsearch;
 use log::info;
+use sqlx::{MySql, Pool};
 use sqlx::mysql::MySqlPoolOptions;
 
 use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG};
 use errors::AnyhowResult;
 
 use crate::cli_args::parse_cli_args;
+use crate::seeding::users::seed_user_accounts;
 
 pub mod bucket_clients;
 
@@ -26,7 +28,7 @@ pub async fn main() -> AnyhowResult<()> {
         "MYSQL_URL",
         DEFAULT_MYSQL_CONNECTION_STRING);
 
-  let _pool = MySqlPoolOptions::new()
+  let pool = MySqlPoolOptions::new()
       .max_connections(easyenv::get_env_num("MYSQL_MAX_CONNECTIONS", 3)?)
       .connect(&db_connection_string)
       .await?;
@@ -45,7 +47,8 @@ pub async fn main() -> AnyhowResult<()> {
 //    maybe_elasticsearch = Some(get_elasticsearch_client());
 //  }
 
-  //seed_user_accounts(&pool).await?;
+  idempotent_always_seed(&pool).await?;
+
   // seed_media_files(&pool, maybe_bucket_clients.as_ref()).await?;
   //seed_zero_shot_tts(&pool, maybe_bucket_clients.as_ref()).await?;
   // seed_voice_conversion(&pool).await?;
@@ -58,6 +61,13 @@ pub async fn main() -> AnyhowResult<()> {
   //println!("TESTING DOWLOAD");
   //test_seed_weights_files().await?;
   //info!("Done!");
+  Ok(())
+}
+
+async fn idempotent_always_seed(mysql: &Pool<MySql>) -> AnyhowResult<()> {
+  // NB: The following seed functions do not need to be commented out or removed.
+  // They should be idempotent and always useful.
+  seed_user_accounts(mysql).await?;
   Ok(())
 }
 
