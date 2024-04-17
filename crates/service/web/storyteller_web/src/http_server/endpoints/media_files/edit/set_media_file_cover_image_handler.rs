@@ -14,7 +14,7 @@ use http_server_common::response::serialize_as_json_error::serialize_as_json_err
 use mysql_queries::queries::media_files::edit::set_media_file_cover_image::{set_media_file_cover_image, UpdateArgs};
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use tokens::tokens::media_files::MediaFileToken;
-use crate::http_server::endpoints::weights::set_model_weight_cover_image::SetModelWeightCoverImageError;
+use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::SetModelWeightCoverImageError;
 
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;

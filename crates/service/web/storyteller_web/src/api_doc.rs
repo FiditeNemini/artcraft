@@ -69,13 +69,14 @@ use crate::http_server::endpoints::user_ratings::get_user_rating_handler::*;
 use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
 use crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::*;
-use crate::http_server::endpoints::weights::delete_weight::*;
-use crate::http_server::endpoints::weights::get_weight::*;
-use crate::http_server::endpoints::weights::list_available_weights::*;
-use crate::http_server::endpoints::weights::list_weights_by_user::*;
+use crate::http_server::endpoints::weights::delete_weight_handler::*;
+use crate::http_server::endpoints::weights::get_weight_handler::*;
+use crate::http_server::endpoints::weights::list_available_weights_handler::*;
+use crate::http_server::endpoints::weights::list_featured_weights_handler::*;
+use crate::http_server::endpoints::weights::list_weights_by_user_handler::*;
 use crate::http_server::endpoints::weights::search_model_weights_handler::*;
-use crate::http_server::endpoints::weights::set_model_weight_cover_image::*;
-use crate::http_server::endpoints::weights::update_weight::*;
+use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::*;
+use crate::http_server::endpoints::weights::update_weight_handler::*;
 use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::*;
 use crate::http_server::web_utils::response_success_helpers::*;
 
@@ -114,13 +115,14 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::user_ratings::set_user_rating_handler::set_user_rating_handler,
     crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
     crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::list_datasets_by_user_handler,
-    crate::http_server::endpoints::weights::delete_weight::delete_weight_handler,
-    crate::http_server::endpoints::weights::get_weight::get_weight_handler,
-    crate::http_server::endpoints::weights::list_available_weights::list_available_weights_handler,
-    crate::http_server::endpoints::weights::list_weights_by_user::list_weights_by_user_handler,
+    crate::http_server::endpoints::weights::delete_weight_handler::delete_weight_handler,
+    crate::http_server::endpoints::weights::get_weight_handler::get_weight_handler,
+    crate::http_server::endpoints::weights::list_available_weights_handler::list_available_weights_handler,
+    crate::http_server::endpoints::weights::list_featured_weights_handler::list_featured_weights_handler,
+    crate::http_server::endpoints::weights::list_weights_by_user_handler::list_weights_by_user_handler,
     crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler,
-    crate::http_server::endpoints::weights::set_model_weight_cover_image::set_model_weight_cover_image_handler,
-    crate::http_server::endpoints::weights::update_weight::update_weight_handler,
+    crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler,
+    crate::http_server::endpoints::weights::update_weight_handler::update_weight_handler,
     crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler,
     users_component::endpoints::get_profile_handler::get_profile_handler,
     users_component::endpoints::login_handler::login_handler,
@@ -210,6 +212,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     EnqueueVideoStyleTransferRequest,
     EnqueueVideoStyleTransferSuccessResponse,
     FakeYouPlan,
+    FeaturedModelWeightForList,
     GetInferenceJobStatusError,
     GetInferenceJobStatusPathInfo,
     GetInferenceJobStatusSuccessResponse,
@@ -226,11 +229,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     GetWeightError,
     GetWeightPathInfo,
     GetWeightResponse,
+    InferenceJobStatusResponsePayload,
+    InferenceJobTokenType,
     InferTtsError,
     InferTtsRequest,
     InferTtsSuccessResponse,
-    InferenceJobStatusResponsePayload,
-    InferenceJobTokenType,
     ListAvailableWeightsQuery,
     ListAvailableWeightsSuccessResponse,
     ListDatasetsByUserError,
@@ -238,6 +241,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListDatasetsByUserSuccessResponse,
     ListFeaturedMediaFilesError,
     ListFeaturedMediaFilesSuccessResponse,
+    ListFeaturedWeightsError,
+    ListFeaturedWeightsSuccessResponse,
     ListMediaFilesByBatchError,
     ListMediaFilesByBatchPathInfo,
     ListMediaFilesByBatchSuccessResponse,

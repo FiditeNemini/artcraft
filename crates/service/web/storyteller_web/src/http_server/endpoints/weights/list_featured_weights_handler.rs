@@ -24,11 +24,11 @@ use crate::server_state::ServerState;
 #[derive(Serialize, ToSchema)]
 pub struct ListFeaturedWeightsSuccessResponse {
   pub success: bool,
-  pub results: Vec<ModelWeightForList>,
+  pub results: Vec<FeaturedModelWeightForList>,
 }
 
 #[derive(Serialize, ToSchema)]
-pub struct ModelWeightForList {
+pub struct FeaturedModelWeightForList {
   pub weight_token: ModelWeightToken,
 
   pub weight_type: WeightsType,
@@ -152,7 +152,7 @@ pub async fn list_featured_weights_handler(
                     .to_string()
               });
 
-          ModelWeightForList {
+          FeaturedModelWeightForList {
             weight_token: w.token,
             title: w.title,
             weight_type: w.weights_type,
