@@ -196,7 +196,7 @@ export class TimeLine {
     let raycaster = new THREE.Raycaster();
     if (this.mouse && this.camera) {
       raycaster.setFromCamera(this.mouse, this.camera);
-      const intersects = raycaster.intersectObjects(this.scene.scene.children, true);
+      const intersects = raycaster.intersectObjects(this.scene.scene.children, false);
       console.log(intersects);
       if (intersects.length > 0) {
         return intersects[0].point;
