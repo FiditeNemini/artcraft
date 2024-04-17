@@ -7,6 +7,7 @@ use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG
 use errors::AnyhowResult;
 
 use crate::cli_args::parse_cli_args;
+use crate::seeding::user_roles::seed_user_roles;
 use crate::seeding::users::seed_user_accounts;
 
 pub mod bucket_clients;
@@ -67,6 +68,7 @@ pub async fn main() -> AnyhowResult<()> {
 async fn idempotent_always_seed(mysql: &Pool<MySql>) -> AnyhowResult<()> {
   // NB: The following seed functions do not need to be commented out or removed.
   // They should be idempotent and always useful.
+  seed_user_roles(mysql).await?;
   seed_user_accounts(mysql).await?;
   Ok(())
 }
