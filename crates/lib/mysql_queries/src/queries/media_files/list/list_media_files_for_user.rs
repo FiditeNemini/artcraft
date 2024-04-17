@@ -45,6 +45,10 @@ pub struct MediaFileListItem {
 
   pub creator_set_visibility: Visibility,
 
+  pub maybe_file_cover_image_public_bucket_hash: Option<String>,
+  pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
+  pub maybe_file_cover_image_public_bucket_extension: Option<String>,
+
   pub maybe_title: Option<String>,
 
   /// Text transcripts for TTS, etc.
@@ -124,6 +128,9 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
           maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
           maybe_public_bucket_extension: record.maybe_public_bucket_extension,
           creator_set_visibility: record.creator_set_visibility,
+          maybe_file_cover_image_public_bucket_hash: record.maybe_file_cover_image_public_bucket_hash,
+          maybe_file_cover_image_public_bucket_prefix: record.maybe_file_cover_image_public_bucket_prefix,
+          maybe_file_cover_image_public_bucket_extension: record.maybe_file_cover_image_public_bucket_extension,
           maybe_title: record.maybe_title,
           maybe_text_transcript: record.maybe_text_transcript,
           maybe_ratings_positive_count: record.maybe_ratings_positive_count,
@@ -165,6 +172,10 @@ fn select_result_fields() -> String {
     m.maybe_public_bucket_extension,
 
     m.creator_set_visibility,
+
+    media_file_cover_image.public_bucket_directory_hash as maybe_file_cover_image_public_bucket_hash,
+    media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
+    media_file_cover_image.maybe_public_bucket_extension as maybe_file_cover_image_public_bucket_extension,
 
     m.maybe_title,
     m.maybe_text_transcript,
@@ -209,6 +220,8 @@ LEFT OUTER JOIN users AS u
     ON m.maybe_creator_user_token = u.token
 LEFT OUTER JOIN model_weights as w
      ON m.maybe_origin_model_token = w.token
+LEFT OUTER JOIN media_files as media_file_cover_image
+    ON media_file_cover_image.token = m.maybe_cover_image_media_file_token
 LEFT OUTER JOIN entity_stats
     ON entity_stats.entity_type = "media_file"
     AND entity_stats.entity_token = m.token
@@ -309,6 +322,10 @@ struct MediaFileListItemInternal {
 
   creator_set_visibility: Visibility,
 
+  maybe_file_cover_image_public_bucket_hash: Option<String>,
+  maybe_file_cover_image_public_bucket_prefix: Option<String>,
+  maybe_file_cover_image_public_bucket_extension: Option<String>,
+
   maybe_title: Option<String>,
 
   /// Text transcripts for TTS, etc.
@@ -350,6 +367,9 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
       maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
+      maybe_file_cover_image_public_bucket_hash: row.try_get("maybe_file_cover_image_public_bucket_hash")?,
+      maybe_file_cover_image_public_bucket_prefix: row.try_get("maybe_file_cover_image_public_bucket_prefix")?,
+      maybe_file_cover_image_public_bucket_extension: row.try_get("maybe_file_cover_image_public_bucket_extension")?,
       maybe_title: row.try_get("maybe_title")?,
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
