@@ -380,6 +380,7 @@ class Editor {
           this.orbitControls.enabled = false;
           this.cameraViewControls.enabled = false;
         }
+        this.cameraViewControls?.reset();
       }
     });
 
@@ -520,6 +521,7 @@ class Editor {
 
   switchCameraView() {
     this.camera_person_mode = !this.camera_person_mode;
+    this.cameraViewControls?.reset();
     if (this.cam_obj) {
       if (this.camera_person_mode) {
         this.last_cam_pos.copy(this.camera.position);
