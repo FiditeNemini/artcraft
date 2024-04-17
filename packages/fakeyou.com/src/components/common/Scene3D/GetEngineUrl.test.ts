@@ -92,7 +92,14 @@ describe('media files', () => {
             color_index: 2,
           }
         },
-      }
+      },
+      cover_image: {
+        default_cover: {
+          color_index: 1,
+          image_index: 2
+        },
+        maybe_cover_image_public_bucket_path: null
+      },
     };
   });
 

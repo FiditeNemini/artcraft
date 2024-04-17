@@ -43,6 +43,7 @@ const EntityInputFull = ({ media, clear }: SlideProps) => {
   const mediaType = mediaCategoryfromString(media?.media_type || "");
 
   switch (mediaType) {
+    case MediaFilters.image: return <img {...{ src: mediaUrl, alt: "Selected media file" }}/>
     case MediaFilters.video: return <>
       <video controls {...{ src: mediaUrl }}/>
       <div {...{ className: "fy-entity-input-full-controls" }}>

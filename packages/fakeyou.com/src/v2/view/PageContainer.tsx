@@ -98,6 +98,7 @@ import VcModelDeletePage from "./pages/vc/vc_model_delete/VcModelDeletePage";
 import TopNav from "components/layout/TopNav/TopNav";
 import SideNav from "components/layout/SideNav/SideNav";
 import MediaPage from "./pages/media/MediaPage";
+import EditCoverImage from "./pages/media/EditCoverImage";
 import MediaRenamePage from "./pages/media/MediaRenamePage";
 import { VoiceDesignerFormPage } from "./pages/voice_designer/VoiceDesignerFormPage";
 import { VoiceDesignerMainPage } from "./pages/voice_designer/VoiceDesignerMainPage";
@@ -388,6 +389,10 @@ class PageContainer extends React.Component<
 
                   <Route path="/media/:token">
                     <MediaPage />
+                  </Route>
+
+                  <Route path="/edit-cover-image/:token">
+                    <EditCoverImage />
                   </Route>
 
                   <Route path="/explore">

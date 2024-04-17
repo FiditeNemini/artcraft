@@ -29,6 +29,13 @@ export interface MediaFile {
     maybe_weight_creator: UserDetailsLight;
     maybe_cover_image_public_bucket_path: string;
   };
+  cover_image: {
+    default_cover: {
+      color_index: number,
+      image_index: number
+    },
+    maybe_cover_image_public_bucket_path: string | null
+  };
 }
 
 export interface GetMediaRequest {}
