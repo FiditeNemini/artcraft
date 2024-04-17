@@ -33,20 +33,21 @@ export const TrackKeyFrame = ({ keyframe, updateKeyframe }: Props) => {
   return (
     <button
       className={[
-        "block rotate-45 cursor-ew-resize",
+        "top-[11px] block h-[14px] w-[14px] rotate-45 cursor-ew-resize",
         "absolute",
         keyframe.keyframe_uuid === selectedKeyframeId
           ? "bg-keyframe-selected"
           : "bg-keyframe-unselected",
       ].join(" ")}
       style={{
-        width: 14,
-        height: 14,
-        left: displayOffset * 4 * scale.value - 6,
-        top: 11,
+        left: displayOffset * 4 * scale.value - 5,
       }}
       onPointerDown={(event) => onPointerDown(event, "drag")}
-      onClick={() => (selectedItem.value = keyframe)}
+      onClick={(event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        selectedItem.value = keyframe;
+      }}
     />
   );
 };

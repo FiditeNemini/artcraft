@@ -2,22 +2,16 @@ import {
   faAngleRight,
   faArrowsRotate,
   faArrowsUpDownLeftRight,
-  faCube,
-  faPlus,
   faUpRightAndDownLeftFromCenter,
 } from "@fortawesome/pro-solid-svg-icons";
-import {
-  fa3dCylinder,
-  fa3dTorus,
-  fa3dSphere,
-} from "@awesome.me/kit-fde2be5eb0/icons/kit/custom";
-import { Button, ButtonIcon, ButtonIconSelect, Link } from "~/components";
-import { EngineContext } from "../../../../contexts/EngineContext";
+import { Button, ButtonIconSelect } from "~/components";
+import { EngineContext } from "~/contexts/EngineContext";
 import { useContext } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Pages } from "~/pages/PageEnigma/constants/page";
 
 interface Props {
-  setPage: (page: string) => void;
+  setPage: (page: Pages) => void;
 }
 
 export const Controls3D = ({ setPage }: Props) => {
@@ -60,7 +54,7 @@ export const Controls3D = ({ setPage }: Props) => {
 
   const changeStylize = () => {
     editorEngine?.switchPreview();
-    setPage("style");
+    setPage(Pages.STYLE);
   };
 
   const modes = [

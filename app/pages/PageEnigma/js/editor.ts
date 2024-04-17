@@ -364,6 +364,25 @@ class Editor {
       this.loadScene(sceneToken);
     }
 
+    document.addEventListener('mouseover', (event) => {
+      if (this.orbitControls && this.cameraViewControls) {
+        if (event.target instanceof HTMLCanvasElement) {
+          if (this.camera_person_mode) {
+            this.orbitControls.enabled = false;
+            this.cameraViewControls.enabled = true;
+          }
+          else {
+            this.orbitControls.enabled = true;
+            this.cameraViewControls.enabled = false;
+          }
+        }
+        else {
+          this.orbitControls.enabled = false;
+          this.cameraViewControls.enabled = false;
+        }
+      }
+    });
+
     loadingBarData.value = {
       ...loadingBarData.value,
       progress: 100,
@@ -654,7 +673,7 @@ class Editor {
 
   deleteObject(uuid: string) {
     const obj = this.activeScene.get_object_by_uuid(uuid);
-    if(obj?.name === "::CAM::") { return; }
+    if (obj?.name === "::CAM::") { return; }
     if (obj) {
       this.activeScene.scene.remove(obj);
     }
@@ -691,7 +710,7 @@ class Editor {
   }
 
   // Render the scene to the camera, this is called in the update.
-  renderScene() {
+  async renderScene() {
     if (this.composer != null && !this.rendering && this.rawRenderer) {
       this.composer.render();
       this.rawRenderer.render(this.activeScene.scene, this.render_camera);
@@ -708,33 +727,40 @@ class Editor {
       if (this.recorder == undefined) {
         this.rawRenderer.setSize(1024, 576);
         this.render_camera.aspect = 1024 / 576;
-        this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 60 FPS
-        this.recorder = new MediaRecorder(this.record_stream, {
-          mimeType: "video/webm",
-        });
-        this.recorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            this.frame_buffer.push(event.data);
-            this.frames += 1;
-            this.playback_location++;
-          }
-        };
-        this.recorder.onstop = () => {
-          this.stopPlayback();
-        };
-        this.recorder.start();
+        //this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 60 FPS
+        //this.recorder = new MediaRecorder(this.record_stream, {
+        //  mimeType: "video/webm",
+        //});
+        //this.recorder.ondataavailable = (event) => {
+        //  if (event.data.size > 0) {
+        //    this.frame_buffer.push(event.data);
+        //    this.frames += 1;
+        //    this.playback_location++;
+        //  }
+        //};
+        //this.recorder.onstop = () => {
+        //  this.stopPlayback();
+        //};
+        //this.recorder.start(1000 / this.cap_fps);
+        //this.recorder = "";
       }
 
       this.render_timer += this.clock.getDelta();
+      this.frames += 1;
+      this.playback_location++;
+      const imgData = this.rawRenderer.domElement.toDataURL('image/png', 1.0); // Medium quality png for speed & size.
+      this.frame_buffer.push(imgData);
+      this.render_timer += this.clock.getDelta();
       if (this.timeline.is_playing == false) {
-        this.recorder.stop();
+        //this.recorder.stop();
         this.playback_location = 0;
+        this.stopPlayback();
       }
     }
   }
 
   getselectedSum() {
-    if(this.selected === undefined) { return 0; }
+    if (this.selected === undefined) { return 0; }
     let posCombo = this.selected.position.x + this.selected.position.y + this.selected.position.z;
     let rotCombo = this.selected.rotation.x + this.selected.rotation.y + this.selected.rotation.z;
     let sclCombo = this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
@@ -797,14 +823,14 @@ class Editor {
       if (changeView) {
         this.switchCameraView();
       }
-    } 
+    }
     else if (this.last_scrub === this.timeline.scrubber_frame_position && this.getselectedSum() !== this.last_selected_sum) {
       this.updateSelectedUI();
     }
     this.last_selected_sum = this.getselectedSum();
 
+    await this.renderScene();
     this.last_scrub = this.timeline.scrubber_frame_position;
-    this.renderScene();
   }
 
   change_mode(type: any) {
@@ -905,36 +931,34 @@ class Editor {
   }
 
   async stopPlayback(compile_audio: boolean = true) {
-    //let video_fps = Math.floor(this.frames * (this.cap_fps / this.timeline.timeline_limit));
-    //console.log("Video FPS:", video_fps)
     this.rendering = false;
-    const videoBlob = new Blob(this.frame_buffer, { type: "video/webm" });
-    const videoURL = URL.createObjectURL(videoBlob);
+
+    //const videoBlob = new Blob(this.frame_buffer, { type: "video/webm" });
+    //const videoURL = URL.createObjectURL(videoBlob);
 
     this.generating_preview = true;
-    const ffmpeg = createFFmpeg({ log: true });
+    const ffmpeg = createFFmpeg({ log: false });
     await ffmpeg.load();
 
     this.updateLoad(50, "Processing ...");
 
     // Write the Uint8Array to the FFmpeg file system
-    ffmpeg.FS("writeFile", "input.webm", await fetchFile(videoURL));
+    //ffmpeg.FS("writeFile", "input.webm", await fetchFile(videoURL));
+
+    for (let index = 0; index < this.frame_buffer.length; index++) {
+      const element = this.frame_buffer[index];
+      await ffmpeg.FS(
+        "writeFile",
+        `image${index}.png`,
+        await fetchFile(element),
+      );
+    }
 
     await ffmpeg.run(
+      "-framerate",
+      "" + this.cap_fps,
       "-i",
-      "input.webm",
-      "-vf",
-      "scale=1024:576",
-      "-c:v",
-      "libx264",
-      "-preset",
-      "fast",
-      "-crf",
-      "23",
-      "-c:a",
-      "aac",
-      "-b:a",
-      "192k",
+      "image%d.png",
       "input.mp4",
     );
 
@@ -947,6 +971,8 @@ class Editor {
       "anullsrc", // This adds a silent audio track
       "-max_muxing_queue_size",
       "999999",
+      "-vf",
+      "select=gte(n\\,1),scale=1024:576", // scale=1024:576
       "-c:v",
       "libx264", // Specify video codec (optional, but recommended for MP4)
       "-c:a",
@@ -1041,8 +1067,8 @@ class Editor {
 
   async generateFrame() {
     if (this.renderer && !this.generating_preview) {
-      this.removeTransformControls();
       this.generating_preview = true;
+      this.removeTransformControls();
       this.activeScene.renderMode(true);
       if (this.activeScene.hot_items) {
         this.activeScene.hot_items.forEach((element) => {
@@ -1078,6 +1104,7 @@ class Editor {
       await ffmpeg.run("-i", `render.png`, "render.mp4");
       const output = await ffmpeg.FS("readFile", "render.mp4");
       const blob = new Blob([output.buffer], { type: "video/mp4" });
+      this.generating_preview = false;
 
       const url = await this.api_manager.uploadMediaFrameGeneration(
         blob,
@@ -1097,8 +1124,6 @@ class Editor {
         console.log("No style preview window.");
       }
 
-      this.generating_preview = false;
-
       return new Promise((resolve, reject) => {
         resolve(url);
       });
@@ -1108,7 +1133,7 @@ class Editor {
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
     console.log("Generating video...", this.frame_buffer);
-    if (this.rendering) {
+    if (this.rendering || this.generating_preview) {
       return;
     }
 

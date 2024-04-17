@@ -23,6 +23,7 @@ export function addNewCharacter(data: MediaItem) {
     name: data.name,
     media_id: data.media_id,
     muted: false,
+    minimized: false,
     animationClips: [],
     positionKeyframes: [],
     lipSyncClips: [],

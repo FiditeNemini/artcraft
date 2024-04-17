@@ -49,6 +49,7 @@ export interface CharacterTrack {
   media_id: string;
   name: string;
   muted: boolean;
+  minimized: boolean;
   animationClips: Clip[];
   positionKeyframes: Keyframe[];
   lipSyncClips: Clip[];
