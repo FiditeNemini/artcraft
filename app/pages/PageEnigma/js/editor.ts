@@ -520,7 +520,6 @@ class Editor {
 
   switchCameraView() {
     this.camera_person_mode = !this.camera_person_mode;
-    console.log(this.camera_person_mode);
     if (this.cam_obj) {
       if (this.camera_person_mode) {
         this.last_cam_pos.copy(this.camera.position);
