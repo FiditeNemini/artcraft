@@ -1,10 +1,6 @@
-pub mod batch_get_media_files_handler;
-pub mod change_media_file_visibility_handler;
-pub mod delete_media_file;
-pub mod get_media_file_handler;
+pub mod delete;
+pub mod edit;
+pub mod get;
 pub mod list;
-pub mod rename_media_file_handler;
-pub mod set_media_file_cover_image_handler;
-pub mod update_media_file;
 pub mod upload;
-pub mod upsert_write;
+pub mod upsert_upload;

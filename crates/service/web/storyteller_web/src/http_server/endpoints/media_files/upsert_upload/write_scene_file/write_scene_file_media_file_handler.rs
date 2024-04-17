@@ -11,6 +11,8 @@ use stripe::CreatePaymentLinkShippingAddressCollectionAllowedCountries::Mf;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
@@ -23,15 +25,15 @@ use mysql_queries::queries::media_files::upsert::upsert_media_file_from_file_upl
 use tokens::tokens::media_files::MediaFileToken;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
-use crate::http_server::endpoints::media_files::upsert_write::write_engine_asset::drain_multipart_request::drain_multipart_request;
-use crate::http_server::endpoints::media_files::upsert_write::write_error::MediaFileWriteError;
+use crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::drain_multipart_request::drain_multipart_request;
+use crate::http_server::endpoints::media_files::upsert_upload::write_error::MediaFileWriteError;
 use crate::server_state::ServerState;
 use crate::util::check_creator_tokens::{check_creator_tokens, CheckCreatorTokenArgs, CheckCreatorTokenResult};
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 // Unlike the "upload" endpoints, which are pure inserts, these endpoints are *upserts*.
 #[derive(Serialize, ToSchema)]
-pub struct WriteEngineAssetMediaSuccessResponse {
+pub struct WriteSceneFileMediaSuccessResponse {
   pub success: bool,
   pub media_file_token: MediaFileToken,
 }
@@ -39,9 +41,9 @@ pub struct WriteEngineAssetMediaSuccessResponse {
 #[utoipa::path(
   post,
   tag = "Media Files",
-  path = "/v1/media_files/write/engine_asset",
+  path = "/v1/media_files/write/scene_file",
   responses(
-    (status = 200, description = "Success Update", body = WriteEngineAssetMediaSuccessResponse),
+    (status = 200, description = "Success Update", body = WriteSceneFileMediaSuccessResponse),
     (status = 400, description = "Bad input", body = MediaFileWriteError),
     (status = 401, description = "Not authorized", body = MediaFileWriteError),
     (status = 429, description = "Too many requests", body = MediaFileWriteError),
@@ -51,7 +53,7 @@ pub struct WriteEngineAssetMediaSuccessResponse {
     ("request" = (), description = "Ask Brandon. This is form-multipart."),
   )
 )]
-pub async fn write_engine_asset_media_file_handler(
+pub async fn write_scene_file_media_file_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
   mut multipart_payload: Multipart,
@@ -182,21 +184,6 @@ pub async fn write_engine_asset_media_file_handler(
       .and_then(|filename| filename.extension())
       .and_then(|ext| ext.to_str());
 
-  let (suffix, media_file_type, mimetype) = match maybe_file_extension {
-    None => {
-      return Err(MediaFileWriteError::BadInput("no file extension".to_string()));
-    }
-    Some("bvh") => (".bvh", MediaFileType::Bvh, "application/octet-stream"),
-    Some("fbx") => (".fbx", MediaFileType::Fbx, "application/octet-stream"),
-    Some("glb") => (".glb", MediaFileType::Glb, "application/octet-stream"),
-    Some("gltf") => (".gltf", MediaFileType::Gltf, "application/octet-stream"),
-    Some("ron") => (".scn.ron", MediaFileType::SceneRon, "application/octet-stream"),
-    _ => {
-      return Err(MediaFileWriteError::BadInput(
-        "unsupported file extension. Must be bvh, glb, gltf, or fbx.".to_string()));
-    }
-  };
-
   let file_size_bytes = file_bytes.len();
 
   let hash = sha256_hash_bytes(&file_bytes)
@@ -212,16 +199,19 @@ pub async fn write_engine_asset_media_file_handler(
   //  benefit of restoring old versions (if we mapped to existing paths but had a versioning scheme),
   //  but we can move fast.
 
+  const MEDIA_FILE_TYPE: MediaFileType = MediaFileType::SceneJson;
+  const MIMETYPE: &str = "application/json";
   const PREFIX : Option<&str> = Some("upload_");
+  const SUFFIX: &str = ".json";
 
-  let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, Some(suffix));
+  let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, Some(SUFFIX));
 
   info!("Uploading media to bucket path: {}", public_upload_path.get_full_object_path_str());
 
   server_state.public_bucket_client.upload_file_with_content_type(
     public_upload_path.get_full_object_path_str(),
     file_bytes.as_ref(),
-    mimetype)
+    MIMETYPE)
       .await
       .map_err(|e| {
         warn!("Upload media bytes to bucket error: {:?}", e);
@@ -236,16 +226,16 @@ pub async fn write_engine_asset_media_file_handler(
     creator_ip_address: &ip_address,
     creator_set_visibility,
     upload_type: UploadType::Filesystem,
-    media_file_type,
-    maybe_media_class: upload_media_request.media_file_class,
-    maybe_media_subtype: upload_media_request.media_file_subtype,
-    maybe_mime_type: Some(mimetype),
+    media_file_type: MEDIA_FILE_TYPE,
+    maybe_media_class: Some(MediaFileClass::Unknown),
+    maybe_media_subtype: None,
+    maybe_mime_type: Some(MIMETYPE),
     file_size_bytes: file_size_bytes as u64,
     duration_millis: 0,
     sha256_checksum: &hash,
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
-    maybe_public_bucket_extension: Some(suffix),
+    maybe_public_bucket_extension: Some(SUFFIX),
     pool: &server_state.mysql_pool,
   })
       .await
@@ -256,7 +246,7 @@ pub async fn write_engine_asset_media_file_handler(
 
   info!("new media file id: {} token: {:?}", record_id, &token);
 
-  let response = WriteEngineAssetMediaSuccessResponse {
+  let response = WriteSceneFileMediaSuccessResponse {
     success: true,
     media_file_token: token,
   };
