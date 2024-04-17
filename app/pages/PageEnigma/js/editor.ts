@@ -937,7 +937,7 @@ class Editor {
     //const videoURL = URL.createObjectURL(videoBlob);
 
     this.generating_preview = true;
-    const ffmpeg = createFFmpeg({ log: true });
+    const ffmpeg = createFFmpeg({ log: false });
     await ffmpeg.load();
 
     this.updateLoad(50, "Processing ...");
