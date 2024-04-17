@@ -4,10 +4,9 @@ import Card from "../Card";
 import useTimeAgo from "hooks/useTimeAgo";
 import Badge from "components/common/Badge";
 import { CardFooter } from "components/entities";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPersonWalking } from "@fortawesome/pro-solid-svg-icons";
 import getCardUrl from "../getCardUrl";
 import { GetMediaFileTitle } from "common/GetMediaFileTitle";
+import { BucketConfig } from "@storyteller/components/src/api/BucketConfig";
 
 interface BVHCardProps {
   bookmarks: any;
@@ -35,15 +34,24 @@ export default function BVHCard({
 
   const Wrapper = ({ children }: { children: any }) => inClick ? <div {...{ onClick: () => { inClick(data) } }}>{ children }</div> : <Link {...{ to: linkUrl  }}>{ children }</Link>;
 
-  // const bucketConfig = new BucketConfig();
+  const bucketConfig = new BucketConfig();
+
+  let coverImage = `/images/default-covers/${
+      data?.cover_image?.default_cover.image_index || 0
+    }.webp`;
+
+  if (data?.cover_image?.maybe_cover_image_public_bucket_path) {
+    coverImage = bucketConfig.getCdnUrl(
+      data.cover_image.maybe_cover_image_public_bucket_path,
+      600,
+      100
+    );
+  }
 
   return (
     <Wrapper>
       <Card padding={false} canHover={true}>
-        <div className="card-img d-flex align-items-center justify-content-center">
-          <FontAwesomeIcon icon={faPersonWalking} className="card-img-icon" />
-        </div>
-
+        <img src={coverImage} alt={data.maybe_title} className="card-img" />
         <div className="card-img-overlay">
           <div className="card-img-gradient" />
 
