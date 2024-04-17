@@ -9,3 +9,4 @@ export * from "./shape";
 export * from "./sidePanel";
 export * from "./sizing";
 export * from "./timing";
+export * from "./hotkeys";

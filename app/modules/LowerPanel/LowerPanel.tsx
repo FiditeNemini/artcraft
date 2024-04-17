@@ -49,8 +49,8 @@ export const LowerPanel = ({ children, onStyle }: LowerPanelPropsI) => {
     <>
       {!onStyle && (
         <div
-          className="absolute w-full cursor-ns-resize bg-ui-panel-border"
-          style={{ height: 3, zIndex: 1000, bottom: displayHeight }}
+          className="absolute w-full cursor-ns-resize bg-ui-panel-border h-1 z-10"
+          style={{bottom: displayHeight }}
           onPointerDown={onPointerDown}
         />
       )}
