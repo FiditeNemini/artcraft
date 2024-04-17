@@ -55,6 +55,10 @@ pub struct MediaFile {
 
   pub maybe_prompt_token: Option<PromptToken>,
 
+  pub maybe_file_cover_image_public_bucket_hash: Option<String>,
+  pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
+  pub maybe_file_cover_image_public_bucket_extension: Option<String>,
+
   pub maybe_model_weights_token: Option<ModelWeightToken>,
   pub maybe_model_weights_title: Option<String>,
   pub maybe_model_weights_type: Option<WeightsType>,
@@ -126,6 +130,10 @@ pub struct MediaFileRaw {
 
   pub maybe_prompt_token: Option<PromptToken>,
 
+  pub maybe_file_cover_image_public_bucket_hash: Option<String>,
+  pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
+  pub maybe_file_cover_image_public_bucket_extension: Option<String>,
+
   pub maybe_model_weights_token: Option<ModelWeightToken>,
   pub maybe_model_weights_title: Option<String>,
   pub maybe_model_weights_type: Option<WeightsType>,
@@ -194,6 +202,9 @@ pub async fn get_media_file(
     maybe_creator_anonymous_visitor_token: record.maybe_creator_anonymous_visitor_token,
     creator_set_visibility: record.creator_set_visibility,
     maybe_prompt_token: record.maybe_prompt_token,
+    maybe_file_cover_image_public_bucket_hash: record.maybe_file_cover_image_public_bucket_hash,
+    maybe_file_cover_image_public_bucket_prefix: record.maybe_file_cover_image_public_bucket_prefix,
+    maybe_file_cover_image_public_bucket_extension: record.maybe_file_cover_image_public_bucket_extension,
     maybe_model_weights_token: record.maybe_model_weights_token,
     maybe_model_weights_title: record.maybe_model_weights_title,
     maybe_model_weights_type: record.maybe_model_weights_type,
@@ -248,6 +259,10 @@ SELECT
 
     m.maybe_prompt_token as `maybe_prompt_token: tokens::tokens::prompts::PromptToken`,
 
+    media_file_cover_image.public_bucket_directory_hash as maybe_file_cover_image_public_bucket_hash,
+    media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
+    media_file_cover_image.maybe_public_bucket_extension as maybe_file_cover_image_public_bucket_extension,
+
     m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
     model_weights.token as `maybe_model_weights_token: tokens::tokens::model_weights::ModelWeightToken`,
@@ -255,9 +270,9 @@ SELECT
     model_weights.weights_type as `maybe_model_weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
     model_weights.weights_category as `maybe_model_weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
 
-    cover_image.public_bucket_directory_hash as maybe_model_cover_image_public_bucket_hash,
-    cover_image.maybe_public_bucket_prefix as maybe_model_cover_image_public_bucket_prefix,
-    cover_image.maybe_public_bucket_extension as maybe_model_cover_image_public_bucket_extension,
+    model_weight_cover_image.public_bucket_directory_hash as maybe_model_cover_image_public_bucket_hash,
+    model_weight_cover_image.maybe_public_bucket_prefix as maybe_model_cover_image_public_bucket_prefix,
+    model_weight_cover_image.maybe_public_bucket_extension as maybe_model_cover_image_public_bucket_extension,
 
     model_weight_creator.token as `maybe_model_weight_creator_user_token: tokens::tokens::users::UserToken`,
     model_weight_creator.username as maybe_model_weight_creator_username,
@@ -280,8 +295,10 @@ LEFT OUTER JOIN users
     ON m.maybe_creator_user_token = users.token
 LEFT OUTER JOIN model_weights
     ON m.maybe_origin_model_token = model_weights.token
-LEFT OUTER JOIN media_files as cover_image
-    ON cover_image.token = model_weights.maybe_cover_image_media_file_token
+LEFT OUTER JOIN media_files as media_file_cover_image
+    ON media_file_cover_image.token = m.maybe_cover_image_media_file_token
+LEFT OUTER JOIN media_files as model_weight_cover_image
+    ON model_weight_cover_image.token = model_weights.maybe_cover_image_media_file_token
 LEFT OUTER JOIN users as model_weight_creator
     ON model_weight_creator.token = model_weights.creator_user_token
 LEFT OUTER JOIN entity_stats
@@ -328,6 +345,10 @@ SELECT
 
     m.maybe_prompt_token as `maybe_prompt_token: tokens::tokens::prompts::PromptToken`,
 
+    media_file_cover_image.public_bucket_directory_hash as maybe_file_cover_image_public_bucket_hash,
+    media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
+    media_file_cover_image.maybe_public_bucket_extension as maybe_file_cover_image_public_bucket_extension,
+
     m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
 
     model_weights.token as `maybe_model_weights_token: tokens::tokens::model_weights::ModelWeightToken`,
@@ -335,9 +356,9 @@ SELECT
     model_weights.weights_type as `maybe_model_weights_type: enums::by_table::model_weights::weights_types::WeightsType`,
     model_weights.weights_category as `maybe_model_weights_category: enums::by_table::model_weights::weights_category::WeightsCategory`,
 
-    cover_image.public_bucket_directory_hash as maybe_model_cover_image_public_bucket_hash,
-    cover_image.maybe_public_bucket_prefix as maybe_model_cover_image_public_bucket_prefix,
-    cover_image.maybe_public_bucket_extension as maybe_model_cover_image_public_bucket_extension,
+    model_weight_cover_image.public_bucket_directory_hash as maybe_model_cover_image_public_bucket_hash,
+    model_weight_cover_image.maybe_public_bucket_prefix as maybe_model_cover_image_public_bucket_prefix,
+    model_weight_cover_image.maybe_public_bucket_extension as maybe_model_cover_image_public_bucket_extension,
 
     model_weight_creator.token as `maybe_model_weight_creator_user_token: tokens::tokens::users::UserToken`,
     model_weight_creator.username as maybe_model_weight_creator_username,
@@ -360,8 +381,10 @@ LEFT OUTER JOIN users
     ON m.maybe_creator_user_token = users.token
 LEFT OUTER JOIN model_weights
     ON m.maybe_origin_model_token = model_weights.token
-LEFT OUTER JOIN media_files as cover_image
-    ON cover_image.token = model_weights.maybe_cover_image_media_file_token
+LEFT OUTER JOIN media_files as media_file_cover_image
+    ON media_file_cover_image.token = m.maybe_cover_image_media_file_token
+LEFT OUTER JOIN media_files as model_weight_cover_image
+    ON model_weight_cover_image.token = model_weights.maybe_cover_image_media_file_token
 LEFT OUTER JOIN users as model_weight_creator
     ON model_weight_creator.token = model_weights.creator_user_token
 LEFT OUTER JOIN entity_stats

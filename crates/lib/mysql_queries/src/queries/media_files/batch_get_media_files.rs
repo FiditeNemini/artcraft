@@ -54,6 +54,10 @@ pub struct MediaFile {
 
   pub maybe_prompt_token: Option<PromptToken>,
 
+  pub maybe_file_cover_image_public_bucket_hash: Option<String>,
+  pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
+  pub maybe_file_cover_image_public_bucket_extension: Option<String>,
+
   pub maybe_model_weights_token: Option<ModelWeightToken>,
   pub maybe_model_weights_title: Option<String>,
   pub maybe_model_weights_type: Option<WeightsType>,
@@ -121,6 +125,10 @@ pub struct MediaFileRaw {
   pub creator_set_visibility: Visibility,
 
   pub maybe_prompt_token: Option<PromptToken>,
+
+  pub maybe_file_cover_image_public_bucket_hash: Option<String>,
+  pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
+  pub maybe_file_cover_image_public_bucket_extension: Option<String>,
 
   pub maybe_model_weights_token: Option<ModelWeightToken>,
   pub maybe_model_weights_title: Option<String>,
@@ -209,6 +217,9 @@ pub async fn batch_get_media_files(
         maybe_creator_gravatar_hash: record.maybe_creator_gravatar_hash,
         creator_set_visibility: record.creator_set_visibility,
         maybe_prompt_token: record.maybe_prompt_token,
+        maybe_file_cover_image_public_bucket_hash: record.maybe_file_cover_image_public_bucket_hash,
+        maybe_file_cover_image_public_bucket_prefix: record.maybe_file_cover_image_public_bucket_prefix,
+        maybe_file_cover_image_public_bucket_extension: record.maybe_file_cover_image_public_bucket_extension,
         maybe_model_weights_token: record.maybe_model_weights_token,
         maybe_model_weights_title: record.maybe_model_weights_title,
         maybe_model_weights_type: record.maybe_model_weights_type,
@@ -257,6 +268,10 @@ SELECT
 
     m.maybe_prompt_token,
 
+    media_file_cover_image.public_bucket_directory_hash as maybe_file_cover_image_public_bucket_hash,
+    media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
+    media_file_cover_image.maybe_public_bucket_extension as maybe_file_cover_image_public_bucket_extension,
+
     m.creator_set_visibility,
 
     model_weights.token as maybe_model_weights_token,
@@ -264,9 +279,9 @@ SELECT
     model_weights.weights_type as maybe_model_weights_type,
     model_weights.weights_category as maybe_model_weights_category,
 
-    cover_image.public_bucket_directory_hash as maybe_model_cover_image_public_bucket_hash,
-    cover_image.maybe_public_bucket_prefix as maybe_model_cover_image_public_bucket_prefix,
-    cover_image.maybe_public_bucket_extension as maybe_model_cover_image_public_bucket_extension,
+    model_weight_cover_image.public_bucket_directory_hash as maybe_model_cover_image_public_bucket_hash,
+    model_weight_cover_image.maybe_public_bucket_prefix as maybe_model_cover_image_public_bucket_prefix,
+    model_weight_cover_image.maybe_public_bucket_extension as maybe_model_cover_image_public_bucket_extension,
 
     model_weight_creator.token as maybe_model_weight_creator_user_token,
     model_weight_creator.username as maybe_model_weight_creator_username,
@@ -289,8 +304,10 @@ LEFT OUTER JOIN users
     ON m.maybe_creator_user_token = users.token
 LEFT OUTER JOIN model_weights
     ON m.maybe_origin_model_token = model_weights.token
-LEFT OUTER JOIN media_files as cover_image
-    ON cover_image.token = model_weights.maybe_cover_image_media_file_token
+LEFT OUTER JOIN media_files as media_file_cover_image
+    ON media_file_cover_image.token = m.maybe_cover_image_media_file_token
+LEFT OUTER JOIN media_files as model_weight_cover_image
+    ON model_weight_cover_image.token = model_weights.maybe_cover_image_media_file_token
 LEFT OUTER JOIN users as model_weight_creator
     ON model_weight_creator.token = model_weights.creator_user_token
 LEFT OUTER JOIN entity_stats
@@ -332,6 +349,10 @@ impl FromRow<'_, MySqlRow> for MediaFileRaw {
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
 
       maybe_prompt_token: PromptToken::try_from_mysql_row_nullable(row, "maybe_prompt_token")?,
+
+      maybe_file_cover_image_public_bucket_hash: row.try_get("maybe_file_cover_image_public_bucket_hash")?,
+      maybe_file_cover_image_public_bucket_prefix: row.try_get("maybe_file_cover_image_public_bucket_prefix")?,
+      maybe_file_cover_image_public_bucket_extension: row.try_get("maybe_file_cover_image_public_bucket_extension")?,
 
       maybe_model_weights_token: ModelWeightToken::try_from_mysql_row_nullable(row, "maybe_model_weights_token")?,
       maybe_model_weights_title: row.try_get("maybe_model_weights_title")?,

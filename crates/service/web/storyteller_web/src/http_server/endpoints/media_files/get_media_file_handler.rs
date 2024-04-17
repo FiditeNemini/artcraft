@@ -304,7 +304,12 @@ async fn modern_media_file_lookup(
       maybe_engine_extension,
       maybe_batch_token: result.maybe_batch_token,
       public_bucket_path,
-      cover_image: MediaFileCoverImageDetails::from_token(&result.token),
+      cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
+        &result.token,
+        result.maybe_file_cover_image_public_bucket_hash.as_deref(),
+        result.maybe_file_cover_image_public_bucket_prefix.as_deref(),
+        result.maybe_file_cover_image_public_bucket_extension.as_deref(),
+      ),
       maybe_title: result.maybe_title,
       maybe_text_transcript: result.maybe_text_transcript,
       maybe_model_weight_info: match result.maybe_model_weights_token {

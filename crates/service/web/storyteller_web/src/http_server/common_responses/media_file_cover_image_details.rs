@@ -2,8 +2,12 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
 use utoipa::ToSchema;
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 
 use tokens::tokens::media_files::MediaFileToken;
+use tokens::tokens::model_weights::ModelWeightToken;
+use crate::http_server::common_responses::weights_cover_image_details::WeightsDefaultCoverInfo;
+use crate::util::placeholder_images::cover_images::default_cover_image_from_token::default_cover_image_from_token;
 
 /// There are currently 25 cover images numbered 0 to 24 (0-indexed).
 /// The original dataset was numbered 1 - 25, but I renamed 25 to 0.
@@ -46,6 +50,44 @@ impl MediaFileCoverImageDetails {
     Self {
       // TODO(bt,2024-04-07): Add column to schema to support + CRUD to add.
       maybe_cover_image_public_bucket_path: None,
+      default_cover: MediaFileDefaultCover::from_token_str(token),
+    }
+  }
+
+  pub fn from_optional_db_fields(
+    token: &MediaFileToken,
+    maybe_cover_image_public_bucket_path: Option<&str>,
+    maybe_cover_image_public_bucket_prefix: Option<&str>,
+    maybe_cover_image_public_bucket_extension: Option<&str>,
+  ) -> Self {
+    Self::from_optional_db_str_fields(
+      token.as_str(),
+      maybe_cover_image_public_bucket_path,
+      maybe_cover_image_public_bucket_prefix,
+      maybe_cover_image_public_bucket_extension
+    )
+  }
+
+  pub fn from_optional_db_str_fields(
+    token: &str,
+    maybe_cover_image_public_bucket_path: Option<&str>,
+    maybe_cover_image_public_bucket_prefix: Option<&str>,
+    maybe_cover_image_public_bucket_extension: Option<&str>,
+  ) -> Self {
+    let maybe_bucket_path = maybe_cover_image_public_bucket_path
+        .map(|hash| MediaFileBucketPath::from_object_hash(
+          hash,
+          maybe_cover_image_public_bucket_prefix,
+          maybe_cover_image_public_bucket_extension
+        ));
+
+    let maybe_cover_image_public_bucket_path = maybe_bucket_path
+        .map(|bucket_path| bucket_path
+            .get_full_object_path_str()
+            .to_string());
+
+    Self {
+      maybe_cover_image_public_bucket_path,
       default_cover: MediaFileDefaultCover::from_token_str(token),
     }
   }
