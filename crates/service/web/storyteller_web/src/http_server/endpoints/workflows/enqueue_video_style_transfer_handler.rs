@@ -41,6 +41,12 @@ const DEBUG_HEADER_NAME : &str = "enable-debug-mode";
 /// This is useful for catching the live logs or intercepting the job.
 const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 
+/// The default ending trim point of a video if not supplied in the request.
+const DEFAULT_TRIM_MILLISECONDS_END : u64 = 3_000;
+
+/// This is the maximum duration (for premium users)
+const MAXIMUM_DURATION_MILLIS : u64 = 10_000;
+
 #[derive(Deserialize, ToSchema)]
 pub struct EnqueueVideoStyleTransferRequest {
     /// Entropy for request de-duplication (required)
@@ -238,20 +244,20 @@ pub async fn enqueue_video_style_transfer_handler(
 
 
     let mut trim_start_millis = request.trim_start_millis.unwrap_or(0);
-    let mut trim_end_millis = request.trim_end_millis.unwrap_or(3_000);
+    let mut trim_end_millis = request.trim_end_millis.unwrap_or(DEFAULT_TRIM_MILLISECONDS_END);
 
     let has_paid_plan = plan.plan_slug() == "fakeyou_contributor" || plan.plan_category() == PlanCategory::Paid;
 
     // block trim too much
     if has_paid_plan {
-        if trim_end_millis - trim_start_millis > 10_000 {
+        if trim_end_millis - trim_start_millis > MAXIMUM_DURATION_MILLIS {
             trim_start_millis = 0;
-            trim_end_millis = 3_000;
+            trim_end_millis = DEFAULT_TRIM_MILLISECONDS_END;
         }
     } else {
-        if trim_end_millis - trim_start_millis > 3_000 {
+        if trim_end_millis - trim_start_millis > DEFAULT_TRIM_MILLISECONDS_END {
             trim_start_millis = 0;
-            trim_end_millis = 3_000;
+            trim_end_millis = DEFAULT_TRIM_MILLISECONDS_END;
         }
     }
 

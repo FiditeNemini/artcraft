@@ -28,7 +28,10 @@ impl CommandArgs for FfmpegAudioReplaceArgs<'_> {
     //  - https://stackoverflow.com/a/64927381
     //  - https://video.stackexchange.com/a/34928
     //  - https://superuser.com/a/801595
-    command.push_str(" -fflags +shortest ");
+    //command.push_str(" -fflags +shortest ");
+
+    // NB(bt): Actually, +shortest left 4 seconds of trailing audio.
+    command.push_str(" -shortest ");
 
     command.push_str(&path_to_string(self.output_video_file));
 
