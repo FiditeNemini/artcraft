@@ -354,9 +354,20 @@ export class TimeLine {
     const keyframe_uuid = data["data"]["keyframe_uuid"];
     const keyframe_offset = data["data"]["offset"];
     const object_uuid = data["data"]["object_uuid"];
+
+    const keyframe_pos = data["data"]["position"];
+    const keyframe_rot = data["data"]["rotation"];
+    const keyframe_scl = data["data"]["scale"];
+
     this.transform_engine.clips[object_uuid].setOffset(
       keyframe_uuid,
       keyframe_offset,
+    );
+    this.transform_engine.clips[object_uuid].setTransform(
+      keyframe_uuid, 
+      keyframe_pos, 
+      keyframe_rot, 
+      keyframe_scl,
     );
   }
 
