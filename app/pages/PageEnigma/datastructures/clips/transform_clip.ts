@@ -70,7 +70,17 @@ export class TransformClip {
     this.keyframes.forEach(item => {
       if (item.keyframe_uuid === keyframe_uuid) {
           item.offset = keyframe_offset;
-          console.log("Set keyframe!!");
+          return;
+      }
+    });
+  }
+
+  public setTransform(keyframe_uuid: string, position: THREE.Vector3, rotation: THREE.Vector3, scale: THREE.Vector3) {
+    this.keyframes.forEach(item => {
+      if (item.keyframe_uuid === keyframe_uuid) {
+          item.position = position;
+          item.rotation = rotation;
+          item.scale = scale;
           return;
       }
     });
