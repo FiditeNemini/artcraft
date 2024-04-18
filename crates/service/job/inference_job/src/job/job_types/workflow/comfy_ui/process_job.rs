@@ -32,6 +32,7 @@ use mysql_queries::queries::media_files::create::insert_media_file_from_comfy_ui
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
+use subprocess_common::command_runner::command_runner_args::RunAsSubprocessArgs;
 use thumbnail_generator::task_client::thumbnail_task::ThumbnailTaskBuilder;
 use tokens::tokens::prompts::PromptToken;
 
@@ -40,6 +41,7 @@ use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
+use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
 use crate::util::common_commands::ffmpeg_logo_watermark_command::WatermarkArgs;
 
 fn get_file_extension(mimetype: &str) -> Result<&'static str> {
@@ -104,6 +106,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .map_err(|e| ProcessSingleJobError::from_io_error(e))?;
 
     // ===================== DOWNLOAD REQUIRED MODELS IF NOT EXIST ===================== //
+
     let root_comfy_path = model_dependencies.inference_command.mounts_directory.clone();
 
     let remote_cloud_file_client = RemoteCloudFileClient::get_remote_cloud_file_client().await;
@@ -144,7 +147,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
         _ => { }
     }
-
 
     let maybe_args = job.maybe_inference_args
         .as_ref()
@@ -205,17 +207,21 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         let workflow_name = style_json.get("workflow_api_name").and_then(|v| v.as_str())
             .ok_or(ProcessSingleJobError::Other(anyhow!("Failed to get or convert workflow_api_name from style.json")))?;
         let workflow_original_location = model_dependencies.inference_command.workflows_directory.join(workflow_name);
+
         std::fs::copy(&workflow_original_location, &workflow_path).map_err(|e| ProcessSingleJobError::Other(anyhow!("error copying workflow: {:?}", e)))?;
 
         let style_modifications = style_json.get("modifications").ok_or(ProcessSingleJobError::Other(anyhow!("Failed to get modifications from style.json")))?;
         let positive_prompt = maybe_positive_prompt.as_deref();
         let maybe_negative_prompt = maybe_negative_prompt.as_deref();
+
         json_modifications = Some(get_style_modifications(style_modifications, &mapping_json, &positive_prompt, &maybe_negative_prompt));
+
     } else {
         return Err(ProcessSingleJobError::Other(anyhow!("No style nor json modifications provided")));
     }
 
     workflow_path = apply_jsonpath_modifications(json_modifications.unwrap(), &workflow_path)?;
+
     // ==================== QUERY AND DOWNLOAD FILES ==================== //
 
     // Download Lora model if specified
@@ -460,6 +466,53 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         if use_watermarked_file {
             info!("Using watermark file: {:?}", output_video_fs_path_watermark);
             final_finished_video_file = output_video_fs_path_watermark;
+        }
+    }
+
+    // ==================== COPY BACK AUDIO ==================== //
+
+    // We need to reference either the watermarked or original comfy video
+    // maybe maybe_input_path
+    let original_video_with_possible_audio = maybe_original_input_path.clone()
+        .expect("this should exist");
+    let current_processed_video= final_finished_video_file.clone();
+
+    // TODO(bt, 2024-03-01): Interrogate account for premium
+    const RESTORE_AUDIO : bool = true;
+
+    if RESTORE_AUDIO {
+        info!("Restoring audio...");
+
+        let output_video_fs_path_restored = comfy_output_video_file.with_extension("_restored.mp4");
+
+        let command_exit_status = model_dependencies
+            .ffmpeg_command_runner
+            .run_with_subprocess(RunAsSubprocessArgs {
+                args: Box::new(&FfmpegAudioReplaceArgs {
+                    input_video_file: &current_processed_video,
+                    input_audio_file: &original_video_with_possible_audio,
+                    output_video_file: &output_video_fs_path_restored,
+                }),
+                maybe_stderr_output_file: None,
+                maybe_stdout_output_file: None,
+            });
+
+        let mut use_restored_audio = true;
+
+        // NB: Don't fail the entire command if watermarking fails.
+        if let Err(err) = check_file_exists(&output_video_fs_path_restored) {
+            use_restored_audio = false;
+            error!("Audio copy failed: {:?}", err);
+        }
+
+        if !command_exit_status.is_success() {
+            use_restored_audio = false;
+            error!("Audio copy failed: {:?} ; we'll save the non-audio copy.", command_exit_status);
+        }
+
+        if use_restored_audio {
+            info!("Using restored audio file: {:?}", output_video_fs_path_restored);
+            final_finished_video_file = output_video_fs_path_restored;
         }
     }
 
