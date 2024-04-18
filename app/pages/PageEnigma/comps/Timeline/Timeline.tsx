@@ -8,12 +8,13 @@ import {
   deleteAudioClip,
   deleteCharacterClip,
   filmLength,
-  ignoreDelete,
+  ignoreKeyDelete,
   scale,
   selectedItem,
   timelineHeight,
   timelineScrollX,
   timelineScrollY,
+  isHotkeyDisabled,
 } from "~/pages/PageEnigma/store";
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -64,7 +65,7 @@ export const Timeline = () => {
 
   const onDeleteAsk = useCallback(
     (event: KeyboardEvent) => {
-      if (ignoreDelete.value) {
+      if (ignoreKeyDelete.value || isHotkeyDisabled()) {
         return;
       }
       if (
@@ -127,7 +128,7 @@ export const Timeline = () => {
         </div>
       </LowerPanel>
       <ConfirmationModal
-        title="Delete Clip"
+        title={`Delete ${getItemType(selectedItem.value)}`}
         text={`Are you sure you want to delete the selected ${getItemType(selectedItem.value)}?`}
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}

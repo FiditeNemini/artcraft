@@ -3,6 +3,8 @@ import { IconDefinition } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Label } from "./Typography";
 import { kebabCase } from "~/utilities";
+import { disableHotkeyInput,enableHotkeyInput,DomLevels } from "~/pages/PageEnigma/store";
+
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -24,6 +26,8 @@ export function Input({ label, icon, className, id, ...rest }: InputProps) {
             "h-10 w-full rounded-md bg-brand-secondary px-3 py-2.5 text-white outline-none outline-offset-0 transition-all duration-150 ease-in-out focus:outline-brand-primary",
             icon ? "pl-12" : "",
           )}
+          onFocus={() => disableHotkeyInput(DomLevels.INPUT)}
+          onBlur={() => enableHotkeyInput(DomLevels.INPUT)}
           {...rest}
         />
       </div>
