@@ -83,6 +83,7 @@ class Editor {
   current_frame: number;
   lockControls: PointerLockControls | undefined;
   cam_obj: THREE.Object3D | undefined;
+  camera_last_pos: THREE.Vector3;
   renderPass: RenderPass | undefined;
   generating_preview: boolean;
   frames: number;
@@ -142,6 +143,7 @@ class Editor {
     this.outlinePass;
     this.last_cam_pos = new THREE.Vector3(0, 0, 0);
     this.last_cam_rot = new THREE.Euler(0, 0, 0);
+    this.camera_last_pos = new THREE.Vector3(0, 0, 0);
     this.lockControls;
     this.saoPass;
     this.outputPass;
@@ -1266,6 +1268,13 @@ class Editor {
     if (event.button === 1) {
       this.lockControls?.unlock();
     }
+
+    if (event.button !== 0) {
+      let camera_pos = new THREE.Vector3(parseFloat(this.camera.position.x.toFixed(2)),
+        parseFloat(this.camera.position.y.toFixed(2)),
+        parseFloat(this.camera.position.z.toFixed(2)));
+      this.camera_last_pos.copy(camera_pos);
+    }
   }
 
   // Sets new mouse location usually used in raycasts.
@@ -1281,15 +1290,25 @@ class Editor {
 
   // When the mouse clicks the screen.
   onMouseClick() {
+    let camera_pos = new THREE.Vector3(parseFloat(this.camera.position.x.toFixed(2)),
+      parseFloat(this.camera.position.y.toFixed(2)),
+      parseFloat(this.camera.position.z.toFixed(2)));
+    if (this.camera_last_pos.equals(new THREE.Vector3(0, 0, 0))) {
+      this.camera_last_pos.copy(camera_pos);
+    }
+
     if (
       this.raycaster == undefined ||
       this.mouse == undefined ||
       this.control == undefined ||
       this.outlinePass == undefined ||
-      this.camera_person_mode
+      this.camera_person_mode ||
+      !this.camera_last_pos.equals(camera_pos)
     ) {
+      this.camera_last_pos.copy(camera_pos);
       return;
     }
+    this.camera_last_pos.copy(camera_pos);
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const interactable: any[] = [];
@@ -1333,13 +1352,11 @@ class Editor {
         });
         this.updateSelectedUI();
       }
-    } else if (this.transform_interaction == false) {
+    } else {
       this.removeTransformControls();
       this.dispatchAppUiState({
         type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
       });
-    } else {
-      this.transform_interaction = false;
     }
   }
 }
