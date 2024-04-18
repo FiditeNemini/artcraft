@@ -128,7 +128,7 @@ export const Timeline = () => {
         </div>
       </LowerPanel>
       <ConfirmationModal
-        title="Delete Clip"
+        title={`Delete ${getItemType(selectedItem.value)}`}
         text={`Are you sure you want to delete the selected ${getItemType(selectedItem.value)}?`}
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
