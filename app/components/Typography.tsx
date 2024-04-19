@@ -9,41 +9,54 @@ interface TypoProps {
 const baseTypo = "text-white";
 
 export const H1 = ({ className, children }: TypoProps) => (
-  <h1 className={twMerge(baseTypo, "text-2xl font-medium", className)}>{children}</h1>
+  <h1 className={twMerge(baseTypo, "text-2xl font-medium", className)}>
+    {children}
+  </h1>
 );
 
 export const H2 = ({ className, children }: TypoProps) => (
-  <h2 className={twMerge(baseTypo, "text-xl font-medium", className)}>{children}</h2>
+  <h2 className={twMerge(baseTypo, "text-xl font-medium", className)}>
+    {children}
+  </h2>
 );
 
 export const H3 = ({ className, children }: TypoProps) => (
-  <h3 className={twMerge(baseTypo, "text-lg font-medium", className)}>{children}</h3>
+  <h3 className={twMerge(baseTypo, "text-lg font-medium", className)}>
+    {children}
+  </h3>
 );
 
 export const H4 = ({ className, children }: TypoProps) => (
-  <h4 className={twMerge(baseTypo, "text-base font-medium", className)}>{children}</h4>
+  <h4 className={twMerge(baseTypo, "text-base font-medium", className)}>
+    {children}
+  </h4>
 );
 
-export const Label = ({ 
-  className, children, ...rest
+export const Label = ({
+  className,
+  children,
+  ...rest
 }: LabelHTMLAttributes<HTMLLabelElement>) => (
   <label
-    className={twMerge(baseTypo, "mb-2 text-base font-medium", className)}
-    {...rest}
-  >
-      {children}
+    className={twMerge(baseTypo, "mb-2 text-sm font-medium", className)}
+    {...rest}>
+    {children}
   </label>
 );
 
 export const H5 = ({ className, children }: TypoProps) => (
-  <h5 className={twMerge(baseTypo, "text-sm font-medium", className)}>{children}</h5>
+  <h5 className={twMerge(baseTypo, "text-sm font-medium", className)}>
+    {children}
+  </h5>
 );
 
 export const H6 = ({ className, children }: TypoProps) => (
-  <h6 className={twMerge(baseTypo, "text-sm font-light", className)}>{children}</h6>
+  <h6 className={twMerge(baseTypo, "text-sm font-light", className)}>
+    {children}
+  </h6>
 );
 
-export const Link = ({className, ...rest}:NavLinkProps)=>
+export const Link = ({ className, ...rest }: NavLinkProps) => (
   <NavLink
     className={twMerge(
       "text-brand-primary hover:text-brand-primary-400",
@@ -51,6 +64,7 @@ export const Link = ({className, ...rest}:NavLinkProps)=>
     )}
     {...rest}
   />
+);
 
 export const P = ({ className, children }: TypoProps) => (
   <p className={twMerge(baseTypo, className)}> {children} </p>

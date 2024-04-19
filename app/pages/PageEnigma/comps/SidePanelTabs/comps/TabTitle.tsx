@@ -19,7 +19,7 @@ export function TabTitle({ title, onBack }: Props) {
   };
 
   return (
-    <div className="flex items-center justify-between pb-2">
+    <div className="flex items-center justify-between pb-3">
       {onBack ? (
         <div className="flex items-center gap-2">
           <ButtonIcon onClick={onBack} icon={faAngleLeft} />
@@ -28,7 +28,12 @@ export function TabTitle({ title, onBack }: Props) {
       ) : (
         <div className="align-middle text-base font-bold">{title}</div>
       )}
-      <ButtonIcon onClick={onClose} icon={faClose} />
+      <ButtonIcon
+        onClick={onClose}
+        icon={faClose}
+        size="lg"
+        className="h-auto w-auto opacity-75 hover:opacity-50"
+      />
     </div>
   );
 }
