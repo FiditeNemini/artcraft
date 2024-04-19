@@ -319,6 +319,7 @@ class Editor {
     this.control.setScaleSnap(0.05);
     this.control.setTranslationSnap(0.05);
     this.control.setRotationSnap(0.05);
+    console.log("Control Sensitivity:", this.control.sensitivity);
 
     // OnClick and MouseMove events.
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
