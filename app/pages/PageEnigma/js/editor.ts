@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { FreeCam } from "./free_cam";
-import { TransformControls } from "three/addons/controls/TransformControls.js";
+import { TransformControls } from "./TransformControls.js";
 import Scene from "./scene.js";
 import { APIManager, ArtStyle, Visibility } from "./api_manager.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
@@ -316,9 +316,10 @@ class Editor {
     this.control.space = "local"; // Local transformation mode
     // .space = 'world'; // Global mode
 
-    this.control.setScaleSnap(0.1);
-    this.control.setTranslationSnap(0.1);
-    this.control.setRotationSnap(0.1);
+    this.control.setScaleSnap(0.05);
+    this.control.setTranslationSnap(0.05);
+    this.control.setRotationSnap(0.05);
+    console.log("Control Sensitivity:", this.control.sensitivity);
 
     // OnClick and MouseMove events.
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
