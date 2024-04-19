@@ -73,7 +73,16 @@ export const PageEditor = ({ setPage }: Props) => {
                   ? "invisible"
                   : ""
               }>
-              <canvas id="video-scene" width="1280px" height="720px" />
+              <div
+                id="video-scene-container"
+                style={{
+                  width:
+                    pageWidth.value -
+                    (sidePanelVisible.value ? sidePanelWidth.value : 0) -
+                    84,
+                }}>
+                <canvas id="video-scene" width="1280px" height="720px" />
+              </div>
 
               {/* Top controls */}
               <div
