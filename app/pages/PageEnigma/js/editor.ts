@@ -309,6 +309,9 @@ class Editor {
       this.renderer.domElement,
     );
 
+    this.orbitControls.mouseButtons = { MIDDLE: THREE.MOUSE.ROTATE, RIGHT: THREE.MOUSE.PAN }; // Blender Style
+    // this.orbitControls.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN }; // Standard
+
     this.control = new TransformControls(this.camera, this.renderer.domElement);
     this.control.space = "local"; // Local transformation mode
     // .space = 'world'; // Global mode
