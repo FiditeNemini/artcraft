@@ -93,7 +93,7 @@ export class LipSync {
 
   update(frame, offset, rendering) {
 
-    const frameBuffer = 16;
+    const frameBuffer = 12;
 
     let pos = frame - offset;
 
