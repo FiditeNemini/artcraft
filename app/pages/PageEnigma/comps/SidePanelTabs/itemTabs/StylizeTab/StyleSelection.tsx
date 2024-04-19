@@ -20,14 +20,6 @@ export const StyleSelection = () => {
     90 + (sidePanelWidth.value - 32 - shownImageCount * 98) / shownImageCount;
   const imageHeight = (54 * imageWidth) / 90;
 
-  console.log(
-    "image",
-    shownImageCount,
-    sidePanelWidth.value,
-    imageWidth,
-    imageHeight,
-  );
-
   const editorEngine = useContext(EngineContext);
 
   const handlePickingStylizer = (picked: ArtStyle) => {

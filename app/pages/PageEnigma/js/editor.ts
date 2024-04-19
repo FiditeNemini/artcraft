@@ -1058,10 +1058,10 @@ class Editor {
     }
   }
 
-  switchPreview() {
+  async switchPreview() {
     if (!this.switchPreviewToggle) {
       this.switchPreviewToggle = true;
-      this.generateFrame();
+      await this.generateFrame();
       if (this.cameraViewControls) {
         this.cameraViewControls.enabled = false;
       }
@@ -1127,27 +1127,30 @@ class Editor {
       const blob = new Blob([output.buffer], { type: "video/mp4" });
       this.generating_preview = false;
 
-      const url = await this.api_manager.uploadMediaFrameGeneration(
-        blob,
-        "render.mp4",
-        this.art_style,
-        this.positive_prompt,
-        this.negative_prompt,
-      );
-      console.log(url);
+      try {
+        const url = await this.api_manager.uploadMediaFrameGeneration(
+          blob,
+          "render.mp4",
+          this.art_style,
+          this.positive_prompt,
+          this.negative_prompt,
+        );
+        console.log(url);
 
-      const stylePreview: HTMLVideoElement | null = document.getElementById(
-        "video-scene",
-      ) as HTMLVideoElement;
-      if (stylePreview) {
-        stylePreview.src = url;
-      } else {
-        console.log("No style preview window.");
+        const stylePreview: HTMLVideoElement | null = document.getElementById(
+          "video-scene",
+        ) as HTMLVideoElement;
+        if (stylePreview) {
+          stylePreview.src = url;
+        } else {
+          console.log("No style preview window.");
+        }
+
+        return Promise.resolve(url);
+      } catch (err: any) {
+        console.log(err.message);
+        return Promise.resolve("");
       }
-
-      return new Promise((resolve, reject) => {
-        resolve(url);
-      });
     }
   }
 

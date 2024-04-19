@@ -16,8 +16,6 @@ export const PreviewEngineCamera = () => {
     setTimeout(() => setShowLoader(false), 1000);
   }, []);
 
-  console.log("state", editorState.value);
-
   const handleButtonCameraView = () => {
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,

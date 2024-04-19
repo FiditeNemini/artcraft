@@ -33,12 +33,11 @@ export function StyleButtons() {
     });
   };
 
+  console.log("state", editorState.value);
+
   return (
     <div className="flex w-full flex-col justify-center gap-4 rounded-b-lg bg-ui-panel">
       <div className="w-full">
-        <div className="mb-2 text-sm font-medium">
-          Render the current camera view with AI
-        </div>
         {editorState.value === EditorStates.EDIT && (
           <Button
             icon={faArrowsRotate}
@@ -49,13 +48,18 @@ export function StyleButtons() {
           </Button>
         )}
         {editorState.value === EditorStates.PREVIEW && (
-          <Button
-            icon={faArrowsRotate}
-            variant="action"
-            className="w-full"
-            onClick={switchEdit}>
-            Return to Edit
-          </Button>
+          <>
+            <div className="mb-2 text-sm font-medium">
+              Render the current camera view with AI
+            </div>
+            <Button
+              icon={faArrowsRotate}
+              variant="action"
+              className="w-full"
+              onClick={switchEdit}>
+              Return to Edit
+            </Button>
+          </>
         )}
       </div>
       <div className="w-full">

@@ -151,7 +151,7 @@ export class TimeLine {
         await this.addShape(data);
         break;
       case toEngineActions.ENTER_PREVIEW_STATE:
-        this.editorEngine.switchPreview();
+        await this.editorEngine.switchPreview();
         break;
       case toEngineActions.ENTER_EDIT_STATE:
         this.editorEngine.switchEdit();
