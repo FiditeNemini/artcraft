@@ -335,6 +335,7 @@ class Editor {
       }
       this.orbitControls.enabled = !event.value;
       this.updateSelectedUI();
+      this.camera_last_pos.copy(new THREE.Vector3(-99999, -99999, -99999));
       // this.update_properties()
     });
     this.control.setSize(0.5); // Good default value for visuals.
