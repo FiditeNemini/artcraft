@@ -6,7 +6,7 @@ import { EngineContext } from "~/contexts/EngineContext";
 import { ArtStyle } from "~/pages/PageEnigma/js/api_manager";
 import { faAngleLeft, faAngleRight } from "@fortawesome/pro-solid-svg-icons";
 import { styleList } from "~/pages/PageEnigma/styleList";
-import { sidePanelWidth } from "~/pages/PageEnigma/store";
+import { sidePanelHeight, sidePanelWidth } from "~/pages/PageEnigma/store";
 import { ItemPicker } from "./ItemPicker";
 import { useSignals } from "@preact/signals-react/runtime";
 
@@ -19,6 +19,11 @@ export const StyleSelection = () => {
   const imageWidth =
     90 + (sidePanelWidth.value - 32 - shownImageCount * 98) / shownImageCount;
   const imageHeight = (54 * imageWidth) / 90;
+
+  const imageRows = Math.max(
+    Math.floor((sidePanelHeight.value - 520) / imageHeight),
+    2,
+  );
 
   const editorEngine = useContext(EngineContext);
 
@@ -39,7 +44,7 @@ export const StyleSelection = () => {
             className="relative overflow-hidden"
             style={{
               width: sidePanelWidth.value - 32,
-              height: imageHeight * 2 + 16,
+              height: imageHeight * imageRows + 8 * imageRows,
             }}>
             <div
               className="absolute flex flex-col gap-1 transition-all duration-300 ease-in-out"
@@ -48,38 +53,24 @@ export const StyleSelection = () => {
                 left: scrollPosition * (imageWidth + 8) * -1,
                 top: 0,
               }}>
-              <div className="flex gap-1">
-                {styleList
-                  .filter((_, index) => index % 2 === 0)
-                  .map((style) => (
-                    <ItemPicker
-                      key={style.type}
-                      label={style.label}
-                      type={style.type}
-                      selected={selection === style.type}
-                      onSelected={handlePickingStylizer}
-                      src={style.image}
-                      width={imageWidth}
-                      height={imageHeight}
-                    />
-                  ))}
-              </div>
-              <div className="flex gap-1">
-                {styleList
-                  .filter((_, index) => index % 2 === 1)
-                  .map((style) => (
-                    <ItemPicker
-                      key={style.type}
-                      label={style.label}
-                      type={style.type}
-                      selected={selection === style.type}
-                      onSelected={handlePickingStylizer}
-                      src={style.image}
-                      width={imageWidth}
-                      height={imageHeight}
-                    />
-                  ))}
-              </div>
+              {[...Array(imageRows).keys()].map((_, rowCount) => (
+                <div key={rowCount} className="flex gap-1">
+                  {styleList
+                    .filter((_, index) => index % imageRows === rowCount)
+                    .map((style) => (
+                      <ItemPicker
+                        key={style.type}
+                        label={style.label}
+                        type={style.type}
+                        selected={selection === style.type}
+                        onSelected={handlePickingStylizer}
+                        src={style.image}
+                        width={imageWidth}
+                        height={imageHeight}
+                      />
+                    ))}
+                </div>
+              ))}
             </div>
           </div>
           {scrollPosition > 0 && (
