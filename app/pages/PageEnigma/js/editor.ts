@@ -200,7 +200,7 @@ class Editor {
       this.animation_engine,
       this.activeScene,
       this.camera,
-      this.mouse
+      this.mouse,
     );
 
     this.current_frame = 0;
@@ -249,9 +249,13 @@ class Editor {
     this.canvReference = document.getElementById("video-scene");
     this.canvasRenderCamReference = document.getElementById("camera-view");
 
-    // Base width and height.
-    const width = this.canvReference.width;
-    const height = this.canvReference.height;
+    // Find the container element
+    const container = document.getElementById("video-scene-container");
+
+    // Use the container's dimensions
+    const width = container.offsetWidth;
+    const height = container.offsetHeight;
+
     // Sets up camera and base position.
     this.camera = new THREE.PerspectiveCamera(70, width / height, 0.15, 30);
     this.camera.position.z = 3;
@@ -284,6 +288,7 @@ class Editor {
     this.clock = new THREE.Clock();
     // Resizes the renderer.
     this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     //document.body.appendChild(this.renderer.domElement)
     window.addEventListener("resize", this.onWindowResize.bind(this));
     this._configurePostProcessing();
@@ -309,7 +314,10 @@ class Editor {
       this.renderer.domElement,
     );
 
-    this.orbitControls.mouseButtons = { MIDDLE: THREE.MOUSE.ROTATE, RIGHT: THREE.MOUSE.PAN }; // Blender Style
+    this.orbitControls.mouseButtons = {
+      MIDDLE: THREE.MOUSE.ROTATE,
+      RIGHT: THREE.MOUSE.PAN,
+    }; // Blender Style
     // this.orbitControls.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN }; // Standard
 
     this.control = new TransformControls(this.camera, this.renderer.domElement);
@@ -345,6 +353,8 @@ class Editor {
     // Resets canvas size.
     this.onWindowResize();
 
+    this.setupResizeObserver();
+
     this.timeline.scene = this.activeScene;
 
     //this._test_demo();
@@ -375,19 +385,17 @@ class Editor {
       this.loadScene(sceneToken);
     }
 
-    document.addEventListener('mouseover', (event) => {
+    document.addEventListener("mouseover", (event) => {
       if (this.orbitControls && this.cameraViewControls) {
         if (event.target instanceof HTMLCanvasElement) {
           if (this.camera_person_mode) {
             this.orbitControls.enabled = false;
             this.cameraViewControls.enabled = true;
-          }
-          else {
+          } else {
             this.orbitControls.enabled = true;
             this.cameraViewControls.enabled = false;
           }
-        }
-        else {
+        } else {
           this.orbitControls.enabled = false;
           this.cameraViewControls.enabled = false;
         }
@@ -411,7 +419,7 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() { }
+  public async testTestTimelineEvents() {}
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -685,7 +693,9 @@ class Editor {
 
   deleteObject(uuid: string) {
     const obj = this.activeScene.get_object_by_uuid(uuid);
-    if (obj?.name === "::CAM::") { return; }
+    if (obj?.name === "::CAM::") {
+      return;
+    }
     if (obj) {
       this.activeScene.scene.remove(obj);
     }
@@ -760,7 +770,7 @@ class Editor {
       this.render_timer += this.clock.getDelta();
       this.frames += 1;
       this.playback_location++;
-      const imgData = this.rawRenderer.domElement.toDataURL('image/png', 1.0); // Medium quality png for speed & size.
+      const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // Medium quality png for speed & size.
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
       if (this.timeline.is_playing == false) {
@@ -772,10 +782,19 @@ class Editor {
   }
 
   getselectedSum() {
-    if (this.selected === undefined) { return 0; }
-    let posCombo = this.selected.position.x + this.selected.position.y + this.selected.position.z;
-    let rotCombo = this.selected.rotation.x + this.selected.rotation.y + this.selected.rotation.z;
-    let sclCombo = this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
+    if (this.selected === undefined) {
+      return 0;
+    }
+    let posCombo =
+      this.selected.position.x +
+      this.selected.position.y +
+      this.selected.position.z;
+    let rotCombo =
+      this.selected.rotation.x +
+      this.selected.rotation.y +
+      this.selected.rotation.z;
+    let sclCombo =
+      this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
     return posCombo + rotCombo + sclCombo;
   }
 
@@ -835,8 +854,10 @@ class Editor {
       if (changeView) {
         this.switchCameraView();
       }
-    }
-    else if (this.last_scrub === this.timeline.scrubber_frame_position && this.getselectedSum() !== this.last_selected_sum) {
+    } else if (
+      this.last_scrub === this.timeline.scrubber_frame_position &&
+      this.getselectedSum() !== this.last_selected_sum
+    ) {
       this.updateSelectedUI();
     }
     this.last_selected_sum = this.getselectedSum();
@@ -904,10 +925,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-      startTime * 1000 +
-      "|" +
-      startTime * 1000 +
-      "[a1];[0:a][a1]amix=inputs=2[a]",
+        startTime * 1000 +
+        "|" +
+        startTime * 1000 +
+        "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -1179,9 +1200,7 @@ class Editor {
           element.visible = true;
         });
       }
-    }
-    else {
-
+    } else {
       this.timeline.is_playing = true;
       this.timeline.scrubber_frame_position = 0;
       if (!this.camera_person_mode) {
@@ -1237,9 +1256,11 @@ class Editor {
 
   // Automaticly resize scene.
   onWindowResize() {
-    // Calculate the maximum possible dimensions while maintaining the aspect ratio
-    const width = window.innerWidth; // / aspect_adjust
-    const height = window.innerHeight; // / aspectRatio
+    const container = document.getElementById("video-scene-container");
+    if (!container) return;
+
+    const width = container.clientWidth;
+    const height = container.clientHeight;
 
     if (this.camera == undefined || this.renderer == undefined) {
       return;
@@ -1263,6 +1284,23 @@ class Editor {
     this.render_camera.updateProjectionMatrix();
   }
 
+  setupResizeObserver() {
+    const container = document.getElementById("video-scene-container");
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer?.setSize(width, height);
+        this.renderer?.setPixelRatio(window.devicePixelRatio);
+      }
+    });
+
+    resizeObserver.observe(container);
+  }
+
   onMouseDown(event: any) {
     if (event.button === 1 && this.camera_person_mode) {
       this.lockControls?.lock();
@@ -1275,9 +1313,11 @@ class Editor {
     }
 
     if (event.button !== 0) {
-      let camera_pos = new THREE.Vector3(parseFloat(this.camera.position.x.toFixed(2)),
+      let camera_pos = new THREE.Vector3(
+        parseFloat(this.camera.position.x.toFixed(2)),
         parseFloat(this.camera.position.y.toFixed(2)),
-        parseFloat(this.camera.position.z.toFixed(2)));
+        parseFloat(this.camera.position.z.toFixed(2)),
+      );
       this.camera_last_pos.copy(camera_pos);
     }
   }
@@ -1295,9 +1335,11 @@ class Editor {
 
   // When the mouse clicks the screen.
   onMouseClick() {
-    let camera_pos = new THREE.Vector3(parseFloat(this.camera.position.x.toFixed(2)),
+    let camera_pos = new THREE.Vector3(
+      parseFloat(this.camera.position.x.toFixed(2)),
       parseFloat(this.camera.position.y.toFixed(2)),
-      parseFloat(this.camera.position.z.toFixed(2)));
+      parseFloat(this.camera.position.z.toFixed(2)),
+    );
     if (this.camera_last_pos.equals(new THREE.Vector3(0, 0, 0))) {
       this.camera_last_pos.copy(camera_pos);
     }
