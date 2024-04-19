@@ -532,7 +532,14 @@ export const characterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Skibidi Toilet",
     thumbnail: "/resources/characters/img15.png",
-  }
+  },
+  {
+    version: 1,
+    media_id: "m_ecfxa94v4ftvh58hv7se3qqy8a385n",
+    type: AssetType.CHARACTER,
+    name: "Pop",
+    thumbnail: "/resources/placeholders/placeholder.png",
+  },
 ]);
 
 export const objectItems = signal<MediaItem[]>([
