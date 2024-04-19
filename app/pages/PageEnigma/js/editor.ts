@@ -1061,11 +1061,11 @@ class Editor {
   async switchPreview() {
     if (!this.switchPreviewToggle) {
       this.switchPreviewToggle = true;
+      editorState.value = EditorStates.PREVIEW;
       await this.generateFrame();
       if (this.cameraViewControls) {
         this.cameraViewControls.enabled = false;
       }
-      editorState.value = EditorStates.PREVIEW;
     }
   }
 
@@ -1114,8 +1114,9 @@ class Editor {
         canvas: this.canvasRenderCamReference,
         preserveDrawingBuffer: true,
       });
-      if (this.camera_person_mode == false) {
+      if (!this.camera_person_mode) {
         this.switchCameraView();
+        editorState.value = EditorStates.PREVIEW;
       }
       this.activeScene.renderMode(true);
 
