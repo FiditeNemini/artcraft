@@ -33,6 +33,11 @@ export const TrackProvider = ({ children }: Props) => {
 
   // cross group functions
   const dropClip = useCallback(() => {
+    if (!canDrop.value) {
+      endDrag();
+      return;
+    }
+
     if (dragItem.value) {
       const mediaItem = dragItem.value;
       if (mediaItem.type === AssetType.CHARACTER) {
