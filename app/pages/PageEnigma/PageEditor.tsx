@@ -24,13 +24,8 @@ import { AppUiContext } from "~/contexts/AppUiContext";
 import { pageHeight, pageWidth } from "~/store";
 import { TopBar } from "~/modules/TopBar";
 import { DialogueTTS } from "./comps/DialogueTTS/DialogueTTS";
-import { Pages } from "~/pages/PageEnigma/constants/page";
 
-interface Props {
-  setPage: (page: Pages) => void;
-}
-
-export const PageEditor = ({ setPage }: Props) => {
+export const PageEditor = () => {
   useSignals();
 
   const [appUiState] = useContext(AppUiContext);
@@ -45,8 +40,8 @@ export const PageEditor = ({ setPage }: Props) => {
       ? dndSidePanelWidth.value
       : sidePanelWidth.value;
   const width = sidePanelVisible.value
-    ? pageWidth.value - dndWidth - 66
-    : pageWidth.value - 66;
+    ? pageWidth.value - dndWidth - 84
+    : pageWidth.value - 84;
   const height =
     dndTimelineHeight.value > -1
       ? pageHeight.value - dndTimelineHeight.value - 68
@@ -81,7 +76,7 @@ export const PageEditor = ({ setPage }: Props) => {
                 onClick={handleOverlayClick}>
                 <div className="grid grid-cols-3 gap-4">
                   <ControlsTopButtons />
-                  <Controls3D setPage={setPage} />
+                  <Controls3D />
                 </div>
               </div>
 

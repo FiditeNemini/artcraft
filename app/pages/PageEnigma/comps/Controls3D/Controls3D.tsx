@@ -1,20 +1,13 @@
 import {
-  faAngleRight,
   faArrowsRotate,
   faArrowsUpDownLeftRight,
   faUpRightAndDownLeftFromCenter,
 } from "@fortawesome/pro-solid-svg-icons";
-import { Button, ButtonIconSelect } from "~/components";
+import { ButtonIconSelect } from "~/components";
 import { EngineContext } from "~/contexts/EngineContext";
 import { useContext } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Pages } from "~/pages/PageEnigma/constants/page";
 
-interface Props {
-  setPage: (page: Pages) => void;
-}
-
-export const Controls3D = ({ setPage }: Props) => {
+export const Controls3D = () => {
   const editorEngine = useContext(EngineContext);
 
   const handleMoveArrows = () => {
@@ -52,11 +45,6 @@ export const Controls3D = ({ setPage }: Props) => {
     }
   };
 
-  const changeStylize = () => {
-    editorEngine?.switchPreview();
-    setPage(Pages.STYLE);
-  };
-
   const modes = [
     { value: "move", icon: faArrowsUpDownLeftRight },
     { value: "rotate", icon: faArrowsRotate },
@@ -72,12 +60,6 @@ export const Controls3D = ({ setPage }: Props) => {
               options={modes}
               onOptionChange={handleModeChange}
             />
-
-            <span className="h-6 w-0 border-l border-white/[0.2]" />
-
-            <Button variant="primary" onClick={() => changeStylize()}>
-              Stylize <FontAwesomeIcon icon={faAngleRight} />
-            </Button>
           </div>
         </div>
       </div>

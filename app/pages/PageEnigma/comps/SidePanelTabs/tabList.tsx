@@ -3,8 +3,8 @@ import { ObjectsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/Obje
 import { ShapeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ShapeTab";
 import { AnimationTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AnimationTab";
 import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AudioTab";
-import { TabStylization } from "~/pages/PageEnigma/comps/SidePanelTabs/TabStylization";
 import { CameraTab } from "./itemTabs/CameraTab";
+import { StylizeTab } from "./itemTabs/StylizeTab/StylizeTab";
 export const tabList = [
   {
     icon: "/resources/icons/characters.png",
@@ -41,5 +41,11 @@ export const tabList = [
     title: "Audio",
     value: AssetType.AUDIO,
     component: <AudioTab />,
+  },
+  {
+    icon: "/resources/icons/audios.png",
+    title: "AI Stylize",
+    value: AssetType.STYLE,
+    component: <StylizeTab />,
   },
 ];

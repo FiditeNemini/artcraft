@@ -198,7 +198,7 @@ class Editor {
       this.animation_engine,
       this.activeScene,
       this.camera,
-      this.mouse
+      this.mouse,
     );
 
     this.current_frame = 0;
@@ -368,19 +368,17 @@ class Editor {
       this.loadScene(sceneToken);
     }
 
-    document.addEventListener('mouseover', (event) => {
+    document.addEventListener("mouseover", (event) => {
       if (this.orbitControls && this.cameraViewControls) {
         if (event.target instanceof HTMLCanvasElement) {
           if (this.camera_person_mode) {
             this.orbitControls.enabled = false;
             this.cameraViewControls.enabled = true;
-          }
-          else {
+          } else {
             this.orbitControls.enabled = true;
             this.cameraViewControls.enabled = false;
           }
-        }
-        else {
+        } else {
           this.orbitControls.enabled = false;
           this.cameraViewControls.enabled = false;
         }
@@ -404,7 +402,7 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() { }
+  public async testTestTimelineEvents() {}
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -678,7 +676,9 @@ class Editor {
 
   deleteObject(uuid: string) {
     const obj = this.activeScene.get_object_by_uuid(uuid);
-    if (obj?.name === "::CAM::") { return; }
+    if (obj?.name === "::CAM::") {
+      return;
+    }
     if (obj) {
       this.activeScene.scene.remove(obj);
     }
@@ -753,7 +753,7 @@ class Editor {
       this.render_timer += this.clock.getDelta();
       this.frames += 1;
       this.playback_location++;
-      const imgData = this.rawRenderer.domElement.toDataURL('image/png', 1.0); // Medium quality png for speed & size.
+      const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // Medium quality png for speed & size.
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
       if (this.timeline.is_playing == false) {
@@ -765,10 +765,19 @@ class Editor {
   }
 
   getselectedSum() {
-    if (this.selected === undefined) { return 0; }
-    let posCombo = this.selected.position.x + this.selected.position.y + this.selected.position.z;
-    let rotCombo = this.selected.rotation.x + this.selected.rotation.y + this.selected.rotation.z;
-    let sclCombo = this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
+    if (this.selected === undefined) {
+      return 0;
+    }
+    const posCombo =
+      this.selected.position.x +
+      this.selected.position.y +
+      this.selected.position.z;
+    const rotCombo =
+      this.selected.rotation.x +
+      this.selected.rotation.y +
+      this.selected.rotation.z;
+    const sclCombo =
+      this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
     return posCombo + rotCombo + sclCombo;
   }
 
@@ -828,8 +837,10 @@ class Editor {
       if (changeView) {
         this.switchCameraView();
       }
-    }
-    else if (this.last_scrub === this.timeline.scrubber_frame_position && this.getselectedSum() !== this.last_selected_sum) {
+    } else if (
+      this.last_scrub === this.timeline.scrubber_frame_position &&
+      this.getselectedSum() !== this.last_selected_sum
+    ) {
       this.updateSelectedUI();
     }
     this.last_selected_sum = this.getselectedSum();
@@ -897,10 +908,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-      startTime * 1000 +
-      "|" +
-      startTime * 1000 +
-      "[a1];[0:a][a1]amix=inputs=2[a]",
+        startTime * 1000 +
+        "|" +
+        startTime * 1000 +
+        "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -1092,7 +1103,7 @@ class Editor {
       this.activeScene.renderMode(false);
       this.onWindowResize();
 
-      this.canvasRenderCamReference = document.getElementById("raw-preview");
+      this.canvasRenderCamReference = document.getElementById("video-scene");
       this.rawRenderer = new THREE.WebGLRenderer({
         antialias: false,
         canvas: this.canvasRenderCamReference,
@@ -1121,7 +1132,7 @@ class Editor {
       console.log(url);
 
       const stylePreview: HTMLVideoElement | null = document.getElementById(
-        "styled-preview",
+        "video-scene",
       ) as HTMLVideoElement;
       if (stylePreview) {
         stylePreview.src = url;
@@ -1172,9 +1183,7 @@ class Editor {
           element.visible = true;
         });
       }
-    }
-    else {
-
+    } else {
       this.timeline.is_playing = true;
       this.timeline.scrubber_frame_position = 0;
       if (!this.camera_person_mode) {
