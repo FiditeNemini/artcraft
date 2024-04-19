@@ -43,7 +43,11 @@ export const TopBar = ({ pageName }: Props) => {
           <div className="flex items-center justify-center font-medium">
             <span className="opacity-60">{pageName}&nbsp;&nbsp;/</span>
             &nbsp;&nbsp;
-            {sceneTitle.value}
+            {sceneTitle.value} 
+            &nbsp;&nbsp;
+            <span className="opacity-60">
+              @ CURRENT_STORYTELLER_GIT_VERSION
+            </span>
           </div>
 
           <div className="flex justify-end gap-2">
