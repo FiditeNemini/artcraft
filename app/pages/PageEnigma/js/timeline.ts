@@ -552,13 +552,12 @@ export class TimeLine {
           }
         } else if (
           element.type === ClipType.AUDIO &&
-          element.group !== ClipGroup.CHARACTER &&
-          this.is_playing
+          element.group !== ClipGroup.CHARACTER
         ) {
           if (this.scrubber_frame_position + 1 >= element.length) {
             this.audio_engine.stopClip(element.media_id);
           } else {
-            this.audio_engine.playClip(element.media_id);
+            this.audio_engine.playClip(element.media_id, this.scrubber_frame_position, element.offset);
           }
         } else if (
           element.type === ClipType.AUDIO &&
