@@ -543,6 +543,27 @@ export const objectItems = signal<MediaItem[]>([
     name: "Pikachu Statue",
     thumbnail: "/resources/placeholders/placeholder.png",
   },
+  {
+    version: 1,
+    media_id: "m_4d2s2q1xy9m1xncppr3gf9ne6bm2m0",
+    type: AssetType.OBJECT,
+    name: "Moon",
+    thumbnail: "/resources/objects/moon.png",
+  },
+  {
+    version: 1,
+    media_id: "m_t0s6gbvfp78rvc0sd6129za41crr9d",
+    type: AssetType.OBJECT,
+    name: "Crown",
+    thumbnail: "/resources/objects/crown.png",
+  },
+  {
+    version: 1,
+    media_id: "m_zp0zykww0k7ka2zagg3q3pb9t123k4",
+    type: AssetType.OBJECT,
+    name: "Sakura Tree",
+    thumbnail: "/resources/objects/sakura.png",
+  },
 ]);
 
 // In the future these will have shape id's
