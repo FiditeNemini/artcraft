@@ -91,7 +91,7 @@ export const StyleSelection = () => {
             </div>
           </div>
           {scrollPosition > 0 && (
-            <div className="pointer-events-none absolute left-[-10px] top-0 h-full w-12 bg-gradient-to-r from-ui-panel to-transparent">
+            <div className="pointer-events-none absolute left-[-10px] top-0 h-full w-12">
               <div className="flex h-full w-full items-center justify-start">
                 <ButtonIcon
                   icon={faAngleLeft}
@@ -109,7 +109,7 @@ export const StyleSelection = () => {
             </div>
           )}
           {scrollPosition < styleList.length / 2 - shownImageCount && (
-            <div className="pointer-events-none absolute right-[-32px] top-0 h-full w-12 bg-gradient-to-l from-ui-panel to-transparent">
+            <div className="pointer-events-none absolute right-[-32px] top-0 h-full w-12">
               <div className="flex h-full w-full items-center justify-end pr-6">
                 <ButtonIcon
                   icon={faAngleRight}
