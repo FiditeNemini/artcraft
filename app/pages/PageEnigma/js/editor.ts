@@ -32,6 +32,7 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
 import { loadingBarData, loadingBarIsShowing } from "~/store/loadingBar";
+import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 class Editor {
@@ -550,6 +551,7 @@ class Editor {
           type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
         });
         this.updateSelectedUI();
+        editorState.value = EditorStates.CAMERA_VIEW;
       } else {
         this.camera.position.copy(this.last_cam_pos);
         this.camera.rotation.copy(this.last_cam_rot);
@@ -572,6 +574,7 @@ class Editor {
         this.dispatchAppUiState({
           type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
         });
+        editorState.value = EditorStates.EDIT;
       }
     }
   }
@@ -1056,17 +1059,18 @@ class Editor {
   }
 
   switchPreview() {
-    if (this.switchPreviewToggle == false) {
+    if (!this.switchPreviewToggle) {
       this.switchPreviewToggle = true;
       this.generateFrame();
       if (this.cameraViewControls) {
         this.cameraViewControls.enabled = false;
       }
+      editorState.value = EditorStates.PREVIEW;
     }
   }
 
   switchEdit() {
-    if (this.switchPreviewToggle == true) {
+    if (this.switchPreviewToggle) {
       this.switchPreviewToggle = false;
       this.canvasRenderCamReference = document.getElementById("camera-view");
       this.rawRenderer = new THREE.WebGLRenderer({
@@ -1074,10 +1078,11 @@ class Editor {
         canvas: this.canvasRenderCamReference,
         preserveDrawingBuffer: true,
       });
-      if (this.camera_person_mode == true) {
+      if (this.camera_person_mode) {
         this.switchCameraView();
       }
       this.activeScene.renderMode(false);
+      editorState.value = EditorStates.EDIT;
     }
   }
 

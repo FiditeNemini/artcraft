@@ -6,4 +6,4 @@ export enum EditorStates {
   PREVIEW,
 }
 
-export const engineState = signal<EditorStates>(EditorStates.EDIT);
+export const editorState = signal<EditorStates>(EditorStates.EDIT);

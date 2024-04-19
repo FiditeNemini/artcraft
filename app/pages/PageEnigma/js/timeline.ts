@@ -16,6 +16,7 @@ import { fromEngineActions } from "../Queue/fromEngineActions";
 import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 import { MediaItem } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/js/editor";
+import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
 
 // Every object uuid / entity has a track.
 export class TimelineDataState {
@@ -64,7 +65,7 @@ export class TimeLine {
     animation_engine: AnimationEngine,
     scene: Scene,
     camera: THREE.Camera,
-    mouse: THREE.Vector2 | undefined
+    mouse: THREE.Vector2 | undefined,
   ) {
     this.editorEngine = editor;
     this.timeline_items = [];
@@ -149,6 +150,18 @@ export class TimeLine {
       case toEngineActions.ADD_SHAPE:
         await this.addShape(data);
         break;
+      case toEngineActions.ENTER_PREVIEW_STATE:
+        this.editorEngine.switchPreview();
+        break;
+      case toEngineActions.ENTER_EDIT_STATE:
+        this.editorEngine.switchEdit();
+        break;
+      case toEngineActions.TOGGLE_CAMERA_STATE:
+        this.editorEngine.switchCameraView();
+        break;
+      case toEngineActions.GENERATE_VIDEO:
+        this.editorEngine.generateVideo();
+        break;
       default:
         console.log("Action Not Wired", action);
     }
@@ -157,8 +170,8 @@ export class TimeLine {
   public async addCharacter(data: { data: MediaItem }) {
     const media_id = data.data.media_id;
     const name = data.data.name;
-    let pos = this.getPos();
-    let new_data = { ...data.data };
+    const pos = this.getPos();
+    const new_data = { ...data.data };
 
     const obj = await this.scene.load_glb(media_id);
     obj.userData["name"] = name;
@@ -193,10 +206,13 @@ export class TimeLine {
   }
 
   public getPos() {
-    let raycaster = new THREE.Raycaster();
+    const raycaster = new THREE.Raycaster();
     if (this.mouse && this.camera) {
       raycaster.setFromCamera(this.mouse, this.camera);
-      const intersects = raycaster.intersectObjects(this.scene.scene.children, false);
+      const intersects = raycaster.intersectObjects(
+        this.scene.scene.children,
+        false,
+      );
       console.log(intersects);
       if (intersects.length > 0) {
         return intersects[0].point;
@@ -206,7 +222,7 @@ export class TimeLine {
   }
 
   public async addObject(data: { data: MediaItem }) {
-    let pos = this.getPos();
+    const pos = this.getPos();
     const media_id = data.data.media_id;
     const name = data.data.name;
     const obj = await this.scene.load_glb(media_id);
@@ -216,7 +232,7 @@ export class TimeLine {
   }
 
   public async addShape({ data }: { data: MediaItem }) {
-    let pos = this.getPos();
+    const pos = this.getPos();
     this.editorEngine.create_parim(data.media_id, pos);
   }
 
@@ -270,8 +286,10 @@ export class TimeLine {
   }
 
   public deleteObject(object_uuid: string) {
-    let object = this.scene.get_object_by_uuid(object_uuid);
-    if (object?.name === "::CAM::") { return; }
+    const object = this.scene.get_object_by_uuid(object_uuid);
+    if (object?.name === "::CAM::") {
+      return;
+    }
     this.timeline_items = this.timeline_items.filter(
       (element) => element.object_uuid !== object_uuid,
     );
@@ -364,9 +382,9 @@ export class TimeLine {
       keyframe_offset,
     );
     this.transform_engine.clips[object_uuid].setTransform(
-      keyframe_uuid, 
-      keyframe_pos, 
-      keyframe_rot, 
+      keyframe_uuid,
+      keyframe_pos,
+      keyframe_rot,
       keyframe_scl,
     );
   }
@@ -437,15 +455,15 @@ export class TimeLine {
   public async updatePlayableClip(
     clip_uuid: string,
     updates: AnyJson,
-  ): Promise<void> { }
+  ): Promise<void> {}
 
-  public async deletePlayableClip(clip_uuid: string): Promise<void> { }
+  public async deletePlayableClip(clip_uuid: string): Promise<void> {}
 
   public async scrub(data: any): Promise<void> {
     if (this.is_playing) {
       return;
     }
-    const value = Math.floor(data["data"]["currentTime"])
+    const value = Math.floor(data["data"]["currentTime"]);
     this.setScrubberPosition(value);
     this.update();
   }
@@ -458,7 +476,7 @@ export class TimeLine {
     });
   }
 
-  public async scrubberDidStop(offset_frame: number) { }
+  public async scrubberDidStop(offset_frame: number) {}
   // public streaming events into the timeline from
   public async setScrubberPosition(offset: number) {
     this.scrubber_frame_position = offset; // in ms
@@ -583,7 +601,7 @@ export class TimeLine {
             await this.animation_engine.clips[
               object.uuid + element.media_id
             ].play(object);
-            let fps = 60;
+            const fps = 60;
             this.animation_engine.clips[object.uuid + element.media_id].step(
               this.scrubber_frame_position / fps, // Double FPS for best result.
             );

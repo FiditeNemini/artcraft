@@ -5,18 +5,27 @@ import {
   QueueClip,
   QueueKeyframe,
   UpdateTime,
+  MediaItem,
 } from "~/pages/PageEnigma/models";
 import { toTimelineActions } from "./toTimelineActions";
 
-type UnionedActionTypes = fromEngineActions | toEngineActions | toTimelineActions;
-type UnionedDataTypes = QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem;
+type UnionedActionTypes =
+  | fromEngineActions
+  | toEngineActions
+  | toTimelineActions;
+type UnionedDataTypes =
+  | QueueClip
+  | UpdateTime
+  | QueueKeyframe
+  | ClipUI[]
+  | MediaItem
+  | null;
 
 export type QueueSubscribeType = {
-    action: UnionedActionTypes;
-    data: UnionedDataTypes;
-}
+  action: UnionedActionTypes;
+  data: UnionedDataTypes;
+};
 import { ClipUI } from "../datastructures/clips/clip_ui";
-import { MediaItem } from "~/pages/PageEnigma/models";
 class Queue {
   private _queue: Record<
     string,
@@ -27,10 +36,7 @@ class Queue {
   > = {};
   private _subscribers: Record<
     string,
-    (entry: {
-      action: UnionedActionTypes;
-      data: UnionedDataTypes;
-    }) => void
+    (entry: { action: UnionedActionTypes; data: UnionedDataTypes }) => void
   > = {};
 
   public publish({
@@ -40,7 +46,7 @@ class Queue {
   }: {
     queueName: string;
     action: UnionedActionTypes;
-    data: UnionedDataTypes ;
+    data: UnionedDataTypes;
   }) {
     if (!this._queue[queueName]) {
       this._queue[queueName] = [];

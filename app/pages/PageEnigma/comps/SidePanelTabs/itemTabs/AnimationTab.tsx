@@ -5,22 +5,23 @@ import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/It
 import { Button } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
+import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 
 export const AnimationTab = () => {
   useSignals();
 
   return (
     <>
-      <div className="w-full overflow-x-auto">
-        <div className="mb-4 mt-4 flex justify-start gap-2 px-4">
+      <div className="w-full overflow-x-auto p-4">
+        <TabTitle title="Animation" />
+        <div className="mb-4 flex justify-start gap-2">
           <button
             className={twMerge(
               "filter-tab",
               animationFilter.value === AssetFilterOption.ALL ? "active" : "",
               "disabled",
             )}
-            onClick={() => (animationFilter.value = AssetFilterOption.ALL)}
-          >
+            onClick={() => (animationFilter.value = AssetFilterOption.ALL)}>
             All
           </button>
           <button
@@ -30,8 +31,7 @@ export const AnimationTab = () => {
               "disabled",
             )}
             onClick={() => (animationFilter.value = AssetFilterOption.MINE)}
-            disabled={!animationItems.value.some((item) => item.isMine)}
-          >
+            disabled={!animationItems.value.some((item) => item.isMine)}>
             My Animations
           </button>
           <button
@@ -45,8 +45,7 @@ export const AnimationTab = () => {
             onClick={() =>
               (animationFilter.value = AssetFilterOption.BOOKMARKED)
             }
-            disabled={!animationItems.value.some((item) => item.isBookmarked)}
-          >
+            disabled={!animationItems.value.some((item) => item.isBookmarked)}>
             Bookmarked
           </button>
         </div>
@@ -55,8 +54,7 @@ export const AnimationTab = () => {
         <Button
           icon={faCirclePlus}
           variant="action"
-          className="w-full py-3 text-sm font-medium"
-        >
+          className="w-full py-3 text-sm font-medium">
           Upload Animation
         </Button>
       </div>

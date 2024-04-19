@@ -6,6 +6,10 @@ import {
   sidePanelVisible,
 } from "~/pages/PageEnigma/store/sidePanel";
 import { tabList } from "./tabList";
+import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 export const SidePanelMenu = () => {
   useSignals();
@@ -27,8 +31,7 @@ export const SidePanelMenu = () => {
         maxWidth: 84,
         right: 0,
         top: 70,
-      }}
-    >
+      }}>
       <div className="flex w-full flex-col gap-2">
         {tabList.map((tab) => (
           <button
@@ -44,8 +47,14 @@ export const SidePanelMenu = () => {
               if (!sidePanelVisible.value) {
                 sidePanelVisible.value = true;
               }
-            }}
-          >
+              if (editorState.value === EditorStates.PREVIEW) {
+                Queue.publish({
+                  queueName: QueueNames.TO_ENGINE,
+                  action: toEngineActions.ENTER_EDIT_STATE,
+                  data: null,
+                });
+              }
+            }}>
             <div>
               <img src={tab.icon} alt={tab.title} width={20} height={20} />
             </div>

@@ -1,18 +1,36 @@
 import { Button } from "~/components";
 import { faArrowsRotate, faFilm } from "@fortawesome/pro-solid-svg-icons";
-import { useContext } from "react";
-import { EngineContext } from "~/contexts/EngineContext";
+import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
+import { useSignals } from "@preact/signals-react/runtime";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 export function StyleButtons() {
-  const editorEngine = useContext(EngineContext);
+  useSignals();
 
-  const generateFrame = async () => {
-    editorEngine?.switchPreview();
-    await editorEngine?.generateFrame();
+  const switchPreview = async () => {
+    Queue.publish({
+      queueName: QueueNames.TO_ENGINE,
+      action: toEngineActions.ENTER_PREVIEW_STATE,
+      data: null,
+    });
+  };
+
+  const switchEdit = async () => {
+    Queue.publish({
+      queueName: QueueNames.TO_ENGINE,
+      action: toEngineActions.ENTER_EDIT_STATE,
+      data: null,
+    });
   };
 
   const generateMovie = async () => {
-    editorEngine?.generateVideo();
+    Queue.publish({
+      queueName: QueueNames.TO_ENGINE,
+      action: toEngineActions.GENERATE_VIDEO,
+      data: null,
+    });
   };
 
   return (
@@ -21,13 +39,24 @@ export function StyleButtons() {
         <div className="mb-2 text-sm font-medium">
           Render the current camera view with AI
         </div>
-        <Button
-          icon={faArrowsRotate}
-          variant="primary"
-          className="w-full"
-          onClick={generateFrame}>
-          Preview Frame
-        </Button>
+        {editorState.value === EditorStates.EDIT && (
+          <Button
+            icon={faArrowsRotate}
+            variant="primary"
+            className="w-full"
+            onClick={switchPreview}>
+            Preview Frame
+          </Button>
+        )}
+        {editorState.value === EditorStates.PREVIEW && (
+          <Button
+            icon={faArrowsRotate}
+            variant="action"
+            className="w-full"
+            onClick={switchEdit}>
+            Return to Edit
+          </Button>
+        )}
       </div>
       <div className="w-full">
         <div className="text-sm font-medium">

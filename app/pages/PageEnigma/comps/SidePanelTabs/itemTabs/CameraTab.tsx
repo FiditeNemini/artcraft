@@ -5,22 +5,23 @@ import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/It
 import { Button } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
+import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 
 export const CameraTab = () => {
   useSignals();
 
   return (
     <>
-      <div className="w-full overflow-x-auto">
-        <div className="mb-4 mt-4 flex justify-start gap-2 px-4">
+      <div className="w-full overflow-x-auto p-4">
+        <TabTitle title="Camera" />
+        <div className="mb-4 flex justify-start gap-2">
           <button
             className={twMerge(
               "filter-tab",
               cameraFilter.value === AssetFilterOption.ALL ? "active" : "",
               "disabled",
             )}
-            onClick={() => (cameraFilter.value = AssetFilterOption.ALL)}
-          >
+            onClick={() => (cameraFilter.value = AssetFilterOption.ALL)}>
             All
           </button>
           <button
@@ -30,8 +31,7 @@ export const CameraTab = () => {
               "disabled",
             )}
             onClick={() => (cameraFilter.value = AssetFilterOption.MINE)}
-            disabled={!cameraItems.value.some((item) => item.isMine)}
-          >
+            disabled={!cameraItems.value.some((item) => item.isMine)}>
             My Cameras
           </button>
           <button
@@ -43,8 +43,7 @@ export const CameraTab = () => {
               "disabled",
             )}
             onClick={() => (cameraFilter.value = AssetFilterOption.BOOKMARKED)}
-            disabled={!cameraItems.value.some((item) => item.isBookmarked)}
-          >
+            disabled={!cameraItems.value.some((item) => item.isBookmarked)}>
             Bookmarked
           </button>
         </div>
@@ -53,8 +52,7 @@ export const CameraTab = () => {
         <Button
           icon={faCirclePlus}
           variant="action"
-          className="w-full py-3 text-sm font-medium"
-        >
+          className="w-full py-3 text-sm font-medium">
           Create Camera Movement
         </Button>
       </div>
