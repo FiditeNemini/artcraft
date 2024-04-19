@@ -553,7 +553,7 @@ export class TimeLine {
         } else if (
           element.type === ClipType.AUDIO &&
           element.group !== ClipGroup.CHARACTER &&
-          this.is_playing
+          this.is_playing && !isRendering
         ) {
           if (this.scrubber_frame_position + 1 >= element.length) {
             this.audio_engine.stopClip(element.media_id);
@@ -576,7 +576,7 @@ export class TimeLine {
             ].play(object);
             this.lipSync_engine.clips[
               element.object_uuid + element.media_id
-            ].step();
+            ].step(this.scrubber_frame_position, element.offset, isRendering);
           }
         } else if (element.type === ClipType.ANIMATION) {
           if (object) {

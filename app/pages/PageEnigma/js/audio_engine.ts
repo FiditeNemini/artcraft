@@ -6,12 +6,14 @@ class AudioEngine {
     audio_sources: { [key: string]: AudioBufferSourceNode } = {};
     version: number;
     playing: string[];
+    last_frame: number;
 
     constructor() {
         this.clips = {};
         this.playing = [];
         this.audio_sources = {};
         this.version = 1.0;
+        this.last_frame = 0;
     }
 
     // loads clips into the engine to cache
