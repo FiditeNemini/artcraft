@@ -288,6 +288,7 @@ class Editor {
     this.clock = new THREE.Clock();
     // Resizes the renderer.
     this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     //document.body.appendChild(this.renderer.domElement)
     window.addEventListener("resize", this.onWindowResize.bind(this));
     this._configurePostProcessing();
@@ -1292,7 +1293,8 @@ class Editor {
         const { width, height } = entry.contentRect;
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(width, height);
+        this.renderer?.setSize(width, height);
+        this.renderer?.setPixelRatio(window.devicePixelRatio);
       }
     });
 

@@ -18,6 +18,7 @@ import {
   sidePanelVisible,
   dndSidePanelWidth,
   dndTimelineHeight,
+  sidePanelHeight,
 } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/contexts/AppUiContext";
@@ -80,6 +81,7 @@ export const PageEditor = ({ setPage }: Props) => {
                     pageWidth.value -
                     (sidePanelVisible.value ? sidePanelWidth.value : 0) -
                     84,
+                  height: pageHeight.value - timelineHeight.value - 68,
                 }}>
                 <canvas id="video-scene" width="1280px" height="720px" />
               </div>
