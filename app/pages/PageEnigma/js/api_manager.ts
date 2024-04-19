@@ -355,7 +355,7 @@ export class APIManager {
     negative_prompt: string,
   ): Promise<string> {
     //const url = 'http://213.173.110.135:15750/preview';
-    const url = 'https://funnel.tailce84f.ts.net/preview';
+    const url = 'https://funnel.tailce84f.ts.net/preview/';
 
     const payload = {
       style: style,
