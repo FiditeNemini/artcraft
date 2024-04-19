@@ -525,6 +525,13 @@ export const characterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Waifu H",
     thumbnail: "/resources/characters/img14.png",
+  },
+  {
+    version: 1,
+    media_id: "m_qfqw9e5kz0b7kspbwcc3c9y7pym97q",
+    type: AssetType.CHARACTER,
+    name: "Skibidi Toilet",
+    thumbnail: "/resources/characters/img15.png",
   }
 ]);
 
