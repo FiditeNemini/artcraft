@@ -18,7 +18,9 @@ export function StyleButtons() {
   return (
     <div className="flex w-full flex-col justify-center gap-4 rounded-b-lg bg-ui-panel">
       <div className="w-full">
-        <div className="text-sm">Render the current camera view with AI</div>
+        <div className="mb-2 text-sm font-medium">
+          Render the current camera view with AI
+        </div>
         <Button
           icon={faArrowsRotate}
           variant="primary"
@@ -28,10 +30,10 @@ export function StyleButtons() {
         </Button>
       </div>
       <div className="w-full">
-        <div className="text-sm">
+        <div className="text-sm font-medium">
           When you&apos;re done, render your entire animation with AI
         </div>
-        <div className="text-xs text-white/80">
+        <div className="mb-2 text-xs text-white/70">
           (This may take several minutes)
         </div>
         <Button

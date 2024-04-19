@@ -43,11 +43,11 @@ export const Prompts = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 rounded-t-lg bg-ui-panel py-4">
+    <div className="flex flex-col gap-3 rounded-t-lg bg-ui-panel py-4">
       <div className="relative w-full">
         <Textarea
           label="Enter a Prompt"
-          className="mb-4 w-full"
+          className="w-full"
           rows={3}
           name="positive-prompt"
           placeholder="Type here to describe your scene"
@@ -56,11 +56,12 @@ export const Prompts = () => {
           required
           value={textBufferPositive}
         />
-        <div className="absolute right-0 top-0">
+        <div className="absolute right-0 top-[2px]">
           <button
-            className="text-xs text-[#FC6B68]"
+            className="flex items-center text-xs font-medium text-[#FC6B68] transition-colors duration-100 hover:text-[#FC6B68]/85 "
             onClick={generateRandomTextPositive}>
-            <FontAwesomeIcon icon={faRandom} /> Randomize
+            <FontAwesomeIcon icon={faRandom} className="me-2" />
+            Randomize
           </button>
         </div>
       </div>
@@ -75,11 +76,12 @@ export const Prompts = () => {
           resize="none"
           value={textBufferNegative}
         />
-        <div className="absolute right-0 top-0">
+        <div className="absolute right-0 top-[2px]">
           <button
-            className="text-xs text-[#FC6B68]"
+            className="flex items-center text-xs font-medium text-[#FC6B68] transition-colors duration-100 hover:text-[#FC6B68]/85"
             onClick={generateRandomTextNegative}>
-            <FontAwesomeIcon icon={faRandom} /> Randomize
+            <FontAwesomeIcon icon={faRandom} className="me-2" />
+            Randomize
           </button>
         </div>
       </div>
