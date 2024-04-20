@@ -267,9 +267,8 @@ impl SessionChecker {
         can_ban_users: user_session.can_ban_users,
         can_delete_users: user_session.can_delete_users,
       },
-      feature_flags: UserSessionFeatureFlags {
-        maybe_feature_flags: user_session.maybe_feature_flags,
-      }
+      feature_flags: UserSessionFeatureFlags::from_optional_str(
+        user_session.maybe_feature_flags.as_deref()),
     }))
   }
 

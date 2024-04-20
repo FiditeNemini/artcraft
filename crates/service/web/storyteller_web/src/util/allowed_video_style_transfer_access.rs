@@ -22,13 +22,13 @@ pub trait UserSessionVideoStyleTransferFlag {
 
 impl UserSessionVideoStyleTransferFlag for UserSessionExtended {
   fn can_access_video_style_transfer(&self) -> bool {
-    self.feature_flags.has_permission_unoptimized(UserFeatureFlag::VideoStyleTransfer)
+    self.feature_flags.has_flag(UserFeatureFlag::VideoStyleTransfer)
   }
 }
 
 impl UserSessionVideoStyleTransferFlag for &UserSessionExtended {
   fn can_access_video_style_transfer(&self) -> bool {
-    self.feature_flags.has_permission_unoptimized(UserFeatureFlag::VideoStyleTransfer)
+    self.feature_flags.has_flag(UserFeatureFlag::VideoStyleTransfer)
   }
 }
 
@@ -47,9 +47,8 @@ impl UserSessionVideoStyleTransferFlag for &SessionUserRecord {
 fn user_session_has_feature(user_session: &SessionUserRecord) -> bool {
   // TODO(bt, 2024-03-05): this is horrible.
   //  There should be a wrapper class between the query and the caller.
-  let flags = UserSessionFeatureFlags {
-    maybe_feature_flags: user_session.maybe_feature_flags.clone(),
-  };
+  let flags =
+      UserSessionFeatureFlags::from_optional_str(user_session.maybe_feature_flags.as_deref());
 
-  flags.has_permission_unoptimized(UserFeatureFlag::VideoStyleTransfer)
+  flags.has_flag(UserFeatureFlag::VideoStyleTransfer)
 }

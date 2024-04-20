@@ -1,0 +1,161 @@
+use std::collections::BTreeSet;
+use std::fmt;
+use std::iter::FromIterator;
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use actix_web::web::Data;
+use log::{info, log, warn};
+use sqlx::types::Json;
+use utoipa::ToSchema;
+
+use enums::by_table::users::user_feature_flag::UserFeatureFlag;
+use mysql_queries::queries::users::user::set_user_feature_flags::{set_user_feature_flags, SetUserFeatureFlagArgs};
+use mysql_queries::queries::users::user_profiles::get_user_profile_by_token::get_user_profile_by_token;
+use mysql_queries::queries::users::user_sessions::get_user_session_by_token::get_user_session_by_token;
+use tokens::tokens::users::UserToken;
+use users_component::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
+
+use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
+use crate::http_server::web_utils::response_success_helpers::simple_json_success;
+use crate::server_state::ServerState;
+
+#[derive(Deserialize, ToSchema)]
+pub struct EditUserFeatureFlagsRequest {
+  user_token: UserToken,
+  action: EditUserFeatureFlagsOption,
+}
+
+#[derive(Deserialize, ToSchema)]
+pub enum EditUserFeatureFlagsOption {
+  /// Add the following flags to the user, keeping any existing flags.
+  AddFlags {
+    flags: Vec<UserFeatureFlag>
+  },
+  /// Remove the following flags from the user, keeping any other existing flags not listed below.
+  RemoveFlags {
+    flags: Vec<UserFeatureFlag>
+  },
+  /// Keep only the following flags on the user, but only if they're already present.
+  KeepFlags {
+    flags: Vec<UserFeatureFlag>
+  },
+  /// Set the exact set of flags below, discarding any existing state.
+  SetExactFlags {
+    flags: Vec<UserFeatureFlag>
+  },
+  /// Clear all flags from the user.
+  ClearAllFlags,
+}
+
+#[derive(Debug)]
+pub enum EditUserFeatureFlagsError {
+  BadInput(String),
+  ServerError,
+  Unauthorized,
+}
+
+impl ResponseError for EditUserFeatureFlagsError {
+  fn status_code(&self) -> StatusCode {
+    match *self {
+      EditUserFeatureFlagsError::BadInput(_) => StatusCode::BAD_REQUEST,
+      EditUserFeatureFlagsError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+      EditUserFeatureFlagsError::Unauthorized => StatusCode::UNAUTHORIZED,
+    }
+  }
+
+  fn error_response(&self) -> HttpResponse {
+    let error_reason = match self {
+      EditUserFeatureFlagsError::BadInput(reason) => reason.to_string(),
+      EditUserFeatureFlagsError::ServerError => "server error".to_string(),
+      EditUserFeatureFlagsError::Unauthorized => "unauthorized".to_string(),
+    };
+
+    to_simple_json_error(&error_reason, self.status_code())
+  }
+}
+
+// NB: Not using derive_more::Display since Clion doesn't understand it.
+impl fmt::Display for EditUserFeatureFlagsError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+pub async fn add_user_feature_flags_handler(
+  http_request: HttpRequest,
+  request: Json<EditUserFeatureFlagsRequest>,
+  server_state: Data<Arc<ServerState>>
+) -> Result<HttpResponse, EditUserFeatureFlagsError> {
+
+  let maybe_user_session = server_state
+      .session_checker
+      .maybe_get_user_session(&http_request, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Session checker error: {:?}", e);
+        EditUserFeatureFlagsError::ServerError
+      })?;
+
+  let user_session = match maybe_user_session {
+    Some(session) => session,
+    None => {
+      return Err(EditUserFeatureFlagsError::Unauthorized);
+    }
+  };
+
+  if !user_session.can_ban_users {
+    warn!("user is not allowed to add bans: {}", user_session.user_token);
+    return Err(EditUserFeatureFlagsError::Unauthorized);
+  }
+
+  // TODO: Allow username lookup too
+
+  let user_profile = get_user_profile_by_token(&request.user_token, &server_state.mysql_pool)
+    .await
+    .map_err(|e| {
+      warn!("Could not get user session by token: {:?}", e);
+      EditUserFeatureFlagsError::ServerError
+    })?
+    .ok_or_else(|| {
+      EditUserFeatureFlagsError::ServerError
+    })?;
+
+  let mut user_feature_flags =
+      UserSessionFeatureFlags::new(user_profile.maybe_feature_flags.as_deref());
+
+  match &request.action {
+    EditUserFeatureFlagsOption::AddFlags { flags } => {
+      user_feature_flags.add_flags(flags.iter().cloned());
+    }
+    EditUserFeatureFlagsOption::RemoveFlags { flags } => {
+      let flags = BTreeSet::from_iter(flags.iter().cloned());
+      user_feature_flags.remove_flags(&flags);
+    }
+    EditUserFeatureFlagsOption::KeepFlags { flags } => {
+      let flags = BTreeSet::from_iter(flags.iter().cloned());
+      user_feature_flags.keep_flags(&flags);
+    }
+    EditUserFeatureFlagsOption::SetExactFlags { flags } => {
+      user_feature_flags.set_flags(flags.iter().cloned());
+    }
+    EditUserFeatureFlagsOption::ClearAllFlags => {
+      user_feature_flags.clear_flags();
+    }
+  }
+
+  set_user_feature_flags(SetUserFeatureFlagArgs {
+    subject_user_token: &user_profile.user_token,
+    maybe_feature_flags: user_feature_flags.maybe_serialize_string().as_deref(),
+    mod_user_token: &user_session.user_token_typed,
+    mysql_pool: &server_state.mysql_pool,
+  }).await
+    .map_err(|e| {
+      warn!("Could not set flags: {:?}", e);
+      EditUserFeatureFlagsError::ServerError
+    })?;
+
+  Ok(simple_json_success())
+}

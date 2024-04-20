@@ -39,6 +39,9 @@ pub struct UserProfileResult {
   pub preferred_tts_result_visibility: Visibility,
   pub preferred_w2l_result_visibility: Visibility,
 
+  // Optional comma-separated list of parseable `UserFeatureFlag` enum features
+  pub maybe_feature_flags: Option<String>,
+
   pub created_at: DateTime<Utc>,
 
   // NB: Moderator fields must be cleared by HTTP handlers for non-mods
@@ -75,6 +78,9 @@ struct RawUserProfileRecord {
   // Preferences; NB: included for get_profile_handler legacy reasons
   preferred_tts_result_visibility: Visibility,
   preferred_w2l_result_visibility: Visibility,
+
+  // Optional comma-separated list of parseable `UserFeatureFlag` enum features
+  maybe_feature_flags: Option<String>,
 
   // Mod fields
   is_banned: i8,
@@ -116,6 +122,7 @@ SELECT
     github_username,
     cashapp_username,
     website_url,
+    maybe_feature_flags,
     is_banned,
     maybe_mod_comments,
     maybe_mod_user_token,
@@ -146,7 +153,7 @@ WHERE
     }
   };
 
-  let profile_for_response = UserProfileResult {
+  Ok(Some(UserProfileResult {
     user_token: profile_record.user_token,
     username: profile_record.username,
     display_name: profile_record.display_name,
@@ -165,13 +172,12 @@ WHERE
     website_url: profile_record.website_url,
     preferred_tts_result_visibility: profile_record.preferred_tts_result_visibility,
     preferred_w2l_result_visibility: profile_record.preferred_w2l_result_visibility,
+    maybe_feature_flags: profile_record.maybe_feature_flags,
     created_at: profile_record.created_at,
     maybe_moderator_fields: Some(UserProfileModeratorFields {
       is_banned: i8_to_bool(profile_record.is_banned),
       maybe_mod_comments: profile_record.maybe_mod_comments,
       maybe_mod_user_token: profile_record.maybe_mod_user_token,
     })
-  };
-
-  Ok(Some(profile_for_response))
+  }))
 }

@@ -22,13 +22,13 @@ pub trait UserSessionStudioFlag {
 
 impl UserSessionStudioFlag for UserSessionExtended {
   fn can_access_studio(&self) -> bool {
-    self.role.can_access_studio || self.feature_flags.has_permission_unoptimized(UserFeatureFlag::Studio)
+    self.role.can_access_studio || self.feature_flags.has_flag(UserFeatureFlag::Studio)
   }
 }
 
 impl UserSessionStudioFlag for &UserSessionExtended {
   fn can_access_studio(&self) -> bool {
-    self.role.can_access_studio || self.feature_flags.has_permission_unoptimized(UserFeatureFlag::Studio)
+    self.role.can_access_studio || self.feature_flags.has_flag(UserFeatureFlag::Studio)
   }
 }
 
@@ -40,11 +40,10 @@ impl UserSessionStudioFlag for SessionUserRecord {
 
     // TODO(bt, 2024-03-05): this is horrible.
     //  There should be a wrapper class between the query and the caller.
-    let flags = UserSessionFeatureFlags {
-      maybe_feature_flags: self.maybe_feature_flags.clone(),
-    };
+    let flags =
+        UserSessionFeatureFlags::from_optional_str(self.maybe_feature_flags.as_deref());
 
-    flags.has_permission_unoptimized(UserFeatureFlag::Studio)
+    flags.has_flag(UserFeatureFlag::Studio)
   }
 }
 
@@ -56,10 +55,9 @@ impl UserSessionStudioFlag for &SessionUserRecord {
 
     // TODO(bt, 2024-03-05): this is horrible.
     //  There should be a wrapper class between the query and the caller.
-    let flags = UserSessionFeatureFlags {
-      maybe_feature_flags: self.maybe_feature_flags.clone(),
-    };
+    let flags =
+        UserSessionFeatureFlags::from_optional_str(self.maybe_feature_flags.as_deref());
 
-    flags.has_permission_unoptimized(UserFeatureFlag::Studio)
+    flags.has_flag(UserFeatureFlag::Studio)
   }
 }

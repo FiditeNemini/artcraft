@@ -177,7 +177,7 @@ pub async fn session_info_handler(
 
           // Rollout / feature flags:
           can_access_studio: session_data.can_access_studio,
-          maybe_feature_flags: feature_flags.get_flags(),
+          maybe_feature_flags: feature_flags.clone_flags(),
 
           // Premium plans:
           fakeyou_plan: FakeYouPlan::Free,
