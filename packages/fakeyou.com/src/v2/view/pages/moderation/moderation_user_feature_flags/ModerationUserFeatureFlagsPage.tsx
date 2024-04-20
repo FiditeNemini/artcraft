@@ -25,6 +25,7 @@ function ModerationUserFeatureFlagsPage(props: Props) {
 
   const [userData, setUserData] = useState<User | undefined>(undefined);
   const [canAccessStudio, setCanAccessStudio] = useState<boolean>(false);
+  const [canExploreMedia, setCanExploreMedia] = useState<boolean>(false);
   const [canVideoStyleTransfer, setCanVideoStyleTransfer] = useState<boolean>(false);
 
   const getUser = useCallback(async (username) => {
@@ -32,6 +33,7 @@ function ModerationUserFeatureFlagsPage(props: Props) {
     if (!lookupUsername) {
       setUserData(undefined);
       setCanAccessStudio(false);
+      setCanExploreMedia(false);
       setCanVideoStyleTransfer(false);
       return;
     }
@@ -41,11 +43,13 @@ function ModerationUserFeatureFlagsPage(props: Props) {
     if (GetUserByUsernameIsOk(response)) {
       setUserData(response);
       setCanAccessStudio(hasFlag("studio", response));
+      setCanExploreMedia(hasFlag("explore_media", response));
       setCanVideoStyleTransfer(hasFlag("video_style_transfer", response));
 
     } else if (GetUserByUsernameIsErr(response)) {
       setUserData(undefined);
       setCanAccessStudio(false);
+      setCanExploreMedia(false);
       setCanVideoStyleTransfer(false);
     }
   }, []);
@@ -72,6 +76,10 @@ function ModerationUserFeatureFlagsPage(props: Props) {
 
     if (canAccessStudio) {
       flags.push("studio");
+    }
+
+    if (canExploreMedia) {
+      flags.push("explore_media");
     }
 
     if (canVideoStyleTransfer) {
@@ -119,6 +127,20 @@ function ModerationUserFeatureFlagsPage(props: Props) {
             />
             <label className="form-check-label" htmlFor="checkAccessStudio">
               Access Studio
+            </label>
+          </div>
+
+          <div className="form-check">
+            <input 
+              className="form-check-input" 
+              type="checkbox" 
+              value="" 
+              checked={canExploreMedia} 
+              onChange={() => setCanExploreMedia(!canExploreMedia)}
+              id="canExploreMedia" 
+            />
+            <label className="form-check-label" htmlFor="canExploreMedia">
+              Explore Media (dangerous, moderators only)
             </label>
           </div>
 
