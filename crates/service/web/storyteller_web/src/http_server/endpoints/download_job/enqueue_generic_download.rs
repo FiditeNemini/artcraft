@@ -125,7 +125,7 @@ pub async fn enqueue_generic_download_handler(
     download_type: request.generic_download_type,
     download_url: &download_url,
     title: &title,
-    creator_user_token: user_session.user_token_typed.as_str(),
+    creator_user_token: user_session.user_token.as_str(),
     creator_ip_address: &ip_address,
     creator_set_visibility,
     mysql_pool: &server_state.mysql_pool,
@@ -138,7 +138,7 @@ pub async fn enqueue_generic_download_handler(
 
   info!("new generic download job id: {}, token: {}", record_id, job_token);
 
-  server_state.firehose_publisher.enqueue_generic_download(user_session.user_token_typed.as_str(), job_token.as_str())
+  server_state.firehose_publisher.enqueue_generic_download(user_session.user_token.as_str(), job_token.as_str())
       .await
       .map_err(|e| {
         warn!("error publishing event: {:?}", e);

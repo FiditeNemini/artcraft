@@ -131,10 +131,10 @@ pub async fn set_model_weight_cover_image_handler(
     }
   };
 
-  let is_creator = model_weight.creator_user_token.as_str() == user_session.user_token_typed.as_str();
+  let is_creator = model_weight.creator_user_token.as_str() == user_session.user_token.as_str();
 
   if !is_creator && !is_mod {
-    warn!("user is not allowed to edit this media_file: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to edit this media_file: {:?}", user_session.user_token);
     return Err(SetModelWeightCoverImageError::NotAuthorized);
   }
 

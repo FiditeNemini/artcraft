@@ -209,12 +209,12 @@ impl SessionChecker {
     let subscriptions =
         list_active_user_subscriptions(
           mysql_connection,
-          user_session.user_token_typed.as_str()
+          user_session.user_token.as_str()
         ).await?;
 
     Ok(Some(UserSessionExtended {
-      user_token: user_session.user_token_typed.as_str().to_string(),
-      user_token_typed: user_session.user_token_typed,
+      user_token: user_session.user_token.as_str().to_string(),
+      user_token_typed: user_session.user_token,
       user: UserSessionUserDetails {
         username: user_session.username,
         display_name: user_session.display_name,

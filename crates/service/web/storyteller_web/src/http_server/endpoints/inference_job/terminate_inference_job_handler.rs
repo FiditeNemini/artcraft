@@ -109,7 +109,7 @@ pub async fn terminate_inference_job_handler(
 
   let maybe_user_tokens = maybe_user_session
       .as_ref()
-      .and_then(|session| Some(session.user_token_typed.clone()))
+      .and_then(|session| Some(session.user_token.clone()))
       .zip(job_status.user_details.maybe_creator_user_token.clone());
 
   if let Some((session_user_token, job_user_token)) = maybe_user_tokens {

@@ -78,7 +78,7 @@ pub async fn add_ip_ban_handler(
   };
 
   if !user_session.can_ban_users {
-    warn!("user is not allowed to add bans: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to add bans: {:?}", user_session.user_token);
     return Err(AddIpBanError::Unauthorized);
   }
 
@@ -94,7 +94,7 @@ pub async fn add_ip_ban_handler(
   upsert_ip_ban(UpsertIpBanArgs {
     ip_address,
     maybe_target_user_token: request.maybe_target_user_token.as_deref(),
-    mod_user_token: user_session.user_token_typed.as_str(),
+    mod_user_token: user_session.user_token.as_str(),
     mod_notes: &request.mod_notes,
     mysql_pool: &server_state.mysql_pool,
   }).await

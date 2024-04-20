@@ -130,7 +130,7 @@ pub async fn edit_w2l_template_handler(
   };
 
   // NB: Second set of permission checks
-  let is_author = template_record.creator_user_token == user_session.user_token_typed.as_str();
+  let is_author = template_record.creator_user_token == user_session.user_token.as_str();
   let is_mod = user_session.can_edit_other_users_w2l_templates ;
 
   if !is_author && !is_mod {
@@ -189,7 +189,7 @@ pub async fn edit_w2l_template_handler(
       }
     } else {
       CreatorOrModFields::ModFields(ModFields {
-        mod_user_token: user_session.user_token_typed.as_str(),
+        mod_user_token: user_session.user_token.as_str(),
         is_public_listing_approved: request.is_public_listing_approved.unwrap_or(false),
         is_locked_from_user_modification: request.is_locked_from_user_modification.unwrap_or(false),
         is_locked_from_use: request.is_locked_from_use.unwrap_or(false),

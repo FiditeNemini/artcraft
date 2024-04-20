@@ -93,7 +93,7 @@ pub async fn list_twitch_event_rules_for_user_handler(
   }
 
   let twitch_event_rules = list_twitch_event_rules_for_user(
-    user_session.user_token_typed.as_str(), &server_state.mysql_pool)
+    user_session.user_token.as_str(), &server_state.mysql_pool)
       .await
       .map_err(|e| {
         warn!("query error: {:?}", e);

@@ -114,13 +114,13 @@ pub async fn delete_tts_inference_result_handler(
   // NB: Second set of permission checks
   let is_author = tts_inference_result.maybe_creator_user_token
       .as_ref()
-      .map(|creator_token| creator_token == &user_session.user_token_typed)
+      .map(|creator_token| creator_token == &user_session.user_token)
       .unwrap_or(false);
 
   let is_mod = user_session.can_delete_other_users_tts_results;
 
   if !is_author && !is_mod {
-    warn!("user is not allowed to delete inference results: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to delete inference results: {:?}", user_session.user_token);
     return Err(DeleteTtsInferenceResultError::NotAuthorized);
   }
 
@@ -129,7 +129,7 @@ pub async fn delete_tts_inference_result_handler(
   let query_result = if request.set_delete {
     match delete_role {
       DeleteRole::ErrorDoNotDelete => {
-        warn!("user is not allowed to delete inference results: {:?}", user_session.user_token_typed);
+        warn!("user is not allowed to delete inference results: {:?}", user_session.user_token);
         return Err(DeleteTtsInferenceResultError::NotAuthorized);
       }
       DeleteRole::AsUser => {
@@ -141,7 +141,7 @@ pub async fn delete_tts_inference_result_handler(
       DeleteRole::AsMod => {
         delete_tts_inference_result_as_mod(
           &path.token,
-          user_session.user_token_typed.as_str(),
+          user_session.user_token.as_str(),
           &server_state.mysql_pool
         ).await
       }
@@ -149,7 +149,7 @@ pub async fn delete_tts_inference_result_handler(
   } else {
     match delete_role {
       DeleteRole::ErrorDoNotDelete => {
-        warn!("user is not allowed to undelete inference results: {:?}", user_session.user_token_typed);
+        warn!("user is not allowed to undelete inference results: {:?}", user_session.user_token);
         return Err(DeleteTtsInferenceResultError::NotAuthorized);
       }
       DeleteRole::AsUser => {
@@ -162,7 +162,7 @@ pub async fn delete_tts_inference_result_handler(
       DeleteRole::AsMod => {
         undelete_tts_inference_result_as_mod(
           &path.token,
-          user_session.user_token_typed.as_str(),
+          user_session.user_token.as_str(),
           &server_state.mysql_pool
         ).await
       }

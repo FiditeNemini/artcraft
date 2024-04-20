@@ -183,11 +183,11 @@ pub async fn edit_tts_model_handler(
   };
 
   // NB: Second set of permission checks
-  let is_author = &model_record.creator_user_token == user_session.user_token_typed.as_str();
+  let is_author = &model_record.creator_user_token == user_session.user_token.as_str();
   let is_mod = user_session.can_edit_other_users_tts_models ;
 
   if !is_author && !is_mod {
-    warn!("user is not allowed to edit model: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to edit model: {:?}", user_session.user_token);
     return Err(EditTtsModelError::NotAuthorized);
   }
 
@@ -306,7 +306,7 @@ pub async fn edit_tts_model_handler(
       maybe_default_pretrained_vocoder,
       request.maybe_custom_vocoder_token.as_deref(),
       text_pipeline_type,
-      user_session.user_token_typed.as_str(),
+      user_session.user_token.as_str(),
     ).await
   };
 
@@ -321,7 +321,7 @@ pub async fn edit_tts_model_handler(
   if is_mod {
     update_mod_details(
       &request,
-      user_session.user_token_typed.as_str(),
+      user_session.user_token.as_str(),
       &model_record.model_token,
       &server_state.mysql_pool
     ).await?;

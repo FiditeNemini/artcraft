@@ -86,7 +86,7 @@ pub async fn create_dataset_handler(http_request: HttpRequest, request: web::Jso
 
   let query_result = create_dataset(CreateDatasetArgs {
       dataset_title: &title,
-      maybe_creator_user_token: Some(user_session.user_token_typed.as_str()),
+      maybe_creator_user_token: Some(user_session.user_token.as_str()),
       creator_ip_address: &creator_ip_address,
       creator_set_visibility,
       mysql_pool: &server_state.mysql_pool

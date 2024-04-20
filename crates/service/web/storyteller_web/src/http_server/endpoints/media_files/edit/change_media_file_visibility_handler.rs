@@ -123,10 +123,10 @@ pub async fn change_media_file_visibility_handler(
     };
 
     let is_creator = media_file.maybe_creator_user_token
-        .is_some_and(|t| t.as_str() == user_session.user_token_typed.as_str());
+        .is_some_and(|t| t.as_str() == user_session.user_token.as_str());
 
     if !is_creator && !is_mod {
-        warn!("user is not allowed to edit this media_file: {:?}", user_session.user_token_typed);
+        warn!("user is not allowed to edit this media_file: {:?}", user_session.user_token);
         return Err(ChangeMediaFileVisibilityError::NotAuthorized);
     }
 
@@ -142,7 +142,7 @@ pub async fn change_media_file_visibility_handler(
     let mut maybe_mod_user_token = None;
 
     if is_mod {
-        maybe_mod_user_token = Some(user_session.user_token_typed.as_str().to_string());
+        maybe_mod_user_token = Some(user_session.user_token.as_str().to_string());
     }
     let query_result = update_media_file(
         UpdateMediaFileArgs {

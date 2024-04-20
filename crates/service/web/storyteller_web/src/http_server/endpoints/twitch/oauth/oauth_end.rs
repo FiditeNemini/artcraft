@@ -167,7 +167,7 @@ pub async fn oauth_end_enroll_from_redirect(
           .has_chat_read(true);
 
   if let Some(user_session) = maybe_user_session {
-    insert_builder = insert_builder.set_user_token(Some(user_session.user_token_typed.as_str()));
+    insert_builder = insert_builder.set_user_token(Some(user_session.user_token.as_str()));
   }
 
   let _result = insert_builder.insert(&server_state.mysql_pool)

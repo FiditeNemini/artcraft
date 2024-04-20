@@ -150,7 +150,7 @@ pub async fn batch_get_user_bookmarks_handler(
   };
 
   batch_get_user_bookmarks(
-    &user_session.user_token_typed,
+    &user_session.user_token,
     &tokens,
     &mut mysql_connection
   ).await

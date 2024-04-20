@@ -168,7 +168,7 @@ pub async fn set_user_rating_handler(
       })?;
 
   let maybe_existing_user_rating = get_user_rating_transactional_locking(
-    &user_session.user_token_typed,
+    &user_session.user_token,
     &entity,
     &mut *transaction,
   ).await
@@ -178,7 +178,7 @@ pub async fn set_user_rating_handler(
       })?;
 
   let _r = upsert_user_rating(Args {
-    user_token: &user_session.user_token_typed,
+    user_token: &user_session.user_token,
     user_rating_entity: &entity,
     user_rating_value: request.rating_value,
     ip_address: &ip_address,

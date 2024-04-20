@@ -143,7 +143,7 @@ pub async fn create_comment_handler(
   let query_result = insert_comment(InsertCommentArgs {
     entity_token: &entity_token,
     uuid_idempotency_token: &request.uuid_idempotency_token,
-    user_token: &user_session.user_token_typed,
+    user_token: &user_session.user_token,
     comment_markdown: &markdown,
     comment_rendered_html: &html,
     creator_ip_address: &ip_address,
@@ -160,7 +160,7 @@ pub async fn create_comment_handler(
   };
 
   server_state.firehose_publisher.publish_comment_created(
-    &user_session.user_token_typed, &comment_token)
+    &user_session.user_token, &comment_token)
       .await
       .map_err(|e| {
         warn!("error publishing event: {:?}", e);

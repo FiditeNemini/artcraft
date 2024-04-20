@@ -119,16 +119,16 @@ pub async fn delete_tts_model_handler(
   };
 
   // NB: Second set of permission checks
-  let is_author = &tts_model.creator_user_token == user_session.user_token_typed.as_str();
+  let is_author = &tts_model.creator_user_token == user_session.user_token.as_str();
 
   if !is_author && !is_mod {
-    warn!("user is not allowed to delete models: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to delete models: {:?}", user_session.user_token);
     return Err(DeleteTtsModelError::NotAuthorized);
   }
 
   if !is_mod {
     if tts_model.is_locked_from_user_modification || tts_model.is_locked_from_use {
-      warn!("user is not allowed to delete models (locked): {:?}", user_session.user_token_typed);
+      warn!("user is not allowed to delete models (locked): {:?}", user_session.user_token);
       return Err(DeleteTtsModelError::NotAuthorized);
     }
   }
@@ -140,7 +140,7 @@ pub async fn delete_tts_model_handler(
   let query_result = if request.set_delete {
     match delete_role {
       DeleteRole::ErrorDoNotDelete => {
-        warn!("user is not allowed to delete model: {:?}", user_session.user_token_typed);
+        warn!("user is not allowed to delete model: {:?}", user_session.user_token);
         return Err(DeleteTtsModelError::NotAuthorized);
       }
       DeleteRole::AsUser => {
@@ -153,7 +153,7 @@ pub async fn delete_tts_model_handler(
       DeleteRole::AsMod => {
         delete_tts_model_as_mod(
           &path.token,
-          user_session.user_token_typed.as_str(),
+          user_session.user_token.as_str(),
           &server_state.mysql_pool
         ).await
       }
@@ -161,7 +161,7 @@ pub async fn delete_tts_model_handler(
   } else {
     match delete_role {
       DeleteRole::ErrorDoNotDelete => {
-        warn!("user is not allowed to undelete model: {:?}", user_session.user_token_typed);
+        warn!("user is not allowed to undelete model: {:?}", user_session.user_token);
         return Err(DeleteTtsModelError::NotAuthorized);
       }
       DeleteRole::AsUser => {
@@ -175,7 +175,7 @@ pub async fn delete_tts_model_handler(
       DeleteRole::AsMod => {
         undelete_tts_model_as_mod(
           &path.token,
-          user_session.user_token_typed.as_str(),
+          user_session.user_token.as_str(),
           &server_state.mysql_pool
         ).await
       }

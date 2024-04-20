@@ -120,11 +120,11 @@ pub async fn update_dataset_handler(
 
   // let is_creator = dataset.maybe_creator_user_token == Some(user_session.user_token);
   let is_creator = dataset.maybe_creator_user_token.as_deref()
-      .map(|creator_user_token| creator_user_token == user_session.user_token_typed.as_str())
+      .map(|creator_user_token| creator_user_token == user_session.user_token.as_str())
       .unwrap_or(false);
 
   if !is_creator && !is_mod {
-    warn!("user is not allowed to edit this dataset: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to edit this dataset: {:?}", user_session.user_token);
     return Err(UpdateDatasetError::NotAuthorized);
   }
 
@@ -174,13 +174,13 @@ pub async fn update_dataset_handler(
   let mut maybe_mod_user_token = None;
 
   if is_mod {
-    maybe_mod_user_token = Some(user_session.user_token_typed.as_str().to_string());
+    maybe_mod_user_token = Some(user_session.user_token.as_str().to_string());
   }
   let query_result = update_dataset(
     UpdateDatasetArgs {
       dataset_token: &ZsVoiceDatasetToken::new(dataset_token.clone()),
       dataset_title: title.as_deref(),
-      maybe_creator_user_token: Some(user_session.user_token_typed.as_str()),
+      maybe_creator_user_token: Some(user_session.user_token.as_str()),
       creator_ip_address: ip_address.as_ref(),
       creator_set_visibility: &creator_set_visibility,
       maybe_mod_user_token: maybe_mod_user_token.as_deref(),

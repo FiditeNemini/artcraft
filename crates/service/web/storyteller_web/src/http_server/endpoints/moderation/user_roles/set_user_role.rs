@@ -88,7 +88,7 @@ pub async fn set_user_role_handler(
 
   // TODO: This is not the correct permission
   if !user_session.can_ban_users {
-    warn!("user is not allowed to change user roles: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to change user roles: {:?}", user_session.user_token);
     return Err(SetUserRoleError::NotAuthorized);
   }
 

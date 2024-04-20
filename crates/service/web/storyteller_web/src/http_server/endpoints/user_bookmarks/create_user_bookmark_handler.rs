@@ -166,7 +166,7 @@ pub async fn create_user_bookmark_handler(
 
   let upsert_result = upsert_user_bookmark(CreateUserBookmarkArgs {
     entity_token: &entity_token,
-    user_token: &user_session.user_token_typed,
+    user_token: &user_session.user_token,
     mysql_executor: &mut *transaction,
     phantom: Default::default(),
   }).await;

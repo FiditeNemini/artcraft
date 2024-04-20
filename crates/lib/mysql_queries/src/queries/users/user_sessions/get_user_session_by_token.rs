@@ -15,8 +15,7 @@ use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_bool_default
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct SessionUserRecord {
-  pub user_token: String, // TODO(bt, 2022-12-20): Convert to strongly-typed `UserToken`
-  pub user_token_typed: UserToken,
+  pub user_token: UserToken,
   pub username: String,
   pub display_name: String,
 
@@ -80,7 +79,7 @@ pub struct SessionUserRecord {
 impl SessionUserRecord {
   // TODO(bt, 2022-12-20): Convert all users of the bare record to using `UserToken`, then get rid of this method.
   pub fn get_strongly_typed_user_token(&self) -> UserToken {
-    self.user_token_typed.clone()
+    self.user_token.clone()
   }
 }
 
@@ -166,8 +165,7 @@ WHERE user_sessions.token = ?
   match maybe_user_record {
     Ok(raw_user_record) => {
       let result_user_record = SessionUserRecord {
-        user_token: raw_user_record.user_token.to_string(),
-        user_token_typed: UserToken::new(raw_user_record.user_token),
+        user_token: UserToken::new(raw_user_record.user_token),
         username: raw_user_record.username,
         display_name: raw_user_record.display_name,
         email_address: raw_user_record.email_address,

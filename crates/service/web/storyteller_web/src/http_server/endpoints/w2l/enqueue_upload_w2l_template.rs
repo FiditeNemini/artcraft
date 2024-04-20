@@ -137,7 +137,7 @@ pub async fn upload_w2l_template_handler(
 
   let job_token = insert_w2l_template_upload_job(InsertW2lTemplateUploadJobArgs {
     uuid: &uuid,
-    creator_user_token: user_session.user_token_typed.as_str(),
+    creator_user_token: user_session.user_token.as_str(),
     creator_ip_address: &ip_address,
     creator_set_visibility: &creator_set_visibility,
     title: &title,
@@ -150,7 +150,7 @@ pub async fn upload_w2l_template_handler(
         UploadW2lTemplateError::ServerError
       })?;
 
-  server_state.firehose_publisher.enqueue_w2l_template_upload(user_session.user_token_typed.as_str(), &job_token)
+  server_state.firehose_publisher.enqueue_w2l_template_upload(user_session.user_token.as_str(), &job_token)
     .await
     .map_err(|e| {
       warn!("error publishing event: {:?}", e);

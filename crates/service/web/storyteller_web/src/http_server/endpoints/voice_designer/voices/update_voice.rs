@@ -118,11 +118,11 @@ pub async fn update_voice_handler(
 
   // let is_creator = voice.maybe_creator_user_token == Some(user_session.user_token);
   let is_creator = voice.maybe_creator_user_token.as_ref()
-      .map(|creator_user_token| creator_user_token == &user_session.user_token_typed)
+      .map(|creator_user_token| creator_user_token == &user_session.user_token)
       .unwrap_or(false);
 
   if !is_creator && !is_mod {
-    warn!("user is not allowed to edit this voice: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to edit this voice: {:?}", user_session.user_token);
     return Err(UpdateVoiceError::NotAuthorized);
   }
 
@@ -171,7 +171,7 @@ pub async fn update_voice_handler(
   let mut maybe_mod_user_token = None;
 
   if is_mod {
-    maybe_mod_user_token = Some(user_session.user_token_typed.as_str().to_string());
+    maybe_mod_user_token = Some(user_session.user_token.as_str().to_string());
   }
 
   let query_result = update_voice(

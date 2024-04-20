@@ -133,7 +133,7 @@ pub async fn get_user_rating_handler(
   };
 
   let maybe_rating = get_user_rating(Args {
-    user_token: &user_session.user_token_typed,
+    user_token: &user_session.user_token,
     user_rating_entity: &entity,
     mysql_connection: &mut mysql_connection
   })

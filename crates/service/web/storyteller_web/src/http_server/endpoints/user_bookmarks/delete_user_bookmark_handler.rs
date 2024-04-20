@@ -139,7 +139,7 @@ pub async fn delete_user_bookmark_handler(
 
   let delete_result = delete_user_bookmark(
     &path.user_bookmark_token,
-    &user_session.user_token_typed,
+    &user_session.user_token,
     &mut *transaction,
   ).await;
 

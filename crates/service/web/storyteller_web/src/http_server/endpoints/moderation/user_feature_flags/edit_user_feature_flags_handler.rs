@@ -133,7 +133,7 @@ pub async fn edit_user_feature_flags_handler(
   };
 
   if !user_session.can_ban_users {
-    warn!("user is not allowed to add bans: {:?}", user_session.user_token_typed.as_str());
+    warn!("user is not allowed to add bans: {:?}", user_session.user_token.as_str());
     return Err(EditUserFeatureFlagsError::Unauthorized);
   }
 
@@ -193,7 +193,7 @@ pub async fn edit_user_feature_flags_handler(
   set_user_feature_flags(SetUserFeatureFlagArgs {
     subject_user_token: &user_profile.user_token,
     maybe_feature_flags: user_feature_flags.maybe_serialize_string().as_deref(),
-    mod_user_token: &user_session.user_token_typed,
+    mod_user_token: &user_session.user_token,
     mysql_pool: &server_state.mysql_pool,
   }).await
     .map_err(|e| {
@@ -205,7 +205,7 @@ pub async fn edit_user_feature_flags_handler(
   let _r = insert_audit_log(InsertAuditLogArgs {
     entity: &AuditLogEntity::User(user_profile.user_token),
     entity_action: AuditLogEntityAction::EditFeatures,
-    maybe_actor_user_token: Some(&user_session.user_token_typed),
+    maybe_actor_user_token: Some(&user_session.user_token),
     maybe_actor_anonymous_visitor_token: None,
     actor_ip_address: &ip_address,
     is_actor_moderator: true,

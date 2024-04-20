@@ -89,7 +89,7 @@ pub async fn create_api_token_handler(
   let creator_ip_address = get_request_ip(&http_request);
 
   let api_token = create_api_token_for_user(
-    user_session.user_token_typed.as_str(),
+    user_session.user_token.as_str(),
     &request.idempotency_token,
     &creator_ip_address,
     &server_state.mysql_pool)

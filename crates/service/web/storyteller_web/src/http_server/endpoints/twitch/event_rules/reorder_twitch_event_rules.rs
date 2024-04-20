@@ -96,7 +96,7 @@ pub async fn reorder_twitch_event_rules_handler(
   }
 
   let rules = list_twitch_event_rules_for_user(
-    user_session.user_token_typed.as_str(),
+    user_session.user_token.as_str(),
     &server_state.mysql_pool)
       .await
       .map_err(|e| {
@@ -131,7 +131,7 @@ pub async fn reorder_twitch_event_rules_handler(
 
   reorder_twitch_event_rules(
     rule_token_to_order_map,
-    user_session.user_token_typed.as_str(),
+    user_session.user_token.as_str(),
     &ip_address,
     &server_state.mysql_pool)
       .await

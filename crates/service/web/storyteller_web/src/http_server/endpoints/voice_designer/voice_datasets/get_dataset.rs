@@ -87,7 +87,7 @@ pub async fn get_dataset_handler(
     };
 
     let dataset_token = path.dataset_token.clone();
-    let creator_user_token = user_session.user_token_typed.as_str().to_string();
+    let creator_user_token = user_session.user_token.as_str().to_string();
     let is_mod = user_session.can_ban_users;
 
     let dataset_lookup_result = get_dataset_by_token(
@@ -109,11 +109,11 @@ pub async fn get_dataset_handler(
     };
 
     let is_creator = dataset.maybe_creator_user_token.as_deref()
-        .map(|creator_user_token| creator_user_token == user_session.user_token_typed.as_str())
+        .map(|creator_user_token| creator_user_token == user_session.user_token.as_str())
         .unwrap_or(false);
 
     if !is_creator && !is_mod {
-        warn!("user is not allowed to view this dataset: {:?}", user_session.user_token_typed);
+        warn!("user is not allowed to view this dataset: {:?}", user_session.user_token);
         return Err(GetDatasetError::NotAuthorized);
     }
 
@@ -124,7 +124,7 @@ pub async fn get_dataset_handler(
         ietf_language_tag: dataset.ietf_language_tag,
         ietf_primary_language_subtag: dataset.ietf_primary_language_subtag,
         creator: UserDetailsLight::from_db_fields(
-            &user_session.user_token_typed,
+            &user_session.user_token,
             user_session.username.as_ref(),
             user_session.display_name.as_ref(),
             user_session.email_gravatar_hash.as_ref(),

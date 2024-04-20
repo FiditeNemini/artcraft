@@ -119,11 +119,11 @@ pub async fn edit_w2l_inference_result_handler(
   // NB: Second set of permission checks
   let mut is_author = false;
   if let Some(creator_user_token) = inference_result.maybe_creator_user_token.as_deref() {
-    is_author = creator_user_token == user_session.user_token_typed.as_str();
+    is_author = creator_user_token == user_session.user_token.as_str();
   }
 
   if !is_author && !is_moderator {
-    warn!("user is not allowed to edit result: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to edit result: {:?}", user_session.user_token);
     return Err(EditW2lResultError::NotAuthorized);
   }
 
@@ -147,7 +147,7 @@ pub async fn edit_w2l_inference_result_handler(
       }
     } else {
       CreatorOrModFields::ModFields {
-        mod_user_token: user_session.user_token_typed.as_str(),
+        mod_user_token: user_session.user_token.as_str(),
       }
     },
     mysql_pool: &server_state.mysql_pool,

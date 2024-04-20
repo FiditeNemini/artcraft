@@ -90,7 +90,7 @@ pub async fn delete_twitch_event_rule_handler(
   }
 
   let twitch_event_rule = get_twitch_event_rule_for_user(
-    &path.token, user_session.user_token_typed.as_str(), &server_state.mysql_pool)
+    &path.token, user_session.user_token.as_str(), &server_state.mysql_pool)
       .await
       .map_err(|e| {
         error!("Error with query: {:?}", e);

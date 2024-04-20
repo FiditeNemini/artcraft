@@ -114,7 +114,7 @@ pub async fn delete_comment_handler(
         .ok_or(DeleteCommentError::NotFound)?;
 
     // 2) Delete as author
-    if comment.user_token == user_session.user_token_typed {
+    if comment.user_token == user_session.user_token {
       maybe_delete_as = Some(DeleteCommentAs::Author);
     }
 

@@ -166,12 +166,12 @@ pub async fn session_info_handler(
         logged_in = true;
         user_info = Some(SessionUserInfo {
           core_info: UserDetailsLight::from_db_fields(
-            &session_data.user_token_typed,
+            &session_data.user_token,
             &session_data.username,
             &session_data.display_name,
             &session_data.email_gravatar_hash,
           ),
-          user_token: session_data.user_token_typed,
+          user_token: session_data.user_token,
           username: session_data.username.to_string(),
           display_name: session_data.display_name.to_string(),
           email_gravatar_hash: session_data.email_gravatar_hash.to_string(),

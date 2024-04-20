@@ -108,7 +108,7 @@ pub async fn ban_user_handler(
   };
 
   if !user_session.can_ban_users {
-    warn!("user is not allowed to add bans: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to add bans: {:?}", user_session.user_token);
     return Err(BanUserErrorResponse::unauthorized());
   }
 
@@ -129,7 +129,7 @@ pub async fn ban_user_handler(
   set_user_ban_status(SetUserBanStatsArgs {
     subject_user_token: &user_profile.user_token,
     is_banned: request.is_banned,
-    mod_user_token: &user_session.user_token_typed,
+    mod_user_token: &user_session.user_token,
     maybe_mod_comments: Some(&request.mod_notes),
     mysql_pool: &server_state.mysql_pool,
   }).await

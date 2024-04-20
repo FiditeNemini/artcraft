@@ -111,11 +111,11 @@ pub async fn delete_voice_handler(
   };
 
   let is_creator = voice.maybe_creator_user_token.as_ref()
-      .map(|creator_user_token| creator_user_token == &user_session.user_token_typed)
+      .map(|creator_user_token| creator_user_token == &user_session.user_token)
       .unwrap_or(false);
 
   if !is_creator && !is_mod {
-    warn!("user is not allowed to delete this voice: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to delete this voice: {:?}", user_session.user_token);
     return Err(DeleteVoiceError::NotAuthorized);
   }
 
@@ -124,7 +124,7 @@ pub async fn delete_voice_handler(
   let query_result = if request.set_delete {
     match delete_role {
       DeleteRole::ErrorDoNotDelete => {
-        warn!("user is not allowed to delete voices: {:?}", user_session.user_token_typed);
+        warn!("user is not allowed to delete voices: {:?}", user_session.user_token);
         return Err(DeleteVoiceError::NotAuthorized);
       }
       DeleteRole::AsUser => {
@@ -136,7 +136,7 @@ pub async fn delete_voice_handler(
       DeleteRole::AsMod => {
         delete_voice_as_mod(
           &path.voice_token,
-          user_session.user_token_typed.as_str(),
+          user_session.user_token.as_str(),
           &server_state.mysql_pool
         ).await
       }
@@ -144,7 +144,7 @@ pub async fn delete_voice_handler(
   } else {
     match delete_role {
       DeleteRole::ErrorDoNotDelete => {
-        warn!("user is not allowed to undelete voices: {:?}", user_session.user_token_typed);
+        warn!("user is not allowed to undelete voices: {:?}", user_session.user_token);
         return Err(DeleteVoiceError::NotAuthorized);
       }
       DeleteRole::AsUser => {
@@ -156,7 +156,7 @@ pub async fn delete_voice_handler(
       DeleteRole::AsMod => {
         undelete_voice_as_mod(
           &path.voice_token,
-          user_session.user_token_typed.as_str(),
+          user_session.user_token.as_str(),
           &server_state.mysql_pool
         ).await
       }

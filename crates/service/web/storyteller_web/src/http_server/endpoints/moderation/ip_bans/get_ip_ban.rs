@@ -92,7 +92,7 @@ pub async fn get_ip_ban_handler(
   };
 
   if !user_session.can_ban_users {
-    warn!("user is not allowed to view bans: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to view bans: {:?}", user_session.user_token);
     return Err(GetIpBanError::Unauthorized);
   }
 

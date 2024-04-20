@@ -111,13 +111,13 @@ pub async fn delete_sample_handler(
   // NB: Second set of permission checks
   let is_author = dataset_sample.maybe_creator_user_token
       .as_ref()
-      .map(|creator_token| creator_token == &user_session.user_token_typed)
+      .map(|creator_token| creator_token == &user_session.user_token)
       .unwrap_or(false);
 
   let is_mod = user_session.can_delete_other_users_tts_results;
 
   if !is_author && !is_mod {
-    warn!("user is not allowed to delete samples: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to delete samples: {:?}", user_session.user_token);
     return Err(DeleteSampleError::NotAuthorized);
   }
 
@@ -132,7 +132,7 @@ pub async fn delete_sample_handler(
         delete_sample_as_user(&path.sample_token, &server_state.mysql_pool).await
       }
       DeleteRole::AsMod => {
-        delete_sample_as_mod(&path.sample_token, &user_session.user_token_typed, &server_state.mysql_pool).await
+        delete_sample_as_mod(&path.sample_token, &user_session.user_token, &server_state.mysql_pool).await
       }
     }
   } else {
@@ -144,7 +144,7 @@ pub async fn delete_sample_handler(
         undelete_sample_as_user(&path.sample_token, &server_state.mysql_pool).await
       }
       DeleteRole::AsMod => {
-        undelete_sample_as_mod(&path.sample_token, &user_session.user_token_typed, &server_state.mysql_pool).await
+        undelete_sample_as_mod(&path.sample_token, &user_session.user_token, &server_state.mysql_pool).await
       }
     }
   };

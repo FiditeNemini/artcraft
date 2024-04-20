@@ -67,7 +67,7 @@ pub async fn get_voice_count_stats_handler(
 
   // TODO: Not a good fit for this permission.
   if !user_session.can_edit_other_users_tts_models {
-    warn!("user is not allowed to edit user tts: {:?}", user_session.user_token_typed);
+    warn!("user is not allowed to edit user tts: {:?}", user_session.user_token);
     return Err(GetVoiceCountStatsError::Unauthorized);
   }
 
