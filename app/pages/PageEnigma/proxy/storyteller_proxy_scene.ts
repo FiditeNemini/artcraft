@@ -38,6 +38,10 @@ export class StoryTellerProxyScene {
           proxyObject3D.object_user_data_name = child.userData.name;
           proxyObject3D.object_name = child.name;
           proxyObject3D.object_uuid = child.uuid;
+          proxyObject3D.color = child.userData["color"];
+          proxyObject3D.metalness = child.userData["metalness"];
+          proxyObject3D.shininess = child.userData["shininess"];
+          proxyObject3D.specular = child.userData["specular"];
           const json_data = await proxyObject3D.toJSON();
           results.push(json_data);
         }

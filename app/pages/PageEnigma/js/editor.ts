@@ -488,6 +488,7 @@ class Editor {
       this.activeScene,
     );
     const scene_json = await proxyScene.saveToScene();
+    console.log("scene_json", scene_json);
 
     const proxyTimeline = new StoryTellerProxyTimeline(
       this.version,
