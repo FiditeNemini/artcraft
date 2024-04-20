@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\nSELECT\n    users.token as `user_token: tokens::tokens::users::UserToken`,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::common::visibility::Visibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::common::visibility::Visibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    is_banned,\n    maybe_mod_comments,\n    maybe_mod_user_token,\n    created_at\nFROM users\nWHERE\n    users.token = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
+  "query": "\nSELECT\n    users.token as `user_token: tokens::tokens::users::UserToken`,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::common::visibility::Visibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::common::visibility::Visibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    maybe_feature_flags,\n    is_banned,\n    maybe_mod_comments,\n    maybe_mod_user_token,\n    created_at\nFROM users\nWHERE\n    users.token = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
   "describe": {
     "columns": [
       {
@@ -175,6 +175,16 @@
       },
       {
         "ordinal": 17,
+        "name": "maybe_feature_flags",
+        "type_info": {
+          "type": "VarString",
+          "flags": "BINARY",
+          "char_set": 224,
+          "max_size": 1020
+        }
+      },
+      {
+        "ordinal": 18,
         "name": "is_banned",
         "type_info": {
           "type": "Tiny",
@@ -184,7 +194,7 @@
         }
       },
       {
-        "ordinal": 18,
+        "ordinal": 19,
         "name": "maybe_mod_comments",
         "type_info": {
           "type": "VarString",
@@ -194,7 +204,7 @@
         }
       },
       {
-        "ordinal": 19,
+        "ordinal": 20,
         "name": "maybe_mod_user_token",
         "type_info": {
           "type": "VarString",
@@ -204,7 +214,7 @@
         }
       },
       {
-        "ordinal": 20,
+        "ordinal": 21,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -235,11 +245,12 @@
       true,
       true,
       true,
+      true,
       false,
       true,
       true,
       false
     ]
   },
-  "hash": "46da98d62f2120067073062a093a8cf636549208d849355523a42cb160fd25c9"
+  "hash": "eb47461f68a64712137cc99b79cae6969d0137907f4f7e4828e4051ad580ad3e"
 }
