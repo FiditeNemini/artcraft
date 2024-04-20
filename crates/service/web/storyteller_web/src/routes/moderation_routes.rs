@@ -20,6 +20,7 @@ use crate::http_server::endpoints::moderation::stats::get_on_prem_worker_stats::
 use crate::http_server::endpoints::moderation::stats::get_voice_count_stats::get_voice_count_stats_handler;
 use crate::http_server::endpoints::moderation::user_bans::ban_user::ban_user_handler;
 use crate::http_server::endpoints::moderation::user_bans::list_banned_users::list_banned_users_handler;
+use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::edit_user_feature_flags_handler;
 use crate::http_server::endpoints::moderation::user_roles::list_roles::list_user_roles_handler;
 use crate::http_server::endpoints::moderation::user_roles::list_staff::list_staff_handler;
 use crate::http_server::endpoints::moderation::user_roles::set_user_role::set_user_role_handler;
@@ -36,8 +37,13 @@ pub fn add_moderator_routes<T, B> (app: App<T>) -> App<T>
         InitError = (),
       >,
 {
-  app.service(
-    web::scope("/moderation")
+  app.service(web::scope("/v1/moderation")
+        .service(web::resource("/user_feature_flags/{username_or_token}")
+            .route(web::post().to(edit_user_feature_flags_handler))
+            .route(web::head().to(|| HttpResponse::Ok()))
+        )
+      )
+      .service(web::scope("/moderation")
         .service(web::resource("/staff")
             .route(web::get().to(list_staff_handler))
             .route(web::head().to(|| HttpResponse::Ok()))

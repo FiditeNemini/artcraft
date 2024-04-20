@@ -46,9 +46,9 @@ use crate::http_server::endpoints::media_files::edit::set_media_file_cover_image
 use crate::http_server::endpoints::media_files::get::batch_get_media_files_handler::*;
 use crate::http_server::endpoints::media_files::get::get_media_file_handler::*;
 use crate::http_server::endpoints::media_files::list::list_featured_media_files_handler::*;
-use crate::http_server::endpoints::media_files::list::list_media_files_handler::*;
 use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token_handler::*;
 use crate::http_server::endpoints::media_files::list::list_media_files_for_user_handler::*;
+use crate::http_server::endpoints::media_files::list::list_media_files_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::*;
@@ -56,6 +56,7 @@ use crate::http_server::endpoints::media_files::upload::upload_video::upload_vid
 use crate::http_server::endpoints::media_files::upsert_upload::write_engine_asset::write_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_upload::write_error::MediaFileWriteError;
 use crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::write_scene_file_media_file_handler::*;
+use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::*;
 use crate::http_server::endpoints::prompts::get_prompt_handler::*;
 use crate::http_server::endpoints::service::status_alert_handler::*;
 use crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::*;
@@ -102,6 +103,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::upload_video_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_upload::write_engine_asset::write_engine_asset_media_file_handler::write_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::write_scene_file_media_file_handler::write_scene_file_media_file_handler,
+    crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::edit_user_feature_flags_handler,
     crate::http_server::endpoints::prompts::get_prompt_handler::get_prompt_handler,
     crate::http_server::endpoints::service::status_alert_handler::status_alert_handler,
     crate::http_server::endpoints::tts::enqueue_infer_tts_handler::enqueue_infer_tts_handler::enqueue_infer_tts_handler,
@@ -202,6 +204,10 @@ use crate::http_server::web_utils::response_success_helpers::*;
     DeleteWeightError,
     DeleteWeightPathInfo,
     DeleteWeightRequest,
+    EditUserFeatureFlagPathInfo,
+    EditUserFeatureFlagsError,
+    EditUserFeatureFlagsOption,
+    EditUserFeatureFlagsRequest,
     EnqueueFbxToGltfRequest,
     EnqueueFbxToGltfRequestError,
     EnqueueFbxToGltfRequestSuccessResponse,
@@ -229,11 +235,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     GetWeightError,
     GetWeightPathInfo,
     GetWeightResponse,
-    InferenceJobStatusResponsePayload,
-    InferenceJobTokenType,
     InferTtsError,
     InferTtsRequest,
     InferTtsSuccessResponse,
+    InferenceJobStatusResponsePayload,
+    InferenceJobTokenType,
     ListAvailableWeightsQuery,
     ListAvailableWeightsSuccessResponse,
     ListDatasetsByUserError,

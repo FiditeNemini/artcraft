@@ -6,25 +6,31 @@ use std::sync::Arc;
 use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
-use actix_web::web::Data;
+use actix_web::web::{Data, Json, Path};
 use log::{info, log, warn};
-use sqlx::types::Json;
 use utoipa::ToSchema;
 
 use enums::by_table::users::user_feature_flag::UserFeatureFlag;
+use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 use mysql_queries::queries::users::user::set_user_feature_flags::{set_user_feature_flags, SetUserFeatureFlagArgs};
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_token::get_user_profile_by_token;
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token::get_user_session_by_token;
 use tokens::tokens::users::UserToken;
+use users_component::endpoints::get_profile_handler::GetProfilePathInfo;
 use users_component::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 
 use crate::http_server::web_utils::response_error_helpers::to_simple_json_error;
 use crate::http_server::web_utils::response_success_helpers::simple_json_success;
 use crate::server_state::ServerState;
 
+/// For the URL PathInfo
+#[derive(Deserialize, ToSchema)]
+pub struct EditUserFeatureFlagPathInfo {
+  username_or_token: String,
+}
+
 #[derive(Deserialize, ToSchema)]
 pub struct EditUserFeatureFlagsRequest {
-  user_token: UserToken,
   action: EditUserFeatureFlagsOption,
 }
 
@@ -50,7 +56,7 @@ pub enum EditUserFeatureFlagsOption {
   ClearAllFlags,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum EditUserFeatureFlagsError {
   BadInput(String),
   ServerError,
@@ -84,8 +90,24 @@ impl fmt::Display for EditUserFeatureFlagsError {
   }
 }
 
-pub async fn add_user_feature_flags_handler(
+#[utoipa::path(
+  post,
+  tag = "Moderation",
+  path = "/v1/moderation/user_feature_flags/{username_or_token}",
+  responses(
+    (status = 200, description = "Success", body = SimpleGenericJsonSuccess),
+    (status = 401, description = "Unauthorized", body = EditUserFeatureFlagsError),
+    (status = 404, description = "Not found", body = EditUserFeatureFlagsError),
+    (status = 500, description = "Server error", body = EditUserFeatureFlagsError),
+  ),
+  params(
+    ("path" = EditUserFeatureFlagPathInfo, description = "Path for Request"),
+    ("request" = EditUserFeatureFlagsRequest, description = "Payload for Request"),
+  )
+)]
+pub async fn edit_user_feature_flags_handler(
   http_request: HttpRequest,
+  path: Path<EditUserFeatureFlagPathInfo>,
   request: Json<EditUserFeatureFlagsRequest>,
   server_state: Data<Arc<ServerState>>
 ) -> Result<HttpResponse, EditUserFeatureFlagsError> {
@@ -111,9 +133,25 @@ pub async fn add_user_feature_flags_handler(
     return Err(EditUserFeatureFlagsError::Unauthorized);
   }
 
-  // TODO: Allow username lookup too
+  let username_or_token = path.username_or_token.trim();
 
-  let user_profile = get_user_profile_by_token(&request.user_token, &server_state.mysql_pool)
+  let user_token;
+
+  if username_or_token.starts_with(UserToken::token_prefix()) || username_or_token.starts_with("U:") {
+    user_token = UserToken::new_from_str(username_or_token);
+  } else {
+    user_token = get_user_token_by_username(&username_or_token, &server_state.mysql_pool)
+      .await
+      .map_err(|e| {
+        warn!("Could not get user token by username: {:?}", e);
+        EditUserFeatureFlagsError::ServerError
+      })?
+      .ok_or_else(|| {
+        EditUserFeatureFlagsError::ServerError
+      })?;
+  }
+
+  let user_profile = get_user_profile_by_token(&user_token, &server_state.mysql_pool)
     .await
     .map_err(|e| {
       warn!("Could not get user session by token: {:?}", e);
