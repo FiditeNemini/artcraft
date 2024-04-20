@@ -20,6 +20,7 @@ pub struct UpsertEntityStatsArgs<'e, 'c, E>
   pub action: BookmarkAction,
   pub mysql_executor: E,
 
+  // NB: phantom can be passed as Default::default()
   // TODO: Not sure if this works to tell the compiler we need the lifetime annotation.
   //  See: https://doc.rust-lang.org/std/marker/struct.PhantomData.html#unused-lifetime-parameters
   pub phantom: PhantomData<&'c E>,

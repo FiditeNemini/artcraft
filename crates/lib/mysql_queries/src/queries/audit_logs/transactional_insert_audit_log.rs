@@ -1,8 +1,7 @@
 //! Audit logs are for entities that can be *edited* where we might lose the IP / edit history.
 
-use std::marker::PhantomData;
 use anyhow::anyhow;
-use sqlx::{Executor, MySql};
+use sqlx::{Executor, MySql, Transaction};
 
 use composite_identifiers::by_table::audit_logs::audit_log_entity::AuditLogEntity;
 use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction;
@@ -11,9 +10,7 @@ use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
 use tokens::tokens::audit_logs::AuditLogToken;
 use tokens::tokens::users::UserToken;
 
-pub struct InsertAuditLogArgs<'a, 'c : 'a, E>
-  where E: 'a + Executor<'c, Database = MySql>
-{
+pub struct TransactionalInsertAuditLogArgs<'a, 'b> {
   pub entity: &'a AuditLogEntity,
   pub entity_action: AuditLogEntityAction,
 
@@ -22,18 +19,13 @@ pub struct InsertAuditLogArgs<'a, 'c : 'a, E>
   pub actor_ip_address: &'a str,
   pub is_actor_moderator: bool,
 
-  pub mysql_executor: E,
-
-  // TODO: Not sure if this works to tell the compiler we need the lifetime annotation.
-  //  See: https://doc.rust-lang.org/std/marker/struct.PhantomData.html#unused-lifetime-parameters
-  pub phantom: PhantomData<&'c E>,
+  pub transaction: &'a mut Transaction<'b, MySql>,
 }
 
-pub async fn insert_audit_log<'a, 'c, E>(
-  args: InsertAuditLogArgs<'a, 'c, E>,
-) -> AnyhowResult<AuditLogToken>
-  where E: 'a + Executor<'c, Database = MySql>
-{
+
+pub async fn transactional_insert_audit_log<'a, 'b>(
+  args: TransactionalInsertAuditLogArgs<'a, 'b>,
+) -> AnyhowResult<AuditLogToken> {
 
   let audit_log_token = AuditLogToken::generate();
   let (entity_type, entity_token) = args.entity.get_composite_keys();
@@ -60,7 +52,7 @@ SET
       args.is_actor_moderator,
       args.actor_ip_address,
     )
-      .execute(args.mysql_executor)
+      .execute(&mut **args.transaction)
       .await;
 
   let _record_id = match query_result {

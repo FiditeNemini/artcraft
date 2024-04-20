@@ -17,6 +17,10 @@ pub enum AuditLogEntityAction {
   #[serde(rename = "edit")]
   Edit,
 
+  /// Edit features (eg. user feature flags)
+  #[serde(rename = "edit_features")]
+  EditFeatures,
+
   /// Delete action
   #[serde(rename = "delete")]
   Delete,
@@ -32,6 +36,7 @@ impl AuditLogEntityAction {
     match self {
       Self::Create => "create",
       Self::Edit => "edit",
+      Self::EditFeatures => "edit_features",
       Self::Delete => "delete",
     }
   }
@@ -40,6 +45,7 @@ impl AuditLogEntityAction {
     match value {
       "create" => Ok(Self::Create),
       "edit" => Ok(Self::Edit),
+      "edit_features" => Ok(Self::EditFeatures),
       "delete" => Ok(Self::Delete),
       _ => Err(format!("invalid value: {:?}", value)),
     }
@@ -58,6 +64,7 @@ mod tests {
     fn test_serialization() {
       assert_serialization(AuditLogEntityAction::Create, "create");
       assert_serialization(AuditLogEntityAction::Edit, "edit");
+      assert_serialization(AuditLogEntityAction::EditFeatures, "edit_features");
       assert_serialization(AuditLogEntityAction::Delete, "delete");
     }
   }
@@ -69,6 +76,7 @@ mod tests {
     fn test_to_str() {
       assert_eq!(AuditLogEntityAction::Create.to_str(), "create");
       assert_eq!(AuditLogEntityAction::Edit.to_str(), "edit");
+      assert_eq!(AuditLogEntityAction::EditFeatures.to_str(), "edit_features");
       assert_eq!(AuditLogEntityAction::Delete.to_str(), "delete");
     }
 
@@ -76,6 +84,7 @@ mod tests {
     fn test_from_str() {
       assert_eq!(AuditLogEntityAction::from_str("create").unwrap(), AuditLogEntityAction::Create);
       assert_eq!(AuditLogEntityAction::from_str("edit").unwrap(), AuditLogEntityAction::Edit);
+      assert_eq!(AuditLogEntityAction::from_str("edit_features").unwrap(), AuditLogEntityAction::EditFeatures);
       assert_eq!(AuditLogEntityAction::from_str("delete").unwrap(), AuditLogEntityAction::Delete);
       assert!(AuditLogEntityAction::from_str("foo").is_err());
     }

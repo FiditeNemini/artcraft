@@ -9,8 +9,12 @@ use actix_web::http::StatusCode;
 use actix_web::web::{Data, Json, Path};
 use log::{info, log, warn};
 use utoipa::ToSchema;
+use composite_identifiers::by_table::audit_logs::audit_log_entity::AuditLogEntity;
+use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction;
 
 use enums::by_table::users::user_feature_flag::UserFeatureFlag;
+use http_server_common::request::get_request_ip::get_request_ip;
+use mysql_queries::queries::audit_logs::insert_audit_log::{insert_audit_log, InsertAuditLogArgs};
 use mysql_queries::queries::users::user::get_user_token_by_username::get_user_token_by_username;
 use mysql_queries::queries::users::user::set_user_feature_flags::{set_user_feature_flags, SetUserFeatureFlagArgs};
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_token::get_user_profile_by_token;
@@ -184,6 +188,8 @@ pub async fn edit_user_feature_flags_handler(
     }
   }
 
+  let ip_address = get_request_ip(&http_request);
+
   set_user_feature_flags(SetUserFeatureFlagArgs {
     subject_user_token: &user_profile.user_token,
     maybe_feature_flags: user_feature_flags.maybe_serialize_string().as_deref(),
@@ -194,6 +200,18 @@ pub async fn edit_user_feature_flags_handler(
       warn!("Could not set flags: {:?}", e);
       EditUserFeatureFlagsError::ServerError
     })?;
+
+  // NB: fail open
+  let _r = insert_audit_log(InsertAuditLogArgs {
+    entity: &AuditLogEntity::User(user_profile.user_token),
+    entity_action: AuditLogEntityAction::EditFeatures,
+    maybe_actor_user_token: Some(&user_session.user_token_typed),
+    maybe_actor_anonymous_visitor_token: None,
+    actor_ip_address: &ip_address,
+    is_actor_moderator: true,
+    mysql_executor: &server_state.mysql_pool,
+    phantom: Default::default(),
+  }).await;
 
   Ok(simple_json_success())
 }
