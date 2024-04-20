@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\nSELECT\n    users.token as `user_token: tokens::tokens::users::UserToken`,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::common::visibility::Visibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::common::visibility::Visibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    is_banned,\n    maybe_mod_comments,\n    maybe_mod_user_token,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
+  "query": "\nSELECT\n    users.token as `user_token: tokens::tokens::users::UserToken`,\n    username,\n    display_name,\n    email_gravatar_hash,\n    profile_markdown,\n    profile_rendered_html,\n    user_role_slug,\n    disable_gravatar,\n    preferred_tts_result_visibility as `preferred_tts_result_visibility: enums::common::visibility::Visibility`,\n    preferred_w2l_result_visibility as `preferred_w2l_result_visibility: enums::common::visibility::Visibility`,\n    discord_username,\n    twitch_username,\n    twitter_username,\n    patreon_username,\n    github_username,\n    cashapp_username,\n    website_url,\n    is_banned,\n    maybe_mod_comments,\n    maybe_mod_user_token,\n    maybe_feature_flags,\n    created_at\nFROM users\nWHERE\n    users.username = ?\n    AND users.user_deleted_at IS NULL\n    AND users.mod_deleted_at IS NULL\n        ",
   "describe": {
     "columns": [
       {
@@ -205,6 +205,16 @@
       },
       {
         "ordinal": 20,
+        "name": "maybe_feature_flags",
+        "type_info": {
+          "type": "VarString",
+          "flags": "BINARY",
+          "char_set": 224,
+          "max_size": 1020
+        }
+      },
+      {
+        "ordinal": 21,
         "name": "created_at",
         "type_info": {
           "type": "Timestamp",
@@ -238,8 +248,9 @@
       false,
       true,
       true,
+      true,
       false
     ]
   },
-  "hash": "ecce5209af9975f4140e7270df40265b00e03bd577f1abfb544beb132eb7d8e5"
+  "hash": "0094fbe30590b24420db8f85726d04fbbe6ac080325c8fe874ffe19b6ef565a2"
 }
