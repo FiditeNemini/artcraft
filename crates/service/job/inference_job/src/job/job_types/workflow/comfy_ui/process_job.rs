@@ -765,10 +765,10 @@ fn get_style_modifications(style_json: &Value, mapping_json: &Value, pos_in: &Op
     }
 
     if let Some(pos) = pos_in {
-        new_style_json["positive_prompt"] = Value::String(format!("{}, {}", style_json["positive_prompt"].as_str().unwrap(), pos));
+        new_style_json["positive_prompt"] = Value::String(format!("{}, {}",pos, style_json["positive_prompt"].as_str().unwrap()));
     }
     if let Some(neg) = neg_in {
-        new_style_json["negative_prompt"] = Value::String(format!("{}, {}", style_json["negative_prompt"].as_str().unwrap(), neg));
+        new_style_json["negative_prompt"] = Value::String(format!("{}, {}",neg, style_json["negative_prompt"].as_str().unwrap()));
     }
 
     for (key, value) in new_style_json.as_object().unwrap() {
