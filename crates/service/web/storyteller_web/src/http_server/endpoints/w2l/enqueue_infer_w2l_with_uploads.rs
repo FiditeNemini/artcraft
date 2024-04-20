@@ -124,7 +124,7 @@ pub async fn enqueue_infer_w2l_with_uploads(
 
   let maybe_user_token : Option<String> = maybe_session
     .as_ref()
-    .map(|user_session| user_session.user_token.to_string());
+    .map(|user_session| user_session.user_token_typed.as_str().to_string());
 
   let maybe_user_preferred_visibility : Option<Visibility> = maybe_session
       .as_ref()

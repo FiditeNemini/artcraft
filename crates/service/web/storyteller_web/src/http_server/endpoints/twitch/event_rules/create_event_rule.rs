@@ -118,7 +118,7 @@ pub async fn create_twitch_event_rule_handler(
 
   let insert_builder = InsertTwitchEventRuleBuilder {
     uuid_idempotency_token: request.idempotency_token.clone(),
-    user_token: user_session.user_token,
+    user_token: user_session.user_token_typed.as_str().to_string(),
     event_category: request.event_category,
     event_match_predicate,
     event_response,

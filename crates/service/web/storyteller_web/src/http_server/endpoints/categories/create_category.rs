@@ -136,7 +136,7 @@ pub async fn create_category_handler(
   if is_mod {
     // Moderator fields and adjustments
     is_mod_approved = true;
-    maybe_mod_user_token = Some(user_session.user_token.clone());
+    maybe_mod_user_token = Some(user_session.user_token_typed.as_str().to_string());
     can_directly_have_models = request.can_directly_have_models
         .unwrap_or(DEFAULT_CAN_DIRECTLY_HAVE_MODELS);
     can_have_subcategories = request.can_have_subcategories
@@ -150,7 +150,7 @@ pub async fn create_category_handler(
     idempotency_token: &idempotency_token,
     model_type,
     name: &name,
-    creator_user_token: &user_session.user_token,
+    creator_user_token: user_session.user_token_typed.as_str(),
     creator_ip_address: &creator_ip_address,
     is_mod_approved,
     maybe_mod_user_token: maybe_mod_user_token.as_deref(),

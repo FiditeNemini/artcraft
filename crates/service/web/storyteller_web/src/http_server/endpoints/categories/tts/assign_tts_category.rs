@@ -114,13 +114,13 @@ pub async fn assign_tts_category_handler(
   // If category is exclusively for mods
   if !is_category_mod {
     if category.can_only_mods_apply {
-      warn!("user is not allowed to assign this category: {}", user_session.user_token);
+      warn!("user is not allowed to assign this category: {:?}", user_session.user_token_typed);
       return Err(AssignTtsCategoryError::NotAuthorized);
     }
 
     if category.deleted_at.is_some() ||
         !category.is_mod_approved.unwrap_or(false) {
-      warn!("user is not allowed to see this category: {}", user_session.user_token);
+      warn!("user is not allowed to see this category: {:?}", user_session.user_token_typed);
       return Err(AssignTtsCategoryError::ModelNotFound);
     }
   }
@@ -154,11 +154,11 @@ pub async fn assign_tts_category_handler(
   };
 
   // NB: Third set of permission checks
-  let is_author = model_record.creator_user_token == user_session.user_token;
+  let is_author = &model_record.creator_user_token == user_session.user_token_typed.as_str();
   let is_mod = user_session.can_edit_other_users_tts_models ;
 
   if !is_author && !is_mod {
-    warn!("user is not allowed to add categories to model: {}", user_session.user_token);
+    warn!("user is not allowed to add categories to model: {:?}", user_session.user_token_typed);
     return Err(AssignTtsCategoryError::NotAuthorized);
   }
 
@@ -173,7 +173,7 @@ pub async fn assign_tts_category_handler(
   assign_tts_category(AssignTtsCategoryArgs {
     tts_model_token: &request.tts_model_token,
     tts_category_token: &request.category_token,
-    editor_user_token: &user_session.user_token,
+    editor_user_token: user_session.user_token_typed.as_str(),
     editor_ip_address: &ip_address,
     action: if request.assign { AssignOrDeleteAction::CreateAssignment } else { AssignOrDeleteAction::DeleteAssignment },
     mysql_pool: &server_state.mysql_pool,

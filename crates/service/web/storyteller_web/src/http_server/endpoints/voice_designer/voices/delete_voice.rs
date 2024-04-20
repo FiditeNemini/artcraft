@@ -115,7 +115,7 @@ pub async fn delete_voice_handler(
       .unwrap_or(false);
 
   if !is_creator && !is_mod {
-    warn!("user is not allowed to delete this voice: {}", user_session.user_token);
+    warn!("user is not allowed to delete this voice: {:?}", user_session.user_token_typed);
     return Err(DeleteVoiceError::NotAuthorized);
   }
 
@@ -124,7 +124,7 @@ pub async fn delete_voice_handler(
   let query_result = if request.set_delete {
     match delete_role {
       DeleteRole::ErrorDoNotDelete => {
-        warn!("user is not allowed to delete voices: {}", user_session.user_token);
+        warn!("user is not allowed to delete voices: {:?}", user_session.user_token_typed);
         return Err(DeleteVoiceError::NotAuthorized);
       }
       DeleteRole::AsUser => {
@@ -136,7 +136,7 @@ pub async fn delete_voice_handler(
       DeleteRole::AsMod => {
         delete_voice_as_mod(
           &path.voice_token,
-          &user_session.user_token,
+          user_session.user_token_typed.as_str(),
           &server_state.mysql_pool
         ).await
       }
@@ -144,7 +144,7 @@ pub async fn delete_voice_handler(
   } else {
     match delete_role {
       DeleteRole::ErrorDoNotDelete => {
-        warn!("user is not allowed to undelete voices: {}", user_session.user_token);
+        warn!("user is not allowed to undelete voices: {:?}", user_session.user_token_typed);
         return Err(DeleteVoiceError::NotAuthorized);
       }
       DeleteRole::AsUser => {
@@ -156,7 +156,7 @@ pub async fn delete_voice_handler(
       DeleteRole::AsMod => {
         undelete_voice_as_mod(
           &path.voice_token,
-          &user_session.user_token,
+          user_session.user_token_typed.as_str(),
           &server_state.mysql_pool
         ).await
       }

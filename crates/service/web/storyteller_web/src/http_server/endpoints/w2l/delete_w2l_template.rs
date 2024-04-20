@@ -113,17 +113,17 @@ pub async fn delete_w2l_template_handler(
   };
 
   // NB: Second set of permission checks
-  let is_author = w2l_template.creator_user_token == user_session.user_token;
+  let is_author = w2l_template.creator_user_token == user_session.user_token_typed.as_str();
   let is_mod = user_session.can_delete_other_users_w2l_templates;
 
   if !is_author && !is_mod {
-    warn!("user is not allowed to delete templates: {}", user_session.user_token);
+    warn!("user is not allowed to delete templates: {:?}", user_session.user_token_typed);
     return Err(DeleteW2lTemplateError::NotAuthorized);
   }
 
   if !is_mod {
     if w2l_template.is_locked_from_user_modification || w2l_template.is_locked_from_use {
-      warn!("user is not allowed to delete templates (locked): {}", user_session.user_token);
+      warn!("user is not allowed to delete templates (locked): {:?}", user_session.user_token_typed);
       return Err(DeleteW2lTemplateError::NotAuthorized);
     }
   }
@@ -135,7 +135,7 @@ pub async fn delete_w2l_template_handler(
   let query_result = if request.set_delete {
     match delete_role {
       DeleteRole::ErrorDoNotDelete => {
-        warn!("user is not allowed to delete template: {}", user_session.user_token);
+        warn!("user is not allowed to delete template: {:?}", user_session.user_token_typed);
         return Err(DeleteW2lTemplateError::NotAuthorized);
       }
       DeleteRole::AsUser => {
@@ -148,7 +148,7 @@ pub async fn delete_w2l_template_handler(
       DeleteRole::AsMod => {
         delete_w2l_template_as_mod(
           &path.token,
-          &user_session.user_token,
+          user_session.user_token_typed.as_str(),
           &server_state.mysql_pool
         ).await
       }
@@ -156,7 +156,7 @@ pub async fn delete_w2l_template_handler(
   } else {
     match delete_role {
       DeleteRole::ErrorDoNotDelete => {
-        warn!("user is not allowed to delete template: {}", user_session.user_token);
+        warn!("user is not allowed to delete template: {:?}", user_session.user_token_typed);
         return Err(DeleteW2lTemplateError::NotAuthorized);
       }
       DeleteRole::AsUser => {
@@ -170,7 +170,7 @@ pub async fn delete_w2l_template_handler(
       DeleteRole::AsMod => {
         undelete_w2l_template_as_mod(
           &path.token,
-          &user_session.user_token,
+          user_session.user_token_typed.as_str(),
           &server_state.mysql_pool
         ).await
       }

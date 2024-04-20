@@ -75,7 +75,7 @@ pub async fn list_user_roles_handler(
 
   // TODO: Add new permission for this.
   if !user_session.can_ban_users {
-    warn!("user is not allowed to view user roles: {}", user_session.user_token);
+    warn!("user is not allowed to view user roles: {:?}", user_session.user_token_typed);
     return Err(ListUserRolesError::Unauthorized);
   }
 

@@ -141,10 +141,12 @@ pub async fn update_weight_handler(
         }
     };
 
-    let is_creator = weight.creator_user_token.to_string() == user_session.user_token;
+    let is_creator =
+        weight.creator_user_token.to_string() ==
+            user_session.user_token_typed.as_str().to_string();
 
     if !is_creator && !is_mod {
-        warn!("user is not allowed to edit this weight: {}", user_session.user_token);
+        warn!("user is not allowed to edit this weight: {:?}", user_session.user_token_typed);
         return Err(UpdateWeightError::NotAuthorized);
     }
 

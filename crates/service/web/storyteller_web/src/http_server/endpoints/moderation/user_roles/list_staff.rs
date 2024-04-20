@@ -77,7 +77,7 @@ pub async fn list_staff_handler(
 
   // TODO: This is not the correct permission.
   if !user_session.can_ban_users {
-    warn!("user is not allowed to delete bans: {}", user_session.user_token);
+    warn!("user is not allowed to delete bans: {:?}", user_session.user_token_typed);
     return Err(ListStaffError::Unauthorized);
   }
 

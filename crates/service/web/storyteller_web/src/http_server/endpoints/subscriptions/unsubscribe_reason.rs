@@ -86,7 +86,7 @@ pub async fn set_unsubscribe_reason_handler(
   let ip_address = get_request_ip(&http_request);
 
   UnsubscribeReasonInsertBuilder::new()
-    .set_user_token(&user_session.user_token)
+    .set_user_token(user_session.user_token_typed.as_str())
     .set_ip_address(&ip_address)
     .set_unsubscribe_reason(&request.reason)
     .insert(&mut mysql_connection)

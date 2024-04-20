@@ -107,7 +107,7 @@ pub async fn list_users_handler(
 
   // TODO: Not the correct permission
   if !user_session.can_ban_users {
-    warn!("user is not allowed to add bans: {}", user_session.user_token);
+    warn!("user is not allowed to add bans: {:?}", user_session.user_token_typed);
     return Err(ListUsersErrorResponse::unauthorized());
   }
 

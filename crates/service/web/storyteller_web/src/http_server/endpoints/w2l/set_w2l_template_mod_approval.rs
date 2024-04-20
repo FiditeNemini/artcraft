@@ -91,7 +91,7 @@ pub async fn set_w2l_template_mod_approval_handler(
   };
 
   if !user_session.can_approve_w2l_templates {
-    warn!("user is not allowed to approve templates: {}", user_session.user_token);
+    warn!("user is not allowed to approve templates: {:?}", user_session.user_token_typed);
     return Err(SetW2lTemplateModApprovalError::NotAuthorized);
   }
 
@@ -114,7 +114,7 @@ pub async fn set_w2l_template_mod_approval_handler(
 
   let query_result = set_w2l_template_mod_approval(
     &path.token,
-    &user_session.user_token,
+    user_session.user_token_typed.as_str(),
     request.is_approved,
     &server_state.mysql_pool,
   ).await;

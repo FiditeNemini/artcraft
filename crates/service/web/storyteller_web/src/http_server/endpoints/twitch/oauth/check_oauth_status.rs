@@ -74,7 +74,7 @@ pub async fn check_oauth_status_handler(
     Some(session) => {
       let finder = TwitchOauthTokenFinder::new()
           .allow_expired_tokens(true)
-          .scope_user_token(Some(&session.user_token));
+          .scope_user_token(Some(session.user_token_typed.as_str()));
 
       let maybe_record = finder.perform_query(&server_state.mysql_pool)
           .await

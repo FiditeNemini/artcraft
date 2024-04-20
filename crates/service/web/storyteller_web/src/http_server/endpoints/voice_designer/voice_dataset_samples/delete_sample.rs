@@ -117,7 +117,7 @@ pub async fn delete_sample_handler(
   let is_mod = user_session.can_delete_other_users_tts_results;
 
   if !is_author && !is_mod {
-    warn!("user is not allowed to delete samples: {}", user_session.user_token);
+    warn!("user is not allowed to delete samples: {:?}", user_session.user_token_typed);
     return Err(DeleteSampleError::NotAuthorized);
   }
 

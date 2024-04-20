@@ -124,10 +124,10 @@ pub async fn rename_media_file_handler(
   };
 
   let is_creator = media_file.maybe_creator_user_token
-      .is_some_and(|t| t.as_str() == &user_session.user_token);
+      .is_some_and(|t| t.as_str() == user_session.user_token_typed.as_str());
 
   if !is_creator && !is_mod {
-    warn!("user is not allowed to delete this media_file: {}", user_session.user_token);
+    warn!("user is not allowed to delete this media_file: {:?}", user_session.user_token_typed);
     return Err(RenameMediaFileError::NotAuthorized);
   }
 

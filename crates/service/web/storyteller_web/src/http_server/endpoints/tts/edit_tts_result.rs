@@ -123,7 +123,7 @@ pub async fn edit_tts_inference_result_handler(
   }
 
   if !is_author && !is_moderator {
-    warn!("user is not allowed to edit result: {}", user_session.user_token);
+    warn!("user is not allowed to edit result: {:?}", user_session.user_token_typed);
     return Err(EditTtsResultError::NotAuthorized);
   }
 
@@ -147,7 +147,7 @@ pub async fn edit_tts_inference_result_handler(
       }
     } else {
       CreatorOrModFields::ModFields {
-        mod_user_token: &user_session.user_token,
+        mod_user_token: user_session.user_token_typed.as_str(),
       }
     },
     mysql_pool: &server_state.mysql_pool,

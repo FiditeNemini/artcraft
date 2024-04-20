@@ -122,7 +122,7 @@ pub async fn update_voice_handler(
       .unwrap_or(false);
 
   if !is_creator && !is_mod {
-    warn!("user is not allowed to edit this voice: {}", user_session.user_token);
+    warn!("user is not allowed to edit this voice: {:?}", user_session.user_token_typed);
     return Err(UpdateVoiceError::NotAuthorized);
   }
 
@@ -171,7 +171,7 @@ pub async fn update_voice_handler(
   let mut maybe_mod_user_token = None;
 
   if is_mod {
-    maybe_mod_user_token = Some(user_session.user_token.clone());
+    maybe_mod_user_token = Some(user_session.user_token_typed.as_str().to_string());
   }
 
   let query_result = update_voice(

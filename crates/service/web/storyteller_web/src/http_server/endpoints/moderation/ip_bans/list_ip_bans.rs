@@ -87,7 +87,7 @@ pub async fn list_ip_bans_handler(
   };
 
   if !user_session.can_ban_users {
-    warn!("user is not allowed to see bans: {}", user_session.user_token);
+    warn!("user is not allowed to see bans: {:?}", user_session.user_token_typed);
     return Err(ListIpBansError::Unauthorized);
   }
 

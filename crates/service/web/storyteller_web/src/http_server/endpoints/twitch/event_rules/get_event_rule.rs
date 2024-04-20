@@ -104,7 +104,7 @@ pub async fn get_twitch_event_rule_for_user_handler(
   }
 
   let maybe_twitch_event_rule = get_twitch_event_rule_for_user(
-    &path.token, &user_session.user_token, &server_state.mysql_pool)
+    &path.token, user_session.user_token_typed.as_str(), &server_state.mysql_pool)
       .await
       .map_err(|e| {
         warn!("query error: {:?}", e);

@@ -125,10 +125,12 @@ pub async fn delete_weight_handler(
       }
     };
   
-    let is_creator = weight.creator_user_token.to_string() == user_session.user_token;
+    let is_creator =
+        weight.creator_user_token.to_string() ==
+            user_session.user_token_typed.as_str().to_string();
   
     if !is_creator && !is_mod {
-      warn!("user is not allowed to delete this weight: {}", user_session.user_token);
+      warn!("user is not allowed to delete this weight: {:?}", user_session.user_token_typed);
       return Err(DeleteWeightError::NotAuthorized);
     }
   
@@ -137,7 +139,7 @@ pub async fn delete_weight_handler(
     let query_result = if request.set_delete {
       match delete_role {
         DeleteRole::ErrorDoNotDelete => {
-          warn!("user is not allowed to delete weights: {}", user_session.user_token);
+          warn!("user is not allowed to delete weights: {:?}", user_session.user_token_typed);
           return Err(DeleteWeightError::NotAuthorized);
         }
         DeleteRole::AsUser => {
@@ -156,7 +158,7 @@ pub async fn delete_weight_handler(
     } else {
       match delete_role {
         DeleteRole::ErrorDoNotDelete => {
-          warn!("user is not allowed to undelete weights: {}", user_session.user_token);
+          warn!("user is not allowed to undelete weights: {:?}", user_session.user_token_typed);
           return Err(DeleteWeightError::NotAuthorized);
         }
         DeleteRole::AsUser => {

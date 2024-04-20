@@ -92,7 +92,8 @@ pub async fn edit_api_token_handler(
     return Err(EditApiTokenError::NotAuthorized);
   }
 
-  let tokens = list_available_api_tokens_for_user(&user_session.user_token,
+  let tokens = list_available_api_tokens_for_user(
+    user_session.user_token_typed.as_str(),
     &server_state.mysql_pool)
       .await
       .map_err(|e| {
@@ -112,7 +113,7 @@ pub async fn edit_api_token_handler(
   let creator_ip_address = get_request_ip(&http_request);
 
   let _r = edit_api_token(
-    &user_session.user_token,
+    user_session.user_token_typed.as_str(),
     &request.api_token,
     request.maybe_short_description.as_deref(),
     &creator_ip_address,

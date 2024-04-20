@@ -107,7 +107,7 @@ pub async fn create_voice_clone_request_handler(
 
   let builder = InsertVoiceCloneRequestBuilder {
     uuid_idempotency_token: request.idempotency_token.clone(),
-    maybe_user_token: maybe_user_session.map(|user| user.user_token.clone()),
+    maybe_user_token: maybe_user_session.map(|user| user.user_token_typed.as_str().to_string()),
     email_address: request.email_address.clone(),
     discord_username: request.discord_username.clone(),
     is_for_private_use: request.is_for_private_use,

@@ -241,7 +241,7 @@ pub async fn get_tts_model_handler(
   };
 
   if let Some(user_session) = &maybe_user_session {
-    is_original_author = user_session.user_token == model.creator_user_token();
+    is_original_author = user_session.user_token_typed.as_str().to_string() == model.creator_user_token();
   }
 
   // NB(bt, 2024-01-20): Removing to make porting easier.

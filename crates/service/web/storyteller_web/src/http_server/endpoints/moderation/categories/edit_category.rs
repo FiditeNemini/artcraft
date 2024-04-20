@@ -145,7 +145,7 @@ pub async fn edit_category_handler(
     can_only_mods_apply: request.can_only_mods_apply,
     maybe_super_category_token: request.maybe_super_category_token.as_deref(),
     is_mod_approved: request.is_mod_approved,
-    mod_user_token: &user_session.user_token,
+    mod_user_token: user_session.user_token_typed.as_str(),
     maybe_mod_comments: request.maybe_mod_comments.as_deref(),
     model_category_token: &path.token,
     mysql_pool: &server_state.mysql_pool,

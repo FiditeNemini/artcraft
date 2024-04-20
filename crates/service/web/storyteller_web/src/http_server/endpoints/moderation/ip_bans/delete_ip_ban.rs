@@ -76,7 +76,7 @@ pub async fn delete_ip_ban_handler(
   };
 
   if !user_session.can_ban_users {
-    warn!("user is not allowed to delete bans: {}", user_session.user_token);
+    warn!("user is not allowed to delete bans: {:?}", user_session.user_token_typed.as_str());
     return Err(DeleteIpBanError::Unauthorized);
   }
 
@@ -91,7 +91,7 @@ pub async fn delete_ip_ban_handler(
 
   let query_result = toggle_ip_ban(
     &path.ip_address,
-    &user_session.user_token,
+    user_session.user_token_typed.as_str(),
     toggle_action,
     &server_state.mysql_pool
   ).await;

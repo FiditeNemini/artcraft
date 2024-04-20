@@ -15,6 +15,7 @@ use utoipa::ToSchema;
 
 use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use http_server_common::response::response_error_helpers::to_simple_json_error;
+use tokens::tokens::users::UserToken;
 
 use crate::common_responses::user_details_lite::UserDetailsLight;
 use crate::cookies::anonymous_visitor_tracking::avt_cookie_manager::AvtCookieManager;
@@ -43,7 +44,7 @@ pub enum StorytellerStreamPlan {
 pub struct SessionUserInfo {
   pub core_info: UserDetailsLight,
 
-  pub user_token: String,
+  pub user_token: UserToken,
   pub username: String,
   pub display_name: String,
   pub email_gravatar_hash: String,
@@ -170,7 +171,7 @@ pub async fn session_info_handler(
             &session_data.display_name,
             &session_data.email_gravatar_hash,
           ),
-          user_token: session_data.user_token.clone(),
+          user_token: session_data.user_token_typed,
           username: session_data.username.to_string(),
           display_name: session_data.display_name.to_string(),
           email_gravatar_hash: session_data.email_gravatar_hash.to_string(),

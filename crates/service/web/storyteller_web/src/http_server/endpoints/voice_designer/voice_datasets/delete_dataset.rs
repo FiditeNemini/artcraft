@@ -111,11 +111,11 @@ pub async fn delete_dataset_handler(
     };
 
     let is_creator = dataset.maybe_creator_user_token.as_deref()
-        .map(|creator_user_token| creator_user_token == &user_session.user_token)
+        .map(|creator_user_token| creator_user_token == user_session.user_token_typed.as_str())
         .unwrap_or(false);
 
     if !is_creator && !is_mod {
-        warn!("user is not allowed to delete this dataset: {}", user_session.user_token);
+        warn!("user is not allowed to delete this dataset: {:?}", user_session.user_token_typed);
         return Err(DeleteDatasetError::NotAuthorized);
     }
 
@@ -124,7 +124,7 @@ pub async fn delete_dataset_handler(
     let query_result = if request.set_delete {
         match delete_role {
             DeleteRole::ErrorDoNotDelete => {
-                warn!("user is not allowed to delete datasets: {}", user_session.user_token);
+                warn!("user is not allowed to delete datasets: {:?}", user_session.user_token_typed);
                 return Err(DeleteDatasetError::NotAuthorized);
             }
             DeleteRole::AsUser => {
@@ -136,7 +136,7 @@ pub async fn delete_dataset_handler(
             DeleteRole::AsMod => {
                 delete_dataset_as_mod(
                     &path.dataset_token,
-                    &user_session.user_token,
+                    user_session.user_token_typed.as_str(),
                     &server_state.mysql_pool
                 ).await
             }
@@ -144,7 +144,7 @@ pub async fn delete_dataset_handler(
     } else {
         match delete_role {
             DeleteRole::ErrorDoNotDelete => {
-                warn!("user is not allowed to undelete voices: {}", user_session.user_token);
+                warn!("user is not allowed to undelete voices: {:?}", user_session.user_token_typed);
                 return Err(DeleteDatasetError::NotAuthorized);
             }
             DeleteRole::AsUser => {
@@ -157,7 +157,7 @@ pub async fn delete_dataset_handler(
             DeleteRole::AsMod => {
                 undelete_dataset_as_mod(
                     &path.dataset_token,
-                    &user_session.user_token,
+                    user_session.user_token_typed.as_str(),
                     &server_state.mysql_pool
                 ).await
             }

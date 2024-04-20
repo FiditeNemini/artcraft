@@ -75,7 +75,7 @@ pub async fn list_voices_by_session_handler(
         ListVoicesByUserError::NotAuthorized
       })?;
 
-  let creator_user_token = user_session.user_token.clone();
+  let creator_user_token = user_session.user_token_typed.as_str().to_string();
   let _is_mod = user_session.can_ban_users;
 
   // NB(bt,2024-01-18): Showing mods deleted files is actually kind of annoying!

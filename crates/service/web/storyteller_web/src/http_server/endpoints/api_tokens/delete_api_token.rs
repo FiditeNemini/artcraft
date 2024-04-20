@@ -91,7 +91,8 @@ pub async fn delete_api_token_handler(
     return Err(DeleteApiTokenError::NotAuthorized);
   }
 
-  let tokens = list_available_api_tokens_for_user(&user_session.user_token,
+  let tokens = list_available_api_tokens_for_user(
+    user_session.user_token_typed.as_str(),
     &server_state.mysql_pool)
       .await
       .map_err(|e| {
@@ -111,7 +112,7 @@ pub async fn delete_api_token_handler(
   let creator_ip_address = get_request_ip(&http_request);
 
   let _r = delete_api_token(
-    &user_session.user_token,
+    user_session.user_token_typed.as_str(),
     &path.api_token,
     &creator_ip_address,
     &server_state.mysql_pool)

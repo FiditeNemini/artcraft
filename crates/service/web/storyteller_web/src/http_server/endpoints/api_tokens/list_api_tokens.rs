@@ -85,7 +85,9 @@ pub async fn list_api_tokens_handler(
     return Err(ListApiTokensError::NotAuthorized);
   }
 
-  let api_tokens = list_available_api_tokens_for_user(&user_session.user_token, &server_state.mysql_pool)
+  let api_tokens = list_available_api_tokens_for_user(
+    user_session.user_token_typed.as_str(),
+    &server_state.mysql_pool)
       .await
       .map_err(|e| {
         warn!("API token query error: {:?}", e);

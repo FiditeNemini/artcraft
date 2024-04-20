@@ -108,7 +108,7 @@ pub async fn ban_user_handler(
   };
 
   if !user_session.can_ban_users {
-    warn!("user is not allowed to add bans: {}", user_session.user_token);
+    warn!("user is not allowed to add bans: {:?}", user_session.user_token_typed);
     return Err(BanUserErrorResponse::unauthorized());
   }
 

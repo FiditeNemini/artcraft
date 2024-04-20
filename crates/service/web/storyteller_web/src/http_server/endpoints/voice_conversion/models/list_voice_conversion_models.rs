@@ -171,7 +171,7 @@ pub async fn list_voice_conversion_models_handler(
 
   let maybe_session_user_token = maybe_user_session
       .as_ref()
-      .map(|s| s.user_token.as_str());
+      .map(|s| s.user_token_typed.as_str());
 
   let models = models.into_iter()
       .filter(|model| {

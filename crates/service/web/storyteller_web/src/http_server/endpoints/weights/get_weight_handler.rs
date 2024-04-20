@@ -147,10 +147,10 @@ pub async fn get_weight_handler(
             }
         };
 
-        let session_user_token = user_session.user_token.clone();
+        let session_user_token = user_session.user_token_typed.as_str().to_string();
 
-        if !is_mod && session_user_token.as_str() != &user_session.user_token {
-            warn!("user is not allowed to view this weight: {}", user_session.user_token);
+        if !is_mod && session_user_token.as_str() != user_session.user_token_typed.as_str() {
+            warn!("user is not allowed to view this weight: {:?}", user_session.user_token_typed.as_str());
             return Err(GetWeightError::NotAuthorized);
         }
     }

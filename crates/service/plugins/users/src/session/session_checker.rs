@@ -14,7 +14,6 @@ use mysql_queries::queries::users::user_sessions::get_user_session_by_token_ligh
 use mysql_queries::queries::users::user_subscriptions::list_active_user_subscriptions::list_active_user_subscriptions;
 use redis_caching::redis_ttl_cache::{RedisTtlCache, RedisTtlCacheConnection};
 use redis_common::redis_cache_keys::RedisCacheKeys;
-use tokens::tokens::users::UserToken;
 
 use crate::session::http::http_user_session_manager::HttpUserSessionManager;
 use crate::session::lookup::user_session_extended::{UserSessionExtended, UserSessionPreferences, UserSessionPremiumPlanInfo, UserSessionRoleAndPermissions, UserSessionSubscriptionPlan, UserSessionUserDetails};
@@ -208,14 +207,14 @@ impl SessionChecker {
 
     // TODO: Cache this so we don't hit the database twice.
     let subscriptions =
-        list_active_user_subscriptions(mysql_connection, &user_session.user_token).await?;
-
-    // TODO: Get rid of the untyped user tokens.
-    let user_token_typed = UserToken::new_from_str(&user_session.user_token);
+        list_active_user_subscriptions(
+          mysql_connection,
+          user_session.user_token_typed.as_str()
+        ).await?;
 
     Ok(Some(UserSessionExtended {
-      user_token: user_session.user_token,
-      user_token_typed,
+      user_token: user_session.user_token_typed.as_str().to_string(),
+      user_token_typed: user_session.user_token_typed,
       user: UserSessionUserDetails {
         username: user_session.username,
         display_name: user_session.display_name,

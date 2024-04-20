@@ -68,7 +68,7 @@ pub async fn get_w2l_inference_queue_count_handler(
 
   // TODO: Not a good fit for this permission.
   if !user_session.can_ban_users {
-    warn!("user is not allowed to view bans: {}", user_session.user_token);
+    warn!("user is not allowed to view bans: {:?}", user_session.user_token_typed);
     return Err(GetW2lInferenceQueueCountError::Unauthorized);
   }
 

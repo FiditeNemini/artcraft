@@ -93,7 +93,7 @@ pub async fn check_if_voice_clone_request_submitted_handler(
   // Logged in users
   if let Some(user) = maybe_user_session.as_ref() {
     let request = get_voice_clone_request_by_user_token(
-      &user.user_token, &server_state.mysql_pool)
+      user.user_token_typed.as_str(), &server_state.mysql_pool)
         .await
         .map_err(|e| {
           warn!("Database error: {:?}", e);

@@ -82,7 +82,7 @@ pub async fn get_pending_w2l_templates_handler(
   };
 
   if !user_session.can_approve_w2l_templates {
-    warn!("user is not allowed to approve w2l templates: {}", user_session.user_token);
+    warn!("user is not allowed to approve w2l templates: {:?}", user_session.user_token_typed);
     return Err(GetPendingW2lTemplatesError::Unauthorized);
   }
 

@@ -172,7 +172,7 @@ pub async fn upload_tts_model_handler(
       // This token is returned to the client.
       let maybe_new_job_token = insert_tts_model_upload_job(InsertTtsModelUploadJobArgs {
         uuid: &uuid,
-        creator_user_token: &user_session.user_token,
+        creator_user_token: user_session.user_token_typed.as_str(),
         creator_ip_address: &ip_address,
         creator_set_visibility: "public", // TODO: Creator set preference.
         title: &title,
@@ -199,7 +199,7 @@ pub async fn upload_tts_model_handler(
         download_type: GenericDownloadType::Vits,
         download_url: &download_url,
         title: &title,
-        creator_user_token: &user_session.user_token,
+        creator_user_token: user_session.user_token_typed.as_str(),
         creator_ip_address: &ip_address,
         creator_set_visibility: Visibility::Public, // TODO: Creator set preference
         mysql_pool: &server_state.mysql_pool,
@@ -215,7 +215,7 @@ pub async fn upload_tts_model_handler(
     }
   }
 
-  server_state.firehose_publisher.enqueue_tts_model_upload(&user_session.user_token, &job_token)
+  server_state.firehose_publisher.enqueue_tts_model_upload(user_session.user_token_typed.as_str(), &job_token)
       .await
       .map_err(|e| {
         warn!("error publishing event: {:?}", e);

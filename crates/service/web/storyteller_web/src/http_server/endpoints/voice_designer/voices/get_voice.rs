@@ -86,7 +86,7 @@ pub async fn get_voice_handler(
     };
 
     let voice_token = path.voice_token.clone();
-    let creator_user_token = user_session.user_token.clone();
+    let creator_user_token = user_session.user_token_typed.as_str().to_string();
     let is_mod = user_session.can_ban_users;
 
     let voice_lookup_result = get_voice_by_token(
@@ -108,11 +108,11 @@ pub async fn get_voice_handler(
     };
 
     let is_creator = voice.maybe_creator_user_token
-        .map(|creator_user_token| creator_user_token.as_str() == &user_session.user_token)
+        .map(|creator_user_token| creator_user_token.as_str() == user_session.user_token_typed.as_str())
         .unwrap_or(false);
 
     if !is_creator && !is_mod {
-        warn!("user is not allowed to view this voice: {}", user_session.user_token);
+        warn!("user is not allowed to view this voice: {:?}", user_session.user_token_typed);
         return Err(GetVoiceError::NotAuthorized);
     }
 
@@ -123,7 +123,7 @@ pub async fn get_voice_handler(
         ietf_language_tag: voice.ietf_language_tag,
         ietf_primary_language_subtag: voice.ietf_primary_language_subtag,
         creator: UserDetailsLight::from_db_fields(
-            &UserToken::new_from_str(user_session.user_token.as_ref()),
+            &user_session.user_token_typed,
             user_session.username.as_ref(),
             user_session.display_name.as_ref(),
             user_session.email_gravatar_hash.as_ref(),

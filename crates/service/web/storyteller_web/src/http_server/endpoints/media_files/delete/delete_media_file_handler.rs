@@ -123,10 +123,10 @@ pub async fn delete_media_file_handler(
     };
 
     let is_creator = media_file.maybe_creator_user_token
-        .is_some_and(|t| t.as_str() == &user_session.user_token);
+        .is_some_and(|t| t.as_str() == user_session.user_token_typed.as_str());
 
     if !is_creator && !is_mod {
-        warn!("user is not allowed to delete this media_file: {}", user_session.user_token);
+        warn!("user is not allowed to delete this media_file: {:?}", user_session.user_token_typed);
         return Err(DeleteMediaFileError::NotAuthorized);
     }
 
@@ -135,7 +135,7 @@ pub async fn delete_media_file_handler(
     let query_result = if request.set_delete {
         match delete_role {
             DeleteRole::ErrorDoNotDelete => {
-                warn!("user is not allowed to delete media_files: {}", user_session.user_token);
+                warn!("user is not allowed to delete media_files: {:?}", user_session.user_token_typed);
                 return Err(DeleteMediaFileError::NotAuthorized);
             }
             DeleteRole::AsUser => {
@@ -147,7 +147,7 @@ pub async fn delete_media_file_handler(
             DeleteRole::AsMod => {
                 delete_media_file_as_mod(
                     &path.token,
-                    &user_session.user_token,
+                    user_session.user_token_typed.as_str(),
                     &server_state.mysql_pool
                 ).await
             }
@@ -155,7 +155,7 @@ pub async fn delete_media_file_handler(
     } else {
         match delete_role {
             DeleteRole::ErrorDoNotDelete => {
-                warn!("user is not allowed to undelete voices: {}", user_session.user_token);
+                warn!("user is not allowed to undelete voices: {:?}", user_session.user_token_typed);
                 return Err(DeleteMediaFileError::NotAuthorized);
             }
             DeleteRole::AsUser => {
@@ -168,7 +168,7 @@ pub async fn delete_media_file_handler(
             DeleteRole::AsMod => {
                 undelete_media_file_as_mod(
                     &path.token,
-                    &user_session.user_token,
+                    user_session.user_token_typed.as_str(),
                     &server_state.mysql_pool
                 ).await
             }
