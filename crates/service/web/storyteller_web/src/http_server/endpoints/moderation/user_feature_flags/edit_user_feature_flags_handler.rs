@@ -9,10 +9,11 @@ use actix_web::http::StatusCode;
 use actix_web::web::{Data, Json, Path};
 use log::{info, log, warn};
 use r2d2_redis::{r2d2, RedisConnectionManager};
+use r2d2_redis::redis::Commands;
 use utoipa::ToSchema;
+
 use composite_identifiers::by_table::audit_logs::audit_log_entity::AuditLogEntity;
 use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction;
-
 use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use http_server_common::request::get_request_ip::get_request_ip;
 use mysql_queries::queries::audit_logs::insert_audit_log::{insert_audit_log, InsertAuditLogArgs};
@@ -226,7 +227,7 @@ pub async fn edit_user_feature_flags_handler(
   if let Ok(mut redis) = redis_pool.get() {
     // TODO(bt,2024-04-20): This should be coordinated with other code.
     let cache_key = format!("cache:userProfile:{}", user_profile.username);
-    let _r = redis.del(&cache_key);
+    let _r : Result<Option<String>, _> = redis.del(&cache_key);
   }
 
   Ok(simple_json_success())
