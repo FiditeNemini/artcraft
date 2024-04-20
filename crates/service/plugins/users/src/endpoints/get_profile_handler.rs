@@ -3,6 +3,7 @@
 #![forbid(unused_mut)]
 #![forbid(unused_variables)]
 
+use std::collections::BTreeSet;
 use std::fmt;
 
 use actix_web::{HttpRequest, HttpResponse, web};
@@ -17,6 +18,7 @@ use r2d2_redis::redis::Commands;
 use sqlx::MySqlPool;
 use utoipa::ToSchema;
 
+use enums::by_table::users::user_feature_flag::UserFeatureFlag;
 use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_header_optional::get_request_header_optional;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
@@ -29,6 +31,7 @@ use tokens::tokens::users::UserToken;
 use crate::common_responses::user_avatars::default_avatar_color_from_username::default_avatar_color_from_username;
 use crate::common_responses::user_avatars::default_avatar_from_username::default_avatar_from_username;
 use crate::common_responses::user_details_lite::UserDetailsLight;
+use crate::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
 use crate::session::session_checker::SessionChecker;
 
 // TODO: This is duplicated in query_user_profile
@@ -67,6 +70,10 @@ pub struct UserProfileModeratorFields {
   pub is_banned: bool,
   pub maybe_mod_comments: Option<String>,
   pub maybe_mod_user_token: Option<String>,
+
+  // Collection of feature / rollout flags
+  // NB: The BTreeSet maintains order so React doesn't introduce re-render state bugs when order changes
+  pub maybe_feature_flags: BTreeSet<UserFeatureFlag>,
 }
 
 #[derive(Serialize, Deserialize, Clone, ToSchema)]
@@ -273,10 +280,14 @@ pub async fn get_profile_handler(
     website_url: user_data.user_profile.website_url,
     created_at: user_data.user_profile.created_at,
     maybe_moderator_fields: user_data.user_profile.maybe_moderator_fields.map(|mod_fields| {
+      let feature_flags =
+          UserSessionFeatureFlags::new(mod_fields.maybe_feature_flags.as_deref());
+
       UserProfileModeratorFields {
         is_banned: mod_fields.is_banned,
         maybe_mod_comments: mod_fields.maybe_mod_comments,
         maybe_mod_user_token: mod_fields.maybe_mod_user_token,
+        maybe_feature_flags: feature_flags.clone_flags(),
       }
     }),
     badges: user_data.badges

@@ -52,6 +52,7 @@ pub struct UserProfileModeratorFields {
   pub is_banned: bool,
   pub maybe_mod_comments: Option<String>,
   pub maybe_mod_user_token: Option<String>,
+  pub maybe_feature_flags: Option<String>,
 }
 
 struct RawUserProfileRecord {
@@ -78,6 +79,7 @@ struct RawUserProfileRecord {
 
   // Mod fields
   is_banned: i8,
+  maybe_feature_flags: Option<String>,
   maybe_mod_comments: Option<String>,
   maybe_mod_user_token: Option<String>,
 }
@@ -119,6 +121,7 @@ SELECT
     is_banned,
     maybe_mod_comments,
     maybe_mod_user_token,
+    maybe_feature_flags,
     created_at
 FROM users
 WHERE
@@ -170,6 +173,7 @@ WHERE
       is_banned: i8_to_bool(profile_record.is_banned),
       maybe_mod_comments: profile_record.maybe_mod_comments,
       maybe_mod_user_token: profile_record.maybe_mod_user_token,
+      maybe_feature_flags: profile_record.maybe_feature_flags,
     })
   };
 
