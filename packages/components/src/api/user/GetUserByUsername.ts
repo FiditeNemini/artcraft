@@ -38,6 +38,7 @@ export interface UserProfileModeratorFields {
   is_banned: boolean,
   maybe_mod_comments: string | null | undefined,
   maybe_mod_user_token: string | null | undefined,
+  maybe_feature_flags: string[] | null | undefined,
 }
 
 export enum UserLookupError {
