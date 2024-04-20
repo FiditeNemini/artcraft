@@ -57,6 +57,7 @@ import { ProfileBanFc } from "./pages/profile/profile_ban/ProfileBanFc";
 import { ModerationUserListFc } from "./pages/moderation/moderation_user_list/ModerationUserList";
 import { LeaderboardPage } from "./pages/leaderboard/LeaderboardPage";
 import { ModerationJobStatsFc } from "./pages/moderation/moderation_job_stats/ModerationJobStatsFc";
+import { ModerationUserFeatureFlagsPage } from "./pages/moderation/moderation_user_feature_flags/ModerationUserFeatureFlagsPage";
 import { ModerationPendingW2lTemplatesFc } from "./pages/moderation/moderation_pending_w2l_templates/ModerationPendingW2lTemplatesFc";
 import { ModerationVoiceStatsFc } from "./pages/moderation/moderation_voice_stats/ModerationVoiceStatsFc";
 import { CreateCategoryPage } from "./pages/category/CreateCategoryPage";
@@ -610,6 +611,12 @@ class PageContainer extends React.Component<
 
                   <Route path="/moderation/user/list">
                     <ModerationUserListFc
+                      sessionWrapper={this.props.sessionWrapper}
+                    />
+                  </Route>
+
+                  <Route path="/moderation/user_feature_flags/:username?">
+                    <ModerationUserFeatureFlagsPage
                       sessionWrapper={this.props.sessionWrapper}
                     />
                   </Route>

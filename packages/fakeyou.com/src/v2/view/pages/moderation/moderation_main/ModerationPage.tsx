@@ -11,7 +11,7 @@ import {
   faTags,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
-import { faMagnifyingGlass } from "@fortawesome/pro-solid-svg-icons";
+import { faMagnifyingGlass, faUserAlt } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   sessionWrapper: SessionWrapper;
@@ -35,10 +35,6 @@ function ModerationPage(props: Props) {
           <h2 className="panel-title fw-bold">Emergency</h2>
           <div className="py-6">
             <div className="d-flex flex-column gap-3">
-              <Link to="/moderation/ip_bans" className="btn btn-primary w-100">
-                <FontAwesomeIcon icon={faBan} className="me-2" />
-                IP Bans
-              </Link>
 
               <Link
                 to="/moderation/job_control"
@@ -72,6 +68,34 @@ function ModerationPage(props: Props) {
                 <FontAwesomeIcon icon={faMagnifyingGlass} className="me-2" />
                 Token Info Lookup
               </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container-panel pt-3 pb-5">
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Users</h2>
+          <div className="py-6">
+            <div className="d-flex flex-column gap-3">
+              <Link to="/moderation/ip_bans" className="btn btn-primary w-100">
+                <FontAwesomeIcon icon={faBan} className="me-2" />
+                IP Bans
+              </Link>
+              <Link to="/moderation/user_feature_flags" className="btn btn-secondary w-100">
+                <FontAwesomeIcon icon={faUserAlt} className="me-2" />
+                User Feature Flags
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container-panel pt-3 pb-5">
+        <div className="panel p-3 p-lg-4">
+          <h2 className="panel-title fw-bold">Legacy and Deprecated Pages</h2>
+          <div className="py-6">
+            <div className="d-flex flex-column gap-3">
 
               <Link
                 to="/moderation/user/list"
