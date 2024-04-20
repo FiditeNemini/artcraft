@@ -21,6 +21,10 @@ export interface ObjectJSON {
   object_uuid: string;
   object_user_data_name: string;
   media_file_token: string;
+  color: string;
+  metalness: number,
+  shininess: number,
+  specular: number,
 }
 
 export class StoryTellerProxy3DObject {
@@ -34,6 +38,10 @@ export class StoryTellerProxy3DObject {
   object_name: string;
   object_user_data_name: string; // changable name
   media_file_token: string;
+  color: string;
+  metalness: number;
+  shininess: number;
+  specular: number;
 
   constructor(
     version: number,
@@ -49,6 +57,19 @@ export class StoryTellerProxy3DObject {
     this.object_name = "";
     this.object_user_data_name = "";
     this.object_uuid = "";
+
+    this.color = "";
+
+    this.metalness = 0.0;
+    this.shininess = 0.0;
+    this.specular = 0.5;
+  }
+
+  getColorAsHexString(object: THREE.Object3D): string {
+    if (object instanceof THREE.Mesh && object.material instanceof THREE.MeshBasicMaterial) {
+      return '#' + object.material.color.getHexString();
+    }
+    return "#FFFFFF"
   }
 
   public async initialize(object: THREE.Object3D) {
@@ -59,6 +80,10 @@ export class StoryTellerProxy3DObject {
     this.object_name = object.name;
     this.object_user_data_name = object.userData.name;
     this.object_uuid = object.uuid;
+    this.color = object.userData["color"];
+    this.metalness = object.userData["metalness"];
+    this.shininess = object.userData["shininess"];
+    this.specular = object.userData["specular"];
   }
 
   public async toJSON(): Promise<ObjectJSON> {
@@ -83,6 +108,10 @@ export class StoryTellerProxy3DObject {
       object_uuid: this.object_uuid,
       object_user_data_name: this.object_user_data_name,
       media_file_token: this.media_file_token,
+      color: this.color,
+      metalness: this.metalness,
+      shininess: this.shininess,
+      specular: this.specular,
     };
     return json;
   }
