@@ -116,7 +116,8 @@ pub async fn edit_user_feature_flags_handler(
   path: Path<EditUserFeatureFlagPathInfo>,
   request: Json<EditUserFeatureFlagsRequest>,
   server_state: Data<Arc<ServerState>>,
-  redis_ttl_cache: Data<RedisTtlCache>,
+  //redis_ttl_cache: Data<RedisTtlCache>,
+  redis_pool: Data<r2d2::Pool<RedisConnectionManager>>,
 ) -> Result<HttpResponse, EditUserFeatureFlagsError> {
 
   let maybe_user_session = server_state
@@ -216,10 +217,16 @@ pub async fn edit_user_feature_flags_handler(
     phantom: Default::default(),
   }).await;
 
-  if let Ok(mut redis) = redis_ttl_cache.get_connection() {
+  //if let Ok(mut redis) = redis_ttl_cache.get_connection() {
+  //  // TODO(bt,2024-04-20): This should be coordinated with other code.
+  //  let cache_key = format!("cache:userProfile:{}", user_profile.username);
+  //  let _r = redis.delete_from_cache(&cache_key);
+  //}
+
+  if let Ok(mut redis) = redis_pool.get() {
     // TODO(bt,2024-04-20): This should be coordinated with other code.
     let cache_key = format!("cache:userProfile:{}", user_profile.username);
-    let _r = redis.delete_from_cache(&cache_key);
+    let _r = redis.del(&cache_key);
   }
 
   Ok(simple_json_success())
