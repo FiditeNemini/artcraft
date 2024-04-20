@@ -37,10 +37,10 @@ export const SidePanelMenu = () => {
           <button
             key={tab.value}
             className={[
-              "flex flex-col items-center rounded-lg px-2 py-3",
+              "flex flex-col items-center rounded-lg px-2 py-3 transition-all duration-200 hover:bg-assets-selectedTab/70",
               tab.value === selectedTab?.value?.value
-                ? "bg-assets-selectedTab opacity-100"
-                : "opacity-50",
+                ? "bg-assets-selectedTab opacity-100 hover:bg-assets-selectedTab"
+                : "opacity-60",
             ].join(" ")}
             onClick={() => {
               selectedTab.value = tab;
