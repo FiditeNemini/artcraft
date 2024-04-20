@@ -8,6 +8,7 @@ use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::{Data, Json, Path};
 use log::{info, log, warn};
+use r2d2_redis::{r2d2, RedisConnectionManager};
 use utoipa::ToSchema;
 use composite_identifiers::by_table::audit_logs::audit_log_entity::AuditLogEntity;
 use enums::by_table::audit_logs::audit_log_entity_action::AuditLogEntityAction;
@@ -19,6 +20,7 @@ use mysql_queries::queries::users::user::get_user_token_by_username::get_user_to
 use mysql_queries::queries::users::user::set_user_feature_flags::{set_user_feature_flags, SetUserFeatureFlagArgs};
 use mysql_queries::queries::users::user_profiles::get_user_profile_by_token::get_user_profile_by_token;
 use mysql_queries::queries::users::user_sessions::get_user_session_by_token::get_user_session_by_token;
+use redis_caching::redis_ttl_cache::RedisTtlCache;
 use tokens::tokens::users::UserToken;
 use users_component::endpoints::get_profile_handler::GetProfilePathInfo;
 use users_component::session::lookup::user_session_feature_flags::UserSessionFeatureFlags;
@@ -113,7 +115,8 @@ pub async fn edit_user_feature_flags_handler(
   http_request: HttpRequest,
   path: Path<EditUserFeatureFlagPathInfo>,
   request: Json<EditUserFeatureFlagsRequest>,
-  server_state: Data<Arc<ServerState>>
+  server_state: Data<Arc<ServerState>>,
+  redis_ttl_cache: Data<RedisTtlCache>,
 ) -> Result<HttpResponse, EditUserFeatureFlagsError> {
 
   let maybe_user_session = server_state
@@ -212,6 +215,12 @@ pub async fn edit_user_feature_flags_handler(
     mysql_executor: &server_state.mysql_pool,
     phantom: Default::default(),
   }).await;
+
+  if let Ok(mut redis) = redis_ttl_cache.get_connection() {
+    // TODO(bt,2024-04-20): This should be coordinated with other code.
+    let cache_key = format!("cache:userProfile:{}", user_profile.username);
+    let _r = redis.delete_from_cache(&cache_key);
+  }
 
   Ok(simple_json_success())
 }
