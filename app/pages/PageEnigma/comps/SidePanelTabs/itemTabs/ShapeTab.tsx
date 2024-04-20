@@ -7,7 +7,7 @@ export const ShapeTab = () => {
   useSignals();
 
   return (
-    <div className="w-full overflow-x-auto p-4">
+    <div className="w-full overflow-x-auto p-4 pb-0">
       <TabTitle title="Shapes" />
       <div className="mb-4 flex justify-start gap-2">
         <ItemElements

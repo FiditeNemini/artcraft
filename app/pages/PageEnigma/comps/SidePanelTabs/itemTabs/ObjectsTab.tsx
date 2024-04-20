@@ -25,7 +25,7 @@ export const ObjectsTab = ({ type }: Props) => {
 
   return (
     <>
-      <div className="w-full overflow-x-auto p-4">
+      <div className="w-full overflow-x-auto p-4 pb-0">
         <TabTitle
           title={type === AssetType.CHARACTER ? "Characters" : "Objects"}
         />
@@ -34,7 +34,6 @@ export const ObjectsTab = ({ type }: Props) => {
             className={twMerge(
               "filter-tab",
               assetFilter.value === AssetFilterOption.ALL ? "active" : "",
-              "disabled",
             )}
             onClick={() => (assetFilter.value = AssetFilterOption.ALL)}>
             All
@@ -43,7 +42,6 @@ export const ObjectsTab = ({ type }: Props) => {
             className={twMerge(
               "filter-tab",
               assetFilter.value === AssetFilterOption.MINE ? "active" : "",
-              "disabled",
             )}
             onClick={() => (assetFilter.value = AssetFilterOption.MINE)}
             disabled={!items.value.some((item) => item.isMine)}>
@@ -55,7 +53,6 @@ export const ObjectsTab = ({ type }: Props) => {
               assetFilter.value === AssetFilterOption.BOOKMARKED
                 ? "active"
                 : "",
-              "disabled",
             )}
             onClick={() => (assetFilter.value = AssetFilterOption.BOOKMARKED)}
             disabled={!items.value.some((item) => item.isBookmarked)}>

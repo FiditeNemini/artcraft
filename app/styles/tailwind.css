@@ -4,14 +4,14 @@
 
 @layer components {
   .filter-tab {
-    @apply text-nowrap rounded-lg border-2 border-assets-background bg-assets-background px-3 py-2 text-sm font-medium transition-all duration-150 hover:border-assets-background/0 hover:bg-assets-background/80;
+    @apply text-nowrap rounded-lg border-2 border-assets-background bg-assets-background px-2.5 py-1.5 text-sm font-medium text-white/80 transition-all duration-150 hover:border-assets-background/0 hover:bg-assets-background/80;
   }
 
   .filter-tab.active {
-    @apply border-2 border-brand-primary hover:border-brand-primary hover:bg-assets-background;
+    @apply border-2 border-brand-primary text-white hover:border-brand-primary hover:bg-assets-background;
   }
 
-  .filter-tab.disabled {
-    @apply hover:bg-assets-background disabled:text-white/50;
+  .filter-tab:disabled {
+    @apply border-transparent bg-assets-background/50 hover:border-transparent disabled:text-white/30;
   }
 }

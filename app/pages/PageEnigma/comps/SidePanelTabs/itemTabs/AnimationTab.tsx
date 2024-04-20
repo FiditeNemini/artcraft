@@ -12,14 +12,13 @@ export const AnimationTab = () => {
 
   return (
     <>
-      <div className="w-full overflow-x-auto p-4">
+      <div className="w-full overflow-x-auto p-4 pb-0">
         <TabTitle title="Animation" />
         <div className="mb-4 flex justify-start gap-2">
           <button
             className={twMerge(
               "filter-tab",
               animationFilter.value === AssetFilterOption.ALL ? "active" : "",
-              "disabled",
             )}
             onClick={() => (animationFilter.value = AssetFilterOption.ALL)}>
             All
@@ -28,7 +27,6 @@ export const AnimationTab = () => {
             className={twMerge(
               "filter-tab",
               animationFilter.value === AssetFilterOption.MINE ? "active" : "",
-              "disabled",
             )}
             onClick={() => (animationFilter.value = AssetFilterOption.MINE)}
             disabled={!animationItems.value.some((item) => item.isMine)}>
@@ -40,7 +38,6 @@ export const AnimationTab = () => {
               animationFilter.value === AssetFilterOption.BOOKMARKED
                 ? "active"
                 : "",
-              "disabled",
             )}
             onClick={() =>
               (animationFilter.value = AssetFilterOption.BOOKMARKED)
