@@ -451,6 +451,7 @@ class Editor {
       this.animation_engine,
       this.audio_engine,
       this.lipsync_engine,
+      this.emotion_engine,
     );
     await proxyTimeline.loadFromJson(scene_json["timeline"]);
 
@@ -497,6 +498,7 @@ class Editor {
       this.animation_engine,
       this.audio_engine,
       this.lipsync_engine,
+      this.emotion_engine,
     );
     const timeline_json = await proxyTimeline.saveToJson();
 

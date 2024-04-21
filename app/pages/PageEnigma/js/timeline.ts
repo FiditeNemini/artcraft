@@ -198,22 +198,22 @@ export class TimeLine {
       ),
     );
 
-    // this.addPlayableClip(
-    //   new ClipUI(
-    //     data.data["version"],
-    //     ClipType.EMOTION,
-    //     ClipGroup.CHARACTER,
-    //     "Test",
-    //     "m_c0g50khzpg99rq8chjn8zgvxcwebc7",
-    //     obj.uuid,
-    //     obj.uuid,
-    //     name,
-    //     0,
-    //     200,
-    //     0
-    //   )
-    // )
-    // this.emotion_engine.loadClip(obj.uuid, "m_c0g50khzpg99rq8chjn8zgvxcwebc7")
+    //this.addPlayableClip(
+    //  new ClipUI(
+    //    data.data["version"],
+    //    ClipType.EMOTION,
+    //    ClipGroup.CHARACTER,
+    //    "Test",
+    //    "m_c0g50khzpg99rq8chjn8zgvxcwebc7",
+    //    obj.uuid,
+    //    obj.uuid,
+    //    name,
+    //    0,
+    //    200,
+    //    0
+    //  )
+    //)
+    //this.emotion_engine.loadClip(obj.uuid, "m_c0g50khzpg99rq8chjn8zgvxcwebc7")
   }
 
   public getPos() {
