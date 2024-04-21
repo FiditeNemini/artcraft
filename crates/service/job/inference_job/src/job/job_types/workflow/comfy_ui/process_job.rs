@@ -626,7 +626,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     info!("Uploading non-watermarked copy...");
 
     let result = args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
-        &result_bucket_object_pathbuf.with_extension("_no_watermark.mp4"),
+        &result_bucket_object_pathbuf.with_extension("no_watermark.mp4"),
         &videos.get_non_watermarked_video_to_upload(),
         &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .await;
