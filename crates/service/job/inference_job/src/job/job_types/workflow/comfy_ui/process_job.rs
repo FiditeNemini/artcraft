@@ -39,7 +39,7 @@ use tokens::tokens::prompts::PromptToken;
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
-use crate::job::job_types::workflow::comfy_ui::job_outputs::JobOutputsStageOne;
+use crate::job::job_types::workflow::comfy_ui::job_outputs::JobOutputs;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
@@ -265,7 +265,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     }
 
     let input_dir = root_comfy_path.join("input");
-    let original_video_input_path = input_dir.join("video.mp4");
 
     if !input_dir.exists() {
         std::fs::create_dir_all(&input_dir)
@@ -273,11 +272,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     }
 
     // Keep track of all the video files we generate
-    let videos = JobOutputsStageOne::new(original_video_input_path);
-
-    // Download Input file if specified
-    //let mut maybe_input_path: Option<PathBuf> = None;
-    //let mut maybe_original_input_path: Option<PathBuf> = None;
+    let mut videos = JobOutputs::new(&root_comfy_path, job_args.output_path);
 
     // TODO(bt,2024-04-20): Clean up this mess.
 
@@ -301,9 +296,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
             info!("Input media file cloud bucket path: {:?}", media_file_bucket_path.get_full_object_path_str());
 
-            //let input_filename = "video.mp4".to_string();
-            //let input_path = path_to_string(input_dir.join(input_filename));
-
             info!("Downloading input file to {:?}", videos.original_video_path);
 
             remote_cloud_file_client.download_media_file(
@@ -312,8 +304,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             ).await?;
 
             info!("Downloaded!");
-
-            //maybe_original_input_path = Some(input_path.parse().unwrap());
 
             // ========================= PROCESS VIDEO ======================== //
 
@@ -356,13 +346,9 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 error!("stderr: {}", String::from_utf8_lossy(&output.stderr));
                 return Err(ProcessSingleJobError::Other(anyhow!("Command failed: {:?}", output.status)));
             }
-
-            //maybe_input_path = Some(input_dir.join("input.mp4"));
         }
         None => {}
     }
-
-    let videos = videos.with_trimmed_resampled_video(input_dir.join("input.mp4"));
 
     // make outputs dir if not exist
     let output_dir = root_comfy_path.join("output");
@@ -407,14 +393,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     }
 
     // ==================== CHECK OUTPUT FILE ======================== //
-
-    // TODO(bt,2024-04-21): We should be responsible for these paths, not relying on the downstream comfy server
-    let mut videos = {
-        let mut comfy_output_video_file = root_comfy_path.join("output");
-        comfy_output_video_file = comfy_output_video_file.join(job_args.output_path);
-
-        videos.add_comfy_output(comfy_output_video_file)
-    };
 
     if let Err(err) = check_file_exists(&videos.comfy_output_video_path) {
         error!("Output file does not  exist: {:?}", err);
