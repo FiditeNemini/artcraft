@@ -39,6 +39,7 @@ use tokens::tokens::prompts::PromptToken;
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
 use crate::job::job_types::workflow::comfy_ui::comfy_ui_inference_command::InferenceArgs;
+use crate::job::job_types::workflow::comfy_ui::job_outputs::JobOutputsStageOne;
 use crate::job::job_types::workflow::comfy_ui::validate_job::validate_job;
 use crate::job_dependencies::JobDependencies;
 use crate::util::common_commands::ffmpeg_audio_replace_args::FfmpegAudioReplaceArgs;
@@ -263,19 +264,25 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         None => {}
     }
 
+    let input_dir = root_comfy_path.join("input");
+    let original_video_input_path = input_dir.join("video.mp4");
+
+    if !input_dir.exists() {
+        std::fs::create_dir_all(&input_dir)
+            .map_err(|err| ProcessSingleJobError::IoError(err))?;
+    }
+
+    // Keep track of all the video files we generate
+    let videos = JobOutputsStageOne::new(original_video_input_path);
+
     // Download Input file if specified
-    let mut maybe_input_path: Option<PathBuf> = None;
-    let mut maybe_original_input_path: Option<PathBuf> = None;
+    //let mut maybe_input_path: Option<PathBuf> = None;
+    //let mut maybe_original_input_path: Option<PathBuf> = None;
+
+    // TODO(bt,2024-04-20): Clean up this mess.
 
     match job_args.maybe_input_file {
         Some(input_media_file_token) => {
-            let input_dir = root_comfy_path.join("input");
-            // make if not exist
-            if !input_dir.exists() {
-                std::fs::create_dir_all(&input_dir)
-                    .map_err(|err| ProcessSingleJobError::IoError(err))?;
-            }
-
             info!("Querying input media file by token: {:?} ...", &input_media_file_token);
 
             let retrieved_input_record =  get_media_file(
@@ -294,14 +301,19 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
             info!("Input media file cloud bucket path: {:?}", media_file_bucket_path.get_full_object_path_str());
 
-            let input_filename = "video.mp4".to_string();
-            let input_path = path_to_string(input_dir.join(input_filename));
+            //let input_filename = "video.mp4".to_string();
+            //let input_path = path_to_string(input_dir.join(input_filename));
 
-            remote_cloud_file_client.download_media_file(&media_file_bucket_path, input_path.clone()).await?;
+            info!("Downloading input file to {:?}", videos.original_video_path);
 
-            info!("Downloaded input file to {:?}", input_path);
+            remote_cloud_file_client.download_media_file(
+                &media_file_bucket_path,
+                path_to_string(&videos.original_video_path)
+            ).await?;
 
-            maybe_original_input_path = Some(input_path.parse().unwrap());
+            info!("Downloaded!");
+
+            //maybe_original_input_path = Some(input_path.parse().unwrap());
 
             // ========================= PROCESS VIDEO ======================== //
 
@@ -319,12 +331,14 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             info!("trim end millis: {trim_end_millis}");
             info!("target FPS: {target_fps}");
 
+            info!("Calling video trim / resample...");
+
             let video_processing_script = model_dependencies.inference_command.processing_script.clone();
 
             // shell out to python script
             let output = Command::new("python3")
                 .arg(video_processing_script)
-                .arg(input_path.clone())
+                .arg(path_to_string(&videos.original_video_path))
                 .arg(format!("{:?}", trim_start_millis))
                 .arg(format!("{:?}", trim_end_millis))
                 .arg(format!("{:?}", target_fps))
@@ -343,10 +357,12 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
                 return Err(ProcessSingleJobError::Other(anyhow!("Command failed: {:?}", output.status)));
             }
 
-            maybe_input_path = Some(input_dir.join("input.mp4"));
+            //maybe_input_path = Some(input_dir.join("input.mp4"));
         }
         None => {}
     }
+
+    let videos = videos.with_trimmed_resampled_video(input_dir.join("input.mp4"));
 
     // make outputs dir if not exist
     let output_dir = root_comfy_path.join("output");
@@ -355,7 +371,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             .map_err(|err| ProcessSingleJobError::IoError(err))?;
     }
 
-    // ==================== SETUP FOR INFERENCE ==================== //
+    // ==================== RUN INFERENCE SCRIPT ==================== //
 
     info!("Ready for ComfyUI inference...");
 
@@ -363,8 +379,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
     info!("Running ComfyUI inference...");
-
-    // ==================== RUN INFERENCE SCRIPT ==================== //
 
     let stderr_output_file = work_temp_dir.path().join("stderr.txt");
     let stdout_output_file = work_temp_dir.path().join("stdout.txt");
@@ -394,10 +408,15 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // ==================== CHECK OUTPUT FILE ======================== //
 
-    let mut comfy_output_video_file = root_comfy_path.join("output");
-    comfy_output_video_file = comfy_output_video_file.join(job_args.output_path);
+    // TODO(bt,2024-04-21): We should be responsible for these paths, not relying on the downstream comfy server
+    let mut videos = {
+        let mut comfy_output_video_file = root_comfy_path.join("output");
+        comfy_output_video_file = comfy_output_video_file.join(job_args.output_path);
 
-    if let Err(err) = check_file_exists(&comfy_output_video_file) {
+        videos.add_comfy_output(comfy_output_video_file)
+    };
+
+    if let Err(err) = check_file_exists(&videos.comfy_output_video_path) {
         error!("Output file does not  exist: {:?}", err);
 
         error!("Inference failed: {:?}", command_exit_status);
@@ -411,39 +430,76 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         safe_delete_temp_directory(&work_temp_dir);
         safe_delete_temp_file(&workflow_path);
 
+        // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
         if let Some(lora_path) = maybe_lora_path {
             safe_delete_temp_file(&lora_path);
         }
-        if let Some(input_path) = maybe_input_path {
-            safe_delete_temp_file(&input_path);
-        }
-        if let Some(original_input_path) = maybe_original_input_path {
-            safe_delete_temp_file(&original_input_path);
-        }
+
+        safe_delete_temp_file(&videos.trimmed_resampled_video_path);
+        safe_delete_temp_file(&videos.original_video_path);
 
         let output_dir = root_comfy_path.join("output");
         recursively_delete_files_in(&output_dir).unwrap();
 
         return Err(ProcessSingleJobError::Other(anyhow!("Output file did not exist: {:?}",
-            &comfy_output_video_file)));
+            &videos.comfy_output_video_path)));
+    }
+
+    // ==================== COPY BACK AUDIO ==================== //
+
+    const RESTORE_AUDIO : bool = true;
+
+    if RESTORE_AUDIO {
+        info!("Restoring audio...");
+
+        let output_video_fs_path_restored = videos.comfy_output_video_path.with_extension("_restored.mp4");
+
+        let command_exit_status = model_dependencies
+            .ffmpeg_command_runner
+            .run_with_subprocess(RunAsSubprocessArgs {
+                args: Box::new(&FfmpegAudioReplaceArgs {
+                    input_video_file: &videos.comfy_output_video_path,
+                    input_audio_file: &videos.trimmed_resampled_video_path,
+                    output_video_file: &output_video_fs_path_restored,
+                }),
+                maybe_stderr_output_file: None,
+                maybe_stdout_output_file: None,
+            });
+
+        let mut use_restored_audio = true;
+
+        // NB: Don't fail the entire command if audio restoration fails
+        if let Err(err) = check_file_exists(&output_video_fs_path_restored) {
+            use_restored_audio = false;
+            error!("Audio copy failed: {:?}", err);
+        }
+
+        if !command_exit_status.is_success() {
+            use_restored_audio = false;
+            error!("Audio copy failed: {:?} ; we'll save the non-audio copy.", command_exit_status);
+        }
+
+        if use_restored_audio {
+            info!("Success generating restored audio file: {:?}", output_video_fs_path_restored);
+            videos.audio_restored_video_path = Some(output_video_fs_path_restored);
+        }
     }
 
     // ==================== OPTIONAL WATERMARK ==================== //
 
-    let mut final_finished_video_file = comfy_output_video_file.clone();
-
     // TODO(bt, 2024-03-01): Interrogate account for premium
+    // TODO(bt, 2024-04-21): Combine this ffmpeg processing with the previous step
     const REMOVE_WATERMARK : bool = false;
 
     if !REMOVE_WATERMARK {
         info!("Adding watermark...");
 
-        let output_video_fs_path_watermark = comfy_output_video_file.with_extension("_watermark.mp4");
+        let output_video_fs_path_watermark = videos.comfy_output_video_path.with_extension("_watermark.mp4");
 
         let command_exit_status = model_dependencies
             .ffmpeg_watermark_command
             .execute_inference(WatermarkArgs {
-                video_path: &comfy_output_video_file,
+                video_path: videos.video_to_watermark(),
                 maybe_override_logo_path: None,
                 alpha: 0.6,
                 scale: 0.1, // NB: 0.1 is good for the Storyteller logo @ 2653x512 placed on 1024x576 output.
@@ -464,68 +520,24 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
 
         if use_watermarked_file {
-            info!("Using watermark file: {:?}", output_video_fs_path_watermark);
-            final_finished_video_file = output_video_fs_path_watermark;
+            info!("Success generating watermarked file: {:?}", output_video_fs_path_watermark);
+            videos.watermarked_video_path = Some(output_video_fs_path_watermark);
         }
     }
 
-    // ==================== COPY BACK AUDIO ==================== //
-
-    // We need to reference either the watermarked or original comfy video
-    // maybe maybe_input_path
-    let original_video_with_possible_audio = maybe_original_input_path.clone()
-        .expect("this should exist");
-    let current_processed_video= final_finished_video_file.clone();
-
-    // TODO(bt, 2024-03-01): Interrogate account for premium
-    const RESTORE_AUDIO : bool = true;
-
-    if RESTORE_AUDIO {
-        info!("Restoring audio...");
-
-        let output_video_fs_path_restored = comfy_output_video_file.with_extension("_restored.mp4");
-
-        let command_exit_status = model_dependencies
-            .ffmpeg_command_runner
-            .run_with_subprocess(RunAsSubprocessArgs {
-                args: Box::new(&FfmpegAudioReplaceArgs {
-                    input_video_file: &current_processed_video,
-                    input_audio_file: &original_video_with_possible_audio,
-                    output_video_file: &output_video_fs_path_restored,
-                }),
-                maybe_stderr_output_file: None,
-                maybe_stdout_output_file: None,
-            });
-
-        let mut use_restored_audio = true;
-
-        // NB: Don't fail the entire command if watermarking fails.
-        if let Err(err) = check_file_exists(&output_video_fs_path_restored) {
-            use_restored_audio = false;
-            error!("Audio copy failed: {:?}", err);
-        }
-
-        if !command_exit_status.is_success() {
-            use_restored_audio = false;
-            error!("Audio copy failed: {:?} ; we'll save the non-audio copy.", command_exit_status);
-        }
-
-        if use_restored_audio {
-            info!("Using restored audio file: {:?}", output_video_fs_path_restored);
-            final_finished_video_file = output_video_fs_path_restored;
-        }
-    }
 
     // ==================== GET METADATA ==================== //
 
     info!("Interrogating result file size ...");
 
-    let file_size_bytes = file_size(&final_finished_video_file)
+    let final_video = videos.get_final_video_to_upload();
+
+    let file_size_bytes = file_size(final_video)
         .map_err(|err| ProcessSingleJobError::Other(err))?;
 
     info!("Interrogating result mimetype ...");
 
-    let mimetype = get_mimetype_for_file(&final_finished_video_file)
+    let mimetype = get_mimetype_for_file(final_video)
         .map_err(|err| ProcessSingleJobError::from_io_error(err))?
         .map(|mime| mime.to_string())
         .ok_or(ProcessSingleJobError::Other(anyhow!("Mimetype could not be determined")))?;
@@ -552,7 +564,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     info!("Calculating sha256...");
 
-    let file_checksum = sha256_hash_file(&final_finished_video_file)
+    let file_checksum = sha256_hash_file(final_video)
         .map_err(|err| {
             ProcessSingleJobError::Other(anyhow!("Error hashing file: {:?}", err))
         })?;
@@ -574,7 +586,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
         &result_bucket_object_pathbuf,
-        &final_finished_video_file,
+        &final_video,
         &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
         .await
         .map_err(|e| ProcessSingleJobError::Other(e))?;
@@ -584,6 +596,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         "video/mp4" => vec!["image/gif", "image/jpeg"],
         _ => vec![],
     };
+
+    info!("Generating thumbnail tasks...");
 
     for output_type in thumbnail_types {
         let thumbnail_task_result = ThumbnailTaskBuilder::new()
@@ -607,25 +621,37 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         }
     }
 
+    // Also upload the non-watermarked copy
+    info!("Uploading non-watermarked copy...");
+
+    let result = args.job_dependencies.buckets.public_bucket_client.upload_filename_with_content_type(
+        &result_bucket_object_pathbuf.with_extension("_no_watermark.mp4"),
+        &videos.get_non_watermarked_video_to_upload(),
+        &mimetype) // TODO: We should check the mimetype to make sure bad payloads can't get uploaded
+        .await;
+
+    if let Err(err) = result {
+        error!("Failed to upload non-watermarked copy: {:?}", err);
+    }
+
     // ==================== CLEANUP/ DELETE TEMP FILES ==================== //
 
     safe_delete_temp_file(&stderr_output_file);
     safe_delete_temp_file(&stdout_output_file);
-    safe_delete_temp_file(&final_finished_video_file);
-    safe_delete_temp_file(&comfy_output_video_file);
+    safe_delete_temp_file(&videos.original_video_path);
+    safe_delete_temp_file(&videos.trimmed_resampled_video_path);
+    safe_delete_temp_file(&videos.comfy_output_video_path);
+    safe_delete_temp_file(videos.video_to_watermark());
+    safe_delete_temp_file(videos.get_final_video_to_upload());
+    safe_delete_temp_file(videos.get_non_watermarked_video_to_upload());
 
     // TODO(bt,2024-03-01): Do we really want to delete the workflow, models, etc.?
 
     safe_delete_temp_file(&workflow_path);
 
+    // TODO(bt,2024-04-21): Not sure we want to delete the LoRA?
     if let Some(lora_path) = maybe_lora_path {
         safe_delete_temp_file(&lora_path);
-    }
-    if let Some(input_path) = maybe_input_path {
-        safe_delete_temp_file(&input_path);
-    }
-    if let Some(original_input_path) = maybe_original_input_path {
-        safe_delete_temp_file(&original_input_path);
     }
 
     let output_dir = root_comfy_path.join("output");
