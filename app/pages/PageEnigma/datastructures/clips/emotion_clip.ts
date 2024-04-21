@@ -1,6 +1,10 @@
 import * as THREE from "three";
 
-export class EmotionClip  {
+interface CsvJson {
+  [key: string]: string[];
+}
+
+export class EmotionClip {
   version: number;
   media_id: string;
   type: "emotion" = "emotion";
@@ -12,7 +16,7 @@ export class EmotionClip  {
     this.media_id = media_id;
     this.type = "emotion";
     this.faces = [];
-    this.download_json().then(data => {
+    this.download_csv().then(data => {
       this.emotion_json = data;
     });
   }
@@ -34,6 +38,29 @@ export class EmotionClip  {
     const response = await fetch(url);
     return await response.json();
   }
+
+  async download_csv(): Promise<CsvJson> {
+    let url = await this.get_media_url();
+    const response = await fetch(url);
+    const csvText = await response.text();
+
+    // Parsing the CSV text
+    const rows = csvText.trim().split('\n');
+    const header = rows[0].split(',');
+    const jsonData: CsvJson = {};
+
+    header.forEach(key => jsonData[key] = []);
+
+    for (let i = 1; i < rows.length; i++) {
+        const values = rows[i].split(',');
+        values.forEach((value, index) => {
+            jsonData[header[index]].push(value);
+        });
+    }
+
+    return jsonData;
+}
+
 
   async _detect_face(object: THREE.Object3D): Promise<THREE.Mesh> {
     this.faces = [];
@@ -64,11 +91,17 @@ export class EmotionClip  {
       }
     });
   }
-  
+
+  async reset(object: THREE.Object3D) {
+    await this._detect_face(object);
+    // setBlends()
+    console.log(this.emotion_json);
+  }
 
   async step(frame: number, object: THREE.Object3D) {
     await this._detect_face(object);
     // setBlends()
+    console.log(this.emotion_json);
   }
 
   toJSON(): any {
