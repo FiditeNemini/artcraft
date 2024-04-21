@@ -546,13 +546,14 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
     let ext = get_file_extension(mimetype.as_str())
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
-    // create prefix from mimetype
-    let prefix = match mimetype.as_str() {
-        "video/mp4" => "video",
-        "image/png" => "image",
-        "image/jpeg" => "image",
-        _ => return Err(ProcessSingleJobError::Other(anyhow!("Mimetype not supported: {}", mimetype))),
+    // Extension is really a "suffix" and should have the leading period to act as an extension.
+    let ext = if ext.starts_with(".") {
+        ext.to_string()
+    } else {
+        format!(".{ext}")
     };
+
+    const PREFIX: &str = "storyteller_";
 
     // determine media type from mime type
     let media_type = match mimetype.as_str() {
@@ -575,8 +576,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         .map_err(|e| ProcessSingleJobError::Other(e))?;
 
     let result_bucket_location = MediaFileBucketPath::generate_new(
-        Some(prefix),
-        Some(ext));
+        Some(PREFIX),
+        Some(&ext));
 
     let result_bucket_object_pathbuf = result_bucket_location.to_full_object_pathbuf();
 
@@ -678,8 +679,8 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         sha256_checksum: &file_checksum,
         maybe_prompt_token: Some(&prompt_token),
         public_bucket_directory_hash: result_bucket_location.get_object_hash(),
-        maybe_public_bucket_prefix: Some(prefix),
-        maybe_public_bucket_extension: Some(ext),
+        maybe_public_bucket_prefix: Some(PREFIX),
+        maybe_public_bucket_extension: Some(&ext),
         is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
         worker_hostname: &args.job_dependencies.job.info.container.hostname,
         worker_cluster: &args.job_dependencies.job.info.container.cluster_name,

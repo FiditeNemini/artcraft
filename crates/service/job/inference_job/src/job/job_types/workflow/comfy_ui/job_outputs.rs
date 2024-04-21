@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+// TODO(bt,2024-04-21): This doesn't need to be a state machine. We can generate the paths we need upfront.
 pub struct JobOutputsStageOne {
   /// Filesystem path of the downloaded original video
   pub original_video_path: PathBuf,
