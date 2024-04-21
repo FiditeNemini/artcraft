@@ -34,6 +34,7 @@ use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use mysql_queries::queries::prompts::insert_prompt::{insert_prompt, InsertPromptArgs};
 use subprocess_common::command_runner::command_runner_args::RunAsSubprocessArgs;
 use thumbnail_generator::task_client::thumbnail_task::ThumbnailTaskBuilder;
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::prompts::PromptToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
@@ -276,78 +277,80 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     // TODO(bt,2024-04-20): Clean up this mess.
 
-    match job_args.maybe_input_file {
-        Some(input_media_file_token) => {
-            info!("Querying input media file by token: {:?} ...", &input_media_file_token);
+    // ==================== DOWNLOAD VIDEO ==================== //
 
-            let retrieved_input_record =  get_media_file(
-                input_media_file_token,
-                false,
-                &deps.db.mysql_pool
-            ).await?.ok_or_else(|| {
-                error!("input media_file not found: {:?}", &input_media_file_token);
-                ProcessSingleJobError::Other(anyhow!("input media_file not found: {:?}", input_media_file_token))
-            })?;
+    let input_media_file_token = match job_args.maybe_input_file {
+        None => return Err(ProcessSingleJobError::InvalidJob(anyhow!("No input video file provided"))),
+        Some(token) => token.clone(),
+    };
 
-            let media_file_bucket_path = MediaFileBucketPath::from_object_hash(
-                &retrieved_input_record.public_bucket_directory_hash,
-                retrieved_input_record.maybe_public_bucket_prefix.as_deref(),
-                retrieved_input_record.maybe_public_bucket_extension.as_deref());
+    info!("Querying input media file by token: {:?} ...", &input_media_file_token);
 
-            info!("Input media file cloud bucket path: {:?}", media_file_bucket_path.get_full_object_path_str());
+    let retrieved_input_record =  get_media_file(
+        &input_media_file_token,
+        false,
+        &deps.db.mysql_pool
+    ).await?.ok_or_else(|| {
+        error!("input media_file not found: {:?}", &input_media_file_token);
+        ProcessSingleJobError::Other(anyhow!("input media_file not found: {:?}", &input_media_file_token))
+    })?;
 
-            info!("Downloading input file to {:?}", videos.original_video_path);
+    let media_file_bucket_path = MediaFileBucketPath::from_object_hash(
+        &retrieved_input_record.public_bucket_directory_hash,
+        retrieved_input_record.maybe_public_bucket_prefix.as_deref(),
+        retrieved_input_record.maybe_public_bucket_extension.as_deref());
 
-            remote_cloud_file_client.download_media_file(
-                &media_file_bucket_path,
-                path_to_string(&videos.original_video_path)
-            ).await?;
+    info!("Input media file cloud bucket path: {:?}", media_file_bucket_path.get_full_object_path_str());
 
-            info!("Downloaded!");
+    info!("Downloading input file to {:?}", videos.original_video_path);
 
-            // ========================= PROCESS VIDEO ======================== //
+    remote_cloud_file_client.download_media_file(
+        &media_file_bucket_path,
+        path_to_string(&videos.original_video_path)
+    ).await?;
 
-            let target_fps = comfy_args.target_fps.unwrap_or(24);
+    info!("Downloaded video!");
 
-            let trim_start_millis = comfy_args.trim_start_milliseconds
-                .or_else(|| comfy_args.trim_start_seconds.map(|s| s as u64 * 1_000))
-                .unwrap_or(0);
+    // ========================= PROCESS VIDEO ======================== //
 
-            let trim_end_millis = comfy_args.trim_end_milliseconds
-                .or_else(|| comfy_args.trim_end_seconds.map(|s| s as u64 * 1_000))
-                .unwrap_or(3_000);
+    let target_fps = comfy_args.target_fps.unwrap_or(24);
 
-            info!("trim start millis: {trim_start_millis}");
-            info!("trim end millis: {trim_end_millis}");
-            info!("target FPS: {target_fps}");
+    let trim_start_millis = comfy_args.trim_start_milliseconds
+        .or_else(|| comfy_args.trim_start_seconds.map(|s| s as u64 * 1_000))
+        .unwrap_or(0);
 
-            info!("Calling video trim / resample...");
+    let trim_end_millis = comfy_args.trim_end_milliseconds
+        .or_else(|| comfy_args.trim_end_seconds.map(|s| s as u64 * 1_000))
+        .unwrap_or(3_000);
 
-            let video_processing_script = model_dependencies.inference_command.processing_script.clone();
+    info!("trim start millis: {trim_start_millis}");
+    info!("trim end millis: {trim_end_millis}");
+    info!("target FPS: {target_fps}");
 
-            // shell out to python script
-            let output = Command::new("python3")
-                .arg(video_processing_script)
-                .arg(path_to_string(&videos.original_video_path))
-                .arg(format!("{:?}", trim_start_millis))
-                .arg(format!("{:?}", trim_end_millis))
-                .arg(format!("{:?}", target_fps))
-                .output()
-                .map_err(|e| {
-                    error!("Error running inference: {:?}", e);
-                    ProcessSingleJobError::Other(e.into())
-                })?;
+    info!("Calling video trim / resample...");
 
-            // check if the command was successful
-            if !output.status.success() {
-                // print stdout and stderr
-                error!("Video processing failed: {:?}", output.status);
-                error!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-                error!("stderr: {}", String::from_utf8_lossy(&output.stderr));
-                return Err(ProcessSingleJobError::Other(anyhow!("Command failed: {:?}", output.status)));
-            }
-        }
-        None => {}
+    let video_processing_script = model_dependencies.inference_command.processing_script.clone();
+
+    // shell out to python script
+    let output = Command::new("python3")
+        .arg(video_processing_script)
+        .arg(path_to_string(&videos.original_video_path))
+        .arg(format!("{:?}", trim_start_millis))
+        .arg(format!("{:?}", trim_end_millis))
+        .arg(format!("{:?}", target_fps))
+        .output()
+        .map_err(|e| {
+            error!("Error running inference: {:?}", e);
+            ProcessSingleJobError::Other(e.into())
+        })?;
+
+    // check if the command was successful
+    if !output.status.success() {
+        // print stdout and stderr
+        error!("Video processing failed: {:?}", output.status);
+        error!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+        error!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+        return Err(ProcessSingleJobError::Other(anyhow!("Command failed: {:?}", output.status)));
     }
 
     // make outputs dir if not exist
@@ -357,7 +360,7 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
             .map_err(|err| ProcessSingleJobError::IoError(err))?;
     }
 
-    // ==================== RUN INFERENCE SCRIPT ==================== //
+    // ==================== RUN COMFY INFERENCE ==================== //
 
     info!("Ready for ComfyUI inference...");
 
