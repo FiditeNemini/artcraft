@@ -13,8 +13,11 @@ import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
+
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
+import EmotionEngine from "./emotion_engine";
+
 import { TimeLine } from "./timeline.js";
 import { ClipUI } from "../datastructures/clips/clip_ui.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
@@ -77,6 +80,7 @@ class Editor {
   max_length: number;
   audio_engine: AudioEngine;
   transform_engine: TransformEngine;
+  emotion_engine: EmotionEngine;
   lipsync_engine: LipSyncEngine;
   animation_engine: AnimationEngine;
   timeline: TimeLine;
@@ -107,9 +111,6 @@ class Editor {
   record_stream: any | undefined;
   recorder: MediaRecorder | undefined;
   // Default params.
-
-  // scene proxy for serialization
-  storyteller_proxy_scene: StoryTellerProxyScene;
 
   constructor() {
     console.log(
@@ -188,6 +189,7 @@ class Editor {
     this.canvasRenderCamReference;
 
     this.audio_engine = new AudioEngine();
+    this.emotion_engine = new EmotionEngine(this.version);
     this.transform_engine = new TransformEngine(this.version);
     this.lipsync_engine = new LipSyncEngine();
     this.animation_engine = new AnimationEngine(this.version);
@@ -198,6 +200,7 @@ class Editor {
       this.transform_engine,
       this.lipsync_engine,
       this.animation_engine,
+      this.emotion_engine,
       this.activeScene,
       this.camera,
       this.mouse,
@@ -217,11 +220,6 @@ class Editor {
       "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.";
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
-
-    this.storyteller_proxy_scene = new StoryTellerProxyScene(
-      this.version,
-      this.activeScene.scene,
-    );
   }
 
   isEmpty(value: string) {
@@ -230,7 +228,7 @@ class Editor {
     );
   }
 
-  initialize(config: any, sceneToken) {
+  initialize(config: any, sceneToken: any) {
     //setup reactland Callbacks
     this.dispatchAppUiState = config.dispatchAppUiState;
 
@@ -251,6 +249,8 @@ class Editor {
 
     // Find the container element
     const container = document.getElementById("video-scene-container");
+
+    if(container == null) { return; }
 
     // Use the container's dimensions
     const width = container.offsetWidth;
@@ -451,6 +451,7 @@ class Editor {
       this.animation_engine,
       this.audio_engine,
       this.lipsync_engine,
+      this.emotion_engine,
     );
     await proxyTimeline.loadFromJson(scene_json["timeline"]);
 
@@ -497,6 +498,7 @@ class Editor {
       this.animation_engine,
       this.audio_engine,
       this.lipsync_engine,
+      this.emotion_engine,
     );
     const timeline_json = await proxyTimeline.saveToJson();
 

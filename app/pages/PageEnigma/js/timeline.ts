@@ -16,6 +16,7 @@ import { fromEngineActions } from "../Queue/fromEngineActions";
 import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 import { MediaItem } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/js/editor";
+import EmotionEngine from "./emotion_engine";
 
 // Every object uuid / entity has a track.
 export class TimelineDataState {
@@ -47,6 +48,10 @@ export class TimeLine {
   animation_engine: AnimationEngine;
   // lip sync engine
   lipSync_engine: LipSyncEngine;
+  // emotion engine
+  emotion_engine: EmotionEngine;
+
+  // characters
   characters: { [key: string]: ClipGroup };
 
   scene: Scene;
@@ -62,6 +67,7 @@ export class TimeLine {
     transform_engine: TransformEngine,
     lipsync_engine: LipSyncEngine,
     animation_engine: AnimationEngine,
+    emotion_engine: EmotionEngine,
     scene: Scene,
     camera: THREE.Camera,
     mouse: THREE.Vector2 | undefined
@@ -82,6 +88,7 @@ export class TimeLine {
     this.transform_engine = transform_engine;
     this.lipSync_engine = lipsync_engine;
     this.animation_engine = animation_engine;
+    this.emotion_engine = emotion_engine;
 
     this.scene = scene;
 
@@ -190,6 +197,23 @@ export class TimeLine {
         0,
       ),
     );
+
+    //this.addPlayableClip(
+    //  new ClipUI(
+    //    data.data["version"],
+    //    ClipType.EMOTION,
+    //    ClipGroup.CHARACTER,
+    //    "Test",
+    //    "m_c0g50khzpg99rq8chjn8zgvxcwebc7",
+    //    obj.uuid,
+    //    obj.uuid,
+    //    name,
+    //    0,
+    //    200,
+    //    0
+    //  )
+    //)
+    //this.emotion_engine.loadClip(obj.uuid, "m_c0g50khzpg99rq8chjn8zgvxcwebc7")
   }
 
   public getPos() {
@@ -301,6 +325,9 @@ export class TimeLine {
       case "transform":
         this.transform_engine.loadObject(object_uuid, data["data"]["length"]);
         break;
+      case "emotion":
+        this.emotion_engine.loadClip(object_uuid, media_id);
+        break;
       case "audio":
         if (group === "character") {
           this.lipSync_engine.load_object(object_uuid, media_id);
@@ -364,9 +391,9 @@ export class TimeLine {
       keyframe_offset,
     );
     this.transform_engine.clips[object_uuid].setTransform(
-      keyframe_uuid, 
-      keyframe_pos, 
-      keyframe_rot, 
+      keyframe_uuid,
+      keyframe_pos,
+      keyframe_rot,
       keyframe_scl,
     );
   }
@@ -497,7 +524,13 @@ export class TimeLine {
         this.lipSync_engine.clips[
           element.object_uuid + element.media_id
         ].reset();
-      }
+      } else if (element.type === ClipType.EMOTION) {
+        const object = this.scene.get_object_by_uuid(element.object_uuid);
+        if(object)
+        this.emotion_engine.clips[
+          element.object_uuid + element.media_id
+        ].reset(object);
+      } 
     }
   }
 
@@ -587,6 +620,12 @@ export class TimeLine {
             this.animation_engine.clips[object.uuid + element.media_id].step(
               this.scrubber_frame_position / fps, // Double FPS for best result.
             );
+          }
+        } else if (element.type === ClipType.EMOTION) {
+          if (object) {
+            await this.emotion_engine.clips[
+              object.uuid + element.media_id
+            ].step(this.scrubber_frame_position-element.offset, object);
           }
         }
         //this.timelineItems = this.timelineItems.filter(item => item !== element)
