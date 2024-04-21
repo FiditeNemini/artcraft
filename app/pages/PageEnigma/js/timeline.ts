@@ -16,6 +16,7 @@ import { fromEngineActions } from "../Queue/fromEngineActions";
 import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 import { MediaItem } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/js/editor";
+import EmotionEngine from "./emotion_engine";
 
 // Every object uuid / entity has a track.
 export class TimelineDataState {
@@ -47,6 +48,10 @@ export class TimeLine {
   animation_engine: AnimationEngine;
   // lip sync engine
   lipSync_engine: LipSyncEngine;
+  // emotion engine
+  emotion_engine: EmotionEngine;
+
+  // characters
   characters: { [key: string]: ClipGroup };
 
   scene: Scene;
@@ -62,6 +67,7 @@ export class TimeLine {
     transform_engine: TransformEngine,
     lipsync_engine: LipSyncEngine,
     animation_engine: AnimationEngine,
+    emotion_engine: EmotionEngine,
     scene: Scene,
     camera: THREE.Camera,
     mouse: THREE.Vector2 | undefined
@@ -82,6 +88,7 @@ export class TimeLine {
     this.transform_engine = transform_engine;
     this.lipSync_engine = lipsync_engine;
     this.animation_engine = animation_engine;
+    this.emotion_engine = emotion_engine;
 
     this.scene = scene;
 
@@ -364,9 +371,9 @@ export class TimeLine {
       keyframe_offset,
     );
     this.transform_engine.clips[object_uuid].setTransform(
-      keyframe_uuid, 
-      keyframe_pos, 
-      keyframe_rot, 
+      keyframe_uuid,
+      keyframe_pos,
+      keyframe_rot,
       keyframe_scl,
     );
   }
@@ -587,6 +594,12 @@ export class TimeLine {
             this.animation_engine.clips[object.uuid + element.media_id].step(
               this.scrubber_frame_position / fps, // Double FPS for best result.
             );
+          }
+        } else if (element.type === ClipType.EMOTION) {
+          if (object) {
+            await this.emotion_engine.clips[
+              object.uuid + element.media_id
+            ].step(this.scrubber_frame_position-element.offset, object);
           }
         }
         //this.timelineItems = this.timelineItems.filter(item => item !== element)

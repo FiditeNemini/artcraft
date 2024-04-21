@@ -1,4 +1,3 @@
-import { faL } from "@fortawesome/pro-solid-svg-icons";
 import { AudioClip } from "../datastructures/clips/audio_clip";
 
 class AudioEngine {
