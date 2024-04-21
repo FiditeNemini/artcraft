@@ -197,6 +197,23 @@ export class TimeLine {
         0,
       ),
     );
+
+    this.addPlayableClip(
+      new ClipUI(
+        data.data["version"],
+        ClipType.EMOTION,
+        ClipGroup.CHARACTER,
+        "Test",
+        "m_c0g50khzpg99rq8chjn8zgvxcwebc7",
+        obj.uuid,
+        obj.uuid,
+        name,
+        0,
+        200,
+        0
+      )
+    )
+    this.emotion_engine.loadClip(obj.uuid, "m_c0g50khzpg99rq8chjn8zgvxcwebc7")
   }
 
   public getPos() {
@@ -504,7 +521,13 @@ export class TimeLine {
         this.lipSync_engine.clips[
           element.object_uuid + element.media_id
         ].reset();
-      }
+      } else if (element.type === ClipType.EMOTION) {
+        const object = this.scene.get_object_by_uuid(element.object_uuid);
+        if(object)
+        this.emotion_engine.clips[
+          element.object_uuid + element.media_id
+        ].reset(object);
+      } 
     }
   }
 

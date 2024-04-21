@@ -52,14 +52,14 @@ export class EmotionClip {
     header.forEach(key => jsonData[key] = []);
 
     for (let i = 1; i < rows.length; i++) {
-        const values = rows[i].split(',');
-        values.forEach((value, index) => {
-            jsonData[header[index]].push(value);
-        });
+      const values = rows[i].split(',');
+      values.forEach((value, index) => {
+        jsonData[header[index]].push(value);
+      });
     }
 
     return jsonData;
-}
+  }
 
 
   async _detect_face(object: THREE.Object3D): Promise<THREE.Mesh> {
@@ -83,7 +83,8 @@ export class EmotionClip {
     this.faces.forEach((element: THREE.Mesh) => {
       if (element.morphTargetInfluences && shapes) {
         Object.keys(shapes).forEach(key => {
-          const index = element.morphTargetDictionary?.[key];
+          let index = element.morphTargetDictionary?.[key];
+          if (index === undefined) { index = element.morphTargetDictionary?.[key.charAt(0).toLowerCase() + key.slice(1)]; }
           if (typeof index === 'number' && element.morphTargetInfluences !== undefined) {
             element.morphTargetInfluences[index] = shapes[key];
           }
@@ -94,14 +95,21 @@ export class EmotionClip {
 
   async reset(object: THREE.Object3D) {
     await this._detect_face(object);
-    // setBlends()
-    console.log(this.emotion_json);
+    let keys: { [key: string]: number } = {};
+    Object.keys(this.emotion_json).forEach(key => {
+      keys[key] = 0;
+    });
+    this.setBlends(keys);
   }
 
   async step(frame: number, object: THREE.Object3D) {
-    await this._detect_face(object);
-    // setBlends()
-    console.log(this.emotion_json);
+    if(this.faces.length  <= 0) { await this._detect_face(object); }
+    let keys: { [key: string]: number } = {};
+    Object.keys(this.emotion_json).forEach(key => {
+      if (frame > this.emotion_json[key].length) { return; }
+      keys[key] = this.emotion_json[key][frame];
+    });
+    this.setBlends(keys);
   }
 
   toJSON(): any {

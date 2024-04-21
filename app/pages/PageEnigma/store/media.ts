@@ -539,7 +539,7 @@ export const characterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Pop",
     thumbnail: "/resources/placeholders/placeholder.png",
-  },
+  }
 ]);
 
 export const objectItems = signal<MediaItem[]>([
