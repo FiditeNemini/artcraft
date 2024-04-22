@@ -154,7 +154,6 @@ export class TimeLine {
         await this.editorEngine.switchPreview();
         break;
       case toEngineActions.ENTER_EDIT_STATE:
-        console.log("edit");
         this.editorEngine.switchEdit();
         break;
       case toEngineActions.TOGGLE_CAMERA_STATE:
