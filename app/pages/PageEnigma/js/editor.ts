@@ -205,7 +205,6 @@ class Editor {
       this.activeScene,
       this.camera,
       this.mouse,
-      this.mouse,
     );
 
     this.current_frame = 0;
@@ -388,18 +387,15 @@ class Editor {
     }
 
     document.addEventListener("mouseover", (event) => {
-    document.addEventListener("mouseover", (event) => {
       if (this.orbitControls && this.cameraViewControls) {
         if (event.target instanceof HTMLCanvasElement) {
           if (this.camera_person_mode) {
             this.orbitControls.enabled = false;
             this.cameraViewControls.enabled = true;
           } else {
-          } else {
             this.orbitControls.enabled = true;
             this.cameraViewControls.enabled = false;
           }
-        } else {
         } else {
           this.orbitControls.enabled = false;
           this.cameraViewControls.enabled = false;
@@ -414,6 +410,7 @@ class Editor {
     };
     loadingBarIsShowing.value = false;
   }
+  
 
   // Token comes in from the front end to load the scene from the site.
   public async testBatchRequest() {
@@ -783,7 +780,6 @@ class Editor {
       this.render_timer += this.clock.getDelta();
       this.frames += 1;
       this.playback_location++;
-      const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // Medium quality png for speed & size.
       const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // Medium quality png for speed & size.
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
