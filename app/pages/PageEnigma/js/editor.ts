@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { FreeCam } from "./free_cam";
-import { TransformControls } from "three/addons/controls/TransformControls.js";
+import { TransformControls } from "./TransformControls.js";
 import Scene from "./scene.js";
 import { APIManager, ArtStyle, Visibility } from "./api_manager.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
@@ -13,8 +13,11 @@ import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
+
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
+import EmotionEngine from "./emotion_engine";
+
 import { TimeLine } from "./timeline.js";
 import { ClipUI } from "../datastructures/clips/clip_ui.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
@@ -77,12 +80,14 @@ class Editor {
   max_length: number;
   audio_engine: AudioEngine;
   transform_engine: TransformEngine;
+  emotion_engine: EmotionEngine;
   lipsync_engine: LipSyncEngine;
   animation_engine: AnimationEngine;
   timeline: TimeLine;
   current_frame: number;
   lockControls: PointerLockControls | undefined;
   cam_obj: THREE.Object3D | undefined;
+  camera_last_pos: THREE.Vector3;
   renderPass: RenderPass | undefined;
   generating_preview: boolean;
   frames: number;
@@ -106,9 +111,6 @@ class Editor {
   record_stream: any | undefined;
   recorder: MediaRecorder | undefined;
   // Default params.
-
-  // scene proxy for serialization
-  storyteller_proxy_scene: StoryTellerProxyScene;
 
   constructor() {
     console.log(
@@ -142,6 +144,7 @@ class Editor {
     this.outlinePass;
     this.last_cam_pos = new THREE.Vector3(0, 0, 0);
     this.last_cam_rot = new THREE.Euler(0, 0, 0);
+    this.camera_last_pos = new THREE.Vector3(0, 0, 0);
     this.lockControls;
     this.saoPass;
     this.outputPass;
@@ -186,6 +189,7 @@ class Editor {
     this.canvasRenderCamReference;
 
     this.audio_engine = new AudioEngine();
+    this.emotion_engine = new EmotionEngine(this.version);
     this.transform_engine = new TransformEngine(this.version);
     this.lipsync_engine = new LipSyncEngine();
     this.animation_engine = new AnimationEngine(this.version);
@@ -196,9 +200,10 @@ class Editor {
       this.transform_engine,
       this.lipsync_engine,
       this.animation_engine,
+      this.emotion_engine,
       this.activeScene,
       this.camera,
-      this.mouse
+      this.mouse,
     );
 
     this.current_frame = 0;
@@ -215,11 +220,6 @@ class Editor {
       "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.";
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
-
-    this.storyteller_proxy_scene = new StoryTellerProxyScene(
-      this.version,
-      this.activeScene.scene,
-    );
   }
 
   isEmpty(value: string) {
@@ -228,7 +228,7 @@ class Editor {
     );
   }
 
-  initialize(config: any, sceneToken) {
+  initialize(config: any, sceneToken: any) {
     //setup reactland Callbacks
     this.dispatchAppUiState = config.dispatchAppUiState;
 
@@ -247,9 +247,15 @@ class Editor {
     this.canvReference = document.getElementById("video-scene");
     this.canvasRenderCamReference = document.getElementById("camera-view");
 
-    // Base width and height.
-    const width = this.canvReference.width;
-    const height = this.canvReference.height;
+    // Find the container element
+    const container = document.getElementById("video-scene-container");
+
+    if(container == null) { return; }
+
+    // Use the container's dimensions
+    const width = container.offsetWidth;
+    const height = container.offsetHeight;
+
     // Sets up camera and base position.
     this.camera = new THREE.PerspectiveCamera(70, width / height, 0.15, 30);
     this.camera.position.z = 3;
@@ -282,6 +288,7 @@ class Editor {
     this.clock = new THREE.Clock();
     // Resizes the renderer.
     this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     //document.body.appendChild(this.renderer.domElement)
     window.addEventListener("resize", this.onWindowResize.bind(this));
     this._configurePostProcessing();
@@ -307,13 +314,20 @@ class Editor {
       this.renderer.domElement,
     );
 
+    this.orbitControls.mouseButtons = {
+      MIDDLE: THREE.MOUSE.ROTATE,
+      RIGHT: THREE.MOUSE.PAN,
+    }; // Blender Style
+    // this.orbitControls.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN }; // Standard
+
     this.control = new TransformControls(this.camera, this.renderer.domElement);
     this.control.space = "local"; // Local transformation mode
     // .space = 'world'; // Global mode
 
-    this.control.setScaleSnap(0.1);
-    this.control.setTranslationSnap(0.1);
-    this.control.setRotationSnap(0.1);
+    this.control.setScaleSnap(0.05);
+    this.control.setTranslationSnap(0.05);
+    this.control.setRotationSnap(0.05);
+    console.log("Control Sensitivity:", this.control.sensitivity);
 
     // OnClick and MouseMove events.
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
@@ -329,6 +343,7 @@ class Editor {
       }
       this.orbitControls.enabled = !event.value;
       this.updateSelectedUI();
+      this.camera_last_pos.copy(new THREE.Vector3(-99999, -99999, -99999));
       // this.update_properties()
     });
     this.control.setSize(0.5); // Good default value for visuals.
@@ -337,6 +352,8 @@ class Editor {
     this.activeScene.scene.add(this.control);
     // Resets canvas size.
     this.onWindowResize();
+
+    this.setupResizeObserver();
 
     this.timeline.scene = this.activeScene;
 
@@ -368,19 +385,17 @@ class Editor {
       this.loadScene(sceneToken);
     }
 
-    document.addEventListener('mouseover', (event) => {
+    document.addEventListener("mouseover", (event) => {
       if (this.orbitControls && this.cameraViewControls) {
         if (event.target instanceof HTMLCanvasElement) {
           if (this.camera_person_mode) {
             this.orbitControls.enabled = false;
             this.cameraViewControls.enabled = true;
-          }
-          else {
+          } else {
             this.orbitControls.enabled = true;
             this.cameraViewControls.enabled = false;
           }
-        }
-        else {
+        } else {
           this.orbitControls.enabled = false;
           this.cameraViewControls.enabled = false;
         }
@@ -404,7 +419,7 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() { }
+  public async testTestTimelineEvents() {}
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -436,6 +451,7 @@ class Editor {
       this.animation_engine,
       this.audio_engine,
       this.lipsync_engine,
+      this.emotion_engine,
     );
     await proxyTimeline.loadFromJson(scene_json["timeline"]);
 
@@ -473,6 +489,7 @@ class Editor {
       this.activeScene,
     );
     const scene_json = await proxyScene.saveToScene();
+    console.log("scene_json", scene_json);
 
     const proxyTimeline = new StoryTellerProxyTimeline(
       this.version,
@@ -481,6 +498,7 @@ class Editor {
       this.animation_engine,
       this.audio_engine,
       this.lipsync_engine,
+      this.emotion_engine,
     );
     const timeline_json = await proxyTimeline.saveToJson();
 
@@ -678,7 +696,9 @@ class Editor {
 
   deleteObject(uuid: string) {
     const obj = this.activeScene.get_object_by_uuid(uuid);
-    if (obj?.name === "::CAM::") { return; }
+    if (obj?.name === "::CAM::") {
+      return;
+    }
     if (obj) {
       this.activeScene.scene.remove(obj);
     }
@@ -753,7 +773,7 @@ class Editor {
       this.render_timer += this.clock.getDelta();
       this.frames += 1;
       this.playback_location++;
-      const imgData = this.rawRenderer.domElement.toDataURL('image/png', 1.0); // Medium quality png for speed & size.
+      const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // Medium quality png for speed & size.
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
       if (this.timeline.is_playing == false) {
@@ -765,10 +785,19 @@ class Editor {
   }
 
   getselectedSum() {
-    if (this.selected === undefined) { return 0; }
-    let posCombo = this.selected.position.x + this.selected.position.y + this.selected.position.z;
-    let rotCombo = this.selected.rotation.x + this.selected.rotation.y + this.selected.rotation.z;
-    let sclCombo = this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
+    if (this.selected === undefined) {
+      return 0;
+    }
+    let posCombo =
+      this.selected.position.x +
+      this.selected.position.y +
+      this.selected.position.z;
+    let rotCombo =
+      this.selected.rotation.x +
+      this.selected.rotation.y +
+      this.selected.rotation.z;
+    let sclCombo =
+      this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
     return posCombo + rotCombo + sclCombo;
   }
 
@@ -828,8 +857,10 @@ class Editor {
       if (changeView) {
         this.switchCameraView();
       }
-    }
-    else if (this.last_scrub === this.timeline.scrubber_frame_position && this.getselectedSum() !== this.last_selected_sum) {
+    } else if (
+      this.last_scrub === this.timeline.scrubber_frame_position &&
+      this.getselectedSum() !== this.last_selected_sum
+    ) {
       this.updateSelectedUI();
     }
     this.last_selected_sum = this.getselectedSum();
@@ -897,10 +928,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-      startTime * 1000 +
-      "|" +
-      startTime * 1000 +
-      "[a1];[0:a][a1]amix=inputs=2[a]",
+        startTime * 1000 +
+        "|" +
+        startTime * 1000 +
+        "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -1172,9 +1203,7 @@ class Editor {
           element.visible = true;
         });
       }
-    }
-    else {
-
+    } else {
       this.timeline.is_playing = true;
       this.timeline.scrubber_frame_position = 0;
       if (!this.camera_person_mode) {
@@ -1230,9 +1259,11 @@ class Editor {
 
   // Automaticly resize scene.
   onWindowResize() {
-    // Calculate the maximum possible dimensions while maintaining the aspect ratio
-    const width = window.innerWidth; // / aspect_adjust
-    const height = window.innerHeight; // / aspectRatio
+    const container = document.getElementById("video-scene-container");
+    if (!container) return;
+
+    const width = container.clientWidth;
+    const height = container.clientHeight;
 
     if (this.camera == undefined || this.renderer == undefined) {
       return;
@@ -1256,6 +1287,23 @@ class Editor {
     this.render_camera.updateProjectionMatrix();
   }
 
+  setupResizeObserver() {
+    const container = document.getElementById("video-scene-container");
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer?.setSize(width, height);
+        this.renderer?.setPixelRatio(window.devicePixelRatio);
+      }
+    });
+
+    resizeObserver.observe(container);
+  }
+
   onMouseDown(event: any) {
     if (event.button === 1 && this.camera_person_mode) {
       this.lockControls?.lock();
@@ -1265,6 +1313,15 @@ class Editor {
   onMouseUp(event: any) {
     if (event.button === 1) {
       this.lockControls?.unlock();
+    }
+
+    if (event.button !== 0) {
+      let camera_pos = new THREE.Vector3(
+        parseFloat(this.camera.position.x.toFixed(2)),
+        parseFloat(this.camera.position.y.toFixed(2)),
+        parseFloat(this.camera.position.z.toFixed(2)),
+      );
+      this.camera_last_pos.copy(camera_pos);
     }
   }
 
@@ -1281,15 +1338,27 @@ class Editor {
 
   // When the mouse clicks the screen.
   onMouseClick() {
+    let camera_pos = new THREE.Vector3(
+      parseFloat(this.camera.position.x.toFixed(2)),
+      parseFloat(this.camera.position.y.toFixed(2)),
+      parseFloat(this.camera.position.z.toFixed(2)),
+    );
+    if (this.camera_last_pos.equals(new THREE.Vector3(0, 0, 0))) {
+      this.camera_last_pos.copy(camera_pos);
+    }
+
     if (
       this.raycaster == undefined ||
       this.mouse == undefined ||
       this.control == undefined ||
       this.outlinePass == undefined ||
-      this.camera_person_mode
+      this.camera_person_mode ||
+      !this.camera_last_pos.equals(camera_pos)
     ) {
+      this.camera_last_pos.copy(camera_pos);
       return;
     }
+    this.camera_last_pos.copy(camera_pos);
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const interactable: any[] = [];
@@ -1333,13 +1402,11 @@ class Editor {
         });
         this.updateSelectedUI();
       }
-    } else if (this.transform_interaction == false) {
+    } else {
       this.removeTransformControls();
       this.dispatchAppUiState({
         type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
       });
-    } else {
-      this.transform_interaction = false;
     }
   }
 }

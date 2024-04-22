@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { currentTime, filmLength, scale } from "~/pages/PageEnigma/store";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
@@ -6,13 +6,27 @@ import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 
 export const useMouseEventsScrubber = () => {
   const [isActive, setIsActive] = useState(false);
-  const [clientX, setClientX] = useState(0);
+  const clientX = useRef(0);
 
   const [time, setTime] = useState(-1);
 
-  useEffect(() => {
+  const getDelta = useCallback((event: MouseEvent) => {
     const max = filmLength.value * 60;
 
+    const delta = Math.round(
+      (event.clientX - clientX.current) / 4 / scale.value + currentTime.value,
+    );
+    if (delta < 0) {
+      return 0;
+    }
+    if (delta > max) {
+      return max;
+    }
+
+    return delta;
+  }, []);
+
+  useEffect(() => {
     const onPointerUp = () => {
       if (isActive) {
         currentTime.value = Math.round(time);
@@ -27,16 +41,11 @@ export const useMouseEventsScrubber = () => {
     };
 
     const onMouseMove = (event: MouseEvent) => {
-      const delta = Math.round(
-        (event.clientX - clientX) / 4 / scale.value + currentTime.value,
-      );
       if (isActive) {
         event.stopPropagation();
         event.preventDefault();
-        console.log(delta, max);
-        if (delta < 0 || delta > max) {
-          return;
-        }
+
+        const delta = getDelta(event);
         setTime((oldTime) => {
           if (oldTime !== delta) {
             Queue.publish({
@@ -59,12 +68,12 @@ export const useMouseEventsScrubber = () => {
       window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointermove", onMouseMove);
     };
-  }, [clientX, isActive, time]);
+  }, [clientX, isActive, time, getDelta]);
 
   return {
     onPointerDown: useCallback((event: React.PointerEvent<HTMLDivElement>) => {
       if (event.button === 0) {
-        setClientX(event.clientX);
+        clientX.current = event.clientX;
         setIsActive(true);
         setTime(currentTime.value);
       }

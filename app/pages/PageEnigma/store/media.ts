@@ -525,6 +525,20 @@ export const characterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Waifu H",
     thumbnail: "/resources/characters/img14.png",
+  },
+  {
+    version: 1,
+    media_id: "m_qfqw9e5kz0b7kspbwcc3c9y7pym97q",
+    type: AssetType.CHARACTER,
+    name: "Skibidi Toilet",
+    thumbnail: "/resources/characters/img15.png",
+  },
+  {
+    version: 1,
+    media_id: "m_ecfxa94v4ftvh58hv7se3qqy8a385n",
+    type: AssetType.CHARACTER,
+    name: "Pop",
+    thumbnail: "/resources/placeholders/placeholder.png",
   }
 ]);
 
@@ -535,6 +549,27 @@ export const objectItems = signal<MediaItem[]>([
     type: AssetType.OBJECT,
     name: "Pikachu Statue",
     thumbnail: "/resources/placeholders/placeholder.png",
+  },
+  {
+    version: 1,
+    media_id: "m_4d2s2q1xy9m1xncppr3gf9ne6bm2m0",
+    type: AssetType.OBJECT,
+    name: "Moon",
+    thumbnail: "/resources/objects/moon.png",
+  },
+  {
+    version: 1,
+    media_id: "m_t0s6gbvfp78rvc0sd6129za41crr9d",
+    type: AssetType.OBJECT,
+    name: "Crown",
+    thumbnail: "/resources/objects/crown.png",
+  },
+  {
+    version: 1,
+    media_id: "m_zp0zykww0k7ka2zagg3q3pb9t123k4",
+    type: AssetType.OBJECT,
+    name: "Sakura Tree",
+    thumbnail: "/resources/objects/sakura.png",
   },
 ]);
 

@@ -10,6 +10,7 @@ import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/It
 import { Button } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
+import { shapeItems } from "~/pages/PageEnigma/store";
 
 interface Props {
   type: AssetType;
@@ -72,7 +73,7 @@ export const ObjectsTab = ({ type }: Props) => {
         </Button>
       </div>
       <div className="h-full w-full overflow-y-auto px-4">
-        <ItemElements items={items.value} assetFilter={assetFilter.value} />
+        <ItemElements items={[ ...type !== AssetType.CHARACTER ? shapeItems.value : [], ...items.value ]} assetFilter={assetFilter.value} />
       </div>
     </>
   );

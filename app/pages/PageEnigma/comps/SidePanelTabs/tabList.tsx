@@ -25,12 +25,6 @@ export const tabList = [
     component: <ObjectsTab type={AssetType.OBJECT} />,
   },
   {
-    icon: "/resources/icons/shapes.png",
-    title: "Shapes",
-    value: AssetType.SHAPE,
-    component: <ShapeTab />,
-  },
-  {
     icon: "/resources/icons/camera.png",
     title: "Camera",
     value: AssetType.CAMERA,
