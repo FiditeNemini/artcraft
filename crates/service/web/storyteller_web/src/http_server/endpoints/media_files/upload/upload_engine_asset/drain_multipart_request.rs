@@ -16,7 +16,6 @@ pub struct MediaFileUploadData {
   pub file_name: Option<String>,
   pub file_bytes: Option<BytesMut>,
   pub media_file_subtype: Option<MediaFileSubtype>,
-  pub media_file_class: Option<MediaFileClass>,
 
   // Optional: title of the scene (media_files' maybe_title)
   pub title: Option<String>,
@@ -27,7 +26,7 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
   let mut uuid_idempotency_token = None;
   let mut file_bytes = None;
   let mut file_name = None;
-  let mut media_file_class = None;
+  //let mut media_file_class = None;
   let mut media_file_subtype = None;
   let mut title = None;
 
@@ -71,19 +70,19 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
               anyhow!("Wrong MediaFileSubtype: {:?}", &err)
             })?;
       },
-      Some("media_file_class") => {
-        media_file_class = read_multipart_field_as_text(&mut field).await
-            .map_err(|err| {
-              warn!("Error reading source: {:?}", &err);
-              err
-            })?
-            .map(|field| MediaFileClass::from_str(&field))
-            .transpose()
-            .map_err(|err| {
-              warn!("Wrong MediaFileClass: {:?}", &err);
-              anyhow!("Wrong MediaFileClass: {:?}", &err)
-            })?;
-      },
+      //Some("media_file_class") => {
+      //  media_file_class = read_multipart_field_as_text(&mut field).await
+      //      .map_err(|err| {
+      //        warn!("Error reading source: {:?}", &err);
+      //        err
+      //      })?
+      //      .map(|field| MediaFileClass::from_str(&field))
+      //      .transpose()
+      //      .map_err(|err| {
+      //        warn!("Wrong MediaFileClass: {:?}", &err);
+      //        anyhow!("Wrong MediaFileClass: {:?}", &err)
+      //      })?;
+      //},
       Some("title") => {
         title = read_multipart_field_as_text(&mut field).await
             .map_err(|e| {
@@ -99,7 +98,6 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
     uuid_idempotency_token,
     file_name,
     file_bytes,
-    media_file_class,
     media_file_subtype,
     title,
   })
