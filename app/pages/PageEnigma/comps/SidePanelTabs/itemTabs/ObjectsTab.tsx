@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { AssetFilterOption, AssetType } from "~/pages/PageEnigma/models";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
@@ -15,6 +15,7 @@ import { shapeItems } from "~/pages/PageEnigma/store";
 import { GetMediaByUser, GetMediaListResponse } from "~/api/media_files/GetMediaByUser";
 import { AssetFilterOption, MediaItem } from "~/pages/PageEnigma/models";
 import { BucketConfig } from "~/api/BucketConfig";
+import { AuthenticationContext } from "~/contexts/Authentication/AuthenticationContext/";
 
 interface Props {
   type: AssetType;
@@ -39,12 +40,14 @@ export const ObjectsTab = ({ type }: Props) => {
     }]
   });
 
+  const { authState } = useContext(AuthenticationContext);
+
   const [status,statusSet] = useState(FetchStatus.ready);
 
   useEffect(() => {
     if (status === FetchStatus.ready && type !== AssetType.CHARACTER) {
       statusSet(FetchStatus.in_progress);
-      GetMediaByUser("echelon",{},{
+      GetMediaByUser(authState.userInfo.username,{},{
         filter_media_type: "glb"
       })
       .then((res: GetMediaListResponse) => {
