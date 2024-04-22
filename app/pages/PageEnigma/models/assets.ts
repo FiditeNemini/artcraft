@@ -4,6 +4,8 @@ export interface MediaItem {
   media_id: string;
   object_uuid?: string;
   name: string;
+  description?: string;
+  publicBucketPath?: string;
   length?: number;
   thumbnail?: string;
   isMine?: boolean;

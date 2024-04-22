@@ -122,3 +122,8 @@ export enum WeightType {
   VALL_E = "vall_e",
   NONE = "none",
 }
+
+export enum AudioTabPages {
+  LIBRARY = 'library',
+  TTS = 'tts',
+}
