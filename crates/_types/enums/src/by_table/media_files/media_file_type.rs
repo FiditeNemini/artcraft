@@ -13,15 +13,19 @@ use utoipa::ToSchema;
 #[derive(Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash, Deserialize, Serialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum MediaFileType {
+  // TODO(bt): Deprecate and split into audio mime types; use media_class to represent broadly
   /// Audio files: wav, mp3, etc.
   Audio,
 
+  // TODO(bt): Deprecate and split into image mime types; use media_class to represent broadly
   /// Image files: png, jpeg, etc.
   Image,
 
+  // TODO(bt): Deprecate and split into video mime types; use media_class to represent broadly
   /// Video files: mp4, etc.
   Video,
 
+  // TODO(bt): Deprecate. This is a media_file_subtype.
   /// Mocap files: BVH, etc.
   /// NB: In actuality, this is just the BVH file type.
   /// NB: This is the old type to migrate from.
@@ -44,8 +48,17 @@ pub enum MediaFileType {
   /// This will be replaced with another format in future versions of Bevy
   SceneRon,
 
+  // TODO(bt): I don't think this was ever used.
   /// Alternate scene files.
   SceneJson,
+
+  /// "Polygon Model Data", character data for MikuMikuDance
+  /// See: https://mikumikudance.fandom.com/wiki/MMD:Polygon_Model_Data
+  Pmd,
+
+  /// "Vocaloid Motion Data", animation data for MikuMikuDance
+  /// See: https://mikumikudance.fandom.com/wiki/VMD_file_format
+  Vmd,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -67,6 +80,8 @@ impl MediaFileType {
       Self::Gltf => "gltf",
       Self::SceneRon => "scene_ron",
       Self::SceneJson => "scene_json",
+      Self::Pmd => "pmd",
+      Self::Vmd => "vmd",
     }
   }
 
@@ -82,6 +97,8 @@ impl MediaFileType {
       "gltf" => Ok(Self::Gltf),
       "scene_ron" => Ok(Self::SceneRon),
       "scene_json" => Ok(Self::SceneJson),
+      "pmd" => Ok(Self::Pmd),
+      "vmd" => Ok(Self::Vmd),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -100,6 +117,8 @@ impl MediaFileType {
       Self::Gltf,
       Self::SceneRon,
       Self::SceneJson,
+      Self::Pmd,
+      Self::Vmd,
     ])
   }
 }
@@ -124,6 +143,8 @@ mod tests {
       assert_serialization(MediaFileType::Gltf, "gltf");
       assert_serialization(MediaFileType::SceneRon, "scene_ron");
       assert_serialization(MediaFileType::SceneJson, "scene_json");
+      assert_serialization(MediaFileType::Pmd, "pmd");
+      assert_serialization(MediaFileType::Vmd, "vmd");
     }
   }
 
@@ -142,6 +163,8 @@ mod tests {
       assert_eq!(MediaFileType::Gltf.to_str(), "gltf");
       assert_eq!(MediaFileType::SceneRon.to_str(), "scene_ron");
       assert_eq!(MediaFileType::SceneJson.to_str(), "scene_json");
+      assert_eq!(MediaFileType::Pmd.to_str(), "pmd");
+      assert_eq!(MediaFileType::Vmd.to_str(), "vmd");
     }
 
     #[test]
@@ -156,6 +179,8 @@ mod tests {
       assert_eq!(MediaFileType::from_str("gltf").unwrap(), MediaFileType::Gltf);
       assert_eq!(MediaFileType::from_str("scene_ron").unwrap(), MediaFileType::SceneRon);
       assert_eq!(MediaFileType::from_str("scene_json").unwrap(), MediaFileType::SceneJson);
+      assert_eq!(MediaFileType::from_str("pmd").unwrap(), MediaFileType::Pmd);
+      assert_eq!(MediaFileType::from_str("vmd").unwrap(), MediaFileType::Vmd);
       assert!(MediaFileType::from_str("foo").is_err());
     }
   }
@@ -166,7 +191,7 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileType::all_variants();
-      assert_eq!(variants.len(), 9);
+      assert_eq!(variants.len(), 12);
       assert_eq!(variants.pop_first(), Some(MediaFileType::Audio));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Image));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Video));
@@ -177,6 +202,8 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileType::Gltf));
       assert_eq!(variants.pop_first(), Some(MediaFileType::SceneRon));
       assert_eq!(variants.pop_first(), Some(MediaFileType::SceneJson));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Pmd));
+      assert_eq!(variants.pop_first(), Some(MediaFileType::Vmd));
       assert_eq!(variants.pop_first(), None);
     }
   }
