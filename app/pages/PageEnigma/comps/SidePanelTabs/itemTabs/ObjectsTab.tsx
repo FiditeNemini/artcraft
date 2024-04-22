@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { AssetFilterOption, AssetType } from "~/pages/PageEnigma/models";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
@@ -11,17 +12,67 @@ import { Button } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
 import { shapeItems } from "~/pages/PageEnigma/store";
+import { GetMediaByUser, GetMediaListResponse } from "~/api/media_files/GetMediaByUser";
+import { AssetFilterOption, MediaItem } from "~/pages/PageEnigma/models";
+import { BucketConfig } from "~/api/BucketConfig";
 
 interface Props {
   type: AssetType;
 }
 
+export enum FetchStatus {
+  paused,
+  ready,
+  in_progress,
+  success,
+  error
+}
+
 export const ObjectsTab = ({ type }: Props) => {
   useSignals();
+  const [objects,objectsSet] = useState<{ value: MediaItem[] }>({ 
+    value:[{
+      media_id: "",
+      name: "",
+      type: "",
+      version: 1,
+    }]
+  });
+
+  const [status,statusSet] = useState(FetchStatus.ready);
+
+  useEffect(() => {
+    if (status === FetchStatus.ready && type !== AssetType.CHARACTER) {
+      statusSet(FetchStatus.in_progress);
+      GetMediaByUser("echelon",{},{
+        filter_media_type: "glb"
+      })
+      .then((res: GetMediaListResponse) => {
+        if (res.success && res.results) {
+          statusSet(FetchStatus.success);
+          objectsSet({
+            value: res.results.map((item,i) => {
+              let bucketConfig = new BucketConfig();
+              let itemThumb = bucketConfig.getCdnUrl(item.cover_image.maybe_cover_image_public_bucket_path,600,100);
+              return {
+                media_id: item.token,
+                name: item.maybe_title,
+                type: item.media_type,
+                version: 1,
+                ...item.cover_image.maybe_cover_image_public_bucket_path ? {
+                  thumbnail: itemThumb
+                } : {}
+              }
+            })
+          });
+        }
+      });
+    }
+  },[status,type]);
 
   const assetFilter =
     type === AssetType.CHARACTER ? characterFilter : objectFilter;
-  const items = type === AssetType.CHARACTER ? characterItems : objectItems;
+  const items = type === AssetType.CHARACTER ? characterItems : objects;
 
   return (
     <>
