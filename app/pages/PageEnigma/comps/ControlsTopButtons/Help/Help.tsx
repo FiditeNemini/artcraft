@@ -64,7 +64,7 @@ export const Help = () => {
           <Shortcut label="Zoom">
             <Mouse button="middle" label="(Scroll)" />
           </Shortcut>
-          <Shortcut label="Free Fly">
+          {/* <Shortcut label="Free Fly">
             <KeyGroup>
               <Key button="W" />
               <Key button="A" />
@@ -73,19 +73,19 @@ export const Help = () => {
               <Key button="Q" />
               <Key button="E" />
             </KeyGroup>
-          </Shortcut>
+          </Shortcut> */}
         </ShortcutsGroup>
 
         <ShortcutsGroup label="Interaction">
           <Shortcut label="Select Object">
             <Mouse button="left" label="(Click)" />
           </Shortcut>
-          <Shortcut label="Clear Selection">
+          {/* <Shortcut label="Clear Selection">
             <Key button="Esc" />
-          </Shortcut>
-          <Shortcut label="Focus Selection">
+          </Shortcut> */}
+          {/* <Shortcut label="Focus Selection">
             <Key button="F" />
-          </Shortcut>
+          </Shortcut> */}
           <Shortcut label="Delete Selection">
             <Key button="Del" />
           </Shortcut>
@@ -123,11 +123,11 @@ export const Help = () => {
             <Plus />
             <Mouse button="middle" label="(Scroll)" />
           </Shortcut>
-          <Shortcut label="Zoom">
+          {/* <Shortcut label="Zoom">
             <Key button="Ctrl/Cmd" />
             <Plus />
             <Mouse button="middle" label="(Scroll)" />
-          </Shortcut>
+          </Shortcut> */}
           <Shortcut label="Add Keyframe to Selected Object">
             <Key button="K" />
           </Shortcut>
