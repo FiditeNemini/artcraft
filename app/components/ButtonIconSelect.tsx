@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 interface Option {
   value: string;
   icon: IconDefinition;
+  text?: string;
 }
 
 interface ButtonIconSelectProps {
@@ -30,18 +31,19 @@ export function ButtonIconSelect({
 
   return (
     <div className="flex space-x-1">
-      {options.map(({ value, icon }) => (
+      {options.map(({ value, icon, text }) => (
         <button
           key={value}
           className={twMerge(
-            `flex h-8 w-8 items-center justify-center rounded-lg border-2 transition-all duration-150`,
+            `flex h-8 items-center justify-center rounded-lg border-2 text-sm transition-all duration-150`,
+            text ? "h-auto w-auto gap-2 px-2.5 py-1" : "w-8",
             selectedOption === value
-              ? "border-brand-primary bg-ui-panel/[0.2]"
+              ? "border-brand-primary bg-ui-panel/[0.3]"
               : "border-transparent hover:bg-ui-panel/[0.4]",
           )}
-          onClick={() => handleOptionChange(value)}
-        >
+          onClick={() => handleOptionChange(value)}>
           <FontAwesomeIcon icon={icon} />
+          {text && <span className="text-sm font-medium">{text}</span>}
         </button>
       ))}
     </div>
