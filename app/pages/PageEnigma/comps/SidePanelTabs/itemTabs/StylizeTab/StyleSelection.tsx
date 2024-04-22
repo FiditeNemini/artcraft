@@ -20,10 +20,12 @@ export const StyleSelection = () => {
     90 + (sidePanelWidth.value - 32 - shownImageCount * 98) / shownImageCount;
   const imageHeight = (54 * imageWidth) / 90;
 
-  const imageRows = Math.max(
-    Math.floor((sidePanelHeight.value - 520) / imageHeight),
-    2,
+  const imageRows = Math.min(
+    Math.max(Math.floor((sidePanelHeight.value - 520) / imageHeight), 2),
+    4,
   );
+
+  const maxWidth = Math.ceil(styleList.length / imageRows);
 
   const editorEngine = useContext(EngineContext);
 
@@ -91,7 +93,7 @@ export const StyleSelection = () => {
               </div>
             </div>
           )}
-          {scrollPosition < styleList.length / 2 - shownImageCount && (
+          {scrollPosition < maxWidth - shownImageCount && (
             <div className="pointer-events-none absolute right-[-32px] top-0 h-full w-12">
               <div className="flex h-full w-full items-center justify-end pr-6">
                 <ButtonIcon
@@ -100,7 +102,7 @@ export const StyleSelection = () => {
                     setScrollPosition(
                       Math.min(
                         scrollPosition + Math.max(shownImageCount - 1, 1),
-                        styleList.length - 3,
+                        maxWidth - shownImageCount,
                       ),
                     )
                   }

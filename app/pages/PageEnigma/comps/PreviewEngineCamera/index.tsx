@@ -16,6 +16,10 @@ export const PreviewEngineCamera = () => {
     setTimeout(() => setShowLoader(false), 1000);
   }, []);
 
+  if (editorState.value === EditorStates.PREVIEW) {
+    return null;
+  }
+
   const handleButtonCameraView = () => {
     Queue.publish({
       queueName: QueueNames.TO_ENGINE,
@@ -33,16 +37,14 @@ export const PreviewEngineCamera = () => {
             <p className="mt-[2px] text-sm font-medium">Camera View</p>
           </div>
 
-          {editorState.value !== EditorStates.PREVIEW && (
-            <Button
-              variant="action"
-              onClick={handleButtonCameraView}
-              className="px-2.5 py-1 text-sm">
-              {editorState.value === EditorStates.EDIT
-                ? "Enter Camera View"
-                : "Exit Camera View"}
-            </Button>
-          )}
+          <Button
+            variant="action"
+            onClick={handleButtonCameraView}
+            className="px-2.5 py-1 text-sm">
+            {editorState.value === EditorStates.EDIT
+              ? "Enter Camera View"
+              : "Exit Camera View"}
+          </Button>
         </div>
         <div className="box relative overflow-hidden rounded-b-lg border border-gray-600">
           <canvas className="aspect-video max-h-40" id="camera-view"></canvas>
