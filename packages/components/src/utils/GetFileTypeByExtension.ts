@@ -20,6 +20,8 @@ export enum FileType {
   Gltf = "gltf",
   Obj = "obj",
   Ron = "ron",
+  Pmd = "pmd",
+  Vmd = "vmd",
 
   // Unknown or unsupported
   Unknown = "unknown",
@@ -37,6 +39,8 @@ const FILE_TYPE_MAP : Record<string, FileType> = {
   "png": FileType.Png,
   "ron": FileType.Ron,
   "wav": FileType.Wav,
+  "pmd": FileType.Pmd,
+  "vmd": FileType.Vmd,
 }
 
 export function GetFileTypeByExtension(filename: string) : FileType {

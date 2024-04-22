@@ -32,7 +32,7 @@ export default function OnboardingSelection(props: OnboardingSelectionProps) {
 
   const cards = [
     {
-      text: "Inked Dragon",
+      text: "Ink Dragon",
       defaultVideo:
         "https://storage.googleapis.com/vocodes-public/media/n/j/n/a/s/njnasfa5cyvg5kf8vq17pmc5c4gpyj7z/videonjnasfa5cyvg5kf8vq17pmc5c4gpyj7zmp4",
       hoverVideo:

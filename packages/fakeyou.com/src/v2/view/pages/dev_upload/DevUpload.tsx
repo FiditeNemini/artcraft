@@ -25,10 +25,10 @@ interface DevUploadProps {}
 export default function DevUpload(props: DevUploadProps) {
   const { studioAccessCheck } = useSession();
 
-  const [file, fileSet] = useState<File | null>(null);
-  const [maybeMediaFileSubtype, maybeMediaFileSubtypeSet] = useState<MediaFileSubtype | undefined>(undefined);
-  const [uploadType, uploadTypeSet] = useState<UploadType>(UploadType.Unknown);
-  const [tokens, tokensSet] = useState<string[]>([]);
+  const [file, setFile] = useState<File | null>(null);
+  const [maybeMediaFileSubtype, setMaybeMediaFileSubtype] = useState<MediaFileSubtype | undefined>(undefined);
+  const [uploadType, setUploadType] = useState<UploadType>(UploadType.Unknown);
+  const [tokens, setTokens] = useState<string[]>([]);
 
   const handleFileChange = (event: any) => {
     const maybeFile = event.target.files[0];
@@ -43,6 +43,9 @@ export default function DevUpload(props: DevUploadProps) {
       case FileType.Gltf:
       case FileType.Obj:
       case FileType.Ron:
+      case FileType.Ron:
+      case FileType.Pmd:
+      case FileType.Vmd:
         uploadType = UploadType.EngineAsset;
         break;
       case FileType.Jpg:
@@ -62,14 +65,14 @@ export default function DevUpload(props: DevUploadProps) {
         break;
     }
 
-    fileSet(maybeFile);
-    uploadTypeSet(uploadType);
+    setFile(maybeFile);
+    setUploadType(uploadType);
   };
 
   const handleSubtypeChange = (ev: React.FormEvent<HTMLSelectElement>) => {
     const value = (ev.target as HTMLSelectElement).value;
     const maybeSubtype = value as MediaFileSubtype;
-    maybeMediaFileSubtypeSet(maybeSubtype);
+    setMaybeMediaFileSubtype(maybeSubtype);
   }
 
   const handleUpload = () => {
@@ -87,8 +90,8 @@ export default function DevUpload(props: DevUploadProps) {
         })
         .then((res: UploadEngineAssetResponse) => {
           if ("media_file_token" in res) {
-            tokensSet([res.media_file_token, ...tokens]);
-            fileSet(null);
+            setTokens([res.media_file_token, ...tokens]);
+            setFile(null);
           }
         });
         break;
@@ -100,8 +103,8 @@ export default function DevUpload(props: DevUploadProps) {
         })
         .then((res: UploadMediaResponse) => {
           if ("media_file_token" in res) {
-            tokensSet([res.media_file_token, ...tokens]);
-            fileSet(null);
+            setTokens([res.media_file_token, ...tokens]);
+            setFile(null);
           }
         });
     }
