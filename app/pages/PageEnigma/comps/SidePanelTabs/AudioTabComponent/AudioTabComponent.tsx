@@ -21,9 +21,9 @@ export const AudioTabComponent = () => {
   });
   const { authState } = useContext(AuthenticationContext);
 
-  const handleListAudioByUser = useCallback((username:string)=>{
+  const handleListAudioByUser = useCallback((username:string, sessionToken:string)=>{
     setState((curr)=>({...curr, fetchingUserAudio:true}));
-    ListAudioByUser(username).then((res:any[])=>{
+    ListAudioByUser(username, sessionToken).then((res:any[])=>{
       setState((curr)=>({...curr, fetchingUserAudio:false}));
       audioItemsFromServer.value = res.map(item=>{
         const morphedItem:MediaItem = {
@@ -45,9 +45,9 @@ export const AudioTabComponent = () => {
   }, []);
 
   useEffect(()=>{
-    if ( authState.userInfo ){
+    if (authState.userInfo && authState.sessionToken){
       if(state.firstLoad === false && audioItemsFromServer.value.length === 0){
-        handleListAudioByUser(authState.userInfo.username);
+        handleListAudioByUser(authState.userInfo.username, authState.sessionToken);
         setState((curr)=>({...curr, firstLoad:true}));
       }
     }
@@ -72,8 +72,8 @@ export const AudioTabComponent = () => {
           return foundItemOfJob !== undefined;
         }
       });
-      if(found === undefined){
-        handleListAudioByUser(authState.userInfo.username);
+      if(found === undefined && authState.sessionToken){
+        handleListAudioByUser(authState.userInfo.username, authState.sessionToken);
       }
     }
   });
@@ -86,7 +86,16 @@ export const AudioTabComponent = () => {
   }
   if(state.page === AudioTabPages.LIBRARY){
     return <PageLibrary changePage={changePage}/>
-  }else if(state.page === AudioTabPages.TTS){
-    return <PageTTS changePage={changePage}/>
+  }else if(state.page === AudioTabPages.TTS && authState.sessionToken){
+    return(
+      <PageTTS
+        changePage={changePage}
+        sessionToken={authState.sessionToken}
+      />
+    );
+  }else{
+    return(
+      <p>Unknown Error</p>
+    )
   }
 };

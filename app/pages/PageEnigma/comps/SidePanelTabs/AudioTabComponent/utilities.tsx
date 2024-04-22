@@ -10,13 +10,14 @@ import {
   GenerateTtsAudioResponse,
 } from '~/pages/PageEnigma/models/tts';
 
-export async function ListTtsModels() : Promise<Array<TtsModelListItem>| undefined> {  
+export async function ListTtsModels(sessionToken:string) : Promise<Array<TtsModelListItem>| undefined> {  
   return await fetch(listTts, {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
+      'session': sessionToken,
     },
-    credentials: 'include',
+    // credentials: 'include',
   })
   .then(res => res.json())
   .then(res => {
@@ -48,13 +49,14 @@ export function maybeMapError(statuslike: StatusLike) : GenerateTtsAudioErrorTyp
 //   return !('inference_job_token' in response);
 // }
 
-export async function GenerateTtsAudio(request: GenerateTtsAudioRequest) : Promise<GenerateTtsAudioResponse>
+export async function GenerateTtsAudio(request: GenerateTtsAudioRequest, sessionToken:string) : Promise<GenerateTtsAudioResponse>
 {
   return await fetch(inferTts, {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
+      'session': sessionToken,
     },
     // credentials: 'include',
     body: JSON.stringify(request),

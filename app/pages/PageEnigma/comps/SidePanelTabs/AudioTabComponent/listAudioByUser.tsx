@@ -34,11 +34,12 @@ export interface MediaFile {
   };
 }
 
-export const ListAudioByUser = async(username:string) => {
+export const ListAudioByUser = async(username:string, sessionToken: string) => {
   return await fetch(listMediaByUser(username),{
     method: 'GET',
     headers: {
       "Accept": "application/json",
+      'session': sessionToken,
     },
     // credentials: 'include'
   })

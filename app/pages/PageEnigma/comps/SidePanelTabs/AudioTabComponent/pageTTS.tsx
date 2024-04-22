@@ -33,9 +33,11 @@ type TtsState = {
 
 
 export const PageTTS =({
-  changePage 
+  changePage,
+  sessionToken,
 }:{
-  changePage: (newPage:AudioTabPages) => void
+  changePage: (newPage:AudioTabPages) => void;
+  sessionToken: string;
 })=>{
   const [ttsState, setTtsState] = useState<TtsState>({
     voice:undefined,
@@ -67,7 +69,7 @@ export const PageTTS =({
     if (ttsModelsLoaded) {
       return; // Already queried.
     }
-    const models = await ListTtsModels();
+    const models = await ListTtsModels(sessionToken);
     if (models) {
       setTtsModels(models);
     }
@@ -89,7 +91,7 @@ export const PageTTS =({
     }
   },[ttsState]);
 
-  const requestTts = useCallback( ()=>{
+  const requestTts = useCallback( (sessionToken:string)=>{
     const modelToken = ttsState.voice ? ttsState.voice.model_token : undefined;
 
     if(modelToken){
@@ -108,7 +110,8 @@ export const PageTTS =({
         inference_text: ttsState.text,
       };
 
-      GenerateTtsAudio(request).then((res:GenerateTtsAudioResponse)=>{
+      GenerateTtsAudio(request, sessionToken).then((
+        res:GenerateTtsAudioResponse)=>{
         if(res && res.inference_job_token){
           setTtsState((curr)=>({
             ...curr,
@@ -160,8 +163,6 @@ export const PageTTS =({
       <div className="flex w-full justify-between mt-4">
         <Label>What would you like to say?</Label>
         <div className="flex gap-2 items-center">
-          {/* <FontAwesomeIcon className="text-brand-primary" icon={faShuffle}/>
-          <H5 className="text-brand-primary">Randomized Text</H5> */}
         </div>
       </div>
       <Textarea
@@ -177,7 +178,7 @@ export const PageTTS =({
               variant={ttsState.hasAudio ? "secondary" : "primary" }
               disabled={ttsState.text === ""}
               icon={faBrainCircuit}
-              onClick={requestTts}
+              onClick={()=>requestTts(sessionToken)}
             >
               Generate
             </Button>
@@ -199,7 +200,7 @@ export const PageTTS =({
           <Button
             type="button"
             disabled={!ttsState.hasAudio}
-            onClick={requestTts}
+            onClick={()=>requestTts(sessionToken)}
             icon={faBrainCircuit}
           >
             Generate Another
