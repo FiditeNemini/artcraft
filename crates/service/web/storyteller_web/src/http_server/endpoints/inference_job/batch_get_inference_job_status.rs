@@ -175,8 +175,7 @@ pub async fn batch_get_inference_job_status_handler(
       .collect::<Vec<_>>();
 
   if tokens.is_empty() {
-    // TODO: Generate empty result.
-    return Err(BatchGetInferenceJobStatusError::NotFound);
+    return records_to_response(Vec::new());
   }
 
   // NB: Since this is publicly exposed, we don't query sensitive data.
@@ -220,9 +219,13 @@ pub async fn batch_get_inference_job_status_handler(
     };
   }
 
+  records_to_response(records)
+}
+
+fn records_to_response(records: Vec<GenericInferenceJobStatus>) -> Result<HttpResponse, BatchGetInferenceJobStatusError> {
   let records = records.into_iter()
       .map(|record| {
-        record_to_payload(record, None)
+        db_record_to_response_payload(record, None)
       })
       .collect::<Vec<_>>();
 
@@ -242,7 +245,7 @@ pub async fn batch_get_inference_job_status_handler(
       .body(body))
 }
 
-fn record_to_payload(
+fn db_record_to_response_payload(
   record: GenericInferenceJobStatus,
   maybe_extra_status_description: Option<String>,
 ) -> BatchInferenceJobStatusResponsePayload {
