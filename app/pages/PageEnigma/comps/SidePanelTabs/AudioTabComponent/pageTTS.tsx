@@ -18,8 +18,10 @@ import { TtsModelListItem, GenerateTtsAudioResponse } from "~/pages/PageEnigma/m
 
 import { addInferenceJob, inferenceJobs} from "../../../store/inferenceJobs";
 import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
-import { ListTtsModels, GenerateTtsAudio } from "./utilities";
+import { ListTtsModels, GenerateTtsAudio, GetMediaFileByToken } from "./utilities";
 import { AudioTabPages } from "./types";
+import { AudioItemElement } from "./audioItemElement";
+import { MediaItem, AssetType } from "~/pages/PageEnigma/models";
 
 type TtsState = {
   voice: TtsModelListItem | undefined;
@@ -27,10 +29,17 @@ type TtsState = {
   hasEnqueued :boolean;
   inferenceToken?: string;
   inferenceJobType?: string;
-  hasAudio: boolean;
-  audioFile?: any;
+  hasTtsResult: boolean;
 }
-
+const initialState:TtsState =
+  {
+    voice:undefined,
+    text:"",
+    hasEnqueued:false,
+    inferenceJobType: undefined,
+    inferenceToken: undefined,
+    hasTtsResult:false,
+  };
 
 export const PageTTS =({
   changePage,
@@ -39,12 +48,9 @@ export const PageTTS =({
   changePage: (newPage:AudioTabPages) => void;
   sessionToken: string;
 })=>{
-  const [ttsState, setTtsState] = useState<TtsState>({
-    voice:undefined,
-    text:"",
-    hasEnqueued:false,
-    hasAudio:false,
-  });
+  const [ttsState, setTtsState] = useState<TtsState>(initialState);
+
+  const [ttsResultFile, setTtsResultFile] = useState<MediaItem|undefined>();
 
   useSignalEffect(()=>{
     console.log(inferenceJobs.value);
@@ -55,9 +61,26 @@ export const PageTTS =({
       if(found?.job_status === JobState.COMPLETE_SUCCESS){
         setTtsState((curr)=>({
           ...curr,
-          hasAudio: true,
-          audioFile: found.result
+          hasTtsResult: true,
         }))
+        GetMediaFileByToken(found.result.entity_token, sessionToken)
+        .then(res=>{
+          console.log(res);
+          const morphedItem:MediaItem = {
+            version: 1,
+            type: AssetType.AUDIO,
+            media_id: res.media_file.token,
+            object_uuid: res.media_file.token,
+            name: ttsState.voice?.title || '',
+            description: ttsState.text,
+            publicBucketPath: res.media_file.public_bucket_path,
+            length: 25,
+            thumbnail: "/resources/placeholders/audio_placeholder.png",
+            isMine: true,
+            // isBookmarked?: boolean;
+          }
+          setTtsResultFile(morphedItem);
+        })
       }
     }
   });
@@ -172,10 +195,10 @@ export const PageTTS =({
       />
       <div className="mt-6 flex gap-2">
         <div className="w-full h-12">
-          {!ttsState.hasAudio && !ttsState.hasEnqueued &&
+          {!ttsState.hasTtsResult && !ttsState.hasEnqueued &&
             <Button
               className="w-36 h-full text-xl "
-              variant={ttsState.hasAudio ? "secondary" : "primary" }
+              variant={ttsState.hasTtsResult ? "secondary" : "primary" }
               disabled={ttsState.text === ""}
               icon={faBrainCircuit}
               onClick={()=>requestTts(sessionToken)}
@@ -183,13 +206,11 @@ export const PageTTS =({
               Generate
             </Button>
           }
-          {!ttsState.hasAudio && ttsState.hasEnqueued &&
+          {!ttsState.hasTtsResult && ttsState.hasEnqueued &&
             <LoadingDotsTyping className="bg-brand-secondary-500 rounded-lg"/>
           }
-          { ttsState.hasAudio &&
-            <div className="bg-inference-job-success w-full h-full rounded-lg flex items-center justify-center p-2">
-              <H2>Success!! Please Check "My Audio" in the Audio Panel.</H2>
-            </div>
+          { ttsResultFile &&
+            <AudioItemElement item={ttsResultFile}/>
           }
         </div>
         
@@ -199,7 +220,7 @@ export const PageTTS =({
         { ttsState.hasEnqueued &&
           <Button
             type="button"
-            disabled={!ttsState.hasAudio}
+            disabled={!ttsState.hasTtsResult}
             onClick={()=>requestTts(sessionToken)}
             icon={faBrainCircuit}
           >

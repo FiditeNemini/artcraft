@@ -1,14 +1,35 @@
-import { listTts, inferTts } from '~/api';
+import { listTts, inferTts, listMediaByUser, getMediaFileByToken } from '~/api';
+import { MediaFile, GetMediaFileResponse } from './types';
 import {
   TtsModelListItem,
   TtsModelListResponsePayload,
   GenerateTtsAudioErrorType,
   StatusLike,
   GenerateTtsAudioRequest,
-  // GenerateTtsAudioSuccess,
-  // GenerateTtsAudioError,
   GenerateTtsAudioResponse,
 } from '~/pages/PageEnigma/models/tts';
+
+
+
+export const ListAudioByUser = async(username:string, sessionToken: string) => {
+  return await fetch(listMediaByUser(username),{
+    method: 'GET',
+    headers: {
+      "Accept": "application/json",
+      'session': sessionToken,
+    },
+    // credentials: 'include'
+  })
+  .then(res => res.json())
+  .then(res => { 
+    if(res.success && res.results){
+      return res.results.filter((item:MediaFile)=>item['media_type']==='audio');
+    }else{
+      Promise.reject();
+    }
+  })
+  .catch(e => ({ success : false }));
+}
 
 export async function ListTtsModels(sessionToken:string) : Promise<Array<TtsModelListItem>| undefined> {  
   return await fetch(listTts, {
@@ -82,3 +103,36 @@ export async function GenerateTtsAudio(request: GenerateTtsAudioRequest, session
   });
 
 };
+
+export async function GetMediaFileByToken (fileToken: string, sessionToken: string) : Promise<GetMediaResponse>
+{
+  return await fetch(getMediaFileByToken(fileToken), {
+    method: "GET",
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'session': sessionToken,
+    },
+  })
+  .then(res =>  res.json())
+  .then(res => {
+    const response: GetMediaFileResponse = res;
+
+      if (response && response.success && response.media_file) {
+        // NB: Timestamps aren't converted to Date objects on their own!
+        response.media_file.created_at = new Date(
+          response.media_file.created_at
+        );
+        response.media_file.updated_at = new Date(
+          response.media_file.updated_at
+        );
+        return response;
+      } else {
+        return { success: false };
+      }
+  })
+  .catch(e => {
+    return { success: false };
+  });
+  ;
+}

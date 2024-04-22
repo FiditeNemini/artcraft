@@ -4,7 +4,7 @@ import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 import { AuthenticationContext } from "~/contexts/Authentication";
 import { MediaItem, AssetType } from "~/pages/PageEnigma/models";
 import { audioItemsFromServer } from "~/pages/PageEnigma/store/mediaFromServer";
-import { ListAudioByUser } from "./listAudioByUser";
+import { ListAudioByUser } from "./utilities";
 import { inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
 import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
 
