@@ -14,11 +14,12 @@ import {
   filmLength,
   scale,
 } from "~/pages/PageEnigma/store";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowUp } from "@fortawesome/pro-solid-svg-icons";
 
 interface Props {
   id: string;
   clips: Clip[];
-  title?: string;
   group: ClipGroup;
   type?: ClipType;
   updateClip: (options: { id: string; length: number; offset: number }) => void;
@@ -49,14 +50,7 @@ function getCanBuild({
   return false;
 }
 
-export const TrackClips = ({
-  id,
-  clips,
-  updateClip,
-  title,
-  group,
-  type,
-}: Props) => {
+export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
   const trackType = (type ?? group) as ClipType;
 
   function onPointerOver() {
@@ -112,7 +106,11 @@ export const TrackClips = ({
   return (
     <div
       id={`track-${trackType}-${id}`}
-      className={`relative block h-9 w-full rounded-lg bg-${group}-unselected`}
+      className={[
+        "relative block h-9 w-full rounded-lg",
+        `bg-${group}-unselected`,
+        clips.length === 0 ? "border-2 border-dashed border-white/15" : "",
+      ].join(" ")}
       onPointerOver={onPointerOver}
       onPointerLeave={onPointerLeave}
       onPointerMove={onPointerMove}>
@@ -132,9 +130,15 @@ export const TrackClips = ({
           clip={clip}
         />
       ))}
-      {!!title && (
-        <div className="prevent-select absolute ps-2 pt-1 text-xs font-medium text-white">
-          {title}
+      {clips.length === 0 && (
+        <div className="prevent-select absolute flex h-full items-center gap-2 ps-2 text-xs font-medium text-white">
+          <div className="animate-bounce">
+            <FontAwesomeIcon icon={faArrowUp} className="text-white/80" />
+          </div>
+          <div className="text-xs text-white/80">
+            Drag and drop {type === ClipType.ANIMATION ? "animation" : "audio"}{" "}
+            clip here
+          </div>
         </div>
       )}
     </div>
