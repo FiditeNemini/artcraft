@@ -143,6 +143,7 @@ use crate::http_server::endpoints::w2l::set_w2l_template_mod_approval::set_w2l_t
 use crate::http_server::endpoints::workflows::enqueue_comfy_ui_handler::enqueue_comfy_ui_handler;
 use crate::http_server::endpoints::workflows::enqueue_video_style_transfer_handler::enqueue_video_style_transfer_handler;
 use crate::http_server::endpoints::workflows::enqueue_workflow_upload_request::enqueue_workflow_upload_request;
+use crate::routes::job_routes::add_job_routes;
 use crate::routes::media_files_routes::add_media_file_routes;
 use crate::routes::moderation_routes::add_moderator_routes;
 use crate::routes::weights_routes::add_weights_routes;
@@ -181,6 +182,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_image_gen_routes(app);
   app = add_weights_routes(app);
   app = add_workflow_routes(app);
+  app = add_job_routes(app);
   app = add_engine_routes(app); /* /v1/engine/... */
 
   // if server_environment == ServerEnvironment::Development {
@@ -216,14 +218,6 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   // ==================== Mocap ========================
   let mut app = RouteBuilder::from_app(app)
       .add_post("/v1/mocap/mocapnet/create", enqueue_mocapnet_handler)
-      .into_app();
-
-  // ==================== "Generic" Inference ====================
-
-  let mut app = RouteBuilder::from_app(app)
-      .add_get("/v1/model_inference/job_status/{token}", get_inference_job_status_handler)
-      .add_delete("/v1/model_inference/job/{token}", terminate_inference_job_handler, true)
-      .add_get("/v1/model_inference/queue_length", get_pending_inference_job_count_handler)
       .into_app();
 
   // ==================== Prompts ====================
