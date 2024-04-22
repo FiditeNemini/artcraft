@@ -22,13 +22,13 @@ pub fn add_job_routes<T, B> (app: App<T>) -> App<T>
   let mut app = RouteBuilder::from_app(app)
       .add_get("/v1/jobs/job/{token}", get_inference_job_status_handler)
       .add_delete("/v1/jobs/job/{token}", terminate_inference_job_handler, true)
-      .add_get("/v1/jobs/queue_length", get_pending_inference_job_count_handler)
       .into_app();
 
   // NB(bt): Old routes (these must be supported for AI streamers).
   let mut app = RouteBuilder::from_app(app)
       .add_get("/v1/model_inference/job_status/{token}", get_inference_job_status_handler)
       .add_delete("/v1/model_inference/job/{token}", terminate_inference_job_handler, true)
+      // NB: This is a legacy endpoint. There's a better comprehensive job status endpoint.
       .add_get("/v1/model_inference/queue_length", get_pending_inference_job_count_handler)
       .into_app();
 

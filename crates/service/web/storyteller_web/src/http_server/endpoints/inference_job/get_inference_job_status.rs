@@ -138,8 +138,8 @@ impl fmt::Display for GetInferenceJobStatusError {
 
 #[utoipa::path(
   get,
-  tag = "Inference Jobs",
-  path = "/v1/model_inference/job/{token}",
+  tag = "Jobs",
+  path = "/v1/jobs/job/{token}",
   params(
     ("path" = GetInferenceJobStatusPathInfo, description = "Path params for Request")
   ),

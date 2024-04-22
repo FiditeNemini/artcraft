@@ -64,8 +64,8 @@ impl fmt::Display for TerminateInferenceJobError {
 
 #[utoipa::path(
   delete,
-  tag = "Inference Jobs",
-  path = "/v1/model_inference/job/{token}",
+  tag = "Jobs",
+  path = "/v1/jobs/job/{token}",
   params(
     ("path" = TerminateInferenceJobPathInfo, description = "Path params for Request")
   ),
