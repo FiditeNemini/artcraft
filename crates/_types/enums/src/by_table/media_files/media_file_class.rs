@@ -26,15 +26,23 @@ pub enum MediaFileClass {
   /// Video files: mp4, etc.
   Video,
 
+  // TODO(bt): IN the future we may have a "volumetric" type.
+  /// 3D engine data: glb, gltf, etc.
+  Dimensional,
+
+  // TODO(bt): This was a bad idea.
   /// Engine "animations"
   Animation,
 
+  // TODO(bt): This was a bad idea.
   /// Engine "characters"
   Character,
 
+  // TODO(bt): This was a bad idea.
   /// Engine "prop" items
   Prop,
 
+  // TODO(bt): This was a bad idea.
   /// Engine scenes (internal and external scenes)
   Scene,
 }
@@ -52,6 +60,7 @@ impl MediaFileClass {
       Self::Audio => "audio",
       Self::Image => "image",
       Self::Video => "video",
+      Self::Dimensional => "dimensional",
       Self::Animation => "animation",
       Self::Character => "character",
       Self::Prop => "prop",
@@ -65,6 +74,7 @@ impl MediaFileClass {
       "audio" => Ok(Self::Audio),
       "image" => Ok(Self::Image),
       "video" => Ok(Self::Video),
+      "dimensional" => Ok(Self::Dimensional),
       "animation" => Ok(Self::Animation),
       "character" => Ok(Self::Character),
       "prop" => Ok(Self::Prop),
@@ -81,6 +91,7 @@ impl MediaFileClass {
       Self::Audio,
       Self::Image,
       Self::Video,
+      Self::Dimensional,
       Self::Animation,
       Self::Character,
       Self::Prop,
@@ -103,6 +114,7 @@ mod tests {
       assert_serialization(MediaFileClass::Audio, "audio");
       assert_serialization(MediaFileClass::Image, "image");
       assert_serialization(MediaFileClass::Video, "video");
+      assert_serialization(MediaFileClass::Dimensional, "dimensional");
       assert_serialization(MediaFileClass::Animation, "animation");
       assert_serialization(MediaFileClass::Character, "character");
       assert_serialization(MediaFileClass::Prop, "prop");
@@ -119,6 +131,7 @@ mod tests {
       assert_eq!(MediaFileClass::Audio.to_str(), "audio");
       assert_eq!(MediaFileClass::Image.to_str(), "image");
       assert_eq!(MediaFileClass::Video.to_str(), "video");
+      assert_eq!(MediaFileClass::Dimensional.to_str(), "dimensional");
       assert_eq!(MediaFileClass::Animation.to_str(), "animation");
       assert_eq!(MediaFileClass::Character.to_str(), "character");
       assert_eq!(MediaFileClass::Prop.to_str(), "prop");
@@ -131,6 +144,7 @@ mod tests {
       assert_eq!(MediaFileClass::from_str("audio").unwrap(), MediaFileClass::Audio);
       assert_eq!(MediaFileClass::from_str("image").unwrap(), MediaFileClass::Image);
       assert_eq!(MediaFileClass::from_str("video").unwrap(), MediaFileClass::Video);
+      assert_eq!(MediaFileClass::from_str("dimensional").unwrap(), MediaFileClass::Dimensional);
       assert_eq!(MediaFileClass::from_str("animation").unwrap(), MediaFileClass::Animation);
       assert_eq!(MediaFileClass::from_str("character").unwrap(), MediaFileClass::Character);
       assert_eq!(MediaFileClass::from_str("prop").unwrap(), MediaFileClass::Prop);
@@ -145,11 +159,12 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileClass::all_variants();
-      assert_eq!(variants.len(), 8);
+      assert_eq!(variants.len(), 9);
       assert_eq!(variants.pop_first(), Some(MediaFileClass::Unknown));
       assert_eq!(variants.pop_first(), Some(MediaFileClass::Audio));
       assert_eq!(variants.pop_first(), Some(MediaFileClass::Image));
       assert_eq!(variants.pop_first(), Some(MediaFileClass::Video));
+      assert_eq!(variants.pop_first(), Some(MediaFileClass::Dimensional));
       assert_eq!(variants.pop_first(), Some(MediaFileClass::Animation));
       assert_eq!(variants.pop_first(), Some(MediaFileClass::Character));
       assert_eq!(variants.pop_first(), Some(MediaFileClass::Prop));
