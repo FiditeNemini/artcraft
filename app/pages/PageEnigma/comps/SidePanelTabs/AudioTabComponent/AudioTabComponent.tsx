@@ -97,14 +97,13 @@ export const AudioTabComponent = () => {
 
   return (
     <>
-      <div className="w-full overflow-x-auto p-4">
+      <div className="w-full overflow-x-auto p-4 pb-0">
         <TabTitle title="Audio" />
         <div className="mb-4 flex justify-start gap-2">
           <button
             className={twMerge(
               "filter-tab",
               audioFilter.value === AssetFilterOption.ALL ? "active" : "",
-              "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.ALL)}>
             All
@@ -113,7 +112,6 @@ export const AudioTabComponent = () => {
             className={twMerge(
               "filter-tab",
               audioFilter.value === AssetFilterOption.MINE ? "active" : "",
-              "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.MINE)}
             disabled={!allAudioItems.some((item) => item.isMine)}>
@@ -125,7 +123,6 @@ export const AudioTabComponent = () => {
               audioFilter.value === AssetFilterOption.BOOKMARKED
                 ? "active"
                 : "",
-              "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.BOOKMARKED)}
             disabled={!allAudioItems.some((item) => item.isBookmarked)}>

@@ -12,14 +12,13 @@ export const CameraTab = () => {
 
   return (
     <>
-      <div className="w-full overflow-x-auto p-4">
+      <div className="w-full overflow-x-auto p-4 pb-0">
         <TabTitle title="Camera" />
         <div className="mb-4 flex justify-start gap-2">
           <button
             className={twMerge(
               "filter-tab",
               cameraFilter.value === AssetFilterOption.ALL ? "active" : "",
-              "disabled",
             )}
             onClick={() => (cameraFilter.value = AssetFilterOption.ALL)}>
             All
@@ -28,7 +27,6 @@ export const CameraTab = () => {
             className={twMerge(
               "filter-tab",
               cameraFilter.value === AssetFilterOption.MINE ? "active" : "",
-              "disabled",
             )}
             onClick={() => (cameraFilter.value = AssetFilterOption.MINE)}
             disabled={!cameraItems.value.some((item) => item.isMine)}>
@@ -40,7 +38,6 @@ export const CameraTab = () => {
               cameraFilter.value === AssetFilterOption.BOOKMARKED
                 ? "active"
                 : "",
-              "disabled",
             )}
             onClick={() => (cameraFilter.value = AssetFilterOption.BOOKMARKED)}
             disabled={!cameraItems.value.some((item) => item.isBookmarked)}>
