@@ -46,15 +46,15 @@ export const Controls3D = () => {
   };
 
   const modes = [
-    { value: "move", icon: faArrowsUpDownLeftRight },
-    { value: "rotate", icon: faArrowsRotate },
-    { value: "scale", icon: faUpRightAndDownLeftFromCenter },
+    { value: "move", icon: faArrowsUpDownLeftRight, text: "Move" },
+    { value: "rotate", icon: faArrowsRotate, text: "Rotate" },
+    { value: "scale", icon: faUpRightAndDownLeftFromCenter, text: "Scale" },
   ];
 
   return (
     <div>
       <div className="flex justify-center">
-        <div className="rounded-b-lg border-x border-b border-ui-panel-border bg-ui-controls p-2 text-white">
+        <div className="rounded-b-lg border-x border-b border-ui-panel-border bg-ui-controls p-1.5 text-white">
           <div className="flex items-center justify-center gap-3">
             <ButtonIconSelect
               options={modes}
