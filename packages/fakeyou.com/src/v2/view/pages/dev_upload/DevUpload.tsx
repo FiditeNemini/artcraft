@@ -43,7 +43,6 @@ export default function DevUpload(props: DevUploadProps) {
       case FileType.Gltf:
       case FileType.Obj:
       case FileType.Ron:
-      case FileType.Ron:
       case FileType.Pmd:
       case FileType.Vmd:
         uploadType = UploadType.EngineAsset;
