@@ -12,26 +12,29 @@ export const WaveformPlayer = ({
   const [isPlaying, toggleIsPlaying] = useState(false);
 
   const containerRef = useCallback((node:HTMLDivElement)=>{
-    const waveSurfer = WaveSurfer.create({
-      container: node,
-      barWidth: 2,
-      height: 30,
-      cursorWidth: 0,
-    });
-    waveSurfer.load(audio);
-    waveSurfer.on('ready', () => {
-      waveSurferRef.current = waveSurfer;
-    });
-    waveSurfer.on('play', () => {
-      toggleIsPlaying(true);
-    });
-    waveSurfer.on('pause', () => {
-      toggleIsPlaying(false);
-    });
+    if(node){
+      const waveSurfer = WaveSurfer.create({
+        container: node,
+        barWidth: 2,
+        height: 30,
+        cursorWidth: 0,
+      });
+      waveSurfer.load(audio);
+      waveSurfer.on('ready', () => {
+        waveSurferRef.current = waveSurfer;
+      });
+      waveSurfer.on('play', () => {
+        toggleIsPlaying(true);
+      });
+      waveSurfer.on('pause', () => {
+        toggleIsPlaying(false);
+      });
+    }
   }, []);
 
   useEffect(()=>{
     return()=>{
+      console.log("OK?");
       waveSurferRef.current?.destroy();
     }
   },[]);

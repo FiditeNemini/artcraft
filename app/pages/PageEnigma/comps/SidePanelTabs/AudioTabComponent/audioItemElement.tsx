@@ -32,10 +32,6 @@ export const AudioItemElement = ({ item }: Props) => {
 
   const { initX, initY } = initPosition.value;
 
-  useEffect (()=>{
-    console.log(item.publicBucketPath);
-  }, []);
-
   useEffect(() => {
     const onPointerUp = () => {
       if (dragItem.value) {
