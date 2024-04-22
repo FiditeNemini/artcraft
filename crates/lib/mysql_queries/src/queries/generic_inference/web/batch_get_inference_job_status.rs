@@ -141,21 +141,21 @@ fn make_query_builder() -> QueryBuilder<'static, MySql> {
   // TODO(bt,2023-10-12): ^^^ Is this comment still accurate? I don't see that field referenced below.
   QueryBuilder::new(r#"
 SELECT
-    jobs.token as `job_token: tokens::tokens::generic_inference_jobs::InferenceJobToken`,
+    jobs.token as job_token,
 
-    jobs.status as `status: enums::common::job_status_plus::JobStatusPlus`,
+    jobs.status as status,
     jobs.attempt_count,
 
-    jobs.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
-    jobs.maybe_creator_anonymous_visitor_token as `maybe_creator_anonymous_visitor_token: tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken`,
+    jobs.maybe_creator_user_token as maybe_creator_user_token`,
+    jobs.maybe_creator_anonymous_visitor_token as maybe_creator_anonymous_visitor_token,
     jobs.creator_ip_address,
 
-    jobs.inference_category as `inference_category: enums::by_table::generic_inference_jobs::inference_category::InferenceCategory`,
+    jobs.inference_category as inference_category,
     jobs.maybe_model_type,
     jobs.maybe_model_token,
     jobs.maybe_raw_inference_text,
 
-    jobs.frontend_failure_category as `maybe_frontend_failure_category: enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory`,
+    jobs.frontend_failure_category as maybe_frontend_failure_category,
 
     jobs.on_success_result_entity_type as maybe_result_entity_type,
     jobs.on_success_result_entity_token as maybe_result_entity_token,
