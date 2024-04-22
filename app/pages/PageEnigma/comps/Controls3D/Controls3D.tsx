@@ -46,9 +46,9 @@ export const Controls3D = () => {
   };
 
   const modes = [
-    { value: "move", icon: faArrowsUpDownLeftRight },
-    { value: "rotate", icon: faArrowsRotate },
-    { value: "scale", icon: faUpRightAndDownLeftFromCenter },
+    { value: "move", icon: faArrowsUpDownLeftRight, text: "Move" },
+    { value: "rotate", icon: faArrowsRotate, text: "Rotate" },
+    { value: "scale", icon: faUpRightAndDownLeftFromCenter, text: "Scale" },
   ];
 
   return (
