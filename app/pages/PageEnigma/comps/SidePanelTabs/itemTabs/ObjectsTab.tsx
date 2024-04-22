@@ -66,6 +66,7 @@ export const ObjectsTab = ({ type }: Props) => {
                 } : {}
               }
             })
+            .filter((item,i) => (item.thumbnail))
           });
         }
       });
@@ -75,6 +76,8 @@ export const ObjectsTab = ({ type }: Props) => {
   const assetFilter =
     type === AssetType.CHARACTER ? characterFilter : objectFilter;
   const items = type === AssetType.CHARACTER ? characterItems : objects;
+
+  console.log("😎",objects);
 
   return (
     <>
