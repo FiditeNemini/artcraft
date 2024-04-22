@@ -37,6 +37,7 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::weights_cover_image_details::*;
 use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::*;
 use crate::http_server::endpoints::engine::create_scene_handler::*;
+use crate::http_server::endpoints::inference_job::batch_get_inference_job_status::*;
 use crate::http_server::endpoints::inference_job::get_inference_job_status::*;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
 use crate::http_server::endpoints::media_files::delete::delete_media_file_handler::*;
@@ -86,6 +87,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
   paths(
     crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::enqueue_fbx_to_gltf_handler,
     crate::http_server::endpoints::engine::create_scene_handler::create_scene_handler,
+    crate::http_server::endpoints::inference_job::batch_get_inference_job_status::batch_get_inference_job_status_handler,
     crate::http_server::endpoints::inference_job::get_inference_job_status::get_inference_job_status_handler,
     crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler,
     crate::http_server::endpoints::media_files::delete::delete_media_file_handler::delete_media_file_handler,
@@ -175,6 +177,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     WeightsDefaultCoverInfo,
 
     // Endpoint API types
+    BatchGetInferenceJobStatusError,
+    BatchGetInferenceJobStatusQueryParams,
+    BatchGetInferenceJobStatusSuccessResponse,
     BatchGetMediaFilesError,
     BatchGetMediaFilesModelInfo,
     BatchGetMediaFilesQueryParams,
@@ -185,7 +190,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     BatchGetUserRatingError,
     BatchGetUserRatingQueryParams,
     BatchGetUserRatingResponse,
+    BatchInferenceJobStatusResponsePayload,
     BatchMediaFileInfo,
+    BatchRequestDetailsResponse,
+    BatchResultDetailsResponse,
+    BatchStatusDetailsResponse,
     BookmarkRow,
     ChangeMediaFileVisibilityError,
     ChangeMediaFileVisibilityPathInfo,

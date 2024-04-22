@@ -11,5 +11,6 @@ use utoipa::ToSchema;
 #[sqlx(transparent)]
 pub struct InferenceJobToken(String);
 
-impl_string_token!(InferenceJobToken);
 impl_crockford_generator!(InferenceJobToken, 32usize, TokenPrefix::InferenceJob, CrockfordLower);
+impl_mysql_token_from_row!(InferenceJobToken);
+impl_string_token!(InferenceJobToken);

@@ -12,5 +12,6 @@ use crate::prefixes::TokenPrefix;
 #[sqlx(transparent)]
 pub struct AnonymousVisitorTrackingToken(pub String);
 
-impl_string_token!(AnonymousVisitorTrackingToken);
 impl_crockford_generator!(AnonymousVisitorTrackingToken, 32usize, TokenPrefix::AnonymousVisitorTracking, CrockfordLower);
+impl_mysql_token_from_row!(AnonymousVisitorTrackingToken);
+impl_string_token!(AnonymousVisitorTrackingToken);
