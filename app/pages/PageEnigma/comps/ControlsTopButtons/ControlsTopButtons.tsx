@@ -6,6 +6,7 @@ import { ToasterContext } from "~/contexts/ToasterContext";
 // import { APPUI_ACTION_TYPES } from "app/reducers";
 
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
+import { Help } from "./Help";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
@@ -49,8 +50,7 @@ export const ControlsTopButtons = () => {
             label: "Load",
             disabled: sceneToken === "",
             onClick: handleButtonLoadScene,
-          }}
-        >
+          }}>
           <Input
             label="Please provide the Token of the scene you wished to load:"
             onChange={(e) => {
@@ -69,8 +69,7 @@ export const ControlsTopButtons = () => {
             label: "Save",
             disabled: sceneName === "",
             onClick: handleButtonSave,
-          }}
-        >
+          }}>
           <Input
             label="Please Enter a name for your scene"
             onChange={(e) => {
@@ -89,8 +88,7 @@ export const ControlsTopButtons = () => {
             disabled: mediaToken === "",
             onClick: handleMediaToken,
           }}
-          title="Add Scene Object via Media Token"
-        >
+          title="Add Scene Object via Media Token">
           <Input
             label="Please Enter a Media Token"
             onChange={(e) => {
@@ -104,15 +102,14 @@ export const ControlsTopButtons = () => {
             variant: "secondary",
             label: "Help",
           }}
-          title="Help"
-        >
-          <p>Do you need help?</p>
-          <p>Ask Michael about this project</p>
-          <p>Ask Miles about ThreeJS</p>
-          <p>Ask Wil about React</p>
+          dialogProps={{
+            className: "max-w-6xl w-auto",
+          }}
+          title="Help">
+          <Help />
         </ButtonDialogue>
       </div>
-      <TestFeaturesButtons debug={false}/>
+      <TestFeaturesButtons debug={false} />
     </div>
   );
 };
