@@ -77,8 +77,6 @@ export const ObjectsTab = ({ type }: Props) => {
     type === AssetType.CHARACTER ? characterFilter : objectFilter;
   const items = type === AssetType.CHARACTER ? characterItems : objects;
 
-  console.log("😎",objects);
-
   return (
     <>
       <div className="w-full overflow-x-auto">
