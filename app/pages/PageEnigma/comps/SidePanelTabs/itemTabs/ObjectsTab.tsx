@@ -1,5 +1,4 @@
 import { useContext, useState, useEffect } from "react";
-import { AssetFilterOption, AssetType } from "~/pages/PageEnigma/models";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
   characterFilter,
@@ -13,9 +12,9 @@ import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
 import { shapeItems } from "~/pages/PageEnigma/store";
 import { GetMediaByUser, GetMediaListResponse } from "~/api/media_files/GetMediaByUser";
-import { AssetFilterOption, MediaItem } from "~/pages/PageEnigma/models";
+import { AssetFilterOption, AssetType, MediaItem } from "~/pages/PageEnigma/models";
 import { BucketConfig } from "~/api/BucketConfig";
-import { AuthenticationContext } from "~/contexts/Authentication/AuthenticationContext/";
+import { AuthenticationContext } from "~/contexts/Authentication";
 
 interface Props {
   type: AssetType;
