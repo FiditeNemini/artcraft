@@ -146,7 +146,7 @@ SELECT
     jobs.status as status,
     jobs.attempt_count,
 
-    jobs.maybe_creator_user_token as maybe_creator_user_token`,
+    jobs.maybe_creator_user_token as maybe_creator_user_token,
     jobs.maybe_creator_anonymous_visitor_token as maybe_creator_anonymous_visitor_token,
     jobs.creator_ip_address,
 
