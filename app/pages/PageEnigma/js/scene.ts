@@ -51,6 +51,10 @@ class Scene {
         //obj.type = "Object3D";
         obj.name = name;
         obj.position.copy(pos);
+        obj.userData["color"] = "#FFFFFF";
+        obj.userData["metalness"] = 0.0;
+        obj.userData["shininess"] = 0.5;
+        obj.userData["specular"] = 0.0;
         this.scene.add(obj);
         return obj.uuid;
     }
@@ -138,21 +142,19 @@ class Scene {
                         if (c instanceof THREE.Mesh) {
                             c.material.metalness = 0.0;
                             c.material.specular = 0.5;
+                            c.material.shininess = 0.0;
                             c.castShadow = true;
                             c.receiveShadow = true;
                             c.frustumCulled = false;
                             c.material.transparent = false;
                         }
                     });
-                    //console.log(child);
-                    //if (child.type == "Group") {
-                    //    if (auto_add) { child.children.forEach(element => {
-                    //        this.scene.add(element);
-                    //    }); }
-                    //    resolve(child);
-                    //}
                     child.frustumCulled = false;
                     child.userData["media_id"] = media_id;
+                    child.userData["color"] = "#FFFFFF";
+                    child.userData["metalness"] = 0.0;
+                    child.userData["shininess"] = 0.5;
+                    child.userData["specular"] = 0.5;
                     if (auto_add) { this.scene.add(child); }
                     resolve(child);
                 });
@@ -179,6 +181,7 @@ class Scene {
                         resolve(child.children[0]);
                         return;
                     }
+                    child.userData["color"] = "#FFFFFF";
                     if (auto_add) { this.scene.add(child); }
                     resolve(child);
                 });

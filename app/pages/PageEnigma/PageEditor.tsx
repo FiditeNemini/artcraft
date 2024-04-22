@@ -18,12 +18,20 @@ import {
   sidePanelVisible,
   dndSidePanelWidth,
   dndTimelineHeight,
+  dragItem,
+  canDrop,
 } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/contexts/AppUiContext";
 import { pageHeight, pageWidth } from "~/store";
 import { TopBar } from "~/modules/TopBar";
 import { DialogueTTS } from "./comps/DialogueTTS/DialogueTTS";
+import { Pages } from "~/pages/PageEnigma/constants/page";
+import { AssetType } from "./models/assets";
+
+interface Props {
+  setPage: (page: Pages) => void;
+}
 
 export const PageEditor = () => {
   useSignals();
@@ -68,7 +76,39 @@ export const PageEditor = () => {
                   ? "invisible"
                   : ""
               }>
-              <canvas id="video-scene" width="1280px" height="720px" />
+              <div
+                id="video-scene-container"
+                style={{
+                  width:
+                    pageWidth.value -
+                    (sidePanelVisible.value ? sidePanelWidth.value : 0) -
+                    84,
+                  height: pageHeight.value - timelineHeight.value - 68,
+                }}>
+                <canvas
+                  id="video-scene"
+                  width="1280px"
+                  height="720px"
+                  onPointerOver={() => {
+                    if (
+                      dragItem.value?.type === AssetType.OBJECT ||
+                      dragItem.value?.type === AssetType.SHAPE ||
+                      dragItem.value?.type === AssetType.CHARACTER
+                    ) {
+                      canDrop.value = true;
+                    }
+                  }}
+                  onPointerLeave={() => {
+                    if (
+                      dragItem.value?.type === AssetType.OBJECT ||
+                      dragItem.value?.type === AssetType.SHAPE ||
+                      dragItem.value?.type === AssetType.CHARACTER
+                    ) {
+                      canDrop.value = false;
+                    }
+                  }}
+                />
+              </div>
 
               {/* Top controls */}
               <div

@@ -116,9 +116,10 @@ export class LipSyncClip {
     });
   }
 
-  step() {
+  step(frame: number, offset: number, rendering: boolean) {
     if (this.lipsync == null) { return; }
-    const positions = this.lipsync.update();
+    const positions = this.lipsync.update(frame, offset, rendering);
+    if(positions)
     this.setBlends(positions["ee"], positions["ah"], positions["oh"]);
   }
 
