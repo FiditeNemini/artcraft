@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use utoipa::ToSchema;
 
 #[cfg(test)]
 use strum::EnumCount;
@@ -15,7 +16,7 @@ use strum::EnumIter;
 /// DO NOT CHANGE VALUES WITHOUT A MIGRATION STRATEGY.
 
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd, Serialize, Deserialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd, Serialize, Deserialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum JobStatusPlus {
   Pending,

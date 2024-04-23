@@ -2,4 +2,5 @@ pub mod batch_get_inference_job_status_handler;
 pub mod get_inference_job_status_handler;
 pub mod get_pending_inference_job_count_handler;
 pub mod kill_inference_jobs_handler;
+pub mod list_session_jobs_handler;
 pub mod terminate_inference_job_handler;
