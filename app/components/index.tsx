@@ -12,6 +12,7 @@ import { ListDropdown } from "./ListDropdown"
 import { ListSearchDropdown } from "./ListSearchDropdown"
 import { LoadingBar } from "./LoadingBar";
 import { LoadingDots, LoadingDotsBricks, LoadingDotsTyping } from "./LoadingDots";
+import { Pill } from "./Pill";
 
 export {
   Button,
@@ -30,4 +31,5 @@ export {
   LoadingDots,
   LoadingDotsBricks,
   LoadingDotsTyping,
+  Pill
 };
