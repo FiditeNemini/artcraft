@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import { AudioTabPages, TtsState } from "./types";
+import { AudioTabPages, TtsState, V2VState } from "./types";
 import { VoiceConversionModelListItem } from "./typesImported";
 
 import {
@@ -17,14 +17,16 @@ export const PageAudioGeneration = ({
   sessionToken,
   ttsState,
   setTtsState,
-  v2vModels,
+  v2vState,
+  setV2VState,
 }:{
   page: AudioTabPages;
   changePage: (newPage:AudioTabPages) => void;
   sessionToken: string;
   ttsState: TtsState;
   setTtsState: (newState:TtsState)=>void;
-  v2vModels: Array<VoiceConversionModelListItem>
+  v2vState: V2VState;
+  setV2VState: (newState: V2VState)=>void;
 }) =>{
   return(
     <div className="flex flex-col px-4 pt-2">
@@ -70,7 +72,8 @@ export const PageAudioGeneration = ({
         <PageVoicetoVoice
           changePage={changePage}
           sessionToken={sessionToken}
-          v2vModels={v2vModels}
+          v2vState={v2vState}
+          setV2VState={setV2VState}
         />
       }
     </div>

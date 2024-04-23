@@ -11,11 +11,12 @@ import { FrontendInferenceJobType } from "~/pages/PageEnigma/models";
 
 import { PageLibrary } from "./pageLibrary";
 import { PageAudioGeneration } from "./pageAudioGeneration";
-import { AudioTabPages, TtsState } from "./types";
-import { initialTtsState } from "./values";
+import { AudioTabPages, TtsState, V2VState } from "./types";
+import { initialTtsState, initialV2VState } from "./values";
 import { TtsModelListItem, } from "~/pages/PageEnigma/models/tts";
 import { VoiceConversionModelListItem } from "./typesImported";
 import { PageSelectTtsModel } from "./pageSelectTtsModel";
+import { PageSelectV2VModel } from "./pageSelectV2VModel";
 
 export const AudioTab = () => {
   // app wide data
@@ -36,6 +37,13 @@ export const AudioTab = () => {
       ...newState,
     }));
   };
+  const [v2vState, setV2VState] = useState<V2VState>(initialV2VState);
+  const handleSetV2VState = (newState: V2VState) => {
+    setV2VState((curr:V2VState)=>({
+      ...curr,
+      ...newState,
+    }));
+  }
   const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
   const [v2vModels, setV2VModels] = useState<Array<VoiceConversionModelListItem>>([]);
 
@@ -150,6 +158,21 @@ export const AudioTab = () => {
         />
       );
     }
+    case AudioTabPages.SELECT_V2V_MODEL:{
+      return (
+        <PageSelectV2VModel
+          changePage={changePage}
+          v2vModels={v2vModels}
+          onSelect={(selectedVoice)=>{
+            setV2VState((curr)=>({
+              ...curr,
+              voice: selectedVoice,
+            }));
+            changePage(AudioTabPages.V2V)
+          }}
+        />
+      );
+    }
     case AudioTabPages.TTS:
     case AudioTabPages.V2V:{
       if(authState.sessionToken){
@@ -160,7 +183,8 @@ export const AudioTab = () => {
             sessionToken={authState.sessionToken}
             ttsState={ttsState}
             setTtsState={handleSetTtsState}
-            v2vModels={v2vModels}
+            v2vState={v2vState}
+            setV2VState={handleSetV2VState}
           />
         );
       }else{

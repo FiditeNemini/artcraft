@@ -5,22 +5,22 @@ import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 import { H2, ButtonIcon, Input } from "~/components";
 import { AudioTabPages } from "./types";
 
-import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
 import { VoiceModelElement } from "./voiceModelElement";
+import { VoiceConversionModelListItem } from './typesImported';
 
-export const PageSelectTtsModel = ({
+export const PageSelectV2VModel = ({
   changePage,
-  ttsModels,
+  v2vModels,
   onSelect
 }:{
   changePage: (newPage:AudioTabPages)=>void;
-  ttsModels: Array<TtsModelListItem>;
-  onSelect: (item:TtsModelListItem)=>void;
+  v2vModels: Array<VoiceConversionModelListItem>;
+  onSelect: (item:VoiceConversionModelListItem)=>void;
 })=>{
   const [query, setQuery] = useState('');
   const filteredListOfModels = query === ''
-  ? ttsModels
-  : ttsModels.filter((model) =>{
+  ? v2vModels
+  : v2vModels.filter((model) =>{
       return model.title
         .toLowerCase()
         .replace(/\s+/g, '')
@@ -49,7 +49,7 @@ export const PageSelectTtsModel = ({
           return(
             <VoiceModelElement
               model={item}
-              onSelect={(item)=>onSelect(item as TtsModelListItem)}
+              onSelect={(item)=>onSelect(item as VoiceConversionModelListItem)}
             />
           );
         })}
