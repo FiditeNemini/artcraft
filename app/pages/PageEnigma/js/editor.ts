@@ -321,11 +321,14 @@ class Editor {
       this.renderer.domElement,
     );
 
-    this.orbitControls.mouseButtons = {
-      MIDDLE: THREE.MOUSE.ROTATE,
-      RIGHT: THREE.MOUSE.PAN,
-    }; // Blender Style
-    // this.orbitControls.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN }; // Standard
+    //this.orbitControls.mouseButtons = {
+    //  MIDDLE: THREE.MOUSE.ROTATE,
+    //  RIGHT: THREE.MOUSE.PAN,
+    //}; // Blender Style
+    this.orbitControls.mouseButtons = { 
+      LEFT: THREE.MOUSE.ROTATE, 
+      MIDDLE: THREE.MOUSE.DOLLY, 
+      RIGHT: THREE.MOUSE.PAN }; // Standard
 
     this.control = new TransformControls(this.camera, this.renderer.domElement);
     this.control.space = "local"; // Local transformation mode
@@ -1348,7 +1351,7 @@ class Editor {
       this.orbitControls.update();
       this.orbitControls.maxDistance = 999;
     } else if (event.key === ' ') {
-      if(this.rendering == false){
+      if (this.rendering == false) {
         this.startPlayback();
       }
     }
