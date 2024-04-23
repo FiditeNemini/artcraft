@@ -20,6 +20,21 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { toTimelineActions } from "../../Queue/toTimelineActions";
 import { QueueKeyframe } from "~/pages/PageEnigma/models";
 
+// TODO this will be useful later to fix the bug on leading zeros
+const formatNumber = (input: string): number => {
+  // Convert the input string to a number to remove leading zeros
+  const num = parseFloat(input);
+  // Convert the number back to a string with at least two decimal places
+  const str = num.toFixed(2);
+  return parseFloat(str);
+}
+
+// console.log(formatNumber("000123.4567"));  // Outputs: "123.46"
+// console.log(formatNumber("000123.4"));     // Outputs: "123.40"
+// console.log(formatNumber("000123"));       // Outputs: "123.00"
+// console.log(formatNumber("0000.00"));      // Outputs: "0.00"
+// console.log(formatNumber("0000.000001"));  // Outputs: "0.00"
+
 export const ControlPanelSceneObject = () => {
   const editorEngine = useContext(EngineContext);
   const [appUiState, dispatchAppUiState] = useContext(AppUiContext);
@@ -29,6 +44,7 @@ export const ControlPanelSceneObject = () => {
     setIsCollapsed(!isCollapsed);
   };
 
+
   const position =
     appUiState.controlPanel.currentSceneObject?.objectVectors?.position;
   const rotation =
@@ -36,6 +52,7 @@ export const ControlPanelSceneObject = () => {
   const scale =
     appUiState.controlPanel.currentSceneObject?.objectVectors?.scale;
   const currentSceneObject = appUiState.controlPanel.currentSceneObject;
+
 
   useEffect(() => {
     // TODO this causes a subtle bug because it renders way too many times.
