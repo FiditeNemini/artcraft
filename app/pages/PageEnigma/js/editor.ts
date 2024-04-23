@@ -1342,6 +1342,10 @@ class Editor {
       this.orbitControls.maxDistance = 4;
       this.orbitControls.update();
       this.orbitControls.maxDistance = 999;
+    } else if (event.key === ' ') {
+      if(this.rendering == false){
+        this.startPlayback();
+      }
     }
   }
 
