@@ -189,7 +189,7 @@ export const ControlPanelSceneObject = () => {
       <div className="mb-1 flex justify-between">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube} />
-          <p className="font-semibold">
+          <p className="max-w-36 truncate font-semibold">
             {appUiState.controlPanel.currentSceneObject.object_name}
           </p>
         </div>
