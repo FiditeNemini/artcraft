@@ -151,7 +151,6 @@ impl RawUserBookmarkRecord {
               MediaFileType::Audio => Some("audio media file".to_string()),
               MediaFileType::Image => Some("image media file".to_string()),
               MediaFileType::Video => Some("video media file".to_string()),
-              MediaFileType::Mocap => Some("mocap file".to_string()),
               MediaFileType::Bvh => Some("3d file".to_string()),
               MediaFileType::Fbx => Some("3d file".to_string()),
               MediaFileType::Glb => Some("3d file".to_string()),

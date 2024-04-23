@@ -185,7 +185,6 @@ pub async fn list_media_files_by_batch_token_handler(
         }
         // Don't allow access to certain media types.
         match record.media_type {
-          MediaFileType::Mocap |
           MediaFileType::Bvh |
           MediaFileType::Fbx |
           MediaFileType::Glb |

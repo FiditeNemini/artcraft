@@ -299,7 +299,6 @@ pub async fn process_upload_media_file(
 
   if extension.is_none() {
     extension = match media_file_type {
-      MediaFileType::Mocap => Some(".bvh".to_string()),
       MediaFileType::Bvh => Some(".bvh".to_string()),
       MediaFileType::Fbx => Some(".fbx".to_string()),
       MediaFileType::Gltf => Some(".gltf".to_string()),
