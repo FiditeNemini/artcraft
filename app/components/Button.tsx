@@ -16,12 +16,8 @@ export const Button = ({
   disabled,
   ...rest
 }: ButtonPropsI) => {
-  const variant = disabled ? "disabled" : propsVariant;
   function getVariantClassNames(variant: string) {
     switch (variant) {
-      case "disabled": {
-        return "bg-brand-secondary-500 text-brand-secondary-300";
-      }
       case "secondary": {
         return " bg-brand-secondary hover:bg-brand-secondary-900 text-white focus-visible:outline-brand-secondary";
       }
@@ -30,20 +26,25 @@ export const Button = ({
       }
       case "primary":
       default: {
-        return " bg-brand-primary hover:bg-brand-primary-400 text-white focus-visible:outline-brand-primary-600";
+        return "bg-brand-primary hover:bg-brand-primary-400 text-white focus-visible:outline-brand-primary-600";
       }
     }
   }
 
+  const disabledClass = twMerge(
+    disabled ? "opacity-40 pointer-events-none" : "",
+  );
+
   const className = twMerge(
     "text-sm font-medium rounded-lg px-3 py-2 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-all duration-150 flex gap-2 items-center justify-center",
-    getVariantClassNames(variant),
+    getVariantClassNames(propsVariant),
     propsClassName,
+    disabledClass,
   );
 
   return (
     <button className={className} disabled={disabled} {...rest}>
-      {icon && <FontAwesomeIcon icon={icon} size="sm"/>}
+      {icon && <FontAwesomeIcon icon={icon} size="sm" />}
       {children}
     </button>
   );

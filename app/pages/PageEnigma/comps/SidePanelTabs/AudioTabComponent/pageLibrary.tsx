@@ -10,25 +10,24 @@ import { AudioItemElements } from "./audioItemElements";
 import { AudioTabPages } from "./types";
 
 export const PageLibrary = ({
-  changePage 
-}:{
-  changePage: (newPage:AudioTabPages) => void
-})=>{
+  changePage,
+}: {
+  changePage: (newPage: AudioTabPages) => void;
+}) => {
   useSignals();
   const allAudioItems = [...audioItems.value, ...audioItemsFromServer.value];
 
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="mb-4 mt-4 flex justify-start items-center gap-2 px-4">
+        <div className="mb-4 mt-4 flex items-center justify-start gap-2 px-4">
           <button
             className={twMerge(
               "filter-tab",
               audioFilter.value === AssetFilterOption.ALL ? "active" : "",
               "disabled",
             )}
-            onClick={() => (audioFilter.value = AssetFilterOption.ALL)}
-          >
+            onClick={() => (audioFilter.value = AssetFilterOption.ALL)}>
             All
           </button>
           <button
@@ -38,8 +37,7 @@ export const PageLibrary = ({
               "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.MINE)}
-            disabled={!allAudioItems.some((item) => item.isMine)}
-          >
+            disabled={!allAudioItems.some((item) => item.isMine)}>
             My Audios
           </button>
           <button
@@ -51,8 +49,7 @@ export const PageLibrary = ({
               "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.BOOKMARKED)}
-            disabled={!allAudioItems.some((item) => item.isBookmarked)}
-          >
+            disabled={!allAudioItems.some((item) => item.isBookmarked)}>
             Bookmarked
           </button>
         </div>
@@ -62,8 +59,7 @@ export const PageLibrary = ({
           icon={faCirclePlus}
           variant="action"
           className="w-full py-3 text-sm font-medium"
-          onClick={()=>changePage(AudioTabPages.TTS)}
-        >
+          onClick={() => changePage(AudioTabPages.TTS)}>
           Generate Audio
         </Button>
       </div>
@@ -76,4 +72,4 @@ export const PageLibrary = ({
       </div>
     </>
   );
-}
+};

@@ -5,20 +5,31 @@ import { v4 as uuidv4 } from "uuid";
 import {
   faChevronLeft,
   faBrainCircuit,
+  faVolumeHigh,
 } from "@fortawesome/pro-solid-svg-icons";
 
-import { 
-  Button, ButtonIcon, H2, Label,
+import {
+  Button,
+  ButtonIcon,
+  H2,
+  Label,
   LoadingDotsTyping,
   ListSearchDropdown,
-  Textarea
+  Textarea,
 } from "~/components";
 
-import { TtsModelListItem, GenerateTtsAudioResponse } from "~/pages/PageEnigma/models/tts";
+import {
+  TtsModelListItem,
+  GenerateTtsAudioResponse,
+} from "~/pages/PageEnigma/models/tts";
 
-import { addInferenceJob, inferenceJobs} from "../../../store/inferenceJobs";
+import { addInferenceJob, inferenceJobs } from "../../../store/inferenceJobs";
 import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
-import { ListTtsModels, GenerateTtsAudio, GetMediaFileByToken } from "./utilities";
+import {
+  ListTtsModels,
+  GenerateTtsAudio,
+  GetMediaFileByToken,
+} from "./utilities";
 import { AudioTabPages } from "./types";
 import { AudioItemElement } from "./audioItemElement";
 import { MediaItem, AssetType } from "~/pages/PageEnigma/models";
@@ -26,61 +37,63 @@ import { MediaItem, AssetType } from "~/pages/PageEnigma/models";
 type TtsState = {
   voice: TtsModelListItem | undefined;
   text: string;
-  hasEnqueued :boolean;
+  hasEnqueued: boolean;
   inferenceToken?: string;
   inferenceJobType?: string;
   hasTtsResult: boolean;
-}
-const initialState:TtsState =
-  {
-    voice:undefined,
-    text:"",
-    hasEnqueued:false,
-    inferenceJobType: undefined,
-    inferenceToken: undefined,
-    hasTtsResult:false,
-  };
+};
+const initialState: TtsState = {
+  voice: undefined,
+  text: "",
+  hasEnqueued: false,
+  inferenceJobType: undefined,
+  inferenceToken: undefined,
+  hasTtsResult: false,
+};
 
-export const PageTTS =({
+export const PageTTS = ({
   changePage,
   sessionToken,
-}:{
-  changePage: (newPage:AudioTabPages) => void;
+}: {
+  changePage: (newPage: AudioTabPages) => void;
   sessionToken: string;
-})=>{
+}) => {
   const [ttsState, setTtsState] = useState<TtsState>(initialState);
 
-  const [ttsResultFile, setTtsResultFile] = useState<MediaItem|undefined>();
+  const [ttsResultFile, setTtsResultFile] = useState<MediaItem | undefined>();
 
-  useSignalEffect(()=>{
+  useSignalEffect(() => {
     console.log(inferenceJobs.value);
-    if(ttsState.hasEnqueued && ttsState.inferenceToken){
-      const found = inferenceJobs.value.find((job)=>job.job_id===ttsState.inferenceToken);
+    if (ttsState.hasEnqueued && ttsState.inferenceToken) {
+      const found = inferenceJobs.value.find(
+        (job) => job.job_id === ttsState.inferenceToken,
+      );
       console.log(`finding: ${ttsState.inferenceToken}`);
       console.log(found);
-      if(found?.job_status === JobState.COMPLETE_SUCCESS){
-        setTtsState((curr)=>({
+      if (found?.job_status === JobState.COMPLETE_SUCCESS) {
+        setTtsState((curr) => ({
           ...curr,
           hasTtsResult: true,
-        }))
-        GetMediaFileByToken(found.result.entity_token, sessionToken)
-        .then(res=>{
-          console.log(res);
-          const morphedItem:MediaItem = {
-            version: 1,
-            type: AssetType.AUDIO,
-            media_id: res.media_file.token,
-            object_uuid: res.media_file.token,
-            name: ttsState.voice?.title || '',
-            description: ttsState.text,
-            publicBucketPath: res.media_file.public_bucket_path,
-            length: 25,
-            thumbnail: "/resources/placeholders/audio_placeholder.png",
-            isMine: true,
-            // isBookmarked?: boolean;
-          }
-          setTtsResultFile(morphedItem);
-        })
+        }));
+        GetMediaFileByToken(found.result.entity_token, sessionToken).then(
+          (res) => {
+            console.log(res);
+            const morphedItem: MediaItem = {
+              version: 1,
+              type: AssetType.AUDIO,
+              media_id: res.media_file.token,
+              object_uuid: res.media_file.token,
+              name: ttsState.voice?.title || "",
+              description: ttsState.text,
+              publicBucketPath: res.media_file.public_bucket_path,
+              length: 25,
+              thumbnail: "/resources/placeholders/audio_placeholder.png",
+              isMine: true,
+              // isBookmarked?: boolean;
+            };
+            setTtsResultFile(morphedItem);
+          },
+        );
       }
     }
   });
@@ -102,132 +115,139 @@ export const PageTTS =({
     listModels();
   }, [listModels]);
 
-  useEffect(()=> {
-    if(ttsState.hasEnqueued && ttsState.inferenceToken && ttsState.inferenceJobType){
+  useEffect(() => {
+    if (
+      ttsState.hasEnqueued &&
+      ttsState.inferenceToken &&
+      ttsState.inferenceJobType
+    ) {
       console.log(`tts has Enqueued`);
       addInferenceJob({
-        version:1,
+        version: 1,
         job_id: ttsState.inferenceToken,
         job_type: ttsState.inferenceJobType,
         job_status: JobState.PENDING,
-      })
-    }
-  },[ttsState]);
-
-  const requestTts = useCallback( (sessionToken:string)=>{
-    const modelToken = ttsState.voice ? ttsState.voice.model_token : undefined;
-
-    if(modelToken){
-      setTtsState((curr)=>({
-        ...curr,
-        hasEnqueued: true,
-        inferenceToken: undefined,
-        inferenceJobType: undefined,
-        hasAudio: false,
-        result: undefined,
-      }));
-
-      const request = {
-        uuid_idempotency_token: uuidv4(),
-        tts_model_token: modelToken,
-        inference_text: ttsState.text,
-      };
-
-      GenerateTtsAudio(request, sessionToken).then((
-        res:GenerateTtsAudioResponse)=>{
-        if(res && res.inference_job_token){
-          setTtsState((curr)=>({
-            ...curr,
-            inferenceToken: res.inference_job_token,
-            inferenceJobType: res.inference_job_token_type
-          }));
-        }
       });
-    }else{
-      console.log("no voice model selected");
     }
-  },[ttsState]);
+  }, [ttsState]);
 
-  const handleTextInput = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  )=>{
-    setTtsState((curr)=>({
+  const requestTts = useCallback(
+    (sessionToken: string) => {
+      const modelToken = ttsState.voice
+        ? ttsState.voice.model_token
+        : undefined;
+
+      if (modelToken) {
+        setTtsState((curr) => ({
+          ...curr,
+          hasEnqueued: true,
+          inferenceToken: undefined,
+          inferenceJobType: undefined,
+          hasAudio: false,
+          result: undefined,
+        }));
+
+        const request = {
+          uuid_idempotency_token: uuidv4(),
+          tts_model_token: modelToken,
+          inference_text: ttsState.text,
+        };
+
+        GenerateTtsAudio(request, sessionToken).then(
+          (res: GenerateTtsAudioResponse) => {
+            if (res && res.inference_job_token) {
+              setTtsState((curr) => ({
+                ...curr,
+                inferenceToken: res.inference_job_token,
+                inferenceJobType: res.inference_job_token_type,
+              }));
+            }
+          },
+        );
+      } else {
+        console.log("no voice model selected");
+      }
+    },
+    [ttsState],
+  );
+
+  const handleTextInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setTtsState((curr) => ({
       ...curr,
       text: e.target.value,
     }));
   };
 
-  const handleOnSelect = (val:string)=>{
-    console.log( val);
-    const voiceModel = ttsModels.find((item)=>{
-      if (item.title === val) return item
-    })
-    setTtsState((curr)=>({
+  const handleOnSelect = (val: string) => {
+    console.log(val);
+    const voiceModel = ttsModels.find((item) => {
+      if (item.title === val) return item;
+    });
+    setTtsState((curr) => ({
       ...curr,
       voice: voiceModel,
     }));
-  }
+  };
 
-  return(
+  return (
     <div className="flex flex-col p-4">
-      <div className="flex items-center">
+      <div className="mb-5 flex items-center gap-3">
         <ButtonIcon
+          className="w-auto p-0 text-xl opacity-60 hover:opacity-40"
           icon={faChevronLeft}
-          onClick={()=>changePage(AudioTabPages.LIBRARY)}
+          onClick={() => changePage(AudioTabPages.LIBRARY)}
         />
-        <H2>Generate TTS</H2>
+        <H2 className="font-semibold">Generate TTS</H2>
       </div>
       <Label className="mb-1">Select a Voice</Label>
-      {ttsModels.length > 0 && <ListSearchDropdown
-        list={ttsModels}
-        listDisplayKey="title"
-        onSelect={handleOnSelect}
-      /> }
-      <div className="flex w-full justify-between mt-4">
+      {ttsModels.length > 0 && (
+        <ListSearchDropdown
+          list={ttsModels}
+          listDisplayKey="title"
+          onSelect={handleOnSelect}
+        />
+      )}
+      <div className="mt-4 flex w-full justify-between">
         <Label>What would you like to say?</Label>
-        <div className="flex gap-2 items-center">
-        </div>
+        <div className="flex items-center gap-2"></div>
       </div>
       <Textarea
         placeholder="Enter what you want the voice to say here."
         value={ttsState.text}
         onChange={handleTextInput}
+        rows={8}
       />
-      <div className="mt-6 flex gap-2">
-        <div className="w-full h-12">
-          {!ttsState.hasTtsResult && !ttsState.hasEnqueued &&
+      <div className="mt-4 flex gap-2">
+        <div className="h-auto w-full">
+          {!ttsState.hasTtsResult && !ttsState.hasEnqueued && (
             <Button
-              className="w-36 h-full text-xl "
-              variant={ttsState.hasTtsResult ? "secondary" : "primary" }
+              className="h-11 w-full text-sm"
+              variant={ttsState.hasTtsResult ? "secondary" : "primary"}
               disabled={ttsState.text === ""}
-              icon={faBrainCircuit}
-              onClick={()=>requestTts(sessionToken)}
-            >
+              icon={faVolumeHigh}
+              onClick={() => requestTts(sessionToken)}>
               Generate
             </Button>
-          }
-          {!ttsState.hasTtsResult && ttsState.hasEnqueued &&
-            <LoadingDotsTyping className="bg-brand-secondary-500 rounded-lg"/>
-          }
-          { ttsResultFile &&
-            <AudioItemElement item={ttsResultFile}/>
-          }
+          )}
+          {!ttsState.hasTtsResult && ttsState.hasEnqueued && (
+            <LoadingDotsTyping className="rounded-lg bg-brand-secondary-500" />
+          )}
+          {ttsResultFile && <AudioItemElement item={ttsResultFile} />}
         </div>
-        
       </div>
 
-      <div className="mt-6 flex justify-between gap-2">
-        { ttsState.hasEnqueued &&
+      <div className="mt-4 flex justify-between gap-2">
+        {ttsState.hasEnqueued && (
           <Button
+            className="h-11 w-full text-sm"
             type="button"
-            disabled={!ttsState.hasTtsResult}
-            onClick={()=>requestTts(sessionToken)}
-            icon={faBrainCircuit}
-          >
+            disabled={!ttsState.hasTtsResult || ttsState.text === ""}
+            onClick={() => requestTts(sessionToken)}
+            icon={faVolumeHigh}>
             Generate Another
           </Button>
-        }
+        )}
       </div>
     </div>
   );
-}
+};
