@@ -5,13 +5,13 @@ import { AuthenticationContext } from "~/contexts/Authentication";
 import { MediaItem, AssetType } from "~/pages/PageEnigma/models";
 import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
 import { audioItemsFromServer } from "~/pages/PageEnigma/store/mediaFromServer";
-import { ListAudioByUser, ListTtsModels } from "./utilities";
+import { ListAudioByUser, ListTtsModels, ListVoiceConversionModels } from "./utilities";
 import { inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
 import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
 
 import { PageLibrary } from "./pageLibrary";
 import { PageAudioGeneration } from "./pageAudioGeneration";
-import { AudioTabPages } from "./types";
+import { AudioTabPages, VoiceConversionModelListItem } from "./types";
 
 export const AudioTab = () => {
   // app wide data
@@ -27,6 +27,7 @@ export const AudioTab = () => {
   });
 
   const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
+  const [v2vModels, setV2VModels] = useState<Array<VoiceConversionModelListItem>>([]);
 
 
   const handleListAudioByUser = useCallback((username:string, sessionToken:string)=>{
@@ -58,6 +59,11 @@ export const AudioTab = () => {
     });
   }, []);
 
+  const fetchV2VModels = useCallback(async (sessionToken:string) => {
+    ListVoiceConversionModels(sessionToken).then(res=>{
+      if(res) setV2VModels(res);
+    });
+  }, []);
   useEffect(()=>{
     if (authState.userInfo && authState.sessionToken){
       if(state.firstLoad === false){
@@ -66,6 +72,9 @@ export const AudioTab = () => {
         }
         if( ttsModels.length === 0){
           fetchTtsModels(authState.sessionToken);
+        }
+        if( v2vModels.length === 0){
+          fetchV2VModels(authState.sessionToken);
         }
         setState((curr)=>({...curr, firstLoad:true}));
         // completed the first load
@@ -117,6 +126,7 @@ export const AudioTab = () => {
             changePage={changePage}
             sessionToken={authState.sessionToken}
             ttsModels={ttsModels}
+            v2vModels={v2vModels}
           />
         );
       }else{
