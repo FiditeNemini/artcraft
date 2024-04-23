@@ -362,7 +362,7 @@ mod tests {
   use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
   use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
   use mysql_queries::queries::generic_inference::web::get_inference_job_status::{GenericInferenceJobStatus, RequestDetails, ResultDetails};
-  use crate::http_server::endpoints::inference_job::get_inference_job_status::record_to_payload;
+  use crate::http_server::endpoints::inference_job::get_inference_job_status_handler::record_to_payload;
 
   #[test]
   fn text_to_speech_as_media_file() {
