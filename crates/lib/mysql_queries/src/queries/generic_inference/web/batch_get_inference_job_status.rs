@@ -7,6 +7,7 @@ use sqlx::pool::PoolConnection;
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::job_status_plus::JobStatusPlus;
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::anonymous_visitor_tracking::AnonymousVisitorTrackingToken;
@@ -15,6 +16,7 @@ use tokens::tokens::users::UserToken;
 use tokens::traits::mysql_token_from_row::MySqlTokenFromRow;
 
 use crate::helpers::boolean_converters::i8_to_bool;
+use crate::payloads::generic_inference_args::generic_inference_args::{GenericInferenceArgs, PolymorphicInferenceArgs};
 
 // NB: Serialization is for internal endpoints, not for returning to end-users.
 #[derive(Debug, Default, Serialize)]
@@ -53,6 +55,10 @@ pub struct RequestDetails {
 
   /// TTS input. In the future, perhaps voice conversion SST
   pub maybe_raw_inference_text: Option<String>,
+
+  /// For Comfy / Video Style Transfer jobs, this might include
+  /// the name of the selected style.
+  pub maybe_style_name: Option<StyleTransferName>,
 }
 
 /// NB: Serialize is for internal moderator-only endpoints
@@ -154,6 +160,7 @@ SELECT
     jobs.maybe_model_type,
     jobs.maybe_model_token,
     jobs.maybe_raw_inference_text,
+    jobs.maybe_inference_args,
 
     jobs.frontend_failure_category as maybe_frontend_failure_category,
 
@@ -198,6 +205,24 @@ LEFT OUTER JOIN media_files ON jobs.on_success_result_entity_token = media_files
 fn raw_records_to_public_result(records: Vec<RawGenericInferenceJobStatus>) -> Vec<GenericInferenceJobStatus> {
   records.into_iter()
       .map(|record| {
+        let maybe_args = record.maybe_inference_args
+            .as_deref()
+            .map(|args| GenericInferenceArgs::from_json(args))
+            .transpose()
+            .ok() // NB: Fail open in this case.
+            .flatten()
+            .map(|generic_args| generic_args.args)
+            .flatten();
+
+        let mut maybe_style_name = None;
+
+        match maybe_args {
+          Some(PolymorphicInferenceArgs::Cu(workflow_args)) => {
+            maybe_style_name = workflow_args.style_name;
+          }
+          _ => {}
+        }
+
         let mut maybe_model_title = None;
 
         if let Some(title) = record.maybe_model_weights_title.as_deref() {
@@ -277,6 +302,7 @@ fn raw_records_to_public_result(records: Vec<RawGenericInferenceJobStatus>) -> V
             maybe_model_token: record.maybe_model_token,
             maybe_model_title: maybe_model_title.map(|title| title.to_string()),
             maybe_raw_inference_text: record.maybe_raw_inference_text,
+            maybe_style_name,
           },
           maybe_result_details,
           user_details: UserDetails {
@@ -307,6 +333,7 @@ struct RawGenericInferenceJobStatus {
   pub maybe_model_type: Option<String>,
   pub maybe_model_token: Option<String>,
   pub maybe_raw_inference_text: Option<String>,
+  pub maybe_inference_args: Option<String>,
 
   pub maybe_result_entity_type: Option<String>,
   pub maybe_result_entity_token: Option<String>,
@@ -360,6 +387,7 @@ impl FromRow<'_, MySqlRow> for RawGenericInferenceJobStatus {
       maybe_model_type: row.try_get("maybe_model_type")?,
       maybe_model_token: row.try_get("maybe_model_token")?,
       maybe_raw_inference_text: row.try_get("maybe_raw_inference_text")?,
+      maybe_inference_args: row.try_get("maybe_inference_args")?,
       maybe_result_entity_type: row.try_get("maybe_result_entity_type")?,
       maybe_result_entity_token: row.try_get("maybe_result_entity_token")?,
       maybe_model_weights_title: row.try_get("maybe_model_weights_title")?,

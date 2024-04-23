@@ -17,6 +17,7 @@ use buckets::public::voice_conversion_results::bucket_file_path::VoiceConversion
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::common::job_status_plus::JobStatusPlus;
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use mysql_queries::queries::generic_inference::web::batch_get_inference_job_status::{batch_get_inference_job_status, GenericInferenceJobStatus};
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
@@ -76,6 +77,10 @@ pub struct BatchRequestDetailsResponse {
 
   /// If the result was TTS, this is the raw inference text.
   pub maybe_raw_inference_text: Option<String>,
+
+  /// For Comfy / Video Style Transfer jobs, this might include
+  /// the name of the selected style.
+  pub maybe_style_name: Option<StyleTransferName>,
 }
 
 /// Details about the ongoing job status
@@ -259,6 +264,7 @@ fn db_record_to_response_payload(
       maybe_model_token: record.request_details.maybe_model_token,
       maybe_model_title: record.request_details.maybe_model_title,
       maybe_raw_inference_text: record.request_details.maybe_raw_inference_text,
+      maybe_style_name: record.request_details.maybe_style_name,
     },
     status: BatchStatusDetailsResponse {
       status: record.status,
