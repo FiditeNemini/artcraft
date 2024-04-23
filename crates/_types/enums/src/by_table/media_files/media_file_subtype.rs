@@ -15,30 +15,45 @@ use utoipa::ToSchema;
 #[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum MediaFileSubtype {
+  // TODO(bt,2024-04-22): Deprecated (migrate)
   /// Animation file from Mixamo
   /// Primarily used for FBX and GLB.
   Mixamo,
 
+  // TODO(bt,2024-04-22): Deprecated (migrate)
   /// Animation file from MocapNet
   /// Primarily used for BVH.
   MocapNet,
 
+  // TODO(bt,2024-04-22): Deprecated
   /// Generic animation case
   /// Used for BVH files, but can also pertain to animation-only files of other types.
   AnimationOnly,
 
-  // TODO(bt,2024-03-08): Migrate records and code, then remove
-  /// DEPRECATED: Use `SceneImport` instead.
-  #[deprecated(note="Use `SceneImport` instead")]
-  Scene,
-
+  // TODO(bt,2024-04-22): Deprecated
   /// Generic 3D scene file.
   /// Can pertain to glTF, glB, FBX, etc.
   SceneImport,
 
+  // TODO(bt,2024-04-22): Deprecated
   /// Native Storyteller scene format.
   /// Typically stored in a `.scn.ron` file.
   StorytellerScene,
+
+  /// A 3D scene full of objects, characters, animations, etc.
+  Scene,
+
+  /// A 3D character model.
+  Character,
+
+  /// A 3D animation.
+  Animation,
+
+  /// A 3D object that doesn't fit with the other types.
+  Object,
+
+  /// A 3D skybox.
+  Skybox,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -53,9 +68,13 @@ impl MediaFileSubtype {
       Self::Mixamo => "mixamo",
       Self::MocapNet => "mocap_net",
       Self::AnimationOnly => "animation_only",
-      Self::Scene => "scene",
       Self::SceneImport => "scene_import",
       Self::StorytellerScene => "storyteller_scene",
+      Self::Scene => "scene",
+      Self::Character => "character",
+      Self::Animation => "animation",
+      Self::Object => "object",
+      Self::Skybox => "skybox",
     }
   }
 
@@ -64,9 +83,13 @@ impl MediaFileSubtype {
       "mixamo" => Ok(Self::Mixamo),
       "mocap_net" => Ok(Self::MocapNet),
       "animation_only" => Ok(Self::AnimationOnly),
-      "scene" => Ok(Self::Scene),
       "scene_import" => Ok(Self::SceneImport),
       "storyteller_scene" => Ok(Self::StorytellerScene),
+      "scene" => Ok(Self::Scene),
+      "character" => Ok(Self::Character),
+      "animation" => Ok(Self::Animation),
+      "object" => Ok(Self::Object),
+      "skybox" => Ok(Self::Skybox),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -78,9 +101,13 @@ impl MediaFileSubtype {
       Self::Mixamo,
       Self::MocapNet,
       Self::AnimationOnly,
-      Self::Scene,
       Self::SceneImport,
       Self::StorytellerScene,
+      Self::Scene,
+      Self::Character,
+      Self::Animation,
+      Self::Object,
+      Self::Skybox,
     ])
   }
 }
@@ -98,9 +125,13 @@ mod tests {
       assert_serialization(MediaFileSubtype::Mixamo, "mixamo");
       assert_serialization(MediaFileSubtype::MocapNet, "mocap_net");
       assert_serialization(MediaFileSubtype::AnimationOnly, "animation_only");
-      assert_serialization(MediaFileSubtype::Scene, "scene");
       assert_serialization(MediaFileSubtype::SceneImport, "scene_import");
       assert_serialization(MediaFileSubtype::StorytellerScene, "storyteller_scene");
+      assert_serialization(MediaFileSubtype::Scene, "scene");
+      assert_serialization(MediaFileSubtype::Character, "character");
+      assert_serialization(MediaFileSubtype::Animation, "animation");
+      assert_serialization(MediaFileSubtype::Object, "object");
+      assert_serialization(MediaFileSubtype::Skybox, "skybox");
     }
 
     #[test]
@@ -108,9 +139,13 @@ mod tests {
       assert_eq!(MediaFileSubtype::Mixamo.to_str(), "mixamo");
       assert_eq!(MediaFileSubtype::MocapNet.to_str(), "mocap_net");
       assert_eq!(MediaFileSubtype::AnimationOnly.to_str(), "animation_only");
-      assert_eq!(MediaFileSubtype::Scene.to_str(), "scene");
       assert_eq!(MediaFileSubtype::SceneImport.to_str(), "scene_import");
       assert_eq!(MediaFileSubtype::StorytellerScene.to_str(), "storyteller_scene");
+      assert_eq!(MediaFileSubtype::Scene.to_str(), "scene");
+      assert_eq!(MediaFileSubtype::Character.to_str(), "character");
+      assert_eq!(MediaFileSubtype::Animation.to_str(), "animation");
+      assert_eq!(MediaFileSubtype::Object.to_str(), "object");
+      assert_eq!(MediaFileSubtype::Skybox.to_str(), "skybox");
     }
 
     #[test]
@@ -118,22 +153,30 @@ mod tests {
       assert_eq!(MediaFileSubtype::from_str("mixamo").unwrap(), MediaFileSubtype::Mixamo);
       assert_eq!(MediaFileSubtype::from_str("mocap_net").unwrap(), MediaFileSubtype::MocapNet);
       assert_eq!(MediaFileSubtype::from_str("animation_only").unwrap(), MediaFileSubtype::AnimationOnly);
-      assert_eq!(MediaFileSubtype::from_str("scene").unwrap(), MediaFileSubtype::Scene);
       assert_eq!(MediaFileSubtype::from_str("scene_import").unwrap(), MediaFileSubtype::SceneImport);
       assert_eq!(MediaFileSubtype::from_str("storyteller_scene").unwrap(), MediaFileSubtype::StorytellerScene);
+      assert_eq!(MediaFileSubtype::from_str("scene").unwrap(), MediaFileSubtype::Scene);
+      assert_eq!(MediaFileSubtype::from_str("character").unwrap(), MediaFileSubtype::Character);
+      assert_eq!(MediaFileSubtype::from_str("animation").unwrap(), MediaFileSubtype::Animation);
+      assert_eq!(MediaFileSubtype::from_str("object").unwrap(), MediaFileSubtype::Object);
+      assert_eq!(MediaFileSubtype::from_str("skybox").unwrap(), MediaFileSubtype::Skybox);
       assert!(MediaFileSubtype::from_str("foo").is_err());
     }
 
     #[test]
     fn all_variants() {
       let mut variants = MediaFileSubtype::all_variants();
-      assert_eq!(variants.len(), 6);
+      assert_eq!(variants.len(), 10);
       assert_eq!(variants.pop_first(), Some(MediaFileSubtype::Mixamo));
       assert_eq!(variants.pop_first(), Some(MediaFileSubtype::MocapNet));
       assert_eq!(variants.pop_first(), Some(MediaFileSubtype::AnimationOnly));
-      assert_eq!(variants.pop_first(), Some(MediaFileSubtype::Scene));
       assert_eq!(variants.pop_first(), Some(MediaFileSubtype::SceneImport));
       assert_eq!(variants.pop_first(), Some(MediaFileSubtype::StorytellerScene));
+      assert_eq!(variants.pop_first(), Some(MediaFileSubtype::Scene));
+      assert_eq!(variants.pop_first(), Some(MediaFileSubtype::Character));
+      assert_eq!(variants.pop_first(), Some(MediaFileSubtype::Animation));
+      assert_eq!(variants.pop_first(), Some(MediaFileSubtype::Object));
+      assert_eq!(variants.pop_first(), Some(MediaFileSubtype::Skybox));
       assert_eq!(variants.pop_first(), None);
     }
   }

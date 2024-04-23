@@ -25,12 +25,6 @@ pub enum MediaFileType {
   /// Video files: mp4, etc.
   Video,
 
-  // TODO(bt): Deprecate. This is a media_file_subtype.
-  /// Mocap files: BVH, etc.
-  /// NB: In actuality, this is just the BVH file type.
-  /// NB: This is the old type to migrate from.
-  Mocap,
-
   /// BVH files (for Bevy)
   /// NB: This is the new type to migrate to.
   Bvh,
@@ -48,7 +42,6 @@ pub enum MediaFileType {
   /// This will be replaced with another format in future versions of Bevy
   SceneRon,
 
-  // TODO(bt): I don't think this was ever used.
   /// Alternate scene files.
   SceneJson,
 
@@ -73,7 +66,6 @@ impl MediaFileType {
       Self::Audio => "audio",
       Self::Image => "image",
       Self::Video => "video",
-      Self::Mocap => "mocap",
       Self::Bvh => "bvh",
       Self::Fbx => "fbx",
       Self::Glb => "glb",
@@ -90,7 +82,6 @@ impl MediaFileType {
       "audio" => Ok(Self::Audio),
       "image" => Ok(Self::Image),
       "video" => Ok(Self::Video),
-      "mocap" => Ok(Self::Mocap),
       "bvh" => Ok(Self::Bvh),
       "fbx" => Ok(Self::Fbx),
       "glb" => Ok(Self::Glb),
@@ -110,7 +101,6 @@ impl MediaFileType {
       Self::Audio,
       Self::Image,
       Self::Video,
-      Self::Mocap,
       Self::Bvh,
       Self::Fbx,
       Self::Glb,
@@ -136,7 +126,6 @@ mod tests {
       assert_serialization(MediaFileType::Audio, "audio");
       assert_serialization(MediaFileType::Image, "image");
       assert_serialization(MediaFileType::Video, "video");
-      assert_serialization(MediaFileType::Mocap, "mocap");
       assert_serialization(MediaFileType::Bvh, "bvh");
       assert_serialization(MediaFileType::Fbx, "fbx");
       assert_serialization(MediaFileType::Glb, "glb");
@@ -156,7 +145,6 @@ mod tests {
       assert_eq!(MediaFileType::Audio.to_str(), "audio");
       assert_eq!(MediaFileType::Image.to_str(), "image");
       assert_eq!(MediaFileType::Video.to_str(), "video");
-      assert_eq!(MediaFileType::Mocap.to_str(), "mocap");
       assert_eq!(MediaFileType::Bvh.to_str(), "bvh");
       assert_eq!(MediaFileType::Fbx.to_str(), "fbx");
       assert_eq!(MediaFileType::Glb.to_str(), "glb");
@@ -172,7 +160,6 @@ mod tests {
       assert_eq!(MediaFileType::from_str("audio").unwrap(), MediaFileType::Audio);
       assert_eq!(MediaFileType::from_str("image").unwrap(), MediaFileType::Image);
       assert_eq!(MediaFileType::from_str("video").unwrap(), MediaFileType::Video);
-      assert_eq!(MediaFileType::from_str("mocap").unwrap(), MediaFileType::Mocap);
       assert_eq!(MediaFileType::from_str("bvh").unwrap(), MediaFileType::Bvh);
       assert_eq!(MediaFileType::from_str("fbx").unwrap(), MediaFileType::Fbx);
       assert_eq!(MediaFileType::from_str("glb").unwrap(), MediaFileType::Glb);
@@ -195,7 +182,6 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileType::Audio));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Image));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Video));
-      assert_eq!(variants.pop_first(), Some(MediaFileType::Mocap));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Bvh));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Fbx));
       assert_eq!(variants.pop_first(), Some(MediaFileType::Glb));
