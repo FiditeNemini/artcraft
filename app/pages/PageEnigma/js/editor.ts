@@ -1342,6 +1342,8 @@ class Editor {
       this.orbitControls.maxDistance = 4;
       this.orbitControls.update();
       this.orbitControls.maxDistance = 999;
+    } else if (event.key === ' ') {
+      this.startPlayback();
     }
   }
 
