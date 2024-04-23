@@ -64,7 +64,7 @@ export const PageLibrary = ({
         </Button>
       </div>
 
-      <div className="h-full w-full overflow-y-auto px-4 pt-4">
+      <div className="mt-4 h-full w-full overflow-y-auto px-4">
         <AudioItemElements
           items={allAudioItems}
           assetFilter={audioFilter.value}
