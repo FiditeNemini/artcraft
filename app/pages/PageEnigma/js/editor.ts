@@ -257,7 +257,7 @@ class Editor {
     const height = container.offsetHeight;
 
     // Sets up camera and base position.
-    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.05, 100);
+    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 200);
     this.camera.position.z = 3;
     this.camera.position.y = 3;
     this.camera.position.x = -3;
@@ -271,8 +271,8 @@ class Editor {
     this.render_camera = new THREE.PerspectiveCamera(
       70,
       width / height,
-      0.05,
-      100,
+      0.01,
+      200,
     );
 
 
@@ -670,9 +670,9 @@ class Editor {
 
     this.saoPass = new SAOPass(this.activeScene.scene, this.camera);
 
-    this.saoPass.params.saoBias = 3.1;
+    this.saoPass.params.saoBias = 4.1;
     this.saoPass.params.saoIntensity = 1.0;
-    this.saoPass.params.saoScale = 12.0;
+    this.saoPass.params.saoScale = 32.0;
     this.saoPass.params.saoKernelRadius = 5.0;
     this.saoPass.params.saoMinResolution = 0.0;
 
