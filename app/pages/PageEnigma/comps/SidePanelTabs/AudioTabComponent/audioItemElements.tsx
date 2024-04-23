@@ -7,7 +7,6 @@ interface Props {
 }
 
 export const AudioItemElements = ({ items, assetFilter }: Props) => {
-
   const displayItems = items.filter((item) => {
     if (assetFilter === AssetFilterOption.ALL) {
       return true;
@@ -19,7 +18,7 @@ export const AudioItemElements = ({ items, assetFilter }: Props) => {
   });
 
   return (
-    <div className={`grid grid-cols-1 gap-3`}>
+    <div className={`grid grid-cols-1 gap-2.5`}>
       {displayItems.map((item) => (
         <AudioItemElement key={item.media_id} item={item} />
       ))}
