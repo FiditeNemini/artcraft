@@ -1348,7 +1348,7 @@ class Editor {
       this.orbitControls.update();
       this.orbitControls.maxDistance = 999;
     } else if (event.key === ' ') {
-      if(this.rendering == false){
+      if(this.rendering == false && this.switchPreviewToggle == false){
         this.startPlayback();
       }
     }
