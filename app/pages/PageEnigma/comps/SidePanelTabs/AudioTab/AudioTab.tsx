@@ -3,15 +3,19 @@ import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 
 import { AuthenticationContext } from "~/contexts/Authentication";
 import { MediaItem, AssetType } from "~/pages/PageEnigma/models";
-import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
 import { audioItemsFromServer } from "~/pages/PageEnigma/store/mediaFromServer";
 import { ListAudioByUser, ListTtsModels, ListVoiceConversionModels } from "./utilities";
-import { inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
+import { addInferenceJob, inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
 import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
+import { FrontendInferenceJobType } from "~/pages/PageEnigma/models";
 
 import { PageLibrary } from "./pageLibrary";
 import { PageAudioGeneration } from "./pageAudioGeneration";
-import { AudioTabPages, VoiceConversionModelListItem } from "./types";
+import { AudioTabPages, TtsState } from "./types";
+import { initialTtsState } from "./values";
+import { TtsModelListItem, } from "~/pages/PageEnigma/models/tts";
+import { VoiceConversionModelListItem } from "./typesImported";
+import { PageSelectTtsModel } from "./pageSelectTtsModel";
 
 export const AudioTab = () => {
   // app wide data
@@ -21,19 +25,23 @@ export const AudioTab = () => {
   // local states and data
   const [ state, setState ] = useState({
     firstLoad: false,
-    fetchingUserAudio: false,
-    fetchingTtsModels: false,
     page: AudioTabPages.LIBRARY,
   });
 
+  // children states are managed at top level for persistent memories
+  const [ttsState, setTtsState] = useState<TtsState>(initialTtsState);
+  const handleSetTtsState = (newState: TtsState) => {
+    setTtsState((curr:TtsState)=>({
+      ...curr,
+      ...newState,
+    }));
+  };
   const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
   const [v2vModels, setV2VModels] = useState<Array<VoiceConversionModelListItem>>([]);
 
 
   const handleListAudioByUser = useCallback((username:string, sessionToken:string)=>{
-    setState((curr)=>({...curr, fetchingUserAudio:true}));
     ListAudioByUser(username, sessionToken).then((res:any[])=>{
-      setState((curr)=>({...curr, fetchingUserAudio:false}));
       audioItemsFromServer.value = res.map(item=>{
         const morphedItem:MediaItem = {
           version: 1,
@@ -53,34 +61,44 @@ export const AudioTab = () => {
     });
   }, []);
 
-  const fetchTtsModels = useCallback(async (sessionToken:string) => {
-    ListTtsModels(sessionToken).then(res=>{
-      if(res) setTtsModels(res);
-    });
-  }, []);
-
-  const fetchV2VModels = useCallback(async (sessionToken:string) => {
-    ListVoiceConversionModels(sessionToken).then(res=>{
-      if(res) setV2VModels(res);
-    });
-  }, []);
   useEffect(()=>{
-    if (authState.userInfo && authState.sessionToken){
-      if(state.firstLoad === false){
-        if( audioItemsFromServer.value.length === 0){
-          handleListAudioByUser(authState.userInfo.username, authState.sessionToken);
-        }
-        if( ttsModels.length === 0){
-          fetchTtsModels(authState.sessionToken);
-        }
-        if( v2vModels.length === 0){
-          fetchV2VModels(authState.sessionToken);
-        }
+    if (
+      authState.userInfo &&
+      authState.sessionToken &&
+      state.firstLoad === false
+    ){
+        //fetch all the data on first load once, after securing auth info
+        handleListAudioByUser(authState.userInfo.username, authState.sessionToken);
+        ListTtsModels(authState.sessionToken).then(res=>{
+          if(res) setTtsModels(res);
+        });
+        ListVoiceConversionModels(authState.sessionToken).then(res=>{
+          if(res) setV2VModels(res);
+        });
         setState((curr)=>({...curr, firstLoad:true}));
         // completed the first load
-      }
     }
-  }, [authState, state, handleListAudioByUser, ttsModels, fetchTtsModels]);
+  }, [authState, state, handleListAudioByUser]);
+
+  useEffect(()=> {
+    //this listens to ttsState and push its new inference jobs
+    setTtsState((curr)=>{
+      if(curr.hasEnqueued < curr.inferenceTokens.length ){
+        // console.log(`tts has Enqueued`);
+        addInferenceJob({
+          version: 1,
+          job_id: ttsState.inferenceTokens[ttsState.inferenceTokens.length - 1],
+          job_type: FrontendInferenceJobType.TextToSpeech,
+          job_status: JobState.PENDING,
+        });
+        return({
+          ...curr,
+          hasEnqueued: curr.hasEnqueued + 1
+        })
+      }
+      return curr; //case of no new jobs, do nothing
+    });
+  }, [ttsState]);
 
   useEffect(()=>{
     console.info('Audio Tab is mounting')
@@ -117,6 +135,15 @@ export const AudioTab = () => {
   switch(state.page){
     case AudioTabPages.LIBRARY:
       return <PageLibrary changePage={changePage}/>
+    case AudioTabPages.SELECT_TTS_MODEL:{
+      return (
+        <PageSelectTtsModel
+          changePage={changePage}
+          ttsModels={ttsModels}
+          setTtsState={handleSetTtsState}
+        />
+      );
+    }
     case AudioTabPages.TTS:
     case AudioTabPages.V2V:{
       if(authState.sessionToken){
@@ -125,7 +152,8 @@ export const AudioTab = () => {
             page={state.page}
             changePage={changePage}
             sessionToken={authState.sessionToken}
-            ttsModels={ttsModels}
+            ttsState={ttsState}
+            setTtsState={handleSetTtsState}
             v2vModels={v2vModels}
           />
         );

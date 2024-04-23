@@ -7,7 +7,6 @@ export enum WeightCategory {
   WF = "workflow_config",
 }
 
-
 export enum MediaFileClass {
   /// Unknown (default value)
  /// This will be present until we migrate all old files.
@@ -122,13 +121,6 @@ export enum WeightType {
   VALL_E = "vall_e",
   NONE = "none",
 }
-
-export enum AudioTabPages {
-  LIBRARY = 'library',
-  TTS = 'tts',
-  V2V = 'v2v',
-}
-
 
 export interface MediaFile {
   token: string;

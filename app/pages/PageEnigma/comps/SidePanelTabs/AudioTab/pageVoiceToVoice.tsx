@@ -1,4 +1,5 @@
-import { AudioTabPages, VoiceConversionModelListItem } from "./types";
+import { AudioTabPages } from "./types";
+import { VoiceConversionModelListItem } from "./typesImported";
 
 export const PageVoicetoVoice = ({
   changePage,

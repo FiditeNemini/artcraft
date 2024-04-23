@@ -1,0 +1,38 @@
+import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
+
+import { H2, ButtonIcon, Input } from "~/components";
+import { AudioTabPages, TtsState } from "./types";
+
+import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
+import { VoiceModelElement } from "./voiceModelElement";
+
+export const PageSelectTtsModel = ({
+  changePage,
+  ttsModels,
+  setTtsState
+}:{
+  changePage: (newPage:AudioTabPages) => void;
+  ttsModels: Array<TtsModelListItem>
+  setTtsState: (newState:TtsState) =>void;
+})=>{
+  const slicedArray = ttsModels.slice(0, 20);
+
+  return(
+    <div className="flex flex-col px-4 pt-2">
+      <div className="pb-4 flex items-center gap-3">
+        <ButtonIcon
+          className="w-auto p-0 text-xl opacity-60 hover:opacity-40"
+          icon={faChevronLeft}
+          onClick={() => changePage(AudioTabPages.TTS)}
+        />
+        <H2 className="font-semibold">Search TTS Voices</H2>
+      </div>
+      <Input className="mb-4"/>
+      <div className="flex flex-col gap-3">
+        {slicedArray.map((item)=>{
+          return(<VoiceModelElement model={item}/>);
+        })}
+      </div>
+    </div>
+  );
+}

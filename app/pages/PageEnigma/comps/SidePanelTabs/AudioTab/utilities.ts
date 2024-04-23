@@ -4,7 +4,7 @@ import {
   GetMediaFileResponse,
   VoiceConversionModelListItem,
   VoiceConversionModelListResponse,
-} from './types';
+} from './typesImported';
 import {
   TtsModelListItem,
   TtsModelListResponsePayload,

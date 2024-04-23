@@ -1,12 +1,12 @@
 import { twMerge } from "tailwind-merge";
-import { AudioTabPages, VoiceConversionModelListItem } from "./types";
+import { AudioTabPages, TtsState } from "./types";
+import { VoiceConversionModelListItem } from "./typesImported";
 
 import {
   faChevronLeft,
 } from "@fortawesome/pro-solid-svg-icons";
 
 import { ButtonIcon, H2, } from "~/components";
-import { TtsModelListItem, } from "~/pages/PageEnigma/models/tts";
 
 import { PageTTS } from "./pageTTS";
 import { PageVoicetoVoice } from "./pageVoiceToVoice";
@@ -15,13 +15,15 @@ export const PageAudioGeneration = ({
   page,
   changePage,
   sessionToken,
-  ttsModels,
+  ttsState,
+  setTtsState,
   v2vModels,
 }:{
   page: AudioTabPages;
   changePage: (newPage:AudioTabPages) => void;
   sessionToken: string;
-  ttsModels: Array<TtsModelListItem>;
+  ttsState: TtsState;
+  setTtsState: (newState:TtsState)=>void;
   v2vModels: Array<VoiceConversionModelListItem>
 }) =>{
   return(
@@ -60,7 +62,8 @@ export const PageAudioGeneration = ({
         <PageTTS
           changePage={changePage}
           sessionToken={sessionToken}
-          ttsModels={ttsModels}
+          ttsState={ttsState}
+          setTtsState={setTtsState}
         />
       }
       {page ===  AudioTabPages.V2V && 
