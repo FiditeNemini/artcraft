@@ -332,6 +332,7 @@ class Editor {
     // OnClick and MouseMove events.
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
     window.addEventListener("click", this.onMouseClick.bind(this), false);
+    window.addEventListener("keydown", this.onkeydown.bind(this), false);
     // Base control and debug stuff remove debug in prod.
     if (this.control == undefined) {
       return;
@@ -1322,6 +1323,15 @@ class Editor {
         parseFloat(this.camera.position.z.toFixed(2)),
       );
       this.camera_last_pos.copy(camera_pos);
+    }
+  }
+
+  onkeydown(event: any) {
+    if (event.key === 'f' && this.selected && this.orbitControls) {
+      this.orbitControls.target.copy(this.selected.position);
+      this.orbitControls.maxDistance = 4;
+      this.orbitControls.update();
+      this.orbitControls.maxDistance = 999;
     }
   }
 
