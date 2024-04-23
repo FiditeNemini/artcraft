@@ -11,7 +11,7 @@ import {
   initPosition,
 } from "~/pages/PageEnigma/store";
 
-import { H4, H6, Pill } from "~/components";
+import { H5, H6, Pill } from "~/components";
 
 function getGcsUrl(bucketRelativePath: string | undefined | null): string {
   let bucket = "vocodes-public";
@@ -79,20 +79,22 @@ export const AudioItemElement = ({ item }: Props) => {
   return (
     <div
       className="relative w-full cursor-pointer rounded-lg transition-all duration-200"
-      onPointerDown={onPointerDown}
-    >
-      <div
-        className="flex flex-col p-2 gap-1 w-full rounded-lg bg-assets-background"
-      > 
-        <div className="flex justify-between pb-1">
+      onPointerDown={onPointerDown}>
+      <div className="flex w-full flex-col gap-0.5 rounded-lg bg-assets-background p-2.5">
+        <div className="flex justify-between">
           <Pill>Audio</Pill>
         </div>
-        
-        {item.publicBucketPath && <WaveformPlayer audio={getGcsUrl(item.publicBucketPath)} />}
-        
 
-        <H4 className="text-overflow-ellipsis">{item.name}</H4>
-        {item.description && <H6 className="text-overflow-ellipsis">{item.description}</H6>}
+        {item.publicBucketPath && (
+          <WaveformPlayer audio={getGcsUrl(item.publicBucketPath)} />
+        )}
+
+        <H5 className="text-overflow-ellipsis">{item.name}</H5>
+        {item.description && (
+          <H6 className="text-overflow-ellipsis text-xs text-white/90">
+            {item.description}
+          </H6>
+        )}
       </div>
     </div>
   );
