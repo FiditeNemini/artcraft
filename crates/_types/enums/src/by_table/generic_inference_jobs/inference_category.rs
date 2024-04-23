@@ -4,6 +4,7 @@ use std::collections::BTreeSet;
 use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
+use utoipa::ToSchema;
 
 /// Used in the `generic_inference_jobs` table in `VARCHAR(32)` field `inference_category`.
 ///
@@ -13,7 +14,7 @@ use strum::EnumIter;
 ///
 /// YOU CAN ADD NEW VALUES, BUT DO NOT CHANGE EXISTING VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, Default, ToSchema)]
 pub enum InferenceCategory {
   /// Eg. SadTalker and possibly Wav2Lip
   #[serde(rename = "lipsync_animation")]

@@ -1,5 +1,7 @@
 use utoipa::OpenApi;
 
+use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
+use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
@@ -148,6 +150,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ZsVoiceDatasetToken,
 
     // Enums
+    FrontendFailureCategory,
+    InferenceCategory,
     JobStatusPlus,
     MediaFileClass,
     MediaFileOriginCategory,

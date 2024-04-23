@@ -4,6 +4,7 @@ use std::collections::BTreeSet;
 use strum::EnumCount;
 #[cfg(test)]
 use strum::EnumIter;
+use utoipa::ToSchema;
 
 /// Used in the `generic_inference_jobs` table in `VARCHAR(32)` field `frontend_failure_category`.
 ///
@@ -20,7 +21,7 @@ use strum::EnumIter;
 ///
 /// YOU CAN ADD NEW VALUES, BUT DO NOT CHANGE EXISTING VALUES WITHOUT A MIGRATION STRATEGY.
 #[cfg_attr(test, derive(EnumIter, EnumCount))]
-#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize)]
+#[derive(Clone, Copy, Eq, PartialEq, Hash, Ord, PartialOrd, Deserialize, Serialize, ToSchema)]
 pub enum FrontendFailureCategory {
   /// When a face is not detected in the image used for animation.
   /// For SadTalker (and possibly Wav2Lip)
