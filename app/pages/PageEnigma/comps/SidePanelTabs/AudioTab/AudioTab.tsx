@@ -140,7 +140,13 @@ export const AudioTab = () => {
         <PageSelectTtsModel
           changePage={changePage}
           ttsModels={ttsModels}
-          setTtsState={handleSetTtsState}
+          onSelect={(selectedVoice)=>{
+            setTtsState((curr)=>({
+              ...curr,
+              voice: selectedVoice,
+            }));
+            changePage(AudioTabPages.TTS)
+          }}
         />
       );
     }

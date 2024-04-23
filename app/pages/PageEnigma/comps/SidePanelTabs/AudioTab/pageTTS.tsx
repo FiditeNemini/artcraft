@@ -5,6 +5,7 @@ import { faVolumeHigh, faChevronRight} from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import {
+  H4, H6,
   Button,
   Label,
   Textarea,
@@ -80,7 +81,11 @@ export const PageTTS = ({
       >
         <span className="bg-brand-secondary-600 rounded-lg w-12 h-12"/>
         <div className="grow">
-          {!ttsState.voice && <h4>None Selected</h4>}
+          {!ttsState.voice && <H4>None Selected</H4>}
+          {ttsState.voice && <>
+            <H4>{ttsState.voice.title}</H4>
+            <H6>by {ttsState.voice.creator_display_name}</H6>
+          </>}
         </div>
         <FontAwesomeIcon icon={faChevronRight} size="2x"/>
       </div>

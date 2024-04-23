@@ -1,7 +1,9 @@
+
+import { useState } from 'react'
 import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 
 import { H2, ButtonIcon, Input } from "~/components";
-import { AudioTabPages, TtsState } from "./types";
+import { AudioTabPages } from "./types";
 
 import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
 import { VoiceModelElement } from "./voiceModelElement";
@@ -9,13 +11,23 @@ import { VoiceModelElement } from "./voiceModelElement";
 export const PageSelectTtsModel = ({
   changePage,
   ttsModels,
-  setTtsState
+  onSelect
 }:{
-  changePage: (newPage:AudioTabPages) => void;
-  ttsModels: Array<TtsModelListItem>
-  setTtsState: (newState:TtsState) =>void;
+  changePage: (newPage:AudioTabPages)=>void;
+  ttsModels: Array<TtsModelListItem>;
+  onSelect: (item:TtsModelListItem)=>void;
 })=>{
-  const slicedArray = ttsModels.slice(0, 20);
+  const [query, setQuery] = useState('');
+  const filteredListOfModels = query === ''
+  ? ttsModels
+  : ttsModels.filter((model) =>{
+      return model.title
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .includes(query.toLowerCase().replace(/\s+/g, ''));
+    })
+
+  const slicedArray = filteredListOfModels.slice(0, 20);
 
   return(
     <div className="flex flex-col px-4 pt-2">
@@ -27,10 +39,19 @@ export const PageSelectTtsModel = ({
         />
         <H2 className="font-semibold">Search TTS Voices</H2>
       </div>
-      <Input className="mb-4"/>
+      <Input
+        className="mb-4"
+        placeholder="Search Voice by Name"
+        onChange={(e)=>setQuery(e.target.value)}
+      />
       <div className="flex flex-col gap-3">
         {slicedArray.map((item)=>{
-          return(<VoiceModelElement model={item}/>);
+          return(
+            <VoiceModelElement
+              model={item}
+              onSelect={onSelect}
+            />
+          );
         })}
       </div>
     </div>
