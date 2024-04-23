@@ -10,7 +10,7 @@ import { inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
 import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
 
 import { PageLibrary } from "./pageLibrary";
-import { PageTTS } from "./pageTTS";
+import { PageAudioGeneration } from "./pageAudioGeneration";
 import { AudioTabPages } from "./types";
 
 export const AudioTab = () => {
@@ -22,11 +22,11 @@ export const AudioTab = () => {
   const [ state, setState ] = useState({
     firstLoad: false,
     fetchingUserAudio: false,
-    fetchingVoiceModels: false,
+    fetchingTtsModels: false,
     page: AudioTabPages.LIBRARY,
   });
 
-  const [voiceModels, setVoiceModels] = useState<Array<TtsModelListItem>>([]);
+  const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
 
 
   const handleListAudioByUser = useCallback((username:string, sessionToken:string)=>{
@@ -52,9 +52,9 @@ export const AudioTab = () => {
     });
   }, []);
 
-  const fetchVoiceModels = useCallback(async (sessionToken:string) => {
+  const fetchTtsModels = useCallback(async (sessionToken:string) => {
     ListTtsModels(sessionToken).then(res=>{
-      if(res) setVoiceModels(res);
+      if(res) setTtsModels(res);
     });
   }, []);
 
@@ -64,14 +64,14 @@ export const AudioTab = () => {
         if( audioItemsFromServer.value.length === 0){
           handleListAudioByUser(authState.userInfo.username, authState.sessionToken);
         }
-        if( voiceModels.length === 0){
-          fetchVoiceModels(authState.sessionToken);
+        if( ttsModels.length === 0){
+          fetchTtsModels(authState.sessionToken);
         }
         setState((curr)=>({...curr, firstLoad:true}));
         // completed the first load
       }
     }
-  }, [authState, state, handleListAudioByUser, voiceModels, fetchVoiceModels]);
+  }, [authState, state, handleListAudioByUser, ttsModels, fetchTtsModels]);
 
   useEffect(()=>{
     console.info('Audio Tab is mounting')
@@ -103,20 +103,27 @@ export const AudioTab = () => {
       ...curr,
       page: newPage
     }))
-  }
-  if(state.page === AudioTabPages.LIBRARY){
-    return <PageLibrary changePage={changePage}/>
-  }else if(state.page === AudioTabPages.TTS && authState.sessionToken){
-    return(
-      <PageTTS
-        changePage={changePage}
-        sessionToken={authState.sessionToken}
-        voiceModels={voiceModels}
-      />
-    );
-  }else{
-    return(
-      <p>Unknown Error</p>
-    )
+  };
+
+  switch(state.page){
+    case AudioTabPages.LIBRARY:
+      return <PageLibrary changePage={changePage}/>
+    case AudioTabPages.TTS:
+    case AudioTabPages.V2V:{
+      if(authState.sessionToken){
+        return(
+          <PageAudioGeneration
+            page={state.page}
+            changePage={changePage}
+            sessionToken={authState.sessionToken}
+            ttsModels={ttsModels}
+          />
+        );
+      }else{
+        return <p>Page not ready Error</p>
+      }
+    }
+    default:
+      return <p>Unknown Page Error</p>
   }
 };

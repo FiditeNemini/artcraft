@@ -126,6 +126,7 @@ export enum WeightType {
 export enum AudioTabPages {
   LIBRARY = 'library',
   TTS = 'tts',
+  V2V = 'v2v',
 }
 
 

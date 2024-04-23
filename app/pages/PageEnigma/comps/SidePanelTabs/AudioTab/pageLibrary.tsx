@@ -20,7 +20,7 @@ export const PageLibrary = ({
   return (
     <>
       <div className="w-full overflow-x-auto">
-        <div className="mb-4 mt-4 flex items-center justify-start gap-2 px-4">
+        <div className="p-4 flex items-center justify-start gap-2 ">
           <button
             className={twMerge(
               "filter-tab",

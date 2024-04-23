@@ -2,15 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useSignalEffect } from "@preact/signals-react/runtime";
 import { v4 as uuidv4 } from "uuid";
 
-import {
-  faChevronLeft,
-  faVolumeHigh,
-} from "@fortawesome/pro-solid-svg-icons";
+import { faVolumeHigh,} from "@fortawesome/pro-solid-svg-icons";
 
 import {
   Button,
-  ButtonIcon,
-  H2,
   Label,
   LoadingDotsTyping,
   ListSearchDropdown,
@@ -53,11 +48,11 @@ const initialState: TtsState = {
 export const PageTTS = ({
   changePage,
   sessionToken,
-  voiceModels
+  ttsModels
 }:{
   changePage: (newPage:AudioTabPages) => void;
   sessionToken: string;
-  voiceModels: Array<TtsModelListItem>
+  ttsModels: Array<TtsModelListItem>
 })=>{
   const [ttsState, setTtsState] = useState<TtsState>(initialState);
 
@@ -157,28 +152,20 @@ export const PageTTS = ({
   };
 
   const handleOnSelect = (val:string)=>{
-    const currVoiceModel = voiceModels.find((item)=>{
+    const currTtsModel = ttsModels.find((item)=>{
       if (item.title === val) return item
     })
     setTtsState((curr)=>({
       ...curr,
-      voice: currVoiceModel,
+      voice: currTtsModel,
     }));
   };
 
   return (
-    <div className="flex flex-col p-4">
-      <div className="mb-5 flex items-center gap-3">
-        <ButtonIcon
-          className="w-auto p-0 text-xl opacity-60 hover:opacity-40"
-          icon={faChevronLeft}
-          onClick={() => changePage(AudioTabPages.LIBRARY)}
-        />
-        <H2 className="font-semibold">Generate TTS</H2>
-      </div>
+    <>
       <Label className="mb-1">Select a Voice</Label>
-      {voiceModels.length > 0 && <ListSearchDropdown
-        list={voiceModels}
+      {ttsModels && ttsModels.length > 0 && <ListSearchDropdown
+        list={ttsModels}
         listDisplayKey="title"
         onSelect={handleOnSelect}
       /> }
@@ -223,6 +210,6 @@ export const PageTTS = ({
           </Button>
         )}
       </div>
-    </div>
+    </>
   );
 };
