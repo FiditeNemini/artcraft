@@ -3,8 +3,9 @@ import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 
 import { AuthenticationContext } from "~/contexts/Authentication";
 import { MediaItem, AssetType } from "~/pages/PageEnigma/models";
+import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
 import { audioItemsFromServer } from "~/pages/PageEnigma/store/mediaFromServer";
-import { ListAudioByUser } from "./utilities";
+import { ListAudioByUser, ListTtsModels } from "./utilities";
 import { inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
 import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
 
@@ -12,14 +13,21 @@ import { PageLibrary } from "./pageLibrary";
 import { PageTTS } from "./pageTTS";
 import { AudioTabPages } from "./types";
 
-export const AudioTabComponent = () => {
+export const AudioTab = () => {
+  // app wide data
   useSignals();
+  const { authState } = useContext(AuthenticationContext);
+
+  // local states and data
   const [ state, setState ] = useState({
     firstLoad: false,
     fetchingUserAudio: false,
+    fetchingVoiceModels: false,
     page: AudioTabPages.LIBRARY,
   });
-  const { authState } = useContext(AuthenticationContext);
+
+  const [voiceModels, setVoiceModels] = useState<Array<TtsModelListItem>>([]);
+
 
   const handleListAudioByUser = useCallback((username:string, sessionToken:string)=>{
     setState((curr)=>({...curr, fetchingUserAudio:true}));
@@ -44,21 +52,33 @@ export const AudioTabComponent = () => {
     });
   }, []);
 
+  const fetchVoiceModels = useCallback(async (sessionToken:string) => {
+    ListTtsModels(sessionToken).then(res=>{
+      if(res) setVoiceModels(res);
+    });
+  }, []);
+
   useEffect(()=>{
     if (authState.userInfo && authState.sessionToken){
-      if(state.firstLoad === false && audioItemsFromServer.value.length === 0){
-        handleListAudioByUser(authState.userInfo.username, authState.sessionToken);
+      if(state.firstLoad === false){
+        if( audioItemsFromServer.value.length === 0){
+          handleListAudioByUser(authState.userInfo.username, authState.sessionToken);
+        }
+        if( voiceModels.length === 0){
+          fetchVoiceModels(authState.sessionToken);
+        }
         setState((curr)=>({...curr, firstLoad:true}));
+        // completed the first load
       }
     }
-  }, [authState, state, handleListAudioByUser]);
+  }, [authState, state, handleListAudioByUser, voiceModels, fetchVoiceModels]);
+
+  useEffect(()=>{
+    console.info('Audio Tab is mounting')
+    return()=>{console.info('Audio Tab is dismounting')}
+  }, []);
 
   useSignalEffect(()=>{
-    // flagging first load is done
-    if (state.firstLoad === false && audioItemsFromServer.value.length > 0){
-      setState(curr=>({...curr, firstLoad: true}));
-    }
-
     // when inference changes, check if there's a new audio to refresh for
     if (inferenceJobs.value.length > 0 && authState.userInfo){
       const found = inferenceJobs.value.find((job)=>{
@@ -91,6 +111,7 @@ export const AudioTabComponent = () => {
       <PageTTS
         changePage={changePage}
         sessionToken={authState.sessionToken}
+        voiceModels={voiceModels}
       />
     );
   }else{

@@ -13,6 +13,7 @@ import { ListSearchDropdown } from "./ListSearchDropdown"
 import { LoadingBar } from "./LoadingBar";
 import { LoadingDots, LoadingDotsBricks, LoadingDotsTyping } from "./LoadingDots";
 import { Pill } from "./Pill";
+import { WaveformPlayer } from "./WaveformPlayer";
 
 export {
   Button,
@@ -31,5 +32,6 @@ export {
   LoadingDots,
   LoadingDotsBricks,
   LoadingDotsTyping,
-  Pill
+  Pill,
+  WaveformPlayer
 };

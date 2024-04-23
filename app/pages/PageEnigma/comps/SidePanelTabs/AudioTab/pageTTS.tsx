@@ -13,12 +13,13 @@ import {
   ListSearchDropdown,
   Textarea
 } from "~/components";
+import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
 
 import { TtsModelListItem, GenerateTtsAudioResponse } from "~/pages/PageEnigma/models/tts";
 
-import { addInferenceJob, inferenceJobs} from "../../../store/inferenceJobs";
-import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
-import { ListTtsModels, GenerateTtsAudio, GetMediaFileByToken } from "./utilities";
+import { addInferenceJob, inferenceJobs} from "~/pages/PageEnigma/store/inferenceJobs";
+
+import { GenerateTtsAudio, GetMediaFileByToken } from "./utilities";
 import { AudioTabPages } from "./types";
 import { AudioItemElement } from "./audioItemElement";
 import { MediaItem, AssetType } from "~/pages/PageEnigma/models";
@@ -44,9 +45,11 @@ const initialState:TtsState =
 export const PageTTS =({
   changePage,
   sessionToken,
+  voiceModels
 }:{
   changePage: (newPage:AudioTabPages) => void;
   sessionToken: string;
+  voiceModels: Array<TtsModelListItem>
 })=>{
   const [ttsState, setTtsState] = useState<TtsState>(initialState);
 
@@ -56,8 +59,8 @@ export const PageTTS =({
     console.log(inferenceJobs.value);
     if(ttsState.hasEnqueued && ttsState.inferenceToken){
       const found = inferenceJobs.value.find((job)=>job.job_id===ttsState.inferenceToken);
-      console.log(`finding: ${ttsState.inferenceToken}`);
-      console.log(found);
+      // console.log(`finding: ${ttsState.inferenceToken}`);
+      // console.log(found);
       if(found?.job_status === JobState.COMPLETE_SUCCESS){
         setTtsState((curr)=>({
           ...curr,
@@ -84,23 +87,6 @@ export const PageTTS =({
       }
     }
   });
-
-  const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
-
-  const listModels = useCallback(async () => {
-    const ttsModelsLoaded = ttsModels.length > 0;
-    if (ttsModelsLoaded) {
-      return; // Already queried.
-    }
-    const models = await ListTtsModels(sessionToken);
-    if (models) {
-      setTtsModels(models);
-    }
-  }, []);
-
-  useEffect(() => {
-    listModels();
-  }, [listModels]);
 
   useEffect(()=> {
     if(ttsState.hasEnqueued && ttsState.inferenceToken && ttsState.inferenceJobType){
@@ -158,13 +144,12 @@ export const PageTTS =({
   };
 
   const handleOnSelect = (val:string)=>{
-    console.log( val);
-    const voiceModel = ttsModels.find((item)=>{
+    const currVoiceModel = voiceModels.find((item)=>{
       if (item.title === val) return item
     })
     setTtsState((curr)=>({
       ...curr,
-      voice: voiceModel,
+      voice: currVoiceModel,
     }));
   }
 
@@ -178,8 +163,8 @@ export const PageTTS =({
         <H2>Generate TTS</H2>
       </div>
       <Label className="mb-1">Select a Voice</Label>
-      {ttsModels.length > 0 && <ListSearchDropdown
-        list={ttsModels}
+      {voiceModels.length > 0 && <ListSearchDropdown
+        list={voiceModels}
         listDisplayKey="title"
         onSelect={handleOnSelect}
       /> }
