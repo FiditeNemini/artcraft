@@ -110,6 +110,8 @@ class Editor {
   last_scrub: number;
   record_stream: any | undefined;
   recorder: MediaRecorder | undefined;
+
+  selectedCanvas: boolean;
   // Default params.
 
   constructor() {
@@ -181,6 +183,7 @@ class Editor {
     this.last_scrub = 0;
     this.frames = 0;
     this.last_selected_sum = 0;
+    this.selectedCanvas = false;
     // Audio Engine Test.
 
     this.render_width = 1280;
@@ -409,9 +412,11 @@ class Editor {
             this.orbitControls.enabled = true;
             this.cameraViewControls.enabled = false;
           }
+          this.selectedCanvas = true;
         } else {
           this.orbitControls.enabled = false;
           this.cameraViewControls.enabled = false;
+          this.selectedCanvas = false;
         }
         this.cameraViewControls?.reset();
       }
@@ -1351,7 +1356,7 @@ class Editor {
       this.orbitControls.update();
       this.orbitControls.maxDistance = 999;
     } else if (event.key === ' ') {
-      if (this.rendering == false) {
+      if(this.rendering == false && this.switchPreviewToggle == false && this.selectedCanvas){
         this.startPlayback();
       }
     }
