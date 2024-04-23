@@ -3,8 +3,11 @@ import { IconDefinition } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Label } from "./Typography";
 import { kebabCase } from "~/utilities";
-import { disableHotkeyInput,enableHotkeyInput,DomLevels } from "~/pages/PageEnigma/store";
-
+import {
+  disableHotkeyInput,
+  enableHotkeyInput,
+  DomLevels,
+} from "~/pages/PageEnigma/store";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -13,7 +16,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export function Input({ label, icon, className, id, ...rest }: InputProps) {
   return (
-    <div className={twMerge("flex flex-col gap-2", className)}>
+    <div className={twMerge("flex flex-col", className)}>
       {label && <Label htmlFor={id ? id : kebabCase(label)}>{label}</Label>}
 
       <div className="relative w-full">
