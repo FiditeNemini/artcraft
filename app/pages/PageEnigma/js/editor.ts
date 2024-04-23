@@ -250,26 +250,33 @@ class Editor {
     // Find the container element
     const container = document.getElementById("video-scene-container");
 
-    if(container == null) { return; }
+    if (container == null) { return; }
 
     // Use the container's dimensions
     const width = container.offsetWidth;
     const height = container.offsetHeight;
 
     // Sets up camera and base position.
-    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.15, 30);
+    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.05, 100);
     this.camera.position.z = 3;
     this.camera.position.y = 3;
     this.camera.position.x = -3;
+
+    this.camera.layers.enable(0);
+    this.camera.layers.enable(1); // This camera does not see this layer
+
 
     this.timeline.camera = this.camera;
 
     this.render_camera = new THREE.PerspectiveCamera(
       70,
       width / height,
-      0.15,
-      30,
+      0.05,
+      100,
     );
+
+
+    this.render_camera.layers.disable(1); // This camera does not see this layer      );
 
     // Base WebGL render and clock for delta time.
     this.renderer = new THREE.WebGLRenderer({
@@ -323,10 +330,9 @@ class Editor {
     this.control = new TransformControls(this.camera, this.renderer.domElement);
     this.control.space = "local"; // Local transformation mode
     // .space = 'world'; // Global mode
-
-    this.control.setScaleSnap(0.05);
-    this.control.setTranslationSnap(0.05);
-    this.control.setRotationSnap(0.05);
+    this.control.setScaleSnap(0.01);
+    this.control.setTranslationSnap(0.01);
+    this.control.setRotationSnap(0.01);
     console.log("Control Sensitivity:", this.control.sensitivity);
 
     // OnClick and MouseMove events.
@@ -348,6 +354,10 @@ class Editor {
     });
     this.control.setSize(0.5); // Good default value for visuals.
     this.raycaster = new THREE.Raycaster();
+    // Configure raycaster to check both layers
+    this.raycaster.layers.set(0); // Enable default layer
+    this.raycaster.layers.enable(1); // Also check objects on the custom layer
+
     this.mouse = new THREE.Vector2();
     this.activeScene.scene.add(this.control);
     // Resets canvas size.
@@ -419,7 +429,7 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() {}
+  public async testTestTimelineEvents() { }
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -662,7 +672,7 @@ class Editor {
 
     this.saoPass.params.saoBias = 3.1;
     this.saoPass.params.saoIntensity = 1.0;
-    this.saoPass.params.saoScale = 6.0;
+    this.saoPass.params.saoScale = 12.0;
     this.saoPass.params.saoKernelRadius = 5.0;
     this.saoPass.params.saoMinResolution = 0.0;
 
@@ -928,10 +938,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-        startTime * 1000 +
-        "|" +
-        startTime * 1000 +
-        "[a1];[0:a][a1]amix=inputs=2[a]",
+      startTime * 1000 +
+      "|" +
+      startTime * 1000 +
+      "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
