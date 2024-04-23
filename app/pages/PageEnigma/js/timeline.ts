@@ -290,7 +290,10 @@ export class TimeLine {
       ),
     );
 
-    this.scene.createPoint(data_json["position"], data_json["keyframe_uuid"]);
+    let point = this.scene.createPoint(data_json["position"], data_json["keyframe_uuid"]);
+    if(this.editorEngine.camera_person_mode){
+      point.visible = false;
+    }
   }
 
   public deleteObject(object_uuid: string) {

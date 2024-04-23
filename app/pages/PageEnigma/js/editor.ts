@@ -581,6 +581,11 @@ class Editor {
           type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
         });
         this.updateSelectedUI();
+        if (this.activeScene.hot_items) {
+          this.activeScene.hot_items.forEach((element) => {
+            element.visible = false;
+          });
+        }
       } else {
         this.camera.position.copy(this.last_cam_pos);
         this.camera.rotation.copy(this.last_cam_rot);
