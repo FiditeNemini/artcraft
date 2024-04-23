@@ -201,7 +201,7 @@ pub async fn create_scene_handler(
     creator_set_visibility: Visibility::Public,
     upload_type: UploadType::StorytellerEngine,
     media_file_type: MediaFileType::SceneRon,
-    maybe_media_class: Some(MediaFileClass::Scene),
+    maybe_media_class: Some(MediaFileClass::Dimensional),
     maybe_media_subtype: Some(MediaFileSubtype::StorytellerScene),
     maybe_mime_type: Some(mime_type),
     file_size_bytes: file_size_bytes as u64,
