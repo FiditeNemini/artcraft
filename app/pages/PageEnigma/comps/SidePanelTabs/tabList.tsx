@@ -1,9 +1,7 @@
 import { AssetType } from "~/pages/PageEnigma/models";
 import { ObjectsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ObjectsTab";
-import { ShapeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ShapeTab";
 import { AnimationTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AnimationTab";
 import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AudioTab";
-import { CameraTab } from "./itemTabs/CameraTab";
 import { StylizeTab } from "./itemTabs/StylizeTab/StylizeTab";
 export const tabList = [
   {
@@ -24,12 +22,12 @@ export const tabList = [
     value: AssetType.OBJECT,
     component: <ObjectsTab type={AssetType.OBJECT} />,
   },
-  {
-    icon: "/resources/icons/camera.png",
-    title: "Camera",
-    value: AssetType.CAMERA,
-    component: <CameraTab />,
-  },
+  // {
+  //   icon: "/resources/icons/camera.png",
+  //   title: "Camera",
+  //   value: AssetType.CAMERA,
+  //   component: <CameraTab />,
+  // },
   {
     icon: "/resources/icons/audios.png",
     title: "Audio",

@@ -147,7 +147,7 @@ export const ControlsTopButtons = () => {
           ]}
         />
 
-        <ButtonDialogue
+        {/* <ButtonDialogue
           buttonProps={{
             variant: "secondary",
             label: "Add Scene Object (Test)",
@@ -164,7 +164,7 @@ export const ControlsTopButtons = () => {
               setMediaToken(e.target.value);
             }}
           />
-        </ButtonDialogue>
+        </ButtonDialogue> */}
 
         <ButtonDialogue
           buttonProps={{
