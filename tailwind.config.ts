@@ -156,6 +156,12 @@ export default {
         divider: "#515168",
       },
 
+      inference:{
+        pending: "#6b728b",
+        generating: "#46527C",
+        error: "#924C4B",
+      },
+      
       "axis-x": "#D33242",
       "axis-y": "#308752",
       "axis-z": "#2E70FF",

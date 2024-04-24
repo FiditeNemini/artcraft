@@ -115,19 +115,22 @@ export const AudioTab = () => {
 
   useSignalEffect(()=>{
     // when inference changes, check if there's a new audio to refresh for
-    if (inferenceJobs.value.length > 0 && authState.userInfo){
-      const found = inferenceJobs.value.find((job)=>{
-        if(job.job_status === JobState.COMPLETE_SUCCESS){
-          console.log(job);
-
+    if ( authState.userInfo && authState.sessionToken){
+      let hasNewCompletedJob = false;
+      inferenceJobs.value.forEach((job)=>{
+        if( job.job_status === JobState.COMPLETE_SUCCESS
+          && (
+            job.job_type === FrontendInferenceJobType.TextToSpeech
+            || job.job_type === FrontendInferenceJobType.VoiceConversion
+          )
+        ){
           const foundItemOfJob = audioItemsFromServer.value.find((item)=>{
             return item.media_id === job.result.entity_token
           });
-
-          return foundItemOfJob !== undefined;
+          hasNewCompletedJob = (foundItemOfJob === undefined);
         }
       });
-      if(found === undefined && authState.sessionToken){
+      if(hasNewCompletedJob){
         handleListAudioByUser(authState.userInfo.username, authState.sessionToken);
       }
     }
