@@ -5,6 +5,7 @@ import {
   selectedTab,
   sidePanelVisible,
 } from "~/pages/PageEnigma/store";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Props {
   title: string;
@@ -22,7 +23,9 @@ export function TabTitle({ title, onBack }: Props) {
     <div className="flex items-center justify-between pb-3">
       {onBack ? (
         <div className="flex items-center gap-2">
-          <ButtonIcon onClick={onBack} icon={faAngleLeft} />
+          <button onClick={onBack}>
+            <FontAwesomeIcon icon={faAngleLeft} />
+          </button>
           <div className="align-middle text-base font-bold">{title}</div>
         </div>
       ) : (

@@ -111,6 +111,8 @@ class Editor {
   last_scrub: number;
   record_stream: any | undefined;
   recorder: MediaRecorder | undefined;
+
+  selectedCanvas: boolean;
   // Default params.
 
   constructor() {
@@ -182,6 +184,7 @@ class Editor {
     this.last_scrub = 0;
     this.frames = 0;
     this.last_selected_sum = 0;
+    this.selectedCanvas = false;
     // Audio Engine Test.
 
     this.render_width = 1280;
@@ -251,26 +254,33 @@ class Editor {
     // Find the container element
     const container = document.getElementById("video-scene-container");
 
-    if(container == null) { return; }
+    if (container == null) {
+      return;
+    }
 
     // Use the container's dimensions
     const width = container.offsetWidth;
     const height = container.offsetHeight;
 
     // Sets up camera and base position.
-    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.15, 30);
+    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 200);
     this.camera.position.z = 3;
     this.camera.position.y = 3;
     this.camera.position.x = -3;
+
+    this.camera.layers.enable(0);
+    this.camera.layers.enable(1); // This camera does not see this layer
 
     this.timeline.camera = this.camera;
 
     this.render_camera = new THREE.PerspectiveCamera(
       70,
       width / height,
-      0.15,
-      30,
+      0.01,
+      200,
     );
+
+    this.render_camera.layers.disable(1); // This camera does not see this layer      );
 
     // Base WebGL render and clock for delta time.
     this.renderer = new THREE.WebGLRenderer({
@@ -315,24 +325,28 @@ class Editor {
       this.renderer.domElement,
     );
 
+    //this.orbitControls.mouseButtons = {
+    //  MIDDLE: THREE.MOUSE.ROTATE,
+    //  RIGHT: THREE.MOUSE.PAN,
+    //}; // Blender Style
     this.orbitControls.mouseButtons = {
-      MIDDLE: THREE.MOUSE.ROTATE,
+      LEFT: THREE.MOUSE.ROTATE,
+      MIDDLE: THREE.MOUSE.DOLLY,
       RIGHT: THREE.MOUSE.PAN,
-    }; // Blender Style
-    // this.orbitControls.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN }; // Standard
+    }; // Standard
 
     this.control = new TransformControls(this.camera, this.renderer.domElement);
     this.control.space = "local"; // Local transformation mode
     // .space = 'world'; // Global mode
-
-    this.control.setScaleSnap(0.05);
-    this.control.setTranslationSnap(0.05);
-    this.control.setRotationSnap(0.05);
+    this.control.setScaleSnap(0.01);
+    this.control.setTranslationSnap(0.01);
+    this.control.setRotationSnap(0.01);
     console.log("Control Sensitivity:", this.control.sensitivity);
 
     // OnClick and MouseMove events.
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
     window.addEventListener("click", this.onMouseClick.bind(this), false);
+    window.addEventListener("keydown", this.onkeydown.bind(this), false);
     // Base control and debug stuff remove debug in prod.
     if (this.control == undefined) {
       return;
@@ -349,6 +363,10 @@ class Editor {
     });
     this.control.setSize(0.5); // Good default value for visuals.
     this.raycaster = new THREE.Raycaster();
+    // Configure raycaster to check both layers
+    this.raycaster.layers.set(0); // Enable default layer
+    this.raycaster.layers.enable(1); // Also check objects on the custom layer
+
     this.mouse = new THREE.Vector2();
     this.activeScene.scene.add(this.control);
     // Resets canvas size.
@@ -396,9 +414,11 @@ class Editor {
             this.orbitControls.enabled = true;
             this.cameraViewControls.enabled = false;
           }
+          this.selectedCanvas = true;
         } else {
           this.orbitControls.enabled = false;
           this.cameraViewControls.enabled = false;
+          this.selectedCanvas = false;
         }
         this.cameraViewControls?.reset();
       }
@@ -410,7 +430,6 @@ class Editor {
     };
     loadingBarIsShowing.value = false;
   }
-  
 
   // Token comes in from the front end to load the scene from the site.
   public async testBatchRequest() {
@@ -573,6 +592,11 @@ class Editor {
         });
         this.updateSelectedUI();
         editorState.value = EditorStates.CAMERA_VIEW;
+        if (this.activeScene.hot_items) {
+          this.activeScene.hot_items.forEach((element) => {
+            element.visible = false;
+          });
+        }
       } else {
         this.camera.position.copy(this.last_cam_pos);
         this.camera.rotation.copy(this.last_cam_rot);
@@ -664,9 +688,9 @@ class Editor {
 
     this.saoPass = new SAOPass(this.activeScene.scene, this.camera);
 
-    this.saoPass.params.saoBias = 3.1;
+    this.saoPass.params.saoBias = 4.1;
     this.saoPass.params.saoIntensity = 1.0;
-    this.saoPass.params.saoScale = 6.0;
+    this.saoPass.params.saoScale = 32.0;
     this.saoPass.params.saoKernelRadius = 5.0;
     this.saoPass.params.saoMinResolution = 0.0;
 
@@ -795,15 +819,15 @@ class Editor {
     if (this.selected === undefined) {
       return 0;
     }
-    let posCombo =
+    const posCombo =
       this.selected.position.x +
       this.selected.position.y +
       this.selected.position.z;
-    let rotCombo =
+    const rotCombo =
       this.selected.rotation.x +
       this.selected.rotation.y +
       this.selected.rotation.z;
-    let sclCombo =
+    const sclCombo =
       this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
     return posCombo + rotCombo + sclCombo;
   }
@@ -939,10 +963,6 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-        startTime * 1000 +
-        "|" +
-        startTime * 1000 +
-        "[a1];[0:a][a1]amix=inputs=2[a]",
         startTime * 1000 +
         "|" +
         startTime * 1000 +
@@ -1315,7 +1335,7 @@ class Editor {
     if (!container) return;
 
     const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
+      for (const entry of entries) {
         const { width, height } = entry.contentRect;
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
@@ -1339,12 +1359,29 @@ class Editor {
     }
 
     if (event.button !== 0) {
-      let camera_pos = new THREE.Vector3(
+      const camera_pos = new THREE.Vector3(
         parseFloat(this.camera.position.x.toFixed(2)),
         parseFloat(this.camera.position.y.toFixed(2)),
         parseFloat(this.camera.position.z.toFixed(2)),
       );
       this.camera_last_pos.copy(camera_pos);
+    }
+  }
+
+  onkeydown(event: any) {
+    if (event.key === "f" && this.selected && this.orbitControls) {
+      this.orbitControls.target.copy(this.selected.position);
+      this.orbitControls.maxDistance = 4;
+      this.orbitControls.update();
+      this.orbitControls.maxDistance = 999;
+    } else if (event.key === " ") {
+      if (
+        this.rendering == false &&
+        this.switchPreviewToggle == false &&
+        this.selectedCanvas
+      ) {
+        this.startPlayback();
+      }
     }
   }
 
@@ -1361,7 +1398,7 @@ class Editor {
 
   // When the mouse clicks the screen.
   onMouseClick() {
-    let camera_pos = new THREE.Vector3(
+    const camera_pos = new THREE.Vector3(
       parseFloat(this.camera.position.x.toFixed(2)),
       parseFloat(this.camera.position.y.toFixed(2)),
       parseFloat(this.camera.position.z.toFixed(2)),

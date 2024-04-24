@@ -8,11 +8,12 @@ interface ButtonDialoguePropsI {
   buttonProps?: UnionedButtonProps;
   confirmButtonProps?: UnionedButtonProps;
   closeButtonProps?: UnionedButtonProps;
-  dialogProps?:{
+  dialogProps?: {
     className?: string;
   };
   title?: string;
   children: React.ReactNode;
+  showClose?: boolean;
 }
 
 export const ButtonDialogue = ({
@@ -22,6 +23,7 @@ export const ButtonDialogue = ({
   closeButtonProps: unionedCloseButtonProps,
   title,
   children,
+  showClose = true,
 }: ButtonDialoguePropsI) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -43,19 +45,20 @@ export const ButtonDialogue = ({
         title={title}
         isOpen={isOpen}
         onClose={closeModal}
-        className={dialogProps.className}
-      >
-        <div className="mt-2">{children}</div>
+        className={dialogProps.className}>
+        <div className="mt-2 h-full">{children}</div>
 
         <div className="mt-6 flex justify-end gap-2">
-          <Button
-            type="button"
-            onClick={closeModal}
-            {...closeButtonProps}
-            variant="secondary"
-          >
-            {closeButtonLabel}
-          </Button>
+          {showClose && (
+            <Button
+              type="button"
+              onClick={closeModal}
+              {...closeButtonProps}
+              variant="secondary">
+              {closeButtonLabel}
+            </Button>
+          )}
+
           {confirmButtonProps && (
             <Button
               type="button"
@@ -65,15 +68,12 @@ export const ButtonDialogue = ({
                   confirmButtonProps.onClick(e);
                 }
                 closeModal();
-              }}
-            >
-              {confirmButtonProps.label
-                ? confirmButtonProps.label
-                : "Confirm"}
+              }}>
+              {confirmButtonProps.label ? confirmButtonProps.label : "Confirm"}
             </Button>
           )}
         </div>
-        </TransitionDialogue>
+      </TransitionDialogue>
     </>
   );
 };

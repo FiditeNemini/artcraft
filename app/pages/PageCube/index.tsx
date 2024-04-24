@@ -1,2 +1,0 @@
-
-export { PageCube } from "./PageCube";

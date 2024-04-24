@@ -5,7 +5,6 @@ export * from "./dragAndDrop";
 export * from "./media";
 export * from "./objectGroup";
 export * from "./selectedItem";
-export * from "./shape";
 export * from "./sidePanel";
 export * from "./sizing";
 export * from "./timing";

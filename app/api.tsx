@@ -12,3 +12,6 @@ export const listTts = `${apiHost}/tts/list`;
 
 // User Media
 export const listMediaByUser = (username:string) => `${apiHost}/v1/media_files/list/user/${username}`;
+
+// Any Media
+export const getMediaFileByToken = (fileToken:string) => `${apiHost}/v1/media_files/file/${fileToken}`;
