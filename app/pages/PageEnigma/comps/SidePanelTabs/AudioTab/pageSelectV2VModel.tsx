@@ -31,6 +31,7 @@ export const PageSelectV2VModel = ({
 
   const refCallback = useCallback((node:HTMLInputElement)=>{
     if(node) node.focus();
+    //auto focus on the mounting on the input component
   },[]);
 
   return(
