@@ -1,6 +1,6 @@
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
-import { useSignals, useComputed } from "@preact/signals-react/runtime";
+import { useComputed } from "@preact/signals-react/runtime";
 import { audioFilter, audioItems } from "~/pages/PageEnigma/store";
 import { AssetFilterOption, FrontendInferenceJobType } from "~/pages/PageEnigma/models";
 import { audioItemsFromServer } from "~/pages/PageEnigma/store/mediaFromServer";
@@ -18,9 +18,10 @@ export const PageLibrary = ({
 }: {
   changePage: (newPage: AudioTabPages) => void;
 }) => {
-  useSignals();
-  const allAudioItems = [...audioItems.value, ...audioItemsFromServer.value];
-
+  const allAudioItems = useComputed(()=>[
+    ...audioItems.value,
+    ...audioItemsFromServer.value
+  ]);
   const audioInferenceJobs = useComputed(()=>
     inferenceJobs.value.filter((job)=>{
       if( job.job_status !== JobState.COMPLETE_SUCCESS
@@ -54,7 +55,7 @@ export const PageLibrary = ({
               "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.MINE)}
-            disabled={!allAudioItems.some((item) => item.isMine)}>
+            disabled={!allAudioItems.value.some((item) => item.isMine)}>
             My Audios
           </button>
           <button
@@ -66,7 +67,7 @@ export const PageLibrary = ({
               "disabled",
             )}
             onClick={() => (audioFilter.value = AssetFilterOption.BOOKMARKED)}
-            disabled={!allAudioItems.some((item) => item.isBookmarked)}>
+            disabled={!allAudioItems.value.some((item) => item.isBookmarked)}>
             Bookmarked
           </button>
         </div>
@@ -90,7 +91,7 @@ export const PageLibrary = ({
           </div>
         }
         <AudioItemElements
-          items={allAudioItems}
+          items={allAudioItems.value}
           assetFilter={audioFilter.value}
         />
       </div>
