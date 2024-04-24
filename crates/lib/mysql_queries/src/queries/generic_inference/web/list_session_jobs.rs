@@ -152,7 +152,7 @@ pub async fn list_session_jobs_from_connection(
     }
   }
 
-  query_builder.push(" ORDER BY id DESC ");
+  query_builder.push(" ORDER BY jobs.id DESC ");
   query_builder.push(" LIMIT 100 ");
 
   let query = query_builder.build_query_as::<RawGenericInferenceJobStatus>();
