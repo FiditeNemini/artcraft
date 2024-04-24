@@ -1,5 +1,5 @@
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 
 import { H2, ButtonIcon, Input } from "~/components";
@@ -29,6 +29,10 @@ export const PageSelectV2VModel = ({
 
   const slicedArray = filteredListOfModels.slice(0, 20);
 
+  const refCallback = useCallback((node:HTMLInputElement)=>{
+    if(node) node.focus();
+  },[]);
+
   return(
     <div className="flex flex-col px-4 pt-2">
       <div className="pb-4 flex items-center gap-3">
@@ -40,6 +44,7 @@ export const PageSelectV2VModel = ({
         <H2 className="font-semibold">Search TTS Voices</H2>
       </div>
       <Input
+        ref={refCallback}
         className="mb-4"
         placeholder="Search Voice by Name"
         onChange={(e)=>setQuery(e.target.value)}
