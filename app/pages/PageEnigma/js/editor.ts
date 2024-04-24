@@ -703,9 +703,6 @@ class Editor {
     if (obj?.name === "::CAM::") {
       return;
     }
-    if (obj?.name === "::CAM::") {
-      return;
-    }
     if (obj) {
       this.activeScene.scene.remove(obj);
     }
@@ -868,10 +865,6 @@ class Editor {
       this.last_scrub === this.timeline.scrubber_frame_position &&
       this.getselectedSum() !== this.last_selected_sum
     ) {
-    } else if (
-      this.last_scrub === this.timeline.scrubber_frame_position &&
-      this.getselectedSum() !== this.last_selected_sum
-    ) {
       this.updateSelectedUI();
     }
     this.last_selected_sum = this.getselectedSum();
@@ -939,10 +932,6 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-        startTime * 1000 +
-        "|" +
-        startTime * 1000 +
-        "[a1];[0:a][a1]amix=inputs=2[a]",
         startTime * 1000 +
         "|" +
         startTime * 1000 +
