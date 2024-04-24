@@ -1,5 +1,10 @@
-import { listTts, inferTts, listMediaByUser, getMediaFileByToken } from '~/api';
-import { MediaFile, GetMediaFileResponse } from './types';
+import { listTts, listV2V, inferTts, listMediaByUser, getMediaFileByToken } from '~/api';
+import {
+  MediaFile,
+  GetMediaFileResponse,
+  VoiceConversionModelListItem,
+  VoiceConversionModelListResponse,
+} from './typesImported';
 import {
   TtsModelListItem,
   TtsModelListResponsePayload,
@@ -66,10 +71,6 @@ export function maybeMapError(statuslike: StatusLike) : GenerateTtsAudioErrorTyp
   }
 }
 
-// export function GenerateTtsAudioIsError(response: GenerateTtsAudioResponse): response is GenerateTtsAudioError {
-//   return !('inference_job_token' in response);
-// }
-
 export async function GenerateTtsAudio(request: GenerateTtsAudioRequest, sessionToken:string) : Promise<GenerateTtsAudioResponse>
 {
   return await fetch(inferTts, {
@@ -104,7 +105,7 @@ export async function GenerateTtsAudio(request: GenerateTtsAudioRequest, session
 
 };
 
-export async function GetMediaFileByToken (fileToken: string, sessionToken: string) : Promise<GetMediaResponse>
+export async function GetMediaFileByToken (fileToken: string, sessionToken: string) : Promise<GetMediaFileResponse>
 {
   return await fetch(getMediaFileByToken(fileToken), {
     method: "GET",
@@ -135,4 +136,26 @@ export async function GetMediaFileByToken (fileToken: string, sessionToken: stri
     return { success: false };
   });
   ;
+}
+
+export async function ListVoiceConversionModels(sessionToken: string) : Promise<Array<VoiceConversionModelListItem>| undefined> {
+  return await fetch(listV2V, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'session': sessionToken,
+    },
+  })
+  .then(res => res.json())
+  .then(res => {
+    const response : VoiceConversionModelListResponse = res;
+    if (!response.success) {
+      return;
+    }
+    return response?.models;
+  })
+  .catch(e => {
+    return undefined;
+  });
 }

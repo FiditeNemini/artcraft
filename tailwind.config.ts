@@ -147,13 +147,21 @@ export default {
         selectedTab: "#55556B",
       },
 
-      "ui-background": "#1a1a27",
-      "ui-panel": "#242433",
-      "ui-panel-border": "#393948",
-      "ui-controls": "#39394D",
-      "ui-controls-button": "#676781",
-      "ui-divider": "#515168",
+      ui:{
+        background: "#1a1a27",
+        panel: "#242433",
+        "panel-border": "#393948",
+        controls: "#39394D",
+        "controls-button": "#676781",
+        divider: "#515168",
+      },
 
+      inference:{
+        pending: "#6b728b",
+        generating: "#46527C",
+        error: "#924C4B",
+      },
+      
       "axis-x": "#D33242",
       "axis-y": "#308752",
       "axis-z": "#2E70FF",

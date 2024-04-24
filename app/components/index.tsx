@@ -18,6 +18,7 @@ import {
   LoadingDotsTyping,
 } from "./LoadingDots";
 import { Pill } from "./Pill";
+import { WaveformPlayer } from "./WaveformPlayer";
 
 export {
   Button,
@@ -46,4 +47,5 @@ export {
   LoadingDotsBricks,
   LoadingDotsTyping,
   Pill,
+  WaveformPlayer
 };

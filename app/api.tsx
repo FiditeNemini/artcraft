@@ -10,6 +10,9 @@ export const logout = `${apiHost}/v1/logout`;
 export const inferTts = `${apiHost}/tts/inference`;
 export const listTts = `${apiHost}/tts/list`;
 
+//V2V
+export const listV2V = `${apiHost}/v1/voice_conversion/model_list`
+
 // User Media
 export const listMediaByUser = (username:string) => `${apiHost}/v1/media_files/list/user/${username}`;
 
