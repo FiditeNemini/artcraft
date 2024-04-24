@@ -5,6 +5,7 @@ import { twMerge } from "tailwind-merge";
 export interface ButtonPropsI
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: IconDefinition;
+  iconFlip?: boolean;
   variant?: "primary" | "secondary" | "action";
 }
 
@@ -14,12 +15,13 @@ export const Button = ({
   className: propsClassName,
   variant: propsVariant = "primary",
   disabled,
+  iconFlip = false,
   ...rest
 }: ButtonPropsI) => {
   function getVariantClassNames(variant: string) {
     switch (variant) {
       case "secondary": {
-        return " bg-brand-secondary hover:bg-brand-secondary-900 text-white focus-visible:outline-brand-secondary";
+        return "bg-brand-secondary hover:bg-brand-secondary-900 text-white focus-visible:outline-brand-secondary";
       }
       case "action": {
         return " bg-action hover:bg-action-500 text-white focus-visible:outline-action";
@@ -44,8 +46,9 @@ export const Button = ({
 
   return (
     <button className={className} disabled={disabled} {...rest}>
-      {icon && <FontAwesomeIcon icon={icon} size="sm" />}
-      {children}
+      {icon && !iconFlip ? <FontAwesomeIcon icon={icon} /> : null}
+      <div>{children}</div>
+      {icon && iconFlip ? <FontAwesomeIcon icon={icon} /> : null}
     </button>
   );
 };
