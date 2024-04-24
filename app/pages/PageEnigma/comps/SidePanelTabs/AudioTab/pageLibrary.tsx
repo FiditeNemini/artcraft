@@ -10,6 +10,7 @@ import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager"
 import { Button } from "~/components";
 import { AudioItemElements } from "./audioItemElements";
 import { AudioTabPages } from "./types";
+import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 import { InferenceElement } from "./inferenceElement";
 
 
@@ -37,8 +38,9 @@ export const PageLibrary = ({
 
   return (
     <>
-      <div className="w-full overflow-x-auto">
-        <div className="p-4 flex items-center justify-start gap-2 ">
+      <div className="w-full overflow-x-auto px-4">
+        <TabTitle title="Audio" />
+        <div className="mb-4 flex items-center justify-start gap-2">
           <button
             className={twMerge(
               "filter-tab",

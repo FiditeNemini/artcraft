@@ -1,13 +1,5 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/pro-solid-svg-icons";
 import {
   dndSidePanelWidth,
-  lastSelectedTab,
-  selectedTab,
-  sidePanelHeight,
   sidePanelVisible,
   sidePanelWidth,
 } from "~/pages/PageEnigma/store";
@@ -36,26 +28,7 @@ export const SidePanel = () => {
           top: 68,
           right: 84,
           width: sidePanelVisible.value ? displayWidth : 0,
-        }}
-      >
-        <button
-          onClick={() => {
-            if (sidePanelVisible.value) {
-              lastSelectedTab.value = selectedTab.value;
-              selectedTab.value = null;
-              sidePanelVisible.value = false;
-            } else {
-              selectedTab.value = lastSelectedTab.value;
-              sidePanelVisible.value = true;
-            }
-          }}
-          className="absolute left-[-25px] flex rounded-l-lg bg-ui-controls px-2 py-3 align-middle text-sm text-white hover:bg-ui-controls-button"
-          style={{ top: sidePanelHeight.value / 2 - 10 }}
-        >
-          <FontAwesomeIcon
-            icon={sidePanelVisible.value ? faChevronRight : faChevronLeft}
-          />
-        </button>
+        }}>
         <div className="relative block h-full w-full bg-ui-panel">
           <SidePanelTabs />
         </div>

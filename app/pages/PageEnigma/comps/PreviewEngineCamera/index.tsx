@@ -1,27 +1,31 @@
-import { useContext, useEffect, useState } from "react";
-import { EngineContext } from "../../../../contexts/EngineContext";
-import { Button, Input, LoadingDotsTyping } from "~/components";
+import { useEffect, useState } from "react";
+import { Button, LoadingDotsTyping } from "~/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCameraViewfinder } from "@fortawesome/pro-solid-svg-icons";
+import Queue from "~/pages/PageEnigma/Queue/Queue";
+import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
+import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export const PreviewEngineCamera = () => {
-  const editorEngine = useContext(EngineContext);
-  //take data from egine context
-
+  useSignals();
   const [showLoader, setShowLoader] = useState<boolean>(true);
-  const [currentMessage, setCurrentMessage] =
-    useState<string>("Enter Camera View");
+
   useEffect(() => {
     setTimeout(() => setShowLoader(false), 1000);
   }, []);
 
+  if (editorState.value === EditorStates.PREVIEW) {
+    return null;
+  }
+
   const handleButtonCameraView = () => {
-    editorEngine?.switchCameraView();
-    if (currentMessage === "Enter Camera View") {
-      setCurrentMessage("Exit Camera View");
-    } else {
-      setCurrentMessage("Enter Camera View");
-    }
+    Queue.publish({
+      queueName: QueueNames.TO_ENGINE,
+      action: toEngineActions.TOGGLE_CAMERA_STATE,
+      data: null,
+    });
   };
 
   return (
@@ -36,9 +40,10 @@ export const PreviewEngineCamera = () => {
           <Button
             variant="action"
             onClick={handleButtonCameraView}
-            className="px-2.5 py-1 text-sm"
-          >
-            {currentMessage}
+            className="px-2.5 py-1 text-sm">
+            {editorState.value === EditorStates.EDIT
+              ? "Enter Camera View"
+              : "Exit Camera View"}
           </Button>
         </div>
         <div className="box relative overflow-hidden rounded-b-lg border border-gray-600">
