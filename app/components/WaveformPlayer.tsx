@@ -35,7 +35,7 @@ export const WaveformPlayer = ({ audio }: { audio: string }) => {
 
   useEffect(() => {
     return () => {
-      console.log("OK?");
+      //destructor on unmount
       waveSurferRef.current?.destroy();
     };
   }, []);

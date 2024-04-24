@@ -1,0 +1,68 @@
+
+import { useCallback, useState } from 'react'
+import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
+
+import { H2, ButtonIcon, Input } from "~/components";
+import { AudioTabPages } from "./types";
+
+import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
+import { VoiceModelElement } from "./voiceModelElement";
+
+export const PageSelectTtsModel = ({
+  changePage,
+  ttsModels,
+  onSelect
+}:{
+  changePage: (newPage:AudioTabPages)=>void;
+  ttsModels: Array<TtsModelListItem>;
+  onSelect: (item:TtsModelListItem)=>void;
+})=>{
+  const [query, setQuery] = useState('');
+  const filteredListOfModels = query === ''
+  ? ttsModels
+  : ttsModels.filter((model) =>{
+      return model.title
+        .toLowerCase()
+        .replace(/\s+/g, '')
+        .includes(query.toLowerCase().replace(/\s+/g, ''));
+    })
+
+  const slicedArray = filteredListOfModels.slice(0, 20);
+  
+  const refCallback = useCallback((node:HTMLInputElement)=>{
+    if(node) node.focus();
+    //auto focus on the mounting on the input component
+  },[]);
+
+  return(
+    <div className="flex flex-col px-4 pt-2">
+      <div className="pb-4 flex items-center gap-3">
+        <ButtonIcon
+          className="w-auto p-0 text-xl opacity-60 hover:opacity-40"
+          icon={faChevronLeft}
+          onClick={() => changePage(AudioTabPages.TTS)}
+        />
+        <H2 className="font-semibold">Search TTS Voices</H2>
+      </div>
+      <Input
+        ref={refCallback}
+        className="mb-4"
+        placeholder="Search Voice by Name"
+        onChange={(e)=>setQuery(e.target.value)}
+      />
+      <div className="w-full overflow-x-auto">
+        <div className="flex flex-col gap-3">
+          {slicedArray.map((item)=>{
+            return(
+              <VoiceModelElement
+                key={item.model_token}
+                model={item}
+                onSelect={(item)=>onSelect(item as TtsModelListItem)}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}

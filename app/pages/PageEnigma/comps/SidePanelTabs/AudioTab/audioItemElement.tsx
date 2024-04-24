@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 
-import { WaveformPlayer } from "./WaveformPlayer";
+import { WaveformPlayer } from "~/components";
 import { MediaItem } from "~/pages/PageEnigma/models";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import {

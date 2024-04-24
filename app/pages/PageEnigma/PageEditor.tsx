@@ -25,7 +25,6 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/contexts/AppUiContext";
 import { pageHeight, pageWidth } from "~/store";
 import { TopBar } from "~/modules/TopBar";
-import { DialogueTTS } from "./comps/DialogueTTS/DialogueTTS";
 import { Pages } from "~/pages/PageEnigma/constants/page";
 import { AssetType } from "./models/assets";
 
@@ -133,7 +132,6 @@ export const PageEditor = () => {
                 <PreviewEngineCamera />
                 <ControlsVideo />
                 <ControlPanelSceneObject />
-                <DialogueTTS />
               </div>
             </div>
             {appUiState.viewMode === APPUI_VIEW_MODES.SIDE_BY_SIDE && (

@@ -1,1 +1,0 @@
-export { AudioTabComponent } from "./AudioTabComponent";

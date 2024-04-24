@@ -2,6 +2,7 @@ import { Fragment, useState, useEffect } from 'react'
 import { Combobox, Transition } from '@headlessui/react'
 import { faCheck, faChevronDown } from '@fortawesome/pro-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { disableHotkeyInput,enableHotkeyInput,DomLevels } from "~/pages/PageEnigma/store";
 
 interface ListDropdownProps {
   list: {[key: string] : string}[];
@@ -44,6 +45,12 @@ export const ListSearchDropdown = ({
             displayValue={(item: {[key: string] : string}) => {
               if(listDisplayKey) return item[listDisplayKey];
               else return Object.values(item)[0]
+            }}
+            onFocus={(e) => {
+              disableHotkeyInput(DomLevels.INPUT)
+            }}
+            onBlur={(e) => {
+              enableHotkeyInput(DomLevels.INPUT)
             }}
             onChange={(event) => setQuery(event.target.value)}
           />

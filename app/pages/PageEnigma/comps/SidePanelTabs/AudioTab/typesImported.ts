@@ -7,7 +7,6 @@ export enum WeightCategory {
   WF = "workflow_config",
 }
 
-
 export enum MediaFileClass {
   /// Unknown (default value)
  /// This will be present until we migrate all old files.
@@ -123,12 +122,6 @@ export enum WeightType {
   NONE = "none",
 }
 
-export enum AudioTabPages {
-  LIBRARY = 'library',
-  TTS = 'tts',
-}
-
-
 export interface MediaFile {
   token: string;
   media_type: MediaFileType;
@@ -157,4 +150,32 @@ export interface MediaFile {
 export interface GetMediaFileResponse {
   success: boolean;
   media_file?: MediaFile;
+}
+
+export interface VoiceConversionModelListItem {
+  token: string,
+  model_type: string,
+  title: string,
+
+  creator: CreatorDetails,
+  creator_set_visibility: string,
+
+  ietf_language_tag: string,
+  ietf_primary_language_subtag: string,
+  is_front_page_featured: boolean,
+
+  created_at: string,
+  updated_at: string,
+}
+
+export interface CreatorDetails {
+  user_token: string,
+  username: string,
+  display_name: string,
+  gravatar_hash: string,
+}
+
+export interface VoiceConversionModelListResponse {
+  success: boolean,
+  models: Array<VoiceConversionModelListItem>,
 }

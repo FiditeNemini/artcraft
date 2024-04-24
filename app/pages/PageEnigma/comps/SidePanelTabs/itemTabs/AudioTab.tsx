@@ -1,1 +1,1 @@
-export { AudioTabComponent as AudioTab } from "../AudioTabComponent";
+export { AudioTab} from "../AudioTab";
