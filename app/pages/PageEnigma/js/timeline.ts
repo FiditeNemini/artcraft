@@ -306,7 +306,10 @@ export class TimeLine {
       ),
     );
 
-    this.scene.createPoint(data_json["position"], data_json["keyframe_uuid"]);
+    let point = this.scene.createPoint(data_json["position"], data_json["keyframe_uuid"]);
+    if(this.editorEngine.camera_person_mode){
+      point.visible = false;
+    }
   }
 
   public deleteObject(object_uuid: string) {
@@ -422,11 +425,13 @@ export class TimeLine {
     const media_id = data["data"]["media_id"];
     const offset = data["data"]["offset"];
     const length = data["data"]["length"] + offset;
+    const clip_uuid = data['data']['clip_uuid'];
 
     for (const element of this.timeline_items) {
       if (
         element.media_id === media_id &&
-        element.object_uuid === object_uuid
+        element.object_uuid === object_uuid &&
+        element.clip_uuid == clip_uuid
       ) {
         element.length = length;
         element.offset = offset;
@@ -439,12 +444,14 @@ export class TimeLine {
     const object_uuid = data["data"]["object_uuid"];
     const media_id = data["data"]["media_id"];
     const type = data["type"];
+    const clip_uuid = data['data']['clip_uuid'];
 
     for (let i = 0; i < this.timeline_items.length; i++) {
       const element = this.timeline_items[i];
       if (
         element.media_id === media_id &&
-        element.object_uuid === object_uuid
+        element.object_uuid === object_uuid &&
+        element.clip_uuid == clip_uuid
       ) {
         this.timeline_items.splice(i, 1);
         break;

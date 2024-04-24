@@ -75,6 +75,7 @@ class Scene {
         obj.receiveShadow = false;
         obj.castShadow = false;
         obj.userData['media_id'] = "Point::" + keyframe_uuid;
+        obj.layers.set(1); // Enable default layer
         if (this.hot_items != undefined) {
             this.hot_items.push(obj);
         }
@@ -105,6 +106,7 @@ class Scene {
             cam_obj.userData["name"] = "::CAM::";
             cam_obj.name = "::CAM::";
             cam_obj.position.set(0, 0.6, 1.5);
+            cam_obj.layers.set(1);
             this.scene.add(cam_obj);
         });
     }
@@ -155,6 +157,8 @@ class Scene {
                     child.userData["metalness"] = 0.0;
                     child.userData["shininess"] = 0.5;
                     child.userData["specular"] = 0.5;
+                    child.layers.enable(0);
+                    child.layers.enable(1);
                     if (auto_add) { this.scene.add(child); }
                     resolve(child);
                 });
@@ -251,6 +255,7 @@ class Scene {
         const size = 25;
         const divisions = 50;
         this.gridHelper = new THREE.GridHelper(size, divisions, new THREE.Color("rgb(199,195,195)"), new THREE.Color("rgb(161,157,157)"));
+        this.gridHelper.layers.set(1); // Enable default layer
         this.scene.add(this.gridHelper);
     }
 }

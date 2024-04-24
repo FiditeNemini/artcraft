@@ -455,6 +455,7 @@ export const audioItems = signal<MediaItem[]>([
     length: 25,
     name: "Talk (Demo Sounds)",
     thumbnail: "/resources/placeholders/audio_placeholder.png",
+    publicBucketPath: "/media/j/a/r/r/3/jarr3asge6t0x048wdzcehzjd2nh4ep7/fakeyou_jarr3asge6t0x048wdzcehzjd2nh4ep7.wav",
   },
   {
     version: 1,
@@ -463,6 +464,7 @@ export const audioItems = signal<MediaItem[]>([
     length: 25,
     name: "NCS Song",
     thumbnail: "/resources/placeholders/audio_placeholder.png",
+    publicBucketPath: "/media/s/j/t/0/6/sjt06a8y2qrdqe574nry02bpd3bt01ma/upload_sjt06a8y2qrdqe574nry02bpd3bt01ma.wav",
   },
 ]);
 
