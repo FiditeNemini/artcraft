@@ -7,7 +7,7 @@ import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager"
 import { InferenceJob } from "~/pages/PageEnigma/models";
 import { ButtonIcon, H5 } from "~/components";
 
-export const InterenceElement = ({job}:{job:InferenceJob})=>{
+export const InferenceElement = ({job}:{job:InferenceJob})=>{
 
   const className = twMerge(
     "rounded-md w-full flex justify-between items-center p-2 gap-2",

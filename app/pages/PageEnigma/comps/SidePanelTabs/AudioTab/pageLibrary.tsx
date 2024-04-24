@@ -10,7 +10,7 @@ import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager"
 import { Button } from "~/components";
 import { AudioItemElements } from "./audioItemElements";
 import { AudioTabPages } from "./types";
-import { InterenceElement } from "./inferenceElement";
+import { InferenceElement } from "./inferenceElement";
 
 
 export const PageLibrary = ({
@@ -86,7 +86,7 @@ export const PageLibrary = ({
         {audioInferenceJobs.value.length > 0 &&
           <div className="grid grid-cols-1 gap-2 mb-4">
             {audioInferenceJobs.value.map((job)=>{
-              return(<InterenceElement job={job}/>);
+              return(<InferenceElement key={job.job_id} job={job}/>);
             })}
           </div>
         }
