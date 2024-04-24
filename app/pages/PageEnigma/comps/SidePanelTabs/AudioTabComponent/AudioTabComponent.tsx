@@ -7,7 +7,6 @@ import { audioItemsFromServer } from "~/pages/PageEnigma/store/mediaFromServer";
 import { ListAudioByUser } from "./utilities";
 import { inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
 import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
-import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 
 import { PageLibrary } from "./pageLibrary";
 import { PageTTS } from "./pageTTS";

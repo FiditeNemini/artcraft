@@ -727,9 +727,6 @@ class Editor {
     if (obj?.name === "::CAM::") {
       return;
     }
-    if (obj?.name === "::CAM::") {
-      return;
-    }
     if (obj) {
       this.activeScene.scene.remove(obj);
     }
@@ -888,10 +885,6 @@ class Editor {
       if (changeView) {
         this.switchCameraView();
       }
-    } else if (
-      this.last_scrub === this.timeline.scrubber_frame_position &&
-      this.getselectedSum() !== this.last_selected_sum
-    ) {
     } else if (
       this.last_scrub === this.timeline.scrubber_frame_position &&
       this.getselectedSum() !== this.last_selected_sum
@@ -1105,8 +1098,10 @@ class Editor {
       const stylePreview: HTMLVideoElement | null = document.getElementById(
         "styled-preview",
       ) as HTMLVideoElement;
-      this.rawRenderer.setSize(stylePreview.width, stylePreview.height);
-      this.render_camera.aspect = stylePreview.width / stylePreview.height;
+      if (stylePreview != null) {
+        this.rawRenderer.setSize(stylePreview.width, stylePreview.height);
+        this.render_camera.aspect = stylePreview.width / stylePreview.height;
+      }
     }
   }
 
