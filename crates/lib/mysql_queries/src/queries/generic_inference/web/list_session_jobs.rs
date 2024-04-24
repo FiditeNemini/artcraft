@@ -125,6 +125,9 @@ pub async fn list_session_jobs_from_connection(
   query_builder.push(" WHERE jobs.maybe_creator_user_token = ");
   query_builder.push_bind(args.user_token.to_string());
 
+  // NB: `created_at` doesn't have an index, but `maybe_creator_user_token` does.
+  query_builder.push(" AND created_at > DATE_SUB(NOW(), INTERVAL 36 HOUR) ");
+
   if let Some(statuses) = args.maybe_include_job_statuses {
     if !statuses.is_empty() {
       query_builder.push(" AND jobs.status IN (");
@@ -148,6 +151,9 @@ pub async fn list_session_jobs_from_connection(
       separated.push_unseparated(") ");
     }
   }
+
+  query_builder.push(" ORDER BY id DESC ");
+  query_builder.push(" LIMIT 100 ");
 
   let query = query_builder.build_query_as::<RawGenericInferenceJobStatus>();
 
