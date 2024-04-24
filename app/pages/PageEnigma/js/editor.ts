@@ -1074,8 +1074,10 @@ class Editor {
       const stylePreview: HTMLVideoElement | null = document.getElementById(
         "styled-preview",
       ) as HTMLVideoElement;
-      this.rawRenderer.setSize(stylePreview.width, stylePreview.height);
-      this.render_camera.aspect = stylePreview.width / stylePreview.height;
+      if(stylePreview != null){
+        this.rawRenderer.setSize(stylePreview.width, stylePreview.height);
+        this.render_camera.aspect = stylePreview.width / stylePreview.height;
+      }
     }
   }
 
