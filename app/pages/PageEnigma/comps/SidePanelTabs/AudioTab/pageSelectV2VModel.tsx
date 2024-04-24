@@ -40,9 +40,9 @@ export const PageSelectV2VModel = ({
         <ButtonIcon
           className="w-auto p-0 text-xl opacity-60 hover:opacity-40"
           icon={faChevronLeft}
-          onClick={() => changePage(AudioTabPages.TTS)}
+          onClick={() => changePage(AudioTabPages.V2V)}
         />
-        <H2 className="font-semibold">Search TTS Voices</H2>
+        <H2 className="font-semibold">Search Convertible Voices</H2>
       </div>
       <Input
         ref={refCallback}
