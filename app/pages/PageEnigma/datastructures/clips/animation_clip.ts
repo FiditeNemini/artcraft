@@ -1,7 +1,7 @@
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-export class AnimationClip  {
+export class AnimationClip {
   version: number;
   media_id: string; // comes from the server
   object_uuid: string;
@@ -38,34 +38,31 @@ export class AnimationClip  {
 
   async get_media_url() {
     //This is for prod when we have the proper info on the url.
-    let api_base_url = "https://api.fakeyou.com";
-    let url = `${api_base_url}/v1/media_files/file/${this.media_id}`
-    let responce = await fetch(url);
-    let json = await JSON.parse(await responce.text());
-    let bucketPath = json["media_file"]["public_bucket_path"];
-    let media_base_url = "https://storage.googleapis.com/vocodes-public"
-    let media_url = `${media_base_url}${bucketPath}`
+    const api_base_url = "https://api.fakeyou.com";
+    const url = `${api_base_url}/v1/media_files/file/${this.media_id}`;
+    const responce = await fetch(url);
+    const json = await JSON.parse(await responce.text());
+    const bucketPath = json["media_file"]["public_bucket_path"];
+    const media_base_url = "https://storage.googleapis.com/vocodes-public";
+    const media_url = `${media_base_url}${bucketPath}`;
     return media_url;
   }
 
   _load_animation(): Promise<THREE.AnimationClip> {
     // Return the promise chain starting from `this.get_media_url()`
-    return this.get_media_url().then(url => {
+    return this.get_media_url().then((url) => {
       // Return a new Promise that resolves with the animation clip
       return new Promise((resolve) => {
         const glbLoader = new GLTFLoader();
-  
-        glbLoader.load(
-          url,
-          (gltf) => {
-            // Assuming the animation is the first one in the animations array
-            const animationClip = gltf.animations[0];
-            resolve(animationClip);
-          },
-        );
+
+        glbLoader.load(url, (gltf) => {
+          // Assuming the animation is the first one in the animations array
+          const animationClip = gltf.animations[0];
+          resolve(animationClip);
+        });
       });
     });
-  }  
+  }
 
   _create_mixer(object: THREE.Object3D) {
     this.mixer = new THREE.AnimationMixer(object);
@@ -82,7 +79,7 @@ export class AnimationClip  {
   async play(object: THREE.Object3D) {
     if (this.mixer == null) {
       this.mixer = this._create_mixer(object);
-      let anim_clip = await this._get_clip();
+      const anim_clip = await this._get_clip();
       this.clip_action = this.mixer?.clipAction(anim_clip);
       if (this.clip_action) {
         if (this.clip_action?.isRunning() == false) {
@@ -93,7 +90,9 @@ export class AnimationClip  {
   }
 
   step(deltatime: number) {
-    if (this.mixer == null) { return; }
+    if (this.mixer == null) {
+      return;
+    }
     this.mixer?.setTime(deltatime);
   }
 

@@ -645,19 +645,6 @@ class Editor {
     loadingBarIsShowing.value = false;
   }
 
-  async _test_demo() {
-    // note the database from the server is the source of truth for all the data.
-    // Test code here
-    // const object: THREE.Object3D = await this.activeScene.load_glb(
-    //   "m_4wva09qznapzk5rcvbxy671d1qx2pr",
-    // );
-    // object.uuid = "CH1";
-    // Stick Open Pose Man: m_9f3d3z94kk6m25zywyz6an3p43fjtw
-    // XBot: m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d
-    // YBot: m_9sqg0evpr23587jnr8z3zsvav1x077
-    // Shrek: m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp
-  }
-
   // Configure post processing.
   _configurePostProcessing() {
     const width = this.canvReference.width;
@@ -780,22 +767,6 @@ class Editor {
       if (this.recorder == undefined) {
         this.rawRenderer.setSize(1024, 576);
         this.render_camera.aspect = 1024 / 576;
-        //this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 60 FPS
-        //this.recorder = new MediaRecorder(this.record_stream, {
-        //  mimeType: "video/webm",
-        //});
-        //this.recorder.ondataavailable = (event) => {
-        //  if (event.data.size > 0) {
-        //    this.frame_buffer.push(event.data);
-        //    this.frames += 1;
-        //    this.playback_location++;
-        //  }
-        //};
-        //this.recorder.onstop = () => {
-        //  this.stopPlayback();
-        //};
-        //this.recorder.start(1000 / this.cap_fps);
-        //this.recorder = "";
       }
 
       this.render_timer += this.clock.getDelta();

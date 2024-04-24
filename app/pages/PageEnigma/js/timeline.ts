@@ -16,7 +16,6 @@ import { fromEngineActions } from "../Queue/fromEngineActions";
 import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 import { MediaItem } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/js/editor";
-import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
 import EmotionEngine from "./emotion_engine";
 
 // Every object uuid / entity has a track.
@@ -280,7 +279,7 @@ export class TimeLine {
       object_name = "undefined";
     }
 
-    const new_item = this.transform_engine.addFrame(
+    this.transform_engine.addFrame(
       uuid,
       this.absolute_end,
       data_json["position"],
@@ -306,8 +305,11 @@ export class TimeLine {
       ),
     );
 
-    let point = this.scene.createPoint(data_json["position"], data_json["keyframe_uuid"]);
-    if(this.editorEngine.camera_person_mode){
+    const point = this.scene.createPoint(
+      data_json["position"],
+      data_json["keyframe_uuid"],
+    );
+    if (this.editorEngine.camera_person_mode) {
       point.visible = false;
     }
   }
@@ -425,7 +427,7 @@ export class TimeLine {
     const media_id = data["data"]["media_id"];
     const offset = data["data"]["offset"];
     const length = data["data"]["length"] + offset;
-    const clip_uuid = data['data']['clip_uuid'];
+    const clip_uuid = data["data"]["clip_uuid"];
 
     for (const element of this.timeline_items) {
       if (
@@ -440,11 +442,11 @@ export class TimeLine {
   }
 
   public async deleteClip(data: any) {
-    const json_data = data["data"];
+    //const json_data = data["data"];
     const object_uuid = data["data"]["object_uuid"];
     const media_id = data["data"]["media_id"];
-    const type = data["type"];
-    const clip_uuid = data['data']['clip_uuid'];
+    //const type = data["type"];
+    const clip_uuid = data["data"]["clip_uuid"];
 
     for (let i = 0; i < this.timeline_items.length; i++) {
       const element = this.timeline_items[i];
@@ -475,24 +477,6 @@ export class TimeLine {
     this.timeline_items.push(clip);
   }
 
-  // when given a media id item it will create the clip.
-  // Then the clip will be loaded by the engines, if they come from outside of the loaded scene.
-  public async createClipOffset(
-    media_id: string,
-    object_uuid: string,
-    type: string,
-  ): Promise<void> {
-    // use engine to load based off media id and type animation | transform |
-  }
-
-  // this will update the state of the clips based off uuid easing?
-  public async updatePlayableClip(
-    clip_uuid: string,
-    updates: AnyJson,
-  ): Promise<void> {}
-
-  public async deletePlayableClip(clip_uuid: string): Promise<void> {}
-
   public async scrub(data: any): Promise<void> {
     if (this.is_playing) {
       return;
@@ -510,7 +494,6 @@ export class TimeLine {
     });
   }
 
-  public async scrubberDidStop(offset_frame: number) {}
   // public streaming events into the timeline from
   public async setScrubberPosition(offset: number) {
     this.scrubber_frame_position = offset; // in ms
@@ -551,11 +534,11 @@ export class TimeLine {
         ].reset();
       } else if (element.type === ClipType.EMOTION) {
         const object = this.scene.get_object_by_uuid(element.object_uuid);
-        if(object)
-        this.emotion_engine.clips[
-          element.object_uuid + element.media_id
-        ].reset(object);
-      } 
+        if (object)
+          this.emotion_engine.clips[
+            element.object_uuid + element.media_id
+          ].reset(object);
+      }
     }
   }
 
@@ -611,7 +594,8 @@ export class TimeLine {
         } else if (
           element.type === ClipType.AUDIO &&
           element.group !== ClipGroup.CHARACTER &&
-          this.is_playing && !isRendering
+          this.is_playing &&
+          !isRendering
         ) {
           if (this.scrubber_frame_position + 1 >= element.length) {
             this.audio_engine.stopClip(element.media_id);
@@ -650,7 +634,7 @@ export class TimeLine {
           if (object) {
             await this.emotion_engine.clips[
               object.uuid + element.media_id
-            ].step(this.scrubber_frame_position-element.offset, object);
+            ].step(this.scrubber_frame_position - element.offset, object);
           }
         }
         //this.timelineItems = this.timelineItems.filter(item => item !== element)
