@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { Input } from "~/components";
+import { ButtonDropdown, Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { EngineContext } from "../../../../contexts/EngineContext";
 import { ToasterContext } from "~/contexts/ToasterContext";
@@ -7,6 +7,7 @@ import { ToasterContext } from "~/contexts/ToasterContext";
 
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
 import { Help } from "./Help";
+import { faFile } from "@fortawesome/pro-solid-svg-icons";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
@@ -39,44 +40,112 @@ export const ControlsTopButtons = () => {
 
   return (
     <div className="flex flex-col gap-2 pl-3 pt-3">
-      <div className="flex gap-2">
-        <ButtonDialogue
-          buttonProps={{
-            variant: "secondary",
-            label: "Load Scene",
-          }}
-          title="Load Scene"
-          confirmButtonProps={{
-            label: "Load",
-            disabled: sceneToken === "",
-            onClick: handleButtonLoadScene,
-          }}>
-          <Input
-            label="Please provide the Token of the scene you wished to load:"
-            onChange={(e) => {
-              setSceneToken(e.target.value);
-            }}
-          />
-        </ButtonDialogue>
+      <div className="flex gap-1.5">
+        <ButtonDropdown
+          label="File"
+          icon={faFile}
+          options={[
+            {
+              label: "New scene",
+              description: "Ctrl+N",
+              dialogProps: {
+                title: "Create a New Scene",
+                content: (
+                  <Input
+                    label="Please enter a name for your new scene"
+                    onChange={(e) => {
+                      setSceneToken(e.target.value);
+                    }}
+                  />
+                ),
+                confirmButtonProps: {
+                  label: "Create",
+                  disabled: sceneName === "",
+                  onClick: () => console.log("NEW SCENE"),
+                },
+                closeButtonProps: {
+                  label: "Cancel",
+                },
+                showClose: true,
+              },
+            },
+            {
+              label: "Load existing scene",
+              description: "Ctrl+O",
+              dialogProps: {
+                title: "Load a Scene",
+                content: (
+                  <Input
+                    label="Please provide the token of the scene you want to load"
+                    onChange={(e) => {
+                      setSceneToken(e.target.value);
+                    }}
+                  />
+                ),
+                confirmButtonProps: {
+                  label: "Load",
+                  disabled: sceneToken === "",
+                  onClick: handleButtonLoadScene,
+                },
+                closeButtonProps: {
+                  label: "Cancel",
+                },
+                showClose: true,
+              },
+            },
 
-        <ButtonDialogue
-          buttonProps={{
-            variant: "secondary",
-            label: "Save Scene",
-          }}
-          title="Save Scene"
-          confirmButtonProps={{
-            label: "Save",
-            disabled: sceneName === "",
-            onClick: handleButtonSave,
-          }}>
-          <Input
-            label="Please Enter a name for your scene"
-            onChange={(e) => {
-              setSceneName(e.target.value);
-            }}
-          />
-        </ButtonDialogue>
+            {
+              label: "Save scene",
+              description: "Ctrl+S",
+              dialogProps: {
+                title: "Save Scene",
+                content: (
+                  <Input
+                    label="Please enter a name for your scene"
+                    onChange={(e) => {
+                      setSceneName(e.target.value);
+                    }}
+                  />
+                ),
+                confirmButtonProps: {
+                  label: "Save",
+                  disabled: sceneName === "",
+                  onClick: handleButtonSave,
+                },
+                closeButtonProps: {
+                  label: "Cancel",
+                },
+                showClose: true,
+              },
+              divider: true,
+            },
+
+            {
+              label: "Save scene as copy",
+              description: "Ctrl+Shift+S",
+              dialogProps: {
+                title: "Save Scene as Copy",
+                content: (
+                  <Input
+                    label="Please enter a name for your scene"
+                    onChange={(e) => {
+                      setSceneName(e.target.value);
+                    }}
+                  />
+                ),
+                confirmButtonProps: {
+                  label: "Save",
+                  disabled: sceneName === "",
+                  onClick: handleButtonSave,
+                },
+                closeButtonProps: {
+                  label: "Cancel",
+                },
+                showClose: true,
+              },
+            },
+          ]}
+        />
 
         <ButtonDialogue
           buttonProps={{
