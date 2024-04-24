@@ -1,8 +1,8 @@
-import { CharacterGroup, MediaItem } from "~/pages/PageEnigma/models";
+import { CharacterTrack, MediaItem } from "~/pages/PageEnigma/models";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
-import { characterGroups } from "~/pages/PageEnigma/store";
+import { characterGroup } from "~/pages/PageEnigma/store";
 
 export function addCharacter(character: MediaItem) {
   Queue.publish({
@@ -13,16 +13,26 @@ export function addCharacter(character: MediaItem) {
 }
 
 export function addNewCharacter(data: MediaItem) {
+  const newCharacterGroups = {
+    ...characterGroup.value,
+    characters: [...characterGroup.value.characters],
+  };
+
   const newCharacter = {
-    id: data.object_uuid,
+    object_uuid: data.object_uuid,
     name: data.name,
+    media_id: data.media_id,
     muted: false,
+    minimized: false,
     animationClips: [],
     positionKeyframes: [],
     lipSyncClips: [],
-  } as CharacterGroup;
+  } as CharacterTrack;
 
-  characterGroups.value = [...characterGroups.value, newCharacter].sort(
-    (charA, charB) => (charA.id < charB.id ? -1 : 1),
+  newCharacterGroups.characters.push(newCharacter);
+  newCharacterGroups.characters.sort((charA, charB) =>
+    charA.object_uuid < charB.object_uuid ? -1 : 1,
   );
+
+  characterGroup.value = newCharacterGroups;
 }

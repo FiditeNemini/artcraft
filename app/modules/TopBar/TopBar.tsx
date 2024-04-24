@@ -1,14 +1,17 @@
-import { useContext, } from "react";
 import { useLocation } from "@remix-run/react";
 
 import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 
-import { TopBarInnerContext } from "~/contexts/TopBarInner";
 import { ButtonLink } from "~/components";
 
 import { AuthButtons } from "./AuthButtons";
+import { sceneTitle } from "~/store";
 
-export const TopBar = () => {
+interface Props {
+  pageName: string;
+}
+
+export const TopBar = ({ pageName }: Props) => {
   const currentLocation = useLocation().pathname;
 
   return (
@@ -30,15 +33,21 @@ export const TopBar = () => {
                 alt="Logo FakeYou StoryTeller.ai"
               />
             </a>
-            {currentLocation !== "/" &&
+            {currentLocation !== "/" && (
               <ButtonLink to={"/"} variant="secondary" icon={faChevronLeft}>
                 Back to Dashboard
               </ButtonLink>
-            }
+            )}
           </div>
 
-          <div className="flex justify-center">
-            <TopBarInner currentLocation={currentLocation}/>
+          <div className="flex items-center justify-center font-medium">
+            <span className="opacity-60">{pageName}&nbsp;&nbsp;/</span>
+            &nbsp;&nbsp;
+            {sceneTitle.value} 
+            &nbsp;&nbsp;
+            <span className="opacity-60">
+              @ CURRENT_STORYTELLER_GIT_VERSION
+            </span>
           </div>
 
           <div className="flex justify-end gap-2">
@@ -49,12 +58,3 @@ export const TopBar = () => {
     </header>
   );
 };
-
-const TopBarInner = ({currentLocation}:{currentLocation:string}) => {
-  const { TopBarInner } = useContext(TopBarInnerContext) || {};
-  if(!TopBarInner || TopBarInner.location !== currentLocation){
-    return null;
-  }
-  return TopBarInner.node;
-};
-

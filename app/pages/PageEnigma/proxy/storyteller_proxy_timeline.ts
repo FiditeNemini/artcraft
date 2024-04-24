@@ -1,10 +1,12 @@
 import { AnimationClip } from "../datastructures/clips/animation_clip";
 import { AudioClip } from "../datastructures/clips/audio_clip";
 import { ClipUI } from "../datastructures/clips/clip_ui";
+import { EmotionClip } from "../datastructures/clips/emotion_clip";
 import { LipSyncClip } from "../datastructures/clips/lipsync_clip";
 import { TransformClip } from "../datastructures/clips/transform_clip";
 import AnimationEngine from "../js/animation_engine";
 import AudioEngine from "../js/audio_engine";
+import EmotionEngine from "../js/emotion_engine";
 import LipSyncEngine from "../js/lip_sync_engine";
 import { TimeLine } from "../js/timeline";
 import TransformEngine from "../js/transform_engine";
@@ -16,13 +18,15 @@ export class StoryTellerProxyTimeline {
     animation_engine: AnimationEngine
     audio_engine: AudioEngine
     lipsync_engine: LipSyncEngine
+    emotion_engine: EmotionEngine
 
-    constructor(version: number, timeline: TimeLine, transform_engine: TransformEngine, animation_engine: AnimationEngine, audio_engine: AudioEngine, lipsync_engine: LipSyncEngine) {
+    constructor(version: number, timeline: TimeLine, transform_engine: TransformEngine, animation_engine: AnimationEngine, audio_engine: AudioEngine, lipsync_engine: LipSyncEngine, emotion_engine: EmotionEngine) {
         this.timeline = timeline;
         this.transform_engine = transform_engine;
         this.animation_engine = animation_engine;
         this.audio_engine = audio_engine;
         this.lipsync_engine = lipsync_engine;
+        this.emotion_engine = emotion_engine;
     }
 
     private async getItems(items: any[]): Promise<any[]> {
@@ -52,6 +56,7 @@ export class StoryTellerProxyTimeline {
             animation: await this.getItemsDict(this.animation_engine.clips),
             audio: await this.getItemsDict(this.audio_engine.clips),
             lipsync: await this.getItemsDict(this.lipsync_engine.clips),
+            emotion: await this.getItemsDict(this.emotion_engine.clips),
         }
         console.log(timeline_json)
 
@@ -122,12 +127,24 @@ export class StoryTellerProxyTimeline {
         return timeline_items_data;
     }
 
+    private async loadEmotionClips(items: { [key: string]: any }): Promise<{ [key: string]: any }> {
+        let timeline_items_data: { [key: string]: any } = {};
+        for (const key in items) {
+            if (items.hasOwnProperty(key)) {
+                const element = items[key];
+                timeline_items_data[key] = new EmotionClip(element.version, element.media_id);
+            }
+        }
+        return timeline_items_data;
+    }
+
     public async loadFromJson(timeline: any) {
         this.timeline.timeline_items = await this.loadTimelineClips(timeline['timeline']);
         this.transform_engine.clips = await this.loadTransformClips(timeline['transform']);
         this.audio_engine.clips = await this.loadAudioClips(timeline['audio']);
         this.lipsync_engine.clips = await this.loadLipsyncClips(timeline['lipsync']);
         this.animation_engine.clips = await this.loadAnimationClips(timeline['animation']);
+        this.emotion_engine.clips = await this.loadEmotionClips(timeline['emotion']);
 
         console.log(this.timeline.timeline_items)
 

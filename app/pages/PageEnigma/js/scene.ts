@@ -24,7 +24,7 @@ class Scene {
         this._create_camera_obj();
     }
 
-    instantiate(name: string) {
+    instantiate(name: string, pos: THREE.Vector3 = new THREE.Vector3(0,0,0)) {
         let material = new THREE.MeshPhongMaterial({ color: 0xDACBCE });
         material.shininess = 0.0;
         let geometry;
@@ -50,6 +50,11 @@ class Scene {
         obj.userData["media_id"] = "Parim";
         //obj.type = "Object3D";
         obj.name = name;
+        obj.position.copy(pos);
+        obj.userData["color"] = "#FFFFFF";
+        obj.userData["metalness"] = 0.0;
+        obj.userData["shininess"] = 0.5;
+        obj.userData["specular"] = 0.0;
         this.scene.add(obj);
         return obj.uuid;
     }
@@ -70,6 +75,7 @@ class Scene {
         obj.receiveShadow = false;
         obj.castShadow = false;
         obj.userData['media_id'] = "Point::" + keyframe_uuid;
+        obj.layers.set(1); // Enable default layer
         if (this.hot_items != undefined) {
             this.hot_items.push(obj);
         }
@@ -92,7 +98,7 @@ class Scene {
     }
 
     _disable_skybox() {
-        this.scene.background = null;
+        //this.scene.background = null;
     }
 
     _create_camera_obj() {
@@ -100,6 +106,7 @@ class Scene {
             cam_obj.userData["name"] = "::CAM::";
             cam_obj.name = "::CAM::";
             cam_obj.position.set(0, 0.6, 1.5);
+            cam_obj.layers.set(1);
             this.scene.add(cam_obj);
         });
     }
@@ -137,21 +144,21 @@ class Scene {
                         if (c instanceof THREE.Mesh) {
                             c.material.metalness = 0.0;
                             c.material.specular = 0.5;
+                            c.material.shininess = 0.0;
                             c.castShadow = true;
                             c.receiveShadow = true;
                             c.frustumCulled = false;
                             c.material.transparent = false;
                         }
                     });
-                    //console.log(child);
-                    //if (child.type == "Group") {
-                    //    if (auto_add) { child.children.forEach(element => {
-                    //        this.scene.add(element);
-                    //    }); }
-                    //    resolve(child);
-                    //}
                     child.frustumCulled = false;
                     child.userData["media_id"] = media_id;
+                    child.userData["color"] = "#FFFFFF";
+                    child.userData["metalness"] = 0.0;
+                    child.userData["shininess"] = 0.5;
+                    child.userData["specular"] = 0.5;
+                    child.layers.enable(0);
+                    child.layers.enable(1);
                     if (auto_add) { this.scene.add(child); }
                     resolve(child);
                 });
@@ -178,6 +185,7 @@ class Scene {
                         resolve(child.children[0]);
                         return;
                     }
+                    child.userData["color"] = "#FFFFFF";
                     if (auto_add) { this.scene.add(child); }
                     resolve(child);
                 });
@@ -188,14 +196,25 @@ class Scene {
     // default skybox.
     _create_skybox() {
         const loader = new THREE.CubeTextureLoader();
+
+        // const texture = loader.load([
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_2_LeftX.png',
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_3_Right-X.png',
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_4_UpY.png',
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_5_Down-Y.png',
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_0_FrontZ.png',
+        //     '/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png',
+        // ]);
+        
         const texture = loader.load([
-            '/resources/skybox/night/Night_Moon_Burst_Cam_2_LeftX.png',
-            '/resources/skybox/night/Night_Moon_Burst_Cam_3_Right-X.png',
-            '/resources/skybox/night/Night_Moon_Burst_Cam_4_UpY.png',
-            '/resources/skybox/night/Night_Moon_Burst_Cam_5_Down-Y.png',
-            '/resources/skybox/night/Night_Moon_Burst_Cam_0_FrontZ.png',
-            '/resources/skybox/night/Night_Moon_Burst_Cam_1_Back-Z.png',
+            '/resources/skybox/day/px.png',
+            '/resources/skybox/day/nx.png',
+            '/resources/skybox/day/py.png',
+            '/resources/skybox/day/ny.png',
+            '/resources/skybox/day/pz.png',
+            '/resources/skybox/day/nz.png',
         ]);
+
         this.scene.background = texture;
         console.log("Backround creation..")
     }
@@ -236,6 +255,7 @@ class Scene {
         const size = 25;
         const divisions = 50;
         this.gridHelper = new THREE.GridHelper(size, divisions, new THREE.Color("rgb(199,195,195)"), new THREE.Color("rgb(161,157,157)"));
+        this.gridHelper.layers.set(1); // Enable default layer
         this.scene.add(this.gridHelper);
     }
 }

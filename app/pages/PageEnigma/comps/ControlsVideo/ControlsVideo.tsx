@@ -7,7 +7,7 @@ import {
   faPlay,
 } from "@fortawesome/pro-solid-svg-icons";
 import { ButtonIcon } from "~/components";
-import { EngineContext } from "../../contexts/EngineContext";
+import { EngineContext } from "../../../../contexts/EngineContext";
 
 export const ControlsVideo = () => {
   const editorEngine = useContext(EngineContext);

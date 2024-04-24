@@ -112,10 +112,23 @@ class FreeCam extends EventDispatcher {
 
 		};
 
+		this.reset = function() {
+			this.moveState.forward = 0;
+			this.moveState.back = 0; 
+			this.moveState.left = 0; 
+			this.moveState.right = 0; 
+			this.moveState.pitchUp = 0; 
+			this.moveState.pitchDown = 0; 
+			this.moveState.yawLeft = 0; 
+			this.moveState.yawRight = 0; 
+			this.moveState.down = 0; 
+			this.moveState.up = 0;
+			this.updateMovementVector();
+		}
+
 		this.update = function ( delta ) {
 
 			if ( this.enabled === false ) return;
-
 
 			const moveMult = delta * scope.movementSpeed;
 

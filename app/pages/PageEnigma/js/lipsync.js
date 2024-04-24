@@ -21,6 +21,8 @@ export class LipSync {
   constructor(face) {
 
     this.face = face;
+    this.buffer = null;
+    this.last_frame = 0;
 
     // WE NEED THIS TO be run at RUNTIME
     // we have to modify this for our
@@ -70,24 +72,59 @@ export class LipSync {
 
     if (this.mediaStreamSource) this.mediaStreamSource.stop();
 
-    this.mediaStreamSource = this.audioContext.createBufferSource();
-    this.mediaStreamSource.buffer = buffer;
-    this.meter = LipSync.createAudioMeter(this.audioContext);
-    this.mediaStreamSource.connect(this.meter);
-    this.mediaStreamSource.connect(this.audioContext.destination);
-    this.mediaStreamSource.start();
-    // connect the output of mediaStreamSource to the input of userSpeechAnalyzer
-    this.mediaStreamSource.connect(this.userSpeechAnalyzer);
+    this.buffer = buffer;
+
+    //this.mediaStreamSource = this.audioContext.createBufferSource();
+    //this.mediaStreamSource.buffer = buffer;
+    //this.meter = LipSync.createAudioMeter(this.audioContext);
+    //this.mediaStreamSource.connect(this.meter);
+    //this.mediaStreamSource.connect(this.audioContext.destination);
+    ////this.mediaStreamSource.start();
+    //// connect the output of mediaStreamSource to the input of userSpeechAnalyzer
+    //this.mediaStreamSource.connect(this.userSpeechAnalyzer);
   }
 
   destroy() {
     this.meter?.shutdown();
     this.meter = null;
     this.mediaStreamSource?.disconnect();
-    return this.audioContext?.close().catch(() => {}) || Promise.resolve();
+    return this.audioContext?.close().catch(() => { }) || Promise.resolve();
   }
 
-  update() {
+  update(frame, offset, rendering) {
+
+    const frameBuffer = 12;
+
+    let pos = frame - offset;
+
+    let doPlay = true;
+    if (Math.abs(this.last_frame - frame) < frameBuffer - 1 && this.last_frame !== 0) { doPlay = false }
+
+    if (pos <= 1 && !rendering) {
+      doPlay = true;
+    }
+    else if(!rendering){
+      doPlay = false;
+    }
+
+    if (doPlay) {
+      const startTime = pos / 60.0;
+      const endTime = frameBuffer / 60.0;
+      this.mediaStreamSource = this.audioContext.createBufferSource();
+      this.mediaStreamSource.buffer = this.buffer;
+      this.meter = LipSync.createAudioMeter(this.audioContext);
+      this.mediaStreamSource.connect(this.meter);
+      this.mediaStreamSource.connect(this.audioContext.destination);
+      if (rendering) {
+        this.mediaStreamSource.start(0, startTime, endTime);
+      }
+      else {
+        this.mediaStreamSource.start();
+      }
+      this.mediaStreamSource.connect(this.userSpeechAnalyzer);
+      this.last_frame = frame;
+    }
+
     if (this.meter) {
       const { volume } = this.meter;
       let { ah, oh, ee } = this.update2();
@@ -156,8 +193,8 @@ export class LipSync {
       Math.max(EnergyBinFem[1], EnergyBinMasc[1]) > 0.2
         ? 1 - 2 * Math.max(EnergyBinMasc[2], EnergyBinFem[2])
         : (1 - 2 * Math.max(EnergyBinMasc[2], EnergyBinFem[2])) *
-          5 *
-          Math.max(EnergyBinMasc[1], EnergyBinFem[1]);
+        5 *
+        Math.max(EnergyBinMasc[1], EnergyBinFem[1]);
 
     const ah = 3 * Math.max(EnergyBinMasc[3], EnergyBinFem[3]);
     const ee =

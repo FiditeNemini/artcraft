@@ -17,6 +17,7 @@ export enum ClipType {
   TRANSFORM = "transform",
   AUDIO = "audio",
   ANIMATION = "animation",
+  EMOTION = "emotion",
   FAKE = "fake",
 }
 
@@ -41,8 +42,15 @@ export interface Keyframe {
 
 export interface CharacterGroup {
   id: string;
+  characters: CharacterTrack[];
+}
+
+export interface CharacterTrack {
+  object_uuid: string;
+  media_id: string;
   name: string;
   muted: boolean;
+  minimized: boolean;
   animationClips: Clip[];
   positionKeyframes: Keyframe[];
   lipSyncClips: Clip[];

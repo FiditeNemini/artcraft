@@ -115,24 +115,28 @@ export default {
         selected: "#6384F4",
         clip: "#7E92DA",
         groupBg: "#2B3448",
+        titleBg: "#384763",
       },
       camera: {
         unselected: "#466C7C",
         selected: "#56BBC1",
         clip: "#5F949F",
         groupBg: "#2B393E",
+        titleBg: "#395259",
       },
       global_audio: {
         unselected: "#864C68",
         selected: "#D460A6",
         clip: "#E37BAD",
         groupBg: "#382940",
+        titleBg: "#5A3D65",
       },
       object: {
         unselected: "#7C5646",
         selected: "#EA8E5A",
         clip: "#D49D75",
         groupBg: "#372E32",
+        titleBg: "#514248",
       },
       keyframe: {
         unselected: "#EEEEEE",

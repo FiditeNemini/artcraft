@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { TimelineDataState } from "./timeline";
+import { STORAGE_KEYS } from "~/contexts/Authentication/types";
 
 /**
  * Storyteller Studio API Manager
@@ -75,9 +76,11 @@ class APIManagerResponseError extends Error {
 
 export class APIManager {
   baseUrl: string;
+  sessionToken: string;
 
   constructor() {
     this.baseUrl = "https://api.fakeyou.com";
+    this.sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN) || "";
     //this.baseUrl = "http://localhost:12345"
   }
 
@@ -191,7 +194,7 @@ export class APIManager {
    * @param media_file_token
    * @returns
    */
-  private async getMediaFile(media_file_token: string): Promise<string> {
+  public async getMediaFile(media_file_token: string): Promise<string> {
     const api_base_url = "https://api.fakeyou.com";
     const url = `${api_base_url}/v1/media_files/file/${media_file_token}`;
     const response = await fetch(url);
@@ -238,9 +241,10 @@ export class APIManager {
 
     const response = await fetch(url, {
       method: "POST",
-      credentials: "include",
+      // credentials: "include",
       headers: {
-        Accept: "application/json",
+        'Accept': "application/json",
+        'session': this.sessionToken,
       },
       body: form_data,
     });
@@ -291,9 +295,10 @@ export class APIManager {
 
     const response = await fetch(url, {
       method: "POST",
-      credentials: "include",
+      // credentials: "include",
       headers: {
-        Accept: "application/json",
+        'Accept': "application/json",
+        'session': this.sessionToken,
       },
       body: form_data,
     });
@@ -325,9 +330,10 @@ export class APIManager {
 
     const response = await fetch(url, {
       method: "POST",
-      credentials: "include",
+      // credentials: "include",
       headers: {
-        Accept: "application/json",
+        'Accept': "application/json",
+        'session': this.sessionToken,
       },
       body: formData,
     });
@@ -348,7 +354,8 @@ export class APIManager {
     positive_prompt: string,
     negative_prompt: string,
   ): Promise<string> {
-    const url = `https://funnel.tailce84f.ts.net/preview/`;
+    //const url = 'http://213.173.110.135:15750/preview';
+    const url = 'https://funnel.tailce84f.ts.net/preview/';
 
     const payload = {
       style: style,
@@ -357,14 +364,15 @@ export class APIManager {
     };
 
     const formData = new FormData();
-    formData.append("video", blob, fileName);
+    formData.append("input_file", blob, fileName);
     formData.append("request", JSON.stringify(payload));
 
     const response = await fetch(url, {
       method: "POST",
-      credentials: "include",
+      // credentials: "include",
       headers: {
-        Accept: "application/json",
+        'Accept': "application/json",
+        'session': this.sessionToken,
       },
       body: formData,
     });
@@ -421,10 +429,11 @@ export class APIManager {
 
     const response = await fetch(`${this.baseUrl}/v1/video/enqueue_vst`, {
       method: "POST",
-      credentials: "include",
+      // credentials: "include",
       headers: {
-        Accept: "application/json",
+        'Accept': "application/json",
         "Content-Type": "application/json",
+        'session': this.sessionToken,
       },
       body: json_data,
     });

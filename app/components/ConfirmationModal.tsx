@@ -1,6 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Button } from "~/components/Button";
-import { Fragment } from "react";
+import { Fragment, useCallback } from "react";
+import { DoNotShow } from "~/pages/PageEnigma/constants/misc";
 
 interface Props {
   text: string;
@@ -12,6 +13,7 @@ interface Props {
   okColor?: string;
   onCancel?: () => void;
   cancelText?: string;
+  canHide?: boolean;
 }
 
 export const ConfirmationModal = ({
@@ -24,7 +26,19 @@ export const ConfirmationModal = ({
   okColor = "bg-brand-success",
   onCancel,
   cancelText = "Cancel",
+  canHide,
 }: Props) => {
+  const handleOk = useCallback(() => {
+    const element = document.getElementById("can-delete");
+    if (element) {
+      if ((element as HTMLInputElement).checked) {
+        localStorage.setItem(title.replace(" ", "-"), DoNotShow);
+      }
+    }
+
+    onOk!();
+  }, [onOk, title]);
+
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog open={open} onClose={onClose}>
@@ -35,8 +49,7 @@ export const ConfirmationModal = ({
           enterTo="opacity-100"
           leave="ease-in duration-200"
           leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
+          leaveTo="opacity-0">
           <div className="fixed inset-0 bg-black/40" />
         </Transition.Child>
         <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
@@ -47,17 +60,23 @@ export const ConfirmationModal = ({
             enterTo="opacity-100 scale-100"
             leave="ease-in duration-200"
             leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
-          >
+            leaveTo="opacity-0 scale-95">
             <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-xl border border-ui-panel-border bg-ui-panel p-5 text-left align-middle shadow-xl transition-all">
               <Dialog.Title
                 as="h4"
-                className="mb-4 text-xl font-bold text-white"
-              >
+                className="mb-4 text-xl font-bold text-white">
                 {title}
               </Dialog.Title>
 
               <div className="mt-2">{text}</div>
+              {canHide && (
+                <div className="mt-2">
+                  <label>
+                    <input id="can-delete" type="checkbox" />
+                    &nbsp;&nbsp;Do not show this again
+                  </label>
+                </div>
+              )}
 
               <div className="mt-6 flex justify-end gap-2">
                 {!!onCancel && (
@@ -65,17 +84,15 @@ export const ConfirmationModal = ({
                     type="button"
                     onClick={onCancel}
                     className="rounded-lg px-3 py-2"
-                    variant="secondary"
-                  >
+                    variant="secondary">
                     {cancelText}
                   </Button>
                 )}
                 {!!onOk && (
                   <Button
                     type="button"
-                    onClick={onOk}
-                    className={[okColor, "rounded-lg px-3 py-2"].join(" ")}
-                  >
+                    onClick={handleOk}
+                    className={[okColor, "rounded-lg px-3 py-2"].join(" ")}>
                     {okText}
                   </Button>
                 )}

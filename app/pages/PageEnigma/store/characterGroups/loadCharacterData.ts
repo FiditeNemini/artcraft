@@ -1,15 +1,15 @@
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
 import {
-  CharacterGroup,
+  CharacterTrack,
   Clip,
   ClipType,
   Keyframe,
 } from "~/pages/PageEnigma/models";
-import { characterGroups } from "~/pages/PageEnigma/store";
+import { characterGroup } from "~/pages/PageEnigma/store";
 
 function getAddCharacter(item: ClipUI) {
-  const existingCharacter = characterGroups.value.find(
-    (character) => character.id === item.object_uuid,
+  const existingCharacter = characterGroup.value.characters.find(
+    (character) => character.object_uuid === item.object_uuid,
   );
 
   if (existingCharacter) {
@@ -17,24 +17,29 @@ function getAddCharacter(item: ClipUI) {
   }
 
   const newCharacter = {
-    id: item.object_uuid,
+    object_uuid: item.object_uuid,
     name: item.object_name,
+    media_id: item.media_id,
     muted: false,
+    minimized: false,
     animationClips: [],
     positionKeyframes: [],
     lipSyncClips: [],
-  } as CharacterGroup;
+  } as CharacterTrack;
 
-  characterGroups.value = [
-    ...characterGroups.value.filter(
-      (character) => character.id !== item.object_uuid,
-    ),
-    newCharacter,
-  ].sort((charA, charB) => (charA.id < charB.id ? -1 : 1));
+  characterGroup.value = {
+    ...characterGroup.value,
+    characters: [
+      ...characterGroup.value.characters.filter(
+        (character) => character.object_uuid !== item.object_uuid,
+      ),
+      newCharacter,
+    ].sort((charA, charB) => (charA.object_uuid < charB.object_uuid ? -1 : 1)),
+  };
 
-  return characterGroups.value.find(
-    (character) => character.id === item.object_uuid,
-  ) as CharacterGroup;
+  return characterGroup.value.characters.find(
+    (character) => character.object_uuid === item.object_uuid,
+  ) as CharacterTrack;
 }
 
 export function loadCharacterData(item: ClipUI) {

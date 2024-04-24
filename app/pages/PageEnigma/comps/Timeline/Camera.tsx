@@ -1,23 +1,63 @@
-import { cameraGroup, fullWidth, updateCamera } from "~/pages/PageEnigma/store";
+import {
+  cameraGroup,
+  cameraMinimized,
+  fullWidth,
+  minimizeIconPosition,
+  updateCamera,
+} from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 import { useSignals } from "@preact/signals-react/runtime";
 import { ClipGroup } from "~/pages/PageEnigma/models";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
 
 export const Camera = () => {
   useSignals();
   const { keyframes } = cameraGroup.value!;
 
+  if (cameraMinimized.value) {
+    return (
+      <div
+        className="relative flex h-[35px] items-center justify-end rounded-r-lg bg-camera-groupBg pr-4"
+        style={{ width: fullWidth.value + 16 }}>
+        <button
+          className="absolute"
+          style={{
+            left: minimizeIconPosition.value,
+          }}
+          onClick={(event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            cameraMinimized.value = !cameraMinimized.value;
+          }}>
+          <FontAwesomeIcon icon={faAngleDown} />
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
-      className="block rounded-lg bg-camera-groupBg pb-5 pl-2 pr-4"
-      style={{ width: fullWidth.value + 90 }}
-    >
-      <div className="mb-5 pt-2 text-xs font-medium text-white">Camera</div>
-      <div className="flex flex-col gap-4">
+      className="relative block rounded-r-lg bg-camera-groupBg pb-5 pr-4"
+      style={{ width: fullWidth.value + 16 }}>
+      <div className="flex justify-end">
+        <button
+          className="absolute"
+          style={{
+            left: minimizeIconPosition.value,
+          }}
+          onClick={(event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            cameraMinimized.value = !cameraMinimized.value;
+          }}>
+          <FontAwesomeIcon icon={faAngleUp} />
+        </button>
+      </div>
+      <div className="pt-[47px]">
         <TrackKeyFrames
           id={cameraGroup.value.id}
           keyframes={keyframes}
-          title="Camera Position/Rotation"
           group={ClipGroup.CAMERA}
           updateKeyframe={updateCamera}
         />

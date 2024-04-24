@@ -1,15 +1,17 @@
 export enum STORAGE_KEYS{
-  USER_INFO = "user_info",
+  SESSION_TOKEN = "session_token",
 }
+
 export enum AUTH_STATUS {
+  INIT = "INIT",
   LOGGED_IN = "logged_in",
   LOGGING = "logging",
   LOGGED_OUT = "logged_out",
 }
 
 export type AuthState = {
-  isLoggedIn?: boolean;
-  sessionData?: string | null;
+  authStatus: AUTH_STATUS;
+  sessionToken?: string | null;
   userInfo?: UserInfo;
 }
 export interface UserInfo {

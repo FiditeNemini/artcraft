@@ -1,42 +1,29 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { twMerge } from "tailwind-merge";
 import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
-import { faCirclePlus, faArrowsRotate } from "@fortawesome/pro-solid-svg-icons";
 
-import { AppUiContext } from "~/pages/PageEnigma/contexts/AppUiContext";
 import { AuthenticationContext } from "~/contexts/Authentication";
-import { APPUI_ACTION_TYPES } from "~/pages/PageEnigma/reducers";
-import { audioFilter, audioItems } from "~/pages/PageEnigma/store";
-import { AssetFilterOption } from "~/pages/PageEnigma/models";
-
-import { Button, ButtonIcon } from "~/components";
-
 import { MediaItem, AssetType } from "~/pages/PageEnigma/models";
-import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
 import { audioItemsFromServer } from "~/pages/PageEnigma/store/mediaFromServer";
-import { ListAudioByUser } from "./listAudioByUser";
+import { ListAudioByUser } from "./utilities";
 import { inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
 import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
+
+import { PageLibrary } from "./pageLibrary";
+import { PageTTS } from "./pageTTS";
+import { AudioTabPages } from "./types";
 
 export const AudioTabComponent = () => {
   useSignals();
   const [ state, setState ] = useState({
     firstLoad: false,
     fetchingUserAudio: false,
+    page: AudioTabPages.LIBRARY,
   });
   const { authState } = useContext(AuthenticationContext);
-  const [, dispatchAppUiState] = useContext(AppUiContext);
-  const handleOpenTtsDialogue = ()=>{
-      dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.OPEN_DIALOGUE_TTS
-    })
-  }
-  const allAudioItems = [...audioItems.value, ...audioItemsFromServer.value];
 
-  const handleListAudioByUser = useCallback((username:string)=>{
+  const handleListAudioByUser = useCallback((username:string, sessionToken:string)=>{
     setState((curr)=>({...curr, fetchingUserAudio:true}));
-    ListAudioByUser(username).then((res:any[])=>{
-      console.log(res)
+    ListAudioByUser(username, sessionToken).then((res:any[])=>{
       setState((curr)=>({...curr, fetchingUserAudio:false}));
       audioItemsFromServer.value = res.map(item=>{
         const morphedItem:MediaItem = {
@@ -45,8 +32,10 @@ export const AudioTabComponent = () => {
           media_id: item.token,
           object_uuid: item.token,
           name: item.maybe_title || item.origin.maybe_model.title,
+          description: item.maybe_text_transcript,
+          publicBucketPath: item.public_bucket_path,
           length: 25,
-          thumbnail: "resources/placeholders/audio_placeholder.png",
+          thumbnail: "/resources/placeholders/audio_placeholder.png",
           isMine: true,
           // isBookmarked?: boolean;
         }
@@ -56,9 +45,10 @@ export const AudioTabComponent = () => {
   }, []);
 
   useEffect(()=>{
-    if ( authState.userInfo ){
+    if (authState.userInfo && authState.sessionToken){
       if(state.firstLoad === false && audioItemsFromServer.value.length === 0){
-        handleListAudioByUser(authState.userInfo.username);
+        handleListAudioByUser(authState.userInfo.username, authState.sessionToken);
+        setState((curr)=>({...curr, firstLoad:true}));
       }
     }
   }, [authState, state, handleListAudioByUser]);
@@ -82,80 +72,30 @@ export const AudioTabComponent = () => {
           return foundItemOfJob !== undefined;
         }
       });
-      if(found === undefined){
-        handleListAudioByUser(authState.userInfo.username);
+      if(found === undefined && authState.sessionToken){
+        handleListAudioByUser(authState.userInfo.username, authState.sessionToken);
       }
     }
   });
 
-  return (
-    <>
-      <div className="w-full overflow-x-auto">
-        <div className="mb-4 mt-4 flex justify-start items-center gap-2 px-4">
-          <button
-            className={twMerge(
-              "filter-tab",
-              audioFilter.value === AssetFilterOption.ALL ? "active" : "",
-              "disabled",
-            )}
-            onClick={() => (audioFilter.value = AssetFilterOption.ALL)}
-          >
-            All
-          </button>
-          <button
-            className={twMerge(
-              "filter-tab",
-              audioFilter.value === AssetFilterOption.MINE ? "active" : "",
-              "disabled",
-            )}
-            onClick={() => (audioFilter.value = AssetFilterOption.MINE)}
-            disabled={!allAudioItems.some((item) => item.isMine)}
-          >
-            My Audios
-          </button>
-          <button
-            className={twMerge(
-              "filter-tab",
-              audioFilter.value === AssetFilterOption.BOOKMARKED
-                ? "active"
-                : "",
-              "disabled",
-            )}
-            onClick={() => (audioFilter.value = AssetFilterOption.BOOKMARKED)}
-            disabled={!allAudioItems.some((item) => item.isBookmarked)}
-          >
-            Bookmarked
-          </button>
-          <ButtonIcon
-            className={twMerge(
-              "absolute right-0 mr-4", 
-              // state.fetchingUserAudio ? "animate-spin" : "",
-            )}
-            icon={faArrowsRotate}
-            onClick={()=>{
-              if(authState.userInfo?.username){
-                handleListAudioByUser(authState.userInfo?.username);
-              }
-            }}
-          />
-        </div>
-      </div>
-      <div className="w-full px-4">
-        <Button
-          icon={faCirclePlus}
-          variant="action"
-          className="w-full py-3 text-sm font-medium"
-          onClick={handleOpenTtsDialogue}
-        >
-          Generate Audio
-        </Button>
-      </div>
-      <div className="h-full w-full overflow-y-auto px-4 pt-4">
-        <ItemElements
-          items={allAudioItems}
-          assetFilter={audioFilter.value}
-        />
-      </div>
-    </>
-  );
+  const changePage = (newPage:AudioTabPages)=>{
+    setState((curr)=>({
+      ...curr,
+      page: newPage
+    }))
+  }
+  if(state.page === AudioTabPages.LIBRARY){
+    return <PageLibrary changePage={changePage}/>
+  }else if(state.page === AudioTabPages.TTS && authState.sessionToken){
+    return(
+      <PageTTS
+        changePage={changePage}
+        sessionToken={authState.sessionToken}
+      />
+    );
+  }else{
+    return(
+      <p>Unknown Error</p>
+    )
+  }
 };

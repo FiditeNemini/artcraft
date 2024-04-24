@@ -73,7 +73,7 @@ export function deleteObjectKeyframe(keyframe: Keyframe) {
   const obj = oldObjectGroup.objects.find(
     (row) => row.object_uuid === keyframe.object_uuid,
   );
-  console.log("delete", obj, keyframe.keyframe_uuid);
+
   if (!obj) {
     return oldObjectGroup;
   }

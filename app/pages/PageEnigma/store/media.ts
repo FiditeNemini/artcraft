@@ -9,7 +9,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Sit",
-    thumbnail: "resources/characters/img04.png",
+    thumbnail: "/resources/characters/img04.png",
     isMine: true,
   },
   {
@@ -18,7 +18,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Idle",
-    thumbnail: "resources/characters/img07.png",
+    thumbnail: "/resources/characters/img07.png",
     isBookmarked: true,
   },
   {
@@ -27,7 +27,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Walk",
-    thumbnail: "resources/characters/img07.png",
+    thumbnail: "/resources/characters/img07.png",
   },
   {
     version: 1,
@@ -35,7 +35,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Punch",
-    thumbnail: "resources/characters/img08.png",
+    thumbnail: "/resources/characters/img08.png",
   },
   {
     version: 1,
@@ -43,7 +43,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Jump",
-    thumbnail: "resources/characters/img06.png",
+    thumbnail: "/resources/characters/img06.png",
   },
   {
     version: 1,
@@ -51,7 +51,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Dance",
-    thumbnail: "resources/characters/img11.png",
+    thumbnail: "/resources/characters/img11.png",
   },
   {
     version: 1,
@@ -59,7 +59,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Jump Forward",
-    thumbnail: "resources/characters_gif/Jump Forward.gif",
+    thumbnail: "/resources/characters_gif/Jump Forward.gif",
   },
   {
     version: 1,
@@ -67,7 +67,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Tonic Seizure",
-    thumbnail: "resources/characters_gif/Tonic Seizure.gif",
+    thumbnail: "/resources/characters_gif/Tonic Seizure.gif",
   },
   {
     version: 1,
@@ -75,7 +75,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Ginga Variation 3",
-    thumbnail: "resources/characters_gif/Ginga Variation 3.gif",
+    thumbnail: "/resources/characters_gif/Ginga Variation 3.gif",
   },
   {
     version: 1,
@@ -83,7 +83,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Crouch Running",
-    thumbnail: "resources/characters_gif/Crouch Running.gif",
+    thumbnail: "/resources/characters_gif/Crouch Running.gif",
   },
   {
     version: 1,
@@ -91,7 +91,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Strafing Jump",
-    thumbnail: "resources/characters_gif/Strafing Jump.gif",
+    thumbnail: "/resources/characters_gif/Strafing Jump.gif",
   },
   {
     version: 1,
@@ -99,7 +99,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Texting",
-    thumbnail: "resources/characters_gif/Texting.gif",
+    thumbnail: "/resources/characters_gif/Texting.gif",
   },
   {
     version: 1,
@@ -107,7 +107,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Pushing",
-    thumbnail: "resources/characters_gif/Pushing.gif",
+    thumbnail: "/resources/characters_gif/Pushing.gif",
   },
   {
     version: 1,
@@ -115,7 +115,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Standing Idle To Crouch",
-    thumbnail: "resources/characters_gif/Standing Idle To Crouch.gif",
+    thumbnail: "/resources/characters_gif/Standing Idle To Crouch.gif",
   },
   {
     version: 1,
@@ -123,7 +123,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Fight Idle To Standing Idle",
-    thumbnail: "resources/characters_gif/Fight Idle To Standing Idle.gif",
+    thumbnail: "/resources/characters_gif/Fight Idle To Standing Idle.gif",
   },
   {
     version: 1,
@@ -131,7 +131,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Texting While Standing",
-    thumbnail: "resources/characters_gif/Texting While Standing.gif",
+    thumbnail: "/resources/characters_gif/Texting While Standing.gif",
   },
   {
     version: 1,
@@ -139,7 +139,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Getting Bit",
-    thumbnail: "resources/characters_gif/Getting Bit.gif",
+    thumbnail: "/resources/characters_gif/Getting Bit.gif",
   },
   {
     version: 1,
@@ -147,7 +147,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Female Laying Pose",
-    thumbnail: "resources/characters_gif/Female Laying Pose.gif",
+    thumbnail: "/resources/characters_gif/Female Laying Pose.gif",
   },
   {
     version: 1,
@@ -155,7 +155,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Twist Dance",
-    thumbnail: "resources/characters_gif/Twist Dance.gif",
+    thumbnail: "/resources/characters_gif/Twist Dance.gif",
   },
   {
     version: 1,
@@ -163,7 +163,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Femme Peek Around Corner",
-    thumbnail: "resources/characters_gif/Femme Peek Around Corner.gif",
+    thumbnail: "/resources/characters_gif/Femme Peek Around Corner.gif",
   },
   {
     version: 1,
@@ -171,7 +171,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Sword And Shield Casting",
-    thumbnail: "resources/characters_gif/Sword And Shield Casting.gif",
+    thumbnail: "/resources/characters_gif/Sword And Shield Casting.gif",
   },
   {
     version: 1,
@@ -179,7 +179,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Breakdance Ready",
-    thumbnail: "resources/characters_gif/Breakdance Ready.gif",
+    thumbnail: "/resources/characters_gif/Breakdance Ready.gif",
   },
   {
     version: 1,
@@ -187,7 +187,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Sitting Yell",
-    thumbnail: "resources/characters_gif/Sitting Yell.gif",
+    thumbnail: "/resources/characters_gif/Sitting Yell.gif",
   },
   {
     version: 1,
@@ -195,7 +195,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Uppercut",
-    thumbnail: "resources/characters_gif/Uppercut.gif",
+    thumbnail: "/resources/characters_gif/Uppercut.gif",
   },
   {
     version: 1,
@@ -203,7 +203,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Female Standing Pose",
-    thumbnail: "resources/characters_gif/Female Standing Pose.gif",
+    thumbnail: "/resources/characters_gif/Female Standing Pose.gif",
   },
   {
     version: 1,
@@ -211,7 +211,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Breakdance Uprock Var 1",
-    thumbnail: "resources/characters_gif/Breakdance Uprock Var 1.gif",
+    thumbnail: "/resources/characters_gif/Breakdance Uprock Var 1.gif",
   },
   {
     version: 1,
@@ -219,7 +219,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Standard Walk",
-    thumbnail: "resources/characters_gif/Standard Walk.gif",
+    thumbnail: "/resources/characters_gif/Standard Walk.gif",
   },
   {
     version: 1,
@@ -227,7 +227,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Rifle Pull Out",
-    thumbnail: "resources/characters_gif/Rifle Pull Out.gif",
+    thumbnail: "/resources/characters_gif/Rifle Pull Out.gif",
   },
   {
     version: 1,
@@ -235,7 +235,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Sword And Shield Jump",
-    thumbnail: "resources/characters_gif/Sword And Shield Jump.gif",
+    thumbnail: "/resources/characters_gif/Sword And Shield Jump.gif",
   },
   {
     version: 1,
@@ -243,7 +243,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Baseball Bunt",
-    thumbnail: "resources/characters_gif/Baseball Bunt.gif",
+    thumbnail: "/resources/characters_gif/Baseball Bunt.gif",
   },
   {
     version: 1,
@@ -251,7 +251,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Strafing",
-    thumbnail: "resources/characters_gif/Strafing.gif",
+    thumbnail: "/resources/characters_gif/Strafing.gif",
   },
   {
     version: 1,
@@ -259,7 +259,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Sneaking Forward",
-    thumbnail: "resources/characters_gif/Sneaking Forward.gif",
+    thumbnail: "/resources/characters_gif/Sneaking Forward.gif",
   },
   {
     version: 1,
@@ -267,7 +267,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Skinning Test",
-    thumbnail: "resources/characters_gif/Skinning Test.gif",
+    thumbnail: "/resources/characters_gif/Skinning Test.gif",
   },
   {
     version: 1,
@@ -275,7 +275,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Female Dance Pose",
-    thumbnail: "resources/characters_gif/Female Dance Pose.gif",
+    thumbnail: "/resources/characters_gif/Female Dance Pose.gif",
   },
   {
     version: 1,
@@ -283,7 +283,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Right Strafe Walking",
-    thumbnail: "resources/characters_gif/Right Strafe Walking.gif",
+    thumbnail: "/resources/characters_gif/Right Strafe Walking.gif",
   },
   {
     version: 1,
@@ -291,7 +291,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Laying Breathless",
-    thumbnail: "resources/characters_gif/Laying Breathless.gif",
+    thumbnail: "/resources/characters_gif/Laying Breathless.gif",
   },
   {
     version: 1,
@@ -299,7 +299,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Box Jump",
-    thumbnail: "resources/characters_gif/Box Jump.gif",
+    thumbnail: "/resources/characters_gif/Box Jump.gif",
   },
   {
     version: 1,
@@ -307,7 +307,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Orc Walk",
-    thumbnail: "resources/characters_gif/Orc Walk.gif",
+    thumbnail: "/resources/characters_gif/Orc Walk.gif",
   },
   {
     version: 1,
@@ -315,7 +315,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Run Look Back",
-    thumbnail: "resources/characters_gif/Run Look Back.gif",
+    thumbnail: "/resources/characters_gif/Run Look Back.gif",
   },
   {
     version: 1,
@@ -323,7 +323,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Standing Torch Jump",
-    thumbnail: "resources/characters_gif/Standing Torch Jump.gif",
+    thumbnail: "/resources/characters_gif/Standing Torch Jump.gif",
   },
   {
     version: 1,
@@ -331,7 +331,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Lengthy Head Nod",
-    thumbnail: "resources/characters_gif/Lengthy Head Nod.gif",
+    thumbnail: "/resources/characters_gif/Lengthy Head Nod.gif",
   },
   {
     version: 1,
@@ -339,7 +339,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Pistol Run Backward Arc",
-    thumbnail: "resources/characters_gif/Pistol Run Backward Arc.gif",
+    thumbnail: "/resources/characters_gif/Pistol Run Backward Arc.gif",
   },
   {
     version: 1,
@@ -347,7 +347,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Right Hook",
-    thumbnail: "resources/characters_gif/Right Hook.gif",
+    thumbnail: "/resources/characters_gif/Right Hook.gif",
   },
   {
     version: 1,
@@ -355,7 +355,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Great Sword Impact",
-    thumbnail: "resources/characters_gif/Great Sword Impact.gif",
+    thumbnail: "/resources/characters_gif/Great Sword Impact.gif",
   },
   {
     version: 1,
@@ -363,7 +363,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Zombie Biting",
-    thumbnail: "resources/characters_gif/Zombie Biting.gif",
+    thumbnail: "/resources/characters_gif/Zombie Biting.gif",
   },
   {
     version: 1,
@@ -371,7 +371,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Leaning",
-    thumbnail: "resources/characters_gif/Leaning.gif",
+    thumbnail: "/resources/characters_gif/Leaning.gif",
   },
   {
     version: 1,
@@ -379,7 +379,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Standing Torch To Crouch Torch",
-    thumbnail: "resources/characters_gif/Standing Torch To Crouch Torch.gif",
+    thumbnail: "/resources/characters_gif/Standing Torch To Crouch Torch.gif",
   },
   {
     version: 1,
@@ -387,7 +387,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Action Idle To Fight Idle",
-    thumbnail: "resources/characters_gif/Action Idle To Fight Idle.gif",
+    thumbnail: "/resources/characters_gif/Action Idle To Fight Idle.gif",
   },
   {
     version: 1,
@@ -395,7 +395,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Corkscrew Evade",
-    thumbnail: "resources/characters_gif/Corkscrew Evade.gif",
+    thumbnail: "/resources/characters_gif/Corkscrew Evade.gif",
   },
   {
     version: 1,
@@ -403,7 +403,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Catwalk Walk Forward Crossed",
-    thumbnail: "resources/characters_gif/Catwalk Walk Forward Crossed.gif",
+    thumbnail: "/resources/characters_gif/Catwalk Walk Forward Crossed.gif",
   },
   {
     version: 1,
@@ -411,7 +411,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Look Around",
-    thumbnail: "resources/characters_gif/Look Around.gif",
+    thumbnail: "/resources/characters_gif/Look Around.gif",
   },
   {
     version: 1,
@@ -419,7 +419,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Zombie Stand Up",
-    thumbnail: "resources/characters_gif/Zombie Stand Up.gif",
+    thumbnail: "/resources/characters_gif/Zombie Stand Up.gif",
   },
   {
     version: 1,
@@ -427,7 +427,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Convulsing",
-    thumbnail: "resources/characters_gif/Convulsing.gif",
+    thumbnail: "/resources/characters_gif/Convulsing.gif",
   },
   {
     version: 1,
@@ -435,7 +435,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Pistol Whip",
-    thumbnail: "resources/characters_gif/Pistol Whip.gif",
+    thumbnail: "/resources/characters_gif/Pistol Whip.gif",
   },
   {
     version: 1,
@@ -443,7 +443,7 @@ export const animationItems = signal<MediaItem[]>([
     type: AssetType.ANIMATION,
     length: 100,
     name: "Mutant Idle",
-    thumbnail: "resources/characters_gif/Mutant Idle.gif",
+    thumbnail: "/resources/characters_gif/Mutant Idle.gif",
   },
 ]);
 
@@ -454,7 +454,8 @@ export const audioItems = signal<MediaItem[]>([
     type: AssetType.AUDIO,
     length: 25,
     name: "Talk (Demo Sounds)",
-    thumbnail: "resources/placeholders/audio_placeholder.png"
+    thumbnail: "/resources/placeholders/audio_placeholder.png",
+    publicBucketPath: "/media/j/a/r/r/3/jarr3asge6t0x048wdzcehzjd2nh4ep7/fakeyou_jarr3asge6t0x048wdzcehzjd2nh4ep7.wav",
   },
   {
     version: 1,
@@ -462,8 +463,9 @@ export const audioItems = signal<MediaItem[]>([
     type: AssetType.AUDIO,
     length: 25,
     name: "NCS Song",
-    thumbnail: "resources/placeholders/audio_placeholder.png"
-  }
+    thumbnail: "/resources/placeholders/audio_placeholder.png",
+    publicBucketPath: "/media/s/j/t/0/6/sjt06a8y2qrdqe574nry02bpd3bt01ma/upload_sjt06a8y2qrdqe574nry02bpd3bt01ma.wav",
+  },
 ]);
 
 export const cameraItems = signal<MediaItem[]>([
@@ -472,14 +474,14 @@ export const cameraItems = signal<MediaItem[]>([
     media_id: uuid.v4(),
     type: AssetType.CAMERA,
     name: "Portrait Zoom Out",
-    thumbnail: "resources/placeholders/placeholder.png",
+    thumbnail: "/resources/placeholders/placeholder.png",
   },
   {
     version: 1,
     media_id: uuid.v4(),
     type: AssetType.CAMERA,
     name: "Pan Left and Right",
-    thumbnail: "resources/placeholders/placeholder.png",
+    thumbnail: "/resources/placeholders/placeholder.png",
   },
 ]);
 
@@ -489,36 +491,57 @@ export const characterItems = signal<MediaItem[]>([
     media_id: "m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp",
     type: AssetType.CHARACTER,
     name: "Shrek",
-    thumbnail: "resources/placeholders/placeholder.png",
+    thumbnail: "/resources/placeholders/placeholder.png",
   },
   {
     version: 1,
     media_id: "m_9f3d3z94kk6m25zywyz6an3p43fjtw",
     type: AssetType.CHARACTER,
     name: "Stick Man",
-    thumbnail: "resources/placeholders/placeholder.png",
+    thumbnail: "/resources/placeholders/placeholder.png",
   },
   {
     version: 1,
     media_id: "m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
     type: AssetType.CHARACTER,
     name: "Female Doll",
-    thumbnail: "resources/characters/img03.png",
+    thumbnail: "/resources/characters/img03.png",
   },
   {
     version: 1,
     media_id: "m_9sqg0evpr23587jnr8z3zsvav1x077 ",
     type: AssetType.CHARACTER,
     name: "Male Doll",
-    thumbnail: "resources/characters/img03.png",
+    thumbnail: "/resources/characters/img03.png",
   },
   {
     version: 1,
-    media_id: "m_4wva09qznapzk5rcvbxy671d1qx2pr ",
+    media_id: "m_pwtk45wsfr5z2bavmwxh2efnwvh4rr ",
     type: AssetType.CHARACTER,
     name: "Story Girl",
-    thumbnail: "resources/characters/img13.png",
+    thumbnail: "/resources/characters/img13.png",
   },
+  {
+    version: 1,
+    media_id: "m_ffhbh6zgjhxxgeg1r3tsj2kqrqqana",
+    type: AssetType.CHARACTER,
+    name: "Waifu H",
+    thumbnail: "/resources/characters/img14.png",
+  },
+  {
+    version: 1,
+    media_id: "m_qfqw9e5kz0b7kspbwcc3c9y7pym97q",
+    type: AssetType.CHARACTER,
+    name: "Skibidi Toilet",
+    thumbnail: "/resources/characters/img15.png",
+  },
+  {
+    version: 1,
+    media_id: "m_ecfxa94v4ftvh58hv7se3qqy8a385n",
+    type: AssetType.CHARACTER,
+    name: "Pop",
+    thumbnail: "/resources/placeholders/placeholder.png",
+  }
 ]);
 
 export const objectItems = signal<MediaItem[]>([
@@ -527,16 +550,59 @@ export const objectItems = signal<MediaItem[]>([
     media_id: "m_0xfrmekc56satjxn66wt6c9dkw7dxe",
     type: AssetType.OBJECT,
     name: "Pikachu Statue",
-    thumbnail: "resources/placeholders/placeholder.png",
+    thumbnail: "/resources/placeholders/placeholder.png",
+  },
+  {
+    version: 1,
+    media_id: "m_4d2s2q1xy9m1xncppr3gf9ne6bm2m0",
+    type: AssetType.OBJECT,
+    name: "Moon",
+    thumbnail: "/resources/objects/moon.png",
+  },
+  {
+    version: 1,
+    media_id: "m_t0s6gbvfp78rvc0sd6129za41crr9d",
+    type: AssetType.OBJECT,
+    name: "Crown",
+    thumbnail: "/resources/objects/crown.png",
+  },
+  {
+    version: 1,
+    media_id: "m_zp0zykww0k7ka2zagg3q3pb9t123k4",
+    type: AssetType.OBJECT,
+    name: "Sakura Tree",
+    thumbnail: "/resources/objects/sakura.png",
   },
 ]);
+
 // In the future these will have shape id's
 export const shapeItems = signal<MediaItem[]>([
   {
     version: 1,
-    media_id: "",
+    media_id: "Box",
     type: AssetType.SHAPE,
     name: "Cube",
-    thumbnail: "resources/placeholders/placeholder.png",
+    thumbnail: "/resources/shapes/cube.png",
+  },
+  {
+    version: 1,
+    media_id: "Cylinder",
+    type: AssetType.SHAPE,
+    name: "Cylinder",
+    thumbnail: "/resources/shapes/cylinder.png",
+  },
+  {
+    version: 1,
+    media_id: "Donut",
+    type: AssetType.SHAPE,
+    name: "Donut",
+    thumbnail: "/resources/shapes/donut.png",
+  },
+  {
+    version: 1,
+    media_id: "Sphere",
+    type: AssetType.SHAPE,
+    name: "Sphere",
+    thumbnail: "/resources/shapes/sphere.png",
   },
 ]);

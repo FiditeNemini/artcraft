@@ -1,49 +1,22 @@
 import {
+  faAngleRight,
   faArrowsRotate,
   faArrowsUpDownLeftRight,
-  faCube,
-  faPlus,
   faUpRightAndDownLeftFromCenter,
 } from "@fortawesome/pro-solid-svg-icons";
-import {
-  fa3dCylinder,
-  fa3dTorus,
-  fa3dSphere,
-} from "@awesome.me/kit-fde2be5eb0/icons/kit/custom";
-import { ButtonIcon, ButtonIconSelect } from "~/components";
-import { EngineContext } from "../../contexts/EngineContext";
+import { Button, ButtonIconSelect } from "~/components";
+import { EngineContext } from "~/contexts/EngineContext";
 import { useContext } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Pages } from "~/pages/PageEnigma/constants/page";
 
-export const Controls3D = () => {
+interface Props {
+  setPage: (page: Pages) => void;
+}
+
+export const Controls3D = ({ setPage }: Props) => {
   const editorEngine = useContext(EngineContext);
 
-  const handlePlus = () => {
-    console.log("Controls 3D: Plus button clicked");
-  };
-  const handleCube = () => {
-    if (editorEngine == null || editorEngine == undefined) {
-      return;
-    }
-    editorEngine.create_parim("Box");
-  };
-  const handleCylinder = () => {
-    if (editorEngine == null || editorEngine == undefined) {
-      return;
-    }
-    editorEngine.create_parim("Cylinder");
-  };
-  const handleTorus = () => {
-    if (editorEngine == null || editorEngine == undefined) {
-      return;
-    }
-    editorEngine.create_parim("Donut");
-  };
-  const handleSphere = () => {
-    if (editorEngine == null || editorEngine == undefined) {
-      return;
-    }
-    editorEngine.create_parim("Sphere");
-  };
   const handleMoveArrows = () => {
     if (!editorEngine) {
       return;
@@ -79,6 +52,11 @@ export const Controls3D = () => {
     }
   };
 
+  const changeStylize = () => {
+    editorEngine?.switchPreview();
+    setPage(Pages.STYLE);
+  };
+
   const modes = [
     { value: "move", icon: faArrowsUpDownLeftRight },
     { value: "rotate", icon: faArrowsRotate },
@@ -89,24 +67,17 @@ export const Controls3D = () => {
     <div>
       <div className="flex justify-center">
         <div className="rounded-b-lg border-x border-b border-ui-panel-border bg-ui-controls p-2 text-white">
-          <div className="flex items-center justify-center gap-2">
-            <ButtonIcon icon={faPlus} onClick={handlePlus} hoverFill={true} />
-
-            <span className="h-4 w-0 border-l border-white/[0.15]" />
-
-            <div className="flex gap-1">
-              <ButtonIcon icon={faCube} onClick={handleCube} />
-              <ButtonIcon icon={fa3dCylinder} onClick={handleCylinder} />
-              <ButtonIcon icon={fa3dTorus} onClick={handleTorus} />
-              <ButtonIcon icon={fa3dSphere} onClick={handleSphere} />
-            </div>
-
-            <span className="h-4 w-0 border-l border-white/[0.15]" />
-
+          <div className="flex items-center justify-center gap-3">
             <ButtonIconSelect
               options={modes}
               onOptionChange={handleModeChange}
             />
+
+            <span className="h-6 w-0 border-l border-white/[0.2]" />
+
+            <Button variant="primary" onClick={() => changeStylize()}>
+              Stylize <FontAwesomeIcon icon={faAngleRight} />
+            </Button>
           </div>
         </div>
       </div>

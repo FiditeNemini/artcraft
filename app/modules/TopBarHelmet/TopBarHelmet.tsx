@@ -1,17 +1,9 @@
 import { useLocation } from "@remix-run/react";
 
-import {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from 'react';
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { TopBarInnerContext } from "~/contexts/TopBarInner";
 
-
-export const TopBarHelmet = (props:{
-  children: React.ReactNode | null;
-})=>{
+export const TopBarHelmet = (props: { children: React.ReactNode | null }) => {
   const [showChild, setShowChild] = useState(false);
   // Wait until after client-side hydration to show
   useEffect(() => {
@@ -23,22 +15,22 @@ export const TopBarHelmet = (props:{
   }
 
   return <LazyLoadTopBarInnerContent {...props} />;
-}
+};
 
-const LazyLoadTopBarInnerContent = (props:{
+const LazyLoadTopBarInnerContent = (props: {
   children: React.ReactNode | null;
-})=>{
+}) => {
   const { setTopBarInner } = useContext(TopBarInnerContext) || {};
   const location = useLocation().pathname;
 
-  useLayoutEffect(()=>{
-    if(setTopBarInner){
+  useLayoutEffect(() => {
+    if (setTopBarInner) {
       setTopBarInner({
         location: location,
-        node: props.children
+        node: props.children,
       });
     }
-  },[setTopBarInner]);
+  }, [setTopBarInner]);
 
   return null;
-}
+};

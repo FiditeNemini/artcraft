@@ -8,3 +8,4 @@ export * from "./selectedItem";
 export * from "./sidePanel";
 export * from "./sizing";
 export * from "./timing";
+export * from "./hotkeys";

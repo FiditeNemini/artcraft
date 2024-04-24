@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { EngineContext } from "../../contexts/EngineContext";
-import { Button, Input } from "~/components";
-import { LoadingDotsTyping } from "~/components";
+import { EngineContext } from "../../../../contexts/EngineContext";
+import { Button, Input, LoadingDotsTyping } from "~/components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCameraViewfinder } from "@fortawesome/pro-solid-svg-icons";
 

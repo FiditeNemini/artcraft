@@ -59,7 +59,7 @@ export async function GetInferenceJobStatus(jobToken:string) : Promise<GetJobSta
     headers: {
       'Accept': 'application/json',
     },
-    credentials: 'include',
+    // credentials: 'include',
   })
   .then(res => res.json())
   .then(res => {

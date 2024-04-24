@@ -12,7 +12,7 @@ import {
   dropId,
   dropOffset,
   addObject,
-  characterGroups,
+  characterGroup,
   cameraGroup,
   audioGroup,
   objectGroup,
@@ -32,6 +32,11 @@ export const TrackProvider = ({ children }: Props) => {
 
   // cross group functions
   const dropClip = useCallback(() => {
+    if (!canDrop.value) {
+      endDrag();
+      return;
+    }
+
     if (dragItem.value) {
       const mediaItem = dragItem.value;
       if (mediaItem.type === AssetType.CHARACTER) {
@@ -74,7 +79,10 @@ export const TrackProvider = ({ children }: Props) => {
   }, [endDrag]);
 
   const clearExistingData = useCallback(() => {
-    characterGroups.value = [];
+    characterGroup.value = {
+      id: "ChG1",
+      characters: [],
+    };
     cameraGroup.value = {
       id: "CG1",
       keyframes: [],

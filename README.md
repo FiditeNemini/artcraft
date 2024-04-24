@@ -1,3 +1,25 @@
+```
+Short Style Guide TS React and Engine:
+
+No use of lets
+
+No basic for loop operators. 
+Use the collection operators and array operators.
+
+React Side / No modules over 200 lines. ( loose rule )
+
+Don't do:
+if (condition) return;
+
+Do:
+if (condition) {
+	return;
+}
+
+No use of any type.
+If you can use chat gpt to create the interface.
+```
+
 # IF YOU ARE WORKING ON THIS PROJECT PLEASE ASK THE TEAM MEMBERS HOW TO SET UP THIS IS OUTDATED INFORMATION
 # GottaGoFast-SS
 Fast Prototyping with Better Netlify Pipeline:

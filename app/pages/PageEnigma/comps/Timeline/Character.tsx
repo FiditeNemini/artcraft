@@ -1,13 +1,17 @@
 import { useCallback, useMemo } from "react";
 import { TrackClips } from "~/pages/PageEnigma/comps/Timeline/TrackClips";
 import {
-  characterGroups,
   fullWidth,
+  minimizeIconPosition,
+  toggleCharacterMinimized,
   toggleLipSyncMute,
   updateCharacters,
 } from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
-import { ClipGroup, ClipType } from "~/pages/PageEnigma/models";
+import { CharacterTrack, ClipGroup, ClipType } from "~/pages/PageEnigma/models";
+import { useSignals } from "@preact/signals-react/runtime";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
 
 function buildUpdaters(
   updateCharacters: (options: {
@@ -37,55 +41,73 @@ function buildUpdaters(
   return { updateClipLipSync, updateClipPosition, updateClipAnimations };
 }
 interface Props {
-  characterId: string;
+  character: CharacterTrack;
 }
 
-export const Character = ({ characterId }: Props) => {
-  const character = characterGroups.value.find((row) => (row.id = characterId));
-
+export const Character = ({ character }: Props) => {
   const { updateClipLipSync, updateClipPosition, updateClipAnimations } =
     useMemo(() => buildUpdaters(updateCharacters), []);
 
-  const toggleCharacterLipSyncMute = useCallback(() => {
-    toggleLipSyncMute(character?.id ?? "");
-  }, [character?.id]);
+  const { animationClips, positionKeyframes, lipSyncClips, minimized } =
+    character;
 
-  if (!character) {
-    return false;
+  if (minimized) {
+    return (
+      <div
+        className="relative flex h-[35px] items-center justify-end rounded-r-lg bg-character-groupBg pr-4"
+        style={{ width: fullWidth.value + 16 }}>
+        <button
+          className="absolute"
+          style={{
+            left: minimizeIconPosition.value,
+          }}
+          onClick={(event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            toggleCharacterMinimized(character.object_uuid);
+          }}>
+          <FontAwesomeIcon icon={faAngleDown} />
+        </button>
+      </div>
+    );
   }
-  const { animationClips, positionKeyframes, lipSyncClips } = character;
 
   return (
     <div
-      className="block rounded-lg bg-character-groupBg pb-5 pl-2 pr-4"
-      style={{ width: fullWidth.value + 90 }}
-    >
-      <div className="prevent-select mb-5 pt-2 text-xs font-medium text-white">
-        Character
+      className="relative block rounded-r-lg bg-character-groupBg pb-5 pr-4"
+      style={{ width: fullWidth.value + 16 }}>
+      <div className="flex h-[35px] items-center justify-end">
+        <button
+          className="absolute"
+          style={{
+            left: minimizeIconPosition.value,
+          }}
+          onClick={(event) => {
+            event.stopPropagation();
+            event.preventDefault();
+            toggleCharacterMinimized(character.object_uuid);
+          }}>
+          <FontAwesomeIcon icon={faAngleUp} />
+        </button>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3 pt-[12px]">
         <TrackClips
-          id={character.id}
+          id={character.object_uuid}
           clips={animationClips}
-          title="Animation"
           updateClip={updateClipAnimations}
           group={ClipGroup.CHARACTER}
           type={ClipType.ANIMATION}
         />
         <TrackKeyFrames
-          id={character.id}
+          id={character.object_uuid}
           keyframes={positionKeyframes}
-          title="Character Position/Rotation"
           updateKeyframe={updateClipPosition}
           group={ClipGroup.CHARACTER}
         />
         <TrackClips
-          id={character.id}
+          id={character.object_uuid}
           clips={lipSyncClips}
-          title="Lipsync Audio TrackClips"
           updateClip={updateClipLipSync}
-          muted={character.muted}
-          toggleMute={toggleCharacterLipSyncMute}
           group={ClipGroup.CHARACTER}
           type={ClipType.AUDIO}
         />

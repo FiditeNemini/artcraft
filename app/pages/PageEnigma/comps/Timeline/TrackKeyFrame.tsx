@@ -3,7 +3,7 @@ import { filmLength, scale, selectedItem } from "~/pages/PageEnigma/store";
 import { useMouseEventsKeyframe } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsKeyframe";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useContext } from "react";
-import { ToasterContext } from "~/pages/PageEnigma/contexts/ToasterContext";
+import { ToasterContext } from "~/contexts/ToasterContext";
 
 interface Props {
   keyframe: Keyframe;
@@ -33,20 +33,21 @@ export const TrackKeyFrame = ({ keyframe, updateKeyframe }: Props) => {
   return (
     <button
       className={[
-        "block rotate-45 cursor-ew-resize",
+        "top-[11px] block h-[14px] w-[14px] rotate-45 cursor-ew-resize",
         "absolute",
         keyframe.keyframe_uuid === selectedKeyframeId
           ? "bg-keyframe-selected"
           : "bg-keyframe-unselected",
       ].join(" ")}
       style={{
-        width: 18,
-        height: 18,
-        left: displayOffset * 4 * scale.value - 6,
-        top: 8,
+        left: displayOffset * 4 * scale.value - 5,
       }}
       onPointerDown={(event) => onPointerDown(event, "drag")}
-      onClick={() => (selectedItem.value = keyframe)}
+      onClick={(event) => {
+        event.stopPropagation();
+        event.preventDefault();
+        selectedItem.value = keyframe;
+      }}
     />
   );
 };

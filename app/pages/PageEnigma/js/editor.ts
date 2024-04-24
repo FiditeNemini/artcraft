@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { FreeCam } from "./free_cam";
-import { TransformControls } from "three/addons/controls/TransformControls.js";
+import { TransformControls } from "./TransformControls.js";
 import Scene from "./scene.js";
 import { APIManager, ArtStyle, Visibility } from "./api_manager.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
@@ -13,16 +13,19 @@ import { SAOPass } from "three/addons/postprocessing/SAOPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { BokehPass } from "three/addons/postprocessing/BokehPass.js";
 import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
+
 import AudioEngine from "./audio_engine.js";
 import TransformEngine from "./transform_engine.js";
+import EmotionEngine from "./emotion_engine";
+
 import { TimeLine } from "./timeline.js";
 import { ClipUI } from "../datastructures/clips/clip_ui.js";
 import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
-import { APPUI_ACTION_TYPES } from "../reducers";
-import { ClipGroup } from "~/pages/PageEnigma/models/track";
+import { APPUI_ACTION_TYPES } from "../../../reducers";
+import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 
 import { XYZ } from "../datastructures/common";
 import { StoryTellerProxyScene } from "../proxy/storyteller_proxy_scene";
@@ -31,6 +34,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
+import { loadingBarData, loadingBarIsShowing } from "~/store/loadingBar";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 class Editor {
@@ -58,6 +62,7 @@ class Editor {
   mouse: THREE.Vector2 | undefined;
   selected: THREE.Object3D | undefined;
   last_selected: THREE.Object3D | undefined;
+  last_selected_sum: number | undefined;
   transform_interaction: any;
   rendering: boolean;
   api_manager: APIManager;
@@ -75,12 +80,14 @@ class Editor {
   max_length: number;
   audio_engine: AudioEngine;
   transform_engine: TransformEngine;
+  emotion_engine: EmotionEngine;
   lipsync_engine: LipSyncEngine;
   animation_engine: AnimationEngine;
   timeline: TimeLine;
   current_frame: number;
   lockControls: PointerLockControls | undefined;
   cam_obj: THREE.Object3D | undefined;
+  camera_last_pos: THREE.Vector3;
   renderPass: RenderPass | undefined;
   generating_preview: boolean;
   frames: number;
@@ -90,6 +97,8 @@ class Editor {
   current_scene_glb_media_token: string | null;
 
   can_initialize: boolean;
+  switchPreviewToggle: boolean;
+
   dispatchAppUiState: any; // todo figure out the type
   render_width: number;
   render_height: number;
@@ -99,10 +108,11 @@ class Editor {
   art_style: ArtStyle;
 
   last_scrub: number;
-  // Default params.
+  record_stream: any | undefined;
+  recorder: MediaRecorder | undefined;
 
-  // scene proxy for serialization
-  storyteller_proxy_scene: StoryTellerProxyScene;
+  selectedCanvas: boolean;
+  // Default params.
 
   constructor() {
     console.log(
@@ -136,6 +146,7 @@ class Editor {
     this.outlinePass;
     this.last_cam_pos = new THREE.Vector3(0, 0, 0);
     this.last_cam_rot = new THREE.Euler(0, 0, 0);
+    this.camera_last_pos = new THREE.Vector3(0, 0, 0);
     this.lockControls;
     this.saoPass;
     this.outputPass;
@@ -150,6 +161,7 @@ class Editor {
     this.last_selected;
     this.transform_interaction;
     this.rendering = false;
+    this.switchPreviewToggle = false;
     // API.
     this.api_manager = new APIManager();
     // Debug & Movement.
@@ -170,6 +182,8 @@ class Editor {
     this.max_length = 10;
     this.last_scrub = 0;
     this.frames = 0;
+    this.last_selected_sum = 0;
+    this.selectedCanvas = false;
     // Audio Engine Test.
 
     this.render_width = 1280;
@@ -178,16 +192,21 @@ class Editor {
     this.canvasRenderCamReference;
 
     this.audio_engine = new AudioEngine();
+    this.emotion_engine = new EmotionEngine(this.version);
     this.transform_engine = new TransformEngine(this.version);
     this.lipsync_engine = new LipSyncEngine();
     this.animation_engine = new AnimationEngine(this.version);
 
     this.timeline = new TimeLine(
+      this,
       this.audio_engine,
       this.transform_engine,
       this.lipsync_engine,
       this.animation_engine,
+      this.emotion_engine,
       this.activeScene,
+      this.camera,
+      this.mouse,
     );
 
     this.current_frame = 0;
@@ -204,16 +223,15 @@ class Editor {
       "((masterpiece, best quality, 8K, detailed)), colorful, epic, fantasy, (fox, red fox:1.2), no humans, 1other, ((koi pond)), outdoors, pond, rocks, stones, koi fish, ((watercolor))), lilypad, fish swimming around.";
     this.negative_prompt = "";
     this.art_style = ArtStyle.Anime2DFlat;
-
-
-    this.storyteller_proxy_scene = new StoryTellerProxyScene(
-      this.version,
-      this.activeScene.scene,
-    );
-
   }
 
-  initialize(config: any) {
+  isEmpty(value: string) {
+    return (
+      value == null || (typeof value === "string" && value.trim().length === 0)
+    );
+  }
+
+  initialize(config: any, sceneToken: any) {
     //setup reactland Callbacks
     this.dispatchAppUiState = config.dispatchAppUiState;
 
@@ -232,21 +250,36 @@ class Editor {
     this.canvReference = document.getElementById("video-scene");
     this.canvasRenderCamReference = document.getElementById("camera-view");
 
-    // Base width and height.
-    const width = this.canvReference.width;
-    const height = this.canvReference.height;
+    // Find the container element
+    const container = document.getElementById("video-scene-container");
+
+    if (container == null) { return; }
+
+    // Use the container's dimensions
+    const width = container.offsetWidth;
+    const height = container.offsetHeight;
+
     // Sets up camera and base position.
-    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.15, 30);
+    this.camera = new THREE.PerspectiveCamera(70, width / height, 0.01, 200);
     this.camera.position.z = 3;
     this.camera.position.y = 3;
     this.camera.position.x = -3;
 
+    this.camera.layers.enable(0);
+    this.camera.layers.enable(1); // This camera does not see this layer
+
+
+    this.timeline.camera = this.camera;
+
     this.render_camera = new THREE.PerspectiveCamera(
       70,
       width / height,
-      0.15,
-      30,
+      0.01,
+      200,
     );
+
+
+    this.render_camera.layers.disable(1); // This camera does not see this layer      );
 
     // Base WebGL render and clock for delta time.
     this.renderer = new THREE.WebGLRenderer({
@@ -265,6 +298,7 @@ class Editor {
     this.clock = new THREE.Clock();
     // Resizes the renderer.
     this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(window.devicePixelRatio);
     //document.body.appendChild(this.renderer.domElement)
     window.addEventListener("resize", this.onWindowResize.bind(this));
     this._configurePostProcessing();
@@ -290,17 +324,27 @@ class Editor {
       this.renderer.domElement,
     );
 
-    this.control = new TransformControls(this.camera, this.renderer.domElement);
-    this.control.space = 'local'; // Local transformation mode
-    // .space = 'world'; // Global mode
+    //this.orbitControls.mouseButtons = {
+    //  MIDDLE: THREE.MOUSE.ROTATE,
+    //  RIGHT: THREE.MOUSE.PAN,
+    //}; // Blender Style
+    this.orbitControls.mouseButtons = { 
+      LEFT: THREE.MOUSE.ROTATE, 
+      MIDDLE: THREE.MOUSE.DOLLY, 
+      RIGHT: THREE.MOUSE.PAN }; // Standard
 
-    this.control.setScaleSnap(0.1);
-    this.control.setTranslationSnap(0.1);
-    this.control.setRotationSnap(0.1);
+    this.control = new TransformControls(this.camera, this.renderer.domElement);
+    this.control.space = "local"; // Local transformation mode
+    // .space = 'world'; // Global mode
+    this.control.setScaleSnap(0.01);
+    this.control.setTranslationSnap(0.01);
+    this.control.setRotationSnap(0.01);
+    console.log("Control Sensitivity:", this.control.sensitivity);
 
     // OnClick and MouseMove events.
     window.addEventListener("mousemove", this.onMouseMove.bind(this), false);
     window.addEventListener("click", this.onMouseClick.bind(this), false);
+    window.addEventListener("keydown", this.onkeydown.bind(this), false);
     // Base control and debug stuff remove debug in prod.
     if (this.control == undefined) {
       return;
@@ -312,16 +356,21 @@ class Editor {
       }
       this.orbitControls.enabled = !event.value;
       this.updateSelectedUI();
+      this.camera_last_pos.copy(new THREE.Vector3(-99999, -99999, -99999));
       // this.update_properties()
     });
     this.control.setSize(0.5); // Good default value for visuals.
     this.raycaster = new THREE.Raycaster();
+    // Configure raycaster to check both layers
+    this.raycaster.layers.set(0); // Enable default layer
+    this.raycaster.layers.enable(1); // Also check objects on the custom layer
+
     this.mouse = new THREE.Vector2();
     this.activeScene.scene.add(this.control);
     // Resets canvas size.
     this.onWindowResize();
-    // Creates the main update loop.
-    this.renderer.setAnimationLoop(this.updateLoop.bind(this));
+
+    this.setupResizeObserver();
 
     this.timeline.scene = this.activeScene;
 
@@ -344,18 +393,40 @@ class Editor {
 
     this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
 
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.UPDATE_EDITOR_LOADINGBAR,
-      payload: {
-        showEditorLoadingBar: {
-          progress: 100,
-        },
-      },
+    // Creates the main update loop.
+    //this.renderer.setAnimationLoop(this.updateLoop.bind(this));
+
+    this.updateLoop();
+
+    if (this.isEmpty(sceneToken) == false) {
+      this.loadScene(sceneToken);
+    }
+
+    document.addEventListener("mouseover", (event) => {
+      if (this.orbitControls && this.cameraViewControls) {
+        if (event.target instanceof HTMLCanvasElement) {
+          if (this.camera_person_mode) {
+            this.orbitControls.enabled = false;
+            this.cameraViewControls.enabled = true;
+          } else {
+            this.orbitControls.enabled = true;
+            this.cameraViewControls.enabled = false;
+          }
+          this.selectedCanvas = true;
+        } else {
+          this.orbitControls.enabled = false;
+          this.cameraViewControls.enabled = false;
+          this.selectedCanvas = false;
+        }
+        this.cameraViewControls?.reset();
+      }
     });
 
-    this.dispatchAppUiState({
-      type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADINGBAR,
-    });
+    loadingBarData.value = {
+      ...loadingBarData.value,
+      progress: 100,
+    };
+    loadingBarIsShowing.value = false;
   }
 
   // Token comes in from the front end to load the scene from the site.
@@ -367,7 +438,7 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() {}
+  public async testTestTimelineEvents() { }
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -399,6 +470,7 @@ class Editor {
       this.animation_engine,
       this.audio_engine,
       this.lipsync_engine,
+      this.emotion_engine,
     );
     await proxyTimeline.loadFromJson(scene_json["timeline"]);
 
@@ -410,19 +482,17 @@ class Editor {
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
     if (this.selected != undefined || this.selected != null) {
+      this.selected.position.x = position.x;
+      this.selected.position.y = position.y;
+      this.selected.position.z = position.z;
 
-      //console.log(`triggering setSelectedObject`) 
-      this.selected.position.x = position.x
-      this.selected.position.y = position.y
-      this.selected.position.z = position.z
+      this.selected.rotation.x = THREE.MathUtils.degToRad(rotation.x);
+      this.selected.rotation.y = THREE.MathUtils.degToRad(rotation.y);
+      this.selected.rotation.z = THREE.MathUtils.degToRad(rotation.z);
 
-      this.selected.rotation.x = THREE.MathUtils.degToRad(rotation.x)
-      this.selected.rotation.y = THREE.MathUtils.degToRad(rotation.y)
-      this.selected.rotation.z = THREE.MathUtils.degToRad(rotation.z)
-
-      this.selected.scale.x = scale.x
-      this.selected.scale.y = scale.y
-      this.selected.scale.z = scale.z
+      this.selected.scale.x = scale.x;
+      this.selected.scale.y = scale.y;
+      this.selected.scale.z = scale.z;
     }
   }
 
@@ -438,6 +508,7 @@ class Editor {
       this.activeScene,
     );
     const scene_json = await proxyScene.saveToScene();
+    console.log("scene_json", scene_json);
 
     const proxyTimeline = new StoryTellerProxyTimeline(
       this.version,
@@ -446,6 +517,7 @@ class Editor {
       this.animation_engine,
       this.audio_engine,
       this.lipsync_engine,
+      this.emotion_engine,
     );
     const timeline_json = await proxyTimeline.saveToJson();
 
@@ -490,7 +562,7 @@ class Editor {
 
   switchCameraView() {
     this.camera_person_mode = !this.camera_person_mode;
-    console.log(this.camera_person_mode);
+    this.cameraViewControls?.reset();
     if (this.cam_obj) {
       if (this.camera_person_mode) {
         this.last_cam_pos.copy(this.camera.position);
@@ -512,10 +584,16 @@ class Editor {
 
         this.removeTransformControls();
         this.selected = this.cam_obj;
+
         this.dispatchAppUiState({
           type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
         });
         this.updateSelectedUI();
+        if (this.activeScene.hot_items) {
+          this.activeScene.hot_items.forEach((element) => {
+            element.visible = false;
+          });
+        }
       } else {
         this.camera.position.copy(this.last_cam_pos);
         this.camera.rotation.copy(this.last_cam_rot);
@@ -546,15 +624,30 @@ class Editor {
     this.activeScene.load_glb(media_file_token);
   }
 
+  async showLoading() {
+    loadingBarIsShowing.value = true;
+  }
+
+  async updateLoad(progress: number, message: string) {
+    loadingBarData.value = {
+      ...loadingBarData.value,
+      progress: progress,
+      message: message,
+    };
+  }
+
+  async endLoading() {
+    console.log("stop loading");
+    loadingBarIsShowing.value = false;
+  }
+
   async _test_demo() {
     // note the database from the server is the source of truth for all the data.
     // Test code here
     // const object: THREE.Object3D = await this.activeScene.load_glb(
     //   "m_4wva09qznapzk5rcvbxy671d1qx2pr",
     // );
-
     // object.uuid = "CH1";
-
     // Stick Open Pose Man: m_9f3d3z94kk6m25zywyz6an3p43fjtw
     // XBot: m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d
     // YBot: m_9sqg0evpr23587jnr8z3zsvav1x077
@@ -591,9 +684,9 @@ class Editor {
 
     this.saoPass = new SAOPass(this.activeScene.scene, this.camera);
 
-    this.saoPass.params.saoBias = 3.1;
+    this.saoPass.params.saoBias = 4.1;
     this.saoPass.params.saoIntensity = 1.0;
-    this.saoPass.params.saoScale = 6.0;
+    this.saoPass.params.saoScale = 32.0;
     this.saoPass.params.saoKernelRadius = 5.0;
     this.saoPass.params.saoMinResolution = 0.0;
 
@@ -627,6 +720,9 @@ class Editor {
 
   deleteObject(uuid: string) {
     const obj = this.activeScene.get_object_by_uuid(uuid);
+    if (obj?.name === "::CAM::") {
+      return;
+    }
     if (obj) {
       this.activeScene.scene.remove(obj);
     }
@@ -649,8 +745,8 @@ class Editor {
     this.timeline.deleteObject(uuid);
   }
 
-  create_parim(name: string) {
-    const uuid = this.activeScene.instantiate(name);
+  create_parim(name: string, pos: THREE.Vector3) {
+    const uuid = this.activeScene.instantiate(name, pos);
   }
 
   renderMode() {
@@ -663,35 +759,78 @@ class Editor {
   }
 
   // Render the scene to the camera, this is called in the update.
-  renderScene() {
+  async renderScene() {
     if (this.composer != null && !this.rendering && this.rawRenderer) {
       this.composer.render();
       this.rawRenderer.render(this.activeScene.scene, this.render_camera);
-    } else if (this.renderer && this.render_camera) {
+    } else if (this.renderer && this.render_camera && !this.rendering) {
       this.renderer.setSize(this.render_width, this.render_height);
       this.renderer.render(this.activeScene.scene, this.render_camera);
+    } else if (this.rendering && this.rawRenderer) {
+      this.rawRenderer.render(this.activeScene.scene, this.render_camera);
     } else {
       console.error("Could not render to canvas no render or composer!");
     }
 
-    if (this.rendering && this.renderer && this.clock) {
+    if (this.rendering && this.rawRenderer && this.clock && this.renderer) {
+      if (this.recorder == undefined) {
+        this.rawRenderer.setSize(1024, 576);
+        this.render_camera.aspect = 1024 / 576;
+        //this.record_stream = this.rawRenderer.domElement.captureStream(60); // Capture at 60 FPS
+        //this.recorder = new MediaRecorder(this.record_stream, {
+        //  mimeType: "video/webm",
+        //});
+        //this.recorder.ondataavailable = (event) => {
+        //  if (event.data.size > 0) {
+        //    this.frame_buffer.push(event.data);
+        //    this.frames += 1;
+        //    this.playback_location++;
+        //  }
+        //};
+        //this.recorder.onstop = () => {
+        //  this.stopPlayback();
+        //};
+        //this.recorder.start(1000 / this.cap_fps);
+        //this.recorder = "";
+      }
+
+      this.render_timer += this.clock.getDelta();
       this.frames += 1;
       this.playback_location++;
-      const imgData = this.renderer.domElement.toDataURL();
+      const imgData = this.rawRenderer.domElement.toDataURL("image/png", 1.0); // Medium quality png for speed & size.
       this.frame_buffer.push(imgData);
       this.render_timer += this.clock.getDelta();
       if (this.timeline.is_playing == false) {
-        this.stopPlayback();
+        //this.recorder.stop();
         this.playback_location = 0;
-        this.rendering = false;
-        this.switchCameraView();
-        this.onWindowResize();
+        this.stopPlayback();
       }
     }
   }
 
+  getselectedSum() {
+    if (this.selected === undefined) {
+      return 0;
+    }
+    let posCombo =
+      this.selected.position.x +
+      this.selected.position.y +
+      this.selected.position.z;
+    let rotCombo =
+      this.selected.rotation.x +
+      this.selected.rotation.y +
+      this.selected.rotation.z;
+    let sclCombo =
+      this.selected.scale.x + this.selected.scale.y + this.selected.scale.z;
+    return posCombo + rotCombo + sclCombo;
+  }
+
   // Basicly Unity 3D's update loop.
-  async updateLoop(time: number) {
+  async updateLoop() {
+    setTimeout(() => {
+      requestAnimationFrame(this.updateLoop.bind(this));
+    }, 1000 / this.cap_fps);
+
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
     }
@@ -739,15 +878,19 @@ class Editor {
 
     if (this.timeline.is_playing) {
       const changeView = await this.timeline.update(this.rendering);
-      if(changeView) {
+      if (changeView) {
         this.switchCameraView();
       }
-    } else if (this.last_scrub == this.timeline.scrubber_frame_position) {
+    } else if (
+      this.last_scrub === this.timeline.scrubber_frame_position &&
+      this.getselectedSum() !== this.last_selected_sum
+    ) {
       this.updateSelectedUI();
     }
+    this.last_selected_sum = this.getselectedSum();
 
+    await this.renderScene();
     this.last_scrub = this.timeline.scrubber_frame_position;
-    this.renderScene();
   }
 
   change_mode(type: any) {
@@ -809,10 +952,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-        startTime * 1000 +
-        "|" +
-        startTime * 1000 +
-        "[a1];[0:a][a1]amix=inputs=2[a]",
+      startTime * 1000 +
+      "|" +
+      startTime * 1000 +
+      "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -837,17 +980,31 @@ class Editor {
     );
   }
 
+  async _debugDownloadVideo(videoURL: string) {
+    // DEBUG ONLY to download the video
+
+    const a = document.createElement("a");
+    a.href = videoURL;
+    a.download = "video.mp4"; // Name of the downloaded file
+    document.body.appendChild(a);
+    a.click(); // Trigger the download
+  }
+
   async stopPlayback(compile_audio: boolean = true) {
-    console.log(this.frames, this.frame_buffer.length);
+    this.rendering = false;
 
-    this.renderMode();
+    //const videoBlob = new Blob(this.frame_buffer, { type: "video/webm" });
+    //const videoURL = URL.createObjectURL(videoBlob);
 
-    if (this.generating_preview) {
-      return;
-    }
     this.generating_preview = true;
-    const ffmpeg = createFFmpeg({ log: true });
+    const ffmpeg = createFFmpeg({ log: false });
     await ffmpeg.load();
+
+    this.updateLoad(50, "Processing ...");
+
+    // Write the Uint8Array to the FFmpeg file system
+    //ffmpeg.FS("writeFile", "input.webm", await fetchFile(videoURL));
+
     for (let index = 0; index < this.frame_buffer.length; index++) {
       const element = this.frame_buffer[index];
       await ffmpeg.FS(
@@ -856,17 +1013,26 @@ class Editor {
         await fetchFile(element),
       );
     }
+
     await ffmpeg.run(
       "-framerate",
-      "" + this.cap_fps / 2,
+      "" + this.cap_fps,
       "-i",
       "image%d.png",
+      "input.mp4",
+    );
+
+    await ffmpeg.run(
+      "-i",
+      "input.mp4",
       "-f",
       "lavfi",
       "-i",
       "anullsrc", // This adds a silent audio track
       "-max_muxing_queue_size",
       "999999",
+      "-vf",
+      "select=gte(n\\,1),scale=1024:576", // scale=1024:576
       "-c:v",
       "libx264", // Specify video codec (optional, but recommended for MP4)
       "-c:a",
@@ -883,7 +1049,7 @@ class Editor {
 
     if (compile_audio) {
       for (const clip of this.timeline.timeline_items) {
-        if (clip.type == "lipsync" || clip.type == "audio") {
+        if (clip.type == ClipType.AUDIO) {
           await this.convertAudioClip(itteration, ffmpeg, clip);
           itteration += 1;
         }
@@ -899,15 +1065,12 @@ class Editor {
     const blob = new Blob([output.buffer], { type: "video/mp4" });
 
     const data: any = await this.api_manager.uploadMedia(blob, "render.mp4");
-    console.log("data", data);
 
     if (data == null) {
       return;
     }
     const upload_token = data["media_file_token"];
     console.log(upload_token);
-    // Create a link to download the file stylize video using api ..
-    //{"success":true,"upload_token":"mu_x9kr5cfafn512pjbygdszvbdpktrr"} payload
 
     const result = await this.api_manager
       .stylizeVideo(
@@ -922,14 +1085,50 @@ class Editor {
       });
 
     // {"success":true,"inference_job_token":"jinf_j3nbqbd15wqxb0xcks13qh3f3bz"}
+    this.updateLoad(100, "Done Check Your Media Tab On Profile.");
+    this.endLoading();
 
     console.log(result);
+    this.recorder = undefined;
+    if (this.rawRenderer) {
+      const stylePreview: HTMLVideoElement | null = document.getElementById(
+        "styled-preview",
+      ) as HTMLVideoElement;
+      this.rawRenderer.setSize(stylePreview.width, stylePreview.height);
+      this.render_camera.aspect = stylePreview.width / stylePreview.height;
+    }
+  }
+
+  switchPreview() {
+    if (this.switchPreviewToggle == false) {
+      this.switchPreviewToggle = true;
+      this.generateFrame();
+      if (this.cameraViewControls) {
+        this.cameraViewControls.enabled = false;
+      }
+    }
+  }
+
+  switchEdit() {
+    if (this.switchPreviewToggle == true) {
+      this.switchPreviewToggle = false;
+      this.canvasRenderCamReference = document.getElementById("camera-view");
+      this.rawRenderer = new THREE.WebGLRenderer({
+        antialias: false,
+        canvas: this.canvasRenderCamReference,
+        preserveDrawingBuffer: true,
+      });
+      if (this.camera_person_mode == true) {
+        this.switchCameraView();
+      }
+      this.activeScene.renderMode(false);
+    }
   }
 
   async generateFrame() {
     if (this.renderer && !this.generating_preview) {
-      this.removeTransformControls();
       this.generating_preview = true;
+      this.removeTransformControls();
       this.activeScene.renderMode(true);
       if (this.activeScene.hot_items) {
         this.activeScene.hot_items.forEach((element) => {
@@ -948,62 +1147,64 @@ class Editor {
       this.activeScene.renderMode(false);
       this.onWindowResize();
 
-      const rawPreview: HTMLVideoElement | null = document.getElementById(
-        "raw-preview",
-      ) as HTMLVideoElement;
-      if (rawPreview) {
-        rawPreview.src = imgData;
-
-        const ffmpeg = createFFmpeg({ log: false });
-        await ffmpeg.load();
-        await ffmpeg.FS("writeFile", `render.png`, await fetchFile(imgData));
-        await ffmpeg.run("-i", `render.png`, "render.mp4");
-        const output = await ffmpeg.FS("readFile", "render.mp4");
-        const blob = new Blob([output.buffer], { type: "video/mp4" });
-
-        const url = await this.api_manager.uploadMediaFrameGeneration(
-          blob,
-          "render.mp4",
-          this.art_style,
-          this.positive_prompt,
-          this.negative_prompt,
-        );
-        console.log(url);
-
-        const stylePreview: HTMLVideoElement | null = document.getElementById(
-          "stylized-preview",
-        ) as HTMLVideoElement;
-        if (stylePreview) {
-          stylePreview.src = url;
-          stylePreview.width = rawPreview.width;
-          stylePreview.height = rawPreview.height;
-        } else {
-          console.log("No style preview window.");
-        }
-
-        this.generating_preview = false;
-
-        return new Promise((resolve, reject) => {
-          resolve(url);
-        });
-      } else {
-        console.log("No raw preview window.");
+      this.canvasRenderCamReference = document.getElementById("raw-preview");
+      this.rawRenderer = new THREE.WebGLRenderer({
+        antialias: false,
+        canvas: this.canvasRenderCamReference,
+        preserveDrawingBuffer: true,
+      });
+      if (this.camera_person_mode == false) {
+        this.switchCameraView();
       }
+      this.activeScene.renderMode(true);
+
+      const ffmpeg = createFFmpeg({ log: false });
+      await ffmpeg.load();
+      await ffmpeg.FS("writeFile", `render.png`, await fetchFile(imgData));
+      await ffmpeg.run("-i", `render.png`, "render.mp4");
+      const output = await ffmpeg.FS("readFile", "render.mp4");
+      const blob = new Blob([output.buffer], { type: "video/mp4" });
       this.generating_preview = false;
+
+      const url = await this.api_manager.uploadMediaFrameGeneration(
+        blob,
+        "render.mp4",
+        this.art_style,
+        this.positive_prompt,
+        this.negative_prompt,
+      );
+      console.log(url);
+
+      const stylePreview: HTMLVideoElement | null = document.getElementById(
+        "styled-preview",
+      ) as HTMLVideoElement;
+      if (stylePreview) {
+        stylePreview.src = url;
+      } else {
+        console.log("No style preview window.");
+      }
+
+      return new Promise((resolve, reject) => {
+        resolve(url);
+      });
     }
   }
 
   // This initializes the generation of a video render scene is where the core work happens
   generateVideo() {
-    console.log("Generating video...");
+    console.log("Generating video...", this.frame_buffer);
     if (this.rendering || this.generating_preview) {
       return;
     }
+
+    this.showLoading();
+
     this.rendering = true; // has to go first to debounce
     this.startPlayback();
     this.frame_buffer = [];
     this.render_timer = 0;
     this.activeScene.renderMode(this.rendering);
+    this.timeline.scrubber_frame_position = 0;
     if (this.activeScene.hot_items) {
       this.activeScene.hot_items.forEach((element) => {
         element.visible = false;
@@ -1012,20 +1213,36 @@ class Editor {
   }
 
   startPlayback() {
-    this.timeline.is_playing = true;
-    this.timeline.scrubber_frame_position = 0;
-    if (this.activeScene.hot_items) {
-      this.activeScene.hot_items.forEach((element) => {
-        element.visible = false;
-      });
-    }
-    if (!this.camera_person_mode) {
+    this.updateLoad(25, "Starting Processing");
+
+    if (!this.rendering && this.timeline.is_playing) {
+      this.timeline.is_playing = false;
+      this.timeline.scrubber_frame_position = 0;
+      this.timeline.current_time = 0;
+      this.timeline.stepFrame(0);
+      this.timeline.resetScene();
       this.switchCameraView();
+      if (this.activeScene.hot_items) {
+        this.activeScene.hot_items.forEach((element) => {
+          element.visible = true;
+        });
+      }
+    } else {
+      this.timeline.is_playing = true;
+      this.timeline.scrubber_frame_position = 0;
+      if (!this.camera_person_mode) {
+        this.switchCameraView();
+      }
+      if (this.activeScene.hot_items) {
+        this.activeScene.hot_items.forEach((element) => {
+          element.visible = false;
+        });
+      }
     }
   }
 
   updateSelectedUI() {
-    if (this.selected == undefined) {
+    if (this.selected === undefined || this.timeline.is_playing) {
       return;
     }
     const pos = this.selected.position;
@@ -1066,9 +1283,11 @@ class Editor {
 
   // Automaticly resize scene.
   onWindowResize() {
-    // Calculate the maximum possible dimensions while maintaining the aspect ratio
-    const width = window.innerWidth; // / aspect_adjust
-    const height = window.innerHeight; // / aspectRatio
+    const container = document.getElementById("video-scene-container");
+    if (!container) return;
+
+    const width = container.clientWidth;
+    const height = container.clientHeight;
 
     if (this.camera == undefined || this.renderer == undefined) {
       return;
@@ -1092,6 +1311,23 @@ class Editor {
     this.render_camera.updateProjectionMatrix();
   }
 
+  setupResizeObserver() {
+    const container = document.getElementById("video-scene-container");
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect;
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer?.setSize(width, height);
+        this.renderer?.setPixelRatio(window.devicePixelRatio);
+      }
+    });
+
+    resizeObserver.observe(container);
+  }
+
   onMouseDown(event: any) {
     if (event.button === 1 && this.camera_person_mode) {
       this.lockControls?.lock();
@@ -1101,6 +1337,28 @@ class Editor {
   onMouseUp(event: any) {
     if (event.button === 1) {
       this.lockControls?.unlock();
+    }
+
+    if (event.button !== 0) {
+      let camera_pos = new THREE.Vector3(
+        parseFloat(this.camera.position.x.toFixed(2)),
+        parseFloat(this.camera.position.y.toFixed(2)),
+        parseFloat(this.camera.position.z.toFixed(2)),
+      );
+      this.camera_last_pos.copy(camera_pos);
+    }
+  }
+
+  onkeydown(event: any) {
+    if (event.key === 'f' && this.selected && this.orbitControls) {
+      this.orbitControls.target.copy(this.selected.position);
+      this.orbitControls.maxDistance = 4;
+      this.orbitControls.update();
+      this.orbitControls.maxDistance = 999;
+    } else if (event.key === ' ') {
+      if(this.rendering == false && this.switchPreviewToggle == false && this.selectedCanvas){
+        this.startPlayback();
+      }
     }
   }
 
@@ -1112,19 +1370,32 @@ class Editor {
     }
     this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    this.timeline.mouse = this.mouse;
   }
 
   // When the mouse clicks the screen.
   onMouseClick() {
+    let camera_pos = new THREE.Vector3(
+      parseFloat(this.camera.position.x.toFixed(2)),
+      parseFloat(this.camera.position.y.toFixed(2)),
+      parseFloat(this.camera.position.z.toFixed(2)),
+    );
+    if (this.camera_last_pos.equals(new THREE.Vector3(0, 0, 0))) {
+      this.camera_last_pos.copy(camera_pos);
+    }
+
     if (
       this.raycaster == undefined ||
       this.mouse == undefined ||
       this.control == undefined ||
       this.outlinePass == undefined ||
-      this.camera_person_mode
+      this.camera_person_mode ||
+      !this.camera_last_pos.equals(camera_pos)
     ) {
+      this.camera_last_pos.copy(camera_pos);
       return;
     }
+    this.camera_last_pos.copy(camera_pos);
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const interactable: any[] = [];
@@ -1168,13 +1439,11 @@ class Editor {
         });
         this.updateSelectedUI();
       }
-    } else if (this.transform_interaction == false) {
+    } else {
       this.removeTransformControls();
       this.dispatchAppUiState({
         type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
       });
-    } else {
-      this.transform_interaction = false;
     }
   }
 }

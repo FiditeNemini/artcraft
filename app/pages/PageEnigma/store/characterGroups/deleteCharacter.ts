@@ -1,8 +1,11 @@
 import { MediaItem } from "~/pages/PageEnigma/models";
-import { characterGroups } from "~/pages/PageEnigma/store";
+import { characterGroup } from "~/pages/PageEnigma/store";
 
 export function deleteCharacter(item: MediaItem) {
-  characterGroups.value = characterGroups.value.filter(
-    (character) => character.id !== item.object_uuid,
-  );
+  characterGroup.value = {
+    ...characterGroup.value,
+    characters: characterGroup.value.characters.filter(
+      (character) => character.object_uuid !== item.object_uuid,
+    ),
+  };
 }
