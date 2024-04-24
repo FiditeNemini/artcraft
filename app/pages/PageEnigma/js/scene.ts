@@ -142,7 +142,6 @@ class Scene {
                 glb.scene.children.forEach(child => {
                     child.traverse((c: THREE.Object3D) => {
                         if (c instanceof THREE.Mesh) {
-                            c.material.side = THREE.FrontSide;
                             c.material.metalness = 0.0;
                             c.material.specular = 0.5;
                             c.material.shininess = 0.0;
