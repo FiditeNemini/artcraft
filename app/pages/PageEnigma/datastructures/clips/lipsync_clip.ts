@@ -1,5 +1,5 @@
 import { LipSync } from "../../js/lipsync";
-import * as THREE from 'three';
+import * as THREE from "three";
 interface AudioData {
   audioContext: AudioContext;
   audioBuffer: AudioBuffer;
@@ -8,7 +8,7 @@ interface AudioData {
 class AudioData implements AudioData {
   audioContext: AudioContext;
   audioBuffer: AudioBuffer;
-  source: AudioBufferSourceNode | undefined
+  source: AudioBufferSourceNode | undefined;
 
   constructor(audioContext: AudioContext, audioBuffer: AudioBuffer) {
     this.audioContext = audioContext;
@@ -35,14 +35,14 @@ export class LipSyncClip {
   audio_data: AudioData | undefined;
   lipsync: LipSync;
   blendshape_helper: BlendShapeHelper;
-  faces: THREE.Mesh[]
+  faces: THREE.Mesh[];
 
   constructor(version: number, media_id: string, volume: number) {
     this.version = version;
     this.media_id = media_id;
     this.type = "lipsync";
     this.volume = volume;
-    this.download_audio().then(data => {
+    this.download_audio().then((data) => {
       this.audio_data = data;
     });
     this.blendshape_helper = new BlendShapeHelper(0, 0, 0);
@@ -51,21 +51,21 @@ export class LipSyncClip {
     this.faces = [];
   }
 
-  // lip sync will be generated through TTS 
+  // lip sync will be generated through TTS
   async get_media_url() {
     //This is for prod when we have the proper info on the url.
-    let api_base_url = "https://api.fakeyou.com";
-    let url = `${api_base_url}/v1/media_files/file/${this.media_id}`
-    let responce = await fetch(url);
-    let json = await JSON.parse(await responce.text());
-    let bucketPath = json["media_file"]["public_bucket_path"];
-    let media_base_url = "https://storage.googleapis.com/vocodes-public"
-    let media_url = `${media_base_url}${bucketPath}`
+    const api_base_url = "https://api.fakeyou.com";
+    const url = `${api_base_url}/v1/media_files/file/${this.media_id}`;
+    const responce = await fetch(url);
+    const json = await JSON.parse(await responce.text());
+    const bucketPath = json["media_file"]["public_bucket_path"];
+    const media_base_url = "https://storage.googleapis.com/vocodes-public";
+    const media_url = `${media_base_url}${bucketPath}`;
     return media_url;
   }
 
   async download_audio() {
-    let url = await this.get_media_url();
+    const url = await this.get_media_url();
     const audioContext = new AudioContext();
     const response = await fetch(url);
     const arrayBuffer = await response.arrayBuffer();
@@ -82,7 +82,11 @@ export class LipSyncClip {
             const blendShapeIndexO = c.morphTargetDictionary["O"];
             const blendShapeIndexA = c.morphTargetDictionary["aa"];
             if (blendShapeIndexE != null) {
-              this.blendshape_helper = new BlendShapeHelper(blendShapeIndexA, blendShapeIndexE, blendShapeIndexO);
+              this.blendshape_helper = new BlendShapeHelper(
+                blendShapeIndexA,
+                blendShapeIndexE,
+                blendShapeIndexO,
+              );
               this.faces.push(c);
               resolve(c);
             }
@@ -92,9 +96,10 @@ export class LipSyncClip {
     });
   }
 
-
   async play(object: THREE.Object3D) {
-    if (this.audio_data?.audioBuffer == null) { await this.download_audio(); }
+    if (this.audio_data?.audioBuffer == null) {
+      await this.download_audio();
+    }
     if (this.lipsync.face == null) {
       this.lipsync = new LipSync(await this._detect_face(object));
       this.lipsync.startLipSyncFromAudioBuffer(this.audio_data?.audioBuffer);
@@ -102,7 +107,9 @@ export class LipSyncClip {
   }
 
   stop() {
-    if (this.lipsync == null) { return; }
+    if (this.lipsync == null) {
+      return;
+    }
     this.lipsync.destroy();
   }
 
@@ -117,15 +124,17 @@ export class LipSyncClip {
   }
 
   step(frame: number, offset: number, rendering: boolean) {
-    if (this.lipsync == null) { return; }
+    if (this.lipsync == null) {
+      return;
+    }
     const positions = this.lipsync.update(frame, offset, rendering);
-    if(positions)
-    this.setBlends(positions["ee"], positions["ah"], positions["oh"]);
+    if (positions)
+      this.setBlends(positions["ee"], positions["ah"], positions["oh"]);
   }
 
   reset() {
     if (this.lipsync.face != undefined) {
-      this.setBlends(0,0,0);
+      this.setBlends(0, 0, 0);
     }
     this.lipsync = new LipSync();
   }

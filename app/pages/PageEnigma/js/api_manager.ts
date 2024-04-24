@@ -1,8 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { TimelineDataState } from "./timeline";
 import { STORAGE_KEYS } from "~/contexts/Authentication/types";
 
 /**
@@ -94,7 +92,6 @@ export class APIManager {
     save_json: string,
     scene_name: string,
     scene_glb_media_file_token: string | null = null,
-    scene_media_file_token: string | null = null,
   ): Promise<string> {
     const file = new File([save_json], `${scene_name}.glb`, {
       type: "application/json",
@@ -105,22 +102,6 @@ export class APIManager {
       file,
       scene_glb_media_file_token,
     );
-
-    //const result_scene_glb_media_file_token =
-    //  upload_glb_response["media_file_token"];
-    //// now write the scene
-    //const save_scene_timeline_response = await this.saveSceneAndTimeLineState(
-    //  result_scene_glb_media_file_token,
-    //  scene_media_file_token,
-    //  scene_name,
-    //  timeline_state,
-    //);
-    //const result_scene_media_file_token =
-    //  save_scene_timeline_response["media_file_token"];
-    //const data = {
-    //  scene_glb_media_file_token: result_scene_glb_media_file_token,
-    //  scene_media_file_token: result_scene_media_file_token,
-    //};
 
     return upload_glb_response["media_file_token"];
   }
@@ -156,37 +137,6 @@ export class APIManager {
 
     console.log(`loadSceneState: ${JSON.stringify(json_result)}`);
     return json_result;
-
-    // const scene_glb_media_file_token: string =
-    //   json_result["scene_glb_media_file_token"];
-    // const media_bucket_path = await this.getMediaFile(
-    //   scene_glb_media_file_token,
-    // );
-    // console.log(`GLB ${media_bucket_path}`);
-    // const glbLoader = new GLTFLoader();
-    // // promisify this
-    // const loadGlb = (
-    //   bucket_path: string,
-    // ): Promise<APIManagerResponseSuccess> => {
-    //   return new Promise((resolve, reject) => {
-    //     glbLoader.load(bucket_path, (glb) => {
-    //       if (glb) {
-    //         const scene: THREE.Scene = glb.scene;
-    //         const data = {
-    //           scene_glb_media_file_token: scene_glb_media_file_token,
-    //           scene_media_file_token: scene_media_file_token,
-    //           scene: scene,
-    //         };
-    //         console.log(`Data: ${data}`);
-    //         resolve(new APIManagerResponseSuccess("Success Loaded", data));
-    //       } else {
-    //         throw new APIManagerResponseError("Failed to Load GLB Scene");
-    //       }
-    //     });
-    //   });
-    // };
-
-    //return await loadGlb(media_bucket_path);
   }
 
   /**
@@ -243,8 +193,8 @@ export class APIManager {
       method: "POST",
       // credentials: "include",
       headers: {
-        'Accept': "application/json",
-        'session': this.sessionToken,
+        Accept: "application/json",
+        session: this.sessionToken,
       },
       body: form_data,
     });
@@ -261,7 +211,6 @@ export class APIManager {
     scene_glb_media_file_token: string | null,
     scene_media_file_token: string | null,
     scene_file_name: string,
-    timeline_state: TimelineDataState | null, // only for now.
   ): Promise<string> {
     const url = `${this.baseUrl}/v1/media_files/write/scene_file`;
     const uuid = uuidv4();
@@ -295,10 +244,9 @@ export class APIManager {
 
     const response = await fetch(url, {
       method: "POST",
-      // credentials: "include",
       headers: {
-        'Accept': "application/json",
-        'session': this.sessionToken,
+        Accept: "application/json",
+        session: this.sessionToken,
       },
       body: form_data,
     });
@@ -332,8 +280,8 @@ export class APIManager {
       method: "POST",
       // credentials: "include",
       headers: {
-        'Accept': "application/json",
-        'session': this.sessionToken,
+        Accept: "application/json",
+        session: this.sessionToken,
       },
       body: formData,
     });
@@ -354,8 +302,7 @@ export class APIManager {
     positive_prompt: string,
     negative_prompt: string,
   ): Promise<string> {
-    //const url = 'http://213.173.110.135:15750/preview';
-    const url = 'https://funnel.tailce84f.ts.net/preview/';
+    const url = "https://funnel.tailce84f.ts.net/preview/";
 
     const payload = {
       style: style,
@@ -371,8 +318,8 @@ export class APIManager {
       method: "POST",
       // credentials: "include",
       headers: {
-        'Accept': "application/json",
-        'session': this.sessionToken,
+        Accept: "application/json",
+        session: this.sessionToken,
       },
       body: formData,
     });
@@ -431,9 +378,9 @@ export class APIManager {
       method: "POST",
       // credentials: "include",
       headers: {
-        'Accept': "application/json",
+        Accept: "application/json",
         "Content-Type": "application/json",
-        'session': this.sessionToken,
+        session: this.sessionToken,
       },
       body: json_data,
     });

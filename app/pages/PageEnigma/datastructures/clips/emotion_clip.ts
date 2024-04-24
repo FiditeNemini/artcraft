@@ -16,43 +16,43 @@ export class EmotionClip {
     this.media_id = media_id;
     this.type = "emotion";
     this.faces = [];
-    this.download_csv().then(data => {
+    this.download_csv().then((data) => {
       this.emotion_json = data;
     });
   }
 
   async get_media_url() {
     //This is for prod when we have the proper info on the url.
-    let api_base_url = "https://api.fakeyou.com";
-    let url = `${api_base_url}/v1/media_files/file/${this.media_id}`
-    let responce = await fetch(url);
-    let json = await JSON.parse(await responce.text());
-    let bucketPath = json["media_file"]["public_bucket_path"];
-    let media_base_url = "https://storage.googleapis.com/vocodes-public"
-    let media_url = `${media_base_url}${bucketPath}`
+    const api_base_url = "https://api.fakeyou.com";
+    const url = `${api_base_url}/v1/media_files/file/${this.media_id}`;
+    const responce = await fetch(url);
+    const json = await JSON.parse(await responce.text());
+    const bucketPath = json["media_file"]["public_bucket_path"];
+    const media_base_url = "https://storage.googleapis.com/vocodes-public";
+    const media_url = `${media_base_url}${bucketPath}`;
     return media_url;
   }
 
   async download_json() {
-    let url = await this.get_media_url();
+    const url = await this.get_media_url();
     const response = await fetch(url);
     return await response.json();
   }
 
   async download_csv(): Promise<CsvJson> {
-    let url = await this.get_media_url();
+    const url = await this.get_media_url();
     const response = await fetch(url);
     const csvText = await response.text();
 
     // Parsing the CSV text
-    const rows = csvText.trim().split('\n');
-    const header = rows[0].split(',');
+    const rows = csvText.trim().split("\n");
+    const header = rows[0].split(",");
     const jsonData: CsvJson = {};
 
-    header.forEach(key => jsonData[key] = []);
+    header.forEach((key) => (jsonData[key] = []));
 
     for (let i = 1; i < rows.length; i++) {
-      const values = rows[i].split(',');
+      const values = rows[i].split(",");
       values.forEach((value, index) => {
         jsonData[header[index]].push(value);
       });
@@ -60,7 +60,6 @@ export class EmotionClip {
 
     return jsonData;
   }
-
 
   async _detect_face(object: THREE.Object3D): Promise<THREE.Mesh> {
     this.faces = [];
@@ -82,10 +81,18 @@ export class EmotionClip {
   setBlends(shapes: { [key: string]: number }) {
     this.faces.forEach((element: THREE.Mesh) => {
       if (element.morphTargetInfluences && shapes) {
-        Object.keys(shapes).forEach(key => {
+        Object.keys(shapes).forEach((key) => {
           let index = element.morphTargetDictionary?.[key];
-          if (index === undefined) { index = element.morphTargetDictionary?.[key.charAt(0).toLowerCase() + key.slice(1)]; }
-          if (typeof index === 'number' && element.morphTargetInfluences !== undefined) {
+          if (index === undefined) {
+            index =
+              element.morphTargetDictionary?.[
+                key.charAt(0).toLowerCase() + key.slice(1)
+              ];
+          }
+          if (
+            typeof index === "number" &&
+            element.morphTargetInfluences !== undefined
+          ) {
             element.morphTargetInfluences[index] = shapes[key];
           }
         });
@@ -95,18 +102,22 @@ export class EmotionClip {
 
   async reset(object: THREE.Object3D) {
     await this._detect_face(object);
-    let keys: { [key: string]: number } = {};
-    Object.keys(this.emotion_json).forEach(key => {
+    const keys: { [key: string]: number } = {};
+    Object.keys(this.emotion_json).forEach((key) => {
       keys[key] = 0;
     });
     this.setBlends(keys);
   }
 
   async step(frame: number, object: THREE.Object3D) {
-    if(this.faces.length  <= 0) { await this._detect_face(object); }
-    let keys: { [key: string]: number } = {};
-    Object.keys(this.emotion_json).forEach(key => {
-      if (frame > this.emotion_json[key].length) { return; }
+    if (this.faces.length <= 0) {
+      await this._detect_face(object);
+    }
+    const keys: { [key: string]: number } = {};
+    Object.keys(this.emotion_json).forEach((key) => {
+      if (frame > this.emotion_json[key].length) {
+        return;
+      }
       keys[key] = this.emotion_json[key][frame];
     });
     this.setBlends(keys);
