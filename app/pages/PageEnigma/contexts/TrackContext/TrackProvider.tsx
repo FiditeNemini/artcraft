@@ -20,6 +20,7 @@ import {
 } from "~/pages/PageEnigma/store";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
 import { deleteObject } from "~/pages/PageEnigma/store/objectGroup/deleteObject";
+import { addShape } from "../../store/shape";
 
 interface Props {
   children: ReactNode;
@@ -48,10 +49,11 @@ export const TrackProvider = ({ children }: Props) => {
       if (dragItem.value.type === AssetType.OBJECT) {
         addObject(dragItem.value);
       }
+
+      if (dragItem.value.type === AssetType.SHAPE) {
+        addShape(dragItem.value);
+      }
     }
-    // if (dragItem.value.type === AssetType.SHAPE) {
-    //   console.log("Dragged In Shape Type")
-    // }
 
     if (canDrop.value && dragItem.value) {
       if (dragItem.value.type === AssetType.ANIMATION) {
