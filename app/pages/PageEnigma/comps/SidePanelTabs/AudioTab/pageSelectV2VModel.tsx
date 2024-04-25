@@ -54,6 +54,7 @@ export const PageSelectV2VModel = ({
         {slicedArray.map((item)=>{
           return(
             <VoiceModelElement
+              key={item.token}
               model={item}
               onSelect={(item)=>onSelect(item as VoiceConversionModelListItem)}
             />

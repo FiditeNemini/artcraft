@@ -10,6 +10,7 @@ export type TtsState = {
 
 export type V2VState = {
   voice: VoiceConversionModelListItem | undefined;
+  inputFileToken: string | undefined;
   hasEnqueued: number;
   inferenceTokens: string[];
 };

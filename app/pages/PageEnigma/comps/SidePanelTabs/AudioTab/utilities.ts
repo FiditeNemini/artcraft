@@ -1,9 +1,11 @@
-import { listTts, listV2V, inferTts, listMediaByUser, getMediaFileByToken } from '~/api';
+import { listTts, listV2V, inferTts, listMediaByUser, getMediaFileByToken, inferV2V } from '~/api';
 import {
   MediaFile,
   GetMediaFileResponse,
   VoiceConversionModelListItem,
   VoiceConversionModelListResponse,
+  EnqueueVoiceConversionRequest,
+  EnqueueVoiceConversionResponse,
 } from './typesImported';
 import {
   TtsModelListItem,
@@ -23,7 +25,6 @@ export const ListAudioByUser = async(username:string, sessionToken: string) => {
       "Accept": "application/json",
       'session': sessionToken,
     },
-    // credentials: 'include'
   })
   .then(res => res.json())
   .then(res => { 
@@ -43,7 +44,6 @@ export async function ListTtsModels(sessionToken:string) : Promise<Array<TtsMode
       'Accept': 'application/json',
       'session': sessionToken,
     },
-    // credentials: 'include',
   })
   .then(res => res.json())
   .then(res => {
@@ -80,7 +80,6 @@ export async function GenerateTtsAudio(request: GenerateTtsAudioRequest, session
       'Content-Type': 'application/json',
       'session': sessionToken,
     },
-    // credentials: 'include',
     body: JSON.stringify(request),
   })
   .then(res =>  res.json())
@@ -157,5 +156,36 @@ export async function ListVoiceConversionModels(sessionToken: string) : Promise<
   })
   .catch(e => {
     return undefined;
+  });
+}
+
+export async function GenerateVoiceConversion(
+  request: EnqueueVoiceConversionRequest,
+  sessionToken: string,
+) : Promise<EnqueueVoiceConversionResponse> 
+{
+  return await fetch(inferV2V, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'session': sessionToken,
+    },
+    body: JSON.stringify(request),
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (!res) {
+      return { success : false };
+    }
+
+    if (res && 'success' in res) {
+      return res;
+    } else {
+      return { success : false };
+    }
+  })
+  .catch(e => {
+    return { success : false };
   });
 }

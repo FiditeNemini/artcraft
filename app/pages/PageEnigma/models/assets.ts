@@ -27,3 +27,7 @@ export enum AssetFilterOption {
   MINE,
   BOOKMARKED,
 }
+
+export interface AudioMediaItem extends MediaItem{
+  category?: string;
+}

@@ -1,5 +1,5 @@
 import { signal } from "@preact/signals-core";
-import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
+import { AssetType, MediaItem, AudioMediaItem } from "~/pages/PageEnigma/models";
 import * as uuid from "uuid";
 
 export const animationItems = signal<MediaItem[]>([
@@ -447,7 +447,7 @@ export const animationItems = signal<MediaItem[]>([
   },
 ]);
 
-export const audioItems = signal<MediaItem[]>([
+export const audioItems = signal<AudioMediaItem[]>([
   {
     version: 1,
     media_id: "m_403phjvjkbbaxxbz8y7r6qjay07mfd",
@@ -455,6 +455,7 @@ export const audioItems = signal<MediaItem[]>([
     length: 25,
     name: "Talk (Demo Sounds)",
     thumbnail: "/resources/placeholders/audio_placeholder.png",
+    category: "demo",
     publicBucketPath:
       "/media/j/a/r/r/3/jarr3asge6t0x048wdzcehzjd2nh4ep7/fakeyou_jarr3asge6t0x048wdzcehzjd2nh4ep7.wav",
   },
@@ -464,6 +465,7 @@ export const audioItems = signal<MediaItem[]>([
     type: AssetType.AUDIO,
     length: 25,
     name: "NCS Song",
+    category: "demo",
     thumbnail: "/resources/placeholders/audio_placeholder.png",
     publicBucketPath:
       "/media/s/j/t/0/6/sjt06a8y2qrdqe574nry02bpd3bt01ma/upload_sjt06a8y2qrdqe574nry02bpd3bt01ma.wav",

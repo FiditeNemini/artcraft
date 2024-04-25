@@ -11,10 +11,14 @@ export const inferTts = `${apiHost}/tts/inference`;
 export const listTts = `${apiHost}/tts/list`;
 
 //V2V
+export const inferV2V = `${apiHost}/v1/voice_conversion/inference`
 export const listV2V = `${apiHost}/v1/voice_conversion/model_list`
 
 // User Media
 export const listMediaByUser = (username:string) => `${apiHost}/v1/media_files/list/user/${username}`;
 
-// Any Media
+// Get Any Media
 export const getMediaFileByToken = (fileToken:string) => `${apiHost}/v1/media_files/file/${fileToken}`;
+
+// Upload File
+export const uploadAudio = `${apiHost}/v1/media_uploads/upload_audio`;

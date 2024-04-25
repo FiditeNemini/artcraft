@@ -1,8 +1,8 @@
 import { AudioItemElement } from "./audioItemElement";
-import { AssetFilterOption, MediaItem } from "~/pages/PageEnigma/models";
+import { AssetFilterOption, AudioMediaItem } from "~/pages/PageEnigma/models";
 
 interface Props {
-  items: MediaItem[];
+  items: AudioMediaItem[];
   assetFilter: AssetFilterOption;
 }
 

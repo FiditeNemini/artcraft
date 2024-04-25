@@ -9,6 +9,7 @@ export const initialTtsState: TtsState = {
 
 export const initialV2VState: V2VState = {
   voice: undefined,
+  inputFileToken: undefined,
   hasEnqueued: 0,
   inferenceTokens: [],
 };

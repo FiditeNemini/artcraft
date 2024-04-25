@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 
 import { WaveformPlayer } from "~/components";
-import { MediaItem } from "~/pages/PageEnigma/models";
+import { AudioMediaItem } from "~/pages/PageEnigma/models";
 import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
 import {
   canDrop,
@@ -11,7 +11,8 @@ import {
   initPosition,
 } from "~/pages/PageEnigma/store";
 
-import { H5, H6, Pill } from "~/components";
+import { H5, H6 } from "~/components";
+import  { AudioTypePill } from "./audioTypePills"
 
 function getGcsUrl(bucketRelativePath: string | undefined | null): string {
   let bucket = "vocodes-public";
@@ -23,7 +24,7 @@ function getGcsUrl(bucketRelativePath: string | undefined | null): string {
 }
 
 interface Props {
-  item: MediaItem;
+  item: AudioMediaItem;
 }
 
 export const AudioItemElement = ({ item }: Props) => {
@@ -82,7 +83,7 @@ export const AudioItemElement = ({ item }: Props) => {
       onPointerDown={onPointerDown}>
       <div className="flex w-full flex-col gap-0.5 rounded-lg bg-assets-background p-2.5">
         <div className="flex justify-between">
-          <Pill>Audio</Pill>
+          <AudioTypePill category={item.category} />
         </div>
 
         {item.publicBucketPath && (

@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect, useState } from "react";
 import { useSignals, useSignalEffect } from "@preact/signals-react/runtime";
 
 import { AuthenticationContext } from "~/contexts/Authentication";
-import { MediaItem, AssetType } from "~/pages/PageEnigma/models";
+import { AudioMediaItem, AssetType } from "~/pages/PageEnigma/models";
 import { audioItemsFromServer } from "~/pages/PageEnigma/store/mediaFromServer";
 import { ListAudioByUser, ListTtsModels, ListVoiceConversionModels } from "./utilities";
 import { addInferenceJob, inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
@@ -49,14 +49,25 @@ export const AudioTab = () => {
 
 
   const handleListAudioByUser = useCallback((username:string, sessionToken:string)=>{
+    function getTitle (item:any){
+      if (item.maybe_title) return item.maybe_title;
+      if (item.origin && item.origin.maybe_model && item.origin.maybe_model.title) return item.origin.maybe_model.title;
+      return "Media Audio";
+    }
+    function getCategory (item:any){
+      if(item.origin && item.origin.product_category && item.origin.product_category !== "unknown" ) return item.origin.product_category;
+      if(item.origin_category) return item.origin_category;
+      return "unknown";
+    }
     ListAudioByUser(username, sessionToken).then((res:any[])=>{
       audioItemsFromServer.value = res.map(item=>{
-        const morphedItem:MediaItem = {
+        const morphedItem:AudioMediaItem = {
           version: 1,
           type: AssetType.AUDIO,
+          category: getCategory(item),
           media_id: item.token,
           object_uuid: item.token,
-          name: item.maybe_title || item.origin.maybe_model.title,
+          name: getTitle(item),
           description: item.maybe_text_transcript,
           publicBucketPath: item.public_bucket_path,
           length: 25,
@@ -92,10 +103,9 @@ export const AudioTab = () => {
     //this listens to ttsState and push its new inference jobs
     setTtsState((curr)=>{
       if(curr.hasEnqueued < curr.inferenceTokens.length ){
-        // console.log(`tts has Enqueued`);
         addInferenceJob({
           version: 1,
-          job_id: ttsState.inferenceTokens[ttsState.inferenceTokens.length - 1],
+          job_id: curr.inferenceTokens[curr.inferenceTokens.length - 1],
           job_type: FrontendInferenceJobType.TextToSpeech,
           job_status: JobState.PENDING,
         });
@@ -107,6 +117,24 @@ export const AudioTab = () => {
       return curr; //case of no new jobs, do nothing
     });
   }, [ttsState]);
+  useEffect(()=> {
+    //this listens to v2vState and push its new inference jobs
+    setV2VState((curr)=>{
+      if(curr.hasEnqueued < curr.inferenceTokens.length ){
+        addInferenceJob({
+          version: 1,
+          job_id: curr.inferenceTokens[curr.inferenceTokens.length - 1],
+          job_type: FrontendInferenceJobType.VoiceConversion,
+          job_status: JobState.PENDING,
+        });
+        return({
+          ...curr,
+          hasEnqueued: curr.hasEnqueued + 1
+        })
+      }
+      return curr; //case of no new jobs, do nothing
+    });
+  }, [v2vState]);
 
   useEffect(()=>{
     console.info('Audio Tab is mounting')

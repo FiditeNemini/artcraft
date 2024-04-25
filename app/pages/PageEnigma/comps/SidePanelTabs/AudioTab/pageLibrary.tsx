@@ -1,6 +1,6 @@
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
-import { useComputed } from "@preact/signals-react/runtime";
+import { useSignals, useComputed } from "@preact/signals-react/runtime";
 import { audioFilter, audioItems } from "~/pages/PageEnigma/store";
 import { AssetFilterOption, FrontendInferenceJobType } from "~/pages/PageEnigma/models";
 import { audioItemsFromServer } from "~/pages/PageEnigma/store/mediaFromServer";
@@ -19,6 +19,7 @@ export const PageLibrary = ({
 }: {
   changePage: (newPage: AudioTabPages) => void;
 }) => {
+  useSignals();
   const allAudioItems = useComputed(()=>[
     ...audioItems.value,
     ...audioItemsFromServer.value
