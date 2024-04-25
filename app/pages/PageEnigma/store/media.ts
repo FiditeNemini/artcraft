@@ -455,7 +455,8 @@ export const audioItems = signal<MediaItem[]>([
     length: 25,
     name: "Talk (Demo Sounds)",
     thumbnail: "/resources/placeholders/audio_placeholder.png",
-    publicBucketPath: "/media/j/a/r/r/3/jarr3asge6t0x048wdzcehzjd2nh4ep7/fakeyou_jarr3asge6t0x048wdzcehzjd2nh4ep7.wav",
+    publicBucketPath:
+      "/media/j/a/r/r/3/jarr3asge6t0x048wdzcehzjd2nh4ep7/fakeyou_jarr3asge6t0x048wdzcehzjd2nh4ep7.wav",
   },
   {
     version: 1,
@@ -464,7 +465,8 @@ export const audioItems = signal<MediaItem[]>([
     length: 25,
     name: "NCS Song",
     thumbnail: "/resources/placeholders/audio_placeholder.png",
-    publicBucketPath: "/media/s/j/t/0/6/sjt06a8y2qrdqe574nry02bpd3bt01ma/upload_sjt06a8y2qrdqe574nry02bpd3bt01ma.wav",
+    publicBucketPath:
+      "/media/s/j/t/0/6/sjt06a8y2qrdqe574nry02bpd3bt01ma/upload_sjt06a8y2qrdqe574nry02bpd3bt01ma.wav",
   },
 ]);
 
@@ -486,6 +488,31 @@ export const cameraItems = signal<MediaItem[]>([
 ]);
 
 export const characterItems = signal<MediaItem[]>([
+  {
+    version: 1,
+    media_id: "m_r7w1tmkx2jg8nznr3hyzj4k6zhfh7d ",
+    type: AssetType.CHARACTER,
+    name: "Female Doll",
+    thumbnail: "/resources/characters/img03.png",
+  },
+  {
+    version: 1,
+    media_id: "m_9sqg0evpr23587jnr8z3zsvav1x077 ",
+    type: AssetType.CHARACTER,
+    name: "Male Doll",
+    thumbnail: "/resources/characters/img03.png",
+  },
+  {
+    version: 1,
+    media_id: "m_pwtk45wsfr5z2bavmwxh2efnwvh4rr ",
+    type: AssetType.CHARACTER,
+    name: "Story Girl",
+    thumbnail: "/resources/characters/img13.png",
+  },
+]);
+
+// TODO: CHANGE TO THIS FOR DEV MODE:
+export const devCharacterItems = signal<MediaItem[]>([
   {
     version: 1,
     media_id: "m_fmxy8wjnep1hdaz7qdg4n7y15d2bsp",
@@ -541,7 +568,7 @@ export const characterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Pop",
     thumbnail: "/resources/placeholders/placeholder.png",
-  }
+  },
 ]);
 
 export const objectItems = signal<MediaItem[]>([

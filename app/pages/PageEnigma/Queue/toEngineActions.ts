@@ -7,6 +7,8 @@ export enum toEngineActions {
 
   ADD_OBJECT = "add_object",
 
+  ADD_SHAPE = "add_shape",
+
   // data= QueueKeyframe
   DELETE_CLIP = "delete_clip",
   // data=QueueClip
