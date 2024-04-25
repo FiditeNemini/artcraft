@@ -1,3 +1,4 @@
+pub mod media_file_animation_type;
 pub mod media_file_class;
 pub mod media_file_origin_category;
 pub mod media_file_origin_model_type;
