@@ -15,6 +15,7 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use mysql_queries::queries::media_files::list::list_media_files::{list_media_files, ListMediaFilesArgs};
 use tokens::tokens::media_files::MediaFileToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
@@ -85,6 +86,10 @@ pub struct MediaFileListItem {
 
   /// Text transcripts for TTS, etc.
   pub maybe_text_transcript: Option<String>,
+
+  /// For Comfy / Video Style Transfer jobs, this might include
+  /// the name of the selected style.
+  pub maybe_style_name: Option<StyleTransferName>,
 
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
@@ -264,6 +269,10 @@ pub async fn list_media_files_handler(
         creator_set_visibility: record.creator_set_visibility,
         maybe_title: record.maybe_title,
         maybe_text_transcript: record.maybe_text_transcript,
+        maybe_style_name: record.maybe_prompt_args
+            .as_ref()
+            .and_then(|args| args.style_name.as_ref())
+            .and_then(|style| style.to_style_name()),
         created_at: record.created_at,
         updated_at: record.updated_at,
       })

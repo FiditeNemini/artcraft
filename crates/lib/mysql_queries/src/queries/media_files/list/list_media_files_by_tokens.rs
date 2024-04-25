@@ -10,6 +10,7 @@ use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
+use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 #[derive(Serialize)]
 pub struct MediaFilesByTokensRecord {
@@ -43,6 +44,7 @@ pub struct MediaFilesByTokensRecord {
 
   /// Text transcripts for TTS, etc.
   pub maybe_text_transcript: Option<String>,
+  pub maybe_prompt_args: Option<PromptInnerPayload>,
 
   pub maybe_file_cover_image_public_bucket_hash: Option<String>,
   pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
@@ -98,6 +100,7 @@ async fn get_raw_media_files_by_tokens(
 
           m.maybe_title,
           m.maybe_text_transcript,
+          prompts.maybe_other_args as maybe_other_prompt_args,
 
           entity_stats.ratings_positive_count as maybe_ratings_positive_count,
           entity_stats.ratings_negative_count as maybe_ratings_negative_count,
@@ -114,6 +117,8 @@ async fn get_raw_media_files_by_tokens(
       LEFT OUTER JOIN entity_stats
           ON entity_stats.entity_type = "media_file"
           AND entity_stats.entity_token = m.token
+      LEFT OUTER JOIN prompts
+          ON prompts.token = m.maybe_prompt_token
       WHERE
           m.creator_set_visibility = "public"
           AND m.token IN (
@@ -145,6 +150,7 @@ async fn get_raw_media_files_by_tokens(
 
           m.maybe_title,
           m.maybe_text_transcript,
+          prompts.maybe_other_args as maybe_other_prompt_args,
 
           entity_stats.ratings_positive_count as maybe_ratings_positive_count,
           entity_stats.ratings_negative_count as maybe_ratings_negative_count,
@@ -167,6 +173,8 @@ async fn get_raw_media_files_by_tokens(
           AND entity_stats.entity_token = m.token
       LEFT OUTER JOIN media_files as media_file_cover_image
           ON media_file_cover_image.token = m.maybe_cover_image_media_file_token
+      LEFT OUTER JOIN prompts
+          ON prompts.token = m.maybe_prompt_token
       WHERE
           m.creator_set_visibility = "public"
           AND m.user_deleted_at IS NULL
@@ -228,6 +236,13 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
           maybe_title: media_file.maybe_title,
           maybe_text_transcript: media_file.maybe_text_transcript,
 
+          maybe_prompt_args: media_file.maybe_other_prompt_args
+              .as_deref()
+              .map(|args| PromptInnerPayload::from_json(args))
+              .transpose()
+              .ok() // NB: Fail open
+              .flatten(),
+
           maybe_file_cover_image_public_bucket_hash: media_file.maybe_file_cover_image_public_bucket_hash,
           maybe_file_cover_image_public_bucket_prefix: media_file.maybe_file_cover_image_public_bucket_prefix,
           maybe_file_cover_image_public_bucket_extension: media_file.maybe_file_cover_image_public_bucket_extension,
@@ -269,6 +284,7 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
 
     pub maybe_title: Option<String>,
     pub maybe_text_transcript: Option<String>,
+    pub maybe_other_prompt_args: Option<String>,
 
     pub maybe_file_cover_image_public_bucket_hash: Option<String>,
     pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
@@ -313,6 +329,7 @@ impl FromRow<'_, MySqlRow> for RawMediaFileJoinUser {
       maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,
       maybe_title: row.try_get("maybe_title")?,
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
+      maybe_other_prompt_args: row.try_get("maybe_other_prompt_args")?,
       maybe_file_cover_image_public_bucket_hash: row.try_get("maybe_file_cover_image_public_bucket_hash")?,
       maybe_file_cover_image_public_bucket_prefix: row.try_get("maybe_file_cover_image_public_bucket_prefix")?,
       maybe_file_cover_image_public_bucket_extension: row.try_get("maybe_file_cover_image_public_bucket_extension")?,

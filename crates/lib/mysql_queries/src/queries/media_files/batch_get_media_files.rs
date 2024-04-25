@@ -23,6 +23,8 @@ use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
 use tokens::traits::mysql_token_from_row::MySqlTokenFromRow;
 
+use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
+
 #[derive(Serialize, Debug)]
 pub struct MediaFile {
   pub token: MediaFileToken,
@@ -53,6 +55,7 @@ pub struct MediaFile {
   pub creator_set_visibility: Visibility,
 
   pub maybe_prompt_token: Option<PromptToken>,
+  pub maybe_prompt_args: Option<PromptInnerPayload>,
 
   pub maybe_file_cover_image_public_bucket_hash: Option<String>,
   pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
@@ -125,6 +128,7 @@ pub struct MediaFileRaw {
   pub creator_set_visibility: Visibility,
 
   pub maybe_prompt_token: Option<PromptToken>,
+  pub maybe_other_prompt_args: Option<String>,
 
   pub maybe_file_cover_image_public_bucket_hash: Option<String>,
   pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
@@ -217,6 +221,12 @@ pub async fn batch_get_media_files(
         maybe_creator_gravatar_hash: record.maybe_creator_gravatar_hash,
         creator_set_visibility: record.creator_set_visibility,
         maybe_prompt_token: record.maybe_prompt_token,
+        maybe_prompt_args: record.maybe_other_prompt_args
+            .as_deref()
+            .map(|args| PromptInnerPayload::from_json(args))
+            .transpose()
+            .ok() // NB: Fail open
+            .flatten(),
         maybe_file_cover_image_public_bucket_hash: record.maybe_file_cover_image_public_bucket_hash,
         maybe_file_cover_image_public_bucket_prefix: record.maybe_file_cover_image_public_bucket_prefix,
         maybe_file_cover_image_public_bucket_extension: record.maybe_file_cover_image_public_bucket_extension,
@@ -313,6 +323,8 @@ LEFT OUTER JOIN users as model_weight_creator
 LEFT OUTER JOIN entity_stats
     ON entity_stats.entity_type = "media_file"
     AND entity_stats.entity_token = m.token
+LEFT OUTER JOIN prompts
+    ON prompts.token = m.maybe_prompt_token
     "#)
 }
 
@@ -349,6 +361,7 @@ impl FromRow<'_, MySqlRow> for MediaFileRaw {
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
 
       maybe_prompt_token: PromptToken::try_from_mysql_row_nullable(row, "maybe_prompt_token")?,
+      maybe_other_prompt_args: row.try_get("maybe_other_prompt_args")?,
 
       maybe_file_cover_image_public_bucket_hash: row.try_get("maybe_file_cover_image_public_bucket_hash")?,
       maybe_file_cover_image_public_bucket_prefix: row.try_get("maybe_file_cover_image_public_bucket_prefix")?,

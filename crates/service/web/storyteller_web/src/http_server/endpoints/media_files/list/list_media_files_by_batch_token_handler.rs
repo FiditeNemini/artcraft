@@ -15,6 +15,7 @@ use enums::by_table::media_files::media_file_origin_product_category::MediaFileO
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::view_as::ViewAs;
 use enums::common::visibility::Visibility;
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use mysql_queries::queries::media_files::list::list_media_files_by_batch_token::{list_media_files_by_batch_token, ListMediaFileByBatchArgs};
 use mysql_queries::queries::media_files::list::list_media_files_for_user::{list_media_files_for_user, ListMediaFileForUserArgs};
 use tokens::tokens::batch_generations::BatchGenerationToken;
@@ -84,6 +85,10 @@ pub struct MediaFilesByBatchListItem {
 
   /// Text transcripts for TTS, etc.
   pub maybe_text_transcript: Option<String>,
+
+  /// For Comfy / Video Style Transfer jobs, this might include
+  /// the name of the selected style.
+  pub maybe_style_name: Option<StyleTransferName>,
 
   /// Statistics about the media file
   pub stats: SimpleEntityStats,
@@ -223,6 +228,10 @@ pub async fn list_media_files_by_batch_token_handler(
         creator_set_visibility: record.creator_set_visibility,
         maybe_title: record.maybe_title,
         maybe_text_transcript: record.maybe_text_transcript,
+        maybe_style_name: record.maybe_prompt_args
+            .as_ref()
+            .and_then(|args| args.style_name.as_ref())
+            .and_then(|style| style.to_style_name()),
         stats: SimpleEntityStats {
           positive_rating_count: record.maybe_ratings_positive_count.unwrap_or(0),
           bookmark_count: record.maybe_bookmark_count.unwrap_or(0),

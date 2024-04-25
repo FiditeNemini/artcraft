@@ -13,6 +13,7 @@ use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCat
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use mysql_queries::queries::media_files::list::list_media_files_by_tokens::list_media_files_by_tokens;
 use tokens::tokens::media_files::MediaFileToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
@@ -66,6 +67,10 @@ pub struct MediaFile {
 
   /// Text transcripts for TTS, etc.
   pub maybe_text_transcript: Option<String>,
+
+  /// For Comfy / Video Style Transfer jobs, this might include
+  /// the name of the selected style.
+  pub maybe_style_name: Option<StyleTransferName>,
 
   /// Statistics about the media file
   pub stats: SimpleEntityStats,
@@ -190,6 +195,10 @@ pub async fn list_featured_media_files_handler(
             ),
             maybe_title: m.maybe_title,
             maybe_text_transcript: m.maybe_text_transcript,
+            maybe_style_name: m.maybe_prompt_args
+                .as_ref()
+                .and_then(|args| args.style_name.as_ref())
+                .and_then(|style| style.to_style_name()),
             stats: SimpleEntityStats {
               positive_rating_count: m.maybe_ratings_positive_count.unwrap_or(0),
               bookmark_count: m.maybe_bookmark_count.unwrap_or(0),

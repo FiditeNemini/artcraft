@@ -12,6 +12,7 @@ use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
+use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 pub struct MediaFileListPage {
   pub records: Vec<MediaFileListItem>,
@@ -45,6 +46,7 @@ pub struct MediaFileListItem {
 
   /// Text transcripts for TTS, etc.
   pub maybe_text_transcript: Option<String>,
+  pub maybe_prompt_args: Option<PromptInnerPayload>,
 
   pub maybe_ratings_positive_count: Option<u32>,
   pub maybe_ratings_negative_count: Option<u32>,
@@ -112,6 +114,12 @@ pub async fn list_media_files_by_batch_token(args: ListMediaFileByBatchArgs<'_>)
           creator_set_visibility: record.creator_set_visibility,
           maybe_title: record.maybe_title,
           maybe_text_transcript: record.maybe_text_transcript,
+          maybe_prompt_args: record.maybe_other_prompt_args
+              .as_deref()
+              .map(|args| PromptInnerPayload::from_json(args))
+              .transpose()
+              .ok() // NB: Fail open
+              .flatten(),
           maybe_ratings_positive_count: record.maybe_ratings_positive_count,
           maybe_ratings_negative_count: record.maybe_ratings_negative_count,
           maybe_bookmark_count: record.maybe_bookmark_count,
@@ -153,6 +161,7 @@ fn select_result_fields() -> String {
 
     m.maybe_title,
     m.maybe_text_transcript,
+    prompts.maybe_other_args as maybe_other_prompt_args,
 
     entity_stats.ratings_positive_count as maybe_ratings_positive_count,
     entity_stats.ratings_negative_count as maybe_ratings_negative_count,
@@ -194,6 +203,8 @@ LEFT OUTER JOIN model_weights as w
 LEFT OUTER JOIN entity_stats
     ON entity_stats.entity_type = "media_file"
     AND entity_stats.entity_token = m.token
+LEFT OUTER JOIN prompts
+    ON prompts.token = m.maybe_prompt_token
     "#
   ));
 
@@ -253,6 +264,7 @@ struct MediaFileListItemInternal {
 
   /// Text transcripts for TTS, etc.
   maybe_text_transcript: Option<String>,
+  maybe_other_prompt_args: Option<String>,
 
   maybe_ratings_positive_count: Option<u32>,
   maybe_ratings_negative_count: Option<u32>,
@@ -291,6 +303,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       creator_set_visibility: Visibility::try_from_mysql_row(row, "creator_set_visibility")?,
       maybe_title: row.try_get("maybe_title")?,
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
+      maybe_other_prompt_args: row.try_get("maybe_other_prompt_args")?,
       maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
       maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,
       maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,

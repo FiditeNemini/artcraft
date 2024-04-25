@@ -16,6 +16,7 @@ use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
+use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
 use mysql_queries::queries::media_files::get_media_file::get_media_file;
 use mysql_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
 use tokens::tokens::batch_generations::BatchGenerationToken;
@@ -90,6 +91,10 @@ pub struct MediaFileInfo {
 
   /// Text transcripts for TTS, etc.
   pub maybe_text_transcript: Option<String>,
+
+  /// For Comfy / Video Style Transfer jobs, this might include
+  /// the name of the selected style.
+  pub maybe_style_name: Option<StyleTransferName>,
 
   /// The foreign key to the prompt used to generate the media, if applicable.
   pub maybe_prompt_token: Option<PromptToken>,
@@ -312,6 +317,10 @@ async fn modern_media_file_lookup(
       ),
       maybe_title: result.maybe_title,
       maybe_text_transcript: result.maybe_text_transcript,
+      maybe_style_name: result.maybe_prompt_args
+          .as_ref()
+          .and_then(|args| args.style_name.as_ref())
+          .and_then(|style| style.to_style_name()),
       maybe_model_weight_info: match result.maybe_model_weights_token {
         None => None,
         Some(weight_token) => Some(GetMediaFileModelInfo {
@@ -419,6 +428,7 @@ async fn emulate_media_file_with_legacy_tts_result_lookup(
         result.maybe_creator_gravatar_hash,
       ),
       maybe_prompt_token: None,
+      maybe_style_name: None,
       creator_set_visibility: result.creator_set_visibility,
       maybe_title: None,
       maybe_text_transcript: Some(result.raw_inference_text),

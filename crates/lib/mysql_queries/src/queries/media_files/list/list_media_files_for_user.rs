@@ -15,6 +15,8 @@ use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 
+use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
+
 pub struct MediaFileListPage {
   pub records: Vec<MediaFileListItem>,
 
@@ -53,6 +55,7 @@ pub struct MediaFileListItem {
 
   /// Text transcripts for TTS, etc.
   pub maybe_text_transcript: Option<String>,
+  pub maybe_prompt_args: Option<PromptInnerPayload>,
 
   pub maybe_ratings_positive_count: Option<u32>,
   pub maybe_ratings_negative_count: Option<u32>,
@@ -133,6 +136,12 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
           maybe_file_cover_image_public_bucket_extension: record.maybe_file_cover_image_public_bucket_extension,
           maybe_title: record.maybe_title,
           maybe_text_transcript: record.maybe_text_transcript,
+          maybe_prompt_args: record.maybe_other_prompt_args
+              .as_deref()
+              .map(|args| PromptInnerPayload::from_json(args))
+              .transpose()
+              .ok() // NB: Fail open
+              .flatten(),
           maybe_ratings_positive_count: record.maybe_ratings_positive_count,
           maybe_ratings_negative_count: record.maybe_ratings_negative_count,
           maybe_bookmark_count: record.maybe_bookmark_count,
@@ -179,6 +188,7 @@ fn select_result_fields() -> String {
 
     m.maybe_title,
     m.maybe_text_transcript,
+    prompts.maybe_other_args as maybe_other_prompt_args,
 
     entity_stats.ratings_positive_count as maybe_ratings_positive_count,
     entity_stats.ratings_negative_count as maybe_ratings_negative_count,
@@ -225,6 +235,8 @@ LEFT OUTER JOIN media_files as media_file_cover_image
 LEFT OUTER JOIN entity_stats
     ON entity_stats.entity_type = "media_file"
     AND entity_stats.entity_token = m.token
+LEFT OUTER JOIN prompts
+    ON prompts.token = m.maybe_prompt_token
     "#
   ));
 
@@ -312,6 +324,7 @@ struct MediaFileListItemInternal {
   
   // NB: The title won't be populated for `tts_models` records or non-`model_weights` records.
   maybe_origin_model_title: Option<String>,
+  maybe_other_prompt_args: Option<String>,
 
   media_type: MediaFileType,
   media_class: MediaFileClass,
@@ -361,6 +374,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_origin_model_type: MediaFileOriginModelType::try_from_mysql_row_nullable(row, "maybe_origin_model_type")?,
       maybe_origin_model_token: row.try_get("maybe_origin_model_token")?,
       maybe_origin_model_title: row.try_get("maybe_origin_model_title")?,
+      maybe_other_prompt_args: row.try_get("maybe_other_prompt_args")?,
       media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
       media_class: MediaFileClass::try_from_mysql_row(row, "media_class")?,
       public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,

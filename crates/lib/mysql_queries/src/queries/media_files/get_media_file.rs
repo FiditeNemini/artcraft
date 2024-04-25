@@ -6,8 +6,8 @@
 use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
-use enums::by_table::media_files::media_file_class::MediaFileClass;
 
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
@@ -20,6 +20,8 @@ use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::model_weights::ModelWeightToken;
 use tokens::tokens::prompts::PromptToken;
 use tokens::tokens::users::UserToken;
+
+use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 #[derive(Serialize, Debug)]
 pub struct MediaFile {
@@ -54,6 +56,7 @@ pub struct MediaFile {
   pub creator_set_visibility: Visibility,
 
   pub maybe_prompt_token: Option<PromptToken>,
+  pub maybe_prompt_args: Option<PromptInnerPayload>,
 
   pub maybe_file_cover_image_public_bucket_hash: Option<String>,
   pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
@@ -129,6 +132,7 @@ pub struct MediaFileRaw {
   pub creator_set_visibility: Visibility,
 
   pub maybe_prompt_token: Option<PromptToken>,
+  pub maybe_other_prompt_args: Option<String>,
 
   pub maybe_file_cover_image_public_bucket_hash: Option<String>,
   pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
@@ -185,6 +189,13 @@ pub async fn get_media_file(
     }
   };
 
+  let maybe_prompt_args = record.maybe_other_prompt_args
+      .as_deref()
+      .map(|args| PromptInnerPayload::from_json(args))
+      .transpose()
+      .ok() // NB: Fail open
+      .flatten();
+
   Ok(Some(MediaFile {
     token: record.token,
     media_type: record.media_type,
@@ -202,6 +213,7 @@ pub async fn get_media_file(
     maybe_creator_anonymous_visitor_token: record.maybe_creator_anonymous_visitor_token,
     creator_set_visibility: record.creator_set_visibility,
     maybe_prompt_token: record.maybe_prompt_token,
+    maybe_prompt_args,
     maybe_file_cover_image_public_bucket_hash: record.maybe_file_cover_image_public_bucket_hash,
     maybe_file_cover_image_public_bucket_prefix: record.maybe_file_cover_image_public_bucket_prefix,
     maybe_file_cover_image_public_bucket_extension: record.maybe_file_cover_image_public_bucket_extension,
@@ -258,6 +270,7 @@ SELECT
     m.maybe_duration_millis,
 
     m.maybe_prompt_token as `maybe_prompt_token: tokens::tokens::prompts::PromptToken`,
+    prompts.maybe_other_args as maybe_other_prompt_args,
 
     media_file_cover_image.public_bucket_directory_hash as maybe_file_cover_image_public_bucket_hash,
     media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
@@ -304,6 +317,8 @@ LEFT OUTER JOIN users as model_weight_creator
 LEFT OUTER JOIN entity_stats
     ON entity_stats.entity_type = "media_file"
     AND entity_stats.entity_token = m.token
+LEFT OUTER JOIN prompts
+    ON prompts.token = m.maybe_prompt_token
 WHERE
     m.token = ?
         "#,
@@ -344,6 +359,7 @@ SELECT
     m.maybe_duration_millis,
 
     m.maybe_prompt_token as `maybe_prompt_token: tokens::tokens::prompts::PromptToken`,
+    prompts.maybe_other_args as maybe_other_prompt_args,
 
     media_file_cover_image.public_bucket_directory_hash as maybe_file_cover_image_public_bucket_hash,
     media_file_cover_image.maybe_public_bucket_prefix as maybe_file_cover_image_public_bucket_prefix,
@@ -390,6 +406,8 @@ LEFT OUTER JOIN users as model_weight_creator
 LEFT OUTER JOIN entity_stats
     ON entity_stats.entity_type = "media_file"
     AND entity_stats.entity_token = m.token
+LEFT OUTER JOIN prompts
+    ON prompts.token = m.maybe_prompt_token
 WHERE
     m.token = ?
     AND m.user_deleted_at IS NULL

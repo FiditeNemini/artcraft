@@ -13,6 +13,7 @@ use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
+use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 pub struct MediaFileListPage {
   pub records: Vec<MediaFileListItem>,
@@ -52,6 +53,7 @@ pub struct MediaFileListItem {
 
   pub maybe_title: Option<String>,
   pub maybe_text_transcript: Option<String>,
+  pub maybe_prompt_args: Option<PromptInnerPayload>,
 
   pub creator_set_visibility: Visibility,
 
@@ -124,6 +126,12 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
           maybe_creator_gravatar_hash: record.maybe_creator_gravatar_hash,
           maybe_title: record.maybe_title,
           maybe_text_transcript: record.maybe_text_transcript,
+          maybe_prompt_args: record.maybe_other_prompt_args
+              .as_deref()
+              .map(|args| PromptInnerPayload::from_json(args))
+              .transpose()
+              .ok() // NB: Fail open
+              .flatten(),
           creator_set_visibility: record.creator_set_visibility,
           maybe_file_cover_image_public_bucket_hash: record.maybe_file_cover_image_public_bucket_hash,
           maybe_file_cover_image_public_bucket_prefix: record.maybe_file_cover_image_public_bucket_prefix,
@@ -174,6 +182,7 @@ SELECT
   m.maybe_origin_model_token,
 
   w.title as maybe_origin_model_title,
+  prompts.maybe_other_args as maybe_other_prompt_args,
 
   m.public_bucket_directory_hash,
   m.maybe_public_bucket_prefix,
@@ -218,6 +227,8 @@ LEFT OUTER JOIN comments as c
 LEFT OUTER JOIN entity_stats
     ON entity_stats.entity_type = "media_file"
     AND entity_stats.entity_token = m.token
+LEFT OUTER JOIN prompts
+    ON prompts.token = m.maybe_prompt_token
     "#
   );
 
@@ -342,6 +353,7 @@ struct MediaFileListItemInternal {
 
   maybe_title: Option<String>,
   maybe_text_transcript: Option<String>,
+  maybe_other_prompt_args: Option<String>,
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
@@ -387,6 +399,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_file_cover_image_public_bucket_extension: row.try_get("maybe_file_cover_image_public_bucket_extension")?,
       maybe_title: row.try_get("maybe_title")?,
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
+      maybe_other_prompt_args: row.try_get("maybe_other_prompt_args")?,
       created_at: row.try_get("created_at")?,
       updated_at: row.try_get("updated_at")?,
       comment_count: row.try_get("comment_count")?,
