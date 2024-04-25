@@ -198,6 +198,11 @@ CREATE TABLE generic_inference_jobs (
   -- We can track this against a "max_attempt_count"
   attempt_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 
+  -- If the user chooses to no longer display or poll the job, we mark this flag true.
+  -- This can only be set for terminal state (completed or failed) jobs.
+  -- We use this flag to remove the job from the user's view.
+  is_dismissed_by_user BOOLEAN NOT NULL DEFAULT FALSE,
+
   -- If there is a failure, tell the user why.
   -- This isn't localized or very friendly to present to the user.
   failure_reason VARCHAR(512) DEFAULT NULL,
