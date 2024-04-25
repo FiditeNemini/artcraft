@@ -14,11 +14,10 @@ import {
   deleteInferenceJob,
   inferenceJobs,
 } from "~/pages/PageEnigma/store/inferenceJobs";
-import { InferenceJob } from "~/pages/PageEnigma/models";
+import { InferenceJob, JobState } from "~/pages/PageEnigma/models";
 
 import { ButtonDialogue } from "../ButtonDialogue";
 import { ButtonIcon, H4, H6, P } from "~/components";
-import { JobState } from "~/hooks/useInferenceJobManager/useInferenceJobManager";
 
 const printJobType = (jobType: string) => {
   switch (jobType) {
@@ -131,7 +130,7 @@ export const DialogueInference = () => {
         </ul>
       )}
       {inferenceJobs.value.length === 0 && (
-        <P>You currently have no running proccesses.</P>
+        <P>You currently have no running processes.</P>
       )}
     </ButtonDialogue>
   );

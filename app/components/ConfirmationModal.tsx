@@ -29,7 +29,7 @@ export const ConfirmationModal = ({
   canHide,
 }: Props) => {
   const handleOk = useCallback(() => {
-    const element = document.getElementById("can-delete");
+    const element = document.getElementById("hide-dialog");
     if (element) {
       if ((element as HTMLInputElement).checked) {
         localStorage.setItem(title.replace(" ", "-"), DoNotShow);
@@ -72,7 +72,7 @@ export const ConfirmationModal = ({
               {canHide && (
                 <div className="mt-2">
                   <label>
-                    <input id="can-delete" type="checkbox" />
+                    <input id="hide-dialog" type="checkbox" />
                     &nbsp;&nbsp;Do not show this again
                   </label>
                 </div>

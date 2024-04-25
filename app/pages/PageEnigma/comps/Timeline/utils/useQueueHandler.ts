@@ -3,11 +3,13 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { useCallback, useContext, useEffect } from "react";
 import {
   addNewCharacter,
+  addObjectToTimeline,
   currentTime,
   loadAudioData,
   loadCameraData,
   loadCharacterData,
   loadObjectData,
+  selectedObject,
 } from "~/pages/PageEnigma/store";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
@@ -25,7 +27,7 @@ import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
 
 interface Arguments {
   action: fromEngineActions | toEngineActions | toTimelineActions;
-  data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem;
+  data: QueueClip | UpdateTime | QueueKeyframe | ClipUI[] | MediaItem | null;
 }
 
 const LOADING_FUNCTIONS: Record<ClipGroup, (item: ClipUI) => void> = {
@@ -44,6 +46,27 @@ export function useQueueHandler() {
     ({ action, data }: Arguments) => {
       console.log("FROM ENGINE", action, data);
       switch (action) {
+        case fromEngineActions.ADD_OBJECT: {
+          // this could be an object or character
+          addObjectToTimeline(data as MediaItem);
+          break;
+        }
+        case fromEngineActions.DELETE_OBJECT:
+          // this could be an object or character
+          deleteObjectOrCharacter(data as MediaItem);
+          break;
+        case fromEngineActions.DESELECT_OBJECT:
+          selectedObject.value = null;
+          break;
+        case fromEngineActions.SELECT_OBJECT:
+          selectedObject.value = {
+            type: (data as MediaItem).type,
+            id: (data as MediaItem).object_uuid ?? "",
+          };
+          break;
+        case fromEngineActions.UPDATE_CHARACTER_ID:
+          addNewCharacter(data as MediaItem);
+          break;
         case fromEngineActions.UPDATE_TIME:
           currentTime.value = (data as UpdateTime).currentTime;
           break;
@@ -53,15 +76,6 @@ export function useQueueHandler() {
             LOADING_FUNCTIONS[item.group](item);
           });
           break;
-        case fromEngineActions.UPDATE_CHARACTER_ID: {
-          addNewCharacter(data as MediaItem);
-          break;
-        }
-        case fromEngineActions.DELETE_OBJECT: {
-          // this could be an object or character
-          deleteObjectOrCharacter(data as MediaItem);
-          break;
-        }
         default:
           throw new Error(`Unknown action ${action}`);
       }

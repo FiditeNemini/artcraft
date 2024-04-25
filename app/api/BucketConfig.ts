@@ -1,3 +1,5 @@
+import { environmentVariables } from "~/store";
+
 class BucketConfig {
   isLocalDev: boolean;
 
@@ -10,7 +12,7 @@ class BucketConfig {
 
   // TODO: Prevent callers with undefined/null paths
   getGcsUrl(bucketRelativePath: string | undefined | null): string {
-    let bucket = this.getBucket();
+    const bucket = this.getBucket();
     let path = bucketRelativePath;
     if (path !== undefined && path !== null && !path.startsWith("/")) {
       path = "/" + path;
@@ -25,13 +27,13 @@ class BucketConfig {
   getCdnUrl(
     bucketRelativePath: string,
     width?: number,
-    quality?: number
+    quality?: number,
   ): string {
     // const basePath = this.isLocalDev
     //   ? "https://dev-cdn.fakeyou.com"
     //   : "https://cdn.fakeyou.com";
-    const basePath = "https://cdn.fakeyou.com";
-    let path = bucketRelativePath?.startsWith("/")
+    const basePath = environmentVariables.value.CDN_API;
+    const path = bucketRelativePath?.startsWith("/")
       ? bucketRelativePath
       : "/" + bucketRelativePath;
     let resizeParams = "";

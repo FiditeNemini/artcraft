@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { environmentVariables } from "~/store";
 
 interface CsvJson {
   [key: string]: string[];
@@ -23,7 +24,7 @@ export class EmotionClip {
 
   async get_media_url() {
     //This is for prod when we have the proper info on the url.
-    const api_base_url = "https://api.fakeyou.com";
+    const api_base_url = environmentVariables.value.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${this.media_id}`;
     const responce = await fetch(url);
     const json = await JSON.parse(await responce.text());

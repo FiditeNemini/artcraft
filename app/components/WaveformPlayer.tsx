@@ -2,8 +2,11 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import WaveSurfer from "wavesurfer.js";
 import { faCirclePlay, faCirclePause } from "@fortawesome/pro-solid-svg-icons";
 import { ButtonIcon } from "~/components";
+import { environmentVariables } from "~/store";
+import { useSignals } from "@preact/signals-react/runtime";
 
 export const WaveformPlayer = ({ audio }: { audio: string }) => {
+  useSignals();
   const waveSurferRef = useRef<WaveSurfer | undefined>(undefined);
   const [isPlaying, toggleIsPlaying] = useState(false);
 
@@ -17,7 +20,12 @@ export const WaveformPlayer = ({ audio }: { audio: string }) => {
         waveColor: "#D7C8C8",
         progressColor: "#FB8381",
       });
-      waveSurfer.load(audio);
+      const newUrl = audio.replace(
+        "https://storage.googleapis.com",
+        environmentVariables.value.GOOGLE_API,
+      );
+
+      waveSurfer.load(newUrl);
       waveSurfer.on("ready", () => {
         waveSurferRef.current = waveSurfer;
       });

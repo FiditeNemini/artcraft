@@ -115,11 +115,3 @@ export function deleteObjectKeyframe(keyframe: Keyframe) {
     ],
   };
 }
-
-export function addObject(object: MediaItem) {
-  Queue.publish({
-    queueName: QueueNames.TO_ENGINE,
-    action: toEngineActions.ADD_OBJECT,
-    data: object,
-  });
-}

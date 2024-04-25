@@ -25,12 +25,7 @@ import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/contexts/AppUiContext";
 import { pageHeight, pageWidth } from "~/store";
 import { TopBar } from "~/modules/TopBar";
-import { Pages } from "~/pages/PageEnigma/constants/page";
 import { AssetType } from "./models/assets";
-
-interface Props {
-  setPage: (page: Pages) => void;
-}
 
 export const PageEditor = () => {
   useSignals();

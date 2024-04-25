@@ -11,36 +11,30 @@ import {
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import {
-  UploadAudio,
-  UploadAudioIsOk,
-  UploadAudioRequest,
-} from "./utilities";
+import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "./utilities";
 
 import { Button } from "../Button";
-import { P } from "../Typography";
-import { WaveformPlayer } from "../WaveformPlayer";
+import { P, WaveformPlayer } from "~/components";
 
 const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
 
 interface Props {
   sessionToken: string;
-  onFileStaged?: ()=>void;
-  onClear?: ()=>void;
-  onFileUploaded: (token:string)=>void
+  onFileStaged?: () => void;
+  onClear?: () => void;
+  onFileUploaded: (token: string) => void;
 }
 
 function UploadComponent({
   sessionToken,
   onFileStaged,
   onClear,
-  onFileUploaded
+  onFileUploaded,
 }: Props) {
-
-  const [{file, uploadState, uploadToken}, setState] = useState<{
+  const [{ file, uploadState, uploadToken }, setState] = useState<{
     file: any;
-    uploadState: "init"|"none"|"uploading"|"uploaded"|"error";
-    uploadToken ?: string;
+    uploadState: "init" | "none" | "uploading" | "uploaded" | "error";
+    uploadToken?: string;
   }>({
     file: undefined,
     uploadState: "init",
@@ -48,15 +42,15 @@ function UploadComponent({
   const audioUrl = file ? URL.createObjectURL(file) : "";
 
   const handleChange = (file: any) => {
-    setState((curr)=>({
+    setState((curr) => ({
       ...curr,
-      file:file,
-      uploadState: "none"
+      file: file,
+      uploadState: "none",
     }));
   };
 
   const handleClear = () => {
-    setState((curr)=>({
+    setState((curr) => ({
       ...curr,
       file: undefined,
       uploadState: "none",
@@ -67,38 +61,37 @@ function UploadComponent({
   const handleUploadFile = () => {
     if (file === undefined) return false;
 
-    setState((curr)=>({...curr, uploadState: "uploading"}));
+    setState((curr) => ({ ...curr, uploadState: "uploading" }));
     const request: UploadAudioRequest = {
       uuid_idempotency_token: uuidv4(),
       file: file,
       source: "file",
     };
 
-    UploadAudio(request, sessionToken)
-    .then(res=>{
+    UploadAudio(request, sessionToken).then((res) => {
       if (UploadAudioIsOk(res)) {
-        setState((curr)=>({
+        setState((curr) => ({
           ...curr,
           uploadState: "uploaded",
-          uploadToken: res.upload_token
+          uploadToken: res.upload_token,
         }));
-      }else{
-        setState((curr)=>({
+      } else {
+        setState((curr) => ({
           ...curr,
           uploadState: "error",
-          uploadToken: undefined
+          uploadToken: undefined,
         }));
       }
     });
   };
 
-  useEffect(()=>{
-    if(file && uploadState === "none" && onFileStaged) onFileStaged();
-    if(!file && uploadState === "none" && onClear) onClear();
+  useEffect(() => {
+    if (file && uploadState === "none" && onFileStaged) onFileStaged();
+    if (!file && uploadState === "none" && onClear) onClear();
   }, [file, uploadState]);
-  useEffect(()=>{
-    if(uploadState==="uploaded" && uploadToken) onFileUploaded(uploadToken);
-  },[uploadToken, uploadState])
+  useEffect(() => {
+    if (uploadState === "uploaded" && uploadToken) onFileUploaded(uploadToken);
+  }, [uploadToken, uploadState]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -108,31 +101,34 @@ function UploadComponent({
         name="file"
         types={FILE_TYPES}
         maxSize={50}
-        children={<DragAndDropZone file={file}/>}
+        children={<DragAndDropZone file={file} />}
       />
 
-      {file &&
+      {file && (
         <>
-          <div className="rounded-lg p-3 border border-brand-secondary-700">
-            <WaveformPlayer audio={audioUrl}/>
+          <div className="rounded-lg border border-brand-secondary-700 p-3">
+            <WaveformPlayer audio={audioUrl} />
           </div>
-          <div className="flex gap-3 justify-evenly">
+          <div className="flex justify-evenly gap-3">
             <Button
               className="grow"
               onClick={handleUploadFile}
               disabled={uploadState !== "none" && uploadState !== "error"}
-              icon={uploadState === "uploaded" ? faCheck
-                : uploadState === "error" ? faCircleXmark
-                : faFileArrowUp
-              }
-            >
-              {uploadState === "uploaded" ? "Uploaded" 
-                : uploadState === "error" ? "Upload Error"
-                : "Upload Audio"
-              }
-              {uploadState === "uploading" && 
-                <FontAwesomeIcon icon={faSpinnerThird} spin/>
-              }
+              icon={
+                uploadState === "uploaded"
+                  ? faCheck
+                  : uploadState === "error"
+                    ? faCircleXmark
+                    : faFileArrowUp
+              }>
+              {uploadState === "uploaded"
+                ? "Uploaded"
+                : uploadState === "error"
+                  ? "Upload Error"
+                  : "Upload Audio"}
+              {uploadState === "uploading" && (
+                <FontAwesomeIcon icon={faSpinnerThird} spin />
+              )}
             </Button>
 
             <Button className="grow" onClick={handleClear} icon={faTrash}>
@@ -140,27 +136,22 @@ function UploadComponent({
             </Button>
           </div>
         </>
-      }
+      )}
     </div>
   );
 }
 
-const DragAndDropZone = ({
-  file,
-}:{
-  file:any
-})=>{
-
+const DragAndDropZone = ({ file }: { file: any }) => {
   const fileSize =
     file && file.size >= 1024 * 1024
       ? (file.size / 1024 / 1024).toFixed(2) + " MB"
       : file
-      ? `${Math.floor(file.size / 1024)} KB`
-      : null;
+        ? `${Math.floor(file.size / 1024)} KB`
+        : null;
 
-  if(!file){
-    return(
-      <div className="flex items-center p-3 gap-4 border-2 border-dashed rounded-lg bg-brand-secondary border-brand-secondary-700 cursor-pointer">
+  if (!file) {
+    return (
+      <div className="flex cursor-pointer items-center gap-4 rounded-lg border-2 border-dashed border-brand-secondary-700 bg-brand-secondary p-3">
         <FontAwesomeIcon icon={faFileArrowUp} size="3x" />
         <div className="flex flex-col gap-1">
           <P className="font-medium">
@@ -172,9 +163,9 @@ const DragAndDropZone = ({
         </div>
       </div>
     );
-  }else{
-    return(
-      <div className="flex items-center p-3 gap-4 border-2 border-dashed rounded-lg bg-brand-secondary border-brand-secondary-700 cursor-pointer">
+  } else {
+    return (
+      <div className="flex cursor-pointer items-center gap-4 rounded-lg border-2 border-dashed border-brand-secondary-700 bg-brand-secondary p-3">
         <FontAwesomeIcon icon={faFileAudio} size="3x" />
         <div className="flex flex-col gap-1">
           <P className="font-medium">

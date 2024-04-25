@@ -7,6 +7,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 
 import normalizeCss from "./styles/normalize.css?url";
@@ -23,9 +24,10 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 // Prevent fontawesome from adding its CSS since we did it manually above:
 import { config } from "@fortawesome/fontawesome-svg-core";
 import { useSignals } from "@preact/signals-react/runtime";
-import { pageHeight, pageWidth } from "~/store";
+import { environmentVariables, pageHeight, pageWidth } from "~/store";
 import { sidePanelWidth, timelineHeight } from "~/pages/PageEnigma/store";
 import { AppUIProvider } from "~/contexts/AppUiContext";
+import { json } from "@remix-run/router";
 config.autoAddCss = false; /* eslint-disable import/first */
 
 export const links: LinksFunction = () => [
@@ -56,7 +58,19 @@ export const links: LinksFunction = () => [
   },
 ];
 
+export async function loader() {
+  return json({
+    ENV: {
+      BASE_API: process.env.BASE_API,
+      GOOGLE_API: process.env.GOOGLE_API,
+      FUNNEL_API: process.env.FUNNEL_API,
+      CDN_API: process.env.CDN_API,
+    },
+  });
+}
+
 export default function App() {
+  const data = useLoaderData() as { ENV: Record<string, string> };
   const [topBarInnerComponent, setTopBarInnerComponent] = useState<{
     location: string;
     node: React.ReactNode;
@@ -84,6 +98,10 @@ export default function App() {
       window.removeEventListener("resize", setPage);
     };
   }, []);
+
+  useEffect(() => {
+    environmentVariables.value = data.ENV;
+  }, [data]);
 
   return (
     <html lang="en">
@@ -132,8 +150,7 @@ function CompleteTakeoverLoadingScreen({ isShowing }: { isShowing: boolean }) {
         justifyContent: "center",
         alignItems: "center",
         zIndex: 9999,
-      }}
-    >
+      }}>
       <LoadingDotsBricks />
     </Transition>
   );

@@ -6,6 +6,8 @@ import {
   enableHotkeyInput,
   DomLevels,
 } from "~/pages/PageEnigma/store";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMinus } from "@fortawesome/pro-solid-svg-icons";
 
 const DialogBackdrop = () => {
   useEffect(() => {
@@ -34,12 +36,14 @@ export const TransitionDialogue = ({
   title,
   onClose,
   className,
+  width,
   children,
 }: {
   isOpen: boolean;
   title?: ReactNode;
   onClose: () => void;
   className?: string;
+  width?: number;
   children: ReactNode;
 }) => {
   return (
@@ -58,14 +62,20 @@ export const TransitionDialogue = ({
               leaveTo="opacity-0 scale-95">
               <Dialog.Panel
                 className={twMerge(
-                  "w-full max-w-lg transform rounded-xl border border-ui-panel-border bg-ui-panel p-5 text-left align-middle shadow-xl transition-all",
+                  "w-full max-w-lg transform rounded-xl",
+                  "border border-ui-panel-border bg-ui-panel",
+                  "p-5 text-left align-middle shadow-xl transition-all",
                   className,
-                )}>
+                )}
+                style={{ minWidth: width }}>
                 {title && (
                   <Dialog.Title
-                    as="h4"
-                    className="mb-4 text-xl font-bold text-white">
-                    {title}
+                    as="div"
+                    className="mb-4 flex justify-between border-b border-b-white/60 py-2 text-xl font-bold text-white">
+                    <div>{title}</div>
+                    <button onClick={onClose} className="p1">
+                      <FontAwesomeIcon icon={faMinus} />
+                    </button>
                   </Dialog.Title>
                 )}
                 {children}

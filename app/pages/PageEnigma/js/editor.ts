@@ -557,6 +557,7 @@ class Editor {
     }
     this.last_selected = this.selected;
     this.selected = undefined;
+    this.publishSelect();
     this.control.detach();
     this.activeScene.scene.remove(this.control);
     this.outlinePass.selectedObjects = [];
@@ -586,6 +587,7 @@ class Editor {
 
         this.removeTransformControls();
         this.selected = this.cam_obj;
+        this.publishSelect();
 
         this.dispatchAppUiState({
           type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,
@@ -730,6 +732,7 @@ class Editor {
       } as MediaItem,
     });
     this.selected = undefined;
+    this.publishSelect();
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
     });
@@ -737,7 +740,7 @@ class Editor {
   }
 
   create_parim(name: string, pos: THREE.Vector3) {
-    const uuid = this.activeScene.instantiate(name, pos);
+    return this.activeScene.instantiate(name, pos);
   }
 
   renderMode() {
@@ -1415,6 +1418,7 @@ class Editor {
           this.selected = intersects[0].object;
         }
         this.activeScene.selected = this.selected;
+        this.publishSelect();
 
         // this.update_properties()
         this.activeScene.scene.add(this.control);
@@ -1434,6 +1438,29 @@ class Editor {
         type: APPUI_ACTION_TYPES.HIDE_CONTROLPANELS_SCENEOBJECT,
       });
     }
+  }
+
+  publishSelect() {
+    if (this.selected) {
+      console.log("publish", this.selected);
+      Queue.publish({
+        queueName: QueueNames.FROM_ENGINE,
+        action: fromEngineActions.SELECT_OBJECT,
+        data: {
+          type: this.selected.type,
+          object_uuid: this.selected.uuid,
+          version: 1,
+          media_id: this.selected.id.toString(),
+          name: "",
+        } as MediaItem,
+      });
+      return;
+    }
+    Queue.publish({
+      queueName: QueueNames.FROM_ENGINE,
+      action: fromEngineActions.DESELECT_OBJECT,
+      data: null,
+    });
   }
 }
 

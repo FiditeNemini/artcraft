@@ -14,7 +14,7 @@ import { QueueNames } from "../Queue/QueueNames";
 import { toEngineActions } from "../Queue/toEngineActions";
 import { fromEngineActions } from "../Queue/fromEngineActions";
 import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
-import { MediaItem } from "~/pages/PageEnigma/models";
+import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
 import Editor from "~/pages/PageEnigma/js/editor";
 import EmotionEngine from "./emotion_engine";
 
@@ -150,12 +150,16 @@ export class TimeLine {
       case toEngineActions.ADD_CHARACTER:
         await this.addCharacter(data);
         break;
-      case toEngineActions.ADD_OBJECT:
-        await this.addObject(data);
+      case toEngineActions.ADD_OBJECT: {
+        const newObject = await this.addObject(data);
+        this.queueNewObjectMessage(newObject, data.media_id);
         break;
-      case toEngineActions.ADD_SHAPE:
-        await this.addShape(data);
+      }
+      case toEngineActions.ADD_SHAPE: {
+        const newShape = await this.addShape(data);
+        this.queueNewObjectMessage(newShape, data.media_id);
         break;
+      }
       case toEngineActions.ENTER_PREVIEW_STATE:
         await this.editorEngine.switchPreview();
         break;
@@ -228,6 +232,23 @@ export class TimeLine {
     //this.emotion_engine.loadClip(obj.uuid, "m_c0g50khzpg99rq8chjn8zgvxcwebc7")
   }
 
+  queueNewObjectMessage(
+    item: THREE.Object3D<THREE.Object3DEventMap>,
+    media_id: string,
+  ) {
+    Queue.publish({
+      queueName: QueueNames.FROM_ENGINE,
+      action: fromEngineActions.ADD_OBJECT,
+      data: {
+        media_id: media_id,
+        type: AssetType.OBJECT,
+        name: item.name,
+        object_uuid: item.uuid,
+        version: 1,
+      } as MediaItem,
+    });
+  }
+
   public getPos() {
     const raycaster = new THREE.Raycaster();
     raycaster.layers.enable(0);
@@ -254,11 +275,12 @@ export class TimeLine {
     obj.userData["name"] = name;
     obj.name = name;
     obj.position.copy(pos);
+    return obj;
   }
 
   public async addShape({ data }: { data: MediaItem }) {
     const pos = this.getPos();
-    this.editorEngine.create_parim(data.media_id, pos);
+    return this.editorEngine.create_parim(data.media_id, pos);
   }
 
   public async addKeyFrame(data: any) {

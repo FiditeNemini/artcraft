@@ -1,4 +1,6 @@
 import GetApiHost from "./GetApiHost";
+import { environmentVariables } from "~/store";
+import { useSignals } from "@preact/signals-react/runtime";
 
 // const { formatUrl } = GetApiHost();
 
@@ -9,11 +11,11 @@ interface RequestHeaders {
 }
 
 interface RouteSetup<UrlRouteArgs> {
-    method: string;
-    multipart?: boolean;
-    routingFunction: UrlRoutingFunction<UrlRouteArgs>;
-} 
-  
+  method: string;
+  multipart?: boolean;
+  routingFunction: UrlRoutingFunction<UrlRouteArgs>;
+}
+
 const METHOD_OMITS_BODY: { [key: string]: boolean } = {
   DELETE: false,
   GET: true,
@@ -23,37 +25,50 @@ const METHOD_OMITS_BODY: { [key: string]: boolean } = {
   PUT: false,
 };
 
-const MakeRequest = <UrlRouteArgs, Request, Response, UrlParams>(routeSetup: RouteSetup<UrlRouteArgs>) :  (urlRouteArgs: UrlRouteArgs, request: Request, queries?: UrlParams) => Promise<Response> => {
-    return async function(urlRouteArgs: UrlRouteArgs, request: Request, queries?: any) : Promise<Response> {
-        const newQueries = queries ? Object.keys(queries).map((key, i) => {
-            return `${ i ? "&" : "" }${ key }=${ Array.isArray(queries[key]) ? queries[key].join(`&${ key }=`) : queries[key] }`
-        }).join("") : null;
+const MakeRequest = <UrlRouteArgs, Request, Response, UrlParams>(
+  routeSetup: RouteSetup<UrlRouteArgs>,
+): ((
+  urlRouteArgs: UrlRouteArgs,
+  request: Request,
+  queries?: UrlParams,
+) => Promise<Response>) => {
+  return async function (
+    urlRouteArgs: UrlRouteArgs,
+    request: Request,
+    queries?: any,
+  ): Promise<Response> {
+    const newQueries = queries
+      ? Object.keys(queries)
+          .map((key, i) => {
+            return `${i ? "&" : ""}${key}=${Array.isArray(queries[key]) ? queries[key].join(`&${key}=`) : queries[key]}`;
+          })
+          .join("")
+      : null;
 
-        const endpoint = `${ routeSetup.routingFunction(urlRouteArgs) }${ newQueries ? "?" + newQueries : "" }`;
-        const method = routeSetup.method;
-        const methodOmitsBody = METHOD_OMITS_BODY[method] || false;
+    const endpoint = `${routeSetup.routingFunction(urlRouteArgs)}${newQueries ? "?" + newQueries : ""}`;
+    const method = routeSetup.method;
+    const methodOmitsBody = METHOD_OMITS_BODY[method] || false;
 
-        // return fetch(formatUrl(endpoint), {
-        return fetch(`https://api.fakeyou.com${ endpoint }`, {
-            method,
-            headers: {
-                "Accept": "application/json",
-                ...methodOmitsBody? {} : { "Content-Type": "application/json" }
-            },
-            credentials: 'include',
-            ...methodOmitsBody ? {} : { body: JSON.stringify(request) },
-        })
-        .then(res => res.json())
-        .then(res => {
-            if (!res.success && res && (res.voice_token || res.dataset_token)) {
-                return res;
-            }
-            else if (res && "success" in res) {
-                return res;
-            } else Promise.reject();
-        })
-        .catch(e => ({ success : false }));
-    }
+    // return fetch(formatUrl(endpoint), {
+    return fetch(`${environmentVariables.value.BASE_API}${endpoint}`, {
+      method,
+      headers: {
+        Accept: "application/json",
+        ...(methodOmitsBody ? {} : { "Content-Type": "application/json" }),
+      },
+      credentials: "include",
+      ...(methodOmitsBody ? {} : { body: JSON.stringify(request) }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        if (!res.success && res && (res.voice_token || res.dataset_token)) {
+          return res;
+        } else if (res && "success" in res) {
+          return res;
+        } else Promise.reject();
+      })
+      .catch((e) => ({ success: false }));
+  };
 };
 
 export default MakeRequest;

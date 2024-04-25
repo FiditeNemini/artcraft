@@ -98,10 +98,10 @@ https://api.fakeyou.com/v1/media_files/batch?tokens=m_jh74zz1nfj2jxrkw7n00yamt32
     ]
 }
 
-// lip sync will be generated through TTS 
+// lip sync will be generated through TTS
 async get_media_url() {
     //This is for prod when we have the proper info on the url.
-    let api_base_url = "https://api.fakeyou.com/";
+    let api_base_url = environmentVariables.value.BASE_API;
     let url = ${api_base_url}/v1/media_files/file/${this.media_id}
     let responce = await fetch(url);
     let json = await JSON.parse(await responce.text());

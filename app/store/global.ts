@@ -4,3 +4,5 @@ export const sceneTitle = signal("Home Office");
 
 export const pageHeight = signal(0);
 export const pageWidth = signal(0);
+
+export const environmentVariables = signal<Record<string, string>>({});

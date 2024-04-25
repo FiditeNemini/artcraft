@@ -2,6 +2,8 @@ import { v4 as uuidv4 } from "uuid";
 import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { STORAGE_KEYS } from "~/contexts/Authentication/types";
+import process from "process";
+import { environmentVariables } from "~/store";
 
 /**
  * Storyteller Studio API Manager
@@ -77,7 +79,7 @@ export class APIManager {
   sessionToken: string;
 
   constructor() {
-    this.baseUrl = "https://api.fakeyou.com";
+    this.baseUrl = environmentVariables.value.BASE_API;
     this.sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN) || "";
     //this.baseUrl = "http://localhost:12345"
   }
@@ -109,7 +111,7 @@ export class APIManager {
   public async loadSceneState(
     scene_media_file_token: string | null,
   ): Promise<any> {
-    const api_base_url = "https://api.fakeyou.com";
+    const api_base_url = environmentVariables.value.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
     const response = await fetch(url);
     if (response.status > 200) {
@@ -118,8 +120,8 @@ export class APIManager {
 
     const json = await JSON.parse(await response.text());
     const bucket_path = json["media_file"]["public_bucket_path"];
-    const media_base_url = "https://storage.googleapis.com/vocodes-public";
-    const media_url = `${media_base_url}${bucket_path}`; // gets you a bucket path
+    const media_base_url = environmentVariables.value.GOOGLE_API;
+    const media_url = `/vocodes-public${media_base_url}${bucket_path}`; // gets you a bucket path
 
     const file_response = await fetch(media_url);
 
@@ -145,13 +147,12 @@ export class APIManager {
    * @returns
    */
   public async getMediaFile(media_file_token: string): Promise<string> {
-    const api_base_url = "https://api.fakeyou.com";
-    const url = `${api_base_url}/v1/media_files/file/${media_file_token}`;
+    const url = `${this.baseUrl}/v1/media_files/file/${media_file_token}`;
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
-    const media_base_url = "https://storage.googleapis.com/vocodes-public";
-    const media_url = `${media_base_url}${bucketPath}`; // gets you a bucket path
+    const media_base_url = environmentVariables.value.GOOGLE_API;
+    const media_url = `/vocodes-public${media_base_url}${bucketPath}`; // gets you a bucket path
     return media_url;
   }
 
@@ -302,7 +303,7 @@ export class APIManager {
     positive_prompt: string,
     negative_prompt: string,
   ): Promise<string> {
-    const url = "https://funnel.tailce84f.ts.net/preview/";
+    const url = `${environmentVariables.value.FUNNEL_API}/preview/`;
 
     const payload = {
       style: style,

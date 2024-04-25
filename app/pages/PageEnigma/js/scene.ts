@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { environmentVariables } from "~/store";
 
 class Scene {
   name: string;
@@ -52,7 +53,7 @@ class Scene {
     obj.userData["shininess"] = 0.5;
     obj.userData["specular"] = 0.0;
     this.scene.add(obj);
-    return obj.uuid;
+    return obj;
   }
 
   get_object_by_uuid(uuid: string) {
@@ -125,7 +126,7 @@ class Scene {
 
   async getMediaURL(media_id: string) {
     //This is for prod when we have the proper info on the url.
-    const api_base_url = "https://api.fakeyou.com";
+    const api_base_url = environmentVariables.value.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${media_id}`;
     const responce = await fetch(url);
     const json = await JSON.parse(await responce.text());

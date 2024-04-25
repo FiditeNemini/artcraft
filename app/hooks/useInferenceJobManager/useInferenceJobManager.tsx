@@ -1,122 +1,163 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useContext } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
-import { inferenceJobs, updateInferenceJob } from '~/pages/PageEnigma/store/inferenceJobs';
+import {
+  inferenceJobs,
+  updateInferenceJob,
+} from "~/pages/PageEnigma/store/inferenceJobs";
+import {
+  ActiveJob,
+  ErrorResponse,
+  GetJobStatusResponse,
+  JobState,
+} from "~/pages/PageEnigma/models";
+import { ToasterContext } from "~/contexts/ToasterContext";
+import { activeJobs, movies } from "~/pages/PageEnigma/store";
+import { listMediaByUser } from "~/api";
+import { AuthenticationContext } from "~/contexts/Authentication";
+import { STORAGE_KEYS } from "~/contexts/Authentication/types";
 
-export enum JobState {
-  UNKNOWN = "unknown", // Only on frontend.
-  PENDING = "pending",
-  STARTED = "started",
-  COMPLETE_SUCCESS = "complete_success",
-  COMPLETE_FAILURE = "complete_failure",
-  ATTEMPT_FAILED = "attempt_failed",
-  DEAD = "dead",
-  CANCELED_BY_USER = "canceled_by_user",
-}
-export interface RequestDetails {
-  inference_category: string,
-  maybe_model_type?: string,
-  maybe_model_token?: string,
-  maybe_model_title?: string,
-  maybe_raw_inference_text?: string,
-}
-
-export interface StatusDetails {
-  status: string,
-  maybe_extra_status_description?: string,
-  maybe_failure_category?: string,
-  attempt_count: number,
-}
-
-export interface ResultDetails {
-  entity_type: string,
-  entity_token: string,
-  maybe_public_bucket_media_path?: string,
-}
-
-export interface JobStatus {
-  job_token: string,
-  request: RequestDetails,
-  status: StatusDetails,
-  maybe_result?: ResultDetails,
-  created_at: Date,
-  updated_at: Date,
-}
-
-export interface GetJobStatusResponse {
-  success: boolean;
-  state: JobStatus
-}
-type ErrorResponse = {
-  success: boolean;
-  error_reason: string;
-}
-export async function GetInferenceJobStatus(jobToken:string) : Promise<GetJobStatusResponse | null> {
-
+export async function GetInferenceJobStatus(
+  jobToken: string,
+): Promise<GetJobStatusResponse | ErrorResponse> {
   const endpoint = `https://api.fakeyou.com/v1/model_inference/job_status/${jobToken}`;
-  
+
   return await fetch(endpoint, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Accept': 'application/json',
+      Accept: "application/json",
+    },
+    credentials: "include",
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      const response: GetJobStatusResponse | ErrorResponse = res;
+      return response;
+    })
+    .catch(() => {
+      return {
+        success: false,
+        error_reason: "Unknown error",
+      };
+    });
+}
+
+export function GetActiveJobs() {
+  const endpoint =
+    "https://api.fakeyou.com/v1/jobs/session?exclude_states=complete_success,dead";
+  const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN) || "";
+
+  fetch(endpoint, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      session: sessionToken,
     },
     // credentials: 'include',
   })
-  .then(res => res.json())
-  .then(res => {
-    const response : GetJobStatusResponse = res;
-    return response;
-  })
-  .catch(e => {
-    return null;
-  });
+    .then((res) => res.json())
+    .then((res) => {
+      const jobs = res.jobs.filter(
+        (job: ActiveJob) => job.request.inference_category === "workflow",
+      );
+      if (JSON.stringify(activeJobs.value) !== JSON.stringify({ jobs })) {
+        activeJobs.value = { jobs };
+      }
+    })
+    .catch(() => {
+      return {
+        success: false,
+        error_reason: "Unknown error",
+      };
+    });
 }
 
-function shouldKeepPolling(currStatus:string){
-  if(currStatus === JobState.PENDING 
-    || currStatus === JobState.STARTED
-  ) return true;
-  return false
+export function GetCompletedMovies(username?: string) {
+  if (!username) {
+    return;
+  }
+  const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN) || "";
+  fetch(
+    listMediaByUser(username) +
+      "?" +
+      new URLSearchParams({ filter_media_type: "video" }),
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        session: sessionToken,
+      },
+      // credentials: 'include'
+    },
+  )
+    .then((res) => res.json())
+    .then((res) => {
+      if (res.success && res.results) {
+        if (
+          JSON.stringify(movies.value) !==
+          JSON.stringify({ movies: res.results })
+        ) {
+          console.log("movies", res.results);
+          movies.value = { movies: res.results };
+        }
+      }
+    })
+    .catch(() => {
+      return {
+        success: false,
+        error_reason: "Unknown error",
+      };
+    });
+}
+
+function shouldKeepPolling(currStatus: string) {
+  return currStatus === JobState.PENDING || currStatus === JobState.STARTED;
 }
 
 export const useInferenceJobManager = () => {
   useSignals();
+  const { addToast } = useContext(ToasterContext);
+  const { authState } = useContext(AuthenticationContext);
 
-  const pollInferenceJobs = useCallback(()=>{
-    if(inferenceJobs.value.length > 0 ){
-      inferenceJobs.value.forEach(job=>{
-        if(shouldKeepPolling(job.job_status)){
-          GetInferenceJobStatus(job.job_id).then((res:GetJobStatusResponse|null)=>{
-            if(res!==null){
-              if(res.state.status.status !== job.job_status){
-                console.log(`${res.state.job_token} has new state: ${res.state.status.status}`)
-                if(res.state.status.status === JobState.COMPLETE_SUCCESS){
-                  console.log(res.state);
-                  updateInferenceJob({
-                    ...job,
-                    job_status: res.state.status.status,
-                    result: res.state.maybe_result
-                  });
-                }else{
-                  updateInferenceJob({
-                    ...job,
-                    job_status: res.state.status.status
-                  });
-                }
+  const pollInferenceJobs = useCallback(() => {
+    if (inferenceJobs.value.length > 0) {
+      inferenceJobs.value.forEach((job) => {
+        if (shouldKeepPolling(job.job_status)) {
+          GetInferenceJobStatus(job.job_id).then(
+            (res: GetJobStatusResponse | ErrorResponse) => {
+              if (res?.success) {
+                console.log("inference", res);
+                const response = res as GetJobStatusResponse;
+                updateInferenceJob({
+                  ...job,
+                  job_status: response.state.status.status,
+                  result: response.state.maybe_result,
+                });
+                return;
               }
-            }
-          });
+              addToast("error", (res as ErrorResponse).error_reason);
+            },
+          );
         }
       });
     }
+  }, [addToast]);
+
+  const pollActiveJobs = useCallback(() => {
+    GetActiveJobs();
   }, []);
 
-  useEffect(()=>{
-    console.log('useInferenceJobManager Mounted');
-    const intervalTimer = setInterval(pollInferenceJobs,2000);
-    return()=>{
-      console.log('useInferenceJobManager Dismounted');
-      clearInterval(intervalTimer);
-    }
-  },[]);
-};
+  const pollMovies = useCallback(() => {
+    GetCompletedMovies(authState.userInfo?.username);
+  }, [authState.userInfo]);
 
+  useEffect(() => {
+    const intervalTimer = setInterval(() => {
+      pollInferenceJobs();
+      pollActiveJobs();
+      pollMovies();
+    }, 2000);
+    return () => {
+      clearInterval(intervalTimer);
+    };
+  }, [pollInferenceJobs, pollActiveJobs, pollMovies]);
+};
