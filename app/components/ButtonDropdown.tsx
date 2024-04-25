@@ -9,7 +9,6 @@ import { Button, ButtonPropsI } from "./Button";
 import { TransitionDialogue } from "~/components/TransitionDialogue";
 
 type UnionedButtonProps = { label?: string } & ButtonPropsI;
-type ModalPropsType = ButtonDropdownProps["options"][number]["dialogProps"];
 
 interface ButtonDropdownProps {
   label: string;
@@ -27,6 +26,7 @@ interface ButtonDropdownProps {
       confirmButtonProps?: UnionedButtonProps;
       closeButtonProps?: UnionedButtonProps;
       showClose?: boolean;
+      onClose?: () => void;
     };
   }>;
 }
@@ -37,19 +37,30 @@ export const ButtonDropdown = ({
   icon,
 }: ButtonDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [modalProps, setModalProps] = useState<ModalPropsType | null>(null);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | null>(
+    null,
+  );
 
-  const closeModal = () => setIsOpen(false);
+  const closeModal = () => {
+    setIsOpen(false);
+    options[selectedOptionIndex!].dialogProps?.onClose?.();
+  };
 
-  const handleOptionClick = (option) => {
+  const handleOptionClick = (index: number) => {
+    const option = options[index];
     if (option.onClick) {
       option.onClick();
     }
     if (option.dialogProps) {
-      setModalProps(option.dialogProps);
+      setSelectedOptionIndex(index);
       setIsOpen(true);
     }
   };
+
+  const currentDialogProps =
+    selectedOptionIndex !== null
+      ? options[selectedOptionIndex].dialogProps
+      : null;
 
   return (
     <div className="relative">
@@ -84,7 +95,7 @@ export const ButtonDropdown = ({
                         className={`duration-50 bg-brand-secondary font-medium text-white transition-all ${
                           active ? "bg-ui-controls-button/60" : ""
                         } ${option.disabled ? "pointer-events-none opacity-40" : ""} group flex w-full items-center py-1.5 pl-7 pr-4 text-sm`.trim()}
-                        onClick={() => handleOptionClick(option)}>
+                        onClick={() => handleOptionClick(index)}>
                         <div className="flex w-full">
                           <div className="grow text-start">{option.label}</div>
                           <div className="ml-10 font-normal text-white/75">
@@ -101,34 +112,35 @@ export const ButtonDropdown = ({
         </Transition>
       </Menu>
 
-      {modalProps && (
+      {currentDialogProps && (
         <TransitionDialogue
-          title={modalProps.title}
+          title={currentDialogProps.title}
           isOpen={isOpen}
           onClose={closeModal}
-          className={modalProps.className}>
-          {modalProps.content}
+          className={currentDialogProps.className}>
+          {currentDialogProps.content}
 
           <div className="mt-6 flex justify-end gap-2">
-            {modalProps.showClose !== false && modalProps.closeButtonProps && (
-              <Button
-                variant="secondary"
-                {...modalProps.closeButtonProps}
-                onClick={closeModal}>
-                {modalProps.closeButtonProps.label}
-              </Button>
-            )}
+            {currentDialogProps.showClose !== false &&
+              currentDialogProps.closeButtonProps && (
+                <Button
+                  variant="secondary"
+                  {...currentDialogProps.closeButtonProps}
+                  onClick={closeModal}>
+                  {currentDialogProps.closeButtonProps.label}
+                </Button>
+              )}
 
-            {modalProps.confirmButtonProps && (
+            {currentDialogProps.confirmButtonProps && (
               <Button
-                {...modalProps.confirmButtonProps}
+                {...currentDialogProps.confirmButtonProps}
                 onClick={(e) => {
-                  if (modalProps.confirmButtonProps?.onClick) {
-                    modalProps.confirmButtonProps?.onClick(e);
+                  if (currentDialogProps.confirmButtonProps?.onClick) {
+                    currentDialogProps.confirmButtonProps?.onClick(e);
                   }
                   closeModal();
                 }}>
-                {modalProps.confirmButtonProps.label || "Confirm"}
+                {currentDialogProps.confirmButtonProps.label || "Confirm"}
               </Button>
             )}
           </div>

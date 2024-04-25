@@ -27,7 +27,9 @@ export const ItemPicker = ({
     <button
       className={twMerge(
         "relative cursor-pointer overflow-hidden rounded-lg border-2 transition-colors ease-in-out",
-        selected ? "border-brand-primary" : "border-ui-border",
+        selected
+          ? "border-brand-primary"
+          : "border-[#4B4B5C] hover:border-ui-controls-button",
       )}
       style={{
         minWidth: (width as number) + 4,
@@ -47,7 +49,7 @@ export const ItemPicker = ({
           maxHeight: height,
         }}
       />
-      <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-gray-700" />
+      <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-ui-panel" />
       <H4 className="absolute bottom-[1px] left-[6px] text-start text-[13px] drop-shadow-md">
         {label}
       </H4>

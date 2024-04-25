@@ -8,6 +8,8 @@ import { ToasterContext } from "~/contexts/ToasterContext";
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
 import { Help } from "./Help";
 import { faFile } from "@fortawesome/pro-solid-svg-icons";
+import { LoadScene } from "./LoadScene";
+import { NewSceneFromTemplate } from "./NewSceneFromTemplate";
 
 export const ControlsTopButtons = () => {
   const editorEngine = useContext(EngineContext);
@@ -38,6 +40,11 @@ export const ControlsTopButtons = () => {
     });
   };
 
+  const handleSceneSelection = (token: string) => {
+    setSceneToken(token);
+    console.log(`Selected Scene Token is ${token}`);
+  };
+
   return (
     <div className="flex flex-col gap-2 pl-3 pt-3">
       <div className="flex gap-1.5">
@@ -53,9 +60,11 @@ export const ControlsTopButtons = () => {
                 content: (
                   <Input
                     label="Please enter a name for your new scene"
+                    value={sceneName}
                     onChange={(e) => {
-                      setSceneToken(e.target.value);
+                      setSceneName(e.target.value);
                     }}
+                    autoComplete="false"
                   />
                 ),
                 confirmButtonProps: {
@@ -67,6 +76,27 @@ export const ControlsTopButtons = () => {
                   label: "Cancel",
                 },
                 showClose: true,
+                onClose: () => setSceneName(""),
+              },
+            },
+            {
+              label: "New scene from template...",
+              description: "Ctrl+Shift+N",
+              dialogProps: {
+                title: "Create a New Scene from Template",
+                content: (
+                  <NewSceneFromTemplate onSceneSelect={handleSceneSelection} />
+                ),
+                confirmButtonProps: {
+                  label: "Create",
+                  disabled: sceneToken === "",
+                  onClick: handleButtonLoadScene,
+                },
+                closeButtonProps: {
+                  label: "Cancel",
+                },
+                showClose: true,
+                className: "max-w-7xl w-auto",
               },
             },
             {
@@ -74,14 +104,7 @@ export const ControlsTopButtons = () => {
               description: "Ctrl+O",
               dialogProps: {
                 title: "Load a Scene",
-                content: (
-                  <Input
-                    label="Please provide the token of the scene you want to load"
-                    onChange={(e) => {
-                      setSceneToken(e.target.value);
-                    }}
-                  />
-                ),
+                content: <LoadScene onSceneSelect={handleSceneSelection} />,
                 confirmButtonProps: {
                   label: "Load",
                   disabled: sceneToken === "",
@@ -91,10 +114,11 @@ export const ControlsTopButtons = () => {
                   label: "Cancel",
                 },
                 showClose: true,
+                className: "max-w-7xl w-auto",
               },
             },
-
             {
+              disabled: true, // save scene should be disabled if there are no changes
               label: "Save scene",
               description: "Ctrl+S",
               dialogProps: {
@@ -119,7 +143,6 @@ export const ControlsTopButtons = () => {
               },
               divider: true,
             },
-
             {
               label: "Save scene as copy",
               description: "Ctrl+Shift+S",

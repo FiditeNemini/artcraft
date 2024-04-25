@@ -1,0 +1,84 @@
+import React, { useEffect, useState } from "react";
+import { twMerge } from "tailwind-merge";
+
+export type SceneTypes = {
+  token: string;
+  name: string;
+  updated_at?: string;
+  thumbnail: string;
+};
+
+interface ScenePickerProps {
+  scenes: SceneTypes[];
+  onSceneSelect: (selectedScene: SceneTypes) => void;
+  showDate?: boolean;
+}
+
+export const ScenePicker: React.FC<ScenePickerProps> = ({
+  scenes,
+  onSceneSelect,
+  showDate,
+}) => {
+  const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (scenes.length > 0 && !selectedSceneId) {
+      setSelectedSceneId(scenes[0].token);
+      onSceneSelect(scenes[0]); // Trigger the callback with the first scene
+    }
+  }, [scenes, onSceneSelect, selectedSceneId]);
+
+  const handleSelected = (scene: SceneTypes) => {
+    setSelectedSceneId(scene.token);
+    onSceneSelect(scene);
+  };
+
+  return (
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {scenes.map((scene) => (
+        <button
+          key={scene.token}
+          className={twMerge(
+            "relative w-[260px] cursor-pointer overflow-hidden rounded-lg border-2 transition-colors ease-in-out ",
+            selectedSceneId === scene.token
+              ? "border-brand-primary"
+              : "border-[#4B4B5C] hover:border-ui-controls-button",
+          )}
+          onClick={() => handleSelected(scene)}>
+          <img
+            className="aspect-video object-cover"
+            src={scene.thumbnail}
+            alt={scene.name}
+          />
+          <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-ui-panel to-transparent" />
+          <div className="absolute bottom-[8px] left-[10px] text-start text-sm drop-shadow-md">
+            <div className="flex  flex-col">
+              <span className="w-60 truncate text-sm font-medium">
+                {scene.name}
+              </span>
+              {showDate && (
+                <span className="text-xs opacity-70">{scene.updated_at}</span>
+              )}
+            </div>
+          </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 512 512"
+            className={`absolute right-1.5 top-1.5 h-[22px] w-[22px] transition-opacity duration-200 ease-in-out ${
+              selectedSceneId === scene.token ? "opacity-100" : "opacity-0"
+            }`}>
+            <path
+              opacity="1"
+              d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
+              fill="#FC6B68"
+            />
+            <path
+              d="M369 175c-9.4 9.4-9.4 24.6 0 33.9L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0z"
+              fill="#FFFFFF"
+            />
+          </svg>
+        </button>
+      ))}
+    </div>
+  );
+};

@@ -1,0 +1,1 @@
+export { LoadScene } from "./LoadScene";
