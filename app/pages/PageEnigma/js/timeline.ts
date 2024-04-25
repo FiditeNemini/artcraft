@@ -230,6 +230,8 @@ export class TimeLine {
 
   public getPos() {
     const raycaster = new THREE.Raycaster();
+    raycaster.layers.enable(0);
+    raycaster.layers.enable(1);
     if (this.mouse && this.camera) {
       raycaster.setFromCamera(this.mouse, this.camera);
       const intersects = raycaster.intersectObjects(
