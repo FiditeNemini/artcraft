@@ -3,11 +3,12 @@ import { AssetFilterOption, MediaItem } from "~/pages/PageEnigma/models";
 import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
 
 interface Props {
+  debug?: string;
   items: MediaItem[];
   assetFilter: AssetFilterOption;
 }
 
-export const ItemElements = ({ items, assetFilter }: Props) => {
+export const ItemElements = ({ debug, items, assetFilter }: Props) => {
   const displayWidth =
     dndSidePanelWidth.value > -1
       ? dndSidePanelWidth.value
@@ -40,7 +41,7 @@ export const ItemElements = ({ items, assetFilter }: Props) => {
   return (
     <div className={`grid ${gridColumnsClass} gap-3`}>
       {displayItems.map((item) => (
-        <ItemElement key={item.media_id} item={item} />
+        <ItemElement debug={debug} key={item.media_id} item={item} />
       ))}
     </div>
   );

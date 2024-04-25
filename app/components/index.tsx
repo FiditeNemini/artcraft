@@ -3,6 +3,7 @@ import { ButtonDropdown } from "./ButtonDropdown";
 import { ButtonIcon } from "./ButtonIcon";
 import { ButtonLink } from "./ButtonLink";
 import { ButtonIconSelect } from "./ButtonIconSelect";
+import FileWrapper from "./FileWrapper";
 import { Input } from "./Input";
 import { InputVector } from "./InputVector";
 import { H1, H2, H3, H4, H5, H6, P, Label, Link } from "./Typography";
@@ -19,6 +20,7 @@ import {
 } from "./LoadingDots";
 import { Pill } from "./Pill";
 import { WaveformPlayer } from "./WaveformPlayer";
+import UploadModal from "./UploadModal";
 
 export {
   Button,
@@ -26,6 +28,7 @@ export {
   ButtonIcon,
   ButtonLink,
   ButtonIconSelect,
+  FileWrapper,
   H1,
   H2,
   H3,
@@ -47,5 +50,6 @@ export {
   LoadingDotsBricks,
   LoadingDotsTyping,
   Pill,
-  WaveformPlayer
+  WaveformPlayer,
+  UploadModal,
 };

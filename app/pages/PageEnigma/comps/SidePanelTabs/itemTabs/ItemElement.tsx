@@ -10,6 +10,7 @@ import {
 import { useSignals } from "@preact/signals-react/runtime";
 
 interface Props {
+  debug?: string;
   item: MediaItem;
 }
 
@@ -65,8 +66,7 @@ export const ItemElement = ({ item }: Props) => {
   return (
     <div
       className="relative w-full cursor-pointer rounded-lg transition-all duration-200"
-      onPointerDown={onPointerDown}
-    >
+      onPointerDown={onPointerDown}>
       <img
         src={item.thumbnail}
         alt={item.name}
@@ -74,8 +74,7 @@ export const ItemElement = ({ item }: Props) => {
       />
       <div
         className="text-overflow-ellipsis w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
-        style={{ backgroundColor: "#39394D" }}
-      >
+        style={{ backgroundColor: "#39394D" }}>
         {item.name}
       </div>
     </div>

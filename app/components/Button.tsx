@@ -6,6 +6,7 @@ export interface ButtonPropsI
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: IconDefinition;
   iconFlip?: boolean;
+  htmlFor?: string;
   variant?: "primary" | "secondary" | "action";
 }
 
@@ -13,11 +14,15 @@ export const Button = ({
   icon,
   children,
   className: propsClassName,
+  htmlFor,
   variant: propsVariant = "primary",
   disabled,
   iconFlip = false,
   ...rest
 }: ButtonPropsI) => {
+  const ButtonType = htmlFor ? "label" : "button";
+  const variant = disabled ? "disabled" : propsVariant;
+
   function getVariantClassNames(variant: string) {
     switch (variant) {
       case "secondary": {
