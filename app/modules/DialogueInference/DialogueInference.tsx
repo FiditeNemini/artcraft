@@ -106,32 +106,34 @@ const InferenceItem = ({ job }: { job: InferenceJob }) => {
 };
 
 export const DialogueInference = () => {
-  useSignals();
+  // useSignals();
 
-  const buttonIcon =
-    inferenceJobs.value.length > 0 ? faClipboardList : faClipboard;
-  return (
-    <ButtonDialogue
-      title="My Jobs"
-      dialogProps={{
-        className: "w-1/2 max-w-full",
-      }}
-      buttonProps={{
-        icon: buttonIcon,
-        variant: "secondary",
-        label: "My Jobs",
-        className: inferenceJobs.value.length === 0 ? "invisible" : "visible",
-      }}>
-      {inferenceJobs.value.length > 0 && (
-        <ul className="flex flex-col gap-2">
-          {inferenceJobs.value.map((job) => (
-            <InferenceItem key={job.job_id} job={job} />
-          ))}
-        </ul>
-      )}
-      {inferenceJobs.value.length === 0 && (
-        <P>You currently have no running processes.</P>
-      )}
-    </ButtonDialogue>
-  );
+  return null;
+  //
+  // const buttonIcon =
+  //   inferenceJobs.value.length > 0 ? faClipboardList : faClipboard;
+  // return (
+  //   <ButtonDialogue
+  //     title="My Jobs"
+  //     dialogProps={{
+  //       className: "w-1/2 max-w-full",
+  //     }}
+  //     buttonProps={{
+  //       icon: buttonIcon,
+  //       variant: "secondary",
+  //       label: "My Jobs",
+  //       className: inferenceJobs.value.length === 0 ? "invisible" : "visible",
+  //     }}>
+  //     {inferenceJobs.value.length > 0 && (
+  //       <ul className="flex flex-col gap-2">
+  //         {inferenceJobs.value.map((job) => (
+  //           <InferenceItem key={job.job_id} job={job} />
+  //         ))}
+  //       </ul>
+  //     )}
+  //     {inferenceJobs.value.length === 0 && (
+  //       <P>You currently have no running processes.</P>
+  //     )}
+  //   </ButtonDialogue>
+  // );
 };
