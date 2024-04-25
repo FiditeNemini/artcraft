@@ -74,7 +74,7 @@ export const Timeline = () => {
       ) {
         event.stopPropagation();
         event.preventDefault();
-        const show = localStorage.getItem("Delete-Clip");
+        const show = localStorage.getItem("Delete-clip");
         if (show === DoNotShow) {
           onDelete();
           return;
