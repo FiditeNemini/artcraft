@@ -137,6 +137,9 @@ CREATE TABLE media_files (
   -- For videos, the original frame height.
   maybe_frame_height INT(5) DEFAULT NULL,
 
+  -- For 3D rigs and animations, the type of animation.
+  maybe_animation_type VARCHAR(32) DEFAULT NULL,
+
   -- Optional text transcript for audio or video (especially TTS)
   maybe_text_transcript TEXT DEFAULT NULL,
 
