@@ -113,6 +113,8 @@ export class APIManager {
   ): Promise<any> {
     const api_base_url = environmentVariables.value.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
+    console.log(`API BASE URL? ${api_base_url}`);
+    console.log(`CALLED URL? ${url}`);
     const response = await fetch(url);
     if (response.status > 200) {
       throw new APIManagerResponseError("Failed to load scene");

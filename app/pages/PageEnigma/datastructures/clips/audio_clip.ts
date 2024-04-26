@@ -37,8 +37,11 @@ export class AudioClip {
     //This is for prod when we have the proper info on the url.
     const api_base_url = environmentVariables.value.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${this.media_id}`;
-    const responce = await fetch(url);
-    const json = await JSON.parse(await responce.text());
+
+    console.log(`API BASE URL? ${api_base_url}`);
+    console.log(`CALLED URL? ${url}`);
+    const response = await fetch(url);
+    const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
     const media_base_url = "https://storage.googleapis.com/vocodes-public";
     const media_url = `${media_base_url}${bucketPath}`;
