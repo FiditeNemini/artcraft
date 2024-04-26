@@ -142,9 +142,10 @@ pub async fn list_session_jobs_from_connection(
        AND j.created_at > DATE_SUB(NOW(), INTERVAL 36 HOUR)
        ORDER BY j.id DESC
        LIMIT 100
-     ) AS x
+     )
     "#);
   }
+  // 'AS x\n     AND jobs.is_dismissed_by_user = FALSE  AND jobs.status NOT IN (?, ?)' at line 62" })
 
   query_builder.push(" AND jobs.is_dismissed_by_user = FALSE ");
 
