@@ -122,11 +122,37 @@ pub async fn list_session_jobs_from_connection(
 {
   let mut query_builder: QueryBuilder<MySql> = make_query_builder();
 
-  query_builder.push(" WHERE jobs.maybe_creator_user_token = ");
-  query_builder.push_bind(args.user_token.to_string());
+  // NB: Inner query is meant to run fast via query planner. This is
+  // meant to save us from users that might automate 10k+ jobs within
+  // a 36-hour period.
+  // The inner query is limited to 100 records, which will spare the
+  // outer query. Furthermore, even though `created_at` lacks an index,
+  // sort by id will accomplish this quickly.
+  {
+    query_builder.push(r#"
+    WHERE jobs.id IN (
+       SELECT j.id
+       FROM generic_inference_jobs as j
+       WHERE j.maybe_creator_user_token =
+    "#);
 
-  // NB: `created_at` doesn't have an index, but `maybe_creator_user_token` does.
-  query_builder.push(" AND jobs.created_at > DATE_SUB(NOW(), INTERVAL 36 HOUR) ");
+    query_builder.push_bind(args.user_token.to_string());
+
+    query_builder.push(r#"
+       AND j.created_at > DATE_SUB(NOW(), INTERVAL 36 HOUR)
+       ORDER BY j.id DESC
+       LIMIT 100
+     ) AS x
+    "#);
+  }
+
+  query_builder.push(" AND jobs.is_dismissed_by_user = FALSE ");
+
+  // query_builder.push(" WHERE jobs.maybe_creator_user_token = ");
+  // query_builder.push_bind(args.user_token.to_string());
+
+  // // NB: `created_at` doesn't have an index, but `maybe_creator_user_token` does.
+  // query_builder.push(" AND jobs.created_at > DATE_SUB(NOW(), INTERVAL 36 HOUR) ");
 
   if let Some(statuses) = args.maybe_include_job_statuses {
     if !statuses.is_empty() {
@@ -152,8 +178,8 @@ pub async fn list_session_jobs_from_connection(
     }
   }
 
-  query_builder.push(" ORDER BY jobs.id DESC ");
-  query_builder.push(" LIMIT 100 ");
+  // query_builder.push(" ORDER BY jobs.id DESC ");
+  // query_builder.push(" LIMIT 100 ");
 
   let query = query_builder.build_query_as::<RawGenericInferenceJobStatus>();
 
