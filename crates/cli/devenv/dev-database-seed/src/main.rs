@@ -7,6 +7,7 @@ use config::shared_constants::{DEFAULT_MYSQL_CONNECTION_STRING, DEFAULT_RUST_LOG
 use errors::AnyhowResult;
 
 use crate::cli_args::parse_cli_args;
+use crate::seeding::model_weights::seed_weights;
 use crate::seeding::user_roles::seed_user_roles;
 use crate::seeding::users::seed_user_accounts;
 
@@ -53,7 +54,7 @@ pub async fn main() -> AnyhowResult<()> {
   // seed_media_files(&pool, maybe_bucket_clients.as_ref()).await?;
   //seed_zero_shot_tts(&pool, maybe_bucket_clients.as_ref()).await?;
   // seed_voice_conversion(&pool).await?;
-  //seed_weights(&pool).await?;
+  seed_weights(&pool).await?;
   // seed_media_seedtool(&pool).await?;
   // seed_tts_tacotron2(&pool, maybe_bucket_clients.as_ref()).await?;
   

@@ -5,7 +5,7 @@ use actix_web::{HttpMessage, HttpRequest, HttpResponse, web};
 use actix_web::error::ResponseError;
 use actix_web::http::StatusCode;
 use actix_web::web::Path;
-use log::{error, warn};
+use log::{error, info, warn};
 use utoipa::ToSchema;
 
 use http_server_common::request::get_request_ip::get_request_ip;
@@ -79,6 +79,8 @@ pub async fn terminate_inference_job_handler(
   path: Path<TerminateInferenceJobPathInfo>,
   server_state: web::Data<Arc<ServerState>>) -> Result<HttpResponse, TerminateInferenceJobError>
 {
+  info!("terminate_inference_job_handler: {:?}", path.token);
+
   let mut mysql_connection = server_state.mysql_pool.acquire()
       .await
       .map_err(|e| {
