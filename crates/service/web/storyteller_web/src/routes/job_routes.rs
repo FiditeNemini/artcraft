@@ -32,12 +32,12 @@ pub fn add_job_routes<T, B> (app: App<T>) -> App<T>
                   .route(web::head().to(|| HttpResponse::Ok()))
             )
             .service(
-              web::resource("/v1/jobs/batch")
+              web::resource("/batch")
                   .route(web::get().to(batch_get_inference_job_status_handler))
                   .route(web::head().to(|| HttpResponse::Ok()))
             )
             .service(
-              web::resource("/v1/jobs/session")
+              web::resource("/session")
                   .route(web::get().to(list_session_jobs_handler))
                   .route(web::head().to(|| HttpResponse::Ok()))
             )
