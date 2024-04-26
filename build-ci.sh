@@ -18,10 +18,13 @@ find . -type f -exec sed -i "s/CURRENT_STORYTELLER_GIT_VERSION/${SHORT_SHA}/g" {
 
 echo "Baking ENV configs to code";
 
-find . -type f -exec sed -i "s/%BUILD_BASE_API%/${BASE_API}/g" {} +
-find . -type f -exec sed -i "s/%BUILD_GOOGLE_API%/${GOOGLE_API}/g" {} +
-find . -type f -exec sed -i "s/%BUILD_FUNNEL_API%/${FUNNEL_API}/g" {} +
-find . -type f -exec sed -i "s/%BUILD_CDN_API%/${CDN_API}/g" {} +
+# NB: We can't use slashes as the sed escape character: 
+# https://stackoverflow.com/a/27787551
+d=$'\03'
+find . -type f -exec sed -i "s${d}%BUILD_BASE_API%${d}${BASE_API}${d}g" {} +
+find . -type f -exec sed -i "s${d}%BUILD_GOOGLE_API%${d}${GOOGLE_API}${d}g" {} +
+find . -type f -exec sed -i "s${d}%BUILD_FUNNEL_API%${d}${FUNNEL_API}${d}g" {} +
+find . -type f -exec sed -i "s${d}%BUILD_CDN_API%${d}${CDN_API}${d}g" {} +
 
 # TODO: Run tests when we add them.
 
