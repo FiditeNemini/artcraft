@@ -59,14 +59,16 @@ export const links: LinksFunction = () => [
 ];
 
 export async function loader() {
-  return json({
+  const env = json({
     ENV: {
-      BASE_API: process.env.BASE_API,
-      GOOGLE_API: process.env.GOOGLE_API,
-      FUNNEL_API: process.env.FUNNEL_API,
-      CDN_API: process.env.CDN_API,
+      BASE_API: process.env.BASE_API || "%BUILD_BASE_API%",
+      GOOGLE_API: process.env.GOOGLE_API || "%BUILD_GOOGLE_API%",
+      FUNNEL_API: process.env.FUNNEL_API || "%BUILD_FUNNEL_API%",
+      CDN_API: process.env.CDN_API || "%BUILD_CDN_API%",
     },
   });
+  console.log('environment is', env);
+  return env;
 }
 
 export default function App() {
@@ -101,6 +103,7 @@ export default function App() {
 
   useEffect(() => {
     environmentVariables.value = data.ENV;
+    console.log('data.ENV is', data.ENV);
   }, [data]);
 
   return (
