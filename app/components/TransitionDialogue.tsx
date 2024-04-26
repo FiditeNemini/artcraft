@@ -7,7 +7,11 @@ import {
   DomLevels,
 } from "~/pages/PageEnigma/store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMinus } from "@fortawesome/pro-solid-svg-icons";
+import {
+  IconDefinition,
+  faDownLeftAndUpRightToCenter,
+} from "@fortawesome/pro-solid-svg-icons";
+import Tooltip from "./Tooltip";
 
 const DialogBackdrop = () => {
   useEffect(() => {
@@ -34,17 +38,21 @@ const DialogBackdrop = () => {
 export const TransitionDialogue = ({
   isOpen,
   title,
+  titleIcon,
   onClose,
   className,
   width,
   children,
+  childPadding = true,
 }: {
   isOpen: boolean;
   title?: ReactNode;
+  titleIcon?: IconDefinition;
   onClose: () => void;
   className?: string;
   width?: number;
   children: ReactNode;
+  childPadding?: boolean;
 }) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -64,21 +72,30 @@ export const TransitionDialogue = ({
                 className={twMerge(
                   "w-full max-w-lg transform rounded-xl",
                   "border border-ui-panel-border bg-ui-panel",
-                  "p-5 text-left align-middle shadow-xl transition-all",
+                  "text-left align-middle shadow-xl transition-all",
                   className,
                 )}
                 style={{ minWidth: width }}>
                 {title && (
                   <Dialog.Title
                     as="div"
-                    className="mb-4 flex justify-between border-b border-b-white/60 py-2 text-xl font-bold text-white">
-                    <div>{title}</div>
-                    <button onClick={onClose} className="p1">
-                      <FontAwesomeIcon icon={faMinus} />
-                    </button>
+                    className="mb-5 flex justify-between p-5 pb-0 text-xl font-bold text-white">
+                    <div className="flex items-center gap-3">
+                      {titleIcon && <FontAwesomeIcon icon={titleIcon} />}
+                      {title}
+                    </div>
+                    <Tooltip position="top" content="Close">
+                      <button
+                        onClick={onClose}
+                        className="opacity-50 transition-opacity duration-150 hover:opacity-80">
+                        <FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} />
+                      </button>
+                    </Tooltip>
                   </Dialog.Title>
                 )}
-                {children}
+                <div className={`${childPadding ? "p-5 pt-0" : ""}`.trim()}>
+                  {children}
+                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>

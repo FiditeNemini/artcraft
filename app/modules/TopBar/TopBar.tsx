@@ -46,7 +46,7 @@ export const TopBar = ({ pageName }: Props) => {
           <span className="opacity-60">@ CURRENT_STORYTELLER_GIT_VERSION</span>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2.5">
           <MyMoviesButton />
           <div className="flex justify-end gap-2">
             <AuthButtons />

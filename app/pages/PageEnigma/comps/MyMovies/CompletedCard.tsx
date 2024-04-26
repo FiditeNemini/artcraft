@@ -1,9 +1,10 @@
 import { MediaInfo } from "~/pages/PageEnigma/models/movies";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload } from "@fortawesome/pro-solid-svg-icons";
+import { faArrowDownToLine } from "@fortawesome/pro-solid-svg-icons";
 import { useRef, useState } from "react";
 import { BucketConfig } from "~/api/BucketConfig";
 import dayjs from "dayjs";
+import Tooltip from "~/components/Tooltip";
 
 interface Props {
   movie: MediaInfo;
@@ -20,30 +21,42 @@ export function CompletedCard({ movie }: Props) {
   );
 
   return (
-    <div className="mb-2 mr-2 flex items-center justify-between">
-      <div className="flex gap-2">
-        <div className="rounded-lg py-2 pl-5">
+    <button
+      className="flex w-full items-center justify-between px-5 py-3 text-start transition-all duration-150 hover:bg-brand-secondary/40"
+      onClick={() =>
+        console.log("change current modal to completed video modal")
+      }>
+      <div className="flex gap-4">
+        <div className="rounded-lg">
           <img
             src={
               loadError ? "resources/images/movie-placeholder.png" : imageUrl
             }
-            className="h-[70px] w-[124px] rounded-lg"
+            className="aspect-video w-36 rounded-lg object-cover"
             alt={movie.maybe_title ?? "unknown"}
             crossOrigin="anonymous"
             onError={() => setLoadError(true)}
           />
         </div>
-        <div className="flex flex-col gap-1">
-          <div>{movie.maybe_title}</div>
-          <div className="text-white/60">Anime 2D</div>
-          <div className="text-white/60">
-            {dayjs(movie.updated_at).format("MMM D, YYYY HH:mm")}
+        <div className="flex flex-col justify-center gap-1">
+          <div className="font-medium">{movie.maybe_title || "Untitled"}</div>
+          <div>
+            <div className="text-sm text-white/60">Anime 2D</div>
+            <div className="text-sm text-white/60">
+              {dayjs(movie.updated_at).format("MMM D, YYYY HH:mm")}
+            </div>
           </div>
         </div>
       </div>
-      <button onClick={() => console.log("download")} className="ml-2">
-        <FontAwesomeIcon icon={faDownload} className="text-white/50" />
-      </button>
-    </div>
+      <div className="pr-5">
+        <Tooltip content="Download" position="top">
+          <button
+            onClick={() => console.log("download")}
+            className="text-xl text-white/50 transition-all duration-150 hover:text-white/90">
+            <FontAwesomeIcon icon={faArrowDownToLine} />
+          </button>
+        </Tooltip>
+      </div>
+    </button>
   );
 }
