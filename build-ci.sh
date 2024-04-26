@@ -4,6 +4,9 @@
 # Verbose printing, exit on failure.
 set -euxo pipefail
 
+# Echo env vars
+env
+
 # Add the GIT SHA to the build
 # This must be done before everything else, or it will get cached with the build.
 # (This might be making the builds less performant?)
