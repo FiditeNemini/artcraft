@@ -1,10 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose } from "@fortawesome/pro-solid-svg-icons";
 import { ActiveJob, JobState } from "~/pages/PageEnigma/models";
-import { useCallback } from "react";
+import { useCallback, useContext } from "react";
 import { STORAGE_KEYS } from "~/contexts/Authentication/types";
 import { environmentVariables } from "~/store";
 import Tooltip from "~/components/Tooltip";
+import { ToasterContext, ToastTypes } from "~/contexts/ToasterContext";
 
 interface Props {
   movie: ActiveJob;
@@ -26,6 +27,7 @@ function getPercent(status: string) {
 export function InProgressCard({ movie }: Props) {
   const completePercent = getPercent(movie.status.status);
   const completeLength = (600 * completePercent) / 100;
+  const { addToast } = useContext(ToasterContext);
 
   const deleteJob = useCallback(() => {
     const endpoint = `${environmentVariables.value.BASE_API}/v1/jobs/job/${movie.job_token}`;
@@ -37,13 +39,14 @@ export function InProgressCard({ movie }: Props) {
         Accept: "application/json",
         session: sessionToken,
       },
-    }).catch(() => {
-      return {
-        success: false,
-        error_reason: "Unknown error",
-      };
-    });
-  }, [movie]);
+    })
+      .then(() => {
+        addToast(ToastTypes.SUCCESS, "File successfully deleted.");
+      })
+      .catch(() => {
+        addToast(ToastTypes.ERROR, "Error deleting the file.");
+      });
+  }, [movie, addToast]);
 
   return (
     <button className="flex w-full items-center justify-between px-5 py-3 text-start transition-all duration-150">

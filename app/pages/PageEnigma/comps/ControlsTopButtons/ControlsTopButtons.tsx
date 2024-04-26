@@ -1,10 +1,9 @@
 import { useContext, useState } from "react";
 import { ButtonDropdown, Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
-import { EngineContext } from "../../../../contexts/EngineContext";
-import { ToasterContext } from "~/contexts/ToasterContext";
+import { EngineContext } from "~/contexts/EngineContext";
+import { ToasterContext, ToastTypes } from "~/contexts/ToasterContext";
 // import { APPUI_ACTION_TYPES } from "app/reducers";
-
 import { TestFeaturesButtons } from "./TestFeaturesButtons";
 import { Help } from "./Help";
 import { faFile } from "@fortawesome/pro-solid-svg-icons";
@@ -25,7 +24,7 @@ export const ControlsTopButtons = () => {
     console.log(`SceneName is ${sceneName}`);
     const sceneMediaToken = await editorEngine?.saveScene(sceneName);
     if (sceneMediaToken) {
-      addToast("success", sceneMediaToken);
+      addToast(ToastTypes.SUCCESS, sceneMediaToken);
     }
   };
 
@@ -36,7 +35,7 @@ export const ControlsTopButtons = () => {
   const handleButtonLoadScene = () => {
     console.log(`Scene Token is ${sceneToken}`);
     editorEngine?.loadScene(sceneToken).catch((err) => {
-      addToast("error", err.message);
+      addToast(ToastTypes.ERROR, err.message);
     });
   };
 

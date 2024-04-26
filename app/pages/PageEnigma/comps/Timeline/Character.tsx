@@ -1,17 +1,16 @@
-import { useCallback, useMemo } from "react";
+import { useContext, useMemo } from "react";
 import { TrackClips } from "~/pages/PageEnigma/comps/Timeline/TrackClips";
 import {
   fullWidth,
   minimizeIconPosition,
   toggleCharacterMinimized,
-  toggleLipSyncMute,
   updateCharacters,
 } from "~/pages/PageEnigma/store";
 import { TrackKeyFrames } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrames";
 import { CharacterTrack, ClipGroup, ClipType } from "~/pages/PageEnigma/models";
-import { useSignals } from "@preact/signals-react/runtime";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
+import { AddToast, ToasterContext } from "~/contexts/ToasterContext";
 
 function buildUpdaters(
   updateCharacters: (options: {
@@ -19,34 +18,43 @@ function buildUpdaters(
     id: string;
     length: number;
     offset: number;
+    addToast: AddToast;
   }) => void,
+  addToast: AddToast,
 ) {
   function updateClipAnimations(options: {
     id: string;
     length: number;
     offset: number;
   }) {
-    updateCharacters({ ...options, type: ClipType.ANIMATION });
+    updateCharacters({ ...options, type: ClipType.ANIMATION, addToast });
   }
   function updateClipPosition(options: { id: string; offset: number }) {
-    updateCharacters({ ...options, length: 0, type: ClipType.TRANSFORM });
+    updateCharacters({
+      ...options,
+      length: 0,
+      type: ClipType.TRANSFORM,
+      addToast,
+    });
   }
   function updateClipLipSync(options: {
     id: string;
     length: number;
     offset: number;
   }) {
-    updateCharacters({ ...options, type: ClipType.AUDIO });
+    updateCharacters({ ...options, type: ClipType.AUDIO, addToast });
   }
   return { updateClipLipSync, updateClipPosition, updateClipAnimations };
 }
+
 interface Props {
   character: CharacterTrack;
 }
 
 export const Character = ({ character }: Props) => {
+  const { addToast } = useContext(ToasterContext);
   const { updateClipLipSync, updateClipPosition, updateClipAnimations } =
-    useMemo(() => buildUpdaters(updateCharacters), []);
+    useMemo(() => buildUpdaters(updateCharacters, addToast), [addToast]);
 
   const { animationClips, positionKeyframes, lipSyncClips, minimized } =
     character;

@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useContext } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
   inferenceJobs,
@@ -10,7 +10,7 @@ import {
   GetJobStatusResponse,
   JobState,
 } from "~/pages/PageEnigma/models";
-import { ToasterContext } from "~/contexts/ToasterContext";
+import { ToasterContext, ToastTypes } from "~/contexts/ToasterContext";
 import { activeJobs, movies } from "~/pages/PageEnigma/store";
 import { listMediaByUser } from "~/api";
 import { AuthenticationContext } from "~/contexts/Authentication";
@@ -134,7 +134,7 @@ export const useInferenceJobManager = () => {
                 });
                 return;
               }
-              addToast("error", (res as ErrorResponse).error_reason);
+              addToast(ToastTypes.ERROR, (res as ErrorResponse).error_reason);
             },
           );
         }

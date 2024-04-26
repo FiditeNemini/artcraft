@@ -3,17 +3,20 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import { characterGroup } from "~/pages/PageEnigma/store";
+import { AddToast, ToastTypes } from "~/contexts/ToasterContext";
 
 export function updateCharacters({
   type,
   id,
   offset,
   length,
+  addToast,
 }: {
   type: ClipType;
   id: string;
   length?: number;
   offset: number;
+  addToast: AddToast;
 }) {
   const oldCharacterGroup = characterGroup.value;
   if (type === ClipType.ANIMATION) {
@@ -56,6 +59,18 @@ export function updateCharacters({
         if (keyframeIndex === -1) {
           return { ...character };
         }
+
+        // first check to see if there is an existing keyframe at this offset
+        if (
+          newPositionKeyframes.some((keyframe) => keyframe.offset === offset)
+        ) {
+          addToast(
+            ToastTypes.WARNING,
+            "There can only be one keyframe at this offset.",
+          );
+          return { ...character };
+        }
+
         const keyframe = newPositionKeyframes[keyframeIndex];
         keyframe.offset = offset;
 

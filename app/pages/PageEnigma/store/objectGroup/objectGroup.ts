@@ -1,7 +1,6 @@
 import { signal } from "@preact/signals-core";
 import {
   Keyframe,
-  MediaItem,
   ObjectGroup,
   QueueKeyframe,
 } from "~/pages/PageEnigma/models";
@@ -9,6 +8,7 @@ import * as uuid from "uuid";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { AddToast, ToastTypes } from "~/contexts/ToasterContext";
 
 export const objectGroup = signal<ObjectGroup>({
   id: "OB1",
@@ -18,23 +18,13 @@ export const objectGroup = signal<ObjectGroup>({
 export function addObjectKeyframe(
   keyframe: QueueKeyframe,
   offset: number,
-  addToast: (type: "error" | "warning" | "success", message: string) => void,
+  addToast: AddToast,
 ) {
   const oldObjectGroup = objectGroup.value;
   const obj = oldObjectGroup.objects.find(
     (row) => row.object_uuid === keyframe.object_uuid,
   );
 
-  if (obj && obj.keyframes.some((row) => row.offset === offset)) {
-    addToast("warning", "There can only be one keyframe at this offset.");
-    return;
-  }
-
-  const newObject = obj ?? {
-    object_uuid: keyframe.object_uuid,
-    name: keyframe.object_name ?? "unknown",
-    keyframes: [] as Keyframe[],
-  };
   const newKeyframe = {
     version: keyframe.version,
     keyframe_uuid: uuid.v4(),
@@ -46,11 +36,36 @@ export function addObjectKeyframe(
     scale: keyframe.scale,
     selected: false,
   } as Keyframe;
-  newObject.keyframes.push(newKeyframe);
 
-  newObject.keyframes.sort(
+  // check to see if there is an existing keyframe at this offset for this object
+  // if so, update the existing item, instead of adding a new one
+  const existingKeyframe =
+    obj && obj.keyframes.find((row) => row.offset === offset);
+  if (existingKeyframe) {
+    addToast(
+      ToastTypes.WARNING,
+      "There can only be one keyframe at this offset.",
+    );
+    newKeyframe.object_uuid = existingKeyframe.object_uuid;
+  }
+
+  const newObject = obj ?? {
+    object_uuid: keyframe.object_uuid,
+    name: keyframe.object_name ?? "unknown",
+    keyframes: [] as Keyframe[],
+  };
+
+  const newKeyframes = [
+    ...newObject.keyframes.filter(
+      (keyframe) => keyframe.object_uuid !== existingKeyframe?.object_uuid,
+    ),
+    newKeyframe,
+  ];
+
+  newKeyframes.sort(
     (keyframeA, keyframeB) => keyframeA.offset - keyframeB.offset,
   );
+  newObject.keyframes = newKeyframes;
 
   objectGroup.value = {
     ...oldObjectGroup,
@@ -63,7 +78,9 @@ export function addObjectKeyframe(
   };
   Queue.publish({
     queueName: QueueNames.TO_ENGINE,
-    action: toEngineActions.ADD_KEYFRAME,
+    action: existingKeyframe
+      ? toEngineActions.UPDATE_KEYFRAME
+      : toEngineActions.ADD_KEYFRAME,
     data: newKeyframe,
   });
 }

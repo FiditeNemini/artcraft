@@ -3,14 +3,14 @@ import { filmLength, scale, selectedItem } from "~/pages/PageEnigma/store";
 import { useMouseEventsKeyframe } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsKeyframe";
 import { useSignals } from "@preact/signals-react/runtime";
 import { useContext } from "react";
-import { ToasterContext } from "~/contexts/ToasterContext";
+import { AddToast, ToasterContext } from "~/contexts/ToasterContext";
 
 interface Props {
   keyframe: Keyframe;
   updateKeyframe: (options: {
     id: string;
     offset: number;
-    addToast: (type: "error" | "warning" | "success", message: string) => void;
+    addToast: AddToast;
   }) => void;
 }
 

@@ -2,13 +2,16 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import { objectGroup } from "~/pages/PageEnigma/store";
+import { AddToast, ToastTypes } from "~/contexts/ToasterContext";
 
 export function updateObject({
   id,
   offset,
+  addToast,
 }: {
   id: string;
   offset: number;
+  addToast: AddToast;
 }): void {
   const oldObjectGroup = objectGroup.value;
   const obj = oldObjectGroup.objects.find((objectTrack) =>
@@ -19,12 +22,15 @@ export function updateObject({
     return;
   }
 
-  const existingKeyframe = obj.keyframes.some((row) => {
+  const existingKeyframe = obj.keyframes.find((row) => {
     return row.offset === offset && row.keyframe_uuid !== id;
   });
 
   if (existingKeyframe) {
-    //toast.error("There can only be one keyframe at this offset.");
+    addToast(
+      ToastTypes.WARNING,
+      "There can only be one keyframe at this offset.",
+    );
     return;
   }
 

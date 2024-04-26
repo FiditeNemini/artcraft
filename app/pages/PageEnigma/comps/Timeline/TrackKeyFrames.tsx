@@ -1,5 +1,6 @@
 import { ClipGroup, Keyframe } from "~/pages/PageEnigma/models";
 import { TrackKeyFrame } from "~/pages/PageEnigma/comps/Timeline/TrackKeyFrame";
+import { AddToast } from "~/contexts/ToasterContext";
 
 interface Props {
   id: string;
@@ -12,7 +13,7 @@ interface Props {
     id: string;
     offset: number;
     force?: boolean;
-    addToast: (type: "error" | "warning" | "success", message: string) => void;
+    addToast: AddToast;
   }) => void;
 }
 

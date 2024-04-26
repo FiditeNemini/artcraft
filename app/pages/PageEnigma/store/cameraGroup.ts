@@ -9,6 +9,7 @@ import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
 import { signal } from "@preact/signals-core";
 import { ClipUI } from "~/pages/PageEnigma/datastructures/clips/clip_ui";
+import { AddToast, ToastTypes } from "~/contexts/ToasterContext";
 
 export const cameraGroup = signal<CameraGroup>({ id: "CG1", keyframes: [] });
 
@@ -19,16 +20,19 @@ export function updateCamera({
 }: {
   id: string;
   offset: number;
-  addToast: (type: "error" | "warning" | "success", message: string) => void;
+  addToast: AddToast;
 }) {
   const oldCameraGroup = cameraGroup.value;
 
-  const existingKeyframe = oldCameraGroup.keyframes.some((row) => {
+  const existingKeyframe = oldCameraGroup.keyframes.find((row) => {
     return row.offset === offset && row.keyframe_uuid !== id;
   });
 
   if (existingKeyframe) {
-    addToast("warning", "There can only be one keyframe at this offset.");
+    addToast(
+      ToastTypes.WARNING,
+      "There can only be one keyframe at this offset.",
+    );
     return;
   }
 
@@ -54,13 +58,10 @@ export function updateCamera({
 export function addCameraKeyframe(
   keyframe: QueueKeyframe,
   offset: number,
-  addToast: (type: "error" | "warning" | "success", message: string) => void,
+  addToast: AddToast,
 ) {
   const oldCameraGroup = cameraGroup.value;
-  if (oldCameraGroup.keyframes.some((row) => row.offset === offset)) {
-    addToast("warning", "There can only be one keyframe at this offset.");
-    return;
-  }
+
   const newKeyframe = {
     version: keyframe.version,
     keyframe_uuid: uuid.v4(),
@@ -73,16 +74,33 @@ export function addCameraKeyframe(
     selected: false,
   } as Keyframe;
 
+  const existingKeyframe = oldCameraGroup.keyframes.find(
+    (row) => row.offset === offset,
+  );
+  if (existingKeyframe) {
+    addToast(
+      ToastTypes.WARNING,
+      "There can only be one keyframe at this offset.",
+    );
+    newKeyframe.keyframe_uuid = existingKeyframe.keyframe_uuid;
+  }
+
   cameraGroup.value = {
     ...oldCameraGroup,
-    keyframes: [...oldCameraGroup.keyframes, newKeyframe].sort(
-      (keyFrameA, keyframeB) => keyFrameA.offset - keyframeB.offset,
-    ),
+    keyframes: [
+      ...oldCameraGroup.keyframes.filter(
+        (keyframe) =>
+          keyframe.keyframe_uuid !== existingKeyframe?.keyframe_uuid,
+      ),
+      newKeyframe,
+    ].sort((keyFrameA, keyframeB) => keyFrameA.offset - keyframeB.offset),
   };
 
   Queue.publish({
     queueName: QueueNames.TO_ENGINE,
-    action: toEngineActions.ADD_KEYFRAME,
+    action: existingKeyframe
+      ? toEngineActions.UPDATE_KEYFRAME
+      : toEngineActions.ADD_KEYFRAME,
     data: newKeyframe,
   });
 }

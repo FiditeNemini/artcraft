@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Keyframe } from "~/pages/PageEnigma/models";
 import { canDrop, scale } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
+import { AddToast } from "~/contexts/ToasterContext";
 
 export const useMouseEventsKeyframe = ({
   keyframe,
@@ -16,9 +17,9 @@ export const useMouseEventsKeyframe = ({
   updateKeyframe: (args: {
     id: string;
     offset: number;
-    addToast: (type: "error" | "warning" | "success", message: string) => void;
+    addToast: AddToast;
   }) => void;
-  addToast: (type: "error" | "warning" | "success", message: string) => void;
+  addToast: AddToast;
 }) => {
   useSignals();
   const [offset, setOffset] = useState(-1);

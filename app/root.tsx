@@ -67,7 +67,6 @@ export async function loader() {
       CDN_API: process.env.CDN_API || "%BUILD_CDN_API%",
     },
   });
-  console.log('environment is', env);
   return env;
 }
 
@@ -103,7 +102,6 @@ export default function App() {
 
   useEffect(() => {
     environmentVariables.value = data.ENV;
-    console.log('data.ENV is', data.ENV);
   }, [data]);
 
   return (

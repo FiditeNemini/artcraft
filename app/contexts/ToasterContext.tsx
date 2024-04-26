@@ -16,15 +16,23 @@ import * as uuid from "uuid";
 
 export interface Toast {
   id: string;
-  type: "success" | "warning" | "error";
+  type: ToastTypes;
   icon: ReactNode;
   title: string;
   message: string;
 }
 
+export enum ToastTypes {
+  SUCCESS,
+  WARNING,
+  ERROR,
+}
+
+export type AddToast = (type: ToastTypes, message: string) => void;
+
 export interface ToastProps {
   toasts: Toast[];
-  addToast: (type: "success" | "warning" | "error", message: string) => void;
+  addToast: AddToast;
 }
 
 const ICONS: Record<string, ReactNode> = {
@@ -46,9 +54,9 @@ const ICONS: Record<string, ReactNode> = {
 };
 
 const TITLES = {
-  error: "Error!",
-  warning: "Warning!",
-  success: "Success",
+  [ToastTypes.ERROR]: "Error!",
+  [ToastTypes.WARNING]: "Warning!",
+  [ToastTypes.SUCCESS]: "Success",
 };
 
 export const ToasterContext = createContext<ToastProps>({
@@ -59,30 +67,27 @@ export const ToasterContext = createContext<ToastProps>({
 export const ToasterProvider = ({ children }: { children: ReactNode }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const addToast = useCallback(
-    (type: "success" | "warning" | "error", message: string) => {
-      const toast = {
-        id: uuid.v4(),
-        type,
-        icon: ICONS[type],
-        title: TITLES[type],
-        message,
-      } as Toast;
-      setToasts((oldToasts) => {
-        return [toast, ...oldToasts];
-      });
+  const addToast = useCallback((type: ToastTypes, message: string) => {
+    const toast = {
+      id: uuid.v4(),
+      type,
+      icon: ICONS[type],
+      title: TITLES[type],
+      message,
+    } as Toast;
+    setToasts((oldToasts) => {
+      return [toast, ...oldToasts];
+    });
 
-      setTimeout(
-        () => {
-          setToasts((oldToasts) =>
-            oldToasts.filter((row) => row.id !== toast.id),
-          );
-        },
-        type === "success" ? 20000 : 3000,
-      );
-    },
-    [],
-  );
+    setTimeout(
+      () => {
+        setToasts((oldToasts) =>
+          oldToasts.filter((row) => row.id !== toast.id),
+        );
+      },
+      type === ToastTypes.SUCCESS ? 20000 : 3000,
+    );
+  }, []);
 
   const value = useMemo(() => {
     return {
@@ -97,8 +102,7 @@ export const ToasterProvider = ({ children }: { children: ReactNode }) => {
         <div
           key={toast.id}
           className="rounded=lg fixed z-50 bg-black p-4"
-          style={{ top: 74 + index * 80, right: 6 }}
-        >
+          style={{ top: 74 + index * 80, right: 6 }}>
           <div className="mr-3 flex justify-between rounded-lg">
             <div>
               <div className="ml-3 flex items-center gap-4">
@@ -117,8 +121,7 @@ export const ToasterProvider = ({ children }: { children: ReactNode }) => {
                   oldToasts.filter((row) => row.id !== toast.id),
                 )
               }
-              className="text-sm font-bold text-white opacity-50"
-            >
+              className="text-sm font-bold text-white opacity-50">
               <FontAwesomeIcon icon={faXmark} />
             </button>
           </div>

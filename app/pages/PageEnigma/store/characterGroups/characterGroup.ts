@@ -12,6 +12,7 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
+import { AddToast, ToastTypes } from "~/contexts/ToasterContext";
 
 export const characterGroup = signal<CharacterGroup>({
   id: "CG1",
@@ -113,23 +114,9 @@ export function addCharacterAudio({
 export function addCharacterKeyframe(
   keyframe: QueueKeyframe,
   offset: number,
-  addToast: (type: "error" | "warning" | "success", message: string) => void,
+  addToast: AddToast,
 ) {
   const oldCharacterGroup = characterGroup.value;
-
-  if (
-    oldCharacterGroup.characters.some((characterTrack) => {
-      if (characterTrack.object_uuid !== keyframe.object_uuid) {
-        return;
-      }
-      return characterTrack.positionKeyframes.some(
-        (row) => row.offset === offset,
-      );
-    })
-  ) {
-    addToast("warning", "There can only be one keyframe at this offset.");
-    return;
-  }
 
   const newKeyframe = {
     version: keyframe.version,
@@ -143,6 +130,31 @@ export function addCharacterKeyframe(
     selected: false,
   } as Keyframe;
 
+  // check to see if there is an existing keyframe at this offset for this character
+  // if so, update the existing item, instead of adding a new one
+  const keyframeAtOffset = oldCharacterGroup.characters.reduce(
+    (foundKeyframe, characterTrack) => {
+      if (foundKeyframe) {
+        return foundKeyframe;
+      }
+      if (characterTrack.object_uuid !== keyframe.object_uuid) {
+        return;
+      }
+      return characterTrack.positionKeyframes.find(
+        (row) => row.offset === offset,
+      );
+    },
+    undefined as Keyframe | undefined,
+  );
+
+  if (keyframeAtOffset) {
+    addToast(
+      ToastTypes.WARNING,
+      "Keyframe at this location has been overridden.",
+    );
+    newKeyframe.keyframe_uuid = keyframeAtOffset.keyframe_uuid;
+  }
+
   characterGroup.value = {
     ...oldCharacterGroup,
     characters: oldCharacterGroup.characters.map((character) => {
@@ -152,15 +164,21 @@ export function addCharacterKeyframe(
 
       Queue.publish({
         queueName: QueueNames.TO_ENGINE,
-        action: toEngineActions.ADD_KEYFRAME,
+        action: keyframeAtOffset
+          ? toEngineActions.UPDATE_KEYFRAME
+          : toEngineActions.ADD_KEYFRAME,
         data: newKeyframe,
       });
 
       return {
         ...character,
-        positionKeyframes: [...character.positionKeyframes, newKeyframe].sort(
-          (clipA, clipB) => clipA.offset - clipB.offset,
-        ),
+        positionKeyframes: [
+          ...character.positionKeyframes.filter(
+            (keyframe) =>
+              keyframe.keyframe_uuid !== keyframeAtOffset?.keyframe_uuid,
+          ),
+          newKeyframe,
+        ].sort((clipA, clipB) => clipA.offset - clipB.offset),
       };
     }),
   };
