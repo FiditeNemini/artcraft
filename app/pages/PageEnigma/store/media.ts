@@ -571,6 +571,13 @@ export const devCharacterItems = signal<MediaItem[]>([
     name: "Pop",
     thumbnail: "/resources/placeholders/placeholder.png",
   },
+  {
+    version: 1,
+    media_id: "m_ja13tz27cqqvy366tsed4z4kh4gg0m",
+    type: AssetType.CHARACTER,
+    name: "Roko",
+    thumbnail: "/resources/placeholders/placeholder.png",
+  }
 ]);
 
 export const objectItems = signal<MediaItem[]>([
