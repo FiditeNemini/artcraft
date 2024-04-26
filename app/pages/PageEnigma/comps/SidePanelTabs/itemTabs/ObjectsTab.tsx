@@ -80,6 +80,8 @@ export const ObjectsTab = ({ type }: Props) => {
                 100,
               );
               return {
+                colorIndex: item.cover_image.default_cover.color_index,
+                imageIndex: item.cover_image.default_cover.image_index,
                 media_id: item.token,
                 name: item.maybe_title,
                 type: AssetType.OBJECT,

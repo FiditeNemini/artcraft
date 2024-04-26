@@ -21,7 +21,6 @@ export const Button = ({
   ...rest
 }: ButtonPropsI) => {
   const ButtonType = htmlFor ? "label" : "button";
-  const variant = disabled ? "disabled" : propsVariant;
 
   function getVariantClassNames(variant: string) {
     switch (variant) {
@@ -50,10 +49,13 @@ export const Button = ({
   );
 
   return (
-    <button className={className} disabled={disabled} {...rest}>
+    <ButtonType
+      className={className}
+      disabled={disabled}
+      {...{ ...rest, htmlFor }}>
       {icon && !iconFlip ? <FontAwesomeIcon icon={icon} /> : null}
       <div>{children}</div>
       {icon && iconFlip ? <FontAwesomeIcon icon={icon} /> : null}
-    </button>
+    </ButtonType>
   );
 };

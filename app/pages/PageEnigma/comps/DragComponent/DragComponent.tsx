@@ -6,6 +6,7 @@ import {
   scale,
 } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
+import "./DragComponent.scss";
 
 export const DragComponent = () => {
   useSignals();
@@ -14,6 +15,10 @@ export const DragComponent = () => {
   if (!dragItem.value) {
     return null;
   }
+
+  const thumbnail = dragItem.value.thumbnail
+    ? dragItem.value.thumbnail
+    : `/resources/images/default-covers/${dragItem.value.imageIndex}.webp`;
 
   return (
     <>
@@ -36,25 +41,26 @@ export const DragComponent = () => {
         />
       ) : (
         <div
-          className="absolute rounded-lg"
+          className="dragging-item-container absolute rounded-lg"
           style={{
             width: 91,
             height: 114,
             top: currY - 57,
             left: currX + 1,
             zIndex: 10000,
-          }}
-        >
+          }}>
           <img
-            src={dragItem.value.thumbnail}
+            {...{
+              crossOrigin: "anonymous",
+              src: thumbnail,
+            }}
             alt={dragItem.value.name}
             className="rounded-t-lg"
           />
           <div
-            className="w-full rounded-b-lg py-1 text-center text-sm"
-            style={{ backgroundColor: "#39394D" }}
-          >
-            {dragItem.value.name}
+            className="text-overflow-ellipsis w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
+            style={{ backgroundColor: "#39394D" }}>
+            {dragItem.value.name || dragItem.value.media_id}
           </div>
         </div>
       )}

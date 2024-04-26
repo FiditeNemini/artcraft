@@ -1,6 +1,7 @@
 import { ItemElement } from "./ItemElement";
 import { AssetFilterOption, MediaItem } from "~/pages/PageEnigma/models";
 import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
+import "./ItemElements.scss";
 
 interface Props {
   debug?: string;

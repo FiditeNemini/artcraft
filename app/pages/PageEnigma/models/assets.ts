@@ -1,4 +1,5 @@
 export interface MediaItem {
+  colorIndex?: number;
   version: number;
   type: AssetType;
   media_id: string;
@@ -8,6 +9,7 @@ export interface MediaItem {
   publicBucketPath?: string;
   length?: number;
   thumbnail?: string;
+  imageIndex?: number;
   isMine?: boolean;
   isBookmarked?: boolean;
 }
@@ -28,6 +30,6 @@ export enum AssetFilterOption {
   BOOKMARKED,
 }
 
-export interface AudioMediaItem extends MediaItem{
+export interface AudioMediaItem extends MediaItem {
   category?: string;
 }

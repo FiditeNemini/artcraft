@@ -9,31 +9,30 @@ export enum WeightCategory {
 
 export enum MediaFileClass {
   /// Unknown (default value)
- /// This will be present until we migrate all old files.
- Unknown = "unknown",
+  /// This will be present until we migrate all old files.
+  Unknown = "unknown",
 
- /// Audio files: wav, mp3, etc.
- Audio = "audio",
+  /// Audio files: wav, mp3, etc.
+  Audio = "audio",
 
- /// Image files: png, jpeg, etc.
- Image = "image",
+  /// Image files: png, jpeg, etc.
+  Image = "image",
 
- /// Video files: mp4, etc.
- Video = "video",
+  /// Video files: mp4, etc.
+  Video = "video",
 
- /// Engine "animations"
- Animation = "animation",
+  /// Engine "animations"
+  Animation = "animation",
 
- /// Engine "characters"
- Character = "character",
+  /// Engine "characters"
+  Character = "character",
 
- /// Engine "prop" items
- Prop = "prop",
+  /// Engine "prop" items
+  Prop = "prop",
 
- /// Engine scenes (internal and external scenes)
- Scene = "scene",
+  /// Engine scenes (internal and external scenes)
+  Scene = "scene",
 }
-
 
 export enum MediaFileType {
   Audio = "audio",
@@ -64,7 +63,6 @@ export enum MediaFileType {
   None = "none",
 }
 
-
 export enum MediaFileSubtype {
   /// Animation file from Mixamo
   /// Primarily used for FBX and GLB.
@@ -94,21 +92,19 @@ export enum MediaFileSubtype {
 /// A common type returned by several endpoints.
 /// Basic information to display a user and their avatar.
 export interface UserDetailsLight {
-  user_token: string,
+  user_token: string;
   /// Username (lowercase)
-  username: string,
+  username: string;
   /// Username with user-specified capitalization
-  display_name: string,
-  gravatar_hash: string,
-  default_avatar: DefaultAvatarInfo,
-
+  display_name: string;
+  gravatar_hash: string;
+  default_avatar: DefaultAvatarInfo;
 }
 
 export interface DefaultAvatarInfo {
-  image_index: number,
-  color_index: number,
+  image_index: number;
+  color_index: number;
 }
-
 
 export enum WeightType {
   TT2 = "tt2",
@@ -134,6 +130,13 @@ export interface MediaFile {
   maybe_original_filename: string | null;
   maybe_creator_user: UserDetailsLight | null;
   maybe_prompt_token: string | null;
+  cover_image: {
+    maybe_cover_image_public_bucket_path: string | null;
+    default_cover: {
+      color_index: number;
+      image_index: number;
+    };
+  };
   creator_set_visibility: string;
   created_at: Date;
   updated_at: Date;
@@ -153,37 +156,37 @@ export interface GetMediaFileResponse {
 }
 
 export interface VoiceConversionModelListItem {
-  token: string,
-  model_type: string,
-  title: string,
+  token: string;
+  model_type: string;
+  title: string;
 
-  creator: CreatorDetails,
-  creator_set_visibility: string,
+  creator: CreatorDetails;
+  creator_set_visibility: string;
 
-  ietf_language_tag: string,
-  ietf_primary_language_subtag: string,
-  is_front_page_featured: boolean,
+  ietf_language_tag: string;
+  ietf_primary_language_subtag: string;
+  is_front_page_featured: boolean;
 
-  created_at: string,
-  updated_at: string,
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CreatorDetails {
-  user_token: string,
-  username: string,
-  display_name: string,
-  gravatar_hash: string,
+  user_token: string;
+  username: string;
+  display_name: string;
+  gravatar_hash: string;
 }
 
 export interface VoiceConversionModelListResponse {
-  success: boolean,
-  models: Array<VoiceConversionModelListItem>,
+  success: boolean;
+  models: Array<VoiceConversionModelListItem>;
 }
 
 export interface EnqueueVoiceConversionRequest {
-  uuid_idempotency_token: string,
-  voice_conversion_model_token: string,
-  source_media_upload_token: string,
+  uuid_idempotency_token: string;
+  voice_conversion_model_token: string;
+  source_media_upload_token: string;
 
   // Optional args
   // auto_predict_f0?: boolean,
@@ -192,6 +195,6 @@ export interface EnqueueVoiceConversionRequest {
 }
 
 export interface EnqueueVoiceConversionResponse {
-  success: boolean,
-  inference_job_token?: string,
+  success: boolean;
+  inference_job_token?: string;
 }

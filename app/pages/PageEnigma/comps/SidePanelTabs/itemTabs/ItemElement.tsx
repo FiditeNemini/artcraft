@@ -18,6 +18,9 @@ export const ItemElement = ({ item }: Props) => {
   useSignals();
   const { startDrag, endDrag } = useContext(TrackContext);
   const { initX, initY } = initPosition.value;
+  const thumbnail = item.thumbnail
+    ? item.thumbnail
+    : `/resources/images/default-covers/${item.imageIndex}.webp`;
 
   useEffect(() => {
     const onPointerUp = () => {
@@ -65,17 +68,20 @@ export const ItemElement = ({ item }: Props) => {
 
   return (
     <div
-      className="relative w-full cursor-pointer rounded-lg transition-all duration-200"
+      className="sidebar-object-item relative w-full cursor-pointer rounded-lg transition-all duration-200"
       onPointerDown={onPointerDown}>
       <img
-        src={item.thumbnail}
+        {...{
+          crossOrigin: "anonymous",
+          src: thumbnail,
+        }}
         alt={item.name}
         className="aspect-[4.5/5] w-full rounded-t-lg object-cover object-center"
       />
       <div
         className="text-overflow-ellipsis w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
         style={{ backgroundColor: "#39394D" }}>
-        {item.name}
+        {item.name || item.media_id}
       </div>
     </div>
   );
