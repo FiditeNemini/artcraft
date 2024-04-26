@@ -122,11 +122,37 @@ pub async fn list_session_jobs_from_connection(
 {
   let mut query_builder: QueryBuilder<MySql> = make_query_builder();
 
-  query_builder.push(" WHERE jobs.maybe_creator_user_token = ");
-  query_builder.push_bind(args.user_token.to_string());
+  // NB: We can't use a subquery because -
+  //
+  //   "This version of MySQL doesn't yet support 'LIMIT & IN/ALL/ANY/SOME subquery"
+  //   https://stackoverflow.com/a/17892886
+  //
+  // NB: The join query is meant to run fast via query planner. The intent is to
+  // save us from users that might automate 10k+ jobs within a 36-hour period.
+  //
+  // The join query is limited to 100 records, which will spare the outer query.
+  // Furthermore, even though the join query's `created_at` lacks an index, sort
+  // by id will accomplish this quickly.
+  {
+    query_builder.push(r#"
+    INNER JOIN (
+       SELECT id
+       FROM generic_inference_jobs
+       WHERE maybe_creator_user_token =
+    "#);
 
-  // NB: `created_at` doesn't have an index, but `maybe_creator_user_token` does.
-  query_builder.push(" AND jobs.created_at > DATE_SUB(NOW(), INTERVAL 36 HOUR) ");
+    query_builder.push_bind(args.user_token.to_string());
+
+    query_builder.push(r#"
+       AND created_at > DATE_SUB(NOW(), INTERVAL 36 HOUR)
+       ORDER BY id DESC
+       LIMIT 100
+     ) AS j
+     ON jobs.id = j.id
+    "#);
+  }
+
+  query_builder.push(" WHERE jobs.is_dismissed_by_user = FALSE ");
 
   if let Some(statuses) = args.maybe_include_job_statuses {
     if !statuses.is_empty() {
@@ -151,9 +177,6 @@ pub async fn list_session_jobs_from_connection(
       separated.push_unseparated(") ");
     }
   }
-
-  query_builder.push(" ORDER BY jobs.id DESC ");
-  query_builder.push(" LIMIT 100 ");
 
   let query = query_builder.build_query_as::<RawGenericInferenceJobStatus>();
 
