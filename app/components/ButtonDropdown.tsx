@@ -67,7 +67,7 @@ export const ButtonDropdown = ({
       <Menu as="div" className="inline-block text-left">
         <Menu.Button as="div">
           <Button icon={faChevronDown} iconFlip={true} variant="secondary">
-            {icon ? <FontAwesomeIcon icon={icon} className="mr-2" /> : null}
+            {icon ? <FontAwesomeIcon icon={icon} /> : null}
             {label}
           </Button>
         </Menu.Button>
