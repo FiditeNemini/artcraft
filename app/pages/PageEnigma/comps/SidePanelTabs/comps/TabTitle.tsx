@@ -20,7 +20,7 @@ export function TabTitle({ title, onBack }: Props) {
   };
 
   return (
-    <div className="flex items-center justify-between pb-3">
+    <div className="flex items-center justify-between px-4">
       {onBack ? (
         <div className="flex items-center gap-2">
           <button onClick={onBack}>

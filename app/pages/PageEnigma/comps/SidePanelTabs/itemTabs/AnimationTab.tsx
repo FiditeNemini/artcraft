@@ -12,42 +12,40 @@ export const AnimationTab = () => {
 
   return (
     <>
-      <div className="w-full overflow-x-auto p-4 pb-0">
-        <TabTitle title="Animation" />
-        <div className="mb-4 flex justify-start gap-2">
-          <button
-            className={twMerge(
-              "filter-tab",
-              animationFilter.value === AssetFilterOption.ALL ? "active" : "",
-            )}
-            onClick={() => (animationFilter.value = AssetFilterOption.ALL)}>
-            All
-          </button>
-          <button
-            className={twMerge(
-              "filter-tab",
-              animationFilter.value === AssetFilterOption.MINE ? "active" : "",
-            )}
-            onClick={() => (animationFilter.value = AssetFilterOption.MINE)}
-            disabled={!animationItems.value.some((item) => item.isMine)}>
-            My Animations
-          </button>
-          <button
-            className={twMerge(
-              "filter-tab",
-              animationFilter.value === AssetFilterOption.BOOKMARKED
-                ? "active"
-                : "",
-            )}
-            onClick={() =>
-              (animationFilter.value = AssetFilterOption.BOOKMARKED)
-            }
-            disabled={!animationItems.value.some((item) => item.isBookmarked)}>
-            Bookmarked
-          </button>
-        </div>
+      <TabTitle title="Animation" />
+      <div className="w-full h-48 overflow-x-auto px-4 flex items-center justify-start gap-2">
+        <button
+          className={twMerge(
+            "filter-tab",
+            animationFilter.value === AssetFilterOption.ALL ? "active" : "",
+          )}
+          onClick={() => (animationFilter.value = AssetFilterOption.ALL)}>
+          All
+        </button>
+        <button
+          className={twMerge(
+            "filter-tab",
+            animationFilter.value === AssetFilterOption.MINE ? "active" : "",
+          )}
+          onClick={() => (animationFilter.value = AssetFilterOption.MINE)}
+          disabled={!animationItems.value.some((item) => item.isMine)}>
+          My Animations
+        </button>
+        <button
+          className={twMerge(
+            "filter-tab",
+            animationFilter.value === AssetFilterOption.BOOKMARKED
+              ? "active"
+              : "",
+          )}
+          onClick={() =>
+            (animationFilter.value = AssetFilterOption.BOOKMARKED)
+          }
+          disabled={!animationItems.value.some((item) => item.isBookmarked)}>
+          Bookmarked
+        </button>
       </div>
-      <div className="w-full px-4 pb-4">
+      <div className="w-full px-4">
         <Button
           icon={faCirclePlus}
           variant="action"
@@ -55,7 +53,7 @@ export const AnimationTab = () => {
           Upload Animation
         </Button>
       </div>
-      <div className="h-full w-full overflow-y-auto px-4">
+      <div className="grow flex w-full overflow-y-auto px-4 pb-4">
         <ItemElements
           items={animationItems.value}
           assetFilter={animationFilter.value}

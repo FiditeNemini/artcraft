@@ -42,11 +42,11 @@ export const PageSelectV2VModel = ({
 
       <Input
         ref={refCallback}
-        className="mb-4"
+        className="px-4"
         placeholder="Search Voice by Name"
         onChange={(e)=>setQuery(e.target.value)}
       />
-      <div className="flex flex-col gap-3">
+      <div className="grow w-full flex flex-col overflow-y-auto px-4 pb-4 gap-4">
         {slicedArray.map((item)=>{
           return(
             <VoiceModelElement

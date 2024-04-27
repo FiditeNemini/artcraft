@@ -41,22 +41,21 @@ export const PageSelectTtsModel = ({
 
       <Input
         ref={refCallback}
-        className="mb-4"
+        className="px-4"
         placeholder="Search Voice by Name"
         onChange={(e)=>setQuery(e.target.value)}
       />
-      <div className="w-full overflow-x-auto">
-        <div className="flex flex-col gap-3">
-          {slicedArray.map((item)=>{
-            return(
-              <VoiceModelElement
-                key={item.model_token}
-                model={item}
-                onSelect={(item)=>onSelect(item as TtsModelListItem)}
-              />
-            );
-          })}
-        </div>
+
+      <div className="grow w-full flex flex-col overflow-y-auto px-4 pb-4 gap-4">
+        {slicedArray.map((item)=>{
+          return(
+            <VoiceModelElement
+              key={item.model_token}
+              model={item}
+              onSelect={(item)=>onSelect(item as TtsModelListItem)}
+            />
+          );
+        })}
       </div>
     </div>
   );

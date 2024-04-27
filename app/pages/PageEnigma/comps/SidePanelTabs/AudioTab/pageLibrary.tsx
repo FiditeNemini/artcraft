@@ -40,42 +40,41 @@ export const PageLibrary = ({
 
   return (
     <>
-      <div className="w-full overflow-x-auto px-4">
-        <TabTitle title="Audio" />
-        <div className="mb-4 flex items-center justify-start gap-2">
-          <button
-            className={twMerge(
-              "filter-tab",
-              audioFilter.value === AssetFilterOption.ALL ? "active" : "",
-              "disabled",
-            )}
-            onClick={() => (audioFilter.value = AssetFilterOption.ALL)}>
-            All
-          </button>
-          <button
-            className={twMerge(
-              "filter-tab",
-              audioFilter.value === AssetFilterOption.MINE ? "active" : "",
-              "disabled",
-            )}
-            onClick={() => (audioFilter.value = AssetFilterOption.MINE)}
-            disabled={!allAudioItems.value.some((item) => item.isMine)}>
-            My Audios
-          </button>
-          <button
-            className={twMerge(
-              "filter-tab",
-              audioFilter.value === AssetFilterOption.BOOKMARKED
-                ? "active"
-                : "",
-              "disabled",
-            )}
-            onClick={() => (audioFilter.value = AssetFilterOption.BOOKMARKED)}
-            disabled={!allAudioItems.value.some((item) => item.isBookmarked)}>
-            Bookmarked
-          </button>
-        </div>
+      <TabTitle title="Audio" />
+      <div className="w-full h-48 overflow-x-auto px-4 flex items-center justify-start gap-2">
+        <button
+          className={twMerge(
+            "filter-tab",
+            audioFilter.value === AssetFilterOption.ALL ? "active" : "",
+            "disabled",
+          )}
+          onClick={() => (audioFilter.value = AssetFilterOption.ALL)}>
+          All
+        </button>
+        <button
+          className={twMerge(
+            "filter-tab",
+            audioFilter.value === AssetFilterOption.MINE ? "active" : "",
+            "disabled",
+          )}
+          onClick={() => (audioFilter.value = AssetFilterOption.MINE)}
+          disabled={!allAudioItems.value.some((item) => item.isMine)}>
+          My Audios
+        </button>
+        <button
+          className={twMerge(
+            "filter-tab",
+            audioFilter.value === AssetFilterOption.BOOKMARKED
+              ? "active"
+              : "",
+            "disabled",
+          )}
+          onClick={() => (audioFilter.value = AssetFilterOption.BOOKMARKED)}
+          disabled={!allAudioItems.value.some((item) => item.isBookmarked)}>
+          Bookmarked
+        </button>
       </div>
+
       <div className="w-full px-4">
         <Button
           icon={faCirclePlus}
@@ -86,7 +85,7 @@ export const PageLibrary = ({
         </Button>
       </div>
 
-      <div className="mt-4 h-full w-full overflow-y-auto px-4">
+      <div className="grow w-full overflow-y-auto px-4 pb-4">
         {audioInferenceJobs.value.length > 0 && (
           <div className="mb-4 grid grid-cols-1 gap-2">
             {audioInferenceJobs.value.map((job) => {
