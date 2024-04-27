@@ -13,6 +13,7 @@ import {
 
 import { H5, H6 } from "~/components";
 import  { AudioTypePill } from "./audioTypePills"
+import { cancelNewFromAudioItem } from "~/pages/PageEnigma/store/mediaFromServer";
 
 function getGcsUrl(bucketRelativePath: string | undefined | null): string {
   let bucket = "vocodes-public";
@@ -61,6 +62,10 @@ export const AudioItemElement = ({ item }: Props) => {
 
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
+      if(item.isNew) {
+        console.log('pointerdown triggered');
+        cancelNewFromAudioItem(item.media_id);
+      }
       if (event.button === 0) {
         startDrag(item);
         currPosition.value = {
@@ -84,6 +89,7 @@ export const AudioItemElement = ({ item }: Props) => {
       <div className="flex w-full flex-col gap-0.5 rounded-lg bg-assets-background p-2.5">
         <div className="flex justify-between">
           <AudioTypePill category={item.category} />
+          {item.isNew && <H6 className="text-media-is-new">New*</H6>}
         </div>
 
         {item.publicBucketPath && (

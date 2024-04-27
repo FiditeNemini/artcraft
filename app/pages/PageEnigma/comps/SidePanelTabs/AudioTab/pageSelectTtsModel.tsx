@@ -1,11 +1,9 @@
 
 import { useCallback, useState } from 'react'
-import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
-
-import { H2, ButtonIcon, Input } from "~/components";
+import { Input } from "~/components";
 import { AudioTabPages } from "./types";
-
 import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
+import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 import { VoiceModelElement } from "./voiceModelElement";
 
 export const PageSelectTtsModel = ({
@@ -36,14 +34,11 @@ export const PageSelectTtsModel = ({
 
   return(
     <div className="flex flex-col px-4 pt-2">
-      <div className="pb-4 flex items-center gap-3">
-        <ButtonIcon
-          className="w-auto p-0 text-xl opacity-60 hover:opacity-40"
-          icon={faChevronLeft}
-          onClick={() => changePage(AudioTabPages.TTS)}
-        />
-        <H2 className="font-semibold">Search TTS Voices</H2>
-      </div>
+      <TabTitle
+        title="Search TTS Voices"
+        onBack={() => changePage(AudioTabPages.GENERATE_AUDIO)}
+      />
+
       <Input
         ref={refCallback}
         className="mb-4"

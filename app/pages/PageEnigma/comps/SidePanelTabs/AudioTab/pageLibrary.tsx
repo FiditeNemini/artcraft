@@ -81,7 +81,7 @@ export const PageLibrary = ({
           icon={faCirclePlus}
           variant="action"
           className="w-full py-3 text-sm font-medium"
-          onClick={() => changePage(AudioTabPages.TTS)}>
+          onClick={() => changePage(AudioTabPages.GENERATE_AUDIO)}>
           Generate Audio
         </Button>
       </div>

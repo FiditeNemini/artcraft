@@ -32,4 +32,5 @@ export enum AssetFilterOption {
 
 export interface AudioMediaItem extends MediaItem {
   category?: string;
+  isNew?: boolean;
 }

@@ -74,12 +74,13 @@ export const PageVoicetoVoice = ({
       <H4 className="mt-4 mb-2">Upload Audio</H4>
       <UploadComponent 
         sessionToken={sessionToken}
-        // onFileStaged={()=>{
-        //   console.log("Page knows that file is Staged")
-        // }}
-        // onClear={()=>{
-        //   console.log("Page knows that Upload Component has been cleared")
-        // }}
+        file={v2vState.file}
+        onFileStaged={(file:File)=>{
+          setV2VState({...v2vState, file: file});
+        }}
+        onClear={()=>{
+          setV2VState({...v2vState, file: undefined});
+        }}
         onFileUploaded={(fileToken:string)=>{
           setV2VState({
             ...v2vState,

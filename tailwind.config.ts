@@ -161,6 +161,7 @@ export default {
         "audio-v2v": "#6691B9",
         "audio-upload": "#9760C2",
         "audio-demo" : "#B96675",
+        "is-new": "#FFDC26",
       },
 
       inference:{

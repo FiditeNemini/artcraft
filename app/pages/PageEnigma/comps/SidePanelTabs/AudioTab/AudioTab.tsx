@@ -21,7 +21,7 @@ import {
 
 import { PageLibrary } from "./pageLibrary";
 import { PageAudioGeneration } from "./pageAudioGeneration";
-import { AudioTabPages, TtsState, V2VState } from "./types";
+import { AudioTabPages, AudioPanelState, TtsState, V2VState } from "./types";
 import { initialTtsState, initialV2VState } from "./values";
 import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
 import { VoiceConversionModelListItem } from "./typesImported";
@@ -34,75 +34,62 @@ export const AudioTab = () => {
   const { authState } = useContext(AuthenticationContext);
 
   // local states and data
-  const [state, setState] = useState({
+  const [ state, setState ] = useState<AudioPanelState>({
     firstLoad: false,
     page: AudioTabPages.LIBRARY,
+    // children states are managed at top level for persistent memories
+    lastWorkingAudioGeneration: AudioTabPages.TTS,
+    ttsState: initialTtsState,
+    v2vState: initialV2VState,
   });
 
-  // children states are managed at top level for persistent memories
-  const [ttsState, setTtsState] = useState<TtsState>(initialTtsState);
-  const handleSetTtsState = (newState: TtsState) => {
-    setTtsState((curr: TtsState) => ({
-      ...curr,
-      ...newState,
-    }));
-  };
-  const [v2vState, setV2VState] = useState<V2VState>(initialV2VState);
-  const handleSetV2VState = (newState: V2VState) => {
-    setV2VState((curr: V2VState) => ({
-      ...curr,
-      ...newState,
-    }));
-  };
   const [ttsModels, setTtsModels] = useState<Array<TtsModelListItem>>([]);
   const [v2vModels, setV2VModels] = useState<
     Array<VoiceConversionModelListItem>
   >([]);
 
-  const handleListAudioByUser = useCallback(
-    (username: string, sessionToken: string) => {
-      function getTitle(item: any) {
-        if (item.maybe_title) return item.maybe_title;
-        if (
-          item.origin &&
-          item.origin.maybe_model &&
-          item.origin.maybe_model.title
-        )
-          return item.origin.maybe_model.title;
-        return "Media Audio";
-      }
-
-      function getCategory(item: any) {
-        if (
-          item.origin &&
-          item.origin.product_category &&
-          item.origin.product_category !== "unknown"
-        )
-          return item.origin.product_category;
-        if (item.origin_category) return item.origin_category;
-        return "unknown";
-      }
-
-      ListAudioByUser(username, sessionToken).then((res: any[]) => {
-        audioItemsFromServer.value = res.map((item) => {
-          const morphedItem: AudioMediaItem = {
-            version: 1,
-            type: AssetType.AUDIO,
-            category: getCategory(item),
-            media_id: item.token,
-            object_uuid: item.token,
-            name: getTitle(item),
-            description: item.maybe_text_transcript,
-            publicBucketPath: item.public_bucket_path,
-            length: 25,
-            thumbnail: "/resources/placeholders/audio_placeholder.png",
-            isMine: true,
-            // isBookmarked?: boolean;
-          };
-          return morphedItem;
-        });
+  const handleListAudioByUser = useCallback((username:string, sessionToken:string)=>{
+    function getTitle (item:any){
+      if (item.maybe_title) return item.maybe_title;
+      if (item.origin && item.origin.maybe_model && item.origin.maybe_model.title) return item.origin.maybe_model.title;
+      return "Media Audio";
+    }
+    function getCategory (item:any){
+      if(item.origin && item.origin.product_category && item.origin.product_category !== "unknown" ) return item.origin.product_category;
+      if(item.origin_category) return item.origin_category;
+      return "unknown";
+    }
+    function checkIsNew(token:string){
+      const findNewItem = inferenceJobs.value.find((job=>{
+        if(job.result && job.result.entity_token){ 
+          return token === job.result.entity_token;
+        }else {
+          return false;
+        }
+      }))
+      return findNewItem !== undefined;
+    }
+    ListAudioByUser(username, sessionToken).then((res:any[])=>{
+      audioItemsFromServer.value = res.map(item=>{
+        const morphedItem:AudioMediaItem = {
+          version: 1,
+          type: AssetType.AUDIO,
+          category: getCategory(item),
+          media_id: item.token,
+          object_uuid: item.token,
+          name: getTitle(item),
+          description: item.maybe_text_transcript,
+          publicBucketPath: item.public_bucket_path,
+          length: 25,
+          thumbnail: "/resources/placeholders/audio_placeholder.png",
+          isMine: true,
+          isNew: checkIsNew(item.token),
+          // isBookmarked?: boolean;
+        }
+        return morphedItem;
       });
-    },
+    });
+  },
     [],
   );
 
@@ -130,47 +117,49 @@ export const AudioTab = () => {
 
   useEffect(() => {
     //this listens to ttsState and push its new inference jobs
-    setTtsState((curr) => {
-      if (curr.hasEnqueued < curr.inferenceTokens.length) {
+    setState((curr)=>{
+      const {ttsState: currTtsState} = curr;
+      if(currTtsState.hasEnqueued < currTtsState.inferenceTokens.length ){
         addInferenceJob({
           version: 1,
-          job_id: curr.inferenceTokens[curr.inferenceTokens.length - 1],
+          job_id: currTtsState.inferenceTokens[currTtsState.inferenceTokens.length - 1],
           job_type: InferenceJobType.TextToSpeech,
           job_status: JobState.PENDING,
         });
         return {
           ...curr,
-          hasEnqueued: curr.hasEnqueued + 1,
+          ttsState:{
+            ...currTtsState,
+            hasEnqueued: currTtsState.hasEnqueued + 1
+          }
         };
       }
       return curr; //case of no new jobs, do nothing
     });
-  }, [ttsState]);
-  useEffect(() => {
+  }, [state.ttsState]);
+
+  useEffect(()=> {
     //this listens to v2vState and push its new inference jobs
-    setV2VState((curr) => {
-      if (curr.hasEnqueued < curr.inferenceTokens.length) {
+    setState((curr)=>{
+      const {v2vState: currV2VState} = curr;
+      if(currV2VState.hasEnqueued < currV2VState.inferenceTokens.length ){
         addInferenceJob({
           version: 1,
-          job_id: curr.inferenceTokens[curr.inferenceTokens.length - 1],
+          job_id: currV2VState.inferenceTokens[currV2VState.inferenceTokens.length - 1],
           job_type: InferenceJobType.VoiceConversion,
           job_status: JobState.PENDING,
         });
         return {
           ...curr,
-          hasEnqueued: curr.hasEnqueued + 1,
-        };
+          v2vState:{
+            ...currV2VState,
+            hasEnqueued: currV2VState.hasEnqueued + 1
+          }
+        }
       }
       return curr; //case of no new jobs, do nothing
     });
-  }, [v2vState]);
-
-  useEffect(() => {
-    console.info("Audio Tab is mounting");
-    return () => {
-      console.info("Audio Tab is dismounting");
-    };
-  }, []);
+  }, [state.v2vState]);
 
   useSignalEffect(() => {
     // when inference changes, check if there's a new audio to refresh for
@@ -212,12 +201,12 @@ export const AudioTab = () => {
         <PageSelectTtsModel
           changePage={changePage}
           ttsModels={ttsModels}
-          onSelect={(selectedVoice) => {
-            setTtsState((curr) => ({
+          onSelect={(selectedVoice)=>{
+            setState((curr)=>({
               ...curr,
-              voice: selectedVoice,
+              ttsState: {...curr.ttsState, voice: selectedVoice},
+              page: AudioTabPages.GENERATE_AUDIO
             }));
-            changePage(AudioTabPages.TTS);
           }}
         />
       );
@@ -227,28 +216,24 @@ export const AudioTab = () => {
         <PageSelectV2VModel
           changePage={changePage}
           v2vModels={v2vModels}
-          onSelect={(selectedVoice) => {
-            setV2VState((curr) => ({
+          onSelect={(selectedVoice)=>{
+            setState((curr)=>({
               ...curr,
-              voice: selectedVoice,
+              v2vState: {...curr.v2vState, voice: selectedVoice},
+              page: AudioTabPages.GENERATE_AUDIO
             }));
-            changePage(AudioTabPages.V2V);
           }}
         />
       );
     }
-    case AudioTabPages.TTS:
-    case AudioTabPages.V2V: {
-      if (authState.sessionToken) {
-        return (
+    case AudioTabPages.GENERATE_AUDIO:{
+      if(authState.sessionToken){
+        return(
           <PageAudioGeneration
-            page={state.page}
             changePage={changePage}
             sessionToken={authState.sessionToken}
-            ttsState={ttsState}
-            setTtsState={handleSetTtsState}
-            v2vState={v2vState}
-            setV2VState={handleSetV2VState}
+            audioPanelState={state}
+            setAudioPanelState={setState}
           />
         );
       } else {

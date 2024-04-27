@@ -1,10 +1,9 @@
 
 import { useCallback, useState } from 'react'
-import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 
-import { H2, ButtonIcon, Input } from "~/components";
+import { Input } from "~/components";
 import { AudioTabPages } from "./types";
-
+import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
 import { VoiceModelElement } from "./voiceModelElement";
 import { VoiceConversionModelListItem } from './typesImported';
 
@@ -36,14 +35,11 @@ export const PageSelectV2VModel = ({
 
   return(
     <div className="flex flex-col px-4 pt-2">
-      <div className="pb-4 flex items-center gap-3">
-        <ButtonIcon
-          className="w-auto p-0 text-xl opacity-60 hover:opacity-40"
-          icon={faChevronLeft}
-          onClick={() => changePage(AudioTabPages.V2V)}
-        />
-        <H2 className="font-semibold">Search Convertible Voices</H2>
-      </div>
+      <TabTitle
+        title="Search Convertible Voices"
+        onBack={() => changePage(AudioTabPages.GENERATE_AUDIO)}
+      />
+
       <Input
         ref={refCallback}
         className="mb-4"

@@ -20,29 +20,32 @@ const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
 
 interface Props {
   sessionToken: string;
-  onFileStaged?: () => void;
-  onClear?: () => void;
-  onFileUploaded: (token: string) => void;
+  file?: File;
+  onFileStaged?: (file:File)=>void;
+  onClear?: ()=>void;
+  onFileUploaded: (token:string)=>void
 }
 
 function UploadComponent({
   sessionToken,
+  file: propsFile,
   onFileStaged,
   onClear,
   onFileUploaded,
 }: Props) {
-  const [{ file, uploadState, uploadToken }, setState] = useState<{
-    file: any;
-    uploadState: "init" | "none" | "uploading" | "uploaded" | "error";
-    uploadToken?: string;
+
+  const [{file, uploadState, uploadToken}, setState] = useState<{
+    file: File | undefined;
+    uploadState: "init"|"none"|"uploading"|"uploaded"|"error";
+    uploadToken ?: string;
   }>({
-    file: undefined,
-    uploadState: "init",
+    file: propsFile,
+    uploadState: propsFile ? "none" : "init",
   });
   const audioUrl = file ? URL.createObjectURL(file) : "";
 
-  const handleChange = (file: any) => {
-    setState((curr) => ({
+  const handleChange = (file:File) => {
+    setState((curr)=>({
       ...curr,
       file: file,
       uploadState: "none",
@@ -85,9 +88,9 @@ function UploadComponent({
     });
   };
 
-  useEffect(() => {
-    if (file && uploadState === "none" && onFileStaged) onFileStaged();
-    if (!file && uploadState === "none" && onClear) onClear();
+  useEffect(()=>{
+    if(file && uploadState === "none" && onFileStaged) onFileStaged(file);
+    if(!file && uploadState === "none" && onClear) onClear();
   }, [file, uploadState]);
   useEffect(() => {
     if (uploadState === "uploaded" && uploadToken) onFileUploaded(uploadToken);
