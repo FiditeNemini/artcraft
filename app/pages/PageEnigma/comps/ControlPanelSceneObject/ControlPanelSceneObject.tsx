@@ -27,7 +27,7 @@ const formatNumber = (input: string): number => {
   // Convert the number back to a string with at least two decimal places
   const str = num.toFixed(2);
   return parseFloat(str);
-}
+};
 
 // console.log(formatNumber("000123.4567"));  // Outputs: "123.46"
 // console.log(formatNumber("000123.4"));     // Outputs: "123.40"
@@ -44,7 +44,6 @@ export const ControlPanelSceneObject = () => {
     setIsCollapsed(!isCollapsed);
   };
 
-
   const position =
     appUiState.controlPanel.currentSceneObject?.objectVectors?.position;
   const rotation =
@@ -52,7 +51,6 @@ export const ControlPanelSceneObject = () => {
   const scale =
     appUiState.controlPanel.currentSceneObject?.objectVectors?.scale;
   const currentSceneObject = appUiState.controlPanel.currentSceneObject;
-
 
   useEffect(() => {
     // TODO this causes a subtle bug because it renders way too many times.
@@ -229,9 +227,9 @@ export const ControlPanelSceneObject = () => {
         <div className="flex flex-col gap-1">
           <H5>Location</H5>
           <InputVector
-            x={position?.x || 0}
-            y={position?.y || 0}
-            z={position?.z || 0}
+            x={position ? (position.x === "" ? "" : position.x) : 0}
+            y={position ? (position.y === "" ? "" : position.y) : 0}
+            z={position ? (position.z === "" ? "" : position.z) : 0}
             onChange={handlePositionChange}
           />
         </div>
@@ -239,9 +237,9 @@ export const ControlPanelSceneObject = () => {
         <div className="flex flex-col gap-1">
           <H5>Rotation</H5>
           <InputVector
-            x={rotation?.x || 0}
-            y={rotation?.y || 0}
-            z={rotation?.z || 0}
+            x={rotation ? (rotation.x === "" ? "" : rotation.x) : 0}
+            y={rotation ? (rotation.y === "" ? "" : rotation.y) : 0}
+            z={rotation ? (rotation.z === "" ? "" : rotation.z) : 0}
             onChange={handleRotationChange}
             increment={1}
           />
@@ -250,9 +248,9 @@ export const ControlPanelSceneObject = () => {
         <div className="flex flex-col gap-1">
           <H5>Scale</H5>
           <InputVector
-            x={scale?.x || 0}
-            y={scale?.y || 0}
-            z={scale?.z || 0}
+            x={scale ? (scale.x === "" ? "" : scale.x) : 0}
+            y={scale ? (scale.y === "" ? "" : scale.y) : 0}
+            z={scale ? (scale.z === "" ? "" : scale.z) : 0}
             onChange={handleScaleChange}
           />
         </div>

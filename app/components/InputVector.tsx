@@ -33,10 +33,11 @@ export const InputVector = ({
 
   function handleOnChange() {
     const newVector = {
-      x: Number(xRef.current?.value),
-      y: Number(yRef.current?.value),
-      z: Number(zRef.current?.value),
+      x: xRef.current.value === "" ? "" : Number(xRef.current?.value),
+      y: yRef.current.value === "" ? "" : Number(yRef.current?.value),
+      z: zRef.current.value === "" ? "" : Number(zRef.current?.value),
     };
+
     onChange(newVector);
   }
 
@@ -97,7 +98,7 @@ export const InputVector = ({
   };
 
   return (
-    <div className="flex w-full flex-col justify-between gap-1.5">
+    <div className="translation-panel flex w-full flex-col justify-between gap-1.5">
       <span className={twMerge(wrapperCommonClasses, "before:bg-axis-x")}>
         <div className="absolute left-3.5 z-10 font-semibold">X</div>
         <input
