@@ -91,6 +91,10 @@ pub struct MediaFileListItem {
   /// the name of the selected style.
   pub maybe_style_name: Option<StyleTransferName>,
 
+  /// Duration for audio and video files, if available.
+  /// Measured in milliseconds.
+  pub maybe_duration_millis: Option<u64>,
+
   pub created_at: DateTime<Utc>,
   pub updated_at: DateTime<Utc>,
 }
@@ -273,6 +277,7 @@ pub async fn list_media_files_handler(
             .as_ref()
             .and_then(|args| args.style_name.as_ref())
             .and_then(|style| style.to_style_name()),
+        maybe_duration_millis: record.maybe_duration_millis,
         created_at: record.created_at,
         updated_at: record.updated_at,
       })

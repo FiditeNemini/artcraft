@@ -55,6 +55,8 @@ pub struct MediaFileListItem {
   pub maybe_text_transcript: Option<String>,
   pub maybe_prompt_args: Option<PromptInnerPayload>,
 
+  pub maybe_duration_millis: Option<u64>,
+
   pub creator_set_visibility: Visibility,
 
   pub maybe_file_cover_image_public_bucket_hash: Option<String>,
@@ -132,6 +134,7 @@ pub async fn list_media_files(args: ListMediaFilesArgs<'_>) -> AnyhowResult<Medi
               .transpose()
               .ok() // NB: Fail open
               .flatten(),
+          maybe_duration_millis: record.maybe_duration_millis.map(|d| d as u64),
           creator_set_visibility: record.creator_set_visibility,
           maybe_file_cover_image_public_bucket_hash: record.maybe_file_cover_image_public_bucket_hash,
           maybe_file_cover_image_public_bucket_prefix: record.maybe_file_cover_image_public_bucket_prefix,
@@ -205,6 +208,7 @@ SELECT
 
   m.maybe_title,
   m.maybe_text_transcript,
+  m.maybe_duration_millis,
 
   m.created_at,
   m.updated_at,
@@ -354,6 +358,7 @@ struct MediaFileListItemInternal {
   maybe_title: Option<String>,
   maybe_text_transcript: Option<String>,
   maybe_other_prompt_args: Option<String>,
+  maybe_duration_millis: Option<i32>,
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
@@ -400,6 +405,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_title: row.try_get("maybe_title")?,
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       maybe_other_prompt_args: row.try_get("maybe_other_prompt_args")?,
+      maybe_duration_millis: row.try_get("maybe_duration_millis")?,
       created_at: row.try_get("created_at")?,
       updated_at: row.try_get("updated_at")?,
       comment_count: row.try_get("comment_count")?,

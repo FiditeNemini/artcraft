@@ -48,6 +48,8 @@ pub struct MediaFileListItem {
   pub maybe_text_transcript: Option<String>,
   pub maybe_prompt_args: Option<PromptInnerPayload>,
 
+  pub maybe_duration_millis: Option<u64>,
+
   pub maybe_ratings_positive_count: Option<u32>,
   pub maybe_ratings_negative_count: Option<u32>,
   pub maybe_bookmark_count: Option<u32>,
@@ -120,6 +122,7 @@ pub async fn list_media_files_by_batch_token(args: ListMediaFileByBatchArgs<'_>)
               .transpose()
               .ok() // NB: Fail open
               .flatten(),
+          maybe_duration_millis: record.maybe_duration_millis.map(|d| d as u64),
           maybe_ratings_positive_count: record.maybe_ratings_positive_count,
           maybe_ratings_negative_count: record.maybe_ratings_negative_count,
           maybe_bookmark_count: record.maybe_bookmark_count,
@@ -162,6 +165,7 @@ fn select_result_fields() -> String {
     m.maybe_title,
     m.maybe_text_transcript,
     prompts.maybe_other_args as maybe_other_prompt_args,
+    m.maybe_duration_millis,
 
     entity_stats.ratings_positive_count as maybe_ratings_positive_count,
     entity_stats.ratings_negative_count as maybe_ratings_negative_count,
@@ -269,6 +273,7 @@ struct MediaFileListItemInternal {
   maybe_ratings_positive_count: Option<u32>,
   maybe_ratings_negative_count: Option<u32>,
   maybe_bookmark_count: Option<u32>,
+  maybe_duration_millis: Option<i32>,
 
   created_at: DateTime<Utc>,
   updated_at: DateTime<Utc>,
@@ -304,6 +309,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_title: row.try_get("maybe_title")?,
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       maybe_other_prompt_args: row.try_get("maybe_other_prompt_args")?,
+      maybe_duration_millis: row.try_get("maybe_duration_millis")?,
       maybe_ratings_positive_count: row.try_get("maybe_ratings_positive_count")?,
       maybe_ratings_negative_count: row.try_get("maybe_ratings_negative_count")?,
       maybe_bookmark_count: row.try_get("maybe_bookmark_count")?,

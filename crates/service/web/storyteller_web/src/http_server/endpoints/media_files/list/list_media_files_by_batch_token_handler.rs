@@ -90,6 +90,10 @@ pub struct MediaFilesByBatchListItem {
   /// the name of the selected style.
   pub maybe_style_name: Option<StyleTransferName>,
 
+  /// Duration for audio and video files, if available.
+  /// Measured in milliseconds.
+  pub maybe_duration_millis: Option<u64>,
+
   /// Statistics about the media file
   pub stats: SimpleEntityStats,
 
@@ -232,6 +236,7 @@ pub async fn list_media_files_by_batch_token_handler(
             .as_ref()
             .and_then(|args| args.style_name.as_ref())
             .and_then(|style| style.to_style_name()),
+        maybe_duration_millis: record.maybe_duration_millis,
         stats: SimpleEntityStats {
           positive_rating_count: record.maybe_ratings_positive_count.unwrap_or(0),
           bookmark_count: record.maybe_bookmark_count.unwrap_or(0),

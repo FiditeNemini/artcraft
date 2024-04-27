@@ -57,6 +57,8 @@ pub struct MediaFileListItem {
   pub maybe_text_transcript: Option<String>,
   pub maybe_prompt_args: Option<PromptInnerPayload>,
 
+  pub maybe_duration_millis: Option<u64>,
+
   pub maybe_ratings_positive_count: Option<u32>,
   pub maybe_ratings_negative_count: Option<u32>,
   pub maybe_bookmark_count: Option<u32>,
@@ -142,6 +144,7 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
               .transpose()
               .ok() // NB: Fail open
               .flatten(),
+          maybe_duration_millis: record.maybe_duration_millis.map(|d| d as u64),
           maybe_ratings_positive_count: record.maybe_ratings_positive_count,
           maybe_ratings_negative_count: record.maybe_ratings_negative_count,
           maybe_bookmark_count: record.maybe_bookmark_count,
@@ -189,6 +192,7 @@ fn select_result_fields() -> String {
     m.maybe_title,
     m.maybe_text_transcript,
     prompts.maybe_other_args as maybe_other_prompt_args,
+    m.maybe_duration_millis,
 
     entity_stats.ratings_positive_count as maybe_ratings_positive_count,
     entity_stats.ratings_negative_count as maybe_ratings_negative_count,
@@ -325,6 +329,7 @@ struct MediaFileListItemInternal {
   // NB: The title won't be populated for `tts_models` records or non-`model_weights` records.
   maybe_origin_model_title: Option<String>,
   maybe_other_prompt_args: Option<String>,
+  maybe_duration_millis: Option<i32>,
 
   media_type: MediaFileType,
   media_class: MediaFileClass,
@@ -375,6 +380,7 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_origin_model_token: row.try_get("maybe_origin_model_token")?,
       maybe_origin_model_title: row.try_get("maybe_origin_model_title")?,
       maybe_other_prompt_args: row.try_get("maybe_other_prompt_args")?,
+      maybe_duration_millis: row.try_get("maybe_duration_millis")?,
       media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
       media_class: MediaFileClass::try_from_mysql_row(row, "media_class")?,
       public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,

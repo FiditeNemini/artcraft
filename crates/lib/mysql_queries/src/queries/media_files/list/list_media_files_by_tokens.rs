@@ -46,6 +46,8 @@ pub struct MediaFilesByTokensRecord {
   pub maybe_text_transcript: Option<String>,
   pub maybe_prompt_args: Option<PromptInnerPayload>,
 
+  pub maybe_duration_millis: Option<u64>,
+
   pub maybe_file_cover_image_public_bucket_hash: Option<String>,
   pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
   pub maybe_file_cover_image_public_bucket_extension: Option<String>,
@@ -101,6 +103,7 @@ async fn get_raw_media_files_by_tokens(
           m.maybe_title,
           m.maybe_text_transcript,
           prompts.maybe_other_args as maybe_other_prompt_args,
+          m.maybe_duration_millis,
 
           entity_stats.ratings_positive_count as maybe_ratings_positive_count,
           entity_stats.ratings_negative_count as maybe_ratings_negative_count,
@@ -151,6 +154,7 @@ async fn get_raw_media_files_by_tokens(
           m.maybe_title,
           m.maybe_text_transcript,
           prompts.maybe_other_args as maybe_other_prompt_args,
+          m.maybe_duration_millis,
 
           entity_stats.ratings_positive_count as maybe_ratings_positive_count,
           entity_stats.ratings_negative_count as maybe_ratings_negative_count,
@@ -243,6 +247,8 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
               .ok() // NB: Fail open
               .flatten(),
 
+          maybe_duration_millis: media_file.maybe_duration_millis.map(|d| d as u64),
+
           maybe_file_cover_image_public_bucket_hash: media_file.maybe_file_cover_image_public_bucket_hash,
           maybe_file_cover_image_public_bucket_prefix: media_file.maybe_file_cover_image_public_bucket_prefix,
           maybe_file_cover_image_public_bucket_extension: media_file.maybe_file_cover_image_public_bucket_extension,
@@ -285,6 +291,7 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
     pub maybe_title: Option<String>,
     pub maybe_text_transcript: Option<String>,
     pub maybe_other_prompt_args: Option<String>,
+    pub maybe_duration_millis: Option<i32>,
 
     pub maybe_file_cover_image_public_bucket_hash: Option<String>,
     pub maybe_file_cover_image_public_bucket_prefix: Option<String>,
@@ -330,6 +337,7 @@ impl FromRow<'_, MySqlRow> for RawMediaFileJoinUser {
       maybe_title: row.try_get("maybe_title")?,
       maybe_text_transcript: row.try_get("maybe_text_transcript")?,
       maybe_other_prompt_args: row.try_get("maybe_other_prompt_args")?,
+      maybe_duration_millis: row.try_get("maybe_duration_millis")?,
       maybe_file_cover_image_public_bucket_hash: row.try_get("maybe_file_cover_image_public_bucket_hash")?,
       maybe_file_cover_image_public_bucket_prefix: row.try_get("maybe_file_cover_image_public_bucket_prefix")?,
       maybe_file_cover_image_public_bucket_extension: row.try_get("maybe_file_cover_image_public_bucket_extension")?,
