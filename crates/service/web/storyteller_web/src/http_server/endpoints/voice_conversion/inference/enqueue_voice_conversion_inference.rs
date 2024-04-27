@@ -49,19 +49,18 @@ const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 #[derive(Deserialize, ToSchema)]
 pub struct EnqueueVoiceConversionInferenceRequest {
   uuid_idempotency_token: String,
+
+  /// Model weights token for the voice conversion model.
+  /// This must be either a SoVitsSvc or RvcV2 model.
   voice_conversion_model_token: String,
 
   /// NB: This can be a `MediaUploadToken` or a `MediaFileToken` token.
-  /// We will eventually migrate everything to media files.
+  /// We will eventually migrate everything to media files and remove
+  /// media uploads (legacy, deprecated).
   source_media_upload_token: String,
 
-  // /// Media upload tokens are the old, deprecated format
-  // source_media_upload_token: Option<MediaUploadToken>,
-
-  // /// Media file tokens are the new, preferred format
-  // source_media_file_token: Option<MediaUploadToken>,
-
   creator_set_visibility: Option<Visibility>,
+
   is_storyteller_demo: Option<bool>,
 
   /// Argument for so-vits-svc

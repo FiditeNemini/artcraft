@@ -21,6 +21,9 @@ pub struct MediaFileForInference {
   pub maybe_creator_user_token: Option<UserToken>,
   pub creator_set_visibility: Visibility,
 
+  pub file_size_bytes: u32,
+  pub maybe_duration_millis: Option<u32>,
+
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
   pub maybe_public_bucket_extension: Option<String>,
@@ -34,6 +37,9 @@ pub struct MediaFileRaw {
 
   pub maybe_creator_user_token: Option<UserToken>,
   pub creator_set_visibility: Visibility,
+
+  pub file_size_bytes: i32,
+  pub maybe_duration_millis: Option<i32>,
 
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
@@ -62,6 +68,8 @@ pub async fn get_media_file_for_inference(
     media_type: record.media_type,
     maybe_creator_user_token: record.maybe_creator_user_token,
     creator_set_visibility: record.creator_set_visibility,
+    file_size_bytes: record.file_size_bytes as u32,
+    maybe_duration_millis: record.maybe_duration_millis.map(|i| i as u32),
     public_bucket_directory_hash: record.public_bucket_directory_hash,
     maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
     maybe_public_bucket_extension: record.maybe_public_bucket_extension,
@@ -82,6 +90,9 @@ SELECT
 
     m.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
     m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,
+
+    m.file_size_bytes,
+    m.maybe_duration_millis,
 
     m.public_bucket_directory_hash,
     m.maybe_public_bucket_prefix,

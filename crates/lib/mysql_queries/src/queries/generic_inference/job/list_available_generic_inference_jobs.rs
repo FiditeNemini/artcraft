@@ -5,6 +5,7 @@ use chrono::Utc;
 use sqlx::MySqlPool;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
 use enums::by_table::generic_inference_jobs::inference_model_type::InferenceModelType;
 use enums::common::job_status_plus::JobStatusPlus;
 use enums::common::visibility::Visibility;
@@ -32,7 +33,7 @@ pub struct AvailableInferenceJob {
   pub maybe_model_token: Option<String>,
 
   pub maybe_input_source_token: Option<String>,
-  pub maybe_input_source_token_type: Option<String>,
+  pub maybe_input_source_token_type: Option<InferenceInputSourceTokenType>,
 
   // Inference details
   pub maybe_inference_args: Option<GenericInferenceArgs>,
@@ -130,7 +131,11 @@ pub async fn list_available_generic_inference_jobs(
               .map_err(|e| anyhow!("error: {:?}", e))?, // TODO/FIXME: This is a gross fix.
           maybe_model_token: record.maybe_model_token,
           maybe_input_source_token: record.maybe_input_source_token,
-          maybe_input_source_token_type: record.maybe_input_source_token_type,
+          maybe_input_source_token_type: record.maybe_input_source_token_type
+              .as_deref()
+              .map(|token_type| InferenceInputSourceTokenType::from_str(token_type)
+                  .map_err(|err| anyhow!("error: {:?}", err)))
+              .transpose()?,
           maybe_inference_args: record.maybe_inference_args
               .as_deref()
               .map(|args| GenericInferenceArgs::from_json(args))

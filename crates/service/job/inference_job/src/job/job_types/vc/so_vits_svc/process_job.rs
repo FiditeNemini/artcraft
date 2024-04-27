@@ -26,6 +26,7 @@ use tokens::tokens::users::UserToken;
 
 use crate::job::job_loop::job_success_result::{JobSuccessResult, ResultEntity};
 use crate::job::job_loop::process_single_job_error::ProcessSingleJobError;
+use crate::job::job_types::vc::media_for_inference::MediaForInference;
 use crate::job::job_types::vc::so_vits_svc::so_vits_svc_inference_command::{Device, InferenceArgs};
 use crate::job_dependencies::JobDependencies;
 use crate::util::maybe_download_file_from_bucket::{maybe_download_file_from_bucket, MaybeDownloadArgs};
@@ -37,8 +38,7 @@ pub struct SoVitsSvcProcessJobArgs<'a> {
   pub job_dependencies: &'a JobDependencies,
   pub job: &'a AvailableInferenceJob,
   pub vc_model: &'a VcModel,
-  pub media_upload_token: &'a MediaUploadToken,
-  pub media_upload: &'a MediaUploadRecordForInference,
+  pub inference_media: &'a MediaForInference,
 }
 
 pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccessResult, ProcessSingleJobError> {
@@ -123,15 +123,12 @@ pub async fn process_job(args: SoVitsSvcProcessJobArgs<'_>) -> Result<JobSuccess
   let original_media_upload_fs_path = {
     let original_media_upload_fs_path = work_temp_dir.path().join("original.bin");
 
-    let media_upload_bucket_path =
-        MediaUploadOriginalFilePath::from_object_hash(&args.media_upload.public_bucket_directory_hash);
-
-    let bucket_object_path = media_upload_bucket_path.to_full_object_pathbuf();
+    let bucket_object_path = args.inference_media.get_bucket_path();
 
     info!("Downloading media to bucket path: {:?}", &bucket_object_path);
 
     maybe_download_file_from_bucket(MaybeDownloadArgs {
-      name_or_description_of_file: "media upload (original file)",
+      name_or_description_of_file: "media (original file)",
       final_filesystem_file_path: &original_media_upload_fs_path,
       bucket_object_path: &bucket_object_path,
       bucket_client: &args.job_dependencies.buckets.public_bucket_client,
