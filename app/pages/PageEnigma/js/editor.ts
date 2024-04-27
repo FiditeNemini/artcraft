@@ -113,6 +113,8 @@ class Editor {
   recorder: MediaRecorder | undefined;
 
   selectedCanvas: boolean;
+  startRenderHeight: number;
+  startRenderWidth: number;
   // Default params.
 
   constructor() {
@@ -148,6 +150,8 @@ class Editor {
     this.last_cam_pos = new THREE.Vector3(0, 0, 0);
     this.last_cam_rot = new THREE.Euler(0, 0, 0);
     this.camera_last_pos = new THREE.Vector3(0, 0, 0);
+    this.startRenderWidth = 0;
+    this.startRenderHeight = 0;
     this.lockControls;
     this.saoPass;
     this.outputPass;
@@ -440,7 +444,7 @@ class Editor {
     console.log(result);
   }
 
-  public async testTestTimelineEvents() {}
+  public async testTestTimelineEvents() { }
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -930,10 +934,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-        startTime * 1000 +
-        "|" +
-        startTime * 1000 +
-        "[a1];[0:a][a1]amix=inputs=2[a]",
+      startTime * 1000 +
+      "|" +
+      startTime * 1000 +
+      "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -1069,14 +1073,9 @@ class Editor {
     console.log(result);
     this.recorder = undefined;
     if (this.rawRenderer) {
-      const stylePreview: HTMLVideoElement | null = document.getElementById(
-        "styled-preview",
-      ) as HTMLVideoElement;
-      if (stylePreview != null) {
-        this.rawRenderer.setSize(stylePreview.width, stylePreview.height);
-        this.render_camera.aspect = stylePreview.width / stylePreview.height;
-      }
+      this.rawRenderer.setSize(this.startRenderWidth, this.startRenderHeight);
     }
+    this.activeScene.renderMode(false);
   }
 
   async switchPreview() {
@@ -1202,7 +1201,10 @@ class Editor {
 
   startPlayback() {
     this.updateLoad(25, "Starting Processing");
-
+    if (this.rawRenderer) {
+      this.startRenderWidth = this.rawRenderer.domElement.width;
+      this.startRenderHeight = this.rawRenderer.domElement.height;
+    }
     if (!this.rendering && this.timeline.is_playing) {
       this.timeline.is_playing = false;
       this.timeline.scrubber_frame_position = 0;
