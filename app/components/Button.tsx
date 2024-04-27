@@ -54,7 +54,7 @@ export const Button = ({
       disabled={disabled}
       {...{ ...rest, htmlFor }}>
       {icon && !iconFlip ? <FontAwesomeIcon icon={icon} /> : null}
-      <div>{children}</div>
+      {children}
       {icon && iconFlip ? <FontAwesomeIcon icon={icon} /> : null}
     </ButtonType>
   );

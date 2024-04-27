@@ -110,9 +110,12 @@ export const ObjectsTab = ({ type }: Props) => {
         {...{
           onSuccess: reFetchList,
           render: ({ parentId }: { parentId: string }) => (
-            <>
-              <div className="w-full overflow-x-auto">
-                <div className="mb-4 mt-4 flex justify-start gap-2 px-4">
+            <div className="flex h-full flex-col gap-3.5">
+              <TabTitle
+                title={`${type === AssetType.CHARACTER ? "Characters" : "Objects"}`}
+              />
+              <div>
+                <div className="flex gap-2 overflow-x-auto overflow-y-hidden px-4">
                   <button
                     className={twMerge(
                       "filter-tab",
@@ -152,10 +155,10 @@ export const ObjectsTab = ({ type }: Props) => {
                   </button>
                 </div>
               </div>
-              <div {...{ className: "w-full px-4 pb-4" }}>
+              <div {...{ className: "w-full px-4" }}>
                 <Button
                   {...{
-                    className: "file-picker-button",
+                    className: "file-picker-button py-3",
                     htmlFor: parentId,
                     icon: faCirclePlus,
                     variant: "action",
@@ -163,7 +166,7 @@ export const ObjectsTab = ({ type }: Props) => {
                   Upload {type === AssetType.CHARACTER ? "Character" : "Object"}
                 </Button>
               </div>
-              <div className="w-full px-4">
+              <div className="w-full grow overflow-y-auto px-4 pb-4">
                 <ItemElements
                   {...{
                     ...(type !== AssetType.CHARACTER
@@ -178,7 +181,7 @@ export const ObjectsTab = ({ type }: Props) => {
                   assetFilter={assetFilter.value}
                 />
               </div>
-            </>
+            </div>
           ),
         }}
       />

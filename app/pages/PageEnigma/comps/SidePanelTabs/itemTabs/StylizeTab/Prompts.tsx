@@ -43,7 +43,7 @@ export const Prompts = () => {
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-t-lg bg-ui-panel py-4">
+    <div className="flex flex-col gap-3 rounded-t-lg bg-ui-panel px-4">
       <div className="relative w-full">
         <Textarea
           label="Enter a Prompt"

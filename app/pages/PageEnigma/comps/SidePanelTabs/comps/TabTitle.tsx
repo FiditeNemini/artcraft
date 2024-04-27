@@ -1,11 +1,10 @@
-import { faAngleLeft, faClose } from "@fortawesome/pro-solid-svg-icons";
+import { faChevronLeft, faClose } from "@fortawesome/pro-solid-svg-icons";
 import { ButtonIcon } from "~/components";
 import {
   lastSelectedTab,
   selectedTab,
   sidePanelVisible,
 } from "~/pages/PageEnigma/store";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Props {
   title: string;
@@ -20,12 +19,14 @@ export function TabTitle({ title, onBack }: Props) {
   };
 
   return (
-    <div className="flex items-center justify-between px-4">
+    <div className="flex items-center justify-between px-4 pt-4">
       {onBack ? (
-        <div className="flex items-center gap-2">
-          <button onClick={onBack}>
-            <FontAwesomeIcon icon={faAngleLeft} />
-          </button>
+        <div className="flex items-center gap-3">
+          <ButtonIcon
+            onClick={onBack}
+            icon={faChevronLeft}
+            className="h-auto w-auto text-xl opacity-50 hover:opacity-90"
+          />
           <div className="align-middle text-base font-bold">{title}</div>
         </div>
       ) : (
@@ -34,8 +35,7 @@ export function TabTitle({ title, onBack }: Props) {
       <ButtonIcon
         onClick={onClose}
         icon={faClose}
-        size="lg"
-        className="h-auto w-auto opacity-75 hover:opacity-50"
+        className="h-auto w-auto text-xl opacity-50 hover:opacity-90"
       />
     </div>
   );

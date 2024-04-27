@@ -1,20 +1,14 @@
-import { useCallback, } from "react";
+import { useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-import { faVolumeHigh, faChevronRight} from "@fortawesome/pro-solid-svg-icons";
+import { faVolumeHigh, faChevronRight } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import {
-  H4, H6,
-  Button,
-  Label,
-  Textarea,
-} from "~/components";
+import { H4, H6, Button, Label, Textarea } from "~/components";
 
-import { GenerateTtsAudioResponse, } from "~/pages/PageEnigma/models/tts";
+import { GenerateTtsAudioResponse } from "~/pages/PageEnigma/models/tts";
 
-
-import { GenerateTtsAudio, } from "./utilities";
+import { GenerateTtsAudio } from "./utilities";
 import { AudioTabPages, TtsState } from "./types";
 
 export const PageTTS = ({
@@ -22,13 +16,12 @@ export const PageTTS = ({
   sessionToken,
   ttsState,
   setTtsState,
-}:{
-  changePage: (newPage:AudioTabPages) => void;
+}: {
+  changePage: (newPage: AudioTabPages) => void;
   sessionToken: string;
-  ttsState: TtsState,
-  setTtsState: (newState:TtsState)=>void,
-})=>{
-
+  ttsState: TtsState;
+  setTtsState: (newState: TtsState) => void;
+}) => {
   const requestTts = useCallback(
     (sessionToken: string) => {
       const modelToken = ttsState.voice
@@ -36,7 +29,6 @@ export const PageTTS = ({
         : undefined;
 
       if (modelToken) {
-
         const request = {
           uuid_idempotency_token: uuidv4(),
           tts_model_token: modelToken,
@@ -50,7 +42,7 @@ export const PageTTS = ({
                 ...ttsState,
                 inferenceTokens: [
                   ...ttsState.inferenceTokens,
-                  res.inference_job_token
+                  res.inference_job_token,
                 ],
               });
 
@@ -74,21 +66,24 @@ export const PageTTS = ({
 
   return (
     <>
-      <Label className="mb-1">Select a Voice</Label>
-      <div
-        className="p-3 bg-brand-secondary rounded-lg flex justify-between items-center gap-3 cursor-pointer"
-        onClick={()=>changePage(AudioTabPages.SELECT_TTS_MODEL)}
-      >
-        <span className="bg-brand-secondary-600 rounded-lg w-12 h-12"/>
+      <Label>Select a Voice</Label>
+      <button
+        className="flex cursor-pointer items-center justify-between gap-3 rounded-lg bg-brand-secondary p-3 text-start transition-all hover:bg-ui-controls-button/40"
+        onClick={() => changePage(AudioTabPages.SELECT_TTS_MODEL)}>
+        <span className="h-12 w-12 rounded-lg bg-ui-controls-button/100" />
         <div className="grow">
           {!ttsState.voice && <H4>None Selected</H4>}
-          {ttsState.voice && <>
-            <H4>{ttsState.voice.title}</H4>
-            <H6>by {ttsState.voice.creator_display_name}</H6>
-          </>}
+          {ttsState.voice && (
+            <>
+              <H4>{ttsState.voice.title}</H4>
+              <H6 className="text-white/70">
+                by {ttsState.voice.creator_display_name}
+              </H6>
+            </>
+          )}
         </div>
-        <FontAwesomeIcon icon={faChevronRight} size="2x"/>
-      </div>
+        <FontAwesomeIcon icon={faChevronRight} className="text-xl opacity-60" />
+      </button>
 
       <div className="mt-4 w-full">
         <Textarea
@@ -101,7 +96,7 @@ export const PageTTS = ({
       </div>
 
       <Button
-        className="h-11 w-full text-sm mt-4"
+        className="mt-4 h-11 w-full text-sm"
         variant="primary"
         disabled={ttsState.text === ""}
         icon={faVolumeHigh}

@@ -38,7 +38,7 @@ export const Label = ({
   ...rest
 }: LabelHTMLAttributes<HTMLLabelElement>) => (
   <label
-    className={twMerge(baseTypo, "mb-2 text-sm font-medium", className)}
+    className={twMerge(baseTypo, "mb-2 text-[15px] font-medium", className)}
     {...rest}>
     {children}
   </label>
@@ -51,7 +51,7 @@ export const H5 = ({ className, children }: TypoProps) => (
 );
 
 export const H6 = ({ className, children }: TypoProps) => (
-  <h6 className={twMerge(baseTypo, "text-sm font-light", className)}>
+  <h6 className={twMerge(baseTypo, "text-sm font-normal", className)}>
     {children}
   </h6>
 );

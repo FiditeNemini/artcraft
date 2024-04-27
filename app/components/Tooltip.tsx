@@ -1,13 +1,15 @@
 import React, { useState, useRef } from "react";
 import { Transition } from "@headlessui/react";
+import { twMerge } from "tailwind-merge";
 
 interface TooltipProps {
   children: React.ReactElement;
   content: React.ReactNode;
   position: "top" | "bottom" | "left" | "right";
+  className?: string;
 }
 
-const Tooltip = ({ children, content, position }: TooltipProps) => {
+const Tooltip = ({ children, content, position, className }: TooltipProps) => {
   const [isShowing, setIsShowing] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -64,7 +66,10 @@ const Tooltip = ({ children, content, position }: TooltipProps) => {
         <div
           ref={tooltipRef}
           style={getStyleForPosition()}
-          className="absolute z-10 w-max rounded-lg bg-ui-controls px-2.5 py-1.5 text-sm font-medium text-white shadow-lg">
+          className={twMerge(
+            "absolute z-10 w-max rounded-lg bg-ui-controls px-2.5 py-1.5 text-sm font-medium text-white shadow-xl",
+            className ? className : "",
+          )}>
           {content}
         </div>
       </Transition>

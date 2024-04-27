@@ -1,10 +1,6 @@
 .fy-file-wrapper {
-  border-color: transparent;
-  border-style: dashed;
-  border-width: 2px;
   // flex-grow: 1;
   height: calc(100% - 4px);
-  overflow: scroll;
 
   .file-picker-button {
     cursor: pointer;

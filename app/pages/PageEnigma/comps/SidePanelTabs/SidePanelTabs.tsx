@@ -14,9 +14,10 @@ export const SidePanelTabs = () => {
           <div
             key={tab.value}
             className={
-              tab.value === selectedTab.value?.value ? "h-full flex flex-col gap-4" : "hidden"
-            }
-          >
+              tab.value === selectedTab.value?.value
+                ? "flex h-full flex-col gap-3.5 overflow-y-auto"
+                : "hidden"
+            }>
             {tab.component}
           </div>
         ))}

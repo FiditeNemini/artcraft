@@ -8,22 +8,24 @@ import {
   faFileAudio,
   faSpinnerThird,
   faTrash,
+  faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { UploadAudio, UploadAudioIsOk, UploadAudioRequest } from "./utilities";
 
 import { Button } from "../Button";
-import { P, WaveformPlayer } from "~/components";
+import { ButtonIcon, P, WaveformPlayer } from "~/components";
+import Tooltip from "../Tooltip";
 
 const FILE_TYPES = ["MP3", "WAV", "FLAC", "OGG"];
 
 interface Props {
   sessionToken: string;
   file?: File;
-  onFileStaged?: (file:File)=>void;
-  onClear?: ()=>void;
-  onFileUploaded: (token:string)=>void
+  onFileStaged?: (file: File) => void;
+  onClear?: () => void;
+  onFileUploaded: (token: string) => void;
 }
 
 function UploadComponent({
@@ -33,19 +35,18 @@ function UploadComponent({
   onClear,
   onFileUploaded,
 }: Props) {
-
-  const [{file, uploadState, uploadToken}, setState] = useState<{
+  const [{ file, uploadState, uploadToken }, setState] = useState<{
     file: File | undefined;
-    uploadState: "init"|"none"|"uploading"|"uploaded"|"error";
-    uploadToken ?: string;
+    uploadState: "init" | "none" | "uploading" | "uploaded" | "error";
+    uploadToken?: string;
   }>({
     file: propsFile,
     uploadState: propsFile ? "none" : "init",
   });
   const audioUrl = file ? URL.createObjectURL(file) : "";
 
-  const handleChange = (file:File) => {
-    setState((curr)=>({
+  const handleChange = (file: File) => {
+    setState((curr) => ({
       ...curr,
       file: file,
       uploadState: "none",
@@ -88,9 +89,9 @@ function UploadComponent({
     });
   };
 
-  useEffect(()=>{
-    if(file && uploadState === "none" && onFileStaged) onFileStaged(file);
-    if(!file && uploadState === "none" && onClear) onClear();
+  useEffect(() => {
+    if (file && uploadState === "none" && onFileStaged) onFileStaged(file);
+    if (!file && uploadState === "none" && onClear) onClear();
   }, [file, uploadState]);
   useEffect(() => {
     if (uploadState === "uploaded" && uploadToken) onFileUploaded(uploadToken);
@@ -109,12 +110,22 @@ function UploadComponent({
 
       {file && (
         <>
-          <div className="rounded-lg border border-brand-secondary-700 p-3">
-            <WaveformPlayer audio={audioUrl} />
+          <div className="flex items-center gap-3 rounded-lg bg-brand-secondary p-3">
+            <div className="grow">
+              <WaveformPlayer audio={audioUrl} />
+            </div>
+            <Tooltip content="Remove" position="top">
+              <ButtonIcon
+                icon={faXmark}
+                onClick={handleClear}
+                className="h-auto w-auto bg-transparent p-0 text-xl opacity-60 hover:bg-transparent hover:opacity-90"
+              />
+            </Tooltip>
           </div>
-          <div className="flex justify-evenly gap-3">
+          <div className="flex gap-2">
             <Button
-              className="grow"
+              className="w-full py-2.5"
+              variant="action"
               onClick={handleUploadFile}
               disabled={uploadState !== "none" && uploadState !== "error"}
               icon={
@@ -133,10 +144,6 @@ function UploadComponent({
                 <FontAwesomeIcon icon={faSpinnerThird} spin />
               )}
             </Button>
-
-            <Button className="grow" onClick={handleClear} icon={faTrash}>
-              Clear
-            </Button>
           </div>
         </>
       )}
@@ -154,13 +161,13 @@ const DragAndDropZone = ({ file }: { file: any }) => {
 
   if (!file) {
     return (
-      <div className="flex cursor-pointer items-center gap-4 rounded-lg border-2 border-dashed border-brand-secondary-700 bg-brand-secondary p-3">
-        <FontAwesomeIcon icon={faFileArrowUp} size="3x" />
-        <div className="flex flex-col gap-1">
+      <div className="flex cursor-pointer items-center gap-3.5 rounded-lg border-2 border-dashed border-ui-controls-button/50 bg-brand-secondary p-3">
+        <FontAwesomeIcon icon={faFileArrowUp} className="text-4xl" />
+        <div className="flex flex-col gap-0">
           <P className="font-medium">
             <u>Upload a file</u> or drop it here
           </P>
-          <P className="opacity-50">
+          <P className="flex items-center gap-2 text-sm font-normal opacity-50">
             {FILE_TYPES.join(", ").toString()} supported
           </P>
         </div>
@@ -168,17 +175,17 @@ const DragAndDropZone = ({ file }: { file: any }) => {
     );
   } else {
     return (
-      <div className="flex cursor-pointer items-center gap-4 rounded-lg border-2 border-dashed border-brand-secondary-700 bg-brand-secondary p-3">
-        <FontAwesomeIcon icon={faFileAudio} size="3x" />
-        <div className="flex flex-col gap-1">
+      <div className="flex cursor-pointer items-center gap-3.5 rounded-lg border-2 border-dashed border-ui-controls-button/50 bg-brand-secondary p-3">
+        <FontAwesomeIcon icon={faFileAudio} className="text-4xl" />
+        <div className="flex flex-col gap-0">
           <P className="font-medium">
             {file.name.slice(0, file.name.lastIndexOf("."))}
           </P>
-          <P>
+          <P className="flex items-center gap-2 text-sm font-normal">
             <span className="opacity-50">
               {`${file.name.split(".").pop().toUpperCase()} file size: ${fileSize} `}
             </span>
-            <u>Change File</u>
+            <u className="transition-all hover:text-white/80">Change File</u>
           </P>
         </div>
       </div>

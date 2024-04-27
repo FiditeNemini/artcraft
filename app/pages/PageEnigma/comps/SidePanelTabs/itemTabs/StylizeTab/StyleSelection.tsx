@@ -39,7 +39,7 @@ export const StyleSelection = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 rounded-t-lg bg-ui-panel">
+    <div className="flex flex-col gap-4 rounded-t-lg bg-ui-panel px-4">
       <div className="flex flex-col">
         <div className="relative">
           <div

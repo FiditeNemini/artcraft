@@ -10,72 +10,82 @@ export const PageAudioGeneration = ({
   changePage,
   audioPanelState,
   setAudioPanelState,
-}:{
+}: {
   sessionToken: string;
-  changePage: (newPage: AudioTabPages)=>void;
-  audioPanelState: AudioPanelState
-  setAudioPanelState: React.Dispatch<React.SetStateAction<AudioPanelState>>
-}) =>{
+  changePage: (newPage: AudioTabPages) => void;
+  audioPanelState: AudioPanelState;
+  setAudioPanelState: React.Dispatch<React.SetStateAction<AudioPanelState>>;
+}) => {
   const subpage = audioPanelState.lastWorkingAudioGeneration;
   const changeSubpage = (newSubpage: AudioTabPages.TTS | AudioTabPages.V2V) => {
-    setAudioPanelState((curr)=>({
+    setAudioPanelState((curr) => ({
       ...curr,
-      lastWorkingAudioGeneration: newSubpage
+      lastWorkingAudioGeneration: newSubpage,
     }));
   };
-  const setTtsState = (newTtsState: TtsState)=>{
-    setAudioPanelState((curr)=>({
+  const setTtsState = (newTtsState: TtsState) => {
+    setAudioPanelState((curr) => ({
       ...curr,
-      ttsState : {...curr.ttsState, ...newTtsState}
+      ttsState: { ...curr.ttsState, ...newTtsState },
     }));
   };
-  const setV2VState = (newV2VState: V2VState)=>{
-    setAudioPanelState((curr)=>({
+  const setV2VState = (newV2VState: V2VState) => {
+    setAudioPanelState((curr) => ({
       ...curr,
-      v2vState : {...curr.v2vState, ...newV2VState}
+      v2vState: { ...curr.v2vState, ...newV2VState },
     }));
   };
-  return(
-    <div className="flex flex-col px-4 pt-2">
-      <TabTitle title="Generate Audio" onBack={() => changePage(AudioTabPages.LIBRARY)}/>
+  return (
+    <>
+      <TabTitle
+        title="Generate Audio"
+        onBack={() => changePage(AudioTabPages.LIBRARY)}
+      />
+      <div className="flex flex-col px-4">
+        <div className="mb-4 flex h-10 w-full justify-evenly overflow-hidden rounded-lg">
+          <button
+            className={twMerge(
+              "grow cursor-pointer bg-brand-secondary p-2 text-sm font-medium transition-all",
+              subpage === AudioTabPages.TTS
+                ? "bg-ui-controls-button"
+                : "hover:bg-ui-controls-button/50",
+            )}
+            disabled={subpage === AudioTabPages.TTS}
+            onClick={() => changeSubpage(AudioTabPages.TTS)}>
+            Text to Speech
+          </button>
+          <button
+            className={twMerge(
+              "grow cursor-pointer bg-brand-secondary p-2 text-sm font-medium transition-all",
+              subpage === AudioTabPages.V2V
+                ? "bg-ui-controls-button"
+                : "hover:bg-ui-controls-button/50",
+            )}
+            disabled={subpage === AudioTabPages.V2V}
+            onClick={() => {
+              changeSubpage(AudioTabPages.V2V);
+            }}>
+            Voice to Voice
+          </button>
+        </div>
 
-      <div className="w-full rounded-lg overflow-hidden flex justify-evenly mb-4">
-        <button
-          className={twMerge(
-            "bg-brand-secondary p-2 grow",
-            subpage === AudioTabPages.TTS ? "bg-brand-secondary-800": "",)}
-          disabled={subpage === AudioTabPages.TTS}
-          onClick={()=>changeSubpage(AudioTabPages.TTS)}
-        >
-          Text to Speech
-        </button>
-        <button
-          className={twMerge(
-            "bg-brand-secondary p-2 grow",
-            subpage === AudioTabPages.V2V ? "bg-brand-secondary-800": "",)}
-          disabled={subpage === AudioTabPages.V2V}
-          onClick={()=>{changeSubpage(AudioTabPages.V2V)}}
-        >
-          Voice to Voice
-        </button>
+        {subpage === AudioTabPages.TTS && (
+          <PageTTS
+            changePage={changePage}
+            sessionToken={sessionToken}
+            ttsState={audioPanelState.ttsState}
+            setTtsState={setTtsState}
+          />
+        )}
+        {subpage === AudioTabPages.V2V && (
+          <PageVoicetoVoice
+            changePage={changePage}
+            sessionToken={sessionToken}
+            v2vState={audioPanelState.v2vState}
+            setV2VState={setV2VState}
+          />
+        )}
       </div>
-
-      {subpage ===  AudioTabPages.TTS && 
-        <PageTTS
-          changePage={changePage}
-          sessionToken={sessionToken}
-          ttsState={audioPanelState.ttsState}
-          setTtsState={setTtsState}
-        />
-      }
-      {subpage ===  AudioTabPages.V2V && 
-        <PageVoicetoVoice
-          changePage={changePage}
-          sessionToken={sessionToken}
-          v2vState={audioPanelState.v2vState}
-          setV2VState={setV2VState}
-        />
-      }
-    </div>
+    </>
   );
-}
+};

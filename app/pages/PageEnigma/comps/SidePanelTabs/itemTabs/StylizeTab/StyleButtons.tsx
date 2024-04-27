@@ -1,4 +1,4 @@
-import { Button } from "~/components";
+import { Button, Label } from "~/components";
 import { faArrowsRotate, faFilm } from "@fortawesome/pro-solid-svg-icons";
 import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -36,17 +36,15 @@ export function StyleButtons() {
   console.log("state", editorState.value);
 
   return (
-    <div className="flex w-full flex-col justify-center gap-4 rounded-b-lg bg-ui-panel">
+    <div className="flex w-full flex-col justify-center gap-4 rounded-b-lg bg-ui-panel px-4">
       <div className="w-full">
         {editorState.value === EditorStates.EDIT && (
           <>
-            <div className="mb-2 text-sm font-medium">
-              Render the current camera view with AI
-            </div>
+            <Label>Render the current camera view with AI</Label>
             <Button
               icon={faArrowsRotate}
               variant="primary"
-              className="w-full"
+              className="mt-1.5 w-full"
               onClick={switchPreview}>
               Preview Frame
             </Button>
@@ -63,9 +61,9 @@ export function StyleButtons() {
         )}
       </div>
       <div className="w-full">
-        <div className="text-sm font-medium">
+        <Label>
           When you&apos;re done, render your entire animation with AI
-        </div>
+        </Label>
         <div className="mb-2 text-xs text-white/70">
           (This may take several minutes)
         </div>

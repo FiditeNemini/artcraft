@@ -10,7 +10,7 @@ export function StylizeTab() {
 
   return (
     <div
-      className="overflow-y-auto overflow-x-hidden p-4"
+      className="flex flex-col gap-4"
       style={{ height: sidePanelHeight.value }}>
       <TabTitle title="Transform your animation with AI" />
       <StyleSelection />
