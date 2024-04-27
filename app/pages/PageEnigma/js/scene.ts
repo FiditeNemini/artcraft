@@ -50,6 +50,12 @@ class Scene {
     this._create_camera_obj();
   }
 
+  clear() {
+    this.scene.children.forEach(child => {
+      this.scene.remove(child);
+    });
+  }
+
   instantiate(name: string, pos: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
     const material = new THREE.MeshPhongMaterial({ color: 0xdacbce });
     material.shininess = 0.0;

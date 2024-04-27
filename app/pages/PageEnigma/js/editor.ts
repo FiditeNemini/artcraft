@@ -441,6 +441,28 @@ class Editor {
     loadingBarIsShowing.value = false;
   }
 
+  public async newScene(){
+    this.activeScene.clear();
+    this.audio_engine = new AudioEngine();
+    this.emotion_engine = new EmotionEngine(this.version);
+    this.transform_engine = new TransformEngine(this.version);
+    this.lipsync_engine = new LipSyncEngine();
+    this.animation_engine = new AnimationEngine(this.version);
+
+    this.timeline = new TimeLine(
+      this,
+      this.audio_engine,
+      this.transform_engine,
+      this.lipsync_engine,
+      this.animation_engine,
+      this.emotion_engine,
+      this.activeScene,
+      this.camera,
+      this.mouse,
+      this.camera_name,
+    );
+  }
+
   // Token comes in from the front end to load the scene from the site.
   public async testBatchRequest() {
     const result = await this.api_manager.getMediaBatch([
