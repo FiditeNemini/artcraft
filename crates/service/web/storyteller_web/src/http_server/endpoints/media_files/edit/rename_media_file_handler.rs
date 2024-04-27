@@ -70,7 +70,7 @@ impl fmt::Display for RenameMediaFileError {
   tag = "Media Files",
   path = "/v1/media_files/rename/{token}",
   responses(
-    (status = 200, description = "Success Delete", body = SimpleGenericJsonSuccess),
+    (status = 200, description = "Success", body = SimpleGenericJsonSuccess),
     (status = 400, description = "Bad input", body = RenameMediaFileError),
     (status = 401, description = "Not authorized", body = RenameMediaFileError),
     (status = 500, description = "Server error", body = RenameMediaFileError),

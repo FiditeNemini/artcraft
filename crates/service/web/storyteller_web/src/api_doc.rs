@@ -46,6 +46,7 @@ use crate::http_server::endpoints::inference_job::list_session_jobs_handler::*;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
 use crate::http_server::endpoints::media_files::delete::delete_media_file_handler::*;
 use crate::http_server::endpoints::media_files::edit::change_media_file_visibility_handler::*;
+use crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::*;
 use crate::http_server::endpoints::media_files::edit::rename_media_file_handler::*;
 use crate::http_server::endpoints::media_files::edit::set_media_file_cover_image_handler::*;
 use crate::http_server::endpoints::media_files::get::batch_get_media_files_handler::*;
@@ -122,6 +123,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::user_ratings::batch_get_user_rating_handler::batch_get_user_rating_handler,
     crate::http_server::endpoints::user_ratings::get_user_rating_handler::get_user_rating_handler,
     crate::http_server::endpoints::user_ratings::set_user_rating_handler::set_user_rating_handler,
+    crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::enqueue_voice_conversion_inference_handler,
     crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::enqueue_tts_request,
     crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::list_datasets_by_user_handler,
     crate::http_server::endpoints::weights::delete_weight_handler::delete_weight_handler,
@@ -208,6 +210,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ChangeMediaFileVisibilityPathInfo,
     ChangeMediaFileVisibilityRequest,
     CreateSceneError,
+    EnqueueVoiceConversionInferenceError,
+    EnqueueVoiceConversionInferenceSuccessResponse,
+
+    EnqueueVoiceConversionInferenceRequest,
+    FundamentalFrequencyMethod,
     CreateSceneSuccessResponse,
     CreateUserBookmarkError,
     CreateUserBookmarkRequest,

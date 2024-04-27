@@ -13,6 +13,7 @@ use log::{error, info, warn};
 use r2d2_redis::redis::Commands;
 use sqlx::MySql;
 use sqlx::pool::PoolConnection;
+use utoipa::ToSchema;
 
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::generic_inference_jobs::inference_input_source_token_type::InferenceInputSourceTokenType;
@@ -26,6 +27,7 @@ use mysql_queries::payloads::generic_inference_args::generic_inference_args::{Fu
 use mysql_queries::queries::generic_inference::web::insert_generic_inference_job::{insert_generic_inference_job, InsertGenericInferenceArgs};
 use redis_common::redis_keys::RedisKeys;
 use tokens::tokens::generic_inference_jobs::InferenceJobToken;
+use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::media_uploads::MediaUploadToken;
 use tokens::tokens::users::UserToken;
 use tts_common::priority::FAKEYOU_INVESTOR_PRIORITY_LEVEL;
@@ -44,13 +46,20 @@ const DEBUG_HEADER_NAME : &str = "enable-debug-mode";
 /// This is useful for catching the live logs or intercepting the job.
 const ROUTING_TAG_HEADER_NAME : &str = "routing-tag";
 
-#[derive(Deserialize)]
+#[derive(Deserialize, ToSchema)]
 pub struct EnqueueVoiceConversionInferenceRequest {
   uuid_idempotency_token: String,
   voice_conversion_model_token: String,
 
-  // TODO: Make media upload token optional and allow result audio to be re-used as well
-  source_media_upload_token: MediaUploadToken,
+  /// NB: This can be a `MediaUploadToken` or a `MediaFileToken` token.
+  /// We will eventually migrate everything to media files.
+  source_media_upload_token: String,
+
+  // /// Media upload tokens are the old, deprecated format
+  // source_media_upload_token: Option<MediaUploadToken>,
+
+  // /// Media file tokens are the new, preferred format
+  // source_media_file_token: Option<MediaUploadToken>,
 
   creator_set_visibility: Option<Visibility>,
   is_storyteller_demo: Option<bool>,
@@ -69,7 +78,7 @@ pub struct EnqueueVoiceConversionInferenceRequest {
   transpose: Option<i32>,
 }
 
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize, Clone, Copy, ToSchema)]
 pub enum FundamentalFrequencyMethod {
   /// RMVPE is the best algorithm as of 2023-10-10.
   #[serde(rename = "rmvpe")]
@@ -82,13 +91,13 @@ pub enum FundamentalFrequencyMethod {
   Harvest,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 pub struct EnqueueVoiceConversionInferenceSuccessResponse {
   pub success: bool,
   pub inference_job_token: InferenceJobToken,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ToSchema)]
 pub enum EnqueueVoiceConversionInferenceError {
   BadInput(String),
   NotAuthorized,
@@ -125,6 +134,21 @@ impl fmt::Display for EnqueueVoiceConversionInferenceError {
   }
 }
 
+#[utoipa::path(
+  post,
+  tag = "Voice Conversion",
+  path = "/v1/voice_conversion/inference",
+  responses(
+    (status = 200, description = "Success", body = EnqueueVoiceConversionInferenceSuccessResponse),
+    (status = 400, description = "Bad input", body = EnqueueVoiceConversionInferenceError),
+    (status = 401, description = "Not authorized", body = EnqueueVoiceConversionInferenceError),
+    (status = 429, description = "Rate limited", body = EnqueueVoiceConversionInferenceError),
+    (status = 500, description = "Server error", body = EnqueueVoiceConversionInferenceError),
+  ),
+  params(
+    ("request" = EnqueueVoiceConversionInferenceRequest, description = "Payload for Request"),
+  )
+)]
 pub async fn enqueue_voice_conversion_inference_handler(
   http_request: HttpRequest,
   request: web::Json<EnqueueVoiceConversionInferenceRequest>,
@@ -234,13 +258,45 @@ pub async fn enqueue_voice_conversion_inference_handler(
 
   // TODO(bt): CHECK DATABASE!
   let model_token = request.voice_conversion_model_token.clone();
-  let media_token = request.source_media_upload_token.clone();
 
   let model_inference_info = lookup_model_info(
     &model_token,
     &server_state.caches.durable.model_token_info,
     &mut mysql_connection
   ).await?;
+
+  // ==================== HANDLE AUDIO INPUT ==================== //
+
+  let media_token = request.source_media_upload_token.clone();
+
+  let media_token_type =
+    if media_token.starts_with(MediaUploadToken::token_prefix()) {
+      InferenceInputSourceTokenType::MediaUpload
+    } else if media_token.starts_with(MediaFileToken::token_prefix()) {
+      InferenceInputSourceTokenType::MediaFile
+    } else {
+      return Err(EnqueueVoiceConversionInferenceError::BadInput(
+        "input token is not a media_upload or media_file token".to_string()));
+    };
+
+  // NB: This is better, but we'd need to change the API and migrate callers.
+  // let (input_token, input_token_type) =
+  //     match (&request.source_media_upload_token, &request.source_media_file_token) {
+  //       (Some(media_upload), None) => {
+  //         (media_upload.to_string(), InferenceInputSourceTokenType::MediaUpload)
+  //       },
+  //       (None, Some(media_file)) => {
+  //         (media_file.to_string(), InferenceInputSourceTokenType::MediaFile)
+  //       },
+  //       (Some(_media_upload), Some(_media_file)) => {
+  //         return Err(EnqueueVoiceConversionInferenceError::BadInput(
+  //           "both source_media_upload_token and source_media_file_token provided".to_string()));
+  //       },
+  //       (None, None) => {
+  //         return Err(EnqueueVoiceConversionInferenceError::BadInput(
+  //           "neither source_media_upload_token nor source_media_file_token provided".to_string()));
+  //       },
+  //     };
 
   // ==================== CHECK AND ENQUEUE VOICE CONVERSION ==================== //
 
@@ -306,8 +362,8 @@ pub async fn enqueue_voice_conversion_inference_handler(
     inference_category: InferenceCategory::VoiceConversion,
     maybe_model_type: Some(model_inference_info.job_model_type),
     maybe_model_token: Some(&model_token),
-    maybe_input_source_token: Some(media_token.as_str()),
-    maybe_input_source_token_type: Some(InferenceInputSourceTokenType::MediaUpload),
+    maybe_input_source_token: Some(&media_token),
+    maybe_input_source_token_type: Some(media_token_type),
     maybe_download_url: None,
     maybe_cover_image_media_file_token: None,
     maybe_raw_inference_text: None, // NB: Voice conversion isn't TTS, so there's no text.
