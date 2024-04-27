@@ -1,6 +1,5 @@
 import * as THREE from "three";
 
-import { AnyJson } from "three/examples/jsm/nodes/core/constants.js";
 import { ClipUI } from "../datastructures/clips/clip_ui";
 
 import Scene from "./scene.js";
@@ -60,7 +59,9 @@ export class TimeLine {
 
   current_time: number;
 
+  camera_name: string;
   // ensure that the elements are loaded first.
+
   constructor(
     editor: Editor,
     audio_engine: AudioEngine,
@@ -71,6 +72,7 @@ export class TimeLine {
     scene: Scene,
     camera: THREE.Camera,
     mouse: THREE.Vector2 | undefined,
+    camera_name: string,
   ) {
     this.editorEngine = editor;
     this.timeline_items = [];
@@ -98,6 +100,8 @@ export class TimeLine {
     );
 
     this.current_time = 0;
+
+    this.camera_name = camera_name;
   }
 
   public async updateUI() {
@@ -148,7 +152,7 @@ export class TimeLine {
         await this.mute(data, true);
         break;
       case toEngineActions.ADD_CHARACTER:
-        await this.addCharacter(data);
+        this.addCharacter(data);
         break;
       case toEngineActions.ADD_OBJECT: {
         const newObject = await this.addObject(data);
@@ -183,15 +187,21 @@ export class TimeLine {
     const pos = this.getPos();
     const new_data = { ...data.data };
 
-    const obj = await this.scene.load_glb(media_id);
+    const obj = await this.scene.loadGlbWithPlaceholder(
+      media_id,
+      name,
+      true,
+      pos,
+    );
+
     obj.userData["name"] = name;
     obj.name = name;
     obj.position.copy(pos);
     const object_uuid = obj.uuid;
 
     this.characters[object_uuid] = ClipGroup.CHARACTER;
-
     new_data["object_uuid"] = object_uuid;
+
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,
       action: fromEngineActions.UPDATE_CHARACTER_ID,
@@ -271,7 +281,12 @@ export class TimeLine {
     const pos = this.getPos();
     const media_id = data.data.media_id;
     const name = data.data.name;
-    const obj = await this.scene.load_glb(media_id);
+    const obj = await this.scene.loadGlbWithPlaceholder(
+      media_id,
+      name,
+      true,
+      pos,
+    );
     obj.userData["name"] = name;
     obj.name = name;
     obj.position.copy(pos);
@@ -340,7 +355,7 @@ export class TimeLine {
 
   public deleteObject(object_uuid: string) {
     const object = this.scene.get_object_by_uuid(object_uuid);
-    if (object?.name === "::CAM::") {
+    if (object?.name === this.camera_name) {
       return;
     }
     this.timeline_items = this.timeline_items.filter(

@@ -117,6 +117,8 @@ class Editor {
   startRenderWidth: number;
   // Default params.
 
+  // global names of scene entities
+  camera_name: string;
   constructor() {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
@@ -134,7 +136,10 @@ class Editor {
     // Version and name.
     this.version = 1.0;
     // Clock, scene and camera essentials.
-    this.activeScene = new Scene("" + this.version);
+    // global names
+    this.camera_name = "::CAM::";
+
+    this.activeScene = new Scene("" + this.version, this.camera_name);
     this.activeScene.initialize();
     this.generating_preview = false;
     this.camera;
@@ -212,6 +217,7 @@ class Editor {
       this.activeScene,
       this.camera,
       this.mouse,
+      this.camera_name,
     );
 
     this.current_frame = 0;
@@ -397,7 +403,7 @@ class Editor {
     this.current_scene_media_token = null;
     this.current_scene_glb_media_token = null;
 
-    this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
+    this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
 
     // Creates the main update loop.
     //this.renderer.setAnimationLoop(this.updateLoop.bind(this));
@@ -467,7 +473,7 @@ class Editor {
       this.activeScene,
     );
     await proxyScene.loadFromSceneJson(scene_json["scene"]);
-    this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
+    this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
 
     const proxyTimeline = new StoryTellerProxyTimeline(
       this.version,
@@ -534,7 +540,6 @@ class Editor {
       JSON.stringify(save_data),
       name,
       this.current_scene_glb_media_token,
-      this.current_scene_media_token,
     );
 
     console.log(result);
@@ -630,10 +635,6 @@ class Editor {
     }
   }
 
-  public async loadMediaToken(media_file_token: string) {
-    this.activeScene.load_glb(media_file_token);
-  }
-
   async showLoading() {
     loadingBarIsShowing.value = true;
   }
@@ -717,7 +718,7 @@ class Editor {
 
   deleteObject(uuid: string) {
     const obj = this.activeScene.get_object_by_uuid(uuid);
-    if (obj?.name === "::CAM::") {
+    if (obj?.name === this.camera_name) {
       return;
     }
     if (obj) {
@@ -814,7 +815,7 @@ class Editor {
     }, 1000 / this.cap_fps);
 
     if (this.cam_obj == undefined) {
-      this.cam_obj = this.activeScene.get_object_by_name("::CAM::");
+      this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
     }
 
     // Updates debug stats.
@@ -1244,7 +1245,7 @@ class Editor {
       type: APPUI_ACTION_TYPES.UPDATE_CONTROLPANELS_SCENEOBJECT,
       payload: {
         group:
-          this.selected.name === "::CAM::"
+          this.selected.name === this.camera_name
             ? ClipGroup.CAMERA
             : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
         object_uuid: this.selected.uuid,

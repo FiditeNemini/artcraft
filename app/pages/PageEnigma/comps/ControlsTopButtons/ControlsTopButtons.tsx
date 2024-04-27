@@ -17,19 +17,12 @@ export const ControlsTopButtons = () => {
   const [sceneToken, setSceneToken] = useState<string>("");
   const { addToast } = useContext(ToasterContext);
 
-  // for testing
-  const [mediaToken, setMediaToken] = useState<string>("");
-
   const handleButtonSave = async () => {
     console.log(`SceneName is ${sceneName}`);
     const sceneMediaToken = await editorEngine?.saveScene(sceneName);
     if (sceneMediaToken) {
       addToast(ToastTypes.SUCCESS, sceneMediaToken);
     }
-  };
-
-  const handleMediaToken = async () => {
-    await editorEngine?.loadMediaToken(mediaToken);
   };
 
   const handleButtonLoadScene = () => {

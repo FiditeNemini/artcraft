@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from "uuid";
 import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { STORAGE_KEYS } from "~/contexts/Authentication/types";
-import process from "process";
 import { environmentVariables } from "~/store";
 
 /**
@@ -113,8 +112,6 @@ export class APIManager {
   ): Promise<any> {
     const api_base_url = environmentVariables.value.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
-    console.log(`API BASE URL? ${api_base_url}`);
-    console.log(`CALLED URL? ${url}`);
     const response = await fetch(url);
     if (response.status > 200) {
       throw new APIManagerResponseError("Failed to load scene");
@@ -210,61 +207,6 @@ export class APIManager {
     }
   }
 
-  private async saveSceneAndTimeLineState(
-    scene_glb_media_file_token: string | null,
-    scene_media_file_token: string | null,
-    scene_file_name: string,
-  ): Promise<string> {
-    const url = `${this.baseUrl}/v1/media_files/write/scene_file`;
-    const uuid = uuidv4();
-
-    console.log(
-      `Saving Scene scene_media_file_token:${scene_media_file_token} | scene_glb_media_file_token:${scene_glb_media_file_token}`,
-    );
-    // turn json into a blob
-    const scene_schema = {
-      scene_glb_media_file_token: scene_glb_media_file_token,
-      scene_name: scene_file_name,
-      timeline: { objects: [] },
-    };
-    const json = JSON.stringify(scene_schema);
-    const blob = new Blob([json], { type: "application/json" });
-    const file_name = `${uuid}.json`;
-
-    const form_data = new FormData();
-
-    form_data.append("uuid_idempotency_token", uuid);
-
-    // overrwrites the scene json file and edits.
-    if (scene_media_file_token != null) {
-      form_data.append("media_file_token", scene_media_file_token);
-    }
-
-    form_data.append("file", blob, file_name);
-    form_data.append("source", "file");
-    form_data.append("type", "scene_json");
-    form_data.append("source", "file");
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        session: this.sessionToken,
-      },
-      body: form_data,
-    });
-
-    if (!response.ok) {
-      throw new APIManagerResponseError("Failed to Save Scene.");
-    } else {
-      const json_data = await response.json();
-      // example response {"success":true,"media_file_token":"m_r1ztnn501g2rn0vv2np08nd6zy2fvt"}
-      console.log(`saveSceneAndTimeLineState: ${JSON.stringify(json_data)}`);
-      // should return the same token if it is same file else new token.
-      return json_data; // or handle the response as appropriate
-    }
-  }
-
   public async uploadMedia(
     blob: any,
     fileName: string,
@@ -319,7 +261,6 @@ export class APIManager {
 
     const response = await fetch(url, {
       method: "POST",
-      // credentials: "include",
       headers: {
         Accept: "application/json",
         session: this.sessionToken,
@@ -379,7 +320,6 @@ export class APIManager {
 
     const response = await fetch(`${this.baseUrl}/v1/video/enqueue_vst`, {
       method: "POST",
-      // credentials: "include",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

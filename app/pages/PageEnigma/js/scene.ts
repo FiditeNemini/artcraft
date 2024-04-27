@@ -1,7 +1,10 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { GLTFLoader, GLTF } from "three/addons/loaders/GLTFLoader.js";
 import { environmentVariables } from "~/store";
 
+import { Font } from "three/examples/jsm/loaders/FontLoader.js";
+import { generateUUID } from "three/src/math/MathUtils.js";
+import { LoadingPlaceHolderManager } from "./placeholder_manager";
 class Scene {
   name: string;
   gridHelper: THREE.GridHelper | undefined;
@@ -9,16 +12,38 @@ class Scene {
   hot_items: THREE.Object3D[] | undefined;
   selected: THREE.Object3D | undefined;
 
-  constructor(name: string) {
+  // Display message
+  message_mesh: THREE.Mesh | undefined;
+  loading_placeholder: THREE.Object3D | undefined;
+  message_font: Font | undefined;
+
+  // global names
+  camera_name: string;
+
+  // loading indicator manager
+  placeholder_manager: LoadingPlaceHolderManager | undefined;
+
+  constructor(name: string, camera_name: string) {
     this.name = name;
     this.gridHelper;
     this.scene = new THREE.Scene();
     this.hot_items = [];
     this.selected = undefined;
+
+    this.message_mesh = undefined;
+    this.loading_placeholder = undefined;
+    this.message_font = undefined;
+
+    // global names
+    this.camera_name = camera_name;
+    this.placeholder_manager = undefined;
   }
 
   initialize() {
     this.scene = new THREE.Scene();
+    this.placeholder_manager = new LoadingPlaceHolderManager(this.scene);
+    this.placeholder_manager.initialize();
+
     this._createGrid();
     this._create_base_lighting();
     this._create_skybox();
@@ -101,14 +126,24 @@ class Scene {
     //this.scene.background = null;
   }
 
-  _create_camera_obj() {
-    this.load_glb("m_cxh4asqhapdz10j880755dg4yevshb", false).then((cam_obj) => {
-      cam_obj.userData["name"] = "::CAM::";
-      cam_obj.name = "::CAM::";
-      cam_obj.position.set(0, 0.6, 1.5);
-      cam_obj.layers.set(1);
-      this.scene.add(cam_obj);
-    });
+  async _create_camera_obj() {
+    const camera_position = new THREE.Vector3(0, 0.6, 1.5);
+    const camera_id = "m_cxh4asqhapdz10j880755dg4yevshb";
+    const camera_obj = await this.loadGlbWithPlaceholder(
+      camera_id,
+      "Camera",
+      false,
+      camera_position,
+    );
+    camera_obj.userData["name"] = this.camera_name;
+    camera_obj.name = this.camera_name;
+    camera_obj.position.set(
+      camera_position.x,
+      camera_position.y,
+      camera_position.z,
+    );
+    camera_obj.layers.set(1);
+    this.scene.add(camera_obj);
   }
 
   renderMode(enabled: boolean = true) {
@@ -128,10 +163,6 @@ class Scene {
     //This is for prod when we have the proper info on the url.
     const api_base_url = environmentVariables.value.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${media_id}`;
-
-    console.log(`API BASE URL? ${api_base_url}`);
-    console.log(`CALLED URL? ${url}`);
-
     const response = await fetch(url);
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
@@ -140,75 +171,104 @@ class Scene {
     return media_url;
   }
 
-  async load_glb(
-    media_id: string,
-    auto_add: boolean = true,
-  ): Promise<THREE.Object3D> {
-    // TODO: figure out why this contains async call probably due to await ...
-    return new Promise(async (resolve) => {
-      const glbLoader = new GLTFLoader();
-      glbLoader.load(await this.getMediaURL(media_id), (glb) => {
-        glb.scene.children.forEach((child) => {
-          child.traverse((c: THREE.Object3D) => {
-            if (c instanceof THREE.Mesh) {
-              c.material.metalness = 0.0;
-              c.material.specular = 0.5;
-              c.material.shininess = 0.0;
-              c.castShadow = true;
-              c.receiveShadow = true;
-              c.frustumCulled = false;
-              c.material.transparent = false;
-            }
-          });
-          child.frustumCulled = false;
-          child.userData["media_id"] = media_id;
-          child.userData["color"] = "#FFFFFF";
-          child.userData["metalness"] = 0.0;
-          child.userData["shininess"] = 0.5;
-          child.userData["specular"] = 0.5;
-          child.layers.enable(0);
-          child.layers.enable(1);
-          if (auto_add) {
-            this.scene.add(child);
-          }
-          resolve(child);
-        });
-      });
-    });
+  private floatToPercent(value: number) {
+    return `${(value * 100).toFixed(0)}%`;
   }
 
-  async load_glb_absolute(
-    filepath: string,
+  private async delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async loadGlbWithPlaceholder(
+    media_id: string,
+    name: string,
     auto_add: boolean = true,
+    position: THREE.Vector3 = new THREE.Vector3(-0.5, 1.5, 0),
   ): Promise<THREE.Object3D> {
-    //: Promise<THREE.Object3D> {
-    return new Promise((resolve) => {
-      const glbLoader = new GLTFLoader();
-      glbLoader.load(filepath, (glb) => {
-        glb.scene.children.forEach((child) => {
-          child.traverse((c: THREE.Object3D) => {
-            if (c instanceof THREE.Mesh) {
-              c.material.metalness = 0.0;
-              c.material.specular = 0.5;
-              c.castShadow = true;
-              c.receiveShadow = true;
-              c.material.transparent = false;
-            }
-          });
-          if (child.type == "Group") {
-            if (auto_add) {
-              this.scene.add(child.children[0]);
-            }
-            resolve(child.children[0]);
-            return;
-          }
-          child.userData["color"] = "#FFFFFF";
-          if (auto_add) {
-            this.scene.add(child);
-          }
-          resolve(child);
-        });
+    if (this.placeholder_manager === undefined) {
+      throw Error("Place holder Manager is undefined");
+    }
+
+    const url = await this.getMediaURL(media_id);
+    const key = media_id + name + generateUUID();
+    await this.placeholder_manager.add(key, `Loading: ${name}`, position);
+
+    // await this.delay(3000); // artificial delay.
+
+    const glb = await this.load_glb_wrapped(url, async (progress) => {
+      const total_loaded = progress.loaded / progress.total;
+      //const percent = this.floatToPercent(total_loaded);
+      //console.log(`GLB Loading: ${percent}`);
+
+      if (total_loaded == 1.0) {
+        if (this.placeholder_manager === undefined) {
+          throw Error("Place holder Manager is undefined");
+        }
+        //console.log(`GLB Loading: ${total_loaded} === ${key}`);
+        await this.placeholder_manager.remove(key);
+      }
+    }).catch((error: Error) => {
+      throw error;
+    });
+
+    let child_result = undefined;
+    // Loads the first child
+    glb.scene.children.forEach((child) => {
+      child.traverse((c: THREE.Object3D) => {
+        if (c instanceof THREE.Mesh) {
+          c.material.metalness = 0.0;
+          c.material.specular = 0.5;
+          c.material.shininess = 0.0;
+          c.castShadow = true;
+          c.receiveShadow = true;
+          c.frustumCulled = false;
+          c.material.transparent = false;
+        }
       });
+
+      child.frustumCulled = false;
+      child.userData["media_id"] = media_id;
+      child.userData["color"] = "#FFFFFF";
+      child.userData["metalness"] = 0.0;
+      child.userData["shininess"] = 0.5;
+      child.userData["specular"] = 0.5;
+      child.layers.enable(0);
+      child.layers.enable(1);
+      if (auto_add) {
+        this.scene.add(child);
+      }
+      child_result = child;
+    });
+
+    if (child_result == undefined) {
+      throw Error("GLB Did not contain an object or children.");
+    }
+
+    return child_result;
+  }
+
+  /**
+   * Using a constructed media_url load a glb, grab the progress.
+   * @param media_url
+   * @param progress
+   * @returns
+   */
+  private load_glb_wrapped(
+    media_url: string,
+    progress: (event: ProgressEvent) => void,
+  ): Promise<GLTF> {
+    return new Promise((resolve, reject) => {
+      const glbLoader = new GLTFLoader();
+      glbLoader.load(
+        media_url,
+        (gltf) => {
+          resolve(gltf);
+        },
+        progress,
+        (error) => {
+          reject(error);
+        },
+      );
     });
   }
 
