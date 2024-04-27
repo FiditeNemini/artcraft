@@ -19,6 +19,9 @@ pub struct MediaFileUploadData {
 
   // Optional: title of the scene (media_files' maybe_title)
   pub title: Option<String>,
+
+  // Optional: visibility
+  pub visibility: Option<String>,
 }
 
 /// Pull common parts out of multipart media HTTP requests, typically for handling file uploads.
@@ -29,6 +32,7 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
   //let mut media_file_class = None;
   let mut media_file_subtype = None;
   let mut title = None;
+  let mut visibility = None;
 
   while let Ok(Some(mut field)) = multipart_payload.try_next().await {
     let mut field_name = None;
@@ -90,6 +94,13 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
               e
             })?;
       },
+      Some("visibility") => {
+        visibility = read_multipart_field_as_text(&mut field).await
+            .map_err(|e| {
+              warn!("Error reading title: {:}", &e);
+              e
+            })?;
+      },
       _ => continue,
     }
   }
@@ -100,5 +111,6 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
     file_bytes,
     media_file_subtype,
     title,
+    visibility,
   })
 }

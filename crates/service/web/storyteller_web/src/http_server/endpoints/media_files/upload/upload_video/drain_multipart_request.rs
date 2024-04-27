@@ -16,6 +16,9 @@ pub struct MediaFileUploadData {
 
   // Optional: title of the scene (media_files' maybe_title)
   pub title: Option<String>,
+
+  // Optional: visibility
+  pub visibility: Option<String>,
 }
 
 /// Where the frontend tells us the file came from.
@@ -35,6 +38,7 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
   let mut file_name = None;
   let mut media_source = None;
   let mut title = None;
+  let mut visibility = None;
 
   while let Ok(Some(mut field)) = multipart_payload.try_next().await {
     let mut field_name = None;
@@ -77,6 +81,13 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
               e
             })?;
       },
+      Some("visibility") => {
+        visibility = read_multipart_field_as_text(&mut field).await
+            .map_err(|e| {
+              warn!("Error reading title: {:}", &e);
+              e
+            })?;
+      },
       _ => continue,
     }
   }
@@ -99,5 +110,6 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Anyhow
     file_bytes,
     media_source,
     title,
+    visibility,
   })
 }

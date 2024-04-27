@@ -124,9 +124,19 @@ pub async fn upload_engine_asset_media_file_handler(
 
   // ==================== UPLOAD METADATA ==================== //
 
-  let creator_set_visibility = maybe_user_session
-      .as_ref()
-      .map(|user_session| user_session.preferred_tts_result_visibility) // TODO: We need a new type of visibility control.
+  let creator_set_visibility = upload_media_request.visibility
+      .as_deref()
+      .map(|visibility| Visibility::from_str(visibility))
+      .transpose()
+      .map_err(|err| {
+        error!("Invalid visibility: {:?}", err);
+        MediaFileUploadError::BadInput("invalid visibility".to_string())
+      })?
+      .or_else(|| {
+        maybe_user_session
+            .as_ref()
+            .map(|user_session| user_session.preferred_tts_result_visibility)
+      })
       .unwrap_or(Visibility::default());
 
   // ==================== USER DATA ==================== //
