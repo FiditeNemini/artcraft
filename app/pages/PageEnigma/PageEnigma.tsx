@@ -5,6 +5,7 @@ import { EngineProvider } from "~/contexts/EngineProvider";
 import { useInferenceJobManager } from "~/hooks";
 import { LoadingBar } from "~/components";
 import { MyMovies } from "~/pages/PageEnigma/comps/MyMovies/MyMovies";
+import { ErrorDialog } from "~/components/ErrorDialog";
 
 export const PageEnigma = () => {
   useInferenceJobManager();
@@ -14,6 +15,7 @@ export const PageEnigma = () => {
         <PageEnigmaComponent />
         <DragComponent />
         <MyMovies />
+        <ErrorDialog />
       </EngineProvider>
       <LoadingBar
         id="editor-loading-bar"

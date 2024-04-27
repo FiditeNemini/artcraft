@@ -21,6 +21,7 @@ import {
 import { Pill } from "./Pill";
 import { WaveformPlayer } from "./WaveformPlayer";
 import UploadModal from "./UploadModal";
+import { ErrorDialog } from "./ErrorDialog";
 
 export {
   Button,
@@ -28,6 +29,7 @@ export {
   ButtonIcon,
   ButtonLink,
   ButtonIconSelect,
+  ErrorDialog,
   FileWrapper,
   H1,
   H2,

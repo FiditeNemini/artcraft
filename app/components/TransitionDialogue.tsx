@@ -44,15 +44,19 @@ export const TransitionDialogue = ({
   width,
   children,
   childPadding = true,
+  titleIconClassName,
+  showClose = true,
 }: {
   isOpen: boolean;
   title?: ReactNode;
   titleIcon?: IconDefinition;
+  titleIconClassName?: string;
   onClose: () => void;
   className?: string;
   width?: number;
   children: ReactNode;
   childPadding?: boolean;
+  showClose?: boolean;
 }) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -81,16 +85,25 @@ export const TransitionDialogue = ({
                     as="div"
                     className="mb-5 flex justify-between p-5 pb-0 text-xl font-bold text-white">
                     <div className="flex items-center gap-3">
-                      {titleIcon && <FontAwesomeIcon icon={titleIcon} />}
+                      {titleIcon && (
+                        <FontAwesomeIcon
+                          icon={titleIcon}
+                          className={titleIconClassName}
+                        />
+                      )}
                       {title}
                     </div>
-                    <Tooltip position="top" content="Close">
-                      <button
-                        onClick={onClose}
-                        className="opacity-50 transition-opacity duration-150 hover:opacity-80">
-                        <FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} />
-                      </button>
-                    </Tooltip>
+                    {showClose && (
+                      <Tooltip position="top" content="Close">
+                        <button
+                          onClick={onClose}
+                          className="opacity-50 transition-opacity duration-150 hover:opacity-80 focus:outline-none">
+                          <FontAwesomeIcon
+                            icon={faDownLeftAndUpRightToCenter}
+                          />
+                        </button>
+                      </Tooltip>
+                    )}
                   </Dialog.Title>
                 )}
                 <div className={`${childPadding ? "p-5 pt-0" : ""}`.trim()}>
