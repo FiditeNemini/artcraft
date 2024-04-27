@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "\nSELECT\n    m.token as `token: tokens::tokens::media_files::MediaFileToken`,\n\n    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,\n\n    m.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n\n    m.public_bucket_directory_hash,\n    m.maybe_public_bucket_prefix,\n    m.maybe_public_bucket_extension\n\nFROM media_files AS m\nWHERE\n    m.token = ?\n        ",
+  "query": "\nSELECT\n    m.token as `token: tokens::tokens::media_files::MediaFileToken`,\n\n    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,\n\n    m.maybe_creator_user_token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,\n    m.creator_set_visibility as `creator_set_visibility: enums::common::visibility::Visibility`,\n\n    m.file_size_bytes,\n    m.maybe_duration_millis,\n\n    m.public_bucket_directory_hash,\n    m.maybe_public_bucket_prefix,\n    m.maybe_public_bucket_extension\n\nFROM media_files AS m\nWHERE\n    m.token = ?\n        ",
   "describe": {
     "columns": [
       {
@@ -45,6 +45,26 @@
       },
       {
         "ordinal": 4,
+        "name": "file_size_bytes",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL",
+          "char_set": 63,
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "maybe_duration_millis",
+        "type_info": {
+          "type": "Long",
+          "flags": "",
+          "char_set": 63,
+          "max_size": 10
+        }
+      },
+      {
+        "ordinal": 6,
         "name": "public_bucket_directory_hash",
         "type_info": {
           "type": "VarString",
@@ -54,7 +74,7 @@
         }
       },
       {
-        "ordinal": 5,
+        "ordinal": 7,
         "name": "maybe_public_bucket_prefix",
         "type_info": {
           "type": "VarString",
@@ -64,7 +84,7 @@
         }
       },
       {
-        "ordinal": 6,
+        "ordinal": 8,
         "name": "maybe_public_bucket_extension",
         "type_info": {
           "type": "VarString",
@@ -84,8 +104,10 @@
       false,
       false,
       true,
+      false,
+      true,
       true
     ]
   },
-  "hash": "8ba733c63aff16f144417eaa2004d7de479e59f62688016f0ce7b7c61ec1ec57"
+  "hash": "8deae5674403372e52eeaf29cb23fe92e562832530eab1e5c7684a10e35c5f36"
 }
