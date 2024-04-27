@@ -346,6 +346,8 @@ export class TimeLine {
 
     const point = this.scene.createPoint(
       data_json["position"],
+      data_json["rotation"],
+      data_json["scale"],
       data_json["keyframe_uuid"],
     );
     if (this.editorEngine.camera_person_mode) {
@@ -458,6 +460,7 @@ export class TimeLine {
       keyframe_rot,
       keyframe_scl,
     );
+    this.scene.updatePoint(keyframe_uuid, keyframe_pos, keyframe_rot, keyframe_scl);
   }
 
   public async updateClip(data: any) {

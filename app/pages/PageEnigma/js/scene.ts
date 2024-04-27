@@ -89,11 +89,18 @@ class Scene {
     return this.scene.getObjectByName(name);
   }
 
-  createPoint(pos: THREE.Vector3, keyframe_uuid: string): THREE.Object3D {
+  createPoint(pos: THREE.Vector3, rot: THREE.Vector3, scale: THREE.Vector3, keyframe_uuid: string): THREE.Object3D {
     const geometry = new THREE.SphereGeometry(0.1, 18, 12);
     const material = new THREE.MeshBasicMaterial({ color: 0x05c3dd });
     const obj = new THREE.Mesh(geometry, material);
+    const first_quat = new THREE.Euler(
+      THREE.MathUtils.degToRad(rot.x),
+      THREE.MathUtils.degToRad(rot.y),
+      THREE.MathUtils.degToRad(rot.z),
+    );
     obj.position.copy(pos);
+    obj.rotation.copy(first_quat);
+    //obj.scale.copy(scale);
     obj.receiveShadow = false;
     obj.castShadow = false;
     obj.userData["media_id"] = "Point::" + keyframe_uuid;
@@ -116,6 +123,30 @@ class Scene {
         if (obj_keyframe_uuid === keyframe_uuid) {
           console.log("Found!", object);
           this.scene.remove(object);
+          return;
+        }
+      }
+    });
+  }
+
+
+  updatePoint(keyframe_uuid: string, keyframe_pos: THREE.Vector3, keyframe_rot: THREE.Vector3, keyframe_scl:THREE.Vector3) {
+    this.scene.traverse((object) => {
+      if (object.userData.media_id) {
+        const obj_keyframe_uuid = object.userData.media_id.replace(
+          "Point::",
+          "",
+        );
+        if (obj_keyframe_uuid === keyframe_uuid) {
+          const first_quat = new THREE.Euler(
+            THREE.MathUtils.degToRad(keyframe_rot.x),
+            THREE.MathUtils.degToRad(keyframe_rot.y),
+            THREE.MathUtils.degToRad(keyframe_rot.z),
+          );
+          object.position.copy(keyframe_pos);
+          object.rotation.copy(first_quat);
+          //object.scale.copy(keyframe_scl);
+          
           return;
         }
       }
