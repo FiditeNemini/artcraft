@@ -151,7 +151,7 @@ export class APIManager {
     const json = await JSON.parse(await response.text());
     const bucketPath = json["media_file"]["public_bucket_path"];
     const media_base_url = environmentVariables.value.GOOGLE_API;
-    const media_url = `${media_base_url}/vocodes-public${bucket_path}`; // gets you a bucket path
+    const media_url = `${media_base_url}/vocodes-public${bucketPath}`; // gets you a bucket path
     return media_url;
   }
 
