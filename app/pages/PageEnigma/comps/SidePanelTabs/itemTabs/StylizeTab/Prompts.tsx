@@ -13,7 +13,7 @@ export const Prompts = () => {
   const [textBufferNegative, setTextBufferNegative] = useState("");
 
   const onChangeHandlerNegative = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    if (editorEngine == null) {
+    if (editorEngine === null) {
       console.log("Editor is null");
       return;
     }
@@ -33,12 +33,18 @@ export const Prompts = () => {
   const generateRandomTextPositive = () => {
     const randomIndex = Math.floor(Math.random() * RandomTexts.length);
     const randomText = RandomTexts[randomIndex];
+    if (editorEngine !== null) {
+      editorEngine.positive_prompt = randomText;
+    }
     setTextBufferPositive(randomText);
   };
 
   const generateRandomTextNegative = () => {
     const randomIndex = Math.floor(Math.random() * RandomTexts.length);
     const randomText = RandomTexts[randomIndex];
+    if (editorEngine !== null) {
+      editorEngine.negative_prompt = randomText;
+    }
     setTextBufferNegative(randomText);
   };
 
