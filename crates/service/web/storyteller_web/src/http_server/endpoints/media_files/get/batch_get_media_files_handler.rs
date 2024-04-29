@@ -8,19 +8,21 @@ use actix_web::http::StatusCode;
 use actix_web::web::Path;
 use actix_web_lab::extract::Query;
 use chrono::{DateTime, Utc};
+use futures_old_for_limiter::future::result;
 use log::warn;
 use utoipa::{IntoParams, ToSchema};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
 use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
-use mysql_queries::queries::media_files::batch_get_media_files::batch_get_media_files;
-use mysql_queries::queries::media_files::get_media_file::get_media_file;
+use mysql_queries::queries::media_files::get::batch_get_media_files::batch_get_media_files;
 use mysql_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
 use tokens::tokens::batch_generations::BatchGenerationToken;
 use tokens::tokens::media_files::MediaFileToken;
@@ -60,18 +62,31 @@ pub struct BatchGetMediaFilesSuccessResponse {
 pub struct BatchMediaFileInfo {
   pub token: MediaFileToken,
 
+  /// The coarse-grained class of media file: image, video, etc.
+  pub media_class: MediaFileClass,
+
   /// Type of media will dictate which fields are populated and what
   /// the frontend should display (eg. video player vs audio player).
+  /// This is closer in meaning to a "mime type".
   pub media_type: MediaFileType,
 
-  /// The coarse-grained class of media file
-  pub media_class: MediaFileClass,
+  /// If this is an engine/3D asset, this is the broad category (scene,
+  /// animation, etc.) of that object.
+  /// This can also be used for filtering in list/batch endpoints.
+  pub maybe_engine_category: Option<MediaFileEngineCategory>,
+
+  /// If this is an engine/3D asset for an animation or a rig that can
+  /// be animated with either (or both) skeletal or blend shape animations,
+  /// this describes the animation regime used or supported.
+  pub maybe_animation_type: Option<MediaFileAnimationType>,
 
   /// If the media file has a subtype, we'll report it.
   /// This is mostly used for Bevy engine files.
+  #[deprecated(note="This was for the Bevy engine. Do not use.")]
   pub maybe_media_subtype: Option<MediaFileSubtype>,
 
   /// Extension for the engine to load over remote:// URLs.
+  #[deprecated(note="This was for the Bevy engine. Do not use.")]
   pub maybe_engine_extension: Option<String>,
 
   /// If the file was generated as part of a batch, this is the token for the batch.
@@ -287,8 +302,10 @@ pub async fn batch_get_media_files_handler(
 
         BatchMediaFileInfo {
           token: result.token.clone(),
-          media_type: result.media_type,
           media_class: result.media_class,
+          media_type: result.media_type,
+          maybe_engine_category: result.maybe_engine_category,
+          maybe_animation_type: result.maybe_animation_type,
           maybe_media_subtype: result.maybe_media_subtype,
           maybe_engine_extension,
           maybe_batch_token: result.maybe_batch_token,

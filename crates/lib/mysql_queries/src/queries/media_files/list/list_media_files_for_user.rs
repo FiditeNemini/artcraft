@@ -3,8 +3,10 @@ use std::collections::HashSet;
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 
 use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -29,6 +31,12 @@ pub struct MediaFileListPage {
 pub struct MediaFileListItem {
   pub token: MediaFileToken,
 
+  pub media_class: MediaFileClass,
+  pub media_type: MediaFileType,
+
+  pub maybe_engine_category: Option<MediaFileEngineCategory>,
+  pub maybe_animation_type: Option<MediaFileAnimationType>,
+
   pub origin_category: MediaFileOriginCategory,
   pub origin_product_category: MediaFileOriginProductCategory,
   
@@ -37,9 +45,6 @@ pub struct MediaFileListItem {
   
   // NB: The title won't be populated for `tts_models` records or non-`model_weights` records.
   pub maybe_origin_model_title: Option<String>,
-
-  pub media_type: MediaFileType,
-  pub media_class: MediaFileClass,
 
   pub public_bucket_directory_hash: String,
   pub maybe_public_bucket_prefix: Option<String>,
@@ -122,13 +127,15 @@ pub async fn list_media_files_for_user(args: ListMediaFileForUserArgs<'_>) -> An
       .map(|record| {
         MediaFileListItem {
           token: record.token,
+          media_class: record.media_class,
+          media_type: record.media_type,
+          maybe_engine_category: record.maybe_engine_category,
+          maybe_animation_type: record.maybe_animation_type,
           origin_category: record.origin_category,
           origin_product_category: record.origin_product_category,
           maybe_origin_model_type: record.maybe_origin_model_type,
           maybe_origin_model_token: record.maybe_origin_model_token,
           maybe_origin_model_title: record.maybe_origin_model_title,
-          media_type: record.media_type,
-          media_class: record.media_class,
           public_bucket_directory_hash: record.public_bucket_directory_hash,
           maybe_public_bucket_prefix: record.maybe_public_bucket_prefix,
           maybe_public_bucket_extension: record.maybe_public_bucket_extension,
@@ -168,8 +175,11 @@ fn select_result_fields() -> String {
     m.id,
     m.token,
 
-    m.media_type,
     m.media_class,
+    m.media_type,
+
+    m.maybe_engine_category,
+    m.maybe_animation_type,
 
     m.origin_category,
     m.origin_product_category,
@@ -320,6 +330,12 @@ struct MediaFileListItemInternal {
   id: i64,
   token: MediaFileToken,
 
+  media_class: MediaFileClass,
+  media_type: MediaFileType,
+
+  maybe_engine_category: Option<MediaFileEngineCategory>,
+  maybe_animation_type: Option<MediaFileAnimationType>,
+
   origin_category: MediaFileOriginCategory,
   origin_product_category: MediaFileOriginProductCategory,
   
@@ -330,9 +346,6 @@ struct MediaFileListItemInternal {
   maybe_origin_model_title: Option<String>,
   maybe_other_prompt_args: Option<String>,
   maybe_duration_millis: Option<i32>,
-
-  media_type: MediaFileType,
-  media_class: MediaFileClass,
 
   public_bucket_directory_hash: String,
   maybe_public_bucket_prefix: Option<String>,
@@ -374,6 +387,10 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
     Ok(Self {
       id: row.try_get("id")?,
       token: MediaFileToken::new(row.try_get("token")?),
+      media_class: MediaFileClass::try_from_mysql_row(row, "media_class")?,
+      media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
+      maybe_engine_category: MediaFileEngineCategory::try_from_mysql_row_nullable(row, "maybe_engine_category")?,
+      maybe_animation_type: MediaFileAnimationType::try_from_mysql_row_nullable(row, "maybe_animation_type")?,
       origin_category: MediaFileOriginCategory::try_from_mysql_row(row, "origin_category")?,
       origin_product_category: MediaFileOriginProductCategory::try_from_mysql_row(row, "origin_product_category")?,
       maybe_origin_model_type: MediaFileOriginModelType::try_from_mysql_row_nullable(row, "maybe_origin_model_type")?,
@@ -381,8 +398,6 @@ impl FromRow<'_, MySqlRow> for MediaFileListItemInternal {
       maybe_origin_model_title: row.try_get("maybe_origin_model_title")?,
       maybe_other_prompt_args: row.try_get("maybe_other_prompt_args")?,
       maybe_duration_millis: row.try_get("maybe_duration_millis")?,
-      media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
-      media_class: MediaFileClass::try_from_mysql_row(row, "media_class")?,
       public_bucket_directory_hash: row.try_get("public_bucket_directory_hash")?,
       maybe_public_bucket_prefix: row.try_get("maybe_public_bucket_prefix")?,
       maybe_public_bucket_extension: row.try_get("maybe_public_bucket_extension")?,

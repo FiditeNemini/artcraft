@@ -7,7 +7,9 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
 
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
@@ -27,11 +29,13 @@ use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 pub struct MediaFile {
   pub token: MediaFileToken,
 
-  pub media_type: MediaFileType,
   pub media_class: MediaFileClass,
-  pub maybe_media_subtype: Option<MediaFileSubtype>,
+  pub media_type: MediaFileType,
 
-  // TODO: Bucket hash bits.
+  pub maybe_engine_category: Option<MediaFileEngineCategory>,
+  pub maybe_animation_type: Option<MediaFileAnimationType>,
+
+  pub maybe_media_subtype: Option<MediaFileSubtype>,
 
   // TODO: Other media details (file size, mime type, dimensions, duration, etc.)
   // TODO: Provenance data (product, upload vs inference, model details and foreign keys)
@@ -106,11 +110,13 @@ pub struct MediaFile {
 pub struct MediaFileRaw {
   pub token: MediaFileToken,
 
-  pub media_type: MediaFileType,
   pub media_class: MediaFileClass,
-  pub maybe_media_subtype: Option<MediaFileSubtype>,
+  pub media_type: MediaFileType,
 
-  // TODO: Bucket hash bits.
+  pub maybe_engine_category: Option<MediaFileEngineCategory>,
+  pub maybe_animation_type: Option<MediaFileAnimationType>,
+
+  pub maybe_media_subtype: Option<MediaFileSubtype>,
 
   pub maybe_batch_token: Option<BatchGenerationToken>,
 
@@ -199,6 +205,8 @@ pub async fn get_media_file(
   Ok(Some(MediaFile {
     token: record.token,
     media_type: record.media_type,
+    maybe_engine_category: record.maybe_engine_category,
+    maybe_animation_type: record.maybe_animation_type,
     media_class: record.media_class,
     maybe_media_subtype: record.maybe_media_subtype,
     maybe_batch_token: record.maybe_batch_token,
@@ -249,8 +257,12 @@ async fn select_including_deleted(
 SELECT
     m.token as `token: tokens::tokens::media_files::MediaFileToken`,
 
-    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,
     m.media_class as `media_class: enums::by_table::media_files::media_file_class::MediaFileClass`,
+    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,
+
+    m.maybe_engine_category as `maybe_engine_category: enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory`,
+    m.maybe_animation_type as `maybe_animation_type: enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType`,
+
     m.maybe_media_subtype as `maybe_media_subtype: enums::by_table::media_files::media_file_subtype::MediaFileSubtype`,
 
     users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,
@@ -338,8 +350,12 @@ async fn select_without_deleted(
 SELECT
     m.token as `token: tokens::tokens::media_files::MediaFileToken`,
 
-    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,
     m.media_class as `media_class: enums::by_table::media_files::media_file_class::MediaFileClass`,
+    m.media_type as `media_type: enums::by_table::media_files::media_file_type::MediaFileType`,
+
+    m.maybe_engine_category as `maybe_engine_category: enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory`,
+    m.maybe_animation_type as `maybe_animation_type: enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType`,
+
     m.maybe_media_subtype as `maybe_media_subtype: enums::by_table::media_files::media_file_subtype::MediaFileSubtype`,
 
     users.token as `maybe_creator_user_token: tokens::tokens::users::UserToken`,

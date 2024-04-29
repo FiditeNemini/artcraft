@@ -7,8 +7,10 @@ use anyhow::anyhow;
 use chrono::{DateTime, Utc};
 use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 
 use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::by_table::model_weights::weights_category::WeightsCategory;
@@ -29,8 +31,12 @@ use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 pub struct MediaFile {
   pub token: MediaFileToken,
 
-  pub media_type: MediaFileType,
   pub media_class: MediaFileClass,
+  pub media_type: MediaFileType,
+
+  pub maybe_engine_category: Option<MediaFileEngineCategory>,
+  pub maybe_animation_type: Option<MediaFileAnimationType>,
+
   pub maybe_media_subtype: Option<MediaFileSubtype>,
 
   // TODO: Bucket hash bits.
@@ -105,8 +111,12 @@ pub struct MediaFile {
 pub struct MediaFileRaw {
   pub token: MediaFileToken,
 
-  pub media_type: MediaFileType,
   pub media_class: MediaFileClass,
+  pub media_type: MediaFileType,
+
+  pub maybe_engine_category: Option<MediaFileEngineCategory>,
+  pub maybe_animation_type: Option<MediaFileAnimationType>,
+
   pub maybe_media_subtype: Option<MediaFileSubtype>,
 
   // TODO: Bucket hash bits.
@@ -207,8 +217,10 @@ pub async fn batch_get_media_files(
   Ok(records.into_iter()
       .map(|record| MediaFile {
         token: record.token,
-        media_type: record.media_type,
         media_class: record.media_class,
+        media_type: record.media_type,
+        maybe_engine_category: record.maybe_engine_category,
+        maybe_animation_type: record.maybe_animation_type,
         maybe_media_subtype: record.maybe_media_subtype,
         maybe_batch_token: record.maybe_batch_token,
         maybe_title: record.maybe_title,
@@ -258,8 +270,12 @@ fn make_query_builder() -> QueryBuilder<'static, MySql> {
 SELECT
     m.token,
 
-    m.media_type,
     m.media_class,
+    m.media_type,
+
+    m.maybe_engine_category,
+    m.maybe_animation_type,
+
     m.maybe_media_subtype,
 
     users.token as maybe_creator_user_token,
@@ -344,8 +360,12 @@ impl FromRow<'_, MySqlRow> for MediaFileRaw {
   fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
     Ok(Self {
       token: MediaFileToken::new(row.try_get("token")?),
-      media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
       media_class: MediaFileClass::try_from_mysql_row(row, "media_class")?,
+      media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
+
+      maybe_engine_category: MediaFileEngineCategory::try_from_mysql_row_nullable(row, "maybe_engine_category")?,
+      maybe_animation_type: MediaFileAnimationType::try_from_mysql_row_nullable(row, "maybe_animation_type")?,
+
       maybe_media_subtype: MediaFileSubtype::try_from_mysql_row_nullable(row, "maybe_media_subtype")?,
 
       maybe_batch_token: BatchGenerationToken::try_from_mysql_row_nullable(row, "maybe_batch_token")?,

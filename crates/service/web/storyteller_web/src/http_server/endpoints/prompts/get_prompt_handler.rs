@@ -16,7 +16,7 @@ use enums::by_table::model_weights::weights_types::WeightsType;
 use enums::by_table::prompts::prompt_type::PromptType;
 use enums::common::visibility::Visibility;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
-use mysql_queries::queries::media_files::get_media_file::get_media_file;
+use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::prompts::get_prompt::get_prompt;
 use mysql_queries::queries::tts::tts_results::query_tts_result::select_tts_result_by_token;
 use tokens::tokens::batch_generations::BatchGenerationToken;
