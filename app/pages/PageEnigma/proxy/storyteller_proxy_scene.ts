@@ -69,7 +69,7 @@ export class StoryTellerProxyScene {
         let obj;
         switch (token) {
           case "Parim":
-            let prim_uuid = this.scene.instantiate(json_object.object_name);
+            let prim_uuid = this.scene.instantiate(json_object.object_name).uuid;
             obj = this.scene.get_object_by_uuid(prim_uuid);
             break;
           case "DirectionalLight":
@@ -77,10 +77,12 @@ export class StoryTellerProxyScene {
             break;
           default:
             if (token.includes("m_")) {
-              obj = await this.scene.load_glb(token);
+              obj = await this.scene.loadGlbWithPlaceholder(token, json_object.object_name);
             } else if (token.includes("Point::")) {
               let keyframe_uuid = token.replace("Point::", "");
               obj = this.scene.createPoint(
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(0, 0, 0),
                 new THREE.Vector3(0, 0, 0),
                 keyframe_uuid,
               );

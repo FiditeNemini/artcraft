@@ -496,6 +496,7 @@ class Editor {
     );
     await proxyScene.loadFromSceneJson(scene_json["scene"]);
     this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
+    this.cam_obj?.layers.set(1);
 
     const proxyTimeline = new StoryTellerProxyTimeline(
       this.version,
