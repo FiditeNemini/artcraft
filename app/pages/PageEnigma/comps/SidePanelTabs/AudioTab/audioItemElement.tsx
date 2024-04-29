@@ -13,7 +13,11 @@ import {
 
 import { H5, H6 } from "~/components";
 import  { AudioTypePill } from "./audioTypePills"
-import { cancelNewFromAudioItem } from "~/pages/PageEnigma/store/mediaFromServer";
+import {
+  cancelNewFromAudioItem,
+  updateAudioItemLength,
+  updateDemoAudioItemLength,
+} from "~/pages/PageEnigma/store";
 
 function getGcsUrl(bucketRelativePath: string | undefined | null): string {
   let bucket = "vocodes-public";
@@ -63,7 +67,6 @@ export const AudioItemElement = ({ item }: Props) => {
   const onPointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
       if(item.isNew) {
-        console.log('pointerdown triggered');
         cancelNewFromAudioItem(item.media_id);
       }
       if (event.button === 0) {
@@ -89,11 +92,27 @@ export const AudioItemElement = ({ item }: Props) => {
       <div className="flex w-full flex-col gap-0.5 rounded-lg bg-assets-background p-2.5">
         <div className="flex justify-between">
           <AudioTypePill category={item.category} />
+          {/* <p>{item.length}</p> */}
           {item.isNew && <H6 className="text-media-is-new">New*</H6>}
         </div>
 
         {item.publicBucketPath && (
-          <WaveformPlayer audio={getGcsUrl(item.publicBucketPath)} />
+          <WaveformPlayer
+            hasPlayButton
+            audio={getGcsUrl(item.publicBucketPath)}
+            onLoad={item.length ?
+              undefined :
+              ({duration})=>{
+                // only do this for items that doesn't have a length
+                if(item.category === "demo"){
+                  updateDemoAudioItemLength(item.media_id, duration * 60);
+                }
+                else{
+                  updateAudioItemLength(item.media_id, duration * 60);
+                }
+              }
+          }
+          />
         )}
 
         <H5 className="text-overflow-ellipsis">{item.name}</H5>

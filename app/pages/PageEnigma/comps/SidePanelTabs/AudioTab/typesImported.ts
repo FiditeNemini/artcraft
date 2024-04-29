@@ -130,6 +130,8 @@ export interface MediaFile {
   maybe_original_filename: string | null;
   maybe_creator_user: UserDetailsLight | null;
   maybe_prompt_token: string | null;
+  maybe_text_transcript: string | null;
+  maybe_duration_millis: number | null;
   cover_image: {
     maybe_cover_image_public_bucket_path: string | null;
     default_cover: {

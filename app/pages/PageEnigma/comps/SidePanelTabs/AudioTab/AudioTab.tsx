@@ -21,10 +21,10 @@ import {
 
 import { PageLibrary } from "./pageLibrary";
 import { PageAudioGeneration } from "./pageAudioGeneration";
-import { AudioTabPages, AudioPanelState, TtsState, V2VState } from "./types";
+import { AudioTabPages, AudioPanelState } from "./types";
 import { initialTtsState, initialV2VState } from "./values";
 import { TtsModelListItem } from "~/pages/PageEnigma/models/tts";
-import { VoiceConversionModelListItem } from "./typesImported";
+import { VoiceConversionModelListItem, MediaFile } from "./typesImported";
 import { PageSelectTtsModel } from "./pageSelectTtsModel";
 import { PageSelectV2VModel } from "./pageSelectV2VModel";
 
@@ -69,7 +69,12 @@ export const AudioTab = () => {
       }))
       return findNewItem !== undefined;
     }
-    ListAudioByUser(username, sessionToken).then((res:any[])=>{
+    function getLength(item:any){
+      return item.maybe_duration_millis 
+        ? item.maybe_duration_millis / 1000 * 60
+        : undefined;
+    }
+    ListAudioByUser(username, sessionToken).then((res:MediaFile[])=>{
       audioItemsFromServer.value = res.map(item=>{
         const morphedItem:AudioMediaItem = {
           version: 1,
@@ -78,9 +83,9 @@ export const AudioTab = () => {
           media_id: item.token,
           object_uuid: item.token,
           name: getTitle(item),
-          description: item.maybe_text_transcript,
+          description: item.maybe_text_transcript || "",
           publicBucketPath: item.public_bucket_path,
-          length: 25,
+          length: getLength(item),
           thumbnail: "/resources/placeholders/audio_placeholder.png",
           isMine: true,
           isNew: checkIsNew(item.token),

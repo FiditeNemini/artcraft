@@ -112,7 +112,7 @@ function UploadComponent({
         <>
           <div className="flex items-center gap-3 rounded-lg bg-brand-secondary p-3">
             <div className="grow">
-              <WaveformPlayer audio={audioUrl} />
+              <WaveformPlayer audio={audioUrl} hasPlayButton/>
             </div>
             <Tooltip content="Remove" position="top">
               <ButtonIcon

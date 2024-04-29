@@ -7,7 +7,7 @@ export interface MediaItem {
   name: string;
   description?: string;
   publicBucketPath?: string;
-  length?: number;
+  length?: number; // unit of length is frames, as in FPS
   thumbnail?: string;
   imageIndex?: number;
   isMine?: boolean;

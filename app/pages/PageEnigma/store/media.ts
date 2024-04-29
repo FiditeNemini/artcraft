@@ -2,6 +2,13 @@ import { signal } from "@preact/signals-core";
 import { AssetType, MediaItem, AudioMediaItem } from "~/pages/PageEnigma/models";
 import * as uuid from "uuid";
 
+export const updateDemoAudioItemLength = (mediaId:string, duration: number)=>{
+  const newList = audioItems.value.map((item)=>{
+    if( item.media_id === mediaId ) item.length = duration;
+    return item;
+  })
+  audioItems.value = [...newList];
+}
 export const animationItems = signal<MediaItem[]>([
   {
     version: 1,
@@ -452,7 +459,6 @@ export const audioItems = signal<AudioMediaItem[]>([
     version: 1,
     media_id: "m_403phjvjkbbaxxbz8y7r6qjay07mfd",
     type: AssetType.AUDIO,
-    length: 25,
     name: "Talk (Demo Sounds)",
     thumbnail: "/resources/placeholders/audio_placeholder.png",
     category: "demo",
@@ -463,7 +469,6 @@ export const audioItems = signal<AudioMediaItem[]>([
     version: 1,
     media_id: "m_w5nn3kjh1fbkmjrdac5b2qaba0pmyt",
     type: AssetType.AUDIO,
-    length: 25,
     name: "NCS Song",
     category: "demo",
     thumbnail: "/resources/placeholders/audio_placeholder.png",
