@@ -1,20 +1,25 @@
-import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon, FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
+import {
+  FontAwesomeIcon,
+  FontAwesomeIconProps,
+} from "@fortawesome/react-fontawesome";
 import { twMerge } from "tailwind-merge";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 interface ButtonIconProps extends FontAwesomeIconProps {
-  // icon: IconDefinition;
+  icon: IconDefinition;
   onClick: () => void;
   className?: string;
   hoverFill?: boolean;
+  disabled?: boolean;
 }
 
 export const ButtonIcon = ({
   icon,
   size,
   onClick,
-  className : propsClassName,
+  className: propsClassName,
   hoverFill = false,
+  disabled,
 }: ButtonIconProps) => {
   const className = twMerge(
     "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150",
@@ -25,8 +30,8 @@ export const ButtonIcon = ({
   );
 
   return (
-    <button className={className} onClick={onClick}>
-      <FontAwesomeIcon icon={icon} size={size}/>
+    <button className={className} onClick={onClick} disabled={disabled}>
+      <FontAwesomeIcon icon={icon} size={size} />
     </button>
   );
 };
