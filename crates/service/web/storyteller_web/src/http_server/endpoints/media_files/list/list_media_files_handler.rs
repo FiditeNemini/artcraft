@@ -42,16 +42,31 @@ pub struct ListMediaFilesQueryParams {
   pub cursor: Option<String>,
   pub cursor_is_reversed: Option<bool>,
 
-  /// NB: This can be one (or more comma-separated values) from `MediaFileType`.
-  /// ?filter_media_type=image or ?filter_media_type=image,video (etc.)
-  pub filter_media_type: Option<String>,
-
-  /// NB: This can be one (or more comma-separated values) from `MediaFileClass`.
-  /// ?filter_media_type=animation or ?filter_media_type=animation,character (etc.)
+  /// NB: This can be one (or more comma-separated values) from `MediaFileClass`,
+  /// which are the broad category of media files: image, video, etc.
+  ///
+  /// Usage:
+  ///   - `?filter_media_classes=audio`
+  ///   - `?filter_media_classes=image,video`
+  ///   - etc.
   pub filter_media_classes: Option<String>,
 
+  /// NB: This can be one (or more comma-separated values) from `MediaFileType`,
+  /// which are mimetype-like / format-like categories of media files: glb, gltf,
+  /// scene_json, etc.
+  ///
+  /// Usage:
+  ///   - `?filter_media_type=scene_json`
+  ///   - `?filter_media_type=glb,gltf`
+  ///   - etc.
+  pub filter_media_type: Option<String>,
+
   /// NB: This can be one (or more comma-separated values) from `MediaFileEngineCategory`.
-  /// ?filter_engine_categories=scene or ?filter_engine_categories=animation,character,object (etc.)
+  ///
+  /// Usage:
+  ///   - `?filter_engine_categories=scene`
+  ///   - `?filter_engine_categories=animation,character,object`
+  ///   - etc.
   pub filter_engine_categories: Option<String>,
 }
 
