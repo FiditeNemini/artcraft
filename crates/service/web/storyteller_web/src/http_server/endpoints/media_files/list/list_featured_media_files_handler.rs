@@ -9,12 +9,15 @@ use r2d2_redis::redis::Commands;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::no_table::style_transfer::style_transfer_name::StyleTransferName;
-use mysql_queries::queries::media_files::list::list_media_files_by_tokens::list_media_files_by_tokens;
+use mysql_queries::queries::media_files::get::batch_get_media_files_by_tokens::batch_get_media_files_by_tokens;
 use tokens::tokens::media_files::MediaFileToken;
 use users_component::common_responses::user_details_lite::UserDetailsLight;
 
@@ -33,9 +36,23 @@ pub struct ListFeaturedMediaFilesSuccessResponse {
 pub struct MediaFile {
   pub token: MediaFileToken,
 
+  /// The coarse-grained class of media file: image, video, etc.
+  pub media_class: MediaFileClass,
+
   /// Type of media will dictate which fields are populated and what
   /// the frontend should display (eg. video player vs audio player).
+  /// This is closer in meaning to a "mime type".
   pub media_type: MediaFileType,
+
+  /// If this is an engine/3D asset, this is the broad category (scene,
+  /// animation, etc.) of that object.
+  /// This can also be used for filtering in list/batch endpoints.
+  pub maybe_engine_category: Option<MediaFileEngineCategory>,
+
+  /// If this is an engine/3D asset for an animation or a rig that can
+  /// be animated with either (or both) skeletal or blend shape animations,
+  /// this describes the animation regime used or supported.
+  pub maybe_animation_type: Option<MediaFileAnimationType>,
 
   /// URL to the media file
   pub public_bucket_path: String,
@@ -149,7 +166,7 @@ pub async fn list_featured_media_files_handler(
 
   if !media_file_tokens.is_empty() {
     let query_results =
-        list_media_files_by_tokens(&server_state.mysql_pool, &media_file_tokens, false).await;
+        batch_get_media_files_by_tokens(&server_state.mysql_pool, &media_file_tokens, false).await;
 
     media_files = match query_results {
       Ok(media_files) => media_files,
@@ -173,7 +190,10 @@ pub async fn list_featured_media_files_handler(
 
           MediaFile {
             token: m.token.clone(),
+            media_class: m.media_class,
             media_type: m.media_type,
+            maybe_engine_category: m.maybe_engine_category,
+            maybe_animation_type: m.maybe_animation_type,
             public_bucket_path,
             cover_image: MediaFileCoverImageDetails::from_optional_db_fields(
               &m.token,

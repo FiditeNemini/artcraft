@@ -2,7 +2,9 @@ use utoipa::OpenApi;
 
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -155,7 +157,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     FrontendFailureCategory,
     InferenceCategory,
     JobStatusPlus,
+    MediaFileAnimationType,
     MediaFileClass,
+    MediaFileEngineCategory,
     MediaFileOriginCategory,
     MediaFileOriginModelType,
     MediaFileOriginProductCategory,

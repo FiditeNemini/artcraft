@@ -1,6 +1,9 @@
 use chrono::{DateTime, Utc};
 use sqlx::{Acquire, FromRow, MySql, MySqlConnection, MySqlPool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
@@ -10,13 +13,18 @@ use enums::traits::mysql_from_row::MySqlFromRow;
 use errors::AnyhowResult;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::users::UserToken;
+
 use crate::payloads::prompt_args::prompt_inner_payload::PromptInnerPayload;
 
 #[derive(Serialize)]
 pub struct MediaFilesByTokensRecord {
   pub token: MediaFileToken,
 
+  pub media_class: MediaFileClass,
   pub media_type: MediaFileType,
+
+  pub maybe_engine_category: Option<MediaFileEngineCategory>,
+  pub maybe_animation_type: Option<MediaFileAnimationType>,
 
   pub origin_category: MediaFileOriginCategory,
   pub origin_product_category: MediaFileOriginProductCategory,
@@ -56,7 +64,7 @@ pub struct MediaFilesByTokensRecord {
   pub updated_at: DateTime<Utc>,
 }
 
-pub async fn list_media_files_by_tokens(
+pub async fn batch_get_media_files_by_tokens(
   mysql_pool: &MySqlPool,
   media_file_tokens: &[MediaFileToken],
   can_see_deleted: bool
@@ -81,7 +89,12 @@ async fn get_raw_media_files_by_tokens(
     QueryBuilder::new(r#"
       SELECT
           m.token,
+
+          m.media_class,
           m.media_type,
+
+          m.maybe_engine_category,
+          m.maybe_animation_type,
 
           m.origin_category,
           m.origin_product_category,
@@ -132,7 +145,12 @@ async fn get_raw_media_files_by_tokens(
     QueryBuilder::new(r#"
       SELECT
           m.token,
+
+          m.media_class,
           m.media_type,
+
+          m.maybe_engine_category,
+          m.maybe_animation_type,
 
           m.origin_category,
           m.origin_product_category,
@@ -216,6 +234,12 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
         MediaFilesByTokensRecord {
           token: media_file.token,
 
+          media_class: media_file.media_class,
+          media_type: media_file.media_type,
+
+          maybe_animation_type: media_file.maybe_animation_type,
+          maybe_engine_category: media_file.maybe_engine_category,
+
           origin_category: media_file.origin_category,
           origin_product_category: media_file.origin_product_category,
           maybe_origin_model_type: media_file.maybe_origin_model_type,
@@ -231,7 +255,6 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
           maybe_ratings_negative_count: media_file.maybe_ratings_negative_count,
           maybe_bookmark_count: media_file.maybe_bookmark_count,
 
-          media_type: media_file.media_type,
 
           public_bucket_directory_hash: media_file.public_bucket_directory_hash,
           maybe_public_bucket_prefix: media_file.maybe_public_bucket_prefix,
@@ -265,7 +288,11 @@ fn map_to_media_files(dataset:Vec<RawMediaFileJoinUser>) -> Vec<MediaFilesByToke
   pub struct RawMediaFileJoinUser {
     pub token: MediaFileToken,
 
+    pub media_class: MediaFileClass,
     pub media_type: MediaFileType,
+
+    pub maybe_engine_category: Option<MediaFileEngineCategory>,
+    pub maybe_animation_type: Option<MediaFileAnimationType>,
 
     pub origin_category: MediaFileOriginCategory,
     pub origin_product_category: MediaFileOriginProductCategory,
@@ -317,7 +344,10 @@ impl FromRow<'_, MySqlRow> for RawMediaFileJoinUser {
   fn from_row(row: &MySqlRow) -> Result<Self, sqlx::Error> {
     Ok(Self {
       token: MediaFileToken::new(row.try_get("token")?),
+      media_class: MediaFileClass::try_from_mysql_row(row, "media_class")?,
       media_type: MediaFileType::try_from_mysql_row(row, "media_type")?,
+      maybe_engine_category: MediaFileEngineCategory::try_from_mysql_row_nullable(row, "maybe_engine_category")?,
+      maybe_animation_type: MediaFileAnimationType::try_from_mysql_row_nullable(row, "maybe_animation_type")?,
       origin_category: MediaFileOriginCategory::try_from_mysql_row(row, "origin_category")?,
       origin_product_category: MediaFileOriginProductCategory::try_from_mysql_row(row, "origin_product_category")?,
       maybe_origin_model_type: MediaFileOriginModelType::try_from_mysql_row_nullable(row, "maybe_origin_model_type")?,

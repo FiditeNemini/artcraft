@@ -10,7 +10,7 @@ use utoipa::ToSchema;
 
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
 use mysql_queries::queries::media_files::delete_media_file::{delete_media_file_as_mod, delete_media_file_as_user, undelete_media_file_as_mod, undelete_media_file_as_user};
-use mysql_queries::queries::media_files::get_media_file::get_media_file;
+use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::media_files::rename_media_file::rename_media_file;
 use tokens::tokens::media_files::MediaFileToken;
 

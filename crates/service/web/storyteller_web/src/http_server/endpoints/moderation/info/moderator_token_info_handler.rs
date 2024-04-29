@@ -11,7 +11,7 @@ use sqlx::MySqlPool;
 use utoipa::ToSchema;
 use errors::AnyhowResult;
 use mysql_queries::queries::generic_inference::web::get_inference_job_status::get_inference_job_status;
-use mysql_queries::queries::media_files::get_media_file::get_media_file;
+use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use mysql_queries::queries::model_weights::model_weight_info_lite::get_model_weight_info_lite::get_model_weight_info_lite;
 use mysql_queries::queries::prompts::get_prompt::get_prompt;

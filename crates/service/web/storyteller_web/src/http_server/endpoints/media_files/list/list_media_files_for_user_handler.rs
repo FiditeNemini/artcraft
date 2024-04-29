@@ -10,7 +10,9 @@ use log::{info, warn};
 use utoipa::{IntoParams, ToSchema};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -60,10 +62,23 @@ pub struct ListMediaFilesForUserSuccessResponse {
 pub struct MediaFileForUserListItem {
   pub token: MediaFileToken,
 
+  /// The coarse-grained class of media file: image, video, etc.
+  pub media_class: MediaFileClass,
+
+  /// Type of media will dictate which fields are populated and what
+  /// the frontend should display (eg. video player vs audio player).
+  /// This is closer in meaning to a "mime type".
   pub media_type: MediaFileType,
 
-  /// The coarse-grained class of media file
-  pub media_class: MediaFileClass,
+  /// If this is an engine/3D asset, this is the broad category (scene,
+  /// animation, etc.) of that object.
+  /// This can also be used for filtering in list/batch endpoints.
+  pub maybe_engine_category: Option<MediaFileEngineCategory>,
+
+  /// If this is an engine/3D asset for an animation or a rig that can
+  /// be animated with either (or both) skeletal or blend shape animations,
+  /// this describes the animation regime used or supported.
+  pub maybe_animation_type: Option<MediaFileAnimationType>,
 
   /// Details where the media file came from.
   pub origin: MediaFileOriginDetails,
@@ -245,8 +260,10 @@ pub async fn list_media_files_for_user_handler(
       })
       .map(|record| MediaFileForUserListItem {
         token: record.token.clone(),
-        media_type: record.media_type,
         media_class: record.media_class,
+        media_type: record.media_type,
+        maybe_engine_category: record.maybe_engine_category,
+        maybe_animation_type: record.maybe_animation_type,
         origin: MediaFileOriginDetails::from_db_fields_str(
           record.origin_category,
           record.origin_product_category,

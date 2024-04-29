@@ -13,7 +13,7 @@ use enums::common::visibility::Visibility;
 use http_server_common::request::get_request_ip::get_request_ip;
 use http_server_common::response::response_success_helpers::simple_json_success;
 use http_server_common::response::serialize_as_json_error::serialize_as_json_error;
-use mysql_queries::queries::media_files::get_media_file::get_media_file;
+use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::model_weights::edit::set_model_weight_cover_image::{set_model_weight_cover_image, UpdateArgs};
 use mysql_queries::queries::model_weights::get::get_weight::get_weight_by_token;
 use tokens::tokens::media_files::MediaFileToken;

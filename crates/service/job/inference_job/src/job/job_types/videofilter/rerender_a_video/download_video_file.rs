@@ -10,7 +10,7 @@ use cloud_storage::bucket_client::BucketClient;
 use jobs_common::job_progress_reporter::job_progress_reporter::JobProgressReporter;
 use mysql_queries::payloads::generic_inference_args::videofilter_payload::VideofilterVideoSource;
 use mysql_queries::queries::generic_inference::job::list_available_generic_inference_jobs::AvailableInferenceJob;
-use mysql_queries::queries::media_files::get_media_file::get_media_file;
+use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use mysql_queries::queries::media_uploads::get_media_upload_for_inference::get_media_upload_for_inference;
 use tokens::tokens::media_files::MediaFileToken;
 use tokens::tokens::media_uploads::MediaUploadToken;
