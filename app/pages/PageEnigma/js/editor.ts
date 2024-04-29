@@ -111,10 +111,12 @@ class Editor {
   last_scrub: number;
   record_stream: any | undefined;
   recorder: MediaRecorder | undefined;
+  container: any | undefined;
 
   selectedCanvas: boolean;
   startRenderHeight: number;
   startRenderWidth: number;
+  lastCanvasSize: number;
   // Default params.
 
   // global names of scene entities
@@ -171,6 +173,7 @@ class Editor {
     this.last_selected;
     this.transform_interaction;
     this.rendering = false;
+    this.lastCanvasSize = 0;
     this.switchPreviewToggle = false;
     // API.
     this.api_manager = new APIManager();
@@ -312,6 +315,8 @@ class Editor {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     //document.body.appendChild(this.renderer.domElement)
     window.addEventListener("resize", this.onWindowResize.bind(this));
+    this.renderer.domElement.addEventListener("resize", this.onWindowResize.bind(this));
+
     this._configurePostProcessing();
     // Controls and movement.
 
@@ -724,16 +729,9 @@ class Editor {
       height * this.renderer.getPixelRatio(),
     );
 
-    this.bokehPass = new BokehPass(this.activeScene.scene, this.camera, {
-      focus: 3.0,
-      aperture: 0.00001,
-      maxblur: 0.01,
-    });
-
     this.composer.addPass(this.saoPass);
     this.composer.addPass(this.bloomPass);
     this.composer.addPass(this.smaaPass);
-    this.composer.addPass(this.bokehPass);
 
     this.outputPass = new OutputPass();
     this.composer.addPass(this.outputPass);
@@ -836,6 +834,16 @@ class Editor {
     setTimeout(() => {
       requestAnimationFrame(this.updateLoop.bind(this));
     }, 1000 / this.cap_fps);
+
+    if(this.container === undefined){
+      this.container = document.getElementById("video-scene-container");
+    }
+    if(!this.rendering && this.container !== undefined){
+      if (this.container.clientWidth+this.container.clientHeight !== this.lastCanvasSize) {
+        this.onWindowResize();
+        this.lastCanvasSize = this.container.clientWidth+this.container.clientHeight;
+      }
+    }
 
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
@@ -1297,11 +1305,13 @@ class Editor {
 
   // Automaticly resize scene.
   onWindowResize() {
-    const container = document.getElementById("video-scene-container");
-    if (!container) return;
+    this.container = document.getElementById("video-scene-container");
+    if (!this.container) return;
 
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = this.container.clientWidth;
+    const height = this.container.clientHeight;
+
+    console.log(width, height)
 
     if (this.camera == undefined || this.renderer == undefined) {
       return;
