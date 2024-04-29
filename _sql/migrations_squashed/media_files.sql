@@ -137,6 +137,10 @@ CREATE TABLE media_files (
   -- For videos, the original frame height.
   maybe_frame_height INT(5) DEFAULT NULL,
 
+  -- For 3D files, the category they're organized under
+  -- This is used as a website filter.
+  maybe_engine_category VARCHAR(16) DEFAULT NULL,
+
   -- For 3D rigs and animations, the type of animation.
   maybe_animation_type VARCHAR(32) DEFAULT NULL,
 
@@ -261,6 +265,7 @@ CREATE TABLE media_files (
   KEY index_maybe_batch_token (maybe_batch_token),
   KEY index_media_type (media_type),
   KEY index_media_class (media_class),
+  KEY index_maybe_engine_category (maybe_engine_category),
   KEY fk_maybe_prompt_token (maybe_prompt_token),
   KEY index_checksum_sha2 (checksum_sha2),
   KEY fk_maybe_creator_user_token (maybe_creator_user_token),
