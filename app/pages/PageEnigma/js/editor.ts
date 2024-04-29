@@ -35,7 +35,7 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
 import { loadingBarData, loadingBarIsShowing } from "~/store/loadingBar";
-import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
+import { editorState, EditorStates, previewSrc } from "~/pages/PageEnigma/store/engine";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 class Editor {
@@ -1192,14 +1192,17 @@ class Editor {
         );
         console.log(url);
 
-        const stylePreview: HTMLVideoElement | null = document.getElementById(
-          "video-scene",
-        ) as HTMLVideoElement;
-        if (stylePreview) {
-          stylePreview.src = url;
-        } else {
-          console.log("No style preview window.");
-        }
+        previewSrc.value = url;
+
+        // const stylePreview: HTMLImageElement | null = document.getElementById(
+          // "video-scene",
+        // ) as HTMLImageElement;
+        // if (stylePreview) {
+          // stylePreview.src = url;
+          // console.log("Set preview source.");
+        // } else {
+          // console.log("No style preview window.");
+        // }
 
         return Promise.resolve(url);
       } catch (err: any) {

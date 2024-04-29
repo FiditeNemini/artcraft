@@ -19,6 +19,7 @@ import { QueueNames } from "../../Queue/QueueNames";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { toTimelineActions } from "../../Queue/toTimelineActions";
 import { QueueKeyframe } from "~/pages/PageEnigma/models";
+import { editorState, EditorStates, previewSrc } from "~/pages/PageEnigma/store/engine";
 
 // TODO this will be useful later to fix the bug on leading zeros
 const formatNumber = (input: string): number => {
@@ -66,7 +67,7 @@ export const ControlPanelSceneObject = () => {
     );
   }, [appUiState.controlPanel.currentSceneObject, editorEngine]);
 
-  if (!appUiState.controlPanel.currentSceneObject) {
+  if (!appUiState.controlPanel.currentSceneObject || editorState.value === EditorStates.PREVIEW) {
     return null;
   }
 

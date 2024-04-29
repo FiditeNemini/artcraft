@@ -26,6 +26,7 @@ import { AppUiContext } from "~/contexts/AppUiContext";
 import { pageHeight, pageWidth } from "~/store";
 import { TopBar } from "~/modules/TopBar";
 import { AssetType } from "./models/assets";
+import { editorState, EditorStates, previewSrc } from "~/pages/PageEnigma/store/engine";
 
 export const PageEditor = () => {
   useSignals();
@@ -72,6 +73,7 @@ export const PageEditor = () => {
               }>
               <div
                 id="video-scene-container"
+                className="relative"
                 style={{
                   width:
                     pageWidth.value -
@@ -102,6 +104,15 @@ export const PageEditor = () => {
                     }
                   }}
                 />
+                {editorState.value === EditorStates.PREVIEW && (
+                  <img className="absolute inset-0" src={previewSrc.value} id="video-scene" style={{
+                    width:
+                      pageWidth.value -
+                      (sidePanelVisible.value ? sidePanelWidth.value : 0) -
+                      84,
+                    height: pageHeight.value - timelineHeight.value - 68,
+                  }} />
+                )}
               </div>
 
               {/* Top controls */}

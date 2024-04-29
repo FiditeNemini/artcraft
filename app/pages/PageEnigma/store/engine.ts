@@ -7,3 +7,5 @@ export enum EditorStates {
 }
 
 export const editorState = signal<EditorStates>(EditorStates.EDIT);
+
+export const previewSrc = signal("");
