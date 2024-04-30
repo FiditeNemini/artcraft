@@ -848,8 +848,9 @@ class Editor {
 
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
-    }
 
+    }
+    
     // Updates debug stats.
     if (this.stats != null) {
       this.stats.update();
@@ -1464,11 +1465,13 @@ class Editor {
         this.publishSelect();
 
         // this.update_properties()
-        this.activeScene.scene.add(this.control);
-        this.control.attach(this.selected);
+        if (this.selected.userData["locked"] !== true) {
+          this.activeScene.scene.add(this.control);
+          this.control.attach(this.selected);
+        }
+
         this.outlinePass.selectedObjects = [this.selected];
         this.transform_interaction = true;
-
         // Contact react land
         this.dispatchAppUiState({
           type: APPUI_ACTION_TYPES.SHOW_CONTROLPANELS_SCENEOBJECT,

@@ -49,6 +49,7 @@ export class StoryTellerProxyScene {
           proxyObject3D.metalness = child.userData["metalness"];
           proxyObject3D.shininess = child.userData["shininess"];
           proxyObject3D.specular = child.userData["specular"];
+          proxyObject3D.locked = child.userData["locked"];
           const json_data = await proxyObject3D.toJSON();
           results.push(json_data);
         }
@@ -103,6 +104,11 @@ export class StoryTellerProxyScene {
           obj.userData.name = json_object.object_user_data_name;
           obj.uuid = json_object.object_uuid;
           obj.userData["media_id"] = json_object.media_file_token;
+          obj.userData["locked"] = json_object.locked;
+          obj.userData["color"] = json_object.color;
+          obj.userData["metalness"] = json_object.metalness;
+          obj.userData["shininess"] = json_object.shininess;
+          obj.userData["specular"] = json_object.specular;
         }
       }
       this.scene._createGrid();

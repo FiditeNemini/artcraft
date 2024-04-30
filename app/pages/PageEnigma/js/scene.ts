@@ -85,6 +85,7 @@ class Scene {
     obj.userData["metalness"] = 0.0;
     obj.userData["shininess"] = 0.5;
     obj.userData["specular"] = 0.0;
+    obj.userData["locked"] = false;
     this.scene.add(obj);
     return obj;
   }
@@ -280,6 +281,7 @@ class Scene {
       child.userData["metalness"] = 0.0;
       child.userData["shininess"] = 0.5;
       child.userData["specular"] = 0.5;
+      child.userData["locked"] = false;
       child.layers.enable(0);
       child.layers.enable(1);
       if (auto_add) {

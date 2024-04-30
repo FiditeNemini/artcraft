@@ -25,6 +25,7 @@ export interface ObjectJSON {
   metalness: number,
   shininess: number,
   specular: number,
+  locked: boolean,
 }
 
 export class StoryTellerProxy3DObject {
@@ -42,6 +43,7 @@ export class StoryTellerProxy3DObject {
   metalness: number;
   shininess: number;
   specular: number;
+  locked: boolean;
 
   constructor(
     version: number,
@@ -63,6 +65,7 @@ export class StoryTellerProxy3DObject {
     this.metalness = 0.0;
     this.shininess = 0.0;
     this.specular = 0.5;
+    this.locked = false;
   }
 
   getColorAsHexString(object: THREE.Object3D): string {
@@ -84,6 +87,7 @@ export class StoryTellerProxy3DObject {
     this.metalness = object.userData["metalness"];
     this.shininess = object.userData["shininess"];
     this.specular = object.userData["specular"];
+    this.locked = object.userData["locked"];
   }
 
   public async toJSON(): Promise<ObjectJSON> {
@@ -112,6 +116,7 @@ export class StoryTellerProxy3DObject {
       metalness: this.metalness,
       shininess: this.shininess,
       specular: this.specular,
+      locked: this.locked,
     };
     return json;
   }
