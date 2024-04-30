@@ -2,7 +2,11 @@ import { TextareaHTMLAttributes } from "react";
 import { twMerge } from "tailwind-merge";
 import { Label } from "./Typography";
 import { kebabCase } from "~/utilities";
-import { disableHotkeyInput,enableHotkeyInput,DomLevels } from "~/pages/PageEnigma/store";
+import {
+  disableHotkeyInput,
+  enableHotkeyInput,
+  DomLevels,
+} from "~/pages/PageEnigma/store";
 
 type ResizeType =
   | "none"
@@ -39,13 +43,14 @@ export const Textarea = ({
           resize: resize,
         }}
         onFocus={(e) => {
-          disableHotkeyInput(DomLevels.INPUT)
+          disableHotkeyInput(DomLevels.INPUT);
           e.currentTarget.style.outlineColor = "#e66462";
         }}
         onBlur={(e) => {
-          enableHotkeyInput(DomLevels.INPUT)
+          enableHotkeyInput(DomLevels.INPUT);
           e.currentTarget.style.outlineColor = "transparent";
         }}
+        onKeyDown={(event) => event.stopPropagation()}
         {...rest}
       />
     </div>

@@ -89,7 +89,7 @@ export const Timeline = () => {
     document.addEventListener("keydown", onDeleteAsk);
 
     return () => {
-      document.addEventListener("keydown", onDeleteAsk);
+      document.removeEventListener("keydown", onDeleteAsk);
     };
   }, [onDeleteAsk]);
 
