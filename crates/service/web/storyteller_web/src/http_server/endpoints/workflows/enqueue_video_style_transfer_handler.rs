@@ -252,7 +252,7 @@ pub async fn enqueue_video_style_transfer_handler(
     if has_paid_plan {
         if trim_end_millis - trim_start_millis > MAXIMUM_DURATION_MILLIS {
             trim_start_millis = 0;
-            trim_end_millis = DEFAULT_TRIM_MILLISECONDS_END;
+            trim_end_millis = MAXIMUM_DURATION_MILLIS;
         }
     } else {
         if trim_end_millis - trim_start_millis > DEFAULT_TRIM_MILLISECONDS_END {
