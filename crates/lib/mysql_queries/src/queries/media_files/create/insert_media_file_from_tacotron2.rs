@@ -3,6 +3,7 @@ use sqlx;
 use sqlx::MySqlPool;
 
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -67,7 +68,6 @@ pub async fn insert_media_file_from_tacotron2(
 
   const ORIGIN_CATEGORY : MediaFileOriginCategory = MediaFileOriginCategory::Inference;
   const ORIGIN_PRODUCT_CATEGORY : MediaFileOriginProductCategory = MediaFileOriginProductCategory::TextToSpeech;
-  const MEDIA_TYPE : MediaFileType = MediaFileType::Audio;
 
   let record_id = {
     let query_result = sqlx::query!(
@@ -75,6 +75,9 @@ pub async fn insert_media_file_from_tacotron2(
 INSERT INTO media_files
 SET
   token = ?,
+
+  media_class = ?,
+  media_type = ?,
 
   origin_category = ?,
   origin_product_category = ?,
@@ -84,7 +87,6 @@ SET
 
   maybe_text_transcript = ?,
 
-  media_type = ?,
   maybe_mime_type = ?,
   file_size_bytes = ?,
 
@@ -113,6 +115,9 @@ SET
         "#,
       result_token.as_str(),
 
+      MediaFileClass::Audio.to_str(),
+      MediaFileType::Audio.to_str(), // TODO(bt,2024-04-30): This needs to become "wav" after a frontend migration
+
       ORIGIN_CATEGORY.to_str(),
       ORIGIN_PRODUCT_CATEGORY.to_str(),
 
@@ -121,7 +126,6 @@ SET
 
       args.job.maybe_raw_inference_text,
 
-      MEDIA_TYPE.to_str(),
       args.maybe_mime_type,
       args.file_size_bytes,
 
