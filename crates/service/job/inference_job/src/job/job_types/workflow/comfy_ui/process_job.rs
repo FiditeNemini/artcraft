@@ -536,13 +536,13 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
 
     const PREFIX: &str = "storyteller_";
 
-    // determine media type from mime type
-    let media_type = match mimetype.as_str() {
-        "video/mp4" => MediaFileType::Video,
-        "image/png" => MediaFileType::Image,
-        "image/jpeg" => MediaFileType::Image,
-        _ => return Err(ProcessSingleJobError::Other(anyhow!("Mimetype not supported: {}", mimetype))),
-    };
+    //// determine media type from mime type
+    //let media_type = match mimetype.as_str() {
+    //    "video/mp4" => MediaFileType::Video,
+    //    "image/png" => MediaFileType::Image,
+    //    "image/jpeg" => MediaFileType::Image,
+    //    _ => return Err(ProcessSingleJobError::Other(anyhow!("Mimetype not supported: {}", mimetype))),
+    //};
 
     info!("Calculating sha256...");
 
@@ -665,7 +665,6 @@ pub async fn process_job(args: ComfyProcessJobArgs<'_>) -> Result<JobSuccessResu
         is_on_prem: args.job_dependencies.job.info.container.is_on_prem,
         worker_hostname: &args.job_dependencies.job.info.container.hostname,
         worker_cluster: &args.job_dependencies.job.info.container.cluster_name,
-        media_file_type: media_type,
         extra_file_modification_info: Some(&args_json),
     })
         .await

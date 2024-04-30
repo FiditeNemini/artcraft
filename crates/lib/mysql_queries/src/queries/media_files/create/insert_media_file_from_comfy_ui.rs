@@ -3,6 +3,7 @@ use sqlx;
 use sqlx::MySqlPool;
 
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -34,7 +35,6 @@ pub struct InsertArgs<'a> {
     pub is_on_prem: bool,
     pub worker_hostname: &'a str,
     pub worker_cluster: &'a str,
-    pub media_file_type: MediaFileType,
 
     pub extra_file_modification_info: Option<&'a str>,
 }
@@ -78,11 +78,13 @@ INSERT INTO media_files
 SET
   token = ?,
 
+  media_class = ?,
+  media_type = ?,
+
   origin_category = ?,
   origin_product_category = ?,
   maybe_origin_model_type = ?,
 
-  media_type = ?,
   maybe_mime_type = ?,
   file_size_bytes = ?,
 
@@ -111,11 +113,13 @@ SET
         "#,
       result_token.as_str(),
 
+      MediaFileClass::Video.to_str(),
+      MediaFileType::Video.to_str(), // TODO(bt,2024-04-30): This needs to become "mp4" after a frontend migration
+
       ORIGIN_CATEGORY.to_str(),
       ORIGIN_PRODUCT_CATEGORY.to_str(),
       ORIGIN_MODEL_TYPE.to_str(),
 
-      args.media_file_type.to_str(),
       args.maybe_mime_type,
       args.file_size_bytes,
 
