@@ -28,25 +28,23 @@ export const ListAudioByUser = async (
   username: string,
   sessionToken: string,
 ) => {
-  return await fetch(listMediaByUser(username), {
+  return await fetch(listMediaByUser(username)+"?filter_media_type=audio", {
     method: "GET",
     headers: {
       Accept: "application/json",
       session: sessionToken,
     },
   })
-    .then((res) => res.json())
-    .then((res) => {
-      if (res.success && res.results) {
-        return res.results.filter(
-          (item: MediaFile) => item["media_type"] === "audio",
-        );
-      } else {
-        Promise.reject();
-      }
-    })
-    .catch(() => ({ success: false }));
-};
+  .then(res => res.json())
+  .then(res => { 
+    if(res.success && res.results){
+      return res.results;
+    }else{
+      Promise.reject();
+    }
+  })
+  .catch(e => ({ success : false }));
+}
 
 export async function ListTtsModels(
   sessionToken: string,

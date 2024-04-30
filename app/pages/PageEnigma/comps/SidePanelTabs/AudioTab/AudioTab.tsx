@@ -199,8 +199,20 @@ export const AudioTab = () => {
   };
 
   switch (state.page) {
-    case AudioTabPages.LIBRARY:
-      return <PageLibrary changePage={changePage} />;
+    case AudioTabPages.LIBRARY:{
+      return (
+      <PageLibrary 
+        changePage={changePage}
+        reloadLibrary={()=>{
+          if(authState && authState.userInfo && authState.sessionToken){
+            handleListAudioByUser(
+              authState.userInfo.username,
+              authState.sessionToken,
+            );
+          }
+        }}
+      />);
+    }
     case AudioTabPages.SELECT_TTS_MODEL: {
       return (
         <PageSelectTtsModel

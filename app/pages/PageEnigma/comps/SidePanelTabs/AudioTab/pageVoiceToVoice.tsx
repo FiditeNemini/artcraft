@@ -16,7 +16,7 @@ import {
 import { GenerateVoiceConversion } from "./utilities";
 import { H4, H6, Button, Label } from "~/components";
 
-import UploadComponent from "~/components/UploadComponent";
+import { UploadAudioComponent } from "~/components/UploadAudioComponent";
 
 export const PageVoicetoVoice = ({
   changePage,
@@ -85,7 +85,7 @@ export const PageVoicetoVoice = ({
 
       <div className="flex flex-col">
         <Label>Upload Audio</Label>
-        <UploadComponent
+        <UploadAudioComponent
           sessionToken={sessionToken}
           file={v2vState.file}
           onFileStaged={(file: File) => {

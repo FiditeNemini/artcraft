@@ -1,4 +1,4 @@
-import { uploadAudio } from "~/api";
+import { uploadAudioV2V } from "~/api";
 
 export interface UploadAudioRequest {
   uuid_idempotency_token: string,
@@ -27,9 +27,8 @@ export async function UploadAudio(request: UploadAudioRequest, sessionToken:stri
     formData.append('source', request.source);
   }
 
-  return fetch(uploadAudio, {
+  return fetch(uploadAudioV2V, {
     method: 'POST',
-    credentials: 'include',
     headers: {
       'Accept': 'application/json',
       'session': sessionToken,

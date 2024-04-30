@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
 import { useSignals, useComputed } from "@preact/signals-react/runtime";
@@ -10,7 +11,8 @@ import {
 import { audioItemsFromServer } from "~/pages/PageEnigma/store/mediaFromServer";
 import { inferenceJobs } from "~/pages/PageEnigma/store/inferenceJobs";
 
-import { Button } from "~/components";
+import { Button, Pagination } from "~/components";
+import { UploadAudioButtonDiagloue } from "~/components/UploadAudioButtonDialogue";
 import { AudioItemElements } from "./audioItemElements";
 import { AudioTabPages } from "./types";
 import { TabTitle } from "~/pages/PageEnigma/comps/SidePanelTabs/comps/TabTitle";
@@ -18,14 +20,25 @@ import { InferenceElement } from "./inferenceElement";
 
 export const PageLibrary = ({
   changePage,
+  reloadLibrary,
 }: {
   changePage: (newPage: AudioTabPages) => void;
+  reloadLibrary: ()=>void;
 }) => {
   useSignals();
   const allAudioItems = useComputed(() => [
     ...audioItems.value,
     ...audioItemsFromServer.value,
   ]);
+  const displayedItems = allAudioItems.value.filter((item) => {
+    if (audioFilter.value === AssetFilterOption.ALL) {
+      return true;
+    }
+    if (audioFilter.value === AssetFilterOption.MINE) {
+      return item.isMine;
+    }
+    return item.isBookmarked;
+  });
   const audioInferenceJobs = useComputed(() =>
     inferenceJobs.value.filter((job) => {
       if (
@@ -37,6 +50,9 @@ export const PageLibrary = ({
       }
     }),
   );
+  const pageSize = 20;
+  const totalPages = Math.ceil(allAudioItems.value.length / pageSize);
+  const [currentPage, setCurrentPage] = useState<number>(0);
 
   return (
     <>
@@ -77,17 +93,18 @@ export const PageLibrary = ({
         </div>
       </div>
 
-      <div className="w-full px-4">
+      <div className="w-full px-4 flex gap-3">
+        <UploadAudioButtonDiagloue onUploaded={reloadLibrary}/>
         <Button
+          className="grow py-3 text-sm font-medium"
           icon={faCirclePlus}
           variant="action"
-          className="w-full py-3 text-sm font-medium"
           onClick={() => changePage(AudioTabPages.GENERATE_AUDIO)}>
           Generate Audio
         </Button>
       </div>
 
-      <div className="w-full grow overflow-y-auto px-4 pb-4">
+      <div className="w-full grow overflow-y-auto px-4">
         {audioInferenceJobs.value.length > 0 && (
           <div className="mb-4 grid grid-cols-1 gap-2">
             {audioInferenceJobs.value.map((job) => {
@@ -96,10 +113,22 @@ export const PageLibrary = ({
           </div>
         )}
         <AudioItemElements
-          items={allAudioItems.value}
-          assetFilter={audioFilter.value}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          items={displayedItems}
         />
       </div>
+      {totalPages > 1 &&
+        <Pagination
+          className="-mt-4 px-4"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={(newPage:number)=>{
+            setCurrentPage(newPage);
+          }}
+        />
+      }
+      <span className="w-full"/>
     </>
   );
 };

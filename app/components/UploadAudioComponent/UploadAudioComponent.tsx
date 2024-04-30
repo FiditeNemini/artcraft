@@ -7,7 +7,6 @@ import {
   faFileArrowUp,
   faFileAudio,
   faSpinnerThird,
-  faTrash,
   faXmark,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -28,13 +27,13 @@ interface Props {
   onFileUploaded: (token: string) => void;
 }
 
-function UploadComponent({
+export const UploadAudioComponent = ({
   sessionToken,
   file: propsFile,
   onFileStaged,
   onClear,
   onFileUploaded,
-}: Props) {
+}: Props) => {
   const [{ file, uploadState, uploadToken }, setState] = useState<{
     file: File | undefined;
     uploadState: "init" | "none" | "uploading" | "uploaded" | "error";
@@ -151,13 +150,17 @@ function UploadComponent({
   );
 }
 
-const DragAndDropZone = ({ file }: { file: any }) => {
+const DragAndDropZone = ({file }: { file: File|undefined }) => {
   const fileSize =
     file && file.size >= 1024 * 1024
       ? (file.size / 1024 / 1024).toFixed(2) + " MB"
       : file
         ? `${Math.floor(file.size / 1024)} KB`
         : null;
+  const fileName = 
+    file && file.name
+      ? file.name.split(".")[0].toUpperCase()
+      : "";
 
   if (!file) {
     return (
@@ -183,7 +186,7 @@ const DragAndDropZone = ({ file }: { file: any }) => {
           </P>
           <P className="flex items-center gap-2 text-sm font-normal">
             <span className="opacity-50">
-              {`${file.name.split(".").pop().toUpperCase()} file size: ${fileSize} `}
+              {`${fileName} file size: ${fileSize} `}
             </span>
             <u className="transition-all hover:text-white/80">Change File</u>
           </P>
@@ -193,4 +196,3 @@ const DragAndDropZone = ({ file }: { file: any }) => {
   }
 };
 
-export default UploadComponent;

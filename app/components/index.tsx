@@ -18,6 +18,7 @@ import {
   LoadingDotsBricks,
   LoadingDotsTyping,
 } from "./LoadingDots";
+import { Pagination } from "./Pagination";
 import { Pill } from "./Pill";
 import { WaveformPlayer } from "./WaveformPlayer";
 import UploadModal from "./UploadModal";
@@ -51,6 +52,7 @@ export {
   LoadingDots,
   LoadingDotsBricks,
   LoadingDotsTyping,
+  Pagination,
   Pill,
   WaveformPlayer,
   UploadModal,

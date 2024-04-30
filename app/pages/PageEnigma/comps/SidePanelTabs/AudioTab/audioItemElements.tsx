@@ -1,27 +1,27 @@
+
 import { AudioItemElement } from "./audioItemElement";
 import { AssetFilterOption, AudioMediaItem } from "~/pages/PageEnigma/models";
 
 interface Props {
+  currentPage: number;
+  pageSize: number;
   items: AudioMediaItem[];
-  assetFilter: AssetFilterOption;
 }
 
-export const AudioItemElements = ({ items, assetFilter }: Props) => {
-  const displayItems = items.filter((item) => {
-    if (assetFilter === AssetFilterOption.ALL) {
-      return true;
-    }
-    if (assetFilter === AssetFilterOption.MINE) {
-      return item.isMine;
-    }
-    return item.isBookmarked;
-  });
+export const AudioItemElements = ({
+  currentPage,
+  pageSize,
+  items,
+}: Props) => {
 
   return (
     <div className="grid grid-cols-1 gap-2.5">
-      {displayItems.map((item) => (
-        <AudioItemElement key={item.media_id} item={item} />
-      ))}
+      {items
+        .slice(currentPage*pageSize, (currentPage+1)*pageSize)
+        .map((item) => (
+          <AudioItemElement key={item.media_id} item={item} />
+        ))
+      }
     </div>
   );
 };

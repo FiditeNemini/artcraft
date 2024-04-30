@@ -5,10 +5,6 @@ import { ButtonIcon } from "~/components";
 import { environmentVariables } from "~/store";
 import { useSignals } from "@preact/signals-react/runtime";
 
-function toTimeString(timecode: number):number {
-  return Math.round(timecode * 100) / 100;
-}
-
 export const WaveformPlayer = ({
   hasPlayButton,
   onLoad,
@@ -21,7 +17,6 @@ export const WaveformPlayer = ({
   useSignals();
   const waveSurferRef = useRef<WaveSurfer | undefined>(undefined);
   const [isPlaying, toggleIsPlaying] = useState<boolean>(false);
-  const [currenttime, setCurrenttime] = useState<number>(0);
 
   const containerRef = useCallback((node: HTMLDivElement) => {
     if (node) {
@@ -40,6 +35,9 @@ export const WaveformPlayer = ({
 
       waveSurfer.load(newUrl);
       waveSurfer.on("ready", () => {
+        if(waveSurferRef.current){
+          waveSurferRef.current.destroy();
+        }
         waveSurferRef.current = waveSurfer;
         if(onLoad) onLoad({duration: waveSurfer.getDuration()});
       });
@@ -50,7 +48,7 @@ export const WaveformPlayer = ({
         toggleIsPlaying(false);
       });
     }
-  }, []);
+  }, [audio]);
 
   useEffect(() => {
     return () => {
@@ -58,8 +56,6 @@ export const WaveformPlayer = ({
       waveSurferRef.current?.destroy();
     };
   }, []);
-
-  const duration = toTimeString(waveSurferRef.current ? waveSurferRef.current.getDuration() : 0);
 
   return (
     <div className="flex items-center gap-2 py-1">
