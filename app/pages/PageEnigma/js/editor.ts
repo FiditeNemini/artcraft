@@ -1158,6 +1158,8 @@ class Editor {
       }
 
       this.renderer.setSize(this.render_width, this.render_height);
+      this.render_camera.aspect = this.render_width / this.render_height;
+      this.render_camera.updateProjectionMatrix();
       this.renderer.render(this.activeScene.scene, this.render_camera);
       const imgData = this.renderer.domElement.toDataURL();
       this.activeScene.renderMode(false);
@@ -1183,7 +1185,6 @@ class Editor {
       const blob = new Blob([output.buffer], { type: "video/mp4" });
       ffmpeg.exit()
       this.generating_preview = false;
-      ffmpeg.exit();
 
       try {
         const url = await this.api_manager.uploadMediaFrameGeneration(
