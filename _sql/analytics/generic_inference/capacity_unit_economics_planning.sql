@@ -50,3 +50,40 @@ where generic_inference_jobs.id > 28711606
 group by inference_category, user_subscriptions.subscription_product_slug
 
 -- Number of unique users for each
+
+-- Tammie ask:  "# users who generated anything by payment tier, not generation type"
+
+-- Number of generations by payment tier
+select subscription_product_slug, count(*)
+from generic_inference_jobs
+left outer join users
+   on users.token = generic_inference_jobs.maybe_creator_user_token
+left outer join user_subscriptions
+   on user_subscriptions.user_token = users.token
+where generic_inference_jobs.created_at > (CURDATE() - INTERVAL 14 DAY)
+  and status = 'complete_success'
+group by subscription_product_slug
+
+-- and generic_inference_jobs.id > 28711606
+
+
+-- Count of unique paying and non-paying users ("null") that have used
+-- at least one product at least once in the last 14 days
+SELECT subscription_product_slug, count(*)
+FROM
+(
+  select
+    distinct maybe_creator_user_token as user_token
+  from generic_inference_jobs
+    where maybe_creator_user_token IS NOT NULL
+    and generic_inference_jobs.created_at > (CURDATE() - INTERVAL 14 DAY)
+) as u
+LEFT OUTER JOIN user_subscriptions
+on user_subscriptions.user_token = u.user_token
+group by subscription_product_slug;
+
+-- Unique anonymous users who have used at least one product in the last 14 days
+select count(distinct maybe_creator_anonymous_visitor_token) as anonymous_users
+from generic_inference_jobs
+where maybe_creator_user_token IS NULL
+  and generic_inference_jobs.created_at > (CURDATE() - INTERVAL 14 DAY);
