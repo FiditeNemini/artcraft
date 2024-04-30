@@ -180,7 +180,7 @@ export default {
       facebook: "#4267b2",
       reddit: "#ff5700",
       whatsapp: "#25d366",
-      x: "#1da1f2",
+      x: "#000000",
       email: "#858585",
 
       white: colors.white,

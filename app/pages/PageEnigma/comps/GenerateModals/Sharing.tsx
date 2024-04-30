@@ -1,9 +1,10 @@
 import { useSignals } from "@preact/signals-react/runtime";
-import { useLayoutEffect, useState } from "react";
+import { useState } from "react";
 import { MediaFile } from "~/pages/PageEnigma/models";
-import { Button, Input, TransitionDialogue } from "~/components";
+import { Button, Input, Label, TransitionDialogue } from "~/components";
 import {
   faArrowDownToLine,
+  faArrowRight,
   faFilm,
   faLink,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -35,12 +36,12 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
 
   const generateTitle = () => {
     return (
-      <div>
+      <div className="flex items-center gap-2.5">
         <span className="font-xl font-bold">
           {mediaFile?.maybe_title ?? mediaFile?.token}
         </span>
-        <span className="ml-2 text-sm text-white/60">
-          {dayjs(mediaFile?.updated_at).format("MMM DD, YYYY HH:mm:SS")}
+        <span className="text-sm font-medium text-white/60">
+          {dayjs(mediaFile?.updated_at).format("MMM DD, YYYY HH:mm:ss")}
         </span>
       </div>
     );
@@ -50,7 +51,7 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
     <TransitionDialogue
       title={generateTitle()}
       titleIcon={faFilm}
-      className="max-w-4xl"
+      className="max-w-6xl"
       childPadding={false}
       isOpen={viewMyMovies.value}
       width={1049}
@@ -61,9 +62,9 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
         }
         setMediaFile(null);
       }}>
-      <div className="flex gap-[29px] px-5 pb-5">
-        <div className="w-[616px]">
-          <video controls width={616} crossOrigin="anonymous">
+      <div className="flex gap-6 px-5 pb-5">
+        <div className="max-h-[420px] w-full overflow-hidden rounded-lg">
+          <video controls crossOrigin="anonymous" width="100%">
             <source
               src={`${environmentVariables.value.GOOGLE_API}/vocodes-public${mediaFile?.public_bucket_path}`}
               type="video/mp4"
@@ -71,8 +72,8 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
             Your browser does not support the video tag.
           </video>
         </div>
-        <div className="w-[355px]">
-          <div className="mb-2 text-sm">Share movie to</div>
+        <div className="flex w-[500px] flex-col">
+          <Label>Share movie to:</Label>
           <div className="flex w-full flex-wrap justify-between">
             <SocialButton
               social="x"
@@ -100,7 +101,7 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
               shareText={shareText}
             />
           </div>
-          <div className="my-4 flex w-full gap-2">
+          <div className="my-6 flex w-full gap-2">
             <div className="w-full">
               <Input type="text" value={shareUrl} readOnly />
             </div>
@@ -109,23 +110,27 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
               {buttonLabel}
             </Button>
           </div>
-          <Button
-            icon={faArrowDownToLine}
-            className="my-4 w-full"
-            onClick={() => {
-              window.open(downloadLink, "_blank");
-            }}
-            variant="secondary">
-            Download
-          </Button>
-          <Button
-            className="mb-4 w-full"
-            onClick={() => {
-              window.open(openUrl, "_blank");
-            }}
-            variant="secondary">
-            View on Media Page
-          </Button>
+          <div className="flex flex-col gap-3">
+            <Button
+              icon={faArrowDownToLine}
+              className="h-10 w-full"
+              onClick={() => {
+                window.open(downloadLink, "_blank");
+              }}
+              variant="secondary">
+              Download
+            </Button>
+            <Button
+              className="h-10 w-full"
+              onClick={() => {
+                window.open(openUrl, "_blank");
+              }}
+              icon={faArrowRight}
+              iconFlip={true}
+              variant="secondary">
+              View on Media Page
+            </Button>
+          </div>
         </div>
       </div>
     </TransitionDialogue>

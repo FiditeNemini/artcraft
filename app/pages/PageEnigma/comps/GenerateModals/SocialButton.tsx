@@ -1,8 +1,9 @@
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import {
   faFacebookF,
   faRedditAlien,
   faWhatsapp,
-  faTwitter,
+  faXTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 import { faXmark, faEnvelope } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,7 +20,7 @@ export default function SocialButton({
   shareText,
 }: SocialButtonProps) {
   const socialIcons = {
-    x: faTwitter,
+    x: faXTwitter,
     whatsapp: faWhatsapp,
     facebook: faFacebookF,
     reddit: faRedditAlien,
@@ -68,12 +69,12 @@ export default function SocialButton({
           "items-center justify-center rounded-lg",
           "text-[32px] text-white",
           `bg-${social}`,
-          "hover:opacity-80",
+          "transition-all duration-200 hover:opacity-80",
         ].join(" ")}>
-        <FontAwesomeIcon icon={socialIcon} />
+        <FontAwesomeIcon icon={socialIcon as IconProp} />
       </div>
 
-      <p className="text-xs">
+      <p className="mt-2 text-xs">
         {social.charAt(0).toUpperCase() + social.slice(1)}
       </p>
     </button>
