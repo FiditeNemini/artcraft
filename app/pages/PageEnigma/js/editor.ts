@@ -466,6 +466,7 @@ class Editor {
       this.mouse,
       this.camera_name,
     );
+    this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
   }
 
   // Token comes in from the front end to load the scene from the site.
@@ -731,7 +732,7 @@ class Editor {
 
     this.composer.addPass(this.saoPass);
     this.composer.addPass(this.bloomPass);
-    this.composer.addPass(this.smaaPass);
+    //this.composer.addPass(this.smaaPass);
 
     this.outputPass = new OutputPass();
     this.composer.addPass(this.outputPass);
@@ -833,7 +834,7 @@ class Editor {
   async updateLoop() {
     setTimeout(() => {
       requestAnimationFrame(this.updateLoop.bind(this));
-    }, 1000 / this.cap_fps);
+    }, 1000 / (this.cap_fps*2)); // Get the most FPS we can out of the renderer.
 
     if(this.container === undefined){
       this.container = document.getElementById("video-scene-container");
@@ -891,7 +892,7 @@ class Editor {
     }
 
     if (this.timeline.is_playing) {
-      const changeView = await this.timeline.update(this.rendering);
+      const changeView = await this.timeline.update(this.rendering, delta_time);
       if (changeView) {
         this.switchCameraView();
       }

@@ -599,16 +599,23 @@ export class TimeLine {
   }
 
   // called by the editor update loop on each frame
-  public async update(isRendering = false): Promise<boolean> {
+  public async update(isRendering = false, delta_time:number=0): Promise<boolean> {
     //if (this.is_playing === false) return; // start and stop
     this.timeline_limit = this.getEndPoint();
     if (this.is_playing) {
-      this.current_time += 1; // This fixes fps issues at 60.
+      // When rendering we want to increase it by 1 but when in playback we want it dynamic based on deltatime.
+      if(isRendering){
+        this.current_time += 1;
+      }
+      else {
+        this.current_time += delta_time * this.editorEngine.cap_fps;
+      }
       this.pushEvent(fromEngineActions.UPDATE_TIME, {
         currentTime: this.current_time,
       });
       this.scrubber_frame_position = this.current_time;
     }
+    
 
     if (this.scrubber_frame_position <= 0) {
       await this.resetScene();
