@@ -5,14 +5,17 @@ import { useRef, useState } from "react";
 import { BucketConfig } from "~/api/BucketConfig";
 import dayjs from "dayjs";
 import Tooltip from "~/components/Tooltip";
+import { environmentVariables } from "~/store";
 
 interface Props {
   movie: MediaInfo;
+  setMovieId: (id: string) => void;
 }
 
-export function CompletedCard({ movie }: Props) {
+export function CompletedCard({ movie, setMovieId }: Props) {
   const bucketConfig = useRef<BucketConfig>(new BucketConfig());
   const [loadError, setLoadError] = useState(false);
+  const downloadLink = `${environmentVariables.value.GOOGLE_API}/vocodes-public${movie.public_bucket_path}`;
 
   const imageUrl = bucketConfig.current.getCdnUrl(
     movie.public_bucket_path + "-thumb.gif",
@@ -23,9 +26,9 @@ export function CompletedCard({ movie }: Props) {
   return (
     <button
       className="flex w-full items-center justify-between px-5 py-3 text-start transition-all duration-150 hover:bg-brand-secondary/40"
-      onClick={() =>
-        console.log("change current modal to completed video modal")
-      }>
+      onClick={() => {
+        setMovieId(movie.token);
+      }}>
       <div className="flex gap-4">
         <div className="rounded-lg">
           <img
@@ -51,7 +54,9 @@ export function CompletedCard({ movie }: Props) {
       <div className="pr-5">
         <Tooltip content="Download" position="top">
           <button
-            onClick={() => console.log("download")}
+            onClick={() => {
+              window.open(downloadLink, "_blank");
+            }}
             className="text-xl text-white/50 transition-all duration-150 hover:text-white/90">
             <FontAwesomeIcon icon={faArrowDownToLine} />
           </button>

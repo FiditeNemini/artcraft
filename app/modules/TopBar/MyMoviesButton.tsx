@@ -1,14 +1,23 @@
 import { faFilm } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button } from "~/components";
-import { activeJobs, viewMyMovies } from "~/pages/PageEnigma/store";
+import {
+  activeJobs,
+  generateMovieId,
+  viewMyMovies,
+} from "~/pages/PageEnigma/store";
 
 export const MyMoviesButton = () => {
   const activeCount = activeJobs.value.jobs.length;
 
   return (
     <div className="relative">
-      <Button variant="action" onClick={() => (viewMyMovies.value = true)}>
+      <Button
+        variant="action"
+        onClick={() => {
+          generateMovieId.value = "";
+          viewMyMovies.value = true;
+        }}>
         <div className="relative flex items-center gap-2">
           {activeCount > 0 ? (
             <svg

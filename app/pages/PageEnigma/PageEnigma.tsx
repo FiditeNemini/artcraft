@@ -4,7 +4,7 @@ import { DragComponent } from "~/pages/PageEnigma/comps/DragComponent/DragCompon
 import { EngineProvider } from "~/contexts/EngineProvider";
 import { useInferenceJobManager } from "~/hooks";
 import { LoadingBar } from "~/components";
-import { MyMovies } from "~/pages/PageEnigma/comps/MyMovies/MyMovies";
+import { GenerateModals } from "~/pages/PageEnigma/comps/GenerateModals/GenerateModals";
 import { ErrorDialog } from "~/components/ErrorDialog";
 
 export const PageEnigma = () => {
@@ -14,7 +14,7 @@ export const PageEnigma = () => {
       <EngineProvider>
         <PageEnigmaComponent />
         <DragComponent />
-        <MyMovies />
+        <GenerateModals />
         <ErrorDialog />
       </EngineProvider>
       <LoadingBar

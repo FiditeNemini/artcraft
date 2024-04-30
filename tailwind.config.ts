@@ -147,7 +147,7 @@ export default {
         selectedTab: "#55556B",
       },
 
-      ui:{
+      ui: {
         background: "#1a1a27",
         panel: "#242433",
         "panel-border": "#393948",
@@ -156,26 +156,32 @@ export default {
         divider: "#515168",
       },
 
-      media:{
+      media: {
         "audio-tts": "#6AAA88",
         "audio-v2v": "#6691B9",
         "audio-upload": "#9760C2",
-        "audio-demo" : "#B96675",
+        "audio-demo": "#B96675",
         "is-new": "#FFDC26",
       },
 
-      inference:{
+      inference: {
         pending: "#6b728b",
         generating: "#46527C",
         error: "#924C4B",
       },
-      
+
       "axis-x": "#D33242",
       "axis-y": "#308752",
       "axis-z": "#2E70FF",
       red: "#D33242",
       green: "#308752",
       blue: "#2E70FF",
+
+      facebook: "#4267b2",
+      reddit: "#ff5700",
+      whatsapp: "#25d366",
+      x: "#1da1f2",
+      email: "#858585",
 
       white: colors.white,
       gray: colors.gray,
@@ -196,5 +202,10 @@ export default {
     "bg-object-selected",
     "bg-object-unselected",
     "bg-object-clip",
+    "bg-facebook",
+    "bg-reddit",
+    "bg-whatsapp",
+    "bg-x",
+    "bg-email",
   ],
 } satisfies Config;

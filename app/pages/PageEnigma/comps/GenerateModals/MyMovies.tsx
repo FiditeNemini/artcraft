@@ -1,11 +1,20 @@
-import { TransitionDialogue } from "~/components";
-import { activeJobs, movies, viewMyMovies } from "~/pages/PageEnigma/store";
-import { CompletedCard } from "~/pages/PageEnigma/comps/MyMovies/CompletedCard";
-import { InProgressCard } from "~/pages/PageEnigma/comps/MyMovies/InProgressCard";
+import {
+  activeJobs,
+  generateMovieId,
+  movies,
+  viewMyMovies,
+} from "~/pages/PageEnigma/store";
+import { CompletedCard } from "~/pages/PageEnigma/comps/GenerateModals/CompletedCard";
+import { InProgressCard } from "~/pages/PageEnigma/comps/GenerateModals/InProgressCard";
 import { useSignals } from "@preact/signals-react/runtime";
 import { faFilm } from "@fortawesome/pro-solid-svg-icons";
+import { TransitionDialogue } from "~/components";
 
-export function MyMovies() {
+interface Props {
+  setMovieId: (page: string) => void;
+}
+
+export function MyMovies({ setMovieId }: Props) {
   useSignals();
 
   return (
@@ -15,7 +24,10 @@ export function MyMovies() {
       className="max-w-4xl"
       childPadding={false}
       isOpen={viewMyMovies.value}
-      onClose={() => (viewMyMovies.value = false)}>
+      onClose={() => {
+        setMovieId("");
+        viewMyMovies.value = false;
+      }}>
       <div className="h-[560px] overflow-y-auto overflow-x-hidden rounded-b-lg">
         {activeJobs.value.jobs.length > 0 && (
           <div className="mb-3">
@@ -29,7 +41,11 @@ export function MyMovies() {
           <div className="mx-5 mb-1 font-medium">Completed</div>
           <div className="flex flex-col">
             {movies.value.movies.map((movie) => (
-              <CompletedCard key={movie.token} movie={movie} />
+              <CompletedCard
+                key={movie.token}
+                movie={movie}
+                setMovieId={setMovieId}
+              />
             ))}
           </div>
         </div>

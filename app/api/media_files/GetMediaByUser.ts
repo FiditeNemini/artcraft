@@ -1,6 +1,5 @@
 import MakeRequest from "../MakeRequest";
-import { MediaFile } from "./GetMedia";
-import { Pagination } from "../_common/SharedFetchTypes";
+import { MediaFile, Pagination } from "~/pages/PageEnigma/models";
 
 export interface GetMediaRequest {}
 
@@ -12,6 +11,7 @@ export interface GetMediaListResponse {
 
 export interface GetMediaParams {
   page_index: number;
+  filter_media_type: string;
 }
 
 export const GetMediaByUser = MakeRequest<
