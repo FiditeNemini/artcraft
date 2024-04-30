@@ -1,10 +1,11 @@
 import { useSignals } from "@preact/signals-react/runtime";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { MediaFile } from "~/pages/PageEnigma/models";
 import { Button, Input, Label, TransitionDialogue } from "~/components";
 import {
   faArrowDownToLine,
   faArrowRight,
+  faChevronLeft,
   faFilm,
   faLink,
 } from "@fortawesome/pro-solid-svg-icons";
@@ -12,6 +13,8 @@ import SocialButton from "./SocialButton";
 import { generateMovieId, viewMyMovies } from "~/pages/PageEnigma/store";
 import dayjs from "dayjs";
 import { environmentVariables } from "~/store";
+import { downloadFile } from "~/pages/PageEnigma/comps/GenerateModals/utils/downloadFile";
+import { ToasterContext } from "~/contexts/ToasterContext";
 
 interface Props {
   mediaFile: MediaFile;
@@ -20,6 +23,7 @@ interface Props {
 
 export function Sharing({ mediaFile, setMediaFile }: Props) {
   useSignals();
+  const { addToast } = useContext(ToasterContext);
   const shareUrl = `https://storyteller.ai/media/${mediaFile?.token || ""}`;
   const shareText = "Check out this media on StoryTeller.ai";
   const [buttonLabel, setButtonLabel] = useState("Copy");
@@ -50,16 +54,17 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
   return (
     <TransitionDialogue
       title={generateTitle()}
-      titleIcon={faFilm}
+      titleIcon={generateMovieId.value ? faFilm : faChevronLeft}
+      titleIconClassName="text-white/60 hover:text-white/80 transition-colors duration-150"
+      onTitleIconClick={
+        generateMovieId.value ? undefined : () => setMediaFile(null)
+      }
       className="max-w-6xl"
       childPadding={false}
       isOpen={viewMyMovies.value}
       width={1049}
       onClose={() => {
-        if (generateMovieId.value) {
-          viewMyMovies.value = false;
-          return;
-        }
+        viewMyMovies.value = false;
         setMediaFile(null);
       }}>
       <div className="flex gap-6 px-5 pb-5">
@@ -114,8 +119,10 @@ export function Sharing({ mediaFile, setMediaFile }: Props) {
             <Button
               icon={faArrowDownToLine}
               className="h-10 w-full"
-              onClick={() => {
-                window.open(downloadLink, "_blank");
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                downloadFile(downloadLink, addToast);
               }}
               variant="secondary">
               Download

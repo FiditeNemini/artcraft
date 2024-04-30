@@ -1,11 +1,14 @@
 import { MediaInfo } from "~/pages/PageEnigma/models/movies";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowDownToLine } from "@fortawesome/pro-solid-svg-icons";
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { BucketConfig } from "~/api/BucketConfig";
 import dayjs from "dayjs";
 import Tooltip from "~/components/Tooltip";
 import { environmentVariables } from "~/store";
+import { useSignals } from "@preact/signals-react/runtime";
+import { downloadFile } from "~/pages/PageEnigma/comps/GenerateModals/utils/downloadFile";
+import { ToasterContext } from "~/contexts/ToasterContext";
 
 interface Props {
   movie: MediaInfo;
@@ -13,6 +16,8 @@ interface Props {
 }
 
 export function CompletedCard({ movie, setMovieId }: Props) {
+  useSignals();
+  const { addToast } = useContext(ToasterContext);
   const bucketConfig = useRef<BucketConfig>(new BucketConfig());
   const [loadError, setLoadError] = useState(false);
   const downloadLink = `${environmentVariables.value.GOOGLE_API}/vocodes-public${movie.public_bucket_path}`;
@@ -46,7 +51,7 @@ export function CompletedCard({ movie, setMovieId }: Props) {
           <div>
             <div className="text-sm text-white/60">Anime 2D</div>
             <div className="text-sm text-white/60">
-              {dayjs(movie.updated_at).format("MMM D, YYYY HH:mm")}
+              {dayjs(movie.updated_at).format("MMM D, YYYY HH:mm:ss")}
             </div>
           </div>
         </div>
@@ -54,8 +59,10 @@ export function CompletedCard({ movie, setMovieId }: Props) {
       <div className="pr-5">
         <Tooltip content="Download" position="top">
           <button
-            onClick={() => {
-              window.open(downloadLink, "_blank");
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              downloadFile(downloadLink, addToast);
             }}
             className="text-xl text-white/50 transition-all duration-150 hover:text-white/90">
             <FontAwesomeIcon icon={faArrowDownToLine} />

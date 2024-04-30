@@ -39,6 +39,7 @@ export const TransitionDialogue = ({
   isOpen,
   title,
   titleIcon,
+  onTitleIconClick,
   onClose,
   className,
   width,
@@ -50,6 +51,7 @@ export const TransitionDialogue = ({
   isOpen: boolean;
   title?: ReactNode;
   titleIcon?: IconDefinition;
+  onTitleIconClick?: () => void;
   titleIconClassName?: string;
   onClose: () => void;
   className?: string;
@@ -84,15 +86,33 @@ export const TransitionDialogue = ({
                   <Dialog.Title
                     as="div"
                     className="mb-5 flex justify-between p-5 pb-0 text-xl font-bold text-white">
-                    <div className="flex items-center gap-3">
-                      {titleIcon && (
-                        <FontAwesomeIcon
-                          icon={titleIcon}
-                          className={titleIconClassName}
-                        />
-                      )}
-                      {title}
-                    </div>
+                    {titleIcon && (
+                      <>
+                        {onTitleIconClick ? (
+                          <button
+                            className="flex items-center gap-3"
+                            onClick={onTitleIconClick}>
+                            {titleIcon && (
+                              <FontAwesomeIcon
+                                icon={titleIcon}
+                                className={titleIconClassName}
+                              />
+                            )}
+                            {title}
+                          </button>
+                        ) : (
+                          <div className="flex items-center gap-3">
+                            {titleIcon && (
+                              <FontAwesomeIcon
+                                icon={titleIcon}
+                                className={titleIconClassName}
+                              />
+                            )}
+                            {title}
+                          </div>
+                        )}
+                      </>
+                    )}
                     {showClose && (
                       <Tooltip position="top" content="Close">
                         <button
