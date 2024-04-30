@@ -526,6 +526,10 @@ export class TimeLine {
     const value = Math.floor(data["data"]["currentTime"]);
     this.setScrubberPosition(value);
     this.update();
+
+    if (this.editorEngine.switchPreviewToggle) {
+      this.editorEngine.generateFrame();
+    }
   }
 
   public async stepFrame(frames: number) {

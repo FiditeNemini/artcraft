@@ -1181,6 +1181,7 @@ class Editor {
       const output = await ffmpeg.FS("readFile", "render.mp4");
       const blob = new Blob([output.buffer], { type: "video/mp4" });
       this.generating_preview = false;
+      ffmpeg.exit();
 
       try {
         const url = await this.api_manager.uploadMediaFrameGeneration(
