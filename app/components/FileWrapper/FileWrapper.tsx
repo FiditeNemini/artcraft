@@ -1,4 +1,4 @@
-import React, { useId, useState } from "react";
+import React, { useId, useRef, useState } from "react";
 import { UploadModal } from "~/components";
 // import { useId } from 'hooks'; // replace with react v18
 import "./FileWrapper.scss";
@@ -17,19 +17,26 @@ export default function FileWrapper({
   onSuccess,
   ...rest
 }: Props) {
-  const [file, fileSet] = useState();
+  const fileRef = useRef(null);
+  const [file, fileSet] = useState<File | undefined>();
   const [modalOpen, modalOpenSet] = useState(false);
+  const [resetModal, resetModalSet] = useState(false);
   const [dragging, draggingSet] = useState(false);
   const id = "file-input-" + useId();
   const accept = fileTypes.map((type) => `.${type.toLowerCase()}`).join(",");
-  const clearFile = () => fileSet(undefined);
+  const clearFile = () => {
+    if (fileRef.current !== null) {
+      fileRef.current.value = "";
+      fileSet(undefined);
+    }
+  };
   const closeModal = () => modalOpenSet(false);
 
-  const fileChange = (e: React.DragEvent) => {
+  const fileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    resetModalSet(true);
     e.preventDefault();
     fileSet(e.target.files[0]);
     modalOpenSet(true);
-    // onChange({ target: { name: e.target?.name || "file-input", value: e.target.files[0] }});
   };
   const onDragDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -66,6 +73,7 @@ export default function FileWrapper({
           onChange: fileChange,
           type: "file",
           id,
+          ref: fileRef,
           ...rest,
         }}
       />
@@ -73,10 +81,12 @@ export default function FileWrapper({
       <UploadModal
         {...{
           closeModal,
-          onClose: clearFile,
           file,
           isOpen: modalOpen,
+          onClose: clearFile,
           onSuccess,
+          resetModal,
+          resetModalSet,
         }}
       />
     </div>

@@ -63,7 +63,7 @@ export const ObjectsTab = ({ type }: Props) => {
     if (status === FetchStatus.ready && type !== AssetType.CHARACTER) {
       statusSet(FetchStatus.in_progress);
       GetMediaByUser(
-        authState.userInfo.username,
+        authState?.userInfo?.username || "",
         {},
         {
           filter_media_type: "glb",

@@ -1,4 +1,3 @@
-import { MediaFileSubtype } from "../enums/MediaFileSubtype";
 import MakeMultipartRequest from "../MakeMultipartRequest";
 
 export enum MediaFileSubtype {
@@ -28,16 +27,17 @@ export enum MediaFileSubtype {
 }
 
 export interface UploadEngineAssetRequest {
-  uuid_idempotency_token?: string,
-  file: any,
+  file: File;
   media_file_subtype?: MediaFileSubtype;
+  title?: string;
+  uuid_idempotency_token?: string;
 }
 
 export interface UploadEngineAssetResponse {
-  media_file_token: string,
-  success: boolean
+  media_file_token: string;
+  success: boolean;
 }
 
 export const UploadEngineAsset = (request: UploadEngineAssetRequest) => {
   return MakeMultipartRequest("/v1/media_files/upload/engine_asset", request);
-}
+};
