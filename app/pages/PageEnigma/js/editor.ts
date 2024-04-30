@@ -561,7 +561,7 @@ class Editor {
     );
     const timeline_json = await proxyTimeline.saveToJson();
 
-    const save_data = { scene: scene_json, timeline: timeline_json };
+    const save_data = { version: this.version, scene: scene_json, timeline: timeline_json };
 
     // TODO turn scene information into and object ...
     const result = await this.api_manager.saveSceneState(
