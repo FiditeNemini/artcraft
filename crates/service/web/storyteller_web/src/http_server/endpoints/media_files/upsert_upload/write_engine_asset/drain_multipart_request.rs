@@ -3,7 +3,9 @@ use actix_web::web::BytesMut;
 use anyhow::anyhow;
 use futures::TryStreamExt;
 use log::{info, warn};
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 
 use errors::AnyhowResult;
@@ -17,9 +19,20 @@ pub struct MediaFileUploadData {
   pub uuid_idempotency_token: Option<String>,
   pub file_name: Option<String>,
   pub file_bytes: Option<BytesMut>,
+
   pub media_file_token: Option<MediaFileToken>,
-  pub media_file_subtype: Option<MediaFileSubtype>,
-  pub media_file_class: Option<MediaFileClass>,
+
+  // Optional: title of the scene (media_files' maybe_title)
+  pub maybe_title: Option<String>,
+
+  // Optional: visibility
+  pub maybe_visibility: Option<String>,
+
+  // Optional: visibility
+  pub maybe_engine_category: Option<MediaFileEngineCategory>,
+
+  // Optional: visibility
+  pub maybe_animation_type: Option<MediaFileAnimationType>,
 }
 
 /// Pull common parts out of multipart media HTTP requests, typically for handling file uploads.
@@ -28,8 +41,10 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Result
   let mut file_bytes = None;
   let mut file_name = None;
   let mut media_file_token = None;
-  let mut media_file_class = None;
-  let mut media_file_subtype = None;
+  let mut title = None;
+  let mut visibility = None;
+  let mut maybe_engine_category = None;
+  let mut maybe_animation_type = None;
 
   while let Ok(Some(mut field)) = multipart_payload.try_next().await {
     let mut field_name = None;
@@ -66,30 +81,70 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Result
             })?
             .map(|field| MediaFileToken::new_from_str(&field));
       },
-      Some("media_file_subtype") => {
-        media_file_subtype = read_multipart_field_as_text(&mut field).await
+      //Some("media_file_subtype") => {
+      //  media_file_subtype = read_multipart_field_as_text(&mut field).await
+      //      .map_err(|err| {
+      //        warn!("Error reading source: {:?}", &err);
+      //        MediaFileWriteError::BadInput("Error reading media_file_subtype".to_string())
+      //      })?
+      //      .map(|field| MediaFileSubtype::from_str(&field))
+      //      .transpose()
+      //      .map_err(|err| {
+      //        warn!("Wrong MediaFileSubtype: {:?}", &err);
+      //        MediaFileWriteError::BadInput("Wrong MediaFileSubtype variant".to_string())
+      //      })?;
+      //},
+      //Some("media_file_class") => {
+      //  media_file_class = read_multipart_field_as_text(&mut field).await
+      //      .map_err(|err| {
+      //        warn!("Error reading source: {:?}", &err);
+      //        MediaFileWriteError::BadInput("Error reading media_file_class".to_string())
+      //      })?
+      //      .map(|field| MediaFileClass::from_str(&field))
+      //      .transpose()
+      //      .map_err(|err| {
+      //        warn!("Wrong MediaFileClass: {:?}", &err);
+      //        MediaFileWriteError::BadInput("Wrong MediaFileClass variant".to_string())
+      //      })?;
+      //},
+      Some("engine_category") => {
+        maybe_engine_category = read_multipart_field_as_text(&mut field).await
             .map_err(|err| {
-              warn!("Error reading source: {:?}", &err);
-              MediaFileWriteError::BadInput("Error reading media_file_subtype".to_string())
+              warn!("Error reading engine_category: {:?}", &err);
+              MediaFileWriteError::BadInput(format!("Error reading engine_category: {:?}", &err))
             })?
-            .map(|field| MediaFileSubtype::from_str(&field))
+            .map(|field| MediaFileEngineCategory::from_str(&field))
             .transpose()
             .map_err(|err| {
-              warn!("Wrong MediaFileSubtype: {:?}", &err);
-              MediaFileWriteError::BadInput("Wrong MediaFileSubtype variant".to_string())
+              warn!("Wrong MediaFileEngineCategory: {:?}", &err);
+              MediaFileWriteError::BadInput(format!("Wrong MediaFileEngineCategory: {:?}", &err))
             })?;
       },
-      Some("media_file_class") => {
-        media_file_class = read_multipart_field_as_text(&mut field).await
+      Some("animation_type") => {
+        maybe_animation_type = read_multipart_field_as_text(&mut field).await
             .map_err(|err| {
-              warn!("Error reading source: {:?}", &err);
-              MediaFileWriteError::BadInput("Error reading media_file_class".to_string())
+              warn!("Error reading animation_type: {:?}", &err);
+              MediaFileWriteError::BadInput(format!("Error reading animation_type: {:?}", &err))
             })?
-            .map(|field| MediaFileClass::from_str(&field))
+            .map(|field| MediaFileAnimationType::from_str(&field))
             .transpose()
             .map_err(|err| {
-              warn!("Wrong MediaFileClass: {:?}", &err);
-              MediaFileWriteError::BadInput("Wrong MediaFileClass variant".to_string())
+              warn!("Wrong MediaFileAnimationType: {:?}", &err);
+              MediaFileWriteError::BadInput(format!("Wrong MediaFileAnimationType: {:?}", &err))
+            })?;
+      },
+      Some("title") => {
+        title = read_multipart_field_as_text(&mut field).await
+            .map_err(|err| {
+              warn!("Error reading title: {:}", &err);
+              MediaFileWriteError::BadInput(format!("Error reading title: {:?}", &err))
+            })?;
+      },
+      Some("visibility") => {
+        visibility = read_multipart_field_as_text(&mut field).await
+            .map_err(|err| {
+              warn!("Error reading visibility: {:}", &err);
+              MediaFileWriteError::BadInput(format!("Error reading visibility: {:?}", &err))
             })?;
       },
       _ => continue,
@@ -101,7 +156,9 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Result
     file_name,
     file_bytes,
     media_file_token,
-    media_file_class,
-    media_file_subtype,
+    maybe_title: title,
+    maybe_visibility: visibility,
+    maybe_engine_category,
+    maybe_animation_type,
   })
 }

@@ -11,6 +11,7 @@ use stripe::CreatePaymentLinkShippingAddressCollectionAllowedCountries::Mf;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
@@ -19,7 +20,7 @@ use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mimetypes::mimetype_to_extension::mimetype_to_extension;
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
-use mysql_queries::queries::media_files::upsert::upsert_media_file_from_file_upload::{upsert_media_file_from_file_upload, UpsertMediaFileFromUploadArgs, UploadType};
+use mysql_queries::queries::media_files::upsert::upsert_media_file_from_file_upload::{UploadType, upsert_media_file_from_file_upload, UpsertMediaFileFromUploadArgs};
 use tokens::tokens::media_files::MediaFileToken;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
@@ -191,9 +192,10 @@ pub async fn write_engine_asset_media_file_handler(
     Some("glb") => (".glb", MediaFileType::Glb, "application/octet-stream"),
     Some("gltf") => (".gltf", MediaFileType::Gltf, "application/octet-stream"),
     Some("ron") => (".scn.ron", MediaFileType::SceneRon, "application/octet-stream"),
+    Some("json") => (".scn.json", MediaFileType::SceneJson, "application/json"),
     _ => {
       return Err(MediaFileWriteError::BadInput(
-        "unsupported file extension. Must be bvh, glb, gltf, or fbx.".to_string()));
+        "unsupported file extension. Must be json, bvh, glb, gltf, or fbx.".to_string()));
     }
   };
 
@@ -231,14 +233,16 @@ pub async fn write_engine_asset_media_file_handler(
   // TODO(bt, 2024-02-22): This should be a transaction.
   let (token, record_id) = upsert_media_file_from_file_upload(UpsertMediaFileFromUploadArgs {
     maybe_media_file_token: upload_media_request.media_file_token.as_ref(),
+    maybe_media_class: Some(MediaFileClass::Dimensional),
+    media_file_type,
+    maybe_engine_category: upload_media_request.maybe_engine_category,
+    maybe_animation_type: upload_media_request.maybe_animation_type,
+    maybe_media_subtype: None,
     maybe_creator_user_token: maybe_user_token.as_ref(),
     maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility,
     upload_type: UploadType::Filesystem,
-    media_file_type,
-    maybe_media_class: upload_media_request.media_file_class,
-    maybe_media_subtype: upload_media_request.media_file_subtype,
     maybe_mime_type: Some(mimetype),
     file_size_bytes: file_size_bytes as u64,
     duration_millis: 0,

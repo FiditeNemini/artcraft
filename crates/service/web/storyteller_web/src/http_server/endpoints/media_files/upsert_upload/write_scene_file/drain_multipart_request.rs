@@ -3,7 +3,9 @@ use actix_web::web::BytesMut;
 use anyhow::anyhow;
 use futures::TryStreamExt;
 use log::warn;
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 
 use errors::AnyhowResult;
@@ -18,6 +20,12 @@ pub struct MediaFileUploadData {
   pub file_name: Option<String>,
   pub file_bytes: Option<BytesMut>,
   pub media_file_token: Option<MediaFileToken>,
+
+  // Optional: title of the scene (media_files' maybe_title)
+  pub maybe_title: Option<String>,
+
+  // Optional: visibility
+  pub maybe_visibility: Option<String>,
 }
 
 /// Pull common parts out of multipart media HTTP requests, typically for handling file uploads.
@@ -26,6 +34,8 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Result
   let mut file_bytes = None;
   let mut file_name = None;
   let mut media_file_token = None;
+  let mut title = None;
+  let mut visibility = None;
 
   while let Ok(Some(mut field)) = multipart_payload.try_next().await {
     let mut field_name = None;
@@ -62,6 +72,20 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Result
             })?
             .map(|field| MediaFileToken::new_from_str(&field));
       },
+      Some("title") => {
+        title = read_multipart_field_as_text(&mut field).await
+            .map_err(|err| {
+              warn!("Error reading title: {:}", &err);
+              MediaFileWriteError::BadInput("Error reading title".to_string())
+            })?;
+      },
+      Some("visibility") => {
+        visibility = read_multipart_field_as_text(&mut field).await
+            .map_err(|err| {
+              warn!("Error reading visibility: {:}", &err);
+              MediaFileWriteError::BadInput("Error reading visibility".to_string())
+            })?;
+      },
       _ => continue,
     }
   }
@@ -71,5 +95,7 @@ pub async fn drain_multipart_request(mut multipart_payload: Multipart) -> Result
     file_name,
     file_bytes,
     media_file_token,
+    maybe_title: title,
+    maybe_visibility: visibility,
   })
 }

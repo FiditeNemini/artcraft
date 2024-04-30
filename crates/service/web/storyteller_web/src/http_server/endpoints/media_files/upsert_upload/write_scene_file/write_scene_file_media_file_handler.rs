@@ -12,6 +12,7 @@ use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_subtype::MediaFileSubtype;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
@@ -21,12 +22,12 @@ use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mimetypes::mimetype_to_extension::mimetype_to_extension;
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
-use mysql_queries::queries::media_files::upsert::upsert_media_file_from_file_upload::{upsert_media_file_from_file_upload, UpsertMediaFileFromUploadArgs, UploadType};
+use mysql_queries::queries::media_files::upsert::upsert_media_file_from_file_upload::{UploadType, upsert_media_file_from_file_upload, UpsertMediaFileFromUploadArgs};
 use tokens::tokens::media_files::MediaFileToken;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
 
-use crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::drain_multipart_request::drain_multipart_request;
 use crate::http_server::endpoints::media_files::upsert_upload::write_error::MediaFileWriteError;
+use crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::drain_multipart_request::drain_multipart_request;
 use crate::server_state::ServerState;
 use crate::util::check_creator_tokens::{check_creator_tokens, CheckCreatorTokenArgs, CheckCreatorTokenResult};
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
@@ -199,7 +200,6 @@ pub async fn write_scene_file_media_file_handler(
   //  benefit of restoring old versions (if we mapped to existing paths but had a versioning scheme),
   //  but we can move fast.
 
-  const MEDIA_FILE_TYPE: MediaFileType = MediaFileType::SceneJson;
   const MIMETYPE: &str = "application/json";
   const PREFIX : Option<&str> = Some("upload_");
   const SUFFIX: &str = ".json";
@@ -221,14 +221,16 @@ pub async fn write_scene_file_media_file_handler(
   // TODO(bt, 2024-02-22): This should be a transaction.
   let (token, record_id) = upsert_media_file_from_file_upload(UpsertMediaFileFromUploadArgs {
     maybe_media_file_token: upload_media_request.media_file_token.as_ref(),
+    maybe_media_class: Some(MediaFileClass::Dimensional),
+    media_file_type: MediaFileType::SceneJson,
+    maybe_engine_category: Some(MediaFileEngineCategory::Scene),
+    maybe_animation_type: None,
+    maybe_media_subtype: None,
     maybe_creator_user_token: maybe_user_token.as_ref(),
     maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
     creator_ip_address: &ip_address,
     creator_set_visibility,
     upload_type: UploadType::Filesystem,
-    media_file_type: MEDIA_FILE_TYPE,
-    maybe_media_class: Some(MediaFileClass::Unknown),
-    maybe_media_subtype: None,
     maybe_mime_type: Some(MIMETYPE),
     file_size_bytes: file_size_bytes as u64,
     duration_millis: 0,
