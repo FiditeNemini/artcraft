@@ -73,7 +73,7 @@ pub struct UploadNewSceneMediaFileSuccessResponse {
     (status = 500, description = "Server error", body = MediaFileUploadError),
   ),
   params(
-    ("request" = (), description = "Ask Brandon. This is form-multipart."),
+    ("request" = UploadNewSceneMediaFileForm, description = "Payload Form-Multipart for Request"),
   )
 )]
 pub async fn upload_new_scene_media_file_handler(
