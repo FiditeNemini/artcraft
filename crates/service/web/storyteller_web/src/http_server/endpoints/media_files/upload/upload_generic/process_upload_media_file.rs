@@ -6,6 +6,7 @@ use actix_web::{HttpRequest, web};
 use log::{error, info, warn};
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
@@ -289,6 +290,20 @@ pub async fn process_upload_media_file(
     },
   };
 
+  let media_file_class = match media_file_type {
+    MediaFileType::Audio => MediaFileClass::Audio,
+    MediaFileType::Image => MediaFileClass::Image,
+    MediaFileType::Video => MediaFileClass::Video,
+    MediaFileType::Bvh => MediaFileClass::Dimensional,
+    MediaFileType::Fbx => MediaFileClass::Dimensional,
+    MediaFileType::Glb => MediaFileClass::Dimensional,
+    MediaFileType::Gltf => MediaFileClass::Dimensional,
+    MediaFileType::SceneRon => MediaFileClass::Dimensional,
+    MediaFileType::SceneJson => MediaFileClass::Dimensional,
+    MediaFileType::Pmd => MediaFileClass::Dimensional,
+    MediaFileType::Vmd => MediaFileClass::Dimensional,
+  };
+
   let upload_type = match upload_media_request.media_source {
     MediaFileUploadSource::Unknown => UploadType::Filesystem,
     MediaFileUploadSource::UserFile => UploadType::Filesystem,
@@ -333,7 +348,7 @@ pub async fn process_upload_media_file(
       })?;
 
   let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
-    maybe_media_class: None,
+    maybe_media_class: Some(media_file_class),
     media_file_type,
     maybe_creator_user_token: maybe_user_token.as_ref(),
     maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
