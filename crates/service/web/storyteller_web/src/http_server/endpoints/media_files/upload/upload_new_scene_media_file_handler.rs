@@ -34,23 +34,29 @@ use crate::server_state::ServerState;
 use crate::util::check_creator_tokens::{check_creator_tokens, CheckCreatorTokenArgs, CheckCreatorTokenResult};
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
+/// Form-multipart request fields.
 #[derive(MultipartForm, ToSchema)]
 #[multipart(duplicate_field = "deny")]
 pub struct UploadNewSceneMediaFileForm {
   /// UUID for request idempotency
   #[multipart(limit = "2 KiB")]
+  #[schema(value_type = String, format = Binary)]
   uuid_idempotency_token: Text<String>,
 
+  // TODO: is MultipartBytes better than TempFile ?
   /// The uploaded file
   #[multipart(limit = "512 MiB")]
+  #[schema(value_type = Vec<u8>, format = Binary)]
   file: TempFile,
 
   /// Optional: Title (name) of the scene
   #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<String>, format = Binary)]
   title: Option<Text<String>>,
 
   /// Optional: Visibility of the scene
   #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<String>, format = Binary)]
   visibility: Option<Text<Visibility>>,
 }
 
@@ -73,7 +79,10 @@ pub struct UploadNewSceneMediaFileSuccessResponse {
     (status = 500, description = "Server error", body = MediaFileUploadError),
   ),
   params(
-    ("request" = UploadNewSceneMediaFileForm, description = "Payload Form-Multipart for Request"),
+    (
+      "request" = UploadNewSceneMediaFileForm,
+      description = "PLEASE SEE BOTTOM OF PAGE `UploadNewSceneMediaFileForm` FOR DETAILS ON FIELDS AND NULLABILITY."
+    ),
   )
 )]
 pub async fn upload_new_scene_media_file_handler(
