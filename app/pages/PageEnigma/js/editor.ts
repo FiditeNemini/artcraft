@@ -1180,6 +1180,7 @@ class Editor {
       await ffmpeg.run("-i", `render.png`, "render.mp4");
       const output = await ffmpeg.FS("readFile", "render.mp4");
       const blob = new Blob([output.buffer], { type: "video/mp4" });
+      ffmpeg.exit()
       this.generating_preview = false;
       ffmpeg.exit();
 

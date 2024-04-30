@@ -51,9 +51,11 @@ class Scene {
   }
 
   clear() {
-    this.scene.children.forEach(child => {
-      this.scene.remove(child);
-    });
+    this.scene.children = [];
+    this._createGrid();
+    this._create_base_lighting();
+    this._create_skybox();
+    this._create_camera_obj();
   }
 
   instantiate(name: string, pos: THREE.Vector3 = new THREE.Vector3(0, 0, 0)) {
@@ -95,7 +97,12 @@ class Scene {
     return this.scene.getObjectByName(name);
   }
 
-  createPoint(pos: THREE.Vector3, rot: THREE.Vector3, scale: THREE.Vector3, keyframe_uuid: string): THREE.Object3D {
+  createPoint(
+    pos: THREE.Vector3,
+    rot: THREE.Vector3,
+    scale: THREE.Vector3,
+    keyframe_uuid: string,
+  ): THREE.Object3D {
     const geometry = new THREE.SphereGeometry(0.1, 18, 12);
     const material = new THREE.MeshBasicMaterial({ color: 0x05c3dd });
     const obj = new THREE.Mesh(geometry, material);
@@ -135,8 +142,12 @@ class Scene {
     });
   }
 
-
-  updatePoint(keyframe_uuid: string, keyframe_pos: THREE.Vector3, keyframe_rot: THREE.Vector3, keyframe_scl:THREE.Vector3) {
+  updatePoint(
+    keyframe_uuid: string,
+    keyframe_pos: THREE.Vector3,
+    keyframe_rot: THREE.Vector3,
+    keyframe_scl: THREE.Vector3,
+  ) {
     this.scene.traverse((object) => {
       if (object.userData.media_id) {
         const obj_keyframe_uuid = object.userData.media_id.replace(
@@ -152,7 +163,7 @@ class Scene {
           object.position.copy(keyframe_pos);
           object.rotation.copy(first_quat);
           //object.scale.copy(keyframe_scl);
-          
+
           return;
         }
       }

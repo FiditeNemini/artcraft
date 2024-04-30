@@ -62,7 +62,7 @@ export const ControlsTopButtons = () => {
                 confirmButtonProps: {
                   label: "Create",
                   disabled: sceneName === "",
-                  onClick: () => console.log("NEW SCENE"),
+                  onClick: () => editorEngine?.newScene(),
                 },
                 closeButtonProps: {
                   label: "Cancel",
