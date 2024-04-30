@@ -19,7 +19,7 @@ import { AuthenticationContext } from "~/contexts/Authentication";
 import { UploadMedia, UploadMediaResponse } from "./utilities";
 
 // import { ListDropdown } from "../ListDropdown";
-// const visiblityOpts = [
+// const visiblityOptions = [
 //   {
 //     name: "private",
 //     value: "private",
@@ -36,7 +36,7 @@ type ComponentState = {
   file: File | undefined;
   audioUrl: string;
   uploadState: "init" | "staged" | "uploading" | "uploaded" | "error";
-  visibility: string|undefined;
+  // visibility: string;
   fileToken: string|undefined;
 }
 const initialValues:ComponentState = {
@@ -44,9 +44,14 @@ const initialValues:ComponentState = {
   file: undefined,
   audioUrl: "",
   uploadState: "init",
-  visibility: undefined,
+  // visibility: "private",
   fileToken: undefined,
 }
+
+const getFileName = (file:File)=>{
+  return file.name.split(".")[0] || "";
+}
+
 export const UploadAudioButtonDiagloue = ({
   onUploaded,
 }:{
@@ -57,9 +62,9 @@ export const UploadAudioButtonDiagloue = ({
 
   const closeModal = () => setState(initialValues);
   const openModal = () => setState((curr)=>({...curr, isOpen:true}));
-  const selectVisibility = (value:string) => {
-    setState((curr)=>({...curr, visibility:value}))
-  };
+  // const selectVisibility = (value:string) => {
+  //   setState((curr)=>({...curr, visibility:value}))
+  // };
   const handleFileChange = (file: File) => {
     setState((curr) => ({
       ...curr,
@@ -84,6 +89,7 @@ export const UploadAudioButtonDiagloue = ({
         uuid_idempotency_token: uuidv4(),
         file: file,
         source: "file",
+        title: getFileName(file),
       }, authState.sessionToken)
       .then((res: UploadMediaResponse) => {
         // console.log(res);
@@ -138,10 +144,10 @@ export const UploadAudioButtonDiagloue = ({
               </div>
             </div>
           )}
-          {/* <ListDropdown list={visiblityOpts} onSelect={selectVisibility}/> */}
+          {/* <ListDropdown list={visiblityOptions} onSelect={selectVisibility}/> */}
           <div className="flex justify-end gap-3">
             <Button variant="secondary" onClick={closeModal}>
-              Cancel
+              {uploadState === "uploaded" ? "Close" : "Cancel"}
             </Button>
             {uploadState !== "uploaded" &&
               <Button
@@ -178,10 +184,7 @@ const DragAndDropZone = ({
         ? `${Math.floor(file.size / 1024)} KB`
         : null;
 
-  const fileName = 
-    file && file.name
-    ? file.name.split(".")[0].toUpperCase()
-    : "";
+  const fileName = file && getFileName(file).toUpperCase();
 
   if (!file) {
     return (

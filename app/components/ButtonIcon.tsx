@@ -20,6 +20,7 @@ export const ButtonIcon = ({
   className: propsClassName,
   hoverFill = false,
   disabled,
+  ...rest
 }: ButtonIconProps) => {
   const className = twMerge(
     "flex h-8 w-8 items-center justify-center rounded-lg transition-all duration-150",
@@ -31,7 +32,7 @@ export const ButtonIcon = ({
 
   return (
     <button className={className} onClick={onClick} disabled={disabled}>
-      <FontAwesomeIcon icon={icon} size={size} />
+      <FontAwesomeIcon icon={icon} size={size} {...rest}/>
     </button>
   );
 };

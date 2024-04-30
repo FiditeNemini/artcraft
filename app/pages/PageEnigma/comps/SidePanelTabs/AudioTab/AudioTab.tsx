@@ -8,7 +8,7 @@ import {
   JobState,
   InferenceJobType,
 } from "~/pages/PageEnigma/models";
-import { audioItemsFromServer } from "~/pages/PageEnigma/store/mediaFromServer";
+import { audioItemsFromServer, isRetreivingAudioItems } from "~/pages/PageEnigma/store/mediaFromServer";
 import {
   ListAudioByUser,
   ListTtsModels,
@@ -50,6 +50,7 @@ export const AudioTab = () => {
 
   const handleListAudioByUser = useCallback((username:string, sessionToken:string)=>{
     function getTitle (item:any){
+      console.log(item);
       if (item.maybe_title) return item.maybe_title;
       if (item.origin && item.origin.maybe_model && item.origin.maybe_model.title) return item.origin.maybe_model.title;
       return "Media Audio";
@@ -59,22 +60,22 @@ export const AudioTab = () => {
       if(item.origin_category) return item.origin_category;
       return "unknown";
     }
-    function checkIsNew(token:string){
-      const findNewItem = inferenceJobs.value.find((job=>{
-        if(job.result && job.result.entity_token){ 
-          return token === job.result.entity_token;
-        }else {
-          return false;
-        }
-      }))
-      return findNewItem !== undefined;
+    function checkIsNew(previousItems:AudioMediaItem[],token:string){
+      const foundItem = previousItems.find((item=>{
+          return token === item.media_id && item.isNew !== true;
+      }));
+      const foundNewItem = foundItem === undefined;
+      return foundNewItem;
     }
     function getLength(item:any){
       return item.maybe_duration_millis 
         ? item.maybe_duration_millis / 1000 * 60
         : undefined;
     }
+    isRetreivingAudioItems.value = true;
     ListAudioByUser(username, sessionToken).then((res:MediaFile[])=>{
+      isRetreivingAudioItems.value = false;
+      const previousItems = [...audioItemsFromServer.value];
       audioItemsFromServer.value = res.map(item=>{
         const morphedItem:AudioMediaItem = {
           version: 1,
@@ -88,7 +89,9 @@ export const AudioTab = () => {
           length: getLength(item),
           thumbnail: "/resources/placeholders/audio_placeholder.png",
           isMine: true,
-          isNew: checkIsNew(item.token),
+          isNew: previousItems.length > 0 
+            ? checkIsNew(previousItems,item.token)
+            : false,
           // isBookmarked?: boolean;
         }
         return morphedItem;

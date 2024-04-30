@@ -7,7 +7,6 @@ import {
   inferV2V,
 } from "~/api";
 import {
-  MediaFile,
   GetMediaFileResponse,
   VoiceConversionModelListItem,
   VoiceConversionModelListResponse,

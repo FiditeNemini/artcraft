@@ -1,6 +1,11 @@
 
+import { useSignals } from "@preact/signals-react/runtime";
+import { isRetreivingAudioItems } from "~/pages/PageEnigma/store";
 import { AudioItemElement } from "./audioItemElement";
-import { AssetFilterOption, AudioMediaItem } from "~/pages/PageEnigma/models";
+import { faSpinnerThird } from "@fortawesome/pro-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { AudioMediaItem } from "~/pages/PageEnigma/models";
+import { H6 } from "~/components";
 
 interface Props {
   currentPage: number;
@@ -13,9 +18,15 @@ export const AudioItemElements = ({
   pageSize,
   items,
 }: Props) => {
-
+  useSignals();
   return (
     <div className="grid grid-cols-1 gap-2.5">
+      {isRetreivingAudioItems.value &&
+        <div className="w-full flex gap-3 justify-center items-center">
+          <FontAwesomeIcon icon={faSpinnerThird} spin/>
+          <H6>Retreiving New Audio Items</H6>
+        </div>
+      }
       {items
         .slice(currentPage*pageSize, (currentPage+1)*pageSize)
         .map((item) => (
