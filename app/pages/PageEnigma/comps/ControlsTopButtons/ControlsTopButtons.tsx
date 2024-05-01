@@ -200,7 +200,9 @@ export const ControlsTopButtons = () => {
           dialogProps={{
             className: "max-w-6xl w-auto",
           }}
-          title="Help">
+          title={<>Help<span className="opacity-60">
+          @ CURRENT_STORYTELLER_GIT_VERSION
+        </span></>}>
           <Help />
         </ButtonDialogue>
       </div>

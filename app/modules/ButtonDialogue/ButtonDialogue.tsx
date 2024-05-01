@@ -11,7 +11,7 @@ interface ButtonDialoguePropsI {
   dialogProps?: {
     className?: string;
   };
-  title?: string;
+  title?: React.ReactNode;
   children: React.ReactNode;
   showClose?: boolean;
 }
