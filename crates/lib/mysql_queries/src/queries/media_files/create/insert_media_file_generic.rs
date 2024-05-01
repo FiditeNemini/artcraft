@@ -3,6 +3,7 @@ use sqlx;
 use sqlx::MySqlPool;
 
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -22,6 +23,7 @@ pub struct InsertArgs<'a> {
     pub pool: &'a MySqlPool,
     pub job: &'a AvailableInferenceJob,
 
+    pub media_class: MediaFileClass,
     pub media_type: MediaFileType,
 
     // Origin and categorization
@@ -99,6 +101,8 @@ pub async fn insert_media_file_generic(
         INSERT INTO media_files
         SET
             token = ?,
+
+            media_class = ?,
             media_type = ?,
 
             origin_category = ?, 
@@ -140,6 +144,8 @@ pub async fn insert_media_file_generic(
             generated_by_cluster = ?
         "#,
         result_token,
+
+        args.media_class.to_str(),
         args.media_type.to_str(),
 
         args.origin_category.to_str(),

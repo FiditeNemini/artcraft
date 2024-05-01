@@ -10,6 +10,7 @@ use cloud_storage::remote_file_manager::remote_cloud_file_manager::RemoteCloudFi
 use composite_identifiers::by_table::batch_generations::batch_generation_entity::BatchGenerationEntity;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -263,7 +264,8 @@ pub async fn process_job_inference(
     let (media_file_token, _id) = insert_media_file_generic(InsertArgs {
       pool: mysql_pool,
       job,
-      media_type: MediaFileType::Image,
+      media_class: MediaFileClass::Image,
+      media_type: MediaFileType::Image, // TODO(bt,2024-04-30): This should be a specific type of image
       origin_category: MediaFileOriginCategory::Upload,
       origin_product_category: MediaFileOriginProductCategory::ImageGeneration,
       maybe_origin_model_type: Some(MediaFileOriginModelType::StableDiffusion15),

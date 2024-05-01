@@ -3,6 +3,7 @@ use sqlx;
 use sqlx::MySqlPool;
 
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_model_type::MediaFileOriginModelType;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
@@ -66,7 +67,6 @@ pub async fn insert_media_file_from_face_animation(
   const ORIGIN_CATEGORY : MediaFileOriginCategory = MediaFileOriginCategory::Inference;
   const ORIGIN_PRODUCT_CATEGORY : MediaFileOriginProductCategory = MediaFileOriginProductCategory::FaceAnimator;
   const ORIGIN_MODEL_TYPE : MediaFileOriginModelType = MediaFileOriginModelType::SadTalker;
-  const MEDIA_TYPE : MediaFileType = MediaFileType::Video;
 
   let record_id = {
     let query_result = sqlx::query!(
@@ -75,11 +75,13 @@ INSERT INTO media_files
 SET
   token = ?,
 
+  media_class = ?,
+  media_type = ?,
+
   origin_category = ?,
   origin_product_category = ?,
   maybe_origin_model_type = ?,
 
-  media_type = ?,
   maybe_mime_type = ?,
   file_size_bytes = ?,
 
@@ -105,11 +107,13 @@ SET
         "#,
       result_token.as_str(),
 
+      MediaFileClass::Video.to_str(),
+      MediaFileType::Video.to_str(),
+
       ORIGIN_CATEGORY.to_str(),
       ORIGIN_PRODUCT_CATEGORY.to_str(),
       ORIGIN_MODEL_TYPE.to_str(),
 
-      MEDIA_TYPE.to_str(),
       args.maybe_mime_type,
       args.file_size_bytes,
 

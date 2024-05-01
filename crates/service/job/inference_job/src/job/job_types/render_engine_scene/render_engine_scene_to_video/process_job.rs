@@ -7,6 +7,7 @@ use log::{error, info, warn};
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
 use enums::by_table::generic_inference_jobs::inference_result_type::InferenceResultType;
 use enums::by_table::generic_synthetic_ids::id_category::IdCategory;
+use enums::by_table::media_files::media_file_class::MediaFileClass;
 use enums::by_table::media_files::media_file_origin_category::MediaFileOriginCategory;
 use enums::by_table::media_files::media_file_origin_product_category::MediaFileOriginProductCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
@@ -255,6 +256,7 @@ pub async fn process_job(args: BvhToWorkflowJobArgs<'_>) -> Result<JobSuccessRes
   let (inference_result_token, id) = insert_media_file_generic(InsertArgs {
     pool: &args.job_dependencies.db.mysql_pool,
     job: &job,
+    media_class: MediaFileClass::Video,
     media_type: MediaFileType::Video,
     origin_category: MediaFileOriginCategory::Processed,
     origin_product_category: MediaFileOriginProductCategory::Mocap,
