@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { sceneTitle } from "~/store";
 import { ButtonDropdown, Input } from "~/components";
 import { ButtonDialogue } from "~/modules/ButtonDialogue";
 import { EngineContext } from "~/contexts/EngineContext";
@@ -18,8 +19,10 @@ export const ControlsTopButtons = () => {
   const { addToast } = useContext(ToasterContext);
 
   const handleButtonSave = async () => {
-    console.log(`SceneName is ${sceneName}`);
-    const sceneMediaToken = await editorEngine?.saveScene(sceneName);
+    // console.log(`SceneName is ${sceneName}`);
+    // const sceneMediaToken = await editorEngine?.saveScene(sceneName);
+    console.log(`SceneName is ${sceneTitle.value}`);
+    const sceneMediaToken = await editorEngine?.saveScene(sceneTitle.value);
     if (sceneMediaToken) {
       addToast(ToastTypes.SUCCESS, sceneMediaToken);
     }
@@ -37,6 +40,11 @@ export const ControlsTopButtons = () => {
     console.log(`Selected Scene Token is ${token}`);
   };
 
+
+  const handleChangeSceneTitle = (e: React.ChangeEvent<HTMLInputElement>)=>{
+    sceneTitle.value = e.target.value;
+  }
+
   return (
     <div className="flex flex-col gap-2 pl-3 pt-3">
       <div className="flex gap-1.5">
@@ -52,7 +60,6 @@ export const ControlsTopButtons = () => {
                 content: (
                   <Input
                     label="Please enter a name for your new scene"
-                    value={sceneName}
                     onChange={(e) => {
                       setSceneName(e.target.value);
                     }}
@@ -117,10 +124,12 @@ export const ControlsTopButtons = () => {
                 title: "Save Scene",
                 content: (
                   <Input
+                    value={sceneTitle.value}
                     label="Please enter a name for your scene"
-                    onChange={(e) => {
-                      setSceneName(e.target.value);
-                    }}
+                    // onChange={(e) => {
+                    //   setSceneName(e.target.value);
+                    // }}
+                    onChange={handleChangeSceneTitle}
                   />
                 ),
                 confirmButtonProps: {
@@ -142,10 +151,12 @@ export const ControlsTopButtons = () => {
                 title: "Save Scene as Copy",
                 content: (
                   <Input
+                    value={sceneTitle.value}
                     label="Please enter a name for your scene"
-                    onChange={(e) => {
-                      setSceneName(e.target.value);
-                    }}
+                    // onChange={(e) => {
+                    //   setSceneName(e.target.value);
+                    // }}
+                    onChange={handleChangeSceneTitle}
                   />
                 ),
                 confirmButtonProps: {

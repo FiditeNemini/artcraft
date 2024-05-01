@@ -2,7 +2,7 @@ import React from "react";
 import { twMerge } from "tailwind-merge";
 import { IconDefinition } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Label } from "./Typography";
+import { Label, H6 } from "./Typography";
 import { kebabCase } from "~/utilities";
 import {
   disableHotkeyInput,
@@ -11,13 +11,16 @@ import {
 } from "~/pages/PageEnigma/store";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  inputClassName ?: string,
   label?: string;
   icon?: IconDefinition;
+  isError?: boolean;
+  errorMessage?: string;
 }
 
-export const Input = React.forwardRef(
-  (
-    { label, icon, className, id, ...rest }: InputProps,
+export const Input = React.forwardRef(({
+    label, icon, inputClassName, className, id, isError, errorMessage, ...rest 
+  } : InputProps,
     ref: React.ForwardedRef<HTMLInputElement>,
   ) => {
     return (
@@ -33,12 +36,21 @@ export const Input = React.forwardRef(
             id={id ? id : label ? kebabCase(label) : undefined}
             className={twMerge(
               "h-10 w-full rounded-md bg-brand-secondary px-3 py-2.5 text-white outline-none outline-offset-0 transition-all duration-150 ease-in-out focus:outline-brand-primary",
-              icon ? "pl-12" : "",
+              icon && "pl-12",
+              isError && "outline-red focus:outline-red",
+              inputClassName
             )}
-            onFocus={() => disableHotkeyInput(DomLevels.INPUT)}
-            onBlur={() => enableHotkeyInput(DomLevels.INPUT)}
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => { 
+              if (rest.onFocus) rest.onFocus(e);
+              disableHotkeyInput(DomLevels.INPUT)
+            }}
+            onBlur={(e: React.FocusEvent<HTMLInputElement>) => {
+              if (rest.onBlur) rest.onBlur(e);
+              enableHotkeyInput(DomLevels.INPUT)
+            }}
             {...rest}
           />
+          {errorMessage && <H6 className="absolute text-red z-10">{errorMessage}</H6>}
         </div>
       </div>
     );
