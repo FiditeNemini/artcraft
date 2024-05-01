@@ -24,6 +24,9 @@ pub enum Action {
 
   /// Delete files for a particular user.
   DeleteUserFiles,
+
+  /// Migrate old media file enum values.
+  MigrateMediaFilesEnumValues,
 }
 
 pub fn parse_cli_args() -> AnyhowResult<Args> {

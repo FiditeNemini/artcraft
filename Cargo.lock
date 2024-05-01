@@ -1777,6 +1777,7 @@ dependencies = [
  "easyenv",
  "enums",
  "errors",
+ "itertools 0.11.0",
  "log",
  "my-workspace-hack",
  "mysql_queries",

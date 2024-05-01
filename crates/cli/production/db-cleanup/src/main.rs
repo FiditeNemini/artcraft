@@ -8,6 +8,7 @@ use easyenv::init_all_with_default_logging;
 use crate::cli_args::Action;
 use crate::operations::delete_all_anonymous_user_images::delete_all_anonymous_user_images::delete_all_anonymous_user_images;
 use crate::operations::delete_user_files::delete_user_files::delete_user_files;
+use crate::operations::migrate_media_files_enum_values::migrate_media_files_enum_values::migrate_media_files_enum_values;
 
 mod cli_args;
 mod operations;
@@ -52,6 +53,9 @@ async fn main() -> AnyhowResult<()> {
     }
     Action::DeleteUserFiles => {
       delete_user_files(&args, &mysql).await?;
+    }
+    Action::MigrateMediaFilesEnumValues => {
+      migrate_media_files_enum_values(&args, &mysql).await?;
     }
   }
 
