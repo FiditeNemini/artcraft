@@ -1148,7 +1148,7 @@ class Editor {
   }
 
   async generateFrame() {
-    if (this.renderer && !this.generating_preview) {
+    if (!this.generating_preview && this.rawRenderer) {
       this.generating_preview = true;
       this.removeTransformControls();
       this.activeScene.renderMode(true);
@@ -1163,39 +1163,27 @@ class Editor {
         this.render_camera.rotation.copy(this.cam_obj.rotation);
       }
 
-      this.renderer.setSize(this.render_width, this.render_height);
+      previewSrc.value = "";
+
+      this.rawRenderer.setSize(this.render_width, this.render_height);
       this.render_camera.aspect = this.render_width / this.render_height;
       this.render_camera.updateProjectionMatrix();
-      this.renderer.render(this.activeScene.scene, this.render_camera);
-      const imgData = this.renderer.domElement.toDataURL();
-      this.activeScene.renderMode(false);
-      this.onWindowResize();
+      this.rawRenderer.render(this.activeScene.scene, this.render_camera);
+      const imgData = this.rawRenderer.domElement.toDataURL();
+      const response = await fetch(imgData); // Fetch the data URL
+      const blob = await response.blob(); // Convert to Blob
 
-      this.canvasRenderCamReference = document.getElementById("video-scene");
-      this.rawRenderer = new THREE.WebGLRenderer({
-        antialias: false,
-        canvas: this.canvasRenderCamReference,
-        preserveDrawingBuffer: true,
-      });
       if (!this.camera_person_mode) {
         this.switchCameraView();
         editorState.value = EditorStates.PREVIEW;
       }
-      this.activeScene.renderMode(true);
 
-      const ffmpeg = createFFmpeg({ log: false });
-      await ffmpeg.load();
-      await ffmpeg.FS("writeFile", `render.png`, await fetchFile(imgData));
-      await ffmpeg.run("-i", `render.png`, "render.mp4");
-      const output = await ffmpeg.FS("readFile", "render.mp4");
-      const blob = new Blob([output.buffer], { type: "video/mp4" });
-      ffmpeg.exit()
       this.generating_preview = false;
 
       try {
         const url = await this.api_manager.uploadMediaFrameGeneration(
           blob,
-          "render.mp4",
+          "render.png",
           this.art_style,
           this.positive_prompt,
           this.negative_prompt,
@@ -1203,16 +1191,6 @@ class Editor {
         console.log(url);
 
         previewSrc.value = url;
-
-        // const stylePreview: HTMLImageElement | null = document.getElementById(
-        // "video-scene",
-        // ) as HTMLImageElement;
-        // if (stylePreview) {
-        // stylePreview.src = url;
-        // console.log("Set preview source.");
-        // } else {
-        // console.log("No style preview window.");
-        // }
 
         return Promise.resolve(url);
       } catch (err: any) {
