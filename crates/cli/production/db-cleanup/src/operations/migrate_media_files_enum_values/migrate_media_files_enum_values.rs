@@ -12,7 +12,10 @@ use crate::operations::migrate_media_files_enum_values::query_pair::QueryPair;
 pub async fn migrate_media_files_enum_values(_args: &Args, mysql: &Pool<MySql>) -> AnyhowResult<()> {
   info!("migrate all media files enum values");
 
-  let query_pair = QueryPair {
+  // NB: LIMIT 50,000 seems to be right at the edge of the query planner's capability.
+  // These take a few minutes. 100,000 records takes over ten minutes.
+
+  let _query_pair = QueryPair {
     count_query: r#"
       select count(*) as record_count
       from media_files
@@ -24,6 +27,22 @@ pub async fn migrate_media_files_enum_values(_args: &Args, mysql: &Pool<MySql>) 
       set media_class = "audio"
       where media_class = "unknown"
       and maybe_origin_model_type = "so_vits_svc"
+      limit 50000
+    "#.to_string(),
+  };
+
+  let query_pair = QueryPair {
+    count_query: r#"
+      select count(*) as record_count
+      from media_files
+      where media_class = "unknown"
+      and maybe_origin_model_type = "rvc_v2"
+    "#.to_string(),
+    migrate_query: r#"
+      update media_files
+      set media_class = "audio"
+      where media_class = "unknown"
+      and maybe_origin_model_type = "rvc_v2"
       limit 50000
     "#.to_string(),
   };

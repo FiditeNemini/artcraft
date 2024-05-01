@@ -3,7 +3,7 @@ use std::time::Duration;
 use itertools::Itertools;
 use log::info;
 use sqlx::{FromRow, MySql, MySqlPool, Pool, QueryBuilder, Row};
-use sqlx::mysql::MySqlRow;
+use sqlx::mysql::{MySqlQueryResult, MySqlRow};
 
 use errors::AnyhowResult;
 
@@ -28,7 +28,9 @@ impl QueryPair {
       }
 
       info!("Running migrate query: {}", self.migrate_query());
-      self.run_migrate_query(&mysql).await?;
+      let rows_updated = self.run_migrate_query(&mysql).await?;
+
+      info!("Rows updated: {}", rows_updated);
 
       thread::sleep(Duration::from_millis(1000));
     }
@@ -43,11 +45,11 @@ impl QueryPair {
     Ok(record.record_count)
   }
 
-  async fn run_migrate_query(&self, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
+  async fn run_migrate_query(&self, mysql_pool: &MySqlPool) -> AnyhowResult<u64> {
     let mut query_builder = QueryBuilder::new(&self.migrate_query);
     let query = query_builder.build();
-    let record = query.execute(mysql_pool).await?;
-    Ok(())
+    let result = query.execute(mysql_pool).await?;
+    Ok(result.rows_affected())
   }
 
   fn count_query(&self) -> String {
