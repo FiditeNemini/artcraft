@@ -320,7 +320,7 @@ export class TimeLine {
 
     this.transform_engine.addFrame(
       uuid,
-      this.absolute_end,
+      data_json["offset"],
       data_json["position"],
       data_json["rotation"],
       data_json["scale"],
@@ -339,7 +339,7 @@ export class TimeLine {
         uuid,
         object_name,
         0,
-        this.absolute_end,
+        data_json["offset"],
         data_json["offset"],
       ),
     );
@@ -353,6 +353,16 @@ export class TimeLine {
     if (this.editorEngine.camera_person_mode) {
       point.visible = false;
     }
+    this.checkEditorCanPlay();
+  }
+
+  public checkEditorCanPlay(){
+    if(this.getEndPoint() <= 1){
+      this.editorEngine.can_playback = false;
+    } else {
+      this.editorEngine.can_playback = true;
+    }
+    this.editorEngine.updateSelectedUI();
   }
 
   public deleteObject(object_uuid: string) {
@@ -432,6 +442,8 @@ export class TimeLine {
         end_offset,
       ),
     );
+
+    this.checkEditorCanPlay();
   }
 
   public async deleteKeyFrame(data: any) {
@@ -439,6 +451,16 @@ export class TimeLine {
     const object_uuid = data["data"]["object_uuid"];
     this.transform_engine.clips[object_uuid].removeKeyframe(keyframe_uuid);
     this.scene.deletePoint(keyframe_uuid);
+    for (const element of this.timeline_items) {
+      if (
+        element.clip_uuid === keyframe_uuid &&
+        element.object_uuid === object_uuid
+      ) {
+         this.timeline_items = this.timeline_items.filter(element => !(element.clip_uuid === keyframe_uuid && element.object_uuid === object_uuid));
+         break;
+      }
+   }
+    this.checkEditorCanPlay();
   }
 
   public async updateKeyFrame(data: any) {
@@ -461,6 +483,7 @@ export class TimeLine {
       keyframe_scl,
     );
     this.scene.updatePoint(keyframe_uuid, keyframe_pos, keyframe_rot, keyframe_scl);
+    this.checkEditorCanPlay();
   }
 
   public async updateClip(data: any) {
@@ -481,6 +504,7 @@ export class TimeLine {
         element.offset = offset;
       }
     }
+    this.checkEditorCanPlay();
   }
 
   public async deleteClip(data: any) {
@@ -501,6 +525,8 @@ export class TimeLine {
         break;
       }
     }
+
+    this.checkEditorCanPlay();
   }
 
   public async scrubberUpdate(data: any) {
@@ -525,6 +551,7 @@ export class TimeLine {
     }
     const value = Math.floor(data["data"]["currentTime"]);
     this.setScrubberPosition(value);
+    this.current_time = value;
     this.update();
 
     if (this.editorEngine.switchPreviewToggle) {
@@ -588,9 +615,10 @@ export class TimeLine {
     }
   }
 
-  private getEndPoint(): number {
+  public getEndPoint(): number {
     let longest = 0;
     for (const element of this.timeline_items) {
+      console.log(element)
       if (longest < element.length) {
         longest = element.length;
       }
@@ -650,11 +678,15 @@ export class TimeLine {
           this.is_playing &&
           !isRendering
         ) {
-          if (this.scrubber_frame_position + 1 >= element.length) {
-            this.audio_engine.stopClip(element.media_id);
-          } else {
-            this.audio_engine.playClip(element.media_id);
-          }
+          // if (this.scrubber_frame_position + 1 >= element.length) {
+          //   this.audio_engine.playClip(element.media_id);
+          // } else {
+          //   await this.audio_engine.step(
+          //     element.object_uuid + element.media_id,
+          //   this.scrubber_frame_position, element.offset);
+          // }
+          await this.audio_engine.playClip(element.media_id);
+          await this.audio_engine.step(element.media_id, this.scrubber_frame_position, element.offset);
         } else if (
           element.type === ClipType.AUDIO &&
           element.group === ClipGroup.CHARACTER &&

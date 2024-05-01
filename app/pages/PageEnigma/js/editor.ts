@@ -76,6 +76,7 @@ class Editor {
   render_timer: number;
   fps_number: number;
   cap_fps: number;
+  can_playback: boolean;
   playback: boolean;
   playback_location: number;
   max_length: number;
@@ -190,6 +191,7 @@ class Editor {
     this.fps_number = 60;
     this.cap_fps = 60;
     // Timeline settings.
+    this.can_playback = false;
     this.playback = false;
     this.playback_location = 0;
     this.max_length = 10;
@@ -446,7 +448,7 @@ class Editor {
     loadingBarIsShowing.value = false;
   }
 
-  public async newScene(){
+  public async newScene() {
     this.activeScene.clear();
     this.audio_engine = new AudioEngine();
     this.emotion_engine = new EmotionEngine(this.version);
@@ -514,6 +516,8 @@ class Editor {
       this.emotion_engine,
     );
     await proxyTimeline.loadFromJson(scene_json["timeline"]);
+
+    this.timeline.checkEditorCanPlay();
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
@@ -808,7 +812,7 @@ class Editor {
       if (this.timeline.is_playing == false) {
         //this.recorder.stop();
         this.playback_location = 0;
-        this.stopPlayback();
+        this.stopPlaybackAndUploadVideo();
       }
     }
   }
@@ -834,15 +838,15 @@ class Editor {
   async updateLoop() {
     setTimeout(() => {
       requestAnimationFrame(this.updateLoop.bind(this));
-    }, 1000 / (this.cap_fps*2)); // Get the most FPS we can out of the renderer.
+    }, 1000 / (this.cap_fps * 2)); // Get the most FPS we can out of the renderer.
 
-    if(this.container === undefined){
+    if (this.container === undefined) {
       this.container = document.getElementById("video-scene-container");
     }
-    if(!this.rendering && this.container !== undefined){
-      if (this.container.clientWidth+this.container.clientHeight !== this.lastCanvasSize) {
+    if (!this.rendering && this.container !== undefined) {
+      if (this.container.clientWidth + this.container.clientHeight !== this.lastCanvasSize) {
         this.onWindowResize();
-        this.lastCanvasSize = this.container.clientWidth+this.container.clientHeight;
+        this.lastCanvasSize = this.container.clientWidth + this.container.clientHeight;
       }
     }
 
@@ -850,7 +854,7 @@ class Editor {
       this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
 
     }
-    
+
     // Updates debug stats.
     if (this.stats != null) {
       this.stats.update();
@@ -1006,7 +1010,8 @@ class Editor {
     a.click(); // Trigger the download
   }
 
-  async stopPlayback(compile_audio: boolean = true) {
+  async stopPlaybackAndUploadVideo(compile_audio: boolean = true) {
+    this.playback = false;
     this.rendering = false;
 
     //const videoBlob = new Blob(this.frame_buffer, { type: "video/webm" });
@@ -1200,13 +1205,13 @@ class Editor {
         previewSrc.value = url;
 
         // const stylePreview: HTMLImageElement | null = document.getElementById(
-          // "video-scene",
+        // "video-scene",
         // ) as HTMLImageElement;
         // if (stylePreview) {
-          // stylePreview.src = url;
-          // console.log("Set preview source.");
+        // stylePreview.src = url;
+        // console.log("Set preview source.");
         // } else {
-          // console.log("No style preview window.");
+        // console.log("No style preview window.");
         // }
 
         return Promise.resolve(url);
@@ -1227,7 +1232,7 @@ class Editor {
     this.showLoading();
 
     this.rendering = true; // has to go first to debounce
-    this.startPlayback();
+    this.togglePlayback();
     this.frame_buffer = [];
     this.render_timer = 0;
     this.activeScene.renderMode(this.rendering);
@@ -1239,7 +1244,7 @@ class Editor {
     }
   }
 
-  startPlayback() {
+  togglePlayback() {
     this.updateLoad(25, "Starting Processing");
     if (this.rawRenderer) {
       this.startRenderWidth = this.rawRenderer.domElement.width;
@@ -1247,10 +1252,10 @@ class Editor {
     }
     if (!this.rendering && this.timeline.is_playing) {
       this.timeline.is_playing = false;
-      this.timeline.scrubber_frame_position = 0;
-      this.timeline.current_time = 0;
-      this.timeline.stepFrame(0);
-      this.timeline.resetScene();
+      // this.timeline.scrubber_frame_position = 0;
+      // this.timeline.current_time = 0;
+      // this.timeline.stepFrame(0);
+      // this.timeline.resetScene();
       this.switchCameraView();
       if (this.activeScene.hot_items) {
         this.activeScene.hot_items.forEach((element) => {
@@ -1393,7 +1398,7 @@ class Editor {
         this.switchPreviewToggle == false &&
         this.selectedCanvas
       ) {
-        this.startPlayback();
+        this.togglePlayback();
       }
     }
   }

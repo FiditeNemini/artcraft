@@ -32,24 +32,34 @@ class AudioEngine {
     if (this.clips[audio_media_id] == null) {
       this.loadClip(audio_media_id);
     }
+  }
+
+  async step(audio_media_id: string, frame: number, offset: number) {
+    const frameBuffer = 12;
+
+    let pos = frame - offset;
+
+    let doPlay = true;
+    if (
+      Math.abs(this.last_frame - frame) < frameBuffer - 1 &&
+      this.last_frame !== 0
+    ) {
+      doPlay = false;
+    }
+    if (pos <= 1) {
+      doPlay = true;
+    }
+
     let clip = this.clips[audio_media_id];
-    if (clip.audio_data?.audioContext) {
-      if (this.playing.includes(audio_media_id)) {
-        return;
-      }
-      this.playing.push(audio_media_id);
-      clip.audio_data.source =
-        clip.audio_data.audioContext.createBufferSource();
+
+    if (doPlay && clip.audio_data?.audioContext) {
+      const startTime = pos / 60.0;
+      const endTime = frameBuffer / 60.0;
+      clip.audio_data.source = clip.audio_data.audioContext.createBufferSource();
       clip.audio_data.source.buffer = clip.audio_data.audioBuffer;
       clip.audio_data.source.connect(clip.audio_data.audioContext.destination);
-      clip.audio_data.source.start();
-      clip.audio_data.source.onended = () => {
-        this.playing = this.playing.filter((id) => id !== audio_media_id);
-      };
-    } else {
-      console.warn(
-        `AudioManager: AudioClip buffer with id "${audio_media_id}" not found.`,
-      );
+      clip.audio_data.source.start(0, startTime, endTime);
+      this.last_frame = frame;
     }
   }
 

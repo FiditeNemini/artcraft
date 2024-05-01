@@ -60,7 +60,7 @@ export const TestFeaturesButtons = ({ debug }: { debug: boolean }) => {
     editorEngine?.generateFrame();
   };
   const handleButtonPlayBack = () => {
-    editorEngine?.startPlayback();
+    editorEngine?.togglePlayback();
   };
 
   const smallButtons = "text-xs p-2 h-6 ";

@@ -132,7 +132,7 @@ export class LipSyncClip {
     if (this.lipsync == null) {
       return;
     }
-    const positions = this.lipsync.update(frame, offset, rendering);
+    const positions = this.lipsync.update(frame, offset, true);
     if (positions)
       this.setBlends(positions["ee"], positions["ah"], positions["oh"]);
   }

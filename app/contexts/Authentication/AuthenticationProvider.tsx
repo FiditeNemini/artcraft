@@ -4,7 +4,7 @@ import { CreateSession, DestroySession, GetSession } from "./utilities";
 import { AuthenticationContext } from "./AuthenticationContext";
 
 export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
-  console.log('auth provider rerender');
+  // console.log('auth provider rerender');
 
   const [authState, setAuthState] = useState<AuthState>({
     authStatus: AUTH_STATUS.INIT
@@ -47,7 +47,7 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
     password:string,
     failureCallback?:()=>void
   )=>{
-    console.log('CreateSession');
+    // console.log('CreateSession');
     startLoggingState();
     CreateSession({usernameOrEmail, password})
       .then((loginResponse)=>{
@@ -68,10 +68,10 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
   const logout = useCallback(()=>{
     const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
     if (sessionToken !== null){
-      console.log('destroying the session');
+      // console.log('destroying the session');
       DestroySession(sessionToken).then((res)=>{
-        if (res) console.log('Logout Success'); // do nothing
-        else console.log(res); //TODO: error handling maybe necessary
+        // if (res) console.log('Logout Success'); // do nothing
+        // else console.log(res); //TODO: error handling maybe necessary
       })
     ;}
     // regarldess, clear the state and useeffect will rid of the localstorage
@@ -84,20 +84,20 @@ export const AuthenticationProvider = ({children}:{children:ReactNode})=>{
     if(authState.authStatus === AUTH_STATUS.INIT){
       //Persist Login if Session Data exist
       const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN);
-      console.log(`Session Data: ${sessionToken?.substring(0, 30)}${sessionToken ? '...':''}`);
+      // console.log(`Session Data: ${sessionToken?.substring(0, 30)}${sessionToken ? '...':''}`);
       if (sessionToken !== null){
-        console.log('Getting session to persist login');
+        // console.log('Getting session to persist login');
         updateLoggingState(sessionToken);
         GetSession(sessionToken).then((
           sessionResponse: SessionResponse
         )=>{
-          console.log('Session Returned');
-          console.log(sessionResponse);
+          // console.log('Session Returned');
+          // console.log(sessionResponse);
           if(sessionResponse.success && sessionResponse.user && sessionResponse.user !== null){
-            console.log('Setting Auth State');
+            // console.log('Setting Auth State');
             setLoginState(sessionResponse.user)
           }else{
-            console.log('Session expired, setting State');
+            // console.log('Session expired, setting State');
             setLogoutState(); 
           }
         });

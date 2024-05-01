@@ -1,8 +1,12 @@
-import { useContext, useRef } from "react";
+import { 
+  useContext,
+  // useRef
+} from "react";
 import {
   faBackwardStep,
   faForwardStep,
   faPlay,
+  faPause,
 } from "@fortawesome/pro-solid-svg-icons";
 import { ButtonIcon } from "~/components";
 import { EngineContext } from "~/contexts/EngineContext";
@@ -13,16 +17,19 @@ import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import { useSignals } from "@preact/signals-react/runtime";
 import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
 
-const SCALE_VALUES = [0.5, 1, 1.25, 1.5, 1.75, 2];
-enum ScaleAdjustment {
-  UP,
-  DOWN,
-}
+// const SCALE_VALUES = [0.5, 1, 1.25, 1.5, 1.75, 2];
+// enum ScaleAdjustment {
+//   UP,
+//   DOWN,
+// }
 
 export const ControlsVideo = () => {
   useSignals();
   const editorEngine = useContext(EngineContext);
-  const scaleIndex = useRef(1);
+  // const scaleIndex = useRef(1);
+  // const canPlayback = editorEngine !== null && editorEngine.can_playback;
+  // console.log(`canplayback is ${canPlayback}`);
+  const isPlaying = editorEngine!==null ? editorEngine.timeline.is_playing : false;
 
   const handleBackwardStep = () => {
     currentTime.value = Math.max(currentTime.value - 1, 0);
@@ -32,8 +39,8 @@ export const ControlsVideo = () => {
       data: { currentTime: currentTime.value },
     });
   };
-  const handlePlay = () => {
-    editorEngine?.startPlayback();
+  const handlePlayback = () => {
+    editorEngine?.togglePlayback();
   };
   const handleForwardStep = () => {
     currentTime.value = Math.min(currentTime.value + 1, filmLength.value * 60);
@@ -70,9 +77,21 @@ export const ControlsVideo = () => {
     <div className="flex justify-center">
       <div className="rounded-t-lg border-x border-t border-ui-panel-border bg-ui-controls p-2 text-white">
         <div className="flex content-center gap-2">
-          <ButtonIcon icon={faBackwardStep} onClick={handleBackwardStep} />
-          <ButtonIcon icon={faPlay} onClick={handlePlay} />
-          <ButtonIcon icon={faForwardStep} onClick={handleForwardStep} />
+          <ButtonIcon
+            // disabled={!canPlayback}
+            icon={faBackwardStep}
+            onClick={handleBackwardStep}
+          />
+          <ButtonIcon
+            // disabled={!canPlayback}
+            icon={isPlaying ? faPause : faPlay}
+            onClick={handlePlayback}
+          />
+          <ButtonIcon
+            // disabled={!canPlayback}
+            icon={faForwardStep}
+            onClick={handleForwardStep}
+          />
           {/*<ButtonIcon*/}
           {/*  onClick={() => adjustScale(ScaleAdjustment.DOWN)}*/}
           {/*  icon={faMagnifyingGlassMinus}*/}

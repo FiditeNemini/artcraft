@@ -27,6 +27,7 @@ export const ButtonIcon = ({
     hoverFill
       ? "bg-ui-controls-button hover:bg-ui-controls-button/[0.75]"
       : "bg-transparent hover:bg-ui-panel/[0.4]",
+    disabled && "opacity-50 hover:bg-transparent",
     propsClassName,
   );
 

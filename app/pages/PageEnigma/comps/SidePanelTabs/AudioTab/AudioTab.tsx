@@ -50,7 +50,7 @@ export const AudioTab = () => {
 
   const handleListAudioByUser = useCallback((username:string, sessionToken:string)=>{
     function getTitle (item:any){
-      console.log(item);
+      // console.log(item);
       if (item.maybe_title) return item.maybe_title;
       if (item.origin && item.origin.maybe_model && item.origin.maybe_model.title) return item.origin.maybe_model.title;
       return "Media Audio";
