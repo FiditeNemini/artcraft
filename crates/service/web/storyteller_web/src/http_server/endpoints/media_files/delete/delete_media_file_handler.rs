@@ -64,6 +64,7 @@ impl fmt::Display for DeleteMediaFileError {
 
 // =============== Handler ===============
 
+/// Delete a media file. (Files and records are soft deleted.)
 #[utoipa::path(
     delete,
     tag = "Media Files",

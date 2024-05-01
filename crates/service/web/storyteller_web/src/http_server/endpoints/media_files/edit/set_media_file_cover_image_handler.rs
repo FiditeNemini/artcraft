@@ -68,6 +68,10 @@ impl fmt::Display for SetMediaFileCoverImageError {
 
 // =============== Handler ===============
 
+/// Set or remove the "cover image" (which are used as thumbnails) on a file.
+///
+/// The cover image is another media file of media_class = image. It can be anything in the database,
+/// you'll just need its media file token.
 #[utoipa::path(
   post,
   tag = "Media Files",

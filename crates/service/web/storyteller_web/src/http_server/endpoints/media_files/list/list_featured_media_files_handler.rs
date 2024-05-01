@@ -124,6 +124,7 @@ impl ResponseError for ListFeaturedMediaFilesError {
   }
 }
 
+/// List media files that were featured or promoted by the staff (paginated). This will power our global asset drawers and highlight reels.
 #[utoipa::path(
   get,
   tag = "Media Files",

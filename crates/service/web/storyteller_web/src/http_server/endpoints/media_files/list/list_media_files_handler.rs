@@ -177,6 +177,9 @@ impl std::fmt::Display for ListMediaFilesError {
   }
 }
 
+/// List all media files in the system globally, across all users (paginated).
+///
+/// This powers "explore files" page.
 #[utoipa::path(
   get,
   tag = "Media Files",

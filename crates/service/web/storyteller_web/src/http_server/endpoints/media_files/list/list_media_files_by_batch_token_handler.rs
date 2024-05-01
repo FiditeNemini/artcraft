@@ -147,6 +147,10 @@ impl std::fmt::Display for ListMediaFilesByBatchError {
   }
 }
 
+/// List media files that were generated together in a "batch", e.g. stable diffusion outputs.
+///
+/// This uses a special "batch token" that these jobs return. Media files created together will also
+/// return their batch token in the GET endpoint so that you can render a gallery of the batch outputs.
 #[utoipa::path(
   get,
   tag = "Media Files",

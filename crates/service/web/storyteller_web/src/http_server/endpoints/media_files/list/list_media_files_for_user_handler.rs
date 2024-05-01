@@ -175,6 +175,10 @@ impl std::fmt::Display for ListMediaFilesForUserError {
   }
 }
 
+/// List all of a user's media files (paginated).
+///
+/// This endpoint uses the session to automatically show all files for the given user, but only
+/// show "public" files for external users.
 #[utoipa::path(
   get,
   tag = "Media Files",

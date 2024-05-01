@@ -210,6 +210,7 @@ impl fmt::Display for BatchGetMediaFilesError {
 
 // =============== Handler ===============
 
+/// List many media files at the same time by supplying their tokens. You'll have to provide the tokens.
 #[utoipa::path(
   get,
   tag = "Media Files",

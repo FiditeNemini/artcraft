@@ -192,6 +192,7 @@ impl fmt::Display for GetMediaFileError {
   }
 }
 
+/// Get a single media file by token.
 #[utoipa::path(
   get,
   tag = "Media Files",

@@ -63,6 +63,7 @@ impl fmt::Display for ChangeMediaFileVisibilityError {
 
 // =============== Handler ===============
 
+/// Change the visibility (public, hidden, private) of a media file.
 #[utoipa::path(
     post,
     tag = "Media Files",

@@ -39,6 +39,7 @@ pub struct WriteSceneFileMediaSuccessResponse {
   pub media_file_token: MediaFileToken,
 }
 
+/// DEPRECATED: Use the "new scene" and "saved scene" endpoints instead.
 #[deprecated]
 #[utoipa::path(
   post,

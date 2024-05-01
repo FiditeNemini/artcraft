@@ -67,6 +67,13 @@ pub struct UploadNewSceneMediaFileSuccessResponse {
   pub media_file_token: MediaFileToken,
 }
 
+/// This endpoint is for saving a new scene for the first time.
+///
+/// You'll get back a media token for accessing and querying the scene in the future.
+///
+/// For future saving on the same scene, call the "saved scene" endpoint, i.e. do not
+/// call this endpoint a second time unless the user wants to save a new copy of the
+/// same scene.
 #[utoipa::path(
   post,
   tag = "Media Files",

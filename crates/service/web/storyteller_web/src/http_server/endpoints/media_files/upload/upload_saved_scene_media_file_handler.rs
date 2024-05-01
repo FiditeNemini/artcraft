@@ -67,6 +67,13 @@ pub struct UploadSavedSceneMediaFileSuccessResponse {
   pub media_file_token: MediaFileToken,
 }
 
+/// Use this endpoint to make changes to an existing scene.
+///
+/// If you have a media token for the scene you're trying to save (i.e. not a completely
+/// new, unsaved scene), call this endpoint to overwrite and save the changes to the scene.
+///
+/// If you want to create a new copy of an existing scene, call the "new scene" endpoint
+/// instead as it won't overwrite an existing scene and will return a brand new media token.
 #[utoipa::path(
   post,
   tag = "Media Files",

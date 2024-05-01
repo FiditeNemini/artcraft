@@ -65,6 +65,7 @@ impl fmt::Display for RenameMediaFileError {
 
 // =============== Handler ===============
 
+/// Change (or remove) the "title" of a media file.
 #[utoipa::path(
   post,
   tag = "Media Files",
