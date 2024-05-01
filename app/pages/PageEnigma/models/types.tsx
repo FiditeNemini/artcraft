@@ -58,7 +58,7 @@ export enum MediaFileType {
 
   // Full Storyteller Engine scenes (RON = Rusty Object Notation)
   // This is a temporary format that will eventually go away.
-  SceneRon = "scene_ron",
+  Scene = "scene",
 
   None = "none",
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { ScenePicker, SceneTypes } from "../ScenePicker";
 
 interface NewSceneFromTemplateProps {
@@ -8,7 +8,7 @@ interface NewSceneFromTemplateProps {
 export const NewSceneFromTemplate = ({
   onSceneSelect,
 }: NewSceneFromTemplateProps) => {
-  // Dummy Data - replace with API data
+  // Hard coded scenes
   const dummyScenes: SceneTypes[] = [
     {
       token: "m_9pf7a7v0138zx58f4x6ejsehjcvfq6",
@@ -32,14 +32,14 @@ export const NewSceneFromTemplate = ({
     const element = scrollContainerRef.current;
     if (element) {
       const atBottom =
-        element.scrollHeight - element.scrollTop === element.clientHeight;
+        element.scrollHeight - element.scrollTop <= element.clientHeight + 1;
       const hasOverflow = element.scrollHeight > element.clientHeight;
 
       setBottomGradientOpacity(hasOverflow && !atBottom ? 1 : 0);
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = scrollContainerRef.current;
     if (element) {
       handleScroll();
@@ -53,7 +53,7 @@ export const NewSceneFromTemplate = ({
 
   return (
     <div className="flex flex-col gap-0.5">
-      <div className="relative flex max-h-[500px] flex-col">
+      <div className="relative flex max-h-[500px] min-h-[140px] flex-col">
         <div
           className="overflow-y-auto overflow-x-hidden"
           ref={scrollContainerRef}>

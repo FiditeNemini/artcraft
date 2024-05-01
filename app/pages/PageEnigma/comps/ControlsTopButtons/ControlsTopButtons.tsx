@@ -95,7 +95,7 @@ export const ControlsTopButtons = () => {
                   label: "Cancel",
                 },
                 showClose: true,
-                className: "max-w-7xl w-auto",
+                className: "max-w-5xl",
               },
             },
             {
@@ -113,7 +113,7 @@ export const ControlsTopButtons = () => {
                   label: "Cancel",
                 },
                 showClose: true,
-                className: "max-w-7xl w-auto",
+                className: "max-w-5xl",
               },
             },
             {

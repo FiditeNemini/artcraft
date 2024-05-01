@@ -9,12 +9,17 @@ import {
   ErrorResponse,
   GetJobStatusResponse,
   JobState,
+  MediaFileType,
 } from "~/pages/PageEnigma/models";
 import { ToasterContext, ToastTypes } from "~/contexts/ToasterContext";
 import { activeJobs, movies } from "~/pages/PageEnigma/store";
 import { listMediaByUser } from "~/api";
 import { AuthenticationContext } from "~/contexts/Authentication";
 import { STORAGE_KEYS } from "~/contexts/Authentication/types";
+import {
+  GetMediaByUser,
+  GetMediaListResponse,
+} from "~/api/media_files/GetMediaByUser";
 
 export async function GetInferenceJobStatus(
   jobToken: string,
@@ -75,22 +80,14 @@ export function GetCompletedMovies(username?: string) {
   if (!username) {
     return;
   }
-  const sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN) || "";
-  fetch(
-    listMediaByUser(username) +
-      "?" +
-      new URLSearchParams({ filter_media_type: "video" }),
+  GetMediaByUser(
+    username,
+    {},
     {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        session: sessionToken,
-      },
-      // credentials: 'include'
+      filter_media_type: MediaFileType.Video,
     },
   )
-    .then((res) => res.json())
-    .then((res) => {
+    .then((res: GetMediaListResponse) => {
       if (res.success && res.results) {
         if (
           JSON.stringify(movies.value) !==

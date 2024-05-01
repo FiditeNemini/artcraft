@@ -1,17 +1,20 @@
 import MakeRequest from "../MakeRequest";
-import { MediaFile, Pagination } from "~/pages/PageEnigma/models";
+import { MediaInfo } from "~/pages/PageEnigma/models";
 
 export interface GetMediaRequest {}
 
 export interface GetMediaListResponse {
   pagination: Pagination;
   success: boolean;
-  results: MediaFile[];
+  results: MediaInfo[];
 }
 
+export interface Pagination {}
+
 export interface GetMediaParams {
-  page_index: number;
-  filter_media_type: string;
+  page_index?: number;
+  filter_media_type?: string;
+  filter_engine_categories?: string;
 }
 
 export const GetMediaByUser = MakeRequest<

@@ -6,7 +6,7 @@ import { timelineScrollX } from "~/pages/PageEnigma/store/timing";
 
 // timeline
 export const scale = signal(1);
-export const filmLength = signal(12);
+export const filmLength = signal(7);
 export const timelineHeight = signal(0);
 
 export const cameraMinimized = signal(false);

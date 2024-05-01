@@ -23,6 +23,7 @@ import { Pill } from "./Pill";
 import { WaveformPlayer } from "./WaveformPlayer";
 import UploadModal from "./UploadModal";
 import { ErrorDialog } from "./ErrorDialog";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export {
   Button,
@@ -52,6 +53,7 @@ export {
   LoadingDots,
   LoadingDotsBricks,
   LoadingDotsTyping,
+  LoadingSpinner,
   Pagination,
   Pill,
   WaveformPlayer,
