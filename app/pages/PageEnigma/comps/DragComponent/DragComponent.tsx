@@ -4,66 +4,105 @@ import {
   dragItem,
   overTimeline,
   scale,
+  timelineHeight,
 } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 import "./DragComponent.scss";
+import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
 
 export const DragComponent = () => {
   useSignals();
-  const { currX, currY } = currPosition.value;
-
   if (!dragItem.value) {
     return null;
   }
+  const { currX, currY } = currPosition.value;
 
   const thumbnail = dragItem.value.thumbnail
     ? dragItem.value.thumbnail
     : `/resources/images/default-covers/${dragItem.value.imageIndex}.webp`;
 
-  return (
-    <>
-      {overTimeline.value ? (
-        <div
-          id={`ani-dnd-${dragItem.value.media_id}`}
-          className={[
-            "absolute p-2",
-            "rounded-lg",
-            !canDrop.value ? "bg-brand-primary" : "bg-brand-secondary-700",
-            "block",
-          ].join(" ")}
-          style={{
-            top: currY - 16,
-            left: currX + 1,
-            zIndex: 10000,
-            width: (dragItem.value.length ?? 0) * 4 * scale.value,
-            height: 32,
-          }}
-        />
-      ) : (
-        <div
-          className="dragging-item-container absolute rounded-lg"
-          style={{
-            width: 91,
-            height: 114,
-            top: currY - 57,
-            left: currX + 1,
-            zIndex: 10000,
-          }}>
-          <img
-            {...{
-              crossOrigin: "anonymous",
-              src: thumbnail,
+  if (overTimeline.value) {
+    if (canDrop.value && DndAsset.overElement) {
+      return (
+        <>
+          <div
+            id={`ani-dnd-${dragItem.value.media_id}`}
+            className={[
+              "absolute p-2",
+              "rounded-lg",
+              !canDrop.value
+                ? "bg-brand-primary"
+                : "bg-dnd-canDrop border-dnd-canDropBorder border border-dashed",
+              "block",
+            ].join(" ")}
+            style={{
+              top: DndAsset.overElement.top,
+              left: currX + 1,
+              zIndex: 10000,
+              width: (dragItem.value.length ?? 0) * 4 * scale.value,
+              height: 32,
             }}
-            alt={dragItem.value.name}
-            className="rounded-t-lg"
           />
           <div
-            className="text-overflow-ellipsis w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
-            style={{ backgroundColor: "#39394D" }}>
-            {dragItem.value.name || dragItem.value.media_id}
-          </div>
-        </div>
-      )}
-    </>
+            id={`ani-dnd-${dragItem.value.media_id}`}
+            className={[
+              "absolute p-2",
+              "rounded opacity-60",
+              "bg-dnd-timeGrid border-2-dnd-timeGridBorder border",
+            ].join(" ")}
+            style={{
+              bottom: timelineHeight.value - 60,
+              left: currX + 1,
+              zIndex: 10000,
+              width: (dragItem.value.length ?? 0) * 4 * scale.value,
+              height: 16,
+            }}
+          />
+        </>
+      );
+    }
+    return (
+      <div
+        id={`ani-dnd-${dragItem.value.media_id}`}
+        className={[
+          "absolute p-1",
+          "rounded-lg text-xs",
+          "bg-dnd-cannotDrop",
+          "block text-nowrap",
+        ].join(" ")}
+        style={{
+          top: currY - 16,
+          left: currX + 1,
+          zIndex: 10000,
+        }}>
+        {DndAsset.notDropText || "Cannot drop here"}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="dragging-item-container absolute rounded-lg"
+      style={{
+        width: 91,
+        height: 114,
+        top: currY - 57,
+        left: currX + 1,
+        zIndex: 10000,
+      }}>
+      <img
+        {...{
+          crossOrigin: "anonymous",
+          src: thumbnail,
+        }}
+        alt={dragItem.value.name}
+        className="rounded-t-lg"
+      />
+      <div
+        className="text-overflow-ellipsis w-full rounded-b-lg px-2 py-1.5 text-center text-sm"
+        style={{ backgroundColor: "#39394D" }}>
+        {dragItem.value.name || dragItem.value.media_id}
+      </div>
+    </div>
   );
 };

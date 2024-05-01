@@ -6,16 +6,10 @@ import {
   ClipType,
 } from "~/pages/PageEnigma/models";
 import { PointerEvent } from "react";
-import {
-  canDrop,
-  dragItem,
-  dropId,
-  dropOffset,
-  filmLength,
-  scale,
-} from "~/pages/PageEnigma/store";
+import { canDrop, dragItem, filmLength, scale } from "~/pages/PageEnigma/store";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUp } from "@fortawesome/pro-solid-svg-icons";
+import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
 
 interface Props {
   id: string;
@@ -25,7 +19,7 @@ interface Props {
   updateClip: (options: { id: string; length: number; offset: number }) => void;
 }
 
-function getCanBuild({
+function getCanDrop({
   dragType,
   type,
   group,
@@ -38,6 +32,18 @@ function getCanBuild({
     if (type === ClipType.ANIMATION) {
       return true;
     }
+    if (type === ClipType.AUDIO) {
+      DndAsset.notDropText = "Cannot drag animation onto audio track";
+    }
+    if (type === ClipType.EMOTION) {
+      DndAsset.notDropText = "Cannot drag animation onto expression track";
+    }
+    if (group === ClipGroup.GLOBAL_AUDIO) {
+      DndAsset.notDropText = "Cannot drag animation onto global audio track";
+    }
+    if (group === ClipGroup.CAMERA) {
+      DndAsset.notDropText = "Cannot drag animation onto camera track";
+    }
   }
   if (dragType === AssetType.AUDIO) {
     if (group === ClipGroup.CHARACTER && type === ClipType.AUDIO) {
@@ -46,21 +52,39 @@ function getCanBuild({
     if (group === ClipGroup.GLOBAL_AUDIO) {
       return true;
     }
+    if (group === ClipGroup.CAMERA) {
+      DndAsset.notDropText = "Cannot drag audio onto camera track";
+    }
+    if (type === ClipType.ANIMATION) {
+      DndAsset.notDropText = "Cannot drag audio onto animation track";
+    }
+    if (type === ClipType.EMOTION) {
+      DndAsset.notDropText = "Cannot drag audio onto expression track";
+    }
   }
   return false;
 }
 
 export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
   const trackType = (type ?? group) as ClipType;
+  const canDropAsset = getCanDrop({
+    dragType: dragItem.value?.type,
+    type,
+    group,
+  });
 
   function onPointerOver() {
-    if (getCanBuild({ dragType: dragItem.value?.type, type, group })) {
-      dropId.value = id;
+    if (getCanDrop({ dragType: dragItem.value?.type, type, group })) {
+      DndAsset.dropId = id;
     }
   }
 
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
-    if (!getCanBuild({ dragType: dragItem.value?.type, type, group })) {
+    if (!DndAsset.overElement) {
+      const element = document.getElementById(`track-${trackType}-${id}`);
+      DndAsset.overElement = element!.getBoundingClientRect();
+    }
+    if (!getCanDrop({ dragType: dragItem.value?.type, type, group })) {
       return;
     }
 
@@ -94,13 +118,12 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
     });
 
     canDrop.value = !overlap;
-    dropOffset.value = clipOffset;
-  }
-  function onPointerLeave() {
-    if (canDrop.value) {
-      return;
+    if (!overlap) {
+      DndAsset.dropOffset = clipOffset;
     }
-    canDrop.value = false;
+    if (overlap) {
+      DndAsset.notDropText = "Not enough space to drop here";
+    }
   }
 
   return (
@@ -109,11 +132,18 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
       className={[
         "relative block h-9 w-full rounded-lg",
         `bg-${group}-unselected`,
-        clips.length === 0 ? "border-2 border-dashed border-white/15" : "",
-      ].join(" ")}
-      onPointerOver={onPointerOver}
-      onPointerLeave={onPointerLeave}
-      onPointerMove={onPointerMove}>
+        clips.length === 0 ? "border-2 border-dashed border-white/30" : "",
+      ].join(" ")}>
+      <div
+        className={[
+          "absolute inset-0",
+          canDropAsset
+            ? "animate-pulse bg-white/30 duration-[1500ms]"
+            : "opacity-0",
+        ].join(" ")}
+        onPointerOver={onPointerOver}
+        onPointerMove={onPointerMove}
+      />
       {clips.map((clip, index) => (
         <TrackClip
           key={clip.clip_uuid}

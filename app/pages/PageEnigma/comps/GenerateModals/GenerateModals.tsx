@@ -13,8 +13,6 @@ export function GenerateModals() {
   const [mediaFile, setMediaFile] = useState<MediaFile | null>(null);
   const { addToast } = useContext(ToasterContext);
 
-  console.log(1, mediaFile);
-
   useEffect(() => {
     if (!mediaFile) {
       setMovieId("");

@@ -1,10 +1,6 @@
 import React from "react";
 import { useMouseEventsTimeline } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsTimeline";
-import {
-  dndTimelineHeight,
-  overTimeline,
-  timelineHeight,
-} from "~/pages/PageEnigma/store";
+import { dndTimelineHeight, timelineHeight } from "~/pages/PageEnigma/store";
 import useTimelineClick from "~/pages/PageEnigma/comps/Timeline/utils/useTimelineClick";
 import { Pages } from "~/pages/PageEnigma/constants/page";
 
@@ -25,17 +21,13 @@ export const LowerPanel = ({ children }: LowerPanelPropsI) => {
   return (
     <>
       <div
-        className="absolute w-full cursor-ns-resize bg-ui-panel-border h-1 z-10"
-        style={{bottom: displayHeight }}
+        className="absolute z-10 h-1 w-full cursor-ns-resize bg-ui-panel-border"
+        style={{ bottom: displayHeight }}
         onPointerDown={onPointerDown}
       />
       <div
         className={["absolute bottom-0", "w-screen", "bg-ui-panel"].join(" ")}
         style={{ height: displayHeight }}
-        onPointerOver={() => {
-          overTimeline.value = true;
-        }}
-        onPointerLeave={() => (overTimeline.value = false)}
         onClick={onTimelineClick}>
         {children}
       </div>

@@ -1,26 +1,18 @@
-import { useCallback, useContext, useEffect } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 
-import { WaveformPlayer } from "~/components";
+import { WaveformPlayer, H5, H6 } from "~/components";
 import { AudioMediaItem } from "~/pages/PageEnigma/models";
-import { TrackContext } from "~/pages/PageEnigma/contexts/TrackContext/TrackContext";
-import {
-  canDrop,
-  currPosition,
-  dragItem,
-  initPosition,
-} from "~/pages/PageEnigma/store";
 
-import { H5, H6 } from "~/components";
-import  { AudioTypePill } from "./audioTypePills"
+import { AudioTypePill } from "./audioTypePills";
 import {
   cancelNewFromAudioItem,
   updateAudioItemLength,
   updateDemoAudioItemLength,
 } from "~/pages/PageEnigma/store";
+import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
 
 function getGcsUrl(bucketRelativePath: string | undefined | null): string {
-  let bucket = "vocodes-public";
+  const bucket = "vocodes-public";
   let path = bucketRelativePath;
   if (path !== undefined && path !== null && !path.startsWith("/")) {
     path = "/" + path;
@@ -34,61 +26,16 @@ interface Props {
 
 export const AudioItemElement = ({ item }: Props) => {
   useSignals();
-  const { startDrag, endDrag } = useContext(TrackContext);
-
-  const { initX, initY } = initPosition.value;
-
-  useEffect(() => {
-    const onPointerUp = () => {
-      if (dragItem.value) {
-        endDrag();
-      }
-    };
-
-    const onMouseMove = (event: MouseEvent) => {
-      if (dragItem.value) {
-        event.stopPropagation();
-        event.preventDefault();
-        const deltaX = event.pageX - initX;
-        const deltaY = event.pageY - initY;
-        currPosition.value = { currX: initX + deltaX, currY: initY + deltaY };
-      }
-    };
-
-    window.addEventListener("pointerup", onPointerUp);
-    window.addEventListener("pointermove", onMouseMove);
-
-    return () => {
-      window.removeEventListener("pointerup", onPointerUp);
-      window.removeEventListener("pointermove", onMouseMove);
-    };
-  }, [startDrag, endDrag, initX, initY]);
-
-  const onPointerDown = useCallback(
-    (event: React.PointerEvent<HTMLDivElement>) => {
-      if(item.isNew) {
-        cancelNewFromAudioItem(item.media_id);
-      }
-      if (event.button === 0) {
-        startDrag(item);
-        currPosition.value = {
-          currX: event.pageX,
-          currY: event.pageY,
-        };
-        initPosition.value = {
-          initX: event.pageX,
-          initY: event.pageY,
-        };
-        canDrop.value = false;
-      }
-    },
-    [item, startDrag],
-  );
 
   return (
     <div
       className="relative w-full cursor-pointer rounded-lg transition-all duration-200"
-      onPointerDown={onPointerDown}>
+      onPointerDown={(event) => {
+        if (item.isNew) {
+          cancelNewFromAudioItem(item.media_id);
+        }
+        DndAsset.onPointerDown(event, item);
+      }}>
       <div className="flex w-full flex-col gap-0.5 rounded-lg bg-assets-background p-2.5">
         <div className="flex justify-between">
           <AudioTypePill category={item.category} />
@@ -100,18 +47,18 @@ export const AudioItemElement = ({ item }: Props) => {
           <WaveformPlayer
             hasPlayButton
             audio={getGcsUrl(item.publicBucketPath)}
-            onLoad={item.length ?
-              undefined :
-              ({duration})=>{
-                // only do this for items that doesn't have a length
-                if(item.category === "demo"){
-                  updateDemoAudioItemLength(item.media_id, duration * 60);
-                }
-                else{
-                  updateAudioItemLength(item.media_id, duration * 60);
-                }
-              }
-          }
+            onLoad={
+              item.length
+                ? undefined
+                : ({ duration }) => {
+                    // only do this for items that doesn't have a length
+                    if (item.category === "demo") {
+                      updateDemoAudioItemLength(item.media_id, duration * 60);
+                    } else {
+                      updateAudioItemLength(item.media_id, duration * 60);
+                    }
+                  }
+            }
           />
         )}
 

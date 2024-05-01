@@ -146,6 +146,13 @@ export default {
         background: "#39394D",
         selectedTab: "#55556B",
       },
+      dnd: {
+        canDrop: "#46936E",
+        canDropBorder: "#66E4A9",
+        timeGrid: "#6375B5",
+        timeGridBorder: "#7E92DA",
+        cannotDrop: "#904948",
+      },
 
       ui: {
         background: "#1a1a27",

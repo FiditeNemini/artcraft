@@ -18,15 +18,19 @@ import {
   sidePanelVisible,
   dndSidePanelWidth,
   dndTimelineHeight,
-  dragItem,
   canDrop,
+  dragItem,
 } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/contexts/AppUiContext";
 import { pageHeight, pageWidth } from "~/store";
 import { TopBar } from "~/modules/TopBar";
 import { AssetType } from "./models/assets";
-import { editorState, EditorStates, previewSrc } from "~/pages/PageEnigma/store/engine";
+import {
+  editorState,
+  EditorStates,
+  previewSrc,
+} from "~/pages/PageEnigma/store/engine";
 
 export const PageEditor = () => {
   useSignals();
@@ -105,13 +109,18 @@ export const PageEditor = () => {
                   }}
                 />
                 {editorState.value === EditorStates.PREVIEW && (
-                  <img className="absolute inset-0" src={previewSrc.value} id="video-scene" style={{
-                    width:
-                      pageWidth.value -
-                      (sidePanelVisible.value ? sidePanelWidth.value : 0) -
-                      84,
-                    height: pageHeight.value - timelineHeight.value - 68,
-                  }} />
+                  <img
+                    className="absolute inset-0"
+                    src={previewSrc.value}
+                    id="video-scene"
+                    style={{
+                      width:
+                        pageWidth.value -
+                        (sidePanelVisible.value ? sidePanelWidth.value : 0) -
+                        84,
+                      height: pageHeight.value - timelineHeight.value - 68,
+                    }}
+                  />
                 )}
               </div>
 

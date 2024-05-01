@@ -1,7 +1,13 @@
 import { useMouseEventsClip } from "./utils/useMouseEventsClip";
 import { useState } from "react";
-import { scale, selectedItem } from "~/pages/PageEnigma/store";
+import {
+  canDrop,
+  dragItem,
+  scale,
+  selectedItem,
+} from "~/pages/PageEnigma/store";
 import { Clip, ClipGroup } from "~/pages/PageEnigma/models";
+import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
 
 interface Props {
   min: number;
@@ -50,6 +56,12 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
           left: offset * 4 * scale.value,
         }}
         onPointerDown={(event) => onPointerDown(event, "left")}
+        onPointerMove={() => {
+          if (dragItem.value) {
+            canDrop.value = false;
+            DndAsset.notDropText = "Cannot drop onto another clip";
+          }
+        }}
         onClick={(event) => {
           event.stopPropagation();
           event.preventDefault();
@@ -73,6 +85,12 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
           cursor: "move",
         }}
         onPointerDown={(event) => onPointerDown(event, "drag")}
+        onPointerMove={() => {
+          if (dragItem.value) {
+            canDrop.value = false;
+            DndAsset.notDropText = "Cannot drop onto another clip";
+          }
+        }}
         onClick={(event) => {
           event.stopPropagation();
           event.preventDefault();
@@ -97,6 +115,12 @@ export const TrackClip = ({ clip, min, max, group, updateClip }: Props) => {
           left: offset * 4 * scale.value + length * 4 * scale.value - 15,
         }}
         onPointerDown={(event) => onPointerDown(event, "right")}
+        onPointerMove={() => {
+          if (dragItem.value) {
+            canDrop.value = false;
+            DndAsset.notDropText = "Cannot drop onto another clip";
+          }
+        }}
         onClick={(event) => {
           event.stopPropagation();
           event.preventDefault();
