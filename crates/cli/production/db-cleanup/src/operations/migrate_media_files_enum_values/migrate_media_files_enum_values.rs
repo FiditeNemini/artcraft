@@ -53,7 +53,7 @@ pub async fn migrate_media_files_enum_values(_args: &Args, mysql: &Pool<MySql>) 
   //  |     20570300 |
   //  +--------------+
   //  1 row in set (42.86 sec)
-  let query_pair = QueryPair {
+  let _query_pair = QueryPair {
     count_query: r#"
       select count(*) as record_count
       from media_files
@@ -65,6 +65,22 @@ pub async fn migrate_media_files_enum_values(_args: &Args, mysql: &Pool<MySql>) 
       set media_class = "audio"
       where media_class = "unknown"
       and media_type = "audio"
+      limit 100000
+    "#.to_string(),
+  };
+
+  let query_pair = QueryPair {
+    count_query: r#"
+      select count(*) as record_count
+      from media_files
+      where media_class = "unknown"
+      and media_type = "video"
+    "#.to_string(),
+    migrate_query: r#"
+      update media_files
+      set media_class = "video"
+      where media_class = "unknown"
+      and media_type = "video"
       limit 100000
     "#.to_string(),
   };
