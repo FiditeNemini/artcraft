@@ -17,20 +17,27 @@ pub struct QueryPair {
 impl QueryPair {
 
   pub async fn run_migration(&self, mysql: &Pool<MySql>) -> AnyhowResult<()> {
+    info!("Running count query: {}", self.count_query());
+
+    let mut record_count = self.run_count_query(mysql).await?;
+    let mut estimated_remaining_record_count = record_count;
+
+    info!("Count: {}", record_count);
+    if record_count == 0 {
+      return Ok(());
+    }
+
     loop {
-      info!("Running count query: {}", self.count_query());
-
-      let count = self.run_count_query(mysql).await?;
-
-      info!("Count: {}", count);
-      if count == 0 {
-        break;
-      }
-
       info!("Running migrate query: {}", self.migrate_query());
       let rows_updated = self.run_migrate_query(&mysql).await?;
 
-      info!("Rows updated: {}", rows_updated);
+      estimated_remaining_record_count = estimated_remaining_record_count.saturating_sub(rows_updated);
+
+      info!("Rows updated: {}; estimated remaining rows: {}", rows_updated, estimated_remaining_record_count);
+
+      if rows_updated == 0 {
+        break;
+      }
 
       thread::sleep(Duration::from_millis(1000));
     }
@@ -38,11 +45,11 @@ impl QueryPair {
     Ok(())
   }
 
-  async fn run_count_query(&self, mysql_pool: &MySqlPool) -> AnyhowResult<i64> {
+  async fn run_count_query(&self, mysql_pool: &MySqlPool) -> AnyhowResult<u64> {
     let mut query_builder = QueryBuilder::new(&self.count_query);
     let query = query_builder.build_query_as::<CountRecord>();
     let record = query.fetch_one(mysql_pool).await?;
-    Ok(record.record_count)
+    Ok(record.record_count as u64)
   }
 
   async fn run_migrate_query(&self, mysql_pool: &MySqlPool) -> AnyhowResult<u64> {
