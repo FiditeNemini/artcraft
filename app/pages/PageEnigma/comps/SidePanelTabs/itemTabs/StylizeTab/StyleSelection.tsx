@@ -15,9 +15,9 @@ export const StyleSelection = () => {
   const [selection, setSelection] = useState<ArtStyle>(styleList[0].type);
   const [scrollPosition, setScrollPosition] = useState(0);
 
-  const shownImageCount = Math.floor((sidePanelWidth.value - 32) / 98);
+  const shownImageCount = Math.floor((sidePanelWidth.value - 32) / 104);
   const imageWidth =
-    90 + (sidePanelWidth.value - 32 - shownImageCount * 98) / shownImageCount;
+    96 + (sidePanelWidth.value - 32 - shownImageCount * 104) / shownImageCount;
   const imageHeight = (54 * imageWidth) / 90;
 
   const imageRows = Math.min(

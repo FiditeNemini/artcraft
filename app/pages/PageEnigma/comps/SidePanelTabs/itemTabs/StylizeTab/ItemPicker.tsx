@@ -49,10 +49,26 @@ export const ItemPicker = ({
           maxHeight: height,
         }}
       />
-      <div className="absolute left-0 top-0 h-full w-full bg-gradient-to-t from-ui-panel" />
-      <H4 className="absolute bottom-[1px] left-[6px] text-start text-[13px] drop-shadow-md">
+      <div className="absolute bottom-0 left-0 h-1/2 w-full bg-gradient-to-t from-ui-panel" />
+      <H4 className="absolute bottom-[1px] left-[6px] max-w-[100px] truncate text-start text-[13px] drop-shadow-md">
         {label}
       </H4>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 512 512"
+        className={`absolute right-[5px] top-[5px] h-[18px] w-[18px] shadow-xl transition-opacity duration-200 ease-in-out ${
+          selected ? "opacity-100" : "opacity-0"
+        }`}>
+        <path
+          opacity="1"
+          d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
+          fill="#FC6B68"
+        />
+        <path
+          d="M369 175c-9.4 9.4-9.4 24.6 0 33.9L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0z"
+          fill="#FFFFFF"
+        />
+      </svg>
     </button>
   );
 };
