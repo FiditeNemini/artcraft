@@ -740,13 +740,14 @@ class Editor {
 
   deleteObject(uuid: string) {
     const obj = this.activeScene.get_object_by_uuid(uuid);
+    this.removeTransformControls();
     if (obj?.name === this.camera_name) {
       return;
     }
     if (obj) {
       this.activeScene.scene.remove(obj);
     }
-    this.removeTransformControls();
+    this.timeline.deleteObject(uuid);
     Queue.publish({
       queueName: QueueNames.FROM_ENGINE,
       action: fromEngineActions.DELETE_OBJECT,

@@ -127,14 +127,14 @@ class Scene {
   }
 
   deletePoint(keyframe_uuid: string) {
-    this.scene.traverse((object) => {
+    this.scene.children.forEach(object => {
       if (object.userData.media_id) {
         const obj_keyframe_uuid = object.userData.media_id.replace(
           "Point::",
           "",
         );
-        console.log(obj_keyframe_uuid);
         if (obj_keyframe_uuid === keyframe_uuid) {
+          console.log("FOUNDDDD", obj_keyframe_uuid);
           console.log("Found!", object);
           this.scene.remove(object);
           return;

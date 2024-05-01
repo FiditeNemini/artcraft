@@ -370,6 +370,12 @@ export class TimeLine {
     if (object?.name === this.camera_name) {
       return;
     }
+    this.timeline_items.forEach(element => {
+      if(element.type == ClipType.TRANSFORM && element.object_uuid == object_uuid){
+        console.log(element)
+        this.scene.deletePoint(element.clip_uuid);
+      }
+    });
     this.timeline_items = this.timeline_items.filter(
       (element) => element.object_uuid !== object_uuid,
     );
