@@ -52,12 +52,12 @@ pub struct UploadNewSceneMediaFileForm {
   /// Optional: Title (name) of the scene
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = Option<String>, format = Binary)]
-  title: Option<Text<String>>,
+  maybe_title: Option<Text<String>>,
 
   /// Optional: Visibility of the scene
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = Option<String>, format = Binary)]
-  visibility: Option<Text<Visibility>>,
+  maybe_visibility: Option<Text<Visibility>>,
 }
 
 // Unlike the "upload" endpoints, which are pure inserts, these endpoints are *upserts*.
@@ -162,9 +162,15 @@ pub async fn upload_new_scene_media_file_handler(
 
   // ==================== UPLOAD METADATA ==================== //
 
-  let creator_set_visibility = maybe_user_session
-      .as_ref()
-      .map(|user_session| user_session.preferred_tts_result_visibility) // TODO: We need a new type of visibility control.
+  let maybe_title = form.maybe_title.map(|title| title.to_string());
+
+  let creator_set_visibility = form.maybe_visibility
+      .map(|visibility| visibility.0)
+      .or_else(|| {
+        maybe_user_session
+            .as_ref()
+            .map(|user_session| user_session.preferred_tts_result_visibility)
+      })
       .unwrap_or(Visibility::default());
 
   // ==================== USER DATA ==================== //
@@ -205,7 +211,7 @@ pub async fn upload_new_scene_media_file_handler(
   //  but we can move fast.
 
   const MIMETYPE: &str = "application/json";
-  const PREFIX : Option<&str> = Some("upload_");
+  const PREFIX : Option<&str> = Some("scene_");
   const SUFFIX: &str = ".scn.json";
 
   let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, Some(SUFFIX));
@@ -222,8 +228,6 @@ pub async fn upload_new_scene_media_file_handler(
         MediaFileUploadError::ServerError
       })?;
 
-  let title = form.title.map(|title| title.to_string());
-
   let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
     maybe_media_class: Some(MediaFileClass::Dimensional),
     media_file_type: MediaFileType::SceneJson,
@@ -238,7 +242,7 @@ pub async fn upload_new_scene_media_file_handler(
     file_size_bytes: file_size_bytes as u64,
     duration_millis: 0,
     sha256_checksum: &hash,
-    maybe_title: title.as_deref(),
+    maybe_title: maybe_title.as_deref(),
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
     maybe_public_bucket_extension: Some(SUFFIX),

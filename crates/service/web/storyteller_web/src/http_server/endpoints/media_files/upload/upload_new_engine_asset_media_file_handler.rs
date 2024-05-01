@@ -1,7 +1,10 @@
 use std::collections::HashSet;
-use std::io::{BufReader, Cursor};
+use std::io::{BufReader, Cursor, Read};
 use std::path::PathBuf;
 use std::sync::Arc;
+use actix_multipart::form::MultipartForm;
+use actix_multipart::form::tempfile::TempFile;
+use actix_multipart::form::text::Text;
 
 use actix_multipart::Multipart;
 use actix_web::{HttpRequest, HttpResponse, web};
@@ -10,7 +13,9 @@ use once_cell::sync::Lazy;
 use utoipa::ToSchema;
 
 use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
 use enums::by_table::media_files::media_file_class::MediaFileClass;
+use enums::by_table::media_files::media_file_engine_category::MediaFileEngineCategory;
 use enums::by_table::media_files::media_file_type::MediaFileType;
 use enums::common::visibility::Visibility;
 use hashing::sha256::sha256_hash_bytes::sha256_hash_bytes;
@@ -24,36 +29,81 @@ use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_fo
 
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::drain_multipart_request::drain_multipart_request;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
+use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::UploadNewSceneMediaFileForm;
 use crate::server_state::ServerState;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
+/// PLEASE SEE BOTTOM OF PAGE `UploadNewEngineAssetFileForm` FOR DETAILS ON FIELDS AND NULLABILITY.
+#[derive(MultipartForm, ToSchema)]
+#[multipart(duplicate_field = "deny")]
+pub struct UploadNewEngineAssetFileForm {
+  /// UUID for request idempotency
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = String, format = Binary)]
+  uuid_idempotency_token: Text<String>,
+
+  // TODO: is MultipartBytes better than TempFile ?
+  /// The uploaded file
+  #[multipart(limit = "512 MiB")]
+  #[schema(value_type = Vec<u8>, format = Binary)]
+  file: TempFile,
+
+  /// The category of engine asset: character, animation, etc.
+  /// See the documentation on `MediaFileEngineCategory`.
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = String, format = Binary)]
+  engine_category: Text<MediaFileEngineCategory>,
+
+  /// Optional: Title (name) of the scene
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<String>, format = Binary)]
+  maybe_title: Option<Text<String>>,
+
+  /// Optional: Visibility of the scene
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<String>, format = Binary)]
+  maybe_visibility: Option<Text<Visibility>>,
+
+  /// Optional: the type of animation (if this is a character or animation)
+  /// See the documentation on `MediaFileAnimationType`.
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<String>, format = Binary)]
+  maybe_animation_type: Option<Text<MediaFileAnimationType>>,
+}
+
 #[derive(Serialize, ToSchema)]
-pub struct UploadEngineAssetMediaSuccessResponse {
+pub struct UploadNewEngineAssetSuccessResponse {
   pub success: bool,
   pub media_file_token: MediaFileToken,
 }
 
-/// DEPRECATED: Use "new engine asset" endpoint instead.
-#[deprecated]
+/// Upload an engine asset: character, animation, etc. Just don't use this for scenes.
+/// 
+/// This is for new assets. You can't update existing assets with this endpoint.
+///
+/// Be careful to set the correct `engine_category` and `maybe_animation_type` (if needed) fields!
 #[utoipa::path(
   post,
   tag = "Media Files",
-  path = "/v1/media_files/upload/engine_asset",
+  path = "/v1/media_files/upload/new_engine_asset",
   responses(
-    (status = 200, description = "Success Update", body = UploadEngineAssetMediaSuccessResponse),
+    (status = 200, description = "Success Update", body = UploadNewEngineAssetSuccessResponse),
     (status = 400, description = "Bad input", body = MediaFileUploadError),
     (status = 401, description = "Not authorized", body = MediaFileUploadError),
     (status = 429, description = "Too many requests", body = MediaFileUploadError),
     (status = 500, description = "Server error", body = MediaFileUploadError),
   ),
   params(
-    ("request" = (), description = "Ask Brandon. This is form-multipart."),
+    (
+      "request" = UploadNewEngineAssetFileForm,
+      description = "PLEASE SEE BOTTOM OF PAGE `UploadNewEngineAssetFileForm` FOR DETAILS ON FIELDS AND NULLABILITY."
+    ),
   )
 )]
-pub async fn upload_engine_asset_media_file_handler(
+pub async fn upload_new_engine_asset_media_file_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
-  mut multipart_payload: Multipart,
+  MultipartForm(mut form): MultipartForm<UploadNewEngineAssetFileForm>,
 ) -> Result<HttpResponse, MediaFileUploadError> {
 
   let mut mysql_connection = server_state.mysql_pool
@@ -98,26 +148,16 @@ pub async fn upload_engine_asset_media_file_handler(
     return Err(MediaFileUploadError::RateLimited);
   }
 
-  // ==================== READ MULTIPART REQUEST ==================== //
-
-  let upload_media_request = drain_multipart_request(multipart_payload)
-      .await
-      .map_err(|e| {
-        // TODO: Error handling could be nicer.
-        MediaFileUploadError::BadInput("bad request".to_string())
-      })?;
-
-  // TODO(bt, 2024-02-26): This should be a transaction.
-  let uuid_idempotency_token = upload_media_request.uuid_idempotency_token
-      .ok_or(MediaFileUploadError::BadInput("no uuid".to_string()))?;
-
   // ==================== HANDLE IDEMPOTENCY ==================== //
 
-  if let Err(reason) = validate_idempotency_token_format(&uuid_idempotency_token) {
+  // TODO(bt, 2024-02-26): This should be a transaction.
+  let uuid_idempotency_token = form.uuid_idempotency_token.as_ref();
+
+  if let Err(reason) = validate_idempotency_token_format(uuid_idempotency_token) {
     return Err(MediaFileUploadError::BadInput(reason));
   }
 
-  insert_idempotency_token(&uuid_idempotency_token, &mut *mysql_connection)
+  insert_idempotency_token(uuid_idempotency_token, &mut *mysql_connection)
       .await
       .map_err(|err| {
         error!("Error inserting idempotency token: {:?}", err);
@@ -126,14 +166,14 @@ pub async fn upload_engine_asset_media_file_handler(
 
   // ==================== UPLOAD METADATA ==================== //
 
-  let creator_set_visibility = upload_media_request.maybe_visibility
-      .as_deref()
-      .map(|visibility| Visibility::from_str(visibility))
-      .transpose()
-      .map_err(|err| {
-        error!("Invalid visibility: {:?}", err);
-        MediaFileUploadError::BadInput("invalid visibility".to_string())
-      })?
+  let engine_category = form.engine_category.0;
+
+  let maybe_animation_type = form.maybe_animation_type.map(|t| t.0);
+
+  let maybe_title = form.maybe_title.map(|title| title.to_string());
+
+  let creator_set_visibility = form.maybe_visibility
+      .map(|visibility| visibility.0)
       .or_else(|| {
         maybe_user_session
             .as_ref()
@@ -150,12 +190,7 @@ pub async fn upload_engine_asset_media_file_handler(
 
   // ==================== FILE DATA ==================== //
 
-  let file_bytes = match upload_media_request.file_bytes {
-    None => return Err(MediaFileUploadError::BadInput("missing file contents".to_string())),
-    Some(bytes) => bytes,
-  };
-
-  let maybe_filename = upload_media_request.file_name
+  let maybe_filename = form.file.file_name.as_deref()
       .as_deref()
       .map(|filename| PathBuf::from(filename));
 
@@ -164,22 +199,12 @@ pub async fn upload_engine_asset_media_file_handler(
       .and_then(|filename| filename.extension())
       .and_then(|ext| ext.to_str());
 
-  let (suffix, media_file_type, mimetype) = match maybe_file_extension {
-    None => {
-      return Err(MediaFileUploadError::BadInput("no file extension".to_string()));
-    }
-    Some("bvh") => (".bvh", MediaFileType::Bvh, "application/octet-stream"),
-    Some("fbx") => (".fbx", MediaFileType::Fbx, "application/octet-stream"),
-    Some("glb") => (".glb", MediaFileType::Glb, "application/octet-stream"),
-    Some("gltf") => (".gltf", MediaFileType::Gltf, "application/octet-stream"),
-    Some("ron") => (".scn.ron", MediaFileType::SceneRon, "application/octet-stream"),
-    Some("pmd") => (".pmd", MediaFileType::Pmd, "application/octet-stream"),
-    Some("vmd") => (".vmd", MediaFileType::Vmd, "application/octet-stream"),
-    _ => {
-      return Err(MediaFileUploadError::BadInput(
-        "unsupported file extension. Must be bvh, glb, gltf, or fbx.".to_string()));
-    }
-  };
+  let mut file_bytes = Vec::new();
+  form.file.file.read_to_end(&mut file_bytes)
+      .map_err(|e| {
+        error!("Problem reading file: {:?}", e);
+        MediaFileUploadError::ServerError
+      })?;
 
   let file_size_bytes = file_bytes.len();
 
@@ -189,9 +214,25 @@ pub async fn upload_engine_asset_media_file_handler(
         MediaFileUploadError::ServerError
       })?;
 
+  let (suffix, media_file_type, mimetype) = match maybe_file_extension {
+    None => {
+      return Err(MediaFileUploadError::BadInput("no file extension".to_string()));
+    }
+    Some("bvh") => (".bvh", MediaFileType::Bvh, "application/octet-stream"),
+    Some("fbx") => (".fbx", MediaFileType::Fbx, "application/octet-stream"),
+    Some("glb") => (".glb", MediaFileType::Glb, "application/octet-stream"),
+    Some("gltf") => (".gltf", MediaFileType::Gltf, "application/octet-stream"),
+    Some("pmd") => (".pmd", MediaFileType::Pmd, "application/octet-stream"),
+    Some("vmd") => (".vmd", MediaFileType::Vmd, "application/octet-stream"),
+    _ => {
+      return Err(MediaFileUploadError::BadInput(
+        "unsupported file extension. Must be bvh, glb, gltf, or fbx.".to_string()));
+    }
+  };
+
   // ==================== UPLOAD AND SAVE ==================== //
 
-  const PREFIX : Option<&str> = Some("upload_");
+  const PREFIX : Option<&str> = Some("asset_");
 
   let public_upload_path = MediaFileBucketPath::generate_new(PREFIX, Some(suffix));
 
@@ -216,13 +257,13 @@ pub async fn upload_engine_asset_media_file_handler(
     creator_ip_address: &ip_address,
     creator_set_visibility,
     upload_type: UploadType::Filesystem,
-    maybe_engine_category: upload_media_request.maybe_engine_category,
-    maybe_animation_type: upload_media_request.maybe_animation_type,
+    maybe_engine_category: Some(engine_category),
+    maybe_animation_type,
     maybe_mime_type: Some(mimetype),
     file_size_bytes: file_size_bytes as u64,
     duration_millis: 0,
     sha256_checksum: &hash,
-    maybe_title: upload_media_request.maybe_title.as_deref(),
+    maybe_title: maybe_title.as_deref(),
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
     maybe_public_bucket_extension: Some(suffix),
@@ -236,7 +277,7 @@ pub async fn upload_engine_asset_media_file_handler(
 
   info!("new media file id: {} token: {:?}", record_id, &token);
 
-  let response = UploadEngineAssetMediaSuccessResponse {
+  let response = UploadNewEngineAssetSuccessResponse {
     success: true,
     media_file_token: token,
   };

@@ -59,6 +59,7 @@ use crate::http_server::endpoints::media_files::list::list_media_files_handler::
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::*;
+use crate::http_server::endpoints::media_files::upload::upload_new_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_saved_scene_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::*;
@@ -112,6 +113,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::list::list_media_files_handler::list_media_files_handler,
     crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::upload_media_file_handler,
+    crate::http_server::endpoints::media_files::upload::upload_new_engine_asset_media_file_handler::upload_new_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::upload_new_scene_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_saved_scene_media_file_handler::upload_saved_scene_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::upload_video_media_file_handler,
@@ -218,11 +220,6 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ChangeMediaFileVisibilityPathInfo,
     ChangeMediaFileVisibilityRequest,
     CreateSceneError,
-    EnqueueVoiceConversionInferenceError,
-    EnqueueVoiceConversionInferenceSuccessResponse,
-
-    EnqueueVoiceConversionInferenceRequest,
-    FundamentalFrequencyMethod,
     CreateSceneSuccessResponse,
     CreateUserBookmarkError,
     CreateUserBookmarkRequest,
@@ -249,8 +246,12 @@ use crate::http_server::web_utils::response_success_helpers::*;
     EnqueueVideoStyleTransferError,
     EnqueueVideoStyleTransferRequest,
     EnqueueVideoStyleTransferSuccessResponse,
+    EnqueueVoiceConversionInferenceError,
+    EnqueueVoiceConversionInferenceRequest,
+    EnqueueVoiceConversionInferenceSuccessResponse,
     FakeYouPlan,
     FeaturedModelWeightForList,
+    FundamentalFrequencyMethod,
     GetInferenceJobStatusError,
     GetInferenceJobStatusPathInfo,
     GetInferenceJobStatusSuccessResponse,
@@ -353,18 +354,20 @@ use crate::http_server::web_utils::response_success_helpers::*;
     StatusDetailsResponse,
     StorytellerStreamPlan,
     TerminateInferenceJobError,
-    UploadSavedSceneMediaFileSuccessResponse,
     TerminateInferenceJobPathInfo,
     TerminateInferenceJobSuccessResponse,
     UpdateWeightError,
-    UploadSavedSceneMediaFileForm,
     UpdateWeightPathInfo,
-    UploadSavedSceneMediaFilePathInfo,
     UpdateWeightRequest,
     UploadEngineAssetMediaSuccessResponse,
     UploadMediaSuccessResponse,
+    UploadNewEngineAssetFileForm,
+    UploadNewEngineAssetSuccessResponse,
     UploadNewSceneMediaFileForm,
     UploadNewSceneMediaFileSuccessResponse,
+    UploadSavedSceneMediaFileForm,
+    UploadSavedSceneMediaFilePathInfo,
+    UploadSavedSceneMediaFileSuccessResponse,
     UploadVideoMediaSuccessResponse,
     UserBookmarkDetailsForUserList,
     UserBookmarkEntityType,
