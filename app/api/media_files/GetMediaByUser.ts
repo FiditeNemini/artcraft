@@ -14,7 +14,12 @@ export interface Pagination {}
 export interface GetMediaParams {
   page_index?: number;
   filter_media_type?: string;
-  filter_engine_categories?: string;
+  filter_engine_categories?:
+    | "scene"
+    | "character"
+    | "animation"
+    | "object"
+    | "skybox";
 }
 
 export const GetMediaByUser = MakeRequest<

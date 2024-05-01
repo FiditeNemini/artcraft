@@ -1,5 +1,6 @@
 import React, { useId, useRef, useState } from "react";
 import { UploadModal } from "~/components";
+import { AssetType } from "~/pages/PageEnigma/models";
 // import { useId } from 'hooks'; // replace with react v18
 import "./FileWrapper.scss";
 
@@ -9,12 +10,14 @@ interface Props {
   onChange: (file?: React.ChangeEvent) => void;
   onSuccess: () => void;
   panelClass?: string;
+  type: AssetType;
 }
 
 export default function FileWrapper({
   render: Render,
   fileTypes = [],
   onSuccess,
+  type,
   ...rest
 }: Props) {
   const fileRef = useRef(null);
@@ -23,7 +26,9 @@ export default function FileWrapper({
   const [resetModal, resetModalSet] = useState(false);
   const [dragging, draggingSet] = useState(false);
   const id = "file-input-" + useId();
-  const accept = fileTypes.map((type) => `.${type.toLowerCase()}`).join(",");
+  const accept = fileTypes
+    .map((fileType) => `.${fileType.toLowerCase()}`)
+    .join(",");
   const clearFile = () => {
     if (fileRef.current !== null) {
       fileRef.current.value = "";
@@ -87,6 +92,7 @@ export default function FileWrapper({
           onSuccess,
           resetModal,
           resetModalSet,
+          type,
         }}
       />
     </div>

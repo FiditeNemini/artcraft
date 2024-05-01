@@ -15,6 +15,7 @@ import "./UploadModal.scss";
 import { fitCameraToCenteredObject } from "./fitCameraToCenteredObject";
 import { EditCoverImage } from "~/api/media_files/EditCoverImage";
 import { Visibility } from "~/pages/PageEnigma/js/api_manager";
+import { AssetType } from "~/pages/PageEnigma/models";
 
 interface Props {
   closeModal: () => void;
@@ -24,6 +25,7 @@ interface Props {
   isOpen: boolean;
   resetModal: boolean;
   resetModalSet: (b: boolean) => void;
+  type: AssetType;
 }
 
 enum UploaderState {
@@ -46,6 +48,7 @@ export default function UploadModal({
   onSuccess,
   resetModal,
   resetModalSet,
+  type,
 }: Props) {
   const [title, titleSet] = useState("");
   const [visibility, visibilitySet] = useState("public");
@@ -172,6 +175,7 @@ export default function UploadModal({
   const uploadAsset = () => {
     objUploadStatusSet(UploaderState.uploadingAsset);
     UploadEngineAsset({
+      engine_category: type === AssetType.CHARACTER ? "character" : "object",
       file,
       media_file_subtype: "mixamo",
       title,

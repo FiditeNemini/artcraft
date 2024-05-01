@@ -26,6 +26,8 @@ import { BucketConfig } from "~/api/BucketConfig";
 import { AuthenticationContext } from "~/contexts/Authentication";
 // import { UploadModal } from "~/components/UploadModal";
 
+import { selectedTab } from "~/pages/PageEnigma/store/sidePanel";
+
 interface Props {
   type: AssetType;
 }
@@ -40,6 +42,8 @@ export enum FetchStatus {
 
 export const ObjectsTab = ({ type }: Props) => {
   useSignals();
+  const currentTab = selectedTab?.value?.value || "";
+  const [cachedTab, cachedTabSet] = useState(currentTab);
   const [objects, objectsSet] = useState<{ value: MediaItem[] }>({
     value: [
       {
@@ -60,13 +64,19 @@ export const ObjectsTab = ({ type }: Props) => {
   };
 
   useEffect(() => {
-    if (status === FetchStatus.ready && type !== AssetType.CHARACTER) {
+    // we need to cache the current tab because we don't unmount components
+    if (cachedTab !== currentTab) {
+      cachedTabSet(currentTab);
+      statusSet(FetchStatus.ready);
+    }
+    if (status === FetchStatus.ready) {
       statusSet(FetchStatus.in_progress);
       GetMediaByUser(
         authState?.userInfo?.username || "",
         {},
         {
-          filter_media_type: "glb",
+          filter_engine_categories:
+            type === AssetType.CHARACTER ? "character" : "object",
         },
       ).then((res: GetMediaListResponse) => {
         if (res.success && res.results) {
@@ -98,11 +108,11 @@ export const ObjectsTab = ({ type }: Props) => {
         }
       });
     }
-  }, [authState, status, type]);
+  }, [authState, cachedTab, currentTab, status, type]);
 
   const assetFilter =
     type === AssetType.CHARACTER ? characterFilter : objectFilter;
-  const items = type === AssetType.CHARACTER ? characterItems : objects;
+  const items = objects;
 
   return (
     <>
@@ -175,7 +185,9 @@ export const ObjectsTab = ({ type }: Props) => {
                   }}
                   debug="objects tab"
                   items={[
-                    ...(type !== AssetType.CHARACTER ? shapeItems.value : []),
+                    ...(type !== AssetType.CHARACTER
+                      ? shapeItems.value
+                      : characterItems.value),
                     ...items.value,
                   ]}
                   assetFilter={assetFilter.value}
@@ -183,6 +195,7 @@ export const ObjectsTab = ({ type }: Props) => {
               </div>
             </div>
           ),
+          type,
         }}
       />
     </>

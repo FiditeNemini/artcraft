@@ -1,5 +1,13 @@
 import MakeMultipartRequest from "../MakeMultipartRequest";
 
+export enum MediaFileEngineCategory {
+  Scene = "scene",
+  Character = "character",
+  Animation = "animation",
+  Object = "object",
+  Skybox = "skybox",
+}
+
 export enum MediaFileSubtype {
   /// Animation file from Mixamo
   /// Primarily used for FBX and GLB.
@@ -30,6 +38,7 @@ export interface UploadEngineAssetRequest {
   file: File;
   media_file_subtype?: MediaFileSubtype;
   title?: string;
+  engine_category: MediaFileEngineCategory;
   uuid_idempotency_token?: string;
 }
 
