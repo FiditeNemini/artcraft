@@ -63,6 +63,8 @@ pub struct CreateSceneSuccessResponse {
   pub media_file_token: MediaFileToken,
 }
 
+/// Deprecated: This was for Bevy engine.
+#[deprecated]
 #[utoipa::path(
   post,
   tag = "Engine",
