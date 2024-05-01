@@ -65,7 +65,7 @@ pub async fn migrate_media_files_enum_values(_args: &Args, mysql: &Pool<MySql>) 
       set media_class = "audio"
       where media_class = "unknown"
       and media_type = "audio"
-      limit 50000
+      limit 100000
     "#.to_string(),
   };
 

@@ -37,6 +37,7 @@ pub struct WriteEngineAssetMediaSuccessResponse {
   pub media_file_token: MediaFileToken,
 }
 
+#[deprecated]
 #[utoipa::path(
   post,
   tag = "Media Files",

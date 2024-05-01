@@ -8,6 +8,7 @@ use actix_multipart::form::tempfile::TempFile;
 use actix_multipart::form::text::Text;
 use actix_multipart::Multipart;
 use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::web::Path;
 use log::{error, info, warn};
 use once_cell::sync::Lazy;
 use stripe::CreatePaymentLinkShippingAddressCollectionAllowedCountries::Mf;
@@ -25,19 +26,28 @@ use mimetypes::mimetype_for_bytes::get_mimetype_for_bytes;
 use mimetypes::mimetype_to_extension::mimetype_to_extension;
 use mysql_queries::queries::idepotency_tokens::insert_idempotency_token::insert_idempotency_token;
 use mysql_queries::queries::media_files::create::insert_media_file_from_file_upload::{insert_media_file_from_file_upload, InsertMediaFileFromUploadArgs, UploadType};
+use mysql_queries::queries::media_files::edit::update_media_file_stored_cloud_contents::{UpdateArgs, updated_media_file_stored_cloud_contents};
 use mysql_queries::queries::media_files::get::get_media_file::get_media_file;
 use tokens::tokens::media_files::MediaFileToken;
 use videos::get_mp4_info::{get_mp4_info, get_mp4_info_for_bytes, get_mp4_info_for_bytes_and_len};
+use crate::http_server::endpoints::media_files::get::get_media_file_handler::GetMediaFilePathInfo;
 
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
+use crate::http_server::endpoints::media_files::upsert_upload::write_error::MediaFileWriteError;
 use crate::server_state::ServerState;
 use crate::util::check_creator_tokens::{check_creator_tokens, CheckCreatorTokenArgs, CheckCreatorTokenResult};
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
+/// For the URL PathInfo
+#[derive(Deserialize, ToSchema)]
+pub struct UploadSavedSceneMediaFilePathInfo {
+  token: MediaFileToken,
+}
+
 /// Form-multipart request fields.
 #[derive(MultipartForm, ToSchema)]
 #[multipart(duplicate_field = "deny")]
-pub struct UploadNewSceneMediaFileForm {
+pub struct UploadSavedSceneMediaFileForm {
   /// UUID for request idempotency
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = String, format = Binary)]
@@ -48,21 +58,11 @@ pub struct UploadNewSceneMediaFileForm {
   #[multipart(limit = "512 MiB")]
   #[schema(value_type = Vec<u8>, format = Binary)]
   file: TempFile,
-
-  /// Optional: Title (name) of the scene
-  #[multipart(limit = "2 KiB")]
-  #[schema(value_type = Option<String>, format = Binary)]
-  title: Option<Text<String>>,
-
-  /// Optional: Visibility of the scene
-  #[multipart(limit = "2 KiB")]
-  #[schema(value_type = Option<String>, format = Binary)]
-  visibility: Option<Text<Visibility>>,
 }
 
 // Unlike the "upload" endpoints, which are pure inserts, these endpoints are *upserts*.
 #[derive(Serialize, ToSchema)]
-pub struct UploadNewSceneMediaFileSuccessResponse {
+pub struct UploadSavedSceneMediaFileSuccessResponse {
   pub success: bool,
   pub media_file_token: MediaFileToken,
 }
@@ -70,25 +70,27 @@ pub struct UploadNewSceneMediaFileSuccessResponse {
 #[utoipa::path(
   post,
   tag = "Media Files",
-  path = "/v1/media_files/upload/new_scene",
+  path = "/v1/media_files/upload/saved_scene/{token}",
   responses(
-    (status = 200, description = "Success Update", body = UploadNewSceneMediaFileSuccessResponse),
+    (status = 200, description = "Success Update", body = UploadSavedSceneMediaFileSuccessResponse),
     (status = 400, description = "Bad input", body = MediaFileUploadError),
     (status = 401, description = "Not authorized", body = MediaFileUploadError),
     (status = 429, description = "Too many requests", body = MediaFileUploadError),
     (status = 500, description = "Server error", body = MediaFileUploadError),
   ),
   params(
+    ("path" = UploadSavedSceneMediaFilePathInfo, description = "Path for Request"),
     (
-      "request" = UploadNewSceneMediaFileForm,
-      description = "PLEASE SEE BOTTOM OF PAGE `UploadNewSceneMediaFileForm` FOR DETAILS ON FIELDS AND NULLABILITY."
+      "request" = UploadSavedSceneMediaFileForm,
+      description = "PLEASE SEE BOTTOM OF PAGE `UploadSavedSceneMediaFileForm` FOR DETAILS ON FIELDS AND NULLABILITY."
     ),
   )
 )]
-pub async fn upload_new_scene_media_file_handler(
+pub async fn upload_saved_scene_media_file_handler(
   http_request: HttpRequest,
   server_state: web::Data<Arc<ServerState>>,
-  MultipartForm(mut form): MultipartForm<UploadNewSceneMediaFileForm>,
+  MultipartForm(mut form): MultipartForm<UploadSavedSceneMediaFileForm>,
+  path: Path<UploadSavedSceneMediaFilePathInfo>,
 ) -> Result<HttpResponse, MediaFileUploadError> {
 
   let mut mysql_connection = server_state.mysql_pool
@@ -135,6 +137,35 @@ pub async fn upload_new_scene_media_file_handler(
 
   if let Err(_err) = rate_limiter.rate_limit_request(&http_request) {
     return Err(MediaFileUploadError::RateLimited);
+  }
+
+  // ==================== MAKE SURE USER OWNS FILE ==================== //
+
+  // TODO(bt,2024-03-26): Don't use the mysql_pool, use the mysql_connection.
+  let media_file =
+      get_media_file(&path.token, false, &server_state.mysql_pool)
+          .await
+          .map_err(|err| {
+            error!("Error getting media file: {:?}", err);
+            MediaFileUploadError::ServerError
+          })?
+          .ok_or_else(|| MediaFileUploadError::NotFoundVerbose("media file not found with that token".to_string()))?;
+
+  let creator_check = check_creator_tokens(CheckCreatorTokenArgs {
+    maybe_creator_user_token: media_file.maybe_creator_user_token.as_ref(),
+    maybe_current_request_user_token: maybe_user_token.as_ref(),
+    maybe_creator_anonymous_visitor_token: media_file.maybe_creator_anonymous_visitor_token.as_ref(),
+    maybe_current_request_anonymous_visitor_token: maybe_avt_token.as_ref(),
+  });
+
+  match creator_check {
+    CheckCreatorTokenResult::UserTokenMatch => {} // Allowed
+    CheckCreatorTokenResult::NoUserAnonymousVisitorTokenMatch => {} // Allowed
+    CheckCreatorTokenResult::InsufficientInformation => {} // TODO(bt,2024-03-28): Temporary fallthrough. This should be a 401.
+    CheckCreatorTokenResult::UserTokenMismatch => return Err(MediaFileUploadError::NotAuthorizedVerbose(
+      "user tokens do not match".to_string())),
+    CheckCreatorTokenResult::NoUserAnonymousVisitorTokenMismatch => return Err(MediaFileUploadError::NotAuthorizedVerbose(
+      "anonymous visitor tokens do not match".to_string())),
   }
 
   // ==================== HANDLE IDEMPOTENCY ==================== //
@@ -215,39 +246,26 @@ pub async fn upload_new_scene_media_file_handler(
         MediaFileUploadError::ServerError
       })?;
 
-  let title = form.title.map(|title| title.to_string());
-
-  let (token, record_id) = insert_media_file_from_file_upload(InsertMediaFileFromUploadArgs {
-    maybe_media_class: Some(MediaFileClass::Dimensional),
-    media_file_type: MediaFileType::SceneJson,
-    maybe_creator_user_token: maybe_user_token.as_ref(),
-    maybe_creator_anonymous_visitor_token: maybe_avt_token.as_ref(),
-    creator_ip_address: &ip_address,
-    creator_set_visibility,
-    upload_type: UploadType::Filesystem,
-    maybe_engine_category: Some(MediaFileEngineCategory::Scene),
-    maybe_animation_type: None,
-    maybe_mime_type: Some(MIMETYPE),
-    file_size_bytes: file_size_bytes as u64,
-    duration_millis: 0,
-    sha256_checksum: &hash,
-    maybe_title: title.as_deref(),
+  updated_media_file_stored_cloud_contents(UpdateArgs {
+    media_file_token: &path.token,
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
     maybe_public_bucket_prefix: PREFIX,
     maybe_public_bucket_extension: Some(SUFFIX),
-    pool: &server_state.mysql_pool,
+    maybe_mime_type: Some(MIMETYPE),
+    file_size_bytes: file_size_bytes as u64,
+    sha256_checksum: &hash,
+    update_ip_address: &ip_address,
+    mysql_pool: &server_state.mysql_pool,
   })
       .await
       .map_err(|err| {
-        warn!("New file creation DB error: {:?}", err);
+        warn!("Updated file creation DB error: {:?}", err);
         MediaFileUploadError::ServerError
       })?;
 
-  info!("new media file id: {} token: {:?}", record_id, &token);
-
-  let response = UploadNewSceneMediaFileSuccessResponse {
+  let response = UploadSavedSceneMediaFileSuccessResponse {
     success: true,
-    media_file_token: token,
+    media_file_token: path.token.clone(),
   };
 
   let body = serde_json::to_string(&response)

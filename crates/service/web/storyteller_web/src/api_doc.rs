@@ -48,7 +48,6 @@ use crate::http_server::endpoints::inference_job::list_session_jobs_handler::*;
 use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::*;
 use crate::http_server::endpoints::media_files::delete::delete_media_file_handler::*;
 use crate::http_server::endpoints::media_files::edit::change_media_file_visibility_handler::*;
-use crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::*;
 use crate::http_server::endpoints::media_files::edit::rename_media_file_handler::*;
 use crate::http_server::endpoints::media_files::edit::set_media_file_cover_image_handler::*;
 use crate::http_server::endpoints::media_files::get::batch_get_media_files_handler::*;
@@ -60,9 +59,10 @@ use crate::http_server::endpoints::media_files::list::list_media_files_handler::
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_error::MediaFileUploadError;
 use crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::*;
+use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::*;
+use crate::http_server::endpoints::media_files::upload::upload_saved_scene_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_upload::write_engine_asset::write_engine_asset_media_file_handler::*;
-use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::*;
 use crate::http_server::endpoints::media_files::upsert_upload::write_error::MediaFileWriteError;
 use crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::write_scene_file_media_file_handler::*;
 use crate::http_server::endpoints::moderation::user_feature_flags::edit_user_feature_flags_handler::*;
@@ -77,6 +77,7 @@ use crate::http_server::endpoints::user_bookmarks::list_user_bookmarks_for_user_
 use crate::http_server::endpoints::user_ratings::batch_get_user_rating_handler::*;
 use crate::http_server::endpoints::user_ratings::get_user_rating_handler::*;
 use crate::http_server::endpoints::user_ratings::set_user_rating_handler::*;
+use crate::http_server::endpoints::voice_conversion::inference::enqueue_voice_conversion_inference::*;
 use crate::http_server::endpoints::voice_designer::inference::enqueue_tts_request::*;
 use crate::http_server::endpoints::voice_designer::voice_datasets::list_datasets_by_user::*;
 use crate::http_server::endpoints::weights::delete_weight_handler::*;
@@ -112,6 +113,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::upload_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_new_scene_media_file_handler::upload_new_scene_media_file_handler,
+    crate::http_server::endpoints::media_files::upload::upload_saved_scene_media_file_handler::upload_saved_scene_media_file_handler,
     crate::http_server::endpoints::media_files::upload::upload_video::upload_video_media_file_handler::upload_video_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_upload::write_engine_asset::write_engine_asset_media_file_handler::write_engine_asset_media_file_handler,
     crate::http_server::endpoints::media_files::upsert_upload::write_scene_file::write_scene_file_media_file_handler::write_scene_file_media_file_handler,
@@ -351,10 +353,13 @@ use crate::http_server::web_utils::response_success_helpers::*;
     StatusDetailsResponse,
     StorytellerStreamPlan,
     TerminateInferenceJobError,
+    UploadSavedSceneMediaFileSuccessResponse,
     TerminateInferenceJobPathInfo,
     TerminateInferenceJobSuccessResponse,
     UpdateWeightError,
+    UploadSavedSceneMediaFileForm,
     UpdateWeightPathInfo,
+    UploadSavedSceneMediaFilePathInfo,
     UpdateWeightRequest,
     UploadEngineAssetMediaSuccessResponse,
     UploadMediaSuccessResponse,

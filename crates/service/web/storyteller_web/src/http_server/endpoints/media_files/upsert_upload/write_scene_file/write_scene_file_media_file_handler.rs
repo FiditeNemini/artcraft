@@ -39,6 +39,7 @@ pub struct WriteSceneFileMediaSuccessResponse {
   pub media_file_token: MediaFileToken,
 }
 
+#[deprecated]
 #[utoipa::path(
   post,
   tag = "Media Files",
