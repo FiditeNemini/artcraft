@@ -45,6 +45,8 @@ pub struct UploadSavedSceneMediaFilePathInfo {
 }
 
 /// Form-multipart request fields.
+///
+/// IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadSavedSceneMediaFileForm` (Under "Schema") FOR DETAILS ON FIELDS AND NULLABILITY.
 #[derive(MultipartForm, ToSchema)]
 #[multipart(duplicate_field = "deny")]
 pub struct UploadSavedSceneMediaFileForm {
@@ -89,7 +91,7 @@ pub struct UploadSavedSceneMediaFileSuccessResponse {
     ("path" = UploadSavedSceneMediaFilePathInfo, description = "Path for Request"),
     (
       "request" = UploadSavedSceneMediaFileForm,
-      description = "PLEASE SEE BOTTOM OF PAGE `UploadSavedSceneMediaFileForm` FOR DETAILS ON FIELDS AND NULLABILITY."
+      description = "IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadSavedSceneMediaFileForm` (Under 'Schema') FOR DETAILS ON FIELDS AND NULLABILITY."
     ),
   )
 )]

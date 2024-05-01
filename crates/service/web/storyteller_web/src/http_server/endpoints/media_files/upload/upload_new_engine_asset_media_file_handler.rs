@@ -33,7 +33,9 @@ use crate::http_server::endpoints::media_files::upload::upload_new_scene_media_f
 use crate::server_state::ServerState;
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
-/// PLEASE SEE BOTTOM OF PAGE `UploadNewEngineAssetFileForm` FOR DETAILS ON FIELDS AND NULLABILITY.
+/// Form-multipart request fields.
+///
+/// IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadNewEngineAssetFileForm` (Under "Schema") FOR DETAILS ON FIELDS AND NULLABILITY.
 #[derive(MultipartForm, ToSchema)]
 #[multipart(duplicate_field = "deny")]
 pub struct UploadNewEngineAssetFileForm {
@@ -96,7 +98,7 @@ pub struct UploadNewEngineAssetSuccessResponse {
   params(
     (
       "request" = UploadNewEngineAssetFileForm,
-      description = "PLEASE SEE BOTTOM OF PAGE `UploadNewEngineAssetFileForm` FOR DETAILS ON FIELDS AND NULLABILITY."
+      description = "IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadNewEngineAssetFileForm` (Under 'Schema') FOR DETAILS ON FIELDS AND NULLABILITY."
     ),
   )
 )]

@@ -35,6 +35,8 @@ use crate::util::check_creator_tokens::{check_creator_tokens, CheckCreatorTokenA
 use crate::validations::validate_idempotency_token_format::validate_idempotency_token_format;
 
 /// Form-multipart request fields.
+///
+/// IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadNewSceneMediaFileForm` (Under "Schema") FOR DETAILS ON FIELDS AND NULLABILITY.
 #[derive(MultipartForm, ToSchema)]
 #[multipart(duplicate_field = "deny")]
 pub struct UploadNewSceneMediaFileForm {
@@ -88,7 +90,7 @@ pub struct UploadNewSceneMediaFileSuccessResponse {
   params(
     (
       "request" = UploadNewSceneMediaFileForm,
-      description = "PLEASE SEE BOTTOM OF PAGE `UploadNewSceneMediaFileForm` FOR DETAILS ON FIELDS AND NULLABILITY."
+      description = "IF VIEWING DOCS, PLEASE SEE BOTTOM OF PAGE `UploadNewSceneMediaFileForm` (Under 'Schema') FOR DETAILS ON FIELDS AND NULLABILITY."
     ),
   )
 )]
