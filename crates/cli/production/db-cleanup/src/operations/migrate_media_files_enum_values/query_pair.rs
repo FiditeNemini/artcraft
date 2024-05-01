@@ -1,5 +1,8 @@
+use std::thread;
+use std::time::Duration;
 use itertools::Itertools;
-use sqlx::{FromRow, MySqlPool, QueryBuilder, Row};
+use log::info;
+use sqlx::{FromRow, MySql, MySqlPool, Pool, QueryBuilder, Row};
 use sqlx::mysql::MySqlRow;
 
 use errors::AnyhowResult;
@@ -13,25 +16,45 @@ pub struct QueryPair {
 
 impl QueryPair {
 
-  pub async fn run_count_query(&self, mysql_pool: &MySqlPool) -> AnyhowResult<i64> {
+  pub async fn run_migration(&self, mysql: &Pool<MySql>) -> AnyhowResult<()> {
+    loop {
+      info!("Running count query: {}", self.count_query());
+
+      let count = self.run_count_query(mysql).await?;
+
+      info!("Count: {}", count);
+      if count == 0 {
+        break;
+      }
+
+      info!("Running migrate query: {}", self.migrate_query());
+      self.run_migrate_query(&mysql).await?;
+
+      thread::sleep(Duration::from_millis(1000));
+    }
+
+    Ok(())
+  }
+
+  async fn run_count_query(&self, mysql_pool: &MySqlPool) -> AnyhowResult<i64> {
     let mut query_builder = QueryBuilder::new(&self.count_query);
     let query = query_builder.build_query_as::<CountRecord>();
     let record = query.fetch_one(mysql_pool).await?;
     Ok(record.record_count)
   }
 
-  pub async fn run_migrate_query(&self, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
+  async fn run_migrate_query(&self, mysql_pool: &MySqlPool) -> AnyhowResult<()> {
     let mut query_builder = QueryBuilder::new(&self.migrate_query);
     let query = query_builder.build();
     let record = query.execute(mysql_pool).await?;
     Ok(())
   }
 
-  pub fn count_query(&self) -> String {
+  fn count_query(&self) -> String {
     Self::single_line_query(&self.count_query)
   }
 
-  pub fn migrate_query(&self) -> String {
+  fn migrate_query(&self) -> String {
     Self::single_line_query(&self.migrate_query)
   }
 
