@@ -86,17 +86,15 @@ export class LipSync {
 
     let pos = frame - offset;
 
+    if (Math.floor(pos) <= 1){
+      this.last_frame = 0;
+    }
+
     let doPlay = true;
     if (
       Math.abs(this.last_frame - frame) < frameBuffer - 1 &&
       this.last_frame !== 0
     ) {
-      doPlay = false;
-    }
-
-    if (pos <= 1 && !rendering) {
-      doPlay = true;
-    } else if (!rendering) {
       doPlay = false;
     }
 
@@ -108,11 +106,7 @@ export class LipSync {
       this.meter = LipSync.createAudioMeter(this.audioContext);
       this.mediaStreamSource.connect(this.meter);
       this.mediaStreamSource.connect(this.audioContext.destination);
-      if (rendering) {
-        this.mediaStreamSource.start(0, startTime, endTime);
-      } else {
-        this.mediaStreamSource.start();
-      }
+      this.mediaStreamSource.start(0, startTime, endTime);
       this.mediaStreamSource.connect(this.userSpeechAnalyzer);
       this.last_frame = frame;
     }

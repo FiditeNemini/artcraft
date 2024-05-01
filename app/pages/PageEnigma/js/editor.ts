@@ -477,7 +477,6 @@ class Editor {
       "m_8fmp9hrvsqcryzka1fra597kg42s50",
       "m_z4jzbst3xfh64h0qn4bqh4afenfps9",
     ]);
-    console.log(result);
   }
 
   public async testTestTimelineEvents() { }
@@ -553,7 +552,6 @@ class Editor {
       this.activeScene,
     );
     const scene_json = await proxyScene.saveToScene();
-    console.log("scene_json", scene_json);
 
     const proxyTimeline = new StoryTellerProxyTimeline(
       this.version,
@@ -574,8 +572,6 @@ class Editor {
       name,
       this.current_scene_glb_media_token,
     );
-
-    console.log(result);
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
@@ -1091,7 +1087,6 @@ class Editor {
       return;
     }
     const upload_token = data["media_file_token"];
-    console.log(upload_token);
 
     const result = await this.api_manager
       .stylizeVideo(
@@ -1109,7 +1104,6 @@ class Editor {
     this.updateLoad(100, "Done Check Your Media Tab On Profile.");
     this.endLoading();
 
-    console.log(result);
     this.recorder = undefined;
     if (this.rawRenderer) {
       this.rawRenderer.setSize(this.startRenderWidth, this.startRenderHeight);
@@ -1188,7 +1182,6 @@ class Editor {
           this.positive_prompt,
           this.negative_prompt,
         );
-        console.log(url);
 
         previewSrc.value = url;
 
@@ -1301,8 +1294,6 @@ class Editor {
 
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
-
-    console.log(width, height)
 
     if (this.camera == undefined || this.renderer == undefined) {
       return;

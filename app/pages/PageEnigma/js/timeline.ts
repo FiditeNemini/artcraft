@@ -356,8 +356,8 @@ export class TimeLine {
     this.checkEditorCanPlay();
   }
 
-  public checkEditorCanPlay(){
-    if(this.getEndPoint() <= 1){
+  public checkEditorCanPlay() {
+    if (this.getEndPoint() <= 1) {
       this.editorEngine.can_playback = false;
     } else {
       this.editorEngine.can_playback = true;
@@ -456,10 +456,10 @@ export class TimeLine {
         element.clip_uuid === keyframe_uuid &&
         element.object_uuid === object_uuid
       ) {
-         this.timeline_items = this.timeline_items.filter(element => !(element.clip_uuid === keyframe_uuid && element.object_uuid === object_uuid));
-         break;
+        this.timeline_items = this.timeline_items.filter(element => !(element.clip_uuid === keyframe_uuid && element.object_uuid === object_uuid));
+        break;
       }
-   }
+    }
     this.checkEditorCanPlay();
   }
 
@@ -618,7 +618,6 @@ export class TimeLine {
   public getEndPoint(): number {
     let longest = 0;
     for (const element of this.timeline_items) {
-      console.log(element)
       if (longest < element.length) {
         longest = element.length;
       }
@@ -627,12 +626,12 @@ export class TimeLine {
   }
 
   // called by the editor update loop on each frame
-  public async update(isRendering = false, delta_time:number=0): Promise<boolean> {
+  public async update(isRendering = false, delta_time: number = 0): Promise<boolean> {
     //if (this.is_playing === false) return; // start and stop
     this.timeline_limit = this.getEndPoint();
     if (this.is_playing) {
       // When rendering we want to increase it by 1 but when in playback we want it dynamic based on deltatime.
-      if(isRendering){
+      if (isRendering) {
         this.current_time += 1;
       }
       else {
@@ -643,7 +642,7 @@ export class TimeLine {
       });
       this.scrubber_frame_position = this.current_time;
     }
-    
+
 
     if (this.scrubber_frame_position <= 0) {
       await this.resetScene();
@@ -692,18 +691,11 @@ export class TimeLine {
           element.group === ClipGroup.CHARACTER &&
           this.is_playing
         ) {
-          // we will remove this when we know which group it will come from character + audio === lip sync audio.
-          if (this.scrubber_frame_position + 1 >= element.length) {
-            this.lipSync_engine.clips[
-              element.object_uuid + element.media_id
-            ].stop();
-          } else if (object) {
+          if (object) {
             await this.lipSync_engine.clips[
               element.object_uuid + element.media_id
             ].play(object);
-            this.lipSync_engine.clips[
-              element.object_uuid + element.media_id
-            ].step(this.scrubber_frame_position, element.offset, isRendering);
+            this.lipSync_engine.clips[element.object_uuid + element.media_id].step(this.scrubber_frame_position, element.offset, isRendering);
           }
         } else if (element.type === ClipType.ANIMATION) {
           if (object) {
