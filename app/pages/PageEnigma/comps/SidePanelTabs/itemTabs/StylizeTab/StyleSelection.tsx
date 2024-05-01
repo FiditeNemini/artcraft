@@ -10,9 +10,12 @@ import { sidePanelHeight, sidePanelWidth } from "~/pages/PageEnigma/store";
 import { ItemPicker } from "./ItemPicker";
 import { useSignals } from "@preact/signals-react/runtime";
 
-export const StyleSelection = () => {
+interface Props {
+  selection: ArtStyle;
+  setSelection: (art: ArtStyle) => void;
+}
+export const StyleSelection = ({ setSelection, selection }: Props) => {
   useSignals();
-  const [selection, setSelection] = useState<ArtStyle>(styleList[0].type);
   const [scrollPosition, setScrollPosition] = useState(0);
 
   const shownImageCount = Math.floor((sidePanelWidth.value - 32) / 104);

@@ -1,16 +1,45 @@
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 
 import { Textarea } from "~/components";
 
 import { EngineContext } from "~/contexts/EngineContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRandom } from "@fortawesome/pro-solid-svg-icons";
-import { RandomTexts } from "~/pages/PageEnigma/constants/RandomTexts";
+import {
+  RandomTextsPositive,
+  RandomTextsNegative,
+} from "~/pages/PageEnigma/constants/RandomTexts";
+import { ArtStyle } from "~/pages/PageEnigma/js/api_manager";
 
-export const Prompts = () => {
+interface Props {
+  selection: ArtStyle;
+}
+
+export const Prompts = ({ selection }: Props) => {
   const editorEngine = useContext(EngineContext);
   const [textBufferPositive, setTextBufferPositive] = useState("");
   const [textBufferNegative, setTextBufferNegative] = useState("");
+
+  useEffect(() => {
+    if (editorEngine === null) {
+      return;
+    }
+    const randomIndexPositive = Math.floor(
+      Math.random() * RandomTextsPositive[selection].length,
+    );
+    const randomTextPositive =
+      RandomTextsPositive[selection][randomIndexPositive];
+    editorEngine.positive_prompt = randomTextPositive;
+    setTextBufferPositive(randomTextPositive);
+
+    const randomIndexNegative = Math.floor(
+      Math.random() * RandomTextsNegative[selection].length,
+    );
+    const randomTextNegative =
+      RandomTextsNegative[selection][randomIndexNegative];
+    editorEngine.negative_prompt = randomTextNegative;
+    setTextBufferNegative(randomTextNegative);
+  }, [selection, editorEngine]);
 
   const onChangeHandlerNegative = (event: ChangeEvent<HTMLTextAreaElement>) => {
     if (editorEngine === null) {
@@ -31,8 +60,10 @@ export const Prompts = () => {
   };
 
   const generateRandomTextPositive = () => {
-    const randomIndex = Math.floor(Math.random() * RandomTexts.length);
-    const randomText = RandomTexts[randomIndex];
+    const randomIndex = Math.floor(
+      Math.random() * RandomTextsPositive[selection].length,
+    );
+    const randomText = RandomTextsPositive[selection][randomIndex];
     if (editorEngine !== null) {
       editorEngine.positive_prompt = randomText;
     }
@@ -40,8 +71,10 @@ export const Prompts = () => {
   };
 
   const generateRandomTextNegative = () => {
-    const randomIndex = Math.floor(Math.random() * RandomTexts.length);
-    const randomText = RandomTexts[randomIndex];
+    const randomIndex = Math.floor(
+      Math.random() * RandomTextsNegative[selection].length,
+    );
+    const randomText = RandomTextsNegative[selection][randomIndex];
     if (editorEngine !== null) {
       editorEngine.negative_prompt = randomText;
     }
