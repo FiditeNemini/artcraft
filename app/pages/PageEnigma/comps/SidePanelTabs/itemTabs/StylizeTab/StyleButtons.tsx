@@ -41,6 +41,9 @@ export function StyleButtons() {
         {editorState.value === EditorStates.EDIT && (
           <>
             <Label>Render the current camera view with AI</Label>
+            <div className="mb-2 text-xs text-white/70">
+              (This helps you test and re-test your scene)
+            </div>
             <Button
               icon={faArrowsRotate}
               variant="primary"

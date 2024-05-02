@@ -10,6 +10,8 @@ import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
+import { twMerge } from "tailwind-merge";
+import { AssetType } from "../../models";
 
 export const SidePanelMenu = () => {
   useSignals();
@@ -22,7 +24,7 @@ export const SidePanelMenu = () => {
     <div
       className={[
         "fixed bg-assets-background",
-        "px-2 py-4",
+        "px-2 py-2",
         "overflow-y-auto",
       ].join(" ")}
       style={{
@@ -30,18 +32,24 @@ export const SidePanelMenu = () => {
         minWidth: 84,
         maxWidth: 84,
         right: 0,
-        top: 70,
+        top: 64,
       }}>
       <div className="flex w-full flex-col gap-2">
         {tabList.map((tab) => (
           <button
             key={tab.value}
-            className={[
-              "flex flex-col items-center rounded-lg px-2 py-3 transition-all duration-200 hover:bg-assets-selectedTab/70",
+            className={twMerge([
+              "flex flex-col items-center rounded-lg border-2 border-transparent px-2 py-3 transition-all duration-200 hover:bg-assets-selectedTab/70",
               tab.value === selectedTab?.value?.value
                 ? "bg-assets-selectedTab opacity-100 hover:bg-assets-selectedTab"
                 : "opacity-60",
-            ].join(" ")}
+              tab.value === AssetType.STYLE &&
+                "bg-brand-primary font-medium opacity-90 hover:border-white/25 hover:bg-brand-primary hover:opacity-100",
+              tab.value === selectedTab?.value?.value &&
+              tab.value === AssetType.STYLE
+                ? "border-white/50 opacity-100 hover:border-white/50"
+                : "",
+            ])}
             onClick={() => {
               selectedTab.value = tab;
               if (!sidePanelVisible.value) {
@@ -58,7 +66,7 @@ export const SidePanelMenu = () => {
             <div>
               <img src={tab.icon} alt={tab.title} width={20} height={20} />
             </div>
-            <div className="" style={{ fontSize: 11 }}>
+            <div className="-mb-1 mt-1" style={{ fontSize: 11 }}>
               {tab.title}
             </div>
           </button>

@@ -35,7 +35,7 @@ export const tabList = [
     component: <AudioTab />,
   },
   {
-    icon: "/resources/icons/audios.png",
+    icon: "/resources/icons/brush.png",
     title: "AI Stylize",
     value: AssetType.STYLE,
     component: <StylizeTab />,

@@ -87,7 +87,7 @@ export const Prompts = ({ selection }: Props) => {
         <Textarea
           label="Enter a Prompt"
           className="w-full"
-          rows={3}
+          rows={2}
           name="positive-prompt"
           placeholder="Type here to describe your scene"
           onChange={onChangeHandlerPositive}
@@ -108,7 +108,7 @@ export const Prompts = ({ selection }: Props) => {
         <Textarea
           label="Negative Prompt"
           className="w-full"
-          rows={2}
+          rows={1}
           name="negative-prompt"
           placeholder="Type here to filter out the things you don't want in the scene"
           onChange={onChangeHandlerNegative}

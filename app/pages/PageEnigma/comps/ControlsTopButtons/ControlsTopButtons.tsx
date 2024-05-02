@@ -40,10 +40,9 @@ export const ControlsTopButtons = () => {
     console.log(`Selected Scene Token is ${token}`);
   };
 
-
-  const handleChangeSceneTitle = (e: React.ChangeEvent<HTMLInputElement>)=>{
+  const handleChangeSceneTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     sceneTitle.value = e.target.value;
-  }
+  };
 
   return (
     <div className="flex flex-col gap-2 pl-3 pt-3">
@@ -200,9 +199,14 @@ export const ControlsTopButtons = () => {
           dialogProps={{
             className: "max-w-6xl w-auto",
           }}
-          title={<>Help<span className="opacity-60">
-          @ CURRENT_STORYTELLER_GIT_VERSION
-        </span></>}>
+          title={
+            <>
+              Help
+              <span className="text-sm font-medium opacity-60">
+                @CURRENT_STORYTELLER_GIT_VERSION
+              </span>
+            </>
+          }>
           <Help />
         </ButtonDialogue>
       </div>

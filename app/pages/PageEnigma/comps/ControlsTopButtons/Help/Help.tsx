@@ -59,7 +59,7 @@ export const Help = () => {
             <Mouse button="right" label="(Drag)" />
           </Shortcut>
           <Shortcut label="Rotate View">
-            <Mouse button="middle" label="(Drag)" />
+            <Mouse button="left" label="(Drag)" />
           </Shortcut>
           <Shortcut label="Zoom">
             <Mouse button="middle" label="(Scroll)" />

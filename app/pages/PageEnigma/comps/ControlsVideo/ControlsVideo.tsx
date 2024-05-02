@@ -1,4 +1,4 @@
-import { 
+import {
   useContext,
   // useRef
 } from "react";
@@ -29,7 +29,8 @@ export const ControlsVideo = () => {
   // const scaleIndex = useRef(1);
   // const canPlayback = editorEngine !== null && editorEngine.can_playback;
   // console.log(`canplayback is ${canPlayback}`);
-  const isPlaying = editorEngine!==null ? editorEngine.timeline.is_playing : false;
+  const isPlaying =
+    editorEngine !== null ? editorEngine.timeline.is_playing : false;
 
   const handleBackwardStep = () => {
     currentTime.value = Math.max(currentTime.value - 1, 0);
@@ -75,7 +76,7 @@ export const ControlsVideo = () => {
 
   return (
     <div className="flex justify-center">
-      <div className="rounded-t-lg border-x border-t border-ui-panel-border bg-ui-controls p-2 text-white">
+      <div className="rounded-t-lg bg-ui-controls p-2 text-white shadow-md">
         <div className="flex content-center gap-2">
           <ButtonIcon
             // disabled={!canPlayback}

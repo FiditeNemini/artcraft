@@ -25,7 +25,7 @@ export const SidePanel = () => {
           "transition-all duration-300 ease-in-out",
         ].join(" ")}
         style={{
-          top: 68,
+          top: 64,
           right: 84,
           width: sidePanelVisible.value ? displayWidth : 0,
         }}>
