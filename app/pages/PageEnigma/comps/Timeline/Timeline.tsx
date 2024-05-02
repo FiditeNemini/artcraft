@@ -1,4 +1,4 @@
-import { UIEvent, useCallback, useEffect, useState } from "react";
+import { UIEvent, useCallback, useEffect, useRef, useState } from "react";
 import { LowerPanel } from "~/modules/LowerPanel";
 
 import { Camera } from "./Camera";
@@ -9,12 +9,14 @@ import {
   deleteCharacterClip,
   filmLength,
   ignoreKeyDelete,
+  isHotkeyDisabled,
+  objectsMinimized,
   scale,
   selectedItem,
+  selectedObject,
   timelineHeight,
   timelineScrollX,
   timelineScrollY,
-  isHotkeyDisabled,
 } from "~/pages/PageEnigma/store";
 import { useQueueHandler } from "~/pages/PageEnigma/comps/Timeline/utils/useQueueHandler";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -23,7 +25,7 @@ import { Scrubber } from "~/pages/PageEnigma/comps/Timeline/Scrubber";
 import { Characters } from "~/pages/PageEnigma/comps/Timeline/Characters";
 import { ObjectGroups } from "~/pages/PageEnigma/comps/Timeline/ObjectGroups";
 import useUpdateKeyframe from "~/pages/PageEnigma/contexts/TrackContext/utils/useUpdateKeyframe";
-import { Clip, Keyframe } from "~/pages/PageEnigma/models";
+import { AssetType, Clip, Keyframe } from "~/pages/PageEnigma/models";
 import { RowHeaders } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/RowHeaders";
 import { pageWidth } from "~/store";
 import { Pages } from "~/pages/PageEnigma/constants/page";
@@ -36,10 +38,38 @@ function getItemType(item: Clip | Keyframe | null) {
   return (item as Clip).clip_uuid ? "clip" : "keyframe";
 }
 
+function scrollItem(itemId: string) {
+  const element = document.getElementById(itemId);
+  if (!element) {
+    return;
+  }
+  element.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
 export const Timeline = () => {
   useSignals();
   const [dialogOpen, setDialogOpen] = useState(false);
   const { deleteKeyframe } = useUpdateKeyframe();
+  const lastSelectedObject = useRef(selectedObject.value);
+
+  if (selectedObject.value !== lastSelectedObject.current) {
+    lastSelectedObject.current = selectedObject.value;
+    switch (selectedObject.value?.type) {
+      case AssetType.CHARACTER:
+        scrollItem(`track-character-${selectedObject.value?.id}`);
+        break;
+      case AssetType.CAMERA:
+        scrollItem("track-camera");
+        break;
+      case AssetType.OBJECT:
+        if (objectsMinimized.value) {
+          scrollItem("track-objects");
+        } else {
+          scrollItem(`track-object-${selectedObject.value?.id}`);
+        }
+        break;
+    }
+  }
 
   const onScroll = useCallback((event: UIEvent<HTMLDivElement>) => {
     timelineScrollX.value = event.currentTarget.scrollLeft;

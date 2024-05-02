@@ -35,7 +35,11 @@ import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { fromEngineActions } from "~/pages/PageEnigma/Queue/fromEngineActions";
 import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
 import { loadingBarData, loadingBarIsShowing } from "~/store/loadingBar";
-import { editorState, EditorStates, previewSrc } from "~/pages/PageEnigma/store/engine";
+import {
+  editorState,
+  EditorStates,
+  previewSrc,
+} from "~/pages/PageEnigma/store/engine";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
 class Editor {
@@ -317,7 +321,10 @@ class Editor {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     //document.body.appendChild(this.renderer.domElement)
     window.addEventListener("resize", this.onWindowResize.bind(this));
-    this.renderer.domElement.addEventListener("resize", this.onWindowResize.bind(this));
+    this.renderer.domElement.addEventListener(
+      "resize",
+      this.onWindowResize.bind(this),
+    );
 
     this._configurePostProcessing();
     // Controls and movement.
@@ -479,7 +486,7 @@ class Editor {
     ]);
   }
 
-  public async testTestTimelineEvents() { }
+  public async testTestTimelineEvents() {}
 
   public async loadScene(scene_media_token: string) {
     this.dispatchAppUiState({
@@ -564,7 +571,11 @@ class Editor {
     );
     const timeline_json = await proxyTimeline.saveToJson();
 
-    const save_data = { version: this.version, scene: scene_json, timeline: timeline_json };
+    const save_data = {
+      version: this.version,
+      scene: scene_json,
+      timeline: timeline_json,
+    };
 
     // TODO turn scene information into and object ...
     const result = await this.api_manager.saveSceneState(
@@ -833,23 +844,29 @@ class Editor {
 
   // Basicly Unity 3D's update loop.
   async updateLoop() {
-    setTimeout(() => {
-      requestAnimationFrame(this.updateLoop.bind(this));
-    }, 1000 / (this.cap_fps * 2)); // Get the most FPS we can out of the renderer.
+    setTimeout(
+      () => {
+        requestAnimationFrame(this.updateLoop.bind(this));
+      },
+      1000 / (this.cap_fps * 2),
+    ); // Get the most FPS we can out of the renderer.
 
     if (this.container === undefined) {
       this.container = document.getElementById("video-scene-container");
     }
     if (!this.rendering && this.container !== undefined) {
-      if (this.container.clientWidth + this.container.clientHeight !== this.lastCanvasSize) {
+      if (
+        this.container.clientWidth + this.container.clientHeight !==
+        this.lastCanvasSize
+      ) {
         this.onWindowResize();
-        this.lastCanvasSize = this.container.clientWidth + this.container.clientHeight;
+        this.lastCanvasSize =
+          this.container.clientWidth + this.container.clientHeight;
       }
     }
 
     if (this.cam_obj == undefined) {
       this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
-
     }
 
     // Updates debug stats.
@@ -969,10 +986,10 @@ class Editor {
       audioSegment,
       "-filter_complex",
       "[1:a]adelay=" +
-      startTime * 1000 +
-      "|" +
-      startTime * 1000 +
-      "[a1];[0:a][a1]amix=inputs=2[a]",
+        startTime * 1000 +
+        "|" +
+        startTime * 1000 +
+        "[a1];[0:a][a1]amix=inputs=2[a]",
       "-map",
       "[a]",
       `${itteration}final_tmp.wav`,
@@ -1461,6 +1478,13 @@ class Editor {
     }
   }
 
+  getAssetType(selected: THREE.Object3D<THREE.Object3DEventMap>): AssetType {
+    if (selected.type === "Mesh") {
+      return selected.name === "::CAM::" ? AssetType.CAMERA : AssetType.OBJECT;
+    }
+    return AssetType.CHARACTER;
+  }
+
   publishSelect() {
     if (this.selected) {
       console.log("publish", this.selected);
@@ -1468,7 +1492,7 @@ class Editor {
         queueName: QueueNames.FROM_ENGINE,
         action: fromEngineActions.SELECT_OBJECT,
         data: {
-          type: this.selected.type,
+          type: this.getAssetType(this.selected),
           object_uuid: this.selected.uuid,
           version: 1,
           media_id: this.selected.id.toString(),

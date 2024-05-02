@@ -18,6 +18,7 @@ export const Audio = () => {
   if (audioMinimized.value) {
     return (
       <div
+        id="track-global-audio"
         className="relative flex h-[35px] items-center justify-end rounded-r-lg bg-global_audio-groupBg pr-4"
         style={{ width: fullWidth.value + 16 }}>
         <button
@@ -38,6 +39,7 @@ export const Audio = () => {
 
   return (
     <div
+      id="track-global-audio"
       className="relative block rounded-r-lg bg-global_audio-groupBg pb-5 pr-4"
       style={{ width: fullWidth.value + 16 }}>
       <button

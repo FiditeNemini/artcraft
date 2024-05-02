@@ -18,6 +18,7 @@ export const Camera = () => {
   if (cameraMinimized.value) {
     return (
       <div
+        id="track-camera"
         className="relative flex h-[35px] items-center justify-end rounded-r-lg bg-camera-groupBg pr-4"
         style={{ width: fullWidth.value + 16 }}>
         <button
@@ -38,6 +39,7 @@ export const Camera = () => {
 
   return (
     <div
+      id="track-camera"
       className="relative block rounded-r-lg bg-camera-groupBg pb-5 pr-4"
       style={{ width: fullWidth.value + 16 }}>
       <div className="flex justify-end">

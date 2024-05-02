@@ -62,7 +62,7 @@ export const Character = ({ character }: Props) => {
   if (minimized) {
     return (
       <div
-        id={`character-${character.object_uuid}`}
+        id={`track-character-${character.object_uuid}`}
         className="relative flex h-[35px] items-center justify-end rounded-r-lg bg-character-groupBg pr-4"
         style={{ width: fullWidth.value + 16 }}>
         <button
@@ -83,6 +83,7 @@ export const Character = ({ character }: Props) => {
 
   return (
     <div
+      id={`track-character-${character.object_uuid}`}
       className="relative block rounded-r-lg bg-character-groupBg pb-5 pr-4"
       style={{ width: fullWidth.value + 16 }}>
       <div className="flex h-[35px] items-center justify-end">

@@ -33,8 +33,6 @@ export function StyleButtons() {
     });
   };
 
-  console.log("state", editorState.value);
-
   return (
     <div className="flex w-full flex-col justify-center gap-4 rounded-b-lg bg-ui-panel px-4">
       <div className="w-full">
