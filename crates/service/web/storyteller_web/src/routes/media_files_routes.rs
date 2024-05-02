@@ -14,6 +14,7 @@ use crate::http_server::endpoints::media_files::list::list_featured_media_files_
 use crate::http_server::endpoints::media_files::list::list_media_files_handler::list_media_files_handler;
 use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token_handler::list_media_files_by_batch_token_handler;
 use crate::http_server::endpoints::media_files::list::list_media_files_for_user_handler::list_media_files_for_user_handler;
+use crate::http_server::endpoints::media_files::upload::upload_audio_media_file_handler::upload_audio_media_file_handler;
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler;
 use crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::upload_media_file_handler;
 use crate::http_server::endpoints::media_files::upload::upload_new_engine_asset_media_file_handler::upload_new_engine_asset_media_file_handler;
@@ -105,6 +106,10 @@ pub fn add_media_file_routes<T, B> (app: App<T>) -> App<T>
       )
       .service(web::resource("/upload/saved_scene/{token}")
           .route(web::post().to(upload_saved_scene_media_file_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/upload/audio")
+          .route(web::post().to(upload_audio_media_file_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
   )
