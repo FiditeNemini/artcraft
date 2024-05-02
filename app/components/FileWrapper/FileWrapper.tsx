@@ -66,7 +66,7 @@ export default function FileWrapper({
   return (
     <div
       {...{
-        className: `fy-file-wrapper${dragging ? " fy-file-dragging" : ""}`,
+        className: `fy-file-wrapper${dragging ? " fy-file-dragging" : ""} flex flex-col gap-3.5 h-full overflow-y-auto`,
         onDragLeave: onDragEvent(false),
         onDragOver: onDragEvent(true),
         onDrop,

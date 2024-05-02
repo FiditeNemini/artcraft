@@ -6,12 +6,19 @@ import "./ItemElements.scss";
 
 interface Props {
   busy?: boolean;
+  className?: string;
   debug?: string;
   items: MediaItem[];
   assetFilter: AssetFilterOption;
 }
 
-export const ItemElements = ({ busy, debug, items, assetFilter }: Props) => {
+export const ItemElements = ({
+  busy,
+  className,
+  debug,
+  items,
+  assetFilter,
+}: Props) => {
   const displayWidth =
     dndSidePanelWidth.value > -1
       ? dndSidePanelWidth.value
@@ -46,7 +53,8 @@ export const ItemElements = ({ busy, debug, items, assetFilter }: Props) => {
       <LoadingDots className="bg-transparent" />
     </div>
   ) : (
-    <div className={`grid ${gridColumnsClass} gap-3`}>
+    <div
+      className={`grid ${gridColumnsClass} gap-3 ${className ? " " + className : ""}`}>
       {displayItems.map((item) => (
         <ItemElement debug={debug} key={item.media_id} item={item} />
       ))}

@@ -7,7 +7,7 @@ import {
   shapeItems,
 } from "~/pages/PageEnigma/store";
 import { ItemElements } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ItemElements";
-import { Button, FileWrapper } from "~/components";
+import { Button, FileWrapper, Pagination } from "~/components";
 import { faCirclePlus } from "@fortawesome/pro-solid-svg-icons";
 import { twMerge } from "tailwind-merge";
 // TODO : add in
@@ -34,6 +34,7 @@ interface Props {
 
 export enum FetchStatus {
   paused,
+  // ready triggers a new fetch
   ready,
   in_progress,
   success,
@@ -54,10 +55,17 @@ export const ObjectsTab = ({ type }: Props) => {
       },
     ],
   });
+  const [page, pageSet] = useState(0);
+  const [pageCount, pageCountSet] = useState(0);
 
   const { authState } = useContext(AuthenticationContext);
 
   const [status, statusSet] = useState(FetchStatus.ready);
+
+  const pageChange = (page: number) => {
+    pageSet(page);
+    statusSet(FetchStatus.ready);
+  };
 
   const reFetchList = () => {
     statusSet(FetchStatus.ready);
@@ -66,6 +74,7 @@ export const ObjectsTab = ({ type }: Props) => {
   useEffect(() => {
     // we need to cache the current tab because we don't unmount components
     if (cachedTab !== currentTab) {
+      pageSet(0);
       cachedTabSet(currentTab);
       statusSet(FetchStatus.ready);
     }
@@ -77,6 +86,8 @@ export const ObjectsTab = ({ type }: Props) => {
         {
           filter_engine_categories:
             type === AssetType.CHARACTER ? "character" : "object",
+          page_index: page,
+          // page_size: 5,
         },
       ).then((res: GetMediaListResponse) => {
         if (res.success && res.results) {
@@ -105,6 +116,9 @@ export const ObjectsTab = ({ type }: Props) => {
             }),
             // .filter((item,i) => (item.thumbnail)) disabled for testing for now
           });
+          if (res.pagination) {
+            pageCountSet(res.pagination.total_page_count);
+          }
         }
       });
     }
@@ -120,7 +134,7 @@ export const ObjectsTab = ({ type }: Props) => {
         {...{
           onSuccess: reFetchList,
           render: ({ parentId }: { parentId: string }) => (
-            <div className="flex h-full flex-col gap-3.5">
+            <>
               <TabTitle
                 title={`${type === AssetType.CHARACTER ? "Characters" : "Objects"}`}
               />
@@ -176,7 +190,7 @@ export const ObjectsTab = ({ type }: Props) => {
                   Upload {type === AssetType.CHARACTER ? "Character" : "Object"}
                 </Button>
               </div>
-              <div className="w-full grow overflow-y-auto px-4 pb-4">
+              <div className="w-full grow overflow-y-auto rounded px-4 pb-4">
                 <ItemElements
                   {...{
                     busy:
@@ -197,7 +211,17 @@ export const ObjectsTab = ({ type }: Props) => {
                   assetFilter={assetFilter.value}
                 />
               </div>
-            </div>
+              {pageCount ? (
+                <Pagination
+                  {...{
+                    className: "-mt-4 mb-3.5 px-4",
+                    currentPage: page,
+                    onPageChange: pageChange,
+                    totalPages: pageCount,
+                  }}
+                />
+              ) : null}
+            </>
           ),
           type,
         }}

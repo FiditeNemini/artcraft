@@ -1,6 +1,6 @@
 .fy-file-wrapper {
   // flex-grow: 1;
-  height: calc(100% - 4px);
+  // height: calc(100% - 4px);
 
   .file-picker-button {
     cursor: pointer;
@@ -10,7 +10,7 @@
     visibility: hidden;
     height: 0;
     width: 0;
-    overflow: hidden;
+    // overflow: hidden;
     position: absolute;
 
     + label {
