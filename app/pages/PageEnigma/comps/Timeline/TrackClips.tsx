@@ -136,9 +136,9 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
       ].join(" ")}>
       <div
         className={[
-          "absolute inset-0",
+          "absolute inset-0 rounded-lg",
           canDropAsset
-            ? "animate-pulse bg-white/30 duration-[1500ms]"
+            ? "animate-pulse bg-white/30 duration-[750ms]"
             : "opacity-0",
         ].join(" ")}
         onPointerOver={onPointerOver}
