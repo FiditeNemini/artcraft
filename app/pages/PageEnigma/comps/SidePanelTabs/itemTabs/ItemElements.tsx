@@ -1,15 +1,17 @@
 import { ItemElement } from "./ItemElement";
 import { AssetFilterOption, MediaItem } from "~/pages/PageEnigma/models";
 import { dndSidePanelWidth, sidePanelWidth } from "~/pages/PageEnigma/store";
+import { LoadingDots } from "~/components";
 import "./ItemElements.scss";
 
 interface Props {
+  busy?: boolean;
   debug?: string;
   items: MediaItem[];
   assetFilter: AssetFilterOption;
 }
 
-export const ItemElements = ({ debug, items, assetFilter }: Props) => {
+export const ItemElements = ({ busy, debug, items, assetFilter }: Props) => {
   const displayWidth =
     dndSidePanelWidth.value > -1
       ? dndSidePanelWidth.value
@@ -39,7 +41,11 @@ export const ItemElements = ({ debug, items, assetFilter }: Props) => {
 
   const gridColumnsClass = getGridColumnsClass(displayWidth);
 
-  return (
+  return busy ? (
+    <div className="flex h-full w-full">
+      <LoadingDots className="bg-transparent" />
+    </div>
+  ) : (
     <div className={`grid ${gridColumnsClass} gap-3`}>
       {displayItems.map((item) => (
         <ItemElement debug={debug} key={item.media_id} item={item} />

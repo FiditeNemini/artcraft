@@ -179,6 +179,10 @@ export const ObjectsTab = ({ type }: Props) => {
               <div className="w-full grow overflow-y-auto px-4 pb-4">
                 <ItemElements
                   {...{
+                    busy:
+                      status === FetchStatus.ready ||
+                      status === FetchStatus.in_progress ||
+                      cachedTab !== currentTab,
                     ...(type !== AssetType.CHARACTER
                       ? { debug: "objects tab" }
                       : {}),
