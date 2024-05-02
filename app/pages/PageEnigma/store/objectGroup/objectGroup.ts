@@ -25,6 +25,10 @@ export function addObjectKeyframe(
     (row) => row.object_uuid === keyframe.object_uuid,
   );
 
+  if (!obj) {
+    return;
+  }
+
   const newKeyframe = {
     version: keyframe.version,
     keyframe_uuid: uuid.v4(),
@@ -39,8 +43,7 @@ export function addObjectKeyframe(
 
   // check to see if there is an existing keyframe at this offset for this object
   // if so, update the existing item, instead of adding a new one
-  const existingKeyframe =
-    obj && obj.keyframes.find((row) => row.offset === offset);
+  const existingKeyframe = obj.keyframes.find((row) => row.offset === offset);
   if (existingKeyframe) {
     addToast(
       ToastTypes.WARNING,
@@ -49,15 +52,9 @@ export function addObjectKeyframe(
     newKeyframe.object_uuid = existingKeyframe.object_uuid;
   }
 
-  const newObject = obj ?? {
-    object_uuid: keyframe.object_uuid,
-    name: keyframe.object_name ?? "unknown",
-    keyframes: [] as Keyframe[],
-  };
-
   const newKeyframes = [
-    ...newObject.keyframes.filter(
-      (keyframe) => keyframe.object_uuid !== existingKeyframe?.object_uuid,
+    ...obj.keyframes.filter(
+      (keyframe) => keyframe.keyframe_uuid !== existingKeyframe?.keyframe_uuid,
     ),
     newKeyframe,
   ];
@@ -65,7 +62,7 @@ export function addObjectKeyframe(
   newKeyframes.sort(
     (keyframeA, keyframeB) => keyframeA.offset - keyframeB.offset,
   );
-  newObject.keyframes = newKeyframes;
+  obj.keyframes = newKeyframes;
 
   objectGroup.value = {
     ...oldObjectGroup,
@@ -73,7 +70,7 @@ export function addObjectKeyframe(
       ...oldObjectGroup.objects.filter(
         (row) => row.object_uuid !== obj?.object_uuid,
       ),
-      newObject,
+      obj,
     ].sort((objA, objB) => (objA.object_uuid < objB.object_uuid ? -1 : 1)),
   };
   Queue.publish({
