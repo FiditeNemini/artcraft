@@ -26,6 +26,7 @@ export function addNewCharacter(data: MediaItem) {
     minimized: false,
     animationClips: [],
     positionKeyframes: [],
+    expressionClips: [],
     lipSyncClips: [],
   } as CharacterTrack;
 

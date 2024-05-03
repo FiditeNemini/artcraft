@@ -16,6 +16,7 @@ import { GlobalAudioHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/
 import { CameraHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/CameraHeader";
 import { ObjectsHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/ObjectsHeader";
 import { CharacterHeader } from "~/pages/PageEnigma/comps/Timeline/RowHeaders/CharacterHeader";
+import { environmentVariables } from "~/store";
 
 export const RowHeaders = () => {
   useSignals();
@@ -49,7 +50,10 @@ export const RowHeaders = () => {
           return (
             <div
               key={character.object_uuid}
-              className="mb-4 h-[199px] w-full rounded-l-lg bg-character-groupBg">
+              className="mb-4 w-full rounded-l-lg bg-character-groupBg"
+              style={{
+                height: environmentVariables.value.EXPRESSIONS ? 247 : 199,
+              }}>
               <div className="h-[47px] text-xs font-medium text-white">
                 <div
                   className={[
@@ -65,6 +69,11 @@ export const RowHeaders = () => {
               <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                 Movement
               </div>
+              {environmentVariables.value.EXPRESSIONS && (
+                <div className="mb-3 flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
+                  Expression
+                </div>
+              )}
               <div className="flex h-[36px] flex-col justify-center pl-[22px] text-xs font-medium text-white opacity-80">
                 <div className="flex gap-3">
                   Lip Sync

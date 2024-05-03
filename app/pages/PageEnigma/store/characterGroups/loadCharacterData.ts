@@ -25,6 +25,7 @@ function getAddCharacter(item: ClipUI) {
     animationClips: [],
     positionKeyframes: [],
     lipSyncClips: [],
+    expressionClips: [],
   } as CharacterTrack;
 
   characterGroup.value = {

@@ -14,6 +14,9 @@ export const animationFilter = signal<AssetFilterOption>(AssetFilterOption.ALL);
 export const audioFilter = signal<AssetFilterOption>(AssetFilterOption.ALL);
 export const cameraFilter = signal<AssetFilterOption>(AssetFilterOption.ALL);
 export const characterFilter = signal<AssetFilterOption>(AssetFilterOption.ALL);
+export const expressionFilter = signal<AssetFilterOption>(
+  AssetFilterOption.ALL,
+);
 export const objectFilter = signal<AssetFilterOption>(AssetFilterOption.ALL);
 export const shapeFilter = signal<AssetFilterOption>(AssetFilterOption.ALL);
 

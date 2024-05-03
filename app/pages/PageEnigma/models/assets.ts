@@ -1,5 +1,4 @@
 export interface MediaItem {
-  colorIndex?: number;
   version: number;
   type: AssetType;
   media_id: string;
@@ -7,19 +6,20 @@ export interface MediaItem {
   name: string;
   description?: string;
   publicBucketPath?: string;
-  length?: number; // unit of length is frames, as in FPS
+  length?: number;
   thumbnail?: string;
-  imageIndex?: number;
   isMine?: boolean;
   isBookmarked?: boolean;
+  imageIndex?: number;
 }
 
 export enum AssetType {
-  CHARACTER = "character",
-  OBJECT = "object",
-  AUDIO = "audio",
   ANIMATION = "animation",
+  AUDIO = "audio",
   CAMERA = "camera",
+  CHARACTER = "character",
+  EXPRESSION = "expression",
+  OBJECT = "object",
   SHAPE = "shape",
   STYLE = "style", // TODO Remove
 }
@@ -28,9 +28,4 @@ export enum AssetFilterOption {
   ALL,
   MINE,
   BOOKMARKED,
-}
-
-export interface AudioMediaItem extends MediaItem {
-  category?: string;
-  isNew?: boolean;
 }

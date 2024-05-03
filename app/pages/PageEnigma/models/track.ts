@@ -17,7 +17,7 @@ export enum ClipType {
   TRANSFORM = "transform",
   AUDIO = "audio",
   ANIMATION = "animation",
-  EMOTION = "emotion",
+  EXPRESSION = "expression",
   FAKE = "fake",
 }
 
@@ -53,6 +53,7 @@ export interface CharacterTrack {
   minimized: boolean;
   animationClips: Clip[];
   positionKeyframes: Keyframe[];
+  expressionClips: Clip[];
   lipSyncClips: Clip[];
 }
 

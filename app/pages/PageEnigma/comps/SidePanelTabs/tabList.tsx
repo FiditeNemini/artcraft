@@ -2,42 +2,66 @@ import { AssetType } from "~/pages/PageEnigma/models";
 import { ObjectsTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ObjectsTab";
 import { AnimationTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AnimationTab";
 import { AudioTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/AudioTab";
-import { StylizeTab } from "./itemTabs/StylizeTab/StylizeTab";
-export const tabList = [
-  {
-    icon: "/resources/icons/characters.png",
-    title: "Characters",
-    value: AssetType.CHARACTER,
-    component: <ObjectsTab type={AssetType.CHARACTER} />,
-  },
-  {
-    icon: "/resources/icons/animations.png",
-    title: "Animation",
-    value: AssetType.ANIMATION,
-    component: <AnimationTab />,
-  },
-  {
-    icon: "/resources/icons/objects.png",
-    title: "Objects",
-    value: AssetType.OBJECT,
-    component: <ObjectsTab type={AssetType.OBJECT} />,
-  },
-  // {
-  //   icon: "/resources/icons/camera.png",
-  //   title: "Camera",
-  //   value: AssetType.CAMERA,
-  //   component: <CameraTab />,
-  // },
-  {
-    icon: "/resources/icons/audios.png",
-    title: "Audio",
-    value: AssetType.AUDIO,
-    component: <AudioTab />,
-  },
-  {
-    icon: "/resources/icons/brush.png",
-    title: "AI Stylize",
-    value: AssetType.STYLE,
-    component: <StylizeTab />,
-  },
-];
+import { StylizeTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/StylizeTab/StylizeTab";
+import { ExpressionTab } from "~/pages/PageEnigma/comps/SidePanelTabs/itemTabs/ExpressionTab";
+import { ReactNode } from "react";
+
+export interface TabItem {
+  icon: string;
+  title: string;
+  value: AssetType;
+  component: ReactNode;
+}
+
+export const tabList = (env: Record<string, string | boolean>): TabItem[] => {
+  const tabList = [
+    {
+      icon: "/resources/icons/characters.png",
+      title: "Characters",
+      value: AssetType.CHARACTER,
+      component: <ObjectsTab type={AssetType.CHARACTER} />,
+    },
+    {
+      icon: "/resources/icons/animations.png",
+      title: "Animation",
+      value: AssetType.ANIMATION,
+      component: <AnimationTab />,
+    },
+    {
+      icon: "/resources/icons/objects.png",
+      title: "Objects",
+      value: AssetType.OBJECT,
+      component: <ObjectsTab type={AssetType.OBJECT} />,
+    },
+    // {
+    //   icon: "/resources/icons/camera.png",
+    //   title: "Camera",
+    //   value: AssetType.CAMERA,
+    //   component: <CameraTab />,
+    // },
+    {
+      icon: "/resources/icons/audios.png",
+      title: "Audio",
+      value: AssetType.AUDIO,
+      component: <AudioTab />,
+    },
+    {
+      icon: "/resources/icons/brush.png",
+      title: "AI Stylize",
+      value: AssetType.STYLE,
+      component: <StylizeTab />,
+    },
+  ];
+
+  if (env.EXPRESSIONS) {
+    const newTabs = [...tabList];
+    newTabs.splice(2, 0, {
+      icon: "/resources/icons/expressions.png",
+      title: "Expressions",
+      value: AssetType.EXPRESSION,
+      component: <ExpressionTab />,
+    });
+    return newTabs;
+  }
+  return tabList;
+};

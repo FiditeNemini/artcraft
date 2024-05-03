@@ -12,7 +12,6 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import * as uuid from "uuid";
-import { AddToast, ToastTypes } from "~/contexts/ToasterContext";
 
 export const characterGroup = signal<CharacterGroup>({
   id: "CG1",
@@ -58,6 +57,52 @@ export function addCharacterAnimation({
       return {
         ...character,
         animationClips: [...character.animationClips, newClip].sort(
+          (clipA, clipB) => clipA.offset - clipB.offset,
+        ),
+      };
+    }),
+  };
+}
+
+export function addCharacterExpression({
+  dragItem,
+  characterId,
+  offset,
+}: {
+  dragItem: MediaItem;
+  characterId: string;
+  offset: number;
+}) {
+  const clip_uuid = uuid.v4();
+  const newClip = {
+    version: 1,
+    media_id: dragItem.media_id,
+    group: ClipGroup.CHARACTER,
+    type: ClipType.EXPRESSION,
+    offset,
+    length: dragItem.length,
+    clip_uuid,
+    name: dragItem.name,
+    object_uuid: characterId,
+  } as Clip;
+
+  const oldCharacterGroup = characterGroup.value;
+  characterGroup.value = {
+    ...oldCharacterGroup,
+    characters: oldCharacterGroup.characters.map((character) => {
+      if (character.object_uuid !== characterId) {
+        return { ...character };
+      }
+
+      Queue.publish({
+        queueName: QueueNames.TO_ENGINE,
+        action: toEngineActions.ADD_CLIP,
+        data: newClip,
+      });
+
+      return {
+        ...character,
+        expressionClips: [...character.expressionClips, newClip].sort(
           (clipA, clipB) => clipA.offset - clipB.offset,
         ),
       };
@@ -114,9 +159,23 @@ export function addCharacterAudio({
 export function addCharacterKeyframe(
   keyframe: QueueKeyframe,
   offset: number,
-  addToast: AddToast,
+  addToast: (type: "error" | "warning" | "success", message: string) => void,
 ) {
   const oldCharacterGroup = characterGroup.value;
+
+  if (
+    oldCharacterGroup.characters.some((characterTrack) => {
+      if (characterTrack.object_uuid !== keyframe.object_uuid) {
+        return;
+      }
+      return characterTrack.positionKeyframes.some(
+        (row) => row.offset === offset,
+      );
+    })
+  ) {
+    addToast("warning", "There can only be one keyframe at this offset.");
+    return;
+  }
 
   const newKeyframe = {
     version: keyframe.version,
@@ -130,31 +189,6 @@ export function addCharacterKeyframe(
     selected: false,
   } as Keyframe;
 
-  // check to see if there is an existing keyframe at this offset for this character
-  // if so, update the existing item, instead of adding a new one
-  const keyframeAtOffset = oldCharacterGroup.characters.reduce(
-    (foundKeyframe, characterTrack) => {
-      if (foundKeyframe) {
-        return foundKeyframe;
-      }
-      if (characterTrack.object_uuid !== keyframe.object_uuid) {
-        return;
-      }
-      return characterTrack.positionKeyframes.find(
-        (row) => row.offset === offset,
-      );
-    },
-    undefined as Keyframe | undefined,
-  );
-
-  if (keyframeAtOffset) {
-    addToast(
-      ToastTypes.WARNING,
-      "Keyframe at this location has been overridden.",
-    );
-    newKeyframe.keyframe_uuid = keyframeAtOffset.keyframe_uuid;
-  }
-
   characterGroup.value = {
     ...oldCharacterGroup,
     characters: oldCharacterGroup.characters.map((character) => {
@@ -164,21 +198,15 @@ export function addCharacterKeyframe(
 
       Queue.publish({
         queueName: QueueNames.TO_ENGINE,
-        action: keyframeAtOffset
-          ? toEngineActions.UPDATE_KEYFRAME
-          : toEngineActions.ADD_KEYFRAME,
+        action: toEngineActions.ADD_KEYFRAME,
         data: newKeyframe,
       });
 
       return {
         ...character,
-        positionKeyframes: [
-          ...character.positionKeyframes.filter(
-            (keyframe) =>
-              keyframe.keyframe_uuid !== keyframeAtOffset?.keyframe_uuid,
-          ),
-          newKeyframe,
-        ].sort((clipA, clipB) => clipA.offset - clipB.offset),
+        positionKeyframes: [...character.positionKeyframes, newKeyframe].sort(
+          (clipA, clipB) => clipA.offset - clipB.offset,
+        ),
       };
     }),
   };
@@ -252,59 +280,6 @@ export function selectCharacterClip(clipId: string) {
         ...clip,
         selected: clip.clip_uuid === clipId ? !clip.selected : clip.selected,
       })),
-    })),
-  };
-}
-
-export function deleteCharacterClip(clip: Clip) {
-  const oldCharacterGroup = characterGroup.value;
-  characterGroup.value = {
-    ...oldCharacterGroup,
-    characters: oldCharacterGroup.characters.map((character) => ({
-      ...character,
-      animationClips: character.animationClips.filter((row) => {
-        if (row.clip_uuid === clip.clip_uuid) {
-          Queue.publish({
-            queueName: QueueNames.TO_ENGINE,
-            action: toEngineActions.DELETE_CLIP,
-            data: row,
-          });
-          return false;
-        }
-        return true;
-      }),
-      lipSyncClips: character.lipSyncClips.filter((row) => {
-        if (row.clip_uuid === clip.clip_uuid) {
-          Queue.publish({
-            queueName: QueueNames.TO_ENGINE,
-            action: toEngineActions.DELETE_CLIP,
-            data: row,
-          });
-          return false;
-        }
-        return true;
-      }),
-    })),
-  };
-}
-
-export function deleteCharacterKeyframe(keyframe: Keyframe) {
-  const oldCharacterGroup = characterGroup.value;
-  characterGroup.value = {
-    ...oldCharacterGroup,
-    characters: oldCharacterGroup.characters.map((character) => ({
-      ...character,
-      positionKeyframes: character.positionKeyframes.filter((row) => {
-        if (row.keyframe_uuid === keyframe.keyframe_uuid) {
-          Queue.publish({
-            queueName: QueueNames.TO_ENGINE,
-            action: toEngineActions.DELETE_KEYFRAME,
-            data: row,
-          });
-          return false;
-        }
-        return true;
-      }),
     })),
   };
 }

@@ -1,24 +1,31 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import {
   selectedTab,
   sidePanelHeight,
   sidePanelVisible,
 } from "~/pages/PageEnigma/store/sidePanel";
-import { tabList } from "./tabList";
+import { TabItem, tabList } from "./tabList";
 import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
 import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { QueueNames } from "~/pages/PageEnigma/Queue/QueueNames";
 import { toEngineActions } from "~/pages/PageEnigma/Queue/toEngineActions";
 import { twMerge } from "tailwind-merge";
 import { AssetType } from "../../models";
+import { environmentVariables } from "~/store";
 
 export const SidePanelMenu = () => {
   useSignals();
+  const [tabs, setTabs] = useState<TabItem[]>();
+  useLayoutEffect(() => {
+    setTabs(tabList(environmentVariables.value));
+  }, []);
 
   useEffect(() => {
-    selectedTab.value = tabList[0];
-  }, []);
+    if (tabs) {
+      selectedTab.value = tabs[0];
+    }
+  }, [tabs]);
 
   return (
     <div
@@ -35,7 +42,7 @@ export const SidePanelMenu = () => {
         top: 64,
       }}>
       <div className="flex w-full flex-col gap-2">
-        {tabList.map((tab) => (
+        {(tabs ?? []).map((tab) => (
           <button
             key={tab.value}
             className={twMerge([

@@ -19,6 +19,14 @@ interface Props {
   updateClip: (options: { id: string; length: number; offset: number }) => void;
 }
 
+const CLIP_TITLES: Record<ClipType, string> = {
+  [ClipType.ANIMATION]: "animation",
+  [ClipType.AUDIO]: "lip sync",
+  [ClipType.EXPRESSION]: "expression",
+  [ClipType.TRANSFORM]: "",
+  [ClipType.FAKE]: "",
+};
+
 function getCanDrop({
   dragType,
   type,
@@ -35,7 +43,7 @@ function getCanDrop({
     if (type === ClipType.AUDIO) {
       DndAsset.notDropText = "Cannot drag animation onto audio track";
     }
-    if (type === ClipType.EMOTION) {
+    if (type === ClipType.EXPRESSION) {
       DndAsset.notDropText = "Cannot drag animation onto expression track";
     }
     if (group === ClipGroup.GLOBAL_AUDIO) {
@@ -43,6 +51,16 @@ function getCanDrop({
     }
     if (group === ClipGroup.CAMERA) {
       DndAsset.notDropText = "Cannot drag animation onto camera track";
+    }
+  }
+  if (dragType === AssetType.EXPRESSION) {
+    if (type === ClipType.EXPRESSION) {
+      return true;
+    }
+  }
+  if (dragType === AssetType.EXPRESSION) {
+    if (type === ClipType.EXPRESSION) {
+      return true;
     }
   }
   if (dragType === AssetType.AUDIO) {
@@ -58,7 +76,7 @@ function getCanDrop({
     if (type === ClipType.ANIMATION) {
       DndAsset.notDropText = "Cannot drag audio onto animation track";
     }
-    if (type === ClipType.EMOTION) {
+    if (type === ClipType.EXPRESSION) {
       DndAsset.notDropText = "Cannot drag audio onto expression track";
     }
   }
@@ -89,7 +107,9 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
     }
 
     const track = document.getElementById(`track-${trackType}-${id}`);
+
     if (!track) {
+      canDrop.value = false;
       return;
     }
 
@@ -166,8 +186,7 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
             <FontAwesomeIcon icon={faArrowUp} className="text-white/80" />
           </div>
           <div className="text-xs text-white/80">
-            Drag and drop {type === ClipType.ANIMATION ? "animation" : "audio"}{" "}
-            clip here
+            Drag and drop {CLIP_TITLES[type!] ?? "audio"} clip here
           </div>
         </div>
       )}

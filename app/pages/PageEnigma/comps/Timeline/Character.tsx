@@ -11,6 +11,7 @@ import { CharacterTrack, ClipGroup, ClipType } from "~/pages/PageEnigma/models";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faAngleUp } from "@fortawesome/pro-solid-svg-icons";
 import { AddToast, ToasterContext } from "~/contexts/ToasterContext";
+import { environmentVariables } from "~/store";
 
 function buildUpdaters(
   updateCharacters: (options: {
@@ -29,6 +30,7 @@ function buildUpdaters(
   }) {
     updateCharacters({ ...options, type: ClipType.ANIMATION, addToast });
   }
+
   function updateClipPosition(options: { id: string; offset: number }) {
     updateCharacters({
       ...options,
@@ -37,6 +39,15 @@ function buildUpdaters(
       addToast,
     });
   }
+
+  function updateClipEmotions(options: {
+    id: string;
+    length: number;
+    offset: number;
+  }) {
+    updateCharacters({ ...options, type: ClipType.EXPRESSION, addToast });
+  }
+
   function updateClipLipSync(options: {
     id: string;
     length: number;
@@ -44,7 +55,12 @@ function buildUpdaters(
   }) {
     updateCharacters({ ...options, type: ClipType.AUDIO, addToast });
   }
-  return { updateClipLipSync, updateClipPosition, updateClipAnimations };
+  return {
+    updateClipLipSync,
+    updateClipPosition,
+    updateClipAnimations,
+    updateClipEmotions,
+  };
 }
 
 interface Props {
@@ -53,11 +69,20 @@ interface Props {
 
 export const Character = ({ character }: Props) => {
   const { addToast } = useContext(ToasterContext);
-  const { updateClipLipSync, updateClipPosition, updateClipAnimations } =
-    useMemo(() => buildUpdaters(updateCharacters, addToast), [addToast]);
+  const {
+    updateClipLipSync,
+    updateClipPosition,
+    updateClipAnimations,
+    updateClipEmotions,
+  } = useMemo(() => buildUpdaters(updateCharacters, addToast), [addToast]);
 
-  const { animationClips, positionKeyframes, lipSyncClips, minimized } =
-    character;
+  const {
+    animationClips,
+    positionKeyframes,
+    lipSyncClips,
+    expressionClips,
+    minimized,
+  } = character;
 
   if (minimized) {
     return (
@@ -114,6 +139,15 @@ export const Character = ({ character }: Props) => {
           updateKeyframe={updateClipPosition}
           group={ClipGroup.CHARACTER}
         />
+        {environmentVariables.value.EXPRESSIONS && (
+          <TrackClips
+            id={character.object_uuid}
+            clips={expressionClips}
+            updateClip={updateClipEmotions}
+            group={ClipGroup.CHARACTER}
+            type={ClipType.EXPRESSION}
+          />
+        )}
         <TrackClips
           id={character.object_uuid}
           clips={lipSyncClips}

@@ -1,14 +1,17 @@
 import { signal } from "@preact/signals-core";
-import { AssetType, MediaItem, AudioMediaItem } from "~/pages/PageEnigma/models";
+import { AssetType, MediaItem } from "~/pages/PageEnigma/models";
 import * as uuid from "uuid";
 
-export const updateDemoAudioItemLength = (mediaId:string, duration: number)=>{
-  const newList = audioItems.value.map((item)=>{
-    if( item.media_id === mediaId ) item.length = duration;
+export const updateDemoAudioItemLength = (
+  mediaId: string,
+  duration: number,
+) => {
+  const newList = audioItems.value.map((item) => {
+    if (item.media_id === mediaId) item.length = duration;
     return item;
-  })
+  });
   audioItems.value = [...newList];
-}
+};
 export const animationItems = signal<MediaItem[]>([
   {
     version: 1,
@@ -454,14 +457,13 @@ export const animationItems = signal<MediaItem[]>([
   },
 ]);
 
-export const audioItems = signal<AudioMediaItem[]>([
+export const audioItems = signal<MediaItem[]>([
   {
     version: 1,
     media_id: "m_403phjvjkbbaxxbz8y7r6qjay07mfd",
     type: AssetType.AUDIO,
     name: "Talk (Demo Sounds)",
     thumbnail: "/resources/placeholders/audio_placeholder.png",
-    category: "demo",
     publicBucketPath:
       "/media/j/a/r/r/3/jarr3asge6t0x048wdzcehzjd2nh4ep7/fakeyou_jarr3asge6t0x048wdzcehzjd2nh4ep7.wav",
   },
@@ -470,10 +472,30 @@ export const audioItems = signal<AudioMediaItem[]>([
     media_id: "m_w5nn3kjh1fbkmjrdac5b2qaba0pmyt",
     type: AssetType.AUDIO,
     name: "NCS Song",
-    category: "demo",
     thumbnail: "/resources/placeholders/audio_placeholder.png",
     publicBucketPath:
       "/media/s/j/t/0/6/sjt06a8y2qrdqe574nry02bpd3bt01ma/upload_sjt06a8y2qrdqe574nry02bpd3bt01ma.wav",
+  },
+]);
+
+export const expressionItems = signal<MediaItem[]>([
+  {
+    version: 1,
+    media_id: "m_yzreg1494d08aepezj74607d2ascep",
+    type: AssetType.EXPRESSION,
+    length: 100,
+    name: "Smile",
+    thumbnail: "/resources/characters/img04.png",
+    isMine: true,
+  },
+  {
+    version: 1,
+    media_id: "m_qepzjytd4ahd5askdt2ngrwzj2aa3f",
+    type: AssetType.EXPRESSION,
+    length: 100,
+    name: "Frown",
+    thumbnail: "/resources/characters/img07.png",
+    isBookmarked: true,
   },
 ]);
 
@@ -582,7 +604,7 @@ export const devCharacterItems = signal<MediaItem[]>([
     type: AssetType.CHARACTER,
     name: "Roko",
     thumbnail: "/resources/placeholders/placeholder.png",
-  }
+  },
 ]);
 
 export const objectItems = signal<MediaItem[]>([

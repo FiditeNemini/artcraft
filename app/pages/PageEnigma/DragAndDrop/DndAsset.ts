@@ -4,6 +4,7 @@ import {
   addCharacter,
   addCharacterAnimation,
   addCharacterAudio,
+  addCharacterExpression,
   addGlobalAudio,
   addObject,
   canDrop,
@@ -82,6 +83,13 @@ class DndAsset {
     if (canDrop.value && dragItem.value) {
       if (dragItem.value.type === AssetType.ANIMATION) {
         addCharacterAnimation({
+          dragItem: dragItem.value,
+          characterId: this.dropId,
+          offset: this.dropOffset,
+        });
+      }
+      if (dragItem.value.type === AssetType.EXPRESSION) {
+        addCharacterExpression({
           dragItem: dragItem.value,
           characterId: this.dropId,
           offset: this.dropOffset,

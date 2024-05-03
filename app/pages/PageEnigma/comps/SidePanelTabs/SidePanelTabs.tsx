@@ -1,16 +1,25 @@
 import { useSignals } from "@preact/signals-react/runtime";
 import { selectedTab, sidePanelHeight } from "~/pages/PageEnigma/store";
-import { tabList } from "~/pages/PageEnigma/comps/SidePanelTabs/tabList";
+import {
+  TabItem,
+  tabList,
+} from "~/pages/PageEnigma/comps/SidePanelTabs/tabList";
 import { useMouseEventsSidePanel } from "~/pages/PageEnigma/comps/Timeline/utils/useMouseEventsSidePanel";
+import { useLayoutEffect, useState } from "react";
+import { environmentVariables } from "~/store";
 
 export const SidePanelTabs = () => {
   useSignals();
   const { onPointerDown } = useMouseEventsSidePanel();
+  const [tabs, setTabs] = useState<TabItem[]>();
+  useLayoutEffect(() => {
+    setTabs(tabList(environmentVariables.value));
+  }, []);
 
   return (
     <>
       <div style={{ height: sidePanelHeight.value, width: "100%" }}>
-        {tabList.map((tab) => (
+        {(tabs ?? []).map((tab) => (
           <div
             key={tab.value}
             className={

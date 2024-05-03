@@ -65,17 +65,15 @@ export async function loader() {
       GOOGLE_API: process.env.GOOGLE_API || "%BUILD_GOOGLE_API%",
       FUNNEL_API: process.env.FUNNEL_API || "%BUILD_FUNNEL_API%",
       CDN_API: process.env.CDN_API || "%BUILD_CDN_API%",
-    },
+      EXPRESSIONS: process.env.EXPRESSIONS === "true",
+    } as Record<string, string | boolean>,
   });
   return env;
 }
 
 export default function App() {
   const data = useLoaderData() as { ENV: Record<string, string> };
-  const [topBarInnerComponent, setTopBarInnerComponent] = useState<{
-    location: string;
-    node: React.ReactNode;
-  } | null>(null);
+
   const [showLoader, setShowLoader] = useState<boolean>(true);
   useEffect(() => {
     setTimeout(() => setShowLoader(false), 2500);
@@ -102,6 +100,7 @@ export default function App() {
 
   useEffect(() => {
     environmentVariables.value = data.ENV;
+    console.log(data.ENV);
   }, [data]);
 
   return (
