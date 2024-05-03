@@ -28,6 +28,7 @@ import { FrontendInferenceJobType } from "@storyteller/components/src/jobs/Infer
 import { usePrefixedDocumentTitle } from "common/UsePrefixedDocumentTitle";
 import { Analytics } from "common/Analytics";
 import "./FaceAnimator.scss";
+import PremiumLock from "components/PremiumLock";
 
 export default function FaceAnimator({
   enqueueInferenceJob,
@@ -213,37 +214,44 @@ export default function FaceAnimator({
 
   return (
     <div {...{ className: "face-animator-container container-panel pt-4" }}>
-      <div {...{ className: "panel face-animator-main" }}>
-        <FaceAnimatorTitle {...headerProps} />
-        {transitions((style, i) => {
-          const Page = FaceAnimatorSubViews[page];
-          return Page ? (
-            <Page
-              {...{
-                audioProps,
-                imageProps,
-                frameDimensions,
-                frameDimensionsChange,
-                disableFaceEnhancement,
-                disableFaceEnhancementChange,
-                enqueueInferenceJob,
-                preferPresetAudio,
-                preferPresetAudioSet,
-                presetAudio,
-                still,
-                stillChange,
-                sessionSubscriptionsWrapper,
-                index,
-                t,
-                toggle: { audio: readyMedia(1), image: readyMedia(0) },
-                style,
-                removeWatermark,
-                removeWatermarkChange,
-              }}
-            />
-          ) : null;
-        })}
-      </div>
+      <FaceAnimatorTitle {...headerProps} />
+      <PremiumLock
+        requiredPlan="any"
+        sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+        large={true}
+        showCtaButton={true}
+      >
+        <div {...{ className: "panel face-animator-main" }}>
+          {transitions((style, i) => {
+            const Page = FaceAnimatorSubViews[page];
+            return Page ? (
+              <Page
+                {...{
+                  audioProps,
+                  imageProps,
+                  frameDimensions,
+                  frameDimensionsChange,
+                  disableFaceEnhancement,
+                  disableFaceEnhancementChange,
+                  enqueueInferenceJob,
+                  preferPresetAudio,
+                  preferPresetAudioSet,
+                  presetAudio,
+                  still,
+                  stillChange,
+                  sessionSubscriptionsWrapper,
+                  index,
+                  t,
+                  toggle: { audio: readyMedia(1), image: readyMedia(0) },
+                  style,
+                  removeWatermark,
+                  removeWatermarkChange,
+                }}
+              />
+            ) : null;
+          })}
+        </div>
+      </PremiumLock>
       <InferenceJobsList
         {...{
           failures,

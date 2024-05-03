@@ -259,6 +259,10 @@ function SdInferencePanel({
       return false;
     }
 
+    if (!sessionSubscriptionsWrapper.hasPaidFeatures()) {
+      return false;
+    }
+
     if (!sessionSubscriptionsWrapper.hasActiveProSubscription()) {
       batchCountSet(1);
     }
@@ -310,234 +314,241 @@ function SdInferencePanel({
   };
 
   return (
-    <div>
-      <SplitPanel dividerHeader={true}>
-        <SplitPanel.Header padding={true}>
-          <h4 className="fw-semibold mb-0 flex-grow-1">Generate an Image</h4>
-        </SplitPanel.Header>
+    <PremiumLock
+      sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+      requiredPlan="any"
+      showCtaButton={true}
+      large={true}
+    >
+      <div>
+        <SplitPanel dividerHeader={true}>
+          <SplitPanel.Header padding={true}>
+            <h4 className="fw-semibold mb-0 flex-grow-1">Generate an Image</h4>
+          </SplitPanel.Header>
 
-        <SplitPanel.Body padding={true}>
-          <div className="d-flex flex-column gap-3 mb-4">
-            {(isStandalone || weightPageType === "lora") && (
-              <SelectModal
-                required={true}
-                modalTitle="Select Stable Diffusion Weight"
-                label="Select a Stable Diffusion Weight"
-                onSelect={handleOnWeightSelect}
-                tabs={[
-                  {
-                    label: "All Weights",
-                    tabKey: "allWeights",
-                    typeFilter: "sd_1.5",
-                    searcher: true,
-                    type: "weights",
-                  },
-                  {
-                    label: "Bookmarked",
-                    tabKey: "bookmarkedWeights",
-                    typeFilter: "sd_1.5",
-                    searcher: false,
-                    type: "weights",
-                    onlyBookmarked: true,
-                  },
-                ]}
+          <SplitPanel.Body padding={true}>
+            <div className="d-flex flex-column gap-3 mb-4">
+              {(isStandalone || weightPageType === "lora") && (
+                <SelectModal
+                  required={true}
+                  modalTitle="Select Stable Diffusion Weight"
+                  label="Select a Stable Diffusion Weight"
+                  onSelect={handleOnWeightSelect}
+                  tabs={[
+                    {
+                      label: "All Weights",
+                      tabKey: "allWeights",
+                      typeFilter: "sd_1.5",
+                      searcher: true,
+                      type: "weights",
+                    },
+                    {
+                      label: "Bookmarked",
+                      tabKey: "bookmarkedWeights",
+                      typeFilter: "sd_1.5",
+                      searcher: false,
+                      type: "weights",
+                      onlyBookmarked: true,
+                    },
+                  ]}
+                />
+              )}
+
+              <TempTextArea
+                {...{
+                  label: "Prompt",
+                  placeholder: "Enter a prompt",
+                  onChange: handlePromptChange,
+                  value: prompt,
+                  required: true,
+                }}
               />
-            )}
-
-            <TempTextArea
-              {...{
-                label: "Prompt",
-                placeholder: "Enter a prompt",
-                onChange: handlePromptChange,
-                value: prompt,
-                required: true,
-              }}
-            />
-            <TempTextArea
-              {...{
-                label: "Negative Prompt",
-                name: "negativePrompt",
-                placeholder: "Enter a negative prompt",
-                onChange: handleNegativePromptChange,
-                value: negativePrompt,
-              }}
-            />
-            <SegmentButtons
-              {...{
-                label: "Aspect Ratio",
-                name: "aspectRatio",
-                onChange,
-                options: dimensionOpts,
-                value: aspectRatio,
-              }}
-            />
-            <div>
-              <Label label="Number of Generations" />
-              <PremiumLock
-                sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
-                requiredPlan="pro"
-              >
-                <SegmentButtons
-                  {...{
-                    name: "batchCount",
-                    onChange,
-                    options: batchCountOpts,
-                    value: batchCount,
-                  }}
-                />
-              </PremiumLock>
-            </div>
-          </div>
-
-          <Accordion>
-            <Accordion.Item title="Advanced">
-              <div className="p-3 d-flex flex-column gap-3">
-                <TempSelect
-                  {...{
-                    label: "Sampler",
-                    name: "sampler",
-                    onChange,
-                    options: samplerOpts,
-                    value: sampler,
-                  }}
-                />
-                <div>
-                  <label className="sub-title">Seed</label>
-                  <div className="d-flex gap-2 align-items-center">
-                    <SegmentButtons
-                      {...{
-                        name: "seed",
-                        onChange: handleSeedChange,
-                        options: seedOpts,
-                        value: seed,
-                      }}
-                    />
-                    <Input
-                      placeholder="Random"
-                      value={seedNumber}
-                      onChange={handleSeedNumberChange}
-                      type="number"
-                      onBlur={handleBlur}
-                    />
-                  </div>
-                </div>
-                <NumberSlider
-                  {...{
-                    min: 1,
-                    max: 30,
-                    name: "cfgScale",
-                    label: "CFG Scale",
-                    onChange,
-                    thumbTip: "CFG Scale",
-                    value: cfgScale,
-                    step: 0.5,
-                  }}
-                />
-                <NumberSlider
-                  {...{
-                    min: 8,
-                    max: 64,
-                    name: "samples",
-                    label: "Samples",
-                    onChange,
-                    thumbTip: "Samples",
-                    value: samples,
-                  }}
-                />
-                {weightPageType === "sd" && (
-                  <SelectModal
-                    modalTitle="Select LoRA Weight"
-                    label="Additional LoRA Weight"
-                    onSelect={handleOnSelect}
-                    tabs={[
-                      {
-                        label: "All LoRA Weights",
-                        tabKey: "allLoraWeights",
-                        typeFilter: "loRA",
-                        searcher: true,
-                        type: "weights",
-                      },
-                      {
-                        label: "Bookmarked",
-                        tabKey: "bookmarkedLoraWeights",
-                        typeFilter: "loRA",
-                        searcher: false,
-                        type: "weights",
-                        onlyBookmarked: true,
-                      },
-                    ]}
+              <TempTextArea
+                {...{
+                  label: "Negative Prompt",
+                  name: "negativePrompt",
+                  placeholder: "Enter a negative prompt",
+                  onChange: handleNegativePromptChange,
+                  value: negativePrompt,
+                }}
+              />
+              <SegmentButtons
+                {...{
+                  label: "Aspect Ratio",
+                  name: "aspectRatio",
+                  onChange,
+                  options: dimensionOpts,
+                  value: aspectRatio,
+                }}
+              />
+              <div>
+                <Label label="Number of Generations" />
+                <PremiumLock
+                  sessionSubscriptionsWrapper={sessionSubscriptionsWrapper}
+                  requiredPlan="pro"
+                >
+                  <SegmentButtons
+                    {...{
+                      name: "batchCount",
+                      onChange,
+                      options: batchCountOpts,
+                      value: batchCount,
+                    }}
                   />
-                )}
+                </PremiumLock>
               </div>
-            </Accordion.Item>
-          </Accordion>
-          <div className="d-flex mt-4 align-items-center flex-wrap gap-4">
-            {isStandalone && (
-              <div className="flex-grow-1">
-                <p className="fs-7">
-                  <span className="opacity-75">
-                    Can't find the model weights you're looking for?
-                  </span>{" "}
-                  <Link to="/upload/sd">Upload your own!</Link>
-                </p>
-              </div>
-            )}
-
-            <div className="d-flex gap-2 justify-content-end flex-grow-1">
-              <Button
-                {...{
-                  label: "Clear/Reset ",
-                  variant: "secondary",
-                  onClick: resetToInitialState,
-                }}
-              />
-              <Button
-                {...{
-                  label: "Generate Image",
-                  disabled: prompt === "" || sdToken === "",
-                  onClick: handleEnqueueImageGen,
-                  isLoading: isEnqueuing,
-                }}
-              />
             </div>
-          </div>
-        </SplitPanel.Body>
 
-        <InferenceJobsList
-          {...{
-            failures,
-            jobType: FrontendInferenceJobType.ImageGeneration,
-          }}
-        />
-      </SplitPanel>
+            <Accordion>
+              <Accordion.Item title="Advanced">
+                <div className="p-3 d-flex flex-column gap-3">
+                  <TempSelect
+                    {...{
+                      label: "Sampler",
+                      name: "sampler",
+                      onChange,
+                      options: samplerOpts,
+                      value: sampler,
+                    }}
+                  />
+                  <div>
+                    <label className="sub-title">Seed</label>
+                    <div className="d-flex gap-2 align-items-center">
+                      <SegmentButtons
+                        {...{
+                          name: "seed",
+                          onChange: handleSeedChange,
+                          options: seedOpts,
+                          value: seed,
+                        }}
+                      />
+                      <Input
+                        placeholder="Random"
+                        value={seedNumber}
+                        onChange={handleSeedNumberChange}
+                        type="number"
+                        onBlur={handleBlur}
+                      />
+                    </div>
+                  </div>
+                  <NumberSlider
+                    {...{
+                      min: 1,
+                      max: 30,
+                      name: "cfgScale",
+                      label: "CFG Scale",
+                      onChange,
+                      thumbTip: "CFG Scale",
+                      value: cfgScale,
+                      step: 0.5,
+                    }}
+                  />
+                  <NumberSlider
+                    {...{
+                      min: 8,
+                      max: 64,
+                      name: "samples",
+                      label: "Samples",
+                      onChange,
+                      thumbTip: "Samples",
+                      value: samples,
+                    }}
+                  />
+                  {weightPageType === "sd" && (
+                    <SelectModal
+                      modalTitle="Select LoRA Weight"
+                      label="Additional LoRA Weight"
+                      onSelect={handleOnSelect}
+                      tabs={[
+                        {
+                          label: "All LoRA Weights",
+                          tabKey: "allLoraWeights",
+                          typeFilter: "loRA",
+                          searcher: true,
+                          type: "weights",
+                        },
+                        {
+                          label: "Bookmarked",
+                          tabKey: "bookmarkedLoraWeights",
+                          typeFilter: "loRA",
+                          searcher: false,
+                          type: "weights",
+                          onlyBookmarked: true,
+                        },
+                      ]}
+                    />
+                  )}
+                </div>
+              </Accordion.Item>
+            </Accordion>
+            <div className="d-flex mt-4 align-items-center flex-wrap gap-4">
+              {isStandalone && (
+                <div className="flex-grow-1">
+                  <p className="fs-7">
+                    <span className="opacity-75">
+                      Can't find the model weights you're looking for?
+                    </span>{" "}
+                    <Link to="/upload/sd">Upload your own!</Link>
+                  </p>
+                </div>
+              )}
 
-      {inferenceJobs[0] ? (
-        <div className={isStandalone ? "mt-4" : "mt-3"}>
+              <div className="d-flex gap-2 justify-content-end flex-grow-1">
+                <Button
+                  {...{
+                    label: "Clear/Reset ",
+                    variant: "secondary",
+                    onClick: resetToInitialState,
+                  }}
+                />
+                <Button
+                  {...{
+                    label: "Generate Image",
+                    disabled: prompt === "" || sdToken === "",
+                    onClick: handleEnqueueImageGen,
+                    isLoading: isEnqueuing,
+                  }}
+                />
+              </div>
+            </div>
+          </SplitPanel.Body>
+
           <InferenceJobsList
             {...{
               failures,
-              value: 0,
               jobType: FrontendInferenceJobType.ImageGeneration,
             }}
           />
-        </div>
-      ) : (
-        <>
-          {isStandalone && (
-            <Panel padding={true} className="mt-4">
-              <div className="d-flex flex-column align-items-center justify-content-center gap-2 py-5 opacity-75">
-                <h4 className="fw-semibold mb-0">
-                  <FontAwesomeIcon icon={faList} className="me-2 fs-5" />
-                  No jobs queued
-                </h4>
+        </SplitPanel>
 
-                <p>Your queued image jobs will appear here.</p>
-              </div>
-            </Panel>
-          )}
-        </>
-      )}
-    </div>
+        {inferenceJobs[0] ? (
+          <div className={isStandalone ? "mt-4" : "mt-3"}>
+            <InferenceJobsList
+              {...{
+                failures,
+                value: 0,
+                jobType: FrontendInferenceJobType.ImageGeneration,
+              }}
+            />
+          </div>
+        ) : (
+          <>
+            {isStandalone && (
+              <Panel padding={true} className="mt-4">
+                <div className="d-flex flex-column align-items-center justify-content-center gap-2 py-5 opacity-75">
+                  <h4 className="fw-semibold mb-0">
+                    <FontAwesomeIcon icon={faList} className="me-2 fs-5" />
+                    No jobs queued
+                  </h4>
+
+                  <p>Your queued image jobs will appear here.</p>
+                </div>
+              </Panel>
+            )}
+          </>
+        )}
+      </div>
+    </PremiumLock>
   );
 }
 
