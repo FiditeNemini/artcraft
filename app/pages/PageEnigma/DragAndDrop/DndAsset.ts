@@ -11,9 +11,10 @@ import {
   currPosition,
   dragItem,
   overTimeline,
+  sidePanelWidth,
   timelineHeight,
 } from "~/pages/PageEnigma/store";
-import { pageHeight } from "~/store";
+import { pageHeight, pageWidth } from "~/store";
 import { addShape } from "~/pages/PageEnigma/store/shape";
 
 class DndAsset {
@@ -55,28 +56,40 @@ class DndAsset {
     }
   }
 
-  onPointerUp() {
+  overCanvas(positionX: number, positionY: number) {
+    if (positionY < 69) {
+      return false;
+    }
+    if (positionY > pageHeight.value - timelineHeight.value) {
+      return false;
+    }
+    return positionX <= pageWidth.value - sidePanelWidth.value - 84;
+  }
+
+  onPointerUp(event: PointerEvent) {
     window.removeEventListener("pointerup", this.onPointerUp);
     window.removeEventListener("pointermove", this.onPointerMove);
-    if (!canDrop.value) {
-      this.endDrag();
-      return;
-    }
 
     if (dragItem.value) {
-      const mediaItem = dragItem.value;
-      if (mediaItem.type === AssetType.CHARACTER) {
-        addCharacter(dragItem.value);
-      }
-      // if (dragItem.value.type === AssetType.CAMERA) {
-      //   console.log("Dragged In Camera Type")
-      // }
-      if (dragItem.value.type === AssetType.OBJECT) {
-        addObject(dragItem.value);
-      }
+      const positionX = event.pageX;
+      const positionY = event.pageY;
+      if (this.overCanvas(positionX, positionY)) {
+        const mediaItem = dragItem.value;
+        if (mediaItem.type === AssetType.CHARACTER) {
+          addCharacter(dragItem.value);
+        }
+        // if (dragItem.value.type === AssetType.CAMERA) {
+        //   console.log("Dragged In Camera Type")
+        // }
+        if (dragItem.value.type === AssetType.OBJECT) {
+          addObject(dragItem.value);
+        }
 
-      if (dragItem.value.type === AssetType.SHAPE) {
-        addShape(dragItem.value);
+        if (dragItem.value.type === AssetType.SHAPE) {
+          addShape(dragItem.value);
+        }
+        this.endDrag();
+        return;
       }
     }
 

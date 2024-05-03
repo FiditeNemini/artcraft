@@ -5,6 +5,7 @@ import { Camera } from "./Camera";
 import { Audio } from "./Audio";
 import { ConfirmationModal } from "~/components/ConfirmationModal";
 import {
+  characterGroup,
   deleteAudioClip,
   deleteCharacterClip,
   filmLength,
@@ -56,7 +57,19 @@ export const Timeline = () => {
     lastSelectedObject.current = selectedObject.value;
     switch (selectedObject.value?.type) {
       case AssetType.CHARACTER:
-        scrollItem(`track-character-${selectedObject.value?.id}`);
+        if (
+          characterGroup.value.characters.some(
+            (character) => character.object_uuid === selectedObject.value?.id,
+          )
+        ) {
+          scrollItem(`track-character-${selectedObject.value?.id}`);
+          break;
+        }
+        if (objectsMinimized.value) {
+          scrollItem("track-objects");
+          break;
+        }
+        scrollItem(`track-object-${selectedObject.value?.id}`);
         break;
       case AssetType.CAMERA:
         scrollItem("track-camera");
@@ -64,9 +77,9 @@ export const Timeline = () => {
       case AssetType.OBJECT:
         if (objectsMinimized.value) {
           scrollItem("track-objects");
-        } else {
-          scrollItem(`track-object-${selectedObject.value?.id}`);
+          break;
         }
+        scrollItem(`track-object-${selectedObject.value?.id}`);
         break;
     }
   }

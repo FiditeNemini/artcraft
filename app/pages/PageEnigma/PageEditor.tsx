@@ -91,29 +91,7 @@ export const PageEditor = () => {
                     84,
                   height: pageHeight.value - timelineHeight.value - 68,
                 }}>
-                <canvas
-                  id="video-scene"
-                  width="1280px"
-                  height="720px"
-                  onPointerOver={() => {
-                    if (
-                      dragItem.value?.type === AssetType.OBJECT ||
-                      dragItem.value?.type === AssetType.SHAPE ||
-                      dragItem.value?.type === AssetType.CHARACTER
-                    ) {
-                      canDrop.value = true;
-                    }
-                  }}
-                  onPointerLeave={() => {
-                    if (
-                      dragItem.value?.type === AssetType.OBJECT ||
-                      dragItem.value?.type === AssetType.SHAPE ||
-                      dragItem.value?.type === AssetType.CHARACTER
-                    ) {
-                      canDrop.value = false;
-                    }
-                  }}
-                />
+                <canvas id="video-scene" width="1280px" height="720px" />
                 {editorState.value === EditorStates.PREVIEW && (
                   <img
                     className="absolute inset-0"
