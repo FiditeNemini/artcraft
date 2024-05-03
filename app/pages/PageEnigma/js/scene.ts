@@ -228,6 +228,24 @@ class Scene {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  setColor(object_uuid: string, hex_color: string) {
+    let object = this.get_object_by_uuid(object_uuid);
+    if(object) {
+      object.userData["color"] = hex_color;
+      object.traverse((c: THREE.Object3D) => {
+        if (c instanceof THREE.Mesh) {
+          if (c.userData["base"] == undefined) {
+            c.userData["base"] = c.material.color.getHex();
+          }
+          var currentColor = new THREE.Color(c.userData["base"]);
+          var tint = new THREE.Color(hex_color);
+          currentColor.multiply(tint);
+          c.material.color.set(new THREE.Color(currentColor));
+        }
+      });
+    }
+  }
+
   async loadGlbWithPlaceholder(
     media_id: string,
     name: string,
@@ -293,6 +311,7 @@ class Scene {
     if (child_result == undefined) {
       throw Error("GLB Did not contain an object or children.");
     }
+
 
     return child_result;
   }

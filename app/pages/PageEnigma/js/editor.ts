@@ -558,6 +558,44 @@ class Editor {
     });
   }
 
+  isObjectLocked(object_uuid: string) {
+    let object = this.activeScene.get_object_by_uuid(object_uuid);
+    if(object){
+      if(object.userData["locked"] == undefined){
+        object.userData["locked"] = false;
+      }
+      return object.userData["locked"];
+    }
+    console.log("No object found.");
+    return false;
+  }
+
+  lockUnlockObject(object_uuid: string) {
+    let object = this.activeScene.get_object_by_uuid(object_uuid);
+    if(object){
+      if(object.userData["locked"] == undefined){
+        object.userData["locked"] = false;
+      }
+      object.userData["locked"] = !object.userData["locked"];
+
+      if(object.userData["locked"]){
+        this.removeTransformControls(false);
+      }
+      else if (this.control) {
+        this.activeScene.scene.add(this.control);
+        this.control.attach(this.selected);
+      }
+      
+      return object.userData["locked"];
+    }
+    console.log("No object found.");
+    return false;
+  }
+
+  setColor(object_uuid: string, hex_color: string) {
+    this.activeScene.setColor(object_uuid, hex_color);
+  }
+
   // TO UPDATE selected objects in the scene might want to add to the scene ...
   async setSelectedObject(position: XYZ, rotation: XYZ, scale: XYZ) {
     if (this.selected != undefined || this.selected != null) {
@@ -625,19 +663,22 @@ class Editor {
    * Doesn't retain those controls.
    * @returns
    */
-  private removeTransformControls() {
-    if (this.control == undefined) {
-      return;
+  private removeTransformControls(remove_outline:boolean=true) {
+      if (this.control == undefined) {
+        return;
+      }
+      if (this.outlinePass == undefined) {
+        return;
+      }
+    if(remove_outline){
+      this.last_selected = this.selected;
+      this.selected = undefined;
+      this.publishSelect();
     }
-    if (this.outlinePass == undefined) {
-      return;
-    }
-    this.last_selected = this.selected;
-    this.selected = undefined;
-    this.publishSelect();
     this.control.detach();
     this.activeScene.scene.remove(this.control);
-    this.outlinePass.selectedObjects = [];
+    if(remove_outline)
+      this.outlinePass.selectedObjects = [];
   }
 
   switchCameraView() {

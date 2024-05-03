@@ -1,9 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useId, useState } from "react";
 import { Transition } from "@headlessui/react";
 import {
   faChevronDown,
   faChevronUp,
   faCube,
+  faLock,
+  faLockOpen,
   faTrash,
 } from "@fortawesome/pro-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -65,6 +67,12 @@ export const ControlPanelSceneObject = () => {
   // used to update engine object
   const [inputsUpdated, inputsUpdatedSet] = useState(false);
   const [inputsFocused, inputsFocusedSet] = useState(false);
+
+  const [locked, lockedSet] = useState(false);
+
+  const [color, colorSet] = useState("#ffffff");
+
+  const colorInputId = useId();
 
   // clears leading and trailing zeros
   const sanitizeNumericInput = (input: string): number => {
@@ -132,7 +140,7 @@ export const ControlPanelSceneObject = () => {
 
   useEffect(() => {
     const isCurrentObj =
-      appUiState.controlPanel.currentSceneObject.object_uuid === initializedObj;
+      (editorEngine?.selected?.uuid || "") === initializedObj;
     // TODO this causes a subtle bug because it renders way too many times.
     if (!appUiState.controlPanel.currentSceneObject) {
       return;
@@ -175,11 +183,19 @@ export const ControlPanelSceneObject = () => {
       localPositionSet(numsToStrings(vectors.position));
       localRotationSet(numsToStrings(vectors.rotation));
       localScaleSet(numsToStrings(vectors.scale));
+
+      lockedSet(
+        editorEngine.isObjectLocked(editorEngine?.selected?.uuid || ""),
+      );
+      colorSet(editorEngine?.selected?.userData.color);
     } else if (!appUiState.controlPanel.isShowing && isCurrentObj) {
       initializedObjSet("");
       localPositionSet(defaultAxises);
       localRotationSet(defaultAxises);
       localScaleSet(defaultAxises);
+
+      lockedSet(false);
+      colorSet("#ffffff");
     }
 
     // updating engine if values originate from the inputs and are valid
@@ -212,6 +228,11 @@ export const ControlPanelSceneObject = () => {
   ) {
     return null;
   }
+
+  const toggleLock = () => {
+    lockedSet((lockState: boolean) => !lockState);
+    editorEngine.lockUnlockObject(editorEngine?.selected?.uuid || "");
+  };
 
   const handlePositionChange = (xyz: XYZ) => {
     localPositionSet(xyz);
@@ -398,6 +419,35 @@ export const ControlPanelSceneObject = () => {
         leaveFrom="opacity-100 max-h-96"
         leaveTo="opacity-0 max-h-0"
         className={"flex flex-col gap-2 overflow-y-auto"}>
+        <Button
+          variant="secondary"
+          icon={locked ? faLockOpen : faLock}
+          onClick={toggleLock}>
+          {locked ? "Unlock" : "Lock"} object
+        </Button>
+
+        <div className="flex flex-col gap-1">
+          <H5>Color</H5>
+          <input
+            className="h-0 w-0 cursor-pointer opacity-0"
+            id={colorInputId}
+            onChange={(e: React.ChangeEvent) => {
+              editorEngine.setColor(
+                editorEngine?.selected?.uuid || "",
+                e.target.value,
+              );
+              colorSet(e.target.value);
+            }}
+            type="color"
+            value={color}
+          />
+          <Button
+            className="cursor-pointer p-3.5"
+            htmlFor={colorInputId}
+            style={{
+              backgroundColor: color,
+            }}></Button>
+        </div>
         <div className="flex flex-col gap-1">
           <H5>Location</H5>
           <InputVector
