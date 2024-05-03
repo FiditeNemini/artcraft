@@ -7,10 +7,12 @@ import {
 } from "~/pages/PageEnigma/store";
 
 interface InputVectorProps {
-  x: number;
-  y: number;
-  z: number;
-  onChange: (v: { x: number; y: number; z: number }) => void;
+  x: string;
+  y: string;
+  z: string;
+  onBlur: () => void;
+  onFocus: () => void;
+  onChange: (v: { x: string; y: string; z: string }) => void;
   increment?: number;
 }
 
@@ -18,6 +20,8 @@ export const InputVector = ({
   x,
   y,
   z,
+  onBlur,
+  onFocus,
   onChange,
   increment = 0.1,
 }: InputVectorProps) => {
@@ -31,14 +35,24 @@ export const InputVector = ({
   const wrapperCommonClasses =
     "relative flex items-center before:inline-block before:h-6 before:bg-brand-primary before:text-white before:rounded-l-lg before:w-1.5 before:text-center before:justify-center before:items-center before:font-semibold before:flex before:align-middle before:leading-8 text-xs";
 
-  function handleOnChange() {
-    const newVector = {
-      x: xRef.current.value === "" ? "" : Number(xRef.current?.value),
-      y: yRef.current.value === "" ? "" : Number(yRef.current?.value),
-      z: zRef.current.value === "" ? "" : Number(zRef.current?.value),
-    };
+  function handleOnChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (
+      xRef.current !== null &&
+      yRef.current !== null &&
+      zRef.current !== null
+    ) {
+      const inputStr = e.target.value;
 
-    onChange(newVector);
+      const newVector: { [key: string]: string } = {
+        x: xRef.current.value,
+        y: yRef.current.value,
+        z: zRef.current.value,
+      };
+
+      newVector[e.target.name] = inputStr;
+
+      onChange(newVector);
+    }
   }
 
   const blurAllInputs = () => {
@@ -66,15 +80,17 @@ export const InputVector = ({
       const currentValue = Number(ref.current?.value) || 0;
       const newValue = currentValue + direction * increment;
 
+      // onFocus();
+
       if (ref.current) {
         ref.current.value = newValue.toFixed(1);
         ref.current.blur();
       }
 
       onChange({
-        x: Number(xRef.current?.value) || 0,
-        y: Number(yRef.current?.value) || 0,
-        z: Number(zRef.current?.value) || 0,
+        x: xRef.current?.value || "",
+        y: yRef.current?.value || "",
+        z: zRef.current?.value || "",
       });
     };
 
@@ -82,6 +98,7 @@ export const InputVector = ({
       document.removeEventListener("mousemove", mouseMoveHandler);
       document.removeEventListener("mouseup", mouseUpHandler);
       if (!isDragging) {
+        // onBlur();
         ref.current?.focus();
         ref.current?.select();
       }
@@ -98,18 +115,29 @@ export const InputVector = ({
   };
 
   return (
-    <div className="translation-panel flex w-full flex-col justify-between gap-1.5">
+    <div className="flex w-full flex-col justify-between gap-1.5">
       <span className={twMerge(wrapperCommonClasses, "before:bg-axis-x")}>
         <div className="absolute left-3.5 z-10 font-semibold">X</div>
         <input
           className={twMerge(inputCommonClasses, "focus:outline-axis-x")}
-          type="number"
+          type="text"
+          name="x"
           onChange={handleOnChange}
           ref={xRef}
           value={x}
-          onFocus={() => disableHotkeyInput(DomLevels.INPUT)}
-          onBlur={() => enableHotkeyInput(DomLevels.INPUT)}
-          onMouseDown={(e) => handleMouseDown(e, xRef)}
+          onFocus={() => {
+            disableHotkeyInput(DomLevels.INPUT);
+            onFocus();
+          }}
+          onBlur={() => {
+            enableHotkeyInput(DomLevels.INPUT);
+            onBlur();
+          }}
+          onMouseDown={(e) => {
+            onFocus();
+            handleMouseDown(e, xRef);
+          }}
+          onMouseUp={() => onBlur()}
           onKeyDown={handleKeyDown}
         />
       </span>
@@ -117,13 +145,24 @@ export const InputVector = ({
         <div className="absolute left-3.5 z-10 font-semibold">Y</div>
         <input
           className={twMerge(inputCommonClasses, "focus:outline-axis-y")}
-          type="number"
+          type="text"
+          name="y"
           onChange={handleOnChange}
           ref={yRef}
           value={y}
-          onFocus={() => disableHotkeyInput(DomLevels.INPUT)}
-          onBlur={() => enableHotkeyInput(DomLevels.INPUT)}
-          onMouseDown={(e) => handleMouseDown(e, yRef)}
+          onFocus={() => {
+            disableHotkeyInput(DomLevels.INPUT);
+            onFocus();
+          }}
+          onBlur={() => {
+            enableHotkeyInput(DomLevels.INPUT);
+            onBlur();
+          }}
+          onMouseDown={(e) => {
+            onFocus();
+            handleMouseDown(e, yRef);
+          }}
+          onMouseUp={() => onBlur()}
           onKeyDown={handleKeyDown}
         />
       </span>
@@ -131,13 +170,24 @@ export const InputVector = ({
         <div className="absolute left-3.5 z-10 font-semibold">Z</div>
         <input
           className={twMerge(inputCommonClasses, "focus:outline-axis-z")}
-          type="number"
+          type="text"
+          name="z"
           onChange={handleOnChange}
           ref={zRef}
           value={z}
-          onFocus={() => disableHotkeyInput(DomLevels.INPUT)}
-          onBlur={() => enableHotkeyInput(DomLevels.INPUT)}
-          onMouseDown={(e) => handleMouseDown(e, zRef)}
+          onFocus={() => {
+            disableHotkeyInput(DomLevels.INPUT);
+            onFocus();
+          }}
+          onBlur={() => {
+            enableHotkeyInput(DomLevels.INPUT);
+            onBlur();
+          }}
+          onMouseDown={(e) => {
+            onFocus();
+            handleMouseDown(e, zRef);
+          }}
+          onMouseUp={() => onBlur()}
           onKeyDown={handleKeyDown}
         />
       </span>
