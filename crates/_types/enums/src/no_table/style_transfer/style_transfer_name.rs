@@ -45,7 +45,45 @@ pub enum StyleTransferName {
   #[serde(rename = "anime_retro_neon")]
   AnimeRetroNeon,
   #[serde(rename = "anime_standard")]
-  AnimeStandard
+  AnimeStandard,
+
+  // New Styles (2024-05-03)
+
+  #[serde(rename = "hr_giger")]
+  HrGiger,
+  #[serde(rename = "simpsons")]
+  Simpsons,
+  #[serde(rename = "carnage")]
+  Carnage,
+  #[serde(rename = "pastel_cute_anime")] // TODO: Rename
+  AnimePastelCute,
+  #[serde(rename = "bloom_lighting")]
+  BloomLighting,
+  #[serde(rename = "25d_horror")] // TODO: Rename
+  Horror2_5D,
+  #[serde(rename = "creepy")]
+  Creepy,
+  #[serde(rename = "creepy_vhs")]
+  CreepyVhs,
+  #[serde(rename = "trail_cam_footage")]
+  TrailCamFootage,
+  #[serde(rename = "old_black_white_movie")]
+  OldBlackWhiteMovie,
+  #[serde(rename = "horror_noir_black_white")]
+  HorrorNoirBlackWhite,
+  #[serde(rename = "techno_noir_black_white")]
+  TechnoNoirBlackWhite,
+  #[serde(rename = "black_white_20s")]
+  BlackWhite20s,
+  #[serde(rename = "cyberpunk_anime")]
+  CyberpunkAnime,
+  #[serde(rename = "dragonball")]
+  Dragonball,
+  #[serde(rename = "realistic_matrix")]
+  RealisticMatrix,
+  #[serde(rename = "realistic_cyberpunk")]
+  RealisticCyberpunk,
+
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -73,6 +111,25 @@ impl StyleTransferName {
         Self::Realistic2 => "realistic_2",
         Self::AnimeRetroNeon => "anime_retro_neon",
         Self::AnimeStandard => "anime_standard",
+
+        // New Styles (2024-05-03)
+        Self::HrGiger => "hr_giger",
+        Self::Simpsons => "simpsons",
+        Self::Carnage => "carnage",
+        Self::AnimePastelCute => "pastel_cute_anime", // TODO: Rename
+        Self::BloomLighting => "bloom_lighting",
+        Self::Horror2_5D => "25d_horror", // TODO: Rename
+        Self::Creepy => "creepy",
+        Self::CreepyVhs => "creepy_vhs",
+        Self::TrailCamFootage => "trail_cam_footage",
+        Self::OldBlackWhiteMovie => "old_black_white_movie",
+        Self::HorrorNoirBlackWhite => "horror_noir_black_white",
+        Self::TechnoNoirBlackWhite => "techno_noir_black_white",
+        Self::BlackWhite20s => "black_white_20s",
+        Self::CyberpunkAnime => "cyberpunk_anime",
+        Self::Dragonball => "dragonball",
+        Self::RealisticMatrix => "realistic_matrix",
+        Self::RealisticCyberpunk => "realistic_cyberpunk",
     }
   }
 
@@ -94,6 +151,24 @@ impl StyleTransferName {
       "realistic_2" => Ok(Self::Realistic2),
       "anime_retro_neon" => Ok(Self::AnimeRetroNeon),
       "anime_standard" => Ok(Self::AnimeStandard),
+      // New styles
+      "hr_giger" => Ok(Self::HrGiger),
+      "simpsons" => Ok(Self::Simpsons),
+      "carnage" => Ok(Self::Carnage),
+      "pastel_cute_anime" => Ok(Self::AnimePastelCute), // TODO: Rename
+      "bloom_lighting" => Ok(Self::BloomLighting),
+      "25d_horror" => Ok(Self::Horror2_5D), // TODO: Rename
+      "creepy" => Ok(Self::Creepy),
+      "creepy_vhs" => Ok(Self::CreepyVhs),
+      "trail_cam_footage" => Ok(Self::TrailCamFootage),
+      "old_black_white_movie" => Ok(Self::OldBlackWhiteMovie),
+      "horror_noir_black_white" => Ok(Self::HorrorNoirBlackWhite),
+      "techno_noir_black_white" => Ok(Self::TechnoNoirBlackWhite),
+      "black_white_20s" => Ok(Self::BlackWhite20s),
+      "cyberpunk_anime" => Ok(Self::CyberpunkAnime),
+      "dragonball" => Ok(Self::Dragonball),
+      "realistic_matrix" => Ok(Self::RealisticMatrix),
+      "realistic_cyberpunk" => Ok(Self::RealisticCyberpunk),
       _ => Err(format!("Unknown StyleTransferName: {}", value)),
     }
   }
@@ -116,6 +191,24 @@ impl StyleTransferName {
       Self::Realistic2 => "14_realistic_2.json",
       Self::AnimeRetroNeon => "15_retro_neon_anime_90.json",
       Self::AnimeStandard => "16_standard_anime_model.json",
+
+      Self::HrGiger => "17_hr_giger.json",
+      Self::Simpsons => "18_simpsons.json",
+      Self::Carnage => "19_carnage.json",
+      Self::AnimePastelCute => "20_pastel_cute_anime.json",
+      Self::BloomLighting => "21_bloom_lighting.json",
+      Self::Horror2_5D => "22_25d_Horror.json",
+      Self::Creepy => "23_creepy.json",
+      Self::CreepyVhs => "24_creepy_vhs.json",
+      Self::TrailCamFootage => "25_trail_cam_footage.json",
+      Self::OldBlackWhiteMovie => "26_old_black_white_movie.json",
+      Self::HorrorNoirBlackWhite => "27_horror_noir_black_white.json",
+      Self::TechnoNoirBlackWhite => "28_techno_noir_black_white.json",
+      Self::BlackWhite20s => "29_black_white_20s.json",
+      Self::CyberpunkAnime => "30_cyberpunk_anime.json",
+      Self::Dragonball => "31_dragonball.json",
+      Self::RealisticMatrix => "32_realistic_matrix.json",
+      Self::RealisticCyberpunk => "33_realistic_cyberpunk.json",
     }
   }
 
@@ -139,6 +232,24 @@ impl StyleTransferName {
       Self::Realistic2,
       Self::AnimeRetroNeon,
       Self::AnimeStandard,
+
+      Self::HrGiger,
+      Self::Simpsons,
+      Self::Carnage,
+      Self::AnimePastelCute,
+      Self::BloomLighting,
+      Self::Horror2_5D,
+      Self::Creepy,
+      Self::CreepyVhs,
+      Self::TrailCamFootage,
+      Self::OldBlackWhiteMovie,
+      Self::HorrorNoirBlackWhite,
+      Self::TechnoNoirBlackWhite,
+      Self::BlackWhite20s,
+      Self::CyberpunkAnime,
+      Self::Dragonball,
+      Self::RealisticMatrix,
+      Self::RealisticCyberpunk,
     ])
   }
 }
@@ -153,22 +264,40 @@ mod tests {
 
     #[test]
     fn test_serialization() {
-      assert_serialization(StyleTransferName::Anime2_5D, r#"anime_2_5d"#);
-      assert_serialization(StyleTransferName::Anime2DFlat, r#"anime_2d_flat"#);
-      assert_serialization(StyleTransferName::Cartoon3D, r#"cartoon_3d"#);
-      assert_serialization(StyleTransferName::ComicBook, r#"comic_book"#);
-      assert_serialization(StyleTransferName::AnimeGhibli, r#"anime_ghibli"#);
-      assert_serialization(StyleTransferName::InkPunk, r#"ink_punk"#);
-      assert_serialization(StyleTransferName::InkSplash, r#"ink_splash"#);
-      assert_serialization(StyleTransferName::InkBWStyle, r#"ink_bw_style"#);
-      assert_serialization(StyleTransferName::JojoStyle, r#"jojo_style"#);
-      assert_serialization(StyleTransferName::PaperOrigami, r#"paper_origami"#);
-      assert_serialization(StyleTransferName::PixelArt, r#"pixel_art"#);
-      assert_serialization(StyleTransferName::PopArt, r#"pop_art"#);
-      assert_serialization(StyleTransferName::Realistic1, r#"realistic_1"#);
-      assert_serialization(StyleTransferName::Realistic2, r#"realistic_2"#);
-      assert_serialization(StyleTransferName::AnimeRetroNeon, r#"anime_retro_neon"#);
-      assert_serialization(StyleTransferName::AnimeStandard, r#"anime_standard"#);
+      assert_serialization(StyleTransferName::Anime2_5D, "anime_2_5d");
+      assert_serialization(StyleTransferName::Anime2DFlat, "anime_2d_flat");
+      assert_serialization(StyleTransferName::Cartoon3D, "cartoon_3d");
+      assert_serialization(StyleTransferName::ComicBook, "comic_book");
+      assert_serialization(StyleTransferName::AnimeGhibli, "anime_ghibli");
+      assert_serialization(StyleTransferName::InkPunk, "ink_punk");
+      assert_serialization(StyleTransferName::InkSplash, "ink_splash");
+      assert_serialization(StyleTransferName::InkBWStyle, "ink_bw_style");
+      assert_serialization(StyleTransferName::JojoStyle, "jojo_style");
+      assert_serialization(StyleTransferName::PaperOrigami, "paper_origami");
+      assert_serialization(StyleTransferName::PixelArt, "pixel_art");
+      assert_serialization(StyleTransferName::PopArt, "pop_art");
+      assert_serialization(StyleTransferName::Realistic1, "realistic_1");
+      assert_serialization(StyleTransferName::Realistic2, "realistic_2");
+      assert_serialization(StyleTransferName::AnimeRetroNeon, "anime_retro_neon");
+      assert_serialization(StyleTransferName::AnimeStandard, "anime_standard");
+
+      assert_serialization(StyleTransferName::HrGiger, "hr_giger");
+      assert_serialization(StyleTransferName::Simpsons, "simpsons");
+      assert_serialization(StyleTransferName::Carnage, "carnage");
+      assert_serialization(StyleTransferName::AnimePastelCute, "pastel_cute_anime");
+      assert_serialization(StyleTransferName::BloomLighting, "bloom_lighting");
+      assert_serialization(StyleTransferName::Horror2_5D, "25d_horror");
+      assert_serialization(StyleTransferName::Creepy, "creepy");
+      assert_serialization(StyleTransferName::CreepyVhs, "creepy_vhs");
+      assert_serialization(StyleTransferName::TrailCamFootage, "trail_cam_footage");
+      assert_serialization(StyleTransferName::OldBlackWhiteMovie, "old_black_white_movie");
+      assert_serialization(StyleTransferName::HorrorNoirBlackWhite, "horror_noir_black_white");
+      assert_serialization(StyleTransferName::TechnoNoirBlackWhite, "techno_noir_black_white");
+      assert_serialization(StyleTransferName::BlackWhite20s, "black_white_20s");
+      assert_serialization(StyleTransferName::CyberpunkAnime, "cyberpunk_anime");
+      assert_serialization(StyleTransferName::Dragonball, "dragonball");
+      assert_serialization(StyleTransferName::RealisticMatrix, "realistic_matrix");
+      assert_serialization(StyleTransferName::RealisticCyberpunk, "realistic_cyberpunk");
     }
 
     mod impl_methods {
@@ -192,6 +321,24 @@ mod tests {
         assert_eq!(StyleTransferName::Realistic2.to_str(), "realistic_2");
         assert_eq!(StyleTransferName::AnimeRetroNeon.to_str(), "anime_retro_neon");
         assert_eq!(StyleTransferName::AnimeStandard.to_str(), "anime_standard");
+
+        assert_eq!(StyleTransferName::HrGiger.to_str(), "hr_giger");
+        assert_eq!(StyleTransferName::Simpsons.to_str(), "simpsons");
+        assert_eq!(StyleTransferName::Carnage.to_str(), "carnage");
+        assert_eq!(StyleTransferName::AnimePastelCute.to_str(), "pastel_cute_anime");
+        assert_eq!(StyleTransferName::BloomLighting.to_str(), "bloom_lighting");
+        assert_eq!(StyleTransferName::Horror2_5D.to_str(), "25d_horror");
+        assert_eq!(StyleTransferName::Creepy.to_str(), "creepy");
+        assert_eq!(StyleTransferName::CreepyVhs.to_str(), "creepy_vhs");
+        assert_eq!(StyleTransferName::TrailCamFootage.to_str(), "trail_cam_footage");
+        assert_eq!(StyleTransferName::OldBlackWhiteMovie.to_str(), "old_black_white_movie");
+        assert_eq!(StyleTransferName::HorrorNoirBlackWhite.to_str(), "horror_noir_black_white");
+        assert_eq!(StyleTransferName::TechnoNoirBlackWhite.to_str(), "techno_noir_black_white");
+        assert_eq!(StyleTransferName::BlackWhite20s.to_str(), "black_white_20s");
+        assert_eq!(StyleTransferName::CyberpunkAnime.to_str(), "cyberpunk_anime");
+        assert_eq!(StyleTransferName::Dragonball.to_str(), "dragonball");
+        assert_eq!(StyleTransferName::RealisticMatrix.to_str(), "realistic_matrix");
+        assert_eq!(StyleTransferName::RealisticCyberpunk.to_str(), "realistic_cyberpunk");
       }
 
       #[test]
@@ -212,6 +359,25 @@ mod tests {
         assert_eq!(StyleTransferName::from_str("realistic_2").unwrap(), StyleTransferName::Realistic2);
         assert_eq!(StyleTransferName::from_str("anime_retro_neon").unwrap(), StyleTransferName::AnimeRetroNeon);
         assert_eq!(StyleTransferName::from_str("anime_standard").unwrap(), StyleTransferName::AnimeStandard);
+
+        assert_eq!(StyleTransferName::from_str("hr_giger").unwrap(), StyleTransferName::HrGiger);
+        assert_eq!(StyleTransferName::from_str("simpsons").unwrap(), StyleTransferName::Simpsons);
+        assert_eq!(StyleTransferName::from_str("carnage").unwrap(), StyleTransferName::Carnage);
+        assert_eq!(StyleTransferName::from_str("pastel_cute_anime").unwrap(), StyleTransferName::AnimePastelCute);
+        assert_eq!(StyleTransferName::from_str("bloom_lighting").unwrap(), StyleTransferName::BloomLighting);
+        assert_eq!(StyleTransferName::from_str("25d_horror").unwrap(), StyleTransferName::Horror2_5D);
+        assert_eq!(StyleTransferName::from_str("creepy").unwrap(), StyleTransferName::Creepy);
+        assert_eq!(StyleTransferName::from_str("creepy_vhs").unwrap(), StyleTransferName::CreepyVhs);
+        assert_eq!(StyleTransferName::from_str("trail_cam_footage").unwrap(), StyleTransferName::TrailCamFootage);
+        assert_eq!(StyleTransferName::from_str("old_black_white_movie").unwrap(), StyleTransferName::OldBlackWhiteMovie);
+        assert_eq!(StyleTransferName::from_str("horror_noir_black_white").unwrap(), StyleTransferName::HorrorNoirBlackWhite);
+        assert_eq!(StyleTransferName::from_str("techno_noir_black_white").unwrap(), StyleTransferName::TechnoNoirBlackWhite);
+        assert_eq!(StyleTransferName::from_str("black_white_20s").unwrap(), StyleTransferName::BlackWhite20s);
+        assert_eq!(StyleTransferName::from_str("cyberpunk_anime").unwrap(), StyleTransferName::CyberpunkAnime);
+        assert_eq!(StyleTransferName::from_str("dragonball").unwrap(), StyleTransferName::Dragonball);
+        assert_eq!(StyleTransferName::from_str("realistic_matrix").unwrap(), StyleTransferName::RealisticMatrix);
+        assert_eq!(StyleTransferName::from_str("realistic_cyberpunk").unwrap(), StyleTransferName::RealisticCyberpunk);
+
         assert!(StyleTransferName::from_str("foo").is_err());
       }
     }
@@ -222,7 +388,7 @@ mod tests {
       #[test]
       fn all_variants() {
         let variants = StyleTransferName::all_variants();
-        assert_eq!(variants.len(), 16);
+        assert_eq!(variants.len(), 33);
       }
     }
 
