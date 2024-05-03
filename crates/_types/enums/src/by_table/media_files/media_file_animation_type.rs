@@ -58,6 +58,14 @@ pub enum MediaFileAnimationType {
   /// Body: Animation or rig for Rigify.
   /// Face: Animation blendshapes for ARKit.
   RigifyArKit,
+
+  /// Body: Animation or rig for Rokoko.
+  /// Face: No face animation.
+  Rokoko,
+
+  /// Body: Animation or rig for Rokoko.
+  /// Face: Animation blendshapes for ARKit.
+  RokokoArKit,
 }
 
 // TODO(bt, 2022-12-21): This desperately needs MySQL integration tests!
@@ -80,6 +88,8 @@ impl MediaFileAnimationType {
       Self::MoveAiArKit => "move_ai_ar_kit",
       Self::Rigify => "rigify",
       Self::RigifyArKit => "rigify_ar_kit",
+      Self::Rokoko => "rokoko",
+      Self::RokokoArKit => "rokoko_ar_kit",
     }
   }
 
@@ -96,6 +106,8 @@ impl MediaFileAnimationType {
       "move_ai_ar_kit" => Ok(Self::MoveAiArKit),
       "rigify" => Ok(Self::Rigify),
       "rigify_ar_kit" => Ok(Self::RigifyArKit),
+      "rokoko" => Ok(Self::Rokoko),
+      "rokoko_ar_kit" => Ok(Self::RokokoArKit),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -115,6 +127,8 @@ impl MediaFileAnimationType {
       Self::MoveAiArKit,
       Self::Rigify,
       Self::RigifyArKit,
+      Self::Rokoko,
+      Self::RokokoArKit,
     ])
   }
 }
@@ -140,6 +154,8 @@ mod tests {
       assert_serialization(MediaFileAnimationType::MoveAiArKit, "move_ai_ar_kit");
       assert_serialization(MediaFileAnimationType::Rigify, "rigify");
       assert_serialization(MediaFileAnimationType::RigifyArKit, "rigify_ar_kit");
+      assert_serialization(MediaFileAnimationType::Rokoko, "rokoko");
+      assert_serialization(MediaFileAnimationType::RokokoArKit, "rokoko_ar_kit");
     }
 
     #[test]
@@ -155,6 +171,8 @@ mod tests {
       assert_eq!(MediaFileAnimationType::MoveAiArKit.to_str(), "move_ai_ar_kit");
       assert_eq!(MediaFileAnimationType::Rigify.to_str(), "rigify");
       assert_eq!(MediaFileAnimationType::RigifyArKit.to_str(), "rigify_ar_kit");
+      assert_eq!(MediaFileAnimationType::Rokoko.to_str(), "rokoko");
+      assert_eq!(MediaFileAnimationType::RokokoArKit.to_str(), "rokoko_ar_kit");
     }
 
     #[test]
@@ -170,13 +188,15 @@ mod tests {
       assert_eq!(MediaFileAnimationType::from_str("move_ai_ar_kit").unwrap(), MediaFileAnimationType::MoveAiArKit);
       assert_eq!(MediaFileAnimationType::from_str("rigify").unwrap(), MediaFileAnimationType::Rigify);
       assert_eq!(MediaFileAnimationType::from_str("rigify_ar_kit").unwrap(), MediaFileAnimationType::RigifyArKit);
+      assert_eq!(MediaFileAnimationType::from_str("rokoko").unwrap(), MediaFileAnimationType::Rokoko);
+      assert_eq!(MediaFileAnimationType::from_str("rokoko_ar_kit").unwrap(), MediaFileAnimationType::RokokoArKit);
       assert!(MediaFileAnimationType::from_str("foo").is_err());
     }
 
     #[test]
     fn all_variants() {
       let mut variants = MediaFileAnimationType::all_variants();
-      assert_eq!(variants.len(), 11);
+      assert_eq!(variants.len(), 13);
       assert_eq!(variants.pop_first(), Some(MediaFileAnimationType::ArKit));
       assert_eq!(variants.pop_first(), Some(MediaFileAnimationType::MikuMikuDance));
       assert_eq!(variants.pop_first(), Some(MediaFileAnimationType::MikuMikuDanceArKit));
@@ -188,6 +208,8 @@ mod tests {
       assert_eq!(variants.pop_first(), Some(MediaFileAnimationType::MoveAiArKit));
       assert_eq!(variants.pop_first(), Some(MediaFileAnimationType::Rigify));
       assert_eq!(variants.pop_first(), Some(MediaFileAnimationType::RigifyArKit));
+      assert_eq!(variants.pop_first(), Some(MediaFileAnimationType::Rokoko));
+      assert_eq!(variants.pop_first(), Some(MediaFileAnimationType::RokokoArKit));
       assert_eq!(variants.pop_first(), None);
     }
   }
