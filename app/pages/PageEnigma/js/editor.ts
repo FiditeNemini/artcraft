@@ -24,7 +24,7 @@ import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
-import { APPUI_ACTION_TYPES, AppUiState, AppUiAction } from "../../../reducers";
+import { APPUI_ACTION_TYPES, AppUiAction } from "../../../reducers";
 import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 
 import { XYZ } from "../datastructures/common";
@@ -46,7 +46,7 @@ import { AuthState } from "~/contexts/Authentication/types";
 
 export type EditorConstructorConfig = {
   dispatchAppUiState: React.Dispatch<AppUiAction>;
-  signalScene: (data:any)=>void;
+  signalScene: (data: any) => void;
   authState: AuthState;
 };
 
@@ -119,7 +119,7 @@ class Editor {
 
   dispatchAppUiState: React.Dispatch<AppUiAction>;
   authState: AuthState;
-  signalScene: ((data:any)=>void);
+  signalScene: (data: any) => void;
   render_width: number;
   render_height: number;
 
@@ -144,7 +144,7 @@ class Editor {
     dispatchAppUiState,
     signalScene,
     authState,
-  }:EditorConstructorConfig) {
+  }: EditorConstructorConfig) {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
     );
@@ -271,9 +271,7 @@ class Editor {
     );
   }
 
-  initialize({
-    sceneToken
-  }:EditorInitializeConfig) {
+  initialize({ sceneToken }: EditorInitializeConfig) {
     if (this.can_initialize == false) {
       console.log("Editor Already Initialized");
       return;
@@ -440,7 +438,7 @@ class Editor {
 
     if (this.isEmpty(sceneToken) == false) {
       this.loadScene(sceneToken);
-    }else{
+    } else {
       this.signalScene({
         title: "Untitled New Scene",
         token: undefined,
@@ -476,7 +474,7 @@ class Editor {
     loadingBarIsShowing.value = false;
   }
 
-  public async newScene(sceneTitleInput:string) {
+  public async newScene(sceneTitleInput: string) {
     this.activeScene.clear();
     this.audio_engine = new AudioEngine();
     this.emotion_engine = new EmotionEngine(this.version);
@@ -497,13 +495,16 @@ class Editor {
       this.camera_name,
     );
     this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
-    const sceneTitle = sceneTitleInput && sceneTitleInput!=="" ? sceneTitleInput : "Untitled New Scene";
+    const sceneTitle =
+      sceneTitleInput && sceneTitleInput !== ""
+        ? sceneTitleInput
+        : "Untitled New Scene";
     this.signalScene({
       title: sceneTitle,
       token: undefined,
       ownerToken: this.authState.userInfo?.user_token,
-      isModified: false
-    })
+      isModified: false,
+    });
   }
 
   // Token comes in from the front end to load the scene from the site.
@@ -1400,20 +1401,26 @@ class Editor {
     }
   }
 
-  onkeydown(event: any) {
+  onkeydown(event: KeyboardEvent) {
+    console.log("down");
     if (event.key === "f" && this.selected && this.orbitControls) {
       this.orbitControls.target.copy(this.selected.position);
       this.orbitControls.maxDistance = 4;
       this.orbitControls.update();
       this.orbitControls.maxDistance = 999;
-    } else if (event.key === " ") {
-      if (
-        this.rendering == false &&
-        this.switchPreviewToggle == false &&
-        this.selectedCanvas
-      ) {
+      return;
+    }
+    if (event.key === " ") {
+      if (!this.rendering && !this.switchPreviewToggle && this.selectedCanvas) {
         this.togglePlayback();
       }
+      return;
+    }
+    if (event.key === "Backspace" || event.key === "Delete") {
+      if (this.selected) {
+        this.deleteObject(this.selected.uuid);
+      }
+      return;
     }
   }
 
