@@ -58,9 +58,12 @@ export default function PremiumLock({
                 className={`me-2 ${large ? "fs-4" : "fs-5"}`}
               />
               {requiredPlan === "any" ? (
-                <span className="lead fw-medium">
+                <span className={`${large ? "lead fw-medium" : ""}`}>
                   This feature requires a{" "}
-                  <Link to="/pricing" className="lead fw-medium">
+                  <Link
+                    to="/pricing"
+                    className={`${large ? "lead fw-medium" : ""}`}
+                  >
                     subscription plan.
                   </Link>
                 </span>

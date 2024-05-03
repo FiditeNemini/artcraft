@@ -4,7 +4,13 @@ import { Spinner } from "components/common";
 import { springs } from "resources";
 import DynamicButton from "./DynamicButton";
 
-const ProgressLi = ({ children, disabled = false }: { children?: any; disabled?: boolean; }) => {
+const ProgressLi = ({
+  children,
+  disabled = false,
+}: {
+  children?: any;
+  disabled?: boolean;
+}) => {
   const style = useSpring({
     ...springs.soft,
     opacity: disabled ? 0.25 : 1,
@@ -31,10 +37,22 @@ const ProgressLi = ({ children, disabled = false }: { children?: any; disabled?:
 };
 
 export default function FaceAnimatorTitle({ ...rest }) {
-  const { audioProps,  audioReady, clearInputs, imageProps, imageReady, indexSet, page, presetAudio, 
+  const {
+    audioProps,
+    audioReady,
+    clearInputs,
+    imageProps,
+    imageReady,
+    indexSet,
+    page,
+    presetAudio,
     preferPresetAudio,
-    submit, t } = rest;
-  const noAudio = (preferPresetAudio && !presetAudio) || (!preferPresetAudio && (!audioReady || !audioProps.file));
+    submit,
+    t,
+  } = rest;
+  const noAudio =
+    (preferPresetAudio && !presetAudio) ||
+    (!preferPresetAudio && (!audioReady || !audioProps.file));
   const noImg = !imageReady || !imageProps.file;
   const incomplete = noAudio || noImg;
 
@@ -52,7 +70,7 @@ export default function FaceAnimatorTitle({ ...rest }) {
   };
 
   return (
-    <div {...{ className: "progress-header" }}>
+    <div {...{ className: "progress-header mt-3 mb-5" }}>
       <h1
         {...{ className: "fw-bold text-center text-md-start progress-heading" }}
       >
@@ -73,7 +91,9 @@ export default function FaceAnimatorTitle({ ...rest }) {
           index: page,
         }}
       />
-      <p {...{ className: "progress-description fa-light-txt" }}>{t("headings.subtitle")}</p>
+      <p {...{ className: "progress-description fa-light-txt" }}>
+        {t("headings.subtitle")}
+      </p>
     </div>
   );
 }
