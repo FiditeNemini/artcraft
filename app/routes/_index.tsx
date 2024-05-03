@@ -1,7 +1,6 @@
 import type { HeadersFunction } from "@remix-run/deno";
 import { withProtectionRoute } from "~/modules/withProtectedRoute";
 import { PageEnigma } from "~/pages/PageEnigma";
-import { useParams } from "@remix-run/react";
 
 // NB(bt): Netlify's custom directives cannot set headers for pages served by Remix,
 // so we must specify them here instead. Netlify header rules (in either _headers or
@@ -29,9 +28,6 @@ export const headers: HeadersFunction = ({
   "Cross-Origin-Opener-Policy": "same-origin",
 });
 
+const Index = withProtectionRoute(()=><PageEnigma />);
 
-const IdealEnigma = withProtectionRoute(()=>{
-  const params= useParams();
-  return <PageEnigma sceneToken={params.sceneToken}/>
-});
-export default IdealEnigma;
+export default Index;

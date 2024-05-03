@@ -1,27 +1,24 @@
 import { useContext, useEffect } from "react";
-
+import { AuthenticationContext } from "~/contexts/Authentication";
 import { AppUiContext } from "~/contexts/AppUiContext";
 import { EngineContext } from "~/contexts/EngineContext";
 import { PageEditor } from "~/pages/PageEnigma/PageEditor";
-import { useParams } from "@remix-run/react";
+import { signalScene } from "~/store";
 
-export const PageEnigmaComponent = () => {
-  const [, dispatchAppUiState] = useContext(AppUiContext);
+export const PageEnigmaComponent = ({
+  sceneToken
+}: {
+  sceneToken?: string;
+}) => {
   const editor = useContext(EngineContext);
-  const params = useParams();
 
   useEffect(() => {
-    if (editor && editor.can_initialize && dispatchAppUiState !== null) {
-      const sceneToken = params["sceneToken"];
-
-      editor.initialize(
-        {
-          dispatchAppUiState,
-        },
-        sceneToken,
+    if (editor && editor.can_initialize) {
+      editor.initialize({
+        sceneToken: sceneToken || ""}
       );
     }
-  }, [editor, dispatchAppUiState, params]);
+  }, [editor, sceneToken]);
 
   return <PageEditor />;
 };

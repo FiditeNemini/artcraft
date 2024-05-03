@@ -109,6 +109,7 @@ export class APIManager {
 
   public async loadSceneState(
     scene_media_file_token: string | null,
+    signalScene: ((data:any)=>void )| null,
   ): Promise<any> {
     const api_base_url = environmentVariables.value.BASE_API;
     const url = `${api_base_url}/v1/media_files/file/${scene_media_file_token}`;
@@ -118,6 +119,17 @@ export class APIManager {
     }
 
     const json = await JSON.parse(await response.text());
+    if(json && json.media_file && signalScene !== null){ 
+      if(json.media_file.maybe_title === null){
+        console.warn(`Scene /w Token: ${scene_media_file_token} has no title`);
+      }
+      signalScene({
+        title: json.media_file.maybe_title || "Untitled Scene",
+        token: scene_media_file_token,
+        ownerToken: json.media_file.maybe_creator_user.user_token,
+        isModified: false,
+      });
+    }
     const bucket_path = json["media_file"]["public_bucket_path"];
     const media_base_url = environmentVariables.value.GOOGLE_API;
     const media_url = `${media_base_url}/vocodes-public${bucket_path}`; // gets you a bucket path
@@ -136,7 +148,7 @@ export class APIManager {
       reader.readAsText(blob);
     });
 
-    console.log(`loadSceneState: ${JSON.stringify(json_result)}`);
+    // console.log(`loadSceneState: ${JSON.stringify(json_result)}`);
     return json_result;
   }
 

@@ -11,7 +11,7 @@ export const ItemElement = ({ item }: Props) => {
   useSignals();
   const thumbnail = item.thumbnail
     ? item.thumbnail
-    : `/resources/images/default-covers/${item.imageIndex}.webp`;
+    : `/resources/images/default-covers/${item.imageIndex || 0}.webp`;
 
   return (
     <div

@@ -24,7 +24,7 @@ import { LipSyncEngine } from "./lip_sync_engine.js";
 import { AnimationEngine } from "./animation_engine.js";
 
 import { PointerLockControls } from "three/addons/controls/PointerLockControls.js";
-import { APPUI_ACTION_TYPES } from "../../../reducers";
+import { APPUI_ACTION_TYPES, AppUiState, AppUiAction } from "../../../reducers";
 import { ClipGroup, ClipType } from "~/pages/PageEnigma/models/track";
 
 import { XYZ } from "../datastructures/common";
@@ -40,8 +40,20 @@ import {
   EditorStates,
   previewSrc,
 } from "~/pages/PageEnigma/store/engine";
+import { AuthState } from "~/contexts/Authentication/types";
 
 // Main editor class that will call everything else all you need to call is " initialize() ".
+
+export type EditorConstructorConfig = {
+  dispatchAppUiState: React.Dispatch<AppUiAction>;
+  signalScene: (data:any)=>void;
+  authState: AuthState;
+};
+
+export type EditorInitializeConfig = {
+  sceneToken: string;
+};
+
 class Editor {
   version: number;
   activeScene: Scene;
@@ -105,7 +117,9 @@ class Editor {
   can_initialize: boolean;
   switchPreviewToggle: boolean;
 
-  dispatchAppUiState: any; // todo figure out the type
+  dispatchAppUiState: React.Dispatch<AppUiAction>;
+  authState: AuthState;
+  signalScene: ((data:any)=>void);
   render_width: number;
   render_height: number;
 
@@ -126,7 +140,11 @@ class Editor {
 
   // global names of scene entities
   camera_name: string;
-  constructor() {
+  constructor({
+    dispatchAppUiState,
+    signalScene,
+    authState,
+  }:EditorConstructorConfig) {
     console.log(
       "If you see this message twice! then it rendered twice, if you see it once it's all good.",
     );
@@ -231,8 +249,10 @@ class Editor {
 
     this.current_frame = 0;
 
-    // Dispatcher
-    this.dispatchAppUiState = null;
+    //setup reactland Callbacks
+    this.dispatchAppUiState = dispatchAppUiState;
+    this.signalScene = signalScene;
+    this.authState = authState;
 
     // Scene State
     this.current_scene_media_token = null;
@@ -251,15 +271,9 @@ class Editor {
     );
   }
 
-  initialize(config: any, sceneToken: any) {
-    //setup reactland Callbacks
-    this.dispatchAppUiState = config.dispatchAppUiState;
-
-    // this is called by the parent for some reason
-    // this.dispatchAppUiState({
-    //   type: APPUI_ACTION_TYPES.SHOW_EDITOR_LOADER
-    // });
-
+  initialize({
+    sceneToken
+  }:EditorInitializeConfig) {
     if (this.can_initialize == false) {
       console.log("Editor Already Initialized");
       return;
@@ -426,6 +440,13 @@ class Editor {
 
     if (this.isEmpty(sceneToken) == false) {
       this.loadScene(sceneToken);
+    }else{
+      this.signalScene({
+        title: "Untitled New Scene",
+        token: undefined,
+        ownerToken: this.authState.userInfo?.user_token,
+        isModified: false,
+      });
     }
 
     document.addEventListener("mouseover", (event) => {
@@ -455,7 +476,7 @@ class Editor {
     loadingBarIsShowing.value = false;
   }
 
-  public async newScene() {
+  public async newScene(sceneTitleInput:string) {
     this.activeScene.clear();
     this.audio_engine = new AudioEngine();
     this.emotion_engine = new EmotionEngine(this.version);
@@ -476,6 +497,13 @@ class Editor {
       this.camera_name,
     );
     this.cam_obj = this.activeScene.get_object_by_name(this.camera_name);
+    const sceneTitle = sceneTitleInput && sceneTitleInput!=="" ? sceneTitleInput : "Untitled New Scene";
+    this.signalScene({
+      title: sceneTitle,
+      token: undefined,
+      ownerToken: this.authState.userInfo?.user_token,
+      isModified: false
+    })
   }
 
   // Token comes in from the front end to load the scene from the site.
@@ -496,14 +524,13 @@ class Editor {
     this.current_scene_media_token = scene_media_token;
 
     const scene_json = await this.api_manager
-      .loadSceneState(this.current_scene_media_token)
+      .loadSceneState(this.current_scene_media_token, this.signalScene)
       .catch((err) => {
         this.dispatchAppUiState({
           type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,
         });
         throw err;
       });
-
     const proxyScene = new StoryTellerProxyScene(
       this.version,
       this.activeScene,

@@ -7,12 +7,16 @@ import { LoadingBar } from "~/components";
 import { GenerateModals } from "~/pages/PageEnigma/comps/GenerateModals/GenerateModals";
 import { ErrorDialog } from "~/components/ErrorDialog";
 
-export const PageEnigma = () => {
+export const PageEnigma = ({
+  sceneToken
+}:{
+  sceneToken?:string
+}) => {
   useInferenceJobManager();
   return (
     <TrackProvider>
       <EngineProvider>
-        <PageEnigmaComponent />
+        <PageEnigmaComponent sceneToken={sceneToken}/>
         <DragComponent />
         <GenerateModals />
         <ErrorDialog />

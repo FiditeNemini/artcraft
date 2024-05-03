@@ -1,13 +1,12 @@
-import { json } from "@remix-run/router";
-import { withProtectionRoute } from "~/modules/withProtectedRoute";
-
 import { faChevronLeft } from "@fortawesome/pro-solid-svg-icons";
 import { P, H1, ButtonLink } from "~/components";
+import { json } from "@remix-run/router";
+
 export const loader = () => {
   return json(null, { status: 404 });
 };
 
-const Page404 = withProtectionRoute(()=>{
+export const Page404 = () => {
   return(
     <div
     className="fixed w-full overflow-scroll"
@@ -22,6 +21,6 @@ const Page404 = withProtectionRoute(()=>{
         <ButtonLink to="/" icon={faChevronLeft}>Back to Dashboard</ButtonLink>
       </div>
     </div>
-  )
-});
+  );
+};
 export default Page404;

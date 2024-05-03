@@ -19,7 +19,7 @@ export const DragComponent = () => {
 
   const thumbnail = dragItem.value.thumbnail
     ? dragItem.value.thumbnail
-    : `/resources/images/default-covers/${dragItem.value.imageIndex}.webp`;
+    : `/resources/images/default-covers/${dragItem.value.imageIndex ||0}.webp`;
 
   if (overTimeline.value) {
     if (canDrop.value && DndAsset.overElement) {

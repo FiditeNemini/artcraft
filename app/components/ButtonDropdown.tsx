@@ -19,6 +19,7 @@ interface ButtonDropdownProps {
     onClick?: () => void;
     disabled?: boolean;
     divider?: boolean;
+    onDialogOpen?: ()=>void;
     dialogProps?: {
       title: string;
       content: React.ReactNode;
@@ -50,6 +51,9 @@ export const ButtonDropdown = ({
     const option = options[index];
     if (option.onClick) {
       option.onClick();
+    }
+    if (option.onDialogOpen) {
+      option.onDialogOpen();
     }
     if (option.dialogProps) {
       setSelectedOptionIndex(index);
