@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 
 import { LoadingDots } from "~/components";
 import { SidePanel } from "~/modules/SidePanel";
@@ -18,19 +18,19 @@ import {
   sidePanelVisible,
   dndSidePanelWidth,
   dndTimelineHeight,
-  canDrop,
   dragItem,
+  canDrop,
 } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
 import { AppUiContext } from "~/contexts/AppUiContext";
 import { pageHeight, pageWidth } from "~/store";
 import { TopBar } from "~/modules/TopBar";
-import { AssetType } from "./models/assets";
 import {
   editorState,
   EditorStates,
   previewSrc,
 } from "~/pages/PageEnigma/store/engine";
+import { AssetType } from "~/pages/PageEnigma/models";
 
 export const PageEditor = () => {
   useSignals();
@@ -41,6 +41,12 @@ export const PageEditor = () => {
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation();
   };
+
+  useEffect(() => {
+    window.onbeforeunload = () => {
+      return "You may have unsaved changes.";
+    };
+  }, []);
 
   const dndWidth =
     dndSidePanelWidth.value > -1
