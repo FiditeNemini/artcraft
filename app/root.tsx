@@ -87,7 +87,7 @@ export default function App() {
       pageWidth.value = window.innerWidth;
     }
     timelineHeight.value = window.innerHeight * 0.25;
-    sidePanelWidth.value = 443;
+    sidePanelWidth.value = 340;
 
     setPage();
 

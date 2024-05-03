@@ -19,7 +19,7 @@ export const useMouseEventsSidePanel = () => {
         const delta = event.clientX - clientX;
         event.stopPropagation();
         event.preventDefault();
-        if (sidePanelWidth.value - delta < 0) {
+        if (sidePanelWidth.value - delta < 240) {
           return;
         }
         if (sidePanelWidth.value - delta > 443) {
