@@ -1,6 +1,6 @@
 import React from "react";
 import { animated, useSpring } from "@react-spring/web";
-import { Spinner } from "components/common";
+import { Panel, Spinner } from "components/common";
 import { springs } from "resources";
 import DynamicButton from "./DynamicButton";
 
@@ -70,30 +70,36 @@ export default function FaceAnimatorTitle({ ...rest }) {
   };
 
   return (
-    <div {...{ className: "progress-header mt-3 mb-5" }}>
-      <h1
-        {...{ className: "fw-bold text-center text-md-start progress-heading" }}
-      >
-        {t("headings.title")}
-      </h1>
-      <ul {...{ className: "async-progress-tracker py-3 py-lg-0" }}>
-        <ProgressLi {...{ disabled: noImg }}>{t("headings.image")}</ProgressLi>
-        <ProgressLi {...{ disabled: noAudio }}>
-          {t("headings.audio")}
-        </ProgressLi>
-      </ul>
-      <DynamicButton
-        {...{
-          className: "face-animation-submit",
-          disabled: incomplete || working,
-          onClick,
-          slides,
-          index: page,
-        }}
-      />
-      <p {...{ className: "progress-description fa-light-txt" }}>
-        {t("headings.subtitle")}
-      </p>
-    </div>
+    <Panel clear={true} className="mt-3 mb-5">
+      <div {...{ className: "progress-header" }}>
+        <h1
+          {...{
+            className: "fw-bold text-center text-md-start progress-heading",
+          }}
+        >
+          {t("headings.title")}
+        </h1>
+        <ul {...{ className: "async-progress-tracker py-3 py-lg-0" }}>
+          <ProgressLi {...{ disabled: noImg }}>
+            {t("headings.image")}
+          </ProgressLi>
+          <ProgressLi {...{ disabled: noAudio }}>
+            {t("headings.audio")}
+          </ProgressLi>
+        </ul>
+        <DynamicButton
+          {...{
+            className: "face-animation-submit",
+            disabled: incomplete || working,
+            onClick,
+            slides,
+            index: page,
+          }}
+        />
+        <p {...{ className: "progress-description fa-light-txt" }}>
+          {t("headings.subtitle")}
+        </p>
+      </div>
+    </Panel>
   );
 }
