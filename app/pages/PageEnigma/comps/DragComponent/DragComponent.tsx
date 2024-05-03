@@ -7,7 +7,6 @@ import {
   timelineHeight,
 } from "~/pages/PageEnigma/store";
 import { useSignals } from "@preact/signals-react/runtime";
-import "./DragComponent.scss";
 import DndAsset from "~/pages/PageEnigma/DragAndDrop/DndAsset";
 
 export const DragComponent = () => {
@@ -19,7 +18,7 @@ export const DragComponent = () => {
 
   const thumbnail = dragItem.value.thumbnail
     ? dragItem.value.thumbnail
-    : `/resources/images/default-covers/${dragItem.value.imageIndex ||0}.webp`;
+    : `/resources/images/default-covers/${dragItem.value.imageIndex || 0}.webp`;
 
   if (overTimeline.value) {
     if (canDrop.value && DndAsset.overElement) {
@@ -82,7 +81,7 @@ export const DragComponent = () => {
 
   return (
     <div
-      className="dragging-item-container absolute rounded-lg"
+      className="bg-dnd-wrapper/50 absolute rounded-lg backdrop-blur-sm"
       style={{
         width: 91,
         height: 114,

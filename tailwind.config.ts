@@ -152,6 +152,7 @@ export default {
         timeGrid: "#6375B5",
         timeGridBorder: "#7E92DA",
         cannotDrop: "#904948",
+        wrapper: "#39394d",
       },
 
       ui: {

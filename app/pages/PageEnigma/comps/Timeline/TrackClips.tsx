@@ -98,13 +98,12 @@ export const TrackClips = ({ id, clips, updateClip, group, type }: Props) => {
   }
 
   function onPointerMove(event: PointerEvent<HTMLDivElement>) {
-    if (!DndAsset.overElement) {
-      const element = document.getElementById(`track-${trackType}-${id}`);
-      DndAsset.overElement = element!.getBoundingClientRect();
-    }
     if (!getCanDrop({ dragType: dragItem.value?.type, type, group })) {
       return;
     }
+
+    const element = document.getElementById(`track-${trackType}-${id}`);
+    DndAsset.overElement = element!.getBoundingClientRect();
 
     const track = document.getElementById(`track-${trackType}-${id}`);
 
