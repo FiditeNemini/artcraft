@@ -24,6 +24,9 @@ pub enum MediaFileEngineCategory {
   /// A 3D animation.
   Animation,
 
+  /// A facial blend shape / shape key animation.
+  Expression,
+
   /// A 3D object that doesn't fit with the other types.
   Object,
 
@@ -43,6 +46,7 @@ impl MediaFileEngineCategory {
       Self::Scene => "scene",
       Self::Character => "character",
       Self::Animation => "animation",
+      Self::Expression => "expression",
       Self::Object => "object",
       Self::Skybox => "skybox",
     }
@@ -53,6 +57,7 @@ impl MediaFileEngineCategory {
       "scene" => Ok(Self::Scene),
       "character" => Ok(Self::Character),
       "animation" => Ok(Self::Animation),
+      "expression" => Ok(Self::Expression),
       "object" => Ok(Self::Object),
       "skybox" => Ok(Self::Skybox),
       _ => Err(format!("invalid value: {:?}", value)),
@@ -66,6 +71,7 @@ impl MediaFileEngineCategory {
       Self::Scene,
       Self::Character,
       Self::Animation,
+      Self::Expression,
       Self::Object,
       Self::Skybox,
     ])
@@ -85,6 +91,7 @@ mod tests {
       assert_serialization(MediaFileEngineCategory::Scene, "scene");
       assert_serialization(MediaFileEngineCategory::Character, "character");
       assert_serialization(MediaFileEngineCategory::Animation, "animation");
+      assert_serialization(MediaFileEngineCategory::Expression, "expression");
       assert_serialization(MediaFileEngineCategory::Object, "object");
       assert_serialization(MediaFileEngineCategory::Skybox, "skybox");
     }
@@ -94,6 +101,7 @@ mod tests {
       assert_eq!(MediaFileEngineCategory::Scene.to_str(), "scene");
       assert_eq!(MediaFileEngineCategory::Character.to_str(), "character");
       assert_eq!(MediaFileEngineCategory::Animation.to_str(), "animation");
+      assert_eq!(MediaFileEngineCategory::Expression.to_str(), "expression");
       assert_eq!(MediaFileEngineCategory::Object.to_str(), "object");
       assert_eq!(MediaFileEngineCategory::Skybox.to_str(), "skybox");
     }
@@ -103,6 +111,7 @@ mod tests {
       assert_eq!(MediaFileEngineCategory::from_str("scene").unwrap(), MediaFileEngineCategory::Scene);
       assert_eq!(MediaFileEngineCategory::from_str("character").unwrap(), MediaFileEngineCategory::Character);
       assert_eq!(MediaFileEngineCategory::from_str("animation").unwrap(), MediaFileEngineCategory::Animation);
+      assert_eq!(MediaFileEngineCategory::from_str("expression").unwrap(), MediaFileEngineCategory::Expression);
       assert_eq!(MediaFileEngineCategory::from_str("object").unwrap(), MediaFileEngineCategory::Object);
       assert_eq!(MediaFileEngineCategory::from_str("skybox").unwrap(), MediaFileEngineCategory::Skybox);
       assert!(MediaFileEngineCategory::from_str("foo").is_err());
@@ -111,10 +120,11 @@ mod tests {
     #[test]
     fn all_variants() {
       let mut variants = MediaFileEngineCategory::all_variants();
-      assert_eq!(variants.len(), 5);
+      assert_eq!(variants.len(), 6);
       assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Scene));
       assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Character));
       assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Animation));
+      assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Expression));
       assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Object));
       assert_eq!(variants.pop_first(), Some(MediaFileEngineCategory::Skybox));
       assert_eq!(variants.pop_first(), None);
