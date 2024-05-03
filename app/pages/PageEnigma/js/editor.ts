@@ -613,7 +613,13 @@ class Editor {
     }
   }
 
-  public async saveScene(name: string): Promise<string> {
+  public async saveScene({
+    sceneTitle,
+    sceneToken,
+  }:{
+    sceneTitle: string,
+    sceneToken?: string
+  }): Promise<string> {
     // remove controls when saving scene.
     this.removeTransformControls();
     this.dispatchAppUiState({
@@ -644,11 +650,11 @@ class Editor {
     };
 
     // TODO turn scene information into and object ...
-    const result = await this.api_manager.saveSceneState(
-      JSON.stringify(save_data),
-      name,
-      this.current_scene_glb_media_token,
-    );
+    const result = await this.api_manager.saveSceneState({
+      saveJson: JSON.stringify(save_data),
+      sceneTitle,
+      sceneToken,
+    });
 
     this.dispatchAppUiState({
       type: APPUI_ACTION_TYPES.HIDE_EDITOR_LOADER,

@@ -3,6 +3,10 @@ import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { STORAGE_KEYS } from "~/contexts/Authentication/types";
 import { environmentVariables } from "~/store";
+import {
+  updateExistingScene,
+  uploadNewScene
+} from "./api_fetchers";
 
 /**
  * Storyteller Studio API Manager
@@ -80,7 +84,6 @@ export class APIManager {
   constructor() {
     this.baseUrl = environmentVariables.value.BASE_API;
     this.sessionToken = localStorage.getItem(STORAGE_KEYS.SESSION_TOKEN) || "";
-    //this.baseUrl = "http://localhost:12345"
   }
 
   /**
@@ -89,22 +92,23 @@ export class APIManager {
    * @param scene_media_file_token If null we will we will create a new save or copy the scene, if provided we will overwrite the scene.
    * @returns APIManagerResponseMessage
    */
-  public async saveSceneState(
-    save_json: string,
-    scene_name: string,
-    scene_glb_media_file_token: string | null = null,
-  ): Promise<string> {
-    const file = new File([save_json], `${scene_name}.glb`, {
+  public async saveSceneState({
+    saveJson, sceneTitle, sceneToken
+  }:{
+    saveJson: string,
+    sceneTitle: string,
+    sceneToken?: string,
+  }): Promise<string> {
+    const file = new File([saveJson], `${sceneTitle}.glb`, {
       type: "application/json",
     });
 
-    // will overwrite the scene on db if token exists
-    const upload_glb_response = await this.uploadEngineAsset(
-      file,
-      scene_glb_media_file_token,
-    );
+    const uploadSceneResponse = sceneToken 
+      ? await updateExistingScene(file, sceneToken, this.sessionToken)
+      : await uploadNewScene(file, sceneTitle, this.sessionToken);
 
-    return upload_glb_response["media_file_token"];
+    console.log(uploadSceneResponse)
+    return uploadSceneResponse["media_file_token"];
   }
 
   public async loadSceneState(
@@ -182,43 +186,6 @@ export class APIManager {
     return file;
   }
 
-  private async uploadEngineAsset(
-    file: File,
-    media_file_token: string | null,
-  ): Promise<any> {
-    const url = `${this.baseUrl}/v1/media_files/write/engine_asset`;
-    const uuid = uuidv4();
-    const form_data = new FormData();
-    form_data.append("uuid_idempotency_token", uuid);
-
-    // update existing scene otherwise create new glb scene and use it's media_file_id
-    if (media_file_token != null) {
-      form_data.append("media_file_token", media_file_token);
-    }
-
-    form_data.append("file", file);
-    form_data.append("source", "file");
-    form_data.append("media_file_subtype", "scene_import");
-    form_data.append("media_file_class", "scene");
-
-    const response = await fetch(url, {
-      method: "POST",
-      // credentials: "include",
-      headers: {
-        Accept: "application/json",
-        session: this.sessionToken,
-      },
-      body: form_data,
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to Send Data");
-    } else {
-      const json_data = await response.json();
-      return json_data; // or handle the response as appropriate
-    }
-  }
-
   public async uploadMedia(
     blob: any,
     fileName: string,
@@ -294,7 +261,7 @@ export class APIManager {
     const result = await fetch(url)
       .then((response) => response.json())
       .then((data) => {
-        const result = data["media_files"].map((element) => {
+        const result = data["media_files"].map((element:any) => {
           return new MediaFile(
             element["public_bucket_path"],
             element["media_type"],

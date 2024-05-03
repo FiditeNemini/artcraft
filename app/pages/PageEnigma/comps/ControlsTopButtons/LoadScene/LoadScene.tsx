@@ -30,6 +30,7 @@ export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
       return;
     }
     sceneLoading.current = true;
+    // console.log("load scene");
     GetMediaByUser(
       authState.userInfo.username,
       {},
@@ -38,6 +39,7 @@ export const LoadScene = ({ onSceneSelect }: LoadSceneProps) => {
       },
     )
       .then((res: GetMediaListResponse) => {
+        // console.log(res);
         if (res.success && res.results) {
           setScenes(
             res.results.map((scene) => ({

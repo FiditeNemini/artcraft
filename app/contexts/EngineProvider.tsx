@@ -8,10 +8,12 @@ import { signalScene } from "~/store";
 import Editor from "~/pages/PageEnigma/js/editor";
 
 interface Props {
+  sceneToken?: string
   children: ReactNode;
 }
 
 export const EngineProvider = ({
+  sceneToken,
   children,
 }: Props) => {
   const [editor, setEditor] = useState<Editor | null>(null);
@@ -34,6 +36,14 @@ export const EngineProvider = ({
     });
     // }
   }, [dispatchAppUiState, authState]);
+
+  useEffect(() => {
+    if (editor && editor.can_initialize) {
+      editor.initialize({
+        sceneToken: sceneToken || ""}
+      );
+    }
+  }, [editor, sceneToken]);
 
   return (
     <EngineContext.Provider value={editor}>{children}</EngineContext.Provider>
