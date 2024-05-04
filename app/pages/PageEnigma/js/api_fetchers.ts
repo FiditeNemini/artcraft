@@ -7,7 +7,7 @@ import {
 export const uploadNewScene = async (
   file:File,
   sceneTitle: string,
-  sessionToken: string,
+  sessionToken: string
 ) => {
   const endpoint = uploadNewSceneEndpoint;
   const formData = new FormData();

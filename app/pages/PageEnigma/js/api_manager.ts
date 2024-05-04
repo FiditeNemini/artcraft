@@ -2,11 +2,12 @@ import { v4 as uuidv4 } from "uuid";
 import * as THREE from "three";
 import { GLTFExporter } from "three/addons/exporters/GLTFExporter.js";
 import { STORAGE_KEYS } from "~/contexts/Authentication/types";
-import { environmentVariables } from "~/store";
+import { environmentVariables, scene } from "~/store";
 import {
   updateExistingScene,
   uploadNewScene
 } from "./api_fetchers";
+import { uploadThumbnail } from "~/api";
 
 /**
  * Storyteller Studio API Manager
@@ -93,11 +94,12 @@ export class APIManager {
    * @returns APIManagerResponseMessage
    */
   public async saveSceneState({
-    saveJson, sceneTitle, sceneToken
+    saveJson, sceneTitle, sceneToken, sceneThumbnail
   }:{
     saveJson: string,
     sceneTitle: string,
     sceneToken?: string,
+    sceneThumbnail: Blob | undefined
   }): Promise<string> {
     const file = new File([saveJson], `${sceneTitle}.glb`, {
       type: "application/json",
@@ -106,6 +108,22 @@ export class APIManager {
     const uploadSceneResponse = sceneToken 
       ? await updateExistingScene(file, sceneToken, this.sessionToken)
       : await uploadNewScene(file, sceneTitle, this.sessionToken);
+
+    if (sceneThumbnail) {
+      let image_resp = await this.uploadMedia(sceneThumbnail, "render.png");
+      if (image_resp["media_file_token"]){
+        let image_token = image_resp["media_file_token"];
+        await fetch(uploadThumbnail+uploadSceneResponse["media_file_token"], {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            "Content-Type": "application/json",
+            session: this.sessionToken,
+          },
+          body: JSON.stringify({"cover_image_media_file_token": image_token}),
+        })
+      }
+    }
 
     console.log(uploadSceneResponse)
     return uploadSceneResponse["media_file_token"];
@@ -189,7 +207,7 @@ export class APIManager {
   public async uploadMedia(
     blob: any,
     fileName: string,
-  ): Promise<APIManagerResponseSuccess> {
+  ) { // Promise<APIManagerResponseSuccess>
     const url = `${this.baseUrl}/v1/media_files/upload`;
     const uuid = uuidv4();
 

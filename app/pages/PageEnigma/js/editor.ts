@@ -650,10 +650,19 @@ class Editor {
     };
 
     // TODO turn scene information into and object ...
+    let sceneThumbnail = undefined;
+
+    if (this.renderer) {
+      const imgData = this.renderer.domElement.toDataURL();
+      const response = await fetch(imgData); // Fetch the data URL
+      sceneThumbnail = await response.blob(); // Convert to Blob
+    }
+
     const result = await this.api_manager.saveSceneState({
       saveJson: JSON.stringify(save_data),
       sceneTitle,
       sceneToken,
+      sceneThumbnail
     });
 
     this.dispatchAppUiState({
@@ -1358,7 +1367,7 @@ class Editor {
             : ClipGroup.OBJECT, // TODO: add meta data to determine what it is a camera or a object or a character into prefab clips
         object_uuid: this.selected.uuid,
         object_name: this.selected.name,
-        version: this.version,
+        version: String(this.version),
         objectVectors: {
           position: {
             x: parseFloat(pos.x.toFixed(2)),
