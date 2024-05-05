@@ -5,6 +5,7 @@ pub mod billing;
 pub mod comments;
 pub mod email_sender_jobs;
 pub mod entity_stats;
+pub mod featured_items;
 pub mod generic_download;
 pub mod generic_inference;
 pub mod generic_synthetic_ids;

@@ -4,6 +4,7 @@ pub mod batch_generations;
 pub mod comments;
 pub mod email_sender_jobs;
 pub mod entity_stats;
+pub mod featured_items;
 pub mod generic_download_jobs;
 pub mod generic_inference_jobs;
 pub mod generic_synthetic_ids;

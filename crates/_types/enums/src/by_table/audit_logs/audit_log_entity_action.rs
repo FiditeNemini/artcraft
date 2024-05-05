@@ -24,6 +24,14 @@ pub enum AuditLogEntityAction {
   /// Delete action
   #[serde(rename = "delete")]
   Delete,
+
+  /// Create featured item
+  #[serde(rename = "featured_item_create")]
+  FeaturedItemCreate,
+
+  /// Delete featured item
+  #[serde(rename = "featured_item_delete")]
+  FeaturedItemDelete,
 }
 
 // TODO(bt, 2023-01-17): This desperately needs MySQL integration tests!
@@ -38,6 +46,8 @@ impl AuditLogEntityAction {
       Self::Edit => "edit",
       Self::EditFeatures => "edit_features",
       Self::Delete => "delete",
+      Self::FeaturedItemCreate => "featured_item_create",
+      Self::FeaturedItemDelete => "featured_item_delete",
     }
   }
 
@@ -47,6 +57,8 @@ impl AuditLogEntityAction {
       "edit" => Ok(Self::Edit),
       "edit_features" => Ok(Self::EditFeatures),
       "delete" => Ok(Self::Delete),
+      "featured_item_create" => Ok(Self::FeaturedItemCreate),
+      "featured_item_delete" => Ok(Self::FeaturedItemDelete),
       _ => Err(format!("invalid value: {:?}", value)),
     }
   }
@@ -66,6 +78,8 @@ mod tests {
       assert_serialization(AuditLogEntityAction::Edit, "edit");
       assert_serialization(AuditLogEntityAction::EditFeatures, "edit_features");
       assert_serialization(AuditLogEntityAction::Delete, "delete");
+      assert_serialization(AuditLogEntityAction::FeaturedItemCreate, "featured_item_create");
+      assert_serialization(AuditLogEntityAction::FeaturedItemDelete, "featured_item_delete");
     }
   }
 
@@ -78,6 +92,8 @@ mod tests {
       assert_eq!(AuditLogEntityAction::Edit.to_str(), "edit");
       assert_eq!(AuditLogEntityAction::EditFeatures.to_str(), "edit_features");
       assert_eq!(AuditLogEntityAction::Delete.to_str(), "delete");
+      assert_eq!(AuditLogEntityAction::FeaturedItemCreate.to_str(), "featured_item_create");
+      assert_eq!(AuditLogEntityAction::FeaturedItemDelete.to_str(), "featured_item_delete");
     }
 
     #[test]
@@ -86,6 +102,8 @@ mod tests {
       assert_eq!(AuditLogEntityAction::from_str("edit").unwrap(), AuditLogEntityAction::Edit);
       assert_eq!(AuditLogEntityAction::from_str("edit_features").unwrap(), AuditLogEntityAction::EditFeatures);
       assert_eq!(AuditLogEntityAction::from_str("delete").unwrap(), AuditLogEntityAction::Delete);
+      assert_eq!(AuditLogEntityAction::from_str("featured_item_create").unwrap(), AuditLogEntityAction::FeaturedItemCreate);
+      assert_eq!(AuditLogEntityAction::from_str("featured_item_delete").unwrap(), AuditLogEntityAction::FeaturedItemDelete);
       assert!(AuditLogEntityAction::from_str("foo").is_err());
     }
   }

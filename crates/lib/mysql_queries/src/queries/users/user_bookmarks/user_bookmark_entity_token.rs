@@ -9,6 +9,8 @@ use tokens::tokens::w2l_results::W2lResultToken;
 use tokens::tokens::w2l_templates::W2lTemplateToken;
 use tokens::tokens::zs_voices::ZsVoiceToken;
 
+// TODO(bt,2024-05-05): Make this a composite_identifier enum
+
 pub enum UserBookmarkEntityToken {
   User(UserToken),
   ModelWeight(ModelWeightToken),
