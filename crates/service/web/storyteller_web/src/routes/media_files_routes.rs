@@ -14,6 +14,7 @@ use crate::http_server::endpoints::media_files::list::list_featured_media_files_
 use crate::http_server::endpoints::media_files::list::list_media_files_handler::list_media_files_handler;
 use crate::http_server::endpoints::media_files::list::list_media_files_by_batch_token_handler::list_media_files_by_batch_token_handler;
 use crate::http_server::endpoints::media_files::list::list_media_files_for_user_handler::list_media_files_for_user_handler;
+use crate::http_server::endpoints::media_files::list::list_pinned_media_files_handler::list_pinned_media_files_handler;
 use crate::http_server::endpoints::media_files::upload::upload_audio_media_file_handler::upload_audio_media_file_handler;
 use crate::http_server::endpoints::media_files::upload::upload_engine_asset::upload_engine_asset_media_file_handler::upload_engine_asset_media_file_handler;
 use crate::http_server::endpoints::media_files::upload::upload_generic::upload_media_file_handler::upload_media_file_handler;
@@ -70,6 +71,10 @@ pub fn add_media_file_routes<T, B> (app: App<T>) -> App<T>
       )
       .service(web::resource("/list_featured")
           .route(web::get().to(list_featured_media_files_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/list_pinned")
+          .route(web::get().to(list_pinned_media_files_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
       .service(web::resource("/list/user/{username}")
