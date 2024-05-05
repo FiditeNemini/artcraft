@@ -36,13 +36,15 @@ import { useBookmarks, useMedia, useRatings, useSession } from "hooks";
 import { WeightCategory } from "@storyteller/components/src/api/_common/enums/WeightCategory";
 import SdBatchMediaPanel from "./components/SdBatchMediaPanel/SdBatchMediaPanel";
 import { GetMediaBatchImages } from "@storyteller/components/src/api/media_files/GetMediaBatchImages";
+import { CreateFeaturedItem } from "@storyteller/components/src/api/featured_items/CreateFeaturedItem";
 import { mediaTypeLabels } from "utils/mediaTypeLabels";
 import { EngineMediaPanel } from "./components/EngineMediaPanel/EngineMediaPanel";
 import { GetMediaFileTitle } from "common/GetMediaFileTitle";
 import { STYLES_BY_KEY } from "common/StyleOptions";
+import { faStarShooting } from "@fortawesome/pro-duotone-svg-icons";
 
 export default function MediaPage() {
-  const { canAccessStudio, canEditMediaFile, user } = useSession();
+  const { canAccessStudio, canEditMediaFile, canBanUsers, user } = useSession();
   const { token } = useParams<{ token: string }>();
   const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -69,6 +71,8 @@ export default function MediaPage() {
   const viewerCanEdit = canEditMediaFile(
     mediaFile?.maybe_creator_user?.user_token || ""
   );
+
+  const viewerCanMakeFeatured = canBanUsers() || false;
 
   // Inside MediaPage.tsx
 
@@ -98,6 +102,22 @@ export default function MediaPage() {
   const openDeleteModal = () => setIsDeleteModalOpen(true);
 
   const deleteMedia = () => remove(!!user?.can_ban_users);
+
+  const handleFeatureMedia = async () => {
+    setFeatureMedia(true);
+  }
+
+  const setFeatureMedia = async (setFeatured: boolean) => {
+    if (mediaFile === undefined) {
+      return;
+    }
+
+    const request = {
+      entity_type: "media_file",
+      entity_token: mediaFile.token
+    }
+    await CreateFeaturedItem("", request);
+  }
 
   const copyToClipboard = async (
     text: string,
@@ -828,6 +848,19 @@ export default function MediaPage() {
                       label="Rename File"
                       onClick={openDeleteModal}
                       to={`/media/rename/${mediaFile?.token || ""}`}
+                    />
+                  </div>
+                </>
+              )}
+              { viewerCanMakeFeatured && (
+                <>
+                  <div className="d-flex gap-2">
+                    <Button
+                      full={true}
+                      variant="secondary"
+                      icon={faStarShooting}
+                      label="Set Featured"
+                      onClick={handleFeatureMedia}
                     />
                   </div>
                 </>
