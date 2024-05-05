@@ -90,6 +90,7 @@ use crate::http_server::endpoints::weights::delete_weight_handler::*;
 use crate::http_server::endpoints::weights::get_weight_handler::*;
 use crate::http_server::endpoints::weights::list_available_weights_handler::*;
 use crate::http_server::endpoints::weights::list_featured_weights_handler::*;
+use crate::http_server::endpoints::weights::list_pinned_weights_handler::*;
 use crate::http_server::endpoints::weights::list_weights_by_user_handler::*;
 use crate::http_server::endpoints::weights::search_model_weights_handler::*;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::*;
@@ -147,6 +148,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::weights::get_weight_handler::get_weight_handler,
     crate::http_server::endpoints::weights::list_available_weights_handler::list_available_weights_handler,
     crate::http_server::endpoints::weights::list_featured_weights_handler::list_featured_weights_handler,
+    crate::http_server::endpoints::weights::list_pinned_weights_handler::list_pinned_weights_handler,
     crate::http_server::endpoints::weights::list_weights_by_user_handler::list_weights_by_user_handler,
     crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler,
     crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler,
@@ -309,6 +311,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListMediaFilesSuccessResponse,
     ListPinnedMediaFilesError,
     ListPinnedMediaFilesSuccessResponse,
+    ListPinnedWeightsError,
+    ListPinnedWeightsSuccessResponse,
     ListSessionJobsError,
     ListSessionJobsItem,
     ListSessionJobsQueryParams,
@@ -342,6 +346,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ModelWeightForList,
     ModelWeightSearchResult,
     PinnedMediaFile,
+    PinnedModelWeightForList,
     ProfileError,
     RatingRow,
     RenameMediaFileError,

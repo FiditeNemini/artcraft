@@ -7,6 +7,7 @@ use crate::http_server::endpoints::weights::delete_weight_handler::delete_weight
 use crate::http_server::endpoints::weights::get_weight_handler::get_weight_handler;
 use crate::http_server::endpoints::weights::list_available_weights_handler::list_available_weights_handler;
 use crate::http_server::endpoints::weights::list_featured_weights_handler::list_featured_weights_handler;
+use crate::http_server::endpoints::weights::list_pinned_weights_handler::list_pinned_weights_handler;
 use crate::http_server::endpoints::weights::list_weights_by_user_handler::list_weights_by_user_handler;
 use crate::http_server::endpoints::weights::search_model_weights_handler::search_model_weights_handler;
 use crate::http_server::endpoints::weights::set_model_weight_cover_image_handler::set_model_weight_cover_image_handler;
@@ -42,5 +43,6 @@ pub fn add_weights_routes<T, B>(app: App<T>) -> App<T>
         .route("/by_user/{username}", web::get().to(list_weights_by_user_handler))
         .route("/list", web::get().to(list_available_weights_handler))
         .route("/list_featured", web::get().to(list_featured_weights_handler))
+        .route("/list_pinned", web::get().to(list_pinned_weights_handler))
   )
 }

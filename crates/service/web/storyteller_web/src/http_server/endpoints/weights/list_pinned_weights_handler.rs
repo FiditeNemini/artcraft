@@ -1,0 +1,185 @@
+use std::sync::Arc;
+
+use actix_web::{HttpRequest, HttpResponse, web};
+use actix_web::error::ResponseError;
+use actix_web::http::StatusCode;
+use chrono::{DateTime, Utc};
+use log::{debug, error, warn};
+use r2d2_redis::redis::Commands;
+use utoipa::ToSchema;
+
+use buckets::public::media_files::bucket_file_path::MediaFileBucketPath;
+use enums::by_table::model_weights::{
+  weights_category::WeightsCategory,
+  weights_types::WeightsType,
+};
+use mysql_queries::queries::model_weights::list::list_weights_by_tokens::list_weights_by_tokens;
+use tokens::tokens::model_weights::ModelWeightToken;
+use users_component::common_responses::user_details_lite::UserDetailsLight;
+
+use crate::http_server::common_responses::weights_cover_image_details::WeightsCoverImageDetails;
+use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats;
+use crate::server_state::ServerState;
+
+#[derive(Serialize, ToSchema)]
+pub struct ListPinnedWeightsSuccessResponse {
+  pub success: bool,
+  pub results: Vec<PinnedModelWeightForList>,
+}
+
+#[derive(Serialize, ToSchema)]
+pub struct PinnedModelWeightForList {
+  pub weight_token: ModelWeightToken,
+
+  pub weight_type: WeightsType,
+  pub weight_category: WeightsCategory,
+
+  pub title: String,
+
+  pub creator: UserDetailsLight,
+
+  /// Information about the cover image.
+  pub cover_image: WeightsCoverImageDetails,
+
+  /// Cover images are small descriptive images that can be set for any model.
+  /// If a cover image is set, this is the path to the asset.
+  #[deprecated(note="switch to CoverImageDetails")]
+  pub maybe_cover_image_public_bucket_path: Option<String>,
+
+  /// Statistics about the weights
+  pub stats: SimpleEntityStats,
+
+  pub created_at: DateTime<Utc>,
+  pub updated_at: DateTime<Utc>,
+}
+
+/// The key we store pinned weights tokens under
+const REDIS_KEY : &str = "pinned_weights_list";
+
+#[derive(Debug, ToSchema)]
+pub enum ListPinnedWeightsError {
+  NotAuthorized,
+  ServerError,
+}
+
+impl std::fmt::Display for ListPinnedWeightsError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{:?}", self)
+  }
+}
+
+impl ResponseError for ListPinnedWeightsError {
+  fn status_code(&self) -> StatusCode {
+    match *self {
+      ListPinnedWeightsError::NotAuthorized => StatusCode::UNAUTHORIZED,
+      ListPinnedWeightsError::ServerError => StatusCode::INTERNAL_SERVER_ERROR,
+    }
+  }
+}
+
+/// List weights that were pinned by the moderators.
+#[utoipa::path(
+  get,
+  tag = "Model Weights",
+  path = "/v1/weights/list_pinned",
+  responses(
+    (status = 200, description = "List Weights", body = ListPinnedWeightsSuccessResponse),
+    (status = 401, description = "Not authorized", body = ListPinnedWeightsError),
+    (status = 500, description = "Server error", body = ListPinnedWeightsError),
+  ),
+)]
+pub async fn list_pinned_weights_handler(
+  http_request: HttpRequest,
+  server_state: web::Data<Arc<ServerState>>
+) -> Result<HttpResponse, impl ResponseError> {
+
+  let mut redis = server_state.redis_pool.get()
+      .map_err(|err| {
+        error!("Could not obtain redis: {err}");
+        ListPinnedWeightsError::ServerError
+      })?;
+
+  let token_list : Option<String> = redis.get(REDIS_KEY)
+      .map_err(|err| {
+        error!("Could not get redis result: {err}");
+        ListPinnedWeightsError::ServerError
+      })?;
+
+  let weight_tokens = token_list
+      .unwrap_or_else(|| "".to_string())
+      .split(",")
+      .into_iter()
+      .map(|item| item.trim())
+      .filter(|item| !item.is_empty())
+      .map(|item| ModelWeightToken::new_from_str(item))
+      .collect::<Vec<ModelWeightToken>>();
+
+  debug!("Weight tokens from Redis: {:?}", weight_tokens);
+
+  let mut weights = Vec::new();
+
+  if !weight_tokens.is_empty() {
+    let query_results =
+        list_weights_by_tokens(&server_state.mysql_pool, &weight_tokens, false).await;
+
+    weights = match query_results {
+      Ok(weights) => weights,
+      Err(e) => {
+        warn!("Query error: {:?}", e);
+        return Err(ListPinnedWeightsError::ServerError);
+      }
+    };
+  }
+
+  let response = ListPinnedWeightsSuccessResponse {
+    success: true,
+    results: weights.into_iter()
+        .map(|w| {
+          let cover_image_details = WeightsCoverImageDetails::from_optional_db_fields(
+            &w.token,
+            w.maybe_cover_image_public_bucket_hash.as_deref(),
+            w.maybe_cover_image_public_bucket_prefix.as_deref(),
+            w.maybe_cover_image_public_bucket_extension.as_deref(),
+          );
+
+          let maybe_cover_image = w.maybe_cover_image_public_bucket_hash
+              .as_deref()
+              .map(|hash| {
+                MediaFileBucketPath::from_object_hash(
+                  hash,
+                  w.maybe_cover_image_public_bucket_prefix.as_deref(),
+                  w.maybe_cover_image_public_bucket_extension.as_deref())
+                    .get_full_object_path_str()
+                    .to_string()
+              });
+
+          PinnedModelWeightForList {
+            weight_token: w.token,
+            title: w.title,
+            weight_type: w.weights_type,
+            weight_category: w.weights_category,
+            cover_image: cover_image_details,
+            maybe_cover_image_public_bucket_path: maybe_cover_image,
+            creator: UserDetailsLight::from_db_fields(
+              &w.creator_user_token,
+              &w.creator_username,
+              &w.creator_display_name,
+              &w.creator_email_gravatar_hash
+            ),
+            stats: SimpleEntityStats {
+              positive_rating_count: w.maybe_ratings_positive_count.unwrap_or(0),
+              bookmark_count: w.maybe_bookmark_count.unwrap_or(0),
+            },
+            created_at: w.created_at,
+            updated_at: w.updated_at,
+          }
+        }).collect::<Vec<_>>(),
+  };
+
+  let body = serde_json::to_string(&response)
+      .map_err(|e| ListPinnedWeightsError::ServerError)?;
+
+  Ok(HttpResponse::Ok()
+      .content_type("application/json")
+      .body(body))
+}
