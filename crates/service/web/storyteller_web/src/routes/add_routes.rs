@@ -35,6 +35,8 @@ use crate::http_server::endpoints::engine::create_scene_handler::create_scene_ha
 use crate::http_server::endpoints::engine::get_scene_handler::get_scene_handler;
 use crate::http_server::endpoints::engine::update_scene_handler::update_scene_handler;
 use crate::http_server::endpoints::events::list_events::list_events_handler;
+use crate::http_server::endpoints::featured_items::create_featured_item_handler::create_featured_item_handler;
+use crate::http_server::endpoints::featured_items::delete_featured_item_handler::delete_featured_item_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_refresh_flag_handler::disable_design_refresh_flag_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
 use crate::http_server::endpoints::image_gen::enqueue_image_generation::enqueue_image_generation_request;
@@ -177,6 +179,7 @@ pub fn add_routes<T, B> (app: App<T>, server_environment: ServerEnvironment) -> 
   app = add_media_upload_routes(app); /* /v1/media_upload/... */
   app = add_trending_routes(app); /* /v1/trending/... */
   app = add_user_rating_routes(app); /* /v1/user_rating/... */
+  app = add_featured_item_routes(app); /* /v1/featured_item/... */
   app = add_subscription_routes(app); /* /v1/subscriptions/... */
   app = add_voice_designer_routes(app); /* /v1/voice_designer */
   app = add_image_gen_routes(app);
@@ -910,6 +913,32 @@ fn add_user_rating_routes<T, B> (app: App<T>) -> App<T>
       )
   )
 }
+
+// ==================== FEATURED ITEM ROUTES ====================
+
+fn add_featured_item_routes<T, B> (app: App<T>) -> App<T>
+  where
+      B: MessageBody,
+      T: ServiceFactory<
+        ServiceRequest,
+        Config = (),
+        Response = ServiceResponse<B>,
+        Error = Error,
+        InitError = (),
+      >,
+{
+  app.service(web::scope("/v1/featured_item")
+      .service(web::resource("/create")
+          .route(web::post().to(create_featured_item_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/delete")
+          .route(web::delete().to(delete_featured_item_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+  )
+}
+
 
 // ==================== TWITCH ROUTES ====================
 

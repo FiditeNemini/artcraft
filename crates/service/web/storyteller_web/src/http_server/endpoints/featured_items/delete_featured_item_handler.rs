@@ -74,22 +74,21 @@ impl fmt::Display for DeleteFeaturedItemError {
   }
 }
 
+/// Remove a featured item (only mods can do this).
 #[utoipa::path(
   delete,
   tag = "Featured Items",
   path = "/v1/featured_item/delete",
-  params(
-  ("user_bookmark_token", description = "UserBookmarkToken"),
-  ),
+  request_body = DeleteFeaturedItemRequest,
   responses(
-    (status = 200, description = "Delete User Bookmark", body = SimpleGenericJsonSuccess),
+    (status = 200, description = "Success", body = SimpleGenericJsonSuccess),
     (status = 400, description = "Bad input", body = DeleteFeaturedItemError),
     (status = 401, description = "Not authorized", body = DeleteFeaturedItemError),
     (status = 404, description = "Not found", body = DeleteFeaturedItemError),
     (status = 500, description = "Server error", body = DeleteFeaturedItemError),
   ),
 )]
-pub async fn delete_user_bookmark_handler(
+pub async fn delete_featured_item_handler(
   http_request: HttpRequest,
   request: web::Json<DeleteFeaturedItemRequest>,
   server_state: web::Data<Arc<ServerState>>

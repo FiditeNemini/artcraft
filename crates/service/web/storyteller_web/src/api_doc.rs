@@ -1,5 +1,6 @@
 use utoipa::OpenApi;
 
+use enums::by_table::featured_items::featured_item_entity_type::FeaturedItemEntityType;
 use enums::by_table::generic_inference_jobs::frontend_failure_category::FrontendFailureCategory;
 use enums::by_table::generic_inference_jobs::inference_category::InferenceCategory;
 use enums::by_table::media_files::media_file_animation_type::MediaFileAnimationType;
@@ -42,6 +43,8 @@ use crate::http_server::common_responses::simple_entity_stats::SimpleEntityStats
 use crate::http_server::common_responses::weights_cover_image_details::*;
 use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::*;
 use crate::http_server::endpoints::engine::create_scene_handler::*;
+use crate::http_server::endpoints::featured_items::create_featured_item_handler::*;
+use crate::http_server::endpoints::featured_items::delete_featured_item_handler::*;
 use crate::http_server::endpoints::inference_job::batch_get_inference_job_status_handler::*;
 use crate::http_server::endpoints::inference_job::get_inference_job_status_handler::*;
 use crate::http_server::endpoints::inference_job::list_session_jobs_handler::*;
@@ -98,6 +101,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
   paths(
     crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::enqueue_fbx_to_gltf_handler,
     crate::http_server::endpoints::engine::create_scene_handler::create_scene_handler,
+    crate::http_server::endpoints::featured_items::create_featured_item_handler::create_featured_item_handler,
+    crate::http_server::endpoints::featured_items::delete_featured_item_handler::delete_featured_item_handler,
     crate::http_server::endpoints::inference_job::batch_get_inference_job_status_handler::batch_get_inference_job_status_handler,
     crate::http_server::endpoints::inference_job::get_inference_job_status_handler::get_inference_job_status_handler,
     crate::http_server::endpoints::inference_job::list_session_jobs_handler::list_session_jobs_handler,
@@ -172,6 +177,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileOriginModelType,
     MediaFileOriginProductCategory,
     MediaFileSubtype,
+    FeaturedItemEntityType,
     MediaFileType,
     PromptType,
     StyleTransferName,
@@ -221,11 +227,16 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ChangeMediaFileVisibilityError,
     ChangeMediaFileVisibilityPathInfo,
     ChangeMediaFileVisibilityRequest,
+    CreateFeaturedItemError,
+    CreateFeaturedItemRequest,
+    CreateFeaturedItemSuccessResponse,
     CreateSceneError,
     CreateSceneSuccessResponse,
     CreateUserBookmarkError,
     CreateUserBookmarkRequest,
     CreateUserBookmarkSuccessResponse,
+    DeleteFeaturedItemError,
+    DeleteFeaturedItemRequest,
     DeleteMediaFileError,
     DeleteMediaFilePathInfo,
     DeleteMediaFileRequest,
@@ -270,11 +281,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     GetWeightError,
     GetWeightPathInfo,
     GetWeightResponse,
+    InferenceJobStatusResponsePayload,
+    InferenceJobTokenType,
     InferTtsError,
     InferTtsRequest,
     InferTtsSuccessResponse,
-    InferenceJobStatusResponsePayload,
-    InferenceJobTokenType,
     ListAvailableWeightsQuery,
     ListAvailableWeightsSuccessResponse,
     ListDatasetsByUserError,
@@ -322,8 +333,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileForUserListItem,
     MediaFileInfo,
     MediaFileListItem,
-    MediaFileUploadError,
     MediaFilesByBatchListItem,
+    MediaFileUploadError,
     ModelWeightForList,
     ModelWeightSearchResult,
     ProfileError,

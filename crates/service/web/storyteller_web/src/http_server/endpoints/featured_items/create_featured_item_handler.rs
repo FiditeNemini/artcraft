@@ -81,6 +81,7 @@ impl fmt::Display for CreateFeaturedItemError {
   }
 }
 
+/// Create a featured item (only mods can do this).
 #[utoipa::path(
   post,
   tag = "Featured Items",
