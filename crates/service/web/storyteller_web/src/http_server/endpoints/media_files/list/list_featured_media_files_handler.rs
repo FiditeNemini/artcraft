@@ -68,6 +68,7 @@ pub struct ListFeaturedMediaFilesQueryParams {
   ///   - etc.
   pub filter_engine_categories: Option<String>,
 }
+
 #[derive(Serialize, ToSchema)]
 pub struct ListFeaturedMediaFilesSuccessResponse {
   pub success: bool,
@@ -230,13 +231,13 @@ pub async fn list_featured_media_files_handler(
   let query_results =
       list_featured_media_files(ListFeaturedMediaFilesArgs {
         limit,
-        maybe_filter_media_types: maybe_filter_media_types.as_ref(),
-        maybe_filter_media_classes: maybe_filter_media_classes.as_ref(),
-        maybe_filter_engine_categories: maybe_filter_engine_categories.as_ref(),
         maybe_offset: cursor,
         cursor_is_reversed,
         sort_ascending,
         view_as,
+        maybe_filter_media_types: maybe_filter_media_types.as_ref(),
+        maybe_filter_media_classes: maybe_filter_media_classes.as_ref(),
+        maybe_filter_engine_categories: maybe_filter_engine_categories.as_ref(),
         mysql_pool: &server_state.mysql_pool,
       }).await;
 

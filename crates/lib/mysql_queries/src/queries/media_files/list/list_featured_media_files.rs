@@ -23,10 +23,10 @@ pub struct FeaturedMediaFileListPage {
 
   pub sort_ascending: bool,
 
-  /// ID of the first record.
+  /// ID of the first record in the result set.
   pub first_id: Option<i64>,
 
-  /// ID of the last record.
+  /// ID of the last record in the result set.
   pub last_id: Option<i64>,
 }
 

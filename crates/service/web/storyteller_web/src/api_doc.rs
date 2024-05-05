@@ -300,6 +300,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     ListFeaturedMediaFilesQueryParams,
     ListFeaturedMediaFilesSuccessResponse,
     ListFeaturedWeightsError,
+    ListFeaturedWeightsQueryParams,
     ListFeaturedWeightsSuccessResponse,
     ListMediaFilesByBatchError,
     ListMediaFilesByBatchPathInfo,
