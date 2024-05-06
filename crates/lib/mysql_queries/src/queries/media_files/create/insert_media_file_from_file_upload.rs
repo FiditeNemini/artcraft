@@ -42,13 +42,10 @@ pub struct InsertMediaFileFromUploadArgs<'a> {
 
   pub maybe_mime_type: Option<&'a str>,
   pub file_size_bytes: u64,
-  pub duration_millis: u64,
   pub sha256_checksum: &'a str,
 
-  // TODO: Media duration.
-  //pub duration_millis: u64,
-
   pub maybe_title: Option<&'a str>,
+  pub maybe_duration_millis: Option<u64>,
 
   pub public_bucket_directory_hash: &'a str,
   pub maybe_public_bucket_prefix: Option<&'a str>,
@@ -114,6 +111,7 @@ SET
   checksum_sha2 = ?,
 
   maybe_title = ?,
+  maybe_duration_millis = ?,
 
   public_bucket_directory_hash = ?,
   maybe_public_bucket_prefix = ?,
@@ -151,6 +149,7 @@ SET
       args.sha256_checksum,
 
       args.maybe_title,
+      args.maybe_duration_millis,
 
       args.public_bucket_directory_hash,
       args.maybe_public_bucket_prefix,

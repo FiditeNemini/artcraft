@@ -71,6 +71,11 @@ pub struct UploadNewEngineAssetFileForm {
   #[multipart(limit = "2 KiB")]
   #[schema(value_type = Option<String>, format = Binary)]
   maybe_animation_type: Option<Text<MediaFileAnimationType>>,
+
+  /// Optional: The duration, for files that are animations.
+  #[multipart(limit = "2 KiB")]
+  #[schema(value_type = Option<u64>, format = Binary)]
+  maybe_duration_millis: Option<Text<u64>>,
 }
 
 #[derive(Serialize, ToSchema)]
@@ -170,9 +175,14 @@ pub async fn upload_new_engine_asset_media_file_handler(
 
   let engine_category = form.engine_category.0;
 
+  let maybe_duration_millis = form.maybe_duration_millis
+      .map(|duration| duration.0);
+
   let maybe_animation_type = form.maybe_animation_type.map(|t| t.0);
 
-  let maybe_title = form.maybe_title.map(|title| title.to_string());
+  let maybe_title = form.maybe_title
+      .map(|title| title.trim().to_string())
+      .filter(|title| !title.is_empty());
 
   let creator_set_visibility = form.maybe_visibility
       .map(|visibility| visibility.0)
@@ -263,7 +273,7 @@ pub async fn upload_new_engine_asset_media_file_handler(
     maybe_animation_type,
     maybe_mime_type: Some(mimetype),
     file_size_bytes: file_size_bytes as u64,
-    duration_millis: 0,
+    maybe_duration_millis,
     sha256_checksum: &hash,
     maybe_title: maybe_title.as_deref(),
     public_bucket_directory_hash: public_upload_path.get_object_hash(),

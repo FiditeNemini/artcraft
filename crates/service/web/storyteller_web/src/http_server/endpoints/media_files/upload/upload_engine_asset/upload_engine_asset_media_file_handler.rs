@@ -220,7 +220,7 @@ pub async fn upload_engine_asset_media_file_handler(
     maybe_animation_type: upload_media_request.maybe_animation_type,
     maybe_mime_type: Some(mimetype),
     file_size_bytes: file_size_bytes as u64,
-    duration_millis: 0,
+    maybe_duration_millis: None, // NB: We're migrating to a new endpoint.
     sha256_checksum: &hash,
     maybe_title: upload_media_request.maybe_title.as_deref(),
     public_bucket_directory_hash: public_upload_path.get_object_hash(),

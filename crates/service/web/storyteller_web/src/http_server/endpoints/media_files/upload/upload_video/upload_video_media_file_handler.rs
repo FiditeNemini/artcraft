@@ -229,7 +229,7 @@ pub async fn upload_video_media_file_handler(
     maybe_animation_type: None,
     maybe_mime_type: Some(mimetype),
     file_size_bytes: file_size_bytes as u64,
-    duration_millis: mp4_info.duration_millis as u64,
+    maybe_duration_millis: Some(mp4_info.duration_millis as u64),
     sha256_checksum: &hash,
     maybe_title: upload_media_request.title.as_deref(),
     public_bucket_directory_hash: public_upload_path.get_object_hash(),

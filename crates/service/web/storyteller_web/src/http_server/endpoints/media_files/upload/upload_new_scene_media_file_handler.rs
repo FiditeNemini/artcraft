@@ -164,7 +164,9 @@ pub async fn upload_new_scene_media_file_handler(
 
   // ==================== UPLOAD METADATA ==================== //
 
-  let maybe_title = form.maybe_title.map(|title| title.to_string());
+  let maybe_title = form.maybe_title
+      .map(|title| title.trim().to_string())
+      .filter(|title| !title.is_empty());
 
   let creator_set_visibility = form.maybe_visibility
       .map(|visibility| visibility.0)
@@ -242,7 +244,7 @@ pub async fn upload_new_scene_media_file_handler(
     maybe_animation_type: None,
     maybe_mime_type: Some(MIMETYPE),
     file_size_bytes: file_size_bytes as u64,
-    duration_millis: 0,
+    maybe_duration_millis: None,
     sha256_checksum: &hash,
     maybe_title: maybe_title.as_deref(),
     public_bucket_directory_hash: public_upload_path.get_object_hash(),

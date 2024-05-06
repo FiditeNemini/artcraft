@@ -334,7 +334,7 @@ pub async fn process_upload_media_file(
     maybe_animation_type: None,
     maybe_mime_type: Some(mime_type),
     file_size_bytes: file_size_bytes as u64,
-    duration_millis: 0, // TODO
+    maybe_duration_millis: None,
     sha256_checksum: &hash,
     maybe_title: upload_media_request.title.as_deref(),
     public_bucket_directory_hash: public_upload_path.get_object_hash(),

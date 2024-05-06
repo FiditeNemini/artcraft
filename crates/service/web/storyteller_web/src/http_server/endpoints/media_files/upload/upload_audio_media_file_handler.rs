@@ -330,7 +330,7 @@ pub async fn upload_audio_media_file_handler(
     maybe_animation_type: None,
     maybe_mime_type: Some(&mimetype),
     file_size_bytes: file_size_bytes as u64,
-    duration_millis: maybe_duration_millis.unwrap_or(0),
+    maybe_duration_millis,
     sha256_checksum: &hash,
     maybe_title: maybe_title.as_deref(),
     public_bucket_directory_hash: public_upload_path.get_object_hash(),
