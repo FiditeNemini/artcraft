@@ -1,4 +1,24 @@
 {
+  "MediaCategories": {
+    "all": "All",
+    "audio": "Audio",
+    "image": "Image",
+    "video": "Video",
+    "engine_asset": "3D Asset"
+  },
+  "MediaCategoriesPlural": {
+    "all": "All",
+    "audio": "Audio",
+    "image": "Images",
+    "video": "Videos",
+    "engine_asset": "3D Assets"
+  },
+  "WeightsCategories": {
+    "all": "All",
+    "faceAnimation": "Face Animator",
+    "tts": "Text to speech",
+    "voiceConversion": "Voice conversion"
+  },
   "WeightTypes": {
     "all": "All weights",
     "hifigan_tt2": "HiFi-GAN TT2",
@@ -20,5 +40,5 @@
     "glb": "GLB",
     "gltf": "gltf",
     "fbx": "FBX"
-  },
+  }
 }
