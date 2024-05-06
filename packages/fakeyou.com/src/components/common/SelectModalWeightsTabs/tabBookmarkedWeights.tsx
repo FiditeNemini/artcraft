@@ -1,17 +1,17 @@
-import React, {useRef, useState} from 'react';
+import React, { useRef, useState } from "react";
 import {
   // useBookmarks,
   useListContent,
   useRatings,
-  useSession
+  useSession,
 } from "hooks";
 import {
   Weight as WeightI,
-  GetBookmarksByUser
+  GetBookmarksByUser,
 } from "@storyteller/components/src/api";
 import { SelectModalData } from "../SelectModal";
 import prepFilter from "resources/prepFilter";
-import { 
+import {
   MasonryGrid,
   WeightsCards,
   Pagination,
@@ -19,14 +19,14 @@ import {
 } from "components/common";
 
 export default function WeightsTabsContent({
-  debug=false,
+  debug = false,
   weightType,
-  onSelect
-}:{
+  onSelect,
+}: {
   debug?: boolean;
   weightType: "sd_1.5" | "loRA";
-  onSelect: (data:SelectModalData) => void;
-}){
+  onSelect: (data: SelectModalData) => void;
+}) {
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   // const bookmarks = useBookmarks();
   const ratings = useRatings();
@@ -43,7 +43,7 @@ export default function WeightsTabsContent({
     list,
     listSet,
     requestList: true,
-    urlParam: user?.username || ""
+    urlParam: user?.username || "",
   });
   const handlePageClick = (selectedItem: { selected: number }) => {
     weights.pageChange(selectedItem.selected);
@@ -55,7 +55,7 @@ export default function WeightsTabsContent({
     pageCount: weights.pageCount + 1,
     currentPage: weights.page,
   };
-  if (weights.isLoading){
+  if (weights.isLoading) {
     return (
       <div className="row gx-3 gy-3">
         {Array.from({ length: 12 }).map((_, index) => (
@@ -63,23 +63,23 @@ export default function WeightsTabsContent({
         ))}
       </div>
     );
-  }else if (weights.list.length === 0 && weights.status === 3){
-    return(
-      <div className="text-center m-4 opacity-75">
-        No weights created yet.
-      </div>
+  } else if (weights.list.length === 0 && weights.status === 3) {
+    return (
+      <div className="text-center m-4 opacity-75">No weights created yet.</div>
     );
-  }else {
-    return(
+  } else {
+    return (
       <>
-        {paginationProps.pageCount > 1 && 
+        {paginationProps.pageCount > 1 && (
           <div className="d-flex justify-content-end mb-4">
             <Pagination {...paginationProps} />
           </div>
-        }
+        )}
         <MasonryGrid
           gridRef={gridContainerRef}
-          onLayoutComplete={() => {if(debug)console.log("Layout complete!")}}
+          onLayoutComplete={() => {
+            if (debug) console.log("Layout complete!");
+          }}
         >
           {weights.list.map((data: any, key: number) => {
             //TODO: data should be TYPED
@@ -95,21 +95,26 @@ export default function WeightsTabsContent({
             return (
               <div
                 {...{
-                  className: "col-12 col-sm-6 col-xl-4 grid-item",
+                  className:
+                    "col-12 col-sm-6 col-lg-6 col-xl-4 col-xxl-3 grid-item",
                   key,
                 }}
               >
-                <WeightsCards {...{ 
-                  type: data.details.maybe_weight_data.weight_category, props }} />
+                <WeightsCards
+                  {...{
+                    type: data.details.maybe_weight_data.weight_category,
+                    props,
+                  }}
+                />
               </div>
             );
           })}
         </MasonryGrid>
-        {paginationProps.pageCount > 1 && 
+        {paginationProps.pageCount > 1 && (
           <div className="d-flex justify-content-end mt-4">
             <Pagination {...paginationProps} />
           </div>
-        }
+        )}
       </>
     );
   }

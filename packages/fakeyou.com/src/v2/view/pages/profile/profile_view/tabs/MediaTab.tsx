@@ -30,7 +30,11 @@ export default function MediaTab({ username }: { username: string }) {
   const media = useListContent({
     addQueries: {
       page_size: urlQueries.get("page_size") || "24",
-      ...prepFilter(mediaType, "filter_media_type",mediaType === "3dFile" ? "bvh,glb,gltf" : "" ),
+      ...prepFilter(
+        mediaType,
+        "filter_media_type",
+        mediaType === "3dFile" ? "bvh,glb,gltf" : ""
+      ),
     },
     addSetters: { mediaTypeSet },
     // debug: "profile media",
@@ -118,11 +122,18 @@ export default function MediaTab({ username }: { username: string }) {
                     onLayoutComplete={() => console.log("Layout complete!")}
                   >
                     {media.list.map((data: MediaFile, key: number) => {
-                      let props = { bookmarks, data, source, ratings, type: "media" };
+                      let props = {
+                        bookmarks,
+                        data,
+                        source,
+                        ratings,
+                        type: "media",
+                      };
                       return (
                         <div
                           {...{
-                            className: "col-12 col-sm-6 col-xl-4 grid-item",
+                            className:
+                              "col-12 col-sm-6 col-lg-6 col-xl-4 col-xxl-3 grid-item",
                             key,
                           }}
                         >

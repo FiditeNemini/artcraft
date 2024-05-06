@@ -47,8 +47,12 @@ export default function ExplorePage(props: ExplorePageProps) {
   ];
 
   return (
-    <Container type="panel">
-      <PageHeader title="Explore" subText="View community created content" />
+    <Container type="panel-full">
+      <PageHeader
+        title="Explore"
+        titleH2={true}
+        subText="View community created content"
+      />
 
       <Panel mb={true}>
         <Tabs tabs={tabs} />

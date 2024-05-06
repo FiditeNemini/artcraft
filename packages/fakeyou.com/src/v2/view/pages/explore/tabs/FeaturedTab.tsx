@@ -19,8 +19,9 @@ export default function FeaturedTab() {
   const ratings = useRatings();
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const [list, listSet] = useState<MediaFile[]>([]);
-  const [listType,
-  // listTypeSet
+  const [
+    listType,
+    // listTypeSet
   ] = useState("media");
   // const [showMasonryGrid, setShowMasonryGrid] = useState(true);
   const [status, statusSet] = useState(FetchStatus.ready);
@@ -45,7 +46,7 @@ export default function FeaturedTab() {
             listSet(res.results);
           }
         });
-      } 
+      }
       // else if (listType === "weight") {}
     }
   }, [listType, status]);
@@ -56,7 +57,7 @@ export default function FeaturedTab() {
         <div className="fy-featured-header mb-3">
           <h3 className="fw-semibold mb-0">Featured</h3>
           {
-           // <SegmentButtons {...{ onChange, options, value: listType }}/> // switch between media/weights control
+            // <SegmentButtons {...{ onChange, options, value: listType }}/> // switch between media/weights control
           }
           <Link to="/explore/media">
             View media
@@ -94,7 +95,8 @@ export default function FeaturedTab() {
                   return (
                     <div
                       {...{
-                        className: "col-12 col-sm-6 col-xl-4 grid-item",
+                        className:
+                          "col-12 col-sm-6 col-lg-6 col-xl-4 col-xxl-3 grid-item",
                         key,
                       }}
                     >
@@ -139,7 +141,7 @@ export default function FeaturedTab() {
                 />
               );
               return (
-                <div key={index} className="col-12 col-sm-6 col-xl-4 grid-item">
+                <div key={index} className="col-12 col-sm-6 col-lg-6 col-xl-4 col-xxl-3 grid-item">
                   {card}
                 </div>
               );
