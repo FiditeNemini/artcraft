@@ -22,6 +22,8 @@ import Queue from "~/pages/PageEnigma/Queue/Queue";
 import { toTimelineActions } from "../../Queue/toTimelineActions";
 import { QueueKeyframe } from "~/pages/PageEnigma/models";
 import { editorState, EditorStates } from "~/pages/PageEnigma/store/engine";
+import { sidePanelHeight } from "../../store";
+import { twMerge } from "tailwind-merge";
 // import { current } from "tailwindcss/colors";
 
 // TODO this will be useful later to fix the bug on leading zeros
@@ -382,22 +384,24 @@ export const ControlPanelSceneObject = () => {
     editorEngine?.deleteObject(currentSceneObject.object_uuid);
   };
 
+  const getScale = () => {
+    const height = sidePanelHeight.value; // Ensure this is the correct way to get the height
+    return height < 603 ? height / 603 : 1;
+  };
+
   return (
     <Transition
       show={appUiState?.controlPanel.isShowing}
-      className={[
-        "absolute bottom-0 right-0",
-        "m-4 flex h-fit w-56 flex-col gap-2",
-        "rounded-lg",
-        "border border-ui-panel-border",
-        "bg-ui-panel p-3.5 text-white",
-      ].join(" ")}
+      className={twMerge(
+        "absolute bottom-0 right-0 m-3 flex h-fit w-56 origin-bottom-right flex-col gap-2 rounded-lg border border-ui-panel-border bg-ui-panel p-3.5 text-white shadow-lg",
+      )}
       enter="transition-opacity duration-150"
       enterFrom="opacity-0"
       enterTo="opacity-100"
       leave="transition-opacity duration-150"
       leaveFrom="opacity-100"
-      leaveTo="opacity-0">
+      leaveTo="opacity-0"
+      style={{ transform: `scale(${getScale()})` }}>
       <div className="mb-1 flex justify-between">
         <div className="flex items-center gap-2">
           <FontAwesomeIcon icon={faCube} />
@@ -423,8 +427,11 @@ export const ControlPanelSceneObject = () => {
         className={"flex flex-col gap-2 overflow-y-auto"}>
         <Button
           variant="secondary"
-          icon={locked ? faLockOpen : faLock}
-          onClick={toggleLock}>
+          icon={locked ? faLock : faLockOpen}
+          onClick={toggleLock}
+          className={
+            locked ? "bg-brand-primary/20 hover:bg-brand-primary/40" : ""
+          }>
           {locked ? "Unlock" : "Lock"} object
         </Button>
 
