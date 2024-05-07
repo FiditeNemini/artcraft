@@ -8,7 +8,6 @@ use actix_helpers::route_builder::RouteBuilder;
 use billing_component::default_routes::add_suggested_stripe_billing_routes;
 use reusable_types::server_environment::ServerEnvironment;
 use users_component::default_routes::add_suggested_api_v1_account_creation_and_session_routes;
-use users_component::endpoints::create_account_handler::create_account_handler;
 use users_component::endpoints::edit_profile_handler::edit_profile_handler;
 use users_component::endpoints::get_profile_handler::get_profile_handler;
 
@@ -37,12 +36,10 @@ use crate::http_server::endpoints::engine::update_scene_handler::update_scene_ha
 use crate::http_server::endpoints::events::list_events::list_events_handler;
 use crate::http_server::endpoints::featured_items::create_featured_item_handler::create_featured_item_handler;
 use crate::http_server::endpoints::featured_items::delete_featured_item_handler::delete_featured_item_handler;
+use crate::http_server::endpoints::featured_items::get_is_featured_item_handler::get_is_featured_item_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::disable_design_refresh_flag_handler::disable_design_refresh_flag_handler;
 use crate::http_server::endpoints::flags::design_refresh_flag::enable_design_refresh_flag_handler::enable_design_refresh_flag_handler;
 use crate::http_server::endpoints::image_gen::enqueue_image_generation::enqueue_image_generation_request;
-use crate::http_server::endpoints::inference_job::get_inference_job_status_handler::get_inference_job_status_handler;
-use crate::http_server::endpoints::inference_job::get_pending_inference_job_count_handler::get_pending_inference_job_count_handler;
-use crate::http_server::endpoints::inference_job::terminate_inference_job_handler::terminate_inference_job_handler;
 use crate::http_server::endpoints::investor_demo::disable_demo_mode_handler::disable_demo_mode_handler;
 use crate::http_server::endpoints::investor_demo::enable_demo_mode_handler::enable_demo_mode_handler;
 use crate::http_server::endpoints::leaderboard::get_leaderboard::leaderboard_handler;
@@ -934,6 +931,10 @@ fn add_featured_item_routes<T, B> (app: App<T>) -> App<T>
       )
       .service(web::resource("/delete")
           .route(web::delete().to(delete_featured_item_handler))
+          .route(web::head().to(|| HttpResponse::Ok()))
+      )
+      .service(web::resource("/is_featured/{entity_type}/{entity_token}")
+          .route(web::delete().to(get_is_featured_item_handler))
           .route(web::head().to(|| HttpResponse::Ok()))
       )
   )

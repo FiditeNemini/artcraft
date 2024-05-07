@@ -45,6 +45,7 @@ use crate::http_server::endpoints::conversion::enqueue_fbx_to_gltf_handler::*;
 use crate::http_server::endpoints::engine::create_scene_handler::*;
 use crate::http_server::endpoints::featured_items::create_featured_item_handler::*;
 use crate::http_server::endpoints::featured_items::delete_featured_item_handler::*;
+use crate::http_server::endpoints::featured_items::get_is_featured_item_handler::*;
 use crate::http_server::endpoints::inference_job::batch_get_inference_job_status_handler::*;
 use crate::http_server::endpoints::inference_job::get_inference_job_status_handler::*;
 use crate::http_server::endpoints::inference_job::list_session_jobs_handler::*;
@@ -105,6 +106,7 @@ use crate::http_server::web_utils::response_success_helpers::*;
     crate::http_server::endpoints::engine::create_scene_handler::create_scene_handler,
     crate::http_server::endpoints::featured_items::create_featured_item_handler::create_featured_item_handler,
     crate::http_server::endpoints::featured_items::delete_featured_item_handler::delete_featured_item_handler,
+    crate::http_server::endpoints::featured_items::get_is_featured_item_handler::get_is_featured_item_handler,
     crate::http_server::endpoints::inference_job::batch_get_inference_job_status_handler::batch_get_inference_job_status_handler,
     crate::http_server::endpoints::inference_job::get_inference_job_status_handler::get_inference_job_status_handler,
     crate::http_server::endpoints::inference_job::list_session_jobs_handler::list_session_jobs_handler,
@@ -273,6 +275,9 @@ use crate::http_server::web_utils::response_success_helpers::*;
     GetInferenceJobStatusError,
     GetInferenceJobStatusPathInfo,
     GetInferenceJobStatusSuccessResponse,
+    GetIsFeaturedItemError,
+    GetIsFeaturedItemPathInfo,
+    GetIsFeaturedItemSuccessResponse,
     GetMediaFileError,
     GetMediaFileModelInfo,
     GetMediaFilePathInfo,
@@ -286,11 +291,11 @@ use crate::http_server::web_utils::response_success_helpers::*;
     GetWeightError,
     GetWeightPathInfo,
     GetWeightResponse,
-    InferenceJobStatusResponsePayload,
-    InferenceJobTokenType,
     InferTtsError,
     InferTtsRequest,
     InferTtsSuccessResponse,
+    InferenceJobStatusResponsePayload,
+    InferenceJobTokenType,
     ListAvailableWeightsQuery,
     ListAvailableWeightsSuccessResponse,
     ListDatasetsByUserError,
@@ -343,8 +348,8 @@ use crate::http_server::web_utils::response_success_helpers::*;
     MediaFileForUserListItem,
     MediaFileInfo,
     MediaFileListItem,
-    MediaFilesByBatchListItem,
     MediaFileUploadError,
+    MediaFilesByBatchListItem,
     ModelWeightForList,
     ModelWeightSearchResult,
     PinnedMediaFile,

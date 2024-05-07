@@ -30,9 +30,20 @@ pub fn nullable_i8_to_optional_bool(value: Option<i8>) -> Option<bool> {
   value.map(|v| i8_to_bool(v))
 }
 
+
+/// MySQL "is null" returns i64.
+pub fn i64_to_bool(value: i64) -> bool {
+  if value == 0 {
+    false
+  } else {
+    true
+  }
+}
+
+
 #[cfg(test)]
 mod tests {
-  use crate::helpers::boolean_converters::{i8_to_bool, nullable_i8_to_bool, nullable_i8_to_bool_default_false, nullable_i8_to_optional_bool};
+  use crate::helpers::boolean_converters::{i64_to_bool, i8_to_bool, nullable_i8_to_bool, nullable_i8_to_bool_default_false, nullable_i8_to_optional_bool};
 
   #[test]
   fn test_i8_to_bool() {
@@ -75,5 +86,13 @@ mod tests {
     assert_eq!(nullable_i8_to_optional_bool(Some(1)), Some(true));
     assert_eq!(nullable_i8_to_optional_bool(Some(100)), Some(true));
     assert_eq!(nullable_i8_to_optional_bool(Some(-100)), Some(true));
+  }
+
+  #[test]
+  fn test_i64_to_bool() {
+    assert_eq!(i64_to_bool(0), false);
+    assert_eq!(i64_to_bool(1), true);
+    assert_eq!(i64_to_bool(-1), true);
+    assert_eq!(i64_to_bool(120), true);
   }
 }
